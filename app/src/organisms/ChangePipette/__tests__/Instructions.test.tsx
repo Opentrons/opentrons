@@ -1,17 +1,23 @@
 import * as React from 'react'
 import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
 import { fireEvent, screen } from '@testing-library/react'
-import { LEFT, PipetteModelSpecs } from '@opentrons/shared-data'
+import { LEFT } from '@opentrons/shared-data'
 import { fixtureP10Multi } from '@opentrons/shared-data/pipette/fixtures/name'
 import { i18n } from '../../../i18n'
 import { mockPipetteInfo } from '../../../redux/pipettes/__fixtures__'
+import { LevelPipette } from '../LevelPipette'
 import { Instructions } from '../Instructions'
 import { CheckPipettesButton } from '../CheckPipettesButton'
+import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
 jest.mock('../CheckPipettesButton')
+jest.mock('../LevelPipette')
 
 const mockCheckPipettesButton = CheckPipettesButton as jest.MockedFunction<
   typeof CheckPipettesButton
+>
+const mockLevelPipette = LevelPipette as jest.MockedFunction<
+  typeof LevelPipette
 >
 
 const render = (props: React.ComponentProps<typeof Instructions>) => {
@@ -44,6 +50,7 @@ describe('Instructions', () => {
       back: jest.fn(),
       setStepPage: jest.fn(),
       stepPage: 0,
+      attachedWrong: false,
     }
     mockCheckPipettesButton.mockReturnValue(
       <div>mock check pipettes button</div>
@@ -94,6 +101,7 @@ describe('Instructions', () => {
       back: jest.fn(),
       setStepPage: jest.fn(),
       stepPage: 0,
+      attachedWrong: false,
     }
     const { getByText, getByRole } = render(props)
     getByText('Choose a pipette to attach')
@@ -116,6 +124,7 @@ describe('Instructions', () => {
       back: jest.fn(),
       setStepPage: jest.fn(),
       stepPage: 0,
+      attachedWrong: false,
     }
     const { getByText, getByRole, getByAltText } = render(props)
     getByText('Insert screws')
@@ -147,6 +156,7 @@ describe('Instructions', () => {
       back: jest.fn(),
       setStepPage: jest.fn(),
       stepPage: 1,
+      attachedWrong: false,
     }
     const { getByText, getByRole, getByAltText } = render(props)
     getByText('Attach the pipette')
@@ -173,6 +183,7 @@ describe('Instructions', () => {
       back: jest.fn(),
       setStepPage: jest.fn(),
       stepPage: 0,
+      attachedWrong: false,
     }
     const { getByText, getByRole, getByAltText } = render(props)
     getByText('Insert screws')
@@ -203,6 +214,7 @@ describe('Instructions', () => {
       back: jest.fn(),
       setStepPage: jest.fn(),
       stepPage: 1,
+      attachedWrong: false,
     }
     const { getByText, getByRole, getByAltText } = render(props)
     getByText('Attach the pipette')
@@ -216,6 +228,50 @@ describe('Instructions', () => {
     getByText('mock check pipettes button')
   })
 
-  //  TOD0(JR, 29.08.22): figure out how to mock the checkPipetteButton so you can click on it
-  //  and render the LevelPipette component
+  it('renders the attach flow 2nd page when a p10 8 channel is selected and the pipette is wrong', () => {
+    props = {
+      robotName: 'otie',
+      mount: LEFT,
+      wantedPipette: fixtureP10Multi,
+      actualPipette: null,
+      displayCategory: 'GEN1',
+      direction: 'attach',
+      setWantedName: jest.fn(),
+      confirm: jest.fn(),
+      back: jest.fn(),
+      setStepPage: jest.fn(),
+      stepPage: 1,
+      attachedWrong: true,
+    }
+    const { getByText, getByRole, getByAltText } = render(props)
+    getByText('Attach the pipette')
+    getByText(
+      'Push in the white connector tab until you feel it plug into the pipette.'
+    )
+    getByAltText('attach-left-multi-GEN1-tab')
+    const goBack = getByRole('button', { name: 'Go back' })
+    fireEvent.click(goBack)
+    expect(props.setStepPage).toHaveBeenCalled()
+    getByText('mock check pipettes button')
+  })
+
+  it('renders the attach flow 3rd page when a p300 8 channel is selected', () => {
+    mockLevelPipette.mockReturnValue(<div>mockLevelPipette</div>)
+    props = {
+      robotName: 'otie',
+      mount: LEFT,
+      wantedPipette: fixtureP10Multi,
+      actualPipette: fixtureP10Multi as PipetteModelSpecs,
+      displayCategory: 'GEN1',
+      direction: 'attach',
+      setWantedName: jest.fn(),
+      confirm: jest.fn(),
+      back: jest.fn(),
+      setStepPage: jest.fn(),
+      stepPage: 2,
+      attachedWrong: false,
+    }
+    const { getByText } = render(props)
+    getByText('mockLevelPipette')
+  })
 })

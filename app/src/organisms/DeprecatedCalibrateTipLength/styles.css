@@ -1,0 +1,10 @@
+@import '@opentrons/components';
+
+.alert_modal_padding {
+  padding: 4rem 1rem;
+}
+
+.block_image {
+  max-height: 20rem;
+  max-width: 16rem;
+}

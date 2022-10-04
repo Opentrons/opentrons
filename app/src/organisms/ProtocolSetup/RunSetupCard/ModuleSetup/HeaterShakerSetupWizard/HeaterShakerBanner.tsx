@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { COLORS } from '@opentrons/components'
 import { Divider } from '../../../../../atoms/structure/Divider'
+import { TertiaryButton } from '../../../../../atoms/buttons'
 import { HeaterShakerWizard } from '../../../../Devices/HeaterShakerWizard'
 import { ModuleRenderInfoForProtocol } from '../../../../Devices/hooks'
 import { Banner, BannerItem } from '../Banner/Banner'
@@ -23,15 +24,19 @@ export function HeaterShakerBanner(
     <Banner title={t('attach_heater_shaker_to_deck', { name: displayName })}>
       {modules.map((module, index) => (
         <React.Fragment key={index}>
-          {wizardId === module.moduleId &&
-            module.attachedModuleMatch?.moduleType ===
-              HEATERSHAKER_MODULE_TYPE && (
-              <HeaterShakerWizard
-                onCloseClick={() => setWizardId(null)}
-                moduleFromProtocol={module}
-                attachedModule={module.attachedModuleMatch}
-              />
-            )}
+          {wizardId === module.moduleId && (
+            <HeaterShakerWizard
+              onCloseClick={() => setWizardId(null)}
+              moduleFromProtocol={module}
+              attachedModule={
+                module.attachedModuleMatch != null &&
+                module.attachedModuleMatch?.moduleType ===
+                  HEATERSHAKER_MODULE_TYPE
+                  ? module.attachedModuleMatch
+                  : null
+              }
+            />
+          )}
           {index > 0 && <Divider color={COLORS.medGreyEnabled} />}
           <BannerItem
             title={t('module_in_slot', {
@@ -39,8 +44,14 @@ export function HeaterShakerBanner(
               slotName: module.slotName,
             })}
             body={t('improperly_fastened_description')}
-            btnText={t('view_instructions')}
-            onClick={() => setWizardId(module.moduleId)}
+            button={
+              <TertiaryButton
+                data-testid="HeaterShakerBanner_Button"
+                onClick={() => setWizardId(module.moduleId)}
+              >
+                {t('view_instructions')}
+              </TertiaryButton>
+            }
           />
         </React.Fragment>
       ))}

@@ -17,6 +17,7 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     HomeRequest,
     GripperGripRequest,
     GripperHomeRequest,
+    AddBrushedLinearMoveRequest,
     TipActionRequest,
     TipActionResponse,
 )
@@ -202,27 +203,21 @@ class MoveGroupRunner:
     def _get_brushed_motor_message(
         self, step: MoveGroupSingleGripperStep, group: int, seq: int
     ) -> MessageDefinition:
+        payload = GripperMoveRequestPayload(
+            group_id=UInt8Field(group),
+            seq_id=UInt8Field(seq),
+            duration=UInt32Field(
+                int(step.duration_sec * brushed_motor_interrupts_per_sec)
+            ),
+            duty_cycle=UInt32Field(int(step.pwm_duty_cycle)),
+            encoder_position_um=Int32Field(int(step.encoder_position_um)),
+        )
         if step.move_type == MoveType.home:
-            home_payload = GripperMoveRequestPayload(
-                group_id=UInt8Field(group),
-                seq_id=UInt8Field(seq),
-                duration=UInt32Field(
-                    int(step.duration_sec * brushed_motor_interrupts_per_sec)
-                ),
-                duty_cycle=UInt32Field(int(step.pwm_duty_cycle)),
-            )
-            return GripperHomeRequest(payload=home_payload)
-
+            return GripperHomeRequest(payload=payload)
+        elif step.move_type == MoveType.grip:
+            return GripperGripRequest(payload=payload)
         else:
-            linear_payload = GripperMoveRequestPayload(
-                group_id=UInt8Field(group),
-                seq_id=UInt8Field(seq),
-                duration=UInt32Field(
-                    int(step.duration_sec * brushed_motor_interrupts_per_sec)
-                ),
-                duty_cycle=UInt32Field(int(step.pwm_duty_cycle)),
-            )
-            return GripperGripRequest(payload=linear_payload)
+            return AddBrushedLinearMoveRequest(payload=payload)
 
     def _get_stepper_motor_message(
         self, step: MoveGroupSingleAxisStep, group: int, seq: int

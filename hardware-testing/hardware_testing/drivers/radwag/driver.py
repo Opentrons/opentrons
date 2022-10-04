@@ -18,6 +18,13 @@ from .responses import RadwagResponse, RadwagResponseCodes, radwag_response_pars
 class RadwagScaleBase(ABC):
     """Base class if Radwag scale driver."""
 
+    @classmethod
+    def vid_pid(cls) -> Tuple[int, int]:
+        """Radwag scale VID:PID."""
+        # TODO: check and handle the vid:pid of other scales
+        # vid:pid for Radwag's "AS 82/220.X2 PLUS" USB2 (usb-b) port
+        return 0x0483, 0xA1AD
+
     @abstractmethod
     def connect(self) -> None:
         """Connect to the scale."""
@@ -80,13 +87,6 @@ class RadwagScale(RadwagScaleBase):
     def __init__(self, connection: Serial) -> None:
         """Constructor."""
         self._connection = connection
-
-    @classmethod
-    def vid_pid(cls) -> Tuple[int, int]:
-        """Radwag scale VID:PID."""
-        # TODO: check and handle the vid:pid of other scales
-        # vid:pid for Radwag's "AS 82/220.X2 PLUS" USB2 (usb-b) port
-        return 1155, 41389
 
     @classmethod
     def create(

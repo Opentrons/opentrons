@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.1.0](https://github.com/Opentrons/opentrons/compare/v6.0.1...v6.1.0) (2022-09-27)
+
+
+### Bug Fixes
+
+* **protocol-designer:** truncate labware type name ([#11364](https://github.com/Opentrons/opentrons/issues/11364)) ([e8211c4](https://github.com/Opentrons/opentrons/commit/e8211c4183d3c7021938dc2bc08ca16c6eee45a7))
+
+
+### Features
+
+* **api, step-generation:** emit and ingest command keys ([#10885](https://github.com/Opentrons/opentrons/issues/10885)) ([4f81309](https://github.com/Opentrons/opentrons/commit/4f81309c4cc546cd36b90f637cd4be447ddd08a5))
+* **app:** update React Select to 5.4.0 and add to App package.json ([#11104](https://github.com/Opentrons/opentrons/issues/11104)) ([8cbd3b8](https://github.com/Opentrons/opentrons/commit/8cbd3b851f317c2b36c5e5eb5212119364d68e60)), closes [#11020](https://github.com/Opentrons/opentrons/issues/11020)
+* **protocol-designer:** add custom liquid color picker ([#10958](https://github.com/Opentrons/opentrons/issues/10958)) ([b4a11af](https://github.com/Opentrons/opentrons/commit/b4a11af69a25d7e481b30c9fc0b4f6fd7c008bc0)), closes [#10573](https://github.com/Opentrons/opentrons/issues/10573) [#10601](https://github.com/Opentrons/opentrons/issues/10601)
+* **protocol-designer:** add new liquid icon design ([#11085](https://github.com/Opentrons/opentrons/issues/11085)) ([f097d56](https://github.com/Opentrons/opentrons/commit/f097d56c1a31f0c2eec5d6d23fb75df61dd833cc)), closes [#10602](https://github.com/Opentrons/opentrons/issues/10602)
+* **protocol-designer:** add slot 6 as accepted slot for HS ([#11275](https://github.com/Opentrons/opentrons/issues/11275)) ([17f6a75](https://github.com/Opentrons/opentrons/commit/17f6a75bd0605f8962b722477b28984383b46e49)), closes [#11148](https://github.com/Opentrons/opentrons/issues/11148)
+* **protocol-designer:** render modals within viewport ([#11284](https://github.com/Opentrons/opentrons/issues/11284)) ([be6b618](https://github.com/Opentrons/opentrons/commit/be6b618ff30dec2e6fe81300bb02f2ba5b0c8730))
+
+
+
+
+
 ## [6.0.1](https://github.com/Opentrons/opentrons/compare/v6.0.0...v6.0.1) (2022-08-09)
 
 **Note:** Version bump only for package protocol-designer

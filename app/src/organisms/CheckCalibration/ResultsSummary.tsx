@@ -18,7 +18,6 @@ import {
   COLOR_SUCCESS,
   COLOR_WARNING,
   OVERLAY_LIGHT_GRAY_50,
-  FONT_HEADER_DARK,
   FONT_SIZE_BODY_1,
   FONT_WEIGHT_SEMIBOLD,
   JUSTIFY_CENTER,
@@ -36,6 +35,7 @@ import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
 import find from 'lodash/find'
 import { PIPETTE_MOUNTS, LEFT, RIGHT } from '../../redux/pipettes'
+import { StyledText } from '../../atoms/text'
 import { saveAs } from 'file-saver'
 
 import type { Mount } from '../../redux/pipettes/types'
@@ -155,13 +155,13 @@ export function ResultsSummary(
         justifyContent={JUSTIFY_START}
         flexDirection={DIRECTION_COLUMN}
       >
-        <Text
-          css={FONT_HEADER_DARK}
+        <StyledText
+          as="h1"
           marginTop={SPACING_2}
           textTransform={TEXT_TRANSFORM_CAPITALIZE}
         >
           {ROBOT_CALIBRATION_CHECK_SUMMARY_HEADER}
-        </Text>
+        </StyledText>
         <Box
           minHeight={SPACING_2}
           marginBottom={SPACING_3}

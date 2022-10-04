@@ -39,6 +39,12 @@ const MODAL_STYLE = {
   boxShadow: BORDERS.smallDropShadow,
 } as const
 
+const FULL_PAGE_STYLE = {
+  overflowY: OVERFLOW_AUTO,
+  height: '100%',
+  width: '100%',
+} as const
+
 const HEADER_STYLE = {
   backgroundColor: COLORS.white,
   position: POSITION_STICKY,
@@ -59,6 +65,8 @@ export interface ModalShellProps extends StyleProps {
   header?: React.ReactNode
   /** Optional sticky footer */
   footer?: React.ReactNode
+  /** Optional full page takeover */
+  fullPage?: boolean
   /** Modal content */
   children: React.ReactNode
 }
@@ -79,6 +87,7 @@ export function ModalShell(props: ModalShellProps): JSX.Element {
     zIndex = 10,
     header,
     footer,
+    fullPage = false,
     children,
     ...styleProps
   } = props
@@ -100,14 +109,17 @@ export function ModalShell(props: ModalShellProps): JSX.Element {
     >
       <Flex {...BASE_STYLE} zIndex={zIndex}>
         <Box
-          {...MODAL_STYLE}
-          {...styleProps}
+          {...(fullPage ? FULL_PAGE_STYLE : MODAL_STYLE)}
+          // apply background color style prop only to full page - omitting width, margin, etc
+          {...(fullPage
+            ? { backgroundColor: styleProps.backgroundColor ?? COLORS.white }
+            : styleProps)}
           onClick={e => {
             e.stopPropagation()
           }}
         >
           {header != null ? <Box {...HEADER_STYLE}>{header}</Box> : null}
-          <Box>{children}</Box>
+          {children}
           {footer != null ? <Box {...FOOTER_STYLE}>{footer}</Box> : null}
         </Box>
       </Flex>

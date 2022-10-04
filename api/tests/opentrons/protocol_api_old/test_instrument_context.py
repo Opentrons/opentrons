@@ -61,7 +61,7 @@ def _mock_publish_context(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None
 @pytest.fixture
 def mock_protocol_context(decoy: Decoy) -> ProtocolContext:
     mock_protocol_context = decoy.mock(cls=ProtocolContext)
-    decoy.when(mock_protocol_context._modules).then_return([])
+    decoy.when(mock_protocol_context._modules).then_return({})
     return mock_protocol_context
 
 

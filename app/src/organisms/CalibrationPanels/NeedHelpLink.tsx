@@ -1,20 +1,40 @@
 import * as React from 'react'
-import { Flex, Link, C_BLUE, FONT_SIZE_BODY_1 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import {
+  Flex,
+  Link,
+  Icon,
+  COLORS,
+  TYPOGRAPHY,
+  SIZE_1,
+  ALIGN_CENTER,
+  SPACING,
+} from '@opentrons/components'
 
-const NEED_HELP = 'Need Help?'
-const SUPPORT_PAGE = 'https://support.opentrons.com/s/ot2-calibration'
-type Props = React.ComponentProps<typeof Flex>
+const SUPPORT_PAGE_URL = 'https://support.opentrons.com/s/ot2-calibration'
 
-export function NeedHelpLink(props: Props): JSX.Element {
+interface NeedHelpLinkProps extends React.ComponentProps<typeof Flex> {
+  href?: string
+}
+
+export function NeedHelpLink(props: NeedHelpLinkProps): JSX.Element {
+  const { href = SUPPORT_PAGE_URL, flexProps } = props
+  const { t } = useTranslation('robot_calibration')
   return (
-    <Flex {...props}>
+    <Flex alignItems={ALIGN_CENTER} {...flexProps}>
+      <Icon
+        color={COLORS.darkGreyEnabled}
+        size={SIZE_1}
+        marginRight={SPACING.spacing2}
+        name="question-mark-circle"
+      />
       <Link
         external
-        fontSize={FONT_SIZE_BODY_1}
-        color={C_BLUE}
-        href={SUPPORT_PAGE}
+        fontSize={TYPOGRAPHY.fontSizeP}
+        css={TYPOGRAPHY.darkLinkLabelSemiBold}
+        href={href}
       >
-        {NEED_HELP}
+        {t('need_help')}
       </Link>
     </Flex>
   )

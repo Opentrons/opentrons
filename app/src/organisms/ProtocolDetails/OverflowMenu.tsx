@@ -52,20 +52,20 @@ export function OverflowMenu(props: OverflowMenuProps): JSX.Element {
     e.preventDefault()
     e.stopPropagation()
     dispatch(viewProtocolSourceFolder(protocolKey))
-    setShowOverflowMenu(!showOverflowMenu)
+    setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }
   const handleClickReanalyze: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
     dispatch(analyzeProtocol(protocolKey))
-    setShowOverflowMenu(!showOverflowMenu)
+    setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }
 
   const handleClickDelete: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
     confirmDeleteProtocol()
-    setShowOverflowMenu(!showOverflowMenu)
+    setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }
 
   return (
@@ -77,7 +77,7 @@ export function OverflowMenu(props: OverflowMenuProps): JSX.Element {
       />
       {showOverflowMenu ? (
         <Flex
-          width="12rem"
+          whiteSpace="nowrap"
           zIndex={10}
           borderRadius="4px 4px 0px 0px"
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
