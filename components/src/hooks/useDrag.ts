@@ -58,7 +58,6 @@ export const useDrag = (position: ElementPosition): UseDragResult => {
         })
     }
   }
-
   const disable = (): void => {
     if (interactiveRef?.current != null) {
       interact((interactiveRef.current as unknown) as HTMLElement).unset()
