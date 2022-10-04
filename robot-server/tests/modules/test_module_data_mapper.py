@@ -180,6 +180,7 @@ def test_maps_temperature_module_data(input_model: str, input_data: LiveData) ->
                 "lid": "open",
                 "lidTarget": None,
                 "lidTemp": None,
+                "lidTempStatus": "idle",
                 "currentTemp": None,
                 "targetTemp": None,
                 "holdTime": None,
@@ -196,6 +197,7 @@ def test_maps_temperature_module_data(input_model: str, input_data: LiveData) ->
                 "lid": "open",
                 "lidTarget": 1,
                 "lidTemp": 2,
+                "lidTempStatus": "heating",
                 "currentTemp": 3,
                 "targetTemp": 4,
                 "holdTime": 5,
@@ -247,6 +249,7 @@ def test_maps_thermocycler_module_data(input_model: str, input_data: LiveData) -
             currentTemperature=input_data["data"]["currentTemp"],  # type: ignore[arg-type]
             targetTemperature=input_data["data"]["targetTemp"],  # type: ignore[arg-type]
             lidStatus=input_data["data"]["lid"],  # type: ignore[arg-type]
+            lidTemperatureStatus=input_data["data"]["lidTempStatus"],  # type: ignore[arg-type]
             lidTemperature=input_data["data"]["lidTemp"],  # type: ignore[arg-type]
             lidTargetTemperature=input_data["data"]["lidTarget"],  # type: ignore[arg-type]
             holdTime=input_data["data"]["holdTime"],  # type: ignore[arg-type]

@@ -2,9 +2,13 @@ import pytest
 
 from opentrons import types
 from opentrons.hardware_control import ThreadManagedHardware
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
 from opentrons.protocol_api.core.protocol_api.protocol_context import (
     ProtocolContextImplementation,
+)
+from opentrons.protocol_api.core.protocol_api.labware_offset_provider import (
+    NullLabwareOffsetProvider,
 )
 from opentrons.protocol_api.core.protocol_api.instrument_context import (
     InstrumentContextImplementation,
@@ -23,7 +27,11 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 @pytest.fixture
 def protocol_context(hardware: ThreadManagedHardware) -> ProtocolContextImplementation:
     """Protocol context implementation fixture."""
-    return ProtocolContextImplementation(sync_hardware=hardware.sync)
+    return ProtocolContextImplementation(
+        sync_hardware=hardware.sync,
+        api_version=MAX_SUPPORTED_VERSION,
+        labware_offset_provider=NullLabwareOffsetProvider(),
+    )
 
 
 @pytest.fixture
@@ -31,7 +39,11 @@ def simulating_protocol_context(
     hardware: ThreadManagedHardware,
 ) -> ProtocolContextSimulation:
     """Protocol context simulation fixture."""
-    return ProtocolContextSimulation(sync_hardware=hardware.sync)
+    return ProtocolContextSimulation(
+        sync_hardware=hardware.sync,
+        api_version=MAX_SUPPORTED_VERSION,
+        labware_offset_provider=NullLabwareOffsetProvider(),
+    )
 
 
 @pytest.fixture

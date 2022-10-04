@@ -41,7 +41,7 @@ class InvalidMagnetEngageHeightError(ValueError):
 
 
 class InvalidTargetTemperatureError(ValueError):
-    """Error raised if a module with heating abilities gets an invalid target temp."""
+    """Error raised if a module with heating abilities gets an invalid target temperature."""
 
 
 class NoTargetTemperatureError(ValueError):
@@ -49,7 +49,7 @@ class NoTargetTemperatureError(ValueError):
 
 
 class InvalidTargetSpeedError(ValueError):
-    """Error raised if a heater-shaker target speed is invalid."""
+    """Error raised if a Heater-Shaker target speed is invalid."""
 
 
 __all__ = [

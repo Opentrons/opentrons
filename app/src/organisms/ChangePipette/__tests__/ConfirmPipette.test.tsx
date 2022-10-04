@@ -1,12 +1,17 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '../../../i18n'
-import { ConfirmPipette } from '../ConfirmPipette'
-import { PipetteModelSpecs, PipetteNameSpecs } from '@opentrons/shared-data'
+import { LEFT } from '@opentrons/shared-data'
 import { mockPipetteInfo } from '../../../redux/pipettes/__fixtures__'
-import { PipetteOffsetCalibration } from '../../../redux/calibration/types'
 import { CheckPipettesButton } from '../CheckPipettesButton'
+import { ConfirmPipette } from '../ConfirmPipette'
+
+import type {
+  PipetteModelSpecs,
+  PipetteNameSpecs,
+} from '@opentrons/shared-data'
+import type { PipetteOffsetCalibration } from '../../../redux/calibration/types'
 
 jest.mock('../CheckPipettesButton')
 
@@ -26,6 +31,11 @@ const MOCK_ACTUAL_PIPETTE = {
   tipLength: {
     value: 20,
   },
+} as PipetteModelSpecs
+
+const MOCK_ACTUAL_PIPETTE_EIGHT_CHANNEL = {
+  channels: 8,
+  name: 'p10_multi',
 } as PipetteModelSpecs
 
 const MOCK_WANTED_PIPETTE = {
@@ -86,6 +96,11 @@ describe('ConfirmPipette', () => {
       tryAgain: jest.fn(),
       exit: jest.fn(),
       toCalibrationDashboard: jest.fn(),
+      mount: LEFT,
+      setWrongWantedPipette: jest.fn(),
+      wrongWantedPipette: null,
+      confirmPipetteLevel: false,
+      setConfirmPipetteLevel: jest.fn(),
     }
 
     const { getByText, getByRole } = render(props)
@@ -108,6 +123,11 @@ describe('ConfirmPipette', () => {
       tryAgain: jest.fn(),
       exit: jest.fn(),
       toCalibrationDashboard: jest.fn(),
+      mount: LEFT,
+      setWrongWantedPipette: jest.fn(),
+      wrongWantedPipette: null,
+      confirmPipetteLevel: false,
+      setConfirmPipetteLevel: jest.fn(),
     }
 
     const { getByText, getByRole } = render(props)
@@ -125,7 +145,7 @@ describe('ConfirmPipette', () => {
     expect(props.tryAgain).toBeCalled()
   })
 
-  it('Should show incorrect pipette attached when the actual pipette is different', () => {
+  it('Should show incorrect pipette attached for single channel when the actual pipette is different', () => {
     props = {
       robotName: 'otie',
       success: false,
@@ -138,6 +158,11 @@ describe('ConfirmPipette', () => {
       tryAgain: jest.fn(),
       exit: jest.fn(),
       toCalibrationDashboard: jest.fn(),
+      mount: LEFT,
+      setWrongWantedPipette: jest.fn(),
+      wrongWantedPipette: null,
+      confirmPipetteLevel: false,
+      setConfirmPipetteLevel: jest.fn(),
     }
 
     const { getByText, getByRole } = render(props)
@@ -145,16 +170,141 @@ describe('ConfirmPipette', () => {
     getByText(
       'The attached does not match the P300 8-Channel GEN2 you had originally selected.'
     )
-
-    const useAttachedBtn = getByRole('button', { name: 'Use attached pipette' })
-    fireEvent.click(useAttachedBtn)
-    expect(props.exit).toBeCalled()
-
     const detachTryAgainBtn = getByRole('button', {
       name: 'Detach and try again',
     })
     fireEvent.click(detachTryAgainBtn)
     expect(props.tryAgain).toBeCalled()
+    const useAttachedBtn = getByRole('button', { name: 'Use attached pipette' })
+    fireEvent.click(useAttachedBtn)
+    expect(props.setWrongWantedPipette).toHaveBeenCalled()
+  })
+
+  it('Should show success modal when incorrect pipette attached but user accepts it', () => {
+    props = {
+      robotName: 'otie',
+      success: false,
+      attachedWrong: true,
+      wantedPipette: MOCK_ACTUAL_PIPETTE,
+      actualPipette: MOCK_ACTUAL_PIPETTE,
+      actualPipetteOffset: {} as PipetteOffsetCalibration,
+      displayName: '',
+      displayCategory: null,
+      tryAgain: jest.fn(),
+      exit: jest.fn(),
+      toCalibrationDashboard: jest.fn(),
+      mount: LEFT,
+      setWrongWantedPipette: jest.fn(),
+      wrongWantedPipette: MOCK_ACTUAL_PIPETTE,
+      confirmPipetteLevel: false,
+      setConfirmPipetteLevel: jest.fn(),
+    }
+
+    const { getByText, getByRole } = render(props)
+    getByText('Pipette attached!')
+    getByText('P10 Single-Channel is now ready to use.')
+    const btn = getByRole('button', { name: 'exit' })
+    fireEvent.click(btn)
+    expect(props.exit).toHaveBeenCalled()
+    expect(
+      screen.queryByRole('button', { name: 'Calibrate pipette offset' })
+    ).not.toBeInTheDocument()
+  })
+
+  it('renders incorrect pipette attached for eight channel when the actual pipette is different', () => {
+    props = {
+      robotName: 'otie',
+      success: false,
+      attachedWrong: true,
+      wantedPipette: MOCK_WANTED_PIPETTE,
+      actualPipette: MOCK_ACTUAL_PIPETTE_EIGHT_CHANNEL,
+      actualPipetteOffset: {} as PipetteOffsetCalibration,
+      displayName: '',
+      displayCategory: null,
+      tryAgain: jest.fn(),
+      exit: jest.fn(),
+      toCalibrationDashboard: jest.fn(),
+      mount: LEFT,
+      setWrongWantedPipette: jest.fn(),
+      wrongWantedPipette: null,
+      confirmPipetteLevel: false,
+      setConfirmPipetteLevel: jest.fn(),
+    }
+
+    const { getByText, getByRole } = render(props)
+    getByText('Incorrect pipette attached')
+    getByText(
+      'The attached does not match the P300 8-Channel GEN2 you had originally selected.'
+    )
+    const detachTryAgainBtn = getByRole('button', {
+      name: 'Detach and try again',
+    })
+    fireEvent.click(detachTryAgainBtn)
+    expect(props.tryAgain).toBeCalled()
+    const useAttachedBtn = getByRole('button', { name: 'Use attached pipette' })
+    fireEvent.click(useAttachedBtn)
+    expect(props.setWrongWantedPipette).toHaveBeenCalled()
+  })
+
+  it('Should show pipette leveling modal when incorrect pipette attached for 8 channel but user accepts it', () => {
+    props = {
+      robotName: 'otie',
+      success: false,
+      attachedWrong: true,
+      wantedPipette: MOCK_WANTED_PIPETTE,
+      actualPipette: MOCK_WANTED_PIPETTE as PipetteModelSpecs,
+      actualPipetteOffset: {} as PipetteOffsetCalibration,
+      displayName: '',
+      displayCategory: null,
+      tryAgain: jest.fn(),
+      exit: jest.fn(),
+      toCalibrationDashboard: jest.fn(),
+      mount: LEFT,
+      setWrongWantedPipette: jest.fn(),
+      wrongWantedPipette: MOCK_WANTED_PIPETTE,
+      confirmPipetteLevel: false,
+      setConfirmPipetteLevel: jest.fn(),
+    }
+
+    const { getByText, getByRole } = render(props)
+    getByText('Level the pipette')
+    const goBack = getByRole('button', { name: 'Go back' })
+    fireEvent.click(goBack)
+    expect(props.tryAgain).toHaveBeenCalled()
+    const continueBtn = getByRole('button', { name: 'Confirm level' })
+    fireEvent.click(continueBtn)
+    expect(props.setConfirmPipetteLevel).toHaveBeenCalled()
+  })
+
+  it('renders the success modal when the confirmPipetteLevel is true when attaching an incorrect 8 channel pipette with no pipetteoffset data', () => {
+    props = {
+      robotName: 'otie',
+      success: false,
+      attachedWrong: true,
+      wantedPipette: MOCK_WANTED_PIPETTE,
+      actualPipette: MOCK_WANTED_PIPETTE as PipetteModelSpecs,
+      actualPipetteOffset: null,
+      displayName: '',
+      displayCategory: null,
+      tryAgain: jest.fn(),
+      exit: jest.fn(),
+      toCalibrationDashboard: jest.fn(),
+      mount: LEFT,
+      setWrongWantedPipette: jest.fn(),
+      wrongWantedPipette: MOCK_WANTED_PIPETTE,
+      confirmPipetteLevel: true,
+      setConfirmPipetteLevel: jest.fn(),
+    }
+
+    const { getByText, getByRole } = render(props)
+    getByText('Pipette attached!')
+    getByText('P300 8-Channel GEN2 is now ready to use.')
+    const btn = getByRole('button', { name: 'exit' })
+    fireEvent.click(btn)
+    expect(props.exit).toHaveBeenCalled()
+    const pocBtn = getByRole('button', { name: 'Calibrate pipette offset' })
+    fireEvent.click(pocBtn)
+    expect(props.toCalibrationDashboard).toBeCalled()
   })
 
   it('Should show unable to detect pipette when a pipette is not connected', () => {
@@ -171,6 +321,11 @@ describe('ConfirmPipette', () => {
       tryAgain: jest.fn(),
       exit: jest.fn(),
       toCalibrationDashboard: jest.fn(),
+      mount: LEFT,
+      setWrongWantedPipette: jest.fn(),
+      wrongWantedPipette: null,
+      confirmPipetteLevel: false,
+      setConfirmPipetteLevel: jest.fn(),
     }
 
     const { getByText, getByRole } = render(props)
@@ -201,6 +356,11 @@ describe('ConfirmPipette', () => {
       tryAgain: jest.fn(),
       exit: jest.fn(),
       toCalibrationDashboard: jest.fn(),
+      mount: LEFT,
+      setWrongWantedPipette: jest.fn(),
+      wrongWantedPipette: null,
+      confirmPipetteLevel: false,
+      setConfirmPipetteLevel: jest.fn(),
     }
 
     const { getByText, getByRole } = render(props)
@@ -224,6 +384,11 @@ describe('ConfirmPipette', () => {
       tryAgain: jest.fn(),
       exit: jest.fn(),
       toCalibrationDashboard: jest.fn(),
+      mount: LEFT,
+      setWrongWantedPipette: jest.fn(),
+      wrongWantedPipette: null,
+      confirmPipetteLevel: false,
+      setConfirmPipetteLevel: jest.fn(),
     }
 
     const { getByText, getByRole } = render(props)

@@ -3,7 +3,7 @@ import {
   ANALYTICS_PIPETTE_OFFSET_STARTED,
   ANALYTICS_TIP_LENGTH_STARTED,
 } from './constants'
-import * as CalUITypes from '../../organisms/CalibrationPanels/types'
+import * as CalUITypes from '../../organisms/DeprecatedCalibrationPanels/types'
 
 import type { CalibrationCheckComparisonsPerCalibration } from '../sessions/types'
 import type { DeckCalibrationStatus } from '../calibration/types'

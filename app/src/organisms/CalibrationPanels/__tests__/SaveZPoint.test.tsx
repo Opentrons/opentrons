@@ -1,59 +1,46 @@
 import * as React from 'react'
-import { mount } from 'enzyme'
+import { renderWithProviders } from '@opentrons/components'
+import { i18n } from '../../../i18n'
 
-import { mockDeckCalTipRack } from '../../../redux/sessions/__fixtures__'
+import {
+  mockDeckCalTipRack,
+  mockTipLengthCalBlock,
+} from '../../../redux/sessions/__fixtures__'
 import * as Sessions from '../../../redux/sessions'
 import { SaveZPoint } from '../SaveZPoint'
 
-import type { Mount } from '@opentrons/components'
-import type { ReactWrapper, HTMLAttributes } from 'enzyme'
-import type { VectorTuple } from '../../../redux/sessions/types'
-
 describe('SaveZPoint', () => {
   let render: (
-    props?: Partial<
-      React.ComponentProps<typeof SaveZPoint> & { pipMount: Mount }
-    >
-  ) => ReactWrapper<React.ComponentProps<typeof SaveZPoint>>
+    props?: Partial<React.ComponentProps<typeof SaveZPoint>>
+  ) => ReturnType<typeof renderWithProviders>
 
   const mockSendCommands = jest.fn()
   const mockDeleteSession = jest.fn()
 
-  const getSaveButton = (
-    wrapper: ReactWrapper<React.ComponentProps<typeof SaveZPoint>>
-  ): ReactWrapper<HTMLAttributes> => wrapper.find('button[title="save"]')
-
-  const getJogButton = (
-    wrapper: ReactWrapper<React.ComponentProps<typeof SaveZPoint>>,
-    direction: string
-  ): ReactWrapper<HTMLAttributes> =>
-    wrapper.find(`button[title="${direction}"]`).find('button')
-
-  const getVideo = (
-    wrapper: ReactWrapper<React.ComponentProps<typeof SaveZPoint>>
-  ): ReactWrapper<HTMLAttributes> => wrapper.find(`source`)
-
   beforeEach(() => {
     render = (props = {}) => {
       const {
-        pipMount = 'left',
+        mount = 'left',
         isMulti = false,
         tipRack = mockDeckCalTipRack,
         sendCommands = mockSendCommands,
         cleanUpAndExit = mockDeleteSession,
         currentStep = Sessions.DECK_STEP_JOGGING_TO_DECK,
         sessionType = Sessions.SESSION_TYPE_DECK_CALIBRATION,
+        calBlock,
       } = props
-      return mount(
+      return renderWithProviders(
         <SaveZPoint
           isMulti={isMulti}
-          mount={pipMount}
+          mount={mount}
           tipRack={tipRack}
           sendCommands={sendCommands}
           cleanUpAndExit={cleanUpAndExit}
           currentStep={currentStep}
           sessionType={sessionType}
-        />
+          calBlock={calBlock}
+        />,
+        { i18nInstance: i18n }
       )
     }
   })
@@ -61,158 +48,139 @@ describe('SaveZPoint', () => {
     jest.resetAllMocks()
   })
 
-  it('displays proper asset', () => {
-    const assetMap: {
-      [mount in Mount]: { [c in 'multi' | 'single']: string }
-    } = {
-      left: {
-        multi: 'SLOT_5_LEFT_MULTI_Z.webm',
-        single: 'SLOT_5_LEFT_SINGLE_Z.webm',
-      },
-      right: {
-        multi: 'SLOT_5_RIGHT_MULTI_Z.webm',
-        single: 'SLOT_5_RIGHT_SINGLE_Z.webm',
-      },
-    }
+  it('displays proper asset for left multi', () => {
+    const { getByLabelText } = render({ mount: 'left', isMulti: true })[0]
+    getByLabelText('left multi channel pipette moving to slot 5')
+  })
+  it('displays proper asset for right multi', () => {
+    const { getByLabelText } = render({ mount: 'right', isMulti: true })[0]
+    getByLabelText('right multi channel pipette moving to slot 5')
+  })
+  it('displays proper asset for left single', () => {
+    const { getByLabelText } = render({ mount: 'left', isMulti: false })[0]
+    getByLabelText('left single channel pipette moving to slot 5')
+  })
+  it('displays proper asset for right single', () => {
+    const { getByLabelText } = render({ mount: 'right', isMulti: false })[0]
+    getByLabelText('right single channel pipette moving to slot 5')
+  })
 
-    Object.keys(assetMap).forEach(mountString => {
-      Object.keys(assetMap[mountString as Mount]).forEach(channelString => {
-        const wrapper = render({
-          pipMount: mountString as Mount,
-          isMulti: (channelString as 'multi' | 'single') === 'multi',
-        })
-        expect(getVideo(wrapper).prop('src')).toEqual(
-          assetMap[mountString as Mount][channelString as 'multi' | 'single']
-        )
-      })
+  it('jogging sends command', () => {
+    const { getByRole } = render()[0]
+    getByRole('button', { name: 'up' }).click()
+
+    expect(mockSendCommands).toHaveBeenCalledWith({
+      command: Sessions.sharedCalCommands.JOG,
+      data: { vector: [0, 0, 0.1] },
     })
   })
 
-  it('allows jogging in z axis', () => {
-    const wrapper = render()
-
-    type ZJogDir = 'up' | 'down'
-    const jogDirections: ZJogDir[] = ['up', 'down']
-    const jogVectorByDirection: { [dir in ZJogDir]: VectorTuple } = {
-      up: [0, 0, 0.1],
-      down: [0, 0, -0.1],
-    }
-    jogDirections.forEach(direction => {
-      getJogButton(wrapper, direction).invoke('onClick')?.(
-        {} as React.MouseEvent
-      )
-      wrapper.update()
-
-      expect(mockSendCommands).toHaveBeenCalledWith({
-        command: Sessions.deckCalCommands.JOG,
-        data: {
-          vector: jogVectorByDirection[direction],
-        },
-      })
-      mockSendCommands.mockClear()
-    })
-
-    const unavailableJogDirections = ['left', 'right', 'back', 'forward']
-    unavailableJogDirections.forEach(direction => {
-      expect(getJogButton(wrapper, direction)).toEqual({})
-    })
+  it('renders the confirm crash modal when invoked', () => {
+    const { getByText, queryByText } = render()[0]
+    expect(
+      queryByText('Starting over will cancel your calibration progress.')
+    ).toBeNull()
+    const crashLink = getByText('Start over')
+    crashLink.click()
+    getByText('Starting over will cancel your calibration progress.')
   })
 
-  it('allows jogging in xy axis after prompt clicked', () => {
-    const wrapper = render()
-
-    const jogDirections: string[] = ['left', 'right', 'back', 'forward']
-    const jogVectorByDirection: { [dir: string]: VectorTuple } = {
-      left: [-0.1, 0, 0],
-      right: [0.1, 0, 0],
-      back: [0, 0.1, 0],
-      forward: [0, -0.1, 0],
-    }
-    jogDirections.forEach(dir => {
-      expect(getJogButton(wrapper, dir).exists()).toBe(false)
-    })
-    wrapper
-      .find('button[children="Reveal XY jog controls to move across deck"]')
-      .invoke('onClick')?.({} as React.MouseEvent)
-    jogDirections.forEach(direction => {
-      getJogButton(wrapper, direction).invoke('onClick')?.(
-        {} as React.MouseEvent
-      )
-
-      expect(mockSendCommands).toHaveBeenCalledWith({
-        command: Sessions.deckCalCommands.JOG,
-        data: {
-          vector: jogVectorByDirection[direction],
-        },
-      })
-      mockSendCommands.mockClear()
-    })
+  it('renders the need help link', () => {
+    const { getByRole } = render()[0]
+    getByRole('link', { name: 'Need help?' })
   })
 
-  it('renders need help link', () => {
-    const wrapper = render()
-    expect(wrapper.find('NeedHelpLink').exists()).toBe(true)
-  })
-
-  it('sends save offset command when primary button is clicked', () => {
-    const wrapper = render()
-
-    getSaveButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
-    wrapper.update()
-
+  it('clicking proceed sends save offset and move to point one commands for deck cal', () => {
+    const { getByRole } = render({
+      sessionType: Sessions.SESSION_TYPE_DECK_CALIBRATION,
+    })[0]
+    getByRole('button', { name: 'Confirm placement' }).click()
     expect(mockSendCommands).toHaveBeenCalledWith(
       {
-        command: Sessions.deckCalCommands.SAVE_OFFSET,
+        command: Sessions.sharedCalCommands.SAVE_OFFSET,
       },
       {
-        command: Sessions.deckCalCommands.MOVE_TO_POINT_ONE,
+        command: Sessions.sharedCalCommands.MOVE_TO_POINT_ONE,
+      }
+    )
+  })
+
+  it('clicking proceed sends save offset and move to point one commands for pipette offset cal', () => {
+    const { getByRole } = render({
+      sessionType: Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
+    })[0]
+    getByRole('button', { name: 'Confirm placement' }).click()
+    expect(mockSendCommands).toHaveBeenCalledWith(
+      {
+        command: Sessions.sharedCalCommands.SAVE_OFFSET,
+      },
+      {
+        command: Sessions.sharedCalCommands.MOVE_TO_POINT_ONE,
+      }
+    )
+  })
+
+  it('clicking proceed sends compare point and move to point one commands for health check', () => {
+    const { getByRole } = render({
+      sessionType: Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
+    })[0]
+    getByRole('button', { name: 'Confirm placement' }).click()
+    expect(mockSendCommands).toHaveBeenCalledWith(
+      {
+        command: Sessions.checkCommands.COMPARE_POINT,
+      },
+      {
+        command: Sessions.sharedCalCommands.MOVE_TO_POINT_ONE,
       }
     )
   })
 
   it('pip offset cal session type shows correct text', () => {
-    const wrapper = render({
+    const { getByText, getByRole } = render({
       sessionType: Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
-    })
-    const allText = wrapper.text()
-    expect(allText).toContain('save calibration and move to slot 1')
-    expect(allText).toContain('calibrate z-axis in slot 5')
-    expect(allText).toContain('calibrate the z offset for this pipette')
+    })[0]
+
+    getByRole('heading', { name: 'Calibrate z-axis in slot 5' })
+    getByText(
+      'Jog the pipette until the tip is barely touching (less than 0.1 mm) the deck in slot 5.'
+    )
+    getByText(
+      'If the pipette is over the embossed 5, on the ridge of the slot, or hard to see, switch to the x- and y-axis controls to move the pipette across the deck.'
+    )
   })
 
   it('deck cal session type shows correct text', () => {
-    const wrapper = render({
+    const { getByText, getByRole } = render({
       sessionType: Sessions.SESSION_TYPE_DECK_CALIBRATION,
-    })
-    const allText = wrapper.text()
-    expect(allText).toContain('remember z-axis and move to slot 1')
-    expect(allText).toContain('z-axis in slot 5')
-    expect(allText).toContain(
-      'use this z position for the rest of deck calibration'
+    })[0]
+
+    getByRole('heading', { name: 'Calibrate z-axis in slot 5' })
+    getByText(
+      'Jog the pipette until the tip is barely touching (less than 0.1 mm) the deck in slot 5.'
+    )
+    getByText(
+      'If the pipette is over the embossed 5, on the ridge of the slot, or hard to see, switch to the x- and y-axis controls to move the pipette across the deck.'
     )
   })
 
-  it('health check session type shows correct text', () => {
-    const wrapper = render({
+  it('health check session type shows correct text with block', () => {
+    const { getByText, getByRole } = render({
       sessionType: Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
-    })
-    const allText = wrapper.text()
-    expect(allText).toContain('check z-axis')
-    expect(allText).toContain('check z-axis in slot 5')
-    expect(allText).toContain('to determine how this position compares')
-  })
-
-  it('renders the confirm crash link', () => {
-    const wrapper = render()
-    expect(wrapper.find('a[children="Start over"]').exists()).toBe(true)
-  })
-
-  it('renders the confirm crash modal when invoked', () => {
-    const wrapper = render()
-    wrapper.find('a[children="Start over"]').invoke('onClick')?.(
-      {} as React.MouseEvent
+      calBlock: mockTipLengthCalBlock,
+    })[0]
+    getByRole('heading', { name: 'Check z-axis on block' })
+    getByText(
+      'Jog the pipette until the tip is barely touching (less than 0.1 mm) the block in slot 6.'
     )
-    wrapper.update()
-    expect(wrapper.find('ConfirmCrashRecoveryModal').exists()).toBe(true)
+  })
+
+  it('health check session type shows correct text without block', () => {
+    const { getByText, getByRole } = render({
+      sessionType: Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
+    })[0]
+    getByRole('heading', { name: 'Check z-axis on trash bin' })
+    getByText(
+      'Jog the pipette until the tip is barely touching (less than 0.1 mm) the flat surface of the trash bin.'
+    )
   })
 })

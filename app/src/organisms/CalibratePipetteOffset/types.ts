@@ -3,7 +3,6 @@ import type {
   PipetteOffsetCalibrationSession,
   CalibrationLabware,
 } from '../../redux/sessions/types'
-import type { PipetteOffsetIntent } from '../../organisms/CalibrationPanels/types'
 
 import type { PipetteOffsetCalibrationStep } from '../../redux/sessions/pipette-offset-calibration/types'
 import { DispatchRequestsType } from '../../redux/robot-api'
@@ -14,7 +13,6 @@ export interface CalibratePipetteOffsetParentProps {
   dispatchRequests: DispatchRequestsType
   showSpinner: boolean
   isJogging: boolean
-  intent: PipetteOffsetIntent
 }
 
 export interface CalibratePipetteOffsetChildProps {

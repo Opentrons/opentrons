@@ -1,8 +1,7 @@
-from typing import List, Tuple, Optional
+from typing import List
 from typing_extensions import Protocol
 
-from ..modules import AbstractModule
-from ..modules.types import ModuleModel, ModuleType
+from ..modules import AbstractModule, ModuleModel
 
 
 class ModuleProvider(Protocol):
@@ -13,10 +12,5 @@ class ModuleProvider(Protocol):
         """Return a list of currently-attached modules."""
         ...
 
-    async def find_modules(
-        self,
-        by_model: ModuleModel,
-        resolved_type: ModuleType,
-    ) -> Tuple[List[AbstractModule], Optional[AbstractModule]]:
-        """Query the attached modules for a specific kind or model of module."""
-        ...
+    async def create_simulating_module(self, model: ModuleModel) -> AbstractModule:
+        """Create a simulating module hardware interface."""

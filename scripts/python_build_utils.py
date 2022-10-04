@@ -40,6 +40,9 @@ package_entries = {
     'hardware': PackageEntry(
         os.path.join(HERE, '..', 'hardware', 'opentrons_hardware', 'package.json'),
         'opentrons_hardware'),
+    'usb-bridge': PackageEntry(
+        os.path.join(HERE, '..', 'usb-bridge', 'ot3usb', 'package.json'),
+        'usb_bridge'),
 }
 
 

@@ -136,7 +136,7 @@ describe('AboutModuleSlideout', () => {
     }
     const { getByText, getByRole, getByLabelText } = render(props)
 
-    getByText('About Thermocycler Module')
+    getByText('About Thermocycler Module GEN1')
     getByText('ghi789')
     getByText('Serial Number')
     getByText('Current Version')
