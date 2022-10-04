@@ -22,3 +22,6 @@ default_gadget = SerialGadgetConfig(
     configuration_desc=DEFAULT_CONFIGURATION,
     max_power=DEFAULT_MAX_POWER,
 )
+
+# The name of the PHY in sysfs for the OT3
+PHY_NAME = "usbphynop1"

@@ -10,6 +10,9 @@ from .src import cli, usb_config, default_config, usb_monitor
 
 LOG = logging.getLogger(__name__)
 
+# 1 second polling for select()
+POLL_TIMEOUT = 1.0
+
 
 def update_ser_handle(
     config: usb_config.SerialGadget, ser: Optional[serial.Serial], connected: bool
@@ -70,7 +73,7 @@ def listen(
     rlist = [monitor]
     if ser:
         rlist.append(ser)
-    ready = select.select(rlist, [], [], 1.0)[0]
+    ready = select.select(rlist, [], [], POLL_TIMEOUT)[0]
     if len(ready) == 0 or monitor in ready:
         # Read a new udev messages
         check_monitor(monitor, monitor in ready)
@@ -124,7 +127,7 @@ async def main() -> NoReturn:
     ser = None
 
     monitor = usb_monitor.USBConnectionMonitorFactory.create(
-        phy_udev_name="usbphynop1", udc_folder=config.udc_folder()
+        phy_udev_name=default_config.PHY_NAME, udc_folder=config.udc_folder()
     )
 
     # After the gadget starts up, need time to populate state
