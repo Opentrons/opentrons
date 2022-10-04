@@ -45,7 +45,7 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
   const handleStepSelect = (
     event: React.MouseEvent<HTMLButtonElement>
   ): void => {
-    setCurrentStepSize(Number(event.currentTarget.value))
+    setCurrentStepSize(Number(event.currentTarget.value) as StepSize)
     event.currentTarget.blur()
   }
 
@@ -59,49 +59,46 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
     10: t('large'),
   }
 
-  const STEP_SIZE_BUTTON_STYLING = css`
+  const BUTTON_WRAPPER_STYLE = css`
     display: grid;
     grid-auto-flow: column;
-    gap: 1rem;
+    grid-gap: ${SPACING.spacing3};
+    margin-top: ${SPACING.spacing4};
 
     @media (max-width: 750px) {
       grid-template-columns: none;
       grid-template-rows: repeat(3, minmax(auto, 50%));
     }
-
-    button {
-      background-color: ${COLORS.white};
-
-      &:hover {
-        background-color: ${COLORS.white};
-        color: ${COLORS.black};
-        box-shadow: 0 0 0;
-        border: 1px ${COLORS.lightGreyHover} solid;
-      }
-
-      &:active {
-        background-color: ${COLORS.white};
-        color: ${COLORS.blueEnabled};
-        border: 1px ${COLORS.blueEnabled} solid;
-      }
-
-      &:disabled {
-        background-color: inherit;
-        color: ${COLORS.errorDisabled};
-      }
-    }
   `
 
-  const ACTIVE_STYLE = css`
+  const DEFAULT_BUTTON_STYLE = css`
     background-color: ${COLORS.white};
+    height: 3.62rem;
+    color: ${COLORS.black};
+
+    &:hover {
+      background-color: ${COLORS.white};
+      color: ${COLORS.black};
+      box-shadow: 0 0 0;
+      border: 1px ${COLORS.lightGreyHover} solid;
+    }
+
+    &:active {
+      background-color: ${COLORS.white};
+      color: ${COLORS.blueEnabled};
+      border: 1px ${COLORS.blueEnabled} solid;
+    }
+
+    &:disabled {
+      background-color: inherit;
+      color: ${COLORS.errorDisabled};
+    }
+  `
+  const ACTIVE_BUTTON_STYLE = css`
+    ${DEFAULT_BUTTON_STYLE}
     color: ${COLORS.blueEnabled};
     border: 1px ${COLORS.blueEnabled} solid;
   `
-
-  const DEFAULT_STYLE = css`
-    background-color: ${COLORS.white};
-  `
-
   return (
     <ControlContainer title={STEP_SIZE_TITLE}>
       <HandleKeypress
@@ -113,7 +110,7 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
           { key: '+', onPress: increaseStepSize },
         ]}
       >
-        <Flex flexDirection={DIRECTION_COLUMN}>
+        <Flex flexDirection={DIRECTION_COLUMN} flex="1">
           <Flex flexDirection={DIRECTION_ROW}>
             <Icon name="jump-size" width="1.2rem" css={JUMP_SIZE_ICON_STYLE} />
             <StyledText
@@ -130,19 +127,16 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
           >
             {STEP_SIZE_SUBTITLE}
           </StyledText>
-          <Box marginY={SPACING.spacing4} css={STEP_SIZE_BUTTON_STYLING}>
+          <Box css={BUTTON_WRAPPER_STYLE}>
             {stepSizes.map((stepSize: StepSize, index) => {
               return (
                 <PrimaryButton
                   key={index}
                   css={
-                    currentStepSize === stepSize ? ACTIVE_STYLE : DEFAULT_STYLE
+                    currentStepSize === stepSize
+                      ? ACTIVE_BUTTON_STYLE
+                      : DEFAULT_BUTTON_STYLE
                   }
-                  height="3.125rem"
-                  width="100%"
-                  backgroundColor={COLORS.white}
-                  color={COLORS.black}
-                  marginRight={SPACING.spacing4}
                   value={stepSize}
                   onClick={handleStepSelect}
                 >

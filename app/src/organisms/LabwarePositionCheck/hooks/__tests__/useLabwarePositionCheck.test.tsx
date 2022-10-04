@@ -25,6 +25,7 @@ import { useLabwarePositionCheck } from '../useLabwarePositionCheck'
 
 import type { HostConfig } from '@opentrons/api-client'
 import type { LabwarePositionCheckStep } from '../../types'
+import { LARGE_STEP_SIZE_MM } from '../../../../molecules/JogControls'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../redux/analytics')
@@ -243,7 +244,7 @@ describe('useLabwarePositionCheck', () => {
       const [FIRST_JOG_AXIS, FIRST_JOG_DIRECTION, FIRST_JOG_DISTANCE] = [
         'x' as 'x',
         1 as 1,
-        2,
+        LARGE_STEP_SIZE_MM,
       ]
       if ('error' in result.current) {
         throw new Error('error should not be present')

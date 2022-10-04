@@ -15,7 +15,7 @@ import { LabwarePositionCheckStepDetail } from './LabwarePositionCheckStepDetail
 import { SectionList } from './SectionList'
 import { useIntroInfo, useLabwareIdsBySection, useSteps } from './hooks'
 import { DeckMap } from './DeckMap'
-import type { Jog } from '../../molecules/JogControls'
+import type { Jog } from '../../molecules/DeprecatedJogControls'
 import type { LabwarePositionCheckStep, SavePositionCommandData } from './types'
 
 interface GenericStepScreenProps {

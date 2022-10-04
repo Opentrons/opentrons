@@ -102,6 +102,7 @@ def test_map_after_command() -> None:
                     legacyCommandType="command.COMMENT",
                     legacyCommandText="hello world",
                 ),
+                result=pe_commands.CustomResult(),
             )
         )
     ]
@@ -123,7 +124,6 @@ def test_map_after_with_error_command() -> None:
         "error": RuntimeError("oh no"),
         "payload": {"text": "hello world"},
     }
-
     subject = LegacyCommandMapper()
 
     _ = subject.map_command(legacy_command_start)
@@ -220,6 +220,7 @@ def test_command_stack() -> None:
                     legacyCommandType="command.COMMENT",
                     legacyCommandText="hello",
                 ),
+                result=pe_commands.CustomResult(),
             )
         ),
         pe_actions.FailCommandAction(

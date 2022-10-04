@@ -31,8 +31,6 @@ import {
 import {
   HORIZONTAL_PLANE,
   VERTICAL_PLANE,
-} from '../../../molecules/JogControls'
-import {
   DeprecatedJogControls,
   DeprecatedJogControlsProps,
 } from '../../../molecules/DeprecatedJogControls'
@@ -41,7 +39,7 @@ import { useProtocolDetailsForRun } from '../../Devices/hooks'
 import { DeprecatedStepDetailText } from './DeprecatedStepDetailText'
 import levelWithTip from '../../../assets/images/lpc_level_with_tip.svg'
 import levelWithLabware from '../../../assets/images/lpc_level_with_labware.svg'
-import type { Jog } from '../../../molecules/JogControls/types'
+import type { Jog } from '../../../molecules/DeprecatedJogControls/types'
 import type {
   LabwarePositionCheckCreateCommand,
   LabwarePositionCheckMovementCommand,

@@ -20,7 +20,7 @@ import { GeneralSettings } from './GeneralSettings'
 import { PrivacySettings } from './PrivacySettings'
 import { AdvancedSettings } from './AdvancedSettings'
 import { FeatureFlags } from '../../organisms/AppSettings/FeatureFlags'
-import { NavTab } from '../../atoms/NavTab'
+import { NavTab } from '../../molecules/NavTab'
 import { Line } from '../../atoms/structure'
 
 import type { NavRouteParams, AppSettingsTab } from '../../App/types'

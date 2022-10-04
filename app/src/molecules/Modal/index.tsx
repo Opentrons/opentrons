@@ -13,6 +13,7 @@ export interface ModalProps extends StyleProps {
   closeOnOutsideClick?: boolean
   title?: React.ReactNode
   footer?: React.ReactNode
+  fullPage?: boolean
   childrenPadding?: string | number
   children?: React.ReactNode
 }

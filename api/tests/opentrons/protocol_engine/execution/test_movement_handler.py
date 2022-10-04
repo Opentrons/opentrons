@@ -517,6 +517,74 @@ async def test_save_position_must_home(
         await subject.save_position(pipette_id="pipette-id", position_id="123")
 
 
+async def test_move_to_coordinates(
+    decoy: Decoy,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    subject: MovementHandler,
+) -> None:
+    """Test that move_to_coordinates correctly calls api.move_to."""
+    mount = Mount.RIGHT
+
+    current_position = Point(4.44, 5.55, 6.66)
+    destination_deck = DeckPoint(x=1.11, y=2.22, z=3.33)
+    destination_point = Point(1.11, 2.22, 3.33)
+
+    planned_waypoint_1 = Waypoint(position=Point(3, 1, 4), critical_point=None)
+    planned_waypoint_2 = Waypoint(
+        position=Point(1, 5, 9), critical_point=CriticalPoint.XY_CENTER
+    )
+
+    decoy.when(
+        state_store.motion.get_pipette_location(
+            pipette_id="pipette-id",
+        )
+    ).then_return(
+        PipetteLocationData(
+            mount=MountType.RIGHT,
+            critical_point=CriticalPoint.XY_CENTER,
+        )
+    )
+
+    decoy.when(
+        await hardware_api.gantry_position(mount=mount, critical_point=None)
+    ).then_return(current_position)
+
+    decoy.when(
+        hardware_api.get_instrument_max_height(mount=mount, critical_point=None)
+    ).then_return(5678)
+
+    decoy.when(
+        state_store.motion.get_movement_waypoints_to_coords(
+            origin=current_position,
+            dest=destination_point,
+            max_travel_z=5678,
+            direct=True,
+            additional_min_travel_z=1234,
+        )
+    ).then_return([planned_waypoint_1, planned_waypoint_2])
+
+    await subject.move_to_coordinates(
+        pipette_id="pipette-id",
+        deck_coordinates=destination_deck,
+        direct=True,
+        additional_min_travel_z=1234,
+    )
+
+    decoy.verify(
+        await hardware_api.move_to(
+            mount=mount,
+            abs_position=planned_waypoint_1.position,
+            critical_point=planned_waypoint_1.critical_point,
+        ),
+        await hardware_api.move_to(
+            mount=mount,
+            abs_position=planned_waypoint_2.position,
+            critical_point=planned_waypoint_2.critical_point,
+        ),
+    )
+
+
 async def test_home(
     decoy: Decoy,
     hardware_api: HardwareAPI,

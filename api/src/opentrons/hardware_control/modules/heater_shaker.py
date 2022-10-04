@@ -13,6 +13,7 @@ from opentrons.hardware_control.execution_manager import ExecutionManager
 from opentrons.hardware_control.poller import Reader, WaitableListener, Poller
 from opentrons.hardware_control.modules import mod_abc, update
 from opentrons.hardware_control.modules.types import (
+    ModuleType,
     TemperatureStatus,
     SpeedStatus,
     HeaterShakerStatus,
@@ -37,7 +38,9 @@ class HeaterShakerError(RuntimeError):
 
 
 class HeaterShaker(mod_abc.AbstractModule):
-    """Heater-Shaker module class"""
+    """Hardware control interface for an attached Heater-Shaker module."""
+
+    MODULE_TYPE = ModuleType.HEATER_SHAKER
 
     @classmethod
     async def build(
@@ -415,12 +418,15 @@ class HeaterShaker(mod_abc.AbstractModule):
         while self.labware_latch_status != status:
             await self.wait_next_poll()
 
+    async def _wait_for_shake_deactivation(self) -> None:
+        """Wait until hardware reports that module has stopped shaking and has homed."""
+        while self.speed_status != SpeedStatus.IDLE:
+            await self.wait_next_poll()
+
     async def deactivate(self) -> None:
         """Stop heating/cooling; stop shaking and home the plate"""
-        await self.wait_for_is_running()
-        await self._driver.deactivate_heater()
-        await self._driver.home()
-        await self.wait_next_poll()
+        await self.deactivate_heater()
+        await self.deactivate_shaker()
 
     async def deactivate_heater(self) -> None:
         """Stop heating/cooling"""
@@ -432,7 +438,7 @@ class HeaterShaker(mod_abc.AbstractModule):
         """Stop shaking and home the plate"""
         await self.wait_for_is_running()
         await self._driver.home()
-        await self.wait_next_poll()
+        await self._wait_for_shake_deactivation()
 
     async def open_labware_latch(self) -> None:
         await self.wait_for_is_running()
@@ -446,13 +452,9 @@ class HeaterShaker(mod_abc.AbstractModule):
 
     async def prep_for_update(self) -> str:
         await self._poller.stop_and_wait()
-        async with update.protect_dfu_transition():
-            await self._driver.enter_programming_mode()
-            # Heater-Shaker has two unique DFU devices
-            dfu_info = await update.find_dfu_device(
-                pid=DFU_PID, expected_device_count=2
-            )
-            return dfu_info
+        await self._driver.enter_programming_mode()
+        dfu_info = await update.find_dfu_device(pid=DFU_PID, expected_device_count=2)
+        return dfu_info
 
 
 @dataclass

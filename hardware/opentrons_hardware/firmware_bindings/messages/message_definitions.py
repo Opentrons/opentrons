@@ -527,6 +527,17 @@ class GripperHomeRequest:  # noqa: D101
 
 
 @dataclass
+class AddBrushedLinearMoveRequest:  # noqa: D101
+    payload: payloads.GripperMoveRequestPayload
+    payload_type: Type[
+        payloads.GripperMoveRequestPayload
+    ] = payloads.GripperMoveRequestPayload
+    message_id: Literal[
+        MessageId.add_brushed_linear_move_request
+    ] = MessageId.add_brushed_linear_move_request
+
+
+@dataclass
 class BindSensorOutputRequest:  # noqa: D101
     payload: payloads.BindSensorOutputRequestPayload
     payload_type: Type[

@@ -3,9 +3,9 @@ import * as React from 'react'
 import cx from 'classnames'
 import { RadioGroup, HandleKeypress } from '@opentrons/components'
 import { DeprecatedControlContainer } from './DeprecatedControlContainer'
-import styles from '../JogControls/styles.css'
+import styles from './styles.css'
 
-import type { StepSize } from '../JogControls/types'
+import type { StepSize } from './types'
 
 const STEP_SIZE_TITLE = 'Jump Size'
 const STEP_SIZE_SUBTITLE = 'Change with + and -'

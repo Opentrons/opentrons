@@ -14,14 +14,16 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
+import { useSelector } from 'react-redux'
 
 import { CONNECTABLE, UNREACHABLE, REACHABLE } from '../../../redux/discovery'
+import { getBuildrootSession } from '../../../redux/buildroot'
 import { StyledText } from '../../../atoms/text'
 import { Banner } from '../../../atoms/Banner'
 import { useRobot } from '../../../organisms/Devices/hooks'
 import { Line } from '../../../atoms/structure'
-import { NavTab } from '../../../atoms/NavTab'
-import { RobotSettingsCalibration } from '../../../organisms/Devices/RobotSettings/RobotSettingsCalibration'
+import { NavTab } from '../../../molecules/NavTab'
+import { RobotSettingsCalibration } from '../../../organisms/RobotSettingsCalibration'
 import { RobotSettingsAdvanced } from '../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced'
 import { RobotSettingsNetworking } from '../../../organisms/Devices/RobotSettings/RobotSettingsNetworking'
 import { ReachableBanner } from '../../../organisms/Devices/ReachableBanner'
@@ -37,6 +39,7 @@ export function RobotSettings(): JSX.Element | null {
   const [showRobotBusyBanner, setShowRobotBusyBanner] = React.useState<boolean>(
     false
   )
+  const buildrootUpdateSession = useSelector(getBuildrootSession)
 
   const updateRobotStatus = (isRobotBusy: boolean): void => {
     if (isRobotBusy) setShowRobotBusyBanner(true)
@@ -66,9 +69,10 @@ export function RobotSettings(): JSX.Element | null {
   }
 
   if (
-    robot == null ||
-    robot?.status === UNREACHABLE ||
-    (robot?.status === REACHABLE && robot?.serverHealthStatus !== 'ok')
+    (robot == null ||
+      robot?.status === UNREACHABLE ||
+      (robot?.status === REACHABLE && robot?.serverHealthStatus !== 'ok')) &&
+    buildrootUpdateSession == null
   ) {
     return <Redirect to={`/devices/${robotName}`} />
   }
@@ -104,7 +108,7 @@ export function RobotSettings(): JSX.Element | null {
           >
             {t('robot_settings')}
           </Box>
-          <ReachableBanner robot={robot} />
+          {robot != null && <ReachableBanner robot={robot} />}
           {showRobotBusyBanner && (
             <Banner type="warning" marginBottom={SPACING.spacing4}>
               <StyledText as="p">

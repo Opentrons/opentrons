@@ -1,11 +1,11 @@
 """ProtocolEngine-based Protocol API core implementation."""
-from typing import Dict, Optional
+from typing import Dict, Optional, Union
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
-from opentrons.types import Mount, MountType, Location, DeckLocation, DeckSlotName
+from opentrons.types import Mount, MountType, Location, DeckSlotName
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import ModuleModel
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
@@ -16,17 +16,18 @@ from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocol_engine import DeckSlotLocation
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 
-from ..protocol import AbstractProtocol, LoadModuleResult
+from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 from .labware import LabwareCore
 from .instrument import InstrumentCore
+from .module_core import ModuleCore
 
 
 # TODO(mc, 2022-08-24): many of these methods are likely unnecessary
 # in a ProtocolEngine world. As we develop this core, we should remove
 # and consolidate logic as we need to across all cores rather than
 # necessarily try to support every one of these behaviors in the engine.
-class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore]):
+class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
     """Protocol API core using a ProtocolEngine.
 
     Args:
@@ -83,12 +84,15 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore]):
     def load_labware(
         self,
         load_name: str,
-        location: DeckSlotName,
+        location: Union[DeckSlotName, ModuleCore],
         label: Optional[str],
         namespace: Optional[str],
         version: Optional[int],
     ) -> LabwareCore:
         """Load a labware using its identifying parameters."""
+        if isinstance(location, ModuleCore):
+            raise NotImplementedError("Load labware on module not yet implemented")
+
         load_result = self._engine_client.load_labware(
             load_name=load_name,
             location=DeckSlotLocation(slotName=location),
@@ -104,14 +108,10 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore]):
     def load_module(
         self,
         model: ModuleModel,
-        location: Optional[DeckLocation],
+        location: Optional[DeckSlotName],
         configuration: Optional[str],
-    ) -> Optional[LoadModuleResult]:
+    ) -> ModuleCore:
         """Load a module into the protocol."""
-        raise NotImplementedError("ProtocolEngine PAPI core not implemented")
-
-    def get_loaded_modules(self) -> Dict[int, LoadModuleResult]:
-        """Get all loaded modules by deck slot number."""
         raise NotImplementedError("ProtocolEngine PAPI core not implemented")
 
     def load_instrument(

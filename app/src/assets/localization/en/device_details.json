@@ -111,5 +111,12 @@
   "power_force": "Power / Force",
   "robot_is_busy": "Robot is busy",
   "this_robot_will_restart_with_update": "<block>This robot has to restart to update its software. Restarting will immediately stop the current run or calibration.</block><block>Do you want to update now anyway?</block>",
-  "yes_update_now": "Yes, update now"
+  "yes_update_now": "Yes, update now",
+  "open_lid": "Open lid",
+  "close_lid": "Close lid",
+  "module_error": "Module error",
+  "module_name_error": "{{moduleName}} error",
+  "view": "View",
+  "error_details": "error details",
+  "module_error_contact_support": "Try powering the module off and on again. If the error persists, contact Opentrons Support."
 }

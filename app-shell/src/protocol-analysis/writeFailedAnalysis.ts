@@ -23,6 +23,7 @@ export function createFailedAnalysis(
     files: [],
     metadata: [],
     commands: [],
+    liquids: [],
     // TODO(mc, 2022-05-04): this field does not make sense for an
     // analysis that was unable to complete, but is required by
     // ProtocolAnalysisOutput

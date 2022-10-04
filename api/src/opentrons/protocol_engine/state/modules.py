@@ -681,9 +681,7 @@ class ModuleView(HasState[ModuleState]):
         Returns True if we need to dodge, False otherwise.
         """
         all_mods = self.get_all()
-        if all_mods and ModuleModel.THERMOCYCLER_MODULE_V1 in [
-            mod.model for mod in all_mods
-        ]:
+        if any(ModuleModel.is_thermocycler_module_model(mod.model) for mod in all_mods):
             transit = (from_slot, to_slot)
             if transit in _THERMOCYCLER_SLOT_TRANSITS_TO_DODGE:
                 return True

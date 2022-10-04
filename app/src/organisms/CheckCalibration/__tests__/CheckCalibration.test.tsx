@@ -1,28 +1,13 @@
 import * as React from 'react'
-import { Provider } from 'react-redux'
-import { mount } from 'enzyme'
-import { act } from 'react-dom/test-utils'
 import { when, resetAllWhenMocks } from 'jest-when'
 
-import * as Sessions from '../../../redux/sessions'
+import { renderWithProviders } from '@opentrons/components'
 import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
-import { useFeatureFlag } from '../../../redux/config'
+import { i18n } from '../../../i18n'
+import * as Sessions from '../../../redux/sessions'
 import { mockCalibrationCheckSessionAttributes } from '../../../redux/sessions/__fixtures__'
 
 import { CheckCalibration } from '../index'
-import { ResultsSummary } from '../ResultsSummary'
-import { ReturnTip } from '../ReturnTip'
-import {
-  Introduction,
-  DeckSetup,
-  TipPickUp,
-  TipConfirmation,
-  SaveXYPoint,
-  SaveZPoint,
-} from '../../../organisms/CalibrationPanels'
-
-import type { ReactWrapper } from 'enzyme'
-import type { Dispatch } from '../../../redux/types'
 import type { RobotCalibrationCheckStep } from '../../../redux/sessions/types'
 
 jest.mock('@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions')
@@ -30,92 +15,78 @@ jest.mock('../../../redux/calibration/selectors')
 jest.mock('../../../redux/config')
 
 interface CheckCalibrationSpec {
-  component: React.ComponentType<any>
+  heading: string
   currentStep: RobotCalibrationCheckStep
 }
 
 const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<
   typeof getDeckDefinitions
 >
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
->
 
 describe('CheckCalibration', () => {
-  let mockStore: any
   let render: (
     props?: Partial<React.ComponentProps<typeof CheckCalibration>>
-  ) => ReactWrapper<React.ComponentProps<typeof CheckCalibration>>
-  let dispatch: jest.MockedFunction<Dispatch>
+  ) => ReturnType<typeof renderWithProviders>
   let dispatchRequests: jest.MockedFunction<any>
-  let mockCalibrationCheckSession: Sessions.CalibrationCheckSession = {
+  const mockCalibrationCheckSession: Sessions.CalibrationCheckSession = {
     id: 'fake_check_session_id',
     ...mockCalibrationCheckSessionAttributes,
   }
-  const getExitButton = (
-    wrapper: ReactWrapper<React.ComponentProps<typeof CheckCalibration>>
-  ) => wrapper.find('button[aria-label="Exit"]')
-
-  const POSSIBLE_CHILDREN = [
-    Introduction,
-    DeckSetup,
-    TipPickUp,
-    TipConfirmation,
-    SaveZPoint,
-    SaveXYPoint,
-    ResultsSummary,
-  ]
 
   const SPECS: CheckCalibrationSpec[] = [
-    { component: Introduction, currentStep: 'sessionStarted' },
-    { component: DeckSetup, currentStep: 'labwareLoaded' },
-    { component: TipPickUp, currentStep: 'preparingPipette' },
-    { component: TipConfirmation, currentStep: 'inspectingTip' },
-    { component: SaveZPoint, currentStep: 'comparingHeight' },
-    { component: SaveXYPoint, currentStep: 'comparingPointOne' },
-    { component: SaveXYPoint, currentStep: 'comparingPointTwo' },
-    { component: SaveXYPoint, currentStep: 'comparingPointThree' },
-    { component: ReturnTip, currentStep: 'returningTip' },
-    { component: ResultsSummary, currentStep: 'resultsSummary' },
+    { heading: 'Before you begin', currentStep: 'sessionStarted' },
+    { heading: 'Prepare the space', currentStep: 'labwareLoaded' },
+    { heading: 'Position pipette over A1', currentStep: 'preparingPipette' },
+    {
+      heading: 'Did pipette pick up tip successfully?',
+      currentStep: 'inspectingTip',
+    },
+    { heading: 'Check z-axis on trash bin', currentStep: 'comparingHeight' },
+    {
+      heading: 'Check x- and y-axis in slot 1',
+      currentStep: 'comparingPointOne',
+    },
+    {
+      heading: 'Check x- and y-axis in slot 3',
+      currentStep: 'comparingPointTwo',
+    },
+    {
+      heading: 'Check x- and y-axis in slot 7',
+      currentStep: 'comparingPointThree',
+    },
+    {
+      heading: 'Return tip and continue to next pipette',
+      currentStep: 'returningTip',
+    },
+    {
+      heading: 'calibration health check results',
+      currentStep: 'resultsSummary',
+    },
   ]
 
   beforeEach(() => {
-    dispatch = jest.fn()
-    mockStore = {
-      subscribe: () => {},
-      getState: () => ({
-        robotApi: {},
-      }),
-      dispatch,
-    }
     when(mockGetDeckDefinitions).calledWith().mockReturnValue({})
-    when(mockUseFeatureFlag)
-      .calledWith('enableCalibrationWizards')
-      .mockReturnValue(true)
 
-    mockCalibrationCheckSession = {
-      id: 'fake_check_session_id',
-      ...mockCalibrationCheckSessionAttributes,
-    }
     dispatchRequests = jest.fn()
 
     render = (
       props: Partial<React.ComponentProps<typeof CheckCalibration>> = {}
     ) => {
-      const { showSpinner = false, isJogging = false } = props
-      return mount(
+      const {
+        showSpinner = false,
+        isJogging = false,
+        session = mockCalibrationCheckSession,
+      } = props
+      return renderWithProviders<React.ComponentType<typeof CheckCalibration>>(
         <CheckCalibration
           robotName="robot-name"
-          session={mockCalibrationCheckSession}
+          session={session}
           dispatchRequests={dispatchRequests}
           showSpinner={showSpinner}
           hasBlock={false}
           isJogging={isJogging}
         />,
-        {
-          wrappingComponent: Provider,
-          wrappingComponentProps: { store: mockStore },
-        }
+        { i18nInstance: i18n }
       )
     }
   })
@@ -126,245 +97,93 @@ describe('CheckCalibration', () => {
 
   SPECS.forEach(spec => {
     it(`renders correct contents when currentStep is ${spec.currentStep}`, () => {
-      mockCalibrationCheckSession = {
-        ...mockCalibrationCheckSession,
-        details: {
-          ...mockCalibrationCheckSession.details,
-          currentStep: spec.currentStep,
+      const { getByRole, queryByRole } = render({
+        session: {
+          ...mockCalibrationCheckSession,
+          details: {
+            ...mockCalibrationCheckSession.details,
+            currentStep: spec.currentStep,
+          },
         },
-      } as any
-      const wrapper = render()
-      POSSIBLE_CHILDREN.forEach(child => {
-        if (child === spec.component) {
-          expect(wrapper.exists(child)).toBe(true)
+      })[0]
+
+      SPECS.forEach(({ currentStep, heading }) => {
+        if (currentStep === spec.currentStep) {
+          expect(
+            getByRole('heading', { name: spec.heading })
+          ).toBeInTheDocument()
         } else {
-          expect(wrapper.exists(child)).toBe(false)
+          expect(queryByRole('heading', { name: heading })).toBeNull()
         }
       })
     })
   })
 
-  it('renders confirm exit modal on exit click', () => {
-    const wrapper = render()
+  it('renders confirm exit on exit click', () => {
+    const { getByRole, queryByRole } = render()[0]
 
-    expect(wrapper.find('ConfirmExitModal').exists()).toBe(false)
-    act(() =>
-      getExitButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
-    )
-    wrapper.update()
-    expect(wrapper.find('ConfirmExitModal').exists()).toBe(true)
+    expect(
+      queryByRole('heading', {
+        name: 'Calibration Health Check progress will be lost',
+      })
+    ).toBeNull()
+    getByRole('button', { name: 'Exit' }).click()
+    expect(
+      getByRole('heading', {
+        name: 'Calibration Health Check progress will be lost',
+      })
+    ).toBeInTheDocument()
   })
 
-  it('does not render spinner when showSpinner is false', () => {
-    const wrapper = render({ showSpinner: false })
-    expect(wrapper.find('SpinnerModalPage').exists()).toBe(false)
-  })
-
-  it('renders spinner when showSpinner is true', () => {
-    const wrapper = render({ showSpinner: true })
-    expect(wrapper.find('SpinnerModalPage').exists()).toBe(true)
+  it('does not render contents when showSpinner is true', () => {
+    const { queryByRole } = render({
+      showSpinner: true,
+      session: {
+        ...mockCalibrationCheckSession,
+        details: {
+          ...mockCalibrationCheckSession.details,
+          currentStep: 'sessionStarted',
+        },
+      },
+    })[0]
+    expect(queryByRole('heading', { name: 'Before you begin' })).toBeNull()
   })
 
   it('does dispatch jog requests when not isJogging', () => {
-    mockCalibrationCheckSession = {
-      ...mockCalibrationCheckSession,
-      details: {
-        ...mockCalibrationCheckSession.details,
-        currentStep: 'preparingPipette',
-      },
-    }
-    const wrapper = render({ isJogging: false })
-    wrapper.find('button[title="forward"]').invoke('onClick')?.(
-      {} as React.MouseEvent
-    )
-    expect(dispatchRequests).toHaveBeenCalledWith(
-      Sessions.createSessionCommand(
-        'robot-name',
-        mockCalibrationCheckSession.id,
-        {
-          command: Sessions.sharedCalCommands.JOG,
-          data: { vector: [0, -0.1, 0] },
-        }
-      )
-    )
-  })
-  it('does not dispatch jog requests when isJogging', () => {
-    mockCalibrationCheckSession = {
-      ...mockCalibrationCheckSession,
-      details: {
-        ...mockCalibrationCheckSession.details,
-        currentStep: 'preparingPipette',
-      },
-    }
-    const wrapper = render({ isJogging: true })
-    dispatch.mockClear()
-    wrapper.find('button[title="forward"]').invoke('onClick')?.(
-      {} as React.MouseEvent
-    )
-    expect(dispatchRequests).not.toHaveBeenCalled()
-  })
-})
-
-describe('deprecated CheckCalibration, remove this whole block when enableCalibrationWizards FF is deleted', () => {
-  let mockStore: any
-  let render: (
-    props?: Partial<React.ComponentProps<typeof CheckCalibration>>
-  ) => ReactWrapper<React.ComponentProps<typeof CheckCalibration>>
-  let dispatch: jest.MockedFunction<Dispatch>
-  let dispatchRequests: jest.MockedFunction<any>
-  let mockCalibrationCheckSession: Sessions.CalibrationCheckSession = {
-    id: 'fake_check_session_id',
-    ...mockCalibrationCheckSessionAttributes,
-  }
-  const getExitButton = (
-    wrapper: ReactWrapper<React.ComponentProps<typeof CheckCalibration>>
-  ) => wrapper.find({ title: 'exit' }).find('button')
-
-  const POSSIBLE_CHILDREN = [
-    Introduction,
-    DeckSetup,
-    TipPickUp,
-    TipConfirmation,
-    SaveZPoint,
-    SaveXYPoint,
-    ResultsSummary,
-  ]
-
-  const SPECS: CheckCalibrationSpec[] = [
-    { component: Introduction, currentStep: 'sessionStarted' },
-    { component: DeckSetup, currentStep: 'labwareLoaded' },
-    { component: TipPickUp, currentStep: 'preparingPipette' },
-    { component: TipConfirmation, currentStep: 'inspectingTip' },
-    { component: SaveZPoint, currentStep: 'comparingHeight' },
-    { component: SaveXYPoint, currentStep: 'comparingPointOne' },
-    { component: SaveXYPoint, currentStep: 'comparingPointTwo' },
-    { component: SaveXYPoint, currentStep: 'comparingPointThree' },
-    { component: ReturnTip, currentStep: 'returningTip' },
-    { component: ResultsSummary, currentStep: 'resultsSummary' },
-  ]
-
-  beforeEach(() => {
-    dispatch = jest.fn()
-    mockStore = {
-      subscribe: () => {},
-      getState: () => ({
-        robotApi: {},
-      }),
-      dispatch,
-    }
-    when(mockGetDeckDefinitions).calledWith().mockReturnValue({})
-    when(mockUseFeatureFlag)
-      .calledWith('enableCalibrationWizards')
-      .mockReturnValue(false)
-
-    mockCalibrationCheckSession = {
-      id: 'fake_check_session_id',
+    const session = {
+      id: 'fake_session_id',
       ...mockCalibrationCheckSessionAttributes,
-    }
-    dispatchRequests = jest.fn()
-
-    render = (
-      props: Partial<React.ComponentProps<typeof CheckCalibration>> = {}
-    ) => {
-      const { showSpinner = false, isJogging = false } = props
-      return mount(
-        <CheckCalibration
-          robotName="robot-name"
-          session={mockCalibrationCheckSession}
-          dispatchRequests={dispatchRequests}
-          showSpinner={showSpinner}
-          hasBlock={false}
-          isJogging={isJogging}
-        />,
-        {
-          wrappingComponent: Provider,
-          wrappingComponentProps: { store: mockStore },
-        }
-      )
-    }
-  })
-
-  afterEach(() => {
-    resetAllWhenMocks()
-  })
-
-  SPECS.forEach(spec => {
-    it(`renders correct contents when currentStep is ${spec.currentStep}`, () => {
-      mockCalibrationCheckSession = {
-        ...mockCalibrationCheckSession,
-        details: {
-          ...mockCalibrationCheckSession.details,
-          currentStep: spec.currentStep,
-        },
-      } as any
-      const wrapper = render()
-      POSSIBLE_CHILDREN.forEach(child => {
-        if (child === spec.component) {
-          expect(wrapper.exists(child)).toBe(true)
-        } else {
-          expect(wrapper.exists(child)).toBe(false)
-        }
-      })
-    })
-  })
-
-  it('renders confirm exit modal on exit click', () => {
-    const wrapper = render()
-
-    expect(wrapper.find('ConfirmExitModal').exists()).toBe(false)
-    act(() =>
-      getExitButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
-    )
-    wrapper.update()
-    expect(wrapper.find('ConfirmExitModal').exists()).toBe(true)
-  })
-
-  it('does not render spinner when showSpinner is false', () => {
-    const wrapper = render({ showSpinner: false })
-    expect(wrapper.find('SpinnerModalPage').exists()).toBe(false)
-  })
-
-  it('renders spinner when showSpinner is true', () => {
-    const wrapper = render({ showSpinner: true })
-    expect(wrapper.find('SpinnerModalPage').exists()).toBe(true)
-  })
-
-  it('does dispatch jog requests when not isJogging', () => {
-    mockCalibrationCheckSession = {
-      ...mockCalibrationCheckSession,
       details: {
-        ...mockCalibrationCheckSession.details,
-        currentStep: 'preparingPipette',
+        ...mockCalibrationCheckSessionAttributes.details,
+        currentStep: Sessions.DECK_STEP_PREPARING_PIPETTE,
       },
     }
-    const wrapper = render({ isJogging: false })
-    wrapper.find('button[title="forward"]').invoke('onClick')?.(
-      {} as React.MouseEvent
-    )
+    const { getByRole } = render({ isJogging: false, session })[0]
+    getByRole('button', { name: 'forward' }).click()
     expect(dispatchRequests).toHaveBeenCalledWith(
-      Sessions.createSessionCommand(
-        'robot-name',
-        mockCalibrationCheckSession.id,
-        {
-          command: Sessions.sharedCalCommands.JOG,
-          data: { vector: [0, -0.1, 0] },
-        }
-      )
+      Sessions.createSessionCommand('robot-name', session.id, {
+        command: Sessions.sharedCalCommands.JOG,
+        data: { vector: [0, -0.1, 0] },
+      })
     )
   })
+
   it('does not dispatch jog requests when isJogging', () => {
-    mockCalibrationCheckSession = {
-      ...mockCalibrationCheckSession,
+    const session = {
+      id: 'fake_session_id',
+      ...mockCalibrationCheckSessionAttributes,
       details: {
-        ...mockCalibrationCheckSession.details,
-        currentStep: 'preparingPipette',
+        ...mockCalibrationCheckSessionAttributes.details,
+        currentStep: Sessions.DECK_STEP_PREPARING_PIPETTE,
       },
     }
-    const wrapper = render({ isJogging: true })
-    dispatch.mockClear()
-    wrapper.find('button[title="forward"]').invoke('onClick')?.(
-      {} as React.MouseEvent
+    const { getByRole } = render({ isJogging: true, session })[0]
+    getByRole('button', { name: 'forward' }).click()
+    expect(dispatchRequests).not.toHaveBeenCalledWith(
+      Sessions.createSessionCommand('robot-name', session.id, {
+        command: Sessions.sharedCalCommands.JOG,
+        data: { vector: [0, -0.1, 0] },
+      })
     )
-    expect(dispatchRequests).not.toHaveBeenCalled()
   })
 })

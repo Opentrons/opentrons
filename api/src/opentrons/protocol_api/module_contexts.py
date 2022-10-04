@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import logging
-from typing import Generic, List, Optional, TYPE_CHECKING, TypeVar, cast
+from typing import Generic, List, Optional, TypeVar, cast
+
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from opentrons import types
+from opentrons.broker import Broker
 from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
-from opentrons.hardware_control import modules
+from opentrons.hardware_control import SynchronousAdapter, modules
 from opentrons.hardware_control.modules import ModuleModel, types as module_types
 from opentrons.hardware_control.types import Axis
 from opentrons.commands import module_commands as cmds
@@ -19,17 +22,18 @@ from opentrons.protocols.geometry.module_geometry import (
     HeaterShakerGeometry,
 )
 
-from . import validation
+from .core.protocol import AbstractProtocol
+from .core.instrument import AbstractInstrument
+from .core.labware import AbstractLabware
+from .core.module import AbstractModuleCore
+from .core.well import AbstractWellCore
+
 from .module_validation_and_errors import (
     validate_heater_shaker_temperature,
     validate_heater_shaker_speed,
 )
-from .labware import Labware, load, load_from_definition
-from .load_info import LabwareLoadInfo
+from .labware import Labware
 
-if TYPE_CHECKING:
-    from .protocol_context import ProtocolContext
-    from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 ENGAGE_HEIGHT_UNIT_CNV = 2
 MAGDECK_HALF_MM_LABWARE = [
@@ -40,9 +44,14 @@ MAGDECK_HALF_MM_LABWARE = [
     "usascientific_96_wellplate_2.4ml_deep",
 ]
 
-MODULE_LOG = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
 
 GeometryType = TypeVar("GeometryType", bound=ModuleGeometry)
+
+InstrumentCore = AbstractInstrument[AbstractWellCore]
+LabwareCore = AbstractLabware[AbstractWellCore]
+ModuleCore = AbstractModuleCore[LabwareCore]
+ProtocolCore = AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]
 
 
 class NoTargetTemperatureSetError(RuntimeError):
@@ -54,38 +63,30 @@ class CannotPerformModuleAction(RuntimeError):
 
 
 class ModuleContext(CommandPublisher, Generic[GeometryType]):
-    """An object representing a connected module.
+    """A connected module in the protocol.
 
     .. versionadded:: 2.0
     """
 
     def __init__(
         self,
-        ctx: ProtocolContext,
-        geometry: GeometryType,
-        requested_as: ModuleModel,
-        at_version: APIVersion,
+        core: ModuleCore,
+        protocol_core: ProtocolCore,
+        api_version: APIVersion,
+        broker: Broker,
     ) -> None:
-        """Build the ModuleContext.
-
-        This usually should not be instantiated directly; instead, modules
-        should be loaded using :py:meth:`ProtocolContext.load_module`.
-
-        :param ctx: The parent context for the module
-        :param geometry: The :py:class:`.ModuleGeometry` for the module
-        :param requested_as: See :py:obj:`requested_as`.
-        """
-        super().__init__(ctx.broker)
-        self._geometry = geometry
-        self._ctx = ctx
-        self._requested_as = requested_as
-        self._api_version = at_version
+        super().__init__(broker=broker)
+        self._core = core
+        self._protocol_core = protocol_core
+        self._api_version = api_version
+        self._labware: Optional[Labware] = None
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def api_version(self) -> APIVersion:
         return self._api_version
 
+    # TODO(mc, 2022-09-08): Remove this method
     @requires_version(2, 0)
     def load_labware_object(self, labware: Labware) -> Labware:
         """Specify the presence of a piece of labware on the module.
@@ -96,39 +97,19 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
                         onto the module in one step, see
                         :py:meth:`load_labware`.
         :returns: The properly-linked labware object
+
+        ..deprecated: 2.14
         """
-        # TODO(mc, 2022-09-02): move to module_core
-        mod_labware = self._geometry.add_labware(labware)
-
-        labware_core = mod_labware._implementation
-        deck_slot = validation.ensure_deck_slot(self._geometry.parent)  # type: ignore[arg-type]
-        load_params = labware_core.get_load_params()
-
-        provided_offset = self._ctx._labware_offset_provider.find(
-            load_params=load_params,
-            requested_module_model=self.requested_as,
-            deck_slot=deck_slot,
+        _log.warning(
+            "`module.load_labware_object` is an internal, deprecated method."
+            " Use `module.load_labware` or `load_labware_by_definition` instead."
         )
+        assert (
+            labware.parent == self.geometry
+        ), "Labware is not configured with this module as its parent"
 
-        labware_core.set_calibration(provided_offset.delta)
-        self._ctx._implementation.get_deck().recalculate_high_z()
+        return self._core.geometry.add_labware(labware)
 
-        self._ctx.equipment_broker.publish(
-            LabwareLoadInfo(
-                labware_definition=labware_core.get_definition(),
-                labware_namespace=load_params.namespace,
-                labware_load_name=load_params.load_name,
-                labware_version=load_params.version,
-                deck_slot=deck_slot,
-                on_module=True,
-                offset_id=provided_offset.offset_id,
-                labware_display_name=labware_core.get_user_display_name(),
-            )
-        )
-
-        return mod_labware
-
-    @requires_version(2, 0)
     def load_labware(
         self,
         name: str,
@@ -136,37 +117,47 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
         namespace: Optional[str] = None,
         version: int = 1,
     ) -> Labware:
-        """Specify the presence of a piece of labware on the module.
+        """Load a labware onto the module by its load parameters.
 
         :param name: The name of the labware object.
-        :param str label: An optional special name to give the labware. If
-            specified, this is the name the labware will appear as in the run
-            log and the calibration view in the Opentrons app.
+        :param str label: An optional display name to give the labware.
+            If specified, this is the name the labware will use in the run log
+            and the calibration view in the Opentrons App.
         :param str namespace: The namespace the labware definition belongs to.
             If unspecified, will search 'opentrons' then 'custom_beta'
-        :param int version: The version of the labware definition. If
-            unspecified, will use version 1.
+        :param int version: The version of the labware definition.
+            If unspecified, will use version 1.
 
         :returns: The initialized and loaded labware object.
 
         .. versionadded:: 2.1
             The *label,* *namespace,* and *version* parameters.
         """
-        if self.api_version < APIVersion(2, 1) and (label or namespace or version):
-            MODULE_LOG.warning(
+        if self._api_version < APIVersion(2, 1) and (
+            label is not None or namespace is not None or version != 1
+        ):
+            _log.warning(
                 f"You have specified API {self.api_version}, but you "
                 "are trying to utilize new load_labware parameters in 2.1"
             )
-        lw = load(
-            name,
-            self._geometry.location,
-            label,
-            namespace,
-            version,
-            bundled_defs=self._ctx._implementation.get_bundled_labware(),
-            extra_defs=self._ctx._implementation.get_extra_labware(),
+
+        labware_core = self._protocol_core.load_labware(
+            load_name=name,
+            label=label,
+            namespace=namespace,
+            version=version,
+            location=self._core,
         )
-        return self.load_labware_object(lw)
+
+        # TODO(mc, 2022-09-02): add API version
+        # https://opentrons.atlassian.net/browse/RSS-97
+        labware = self._core.geometry.add_labware(Labware(implementation=labware_core))
+
+        # TODO(mc, 2022-09-08): move this into legacy PAPIv2 implementation
+        # by reworking the `Deck` and/or `ModuleGeometry` interface
+        self._protocol_core.get_deck().recalculate_high_z()
+
+        return labware
 
     @requires_version(2, 0)
     def load_labware_from_definition(
@@ -183,8 +174,14 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
                           Opentrons app.
         :returns: The initialized and loaded labware object.
         """
-        lw = load_from_definition(definition, self._geometry.location, label)
-        return self.load_labware_object(lw)
+        load_params = self._protocol_core.add_labware_definition(definition)
+
+        return self.load_labware(
+            name=load_params.load_name,
+            namespace=load_params.namespace,
+            version=load_params.version,
+            label=label,
+        )
 
     @requires_version(2, 1)
     def load_labware_by_name(
@@ -198,26 +195,25 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
         .. deprecated:: 2.0
             Use :py:meth:`load_labware` instead.
         """
-        MODULE_LOG.warning(
-            "load_labware_by_name is deprecated. Use load_labware instead."
+        _log.warning("load_labware_by_name is deprecated. Use load_labware instead.")
+        return self.load_labware(
+            name=name, label=label, namespace=namespace, version=version
         )
-        return self.load_labware(name, label, namespace, version)
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def labware(self) -> Optional[Labware]:
         """The labware (if any) present on this module."""
-        return self._geometry.labware
+        return self._core.geometry.labware
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
-    # TODO (spp, 2022-07-27): Check if it is better to use GeometryType as the returnType
-    def geometry(self) -> ModuleGeometry:
+    def geometry(self) -> GeometryType:
         """The object representing the module as an item on the deck
 
         :returns: ModuleGeometry
         """
-        return self._geometry
+        return cast(GeometryType, self._core.geometry)
 
     @property
     def requested_as(self) -> ModuleModel:
@@ -230,11 +226,16 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
 
         :meta private:
         """
-        return self._requested_as
+        return self._core.get_requested_model()
+
+    # TODO(mc, 2022-09-08): remove this property
+    @property
+    def _module(self) -> SynchronousAdapter[modules.AbstractModule]:
+        return self._core._sync_module_hardware  # type: ignore[attr-defined, no-any-return]
 
     def __repr__(self) -> str:
         return "{} at {} lw {}".format(
-            self.__class__.__name__, self._geometry, self.labware
+            self.__class__.__name__, self.geometry, self.labware
         )
 
 
@@ -270,18 +271,9 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
 
     """
 
-    def __init__(
-        self,
-        ctx: ProtocolContext,
-        # TODO(mc, 2022-02-05): this type annotation is misleading;
-        # a SynchronousAdapter wrapper is actually passed in
-        hw_module: modules.tempdeck.TempDeck,
-        geometry: ModuleGeometry,
-        requested_as: ModuleModel,
-        at_version: APIVersion,
-    ) -> None:
-        self._module = hw_module
-        super().__init__(ctx, geometry, requested_as, at_version)
+    # TODO(mc, 2022-02-05): this type annotation is misleading;
+    # a SynchronousAdapter wrapper is actually passed in
+    _module: modules.tempdeck.TempDeck  # type: ignore[assignment]
 
     @publish(command=cmds.tempdeck_set_temp)
     @requires_version(2, 0)
@@ -355,18 +347,9 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
 
     """
 
-    def __init__(
-        self,
-        ctx: ProtocolContext,
-        # TODO(mc, 2022-02-05): this type annotation is misleading;
-        # a SynchronousAdapter wrapper is actually passed in
-        hw_module: modules.magdeck.MagDeck,
-        geometry: ModuleGeometry,
-        requested_as: ModuleModel,
-        at_version: APIVersion,
-    ) -> None:
-        self._module = hw_module
-        super().__init__(ctx, geometry, requested_as, at_version)
+    # TODO(mc, 2022-02-05): this type annotation is misleading;
+    # a SynchronousAdapter wrapper is actually passed in
+    _module: modules.magdeck.MagDeck  # type: ignore[assignment]
 
     @publish(command=cmds.magdeck_calibrate)
     @requires_version(2, 0)
@@ -384,7 +367,7 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
         Load labware onto a Magnetic Module, checking if it is compatible
         """
         if labware.magdeck_engage_height is None:
-            MODULE_LOG.warning(
+            _log.warning(
                 "This labware ({}) is not explicitly compatible with the"
                 " Magnetic Module. You will have to specify a height when"
                 " calling engage()."
@@ -450,9 +433,7 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
         # we will silently ignore it instead of raising APIVersionError.
         # Leaving this unfixed because we haven't thought through
         # how to do backwards-compatible fixes to our version checking itself.
-        elif height_from_base is not None and self._ctx._api_version >= APIVersion(
-            2, 2
-        ):
+        elif height_from_base is not None and self._api_version >= APIVersion(2, 2):
             dist = (
                 height_from_base
                 + modules.magdeck.OFFSET_TO_LABWARE_BOTTOM[self._module.model()]
@@ -487,7 +468,7 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
 
         engage_height = self.labware.magdeck_engage_height
 
-        is_api_breakpoint = self._ctx._api_version >= APIVersion(2, 3)
+        is_api_breakpoint = self._api_version >= APIVersion(2, 3)
         is_v1_module = self._module.model() == "magneticModuleV1"
         engage_height_is_in_half_mm = self.labware.load_name in MAGDECK_HALF_MM_LABWARE
 
@@ -520,67 +501,67 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     .. versionadded:: 2.0
     """
 
-    def __init__(
-        self,
-        ctx: ProtocolContext,
-        # TODO(mc, 2022-02-05): this type annotation is misleading;
-        # a SynchronousAdapter wrapper is actually passed in
-        hw_module: modules.thermocycler.Thermocycler,
-        geometry: ThermocyclerGeometry,
-        requested_as: ModuleModel,
-        at_version: APIVersion,
-    ) -> None:
-        self._module = hw_module
-        super().__init__(ctx, geometry, requested_as, at_version)
+    # TODO(mc, 2022-02-05): this type annotation is misleading;
+    # a SynchronousAdapter wrapper is actually passed in
+    _module: modules.thermocycler.Thermocycler  # type: ignore[assignment]
+
+    def _get_fixed_trash(self) -> Labware:
+        trash = self._protocol_core.get_fixed_trash()
+
+        if isinstance(trash, AbstractLabware):
+            trash = Labware(implementation=trash)
+
+        return cast(Labware, trash)
 
     def _prepare_for_lid_move(self) -> None:
         loaded_instruments = [
             instr
-            for mount, instr in self._ctx._instruments.items()
+            for mount, instr in self._protocol_core.get_loaded_instruments().items()
             if instr is not None
         ]
         try:
-            instr = loaded_instruments[0]
+            instr_impl = loaded_instruments[0]
         except IndexError:
-            MODULE_LOG.warning(
+            _log.warning(
                 "Cannot assure a safe gantry position to avoid colliding"
                 " with the lid of the Thermocycler Module."
             )
         else:
-            ctx_impl = self._ctx._implementation
-            instr_impl = instr._implementation
+            ctx_impl = self._protocol_core
             hardware = ctx_impl.get_hardware()
-
             hardware.retract(instr_impl.get_mount())
             high_point = hardware.current_position(instr_impl.get_mount())
-            trash_top = self._ctx.fixed_trash.wells()[0].top()
+            trash_top = self._get_fixed_trash().wells()[0].top()
             safe_point = trash_top.point._replace(
                 z=high_point[Axis.by_mount(instr_impl.get_mount())]
             )
-            instr.move_to(types.Location(safe_point, None), force_direct=True)
+            instr_impl.move_to(
+                types.Location(safe_point, None),
+                force_direct=True,
+                minimum_z_height=None,
+                speed=None,
+            )
 
     def flag_unsafe_move(
         self, to_loc: types.Location, from_loc: types.Location
     ) -> None:
-        cast(ThermocyclerGeometry, self.geometry).flag_unsafe_move(
-            to_loc, from_loc, self.lid_position
-        )
+        self.geometry.flag_unsafe_move(to_loc, from_loc, self.lid_position)
 
     @publish(command=cmds.thermocycler_open)
     @requires_version(2, 0)
     def open_lid(self) -> str:
         """Opens the lid"""
         self._prepare_for_lid_move()
-        self._geometry.lid_status = self._module.open()  # type: ignore[assignment]
-        return self._geometry.lid_status
+        self.geometry.lid_status = self._module.open()  # type: ignore[assignment]
+        return self.geometry.lid_status
 
     @publish(command=cmds.thermocycler_close)
     @requires_version(2, 0)
     def close_lid(self) -> str:
         """Closes the lid"""
         self._prepare_for_lid_move()
-        self._geometry.lid_status = self._module.close()  # type: ignore[assignment]
-        return self._geometry.lid_status
+        self.geometry.lid_status = self._module.close()  # type: ignore[assignment]
+        return self.geometry.lid_status
 
     @publish(command=cmds.thermocycler_set_block_temp)
     @requires_version(2, 0)
@@ -792,93 +773,79 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     .. versionadded:: 2.13
     """
 
-    def __init__(
-        self,
-        ctx: ProtocolContext,
-        # TODO(mc, 2022-02-05): this type annotation is misleading;
-        # a SynchronousAdapter wrapper is actually passed in
-        hw_module: modules.heater_shaker.HeaterShaker,
-        geometry: HeaterShakerGeometry,
-        requested_as: ModuleModel,
-        at_version: APIVersion,
-    ) -> None:
-        self._module = hw_module
-        super().__init__(ctx, geometry, requested_as, at_version)
+    # TODO(mc, 2022-02-05): this type annotation is misleading;
+    # a SynchronousAdapter wrapper is actually passed in
+    _module: modules.heater_shaker.HeaterShaker  # type: ignore[assignment]
 
     @property  # type: ignore[misc]
     @requires_version(2, 13)
     def target_temperature(self) -> Optional[float]:
-        """Target temperature of the heater-shaker's plate."""
+        """The target temperature of the Heater-Shaker's plate in °C, or ``None`` if no target has been set."""
         return self._module.target_temperature
 
     @property  # type: ignore[misc]
     @requires_version(2, 13)
     def current_temperature(self) -> float:
-        """Current temperature of the heater-shaker's plate."""
+        """The current temperature of the Heater-Shaker's plate in °C. Returns ``23`` in simulation if no target temperature has been set."""
         return self._module.temperature
 
     @property  # type: ignore[misc]
     @requires_version(2, 13)
     def current_speed(self) -> int:
-        """Current speed of the heater-shaker's plate."""
+        """The current rpm of the Heater-Shaker's plate."""
         return self._module.speed
 
     @property  # type: ignore[misc]
     @requires_version(2, 13)
     def target_speed(self) -> Optional[int]:
-        """Target speed of the heater-shaker's plate."""
+        """The target rpm of the Heater-Shaker's plate."""
         return self._module.target_speed
 
     @property  # type: ignore[misc]
     @requires_version(2, 13)
     def temperature_status(self) -> str:
-        """Heater-shaker's temperature status string.
+        """One of five possible temperature statuses:
 
-        Returns one of these possible status values:
-        - "holding at target"
-        - "cooling"
-        - "heating"
-        - "idle"
-        - "error"
+        - ``holding at target``: The module has reached its target temperature and is actively maintaining that temperature.
+        - ``cooling``: The module has previously heated and is now passively cooling. `The Heater-Shaker does not have active cooling.`
+        - ``heating``: The module is heating to a target temperature.
+        - ``idle``: The module has not heated since the beginning of the protocol.
+        - ``error``: The temperature status can't be determined.
         """
         return self._module.temperature_status.value
 
     @property  # type: ignore[misc]
     @requires_version(2, 13)
     def speed_status(self) -> str:
-        """Heater-shaker's speed status string.
+        """One of five possible shaking statuses:
 
-        Returns one of these possible status values:
-        - "holding at target"
-        - "speeding up"
-        - "slowing down"
-        - "idle"
-        - "error"
+        - ``holding at target``: The module has reached its target shake speed and is actively maintaining that speed.
+        - ``speeding up``: The module is increasing its shake speed towards a target.
+        - ``slowing down``: The module was previously shaking at a faster speed and is currently reducing its speed to a lower target or to deactivate.
+        - ``idle``: The module is not shaking.
+        - ``error``: The shaking status can't be determined.
         """
         return self._module.speed_status.value
 
     @property  # type: ignore[misc]
     @requires_version(2, 13)
     def labware_latch_status(self) -> str:
-        """Heater-shaker's labware latch status string.
+        """One of six possible latch statuses:
 
-        Returns one of these possible status values:
-        - "opening": latch is opening
-        - "idle_open": latch is open and idle
-        - "closing": latch is closing
-        - "idle_closed": latch is closed and idle
-        - "idle_unknown": status upon reset
-        - "unknown": latch status cannot be reached, likely due to an error
+        - ``opening``: The latch is currently opening (in motion).
+        - ``idle_open``: The latch is open and not moving.
+        - ``closing``: The latch is currently closing (in motion).
+        - ``idle_closed``: The latch is closed and not moving.
+        - ``idle_unknown``: The default status upon reset, regardless of physical latch position. Use :py:meth:`~HeaterShakerContext.close_labware_latch` before other commands requiring confirmation that the latch is closed.
+        - ``unknown``: The latch status can't be determined.
         """
         return self._module.labware_latch_status.value
 
     @requires_version(2, 13)
     def set_and_wait_for_temperature(self, celsius: float) -> None:
-        """Set the target temperature and wait for it to be reached.
+        """Set a target temperature and block execution of further commands until the module reaches the target.
 
-        Note: The Heater-Shaker truncates the ``temperature`` parameter to 2 decimal places.
-
-        :param celsius: The target temperature, in °C in range 37°C to 95°C.
+        :param celsius: A value between 27 and 95, representing the target temperature in °C. Values are automatically truncated to two decimal places, and the Heater-Shaker module has a temperature accuracy of ±0.5 °C.
         """
         self.set_target_temperature(celsius=celsius)
         self.wait_for_temperature()
@@ -886,14 +853,10 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_set_target_temperature)
     def set_target_temperature(self, celsius: float) -> None:
-        """Set target temperature and return immediately.
+        """Set a target temperature `and return immediately` without
+        waiting for the target to be reached. This allows other commands to be executed while the Heater-Shaker is heating. If, after performing some other commands, you need to wait until the target temperature is reached, use :py:meth:`~HeaterShakerContext.wait_for_temperature` to delay protocol execution.
 
-        Sets the heater-shaker's target temperature and returns immediately without
-        waiting for the target to be reached. Does not delay the protocol until
-        target temperature has reached. Use `wait_for_target_temperature` to delay
-        protocol execution.
-
-        Note: The H/S truncates the temperature param to 2 decimal places
+        :param celsius: A value between 27 and 95, representing the target temperature in °C. Values are automatically truncated to two decimal places, and the Heater-Shaker module has a temperature accuracy of ±0.5 °C.
         """
         validated_temp = validate_heater_shaker_temperature(celsius=celsius)
         self._module.start_set_temperature(celsius=validated_temp)
@@ -901,27 +864,25 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_wait_for_temperature)
     def wait_for_temperature(self) -> None:
-        """Wait for the Heater-Shaker to reach its target temperature.
-
-        Delays protocol execution until the Heater-Shaker has reached its target
-        temperature. The module must have a target temperature set previously.
+        """Delays protocol execution until the Heater-Shaker has reached its target
+        temperature. Returns an error if no target temperature was previously set.
         """
         if self.target_temperature is None:
             raise NoTargetTemperatureSetError(
-                f"Heater-shaker module {self} does not have a target temperature set."
+                f"Heater-Shaker Module {self} does not have a target temperature set."
             )
         self._module.await_temperature(awaiting_temperature=self.target_temperature)
 
     @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_set_and_wait_for_shake_speed)
     def set_and_wait_for_shake_speed(self, rpm: int) -> None:
-        """Set and wait for target speed.
+        """Set a target shake speed and block execution of further commands until the module reaches the target. Reaching a target shake speed typically only takes a few seconds.
 
-        Set the heater shaker's target speed and wait until the specified speed has
-        reached. Delays protocol execution until the target speed has been achieved.
+        .. note::
 
-        NOTE: Before shaking, this command will retract the pipettes up if they are
-              parked adjacent to the heater-shaker.
+            Before shaking, this command will retract the pipettes upward if they are parked adjacent to the Heater-Shaker.
+
+        :param rpm: A value between 200 and 3000, representing the target shake speed in revolutions per minute.
         """
         if (
             self._module.labware_latch_status
@@ -933,7 +894,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         else:
             # TODO: Figure out whether to issue close latch behind the scenes instead
             raise CannotPerformModuleAction(
-                "Cannot start H/S shake unless labware latch is closed."
+                "Cannot start shaking unless labware latch is closed."
             )
 
     @requires_version(2, 13)
@@ -941,15 +902,15 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     def open_labware_latch(self) -> None:
         """Open the Heater-Shaker's labware latch.
 
-        NOTE:
-        1. This command will retract the pipettes up if they are parked east or west
-           of the Heater-Shaker.
-        2. The labware latch needs to be closed before:
+        The labware latch needs to be closed before:
             * Shaking
             * Pipetting to or from the labware on the Heater-Shaker
             * Pipetting to or from labware to the left or right of the Heater-Shaker
 
-        Raises an error when attempting to open the latch while the Heater-Shaker is shaking.
+        Attempting to open the latch while the Heater-Shaker is shaking will raise an error.
+
+        .. note::
+            Before opening the latch, this command will retract the pipettes upward if they are parked adjacent to the left or right of the Heater-Shaker.
         """
         if self._module.speed_status != module_types.SpeedStatus.IDLE:
             # TODO: What to do when speed status is ERROR?
@@ -962,19 +923,19 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_close_labware_latch)
     def close_labware_latch(self) -> None:
-        """Close heater-shaker's labware latch"""
+        """Closes the labware latch. The labware latch needs to be closed using this method before sending a shake command, even if the latch was manually closed before starting the protocol."""
         self._module.close_labware_latch()
 
     @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_deactivate_shaker)
     def deactivate_shaker(self) -> None:
-        """Stop shaking."""
+        """Stops shaking. Decelerating to 0 rpm typically only takes a few seconds."""
         self._module.deactivate_shaker()
 
     @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_deactivate_heater)
     def deactivate_heater(self) -> None:
-        """Stop heating."""
+        """Stops heating. The module will passively cool to room temperature. `The Heater-Shaker does not have active cooling.`"""
         self._module.deactivate_heater()
 
     def flag_unsafe_move(
@@ -984,20 +945,23 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     ) -> None:
         """
         Raise an error if attempting to perform a move that's deemed unsafe due to
-        the presence of the heater-shaker.
+        the presence of the Heater-Shaker.
+
+        :meta private:
         """
+        destination_slot = to_loc.labware.first_parent()
+        if destination_slot is None:
+            _log.warning(
+                "Pipette movement destination has no slot associated with it. Cannot"
+                " determine whether movement will safely avoid colliding with the Heater-Shaker."
+            )
+            return
+
         is_labware_latch_closed = (
             self._module.labware_latch_status
             == HeaterShakerLabwareLatchStatus.IDLE_CLOSED
         )
         is_plate_shaking = self._module.speed_status != module_types.SpeedStatus.IDLE
-
-        destination_slot = to_loc.labware.first_parent()
-        if destination_slot is None:
-            raise Exception(
-                "Destination has no slot associated with it. "
-                "Cannot determine pipette movement safety."
-            )
 
         to_labware_like = to_loc.labware
         is_tiprack: bool
@@ -1013,7 +977,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
                 "Cannot determine pipette movement safety."
             )
 
-        cast(HeaterShakerGeometry, self.geometry).flag_unsafe_move(
+        self.geometry.flag_unsafe_move(
             to_slot=int(destination_slot),
             is_tiprack=is_tiprack,
             is_using_multichannel=is_multichannel,
@@ -1026,26 +990,23 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         Before shaking, retracts pipettes if they're parked over a slot
         adjacent to the heater-shaker.
         """
-
-        if cast(HeaterShakerGeometry, self.geometry).is_pipette_blocking_shake_movement(
-            pipette_location=self._ctx.location_cache
+        protocol_core = self._protocol_core
+        if self.geometry.is_pipette_blocking_shake_movement(
+            pipette_location=protocol_core.get_last_location()
         ):
-            ctx_implementation = self._ctx._implementation
-            hardware = ctx_implementation.get_hardware()
-            for mount in types.Mount:
-                hardware.retract(mount=mount)
-            self._ctx.location_cache = None
+            hardware = protocol_core.get_hardware()
+            hardware.home(axes=[axis for axis in Axis.mount_axes()])
+            protocol_core.set_last_location(None)
 
     def _prepare_for_latch_open(self) -> None:
         """
         Before opening latch, retracts pipettes if they're parked over a slot
         east/ west of the heater-shaker.
         """
-        if cast(HeaterShakerGeometry, self.geometry).is_pipette_blocking_latch_movement(
-            pipette_location=self._ctx.location_cache
+        protocol_core = self._protocol_core
+        if self.geometry.is_pipette_blocking_latch_movement(
+            pipette_location=protocol_core.get_last_location()
         ):
-            ctx_implementation = self._ctx._implementation
-            hardware = ctx_implementation.get_hardware()
-            for mount in types.Mount:
-                hardware.retract(mount=mount)
-            self._ctx.location_cache = None
+            hardware = protocol_core.get_hardware()
+            hardware.home(axes=[axis for axis in Axis.mount_axes()])
+            protocol_core.set_last_location(None)

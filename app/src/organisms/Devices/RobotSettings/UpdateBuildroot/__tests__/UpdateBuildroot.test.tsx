@@ -83,7 +83,7 @@ describe('UpdateBuildroot wizard', () => {
     const versionInfo = wrapper.find(VersionInfoModal)
 
     expect(wrapper.exists(ViewUpdateModal)).toBe(false)
-    versionInfo.invoke('proceed')?.()
+    versionInfo.invoke('goToViewUpdate')?.()
 
     const viewUpdate = wrapper.find(ViewUpdateModal)
     expect(viewUpdate.prop('robotName')).toBe(mockRobot.name)
@@ -95,10 +95,9 @@ describe('UpdateBuildroot wizard', () => {
     expect(closeModal).toHaveBeenCalled()
   })
 
-  it('should proceed from the ViewUpdateModal to an install', () => {
+  it('should proceed from the VersionInfoModal to an install', () => {
     const { wrapper, store } = render()
-    wrapper.find(VersionInfoModal).invoke('proceed')?.()
-    wrapper.find(ViewUpdateModal).invoke('proceed')?.()
+    wrapper.find(VersionInfoModal).invoke('installUpdate')?.()
 
     expect(store.dispatch).toHaveBeenCalledWith(
       Buildroot.startBuildrootUpdate(mockRobot.name)

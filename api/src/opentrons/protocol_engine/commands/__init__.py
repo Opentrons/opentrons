@@ -18,6 +18,8 @@ from . import magnetic_module
 from . import temperature_module
 from . import thermocycler
 
+from . import calibration
+
 from .command import (
     AbstractCommandImpl,
     BaseCommand,
@@ -341,9 +343,11 @@ __all__ = [
     "LoadLiquidParams",
     "LoadLiquidResult",
     "LoadLiquidCommandType",
-    # module command bundles
+    # hardware module command bundles
     "heater_shaker",
     "magnetic_module",
     "temperature_module",
     "thermocycler",
+    # calibration command bundle
+    "calibration",
 ]

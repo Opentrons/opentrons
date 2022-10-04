@@ -1,4 +1,5 @@
 from __future__ import annotations
+from pathlib import Path
 import subprocess
 import signal
 import sys
@@ -8,10 +9,16 @@ from typing import Optional
 
 
 class DevServer:
-    def __init__(self, port: str = "31950") -> None:
+    def __init__(
+        self, port: str = "31950", persistence_directory: Optional[Path] = None
+    ) -> None:
         """Initialize a dev server."""
         self.server_temp_directory: str = tempfile.mkdtemp()
-        self.persistence_directory: str = tempfile.mkdtemp()
+        self.persistence_directory: Path = (
+            persistence_directory
+            if persistence_directory is not None
+            else Path(tempfile.mkdtemp())
+        )
         self.port: str = port
 
     def __enter__(self) -> DevServer:
@@ -52,7 +59,9 @@ class DevServer:
             env={
                 "OT_ROBOT_SERVER_DOT_ENV_PATH": "dev.env",
                 "OT_API_CONFIG_DIR": self.server_temp_directory,
-                "OT_ROBOT_SERVER_persistence_directory": self.persistence_directory,
+                "OT_ROBOT_SERVER_persistence_directory": str(
+                    self.persistence_directory
+                ),
             },
             stdin=subprocess.DEVNULL,
             # The server will log to its stdout or stderr.

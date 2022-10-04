@@ -1,7 +1,7 @@
 // Actions for triggering analytics events that don't work well as epics looking
 // for unrelated events
 
-import * as CalUITypes from '../../organisms/CalibrationPanels/types'
+import * as CalUITypes from '../../organisms/DeprecatedCalibrationPanels/types'
 import * as Types from './types'
 import * as Constants from './constants'
 
