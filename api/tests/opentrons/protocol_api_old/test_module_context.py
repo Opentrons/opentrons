@@ -8,7 +8,6 @@ import opentrons.protocols.geometry as papi_geometry
 
 from opentrons.types import Point, Location
 from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
-from opentrons.hardware_control.types import Axis
 from opentrons.hardware_control.modules.magdeck import OFFSET_TO_LABWARE_BOTTOM
 from opentrons.hardware_control.modules.types import (
     SpeedStatus,

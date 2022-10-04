@@ -53,14 +53,6 @@ ModuleCore = AbstractModuleCore[LabwareCore]
 ProtocolCore = AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]
 
 
-class NoTargetTemperatureSetError(RuntimeError):
-    """An error raised when awaiting temperature when no target was set."""
-
-
-class CannotPerformModuleAction(RuntimeError):
-    """An error raised when attempting to execute an invalid module action."""
-
-
 class ModuleContext(CommandPublisher, Generic[GeometryType]):
     """A connected module in the protocol.
 
@@ -837,10 +829,6 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         """Delays protocol execution until the Heater-Shaker has reached its target
         temperature. Returns an error if no target temperature was previously set.
         """
-        if self.target_temperature is None:
-            raise NoTargetTemperatureSetError(
-                f"Heater-Shaker Module {self} does not have a target temperature set."
-            )
         # TODO should we pass the target temperature to the core (and then to await temperature?)
         self._core.wait_for_target_temperature()
 
@@ -859,15 +847,6 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         """
         validated_speed = validate_heater_shaker_speed(rpm=rpm)
         self._core.set_and_wait_for_shake_speed(rpm=validated_speed)
-        # if self.labware_latch_status == HeaterShakerLabwareLatchStatus.IDLE_CLOSED:
-        #     validated_speed = validate_heater_shaker_speed(rpm=rpm)
-        #     #self._prepare_for_shake()  # TODO move this to core?
-        #     self._core.set_and_wait_for_shake_speed(rpm=validated_speed)
-        # else:
-        #     # TODO: Figure out whether to issue close latch behind the scenes instead
-        #     raise CannotPerformModuleAction(
-        #         "Cannot start shaking unless labware latch is closed."
-        #     )
 
     @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_open_labware_latch)
@@ -886,12 +865,6 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
             Before opening the latch, this command will retract the pipettes upward
             if they are parked adjacent to the left or right of the Heater-Shaker.
         """
-        if self.speed_status != module_types.SpeedStatus.IDLE:
-            # TODO: What to do when speed status is ERROR?
-            raise CannotPerformModuleAction(
-                """Cannot open labware latch while module is shaking."""
-            )
-        #self._prepare_for_latch_open()  # TODO also move this to core?
         self._core.open_labware_latch()
 
     @requires_version(2, 13)

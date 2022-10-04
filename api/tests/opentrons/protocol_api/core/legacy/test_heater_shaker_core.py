@@ -20,6 +20,7 @@ from opentrons.protocol_api.core.protocol_api.legacy_module_core import (
     LegacyHeaterShakerCore,
     create_module_core,
     CannotPerformModuleAction,
+    NoTargetTemperatureSetError,
 )
 
 SyncHeaterShakerHardware = SynchronousAdapter[HeaterShaker]
@@ -175,9 +176,23 @@ def test_wait_for_target_temperature(
     subject: LegacyHeaterShakerCore,
 ) -> None:
     """It should wait for the target temperature with the hardware."""
+    decoy.when(subject.get_target_temperature()).then_return(42.0)
+
     subject.wait_for_target_temperature()
 
     decoy.verify(mock_sync_module_hardware.await_temperature(), times=1)
+
+
+def test_wait_for_temperature_no_target(
+    decoy: Decoy,
+    mock_sync_module_hardware: SyncHeaterShakerHardware,
+    subject: LegacyHeaterShakerCore,
+) -> None:
+    """It should raise a NoTargetTemperatureSetError."""
+    decoy.when(subject.get_target_temperature()).then_return(None)
+
+    with pytest.raises(NoTargetTemperatureSetError):
+        subject.wait_for_target_temperature()
 
 
 def test_set_and_wait_for_shake_speed(
@@ -188,9 +203,10 @@ def test_set_and_wait_for_shake_speed(
     subject: LegacyHeaterShakerCore,
 ) -> None:
     """It should set and wait for the target speed with the hardware."""
-    # TODO check all this mocking
     mock_hardware = decoy.mock(cls=SyncHardwareAPI)
-    decoy.when(subject.get_labware_latch_status()).then_return(HeaterShakerLabwareLatchStatus.IDLE_CLOSED)
+    decoy.when(subject.get_labware_latch_status()).then_return(
+        HeaterShakerLabwareLatchStatus.IDLE_CLOSED
+    )
     decoy.when(mock_geometry.is_pipette_blocking_shake_movement(None)).then_return(True)
     decoy.when(mock_protocol_core.get_hardware()).then_return(mock_hardware)
 
@@ -200,6 +216,7 @@ def test_set_and_wait_for_shake_speed(
         mock_hardware.home(axes=[Axis.Z, Axis.A]),
         mock_protocol_core.set_last_location(None),
         mock_sync_module_hardware.set_speed(rpm=1337),
+        times=1,
     )
 
 
@@ -229,12 +246,46 @@ def test_set_and_wait_for_shake_speed_raises(
 def test_open_labware_latch(
     decoy: Decoy,
     mock_sync_module_hardware: SyncHeaterShakerHardware,
+    mock_geometry: HeaterShakerGeometry,
+    mock_protocol_core: ProtocolContextImplementation,
     subject: LegacyHeaterShakerCore,
 ) -> None:
     """It should open the labware latch with the hardware."""
+    mock_hardware = decoy.mock(cls=SyncHardwareAPI)
+    decoy.when(subject.get_speed_status()).then_return(SpeedStatus.IDLE)
+    decoy.when(mock_geometry.is_pipette_blocking_latch_movement(None)).then_return(True)
+    decoy.when(mock_protocol_core.get_hardware()).then_return(mock_hardware)
+
     subject.open_labware_latch()
 
-    decoy.verify(mock_sync_module_hardware.open_labware_latch(), times=1)
+    decoy.verify(
+        mock_hardware.home(axes=[Axis.Z, Axis.A]),
+        mock_protocol_core.set_last_location(None),
+        mock_sync_module_hardware.open_labware_latch(),
+        times=1,
+    )
+
+
+@pytest.mark.parametrize(
+    "speed_status",
+    [
+        SpeedStatus.DECELERATING,
+        SpeedStatus.ACCELERATING,
+        SpeedStatus.HOLDING,
+        SpeedStatus.ERROR,
+    ],
+)
+def test_open_labware_latch_raises(
+    decoy: Decoy,
+    speed_status: SpeedStatus,
+    mock_sync_module_hardware: SyncHeaterShakerHardware,
+    subject: LegacyHeaterShakerCore,
+) -> None:
+    """It should raise a CannotPerformModuleAction when heater-shaker is not idle."""
+    decoy.when(subject.get_speed_status()).then_return(speed_status)
+
+    with pytest.raises(CannotPerformModuleAction):
+        subject.open_labware_latch()
 
 
 def test_close_labware_latch(

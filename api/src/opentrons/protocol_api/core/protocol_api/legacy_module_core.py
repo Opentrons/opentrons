@@ -15,7 +15,10 @@ from opentrons.hardware_control.modules.types import (
     SpeedStatus,
     MagneticModuleModel,
 )
-from opentrons.protocols.geometry.module_geometry import ModuleGeometry, HeaterShakerGeometry
+from opentrons.protocols.geometry.module_geometry import (
+    ModuleGeometry,
+    HeaterShakerGeometry,
+)
 from opentrons.types import DeckSlotName
 
 from ..module import (
@@ -31,6 +34,10 @@ if TYPE_CHECKING:
 
 
 _log = logging.getLogger(__name__)
+
+
+class NoTargetTemperatureSetError(RuntimeError):
+    """An error raised when awaiting temperature when no target was set."""
 
 
 class CannotPerformModuleAction(RuntimeError):
@@ -229,11 +236,19 @@ class LegacyHeaterShakerCore(
 
     def wait_for_target_temperature(self) -> None:
         """Wait for the labware plate's target temperature to be reached."""
+        if self.get_target_temperature() is None:
+            raise NoTargetTemperatureSetError(
+                "Heater-Shaker Module does not have a target temperature set."
+            )
+
         self._sync_module_hardware.await_temperature()
 
     def set_and_wait_for_shake_speed(self, rpm: int) -> None:
         """Set the shaker's target shake speed and wait for it to spin up."""
-        if self.get_labware_latch_status() == HeaterShakerLabwareLatchStatus.IDLE_CLOSED:
+        if (
+            self.get_labware_latch_status()
+            == HeaterShakerLabwareLatchStatus.IDLE_CLOSED
+        ):
             self._prepare_for_shake()
             self._sync_module_hardware.set_speed(rpm=rpm)
         else:
@@ -244,6 +259,12 @@ class LegacyHeaterShakerCore(
 
     def open_labware_latch(self) -> None:
         """Open the labware latch."""
+        if self.get_speed_status() != SpeedStatus.IDLE:
+            # TODO: What to do when speed status is ERROR?
+            raise CannotPerformModuleAction(
+                """Cannot open labware latch while module is shaking."""
+            )
+        self._prepare_for_latch_open()
         self._sync_module_hardware.open_labware_latch()
 
     def close_labware_latch(self) -> None:
