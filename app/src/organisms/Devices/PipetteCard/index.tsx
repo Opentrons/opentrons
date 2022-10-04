@@ -43,7 +43,11 @@ import { PipetteSettingsSlideout } from './PipetteSettingsSlideout'
 import { AboutPipetteSlideout } from './AboutPipetteSlideout'
 
 import type { AttachedPipette, Mount } from '../../../redux/pipettes/types'
-import type { PipetteModelSpecs } from '@opentrons/shared-data'
+import {
+  isOT3Pipette,
+  PipetteModelSpecs,
+  PipetteName,
+} from '@opentrons/shared-data'
 import type { Dispatch, State } from '../../../redux/types'
 
 interface PipetteCardProps {
@@ -66,7 +70,8 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   } = useMenuHandleClickOutside()
   const dispatch = useDispatch<Dispatch>()
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
-  const pipetteName = pipetteInfo?.displayName
+  const pipetteName = pipetteInfo?.name
+  const pipetteDisplayName = pipetteInfo?.displayName
   const pipetteOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => setShowOverflowMenu(false),
   })
@@ -149,7 +154,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       borderRadius={BORDERS.radiusSoftCorners}
       marginBottom={SPACING.spacing3}
       width="100%"
-      data-testid={`PipetteCard_${pipetteName}`}
+      data-testid={`PipetteCard_${pipetteDisplayName}`}
     >
       {showChangePipette && (
         <ChangePipette
@@ -224,7 +229,8 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
             pipetteOffsetCalibration == null &&
             pipetteInfo != null &&
             showBanner &&
-            !isFetching ? (
+            !isFetching &&
+            !isOT3Pipette(pipetteName as PipetteName) ? (
               <Flex paddingBottom={SPACING.spacing2}>
                 <Banner
                   type="error"
@@ -272,7 +278,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               fontWeight={FONT_WEIGHT_REGULAR}
               fontSize={TYPOGRAPHY.fontSizeCaption}
               paddingBottom={SPACING.spacing2}
-              data-testid={`PipetteCard_mount_${pipetteName}`}
+              data-testid={`PipetteCard_mount_${pipetteDisplayName}`}
             >
               {t('mount', {
                 side: mount === LEFT ? t('left') : t('right'),
@@ -280,10 +286,10 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
             </StyledText>
             <Flex
               paddingBottom={SPACING.spacing2}
-              data-testid={`PipetteCard_display_name_${pipetteName}`}
+              data-testid={`PipetteCard_display_name_${pipetteDisplayName}`}
             >
               <StyledText fontSize={TYPOGRAPHY.fontSizeP}>
-                {pipetteName ?? t('empty')}
+                {pipetteDisplayName ?? t('empty')}
               </StyledText>
             </Flex>
           </Flex>
@@ -292,7 +298,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       <Box
         alignSelf={ALIGN_START}
         padding={SPACING.spacing2}
-        data-testid={`PipetteCard_overflow_btn_${pipetteName}`}
+        data-testid={`PipetteCard_overflow_btn_${pipetteDisplayName}`}
       >
         <OverflowBtn aria-label="overflow" onClick={handleOverflowClick} />
       </Box>
@@ -300,10 +306,11 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
         <>
           <Box
             ref={pipetteOverflowWrapperRef}
-            data-testid={`PipetteCard_overflow_menu_${pipetteName}`}
+            data-testid={`PipetteCard_overflow_menu_${pipetteDisplayName}`}
             onClick={() => setShowOverflowMenu(false)}
           >
             <PipetteOverflowMenu
+              pipetteDisplayName={pipetteDisplayName ?? t('empty')}
               pipetteName={pipetteName ?? t('empty')}
               mount={mount}
               handleChangePipette={handleChangePipette}
