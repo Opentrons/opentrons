@@ -28,9 +28,6 @@ from .. import utils
 class EmptyPayload(utils.BinarySerializable):
     """An empty payload."""
 
-    def __post_init__(self) -> None:
-        message_index = utils.UInt32Field(0)
-
     def __eq__(self, other: object) -> bool:
         """Override __eq__ to ignore message_index."""
         other_dict = vars(other)
