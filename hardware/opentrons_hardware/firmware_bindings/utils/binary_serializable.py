@@ -186,9 +186,22 @@ class BinarySerializable:
             size = cls.get_size()
             # ignore bytes beyond the size of message.
             b = struct.unpack(format_string, data[:size])
-            args = {v.name: v.type.build(b[i]) for i, v in enumerate(fields(cls))}
+            # we have to do message index special until we update to python 3.10 since we can't make it a kw_only arg
+            # 3.10 has an updated dataclass field option that will make this go away, see payloads.py
+            args = {
+                v.name: v.type.build(b[i])
+                for i, v in enumerate(fields(cls))
+                if not (v.name == "message_index")
+            }
+            message_index = next(
+                (v for i, v in enumerate(fields(cls)) if v.name == "message_index"),
+                None,
+            )
             # Mypy is not liking constructing the derived types.
-            return cls(**args)  # type: ignore[call-arg]
+            ret_instance = cls(**args)  # type: ignore[call-arg]
+            if message_index is not None:
+                ret_instance.message_index = message_index
+            return ret_instance
         except struct.error as e:
             raise InvalidFieldException(str(e))
 

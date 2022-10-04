@@ -2,7 +2,7 @@
 # TODO (amit, 2022-01-26): Figure out why using annotations import ruins
 #  dataclass fields interpretation.
 #  from __future__ import annotations
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from .fields import (
     FirmwareShortSHADataField,
@@ -24,13 +24,33 @@ from .fields import (
 from .. import utils
 
 
-@dataclass
+@dataclass(eq=False)
 class EmptyPayload(utils.BinarySerializable):
     """An empty payload."""
-    message_index = 0
+
+    def __post_init__(self) -> None:
+        message_index = utils.UInt32Field(0)
+
+    def __eq__(self, other: object) -> bool:
+        """Override __eq__ to ignore message_index."""
+        other_dict = vars(other)
+        self_dict = vars(self)
+        for key in self_dict:
+            if key != "message_index":
+                if not (key in other_dict and self_dict[key] == other_dict[key]):
+                    return False
+        return True
+
+    # oh boy would it be great to have python 3.10 so we could use the kw_only thing here
+    # we can't have it as a normal arg becuase we'd have to initalize it everywhere we make a message
+    # and we can't just have it set as a default becuase we get a TypeError for initizling the non-default
+    # args of subclasses after this default arg.
+    # to work around this in binary_serializable.build() and can_comm.prompt_payload
+    # we ignore the message_index when constructing args and then set the value manually after
+    message_index: utils.UInt32Field = field(init=False, default=utils.UInt32Field(0))
 
 
-@dataclass
+@dataclass(eq=False)
 class DeviceInfoResponsePayload(EmptyPayload):
     """Device info response."""
 
@@ -39,7 +59,7 @@ class DeviceInfoResponsePayload(EmptyPayload):
     shortsha: FirmwareShortSHADataField
 
 
-@dataclass
+@dataclass(eq=False)
 class TaskInfoResponsePayload(EmptyPayload):
     """Task info response payload."""
 
@@ -50,7 +70,7 @@ class TaskInfoResponsePayload(EmptyPayload):
     priority: utils.UInt16Field
 
 
-@dataclass
+@dataclass(eq=False)
 class GetStatusResponsePayload(EmptyPayload):
     """Get status response."""
 
@@ -58,21 +78,21 @@ class GetStatusResponsePayload(EmptyPayload):
     data: utils.UInt32Field
 
 
-@dataclass
+@dataclass(eq=False)
 class MoveRequestPayload(EmptyPayload):
     """Move request."""
 
     steps: utils.UInt32Field
 
 
-@dataclass
+@dataclass(eq=False)
 class GetSpeedResponsePayload(EmptyPayload):
     """Get speed response."""
 
     mm_sec: utils.UInt32Field
 
 
-@dataclass
+@dataclass(eq=False)
 class EEPromReadPayload(EmptyPayload):
     """Eeprom read request payload ."""
 
@@ -80,28 +100,28 @@ class EEPromReadPayload(EmptyPayload):
     data_length: utils.UInt16Field
 
 
-@dataclass
+@dataclass(eq=False)
 class EEPromDataPayload(EEPromReadPayload):
     """Eeprom payload with data."""
 
     data: EepromDataField
 
 
-@dataclass
+@dataclass(eq=False)
 class MoveGroupRequestPayload(EmptyPayload):
     """A payload with a group id."""
 
     group_id: utils.UInt8Field
 
 
-@dataclass
+@dataclass(eq=False)
 class MoveGroupResponsePayload(EmptyPayload):
     """A response payload with a group id."""
 
     group_id: utils.UInt8Field
 
 
-@dataclass
+@dataclass(eq=False)
 class AddToMoveGroupRequestPayload(MoveGroupRequestPayload):
     """Base of add to move group request to a message group."""
 
@@ -109,7 +129,7 @@ class AddToMoveGroupRequestPayload(MoveGroupRequestPayload):
     duration: utils.UInt32Field
 
 
-@dataclass
+@dataclass(eq=False)
 class AddLinearMoveRequestPayload(AddToMoveGroupRequestPayload):
     """Add a linear move request to a message group."""
 
@@ -118,14 +138,14 @@ class AddLinearMoveRequestPayload(AddToMoveGroupRequestPayload):
     request_stop_condition: utils.UInt8Field
 
 
-@dataclass
+@dataclass(eq=False)
 class HomeRequestPayload(AddToMoveGroupRequestPayload):
     """Request to home."""
 
     velocity: utils.Int32Field
 
 
-@dataclass
+@dataclass(eq=False)
 class GetMoveGroupResponsePayload(MoveGroupResponsePayload):
     """Response to request to get a move group."""
 
@@ -133,7 +153,7 @@ class GetMoveGroupResponsePayload(MoveGroupResponsePayload):
     total_duration: utils.UInt32Field
 
 
-@dataclass
+@dataclass(eq=False)
 class ExecuteMoveGroupRequestPayload(MoveGroupRequestPayload):
     """Start executing a move group."""
 
@@ -141,7 +161,7 @@ class ExecuteMoveGroupRequestPayload(MoveGroupRequestPayload):
     cancel_trigger: utils.UInt8Field
 
 
-@dataclass
+@dataclass(eq=False)
 class MoveCompletedPayload(MoveGroupResponsePayload):
     """Notification of a completed move group."""
 
@@ -151,14 +171,14 @@ class MoveCompletedPayload(MoveGroupResponsePayload):
     ack_id: utils.UInt8Field
 
 
-@dataclass
+@dataclass(eq=False)
 class EncoderPositionResponse(EmptyPayload):
     """Read Encoder Position."""
 
     encoder_position: utils.Int32Field
 
 
-@dataclass
+@dataclass(eq=False)
 class MotionConstraintsPayload(EmptyPayload):
     """The min and max velocity and acceleration of a motion system."""
 
@@ -168,21 +188,21 @@ class MotionConstraintsPayload(EmptyPayload):
     max_acceleration: utils.Int32Field
 
 
-@dataclass
+@dataclass(eq=False)
 class MotorDriverRegisterPayload(EmptyPayload):
     """Read motor driver register request payload."""
 
     reg_addr: utils.UInt8Field
 
 
-@dataclass
+@dataclass(eq=False)
 class MotorDriverRegisterDataPayload(MotorDriverRegisterPayload):
     """Write motor driver register request payload."""
 
     data: utils.UInt32Field
 
 
-@dataclass
+@dataclass(eq=False)
 class ReadMotorDriverRegisterResponsePayload(EmptyPayload):
     """Read motor driver register response payload."""
 
@@ -190,7 +210,7 @@ class ReadMotorDriverRegisterResponsePayload(EmptyPayload):
     data: utils.UInt32Field
 
 
-@dataclass
+@dataclass(eq=False)
 class MotorCurrentPayload(EmptyPayload):
     """Read motor current register payload."""
 
@@ -199,7 +219,7 @@ class MotorCurrentPayload(EmptyPayload):
     run_current: utils.UInt32Field
 
 
-@dataclass
+@dataclass(eq=False)
 class ReadPresenceSensingVoltageResponsePayload(EmptyPayload):
     """Read head presence sensing voltage response payload."""
 
@@ -209,7 +229,7 @@ class ReadPresenceSensingVoltageResponsePayload(EmptyPayload):
     gripper: utils.UInt16Field
 
 
-@dataclass
+@dataclass(eq=False)
 class ToolsDetectedNotificationPayload(EmptyPayload):
     """Tool detection notification."""
 
@@ -219,14 +239,14 @@ class ToolsDetectedNotificationPayload(EmptyPayload):
     gripper: ToolField
 
 
-@dataclass
+@dataclass(eq=False)
 class FirmwareUpdateWithAddress(EmptyPayload):
     """A FW update payload with an address."""
 
     address: utils.UInt32Field
 
 
-@dataclass
+@dataclass(eq=False)
 class FirmwareUpdateData(FirmwareUpdateWithAddress):
     """A FW update data payload."""
 
@@ -260,14 +280,14 @@ class FirmwareUpdateData(FirmwareUpdateWithAddress):
         return obj
 
 
-@dataclass
+@dataclass(eq=False)
 class FirmwareUpdateDataAcknowledge(FirmwareUpdateWithAddress):
     """A FW update data acknowledge payload."""
 
     error_code: ErrorCodeField
 
 
-@dataclass
+@dataclass(eq=False)
 class FirmwareUpdateComplete(EmptyPayload):
     """All data messages have been transmitted."""
 
@@ -275,28 +295,28 @@ class FirmwareUpdateComplete(EmptyPayload):
     crc32: utils.UInt32Field
 
 
-@dataclass
+@dataclass(eq=False)
 class FirmwareUpdateAcknowledge(EmptyPayload):
     """A response to a firmware update message with an error code."""
 
     error_code: ErrorCodeField
 
 
-@dataclass
+@dataclass(eq=False)
 class FirmwareUpdateStatus(EmptyPayload):
     """A response to the FirmwareUpdateStatusRequest message."""
 
     flags: utils.UInt32Field
 
 
-@dataclass
+@dataclass(eq=False)
 class GetLimitSwitchResponse(EmptyPayload):
     """A response to the Limit Switch Status request payload."""
 
     switch_status: utils.UInt8Field
 
 
-@dataclass
+@dataclass(eq=False)
 class SensorPayload(EmptyPayload):
     """Take a single reading from a sensor request payload."""
 
@@ -304,14 +324,14 @@ class SensorPayload(EmptyPayload):
     sensor_id: SensorIdField
 
 
-@dataclass
+@dataclass(eq=False)
 class ReadFromSensorRequestPayload(SensorPayload):
     """Take a single reading from a sensor request payload."""
 
     offset_reading: utils.UInt8Field
 
 
-@dataclass
+@dataclass(eq=False)
 class WriteToSensorRequestPayload(SensorPayload):
     """Write a piece of data to a sensor request payload."""
 
@@ -319,21 +339,21 @@ class WriteToSensorRequestPayload(SensorPayload):
     reg_address: utils.UInt8Field
 
 
-@dataclass
+@dataclass(eq=False)
 class BaselineSensorRequestPayload(SensorPayload):
     """Take a specified amount of readings from a sensor request payload."""
 
     sample_rate: utils.UInt16Field
 
 
-@dataclass
+@dataclass(eq=False)
 class ReadFromSensorResponsePayload(SensorPayload):
     """A response for either a single reading or an averaged reading of a sensor."""
 
     sensor_data: utils.Int32Field
 
 
-@dataclass
+@dataclass(eq=False)
 class SetSensorThresholdRequestPayload(SensorPayload):
     """A request to set the threshold value of a sensor."""
 
@@ -341,7 +361,7 @@ class SetSensorThresholdRequestPayload(SensorPayload):
     mode: SensorThresholdModeField
 
 
-@dataclass
+@dataclass(eq=False)
 class SensorThresholdResponsePayload(SensorPayload):
     """A response that sends back the current threshold value of the sensor."""
 
@@ -349,14 +369,14 @@ class SensorThresholdResponsePayload(SensorPayload):
     mode: SensorThresholdModeField
 
 
-@dataclass
+@dataclass(eq=False)
 class SensorDiagnosticRequestPayload(SensorPayload):
     """A response that sends back the current threshold value of the sensor."""
 
     reg_address: utils.UInt8Field
 
 
-@dataclass
+@dataclass(eq=False)
 class SensorDiagnosticResponsePayload(SensorPayload):
     """A response that sends back the current threshold value of the sensor."""
 
@@ -364,21 +384,21 @@ class SensorDiagnosticResponsePayload(SensorPayload):
     data: utils.UInt32Field
 
 
-@dataclass
+@dataclass(eq=False)
 class BindSensorOutputRequestPayload(SensorPayload):
     """A request to link a GPIO pin output to a sensor threshold."""
 
     binding: SensorOutputBindingField
 
 
-@dataclass
+@dataclass(eq=False)
 class BindSensorOutputResponsePayload(SensorPayload):
     """A response that sends back the current binding for a sensor."""
 
     binding: SensorOutputBindingField
 
 
-@dataclass
+@dataclass(eq=False)
 class PipetteInfoResponsePayload(EmptyPayload):
     """A response carrying data about an attached pipette."""
 
@@ -387,21 +407,21 @@ class PipetteInfoResponsePayload(EmptyPayload):
     serial: SerialDataCodeField
 
 
-@dataclass
+@dataclass(eq=False)
 class BrushedMotorVrefPayload(EmptyPayload):
     """A request to set the reference voltage of a brushed motor."""
 
     v_ref: utils.UInt32Field
 
 
-@dataclass
+@dataclass(eq=False)
 class BrushedMotorPwmPayload(EmptyPayload):
     """A request to set the pwm of a brushed motor."""
 
     duty_cycle: utils.UInt32Field
 
 
-@dataclass
+@dataclass(eq=False)
 class GripperInfoResponsePayload(EmptyPayload):
     """A response carrying data about an attached gripper."""
 
@@ -409,7 +429,7 @@ class GripperInfoResponsePayload(EmptyPayload):
     serial: SerialDataCodeField
 
 
-@dataclass
+@dataclass(eq=False)
 class GripperMoveRequestPayload(AddToMoveGroupRequestPayload):
     """A request to move gripper."""
 
@@ -417,7 +437,7 @@ class GripperMoveRequestPayload(AddToMoveGroupRequestPayload):
     encoder_position_um: utils.Int32Field
 
 
-@dataclass
+@dataclass(eq=False)
 class TipActionRequestPayload(AddToMoveGroupRequestPayload):
     """A request to perform a tip action."""
 
@@ -426,7 +446,7 @@ class TipActionRequestPayload(AddToMoveGroupRequestPayload):
     request_stop_condition: utils.UInt8Field
 
 
-@dataclass
+@dataclass(eq=False)
 class TipActionResponsePayload(MoveCompletedPayload):
     """A response that sends back whether tip action was successful."""
 
@@ -434,14 +454,14 @@ class TipActionResponsePayload(MoveCompletedPayload):
     success: utils.UInt8Field
 
 
-@dataclass
+@dataclass(eq=False)
 class PeripheralStatusResponsePayload(SensorPayload):
     """A response that sends back the initialization status of a peripheral device."""
 
     status: utils.UInt8Field
 
 
-@dataclass
+@dataclass(eq=False)
 class SerialNumberPayload(EmptyPayload):
     """A payload with a serial number."""
 
