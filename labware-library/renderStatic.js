@@ -25,7 +25,7 @@ run({
   include: ['/', '/create/'],
   skipThirdPartyRequests: true,
 })
-  .then(() => globby(path.join(outputPathAbs, '**/*.html')))
+  .then(() => globby(path.join(outputPathAbs, '**/*.html', '**/*.css', '**/*.js')))
   .then(pagePaths =>
     Promise.all(
       pagePaths.map(pagePath =>
