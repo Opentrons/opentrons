@@ -162,7 +162,7 @@ def prompt_payload(
     # Mypy is not liking constructing the derived types.
     ret_instance = payload_type(**i)  # type: ignore[call-arg]
     if message_index is not None:
-        ret_instance.message_index = message_index
+        ret_instance.message_index = message_index  # type: ignore[attr-defined]
     return ret_instance
 
 
