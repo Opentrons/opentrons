@@ -45,7 +45,7 @@ class BaseMessage(object):
 
 
 @dataclass
-class EmptyPayloadMessage(BaseMessage):  # noqa: D101
+class EmptyPayloadMessage(BaseMessage):
     """Base class of a message that has an empty payload."""
 
     payload: payloads.EmptyPayload = payloads.EmptyPayload()
