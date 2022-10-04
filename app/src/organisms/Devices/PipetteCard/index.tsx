@@ -310,8 +310,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
             onClick={() => setShowOverflowMenu(false)}
           >
             <PipetteOverflowMenu
-              pipetteDisplayName={pipetteDisplayName ?? t('empty')}
-              pipetteName={pipetteName ?? t('empty')}
+              pipetteSpecs={pipetteInfo}
               mount={mount}
               handleChangePipette={handleChangePipette}
               handleCalibrate={handleCalibrate}

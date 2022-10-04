@@ -19,8 +19,7 @@ import {
 import type { Mount } from '../../../redux/pipettes/types'
 
 interface PipetteOverflowMenuProps {
-  pipetteDisplayName: PipetteModelSpecs['displayName'] | string
-  pipetteName: PipetteModelSpecs['name'] | string
+  pipetteSpecs: PipetteModelSpecs | null
   mount: Mount
   handleChangePipette: () => void
   handleCalibrate: () => void
@@ -35,8 +34,7 @@ export const PipetteOverflowMenu = (
   const { t } = useTranslation('device_details')
   const {
     mount,
-    pipetteDisplayName,
-    pipetteName,
+    pipetteSpecs,
     handleChangePipette,
     handleCalibrate,
     handleAboutSlideout,
@@ -44,6 +42,10 @@ export const PipetteOverflowMenu = (
     isPipetteCalibrated,
   } = props
 
+  const pipetteName =
+    pipetteSpecs?.name != null ? pipetteSpecs.name : t('empty')
+  const pipetteDisplayName =
+    pipetteSpecs?.displayName != null ? pipetteSpecs.displayName : t('empty')
   const isOT3PipetteAttached = isOT3Pipette(pipetteName as PipetteName)
 
   return (

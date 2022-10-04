@@ -33,8 +33,7 @@ describe('PipetteOverflowMenu', () => {
 
   beforeEach(() => {
     props = {
-      pipetteDisplayName: mockLeftProtoPipette.displayName,
-      pipetteName: mockLeftProtoPipette.name,
+      pipetteSpecs: mockLeftProtoPipette.modelSpecs,
       mount: LEFT,
       handleChangePipette: jest.fn(),
       handleCalibrate: jest.fn(),
@@ -65,8 +64,7 @@ describe('PipetteOverflowMenu', () => {
   })
   it('renders information with no pipette attached', () => {
     props = {
-      pipetteDisplayName: 'Empty',
-      pipetteName: 'Empty',
+      pipetteSpecs: null,
       mount: LEFT,
       handleChangePipette: jest.fn(),
       handleCalibrate: jest.fn(),
@@ -81,8 +79,7 @@ describe('PipetteOverflowMenu', () => {
   })
   it('renders recalibrate pipette offset text', () => {
     props = {
-      pipetteDisplayName: mockLeftProtoPipette.displayName,
-      pipetteName: mockLeftProtoPipette.name,
+      pipetteSpecs: mockLeftProtoPipette.modelSpecs,
       mount: LEFT,
       handleChangePipette: jest.fn(),
       handleCalibrate: jest.fn(),
