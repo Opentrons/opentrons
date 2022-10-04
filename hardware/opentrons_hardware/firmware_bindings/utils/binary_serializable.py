@@ -200,7 +200,7 @@ class BinarySerializable:
             # Mypy is not liking constructing the derived types.
             ret_instance = cls(**args)  # type: ignore[call-arg]
             if message_index is not None:
-                ret_instance.message_index = message_index
+                ret_instance.message_index = message_index  # type: ignore[attr-defined]
             return ret_instance
         except struct.error as e:
             raise InvalidFieldException(str(e))

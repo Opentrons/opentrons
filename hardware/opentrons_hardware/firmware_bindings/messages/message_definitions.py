@@ -35,7 +35,7 @@ class BaseMessage(object):
         """Update the message index from the singleton."""
         try:
             index_generator = SingletonMessageIndexGenerator()
-            self.payload.message_index = utils.UInt32Field(
+            self.payload.message_index = utils.UInt32Field(  # type: ignore[attr-defined]
                 index_generator.get_next_index()
             )
         except AttributeError:
