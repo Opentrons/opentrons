@@ -144,13 +144,26 @@ def prompt_payload(
     """
     payload_fields = dataclasses.fields(payload_type)
     i = {}
+    message_index = None
     for f in payload_fields:
         try:
-            i[f.name] = f.type.from_string(get_user_input(f"enter {f.name}: ").strip())
+            # we have to hack around message_index for now until we update to 3.10
+            # then message index can work like everything else. see payloads.py
+            if not (f.name == "message_index"):
+                i[f.name] = f.type.from_string(
+                    get_user_input(f"enter {f.name}: ").strip()
+                )
+            else:
+                message_index = f.type.from_string(
+                    get_user_input(f"enter {f.name}: ").strip()
+                )
         except ValueError as e:
             raise InvalidInput(str(e))
     # Mypy is not liking constructing the derived types.
-    return payload_type(**i)  # type: ignore[call-arg]
+    ret_instance = payload_type(**i)  # type: ignore[call-arg]
+    if message_index is not None:
+        ret_instance.message_index = message_index
+    return ret_instance
 
 
 def prompt_message(
