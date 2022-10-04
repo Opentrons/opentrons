@@ -1,0 +1,875 @@
+shx rm -rf lib dist python
+webpack --profile
+Hash: 5ae5e7abd608a4ccedf154b53b676bfcab8419d1
+Version: webpack 4.46.0
+Child
+    Hash: 5ae5e7abd608a4ccedf1
+    Time: 1446ms
+    Built at: 10/04/2022 12:00:37 PM
+                  Asset      Size  Chunks                   Chunk Names
+                main.js  1.04 MiB       0  [emitted]        main
+    main.js.LICENSE.txt  1.01 KiB          [emitted]        
+            main.js.map  1.51 MiB       0  [emitted] [dev]  main
+    Entrypoint main = main.js main.js.map
+      [0] external "path" 42 bytes {0} [built]
+          [] 220ms -> [] 86ms -> factory:28ms building:0ms = 334ms
+      [2] external "electron" 42 bytes {0} [built]
+          [] 220ms -> factory:50ms building:36ms dependencies:66ms = 372ms
+      [3] external "fs-extra" 42 bytes {0} [built]
+          [] 220ms -> [] 86ms -> factory:18ms building:0ms = 324ms
+      [4] external "electron-updater" 42 bytes {0} [built]
+          [] 220ms -> [] 86ms -> factory:66ms building:0ms = 372ms
+      [6] external "winston" 42 bytes {0} [built]
+          [] 220ms -> [] 86ms -> factory:18ms building:0ms = 324ms
+      [9] external "util" 42 bytes {0} [built]
+          [] 220ms -> [] 86ms -> factory:18ms building:0ms = 324ms
+    [106] external "electron-store" 42 bytes {0} [built]
+          [] 220ms -> [] 86ms -> factory:74ms building:35ms = 415ms
+    [292] external "electron-context-menu" 42 bytes {0} [built]
+          [] 220ms -> factory:50ms building:36ms dependencies:66ms = 372ms
+    [293] external "merge-options" 42 bytes {0} [built]
+          [] 220ms -> [] 86ms -> factory:67ms building:14ms dependencies:19ms = 406ms
+    [294] external "yargs-parser" 42 bytes {0} [built]
+          [] 220ms -> [] 86ms -> factory:67ms building:14ms dependencies:19ms = 406ms
+    [296] external "dateformat" 42 bytes {0} [built]
+          [] 220ms -> [] 86ms -> factory:18ms building:0ms = 324ms
+    [321] external "electron-dl" 42 bytes {0} [built]
+          [] 220ms -> [] 86ms -> factory:0ms building:0ms = 306ms
+    [805] external "electron-debug" 42 bytes {0} [built]
+          [] 220ms -> factory:50ms building:36ms dependencies:66ms = 372ms
+    [806] external "electron-devtools-installer" 42 bytes {0} [built]
+          [] 220ms -> factory:50ms building:36ms dependencies:66ms = 372ms
+    [807] ./src/main.ts + 110 modules 271 KiB {0} [built]
+          | ./src/main.ts 3.75 KiB [built]
+          |     factory:40ms building:180ms = 220ms
+          | ./src/log.ts 3.11 KiB [built]
+          |     [] 220ms -> factory:50ms building:36ms dependencies:66ms = 372ms
+          | ./src/config/index.ts 2.92 KiB [built]
+          |     [] 220ms -> factory:50ms building:36ms dependencies:66ms = 372ms
+          | ./src/ui.ts 1.82 KiB [built]
+          |     [] 220ms -> factory:50ms building:36ms dependencies:66ms = 372ms
+          | ./src/menu.ts 1.11 KiB [built]
+          |     [] 220ms -> factory:50ms building:36ms dependencies:66ms = 372ms
+          | ./src/labware/index.ts 5.8 KiB [built]
+          |     [] 220ms -> factory:50ms building:36ms dependencies:66ms = 372ms
+          | ./src/protocol-analysis/index.ts 2.35 KiB [built]
+          |     [] 220ms -> factory:50ms building:36ms dependencies:66ms = 372ms
+          | ./src/discovery.ts 3.98 KiB [built]
+          |     [] 220ms -> factory:50ms building:36ms dependencies:66ms = 372ms
+          | ./src/robot-logs.ts 960 bytes [built]
+          |     [] 220ms -> factory:50ms building:36ms dependencies:66ms = 372ms
+          | ./src/update.ts 2.4 KiB [built]
+          |     [] 220ms -> factory:50ms building:36ms dependencies:66ms = 372ms
+          | ./src/buildroot/index.ts 5.96 KiB [built]
+          |     [] 220ms -> factory:50ms building:36ms dependencies:66ms = 372ms
+          | ./src/system-info/index.ts 2.83 KiB [built]
+          |     [] 220ms -> factory:50ms building:36ms dependencies:66ms = 372ms
+          | ./src/protocol-storage/index.ts 4.35 KiB [built]
+          |     [] 220ms -> factory:50ms building:36ms dependencies:66ms = 372ms
+          | ../app/src/redux/shell/actions.ts 186 bytes [built]
+          |     [] 220ms -> [] 86ms -> factory:74ms building:35ms = 415ms
+          | ../app/src/redux/config/index.ts 132 bytes [built]
+          |     [] 220ms -> [] 86ms -> factory:67ms building:14ms dependencies:19ms = 406ms
+          |     + 96 hidden modules
+        + 794 hidden modules
+Child
+    Hash: 54b53b676bfcab8419d1
+    Time: 283ms
+    Built at: 10/04/2022 12:00:36 PM
+             Asset      Size  Chunks                   Chunk Names
+        preload.js  1.12 KiB       0  [emitted]        preload
+    preload.js.map  4.97 KiB       0  [emitted] [dev]  preload
+    Entrypoint preload = preload.js preload.js.map
+    [0] external "electron" 42 bytes {0} [built]
+        [1] 164ms -> factory:0ms building:1ms = 165ms
+    [1] ./src/preload.ts 224 bytes {0} [built]
+        factory:14ms building:150ms = 164ms
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -C ../app
+shx rm -rf dist
+webpack --profile
+Hash: cdfb48250b4b4bb495f8
+Version: webpack 4.46.0
+Time: 11259ms
+Built at: 10/04/2022 12:00:49 PM
+                                                                                            Asset       Size  Chunks                                Chunk Names
+                                                                       1.524691f12f1f49763272.css     53 KiB       1  [emitted] [immutable]         styles
+                                                                 1.bundle.2cbcb0aaf32346eaca8f.js   15.3 KiB       1  [emitted] [immutable]         styles
+                                                             1.bundle.2cbcb0aaf32346eaca8f.js.map   25.8 KiB       1  [emitted] [dev]               styles
+                                                                   bundle.72a199bdcc2a756d69e3.js    5.1 MiB       0  [emitted] [immutable]  [big]  main
+                                                       bundle.72a199bdcc2a756d69e3.js.LICENSE.txt   4.96 KiB          [emitted]                     
+                                                               bundle.72a199bdcc2a756d69e3.js.map   11.7 MiB       0  [emitted] [dev]               main
+                                 fonts/open-sans-latin-300.24f7b0944e9e03a905f9d7701573b2cd.woff2   14.6 KiB          [emitted]                     
+                                  fonts/open-sans-latin-300.a7622f60c56ddd5301549a786b54e6e6.woff   18.2 KiB          [emitted]                     
+                           fonts/open-sans-latin-300italic.6725c3fb1f3abd7ebdcb2d244758f706.woff2   13.5 KiB          [emitted]                     
+                            fonts/open-sans-latin-300italic.793b1237017aeacd646fb80911425566.woff   17.3 KiB          [emitted]                     
+                                 fonts/open-sans-latin-400.33543c5cc5d88f5695dd08c87d280dfd.woff2     14 KiB          [emitted]                     
+                                  fonts/open-sans-latin-400.de0869e324680c99efa1250515b4b41c.woff   17.7 KiB          [emitted]                     
+                            fonts/open-sans-latin-400italic.06b4bfda4e139eaf3ab9872a6d66f42f.woff     17 KiB          [emitted]                     
+                           fonts/open-sans-latin-400italic.b61a9055d92ac56c15cacf4271d4f072.woff2   13.5 KiB          [emitted]                     
+                                  fonts/open-sans-latin-600.449d681cd6006390e1bee3c3a660430b.woff   18.3 KiB          [emitted]                     
+                                 fonts/open-sans-latin-600.819af3d3abdc9f135d49b80a91e2ff4c.woff2   14.5 KiB          [emitted]                     
+                            fonts/open-sans-latin-600italic.56e5756b696615d6164a625e1bcb1a9e.woff   17.1 KiB          [emitted]                     
+                           fonts/open-sans-latin-600italic.ebdfa24cb411ba3016abd1c3ea5746e5.woff2   13.5 KiB          [emitted]                     
+                                 fonts/open-sans-latin-700.0edb76284a7a0f8db4665b560ee2b48f.woff2   14.7 KiB          [emitted]                     
+                                  fonts/open-sans-latin-700.1f85e92d8ff443980bc0f83ad7b23b60.woff   18.5 KiB          [emitted]                     
+                           fonts/open-sans-latin-700italic.a49393f2171a2f4d6927ce6c14f73dbc.woff2   13.6 KiB          [emitted]                     
+                            fonts/open-sans-latin-700italic.bf72679ca22e53320beaea090e8bb07d.woff     17 KiB          [emitted]                     
+                                  fonts/open-sans-latin-800.05ebdbe10796850f045fcd484f35788d.woff   18.6 KiB          [emitted]                     
+                                 fonts/open-sans-latin-800.ab3e500e7375695d702cff19513e4470.woff2   14.7 KiB          [emitted]                     
+                            fonts/open-sans-latin-800italic.92da6f116d973bd334cf9b3afdb29c4f.woff   17.4 KiB          [emitted]                     
+                           fonts/open-sans-latin-800italic.c62c3eea77cf3fca51494e8c924adf4d.woff2   13.6 KiB          [emitted]                     
+                                     images/MoaM_modal_Image.068662030615273467bcf5a6709507ba.svg    142 KiB          [emitted]                     
+                                           images/OT2-R_HERO.79b11ab3de9a6fd843f3bbfc5d0c242b.png   31.9 KiB          [emitted]                     
+                  images/agilent_1_reservoir_290ml_side_view.2f9e3e50861abdd54ca7085ffe37e701.jpg   44.8 KiB          [emitted]                     
+         images/appliedbiosystemsmicroamp_384_wellplate_40ul.e47276c3bb6209d32657d217a9589bd2.jpg   26.8 KiB          [emitted]                     
+                     images/attach-left-multi-GEN2-screws@3x.07f628785c4935f049b4d9ebee4d4590.png    221 KiB          [emitted]                     
+                        images/attach-left-multi-GEN2-tab@3x.cfe03fc0abda282679d58b4fdd0fd245.png    133 KiB          [emitted]                     
+                          images/attach-left-multi-screws@3x.faec9c1c7788abf2ada9586264645033.png    275 KiB          [emitted]              [big]  
+                             images/attach-left-multi-tab@3x.feb69322d6e57df32b610e54bde5e2e3.png    182 KiB          [emitted]                     
+                    images/attach-left-single-GEN2-screws@3x.b531185ce01b78a2330dd0a41571d269.png    181 KiB          [emitted]                     
+                       images/attach-left-single-GEN2-tab@3x.070ddcacf4de58011e0c11de0c5cfdc7.png    133 KiB          [emitted]                     
+                         images/attach-left-single-screws@3x.b3b5c624939f267f74bea41cc5c5b8aa.png    199 KiB          [emitted]                     
+                            images/attach-left-single-tab@3x.17d72bf54710da4e8e1308227db75a51.png    182 KiB          [emitted]                     
+                    images/attach-right-multi-GEN2-screws@3x.8fe2d4f535ab0305657cd937ffe1e49d.png    221 KiB          [emitted]                     
+                       images/attach-right-multi-GEN2-tab@3x.cb73308b78c2b2e7c8d4fa3ceed1c106.png    145 KiB          [emitted]                     
+                         images/attach-right-multi-screws@3x.9ba6d7acaf7427c1e3b6fcdd9ff8745e.png    266 KiB          [emitted]              [big]  
+                            images/attach-right-multi-tab@3x.690516a605565ee4b5980ed5ac96575f.png    182 KiB          [emitted]                     
+                   images/attach-right-single-GEN2-screws@3x.db88e24f7efd3b5c23b4a0451ef144d7.png    180 KiB          [emitted]                     
+                      images/attach-right-single-GEN2-tab@3x.cb73308b78c2b2e7c8d4fa3ceed1c106.png    145 KiB          [emitted]                     
+                        images/attach-right-single-screws@3x.66aa0a4cb88f8cdd3789592adb10219a.png    191 KiB          [emitted]                     
+                           images/attach-right-single-tab@3x.690516a605565ee4b5980ed5ac96575f.png    182 KiB          [emitted]                     
+                    images/axygen_1_reservoir_90ml_side_view.9c934bcf1a81bd12767a648f13c36d1a.jpg   22.7 KiB          [emitted]                     
+                            images/biorad_384_wellplate_50ul.53ba89e98655d733f250ad6619132aa5.jpg   3.93 KiB          [emitted]                     
+   images/biorad_96_wellplate_200ul_pcr_photo_three_quarters.bdb53d07b0ad1c67b9c27f9d3e940a71.jpg   6.25 KiB          [emitted]                     
+ images/corning_12_wellplate_6.9ml_flat_photo_three_quarters.9d0f3f59eb19ce82a35ab6a1717acabf.jpg    314 KiB          [emitted]              [big]  
+ images/corning_24_wellplate_3.4ml_flat_photo_three_quarters.e9eb0fb6c108dc791641bd9aa9a10389.jpg    897 KiB          [emitted]              [big]  
+images/corning_384_wellplate_112ul_flat_photo_three_quarters.a647bb86290d939e00909629fd620ce6.jpg    183 KiB          [emitted]                     
+ images/corning_48_wellplate_1.6ml_flat_photo_three_quarters.ed376b1a01695118fa2e455e34111949.jpg    633 KiB          [emitted]              [big]  
+ images/corning_6_wellplate_16.8ml_flat_photo_three_quarters.af63f6b0d914165537a788af6727eb06.jpg    463 KiB          [emitted]              [big]  
+       images/corning_96_wellplate_360ul_flat_three_quarters.14cba32e26db52f5d3157d8b7ebf5a21.jpg    367 KiB          [emitted]              [big]  
+                             images/deepwell_thermal_adapter.a38cfcd65c239e425318b59aa91e2cf3.png   1.33 MiB          [emitted]              [big]  
+                                  images/depth-plate-flat@3x.6121116277e4801f100109d2dfa97571.png   17.5 KiB          [emitted]                     
+                                 images/depth-plate-round@3x.d3bdd4491616f889788cbdc4310748b7.png   25.3 KiB          [emitted]                     
+                                     images/depth-plate-v@3x.81724d3b2357b848d7c1950bb2129401.png   25.3 KiB          [emitted]                     
+                    images/depth-reservoir-and-tubes-flat@3x.1046522a59c2445acb45cd88a0ba4b78.png   25.5 KiB          [emitted]                     
+                   images/depth-reservoir-and-tubes-round@3x.19ff2bed7bc7906343fe4bd65de10d27.png   30.4 KiB          [emitted]                     
+                       images/depth-reservoir-and-tubes-v@3x.11a87144ccbc349bb274f5cd372c7b23.png     30 KiB          [emitted]                     
+                     images/detach-left-multi-GEN2-screws@3x.f6ca6f2bfe97767780472ffa35c3af4f.png    216 KiB          [emitted]                     
+                        images/detach-left-multi-GEN2-tab@3x.008b7aef8e6b2f229c089c42401816c7.png    128 KiB          [emitted]                     
+                          images/detach-left-multi-screws@3x.074a1f2c40f547760a53cd76ef53d8bd.png    276 KiB          [emitted]              [big]  
+                             images/detach-left-multi-tab@3x.283d24cc0b66bc22c2fd9c9846962c0a.png    170 KiB          [emitted]                     
+                    images/detach-left-single-GEN2-screws@3x.740c622bc2add32dbf1d148ad74e327d.png    166 KiB          [emitted]                     
+                       images/detach-left-single-GEN2-tab@3x.008b7aef8e6b2f229c089c42401816c7.png    128 KiB          [emitted]                     
+                         images/detach-left-single-screws@3x.39efeaa07e471232f69e0addcf4e5702.png    183 KiB          [emitted]                     
+                            images/detach-left-single-tab@3x.283d24cc0b66bc22c2fd9c9846962c0a.png    170 KiB          [emitted]                     
+                    images/detach-right-multi-GEN2-screws@3x.140f1d7cce363ec63d53f24fc4b9384f.png    217 KiB          [emitted]                     
+                       images/detach-right-multi-GEN2-tab@3x.8e1e7e1037aa0ebd7de2123dc1df6f07.png    139 KiB          [emitted]                     
+                         images/detach-right-multi-screws@3x.88b8e80132af47e8ca4c4de728798a2c.png    274 KiB          [emitted]              [big]  
+                            images/detach-right-multi-tab@3x.4ff239009c87e69f5bd675db6cd90f28.png    172 KiB          [emitted]                     
+                   images/detach-right-single-GEN2-screws@3x.425858e2b96495f6e15889ef95bb1369.png    168 KiB          [emitted]                     
+                      images/detach-right-single-GEN2-tab@3x.8e1e7e1037aa0ebd7de2123dc1df6f07.png    139 KiB          [emitted]                     
+                        images/detach-right-single-screws@3x.3ddd8fa29dbc722f353e04d777ef8588.png    180 KiB          [emitted]                     
+                           images/detach-right-single-tab@3x.4ff239009c87e69f5bd675db6cd90f28.png    172 KiB          [emitted]                     
+                images/eppendorf_1.5ml_safelock_snapcap_tube.af81d3fc307a619d0845d113524ab8ec.jpg   3.99 KiB          [emitted]                     
+                images/eppendorf_1000ul_tip_eptips_side_view.387c65e4922a57d084fe0b315a967be4.jpg   2.36 KiB          [emitted]                     
+                images/eppendorf_1000ul_tip_eptips_side_view.f95623f7fa1ea1a38d1fd1f4ec40b613.jpg   1.99 KiB          [emitted]                     
+                 images/eppendorf_10ul_tips_eptips_side_view.17992a3517224ef4aef14499d2bd61d2.jpg    2.2 KiB          [emitted]                     
+                 images/eppendorf_10ul_tips_eptips_side_view.ae15aaef5b0e4a46b4a2c488d5be5039.jpg   2.59 KiB          [emitted]                     
+                  images/eppendorf_2ml_safelock_snapcap_tube.381f3833db2951730632b80dd5fd8160.jpg   4.08 KiB          [emitted]                     
+                             images/falcon_15ml_conical_tube.921bab02f30a40daed204d1fa9309379.jpg     49 KiB          [emitted]                     
+                       images/falcon_50ml_15ml_conical_tubes.95ee2125e636fa15646b7a0b75df6ab3.jpg   78.7 KiB          [emitted]                     
+                             images/falcon_50ml_conical_tube.909c048bb441e0c6e45aacf410db0326.jpg   57.8 KiB          [emitted]                     
+                           images/flatbottom_thermal_adapter.a58ea3aaef7dee1c9d44d1697eb5fe06.png    990 KiB          [emitted]              [big]  
+                                         images/footprint@3x.33bc3f9e9a8242e040460e1cbfaba878.png     33 KiB          [emitted]                     
+                             images/geb_1000ul_tip_side_view.b716991bd9ab5c92b2a9ba56dfafa637.jpg   17.9 KiB          [emitted]                     
+                               images/geb_10ul_tip_side_view.7d9564f02ea559d61bffc6051a26c3c2.jpg   14.7 KiB          [emitted]                     
+                      images/geb_96_tiprack_1000ul_side_view.ab16373720b086136eaec01f194d00e5.jpg     11 KiB          [emitted]                     
+                      images/geb_96_tiprack_1000ul_side_view.d2a97f4c0849431d32ba4d8d0b9f118c.jpg   25.8 KiB          [emitted]                     
+                        images/geb_96_tiprack_10ul_side_view.0dd48d8565c5c4889f43e9c8fbfe5dd8.jpg   13.2 KiB          [emitted]                     
+                        images/geb_96_tiprack_10ul_side_view.dc572637f1a3e0e42ea58bb8c1b76025.jpg   32.7 KiB          [emitted]                     
+                            images/generic_2ml_screwcap_tube.b2c48e8a3f069ff3fceb74821fe4bc48.jpg    122 KiB          [emitted]                     
+                        images/generic_pcr_strip_200ul_tubes.f2bc6f2ef856d1cddac5719bd9692fff.jpg   2.31 KiB          [emitted]                     
+                            images/generic_tiprack_side_view.11ce766f56d2d4345255d10c264edfb7.png    212 KiB          [emitted]                     
+                              images/heater-shaker-key-parts.0426b2c085a136a77b864636e86491b6.png    236 KiB          [emitted]                     
+                      images/heater_shaker_adapter_alignment.75758d29aa6608c0f33919e5f1ee311f.png   2.47 KiB          [emitted]                     
+                    images/heater_shaker_adapter_screwdriver.457ffb992917baed33fe134dd339650f.png   13.8 KiB          [emitted]                     
+                                  images/heater_shaker_empty.fae897e089bd5ed4b003a4584834cfbd.png   7.23 KiB          [emitted]                     
+                         images/heater_shaker_module_diagram.532e224d63c3e07ac7c4123f37c7f3a5.svg   1.27 MiB          [emitted]              [big]  
+                      images/heatershaker_module_transparent.992b6b9a757daecf90eeacb3eba77aaf.svg   1.43 MiB          [emitted]              [big]  
+                           images/height-alum-block-plate@3x.ebc22ddfa662b16da49c808682209f2c.png   15.5 KiB          [emitted]                     
+                           images/height-alum-block-tubes@3x.34af45cd04e2627341f2bff51fc4c223.png   17.5 KiB          [emitted]                     
+                        images/height-plate-and-reservoir@3x.5db63a7d243774a71e4e1be1eba49500.png     16 KiB          [emitted]                     
+                                   images/height-tip-rack@3x.425471bf470a4b29b59d3d9ec5580dfb.png   17.4 KiB          [emitted]                     
+                        images/height-tube-rack-irregular@3x.4f4fc364ef6073c0f9f56df6b8c9a685.png   21.7 KiB          [emitted]                     
+                                  images/height-tube-rack@3x.6b92960ae7ae4b4a1bae078ff274eb75.png   20.5 KiB          [emitted]                     
+                                   images/length-tip-rack@3x.66ad1cfa9c2a0c2918b21d65ee66892b.png   31.8 KiB          [emitted]                     
+                                             images/logo_nav.823728e9fc8a1768deb64f12a8e0eb81.svg    2.2 KiB          [emitted]                     
+                               images/lpc_level_with_labware.96c750f717f17efb45a3f646572aedf9.svg    1.5 KiB          [emitted]                     
+                                   images/lpc_level_with_tip.b713b7a4b3fb57c2de1c7a59cc55c9ec.svg   1.02 KiB          [emitted]                     
+                                   images/lpc_modal_nozzle_1.488053d185258836c323029e7c422821.jpg   60.3 KiB          [emitted]                     
+                                   images/lpc_modal_nozzle_2.1ae89bfde84e19cea45ec3ab803537b7.jpg   37.8 KiB          [emitted]                     
+                      images/lpc_modal_nozzle_not_centered_1.d3e7ca78f95d20339dae835f19233896.jpg   72.4 KiB          [emitted]                     
+                      images/lpc_modal_nozzle_not_centered_2.832e13e5649fad6f0db8d4c30d2d7fd0.jpg   40.5 KiB          [emitted]                     
+                               images/lpc_modal_nozzle_paper.380a01a3d1a1d5ccd5c50b72aa96c0da.jpg   39.4 KiB          [emitted]                     
+                    images/magnetic_module_gen_2_transparent.3a5697962f5add564720df50a23f88f4.svg    478 KiB          [emitted]              [big]  
+                             images/multi-channel_GEN1_800px.a159fc693e32b45616a7f1d8af4a2956.png   12.3 KiB          [emitted]                     
+                             images/multi-channel_GEN2_800px.12244fd63225099c928fdf2f8df9d9fc.png   9.93 KiB          [emitted]                     
+                             images/nest_0.5ml_screwcap_tube.7cfd0fc3b0d269857dedbaf23b3cdbcc.jpg   4.98 KiB          [emitted]                     
+                             images/nest_1.5ml_screwcap_tube.61b0b824ebcccb9b40278343c9b2922a.jpg   6.34 KiB          [emitted]                     
+                              images/nest_1.5ml_snapcap_tube.a0778faf0ec5adc9e063427f63c2e642.jpg   4.69 KiB          [emitted]                     
+                images/nest_12_reservoir_15ml_three_quarters.f1646c26de9f8e9e7c1a638963e1aefa.jpg   43.1 KiB          [emitted]                     
+                               images/nest_15ml_conical_tube.97a91c6bdd33dfc1a53d539e65cdd302.jpg   4.29 KiB          [emitted]                     
+                images/nest_1_reservoir_195ml_three_quarters.921e68d8f61cc617ff6a075da330dde5.jpg   52.2 KiB          [emitted]                     
+                               images/nest_2ml_screwcap_tube.a0688c2f84dcc07a4175876fc578d00f.jpg   6.26 KiB          [emitted]                     
+                                images/nest_2ml_snapcap_tube.74e1f76b3c8823ed70c9ce8f3501f6e9.jpg   6.42 KiB          [emitted]                     
+                         images/nest_50ml_15ml_conical_tubes.c5fe4d2e2a5b73833a652defa96b08cd.jpg    8.9 KiB          [emitted]                     
+                               images/nest_50ml_conical_tube.a9e1865fbe4c81efb1f788bacd3be034.jpg   6.54 KiB          [emitted]                     
+images/nest_96_wellplate_100ul_pcr_full_skirt_three_quarters.a365643b463653c8e5385d3766169fde.jpg   48.6 KiB          [emitted]                     
+          images/nest_96_wellplate_200ul_flat_three_quarters.5c4834b6910b37b704584aa348c7701e.jpg   63.3 KiB          [emitted]                     
+                           images/nest_96_wellplate_2ml_deep.972cce3fbde083520a72916ecbf98134.jpg   37.5 KiB          [emitted]                     
+                                  images/offset-reservoir@3x.a14bc3a17877b5defb23b7000325e94f.png   28.6 KiB          [emitted]                     
+                              images/offset-well-circular@3x.be0a072037e9a4b6728b77531efc50a1.png     74 KiB          [emitted]                     
+                           images/offset-well-rectangular@3x.a0f30edb7cbb8361322585271611c3ee.png   31.2 KiB          [emitted]                     
+                  images/opentrons_10_tuberack_4_6_side_view.cdb178a20997872e028678d24965c744.jpg   36.7 KiB          [emitted]                     
+                      images/opentrons_15_tuberack_side_view.8a849db9e6b4c2b4098ec59a911a70cc.jpg   39.4 KiB          [emitted]                     
+                 images/opentrons_24_aluminumblock_side_view.1c1f49d7f8eed880cfe6387635ada6a9.jpg   13.3 KiB          [emitted]                     
+                      images/opentrons_24_tuberack_side_view.eeb523a58e31a858677c69b0fb22c9fe.jpg   43.5 KiB          [emitted]                     
+                       images/opentrons_6_tuberack_side_view.105aa5b3c41c69fc1448e4f4733f83f2.jpg     37 KiB          [emitted]                     
+                 images/opentrons_96_aluminumblock_side_view.ed80f46cd3c0a73a4cab78f918a4d87c.jpg   33.6 KiB          [emitted]                     
+                images/opentrons_96_tiprack_1000ul_side_view.03865acd51021e8d955fb8026ae53249.jpg   68.8 KiB          [emitted]                     
+                images/opentrons_96_tiprack_1000ul_side_view.a53cce0e635a3c907d99c42581f9c6df.jpg    166 KiB          [emitted]                     
+                  images/opentrons_96_tiprack_10ul_side_view.7c8f1170b07751af9d8d49b5536140ac.jpg    139 KiB          [emitted]                     
+                  images/opentrons_96_tiprack_10ul_side_view.b5279e6f5a0938f9161723a023a72380.jpg   75.9 KiB          [emitted]                     
+                 images/opentrons_96_tiprack_300ul_side_view.41b7f95e0fb8af0ea5e41eb7a2a26aff.jpg   58.4 KiB          [emitted]                     
+                 images/opentrons_96_tiprack_300ul_side_view.839697eae2c49c1db8784eac91ed873c.jpg    120 KiB          [emitted]                     
+                          images/opentrons_calibration_block.915aaa5baa63ee0df913ca7c430a9bf4.png   33.1 KiB          [emitted]                     
+                                  images/pcr_thermal_adapter.0dfa629fd3a2f4fb656fe25f51f73839.png   1.29 MiB          [emitted]              [big]  
+                    images/removable_black_plastic_trash_bin.fd09b8a00db42ca2a000b9605a1123c5.png   4.56 KiB          [emitted]                     
+                                      images/remove-trash@3x.e8d0eebc03ebe4226be9090a8d4c6fdc.png    132 KiB          [emitted]                     
+                               images/robot_calibration_help.b23fb97f682548985b5639c76bfe1ab9.png    590 KiB          [emitted]              [big]  
+                                          images/screwdriver.d40aa4d408905fdd6e1170480a175778.svg   4.06 KiB          [emitted]                     
+                            images/screwdriver_oriented_left.58de2dd5ad872644733c2e2a79f13bd1.svg   1.07 MiB          [emitted]              [big]  
+                               images/secure_mag_mod_bracket.85d38e0daa2323a69f13d42eb58831a3.svg    176 KiB          [emitted]                     
+                                      images/secure_tc_latch.2ecd9ec2b653b8b58c04d14d0d007538.png    466 KiB          [emitted]              [big]  
+                                    images/shape-circular@3x.10c41b7076a9cb6b5e69129a8985dc37.png   31.8 KiB          [emitted]                     
+                                 images/shape-rectangular@3x.688e4a1a1ca33a5864b07526dbe38842.png   17.8 KiB          [emitted]                     
+                            images/single-channel_GEN2_800px.f76cf4d20030cfbbb18656e9bdfe8c28.png   9.07 KiB          [emitted]                     
+                            images/single_channel_GEN1_800px.914371f4183d699f600bde87ee7f543a.png   8.44 KiB          [emitted]                     
+                       images/spacing-reservoir-multi-row@3x.0c6582564608abfcf7cddfbd7ef5b932.png     30 KiB          [emitted]                     
+                                 images/spacing-reservoir@3x.db31eb063935ffb1aaf859a86522e5e3.png   24.4 KiB          [emitted]                     
+                             images/spacing-well-circular@3x.109fbdb472e92c099cea7b4103b4773e.png   72.9 KiB          [emitted]                     
+                          images/spacing-well-rectangular@3x.ad410a54777a0251057c41ca912408e6.png   32.1 KiB          [emitted]                     
+                                 images/t10_torx_screwdriver.0fb7ed9ca1cce476c7a1b0f0a5f90c77.png   2.06 KiB          [emitted]                     
+                          images/temp_deck_gen_2_transparent.a808872e0452922fddee2315aa8b0c84.svg    495 KiB          [emitted]              [big]  
+                                  images/thermocycler_closed.c276cf600435c2a28a87161e25224d59.svg    221 KiB          [emitted]                     
+             images/thermoscientificnunc_96_wellplate_1300ul.a506f9b00330b8b8d812a84ce9a30c19.jpg     48 KiB          [emitted]                     
+             images/thermoscientificnunc_96_wellplate_2000ul.a506f9b00330b8b8d812a84ce9a30c19.jpg     48 KiB          [emitted]                     
+                           images/tipone_200ul_tip_side_view.bd6aa5320f3445ef5c3f7b6f52773a65.jpg   2.72 KiB          [emitted]                     
+                    images/tipone_96_tiprack_200ul_side_view.366a553af2350e3f24eb84e57f9d88f5.jpg     19 KiB          [emitted]                     
+                    images/tipone_96_tiprack_200ul_side_view.ee959b097546d9d33e30f3f4ad4b2a0c.jpg   26.7 KiB          [emitted]                     
+                            images/universal_thermal_adapter.c179bbd698dd630dc9728e6305617c52.png    506 KiB          [emitted]              [big]  
+            images/usascientific_12_reservoir_22ml_side_view.27d2bdfda3c47f7ead071c7d26af42d3.jpg   16.1 KiB          [emitted]                     
+      images/usascientific_96_wellplate_2.4ml_deep_side_view.80b9b3f1833b809c56892075c8f1c196.jpg   9.67 KiB          [emitted]                     
+                                                                                       index.html  566 bytes          [emitted]                     
+                               videos/A1_Multi_Channel_REV1.461fc621c548c1ae7b1b575714d3d647.webm   97.6 KiB          [emitted]                     
+                              videos/A1_Single_Channel_REV1.ee112acbf7820d7aa5f439c4424d674e.webm   89.3 KiB          [emitted]                     
+                                   videos/HS_Deck_Lock_Anim.8dc47bd33bf1cead984d82959b9f57dd.webm    116 KiB          [emitted]                     
+            videos/Left_Multi_CalBlock_NO_TIP_(330x260)REV1.956307edeb9455d8d7bb95eeef195e2d.webm    280 KiB          [emitted]              [big]  
+            videos/Left_Multi_CalBlock_NO_TIP_(330x260)REV2.fe7c78518351f923fb4145a2e78083dc.webm    274 KiB          [emitted]              [big]  
+          videos/Left_Multi_CalBlock_WITH_TIP_(330x260)REV1.0d8e56b6634ac9f9b1501a1148bbdf53.webm    292 KiB          [emitted]              [big]  
+          videos/Left_Multi_CalBlock_WITH_TIP_(330x260)REV2.b0b8c440556fa02250c131f72d3de250.webm    283 KiB          [emitted]              [big]  
+               videos/Left_Multi_Trash_NO_TIP_(330x260)REV1.cdfde3ba1ac01c4d4583b5d541b42afd.webm    300 KiB          [emitted]              [big]  
+             videos/Left_Multi_Trash_WITH_TIP_(330x260)REV1.ab84b5016af2281d838acd75d85d254a.webm    310 KiB          [emitted]              [big]  
+           videos/Left_Single_CalBlock_NO_TIP_(330x260)REV1.55d9d1be3528441bc8037352d7a3ab1f.webm    257 KiB          [emitted]              [big]  
+           videos/Left_Single_CalBlock_NO_TIP_(330x260)REV2.0d5ee709fdd6883b41a8533384ae91df.webm    248 KiB          [emitted]              [big]  
+         videos/Left_Single_CalBlock_WITH_TIP_(330x260)REV1.068d15d74ac7956e68ba849ee17803a5.webm    261 KiB          [emitted]              [big]  
+         videos/Left_Single_CalBlock_WITH_TIP_(330x260)REV2.f342b48dd56025953997ee165d40bffa.webm    252 KiB          [emitted]              [big]  
+              videos/Left_Single_Trash_NO_TIP_(330x260)REV1.fca2370bfb624a701048f33342c5a994.webm    268 KiB          [emitted]              [big]  
+            videos/Left_Single_Trash_WITH_TIP_(330x260)REV1.59330fdc5e67ab643d04c5d99b03607a.webm    273 KiB          [emitted]              [big]  
+           videos/Right_Multi_CalBlock_NO_TIP_(330x260)REV1.7b7499bd130ca518e85b1dd7fafb8b6b.webm    271 KiB          [emitted]              [big]  
+           videos/Right_Multi_CalBlock_NO_TIP_(330x260)REV2.19fdcf5082e8090e4b484c5e9d1b85a8.webm    262 KiB          [emitted]              [big]  
+         videos/Right_Multi_CalBlock_WITH_TIP_(330x260)REV1.b9b5559b9588a881e4b903327f45db81.webm    282 KiB          [emitted]              [big]  
+         videos/Right_Multi_CalBlock_WITH_TIP_(330x260)REV2.99a72fbb89aa1762c7e8559d8378b350.webm    273 KiB          [emitted]              [big]  
+              videos/Right_Multi_Trash_NO_TIP_(330x260)REV1.2ef7be64cdbc8a60946e11e72053f785.webm    289 KiB          [emitted]              [big]  
+            videos/Right_Multi_Trash_WITH_TIP_(330x260)REV1.7cd016b277b5632c01a5f1cd7e7bde5b.webm    301 KiB          [emitted]              [big]  
+          videos/Right_Single_CalBlock_NO_TIP_(330x260)REV1.dffb604ced3d9125626e38c5a33e8639.webm    257 KiB          [emitted]              [big]  
+          videos/Right_Single_CalBlock_NO_TIP_(330x260)REV2.abb94f786c13cd8977d22e0442d44f1e.webm    249 KiB          [emitted]              [big]  
+        videos/Right_Single_CalBlock_WITH_TIP_(330x260)REV1.27fdf7abb4964ae9afa8a4eb7b0eecea.webm    260 KiB          [emitted]              [big]  
+        videos/Right_Single_CalBlock_WITH_TIP_(330x260)REV2.b068880588e8b054638d5539b11fcd8b.webm    253 KiB          [emitted]              [big]  
+             videos/Right_Single_Trash_NO_TIP_(330x260)REV1.61a514e0339e30358e5cbc80d30e163d.webm    269 KiB          [emitted]              [big]  
+           videos/Right_Single_Trash_WITH_TIP_(330x260)REV1.9a2a6f986963423db2a0818efce0442a.webm    272 KiB          [emitted]              [big]  
+                               videos/SLOT_1_LEFT_MULTI_X-Y.1c2d5f4bda8ff85dbfb6d060e2286ccb.webm    423 KiB          [emitted]              [big]  
+                              videos/SLOT_1_LEFT_SINGLE_X-Y.6a66fae028405a5e814b897b1b5e1044.webm    353 KiB          [emitted]              [big]  
+                              videos/SLOT_1_RIGHT_MULTI_X-Y.403e79debe40f46c9d5022dedd4423c7.webm    380 KiB          [emitted]              [big]  
+                             videos/SLOT_1_RIGHT_SINGLE_X-Y.f0d37908a12142a85b64f88bdf750e07.webm    355 KiB          [emitted]              [big]  
+                               videos/SLOT_3_LEFT_MULTI_X-Y.d5a44227bf38118ac349f86b52c93774.webm    402 KiB          [emitted]              [big]  
+                              videos/SLOT_3_LEFT_SINGLE_X-Y.5aba1f98b8d24f084555c8efe3212ed3.webm    342 KiB          [emitted]              [big]  
+                              videos/SLOT_3_RIGHT_MULTI_X-Y.134b1bbba4e5f522e54f0654ee108c55.webm    369 KiB          [emitted]              [big]  
+                             videos/SLOT_3_RIGHT_SINGLE_X-Y.1b244a9c50895925ea7c4b095f7e0c8f.webm    337 KiB          [emitted]              [big]  
+                                 videos/SLOT_5_LEFT_MULTI_Z.f65372350b38a3675b7b6c59707d2ae9.webm    570 KiB          [emitted]              [big]  
+                                videos/SLOT_5_LEFT_SINGLE_Z.074099d8013846f9809a3b831403ea75.webm    516 KiB          [emitted]              [big]  
+                                videos/SLOT_5_RIGHT_MULTI_Z.d3d2a4902a5e6eb0072a93662557e283.webm    534 KiB          [emitted]              [big]  
+                               videos/SLOT_5_RIGHT_SINGLE_Z.6562379fe1c9829f783206abedb4343f.webm    516 KiB          [emitted]              [big]  
+                               videos/SLOT_7_LEFT_MULTI_X-Y.62dea5a9b57ec60e1c9549eb935c0559.webm    414 KiB          [emitted]              [big]  
+                              videos/SLOT_7_LEFT_SINGLE_X-Y.391745dd076564adb4f5b78ce22e1e6d.webm    350 KiB          [emitted]              [big]  
+                              videos/SLOT_7_RIGHT_MULTI_X-Y.96e181b188c1d5b05f11be8d47525c3f.webm    374 KiB          [emitted]              [big]  
+                             videos/SLOT_7_RIGHT_SINGLE_X-Y.e47bd51d5d4002b4788d466031a8a805.webm    348 KiB          [emitted]              [big]  
+                videos/Slot_1_Remove_CalBlock_(330x260)REV1.0b2c07def1f72f3682d9a78b494d03be.webm    159 KiB          [emitted]                     
+                videos/Slot_3_Remove_CalBlock_(330x260)REV1.7feef9717e15d23e5595cdab8c28760f.webm    145 KiB          [emitted]                     
+                                 videos/p20_multi_gen2-left.826ffef3b32310a7c33e09fc1078d2e0.webm   2.61 MiB          [emitted]              [big]  
+                                videos/p20_multi_gen2-right.e3e739b22ad465392cd36ff1b39f183d.webm   2.61 MiB          [emitted]              [big]  
+                                videos/p300_multi_gen2-left.bb635aa78336e364069a1dbb312ad7ba.webm   2.59 MiB          [emitted]              [big]  
+                               videos/p300_multi_gen2-right.80be1f5c71a3441376d59b5ac5a42b46.webm    2.6 MiB          [emitted]              [big]  
+Entrypoint main [big] = 1.524691f12f1f49763272.css 1.bundle.2cbcb0aaf32346eaca8f.js 1.bundle.2cbcb0aaf32346eaca8f.js.map bundle.72a199bdcc2a756d69e3.js bundle.72a199bdcc2a756d69e3.js.map
+   [0] ../components/src/index.ts + 209 modules 392 KiB {0} [built]
+       |    210 modules
+   [6] ../node_modules/react-redux/es/index.js + 22 modules 49.9 KiB {0} [built]
+       |    23 modules
+  [22] ../react-api-client/src/index.ts + 40 modules 58 KiB {0} [built]
+       | ../react-api-client/src/index.ts 242 bytes [built]
+       |     [1388] 1ms -> [1389] 129ms -> factory:40ms building:86ms dependencies:1039ms = 1295ms
+       | ../react-api-client/src/api/index.ts 162 bytes [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:168ms building:50ms = 474ms
+       | ../react-api-client/src/health/index.ts 56 bytes [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:168ms building:50ms = 474ms
+       | ../react-api-client/src/runs/index.ts 914 bytes [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:168ms building:50ms = 474ms
+       | ../react-api-client/src/sessions/index.ts 251 bytes [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:168ms building:50ms = 474ms
+       | ../react-api-client/src/protocols/index.ts 334 bytes [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:168ms building:50ms = 474ms
+       | ../react-api-client/src/server/index.ts 74 bytes [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:168ms building:50ms = 474ms
+       | ../react-api-client/src/modules/index.ts 52 bytes [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:168ms building:50ms = 474ms
+       | ../react-api-client/src/pipettes/index.ts 123 bytes [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:168ms building:50ms = 474ms
+       | ../react-api-client/src/api/ApiClientProvider.tsx 370 bytes [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> [] 218ms -> factory:899ms building:29ms dependencies:86ms = 1488ms
+       | ../react-api-client/src/api/ApiHostProvider.tsx 720 bytes [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> [] 218ms -> factory:899ms building:29ms dependencies:86ms = 1488ms
+       | ../react-api-client/src/api/useHost.ts 154 bytes [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> [] 218ms -> factory:899ms building:29ms dependencies:86ms = 1488ms
+       | ../react-api-client/src/health/useHealth.ts 463 bytes [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> [] 218ms -> factory:58ms building:47ms dependencies:273ms = 852ms
+       | ../react-api-client/src/runs/useAllRunsQuery.ts 1.89 KiB [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> [] 218ms -> factory:892ms building:25ms dependencies:333ms = 1724ms
+       | ../react-api-client/src/runs/useRunQuery.ts 1.97 KiB [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> [] 218ms -> factory:892ms building:25ms dependencies:333ms = 1724ms
+       |     + 26 hidden modules
+  [30] ./src/redux/discovery/index.ts 84 bytes {0} [built]
+       [1388] 1ms -> [1389] 129ms -> [] 126ms -> [] 174ms -> [] 197ms -> [114] 905ms -> factory:756ms building:55ms dependencies:42ms = 2385ms
+  [34] ./src/App/portal.tsx 5.49 KiB {0} [built]
+       [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:1100ms building:29ms dependencies:90ms = 1475ms
+  [35] ./src/redux/config/index.ts + 3 modules 6.27 KiB {0} [built]
+       | ./src/redux/config/index.ts 132 bytes [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> [] 174ms -> [1304] 197ms -> factory:118ms building:46ms dependencies:154ms = 945ms
+       | ./src/redux/config/actions.ts 2.2 KiB [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> [] 174ms -> [1304] 197ms -> [] 164ms -> factory:154ms building:58ms dependencies:1ms = 1004ms
+       | ./src/redux/config/selectors.ts 3.64 KiB [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> [] 174ms -> [1304] 197ms -> [] 164ms -> factory:154ms building:58ms dependencies:1ms = 1004ms
+       | ./src/redux/config/hooks.ts 285 bytes [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> [] 174ms -> [1304] 197ms -> [] 164ms -> factory:154ms building:58ms dependencies:1ms = 1004ms
+ [101] ./src/redux/shell/index.ts + 1 modules 399 bytes {0} [built]
+       | ./src/redux/shell/index.ts 198 bytes [built]
+       |     [1388] 1ms -> [1389] 129ms -> factory:40ms building:86ms dependencies:1039ms = 1295ms
+       | ./src/redux/shell/actions.ts 186 bytes [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:1066ms building:24ms dependencies:0ms = 1346ms
+ [164] ./src/logger.ts 3.53 KiB {0} [built]
+       [1388] 1ms -> [1389] 129ms -> factory:40ms building:86ms dependencies:1039ms = 1295ms
+ [479] ./node_modules/connected-react-router/esm/index.js + 5 modules 17.1 KiB {0} [built]
+       |    6 modules
+ [485] ./src/redux/reducer.ts + 18 modules 69.3 KiB {0} [built]
+       | ./src/redux/reducer.ts 2.19 KiB [built]
+       |     [1388] 1ms -> [1389] 129ms -> factory:40ms building:86ms dependencies:1039ms = 1295ms
+       | ./src/redux/robot-api/reducer.ts 2.84 KiB [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:132ms building:56ms dependencies:988ms = 1432ms
+       | ./src/redux/robot-admin/reducer.ts 3.82 KiB [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:132ms building:56ms dependencies:988ms = 1432ms
+       | ./src/redux/robot-controls/reducer.ts 3.46 KiB [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:132ms building:56ms dependencies:988ms = 1432ms
+       | ./src/redux/robot-settings/reducer.ts 2.6 KiB [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:132ms building:56ms dependencies:988ms = 1432ms
+       | ./src/redux/buildroot/reducer.ts 6.91 KiB [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:132ms building:56ms dependencies:988ms = 1432ms
+       | ./src/redux/pipettes/reducer.ts 3.63 KiB [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:132ms building:56ms dependencies:988ms = 1432ms
+       | ./src/redux/networking/reducer.ts 7.13 KiB [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:132ms building:56ms dependencies:988ms = 1432ms
+       | ./src/redux/shell/reducer.ts 2.88 KiB [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:132ms building:56ms dependencies:988ms = 1432ms
+       | ./src/redux/config/reducer.ts 580 bytes [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:132ms building:56ms dependencies:988ms = 1432ms
+       | ./src/redux/discovery/reducer.ts 2.31 KiB [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:132ms building:56ms dependencies:988ms = 1432ms
+       | ./src/redux/protocol/reducer.ts 2.21 KiB [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:132ms building:56ms dependencies:988ms = 1432ms
+       | ./src/redux/custom-labware/reducer.ts 3.3 KiB [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:132ms building:56ms dependencies:988ms = 1432ms
+       | ./src/redux/system-info/reducer.ts 4.73 KiB [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:132ms building:56ms dependencies:988ms = 1432ms
+       | ./src/redux/alerts/reducer.ts 4.17 KiB [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:132ms building:56ms dependencies:988ms = 1432ms
+       |     + 4 hidden modules
+ [873] ./src/redux/store.ts + 88 modules 225 KiB {0} [built]
+       | ./src/redux/store.ts 974 bytes [built]
+       |     [1388] 1ms -> [1389] 129ms -> factory:40ms building:86ms dependencies:1039ms = 1295ms
+       | ./src/redux/epic.ts 1 KiB [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:147ms building:27ms dependencies:16ms = 446ms
+       | ./src/redux/analytics/epic.ts 4.25 KiB [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> [] 174ms -> factory:156ms building:41ms dependencies:889ms = 1516ms
+       | ./src/redux/discovery/epic.ts 1.05 KiB [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> [] 174ms -> factory:156ms building:41ms dependencies:889ms = 1516ms
+       | ./src/redux/robot-admin/epic/index.ts 571 bytes [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> [] 174ms -> factory:156ms building:41ms dependencies:889ms = 1516ms
+       | ./src/redux/robot-controls/epic/index.ts 334 bytes [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> [] 174ms -> factory:156ms building:41ms dependencies:889ms = 1516ms
+       | ./src/redux/robot-settings/epic/index.ts 330 bytes [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> [] 174ms -> factory:156ms building:41ms dependencies:889ms = 1516ms
+       | ./src/redux/buildroot/epic.ts 16.5 KiB [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> [] 174ms -> factory:156ms building:41ms dependencies:889ms = 1516ms
+       | ./src/redux/pipettes/epic/index.ts 361 bytes [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> [] 174ms -> factory:156ms building:41ms dependencies:889ms = 1516ms
+       | ./src/redux/modules/epic/index.ts 160 bytes [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> [] 174ms -> factory:156ms building:41ms dependencies:889ms = 1516ms
+       | ./src/redux/networking/epic/index.ts 580 bytes [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> [] 174ms -> factory:156ms building:41ms dependencies:889ms = 1516ms
+       | ./src/redux/alerts/epic.ts 569 bytes [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> [] 174ms -> factory:156ms building:41ms dependencies:889ms = 1516ms
+       | ./src/redux/system-info/epic.ts 2.64 KiB [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> [] 174ms -> factory:156ms building:41ms dependencies:889ms = 1516ms
+       | ./src/redux/sessions/epic/index.ts 571 bytes [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> [] 174ms -> factory:156ms building:41ms dependencies:889ms = 1516ms
+       | ./src/redux/calibration/epic/index.ts 388 bytes [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> [] 174ms -> factory:156ms building:41ms dependencies:889ms = 1516ms
+       |     + 74 hidden modules
+[1371] ./src/App/index.tsx + 454 modules 1.77 MiB {0} [built]
+       | ./src/App/index.tsx 4.65 KiB [built]
+       |     [1388] 1ms -> [1389] 129ms -> factory:40ms building:86ms dependencies:1039ms = 1295ms
+       | ./src/atoms/GlobalStyle/index.ts 918 bytes [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:1100ms building:29ms dependencies:90ms = 1475ms
+       | ./src/organisms/Alerts/index.tsx 1.23 KiB [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:1100ms building:29ms dependencies:90ms = 1475ms
+       | ./src/organisms/Breadcrumbs/index.tsx 5.65 KiB [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:1100ms building:29ms dependencies:90ms = 1475ms
+       | ./src/pages/Devices/CalibrationDashboard/index.tsx 887 bytes [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:1100ms building:29ms dependencies:90ms = 1475ms
+       | ./src/pages/Devices/DeviceDetails/index.tsx 5.13 KiB [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:1100ms building:29ms dependencies:90ms = 1475ms
+       | ./src/pages/Devices/DevicesLanding/index.tsx 9.92 KiB [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:1100ms building:29ms dependencies:90ms = 1475ms
+       | ./src/pages/Devices/ProtocolRunDetails/index.tsx 11.2 KiB [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:1100ms building:29ms dependencies:90ms = 1475ms
+       | ./src/pages/Devices/RobotSettings/index.tsx 7.62 KiB [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:1100ms building:29ms dependencies:90ms = 1475ms
+       | ./src/pages/Protocols/ProtocolsLanding/index.tsx 793 bytes [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:1100ms building:29ms dependencies:90ms = 1475ms
+       | ./src/pages/Protocols/ProtocolDetails/index.tsx 846 bytes [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:1100ms building:29ms dependencies:90ms = 1475ms
+       | ./src/pages/AppSettings/index.tsx 3.17 KiB [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:1100ms building:29ms dependencies:90ms = 1475ms
+       | ./src/pages/Labware/index.tsx 12.3 KiB [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:1100ms building:29ms dependencies:90ms = 1475ms
+       | ./src/App/hooks.ts 480 bytes [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:1100ms building:29ms dependencies:90ms = 1475ms
+       | ./src/App/Navbar.tsx 4.4 KiB [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:1100ms building:29ms dependencies:90ms = 1475ms
+       |     + 440 hidden modules
+[1374] ./src/i18n.ts + 7 modules 79.4 KiB {0} [built]
+       | ./src/i18n.ts 1.08 KiB [built]
+       |     [1388] 1ms -> [1389] 129ms -> factory:40ms building:86ms dependencies:1039ms = 1295ms
+       | ./src/assets/localization/index.ts 63 bytes [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> factory:166ms building:36ms = 458ms
+       | ./src/assets/localization/en/index.ts 2.2 KiB [built]
+       |     [1388] 1ms -> [1389] 129ms -> [] 126ms -> [] 202ms -> factory:131ms building:44ms = 633ms
+       |     + 5 hidden modules
+[1388] multi ./src/index.tsx 28 bytes {0} [built]
+       factory:1ms building:0ms = 1ms
+[1389] ./src/index.tsx 1.06 KiB {0} [built]
+       [1388] 1ms -> factory:9ms building:120ms = 130ms
+    + 3194 hidden modules
+
+WARNING in asset size limit: The following asset(s) exceed the recommended size limit (244 KiB).
+This can impact web performance.
+Assets: 
+  images/heatershaker_module_transparent.992b6b9a757daecf90eeacb3eba77aaf.svg (1.43 MiB)
+  videos/Left_Multi_CalBlock_NO_TIP_(330x260)REV1.956307edeb9455d8d7bb95eeef195e2d.webm (280 KiB)
+  videos/Left_Multi_Trash_NO_TIP_(330x260)REV1.cdfde3ba1ac01c4d4583b5d541b42afd.webm (300 KiB)
+  videos/Left_Single_CalBlock_NO_TIP_(330x260)REV1.55d9d1be3528441bc8037352d7a3ab1f.webm (257 KiB)
+  videos/Left_Single_Trash_NO_TIP_(330x260)REV1.fca2370bfb624a701048f33342c5a994.webm (268 KiB)
+  videos/Right_Multi_CalBlock_NO_TIP_(330x260)REV1.7b7499bd130ca518e85b1dd7fafb8b6b.webm (271 KiB)
+  videos/Right_Multi_Trash_NO_TIP_(330x260)REV1.2ef7be64cdbc8a60946e11e72053f785.webm (289 KiB)
+  videos/Right_Single_CalBlock_NO_TIP_(330x260)REV1.dffb604ced3d9125626e38c5a33e8639.webm (257 KiB)
+  videos/Right_Single_Trash_NO_TIP_(330x260)REV1.61a514e0339e30358e5cbc80d30e163d.webm (269 KiB)
+  videos/Left_Multi_CalBlock_NO_TIP_(330x260)REV2.fe7c78518351f923fb4145a2e78083dc.webm (274 KiB)
+  videos/Right_Multi_CalBlock_NO_TIP_(330x260)REV2.19fdcf5082e8090e4b484c5e9d1b85a8.webm (262 KiB)
+  videos/Left_Single_CalBlock_NO_TIP_(330x260)REV2.0d5ee709fdd6883b41a8533384ae91df.webm (248 KiB)
+  videos/Right_Single_CalBlock_NO_TIP_(330x260)REV2.abb94f786c13cd8977d22e0442d44f1e.webm (249 KiB)
+  videos/Left_Multi_CalBlock_WITH_TIP_(330x260)REV1.0d8e56b6634ac9f9b1501a1148bbdf53.webm (292 KiB)
+  videos/Left_Multi_Trash_WITH_TIP_(330x260)REV1.ab84b5016af2281d838acd75d85d254a.webm (310 KiB)
+  videos/Left_Single_CalBlock_WITH_TIP_(330x260)REV1.068d15d74ac7956e68ba849ee17803a5.webm (261 KiB)
+  videos/Left_Single_Trash_WITH_TIP_(330x260)REV1.59330fdc5e67ab643d04c5d99b03607a.webm (273 KiB)
+  videos/Right_Multi_CalBlock_WITH_TIP_(330x260)REV1.b9b5559b9588a881e4b903327f45db81.webm (282 KiB)
+  videos/Right_Multi_Trash_WITH_TIP_(330x260)REV1.7cd016b277b5632c01a5f1cd7e7bde5b.webm (301 KiB)
+  videos/Right_Single_CalBlock_WITH_TIP_(330x260)REV1.27fdf7abb4964ae9afa8a4eb7b0eecea.webm (260 KiB)
+  videos/Right_Single_Trash_WITH_TIP_(330x260)REV1.9a2a6f986963423db2a0818efce0442a.webm (272 KiB)
+  videos/Left_Multi_CalBlock_WITH_TIP_(330x260)REV2.b0b8c440556fa02250c131f72d3de250.webm (283 KiB)
+  videos/Right_Multi_CalBlock_WITH_TIP_(330x260)REV2.99a72fbb89aa1762c7e8559d8378b350.webm (273 KiB)
+  videos/Left_Single_CalBlock_WITH_TIP_(330x260)REV2.f342b48dd56025953997ee165d40bffa.webm (252 KiB)
+  videos/Right_Single_CalBlock_WITH_TIP_(330x260)REV2.b068880588e8b054638d5539b11fcd8b.webm (253 KiB)
+  videos/SLOT_5_LEFT_MULTI_Z.f65372350b38a3675b7b6c59707d2ae9.webm (570 KiB)
+  videos/SLOT_5_LEFT_SINGLE_Z.074099d8013846f9809a3b831403ea75.webm (516 KiB)
+  videos/SLOT_5_RIGHT_MULTI_Z.d3d2a4902a5e6eb0072a93662557e283.webm (534 KiB)
+  videos/SLOT_5_RIGHT_SINGLE_Z.6562379fe1c9829f783206abedb4343f.webm (516 KiB)
+  videos/SLOT_1_LEFT_MULTI_X-Y.1c2d5f4bda8ff85dbfb6d060e2286ccb.webm (423 KiB)
+  videos/SLOT_1_LEFT_SINGLE_X-Y.6a66fae028405a5e814b897b1b5e1044.webm (353 KiB)
+  videos/SLOT_1_RIGHT_MULTI_X-Y.403e79debe40f46c9d5022dedd4423c7.webm (380 KiB)
+  videos/SLOT_1_RIGHT_SINGLE_X-Y.f0d37908a12142a85b64f88bdf750e07.webm (355 KiB)
+  videos/SLOT_3_LEFT_MULTI_X-Y.d5a44227bf38118ac349f86b52c93774.webm (402 KiB)
+  videos/SLOT_3_LEFT_SINGLE_X-Y.5aba1f98b8d24f084555c8efe3212ed3.webm (342 KiB)
+  videos/SLOT_3_RIGHT_MULTI_X-Y.134b1bbba4e5f522e54f0654ee108c55.webm (369 KiB)
+  videos/SLOT_3_RIGHT_SINGLE_X-Y.1b244a9c50895925ea7c4b095f7e0c8f.webm (337 KiB)
+  videos/SLOT_7_LEFT_MULTI_X-Y.62dea5a9b57ec60e1c9549eb935c0559.webm (414 KiB)
+  videos/SLOT_7_LEFT_SINGLE_X-Y.391745dd076564adb4f5b78ce22e1e6d.webm (350 KiB)
+  videos/SLOT_7_RIGHT_MULTI_X-Y.96e181b188c1d5b05f11be8d47525c3f.webm (374 KiB)
+  videos/SLOT_7_RIGHT_SINGLE_X-Y.e47bd51d5d4002b4788d466031a8a805.webm (348 KiB)
+  images/screwdriver_oriented_left.58de2dd5ad872644733c2e2a79f13bd1.svg (1.07 MiB)
+  images/flatbottom_thermal_adapter.a58ea3aaef7dee1c9d44d1697eb5fe06.png (990 KiB)
+  images/deepwell_thermal_adapter.a38cfcd65c239e425318b59aa91e2cf3.png (1.33 MiB)
+  images/pcr_thermal_adapter.0dfa629fd3a2f4fb656fe25f51f73839.png (1.29 MiB)
+  images/universal_thermal_adapter.c179bbd698dd630dc9728e6305617c52.png (506 KiB)
+  images/heater_shaker_module_diagram.532e224d63c3e07ac7c4123f37c7f3a5.svg (1.27 MiB)
+  images/magnetic_module_gen_2_transparent.3a5697962f5add564720df50a23f88f4.svg (478 KiB)
+  images/temp_deck_gen_2_transparent.a808872e0452922fddee2315aa8b0c84.svg (495 KiB)
+  images/secure_tc_latch.2ecd9ec2b653b8b58c04d14d0d007538.png (466 KiB)
+  images/robot_calibration_help.b23fb97f682548985b5639c76bfe1ab9.png (590 KiB)
+  images/attach-left-multi-screws@3x.faec9c1c7788abf2ada9586264645033.png (275 KiB)
+  images/attach-right-multi-screws@3x.9ba6d7acaf7427c1e3b6fcdd9ff8745e.png (266 KiB)
+  images/detach-left-multi-screws@3x.074a1f2c40f547760a53cd76ef53d8bd.png (276 KiB)
+  images/detach-right-multi-screws@3x.88b8e80132af47e8ca4c4de728798a2c.png (274 KiB)
+  videos/p20_multi_gen2-left.826ffef3b32310a7c33e09fc1078d2e0.webm (2.61 MiB)
+  videos/p20_multi_gen2-right.e3e739b22ad465392cd36ff1b39f183d.webm (2.61 MiB)
+  videos/p300_multi_gen2-left.bb635aa78336e364069a1dbb312ad7ba.webm (2.59 MiB)
+  videos/p300_multi_gen2-right.80be1f5c71a3441376d59b5ac5a42b46.webm (2.6 MiB)
+  images/corning_12_wellplate_6.9ml_flat_photo_three_quarters.9d0f3f59eb19ce82a35ab6a1717acabf.jpg (314 KiB)
+  images/corning_24_wellplate_3.4ml_flat_photo_three_quarters.e9eb0fb6c108dc791641bd9aa9a10389.jpg (897 KiB)
+  images/corning_96_wellplate_360ul_flat_three_quarters.14cba32e26db52f5d3157d8b7ebf5a21.jpg (367 KiB)
+  images/corning_48_wellplate_1.6ml_flat_photo_three_quarters.ed376b1a01695118fa2e455e34111949.jpg (633 KiB)
+  images/corning_6_wellplate_16.8ml_flat_photo_three_quarters.af63f6b0d914165537a788af6727eb06.jpg (463 KiB)
+  bundle.72a199bdcc2a756d69e3.js (5.1 MiB)
+
+WARNING in entrypoint size limit: The following entrypoint(s) combined asset size exceeds the recommended limit (244 KiB). This can impact web performance.
+Entrypoints:
+  main (5.17 MiB)
+      1.524691f12f1f49763272.css
+      1.bundle.2cbcb0aaf32346eaca8f.js
+      bundle.72a199bdcc2a756d69e3.js
+
+
+WARNING in webpack performance recommendations: 
+You can limit the size of your bundles by using import() or require.ensure to lazy load some parts of your application.
+For more info visit https://webpack.js.org/guides/code-splitting/
+Child html-webpack-plugin for "index.html":
+     1 asset
+    Entrypoint undefined = index.html
+    [7] ../node_modules/html-webpack-plugin/lib/loader.js!./src/index.hbs 1.68 KiB {0} [built]
+        factory:25ms building:116ms = 141ms
+        + 23 hidden modules
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!src/molecules/DeprecatedJogControls/styles.css:
+    Entrypoint mini-css-extract-plugin = *
+    [0] ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src??postcss!./src/molecules/DeprecatedJogControls/styles.css 749 bytes {0} [built]
+        factory:0ms building:30ms = 30ms
+        + 1 hidden module
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!src/molecules/ReleaseNotes/styles.css:
+    Entrypoint mini-css-extract-plugin = *
+    [0] ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src??postcss!./src/molecules/ReleaseNotes/styles.css 12.3 KiB {0} [built]
+        factory:0ms building:762ms = 762ms
+        + 1 hidden module
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!src/molecules/modals/styles.css:
+    Entrypoint mini-css-extract-plugin = *
+    [0] ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src??postcss!./src/molecules/modals/styles.css 12.3 KiB {0} [built]
+        factory:0ms building:720ms = 720ms
+        + 1 hidden module
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!src/organisms/CalibrateTipLength/styles.css:
+    Entrypoint mini-css-extract-plugin = *
+    [0] ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src??postcss!./src/organisms/CalibrateTipLength/styles.css 9.29 KiB {0} [built]
+        factory:0ms building:738ms = 738ms
+        + 1 hidden module
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!src/organisms/CalibrationPanels/styles.css:
+    Entrypoint mini-css-extract-plugin = *
+    [0] ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src??postcss!./src/organisms/CalibrationPanels/styles.css 1.42 KiB {0} [built]
+        factory:0ms building:45ms = 45ms
+        + 1 hidden module
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!src/organisms/ChangePipette/ClearDeckModal/styles.css:
+    Entrypoint mini-css-extract-plugin = *
+    [0] ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src??postcss!./src/organisms/ChangePipette/ClearDeckModal/styles.css 11.1 KiB {0} [built]
+        factory:0ms building:985ms = 985ms
+        + 1 hidden module
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!src/organisms/ChangePipette/styles.css:
+    Entrypoint mini-css-extract-plugin = *
+    [0] ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src??postcss!./src/organisms/ChangePipette/styles.css 18.7 KiB {0} [built]
+        factory:1ms building:935ms = 936ms
+        + 1 hidden module
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!src/organisms/ConfigurePipette/styles.css:
+    Entrypoint mini-css-extract-plugin = *
+    [0] ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src??postcss!./src/organisms/ConfigurePipette/styles.css 13 KiB {0} [built]
+        factory:0ms building:782ms = 782ms
+        + 1 hidden module
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!src/organisms/DeprecatedCalibrateTipLength/styles.css:
+    Entrypoint mini-css-extract-plugin = *
+    [0] ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src??postcss!./src/organisms/DeprecatedCalibrateTipLength/styles.css 9.29 KiB {0} [built]
+        factory:1ms building:962ms = 963ms
+        + 1 hidden module
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!src/organisms/DeprecatedCalibrationPanels/styles.css:
+    Entrypoint mini-css-extract-plugin = *
+    [0] ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src??postcss!./src/organisms/DeprecatedCalibrationPanels/styles.css 1.42 KiB {0} [built]
+        factory:0ms building:26ms = 26ms
+        + 1 hidden module
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!src/organisms/DeprecatedCheckCalibration/styles.css:
+    Entrypoint mini-css-extract-plugin = *
+    [0] ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src??postcss!./src/organisms/DeprecatedCheckCalibration/styles.css 557 bytes {0} [built]
+        factory:1ms building:17ms = 18ms
+        + 1 hidden module
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!src/organisms/Devices/RobotSettings/UpdateBuildroot/styles.css:
+    Entrypoint mini-css-extract-plugin = *
+    [0] ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src??postcss!./src/organisms/Devices/RobotSettings/UpdateBuildroot/styles.css 16.2 KiB {0} [built]
+        factory:0ms building:866ms = 866ms
+        + 1 hidden module
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!src/organisms/LabwarePositionCheck/DeprecatedComponents/styles.css:
+    Entrypoint mini-css-extract-plugin = *
+    [0] ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src??postcss!./src/organisms/LabwarePositionCheck/DeprecatedComponents/styles.css 9.8 KiB {0} [built]
+        factory:0ms building:789ms = 789ms
+        + 1 hidden module
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!src/organisms/LabwarePositionCheck/styles.css:
+    Entrypoint mini-css-extract-plugin = *
+    [0] ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src??postcss!./src/organisms/LabwarePositionCheck/styles.css 9.78 KiB {0} [built]
+        factory:1ms building:779ms = 780ms
+        + 1 hidden module
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!src/organisms/ProtocolSetup/styles.css:
+    Entrypoint mini-css-extract-plugin = *
+    [0] ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src??postcss!./src/organisms/ProtocolSetup/styles.css 9.78 KiB {0} [built]
+        factory:1ms building:780ms = 781ms
+        + 1 hidden module
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!../components/src/alerts/alerts.css:
+    Entrypoint mini-css-extract-plugin = *
+       2 modules
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!../components/src/buttons/buttons.css:
+    Entrypoint mini-css-extract-plugin = *
+       2 modules
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!../components/src/controls/styles.css:
+    Entrypoint mini-css-extract-plugin = *
+       2 modules
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!../components/src/forms/Select.css:
+    Entrypoint mini-css-extract-plugin = *
+       2 modules
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!../components/src/forms/SelectField.css:
+    Entrypoint mini-css-extract-plugin = *
+       2 modules
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!../components/src/forms/forms.css:
+    Entrypoint mini-css-extract-plugin = *
+       2 modules
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!../components/src/hardware-sim/Deck/Deck.css:
+    Entrypoint mini-css-extract-plugin = *
+       2 modules
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!../components/src/hardware-sim/Deck/RobotWorkSpace.css:
+    Entrypoint mini-css-extract-plugin = *
+       2 modules
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!../components/src/hardware-sim/Labware/LabwareRender.css:
+    Entrypoint mini-css-extract-plugin = *
+       2 modules
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!../components/src/hardware-sim/Labware/labwareInternals/LabwareOutline.css:
+    Entrypoint mini-css-extract-plugin = *
+       2 modules
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!../components/src/hardware-sim/Labware/labwareInternals/StaticLabware.css:
+    Entrypoint mini-css-extract-plugin = *
+       2 modules
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!../components/src/hardware-sim/Labware/labwareInternals/Well.css:
+    Entrypoint mini-css-extract-plugin = *
+       2 modules
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!../components/src/hardware-sim/Labware/labwareInternals/WellLabels.css:
+    Entrypoint mini-css-extract-plugin = *
+       2 modules
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!../components/src/hardware-sim/Pipette/styles.css:
+    Entrypoint mini-css-extract-plugin = *
+       2 modules
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!../components/src/instrument/PipetteSelect.css:
+    Entrypoint mini-css-extract-plugin = *
+       2 modules
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!../components/src/instrument/instrument.css:
+    Entrypoint mini-css-extract-plugin = *
+       2 modules
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!../components/src/legacy-hardware-sim/Labware.css:
+    Entrypoint mini-css-extract-plugin = *
+       2 modules
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!../components/src/legacy-hardware-sim/LabwareNameOverlay.css:
+    Entrypoint mini-css-extract-plugin = *
+       2 modules
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!../components/src/legacy-hardware-sim/ModuleItem.css:
+    Entrypoint mini-css-extract-plugin = *
+       2 modules
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!../components/src/legacy-hardware-sim/ModuleViz.css:
+    Entrypoint mini-css-extract-plugin = *
+       2 modules
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!../components/src/legacy-hardware-sim/Well.css:
+    Entrypoint mini-css-extract-plugin = *
+       2 modules
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!../components/src/lists/lists.css:
+    Entrypoint mini-css-extract-plugin = *
+       2 modules
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!../components/src/modals/modals.css:
+    Entrypoint mini-css-extract-plugin = *
+       2 modules
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!../components/src/nav/SidePanel.css:
+    Entrypoint mini-css-extract-plugin = *
+       2 modules
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!../components/src/slotmap/styles.css:
+    Entrypoint mini-css-extract-plugin = *
+       2 modules
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!../components/src/structure/Pill.css:
+    Entrypoint mini-css-extract-plugin = *
+       2 modules
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!../components/src/structure/Splash.css:
+    Entrypoint mini-css-extract-plugin = *
+       2 modules
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!../components/src/structure/structure.css:
+    Entrypoint mini-css-extract-plugin = *
+       2 modules
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!../components/src/tabbedNav/navbar.css:
+    Entrypoint mini-css-extract-plugin = *
+       2 modules
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!../components/src/tooltips/tooltips.css:
+    Entrypoint mini-css-extract-plugin = *
+       2 modules
+Child mini-css-extract-plugin ../node_modules/css-loader/dist/cjs.js??ref--6-1!../node_modules/postcss-loader/src/index.js??postcss!../node_modules/typeface-open-sans/index.css:
+    Entrypoint mini-css-extract-plugin = *
+       23 modules
+NO_PYTHON=true NO_USB_DETECTION=true electron-builder --config electron-builder.config.js --publish never --linux --arm64 --dir
+  • electron-builder  version=23.3.3 os=21.6.0
+  • loaded configuration  file=/Users/kojikanao/Documents/opentrons/app-shell/electron-builder.config.js
+  • rebuilding native dependencies  dependencies=usb-detection@4.14.1 platform=linux arch=arm64
+  • install prebuilt binary  name=usb-detection version=4.14.1 platform=linux arch=arm64 napi=
+  • cannot install prebuilt binaries for optional native dependency  name=usb-detection
+                                                                     version=4.14.1
+                                                                     platform=linux
+                                                                     arch=arm64
+                                                                     napi=
+                                                                     cause=exit status 1
+                                                                     errorOut=prebuild-install info begin Prebuild-install version 7.1.1
+    prebuild-install warn install prebuilt binaries enforced with --force!
+    prebuild-install warn install prebuilt binaries may be out of date!
+    prebuild-install info looking for local prebuild @ prebuilds/usb-detection-v4.14.1-electron-v107-linux-arm64.tar.gz
+    prebuild-install info looking for cached prebuild @ /Users/kojikanao/.npm/_prebuilds/3eced5-usb-detection-v4.14.1-electron-v107-linux-arm64.tar.gz
+    prebuild-install http request GET https://github.com/MadLittleMods/node-usb-detection/releases/download/v4.14.1/usb-detection-v4.14.1-electron-v107-linux-arm64.tar.gz
+    prebuild-install http 404 https://github.com/MadLittleMods/node-usb-detection/releases/download/v4.14.1/usb-detection-v4.14.1-electron-v107-linux-arm64.tar.gz
+    prebuild-install warn install No prebuilt binaries found (target=20.3.0 runtime=electron arch=arm64 libc= platform=linux)
+    
+                                                                     command=/Users/kojikanao/.nvs/node/16.17.0/arm64/bin/node /Users/kojikanao/Documents/opentrons/app-shell/node_modules/prebuild-install/bin.js --platform=linux --arch=arm64 --target=20.3.0 --runtime=electron --verbose --force
+                                                                     workingDir=/Users/kojikanao/Documents/opentrons/app-shell/node_modules/usb-detection
+  ⨯ cannot execute  cause=exit status 1
+                    errorOut=npm WARN using --force Recommended protections disabled.
+    npm ERR! code 1
+    npm ERR! path /Users/kojikanao/Documents/opentrons/app-shell/node_modules/usb-detection
+    npm ERR! command failed
+    npm ERR! command sh -c -- prebuild-install || node-gyp rebuild
+    npm ERR! CXX(target) Release/obj.target/detection/src/detection.o
+    npm ERR! prebuild-install warn install No prebuilt binaries found (target=20.3.0 runtime=electron arch=arm64 libc= platform=linux)
+    npm ERR! gyp info it worked if it ends with ok
+    npm ERR! gyp info using node-gyp@9.1.0
+    npm ERR! gyp info using node@16.17.0 | darwin | arm64
+    npm ERR! gyp info find Python using Python version 3.7.13 found at "/Users/kojikanao/.pyenv/versions/3.7.13/bin/python3"
+    npm ERR! gyp info spawn /Users/kojikanao/.pyenv/versions/3.7.13/bin/python3
+    npm ERR! gyp info spawn args [
+    npm ERR! gyp info spawn args   '/Users/kojikanao/Documents/opentrons/node_modules/node-gyp/gyp/gyp_main.py',
+    npm ERR! gyp info spawn args   'binding.gyp',
+    npm ERR! gyp info spawn args   '-f',
+    npm ERR! gyp info spawn args   'make',
+    npm ERR! gyp info spawn args   '-I',
+    npm ERR! gyp info spawn args   '/Users/kojikanao/Documents/opentrons/app-shell/node_modules/usb-detection/build/config.gypi',
+    npm ERR! gyp info spawn args   '-I',
+    npm ERR! gyp info spawn args   '/Users/kojikanao/Documents/opentrons/node_modules/node-gyp/addon.gypi',
+    npm ERR! gyp info spawn args   '-I',
+    npm ERR! gyp info spawn args   '/Users/kojikanao/.electron-gyp/20.3.0/include/node/common.gypi',
+    npm ERR! gyp info spawn args   '-Dlibrary=shared_library',
+    npm ERR! gyp info spawn args   '-Dvisibility=default',
+    npm ERR! gyp info spawn args   '-Dnode_root_dir=/Users/kojikanao/.electron-gyp/20.3.0',
+    npm ERR! gyp info spawn args   '-Dnode_gyp_dir=/Users/kojikanao/Documents/opentrons/node_modules/node-gyp',
+    npm ERR! gyp info spawn args   '-Dnode_lib_file=/Users/kojikanao/.electron-gyp/20.3.0/<(target_arch)/node.lib',
+    npm ERR! gyp info spawn args   '-Dmodule_root_dir=/Users/kojikanao/Documents/opentrons/app-shell/node_modules/usb-detection',
+    npm ERR! gyp info spawn args   '-Dnode_engine=v8',
+    npm ERR! gyp info spawn args   '--depth=.',
+    npm ERR! gyp info spawn args   '--no-parallel',
+    npm ERR! gyp info spawn args   '--generator-output',
+    npm ERR! gyp info spawn args   'build',
+    npm ERR! gyp info spawn args   '-Goutput_dir=.'
+    npm ERR! gyp info spawn args ]
+    npm ERR! gyp info spawn make
+    npm ERR! gyp info spawn args [ 'BUILDTYPE=Release', '-C', 'build' ]
+    npm ERR! In file included from ../src/detection.cpp:1:
+    npm ERR! In file included from ../src/detection.h:5:
+    npm ERR! In file included from /Users/kojikanao/.electron-gyp/20.3.0/include/node/node.h:69:
+    npm ERR! In file included from /Users/kojikanao/.electron-gyp/20.3.0/include/node/v8.h:24:
+    npm ERR! In file included from /Users/kojikanao/.electron-gyp/20.3.0/include/node/v8-array-buffer.h:13:
+    npm ERR! In file included from /Users/kojikanao/.electron-gyp/20.3.0/include/node/v8-object.h:9:
+    npm ERR! /Users/kojikanao/.electron-gyp/20.3.0/include/node/v8-maybe.h:106:45: error: no template named 'is_lvalue_reference_v' in namespace 'std'; did you mean 'is_lvalue_reference'?
+    npm ERR!   template <class U, std::enable_if_t<!std::is_lvalue_reference_v<U>>*>
+    npm ERR!                                        ~~~~~^~~~~~~~~~~~~~~~~~~~~
+    npm ERR!                                             is_lvalue_reference
+    npm ERR! /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/type_traits:910:29: note: 'is_lvalue_reference' declared here
+    npm ERR! struct _LIBCPP_TEMPLATE_VIS is_lvalue_reference : _BoolConstant<__is_lvalue_reference(_Tp)> { };
+    npm ERR!                             ^
+    npm ERR! In file included from ../src/detection.cpp:1:
+    npm ERR! In file included from ../src/detection.h:5:
+    npm ERR! In file included from /Users/kojikanao/.electron-gyp/20.3.0/include/node/node.h:69:
+    npm ERR! In file included from /Users/kojikanao/.electron-gyp/20.3.0/include/node/v8.h:24:
+    npm ERR! In file included from /Users/kojikanao/.electron-gyp/20.3.0/include/node/v8-array-buffer.h:13:
+    npm ERR! In file included from /Users/kojikanao/.electron-gyp/20.3.0/include/node/v8-object.h:9:
+    npm ERR! /Users/kojikanao/.electron-gyp/20.3.0/include/node/v8-maybe.h:106:69: error: expected '(' for function-style cast or type construction
+    npm ERR!   template <class U, std::enable_if_t<!std::is_lvalue_reference_v<U>>*>
+    npm ERR!                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+    npm ERR! /Users/kojikanao/.electron-gyp/20.3.0/include/node/v8-maybe.h:123:43: error: no template named 'is_lvalue_reference_v' in namespace 'std'; did you mean 'is_lvalue_reference'?
+    npm ERR! template <class T, std::enable_if_t<!std::is_lvalue_reference_v<T>>* = nullptr>
+    npm ERR!                                      ~~~~~^~~~~~~~~~~~~~~~~~~~~
+    npm ERR!                                           is_lvalue_reference
+    npm ERR! /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/type_traits:910:29: note: 'is_lvalue_reference' declared here
+    npm ERR! struct _LIBCPP_TEMPLATE_VIS is_lvalue_reference : _BoolConstant<__is_lvalue_reference(_Tp)> { };
+    npm ERR!                             ^
+    npm ERR! In file included from ../src/detection.cpp:1:
+    npm ERR! In file included from ../src/detection.h:5:
+    npm ERR! In file included from /Users/kojikanao/.electron-gyp/20.3.0/include/node/node.h:69:
+    npm ERR! In file included from /Users/kojikanao/.electron-gyp/20.3.0/include/node/v8.h:24:
+    npm ERR! In file included from /Users/kojikanao/.electron-gyp/20.3.0/include/node/v8-array-buffer.h:13:
+    npm ERR! In file included from /Users/kojikanao/.electron-gyp/20.3.0/include/node/v8-object.h:9:
+    npm ERR! /Users/kojikanao/.electron-gyp/20.3.0/include/node/v8-maybe.h:123:67: error: expected '(' for function-style cast or type construction
+    npm ERR! template <class T, std::enable_if_t<!std::is_lvalue_reference_v<T>>* = nullptr>
+    npm ERR!                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+    npm ERR! In file included from ../src/detection.cpp:1:
+    npm ERR! In file included from ../src/detection.h:15:
+    npm ERR! ../src/deviceList.h:7:15: warning: anonymous non-C-compatible type given name for linkage purposes by typedef declaration; add a tag name here [-Wnon-c-typedef-for-linkage]
+    npm ERR! typedef struct {
+    npm ERR!               ^
+    npm ERR!                ListResultItem_t
+    npm ERR! ../src/deviceList.h:8:2: note: type is not C-compatible due to this member declaration
+    npm ERR!         public:
+    npm ERR!         ^~~~~~~
+    npm ERR! ../src/deviceList.h:16:3: note: type is given name 'ListResultItem_t' for linkage purposes by this typedef declaration
+    npm ERR! } ListResultItem_t;
+    npm ERR!   ^
+    npm ERR! 1 warning and 4 errors generated.
+    npm ERR! make[1]: *** [Release/obj.target/detection/src/detection.o] Error 1
+    npm ERR! gyp ERR! build error 
+    npm ERR! gyp ERR! stack Error: `make` failed with exit code: 2
+    npm ERR! gyp ERR! stack     at ChildProcess.onExit (/Users/kojikanao/Documents/opentrons/node_modules/node-gyp/lib/build.js:201:23)
+    npm ERR! gyp ERR! stack     at ChildProcess.emit (node:events:513:28)
+    npm ERR! gyp ERR! stack     at Process.ChildProcess._handle.onexit (node:internal/child_process:291:12)
+    npm ERR! gyp ERR! System Darwin 21.6.0
+    npm ERR! gyp ERR! command "/Users/kojikanao/.nvs/node/16.17.0/arm64/bin/node" "/Users/kojikanao/Documents/opentrons/node_modules/.bin/node-gyp" "rebuild"
+    npm ERR! gyp ERR! cwd /Users/kojikanao/Documents/opentrons/app-shell/node_modules/usb-detection
+    npm ERR! gyp ERR! node -v v16.17.0
+    npm ERR! gyp ERR! node-gyp -v v9.1.0
+    npm ERR! gyp ERR! not ok
+    
+    npm ERR! A complete log of this run can be found in:
+    npm ERR!     /Users/kojikanao/.npm/_logs/2022-10-04T16_00_50_576Z-debug-0.log
+    
+                    command=npm rebuild usb-detection@4.14.1
+                    workingDir=

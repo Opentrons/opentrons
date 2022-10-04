@@ -46,7 +46,7 @@
     "electron-devtools-installer": "3.1.1",
     "electron-dl": "1.14.0",
     "electron-store": "5.1.1",
-    "electron-updater": "4.1.2",
+    "electron-updater": "5.2.3",
     "execa": "4.0.0",
     "form-data": "2.5.0",
     "fs-extra": "10.0.0",
