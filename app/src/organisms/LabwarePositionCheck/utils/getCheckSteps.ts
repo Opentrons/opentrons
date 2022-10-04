@@ -28,6 +28,7 @@ const PICK_UP_TIP_LOCATION: LabwareLocation = { slotName: '2' }
 
 export const getCheckSteps = (args: LPCArgs): LabwarePositionCheckStep[] => {
   const checkTipRacksSectionSteps = getCheckTipRackSectionSteps(args)
+  console.log('checkTipRacksSectionSteps', checkTipRacksSectionSteps)
   if (checkTipRacksSectionSteps.length < 1) return []
 
   const lastTiprackCheckStep = checkTipRacksSectionSteps[checkTipRacksSectionSteps.length - 1]
@@ -38,7 +39,7 @@ export const getCheckSteps = (args: LPCArgs): LabwarePositionCheckStep[] => {
     location: PICK_UP_TIP_LOCATION
   }
 
-  const checkLabwareSteps = getCheckLabwareSectionSteps(args)
+  const checkLabwareSectionSteps = getCheckLabwareSectionSteps(args)
 
   const returnTipSectionStep: ReturnTipStep = {
     section: SECTIONS.RETURN_TIP,
@@ -47,29 +48,29 @@ export const getCheckSteps = (args: LPCArgs): LabwarePositionCheckStep[] => {
     location: PICK_UP_TIP_LOCATION
   }
 
-  console.log('checkTipRacksSectionSteps', checkTipRacksSectionSteps)
   console.log('checkLabwareSectionSteps', checkLabwareSectionSteps)
   return [
     { section: SECTIONS.BEFORE_BEGINNING },
     ...checkTipRacksSectionSteps,
     pickUpTipSectionStep,
-    ...checkLabwareSteps,
+    ...checkLabwareSectionSteps,
     returnTipSectionStep,
     { section: SECTIONS.RESULTS_SUMMARY },
   ]
 }
 
 function getCheckTipRackSectionSteps(args: LPCArgs): CheckTipRacksStep[] {
-  const { secondaryPipetteId, primaryPipetteId, commands, labware } = args
+  const { secondaryPipetteId, primaryPipetteId, commands } = args
 
   const pickUpTipCommands = commands.filter(
     (command): command is PickUpTipRunTimeCommand => command.commandType === 'pickUpTip'
   )
 
+  console.log('pickUpTipCommands', pickUpTipCommands)
   const uniqPickUpTipCommands = pickUpTipCommands.reduce<PickUpTipRunTimeCommand[]>((acc, pickUpTipCommand) => {
     if (
       (pickUpTipCommand.params.pipetteId === primaryPipetteId
-        && pickUpTipCommands.some(c => c.params.labwareId === pickUpTipCommand.params.labwareId))
+        && acc.some(c => c.params.labwareId === pickUpTipCommand.params.labwareId))
       ||
       (pickUpTipCommand.params.pipetteId === secondaryPipetteId
         && pickUpTipCommands.some(c => c.params.labwareId === pickUpTipCommand.params.labwareId && c.params.pipetteId === primaryPipetteId))
@@ -79,6 +80,7 @@ function getCheckTipRackSectionSteps(args: LPCArgs): CheckTipRacksStep[] {
     return [...acc, pickUpTipCommand]
   }, [])
 
+  console.log('uniqPickUpTipCommands', uniqPickUpTipCommands)
   return uniqPickUpTipCommands.reduce<CheckTipRacksStep[]>((acc, { params }) => {
     const labwareLocations = getAllUniqLocationsForLabware(params.labwareId, commands)
     return [

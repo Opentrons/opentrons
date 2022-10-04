@@ -10,16 +10,17 @@ import {
 import { Portal } from '../../App/portal'
 import { useTrackEvent } from '../../redux/analytics'
 import { useRestartRun } from '../ProtocolUpload/hooks'
-import { useLabwarePositionCheck } from './hooks'
+import { useLabwarePositionCheck, useSteps } from './hooks'
 import { IntroScreen } from './IntroScreen'
 import { GenericStepScreen } from './GenericStepScreen'
 import { SummaryScreen } from './SummaryScreen'
 import { RobotMotionLoadingModal } from './RobotMotionLoadingModal'
 import { ConfirmPickUpTipModal } from './ConfirmPickUpTipModal'
-import { ExitPreventionModal } from './ExitPreventionModal'
+import { ExitConfirmation } from './ExitConfirmation'
+import { CheckItem } from './CheckItem'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
-
+import { useMostRecentCompletedAnalysis } from './hooks/useMostRecentCompletedAnalysis'
 interface LabwarePositionCheckModalProps {
   onCloseClick: () => unknown
   runId: string
@@ -30,8 +31,6 @@ export const LabwarePositionCheckComponent = (
   props: LabwarePositionCheckModalProps
 ): JSX.Element | null => {
   const { t } = useTranslation(['labware_position_check', 'shared'])
-  const restartRun = useRestartRun()
-  const trackEvent = useTrackEvent()
   const [
     savePositionCommandData,
     savePositionCommandDataDispatch,
@@ -44,8 +43,8 @@ export const LabwarePositionCheckComponent = (
       const nextCommandList =
         state[labwareId] != null
           ? // if there are already two command ids, overwrite the second one with the new one coming in
-            // this is used when there is an unsuccessful pick up tip, and additional pick up tip attempts occur
-            [state[labwareId][0], commandId]
+          // this is used when there is an unsuccessful pick up tip, and additional pick up tip attempts occur
+          [state[labwareId][0], commandId]
           : [commandId]
       return {
         ...state,
@@ -54,7 +53,6 @@ export const LabwarePositionCheckComponent = (
     },
     {}
   )
-  const [isRestartingRun, setIsRestartingRun] = React.useState<boolean>(false)
   const {
     confirm: confirmExitLPC,
     showConfirmation,
@@ -68,97 +66,42 @@ export const LabwarePositionCheckComponent = (
   ): void => {
     savePositionCommandDataDispatch({ labwareId, commandId })
   }
-  const labwarePositionCheckUtils = useLabwarePositionCheck(
-    addSavePositionCommandData,
-    savePositionCommandData
-  )
 
-  if ('error' in labwarePositionCheckUtils) {
-    // show the modal for 5 seconds, then unmount and restart the run
-    if (!isRestartingRun) {
-      setTimeout(() => restartRun(), 5000)
-      setIsRestartingRun(true)
-      const { name, message } = labwarePositionCheckUtils.error
-      trackEvent({
-        name: 'labwarePositionCheckFailed',
-        properties: { error: { message, name } },
-      })
-    }
-    const { error } = labwarePositionCheckUtils
-    return (
-      <Portal level="top">
-        <AlertModal
-          heading={t('error_modal_header')}
-          iconName={null}
-          buttons={[
-            {
-              children: t('shared:close'),
-              onClick: props.onCloseClick,
-            },
-          ]}
-          alertOverlay
-        >
-          <Box>
-            <Text marginTop={SPACING_2}>Error: {error.message}</Text>
-          </Box>
-        </AlertModal>
-      </Portal>
-    )
-  }
+  const protocolData = useMostRecentCompletedAnalysis(props.runId)
+  const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
+  const LPCSteps = useSteps(protocolData)
 
-  const {
-    beginLPC,
-    proceed,
-    ctaText,
-    currentCommandIndex,
-    currentStep,
-    showPickUpTipConfirmationModal,
-    onUnsuccessfulPickUpTip,
-    isComplete,
-    titleText,
-    isLoading,
-    jog,
-  } = labwarePositionCheckUtils
+  const totalStepCount = LPCSteps.length
+  const currentStep = LPCSteps?.[currentStepIndex]
+  const proceed = () => setCurrentStepIndex(currentStepIndex !== LPCSteps.length - 1 ? currentStepIndex + 1 : currentStepIndex)
 
-  let modalContent: JSX.Element
-  if (isLoading) {
-    modalContent = <RobotMotionLoadingModal title={titleText} />
-  } else if (showConfirmation) {
+  if (protocolData == null || currentStep == null) return null
+  console.log('CURRENT_STEP', currentStep)
+  let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
+  if (showConfirmation) {
     modalContent = (
-      <ExitPreventionModal
+      <ExitConfirmation
         onGoBack={cancelExitLPC}
         onConfirmExit={confirmExitLPC}
       />
     )
-  } else if (showPickUpTipConfirmationModal) {
+  } else if (currentStep.section === 'BEFORE_BEGINNING') {
+    modalContent = <IntroScreen proceed={proceed} protocolData={protocolData} />
+  } else if (currentStep.section === 'CHECK_TIP_RACKS') {
     modalContent = (
-      <ConfirmPickUpTipModal
-        confirmText={ctaText}
-        onConfirm={proceed}
-        onDeny={onUnsuccessfulPickUpTip}
-      />
-    )
-  } else if (isComplete) {
-    modalContent = (
-      <SummaryScreen
-        savePositionCommandData={savePositionCommandData}
-        onCloseClick={props.onCloseClick}
-      />
-    )
-  } else if (currentCommandIndex !== 0) {
-    modalContent = (
-      <GenericStepScreen
-        selectedStep={currentStep}
-        ctaText={ctaText}
-        proceed={proceed}
-        title={titleText}
-        jog={jog}
+      <CheckItem
         runId={props.runId}
-        savePositionCommandData={savePositionCommandData}
-      />
-    )
-  } else {
-    modalContent = <IntroScreen beginLPC={beginLPC} />
+        {...currentStep}
+        proceed={proceed}
+        protocolData={protocolData} />
+  } else if (currentStep.section === 'PICK_UP_TIP') {
+    modalContent = (<div> PICK_UP_TIP <button onClick={proceed}>PROCEED</button> </div>)
+  } else if (currentStep.section === 'CHECK_LABWARE') {
+    modalContent = (<div> CHECK_LABWARE <button onClick={proceed}>PROCEED</button> </div>)
+  } else if (currentStep.section === 'RETURN_TIP') {
+    modalContent = (<div> RETURN_TIP <button onClick={proceed}>PROCEED</button> </div>)
+  } else if (currentStep.section === 'RESULTS_SUMMARY') {
+    modalContent = (<div> RESULTS_SUMMARY <button onClick={proceed}>PROCEED</button> </div>)
   }
   return (
     <Portal level="top">
@@ -166,8 +109,8 @@ export const LabwarePositionCheckComponent = (
         header={
           <WizardHeader
             title={t('labware_position_check_title')}
-            currentStep={1}
-            totalSteps={5}
+            currentStep={currentStepIndex}
+            totalSteps={totalStepCount}
             onExit={confirmExitLPC}
           />
         }

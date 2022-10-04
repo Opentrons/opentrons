@@ -5,9 +5,10 @@ import type {
 } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { LabwarePositionCheckStep } from './types'
 import { getCheckSteps } from './utils/getCheckSteps'
+import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 export const getLabwarePositionCheckSteps = (
-  protocolData: ProtocolAnalysisOutput
+  protocolData: ProtocolAnalysisOutput | CompletedProtocolAnalysis
 ): LabwarePositionCheckStep[] => {
   if (protocolData != null && 'pipettes' in protocolData) {
     // filter out any pipettes that are not being used in the protocol

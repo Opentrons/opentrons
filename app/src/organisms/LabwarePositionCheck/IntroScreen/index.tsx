@@ -15,21 +15,30 @@ import {
   SPACING_3,
   SPACING_6,
 } from '@opentrons/components'
-import { useCurrentRun } from '../ProtocolUpload/hooks'
-import { SectionList } from './SectionList'
-import { DeckMap } from './DeckMap'
-import { useIntroInfo, useLabwareIdsBySection } from './hooks'
+import { useCurrentRun } from '../../ProtocolUpload/hooks'
+import { SectionList } from '../SectionList'
+import { DeckMap } from '../DeckMap'
+import { useIntroInfo, useLabwareIdsBySection } from '../hooks'
+import { getPrepCommands } from './getPrepCommands'
+import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import { useCreateCommandMutation } from '@opentrons/react-api-client'
 
 export const INTERVAL_MS = 3000
 
 export const IntroScreen = (props: {
-  beginLPC: () => void
+  proceed: () => void
+  protocolData: CompletedProtocolAnalysis
 }): JSX.Element | null => {
+  const { proceed, protocolData } = props
+
+
   const runRecord = useCurrentRun()
+  const { createCommand } = useCreateCommandMutation()
   const labwareIdsBySection = useLabwareIdsBySection(
     runRecord?.data?.id ?? null
   )
   const introInfo = useIntroInfo()
+  if (runRecord == null) return null
   const { t } = useTranslation(['labware_position_check', 'shared'])
 
   const [sectionIndex, setSectionIndex] = React.useState<number>(0)
@@ -47,6 +56,16 @@ export const IntroScreen = (props: {
 
   const currentSection = sections[sectionIndex]
   const labwareIdsToHighlight = labwareIdsBySection[currentSection]
+
+  const handleClickStartLPC = () => {
+    const prepCommands = getPrepCommands(protocolData?.commands ?? [])
+    prepCommands.forEach(command => {
+      createCommand({ runId: runRecord.data.id, command }).catch((e: Error) => {
+        console.error(`error issuing command to robot: ${e.message}`)
+      })
+    })
+    proceed()
+  }
 
   return (
     <Box margin={SPACING_3}>
@@ -85,7 +104,7 @@ export const IntroScreen = (props: {
           title={t('start_position_check', {
             initial_labware_slot: firstTiprackSlot,
           })}
-          onClick={props.beginLPC}
+          onClick={handleClickStartLPC}
         >
           {t('start_position_check', {
             initial_labware_slot: firstTiprackSlot,
