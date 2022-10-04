@@ -8,7 +8,7 @@ export function getLabwareDefinitionUri(
   labwareDefinitions: ProtocolFile<{}>['labwareDefinitions']
 ): string {
   //  @ts-expect-error
-  const labwareDefinitionUri = labware[labwareId].definitionUri
+  const labwareDefinitionUri = `${labware[labwareId].definitionUri}_id`
   if (labwareDefinitionUri == null) {
     throw new Error(
       'expected to be able to find labware definition uri for labware, but could not'

@@ -19,7 +19,7 @@ describe('getLabwareDefinitionUri', () => {
     const DEF_ID = `${MOCK_DEFINITION_URI}_id`
     const mockLabware = {
       [MOCK_LABWARE_ID]: {
-        definitionUri: `${MOCK_DEFINITION_URI}`,
+        definitionUri: MOCK_DEFINITION_URI,
         displayName: 'some dope labware',
       },
     }

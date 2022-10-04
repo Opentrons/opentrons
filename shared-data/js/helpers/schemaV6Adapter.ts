@@ -54,7 +54,7 @@ export const schemaV6Adapter = (
       return {
         ...acc,
         [labwareId]: {
-          definitionUri: `${labware.definitionUri}`,
+          definitionUri: labware.definitionUri,
           displayName: displayName,
         },
       }
