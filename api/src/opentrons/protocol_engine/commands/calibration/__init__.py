@@ -9,11 +9,11 @@ from .calibrate_pipette import (
 )
 
 from .move_to_location import (
-    MoveToLocation,
-    MoveToLocationCreate,
     MoveToLocationParams,
     MoveToLocationResult,
+    MoveToLocationCreate,
     MoveToLocationCommandType,
+    MoveToLocation,
 )
 
 __all__ = [
@@ -31,8 +31,4 @@ __all__ = [
     "MoveToLocationCommandType",
 ]
 
-<<<<<<< HEAD
 # param name and optional value
-=======
-# param name and optiona value
->>>>>>> a7c25a130 (updated test)
