@@ -15,6 +15,7 @@ import { StyledText } from '../text'
 interface StatusLabelProps {
   status: string
   backgroundColor: string
+  showIcon?: boolean
   iconColor?: string
   textColor?: string
   fontWeight?: number
@@ -32,6 +33,7 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
     fontWeight,
     iconSize,
     pulse,
+    showIcon = true,
     id,
   } = props
 
@@ -48,7 +50,7 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
         marginBottom={SPACING.spacing2}
         data-testid={`status_label_${status}_${id}`}
       >
-        {iconColor != null ? (
+        {showIcon ? (
           <Icon
             name="circle"
             color={iconColor}

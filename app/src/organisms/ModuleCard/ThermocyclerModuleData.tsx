@@ -90,6 +90,7 @@ export const ThermocyclerModuleData = (
               status={data.lidStatus}
               backgroundColor={COLORS.medGreyEnabled}
               textColor={COLORS.darkBlackEnabled}
+              showIcon={false}
               key="lidStatus"
               id="lidStatus"
             />
