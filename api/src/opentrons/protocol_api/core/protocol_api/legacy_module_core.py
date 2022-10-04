@@ -2,9 +2,12 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Optional, cast
+from typing import TYPE_CHECKING, List, Optional, cast
 
-from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
+from opentrons.drivers.types import (
+    HeaterShakerLabwareLatchStatus,
+    ThermocyclerLidStatus,
+)
 from opentrons.hardware_control import SynchronousAdapter, modules as hw_modules
 from opentrons.hardware_control.types import Axis
 from opentrons.hardware_control.modules.types import (
@@ -14,6 +17,7 @@ from opentrons.hardware_control.modules.types import (
     MagneticStatus,
     SpeedStatus,
     MagneticModuleModel,
+    ThermocyclerStep,
 )
 from opentrons.protocols.geometry.module_geometry import (
     ModuleGeometry,
@@ -25,6 +29,7 @@ from ..module import (
     AbstractModuleCore,
     AbstractTemperatureModuleCore,
     AbstractMagneticModuleCore,
+    AbstractThermocyclerCore,
     AbstractHeaterShakerCore,
 )
 from .labware import LabwareImplementation
@@ -222,6 +227,110 @@ class LegacyMagneticModuleCore(
             )
 
 
+class LegacyThermocyclerCore(
+    LegacyModuleCore, AbstractThermocyclerCore[LabwareImplementation]
+):
+    """Core control interface for an attached Thermocycler Module."""
+
+    _sync_module_hardware: SynchronousAdapter[hw_modules.Thermocycler]
+
+    def open_lid(self) -> None:
+        """Open the thermocycler's lid."""
+        raise NotImplementedError("LegacyThermocyclerCore.open_lid")
+
+    def close_lid(self) -> None:
+        """Close the thermocycler's lid."""
+        raise NotImplementedError("LegacyThermocyclerCore.close_lid")
+
+    def set_block_temperature(
+        self,
+        celsius: float,
+        hold_time_seconds: Optional[float] = None,
+        hold_time_minutes: Optional[float] = None,
+        ramp_rate: Optional[float] = None,
+        block_max_volume: Optional[float] = None,
+    ) -> None:
+        """Set the target temperature for the well block, in °C."""
+        raise NotImplementedError("LegacyThermocyclerCore.set_block_temperature")
+
+    def set_lid_temperature(self, celsius: float) -> None:
+        """Set the target temperature for the heated lid, in °C."""
+        raise NotImplementedError("LegacyThermocyclerCore.set_lid_temperature")
+
+    def execute_profile(
+        self,
+        steps: List[ThermocyclerStep],
+        repetitions: int,
+        block_max_volume: Optional[float] = None,
+    ) -> None:
+        """Execute a Thermocycler Profile."""
+        raise NotImplementedError("LegacyThermocyclerCore.execute_profile")
+
+    def deactivate_lid(self) -> None:
+        """Turn off the heated lid."""
+        raise NotImplementedError("LegacyThermocyclerCore.deactivate_lid")
+
+    def deactivate_block(self) -> None:
+        """Turn off the well block temperature controller"""
+        raise NotImplementedError("LegacyThermocyclerCore.deactivate_block")
+
+    def deactivate(self) -> None:
+        """Turn off the well block temperature controller, and heated lid"""
+        raise NotImplementedError("LegacyThermocyclerCore.deactivate")
+
+    def get_lid_position(self) -> Optional[ThermocyclerLidStatus]:
+        """Get the thermoycler's lid position."""
+        return self._sync_module_hardware.lid_status  # type: ignore[no-any-return]
+
+    def get_block_temperature_status(self) -> TemperatureStatus:
+        """Get the thermoycler's block temperature status."""
+        return self._sync_module_hardware.status  # type: ignore[no-any-return]
+
+    def get_lid_temperature_status(self) -> Optional[TemperatureStatus]:
+        """Get the thermoycler's lid temperature status."""
+        return self._sync_module_hardware.lid_temp_status  # type: ignore[no-any-return]
+
+    def get_block_temperature(self) -> Optional[float]:
+        """Get the thermocycler's current block temperature in °C."""
+        return self._sync_module_hardware.temperature  # type: ignore[no-any-return]
+
+    def get_block_target_temperature(self) -> Optional[float]:
+        """Get the thermocycler's target block temperature in °C."""
+        return self._sync_module_hardware.target  # type: ignore[no-any-return]
+
+    def get_lid_temperature(self) -> Optional[float]:
+        """Get the thermocycler's current lid temperature in °C."""
+        return self._sync_module_hardware.lid_temp  # type: ignore[no-any-return]
+
+    def get_lid_target_temperature(self) -> Optional[float]:
+        """Get the thermocycler's target lid temperature in °C."""
+        return self._sync_module_hardware.lid_target  # type: ignore[no-any-return]
+
+    def get_ramp_rate(self) -> Optional[float]:
+        """Get the thermocycler's current ramp rate in °C/sec."""
+        return self._sync_module_hardware.ramp_rate  # type: ignore[no-any-return]
+
+    def get_hold_time(self) -> Optional[float]:
+        """Get the remaining hold time in seconds."""
+        return self._sync_module_hardware.hold_time  # type: ignore[no-any-return]
+
+    def get_total_cycle_count(self) -> Optional[int]:
+        """Get number of repetitions for current set cycle."""
+        return self._sync_module_hardware.total_cycle_count  # type: ignore[no-any-return]
+
+    def get_current_cycle_index(self) -> Optional[int]:
+        """Get index of the current set cycle repetition."""
+        return self._sync_module_hardware.current_cycle_index  # type: ignore[no-any-return]
+
+    def get_total_step_count(self) -> Optional[int]:
+        """Get number of steps within the current cycle."""
+        return self._sync_module_hardware.total_step_count  # type: ignore[no-any-return]
+
+    def get_current_step_index(self) -> Optional[int]:
+        """Get the index of the current step within the current cycle."""
+        return self._sync_module_hardware.current_step_index  # type: ignore[no-any-return]
+
+
 class LegacyHeaterShakerCore(
     LegacyModuleCore, AbstractHeaterShakerCore[LabwareImplementation]
 ):
@@ -348,6 +457,8 @@ def create_module_core(
         core_cls = LegacyTemperatureModuleCore
     elif isinstance(module_hardware_api, hw_modules.MagDeck):
         core_cls = LegacyMagneticModuleCore
+    elif isinstance(module_hardware_api, hw_modules.Thermocycler):
+        core_cls = LegacyThermocyclerCore
     elif isinstance(module_hardware_api, hw_modules.HeaterShaker):
         core_cls = LegacyHeaterShakerCore
 

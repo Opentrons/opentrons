@@ -1,12 +1,16 @@
 """Core module control interfaces."""
 from abc import ABC, abstractmethod
-from typing import Any, Generic, Optional, TypeVar
+from typing import Any, Generic, Optional, TypeVar, List
 
-from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
+from opentrons.drivers.types import (
+    HeaterShakerLabwareLatchStatus,
+    ThermocyclerLidStatus,
+)
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     ModuleType,
     TemperatureStatus,
+    ThermocyclerStep,
     MagneticStatus,
     SpeedStatus,
 )
@@ -128,6 +132,152 @@ class AbstractMagneticModuleCore(AbstractModuleCore[LabwareCoreType]):
     @abstractmethod
     def get_status(self) -> MagneticStatus:
         """Get the module's current magnet status."""
+
+
+class AbstractThermocyclerCore(AbstractModuleCore[LabwareCoreType]):
+    """Core control interface for an attached Thermocycler Module."""
+
+    @abstractmethod
+    def open_lid(self) -> None:
+        """Open the thermocycler's lid."""
+
+    @abstractmethod
+    def close_lid(self) -> None:
+        """Close the thermocycler's lid."""
+
+    @abstractmethod
+    def set_block_temperature(
+        self,
+        celsius: float,
+        hold_time_seconds: Optional[float] = None,
+        hold_time_minutes: Optional[float] = None,
+        ramp_rate: Optional[float] = None,
+        block_max_volume: Optional[float] = None,
+    ) -> None:
+        """Set the target temperature for the well block, in °C.
+
+        Valid operational range yet to be determined.
+
+        :param celsius: The target temperature, in °C.
+        :param hold_time_minutes: The number of minutes to hold, after reaching
+                                  ``temperature``, before proceeding to the
+                                  next command.
+        :param hold_time_seconds: The number of seconds to hold, after reaching
+                                  ``temperature``, before proceeding to the
+                                  next command. If ``hold_time_minutes`` and
+                                  ``hold_time_seconds`` are not specified,
+                                  the Thermocycler will proceed to the next
+                                  command after ``temperature`` is reached.
+        :param ramp_rate: The target rate of temperature change, in °C/sec.
+                          If ``ramp_rate`` is not specified, it will default
+                          to the maximum ramp rate as defined in the device
+                          configuration.
+        :param block_max_volume: The maximum volume of any individual well
+                                 of the loaded labware. If not supplied,
+                                 the thermocycler will default to 25µL/well.
+
+        .. note:
+
+            If ``hold_time_minutes`` and ``hold_time_seconds`` are not
+            specified, the Thermocycler will proceed to the next command
+            after ``temperature`` is reached.
+        """
+
+    @abstractmethod
+    def set_lid_temperature(self, celsius: float) -> None:
+        """Set the target temperature for the heated lid, in °C."""
+
+    @abstractmethod
+    def execute_profile(  # TODO name it this or cycle_temperatures?
+        self,
+        steps: List[ThermocyclerStep],
+        repetitions: int,
+        block_max_volume: Optional[float] = None,
+    ) -> None:
+        """Execute a Thermocycler Profile defined as a cycle of
+        ``steps`` to repeat for a given number of ``repetitions``.
+
+        :param steps: List of unique steps that make up a single cycle.
+                      Each list item should be a dictionary that maps to
+                      the parameters of the :py:meth:`set_block_temperature`
+                      method with keys 'temperature', 'hold_time_seconds',
+                      and 'hold_time_minutes'.
+        :param repetitions: The number of times to repeat the cycled steps.
+        :param block_max_volume: The maximum volume of any individual well
+                                 of the loaded labware. If not supplied,
+                                 the thermocycler will default to 25µL/well.
+
+        .. note:
+
+            Unlike the :py:meth:`set_block_temperature`, either or both of
+            'hold_time_minutes' and 'hold_time_seconds' must be defined
+            and finite for each step.
+
+        """
+
+    @abstractmethod
+    def deactivate_lid(self) -> None:
+        """Turn off the heated lid."""
+
+    @abstractmethod
+    def deactivate_block(self) -> None:
+        """Turn off the well block temperature controller"""
+
+    @abstractmethod
+    def deactivate(self) -> None:  # TODO do we need this in addition to the above two?
+        """Turn off the well block temperature controller, and heated lid"""
+
+    @abstractmethod
+    def get_lid_position(self) -> Optional[ThermocyclerLidStatus]:
+        """Get the thermoycler's lid position."""
+
+    @abstractmethod
+    def get_block_temperature_status(self) -> TemperatureStatus:
+        """Get the thermoycler's block temperature status."""
+
+    @abstractmethod
+    def get_lid_temperature_status(self) -> Optional[TemperatureStatus]:
+        """Get the thermoycler's lid temperature status."""
+
+    @abstractmethod
+    def get_block_temperature(self) -> Optional[float]:
+        """Get the thermocycler's current block temperature in °C."""
+
+    @abstractmethod
+    def get_block_target_temperature(self) -> Optional[float]:
+        """Get the thermocycler's target block temperature in °C."""
+
+    @abstractmethod
+    def get_lid_temperature(self) -> Optional[float]:
+        """Get the thermocycler's current lid temperature in °C."""
+
+    @abstractmethod
+    def get_lid_target_temperature(self) -> Optional[float]:
+        """Get the thermocycler's target lid temperature in °C."""
+
+    @abstractmethod
+    def get_ramp_rate(self) -> Optional[float]:
+        """Get the thermocycler's current rampe rate in °C/sec."""
+
+    @abstractmethod
+    def get_hold_time(self) -> Optional[float]:
+        """Get the remaining hold time in seconds."""
+
+    @abstractmethod
+    def get_total_cycle_count(self) -> Optional[int]:
+        """Get number of repetitions for current set cycle."""
+
+    @abstractmethod
+    def get_current_cycle_index(self) -> Optional[int]:
+        """Get index of the current set cycle repetition."""
+
+    @abstractmethod
+    def get_total_step_count(self) -> Optional[int]:
+        """Get number of steps within the current cycle."""
+
+    @abstractmethod
+    def get_current_step_index(self) -> Optional[int]:
+        """Get the index of the current step within the current cycle."""
 
 
 class AbstractHeaterShakerCore(AbstractModuleCore[LabwareCoreType]):

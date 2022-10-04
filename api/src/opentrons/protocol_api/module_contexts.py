@@ -29,6 +29,7 @@ from .core.module import (
     AbstractModuleCore,
     AbstractTemperatureModuleCore,
     AbstractMagneticModuleCore,
+    AbstractThermocyclerCore,
     AbstractHeaterShakerCore,
 )
 from .core.well import AbstractWellCore
@@ -446,6 +447,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     # TODO(mc, 2022-02-05): this type annotation is misleading;
     # a SynchronousAdapter wrapper is actually passed in
     _module: modules.thermocycler.Thermocycler  # type: ignore[assignment]
+    _core: AbstractThermocyclerCore[AbstractLabware[AbstractWellCore]]
 
     def _get_fixed_trash(self) -> Labware:
         trash = self._protocol_core.get_fixed_trash()
@@ -633,77 +635,79 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     @requires_version(2, 0)
     def lid_position(self) -> Optional[str]:
         """Lid open/close status string"""
-        return self._module.lid_status
+        return self._core.get_lid_position()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def block_temperature_status(self) -> str:
-        return self._module.status
+        """Block temperature status string"""
+        return self._core.get_block_temperature_status()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def lid_temperature_status(self) -> Optional[str]:
-        return self._module.lid_temp_status
+        """Lod temperature status string"""
+        return self._core.get_lid_temperature_status()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def block_temperature(self) -> Optional[float]:
         """Current temperature in degrees C"""
-        return self._module.temperature
+        return self._core.get_block_temperature()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def block_target_temperature(self) -> Optional[float]:
         """Target temperature in degrees C"""
-        return self._module.target
+        return self._core.get_block_target_temperature()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def lid_temperature(self) -> Optional[float]:
         """Current temperature in degrees C"""
-        return self._module.lid_temp
+        return self._core.get_lid_temperature()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def lid_target_temperature(self) -> Optional[float]:
         """Target temperature in degrees C"""
-        return self._module.lid_target
+        return self._core.get_lid_target_temperature()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def ramp_rate(self) -> Optional[float]:
         """Current ramp rate in degrees C/sec"""
-        return self._module.ramp_rate
+        return self._core.get_ramp_rate()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def hold_time(self) -> Optional[float]:
         """Remaining hold time in sec"""
-        return self._module.hold_time
+        return self._core.get_hold_time()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def total_cycle_count(self) -> Optional[int]:
         """Number of repetitions for current set cycle"""
-        return self._module.total_cycle_count
+        return self._core.get_total_cycle_count()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def current_cycle_index(self) -> Optional[int]:
         """Index of the current set cycle repetition"""
-        return self._module.current_cycle_index
+        return self._core.get_current_cycle_index()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def total_step_count(self) -> Optional[int]:
         """Number of steps within the current cycle"""
-        return self._module.total_step_count
+        return self._core.get_total_step_count()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def current_step_index(self) -> Optional[int]:
         """Index of the current step within the current cycle"""
-        return self._module.current_step_index
+        return self._core.get_current_step_index()
 
 
 class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
