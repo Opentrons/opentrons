@@ -1,11 +1,13 @@
 """Opentrons helper methods."""
 from dataclasses import dataclass
 from subprocess import run
-from typing import List, Optional, Dict, Union, Type
+from typing import List, Optional, Dict, Union, Type, Tuple
 
 from opentrons.config.robot_configs import build_config_ot3, load_ot3 as load_ot3_config
 from opentrons.config.defaults_ot3 import DEFAULT_MAX_SPEED_DISCONTINUITY
+from opentrons.config.pipette_config import PipetteConfig
 from opentrons.hardware_control.api import API as OT2API
+from opentrons.hardware_control.motion_utilities import target_position_from_plunger
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.protocols import HardwareControlAPI
 from opentrons.hardware_control.thread_manager import ThreadManager
@@ -171,8 +173,9 @@ async def home_ot3(
         OT3Axis.P_R,
     ]
     default_home_speed = 10
+    max_speeds_for_load = DEFAULT_MAX_SPEED_DISCONTINUITY[api.gantry_load]
     homing_speeds: Dict[OT3Axis, float] = {
-        ax: DEFAULT_MAX_SPEED_DISCONTINUITY[api.gantry_load].get(OT3Axis.to_kind(ax), default_home_speed)
+        ax: max_speeds_for_load.get(OT3Axis.to_kind(ax), default_home_speed)
         for ax in _all_axes
     }
     cached_discontinuities: Dict[OT3Axis, float] = {
@@ -191,9 +194,45 @@ async def home_ot3(
             api, ax, max_speed_discontinuity=val
         )
 
+
 async def home_pipette(api: ThreadManagedHardwareAPI, mount: OT3Mount):
     """Home Plunger"""
     await api.home_plunger(mount)
+
+
+def get_plunger_positions_ot3(api: ThreadManagedHardwareAPI,
+                              mount: OT3Mount) -> Tuple[float, float, float, float]:
+    cfg = api.hardware_pipettes[mount]
+    return cfg.top, cfg.bottom, cfg.blow_out, cfg.drop_tip
+
+
+async def move_plunger_absolute_ot3(api: ThreadManagedHardwareAPI,
+                                    mount: OT3Mount,
+                                    position: float,
+                                    speed: Optional[float] = None) -> None:
+    if mount == OT3Mount.LEFT:
+        pip_axis = OT3Axis.P_L
+    elif mount == OT3Mount.RIGHT:
+        pip_axis = OT3Axis.P_R
+    else:
+        raise ValueError(f'Unexpected mount: {mount}')
+    await api._move(target_position={pip_axis: position}, speed=speed)
+
+
+async def move_plunger_relative_ot3(api: ThreadManagedHardwareAPI,
+                                    mount: OT3Mount,
+                                    position: float,
+                                    speed: Optional[float] = None) -> None:
+    if mount == OT3Mount.LEFT:
+        pip_axis = OT3Axis.P_L
+    elif mount == OT3Mount.RIGHT:
+        pip_axis = OT3Axis.P_R
+    else:
+        raise ValueError(f'Unexpected mount: {mount}')
+    current_pos = await api.current_position(mount=mount)
+    plunger_pos = current_pos[pip_axis]
+    await api._move(target_position={pip_axis: plunger_pos + position}, speed=speed)
+
 
 def get_endstop_position_ot3(api: ThreadManagedHardwareAPI, mount: OT3Mount) -> Point:
     """Get the endstop's position per mount."""
