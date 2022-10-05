@@ -16,7 +16,6 @@ describe('getLabwareDefinitionUri', () => {
   })
   it('should return the definition uri of a given labware', () => {
     const MOCK_LABWARE_ID = 'some_labware'
-    const DEF_ID = MOCK_DEFINITION_URI
     const mockLabware = {
       [MOCK_LABWARE_ID]: {
         definitionUri: MOCK_DEFINITION_URI,
@@ -24,7 +23,7 @@ describe('getLabwareDefinitionUri', () => {
       },
     }
     const mockLabwareDefinitions = {
-      [DEF_ID]: MOCK_DEF,
+      [MOCK_DEFINITION_URI]: MOCK_DEF,
     }
     expect(
       getLabwareDefinitionUri(

@@ -148,9 +148,7 @@ function getRequestedPipetteMatch(
     attachedPipette?.modelSpecs?.backCompatNames.includes(requestedPipetteName)
   ) {
     return INEXACT_MATCH
-  } else if (
-    requestedPipetteName === attachedPipette?.modelSpecs?.name
-  ) {
+  } else if (requestedPipetteName === attachedPipette?.modelSpecs?.name) {
     return MATCH
   } else {
     return INCOMPATIBLE

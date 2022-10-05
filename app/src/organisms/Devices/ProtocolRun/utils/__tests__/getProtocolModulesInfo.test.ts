@@ -40,6 +40,8 @@ describe('getProtocolModulesInfo', () => {
         moduleDef: getModuleDef2('magneticModuleV2'),
         nestedLabwareDef:
           _protocolWithMagTempTC.labwareDefinitions[
+            // prettier-ignore
+            /* eslint-disable */
             _protocolWithMagTempTC.labware[MAG_LW_ID]
               //  @ts-expect-error
               .definitionUri as keyof typeof _protocolWithMagTempTC.labwareDefinitions
@@ -58,8 +60,10 @@ describe('getProtocolModulesInfo', () => {
         moduleDef: getModuleDef2('temperatureModuleV2'),
         nestedLabwareDef:
           _protocolWithMagTempTC.labwareDefinitions[
+            // prettier-ignore
+            /* eslint-disable */
             _protocolWithMagTempTC.labware[TEMP_LW_ID]
-              //  @ts-expect-error
+               //  @ts-expect-error
               .definitionUri as keyof typeof _protocolWithMagTempTC.labwareDefinitions
           ],
         nestedLabwareId: TEMP_LW_ID,
@@ -76,6 +80,8 @@ describe('getProtocolModulesInfo', () => {
         moduleDef: getModuleDef2('thermocyclerModuleV1'),
         nestedLabwareDef:
           _protocolWithMagTempTC.labwareDefinitions[
+            // prettier-ignore
+            /* eslint-disable */
             _protocolWithMagTempTC.labware[TC_LW_ID]
               //  @ts-expect-error
               .definitionUri as keyof typeof _protocolWithMagTempTC.labwareDefinitions
@@ -123,6 +129,8 @@ describe('getProtocolModulesInfo', () => {
         moduleDef: getModuleDef2('magneticModuleV2'),
         nestedLabwareDef:
           _protocolWithMultipleTemps.labwareDefinitions[
+            // prettier-ignore
+            /* eslint-disable */
             _protocolWithMultipleTemps.labware[MAG_LW_ID]
               //  @ts-expect-error
               .definitionUri as keyof typeof _protocolWithMultipleTemps.labwareDefinitions
@@ -141,6 +149,8 @@ describe('getProtocolModulesInfo', () => {
         moduleDef: getModuleDef2('temperatureModuleV2'),
         nestedLabwareDef:
           _protocolWithMultipleTemps.labwareDefinitions[
+            // prettier-ignore
+            /* eslint-disable */
             _protocolWithMultipleTemps.labware[TEMP_ONE_LW_ID]
               //  @ts-expect-error
               .definitionUri as keyof typeof _protocolWithMultipleTemps.labwareDefinitions
@@ -159,6 +169,8 @@ describe('getProtocolModulesInfo', () => {
         moduleDef: getModuleDef2('temperatureModuleV2'),
         nestedLabwareDef:
           _protocolWithMultipleTemps.labwareDefinitions[
+            // prettier-ignore
+            /* eslint-disable */
             _protocolWithMultipleTemps.labware[TEMP_TWO_LW_ID]
               //  @ts-expect-error
               .definitionUri as keyof typeof _protocolWithMultipleTemps.labwareDefinitions
@@ -195,6 +207,8 @@ describe('getProtocolModulesInfo', () => {
         moduleDef: getModuleDef2('magneticModuleV2'),
         nestedLabwareDef:
           _protocolWithMagTempTC.labwareDefinitions[
+            // prettier-ignore
+            /* eslint-disable */
             _protocolWithMagTempTC.labware[MAG_LW_ID]
               //  @ts-expect-error
               .definitionUri as keyof typeof _protocolWithMagTempTC.labwareDefinitions
