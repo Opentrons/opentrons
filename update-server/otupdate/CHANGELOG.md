@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.1.0](https://github.com/Opentrons/opentrons/compare/v6.0.1...v6.1.0) (2022-09-27)
+
+
+### Bug Fixes
+
+* **api,update-server:** Synchronize robot name more tightly between between api and update-server ([#11175](https://github.com/Opentrons/opentrons/issues/11175)) ([f3ac4d9](https://github.com/Opentrons/opentrons/commit/f3ac4d96d63bbd857ed8b8ee75c9a982b8fd0a38))
+
+
+
+
+
 ## [6.0.1](https://github.com/Opentrons/opentrons/compare/v6.0.0...v6.0.1) (2022-08-09)
 
 **Note:** Version bump only for package @opentrons/update-server
