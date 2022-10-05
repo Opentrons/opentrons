@@ -100,7 +100,7 @@ class AbstractMagneticModuleCore(AbstractModuleCore[LabwareCoreType]):
 
         Args:
             height_from_base: Distance from labware base to raise the magnets.
-            height_from_base: Distance from motor home position to raise the magnets.
+            height_from_home: Distance from motor home position to raise the magnets.
         """
 
     @abstractmethod

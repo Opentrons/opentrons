@@ -437,7 +437,7 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
     @property  # type: ignore
     @requires_version(2, 0)
     def status(self) -> str:
-        """The status of the module; either 'engaged' or 'disengaged'"""
+        """The status of the module: either ``engaged`` or ``disengaged``"""
         return self._core.get_status().value
 
 

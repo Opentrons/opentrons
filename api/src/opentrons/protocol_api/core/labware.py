@@ -130,7 +130,7 @@ class AbstractLabware(DeckItem, ABC, Generic[WellCoreType]):
     ) -> Optional[float]:
         """Get the labware's default magnet engage height, if defined.
 
-        Value returned is in real mm's from the labware's base,
+        Value returned is in real millimeters from the labware's base,
         unless `preserve_half_mm` is specified, in which case
         some definitions will return half-millimeters.
         """

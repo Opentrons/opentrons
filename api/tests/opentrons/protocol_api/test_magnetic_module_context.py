@@ -1,4 +1,4 @@
-"""Tests for Protocol API temperature module contexts."""
+"""Tests for Protocol API magnetic module contexts."""
 import pytest
 from decoy import Decoy, matchers
 
@@ -41,7 +41,7 @@ def subject(
     mock_protocol_core: ProtocolCore,
     mock_broker: Broker,
 ) -> MagneticModuleContext:
-    """Get a temperature module context with its dependencies mocked out."""
+    """Get a magnetic module context with its dependencies mocked out."""
     return MagneticModuleContext(
         core=mock_core,
         protocol_core=mock_protocol_core,
@@ -56,7 +56,7 @@ def test_disengage(
     mock_broker: Broker,
     subject: MagneticModuleContext,
 ) -> None:
-    """It should set and wait for the temperature via the core."""
+    """It should disengage magnets via the core."""
     subject.disengage()
 
     decoy.verify(
@@ -125,7 +125,7 @@ def test_engage_offset_from_default(
     mock_core: MagneticModuleCore,
     subject: MagneticModuleContext,
 ) -> None:
-    """It should engage if given a height from the base."""
+    """It should engage from a labware's default engage height."""
     subject.engage(offset=42.0)
 
     decoy.verify(
@@ -144,7 +144,7 @@ def test_engage_offset_from_default_low_version(
     mock_core: MagneticModuleCore,
     subject: MagneticModuleContext,
 ) -> None:
-    """It should engage if given a height from the base."""
+    """It should preserve pre-2.3 buggy labware engage height behavior."""
     subject.engage(offset=42.0)
 
     decoy.verify(
