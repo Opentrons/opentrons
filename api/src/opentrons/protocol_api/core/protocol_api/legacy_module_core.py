@@ -195,8 +195,9 @@ class LegacyMagneticModuleCore(
         if labware_core.get_default_magnet_engage_height() is None:
             name = labware_core.get_name()
             _log.warning(
-                f"Labware {name} is not explicitly compatible with the Magnetic Module."
-                " You will have to specify a height explicitly when calling engage()."
+                f"The labware definition for {name} does not define a"
+                " default engagement height for use with the Magnetic Module;"
+                " you must specify a height explicitly when calling engage()."
             )
 
 
