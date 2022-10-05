@@ -194,8 +194,10 @@ def get_protocol_api(
         extra_labware = labware_from_paths([str(JUPYTER_NOTEBOOK_LABWARE_DIR)])
 
     if should_use_ot3():
+        print('Using OT3')
         build_hw = OT3API.build_hardware_simulator
     else:
+        print('Using OT2')
         build_hw = HardwareAPI.build_hardware_simulator
     checked_hardware = hardware_simulator or ThreadManager(build_hw)
 
