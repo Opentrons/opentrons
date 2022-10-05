@@ -81,7 +81,7 @@ export function StepText(props: Props): JSX.Element | null {
             : getLabwareDisplayName(
                 protocolData.labwareDefinitions[
                   //  @ts-expect-error
-                  `${protocolData.labware[labwareId].definitionUri}_id`
+                  protocolData.labware[labwareId].definitionUri
                 ]
               ),
         labware_location: labwareLocation.slotName,

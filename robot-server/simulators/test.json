@@ -1,10 +1,10 @@
 {
   "attached_instruments": {
     "right": {
-      "model": "p300_single_v1",
+      "model": "p50_single_v3.1",
       "id": "321",
       "max_volume": 300,
-      "name": "p300_single",
+      "name": "p50_single_gen3",
       "tip_length": 0,
       "channels": 1
     },

@@ -61,7 +61,7 @@ export const schemaV6Adapter = (
     }, {})
 
     const labwareDefinitions: {
-      [definitionId: string]: LabwareDefinition2
+      [definitionUri: string]: LabwareDefinition2
     } = protocolAnalysis.commands
       .filter(
         (command: RunTimeCommand): command is LoadLabwareRunTimeCommand =>
@@ -70,14 +70,14 @@ export const schemaV6Adapter = (
       .reduce((acc, command: LoadLabwareRunTimeCommand) => {
         const labwareDef: LabwareDefinition2 = command.result?.definition
         const labwareId = command.result?.labwareId ?? ''
-        const definitionUri = protocolAnalysis.labware.find(
-          labware => labware.id === labwareId
-        )?.definitionUri
-        const definitionId = `${definitionUri}_id`
+        const definitionUri =
+          protocolAnalysis.labware
+            .find(labware => labware.id === labwareId)
+            ?.definitionUri.toString() ?? ''
 
         return {
           ...acc,
-          [definitionId]: labwareDef,
+          [definitionUri]: labwareDef,
         }
       }, {})
 

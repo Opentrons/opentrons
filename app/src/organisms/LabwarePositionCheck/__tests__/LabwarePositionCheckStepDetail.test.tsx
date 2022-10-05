@@ -168,7 +168,7 @@ describe('LabwarePositionCheckStepDetail', () => {
             },
           },
           labwareDefinitions: {
-            [`${LABWARE_DEF_URI}_id`]: LABWARE_DEF,
+            [LABWARE_DEF_URI]: LABWARE_DEF,
           },
           pipettes: {
             [PRIMARY_PIPETTE_ID]: {
@@ -248,7 +248,7 @@ describe('LabwarePositionCheckStepDetail', () => {
             },
           },
           labwareDefinitions: {
-            [`${TIPRACK_DEF_URI}_id`]: LABWARE_DEF,
+            [TIPRACK_DEF_URI]: LABWARE_DEF,
           },
           pipettes: {
             [PRIMARY_PIPETTE_ID]: {

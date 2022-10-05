@@ -86,7 +86,7 @@ export const LabwarePositionCheckStepDetail = (
   if (protocolData == null) return null
   //  @ts-expect-error: will be an error until we remove the schemaV6Adapter
   const labwareDefUri = protocolData.labware[labwareId].definitionUri
-  const labwareDef = protocolData.labwareDefinitions[`${labwareDefUri}_id`]
+  const labwareDef = protocolData.labwareDefinitions[labwareDefUri]
   // filter out the TC open lid command as it does not have an associated pipette id
   const stepMovementCommands = selectedStep.commands.filter(
     (
