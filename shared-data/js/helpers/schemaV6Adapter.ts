@@ -71,9 +71,8 @@ export const schemaV6Adapter = (
         const labwareDef: LabwareDefinition2 = command.result?.definition
         const labwareId = command.result?.labwareId ?? ''
         const definitionUri =
-          protocolAnalysis.labware
-            .find(labware => labware.id === labwareId)
-            ?.definitionUri.toString() ?? ''
+          protocolAnalysis.labware.find(labware => labware.id === labwareId)
+            ?.definitionUri ?? ''
 
         return {
           ...acc,
