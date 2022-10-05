@@ -1,24 +1,15 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import {
-  NewPrimaryBtn,
   Text,
   Flex,
   Box,
-  useInterval,
   TYPOGRAPHY,
   FONT_WEIGHT_SEMIBOLD,
-  JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_CENTER,
-  ALIGN_CENTER,
-  SPACING_2,
-  SPACING_3,
-  SPACING_6,
 } from '@opentrons/components'
 import { useCurrentRun } from '../../ProtocolUpload/hooks'
-import { SectionList } from '../SectionList'
-import { DeckMap } from '../DeckMap'
-import { useIntroInfo, useLabwareIdsBySection } from '../hooks'
+import { PrimaryButton } from '../../../atoms/buttons'
 import { getPrepCommands } from './getPrepCommands'
 import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import { useCreateCommandMutation } from '@opentrons/react-api-client'
@@ -34,27 +25,9 @@ export const IntroScreen = (props: {
 
   const runRecord = useCurrentRun()
   const { createCommand } = useCreateCommandMutation()
-  const labwareIdsBySection = useLabwareIdsBySection(
-    runRecord?.data?.id ?? null
-  )
-  const introInfo = useIntroInfo()
   const { t } = useTranslation(['labware_position_check', 'shared'])
 
-  const [sectionIndex, setSectionIndex] = React.useState<number>(0)
-  const rotateSectionIndex = (): void =>
-    setSectionIndex((sectionIndex + 1) % sections.length)
-  useInterval(rotateSectionIndex, INTERVAL_MS)
-
-  if (runRecord == null || introInfo == null) return null
-  const {
-    primaryPipetteMount,
-    secondaryPipetteMount,
-    firstTiprackSlot,
-    sections,
-  } = introInfo
-
-  const currentSection = sections[sectionIndex]
-  const labwareIdsToHighlight = labwareIdsBySection[currentSection]
+  if (runRecord == null) return null
 
   const handleClickStartLPC = (): void => {
     const prepCommands = getPrepCommands(protocolData?.commands ?? [])
@@ -67,7 +40,7 @@ export const IntroScreen = (props: {
   }
 
   return (
-    <Box margin={SPACING_3}>
+    <Box>
       <Text
         as="h3"
         textTransform={TYPOGRAPHY.textTransformUppercase}
@@ -80,34 +53,14 @@ export const IntroScreen = (props: {
         i18nKey="position_check_description"
         components={{
           block: (
-            <Text fontSize={TYPOGRAPHY.fontSizeH3} marginBottom={SPACING_2} />
+            <Text fontSize={TYPOGRAPHY.fontSizeH3} />
           ),
         }}
       ></Trans>
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
-        <Flex marginLeft={SPACING_6}>
-          <SectionList
-            sections={sections}
-            currentSection={currentSection}
-            primaryPipetteMount={primaryPipetteMount}
-            secondaryPipetteMount={secondaryPipetteMount}
-          />
-        </Flex>
-        <Box width="60%" padding={SPACING_2}>
-          <DeckMap labwareIdsToHighlight={labwareIdsToHighlight} />
-        </Box>
-      </Flex>
-      <Flex justifyContent={JUSTIFY_CENTER} marginBottom={SPACING_3}>
-        <NewPrimaryBtn
-          title={t('start_position_check', {
-            initial_labware_slot: firstTiprackSlot,
-          })}
-          onClick={handleClickStartLPC}
-        >
-          {t('start_position_check', {
-            initial_labware_slot: firstTiprackSlot,
-          })}
-        </NewPrimaryBtn>
+      <Flex justifyContent={JUSTIFY_CENTER}>
+        <PrimaryButton onClick={handleClickStartLPC}>
+          PROCEED
+        </PrimaryButton>
       </Flex>
     </Box>
   )

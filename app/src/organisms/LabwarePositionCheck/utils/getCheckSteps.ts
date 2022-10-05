@@ -1,7 +1,15 @@
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import { SECTIONS } from '../constants'
-import { getAllUniqLocationsForLabware, getLabwareDefinitionsFromCommands } from './labware'
-import { getLabwareDefURI, getIsTiprack, getSlotHasMatingSurfaceUnitVector } from '@opentrons/shared-data'
+import {
+  getAllUniqLocationsForLabware,
+  getLabwareDefinitionsFromCommands,
+} from './labware'
+import {
+  getLabwareDefURI,
+  getIsTiprack,
+  getSlotHasMatingSurfaceUnitVector,
+  FIXED_TRASH_ID,
+} from '@opentrons/shared-data'
 
 import type {
   LabwarePositionCheckStep,
@@ -10,9 +18,15 @@ import type {
   CheckLabwareStep,
   ReturnTipStep,
 } from '../types'
-import type { RunTimeCommand, ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import type {
+  RunTimeCommand,
+  ProtocolAnalysisOutput,
+} from '@opentrons/shared-data'
 import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
-import type { LabwareLocation, LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import type {
+  LabwareLocation,
+  LoadModuleRunTimeCommand,
+} from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
 interface LPCArgs {
   primaryPipetteId: string
@@ -31,12 +45,13 @@ export const getCheckSteps = (args: LPCArgs): LabwarePositionCheckStep[] => {
   console.log('checkTipRacksSectionSteps', checkTipRacksSectionSteps)
   if (checkTipRacksSectionSteps.length < 1) return []
 
-  const lastTiprackCheckStep = checkTipRacksSectionSteps[checkTipRacksSectionSteps.length - 1]
+  const lastTiprackCheckStep =
+    checkTipRacksSectionSteps[checkTipRacksSectionSteps.length - 1]
   const pickUpTipSectionStep: PickUpTipStep = {
     section: SECTIONS.PICK_UP_TIP,
     labwareId: lastTiprackCheckStep.labwareId,
     pipetteId: lastTiprackCheckStep.pipetteId,
-    location: PICK_UP_TIP_LOCATION
+    location: PICK_UP_TIP_LOCATION,
   }
 
   const checkLabwareSectionSteps = getCheckLabwareSectionSteps(args)
@@ -45,7 +60,7 @@ export const getCheckSteps = (args: LPCArgs): LabwarePositionCheckStep[] => {
     section: SECTIONS.RETURN_TIP,
     labwareId: lastTiprackCheckStep.labwareId,
     pipetteId: lastTiprackCheckStep.pipetteId,
-    location: PICK_UP_TIP_LOCATION
+    location: PICK_UP_TIP_LOCATION,
   }
 
   console.log('checkLabwareSectionSteps', checkLabwareSectionSteps)
@@ -63,17 +78,25 @@ function getCheckTipRackSectionSteps(args: LPCArgs): CheckTipRacksStep[] {
   const { secondaryPipetteId, primaryPipetteId, commands } = args
 
   const pickUpTipCommands = commands.filter(
-    (command): command is PickUpTipRunTimeCommand => command.commandType === 'pickUpTip'
+    (command): command is PickUpTipRunTimeCommand =>
+      command.commandType === 'pickUpTip'
   )
 
   console.log('pickUpTipCommands', pickUpTipCommands)
-  const uniqPickUpTipCommands = pickUpTipCommands.reduce<PickUpTipRunTimeCommand[]>((acc, pickUpTipCommand) => {
+  const uniqPickUpTipCommands = pickUpTipCommands.reduce<
+    PickUpTipRunTimeCommand[]
+  >((acc, pickUpTipCommand) => {
     if (
-      (pickUpTipCommand.params.pipetteId === primaryPipetteId
-        && acc.some(c => c.params.labwareId === pickUpTipCommand.params.labwareId))
-      ||
-      (pickUpTipCommand.params.pipetteId === secondaryPipetteId
-        && pickUpTipCommands.some(c => c.params.labwareId === pickUpTipCommand.params.labwareId && c.params.pipetteId === primaryPipetteId))
+      (pickUpTipCommand.params.pipetteId === primaryPipetteId &&
+        acc.some(
+          c => c.params.labwareId === pickUpTipCommand.params.labwareId
+        )) ||
+      (pickUpTipCommand.params.pipetteId === secondaryPipetteId &&
+        pickUpTipCommands.some(
+          c =>
+            c.params.labwareId === pickUpTipCommand.params.labwareId &&
+            c.params.pipetteId === primaryPipetteId
+        ))
     ) {
       return acc
     }
@@ -81,63 +104,66 @@ function getCheckTipRackSectionSteps(args: LPCArgs): CheckTipRacksStep[] {
   }, [])
 
   console.log('uniqPickUpTipCommands', uniqPickUpTipCommands)
-  return uniqPickUpTipCommands.reduce<CheckTipRacksStep[]>((acc, { params }) => {
-    const labwareLocations = getAllUniqLocationsForLabware(params.labwareId, commands)
-    return [
-      ...acc,
-      ...labwareLocations.map(location => ({
-        section: SECTIONS.CHECK_TIP_RACKS,
-        labwareId: params.labwareId,
-        pipetteId: params.pipetteId,
-        location,
-      }))
-    ]
-  }, [])
+  return uniqPickUpTipCommands.reduce<CheckTipRacksStep[]>(
+    (acc, { params }) => {
+      const labwareLocations = getAllUniqLocationsForLabware(
+        params.labwareId,
+        commands
+      )
+      return [
+        ...acc,
+        ...labwareLocations.map(location => ({
+          section: SECTIONS.CHECK_TIP_RACKS,
+          labwareId: params.labwareId,
+          pipetteId: params.pipetteId,
+          location,
+        })),
+      ]
+    },
+    []
+  )
 }
 
 function getCheckLabwareSectionSteps(args: LPCArgs): CheckLabwareStep[] {
   const { labware, commands, primaryPipetteId } = args
   const labwareDefinitions = getLabwareDefinitionsFromCommands(commands)
 
-  return labware.reduce<CheckLabwareStep[]>(
-    (acc, currentLabware) => {
-      const labwareDef = labwareDefinitions.find(def => getLabwareDefURI(def) === currentLabware.definitionUri)
-      if (labwareDef == null) {
-        throw new Error(`could not find labware definition within protocol with uri: ${currentLabware.definitionUri}`)
-      }
-      const isTiprack = getIsTiprack(labwareDef)
-      if (isTiprack) return acc // skip any labware that is a tiprack
+  return labware.reduce<CheckLabwareStep[]>((acc, currentLabware) => {
+    const labwareDef = labwareDefinitions.find(
+      def => getLabwareDefURI(def) === currentLabware.definitionUri
+    )
+    if (currentLabware.id === FIXED_TRASH_ID) return acc
+    if (labwareDef == null) {
+      throw new Error(
+        `could not find labware definition within protocol with uri: ${currentLabware.definitionUri}`
+      )
+    }
+    const isTiprack = getIsTiprack(labwareDef)
+    if (isTiprack) return acc // skip any labware that is a tiprack
 
-      const labwareLocations = getAllUniqLocationsForLabware(currentLabware.id, commands)
-      return [
-        ...acc,
-        ...labwareLocations.reduce<CheckLabwareStep[]>((innerAcc, loc) => {
-          if (!getSlotHasMatingSurfaceUnitVector(OT2_STANDARD_DECK_DEF, 'slotName' in loc ? loc.slotName : '')) {
-            return innerAcc
-          }
+    const labwareLocations = getAllUniqLocationsForLabware(
+      currentLabware.id,
+      commands
+    )
+    return [
+      ...acc,
+      ...labwareLocations.reduce<CheckLabwareStep[]>((innerAcc, loc) => {
+        if (
+          !getSlotHasMatingSurfaceUnitVector(
+            OT2_STANDARD_DECK_DEF,
+            'slotName' in loc ? loc.slotName : ''
+          )
+        ) {
+          return innerAcc
+        }
 
-          if ('moduleId' in loc) {
-            const loadModuleCommand = commands.find(
-              (command: RunTimeCommand): command is LoadModuleRunTimeCommand =>
-                command.commandType === 'loadModule' &&
-                command.params.moduleId === loc.moduleId
-            )
-            if (loadModuleCommand != null) {
-              return [
-                ...innerAcc,
-                {
-                  section: SECTIONS.CHECK_LABWARE,
-                  labwareId: currentLabware.id,
-                  pipetteId: primaryPipetteId,
-                  location: {
-                    moduleModel: loadModuleCommand.params.model,
-                    slotName: loadModuleCommand.params.location.slotName,
-                  }
-                }
-              ]
-            }
-            return innerAcc
-          } else {
+        if ('moduleId' in loc) {
+          const loadModuleCommand = commands.find(
+            (command: RunTimeCommand): command is LoadModuleRunTimeCommand =>
+              command.commandType === 'loadModule' &&
+              command.params.moduleId === loc.moduleId
+          )
+          if (loadModuleCommand != null) {
             return [
               ...innerAcc,
               {
@@ -145,14 +171,27 @@ function getCheckLabwareSectionSteps(args: LPCArgs): CheckLabwareStep[] {
                 labwareId: currentLabware.id,
                 pipetteId: primaryPipetteId,
                 location: {
-                  slotName: loc.slotName,
-                }
-              }
+                  moduleModel: loadModuleCommand.params.model,
+                  slotName: loadModuleCommand.params.location.slotName,
+                },
+              },
             ]
           }
-        }, [])
-      ]
-    },
-    []
-  )
+          return innerAcc
+        } else {
+          return [
+            ...innerAcc,
+            {
+              section: SECTIONS.CHECK_LABWARE,
+              labwareId: currentLabware.id,
+              pipetteId: primaryPipetteId,
+              location: {
+                slotName: loc.slotName,
+              },
+            },
+          ]
+        }
+      }, []),
+    ]
+  }, [])
 }

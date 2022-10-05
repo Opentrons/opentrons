@@ -1,12 +1,9 @@
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import type {
-  RunTimeCommand,
-  ProtocolFile,
-} from '@opentrons/shared-data/protocol'
-import { LoadPipetteRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import type { RunTimeCommand } from '@opentrons/shared-data/protocol'
+import type { LoadPipetteRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
 export const getPrimaryPipetteId = (
-  pipettesById: ProtocolFile<{}>['pipettes'],
+  pipettesById: { [id: string]: LoadedPipette },
   commands: RunTimeCommand[]
 ): string => {
   if (Object.keys(pipettesById).length === 1) {
