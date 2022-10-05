@@ -65,19 +65,19 @@ class LegacyTemperatureModuleCore(
     _sync_module_hardware: SynchronousAdapter[TempDeck]
 
     def set_target_temperature(self, celsius: float) -> None:
-        """Set the temperature module's target temperature in °C."""
+        """Set the Temperature Module's target temperature in °C."""
         self._sync_module_hardware.start_set_temperature(celsius)
 
     def wait_for_target_temperature(self, celsius: Optional[float] = None) -> None:
         """Wait until the module's target temperature is reached.
 
-        Specifying a value for `celsius` that is different than
+        Specifying a value for ``celsius`` that is different than
         the module's current target temperature may beahave unpredictably.
         """
         self._sync_module_hardware.await_temperature(celsius)
 
     def deactivate(self) -> None:
-        """Deactivate the temperature module."""
+        """Deactivate the Temperature Module."""
         self._sync_module_hardware.deactivate()
 
     def get_current_temperature(self) -> float:

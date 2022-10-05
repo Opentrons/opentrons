@@ -117,16 +117,16 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
         namespace: Optional[str] = None,
         version: int = 1,
     ) -> Labware:
-        """Load a labware onto the module by its load parameters.
+        """Load a labware onto the module using its load parameters.
 
         :param name: The name of the labware object.
         :param str label: An optional display name to give the labware.
-            If specified, this is the name the labware will use in the run log
-            and the calibration view in the Opentrons App.
+                          If specified, this is the name the labware will use
+                          in the run log and the calibration view in the Opentrons App.
         :param str namespace: The namespace the labware definition belongs to.
-            If unspecified, will search 'opentrons' then 'custom_beta'
+                              If unspecified, will search 'opentrons' then 'custom_beta'
         :param int version: The version of the labware definition.
-            If unspecified, will use version 1.
+                            If unspecified, will use version 1.
 
         :returns: The initialized and loaded labware object.
 
@@ -163,9 +163,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
     def load_labware_from_definition(
         self, definition: LabwareDefinition, label: Optional[str] = None
     ) -> Labware:
-        """
-        Specify the presence of a labware on the module, using an
-        inline definition.
+        """Load a labware onto the module using an inline definition.
 
         :param definition: The labware definition.
         :param str label: An optional special name to give the labware. If
@@ -209,7 +207,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def geometry(self) -> GeometryType:
-        """The object representing the module as an item on the deck
+        """The object representing the module as an item on the deck.
 
         :returns: ModuleGeometry
         """
@@ -316,13 +314,13 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def temperature(self) -> float:
-        """Current temperature in °C"""
+        """Current temperature in °C."""
         return self._core.get_current_temperature()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def target(self) -> Optional[float]:
-        """Current target temperature in °C"""
+        """Current target temperature in °C."""
         return self._core.get_target_temperature()
 
     @property  # type: ignore[misc]
@@ -330,8 +328,7 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
     def status(self) -> str:
         """The status of the module.
 
-        Returns ``holding at target``, ``cooling``, ``heating``, or ``idle``
-
+        Returns ``holding at target``, ``cooling``, ``heating``, or ``idle``.
         """
         return self._core.get_status().value
 
