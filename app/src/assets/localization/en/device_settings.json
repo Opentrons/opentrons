@@ -136,5 +136,6 @@
   "wireless_ip": "Wireless IP",
   "wireless_mac_address": "Wireless MAC Address",
   "wireless_subnet_mask": "Wireless Subnet Mask",
-  "yes_clear_data_and_restart_robot": "Yes, clear data and restart robot"
+  "yes_clear_data_and_restart_robot": "Yes, clear data and restart robot",
+  "protocol_run_history_description": "Resetting run history will also clear Labware Offset data."
 }

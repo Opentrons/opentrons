@@ -42,7 +42,7 @@ def test_get_waypoints_in_labware_arc() -> None:
     ]
 
 
-def test_get_waypoints_in_labware_arc_with_high_origin() -> None:
+def test_get_waypoints_in_labware_arc_with_high_dest() -> None:
     """It should favor dest height over travel z if point is higher."""
     result = get_waypoints(
         origin=Point(1, 1, 10),
@@ -59,7 +59,7 @@ def test_get_waypoints_in_labware_arc_with_high_origin() -> None:
     ]
 
 
-def test_get_waypoints_in_labware_arc_with_high_dest() -> None:
+def test_get_waypoints_in_labware_arc_with_high_origin() -> None:
     """It should favor origin height over travel z if point is higher."""
     result = get_waypoints(
         origin=Point(1, 1, 11),
@@ -73,6 +73,23 @@ def test_get_waypoints_in_labware_arc_with_high_dest() -> None:
     assert result == [
         Waypoint(Point(2, 2, 11)),
         Waypoint(Point(2, 2, 10)),
+    ]
+
+
+def test_get_waypoints_in_labware_arc_with_extra_high_origin() -> None:
+    """It should favor origin height over max travel z if higher."""
+    result = get_waypoints(
+        origin=Point(1, 1, 11),
+        dest=Point(2, 2, 5),
+        move_type=MoveType.IN_LABWARE_ARC,
+        min_travel_z=6,
+        # max_travel_z lower than starting point
+        max_travel_z=10,
+    )
+
+    assert result == [
+        Waypoint(Point(2, 2, 11)),
+        Waypoint(Point(2, 2, 5)),
     ]
 
 

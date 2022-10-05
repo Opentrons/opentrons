@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { THERMOCYCLER_MODULE_V1, getModuleDef2 } from '@opentrons/shared-data'
 import { RobotWorkSpace } from '../Deck/RobotWorkSpace'
 import { getDeckDefinitions } from '../Deck/getDeckDefinitions'
 
@@ -7,7 +8,6 @@ import { Module } from './'
 import type { ThermocyclerVizProps } from './Thermocycler'
 import type { RobotWorkSpaceRenderProps } from '../Deck/RobotWorkSpace'
 import type { Story, Meta } from '@storybook/react'
-import { THERMOCYCLER_MODULE_V1, getModuleDef2 } from '@opentrons/shared-data'
 
 const lidMotorStates = ['open', 'closed', 'unknown']
 

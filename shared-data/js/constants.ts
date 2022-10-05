@@ -123,7 +123,7 @@ export const MICRO_LITERS = 'µL'
 export const RPM: 'RPM' = 'RPM'
 export const HS_RPM_MIN = 200
 export const HS_RPM_MAX = 3000
-export const HS_TOO_HOT_TEMP = 48.9
+export const TOO_HOT_TEMP = 48.9
 export const MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM = 53
 
 export const OT2_STANDARD_MODEL: 'OT-2 Standard' = 'OT-2 Standard'
