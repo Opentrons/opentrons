@@ -73,7 +73,7 @@ export const LabwarePositionCheckComponent = (
 
   const totalStepCount = LPCSteps.length
   const currentStep = LPCSteps?.[currentStepIndex]
-  const proceed = () => setCurrentStepIndex(currentStepIndex !== LPCSteps.length - 1 ? currentStepIndex + 1 : currentStepIndex)
+  const proceed = (): void => setCurrentStepIndex(currentStepIndex !== LPCSteps.length - 1 ? currentStepIndex + 1 : currentStepIndex)
 
   if (protocolData == null || currentStep == null) return null
   console.log('CURRENT_STEP', currentStep)
@@ -94,6 +94,7 @@ export const LabwarePositionCheckComponent = (
         {...currentStep}
         proceed={proceed}
         protocolData={protocolData} />
+    )
   } else if (currentStep.section === 'PICK_UP_TIP') {
     modalContent = (<div> PICK_UP_TIP <button onClick={proceed}>PROCEED</button> </div>)
   } else if (currentStep.section === 'CHECK_LABWARE') {
