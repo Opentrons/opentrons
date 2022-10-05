@@ -829,7 +829,6 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         """Delays protocol execution until the Heater-Shaker has reached its target
         temperature. Returns an error if no target temperature was previously set.
         """
-        # TODO should we pass the target temperature to the core (and then to await temperature?)
         self._core.wait_for_target_temperature()
 
     @requires_version(2, 13)
@@ -882,7 +881,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     def deactivate_shaker(self) -> None:
         """Stops shaking.
 
-        Decelerating to 0 rpm typically only takes a few seconds.
+        Decelerating to 0 RPM typically only takes a few seconds.
         """
         self._core.deactivate_shaker()
 
