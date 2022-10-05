@@ -43,7 +43,7 @@ defaults:
 jobs:
   lint-test:
     name: 'notify server package linting and tests'
-    timeout-minutes: 30
+    timeout-minutes: 20
     runs-on: 'ubuntu-22.04'
     steps:
       - uses: 'actions/checkout@v3'

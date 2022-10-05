@@ -94,8 +94,7 @@ $(sdist_file): setup.py $(ot_sources)
 sdist: $(sdist_file)
 
 .PHONY: test
-test:
-	$(call pytest,ot-3/robot-server) $(tests) $(test_opts)
+test: test-ot2 test-ot3
 
 .PHONY: test-cov
 test-cov:
@@ -104,6 +103,10 @@ test-cov:
 .PHONY: test-ot2
 test-ot2:
 	$(call pytest,ot-2) $(tests) $(test_opts) --ot2-only --ignore-glob="**/*ot3*"
+
+.PHONY: test-ot3
+test-ot3:
+	$(call pytest,ot-3) $(tests) $(test_opts)
 
 .PHONY: test-app
 test-app:
