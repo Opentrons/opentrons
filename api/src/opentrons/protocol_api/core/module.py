@@ -59,13 +59,13 @@ class AbstractTemperatureModuleCore(AbstractModuleCore[LabwareCoreType]):
     def wait_for_target_temperature(self, celsius: Optional[float] = None) -> None:
         """Wait until the module's target temperature is reached.
 
-        Specifying a value for `celsius` that is different than
+        Specifying a value for ``celsius`` that is different than
         the module's current target temperature may beahave unpredictably.
         """
 
     @abstractmethod
     def deactivate(self) -> None:
-        """Deactivate the temperature module."""
+        """Deactivate the Temperature Module."""
 
     @abstractmethod
     def get_current_temperature(self) -> float:
