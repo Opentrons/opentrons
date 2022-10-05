@@ -9,8 +9,9 @@ export const getPrimaryPipetteId = (
   pipettesById: ProtocolFile<{}>['pipettes'],
   commands: RunTimeCommand[]
 ): string => {
-  if (Object.keys(pipettesById).length === 1) {
-    return Object.keys(pipettesById)[0]
+  if (pipettesById[1] == null) {
+    //  @ts-expect-error: id will exist when we remove the schemaV6Adapter
+    return pipettesById[0].id
   }
 
   const leftPipetteId = commands.find(
@@ -28,8 +29,8 @@ export const getPrimaryPipetteId = (
     )
   }
 
-  const leftPipette = pipettesById[leftPipetteId]
-  const rightPipette = pipettesById[rightPipetteId]
+  const leftPipette = pipettesById[0]
+  const rightPipette = pipettesById[1]
 
   //  @ts-expect-error: pipetteName should be name until we remove the schemaV6Adapter
   const leftPipetteSpecs = getPipetteNameSpecs(leftPipette.pipetteName)

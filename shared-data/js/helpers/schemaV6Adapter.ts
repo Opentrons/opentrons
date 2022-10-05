@@ -23,11 +23,15 @@ export const schemaV6Adapter = (
 ): ProtocolAnalysisFile<{}> | null => {
   if (protocolAnalysis != null && protocolAnalysis.status === 'completed') {
     const pipettes: {
-      [pipetteId: string]: { pipetteName: PipetteName }
-    } = protocolAnalysis.pipettes.reduce((acc, pipette) => {
+      [index: number]: {
+        id: string
+        pipetteName: PipetteName
+      }
+    } = protocolAnalysis.pipettes.reduce((acc, pipette, index) => {
       return {
         ...acc,
-        [pipette.id]: {
+        [index]: {
+          id: pipette.id,
           pipetteName: pipette.pipetteName,
         },
       }
