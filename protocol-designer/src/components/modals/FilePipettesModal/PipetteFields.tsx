@@ -6,13 +6,11 @@ import {
   PipetteSelect,
   OutlineButton,
   Mount,
-  SelectOption,
 } from '@opentrons/components'
 import {
-  getAllPipetteNames,
+  getIncompatiblePipetteNames,
   getLabwareDefURI,
   getLabwareDisplayName,
-  getPipetteNameSpecs,
   OT3_PIPETTES,
 } from '@opentrons/shared-data'
 import isEmpty from 'lodash/isEmpty'
@@ -67,12 +65,7 @@ export interface Props {
 interface PipetteSelectProps {
   mount: Mount
   tabIndex: number
-  filteredOptions?: SelectOption[]
-}
-
-interface GEN3PipetteOptions {
-  value: PipetteName
-  label: string | undefined
+  nameBlocklist?: string[]
 }
 
 export function PipetteFields(props: Props): JSX.Element {
@@ -123,25 +116,13 @@ export function PipetteFields(props: Props): JSX.Element {
 
   const initialTabIndex = props.initialTabIndex || 1
 
-  const getGEN3PipetteOptions = (
-    pipettes: PipetteName[]
-  ): GEN3PipetteOptions[] => {
-    const getGEN3Pipettes = pipettes.filter(
-      pipette => getPipetteNameSpecs(pipette)?.displayCategory === 'GEN3'
-    )
-    const options = getGEN3Pipettes.map(pipette => {
-      return {
-        value: pipette,
-        label: getPipetteNameSpecs(pipette)?.displayName,
-      }
-    })
-    return options
-  }
-
   const renderPipetteSelect = (props: PipetteSelectProps): JSX.Element => {
-    const { tabIndex, mount, filteredOptions } = props
+    const { tabIndex, mount, nameBlocklist } = props
     const pipetteName = values[mount].pipetteName
-
+    const updatedNameBlockList =
+      nameBlocklist != null && !enableOT3Support
+        ? [...nameBlocklist, ...OT3_PIPETTES]
+        : nameBlocklist
     return (
       <PipetteSelect
         enableNoneOption
@@ -156,9 +137,8 @@ export function PipetteFields(props: Props): JSX.Element {
           onSetFieldValue(targetToClear, null)
           onSetFieldTouched(targetToClear, false)
         }}
-        nameBlocklist={enableOT3Support ? [] : OT3_PIPETTES}
+        nameBlocklist={updatedNameBlockList != null ? updatedNameBlockList : []}
         id={`PipetteSelect_${mount}`}
-        filteredOptions={filteredOptions}
       />
     )
   }
@@ -175,11 +155,9 @@ export function PipetteFields(props: Props): JSX.Element {
             {renderPipetteSelect({
               mount: 'left',
               tabIndex: initialTabIndex + 1,
-              filteredOptions:
-                getPipetteNameSpecs(values.right.pipetteName as PipetteName)
-                  ?.displayCategory === 'GEN3'
-                  ? getGEN3PipetteOptions(getAllPipetteNames())
-                  : [],
+              nameBlocklist: getIncompatiblePipetteNames(
+                values.right.pipetteName as PipetteName
+              ),
             })}
           </FormGroup>
           <FormGroup
@@ -225,11 +203,9 @@ export function PipetteFields(props: Props): JSX.Element {
             {renderPipetteSelect({
               mount: 'right',
               tabIndex: initialTabIndex + 3,
-              filteredOptions:
-                getPipetteNameSpecs(values.left.pipetteName as PipetteName)
-                  ?.displayCategory === 'GEN3'
-                  ? getGEN3PipetteOptions(getAllPipetteNames())
-                  : [],
+              nameBlocklist: getIncompatiblePipetteNames(
+                values.left.pipetteName as PipetteName
+              ),
             })}
           </FormGroup>
           <FormGroup

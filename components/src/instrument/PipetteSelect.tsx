@@ -33,8 +33,6 @@ export interface PipetteSelectProps {
   className?: string
   /** custom id to be applied. likely to be used as a data test id for e2e testing */
   id?: string
-  /** filtered options to overwrite the default pipette options **/
-  filteredOptions?: SelectOption[] | null
 }
 
 // TODO(mc, 2019-10-14): i18n
@@ -67,26 +65,19 @@ export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
     enableNoneOption,
     id,
     nameBlocklist = [],
-    filteredOptions,
   } = props
   const allowlist = ({ value }: SelectOption): boolean => {
     return !nameBlocklist.some(n => n === value)
   }
-  const gen30options = specsByCategory[GEN3].map(specToOption).filter(allowlist)
+  const gen3options = specsByCategory[GEN3].map(specToOption).filter(allowlist)
   const gen2Options = specsByCategory[GEN2].map(specToOption).filter(allowlist)
   const gen1Options = specsByCategory[GEN1].map(specToOption).filter(allowlist)
-  const groupedOptions =
-    filteredOptions != null && filteredOptions.length > 0
-      ? [
-          ...(enableNoneOption ? [OPTION_NONE] : []),
-          ...(filteredOptions.length > 0 ? [{ options: filteredOptions }] : []),
-        ]
-      : [
-          ...(enableNoneOption ? [OPTION_NONE] : []),
-          ...(gen30options.length > 0 ? [{ options: gen30options }] : []),
-          ...(gen2Options.length > 0 ? [{ options: gen2Options }] : []),
-          ...(gen1Options.length > 0 ? [{ options: gen1Options }] : []),
-        ]
+  const groupedOptions = [
+    ...(enableNoneOption ? [OPTION_NONE] : []),
+    ...(gen3options.length > 0 ? [{ options: gen3options }] : []),
+    ...(gen2Options.length > 0 ? [{ options: gen2Options }] : []),
+    ...(gen1Options.length > 0 ? [{ options: gen1Options }] : []),
+  ]
 
   const defaultValue = enableNoneOption ? OPTION_NONE : null
   const value =
