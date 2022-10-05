@@ -1,12 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  AlertModal,
-  Box,
-  SPACING_2,
-  Text,
-  useConditionalConfirm,
-} from '@opentrons/components'
+import { useConditionalConfirm } from '@opentrons/components'
 import { Portal } from '../../App/portal'
 import { useTrackEvent } from '../../redux/analytics'
 import { useRestartRun } from '../ProtocolUpload/hooks'

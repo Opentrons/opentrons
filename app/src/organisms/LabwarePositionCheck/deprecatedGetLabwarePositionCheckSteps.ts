@@ -1,6 +1,6 @@
 import omitBy from 'lodash/omitBy'
 import values from 'lodash/values'
-import { getPrimaryPipetteId } from './utils/getPrimaryPipetteId'
+import { deprecatedGetPrimaryPipetteId } from './utils/deprecatedGetPrimaryPipetteId'
 import { getPipetteWorkflow } from './utils/getPipetteWorkflow'
 import { getOnePipettePositionCheckSteps } from './utils/getOnePipettePositionCheckSteps'
 import { getTwoPipettePositionCheckSteps } from './utils/getTwoPipettePositionCheckSteps'
@@ -40,7 +40,10 @@ export const deprecatedGetLabwarePositionCheckSteps = (
     const modules: ProtocolAnalysisFile['modules'] = protocolData.modules
     const labwareDefinitions = protocolData.labwareDefinitions
     const commands: RunTimeCommand[] = protocolData.commands
-    const primaryPipetteId = getPrimaryPipetteId(pipettesById, commands)
+    const primaryPipetteId = deprecatedGetPrimaryPipetteId(
+      pipettesById,
+      commands
+    )
     const pipetteWorkflow = getPipetteWorkflow({
       pipetteNames,
       primaryPipetteId,

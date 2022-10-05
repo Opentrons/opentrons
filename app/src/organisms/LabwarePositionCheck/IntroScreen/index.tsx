@@ -38,7 +38,6 @@ export const IntroScreen = (props: {
     runRecord?.data?.id ?? null
   )
   const introInfo = useIntroInfo()
-  if (runRecord == null) return null
   const { t } = useTranslation(['labware_position_check', 'shared'])
 
   const [sectionIndex, setSectionIndex] = React.useState<number>(0)
@@ -46,7 +45,7 @@ export const IntroScreen = (props: {
     setSectionIndex((sectionIndex + 1) % sections.length)
   useInterval(rotateSectionIndex, INTERVAL_MS)
 
-  if (introInfo == null) return null
+  if (runRecord == null || introInfo == null) return null
   const {
     primaryPipetteMount,
     secondaryPipetteMount,
@@ -57,7 +56,7 @@ export const IntroScreen = (props: {
   const currentSection = sections[sectionIndex]
   const labwareIdsToHighlight = labwareIdsBySection[currentSection]
 
-  const handleClickStartLPC = () => {
+  const handleClickStartLPC = (): void => {
     const prepCommands = getPrepCommands(protocolData?.commands ?? [])
     prepCommands.forEach(command => {
       createCommand({ runId: runRecord.data.id, command }).catch((e: Error) => {
@@ -73,7 +72,6 @@ export const IntroScreen = (props: {
         as="h3"
         textTransform={TYPOGRAPHY.textTransformUppercase}
         fontWeight={FONT_WEIGHT_SEMIBOLD}
-        id="IntroScreen_labware_position_check_overview"
       >
         {t('labware_position_check_overview')}
       </Text>
