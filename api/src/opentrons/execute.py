@@ -12,7 +12,7 @@ import os
 import sys
 from typing import TYPE_CHECKING, Callable, Dict, List, Optional, TextIO, Union
 
-from opentrons import protocol_api, __version__
+from opentrons import protocol_api, __version__, should_use_ot3
 from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocols.execution import execute as execute_apiv2
@@ -22,6 +22,7 @@ from opentrons.protocols.parse import parse, version_from_string
 from opentrons.protocols.types import ApiDeprecationError
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control import API, ThreadManager, HardwareControlAPI
+from opentrons.hardware_control.ot3api import OT3API
 from .util.entrypoint_util import labware_from_paths, datafiles_from_paths
 
 if TYPE_CHECKING:
@@ -88,7 +89,10 @@ def get_protocol_api(
         # is at script/repl scope not function scope and is synchronous so
         # you can't control the loop from inside. If we update to
         # IPython 7 we can avoid this, but for now we can't
-        _THREAD_MANAGED_HW = ThreadManager(API.build_hardware_controller)
+        if should_use_ot3():
+            _THREAD_MANAGED_HW = ThreadManager(OT3API.build_hardware_controller)
+        else:
+            _THREAD_MANAGED_HW = ThreadManager(API.build_hardware_controller)
     if isinstance(version, str):
         checked_version = version_from_string(version)
     elif not isinstance(version, APIVersion):

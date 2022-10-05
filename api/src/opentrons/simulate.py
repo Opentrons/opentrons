@@ -22,11 +22,13 @@ from typing import (
 )
 
 import opentrons
+from opentrons import should_use_ot3
 from opentrons.hardware_control import (
     API as HardwareAPI,
     ThreadManager,
     ThreadManagedHardware,
 )
+from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.simulator_setup import load_simulator
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocols.duration import DurationEstimator
@@ -191,9 +193,11 @@ def get_protocol_api(
     ):
         extra_labware = labware_from_paths([str(JUPYTER_NOTEBOOK_LABWARE_DIR)])
 
-    checked_hardware = hardware_simulator or ThreadManager(
-        HardwareAPI.build_hardware_simulator
-    )
+    if should_use_ot3():
+        build_hw = OT3API.build_hardware_simulator
+    else:
+        build_hw = HardwareAPI.build_hardware_simulator
+    checked_hardware = hardware_simulator or ThreadManager(build_hw)
 
     return _build_protocol_context(
         version=checked_version,
