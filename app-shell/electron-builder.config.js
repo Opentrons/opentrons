@@ -8,7 +8,7 @@ const NO_USB_DETECTION = process.env.NO_USB_DETECTION === 'true'
 
 module.exports = {
   appId: 'com.opentrons.app',
-  electronVersion: '20.3.0',
+  electronVersion: '21.0.1',
   files: [
     '**/*',
     'build/br-premigration-wheels',

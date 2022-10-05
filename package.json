@@ -83,7 +83,7 @@
     "cz-conventional-changelog": "2.1.0",
     "decompress": "4.2.1",
     "download": "8.0.0",
-    "electron": "20.3.0",
+    "electron": "21.0.1",
     "electron-builder": "^23.3.3",
     "electron-notarize": "^1.1.0",
     "electron-publisher-s3": "^20.17.2",
