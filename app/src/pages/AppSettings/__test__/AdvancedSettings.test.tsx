@@ -121,17 +121,17 @@ describe('AdvancedSettings', () => {
 
   it('renders correct titles', () => {
     const [{ getByText }] = render()
-    getByText('Update Channel')
+    getByText('Update channel')
     getByText('Additional Custom Labware Source Folder')
     getByText('Tip Length Calibration Method')
-    getByText('Disable Robot Caching')
+    getByText('Robot caching')
     getByText('Clear Unavailable Robots')
     getByText('Enable Developer Tools')
   })
   it('renders the update channel combobox and section', () => {
     const [{ getByText, getByRole }] = render()
     getByText(
-      'Stable receives the latest stable releases. Beta allows you to try out new features before they have completed testing and launch in the Stable channel.'
+      'Stable receives the latest stable releases. Beta allows you to try out new in-progress features before they launch in Stable channel, but they have not completed testing yet.'
     )
     getByRole('combobox', { name: '' })
   })
@@ -162,11 +162,11 @@ describe('AdvancedSettings', () => {
       name: 'Always show the prompt to choose calibration block or trash bin',
     })
   })
-  it('renders the display unavailable robots section', () => {
+  it('renders the robot caching section', () => {
     const [{ getByText, getByRole }] = render()
-    getByText('NOTE: This will clear cached robots when switched ON.')
+    getByText('Note: This will clear cached robots when switched on.')
     getByText(
-      'Disable caching of previously seen robots. Enabling this setting may improve overall networking performance in environments with many OT-2s, but may cause initial OT-2 discovery on app launch to be slower and more susceptible to failures.'
+      'Disabling this may improve overall networking performance in environments with many robots, but may cause initial robot discovery on app launch to be slower and more susceptile to failures.'
     )
     getByRole('switch', { name: 'display_unavailable_robots' })
   })
@@ -237,7 +237,7 @@ describe('AdvancedSettings', () => {
 
   it('renders the display show link to get labware offset data section', () => {
     const [{ getByText, getByRole }] = render()
-    getByText('Show Link to Get Labware Offset Data')
+    getByText('Show link to get Labware Offset data')
     getByText(
       'If you need to access Labware Offset data outside of the Opentrons App, enabling this setting will display a link to get Offset Data in the Recent Runs overflow menu and in the Labware Setup section of the Protocol page.'
     )
@@ -278,7 +278,7 @@ describe('AdvancedSettings', () => {
   it('renders the path to python override text and button with no default path', () => {
     mockGetPathToPythonOverride.mockReturnValue(null)
     const [{ getByText, getByRole }] = render()
-    getByText('Override Path to Python')
+    getByText('Override path to Python')
     getByText(
       'If specified, the Opentrons App will use the Python interpreter at this path instead of the default bundled Python interpreter.'
     )
@@ -295,7 +295,7 @@ describe('AdvancedSettings', () => {
   it('renders the path to python override text and button with a selected path', () => {
     mockGetPathToPythonOverride.mockReturnValue('otherPath')
     const [{ getByText, getByRole }] = render()
-    getByText('Override Path to Python')
+    getByText('Override path to Python')
     getByText(
       'If specified, the Opentrons App will use the Python interpreter at this path instead of the default bundled Python interpreter.'
     )

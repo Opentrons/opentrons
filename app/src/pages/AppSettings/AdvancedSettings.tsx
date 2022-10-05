@@ -367,9 +367,13 @@ export function AdvancedSettings(): JSX.Element {
               paddingBottom={SPACING.spacing3}
               id="AdvancedSettings_unavailableRobots"
             >
-              {t('disable_robot_caching')}
+              {t('robot_caching')}
             </StyledText>
-            <StyledText as="p" marginBottom={SPACING.spacing4}>
+            <StyledText
+              as="p"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              marginBottom={SPACING.spacing4}
+            >
               {t('note_this_will_clear_caching')}
             </StyledText>
             <StyledText as="p">
@@ -384,6 +388,26 @@ export function AdvancedSettings(): JSX.Element {
             }
             id="AdvancedSettings_unavailableRobotsToggleButton"
           />
+        </Flex>
+        <Divider marginY={SPACING.spacing5} />
+        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+          <Box width="70%">
+            <StyledText
+              css={TYPOGRAPHY.h3SemiBold}
+              paddingBottom={SPACING.spacing3}
+              id="AdvancedSettings_clearRobots"
+            >
+              {t('clear_unavail_robots')}
+            </StyledText>
+            <StyledText as="p">{t('clear_robots_description')}</StyledText>
+          </Box>
+          <TertiaryButton
+            marginLeft={SPACING_AUTO}
+            onClick={confirmDeleteUnavailRobots}
+            id="AdvancedSettings_clearUnavailableRobots"
+          >
+            {t('clear_robots_button')}
+          </TertiaryButton>
         </Flex>
         <Divider marginY={SPACING.spacing5} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -504,27 +528,6 @@ export function AdvancedSettings(): JSX.Element {
           />
         </Flex>
         <Divider marginY={SPACING.spacing5} />
-        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Box width="70%">
-            <StyledText
-              css={TYPOGRAPHY.h3SemiBold}
-              paddingBottom={SPACING.spacing3}
-              id="AdvancedSettings_clearRobots"
-            >
-              {t('clear_unavail_robots')}
-            </StyledText>
-            <StyledText as="p">{t('clear_robots_description')}</StyledText>
-          </Box>
-          <TertiaryButton
-            marginLeft={SPACING_AUTO}
-            onClick={confirmDeleteUnavailRobots}
-            id="AdvancedSettings_clearUnavailableRobots"
-          >
-            {t('clear_robots_button')}
-          </TertiaryButton>
-        </Flex>
-        <Divider marginY={SPACING.spacing5} />
-
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box width="70%">
             <StyledText
