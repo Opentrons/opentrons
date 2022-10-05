@@ -74,7 +74,7 @@ class USBConnectionMonitor:
         """
         if not self._monitor.started:
             # Check the `state` file to get an initial state setting
-            LOG.info(f"Monitoring platform/{self._phy_udev_name}")
+            LOG.debug(f"Monitoring platform/{self._phy_udev_name}")
             self._monitor.start()
             self._host_connected = self._read_state()
 
@@ -99,9 +99,10 @@ class USBConnectionMonitor:
     def _read_state(self) -> bool:
         fp = os.path.join(self._udc_folder, "state")
         try:
-            state = open(fp, mode="r").read()
-            LOG.debug(f"state={state}")
-            return state.startswith("configured")  # or state.startswith('suspended')
+            with open(fp, mode="r") as statefile:
+                state = statefile.read()
+                LOG.debug(f"state={state}")
+                return state.startswith("configured")
         except Exception:
             return False
 

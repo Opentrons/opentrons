@@ -28,10 +28,10 @@ def update_ser_handle(
         connected or not
     """
     if ser and not connected:
-        LOG.info("USB host disconnected")
+        LOG.debug("USB host disconnected")
         ser = None
     elif connected and not ser:
-        LOG.info("New USB host connected")
+        LOG.debug("New USB host connected")
         ser = config.get_handle()
     return ser
 
@@ -109,7 +109,7 @@ async def main() -> NoReturn:
 
     try:
         config.configure_and_activate()
-        LOG.info("Configured UDC as USB gadget")
+        LOG.debug("Configured UDC as USB gadget")
     except BaseException as err:
         LOG.error("Failed to configure UDC as USB gadget")
         LOG.error(f"Exception: {format(err)}")
@@ -136,7 +136,7 @@ async def main() -> NoReturn:
     monitor.begin()
 
     if monitor.host_connected():
-        LOG.info("USB connected on startup")
+        LOG.debug("USB connected on startup")
         ser = config.get_handle()
 
     while True:
