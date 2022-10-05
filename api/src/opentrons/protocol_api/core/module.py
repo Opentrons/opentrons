@@ -53,7 +53,7 @@ class AbstractTemperatureModuleCore(AbstractModuleCore[LabwareCoreType]):
 
     @abstractmethod
     def set_target_temperature(self, celsius: float) -> None:
-        """Set the temperature module's target temperature in °C."""
+        """Set the Temperature Module's target temperature in °C."""
 
     @abstractmethod
     def wait_for_target_temperature(self, celsius: Optional[float] = None) -> None:
