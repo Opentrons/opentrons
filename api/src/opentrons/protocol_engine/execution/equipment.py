@@ -329,8 +329,9 @@ class EquipmentHandler:
             )
             slot_name = module_location.slotName
         else:
-            # No offset for off-deck location. This would allow loading a labware with
-            # 'off-deck' as valid location.
+            # No offset for off-deck location.
+            # Returning None instead of raising an exception
+            # allows loading a labware with 'off-deck' as valid location.
             return None
 
         offset = self._state_store.labware.find_applicable_labware_offset(

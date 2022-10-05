@@ -25,7 +25,7 @@ from .command_fixtures import (
     create_move_to_well_command,
     create_blow_out_command,
     create_move_labware_command,
-    create_move_labware_offdeck_command,
+    create_move_labware_off_deck_command,
 )
 
 
@@ -416,9 +416,9 @@ def test_heater_shaker_command_without_movement(
             None,
         ),
         (
-            create_move_labware_offdeck_command(labware_id="non-matching-labware-id"),
+            create_move_labware_off_deck_command(labware_id="non-matching-labware-id"),
             # Current well NOT cleared,
-            # because MoveLabware command had "non-matching-labware-id".
+            # because MoveLabwareOffDeck command had "non-matching-labware-id".
             CurrentWell(
                 pipette_id="pipette-id",
                 labware_id="matching-labware-id",
@@ -426,9 +426,9 @@ def test_heater_shaker_command_without_movement(
             ),
         ),
         (
-            create_move_labware_offdeck_command(labware_id="matching-labware-id"),
+            create_move_labware_off_deck_command(labware_id="matching-labware-id"),
             # Current well IS cleared,
-            # because MoveLabware command had "matching-labware-id".
+            # because MoveLabwareOffDeck command had "matching-labware-id".
             None,
         ),
     ),

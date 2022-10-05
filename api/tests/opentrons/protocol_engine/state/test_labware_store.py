@@ -27,7 +27,7 @@ from opentrons.protocol_engine.state.labware import LabwareStore, LabwareState
 from .command_fixtures import (
     create_load_labware_command,
     create_move_labware_command,
-    create_move_labware_offdeck_command,
+    create_move_labware_off_deck_command,
 )
 
 
@@ -235,7 +235,7 @@ def test_handles_move_labware_off_deck(
     )
     subject.handle_action(UpdateCommandAction(command=load_labware_command))
 
-    move_labware_off_deck_cmd = create_move_labware_offdeck_command(
+    move_labware_off_deck_cmd = create_move_labware_off_deck_command(
         labware_id="my-labware-id"
     )
     subject.handle_action(UpdateCommandAction(command=move_labware_off_deck_cmd))

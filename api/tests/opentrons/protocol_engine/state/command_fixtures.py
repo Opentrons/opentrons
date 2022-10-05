@@ -358,7 +358,7 @@ def create_move_labware_command(
     )
 
 
-def create_move_labware_offdeck_command(
+def create_move_labware_off_deck_command(
     labware_id: str = "labware-id",
 ) -> cmd.MoveLabwareOffDeck:
     """Get a completed MoveLabwareOffDeck command."""
