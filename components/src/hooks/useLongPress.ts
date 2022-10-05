@@ -1,15 +1,21 @@
-import { useState, useEffect, useRef, CSSProperties, MutableRefObject } from 'react'
-import interact from "interactjs"
+import {
+  useState,
+  useEffect,
+  useRef,
+  CSSProperties,
+  MutableRefObject,
+} from 'react'
+import interact from 'interactjs'
 import type PointerEvent from 'interactjs'
 
 interface UseLongPressResult {
-    ref: MutableRefObject<null>,
-    style: CSSProperties,
-    isEnabled: boolean,
-    isLongPressed: boolean,
-    isTapped: boolean,
-    enable: () => void,
-    disable: () => void,
+  ref: MutableRefObject<null>
+  style: CSSProperties
+  isEnabled: boolean
+  isLongPressed: boolean
+  isTapped: boolean
+  enable: () => void
+  disable: () => void
 }
 
 /**
@@ -18,29 +24,29 @@ interface UseLongPressResult {
  * @returns {UseLongPressResult}
  */
 export const useLongPress = (): UseLongPressResult => {
-    const [isLongPressed, setIsLongPressed ] = useState<boolean>(false)
-    const [isTapped, setIsTapped ] = useState<boolean>(false)
+  const [isLongPressed, setIsLongPressed] = useState<boolean>(false)
+  const [isTapped, setIsTapped] = useState<boolean>(false)
   const [isEnabled, setIsEnabled] = useState<boolean>(true)
   const interactiveRef = useRef(null)
 
   const enable = (): void => {
-    if(interactiveRef?.current != null) {
-        interact((interactiveRef.current as unknown) as HTMLElement)
+    if (interactiveRef?.current != null) {
+      interact((interactiveRef.current as unknown) as HTMLElement)
         .pointerEvents({
-            holdDuration: 3000,
+          holdDuration: 3000,
         })
-      .on("hold", (event: PointerEvent) => {
-        setIsLongPressed(true)
-      })
-      // This might be needed but it would depend on how we implement
-      .on("tap", (event: PointerEvent) => {
-        setIsTapped(true)
-      })
+        .on('hold', (event: PointerEvent) => {
+          setIsLongPressed(true)
+        })
+        // This might be needed but it would depend on how we implement
+        .on('tap', (event: PointerEvent) => {
+          setIsTapped(true)
+        })
     }
   }
   const disable = (): void => {
-    if(interactiveRef?.current != null) {
-        interact((interactiveRef.current as unknown) as HTMLElement).unset()
+    if (interactiveRef?.current != null) {
+      interact((interactiveRef.current as unknown) as HTMLElement).unset()
     }
   }
 
@@ -57,12 +63,12 @@ export const useLongPress = (): UseLongPressResult => {
   return {
     ref: interactiveRef,
     style: {
-      touchAction: "none"
+      touchAction: 'none',
     },
     isEnabled,
     isLongPressed,
     isTapped,
     enable: () => setIsEnabled(true),
-    disable: () => setIsEnabled(false)
+    disable: () => setIsEnabled(false),
   }
 }
