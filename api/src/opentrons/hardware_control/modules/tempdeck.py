@@ -122,11 +122,11 @@ class TempDeck(mod_abc.AbstractModule):
         await self._listener.wait_next_poll()
 
     async def start_set_temperature(self, celsius: float) -> None:
-        """Set the target temperature in degree Celsius.
+        """Set the target temperature in degrees Celsius.
 
-        Range: 4 to 95 degree Celsius (QA tested).
+        Range: 4 to 95 degrees Celsius (QA tested).
 
-        The internal temp range is -9 to 99 C, which is limited by the 2-digit
+        The internal temp range is -9 to 99 °C, which is limited by the two-digit
         temperature display. Any input outside of this range will be clipped
         to the nearest limit.
         """
@@ -135,13 +135,13 @@ class TempDeck(mod_abc.AbstractModule):
         await self.wait_next_poll()
 
     async def await_temperature(self, awaiting_temperature: Optional[float]) -> None:
-        """Await a target temperature in degree Celsius.
+        """Await a target temperature in degrees Celsius.
 
-        Polls temperature module's temperature until
+        Polls Temperature Module's temperature until
         the specified temperature is reached.
 
         Args:
-            temperature: The temeprature to wait for.
+            temperature: The temperature to wait for.
                 If `None` (recommended), the module's target will be used.
                 Specifying any value other than the current target
                 may produce unpredictable behavior.

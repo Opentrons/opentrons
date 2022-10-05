@@ -47,7 +47,7 @@
       {
         "function_name": "await_temperature",
         "kwargs": {
-          "awaiting_temperature": 3
+          "awaiting_temperature": null
         }
       }
     ],

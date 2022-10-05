@@ -278,9 +278,9 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
     def set_temperature(self, celsius: float) -> None:
         """Set the target temperature, in °C, waiting for the target to be hit.
 
-        Must be between 4 and 95°C based on Opentrons QA.
+        Must be between 4 and 95 °C based on Opentrons QA.
 
-        :param celsius: The target temperature, in C
+        :param celsius: The target temperature, in °C
         """
         self._core.set_target_temperature(celsius)
         self._core.wait_for_target_temperature()
@@ -290,7 +290,7 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
     def start_set_temperature(self, celsius: float) -> None:
         """Set the target temperature, in °C, without waiting for the target to be hit.
 
-        Must be between 4 and 95°C based on Opentrons QA.
+        Must be between 4 and 95 °C based on Opentrons QA.
 
         :param celsius: The target temperature, in C
         """
@@ -299,9 +299,9 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
     @publish(command=cmds.tempdeck_await_temp)
     @requires_version(2, 3)
     def await_temperature(self, celsius: float) -> None:
-        """Wait until module reaches temperature, in C.
+        """Wait until module reaches temperature, in °C.
 
-        Must be between 4 and 95°C based on Opentrons QA.
+        Must be between 4 and 95 °C based on Opentrons QA.
 
         :param celsius: The target temperature, in °C
         """
@@ -322,7 +322,7 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def target(self) -> Optional[float]:
-        """Current target temperature in C"""
+        """Current target temperature in °C"""
         return self._core.get_target_temperature()
 
     @property  # type: ignore[misc]
@@ -330,7 +330,7 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
     def status(self) -> str:
         """The status of the module.
 
-        Returns 'holding at target', 'cooling', 'heating', or 'idle'
+        Returns ``holding at target``, ``cooling``, ``heating``, or ``idle``
 
         """
         return self._core.get_status().value
