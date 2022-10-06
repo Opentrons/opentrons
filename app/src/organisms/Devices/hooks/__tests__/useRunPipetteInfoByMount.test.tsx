@@ -112,6 +112,12 @@ const modifiedSimpleV6Protocol = ({
       definitionUri: 'example/plate/1',
     },
   },
+  pipettes: [
+    {
+      id: 'pipetteId',
+      pipetteName: 'p10_single',
+    },
+  ],
 } as any) as ProtocolAnalysisFile<{}>
 
 const PROTOCOL_DETAILS = {
@@ -165,7 +171,7 @@ describe('useRunPipetteInfoByMount hook', () => {
     expect(result.current).toStrictEqual({
       left: ({
         id: 'pipetteId',
-        name: 'p10_single',
+        pipetteName: 'p10_single',
         requestedPipetteMatch: 'incompatible',
         pipetteCalDate: null,
         pipetteSpecs: {

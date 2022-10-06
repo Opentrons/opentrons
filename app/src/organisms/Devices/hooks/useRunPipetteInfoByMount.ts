@@ -68,6 +68,7 @@ export function useRunPipetteInfoByMount(
     )
     if (loadCommand != null) {
       const { mount } = loadCommand.params
+      //  @ts-expect-error
       const requestedPipetteName = pipette.pipetteName
       const pipetteSpecs = getPipetteNameSpecs(requestedPipetteName)
 
@@ -89,10 +90,10 @@ export function useRunPipetteInfoByMount(
 
         const attachedPipette = attachedPipettes[mount as Mount]
         const requestedPipetteMatch = getRequestedPipetteMatch(
+          //  @ts-expect-error
           pipette.pipetteName,
           attachedPipette
         )
-
         const tipRacksForPipette = tipRackDefs.map(tipRackDef => {
           const tlcDataMatch = last(
             tipLengthCalibrations.filter(
@@ -121,7 +122,7 @@ export function useRunPipetteInfoByMount(
         return {
           ...acc,
           [mount]: {
-            name: requestedPipetteName,
+            pipetteName: requestedPipetteName,
             id: pipetteId,
             pipetteSpecs,
             tipRacksForPipette,
