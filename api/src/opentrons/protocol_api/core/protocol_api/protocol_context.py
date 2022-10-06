@@ -225,7 +225,7 @@ class ProtocolContextImplementation(
                     selected_definition = definition
                     break
 
-        if selected_hardware is None and self.is_simulating:
+        if selected_hardware is None and self.is_simulating():
             selected_hardware = self._sync_hardware.create_simulating_module(model)
             selected_definition = module_geometry.load_definition(model)
 
