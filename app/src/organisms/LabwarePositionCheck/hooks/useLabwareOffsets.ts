@@ -84,9 +84,10 @@ export const useLabwareOffsets = (
         protocolData.labware,
         protocolData.labwareDefinitions
       )
-      const { definitionId } = protocolData.labware[labwareId]
+      //   @ts-expect-error: when we remove schemav6Adapter, defintiionUri will be correct
+      const { definitionUri } = protocolData.labware[labwareId]
       const displayName = getLabwareDisplayName(
-        protocolData.labwareDefinitions[definitionId]
+        protocolData.labwareDefinitions[definitionUri]
       )
       const vectorPromise = offsetDataByLabwareId.then(result => ({
         ...result[labwareId],

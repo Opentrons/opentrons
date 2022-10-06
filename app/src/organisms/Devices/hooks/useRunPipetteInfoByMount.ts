@@ -78,7 +78,8 @@ export function useRunPipetteInfoByMount(
         >((acc, command) => {
           if (pipetteId === command.params?.pipetteId) {
             const tipRack = labware[command.params?.labwareId]
-            const tipRackDefinition = labwareDefinitions[tipRack.definitionId]
+            //  @ts-expect-error: will be an error until we remove the schemaV6Adapter
+            const tipRackDefinition = labwareDefinitions[tipRack.definitionUri]
 
             if (tipRackDefinition != null && !acc.includes(tipRackDefinition)) {
               return [...acc, tipRackDefinition]

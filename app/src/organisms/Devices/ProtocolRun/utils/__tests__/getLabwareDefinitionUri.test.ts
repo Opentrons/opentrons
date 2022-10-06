@@ -16,19 +16,19 @@ describe('getLabwareDefinitionUri', () => {
   })
   it('should return the definition uri of a given labware', () => {
     const MOCK_LABWARE_ID = 'some_labware'
-    const DEF_ID = `${MOCK_DEFINITION_URI}_id`
     const mockLabware = {
       [MOCK_LABWARE_ID]: {
-        definitionId: `${MOCK_DEFINITION_URI}_id`,
+        definitionUri: MOCK_DEFINITION_URI,
         displayName: 'some dope labware',
       },
     }
     const mockLabwareDefinitions = {
-      [DEF_ID]: MOCK_DEF,
+      [MOCK_DEFINITION_URI]: MOCK_DEF,
     }
     expect(
       getLabwareDefinitionUri(
         MOCK_LABWARE_ID,
+        //  @ts-expect-error
         mockLabware,
         mockLabwareDefinitions
       )

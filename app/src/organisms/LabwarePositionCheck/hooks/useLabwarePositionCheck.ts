@@ -176,7 +176,8 @@ export const useTitleText = (
   } else {
     if (labware == null || labwareDefinitions == null) return ''
 
-    const labwareDefId = labware[labwareId].definitionId
+    //  @ts-expect-error: will be an error until we remove the schemaV6Adapter
+    const labwareDefId = labware[labwareId].definitionUri
     const labwareDisplayName = getLabwareDisplayName(
       labwareDefinitions[labwareDefId]
     )
