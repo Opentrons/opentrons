@@ -13,7 +13,7 @@ You will need the following tools installed to develop on the Opentrons platform
 - curl
 - ssh
 - Python v3.7
-- Node.js v14
+- Node.js v16.8.0
 
 ### macOS
 
@@ -63,7 +63,7 @@ If you haven't used `git` before, **be sure to complete [first-time Git setup][]
 
 Our recommended installation instructions for Node.js differ between `x86_64` (Intel) and `ARM` (M1) Macs.
 
-##### x86-64 Mac (Intel)
+##### x86-64 Mac (Intel) & ARM Mac(M1)
 
 On x86, we recommend [nvs][] to install Node.js because it works well and is compatible with macOS, Windows, and Linux.
 
@@ -85,7 +85,7 @@ nvs --version
 Now we can use nvs to install Node.js v14 and switch on `auto` mode, which will make sure Node.js v14 is used any time we're in the `opentrons` project directory.
 
 ```shell
-nvs add 14
+nvs add 16.8.0
 nvs auto on
 ```
 
@@ -96,38 +96,6 @@ If the `nvs` command isn't working, confirm that your shell is set up properly. 
 # ...
 export NVS_HOME="$HOME/.nvs"
 [ -s "$NVS_HOME/nvs.sh" ] && . "$NVS_HOME/nvs.sh"
-# ...
-```
-
-##### ARM Mac (M1)
-
-If you are running an ARM (M1) Mac, you **should not use `nvs` nor `nvm`**, because those tools do not have access to Node.js v14 for the ARM architecture. Until we upgrade to version 16 or higher, you need to use an alternative installation method for Node.js.
-
-Fortunately, you can use `brew` to install an ARM-native version of Node v14.
-
-```shell
-brew install node@14
-```
-
-Once `brew` finishes installing Node, it will print one additional step to complete the installation to ensure your system selects the proper Node executable to use.
-
-```shell
-echo 'export PATH="/opt/homebrew/opt/node@14/bin:$PATH"' >> ~/.zshrc
-```
-
-Close and re-open your terminal to confirm that the correct version of Node is installed for the correct architecture.
-
-```shell
-node -e "console.log(process.version, process.arch)"
-# > v14.19.1 arm64
-```
-
-If your `node` command isn't working or is printing the wrong information, confirm that your shell is set up properly. If you print out the contents of `~/.zshrc`, you should see something similar to the following:
-
-```shell
-# ~/.zshrc
-# ...
-export PATH="/opt/homebrew/opt/node@14/bin:$PATH"
 # ...
 ```
 
