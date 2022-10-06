@@ -6139,7 +6139,7 @@
         "type": "float"
       },
       "pickUpDistance": {
-        "value": 12,
+        "value": 17,
         "min": 1,
         "max": 30,
         "units": "mm",
@@ -6160,7 +6160,7 @@
         "type": "int"
       },
       "pickUpSpeed": {
-        "value": 5,
+        "value": 10,
         "min": 1,
         "max": 30,
         "units": "mm/s",
