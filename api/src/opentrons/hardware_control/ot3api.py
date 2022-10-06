@@ -850,7 +850,7 @@ class OT3API(
         check_motion_bounds(to_check, target_position, bounds, check_bounds)
 
         # TODO: (2022-02-10) Use actual max speed for MoveTarget
-        checked_speed = speed or 500
+        checked_speed = speed or 400
         self._move_manager.update_constraints(
             get_system_constraints(self._config.motion_settings, self._gantry_load)
         )
