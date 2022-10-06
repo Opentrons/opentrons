@@ -106,7 +106,7 @@ test-ot2:
 
 .PHONY: test-ot3
 test-ot3:
-	$(call pytest,ot-3) $(tests) $(test_opts)
+	$(call pytest,ot-3/robot-server) $(tests) $(test_opts)
 
 .PHONY: test-app
 test-app:

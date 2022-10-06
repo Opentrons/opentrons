@@ -295,8 +295,10 @@ npm install --global yarn@1
 Finally, you need to download and install all of our various development dependencies. **This step will take several minutes** the first time you run it!
 
 ```shell
-make setup
+make setup -j
 ```
+
+If you experience issues, run `make setup` without the `-j` to see the errors clearly.
 
 Once `make setup` completes, you're ready to start developing! Check out our general [contributing guide][] for more information. If you ever need to remove (or recreate) the steps run in `make setup`, you can use `make teardown` to remove the installed dependencies.
 
