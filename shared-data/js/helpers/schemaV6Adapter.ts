@@ -113,14 +113,15 @@ export const schemaV6Adapter = (
         },
       }
     }, {})
+
     return {
       ...protocolAnalysis,
       //  @ts-expect-error
       pipettes,
-      liquids,
       //  @ts-expect-error
       labware,
       modules,
+      liquids,
       labwareDefinitions,
       commands: protocolAnalysis.commands,
     }

@@ -1,8 +1,6 @@
 import * as React from 'react'
 import last from 'lodash/last'
 import { schemaV6Adapter } from '@opentrons/shared-data'
-import { schemaV6Adapter as schemaV6AdapterWithLiquids } from './utils/schemaV6Adapter'
-import { useFeatureFlag } from '../../../redux/config'
 import {
   useProtocolQuery,
   useProtocolAnalysesQuery,
@@ -21,7 +19,6 @@ export interface ProtocolDetails {
 export function useProtocolDetailsForRun(
   runId: string | null
 ): ProtocolDetails {
-  const liquidSetupEnabled = useFeatureFlag('enableLiquidSetup')
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
   const protocolId = runRecord?.data?.protocolId ?? null
   const [
@@ -58,11 +55,7 @@ export function useProtocolDetailsForRun(
   return {
     displayName: displayName ?? null,
     protocolData:
-      mostRecentAnalysis != null
-        ? liquidSetupEnabled
-          ? schemaV6AdapterWithLiquids(mostRecentAnalysis)
-          : schemaV6Adapter(mostRecentAnalysis)
-        : null,
+      mostRecentAnalysis != null ? schemaV6Adapter(mostRecentAnalysis) : null,
     protocolKey: protocolRecord?.data.key ?? null,
     isProtocolAnalyzing:
       mostRecentAnalysis != null && mostRecentAnalysis?.status === 'pending',
