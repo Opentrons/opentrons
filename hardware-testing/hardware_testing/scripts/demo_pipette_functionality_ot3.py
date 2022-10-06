@@ -87,10 +87,10 @@ async def _main(api: ThreadManagedHardwareAPI) -> None:
     await _test_home_pipette(api, MOUNT)
     await _test_encoder(api, axis=OT3Axis.by_mount(MOUNT), distance = 10)
     # input("Enter to disengage the pipette")
-    # await api.disengage_axes([OT3Axis.of_main_tool_actuator(MOUNT)])
-    # input("ENTER to re-engage")
-    # await api.engage_axes([OT3Axis.of_main_tool_actuator(MOUNT)])
-    # input("Check Motor if engaged")
+    await api.disengage_axes([OT3Axis.of_main_tool_actuator(MOUNT)])
+    input("ENTER to re-engage")
+    await api.engage_axes([OT3Axis.of_main_tool_actuator(MOUNT)])
+    input("Check Motor if engaged")
 
 
 if __name__ == "__main__":
