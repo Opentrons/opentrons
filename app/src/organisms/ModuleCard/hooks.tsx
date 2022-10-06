@@ -269,6 +269,7 @@ export function useModuleOverflowMenu(
       key={`thermocycler_block_temp_command_btn_${module.moduleModel}`}
       onClick={sendBlockTempCommand}
       disabled={isDisabled}
+      whiteSpace="nowrap"
     >
       {module.data.status !== 'idle'
         ? t('overflow_menu_deactivate_block')
