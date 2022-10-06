@@ -62,16 +62,23 @@ export function useRunPipetteInfoByMount(
       command.commandType === 'pickUpTip'
   )
 
-  return Object.entries(pipettes).reduce((acc, [pipetteId, pipette]) => {
-    const loadCommand = loadPipetteCommands.find(
-      command => command.result?.pipetteId === pipetteId
+  return Object.entries(pipettes).reduce((acc, pipette) => {
+    const loadCommand = loadPipetteCommands.find(command =>
+      //  @ts-expect-error
+      command.result?.pipetteId === pipette[0].id
+        ? //  @ts-expect-error
+          pipette[0].id
+        : //  @ts-expect-error
+          pipette[1].id
     )
     if (loadCommand != null) {
-      const { mount } = loadCommand.params
+      const { mount, pipetteId } = loadCommand.params
+      const correctPipette =
+        //  @ts-expect-error
+        pipetteId === pipette[0].id ? pipette[0] : pipette[1]
       //  @ts-expect-error
-      const requestedPipetteName = pipette.pipetteName
+      const requestedPipetteName = correctPipette.pipetteName
       const pipetteSpecs = getPipetteNameSpecs(requestedPipetteName)
-
       if (pipetteSpecs != null) {
         const tipRackDefs: LabwareDefinition2[] = pickUpTipCommands.reduce<
           LabwareDefinition2[]
@@ -91,7 +98,7 @@ export function useRunPipetteInfoByMount(
         const attachedPipette = attachedPipettes[mount as Mount]
         const requestedPipetteMatch = getRequestedPipetteMatch(
           //  @ts-expect-error
-          pipette.pipetteName,
+          correctPipette.pipetteName,
           attachedPipette
         )
         const tipRacksForPipette = tipRackDefs.map(tipRackDef => {
