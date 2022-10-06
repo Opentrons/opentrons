@@ -9,7 +9,6 @@ import {
   useProtocolQuery,
   useRunQuery,
 } from '@opentrons/react-api-client'
-import { useFeatureFlag } from '../../../../redux/config'
 
 import { useProtocolDetailsForRun } from '..'
 
@@ -33,7 +32,6 @@ const mockSchemaV6Adapter = schemaV6Adapter as jest.MockedFunction<
   typeof schemaV6Adapter
 >
 jest.mock('@opentrons/react-api-client')
-jest.mock('../../../../redux/config')
 
 const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
   typeof useProtocolQuery
@@ -42,10 +40,6 @@ const mockUseProtocolAnalysesQuery = useProtocolAnalysesQuery as jest.MockedFunc
   typeof useProtocolAnalysesQuery
 >
 const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
-
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
->
 
 const PROTOCOL_RESPONSE = {
   data: {
@@ -73,7 +67,6 @@ describe('useProtocolDetailsForRun hook', () => {
       .mockReturnValue({
         data: { data: [] } as any,
       } as UseQueryResult<ProtocolAnalyses>)
-    mockUseFeatureFlag.mockReturnValue(false)
   })
 
   afterEach(() => {
