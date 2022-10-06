@@ -27,7 +27,6 @@ export const getPrimaryPipetteId = (
       'expected to find both left pipette and right pipette but could not'
     )
   }
-  console.log(pipettesById[0])
 
   const leftPipette = pipettesById[0]
   const rightPipette = pipettesById[1]
