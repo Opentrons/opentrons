@@ -40,6 +40,7 @@ export const HEATERSHAKER_MODULE_V1: 'heaterShakerModuleV1' =
   'heaterShakerModuleV1'
 
 // pipette display categories
+export const GEN3: 'GEN3' = 'GEN3'
 export const GEN2: 'GEN2' = 'GEN2'
 export const GEN1: 'GEN1' = 'GEN1'
 
