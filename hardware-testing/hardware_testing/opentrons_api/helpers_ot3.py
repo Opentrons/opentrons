@@ -2,6 +2,7 @@
 from dataclasses import dataclass
 from subprocess import run
 from typing import List, Optional, Dict, Union, Type, Tuple
+from dataclasses import replace
 
 from opentrons.config.robot_configs import build_config_ot3, load_ot3 as load_ot3_config
 from opentrons.config.defaults_ot3 import DEFAULT_MAX_SPEED_DISCONTINUITY
@@ -210,13 +211,46 @@ def get_plunger_positions_ot3(api: ThreadManagedHardwareAPI,
     return cfg.top, cfg.bottom, cfg.blow_out, cfg.drop_tip
 
 
+async def update_pick_up_current(api: ThreadManagedHardwareAPI,
+                              mount: OT3Mount,
+                              current: Optional[float] = 0.125):
+    hw_instr = api._pipette_handler.get_pipette(mount)
+    realmount = OT3Mount.from_mount(mount)
+    old_pickup = api._pipette_handler.hardware_instruments[mount]._config.pick_up_current
+    print(f"Pick_up_current:{old_pickup}")
+    hw_instr._config = replace(hw_instr._config, pick_up_current = current)
+    new_pickup = api._pipette_handler.hardware_instruments[mount]._config.pick_up_current
+    print(f"Pick_up_current:{new_pickup}")
+    spec, _add_tip_to_instrs = api._pipette_handler.plan_check_pick_up_tip(
+        realmount, 78.3, 1, 0
+    )
+    print(f"specs: {spec.presses}")
+
+async def update_pick_up_distance(api: ThreadManagedHardwareAPI,
+                              mount: OT3Mount,
+                              distance: Optional[float] = 17.0):
+    #default pick_up_distance = 17
+    hw_instr = api._pipette_handler.get_pipette(mount)
+    old_pickup_distance = api._pipette_handler.hardware_instruments[mount]._config.pick_up_distance
+    print(f"Pick_up_distance:{old_pickup_distance}")
+    hw_instr._config = replace(hw_instr._config, pick_up_distance = distance)
+    new_pickup_distance = api._pipette_handler.hardware_instruments[mount]._config.pick_up_distance
+    print(f"Pick_up_distance:{new_pickup_distance}")
+
 async def move_plunger_absolute_ot3(api: ThreadManagedHardwareAPI,
                                     mount: OT3Mount,
                                     position: float,
                                     motor_current: Optional[float] = 1.0,
                                     speed: Optional[float] = None) -> None:
-    await api._backend.set_active_current(
-                                {OT3Axis.of_main_tool_actuator(mount): motor_current})
+    """
+    hw_instr = hw.hardware_pipettes[instrument._implementation._mount]
+    old_pickup = hw_instr._config.pick_up_current
+    try:
+        hw_instr._config = replace(hw_instr._config, pick_up_current=0.125)
+        instrument.pick_up_tip(tip, presses=1, increment=0.5)
+    finally:
+        hw_instr._config = replace(hw_instr._config, pick_up_current=old_pickup)
+    """
     await api._move(
                 target_position={
                     OT3Axis.of_main_tool_actuator(mount): position},
