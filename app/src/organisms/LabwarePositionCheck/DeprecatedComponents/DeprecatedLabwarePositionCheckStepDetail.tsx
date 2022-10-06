@@ -104,8 +104,13 @@ export const DeprecatedLabwarePositionCheckStepDetail = (
   const command = stepMovementCommands[0]
 
   const pipetteId = command.params.pipetteId
-  //  @ts-expect-error: pipetteName should be name until we remove the schemaV6Adapter
-  const pipetteName = protocolData.pipettes[pipetteId].pipetteName
+  const pipetteName =
+    //  @ts-expect-error
+    protocolData.pipettes[0].id === pipetteId
+      ? //  @ts-expect-error: pipetteName should be name until we remove the schemaV6Adapter
+        protocolData.pipettes[0].pipetteName
+      : //  @ts-expect-error: pipetteName should be name until we remove the schemaV6Adapter
+        protocolData.pipettes[1].pipetteName
   let wellsToHighlight: string[] = []
   const pipetteChannels = getPipetteNameSpecs(pipetteName)?.channels
   if (pipetteChannels === 8) {

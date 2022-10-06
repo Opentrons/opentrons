@@ -13,7 +13,6 @@ export const getPrimaryPipetteId = (
     //  @ts-expect-error: id will exist when we remove the schemaV6Adapter
     return pipettesById[0].id
   }
-
   const leftPipetteId = commands.find(
     (command: RunTimeCommand): command is LoadPipetteRunTimeCommand =>
       command.commandType === 'loadPipette' && command.params.mount === 'left'
@@ -28,6 +27,7 @@ export const getPrimaryPipetteId = (
       'expected to find both left pipette and right pipette but could not'
     )
   }
+  console.log(pipettesById[0])
 
   const leftPipette = pipettesById[0]
   const rightPipette = pipettesById[1]

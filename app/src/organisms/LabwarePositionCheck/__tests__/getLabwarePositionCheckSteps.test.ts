@@ -27,22 +27,25 @@ const protocolWithOnePipette = ({
       definitionUri: 'opentrons/opentrons_96_tiprack_300ul/1',
     },
   },
-  pipettes: {
-    '50d23e00-0042-11ec-8258-f7ffdf5ad45a': {
+  pipettes: [
+    {
       pipetteName: 'p300_single_gen2',
+      id: '50d23e00-0042-11ec-8258-f7ffdf5ad45a',
     },
-  },
+  ],
 } as unknown) as ProtocolAnalysisFile
 const protocolWithTwoPipettes = ({
   ..._uncasted_v6ProtocolWithTwoPipettes,
-  pipettes: {
-    '50d23e00-0042-11ec-8258-f7ffdf5ad45a': {
+  pipettes: [
+    {
       pipetteName: 'p300_single_gen2',
+      id: '50d23e00-0042-11ec-8258-f7ffdf5ad45a',
     },
-    'c235a5a0-0042-11ec-8258-f7ffdf5ad45a': {
+    {
       pipetteName: 'p300_multi',
+      id: 'c235a5a0-0042-11ec-8258-f7ffdf5ad45a',
     },
-  },
+  ],
   labware: {
     fixedTrash: {
       displayName: 'Trash',
@@ -86,21 +89,11 @@ describe('getLabwarePositionCheckSteps', () => {
     resetAllWhenMocks()
   })
   it('should generate commands with the one pipette workflow when there is only one pipette in the protocol', () => {
-    const mockPipette =
-      protocolWithOnePipette.pipettes[
-        Object.keys(protocolWithOnePipette.pipettes)[0]
-      ]
-    when(mockGetPrimaryPipetteId)
-      .calledWith(
-        protocolWithOnePipette.pipettes,
-        protocolWithOnePipette.commands
-      )
-      .mockReturnValue('pipetteId')
-
+    mockGetPrimaryPipetteId.mockReturnValue('pipetteId')
     when(mockGetPipetteWorkflow)
       .calledWith({
         //  @ts-expect-error
-        pipetteNames: [mockPipette.pipetteName],
+        pipetteNames: [protocolWithOnePipette.pipettes[0].pipetteName],
         primaryPipetteId: 'pipetteId',
         labware: protocolWithOnePipette.labware,
         labwareDefinitions: protocolWithOnePipette.labwareDefinitions,
@@ -119,16 +112,7 @@ describe('getLabwarePositionCheckSteps', () => {
     })
   })
   it('should not include labware that are tip racks and are unused in protocol', () => {
-    const mockPipette =
-      protocolWithOnePipette.pipettes[
-        Object.keys(protocolWithOnePipette.pipettes)[0]
-      ]
-    when(mockGetPrimaryPipetteId)
-      .calledWith(
-        protocolWithOnePipette.pipettes,
-        protocolWithOnePipette.commands
-      )
-      .mockReturnValue('pipetteId')
+    mockGetPrimaryPipetteId.mockReturnValue('pipetteId')
 
     const protocolWithUnusedTipRack = {
       ...protocolWithOnePipette,
@@ -147,7 +131,7 @@ describe('getLabwarePositionCheckSteps', () => {
     when(mockGetPipetteWorkflow)
       .calledWith({
         //  @ts-expect-error
-        pipetteNames: [mockPipette.pipetteName],
+        pipetteNames: [protocolWithOnePipette.pipettes[0].pipetteName],
         primaryPipetteId: 'pipetteId',
         labware: protocolWithOnePipette.labware,
         labwareDefinitions: protocolWithOnePipette.labwareDefinitions,
@@ -169,7 +153,7 @@ describe('getLabwarePositionCheckSteps', () => {
   it('should generate commands with the one pipette workflow when there are two pipettes in the protocol but only one is used', () => {
     const leftPipetteId = '50d23e00-0042-11ec-8258-f7ffdf5ad45a'
     const rightPipetteId = 'c235a5a0-0042-11ec-8258-f7ffdf5ad45a'
-    const rightPipette = protocolWithTwoPipettes.pipettes[rightPipetteId]
+    const rightPipette = protocolWithTwoPipettes.pipettes[1]
     const commandsWithoutLeftPipettePickupTipCommand = protocolWithTwoPipettes.commands.filter(
       command =>
         !(
@@ -183,16 +167,7 @@ describe('getLabwarePositionCheckSteps', () => {
       commands: commandsWithoutLeftPipettePickupTipCommand,
     }
 
-    const pipettesBeingUsedInProtocol: ProtocolAnalysisFile['pipettes'] = {
-      [rightPipetteId]: rightPipette,
-    }
-
-    when(mockGetPrimaryPipetteId)
-      .calledWith(
-        pipettesBeingUsedInProtocol,
-        protocolWithTwoPipettesWithOnlyOneBeingUsed.commands
-      )
-      .mockReturnValue(rightPipetteId)
+    mockGetPrimaryPipetteId.mockReturnValue(rightPipetteId)
 
     when(mockGetPipetteWorkflow)
       .calledWith({
@@ -220,15 +195,10 @@ describe('getLabwarePositionCheckSteps', () => {
   it('should generate commands with the two pipette workflow', () => {
     const leftPipetteId = '50d23e00-0042-11ec-8258-f7ffdf5ad45a'
     const rightPipetteId = 'c235a5a0-0042-11ec-8258-f7ffdf5ad45a'
-    const leftPipette = protocolWithTwoPipettes.pipettes[leftPipetteId]
-    const rightPipette = protocolWithTwoPipettes.pipettes[rightPipetteId]
+    const leftPipette = protocolWithTwoPipettes.pipettes[0]
+    const rightPipette = protocolWithTwoPipettes.pipettes[1]
 
-    when(mockGetPrimaryPipetteId)
-      .calledWith(
-        protocolWithTwoPipettes.pipettes,
-        protocolWithTwoPipettes.commands
-      )
-      .mockReturnValue(leftPipetteId)
+    mockGetPrimaryPipetteId.mockReturnValue(leftPipetteId)
 
     when(mockGetPipetteWorkflow)
       .calledWith({

@@ -175,12 +175,13 @@ describe('DeprecatedLabwarePositionCheckStepDetail', () => {
           labwareDefinitions: {
             [LABWARE_DEF_URI]: LABWARE_DEF,
           },
-          pipettes: {
-            [PRIMARY_PIPETTE_ID]: {
+          pipettes: [
+            {
+              id: PRIMARY_PIPETTE_ID,
               pipetteName: PRIMARY_PIPETTE_NAME,
               mount: 'left',
             },
-          },
+          ],
         },
       } as any)
 
@@ -255,12 +256,13 @@ describe('DeprecatedLabwarePositionCheckStepDetail', () => {
           labwareDefinitions: {
             [TIPRACK_DEF_URI]: LABWARE_DEF,
           },
-          pipettes: {
-            [PRIMARY_PIPETTE_ID]: {
+          pipettes: [
+            {
+              id: PRIMARY_PIPETTE_ID,
               pipetteName: PRIMARY_PIPETTE_NAME,
               mount: 'left',
             },
-          },
+          ],
         },
       } as any)
     render(props)

@@ -17,11 +17,12 @@ export const getLabwarePositionCheckSteps = (
     // filter out any pipettes that are not being used in the protocol
     const pipettesById: ProtocolAnalysisFile['pipettes'] = omitBy(
       protocolData.pipettes,
-      (_pipette, id) =>
+      _pipette =>
         !protocolData.commands.some(
           command =>
             command.commandType === 'pickUpTip' &&
-            command.params.pipetteId === id
+            //  @ts-expect-error: pipetteName should be name until we remove the schemaV6Adapter
+            command.params.pipetteId === _pipette.id
         )
     )
     const pipettes = values(pipettesById)
@@ -50,7 +51,6 @@ export const getLabwarePositionCheckSteps = (
       labwareDefinitions,
       commands,
     })
-
     if (pipetteWorkflow === 1) {
       return getOnePipettePositionCheckSteps({
         primaryPipetteId,
@@ -60,10 +60,13 @@ export const getLabwarePositionCheckSteps = (
         commands,
       })
     } else {
-      const secondaryPipetteId = Object.keys(pipettesById).find(
-        pipetteId => pipetteId !== primaryPipetteId
-      ) as string
-
+      const secondaryPipetteId =
+        //  @ts-expect-error
+        Object.values(pipettesById)[0].id !== primaryPipetteId
+          ? //  @ts-expect-error
+            Object.values(pipettesById)[0].id
+          : //  @ts-expect-error
+            Object.values(pipettesById)[1].id
       return getTwoPipettePositionCheckSteps({
         primaryPipetteId,
         secondaryPipetteId,
