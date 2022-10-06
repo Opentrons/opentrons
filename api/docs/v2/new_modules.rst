@@ -4,16 +4,14 @@
 Hardware Modules
 ################
 
-Modules are peripherals that attach to the OT-2 to extend its capabilities.
-
-We currently support the Temperature, Magnetic and Thermocycler Modules.
+Hardware modules are first-party peripherals that attach to the OT-2 to extend its capabilities. The Python API currently supports four modules that attach to the OT-2 deck and are controlled over a USB connection: the :ref:`Temperature <temperature-module>`, :ref:`Magnetic <magnetic-module>`, :ref:`Thermocycler <thermocycler-module>`, and :ref:`Heater-Shaker <heater-shaker-module>` Modules.
 
 ************
 Module Setup
 ************
 
-Loading Your Module Onto the Deck
-=================================
+Loading a Module onto the Deck
+==============================
 
 Like labware and pipettes, you must inform the Protocol API of the modules you will use in your protocol.
 
@@ -42,65 +40,36 @@ Use :py:meth:`.ProtocolContext.load_module` to load a module.  It will return an
 Available Modules
 -----------------
 
-The first parameter to :py:meth:`.ProtocolContext.load_module`, the module's *load name,* specifies the kind of module to load.
-Check the table below for the proper load name to use for each kind of module.
+The first parameter to :py:meth:`.ProtocolContext.load_module`, the module's *load name*, specifies the kind of module to load. The table below lists the load names for each kind of module.
 
-Some modules were added to the Protocol API later than others.
-Make sure you use a :ref:`Protocol API version <v2-versioning>` high enough to support all the modules you want to use.
+Some modules were added to the Protocol API later than others, and some modules have multiple hardware generations (GEN2 modules have a "GEN2" label on the device). Make sure your protocol's metadata specifies a :ref:`Protocol API version <v2-versioning>` high enough to support all the modules you want to use.
 
 .. table::
-   :widths: 2 1 3 3
+   :widths: 4 5 2
    
-   +--------------------+-------------------------------+------------------------------------+
-   | Module             | Load name                     | Minimum                            |
-   |                    |                               | :ref:`API version <v2-versioning>` |
-   +=============+======+===============================+====================================+
-   | Temperature | GEN1 | ``'temperature module'``      | 2.0                                |
-   | Module      |      | or ``'tempdeck'``             |                                    |
-   |             +------+-------------------------------+------------------------------------+
-   |             | GEN2 | ``'temperature module gen2'`` | 2.3                                |
-   +-------------+------+-------------------------------+------------------------------------+
-   | Magnetic    | GEN1 | ``'magnetic module'``         | 2.0                                |
-   | Module      |      | or ``'magdeck'``              |                                    |
-   |             +------+-------------------------------+------------------------------------+
-   |             | GEN2 | ``'magnetic module gen2'``    | 2.3                                |
-   +-------------+------+-------------------------------+------------------------------------+
-   | Thermocycler       | ``'thermocycler module'``     | 2.0                                |
-   | Module             | or ``'thermocycler'``         |                                    |
-   +--------------------+-------------------------------+------------------------------------+
+   +--------------------+-------------------------------+---------------------+
+   | Module             | Load Name                     | Minimum API Version |
+   +====================+===============================+=====================+
+   | Temperature Module | ``temperature module``        | 2.0                 |
+   | GEN1               | or ``tempdeck``               |                     |
+   +--------------------+-------------------------------+---------------------+
+   | Temperature Module | ``temperature module gen2``   | 2.3                 |
+   | GEN2               |                               |                     |
+   +--------------------+-------------------------------+---------------------+
+   | Magnetic Module    | ``magnetic module``           | 2.0                 |
+   | GEN1               | or ``magdeck``                |                     |
+   +--------------------+-------------------------------+---------------------+
+   | Magnetic Module    | ``magnetic module gen2``      | 2.3                 |
+   | GEN2               |                               |                     |
+   +--------------------+-------------------------------+---------------------+
+   | Thermocycler       | ``thermocycler module``       | 2.0                 |
+   | Module             | or ``thermocycler``           |                     |
+   +--------------------+-------------------------------+---------------------+
+   | Heater-Shaker      | ``heaterShakerModuleV1``      | 2.13                |
+   | Module             |                               |                     |
+   +--------------------+-------------------------------+---------------------+
 
-
-GEN1 vs. GEN2 Modules
-=====================
-
-GEN2 modules are newer.
-They have improvements that make them more reliable and easier to use.
-
-Identifying a GEN2 Module
--------------------------
-
-You can determine if your module is a GEN2 model by inspecting the sides of the device for a label that specifies `GEN2`.
-
-Changes with the GEN2 Temperature Module
-----------------------------------------
-
-The GEN2 Temperature Module has a plastic insulating rim around the plate, and plastic insulating shrouds designed to fit over our aluminum blocks.
-This mitigates an issue where the GEN1 Temperature Module would have trouble cooling to very low temperatures, especially if it shared the deck with a running Thermocycler.
-
-Changes with the GEN2 Magnetic Module
--------------------------------------
-
-The GEN2 Magnetic Module uses smaller magnets than the GEN1 version.
-This mitigates an issue where beads would be attracted even when the magnets were retracted.
-
-This means it will take longer for the GEN2 module to attract beads.
-
-Recommended Magnetic Module GEN2 bead attraction time:
-    - Total liquid volume <= 50 uL: 5 minutes
-    - Total liquid volume > 50 uL: 7 minutes
-
-
-Loading Labware Onto Your Module
+Loading Labware onto Your Module
 ================================
 
 Like specifying labware that will be present on the deck of the OT-2, you must specify labware that will be present on the module you have just loaded.
@@ -118,10 +87,7 @@ You do this using ``module.load_labware()``. For instance, to load a Temperature
          my_labware = module.load_labware('opentrons_24_aluminumblock_generic_2ml_screwcap',
                                           label='Temperature-Controlled Tubes')
 
-See
-:py:meth:`.MagneticModuleContext.load_labware`,
-:py:meth:`.TemperatureModuleContext.load_labware`,
-or :py:meth:`.ThermocyclerContext.load_labware`.
+See :py:meth:`.MagneticModuleContext.load_labware`, :py:meth:`.TemperatureModuleContext.load_labware`, :py:meth:`.ThermocyclerContext.load_labware`, or :py:meth:`.HeaterShakerContext.load_labware` for more details.
 
 Notice that when you load labware on a module, you don't specify the labware's deck slot.  The labware is loaded on the module, on whichever deck slot the module occupies.
 
@@ -147,6 +113,8 @@ Any custom labware added to your Opentrons App (see :ref:`v2-custom-labware`) is
 
     In API version 2.0, ``module.load_labware()`` only took a ``load_name`` argument. In API version 2.1 (introduced in Robot Software version 3.15.2) or higher you can now specify a label, version, and namespace (though most of the time you won't have to).
 
+
+.. _temperature-module:
 
 **************************
 Using a Temperature Module
@@ -242,6 +210,15 @@ After deactivating your Temperature module, you can later call :py:meth:`.Temper
 
 .. versionadded:: 2.0
 
+Changes with the GEN2 Temperature Module
+========================================
+
+The GEN2 Temperature Module has a plastic insulating rim around the plate, and plastic insulating shrouds designed to fit over our aluminum blocks.
+This mitigates an issue where the GEN1 Temperature Module would have trouble cooling to very low temperatures, especially if it shared the deck with a running Thermocycler.
+
+
+.. _magnetic-module:
+
 ***********************
 Using a Magnetic Module
 ***********************
@@ -335,9 +312,21 @@ The :py:obj:`.MagneticModuleContext.status` property is a string that is one of 
 .. code-block:: python
 
     mag_mod.status
+    
+Changes with the GEN2 Magnetic Module
+=====================================
+
+The GEN2 Magnetic Module uses smaller magnets than the GEN1 version.
+This mitigates an issue where beads would be attracted even when the magnets were retracted.
+
+This means it will take longer for the GEN2 module to attract beads.
+
+Recommended Magnetic Module GEN2 bead attraction time:
+    - Total liquid volume <= 50 uL: 5 minutes
+    - Total liquid volume > 50 uL: 7 minutes
 
 
-.. _thermocycler-section:
+.. _thermocycler-module:
 
 ***************************
 Using a Thermocycler Module
@@ -606,36 +595,177 @@ This deactivates only the well block of the Thermocycler.
 .. versionadded:: 2.0
 
 
+.. _heater-shaker-module:
+
+****************************
+Using a Heater-Shaker Module
+****************************
+
+The Heater-Shaker Module provides on-deck heating and orbital shaking. The module can heat from 37 to 95 °C, and can shake samples from 200 to 3000 rpm.
+
+The Heater-Shaker Module is represented in code by a :py:class:`.HeaterShakerContext` object. The examples in this section will use a Heater-Shaker loaded in slot 1:
+
+.. code-block:: python
+
+    from opentrons import protocol_api
+
+    metadata = {'apiLevel': '2.13'}
+
+    def run(protocol: protocol_api.ProtocolContext):
+         hs_mod = protocol.load_module('heaterShakerModuleV1', 1)
+
+.. versionadded:: 2.13
+
+
+Placement Restrictions
+======================
+
+To allow for proper anchoring and cable routing, the Heater-Shaker should only be loaded in slot 1, 3, 4, 6, 7, or 10. 
+
+In general, it's best to leave all slots adjacent to the Heater-Shaker empty, in both directions. If your protocol requires filling those slots, you’ll need to observe certain restrictions put in place to avoid physical crashes involving the Heater-Shaker.
+
+First, you can’t place any other modules adjacent to the Heater-Shaker in any direction. This prevents collisions both while shaking and while opening the labware latch. Attempting to load a module next to the Heater-Shaker will raise a ``DeckConflictError``.
+
+Next, you can’t place tall labware (defined as >53 mm) to the left or right of the Heater-Shaker. This prevents the Heater-Shaker’s latch from colliding with the adjacent labware. Attempting to load tall labware to the right or left of the Heater-Shaker will also raise a ``DeckConflictError``. Common labware that exceed the height limit include Opentrons tube racks and Opentrons 1000 µL tip racks.
+
+Finally, if you are using an 8-channel pipette, you can't perform pipetting actions in `any` adjacent slots. Attempting to do so will raise a ``PipetteMovementRestrictedByHeaterShakerError``. This prevents the pipette ejector from crashing on the module housing or labware latch. There is one exception: to the front or back of the Heater-Shaker, an 8-channel pipette can access tip racks only. Attempting to pipette to non-tip-rack labware will also raise a ``PipetteMovementRestrictedByHeaterShakerError``.
+
+Latch Control
+=============
+
+To easily add and remove labware from the Heater-Shaker, you can control its labware latch within your protocol using :py:meth:`.open_labware_latch` and :py:meth:`.close_labware_latch`. Shaking requires the labware latch to be closed, so you may want to issue a close command before the first shake command in your protocol:
+
+.. code-block:: python
+
+    hs_mod.close_labware_latch()
+    hs_mod.set_and_wait_for_shake_speed(500)
+
+If the labware latch is already closed, ``close_labware_latch()`` will succeed immediately; you don’t have to check the status of the latch before opening or closing it.
+
+To prepare the deck before running a protocol, use the labware latch controls in the Opentrons App or run these methods in Jupyter notebook.
+
+Loading Labware
+===============
+
+Like with all modules, use the Heater-Shaker’s :py:meth:`~.HeaterShakerContext.load_labware` method to specify what you will place on the module. For the Heater-Shaker, you must use a definition that describes the combination of a thermal adapter and labware that fits it. Currently, only the following combinations are supported in the Opentrons Labware Library:
+
++-------------------------+-------------------------------------------+----------------------------------------------------------------------+
+| Adapter                 | Labware                                   | Definition                                                           |
++=========================+===========================================+======================================================================+
+| Deep Well Adapter       | NEST 96 Deep Well Plate 2mL               | ``opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep``           |
++-------------------------+-------------------------------------------+----------------------------------------------------------------------+
+| 96 Flat Bottom Adapter  | NEST 96 Well Plate 200 µL Flat            | ``opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat``       |
++-------------------------+-------------------------------------------+----------------------------------------------------------------------+
+| PCR Adapter             | NEST 96 Well Plate 100 µL PCR Full Skirt  | ``opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt``     |
++-------------------------+-------------------------------------------+----------------------------------------------------------------------+
+| PCR Adapter             | Thermo Scientific Armadillo PCR Plate     | ``opentrons_96_pcr_adapter_armadillo_wellplate_200ul``               |
++-------------------------+-------------------------------------------+----------------------------------------------------------------------+
+| Universal Flat Adapter  | Corning 384 Well Plate 112 µL Flat        | ``opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat``|
++-------------------------+-------------------------------------------+----------------------------------------------------------------------+
+
+
+Custom flat-bottom labware can be used with the Universal Flat Adapter. If you need assistance creating custom labware definitions for the Heater-Shaker, `submit a request <https://support.opentrons.com/s/article/Requesting-a-custom-labware-definition>`_.
+
+
+Heating and Shaking
+===================
+
+Heating and shaking operations are controlled independently, and are treated differently due to the amount of time they take. Speeding up or slowing down the shaker takes at most a few seconds, so it is treated as a *blocking* command — all other command execution must wait until it is complete. In contrast, heating the module or letting it passively cool can take much longer, so the Python API gives you the flexibility to perform other pipetting actions while waiting to reach a target temperature. When holding at a target, you can design your protocol to run in a blocking or non-blocking manner.
+
+.. note::
+
+	As of version 2.13 of the API, only the Heater-Shaker Module supports non-blocking command execution. All other modules' methods are blocking commands.
+
+Blocking commands
+-----------------
+
+Here is an example of how to shake a sample for one minute in a blocking manner — no other commands will execute until the minute has elapsed. This can be done with three commands, which start the shake, wait the minute, and stop the shake:
+
+.. code-block:: python
+
+    hs_mod.set_and_wait_for_shake_speed(500)
+    protocol.delay(minutes=1)
+    hs_mod.deactivate_shaker()
+
+These actions will take about 65 seconds total. Compare this with similar-looking commands for holding a sample at a temperature for one minute:
+
+.. code-block:: python
+
+    hs_mod.set_and_wait_for_temperature(75)
+    protocol.delay(minutes=1)
+    hs_mod.deactivate_heater()
+
+This may take much longer, depending on the thermal block used, the volume and type of liquid contained in the labware, and the initial temperature of the module. 
+
+Non-blocking commands
+---------------------
+
+To pipette while the Heater-Shaker is heating, use :py:meth:`~.HeaterShakerContext.set_target_temperature` and :py:meth:`~.HeaterShakerContext.wait_for_temperature` instead of :py:meth:`~.HeaterShakerContext.set_and_wait_for_temperature`:
+
+.. code-block:: python
+
+    hs_mod.set_target_temperature(75)
+    pipette.pick_up_tip()   
+    pipette.aspirate(50, plate['A1'])
+    pipette.dispense(50, plate['B1'])
+    pipette.drop_tip()
+    hs_mod.wait_for_temperature()
+    protocol.delay(minutes=1)
+    hs_mod.deactivate_heater()
+
+This example would likely take just as long as the blocking version above; it’s unlikely that one aspirate and one dispense action would take longer than the time for the module to heat. However, be careful when putting a lot of commands between a ``set_target_temperature()`` call and a ``delay()`` call. In this situation, you’re relying on ``wait_for_temperature()`` to resume execution of commands once heating is complete. But if the temperature has already been reached, the delay will begin later than expected and the Heater-Shaker will hold at its target temperature longer than intended.
+
+Additionally, if you want to pipette while the module holds at a target for a certain length of time, you need to track the holding time yourself. One of the simplest ways to do this is with Python’s ``time`` module. First, add ``import time`` at the start of your protocol. Then, use :py:func:`time.monotonic` to set a reference time when the target is reached. Finally, add a delay that calculates how much holding time is remaining after the pipetting actions:
+
+.. code-block:: python
+
+    hs_mod.set_and_wait_for_temperature(75)
+    start_time = time.monotonic()  # set reference time
+    pipette.pick_up_tip()   
+    pipette.aspirate(50, plate['A1'])
+    pipette.dispense(50, plate['B1'])
+    pipette.drop_tip()
+    # delay for the difference between now and 60 seconds after the reference time
+    protocol.delay(max(0, start_time+60 - time.monotonic()))
+    hs_mod.deactivate_heater()
+
+Provided that the parallel pipetting actions don’t take more than one minute, this code will deactivate the heater one minute after its target was reached. If more than one minute has elapsed, the value passed to ``protocol.delay`` will equal 0, and the protocol will continue immediately.
+
+Deactivating
+============
+
+As with setting targets, deactivating the heater and shaker are done separately, with :py:meth:`~.HeaterShakerContext.deactivate_heater` and :py:meth:`~.HeaterShakerContext.deactivate_shaker` respectively. There is no method to deactivate both simultaneously, so call the two methods in sequence if you need to stop both heating and shaking.
+
+.. note:: 
+
+    The OT-2 will not automatically deactivate the Heater-Shaker at the end of a protocol. If you need to deactivate the module after a protocol is completed or canceled, use the Heater-Shaker module controls on the device detail page in the Opentrons App or run these methods in Jupyter notebook.
+
+
 ***************************************
 Using Multiple Modules of the Same Type
 ***************************************
 
-To use this feature, you must be running software version 4.3 or higher. Currently, you can only use multiple Magnetic Modules or multiple Temperature Modules.
-You won’t be able to load multiple Thermocycler Modules.
+It's possible to use multiples of most module types within a single protocol. The exception is the Thermocycler Module, which only has one supported deck location due to its size. Running protocols with multiple modules of the same type requires version 4.3 or newer of the Opentrons App and OT-2 robot server. 
 
-The following diagram shows the mapping of two Temperature Modules on the robot.
-
-.. image:: ../img/modules/multiples_of_a_module.png
-
-
-In a protocol, the diagram would map to your modules as found below.
-
+In order to send commands to the correct module on the deck, you need to load the modules in your protocol in a specific order. Whenever you call :py:meth:`.load_module` for a particular module type, the OT-2 will initialize the matching module attached to the lowest-numbered USB port. Deck slot numbers play no role in the ordering of modules; you could load a Temperature Module in slot 4 first, followed by another one in slot 3:
 
 .. code-block:: python
-    :substitutions:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata = {'apiLevel': '2.3'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        # Load Temperature Module 1 in deck slot 1 on port 1 of the robot.
-        temperature_module_1 = protocol.load_module('temperature module gen2', 1)
+        # Load Temperature Module 1 in deck slot 4 on USB port 1
+        temperature_module_1 = protocol.load_module('temperature module gen2', 4)
 
-        # Load Temperature Module 2 in deck slot 3 on port 2 of the robot.
+        # Load Temperature Module 2 in deck slot 3 on USB port 2
         temperature_module_2 = protocol.load_module('temperature module gen2', 3)
+        
+For this code to work as expected, ``temperature_module_1`` should be plugged into a lower-numbered USB port than ``temperature_module_2``. Assuming there are no other modules used in this protocol, it's simplest to use ports 1 and 2, like this:
 
-Referencing the diagram, you should make sure that Temperature Module 1 in slot 1 is plugged into port 1 of the robot and Temperature Module 1 in slot 3 is plugged into port 2 of the robot.
-If for whatever reason you want to plug Temperature Module 2 into a port to the left of Temperature Module 1, you should switch the modules physically on your robot.
+.. image:: ../img/modules/multiples_of_a_module.svg
 
-For detailed information, please refer to `Using Multiple Modules of the Same Type <https://support.opentrons.com/en/articles/5167312-using-modules-of-the-same-type-on-the-ot-2>`_ in our help center.
+Before running your protocol, it's a good idea to use the module controls in the Opentrons App to check that commands are being sent where you expect.
+
+For additional information, including using modules with USB hubs, see our `support article on Using Multiple Modules of the Same Type <https://support.opentrons.com/s/article/Using-modules-of-the-same-type-on-the-OT-2>`_.

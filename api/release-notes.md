@@ -6,18 +6,38 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# OT-2 Software Changes in 6.0.1
+# OT-2 Software Changes in 6.1.0
+
+Welcome to the v6.1.0 release of the OT-2 software! This release adds support for the Opentrons Heater-Shaker Module.
+
+## New Features
+
+- Heater-Shaker support
+  - The OT-2 can run JSON and Python protocols that control the Heater-Shaker Module
+  - Implements restrictions on module and labware placement around the Heater-Shaker
+  - When possible, the OT-2 will automatically move its pipettes or the Heater-Shaker's labware latch to shake safely and avoid crashes
+  - The OT-2 can update the firmware on an attached Heater-Shaker
+
+## Bug Fixes
+
+- Improved tip pickup and drop behavior
+- Fixed issues when running Thermocycler profiles
+- Fixed a bug that prevented pipetting to arbitrary deck coordinates
+
+---
+
+## OT-2 Software Changes in 6.0.1
 
 Welcome to the v6.0.1 release of the OT-2 software!
 
 In conjunction with [changes in the Opentrons App](https://github.com/Opentrons/opentrons/blob/edge/app-shell/build/release-notes.md), the 6.0 release reshapes the way your OT-2 stores runs and protocols.
 
-## New Features
+### New Features
 
 - The OT-2 will retain the past 20 protocol runs on the robot, even across reboots.
 - Supports renaming robots via the Opentrons App.
 
-## 6.0.0 to 6.0.1
+### 6.0.0 to 6.0.1
 
 The 6.0.1 hotfix release fixes one robot software bug:
 
@@ -25,7 +45,7 @@ The 6.0.1 hotfix release fixes one robot software bug:
 
 As noted below, the 6.0.0 release fixed various protocol analysis bugs. **If you have been using the "Use older protocol analysis method" setting, we recommend you turn it off.** You might no longer need it, and your protocols will upload to your OT-2 faster with the setting disabled!
 
-## Bug Fixes
+### Bug Fixes
 
 - The `opentrons` Python module is now compatible with Python 3.10.
 - Protocols will correctly fail analysis when attempting to place a Thermocycler in a slot that conflicts with already-placed labware.
@@ -33,7 +53,7 @@ As noted below, the 6.0.0 release fixed various protocol analysis bugs. **If you
 - Fixed various pipette bugs in protocol analysis.
 - Fixed [a bug](https://github.com/Opentrons/opentrons/issues/10126) where a robot would be undiscoverable if it happened to have the same name as another device on the network.
 
-## Known Issues
+### Known Issues
 
 - Sometimes module load order is affected by the order in which you power the modules on. We strongly suggest connecting and powering on modules in the order they will be used in the protocol.
 

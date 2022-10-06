@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   Flex,
@@ -8,14 +9,13 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import type { Dispatch } from '../../redux/types'
-import * as Config from '../../redux/config'
-
-import type { DevInternalFlag } from '../../redux/config/types'
 import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
 import { ToggleButton } from '../../atoms/buttons'
-import { useTranslation } from 'react-i18next'
+import * as Config from '../../redux/config'
+
+import type { DevInternalFlag } from '../../redux/config/types'
+import type { Dispatch } from '../../redux/types'
 
 export function FeatureFlags(): JSX.Element {
   const { t } = useTranslation('app_settings')

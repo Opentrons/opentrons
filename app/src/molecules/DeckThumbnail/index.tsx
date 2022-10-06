@@ -42,6 +42,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
   const deckDef = React.useMemo(() => getDeckDefinitions().ot2_standard, [])
   const { commands, liquids } = props
   const liquidSetupEnabled = useFeatureFlag('enableLiquidSetup')
+  const enableThermocyclerGen2 = useFeatureFlag('enableThermocyclerGen2')
 
   const initialLoadedLabwareBySlot = parseInitialLoadedLabwareBySlot(commands)
   const initialLoadedModulesBySlot = parseInitialLoadedModulesBySlot(commands)
@@ -94,7 +95,11 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
               : null
           return (
             <React.Fragment key={slotId}>
-              {moduleInSlot != null ? (
+              {/* TODO(jr, 9/28/22): revert this logic to only moduleInSlot != null when we remove the enableThermocyclerGen2 FF */}
+              {(moduleInSlot != null && enableThermocyclerGen2) ||
+              (moduleInSlot != null &&
+                !enableThermocyclerGen2 &&
+                moduleInSlot.params.model !== 'thermocyclerModuleV2') ? (
                 <Module
                   x={slot.position[0]}
                   y={slot.position[1]}
