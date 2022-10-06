@@ -40,7 +40,8 @@ export function ToggleBtn(props: ToggleBtnProps): JSX.Element {
       color={color}
       {...buttonProps}
     >
-      <Icon name={iconName} height="0.875rem" />
+      {/* TODO(bh, 2022-10-05): implement small and large sizes from design system */}
+      <Icon name={iconName} height="1rem" />
     </Btn>
   )
 }
