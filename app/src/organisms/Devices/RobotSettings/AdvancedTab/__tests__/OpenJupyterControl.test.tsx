@@ -38,9 +38,9 @@ describe('RobotSettings OpenJupyterControl', () => {
     const [{ getByText, getByRole }] = render()
     getByText('Jupyter Notebook')
     getByText(
-      'Open the Jupyter Notebook running on this OT-2 in the web browser. This is an experimental feature.'
+      'Open the Jupyter Notebook running on this robot in the web browser. This is an experimental feature.'
     )
-    getByText('Learn more about using Jupyter notebook with the OT-2')
+    getByText('Learn more about using Jupyter notebook')
     getByText('Launch Jupyter Notebook')
     expect(
       getByRole('link', { name: 'Launch Jupyter Notebook' })
