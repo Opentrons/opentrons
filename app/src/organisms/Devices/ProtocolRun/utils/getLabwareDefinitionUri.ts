@@ -7,13 +7,14 @@ export function getLabwareDefinitionUri(
   labware: ProtocolFile<{}>['labware'],
   labwareDefinitions: ProtocolFile<{}>['labwareDefinitions']
 ): string {
-  const labwareDefinitionId = labware[labwareId].definitionId
-  if (labwareDefinitionId == null) {
+  //  @ts-expect-error
+  const labwareDefinitionUri = labware[labwareId].definitionUri
+  if (labwareDefinitionUri == null) {
     throw new Error(
-      'expected to be able to find labware definition id for labware, but could not'
+      'expected to be able to find labware definition uri for labware, but could not'
     )
   }
-  const labwareDefinition = labwareDefinitions[labwareDefinitionId]
+  const labwareDefinition = labwareDefinitions[labwareDefinitionUri]
   if (labwareDefinition == null) {
     throw new Error(
       'expected to be able to find labware definitions for protocol, but could not'

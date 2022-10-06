@@ -35,7 +35,7 @@ export const schemaV6Adapter = (
 
     const labware: {
       [labwareId: string]: {
-        definitionId: string
+        definitionUri: string
         displayName?: string
       }
     } = protocolAnalysis.labware.reduce((acc, labware) => {
@@ -54,14 +54,14 @@ export const schemaV6Adapter = (
       return {
         ...acc,
         [labwareId]: {
-          definitionId: `${labware.definitionUri}_id`,
+          definitionUri: labware.definitionUri,
           displayName: displayName,
         },
       }
     }, {})
 
     const labwareDefinitions: {
-      [definitionId: string]: LabwareDefinition2
+      [definitionUri: string]: LabwareDefinition2
     } = protocolAnalysis.commands
       .filter(
         (command: RunTimeCommand): command is LoadLabwareRunTimeCommand =>
@@ -70,14 +70,13 @@ export const schemaV6Adapter = (
       .reduce((acc, command: LoadLabwareRunTimeCommand) => {
         const labwareDef: LabwareDefinition2 = command.result?.definition
         const labwareId = command.result?.labwareId ?? ''
-        const definitionUri = protocolAnalysis.labware.find(
-          labware => labware.id === labwareId
-        )?.definitionUri
-        const definitionId = `${definitionUri}_id`
+        const definitionUri =
+          protocolAnalysis.labware.find(labware => labware.id === labwareId)
+            ?.definitionUri ?? ''
 
         return {
           ...acc,
-          [definitionId]: labwareDef,
+          [definitionUri]: labwareDef,
         }
       }, {})
 
@@ -119,6 +118,7 @@ export const schemaV6Adapter = (
       //  @ts-expect-error
       pipettes,
       liquids,
+      //  @ts-expect-error
       labware,
       modules,
       labwareDefinitions,

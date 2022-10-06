@@ -30,7 +30,8 @@ export const getLabwarePositionCheckSteps = (
     const labware = omitBy(
       protocolData.labware,
       (labware, id) =>
-        protocolData.labwareDefinitions[labware.definitionId]?.parameters
+        //  @ts-expect-error: will be an error until we remove the schemaV6Adapter
+        protocolData.labwareDefinitions[labware.definitionUri]?.parameters
           .isTiprack &&
         !protocolData.commands.some(
           command =>
