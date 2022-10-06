@@ -23,15 +23,19 @@ def stop_server_ot3() -> None:
     run(["systemctl", "stop", "opentrons-robot-server"])
 
 def build_ot3_hardware_api(
-    is_simulating: Optional[bool] = False, use_defaults: Optional[bool] = False
-) -> ThreadManagedHardwareAPI:
+                            is_simulating: Optional[bool] = False,
+                            use_defaults: Optional[bool] = False
+                                                ) -> ThreadManagedHardwareAPI:
     """Built an OT3 Hardware API instance."""
     if use_defaults:
         config = build_config_ot3({})
     else:
         config = load_ot3_config()
+    """TODO: CF-Need a way to simulate pipettes attached """
     if is_simulating:
-        hw_api = ThreadManager(HWApiOT3.build_hardware_simulator, config=config)
+        hw_api = ThreadManager(
+                                HWApiOT3.build_hardware_simulator,
+                                config=config)
     else:
         stop_server_ot3()
         hw_api = ThreadManager(HWApiOT3.build_hardware_controller, config=config)
@@ -209,29 +213,30 @@ def get_plunger_positions_ot3(api: ThreadManagedHardwareAPI,
 async def move_plunger_absolute_ot3(api: ThreadManagedHardwareAPI,
                                     mount: OT3Mount,
                                     position: float,
+                                    motor_current: Optional[float] = 1.0,
                                     speed: Optional[float] = None) -> None:
-    if mount == OT3Mount.LEFT:
-        pip_axis = OT3Axis.P_L
-    elif mount == OT3Mount.RIGHT:
-        pip_axis = OT3Axis.P_R
-    else:
-        raise ValueError(f'Unexpected mount: {mount}')
-    await api._move(target_position={pip_axis: position}, speed=speed)
+    await api._backend.set_active_current(
+                                {OT3Axis.of_main_tool_actuator(mount): motor_current})
+    await api._move(
+                target_position={
+                    OT3Axis.of_main_tool_actuator(mount): position},
+                speed=speed)
 
 
 async def move_plunger_relative_ot3(api: ThreadManagedHardwareAPI,
                                     mount: OT3Mount,
                                     position: float,
+                                    motor_current: Optional[float] = 1.0,
                                     speed: Optional[float] = None) -> None:
-    if mount == OT3Mount.LEFT:
-        pip_axis = OT3Axis.P_L
-    elif mount == OT3Mount.RIGHT:
-        pip_axis = OT3Axis.P_R
-    else:
-        raise ValueError(f'Unexpected mount: {mount}')
     current_pos = await api.current_position(mount=mount)
-    plunger_pos = current_pos[pip_axis]
-    await api._move(target_position={pip_axis: plunger_pos + position}, speed=speed)
+    await api._backend.set_active_current(
+                                {OT3Axis.of_main_tool_actuator(mount): motor_current})
+    plunger_pos = current_pos[OT3Axis.of_main_tool_actuator(mount)]
+    await api._move(
+                target_position={OT3Axis.of_main_tool_actuator(mount):
+                                    plunger_pos + position
+                                    },
+                speed=speed)
 
 
 def get_endstop_position_ot3(api: ThreadManagedHardwareAPI, mount: OT3Mount) -> Point:
