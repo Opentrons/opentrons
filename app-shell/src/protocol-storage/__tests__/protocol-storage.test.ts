@@ -15,15 +15,22 @@ describe('protocol storage directory utilities', () => {
   let protocolsDir: string
   let mockAnalysisFilePath: string
   let mockDispatch: () => void
+  let requiredRmdir: boolean
 
   beforeEach(() => {
     mockAnalysisFilePath = tempy.file({ extension: 'json' })
     protocolsDir = path.join('__mock-app-path__', PROTOCOLS_DIRECTORY_NAME)
     mockDispatch = jest.fn()
+    requiredRmdir = true
   })
 
   afterEach(() => {
-    return Promise.all([fs.rm(mockAnalysisFilePath, { force: true })])
+    return requiredRmdir
+      ? Promise.all([
+          fs.rmdir(protocolsDir, { recursive: true }),
+          fs.rm(mockAnalysisFilePath, { force: true }),
+        ])
+      : fs.rm(mockAnalysisFilePath, { force: true })
   })
   afterAll(() => {
     jest.resetAllMocks()
@@ -80,6 +87,7 @@ describe('protocol storage directory utilities', () => {
 
   describe('getParsedAnalysis', () => {
     it('parses json if available', () => {
+      requiredRmdir = false
       return fs
         .writeJson(mockAnalysisFilePath, {
           someKey: 1,
@@ -91,6 +99,7 @@ describe('protocol storage directory utilities', () => {
         })
     })
     it('returns failed analysis if parsing error', () => {
+      requiredRmdir = false
       expect(getParsedAnalysisFromPath('non-existent-path.json')).toEqual({
         commands: [],
         liquids: [],
