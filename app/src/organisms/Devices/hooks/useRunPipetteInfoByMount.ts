@@ -66,10 +66,9 @@ export function useRunPipetteInfoByMount(
     const loadCommand = loadPipetteCommands.find(
       command => command.result?.pipetteId === pipetteId
     )
-
     if (loadCommand != null) {
       const { mount } = loadCommand.params
-      const requestedPipetteName = pipette.name
+      const requestedPipetteName = pipette.pipetteName
       const pipetteSpecs = getPipetteNameSpecs(requestedPipetteName)
 
       if (pipetteSpecs != null) {
@@ -90,7 +89,7 @@ export function useRunPipetteInfoByMount(
 
         const attachedPipette = attachedPipettes[mount as Mount]
         const requestedPipetteMatch = getRequestedPipetteMatch(
-          pipette.name,
+          pipette.pipetteName,
           attachedPipette
         )
 
