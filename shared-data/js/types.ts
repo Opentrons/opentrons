@@ -264,12 +264,6 @@ export interface DeckMetadata {
   tags: string[]
 }
 
-export interface DeckLayerFeature {
-  footprint: string
-}
-
-export type DeckLayer = DeckLayerFeature[]
-
 export interface DeckDefinition {
   otId: string
   cornerOffsetFromOrigin: CoordinateTuple
