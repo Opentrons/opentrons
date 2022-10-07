@@ -250,6 +250,9 @@ class Controller:
             return
         if event is not None:
             if "ot_module" in event.name:
+                if ".tmp" in event.name:
+                    MODULE_LOG.warning(f"ignoring module tempnode {event.name}")
+                    return
                 event_name = event.name
                 flags = aionotify.Flags.parse(event.flags)
                 event_description = AionotifyEvent.build(event_name, flags)
