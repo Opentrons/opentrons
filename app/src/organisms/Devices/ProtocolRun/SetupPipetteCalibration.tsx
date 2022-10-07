@@ -56,7 +56,6 @@ export function SetupPipetteCalibration({
       </StyledText>
       {PipetteConstants.PIPETTE_MOUNTS.map((mount, index) => {
         const pipetteInfo = runPipetteInfoByMount[mount]
-        console.log(pipetteInfo)
         return pipetteInfo != null ? (
           <SetupPipetteCalibrationItem
             key={index}
