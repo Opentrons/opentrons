@@ -9,24 +9,34 @@ import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 
 const protocolWithOnePipette = ({
   ..._uncasted_v6ProtocolWithTwoPipettes,
-  labware: {
-    fixedTrash: {
+  labware: [
+    {
+      id: 'fixedTrash',
+      loadName: 'opentrons_1_trash_1100ml_fixed',
       displayName: 'Trash',
       definitionUri: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
     },
-    '50d3ebb0-0042-11ec-8258-f7ffdf5ad45a:opentrons/opentrons_96_tiprack_300ul/1': {
+    {
+      id:
+        '50d3ebb0-0042-11ec-8258-f7ffdf5ad45a:opentrons/opentrons_96_tiprack_300ul/1',
+      loadName: 'opentrons_96_tiprack_300ul',
       displayName: 'Opentrons 96 Tip Rack 300 µL',
       definitionUri: 'opentrons/opentrons_96_tiprack_300ul/1',
     },
-    '9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1': {
+    {
+      id:
+        '9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1',
+      loadName: 'nest_12_reservoir_15ml',
       displayName: 'NEST 12 Well Reservoir 15 mL',
       definitionUri: 'opentrons/nest_12_reservoir_15ml/1',
     },
-    'e24818a0-0042-11ec-8258-f7ffdf5ad45a': {
+    {
+      id: 'e24818a0-0042-11ec-8258-f7ffdf5ad45a',
+      loadName: 'opentrons_96_tiprack_300ul',
       displayName: 'Opentrons 96 Tip Rack 300 µL (1)',
       definitionUri: 'opentrons/opentrons_96_tiprack_300ul/1',
     },
-  },
+  ],
   pipettes: [
     {
       pipetteName: 'p300_single_gen2',
@@ -46,24 +56,34 @@ const protocolWithTwoPipettes = ({
       id: 'c235a5a0-0042-11ec-8258-f7ffdf5ad45a',
     },
   ],
-  labware: {
-    fixedTrash: {
+  labware: [
+    {
+      id: 'fixedTrash',
+      loadName: 'opentrons_1_trash_1100ml_fixed',
       displayName: 'Trash',
       definitionUri: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
     },
-    '50d3ebb0-0042-11ec-8258-f7ffdf5ad45a:opentrons/opentrons_96_tiprack_300ul/1': {
+    {
+      id:
+        '50d3ebb0-0042-11ec-8258-f7ffdf5ad45a:opentrons/opentrons_96_tiprack_300ul/1',
+      loadName: 'opentrons_96_tiprack_300ul',
       displayName: 'Opentrons 96 Tip Rack 300 µL',
       definitionUri: 'opentrons/opentrons_96_tiprack_300ul/1',
     },
-    '9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1': {
+    {
+      id:
+        '9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1',
+      loadName: 'nest_12_reservoir_15ml',
       displayName: 'NEST 12 Well Reservoir 15 mL',
       definitionUri: 'opentrons/nest_12_reservoir_15ml/1',
     },
-    'e24818a0-0042-11ec-8258-f7ffdf5ad45a': {
+    {
+      id: 'e24818a0-0042-11ec-8258-f7ffdf5ad45a',
+      loadName: 'opentrons_96_tiprack_300ul',
       displayName: 'Opentrons 96 Tip Rack 300 µL (1)',
       definitionUri: 'opentrons/opentrons_96_tiprack_300ul/1',
     },
-  },
+  ],
 } as unknown) as ProtocolAnalysisFile
 
 jest.mock('../utils/getPrimaryPipetteId')
@@ -118,9 +138,8 @@ describe('getLabwarePositionCheckSteps', () => {
       ...protocolWithOnePipette,
       labware: {
         ...protocolWithOnePipette.labware,
-        unusedTipRackId: {
-          definitionUri: 'bogusDefinitionUri',
-        },
+        id: 'unusedTipRackId',
+        definitionUri: 'bogusDefinitionUri',
       },
       labwareDefinitions: {
         ...protocolWithOnePipette.labwareDefinitions,

@@ -39,7 +39,6 @@ export function useProtocolDetailsForRun(
   )
 
   const mostRecentAnalysis = last(protocolAnalyses?.data ?? []) ?? null
-
   React.useEffect(() => {
     if (mostRecentAnalysis?.status === 'completed') {
       setIsPollingProtocolAnalyses(false)

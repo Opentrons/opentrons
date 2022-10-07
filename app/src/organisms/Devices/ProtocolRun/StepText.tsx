@@ -47,6 +47,7 @@ export function StepText(props: Props): JSX.Element | null {
     )
     return null
   }
+
   // params will not exist on command summaries
   switch (displayCommand.commandType) {
     case 'delay': {
@@ -66,6 +67,11 @@ export function StepText(props: Props): JSX.Element | null {
     }
     case 'dropTip': {
       const { wellName, labwareId } = displayCommand.params
+      //  @ts-expect-error
+      const matchingLabware = protocolData.labware.find(
+        //  @ts-expect-error
+        item => item.id === labwareId
+      )
       const labwareLocation = getLabwareLocation(
         labwareId,
         protocolData.commands
@@ -79,10 +85,7 @@ export function StepText(props: Props): JSX.Element | null {
           labwareId === TRASH_ID
             ? 'Opentrons Fixed Trash'
             : getLabwareDisplayName(
-                protocolData.labwareDefinitions[
-                  //  @ts-expect-error
-                  protocolData.labware[labwareId].definitionUri
-                ]
+                protocolData.labwareDefinitions[matchingLabware.definitionUri]
               ),
         labware_location: labwareLocation.slotName,
       })

@@ -12,24 +12,34 @@ const protocolWithTC = (_uncastedProtocolWithTC as unknown) as ProtocolAnalysisF
 describe('getOnePipettePositionCheckSteps', () => {
   it('should check all tipracks, pick up a tip at the final tiprack, move to all remaining labware, and drop the tip', () => {
     const primaryPipetteId = 'c235a5a0-0042-11ec-8258-f7ffdf5ad45a' // this is just taken from the protocol fixture
-    const labware = {
-      fixedTrash: {
+    const labware = [
+      {
+        id: 'fixedTrash',
         displayName: 'Trash',
         definitionUri: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
+        loadName: 'opentrons_1_trash_1100ml_fixed',
       },
-      '50d3ebb0-0042-11ec-8258-f7ffdf5ad45a:opentrons/opentrons_96_tiprack_300ul/1': {
+      {
+        id:
+          '50d3ebb0-0042-11ec-8258-f7ffdf5ad45a:opentrons/opentrons_96_tiprack_300ul/1',
         displayName: 'Opentrons 96 Tip Rack 300 µL',
         definitionUri: 'opentrons/opentrons_96_tiprack_300ul/1',
+        loadName: 'opentrons_96_tiprack_300ul',
       },
-      '9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1': {
+      {
+        id:
+          '9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1',
         displayName: 'NEST 12 Well Reservoir 15 mL',
         definitionUri: 'opentrons/nest_12_reservoir_15ml/1',
+        loadName: 'nest_12_reservoir_15ml',
       },
-      'e24818a0-0042-11ec-8258-f7ffdf5ad45a': {
+      {
+        id: 'e24818a0-0042-11ec-8258-f7ffdf5ad45a',
         displayName: 'Opentrons 96 Tip Rack 300 µL (1)',
         definitionUri: 'opentrons/opentrons_96_tiprack_300ul/1',
+        loadName: 'opentrons_96_tiprack_300ul',
       },
-    }
+    ]
     const labwareDefinitions = protocolMultipleTipracks.labwareDefinitions
     const modules = protocolMultipleTipracks.modules
 
@@ -134,28 +144,41 @@ describe('getOnePipettePositionCheckSteps', () => {
   })
   it('should check tiprack, pick up a tip at the final tiprack, move to all remaining labware (and open TC lid), and drop the tip', () => {
     const primaryPipetteId = 'c235a5a0-0042-11ec-8258-f7ffdf5ad45a' // this is just taken from the protocol fixture
-    const labware = {
-      fixedTrash: {
+    const labware = [
+      {
+        id: 'fixedTrash',
         displayName: 'Trash',
         definitionUri: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
+        loadName: 'opentrons_1_trash_1100ml_fixed',
       },
-      '50d3ebb0-0042-11ec-8258-f7ffdf5ad45a:opentrons/opentrons_96_tiprack_300ul/1': {
+      {
+        id:
+          '50d3ebb0-0042-11ec-8258-f7ffdf5ad45a:opentrons/opentrons_96_tiprack_300ul/1',
         displayName: 'Opentrons 96 Tip Rack 300 µL',
         definitionUri: 'opentrons/opentrons_96_tiprack_300ul/1',
+        loadName: 'opentrons_96_tiprack_300ul',
       },
-      '9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1': {
+      {
+        id:
+          '9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1',
         displayName: 'NEST 12 Well Reservoir 15 mL',
         definitionUri: 'opentrons/nest_12_reservoir_15ml/1',
+        loadName: 'nest_12_reservoir_15ml',
       },
-      'e24818a0-0042-11ec-8258-f7ffdf5ad45a': {
+      {
+        id: 'e24818a0-0042-11ec-8258-f7ffdf5ad45a',
         displayName: 'Opentrons 96 Tip Rack 300 µL (1)',
         definitionUri: 'opentrons/opentrons_96_tiprack_300ul/1',
+        loadName: 'opentrons_96_tiprack_300ul',
       },
-      '1dc0c050-0122-11ec-88a3-f1745cf9b36c:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1': {
+      {
+        id:
+          '1dc0c050-0122-11ec-88a3-f1745cf9b36c:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1',
         displayName: 'NEST 96 Well Plate 100 µL PCR Full Skirt',
         definitionUri: 'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1',
+        loadName: 'nest_96_wellplate_100ul_pcr_full_skirt',
       },
-    }
+    ]
     const labwareDefinitions = protocolWithTC.labwareDefinitions
     const modules = protocolWithTC.modules
 

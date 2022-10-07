@@ -89,24 +89,32 @@ const TIP_LENGTH_CALIBRATIONS = [
 const tiprack10ul = _tiprack10ul as LabwareDefinition2
 const modifiedSimpleV6Protocol = ({
   ..._uncastedModifiedSimpleV6Protocol,
-  labware: {
-    trashId: {
+  labware: [
+    {
+      id: ' trashId',
       displayName: 'Trash',
       definitionUri: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
+      loadName: 'opentrons_1_trash_1100ml_fixed',
     },
-    tipRackId: {
+    {
+      id: 'tipRackId',
       displayName: 'Opentrons 96 Tip Rack 10 µL',
       definitionUri: 'opentrons/opentrons_96_tiprack_10ul/1',
+      loadName: 'opentrons_96_tiprack_10ul',
     },
-    sourcePlateId: {
+    {
+      id: 'sourcePlateId',
       displayName: 'Source Plate',
       definitionUri: 'example/plate/1',
+      loadName: 'plate',
     },
-    destPlateId: {
+    {
+      id: 'destPlateId',
       displayName: 'Sample Collection Plate',
       definitionUri: 'example/plate/1',
+      loadName: 'plate',
     },
-  },
+  ],
   pipettes: [
     {
       id: 'pipetteId',

@@ -38,15 +38,17 @@ export function useOffsetCandidatesForCurrentRun(): OffsetCandidate[] {
   )
     return []
 
-  return Object.keys(protocolData.labware).reduce<OffsetCandidate[]>(
-    (acc: OffsetCandidate[], labwareId: string) => {
+  //  @ts-expect-error
+  return protocolData.labware.reduce<OffsetCandidate[]>(
+    //  @ts-expect-error
+    (acc: OffsetCandidate[], item) => {
       const location = getLabwareOffsetLocation(
-        labwareId,
+        item.id,
         protocolData.commands,
         protocolData.modules
       )
       const definition = getLabwareDefinition(
-        labwareId,
+        item.id,
         protocolData.labware,
         protocolData.labwareDefinitions
       )
@@ -81,7 +83,8 @@ function getLabwareDefinition(
   labwareDefinitions: ProtocolFile<{}>['labwareDefinitions']
 ): ProtocolFile<{}>['labwareDefinitions'][string] {
   //  @ts-expect-error: will be an error until we remove the schemaV6Adapter
-  const labwareDefinitionId = labware[labwareId].definitionUri
+  const labwareDefinitionId = labware.find(item => item.id === labwareId)
+    .definitionUri
   if (labwareDefinitionId == null) {
     throw new Error(
       'expected to be able to find labware definition id for labware, but could not'

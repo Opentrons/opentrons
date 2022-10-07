@@ -31,7 +31,8 @@ export const StepDetailText = (
   ] = React.useState<boolean>(false)
   if (protocolData == null) return null
   //   @ts-expect-error: when we remove schemav6Adapter, defintiionUri will be correct
-  const labwareDefId = protocolData.labware[labwareId].definitionUri
+  const labwareDefId = protocolData.labware.find(item => item.id === labwareId)
+    .definitionUri
   const labwareDef = protocolData.labwareDefinitions[labwareDefId]
   const { displayName } = labwareDef.metadata
   const { isTiprack } = labwareDef.parameters

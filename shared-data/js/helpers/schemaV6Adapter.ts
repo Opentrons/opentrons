@@ -12,7 +12,6 @@ import type {
 // This adapter exists to resolve the interface mismatch between the PE analysis response
 // and the protocol schema v6 interface. Much of this logic should be deleted once we resolve
 // these discrepencies on the server side
-const TRASH_ID = 'fixedTrash'
 
 /**
  * @deprecated No longer necessary, do not use
@@ -22,31 +21,29 @@ export const schemaV6Adapter = (
 ): ProtocolAnalysisFile<{}> | null => {
   if (protocolAnalysis != null && protocolAnalysis.status === 'completed') {
     const labware: {
-      [labwareId: string]: {
-        definitionUri: string
-        displayName?: string
-      }
-    } = protocolAnalysis.labware.reduce((acc, labware) => {
+      id: string
+      loadName: string
+      definitionUri: string
+      displayName?: string
+    }[] = protocolAnalysis.labware.map(labware => {
       const labwareId = labware.id
-      if (labwareId === TRASH_ID) {
-        return { ...acc }
-      }
+      //  TODO(jr, 10/6/22): this logic can be removed when protocol analysis includes displayName
       const loadCommand: LoadLabwareRunTimeCommand | null =
         protocolAnalysis.commands.find(
           (command: RunTimeCommand): command is LoadLabwareRunTimeCommand =>
             command.commandType === 'loadLabware' &&
             command.result?.labwareId === labwareId
         ) ?? null
-      const displayName: string | null = loadCommand?.params.displayName ?? null
+      const displayName: string | undefined =
+        loadCommand?.params.displayName ?? undefined
 
       return {
-        ...acc,
-        [labwareId]: {
-          definitionUri: labware.definitionUri,
-          displayName: displayName,
-        },
+        id: labwareId,
+        loadName: labware.loadName,
+        definitionUri: labware.definitionUri,
+        displayName: displayName,
       }
-    }, {})
+    })
 
     const labwareDefinitions: {
       [definitionUri: string]: LabwareDefinition2

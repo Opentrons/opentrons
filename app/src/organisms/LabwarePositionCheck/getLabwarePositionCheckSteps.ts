@@ -10,6 +10,8 @@ import type {
 } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { LabwarePositionCheckStep } from './types'
 
+const TRASH_ID = 'fixedTrash'
+
 export const getLabwarePositionCheckSteps = (
   protocolData: ProtocolAnalysisFile
 ): LabwarePositionCheckStep[] => {
@@ -29,16 +31,21 @@ export const getLabwarePositionCheckSteps = (
     const pipetteNames = values(pipettes).map(({ pipetteName }) => pipetteName)
     const labware = omitBy(
       protocolData.labware,
-      (labware, id) =>
-        //  @ts-expect-error: will be an error until we remove the schemaV6Adapter
-        protocolData.labwareDefinitions[labware.definitionUri]?.parameters
+      item =>
+        //  @ts-expect-error
+        (protocolData.labwareDefinitions[item.definitionUri]?.parameters
           .isTiprack &&
-        !protocolData.commands.some(
-          command =>
-            command.commandType === 'pickUpTip' &&
-            command.params.labwareId === id
-        )
+          !protocolData.commands.some(
+            command =>
+              command.commandType === 'pickUpTip' &&
+              //  @ts-expect-error
+              command.params.labwareId === item.definitionUri
+          )) ||
+        //  @ts-expect-error
+        item.id === TRASH_ID
     )
+
+    console.log(labware)
     const modules: ProtocolAnalysisFile['modules'] = protocolData.modules
     const labwareDefinitions = protocolData.labwareDefinitions
     const commands: RunTimeCommand[] = protocolData.commands
