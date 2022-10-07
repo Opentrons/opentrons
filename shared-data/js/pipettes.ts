@@ -72,3 +72,18 @@ export function isOT3Pipette(pipetteName: PipetteName): boolean {
     getPipetteNameSpecs(pipetteName)?.displayCategory === 'GEN3'
   )
 }
+
+export const getIncompatiblePipetteNames = (
+  currentPipette: PipetteName
+): string[] => {
+  if (isOT3Pipette(currentPipette)) {
+    return getAllPipetteNames().filter(pipette => !isOT3Pipette(pipette))
+  } else if (
+    getPipetteNameSpecs(currentPipette)?.displayCategory === 'GEN1' ||
+    getPipetteNameSpecs(currentPipette)?.displayCategory === 'GEN2'
+  ) {
+    return getAllPipetteNames().filter(pipette => isOT3Pipette(pipette))
+  } else {
+    return []
+  }
+}
