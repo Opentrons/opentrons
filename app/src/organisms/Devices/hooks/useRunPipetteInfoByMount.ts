@@ -81,7 +81,7 @@ export function useRunPipetteInfoByMount(
             //  @ts-expect-error: will be an error until we remove the schemaV6Adapter
             const tipRack = labware.find(
               //  @ts-expect-error: will be an error until we remove the schemaV6Adapter
-              index => index.id === command.params?.labwareId
+              item => item.id === command.params?.labwareId
             )
             const tipRackDefinition = labwareDefinitions[tipRack.definitionUri]
 
