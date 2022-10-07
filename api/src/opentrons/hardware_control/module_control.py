@@ -21,18 +21,20 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 # All names joined with alternators in a non-capturing group (just so the alternation works)
-_MODULE_NAME_SUBRE = r'(?:' + r"|".join(modules.MODULE_HW_BY_NAME.keys()) + r')'
+_MODULE_NAME_SUBRE = r"(?:" + r"|".join(modules.MODULE_HW_BY_NAME.keys()) + r")"
 # group that requires a module name (non-capturing) and a number (non-zero if more than one of the same
 # module is connected) and bundles the whole thing into a named capture
-_MODULE_SYMLINK_NAME_SUBRE = r'(?P<symlink_name>' + _MODULE_NAME_SUBRE + '\d+)'
+_MODULE_SYMLINK_NAME_SUBRE = r"(?P<symlink_name>" + _MODULE_NAME_SUBRE + r"\d+)"
 
 # when connecting a module, regardless of what udev rules exist the kernel + udev conspire
 # to create a "tmpnode", a dev node with the guaranteed-unique name "NAME.tmp-cMAJ:MIN". this
 # device only exists until the rest of the nodes and symlinks are established, and cannot be
 # used after udev finishes processing. we'll pick it up from inotify, but by the time we try
 # to open it it'll be gone and we'll error - so ignore it.
-_MODULE_IGNORE_TMPNODE_SUBRE = r'(?!.tmp)'
-MODULE_PORT_REGEX = re.compile(_MODULE_SYMLINK_NAME_SUBRE + _MODULE_IGNORE_TMPNODE_SUBRE, re.I)
+_MODULE_IGNORE_TMPNODE_SUBRE = r"(?!.tmp)"
+MODULE_PORT_REGEX = re.compile(
+    _MODULE_SYMLINK_NAME_SUBRE + _MODULE_IGNORE_TMPNODE_SUBRE, re.I
+)
 
 
 class AttachedModulesControl:
@@ -239,7 +241,7 @@ class AttachedModulesControl:
         """
         match = MODULE_PORT_REGEX.search(port)
         if match:
-            name = match.group('symlink_name').lower()
+            name = match.group("symlink_name").lower()
             if name not in modules.MODULE_HW_BY_NAME:
                 log.warning(f"Unexpected module connected: {name} on {port}")
                 return None
