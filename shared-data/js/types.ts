@@ -277,7 +277,7 @@ export interface DeckDefinition {
   robot: DeckRobot
   locations: DeckLocations
   metadata: DeckMetadata
-  layers: Record<string, DeckLayer>
+  layers: INode[]
 }
 
 export interface ModuleDimensions {

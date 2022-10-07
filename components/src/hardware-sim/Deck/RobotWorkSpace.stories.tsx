@@ -3,10 +3,20 @@ import { RobotWorkSpace } from './RobotWorkSpace'
 import { RobotCoordsForeignDiv, Module } from '@opentrons/components'
 import { getModuleDef2 } from '@opentrons/shared-data'
 import { getDeckDefinitions } from './getDeckDefinitions'
+import type { DeckLayer } from '@opentrons/shared-data'
 
 import type { Story, Meta } from '@storybook/react'
 
 const allDeckDefs = getDeckDefinitions()
+
+const getLayerIds = (layers: DeckLayer[]): string[] => {
+  return layers.reduce<string[]>((acc, layer) => {
+    if (layer.attributes.id) {
+      return [...acc, layer.attributes.id]
+    }
+    return []
+  }, [])
+}
 
 export default {
   title: 'Library/Molecules/Simulation/Deck',
@@ -19,7 +29,10 @@ export default {
       defaultValue: 'ot2_standard',
     },
     deckLayerBlocklist: {
-      options: Object.keys(allDeckDefs.ot2_standard.layers),
+      options: [
+        ...getLayerIds(allDeckDefs.ot2_standard.layers),
+        ...getLayerIds(allDeckDefs.ot3_standard.layers),
+      ],
       control: {
         type: 'check',
       },
