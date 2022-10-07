@@ -68,6 +68,7 @@ all: package
 # must be wrapped in yarn run otherwise `prebuild-install` will fail silently
 # due to how `electron-rebuild` calls `prebuild-install`
 setup:
+    yarn patch-package github:jkleinsc/nan#remove_accessor_signature
 	yarn electron-rebuild
 
 .PHONY: clean
