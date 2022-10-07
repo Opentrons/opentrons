@@ -136,11 +136,39 @@ describe('getLabwarePositionCheckSteps', () => {
 
     const protocolWithUnusedTipRack = {
       ...protocolWithOnePipette,
-      labware: {
-        ...protocolWithOnePipette.labware,
-        id: 'unusedTipRackId',
-        definitionUri: 'bogusDefinitionUri',
-      },
+      labware: [
+        {
+          id: 'fixedTrash',
+          loadName: 'opentrons_1_trash_1100ml_fixed',
+          displayName: 'Trash',
+          definitionUri: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
+        },
+        {
+          id:
+            '50d3ebb0-0042-11ec-8258-f7ffdf5ad45a:opentrons/opentrons_96_tiprack_300ul/1',
+          loadName: 'opentrons_96_tiprack_300ul',
+          displayName: 'Opentrons 96 Tip Rack 300 µL',
+          definitionUri: 'opentrons/opentrons_96_tiprack_300ul/1',
+        },
+        {
+          id:
+            '9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1',
+          loadName: 'nest_12_reservoir_15ml',
+          displayName: 'NEST 12 Well Reservoir 15 mL',
+          definitionUri: 'opentrons/nest_12_reservoir_15ml/1',
+        },
+        {
+          id: 'e24818a0-0042-11ec-8258-f7ffdf5ad45a',
+          loadName: 'opentrons_96_tiprack_300ul',
+          displayName: 'Opentrons 96 Tip Rack 300 µL (1)',
+          definitionUri: 'opentrons/opentrons_96_tiprack_300ul/1',
+        },
+        {
+          id: 'unusedTipRackId',
+          definitionUri: 'bogusDefinitionUri',
+          loadName: 'someLoadname',
+        },
+      ],
       labwareDefinitions: {
         ...protocolWithOnePipette.labwareDefinitions,
         bogusDefinitionId: { parameters: { isTiprack: true } } as any,

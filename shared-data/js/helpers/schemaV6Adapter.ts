@@ -20,12 +20,12 @@ export const schemaV6Adapter = (
   protocolAnalysis: PendingProtocolAnalysis | CompletedProtocolAnalysis
 ): ProtocolAnalysisFile<{}> | null => {
   if (protocolAnalysis != null && protocolAnalysis.status === 'completed') {
-    const labware: {
+    const labware: Array<{
       id: string
       loadName: string
       definitionUri: string
       displayName?: string
-    }[] = protocolAnalysis.labware.map(labware => {
+    }> = protocolAnalysis.labware.map(labware => {
       const labwareId = labware.id
       //  TODO(jr, 10/6/22): this logic can be removed when protocol analysis includes displayName
       const loadCommand: LoadLabwareRunTimeCommand | null =

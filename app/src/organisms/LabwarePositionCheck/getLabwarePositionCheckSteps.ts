@@ -10,8 +10,6 @@ import type {
 } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { LabwarePositionCheckStep } from './types'
 
-const TRASH_ID = 'fixedTrash'
-
 export const getLabwarePositionCheckSteps = (
   protocolData: ProtocolAnalysisFile
 ): LabwarePositionCheckStep[] => {
@@ -28,24 +26,22 @@ export const getLabwarePositionCheckSteps = (
         )
     )
     //  @ts-expect-error: pipetteName should be name until we remove the schemaV6Adapter
-    const pipetteNames = values(pipettes).map(({ pipetteName }) => pipetteName)
-    const labware = omitBy(
-      protocolData.labware,
-      item =>
-        //  @ts-expect-error
-        (protocolData.labwareDefinitions[item.definitionUri]?.parameters
-          .isTiprack &&
+    const pipetteNames = pipettes.map(({ pipetteName }) => pipetteName)
+    const labware = Object.values(
+      omitBy(
+        protocolData.labware,
+        labware =>
+          //  @ts-expect-error
+          protocolData.labwareDefinitions[labware.definitionUri]?.parameters
+            .isTiprack &&
           !protocolData.commands.some(
             command =>
               command.commandType === 'pickUpTip' &&
               //  @ts-expect-error
-              command.params.labwareId === item.definitionUri
-          )) ||
-        //  @ts-expect-error
-        item.id === TRASH_ID
+              command.params.labwareId === labware.id
+          )
+      )
     )
-
-    console.log(labware)
     const modules: ProtocolAnalysisFile['modules'] = protocolData.modules
     const labwareDefinitions = protocolData.labwareDefinitions
     const commands: RunTimeCommand[] = protocolData.commands
@@ -53,6 +49,7 @@ export const getLabwarePositionCheckSteps = (
     const pipetteWorkflow = getPipetteWorkflow({
       pipetteNames,
       primaryPipetteId,
+      //  @ts-expect-error
       labware,
       labwareDefinitions,
       commands,
@@ -60,6 +57,7 @@ export const getLabwarePositionCheckSteps = (
     if (pipetteWorkflow === 1) {
       return getOnePipettePositionCheckSteps({
         primaryPipetteId,
+        //  @ts-expect-error
         labware,
         labwareDefinitions,
         modules,
@@ -75,6 +73,7 @@ export const getLabwarePositionCheckSteps = (
       return getTwoPipettePositionCheckSteps({
         primaryPipetteId,
         secondaryPipetteId,
+        //  @ts-expect-error
         labware,
         labwareDefinitions,
         modules,

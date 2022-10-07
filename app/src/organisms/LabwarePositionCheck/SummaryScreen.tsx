@@ -51,7 +51,8 @@ export const SummaryScreen = (props: {
   const { setIsShowingLPCSuccessToast } = useLPCSuccessToast()
 
   if (runId == null || introInfo == null || protocolData == null) return null
-  const labwareIds = Object.keys(protocolData.labware)
+  //  @ts-expect-error
+  const labwareIds = protocolData.labware.map(item => item.id)
   const { sections, primaryPipetteMount, secondaryPipetteMount } = introInfo
 
   const applyLabwareOffsets = (): void => {
