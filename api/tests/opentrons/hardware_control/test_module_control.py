@@ -154,6 +154,11 @@ async def test_register_modules_sort(
             "ot_module_tempdeck1000",
             ModuleAtPort(port="/dev/ot_module_tempdeck1000", name="tempdeck"),
         ),
+        (
+            "/dev/ot_module_tempdeck999",
+            ModuleAtPort(port="/dev/ot_module_tempdeck999", name="tempdeck"),
+        ),
+        ("/dev/ot_module_heatershaker0.tmp-c166:0", None),
     ],
 )
 def test_port_filtering(portname: str, result: Optional[ModuleAtPort]) -> None:
