@@ -89,6 +89,11 @@ const TIP_LENGTH_CALIBRATIONS = [
 const tiprack10ul = _tiprack10ul as LabwareDefinition2
 const modifiedSimpleV6Protocol = ({
   ..._uncastedModifiedSimpleV6Protocol,
+  pipettes: {
+    pipetteId: {
+      pipetteName: 'p10_single',
+    },
+  },
   labware: {
     trashId: {
       displayName: 'Trash',

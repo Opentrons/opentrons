@@ -38,7 +38,7 @@ export function parseInitialPipetteNamesByMount(
 }
 
 export interface PipetteNamesById {
-  [pipetteId: string]: { name: PipetteName }
+  [pipetteId: string]: { pipetteName: PipetteName }
 }
 
 export function parseInitialPipetteNamesById(
@@ -57,7 +57,7 @@ export function parseInitialPipetteNamesById(
     rightPipette != null
       ? {
           [rightPipette.result.pipetteId]: {
-            name: rightPipette.params.pipetteName,
+            pipetteName: rightPipette.params.pipetteName,
           },
         }
       : {}
@@ -65,7 +65,7 @@ export function parseInitialPipetteNamesById(
     leftPipette != null
       ? {
           [leftPipette.result.pipetteId]: {
-            name: leftPipette.params.pipetteName,
+            pipetteName: leftPipette.params.pipetteName,
           },
         }
       : {}
@@ -152,7 +152,7 @@ export function parseInitialLoadedLabwareByModuleId(
 
 export interface LoadedLabwareById {
   [labwareId: string]: {
-    definitionId: string
+    definitionUri: string
     displayName?: string
   }
 }
@@ -179,12 +179,12 @@ export function parseInitialLoadedLabwareById(
         version,
         parameters: { loadName },
       } = command.result.definition
-      const definitionId = `${namespace}/${loadName}/${version}_id`
+      const definitionUri = `${namespace}/${loadName}/${version}`
 
       return {
         ...acc,
         [labwareId]: {
-          definitionId,
+          definitionUri,
           displayName: command.params.displayName,
         },
       }
@@ -194,7 +194,7 @@ export function parseInitialLoadedLabwareById(
 }
 
 export interface LoadedLabwareDefinitionsById {
-  [definitionId: string]: LabwareDefinition2
+  [definitionUri: string]: LabwareDefinition2
 }
 export function parseInitialLoadedLabwareDefinitionsById(
   commands: RunTimeCommand[]
@@ -215,11 +215,11 @@ export function parseInitialLoadedLabwareDefinitionsById(
       }
       const labwareDef: LabwareDefinition2 = command.result?.definition
       const labwareId = command.result?.labwareId ?? ''
-      const definitionId = labware[labwareId]?.definitionId
+      const definitionUri = labware[labwareId]?.definitionUri
 
       return {
         ...acc,
-        [definitionId]: labwareDef,
+        [definitionUri]: labwareDef,
       }
     },
     {}
