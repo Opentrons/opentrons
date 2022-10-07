@@ -17,7 +17,7 @@ scp -i $(2) $(3) "$(4)" root@$(1):/data/$(notdir $(4))
 ssh -i $(2) $(3) root@$(1) \
 "function cleanup () { rm -f /data/$(notdir $(4)) && mount -o remount,ro / ; } ;\
 mount -o remount,rw / &&\
-cd /usr/lib/python3.7/site-packages &&\
+cd /usr/lib/python3.10/site-packages &&\
 unzip -o /data/$(notdir $(4)) && cleanup || cleanup"
 endef
 
