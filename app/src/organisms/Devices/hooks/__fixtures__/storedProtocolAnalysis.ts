@@ -11,7 +11,7 @@ import type { StoredProtocolAnalysis } from '../useStoredProtocolAnalysis'
 
 export const LABWARE_BY_ID: LoadedLabwareById = {
   'labware-0': {
-    definitionId: 'fakeLabwareDefinitionId',
+    definitionUri: 'fakeLabwareDefinitionUri',
     displayName: 'a fake labware',
   },
 }
@@ -22,7 +22,7 @@ export const MODULE_MODELS_BY_ID: ModuleModelsById = {
   'module-0': { model: 'thermocyclerModuleV1' },
 }
 export const PIPETTE_NAMES_BY_ID: PipetteNamesById = {
-  'pipette-0': { name: 'p10_single' },
+  'pipette-0': { pipetteName: 'p10_single' },
 }
 
 export const STORED_PROTOCOL_ANALYSIS = {

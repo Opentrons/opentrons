@@ -51,6 +51,15 @@ const mockParseInitialPipetteNamesById = parseInitialPipetteNamesById as jest.Mo
 >
 const store: Store<any> = createStore(jest.fn(), {})
 
+const modifiedStoredProtocolData = {
+  ...storedProtocolData,
+  mostRecentAnalysis: {
+    commands: storedProtocolData?.mostRecentAnalysis?.commands,
+    liquids: storedProtocolData?.mostRecentAnalysis?.liquids,
+    errors: storedProtocolData?.mostRecentAnalysis?.errors,
+  },
+}
+
 const RUN_ID = 'the_run_id'
 const PROTOCOL_ID = 'the_protocol_id'
 const PROTOCOL_KEY = 'the_protocol_key'
@@ -133,7 +142,8 @@ describe('useStoredProtocolAnalysis hook', () => {
       } as UseQueryResult<Protocol>)
     when(mockGetStoredProtocol)
       .calledWith(undefined as any, PROTOCOL_KEY)
-      .mockReturnValue(storedProtocolData)
+      // @ts-expect-error
+      .mockReturnValue(modifiedStoredProtocolData)
 
     const { result } = renderHook(() => useStoredProtocolAnalysis(RUN_ID), {
       wrapper,
