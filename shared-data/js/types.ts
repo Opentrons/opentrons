@@ -15,6 +15,7 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   GEN1,
   GEN2,
+  GEN3,
   LEFT,
   RIGHT,
 } from './constants'
@@ -336,7 +337,7 @@ export type ModuleOrientation = 'left' | 'right'
 
 export type PipetteChannels = 1 | 8
 
-export type PipetteDisplayCategory = typeof GEN1 | typeof GEN2
+export type PipetteDisplayCategory = typeof GEN1 | typeof GEN2 | typeof GEN3
 
 export type PipetteMount = typeof LEFT | typeof RIGHT
 
