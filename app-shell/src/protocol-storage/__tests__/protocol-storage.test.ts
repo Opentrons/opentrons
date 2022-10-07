@@ -23,10 +23,7 @@ describe('protocol storage directory utilities', () => {
   })
 
   afterEach(() => {
-    return Promise.all([
-      fs.rmdir(protocolsDir, { recursive: true }),
-      fs.rm(mockAnalysisFilePath, { force: true }),
-    ])
+    return Promise.all([fs.rm(mockAnalysisFilePath, { force: true })])
   })
   afterAll(() => {
     jest.resetAllMocks()
