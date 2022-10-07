@@ -7,7 +7,8 @@
   "main": "lib/main.js",
   "types": "lib/main.d.ts",
   "scripts": {
-    "start": "make dev"
+    "start": "make dev",
+    "postinstall": "patch-package"
   },
   "repository": {
     "type": "git",
