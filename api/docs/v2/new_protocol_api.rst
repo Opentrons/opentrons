@@ -7,13 +7,13 @@ API Version 2 Reference
 
 Protocols and Instruments
 -------------------------
-.. module:: opentrons.protocol_api.contexts
+.. module:: opentrons.protocol_api
 
-.. autoclass:: opentrons.protocol_api.contexts.ProtocolContext
+.. autoclass:: opentrons.protocol_api.ProtocolContext
    :members:
    :exclude-members: location_cache, _hw_manager
 
-.. autoclass:: opentrons.protocol_api.contexts.InstrumentContext
+.. autoclass:: opentrons.protocol_api.InstrumentContext
    :members:
 
 .. _protocol-api-labware:
@@ -28,21 +28,21 @@ Labware and Wells
 
 Modules
 -------
-.. autoclass:: opentrons.protocol_api.contexts.TemperatureModuleContext
+.. autoclass:: opentrons.protocol_api.TemperatureModuleContext
    :members:
    :exclude-members: start_set_temperature
    :inherited-members:
 
-.. autoclass:: opentrons.protocol_api.contexts.MagneticModuleContext
+.. autoclass:: opentrons.protocol_api.MagneticModuleContext
    :members:
    :inherited-members:
 
-.. autoclass:: opentrons.protocol_api.contexts.ThermocyclerContext
+.. autoclass:: opentrons.protocol_api.ThermocyclerContext
    :members:
    :exclude-members: total_step_count, current_cycle_index, total_cycle_count, hold_time, ramp_rate, current_step_index, flag_unsafe_move
    :inherited-members:
    
-.. autoclass:: opentrons.protocol_api.contexts.HeaterShakerContext
+.. autoclass:: opentrons.protocol_api.HeaterShakerContext
    :members:
    :inherited-members:
 

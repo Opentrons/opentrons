@@ -28,7 +28,11 @@ export const ThermocyclerModuleData = (
 
   const getStatusLabelProps = (
     status: string | null
-  ): { backgroundColor: string; iconColor: string; textColor: string } => {
+  ): {
+    backgroundColor: string
+    iconColor: string
+    textColor: string
+  } => {
     const StatusLabelProps = {
       backgroundColor: COLORS.medGreyEnabled,
       iconColor: COLORS.darkGreyEnabled,
@@ -37,8 +41,6 @@ export const ThermocyclerModuleData = (
     }
 
     switch (status) {
-      case 'closed':
-      case 'open':
       case 'idle': {
         StatusLabelProps.backgroundColor = COLORS.medGreyEnabled
         StatusLabelProps.iconColor = COLORS.darkGreyEnabled
@@ -53,6 +55,7 @@ export const ThermocyclerModuleData = (
       case 'cooling':
       case 'heating': {
         StatusLabelProps.backgroundColor = COLORS.medBlue
+        StatusLabelProps.iconColor = COLORS.darkGreyEnabled
         StatusLabelProps.pulse = true
         break
       }
@@ -85,7 +88,9 @@ export const ThermocyclerModuleData = (
           <Box marginRight={SPACING.spacing2}>
             <StatusLabel
               status={data.lidStatus}
-              {...getStatusLabelProps(data.lidStatus)}
+              backgroundColor={COLORS.medGreyEnabled}
+              textColor={COLORS.darkBlackEnabled}
+              showIcon={false}
               key="lidStatus"
               id="lidStatus"
             />

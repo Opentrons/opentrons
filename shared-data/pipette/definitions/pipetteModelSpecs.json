@@ -5749,21 +5749,21 @@
         "type": "float"
       },
       "bottom": {
-        "value": 59.5,
+        "value": 71.5,
         "min": 10,
         "max": 65,
         "type": "float",
         "units": "mm"
       },
       "blowout": {
-        "value": 64.5,
+        "value": 76.5,
         "min": 20,
         "max": 75,
         "units": "mm",
         "type": "float"
       },
       "dropTip": {
-        "value": 74.5,
+        "value": 90.5,
         "min": 30,
         "max": 80,
         "units": "mm",
@@ -6111,21 +6111,21 @@
         "type": "float"
       },
       "bottom": {
-        "value": 61,
+        "value": 71.5,
         "min": 55,
         "max": 80,
         "type": "float",
         "units": "mm"
       },
       "blowout": {
-        "value": 66,
+        "value": 76.5,
         "min": 60,
         "max": 85,
         "units": "mm",
         "type": "float"
       },
       "dropTip": {
-        "value": 80,
+        "value": 90.5,
         "min": 78,
         "max": 119,
         "units": "mm",
