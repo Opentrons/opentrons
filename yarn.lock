@@ -18483,7 +18483,7 @@ punycode@^2.1.0, punycode@^2.1.1:
 pupa@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/pupa/-/pupa-1.0.0.tgz#9a9568a5af7e657b8462a6e9d5328743560ceff6"
-  integrity sha1-mpVopa9+ZXuEYqbp1TKHQ1YM7/Y=
+  integrity sha512-WTQm0CKSL1kn+DQCuu970eBPGmhIcfDyDBa9cbgR/grZ2jLrQmLDHoqqAPWLTRlOHFUrBBmL7FQJBZALA+llQg==
 
 pupa@^2.0.1, pupa@^2.1.1:
   version "2.1.1"
@@ -22675,7 +22675,7 @@ untildify@^4.0.0:
 unused-filename@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/unused-filename/-/unused-filename-1.0.0.tgz#d340880f71ae2115ebaa1325bef05cc6684469c6"
-  integrity sha1-00CID3GuIRXrqhMlvvBcxmhEacY=
+  integrity sha512-CzxEtvTNfsydlKb30IeExGVcRAQv9CLgzoYmnQskceQTV/EZY4jTOrtUcUBlWnAfZdi1UmX1JO0hMKQTDcwCVw==
   dependencies:
     modify-filename "^1.1.0"
     path-exists "^3.0.0"
