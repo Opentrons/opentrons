@@ -7,7 +7,8 @@
   "main": "lib/main.js",
   "types": "lib/main.d.ts",
   "scripts": {
-    "start": "make dev"
+    "start": "make dev",
+    "postinstall": "patch-package"
   },
   "repository": {
     "type": "git",
@@ -30,7 +31,9 @@
   "devDependencies": {
     "@opentrons/app": "6.1.0",
     "@opentrons/discovery-client": "6.1.0",
-    "@opentrons/shared-data": "6.1.0"
+    "@opentrons/shared-data": "6.1.0",
+    "patch-package": "^6.4.7",
+    "postinstall-postinstall": "^2.1.0"
   },
   "dependencies": {
     "@thi.ng/paths": "1.6.5",
