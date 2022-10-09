@@ -61,7 +61,7 @@ class PipetteNameType(str, Enum):
 # a huge number of them
 PipetteModel = NewType("PipetteModel", str)
 
-DisplayCategory = Literal["GEN1", "GEN2"]
+DisplayCategory = Literal["GEN1", "GEN2", "GEN3"]
 
 # todo(mm, 2022-03-18):
 # The JSON schema defines this as any string, not as an enum of string literals.

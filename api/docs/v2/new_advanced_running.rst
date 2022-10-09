@@ -24,7 +24,7 @@ Protocol Structure
 
 Jupyter Notebook is structured around `cells`: discrete chunks of code that can be run individually. This is nearly the opposite of Opentrons protocols, which bundle all commands into a single ``run`` function. Therefore, to take full advantage of Jupyter Notebook, you have to restructure your protocol. 
 
-Rather than writing a  ``run`` function and embedding commands within it, start your notebook by importing ``opentrons.execute`` and calling :py:meth:`opentrons.execute.get_protocol_api`. This function also replaces the ``metadata`` block of a standalone protocol by taking the minimum :ref:`API version <v2-versioning>` as its argument. Then you can call :py:class:`~opentrons.protocol_api.contexts.ProtocolContext` methods in subsequent lines or cells:
+Rather than writing a  ``run`` function and embedding commands within it, start your notebook by importing ``opentrons.execute`` and calling :py:meth:`opentrons.execute.get_protocol_api`. This function also replaces the ``metadata`` block of a standalone protocol by taking the minimum :ref:`API version <v2-versioning>` as its argument. Then you can call :py:class:`~opentrons.protocol_api.ProtocolContext` methods in subsequent lines or cells:
 
 .. code-block:: python
     :substitutions:
@@ -33,7 +33,7 @@ Rather than writing a  ``run`` function and embedding commands within it, start 
     protocol = opentrons.execute.get_protocol_api('|apiLevel|')
     protocol.home()
 
-The first command you execute should always be :py:meth:`~opentrons.protocol_api.contexts.ProtocolContext.home`. If you try to execute other commands first, you will get a ``MustHomeError``. (When running protocols through the Opentrons App, the robot homes automatically.)
+The first command you execute should always be :py:meth:`~opentrons.protocol_api.ProtocolContext.home`. If you try to execute other commands first, you will get a ``MustHomeError``. (When running protocols through the Opentrons App, the robot homes automatically.)
 
 You should use the same :py:class:`.ProtocolContext` throughout your notebook, unless you need to start over from the beginning of your protocol logic. In that case, call :py:meth:`~opentrons.execute.get_protocol_api` again to get a new :py:class:`.ProtocolContext`.
 
@@ -62,7 +62,7 @@ Since a typical protocol only `defines` the ``run`` function but doesn't `call` 
 Using Custom Labware
 ++++++++++++++++++++
 
-If you have custom labware definitions you want to use with Jupyter, make a new directory called ``labware`` in Jupyter and put the definitions there. These definitions will be available when you call :py:meth:`~opentrons.protocol_api.contexts.ProtocolContext.load_labware`.
+If you have custom labware definitions you want to use with Jupyter, make a new directory called ``labware`` in Jupyter and put the definitions there. These definitions will be available when you call :py:meth:`~opentrons.protocol_api.ProtocolContext.load_labware`.
 
 Using Modules
 +++++++++++++
