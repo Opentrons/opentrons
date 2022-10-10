@@ -1,18 +1,14 @@
 """Opentrons helper methods."""
-from dataclasses import dataclass, replace as dataclasses_replace
-from enum import Enum
+from dataclasses import dataclass
 from subprocess import run
 from typing import List, Optional, Dict, Union, Type
 
 from opentrons.config.robot_configs import build_config_ot3, load_ot3 as load_ot3_config
 from opentrons.config.defaults_ot3 import DEFAULT_MAX_SPEED_DISCONTINUITY
-from opentrons.config.pipette_config import PipetteConfig
 from opentrons.hardware_control.api import API as OT2API
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.protocols import HardwareControlAPI
 from opentrons.hardware_control.thread_manager import ThreadManager
-
-from opentrons_shared_data.pipette import fuse_specs
 
 from .types import GantryLoad, PerPipetteAxisSettings, OT3Axis, OT3Mount, Point
 
@@ -211,35 +207,3 @@ def get_endstop_position_ot3(api: ThreadManagedHardwareAPI, mount: OT3Mount) -> 
         y=api.config.carriage_offset[1] + mount_offset[1],
         z=api.config.carriage_offset[2] + mount_offset[2],
     )
-
-
-class UlPerMmIndexP1000(Enum):
-    """Temporary indices for different pipetting functions on Gen3 P1000."""
-
-    T50 = 0
-    T200 = 1
-    T1000 = 2
-
-
-def switch_ul_per_mm_table(
-    cfg: PipetteConfig, ul_per_mm_index: UlPerMmIndexP1000
-) -> PipetteConfig:
-    """Duplicate a PipetteConfig object, while overwriting its ul_per_mm value."""
-    default_cfg = fuse_specs(cfg.model)
-    list_of_ul_per_mm = default_cfg["ulPerMm"]
-    total_available_tables = len(list_of_ul_per_mm)
-    assert 0 <= ul_per_mm_index.value < total_available_tables, (
-        f"Index ({ul_per_mm_index}) must be less than total number "
-        f"of available functions ({total_available_tables}) for pipette {cfg.model}"
-    )
-    ul_per_mm = list_of_ul_per_mm[ul_per_mm_index.value]
-    return dataclasses_replace(cfg, ul_per_mm=ul_per_mm)
-
-
-def overwrite_attached_pipette_ul_per_mm(
-    api: ThreadManagedHardwareAPI, mount: OT3Mount, ul_per_mm_index: UlPerMmIndexP1000
-) -> None:
-    """Switch the attached Pipette's ul_per_mm table, per table index."""
-    old_cfg = api._pipette_handler._attached_instruments[mount]._config
-    new_cfg = switch_ul_per_mm_table(old_cfg, ul_per_mm_index)
-    api._pipette_handler._attached_instruments[mount]._config = new_cfg
