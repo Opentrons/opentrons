@@ -13,6 +13,7 @@ from ..types import (
     WellOffset,
     DeckSlotLocation,
     ModuleLocation,
+    OFF_DECK_LOCATION,
 )
 from .labware import LabwareView
 from .modules import ModuleView
@@ -80,7 +81,7 @@ class GeometryView:
         elif isinstance(labware_data.location, ModuleLocation):
             module_id = labware_data.location.moduleId
             slot_name = self._modules.get_location(module_id).slotName
-        else:
+        elif labware_data.location == OFF_DECK_LOCATION:
             # Labware is off-deck
             raise errors.LabwareNotOnDeckError(
                 f"Labware {labware_id} does not have a parent associated with it"
@@ -283,8 +284,7 @@ class GeometryView:
         elif isinstance(labware.location, ModuleLocation):
             module_id = labware.location.moduleId
             slot_name = self._modules.get_location(module_id).slotName
-        else:
-            # Labware is off-deck
+        elif labware.location == OFF_DECK_LOCATION:
             raise errors.LabwareNotOnDeckError(
                 f"Labware {labware_id} does not have a slot associated with it"
                 f" since it is no longer on the deck."

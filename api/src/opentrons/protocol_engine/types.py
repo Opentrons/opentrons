@@ -51,9 +51,10 @@ class ModuleLocation(BaseModel):
     )
 
 
-OffDeckLocationType = Literal["off-deck"]
+_OffDeckLocationType = Literal["off-deck"]
+OFF_DECK_LOCATION: _OffDeckLocationType = "off-deck"
 
-LabwareLocation = Union[DeckSlotLocation, ModuleLocation, OffDeckLocationType]
+LabwareLocation = Union[DeckSlotLocation, ModuleLocation, _OffDeckLocationType]
 """Union of all locations where it's legal to keep a labware."""
 
 
