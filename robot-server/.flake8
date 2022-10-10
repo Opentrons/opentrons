@@ -35,3 +35,7 @@ per-file-ignores =
     tests/service/*:ANN,D
     tests/conftest.py:ANN,D
     tests/test_util.py:ANN,D
+
+# Ignore Python Protocol API files that are used as opaque test input.
+extend-exclude =
+    tests/integration/persistence_snapshots/

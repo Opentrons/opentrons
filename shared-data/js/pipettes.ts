@@ -1,5 +1,6 @@
 import pipetteNameSpecs from '../pipette/definitions/pipetteNameSpecs.json'
 import pipetteModelSpecs from '../pipette/definitions/pipetteModelSpecs.json'
+import { OT3_PIPETTES } from './constants'
 
 import type { PipetteNameSpecs, PipetteModelSpecs } from './types'
 
@@ -63,4 +64,26 @@ function comparePipettes(sortBy: SortableProps[]) {
 
 export function shouldLevel(specs: PipetteNameSpecs): boolean {
   return specs.displayCategory === 'GEN2' && specs.channels === 8
+}
+
+export function isOT3Pipette(pipetteName: PipetteName): boolean {
+  return (
+    OT3_PIPETTES.includes(pipetteName) ||
+    getPipetteNameSpecs(pipetteName)?.displayCategory === 'GEN3'
+  )
+}
+
+export const getIncompatiblePipetteNames = (
+  currentPipette: PipetteName
+): string[] => {
+  if (isOT3Pipette(currentPipette)) {
+    return getAllPipetteNames().filter(pipette => !isOT3Pipette(pipette))
+  } else if (
+    getPipetteNameSpecs(currentPipette)?.displayCategory === 'GEN1' ||
+    getPipetteNameSpecs(currentPipette)?.displayCategory === 'GEN2'
+  ) {
+    return getAllPipetteNames().filter(pipette => isOT3Pipette(pipette))
+  } else {
+    return []
+  }
 }

@@ -475,6 +475,19 @@ def test_final_speed(
     assert find_final_speed(CONSTRAINTS, move, next_move) == expected
 
 
+def test_handle_rounding_error_when_calculating_block_final_speed() -> None:
+    """Avoid rounding errors."""
+    # these magic values below were found to create a NaN value for Block.final_speed
+    # because of rounding errors. This should not happen.
+    b = Block(
+        initial_speed=499.99999999999994,
+        acceleration=-3292.7694932142017,
+        distance=37.961964922719986,
+    )
+    assert b.final_speed == 0
+    assert b.time
+
+
 def test_blend_motion() -> None:
     """Motion should blend."""
     manager = MoveManager(CONSTRAINTS)

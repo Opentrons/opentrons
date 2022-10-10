@@ -11,6 +11,6 @@ export function useHistoricRunDetails(): RunData[] {
         .filter(run => !run.current)
         .sort(
           (a, b) =>
-            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         )
 }

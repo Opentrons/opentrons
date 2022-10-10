@@ -11,12 +11,12 @@ from contextlib import asynccontextmanager
 
 log = logging.getLogger(__name__)
 
-_dfu_transition_lock = ThreadedAsyncLock()
+_update_transition_lock = ThreadedAsyncLock()
 
 
 @asynccontextmanager
-async def protect_dfu_transition() -> AsyncGenerator[None, None]:
-    async with _dfu_transition_lock.lock():
+async def protect_update_transition() -> AsyncGenerator[None, None]:
+    async with _update_transition_lock.lock():
         yield
 
 
@@ -29,18 +29,19 @@ async def update_firmware(
 
     raises an UpdateError with the reason for the failure.
     """
-    flash_port_or_dfu_serial = await module.prep_for_update()
-    kwargs: Dict[str, Any] = {
-        "stdout": asyncio.subprocess.PIPE,
-        "stderr": asyncio.subprocess.PIPE,
-        "loop": loop,
-    }
-    successful, res = await module.bootloader()(
-        flash_port_or_dfu_serial, str(firmware_file), kwargs
-    )
-    if not successful:
-        log.info(f"Bootloader reponse: {res}")
-        raise UpdateError(res)
+    async with protect_update_transition():
+        flash_port_or_dfu_serial = await module.prep_for_update()
+        kwargs: Dict[str, Any] = {
+            "stdout": asyncio.subprocess.PIPE,
+            "stderr": asyncio.subprocess.PIPE,
+            "loop": loop,
+        }
+        successful, res = await module.bootloader()(
+            flash_port_or_dfu_serial, str(firmware_file), kwargs
+        )
+        if not successful:
+            log.info(f"Bootloader reponse: {res}")
+            raise UpdateError(res)
 
 
 async def find_bootloader_port() -> str:
@@ -211,13 +212,20 @@ async def upload_via_dfu(
 ) -> Tuple[bool, str]:
     """Run firmware upload command for DFU.
 
+    Unlike other firmware upload methods, this one doesn't take a `port` argument since
+    the module isn't recognized as a cdc device in dfu mode and hence doesn't get
+    a port. The firmware upload utility, dfu-util, looks for the specific module
+    by searching for available dfu devices. Since we check beforehand that only one
+    dfu device is available during the upload process, this check is sufficient for us.
+
+    In the future, if we want to make sure that the dfu device available is in fact
+    the one we seek, then we can ask dfu-util to check for available dfu devices with
+    a specific serial number (unrelated to Opentrons' module serial numbers).
+    Hence, this method takes a `dfu_serial` argument instead.
+
     Returns tuple of success boolean and message from bootloader
     """
     log.info("Starting firmware upload via dfu util")
-
-    # We don't specify a port since the dfu device doesn't get one &
-    # dfu-util doesn't need it either so I've replaced the 'port' arg with an arg to
-    # fetch dfu device serial. I haven't used it in the below command though.
     dfu_args = [
         "dfu-util",
         "-a 0",

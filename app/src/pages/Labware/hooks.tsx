@@ -1,11 +1,11 @@
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
-  getCustomLabware,
   getAddLabwareFailure,
   clearAddCustomLabwareFailure,
   getAddNewLabwareName,
   clearNewLabwareName,
+  getValidCustomLabware,
 } from '../../redux/custom-labware'
 import { getAllDefinitions } from './helpers/definitions'
 import type { Dispatch } from '../../redux/types'
@@ -26,7 +26,7 @@ export function useAllLabware(
   const fullLabwareList: LabwareDefAndDate[] = []
   const labwareDefinitions = getAllDefinitions()
   labwareDefinitions.forEach(def => fullLabwareList.push({ definition: def }))
-  const customLabwareList = useSelector(getCustomLabware)
+  const customLabwareList = useSelector(getValidCustomLabware)
   customLabwareList.forEach(customLabware =>
     'definition' in customLabware
       ? fullLabwareList.push({

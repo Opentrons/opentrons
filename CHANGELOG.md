@@ -3,6 +3,108 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.1.0](https://github.com/Opentrons/opentrons/compare/v6.0.1...v6.1.0) (2022-09-27)
+
+
+### Bug Fixes
+
+* **api:** allow aspirate/dispense at arbitrary locations ([#11352](https://github.com/Opentrons/opentrons/issues/11352)) ([d9107d2](https://github.com/Opentrons/opentrons/commit/d9107d25cb366f49454a6e35a90205ab354d8acf)), closes [#11302](https://github.com/Opentrons/opentrons/issues/11302)
+* **api:** be prepared for aspirate after pick-up-tip ([#10914](https://github.com/Opentrons/opentrons/issues/10914)) ([cf705bc](https://github.com/Opentrons/opentrons/commit/cf705bc8638b7e6d23272eb7b025512812131936))
+* **api:** do not acquire gpio in ot3simulator ([#11251](https://github.com/Opentrons/opentrons/issues/11251)) ([81f74a6](https://github.com/Opentrons/opentrons/commit/81f74a65026ea4c38d48a2e5327ad4bc9b1313b3))
+* **api:** Do not pause in the middle of a Thermocycler profile ([#10963](https://github.com/Opentrons/opentrons/issues/10963)) ([64ce32d](https://github.com/Opentrons/opentrons/commit/64ce32de887c9bee4a903e5e2a8538ab1e4e6b7b))
+* **api:** ensure pipette cannot move down from origin to travel height ([#11426](https://github.com/Opentrons/opentrons/issues/11426)) ([c0905f6](https://github.com/Opentrons/opentrons/commit/c0905f6b932a91b1779b826a0a7c5c0dedfa6584))
+* **api:** if needed, home both pipettes with InstrumentContext.home ([#11072](https://github.com/Opentrons/opentrons/issues/11072)) ([0115066](https://github.com/Opentrons/opentrons/commit/0115066c807eb93b256d936ccff1bda155e49968)), closes [#7499](https://github.com/Opentrons/opentrons/issues/7499)
+* **api:** inlcude command error details in top-level fatal error ([#11277](https://github.com/Opentrons/opentrons/issues/11277)) ([330eab3](https://github.com/Opentrons/opentrons/commit/330eab35813aefbfa678c86e74de9f9cbc724a17))
+* **api:** make hs wait until idle on deactivate shake ([#11342](https://github.com/Opentrons/opentrons/issues/11342)) ([a78b6fb](https://github.com/Opentrons/opentrons/commit/a78b6fbdf607549a0313fccaae18681646f11207))
+* **api:** move to safe plunger position after every drop-tip ([#10897](https://github.com/Opentrons/opentrons/issues/10897)) ([9bd9902](https://github.com/Opentrons/opentrons/commit/9bd99024603086b7402aad82acf6e86267d074da))
+* **api:** smoothie-driver backlash compensation allows all axes to move simultaneously ([#10923](https://github.com/Opentrons/opentrons/issues/10923)) ([d65147e](https://github.com/Opentrons/opentrons/commit/d65147ec8a68354227e26d1f714e1a4ddb138d43))
+* **api,shared-data:** Fix incorrect rejection of `thermocycler/runProfile` commands ([#11241](https://github.com/Opentrons/opentrons/issues/11241)) ([4366958](https://github.com/Opentrons/opentrons/commit/4366958c3025213115f9af00af5cd95b6cbbf32a))
+* **api,update-server:** Synchronize robot name more tightly between between api and update-server ([#11175](https://github.com/Opentrons/opentrons/issues/11175)) ([f3ac4d9](https://github.com/Opentrons/opentrons/commit/f3ac4d96d63bbd857ed8b8ee75c9a982b8fd0a38))
+* **app:** accept protocols with Thermocycler Gen2 ([#10850](https://github.com/Opentrons/opentrons/issues/10850)) ([02c7c79](https://github.com/Opentrons/opentrons/commit/02c7c79cf908616f8831bad77f7af461a5852edf))
+* **app:** add firstNonSetupIndex to historical run commands query cursor ([#11158](https://github.com/Opentrons/opentrons/issues/11158)) ([a8f8619](https://github.com/Opentrons/opentrons/commit/a8f8619dc40bba6c64714d9465b540a2bc21d0fc)), closes [#11135](https://github.com/Opentrons/opentrons/issues/11135)
+* **app:** add support for labware on modules in run log ([#11276](https://github.com/Opentrons/opentrons/issues/11276)) ([b370f5d](https://github.com/Opentrons/opentrons/commit/b370f5d85df9d6f203ba43e00fc676bd88872568))
+* **app:** confirm attachment modal logic refactor ([#11362](https://github.com/Opentrons/opentrons/issues/11362)) ([4fafb10](https://github.com/Opentrons/opentrons/commit/4fafb10b670dd463a1582d3a1d163a7af04afadd))
+* **app:** disabled input values when H-S is shaking ([#11357](https://github.com/Opentrons/opentrons/issues/11357)) ([f579517](https://github.com/Opentrons/opentrons/commit/f57951796a946788945e6b4904e559f52733e142))
+* **app:** do not initiate new buildroot session after successful update ([#11476](https://github.com/Opentrons/opentrons/issues/11476)) ([aada770](https://github.com/Opentrons/opentrons/commit/aada770cf0fab16e5c260d6504de18b8d5d2dc4e))
+* **app:** fix pipette settings when allPipetteConfig FF is on ([#11397](https://github.com/Opentrons/opentrons/issues/11397)) ([685cb0b](https://github.com/Opentrons/opentrons/commit/685cb0bf40eed546e639f1ac98b52165afe39d55))
+* **app:** Fix text spacing issue on LPC screen ([#11159](https://github.com/Opentrons/opentrons/issues/11159)) ([95a01cd](https://github.com/Opentrons/opentrons/commit/95a01cd2d3372d21a6905901f70408c6d945b194)), closes [#110671](https://github.com/Opentrons/opentrons/issues/110671)
+* **app:** fixes extra module bug in module controls ([#11195](https://github.com/Opentrons/opentrons/issues/11195)) ([7582870](https://github.com/Opentrons/opentrons/commit/7582870843d460631788cfed1bf947b57b19c194))
+* **app:** H-S test shake input value no longer accepts decimals ([#11344](https://github.com/Opentrons/opentrons/issues/11344)) ([1a98822](https://github.com/Opentrons/opentrons/commit/1a98822ca881401b9a4f4e3f75c9bbfa98625be0))
+* **app:** hS fix tooltip text position in overflow menu button ([#11363](https://github.com/Opentrons/opentrons/issues/11363)) ([499fc90](https://github.com/Opentrons/opentrons/commit/499fc9051dc8d02ab2865b7f99de870fc6d2e97a))
+* **app:** labware setup H-S latch command add runId ([#11133](https://github.com/Opentrons/opentrons/issues/11133)) ([75cc2f2](https://github.com/Opentrons/opentrons/commit/75cc2f2071f98b4026c92603ccecea3c7929ac8c)), closes [#11048](https://github.com/Opentrons/opentrons/issues/11048) [#11125](https://github.com/Opentrons/opentrons/issues/11125)
+* **app:** order labware offset reapply candidates newest to oldest ([#11467](https://github.com/Opentrons/opentrons/issues/11467)) ([cb4d8ef](https://github.com/Opentrons/opentrons/commit/cb4d8ef6f8a02c6ba9fe71477abd5639a3f8a357))
+* **app:** return valid custom labware when sorting ([#11369](https://github.com/Opentrons/opentrons/issues/11369)) ([9d6cc14](https://github.com/Opentrons/opentrons/commit/9d6cc142f4190988d94cf021a0b291ca613ae29e))
+* **app:** robotSettings Calibrations tab section title text-align bug ([#11314](https://github.com/Opentrons/opentrons/issues/11314)) ([be5f65e](https://github.com/Opentrons/opentrons/commit/be5f65e3c533f08b48bcfef5a6ee901d75096453))
+* **app:** show H-S wizard when module is powered off ([#11358](https://github.com/Opentrons/opentrons/issues/11358)) ([dfd6bb5](https://github.com/Opentrons/opentrons/commit/dfd6bb57e80515ad8fb24e33f2d25bb749d20d9b))
+* **app:** this will close [#11223](https://github.com/Opentrons/opentrons/issues/11223) ([#11231](https://github.com/Opentrons/opentrons/issues/11231)) ([c718356](https://github.com/Opentrons/opentrons/commit/c718356cc4a7e42a532788816c8a7b422a0ca611))
+* **app:** unattached pipette calibration bugfix ([#11412](https://github.com/Opentrons/opentrons/issues/11412)) ([59c1cff](https://github.com/Opentrons/opentrons/commit/59c1cffff871b17c0a7c1813e79823913146a0e7))
+* **app:** update factoryreset options description ([#11433](https://github.com/Opentrons/opentrons/issues/11433)) ([db4d918](https://github.com/Opentrons/opentrons/commit/db4d9182957dd86511be944c403afa155f2a2f54))
+* **app:** update hover state of historical run chevron ([#11153](https://github.com/Opentrons/opentrons/issues/11153)) ([bb861c5](https://github.com/Opentrons/opentrons/commit/bb861c5a779bdfebf703aebba355e2d634869814))
+* **components:** fix well highlight so it matches prod on PD ([#11240](https://github.com/Opentrons/opentrons/issues/11240)) ([c508c7c](https://github.com/Opentrons/opentrons/commit/c508c7ce618200ad87b771a55af2205cac12eb96))
+* **engine:** pause hardware API when engine is paused ([#10882](https://github.com/Opentrons/opentrons/issues/10882)) ([78658f6](https://github.com/Opentrons/opentrons/commit/78658f60e58e90621e79a048105913175e7d9a57))
+* **engine:** thermocycler movement flagger in analysis ([#11261](https://github.com/Opentrons/opentrons/issues/11261)) ([2a460f1](https://github.com/Opentrons/opentrons/commit/2a460f119fb4f3fc64261427a6f4568a5f752542)), closes [#11235](https://github.com/Opentrons/opentrons/issues/11235)
+* **hardware:** handle timeout finding pipettes ([#11252](https://github.com/Opentrons/opentrons/issues/11252)) ([18dfb85](https://github.com/Opentrons/opentrons/commit/18dfb8503ba15a6036ea8fe4e1b841feb9f94174))
+* **heater-shaker:** fix async error handling ([#11400](https://github.com/Opentrons/opentrons/issues/11400)) ([c67e8e3](https://github.com/Opentrons/opentrons/commit/c67e8e39a5e4cee24d2a86c808280430dcfaa12b))
+* **heater-shaker:** updated dfu locking mechanism ([#11395](https://github.com/Opentrons/opentrons/issues/11395)) ([86f674f](https://github.com/Opentrons/opentrons/commit/86f674fbb085e9ce6d3e354123144778a907f918))
+* **ot3:** modify the device info integration test to check for all expected nodes during broadcast ([#11051](https://github.com/Opentrons/opentrons/issues/11051)) ([5d62a58](https://github.com/Opentrons/opentrons/commit/5d62a58b9f39d108779b584e9f8606420a28d39a))
+* **ot3:** separate out position and encoder position in integration test ([#11147](https://github.com/Opentrons/opentrons/issues/11147)) ([9c12d28](https://github.com/Opentrons/opentrons/commit/9c12d2818adbbccce917e2fb32e7da9302f4e2bf))
+* **papi-v2:** allow pick_up_tip to pick up from exact location  ([#11038](https://github.com/Opentrons/opentrons/issues/11038)) ([72f6d4b](https://github.com/Opentrons/opentrons/commit/72f6d4be6d258f5b6db531a2278289f0827f3cd1))
+* **papi-v2:** do not raise h/s movement flagger for point-only destinations ([#11335](https://github.com/Opentrons/opentrons/issues/11335)) ([aeb8c46](https://github.com/Opentrons/opentrons/commit/aeb8c46c33903aaab31ab129a84cf69ec51067cc))
+* **PAPIv2:** allow presses=0 to hover over tip when calling pick_up_tip ([#11200](https://github.com/Opentrons/opentrons/issues/11200)) ([f3d3525](https://github.com/Opentrons/opentrons/commit/f3d3525bc374b7fb6222853c21b42fd3d3ca5f7b))
+* **protocol-designer:** truncate labware type name ([#11364](https://github.com/Opentrons/opentrons/issues/11364)) ([e8211c4](https://github.com/Opentrons/opentrons/commit/e8211c4183d3c7021938dc2bc08ca16c6eee45a7))
+* **robot-server:** fully delete current run ([#11070](https://github.com/Opentrons/opentrons/issues/11070)) ([da45a96](https://github.com/Opentrons/opentrons/commit/da45a96a12f7641cde8712a5a636c7393123163f))
+
+
+### Features
+
+* **api:** add gripper handler for the OT3 ([#10953](https://github.com/Opentrons/opentrons/issues/10953)) ([f8acf64](https://github.com/Opentrons/opentrons/commit/f8acf647067452f2e109ae182fb26dfd8cc606e1))
+* **api:** Forbid Heater-Shakers in slot 9, just south of the trash ([#11019](https://github.com/Opentrons/opentrons/issues/11019)) ([cb769cc](https://github.com/Opentrons/opentrons/commit/cb769cc478b3bdf61e1526fca89b30e3c74ec31e)), closes [#10912](https://github.com/Opentrons/opentrons/issues/10912)
+* **api:** Heater Shaker Firmware Level Emulator ([#11121](https://github.com/Opentrons/opentrons/issues/11121)) ([#11207](https://github.com/Opentrons/opentrons/issues/11207)) ([0df9319](https://github.com/Opentrons/opentrons/commit/0df931940045362935ee2f37265984b7d7e1536f)), closes [/github.com/Opentrons/opentrons/pull/11121#issuecomment-1190383124](https://github.com//github.com/Opentrons/opentrons/pull/11121/issues/issuecomment-1190383124)
+* **api:** heater-shaker: error status setting ([#10765](https://github.com/Opentrons/opentrons/issues/10765)) ([74f589b](https://github.com/Opentrons/opentrons/commit/74f589b1133c85d1c5dc1939bde9173377edd7da)), closes [#9644](https://github.com/Opentrons/opentrons/issues/9644)
+* **api:** implement pipetting restrictions around heater-shaker ([#11218](https://github.com/Opentrons/opentrons/issues/11218)) ([d9caa3d](https://github.com/Opentrons/opentrons/commit/d9caa3d16aea30d80ca7572af5a2a3ff4a568793))
+* **api:** ot3: add gripper grip and ungrip to hardware control ([#10987](https://github.com/Opentrons/opentrons/issues/10987)) ([62e9c9b](https://github.com/Opentrons/opentrons/commit/62e9c9bc9d82014b55a9c1db5f7e0a2becaf9b62))
+* **api, step-generation:** emit and ingest command keys ([#10885](https://github.com/Opentrons/opentrons/issues/10885)) ([4f81309](https://github.com/Opentrons/opentrons/commit/4f81309c4cc546cd36b90f637cd4be447ddd08a5))
+* **app:** add customLabware to labware filterBy ([#11236](https://github.com/Opentrons/opentrons/issues/11236)) ([3ea1731](https://github.com/Opentrons/opentrons/commit/3ea1731afe0409c6b745d353b8c49c4b5cb4faac)), closes [#10917](https://github.com/Opentrons/opentrons/issues/10917)
+* **app:** add error banner + modal if H-S or TC is in error ([#11382](https://github.com/Opentrons/opentrons/issues/11382)) ([09fbba3](https://github.com/Opentrons/opentrons/commit/09fbba393645809e8742985732ba398fc3af34e3))
+* **app:** add map view to liquid labware modal ([#10869](https://github.com/Opentrons/opentrons/issues/10869)) ([94ca292](https://github.com/Opentrons/opentrons/commit/94ca2923c649298d695820d3ad542cc5fa2704d1)), closes [#10521](https://github.com/Opentrons/opentrons/issues/10521)
+* **app:** adding support for v6 commands in run log ([#11254](https://github.com/Opentrons/opentrons/issues/11254)) ([41a5a39](https://github.com/Opentrons/opentrons/commit/41a5a39a959b9a1bed3f9e96e1287385c1647075)), closes [#11247](https://github.com/Opentrons/opentrons/issues/11247)
+* **app:** display rows of wells with same liquid as a range ([#10974](https://github.com/Opentrons/opentrons/issues/10974)) ([f73c484](https://github.com/Opentrons/opentrons/commit/f73c484246f75615e60430bd9c5f476d8b58b2b3)), closes [#10671](https://github.com/Opentrons/opentrons/issues/10671)
+* **app:** liquids tab in protocol details ([#10812](https://github.com/Opentrons/opentrons/issues/10812)) ([7745817](https://github.com/Opentrons/opentrons/commit/77458172c4a15bebb5bb136c427c926c7c7fc61e)), closes [#8826](https://github.com/Opentrons/opentrons/issues/8826)
+* **app:** replace lookup with search with google in electron-context-menu ([#11232](https://github.com/Opentrons/opentrons/issues/11232)) ([047978f](https://github.com/Opentrons/opentrons/commit/047978f8a64830e790360451a3a3e529986b38e1)), closes [#11220](https://github.com/Opentrons/opentrons/issues/11220)
+* **app:** show text if no modules plugged in but required during setup ([#11140](https://github.com/Opentrons/opentrons/issues/11140)) ([efa56d9](https://github.com/Opentrons/opentrons/commit/efa56d90abaf0f6894d7552a28797fb8802ebbac)), closes [#10947](https://github.com/Opentrons/opentrons/issues/10947)
+* **app:** support module JSON v6 commands in run log ([#11234](https://github.com/Opentrons/opentrons/issues/11234)) ([5f0cc21](https://github.com/Opentrons/opentrons/commit/5f0cc21a3b7d1958f98910065e87d45869c8939e)), closes [#11228](https://github.com/Opentrons/opentrons/issues/11228)
+* **app:** update modal component and labware liquid modal ([#11216](https://github.com/Opentrons/opentrons/issues/11216)) ([3bd4b3a](https://github.com/Opentrons/opentrons/commit/3bd4b3ac83d500680aec48cc79d3b8ec9b12b118)), closes [#11142](https://github.com/Opentrons/opentrons/issues/11142)
+* **app:** update React Select to 5.4.0 and add to App package.json ([#11104](https://github.com/Opentrons/opentrons/issues/11104)) ([8cbd3b8](https://github.com/Opentrons/opentrons/commit/8cbd3b851f317c2b36c5e5eb5212119364d68e60)), closes [#11020](https://github.com/Opentrons/opentrons/issues/11020)
+* **app:** use started at timestamp in run log ([#11213](https://github.com/Opentrons/opentrons/issues/11213)) ([3878f05](https://github.com/Opentrons/opentrons/commit/3878f05f52b1ecde83b84de19350db92c68907e5))
+* **app, components:** align Liquid Setup UI with Figma ([#11044](https://github.com/Opentrons/opentrons/issues/11044)) ([dfd8526](https://github.com/Opentrons/opentrons/commit/dfd8526d133c5954063b416b16b7b5db2a6211fe))
+* **engine:** heater-shaker movement restrictions ([#10861](https://github.com/Opentrons/opentrons/issues/10861)) ([158d15d](https://github.com/Opentrons/opentrons/commit/158d15d83d7a693fbe2cae93e7731ad95c188787))
+* **engine:** move pipettes away if blocking heater-shaker open latch or start shake ([#11248](https://github.com/Opentrons/opentrons/issues/11248)) ([e77add5](https://github.com/Opentrons/opentrons/commit/e77add5045479d918cd85af8ab557d49b57c316e))
+* **engine:** pause protocol execution if door is opened ([#11021](https://github.com/Opentrons/opentrons/issues/11021)) ([c3dc40e](https://github.com/Opentrons/opentrons/commit/c3dc40ece62775065b1c8700084c37af7cf12f1d))
+* **engine:** thermocycler run profile ([#10921](https://github.com/Opentrons/opentrons/issues/10921)) ([8a70b53](https://github.com/Opentrons/opentrons/commit/8a70b53ed35d33951b130bb1299026f02cf81d7b))
+* **g-code-parsing:**  Add ability to run multiple PAPI versions  ([#11221](https://github.com/Opentrons/opentrons/issues/11221)) ([805103f](https://github.com/Opentrons/opentrons/commit/805103f4ebae27f0649320240bf72fc49c2cb289))
+* **hardware:** convert encoder pulses to encoder position in mm ([#10288](https://github.com/Opentrons/opentrons/issues/10288)) ([69a1075](https://github.com/Opentrons/opentrons/commit/69a107547ca7cb2098d28e33606d755146854604))
+* **heater-shaker:** add firmware upload capability ([#10307](https://github.com/Opentrons/opentrons/issues/10307)) ([a77b08d](https://github.com/Opentrons/opentrons/commit/a77b08d85dea1b64e7cbe5d71251f21d8e444747))
+* **papi-v2:** home both pipettes at once before specific h/s actions ([#11330](https://github.com/Opentrons/opentrons/issues/11330)) ([3c12e94](https://github.com/Opentrons/opentrons/commit/3c12e94ee0d6d17ecc66127651fb6d7d6ea8816d))
+* **papiv2:** retract pipettes before shaking or opening latch ([#11268](https://github.com/Opentrons/opentrons/issues/11268)) ([f0913d7](https://github.com/Opentrons/opentrons/commit/f0913d7219ab41b55b3980a1262a884007223ad6)), closes [#11210](https://github.com/Opentrons/opentrons/issues/11210) [#11209](https://github.com/Opentrons/opentrons/issues/11209)
+* **protocol-designer:** add custom liquid color picker ([#10958](https://github.com/Opentrons/opentrons/issues/10958)) ([b4a11af](https://github.com/Opentrons/opentrons/commit/b4a11af69a25d7e481b30c9fc0b4f6fd7c008bc0)), closes [#10573](https://github.com/Opentrons/opentrons/issues/10573) [#10601](https://github.com/Opentrons/opentrons/issues/10601)
+* **protocol-designer:** add new liquid icon design ([#11085](https://github.com/Opentrons/opentrons/issues/11085)) ([f097d56](https://github.com/Opentrons/opentrons/commit/f097d56c1a31f0c2eec5d6d23fb75df61dd833cc)), closes [#10602](https://github.com/Opentrons/opentrons/issues/10602)
+* **protocol-designer:** add slot 6 as accepted slot for HS ([#11275](https://github.com/Opentrons/opentrons/issues/11275)) ([17f6a75](https://github.com/Opentrons/opentrons/commit/17f6a75bd0605f8962b722477b28984383b46e49)), closes [#11148](https://github.com/Opentrons/opentrons/issues/11148)
+* **protocol-designer:** render modals within viewport ([#11284](https://github.com/Opentrons/opentrons/issues/11284)) ([be6b618](https://github.com/Opentrons/opentrons/commit/be6b618ff30dec2e6fe81300bb02f2ba5b0c8730))
+* **robot-server:** allow live commands when run is current and unstarted ([#11267](https://github.com/Opentrons/opentrons/issues/11267)) ([3af065a](https://github.com/Opentrons/opentrons/commit/3af065a7302df639c2e0f4079e1ce63ec8a2bb5d))
+* **shared-data:** add Armadillo PCR plate and adapter definitions ([#11003](https://github.com/Opentrons/opentrons/issues/11003)) ([2519f8a](https://github.com/Opentrons/opentrons/commit/2519f8a50ac88f078c85ed42a1ba2c413f61968d))
+* **shared-data:** update Thermocycler Gen2 module definition ([#10951](https://github.com/Opentrons/opentrons/issues/10951)) ([9fa9f83](https://github.com/Opentrons/opentrons/commit/9fa9f8319965b9e7e21d68b8928915751d088614))
+* **step-generation:** deactivate heater shaker after timer finishes ([#10876](https://github.com/Opentrons/opentrons/issues/10876)) ([21cf672](https://github.com/Opentrons/opentrons/commit/21cf6728409857dfd645d6861cf85408c7bcc41f)), closes [#10875](https://github.com/Opentrons/opentrons/issues/10875)
+* **step-generation, shared-data:** delete TC await profile complete command ([#11273](https://github.com/Opentrons/opentrons/issues/11273)) ([9654cf2](https://github.com/Opentrons/opentrons/commit/9654cf2c86f7908bf718053a5bbab222d6103a73)), closes [#11272](https://github.com/Opentrons/opentrons/issues/11272)
+
+
+### Performance Improvements
+
+* **robot-server:** Minimize selected columns to speed up `GET /runs` ([#11002](https://github.com/Opentrons/opentrons/issues/11002)) ([4000e5b](https://github.com/Opentrons/opentrons/commit/4000e5bf543ea56260e441e47e561e97103fe435))
+
+
+
+
+
 ## [6.0.1](https://github.com/Opentrons/opentrons/compare/v6.0.0...v6.0.1) (2022-08-09)
 
 

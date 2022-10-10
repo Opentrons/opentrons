@@ -1,8 +1,7 @@
 from __future__ import annotations
 import logging
-import asyncio
 import re
-from typing import List, Tuple, Optional, Union, Awaitable, cast, TYPE_CHECKING
+from typing import TYPE_CHECKING, List, Optional, Union
 from glob import glob
 
 from opentrons.config import IS_ROBOT, IS_LINUX
@@ -20,7 +19,7 @@ if TYPE_CHECKING:
 
 log = logging.getLogger(__name__)
 
-MODULE_PORT_REGEX = re.compile("|".join(modules.MODULE_HW_BY_NAME.keys()), re.I)
+MODULE_PORT_REGEX = re.compile("|".join(modules.MODULE_TYPE_BY_NAME.keys()), re.I)
 
 
 class AttachedModulesControl:
@@ -70,16 +69,15 @@ class AttachedModulesControl:
         self,
         port: str,
         usb_port: types.USBPort,
-        model: str,
-        loop: asyncio.AbstractEventLoop,
+        type: modules.ModuleType,
         sim_model: Optional[str] = None,
     ) -> modules.AbstractModule:
         return await modules.build(
             port=port,
             usb_port=usb_port,
-            which=model,
+            type=type,
             simulating=self._api.is_simulator,
-            loop=loop,
+            loop=self._api.loop,
             execution_manager=self._api._execution_manager,
             sim_model=sim_model,
         )
@@ -139,8 +137,7 @@ class AttachedModulesControl:
             new_instance = await self.build_module(
                 port=mod.port,
                 usb_port=mod.usb_port,
-                model=mod.name,
-                loop=self._api.loop,
+                type=modules.MODULE_TYPE_BY_NAME[mod.name],
             )
             self._available_modules.append(new_instance)
             log.info(
@@ -150,55 +147,6 @@ class AttachedModulesControl:
         self._available_modules = sorted(
             self._available_modules, key=modules.AbstractModule.sort_key
         )
-
-    async def parse_modules(
-        self,
-        by_model: modules.types.ModuleModel,
-        resolved_type: modules.types.ModuleType,
-    ) -> Tuple[List[modules.AbstractModule], Optional[modules.AbstractModule]]:
-        """
-        Parse Modules.
-        Given a module model and type, find all attached
-        modules that fit this criteria. If there are no
-        modules attached, but the module is being loaded
-        in simulation, then it should return a simulating
-        module of the same type.
-        """
-        matching_modules = []
-        simulated_module = None
-        mod_type = {
-            modules.types.ModuleType.MAGNETIC: "magdeck",
-            modules.types.ModuleType.TEMPERATURE: "tempdeck",
-            modules.types.ModuleType.THERMOCYCLER: "thermocycler",
-            modules.types.ModuleType.HEATER_SHAKER: "heatershaker",
-        }[resolved_type]
-        for module in self.available_modules:
-            if mod_type == module.name():
-                matching_modules.append(module)
-        if self._api.is_simulator:
-            module_builder = {
-                "magdeck": modules.MagDeck.build,
-                "tempdeck": modules.TempDeck.build,
-                "thermocycler": modules.Thermocycler.build,
-                "heatershaker": modules.HeaterShaker.build,
-            }[mod_type]
-            if module_builder:
-                # The dict stuff above somehow erases specifically the return type
-                # of the module builders instead of upcasting it so an explicit
-                # upcast here works without erasing the argument types
-                simulating_module = await cast(
-                    Awaitable[modules.AbstractModule],
-                    module_builder(
-                        port="",
-                        usb_port=types.USBPort(name="", port_number=0),
-                        simulating=True,
-                        loop=self._api.loop,
-                        execution_manager=self._api._execution_manager,
-                        sim_model=by_model.value,
-                    ),
-                )
-                simulated_module = simulating_module
-        return matching_modules, simulated_module
 
     def scan(self) -> List[modules.ModuleAtPort]:
         """Scan for connected modules and return list of
@@ -228,7 +176,7 @@ class AttachedModulesControl:
         match = MODULE_PORT_REGEX.search(port)
         if match:
             name = match.group().lower()
-            if name not in modules.MODULE_HW_BY_NAME:
+            if name not in modules.MODULE_TYPE_BY_NAME:
                 log.warning(f"Unexpected module connected: {name} on {port}")
                 return None
             return modules.ModuleAtPort(port=f"/dev/{port}", name=name)

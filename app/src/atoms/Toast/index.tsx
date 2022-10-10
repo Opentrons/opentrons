@@ -56,17 +56,17 @@ const toastStyleByType: {
   error: {
     iconName: 'alert-circle',
     color: COLORS.errorEnabled,
-    backgroundColor: COLORS.errorBackground,
+    backgroundColor: COLORS.errorBackgroundLight,
   },
   warning: {
     iconName: 'alert-circle',
     color: COLORS.warningEnabled,
-    backgroundColor: COLORS.warningBackground,
+    backgroundColor: COLORS.warningBackgroundLight,
   },
   success: {
     iconName: 'check-circle',
     color: COLORS.successEnabled,
-    backgroundColor: COLORS.successBackground,
+    backgroundColor: COLORS.successBackgroundLight,
   },
   info: {
     iconName: 'information',

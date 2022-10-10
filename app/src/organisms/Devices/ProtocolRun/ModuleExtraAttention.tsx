@@ -6,9 +6,11 @@ import {
   MAGNETIC_MODULE_TYPE,
   ModuleType,
   THERMOCYCLER_MODULE_TYPE,
+  THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { COLORS } from '@opentrons/components'
 import { Divider } from '../../../atoms/structure/Divider'
+import { TertiaryButton } from '../../../atoms/buttons'
 import {
   Banner,
   BannerItem,
@@ -89,8 +91,14 @@ const ModuleExtraAttentionItem = (
             slotName: moduleInfo.slotName,
           })}
           body={t('protocol_setup:magnetic_module_extra_attention')}
-          btnText={t('view_instructions')}
-          onClick={onClick}
+          button={
+            <TertiaryButton
+              data-testid="banner_open_wizard_btn"
+              onClick={onClick}
+            >
+              {t('view_instructions')}
+            </TertiaryButton>
+          }
         />
       )
     case HEATERSHAKER_MODULE_TYPE:
@@ -128,10 +136,16 @@ const ModuleExtraAttentionItem = (
               slotName: moduleInfo.slotName,
             })}
             body={t('protocol_setup:heater_shaker_extra_attention')}
-            btnText={
-              isLatchClosed ? t('open_labware_latch') : t('close_labware_latch')
+            button={
+              <TertiaryButton
+                data-testid="ModuleExtraAttention_HeaterShakerButton"
+                onClick={toggleLatch}
+              >
+                {isLatchClosed
+                  ? t('open_labware_latch')
+                  : t('close_labware_latch')}
+              </TertiaryButton>
             }
-            onClick={toggleLatch}
           />
         )
       } else {
@@ -144,9 +158,21 @@ const ModuleExtraAttentionItem = (
             moduleName: moduleInfo.moduleDef.displayName,
             slotName: moduleInfo.slotName,
           })}
-          body={t('protocol_setup:thermocycler_extra_attention')}
-          btnText={t('view_instructions')}
-          onClick={onClick}
+          body={t(
+            moduleInfo.moduleDef.model === THERMOCYCLER_MODULE_V1
+              ? 'protocol_setup:thermocycler_extra_attention_gen_1'
+              : 'protocol_setup:thermocycler_extra_attention_gen_2'
+          )}
+          button={
+            moduleInfo.moduleDef.model === THERMOCYCLER_MODULE_V1 ? (
+              <TertiaryButton
+                data-testid="ModuleExtraAttention_ThermocyclerGen1Button"
+                onClick={onClick}
+              >
+                {t('view_instructions')}
+              </TertiaryButton>
+            ) : null
+          }
         />
       )
     default:

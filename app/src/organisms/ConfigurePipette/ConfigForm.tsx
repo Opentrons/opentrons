@@ -83,7 +83,10 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
   }
 
   getVisibleFields: () => PipetteSettingsFieldsMap = () => {
-    if (this.props.__showHiddenFields) return this.props.settings
+    if (this.props.__showHiddenFields) {
+      return omit(this.props.settings, [QUIRK_KEY])
+    }
+
     return pick(this.props.settings, [
       ...PLUNGER_KEYS,
       ...POWER_KEYS,

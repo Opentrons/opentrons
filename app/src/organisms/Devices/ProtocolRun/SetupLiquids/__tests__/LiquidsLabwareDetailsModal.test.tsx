@@ -95,7 +95,7 @@ describe('LiquidsLabwareDetailsModal', () => {
     })
     mockParseLiquidsInLoadOrder.mockReturnValue([
       {
-        liquidId: '4',
+        id: '4',
         displayName: 'liquid 4',
         description: 'saliva',
         displayColor: '#B925FF',

@@ -40,19 +40,22 @@ export const darkGreySelected = '#5a5a5e'
 export const darkGreyDisabled = '#eaeaeb'
 
 // colors success
-export const successBackground = '#f3fffa'
+export const successBackgroundLight = '#f3fffa'
+export const successBackgroundMed = '#def4eb'
 export const successEnabled = '#04aa65'
 export const successText = '#00854d'
 export const successDisabled = '#8f8f8f'
 
 // colors warning
-export const warningBackground = '#fffcf5'
+export const warningBackgroundLight = '#fffcf5'
+export const warningBackgroundMed = '#fcf0d8'
 export const warningEnabled = '#f09d20'
 export const warningText = '#7b5b09'
 export const warningDisabled = '#8f8f8f'
 
 // colors error
-export const errorBackground = '#fff3f3'
+export const errorBackgroundLight = '#fff3f3'
+export const errorBackgroundMed = '#f7e0e0'
 export const errorEnabled = '#bf0000'
 export const errorHover = '#a30000'
 export const errorText = '#850000'

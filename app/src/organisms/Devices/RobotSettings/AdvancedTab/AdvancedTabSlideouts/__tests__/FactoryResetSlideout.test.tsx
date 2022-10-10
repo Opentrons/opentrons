@@ -70,6 +70,7 @@ describe('RobotSettings FactoryResetSlideout', () => {
       'Resetting Deck and/or Tip Length Calibration data will also clear Pipette Offset Calibration data.'
     )
     getByText('Protocol Run History')
+    getByText('Resetting run history will also clear Labware Offset data.')
     getByText('Clear BootScript Foo')
     getByText('Clear Calibration Bar')
     getByText('RunsHistory FooBar')

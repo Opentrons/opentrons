@@ -28,7 +28,7 @@ import { AskForCalibrationBlockModal } from '../../../organisms/CalibrateTipLeng
 import { getHasCalibrationBlock } from '../../../redux/config'
 import { Banner } from '../../../atoms/Banner'
 import * as PipetteConstants from '../../../redux/pipettes/constants'
-import { useDeckCalibrationData } from '../hooks'
+import { useDeckCalibrationData, useIsOT3 } from '../hooks'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 
 import type { PipetteInfo } from '../hooks'
@@ -55,6 +55,7 @@ export function SetupPipetteCalibrationItem({
   const deviceDetailsUrl = `/devices/${robotName}`
 
   const { isDeckCalibrated } = useDeckCalibrationData(robotName)
+  const isOT3 = useIsOT3(robotName)
 
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_LEFT,
@@ -161,11 +162,16 @@ export function SetupPipetteCalibrationItem({
     )
   }
 
+  // temporarily present valid pipette calibration for OT-3
+  const attachedCalibratedDate = isOT3
+    ? 'OT-3 temporary calibrated date placeholder'
+    : pipetteInfo.pipetteCalDate
+
   return (
     <>
       <SetupCalibrationItem
         button={button}
-        calibratedDate={attached ? pipetteInfo.pipetteCalDate : null}
+        calibratedDate={attached ? attachedCalibratedDate : null}
         subText={subText}
         label={t(`devices_landing:${mount}_mount`)}
         title={pipetteInfo.pipetteSpecs?.displayName}

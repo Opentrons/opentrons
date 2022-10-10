@@ -22,6 +22,7 @@ import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_stand
 import {
   useLabwareRenderInfoForRunById,
   useModuleRenderInfoForProtocolById,
+  useProtocolDetailsForRun,
 } from '../../hooks'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'
@@ -53,8 +54,14 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
     runId
   )
   const labwareRenderInfoById = useLabwareRenderInfoForRunById(runId)
-  const liquids = parseLiquidsInLoadOrder()
-  const labwareByLiquidId = parseLabwareInfoByLiquidId()
+  const protocolData = useProtocolDetailsForRun(runId).protocolData
+  const liquids = parseLiquidsInLoadOrder(
+    protocolData?.liquids != null ? protocolData?.liquids : {},
+    protocolData?.commands ?? []
+  )
+  const labwareByLiquidId = parseLabwareInfoByLiquidId(
+    protocolData?.commands ?? []
+  )
   const [liquidDetailsLabwareId, setLiquidDetailsLabwareId] = React.useState<
     string | null
   >(null)
