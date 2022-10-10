@@ -1,10 +1,14 @@
 """Opentrons helper methods."""
+from dataclasses import replace as dataclasses_replace
 from types import MethodType
 from typing import Any, List, Dict
 
 from opentrons import protocol_api, execute, simulate
+from opentrons.config.pipette_config import PipetteConfig
 from opentrons.protocol_api.labware import Well
 from opentrons.hardware_control.thread_manager import ThreadManagerException
+
+from opentrons_shared_data.pipette import fuse_specs
 
 from .workarounds import is_running_in_app, store_robot_acceleration
 from .types import Axis, Point
@@ -87,3 +91,16 @@ def get_pipette_unique_name(pipette: protocol_api.InstrumentContext) -> str:
 def gantry_position_as_point(position: Dict[Axis, float]) -> Point:
     """Helper to convert Dict[Axis, float] to a Point()."""
     return Point(x=position[Axis.X], y=position[Axis.Y], z=position[Axis.Z])
+
+
+def switch_ul_per_mm_table(cfg: PipetteConfig, ul_per_mm_index: int) -> PipetteConfig:
+    """Duplicate a PipetteConfig object, while overwriting its ul_per_mm value."""
+    default_cfg = fuse_specs(cfg.model)
+    list_of_ul_per_mm = default_cfg["ulPerMm"]
+    total_available_tables = len(list_of_ul_per_mm)
+    assert 0 <= ul_per_mm_index < total_available_tables, (
+        f"Index ({ul_per_mm_index}) must be less than total number "
+        f"of available functions ({total_available_tables}) for pipette {cfg.model}"
+    )
+    ul_per_mm = list_of_ul_per_mm[ul_per_mm_index]
+    return dataclasses_replace(cfg, ul_per_mm=ul_per_mm)

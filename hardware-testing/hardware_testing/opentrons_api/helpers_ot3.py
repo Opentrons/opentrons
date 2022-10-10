@@ -10,6 +10,7 @@ from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.protocols import HardwareControlAPI
 from opentrons.hardware_control.thread_manager import ThreadManager
 
+from .helpers import switch_ul_per_mm_table
 from .types import GantryLoad, PerPipetteAxisSettings, OT3Axis, OT3Mount, Point
 
 HWApiOT3: Union[Type[OT3API], Type[OT2API]] = OT3API
@@ -207,3 +208,12 @@ def get_endstop_position_ot3(api: ThreadManagedHardwareAPI, mount: OT3Mount) -> 
         y=api.config.carriage_offset[1] + mount_offset[1],
         z=api.config.carriage_offset[2] + mount_offset[2],
     )
+
+
+def overwrite_attached_pipette_ul_per_mm(
+    api: ThreadManagedHardwareAPI, mount: OT3Mount, ul_per_mm_index: int
+) -> None:
+    """Switch the attached Pipette's ul_per_mm table, per table index."""
+    old_cfg = api._pipette_handler._attached_instruments[mount]._config
+    new_cfg = switch_ul_per_mm_table(old_cfg, ul_per_mm_index)
+    api._pipette_handler._attached_instruments[mount]._config = new_cfg
