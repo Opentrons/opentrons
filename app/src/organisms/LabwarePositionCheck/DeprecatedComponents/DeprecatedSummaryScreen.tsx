@@ -40,7 +40,6 @@ export const DeprecatedSummaryScreen = (props: {
   const { t } = useTranslation('labware_position_check')
   const introInfo = useIntroInfo()
   const { protocolData } = useProtocolDetailsForRun(runId)
-  console.log(protocolData)
   const trackEvent = useTrackEvent()
   useLabwareOffsets(
     savePositionCommandData,
