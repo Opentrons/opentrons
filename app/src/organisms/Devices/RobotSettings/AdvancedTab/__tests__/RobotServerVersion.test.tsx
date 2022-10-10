@@ -56,17 +56,14 @@ describe('RobotSettings RobotServerVersion', () => {
 
   it('should render title and description', () => {
     const [{ getByText }] = render()
-    getByText('Robot Server Versions')
+    getByText('Robot Server Version')
     getByText('View latest release notes on')
     getByText('v7.7.7')
   })
 
   it('should render the message, up to date, if the robot server version is the same as the latest version', () => {
-    const [{ getByText, getByRole }] = render()
+    const [{ getByText }] = render()
     getByText('up to date')
-    const reinstall = getByRole('button', { name: 'reinstall' })
-    fireEvent.click(reinstall)
-    getByText('mock update buildroot')
   })
 
   it('should render the warning message if the robot server version needs to upgrade', () => {

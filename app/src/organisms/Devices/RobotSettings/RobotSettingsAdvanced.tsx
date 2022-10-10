@@ -6,7 +6,7 @@ import { Box, SPACING, IconProps } from '@opentrons/components'
 
 import { Divider } from '../../../atoms/structure'
 import { Toast } from '../../../atoms/Toast'
-import { useIsRobotBusy, useRobot } from '../hooks'
+import { useIsOT3, useIsRobotBusy, useRobot } from '../hooks'
 import { DisplayRobotName } from './AdvancedTab/DisplayRobotName'
 import { RobotInformation } from './AdvancedTab/RobotInformation'
 import { RobotServerVersion } from './AdvancedTab/RobotServerVersion'
@@ -69,6 +69,7 @@ export function RobotSettingsAdvanced({
 
   const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
   const robot = useRobot(robotName)
+  const isOT3 = useIsOT3(robotName)
   const ipAddress = robot?.ip != null ? robot.ip : ''
   const settings = useSelector<State, RobotSettings>((state: State) =>
     getRobotSettings(state, robotName)
@@ -184,13 +185,12 @@ export function RobotSettingsAdvanced({
         />
         <Divider marginY={SPACING.spacing4} />
         <OpenJupyterControl robotIp={ipAddress} />
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY={SPACING.spacing4} />
         <UpdateRobotSoftware
           robotName={robotName}
           isRobotBusy={isRobotBusy}
           onUpdateStart={() => setShowSoftwareUpdateModal(true)}
         />
-        <Divider marginY={SPACING.spacing4} />
         <Troubleshooting
           robotName={robotName}
           updateDownloadLogsStatus={updateDownloadLogsStatus}
@@ -200,30 +200,34 @@ export function RobotSettingsAdvanced({
           updateIsExpanded={updateIsExpanded}
           isRobotBusy={isRobotBusy}
         />
-        <Divider marginY={SPACING.spacing4} />
-        <UseOlderProtocol
-          settings={findSettings('disableFastProtocolUpload')}
-          robotName={robotName}
-          isRobotBusy={isRobotBusy}
-        />
-        <Divider marginY={SPACING.spacing4} />
-        <LegacySettings
-          settings={findSettings('deckCalibrationDots')}
-          robotName={robotName}
-          isRobotBusy={isRobotBusy}
-        />
-        <Divider marginY={SPACING.spacing4} />
-        <ShortTrashBin
-          settings={findSettings('shortFixedTrash')}
-          robotName={robotName}
-          isRobotBusy={isRobotBusy}
-        />
-        <Divider marginY={SPACING.spacing4} />
-        <UseOlderAspirateBehavior
-          settings={findSettings('useOldAspirationFunctions')}
-          robotName={robotName}
-          isRobotBusy={isRobotBusy}
-        />
+        {isOT3 ? null : (
+          <>
+            <Divider marginY={SPACING.spacing4} />
+            <UseOlderProtocol
+              settings={findSettings('disableFastProtocolUpload')}
+              robotName={robotName}
+              isRobotBusy={isRobotBusy}
+            />
+            <Divider marginY={SPACING.spacing4} />
+            <LegacySettings
+              settings={findSettings('deckCalibrationDots')}
+              robotName={robotName}
+              isRobotBusy={isRobotBusy}
+            />
+            <Divider marginY={SPACING.spacing4} />
+            <ShortTrashBin
+              settings={findSettings('shortFixedTrash')}
+              robotName={robotName}
+              isRobotBusy={isRobotBusy}
+            />
+            <Divider marginY={SPACING.spacing4} />
+            <UseOlderAspirateBehavior
+              settings={findSettings('useOldAspirationFunctions')}
+              robotName={robotName}
+              isRobotBusy={isRobotBusy}
+            />
+          </>
+        )}
       </Box>
     </>
   )
