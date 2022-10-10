@@ -340,9 +340,9 @@ class LoadedLabware(BaseModel):
 
 class HexColor(BaseModel):
     """Hex color representation."""
-    __root__: str
+    displayColor: Optional[str]
 
-    @validator("__root__")
+    @validator(displayColor, check_fields=False)
     def _color_is_a_valid_hex(cls, v: str) -> None:
         print(v)
         match = re.search(r"^#(?:[0-9a-fA-F]{3}){1,2}$", v)
@@ -350,13 +350,12 @@ class HexColor(BaseModel):
             raise ValueError("Color is not a valid hex color.")
 
 
-class Liquid(BaseModel):
+class Liquid(HexColor):
     """Payload required to create a liquid."""
 
     id: str
     displayName: str
     description: str
-    displayColor: Optional[HexColor]
 
 
 class SpeedRange(NamedTuple):
