@@ -40,6 +40,7 @@ export const DeprecatedSummaryScreen = (props: {
   const { t } = useTranslation('labware_position_check')
   const introInfo = useIntroInfo()
   const { protocolData } = useProtocolDetailsForRun(runId)
+  console.log(protocolData)
   const trackEvent = useTrackEvent()
   useLabwareOffsets(
     savePositionCommandData,
@@ -58,7 +59,6 @@ export const DeprecatedSummaryScreen = (props: {
   //  @ts-expect-error
   const labwareIds = protocolData.labware.map(item => item.id)
   const { sections, primaryPipetteMount, secondaryPipetteMount } = introInfo
-
   const applyLabwareOffsets = (): void => {
     trackEvent({ name: 'applyLabwareOffsetData', properties: {} })
     if (labwareOffsets.length > 0) {

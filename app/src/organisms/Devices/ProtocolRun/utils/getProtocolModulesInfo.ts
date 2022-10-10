@@ -49,11 +49,11 @@ export const getProtocolModulesInfo = (
             )?.result?.labwareId ?? null
 
         const nestedLabware =
+        //  @ts-expect-error
           nestedLabwareId != null ? protocolData.labware[nestedLabwareId] : null
         const nestedLabwareDef =
           nestedLabware != null
-            ? //  @ts-expect-error: will be an error until we remove the schemaV6Adapter
-              protocolData.labwareDefinitions[nestedLabware.definitionUri]
+            ? protocolData.labwareDefinitions[nestedLabware.definitionUri]
             : null
         const nestedLabwareDisplayName = nestedLabware?.displayName ?? null
         const moduleInitialLoadInfo = getModuleInitialLoadInfo(

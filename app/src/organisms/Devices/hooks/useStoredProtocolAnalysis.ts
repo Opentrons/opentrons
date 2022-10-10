@@ -22,7 +22,7 @@ import type { State } from '../../../redux/types'
 export interface StoredProtocolAnalysis extends ProtocolAnalysisOutput {
   pipettes: PipetteNamesById[]
   modules: ModuleModelsById
-  labware: LoadedLabwareById
+  labware: LoadedLabwareById[]
   labwareDefinitions: LoadedLabwareDefinitionsById
 }
 
@@ -41,7 +41,6 @@ export const parseProtocolAnalysisOutput = (
   const labwareDefinitionsById = parseInitialLoadedLabwareDefinitionsById(
     storedProtocolAnalysis?.commands ?? []
   )
-
   return storedProtocolAnalysis != null
     ? {
         ...storedProtocolAnalysis,
@@ -68,6 +67,7 @@ export function useStoredProtocolAnalysis(
   const storedProtocolAnalysis =
     useSelector((state: State) => getStoredProtocol(state, protocolKey))
       ?.mostRecentAnalysis ?? null
+
   // @ts-expect-error
   return storedProtocolAnalysis != null && 'modules' in storedProtocolAnalysis
     ? schemaV6Adapter(storedProtocolAnalysis)

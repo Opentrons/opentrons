@@ -85,7 +85,7 @@ export const useLabwareOffsets = (
         protocolData.labwareDefinitions
       )
       //   @ts-expect-error: when we remove schemav6Adapter, this logic will be correct
-      const { definitionUri } = protocolData.labware.find(
+      const definitionUri = protocolData.labware.find(
         //   @ts-expect-error: when we remove schemav6Adapter, this logic will be correct
         item => item.id === labwareId
       ).definitionUri

@@ -88,7 +88,7 @@ describe('useStoredProtocolAnalysis hook', () => {
     when(mockParseAllRequiredModuleModelsById).mockReturnValue(
       MODULE_MODELS_BY_ID
     )
-    when(mockParseInitialLoadedLabwareById).mockReturnValue(LABWARE_BY_ID)
+    when(mockParseInitialLoadedLabwareById).mockReturnValue([LABWARE_BY_ID])
     when(mockParseInitialLoadedLabwareDefinitionsById).mockReturnValue(
       LABWARE_DEFINITIONS
     )
