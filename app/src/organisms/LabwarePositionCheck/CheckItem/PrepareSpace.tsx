@@ -1,15 +1,14 @@
 import * as React from 'react'
-import { useCreateCommandMutation } from '@opentrons/react-api-client'
 import {
   LabwareRender,
   Module,
   RobotWorkSpace,
   Flex,
   Box,
-  JUSTIFY_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
+  ALIGN_CENTER,
   DIRECTION_COLUMN,
   SPACING,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   THERMOCYCLER_MODULE_V1,
@@ -26,6 +25,10 @@ import { getLabwareDefinitionsFromCommands } from '../utils/labware'
 import { CheckTipRacksStep } from '../types'
 import { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import { useTranslation } from 'react-i18next'
+import { NeedHelpLink } from '../../CalibrationPanels'
+
+const LPC_HELP_LINK_URL =
+  'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
 
 const DECK_MAP_VIEWBOX = '-80 -20 550 460'
 const DECK_LAYER_BLOCKLIST = [
@@ -37,26 +40,14 @@ const DECK_LAYER_BLOCKLIST = [
   'removableDeckOutline',
   'screwHoles',
 ]
-interface PrpareSpaceProps extends Omit<CheckTipRacksStep, 'section'> {
+interface PrepareSpaceProps extends Omit<CheckTipRacksStep, 'section'> {
   runId: string
   protocolData: CompletedProtocolAnalysis
-  proceed: () => void
+  confirmPlacement: () => void
 }
-export const PrepareSpace = (props: PrpareSpaceProps): JSX.Element | null => {
-  const { t } = useTranslation('labware_position_check')
-  const { runId, location, labwareId, protocolData } = props
-  const { createCommand } = useCreateCommandMutation()
-
-  // const initialSavePositionCommandId = (savePositionCommandData[labwareId] ??
-  //   [])[0]
-  // const initialSavePositionCommand = useCommandQuery(
-  //   runId,
-  //   initialSavePositionCommandId
-  // )?.data?.data
-  // const initialPosition =
-  //   initialSavePositionCommand?.commandType === 'savePosition'
-  //     ? initialSavePositionCommand.result.position
-  //     : null
+export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
+  const { t } = useTranslation(['labware_position_check', 'shared'])
+  const { location, labwareId, protocolData } = props
 
   if (protocolData == null) return null
   const labwareDefUri = protocolData.labware.find(l => l.id === labwareId)
@@ -70,10 +61,19 @@ export const PrepareSpace = (props: PrpareSpaceProps): JSX.Element | null => {
   if (labwareDef == null) return null
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
-      <Flex>
-        <Flex flex="1" flexDirection={DIRECTION_COLUMN}>
-          <StyledText as="h3">
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      padding={SPACING.spacing6}
+      minHeight="25rem"
+    >
+      <Flex gridGap={SPACING.spacingXXL}>
+        <Flex
+          flex="1"
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing3}
+        >
+          <StyledText as="h1">
             {t('prepare_item', {
               item: labwareId,
               location: location?.slotName ?? location.moduleId,
@@ -138,8 +138,16 @@ export const PrepareSpace = (props: PrpareSpaceProps): JSX.Element | null => {
           </RobotWorkSpace>
         </Box>
       </Flex>
-      <Flex justifyContent={JUSTIFY_CENTER} marginTop={SPACING.spacing4}>
-        <PrimaryButton onClick={props.proceed}>CONFIRM PLACEMENT</PrimaryButton>
+      <Flex
+        width="100%"
+        marginTop={SPACING.spacing6}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        alignItems={ALIGN_CENTER}
+      >
+        <NeedHelpLink href={LPC_HELP_LINK_URL} />
+        <PrimaryButton onClick={props.confirmPlacement}>
+          {t('shared:confirm_placement')}
+        </PrimaryButton>
       </Flex>
     </Flex>
   )

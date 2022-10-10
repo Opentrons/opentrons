@@ -1,29 +1,29 @@
 import * as React from 'react'
-import {
-  DIRECTION_COLUMN,
-  Flex,
-  JUSTIFY_CENTER,
-  SPACING,
-} from '@opentrons/components'
-import { PrimaryButton } from '../../../atoms/buttons'
+import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
 import { PrepareSpace } from './PrepareSpace'
+import { JogToWell } from './JogToWell'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { CheckTipRacksStep } from '../types'
 
-interface CheckItemProps extends Omit<CheckTipRacksStep, 'section'>{
+interface CheckItemProps extends Omit<CheckTipRacksStep, 'section'> {
   runId: string
   protocolData: CompletedProtocolAnalysis
   proceed: () => void
 }
-export const CheckItem = (
-  props: CheckItemProps
-): JSX.Element | null => {
+export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
+  const {labwareId, pipetteId, location} = props
+  const [hasPreparedSpace, setHasPreparedSpace] = React.useState(false)
+  React.useEffect(() => {
+    console.log('EFFECT CALLED')
+    setHasPreparedSpace(false)
+  }, [labwareId, pipetteId, location?.moduleId, location?.slotName])
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      <PrepareSpace {...props} />
-      <Flex justifyContent={JUSTIFY_CENTER} marginTop={SPACING.spacing4}>
-        <PrimaryButton onClick={props.proceed}>CONFIRM POSITION</PrimaryButton>
-      </Flex>
+      {hasPreparedSpace ? (
+        <JogToWell {...props} goBack={() => setHasPreparedSpace(false)}/>
+      ) : (
+        <PrepareSpace {...props} confirmPlacement={() => setHasPreparedSpace(true)}/>
+      )}
     </Flex>
   )
 }

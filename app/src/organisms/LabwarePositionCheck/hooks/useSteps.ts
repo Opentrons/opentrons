@@ -12,6 +12,5 @@ export function useSteps(
   if (LPCSteps.length === 0) {
     setLPCSteps(getLabwarePositionCheckSteps(protocolData))
   }
-  console.log('LPCSteps', LPCSteps)
   return LPCSteps
 }
