@@ -236,12 +236,14 @@ class LegacyHeaterShakerCore(
 
     def wait_for_target_temperature(self) -> None:
         """Wait for the labware plate's target temperature to be reached."""
-        if self.get_target_temperature() is None:
+        target_temperature = self.get_target_temperature()
+
+        if target_temperature is None:
             raise NoTargetTemperatureSetError(
                 "Heater-Shaker Module does not have a target temperature set."
             )
 
-        self._sync_module_hardware.await_temperature()
+        self._sync_module_hardware.await_temperature(target_temperature)
 
     def set_and_wait_for_shake_speed(self, rpm: int) -> None:
         """Set the shaker's target shake speed and wait for it to spin up."""

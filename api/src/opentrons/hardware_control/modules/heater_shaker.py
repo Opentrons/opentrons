@@ -32,10 +32,6 @@ SIMULATING_POLL_PERIOD = POLL_PERIOD / 20.0
 DFU_PID = "df11"
 
 
-class HeaterShakerError(RuntimeError):
-    """An error propagated from the heater-shaker module."""
-
-
 class HeaterShaker(mod_abc.AbstractModule):
     """Hardware control interface for an attached Heater-Shaker module."""
 
@@ -279,14 +275,15 @@ class HeaterShaker(mod_abc.AbstractModule):
         await self._driver.set_temperature(celsius)
         await self.wait_next_poll()
 
-    async def await_temperature(
-        self, awaiting_temperature: Optional[float] = None
-    ) -> None:
+    # TODO(mc, 2022-10-10): remove `awaiting_temperature` argument,
+    # and instead, wait until status is holding
+    async def await_temperature(self, awaiting_temperature: float) -> None:
         """Await temperature in degrees Celsius.
 
         Polls temperature module's current temperature until
         the specified temperature is reached. If `awaiting_temperature`
-        is unspecified, will wait until the current target is reached.
+        is different than the current target temperature,
+        the resulting behavior may be unpredictable.
         """
         if self.is_simulated:
             return
@@ -295,10 +292,7 @@ class HeaterShaker(mod_abc.AbstractModule):
         await self.wait_next_poll()
 
         async def _await_temperature() -> None:
-            if awaiting_temperature is None:
-                while self.temperature_status != TemperatureStatus.HOLDING:
-                    await self.wait_next_poll()
-            elif self.temperature_status == TemperatureStatus.HEATING:
+            if self.temperature_status == TemperatureStatus.HEATING:
                 while self.temperature < awaiting_temperature:
                     await self.wait_next_poll()
             elif self.temperature_status == TemperatureStatus.COOLING:

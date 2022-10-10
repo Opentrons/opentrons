@@ -191,7 +191,7 @@ def test_wait_for_target_temperature(
 
     subject.wait_for_target_temperature()
 
-    decoy.verify(mock_sync_module_hardware.await_temperature(), times=1)
+    decoy.verify(mock_sync_module_hardware.await_temperature(42.0), times=1)
 
 
 def test_wait_for_temperature_no_target(
