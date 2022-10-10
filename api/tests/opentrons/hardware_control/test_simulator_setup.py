@@ -63,7 +63,12 @@ async def test_with_tempdeck():
     setup = simulator_setup.SimulatorSetup(
         attached_modules={
             "tempdeck": [
-                simulator_setup.ModuleCall("set_temperature", kwargs={"celsius": 23})
+                simulator_setup.ModuleCall(
+                    "start_set_temperature", kwargs={"celsius": 23}
+                ),
+                simulator_setup.ModuleCall(
+                    "await_temperature", kwargs={"awaiting_temperature": None}
+                ),
             ]
         }
     )

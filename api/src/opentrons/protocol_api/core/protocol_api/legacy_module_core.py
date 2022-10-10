@@ -1,13 +1,17 @@
 """Legacy Protocol API module implementation logic."""
-from typing import cast
+from typing import Optional, cast
 
 from opentrons.hardware_control import SynchronousAdapter
-from opentrons.hardware_control.modules import AbstractModule
-from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
+from opentrons.hardware_control.modules import AbstractModule, TempDeck
+from opentrons.hardware_control.modules.types import (
+    ModuleModel,
+    ModuleType,
+    TemperatureStatus,
+)
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.types import DeckSlotName
 
-from ..module import AbstractModuleCore
+from ..module import AbstractModuleCore, AbstractTemperatureModuleCore
 from .labware import LabwareImplementation
 
 
@@ -51,3 +55,56 @@ class LegacyModuleCore(AbstractModuleCore[LabwareImplementation]):
     def get_deck_slot(self) -> DeckSlotName:
         """Get the module's deck slot."""
         return DeckSlotName.from_primitive(self._geometry.parent)  # type: ignore[arg-type]
+
+
+class LegacyTemperatureModuleCore(
+    LegacyModuleCore, AbstractTemperatureModuleCore[LabwareImplementation]
+):
+    """Legacy core control implementation for an attached Temperature Module."""
+
+    _sync_module_hardware: SynchronousAdapter[TempDeck]
+
+    def set_target_temperature(self, celsius: float) -> None:
+        """Set the Temperature Module's target temperature in °C."""
+        self._sync_module_hardware.start_set_temperature(celsius)
+
+    def wait_for_target_temperature(self, celsius: Optional[float] = None) -> None:
+        """Wait until the module's target temperature is reached.
+
+        Specifying a value for ``celsius`` that is different than
+        the module's current target temperature may beahave unpredictably.
+        """
+        self._sync_module_hardware.await_temperature(celsius)
+
+    def deactivate(self) -> None:
+        """Deactivate the Temperature Module."""
+        self._sync_module_hardware.deactivate()
+
+    def get_current_temperature(self) -> float:
+        """Get the module's current temperature in °C."""
+        return self._sync_module_hardware.temperature  # type: ignore[no-any-return]
+
+    def get_target_temperature(self) -> Optional[float]:
+        """Get the module's target temperature in °C, if set."""
+        return self._sync_module_hardware.target  # type: ignore[no-any-return]
+
+    def get_status(self) -> TemperatureStatus:
+        """Get the module's current temperature status."""
+        return self._sync_module_hardware.status  # type: ignore[no-any-return]
+
+
+def create_module_core(
+    module_hardware_api: AbstractModule,
+    requested_model: ModuleModel,
+    geometry: ModuleGeometry,
+) -> LegacyModuleCore:
+    core_cls = LegacyModuleCore
+
+    if isinstance(module_hardware_api, TempDeck):
+        core_cls = LegacyTemperatureModuleCore
+
+    return core_cls(
+        sync_module_hardware=SynchronousAdapter(module_hardware_api),
+        requested_model=requested_model,
+        geometry=geometry,
+    )
