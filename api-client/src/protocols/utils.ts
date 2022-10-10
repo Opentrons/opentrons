@@ -260,19 +260,14 @@ export interface LoadedLiquidsById {
 // and the other in array form coming from ProtocolAnalysisOutput. This should be reconciled to use a single type so
 // conversion of the shape is not needed in the util and the type is consistent across the board.
 export function parseLiquidsInLoadOrder(
-  liquids: LoadedLiquidsById | LoadedLiquid[],
+  liquids: LoadedLiquid[],
   commands: RunTimeCommand[]
 ): LoadedLiquid[] {
   const loadLiquidCommands = commands.filter(
     (command): command is LoadLiquidRunTimeCommand =>
       command.commandType === 'loadLiquid'
   )
-  const transformedLiquids = Array.isArray(liquids)
-    ? liquids
-    : Object.keys(liquids).map(key => {
-        return { id: key, ...liquids[key] }
-      })
-  const loadedLiquids = transformedLiquids.map((liquid, index) => {
+  const loadedLiquids = liquids.map((liquid, index) => {
     return {
       ...liquid,
       displayColor:

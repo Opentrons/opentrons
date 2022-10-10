@@ -56,7 +56,8 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
   const labwareRenderInfoById = useLabwareRenderInfoForRunById(runId)
   const protocolData = useProtocolDetailsForRun(runId).protocolData
   const liquids = parseLiquidsInLoadOrder(
-    protocolData?.liquids != null ? protocolData?.liquids : {},
+    //  @ts-expect-error
+    protocolData?.liquids != null ? protocolData?.liquids : [],
     protocolData?.commands ?? []
   )
   const labwareByLiquidId = parseLabwareInfoByLiquidId(

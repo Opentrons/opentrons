@@ -50,7 +50,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
     commands
   )
   const liquidsInLoadOrder = parseLiquidsInLoadOrder(
-    liquids != null ? liquids : {},
+    liquids != null ? liquids : [],
     commands
   )
   const labwareByLiquidId = parseLabwareInfoByLiquidId(commands)

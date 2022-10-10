@@ -134,6 +134,7 @@ export const RunLogProtocolSetupInfo = ({
       )
   } else if (setupCommand.commandType === 'loadLiquid') {
     const liquidInfo = parseLiquidsInLoadOrder(
+      //  @ts-expect-error
       protocolData.liquids,
       protocolData.commands
     )
