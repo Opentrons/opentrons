@@ -65,7 +65,7 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
         OT3AxisKind.Y: 500,
         OT3AxisKind.Z: 200,
         OT3AxisKind.P: 45,
-        OT3AxisKind.Z_G: 200,
+        OT3AxisKind.Z_G: 120,
     },
     high_throughput={
         OT3AxisKind.X: 500,
@@ -83,7 +83,7 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
         OT3AxisKind.X: 500,
         OT3AxisKind.Y: 500,
     },
-    gripper={OT3AxisKind.Z: 200, OT3AxisKind.Z_G: 200},
+    gripper={OT3AxisKind.Z: 350, OT3AxisKind.Z_G: 120},
 )
 
 DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
