@@ -38,42 +38,46 @@ export function useOffsetCandidatesForCurrentRun(): OffsetCandidate[] {
   )
     return []
 
-  //  @ts-expect-error
-  return protocolData.labware.reduce<OffsetCandidate[]>(
-    //  @ts-expect-error
-    (acc: OffsetCandidate[], item) => {
-      const location = getLabwareOffsetLocation(
-        item.id,
-        protocolData.commands,
-        protocolData.modules
-      )
-      const definition = getLabwareDefinition(
-        item.id,
-        protocolData.labware,
-        protocolData.labwareDefinitions
-      )
-      const defUri = getLabwareDefURI(definition)
-      const labwareDisplayName = getLabwareDisplayName(definition)
+  return (
+    protocolData.labware
+      //  @ts-expect-error
+      .filter(labware => labware.id !== 'fixedTrash')
+      .reduce<OffsetCandidate[]>(
+        //  @ts-expect-error
+        (acc: OffsetCandidate[], item) => {
+          const location = getLabwareOffsetLocation(
+            item.id,
+            protocolData.commands,
+            protocolData.modules
+          )
+          const definition = getLabwareDefinition(
+            item.id,
+            protocolData.labware,
+            protocolData.labwareDefinitions
+          )
+          const defUri = getLabwareDefURI(definition)
+          const labwareDisplayName = getLabwareDisplayName(definition)
 
-      const offsetMatch = allHistoricOffsets.find(
-        ({ offset }) =>
-          !isEqual(offset.vector, { x: 0, y: 0, z: 0 }) &&
-          isEqual(offset.location, location) &&
-          offset.definitionUri === defUri
-      )
+          const offsetMatch = allHistoricOffsets.find(
+            ({ offset }) =>
+              !isEqual(offset.vector, { x: 0, y: 0, z: 0 }) &&
+              isEqual(offset.location, location) &&
+              offset.definitionUri === defUri
+          )
 
-      return offsetMatch == null
-        ? acc
-        : [
-            ...acc,
-            {
-              ...offsetMatch.offset,
-              runCreatedAt: offsetMatch.runCreatedAt,
-              labwareDisplayName,
-            },
-          ]
-    },
-    []
+          return offsetMatch == null
+            ? acc
+            : [
+                ...acc,
+                {
+                  ...offsetMatch.offset,
+                  runCreatedAt: offsetMatch.runCreatedAt,
+                  labwareDisplayName,
+                },
+              ]
+        },
+        []
+      )
   )
 }
 

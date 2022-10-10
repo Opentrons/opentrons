@@ -47,9 +47,8 @@ export const getProtocolModulesInfo = (
                 'moduleId' in command.params.location &&
                 command.params.location.moduleId === moduleId
             )?.result?.labwareId ?? null
-
         const nestedLabware =
-        //  @ts-expect-error
+          //  @ts-expect-error
           nestedLabwareId != null ? protocolData.labware[nestedLabwareId] : null
         const nestedLabwareDef =
           nestedLabware != null
