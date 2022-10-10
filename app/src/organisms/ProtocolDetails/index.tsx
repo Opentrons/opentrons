@@ -333,7 +333,6 @@ export function ProtocolDetails(
         showSlideout={showSlideout}
         storedProtocolData={props}
       />
-
       <Flex
         backgroundColor={COLORS.white}
         border={`1px solid ${COLORS.medGreyEnabled}`}
