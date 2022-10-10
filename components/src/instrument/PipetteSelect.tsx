@@ -6,6 +6,7 @@ import {
   getPipetteNameSpecs,
   GEN1,
   GEN2,
+  GEN3,
 } from '@opentrons/shared-data'
 import { Select, CONTEXT_VALUE } from '../forms'
 import styles from './PipetteSelect.css'
@@ -68,10 +69,12 @@ export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
   const allowlist = ({ value }: SelectOption): boolean => {
     return !nameBlocklist.some(n => n === value)
   }
+  const gen3options = specsByCategory[GEN3].map(specToOption).filter(allowlist)
   const gen2Options = specsByCategory[GEN2].map(specToOption).filter(allowlist)
   const gen1Options = specsByCategory[GEN1].map(specToOption).filter(allowlist)
   const groupedOptions = [
     ...(enableNoneOption ? [OPTION_NONE] : []),
+    ...(gen3options.length > 0 ? [{ options: gen3options }] : []),
     ...(gen2Options.length > 0 ? [{ options: gen2Options }] : []),
     ...(gen1Options.length > 0 ? [{ options: gen1Options }] : []),
   ]

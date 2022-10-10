@@ -27,7 +27,10 @@ class OpenLabwareLatchResult(BaseModel):
 
     pipetteRetracted: bool = Field(
         ...,
-        description="Whether the pipette was retracted/ homed before starting shake.",
+        description=(
+            "Whether this command automatically retracted the pipettes"
+            " before opening the latch, to avoid a potential collision."
+        ),
     )
 
 

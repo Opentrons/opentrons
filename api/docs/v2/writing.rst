@@ -91,7 +91,7 @@ This function must be named exactly ``run`` and must take exactly one mandatory 
 
 The function ``run`` is the container for the code that defines your protocol.
 
-The object ``protocol`` is the *protocol context*, which represents the robot and its capabilities. It is always an instance of the :py:class:`opentrons.protocol_api.contexts.ProtocolContext` class (though you'll never have to instantiate one yourself - it is always passed in to ``run()``), and it is tagged as such in the example protocol to allow most editors to give you autocomplete.
+The object ``protocol`` is the *protocol context*, which represents the robot and its capabilities. It is always an instance of the :py:class:`opentrons.protocol_api.ProtocolContext` class (though you'll never have to instantiate one yourself - it is always passed in to ``run()``), and it is tagged as such in the example protocol to allow most editors to give you autocomplete.
 
 The protocol context has two responsibilities:
 

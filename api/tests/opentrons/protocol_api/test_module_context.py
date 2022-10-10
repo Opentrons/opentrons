@@ -11,6 +11,7 @@ from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, ModuleContext, Labware
 from opentrons.protocol_api.core.labware import LabwareLoadParams
 
+
 from .types import LabwareCore, ModuleCore, ProtocolCore
 
 
@@ -98,6 +99,7 @@ def test_load_labware(
     )
 
     assert result is mock_labware
+    decoy.verify(mock_core.add_labware_core(mock_labware_core), times=1)
     decoy.verify(mock_deck.recalculate_high_z(), times=1)
 
 

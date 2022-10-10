@@ -6,7 +6,7 @@ import asyncio
 from typing import Optional, Dict
 from opentrons.drivers import utils
 from opentrons.drivers.command_builder import CommandBuilder
-from opentrons.drivers.asyncio.communication import SerialConnection
+from opentrons.drivers.asyncio.communication import AsyncResponseSerialConnection
 from opentrons.drivers.heater_shaker.abstract import AbstractHeaterShakerDriver
 from opentrons.drivers.types import Temperature, RPM, HeaterShakerLabwareLatchStatus
 
@@ -30,6 +30,7 @@ DEFAULT_HS_TIMEOUT = 40
 HS_COMMAND_TERMINATOR = "\n"
 HS_ACK = "OK" + HS_COMMAND_TERMINATOR
 HS_ERROR_KEYWORD = "err"
+HS_ASYNC_ERROR_ACK = "async"
 DEFAULT_COMMAND_RETRIES = 0
 
 
@@ -47,17 +48,18 @@ class HeaterShakerDriver(AbstractHeaterShakerDriver):
 
         Returns: driver
         """
-        connection = await SerialConnection.create(
+        connection = await AsyncResponseSerialConnection.create(
             port=port,
             baud_rate=HS_BAUDRATE,
             timeout=DEFAULT_HS_TIMEOUT,
             ack=HS_ACK,
             loop=loop,
             error_keyword=HS_ERROR_KEYWORD,
+            async_error_ack=HS_ASYNC_ERROR_ACK,
         )
         return cls(connection=connection)
 
-    def __init__(self, connection: SerialConnection) -> None:
+    def __init__(self, connection: AsyncResponseSerialConnection) -> None:
         """
         Constructor
 

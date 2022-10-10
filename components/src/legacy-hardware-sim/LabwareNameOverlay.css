@@ -13,6 +13,7 @@
   font-weight: var(--fw-semibold);
   color: var(--c-font-light);
   text-transform: uppercase;
+  overflow-wrap: break-word;
 }
 
 .deck_slot:active {

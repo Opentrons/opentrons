@@ -173,6 +173,7 @@ export function useModuleOverflowMenu(
       key={`hs_attach_to_deck_${module.moduleModel}`}
       data-testid={`hs_attach_to_deck_${module.moduleModel}`}
       onClick={() => handleWizardClick()}
+      whiteSpace="nowrap"
     >
       {t('heater_shaker:show_attachment_instructions')}
     </MenuItem>
@@ -268,6 +269,7 @@ export function useModuleOverflowMenu(
       key={`thermocycler_block_temp_command_btn_${module.moduleModel}`}
       onClick={sendBlockTempCommand}
       disabled={isDisabled}
+      whiteSpace="nowrap"
     >
       {module.data.status !== 'idle'
         ? t('overflow_menu_deactivate_block')

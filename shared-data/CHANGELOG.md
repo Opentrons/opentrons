@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.1.0](https://github.com/Opentrons/opentrons/compare/v6.0.1...v6.1.0) (2022-09-27)
+
+
+### Bug Fixes
+
+* **api,shared-data:** Fix incorrect rejection of `thermocycler/runProfile` commands ([#11241](https://github.com/Opentrons/opentrons/issues/11241)) ([4366958](https://github.com/Opentrons/opentrons/commit/4366958c3025213115f9af00af5cd95b6cbbf32a))
+* **app:** accept protocols with Thermocycler Gen2 ([#10850](https://github.com/Opentrons/opentrons/issues/10850)) ([02c7c79](https://github.com/Opentrons/opentrons/commit/02c7c79cf908616f8831bad77f7af461a5852edf))
+
+
+### Features
+
+* **app:** support module JSON v6 commands in run log ([#11234](https://github.com/Opentrons/opentrons/issues/11234)) ([5f0cc21](https://github.com/Opentrons/opentrons/commit/5f0cc21a3b7d1958f98910065e87d45869c8939e)), closes [#11228](https://github.com/Opentrons/opentrons/issues/11228)
+* **engine:** thermocycler run profile ([#10921](https://github.com/Opentrons/opentrons/issues/10921)) ([8a70b53](https://github.com/Opentrons/opentrons/commit/8a70b53ed35d33951b130bb1299026f02cf81d7b))
+* **shared-data:** add Armadillo PCR plate and adapter definitions ([#11003](https://github.com/Opentrons/opentrons/issues/11003)) ([2519f8a](https://github.com/Opentrons/opentrons/commit/2519f8a50ac88f078c85ed42a1ba2c413f61968d))
+* **shared-data:** update Thermocycler Gen2 module definition ([#10951](https://github.com/Opentrons/opentrons/issues/10951)) ([9fa9f83](https://github.com/Opentrons/opentrons/commit/9fa9f8319965b9e7e21d68b8928915751d088614))
+* **step-generation, shared-data:** delete TC await profile complete command ([#11273](https://github.com/Opentrons/opentrons/issues/11273)) ([9654cf2](https://github.com/Opentrons/opentrons/commit/9654cf2c86f7908bf718053a5bbab222d6103a73)), closes [#11272](https://github.com/Opentrons/opentrons/issues/11272)
+
+
+
+
+
 ## [6.0.1](https://github.com/Opentrons/opentrons/compare/v6.0.0...v6.0.1) (2022-08-09)
 
 **Note:** Version bump only for package @opentrons/shared-data

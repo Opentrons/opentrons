@@ -8,6 +8,7 @@
   "confirm_placement": "Confirm placement",
   "confirm_position": "Confirm position",
   "continue": "continue",
+  "did_pipette_pick_up_tip": "Did pipette pick up tip successfully?",
   "disabled_cannot_connect": "Cannot connect to robot",
   "disabled_connect_to_robot": "Connect to robot to control",
   "disabled_no_pipette_attached": "Attach a pipette to proceed",

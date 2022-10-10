@@ -1,17 +1,17 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
-import { ExitPreventionModal } from '../ExitPreventionModal'
+import { ExitConfirmation } from '../ExitConfirmation'
 import { i18n } from '../../../i18n'
 import { renderWithProviders } from '@opentrons/components'
 
-const render = (props: React.ComponentProps<typeof ExitPreventionModal>) => {
-  return renderWithProviders(<ExitPreventionModal {...props} />, {
+const render = (props: React.ComponentProps<typeof ExitConfirmation>) => {
+  return renderWithProviders(<ExitConfirmation {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
 describe('Exit Prevention Modal', () => {
-  let props: React.ComponentProps<typeof ExitPreventionModal>
+  let props: React.ComponentProps<typeof ExitConfirmation>
   beforeEach(() => {
     props = { onGoBack: jest.fn(), onConfirmExit: jest.fn() }
   })

@@ -20,7 +20,7 @@ import { useCurrentRun, useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { getLatestLabwareOffsetCount } from '../utils/getLatestLabwareOffsetCount'
 import { SectionList } from '../SectionList'
 import { useIntroInfo, useLabwareIdsBySection } from '../hooks'
-import { IntroScreen, INTERVAL_MS } from '../IntroScreen'
+import { IntroScreen, INTERVAL_MS } from '../IntroScreen/IntroScreen'
 import type { DeprecatedSection } from '../types'
 import type { HostConfig, LabwareOffset } from '@opentrons/api-client'
 

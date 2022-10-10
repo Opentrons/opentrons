@@ -1,16 +1,16 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { DIRECTION_COLUMN, Flex, TYPOGRAPHY } from '@opentrons/components'
-import { StyledText } from '../../../atoms/text'
+import { StyledText } from '../../atoms/text'
 import { PrepareSpace } from './PrepareSpace'
 import { JogToWell } from './JogToWell'
 import { CompletedProtocolAnalysis, getIsTiprack, getLabwareDefURI, getLabwareDisplayName, getModuleDisplayName } from '@opentrons/shared-data'
-import type { CheckTipRacksStep } from '../types'
-import { getLabwareDefinitionsFromCommands } from '../utils/labware'
-import { UnorderedList } from '../../../molecules/UnorderedList'
+import { getLabwareDefinitionsFromCommands } from './utils/labware'
+import { UnorderedList } from '../../molecules/UnorderedList'
 
-interface CheckItemProps extends Omit<CheckTipRacksStep, 'section'> {
-  runId: string
+import type { CheckTipRacksStep } from './types'
+
+interface CheckItemProps extends CheckTipRacksStep {
   protocolData: CompletedProtocolAnalysis
   proceed: () => void
 }
@@ -19,7 +19,6 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   const [hasPreparedSpace, setHasPreparedSpace] = React.useState(false)
   const { t } = useTranslation('labware_position_check')
   React.useEffect(() => {
-    console.log('EFFECT CALLED')
     setHasPreparedSpace(false)
   }, [labwareId, pipetteId, location?.moduleId, location?.slotName])
 

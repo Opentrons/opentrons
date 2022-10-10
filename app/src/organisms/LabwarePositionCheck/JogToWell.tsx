@@ -20,28 +20,26 @@ import {
   IDENTITY_VECTOR,
 } from '@opentrons/shared-data'
 
-import levelWithTip from '../../../assets/images/lpc_level_with_tip.svg'
-import levelWithLabware from '../../../assets/images/lpc_level_with_labware.svg'
-import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
-import { StyledText } from '../../../atoms/text'
-import { getLabwareDefinitionsFromCommands } from '../utils/labware'
-import { NeedHelpLink } from '../../CalibrationPanels'
-import { JogControls } from '../../../molecules/JogControls'
+import levelWithTip from '../../assets/images/lpc_level_with_tip.svg'
+import levelWithLabware from '../../assets/images/lpc_level_with_labware.svg'
+import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
+import { StyledText } from '../../atoms/text'
+import { NeedHelpLink } from '../CalibrationPanels'
+import { JogControls } from '../../molecules/JogControls'
 
 import type {
   CompletedProtocolAnalysis,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
 import type { WellStroke } from '@opentrons/components'
-import type { CheckTipRacksStep } from '../types'
-import { OffsetVector } from '../../../molecules/OffsetVector'
+import type { CheckTipRacksStep } from './types'
+import { OffsetVector } from '../../molecules/OffsetVector'
 
 const DECK_MAP_VIEWBOX = '-30 -20 170 115'
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
 
 interface JogToWellProps extends Omit<CheckTipRacksStep, 'section'> {
-  runId: string
   protocolData: CompletedProtocolAnalysis
   proceed: () => void
   goBack: () => void

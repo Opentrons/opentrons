@@ -15,6 +15,7 @@ import { CheckItem } from './CheckItem'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { useMostRecentCompletedAnalysis } from './hooks/useMostRecentCompletedAnalysis'
+import { PickUpTip } from './PickUpTip'
 interface LabwarePositionCheckModalProps {
   onCloseClick: () => unknown
   runId: string
@@ -84,15 +85,24 @@ export const LabwarePositionCheckComponent = (
   } else if (currentStep.section === 'CHECK_TIP_RACKS') {
     modalContent = (
       <CheckItem
-        runId={props.runId}
         {...currentStep}
         proceed={proceed}
         protocolData={protocolData} />
     )
   } else if (currentStep.section === 'PICK_UP_TIP') {
-    modalContent = (<div> PICK_UP_TIP <button onClick={proceed}>PROCEED</button> </div>)
+    modalContent = (
+      <PickUpTip
+        {...currentStep}
+        proceed={proceed}
+        protocolData={protocolData} />
+    )
   } else if (currentStep.section === 'CHECK_LABWARE') {
-    modalContent = (<div> CHECK_LABWARE <button onClick={proceed}>PROCEED</button> </div>)
+    modalContent = (
+      <CheckItem
+        {...currentStep}
+        proceed={proceed}
+        protocolData={protocolData} />
+    )
   } else if (currentStep.section === 'RETURN_TIP') {
     modalContent = (<div> RETURN_TIP <button onClick={proceed}>PROCEED</button> </div>)
   } else if (currentStep.section === 'RESULTS_SUMMARY') {

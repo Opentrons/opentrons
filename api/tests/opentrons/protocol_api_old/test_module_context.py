@@ -6,19 +6,16 @@ from typing import cast
 import opentrons.protocol_api as papi
 import opentrons.protocols.geometry as papi_geometry
 
-from opentrons.types import Point, Location, Mount
+from opentrons.types import Point, Location
 from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
 from opentrons.hardware_control.modules.magdeck import OFFSET_TO_LABWARE_BOTTOM
 from opentrons.hardware_control.modules.types import (
-    TemperatureStatus,
     SpeedStatus,
     ThermocyclerModuleModel,
 )
 
 from opentrons.protocol_api import ProtocolContext
 from opentrons.protocol_api.module_contexts import (
-    NoTargetTemperatureSetError,
-    CannotPerformModuleAction,
     HeaterShakerContext,
 )
 
@@ -179,97 +176,12 @@ def test_load_simulating_module(ctx, loadname, klass, model):
     assert mod._module.model() == model
 
 
-# ________ Temperature Module tests _________
-
-
-def test_tempdeck(ctx_with_tempdeck, mock_module_controller):
-    mod = ctx_with_tempdeck.load_module("Temperature Module", 1)
-    assert ctx_with_tempdeck.deck[1] == mod.geometry
-
-
-def test_tempdeck_target(ctx_with_tempdeck, mock_module_controller):
-    mod = ctx_with_tempdeck.load_module("Temperature Module", 1)
-    m = mock.PropertyMock(return_value=0x1337)
-    type(mock_module_controller).target = m
-    assert mod.target == 0x1337
-
-
-def test_tempdeck_set_temperature(ctx_with_tempdeck, mock_module_controller):
-    mod = ctx_with_tempdeck.load_module("Temperature Module", 1)
-    mod.set_temperature(20)
-    assert "setting temperature" in ",".join(
-        cmd.lower() for cmd in ctx_with_tempdeck.commands()
-    )
-    mock_module_controller.set_temperature.assert_called_once_with(20)
-
-
-def test_tempdeck_temperature(ctx_with_tempdeck, mock_module_controller):
-    mod = ctx_with_tempdeck.load_module("Temperature Module", 1)
-    m = mock.PropertyMock(return_value=0xDEAD)
-    type(mock_module_controller).temperature = m
-    assert mod.temperature == 0xDEAD
-
-
-def test_tempdeck_deactivate(ctx_with_tempdeck, mock_module_controller):
-    mod = ctx_with_tempdeck.load_module("Temperature Module", 1)
-    mod.deactivate()
-    assert "deactivating temperature" in ",".join(
-        cmd.lower() for cmd in ctx_with_tempdeck.commands()
-    )
-    mock_module_controller.deactivate.assert_called_once()
-
-
-def test_tempdeck_status(ctx_with_tempdeck, mock_module_controller):
-    mod = ctx_with_tempdeck.load_module("Temperature Module", 1)
-    m = mock.PropertyMock(return_value="some status")
-    type(mock_module_controller).status = m
-    assert mod.status == "some status"
-
-
 # _________ Magnetic Module tests __________
 
 
 def test_magdeck(ctx_with_magdeck, mock_module_controller):
     mod = ctx_with_magdeck.load_module("Magnetic Module", 1)
     assert ctx_with_magdeck.deck[1] == mod.geometry
-
-
-def test_magdeck_status(ctx_with_magdeck, mock_module_controller):
-    mod = ctx_with_magdeck.load_module("Magnetic Module", 1)
-    m = mock.PropertyMock(return_value="disengaged")
-    type(mock_module_controller).status = m
-    assert mod.status == "disengaged"
-
-
-def test_magdeck_engage_no_height_no_labware(ctx_with_magdeck, mock_module_controller):
-    """It should raise an error."""
-    mod = ctx_with_magdeck.load_module("Magnetic Module", 1)
-    with pytest.raises(ValueError):
-        mod.engage()
-
-
-def test_magdeck_engage_with_height(ctx_with_magdeck, mock_module_controller):
-    mod = ctx_with_magdeck.load_module("Magnetic Module", 1)
-    mod.engage(height=2)
-    assert "engaging magnetic" in ",".join(
-        cmd.lower() for cmd in ctx_with_magdeck.commands()
-    )
-    mock_module_controller.engage.assert_called_once_with(2)
-
-
-def test_magdeck_engage_with_height_from_base(ctx_with_magdeck, mock_module_controller):
-    mod = ctx_with_magdeck.load_module("Magnetic Module", 1)
-    mod.engage(height_from_base=2)
-    mock_module_controller.engage.assert_called_once_with(7)
-
-
-def test_magdeck_disengage(ctx_with_magdeck, mock_module_controller):
-    mod = ctx_with_magdeck.load_module("Magnetic Module", 1)
-    mod.disengage()
-    assert "disengaging magnetic" in ",".join(
-        cmd.lower() for cmd in ctx_with_magdeck.commands()
-    )
-    mock_module_controller.deactivate.assert_called_once_with()
 
 
 def test_magdeck_calibrate(ctx_with_magdeck, mock_module_controller):
@@ -533,6 +445,21 @@ def test_hs_flag_unsafe_move_raises(
         mod.flag_unsafe_move(to_loc=labware.wells()[1].top(), is_multichannel=False)
 
 
+def test_hs_flag_unsafe_move_skips_non_labware_locations(
+    ctx_with_heater_shaker: ProtocolContext,
+    mock_module_controller: mock.MagicMock,
+) -> None:
+    """Test that purely point locations do not raise error."""
+    mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 3)
+    assert isinstance(mod, HeaterShakerContext)
+    mod._core.geometry.flag_unsafe_move = mock.MagicMock()  # type: ignore[attr-defined]
+
+    mod.flag_unsafe_move(
+        to_loc=Location(point=Point(1, 2, 3), labware=None), is_multichannel=False
+    )
+    mod._core.geometry.flag_unsafe_move.assert_not_called()  # type: ignore[attr-defined]
+
+
 def test_heater_shaker_loading(
     ctx_with_heater_shaker: ProtocolContext,
     mock_module_controller: mock.MagicMock,
@@ -540,273 +467,6 @@ def test_heater_shaker_loading(
     """It should load a heater-shaker in the specified slot."""
     mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 3)
     assert ctx_with_heater_shaker.deck[3] == mod.geometry
-
-
-def test_heater_shaker_set_target_temperature(
-    ctx_with_heater_shaker: ProtocolContext,
-    mock_module_controller: mock.MagicMock,
-) -> None:
-    """It should issue a hw control command to set validated target temperature."""
-    with mock.patch(
-        "opentrons.protocol_api.module_contexts.validate_heater_shaker_temperature"
-    ) as mock_validator:
-        mock_validator.return_value = 10
-        hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
-        hs_mod.set_target_temperature(celsius=50)  # type: ignore[union-attr]
-        mock_validator.assert_called_once_with(celsius=50)
-        mock_module_controller.start_set_temperature.assert_called_once_with(celsius=10)
-
-
-def test_heater_shaker_wait_for_temperature(
-    ctx_with_heater_shaker: ProtocolContext, mock_module_controller: mock.MagicMock
-) -> None:
-    """It should issue a hardware control wait for temperature."""
-    mock_target_temp = mock.PropertyMock(return_value=100)
-    type(mock_module_controller).target_temperature = mock_target_temp
-
-    hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
-    hs_mod.wait_for_temperature()  # type: ignore[union-attr]
-    mock_module_controller.await_temperature.assert_called_once_with(
-        awaiting_temperature=100
-    )
-
-
-def test_heater_shaker_wait_for_temperature_raises(
-    ctx_with_heater_shaker: ProtocolContext, mock_module_controller: mock.MagicMock
-) -> None:
-    """It should raise an error when waiting for temperature when no target is set."""
-    mock_target_temp = mock.PropertyMock(return_value=None)
-    type(mock_module_controller).target_temperature = mock_target_temp
-
-    hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
-
-    with pytest.raises(NoTargetTemperatureSetError):
-        hs_mod.wait_for_temperature()  # type: ignore[union-attr]
-
-
-def test_heater_shaker_set_and_wait_for_temperature(
-    ctx_with_heater_shaker: ProtocolContext, mock_module_controller: mock.MagicMock
-) -> None:
-    """It should issue a set and wait for the target temperature."""
-    mock_target_temp = mock.PropertyMock(return_value=100)
-    type(mock_module_controller).target_temperature = mock_target_temp
-
-    with mock.patch(
-        "opentrons.protocol_api.module_contexts.validate_heater_shaker_temperature"
-    ) as mock_validator:
-        mock_validator.return_value = 11
-        hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
-        hs_mod.set_and_wait_for_temperature(celsius=50)  # type: ignore[union-attr]
-        mock_validator.assert_called_once_with(celsius=50)
-        mock_module_controller.start_set_temperature.assert_called_once_with(celsius=11)
-        mock_module_controller.await_temperature.assert_called_once_with(
-            awaiting_temperature=100
-        )
-
-
-def test_heater_shaker_temperature_properties(
-    ctx_with_heater_shaker: ProtocolContext, mock_module_controller: mock.MagicMock
-) -> None:
-    """It should return the correct target and current temperature values."""
-    mock_current_temp = mock.PropertyMock(return_value=123.45)
-    mock_target_temp = mock.PropertyMock(return_value=234.56)
-
-    type(mock_module_controller).temperature = mock_current_temp
-    type(mock_module_controller).target_temperature = mock_target_temp
-
-    hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
-
-    assert isinstance(hs_mod, HeaterShakerContext)
-    assert hs_mod.current_temperature == 123.45
-    assert hs_mod.target_temperature == 234.56
-
-
-def test_heater_shaker_speed_properties(
-    ctx_with_heater_shaker: ProtocolContext, mock_module_controller: mock.MagicMock
-) -> None:
-    """It should return the current & target speed values."""
-    mock_current_speed = mock.PropertyMock(return_value=12)
-    mock_target_speed = mock.PropertyMock(return_value=34)
-
-    type(mock_module_controller).speed = mock_current_speed
-    type(mock_module_controller).target_speed = mock_target_speed
-
-    hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
-
-    assert isinstance(hs_mod, HeaterShakerContext)
-    assert hs_mod.current_speed == 12
-    assert hs_mod.target_speed == 34
-
-
-def test_heater_shaker_temp_and_speed_status(
-    ctx_with_heater_shaker: ProtocolContext, mock_module_controller: mock.MagicMock
-) -> None:
-    """It should return the heater-shaker's temperature and speed status strings."""
-    mock_temp_status = mock.PropertyMock(return_value=TemperatureStatus.HOLDING)
-    mock_speed_status = mock.PropertyMock(return_value=SpeedStatus.DECELERATING)
-
-    type(mock_module_controller).temperature_status = mock_temp_status
-    type(mock_module_controller).speed_status = mock_speed_status
-    hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
-
-    assert isinstance(hs_mod, HeaterShakerContext)
-    assert hs_mod.temperature_status == "holding at target"
-    assert hs_mod.speed_status == "slowing down"
-
-
-def test_heater_shaker_latch_status(
-    ctx_with_heater_shaker: ProtocolContext, mock_module_controller: mock.MagicMock
-) -> None:
-    """It should return the heater-shaker's labware latch status string."""
-    mock_latch_status = mock.PropertyMock(
-        return_value=HeaterShakerLabwareLatchStatus.IDLE_CLOSED
-    )
-    type(mock_module_controller).labware_latch_status = mock_latch_status
-
-    hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
-    assert hs_mod.labware_latch_status == "idle_closed"  # type: ignore[union-attr]
-
-
-def test_heater_shaker_set_and_wait_for_shake_speed(
-    ctx_with_heater_shaker: ProtocolContext,
-    mock_module_controller: mock.MagicMock,
-    mock_pipette_location: mock.MagicMock,
-    mock_hardware: mock.AsyncMock,
-) -> None:
-    """It should issue a blocking set target shake speed."""
-    # Mock setup
-    mock_latch_status = mock.PropertyMock(
-        return_value=HeaterShakerLabwareLatchStatus.IDLE_CLOSED
-    )
-    type(mock_module_controller).labware_latch_status = mock_latch_status
-
-    with mock.patch(
-        "opentrons.protocol_api.module_contexts.validate_heater_shaker_speed"
-    ) as mock_validator:
-        mock_validator.return_value = 10
-        hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
-        assert isinstance(hs_mod, HeaterShakerContext)
-        hs_mod._core.geometry.is_pipette_blocking_shake_movement = mock.MagicMock(  # type: ignore[attr-defined]
-            return_value=True
-        )
-
-        # Call subject method
-        hs_mod.set_and_wait_for_shake_speed(rpm=400)
-
-        # Assert expected calls
-        mock_validator.assert_called_once_with(rpm=400)
-        hs_mod.geometry.is_pipette_blocking_shake_movement.assert_called_with(  # type: ignore[attr-defined]
-            pipette_location=mock_pipette_location
-        )
-        calls = [mock.call(mount=Mount.LEFT), mock.call(mount=Mount.RIGHT)]
-        mock_hardware.retract.assert_has_calls(calls, any_order=True)
-        mock_module_controller.set_speed.assert_called_once_with(rpm=10)
-        assert ctx_with_heater_shaker.location_cache is None
-
-
-@pytest.mark.parametrize(
-    "latch_status",
-    [
-        HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN,
-        HeaterShakerLabwareLatchStatus.UNKNOWN,
-        HeaterShakerLabwareLatchStatus.CLOSING,
-        HeaterShakerLabwareLatchStatus.IDLE_OPEN,
-        HeaterShakerLabwareLatchStatus.OPENING,
-    ],
-)
-def test_heater_shaker_set_and_wait_for_shake_speed_raises(
-    ctx_with_heater_shaker: ProtocolContext,
-    mock_module_controller: mock.MagicMock,
-    latch_status: HeaterShakerLabwareLatchStatus,
-) -> None:
-    """It should raise an error while setting speed when labware latch not closed."""
-    mock_latch_status = mock.PropertyMock(return_value=latch_status)
-    type(mock_module_controller).labware_latch_status = mock_latch_status
-
-    with pytest.raises(CannotPerformModuleAction):
-        hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
-        hs_mod.set_and_wait_for_shake_speed(rpm=400)  # type: ignore[union-attr]
-
-
-def test_heater_shaker_open_labware_latch(
-    ctx_with_heater_shaker: ProtocolContext,
-    mock_module_controller: mock.MagicMock,
-    mock_pipette_location: mock.MagicMock,
-    mock_hardware: mock.MagicMock,
-) -> None:
-    """It should issue a labware latch open command."""
-    # Mocks
-    mock_speed_status = mock.PropertyMock(return_value=SpeedStatus.IDLE)
-    type(mock_module_controller).speed_status = mock_speed_status
-
-    # Get subject
-    hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
-    assert isinstance(hs_mod, HeaterShakerContext)
-    hs_mod._core.geometry.is_pipette_blocking_latch_movement = mock.MagicMock(  # type: ignore[attr-defined]
-        return_value=True
-    )
-
-    # Call subject method
-    hs_mod.open_labware_latch()
-    # Assert calls
-    hs_mod.geometry.is_pipette_blocking_latch_movement.assert_called_with(  # type: ignore[attr-defined]
-        pipette_location=mock_pipette_location
-    )
-    calls = [mock.call(mount=Mount.LEFT), mock.call(mount=Mount.RIGHT)]
-    mock_hardware.retract.assert_has_calls(calls, any_order=True)
-    mock_module_controller.open_labware_latch.assert_called_once()
-    assert ctx_with_heater_shaker.location_cache is None
-
-
-@pytest.mark.parametrize(
-    "speed_status",
-    [
-        SpeedStatus.DECELERATING,
-        SpeedStatus.ACCELERATING,
-        SpeedStatus.HOLDING,
-        SpeedStatus.ERROR,
-    ],
-)
-def test_heater_shaker_open_labware_latch_raises(
-    ctx_with_heater_shaker: ProtocolContext,
-    mock_module_controller: mock.MagicMock,
-    speed_status: SpeedStatus,
-) -> None:
-    """It should raise when opening latch during a shake."""
-    mock_speed_status = mock.PropertyMock(return_value=speed_status)
-    type(mock_module_controller).speed_status = mock_speed_status
-
-    hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
-    with pytest.raises(CannotPerformModuleAction):
-        hs_mod.open_labware_latch()  # type: ignore[union-attr]
-
-
-def test_heater_shaker_close_labware_latch(
-    ctx_with_heater_shaker: ProtocolContext, mock_module_controller: mock.MagicMock
-) -> None:
-    """It should issue a labware latch close command."""
-    hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
-
-    hs_mod.close_labware_latch()  # type: ignore[union-attr]
-    mock_module_controller.close_labware_latch.assert_called_once()
-
-
-def test_heater_shaker_deactivate_heater(
-    ctx_with_heater_shaker: ProtocolContext, mock_module_controller: mock.MagicMock
-) -> None:
-    """It should issue a deactivate heater hw control command."""
-    hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
-    hs_mod.deactivate_heater()  # type: ignore[union-attr]
-    mock_module_controller.deactivate_heater.assert_called_once()
-
-
-def test_heater_shaker_deactivate_shaker(
-    ctx_with_heater_shaker: ProtocolContext, mock_module_controller: mock.MagicMock
-) -> None:
-    """It should issue a deactivate shaker hw control command."""
-    hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
-    hs_mod.deactivate_shaker()  # type: ignore[union-attr]
-    mock_module_controller.deactivate_shaker.assert_called_once()
 
 
 # __________ Testing loading Labware on modules ___________

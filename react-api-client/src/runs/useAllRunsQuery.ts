@@ -5,9 +5,11 @@ import { useHost } from '../api'
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
 
 export function useAllRunsQuery(
-  options: UseQueryOptions<Runs, Error, Runs, Array<string | HostConfig>> = {}
+  options: UseQueryOptions<Runs, Error, Runs, Array<string | HostConfig>> = {},
+  hostOverride?: HostConfig | null
 ): UseQueryResult<Runs> {
-  const host = useHost()
+  const contextHost = useHost()
+  const host = hostOverride ?? contextHost
   const query = useQuery(
     [host as HostConfig, 'runs', 'details'],
     () => getRuns(host as HostConfig).then(response => response.data),

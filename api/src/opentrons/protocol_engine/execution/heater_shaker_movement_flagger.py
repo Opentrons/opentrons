@@ -1,4 +1,4 @@
-"""Helpers for flagging unsafe movements around a heater-shaker Module."""
+"""Helpers for flagging unsafe movements around a Heater-Shaker Module."""
 
 from typing import List
 
@@ -27,7 +27,7 @@ def raise_if_movement_restricted(
         )
         dest_heater_shaker = destination_slot == hs_movement_restrictor.deck_slot
 
-        # If heater-shaker is running, can't move to or around it
+        # If Heater-Shaker is running, can't move to or around it
         if (
             any([dest_east_west, dest_north_south, dest_heater_shaker])
             and hs_movement_restrictor.plate_shaking
@@ -36,22 +36,22 @@ def raise_if_movement_restricted(
                 "Cannot move pipette to Heater-Shaker or adjacent slot while module is shaking"
             )
 
-        # If heater-shaker's latch is open, can't move to it or east and west of it
+        # If Heater-Shaker's latch is open, can't move to it or east and west of it
         elif (
             dest_east_west or dest_heater_shaker
         ) and not hs_movement_restrictor.latch_closed:
             raise PipetteMovementRestrictedByHeaterShakerError(
-                "Cannot move pipette east or west of or to Heater-Shaker while latch is open"
+                "Cannot move pipette to Heater-Shaker or adjacent slot to the left or right while labware latch is open"
             )
 
         elif is_multi_channel:
             # Can't go to east/west slot under any circumstances if pipette is multi-channel
             if dest_east_west:
                 raise PipetteMovementRestrictedByHeaterShakerError(
-                    "Cannot move multi-channel pipette east or west of Heater-Shaker"
+                    "Cannot move 8-Channel pipette to slot adjacent to the left or right of Heater-Shaker"
                 )
             # Can only go north/south if the labware is a tip rack
             elif dest_north_south and not destination_is_tip_rack:
                 raise PipetteMovementRestrictedByHeaterShakerError(
-                    "Cannot move multi-channel pipette to non-tip rack labware north or south of Heater-Shaker"
+                    "Cannot move 8-Channel pipette to non-tip-rack labware directly in front of or behind a Heater-Shaker"
                 )

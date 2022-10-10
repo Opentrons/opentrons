@@ -50,8 +50,8 @@
   "fully_calibrate_before_checking_health": "Fully calibrate your robot before checking calibration health",
   "go_to_advanced_settings": "Go to Advanced App Settings",
   "health_check": "Check health",
-  "jupyter_notebook_description": "Open the Jupyter Notebook running on this OT-2 in the web browser. This is an experimental feature.",
-  "jupyter_notebook_link": "Learn more about using Jupyter notebook with the OT-2",
+  "jupyter_notebook_description": "Open the Jupyter Notebook running on this robot in the web browser. This is an experimental feature.",
+  "jupyter_notebook_link": "Learn more about using Jupyter notebook",
   "jupyter_notebook": "Jupyter Notebook",
   "last_calibrated_label": "Last Calibrated",
   "last_calibrated": "Last calibrated: {{date}}",
@@ -95,7 +95,8 @@
   "robot_name": "Robot Name",
   "robot_rename_button": "Rename robot",
   "robot_serial_number": "Robot Serial Number",
-  "robot_server_versions": "Robot Server Versions",
+  "robot_server_version": "Robot Server Version",
+  "robot_server_version_ot3_description": "The OT-3 robot software includes the robot server and the touchscreen display interface.",
   "robot_settings_advanced_unknown": "Unknown",
   "robot_settings": "Robot Settings",
   "robot_software_update_required": "A robot software update is required to run protocols with this version of the Opentrons App.",
@@ -136,5 +137,6 @@
   "wireless_ip": "Wireless IP",
   "wireless_mac_address": "Wireless MAC Address",
   "wireless_subnet_mask": "Wireless Subnet Mask",
-  "yes_clear_data_and_restart_robot": "Yes, clear data and restart robot"
+  "yes_clear_data_and_restart_robot": "Yes, clear data and restart robot",
+  "protocol_run_history_description": "Resetting run history will also clear Labware Offset data."
 }

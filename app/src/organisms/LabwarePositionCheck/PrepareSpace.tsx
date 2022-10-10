@@ -24,13 +24,13 @@ import {
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 
-import { PrimaryButton } from '../../../atoms/buttons'
-import { StyledText } from '../../../atoms/text'
-import { getLabwareDefinitionsFromCommands } from '../utils/labware'
-import { CheckTipRacksStep } from '../types'
+import { PrimaryButton } from '../../atoms/buttons'
+import { StyledText } from '../../atoms/text'
+import { getLabwareDefinitionsFromCommands } from './utils/labware'
+import { CheckTipRacksStep } from './types'
 import { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import { Trans, useTranslation } from 'react-i18next'
-import { NeedHelpLink } from '../../CalibrationPanels'
+import { NeedHelpLink } from '../CalibrationPanels'
 
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
@@ -46,7 +46,6 @@ const DECK_LAYER_BLOCKLIST = [
   'screwHoles',
 ]
 interface PrepareSpaceProps extends Omit<CheckTipRacksStep, 'section'> {
-  runId: string
   labwareDef: LabwareDefinition2
   protocolData: CompletedProtocolAnalysis
   confirmPlacement: () => void

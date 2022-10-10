@@ -8,6 +8,7 @@ import {
   Mount,
 } from '@opentrons/components'
 import {
+  getIncompatiblePipetteNames,
   getLabwareDefURI,
   getLabwareDisplayName,
   OT3_PIPETTES,
@@ -15,6 +16,7 @@ import {
 import isEmpty from 'lodash/isEmpty'
 import reduce from 'lodash/reduce'
 import { i18n } from '../../../localization'
+import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import { createCustomTiprackDef } from '../../../labware-defs/actions'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { PipetteDiagram } from './PipetteDiagram'
@@ -24,6 +26,8 @@ import formStyles from '../../forms/forms.css'
 
 import { FormPipettesByMount } from '../../../step-forms'
 import { DropdownOption } from '../../../../../components/src/forms/DropdownField'
+
+import type { PipetteName } from '@opentrons/shared-data'
 
 export interface Props {
   initialTabIndex?: number
@@ -61,6 +65,7 @@ export interface Props {
 interface PipetteSelectProps {
   mount: Mount
   tabIndex: number
+  nameBlocklist?: string[]
 }
 
 export function PipetteFields(props: Props): JSX.Element {
@@ -78,12 +83,26 @@ export function PipetteFields(props: Props): JSX.Element {
 
   const allLabware = useSelector(getLabwareDefsByURI)
 
+  const enableOT3Support = useSelector(featureFlagSelectors.getEnabledOT3)
+
+  // TODO(sh, 2022-09-29): remove this list of OT-3 tip racks when the feature flag is removed
+  const OT_3_TIP_RACKS = [
+    'opentrons_ot3_96_tiprack_200ul',
+    'opentrons_ot3_96_tiprack_1000ul',
+    'opentrons_ot3_96_tiprack_50ul',
+  ]
+
   type Values<T> = T[keyof T]
 
   const tiprackOptions = reduce<typeof allLabware, DropdownOption[]>(
     allLabware,
     (acc, def: Values<typeof allLabware>) => {
-      if (def.metadata.displayCategory !== 'tipRack') return acc
+      if (
+        (!enableOT3Support &&
+          OT_3_TIP_RACKS.includes(def.parameters.loadName)) ||
+        def.metadata.displayCategory !== 'tipRack'
+      )
+        return acc
       return [
         ...acc,
         {
@@ -98,9 +117,12 @@ export function PipetteFields(props: Props): JSX.Element {
   const initialTabIndex = props.initialTabIndex || 1
 
   const renderPipetteSelect = (props: PipetteSelectProps): JSX.Element => {
-    const { tabIndex, mount } = props
+    const { tabIndex, mount, nameBlocklist } = props
     const pipetteName = values[mount].pipetteName
-
+    const updatedNameBlockList =
+      nameBlocklist != null && !enableOT3Support
+        ? [...nameBlocklist, ...OT3_PIPETTES]
+        : nameBlocklist
     return (
       <PipetteSelect
         enableNoneOption
@@ -115,7 +137,7 @@ export function PipetteFields(props: Props): JSX.Element {
           onSetFieldValue(targetToClear, null)
           onSetFieldTouched(targetToClear, false)
         }}
-        nameBlocklist={OT3_PIPETTES}
+        nameBlocklist={updatedNameBlockList != null ? updatedNameBlockList : []}
         id={`PipetteSelect_${mount}`}
       />
     )
@@ -133,6 +155,9 @@ export function PipetteFields(props: Props): JSX.Element {
             {renderPipetteSelect({
               mount: 'left',
               tabIndex: initialTabIndex + 1,
+              nameBlocklist: getIncompatiblePipetteNames(
+                values.right.pipetteName as PipetteName
+              ),
             })}
           </FormGroup>
           <FormGroup
@@ -178,6 +203,9 @@ export function PipetteFields(props: Props): JSX.Element {
             {renderPipetteSelect({
               mount: 'right',
               tabIndex: initialTabIndex + 3,
+              nameBlocklist: getIncompatiblePipetteNames(
+                values.left.pipetteName as PipetteName
+              ),
             })}
           </FormGroup>
           <FormGroup

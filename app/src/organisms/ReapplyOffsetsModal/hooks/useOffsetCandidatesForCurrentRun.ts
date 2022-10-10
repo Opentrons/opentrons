@@ -7,7 +7,8 @@ import { useHistoricRunDetails } from './useHistoricRunDetails'
 
 import type { LabwareOffset } from '@opentrons/api-client'
 import type { ProtocolFile } from '@opentrons/shared-data'
-interface OffsetCandidate extends LabwareOffset {
+
+export interface OffsetCandidate extends LabwareOffset {
   labwareDisplayName: string
   runCreatedAt: string
 }
@@ -25,8 +26,8 @@ export function useOffsetCandidatesForCurrentRun(): OffsetCandidate[] {
           }))
           ?.sort(
             (a, b) =>
-              new Date(a.offset.createdAt).getTime() -
-              new Date(b.offset.createdAt).getTime()
+              new Date(b.offset.createdAt).getTime() -
+              new Date(a.offset.createdAt).getTime()
           ) ?? []
     )
     .flat()
