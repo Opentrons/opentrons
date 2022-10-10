@@ -5,6 +5,7 @@ from opentrons.protocol_api.core.labware import AbstractLabware
 from opentrons.protocol_api.core.module import (
     AbstractModuleCore,
     AbstractTemperatureModuleCore,
+    AbstractMagneticModuleCore,
 )
 from opentrons.protocol_api.core.well import AbstractWellCore
 
@@ -13,4 +14,5 @@ InstrumentCore = AbstractInstrument[AbstractWellCore]
 LabwareCore = AbstractLabware[AbstractWellCore]
 ModuleCore = AbstractModuleCore[LabwareCore]
 TemperatureModuleCore = AbstractTemperatureModuleCore[LabwareCore]
+MagneticModuleCore = AbstractMagneticModuleCore[LabwareCore]
 ProtocolCore = AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]
