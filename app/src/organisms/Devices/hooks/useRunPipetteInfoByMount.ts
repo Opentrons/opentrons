@@ -73,11 +73,13 @@ export function useRunPipetteInfoByMount(
     if (loadCommand != null) {
       const { mount } = loadCommand.params
       const { pipetteId } = loadCommand.result
-      const correctPipette =
+      const pipetteName =
         //  @ts-expect-error
-        pipetteId === pipette[0].id ? pipette[0] : pipette[1]
-
-      const requestedPipetteName = correctPipette.pipetteName
+        loadCommand.result.pipetteId === pipette[0].id
+          ? //  @ts-expect-error
+            pipette[0].pipetteName
+          : pipette[1].pipetteName
+      const requestedPipetteName = pipetteName
       const pipetteSpecs = getPipetteNameSpecs(requestedPipetteName)
       if (pipetteSpecs != null) {
         const tipRackDefs: LabwareDefinition2[] = pickUpTipCommands.reduce<
@@ -97,7 +99,7 @@ export function useRunPipetteInfoByMount(
 
         const attachedPipette = attachedPipettes[mount as Mount]
         const requestedPipetteMatch = getRequestedPipetteMatch(
-          correctPipette.pipetteName,
+          pipetteName,
           attachedPipette
         )
         const tipRacksForPipette = tipRackDefs.map(tipRackDef => {
@@ -109,7 +111,6 @@ export function useRunPipetteInfoByMount(
                 tlcData.pipette === attachedPipette.id
             )
           )
-
           const lastModifiedDate =
             tlcDataMatch != null && requestedPipetteMatch !== INCOMPATIBLE
               ? tlcDataMatch.lastModified
