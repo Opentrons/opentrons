@@ -45,7 +45,7 @@ jobs:
       - uses: 'actions/checkout@v3'
       - uses: 'actions/setup-node@v3'
         with:
-          node-version: '14'
+          node-version: '16.8.0'
       - name: 'set complex environment variables'
         id: 'set-vars'
         uses: actions/github-script@v6.1.1
@@ -70,7 +70,7 @@ jobs:
           npm config set cache ${{ github.workspace }}/.npm-cache
           yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
           make setup-js
-      # Use the if to run all the lint checks even of some fail
+        # Use the if to run all the lint checks even of some fail
         shell: bash
       - name: 'lint js'
         if: always() && steps.setup-js.outcome == 'success'
