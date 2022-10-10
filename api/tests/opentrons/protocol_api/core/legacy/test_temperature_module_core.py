@@ -10,6 +10,9 @@ from opentrons.hardware_control.modules.types import (
 )
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 
+from opentrons.protocol_api.core.protocol_api.protocol_context import (
+    ProtocolContextImplementation,
+)
 from opentrons.protocol_api.core.protocol_api.legacy_module_core import (
     LegacyTemperatureModuleCore,
     create_module_core,
@@ -29,21 +32,30 @@ def mock_sync_module_hardware(decoy: Decoy) -> SynchronousAdapter[TempDeck]:
 
 
 @pytest.fixture
+def mock_protocol_core(decoy: Decoy) -> ProtocolContextImplementation:
+    """Get a mock protocol core."""
+    return decoy.mock(cls=ProtocolContextImplementation)
+
+
+@pytest.fixture
 def subject(
     mock_geometry: ModuleGeometry,
     mock_sync_module_hardware: SynchronousAdapter[TempDeck],
+    mock_protocol_core: ProtocolContextImplementation,
 ) -> LegacyTemperatureModuleCore:
     """Get a legacy module implementation core with mocked out dependencies."""
     return LegacyTemperatureModuleCore(
         requested_model=TemperatureModuleModel.TEMPERATURE_V1,
         geometry=mock_geometry,
         sync_module_hardware=mock_sync_module_hardware,
+        protocol_core=mock_protocol_core,
     )
 
 
 def test_create(
     decoy: Decoy,
     mock_geometry: ModuleGeometry,
+    mock_protocol_core: ProtocolContextImplementation,
 ) -> None:
     """It should be able to create a temperature module core."""
     mock_module_hardware_api = decoy.mock(cls=TempDeck)
@@ -51,6 +63,7 @@ def test_create(
         geometry=mock_geometry,
         module_hardware_api=mock_module_hardware_api,
         requested_model=TemperatureModuleModel.TEMPERATURE_V1,
+        protocol_core=mock_protocol_core,
     )
 
     assert isinstance(result, LegacyTemperatureModuleCore)

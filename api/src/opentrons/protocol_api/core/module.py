@@ -2,11 +2,13 @@
 from abc import ABC, abstractmethod
 from typing import Any, Generic, Optional, TypeVar
 
+from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     ModuleType,
     TemperatureStatus,
     MagneticStatus,
+    SpeedStatus,
 )
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.types import DeckSlotName
@@ -126,3 +128,63 @@ class AbstractMagneticModuleCore(AbstractModuleCore[LabwareCoreType]):
     @abstractmethod
     def get_status(self) -> MagneticStatus:
         """Get the module's current magnet status."""
+
+
+class AbstractHeaterShakerCore(AbstractModuleCore[LabwareCoreType]):
+    """Core control interface for an attached Heater-Shaker Module."""
+
+    @abstractmethod
+    def set_target_temperature(self, celsius: float) -> None:
+        """Set the labware plate's target temperature in °C."""
+
+    @abstractmethod
+    def wait_for_target_temperature(self) -> None:
+        """Wait for the labware plate's target temperature to be reached."""
+
+    @abstractmethod
+    def set_and_wait_for_shake_speed(self, rpm: int) -> None:
+        """Set the shaker's target shake speed and wait for it to spin up."""
+
+    @abstractmethod
+    def open_labware_latch(self) -> None:
+        """Open the labware latch."""
+
+    @abstractmethod
+    def close_labware_latch(self) -> None:
+        """Close the labware latch."""
+
+    @abstractmethod
+    def deactivate_shaker(self) -> None:
+        """Stop shaking."""
+
+    @abstractmethod
+    def deactivate_heater(self) -> None:
+        """Stop heating."""
+
+    @abstractmethod
+    def get_current_temperature(self) -> float:
+        """Get the labware plate's current temperature in °C."""
+
+    @abstractmethod
+    def get_target_temperature(self) -> Optional[float]:
+        """Get the labware plate's target temperature in °C, if set."""
+
+    @abstractmethod
+    def get_current_speed(self) -> int:
+        """Get the shaker's current speed in RPM."""
+
+    @abstractmethod
+    def get_target_speed(self) -> Optional[int]:
+        """Get the shaker's target speed in RPM, if set."""
+
+    @abstractmethod
+    def get_temperature_status(self) -> TemperatureStatus:
+        """Get the module's heater status."""
+
+    @abstractmethod
+    def get_speed_status(self) -> SpeedStatus:
+        """Get the module's heater status."""
+
+    @abstractmethod
+    def get_labware_latch_status(self) -> HeaterShakerLabwareLatchStatus:
+        """Get the module's labware latch status."""

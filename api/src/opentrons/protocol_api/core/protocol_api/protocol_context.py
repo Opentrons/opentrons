@@ -243,6 +243,7 @@ class ProtocolContextImplementation(
             module_hardware_api=selected_hardware,
             requested_model=model,
             geometry=geometry,
+            protocol_core=self,
         )
 
         self._deck_layout[resolved_location] = geometry
