@@ -188,44 +188,6 @@ def test_magdeck(ctx_with_magdeck, mock_module_controller):
     assert ctx_with_magdeck.deck[1] == mod.geometry
 
 
-def test_magdeck_status(ctx_with_magdeck, mock_module_controller):
-    mod = ctx_with_magdeck.load_module("Magnetic Module", 1)
-    m = mock.PropertyMock(return_value="disengaged")
-    type(mock_module_controller).status = m
-    assert mod.status == "disengaged"
-
-
-def test_magdeck_engage_no_height_no_labware(ctx_with_magdeck, mock_module_controller):
-    """It should raise an error."""
-    mod = ctx_with_magdeck.load_module("Magnetic Module", 1)
-    with pytest.raises(ValueError):
-        mod.engage()
-
-
-def test_magdeck_engage_with_height(ctx_with_magdeck, mock_module_controller):
-    mod = ctx_with_magdeck.load_module("Magnetic Module", 1)
-    mod.engage(height=2)
-    assert "engaging magnetic" in ",".join(
-        cmd.lower() for cmd in ctx_with_magdeck.commands()
-    )
-    mock_module_controller.engage.assert_called_once_with(2)
-
-
-def test_magdeck_engage_with_height_from_base(ctx_with_magdeck, mock_module_controller):
-    mod = ctx_with_magdeck.load_module("Magnetic Module", 1)
-    mod.engage(height_from_base=2)
-    mock_module_controller.engage.assert_called_once_with(7)
-
-
-def test_magdeck_disengage(ctx_with_magdeck, mock_module_controller):
-    mod = ctx_with_magdeck.load_module("Magnetic Module", 1)
-    mod.disengage()
-    assert "disengaging magnetic" in ",".join(
-        cmd.lower() for cmd in ctx_with_magdeck.commands()
-    )
-    mock_module_controller.deactivate.assert_called_once_with()
-
-
 def test_magdeck_calibrate(ctx_with_magdeck, mock_module_controller):
     mod = ctx_with_magdeck.load_module("Magnetic Module", 1)
     mod.calibrate()
