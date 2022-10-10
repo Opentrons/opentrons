@@ -7,6 +7,8 @@ import pytest
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.thermocycler import SimulatingDriver
 from opentrons.hardware_control import modules, ExecutionManager
+from opentrons.hardware_control.poller import Poller
+from opentrons.hardware_control.modules.thermocycler import ThermocyclerReader
 
 
 @pytest.fixture
@@ -142,14 +144,18 @@ async def set_temperature_subject(
     usb_port: USBPort, simulator_set_plate_spy: SimulatingDriver
 ) -> AsyncGenerator[modules.Thermocycler, None]:
     """Fixture that spys on set_plate_temperature"""
+    reader = ThermocyclerReader(driver=simulator_set_plate_spy)
+    poller = Poller(reader=reader, interval=0.1)
+
     hw_tc = modules.Thermocycler(
         port="/dev/ot_module_sim_thermocycler0",
         usb_port=usb_port,
         loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
         driver=simulator_set_plate_spy,
+        reader=reader,
+        poller=poller,
         device_info={},
-        polling_interval_sec=0.001,
     )
     yield hw_tc
     await hw_tc.cleanup()
