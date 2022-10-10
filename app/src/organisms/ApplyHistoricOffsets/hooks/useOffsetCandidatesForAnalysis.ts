@@ -1,12 +1,10 @@
 import isEqual from 'lodash/isEqual'
+import { getLabwareDisplayName, IDENTITY_VECTOR } from '@opentrons/shared-data'
 import { useAllHistoricOffsets } from './useAllHistoricOffsets'
 import { getLabwareLocationCombos } from './getLabwareLocationCombos'
 import { getDefsByURI } from './getDefsByURI'
 
-import {
-  getLabwareDisplayName,
-  ProtocolAnalysisOutput,
-} from '@opentrons/shared-data'
+import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { LabwareOffset } from '@opentrons/api-client'
 export interface OffsetCandidate extends LabwareOffset {
   runCreatedAt: string
@@ -32,7 +30,7 @@ export function useOffsetCandidatesForAnalysis(
     (acc, { location, definitionUri }) => {
       const offsetMatch = allHistoricOffsets.find(
         historicOffset =>
-          !isEqual(historicOffset.vector, { x: 0, y: 0, z: 0 }) &&
+          !isEqual(historicOffset.vector, IDENTITY_VECTOR) &&
           isEqual(historicOffset.location, location) &&
           historicOffset.definitionUri === definitionUri
       )
