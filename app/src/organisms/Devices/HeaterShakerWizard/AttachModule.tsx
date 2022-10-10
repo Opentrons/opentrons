@@ -41,6 +41,8 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
     'screwHoles',
   ]
 
+  // ToDo kj 10/10/2022 the current hardcoded sizes will be removed
+  // when we make this wizard responsible
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <StyledText
@@ -52,9 +54,17 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
       <AttachedModuleItem step={t('1a')}>
         <Flex flexDirection={DIRECTION_ROW} marginLeft={SPACING.spacingXL}>
           <img src={attachHeaterShakerModule} alt="Attach Module to Deck" />
-          <img src={screwdriverOrientedLeft} alt="screwdriver_1a" />
+          <Box marginTop="1.375rem" marginRight="1.375rem">
+            <img
+              src={screwdriverOrientedLeft}
+              width="77"
+              height="112"
+              alt="screwdriver_1a"
+            />
+          </Box>
+
           <Flex
-            marginLeft={SPACING.spacingXL}
+            marginLeft={SPACING.spacingXXL}
             marginTop={SPACING.spacing4}
             flexDirection={DIRECTION_COLUMN}
           >
@@ -126,9 +136,16 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
               />
             )}
           </Box>
-          <img src={screwdriverOrientedLeft} alt="screwdriver_1b" />
+          <Box marginTop="4.25rem">
+            <img
+              src={screwdriverOrientedLeft}
+              width="77"
+              height="112"
+              alt="screwdriver_1b"
+            />
+          </Box>
           <Flex
-            marginLeft={SPACING.spacing4}
+            marginLeft={SPACING.spacingXXL}
             marginTop={SPACING.spacing4}
             flexDirection={DIRECTION_COLUMN}
           >
