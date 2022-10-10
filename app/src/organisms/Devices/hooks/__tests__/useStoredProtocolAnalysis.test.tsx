@@ -20,7 +20,7 @@ import {
   LABWARE_BY_ID,
   LABWARE_DEFINITIONS,
   MODULE_MODELS_BY_ID,
-  PIPETTE_NAMES_BY_ID,
+  PIPETTE_NAME_BY_ID,
   STORED_PROTOCOL_ANALYSIS,
 } from '../__fixtures__/storedProtocolAnalysis'
 
@@ -92,7 +92,7 @@ describe('useStoredProtocolAnalysis hook', () => {
     when(mockParseInitialLoadedLabwareDefinitionsById).mockReturnValue(
       LABWARE_DEFINITIONS
     )
-    when(mockParseInitialPipetteNamesById).mockReturnValue(PIPETTE_NAMES_BY_ID)
+    when(mockParseInitialPipetteNamesById).mockReturnValue([PIPETTE_NAME_BY_ID])
   })
   afterEach(() => {
     resetAllWhenMocks()

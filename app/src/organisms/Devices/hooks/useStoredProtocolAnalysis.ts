@@ -20,7 +20,7 @@ import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { State } from '../../../redux/types'
 
 export interface StoredProtocolAnalysis extends ProtocolAnalysisOutput {
-  pipettes: PipetteNamesById
+  pipettes: PipetteNamesById[]
   modules: ModuleModelsById
   labware: LoadedLabwareById
   labwareDefinitions: LoadedLabwareDefinitionsById

@@ -38,12 +38,13 @@ export function parseInitialPipetteNamesByMount(
 }
 
 export interface PipetteNamesById {
-  [pipetteId: string]: { pipetteName: PipetteName }
+  id: string
+  pipetteName: PipetteName
 }
 
 export function parseInitialPipetteNamesById(
   commands: RunTimeCommand[]
-): PipetteNamesById {
+): PipetteNamesById[] {
   const rightPipette = commands.find(
     (command): command is LoadPipetteRunTimeCommand =>
       command.commandType === 'loadPipette' && command.params.mount === 'right'
@@ -56,22 +57,26 @@ export function parseInitialPipetteNamesById(
   const rightPipetteById =
     rightPipette != null
       ? {
-          [rightPipette.result.pipetteId]: {
-            pipetteName: rightPipette.params.pipetteName,
-          },
+          id: rightPipette.result.pipetteId,
+          pipetteName: rightPipette.params.pipetteName,
         }
       : {}
   const leftPipetteById =
     leftPipette != null
       ? {
-          [leftPipette.result.pipetteId]: {
-            pipetteName: leftPipette.params.pipetteName,
-          },
+          id: leftPipette.result.pipetteId,
+          pipetteName: leftPipette.params.pipetteName,
         }
       : {}
-  return {
-    ...rightPipetteById,
-    ...leftPipetteById,
+
+  if (leftPipetteById.id == null && rightPipetteById.id != null) {
+    return [rightPipetteById]
+  } else if (rightPipetteById.id == null && leftPipetteById.id != null) {
+    return [leftPipetteById]
+  } else if (rightPipetteById.id != null && leftPipetteById.id != null) {
+    return [rightPipetteById, leftPipetteById]
+  } else {
+    return []
   }
 }
 

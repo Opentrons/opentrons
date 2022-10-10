@@ -68,15 +68,14 @@ export function useRunPipetteInfoByMount(
       command.result?.pipetteId === pipette[0].id
         ? //  @ts-expect-error
           pipette[0].id
-        : //  @ts-expect-error
-          pipette[1].id
+        : pipette[1].id
     )
     if (loadCommand != null) {
       const { mount, pipetteId } = loadCommand.params
       const correctPipette =
         //  @ts-expect-error
         pipetteId === pipette[0].id ? pipette[0] : pipette[1]
-      //  @ts-expect-error
+
       const requestedPipetteName = correctPipette.pipetteName
       const pipetteSpecs = getPipetteNameSpecs(requestedPipetteName)
       if (pipetteSpecs != null) {
@@ -97,7 +96,6 @@ export function useRunPipetteInfoByMount(
 
         const attachedPipette = attachedPipettes[mount as Mount]
         const requestedPipetteMatch = getRequestedPipetteMatch(
-          //  @ts-expect-error
           correctPipette.pipetteName,
           attachedPipette
         )
