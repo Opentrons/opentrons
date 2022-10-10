@@ -10,7 +10,8 @@ import { UnorderedList } from '../../molecules/UnorderedList'
 
 import type { CheckTipRacksStep } from './types'
 
-interface CheckItemProps extends CheckTipRacksStep {
+interface CheckItemProps extends Omit<CheckTipRacksStep, 'section'> {
+  section: 'CHECK_LABWARE' | 'CHECK_TIP_RACKS'
   protocolData: CompletedProtocolAnalysis
   proceed: () => void
 }

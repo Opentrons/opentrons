@@ -40,6 +40,7 @@ const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
 
 interface JogToWellProps extends Omit<CheckTipRacksStep, 'section'> {
+  section: 'CHECK_LABWARE' | 'CHECK_TIP_RACKS' | 'PICK_UP_TIP'
   protocolData: CompletedProtocolAnalysis
   proceed: () => void
   goBack: () => void

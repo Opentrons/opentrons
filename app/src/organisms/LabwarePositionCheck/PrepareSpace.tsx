@@ -46,6 +46,7 @@ const DECK_LAYER_BLOCKLIST = [
   'screwHoles',
 ]
 interface PrepareSpaceProps extends Omit<CheckTipRacksStep, 'section'> {
+  section: 'CHECK_LABWARE' | 'CHECK_TIP_RACKS' | 'PICK_UP_TIP' | 'RETURN_TIP'
   labwareDef: LabwareDefinition2
   protocolData: CompletedProtocolAnalysis
   confirmPlacement: () => void

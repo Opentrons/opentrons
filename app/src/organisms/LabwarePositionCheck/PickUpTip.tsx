@@ -66,6 +66,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
             })}
             body={<StyledText as="p">{t('ensure_nozzle_is_above_tip')}</StyledText>}
             labwareDef={labwareDef}
+            proceed={() => setShowTipConfirmation(true)}
             goBack={() => setHasPreparedSpace(false)} />
         ) : (
           <PrepareSpace
