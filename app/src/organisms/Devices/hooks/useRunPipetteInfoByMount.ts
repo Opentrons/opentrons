@@ -71,7 +71,8 @@ export function useRunPipetteInfoByMount(
         : pipette[1].id
     )
     if (loadCommand != null) {
-      const { mount, pipetteId } = loadCommand.params
+      const { mount } = loadCommand.params
+      const { pipetteId } = loadCommand.result
       const correctPipette =
         //  @ts-expect-error
         pipetteId === pipette[0].id ? pipette[0] : pipette[1]
