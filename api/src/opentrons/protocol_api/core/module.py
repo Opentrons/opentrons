@@ -1,8 +1,12 @@
-"""Core module logic abstract interfaces."""
+"""Core module control interfaces."""
 from abc import ABC, abstractmethod
-from typing import Any, Generic, TypeVar
+from typing import Any, Generic, Optional, TypeVar
 
-from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
+from opentrons.hardware_control.modules.types import (
+    ModuleModel,
+    ModuleType,
+    TemperatureStatus,
+)
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.types import DeckSlotName
 
@@ -10,7 +14,7 @@ from .labware import LabwareCoreType
 
 
 class AbstractModuleCore(ABC, Generic[LabwareCoreType]):
-    """Abstract core module interface."""
+    """Abstract core module control interface."""
 
     @property
     @abstractmethod
@@ -42,3 +46,35 @@ class AbstractModuleCore(ABC, Generic[LabwareCoreType]):
 
 
 ModuleCoreType = TypeVar("ModuleCoreType", bound=AbstractModuleCore[Any])
+
+
+class AbstractTemperatureModuleCore(AbstractModuleCore[LabwareCoreType]):
+    """Core control interface for an attached Temperature Module."""
+
+    @abstractmethod
+    def set_target_temperature(self, celsius: float) -> None:
+        """Set the Temperature Module's target temperature in °C."""
+
+    @abstractmethod
+    def wait_for_target_temperature(self, celsius: Optional[float] = None) -> None:
+        """Wait until the module's target temperature is reached.
+
+        Specifying a value for ``celsius`` that is different than
+        the module's current target temperature may beahave unpredictably.
+        """
+
+    @abstractmethod
+    def deactivate(self) -> None:
+        """Deactivate the Temperature Module."""
+
+    @abstractmethod
+    def get_current_temperature(self) -> float:
+        """Get the module's current temperature in °C."""
+
+    @abstractmethod
+    def get_target_temperature(self) -> Optional[float]:
+        """Get the module's target temperature in °C, if set."""
+
+    @abstractmethod
+    def get_status(self) -> TemperatureStatus:
+        """Get the module's current temperature status."""

@@ -180,53 +180,6 @@ def test_load_simulating_module(ctx, loadname, klass, model):
     assert mod._module.model() == model
 
 
-# ________ Temperature Module tests _________
-
-
-def test_tempdeck(ctx_with_tempdeck, mock_module_controller):
-    mod = ctx_with_tempdeck.load_module("Temperature Module", 1)
-    assert ctx_with_tempdeck.deck[1] == mod.geometry
-
-
-def test_tempdeck_target(ctx_with_tempdeck, mock_module_controller):
-    mod = ctx_with_tempdeck.load_module("Temperature Module", 1)
-    m = mock.PropertyMock(return_value=0x1337)
-    type(mock_module_controller).target = m
-    assert mod.target == 0x1337
-
-
-def test_tempdeck_set_temperature(ctx_with_tempdeck, mock_module_controller):
-    mod = ctx_with_tempdeck.load_module("Temperature Module", 1)
-    mod.set_temperature(20)
-    assert "setting temperature" in ",".join(
-        cmd.lower() for cmd in ctx_with_tempdeck.commands()
-    )
-    mock_module_controller.set_temperature.assert_called_once_with(20)
-
-
-def test_tempdeck_temperature(ctx_with_tempdeck, mock_module_controller):
-    mod = ctx_with_tempdeck.load_module("Temperature Module", 1)
-    m = mock.PropertyMock(return_value=0xDEAD)
-    type(mock_module_controller).temperature = m
-    assert mod.temperature == 0xDEAD
-
-
-def test_tempdeck_deactivate(ctx_with_tempdeck, mock_module_controller):
-    mod = ctx_with_tempdeck.load_module("Temperature Module", 1)
-    mod.deactivate()
-    assert "deactivating temperature" in ",".join(
-        cmd.lower() for cmd in ctx_with_tempdeck.commands()
-    )
-    mock_module_controller.deactivate.assert_called_once()
-
-
-def test_tempdeck_status(ctx_with_tempdeck, mock_module_controller):
-    mod = ctx_with_tempdeck.load_module("Temperature Module", 1)
-    m = mock.PropertyMock(return_value="some status")
-    type(mock_module_controller).status = m
-    assert mod.status == "some status"
-
-
 # _________ Magnetic Module tests __________
 
 
