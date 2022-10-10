@@ -6,7 +6,7 @@ from typing import Tuple
 from hardware_testing.opentrons_api.types import GantryLoad, OT3Mount, OT3Axis, Point
 from hardware_testing.opentrons_api.helpers_ot3 import (
     ThreadManagedHardwareAPI,
-    build_ot3_hardware_api,
+    build_thread_managed_ot3_hardware_api,
     GantryLoadSettings,
     set_gantry_load_per_axis_settings_ot3,
     home_ot3,
@@ -131,6 +131,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
     args = parser.parse_args()
-    hw_api = build_ot3_hardware_api(is_simulating=args.simulate, use_defaults=True)
+    hw_api = build_thread_managed_ot3_hardware_api(is_simulating=args.simulate, use_defaults=True)
     asyncio.run(_main(hw_api))
     hw_api.clean_up()
