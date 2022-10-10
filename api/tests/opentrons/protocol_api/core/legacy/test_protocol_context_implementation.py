@@ -391,6 +391,7 @@ def test_load_module(
             module_hardware_api=mock_hw_mod_2,
             requested_model=TemperatureModuleModel.TEMPERATURE_V1,
             geometry=mock_geometry,
+            protocol_core=subject,
         )
     ).then_return(mock_module_core)
 
