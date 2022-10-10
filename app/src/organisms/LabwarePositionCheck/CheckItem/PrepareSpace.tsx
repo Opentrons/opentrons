@@ -9,6 +9,7 @@ import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   THERMOCYCLER_MODULE_V1,
@@ -16,6 +17,10 @@ import {
   CompletedProtocolAnalysis,
   getLabwareDefURI,
   getModuleDef2,
+  getIsTiprack,
+  getModuleDisplayName,
+  getLabwareDisplayName,
+  LabwareDefinition2,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 
@@ -24,7 +29,7 @@ import { StyledText } from '../../../atoms/text'
 import { getLabwareDefinitionsFromCommands } from '../utils/labware'
 import { CheckTipRacksStep } from '../types'
 import { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import { NeedHelpLink } from '../../CalibrationPanels'
 
 const LPC_HELP_LINK_URL =
@@ -42,24 +47,17 @@ const DECK_LAYER_BLOCKLIST = [
 ]
 interface PrepareSpaceProps extends Omit<CheckTipRacksStep, 'section'> {
   runId: string
+  labwareDef: LabwareDefinition2
   protocolData: CompletedProtocolAnalysis
   confirmPlacement: () => void
+  header: React.ReactNode
+  body: React.ReactNode
 }
 export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
   const { t } = useTranslation(['labware_position_check', 'shared'])
-  const { location, labwareId, protocolData } = props
+  const { location, labwareDef, protocolData, header, body } = props
 
   if (protocolData == null) return null
-  const labwareDefUri = protocolData.labware.find(l => l.id === labwareId)
-    ?.definitionUri
-  const labwareDefinitions = getLabwareDefinitionsFromCommands(
-    protocolData.commands
-  )
-  const labwareDef = labwareDefinitions.find(
-    def => getLabwareDefURI(def) === labwareDefUri
-  )
-  if (labwareDef == null) return null
-
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -73,20 +71,8 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing3}
         >
-          <StyledText as="h1">
-            {t('prepare_item', {
-              item: labwareId,
-              location: location?.slotName ?? location.moduleId,
-            })}
-          </StyledText>
-          <ul>
-            <li>
-              <StyledText as="p">{t('place_modules')}</StyledText>
-            </li>
-            <li>
-              <StyledText as="p">{t('clear_all_slots')}</StyledText>
-            </li>
-          </ul>
+          <StyledText as="h1">{header}</StyledText>
+          {body}
         </Flex>
         <Box flex="1">
           <RobotWorkSpace
@@ -152,3 +138,4 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
     </Flex>
   )
 }
+

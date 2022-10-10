@@ -14,10 +14,10 @@ import {
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
 import {
-  CompletedProtocolAnalysis,
   getIsTiprack,
   getLabwareDefURI,
   getPipetteNameSpecs,
+  IDENTITY_VECTOR,
 } from '@opentrons/shared-data'
 
 import levelWithTip from '../../../assets/images/lpc_level_with_tip.svg'
@@ -28,8 +28,13 @@ import { getLabwareDefinitionsFromCommands } from '../utils/labware'
 import { NeedHelpLink } from '../../CalibrationPanels'
 import { JogControls } from '../../../molecules/JogControls'
 
+import type {
+  CompletedProtocolAnalysis,
+  LabwareDefinition2,
+} from '@opentrons/shared-data'
 import type { WellStroke } from '@opentrons/components'
 import type { CheckTipRacksStep } from '../types'
+import { OffsetVector } from '../../../molecules/OffsetVector'
 
 const DECK_MAP_VIEWBOX = '-30 -20 170 115'
 const LPC_HELP_LINK_URL =
@@ -40,21 +45,14 @@ interface JogToWellProps extends Omit<CheckTipRacksStep, 'section'> {
   protocolData: CompletedProtocolAnalysis
   proceed: () => void
   goBack: () => void
+  labwareDef: LabwareDefinition2
+  header: React.ReactNode
+  body: React.ReactNode
 }
 export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
   const { t } = useTranslation(['labware_position_check', 'shared'])
-  const { pipetteId, labwareId, protocolData, proceed, goBack } = props
+  const { header, body, pipetteId, labwareDef, protocolData, proceed, goBack } = props
 
-  if (protocolData == null) return null
-  const labwareDefUri = protocolData.labware.find(l => l.id === labwareId)
-    ?.definitionUri
-  const labwareDefinitions = getLabwareDefinitionsFromCommands(
-    protocolData.commands
-  )
-  const labwareDef = labwareDefinitions.find(
-    def => getLabwareDefURI(def) === labwareDefUri
-  )
-  if (labwareDef == null) return null
   const pipetteName =
     protocolData.pipettes.find(p => p.id === pipetteId)?.pipetteName ?? null
   if (pipetteName == null) return null
@@ -83,9 +81,9 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing3}
         >
-          <StyledText as="h1">TODO HEADER</StyledText>
-          <StyledText as="p">TODO BODY TEXT</StyledText>
-          <StyledText as="p">TODO LABWARE OFFSET DATA</StyledText>
+          <StyledText as="h1">{header}</StyledText>
+          {body}
+          <OffsetVector {...IDENTITY_VECTOR}/>
         </Flex>
         <Flex flex="1">
           <RobotWorkSpace viewBox={DECK_MAP_VIEWBOX}>
