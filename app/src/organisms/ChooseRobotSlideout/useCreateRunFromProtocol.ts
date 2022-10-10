@@ -10,7 +10,11 @@ import { useTranslation } from 'react-i18next'
 import { getValidCustomLabwareFiles } from '../../redux/custom-labware/selectors'
 
 import type { UseMutateFunction } from 'react-query'
-import type { HostConfig, Protocol } from '@opentrons/api-client'
+import type {
+  HostConfig,
+  LabwareOffsetCreateData,
+  Protocol,
+} from '@opentrons/api-client'
 import type { UseCreateRunMutationOptions } from '@opentrons/react-api-client/src/runs/useCreateRunMutation'
 import type { CreateProtocolVariables } from '@opentrons/react-api-client/src/protocols/useCreateProtocolMutation'
 import type { State } from '../../redux/types'
@@ -30,7 +34,8 @@ export interface UseCreateRun {
 
 export function useCreateRunFromProtocol(
   options: UseCreateRunMutationOptions,
-  hostOverride?: HostConfig | null
+  hostOverride?: HostConfig | null,
+  labwareOffsets?: LabwareOffsetCreateData[]
 ): UseCreateRun {
   const contextHost = useHost()
   const host = hostOverride ?? contextHost
@@ -68,7 +73,7 @@ export function useCreateRunFromProtocol(
   } = useCreateProtocolMutation(
     {
       onSuccess: data => {
-        createRun({ protocolId: data.data.id })
+        createRun({ protocolId: data.data.id, labwareOffsets })
       },
     },
     host
