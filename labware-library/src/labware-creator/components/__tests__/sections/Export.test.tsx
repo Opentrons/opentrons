@@ -50,7 +50,7 @@ describe('Export', () => {
 
     screen.getByText(
       'Your file will be exported with a protocol that will help you test and troubleshoot your labware definition on the robot. ' +
-        'The protocol requires a Single or Eight-Channel pipette on the right mount of your robot.'
+        'The protocol requires a Single or 8-Channel pipette on the right mount of your robot.'
     )
 
     screen.getByText(/test pipette/i)
