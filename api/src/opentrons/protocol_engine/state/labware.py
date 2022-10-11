@@ -30,6 +30,7 @@ from ..types import (
     LabwareOffsetLocation,
     LabwareLocation,
     LoadedLabware,
+    OFF_DECK_LOCATION,
 )
 from ..actions import (
     Action,
@@ -159,7 +160,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
 
         elif isinstance(command.result, MoveLabwareOffDeckResult):
             labware_id = command.params.labwareId
-            self._state.labware_by_id[labware_id].location = "offDeck"
+            self._state.labware_by_id[labware_id].location = OFF_DECK_LOCATION
             self._state.labware_by_id[labware_id].offsetId = None
 
     def _add_labware_offset(self, labware_offset: LabwareOffset) -> None:

@@ -16,6 +16,7 @@ from opentrons.protocol_engine.types import (
     LabwareOffsetLocation,
     DeckSlotLocation,
     LoadedLabware,
+    OFF_DECK_LOCATION,
 )
 from opentrons.protocol_engine.actions import (
     AddLabwareOffsetAction,
@@ -239,5 +240,5 @@ def test_handles_move_labware_off_deck(
         labware_id="my-labware-id"
     )
     subject.handle_action(UpdateCommandAction(command=move_labware_off_deck_cmd))
-    assert subject.state.labware_by_id["my-labware-id"].location == "offDeck"
+    assert subject.state.labware_by_id["my-labware-id"].location == OFF_DECK_LOCATION
     assert subject.state.labware_by_id["my-labware-id"].offsetId is None

@@ -19,6 +19,7 @@ from opentrons.protocol_engine.types import (
     WellLocation,
     WellOrigin,
     WellOffset,
+    OFF_DECK_LOCATION,
 )
 from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.modules import ModuleView
@@ -80,7 +81,7 @@ def test_raise_error_for_off_deck_labware_parent(
         id="labware-id",
         loadName="b",
         definitionUri=uri_from_details(namespace="a", load_name="b", version=1),
-        location="offDeck",
+        location=OFF_DECK_LOCATION,
         offsetId=None,
     )
     decoy.when(labware_view.get("labware-id")).then_return(labware_data)
