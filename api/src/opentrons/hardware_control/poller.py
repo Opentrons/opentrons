@@ -22,7 +22,6 @@ class Poller:
     Args:
         reader: An interface to read data.
         interval: The poll interval, in seconds.
-        on_error: An optional callback to trigger if a poll raises an error.
     """
 
     interval: float
