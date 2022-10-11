@@ -82,7 +82,9 @@ class Labware:  # noqa: D101
         if isinstance(parent, DeckSlotLocation):
             return str(parent.slotName)
         else:
-            raise NotImplementedError("Not yet implemented for labware on modules.")
+            raise NotImplementedError(
+                "Not yet implemented for labware on modules or off-deck labware."
+            )
 
     # TODO(mc, 2021-05-03): document removal of name setter
     @property
