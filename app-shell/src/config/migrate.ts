@@ -60,7 +60,7 @@ export const DEFAULTS_V0: ConfigV0 = {
   // analytics (mixpanel)
   analytics: {
     appId: uuid(),
-    optedIn: false,
+    optedIn: true,
     seenOptIn: false,
   },
 

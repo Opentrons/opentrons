@@ -42,7 +42,7 @@ export const MOCK_CONFIG_V0: ConfigV0 = {
   },
   analytics: {
     appId: 'mock-mixpanel-id',
-    optedIn: false,
+    optedIn: true,
     seenOptIn: false,
   },
 
