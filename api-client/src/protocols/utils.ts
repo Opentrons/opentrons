@@ -37,14 +37,14 @@ export function parseInitialPipetteNamesByMount(
   }
 }
 
-export interface PipetteNamesById {
+export interface PipetteEntity {
   id: string
   pipetteName: PipetteName
 }
 
-export function parseInitialPipetteNamesById(
+export function parsePipetteEntity(
   commands: RunTimeCommand[]
-): PipetteNamesById[] {
+): PipetteEntity[] {
   const rightPipette = commands.find(
     (command): command is LoadPipetteRunTimeCommand =>
       command.commandType === 'loadPipette' && command.params.mount === 'right'
@@ -54,14 +54,14 @@ export function parseInitialPipetteNamesById(
       command.commandType === 'loadPipette' && command.params.mount === 'left'
   )
 
-  const rightPipetteById =
+  const rightPipetteEntity =
     rightPipette != null
       ? {
           id: rightPipette.result.pipetteId,
           pipetteName: rightPipette.params.pipetteName,
         }
       : {}
-  const leftPipetteById =
+  const leftPipetteEntity =
     leftPipette != null
       ? {
           id: leftPipette.result.pipetteId,
@@ -69,12 +69,12 @@ export function parseInitialPipetteNamesById(
         }
       : {}
 
-  if (leftPipetteById.id == null && rightPipetteById.id != null) {
-    return [rightPipetteById]
-  } else if (rightPipetteById.id == null && leftPipetteById.id != null) {
-    return [leftPipetteById]
-  } else if (rightPipetteById.id != null && leftPipetteById.id != null) {
-    return [rightPipetteById, leftPipetteById]
+  if (leftPipetteEntity.id == null && rightPipetteEntity.id != null) {
+    return [rightPipetteEntity]
+  } else if (rightPipetteEntity.id == null && leftPipetteEntity.id != null) {
+    return [leftPipetteEntity]
+  } else if (rightPipetteEntity.id != null && leftPipetteEntity.id != null) {
+    return [rightPipetteEntity, leftPipetteEntity]
   } else {
     return []
   }

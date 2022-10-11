@@ -1,6 +1,6 @@
 import { RunTimeCommand } from '@opentrons/shared-data'
 import {
-  parseInitialPipetteNamesById,
+  parsePipetteEntity,
   parseInitialPipetteNamesByMount,
   parseAllRequiredModuleModels,
   parseAllRequiredModuleModelsById,
@@ -138,10 +138,10 @@ describe('parseInitialPipetteNamesByMount', () => {
     expect(parseInitialPipetteNamesByMount(onlyRightMount)).toEqual(expected)
   })
 })
-describe('parseInitialPipetteNamesById', () => {
+describe('parsePipetteEntity', () => {
   it('returns pipette names by id if loaded', () => {
     const expected = [{ id: 'pipette-0', pipetteName: 'p300_single_gen2' }]
-    expect(parseInitialPipetteNamesById(mockRunTimeCommands)).toEqual(expected)
+    expect(parsePipetteEntity(mockRunTimeCommands)).toEqual(expected)
   })
 })
 describe('parseAllRequiredModuleModels', () => {

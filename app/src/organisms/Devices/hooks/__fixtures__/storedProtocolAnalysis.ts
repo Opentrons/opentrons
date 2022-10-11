@@ -4,7 +4,7 @@ import type {
   LoadedLabwareById,
   LoadedLabwareDefinitionsById,
   ModuleModelsById,
-  PipetteNamesById,
+  PipetteEntity,
 } from '@opentrons/api-client'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { StoredProtocolAnalysis } from '../useStoredProtocolAnalysis'
@@ -21,7 +21,7 @@ export const LABWARE_DEFINITIONS: LoadedLabwareDefinitionsById = {
 export const MODULE_MODELS_BY_ID: ModuleModelsById = {
   'module-0': { model: 'thermocyclerModuleV1' },
 }
-export const PIPETTE_NAME_BY_ID: PipetteNamesById = {
+export const PIPETTE: PipetteEntity = {
   id: 'pipette-0',
   pipetteName: 'p10_single',
 }
@@ -31,5 +31,5 @@ export const STORED_PROTOCOL_ANALYSIS = {
   modules: MODULE_MODELS_BY_ID,
   labware: LABWARE_BY_ID,
   labwareDefinitions: LABWARE_DEFINITIONS,
-  pipettes: [PIPETTE_NAME_BY_ID],
+  pipettes: [PIPETTE],
 } as StoredProtocolAnalysis
