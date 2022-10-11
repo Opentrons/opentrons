@@ -12,7 +12,7 @@ from .types import GantryLoad, PerPipetteAxisSettings, OT3Axis, OT3Mount, Point
 
 def stop_server_ot3() -> None:
     """Stop opentrons-robot-server on the OT3."""
-    print('Stopping \"opentrons-robot-server\"...')
+    print('Stopping "opentrons-robot-server"...')
     run(["systemctl", "stop", "opentrons-robot-server"])
 
 
@@ -149,9 +149,7 @@ def set_gantry_load_per_axis_settings_ot3(
         )
 
 
-async def home_ot3(
-    api: OT3API, axes: Optional[List[OT3Axis]] = None
-) -> None:
+async def home_ot3(api: OT3API, axes: Optional[List[OT3Axis]] = None) -> None:
     """Home OT3 gantry."""
     _all_axes = [
         OT3Axis.X,
