@@ -7,6 +7,7 @@ import {
   getSlotHasMatingSurfaceUnitVector,
   getLabwareDefURI,
   DeckDefinition,
+  CompletedProtocolAnalysis,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
@@ -195,4 +196,14 @@ export const getAllUniqLocationsForLabware = (
   return labwareLocation
 }
 
+export function getLabwareDef(labwareId: string, protocolData: CompletedProtocolAnalysis): LabwareDefinition2 | undefined {
+  const labwareDefUri = protocolData.labware.find(l => l.id === labwareId)
+    ?.definitionUri
+  const labwareDefinitions = getLabwareDefinitionsFromCommands(
+    protocolData.commands
+  )
+  return labwareDefinitions.find(
+    def => getLabwareDefURI(def) === labwareDefUri
+  )
+}
 

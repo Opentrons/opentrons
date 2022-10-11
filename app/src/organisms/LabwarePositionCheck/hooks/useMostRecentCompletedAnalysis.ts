@@ -1,3 +1,4 @@
+import * as React from 'react'
 import last from 'lodash/last'
 import {
   useProtocolAnalysesQuery,
@@ -5,24 +6,23 @@ import {
 } from '@opentrons/react-api-client'
 import {
   CompletedProtocolAnalysis,
-  PendingProtocolAnalysis,
 } from '@opentrons/shared-data'
 
 export function useMostRecentCompletedAnalysis(
   runId: string | null
 ): CompletedProtocolAnalysis | null {
-  const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
+  const { data: runRecord } = useRunQuery(runId)
   const protocolId = runRecord?.data?.protocolId ?? null
-  const { data: protocolAnalyses } = useProtocolAnalysesQuery(protocolId, {
-    staleTime: Infinity,
-  })
+  const { data: protocolAnalyses } = useProtocolAnalysesQuery(protocolId)
 
-  return (
+  const mostRecentAnalysis = React.useMemo(() => (
     (protocolAnalyses?.data ?? [])
       .reverse()
       .find(
         (analysis): analysis is CompletedProtocolAnalysis =>
           analysis.status === 'completed'
       ) ?? null
-  )
+  ), [protocolAnalyses?.data != null ? last(protocolAnalyses.data)?.id : null])
+
+  return mostRecentAnalysis
 }

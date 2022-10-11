@@ -1,11 +1,12 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { DIRECTION_COLUMN, Flex, TYPOGRAPHY } from '@opentrons/components'
+import { useCreateCommandMutation } from '@opentrons/react-api-client'
 import { StyledText } from '../../atoms/text'
 import { PrepareSpace } from './PrepareSpace'
 import { JogToWell } from './JogToWell'
 import { CompletedProtocolAnalysis, getIsTiprack, getLabwareDefURI, getLabwareDisplayName, getModuleDisplayName } from '@opentrons/shared-data'
-import { getLabwareDefinitionsFromCommands } from './utils/labware'
+import { getLabwareDef } from './utils/labware'
 import { UnorderedList } from '../../molecules/UnorderedList'
 import { TipConfirmation } from './TipConfirmation'
 
@@ -14,6 +15,7 @@ import type { PickUpTipStep } from './types'
 interface PickUpTipProps extends PickUpTipStep {
   protocolData: CompletedProtocolAnalysis
   proceed: () => void
+  createRunCommand: ReturnType<typeof useCreateCommandMutation>['createCommand']
 }
 export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
   const { t } = useTranslation('labware_position_check')
@@ -24,15 +26,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
     setHasPreparedSpace(false)
   }, [labwareId, pipetteId, location?.moduleId, location?.slotName])
 
-  if (protocolData == null) return null
-  const labwareDefUri = protocolData.labware.find(l => l.id === labwareId)
-    ?.definitionUri
-  const labwareDefinitions = getLabwareDefinitionsFromCommands(
-    protocolData.commands
-  )
-  const labwareDef = labwareDefinitions.find(
-    def => getLabwareDefURI(def) === labwareDefUri
-  )
+  const labwareDef = getLabwareDef(labwareId, protocolData)
   if (labwareDef == null) return null
 
   const displayLocation = t('slot_name', { slotName: 'slotName' in location ? location?.slotName : ''})
@@ -60,8 +54,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
         {hasPreparedSpace ? (
           <JogToWell
             {...props}
-            header={t('check_item_in_location', {
-              item: t('tip_rack'),
+            header={t('pick_up_tip_from_rack_in_location', {
               location: displayLocation,
             })}
             body={<StyledText as="p">{t('ensure_nozzle_is_above_tip')}</StyledText>}

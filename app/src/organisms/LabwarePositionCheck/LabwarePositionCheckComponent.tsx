@@ -14,99 +14,99 @@ import { ExitConfirmation } from './ExitConfirmation'
 import { CheckItem } from './CheckItem'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
+import { LoadingState } from '../CalibrationPanels/LoadingState'
 import { useMostRecentCompletedAnalysis } from './hooks/useMostRecentCompletedAnalysis'
 import { PickUpTip } from './PickUpTip'
+import { ReturnTip } from './ReturnTip'
+import { ResultsSummary } from './ResultsSummary'
+import { LabwareOffsetCreateData, LabwareOffsetLocation, VectorOffset } from '@opentrons/api-client'
+import { getLabwareDef } from './utils/labware'
+import { CreateCommand, getLabwareDefURI } from '@opentrons/shared-data'
+import { useCreateCommandMutation } from '@opentrons/react-api-client'
+import { CreateRunCommand } from './types'
 interface LabwarePositionCheckModalProps {
   onCloseClick: () => unknown
   runId: string
   caughtError?: Error
 }
 
-export const LabwarePositionCheckComponent = (
+export const LabwarePositionCheckInner = (
   props: LabwarePositionCheckModalProps
 ): JSX.Element | null => {
+  const { runId } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
+  console.log('RENDERED LPC COMPONENT')
+  const protocolData = useMostRecentCompletedAnalysis(runId)
   const [
-    savePositionCommandData,
-    savePositionCommandDataDispatch,
+    labwareOffsets,
+    storeLabwareOffset,
   ] = React.useReducer(
     (
-      state: { [labwareId: string]: string[] },
-      action: { labwareId: string; commandId: string }
+      state: LabwareOffsetCreateData[],
+      action: { labwareId: string; location: LabwareOffsetLocation; vector: VectorOffset }
     ) => {
-      const { labwareId, commandId } = action
-      const nextCommandList =
-        state[labwareId] != null
-          ? // if there are already two command ids, overwrite the second one with the new one coming in
-          // this is used when there is an unsuccessful pick up tip, and additional pick up tip attempts occur
-          [state[labwareId][0], commandId]
-          : [commandId]
-      return {
-        ...state,
-        [labwareId]: nextCommandList,
+      const { labwareId, location, vector } = action
+      if (protocolData == null) return state
+      const labwareDef = getLabwareDef(labwareId, protocolData)
+      if (labwareDef == null) {
+        console.warn(`could not find corresponding labware definition for labwareId ${labwareId}`)
+        return state
       }
+      return [
+        ...state,
+        { definitionUri: getLabwareDefURI(labwareDef), location, vector },
+      ]
     },
-    {}
+    []
   )
   const {
     confirm: confirmExitLPC,
     showConfirmation,
     cancel: cancelExitLPC,
   } = useConditionalConfirm(props.onCloseClick, true)
-
-  // at the end of LPC, each labwareId will have 2 associated save position command ids which will be used to calculate the labware offsets
-  const addSavePositionCommandData = (
-    commandId: string,
-    labwareId: string
-  ): void => {
-    savePositionCommandDataDispatch({ labwareId, commandId })
+  const { createCommand, isLoading } = useCreateCommandMutation()
+  const createRunCommand: CreateRunCommand = (variables, ...options) => {
+    return createCommand({ ...variables, runId }, ...options)
   }
 
-  const protocolData = useMostRecentCompletedAnalysis(props.runId)
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const LPCSteps = useSteps(protocolData)
-
   const totalStepCount = LPCSteps.length
   const currentStep = LPCSteps?.[currentStepIndex]
   const proceed = (): void => setCurrentStepIndex(currentStepIndex !== LPCSteps.length - 1 ? currentStepIndex + 1 : currentStepIndex)
-
   if (protocolData == null || currentStep == null) return null
+
+  const movementStepProps = { proceed, protocolData, createRunCommand }
   console.log('CURRENT_STEP', currentStep)
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
   if (showConfirmation) {
     modalContent = (
-      <ExitConfirmation
-        onGoBack={cancelExitLPC}
-        onConfirmExit={confirmExitLPC}
-      />
+      <ExitConfirmation onGoBack={cancelExitLPC} onConfirmExit={confirmExitLPC} />
     )
+  } else if (isLoading) {
+    modalContent = <LoadingState />
   } else if (currentStep.section === 'BEFORE_BEGINNING') {
     modalContent = <IntroScreen proceed={proceed} protocolData={protocolData} />
   } else if (currentStep.section === 'CHECK_TIP_RACKS') {
     modalContent = (
-      <CheckItem
-        {...currentStep}
-        proceed={proceed}
-        protocolData={protocolData} />
+      <CheckItem {...currentStep} {...movementStepProps} />
     )
   } else if (currentStep.section === 'PICK_UP_TIP') {
     modalContent = (
-      <PickUpTip
-        {...currentStep}
-        proceed={proceed}
-        protocolData={protocolData} />
+      <PickUpTip {...currentStep} {...movementStepProps} />
     )
   } else if (currentStep.section === 'CHECK_LABWARE') {
     modalContent = (
-      <CheckItem
-        {...currentStep}
-        proceed={proceed}
-        protocolData={protocolData} />
+      <CheckItem {...currentStep} {...movementStepProps} />
     )
   } else if (currentStep.section === 'RETURN_TIP') {
-    modalContent = (<div> RETURN_TIP <button onClick={proceed}>PROCEED</button> </div>)
+    modalContent = (
+      <ReturnTip {...currentStep} {...movementStepProps} />
+    )
   } else if (currentStep.section === 'RESULTS_SUMMARY') {
-    modalContent = (<div> RESULTS_SUMMARY <button onClick={proceed}>PROCEED</button> </div>)
+    modalContent = (
+      <ResultsSummary {...currentStep} protocolData={protocolData} />
+    )
   }
   return (
     <Portal level="top">
@@ -125,3 +125,11 @@ export const LabwarePositionCheckComponent = (
     </Portal>
   )
 }
+
+export const LabwarePositionCheckComponent = React.memo(
+  LabwarePositionCheckInner,
+  ({ runId: prevRunId }, { runId: nextRunId }) => {
+    console.log('prev: ', prevRunId, ' next: ', nextRunId)
+    return prevRunId === nextRunId
+  }
+)

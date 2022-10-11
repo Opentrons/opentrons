@@ -4,35 +4,24 @@ import { DIRECTION_COLUMN, Flex, TYPOGRAPHY } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { PrepareSpace } from './PrepareSpace'
 import { JogToWell } from './JogToWell'
-import { CompletedProtocolAnalysis, getIsTiprack, getLabwareDefURI, getLabwareDisplayName, getModuleDisplayName } from '@opentrons/shared-data'
-import { getLabwareDefinitionsFromCommands } from './utils/labware'
+import { CompletedProtocolAnalysis, getIsTiprack, getLabwareDisplayName, getModuleDisplayName } from '@opentrons/shared-data'
+import { getLabwareDef } from './utils/labware'
 import { UnorderedList } from '../../molecules/UnorderedList'
 
-import type { CheckTipRacksStep } from './types'
+import type { CheckTipRacksStep, CreateRunCommand } from './types'
 
 interface CheckItemProps extends Omit<CheckTipRacksStep, 'section'> {
   section: 'CHECK_LABWARE' | 'CHECK_TIP_RACKS'
   protocolData: CompletedProtocolAnalysis
   proceed: () => void
+  createRunCommand: CreateRunCommand
 }
 export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
-  const { labwareId, pipetteId, location, protocolData } = props
-  const [hasPreparedSpace, setHasPreparedSpace] = React.useState(false)
+  const { labwareId, pipetteId, location, protocolData, createRunCommand } = props
+  const startingPosition = React.useRef(null)
   const { t } = useTranslation('labware_position_check')
-  React.useEffect(() => {
-    setHasPreparedSpace(false)
-  }, [labwareId, pipetteId, location?.moduleId, location?.slotName])
-
-
-  if (protocolData == null) return null
-  const labwareDefUri = protocolData.labware.find(l => l.id === labwareId)
-    ?.definitionUri
-  const labwareDefinitions = getLabwareDefinitionsFromCommands(
-    protocolData.commands
-  )
-  const labwareDef = labwareDefinitions.find(
-    def => getLabwareDefURI(def) === labwareDefUri
-  )
+  console.log('startingPosition', startingPosition.current)
+  const labwareDef = getLabwareDef(labwareId, protocolData)
   if (labwareDef == null) return null
   const isTiprack = getIsTiprack(labwareDef)
 
@@ -58,9 +47,37 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
     placeItemInstruction,
   ]
 
+  const handleConfirmPlacement = () => {
+    createRunCommand({
+      command: {
+        commandType: 'moveToWell' as const,
+        params: {
+          pipetteId: pipetteId,
+          labwareId: labwareId,
+          wellName: 'A1',
+          wellLocation: { origin: 'top' as const },
+        },
+      },
+      waitUntilComplete: true,
+    })
+      .then(_response => {
+        createRunCommand({
+          command: { commandType: 'savePosition', params: { pipetteId } },
+          waitUntilComplete: true,
+        }).then(response => {
+          const { position } = response.data.result
+          console.log('position ', position)
+          startingPosition.current = position
+        })
+      })
+      .catch((e: Error) => {
+        console.error(`error saving position: ${e.message}`)
+      })
+  }
+
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      {hasPreparedSpace ? (
+      {startingPosition.current != null ? (
         <JogToWell
           {...props}
           header={t('check_item_in_location', {
@@ -73,7 +90,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
             </StyledText>
           }
           labwareDef={labwareDef}
-          goBack={() => setHasPreparedSpace(false)} />
+          goBack={() => startingPosition.current = null} />
       ) : (
         <PrepareSpace
           {...props}
@@ -83,7 +100,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
           })}
           body={<UnorderedList items={instructions} />}
           labwareDef={labwareDef}
-          confirmPlacement={() => setHasPreparedSpace(true)} />
+          confirmPlacement={handleConfirmPlacement} />
       )}
     </Flex>
   )

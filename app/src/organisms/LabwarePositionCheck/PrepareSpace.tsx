@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   LabwareRender,
   Module,
@@ -9,27 +10,20 @@ import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   SPACING,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   THERMOCYCLER_MODULE_V1,
   inferModuleOrientationFromXCoordinate,
   CompletedProtocolAnalysis,
-  getLabwareDefURI,
   getModuleDef2,
-  getIsTiprack,
-  getModuleDisplayName,
-  getLabwareDisplayName,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 
 import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
-import { getLabwareDefinitionsFromCommands } from './utils/labware'
 import { CheckTipRacksStep } from './types'
 import { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-import { Trans, useTranslation } from 'react-i18next'
 import { NeedHelpLink } from '../CalibrationPanels'
 
 const LPC_HELP_LINK_URL =

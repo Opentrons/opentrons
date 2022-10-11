@@ -1,4 +1,5 @@
 import { DEPRECATED_SECTIONS, SECTIONS } from './constants'
+import { useCreateCommandMutation } from '@opentrons/react-api-client'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { MoveToWellCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
 import type {
@@ -74,5 +75,12 @@ export interface ReturnTipStep {
 export interface ResultsSummaryStep {
   section: typeof SECTIONS.RESULTS_SUMMARY
 }
+
+type CreateCommandMutate = ReturnType<typeof useCreateCommandMutation>['createCommand']
+export type CreateRunCommand = (
+  params: Omit<Parameters<CreateCommandMutate>[0], 'runId'>,
+  options?: Parameters<CreateCommandMutate>[1]
+) => ReturnType<CreateCommandMutate>
+
 
 
