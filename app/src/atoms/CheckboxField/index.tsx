@@ -1,6 +1,16 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { Icon, COLORS, Box, SPACING, TYPOGRAPHY } from '@opentrons/components'
+import {
+  Flex,
+  Icon,
+  COLORS,
+  Box,
+  SPACING,
+  TYPOGRAPHY,
+  ALIGN_CENTER,
+  JUSTIFY_CENTER,
+  SIZE_1,
+} from '@opentrons/components'
 
 export interface CheckboxFieldProps {
   /** change handler */
@@ -10,7 +20,7 @@ export interface CheckboxFieldProps {
   /** name of field in form */
   name?: string
   /** label text for checkbox */
-  label?: string
+  label?: React.ReactNode
   /** checkbox is disabled if value is true */
   disabled?: boolean
   /** html tabindex property */
@@ -109,7 +119,19 @@ export function CheckboxField(props: CheckboxFieldProps): JSX.Element {
   return (
     <label css={OUTER_STYLE}>
       {props.isIndeterminate ? (
-        <Icon name="minus-box" width="100%" css={INNER_STYLE_VALUE} />
+        <Flex
+          alignItems={ALIGN_CENTER}
+          justifyContent={JUSTIFY_CENTER}
+          borderRadius="2px"
+          backgroundColor={COLORS.darkGreyDisabled}
+          size={SIZE_1}
+        >
+          <Box
+            height="1.5px"
+            width="0.375rem"
+            backgroundColor={COLORS.darkGreyEnabled}
+          />
+        </Flex>
       ) : (
         <Icon
           css={props.value ? INNER_STYLE_VALUE : INNER_STYLE_NO_VALUE}

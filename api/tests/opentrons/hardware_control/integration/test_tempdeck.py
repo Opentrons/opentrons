@@ -43,7 +43,9 @@ async def test_set_temperature(tempdeck: TempDeck) -> None:
         "data": {"currentTemp": 0, "targetTemp": None},
     }
 
-    await tempdeck.set_temperature(10)
+    await tempdeck.start_set_temperature(10)
+    await tempdeck.await_temperature(None)
+
     assert tempdeck.live_data == {
         "status": "holding at target",
         "data": {"currentTemp": 10, "targetTemp": 10},
@@ -57,8 +59,6 @@ async def test_start_set_temperature_cool(tempdeck: TempDeck) -> None:
     new_temp = current - 20
 
     await tempdeck.start_set_temperature(new_temp)
-    # Wait for poll
-    await tempdeck.wait_next_poll()
     assert tempdeck.live_data == {
         "status": "cooling",
         "data": {"currentTemp": current, "targetTemp": new_temp},
@@ -79,8 +79,6 @@ async def test_start_set_temperature_heat(tempdeck: TempDeck) -> None:
     new_temp = current + 20
 
     await tempdeck.start_set_temperature(new_temp)
-    # Wait for poll
-    await tempdeck.wait_next_poll()
     assert tempdeck.live_data == {
         "status": "heating",
         "data": {"currentTemp": current, "targetTemp": new_temp},
@@ -97,7 +95,7 @@ async def test_start_set_temperature_heat(tempdeck: TempDeck) -> None:
 async def test_deactivate(tempdeck: TempDeck) -> None:
     """It should deactivate and move to room temperature"""
     await tempdeck.deactivate()
-    await tempdeck.wait_next_poll()
+
     # Wait for temperature to be reached
     await tempdeck.await_temperature(awaiting_temperature=23)
     assert tempdeck.live_data == {
