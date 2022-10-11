@@ -523,4 +523,4 @@ stages:
               - id: waterId
                 displayName: Water
                 description: Liquid H2O
-                displayColor: '#fff'
+                displayColor: '#7332a8'

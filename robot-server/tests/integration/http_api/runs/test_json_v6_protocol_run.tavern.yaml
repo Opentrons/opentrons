@@ -48,7 +48,7 @@ stages:
             - id: waterId
               displayName: Water
               description: Liquid H2O
-              displayColor: '#fff'
+              displayColor: '#7332a8'
           protocolId: '{protocol_id}'
 
   - name: Execute a setup command
