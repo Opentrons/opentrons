@@ -121,10 +121,10 @@ describe('AdvancedSettings', () => {
 
   it('renders correct titles', () => {
     const [{ getByText }] = render()
-    getByText('Update channel')
+    getByText('Update Channel')
     getByText('Additional Custom Labware Source Folder')
     getByText('Tip Length Calibration Method')
-    getByText('Robot caching')
+    getByText('Prevent Robot Caching')
     getByText('Clear Unavailable Robots')
     getByText('Enable Developer Tools')
   })
@@ -163,10 +163,9 @@ describe('AdvancedSettings', () => {
     })
   })
   it('renders the robot caching section', () => {
-    const [{ getByText, getByRole }] = render()
-    getByText('Note: This will clear cached robots when switched on.')
-    getByText(
-      'Disabling this may improve overall networking performance in environments with many robots, but may cause initial robot discovery on app launch to be slower and more susceptile to failures.'
+    const [{ queryByText, getByRole }] = render()
+    queryByText(
+      'The app will immediately clear unavailable robots and will not remember unavailable robots while this is enabled. On networks with many robots, preventing caching may improve network performance at the expense of slower and less reliable robot discovery on app launch.'
     )
     getByRole('switch', { name: 'display_unavailable_robots' })
   })
@@ -237,7 +236,7 @@ describe('AdvancedSettings', () => {
 
   it('renders the display show link to get labware offset data section', () => {
     const [{ getByText, getByRole }] = render()
-    getByText('Show link to get Labware Offset data')
+    getByText('Show Link to Get Labware Offset Data')
     getByText(
       'If you need to access Labware Offset data outside of the Opentrons App, enabling this setting will display a link to get Offset Data in the Recent Runs overflow menu and in the Labware Setup section of the Protocol page.'
     )
@@ -278,7 +277,7 @@ describe('AdvancedSettings', () => {
   it('renders the path to python override text and button with no default path', () => {
     mockGetPathToPythonOverride.mockReturnValue(null)
     const [{ getByText, getByRole }] = render()
-    getByText('Override path to Python')
+    getByText('Override Path to Python')
     getByText(
       'If specified, the Opentrons App will use the Python interpreter at this path instead of the default bundled Python interpreter.'
     )
@@ -295,7 +294,7 @@ describe('AdvancedSettings', () => {
   it('renders the path to python override text and button with a selected path', () => {
     mockGetPathToPythonOverride.mockReturnValue('otherPath')
     const [{ getByText, getByRole }] = render()
-    getByText('Override path to Python')
+    getByText('Override Path to Python')
     getByText(
       'If specified, the Opentrons App will use the Python interpreter at this path instead of the default bundled Python interpreter.'
     )
@@ -335,7 +334,7 @@ describe('AdvancedSettings', () => {
   it('renders the developer tools section', () => {
     const [{ getByText, getByRole }] = render()
     getByText(
-      'Open Developer Tools on app launch, enable additional logging, and allow access to feature flags.'
+      'Enabling this setting opens Developer Tools on app launch, enables additional logging and gives access to feature flags.'
     )
     getByRole('switch', { name: 'enable_dev_tools' })
   })

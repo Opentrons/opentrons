@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import { css } from 'styled-components'
 
@@ -186,7 +186,7 @@ export function AdvancedSettings(): JSX.Element {
         <Flex
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
-          gridGap={SPACING.spacing4}
+          gridGap={SPACING.spacingXXL}
         >
           {showSuccessToast && (
             <Toast
@@ -238,7 +238,7 @@ export function AdvancedSettings(): JSX.Element {
               </Modal>
             </Portal>
           ) : null}
-          <Box width="70%">
+          <Flex flexDirection={DIRECTION_COLUMN}>
             <StyledText
               css={TYPOGRAPHY.h3SemiBold}
               paddingBottom={SPACING.spacing3}
@@ -249,21 +249,24 @@ export function AdvancedSettings(): JSX.Element {
             <StyledText as="p" paddingBottom={SPACING.spacing3}>
               {t('update_description')}
             </StyledText>
-          </Box>
-          <SelectField
-            name={'__UpdateChannel__'}
-            options={channelOptions}
-            onValueChange={handleChannel}
-            value={channel}
-            placeholder={channel}
-            formatOptionLabel={formatOptionLabel}
-            isSearchable={false}
-            width="10rem"
-          />
+          </Flex>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+            <StyledText css={TYPOGRAPHY.labelSemiBold}>{t('channel')}</StyledText>
+            <SelectField
+              name={'__UpdateChannel__'}
+              options={channelOptions}
+              onValueChange={handleChannel}
+              value={channel}
+              placeholder={channel}
+              formatOptionLabel={formatOptionLabel}
+              isSearchable={false}
+              width="10rem"
+            />
+          </Flex>
         </Flex>
         <Divider marginY={SPACING.spacing5} />
-        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Box width="70%">
+        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN} gridGap={SPACING.spacingXXL}>
+          <Flex flexDirection={DIRECTION_COLUMN} >
             <StyledText
               css={TYPOGRAPHY.h3SemiBold}
               paddingBottom={SPACING.spacing3}
@@ -302,7 +305,7 @@ export function AdvancedSettings(): JSX.Element {
             ) : (
               <StyledText as="p">{t('no_folder')}</StyledText>
             )}
-          </Box>
+          </Flex>
           {
             <TertiaryButton
               marginLeft={SPACING_AUTO}
@@ -340,8 +343,8 @@ export function AdvancedSettings(): JSX.Element {
               useTrashSurfaceForTipCal === true
                 ? ALWAYS_TRASH
                 : useTrashSurfaceForTipCal === false
-                ? ALWAYS_BLOCK
-                : ALWAYS_PROMPT
+                  ? ALWAYS_BLOCK
+                  : ALWAYS_PROMPT
             }
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               // you know this is a limited-selection field whose values are only
@@ -367,17 +370,20 @@ export function AdvancedSettings(): JSX.Element {
               paddingBottom={SPACING.spacing3}
               id="AdvancedSettings_unavailableRobots"
             >
-              {t('robot_caching')}
-            </StyledText>
-            <StyledText
-              as="p"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              marginBottom={SPACING.spacing4}
-            >
-              {t('note_this_will_clear_caching')}
+              {t('prevent_robot_caching')}
             </StyledText>
             <StyledText as="p">
-              {t('disable_robot_caching_descriptions')}
+              <Trans
+                t={t}
+                i18nKey="prevent_robot_caching_description"
+                components={{
+                  strong: (
+                    <StyledText as="span"
+                      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                    />
+                  ),
+                }}
+              />
             </StyledText>
           </Box>
           <ToggleButton
@@ -390,8 +396,8 @@ export function AdvancedSettings(): JSX.Element {
           />
         </Flex>
         <Divider marginY={SPACING.spacing5} />
-        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Box width="70%">
+        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN} gridGap={SPACING.spacingXXL}>
+          <Box>
             <StyledText
               css={TYPOGRAPHY.h3SemiBold}
               paddingBottom={SPACING.spacing3}
