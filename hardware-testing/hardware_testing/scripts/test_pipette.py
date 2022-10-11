@@ -8,7 +8,7 @@ from hardware_testing.opentrons_api.helpers_ot3 import (
     build_ot3_hardware_api,
     GantryLoadSettings,
     home_ot3,
-    set_gantry_load_per_axis_settings_ot3
+    set_gantry_load_per_axis_settings_ot3,
 )
 
 MOUNT = OT3Mount.LEFT
@@ -102,9 +102,9 @@ async def _main(api: ThreadManagedHardwareAPI) -> None:
     #       7) read capacitive sensor
     #       8) read air-pressure sensor
     #       9) read temp/humidity sensor
-    await api.disengage_axes([OT3Axis.X, OT3Axis.Y,
-                              OT3Axis.Z_L, OT3Axis.Z_R,
-                              PLUNGER_AXIS])
+    await api.disengage_axes(
+        [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R, PLUNGER_AXIS]
+    )
 
 
 if __name__ == "__main__":
@@ -114,8 +114,7 @@ if __name__ == "__main__":
     hw_api = build_ot3_hardware_api(is_simulating=args.simulate)
     asyncio.run(_main(hw_api))
     hw_api.clean_up()
-    input('Done. Press ENTER to exit:')
+    input("Done. Press ENTER to exit:")
     print("###########################################")
     print("###########################################")
     print("###########################################")
-

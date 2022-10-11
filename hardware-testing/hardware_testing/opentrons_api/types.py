@@ -1,6 +1,6 @@
 """Types."""
 from opentrons.config.types import GantryLoad, PerPipetteAxisSettings
-from opentrons.hardware_control.types import OT3Mount, OT3Axis, Axis
+from opentrons.hardware_control.types import OT3Mount, OT3Axis, Axis, CriticalPoint
 from opentrons.types import Point, Mount
 
 __all__ = [
@@ -10,5 +10,6 @@ __all__ = [
     "Point",
     "PerPipetteAxisSettings",
     "Axis",
-    "Mount"
+    "Mount",
+    "CriticalPoint",
 ]

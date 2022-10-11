@@ -37,9 +37,12 @@ import { PrimaryButton } from '../../atoms/buttons'
 import { Slideout } from '../../atoms/Slideout'
 import { StyledText } from '../../atoms/text'
 import { StoredProtocolData } from '../../redux/protocol-storage'
+import { useFeatureFlag } from '../../redux/config'
 import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
+import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
 import { AvailableRobotOption } from './AvailableRobotOption'
 import { useCreateRunFromProtocol } from './useCreateRunFromProtocol'
+import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 
 import type { StyleProps } from '@opentrons/components'
 import type { State, Dispatch } from '../../redux/types'
@@ -50,7 +53,287 @@ interface ChooseRobotSlideoutProps extends StyleProps {
   onCloseClick: () => void
   showSlideout: boolean
 }
-export function ChooseRobotSlideout(
+
+export function ChooseRobotSlideoutComponent(
+  props: ChooseRobotSlideoutProps
+): JSX.Element | null {
+  const { t } = useTranslation(['protocol_details', 'shared', 'app_settings'])
+  const { storedProtocolData, showSlideout, onCloseClick, ...restProps } = props
+  const dispatch = useDispatch<Dispatch>()
+  const history = useHistory()
+  const isScanning = useSelector((state: State) => getScanning(state))
+  const [shouldApplyOffsets, setShouldApplyOffsets] = React.useState(true)
+  const {
+    protocolKey,
+    srcFileNames,
+    srcFiles,
+    mostRecentAnalysis,
+  } = storedProtocolData
+
+  const { trackCreateProtocolRunEvent } = useTrackCreateProtocolRunEvent(
+    storedProtocolData
+  )
+
+  const unhealthyReachableRobots = useSelector((state: State) =>
+    getReachableRobots(state)
+  )
+  const unreachableRobots = useSelector((state: State) =>
+    getUnreachableRobots(state)
+  )
+  const healthyReachableRobots = useSelector((state: State) =>
+    getConnectableRobots(state)
+  )
+  const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(
+    healthyReachableRobots[0] ?? null
+  )
+  const offsetCandidates = useOffsetCandidatesForAnalysis(
+    mostRecentAnalysis,
+    selectedRobot?.ip ?? null
+  )
+  const {
+    createRunFromProtocolSource,
+    runCreationError,
+    reset: resetCreateRun,
+    isCreatingRun,
+    runCreationErrorCode,
+  } = useCreateRunFromProtocol(
+    {
+      onSuccess: ({ data: runData }) => {
+        if (selectedRobot != null) {
+          trackCreateProtocolRunEvent({
+            name: 'createProtocolRecordResponse',
+            properties: { success: true },
+          })
+          history.push(
+            `/devices/${selectedRobot.name}/protocol-runs/${runData.id}`
+          )
+        }
+      },
+      onError: (error: Error) => {
+        trackCreateProtocolRunEvent({
+          name: 'createProtocolRecordResponse',
+          properties: { success: false, error: error.message },
+        })
+      },
+    },
+    selectedRobot != null ? { hostname: selectedRobot.ip } : null,
+    shouldApplyOffsets
+      ? offsetCandidates.map(({ vector, location, definitionUri }) => ({
+          vector,
+          location,
+          definitionUri,
+        }))
+      : []
+  )
+  const handleProceed: React.MouseEventHandler<HTMLButtonElement> = () => {
+    trackCreateProtocolRunEvent({ name: 'createProtocolRecordRequest' })
+    createRunFromProtocolSource({ files: srcFileObjects, protocolKey })
+  }
+
+  const isSelectedRobotOnWrongVersionOfSoftware = [
+    'upgrade',
+    'downgrade',
+  ].includes(
+    useSelector((state: State) => {
+      const value =
+        selectedRobot != null
+          ? getBuildrootUpdateDisplayInfo(state, selectedRobot.name)
+          : { autoUpdateAction: '' }
+      return value
+    })?.autoUpdateAction
+  )
+
+  if (
+    protocolKey == null ||
+    srcFileNames == null ||
+    srcFiles == null ||
+    mostRecentAnalysis == null
+  ) {
+    // TODO: do more robust corrupt file catching and handling here
+    return null
+  }
+  const srcFileObjects = srcFiles.map((srcFileBuffer, index) => {
+    const srcFilePath = srcFileNames[index]
+    return new File([srcFileBuffer], path.basename(srcFilePath))
+  })
+  const protocolDisplayName =
+    mostRecentAnalysis?.metadata?.protocolName ??
+    first(srcFileNames) ??
+    protocolKey
+  const unavailableCount =
+    unhealthyReachableRobots.length + unreachableRobots.length
+
+  return (
+    <Slideout
+      isExpanded={showSlideout}
+      onCloseClick={onCloseClick}
+      title={t('choose_robot_to_run', {
+        protocol_name: protocolDisplayName,
+      })}
+      footer={
+        <Flex flexDirection={DIRECTION_COLUMN}>
+          <ApplyHistoricOffsets
+            offsetCandidates={offsetCandidates}
+            shouldApplyOffsets={shouldApplyOffsets}
+            setShouldApplyOffsets={setShouldApplyOffsets}
+          />
+          <PrimaryButton
+            onClick={handleProceed}
+            width="100%"
+            disabled={
+              isCreatingRun ||
+              selectedRobot == null ||
+              isSelectedRobotOnWrongVersionOfSoftware
+            }
+          >
+            {isCreatingRun ? (
+              <Icon name="ot-spinner" spin size={SIZE_1} />
+            ) : (
+              t('shared:proceed_to_setup')
+            )}
+          </PrimaryButton>
+        </Flex>
+      }
+      {...restProps}
+    >
+      <Flex flexDirection={DIRECTION_COLUMN}>
+        <Flex
+          alignSelf={ALIGN_FLEX_END}
+          marginBottom={SPACING.spacing3}
+          height={SIZE_2}
+        >
+          {isScanning ? (
+            <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
+              <StyledText
+                as="p"
+                color={COLORS.darkGreyEnabled}
+                marginRight={SPACING.spacingSM}
+              >
+                {t('app_settings:searching')}
+              </StyledText>
+              <Icon
+                name="ot-spinner"
+                spin
+                size="1.25rem"
+                color={COLORS.darkGreyEnabled}
+              />
+            </Flex>
+          ) : (
+            <Link
+              onClick={() => dispatch(startDiscovery())}
+              textTransform={TYPOGRAPHY.textTransformCapitalize}
+              role="button"
+              css={TYPOGRAPHY.linkPSemiBold}
+            >
+              {t('shared:refresh')}
+            </Link>
+          )}
+        </Flex>
+        {!isScanning && healthyReachableRobots.length === 0 ? (
+          <Flex
+            css={BORDERS.cardOutlineBorder}
+            flexDirection={DIRECTION_COLUMN}
+            justifyContent={JUSTIFY_CENTER}
+            alignItems={ALIGN_CENTER}
+            height={SIZE_4}
+          >
+            <Icon name="alert-circle" size={SIZE_1} />
+            <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+              {t('no_available_robots_found')}
+            </StyledText>
+          </Flex>
+        ) : (
+          healthyReachableRobots.map(robot => {
+            const isSelected =
+              selectedRobot != null && selectedRobot.ip === robot.ip
+            return (
+              <Flex key={robot.ip} flexDirection={DIRECTION_COLUMN}>
+                <AvailableRobotOption
+                  key={robot.ip}
+                  robotName={robot.name}
+                  robotModel="OT-2"
+                  local={robot.local}
+                  onClick={() => {
+                    if (!isCreatingRun) {
+                      resetCreateRun()
+                      setSelectedRobot(robot)
+                    }
+                  }}
+                  isError={runCreationError != null}
+                  isSelected={isSelected}
+                  isOnDifferentSoftwareVersion={
+                    isSelectedRobotOnWrongVersionOfSoftware
+                  }
+                />
+                {runCreationError != null && isSelected && (
+                  <StyledText
+                    as="label"
+                    color={COLORS.errorText}
+                    overflowWrap="anywhere"
+                    display={DISPLAY_INLINE_BLOCK}
+                    marginTop={`-${SPACING.spacing2}`}
+                    marginBottom={SPACING.spacing3}
+                  >
+                    {runCreationErrorCode === 409 ? (
+                      <Trans
+                        t={t}
+                        i18nKey="shared:robot_is_busy_no_protocol_run_allowed"
+                        components={{
+                          robotLink: (
+                            <NavLink
+                              css={css`
+                                color: ${COLORS.errorText};
+                                text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
+                              `}
+                              to={`/devices/${robot.name}`}
+                            />
+                          ),
+                        }}
+                      />
+                    ) : (
+                      runCreationError
+                    )}
+                  </StyledText>
+                )}
+              </Flex>
+            )
+          })
+        )}
+        {!isScanning && unavailableCount > 0 ? (
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            alignItems={ALIGN_CENTER}
+            textAlign={TYPOGRAPHY.textAlignCenter}
+            marginTop={SPACING.spacing5}
+          >
+            <StyledText as="p">
+              {t('unavailable_robot_not_listed', { count: unavailableCount })}
+            </StyledText>
+            <StyledText as="p">
+              <Trans
+                t={t}
+                i18nKey="view_unavailable_robots"
+                components={{
+                  devicesLink: (
+                    <NavLink to="/devices" css={TYPOGRAPHY.linkPSemiBold} />
+                  ),
+                }}
+              />
+            </StyledText>
+          </Flex>
+        ) : null}
+      </Flex>
+    </Slideout>
+  )
+}
+
+/**
+ * @deprecated This component is slated for removal along with the
+ * enableManualDeckStateMod feature flag. It's functionality is being
+ * replaced by the above component which should be relabelled as the main export
+ * `ChooseRobotSlideout` when the ff is removed
+ */
+export function DeprecatedChooseRobotSlideout(
   props: ChooseRobotSlideoutProps
 ): JSX.Element | null {
   const { t } = useTranslation(['protocol_details', 'shared', 'app_settings'])
@@ -301,5 +584,18 @@ export function ChooseRobotSlideout(
         ) : null}
       </Flex>
     </Slideout>
+  )
+}
+
+export function ChooseRobotSlideout(
+  props: ChooseRobotSlideoutProps
+): JSX.Element | null {
+  const enableManualDeckStateMod = useFeatureFlag(
+    'enableManualDeckStateModification'
+  )
+  return enableManualDeckStateMod ? (
+    <ChooseRobotSlideoutComponent {...props} />
+  ) : (
+    <DeprecatedChooseRobotSlideout {...props} />
   )
 }

@@ -3,17 +3,13 @@ import argparse
 import asyncio
 from typing import Tuple
 
-from opentrons.hardware_control.motion_utilities import target_position_from_plunger
 from hardware_testing.opentrons_api.types import GantryLoad, OT3Mount, OT3Axis, Point
 from hardware_testing.opentrons_api.helpers_ot3 import (
     ThreadManagedHardwareAPI,
     build_ot3_hardware_api,
-    GantryLoadSettings,
-    set_gantry_load_per_axis_settings_ot3,
     home_ot3,
-    home_pipette,
     get_endstop_position_ot3,
-    move_plunger_absolute_ot3
+    move_plunger_absolute_ot3,
 )
 
 MOUNT = OT3Mount.LEFT
@@ -31,23 +27,13 @@ def _create_relative_point(axis: OT3Axis, distance: float) -> Point:
     raise ValueError(f"Unexpected axis: {axis}")
 
 
-async def _test_home_pipette(api: ThreadManagedHardwareAPI, mount: OT3Mount) -> None:
-    await api.home_plunger(mount)
-
-
-async def _test_move_plunger(api: ThreadManagedHardwareAPI,mount: OT3Mount,
-                                                plunger_distance: float)-> None:
-    await move_plunger_absolute_ot3(api, mount, plunger_distance)
-
-
 async def _test_encoder(
-    api: ThreadManagedHardwareAPI, axis: OT3Axis, distance: float = -10
+    api: ThreadManagedHardwareAPI, distance: float = 10
 ) -> None:
     pos_start = await api.current_position(mount=MOUNT, refresh=True)
     enc_start = await api.encoder_current_position(mount=MOUNT, refresh=True)
-    rel_pnt = _create_relative_point(axis, distance)
     input("ready?")
-    await _test_move_plunger(api, mount= MOUNT, plunger_distance= 10)
+    await move_plunger_absolute_ot3(api, MOUNT, distance)
     pos_end = await api.current_position_ot3(mount=MOUNT, refresh=True)
     enc_end = await api.encoder_current_position(mount=MOUNT, refresh=True)
     print(f"Position:\n\tstart={pos_start}\n\tend={pos_end}")
@@ -84,8 +70,8 @@ async def _main(api: ThreadManagedHardwareAPI) -> None:
     await home_ot3(api, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
     switches = await api.get_limit_switches()
     print(f"Switches: {switches}")
-    await _test_home_pipette(api, MOUNT)
-    await _test_encoder(api, axis=OT3Axis.by_mount(MOUNT), distance = 10)
+    await api.home_plunger(MOUNT)
+    await _test_encoder(api, distance=10)
     input("Enter to disengage the pipette")
     await api.disengage_axes([OT3Axis.of_main_tool_actuator(MOUNT)])
     input("ENTER to re-engage")
@@ -97,7 +83,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
     args = parser.parse_args()
-    hw_api = build_ot3_hardware_api(is_simulating=args.simulate,
-                                    use_defaults=True)
+    hw_api = build_ot3_hardware_api(is_simulating=args.simulate, use_defaults=True)
     asyncio.run(_main(hw_api))
     hw_api.clean_up()
