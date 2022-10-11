@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import {
   Flex,
   ALIGN_CENTER,
+  COLORS,
   JUSTIFY_SPACE_BETWEEN,
   Box,
   SPACING,
@@ -53,7 +54,9 @@ export function DisplayRobotName({
         >
           {t('robot_name')}
         </StyledText>
-        <StyledText as="p">{robotName}</StyledText>
+        <StyledText as="p" color={COLORS.darkGreyEnabled}>
+          {robotName}
+        </StyledText>
       </Box>
       <TertiaryButton
         marginLeft={SPACING_AUTO}

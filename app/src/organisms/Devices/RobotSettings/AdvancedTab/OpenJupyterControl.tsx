@@ -35,12 +35,14 @@ export function OpenJupyterControl({
       <Box width="70%">
         <StyledText
           css={TYPOGRAPHY.pSemiBold}
-          marginBottom={SPACING.spacing2}
+          marginBottom={SPACING.spacing3}
           id="AdvancedSettings_About"
         >
           {t('jupyter_notebook')}
         </StyledText>
-        <StyledText as="p">{t('jupyter_notebook_description')}</StyledText>
+        <StyledText as="p" marginBottom={SPACING.spacing3}>
+          {t('jupyter_notebook_description')}
+        </StyledText>
         <ExternalLink href={JUPYTER_NOTEBOOK_LINK}>
           {t('jupyter_notebook_link')}
         </ExternalLink>
