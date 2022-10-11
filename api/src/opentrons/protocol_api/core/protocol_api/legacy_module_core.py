@@ -21,9 +21,10 @@ from opentrons.hardware_control.modules.types import (
 )
 from opentrons.protocols.geometry.module_geometry import (
     ModuleGeometry,
+    ThermocyclerGeometry,
     HeaterShakerGeometry,
 )
-from opentrons.types import DeckSlotName
+from opentrons.types import DeckSlotName, Location
 
 from ..module import (
     AbstractModuleCore,
@@ -32,7 +33,11 @@ from ..module import (
     AbstractThermocyclerCore,
     AbstractHeaterShakerCore,
 )
+
+# TODO I hate this
 from .labware import LabwareImplementation
+from ..labware import AbstractLabware
+from ...labware import Labware
 
 if TYPE_CHECKING:
     from .protocol_context import ProtocolContextImplementation
@@ -233,14 +238,19 @@ class LegacyThermocyclerCore(
     """Core control interface for an attached Thermocycler Module."""
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.Thermocycler]
+    _geometry: ThermocyclerGeometry
 
-    def open_lid(self) -> None:
+    def open_lid(self) -> str:
         """Open the thermocycler's lid."""
-        raise NotImplementedError("LegacyThermocyclerCore.open_lid")
+        self._prepare_for_lid_move()
+        self._geometry.lid_status = self._sync_module_hardware.open()
+        return self._geometry.lid_status
 
-    def close_lid(self) -> None:
+    def close_lid(self) -> str:
         """Close the thermocycler's lid."""
-        raise NotImplementedError("LegacyThermocyclerCore.close_lid")
+        self._prepare_for_lid_move()
+        self._geometry.lid_status = self._sync_module_hardware.close()
+        return self._geometry.lid_status
 
     def set_block_temperature(
         self,
@@ -251,11 +261,17 @@ class LegacyThermocyclerCore(
         block_max_volume: Optional[float] = None,
     ) -> None:
         """Set the target temperature for the well block, in °C."""
-        raise NotImplementedError("LegacyThermocyclerCore.set_block_temperature")
+        self._sync_module_hardware.set_temperature(
+            temperature=celsius,
+            hold_time_seconds=hold_time_seconds,
+            hold_time_minutes=hold_time_minutes,
+            ramp_rate=ramp_rate,
+            volume=block_max_volume,
+        )
 
     def set_lid_temperature(self, celsius: float) -> None:
         """Set the target temperature for the heated lid, in °C."""
-        raise NotImplementedError("LegacyThermocyclerCore.set_lid_temperature")
+        self._sync_module_hardware.set_lid_temperature(temperature=celsius)
 
     def execute_profile(
         self,
@@ -264,19 +280,33 @@ class LegacyThermocyclerCore(
         block_max_volume: Optional[float] = None,
     ) -> None:
         """Execute a Thermocycler Profile."""
-        raise NotImplementedError("LegacyThermocyclerCore.execute_profile")
+        if repetitions <= 0:
+            raise ValueError("repetitions must be a positive integer")
+        for step in steps:
+            if step.get("temperature") is None:
+                raise ValueError("temperature must be defined for each step in cycle")
+            hold_mins = step.get("hold_time_minutes")
+            hold_secs = step.get("hold_time_seconds")
+            if hold_mins is None and hold_secs is None:
+                raise ValueError(
+                    "either hold_time_minutes or hold_time_seconds must be"
+                    "defined for each step in cycle"
+                )
+        self._sync_module_hardware.cycle_temperatures(
+            steps=steps, repetitions=repetitions, volume=block_max_volume
+        )
 
     def deactivate_lid(self) -> None:
         """Turn off the heated lid."""
-        raise NotImplementedError("LegacyThermocyclerCore.deactivate_lid")
+        self._sync_module_hardware.deactivate_lid()
 
     def deactivate_block(self) -> None:
         """Turn off the well block temperature controller"""
-        raise NotImplementedError("LegacyThermocyclerCore.deactivate_block")
+        self._sync_module_hardware.deactivate_block()
 
     def deactivate(self) -> None:
         """Turn off the well block temperature controller, and heated lid"""
-        raise NotImplementedError("LegacyThermocyclerCore.deactivate")
+        self._sync_module_hardware.deactivate()
 
     def get_lid_position(self) -> Optional[ThermocyclerLidStatus]:
         """Get the thermoycler's lid position."""
@@ -329,6 +359,43 @@ class LegacyThermocyclerCore(
     def get_current_step_index(self) -> Optional[int]:
         """Get the index of the current step within the current cycle."""
         return self._sync_module_hardware.current_step_index  # type: ignore[no-any-return]
+
+    def _get_fixed_trash(self) -> Labware:
+        trash = self._protocol_core.get_fixed_trash()
+
+        if isinstance(trash, AbstractLabware):
+            trash = Labware(implementation=trash)
+
+        return cast(Labware, trash)
+
+    def _prepare_for_lid_move(self) -> None:
+        loaded_instruments = [
+            instr
+            for mount, instr in self._protocol_core.get_loaded_instruments().items()
+            if instr is not None
+        ]
+        try:
+            instr_core = loaded_instruments[0]
+        except IndexError:
+            _log.warning(
+                "Cannot assure a safe gantry position to avoid colliding"
+                " with the lid of the Thermocycler Module."
+            )
+        else:
+            protocol_core = self._protocol_core
+            hardware = protocol_core.get_hardware()
+            hardware.retract(instr_core.get_mount())
+            high_point = hardware.current_position(instr_core.get_mount())
+            trash_top = self._get_fixed_trash().wells()[0].top()
+            safe_point = trash_top.point._replace(
+                z=high_point[Axis.by_mount(instr_core.get_mount())]
+            )
+            instr_core.move_to(
+                Location(safe_point, None),
+                force_direct=True,
+                minimum_z_height=None,
+                speed=None,
+            )
 
 
 class LegacyHeaterShakerCore(

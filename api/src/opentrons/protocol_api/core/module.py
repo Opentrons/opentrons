@@ -138,11 +138,11 @@ class AbstractThermocyclerCore(AbstractModuleCore[LabwareCoreType]):
     """Core control interface for an attached Thermocycler Module."""
 
     @abstractmethod
-    def open_lid(self) -> None:
+    def open_lid(self) -> str:
         """Open the thermocycler's lid."""
 
     @abstractmethod
-    def close_lid(self) -> None:
+    def close_lid(self) -> str:
         """Close the thermocycler's lid."""
 
     @abstractmethod

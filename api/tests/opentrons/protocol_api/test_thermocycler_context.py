@@ -1,6 +1,6 @@
 """Tests for Protocol API thermocycler module contexts."""
 import pytest
-from decoy import Decoy
+from decoy import Decoy, matchers
 
 from opentrons.broker import Broker
 from opentrons.drivers.types import ThermocyclerLidStatus
@@ -170,3 +170,287 @@ def test_get_current_step_index(
     decoy.when(mock_core.get_current_step_index()).then_return(42)
     result = subject.current_step_index
     assert result == 42
+
+
+def test_open_lid(
+    decoy: Decoy,
+    mock_core: ThermocyclerCore,
+    mock_broker: Broker,
+    subject: ThermocyclerContext,
+) -> None:
+    """It should open the lid via the core."""
+    decoy.when(mock_core.open_lid()).then_return("open")
+
+    result = subject.open_lid()
+
+    decoy.verify(
+        mock_broker.publish(
+            "command",
+            matchers.DictMatching(
+                {
+                    "$": "before",
+                    "name": "command.THERMOCYCLER_OPEN",
+                }
+            ),
+        ),
+        mock_broker.publish(
+            "command",
+            matchers.DictMatching({"$": "after"}),
+        ),
+    )
+    assert result == "open"
+
+
+def test_close_lid(
+    decoy: Decoy,
+    mock_core: ThermocyclerCore,
+    mock_broker: Broker,
+    subject: ThermocyclerContext,
+) -> None:
+    """It should close the lid via the core."""
+    decoy.when(mock_core.close_lid()).then_return("close")
+
+    result = subject.close_lid()
+
+    decoy.verify(
+        mock_broker.publish(
+            "command",
+            matchers.DictMatching(
+                {
+                    "$": "before",
+                    "name": "command.THERMOCYCLER_CLOSE",
+                }
+            ),
+        ),
+        mock_broker.publish(
+            "command",
+            matchers.DictMatching({"$": "after"}),
+        ),
+    )
+    assert result == "close"
+
+
+def test_set_block_temperature(
+    decoy: Decoy,
+    mock_core: ThermocyclerCore,
+    mock_broker: Broker,
+    subject: ThermocyclerContext,
+) -> None:
+    """It should set the block temperature via the core."""
+    subject.set_block_temperature(
+        temperature=42.0,
+        hold_time_seconds=1.2,
+        hold_time_minutes=3.4,
+        ramp_rate=5.6,
+        block_max_volume=7.8,
+    )
+
+    decoy.verify(
+        mock_broker.publish(
+            "command",
+            matchers.DictMatching(
+                {
+                    "$": "before",
+                    "name": "command.THERMOCYCLER_SET_BLOCK_TEMP",
+                    "payload": matchers.DictMatching(
+                        {"temperature": 42.0, "hold_time": 205.2}
+                    ),
+                }
+            ),
+        ),
+        mock_core.set_block_temperature(
+            celsius=42.0,
+            hold_time_seconds=1.2,
+            hold_time_minutes=3.4,
+            ramp_rate=5.6,
+            block_max_volume=7.8,
+        ),
+        mock_broker.publish(
+            "command",
+            matchers.DictMatching(
+                {
+                    "$": "after",
+                    "payload": matchers.DictMatching(
+                        {"temperature": 42.0, "hold_time": 205.2}
+                    ),
+                }
+            ),
+        ),
+    )
+
+
+def test_set_lid_temperature(
+    decoy: Decoy,
+    mock_core: ThermocyclerCore,
+    mock_broker: Broker,
+    subject: ThermocyclerContext,
+) -> None:
+    """It should close the lid via the core."""
+    subject.set_lid_temperature(temperature=42.0)
+
+    decoy.verify(
+        mock_broker.publish(
+            "command",
+            matchers.DictMatching(
+                {
+                    "$": "before",
+                    "name": "command.THERMOCYCLER_SET_LID_TEMP",
+                }
+            ),
+        ),
+        mock_core.set_lid_temperature(celsius=42.0),
+        mock_broker.publish(
+            "command",
+            matchers.DictMatching({"$": "after"}),
+        ),
+    )
+
+
+def test_execute_profile(
+    decoy: Decoy,
+    mock_core: ThermocyclerCore,
+    mock_broker: Broker,
+    subject: ThermocyclerContext,
+) -> None:
+    """It should execute a thermocycler profile via the core."""
+    subject.execute_profile(
+        steps=[
+            {"temperature": 42.0, "hold_time_minutes": 12.3, "hold_time_seconds": 45.6}
+        ],
+        repetitions=12,
+        block_max_volume=34.5,
+    )
+
+    decoy.verify(
+        mock_broker.publish(
+            "command",
+            matchers.DictMatching(
+                {
+                    "$": "before",
+                    "name": "command.THERMOCYCLER_EXECUTE_PROFILE",
+                    "payload": matchers.DictMatching(
+                        {
+                            "steps": [
+                                {
+                                    "temperature": 42.0,
+                                    "hold_time_minutes": 12.3,
+                                    "hold_time_seconds": 45.6,
+                                }
+                            ]
+                        }
+                    ),
+                }
+            ),
+        ),
+        mock_core.execute_profile(
+            steps=[
+                {
+                    "temperature": 42.0,
+                    "hold_time_minutes": 12.3,
+                    "hold_time_seconds": 45.6,
+                }
+            ],
+            repetitions=12,
+            block_max_volume=34.5,
+        ),
+        mock_broker.publish(
+            "command",
+            matchers.DictMatching(
+                {
+                    "$": "after",
+                    "payload": matchers.DictMatching(
+                        {
+                            "steps": [
+                                {
+                                    "temperature": 42.0,
+                                    "hold_time_minutes": 12.3,
+                                    "hold_time_seconds": 45.6,
+                                }
+                            ]
+                        }
+                    ),
+                }
+            ),
+        ),
+    )
+
+
+def test_deactivate_lid(
+    decoy: Decoy,
+    mock_core: ThermocyclerCore,
+    mock_broker: Broker,
+    subject: ThermocyclerContext,
+) -> None:
+    """It should turn off the heated lid via the core."""
+    subject.deactivate_lid()
+
+    decoy.verify(
+        mock_broker.publish(
+            "command",
+            matchers.DictMatching(
+                {
+                    "$": "before",
+                    "name": "command.THERMOCYCLER_DEACTIVATE_LID",
+                }
+            ),
+        ),
+        mock_core.deactivate_lid(),
+        mock_broker.publish(
+            "command",
+            matchers.DictMatching({"$": "after"}),
+        ),
+    )
+
+
+def test_deactivate_block(
+    decoy: Decoy,
+    mock_core: ThermocyclerCore,
+    mock_broker: Broker,
+    subject: ThermocyclerContext,
+) -> None:
+    """It should turn off the well block temperature controller via the core."""
+    subject.deactivate_block()
+
+    decoy.verify(
+        mock_broker.publish(
+            "command",
+            matchers.DictMatching(
+                {
+                    "$": "before",
+                    "name": "command.THERMOCYCLER_DEACTIVATE_BLOCK",
+                }
+            ),
+        ),
+        mock_core.deactivate_block(),
+        mock_broker.publish(
+            "command",
+            matchers.DictMatching({"$": "after"}),
+        ),
+    )
+
+
+def test_deactivate(
+    decoy: Decoy,
+    mock_core: ThermocyclerCore,
+    mock_broker: Broker,
+    subject: ThermocyclerContext,
+) -> None:
+    """It should turn off the well block and heated lid via the core."""
+    subject.deactivate()
+
+    decoy.verify(
+        mock_broker.publish(
+            "command",
+            matchers.DictMatching(
+                {
+                    "$": "before",
+                    "name": "command.THERMOCYCLER_DEACTIVATE",
+                }
+            ),
+        ),
+        mock_core.deactivate(),
+        mock_broker.publish(
+            "command",
+            matchers.DictMatching({"$": "after"}),
+        ),
+    )
