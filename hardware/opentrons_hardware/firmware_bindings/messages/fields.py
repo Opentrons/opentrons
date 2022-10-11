@@ -15,6 +15,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     SensorOutputBinding,
     SensorThresholdMode,
     PipetteTipActionType,
+    ErrorSeverity,
 )
 
 
@@ -74,6 +75,18 @@ class FirmwareUpdateDataField(utils.BinaryFieldBase[bytes]):
 
     NUM_BYTES = 56
     FORMAT = f"{NUM_BYTES}s"
+
+
+class ErrorSeverityField(utils.UInt16Field):
+    """A field for error severity."""
+
+    def __repr__(self) -> str:
+        """Print error severity."""
+        try:
+            severity = ErrorSeverity(self.value).name
+        except ValueError:
+            severity = str(self.value)
+        return f"{self.__class__.__name__}(value={severity})"
 
 
 class ErrorCodeField(utils.UInt16Field):

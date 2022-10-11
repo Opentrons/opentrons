@@ -59,6 +59,13 @@ class Acknowledgement(EmptyPayloadMessage):  # noqa: D101
 
 
 @dataclass
+class ErrorMessage(BaseMessage):  # noqa: D101
+    payload: payloads.ErrorMessagePayload
+    payload_type: Type[payloads.ErrorMessagePayload] = payloads.ErrorMessagePayload
+    message_id: Literal[MessageId.error_message] = MessageId.error_message
+
+
+@dataclass
 class HeartbeatRequest(EmptyPayloadMessage):  # noqa: D101
     message_id: Literal[MessageId.heartbeat_request] = MessageId.heartbeat_request
 

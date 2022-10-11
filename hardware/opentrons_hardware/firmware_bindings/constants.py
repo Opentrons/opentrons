@@ -63,6 +63,8 @@ class MessageId(int, Enum):
 
     stop_request = 0x00
 
+    error_message = 0x02
+
     get_status_request = 0x01
     get_status_response = 0x05
 
@@ -140,6 +142,15 @@ class MessageId(int, Enum):
     bind_sensor_output_response = 0x8B
     peripheral_status_request = 0x8C
     peripheral_status_response = 0x8D
+
+
+@unique
+class ErrorSeverity(int, Enum):
+    """Error Severity levels."""
+
+    WARNING = 0x1
+    RECOVERABLE = 0x2
+    UNRECOVERABLE = 0x3
 
 
 @unique
