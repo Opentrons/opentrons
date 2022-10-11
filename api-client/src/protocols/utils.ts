@@ -155,21 +155,20 @@ export function parseInitialLoadedLabwareByModuleId(
   )
 }
 
-export interface LoadedLabwareById {
+export interface LoadedLabwareEntity {
   id: string
   loadName: string
   definitionUri: string
   displayName?: string
 }
 
-export function parseInitialLoadedLabwareById(
+export function parseLoadedLabwareEntity(
   commands: RunTimeCommand[]
-): LoadedLabwareById[] {
+): LoadedLabwareEntity[] {
   const loadLabwareCommands = commands.filter(
     (command): command is LoadLabwareRunTimeCommand =>
       command.commandType === 'loadLabware'
   )
-
   const filterOutTrashCommands = loadLabwareCommands.filter(
     command => command.result.definition.metadata.displayCategory !== 'trash'
   )
@@ -196,7 +195,7 @@ export interface LoadedLabwareDefinitionsById {
 export function parseInitialLoadedLabwareDefinitionsById(
   commands: RunTimeCommand[]
 ): LoadedLabwareDefinitionsById {
-  const labware = parseInitialLoadedLabwareById(commands)
+  const labware = parseLoadedLabwareEntity(commands)
   const loadLabwareCommandsReversed = commands
     .filter(
       (command): command is LoadLabwareRunTimeCommand =>
