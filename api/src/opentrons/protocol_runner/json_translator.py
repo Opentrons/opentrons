@@ -121,7 +121,7 @@ class JsonTranslator:
                 id=liquid_id,
                 displayName=liquid.displayName,
                 description=liquid.description,
-                displayColor=liquid.displayColor if liquid.displayColor else None,
+                displayColor=liquid.displayColor
             )
             for liquid_id, liquid in protocol_liquids.items()
         ]
