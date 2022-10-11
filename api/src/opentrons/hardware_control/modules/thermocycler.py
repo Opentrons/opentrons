@@ -23,9 +23,7 @@ from opentrons.drivers.thermocycler import (
 MODULE_LOG = logging.getLogger(__name__)
 
 POLLING_FREQUENCY_SEC = 1.0
-SIM_POLLING_FREQUENCY_SEC = POLLING_FREQUENCY_SEC / 20.0
-
-TEMP_UPDATE_RETRIES = 50
+SIM_POLLING_FREQUENCY_SEC = POLLING_FREQUENCY_SEC / 50.0
 
 V1_MODULE_STRING = "thermocyclerModuleV1"
 V2_MODULE_STRING = "thermocyclerModuleV2"
@@ -125,13 +123,10 @@ class Thermocycler(mod_abc.AbstractModule):
         self._device_info = device_info
         self._reader = reader
         self._poller = poller
-        self._hold_time_fuzzy_seconds = poller.interval * 5
-
         self._total_cycle_count: Optional[int] = None
         self._current_cycle_index: Optional[int] = None
         self._total_step_count: Optional[int] = None
         self._current_step_index: Optional[int] = None
-        self._in_error_state: bool = False
 
     async def cleanup(self) -> None:
         """Stop the poller task."""
@@ -175,18 +170,21 @@ class Thermocycler(mod_abc.AbstractModule):
         """Deactivate the lid heating pad"""
         await self.wait_for_is_running()
         await self._driver.deactivate_lid()
+        await self._reader.read_lid_temperature()
 
     async def deactivate_block(self) -> None:
         """Deactivate the block peltiers"""
         await self.wait_for_is_running()
         self._clear_cycle_counters()
         await self._driver.deactivate_block()
+        await self._reader.read_block_temperature()
 
     async def deactivate(self) -> None:
         """Deactivate the block peltiers and lid heating pad"""
         await self.wait_for_is_running()
         self._clear_cycle_counters()
         await self._driver.deactivate_all()
+        await self._reader.read()
 
     async def open(self) -> str:
         """Open the lid if it is closed"""
@@ -201,23 +199,6 @@ class Thermocycler(mod_abc.AbstractModule):
         await self._driver.close_lid()
         await self._wait_for_lid_status(ThermocyclerLidStatus.CLOSED)
         return ThermocyclerLidStatus.CLOSED
-
-    def hold_time_probably_set(self, new_hold_time: Optional[float]) -> bool:
-        """
-        Since we can only get hold time *remaining* from TC, by the time we
-        read hold_time after a set_temperature, the hold_time in TC could have
-        started counting down. So instead of checking for equality, we will
-        have to check if the hold_time returned from TC is within a few seconds
-        of the new hold time. The number of seconds is determined by status
-        polling frequency.
-        """
-        if new_hold_time is None:
-            return True
-        hold_time = self.hold_time
-        if hold_time is None:
-            return False
-        lower_bound = max(0.0, new_hold_time - self._hold_time_fuzzy_seconds)
-        return lower_bound <= hold_time <= new_hold_time
 
     async def set_temperature(
         self,
@@ -265,36 +246,19 @@ class Thermocycler(mod_abc.AbstractModule):
         minutes = hold_time_minutes if hold_time_minutes is not None else 0
         total_seconds = seconds + (minutes * 60)
         hold_time = total_seconds if total_seconds > 0 else 0
+
         if ramp_rate is not None:
             await self._driver.set_ramp_rate(ramp_rate=ramp_rate)
+
         await self._driver.set_plate_temperature(
             temp=temperature, hold_time=hold_time, volume=volume
         )
 
-        # Wait for target temperature to be set.
-        retries = 0
-        while self.target != temperature or not self.hold_time_probably_set(hold_time):
-            # Wait for the poller to update
-            await self.wait_next_poll()
-            retries += 1
-            if retries > TEMP_UPDATE_RETRIES:
-                raise ThermocyclerError(
-                    f"Thermocycler driver set the block temp to "
-                    f"T={temperature} & H={hold_time} but status reads "
-                    f"T={self.target} & H={self.hold_time}"
-                )
-
-        if hold_time:
-            task = self._loop.create_task(self._wait_for_hold(hold_time))
-        else:
-            task = self._loop.create_task(self._wait_for_temp())
+        task = self._loop.create_task(self._wait_for_block_target())
         self.make_cancellable(task)
         await task
 
-    async def wait_for_block_temperature(
-        self,
-        temperature: float,
-    ) -> None:
+    async def wait_for_block_target(self) -> None:
         """
         Wait for thermocycler to reach given temperature.
 
@@ -306,21 +270,7 @@ class Thermocycler(mod_abc.AbstractModule):
         Returns: None
         """
         await self.wait_for_is_running()
-
-        # Wait for target temperature to be set.
-        retries = 0
-        while self.target != temperature:
-            # Wait for the poller to update
-            await self.wait_next_poll()
-            retries += 1
-            if retries > TEMP_UPDATE_RETRIES:
-                raise ThermocyclerError(
-                    f"Thermocycler driver waiting for block temp "
-                    f"T={temperature} but status reads "
-                    f"T={self.target}"
-                )
-
-        task = self._loop.create_task(self._wait_for_temp())
+        task = self._loop.create_task(self._wait_for_block_target())
         self.make_cancellable(task)
         await task
 
@@ -349,40 +299,19 @@ class Thermocycler(mod_abc.AbstractModule):
         await task
 
     async def set_lid_temperature(self, temperature: float) -> None:
-        """Set the lid temperature in deg Celsius"""
+        """Set the lid temperature in degrees Celsius"""
         await self.wait_for_is_running()
         await self._driver.set_lid_temperature(temp=temperature)
-        # Wait for target to be set
-        retries = 0
-        while self.lid_target != temperature:
-            # Wait for the poller to update
-            await self.wait_next_poll()
-            retries += 1
-            if retries > TEMP_UPDATE_RETRIES:
-                raise ThermocyclerError(
-                    f"Thermocycler driver set the lid temp to T={temperature} "
-                    f"but status reads T={self.lid_target}"
-                )
-        task = self._loop.create_task(self._wait_for_lid_temp())
+
+        task = self._loop.create_task(self._wait_for_lid_target())
         self.make_cancellable(task)
         await task
 
-    async def wait_for_lid_temperature(self, temperature: float) -> None:
-        """Set the lid temperature in deg Celsius"""
+    async def wait_for_lid_target(self) -> None:
+        """Set the lid temperature in degres Celsius"""
         await self.wait_for_is_running()
 
-        # Wait for target to be set
-        retries = 0
-        while self.lid_target != temperature:
-            # Wait for the poller to update
-            await self.wait_next_poll()
-            retries += 1
-            if retries > TEMP_UPDATE_RETRIES:
-                raise ThermocyclerError(
-                    f"Thermocycler driver set the lid temp to T={temperature} "
-                    f"but status reads T={self.lid_target}"
-                )
-        task = self._loop.create_task(self._wait_for_lid_temp())
+        task = self._loop.create_task(self._wait_for_lid_target())
         self.make_cancellable(task)
         await task
 
@@ -406,7 +335,7 @@ class Thermocycler(mod_abc.AbstractModule):
             hold_time=hold_time_seconds,
             volume=volume,
         )
-        await self.wait_next_poll()
+        await self._reader.read_block_temperature()
 
     # TODO(mc, 2022-04-26): de-duplicate with `set_lid_temperature`
     async def set_target_lid_temperature(self, celsius: float) -> None:
@@ -419,50 +348,44 @@ class Thermocycler(mod_abc.AbstractModule):
         """
         await self.wait_for_is_running()
         await self._driver.set_lid_temperature(temp=celsius)
-        await self.wait_next_poll()
+        await self._reader.read_lid_temperature()
 
-    async def _wait_for_lid_temp(self) -> None:
+    async def _wait_for_lid_target(self) -> None:
         """
         This method only exits if lid target temperature has been reached.
 
         Subject to change without a version bump.
         """
-        if self.is_simulated:
-            return
+        await self._reader.read_lid_temperature()
 
         while self._reader.lid_temperature_status != TemperatureStatus.HOLDING:
             await self.wait_next_poll()
 
-    async def _wait_for_temp(self) -> None:
+    async def _wait_for_block_target(self) -> None:
         """
         This method only exits if set temperature has been reached.
 
         Subject to change without a version bump.
         """
-        while self._reader.plate_temperature_status != TemperatureStatus.HOLDING:
+        await self._reader.read_block_temperature()
+
+        # if self.is_simulated:
+        #     return
+
+        while self._reader.block_temperature_status != TemperatureStatus.HOLDING:
             await self.wait_next_poll()
 
-    async def _wait_for_hold(self, hold_time: float = 0) -> None:
-        """
-        This method returns only when hold time has elapsed
-        """
-        if self.is_simulated:
-            return
-
-        # If hold time is within the _hold_time_fuzzy_seconds time gap, then,
-        # because of the driver's status poller delays, it is impossible to
-        # know for certain if self.hold_time holds the most recent value.
-        # So instead of counting on the cached self.hold_time, it is better to
-        # just wait for hold_time time. (Skip if hold_time = 0 since we don't
-        # want to wait in that case. Cached self.hold_time would be 0 anyway)
-        if 0 < hold_time <= self._hold_time_fuzzy_seconds:
-            await asyncio.sleep(hold_time)
-        else:
-            while self.hold_time != 0:
+        while self.hold_time is not None and self.hold_time > 0:
+            if self.hold_time < self._poller.interval:
+                await asyncio.sleep(self.hold_time)
+                await self._reader.read_block_temperature()
+            else:
                 await self.wait_next_poll()
 
     async def _wait_for_lid_status(self, status: ThermocyclerLidStatus) -> None:
         """Wait for lid status to be status."""
+        await self._reader.read_lid_status()
+
         while self.lid_status != status:
             await self.wait_next_poll()
 
@@ -470,8 +393,8 @@ class Thermocycler(mod_abc.AbstractModule):
         """Wait for the next poll to complete."""
         try:
             await self._poller.wait_next_poll()
-        except Exception as e:
-            self._enter_error_state(e)
+        except Exception:
+            self._enter_error_state()
 
     @property
     def lid_target(self) -> Optional[float]:
@@ -498,21 +421,21 @@ class Thermocycler(mod_abc.AbstractModule):
 
     @property
     def hold_time(self) -> Optional[float]:
-        return self._reader.plate_temperature.hold
+        return self._reader.block_temperature.hold
 
     @property
     def temperature(self) -> Optional[float]:
-        return self._reader.plate_temperature.current
+        return self._reader.block_temperature.current
 
     @property
     def target(self) -> Optional[float]:
-        return self._reader.plate_temperature.target
+        return self._reader.block_temperature.target
 
     @property
     def status(self) -> str:
         return (
-            self._reader.plate_temperature_status
-            if not self._in_error_state
+            self._reader.block_temperature_status
+            if self._reader.error is None
             else TemperatureStatus.ERROR
         )
 
@@ -561,6 +484,7 @@ class Thermocycler(mod_abc.AbstractModule):
         return isinstance(self._driver, SimulatingDriver)
 
     async def prep_for_update(self) -> str:
+        await self._poller.stop()
         await self._driver.enter_programming_mode()
 
         if self.model() == V2_MODULE_STRING:
@@ -618,9 +542,8 @@ class Thermocycler(mod_abc.AbstractModule):
             for step_idx, step in enumerate(steps):
                 self._current_step_index = step_idx + 1  # science starts at 1
                 await self._execute_cycle_step(step, volume)
-                await self._wait_for_hold()
 
-    def _enter_error_state(self, cause: Exception) -> None:
+    def _enter_error_state(self) -> None:
         """Enter into an error state.
 
         The Thermocycler will not be accessible in this state.
@@ -631,9 +554,8 @@ class Thermocycler(mod_abc.AbstractModule):
         Returns:
             None
         """
-        self._in_error_state = True
         MODULE_LOG.error(
-            f"Thermocycler has encountered an unrecoverable error: {str(cause)}. "
+            f"Thermocycler has encountered an unrecoverable error: {self._reader.error}. "
             f"Please refer to support article at "
             f"https://support.opentrons.com/en/articles/3469797-thermocycler-module"
             f" for troubleshooting."
@@ -651,7 +573,8 @@ class ThermocyclerReader(Reader):
 
     lid_status: ThermocyclerLidStatus
     lid_temperature: Temperature
-    plate_temperature: PlateTemperature
+    block_temperature: PlateTemperature
+    error: Optional[str]
 
     def __init__(
         self,
@@ -659,23 +582,36 @@ class ThermocyclerReader(Reader):
     ) -> None:
         self.lid_status = ThermocyclerLidStatus.UNKNOWN
         self.lid_temperature = Temperature(current=25.0, target=None)
-        self.plate_temperature = PlateTemperature(current=25.0, target=None, hold=None)
+        self.block_temperature = PlateTemperature(current=25.0, target=None, hold=None)
+        self.error = None
         self._lid_temperature_status = LidTemperatureStatus()
-        self._plate_temperature_status = PlateTemperatureStatus()
+        self._block_temperature_status = PlateTemperatureStatus()
         self._driver = driver
 
     @property
-    def plate_temperature_status(self) -> TemperatureStatus:
-        return self._plate_temperature_status.status
+    def block_temperature_status(self) -> TemperatureStatus:
+        return self._block_temperature_status.status
 
     @property
     def lid_temperature_status(self) -> TemperatureStatus:
         return self._lid_temperature_status.status
 
+    def on_error(self, exception: Exception) -> None:
+        self.error = str(exception)
+
     async def read(self) -> None:
         """Poll the thermocycler."""
+        await self.read_lid_status()
+        await self.read_lid_temperature()
+        await self.read_block_temperature()
+
+    async def read_lid_status(self) -> None:
         self.lid_status = await self._driver.get_lid_status()
+
+    async def read_block_temperature(self) -> None:
+        self.block_temperature = await self._driver.get_plate_temperature()
+        self._block_temperature_status.update(self.block_temperature)
+
+    async def read_lid_temperature(self) -> None:
         self.lid_temperature = await self._driver.get_lid_temperature()
-        self.plate_temperature = await self._driver.get_plate_temperature()
         self._lid_temperature_status.update(self.lid_temperature)
-        self._plate_temperature_status.update(self.plate_temperature)
