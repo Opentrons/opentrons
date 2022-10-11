@@ -78,9 +78,7 @@ export function AdvancedSettings(): JSX.Element {
   const isLabwareOffsetCodeSnippetsOn = useSelector(
     Config.getIsLabwareOffsetCodeSnippetsOn
   )
-  const sendAllProtocolsToOT3 = useSelector(
-    Config.getSendAllProtocolsToOT3
-  )
+  const sendAllProtocolsToOT3 = useSelector(Config.getSendAllProtocolsToOT3)
   const isHeaterShakerAttachmentModalVisible = useSelector(
     Config.getIsHeaterShakerAttached
   )
@@ -265,7 +263,9 @@ export function AdvancedSettings(): JSX.Element {
             </StyledText>
           </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
-            <StyledText css={TYPOGRAPHY.labelSemiBold}>{t('channel')}</StyledText>
+            <StyledText css={TYPOGRAPHY.labelSemiBold}>
+              {t('channel')}
+            </StyledText>
             <SelectField
               name={'__UpdateChannel__'}
               options={channelOptions}
@@ -279,8 +279,12 @@ export function AdvancedSettings(): JSX.Element {
           </Flex>
         </Flex>
         <Divider marginY={SPACING.spacing5} />
-        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN} gridGap={SPACING.spacingXXL}>
-          <Flex flexDirection={DIRECTION_COLUMN} >
+        <Flex
+          alignItems={ALIGN_CENTER}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          gridGap={SPACING.spacingXXL}
+        >
+          <Flex flexDirection={DIRECTION_COLUMN}>
             <StyledText
               css={TYPOGRAPHY.h3SemiBold}
               paddingBottom={SPACING.spacing3}
@@ -357,8 +361,8 @@ export function AdvancedSettings(): JSX.Element {
               useTrashSurfaceForTipCal === true
                 ? ALWAYS_TRASH
                 : useTrashSurfaceForTipCal === false
-                  ? ALWAYS_BLOCK
-                  : ALWAYS_PROMPT
+                ? ALWAYS_BLOCK
+                : ALWAYS_PROMPT
             }
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               // you know this is a limited-selection field whose values are only
@@ -392,7 +396,8 @@ export function AdvancedSettings(): JSX.Element {
                 i18nKey="prevent_robot_caching_description"
                 components={{
                   strong: (
-                    <StyledText as="span"
+                    <StyledText
+                      as="span"
                       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     />
                   ),
@@ -410,7 +415,11 @@ export function AdvancedSettings(): JSX.Element {
           />
         </Flex>
         <Divider marginY={SPACING.spacing5} />
-        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN} gridGap={SPACING.spacingXXL}>
+        <Flex
+          alignItems={ALIGN_CENTER}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          gridGap={SPACING.spacingXXL}
+        >
           <Box>
             <StyledText
               css={TYPOGRAPHY.h3SemiBold}

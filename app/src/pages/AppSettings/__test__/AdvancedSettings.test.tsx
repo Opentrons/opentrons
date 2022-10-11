@@ -246,7 +246,9 @@ describe('AdvancedSettings', () => {
   it('renders the allow sending all protocols to ot-3 section', () => {
     const [{ getByText, getByRole }] = render()
     getByText('Allow Sending All Protocols to OT-3')
-    getByText('Enable the "Send to OT-3" menu item for each imported protocol, even if protocol analysis fails or does not recognize it as designed for the OT-3.')
+    getByText(
+      'Enable the "Send to OT-3" menu item for each imported protocol, even if protocol analysis fails or does not recognize it as designed for the OT-3.'
+    )
     getByRole('switch', { name: 'allow_sending_all_protocols_to_ot3' })
   })
 
