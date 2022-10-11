@@ -21,6 +21,11 @@ def stop_server_ot3() -> None:
     run(["systemctl", "stop", "opentrons-robot-server"])
 
 
+def stop_on_device_display_ot3() -> None:
+    """Stop opentrons on-device-display on the OT3."""
+    run(["systemctl", "stop", "opentrons-robot-app"])
+
+
 def build_ot3_hardware_api(
     is_simulating: Optional[bool] = False, use_defaults: Optional[bool] = False
 ) -> ThreadManagedHardwareAPI:
@@ -171,14 +176,16 @@ async def home_ot3(
         OT3Axis.P_L,
         OT3Axis.P_R,
     ]
+    default_home_speed = 10
+    max_speeds_for_load = DEFAULT_MAX_SPEED_DISCONTINUITY[api.gantry_load]
     homing_speeds: Dict[OT3Axis, float] = {
-        ax: DEFAULT_MAX_SPEED_DISCONTINUITY[api.gantry_load][OT3Axis.to_kind(ax)]
+        ax: max_speeds_for_load.get(OT3Axis.to_kind(ax), default_home_speed)
         for ax in _all_axes
     }
     cached_discontinuities: Dict[OT3Axis, float] = {
-        ax: api.config.motion_settings.max_speed_discontinuity[api.gantry_load][
-            OT3Axis.to_kind(ax)
-        ]
+        ax: api.config.motion_settings.max_speed_discontinuity[api.gantry_load].get(
+            OT3Axis.to_kind(ax), default_home_speed
+        )
         for ax in _all_axes
     }
     for ax, val in homing_speeds.items():
