@@ -47,7 +47,7 @@
     "waterId": {
       "displayName": "Water",
       "description": "Liquid H2O",
-      "displayColor": "#7332a8"
+      "displayColor": "#fff"
     }
   },
   "labwareDefinitions": {

@@ -341,14 +341,15 @@ class LoadedLabware(BaseModel):
 class HexColor(BaseModel):
     """Hex color representation."""
 
-    displayColor: Optional[str] = None
+    displayColor: Optional[str] = Field(default_factory=None)
 
     @validator("displayColor")
-    def _color_is_a_valid_hex(cls, v: Optional[str]) -> None:
+    def _color_is_a_valid_hex(cls, v: Optional[str]) -> Optional[str]:
         if v:
             match = re.search(r"^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$", v)
             if not match:
                 raise ValueError("Color is not a valid hex color.")
+        return v
 
 
 class Liquid(HexColor):
