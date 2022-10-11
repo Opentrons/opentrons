@@ -5,9 +5,7 @@ import asyncio
 from hardware_testing.opentrons_api.types import GantryLoad, OT3Mount, OT3Axis
 from hardware_testing.opentrons_api.helpers_ot3 import (
     build_async_ot3_hardware_api,
-    GantryLoadSettings,
     home_ot3,
-    set_gantry_load_per_axis_settings_ot3,
 )
 
 MOUNT = OT3Mount.LEFT
@@ -22,62 +20,10 @@ MAX_SPEED_XY = 5000
 MAX_SPEED_Z = 200
 MAX_SPEED_PIP = 20
 
-SETTINGS = {
-    OT3Axis.X: GantryLoadSettings(
-        max_speed=MAX_SPEED_XY,
-        acceleration=2000,
-        max_start_stop_speed=0,
-        max_change_dir_speed=0,
-        hold_current=0.1,
-        run_current=1.4,
-    ),
-    OT3Axis.Y: GantryLoadSettings(
-        max_speed=MAX_SPEED_XY,
-        acceleration=2000,
-        max_start_stop_speed=0,
-        max_change_dir_speed=0,
-        hold_current=0.1,
-        run_current=1.4,
-    ),
-    OT3Axis.Z_L: GantryLoadSettings(
-        max_speed=MAX_SPEED_Z,
-        acceleration=1500,
-        max_start_stop_speed=0,
-        max_change_dir_speed=0,
-        hold_current=0.1,
-        run_current=1.4,
-    ),
-    OT3Axis.Z_R: GantryLoadSettings(
-        max_speed=MAX_SPEED_Z,
-        acceleration=1500,
-        max_start_stop_speed=0,
-        max_change_dir_speed=0,
-        hold_current=0.1,
-        run_current=1.4,
-    ),
-    OT3Axis.P_L: GantryLoadSettings(
-        max_speed=MAX_SPEED_PIP,
-        acceleration=40,
-        max_start_stop_speed=0,
-        max_change_dir_speed=0,
-        hold_current=0.1,
-        run_current=1.4,
-    ),
-    OT3Axis.P_R: GantryLoadSettings(
-        max_speed=MAX_SPEED_PIP,
-        acceleration=40,
-        max_start_stop_speed=0,
-        max_change_dir_speed=0,
-        hold_current=0.1,
-        run_current=1.4,
-    ),
-}
-
 
 async def _main(is_simulating: bool) -> None:
     api = await build_async_ot3_hardware_api(is_simulating=is_simulating)
     await api.set_gantry_load(gantry_load=LOAD)
-    set_gantry_load_per_axis_settings_ot3(api, SETTINGS, load=LOAD)
 
     attached_pips = api.get_attached_pipettes()
     assert attached_pips[MOUNT.to_mount()]
