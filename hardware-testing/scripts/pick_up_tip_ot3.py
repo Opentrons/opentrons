@@ -1,16 +1,20 @@
 """Pick-Up-Tip OT3."""
 import argparse
 import asyncio
-from typing import Tuple
 
-from hardware_testing.opentrons_api.types import GantryLoad, OT3Mount, OT3Axis, Point, CriticalPoint
+from hardware_testing.opentrons_api.types import (
+    GantryLoad,
+    OT3Mount,
+    OT3Axis,
+    Point,
+    CriticalPoint,
+)
 from hardware_testing.opentrons_api.helpers_ot3 import (
     ThreadManagedHardwareAPI,
     build_ot3_hardware_api,
     GantryLoadSettings,
     set_gantry_load_per_axis_settings_ot3,
     home_ot3,
-    get_endstop_position_ot3,
 )
 
 MOUNT = OT3Mount.LEFT
@@ -67,14 +71,15 @@ async def _main(api: ThreadManagedHardwareAPI) -> None:
     tip_position = Point(x=100, y=100, z=100)
 
     await _safe_home(api, safe_home_offset)
-    input('ENTER to move Nozzle to tip rack: ')
-    await api.move_to(mount=MOUNT, abs_position=tip_position,
-                      critical_point=CriticalPoint.NOZZLE)
-    input('ENTER to pick up tip(s): ')
+    input("ENTER to move Nozzle to tip rack: ")
+    await api.move_to(
+        mount=MOUNT, abs_position=tip_position, critical_point=CriticalPoint.NOZZLE
+    )
+    input("ENTER to pick up tip(s): ")
     await api.pick_up_tip(mount=MOUNT, tip_length=40, presses=3)
-    input('ENTER to drop tip(s): ')
+    input("ENTER to drop tip(s): ")
     await api.drop_tip(mount=MOUNT)
-    input('ENTER to exit script: ')
+    input("ENTER to exit script: ")
     await api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
 
 

@@ -10,5 +10,5 @@ __all__ = [
     "Point",
     "PerPipetteAxisSettings",
     "Axis",
-    "CriticalPoint"
+    "CriticalPoint",
 ]
