@@ -59,7 +59,7 @@ export const Export = (props: ExportProps): JSX.Element | null => {
           <p>
             Your file will be exported with a protocol that will help you test
             and troubleshoot your labware definition on the robot. The protocol
-            requires a Single or Eight-Channel pipette on the right mount of
+            requires a Single or 8-Channel pipette on the right mount of
             your robot.
           </p>
         </div>
