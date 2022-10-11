@@ -5702,7 +5702,7 @@
         }
       ],
       "plungerCurrent": {
-        "value": 1.5,
+        "value": 1.0,
         "min": 0.1,
         "max": 1.5,
         "units": "amps",
@@ -5897,7 +5897,7 @@
         }
       ],
       "plungerCurrent": {
-        "value": 1.5,
+        "value": 1.0,
         "min": 0.1,
         "max": 1.5,
         "units": "amps",
@@ -6279,21 +6279,21 @@
         "type": "float"
       },
       "bottom": {
-        "value": 61,
+        "value": 71.5,
         "min": 55,
         "max": 80,
         "type": "float",
         "units": "mm"
       },
       "blowout": {
-        "value": 66,
+        "value": 76.5,
         "min": 60,
         "max": 85,
         "units": "mm",
         "type": "float"
       },
       "dropTip": {
-        "value": 80,
+        "value": 90.5,
         "min": 78,
         "max": 110,
         "units": "mm",
@@ -6669,21 +6669,21 @@
         "type": "float"
       },
       "bottom": {
-        "value": 61,
+        "value": 71.5,
         "min": 55,
         "max": 80,
         "type": "float",
         "units": "mm"
       },
       "blowout": {
-        "value": 66,
+        "value": 76.5,
         "min": 60,
         "max": 85,
         "units": "mm",
         "type": "float"
       },
       "dropTip": {
-        "value": 80,
+        "value": 90.5,
         "min": 78,
         "max": 119,
         "units": "mm",

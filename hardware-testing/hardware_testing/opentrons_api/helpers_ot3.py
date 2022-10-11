@@ -1,10 +1,11 @@
 """Opentrons helper methods."""
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from subprocess import run
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Tuple
 
 from opentrons.config.robot_configs import build_config_ot3, load_ot3 as load_ot3_config
 from opentrons.config.defaults_ot3 import DEFAULT_MAX_SPEED_DISCONTINUITY
+from opentrons.hardware_control.instruments.pipette import Pipette
 from opentrons.hardware_control.ot3api import OT3API
 
 from .types import GantryLoad, PerPipetteAxisSettings, OT3Axis, OT3Mount, Point
@@ -25,6 +26,7 @@ async def build_async_ot3_hardware_api(
     is_simulating: Optional[bool] = False, use_defaults: Optional[bool] = False
 ) -> OT3API:
     """Built an OT3 Hardware API instance."""
+    """TODO: CF-Need a way to simulate pipettes attached """
     config = build_config_ot3({}) if use_defaults else load_ot3_config()
     if is_simulating:
         builder = OT3API.build_hardware_simulator
@@ -186,6 +188,71 @@ async def home_ot3(api: OT3API, axes: Optional[List[OT3Axis]] = None) -> None:
         set_gantry_load_per_axis_motion_settings_ot3(
             api, ax, max_speed_discontinuity=val
         )
+
+
+def _get_pipette_from_mount(api: OT3API, mount: OT3Mount) -> Pipette:
+    pipette = api.hardware_pipettes[mount.to_mount()]
+    if pipette is None:
+        raise RuntimeError(f"No pipette currently attaced to mount {mount}")
+    return pipette
+
+
+def get_plunger_positions_ot3(
+    api: OT3API, mount: OT3Mount
+) -> Tuple[float, float, float, float]:
+    """Update plunger current."""
+    pipette = _get_pipette_from_mount(api, mount)
+    cfg = pipette.config
+    return cfg.top, cfg.bottom, cfg.blow_out, cfg.drop_tip
+
+
+async def update_pick_up_current(
+    api: OT3API, mount: OT3Mount, current: Optional[float] = 0.125
+) -> None:
+    """Update pick-up-tip current."""
+    pipette = _get_pipette_from_mount(api, mount)
+    pipette._config = replace(pipette.config, pick_up_current=current)
+
+
+async def update_pick_up_distance(
+    api: OT3API, mount: OT3Mount, distance: Optional[float] = 17.0
+) -> None:
+    """Update pick-up-tip current."""
+    pipette = _get_pipette_from_mount(api, mount)
+    pipette._config = replace(pipette.config, pick_up_distance=distance)
+
+
+async def move_plunger_absolute_ot3(
+    api: OT3API,
+    mount: OT3Mount,
+    position: float,
+    speed: Optional[float] = None,
+) -> None:
+    """Move OT3 plunger position to an absolute position."""
+    await api._move(
+        target_position={OT3Axis.of_main_tool_actuator(mount): position},  # type: ignore[arg-type]
+        speed=speed,
+    )
+
+
+async def move_plunger_relative_ot3(
+    api: OT3API,
+    mount: OT3Mount,
+    position: float,
+    motor_current: Optional[float] = 1.0,
+    speed: Optional[float] = None,
+) -> None:
+    """Move OT3 plunger position in a relative direction."""
+    current_pos = await api.current_position(mount=mount)
+    await api._backend.set_active_current(
+        {OT3Axis.of_main_tool_actuator(mount): motor_current}  # type: ignore[dict-item]
+    )
+    plunger_pos = current_pos[OT3Axis.of_main_tool_actuator(mount)]  # type: ignore[index]
+    target_pos = {OT3Axis.of_main_tool_actuator(mount): plunger_pos + position}
+    await api._move(
+        target_position=target_pos,  # type: ignore[arg-type]
+        speed=speed,
+    )
 
 
 def get_endstop_position_ot3(api: OT3API, mount: OT3Mount) -> Point:
