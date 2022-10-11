@@ -1,23 +1,18 @@
 """Opentrons helper methods."""
 from dataclasses import dataclass
 from subprocess import run
-from typing import List, Optional, Dict, Union, Type
+from typing import List, Optional, Dict
 
 from opentrons.config.robot_configs import build_config_ot3, load_ot3 as load_ot3_config
 from opentrons.config.defaults_ot3 import DEFAULT_MAX_SPEED_DISCONTINUITY
-from opentrons.hardware_control.api import API as OT2API
 from opentrons.hardware_control.ot3api import OT3API
-from opentrons.hardware_control.protocols import HardwareControlAPI
-from opentrons.hardware_control.thread_manager import ThreadManager
 
 from .types import GantryLoad, PerPipetteAxisSettings, OT3Axis, OT3Mount, Point
-
-HWApiOT3: Union[Type[OT3API], Type[OT2API]] = OT3API
-ThreadManagedHardwareAPI = ThreadManager[HardwareControlAPI]
 
 
 def stop_server_ot3() -> None:
     """Stop opentrons-robot-server on the OT3."""
+    print('Stopping "opentrons-robot-server"...')
     run(["systemctl", "stop", "opentrons-robot-server"])
 
 
@@ -26,21 +21,17 @@ def stop_on_device_display_ot3() -> None:
     run(["systemctl", "stop", "opentrons-robot-app"])
 
 
-def build_ot3_hardware_api(
+async def build_async_ot3_hardware_api(
     is_simulating: Optional[bool] = False, use_defaults: Optional[bool] = False
-) -> ThreadManagedHardwareAPI:
+) -> OT3API:
     """Built an OT3 Hardware API instance."""
-    if use_defaults:
-        config = build_config_ot3({})
-    else:
-        config = load_ot3_config()
+    config = build_config_ot3({}) if use_defaults else load_ot3_config()
     if is_simulating:
-        hw_api = ThreadManager(HWApiOT3.build_hardware_simulator, config=config)
+        builder = OT3API.build_hardware_simulator
     else:
+        builder = OT3API.build_hardware_controller
         stop_server_ot3()
-        hw_api = ThreadManager(HWApiOT3.build_hardware_controller, config=config)
-    hw_api.managed_thread_ready_blocking()
-    return hw_api
+    return await builder(config=config)
 
 
 def set_gantry_per_axis_setting_ot3(
@@ -61,7 +52,7 @@ def set_gantry_per_axis_setting_ot3(
 
 
 def set_gantry_load_per_axis_current_settings_ot3(
-    api: ThreadManagedHardwareAPI,
+    api: OT3API,
     axis: OT3Axis,
     load: Optional[GantryLoad] = None,
     hold_current: Optional[float] = None,
@@ -87,7 +78,7 @@ def set_gantry_load_per_axis_current_settings_ot3(
 
 
 def set_gantry_load_per_axis_motion_settings_ot3(
-    api: ThreadManagedHardwareAPI,
+    api: OT3API,
     axis: OT3Axis,
     load: Optional[GantryLoad] = None,
     default_max_speed: Optional[float] = None,
@@ -141,7 +132,7 @@ class GantryLoadSettings:
 
 
 def set_gantry_load_per_axis_settings_ot3(
-    api: ThreadManagedHardwareAPI,
+    api: OT3API,
     settings: Dict[OT3Axis, GantryLoadSettings],
     load: Optional[GantryLoad] = None,
 ) -> None:
@@ -163,9 +154,7 @@ def set_gantry_load_per_axis_settings_ot3(
         )
 
 
-async def home_ot3(
-    api: ThreadManagedHardwareAPI, axes: Optional[List[OT3Axis]] = None
-) -> None:
+async def home_ot3(api: OT3API, axes: Optional[List[OT3Axis]] = None) -> None:
     """Home OT3 gantry."""
     _all_axes = [
         OT3Axis.X,
@@ -199,7 +188,7 @@ async def home_ot3(
         )
 
 
-def get_endstop_position_ot3(api: ThreadManagedHardwareAPI, mount: OT3Mount) -> Point:
+def get_endstop_position_ot3(api: OT3API, mount: OT3Mount) -> Point:
     """Get the endstop's position per mount."""
     if mount == OT3Mount.LEFT:
         mount_offset = api.config.left_mount_offset
