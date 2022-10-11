@@ -369,18 +369,11 @@ class Thermocycler(mod_abc.AbstractModule):
         """
         await self._reader.read_block_temperature()
 
-        # if self.is_simulated:
-        #     return
-
         while self._reader.block_temperature_status != TemperatureStatus.HOLDING:
             await self.wait_next_poll()
 
         while self.hold_time is not None and self.hold_time > 0:
-            if self.hold_time < self._poller.interval:
-                await asyncio.sleep(self.hold_time)
-                await self._reader.read_block_temperature()
-            else:
-                await self.wait_next_poll()
+            await self.wait_next_poll()
 
     async def _wait_for_lid_status(self, status: ThermocyclerLidStatus) -> None:
         """Wait for lid status to be status."""
@@ -389,6 +382,7 @@ class Thermocycler(mod_abc.AbstractModule):
         while self.lid_status != status:
             await self.wait_next_poll()
 
+    # TODO(mc, 2022-10-08): not publicly used; remove
     async def wait_next_poll(self) -> None:
         """Wait for the next poll to complete."""
         try:
@@ -398,7 +392,7 @@ class Thermocycler(mod_abc.AbstractModule):
 
     @property
     def lid_target(self) -> Optional[float]:
-        return self._reader.lid_temperature.target if self._reader else None
+        return self._reader.lid_temperature.target
 
     # TODO(mc, 2022-10-10): update type signature to non-optional
     @property
