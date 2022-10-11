@@ -69,7 +69,9 @@ async def _bowtie_ot3(api: ThreadManagedHardwareAPI, cycles: int = 1) -> None:
         await api.move_rel(mount=MOUNT, delta=Point(z=step_z), speed=default_speed)
         await api.move_rel(mount=MOUNT, delta=Point(x=-step_x), speed=default_speed)
         await api.move_rel(mount=MOUNT, delta=Point(z=-step_z), speed=default_speed)
-        await api.move_rel(mount=MOUNT, delta=Point(x=step_x, y=step_y), speed=default_speed)
+        await api.move_rel(
+            mount=MOUNT, delta=Point(x=step_x, y=step_y), speed=default_speed
+        )
         await api.move_rel(mount=MOUNT, delta=Point(z=step_z), speed=default_speed)
 
 
