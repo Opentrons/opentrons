@@ -311,8 +311,8 @@ describe('getProtocolModulesInfo', () => {
           ...protocolWithMagTempTC,
           modules: { [MAG_MOD_ID]: protocolWithMagTempTC.modules[MAG_MOD_ID] },
           labware: [
-            //  @ts-expect-error
             {
+              //  @ts-expect-error
               definitionUri:
                 'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1',
               id: MAG_LW_ID,
