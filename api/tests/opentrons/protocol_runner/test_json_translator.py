@@ -454,7 +454,7 @@ def test_load_liquid(
     result = subject.translate_liquids(protocol)
 
     assert result == [
-        Liquid(id="liquid-id-555", displayName="water", description="water description")
+        Liquid(id="liquid-id-555", displayName="water", description="water description", displayColor="#F00")
     ]
 
 
