@@ -19,7 +19,7 @@
     "links": ["http://www.cell-nest.com/page94?product_id=101&_l=en"]
   },
   "metadata": {
-    "displayName": "NEST 96 Deepwell Plate 2mL",
+    "displayName": "NEST 96 Deep Well Plate 2mL",
     "displayCategory": "wellPlate",
     "displayVolumeUnits": "µL",
     "tags": []
@@ -994,7 +994,7 @@
   "groups": [
     {
       "metadata": {
-        "displayName": "NEST 96 Deepwell Plate 2mL",
+        "displayName": "NEST 96 Deep well Plate 2mL",
         "displayCategory": "wellPlate",
         "wellBottomShape": "v"
       },
