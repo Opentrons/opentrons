@@ -21,6 +21,11 @@ def stop_server_ot3() -> None:
     run(["systemctl", "stop", "opentrons-robot-server"])
 
 
+def stop_on_device_display_ot3() -> None:
+    """Stop opentrons on-device-display on the OT3."""
+    run(["systemctl", "stop", "opentrons-robot-app"])
+
+
 def build_ot3_hardware_api(
     is_simulating: Optional[bool] = False, use_defaults: Optional[bool] = False
 ) -> ThreadManagedHardwareAPI:
