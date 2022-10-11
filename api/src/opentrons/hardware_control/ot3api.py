@@ -1197,9 +1197,6 @@ class OT3API(
         presses: Optional[int] = None,
         increment: Optional[float] = None,
         prep_after: bool = True,
-        amps: Optional[float] = None,
-        speed: Optional[float] = None,
-        distance: Optional[float] = None
     ) -> None:
         """Pick up tip from current location."""
         realmount = OT3Mount.from_mount(mount)
@@ -1218,27 +1215,16 @@ class OT3API(
         )
 
         for press in spec.presses:
-            press_speed = speed if speed else press.speed
-            if distance:
-                press_down_dist = top_types.Point(z=-distance)
-                press_up_dist = top_types.Point(z=distance)
-            else:
-                press_down_dist = press.relative_down
-                press_up_dist = press.relative_up
             async with self._backend.restore_current():
-                if amps is None:
-                    await self._backend.set_active_current(
-                        {axis: current for axis, current in press.current.items()}
-                    )
-                else:
-                    z_axis = OT3Axis.Z_L if mount == OT3Mount.LEFT else OT3Axis.Z_R
-                    await self._backend.set_active_current({z_axis: amps})
-                target_down = target_position_from_relative(
-                    realmount, press_down_dist, self._current_position
+                await self._backend.set_active_current(
+                    {axis: current for axis, current in press.current.items()}
                 )
-                await self._move(target_down, speed=press_speed)
+                target_down = target_position_from_relative(
+                    realmount, press.relative_down, self._current_position
+                )
+                await self._move(target_down, speed=press.speed)
             target_up = target_position_from_relative(
-                realmount, press_up_dist, self._current_position
+                realmount, press.relative_up, self._current_position
             )
             await self._move(target_up)
 
