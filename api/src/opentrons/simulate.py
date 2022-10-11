@@ -28,7 +28,9 @@ from opentrons.hardware_control import (
     ThreadManager,
     ThreadManagedHardware,
 )
-from opentrons.hardware_control.ot3api import OT3API
+
+if should_use_ot3():
+    from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.simulator_setup import load_simulator
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocols.duration import DurationEstimator

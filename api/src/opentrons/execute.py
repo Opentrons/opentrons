@@ -22,7 +22,9 @@ from opentrons.protocols.parse import parse, version_from_string
 from opentrons.protocols.types import ApiDeprecationError
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control import API as OT2API, ThreadManager, HardwareControlAPI
-from opentrons.hardware_control.ot3api import OT3API
+
+if should_use_ot3():
+    from opentrons.hardware_control.ot3api import OT3API
 from .util.entrypoint_util import labware_from_paths, datafiles_from_paths
 
 if TYPE_CHECKING:
