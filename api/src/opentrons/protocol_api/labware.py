@@ -335,6 +335,9 @@ class Labware(DeckItem):
         """Quirks specific to this labware."""
         return self._implementation.get_quirks()
 
+    # TODO(mc, 2022-09-23): use `self._implementation.get_default_magnet_engage_height`
+    # blocked until Labware actually respects API version
+    # https://opentrons.atlassian.net/browse/RSS-97
     @property  # type: ignore
     @requires_version(2, 0)
     def magdeck_engage_height(self) -> Optional[float]:
