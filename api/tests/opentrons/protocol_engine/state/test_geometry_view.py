@@ -80,7 +80,7 @@ def test_raise_error_for_off_deck_labware_parent(
         id="labware-id",
         loadName="b",
         definitionUri=uri_from_details(namespace="a", load_name="b", version=1),
-        location="off-deck",
+        location="offDeck",
         offsetId=None,
     )
     decoy.when(labware_view.get("labware-id")).then_return(labware_data)
