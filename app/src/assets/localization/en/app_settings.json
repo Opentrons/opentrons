@@ -73,6 +73,8 @@
   "usb_to_ethernet_not_connected": "No USB-to-Ethernet adapter connected",
   "show_link_labware_data": "Show Link to Get Labware Offset Data",
   "show_link_labware_data_description": "If you need to access Labware Offset data outside of the Opentrons App, enabling this setting will display a link to get Offset Data in the Recent Runs overflow menu and in the Labware Setup section of the Protocol page.",
+  "allow_sending_all_protocols_to_ot3": "Allow Sending All Protocols to OT-3",
+  "allow_sending_all_protocols_to_ot3_description": "Enable the \"Send to OT-3\" menu item for each imported protocol, even if protocol analysis fails or does not recognize it as designed for the OT-3.",
   "clear_unavail_robots": "Clear Unavailable Robots",
   "clear_robots_description": "Clear the list of unavailable robots on the Devices page. This action cannot be undone.",
   "clear_robots_button": "Clear unavailable robots list",

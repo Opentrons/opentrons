@@ -148,4 +148,9 @@ export interface ConfigV9 extends Omit<ConfigV8, 'version'> {
   isOnDevice: boolean
 }
 
-export type Config = ConfigV9
+export interface ConfigV10 extends Omit<ConfigV9, 'version'> {
+  version: 10
+  protocols: { sendAllProtocolsToOT3: boolean }
+}
+
+export type Config = ConfigV10
