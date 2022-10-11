@@ -21,7 +21,7 @@ from opentrons.commands import types as command_types
 from opentrons.protocols.parse import parse, version_from_string
 from opentrons.protocols.types import ApiDeprecationError
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.hardware_control import API, ThreadManager, HardwareControlAPI
+from opentrons.hardware_control import API as OT2API, ThreadManager, HardwareControlAPI
 from opentrons.hardware_control.ot3api import OT3API
 from .util.entrypoint_util import labware_from_paths, datafiles_from_paths
 
@@ -92,7 +92,7 @@ def get_protocol_api(
         if should_use_ot3():
             _THREAD_MANAGED_HW = ThreadManager(OT3API.build_hardware_controller)
         else:
-            _THREAD_MANAGED_HW = ThreadManager(API.build_hardware_controller)
+            _THREAD_MANAGED_HW = ThreadManager(OT2API.build_hardware_controller)
     if isinstance(version, str):
         checked_version = version_from_string(version)
     elif not isinstance(version, APIVersion):

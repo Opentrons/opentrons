@@ -18,6 +18,7 @@ def run(ctx: ProtocolContext) -> None:
 if __name__ == "__main__":
     import argparse
     from hardware_testing.opentrons_api import helpers
+
     parser = argparse.ArgumentParser("Fake Protocol")
     parser.add_argument(
         "--simulate", action="store_true", help="If set, the protocol will be simulated"
