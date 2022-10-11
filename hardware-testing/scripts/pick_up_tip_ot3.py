@@ -1,4 +1,4 @@
-"""Demo OT3 Gantry Functionality."""
+"""Pick-Up-Tip OT3."""
 import argparse
 import asyncio
 from typing import Tuple
