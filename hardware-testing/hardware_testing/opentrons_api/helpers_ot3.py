@@ -1,24 +1,19 @@
 """Opentrons helper methods."""
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from subprocess import run
-from typing import List, Optional, Dict, Union, Type, Tuple
-from dataclasses import replace
+from typing import List, Optional, Dict, Tuple
 
 from opentrons.config.robot_configs import build_config_ot3, load_ot3 as load_ot3_config
 from opentrons.config.defaults_ot3 import DEFAULT_MAX_SPEED_DISCONTINUITY
-from opentrons.hardware_control.api import API as OT2API
+from opentrons.hardware_control.instruments.pipette import Pipette
 from opentrons.hardware_control.ot3api import OT3API
-from opentrons.hardware_control.protocols import HardwareControlAPI
-from opentrons.hardware_control.thread_manager import ThreadManager
 
 from .types import GantryLoad, PerPipetteAxisSettings, OT3Axis, OT3Mount, Point
-
-HWApiOT3: Union[Type[OT3API], Type[OT2API]] = OT3API
-ThreadManagedHardwareAPI = ThreadManager[HardwareControlAPI]
 
 
 def stop_server_ot3() -> None:
     """Stop opentrons-robot-server on the OT3."""
+    print('Stopping "opentrons-robot-server"...')
     run(["systemctl", "stop", "opentrons-robot-server"])
 
 
@@ -27,22 +22,18 @@ def stop_on_device_display_ot3() -> None:
     run(["systemctl", "stop", "opentrons-robot-app"])
 
 
-def build_ot3_hardware_api(
+async def build_async_ot3_hardware_api(
     is_simulating: Optional[bool] = False, use_defaults: Optional[bool] = False
-) -> ThreadManagedHardwareAPI:
+) -> OT3API:
     """Built an OT3 Hardware API instance."""
-    if use_defaults:
-        config = build_config_ot3({})
-    else:
-        config = load_ot3_config()
     """TODO: CF-Need a way to simulate pipettes attached """
+    config = build_config_ot3({}) if use_defaults else load_ot3_config()
     if is_simulating:
-        hw_api = ThreadManager(HWApiOT3.build_hardware_simulator, config=config)
+        builder = OT3API.build_hardware_simulator
     else:
+        builder = OT3API.build_hardware_controller
         stop_server_ot3()
-        hw_api = ThreadManager(HWApiOT3.build_hardware_controller, config=config)
-    hw_api.managed_thread_ready_blocking()
-    return hw_api
+    return await builder(config=config)
 
 
 def set_gantry_per_axis_setting_ot3(
@@ -63,7 +54,7 @@ def set_gantry_per_axis_setting_ot3(
 
 
 def set_gantry_load_per_axis_current_settings_ot3(
-    api: ThreadManagedHardwareAPI,
+    api: OT3API,
     axis: OT3Axis,
     load: Optional[GantryLoad] = None,
     hold_current: Optional[float] = None,
@@ -89,7 +80,7 @@ def set_gantry_load_per_axis_current_settings_ot3(
 
 
 def set_gantry_load_per_axis_motion_settings_ot3(
-    api: ThreadManagedHardwareAPI,
+    api: OT3API,
     axis: OT3Axis,
     load: Optional[GantryLoad] = None,
     default_max_speed: Optional[float] = None,
@@ -143,7 +134,7 @@ class GantryLoadSettings:
 
 
 def set_gantry_load_per_axis_settings_ot3(
-    api: ThreadManagedHardwareAPI,
+    api: OT3API,
     settings: Dict[OT3Axis, GantryLoadSettings],
     load: Optional[GantryLoad] = None,
 ) -> None:
@@ -165,9 +156,7 @@ def set_gantry_load_per_axis_settings_ot3(
         )
 
 
-async def home_ot3(
-    api: ThreadManagedHardwareAPI, axes: Optional[List[OT3Axis]] = None
-) -> None:
+async def home_ot3(api: OT3API, axes: Optional[List[OT3Axis]] = None) -> None:
     """Home OT3 gantry."""
     _all_axes = [
         OT3Axis.X,
@@ -201,94 +190,72 @@ async def home_ot3(
         )
 
 
-async def home_pipette(api: ThreadManagedHardwareAPI, mount: OT3Mount):
-    """Home Plunger"""
-    await api.home_plunger(mount)
+def _get_pipette_from_mount(api: OT3API, mount: OT3Mount) -> Pipette:
+    pipette = api.hardware_pipettes[mount.to_mount()]
+    if pipette is None:
+        raise RuntimeError(f"No pipette currently attaced to mount {mount}")
+    return pipette
 
 
 def get_plunger_positions_ot3(
-    api: ThreadManagedHardwareAPI, mount: OT3Mount
+    api: OT3API, mount: OT3Mount
 ) -> Tuple[float, float, float, float]:
-    cfg = api.hardware_pipettes[mount]
+    """Update plunger current."""
+    pipette = _get_pipette_from_mount(api, mount)
+    cfg = pipette.config
     return cfg.top, cfg.bottom, cfg.blow_out, cfg.drop_tip
 
 
 async def update_pick_up_current(
-    api: ThreadManagedHardwareAPI, mount: OT3Mount, current: Optional[float] = 0.125
-):
-    hw_instr = api._pipette_handler.get_pipette(mount)
-    realmount = OT3Mount.from_mount(mount)
-    old_pickup = api._pipette_handler.hardware_instruments[
-        mount
-    ]._config.pick_up_current
-    print(f"Pick_up_current:{old_pickup}")
-    hw_instr._config = replace(hw_instr._config, pick_up_current=current)
-    new_pickup = api._pipette_handler.hardware_instruments[
-        mount
-    ]._config.pick_up_current
-    print(f"Pick_up_current:{new_pickup}")
-    spec, _add_tip_to_instrs = api._pipette_handler.plan_check_pick_up_tip(
-        realmount, 78.3, 1, 0
-    )
-    print(f"specs: {spec.presses}")
+    api: OT3API, mount: OT3Mount, current: Optional[float] = 0.125
+) -> None:
+    """Update pick-up-tip current."""
+    pipette = _get_pipette_from_mount(api, mount)
+    pipette._config = replace(pipette.config, pick_up_current=current)
 
 
 async def update_pick_up_distance(
-    api: ThreadManagedHardwareAPI, mount: OT3Mount, distance: Optional[float] = 17.0
-):
-    # default pick_up_distance = 17
-    hw_instr = api._pipette_handler.get_pipette(mount)
-    old_pickup_distance = api._pipette_handler.hardware_instruments[
-        mount
-    ]._config.pick_up_distance
-    print(f"Pick_up_distance:{old_pickup_distance}")
-    hw_instr._config = replace(hw_instr._config, pick_up_distance=distance)
-    new_pickup_distance = api._pipette_handler.hardware_instruments[
-        mount
-    ]._config.pick_up_distance
-    print(f"Pick_up_distance:{new_pickup_distance}")
+    api: OT3API, mount: OT3Mount, distance: Optional[float] = 17.0
+) -> None:
+    """Update pick-up-tip current."""
+    pipette = _get_pipette_from_mount(api, mount)
+    pipette._config = replace(pipette.config, pick_up_distance=distance)
 
 
 async def move_plunger_absolute_ot3(
-    api: ThreadManagedHardwareAPI,
+    api: OT3API,
     mount: OT3Mount,
     position: float,
-    motor_current: Optional[float] = 1.0,
     speed: Optional[float] = None,
 ) -> None:
-    """
-    hw_instr = hw.hardware_pipettes[instrument._implementation._mount]
-    old_pickup = hw_instr._config.pick_up_current
-    try:
-        hw_instr._config = replace(hw_instr._config, pick_up_current=0.125)
-        instrument.pick_up_tip(tip, presses=1, increment=0.5)
-    finally:
-        hw_instr._config = replace(hw_instr._config, pick_up_current=old_pickup)
-    """
+    """Move OT3 plunger position to an absolute position."""
     await api._move(
-        target_position={OT3Axis.of_main_tool_actuator(mount): position}, speed=speed
-    )
-
-
-async def move_plunger_relative_ot3(
-    api: ThreadManagedHardwareAPI,
-    mount: OT3Mount,
-    position: float,
-    motor_current: Optional[float] = 1.0,
-    speed: Optional[float] = None,
-) -> None:
-    current_pos = await api.current_position(mount=mount)
-    await api._backend.set_active_current(
-        {OT3Axis.of_main_tool_actuator(mount): motor_current}
-    )
-    plunger_pos = current_pos[OT3Axis.of_main_tool_actuator(mount)]
-    await api._move(
-        target_position={OT3Axis.of_main_tool_actuator(mount): plunger_pos + position},
+        target_position={OT3Axis.of_main_tool_actuator(mount): position},  # type: ignore[arg-type]
         speed=speed,
     )
 
 
-def get_endstop_position_ot3(api: ThreadManagedHardwareAPI, mount: OT3Mount) -> Point:
+async def move_plunger_relative_ot3(
+    api: OT3API,
+    mount: OT3Mount,
+    position: float,
+    motor_current: Optional[float] = 1.0,
+    speed: Optional[float] = None,
+) -> None:
+    """Move OT3 plunger position in a relative direction."""
+    current_pos = await api.current_position(mount=mount)
+    await api._backend.set_active_current(
+        {OT3Axis.of_main_tool_actuator(mount): motor_current}  # type: ignore[dict-item]
+    )
+    plunger_pos = current_pos[OT3Axis.of_main_tool_actuator(mount)]  # type: ignore[index]
+    target_pos = {OT3Axis.of_main_tool_actuator(mount): plunger_pos + position}
+    await api._move(
+        target_position=target_pos,  # type: ignore[arg-type]
+        speed=speed,
+    )
+
+
+def get_endstop_position_ot3(api: OT3API, mount: OT3Mount) -> Point:
     """Get the endstop's position per mount."""
     if mount == OT3Mount.LEFT:
         mount_offset = api.config.left_mount_offset

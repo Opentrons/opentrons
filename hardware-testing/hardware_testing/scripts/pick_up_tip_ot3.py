@@ -10,8 +10,8 @@ from hardware_testing.opentrons_api.types import (
     CriticalPoint,
 )
 from hardware_testing.opentrons_api.helpers_ot3 import (
-    ThreadManagedHardwareAPI,
-    build_ot3_hardware_api,
+    OT3API,
+    build_async_ot3_hardware_api,
     GantryLoadSettings,
     set_gantry_load_per_axis_settings_ot3,
     home_ot3,
@@ -58,13 +58,14 @@ SETTINGS = {
 }
 
 
-async def _safe_home(api: ThreadManagedHardwareAPI, offset: Point) -> None:
+async def _safe_home(api: OT3API, offset: Point) -> None:
     await home_ot3(api)
     await api.move_rel(mount=MOUNT, delta=Point(y=offset.y))
     await api.move_rel(mount=MOUNT, delta=Point(x=offset.x))
 
 
-async def _main(api: ThreadManagedHardwareAPI) -> None:
+async def _main(is_simulating: bool) -> None:
+    api: OT3API = await build_async_ot3_hardware_api(is_simulating=is_simulating)
     safe_home_offset = Point(x=-10, y=-10)
     set_gantry_load_per_axis_settings_ot3(api, SETTINGS, load=LOAD)
 
@@ -76,7 +77,7 @@ async def _main(api: ThreadManagedHardwareAPI) -> None:
         mount=MOUNT, abs_position=tip_position, critical_point=CriticalPoint.NOZZLE
     )
     input("ENTER to pick up tip(s): ")
-    await api.pick_up_tip(mount=MOUNT, tip_length=40, presses=3)
+    await api.pick_up_tip(mount=MOUNT, tip_length=40, presses=3)  # type: ignore[arg-type]
     input("ENTER to drop tip(s): ")
     await api.drop_tip(mount=MOUNT)
     input("ENTER to exit script: ")
@@ -87,6 +88,4 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
     args = parser.parse_args()
-    hw_api = build_ot3_hardware_api(is_simulating=args.simulate, use_defaults=True)
-    asyncio.run(_main(hw_api))
-    hw_api.clean_up()
+    asyncio.run(_main(args.simulat))

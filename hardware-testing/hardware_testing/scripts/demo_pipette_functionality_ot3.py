@@ -5,8 +5,8 @@ from typing import Tuple
 
 from hardware_testing.opentrons_api.types import GantryLoad, OT3Mount, OT3Axis, Point
 from hardware_testing.opentrons_api.helpers_ot3 import (
-    ThreadManagedHardwareAPI,
-    build_ot3_hardware_api,
+    OT3API,
+    build_async_ot3_hardware_api,
     home_ot3,
     get_endstop_position_ot3,
     move_plunger_absolute_ot3,
@@ -27,9 +27,7 @@ def _create_relative_point(axis: OT3Axis, distance: float) -> Point:
     raise ValueError(f"Unexpected axis: {axis}")
 
 
-async def _test_encoder(
-    api: ThreadManagedHardwareAPI, distance: float = 10
-) -> None:
+async def _test_encoder(api: OT3API, distance: float = 10) -> None:
     pos_start = await api.current_position(mount=MOUNT, refresh=True)
     enc_start = await api.encoder_current_position(mount=MOUNT, refresh=True)
     input("ready?")
@@ -41,7 +39,7 @@ async def _test_encoder(
 
 
 async def _test_limit_switch(
-    api: ThreadManagedHardwareAPI, axis: OT3Axis, tolerance: float = 0.5
+    api: OT3API, axis: OT3Axis, tolerance: float = 0.5
 ) -> None:
     def _points_before_after_switch(tolerance_delta: Point) -> Tuple[Point, Point]:
         endstop_pos = get_endstop_position_ot3(api, mount=MOUNT)
@@ -65,7 +63,8 @@ async def _test_limit_switch(
     ), f"switch on axis {axis} is NOT pressed when it should be"
 
 
-async def _main(api: ThreadManagedHardwareAPI) -> None:
+async def _main(is_simulating: bool) -> None:
+    api = await build_async_ot3_hardware_api(is_simulating=is_simulating)
     await api.cache_instruments()
     await home_ot3(api, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
     switches = await api.get_limit_switches()
@@ -83,6 +82,4 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
     args = parser.parse_args()
-    hw_api = build_ot3_hardware_api(is_simulating=args.simulate, use_defaults=True)
-    asyncio.run(_main(hw_api))
-    hw_api.clean_up()
+    asyncio.run(_main(args.simulate))
