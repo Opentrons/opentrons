@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Flex, POSITION_FIXED } from '..'
 
-export interface OverlayProps {
+export interface OverlayProps extends React.ComponentProps<typeof Flex> {
   /** optional onClick handler */
   onClick?: React.MouseEventHandler
   alertOverlay?: boolean | null
@@ -13,6 +13,7 @@ export function Overlay(props: OverlayProps): JSX.Element {
     alertOverlay,
     backgroundColor = 'rgba(0, 0, 0, 0.9)',
     onClick,
+    ...flexProps
   } = props
 
   const alertOverlayBackgroundColor = 'rgba(115, 115, 115, 0.9)'
@@ -31,6 +32,7 @@ export function Overlay(props: OverlayProps): JSX.Element {
           : backgroundColor
       }
       onClick={onClick}
+      {...flexProps}
     />
   )
 }
