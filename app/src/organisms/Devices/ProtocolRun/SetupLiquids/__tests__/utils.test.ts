@@ -8,12 +8,12 @@ import {
   getDisabledWellGroupForLiquidId,
 } from '../utils'
 import type { LabwareByLiquidId } from '@opentrons/api-client'
-import type { LoadedLiquid } from '@opentrons/shared-data'
+import type { Liquid } from '@opentrons/shared-data'
 
 const LABWARE_ID =
   '60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1'
 const LIQUID_ID = '7'
-const MOCK_LIQUIDS_IN_LOAD_ORDER: LoadedLiquid[] = [
+const MOCK_LIQUIDS_IN_LOAD_ORDER: Liquid[] = [
   {
     description: 'water',
     displayColor: '#00d781',

@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next'
 import {
   Flex,
   DIRECTION_COLUMN,
-  JUSTIFY_SPACE_BETWEEN,
   Box,
+  JUSTIFY_FLEX_START,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -40,8 +40,12 @@ export function RobotInformation({
 
   return (
     <Box>
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} marginTop={SPACING.spacing4}>
-        <Flex flexDirection={DIRECTION_COLUMN} paddingRight={SPACING.spacing4}>
+      <Flex
+        gridGap={SPACING.spacing4}
+        justifyContent={JUSTIFY_FLEX_START}
+        marginTop={SPACING.spacing4}
+      >
+        <Flex flexDirection={DIRECTION_COLUMN}>
           <StyledText css={TYPOGRAPHY.pSemiBold}>
             {t('robot_serial_number')}
           </StyledText>
@@ -51,7 +55,7 @@ export function RobotInformation({
               : t('robot_settings_advanced_unknown')}
           </StyledText>
         </Flex>
-        <Flex flexDirection={DIRECTION_COLUMN} paddingRight={SPACING.spacing4}>
+        <Flex flexDirection={DIRECTION_COLUMN}>
           <StyledText css={TYPOGRAPHY.pSemiBold}>
             {t('firmware_version')}
           </StyledText>
@@ -61,7 +65,7 @@ export function RobotInformation({
               : t('robot_settings_advanced_unknown')}
           </StyledText>
         </Flex>
-        <Flex flexDirection={DIRECTION_COLUMN} paddingRight={SPACING.spacing4}>
+        <Flex flexDirection={DIRECTION_COLUMN}>
           <StyledText css={TYPOGRAPHY.pSemiBold}>
             {t('supported_protocol_api_versions')}
           </StyledText>

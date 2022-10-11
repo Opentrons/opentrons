@@ -5,8 +5,21 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { PipetteOverflowMenu } from '../PipetteOverflowMenu'
 import { mockLeftProtoPipette } from '../../../../redux/pipettes/__fixtures__'
+import { isOT3Pipette } from '@opentrons/shared-data'
 
 import type { Mount } from '../../../../redux/pipettes/types'
+
+jest.mock('@opentrons/shared-data', () => {
+  const actualSharedData = jest.requireActual('@opentrons/shared-data')
+  return {
+    ...actualSharedData,
+    isOT3Pipette: jest.fn(),
+  }
+})
+
+const mockIsOT3Pipette = isOT3Pipette as jest.MockedFunction<
+  typeof isOT3Pipette
+>
 
 const render = (props: React.ComponentProps<typeof PipetteOverflowMenu>) => {
   return renderWithProviders(<PipetteOverflowMenu {...props} />, {
@@ -20,7 +33,7 @@ describe('PipetteOverflowMenu', () => {
 
   beforeEach(() => {
     props = {
-      pipetteName: mockLeftProtoPipette.displayName,
+      pipetteSpecs: mockLeftProtoPipette.modelSpecs,
       mount: LEFT,
       handleChangePipette: jest.fn(),
       handleCalibrate: jest.fn(),
@@ -51,7 +64,7 @@ describe('PipetteOverflowMenu', () => {
   })
   it('renders information with no pipette attached', () => {
     props = {
-      pipetteName: 'Empty',
+      pipetteSpecs: null,
       mount: LEFT,
       handleChangePipette: jest.fn(),
       handleCalibrate: jest.fn(),
@@ -66,7 +79,7 @@ describe('PipetteOverflowMenu', () => {
   })
   it('renders recalibrate pipette offset text', () => {
     props = {
-      pipetteName: mockLeftProtoPipette.displayName,
+      pipetteSpecs: mockLeftProtoPipette.modelSpecs,
       mount: LEFT,
       handleChangePipette: jest.fn(),
       handleCalibrate: jest.fn(),
@@ -80,5 +93,24 @@ describe('PipetteOverflowMenu', () => {
     })
     fireEvent.click(recalibrate)
     expect(props.handleCalibrate).toHaveBeenCalled()
+  })
+
+  it('renders only the about pipette button if OT-3/GEN3 pipette is attached', () => {
+    mockIsOT3Pipette.mockReturnValue(true)
+
+    const { getByRole, queryByRole } = render(props)
+
+    const calibrate = queryByRole('button', {
+      name: 'Calibrate pipette offset',
+    })
+    const detach = queryByRole('button', { name: 'Detach pipette' })
+    const settings = queryByRole('button', { name: 'Pipette Settings' })
+    const about = getByRole('button', { name: 'About pipette' })
+
+    expect(calibrate).toBeNull()
+    expect(detach).toBeNull()
+    expect(settings).toBeNull()
+    fireEvent.click(about)
+    expect(props.handleAboutSlideout).toHaveBeenCalled()
   })
 })

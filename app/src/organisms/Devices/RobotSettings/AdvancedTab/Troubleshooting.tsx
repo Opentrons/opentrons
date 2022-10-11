@@ -51,13 +51,13 @@ export function Troubleshooting({
     <Flex
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      marginTop={SPACING.spacingXXL}
+      marginTop={SPACING.spacing5}
     >
       <Box width="70%">
         <StyledText
-          as="h2"
+          as="h3"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          marginBottom={SPACING.spacing4}
+          marginBottom={SPACING.spacingM}
         >
           {t('troubleshooting')}
         </StyledText>
