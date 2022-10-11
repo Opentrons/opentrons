@@ -340,9 +340,10 @@ class LoadedLabware(BaseModel):
 
 class HexColor(BaseModel):
     """Hex color representation."""
+
     displayColor: Optional[str] = None
 
-    @validator('displayColor')
+    @validator("displayColor")
     def _color_is_a_valid_hex(cls, v: Optional[str]) -> None:
         if v:
             match = re.search(r"^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$", v)

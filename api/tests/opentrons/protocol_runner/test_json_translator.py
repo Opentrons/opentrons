@@ -29,7 +29,6 @@ from opentrons.protocol_engine import (
     ModuleModel,
     ModuleLocation,
     Liquid,
-    HexColor,
 )
 
 VALID_TEST_PARAMS = [
@@ -454,7 +453,12 @@ def test_load_liquid(
     result = subject.translate_liquids(protocol)
 
     assert result == [
-        Liquid(id="liquid-id-555", displayName="water", description="water description", displayColor="#F00")
+        Liquid(
+            id="liquid-id-555",
+            displayName="water",
+            description="water description",
+            displayColor="#F00",
+        )
     ]
 
 
@@ -465,5 +469,5 @@ def test_handles_add_liquid_invalid_hex(subject: JsonTranslator) -> None:
             id="water-id",
             displayName="water",
             description="water-desc",
-            displayColor="#123456789"
+            displayColor="#123456789",
         )

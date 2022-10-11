@@ -12,7 +12,6 @@ from opentrons.protocol_engine import (
     ModuleModel,
     DeckSlotLocation,
     Liquid,
-    HexColor,
 )
 
 
@@ -116,15 +115,13 @@ class JsonTranslator:
     def translate_liquids(self, protocol: ProtocolSchemaV6) -> List[Liquid]:
         """Takes json protocol v6 and translates liquids->protocol engine liquids."""
         protocol_liquids = protocol.liquids or {}
-        print(protocol_liquids.items())
+
         return [
             Liquid(
                 id=liquid_id,
                 displayName=liquid.displayName,
                 description=liquid.description,
-                displayColor=liquid.displayColor
-                if liquid.displayColor
-                else None,
+                displayColor=liquid.displayColor if liquid.displayColor else None,
             )
             for liquid_id, liquid in protocol_liquids.items()
         ]
