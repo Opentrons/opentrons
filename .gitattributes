@@ -1,6 +1,10 @@
 # Set the default behavior, in case people don't have core.autocrlf set.
-* text=auto
+* text=false
 # These files are binary and line endings should be left untouched
 *.hex binary
 *.bat binary
+* -text
+# Never modify line endings of our bash scripts
+*.sh -crlf
+
 api/pypi-readme.rst text eol=lf
