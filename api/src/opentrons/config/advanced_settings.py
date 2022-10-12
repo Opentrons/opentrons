@@ -187,9 +187,7 @@ settings = [
     SettingDefinition(
         _id="enableLoadLiquid",
         title="Enable load liquid command and liquids translation",
-        description=(
-            "Allow load liquid command and liquids translation."
-        ),
+        description="Allow load liquid command and liquids translation.",
     ),
 ]
 

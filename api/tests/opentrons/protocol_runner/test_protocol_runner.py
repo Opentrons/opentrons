@@ -247,7 +247,9 @@ def test_load_json(
             params=pe_commands.WaitForResumeParams(message="goodbye")
         ),
         pe_commands.LoadLiquidCreate(
-            params=pe_commands.LoadLiquidParams(liquidId="water-id", labwareId="labware-id", volumeByWell={"A1": 30})
+            params=pe_commands.LoadLiquidParams(
+                liquidId="water-id", labwareId="labware-id", volumeByWell={"A1": 30}
+            )
         ),
     ]
 
@@ -277,7 +279,9 @@ def test_load_json(
         ),
         protocol_engine.add_command(
             request=pe_commands.LoadLiquidCreate(
-                params=pe_commands.LoadLiquidParams(liquidId="water-id", labwareId="labware-id", volumeByWell={"A1": 30})
+                params=pe_commands.LoadLiquidParams(
+                    liquidId="water-id", labwareId="labware-id", volumeByWell={"A1": 30}
+                )
             ),
         ),
         task_queue.set_run_func(func=protocol_engine.wait_until_complete),
@@ -313,7 +317,9 @@ def test_load_json_pre_liquids_ff(
             params=pe_commands.WaitForResumeParams(message="goodbye")
         ),
         pe_commands.LoadLiquidCreate(
-            params=pe_commands.LoadLiquidParams(liquidId="water-id", labwareId="labware-id", volumeByWell={"A1": 30})
+            params=pe_commands.LoadLiquidParams(
+                liquidId="water-id", labwareId="labware-id", volumeByWell={"A1": 30}
+            )
         ),
     ]
 
