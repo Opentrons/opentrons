@@ -246,6 +246,9 @@ def test_load_json(
         pe_commands.WaitForResumeCreate(
             params=pe_commands.WaitForResumeParams(message="goodbye")
         ),
+        pe_commands.LoadLiquidCreate(
+            params=pe_commands.LoadLiquidParams(liquidId="water-id", labwareId="labware-id", volumeByWell={"A1": 30})
+        ),
     ]
 
     liquids: List[Liquid] = [
@@ -262,6 +265,69 @@ def test_load_json(
         protocol_engine.add_liquid(
             liquid=Liquid(id="water-id", displayName="water", description=" water desc")
         ),
+        protocol_engine.add_command(
+            request=pe_commands.WaitForResumeCreate(
+                params=pe_commands.WaitForResumeParams(message="hello")
+            )
+        ),
+        protocol_engine.add_command(
+            request=pe_commands.WaitForResumeCreate(
+                params=pe_commands.WaitForResumeParams(message="goodbye")
+            )
+        ),
+        protocol_engine.add_command(
+            request=pe_commands.LoadLiquidCreate(
+                params=pe_commands.LoadLiquidParams(liquidId="water-id", labwareId="labware-id", volumeByWell={"A1": 30})
+            ),
+        ),
+        task_queue.set_run_func(func=protocol_engine.wait_until_complete),
+    )
+
+
+# TODO (tz, 10-12-22): remove this test when liquids ff is removed
+def test_load_json_pre_liquids_ff(
+    decoy: Decoy,
+    json_file_reader: JsonFileReader,
+    json_translator: JsonTranslator,
+    protocol_engine: ProtocolEngine,
+    task_queue: TaskQueue,
+    subject: ProtocolRunner,
+) -> None:
+    """It should load a JSON protocol file without liquids when liquids ff is off."""
+    json_protocol_source = ProtocolSource(
+        directory=Path("/dev/null"),
+        main_file=Path("/dev/null/abc.json"),
+        files=[],
+        metadata={},
+        config=JsonProtocolConfig(schema_version=6),
+        labware_definitions=[],
+    )
+
+    json_protocol = ProtocolSchemaV6.construct()  # type: ignore[call-arg]
+
+    commands: List[pe_commands.CommandCreate] = [
+        pe_commands.WaitForResumeCreate(
+            params=pe_commands.WaitForResumeParams(message="hello")
+        ),
+        pe_commands.WaitForResumeCreate(
+            params=pe_commands.WaitForResumeParams(message="goodbye")
+        ),
+        pe_commands.LoadLiquidCreate(
+            params=pe_commands.LoadLiquidParams(liquidId="water-id", labwareId="labware-id", volumeByWell={"A1": 30})
+        ),
+    ]
+
+    liquids: List[Liquid] = [
+        Liquid(id="water-id", displayName="water", description=" water desc")
+    ]
+
+    decoy.when(json_file_reader.read(json_protocol_source)).then_return(json_protocol)
+    decoy.when(json_translator.translate_commands(json_protocol)).then_return(commands)
+    decoy.when(json_translator.translate_liquids(json_protocol)).then_return(liquids)
+
+    subject.load(json_protocol_source)
+
+    decoy.verify(
         protocol_engine.add_command(
             request=pe_commands.WaitForResumeCreate(
                 params=pe_commands.WaitForResumeParams(message="hello")
