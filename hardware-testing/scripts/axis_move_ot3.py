@@ -11,11 +11,14 @@ from hardware_testing.opentrons_api.helpers_ot3 import (
     home_ot3,
 )
 
-MOUNT = OT3Mount.LEFT
+MOUNT_L = OT3Mount.LEFT
+MOUNT_R = OT3Mount.RIGHT
 LOAD = GantryLoad.NONE
 CYCLES = 1
 SPEED_XY = 500
-SPEED_Z = 250
+SPEED_Z = 50
+RUN_CURRENT_Z = 1.4
+ACCELERATION_Z = 100
 
 SETTINGS = {
     OT3Axis.X: GantryLoadSettings(
@@ -36,19 +39,19 @@ SETTINGS = {
     ),
     OT3Axis.Z_L: GantryLoadSettings(
         max_speed=SPEED_Z,
-        acceleration=1500,
+        acceleration=ACCELERATION_Z,
         max_start_stop_speed=0,
         max_change_dir_speed=0,
         hold_current=0.1,
-        run_current=1.4,
+        run_current=RUN_CURRENT_Z,
     ),
     OT3Axis.Z_R: GantryLoadSettings(
         max_speed=SPEED_Z,
-        acceleration=1500,
+        acceleration=ACCELERATION_Z,
         max_start_stop_speed=0,
         max_change_dir_speed=0,
         hold_current=0.1,
-        run_current=1.4,
+        run_current=RUN_CURRENT_Z,
     ),
 }
 
@@ -60,16 +63,20 @@ async def _bowtie_ot3(api: ThreadManagedHardwareAPI, cycles: int = 1) -> None:
     step_y = 370
     step_z = 200
     for _ in range(cycles):
+        # await api.move_rel(mount=MOUNT, delta=Point(y=-step_y), speed=SPEED_XY)
+        # await api.move_rel(mount=MOUNT, delta=Point(y=step_y), speed=SPEED_XY)
         # await api.move_rel(mount=MOUNT, delta=Point(x=-step_x), speed=SPEED_XY)
-        await api.move_rel(mount=MOUNT, delta=Point(z=-step_z), speed=SPEED_Z)
+        await api.move_rel(mount=MOUNT_L, delta=Point(z=-step_z), speed=SPEED_Z)
+        await api.move_rel(mount=MOUNT_R, delta=Point(z=-step_z), speed=SPEED_Z)
         # await api.move_rel(
         #     mount=MOUNT, delta=Point(x=step_x, y=-step_y), speed=SPEED_XY
         # )
-        await api.move_rel(mount=MOUNT, delta=Point(z=step_z), speed=SPEED_Z)
+        # await api.move_rel(mount=MOUNT, delta=Point(z=step_z), speed=SPEED_Z)
         # await api.move_rel(mount=MOUNT, delta=Point(x=-step_x), speed=SPEED_XY)
-        await api.move_rel(mount=MOUNT, delta=Point(z=-step_z), speed=SPEED_Z)
+        # await api.move_rel(mount=MOUNT, delta=Point(z=-step_z), speed=SPEED_Z)
         # await api.move_rel(mount=MOUNT, delta=Point(x=step_x, y=step_y), speed=SPEED_XY)
-        await api.move_rel(mount=MOUNT, delta=Point(z=step_z), speed=SPEED_Z)
+        await api.move_rel(mount=MOUNT_L, delta=Point(z=step_z), speed=SPEED_Z)
+        await api.move_rel(mount=MOUNT_R, delta=Point(z=step_z), speed=SPEED_Z)
 
 
 async def _main(api: ThreadManagedHardwareAPI) -> None:
@@ -87,14 +94,22 @@ if __name__ == "__main__":
     parser.add_argument("--cycles", type=int, default=CYCLES)
     parser.add_argument("--speed-xy", type=int, default=SPEED_XY)
     parser.add_argument("--speed-z", type=int, default=SPEED_Z)
+    parser.add_argument("--current-z", type=int, default=RUN_CURRENT_Z)
+    parser.add_argument("--accel-z", type=int, default=ACCELERATION_Z)
     args = parser.parse_args()
     CYCLES = args.cycles
     SPEED_XY = args.speed_xy
     SPEED_Z = args.speed_z
+    RUN_CURRENT_Z = args.current_z
+    ACCELERATION_Z = args.accel_z
     SETTINGS[OT3Axis.X].max_speed = SPEED_XY
     SETTINGS[OT3Axis.Y].max_speed = SPEED_XY
     SETTINGS[OT3Axis.Z_L].max_speed = SPEED_Z
     SETTINGS[OT3Axis.Z_R].max_speed = SPEED_Z
+    SETTINGS[OT3Axis.Z_L].run_current = RUN_CURRENT_Z
+    SETTINGS[OT3Axis.Z_R].run_current = RUN_CURRENT_Z
+    SETTINGS[OT3Axis.Z_L].acceleration = ACCELERATION_Z
+    SETTINGS[OT3Axis.Z_R].acceleration = ACCELERATION_Z
     hw_api = build_ot3_hardware_api(is_simulating=args.simulate)
     asyncio.run(_main(hw_api))
     hw_api.clean_up()
