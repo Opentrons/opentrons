@@ -393,3 +393,15 @@ def sql_engine(tmp_path: Path) -> Generator[Engine, None, None]:
     sql_engine = create_sql_engine(db_file_path)
     yield sql_engine
     sql_engine.dispose()
+
+
+@pytest.fixture
+def enable_load_liquid(request_session: requests.Session) -> Iterator[None]:
+    """For integration tests that need to set then clear the
+    enableLoadLiquid feature flag"""
+    url = "http://localhost:31950/settings"
+    data = {"id": "enableLoadLiquid", "value": True}
+    request_session.post(url, json=data)
+    yield None
+    data["value"] = None
+    request_session.post(url, json=data)
