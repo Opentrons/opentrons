@@ -186,7 +186,7 @@ async def home_ot3(api: OT3API, axes: Optional[List[OT3Axis]] = None) -> None:
         set_gantry_load_per_axis_motion_settings_ot3(
             api, ax, max_speed_discontinuity=val
         )
-    await api.engage_axes(which=axes)
+    await api.engage_axes(which=axes)  # type: ignore[arg-type]
     await asyncio.sleep(0.5)
     await api.home(axes=axes)
     for ax, val in cached_discontinuities.items():
