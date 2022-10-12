@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   Flex,
-  Box,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   JUSTIFY_SPACE_BETWEEN,
