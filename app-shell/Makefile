@@ -139,7 +139,7 @@ dist-ubuntu-latest: dist-linux
 .PHONY: dist-ubuntu-22.04
 dist-ubuntu-22.04: dist-linux
 
-.PHONY: dist-windows-2019
+.PHONY: dist-windows-2022
 dist-windows-2019: dist-win
 
 # copy distributable artifacts to the publish directory
