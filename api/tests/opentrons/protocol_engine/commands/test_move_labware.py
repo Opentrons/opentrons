@@ -12,7 +12,7 @@ from opentrons.protocol_engine.commands.move_labware import (
 )
 
 
-async def test_load_labware_implementation(
+async def test_move_labware_implementation(
     decoy: Decoy,
     equipment: EquipmentHandler,
 ) -> None:

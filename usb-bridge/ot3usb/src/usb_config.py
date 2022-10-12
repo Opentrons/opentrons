@@ -13,7 +13,6 @@ and a few kernel modules must be running before this program:
 
 - dwc3 (or another USB module)
 - libcomposite (to provide the configuration filesystem)
-- g_serial (to provide /dev/ttyGS0 after configuration)
 """
 
 from dataclasses import dataclass
@@ -107,6 +106,7 @@ class SerialGadget:
         """
         self._driver = driver
         self._config = config
+        self._udc_name: typing.Optional[str] = None
 
         self._basename = os.path.join(GADGET_BASE_PATH, config.name)
 
@@ -124,6 +124,12 @@ class SerialGadget:
         with open(os.path.join(self._basename, filename), mode="w") as f:
             written = f.write(contents)
         return written == len(contents)
+
+    def udc_folder(self) -> str:
+        """Get the folder where UDC configuration lives."""
+        if not self._udc_name:
+            raise RuntimeError("Gadget is not configured")
+        return os.path.join(UDC_HANDLE_FOLDER, self._udc_name)
 
     def configure_and_activate(self) -> None:
         """Configure this gadget. Throws exceptions on errors."""
@@ -169,31 +175,32 @@ class SerialGadget:
                 dest=os.path.join(self._basename, "configs/c.1/acm.usb0"),
             )
         except FileExistsError:
-            LOG.info("symlink already exists")
+            LOG.debug("symlink already exists")
         # Last step is to set up the UDC. This assumes there's only ONE UDC
         udc_path = os.path.join(self._basename, "UDC")
         udc_handles = self._driver.listdir(UDC_HANDLE_FOLDER)
         if len(udc_handles) == 0:
-            raise Exception("Failed to find UDC handle. Check kernel configuration.")
+            raise RuntimeError("Failed to find UDC handle. Check kernel configuration.")
         # Before writing the UDC handle, we write nothing to the UDC file
         # to clear any configuration.
         try:
             self._write_file("\n", "UDC")
         except Exception:
-            LOG.info("UDC was already uninitialized")
+            LOG.debug("UDC was already uninitialized")
         try:
             self._write_file(udc_handles[0], "UDC")
+            self._udc_name = udc_handles[0]
         except Exception:
-            raise Exception("UDC is occupied by another driver!")
+            raise RuntimeError("UDC is occupied by another driver!")
         if not self._driver.exists(udc_path):
-            raise Exception("Failed to enumerate UDC")
+            raise RuntimeError("Failed to enumerate UDC")
 
     def _get_handle_path(self) -> str:
         """Check for the expected path for the serial handle."""
         portnum_path = os.path.join(self._basename, FUNCTION_SUBFOLDER, "port_num")
         suffix = open(portnum_path, mode="r").read()
         if len(suffix) == 0:
-            raise Exception("Port does not have a number")
+            raise RuntimeError("Port does not have a number")
         # This conversion is necessary to strip out the newline
         portnum = int(suffix)
         return self.HANDLE + str(portnum)
@@ -210,4 +217,7 @@ class SerialGadget:
     def get_handle(self) -> serial.Serial:
         """Open a handle to the serial port."""
         path = self._get_handle_path()
-        return serial.Serial(port=path)
+        ser = serial.Serial(port=path)
+        # To support select()
+        ser.nonblocking()
+        return ser
