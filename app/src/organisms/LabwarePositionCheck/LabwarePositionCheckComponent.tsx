@@ -1,70 +1,101 @@
 import * as React from 'react'
+import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
 import { useConditionalConfirm } from '@opentrons/components'
 import { Portal } from '../../App/portal'
-import { useTrackEvent } from '../../redux/analytics'
-import { useRestartRun } from '../ProtocolUpload/hooks'
-import { useLabwarePositionCheck, useSteps } from './hooks'
+// import { useTrackEvent } from '../../redux/analytics'
+import { useSteps } from './hooks'
 import { IntroScreen } from './IntroScreen'
-import { GenericStepScreen } from './GenericStepScreen'
-import { SummaryScreen } from './SummaryScreen'
-import { RobotMotionLoadingModal } from './RobotMotionLoadingModal'
-import { ConfirmPickUpTipModal } from './ConfirmPickUpTipModal'
 import { ExitConfirmation } from './ExitConfirmation'
 import { CheckItem } from './CheckItem'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { LoadingState } from '../CalibrationPanels/LoadingState'
-import { useMostRecentCompletedAnalysis } from './hooks/useMostRecentCompletedAnalysis'
 import { PickUpTip } from './PickUpTip'
 import { ReturnTip } from './ReturnTip'
 import { ResultsSummary } from './ResultsSummary'
-import { LabwareOffsetCreateData, LabwareOffsetLocation, VectorOffset } from '@opentrons/api-client'
-import { getLabwareDef } from './utils/labware'
-import { CreateCommand, getLabwareDefURI } from '@opentrons/shared-data'
+import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import { useCreateCommandMutation } from '@opentrons/react-api-client'
-import { CreateRunCommand } from './types'
+
+import type { Axis, Sign, StepSize } from '../../molecules/DeprecatedJogControls/types'
+import type { CreateRunCommand, RegisterPositionAction, WorkingOffset } from './types'
+import type { Coordinates } from '@opentrons/shared-data'
+
+const JOG_COMMAND_TIMEOUT = 10000 // 10 seconds
 interface LabwarePositionCheckModalProps {
   onCloseClick: () => unknown
   runId: string
+  mostRecentAnalysis: CompletedProtocolAnalysis | null
   caughtError?: Error
 }
 
 export const LabwarePositionCheckInner = (
   props: LabwarePositionCheckModalProps
 ): JSX.Element | null => {
-  const { runId } = props
+  const { runId, mostRecentAnalysis } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
-  console.log('RENDERED LPC COMPONENT')
-  const protocolData = useMostRecentCompletedAnalysis(runId)
+  const protocolData = mostRecentAnalysis
   const [
-    labwareOffsets,
-    storeLabwareOffset,
+    { workingOffsets, tipPickUpPosition },
+    registerPosition,
   ] = React.useReducer(
     (
-      state: LabwareOffsetCreateData[],
-      action: { labwareId: string; location: LabwareOffsetLocation; vector: VectorOffset }
+      state: { workingOffsets: WorkingOffset[], tipPickUpPosition: Coordinates | null },
+      action: RegisterPositionAction
     ) => {
-      const { labwareId, location, vector } = action
-      if (protocolData == null) return state
-      const labwareDef = getLabwareDef(labwareId, protocolData)
-      if (labwareDef == null) {
-        console.warn(`could not find corresponding labware definition for labwareId ${labwareId}`)
+      const { type, labwareId, location, position } = action
+      if (type === 'tipPickUpPosition') return { ...state, tipPickUpPosition: position }
+
+      if (['initialPosition', 'finalPosition'].includes(type)) {
+        const existingRecordIndex = state.workingOffsets.findIndex(record => (
+          record.labwareId === labwareId && isEqual(record.location, location)
+        ))
+        if (existingRecordIndex >= 0) {
+          if (type === 'initialPosition') {
+            return {
+              ...state,
+              workingOffsets: [
+                ...state.workingOffsets.slice(0, existingRecordIndex),
+                { ...state.workingOffsets[existingRecordIndex], initialPosition: position, finalPosition: null },
+                ...state.workingOffsets.slice(existingRecordIndex + 1)
+              ]
+            }
+          } else if (type === 'finalPosition') {
+            return {
+              ...state,
+              workingOffsets: [
+                ...state.workingOffsets.slice(0, existingRecordIndex),
+                { ...state.workingOffsets[existingRecordIndex], finalPosition: position },
+                ...state.workingOffsets.slice(existingRecordIndex + 1)
+              ]
+            }
+          }
+        }
+        return {
+          ...state,
+          workingOffsets: [
+            ...state.workingOffsets,
+            {
+              labwareId,
+              location,
+              initialPosition: type === 'initialPosition' ? position : null,
+              finalPosition: type === 'finalPosition' ? position : null,
+            },
+          ]
+        }
+      } else {
         return state
       }
-      return [
-        ...state,
-        { definitionUri: getLabwareDefURI(labwareDef), location, vector },
-      ]
     },
-    []
+    { workingOffsets: [], tipPickUpPosition: null }
   )
   const {
     confirm: confirmExitLPC,
     showConfirmation,
     cancel: cancelExitLPC,
   } = useConditionalConfirm(props.onCloseClick, true)
-  const { createCommand, isLoading } = useCreateCommandMutation()
+  const { createCommand, isLoading: isRobotMoving } = useCreateCommandMutation()
+  const { createCommand: createSilentCommand } = useCreateCommandMutation()
   const createRunCommand: CreateRunCommand = (variables, ...options) => {
     return createCommand({ ...variables, runId }, ...options)
   }
@@ -76,36 +107,63 @@ export const LabwarePositionCheckInner = (
   const proceed = (): void => setCurrentStepIndex(currentStepIndex !== LPCSteps.length - 1 ? currentStepIndex + 1 : currentStepIndex)
   if (protocolData == null || currentStep == null) return null
 
-  const movementStepProps = { proceed, protocolData, createRunCommand }
+  const handleJog = (
+    axis: Axis,
+    dir: Sign,
+    step: StepSize,
+    onSuccess?: (position: Coordinates | null) => void
+  ): void => {
+    const pipetteId = 'pipetteId' in currentStep ? currentStep.pipetteId : null
+    if (pipetteId != null) {
+      createSilentCommand({
+        runId,
+        command: {
+          commandType: 'moveRelative',
+          params: { pipetteId: pipetteId, distance: step * dir, axis, },
+        },
+        waitUntilComplete: true,
+        timeout: JOG_COMMAND_TIMEOUT,
+      })
+        .then(data => { onSuccess != null && onSuccess(data?.data?.result?.position ?? null) })
+        .catch((e: Error) => { console.error(`error issuing jog command: ${e.message}`) })
+    } else {
+      console.error(`could not find pipette to jog with id: ${pipetteId}`)
+    }
+  }
+  const movementStepProps = { proceed, protocolData, createRunCommand, registerPosition, handleJog }
+
   console.log('CURRENT_STEP', currentStep)
+  console.log('workingOffsets', workingOffsets)
+  console.log('tipPickUpPosition', tipPickUpPosition)
+
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
   if (showConfirmation) {
     modalContent = (
       <ExitConfirmation onGoBack={cancelExitLPC} onConfirmExit={confirmExitLPC} />
     )
-  } else if (isLoading) {
+  } else if (isRobotMoving) {
     modalContent = <LoadingState />
   } else if (currentStep.section === 'BEFORE_BEGINNING') {
     modalContent = <IntroScreen proceed={proceed} protocolData={protocolData} />
   } else if (currentStep.section === 'CHECK_TIP_RACKS') {
     modalContent = (
-      <CheckItem {...currentStep} {...movementStepProps} />
+      <CheckItem {...currentStep} {...movementStepProps} {...{ workingOffsets }} />
     )
   } else if (currentStep.section === 'PICK_UP_TIP') {
     modalContent = (
-      <PickUpTip {...currentStep} {...movementStepProps} />
+      <PickUpTip {...currentStep} {...movementStepProps} {...{ workingOffsets }} />
     )
   } else if (currentStep.section === 'CHECK_LABWARE') {
     modalContent = (
-      <CheckItem {...currentStep} {...movementStepProps} />
+      <CheckItem {...currentStep} {...movementStepProps} {...{ workingOffsets }} />
     )
   } else if (currentStep.section === 'RETURN_TIP') {
     modalContent = (
-      <ReturnTip {...currentStep} {...movementStepProps} />
+      <ReturnTip {...currentStep} {...movementStepProps} {...{ workingOffsets, tipPickUpPosition }} />
     )
   } else if (currentStep.section === 'RESULTS_SUMMARY') {
     modalContent = (
-      <ResultsSummary {...currentStep} protocolData={protocolData} />
+      <ResultsSummary {...currentStep} protocolData={protocolData} {...{workingOffsets}} />
     )
   }
   return (
@@ -129,7 +187,6 @@ export const LabwarePositionCheckInner = (
 export const LabwarePositionCheckComponent = React.memo(
   LabwarePositionCheckInner,
   ({ runId: prevRunId }, { runId: nextRunId }) => {
-    console.log('prev: ', prevRunId, ' next: ', nextRunId)
     return prevRunId === nextRunId
   }
 )

@@ -9,6 +9,5 @@ export function useSteps(
 ): LabwarePositionCheckStep[] {
   if (protocolData == null) return [] // this state should never be reached
   
-  const LPCSteps = React.useMemo(() => getLabwarePositionCheckSteps(protocolData), [protocolData.id])
-  return LPCSteps
+  return getLabwarePositionCheckSteps(protocolData)
 }

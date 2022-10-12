@@ -15,14 +15,10 @@ export function useMostRecentCompletedAnalysis(
   const protocolId = runRecord?.data?.protocolId ?? null
   const { data: protocolAnalyses } = useProtocolAnalysesQuery(protocolId)
 
-  const mostRecentAnalysis = React.useMemo(() => (
-    (protocolAnalyses?.data ?? [])
-      .reverse()
-      .find(
-        (analysis): analysis is CompletedProtocolAnalysis =>
-          analysis.status === 'completed'
-      ) ?? null
-  ), [protocolAnalyses?.data != null ? last(protocolAnalyses.data)?.id : null])
-
-  return mostRecentAnalysis
+  return (protocolAnalyses?.data ?? [])
+    .reverse()
+    .find(
+      (analysis): analysis is CompletedProtocolAnalysis =>
+        analysis.status === 'completed'
+    ) ?? null
 }

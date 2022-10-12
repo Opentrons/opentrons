@@ -17,22 +17,15 @@ export const getLabwarePositionCheckSteps = (
             command.params.pipetteId === id
         )
     )
-    console.log('pipettesUsedInProtocol', pipettesUsedInProtocol)
     const { labware, modules, commands } = protocolData
-    console.log('labware', labware)
-    console.log('modules', modules)
-    console.log('commands', commands)
     const pipettesById = pipettesUsedInProtocol.reduce(
       (acc, pip) => ({ ...acc, [pip.id]: pip }),
       {}
     )
-    console.log('pipettesById', pipettesById)
     const primaryPipetteId = getPrimaryPipetteId(pipettesById, commands)
     const secondaryPipetteId =
       pipettesUsedInProtocol.find(({ id }) => id !== primaryPipetteId)?.id ??
       null
-    console.log('primaryPipetteId', primaryPipetteId)
-    console.log('secondaryPipetteId', secondaryPipetteId)
     return getCheckSteps({
       primaryPipetteId,
       secondaryPipetteId,

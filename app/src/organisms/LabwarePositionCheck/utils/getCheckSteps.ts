@@ -42,7 +42,6 @@ const PICK_UP_TIP_LOCATION: LabwareLocation = { slotName: '2' }
 
 export const getCheckSteps = (args: LPCArgs): LabwarePositionCheckStep[] => {
   const checkTipRacksSectionSteps = getCheckTipRackSectionSteps(args)
-  console.log('checkTipRacksSectionSteps', checkTipRacksSectionSteps)
   if (checkTipRacksSectionSteps.length < 1) return []
 
   const lastTiprackCheckStep =
@@ -63,7 +62,6 @@ export const getCheckSteps = (args: LPCArgs): LabwarePositionCheckStep[] => {
     location: PICK_UP_TIP_LOCATION,
   }
 
-  console.log('checkLabwareSectionSteps', checkLabwareSectionSteps)
   return [
     { section: SECTIONS.BEFORE_BEGINNING },
     ...checkTipRacksSectionSteps,
@@ -82,7 +80,6 @@ function getCheckTipRackSectionSteps(args: LPCArgs): CheckTipRacksStep[] {
       command.commandType === 'pickUpTip'
   )
 
-  console.log('pickUpTipCommands', pickUpTipCommands)
   const uniqPickUpTipCommands = pickUpTipCommands.reduce<
     PickUpTipRunTimeCommand[]
   >((acc, pickUpTipCommand) => {
@@ -103,7 +100,6 @@ function getCheckTipRackSectionSteps(args: LPCArgs): CheckTipRacksStep[] {
     return [...acc, pickUpTipCommand]
   }, [])
 
-  console.log('uniqPickUpTipCommands', uniqPickUpTipCommands)
   return uniqPickUpTipCommands.reduce<CheckTipRacksStep[]>(
     (acc, { params }) => {
       const labwareLocations = getAllUniqLocationsForLabware(

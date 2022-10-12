@@ -6,6 +6,7 @@ import { useLogger } from '../../logger'
 import { useFeatureFlag } from '../../redux/config'
 import { LabwarePositionCheckComponent } from './LabwarePositionCheckComponent'
 import { DeprecatedLabwarePositionCheckComponent } from './DeprecatedComponents/DeprecatedLabwarePositionCheckComponent'
+import { useMostRecentCompletedAnalysis } from './hooks/useMostRecentCompletedAnalysis'
 
 interface LabwarePositionCheckModalProps {
   onCloseClick: () => unknown
@@ -25,10 +26,12 @@ export const LabwarePositionCheck = (
     'enableManualDeckStateModification'
   )
 
+  const mostRecentAnalysis = useMostRecentCompletedAnalysis(props.runId)
+
   return (
     <ErrorBoundary logger={logger} ErrorComponent={CrashingErrorModal}>
       {manualDeckStateModificationEnabled ? (
-        <LabwarePositionCheckComponent {...props} />
+        <LabwarePositionCheckComponent {...props} mostRecentAnalysis={mostRecentAnalysis}/>
       ) : (
         <DeprecatedLabwarePositionCheckComponent {...props} />
       )}

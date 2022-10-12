@@ -9,15 +9,17 @@ import { getLabwareDef } from './utils/labware'
 import { UnorderedList } from '../../molecules/UnorderedList'
 
 import type { ReturnTipStep } from './types'
+import { VectorOffset } from '@opentrons/api-client'
 
 interface ReturnTipProps extends ReturnTipStep {
   protocolData: CompletedProtocolAnalysis
   proceed: () => void
   createRunCommand: ReturnType<typeof useCreateCommandMutation>['createCommand']
+  tipPickUpPosition: VectorOffset | null
 }
 export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
   const { t } = useTranslation('labware_position_check')
-  const { labwareId, location, protocolData, proceed } = props
+  const { labwareId, location, protocolData, proceed, tipPickUpPosition } = props
 
   const labwareDef = getLabwareDef(labwareId, protocolData)
   if (labwareDef == null) return null
@@ -34,6 +36,11 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
       components={{ bold: <StyledText as="span" fontWeight={TYPOGRAPHY.fontWeightSemiBold} /> }} />
   ]
 
+  const handleConfirmPlacement = () => {
+    console.log('RETURN TIP TO POSITION', tipPickUpPosition)
+    proceed()
+  }
+
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <PrepareSpace
@@ -44,7 +51,7 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
         })}
         body={<UnorderedList items={instructions} />}
         labwareDef={labwareDef}
-        confirmPlacement={proceed} />
+        confirmPlacement={handleConfirmPlacement} />
     </Flex>
   )
 }

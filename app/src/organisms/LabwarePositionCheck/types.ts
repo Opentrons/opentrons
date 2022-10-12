@@ -11,7 +11,9 @@ import type {
   DropTipCreateCommand,
   PickUpTipCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
-import { LabwareLocation } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import type { LabwareOffsetLocation } from '@opentrons/api-client'
+import type { VectorOffset } from '@opentrons/api-client'
+import { getLabwareOffsetLocation } from '../Devices/ProtocolRun/utils/getLabwareOffsetLocation'
 
 export type DeprecatedSection = keyof typeof DEPRECATED_SECTIONS
 
@@ -52,25 +54,26 @@ export interface CheckTipRacksStep {
   section: typeof SECTIONS.CHECK_TIP_RACKS
   pipetteId: string
   labwareId: string
-  location: LabwareLocation
+  location: LabwareOffsetLocation
 }
+getLabwareOffsetLocation
 export interface PickUpTipStep {
   section: typeof SECTIONS.PICK_UP_TIP
   pipetteId: string
   labwareId: string
-  location: LabwareLocation
+  location: LabwareOffsetLocation
 }
 export interface CheckLabwareStep {
   section: typeof SECTIONS.CHECK_LABWARE
   pipetteId: string
   labwareId: string
-  location: LabwareLocation
+  location: LabwareOffsetLocation
 }
 export interface ReturnTipStep {
   section: typeof SECTIONS.RETURN_TIP
   pipetteId: string
   labwareId: string
-  location: LabwareLocation
+  location: LabwareOffsetLocation
 }
 export interface ResultsSummaryStep {
   section: typeof SECTIONS.RESULTS_SUMMARY
@@ -81,6 +84,18 @@ export type CreateRunCommand = (
   params: Omit<Parameters<CreateCommandMutate>[0], 'runId'>,
   options?: Parameters<CreateCommandMutate>[1]
 ) => ReturnType<CreateCommandMutate>
+
+export type RegisterPositionAction =
+  { type: 'finalPosition', labwareId: string; location: LabwareOffsetLocation; position: VectorOffset | null } |
+  { type: 'tipPickUpPosition', labwareId: string; location: LabwareOffsetLocation; position: VectorOffset | null }
+
+export interface WorkingOffset {
+  labwareId: string
+  location: LabwareOffsetLocation
+  initialPosition: VectorOffset | null
+  finalPosition: VectorOffset | null
+}
+
 
 
 

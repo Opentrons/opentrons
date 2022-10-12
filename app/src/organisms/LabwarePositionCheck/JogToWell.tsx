@@ -18,6 +18,7 @@ import {
   getLabwareDefURI,
   getPipetteNameSpecs,
   IDENTITY_VECTOR,
+  PipetteName,
 } from '@opentrons/shared-data'
 
 import levelWithTip from '../../assets/images/lpc_level_with_tip.svg'
@@ -27,6 +28,7 @@ import { StyledText } from '../../atoms/text'
 import { NeedHelpLink } from '../CalibrationPanels'
 import { JogControls } from '../../molecules/JogControls'
 
+import type { Jog } from '../../molecules/JogControls'
 import type {
   CompletedProtocolAnalysis,
   LabwareDefinition2,
@@ -39,22 +41,19 @@ const DECK_MAP_VIEWBOX = '-30 -20 170 115'
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
 
-interface JogToWellProps extends Omit<CheckTipRacksStep, 'section'> {
-  section: 'CHECK_LABWARE' | 'CHECK_TIP_RACKS' | 'PICK_UP_TIP'
-  protocolData: CompletedProtocolAnalysis
-  proceed: () => void
-  goBack: () => void
+interface JogToWellProps {
+  handleConfirmPosition: () => void
+  handleGoBack: () => void
+  handleJog: Jog
+  pipetteName: PipetteName
   labwareDef: LabwareDefinition2
   header: React.ReactNode
   body: React.ReactNode
 }
 export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
   const { t } = useTranslation(['labware_position_check', 'shared'])
-  const { header, body, pipetteId, labwareDef, protocolData, proceed, goBack } = props
+  const { header, body, pipetteName, labwareDef, handleConfirmPosition, handleGoBack, handleJog } = props
 
-  const pipetteName =
-    protocolData.pipettes.find(p => p.id === pipetteId)?.pipetteName ?? null
-  if (pipetteName == null) return null
   let wellsToHighlight: string[] = []
   if (getPipetteNameSpecs(pipetteName)?.channels === 8) {
     wellsToHighlight = labwareDef.ordering[0]
@@ -82,7 +81,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
         >
           <StyledText as="h1">{header}</StyledText>
           {body}
-          <OffsetVector {...IDENTITY_VECTOR}/>
+          <OffsetVector {...IDENTITY_VECTOR} />
         </Flex>
         <Flex flex="1">
           <RobotWorkSpace viewBox={DECK_MAP_VIEWBOX}>
@@ -115,7 +114,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
           </Box>
         </Flex>
       </Flex>
-      <JogControls />
+      <JogControls jog={handleJog} />
       <Flex
         width="100%"
         marginTop={SPACING.spacing6}
@@ -124,8 +123,8 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
       >
         <NeedHelpLink href={LPC_HELP_LINK_URL} />
         <Flex gridGap={SPACING.spacing3}>
-          <SecondaryButton onClick={goBack}>{t('shared:go_back')}</SecondaryButton>
-          <PrimaryButton onClick={proceed}>
+          <SecondaryButton onClick={handleGoBack}>{t('shared:go_back')}</SecondaryButton>
+          <PrimaryButton onClick={handleConfirmPosition}>
             {t('shared:confirm_position')}
           </PrimaryButton>
         </Flex>

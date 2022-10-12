@@ -57,7 +57,6 @@ export const getAttachedPipetteCalibrations: (
   getPipetteOffsetCalibrations,
   getTipLengthCalibrations,
   (attached, calibrations, tipLengths) => {
-    console.log('RESELECT CALS')
     const offsets = {
       left: attached.left
         ? filterCalibrationForPipette(calibrations, attached.left.id, 'left')
