@@ -186,9 +186,9 @@ settings = [
     ),
     SettingDefinition(
         _id="enableLoadLiquid",
-        title="Enable protocol engine load liquid command",
+        title="Enable load liquid command and liquids translation",
         description=(
-            "This is an Opentrons-internal setting to allow load liquid command."
+            "Allow load liquid command and liquids translation."
         ),
     ),
 ]

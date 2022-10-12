@@ -62,8 +62,8 @@ stages:
             value: !anything
           - id: enableLoadLiquid
             old_id: Null
-            title: Enable protocol engine load liquid command
-            description: !re_search 'This is an Opentrons-internal setting to allow load liquid command.'
+            title: Enable load liquid command and liquids translation
+            description: !re_search 'Allow load liquid command and liquids translation.'
             restart_required: false
             value: !anything
         links: !anydict
