@@ -156,9 +156,10 @@ class ProtocolRunner:
     def _load_json(self, protocol_source: ProtocolSource) -> None:
         protocol = self._json_file_reader.read(protocol_source)
         commands = self._json_translator.translate_commands(protocol)
-        liquids = self._json_translator.translate_liquids(protocol)
-        for liquid in liquids:
-            self._protocol_engine.add_liquid(liquid=liquid)
+        if feature_flags.enable_load_liquid():
+            liquids = self._json_translator.translate_liquids(protocol)
+            for liquid in liquids:
+                self._protocol_engine.add_liquid(liquid=liquid)
         for command in commands:
             self._protocol_engine.add_command(request=command)
         self._task_queue.set_run_func(func=self._protocol_engine.wait_until_complete)

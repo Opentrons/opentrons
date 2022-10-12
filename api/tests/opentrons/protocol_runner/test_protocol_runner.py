@@ -2,7 +2,7 @@
 import pytest
 from decoy import Decoy, matchers
 from pathlib import Path
-from typing import List, cast
+from typing import List, cast, AsyncGenerator
 
 from opentrons_shared_data.protocol.dev_types import (
     JsonProtocol as LegacyJsonProtocolDict,
@@ -225,6 +225,7 @@ def test_load_json(
     protocol_engine: ProtocolEngine,
     task_queue: TaskQueue,
     subject: ProtocolRunner,
+    enable_load_liquid: AsyncGenerator[None, None]
 ) -> None:
     """It should load a JSON protocol file."""
     json_protocol_source = ProtocolSource(
