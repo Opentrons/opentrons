@@ -1,4 +1,5 @@
 {
+  "apply_offset_data": "Apply Labware Offset data",
   "labware_position_check_title": "Labware Position Check",
   "labware_position_check_overview": "Labware Position Check Overview",
   "position_check_description": "<block>Labware Position Check is a guided workflow that checks every labware on the deck for an added degree of precision in your protocol.</block><block>When you check a labware, the OT-2’s pipette nozzle or attached tip will stop at the center of the A1 well. If the pipette nozzle or tip is not centered, you can reveal the OT-2’s jog controls to make an adjustment. This Labware Offset will be applied to the entire labware. Offset data is measured to the nearest 1/10th mm and can be made in the X, Y and/or Z directions.</block>",
@@ -51,5 +52,16 @@
   "exit_screen_title": "Exit before completing Labware Position Check?",
   "exit_screen_subtitle": "If you exit now, all labware offsets will be discarded. This cannot be undone.",
   "exit_screen_go_back": "Go back to labware position check",
-  "exit_screen_confirm_exit": "Exit and discard all labware offsets"
+  "exit_screen_confirm_exit": "Exit and discard all labware offsets",
+  "view_data": "View data",
+  "location": "location",
+  "labware": "labware",
+  "labware_offset_data": "labware offset data",
+  "run": "Run",
+  "slot": "Slot {{slotName}}",
+  "robot_has_offsets_from_previous_runs": "This robot has offsets for labware used in this protocol. If you apply these offsets, you can still adjust them with Labware Position Check.",
+  "robot_has_no_offsets_from_previous_runs": "This robot has no useable offsets for labware used in this protocol. You can still add new offsets with Labware Position Check.",
+  "see_how_offsets_work": "See how labware offsets work",
+  "stored_offset_data": "Stored Labware Offset data",
+  "stored_offsets_for_this_protocol": "Stored Labware Offset data that applies to this protocol"
 }

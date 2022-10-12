@@ -10,7 +10,6 @@ from .types import (
     LabwareParameters,
     Point,
     DeckSlotLocation,
-    ModuleLocation,
 )
 from .well import Well
 from ..protocols.models import LabwareDefinition
@@ -82,8 +81,10 @@ class Labware:  # noqa: D101
         )
         if isinstance(parent, DeckSlotLocation):
             return str(parent.slotName)
-        elif isinstance(parent, ModuleLocation):
-            raise NotImplementedError("Not yet implemented for labware on modules.")
+        else:
+            raise NotImplementedError(
+                "Not yet implemented for labware on modules or off-deck labware."
+            )
 
     # TODO(mc, 2021-05-03): document removal of name setter
     @property

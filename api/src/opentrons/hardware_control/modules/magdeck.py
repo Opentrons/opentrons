@@ -20,9 +20,9 @@ MAX_ENGAGE_HEIGHT = {
 }
 
 # Measured in model-specific units (half-mm for GEN1, mm for GEN2).
-# TODO(mc, 2022-06-13): the value for gen1 is off by 1.5 mm
-# The correct value is 8.0 half-mm (4.0 mm)
-# https://github.com/Opentrons/opentrons/issues/9529
+# TODO(mc, 2022-06-13): the value for gen1 is off by ~1.5 mm
+# The correct value is ~8.0 half-mm (4.0 mm)
+# https://opentrons.atlassian.net/browse/RET-1242
 OFFSET_TO_LABWARE_BOTTOM = {"magneticModuleV1": 5, "magneticModuleV2": 2.5}
 
 
@@ -38,7 +38,9 @@ def engage_height_is_in_range(model: str, height: float) -> bool:
 
 
 class MagDeck(mod_abc.AbstractModule):
+    """Hardware control interface for an attached Temperature Module."""
 
+    MODULE_TYPE = types.ModuleType.MAGNETIC
     FIRST_GEN2_REVISION = 20
 
     @classmethod
@@ -112,13 +114,24 @@ class MagDeck(mod_abc.AbstractModule):
         await self._driver.probe_plate()
         # return if successful or not?
 
-    async def engage(self, height: float) -> None:
+    # TODO(mc, 2022-09-23): refactor this method to take real mm,
+    # hardware API should abstract away the idea of "short millimeters"
+    # https://opentrons.atlassian.net/browse/RET-1242
+    async def engage(
+        self,
+        height: Optional[float] = None,
+        height_from_base: Optional[float] = None,
+    ) -> None:
         """Move the magnet to a specific height, measured from home position.
 
         The units of position depend on the module model.
         For GEN1, it's half millimeters ("short millimeters").
         For GEN2, it's millimeters.
         """
+        if height is None:
+            assert height_from_base is not None, "An engage height must be specified"
+            height = height_from_base + OFFSET_TO_LABWARE_BOTTOM[self.model()]
+
         await self.wait_for_is_running()
         if not engage_height_is_in_range(self.model(), height):
             raise ValueError(
@@ -150,11 +163,11 @@ class MagDeck(mod_abc.AbstractModule):
         return self._device_info
 
     @property
-    def status(self) -> str:
+    def status(self) -> types.MagneticStatus:
         if self.current_height > 0:
-            return "engaged"
+            return types.MagneticStatus.ENGAGED
         else:
-            return "disengaged"
+            return types.MagneticStatus.DISENGAGED
 
     @property
     def engaged(self) -> bool:

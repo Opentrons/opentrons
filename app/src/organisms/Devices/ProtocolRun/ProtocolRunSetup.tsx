@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import size from 'lodash/size'
 
 import { parseAllRequiredModuleModels } from '@opentrons/api-client'
 import {
@@ -15,7 +16,7 @@ import { Line } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
 import { InfoMessage } from '../../../molecules/InfoMessage'
 import {
-  useDeckCalibrationData,
+  useIsOT3,
   useProtocolDetailsForRun,
   useRobot,
   useRunCalibrationStatus,
@@ -23,6 +24,7 @@ import {
   useProtocolAnalysisErrors,
   useStoredProtocolAnalysis,
 } from '../hooks'
+
 import { SetupLabware } from './SetupLabware'
 import { SetupRobotCalibration } from './SetupRobotCalibration'
 import { SetupModules } from './SetupModules'
@@ -59,7 +61,7 @@ export function ProtocolRunSetup({
   const modules = parseAllRequiredModuleModels(protocolData?.commands ?? [])
   const robot = useRobot(robotName)
   const calibrationStatus = useRunCalibrationStatus(robotName, runId)
-  const { isDeckCalibrated } = useDeckCalibrationData(robotName)
+  const isOT3 = useIsOT3(robotName)
   const runHasStarted = useRunHasStarted(runId)
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const liquidSetupEnabled = useFeatureFlag('enableLiquidSetup')
@@ -74,11 +76,12 @@ export function ProtocolRunSetup({
   React.useEffect(() => {
     let nextStepKeysInOrder = stepsKeysInOrder
     const showModuleSetup = protocolData != null && modules.length > 0
-    const showLiquidSetup = liquidSetupEnabled
-    // uncomment this once we start getting liquids back from protocol data
-    // &&
-    // protocolData != null &&
-    // protocolHasLiquids(protocolData)
+    const showLiquidSetup =
+      liquidSetupEnabled &&
+      protocolData != null &&
+      'liquids' in protocolData &&
+      size(protocolData.liquids) > 0
+
     if (showModuleSetup && showLiquidSetup) {
       nextStepKeysInOrder = [
         ROBOT_CALIBRATION_STEP_KEY,
@@ -124,7 +127,10 @@ export function ProtocolRunSetup({
           calibrationStatus={calibrationStatus}
         />
       ),
-      description: t(`${ROBOT_CALIBRATION_STEP_KEY}_description`),
+      // change description for OT-3
+      description: isOT3
+        ? t(`${ROBOT_CALIBRATION_STEP_KEY}_description_pipettes_only`)
+        : t(`${ROBOT_CALIBRATION_STEP_KEY}_description`),
     },
     [MODULE_SETUP_KEY]: {
       stepInternals: (
@@ -197,7 +203,7 @@ export function ProtocolRunSetup({
                   }
                   calibrationStatusComplete={
                     stepKey === ROBOT_CALIBRATION_STEP_KEY && !runHasStarted
-                      ? calibrationStatus.complete && isDeckCalibrated
+                      ? calibrationStatus.complete
                       : null
                   }
                 >

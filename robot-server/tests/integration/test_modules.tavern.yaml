@@ -107,6 +107,7 @@ stages:
             data:
               status: !anystr
               lidStatus: !anystr
+              lidTemperatureStatus: !anystr
               lidTargetTemperature: !anyfloat
               lidTemperature: !anyfloat
               currentTemperature: !anyfloat

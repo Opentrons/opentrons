@@ -30,7 +30,10 @@ class SetAndWaitForShakeSpeedResult(BaseModel):
 
     pipetteRetracted: bool = Field(
         ...,
-        description="Whether the pipette was retracted/ homed before starting shake.",
+        description=(
+            "Whether this command automatically retracted the pipettes"
+            " before starting the shake, to avoid a potential collision."
+        ),
     )
 
 

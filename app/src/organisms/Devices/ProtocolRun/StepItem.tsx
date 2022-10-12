@@ -72,7 +72,7 @@ const WRAPPER_STYLE_BY_STATUS: {
   },
   failed: {
     border: `1px solid ${COLORS.errorEnabled}`,
-    backgroundColor: COLORS.errorBackground,
+    backgroundColor: COLORS.errorBackgroundLight,
     color: COLORS.darkBlackEnabled,
   },
 }

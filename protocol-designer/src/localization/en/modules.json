@@ -17,6 +17,7 @@
     "magneticModuleV1": "GEN1",
     "magneticModuleV2": "GEN2",
     "thermocyclerModuleV1": "GEN1",
+    "thermocyclerModuleV2": "GEN2",
     "heaterShakerModuleV1": "GEN1"
   },
   "status": {

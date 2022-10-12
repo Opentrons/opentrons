@@ -120,7 +120,8 @@ This table lists the correspondence between Protocol API versions and robot soft
 +-------------+-----------------------------+
 |     2.13    |          6.1.0              |
 +-------------+-----------------------------+
-
+|     2.14    |        unreleased           |
++-------------+-----------------------------+
 
 Changes in API Versions
 -----------------------
@@ -253,5 +254,16 @@ Version 2.12
 Version 2.13
 ++++++++++++
 
+- Adds :py:class:`.HeaterShakerContext` to support the Heater-Shaker Module. You can use the load name ``heaterShakerModuleV1`` with :py:meth:`.ProtocolContext.load_module` to add a Heater-Shaker to a protocol.
 - :py:meth:`.InstrumentContext.drop_tip` now has a ``prep_after`` parameter.
 - :py:meth:`.InstrumentContext.home` may home *both* pipettes as needed to avoid collision risks.
+- :py:meth:`.InstrumentContext.aspirate` and :py:meth:`.InstrumentContext.dispense` will avoid interacting directly with modules.
+
+
+Version 2.14
+++++++++++++
+
+Upcoming, not yet released.
+
+- :py:meth:`.ModuleContext.load_labware_object` has been deprecated.
+- :py:meth:`.MagneticModuleContext.calibrate` has been deprecated.

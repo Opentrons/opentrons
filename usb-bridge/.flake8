@@ -20,3 +20,7 @@ extend-ignore =
 docstring-convention = google
 
 noqa-require-code = true
+
+# Ignore type annotation and doc string lints in tests
+per-file-ignores =
+    tests/*:ANN,D

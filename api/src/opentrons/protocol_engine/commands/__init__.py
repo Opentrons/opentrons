@@ -18,6 +18,8 @@ from . import magnetic_module
 from . import temperature_module
 from . import thermocycler
 
+from . import calibration
+
 from .command import (
     AbstractCommandImpl,
     BaseCommand,
@@ -120,6 +122,14 @@ from .move_labware import (
     MoveLabwareCreate,
     MoveLabwareResult,
     MoveLabwareCommandType,
+)
+
+from .move_labware_off_deck import (
+    MoveLabwareOffDeck,
+    MoveLabwareOffDeckParams,
+    MoveLabwareOffDeckCreate,
+    MoveLabwareOffDeckResult,
+    MoveLabwareOffDeckCommandType,
 )
 
 from .move_relative import (
@@ -274,6 +284,12 @@ __all__ = [
     "MoveLabwareParams",
     "MoveLabwareResult",
     "MoveLabwareCommandType",
+    # move labware off-deck command models
+    "MoveLabwareOffDeck",
+    "MoveLabwareOffDeckCreate",
+    "MoveLabwareOffDeckParams",
+    "MoveLabwareOffDeckResult",
+    "MoveLabwareOffDeckCommandType",
     # move relative command models
     "MoveRelative",
     "MoveRelativeParams",
@@ -341,9 +357,11 @@ __all__ = [
     "LoadLiquidParams",
     "LoadLiquidResult",
     "LoadLiquidCommandType",
-    # module command bundles
+    # hardware module command bundles
     "heater_shaker",
     "magnetic_module",
     "temperature_module",
     "thermocycler",
+    # calibration command bundle
+    "calibration",
 ]

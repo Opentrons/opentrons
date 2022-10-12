@@ -3,12 +3,12 @@ import asyncio
 import logging
 import re
 from pkg_resources import parse_version
-from typing import Mapping, Optional, cast, TypeVar
+from typing import ClassVar, Mapping, Optional, cast, TypeVar
 from opentrons.config import IS_ROBOT, ROBOT_FIRMWARE_DIR
 from opentrons.hardware_control.util import use_or_initialize_loop
 from opentrons.drivers.rpi_drivers.types import USBPort
 from ..execution_manager import ExecutionManager
-from .types import BundledFirmware, UploadFunction, LiveData
+from .types import BundledFirmware, UploadFunction, LiveData, ModuleType
 
 mod_log = logging.getLogger(__name__)
 
@@ -17,6 +17,8 @@ TaskPayload = TypeVar("TaskPayload")
 
 class AbstractModule(abc.ABC):
     """Defines the common methods of a module."""
+
+    MODULE_TYPE: ClassVar[ModuleType]
 
     @classmethod
     @abc.abstractmethod

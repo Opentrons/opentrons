@@ -29,7 +29,6 @@ import { StyledText } from '../../atoms/text'
 import { useDispatchApiRequest } from '../../redux/robot-api'
 import { fetchLights } from '../../redux/robot-controls'
 import { ChooseProtocolSlideout } from '../ChooseProtocolSlideout'
-import { Portal } from '../../App/portal'
 import { CONNECTABLE, getRobotModelByName } from '../../redux/discovery'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
@@ -155,13 +154,11 @@ export function RobotOverview({
             </Tooltip>
           )}
           {robot.status === CONNECTABLE ? (
-            <Portal level="top">
-              <ChooseProtocolSlideout
-                robot={robot}
-                showSlideout={showChooseProtocolSlideout}
-                onCloseClick={() => setShowChooseProtocolSlideout(false)}
-              />
-            </Portal>
+            <ChooseProtocolSlideout
+              robot={robot}
+              showSlideout={showChooseProtocolSlideout}
+              onCloseClick={() => setShowChooseProtocolSlideout(false)}
+            />
           ) : null}
         </Flex>
       </Box>

@@ -37,9 +37,9 @@ class ThermocyclerError(Exception):
 
 
 class Thermocycler(mod_abc.AbstractModule):
-    """
-    Under development. API subject to change without a version bump
-    """
+    """Hardware control interface for an attached Thermocycler."""
+
+    MODULE_TYPE = types.ModuleType.THERMOCYCLER
 
     @classmethod
     async def build(
@@ -560,6 +560,7 @@ class Thermocycler(mod_abc.AbstractModule):
                 "lid": self.lid_status,
                 "lidTarget": self.lid_target,
                 "lidTemp": self.lid_temp,
+                "lidTempStatus": self.lid_temp_status,
                 "currentTemp": self.temperature,
                 "targetTemp": self.target,
                 "holdTime": self.hold_time,

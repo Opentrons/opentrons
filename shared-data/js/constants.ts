@@ -40,6 +40,7 @@ export const HEATERSHAKER_MODULE_V1: 'heaterShakerModuleV1' =
   'heaterShakerModuleV1'
 
 // pipette display categories
+export const GEN3: 'GEN3' = 'GEN3'
 export const GEN2: 'GEN2' = 'GEN2'
 export const GEN1: 'GEN1' = 'GEN1'
 
@@ -123,11 +124,13 @@ export const MICRO_LITERS = 'µL'
 export const RPM: 'RPM' = 'RPM'
 export const HS_RPM_MIN = 200
 export const HS_RPM_MAX = 3000
-export const HS_TOO_HOT_TEMP = 48.9
+export const TOO_HOT_TEMP = 48.9
 export const MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM = 53
 
 export const OT2_STANDARD_MODEL: 'OT-2 Standard' = 'OT-2 Standard'
 export const OT2_STANDARD_DECKID: 'ot2_standard' = 'ot2_standard'
+export const OT3_STANDARD_MODEL: 'OT-3 Standard' = 'OT-3 Standard'
+export const OT3_STANDARD_DECKID: 'ot3_standard' = 'ot3_standard'
 
 export const SINGLE_CHANNEL: 'Single-Channel' = 'Single-Channel'
 export const EIGHT_CHANNEL: '8-Channel' = '8-Channel'

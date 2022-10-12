@@ -35,16 +35,17 @@ export function ManualIpHostnameList({
           bDiscovered && !aDiscovered ? -1 : 1
         )
         .map(([candidate, discovered], index) => (
-          <ManualIpHostnameItem
-            candidate={candidate}
-            key={index}
-            removeIp={() => dispatch(removeManualIp(candidate))}
-            discovered={discovered}
-            mostRecentAddition={mostRecentAddition}
-            setMostRecentAddition={setMostRecentAddition}
-            setMostRecentDiscovered={setMostRecentDiscovered}
-            isLast={index === candidates.length - 1}
-          />
+          <React.Fragment key={index}>
+            <ManualIpHostnameItem
+              candidate={candidate}
+              removeIp={() => dispatch(removeManualIp(candidate))}
+              discovered={discovered}
+              mostRecentAddition={mostRecentAddition}
+              setMostRecentAddition={setMostRecentAddition}
+              setMostRecentDiscovered={setMostRecentDiscovered}
+              isLast={index === candidates.length - 1}
+            />
+          </React.Fragment>
         ))}
     </>
   )

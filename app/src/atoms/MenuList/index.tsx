@@ -23,7 +23,6 @@ export const MenuList = (props: MenuListProps): JSX.Element | null => {
       top="2.6rem"
       right={`calc(50% + ${SPACING.spacing2})`}
       flexDirection={DIRECTION_COLUMN}
-      whiteSpace="nowrap"
     >
       {props.buttons}
     </Flex>

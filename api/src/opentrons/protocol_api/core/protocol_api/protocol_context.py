@@ -6,8 +6,8 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from opentrons.types import Mount, Location, DeckSlotName
 from opentrons.equipment_broker import EquipmentBroker
-from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
-from opentrons.hardware_control.modules import AbstractModule, ModuleModel
+from opentrons.hardware_control import SyncHardwareAPI
+from opentrons.hardware_control.modules import AbstractModule, ModuleModel, ModuleType
 from opentrons.hardware_control.types import DoorState, PauseType
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
@@ -19,10 +19,10 @@ from opentrons.protocols import labware as labware_definition
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 
+from . import legacy_module_core
 from .instrument_context import InstrumentContextImplementation
 from .labware_offset_provider import AbstractLabwareOffsetProvider
 from .labware import LabwareImplementation
-from .legacy_module_core import LegacyModuleCore
 from .load_info import LoadInfo, InstrumentLoadInfo, LabwareLoadInfo, ModuleLoadInfo
 
 logger = logging.getLogger(__name__)
@@ -30,7 +30,9 @@ logger = logging.getLogger(__name__)
 
 class ProtocolContextImplementation(
     AbstractProtocol[
-        InstrumentContextImplementation, LabwareImplementation, LegacyModuleCore
+        InstrumentContextImplementation,
+        LabwareImplementation,
+        legacy_module_core.LegacyModuleCore,
     ]
 ):
     def __init__(
@@ -139,7 +141,7 @@ class ProtocolContextImplementation(
     def load_labware(
         self,
         load_name: str,
-        location: Union[DeckSlotName, LegacyModuleCore],
+        location: Union[DeckSlotName, legacy_module_core.LegacyModuleCore],
         label: Optional[str],
         namespace: Optional[str],
         version: Optional[int],
@@ -173,7 +175,7 @@ class ProtocolContextImplementation(
             deck_slot=deck_slot,
             requested_module_model=(
                 location.get_requested_model()
-                if isinstance(location, LegacyModuleCore)
+                if isinstance(location, legacy_module_core.LegacyModuleCore)
                 else None
             ),
         )
@@ -189,7 +191,7 @@ class ProtocolContextImplementation(
                 labware_load_name=labware_load_params.load_name,
                 labware_version=labware_load_params.version,
                 deck_slot=deck_slot,
-                on_module=isinstance(location, LegacyModuleCore),
+                on_module=isinstance(location, legacy_module_core.LegacyModuleCore),
                 offset_id=labware_offset.offset_id,
                 labware_display_name=labware_core.get_user_display_name(),
             )
@@ -202,46 +204,46 @@ class ProtocolContextImplementation(
         model: ModuleModel,
         deck_slot: Optional[DeckSlotName],
         configuration: Optional[str],
-    ) -> LegacyModuleCore:
+    ) -> legacy_module_core.LegacyModuleCore:
         """Load a module."""
-        resolved_type = module_geometry.resolve_module_type(model)
+        resolved_type = ModuleType.from_model(model)
         resolved_location = self._deck_layout.resolve_module_location(
             resolved_type, deck_slot
         )
 
-        # Try to find in the hardware instance
-        available_modules, simulating_module = self._sync_hardware.find_modules(
-            model, resolved_type
-        )
+        selected_hardware = None
+        selected_definition = None
 
-        hc_mod_instance = None
-        for mod in available_modules:
-            compatible = module_geometry.models_compatible(
-                module_geometry.module_model_from_string(mod.model()), model
-            )
-            if compatible and mod not in self._loaded_modules:
-                self._loaded_modules.add(mod)
-                hc_mod_instance = SynchronousAdapter(mod)
-                break
+        for module_hardware in self._sync_hardware.attached_modules:
+            if module_hardware not in self._loaded_modules:
+                definition = module_geometry.load_definition(module_hardware.model())
+                compatible = module_geometry.models_compatible(model, definition)
 
-        if simulating_module and not hc_mod_instance:
-            hc_mod_instance = SynchronousAdapter(simulating_module)
+                if compatible:
+                    self._loaded_modules.add(module_hardware)
+                    selected_hardware = module_hardware
+                    selected_definition = definition
+                    break
 
-        if not hc_mod_instance:
+        if selected_hardware is None and self.is_simulating():
+            selected_hardware = self._sync_hardware.create_simulating_module(model)
+            selected_definition = module_geometry.load_definition(model)
+
+        if selected_hardware is None or selected_definition is None:
             raise RuntimeError(f"Could not find specified module: {model.value}")
 
         # Load geometry to match the hardware module that we found connected.
-        geometry = module_geometry.load_module(
-            model=module_geometry.module_model_from_string(hc_mod_instance.model()),
+        geometry = module_geometry.create_geometry(
+            definition=selected_definition,
             parent=self._deck_layout.position_for(resolved_location),
-            api_level=self._api_version,
             configuration=configuration,
         )
 
-        module_core = LegacyModuleCore(
-            sync_module_hardware=hc_mod_instance,
+        module_core = legacy_module_core.create_module_core(
+            module_hardware_api=selected_hardware,
             requested_model=model,
             geometry=geometry,
+            protocol_core=self,
         )
 
         self._deck_layout[resolved_location] = geometry

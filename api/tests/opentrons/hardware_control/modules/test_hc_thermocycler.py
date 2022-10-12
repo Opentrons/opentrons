@@ -25,7 +25,7 @@ async def subject(usb_port: USBPort) -> AsyncGenerator[modules.Thermocycler, Non
     therm = await modules.build(
         port="/dev/ot_module_sim_thermocycler0",
         usb_port=usb_port,
-        which="thermocycler",
+        type=modules.ModuleType.THERMOCYCLER,
         simulating=True,
         loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),

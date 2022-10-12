@@ -238,7 +238,7 @@ def create_home_group(
     return move_group
 
 
-def create_gripper_jaw_move_group(
+def create_gripper_jaw_grip_group(
     duty_cycle: float,
     stop_condition: MoveStopCondition = MoveStopCondition.none,
 ) -> MoveGroup:
@@ -246,6 +246,7 @@ def create_gripper_jaw_move_group(
         duration=np.float64(GRIPPER_JAW_GRIP_TIME),
         duty_cycle=np.float32(duty_cycle),
         stop_condition=stop_condition,
+        move_type=MoveType.grip,
     )
     move_group: MoveGroup = [step]
     return move_group
@@ -257,6 +258,18 @@ def create_gripper_jaw_home_group() -> MoveGroup:
         duty_cycle=np.float32(GRIPPER_JAW_HOME_DC),
         stop_condition=MoveStopCondition.limit_switch,
         move_type=MoveType.home,
+    )
+    move_group: MoveGroup = [step]
+    return move_group
+
+
+def create_gripper_jaw_hold_group(encoder_position_um: int) -> MoveGroup:
+    step = create_gripper_jaw_step(
+        duration=np.float64(GRIPPER_JAW_GRIP_TIME),
+        duty_cycle=np.float32(0),
+        encoder_position_um=np.int32(encoder_position_um),
+        stop_condition=MoveStopCondition.encoder_position,
+        move_type=MoveType.linear,
     )
     move_group: MoveGroup = [step]
     return move_group

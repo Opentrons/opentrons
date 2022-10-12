@@ -318,7 +318,7 @@ async def test_load_labware_on_module(
     )
 
 
-def test_move_labware_to_deck(
+def test_move_labware_to_deck_slot(
     decoy: Decoy,
     state_store: StateStore,
     subject: EquipmentHandler,

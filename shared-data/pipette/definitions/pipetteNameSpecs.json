@@ -458,7 +458,7 @@
   },
   "p50_single_gen3": {
     "displayName": "P50 Single-Channel GEN3",
-    "displayCategory": "GEN2",
+    "displayCategory": "GEN3",
     "defaultAspirateFlowRate": {
       "value": 7.85,
       "min": 3,
@@ -498,7 +498,7 @@
   },
   "p1000_single_gen3": {
     "displayName": "P1000 Single-Channel GEN3",
-    "displayCategory": "GEN2",
+    "displayCategory": "GEN3",
     "defaultAspirateFlowRate": {
       "value": 137.35,
       "min": 3,
@@ -542,7 +542,7 @@
   },
   "p1000_multi_gen3": {
     "displayName": "P1000 8-Channel GEN3",
-    "displayCategory": "GEN2",
+    "displayCategory": "GEN3",
     "defaultAspirateFlowRate": {
       "value": 137.35,
       "min": 3,
@@ -584,7 +584,7 @@
   },
   "p50_multi_gen3": {
     "displayName": "P50 8-Channel GEN3",
-    "displayCategory": "GEN2",
+    "displayCategory": "GEN3",
     "defaultAspirateFlowRate": {
       "value": 7.85,
       "min": 3,

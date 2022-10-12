@@ -74,10 +74,9 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
         )
   }
 
-  const [confirmLink, confirmModal] = useConfirmCrashRecovery({
-    requiresNewTip: true,
-    ...props,
-  })
+  const [confirmLink, crashRecoveryConfirmation] = useConfirmCrashRecovery(
+    props
+  )
 
   let title = t('calibrate_z_axis_on_slot')
   let bodyTranlsationKey = 'jog_pipette_to_touch_slot'
@@ -91,66 +90,67 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
   }
 
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={SPACING.spacing6}
-      minHeight="32rem"
-    >
+    crashRecoveryConfirmation ?? (
       <Flex
+        flexDirection={DIRECTION_COLUMN}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        alignSelf={ALIGN_STRETCH}
-        gridGap={SPACING.spacing3}
+        padding={SPACING.spacing6}
+        minHeight="32rem"
       >
-        <Flex flexDirection={DIRECTION_COLUMN} flex="1">
-          <StyledText as="h1" marginBottom={SPACING.spacing4}>
-            {title}
-          </StyledText>
-          <Trans
-            t={t}
-            i18nKey={bodyTranlsationKey}
-            components={{
-              block: <StyledText as="p" marginBottom={SPACING.spacing3} />,
-            }}
-          />
+        <Flex
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          alignSelf={ALIGN_STRETCH}
+          gridGap={SPACING.spacing3}
+        >
+          <Flex flexDirection={DIRECTION_COLUMN} flex="1">
+            <StyledText as="h1" marginBottom={SPACING.spacing4}>
+              {title}
+            </StyledText>
+            <Trans
+              t={t}
+              i18nKey={bodyTranlsationKey}
+              components={{
+                block: <StyledText as="p" marginBottom={SPACING.spacing3} />,
+              }}
+            />
+          </Flex>
+          <Box flex="1">
+            <video
+              key={demoAsset}
+              css={css`
+                max-width: 100%;
+                max-height: 15rem;
+              `}
+              autoPlay={true}
+              loop={true}
+              controls={false}
+              aria-label={`${mount} ${
+                isMulti ? 'multi' : 'single'
+              } channel pipette moving to slot 5`}
+            >
+              <source src={demoAsset} />
+            </video>
+          </Box>
         </Flex>
-        <Box flex="1">
-          <video
-            key={demoAsset}
-            css={css`
-              max-width: 100%;
-              max-height: 15rem;
-            `}
-            autoPlay={true}
-            loop={true}
-            controls={false}
-            aria-label={`${mount} ${
-              isMulti ? 'multi' : 'single'
-            } channel pipette moving to slot 5`}
-          >
-            <source src={demoAsset} />
-          </video>
+        <JogControls
+          jog={jog}
+          stepSizes={[SMALL_STEP_SIZE_MM, MEDIUM_STEP_SIZE_MM]}
+          initialPlane={VERTICAL_PLANE}
+        />
+        <Box alignSelf={ALIGN_FLEX_END} marginTop={SPACING.spacing2}>
+          {confirmLink}
         </Box>
+        <Flex
+          width="100%"
+          marginTop={SPACING.spacing4}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+        >
+          <NeedHelpLink />
+          <PrimaryButton onClick={proceed}>
+            {t('confirm_placement')}
+          </PrimaryButton>
+        </Flex>
       </Flex>
-      <JogControls
-        jog={jog}
-        stepSizes={[SMALL_STEP_SIZE_MM, MEDIUM_STEP_SIZE_MM]}
-        initialPlane={VERTICAL_PLANE}
-      />
-      <Box alignSelf={ALIGN_FLEX_END} marginTop={SPACING.spacing2}>
-        {confirmLink}
-      </Box>
-      <Flex
-        width="100%"
-        marginTop={SPACING.spacing4}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-      >
-        <NeedHelpLink />
-        <PrimaryButton onClick={proceed}>
-          {t('confirm_placement')}
-        </PrimaryButton>
-      </Flex>
-      {confirmModal}
-    </Flex>
+    )
   )
 }

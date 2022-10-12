@@ -30,7 +30,8 @@ const getAvailableShellUpdate = Shell.getAvailableShellUpdate as jest.MockedFunc
 
 describe('VersionInfoModal', () => {
   const handleClose = jest.fn()
-  const handleProceed = jest.fn()
+  const mockGoToViewUpdate = jest.fn()
+  const mockInstallUpdate = jest.fn()
 
   const render = (
     robotUpdateType: React.ComponentProps<
@@ -46,7 +47,8 @@ describe('VersionInfoModal', () => {
         robot={mockReachableRobot}
         robotUpdateType={robotUpdateType}
         close={handleClose}
-        proceed={handleProceed}
+        goToViewUpdate={mockGoToViewUpdate}
+        installUpdate={mockInstallUpdate}
       />,
       { initialState: MOCK_STATE }
     )
@@ -88,9 +90,9 @@ describe('VersionInfoModal', () => {
     expect(handleClose).not.toHaveBeenCalled()
     closeButton.invoke('onClick')?.({} as React.MouseEvent)
     expect(handleClose).toHaveBeenCalled()
-    expect(handleProceed).not.toHaveBeenCalled()
+    expect(mockInstallUpdate).not.toHaveBeenCalled()
     primaryButton.invoke('onClick')?.({} as React.MouseEvent)
-    expect(handleProceed).toHaveBeenCalled()
+    expect(mockGoToViewUpdate).toHaveBeenCalled()
   })
 
   it('should render an AlertModal with the proper children for a downgrade', () => {
@@ -118,9 +120,9 @@ describe('VersionInfoModal', () => {
     expect(handleClose).not.toHaveBeenCalled()
     closeButton.invoke('onClick')?.({} as React.MouseEvent)
     expect(handleClose).toHaveBeenCalled()
-    expect(handleProceed).not.toHaveBeenCalled()
+    expect(mockGoToViewUpdate).not.toHaveBeenCalled()
     primaryButton.invoke('onClick')?.({} as React.MouseEvent)
-    expect(handleProceed).toHaveBeenCalled()
+    expect(mockGoToViewUpdate).toHaveBeenCalled()
   })
 
   it('should render an AlertModal with the proper children for a reinstall', () => {
@@ -145,9 +147,9 @@ describe('VersionInfoModal', () => {
     expect(handleClose).not.toHaveBeenCalled()
     closeButton.invoke('onClick')?.({} as React.MouseEvent)
     expect(handleClose).toHaveBeenCalled()
-    expect(handleProceed).not.toHaveBeenCalled()
+    expect(mockInstallUpdate).not.toHaveBeenCalled()
     primaryButton.invoke('onClick')?.({} as React.MouseEvent)
-    expect(handleProceed).toHaveBeenCalled()
+    expect(mockInstallUpdate).toHaveBeenCalled()
   })
 
   describe('with an app update available', () => {
@@ -186,9 +188,9 @@ describe('VersionInfoModal', () => {
       const { wrapper } = render()
       const skipAppUpdate = wrapper.find(SkipAppUpdateMessage)
 
-      expect(handleProceed).not.toHaveBeenCalled()
+      expect(mockInstallUpdate).not.toHaveBeenCalled()
       skipAppUpdate.invoke('onClick')?.({} as React.MouseEvent)
-      expect(handleProceed).toHaveBeenCalled()
+      expect(mockInstallUpdate).toHaveBeenCalled()
     })
 
     it('should call props.close when the UpdateAppModal is closed', () => {

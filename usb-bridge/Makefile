@@ -18,7 +18,7 @@ PATH := $(shell cd .. && yarn bin):$(PATH)
 # specified test
 tests ?= tests
 test_opts ?=
-sdist_file = $(call python_get_sdistname,ot3usb)
+sdist_file = $(call python_get_sdistname,usb-bridge,ot3usb)
 # Host key location for buildroot robot
 br_ssh_key ?= $(default_ssh_key)
 # Other SSH args for buildroot robots
