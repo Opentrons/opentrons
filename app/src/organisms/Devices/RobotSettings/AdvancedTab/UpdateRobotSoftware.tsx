@@ -64,20 +64,18 @@ export function UpdateRobotSoftware({
   }
 
   return (
-    <Flex
-      alignItems={ALIGN_CENTER}
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      marginBottom={SPACING.spacing4}
-    >
+    <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
         <StyledText
           css={TYPOGRAPHY.pSemiBold}
-          marginBottom={SPACING.spacing2}
+          marginBottom={SPACING.spacing3}
           id="AdvancedSettings_updateRobotSoftware"
         >
           {t('update_robot_software')}
         </StyledText>
-        <StyledText as="p">{t('update_robot_software_description')}</StyledText>
+        <StyledText as="p" marginBottom={SPACING.spacing3}>
+          {t('update_robot_software_description')}
+        </StyledText>
         <ExternalLink href={OT_APP_UPDATE_PAGE_LINK}>
           {t('update_robot_software_link')}
         </ExternalLink>

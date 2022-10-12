@@ -42,7 +42,10 @@ import { LabwareInfoOverlay } from './LabwareInfoOverlay'
 import { LabwareOffsetModal } from '../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/LabwareOffsetModal'
 import { getModuleTypesThatRequireExtraAttention } from '../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
 import { DownloadOffsetDataModal } from '../../../organisms/ProtocolUpload/DownloadOffsetDataModal'
-import { getIsLabwareOffsetCodeSnippetsOn } from '../../../redux/config'
+import {
+  getIsLabwareOffsetCodeSnippetsOn,
+  useFeatureFlag,
+} from '../../../redux/config'
 import { ReapplyOffsetsModal } from '../../ReapplyOffsetsModal'
 import { useCurrentRun } from '../../ProtocolUpload/hooks'
 import {
@@ -142,6 +145,14 @@ export function SetupLabware({
   )
   const { setIsShowingLPCSuccessToast } = useLPCSuccessToast()
 
+  /**
+   * This component's usage of the reapply offsets modal can be removed
+   * along with the enableManualDeckStateMod feature flag.
+   */
+  const enableManualDeckStateMod = useFeatureFlag(
+    'enableManualDeckStateModification'
+  )
+
   const tipRackLoadedInProtocol: boolean = some(
     protocolData?.labwareDefinitions,
     def => def.parameters?.isTiprack
@@ -178,6 +189,7 @@ export function SetupLabware({
   }
 
   const showReapplyOffsetsModal =
+    !enableManualDeckStateMod &&
     currentRun?.data.id === runId &&
     (currentRun?.data?.labwareOffsets == null ||
       currentRun?.data?.labwareOffsets.length === 0)
