@@ -48,18 +48,22 @@ function _getNextRobotStateAndWarningsSingleCommand(
   assert(command, 'undefined command passed to getNextRobotStateAndWarning')
   switch (command.commandType) {
     case 'aspirate':
-      if (command.meta?.isAirGap === true) {
-        return
-      } else {
-        forAspirate(command.params, invariantContext, robotStateAndWarnings)
+      switch (command.meta) {
+        case undefined:
+          forAspirate(command.params, invariantContext, robotStateAndWarnings)
+          break
+        case 'isAirGap':
+          break
       }
       break
 
     case 'dispense':
-      if (command.meta?.isAirGap === true) {
-        return
-      } else {
-        forDispense(command.params, invariantContext, robotStateAndWarnings)
+      switch (command.meta) {
+        case undefined:
+          forDispense(command.params, invariantContext, robotStateAndWarnings)
+          break
+        case 'isAirGap':
+          break
       }
       break
 
