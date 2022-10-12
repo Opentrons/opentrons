@@ -521,6 +521,27 @@ export function AdvancedSettings(): JSX.Element {
             <StyledText
               css={TYPOGRAPHY.h3SemiBold}
               paddingBottom={SPACING.spacing3}
+              id="AdvancedSettings_showHeaterShakerAttachmentModal"
+            >
+              {t('heater_shaker_attach_visible')}
+            </StyledText>
+            <StyledText as="p">
+              {t('heater_shaker_attach_description')}
+            </StyledText>
+          </Box>
+          <ToggleButton
+            label="show_heater_shaker_modal"
+            toggledOn={!isHeaterShakerAttachmentModalVisible}
+            onClick={toggleHeaterShakerModalVisibilty}
+            id="AdvancedSettings_showHeaterShakerAttachmentBtn"
+          />
+        </Flex>
+        <Divider marginY={SPACING.spacing5} />
+        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+          <Box width="70%">
+            <StyledText
+              css={TYPOGRAPHY.h3SemiBold}
+              paddingBottom={SPACING.spacing3}
               id="AdvancedSettings_showLink"
             >
               {t('show_link_labware_data')}
@@ -565,27 +586,6 @@ export function AdvancedSettings(): JSX.Element {
             <Divider marginY={SPACING.spacing5} />
           </>
         ) : null}
-        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Box width="70%">
-            <StyledText
-              css={TYPOGRAPHY.h3SemiBold}
-              paddingBottom={SPACING.spacing3}
-              id="AdvancedSettings_showHeaterShakerAttachmentModal"
-            >
-              {t('heater_shaker_attach_visible')}
-            </StyledText>
-            <StyledText as="p">
-              {t('heater_shaker_attach_description')}
-            </StyledText>
-          </Box>
-          <ToggleButton
-            label="show_heater_shaker_modal"
-            toggledOn={!isHeaterShakerAttachmentModalVisible}
-            onClick={toggleHeaterShakerModalVisibilty}
-            id="AdvancedSettings_showHeaterShakerAttachmentBtn"
-          />
-        </Flex>
-        <Divider marginY={SPACING.spacing5} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box width="70%">
             <StyledText

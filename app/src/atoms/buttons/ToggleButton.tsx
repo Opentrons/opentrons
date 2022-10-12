@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 
-import { Btn, Icon, COLORS, SIZE_2 } from '@opentrons/components'
+import { Btn, Icon, COLORS, SIZE_1, SIZE_2 } from '@opentrons/components'
 
 import type { StyleProps } from '@opentrons/components'
 
@@ -60,7 +60,7 @@ export const ToggleButton = (props: ToggleButtonProps): JSX.Element => {
       {...buttonProps}
     >
       {/* TODO(bh, 2022-10-05): implement small and large sizes from design system */}
-      <Icon name={iconName} height="1rem" />
+      <Icon name={iconName} height={SIZE_1} />
     </Btn>
   )
 }
