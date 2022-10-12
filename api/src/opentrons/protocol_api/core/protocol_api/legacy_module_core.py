@@ -34,9 +34,7 @@ from ..module import (
     AbstractHeaterShakerCore,
 )
 
-# TODO I hate this
 from .labware import LabwareImplementation
-from ..labware import AbstractLabware
 from ...labware import Labware
 
 if TYPE_CHECKING:
@@ -363,7 +361,7 @@ class LegacyThermocyclerCore(
     def _get_fixed_trash(self) -> Labware:
         trash = self._protocol_core.get_fixed_trash()
 
-        if isinstance(trash, AbstractLabware):
+        if isinstance(trash, LabwareImplementation):
             trash = Labware(implementation=trash)
 
         return cast(Labware, trash)
