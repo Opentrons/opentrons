@@ -119,7 +119,7 @@ async def enable_ot3_hardware_controller(
 
 @pytest.fixture
 async def enable_load_liquid() -> AsyncGenerator[None, None]:
-    """Fixture enabling load-liquid PAPI support."""
+    """Fixture enabling load-liquid support."""
     await config.advanced_settings.set_adv_setting("enableLoadLiquid", True)
     yield
     await config.advanced_settings.set_adv_setting("enableLoadLiquid", False)
