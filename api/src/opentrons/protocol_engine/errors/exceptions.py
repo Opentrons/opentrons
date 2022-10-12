@@ -47,6 +47,10 @@ class LabwareNotLoadedError(ProtocolEngineError):
     """An error raised when referencing a labware that has not been loaded."""
 
 
+class LabwareNotOnDeckError(ProtocolEngineError):
+    """An error raised when a labware can't be used because it's off-deck."""
+
+
 class LiquidDoesNotExistError(ProtocolEngineError):
     """An error raised when referencing a liquid that has not been loaded."""
 

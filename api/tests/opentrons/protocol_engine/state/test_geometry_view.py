@@ -19,6 +19,7 @@ from opentrons.protocol_engine.types import (
     WellLocation,
     WellOrigin,
     WellOffset,
+    OFF_DECK_LOCATION,
 )
 from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.modules import ModuleView
@@ -66,6 +67,26 @@ def test_get_labware_parent_position(
     result = subject.get_labware_parent_position("labware-id")
 
     assert result == Point(1, 2, 3)
+
+
+def test_raise_error_for_off_deck_labware_parent(
+    decoy: Decoy,
+    standard_deck_def: DeckDefinitionV3,
+    well_plate_def: LabwareDefinition,
+    labware_view: LabwareView,
+    subject: GeometryView,
+) -> None:
+    """Test raise error when fetching parent for labware that's off-deck."""
+    labware_data = LoadedLabware(
+        id="labware-id",
+        loadName="b",
+        definitionUri=uri_from_details(namespace="a", load_name="b", version=1),
+        location=OFF_DECK_LOCATION,
+        offsetId=None,
+    )
+    decoy.when(labware_view.get("labware-id")).then_return(labware_data)
+    with pytest.raises(errors.LabwareNotOnDeckError):
+        subject.get_labware_parent_position("labware-id")
 
 
 def test_get_labware_parent_position_on_module(
