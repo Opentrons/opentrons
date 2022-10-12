@@ -3,7 +3,7 @@ import argparse
 import ast
 import asyncio
 import csv
-from typing import Tuple, Dict
+from typing import Tuple, Dict, Optional
 from threading import Thread
 
 from opentrons.hardware_control.motion_utilities import target_position_from_plunger
