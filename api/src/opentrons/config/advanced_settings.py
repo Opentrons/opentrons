@@ -515,7 +515,7 @@ _MIGRATIONS = [
     _migrate14to15,
     _migrate15to16,
     _migrate16to17,
-    _migrate17to18
+    _migrate17to18,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

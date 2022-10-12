@@ -161,7 +161,11 @@ class ProtocolRunner:
             for liquid in liquids:
                 self._protocol_engine.add_liquid(liquid=liquid)
         for command in commands:
-            self._protocol_engine.add_command(request=command)
+            if feature_flags.enable_load_liquid() or (
+                not feature_flags.enable_load_liquid()
+                and command.commandType != "loadLiquid"
+            ):
+                self._protocol_engine.add_command(request=command)
         self._task_queue.set_run_func(func=self._protocol_engine.wait_until_complete)
 
     def _load_python(self, protocol_source: ProtocolSource) -> None:
