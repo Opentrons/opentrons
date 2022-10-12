@@ -152,7 +152,6 @@ export const dispense: CommandCreator<DispenseParams> = (
   const commands: CreateCommand[] = [
     {
       commandType: 'dispense',
-      meta: isAirGap,
       key: uuid(),
       params: {
         pipetteId: pipette,
@@ -167,6 +166,7 @@ export const dispense: CommandCreator<DispenseParams> = (
         },
         flowRate,
       },
+      ...(isAirGap && { meta: { isAirGap } }),
     },
   ]
   return {

@@ -175,7 +175,6 @@ export const aspirate: CommandCreator<AspirateParams> = (
   const commands: CreateCommand[] = [
     {
       commandType: 'aspirate',
-      meta: isAirGap,
       key: uuid(),
       params: {
         pipetteId: pipette,
@@ -190,6 +189,7 @@ export const aspirate: CommandCreator<AspirateParams> = (
         },
         flowRate,
       },
+      ...(isAirGap && { meta: { isAirGap } }),
     },
   ]
   return {
