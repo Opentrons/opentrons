@@ -251,7 +251,6 @@ export function ChooseRobotSlideoutComponent(
                 <AvailableRobotOption
                   key={robot.ip}
                   robotName={robot.name}
-                  robotModel="OT-2"
                   local={robot.local}
                   onClick={() => {
                     if (!isCreatingRun) {
