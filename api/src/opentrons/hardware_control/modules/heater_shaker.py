@@ -279,7 +279,7 @@ class HeaterShaker(mod_abc.AbstractModule):
     async def await_temperature(self, awaiting_temperature: float) -> None:
         """Await temperature in degreess Celsius.
 
-        Polls the Temperature Module's current temperature until
+        Polls the Heater-Shaker's current temperature until
         the specified temperature is reached. If `awaiting_temperature`
         is different than the current target temperature,
         the resulting behavior may be unpredictable.
