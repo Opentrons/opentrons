@@ -39,9 +39,15 @@
     "heatershaker": [],
     "tempdeck": [
       {
-        "function_name": "set_temperature",
+        "function_name": "start_set_temperature",
         "kwargs": {
           "celsius": 3
+        }
+      },
+      {
+        "function_name": "await_temperature",
+        "kwargs": {
+          "awaiting_temperature": null
         }
       }
     ],

@@ -36,6 +36,9 @@ describe('write failed analysis', () => {
           config: {},
           metadata: [],
           commands: [],
+          labware: [],
+          modules: [],
+          pipettes: [],
           liquids: [],
         })
       })
