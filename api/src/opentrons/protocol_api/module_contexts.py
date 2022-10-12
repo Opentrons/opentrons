@@ -502,13 +502,16 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
             specified, the Thermocycler will proceed to the next command
             after ``temperature`` is reached.
         """
-        self._core.set_block_temperature(
+        if hold_time_minutes is not None:
+            if hold_time_seconds is None:
+                hold_time_seconds = 0
+            hold_time_seconds += hold_time_minutes * 60
+        self._core.set_target_block_temperature(
             celsius=temperature,
             hold_time_seconds=hold_time_seconds,
-            hold_time_minutes=hold_time_minutes,
-            ramp_rate=ramp_rate,
             block_max_volume=block_max_volume,
         )
+        self._core.wait_for_block_temperature()
 
     @publish(command=cmds.thermocycler_set_lid_temperature)
     @requires_version(2, 0)
@@ -524,7 +527,8 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
             ``temperature`` has been reached.
 
         """
-        self._core.set_lid_temperature(celsius=42.0)
+        self._core.set_target_lid_temperature(celsius=42.0)
+        self._core.wait_for_lid_temperature()
 
     @publish(command=cmds.thermocycler_execute_profile)
     @requires_version(2, 0)

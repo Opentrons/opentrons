@@ -146,12 +146,10 @@ class AbstractThermocyclerCore(AbstractModuleCore[LabwareCoreType]):
         """Close the thermocycler's lid."""
 
     @abstractmethod
-    def set_block_temperature(
+    def set_target_block_temperature(
         self,
         celsius: float,
         hold_time_seconds: Optional[float] = None,
-        hold_time_minutes: Optional[float] = None,
-        ramp_rate: Optional[float] = None,
         block_max_volume: Optional[float] = None,
     ) -> None:
         """Set the target temperature for the well block, in °C.
@@ -159,36 +157,35 @@ class AbstractThermocyclerCore(AbstractModuleCore[LabwareCoreType]):
         Valid operational range yet to be determined.
 
         :param celsius: The target temperature, in °C.
-        :param hold_time_minutes: The number of minutes to hold, after reaching
-                                  ``temperature``, before proceeding to the
-                                  next command.
         :param hold_time_seconds: The number of seconds to hold, after reaching
                                   ``temperature``, before proceeding to the
-                                  next command. If ``hold_time_minutes`` and
-                                  ``hold_time_seconds`` are not specified,
-                                  the Thermocycler will proceed to the next
+                                  next command. If `not specified, the
+                                  Thermocycler will proceed to the next
                                   command after ``temperature`` is reached.
-        :param ramp_rate: The target rate of temperature change, in °C/sec.
-                          If ``ramp_rate`` is not specified, it will default
-                          to the maximum ramp rate as defined in the device
-                          configuration.
         :param block_max_volume: The maximum volume of any individual well
                                  of the loaded labware. If not supplied,
                                  the thermocycler will default to 25µL/well.
 
         .. note:
 
-            If ``hold_time_minutes`` and ``hold_time_seconds`` are not
-            specified, the Thermocycler will proceed to the next command
-            after ``temperature`` is reached.
+            If ``hold_time_seconds`` is not specified, the Thermocycler
+            will proceed to the next command after ``temperature`` is reached.
         """
 
     @abstractmethod
-    def set_lid_temperature(self, celsius: float) -> None:
+    def wait_for_block_temperature(self) -> None:
+        """Wait for target block temperature to be reached."""
+
+    @abstractmethod
+    def set_target_lid_temperature(self, celsius: float) -> None:
         """Set the target temperature for the heated lid, in °C."""
 
     @abstractmethod
-    def execute_profile(  # TODO name it this or cycle_temperatures?
+    def wait_for_lid_temperature(self) -> None:
+        """Wait for target lid temperature to be reached."""
+
+    @abstractmethod
+    def execute_profile(
         self,
         steps: List[ThermocyclerStep],
         repetitions: int,
@@ -224,20 +221,20 @@ class AbstractThermocyclerCore(AbstractModuleCore[LabwareCoreType]):
         """Turn off the well block temperature controller"""
 
     @abstractmethod
-    def deactivate(self) -> None:  # TODO do we need this in addition to the above two?
+    def deactivate(self) -> None:
         """Turn off the well block temperature controller, and heated lid"""
 
     @abstractmethod
     def get_lid_position(self) -> Optional[ThermocyclerLidStatus]:
-        """Get the thermoycler's lid position."""
+        """Get the thermocycler's lid position."""
 
     @abstractmethod
     def get_block_temperature_status(self) -> TemperatureStatus:
-        """Get the thermoycler's block temperature status."""
+        """Get the thermocycler's block temperature status."""
 
     @abstractmethod
     def get_lid_temperature_status(self) -> Optional[TemperatureStatus]:
-        """Get the thermoycler's lid temperature status."""
+        """Get the thermocycler's lid temperature status."""
 
     @abstractmethod
     def get_block_temperature(self) -> Optional[float]:

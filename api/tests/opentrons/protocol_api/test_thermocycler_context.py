@@ -258,13 +258,12 @@ def test_set_block_temperature(
                 }
             ),
         ),
-        mock_core.set_block_temperature(
+        mock_core.set_target_block_temperature(
             celsius=42.0,
-            hold_time_seconds=1.2,
-            hold_time_minutes=3.4,
-            ramp_rate=5.6,
+            hold_time_seconds=205.2,
             block_max_volume=7.8,
         ),
+        mock_core.wait_for_block_temperature(),
         mock_broker.publish(
             "command",
             matchers.DictMatching(
@@ -298,7 +297,8 @@ def test_set_lid_temperature(
                 }
             ),
         ),
-        mock_core.set_lid_temperature(celsius=42.0),
+        mock_core.set_target_lid_temperature(celsius=42.0),
+        mock_core.wait_for_lid_temperature(),
         mock_broker.publish(
             "command",
             matchers.DictMatching({"$": "after"}),

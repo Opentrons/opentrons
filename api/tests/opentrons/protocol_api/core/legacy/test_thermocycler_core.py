@@ -335,30 +335,37 @@ def test_close_lid(
     assert result == "close"
 
 
-def test_set_block_temperature(
+def test_set_target_block_temperature(
     decoy: Decoy,
     mock_sync_module_hardware: SyncThermocyclerHardware,
     subject: LegacyThermocyclerCore,
 ) -> None:
     """It should set the block temperature with the hardware."""
-    subject.set_block_temperature(
+    subject.set_target_block_temperature(
         celsius=42.0,
         hold_time_seconds=1.2,
-        hold_time_minutes=3.4,
-        ramp_rate=5.6,
         block_max_volume=7.8,
     )
 
     decoy.verify(
-        mock_sync_module_hardware.set_temperature(
+        mock_sync_module_hardware.set_target_block_temperature(
             temperature=42.0,
             hold_time_seconds=1.2,
-            hold_time_minutes=3.4,
-            ramp_rate=5.6,
             volume=7.8,
         ),
         times=1,
     )
+
+
+def test_wait_for_block_temperature(
+    decoy: Decoy,
+    mock_sync_module_hardware: SyncThermocyclerHardware,
+    subject: LegacyThermocyclerCore,
+) -> None:
+    """It should wait for the block temperature with the hardware."""
+    subject.wait_for_block_temperature()
+
+    decoy.verify(mock_sync_module_hardware.wait_for_block_target(), times=1)
 
 
 def test_set_lid_temperature(
@@ -367,9 +374,20 @@ def test_set_lid_temperature(
     subject: LegacyThermocyclerCore,
 ) -> None:
     """It should set the lid temperature with the hardware."""
-    subject.set_lid_temperature(celsius=42.0)
+    subject.set_target_lid_temperature(celsius=42.0)
 
-    decoy.verify(mock_sync_module_hardware.set_lid_temperature(temperature=42.0))
+    decoy.verify(mock_sync_module_hardware.set_target_lid_temperature(temperature=42.0))
+
+
+def test_wait_for_lid_temperature(
+    decoy: Decoy,
+    mock_sync_module_hardware: SyncThermocyclerHardware,
+    subject: LegacyThermocyclerCore,
+) -> None:
+    """It should wait for the lid temperature with the hardware."""
+    subject.wait_for_lid_temperature()
+
+    decoy.verify(mock_sync_module_hardware.wait_for_lid_target(), times=1)
 
 
 @pytest.mark.parametrize(
