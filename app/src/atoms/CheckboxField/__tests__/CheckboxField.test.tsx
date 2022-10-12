@@ -117,19 +117,6 @@ describe('CheckboxField', () => {
     expect(checkBoxIcon).toHaveStyle(`align-items: ${ALIGN_CENTER}`)
   })
 
-  it('render icon with correct style - isIndeterminate true', () => {
-    props.isIndeterminate = true
-    const { getByTestId } = render(props)
-    const checkBoxIcon = getByTestId('CheckboxField_icon_minus-box')
-    expect(checkBoxIcon).toHaveStyle(`width: ${SPACING.spacingM}`)
-    expect(checkBoxIcon).toHaveStyle(`min-width: ${SPACING.spacingM}`)
-    expect(checkBoxIcon).toHaveStyle(`color: ${COLORS.blueEnabled}`)
-    expect(checkBoxIcon).toHaveStyle(`display: flex`)
-    expect(checkBoxIcon).toHaveStyle(`border-radius: ${SPACING.spacingXXS}`)
-    expect(checkBoxIcon).toHaveStyle(`justify-content: ${JUSTIFY_CENTER}`)
-    expect(checkBoxIcon).toHaveStyle(`align-items: ${ALIGN_CENTER}`)
-  })
-
   it('renders label with correct style - value undefine', () => {
     props.value = undefined
     const { getByTestId } = render(props)
