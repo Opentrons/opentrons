@@ -155,6 +155,7 @@ jobs:
             make -C app-shell dist-${{ matrix.os }}
           else
             CPPFLAGS="-std=c++17" make -C app-shell dist-${{ matrix.os }}
+          fi
 
       - if: github.event_name != 'pull_request'
         name: 'upload github artifact'
