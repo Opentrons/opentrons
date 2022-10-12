@@ -1,5 +1,7 @@
 from dataclasses import dataclass, field
 from pathlib import Path
+from shutil import copytree
+from tempfile import TemporaryDirectory
 from typing import List
 
 import pytest
@@ -11,7 +13,7 @@ from .persistence_snapshots_dir import PERSISTENCE_SNAPSHOTS_DIR
 
 @dataclass
 class Snapshot:
-    """Model to describe a database snapshot."""
+    """Model to describe a snapshot of a persistence directory."""
 
     version: str
     expected_protocol_count: int
@@ -19,10 +21,17 @@ class Snapshot:
     protocols_with_no_analyses: List[str] = field(default_factory=list)
     runs_with_no_commands: List[str] = field(default_factory=list)
 
-    @property
-    def db_path(self) -> Path:
-        """Path of the DB."""
-        return Path(PERSISTENCE_SNAPSHOTS_DIR, self.version)
+    def get_copy(self) -> Path:
+        """Return a path to an isolated copy of this snapshot.
+
+        The server might rewrite data as part of automatic schema migration.
+        We return a copy to avoid accidentally modifying the files checked into Git,
+        and to avoid leakage between test sessions.
+        """
+        snapshot_source_dir = PERSISTENCE_SNAPSHOTS_DIR / self.version
+        snapshot_copy_dir = Path(TemporaryDirectory().name) / self.version
+        copytree(src=snapshot_source_dir, dst=snapshot_copy_dir)
+        return snapshot_copy_dir
 
 
 snapshots: List[(Snapshot)] = [
@@ -63,7 +72,7 @@ async def test_protocols_analyses_and_runs_available_from_older_persistence_dir(
         assert (
             await robot_client.wait_until_dead()
         ), "Dev Robot is running and must not be."
-        with DevServer(port=port, persistence_directory=snapshot.db_path) as server:
+        with DevServer(port=port, persistence_directory=snapshot.get_copy()) as server:
             server.start()
             assert (
                 await robot_client.wait_until_alive()
