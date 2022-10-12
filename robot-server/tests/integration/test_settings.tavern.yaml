@@ -60,6 +60,12 @@ stages:
             description: !re_search 'Opentrons-internal setting to test new execution logic'
             restart_required: false
             value: !anything
+          - id: enableLoadLiquid
+            old_id: Null
+            title: Enable protocol engine load liquid command
+            description: !re_search 'This is an Opentrons-internal setting to allow load liquid command.'
+            restart_required: false
+            value: !anything
         links: !anydict
 
 ---
