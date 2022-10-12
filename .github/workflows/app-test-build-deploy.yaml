@@ -78,7 +78,7 @@ jobs:
         run: |
           npm config set cache ${{ github.workspace }}/.npm-cache
           yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
-          CPPFLAGS="-std=c++17" make setup-js
+          make setup-js
       - name: 'test frontend packages'
         run: |
           yarn jest --coverage=true --ci=true --collectCoverageFrom="app/src/**/*.(js|ts|tsx)" app/src components/src shared-data/js
