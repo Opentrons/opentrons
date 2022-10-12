@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import {
@@ -88,6 +89,10 @@ const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
 
+const mockUseFeatureFlag = Config.useFeatureFlag as jest.MockedFunction<
+  typeof Config.useFeatureFlag
+>
+
 let mockTrackEvent: jest.Mock
 const mockConfirm = jest.fn()
 const mockCancel = jest.fn()
@@ -114,9 +119,13 @@ describe('AdvancedSettings', () => {
       showConfirmation: true,
       cancel: mockCancel,
     })
+    when(mockUseFeatureFlag)
+      .calledWith('enableExtendedHardware')
+      .mockReturnValue(false)
   })
   afterEach(() => {
     jest.resetAllMocks()
+    resetAllWhenMocks()
   })
 
   it('renders correct titles', () => {
@@ -243,7 +252,23 @@ describe('AdvancedSettings', () => {
     getByRole('switch', { name: 'show_link_to_get_labware_offset_data' })
   })
 
-  it('renders the allow sending all protocols to ot-3 section', () => {
+  it('does not render the allow sending all protocols to ot-3 section when feature flag is off', () => {
+    const [{ queryByText, queryByRole }] = render()
+    expect(queryByText('Allow Sending All Protocols to OT-3')).toBeNull()
+    expect(
+      queryByText(
+        'Enable the "Send to OT-3" menu item for each imported protocol, even if protocol analysis fails or does not recognize it as designed for the OT-3.'
+      )
+    ).toBeNull()
+    expect(
+      queryByRole('switch', { name: 'allow_sending_all_protocols_to_ot3' })
+    ).toBeNull()
+  })
+
+  it('renders the allow sending all protocols to ot-3 section when feature flag is on', () => {
+    when(mockUseFeatureFlag)
+      .calledWith('enableExtendedHardware')
+      .mockReturnValue(true)
     const [{ getByText, getByRole }] = render()
     getByText('Allow Sending All Protocols to OT-3')
     getByText(

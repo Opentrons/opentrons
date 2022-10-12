@@ -83,6 +83,7 @@ export function AdvancedSettings(): JSX.Element {
     Config.getIsHeaterShakerAttached
   )
   const pathToPythonInterpreter = useSelector(Config.getPathToPythonOverride)
+  const enableExtendedHardware = Config.useFeatureFlag('enableExtendedHardware')
 
   const dispatch = useDispatch<Dispatch>()
   const [showSuccessToast, setShowSuccessToast] = React.useState(false)
@@ -536,27 +537,34 @@ export function AdvancedSettings(): JSX.Element {
           />
         </Flex>
         <Divider marginY={SPACING.spacing5} />
-        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Box width="70%">
-            <StyledText
-              css={TYPOGRAPHY.h3SemiBold}
-              paddingBottom={SPACING.spacing3}
-              id="AdvancedSettings_showLink"
+        {enableExtendedHardware ? (
+          <>
+            <Flex
+              alignItems={ALIGN_CENTER}
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
             >
-              {t('allow_sending_all_protocols_to_ot3')}
-            </StyledText>
-            <StyledText as="p">
-              {t('allow_sending_all_protocols_to_ot3_description')}
-            </StyledText>
-          </Box>
-          <ToggleButton
-            label="allow_sending_all_protocols_to_ot3"
-            toggledOn={sendAllProtocolsToOT3}
-            onClick={toggleSendAllProtocolsToOT3}
-            id="AdvancedSettings_sendAllProtocolsToggleButton"
-          />
-        </Flex>
-        <Divider marginY={SPACING.spacing5} />
+              <Box width="70%">
+                <StyledText
+                  css={TYPOGRAPHY.h3SemiBold}
+                  paddingBottom={SPACING.spacing3}
+                  id="AdvancedSettings_showLink"
+                >
+                  {t('allow_sending_all_protocols_to_ot3')}
+                </StyledText>
+                <StyledText as="p">
+                  {t('allow_sending_all_protocols_to_ot3_description')}
+                </StyledText>
+              </Box>
+              <ToggleButton
+                label="allow_sending_all_protocols_to_ot3"
+                toggledOn={sendAllProtocolsToOT3}
+                onClick={toggleSendAllProtocolsToOT3}
+                id="AdvancedSettings_sendAllProtocolsToggleButton"
+              />
+            </Flex>
+            <Divider marginY={SPACING.spacing5} />
+          </>
+        ) : null}
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box width="70%">
             <StyledText
