@@ -149,7 +149,7 @@ export function getAnalyticsConfig(state: State): AnalyticsConfig | null {
 }
 
 export function getAnalyticsOptedIn(state: State): boolean {
-  return state.config?.analytics.optedIn ?? false
+  return state.config?.analytics.optedIn ?? true
 }
 
 export function getAnalyticsOptInSeen(state: State): boolean {
