@@ -1,4 +1,4 @@
 """Mark 10 drivers."""
-from .driver import mark10_fg
+from .mark10_fg import Mark10
 
 __all__ = ["Mark10"]

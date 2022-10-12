@@ -9,12 +9,11 @@ from threading import Thread
 from opentrons.hardware_control.motion_utilities import target_position_from_plunger
 from hardware_testing.opentrons_api.types import GantryLoad, OT3Mount, OT3Axis, Point
 from hardware_testing.opentrons_api.helpers_ot3 import (
-    ThreadManagedHardwareAPI,
-    build_ot3_hardware_api,
+    OT3API,
+    build_async_ot3_hardware_api,
     GantryLoadSettings,
     set_gantry_load_per_axis_settings_ot3,
     home_ot3,
-    home_pipette,
     get_endstop_position_ot3,
     move_plunger_absolute_ot3,
     update_pick_up_current,
@@ -25,7 +24,6 @@ from hardware_testing import data
 from hardware_testing.drivers.mark10 import Mark10
 
 MOUNT = OT3Mount.LEFT
-LOAD = GantryLoad.NONE
 PIPETTE_SPEED = 10
 
 SPEED_XY = 500
@@ -33,40 +31,6 @@ SPEED_Z = 250
 
 pick_up_speed = 10
 press_distance = 30
-default_run_settings = {
-    OT3Axis.X: GantryLoadSettings(
-        max_speed=SPEED_XY,
-        acceleration=2000,
-        max_start_stop_speed=0,
-        max_change_dir_speed=0,
-        hold_current=0.1,
-        run_current=1.4,
-    ),
-    OT3Axis.Y: GantryLoadSettings(
-        max_speed=SPEED_XY,
-        acceleration=2000,
-        max_start_stop_speed=0,
-        max_change_dir_speed=0,
-        hold_current=0.1,
-        run_current=1.4,
-    ),
-    OT3Axis.Z_L: GantryLoadSettings(
-        max_speed=SPEED_Z,
-        acceleration=1500,
-        max_start_stop_speed=0,
-        max_change_dir_speed=0,
-        hold_current=0.1,
-        run_current=1.0,
-    ),
-    OT3Axis.Z_R: GantryLoadSettings(
-        max_speed=SPEED_Z,
-        acceleration=1500,
-        max_start_stop_speed=0,
-        max_change_dir_speed=0,
-        hold_current=0.1,
-        run_current=1.0,
-    ),
-}
 
 def _create_relative_point(axis: OT3Axis, distance: float) -> Point:
     if axis == OT3Axis.X:
@@ -78,11 +42,11 @@ def _create_relative_point(axis: OT3Axis, distance: float) -> Point:
     raise ValueError(f"Unexpected axis: {axis}")
 
 async def get_encoder_position(
-    api: ThreadManagedHardwareAPI, mount: OT3Mount) -> Dict[Axis, Float]:
+    api: OT3API, mount: OT3Mount) -> Dict[OT3Axis, float]:
     enc_position = await api.encoder_current_position(mount=MOUNT, refresh=True)
     return enc_position
 
-async def jog(api: ThreadManagedHardwareAPI)-> Dict[OT3Axis, float]:
+async def jog(api: OT3API)-> Dict[OT3Axis, float]:
     jog = True
     cur_pos = await api.current_position_ot3(MOUNT)
     print(f"X: {cur_pos[0]}, Y: {cur_pos[1]}, Z: {cur_pos[2]}")
@@ -97,11 +61,50 @@ async def jog(api: ThreadManagedHardwareAPI)-> Dict[OT3Axis, float]:
             jog = False
     return  await api.current_position_ot3(MOUNT)
 
-async def set_default_current_settings(api: ThreadManagedHardwareAPI):
-    set_gantry_load_per_axis_settings_ot3(api, default_run_settings, load=LOAD)
+async def set_default_current_settings(api: OT3API, load: Optional[GantryLoad] = None):
+    default_run_settings = {
+        OT3Axis.X: GantryLoadSettings(
+            max_speed=SPEED_XY,
+            acceleration=2000,
+            max_start_stop_speed=0,
+            max_change_dir_speed=0,
+            hold_current=0.1,
+            run_current=1.4,
+        ),
+        OT3Axis.Y: GantryLoadSettings(
+            max_speed=SPEED_XY,
+            acceleration=2000,
+            max_start_stop_speed=0,
+            max_change_dir_speed=0,
+            hold_current=0.1,
+            run_current=1.4,
+        ),
+        OT3Axis.Z_L: GantryLoadSettings(
+            max_speed=SPEED_Z,
+            acceleration=1500,
+            max_start_stop_speed=0,
+            max_change_dir_speed=0,
+            hold_current=0.1,
+            run_current=1.0,
+        ),
+        OT3Axis.Z_R: GantryLoadSettings(
+            max_speed=SPEED_Z,
+            acceleration=1500,
+            max_start_stop_speed=0,
+            max_change_dir_speed=0,
+            hold_current=0.1,
+            run_current=1.0,
+        ),
+    }
+    if load is None:
+        LOAD = api.gantry_load
+    set_gantry_load_per_axis_settings_ot3(api,
+                                        default_run_settings,
+                                        load=LOAD
+                                        )
     await api.set_gantry_load(gantry_load=LOAD)
 
-async def set_current_settings(api: ThreadManagedHardwareAPI, motor_current: float):
+async def set_current_settings(api: OT3API, motor_current: float, load: Optional[GantryLoad] = None):
     z_pickup_run_settings = {
         OT3Axis.X: GantryLoadSettings(
             max_speed=SPEED_XY,
@@ -136,10 +139,14 @@ async def set_current_settings(api: ThreadManagedHardwareAPI, motor_current: flo
             run_current=motor_current,
         ),
     }
-    set_gantry_load_per_axis_settings_ot3(api, z_pickup_run_settings, load=LOAD)
+    if load is None:
+        LOAD = api.gantry_load
+    set_gantry_load_per_axis_settings_ot3(api,
+                                            z_pickup_run_settings,
+                                            load=LOAD)
     await api.set_gantry_load(gantry_load=LOAD)
 
-async def pick_up_function(api: ThreadManagedHardwareAPI,
+async def pick_up_function(api: OT3API,
                             loc, speed, press_distance):
     # Pick up tip function
     await api.move_to(MOUNT,
@@ -160,16 +167,18 @@ async def update_tip_spec(api, action):
     else:
         raise("Pass a pickup or drop_tip to function")
 
-async def _main(api: ThreadManagedHardwareAPI) -> None:
+async def _main(api: OT3API) -> None:
+    hw_api = await build_async_ot3_hardware_api(is_simulating=args.simulate,
+                                    use_defaults=True)
     await set_default_current_settings(api)
     await home_ot3(api, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
     await api.cache_instruments()
     await api.home_plunger(MOUNT)
-    if options.fg_jog:
+    if args.fg_jog:
         fg_loc = await jog(api)
-    if options.tiprack:
+    if args.tiprack:
         tiprack_loc = await jog(api)
-    if options.trough:
+    if args.trough:
         trough_loc = await jog(api)
 
     while True:
@@ -193,7 +202,7 @@ async def _main(api: ThreadManagedHardwareAPI) -> None:
         stop_threads = True
         force_thread.join() #Thread Finished
         # -365 is for the other robot
-        await set_default_current_settings(api, m_current)
+        await set_default_current_settings(api)
         await api.home_z(MOUNT, allow_home_other = False)
         # Obtain the current position of the Z mount
         cur_pos = await api.current_position_ot3(MOUNT)
@@ -223,6 +232,7 @@ async def _main(api: ThreadManagedHardwareAPI) -> None:
         # Home Z
         await api.home_z(MOUNT, allow_home_other = False)
         input("Feel the Tip")
+    hw_api.clean_up()
 
     # cur_pos = await api.current_position_ot3(MOUNT)
     # z_pos = cur_pos[OT3Axis.by_mount(MOUNT)]
@@ -316,15 +326,11 @@ if __name__ == "__main__":
     parser.add_argument("--fg_jog", action="store_true")
     parser.add_argument("--trough", action="store_true")
     parser.add_argument("--tiprack", action="store_true")
-    parser.add_option("-c", "--cycles", dest = "cycles", type = "int",
-                                default = 1000, help = "Number of Cycles to run")
-    parser.add_option("-p", "--port", dest = "port", type = "str",
-                                    default = 'COM11', help = "Force Gauge Port")
+    parser.add_argument("--cycles", type=int,
+                            default = 1000, help = "Number of Cycles to run")
+    parser.add_argument("--port", type=str,
+                        default = '/dev/ttyUSB0', help = "Force Gauge Port")
     args = parser.parse_args()
-    fg = Mark10.create(port=options.port)
+    fg = Mark10.create(port=args.port)
     fg.connect()
-    hw_api = build_ot3_hardware_api(is_simulating=args.simulate,
-                                    use_defaults=True)
-
-    asyncio.run(_main(hw_api))
-    hw_api.clean_up()
+    asyncio.run(_main(args.simulate))
