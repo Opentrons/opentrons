@@ -9,6 +9,7 @@ import { LabwareOffsetLocation } from '@opentrons/api-client'
 interface LabwareLocationCombo {
   location: LabwareOffsetLocation
   definitionUri: string
+  labwareId: string
 }
 export function getLabwareLocationCombos(
   commands: RunTimeCommand[],
@@ -26,13 +27,15 @@ export function getLabwareLocationCombos(
         return modLocation == null
           ? acc
           : appendLocationComboIfUniq(acc, {
-              location: modLocation,
-              definitionUri,
-            })
+            location: modLocation,
+            definitionUri,
+            labwareId: command.params.labwareId
+          })
       } else {
         return appendLocationComboIfUniq(acc, {
           location: command.params.location,
           definitionUri,
+          labwareId: command.params.labwareId
         })
       }
     } else if (command.commandType === 'moveLabware') {
@@ -52,13 +55,15 @@ export function getLabwareLocationCombos(
         return modLocation == null
           ? acc
           : appendLocationComboIfUniq(acc, {
-              location: modLocation,
-              definitionUri: labwareEntity.definitionUri,
-            })
+            location: modLocation,
+            definitionUri: labwareEntity.definitionUri,
+            labwareId: command.params.labwareId
+          })
       } else {
         return appendLocationComboIfUniq(acc, {
           location: command.params.newLocation,
           definitionUri: labwareEntity.definitionUri,
+          labwareId: command.params.labwareId
         })
       }
     } else {

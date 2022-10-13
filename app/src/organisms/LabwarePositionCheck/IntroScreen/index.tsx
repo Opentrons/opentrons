@@ -1,15 +1,17 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import {
-  Text,
   Flex,
-  Box,
+  SPACING,
+  DIRECTION_COLUMN,
+  JUSTIFY_SPACE_BETWEEN,
   TYPOGRAPHY,
-  FONT_WEIGHT_SEMIBOLD,
-  JUSTIFY_CENTER,
+  ALIGN_CENTER,
 } from '@opentrons/components'
 import { useCurrentRun } from '../../ProtocolUpload/hooks'
+import { NeedHelpLink } from '../../CalibrationPanels'
 import { PrimaryButton } from '../../../atoms/buttons'
+import { StyledText } from '../../../atoms/text'
 import { getPrepCommands } from './getPrepCommands'
 import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import { useCreateCommandMutation } from '@opentrons/react-api-client'
@@ -40,28 +42,44 @@ export const IntroScreen = (props: {
   }
 
   return (
-    <Box>
-      <Text
-        as="h3"
-        textTransform={TYPOGRAPHY.textTransformUppercase}
-        fontWeight={FONT_WEIGHT_SEMIBOLD}
-      >
-        {t('labware_position_check_overview')}
-      </Text>
-      <Trans
-        t={t}
-        i18nKey="position_check_description"
-        components={{
-          block: (
-            <Text fontSize={TYPOGRAPHY.fontSizeH3} />
-          ),
-        }}
-      ></Trans>
-      <Flex justifyContent={JUSTIFY_CENTER}>
-        <PrimaryButton onClick={handleClickStartLPC}>
-          PROCEED
-        </PrimaryButton>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      padding={SPACING.spacing6}
+      minHeight="25rem"
+    >
+      <Flex gridGap={SPACING.spacingXXL}>
+        <Flex
+          flex="1"
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing3}
+        >
+          <StyledText as="h1" marginBottom={SPACING.spacing4}>
+            {t('shared:before_you_begin')}
+          </StyledText>
+          <Trans
+            t={t}
+            i18nKey="labware_position_check_description"
+            components={{ block: <StyledText as="p" /> }} />
+        </Flex>
+        <Flex flex="1" flexDirection={DIRECTION_COLUMN}>
+          <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            {t('you_will_need')}
+          </StyledText>
+          <StyledText as="p">{t('before_you_begin')}</StyledText>
+        </Flex>
       </Flex>
-    </Box>
+      <Flex
+        width="100%"
+        marginTop={SPACING.spacing6}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        alignItems={ALIGN_CENTER}
+      >
+        <NeedHelpLink />
+        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
+          <PrimaryButton onClick={handleClickStartLPC}>{t('get_started')}</PrimaryButton>
+        </Flex>
+      </Flex>
+    </Flex >
   )
 }

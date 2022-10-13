@@ -68,7 +68,7 @@
   "check_item_in_location": "Check {{item}} in {{location}}",
   "prepare_item_in_location": "Prepare {{item}} in {{location}}",
   "slot_name": "slot {{slotName}}",
-  "place_modules": "Ensure all depicted modules are in correct deck locations",
+  "place_modules": "Place modules on deck",
   "clear_all_slots": "Clear all deck slots and modules of labware",
   "place_a_full_tip_rack_in_location": "Place a full <bold>{{tip_rack}}</bold> into <bold>{{location}}</bold>",
   "place_previous_tip_rack_in_location": "Place <bold>{{tip_rack}}</bold> with tip removed into <bold>{{location}}</bold>",
@@ -77,5 +77,7 @@
   "ensure_tip_is_above_well": "Ensure that the pipette tip closest to you is centered above and level with well A1 on the labware. If it isn't, use the controls below or your keyboard to jog the pipette until it is properly aligned",
   "pick_up_tip_from_rack_in_location": "Pick up tip from tip rack in {{location}}",
   "new_labware_offset_data": "New labware offset data",
-  "apply_offsets": "Apply Offsets"
+  "apply_offsets": "Apply Offsets",
+  "labware_position_check_description": "<block>Labware Position Check is a guided workflow that checks every labware on the deck for an added degree of precision in your protocol.</block><block>When you check a labware, the OT-2’s pipette nozzle or attached tip will stop at the center of the A1 well. If the pipette nozzle or tip is not centered, you can reveal the OT-2’s jog controls to make an adjustment. This Labware Offset will be applied to the entire labware. Offset data is measured to the nearest 1/10th mm and can be made in the X, Y and/or Z directions.</block>",
+  "all_modules_and_labware_from_protocol": "All modules and labware used in the protocol"
 }

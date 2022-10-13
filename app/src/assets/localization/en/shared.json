@@ -2,6 +2,7 @@
   "browse": "browse",
   "yes": "yes",
   "no": "no",
+  "before_you_begin": "Before you begin",
   "cancel": "cancel",
   "close": "close",
   "confirm": "Confirm",
@@ -46,5 +47,6 @@
   "reanalyze": "Reanalyze",
   "step": "Step {{current}} / {{max}}",
   "none": "None",
-  "remember_my_selection_and_do_not_ask_again": "Remember my selection and don't ask again"
+  "remember_my_selection_and_do_not_ask_again": "Remember my selection and don't ask again",
+  "you_will_need": "You will need:"
 }

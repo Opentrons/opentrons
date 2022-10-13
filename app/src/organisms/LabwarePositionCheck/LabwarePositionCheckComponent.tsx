@@ -169,6 +169,7 @@ export const LabwarePositionCheckInner = (
   return (
     <Portal level="top">
       <ModalShell
+        width="47rem"
         header={
           <WizardHeader
             title={t('labware_position_check_title')}

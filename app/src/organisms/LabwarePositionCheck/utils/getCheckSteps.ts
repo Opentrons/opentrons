@@ -27,6 +27,7 @@ import type {
   LabwareLocation,
   LoadModuleRunTimeCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import { getLabwareLocationCombos } from '../../ApplyHistoricOffsets/hooks/getLabwareLocationCombos'
 
 interface LPCArgs {
   primaryPipetteId: string
@@ -73,8 +74,9 @@ export const getCheckSteps = (args: LPCArgs): LabwarePositionCheckStep[] => {
 }
 
 function getCheckTipRackSectionSteps(args: LPCArgs): CheckTipRacksStep[] {
-  const { secondaryPipetteId, primaryPipetteId, commands } = args
+  const { secondaryPipetteId, primaryPipetteId, commands, labware, modules } = args
 
+  const labwareLocationCombos = getLabwareLocationCombos(commands, labware, modules)
   const pickUpTipCommands = commands.filter(
     (command): command is PickUpTipRunTimeCommand =>
       command.commandType === 'pickUpTip'
@@ -102,13 +104,10 @@ function getCheckTipRackSectionSteps(args: LPCArgs): CheckTipRacksStep[] {
 
   return uniqPickUpTipCommands.reduce<CheckTipRacksStep[]>(
     (acc, { params }) => {
-      const labwareLocations = getAllUniqLocationsForLabware(
-        params.labwareId,
-        commands
-      )
+      const labwareLocations = labwareLocationCombos.filter(combo => combo.labwareId === params.labwareId)
       return [
         ...acc,
-        ...labwareLocations.map(location => ({
+        ...labwareLocations.map(({location}) => ({
           section: SECTIONS.CHECK_TIP_RACKS,
           labwareId: params.labwareId,
           pipetteId: params.pipetteId,
