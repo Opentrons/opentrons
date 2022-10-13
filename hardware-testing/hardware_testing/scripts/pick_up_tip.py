@@ -96,13 +96,13 @@ async def set_default_current_settings(api: OT3API, load: Optional[GantryLoad] =
             run_current=1.0,
         ),
     }
-    if load is None:
-        LOAD = api.gantry_load
-    set_gantry_load_per_axis_settings_ot3(api,
+    # if load is None:
+    #     LOAD = api._gantry_load
+    await set_gantry_load_per_axis_settings_ot3(api,
                                         default_run_settings,
-                                        load=LOAD
+                                        load=None
                                         )
-    await api.set_gantry_load(gantry_load=LOAD)
+    # await api.set_gantry_load(gantry_load=LOAD)
 
 async def set_current_settings(api: OT3API, motor_current: float, load: Optional[GantryLoad] = None):
     z_pickup_run_settings = {
@@ -139,12 +139,12 @@ async def set_current_settings(api: OT3API, motor_current: float, load: Optional
             run_current=motor_current,
         ),
     }
-    if load is None:
-        LOAD = api.gantry_load
-    set_gantry_load_per_axis_settings_ot3(api,
+    # if load is None:
+    #     LOAD = api._gantry_load
+    await set_gantry_load_per_axis_settings_ot3(api,
                                             z_pickup_run_settings,
-                                            load=LOAD)
-    await api.set_gantry_load(gantry_load=LOAD)
+                                            load=None)
+    # await api.set_gantry_load(gantry_load=LOAD)
 
 async def pick_up_function(api: OT3API,
                             loc, speed, press_distance):
@@ -167,13 +167,13 @@ async def update_tip_spec(api, action):
     else:
         raise("Pass a pickup or drop_tip to function")
 
-async def _main(api: OT3API) -> None:
+async def _main() -> None:
     hw_api = await build_async_ot3_hardware_api(is_simulating=args.simulate,
                                     use_defaults=True)
-    await set_default_current_settings(api)
-    await home_ot3(api, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
-    await api.cache_instruments()
-    await api.home_plunger(MOUNT)
+    await set_default_current_settings(hw_api, load=None)
+    await home_ot3(hw_api, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
+    await hw_api.cache_instruments()
+    # await hw_api.home_plunger(MOUNT)
     if args.fg_jog:
         fg_loc = await jog(api)
     if args.tiprack:
@@ -182,13 +182,13 @@ async def _main(api: OT3API) -> None:
         trough_loc = await jog(api)
 
     while True:
-        await set_default_current_settings(api)
-        cur_pos = await api.current_position_ot3(MOUNT)
+        await set_default_current_settings(hw_api, load=None)
+        cur_pos = await hw_api.current_position_ot3(MOUNT)
         z_pos = cur_pos[OT3Axis.by_mount(MOUNT)]
         m_current = float(input("motor_current in amps: "))
-        await api.move_to(MOUNT, Point(fg_loc[0], fg_loc[1], z_pos))
+        await hw_api.move_to(MOUNT, Point(fg_loc[0], fg_loc[1], z_pos))
         # Move pipette to Force Gauge calibrated location
-        await api.move_to(MOUNT, Point(fg_loc[0], fg_loc[1], fg_loc[2]))
+        await hw_api.move_to(MOUNT, Point(fg_loc[0], fg_loc[1], fg_loc[2]))
         location = 'Force_Gauge'
         force_thread = Thread(target=force_record, args=(m_current,location,))
         encoder_position = get_encoder_position(api, MOUNT)
@@ -202,35 +202,35 @@ async def _main(api: OT3API) -> None:
         stop_threads = True
         force_thread.join() #Thread Finished
         # -365 is for the other robot
-        await set_default_current_settings(api)
-        await api.home_z(MOUNT, allow_home_other = False)
+        await set_default_current_settings(hw_api, load=None)
+        await hw_api.home_z(MOUNT, allow_home_other = False)
         # Obtain the current position of the Z mount
         cur_pos = await api.current_position_ot3(MOUNT)
         z_pos = cur_pos[OT3Axis.by_mount(MOUNT)]
         # Move over to the TipRack location and
-        await api.move_to(MOUNT, Point(tiprack_loc[0], tip_rack_loc[1], z_pos))
+        await hw_api.move_to(MOUNT, Point(tiprack_loc[0], tip_rack_loc[1], z_pos))
         # Start recording the encoder
         location = 'Tiprack'
         enc_thread = Thread(target=force_record, args=(m_current,location,))
-        encoder_start = get_encoder_position(api, MOUNT)
+        encoder_start = get_encoder_position(hw_api, MOUNT)
         enc_thread.start()
         # Move Pipette to top of Tip Rack Location
         await api.move_to(MOUNT, Point(tiprack_loc[0], tiprack_loc[1], tip_rack_loc[2]))
         # Press Pipette into the tip
-        await set_current_settings(api, m_current)
+        await set_current_settings(hw_api, m_current)
         await api.move_to(MOUNT,
                             Point(tiprack_loc[0],
                                 tiprack_loc[1],
                                 tip_rack_loc[2]-press_distance),
                                 speed = pick_up_speed
                         )
-        encoder_end = get_encoder_position(api, MOUNT)
+        encoder_end = get_encoder_position(hw_api, MOUNT)
         stop_threads = True
         enc_thread.join() #Thread Finished
         # Reset Current Settings
-        await set_default_current_settings(api)
+        await set_default_current_settings(api, load=None)
         # Home Z
-        await api.home_z(MOUNT, allow_home_other = False)
+        await hw_api.home_z(MOUNT, allow_home_other = False)
         input("Feel the Tip")
     hw_api.clean_up()
 
@@ -241,7 +241,7 @@ async def _main(api: OT3API) -> None:
     # await update_pick_up_distance(api, MOUNT, 100)
     # await api.pick_up_tip(MOUNT, 78.3)
     # await api.drop_tip(MOUNT, home_after = False)
-    await api.disengage_axes([OT3Axis.of_main_tool_actuator(MOUNT)])
+    await hw_api.disengage_axes([OT3Axis.of_main_tool_actuator(MOUNT)])
 
 def force_record(motor_current, location):
     file_name = "results/force_pu_test_%s-%s-%s.csv" %(motor_current,
@@ -249,7 +249,7 @@ def force_record(motor_current, location):
                             location)
     print(file_name)
     with open(file_name, 'w', newline='') as f:
-        test_data = {'time(s)':None,
+        test_data = {'Time(s)':None,
                     'Force(N)':None,
                     'M_current(amps)':None,
                     'enc_pos(mm)': None}
@@ -260,7 +260,7 @@ def force_record(motor_current, location):
             motion = True
             while motion:
                 reading = float(FG.get_reading())
-                test_data['time(s)'] = fg._timer.elasped_time()
+                test_data['Time(s)'] = fg._timer.elasped_time()
                 test_data['Force(N)'] = reading
                 test_data['M_current(amps)'] = motor_current
                 test_data['encoder_pos(mm)'] = encoder_position
@@ -333,4 +333,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
     fg = Mark10.create(port=args.port)
     fg.connect()
-    asyncio.run(_main(args.simulate))
+    asyncio.run(_main())
