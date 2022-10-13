@@ -115,6 +115,9 @@ describe('protocol storage directory utilities', () => {
         ],
         files: [],
         metadata: [],
+        pipettes: [],
+        modules: [],
+        labware: [],
       })
     })
   })

@@ -22,6 +22,7 @@ import {
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
+import OT3_PNG from '../../assets/images/OT3.png'
 import { StyledText } from '../../atoms/text'
 import { SecondaryTertiaryButton } from '../../atoms/buttons'
 import {
@@ -102,7 +103,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
       cursor="pointer"
     >
       <img
-        src={OT2_PNG}
+        src={robotModel === 'OT-2' ? OT2_PNG : OT3_PNG}
         style={{ width: '6rem' }}
         id={`RobotCard_${robotName}_robotImage`}
       />
