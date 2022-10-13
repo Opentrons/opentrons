@@ -82,6 +82,8 @@ export const MIN_TC_LID_TEMP = 37
 export const MAX_TC_LID_TEMP = 110
 export const MIN_TC_DURATION_SECONDS = 0
 export const MAX_TC_DURATION_SECONDS = 60
+export const MIN_TC_PROFILE_VOLUME = 0
+export const MAX_TC_PROFILE_VOLUME = 100
 export const MODELS_FOR_MODULE_TYPE: Record<
   ModuleType,
   Array<{

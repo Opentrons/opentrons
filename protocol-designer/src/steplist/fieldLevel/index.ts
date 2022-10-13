@@ -34,6 +34,8 @@ import {
   MAX_HEATER_SHAKER_MODULE_RPM,
   MIN_HEATER_SHAKER_DURATION_SECONDS,
   MAX_HEATER_SHAKER_DURATION_SECONDS,
+  MIN_TC_PROFILE_VOLUME,
+  MAX_TC_PROFILE_VOLUME,
 } from '../../constants'
 import {
   LabwareEntity,
@@ -259,6 +261,12 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   profileTargetLidTemp: {
     getErrors: composeErrors(
       temperatureRangeFieldValue(MIN_TC_LID_TEMP, MAX_TC_LID_TEMP)
+    ),
+  },
+  profileVolume: {
+    getErrors: composeErrors(
+      minFieldValue(MIN_TC_PROFILE_VOLUME),
+      maxFieldValue(MAX_TC_PROFILE_VOLUME)
     ),
   },
   blockTargetTempHold: {
