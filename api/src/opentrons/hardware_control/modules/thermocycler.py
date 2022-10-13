@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Optional, List, Dict, Mapping
+from typing import Callable, Optional, List, Dict, Mapping
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.types import ThermocyclerLidStatus, Temperature, PlateTemperature
 from opentrons.hardware_control.modules.lid_temp_status import LidTemperatureStatus
@@ -137,6 +137,8 @@ class Thermocycler(mod_abc.AbstractModule):
         self._current_cycle_index: Optional[int] = None
         self._total_step_count: Optional[int] = None
         self._current_step_index: Optional[int] = None
+        self._error: Optional[str] = None
+        self._reader.register_error_handler(self._enter_error_state)
 
     async def cleanup(self) -> None:
         """Stop the poller task."""
@@ -369,7 +371,7 @@ class Thermocycler(mod_abc.AbstractModule):
         await self._reader.read_lid_temperature()
 
         while not _temperature_is_holding(self.lid_temp_status):
-            await self.wait_next_poll()
+            await self._poller.wait_next_poll()
 
     async def _wait_for_block_target(self) -> None:
         """
@@ -380,25 +382,22 @@ class Thermocycler(mod_abc.AbstractModule):
         await self._reader.read_block_temperature()
 
         while not _temperature_is_holding(self.status):
-            await self.wait_next_poll()
+            await self._poller.wait_next_poll()
 
         while self.hold_time is not None and self.hold_time > 0:
-            await self.wait_next_poll()
+            await self._poller.wait_next_poll()
 
     async def _wait_for_lid_status(self, status: ThermocyclerLidStatus) -> None:
         """Wait for lid status to be status."""
         await self._reader.read_lid_status()
 
         while self.lid_status != status:
-            await self.wait_next_poll()
+            await self._poller.wait_next_poll()
 
     # TODO(mc, 2022-10-08): not publicly used; remove
     async def wait_next_poll(self) -> None:
         """Wait for the next poll to complete."""
-        try:
-            await self._poller.wait_next_poll()
-        except Exception:
-            self._enter_error_state()
+        await self._poller.wait_next_poll()
 
     @property
     def lid_target(self) -> Optional[float]:
@@ -438,7 +437,7 @@ class Thermocycler(mod_abc.AbstractModule):
     def status(self) -> TemperatureStatus:
         return (
             self._reader.block_temperature_status
-            if self._reader.error is None
+            if self._error is None
             else TemperatureStatus.ERROR
         )
 
@@ -546,7 +545,11 @@ class Thermocycler(mod_abc.AbstractModule):
                 self._current_step_index = step_idx + 1  # science starts at 1
                 await self._execute_cycle_step(step, volume)
 
-    def _enter_error_state(self) -> None:
+    # TODO(mc, 2022-10-13): why does this exist?
+    # Do the driver and poller really need to be disconnected?
+    # Could we accomplish the same thing by latching the error state
+    # and allowing the driver and poller to continue?
+    def _enter_error_state(self, error: Exception) -> None:
         """Enter into an error state.
 
         The Thermocycler will not be accessible in this state.
@@ -557,8 +560,9 @@ class Thermocycler(mod_abc.AbstractModule):
         Returns:
             None
         """
+        self._error = str(error)
         MODULE_LOG.error(
-            f"Thermocycler has encountered an unrecoverable error: {self._reader.error}. "
+            f"Thermocycler has encountered an unrecoverable error: {self._error}. "
             f"Please refer to support article at "
             f"https://support.opentrons.com/en/articles/3469797-thermocycler-module"
             f" for troubleshooting."
@@ -576,7 +580,6 @@ class ThermocyclerReader(Reader):
     lid_status: ThermocyclerLidStatus
     lid_temperature: Temperature
     block_temperature: PlateTemperature
-    error: Optional[str]
 
     def __init__(
         self,
@@ -585,10 +588,10 @@ class ThermocyclerReader(Reader):
         self.lid_status = ThermocyclerLidStatus.UNKNOWN
         self.lid_temperature = Temperature(current=25.0, target=None)
         self.block_temperature = PlateTemperature(current=25.0, target=None, hold=None)
-        self.error = None
         self._lid_temperature_status = LidTemperatureStatus()
         self._block_temperature_status = PlateTemperatureStatus()
         self._driver = driver
+        self._handle_error: Optional[Callable[[Exception], None]] = None
 
     @property
     def block_temperature_status(self) -> TemperatureStatus:
@@ -599,7 +602,11 @@ class ThermocyclerReader(Reader):
         return self._lid_temperature_status.status
 
     def on_error(self, exception: Exception) -> None:
-        self.error = str(exception)
+        if self._handle_error is not None:
+            self._handle_error(exception)
+
+    def register_error_handler(self, handle_error: Callable[[Exception], None]) -> None:
+        self._handle_error = handle_error
 
     async def read(self) -> None:
         """Poll the thermocycler."""
