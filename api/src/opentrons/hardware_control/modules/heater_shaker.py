@@ -291,10 +291,7 @@ class HeaterShaker(mod_abc.AbstractModule):
         await self._reader.read_temperature()
 
         async def _await_temperature() -> None:
-            if awaiting_temperature is None:
-                while self.temperature_status != TemperatureStatus.HOLDING:
-                    await self._poller.wait_next_poll()
-            elif self.temperature_status == TemperatureStatus.HEATING:
+            if self.temperature_status == TemperatureStatus.HEATING:
                 while self.temperature < awaiting_temperature:
                     await self._poller.wait_next_poll()
             elif self.temperature_status == TemperatureStatus.COOLING:

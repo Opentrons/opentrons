@@ -35,6 +35,16 @@ class ThermocyclerError(Exception):
     pass
 
 
+def _temperature_is_holding(status: Optional[TemperatureStatus]) -> bool:
+    if status in (TemperatureStatus.HOLDING, TemperatureStatus.IDLE):
+        return True
+
+    if status == TemperatureStatus.ERROR:
+        raise ThermocyclerError("Error occurred while waiting for temperature")
+
+    return False
+
+
 class Thermocycler(mod_abc.AbstractModule):
     """Hardware control interface for an attached Thermocycler."""
 
@@ -358,7 +368,7 @@ class Thermocycler(mod_abc.AbstractModule):
         """
         await self._reader.read_lid_temperature()
 
-        while self._reader.lid_temperature_status != TemperatureStatus.HOLDING:
+        while not _temperature_is_holding(self.lid_temp_status):
             await self.wait_next_poll()
 
     async def _wait_for_block_target(self) -> None:
@@ -369,7 +379,7 @@ class Thermocycler(mod_abc.AbstractModule):
         """
         await self._reader.read_block_temperature()
 
-        while self._reader.block_temperature_status != TemperatureStatus.HOLDING:
+        while not _temperature_is_holding(self.status):
             await self.wait_next_poll()
 
         while self.hold_time is not None and self.hold_time > 0:
@@ -394,20 +404,19 @@ class Thermocycler(mod_abc.AbstractModule):
     def lid_target(self) -> Optional[float]:
         return self._reader.lid_temperature.target
 
-    # TODO(mc, 2022-10-10): update type signature to non-optional
     @property
-    def lid_temp(self) -> Optional[float]:
+    def lid_temp(self) -> float:
         return self._reader.lid_temperature.current
 
-    # TODO(mc, 2022-10-10): update type signature to non-optional
     @property
-    def lid_status(self) -> Optional[ThermocyclerLidStatus]:
+    def lid_status(self) -> ThermocyclerLidStatus:
         return self._reader.lid_status
 
     @property
-    def lid_temp_status(self) -> Optional[str]:
-        return self._reader.lid_temperature_status.value
+    def lid_temp_status(self) -> TemperatureStatus:
+        return self._reader.lid_temperature_status
 
+    # TODO(mc, 2022-10-13): remove
     @property
     def ramp_rate(self) -> Optional[float]:
         """Not supported."""
@@ -426,7 +435,7 @@ class Thermocycler(mod_abc.AbstractModule):
         return self._reader.block_temperature.target
 
     @property
-    def status(self) -> str:
+    def status(self) -> TemperatureStatus:
         return (
             self._reader.block_temperature_status
             if self._reader.error is None
@@ -562,7 +571,6 @@ class ThermocyclerReader(Reader):
 
     Args:
         driver: A connected Thermocycler driver.
-        handle_error: A callback to call if the
     """
 
     lid_status: ThermocyclerLidStatus
