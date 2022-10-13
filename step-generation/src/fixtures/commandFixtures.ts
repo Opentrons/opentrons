@@ -94,7 +94,7 @@ export const SOURCE_LABWARE = 'sourcePlateId'
 export const DEST_LABWARE = 'destPlateId'
 export const TROUGH_LABWARE = 'troughId'
 export const DEFAULT_BLOWOUT_WELL = 'A1'
-export const IS_AIR_GAP = { isAirGap: true } // to differentiate if the aspirate or dispense command is an air gap or not
+export const AIR_GAP_META = { isAirGap: true } // to differentiate if the aspirate or dispense command is an air gap or not
 // =================
 type MakeAspDispHelper<P> = (
   bakedParams?: Partial<P>
@@ -142,7 +142,7 @@ export const makeAirGapHelper: MakeAirGapHelper<AspDispAirgapParams> = bakedPara
   params
 ) => ({
   commandType: 'aspirate',
-  meta: IS_AIR_GAP,
+  meta: AIR_GAP_META,
   key: expect.any(String),
   params: {
     ..._defaultAspirateParams,
@@ -214,7 +214,7 @@ export const makeDispenseAirGapHelper: MakeDispenseAirGapHelper<AspDispAirgapPar
     volume,
     ...params,
   },
-  meta: IS_AIR_GAP,
+  meta: AIR_GAP_META,
 })
 const _defaultTouchTipParams = {
   pipetteId: DEFAULT_PIPETTE,

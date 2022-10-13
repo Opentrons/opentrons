@@ -18,7 +18,7 @@ import {
   pickUpTipHelper,
   SOURCE_LABWARE,
   makeDispenseAirGapHelper,
-  IS_AIR_GAP,
+  AIR_GAP_META,
 } from '../fixtures'
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
@@ -1148,7 +1148,7 @@ describe('advanced options', () => {
         // aspirate > air gap
         {
           commandType: 'aspirate',
-          meta: IS_AIR_GAP,
+          meta: AIR_GAP_META,
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
@@ -1174,7 +1174,7 @@ describe('advanced options', () => {
         // dispense the aspirate > air gap
         {
           commandType: 'dispense',
-          meta: IS_AIR_GAP,
+          meta: AIR_GAP_META,
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
@@ -1433,7 +1433,7 @@ describe('advanced options', () => {
         // aspirate > air gap
         {
           commandType: 'aspirate',
-          meta: IS_AIR_GAP,
+          meta: AIR_GAP_META,
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
@@ -1459,7 +1459,7 @@ describe('advanced options', () => {
         // dispense aspirate > air gap then liquid
         {
           commandType: 'dispense',
-          meta: IS_AIR_GAP,
+          meta: AIR_GAP_META,
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
@@ -1811,7 +1811,7 @@ describe('advanced options', () => {
         // aspirate > air gap
         {
           commandType: 'aspirate',
-          meta: IS_AIR_GAP,
+          meta: AIR_GAP_META,
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
@@ -1837,7 +1837,7 @@ describe('advanced options', () => {
         // dispense the aspirate > air gap
         {
           commandType: 'dispense',
-          meta: IS_AIR_GAP,
+          meta: AIR_GAP_META,
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
@@ -2097,7 +2097,7 @@ describe('advanced options', () => {
         // aspirate > air gap
         {
           commandType: 'aspirate',
-          meta: IS_AIR_GAP,
+          meta: AIR_GAP_META,
           key: expect.any(String),
           params: {
             flowRate: 2.1,
@@ -2122,7 +2122,7 @@ describe('advanced options', () => {
         },
         {
           commandType: 'dispense',
-          meta: IS_AIR_GAP,
+          meta: AIR_GAP_META,
           key: expect.any(String),
           params: {
             flowRate: 2.2,
@@ -2495,7 +2495,7 @@ describe('advanced options', () => {
         // aspirate > air gap
         {
           commandType: 'aspirate',
-          meta: IS_AIR_GAP,
+          meta: AIR_GAP_META,
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
@@ -2521,7 +2521,7 @@ describe('advanced options', () => {
         // dispense
         {
           commandType: 'dispense',
-          meta: IS_AIR_GAP,
+          meta: AIR_GAP_META,
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
@@ -2781,7 +2781,7 @@ describe('advanced options', () => {
         // aspirate > air gap
         {
           commandType: 'aspirate',
-          meta: IS_AIR_GAP,
+          meta: AIR_GAP_META,
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
@@ -2807,7 +2807,7 @@ describe('advanced options', () => {
         // dispense "aspirate > air gap" then dispense liquid
         {
           commandType: 'dispense',
-          meta: IS_AIR_GAP,
+          meta: AIR_GAP_META,
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
@@ -3179,7 +3179,7 @@ describe('advanced options', () => {
         // aspirate > air gap
         {
           commandType: 'aspirate',
-          meta: IS_AIR_GAP,
+          meta: AIR_GAP_META,
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
@@ -3205,7 +3205,7 @@ describe('advanced options', () => {
         // dispense
         {
           commandType: 'dispense',
-          meta: IS_AIR_GAP,
+          meta: AIR_GAP_META,
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
@@ -3506,7 +3506,7 @@ describe('advanced options', () => {
         {
           commandType: 'aspirate',
           key: expect.any(String),
-          meta: IS_AIR_GAP,
+          meta: AIR_GAP_META,
           params: {
             pipetteId: 'p300SingleId',
             volume: 31,
@@ -3531,7 +3531,7 @@ describe('advanced options', () => {
         // dispense "aspirate > air gap" then dispense liquid
         {
           commandType: 'dispense',
-          meta: IS_AIR_GAP,
+          meta: AIR_GAP_META,
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',

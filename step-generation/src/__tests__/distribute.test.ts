@@ -919,7 +919,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         blowoutSingleToTrash,
       ])
     })
-    it('should create commands in the expected order with expected params (blowout in trash, reuse tip', () => {
+    it('should create commands in the expected order with expected params (blowout in trash, reuse tip)', () => {
       const args = {
         ...allArgs,
         volume: 100,
