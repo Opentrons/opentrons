@@ -104,6 +104,14 @@ from .move_labware import (
     MoveLabwareCommandType,
 )
 
+from .move_labware_off_deck import (
+    MoveLabwareOffDeck,
+    MoveLabwareOffDeckParams,
+    MoveLabwareOffDeckCreate,
+    MoveLabwareOffDeckResult,
+    MoveLabwareOffDeckCommandType,
+)
+
 from .move_relative import (
     MoveRelative,
     MoveRelativeParams,
@@ -189,6 +197,7 @@ Command = Union[
     LoadModule,
     LoadPipette,
     MoveLabware,
+    MoveLabwareOffDeck,
     MoveRelative,
     MoveToCoordinates,
     MoveToWell,
@@ -235,6 +244,7 @@ CommandParams = Union[
     LoadModuleParams,
     LoadPipetteParams,
     MoveLabwareParams,
+    MoveLabwareOffDeckParams,
     MoveRelativeParams,
     MoveToCoordinatesParams,
     MoveToWellParams,
@@ -282,6 +292,7 @@ CommandType = Union[
     LoadModuleCommandType,
     LoadPipetteCommandType,
     MoveLabwareCommandType,
+    MoveLabwareOffDeckCommandType,
     MoveRelativeCommandType,
     MoveToCoordinatesCommandType,
     MoveToWellCommandType,
@@ -327,6 +338,7 @@ CommandCreate = Union[
     LoadModuleCreate,
     LoadPipetteCreate,
     MoveLabwareCreate,
+    MoveLabwareOffDeckCreate,
     MoveRelativeCreate,
     MoveToCoordinatesCreate,
     MoveToWellCreate,
@@ -373,6 +385,7 @@ CommandResult = Union[
     LoadModuleResult,
     LoadPipetteResult,
     MoveLabwareResult,
+    MoveLabwareOffDeckResult,
     MoveRelativeResult,
     MoveToCoordinatesResult,
     MoveToWellResult,

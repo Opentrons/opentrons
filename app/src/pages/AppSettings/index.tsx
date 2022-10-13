@@ -50,7 +50,6 @@ export function AppSettings(): JSX.Element {
         backgroundColor={COLORS.white}
         height="100%"
         width="100%"
-        margin={SPACING.spacing4}
         border={`${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.medGreyEnabled}`}
         borderRadius={BORDERS.radiusSoftCorners}
         minHeight="95%"

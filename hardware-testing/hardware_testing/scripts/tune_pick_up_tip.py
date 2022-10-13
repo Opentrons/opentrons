@@ -5,8 +5,8 @@ from typing import Tuple
 
 from hardware_testing.opentrons_api.types import OT3Mount, OT3Axis, Point
 from hardware_testing.opentrons_api.helpers_ot3 import (
-    ThreadManagedHardwareAPI,
-    build_ot3_hardware_api,
+    OT3API,
+    build_async_ot3_hardware_api,
     home_ot3,
 )
 
@@ -22,7 +22,7 @@ def _read_number_from_input(msg: str) -> float:
         return _read_number_from_input(msg)
 
 
-async def _find_tip_pos(api: ThreadManagedHardwareAPI) -> Point:
+async def _find_tip_pos(api: OT3API) -> Point:
     print("We need to first find the tip coordinate:")
     while True:
         x = _read_number_from_input("\tX: ")
@@ -43,18 +43,16 @@ def _input_pick_up_tip_params() -> Tuple[float, float, float]:
     return current, speed, distance
 
 
-async def _run_pick_up_tip_sequence(
-    api: ThreadManagedHardwareAPI, current: float, speed: float, distance: float
-) -> None:
+async def _run_pick_up_tip_sequence(api: OT3API) -> None:
     print("picking up tip...")
-    await api.pick_up_tip(
-        mount=MOUNT, tip_length=78, amps=current, speed=speed, distance=distance
-    )
+    # TODO: figure out method to set current/speed/distance in real-time
+    await api.pick_up_tip(mount=MOUNT, tip_length=78)
     input("ENTER to drop-tip: ")
     await api.drop_tip(mount=MOUNT)
 
 
-async def _main(api: ThreadManagedHardwareAPI) -> None:
+async def _main(is_simulating: bool) -> None:
+    api = await build_async_ot3_hardware_api(is_simulating=is_simulating)
     await api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
     input("ENTER to start homing: ")
     await home_ot3(api)
@@ -64,7 +62,7 @@ async def _main(api: ThreadManagedHardwareAPI) -> None:
         await api.move_to(mount=MOUNT, abs_position=tip_pos)
         current, speed, distance = _input_pick_up_tip_params()
         input(f"ENTER to run (current={current}, speed={speed}, distance={distance}): ")
-        await _run_pick_up_tip_sequence(api, current, speed, distance)
+        await _run_pick_up_tip_sequence(api)
         await api.remove_tip(mount=MOUNT)
 
 
@@ -72,6 +70,4 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
     args = parser.parse_args()
-    hw_api = build_ot3_hardware_api(is_simulating=args.simulate)
-    asyncio.run(_main(hw_api))
-    hw_api.clean_up()
+    asyncio.run(_main(args.simulate))
