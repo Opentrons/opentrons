@@ -215,7 +215,7 @@ class LabwareOffsetVector(BaseModel):
 
 
 class InstrumentOffsetVector(BaseModel):
-    """Offset for instrument from home position to robot deck."""
+    """Instrument Offset from home position to robot deck."""
 
     x: float
     y: float
