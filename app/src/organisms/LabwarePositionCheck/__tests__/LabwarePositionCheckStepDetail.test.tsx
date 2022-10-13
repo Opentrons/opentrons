@@ -170,12 +170,13 @@ describe('LabwarePositionCheckStepDetail', () => {
           labwareDefinitions: {
             [LABWARE_DEF_URI]: LABWARE_DEF,
           },
-          pipettes: {
-            [PRIMARY_PIPETTE_ID]: {
+          pipettes: [
+            {
+              id: PRIMARY_PIPETTE_ID,
               pipetteName: PRIMARY_PIPETTE_NAME,
               mount: 'left',
             },
-          },
+          ],
         },
       } as any)
 
@@ -250,12 +251,13 @@ describe('LabwarePositionCheckStepDetail', () => {
           labwareDefinitions: {
             [TIPRACK_DEF_URI]: LABWARE_DEF,
           },
-          pipettes: {
-            [PRIMARY_PIPETTE_ID]: {
-              name: PRIMARY_PIPETTE_NAME,
+          pipettes: [
+            {
+              id: PRIMARY_PIPETTE_ID,
+              pipetteName: PRIMARY_PIPETTE_NAME,
               mount: 'left',
             },
-          },
+          ],
         },
       } as any)
     render(props)

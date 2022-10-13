@@ -21,8 +21,9 @@ export const LABWARE_DEFINITIONS: LoadedLabwareDefinitionsById = {
 export const MODULE_MODELS_BY_ID: ModuleModelsById = {
   'module-0': { model: 'thermocyclerModuleV1' },
 }
-export const PIPETTE_NAMES_BY_ID: PipetteNamesById = {
-  'pipette-0': { pipetteName: 'p10_single' },
+export const PIPETTE_NAME_BY_ID: PipetteNamesById = {
+  id: 'pipette-0',
+  pipetteName: 'p10_single',
 }
 
 export const STORED_PROTOCOL_ANALYSIS = {
@@ -30,5 +31,5 @@ export const STORED_PROTOCOL_ANALYSIS = {
   modules: MODULE_MODELS_BY_ID,
   labware: LABWARE_BY_ID,
   labwareDefinitions: LABWARE_DEFINITIONS,
-  pipettes: PIPETTE_NAMES_BY_ID,
+  pipettes: [PIPETTE_NAME_BY_ID],
 } as StoredProtocolAnalysis

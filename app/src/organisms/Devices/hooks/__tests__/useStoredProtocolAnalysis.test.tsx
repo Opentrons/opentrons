@@ -9,7 +9,7 @@ import {
   parseAllRequiredModuleModelsById,
   parseInitialLoadedLabwareById,
   parseInitialLoadedLabwareDefinitionsById,
-  parseInitialPipetteNamesById,
+  parsePipetteEntity,
 } from '@opentrons/api-client'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 
@@ -20,7 +20,7 @@ import {
   LABWARE_BY_ID,
   LABWARE_DEFINITIONS,
   MODULE_MODELS_BY_ID,
-  PIPETTE_NAMES_BY_ID,
+  PIPETTE_NAME_BY_ID,
   STORED_PROTOCOL_ANALYSIS,
 } from '../__fixtures__/storedProtocolAnalysis'
 
@@ -46,8 +46,8 @@ const mockParseInitialLoadedLabwareById = parseInitialLoadedLabwareById as jest.
 const mockParseInitialLoadedLabwareDefinitionsById = parseInitialLoadedLabwareDefinitionsById as jest.MockedFunction<
   typeof parseInitialLoadedLabwareDefinitionsById
 >
-const mockParseInitialPipetteNamesById = parseInitialPipetteNamesById as jest.MockedFunction<
-  typeof parseInitialPipetteNamesById
+const mockParsePipetteEntity = parsePipetteEntity as jest.MockedFunction<
+  typeof parsePipetteEntity
 >
 const store: Store<any> = createStore(jest.fn(), {})
 
@@ -92,7 +92,7 @@ describe('useStoredProtocolAnalysis hook', () => {
     when(mockParseInitialLoadedLabwareDefinitionsById).mockReturnValue(
       LABWARE_DEFINITIONS
     )
-    when(mockParseInitialPipetteNamesById).mockReturnValue(PIPETTE_NAMES_BY_ID)
+    when(mockParsePipetteEntity).mockReturnValue([PIPETTE_NAME_BY_ID])
   })
   afterEach(() => {
     resetAllWhenMocks()

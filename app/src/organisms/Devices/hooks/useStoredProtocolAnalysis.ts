@@ -3,7 +3,7 @@ import {
   parseAllRequiredModuleModelsById,
   parseInitialLoadedLabwareById,
   parseInitialLoadedLabwareDefinitionsById,
-  parseInitialPipetteNamesById,
+  parsePipetteEntity,
 } from '@opentrons/api-client'
 import { schemaV6Adapter } from '@opentrons/shared-data'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
@@ -23,7 +23,7 @@ import type { State } from '../../../redux/types'
 // instead of just extending it, as soon as we remove the need for the schemaV6adapter
 export interface StoredProtocolAnalysis
   extends Omit<ProtocolAnalysisOutput, 'pipettes' | 'modules' | 'labware'> {
-  pipettes: PipetteNamesById
+  pipettes: PipetteNamesById[]
   modules: ModuleModelsById
   labware: LoadedLabwareById
   labwareDefinitions: LoadedLabwareDefinitionsById
@@ -32,7 +32,7 @@ export interface StoredProtocolAnalysis
 export const parseProtocolAnalysisOutput = (
   storedProtocolAnalysis: ProtocolAnalysisOutput | null
 ): StoredProtocolAnalysis | null => {
-  const pipettesNamesById = parseInitialPipetteNamesById(
+  const pipettesNamesById = parsePipetteEntity(
     storedProtocolAnalysis?.commands ?? []
   )
   const moduleModelsById = parseAllRequiredModuleModelsById(
