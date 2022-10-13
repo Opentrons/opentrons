@@ -3,7 +3,7 @@ import {
   parseAllRequiredModuleModelsById,
   parseInitialLoadedLabwareById,
   parseInitialLoadedLabwareDefinitionsById,
-  parseInitialPipetteNamesById,
+  parsePipetteEntity,
 } from '@opentrons/api-client'
 import { schemaV6Adapter } from '@opentrons/shared-data'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
@@ -20,7 +20,7 @@ import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { State } from '../../../redux/types'
 
 export interface StoredProtocolAnalysis extends ProtocolAnalysisOutput {
-  pipettes: PipetteNamesById
+  pipettes: PipetteNamesById[]
   modules: ModuleModelsById
   labware: LoadedLabwareById
   labwareDefinitions: LoadedLabwareDefinitionsById
@@ -29,7 +29,7 @@ export interface StoredProtocolAnalysis extends ProtocolAnalysisOutput {
 export const parseProtocolAnalysisOutput = (
   storedProtocolAnalysis: ProtocolAnalysisOutput | null
 ): StoredProtocolAnalysis | null => {
-  const pipettesNamesById = parseInitialPipetteNamesById(
+  const pipettesNamesById = parsePipetteEntity(
     storedProtocolAnalysis?.commands ?? []
   )
   const moduleModelsById = parseAllRequiredModuleModelsById(

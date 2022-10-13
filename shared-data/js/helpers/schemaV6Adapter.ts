@@ -3,7 +3,6 @@ import type {
   LoadModuleRunTimeCommand,
 } from '../../protocol/types/schemaV6/command/setup'
 import type { RunTimeCommand, ProtocolAnalysisFile } from '../../protocol'
-import type { PipetteName } from '../pipettes'
 import type {
   PendingProtocolAnalysis,
   CompletedProtocolAnalysis,
@@ -22,17 +21,6 @@ export const schemaV6Adapter = (
   protocolAnalysis: PendingProtocolAnalysis | CompletedProtocolAnalysis
 ): ProtocolAnalysisFile<{}> | null => {
   if (protocolAnalysis != null && protocolAnalysis.status === 'completed') {
-    const pipettes: {
-      [pipetteId: string]: { pipetteName: PipetteName }
-    } = protocolAnalysis.pipettes.reduce((acc, pipette) => {
-      return {
-        ...acc,
-        [pipette.id]: {
-          pipetteName: pipette.pipetteName,
-        },
-      }
-    }, {})
-
     const labware: {
       [labwareId: string]: {
         definitionUri: string
@@ -113,11 +101,10 @@ export const schemaV6Adapter = (
         },
       }
     }, {})
-
     return {
       ...protocolAnalysis,
       //  @ts-expect-error
-      pipettes,
+      pipettes: protocolAnalysis.pipettes,
       //  @ts-expect-error
       labware,
       modules,

@@ -99,8 +99,11 @@ export const LabwarePositionCheckStepDetail = (
   const command = stepMovementCommands[0]
 
   const pipetteId = command.params.pipetteId
-  //  @ts-expect-error: pipetteName should be name until we remove the schemaV6Adapter
-  const pipetteName = protocolData.pipettes[pipetteId].pipetteName
+  //  @ts-expect-error
+  const pipetteName = protocolData.pipettes.find(
+    //  @ts-expect-error
+    pipette => pipette.id === pipetteId
+  ).pipetteName
   let wellsToHighlight: string[] = []
   const pipetteChannels = getPipetteNameSpecs(pipetteName)?.channels
   if (pipetteChannels === 8) {
