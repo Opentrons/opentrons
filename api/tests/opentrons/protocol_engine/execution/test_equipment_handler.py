@@ -669,10 +669,9 @@ def test_get_module_hardware_api_missing(
 
 
 def test_move_labware_with_gripper(
-        decoy: Decoy,
-        state_store: StateStore,
-        hardware_api: HardwareControlAPI,
-        subject: EquipmentHandler,
+    decoy: Decoy,
+    state_store: StateStore,
+    hardware_api: HardwareControlAPI,
+    subject: EquipmentHandler,
 ) -> None:
     """It should perform a labware movement with gripper by delegating to OT3API."""
-    
