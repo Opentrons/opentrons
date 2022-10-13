@@ -52,6 +52,7 @@ jest.mock('../../ChooseProtocolSlideout')
 jest.mock('../../../redux/config')
 
 const OT2_PNG_FILE_NAME = 'OT2-R_HERO.png'
+const OT3_PNG_FILE_NAME = 'OT3.png'
 const MOCK_STATE: State = {
   discovery: {
     robot: { connection: { connectedTo: null } },
@@ -186,11 +187,22 @@ describe('RobotCard', () => {
     resetAllWhenMocks()
   })
 
-  it('renders an OT image', () => {
+  it('renders an OT-2 image when robot model is OT-2', () => {
     const [{ getByRole }] = render(props)
     const image = getByRole('img')
 
     expect(image.getAttribute('src')).toEqual(OT2_PNG_FILE_NAME)
+  })
+
+  it('renders an OT-3 image when robot model is OT-3', () => {
+    props = { robot: { ...mockConnectableRobot, name: 'buzz' } }
+    when(mockGetRobotModelByName)
+      .calledWith(MOCK_STATE, 'buzz')
+      .mockReturnValue('OT-3')
+    const [{ getByRole }] = render(props)
+    const image = getByRole('img')
+
+    expect(image.getAttribute('src')).toEqual(OT3_PNG_FILE_NAME)
   })
 
   it('renders a UpdateRobotBanner component', () => {

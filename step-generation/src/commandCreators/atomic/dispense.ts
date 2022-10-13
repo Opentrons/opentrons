@@ -21,7 +21,15 @@ export const dispense: CommandCreator<DispenseParams> = (
   invariantContext,
   prevRobotState
 ) => {
-  const { pipette, volume, labware, well, offsetFromBottomMm, flowRate } = args
+  const {
+    pipette,
+    volume,
+    labware,
+    well,
+    offsetFromBottomMm,
+    flowRate,
+    isAirGap,
+  } = args
   const actionName = 'dispense'
   const errors: CommandCreatorError[] = []
   const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
@@ -158,6 +166,7 @@ export const dispense: CommandCreator<DispenseParams> = (
         },
         flowRate,
       },
+      ...(isAirGap && { meta: { isAirGap } }),
     },
   ]
   return {

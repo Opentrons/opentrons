@@ -71,6 +71,21 @@ class SyncClient:
 
         return cast(commands.MoveLabwareOffDeckResult, result)
 
+    def move_labware(
+        self,
+        labware_id: str,
+        new_location: LabwareLocation,
+    ) -> commands.MoveLabwareResult:
+        """Execute a MoveLabware command and return the result."""
+        request = commands.MoveLabwareCreate(
+            params=commands.MoveLabwareParams(
+                labwareId=labware_id,
+                newLocation=new_location,
+            )
+        )
+        result = self._transport.execute_command(request=request)
+
+        return cast(commands.MoveLabwareResult, result)
 
     def load_pipette(
         self,

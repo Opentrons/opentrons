@@ -63,6 +63,7 @@ class Params(BaseModel):
     height: Optional[float]
     offset: Optional[OffsetVector]
     profile: Optional[List[ProfileStep]]
+    newLocation: Optional[Location]
 
 
 class Command(BaseModel):
