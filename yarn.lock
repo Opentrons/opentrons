@@ -16266,7 +16266,7 @@ npm-lifecycle@^3.1.2:
   dependencies:
     byline "^5.0.0"
     graceful-fs "^4.1.15"
-    node-gyp "^5.0.2"
+    node-gyp "^9.0.0"
     resolve-from "^4.0.0"
     slide "^1.1.6"
     uid-number "0.0.6"
