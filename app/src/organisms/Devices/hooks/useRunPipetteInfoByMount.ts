@@ -62,23 +62,15 @@ export function useRunPipetteInfoByMount(
       command.commandType === 'pickUpTip'
   )
 
-  return Object.entries(pipettes).reduce((acc, pipette) => {
-    const loadCommand = loadPipetteCommands.find(command =>
-      //  @ts-expect-error
-      command.result?.pipetteId === pipette[0].id
-        ? //  @ts-expect-error
-          pipette[0].id
-        : pipette[1].id
+  //  @ts-expect-error
+  return pipettes.reduce((acc, pipette) => {
+    const loadCommand = loadPipetteCommands.find(
+      command => command.result?.pipetteId === pipette.id
     )
     if (loadCommand != null) {
       const { mount } = loadCommand.params
       const { pipetteId } = loadCommand.result
-      const pipetteName =
-        //  @ts-expect-error
-        loadCommand.result.pipetteId === pipette[0].id
-          ? //  @ts-expect-error
-            pipette[0].pipetteName
-          : pipette[1].pipetteName
+      const pipetteName = pipette.pipetteName
       const requestedPipetteName = pipetteName
       const pipetteSpecs = getPipetteNameSpecs(requestedPipetteName)
       if (pipetteSpecs != null) {

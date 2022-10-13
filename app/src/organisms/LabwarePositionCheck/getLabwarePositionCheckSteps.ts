@@ -15,7 +15,7 @@ export const getLabwarePositionCheckSteps = (
 ): LabwarePositionCheckStep[] => {
   if (protocolData != null && 'pipettes' in protocolData) {
     // filter out any pipettes that are not being used in the protocol
-    const pipettesById: ProtocolAnalysisFile['pipettes'] = omitBy(
+    const pipettes: ProtocolAnalysisFile['pipettes'] = omitBy(
       protocolData.pipettes,
       _pipette =>
         !protocolData.commands.some(
@@ -25,9 +25,8 @@ export const getLabwarePositionCheckSteps = (
             command.params.pipetteId === _pipette.id
         )
     )
-    const pipettes = values(pipettesById)
     //  @ts-expect-error: pipetteName should be name until we remove the schemaV6Adapter
-    const pipetteNames = pipettes.map(({ pipetteName }) => pipetteName)
+    const pipetteNames = values(pipettes).map(({ pipetteName }) => pipetteName)
     const labware = omitBy(
       protocolData.labware,
       (labware, id) =>
@@ -43,7 +42,7 @@ export const getLabwarePositionCheckSteps = (
     const modules: ProtocolAnalysisFile['modules'] = protocolData.modules
     const labwareDefinitions = protocolData.labwareDefinitions
     const commands: RunTimeCommand[] = protocolData.commands
-    const primaryPipetteId = getPrimaryPipetteId(pipettesById, commands)
+    const primaryPipetteId = getPrimaryPipetteId(pipettes, commands)
     const pipetteWorkflow = getPipetteWorkflow({
       pipetteNames,
       primaryPipetteId,
@@ -60,13 +59,12 @@ export const getLabwarePositionCheckSteps = (
         commands,
       })
     } else {
-      const secondaryPipetteId =
+      //  @ts-expect-error
+      const secondaryPipetteId = values(pipettes).find(
         //  @ts-expect-error
-        Object.values(pipettesById)[0].id !== primaryPipetteId
-          ? //  @ts-expect-error
-            Object.values(pipettesById)[0].id
-          : //  @ts-expect-error
-            Object.values(pipettesById)[1].id
+        pipette => pipette.id !== primaryPipetteId
+        //  @ts-expect-error
+      ).id
       return getTwoPipettePositionCheckSteps({
         primaryPipetteId,
         secondaryPipetteId,

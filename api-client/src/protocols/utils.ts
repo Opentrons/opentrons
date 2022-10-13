@@ -37,14 +37,14 @@ export function parseInitialPipetteNamesByMount(
   }
 }
 
-export interface PipetteEntity {
+export interface PipetteNamesById {
   id: string
   pipetteName: PipetteName
 }
 
 export function parsePipetteEntity(
   commands: RunTimeCommand[]
-): PipetteEntity[] {
+): PipetteNamesById[] {
   const rightPipette = commands.find(
     (command): command is LoadPipetteRunTimeCommand =>
       command.commandType === 'loadPipette' && command.params.mount === 'right'

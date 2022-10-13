@@ -14,13 +14,13 @@ import type {
   LoadedLabwareById,
   LoadedLabwareDefinitionsById,
   ModuleModelsById,
-  PipetteEntity,
+  PipetteNamesById,
 } from '@opentrons/api-client'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { State } from '../../../redux/types'
 
 export interface StoredProtocolAnalysis extends ProtocolAnalysisOutput {
-  pipettes: PipetteEntity[]
+  pipettes: PipetteNamesById[]
   modules: ModuleModelsById
   labware: LoadedLabwareById
   labwareDefinitions: LoadedLabwareDefinitionsById

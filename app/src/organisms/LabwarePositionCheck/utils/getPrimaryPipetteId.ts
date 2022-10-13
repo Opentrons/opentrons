@@ -1,17 +1,17 @@
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import { LoadPipetteRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import type {
   RunTimeCommand,
   ProtocolFile,
 } from '@opentrons/shared-data/protocol'
-import { LoadPipetteRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
 export const getPrimaryPipetteId = (
-  pipettesById: ProtocolFile<{}>['pipettes'],
+  pipettes: ProtocolFile<{}>['pipettes'],
   commands: RunTimeCommand[]
 ): string => {
-  if (pipettesById[1] == null) {
-    //  @ts-expect-error: id will exist when we remove the schemaV6Adapter
-    return pipettesById[0].id
+  if (Object.keys(pipettes).length === 1) {
+    //  @ts-expect-error
+    return pipettes[0].id
   }
   const leftPipetteId = commands.find(
     (command: RunTimeCommand): command is LoadPipetteRunTimeCommand =>
@@ -28,8 +28,8 @@ export const getPrimaryPipetteId = (
     )
   }
 
-  const leftPipette = pipettesById[0]
-  const rightPipette = pipettesById[1]
+  const leftPipette = pipettes[0]
+  const rightPipette = pipettes[1]
 
   //  @ts-expect-error: pipetteName should be name until we remove the schemaV6Adapter
   const leftPipetteSpecs = getPipetteNameSpecs(leftPipette.pipetteName)
