@@ -320,7 +320,7 @@ class Thermocycler(mod_abc.AbstractModule):
         await task
 
     async def wait_for_lid_target(self) -> None:
-        """Set the lid temperature in degres Celsius"""
+        """Set the lid temperature in degrees Celsius"""
         await self.wait_for_is_running()
 
         task = self._loop.create_task(self._wait_for_lid_target())

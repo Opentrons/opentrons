@@ -277,7 +277,7 @@ class HeaterShaker(mod_abc.AbstractModule):
     # TODO(mc, 2022-10-10): remove `awaiting_temperature` argument,
     # and instead, wait until status is holding
     async def await_temperature(self, awaiting_temperature: float) -> None:
-        """Await temperature in degreess Celsius.
+        """Await temperature in degrees Celsius.
 
         Polls the Heater-Shaker's current temperature until
         the specified temperature is reached. If `awaiting_temperature`
