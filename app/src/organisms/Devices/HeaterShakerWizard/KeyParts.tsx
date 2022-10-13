@@ -11,7 +11,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { StyledText } from '../../../atoms/text'
-import HeaterShakerKeyParts from '../../../assets/images/heater-shaker-key-parts.png'
+import HeaterShakerKeyParts from '../../../assets/images/heater_shaker-key-parts.png'
 import HeaterShakerDeckLock from '../../../assets/videos/heater-shaker-setup/HS_Deck_Lock_Anim.webm'
 
 export function KeyParts(): JSX.Element {

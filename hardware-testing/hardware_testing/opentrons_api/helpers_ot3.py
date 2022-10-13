@@ -1,4 +1,5 @@
 """Opentrons helper methods."""
+import asyncio
 from dataclasses import dataclass, replace
 from subprocess import run
 from typing import List, Optional, Dict, Tuple
@@ -133,7 +134,7 @@ class GantryLoadSettings:
     run_current: float  # amps
 
 
-def set_gantry_load_per_axis_settings_ot3(
+async def set_gantry_load_per_axis_settings_ot3(
     api: OT3API,
     settings: Dict[OT3Axis, GantryLoadSettings],
     load: Optional[GantryLoad] = None,
@@ -154,6 +155,8 @@ def set_gantry_load_per_axis_settings_ot3(
         set_gantry_load_per_axis_current_settings_ot3(
             api, ax, load, hold_current=stg.hold_current, run_current=stg.run_current
         )
+    if load == api.gantry_load:
+        await api.set_gantry_load(gantry_load=load)
 
 
 async def home_ot3(api: OT3API, axes: Optional[List[OT3Axis]] = None) -> None:
@@ -183,6 +186,8 @@ async def home_ot3(api: OT3API, axes: Optional[List[OT3Axis]] = None) -> None:
         set_gantry_load_per_axis_motion_settings_ot3(
             api, ax, max_speed_discontinuity=val
         )
+    await api.engage_axes(which=axes)  # type: ignore[arg-type]
+    await asyncio.sleep(0.5)
     await api.home(axes=axes)
     for ax, val in cached_discontinuities.items():
         set_gantry_load_per_axis_motion_settings_ot3(
