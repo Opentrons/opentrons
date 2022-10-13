@@ -344,14 +344,14 @@ def test_set_target_block_temperature(
     subject.set_target_block_temperature(
         celsius=42.0,
         hold_time_seconds=1.2,
-        block_max_volume=7.8,
+        block_max_volume=3.4,
     )
 
     decoy.verify(
         mock_sync_module_hardware.set_target_block_temperature(
-            temperature=42.0,
+            celsius=42.0,
             hold_time_seconds=1.2,
-            volume=7.8,
+            volume=3.4,
         ),
         times=1,
     )
@@ -368,7 +368,7 @@ def test_wait_for_block_temperature(
     decoy.verify(mock_sync_module_hardware.wait_for_block_target(), times=1)
 
 
-def test_set_lid_temperature(
+def test_set_target_lid_temperature(
     decoy: Decoy,
     mock_sync_module_hardware: SyncThermocyclerHardware,
     subject: LegacyThermocyclerCore,
@@ -376,7 +376,7 @@ def test_set_lid_temperature(
     """It should set the lid temperature with the hardware."""
     subject.set_target_lid_temperature(celsius=42.0)
 
-    decoy.verify(mock_sync_module_hardware.set_target_lid_temperature(temperature=42.0))
+    decoy.verify(mock_sync_module_hardware.set_target_lid_temperature(celsius=42.0))
 
 
 def test_wait_for_lid_temperature(

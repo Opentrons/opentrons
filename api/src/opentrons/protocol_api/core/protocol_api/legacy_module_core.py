@@ -258,7 +258,7 @@ class LegacyThermocyclerCore(
     ) -> None:
         """Set the target temperature for the well block, in °C."""
         self._sync_module_hardware.set_target_block_temperature(
-            temperature=celsius,
+            celsius=celsius,
             hold_time_seconds=hold_time_seconds,
             volume=block_max_volume,
         )
@@ -269,7 +269,7 @@ class LegacyThermocyclerCore(
 
     def set_target_lid_temperature(self, celsius: float) -> None:
         """Set the target temperature for the heated lid, in °C."""
-        self._sync_module_hardware.set_target_lid_temperature(temperature=celsius)
+        self._sync_module_hardware.set_target_lid_temperature(celsius=celsius)
 
     def wait_for_lid_temperature(self) -> None:
         """Wait for target lid temperature to be reached."""

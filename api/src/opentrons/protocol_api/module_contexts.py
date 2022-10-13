@@ -595,7 +595,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def lid_temperature_status(self) -> Optional[str]:
-        """Lod temperature status string"""
+        """Lid temperature status string"""
         return self._core.get_lid_temperature_status()
 
     @property  # type: ignore[misc]
