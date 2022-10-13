@@ -12,10 +12,10 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons.types import Mount, MountType, DeckSlotName
 from opentrons.protocol_engine import commands
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons.protocol_engine.types import DeckSlotLocation
+from opentrons.protocol_engine.types import DeckSlotLocation, ModuleLocation
 
 from opentrons.protocol_api.core.labware import LabwareLoadParams
-from opentrons.protocol_api.core.engine import ProtocolCore, InstrumentCore, LabwareCore
+from opentrons.protocol_api.core.engine import ProtocolCore, InstrumentCore, LabwareCore, ModuleCore
 
 
 @pytest.fixture
@@ -75,6 +75,40 @@ def test_load_labware(
     result = subject.load_labware(
         load_name="some_labware",
         location=DeckSlotName.SLOT_5,
+        label="some_display_name",  # maps to optional display name
+        namespace="some_explicit_namespace",
+        version=9001,
+    )
+
+    assert isinstance(result, LabwareCore)
+    assert result.labware_id == "abc123"
+
+
+def test_load_labware_on_module(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: ProtocolCore,
+) -> None:
+    """It should issue a LoadLabware command."""
+    decoy.when(
+        mock_engine_client.load_labware(
+            location=ModuleLocation(moduleId="module-id"),
+            load_name="some_labware",
+            display_name="some_display_name",
+            namespace="some_explicit_namespace",
+            version=9001,
+        )
+    ).then_return(
+        commands.LoadLabwareResult(
+            labwareId="abc123",
+            definition=LabwareDefinition.construct(),  # type: ignore[call-arg]
+            offsetId=None,
+        )
+    )
+
+    result = subject.load_labware(
+        load_name="some_labware",
+        location=ModuleCore(module_id="module-id"),
         label="some_display_name",  # maps to optional display name
         namespace="some_explicit_namespace",
         version=9001,

@@ -13,7 +13,7 @@ from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
 
-from opentrons.protocol_engine import DeckSlotLocation
+from opentrons.protocol_engine import DeckSlotLocation, ModuleLocation
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 
 from ..protocol import AbstractProtocol
@@ -91,15 +91,22 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
     ) -> LabwareCore:
         """Load a labware using its identifying parameters."""
         if isinstance(location, ModuleCore):
-            raise NotImplementedError("Load labware on module not yet implemented")
-
-        load_result = self._engine_client.load_labware(
-            load_name=load_name,
-            location=DeckSlotLocation(slotName=location),
-            namespace=namespace if namespace is not None else OPENTRONS_NAMESPACE,
-            version=version or 1,
-            display_name=label,
-        )
+            moduleLocation = ModuleLocation(moduleId=location.module_id)
+            load_result = self._engine_client.load_labware(
+                load_name=load_name,
+                location=moduleLocation,
+                namespace=namespace if namespace is not None else OPENTRONS_NAMESPACE,
+                version=version or 1,
+                display_name=label,
+            )
+        else:
+            load_result = self._engine_client.load_labware(
+                load_name=load_name,
+                location=DeckSlotLocation(slotName=location),
+                namespace=namespace if namespace is not None else OPENTRONS_NAMESPACE,
+                version=version or 1,
+                display_name=label,
+            )
         return LabwareCore(
             labware_id=load_result.labwareId,
             engine_client=self._engine_client,
