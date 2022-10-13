@@ -18,6 +18,17 @@ log = logging.getLogger(__name__)
 DEFAULT_GRIPPER_CALIBRATION_OFFSET = [0.0, 0.0, 0.0]
 
 
+"""
+Gripper load measurement
+========================
+10/13/2022
+
+To lift a 1.5 kg load,
+the velocity should be 19 mm/s & acceleration at 19 mm/s^2.
+Run current: 0.7 A and Hold current: 0.2 A.
+"""
+
+
 @dataclass(frozen=True)
 class GripperConfig:
     display_name: str
