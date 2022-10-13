@@ -16,6 +16,7 @@ from ..commands import (
     DispenseResult,
     DispenseInPlaceResult,
     MoveLabwareResult,
+    MoveLabwareOffDeckResult,
     MoveToCoordinatesResult,
     MoveToWellResult,
     PickUpTipResult,
@@ -172,7 +173,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         #
         # This is necessary for safe motion planning in case the next movement
         # goes to the same labware (now in a new place).
-        elif isinstance(command.result, MoveLabwareResult):
+        elif isinstance(command.result, (MoveLabwareResult, MoveLabwareOffDeckResult)):
             moved_labware_id = command.params.labwareId
             if (
                 self._state.current_well is not None
