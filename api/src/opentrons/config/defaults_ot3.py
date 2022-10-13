@@ -83,7 +83,7 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
         OT3AxisKind.X: 500,
         OT3AxisKind.Y: 500,
     },
-    gripper={OT3AxisKind.Z: 350},
+    gripper={OT3AxisKind.Z: 200},
 )
 
 DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
