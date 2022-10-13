@@ -1,7 +1,7 @@
 import { storedProtocolData } from '../../../../redux/protocol-storage/__fixtures__'
 
 import type {
-  LoadedLabwareEntity,
+  LoadedLabwareById,
   LoadedLabwareDefinitionsById,
   ModuleModelsById,
   PipetteNamesById,
@@ -9,7 +9,7 @@ import type {
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { StoredProtocolAnalysis } from '../useStoredProtocolAnalysis'
 
-export const LABWARE: LoadedLabwareEntity = {
+export const LABWARE_BY_ID: LoadedLabwareById = {
   id: 'labware-0',
   loadName: 'fakeLoadName',
   definitionUri: 'fakeLabwareDefinitionUri',
@@ -29,7 +29,7 @@ export const PIPETTE_NAME_BY_ID: PipetteNamesById = {
 export const STORED_PROTOCOL_ANALYSIS = {
   ...storedProtocolData.mostRecentAnalysis,
   modules: MODULE_MODELS_BY_ID,
-  labware: [LABWARE],
+  labware: [LABWARE_BY_ID],
   labwareDefinitions: LABWARE_DEFINITIONS,
   pipettes: [PIPETTE_NAME_BY_ID],
 } as StoredProtocolAnalysis

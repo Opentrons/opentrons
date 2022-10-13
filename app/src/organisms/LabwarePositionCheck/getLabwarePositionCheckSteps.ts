@@ -27,21 +27,19 @@ export const getLabwarePositionCheckSteps = (
     )
     //  @ts-expect-error: pipetteName should be name until we remove the schemaV6Adapter
     const pipetteNames = pipettes.map(({ pipetteName }) => pipetteName)
-    const labware = Object.values(
-      omitBy(
-        protocolData.labware,
-        labware =>
-          //  @ts-expect-error
-          protocolData.labwareDefinitions[labware.definitionUri]?.parameters
-            .isTiprack &&
-          !protocolData.commands.some(
-            command =>
-              command.commandType === 'pickUpTip' &&
-              //  @ts-expect-error
-              command.params.labwareId === labware.id
-          )
-      )
+    //  @ts-expect-error
+    const labware = protocolData.labware.filter(
+      //  @ts-expect-error
+      labware =>
+        protocolData.labwareDefinitions[labware.definitionUri]?.parameters
+          .isTiprack ||
+        !protocolData.commands.some(
+          command =>
+            command.commandType === 'pickUpTip' &&
+            command.params.labwareId === labware.id
+        )
     )
+
     const modules: ProtocolAnalysisFile['modules'] = protocolData.modules
     const labwareDefinitions = protocolData.labwareDefinitions
     const commands: RunTimeCommand[] = protocolData.commands
@@ -49,7 +47,6 @@ export const getLabwarePositionCheckSteps = (
     const pipetteWorkflow = getPipetteWorkflow({
       pipetteNames,
       primaryPipetteId,
-      //  @ts-expect-error
       labware,
       labwareDefinitions,
       commands,
@@ -57,7 +54,6 @@ export const getLabwarePositionCheckSteps = (
     if (pipetteWorkflow === 1) {
       return getOnePipettePositionCheckSteps({
         primaryPipetteId,
-        //  @ts-expect-error
         labware,
         labwareDefinitions,
         modules,
@@ -73,7 +69,6 @@ export const getLabwarePositionCheckSteps = (
       return getTwoPipettePositionCheckSteps({
         primaryPipetteId,
         secondaryPipetteId,
-        //  @ts-expect-error
         labware,
         labwareDefinitions,
         modules,

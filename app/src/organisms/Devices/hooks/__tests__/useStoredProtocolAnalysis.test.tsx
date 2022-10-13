@@ -7,7 +7,7 @@ import { renderHook } from '@testing-library/react-hooks'
 
 import {
   parseAllRequiredModuleModelsById,
-  parseLoadedLabwareEntity,
+  parseLoadedLabwareById,
   parseInitialLoadedLabwareDefinitionsById,
   parsePipetteEntity,
 } from '@opentrons/api-client'
@@ -17,7 +17,7 @@ import { storedProtocolData } from '../../../../redux/protocol-storage/__fixture
 import { getStoredProtocol } from '../../../../redux/protocol-storage'
 import { useStoredProtocolAnalysis } from '../useStoredProtocolAnalysis'
 import {
-  LABWARE,
+  LABWARE_BY_ID,
   LABWARE_DEFINITIONS,
   MODULE_MODELS_BY_ID,
   PIPETTE_NAME_BY_ID,
@@ -40,8 +40,8 @@ const mockGetStoredProtocol = getStoredProtocol as jest.MockedFunction<
 const mockParseAllRequiredModuleModelsById = parseAllRequiredModuleModelsById as jest.MockedFunction<
   typeof parseAllRequiredModuleModelsById
 >
-const mockParseLoadedLabwareEntity = parseLoadedLabwareEntity as jest.MockedFunction<
-  typeof parseLoadedLabwareEntity
+const mockParseLoadedLabwareById = parseLoadedLabwareById as jest.MockedFunction<
+  typeof parseLoadedLabwareById
 >
 const mockParseInitialLoadedLabwareDefinitionsById = parseInitialLoadedLabwareDefinitionsById as jest.MockedFunction<
   typeof parseInitialLoadedLabwareDefinitionsById
@@ -88,7 +88,7 @@ describe('useStoredProtocolAnalysis hook', () => {
     when(mockParseAllRequiredModuleModelsById).mockReturnValue(
       MODULE_MODELS_BY_ID
     )
-    when(mockParseLoadedLabwareEntity).mockReturnValue([LABWARE])
+    when(mockParseLoadedLabwareById).mockReturnValue([LABWARE_BY_ID])
     when(mockParseInitialLoadedLabwareDefinitionsById).mockReturnValue(
       LABWARE_DEFINITIONS
     )
