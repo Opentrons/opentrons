@@ -21,7 +21,6 @@ from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     ModuleLocation,
-    LoadedLabware,
     LoadedPipette,
     LabwareOffset,
     LabwareOffsetVector,
@@ -318,22 +317,12 @@ async def test_load_labware_on_module(
     )
 
 
-def test_move_labware_to_deck_slot(
+def test_find_offset_id_of_labware_on_deck_slot(
     decoy: Decoy,
     state_store: StateStore,
     subject: EquipmentHandler,
 ) -> None:
-    """It should find a new offset by resolving the new location."""
-    decoy.when(state_store.labware.get(labware_id="input-labware-id")).then_return(
-        LoadedLabware(
-            id="input-labware-id",
-            loadName="load-name",
-            definitionUri="opentrons-test/load-name/1",
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-            offsetId=None,
-        )
-    )
-
+    """It should find the offset by resolving the provided location."""
     decoy.when(
         state_store.labware.find_applicable_labware_offset(
             definition_uri="opentrons-test/load-name/1",
@@ -355,9 +344,9 @@ def test_move_labware_to_deck_slot(
         )
     )
 
-    result = subject.move_labware(
-        labware_id="input-labware-id",
-        new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+    result = subject.find_applicable_labware_offset_id(
+        labware_definition_uri="opentrons-test/load-name/1",
+        labware_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
     )
 
     assert result == "labware-offset-id"
@@ -369,15 +358,6 @@ def test_move_labware_to_module(
     subject: EquipmentHandler,
 ) -> None:
     """It should find a new offset by resolving the new location."""
-    decoy.when(state_store.labware.get(labware_id="input-labware-id")).then_return(
-        LoadedLabware(
-            id="input-labware-id",
-            loadName="load-name",
-            definitionUri="opentrons-test/load-name/1",
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-            offsetId=None,
-        )
-    )
     decoy.when(state_store.modules.get_model("input-module-id")).then_return(
         ModuleModel.THERMOCYCLER_MODULE_V1
     )
@@ -406,9 +386,9 @@ def test_move_labware_to_module(
         )
     )
 
-    result = subject.move_labware(
-        labware_id="input-labware-id",
-        new_location=ModuleLocation(moduleId="input-module-id"),
+    result = subject.find_applicable_labware_offset_id(
+        labware_definition_uri="opentrons-test/load-name/1",
+        labware_location=ModuleLocation(moduleId="input-module-id"),
     )
 
     assert result == "labware-offset-id"
@@ -686,3 +666,13 @@ def test_get_module_hardware_api_missing(
 
     with pytest.raises(errors.ModuleNotAttachedError):
         subject.get_module_hardware_api(cast(Any, "module-id"))
+
+
+def test_move_labware_with_gripper(
+        decoy: Decoy,
+        state_store: StateStore,
+        hardware_api: HardwareControlAPI,
+        subject: EquipmentHandler,
+) -> None:
+    """It should perform a labware movement with gripper by delegating to OT3API."""
+    

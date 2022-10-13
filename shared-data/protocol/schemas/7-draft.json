@@ -107,6 +107,10 @@
               "type": "string"
             }
           }
+        },
+        {
+          "const": "offDeck",
+          "description": "String literal 'offDeck'. Used to load a labware without placing it on the deck"
         }
       ]
     }
