@@ -477,6 +477,23 @@
           },
 
           {
+            "description": "[PROVISIONAL AND EXPERIMENTAL] Move Labware Off-Deck: Move a loaded labware off the deck.",
+            "type": "object",
+            "required": ["commandType", "params"],
+            "properties": {
+              "key": { "type": "string" },
+              "commandType": { "enum": ["moveLabwareOffDeck"] },
+              "params": {
+                "required": ["labwareId"],
+                "labwareId": {
+                  "type": "string",
+                  "description": "The ID of the labware to move. Must be a key from the top-level `labware` object."
+                }
+              }
+            }
+          },
+
+          {
             "description": "Move Relative",
             "type": "object",
             "required": ["commandType", "params"],
