@@ -249,7 +249,7 @@ class Controller:
             MODULE_LOG.warning("incomplete read error from watcher")
             return
         if event is not None:
-            MODULE_LOG.info(f'aionotify event on {event.name}: {event}')
+            MODULE_LOG.info(f"aionotify event on {event.name}: {event}")
             if "ot_module" in event.name:
                 event_name = event.name
                 flags = aionotify.Flags.parse(event.flags)
