@@ -249,10 +249,12 @@ class Controller:
             MODULE_LOG.warning("incomplete read error from watcher")
             return
         if event is not None:
-            MODULE_LOG.info(f"aionotify event on {event.name}: {event}")
+            flags = aionotify.Flags.parse(event.flags)
+            MODULE_LOG.info(
+                f"aionotify event on {event.name}: {event} with flags {flags}"
+            )
             if "ot_module" in event.name:
                 event_name = event.name
-                flags = aionotify.Flags.parse(event.flags)
                 event_description = AionotifyEvent.build(event_name, flags)
                 await self.module_controls.handle_module_appearance(event_description)
 

@@ -139,7 +139,10 @@ async def test_register_modules_sort(
             "ot_module_magdeck0",
             ModuleAtPort(port="/dev/ot_module_magdeck0", name="magdeck"),
         ),
-        ("ot_module_magdeck0.tmp-c166:0", None),
+        (
+            "ot_module_magdeck0.tmp-c166:0",
+            ModuleAtPort(port="/dev/ot_module_magdeck0", name="magdeck"),
+        ),
         (
             "ot_module_thermocycler2",
             ModuleAtPort(port="/dev/ot_module_thermocycler2", name="thermocycler"),
@@ -149,7 +152,10 @@ async def test_register_modules_sort(
             "ot_module_heatershaker29",
             ModuleAtPort(port="/dev/ot_module_heatershaker29", name="heatershaker"),
         ),
-        ("ot_module_tempdeck1000.tmp-c166:0", None),
+        (
+            "ot_module_tempdeck1000.tmp-c166:0",
+            ModuleAtPort(port="/dev/ot_module_tempdeck1000", name="tempdeck"),
+        ),
         (
             "ot_module_tempdeck1000",
             ModuleAtPort(port="/dev/ot_module_tempdeck1000", name="tempdeck"),
@@ -158,7 +164,10 @@ async def test_register_modules_sort(
             "/dev/ot_module_tempdeck999",
             ModuleAtPort(port="/dev/ot_module_tempdeck999", name="tempdeck"),
         ),
-        ("/dev/ot_module_heatershaker0.tmp-c166:0", None),
+        (
+            "/dev/ot_module_heatershaker0.tmp-c166:0",
+            ModuleAtPort(port="/dev/ot_module_heatershaker0", name="heatershaker"),
+        ),
     ],
 )
 def test_port_filtering(portname: str, result: Optional[ModuleAtPort]) -> None:

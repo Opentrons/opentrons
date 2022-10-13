@@ -34,12 +34,12 @@ _MODULE_SYMLINK_NAME_SUBRE = (
 # to create a "tmpnode", a dev node with the guaranteed-unique name "NAME.tmp-cMAJ:MIN". this
 # device only exists until the rest of the nodes and symlinks are established, and cannot be
 # used after udev finishes processing. we'll pick it up from inotify, but by the time we try
-# to open it it'll be gone and we'll error - so ignore it. to get this to work, we need an
-# end-of-line anchor so that the search() can't just terminate early, so make sure this is
-# called on a stripped line.
-_MODULE_IGNORE_TMPNODE_SUBRE = r"(?!tmp\d+:\d+)$"
+# to open it it'll be gone and we'll error - so we need to separately capture the temp node
+# so we can just pay attention to the module symlink part. Make sure this is called on a
+# stripped line since it uses an EOL anchor.
+_MODULE_OPTIONAL_TMPNODE_SUBRE = r"(?:.tmp-c\d+:\d+)?$"
 MODULE_PORT_REGEX = re.compile(
-    _MODULE_SYMLINK_NAME_SUBRE + _MODULE_IGNORE_TMPNODE_SUBRE, re.I
+    _MODULE_SYMLINK_NAME_SUBRE + _MODULE_OPTIONAL_TMPNODE_SUBRE, re.I
 )
 
 
