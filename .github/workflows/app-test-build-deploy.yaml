@@ -106,11 +106,9 @@ jobs:
         with:
           python-version: '3.10'
       - name: 'downgrade npm version'
-        run: npm install -g npm@6.14.17
+        run: npm install -g npm@7.20.3
       - name: 'check npm version'
         run: npm -v
-      - name: 'check python version'
-        run: python --version
       - name: 'install libudev'
         if: startsWith(matrix.os, 'ubuntu')
         run: sudo apt-get update && sudo apt-get install libudev-dev
