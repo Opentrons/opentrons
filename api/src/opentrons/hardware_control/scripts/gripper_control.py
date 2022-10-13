@@ -42,13 +42,6 @@ GRIPPER_OFFSET = Point(0.0, 1.0, 0.0)
 AVAILABLE_SLOTS = [1, 3, 4, 9, 10, 12]
 
 
-class GripperState(enum.Enum):
-    UNGRIPPING = enum.auto()
-    GRIPPING = enum.auto()
-    Z_HOMED = enum.auto()
-    Z_LOWERED = enum.auto()
-
-
 def prompt_int_input(prompt_name: str) -> int:
     """Prompt to choose a member of the enum.
 

@@ -123,7 +123,7 @@ DEFAULT_MAX_SPEED_DISCONTINUITY: Final[
         OT3AxisKind.X: 90,
         OT3AxisKind.Y: 90,
         OT3AxisKind.Z: 40,
-        OT3AxisKind.Z_G: 20,
+        OT3AxisKind.Z_G: 15,
         OT3AxisKind.P: 10,
     },
     high_throughput={
