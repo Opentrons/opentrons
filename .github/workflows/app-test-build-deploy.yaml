@@ -107,8 +107,6 @@ jobs:
           python-version: '3.10'
       - name: 'upgrade npm version'
         run: npm install -g npm@8.19.2
-      - name: 'check npm version'
-        run: npm -v
       - name: 'install libudev'
         if: startsWith(matrix.os, 'ubuntu')
         run: sudo apt-get update && sudo apt-get install libudev-dev
