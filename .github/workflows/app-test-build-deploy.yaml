@@ -153,12 +153,7 @@ jobs:
           APPLE_ID_PASSWORD: ${{ secrets.OT_APP_APPLE_ID_PASSWORD }}
           HOST_PYTHON: python
         run: |
-          if [ '${{ matrix.os}}' == 'ubuntu-22.04']
-          then
-            CPPFLAGS="-std=c++17" make -C app-shell dist-${{ matrix.os }}
-          else
-            make -C app-shell dist-${{ matrix.os }}
-          fi
+          make -C app-shell dist-${{ matrix.os }}
 
       - if: github.event_name != 'pull_request'
         name: 'upload github artifact'
