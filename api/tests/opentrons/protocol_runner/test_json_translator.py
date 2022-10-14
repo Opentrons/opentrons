@@ -414,7 +414,7 @@ def _make_json_protocol(
     },
     liquids: Dict[str, protocol_schema_v6.Liquid] = {
         "liquid-id-555": protocol_schema_v6.Liquid(
-            displayName="water", description="water description", displayColor='#F00'
+            displayName="water", description="water description", displayColor="#F00"
         )
     },
 ) -> protocol_schema_v6.ProtocolSchemaV6:
@@ -458,7 +458,7 @@ def test_load_liquid(
             id="liquid-id-555",
             displayName="water",
             description="water description",
-            displayColor=HexColor("#F00"),
+            displayColor=HexColor(hex_color="#F00"),
         )
     ]
 

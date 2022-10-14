@@ -348,7 +348,7 @@ class HexColor(BaseModel):
 
     @validator("__root__")
     def _color_is_a_valid_hex(cls, v: str) -> str:
-        match = re.search(r"^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$", v)
+        match = re.search(r"^#(?:[0-9a-fA-F]{3,4}){1,2}$", v)
         if not match:
             raise ValueError("Color is not a valid hex color.")
         return v
