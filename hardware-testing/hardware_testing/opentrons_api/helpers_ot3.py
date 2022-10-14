@@ -1,6 +1,7 @@
 """Opentrons helper methods."""
 import asyncio
 from dataclasses import dataclass, replace
+from datetime import datetime
 from subprocess import run
 from typing import List, Optional, Dict, Tuple
 
@@ -23,18 +24,50 @@ def stop_on_device_display_ot3() -> None:
     run(["systemctl", "stop", "opentrons-robot-app"])
 
 
+def _create_fake_pipette_id(mount: OT3Mount, model: Optional[str]) -> Optional[str]:
+    if model is None:
+        return None
+    items = model.split("_")
+    assert len(items) == 3
+    size = "P1K" if items[0] == "p1000" else "P50"
+    channels = "S" if items[1] == "single" else "M"
+    version = items[2].upper().replace(".", "")
+    date = datetime.now().strftime("%y%m%d")
+    unique_number = 1 if mount == OT3Mount.LEFT else 2
+    return f"{size}{channels}{version}{date}A0{unique_number}"
+
+
+def _create_attached_instruments_dict(
+    pipette_left: Optional[str] = None, pipette_right: Optional[str] = None
+) -> Dict[OT3Mount, Dict[str, Optional[str]]]:
+    fake_id_left = _create_fake_pipette_id(OT3Mount.LEFT, pipette_left)
+    fake_id_right = _create_fake_pipette_id(OT3Mount.RIGHT, pipette_right)
+    sim_pip_left = {"model": pipette_left, "id": fake_id_left}
+    sim_pip_right = {"model": pipette_right, "id": fake_id_right}
+    return {OT3Mount.LEFT: sim_pip_left, OT3Mount.RIGHT: sim_pip_right}
+
+
 async def build_async_ot3_hardware_api(
-    is_simulating: Optional[bool] = False, use_defaults: Optional[bool] = False
+    is_simulating: Optional[bool] = False,
+    use_defaults: Optional[bool] = True,
+    pipette_left: Optional[str] = None,
+    pipette_right: Optional[str] = None,
 ) -> OT3API:
     """Built an OT3 Hardware API instance."""
-    """TODO: CF-Need a way to simulate pipettes attached """
     config = build_config_ot3({}) if use_defaults else load_ot3_config()
+    kwargs = {"config": config}
     if is_simulating:
         builder = OT3API.build_hardware_simulator
+        # TODO (andy s): add ability to simulate:
+        #                - gripper
+        #                - 96-channel
+        #                - modules
+        sim_pips = _create_attached_instruments_dict(pipette_left, pipette_right)
+        kwargs["attached_instruments"] = sim_pips  # type: ignore[assignment]
     else:
         builder = OT3API.build_hardware_controller
         stop_server_ot3()
-    return await builder(config=config)
+    return await builder(**kwargs)  # type: ignore[arg-type]
 
 
 def set_gantry_per_axis_setting_ot3(
