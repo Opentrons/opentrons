@@ -25,7 +25,7 @@ import type {
 import type { ModuleTypesThatRequiresExtraAttention } from '../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
 
 interface ModuleExtraAttentionProps {
-  moduleTypes: ModuleType[]
+  moduleTypes:  ModuleType[]
   modulesInfo: { [moduleId: string]: ModuleRenderInfoForProtocol }
 }
 
