@@ -405,6 +405,3 @@ def sql_engine(tmp_path: Path) -> Generator[Engine, None, None]:
     sql_engine = create_sql_engine(db_file_path)
     yield sql_engine
     sql_engine.dispose()
-
-
-
