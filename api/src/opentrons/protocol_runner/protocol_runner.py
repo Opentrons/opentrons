@@ -11,7 +11,7 @@ from opentrons.protocol_reader import (
     JsonProtocolConfig,
 )
 from opentrons.protocol_engine import ProtocolEngine, StateSummary, Command
-from opentrons.protocols.api_support.util import UnsupportedAPIError
+from opentrons.protocol_engine.errors.exceptions import CommandDoesNotExistError
 
 from .task_queue import TaskQueue
 from .json_file_reader import JsonFileReader
@@ -161,7 +161,7 @@ class ProtocolRunner:
         if not feature_flags.enable_load_liquid() and any(
             c.commandType != "loadLiquid" for c in commands
         ):
-            raise UnsupportedAPIError("loadLiquid command is not yet supported.")
+            raise CommandDoesNotExistError("loadLiquid command is not yet supported.")
 
         if feature_flags.enable_load_liquid():
             liquids = self._json_translator.translate_liquids(protocol)

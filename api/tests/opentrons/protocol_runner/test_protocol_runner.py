@@ -12,11 +12,11 @@ from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.config import feature_flags
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import UnsupportedAPIError
 from opentrons_shared_data.protocol.models.protocol_schema_v6 import ProtocolSchemaV6
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons.protocol_api_experimental import ProtocolContext
 from opentrons.protocol_engine import ProtocolEngine, Liquid, commands as pe_commands
+from opentrons.protocol_engine.errors.exceptions import CommandDoesNotExistError
 from opentrons.protocol_reader import (
     ProtocolSource,
     JsonProtocolConfig,
@@ -332,7 +332,7 @@ def test_load_json_does_not_load_liquids_when_ff_disabled(
     decoy.when(json_translator.translate_commands(json_protocol)).then_return(commands)
     decoy.when(json_translator.translate_liquids(json_protocol)).then_return(liquids)
 
-    with pytest.raises(UnsupportedAPIError):
+    with pytest.raises(CommandDoesNotExistError):
         subject.load(json_protocol_source)
 
 
