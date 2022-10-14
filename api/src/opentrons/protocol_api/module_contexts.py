@@ -527,7 +527,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
             ``temperature`` has been reached.
 
         """
-        self._core.set_target_lid_temperature(celsius=42.0)
+        self._core.set_target_lid_temperature(celsius=temperature)
         self._core.wait_for_lid_temperature()
 
     @publish(command=cmds.thermocycler_execute_profile)
