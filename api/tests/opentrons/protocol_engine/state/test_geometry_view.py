@@ -246,6 +246,13 @@ def test_get_all_labware_highest_z(
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
         offsetId="plate-offset-id",
     )
+    off_deck_plate = LoadedLabware(
+        id="off-deck-plate-id",
+        loadName="off-deck-plate-load-name",
+        definitionUri="off-deck-plate-definition-uri",
+        location=OFF_DECK_LOCATION,
+        offsetId="plate-offset-id",
+    )
     reservoir = LoadedLabware(
         id="reservoir-id",
         loadName="reservoir-load-name",
@@ -255,19 +262,27 @@ def test_get_all_labware_highest_z(
     )
 
     plate_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+    off_deck_plate_offset = LabwareOffsetVector(x=1, y=-2, z=3)
     reservoir_offset = LabwareOffsetVector(x=1, y=-2, z=3)
 
     decoy.when(module_view.get_all()).then_return([])
 
-    decoy.when(labware_view.get_all()).then_return([plate, reservoir])
+    decoy.when(labware_view.get_all()).then_return([plate, off_deck_plate, reservoir])
     decoy.when(labware_view.get("plate-id")).then_return(plate)
+    decoy.when(labware_view.get("off-deck-plate-id")).then_return(off_deck_plate)
     decoy.when(labware_view.get("reservoir-id")).then_return(reservoir)
 
     decoy.when(labware_view.get_definition("plate-id")).then_return(well_plate_def)
+    decoy.when(labware_view.get_definition("off-deck-plate-id")).then_return(
+        well_plate_def
+    )
     decoy.when(labware_view.get_definition("reservoir-id")).then_return(reservoir_def)
 
     decoy.when(labware_view.get_labware_offset_vector("plate-id")).then_return(
         plate_offset
+    )
+    decoy.when(labware_view.get_labware_offset_vector("off-deck-plate-id")).then_return(
+        off_deck_plate_offset
     )
     decoy.when(labware_view.get_labware_offset_vector("reservoir-id")).then_return(
         reservoir_offset
@@ -284,6 +299,7 @@ def test_get_all_labware_highest_z(
     reservoir_z = subject.get_labware_highest_z("reservoir-id")
     all_z = subject.get_all_labware_highest_z()
 
+    # Should exclude the off-deck plate.
     assert all_z == max(plate_z, reservoir_z)
 
 

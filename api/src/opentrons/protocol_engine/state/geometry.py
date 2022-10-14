@@ -64,6 +64,7 @@ class GeometryView:
             *(
                 self._get_highest_z_from_labware_data(lw_data)
                 for lw_data in self._labware.get_all()
+                if lw_data.location != OFF_DECK_LOCATION
             ),
             *(
                 self._modules.get_overall_height(module.id)
