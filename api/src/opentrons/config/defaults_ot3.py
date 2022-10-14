@@ -63,48 +63,47 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
     none={
         OT3AxisKind.X: 500,
         OT3AxisKind.Y: 500,
-        OT3AxisKind.Z: 200,
+        OT3AxisKind.Z: 65,
         OT3AxisKind.P: 45,
         OT3AxisKind.Z_G: 100,
     },
     high_throughput={
         OT3AxisKind.X: 500,
         OT3AxisKind.Y: 500,
-        OT3AxisKind.Z: 200,
+        OT3AxisKind.Z: 35,
         OT3AxisKind.P: 45,
     },
     low_throughput={
         OT3AxisKind.X: 500,
         OT3AxisKind.Y: 500,
-        OT3AxisKind.Z: 200,
+        OT3AxisKind.Z: 65,
         OT3AxisKind.P: 45,
     },
     two_low_throughput={
         OT3AxisKind.X: 500,
         OT3AxisKind.Y: 500,
     },
-    gripper={OT3AxisKind.Z: 200},
+    gripper={OT3AxisKind.Z: 65},
 )
 
 DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
     none={
         OT3AxisKind.X: 1000,
         OT3AxisKind.Y: 1000,
-        OT3AxisKind.Z: 500,
+        OT3AxisKind.Z: 100,
         OT3AxisKind.P: 50,
-        OT3AxisKind.Z_G: 100,
         OT3AxisKind.Z_G: 20,
     },
     high_throughput={
         OT3AxisKind.X: 1000,
         OT3AxisKind.Y: 1000,
-        OT3AxisKind.Z: 500,
+        OT3AxisKind.Z: 100,
         OT3AxisKind.P: 50,
     },
     low_throughput={
         OT3AxisKind.X: 1000,
         OT3AxisKind.Y: 1000,
-        OT3AxisKind.Z: 500,
+        OT3AxisKind.Z: 100,
         OT3AxisKind.P: 50,
     },
     two_low_throughput={
@@ -112,7 +111,7 @@ DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryL
         OT3AxisKind.Y: 1000,
     },
     gripper={
-        OT3AxisKind.Z: 500,
+        OT3AxisKind.Z: 100,
     },
 )
 
@@ -120,10 +119,10 @@ DEFAULT_MAX_SPEED_DISCONTINUITY: Final[
     ByGantryLoad[Dict[OT3AxisKind, float]]
 ] = ByGantryLoad(
     none={
-        OT3AxisKind.X: 90,
-        OT3AxisKind.Y: 90,
-        OT3AxisKind.Z: 40,
-        OT3AxisKind.Z_G: 15,
+        OT3AxisKind.X: 10,
+        OT3AxisKind.Y: 10,
+        OT3AxisKind.Z: 10,
+        OT3AxisKind.Z_G: 10,
         OT3AxisKind.P: 10,
     },
     high_throughput={
