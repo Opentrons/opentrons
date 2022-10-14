@@ -48,7 +48,6 @@ async def simulating_module_driver_patched(simulating_module):
 
 
 async def test_sim_state(simulating_module):
-    await simulating_module.wait_next_poll()
     assert simulating_module.temperature == 23
     assert simulating_module.speed == 0
     assert simulating_module.target_temperature is None
@@ -149,7 +148,6 @@ async def test_deactivated_updated_live_data(simulating_module):
     await simulating_module.close_labware_latch()
     await simulating_module.start_set_temperature(50)
     await simulating_module.set_speed(100)
-    await simulating_module.wait_next_poll()
     assert simulating_module.live_data == {
         "data": {
             "labwareLatchStatus": "idle_closed",
@@ -193,9 +191,12 @@ async def fake_get_latch_status(*args, **kwargs):
 
 async def test_async_error_response(simulating_module_driver_patched):
     """Test that asynchronous error is detected by poller and module live data and status are updated."""
+    # TODO(mc, 2022-10-13): driver is too deep a level to mock in this test
+    # mock the reader, instead
     simulating_module_driver_patched._driver.get_temperature.side_effect = Exception()
     with pytest.raises(Exception):
-        await simulating_module_driver_patched.wait_next_poll()
+        await simulating_module_driver_patched._poller.wait_next_poll()
+
     assert (
         simulating_module_driver_patched.live_data["data"]["errorDetails"]
         == "Exception()"
@@ -208,6 +209,6 @@ async def test_async_error_response(simulating_module_driver_patched):
     simulating_module_driver_patched._driver.get_labware_latch_status.side_effect = (
         fake_get_latch_status
     )
-    await simulating_module_driver_patched.wait_next_poll()
+    await simulating_module_driver_patched._poller.wait_next_poll()
     assert simulating_module_driver_patched.live_data["data"]["errorDetails"] is None
     assert simulating_module_driver_patched.status == HeaterShakerStatus.RUNNING

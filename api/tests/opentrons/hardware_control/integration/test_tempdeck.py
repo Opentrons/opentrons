@@ -37,7 +37,6 @@ def test_device_info(tempdeck: TempDeck) -> None:
 
 async def test_set_temperature(tempdeck: TempDeck) -> None:
     """It should set the temperature and return when target is reached."""
-    await tempdeck.wait_next_poll()
     assert tempdeck.live_data == {
         "status": "idle",
         "data": {"currentTemp": 0, "targetTemp": None},
@@ -54,7 +53,6 @@ async def test_set_temperature(tempdeck: TempDeck) -> None:
 
 async def test_start_set_temperature_cool(tempdeck: TempDeck) -> None:
     """It should set the temperature and return and wait for temperature."""
-    await tempdeck.wait_next_poll()
     current = tempdeck.temperature
     new_temp = current - 20
 
@@ -74,7 +72,6 @@ async def test_start_set_temperature_cool(tempdeck: TempDeck) -> None:
 
 async def test_start_set_temperature_heat(tempdeck: TempDeck) -> None:
     """It should set the temperature and return and wait for temperature."""
-    await tempdeck.wait_next_poll()
     current = tempdeck.temperature
     new_temp = current + 20
 

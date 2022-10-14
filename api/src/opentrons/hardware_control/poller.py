@@ -1,7 +1,7 @@
 import asyncio
 import logging
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Optional
 
 
 log = logging.getLogger(__name__)
@@ -30,12 +30,20 @@ class Poller:
         self.interval = interval
         self._reader = reader
         self._poll_waiters: List["asyncio.Future[None]"] = []
+        self._poll_forever_task: Optional["asyncio.Task[None]"] = None
+
+    async def start(self) -> None:
+        assert self._poll_forever_task is None, "Poller already started"
         self._poll_forever_task = asyncio.create_task(self._poll_forever())
+        await self.wait_next_poll()
 
     async def stop(self) -> None:
         """Stop polling."""
-        self._poll_forever_task.cancel()
-        await asyncio.gather(self._poll_forever_task, return_exceptions=True)
+        task = self._poll_forever_task
+
+        assert task is not None, "Poller never started"
+        task.cancel()
+        await asyncio.gather(task, return_exceptions=True)
 
     async def wait_next_poll(self) -> None:
         """Wait for the next poll to complete.

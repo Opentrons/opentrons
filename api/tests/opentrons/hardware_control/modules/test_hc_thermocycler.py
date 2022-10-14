@@ -76,7 +76,6 @@ async def test_sim_update(subject: modules.Thermocycler) -> None:
     assert subject.status == "holding at target"
 
     await subject.deactivate_block()
-    await subject.wait_next_poll()
     assert subject.temperature == 23
     assert subject.target is None
     assert subject.status == "idle"
@@ -150,6 +149,8 @@ async def set_temperature_subject(
         poller=poller,
         device_info={},
     )
+
+    await poller.start()
     yield hw_tc
     await hw_tc.cleanup()
 

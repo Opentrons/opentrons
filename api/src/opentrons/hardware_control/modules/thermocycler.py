@@ -20,7 +20,7 @@ from opentrons.drivers.thermocycler import (
 )
 
 
-MODULE_LOG = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 POLLING_FREQUENCY_SEC = 1.0
 SIM_POLLING_FREQUENCY_SEC = POLLING_FREQUENCY_SEC / 50.0
@@ -89,8 +89,7 @@ class Thermocycler(mod_abc.AbstractModule):
 
         reader = ThermocyclerReader(driver=driver)
         poller = Poller(reader=reader, interval=polling_frequency)
-
-        mod = cls(
+        module = cls(
             port=port,
             usb_port=usb_port,
             driver=driver,
@@ -100,7 +99,13 @@ class Thermocycler(mod_abc.AbstractModule):
             loop=loop,
             execution_manager=execution_manager,
         )
-        return mod
+
+        try:
+            await poller.start()
+        except Exception:
+            log.exception(f"First read of Thermocycler on port {port} failed")
+
+        return module
 
     def __init__(
         self,
@@ -394,11 +399,6 @@ class Thermocycler(mod_abc.AbstractModule):
         while self.lid_status != status:
             await self._poller.wait_next_poll()
 
-    # TODO(mc, 2022-10-08): not publicly used; remove
-    async def wait_next_poll(self) -> None:
-        """Wait for the next poll to complete."""
-        await self._poller.wait_next_poll()
-
     @property
     def lid_target(self) -> Optional[float]:
         return self._reader.lid_temperature.target
@@ -561,7 +561,7 @@ class Thermocycler(mod_abc.AbstractModule):
             None
         """
         self._error = str(error)
-        MODULE_LOG.error(
+        log.error(
             f"Thermocycler has encountered an unrecoverable error: {self._error}. "
             f"Please refer to support article at "
             f"https://support.opentrons.com/en/articles/3469797-thermocycler-module"

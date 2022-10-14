@@ -75,20 +75,25 @@ class HeaterShaker(mod_abc.AbstractModule):
             driver = SimulatingDriver()
             polling_period = SIMULATING_POLL_PERIOD
 
-        device_info = await driver.get_device_info()
         reader = HeaterShakerReader(driver=driver)
         poller = Poller(reader=reader, interval=polling_period)
-
-        return cls(
+        module = cls(
             port=port,
             usb_port=usb_port,
-            device_info=device_info,
+            device_info=await driver.get_device_info(),
             execution_manager=execution_manager,
             driver=driver,
             reader=reader,
             poller=poller,
             loop=loop,
         )
+
+        try:
+            await poller.start()
+        except Exception:
+            log.exception(f"First read of Heater-Shaker on port {port} failed")
+
+        return module
 
     def __init__(
         self,
@@ -178,11 +183,6 @@ class HeaterShaker(mod_abc.AbstractModule):
 
     def bootloader(self) -> UploadFunction:
         return update.upload_via_dfu
-
-    # TODO(mc, 2022-10-08): not publicly used; remove
-    async def wait_next_poll(self) -> None:
-        """Wait for the next poll to complete."""
-        await self._poller.wait_next_poll()
 
     @property
     def device_info(self) -> Mapping[str, str]:

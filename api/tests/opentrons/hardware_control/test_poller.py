@@ -40,13 +40,16 @@ async def subject(mock_reader: Reader) -> AsyncGenerator[Poller, None]:
 
 
 async def test_poller(decoy: Decoy, mock_reader: Reader, subject: Poller) -> None:
+    decoy.verify(await mock_reader.read(), times=0)
+
+    await subject.start()
     decoy.verify(await mock_reader.read(), times=1)
 
     await subject.wait_next_poll()
     decoy.verify(await mock_reader.read(), times=2)
 
-    await subject.wait_next_poll()
-    decoy.verify(await mock_reader.read(), times=3)
+    await subject.stop()
+    decoy.verify(await mock_reader.read(), times=2)
 
 
 async def test_poller_concurrency(
@@ -56,8 +59,11 @@ async def test_poller_concurrency(
     """It should wait for a full poll before notifying."""
     read_started_event, ok_to_finish_read_event = mock_reader_flow_control
 
-    # wait for the first read to start, then subscribe in the middle of the first read
+    # wait for the first read to start
+    asyncio.create_task(subject.start())
     await read_started_event.wait()
+
+    # subscribe in the middle of the first read
     poll_notification = asyncio.create_task(subject.wait_next_poll())
 
     # allow the first read to finish, then wait for the second read to start
@@ -77,8 +83,27 @@ async def test_poller_concurrency(
     assert poll_notification.done() is True
 
 
-async def test_poller_error(decoy: Decoy, mock_reader: Reader, subject: Poller) -> None:
-    """It should raise if read errors"""
+async def test_poller_start_error(
+    decoy: Decoy, mock_reader: Reader, subject: Poller
+) -> None:
+    """It should raise in start if read errors."""
+    decoy.when(await mock_reader.read()).then_raise(RuntimeError("oh no"))
+
+    with pytest.raises(RuntimeError, match="oh no"):
+        await subject.start()
+
+    decoy.verify(
+        mock_reader.on_error(matchers.ErrorMatching(RuntimeError, match="oh no")),
+        times=1,
+    )
+
+
+async def test_poller_wait_next_poll_error(
+    decoy: Decoy, mock_reader: Reader, subject: Poller
+) -> None:
+    """It should raise in wait_next_poll if read errors."""
+    await subject.start()
+
     decoy.when(await mock_reader.read()).then_raise(RuntimeError("oh no"))
 
     with pytest.raises(RuntimeError, match="oh no"):

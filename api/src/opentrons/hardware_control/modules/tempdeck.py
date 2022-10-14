@@ -68,18 +68,23 @@ class TempDeck(mod_abc.AbstractModule):
 
         reader = TempDeckReader(driver=driver)
         poller = Poller(reader=reader, interval=polling_frequency)
-        device_info = await driver.get_device_info()
-
-        return cls(
+        module = cls(
             port=port,
             usb_port=usb_port,
             execution_manager=execution_manager,
             driver=driver,
             reader=reader,
             poller=poller,
-            device_info=device_info,
+            device_info=await driver.get_device_info(),
             loop=loop,
         )
+
+        try:
+            await poller.start()
+        except Exception:
+            log.exception(f"First read of Temperature Module on port {port} failed")
+
+        return module
 
     def __init__(
         self,
@@ -120,11 +125,6 @@ class TempDeck(mod_abc.AbstractModule):
     def bootloader(self) -> types.UploadFunction:
         return update.upload_via_avrdude
 
-    # TODO(mc, 2022-10-08): not publicly used; remove
-    async def wait_next_poll(self) -> None:
-        """Wait for the next poll to complete."""
-        await self._poller.wait_next_poll()
-
     async def start_set_temperature(self, celsius: float) -> None:
         """Set the target temperature in degrees Celsius.
 
@@ -159,7 +159,7 @@ class TempDeck(mod_abc.AbstractModule):
         async def _await_temperature() -> None:
             if awaiting_temperature is None:
                 while self.status != TemperatureStatus.HOLDING:
-                    await self.wait_next_poll()
+                    await self._poller.wait_next_poll()
             elif self.status == TemperatureStatus.HEATING:
                 while self.temperature < awaiting_temperature:
                     await self._poller.wait_next_poll()
