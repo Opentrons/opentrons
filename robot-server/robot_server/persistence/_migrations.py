@@ -25,15 +25,24 @@ Database schema versions:
     - `run_table._updated_at` column added
 """
 import logging
+import pickle
 from datetime import datetime, timezone
 from typing import Optional
 from typing_extensions import Final
 
 import sqlalchemy
 
-from ._tables import migration_table, run_table
+from robot_server.protocols.analysis_models import CompletedAnalysis
 
-_LATEST_SCHEMA_VERSION: Final = 1
+from ._tables import (
+    analysis_table as newest_analysis_table,
+    migration_table as newest_migration_table,
+    run_table as newest_run_table,
+)
+
+from . import pydantic_json
+
+_LATEST_SCHEMA_VERSION: Final = 2
 
 _log = logging.getLogger(__name__)
 
@@ -51,12 +60,18 @@ def migrate(sql_engine: sqlalchemy.engine.Engine) -> None:
         version = _get_schema_version(transaction)
 
         if version is not None:
+            # TODO: Spurious log statement when version is already max?
+            _log.info(
+                f"Migrating database from schema {version}"
+                f" to schema {_LATEST_SCHEMA_VERSION}."
+            )
             if version < 1:
                 _migrate_0_to_1(transaction)
-
+            if version < 2:
+                _migrate_1_to_2(transaction)
             _log.info(
                 f"Migrated database from schema {version}"
-                f" to version {_LATEST_SCHEMA_VERSION}"
+                f" to schema {_LATEST_SCHEMA_VERSION}."
             )
         else:
             _log.info(
@@ -69,7 +84,7 @@ def migrate(sql_engine: sqlalchemy.engine.Engine) -> None:
 
 def _insert_migration(transaction: sqlalchemy.engine.Connection) -> None:
     transaction.execute(
-        sqlalchemy.insert(migration_table).values(
+        sqlalchemy.insert(newest_migration_table).values(
             created_at=datetime.now(tz=timezone.utc),
             version=_LATEST_SCHEMA_VERSION,
         )
@@ -86,8 +101,8 @@ def _get_schema_version(transaction: sqlalchemy.engine.Connection) -> Optional[i
     if _is_version_0(transaction):
         return 0
 
-    select_latest_version = sqlalchemy.select(migration_table).order_by(
-        sqlalchemy.desc(migration_table.c.version)
+    select_latest_version = sqlalchemy.select(newest_migration_table).order_by(
+        sqlalchemy.desc(newest_migration_table.c.version)
     )
     migration = transaction.execute(select_latest_version).first()
 
@@ -102,7 +117,7 @@ def _is_version_0(transaction: sqlalchemy.engine.Connection) -> bool:
     we know we're on schema version 0 if those columns are missing.
     """
     inspector = sqlalchemy.inspect(transaction)
-    run_columns = inspector.get_columns(run_table.name)
+    run_columns = inspector.get_columns(newest_run_table.name)
 
     for column in run_columns:
         if column["name"] == "state_summary":
@@ -135,3 +150,45 @@ def _migrate_0_to_1(transaction: sqlalchemy.engine.Connection) -> None:
     transaction.execute(add_commands_column)
     transaction.execute(add_status_column)
     transaction.execute(add_updated_at_column)
+
+
+def _migrate_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
+    """Migrate to schema version 2.
+
+    This is a data-only migration, not affecting column types.
+
+
+
+    This migration changes the following columns,
+    which were storing pickled dicts, into JSON strings:
+
+    * Column "completed_analysis" of table "analysis"
+    * Column "state_summary" of table "run"
+    * Column "commands" of table "run"
+    """
+
+    v1_completed_analysis_column = sqlalchemy.column(
+        "completed_analysis", sqlalchemy.LargeBinary
+    )
+    select_statement = sqlalchemy.select(
+        newest_analysis_table.c.id, v1_completed_analysis_column
+    ).select_from(newest_analysis_table)
+
+    v1_analyses = transaction.execute(select_statement)
+
+    for v1_analysis in v1_analyses:
+        id = v1_analysis.id
+        parsed_analysis = CompletedAnalysis.parse_obj(
+            pickle.loads(v1_analysis.completed_analysis)
+        )
+
+        new_raw = pydantic_json.pydantic_to_sql(data=parsed_analysis)
+
+        update_statement = (
+            sqlalchemy.update(newest_analysis_table)
+            .where(newest_analysis_table.c.id == id)
+            .values(completed_analysis=new_raw)
+        )
+        transaction.execute(update_statement)
+
+    # TODO(mm, 2022-10-13): Also migrate columns run.state_summary and run.commands.

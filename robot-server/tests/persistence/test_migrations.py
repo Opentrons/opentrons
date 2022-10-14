@@ -45,6 +45,8 @@ def database_v0(tmp_path: Path) -> Path:
 def database_v1(tmp_path: Path) -> Path:
     """Create a database matching schema version 1."""
     db_path = tmp_path / "migration-test-v1.db"
+    # FIX BEFORE MERGE: This is no longer a "v1" database. It's "v2."
+    # Can we replace this with our real v1 database snapshot?
     sql_engine = create_sql_engine(db_path)
     sql_engine.dispose()
     return db_path
@@ -74,7 +76,7 @@ def test_migration(subject: sqlalchemy.engine.Engine) -> None:
     """It should migrate a table."""
     migrations = subject.execute(sqlalchemy.select(migration_table)).all()
 
-    assert [m.version for m in migrations] == [1]
+    assert [m.version for m in migrations] == [2]
 
     # all table queries work without raising
     for table in TABLES:
