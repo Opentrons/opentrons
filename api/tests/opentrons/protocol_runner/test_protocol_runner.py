@@ -12,6 +12,7 @@ from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.config import feature_flags
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import UnsupportedAPIError
 from opentrons_shared_data.protocol.models.protocol_schema_v6 import ProtocolSchemaV6
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons.protocol_api_experimental import ProtocolContext
@@ -289,7 +290,7 @@ def test_load_json(
 
 
 # TODO (tz, 10-12-22): remove this test when liquids ff is removed
-def test_load_json_pre_liquids_ff(
+def test_load_json_does_not_load_liquids_when_ff_disabled(
     decoy: Decoy,
     json_file_reader: JsonFileReader,
     json_translator: JsonTranslator,
@@ -331,21 +332,8 @@ def test_load_json_pre_liquids_ff(
     decoy.when(json_translator.translate_commands(json_protocol)).then_return(commands)
     decoy.when(json_translator.translate_liquids(json_protocol)).then_return(liquids)
 
-    subject.load(json_protocol_source)
-
-    decoy.verify(
-        protocol_engine.add_command(
-            request=pe_commands.WaitForResumeCreate(
-                params=pe_commands.WaitForResumeParams(message="hello")
-            )
-        ),
-        protocol_engine.add_command(
-            request=pe_commands.WaitForResumeCreate(
-                params=pe_commands.WaitForResumeParams(message="goodbye")
-            )
-        ),
-        task_queue.set_run_func(func=protocol_engine.wait_until_complete),
-    )
+    with pytest.raises(UnsupportedAPIError):
+        subject.load(json_protocol_source)
 
 
 def test_load_python(
