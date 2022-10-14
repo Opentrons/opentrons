@@ -44,7 +44,6 @@ const render = () => {
 const protocolWithMagTempTC = (_protocolWithMagTempTC as unknown) as ProtocolAnalysisFile
 
 describe('SetupLabwareList', () => {
-  let props: React.ComponentProps<typeof SetupLabwareList>
   beforeEach(() => {
     when(mockUseProtocolDetailsForRun).calledWith(RUN_ID_1).mockReturnValue({
       displayName: null,
