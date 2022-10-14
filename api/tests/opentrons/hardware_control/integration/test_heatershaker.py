@@ -1,13 +1,12 @@
-import asyncio
 from typing import AsyncGenerator
 
 import pytest
-from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.emulation.settings import Settings
 from opentrons.hardware_control.emulation.util import TEMPERATURE_ROOM
-
 from opentrons.hardware_control.modules import HeaterShaker
+
+from .build_module import build_module
 
 TEMP_ROOM_LOW = TEMPERATURE_ROOM - 0.7
 TEMP_ROOM_HIGH = TEMPERATURE_ROOM + 0.7
@@ -20,11 +19,10 @@ async def heatershaker(
     execution_manager: ExecutionManager,
     poll_interval_seconds: float,
 ) -> AsyncGenerator[HeaterShaker, None]:
-    module = await HeaterShaker.build(
-        port=f"socket://127.0.0.1:{emulator_settings.heatershaker_proxy.driver_port}",
+    module = await build_module(
+        HeaterShaker,
+        port=emulator_settings.heatershaker_proxy.driver_port,
         execution_manager=execution_manager,
-        usb_port=USBPort(name="", port_number=1, device_path="", hub=1),
-        hw_control_loop=asyncio.get_running_loop(),
         poll_interval_seconds=poll_interval_seconds,
     )
     yield module
