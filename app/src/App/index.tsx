@@ -25,6 +25,7 @@ import { ProtocolsLanding } from '../pages/Protocols/ProtocolsLanding'
 import { ProtocolDetails } from '../pages/Protocols/ProtocolDetails'
 import { AppSettings } from '../pages/AppSettings'
 import { Labware } from '../pages/Labware'
+import { ODDSplash } from '../pages/ODD/ODDSplash'
 import { getIsOnDevice } from '../redux/config'
 import { getLocalRobot } from '../redux/discovery'
 import { useSoftwareUpdatePoll } from './hooks'
@@ -101,11 +102,20 @@ export const AppComponent = (): JSX.Element => {
       name: 'App Settings',
       path: '/app-settings/:appSettingsTab?',
     },
+    // ODD
+    {
+      Component: ODDSplash,
+      exact: true,
+      name: 'ODD Splash',
+      path: '/device',
+    },
   ]
 
   const isOnDeviceRoutes = allRoutes.filter(route => route.path !== '/devices')
 
   const routes = isOnDevice ? isOnDeviceRoutes : allRoutes
+
+  console.log('routes', routes)
 
   return (
     <>
@@ -139,7 +149,12 @@ export const AppComponent = (): JSX.Element => {
                 </Route>
               )
             })}
-            <Redirect exact from="/" to="/protocols" />
+            <Redirect
+              exact
+              from="/"
+              // to={isOnDevice ? '/device/start' : '/protocols'}
+              to="/start"
+            />
           </Switch>
           <Alerts />
         </Box>
