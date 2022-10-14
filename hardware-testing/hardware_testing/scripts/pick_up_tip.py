@@ -31,6 +31,14 @@ SPEED_Z = 250
 
 pick_up_speed = 10
 press_distance = 30
+aspirate_depth = 7
+volume = 1000
+liquid_retract_dist = 12
+liquid_retract_speed = 10
+retract_dist = 100
+retract_speed = 60
+
+leak_test_time = 30
 
 def _create_relative_point(axis: OT3Axis, distance: float) -> Point:
     if axis == OT3Axis.X:
@@ -167,6 +175,18 @@ async def update_tip_spec(api, action):
     else:
         raise("Pass a pickup or drop_tip to function")
 
+def countdown(self, countdown: float):
+    """
+    This function loops through a countdown before checking the leak visually
+    """
+    time_suspend = 0
+    while time_suspend < countdown:
+        time.sleep(1)
+        time_suspend +=1
+        print(f"Remaining: {countdown-time_suspend} (s)", end='')
+        print('\r', end='')
+    print('')
+
 async def _main() -> None:
     hw_api = await build_async_ot3_hardware_api(is_simulating=args.simulate,
                                     use_defaults=True)
@@ -232,6 +252,37 @@ async def _main() -> None:
         # Home Z
         await hw_api.home_z(MOUNT, allow_home_other = False)
         input("Feel the Tip")
+
+        cur_pos = await api.current_position_ot3(MOUNT)
+        z_pos = cur_pos[OT3Axis.by_mount(MOUNT)]
+        await hw_api.move_to(MOUNT, Point(trough[0], trough[1], z_pos))
+        await hw_api.move_to(MOUNT, Point(trough[0], trough[1], trough[2]-aspirate_depth))
+        await hw_api.prepare_for_aspirate(MOUNT)
+        await hw_api.aspirate(MOUNT, volume)
+
+        cur_pos = await api.current_position_ot3(MOUNT)
+        z_pos = cur_pos[OT3Axis.by_mount(MOUNT)]
+        await hw_api.move_to(MOUNT,
+                            Point(trough[0],
+                                    trough[1],
+                                    z_pos+liquid_retract_dist),
+                            speed = liquid_retract_speed)
+        cur_pos = await api.current_position_ot3(MOUNT)
+        z_pos = cur_pos[OT3Axis.by_mount(MOUNT)]
+        await hw_api.move_to(MOUNT,
+                            Point(trough[0],
+                                    trough[1],
+                                    z_pos+retract_dist),
+                            speed = retract_speed)
+
+        countdown(leak_test_time)
+        input("Check to see if the pipette is leaking")
+
+
+
+
+
+
     hw_api.clean_up()
 
     # cur_pos = await api.current_position_ot3(MOUNT)
