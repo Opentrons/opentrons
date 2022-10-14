@@ -12,27 +12,21 @@ from opentrons.hardware_control.modules.types import TemperatureStatus
 
 
 @pytest.fixture
-def execution_manager() -> ExecutionManager:
-    """Return the ExecutionManager used by the Thermocycler test subject."""
-    return ExecutionManager()
-
-
-@pytest.fixture
 async def thermocycler(
     emulation_app: None,
     emulator_settings: Settings,
     execution_manager: ExecutionManager,
+    poll_interval_seconds: float,
 ) -> AsyncGenerator[Thermocycler, None]:
     """Return a Thermocycler test subject."""
     module = await Thermocycler.build(
         port=f"socket://127.0.0.1:{emulator_settings.thermocycler_proxy.driver_port}",
         execution_manager=execution_manager,
         usb_port=USBPort(name="", port_number=1, device_path="", hub=1),
-        loop=asyncio.get_running_loop(),
-        polling_frequency=0.01,
+        hw_control_loop=asyncio.get_running_loop(),
+        poll_interval_seconds=poll_interval_seconds,
     )
     yield module
-    await execution_manager.cancel()
     await module.cleanup()
 
 
@@ -182,7 +176,7 @@ async def test_cycle_cannot_be_interrupted_by_pause(
     # For this test to be meaningful, this task needs to have woken up before the steps
     # have completed. Double-check that this is actually the case.
     # Note that current_step_index is 1-based.
-    assert thermocycler.current_step_index <= thermocycler.total_step_count
+    assert thermocycler.current_step_index <= thermocycler.total_step_count  # type: ignore[operator]
     assert thermocycler.temperature != final_temp
 
     # Issue a pause now that we're in the middle of the steps.

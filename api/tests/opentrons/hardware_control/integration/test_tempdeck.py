@@ -1,5 +1,5 @@
 import asyncio
-from typing import Iterator
+from typing import AsyncGenerator
 
 import pytest
 from opentrons.drivers.rpi_drivers.types import USBPort
@@ -11,18 +11,19 @@ from opentrons.hardware_control.modules import TempDeck
 @pytest.fixture
 async def tempdeck(
     emulator_settings: Settings,
-    emulation_app: Iterator[None],
-) -> TempDeck:
+    emulation_app: None,
+    execution_manager: ExecutionManager,
+    poll_interval_seconds: float,
+) -> AsyncGenerator[TempDeck, None]:
     execution_manager = ExecutionManager()
     module = await TempDeck.build(
         port=f"socket://127.0.0.1:{emulator_settings.temperature_proxy.driver_port}",
         execution_manager=execution_manager,
         usb_port=USBPort(name="", port_number=1, device_path="", hub=1),
-        loop=asyncio.get_running_loop(),
-        polling_frequency=0.01,
+        hw_control_loop=asyncio.get_running_loop(),
+        poll_interval_seconds=poll_interval_seconds,
     )
     yield module
-    await execution_manager.cancel()
     await module.cleanup()
 
 

@@ -1,9 +1,9 @@
 import asyncio
-from typing import AsyncIterator, Iterator
+from typing import AsyncGenerator
 
 import pytest
-from mock import AsyncMock
 from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.emulation.settings import Settings
 from opentrons.hardware_control.emulation.util import TEMPERATURE_ROOM
 
@@ -15,21 +15,23 @@ TEMP_ROOM_HIGH = TEMPERATURE_ROOM + 0.7
 
 @pytest.fixture
 async def heatershaker(
-    emulation_app: Iterator[None],
+    emulation_app: None,
     emulator_settings: Settings,
-) -> AsyncIterator[HeaterShaker]:
+    execution_manager: ExecutionManager,
+    poll_interval_seconds: float,
+) -> AsyncGenerator[HeaterShaker, None]:
     module = await HeaterShaker.build(
         port=f"socket://127.0.0.1:{emulator_settings.heatershaker_proxy.driver_port}",
-        execution_manager=AsyncMock(),
+        execution_manager=execution_manager,
         usb_port=USBPort(name="", port_number=1, device_path="", hub=1),
-        loop=asyncio.get_running_loop(),
-        polling_period=0.01,
+        hw_control_loop=asyncio.get_running_loop(),
+        poll_interval_seconds=poll_interval_seconds,
     )
     yield module
     await module.cleanup()
 
 
-def test_device_info(heatershaker: HeaterShaker):
+def test_device_info(heatershaker: HeaterShaker) -> None:
     """Confirm device_info returns correct values."""
     assert heatershaker.device_info == {
         "model": "v01",

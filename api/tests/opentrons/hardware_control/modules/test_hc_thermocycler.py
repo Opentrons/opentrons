@@ -29,7 +29,7 @@ async def subject(usb_port: USBPort) -> AsyncGenerator[modules.Thermocycler, Non
         usb_port=usb_port,
         type=modules.ModuleType.THERMOCYCLER,
         simulating=True,
-        loop=asyncio.get_running_loop(),
+        hw_control_loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
     )
     yield cast(modules.Thermocycler, therm)
@@ -142,7 +142,7 @@ async def set_temperature_subject(
     hw_tc = modules.Thermocycler(
         port="/dev/ot_module_sim_thermocycler0",
         usb_port=usb_port,
-        loop=asyncio.get_running_loop(),
+        hw_control_loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
         driver=simulator_set_plate_spy,
         reader=reader,

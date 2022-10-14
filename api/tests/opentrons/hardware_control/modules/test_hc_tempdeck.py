@@ -24,7 +24,7 @@ async def subject(usb_port: USBPort) -> modules.AbstractModule:
         usb_port=usb_port,
         type=modules.ModuleType.TEMPERATURE,
         simulating=True,
-        loop=asyncio.get_running_loop(),
+        hw_control_loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
     )
     yield temp

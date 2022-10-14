@@ -39,7 +39,7 @@ async def build(
     type: ModuleType,
     simulating: bool,
     usb_port: USBPort,
-    loop: asyncio.AbstractEventLoop,
+    hw_control_loop: asyncio.AbstractEventLoop,
     execution_manager: ExecutionManager,
     sim_model: Optional[str] = None,
 ) -> AbstractModule:
@@ -47,7 +47,7 @@ async def build(
         port=port,
         usb_port=usb_port,
         simulating=simulating,
-        loop=loop,
+        hw_control_loop=hw_control_loop,
         execution_manager=execution_manager,
         sim_model=sim_model,
     )

@@ -28,7 +28,7 @@ async def simulating_module(usb_port):
         usb_port=usb_port,
         type=modules.ModuleType.HEATER_SHAKER,
         simulating=True,
-        loop=asyncio.get_running_loop(),
+        hw_control_loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
     )
     assert isinstance(module, modules.AbstractModule)
