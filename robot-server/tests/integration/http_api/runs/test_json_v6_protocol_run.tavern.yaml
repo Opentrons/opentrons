@@ -3,7 +3,7 @@ test_name: Upload and run a JSONv6 protocol.
 marks:
   - usefixtures:
       - run_server
-      - enable_load_liquid
+      - set_enable_load_liquid
 stages:
   - name: Upload simple JSONv6 protocol
     request:
