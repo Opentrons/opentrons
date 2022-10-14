@@ -290,7 +290,7 @@ def test_load_json(
 
 
 # TODO (tz, 10-12-22): remove this test when liquids ff is removed
-def test_load_json_does_not_load_liquids_when_ff_disabled(
+def test_load_json_raises_error_when_ff_disabled(
     decoy: Decoy,
     json_file_reader: JsonFileReader,
     json_translator: JsonTranslator,
@@ -298,7 +298,7 @@ def test_load_json_does_not_load_liquids_when_ff_disabled(
     task_queue: TaskQueue,
     subject: ProtocolRunner,
 ) -> None:
-    """It should load a JSON protocol file without liquids when liquids ff is off."""
+    """It should raise an error when loading a JSON protocol file with loadLiquid command and liquids ff is off."""
     json_protocol_source = ProtocolSource(
         directory=Path("/dev/null"),
         main_file=Path("/dev/null/abc.json"),
