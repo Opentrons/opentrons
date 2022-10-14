@@ -15,11 +15,12 @@ import { PickUpTip } from './PickUpTip'
 import { ReturnTip } from './ReturnTip'
 import { ResultsSummary } from './ResultsSummary'
 import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import { useCreateCommandMutation } from '@opentrons/react-api-client'
+import { useCreateCommandMutation, useCreateLabwareOffsetMutation } from '@opentrons/react-api-client'
 
 import type { Axis, Sign, StepSize } from '../../molecules/DeprecatedJogControls/types'
 import type { CreateRunCommand, RegisterPositionAction, WorkingOffset } from './types'
 import type { Coordinates } from '@opentrons/shared-data'
+import { LabwareOffsetCreateData } from '@opentrons/api-client'
 
 const JOG_COMMAND_TIMEOUT = 10000 // 10 seconds
 interface LabwarePositionCheckModalProps {
@@ -32,7 +33,7 @@ interface LabwarePositionCheckModalProps {
 export const LabwarePositionCheckInner = (
   props: LabwarePositionCheckModalProps
 ): JSX.Element | null => {
-  const { runId, mostRecentAnalysis } = props
+  const { runId, mostRecentAnalysis, onCloseClick } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const protocolData = mostRecentAnalysis
   const [
@@ -99,6 +100,7 @@ export const LabwarePositionCheckInner = (
   const createRunCommand: CreateRunCommand = (variables, ...options) => {
     return createCommand({ ...variables, runId }, ...options)
   }
+  const { createLabwareOffset } = useCreateLabwareOffsetMutation()
 
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const LPCSteps = useSteps(protocolData)
@@ -132,9 +134,18 @@ export const LabwarePositionCheckInner = (
   }
   const movementStepProps = { proceed, protocolData, createRunCommand, registerPosition, handleJog }
 
+  const handleApplyOffsets = (offsets: LabwareOffsetCreateData[]): void => {
+    Promise.all(
+      offsets.map(data => createLabwareOffset({ runId: runId, data }))
+    ).then(() => {
+      onCloseClick()
+    }).catch((e: Error) => {
+      console.error(`error applying labware offsets: ${e.message}`)
+    })
+
+  }
+
   console.log('CURRENT_STEP', currentStep)
-  console.log('workingOffsets', workingOffsets)
-  console.log('tipPickUpPosition', tipPickUpPosition)
 
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
   if (showConfirmation) {
@@ -144,7 +155,7 @@ export const LabwarePositionCheckInner = (
   } else if (isRobotMoving) {
     modalContent = <LoadingState />
   } else if (currentStep.section === 'BEFORE_BEGINNING') {
-    modalContent = <IntroScreen proceed={proceed} protocolData={protocolData} />
+    modalContent = <IntroScreen {...movementStepProps} />
   } else if (currentStep.section === 'CHECK_TIP_RACKS') {
     modalContent = (
       <CheckItem {...currentStep} {...movementStepProps} {...{ workingOffsets }} />
@@ -163,7 +174,7 @@ export const LabwarePositionCheckInner = (
     )
   } else if (currentStep.section === 'RESULTS_SUMMARY') {
     modalContent = (
-      <ResultsSummary {...currentStep} protocolData={protocolData} {...{workingOffsets}} />
+      <ResultsSummary {...currentStep} protocolData={protocolData} {...{ workingOffsets, handleApplyOffsets }} />
     )
   }
   return (

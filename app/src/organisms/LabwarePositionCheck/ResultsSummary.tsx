@@ -21,6 +21,7 @@ import { OffsetVector } from '../../molecules/OffsetVector'
 import type { ResultsSummaryStep, WorkingOffset } from './types'
 import type { LabwareOffsetCreateData, LabwareOffsetLocation } from '@opentrons/api-client'
 import { getLabwareDefinitionsFromCommands } from './utils/labware'
+import { useCreateLabwareOffsetMutation } from '@opentrons/react-api-client'
 
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
@@ -28,10 +29,11 @@ const LPC_HELP_LINK_URL =
 interface ResultsSummaryProps extends ResultsSummaryStep {
   protocolData: CompletedProtocolAnalysis
   workingOffsets: WorkingOffset[]
+  handleApplyOffsets: (offsets: LabwareOffsetCreateData[]) => void
 }
 export const ResultsSummary = (props: ResultsSummaryProps): JSX.Element | null => {
   const { t } = useTranslation('labware_position_check')
-  const { protocolData, workingOffsets } = props
+  const { protocolData, workingOffsets, handleApplyOffsets } = props
   const labwareDefinitions = getLabwareDefinitionsFromCommands(protocolData.commands)
 
   const offsetsToApply = React.useMemo(() => {
@@ -46,9 +48,7 @@ export const ResultsSummary = (props: ResultsSummaryProps): JSX.Element | null =
     })
   }, [workingOffsets])
 
-  const handleApplyOffsets: React.MouseEventHandler<HTMLButtonElement> = _e => {
-    console.log('TODO: apply offsets', offsetsToApply)
-  }
+  
 
   return (
     <Flex

@@ -15,30 +15,32 @@ import { StyledText } from '../../../atoms/text'
 import { getPrepCommands } from './getPrepCommands'
 import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import { useCreateCommandMutation } from '@opentrons/react-api-client'
+import type { CreateRunCommand, RegisterPositionAction } from '../types'
+import type { Jog } from '../../../molecules/JogControls'
 
 export const INTERVAL_MS = 3000
 
 export const IntroScreen = (props: {
   proceed: () => void
   protocolData: CompletedProtocolAnalysis
+  registerPosition: React.Dispatch<RegisterPositionAction>
+  createRunCommand: CreateRunCommand
+  handleJog: Jog
 }): JSX.Element | null => {
-  const { proceed, protocolData } = props
-
-
-  const runRecord = useCurrentRun()
-  const { createCommand } = useCreateCommandMutation()
+  const { proceed, protocolData, createRunCommand } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
-
-  if (runRecord == null) return null
 
   const handleClickStartLPC = (): void => {
     const prepCommands = getPrepCommands(protocolData?.commands ?? [])
-    prepCommands.forEach(command => {
-      createCommand({ runId: runRecord.data.id, command }).catch((e: Error) => {
-        console.error(`error issuing command to robot: ${e.message}`)
-      })
+    Promise.all(
+      prepCommands.map(command =>
+        createRunCommand({command}).catch((e: Error) => {
+          console.error(`error issuing command to robot: ${e.message}`)
+        })
+      )
+    ).then(() => {
+      proceed()
     })
-    proceed()
   }
 
   return (
@@ -64,9 +66,9 @@ export const IntroScreen = (props: {
         </Flex>
         <Flex flex="1" flexDirection={DIRECTION_COLUMN}>
           <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-            {t('you_will_need')}
+            {t('shared:you_will_need')}
           </StyledText>
-          <StyledText as="p">{t('before_you_begin')}</StyledText>
+          <StyledText as="p">{t('all_modules_and_labware_from_protocol')}</StyledText>
         </Flex>
       </Flex>
       <Flex
@@ -77,7 +79,7 @@ export const IntroScreen = (props: {
       >
         <NeedHelpLink />
         <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
-          <PrimaryButton onClick={handleClickStartLPC}>{t('get_started')}</PrimaryButton>
+          <PrimaryButton onClick={handleClickStartLPC}>{t('shared:get_started')}</PrimaryButton>
         </Flex>
       </Flex>
     </Flex >

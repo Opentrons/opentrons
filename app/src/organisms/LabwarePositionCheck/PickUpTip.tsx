@@ -5,7 +5,7 @@ import { useCreateCommandMutation } from '@opentrons/react-api-client'
 import { StyledText } from '../../atoms/text'
 import { PrepareSpace } from './PrepareSpace'
 import { JogToWell } from './JogToWell'
-import { CompletedProtocolAnalysis, getIsTiprack, getLabwareDefURI, getLabwareDisplayName, getModuleDisplayName } from '@opentrons/shared-data'
+import { CompletedProtocolAnalysis, FIXED_TRASH_ID, getIsTiprack, getLabwareDefURI, getLabwareDisplayName, getModuleDisplayName } from '@opentrons/shared-data'
 import { getLabwareDef } from './utils/labware'
 import { UnorderedList } from '../../molecules/UnorderedList'
 import { TipConfirmation } from './TipConfirmation'
@@ -25,9 +25,6 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
   const { labwareId, pipetteId, location, protocolData, proceed, createRunCommand, registerPosition, handleJog } = props
   const [showTipConfirmation, setShowTipConfirmation] = React.useState(false)
   const [hasPreparedSpace, setHasPreparedSpace] = React.useState(false)
-  React.useEffect(() => {
-    setHasPreparedSpace(false)
-  }, [labwareId, pipetteId, location?.moduleId, location?.slotName])
 
   const labwareDef = getLabwareDef(labwareId, protocolData)
   const pipetteName = protocolData.pipettes.find(p => p.id === pipetteId)?.pipetteName ?? null
@@ -45,6 +42,33 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
       components={{ bold: <StyledText as="span" fontWeight={TYPOGRAPHY.fontWeightSemiBold} /> }} />
   ]
 
+  const handleConfirmPlacement = () => {
+    createRunCommand({
+      command: {
+        commandType: 'moveLabware' as const,
+        params: { labwareId: labwareId, newLocation: location },
+      },
+      waitUntilComplete: true,
+    }).then(_moveLabwareResponse => {
+      createRunCommand({
+        command: {
+          commandType: 'moveToWell' as const,
+          params: {
+            pipetteId: pipetteId,
+            labwareId: labwareId,
+            wellName: 'A1',
+            wellLocation: { origin: 'top' as const },
+          },
+        },
+        waitUntilComplete: true,
+      }).then(_response => {
+        setHasPreparedSpace(true)
+      }).catch((e: Error) => {
+        console.error(`error moving to tip rack ${e.message}`)
+      })
+    })
+  }
+
   const handleConfirmPosition = () => {
     createRunCommand({
       command: { commandType: 'savePosition', params: { pipetteId } },
@@ -52,9 +76,30 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
     }).then(response => {
       const { position } = response.data.result
       registerPosition({ type: 'tipPickUpPosition', labwareId, location, position })
-      proceed()
-    }).catch((e: Error) => {
-      console.error(`error saving position: ${e.message}`)
+      createRunCommand({
+        command: {
+          commandType: 'moveLabware' as const,
+          params: { labwareId: labwareId, newLocation: 'offDeck' },
+        },
+        waitUntilComplete: true,
+      }).then(_moveResponse => {
+        createRunCommand({
+          command: {
+            commandType: 'moveToWell' as const,
+            params: {
+              pipetteId: pipetteId,
+              labwareId: FIXED_TRASH_ID,
+              wellName: 'A1',
+              wellLocation: { origin: 'top' as const },
+            },
+          },
+          waitUntilComplete: true,
+        }).then(_homeResponse => {
+          proceed()
+        })
+      }).catch((e: Error) => {
+        console.error(`error saving position: ${e.message}`)
+      })
     })
   }
 
@@ -88,7 +133,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
             })}
             body={<UnorderedList items={instructions} />}
             labwareDef={labwareDef}
-            confirmPlacement={() => setHasPreparedSpace(true)} />
+            confirmPlacement={handleConfirmPlacement} />
         )}
       </Flex>
     )

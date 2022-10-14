@@ -5,7 +5,7 @@ import { DIRECTION_COLUMN, Flex, TYPOGRAPHY } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { PrepareSpace } from './PrepareSpace'
 import { JogToWell } from './JogToWell'
-import { CompletedProtocolAnalysis, Coordinates, getIsTiprack, getLabwareDisplayName, getModuleDisplayName } from '@opentrons/shared-data'
+import { CompletedProtocolAnalysis, Coordinates, FIXED_TRASH_ID, getIsTiprack, getLabwareDisplayName, getModuleDisplayName } from '@opentrons/shared-data'
 import { getLabwareDef } from './utils/labware'
 import { UnorderedList } from '../../molecules/UnorderedList'
 
@@ -51,30 +51,42 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   ]
 
   const handleConfirmPlacement = () => {
+    console.log('HANDLE CONFIRM PLACEMENT')
     createRunCommand({
       command: {
-        commandType: 'moveToWell' as const,
-        params: {
-          pipetteId: pipetteId,
-          labwareId: labwareId,
-          wellName: 'A1',
-          wellLocation: { origin: 'top' as const },
-        },
+        commandType: 'moveLabware' as const,
+        params: { labwareId: labwareId, newLocation: location },
       },
       waitUntilComplete: true,
-    })
-      .then(_response => {
-        createRunCommand({
-          command: { commandType: 'savePosition', params: { pipetteId } },
-          waitUntilComplete: true,
-        }).then(response => {
-          const { position } = response.data.result
-          registerPosition({ type: 'initialPosition', labwareId, location, position })
+    }).then(_moveLabwareResponse => {
+      console.log('MOVE LABWARE COMPLETED')
+      createRunCommand({
+        command: {
+          commandType: 'moveToWell' as const,
+          params: {
+            pipetteId: pipetteId,
+            labwareId: labwareId,
+            wellName: 'A1',
+            wellLocation: { origin: 'top' as const },
+          },
+        },
+        waitUntilComplete: true,
+      })
+        .then(_response => {
+        console.log('MOVE TO WELL')
+          createRunCommand({
+            command: { commandType: 'savePosition', params: { pipetteId } },
+            waitUntilComplete: true,
+          }).then(response => {
+            console.log('SAVE_POSITION')
+            const { position } = response.data.result
+            registerPosition({ type: 'initialPosition', labwareId, location, position })
+          })
         })
-      })
-      .catch((e: Error) => {
-        console.error(`error saving position: ${e.message}`)
-      })
+        .catch((e: Error) => {
+          console.error(`error saving position: ${e.message}`)
+        })
+    })
   }
   const handleConfirmPosition = () => {
     createRunCommand({
@@ -83,7 +95,30 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
     }).then(response => {
       const { position } = response.data.result
       registerPosition({ type: 'finalPosition', labwareId, location, position })
-      proceed()
+      createRunCommand({
+        command: {
+          commandType: 'moveLabware' as const,
+          params: { labwareId: labwareId, newLocation: 'offDeck' },
+        },
+        waitUntilComplete: true,
+      }).then(_moveResponse => {
+        createRunCommand({
+          command: {
+            commandType: 'moveToWell' as const,
+            params: {
+              pipetteId: pipetteId,
+              labwareId: FIXED_TRASH_ID,
+              wellName: 'A1',
+              wellLocation: { origin: 'top' as const },
+            },
+          },
+          waitUntilComplete: true,
+        }).then(_homeResponse => {
+          proceed()
+        }).catch((e: Error) => { console.error(`error homing: ${e.message}`) })
+      }).catch((e: Error) => {
+        console.error(`error moving labware: ${e.message}`)
+      })
     }).catch((e: Error) => {
       console.error(`error saving position: ${e.message}`)
     })

@@ -72,7 +72,7 @@ export type SetupCreateCommand =
   | LoadLiquidCreateCommand
   | MoveLabwareCreateCommand
 
-export type LabwareLocation = { slotName: string } | { moduleId: string }
+export type LabwareLocation = { slotName: string } | { moduleId: string } | 'offDeck'
 
 export interface ModuleLocation {
   slotName: string

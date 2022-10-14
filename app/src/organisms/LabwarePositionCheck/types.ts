@@ -86,6 +86,7 @@ export type CreateRunCommand = (
 ) => ReturnType<CreateCommandMutate>
 
 export type RegisterPositionAction =
+  { type: 'initialPosition', labwareId: string; location: LabwareOffsetLocation; position: VectorOffset | null } |
   { type: 'finalPosition', labwareId: string; location: LabwareOffsetLocation; position: VectorOffset | null } |
   { type: 'tipPickUpPosition', labwareId: string; location: LabwareOffsetLocation; position: VectorOffset | null }
 

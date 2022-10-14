@@ -10,8 +10,8 @@ export function UnorderedList(props: UnorderedListProps): JSX.Element {
   const { items } = props
   return (
     <ul>
-      {items.map(item => (
-        <li css={css`margin-left: ${SPACING.spacing5};`}>
+      {items.map((item, index) => (
+        <li key={index} css={css`margin-left: ${SPACING.spacing5};`}>
           <StyledText as="p">{item}</StyledText>
         </li>
       ))}

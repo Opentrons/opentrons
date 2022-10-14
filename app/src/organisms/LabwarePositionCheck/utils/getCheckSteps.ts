@@ -107,7 +107,7 @@ function getCheckTipRackSectionSteps(args: LPCArgs): CheckTipRacksStep[] {
       const labwareLocations = labwareLocationCombos.filter(combo => combo.labwareId === params.labwareId)
       return [
         ...acc,
-        ...labwareLocations.map(({location}) => ({
+        ...labwareLocations.map(({ location }) => ({
           section: SECTIONS.CHECK_TIP_RACKS,
           labwareId: params.labwareId,
           pipetteId: params.pipetteId,
@@ -120,7 +120,7 @@ function getCheckTipRackSectionSteps(args: LPCArgs): CheckTipRacksStep[] {
 }
 
 function getCheckLabwareSectionSteps(args: LPCArgs): CheckLabwareStep[] {
-  const { labware, commands, primaryPipetteId } = args
+  const { labware, modules, commands, primaryPipetteId } = args
   const labwareDefinitions = getLabwareDefinitionsFromCommands(commands)
 
   return labware.reduce<CheckLabwareStep[]>((acc, currentLabware) => {
@@ -136,56 +136,26 @@ function getCheckLabwareSectionSteps(args: LPCArgs): CheckLabwareStep[] {
     const isTiprack = getIsTiprack(labwareDef)
     if (isTiprack) return acc // skip any labware that is a tiprack
 
-    const labwareLocations = getAllUniqLocationsForLabware(
-      currentLabware.id,
-      commands
-    )
+    const labwareLocationCombos = getLabwareLocationCombos(commands, labware, modules)
+    console.log('LABWARE COMBOS', labwareLocationCombos)
     return [
       ...acc,
-      ...labwareLocations.reduce<CheckLabwareStep[]>((innerAcc, loc) => {
+      ...labwareLocationCombos.reduce<CheckLabwareStep[]>((innerAcc, { location, labwareId }) => {
         if (
-          !getSlotHasMatingSurfaceUnitVector(
-            OT2_STANDARD_DECK_DEF,
-            'slotName' in loc ? loc.slotName : ''
-          )
+          !getSlotHasMatingSurfaceUnitVector(OT2_STANDARD_DECK_DEF, location.slotName) || labwareId !== currentLabware.id
         ) {
           return innerAcc
         }
 
-        if ('moduleId' in loc) {
-          const loadModuleCommand = commands.find(
-            (command: RunTimeCommand): command is LoadModuleRunTimeCommand =>
-              command.commandType === 'loadModule' &&
-              command.params.moduleId === loc.moduleId
-          )
-          if (loadModuleCommand != null) {
-            return [
-              ...innerAcc,
-              {
-                section: SECTIONS.CHECK_LABWARE,
-                labwareId: currentLabware.id,
-                pipetteId: primaryPipetteId,
-                location: {
-                  moduleModel: loadModuleCommand.params.model,
-                  slotName: loadModuleCommand.params.location.slotName,
-                },
-              },
-            ]
-          }
-          return innerAcc
-        } else {
-          return [
-            ...innerAcc,
-            {
-              section: SECTIONS.CHECK_LABWARE,
-              labwareId: currentLabware.id,
-              pipetteId: primaryPipetteId,
-              location: {
-                slotName: loc.slotName,
-              },
-            },
-          ]
-        }
+        return [
+          ...innerAcc,
+          {
+            section: SECTIONS.CHECK_LABWARE,
+            labwareId,
+            pipetteId: primaryPipetteId,
+            location,
+          },
+        ]
       }, []),
     ]
   }, [])

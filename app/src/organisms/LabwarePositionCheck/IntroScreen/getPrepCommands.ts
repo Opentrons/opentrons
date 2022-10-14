@@ -36,6 +36,9 @@ export function getPrepCommands(protocolCommands: RunTimeCommand[]): LPCPrepComm
           },
         }
         return commandWithPipetteId
+      } else if (command.commandType === 'loadLabware') {
+        // load all labware off-deck so that LPC can move them on individually later
+        return { ...command, params: { ...command.params, location: 'offDeck' } }
       }
       return command
     }) ?? []
