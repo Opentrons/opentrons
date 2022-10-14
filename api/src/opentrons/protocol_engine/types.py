@@ -341,23 +341,26 @@ class LoadedLabware(BaseModel):
 class HexColor(BaseModel):
     """Hex color representation."""
 
-    displayColor: Optional[str] = Field(default_factory=None)
+    __root__: str
 
-    @validator("displayColor")
-    def _color_is_a_valid_hex(cls, v: Optional[str]) -> Optional[str]:
-        if v:
-            match = re.search(r"^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$", v)
-            if not match:
-                raise ValueError("Color is not a valid hex color.")
+    def __init__(self, hex_color: str) -> None:
+        super().__init__(__root__=hex_color)
+
+    @validator("__root__")
+    def _color_is_a_valid_hex(cls, v: str) -> str:
+        match = re.search(r"^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$", v)
+        if not match:
+            raise ValueError("Color is not a valid hex color.")
         return v
 
 
-class Liquid(HexColor):
+class Liquid(BaseModel):
     """Payload required to create a liquid."""
 
     id: str
     displayName: str
     description: str
+    displayColor: Optional[HexColor]
 
 
 class SpeedRange(NamedTuple):
