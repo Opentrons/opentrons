@@ -100,7 +100,9 @@ async def test_runner_with_python(
     assert expected_command in commands_result
 
 
-async def test_runner_with_json(json_protocol_file: Path, enable_load_liquid: None) -> None:
+async def test_runner_with_json(
+    json_protocol_file: Path, enable_load_liquid: None
+) -> None:
     """It should run a JSON protocol on the ProtocolRunner."""
     protocol_reader = ProtocolReader()
     protocol_source = await protocol_reader.read_saved(
