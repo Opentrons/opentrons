@@ -12,6 +12,7 @@ import { useCurrentRun } from '../../ProtocolUpload/hooks'
 import { NeedHelpLink } from '../../CalibrationPanels'
 import { PrimaryButton } from '../../../atoms/buttons'
 import { StyledText } from '../../../atoms/text'
+import { LoadingState } from '../../CalibrationPanels/LoadingState'
 import { getPrepCommands } from './getPrepCommands'
 import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import { useCreateCommandMutation } from '@opentrons/react-api-client'
@@ -26,15 +27,17 @@ export const IntroScreen = (props: {
   registerPosition: React.Dispatch<RegisterPositionAction>
   createRunCommand: CreateRunCommand
   handleJog: Jog
+  isRobotMoving: boolean
 }): JSX.Element | null => {
-  const { proceed, protocolData, createRunCommand } = props
+  const { proceed, protocolData, createRunCommand, isRobotMoving } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
 
   const handleClickStartLPC = (): void => {
     const prepCommands = getPrepCommands(protocolData?.commands ?? [])
     Promise.all(
       prepCommands.map(command =>
-        createRunCommand({command}).catch((e: Error) => {
+        createRunCommand({command, waitUntilComplete: true}).catch((e: Error) => {
+        
           console.error(`error issuing command to robot: ${e.message}`)
         })
       )
@@ -43,6 +46,7 @@ export const IntroScreen = (props: {
     })
   }
 
+  if (isRobotMoving) return <LoadingState />
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}

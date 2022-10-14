@@ -1,9 +1,10 @@
 import * as React from 'react'
 import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
+import { useCreateLabwareOffsetMutation } from '@opentrons/react-api-client'
 import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
-import { CompletedProtocolAnalysis, getLabwareDefURI, getLabwareDisplayName, getModuleDisplayName, getModuleType, getVectorDifference, LabwareDefinition2, THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
+import { CompletedProtocolAnalysis, getLabwareDefURI, getLabwareDisplayName, getModuleDisplayName, getModuleType, getVectorDifference, getVectorSum, IDENTITY_VECTOR, LabwareDefinition2, THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
 import { NeedHelpLink } from '../CalibrationPanels'
 import {
   DIRECTION_COLUMN,
@@ -16,12 +17,14 @@ import {
   ALIGN_FLEX_END,
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
-import { OffsetVector } from '../../molecules/OffsetVector'
+import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
+import { getLabwareDefinitionsFromCommands } from './utils/labware'
 
+import type { OffsetVector } from '../../molecules/OffsetVector'
 import type { ResultsSummaryStep, WorkingOffset } from './types'
 import type { LabwareOffsetCreateData, LabwareOffsetLocation } from '@opentrons/api-client'
-import { getLabwareDefinitionsFromCommands } from './utils/labware'
-import { useCreateLabwareOffsetMutation } from '@opentrons/react-api-client'
+import type { LabwareOffset } from '@opentrons/api-client'
+import { LiveOffsetValue } from './LiveOffsetValue'
 
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
@@ -29,21 +32,24 @@ const LPC_HELP_LINK_URL =
 interface ResultsSummaryProps extends ResultsSummaryStep {
   protocolData: CompletedProtocolAnalysis
   workingOffsets: WorkingOffset[]
+  existingOffsets: LabwareOffset[]
   handleApplyOffsets: (offsets: LabwareOffsetCreateData[]) => void
 }
 export const ResultsSummary = (props: ResultsSummaryProps): JSX.Element | null => {
   const { t } = useTranslation('labware_position_check')
-  const { protocolData, workingOffsets, handleApplyOffsets } = props
+  const { protocolData, workingOffsets, handleApplyOffsets, existingOffsets } = props
   const labwareDefinitions = getLabwareDefinitionsFromCommands(protocolData.commands)
 
   const offsetsToApply = React.useMemo(() => {
     if (protocolData == null) return []
     return workingOffsets.map<LabwareOffsetCreateData>(({ initialPosition, finalPosition, labwareId, location }) => {
-      const { definitionUri } = protocolData.labware.find(l => l.id === labwareId) ?? {}
+      const definitionUri = protocolData.labware.find(l => l.id === labwareId)?.definitionUri ?? null
       if (finalPosition == null || initialPosition == null || definitionUri == null) {
         throw new Error(`cannot create offset for labware with id ${labwareId}, in location ${JSON.stringify(location)}, with initial position ${initialPosition}, and final position ${finalPosition}`)
       }
-      const vector = getVectorDifference(finalPosition, initialPosition)
+
+      const existingOffset = getCurrentOffsetForLabwareInLocation(existingOffsets, definitionUri, location)?.vector ?? IDENTITY_VECTOR
+      const vector = getVectorSum(existingOffset, getVectorDifference(finalPosition, initialPosition))
       return { definitionUri, location, vector }
     })
   }, [workingOffsets])
@@ -66,7 +72,7 @@ export const ResultsSummary = (props: ResultsSummaryProps): JSX.Element | null =
         alignItems={ALIGN_CENTER}
       >
         <NeedHelpLink href={LPC_HELP_LINK_URL} />
-        <PrimaryButton onClick={handleApplyOffsets}>
+        <PrimaryButton onClick={() => handleApplyOffsets(offsetsToApply)}>
           {t('apply_offsets')}
         </PrimaryButton>
       </Flex>
@@ -135,7 +141,7 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
                   {vector.x === 0 && vector.y === 0 && vector.z === 0 ? (
                     <StyledText>{t('no_labware_offsets')}</StyledText>
                   ) : (
-                    <OffsetVector {...vector} justifyContent={JUSTIFY_FLEX_END}/>
+                    <LiveOffsetValue {...vector} justifyContent={JUSTIFY_FLEX_END}/>
                   )}
                 </TableDatum>
               </TableRow>

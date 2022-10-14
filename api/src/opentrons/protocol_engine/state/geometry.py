@@ -63,7 +63,7 @@ class GeometryView:
         return max(
             *(
                 self._get_highest_z_from_labware_data(lw_data)
-                for lw_data in self._labware.get_all()
+                for lw_data in self._labware.get_all() if lw_data.location != 'offDeck'
             ),
             *(
                 self._modules.get_overall_height(module.id)
@@ -182,6 +182,7 @@ class GeometryView:
         ]
 
     def _get_highest_z_from_labware_data(self, lw_data: LoadedLabware) -> float:
+        lw_data
         labware_pos = self.get_labware_position(lw_data.id)
         definition = self._labware.get_definition(lw_data.id)
         z_dim = definition.dimensions.zDimension

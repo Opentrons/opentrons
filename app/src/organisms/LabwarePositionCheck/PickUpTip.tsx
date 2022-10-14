@@ -1,28 +1,36 @@
 import * as React from 'react'
+import isEqual from 'lodash/isEqual'
 import { Trans, useTranslation } from 'react-i18next'
 import { DIRECTION_COLUMN, Flex, TYPOGRAPHY } from '@opentrons/components'
 import { useCreateCommandMutation } from '@opentrons/react-api-client'
 import { StyledText } from '../../atoms/text'
+import { LoadingState } from '../CalibrationPanels/LoadingState'
 import { PrepareSpace } from './PrepareSpace'
 import { JogToWell } from './JogToWell'
-import { CompletedProtocolAnalysis, FIXED_TRASH_ID, getIsTiprack, getLabwareDefURI, getLabwareDisplayName, getModuleDisplayName } from '@opentrons/shared-data'
+import { CompletedProtocolAnalysis, FIXED_TRASH_ID, getIsTiprack, getLabwareDefURI, getLabwareDisplayName, getModuleDisplayName, IDENTITY_VECTOR } from '@opentrons/shared-data'
 import { getLabwareDef } from './utils/labware'
 import { UnorderedList } from '../../molecules/UnorderedList'
+import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { TipConfirmation } from './TipConfirmation'
 
 import type { Jog } from '../../molecules/DeprecatedJogControls/types'
-import type { PickUpTipStep, RegisterPositionAction, CreateRunCommand } from './types'
+import type { PickUpTipStep, RegisterPositionAction, CreateRunCommand, WorkingOffset } from './types'
+import type { LabwareOffset, VectorOffset } from '@opentrons/api-client'
 
 interface PickUpTipProps extends PickUpTipStep {
   protocolData: CompletedProtocolAnalysis
   proceed: () => void
   registerPosition: React.Dispatch<RegisterPositionAction>
   createRunCommand: CreateRunCommand
+  workingOffsets: WorkingOffset[]
+  existingOffsets: LabwareOffset[]
+  tipPickUpPosition: VectorOffset | null
   handleJog: Jog
+  isRobotMoving: boolean
 }
 export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
   const { t } = useTranslation('labware_position_check')
-  const { labwareId, pipetteId, location, protocolData, proceed, createRunCommand, registerPosition, handleJog } = props
+  const { labwareId, pipetteId, location, protocolData, proceed, createRunCommand, registerPosition, handleJog, isRobotMoving, existingOffsets, tipPickUpPosition } = props
   const [showTipConfirmation, setShowTipConfirmation] = React.useState(false)
   const [hasPreparedSpace, setHasPreparedSpace] = React.useState(false)
 
@@ -49,27 +57,56 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
         params: { labwareId: labwareId, newLocation: location },
       },
       waitUntilComplete: true,
-    }).then(_moveLabwareResponse => {
-      createRunCommand({
-        command: {
-          commandType: 'moveToWell' as const,
-          params: {
-            pipetteId: pipetteId,
-            labwareId: labwareId,
-            wellName: 'A1',
-            wellLocation: { origin: 'top' as const },
+    }, {
+      onSuccess: () => {
+        createRunCommand({
+          command: {
+            commandType: 'moveToWell' as const,
+            params: {
+              pipetteId: pipetteId,
+              labwareId: labwareId,
+              wellName: 'A1',
+              wellLocation: { origin: 'top' as const },
+            },
           },
-        },
-        waitUntilComplete: true,
-      }).then(_response => {
-        setHasPreparedSpace(true)
-      }).catch((e: Error) => {
-        console.error(`error moving to tip rack ${e.message}`)
-      })
+          waitUntilComplete: true,
+        }, {
+          onSuccess: () => {
+            console.log('COMPLETE ON SUCCESS BEFORE SET')
+            setHasPreparedSpace(true)
+          }
+        }).catch((e: Error) => {
+          console.error(`error moving to tip rack ${e.message}`)
+        })
+      }
+    })
+  }
+  const handleConfirmPosition = () => {
+    createRunCommand({
+      command: { commandType: 'savePosition', params: { pipetteId } },
+      waitUntilComplete: true,
+    }, {
+      onSuccess: () => {
+        createRunCommand({
+          command: {
+            commandType: 'pickUpTip',
+            params: {
+              pipetteId,
+              labwareId,
+              wellName: 'A1',
+            }
+          },
+          waitUntilComplete: true,
+        }, {
+          onSuccess: () => {
+            setShowTipConfirmation(true)
+          }
+        })
+      }
     })
   }
 
-  const handleConfirmPosition = () => {
+  const handleConfirmTipAttached = () => {
     createRunCommand({
       command: { commandType: 'savePosition', params: { pipetteId } },
       waitUntilComplete: true,
@@ -102,14 +139,31 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
       })
     })
   }
-
-  return showTipConfirmation ?
-    <TipConfirmation
-      invalidateTip={() => {
+  const handleInvalidateTip = () => {
+    createRunCommand({
+      command: {
+        commandType: 'dropTip',
+        params: {
+          pipetteId,
+          labwareId,
+          wellName: 'A1',
+        }
+      },
+      waitUntilComplete: true,
+    }, {
+      onSuccess: () => {
         setShowTipConfirmation(false)
         setHasPreparedSpace(true)
-      }}
-      confirmTip={handleConfirmPosition}
+      }
+    })
+  }
+  const existingOffset = getCurrentOffsetForLabwareInLocation(existingOffsets, getLabwareDefURI(labwareDef), location)?.vector ?? IDENTITY_VECTOR
+
+  if (isRobotMoving) return <LoadingState />
+  return showTipConfirmation ?
+    <TipConfirmation
+      invalidateTip={handleInvalidateTip}
+      confirmTip={handleConfirmTipAttached}
     />
     : (
       <Flex flexDirection={DIRECTION_COLUMN}>
@@ -121,9 +175,11 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
             body={<StyledText as="p">{t('ensure_nozzle_is_above_tip')}</StyledText>}
             labwareDef={labwareDef}
             pipetteName={pipetteName}
-            handleConfirmPosition={() => setShowTipConfirmation(true)}
+            handleConfirmPosition={handleConfirmPosition}
             handleGoBack={() => setHasPreparedSpace(false)}
-            handleJog={handleJog} />
+            handleJog={handleJog} 
+            initialPosition={IDENTITY_VECTOR}
+            existingOffset={existingOffset} />
         ) : (
           <PrepareSpace
             {...props}

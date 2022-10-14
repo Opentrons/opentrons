@@ -3,14 +3,18 @@ import isEqual from 'lodash/isEqual'
 import { Trans, useTranslation } from 'react-i18next'
 import { DIRECTION_COLUMN, Flex, TYPOGRAPHY } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
+import { LoadingState } from '../CalibrationPanels/LoadingState'
 import { PrepareSpace } from './PrepareSpace'
 import { JogToWell } from './JogToWell'
-import { CompletedProtocolAnalysis, Coordinates, FIXED_TRASH_ID, getIsTiprack, getLabwareDisplayName, getModuleDisplayName } from '@opentrons/shared-data'
+import { FIXED_TRASH_ID, getIsTiprack, getLabwareDefURI, getLabwareDisplayName, getModuleDisplayName, getVectorDifference, getVectorSum, IDENTITY_VECTOR } from '@opentrons/shared-data'
 import { getLabwareDef } from './utils/labware'
 import { UnorderedList } from '../../molecules/UnorderedList'
 
+import type { LabwareOffset } from '@opentrons/api-client'
+import type { CompletedProtocolAnalysis, Coordinates } from '@opentrons/shared-data'
 import type { CheckTipRacksStep, CreateRunCommand, RegisterPositionAction, WorkingOffset } from './types'
 import type { Jog } from '../../molecules/DeprecatedJogControls/types'
+import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 interface CheckItemProps extends Omit<CheckTipRacksStep, 'section'> {
   section: 'CHECK_LABWARE' | 'CHECK_TIP_RACKS'
   protocolData: CompletedProtocolAnalysis
@@ -18,10 +22,12 @@ interface CheckItemProps extends Omit<CheckTipRacksStep, 'section'> {
   createRunCommand: CreateRunCommand
   registerPosition: React.Dispatch<RegisterPositionAction>
   workingOffsets: WorkingOffset[]
+  existingOffsets: LabwareOffset[]
   handleJog: Jog
+  isRobotMoving: boolean
 }
 export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
-  const { labwareId, pipetteId, location, protocolData, createRunCommand, registerPosition, workingOffsets, proceed, handleJog } = props
+  const { labwareId, pipetteId, location, protocolData, createRunCommand, registerPosition, workingOffsets, proceed, handleJog, isRobotMoving, existingOffsets } = props
   const { t } = useTranslation('labware_position_check')
   const labwareDef = getLabwareDef(labwareId, protocolData)
   const pipetteName = protocolData.pipettes.find(p => p.id === pipetteId)?.pipetteName ?? null
@@ -51,7 +57,6 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   ]
 
   const handleConfirmPlacement = () => {
-    console.log('HANDLE CONFIRM PLACEMENT')
     createRunCommand({
       command: {
         commandType: 'moveLabware' as const,
@@ -59,7 +64,6 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
       },
       waitUntilComplete: true,
     }).then(_moveLabwareResponse => {
-      console.log('MOVE LABWARE COMPLETED')
       createRunCommand({
         command: {
           commandType: 'moveToWell' as const,
@@ -73,12 +77,10 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
         waitUntilComplete: true,
       })
         .then(_response => {
-        console.log('MOVE TO WELL')
           createRunCommand({
             command: { commandType: 'savePosition', params: { pipetteId } },
             waitUntilComplete: true,
           }).then(response => {
-            console.log('SAVE_POSITION')
             const { position } = response.data.result
             registerPosition({ type: 'initialPosition', labwareId, location, position })
           })
@@ -133,12 +135,15 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
       console.error(`error homing: ${e.message}`)
     })
   }
-  const hasInitialPosition = workingOffsets.some(o => (
+  const initialPosition = workingOffsets.find(o => (
     o.labwareId === labwareId && isEqual(o.location, location) && o.initialPosition != null
-  ))
+  ))?.initialPosition
+  const existingOffset = getCurrentOffsetForLabwareInLocation(existingOffsets, getLabwareDefURI(labwareDef), location)?.vector ?? IDENTITY_VECTOR
+
+  if (isRobotMoving) return <LoadingState />
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      {hasInitialPosition ? (
+      {initialPosition != null ? (
         <JogToWell
           header={t('check_item_in_location', {
             item: isTiprack ? t('tip_rack') : t('labware'),
@@ -153,7 +158,10 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
           pipetteName={pipetteName}
           handleConfirmPosition={handleConfirmPosition}
           handleGoBack={handleGoBack}
-          handleJog={handleJog} />
+          handleJog={handleJog}
+          initialPosition={initialPosition}
+          existingOffset={existingOffset}
+          />
       ) : (
         <PrepareSpace
           {...props}

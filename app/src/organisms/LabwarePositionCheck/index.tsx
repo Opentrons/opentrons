@@ -7,6 +7,7 @@ import { useFeatureFlag } from '../../redux/config'
 import { LabwarePositionCheckComponent } from './LabwarePositionCheckComponent'
 import { DeprecatedLabwarePositionCheckComponent } from './DeprecatedComponents/DeprecatedLabwarePositionCheckComponent'
 import { useMostRecentCompletedAnalysis } from './hooks/useMostRecentCompletedAnalysis'
+import { useRunQuery } from '@opentrons/react-api-client'
 
 interface LabwarePositionCheckModalProps {
   onCloseClick: () => unknown
@@ -28,10 +29,15 @@ export const LabwarePositionCheck = (
 
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(props.runId)
 
+  const existingOffsets = useRunQuery(props.runId).data?.data?.labwareOffsets ?? []
+
   return (
     <ErrorBoundary logger={logger} ErrorComponent={CrashingErrorModal}>
       {manualDeckStateModificationEnabled ? (
-        <LabwarePositionCheckComponent {...props} mostRecentAnalysis={mostRecentAnalysis}/>
+        <LabwarePositionCheckComponent
+          {...props}
+          {...{ mostRecentAnalysis, existingOffsets }}
+        />
       ) : (
         <DeprecatedLabwarePositionCheckComponent {...props} />
       )}

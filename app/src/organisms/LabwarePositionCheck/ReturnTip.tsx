@@ -3,23 +3,25 @@ import { Trans, useTranslation } from 'react-i18next'
 import { DIRECTION_COLUMN, Flex, TYPOGRAPHY } from '@opentrons/components'
 import { useCreateCommandMutation } from '@opentrons/react-api-client'
 import { StyledText } from '../../atoms/text'
+import { LoadingState } from '../CalibrationPanels/LoadingState'
 import { PrepareSpace } from './PrepareSpace'
 import { CompletedProtocolAnalysis, getLabwareDisplayName } from '@opentrons/shared-data'
 import { getLabwareDef } from './utils/labware'
 import { UnorderedList } from '../../molecules/UnorderedList'
 
-import type { ReturnTipStep } from './types'
+import type { CreateRunCommand, ReturnTipStep } from './types'
 import { VectorOffset } from '@opentrons/api-client'
 
 interface ReturnTipProps extends ReturnTipStep {
   protocolData: CompletedProtocolAnalysis
   proceed: () => void
-  createRunCommand: ReturnType<typeof useCreateCommandMutation>['createCommand']
+  createRunCommand: CreateRunCommand
   tipPickUpPosition: VectorOffset | null
+  isRobotMoving: boolean
 }
 export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
   const { t } = useTranslation('labware_position_check')
-  const { labwareId, location, protocolData, proceed, tipPickUpPosition } = props
+  const { pipetteId, labwareId, location, protocolData, proceed, tipPickUpPosition, isRobotMoving, createRunCommand } = props
 
   const labwareDef = getLabwareDef(labwareId, protocolData)
   if (labwareDef == null) return null
@@ -37,10 +39,33 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
   ]
 
   const handleConfirmPlacement = () => {
-    console.log('RETURN TIP TO POSITION', tipPickUpPosition)
-    proceed()
+    createRunCommand({
+      command: {
+        commandType: 'moveLabware' as const,
+        params: { labwareId: labwareId, newLocation: location },
+      },
+      waitUntilComplete: true,
+    }, {
+      onSuccess: () => {
+        createRunCommand({
+          command: {
+            commandType: 'dropTip' as const,
+            params: { pipetteId: pipetteId, labwareId: labwareId, wellName: 'A1' },
+          },
+          waitUntilComplete: true,
+        }, {
+          onSuccess: () => {
+            console.log('COMPLETE ON SUCCESS BEFORE SET')
+            proceed()
+          }
+        }).catch((e: Error) => {
+          console.error(`error dropping tip ${e.message}`)
+        })
+      }
+    })
   }
 
+  if (isRobotMoving) return <LoadingState />
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <PrepareSpace

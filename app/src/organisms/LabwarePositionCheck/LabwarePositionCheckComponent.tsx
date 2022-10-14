@@ -10,13 +10,13 @@ import { ExitConfirmation } from './ExitConfirmation'
 import { CheckItem } from './CheckItem'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
-import { LoadingState } from '../CalibrationPanels/LoadingState'
 import { PickUpTip } from './PickUpTip'
 import { ReturnTip } from './ReturnTip'
 import { ResultsSummary } from './ResultsSummary'
-import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import { useCreateCommandMutation, useCreateLabwareOffsetMutation } from '@opentrons/react-api-client'
 
+import type { LabwareOffset } from '@opentrons/api-client'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { Axis, Sign, StepSize } from '../../molecules/DeprecatedJogControls/types'
 import type { CreateRunCommand, RegisterPositionAction, WorkingOffset } from './types'
 import type { Coordinates } from '@opentrons/shared-data'
@@ -27,13 +27,14 @@ interface LabwarePositionCheckModalProps {
   onCloseClick: () => unknown
   runId: string
   mostRecentAnalysis: CompletedProtocolAnalysis | null
+  existingOffsets: LabwareOffset[]
   caughtError?: Error
 }
 
 export const LabwarePositionCheckInner = (
   props: LabwarePositionCheckModalProps
 ): JSX.Element | null => {
-  const { runId, mostRecentAnalysis, onCloseClick } = props
+  const { runId, mostRecentAnalysis, onCloseClick, existingOffsets } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const protocolData = mostRecentAnalysis
   const [
@@ -45,6 +46,7 @@ export const LabwarePositionCheckInner = (
       action: RegisterPositionAction
     ) => {
       const { type, labwareId, location, position } = action
+      console.log('ACTION', tipPickUpPosition)
       if (type === 'tipPickUpPosition') return { ...state, tipPickUpPosition: position }
 
       if (['initialPosition', 'finalPosition'].includes(type)) {
@@ -104,7 +106,7 @@ export const LabwarePositionCheckInner = (
 
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const LPCSteps = useSteps(protocolData)
-  const totalStepCount = LPCSteps.length
+  const totalStepCount = LPCSteps.length - 1
   const currentStep = LPCSteps?.[currentStepIndex]
   const proceed = (): void => setCurrentStepIndex(currentStepIndex !== LPCSteps.length - 1 ? currentStepIndex + 1 : currentStepIndex)
   if (protocolData == null || currentStep == null) return null
@@ -132,7 +134,7 @@ export const LabwarePositionCheckInner = (
       console.error(`could not find pipette to jog with id: ${pipetteId}`)
     }
   }
-  const movementStepProps = { proceed, protocolData, createRunCommand, registerPosition, handleJog }
+  const movementStepProps = { proceed, protocolData, createRunCommand, registerPosition, handleJog, isRobotMoving }
 
   const handleApplyOffsets = (offsets: LabwareOffsetCreateData[]): void => {
     Promise.all(
@@ -152,21 +154,19 @@ export const LabwarePositionCheckInner = (
     modalContent = (
       <ExitConfirmation onGoBack={cancelExitLPC} onConfirmExit={confirmExitLPC} />
     )
-  } else if (isRobotMoving) {
-    modalContent = <LoadingState />
   } else if (currentStep.section === 'BEFORE_BEGINNING') {
     modalContent = <IntroScreen {...movementStepProps} />
   } else if (currentStep.section === 'CHECK_TIP_RACKS') {
     modalContent = (
-      <CheckItem {...currentStep} {...movementStepProps} {...{ workingOffsets }} />
+      <CheckItem {...currentStep} {...movementStepProps} {...{ workingOffsets, existingOffsets }} />
     )
   } else if (currentStep.section === 'PICK_UP_TIP') {
     modalContent = (
-      <PickUpTip {...currentStep} {...movementStepProps} {...{ workingOffsets }} />
+      <PickUpTip {...currentStep} {...movementStepProps} {...{ workingOffsets, existingOffsets, tipPickUpPosition }} />
     )
   } else if (currentStep.section === 'CHECK_LABWARE') {
     modalContent = (
-      <CheckItem {...currentStep} {...movementStepProps} {...{ workingOffsets }} />
+      <CheckItem {...currentStep} {...movementStepProps} {...{ workingOffsets, existingOffsets }} />
     )
   } else if (currentStep.section === 'RETURN_TIP') {
     modalContent = (
@@ -174,7 +174,7 @@ export const LabwarePositionCheckInner = (
     )
   } else if (currentStep.section === 'RESULTS_SUMMARY') {
     modalContent = (
-      <ResultsSummary {...currentStep} protocolData={protocolData} {...{ workingOffsets, handleApplyOffsets }} />
+      <ResultsSummary {...currentStep} protocolData={protocolData} {...{ workingOffsets, existingOffsets, handleApplyOffsets }} />
     )
   }
   return (

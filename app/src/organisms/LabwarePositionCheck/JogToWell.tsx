@@ -17,6 +17,8 @@ import {
   getIsTiprack,
   getLabwareDefURI,
   getPipetteNameSpecs,
+  getVectorDifference,
+  getVectorSum,
   IDENTITY_VECTOR,
   PipetteName,
 } from '@opentrons/shared-data'
@@ -27,15 +29,12 @@ import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { NeedHelpLink } from '../CalibrationPanels'
 import { JogControls } from '../../molecules/JogControls'
+import { LiveOffsetValue } from './LiveOffsetValue'
 
 import type { Jog } from '../../molecules/JogControls'
-import type {
-  CompletedProtocolAnalysis,
-  LabwareDefinition2,
-} from '@opentrons/shared-data'
+import type { LabwareDefinition2, Coordinates} from '@opentrons/shared-data'
 import type { WellStroke } from '@opentrons/components'
-import type { CheckTipRacksStep } from './types'
-import { OffsetVector } from '../../molecules/OffsetVector'
+import type { VectorOffset } from '@opentrons/api-client'
 
 const DECK_MAP_VIEWBOX = '-30 -20 170 115'
 const LPC_HELP_LINK_URL =
@@ -49,10 +48,14 @@ interface JogToWellProps {
   labwareDef: LabwareDefinition2
   header: React.ReactNode
   body: React.ReactNode
+  initialPosition: VectorOffset 
+  existingOffset: VectorOffset 
 }
 export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
   const { t } = useTranslation(['labware_position_check', 'shared'])
-  const { header, body, pipetteName, labwareDef, handleConfirmPosition, handleGoBack, handleJog } = props
+  const { header, body, pipetteName, labwareDef, handleConfirmPosition, handleGoBack, handleJog, initialPosition, existingOffset } = props
+
+  const [joggedPosition, setJoggedPosition] = React.useState<VectorOffset>(initialPosition)
 
   let wellsToHighlight: string[] = []
   if (getPipetteNameSpecs(pipetteName)?.channels === 8) {
@@ -65,6 +68,8 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
     (acc, wellName) => ({ ...acc, [wellName]: COLORS.blueEnabled }),
     {}
   )
+
+  const liveOffset = getVectorSum(existingOffset, getVectorDifference(joggedPosition, initialPosition))
 
   return (
     <Flex
@@ -81,7 +86,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
         >
           <StyledText as="h1">{header}</StyledText>
           {body}
-          <OffsetVector {...IDENTITY_VECTOR} />
+          <LiveOffsetValue {...liveOffset} />
         </Flex>
         <Flex flex="1">
           <RobotWorkSpace viewBox={DECK_MAP_VIEWBOX}>
@@ -114,7 +119,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
           </Box>
         </Flex>
       </Flex>
-      <JogControls jog={handleJog} />
+      <JogControls jog={(axis, direction, step, _onSuccess) => handleJog(axis, direction, step, setJoggedPosition)} />
       <Flex
         width="100%"
         marginTop={SPACING.spacing6}
