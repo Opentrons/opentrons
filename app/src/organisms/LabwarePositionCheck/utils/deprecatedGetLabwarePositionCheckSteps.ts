@@ -1,14 +1,14 @@
 import omitBy from 'lodash/omitBy'
 import values from 'lodash/values'
-import { deprecatedGetPrimaryPipetteId } from './utils/deprecatedGetPrimaryPipetteId'
-import { getPipetteWorkflow } from './utils/getPipetteWorkflow'
-import { getOnePipettePositionCheckSteps } from './utils/getOnePipettePositionCheckSteps'
-import { getTwoPipettePositionCheckSteps } from './utils/getTwoPipettePositionCheckSteps'
+import { deprecatedGetPrimaryPipetteId } from './deprecatedGetPrimaryPipetteId'
+import { getPipetteWorkflow } from './getPipetteWorkflow'
+import { getOnePipettePositionCheckSteps } from './getOnePipettePositionCheckSteps'
+import { getTwoPipettePositionCheckSteps } from './getTwoPipettePositionCheckSteps'
 import type {
   RunTimeCommand,
   ProtocolAnalysisFile,
 } from '@opentrons/shared-data/protocol/types/schemaV6'
-import type { DeprecatedLabwarePositionCheckStep } from './types'
+import type { DeprecatedLabwarePositionCheckStep } from '../types'
 
 export const deprecatedGetLabwarePositionCheckSteps = (
   protocolData: ProtocolAnalysisFile

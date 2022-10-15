@@ -5,7 +5,7 @@ import type {
 } from '@opentrons/shared-data/protocol'
 import { LoadPipetteRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
-export const getPrimaryPipetteId = (
+export const deprecatedGetPrimaryPipetteId = (
   pipettesById: ProtocolFile<{}>['pipettes'],
   commands: RunTimeCommand[]
 ): string => {
