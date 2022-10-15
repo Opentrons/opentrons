@@ -158,7 +158,7 @@ jobs:
         run: |
           if [ '${{ matrix.os}}' == 'ubuntu-22.04']
           then
-            make -C app-shell dist-${{ matrix.os }}
+            CPPFLAGS="-std=c++17" make -C app-shell dist-${{ matrix.os }}
           else
             make -C app-shell dist-${{ matrix.os }}
           fi
