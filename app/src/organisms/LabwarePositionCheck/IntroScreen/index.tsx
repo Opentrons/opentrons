@@ -8,14 +8,12 @@ import {
   TYPOGRAPHY,
   ALIGN_CENTER,
 } from '@opentrons/components'
-import { useCurrentRun } from '../../ProtocolUpload/hooks'
 import { NeedHelpLink } from '../../CalibrationPanels'
 import { PrimaryButton } from '../../../atoms/buttons'
 import { StyledText } from '../../../atoms/text'
-import { LoadingState } from '../../CalibrationPanels/LoadingState'
+import { RobotMotionLoader } from '../RobotMotionLoader'
 import { getPrepCommands } from './getPrepCommands'
 import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import { useCreateCommandMutation } from '@opentrons/react-api-client'
 import type { CreateRunCommand, RegisterPositionAction } from '../types'
 import type { Jog } from '../../../molecules/JogControls'
 
@@ -36,17 +34,19 @@ export const IntroScreen = (props: {
     const prepCommands = getPrepCommands(protocolData?.commands ?? [])
     Promise.all(
       prepCommands.map(command =>
-        createRunCommand({command, waitUntilComplete: true}).catch((e: Error) => {
-        
-          console.error(`error issuing command to robot: ${e.message}`)
-        })
+        createRunCommand({ command, waitUntilComplete: true })
       )
-    ).then(() => {
-      proceed()
-    })
+    )
+      .then(proceed)
+      .catch((e: Error) =>
+        console.error(`error preparing to robot for LPC: ${e.message}`)
+      )
   }
 
-  if (isRobotMoving) return <LoadingState />
+  if (isRobotMoving)
+    return (
+      <RobotMotionLoader header={t('shared:stand_back_robot_is_in_motion')} />
+    )
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -66,13 +66,16 @@ export const IntroScreen = (props: {
           <Trans
             t={t}
             i18nKey="labware_position_check_description"
-            components={{ block: <StyledText as="p" /> }} />
+            components={{ block: <StyledText as="p" /> }}
+          />
         </Flex>
-        <Flex flex="1" flexDirection={DIRECTION_COLUMN}>
+        <Flex flex="1" flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
           <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {t('shared:you_will_need')}
           </StyledText>
-          <StyledText as="p">{t('all_modules_and_labware_from_protocol')}</StyledText>
+          <StyledText as="p">
+            {t('all_modules_and_labware_from_protocol')}
+          </StyledText>
         </Flex>
       </Flex>
       <Flex
@@ -83,9 +86,11 @@ export const IntroScreen = (props: {
       >
         <NeedHelpLink />
         <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
-          <PrimaryButton onClick={handleClickStartLPC}>{t('shared:get_started')}</PrimaryButton>
+          <PrimaryButton onClick={handleClickStartLPC}>
+            {t('shared:get_started')}
+          </PrimaryButton>
         </Flex>
       </Flex>
-    </Flex >
+    </Flex>
   )
 }

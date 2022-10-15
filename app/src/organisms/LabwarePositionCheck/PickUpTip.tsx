@@ -1,13 +1,11 @@
 import * as React from 'react'
-import isEqual from 'lodash/isEqual'
 import { Trans, useTranslation } from 'react-i18next'
 import { DIRECTION_COLUMN, Flex, TYPOGRAPHY } from '@opentrons/components'
-import { useCreateCommandMutation } from '@opentrons/react-api-client'
 import { StyledText } from '../../atoms/text'
-import { LoadingState } from '../CalibrationPanels/LoadingState'
+import { RobotMotionLoader } from './RobotMotionLoader'
 import { PrepareSpace } from './PrepareSpace'
 import { JogToWell } from './JogToWell'
-import { CompletedProtocolAnalysis, FIXED_TRASH_ID, getIsTiprack, getLabwareDefURI, getLabwareDisplayName, getModuleDisplayName, IDENTITY_VECTOR } from '@opentrons/shared-data'
+import { CompletedProtocolAnalysis, FIXED_TRASH_ID, getLabwareDefURI, getLabwareDisplayName, IDENTITY_VECTOR } from '@opentrons/shared-data'
 import { getLabwareDef } from './utils/labware'
 import { UnorderedList } from '../../molecules/UnorderedList'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
@@ -41,16 +39,17 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
   const displayLocation = t('slot_name', { slotName: 'slotName' in location ? location?.slotName : '' })
   const labwareDisplayName = getLabwareDisplayName(labwareDef)
 
-  let instructions = [
+  const instructions = [
     t('clear_all_slots'),
     <Trans
+      key='place_a_full_tip_rack_in_location'
       t={t}
       i18nKey='place_a_full_tip_rack_in_location'
       tOptions={{ tip_rack: labwareDisplayName, location: displayLocation }}
       components={{ bold: <StyledText as="span" fontWeight={TYPOGRAPHY.fontWeightSemiBold} /> }} />
   ]
 
-  const handleConfirmPlacement = () => {
+  const handleConfirmPlacement = (): void => {
     createRunCommand({
       command: {
         commandType: 'moveLabware' as const,
@@ -81,7 +80,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
       }
     })
   }
-  const handleConfirmPosition = () => {
+  const handleConfirmPosition = (): void => {
     createRunCommand({
       command: { commandType: 'savePosition', params: { pipetteId } },
       waitUntilComplete: true,
@@ -106,7 +105,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
     })
   }
 
-  const handleConfirmTipAttached = () => {
+  const handleConfirmTipAttached = (): void => {
     createRunCommand({
       command: { commandType: 'savePosition', params: { pipetteId } },
       waitUntilComplete: true,
@@ -139,7 +138,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
       })
     })
   }
-  const handleInvalidateTip = () => {
+  const handleInvalidateTip = (): void => {
     createRunCommand({
       command: {
         commandType: 'dropTip',
@@ -159,7 +158,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
   }
   const existingOffset = getCurrentOffsetForLabwareInLocation(existingOffsets, getLabwareDefURI(labwareDef), location)?.vector ?? IDENTITY_VECTOR
 
-  if (isRobotMoving) return <LoadingState />
+  if (isRobotMoving) return <RobotMotionLoader />
   return showTipConfirmation ?
     <TipConfirmation
       invalidateTip={handleInvalidateTip}
@@ -177,9 +176,10 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
             pipetteName={pipetteName}
             handleConfirmPosition={handleConfirmPosition}
             handleGoBack={() => setHasPreparedSpace(false)}
-            handleJog={handleJog} 
+            handleJog={handleJog}
             initialPosition={IDENTITY_VECTOR}
-            existingOffset={existingOffset} />
+            existingOffset={existingOffset}
+            showLiveOffset={false} />
         ) : (
           <PrepareSpace
             {...props}

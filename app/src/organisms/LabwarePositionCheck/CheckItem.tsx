@@ -3,7 +3,7 @@ import isEqual from 'lodash/isEqual'
 import { Trans, useTranslation } from 'react-i18next'
 import { DIRECTION_COLUMN, Flex, TYPOGRAPHY } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
-import { LoadingState } from '../CalibrationPanels/LoadingState'
+import { RobotMotionLoader } from './RobotMotionLoader'
 import { PrepareSpace } from './PrepareSpace'
 import { JogToWell } from './JogToWell'
 import { FIXED_TRASH_ID, getIsTiprack, getLabwareDefURI, getLabwareDisplayName, getModuleDisplayName, getVectorDifference, getVectorSum, IDENTITY_VECTOR } from '@opentrons/shared-data'
@@ -11,7 +11,7 @@ import { getLabwareDef } from './utils/labware'
 import { UnorderedList } from '../../molecules/UnorderedList'
 
 import type { LabwareOffset } from '@opentrons/api-client'
-import type { CompletedProtocolAnalysis, Coordinates } from '@opentrons/shared-data'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { CheckTipRacksStep, CreateRunCommand, RegisterPositionAction, WorkingOffset } from './types'
 import type { Jog } from '../../molecules/DeprecatedJogControls/types'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
@@ -140,9 +140,9 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   ))?.initialPosition
   const existingOffset = getCurrentOffsetForLabwareInLocation(existingOffsets, getLabwareDefURI(labwareDef), location)?.vector ?? IDENTITY_VECTOR
 
-  if (isRobotMoving) return <LoadingState />
+  if (isRobotMoving) return <RobotMotionLoader />
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <Flex flexDirection={DIRECTION_COLUMN} minHeight="25rem">
       {initialPosition != null ? (
         <JogToWell
           header={t('check_item_in_location', {

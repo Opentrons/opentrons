@@ -1,9 +1,8 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { DIRECTION_COLUMN, Flex, TYPOGRAPHY } from '@opentrons/components'
-import { useCreateCommandMutation } from '@opentrons/react-api-client'
 import { StyledText } from '../../atoms/text'
-import { LoadingState } from '../CalibrationPanels/LoadingState'
+import { RobotMotionLoader } from './RobotMotionLoader'
 import { PrepareSpace } from './PrepareSpace'
 import { CompletedProtocolAnalysis, getLabwareDisplayName } from '@opentrons/shared-data'
 import { getLabwareDef } from './utils/labware'
@@ -29,16 +28,17 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
   const displayLocation = t('slot_name', { slotName: 'slotName' in location ? location?.slotName : '' })
   const labwareDisplayName = getLabwareDisplayName(labwareDef)
 
-  let instructions = [
+  const instructions = [
     t('clear_all_slots'),
     <Trans
+      key='place_previous_tip_rack_in_location'
       t={t}
       i18nKey='place_previous_tip_rack_in_location'
       tOptions={{ tip_rack: labwareDisplayName, location: displayLocation }}
       components={{ bold: <StyledText as="span" fontWeight={TYPOGRAPHY.fontWeightSemiBold} /> }} />
   ]
 
-  const handleConfirmPlacement = () => {
+  const handleConfirmPlacement = (): void => {
     createRunCommand({
       command: {
         commandType: 'moveLabware' as const,
@@ -65,7 +65,7 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
     })
   }
 
-  if (isRobotMoving) return <LoadingState />
+  if (isRobotMoving) return <RobotMotionLoader />
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <PrepareSpace

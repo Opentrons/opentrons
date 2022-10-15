@@ -10,12 +10,12 @@ import {
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 
-interface LoadingStateProps {
+interface RobotMotionLoaderProps {
   header?: string
   body?: string
 }
 
-export function LoadingState(props: LoadingStateProps): JSX.Element {
+export function RobotMotionLoader(props: RobotMotionLoaderProps): JSX.Element {
   const { header, body } = props
   return (
     <Flex

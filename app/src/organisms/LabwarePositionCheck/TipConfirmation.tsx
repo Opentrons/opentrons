@@ -33,7 +33,7 @@ export function TipConfirmation(props: TipConfirmationProps): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       padding={SPACING.spacing6}
-      minHeight="32rem"
+      minHeight="25rem"
     >
       <StyledText as="h1" marginBottom={SPACING.spacing4}>
         {t('did_pipette_pick_up_tip')}
