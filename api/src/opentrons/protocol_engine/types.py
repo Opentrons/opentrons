@@ -343,9 +343,6 @@ class HexColor(BaseModel):
 
     __root__: str
 
-    def __init__(self, hex_color: str) -> None:
-        super().__init__(__root__=hex_color)
-
     @validator("__root__")
     def _color_is_a_valid_hex(cls, v: str) -> str:
         match = re.search(r"^#(?:[0-9a-fA-F]{3,4}){1,2}$", v)

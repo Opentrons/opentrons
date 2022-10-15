@@ -471,25 +471,25 @@ def test_load_liquid(
             id="liquid-id-555",
             displayName="water",
             description="water description",
-            displayColor=HexColor(hex_color="#F00"),
+            displayColor=HexColor(__root__="#F00"),
         ),
         Liquid(
             id="liquid-id-666",
             displayName="coke",
             description="coke description",
-            displayColor=HexColor(hex_color="#FFCC00CC"),
+            displayColor=HexColor(__root__="#FFCC00CC"),
         ),
         Liquid(
             id="liquid-id-777",
             displayName="diet-coke",
             description="coke description",
-            displayColor=HexColor(hex_color="#FC0C"),
+            displayColor=HexColor(__root__="#FC0C"),
         ),
         Liquid(
             id="liquid-id-888",
             displayName="coke-zero",
             description="coke description",
-            displayColor=HexColor(hex_color="#98e2d1"),
+            displayColor=HexColor(__root__="#98e2d1"),
         ),
     ]
 
@@ -501,5 +501,5 @@ def test_handles_add_liquid_invalid_hex(subject: JsonTranslator) -> None:
             id="water-id",
             displayName="water",
             description="water-desc",
-            displayColor=HexColor(hex_color="#123456789"),
+            displayColor=HexColor(__root__="#123456789"),
         )
