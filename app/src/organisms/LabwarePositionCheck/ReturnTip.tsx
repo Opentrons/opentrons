@@ -4,7 +4,10 @@ import { DIRECTION_COLUMN, Flex, TYPOGRAPHY } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { RobotMotionLoader } from './RobotMotionLoader'
 import { PrepareSpace } from './PrepareSpace'
-import { CompletedProtocolAnalysis, getLabwareDisplayName } from '@opentrons/shared-data'
+import {
+  CompletedProtocolAnalysis,
+  getLabwareDisplayName,
+} from '@opentrons/shared-data'
 import { getLabwareDef } from './utils/labware'
 import { UnorderedList } from '../../molecules/UnorderedList'
 
@@ -20,48 +23,72 @@ interface ReturnTipProps extends ReturnTipStep {
 }
 export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
   const { t } = useTranslation('labware_position_check')
-  const { pipetteId, labwareId, location, protocolData, proceed, tipPickUpOffset, isRobotMoving, createRunCommand } = props
+  const {
+    pipetteId,
+    labwareId,
+    location,
+    protocolData,
+    proceed,
+    tipPickUpOffset,
+    isRobotMoving,
+    createRunCommand,
+  } = props
 
   const labwareDef = getLabwareDef(labwareId, protocolData)
   if (labwareDef == null) return null
 
-  const displayLocation = t('slot_name', { slotName: 'slotName' in location ? location?.slotName : '' })
+  const displayLocation = t('slot_name', {
+    slotName: 'slotName' in location ? location?.slotName : '',
+  })
   const labwareDisplayName = getLabwareDisplayName(labwareDef)
 
   const instructions = [
     t('clear_all_slots'),
     <Trans
-      key='place_previous_tip_rack_in_location'
+      key="place_previous_tip_rack_in_location"
       t={t}
-      i18nKey='place_previous_tip_rack_in_location'
+      i18nKey="place_previous_tip_rack_in_location"
       tOptions={{ tip_rack: labwareDisplayName, location: displayLocation }}
-      components={{ bold: <StyledText as="span" fontWeight={TYPOGRAPHY.fontWeightSemiBold} /> }} />
+      components={{
+        bold: (
+          <StyledText as="span" fontWeight={TYPOGRAPHY.fontWeightSemiBold} />
+        ),
+      }}
+    />,
   ]
 
   const handleConfirmPlacement = (): void => {
-    createRunCommand({
-      command: {
-        commandType: 'moveLabware' as const,
-        params: { labwareId: labwareId, newLocation: location },
+    createRunCommand(
+      {
+        command: {
+          commandType: 'moveLabware' as const,
+          params: { labwareId: labwareId, newLocation: location },
+        },
+        waitUntilComplete: true,
       },
-      waitUntilComplete: true,
-    }, {
-      onSuccess: () => {
-        createRunCommand({
-          command: {
-            commandType: 'dropTip' as const,
-            params: { pipetteId: pipetteId, labwareId: labwareId, wellName: 'A1' },
-          },
-          waitUntilComplete: true,
-        }, {
-          onSuccess: () => {
-            console.log('COMPLETE ON SUCCESS BEFORE SET')
-            proceed()
-          }
-        }).catch((e: Error) => {
-          console.error(`error dropping tip ${e.message}`)
-        })
+      {
+        onSuccess: () => {
+          createRunCommand(
+            {
+              command: {
+                commandType: 'dropTip' as const,
+                params: {
+                  pipetteId: pipetteId,
+                  labwareId: labwareId,
+                  wellName: 'A1',
+                  wellLocation: { offset: tipPickUpOffset ?? undefined },
+                },
+              },
+              waitUntilComplete: true,
+            },
+            { onSuccess: proceed }
+          ).catch((e: Error) => {
+            console.error(`error dropping tip ${e.message}`)
+          })
+        },
       }
+    ).catch((e: Error) => {
+      console.error(`error moving labware onto deck ${e.message}`)
     })
   }
 
@@ -76,7 +103,8 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
         })}
         body={<UnorderedList items={instructions} />}
         labwareDef={labwareDef}
-        confirmPlacement={handleConfirmPlacement} />
+        confirmPlacement={handleConfirmPlacement}
+      />
     </Flex>
   )
 }

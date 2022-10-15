@@ -41,6 +41,7 @@ export function LiveOffsetValue(props: OffsetVectorProps): JSX.Element {
         {[x, y, z].map((axis, index) => (
           <>
             <StyledText
+              key={index}
               as="p"
               marginLeft={SPACING.spacing3}
               marginRight={SPACING.spacing2}

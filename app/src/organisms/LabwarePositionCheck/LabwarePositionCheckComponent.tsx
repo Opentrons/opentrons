@@ -148,12 +148,15 @@ export const LabwarePositionCheckInner = (
   const LPCSteps = useSteps(protocolData)
   const totalStepCount = LPCSteps.length - 1
   const currentStep = LPCSteps?.[currentStepIndex]
-  const proceed = (): void =>
-    setCurrentStepIndex(
-      currentStepIndex !== LPCSteps.length - 1
-        ? currentStepIndex + 1
-        : currentStepIndex
-    )
+  const proceed = (): void => {
+    if (!isCommandMutationLoading) {
+      setCurrentStepIndex(
+        currentStepIndex !== LPCSteps.length - 1
+          ? currentStepIndex + 1
+          : currentStepIndex
+      )
+    }
+  }
   if (protocolData == null || currentStep == null) return null
 
   const handleJog = (

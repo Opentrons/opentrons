@@ -133,7 +133,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
         },
       }
     ).catch((e: Error) => {
-      console.error(`error moving labware ${e.message}`)
+      console.error(`error moving labware onto deck ${e.message}`)
     })
   }
   const handleConfirmPosition = (): void => {
@@ -166,10 +166,10 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
     })
       .then(response => {
         const { position } = response.data.result
-        const offset = getVectorDifference(
+        const offset = initialPosition != null ? getVectorDifference(
           position,
-          initialPosition ?? IDENTITY_VECTOR
-        )
+          initialPosition
+        ) : position
         registerPosition({ type: 'tipPickUpOffset', offset })
         createRunCommand({
           command: {

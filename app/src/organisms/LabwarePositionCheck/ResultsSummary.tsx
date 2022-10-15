@@ -1,10 +1,20 @@
 import * as React from 'react'
 import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
-import { useCreateLabwareOffsetMutation } from '@opentrons/react-api-client'
 import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
-import { CompletedProtocolAnalysis, getLabwareDefURI, getLabwareDisplayName, getModuleDisplayName, getModuleType, getVectorDifference, getVectorSum, IDENTITY_VECTOR, LabwareDefinition2, THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
+import {
+  CompletedProtocolAnalysis,
+  getLabwareDefURI,
+  getLabwareDisplayName,
+  getModuleDisplayName,
+  getModuleType,
+  getVectorDifference,
+  getVectorSum,
+  IDENTITY_VECTOR,
+  LabwareDefinition2,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 import { NeedHelpLink } from '../CalibrationPanels'
 import {
   DIRECTION_COLUMN,
@@ -14,17 +24,17 @@ import {
   ALIGN_CENTER,
   TYPOGRAPHY,
   COLORS,
-  ALIGN_FLEX_END,
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { getLabwareDefinitionsFromCommands } from './utils/labware'
 
-import type { OffsetVector } from '../../molecules/OffsetVector'
 import type { ResultsSummaryStep, WorkingOffset } from './types'
-import type { LabwareOffsetCreateData, LabwareOffsetLocation } from '@opentrons/api-client'
-import type { LabwareOffset } from '@opentrons/api-client'
-import { LiveOffsetValue } from './LiveOffsetValue'
+import type {
+  LabwareOffset,
+  LabwareOffsetCreateData,
+  LabwareOffsetLocation,
+} from '@opentrons/api-client'
 
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
@@ -35,26 +45,53 @@ interface ResultsSummaryProps extends ResultsSummaryStep {
   existingOffsets: LabwareOffset[]
   handleApplyOffsets: (offsets: LabwareOffsetCreateData[]) => void
 }
-export const ResultsSummary = (props: ResultsSummaryProps): JSX.Element | null => {
+export const ResultsSummary = (
+  props: ResultsSummaryProps
+): JSX.Element | null => {
   const { t } = useTranslation('labware_position_check')
-  const { protocolData, workingOffsets, handleApplyOffsets, existingOffsets } = props
-  const labwareDefinitions = getLabwareDefinitionsFromCommands(protocolData.commands)
+  const {
+    protocolData,
+    workingOffsets,
+    handleApplyOffsets,
+    existingOffsets,
+  } = props
+  const labwareDefinitions = getLabwareDefinitionsFromCommands(
+    protocolData.commands
+  )
 
   const offsetsToApply = React.useMemo(() => {
     if (protocolData == null) return []
-    return workingOffsets.map<LabwareOffsetCreateData>(({ initialPosition, finalPosition, labwareId, location }) => {
-      const definitionUri = protocolData.labware.find(l => l.id === labwareId)?.definitionUri ?? null
-      if (finalPosition == null || initialPosition == null || definitionUri == null) {
-        throw new Error(`cannot create offset for labware with id ${labwareId}, in location ${JSON.stringify(location)}, with initial position ${initialPosition}, and final position ${finalPosition}`)
+    return workingOffsets.map<LabwareOffsetCreateData>(
+      ({ initialPosition, finalPosition, labwareId, location }) => {
+        const definitionUri =
+          protocolData.labware.find(l => l.id === labwareId)?.definitionUri ??
+          null
+        if (
+          finalPosition == null ||
+          initialPosition == null ||
+          definitionUri == null
+        ) {
+          throw new Error(
+            `cannot create offset for labware with id ${labwareId}, in location ${JSON.stringify(
+              location
+            )}, with initial position ${initialPosition}, and final position ${finalPosition}`
+          )
+        }
+
+        const existingOffset =
+          getCurrentOffsetForLabwareInLocation(
+            existingOffsets,
+            definitionUri,
+            location
+          )?.vector ?? IDENTITY_VECTOR
+        const vector = getVectorSum(
+          existingOffset,
+          getVectorDifference(finalPosition, initialPosition)
+        )
+        return { definitionUri, location, vector }
       }
-
-      const existingOffset = getCurrentOffsetForLabwareInLocation(existingOffsets, definitionUri, location)?.vector ?? IDENTITY_VECTOR
-      const vector = getVectorSum(existingOffset, getVectorDifference(finalPosition, initialPosition))
-      return { definitionUri, location, vector }
-    })
+    )
   }, [workingOffsets])
-
-  
 
   return (
     <Flex
@@ -64,7 +101,10 @@ export const ResultsSummary = (props: ResultsSummaryProps): JSX.Element | null =
       minHeight="25rem"
     >
       <StyledText as="h1">{t('new_labware_offset_data')}</StyledText>
-      <OffsetTable offsets={offsetsToApply} labwareDefinitions={labwareDefinitions} />
+      <OffsetTable
+        offsets={offsetsToApply}
+        labwareDefinitions={labwareDefinitions}
+      />
       <Flex
         width="100%"
         marginTop={SPACING.spacing6}
@@ -84,7 +124,7 @@ const Table = styled('table')`
   ${TYPOGRAPHY.labelRegular}
   table-layout: auto;
   width: 100%;
-  border-spacing: 0 ${SPACING.spacing1};
+  border-spacing: 0 ${SPACING.spacing2};
   margin: ${SPACING.spacing4} 0;
   text-align: left;
 `
@@ -119,55 +159,85 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
         <tr>
           <TableHeader>{t('location')}</TableHeader>
           <TableHeader>{t('labware')}</TableHeader>
-          <TableHeader css={css`text-align: right;`}>{t('labware_offset_data')}</TableHeader>
+          <TableHeader
+            css={css`
+              text-align: right;
+            `}
+          >
+            {t('labware_offset_data')}
+          </TableHeader>
         </tr>
       </thead>
 
       <tbody>
-        {offsets.map(
-          ({ location, definitionUri, vector }, index) => {
-
-            const labwareDef = labwareDefinitions.find(
-              def => getLabwareDefURI(def) === definitionUri
-            )
-            const labwareDisplayName = labwareDef != null ? getLabwareDisplayName(labwareDef) : ''
-            return (
-              <TableRow key={index}>
-                <TableDatum>
-                  <DisplayLocation location={location} />
-                </TableDatum>
-                <TableDatum>{labwareDisplayName}</TableDatum>
-                <TableDatum css={css`text-align: right;`}>
-                  {vector.x === 0 && vector.y === 0 && vector.z === 0 ? (
-                    <StyledText>{t('no_labware_offsets')}</StyledText>
-                  ) : (
-                    <LiveOffsetValue {...vector} justifyContent={JUSTIFY_FLEX_END}/>
-                  )}
-                </TableDatum>
-              </TableRow>
-            )
-          }
-        )}
+        {offsets.map(({ location, definitionUri, vector }, index) => {
+          const labwareDef = labwareDefinitions.find(
+            def => getLabwareDefURI(def) === definitionUri
+          )
+          const labwareDisplayName =
+            labwareDef != null ? getLabwareDisplayName(labwareDef) : ''
+          return (
+            <TableRow key={index}>
+              <TableDatum>
+                <DisplayLocation location={location} />
+              </TableDatum>
+              <TableDatum>
+                <StyledText as="p">{labwareDisplayName}</StyledText>
+              </TableDatum>
+              <TableDatum
+                css={css`
+                  text-align: right;
+                `}
+              >
+                {vector.x === 0 && vector.y === 0 && vector.z === 0 ? (
+                  <StyledText>{t('no_labware_offsets')}</StyledText>
+                ) : (
+                  <Flex justifyContent={JUSTIFY_FLEX_END}>
+                    {[vector.x, vector.y, vector.z].map((axis, index) => (
+                      <>
+                        <StyledText
+                          as="p"
+                          marginLeft={SPACING.spacing3}
+                          marginRight={SPACING.spacing2}
+                          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                        >
+                          {['X', 'Y', 'Z'][index]}
+                        </StyledText>
+                        <StyledText as="p">{axis.toFixed(1)}</StyledText>
+                      </>
+                    ))}
+                  </Flex>
+                )}
+              </TableDatum>
+            </TableRow>
+          )
+        })}
       </tbody>
     </Table>
   )
 }
 
-const DisplayLocation = ({ location }: { location: LabwareOffsetLocation }): JSX.Element => {
+const DisplayLocation = ({
+  location,
+}: {
+  location: LabwareOffsetLocation
+}): JSX.Element => {
   const { t } = useTranslation('labware_position_check')
   const { slotName, moduleModel } = location
 
   let displayLocation = t('slot_name', { slotName })
   if (moduleModel != null) {
-    if (
-      getModuleType(moduleModel) === THERMOCYCLER_MODULE_TYPE
-    ) {
+    if (getModuleType(moduleModel) === THERMOCYCLER_MODULE_TYPE) {
       displayLocation = getModuleDisplayName(moduleModel)
     } else {
-      displayLocation = `${t('slot_name', { slotName })}, ${getModuleDisplayName(moduleModel)}`
+      displayLocation = `${t('slot_name', {
+        slotName,
+      })}, ${getModuleDisplayName(moduleModel)}`
     }
   }
-  return <StyledText as="p" textTransform={TYPOGRAPHY.textTransformCapitalize}>{displayLocation}</StyledText>
+  return (
+    <StyledText as="p" textTransform={TYPOGRAPHY.textTransformCapitalize}>
+      {displayLocation}
+    </StyledText>
+  )
 }
-
-
