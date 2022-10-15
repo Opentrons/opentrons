@@ -43,10 +43,13 @@ export interface SavePositionCommandData {
   [labwareId: string]: string[]
 }
 
-
-
-
-export type LabwarePositionCheckStep = BeforeBeginningStep | CheckTipRacksStep | PickUpTipStep | CheckLabwareStep | ReturnTipStep | ResultsSummaryStep
+export type LabwarePositionCheckStep =
+  | BeforeBeginningStep
+  | CheckTipRacksStep
+  | PickUpTipStep
+  | CheckLabwareStep
+  | ReturnTipStep
+  | ResultsSummaryStep
 export interface BeforeBeginningStep {
   section: typeof SECTIONS.BEFORE_BEGINNING
 }
@@ -79,24 +82,37 @@ export interface ResultsSummaryStep {
   section: typeof SECTIONS.RESULTS_SUMMARY
 }
 
-type CreateCommandMutate = ReturnType<typeof useCreateCommandMutation>['createCommand']
+type CreateCommandMutate = ReturnType<
+  typeof useCreateCommandMutation
+>['createCommand']
 export type CreateRunCommand = (
   params: Omit<Parameters<CreateCommandMutate>[0], 'runId'>,
   options?: Parameters<CreateCommandMutate>[1]
 ) => ReturnType<CreateCommandMutate>
 
+interface InitialPositionAction {
+  type: 'initialPosition'
+  labwareId: string
+  location: LabwareOffsetLocation
+  position: VectorOffset | null
+}
+interface FinalPositionAction {
+  type: 'finalPosition'
+  labwareId: string
+  location: LabwareOffsetLocation
+  position: VectorOffset | null
+}
+interface TipPickUpOffsetAction {
+  type: 'tipPickUpOffset'
+  offset: VectorOffset | null
+}
 export type RegisterPositionAction =
-  { type: 'initialPosition', labwareId: string; location: LabwareOffsetLocation; position: VectorOffset | null } |
-  { type: 'finalPosition', labwareId: string; location: LabwareOffsetLocation; position: VectorOffset | null } |
-  { type: 'tipPickUpPosition', labwareId: string; location: LabwareOffsetLocation; position: VectorOffset | null }
-
+  | InitialPositionAction
+  | FinalPositionAction
+  | TipPickUpOffsetAction
 export interface WorkingOffset {
   labwareId: string
   location: LabwareOffsetLocation
   initialPosition: VectorOffset | null
   finalPosition: VectorOffset | null
 }
-
-
-
-

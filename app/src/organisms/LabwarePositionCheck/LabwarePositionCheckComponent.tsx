@@ -51,27 +51,31 @@ export const LabwarePositionCheckInner = (
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const protocolData = mostRecentAnalysis
   const [
-    { workingOffsets, tipPickUpPosition },
+    { workingOffsets, tipPickUpOffset },
     registerPosition,
   ] = React.useReducer(
     (
       state: {
         workingOffsets: WorkingOffset[]
-        tipPickUpPosition: Coordinates | null
+        tipPickUpOffset: Coordinates | null
       },
       action: RegisterPositionAction
     ) => {
-      const { type, labwareId, location, position } = action
-      if (type === 'tipPickUpPosition')
-        return { ...state, tipPickUpPosition: position }
+      if (action.type === 'tipPickUpOffset') {
+        return { ...state, tipPickUpOffset: action.offset }
+      }
 
-      if (['initialPosition', 'finalPosition'].includes(type)) {
+      if (
+        action.type === 'initialPosition' ||
+        action.type === 'finalPosition'
+      ) {
+        const { labwareId, location, position } = action
         const existingRecordIndex = state.workingOffsets.findIndex(
           record =>
             record.labwareId === labwareId && isEqual(record.location, location)
         )
         if (existingRecordIndex >= 0) {
-          if (type === 'initialPosition') {
+          if (action.type === 'initialPosition') {
             return {
               ...state,
               workingOffsets: [
@@ -84,7 +88,7 @@ export const LabwarePositionCheckInner = (
                 ...state.workingOffsets.slice(existingRecordIndex + 1),
               ],
             }
-          } else if (type === 'finalPosition') {
+          } else if (action.type === 'finalPosition') {
             return {
               ...state,
               workingOffsets: [
@@ -105,8 +109,9 @@ export const LabwarePositionCheckInner = (
             {
               labwareId,
               location,
-              initialPosition: type === 'initialPosition' ? position : null,
-              finalPosition: type === 'finalPosition' ? position : null,
+              initialPosition:
+                action.type === 'initialPosition' ? position : null,
+              finalPosition: action.type === 'finalPosition' ? position : null,
             },
           ],
         }
@@ -114,7 +119,7 @@ export const LabwarePositionCheckInner = (
         return state
       }
     },
-    { workingOffsets: [], tipPickUpPosition: null }
+    { workingOffsets: [], tipPickUpOffset: null }
   )
   const {
     confirm: confirmExitLPC,
@@ -185,6 +190,8 @@ export const LabwarePositionCheckInner = (
     registerPosition,
     handleJog,
     isRobotMoving,
+    workingOffsets,
+    existingOffsets,
   }
 
   const handleApplyOffsets = (offsets: LabwareOffsetCreateData[]): void => {
@@ -213,27 +220,15 @@ export const LabwarePositionCheckInner = (
     currentStep.section === 'CHECK_TIP_RACKS' ||
     currentStep.section === 'CHECK_LABWARE'
   ) {
-    modalContent = (
-      <CheckItem
-        {...currentStep}
-        {...movementStepProps}
-        {...{ workingOffsets, existingOffsets }}
-      />
-    )
+    modalContent = <CheckItem {...currentStep} {...movementStepProps} />
   } else if (currentStep.section === 'PICK_UP_TIP') {
-    modalContent = (
-      <PickUpTip
-        {...currentStep}
-        {...movementStepProps}
-        {...{ workingOffsets, existingOffsets, tipPickUpPosition }}
-      />
-    )
+    modalContent = <PickUpTip {...currentStep} {...movementStepProps} />
   } else if (currentStep.section === 'RETURN_TIP') {
     modalContent = (
       <ReturnTip
         {...currentStep}
         {...movementStepProps}
-        {...{ workingOffsets, tipPickUpPosition }}
+        {...{ tipPickUpOffset }}
       />
     )
   } else if (currentStep.section === 'RESULTS_SUMMARY') {

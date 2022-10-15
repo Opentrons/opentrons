@@ -15,12 +15,12 @@ interface ReturnTipProps extends ReturnTipStep {
   protocolData: CompletedProtocolAnalysis
   proceed: () => void
   createRunCommand: CreateRunCommand
-  tipPickUpPosition: VectorOffset | null
+  tipPickUpOffset: VectorOffset | null
   isRobotMoving: boolean
 }
 export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
   const { t } = useTranslation('labware_position_check')
-  const { pipetteId, labwareId, location, protocolData, proceed, tipPickUpPosition, isRobotMoving, createRunCommand } = props
+  const { pipetteId, labwareId, location, protocolData, proceed, tipPickUpOffset, isRobotMoving, createRunCommand } = props
 
   const labwareDef = getLabwareDef(labwareId, protocolData)
   if (labwareDef == null) return null
