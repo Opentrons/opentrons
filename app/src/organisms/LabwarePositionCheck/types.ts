@@ -11,12 +11,15 @@ import type {
   DropTipCreateCommand,
   PickUpTipCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
-import type { LabwareOffsetLocation } from '@opentrons/api-client'
-import type { VectorOffset } from '@opentrons/api-client'
-import { getLabwareOffsetLocation } from '../Devices/ProtocolRun/utils/getLabwareOffsetLocation'
+import type { LabwareOffsetLocation, VectorOffset } from '@opentrons/api-client'
 
+/* START DEPRECATED TYPES */
 export type DeprecatedSection = keyof typeof DEPRECATED_SECTIONS
-
+export interface DeprecatedLabwarePositionCheckStep {
+  labwareId: string
+  section: DeprecatedSection
+  commands: LabwarePositionCheckCreateCommand[]
+}
 export type LabwarePositionCheckCreateCommand =
   | MoveToWellCreateCommand
   | PickUpTipCreateCommand
@@ -29,11 +32,6 @@ export type LabwarePositionCheckMovementCommand =
   | MoveToWellCreateCommand
   | PickUpTipCreateCommand
   | DropTipCreateCommand
-export interface DeprecatedLabwarePositionCheckStep {
-  labwareId: string
-  section: DeprecatedSection
-  commands: LabwarePositionCheckCreateCommand[]
-}
 export interface LabwareToOrder {
   definition: LabwareDefinition2
   labwareId: string
@@ -42,6 +40,7 @@ export interface LabwareToOrder {
 export interface SavePositionCommandData {
   [labwareId: string]: string[]
 }
+/* END DEPRECATED TYPES */
 
 export type LabwarePositionCheckStep =
   | BeforeBeginningStep
@@ -59,7 +58,6 @@ export interface CheckTipRacksStep {
   labwareId: string
   location: LabwareOffsetLocation
 }
-getLabwareOffsetLocation
 export interface PickUpTipStep {
   section: typeof SECTIONS.PICK_UP_TIP
   pipetteId: string

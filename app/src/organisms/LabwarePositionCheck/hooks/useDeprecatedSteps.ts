@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useProtocolDetailsForRun } from '../../Devices/hooks/useProtocolDetailsForRun'
-import { deprecatedGetLabwarePositionCheckSteps } from '../utils/deprecatedGetLabwarePositionCheckSteps'
+import { deprecatedGetLabwarePositionCheckSteps } from '../deprecatedUtils/deprecatedGetLabwarePositionCheckSteps'
 import type { DeprecatedLabwarePositionCheckStep } from '../types'
 
 export function useDeprecatedSteps(

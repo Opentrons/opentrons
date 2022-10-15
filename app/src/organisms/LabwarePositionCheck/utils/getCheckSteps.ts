@@ -1,15 +1,13 @@
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import { SECTIONS } from '../constants'
-import {
-  getAllUniqLocationsForLabware,
-  getLabwareDefinitionsFromCommands,
-} from './labware'
+import { getLabwareDefinitionsFromCommands } from './labware'
 import {
   getLabwareDefURI,
   getIsTiprack,
   getSlotHasMatingSurfaceUnitVector,
   FIXED_TRASH_ID,
 } from '@opentrons/shared-data'
+import { getLabwareLocationCombos } from '../../ApplyHistoricOffsets/hooks/getLabwareLocationCombos'
 
 import type {
   LabwarePositionCheckStep,
@@ -23,11 +21,7 @@ import type {
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
-import type {
-  LabwareLocation,
-  LoadModuleRunTimeCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-import { getLabwareLocationCombos } from '../../ApplyHistoricOffsets/hooks/getLabwareLocationCombos'
+import type { LabwareOffsetLocation } from '@opentrons/api-client'
 
 interface LPCArgs {
   primaryPipetteId: string
@@ -39,7 +33,7 @@ interface LPCArgs {
 
 const OT2_STANDARD_DECK_DEF = standardDeckDef as any
 
-const PICK_UP_TIP_LOCATION: LabwareLocation = { slotName: '2' }
+const PICK_UP_TIP_LOCATION: LabwareOffsetLocation = { slotName: '2' }
 
 export const getCheckSteps = (args: LPCArgs): LabwarePositionCheckStep[] => {
   const checkTipRacksSectionSteps = getCheckTipRackSectionSteps(args)
@@ -74,9 +68,19 @@ export const getCheckSteps = (args: LPCArgs): LabwarePositionCheckStep[] => {
 }
 
 function getCheckTipRackSectionSteps(args: LPCArgs): CheckTipRacksStep[] {
-  const { secondaryPipetteId, primaryPipetteId, commands, labware, modules } = args
+  const {
+    secondaryPipetteId,
+    primaryPipetteId,
+    commands,
+    labware,
+    modules,
+  } = args
 
-  const labwareLocationCombos = getLabwareLocationCombos(commands, labware, modules)
+  const labwareLocationCombos = getLabwareLocationCombos(
+    commands,
+    labware,
+    modules
+  )
   const pickUpTipCommands = commands.filter(
     (command): command is PickUpTipRunTimeCommand =>
       command.commandType === 'pickUpTip'
@@ -104,7 +108,9 @@ function getCheckTipRackSectionSteps(args: LPCArgs): CheckTipRacksStep[] {
 
   return uniqPickUpTipCommands.reduce<CheckTipRacksStep[]>(
     (acc, { params }) => {
-      const labwareLocations = labwareLocationCombos.filter(combo => combo.labwareId === params.labwareId)
+      const labwareLocations = labwareLocationCombos.filter(
+        combo => combo.labwareId === params.labwareId
+      )
       return [
         ...acc,
         ...labwareLocations.map(({ location }) => ({
@@ -136,27 +142,37 @@ function getCheckLabwareSectionSteps(args: LPCArgs): CheckLabwareStep[] {
     const isTiprack = getIsTiprack(labwareDef)
     if (isTiprack) return acc // skip any labware that is a tiprack
 
-    const labwareLocationCombos = getLabwareLocationCombos(commands, labware, modules)
-    console.log('LABWARE COMBOS', labwareLocationCombos)
+    const labwareLocationCombos = getLabwareLocationCombos(
+      commands,
+      labware,
+      modules
+    )
     return [
       ...acc,
-      ...labwareLocationCombos.reduce<CheckLabwareStep[]>((innerAcc, { location, labwareId }) => {
-        if (
-          !getSlotHasMatingSurfaceUnitVector(OT2_STANDARD_DECK_DEF, location.slotName) || labwareId !== currentLabware.id
-        ) {
-          return innerAcc
-        }
+      ...labwareLocationCombos.reduce<CheckLabwareStep[]>(
+        (innerAcc, { location, labwareId }) => {
+          if (
+            !getSlotHasMatingSurfaceUnitVector(
+              OT2_STANDARD_DECK_DEF,
+              location.slotName
+            ) ||
+            labwareId !== currentLabware.id
+          ) {
+            return innerAcc
+          }
 
-        return [
-          ...innerAcc,
-          {
-            section: SECTIONS.CHECK_LABWARE,
-            labwareId,
-            pipetteId: primaryPipetteId,
-            location,
-          },
-        ]
-      }, []),
+          return [
+            ...innerAcc,
+            {
+              section: SECTIONS.CHECK_LABWARE,
+              labwareId,
+              pipetteId: primaryPipetteId,
+              location,
+            },
+          ]
+        },
+        []
+      ),
     ]
   }, [])
 }

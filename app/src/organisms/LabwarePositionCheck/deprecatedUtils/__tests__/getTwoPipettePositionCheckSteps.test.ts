@@ -78,7 +78,7 @@ describe('getTwoPipettePositionCheckSteps', () => {
       },
     }
 
-    const allSteps: LabwarePositionCheckStep[] = [
+    const allSteps: DeprecatedLabwarePositionCheckStep[] = [
       {
         labwareId: tiprackInSlot2Id,
         section: DEPRECATED_SECTIONS.SECONDARY_PIPETTE_TIPRACKS,
@@ -96,7 +96,8 @@ describe('getTwoPipettePositionCheckSteps', () => {
       },
       {
         labwareId: resevoirId,
-        section: DEPRECATED_SECTIONS.CHECK_REMAINING_LABWARE_WITH_PRIMARY_PIPETTE,
+        section:
+          DEPRECATED_SECTIONS.CHECK_REMAINING_LABWARE_WITH_PRIMARY_PIPETTE,
         commands: [moveToWellFirstLabware],
       },
       {
@@ -207,7 +208,7 @@ describe('getTwoPipettePositionCheckSteps', () => {
       },
     }
 
-    const allSteps: LabwarePositionCheckStep[] = [
+    const allSteps: DeprecatedLabwarePositionCheckStep[] = [
       {
         labwareId: tiprackInSlot2Id,
         section: DEPRECATED_SECTIONS.SECONDARY_PIPETTE_TIPRACKS,
@@ -225,12 +226,14 @@ describe('getTwoPipettePositionCheckSteps', () => {
       },
       {
         labwareId: resevoirId,
-        section: DEPRECATED_SECTIONS.CHECK_REMAINING_LABWARE_WITH_PRIMARY_PIPETTE,
+        section:
+          DEPRECATED_SECTIONS.CHECK_REMAINING_LABWARE_WITH_PRIMARY_PIPETTE,
         commands: [moveToWellFirstLabware],
       },
       {
         labwareId: TCWellPlateId,
-        section: DEPRECATED_SECTIONS.CHECK_REMAINING_LABWARE_WITH_PRIMARY_PIPETTE,
+        section:
+          DEPRECATED_SECTIONS.CHECK_REMAINING_LABWARE_WITH_PRIMARY_PIPETTE,
         commands: [openTCLidCommand, moveToWellAfterOpeningTCLidCommand],
       },
       {
