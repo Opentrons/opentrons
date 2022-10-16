@@ -25,7 +25,6 @@ Database schema versions:
     - `run_table._updated_at` column added
 """
 import logging
-import pickle
 from datetime import datetime, timezone
 from typing import Optional
 from typing_extensions import Final
@@ -40,6 +39,7 @@ from ._tables import (
     run_table as newest_run_table,
 )
 
+from . import legacy_pickle
 from . import pydantic_json
 
 _LATEST_SCHEMA_VERSION: Final = 2
@@ -179,7 +179,7 @@ def _migrate_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
     for v1_analysis in v1_analyses:
         id = v1_analysis.id
         parsed_analysis = CompletedAnalysis.parse_obj(
-            pickle.loads(v1_analysis.completed_analysis)
+            legacy_pickle.loads(v1_analysis.completed_analysis)
         )
 
         new_raw = pydantic_json.pydantic_to_sql(data=parsed_analysis)
