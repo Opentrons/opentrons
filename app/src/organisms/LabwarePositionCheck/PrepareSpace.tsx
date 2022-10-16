@@ -12,24 +12,24 @@ import {
   SPACING,
 } from '@opentrons/components'
 import {
-  THERMOCYCLER_MODULE_V1,
   inferModuleOrientationFromXCoordinate,
   CompletedProtocolAnalysis,
   getModuleDef2,
   LabwareDefinition2,
+  THERMOCYCLER_MODULE_TYPE,
+  getModuleType,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 
 import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { CheckTipRacksStep } from './types'
-import { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import { NeedHelpLink } from '../CalibrationPanels'
 
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
 
-const DECK_MAP_VIEWBOX = '-80 -20 550 460'
+const DECK_MAP_VIEWBOX = '-80 -20 550 466'
 const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
   'fixedBase',
@@ -49,7 +49,7 @@ interface PrepareSpaceProps extends Omit<CheckTipRacksStep, 'section'> {
 }
 export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
   const { t } = useTranslation(['labware_position_check', 'shared'])
-  const { location, labwareDef, protocolData, header, body } = props
+  const { location, moduleId, labwareDef, protocolData, header, body } = props
 
   if (protocolData == null) return null
   return (
@@ -76,26 +76,21 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
             id="LabwarePositionCheck_deckMap"
           >
             {({ deckSlotsById }) => {
-              if ('moduleId' in location) {
-                const moduleLoadCommand = protocolData.commands.find(
-                  (command): command is LoadModuleRunTimeCommand =>
-                    command.commandType === 'loadModule' &&
-                    command.params.moduleId === location.moduleId
-                )
-                if (moduleLoadCommand == null) return null
-                const { location: modLoc, model } = moduleLoadCommand.params
-                const deckSlot = deckSlotsById[modLoc.slotName]
-                const moduleDef = getModuleDef2(model)
-                return (
+              const deckSlot = deckSlotsById[location.slotName]
+              const [x, y] = deckSlot.position
+              let labwareToPrepare = null
+              if ('moduleModel' in location && location.moduleModel != null) {
+                labwareToPrepare = (
                   <Module
-                    x={deckSlot.position[0]}
-                    y={deckSlot.position[1]}
+                    x={x}
+                    y={y}
                     orientation={inferModuleOrientationFromXCoordinate(
                       deckSlot.position[x]
                     )}
-                    def={moduleDef}
+                    def={getModuleDef2(location.moduleModel)}
                     innerProps={
-                      moduleDef.model === THERMOCYCLER_MODULE_V1
+                      getModuleType(location.moduleModel) ===
+                      THERMOCYCLER_MODULE_TYPE
                         ? { lidMotorState: 'open' }
                         : {}
                     }
@@ -104,16 +99,41 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
                   </Module>
                 )
               } else {
-                const slotName = location.slotName
-                const deckSlot = deckSlotsById[slotName]
-                return (
-                  <g
-                    transform={`translate(${deckSlot.position[0]},${deckSlot.position[1]})`}
-                  >
+                labwareToPrepare = (
+                  <g transform={`translate(${x},${y})`}>
                     <LabwareRender definition={labwareDef} />
                   </g>
                 )
               }
+              return (
+                <>
+                  {protocolData.modules.map(module => {
+                    const [modX, modY] = deckSlotsById[
+                      module.location.slotName
+                    ].position
+
+                    // skip the focused module as it will be rendered above with the labware
+                    return module.id === moduleId ? null : (
+                      <Module
+                        key={module.id}
+                        x={modX}
+                        y={modY}
+                        orientation={inferModuleOrientationFromXCoordinate(
+                          modX
+                        )}
+                        def={getModuleDef2(module.model)}
+                        innerProps={
+                          getModuleType(module.model) ===
+                          THERMOCYCLER_MODULE_TYPE
+                            ? { lidMotorState: 'open' }
+                            : {}
+                        }
+                      />
+                    )
+                  })}
+                  {labwareToPrepare}
+                </>
+              )
             }}
           </RobotWorkSpace>
         </Box>

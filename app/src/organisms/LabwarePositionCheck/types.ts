@@ -69,6 +69,7 @@ export interface CheckLabwareStep {
   pipetteId: string
   labwareId: string
   location: LabwareOffsetLocation
+  moduleId?: string
 }
 export interface ReturnTipStep {
   section: typeof SECTIONS.RETURN_TIP

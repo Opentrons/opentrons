@@ -35,6 +35,7 @@ export const RunLogProtocolSetupInfo = ({
   const { protocolData } = useProtocolDetailsForRun(runId)
   const protocolPipetteData = useRunPipetteInfoByMount(robotName, runId)
   const labwareRenderInfoById = useLabwareRenderInfoForRunById(runId)
+  console.log('labwareRenderInfoById ', labwareRenderInfoById)
 
   if (protocolData == null) return null
   if (setupCommand === undefined) return null

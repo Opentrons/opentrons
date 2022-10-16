@@ -81,48 +81,51 @@ function getCheckTipRackSectionSteps(args: LPCArgs): CheckTipRacksStep[] {
     labware,
     modules
   )
-  const pickUpTipCommands = commands.filter(
-    (command): command is PickUpTipRunTimeCommand =>
-      command.commandType === 'pickUpTip'
-  )
-
-  const uniqPickUpTipCommands = pickUpTipCommands.reduce<
+  const uniqPrimaryPipettePickUpTipCommands = commands.reduce<
     PickUpTipRunTimeCommand[]
-  >((acc, pickUpTipCommand) => {
+  >((acc, command) => {
     if (
-      (pickUpTipCommand.params.pipetteId === primaryPipetteId &&
-        acc.some(
-          c => c.params.labwareId === pickUpTipCommand.params.labwareId
-        )) ||
-      (pickUpTipCommand.params.pipetteId === secondaryPipetteId &&
-        pickUpTipCommands.some(
-          c =>
-            c.params.labwareId === pickUpTipCommand.params.labwareId &&
-            c.params.pipetteId === primaryPipetteId
-        ))
+      command.commandType === 'pickUpTip' &&
+      command.params.pipetteId === primaryPipetteId &&
+      !acc.some(c => c.params.labwareId === command.params.labwareId)
     ) {
-      return acc
+      return [...acc, command]
     }
-    return [...acc, pickUpTipCommand]
+    return acc
+  }, [])
+  const onlySecondaryPipettePickUpTipCommands = commands.reduce<
+    PickUpTipRunTimeCommand[]
+  >((acc, command) => {
+    if (
+      command.commandType === 'pickUpTip' &&
+      command.params.pipetteId === secondaryPipetteId &&
+      !uniqPrimaryPipettePickUpTipCommands.some(
+        c => c.params.labwareId === command.params.labwareId
+      ) &&
+      !acc.some(c => c.params.labwareId === command.params.labwareId)
+    ) {
+      return [...acc, command]
+    }
+    return acc
   }, [])
 
-  return uniqPickUpTipCommands.reduce<CheckTipRacksStep[]>(
-    (acc, { params }) => {
-      const labwareLocations = labwareLocationCombos.filter(
-        combo => combo.labwareId === params.labwareId
-      )
-      return [
-        ...acc,
-        ...labwareLocations.map(({ location }) => ({
-          section: SECTIONS.CHECK_TIP_RACKS,
-          labwareId: params.labwareId,
-          pipetteId: params.pipetteId,
-          location,
-        })),
-      ]
-    },
-    []
-  )
+  return [
+    ...uniqPrimaryPipettePickUpTipCommands,
+    ...onlySecondaryPipettePickUpTipCommands,
+  ].reduce<CheckTipRacksStep[]>((acc, { params }) => {
+    const labwareLocations = labwareLocationCombos.filter(
+      combo => combo.labwareId === params.labwareId
+    )
+    return [
+      ...acc,
+      ...labwareLocations.map(({ location }) => ({
+        section: SECTIONS.CHECK_TIP_RACKS,
+        labwareId: params.labwareId,
+        pipetteId: params.pipetteId,
+        location,
+      })),
+    ]
+  }, [])
 }
 
 function getCheckLabwareSectionSteps(args: LPCArgs): CheckLabwareStep[] {
@@ -150,7 +153,7 @@ function getCheckLabwareSectionSteps(args: LPCArgs): CheckLabwareStep[] {
     return [
       ...acc,
       ...labwareLocationCombos.reduce<CheckLabwareStep[]>(
-        (innerAcc, { location, labwareId }) => {
+        (innerAcc, { location, labwareId, moduleId }) => {
           if (
             !getSlotHasMatingSurfaceUnitVector(
               OT2_STANDARD_DECK_DEF,
@@ -168,6 +171,7 @@ function getCheckLabwareSectionSteps(args: LPCArgs): CheckLabwareStep[] {
               labwareId,
               pipetteId: primaryPipetteId,
               location,
+              moduleId,
             },
           ]
         },

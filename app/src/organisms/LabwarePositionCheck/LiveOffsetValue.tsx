@@ -47,9 +47,8 @@ export function LiveOffsetValue(props: OffsetVectorProps): JSX.Element {
       >
         <Icon name="reticle" size={SIZE_1} />
         {[x, y, z].map((axis, index) => (
-          <>
+          <React.Fragment key={index}>
             <StyledText
-              key={index}
               as="p"
               marginLeft={SPACING.spacing3}
               marginRight={SPACING.spacing2}
@@ -58,7 +57,7 @@ export function LiveOffsetValue(props: OffsetVectorProps): JSX.Element {
               {axisLabels[index]}
             </StyledText>
             <StyledText as="p">{axis.toFixed(1)}</StyledText>
-          </>
+          </React.Fragment>
         ))}
       </Flex>
     </Flex>

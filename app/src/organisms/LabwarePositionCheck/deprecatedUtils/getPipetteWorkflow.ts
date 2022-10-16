@@ -1,5 +1,5 @@
 import uniq from 'lodash/uniq'
-import { doesPipetteVisitAllTipracks } from './doesPipetteVisitAllTipracks'
+import { doesPipetteVisitAllTipracks } from '../utils/doesPipetteVisitAllTipracks'
 import type {
   ProtocolFile,
   LabwareDefinition2,

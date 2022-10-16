@@ -11,7 +11,10 @@ import {
   getIsTiprack,
   getLabwareDefURI,
   getLabwareDisplayName,
+  getModuleType,
+  HEATERSHAKER_MODULE_TYPE,
   IDENTITY_VECTOR,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { getLabwareDef } from './utils/labware'
 import { UnorderedList } from '../../molecules/UnorderedList'
@@ -19,7 +22,7 @@ import { UnorderedList } from '../../molecules/UnorderedList'
 import type { LabwareOffset } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type {
-  CheckTipRacksStep,
+  CheckLabwareStep,
   CreateRunCommand,
   RegisterPositionAction,
   WorkingOffset,
@@ -27,7 +30,7 @@ import type {
 import type { Jog } from '../../molecules/DeprecatedJogControls/types'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { getDisplayLocation } from './utils/getDisplayLocation'
-interface CheckItemProps extends Omit<CheckTipRacksStep, 'section'> {
+interface CheckItemProps extends Omit<CheckLabwareStep, 'section'> {
   section: 'CHECK_LABWARE' | 'CHECK_TIP_RACKS'
   protocolData: CompletedProtocolAnalysis
   proceed: () => void
@@ -37,11 +40,13 @@ interface CheckItemProps extends Omit<CheckTipRacksStep, 'section'> {
   existingOffsets: LabwareOffset[]
   handleJog: Jog
   isRobotMoving: boolean
+  currentStepIndex: number // ensure rerendering on proceed
 }
 export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   const {
     labwareId,
     pipetteId,
+    moduleId,
     location,
     protocolData,
     createRunCommand,
@@ -56,11 +61,56 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   const labwareDef = getLabwareDef(labwareId, protocolData)
   const pipetteName =
     protocolData.pipettes.find(p => p.id === pipetteId)?.pipetteName ?? null
+
+  React.useEffect(() => {
+    if (
+      moduleId != null &&
+      'moduleModel' in location &&
+      location.moduleModel != null
+    ) {
+      const moduleType = getModuleType(location.moduleModel)
+      if (moduleType === THERMOCYCLER_MODULE_TYPE) {
+        createRunCommand({
+          command: {
+            commandType: 'thermocycler/openLid',
+            params: { moduleId },
+          },
+          waitUntilComplete: true,
+        }).catch((e: Error) => {
+          console.error(`error opening thermocycler lid: ${e.message}`)
+        })
+      } else if (moduleType === HEATERSHAKER_MODULE_TYPE) {
+        createRunCommand(
+          {
+            command: {
+              commandType: 'heaterShaker/closeLabwareLatch',
+              params: { moduleId },
+            },
+            waitUntilComplete: true,
+          },
+          {
+            onSuccess: _r => {
+              createRunCommand({
+                command: {
+                  commandType: 'heaterShaker/deactivateShaker',
+                  params: { moduleId },
+                },
+                waitUntilComplete: true,
+              }).catch((e: Error) => {
+                console.error(`error deactivating heater shaker: ${e.message}`)
+              })
+            },
+          }
+        ).catch((e: Error) => {
+          console.error(`error closing labware latch: ${e.message}`)
+        })
+      }
+    }
+  }, [moduleId])
+
   if (pipetteName == null || labwareDef == null) return null
   const isTiprack = getIsTiprack(labwareDef)
-  const displayLocation = getDisplayLocation(location, t )
-
-
+  const displayLocation = getDisplayLocation(location, t)
   const labwareDisplayName = getLabwareDisplayName(labwareDef)
   const placeItemInstruction = isTiprack ? (
     <Trans
@@ -239,7 +289,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
         <PrepareSpace
           {...props}
           header={t('prepare_item_in_location', {
-            itemInLocation: isTiprack ? t('tip_rack') : t('labware'),
+            item: isTiprack ? t('tip_rack') : t('labware'),
             location: displayLocation,
           })}
           body={
