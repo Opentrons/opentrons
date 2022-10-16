@@ -35,6 +35,7 @@ import type {
   LabwareOffsetCreateData,
   LabwareOffsetLocation,
 } from '@opentrons/api-client'
+import { getDisplayLocation } from './utils/getDisplayLocation'
 
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
@@ -159,11 +160,7 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
         <tr>
           <TableHeader>{t('location')}</TableHeader>
           <TableHeader>{t('labware')}</TableHeader>
-          <TableHeader
-            css={css`
-              text-align: right;
-            `}
-          >
+          <TableHeader>
             {t('labware_offset_data')}
           </TableHeader>
         </tr>
@@ -179,16 +176,14 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
           return (
             <TableRow key={index}>
               <TableDatum>
-                <DisplayLocation location={location} />
+                <StyledText as="p" textTransform={TYPOGRAPHY.textTransformCapitalize}>
+                  {getDisplayLocation(location, t)}
+                </StyledText>
               </TableDatum>
               <TableDatum>
                 <StyledText as="p">{labwareDisplayName}</StyledText>
               </TableDatum>
-              <TableDatum
-                css={css`
-                  text-align: right;
-                `}
-              >
+              <TableDatum>
                 {vector.x === 0 && vector.y === 0 && vector.z === 0 ? (
                   <StyledText>{t('no_labware_offsets')}</StyledText>
                 ) : (
@@ -217,27 +212,3 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
   )
 }
 
-const DisplayLocation = ({
-  location,
-}: {
-  location: LabwareOffsetLocation
-}): JSX.Element => {
-  const { t } = useTranslation('labware_position_check')
-  const { slotName, moduleModel } = location
-
-  let displayLocation = t('slot_name', { slotName })
-  if (moduleModel != null) {
-    if (getModuleType(moduleModel) === THERMOCYCLER_MODULE_TYPE) {
-      displayLocation = getModuleDisplayName(moduleModel)
-    } else {
-      displayLocation = `${t('slot_name', {
-        slotName,
-      })}, ${getModuleDisplayName(moduleModel)}`
-    }
-  }
-  return (
-    <StyledText as="p" textTransform={TYPOGRAPHY.textTransformCapitalize}>
-      {displayLocation}
-    </StyledText>
-  )
-}

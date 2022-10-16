@@ -79,5 +79,6 @@
   "new_labware_offset_data": "New labware offset data",
   "apply_offsets": "Apply Offsets",
   "labware_position_check_description": "<block>Labware Position Check is a guided workflow that checks every labware on the deck for an added degree of precision in your protocol.</block><block>Labware Position Check first checks tip racks, and then checks all other labware used in your protocol.</block>",
-  "all_modules_and_labware_from_protocol": "All modules and labware used in the protocol"
+  "all_modules_and_labware_from_protocol": "All modules and labware used in the protocol",
+  "module_in_slot": "{{module}} in {{slot}}"
 }

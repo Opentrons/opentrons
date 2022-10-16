@@ -26,6 +26,7 @@ import type {
   WorkingOffset,
 } from './types'
 import type { LabwareOffset, VectorOffset } from '@opentrons/api-client'
+import { getDisplayLocation } from './utils/getDisplayLocation'
 
 interface PickUpTipProps extends PickUpTipStep {
   protocolData: CompletedProtocolAnalysis
@@ -62,11 +63,8 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
     protocolData.pipettes.find(p => p.id === pipetteId)?.pipetteName ?? null
   if (pipetteName == null || labwareDef == null) return null
 
-  const displayLocation = t('slot_name', {
-    slotName: 'slotName' in location ? location?.slotName : '',
-  })
+  const displayLocation = getDisplayLocation(location, t)
   const labwareDisplayName = getLabwareDisplayName(labwareDef)
-
   const instructions = [
     t('clear_all_slots'),
     <Trans

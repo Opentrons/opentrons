@@ -13,6 +13,7 @@ import { UnorderedList } from '../../molecules/UnorderedList'
 
 import type { CreateRunCommand, ReturnTipStep } from './types'
 import { VectorOffset } from '@opentrons/api-client'
+import { getDisplayLocation } from './utils/getDisplayLocation'
 
 interface ReturnTipProps extends ReturnTipStep {
   protocolData: CompletedProtocolAnalysis
@@ -37,9 +38,7 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
   const labwareDef = getLabwareDef(labwareId, protocolData)
   if (labwareDef == null) return null
 
-  const displayLocation = t('slot_name', {
-    slotName: 'slotName' in location ? location?.slotName : '',
-  })
+  const displayLocation = getDisplayLocation(location, t)
   const labwareDisplayName = getLabwareDisplayName(labwareDef)
 
   const instructions = [

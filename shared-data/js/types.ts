@@ -435,6 +435,7 @@ export interface CompletedProtocolAnalysis {
   result: 'ok' | 'not-ok' | 'error'
   pipettes: LoadedPipette[]
   labware: LoadedLabware[]
+  modules: LoadedModule[]
   liquids: Liquid[]
   commands: RunTimeCommand[]
   errors: AnalysisError[]

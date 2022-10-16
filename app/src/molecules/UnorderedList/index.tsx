@@ -4,7 +4,7 @@ import { SPACING } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 
 interface UnorderedListProps {
-  items: Array<React.ReactNode>
+  items: React.ReactNode[]
 }
 export function UnorderedList(props: UnorderedListProps): JSX.Element {
   const { items } = props
