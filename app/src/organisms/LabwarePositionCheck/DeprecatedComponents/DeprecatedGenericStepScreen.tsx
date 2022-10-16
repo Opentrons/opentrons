@@ -13,7 +13,11 @@ import {
 import { StyledText } from '../../../atoms/text'
 import { DeprecatedLabwarePositionCheckStepDetail } from './DeprecatedLabwarePositionCheckStepDetail'
 import { DeprecatedSectionList } from './DeprecatedSectionList'
-import { useIntroInfo, useLabwareIdsBySection, useDeprecatedSteps } from '../hooks'
+import {
+  useIntroInfo,
+  useLabwareIdsBySection,
+  useDeprecatedSteps,
+} from '../hooks'
 import { DeprecatedDeckMap } from './DeprecatedDeckMap'
 import type { Jog } from '../../../molecules/DeprecatedJogControls'
 import type { LabwarePositionCheckStep, SavePositionCommandData } from './types'

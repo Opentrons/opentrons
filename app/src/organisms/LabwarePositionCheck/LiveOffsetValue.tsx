@@ -26,8 +26,16 @@ export function LiveOffsetValue(props: OffsetVectorProps): JSX.Element {
   const axisLabels = ['X', 'Y', 'Z']
   const { t } = useTranslation('labware_position_check')
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} marginY={SPACING.spacing3} gridGap={SPACING.spacing2}>
-      <StyledText as="label" fontWeight={TYPOGRAPHY.fontWeightSemiBold} textTransform={TYPOGRAPHY.textTransformCapitalize}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      marginY={SPACING.spacing3}
+      gridGap={SPACING.spacing2}
+    >
+      <StyledText
+        as="label"
+        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        textTransform={TYPOGRAPHY.textTransformCapitalize}
+      >
         {t('labware_offset_data')}
       </StyledText>
       <Flex

@@ -29,7 +29,8 @@ export const LabwarePositionCheck = (
 
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(props.runId)
 
-  const existingOffsets = useRunQuery(props.runId).data?.data?.labwareOffsets ?? []
+  const existingOffsets =
+    useRunQuery(props.runId).data?.data?.labwareOffsets ?? []
 
   return (
     <ErrorBoundary logger={logger} ErrorComponent={CrashingErrorModal}>

@@ -147,7 +147,9 @@ describe('DeprecatedIntroScreen', () => {
       firstTiprackSlot: '2',
       sections: MOCK_DEPRECATED_SECTIONS,
     })
-    mockDeprecatedSectionList.mockReturnValue(<div>Mock DeprecatedSection List</div>)
+    mockDeprecatedSectionList.mockReturnValue(
+      <div>Mock DeprecatedSection List</div>
+    )
     when(mockUseCurrentRun)
       .calledWith()
       .mockReturnValue({

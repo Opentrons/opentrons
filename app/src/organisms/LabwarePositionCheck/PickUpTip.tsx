@@ -166,10 +166,10 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
     })
       .then(response => {
         const { position } = response.data.result
-        const offset = initialPosition != null ? getVectorDifference(
-          position,
-          initialPosition
-        ) : position
+        const offset =
+          initialPosition != null
+            ? getVectorDifference(position, initialPosition)
+            : position
         registerPosition({ type: 'tipPickUpOffset', offset })
         createRunCommand({
           command: {

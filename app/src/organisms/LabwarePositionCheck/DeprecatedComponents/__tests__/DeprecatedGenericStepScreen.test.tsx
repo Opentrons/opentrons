@@ -9,7 +9,11 @@ import { DeprecatedGenericStepScreen } from '../DeprecatedGenericStepScreen'
 import { DeprecatedLabwarePositionCheckStepDetail } from '../DeprecatedLabwarePositionCheckStepDetail'
 import { DeprecatedSectionList } from '../DeprecatedSectionList'
 import { DeprecatedDeckMap } from '../DeprecatedDeckMap'
-import { useIntroInfo, useLabwareIdsBySection, useDeprecatedSteps } from '../../hooks'
+import {
+  useIntroInfo,
+  useLabwareIdsBySection,
+  useDeprecatedSteps,
+} from '../../hooks'
 import { DeprecatedSection } from '../types'
 
 jest.mock('../DeprecatedLabwarePositionCheckStepDetail')
@@ -26,7 +30,9 @@ const mockDeprecatedSectionList = DeprecatedSectionList as jest.MockedFunction<
 const mockUseIntroInfo = useIntroInfo as jest.MockedFunction<
   typeof useIntroInfo
 >
-const mockUseSteps = useDeprecatedSteps as jest.MockedFunction<typeof useDeprecatedSteps>
+const mockUseSteps = useDeprecatedSteps as jest.MockedFunction<
+  typeof useDeprecatedSteps
+>
 const mockUseLabwareIdsBySection = useLabwareIdsBySection as jest.MockedFunction<
   typeof useLabwareIdsBySection
 >

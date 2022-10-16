@@ -14,4 +14,3 @@ export const SECTIONS = {
   RETURN_TIP: 'RETURN_TIP',
   RESULTS_SUMMARY: 'RESULTS_SUMMARY',
 } as const
-

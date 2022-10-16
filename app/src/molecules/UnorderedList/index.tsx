@@ -11,11 +11,15 @@ export function UnorderedList(props: UnorderedListProps): JSX.Element {
   return (
     <ul>
       {items.map((item, index) => (
-        <li key={index} css={css`margin-left: ${SPACING.spacing5};`}>
+        <li
+          key={index}
+          css={css`
+            margin-left: ${SPACING.spacing5};
+          `}
+        >
           <StyledText as="p">{item}</StyledText>
         </li>
       ))}
     </ul>
   )
 }
-

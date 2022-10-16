@@ -51,7 +51,9 @@ const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
 >
-const mockUseSteps = useDeprecatedSteps as jest.MockedFunction<typeof useDeprecatedSteps>
+const mockUseSteps = useDeprecatedSteps as jest.MockedFunction<
+  typeof useDeprecatedSteps
+>
 const mockUseCreateCommandMutation = useCreateCommandMutation as jest.MockedFunction<
   typeof useCreateCommandMutation
 >

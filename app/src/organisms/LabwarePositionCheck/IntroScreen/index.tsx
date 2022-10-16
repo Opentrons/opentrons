@@ -69,7 +69,11 @@ export const IntroScreen = (props: {
             components={{ block: <StyledText as="p" /> }}
           />
         </Flex>
-        <Flex flex="1" flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+        <Flex
+          flex="1"
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing3}
+        >
           <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {t('shared:you_will_need')}
           </StyledText>

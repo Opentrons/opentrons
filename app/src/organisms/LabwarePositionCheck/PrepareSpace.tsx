@@ -132,4 +132,3 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
     </Flex>
   )
 }
-

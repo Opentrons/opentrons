@@ -27,15 +27,15 @@ export function getLabwareLocationCombos(
         return modLocation == null
           ? acc
           : appendLocationComboIfUniq(acc, {
-            location: modLocation,
-            definitionUri,
-            labwareId: command.params.labwareId
-          })
+              location: modLocation,
+              definitionUri,
+              labwareId: command.params.labwareId,
+            })
       } else {
         return appendLocationComboIfUniq(acc, {
           location: command.params.location,
           definitionUri,
-          labwareId: command.params.labwareId
+          labwareId: command.params.labwareId,
         })
       }
     } else if (command.commandType === 'moveLabware') {
@@ -55,15 +55,15 @@ export function getLabwareLocationCombos(
         return modLocation == null
           ? acc
           : appendLocationComboIfUniq(acc, {
-            location: modLocation,
-            definitionUri: labwareEntity.definitionUri,
-            labwareId: command.params.labwareId
-          })
+              location: modLocation,
+              definitionUri: labwareEntity.definitionUri,
+              labwareId: command.params.labwareId,
+            })
       } else {
         return appendLocationComboIfUniq(acc, {
           location: command.params.newLocation,
           definitionUri: labwareEntity.definitionUri,
-          labwareId: command.params.labwareId
+          labwareId: command.params.labwareId,
         })
       }
     } else {

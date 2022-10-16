@@ -13,9 +13,12 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
-import { AlertPrimaryButton, PrimaryButton, SecondaryButton } from '../../atoms/buttons'
+import {
+  AlertPrimaryButton,
+  PrimaryButton,
+  SecondaryButton,
+} from '../../atoms/buttons'
 import { NeedHelpLink } from '../CalibrationPanels'
-
 
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
@@ -58,7 +61,10 @@ export const ExitConfirmation = (props: ExitConfirmationProps): JSX.Element => {
           <SecondaryButton onClick={onGoBack}>
             {t('shared:go_back')}
           </SecondaryButton>
-          <AlertPrimaryButton onClick={onConfirmExit} textTransform={TYPOGRAPHY.textTransformCapitalize}>
+          <AlertPrimaryButton
+            onClick={onConfirmExit}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
+          >
             {t('shared:exit')}
           </AlertPrimaryButton>
         </Flex>

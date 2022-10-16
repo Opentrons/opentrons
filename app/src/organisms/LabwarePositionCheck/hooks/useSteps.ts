@@ -8,6 +8,6 @@ export function useSteps(
   protocolData: CompletedProtocolAnalysis | null
 ): LabwarePositionCheckStep[] {
   if (protocolData == null) return [] // this state should never be reached
-  
+
   return getLabwarePositionCheckSteps(protocolData)
 }

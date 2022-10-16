@@ -43,7 +43,9 @@ const mockConfirmPickUpTipModal = DeprecatedConfirmPickUpTipModal as jest.Mocked
 const mockExitPreventionModal = DeprecatedExitPreventionModal as jest.MockedFunction<
   typeof DeprecatedExitPreventionModal
 >
-const mockUseSteps = useDeprecatedSteps as jest.MockedFunction<typeof useDeprecatedSteps>
+const mockUseSteps = useDeprecatedSteps as jest.MockedFunction<
+  typeof useDeprecatedSteps
+>
 const mockUseRestartRun = useRestartRun as jest.MockedFunction<
   typeof useRestartRun
 >

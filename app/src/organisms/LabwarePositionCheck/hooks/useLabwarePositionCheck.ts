@@ -6,23 +6,31 @@ import type { LabwarePositionCheckStep } from '../types'
 
 export type LabwarePositionCheckUtils =
   | {
-    currentStepIndex: number,
-    totalStepCount: number,
-    currentStep: LabwarePositionCheckStep,
-    proceed: () => void
-  }
+      currentStepIndex: number
+      totalStepCount: number
+      currentStep: LabwarePositionCheckStep
+      proceed: () => void
+    }
   | { error: Error }
 
-export function useLabwarePositionCheck(protocolData: CompletedProtocolAnalysis | null): LabwarePositionCheckUtils {
+export function useLabwarePositionCheck(
+  protocolData: CompletedProtocolAnalysis | null
+): LabwarePositionCheckUtils {
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const LPCSteps = useSteps(protocolData)
 
-  if (protocolData == null) return {error: new Error('no protocol data found')}
+  if (protocolData == null)
+    return { error: new Error('no protocol data found') }
 
   return {
     currentStepIndex,
     totalStepCount: LPCSteps.length,
     currentStep: LPCSteps?.[currentStepIndex],
-    proceed: () => setCurrentStepIndex(currentStepIndex !== LPCSteps.length - 1 ? currentStepIndex + 1 : currentStepIndex)
+    proceed: () =>
+      setCurrentStepIndex(
+        currentStepIndex !== LPCSteps.length - 1
+          ? currentStepIndex + 1
+          : currentStepIndex
+      ),
   }
 }

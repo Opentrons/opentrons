@@ -11,10 +11,7 @@ import type {
   HeaterShakerDeactivateShakerCreateCommand,
   TCOpenLidCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
-import type {
-  HomeCreateCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
-
+import type { HomeCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
 
 type LPCPrepCommand =
   | HomeCreateCommand
@@ -23,7 +20,9 @@ type LPCPrepCommand =
   | HeaterShakerDeactivateShakerCreateCommand
   | HeaterShakerCloseLatchCreateCommand
 
-export function getPrepCommands(protocolCommands: RunTimeCommand[]): LPCPrepCommand[] {
+export function getPrepCommands(
+  protocolCommands: RunTimeCommand[]
+): LPCPrepCommand[] {
   // load commands come from the protocol resource
   const loadCommands: SetupRunTimeCommand[] =
     protocolCommands.filter(isLoadCommand).map(command => {
@@ -38,7 +37,10 @@ export function getPrepCommands(protocolCommands: RunTimeCommand[]): LPCPrepComm
         return commandWithPipetteId
       } else if (command.commandType === 'loadLabware') {
         // load all labware off-deck so that LPC can move them on individually later
-        return { ...command, params: { ...command.params, location: 'offDeck' } }
+        return {
+          ...command,
+          params: { ...command.params, location: 'offDeck' },
+        }
       }
       return command
     }) ?? []
@@ -83,7 +85,8 @@ function isHSCommand(
 ): command is
   | HeaterShakerDeactivateShakerCreateCommand
   | HeaterShakerCloseLatchCreateCommand {
-  return command.commandType === 'heaterShaker/deactivateShaker' ||
+  return (
+    command.commandType === 'heaterShaker/deactivateShaker' ||
     command.commandType === 'heaterShaker/closeLabwareLatch'
+  )
 }
-
