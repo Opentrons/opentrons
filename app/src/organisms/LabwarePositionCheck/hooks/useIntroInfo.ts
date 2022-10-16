@@ -11,7 +11,7 @@ interface IntroInfo {
   primaryPipetteMount: string
   secondaryPipetteMount: string
   firstTiprackSlot: string
-  sections: Section[]
+  sections: DeprecatedSection[]
 }
 export function useIntroInfo(): IntroInfo | null {
   const runId = useCurrentRunId()

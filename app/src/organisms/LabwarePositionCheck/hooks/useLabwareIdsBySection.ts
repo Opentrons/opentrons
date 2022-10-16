@@ -3,7 +3,7 @@ import { useDeprecatedSteps } from './useDeprecatedSteps'
 import { useSections } from './useSections'
 
 type LabwareIdsBySection = {
-  [section in Section]?: string[]
+  [section in DeprecatedSection]?: string[]
 }
 export function useLabwareIdsBySection(
   runId: string | null

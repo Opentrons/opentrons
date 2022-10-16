@@ -20,10 +20,10 @@ import {
 } from '../hooks'
 import { DeprecatedDeckMap } from './DeprecatedDeckMap'
 import type { Jog } from '../../../molecules/DeprecatedJogControls'
-import type { LabwarePositionCheckStep, SavePositionCommandData } from './types'
+import type { DeprecatedLabwarePositionCheckStep, SavePositionCommandData } from './types'
 
 interface GenericStepScreenProps {
-  selectedStep: LabwarePositionCheckStep
+  selectedStep: DeprecatedLabwarePositionCheckStep
   ctaText: string
   proceed: () => void
   jog: Jog

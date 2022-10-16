@@ -13,11 +13,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
-import {
-  AlertPrimaryButton,
-  PrimaryButton,
-  SecondaryButton,
-} from '../../atoms/buttons'
+import { AlertPrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import { NeedHelpLink } from '../CalibrationPanels'
 
 const LPC_HELP_LINK_URL =

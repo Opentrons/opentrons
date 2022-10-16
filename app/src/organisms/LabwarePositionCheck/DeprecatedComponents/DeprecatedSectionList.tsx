@@ -20,11 +20,11 @@ import {
 } from '@opentrons/components'
 import type { DeprecatedSection } from './types'
 interface Props {
-  sections: Section[]
-  currentSection?: Section
+  sections: DeprecatedSection[]
+  currentSection?: DeprecatedSection
   primaryPipetteMount: string
   secondaryPipetteMount: string
-  completedSections?: Section[]
+  completedSections?: DeprecatedSection[]
 }
 
 /**

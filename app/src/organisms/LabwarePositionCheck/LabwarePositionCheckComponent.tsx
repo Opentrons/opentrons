@@ -34,6 +34,7 @@ import type {
   WorkingOffset,
 } from './types'
 import { LabwareOffsetCreateData } from '@opentrons/api-client'
+import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
 
 const JOG_COMMAND_TIMEOUT = 10000 // 10 seconds
 interface LabwarePositionCheckModalProps {
@@ -145,9 +146,7 @@ export const LabwarePositionCheckInner = (
   }, [isCommandMutationLoading])
 
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
-  const LPCSteps = useSteps(protocolData)
-  const totalStepCount = LPCSteps.length - 1
-  const currentStep = LPCSteps?.[currentStepIndex]
+
   const proceed = (): void => {
     if (!isCommandMutationLoading) {
       setCurrentStepIndex(
@@ -157,7 +156,11 @@ export const LabwarePositionCheckInner = (
       )
     }
   }
-  if (protocolData == null || currentStep == null) return null
+  if (protocolData == null) return null
+  const LPCSteps = getLabwarePositionCheckSteps(protocolData)
+  const totalStepCount = LPCSteps.length - 1
+  const currentStep = LPCSteps?.[currentStepIndex]
+  if (currentStep == null) return null
 
   const handleJog = (
     axis: Axis,

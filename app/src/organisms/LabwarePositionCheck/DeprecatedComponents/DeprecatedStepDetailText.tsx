@@ -14,7 +14,7 @@ import type { DeprecatedLabwarePositionCheckStep } from './types'
 import { useProtocolDetailsForRun } from '../../Devices/hooks'
 
 interface StepDetailTextProps {
-  selectedStep: LabwarePositionCheckStep
+  selectedStep: DeprecatedLabwarePositionCheckStep
   runId: string
   pipetteChannels?: 1 | 8
 }

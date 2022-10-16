@@ -17,7 +17,7 @@ import {
   useModuleRenderInfoForProtocolById,
 } from '../../../Devices/hooks'
 import { useCurrentRun, useCurrentRunId } from '../../../ProtocolUpload/hooks'
-import { getLatestLabwareOffsetCount } from '../../utils/getLatestLabwareOffsetCount'
+import { getLatestLabwareOffsetCount } from '../../deprecatedUtils/getLatestLabwareOffsetCount'
 import { DeprecatedSectionList } from '../DeprecatedSectionList'
 import { useIntroInfo, useLabwareIdsBySection } from '../../hooks'
 import { DeprecatedIntroScreen, INTERVAL_MS } from '../DeprecatedIntroScreen'
@@ -74,7 +74,7 @@ const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
   (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
   {}
 )
-const MOCK_DEPRECATED_SECTIONS = ['MOCK_PRIMARY_PIPETTE_TIPRACKS' as Section]
+const MOCK_DEPRECATED_SECTIONS = ['MOCK_PRIMARY_PIPETTE_TIPRACKS' as DeprecatedSection]
 const MOCK_300_UL_TIPRACK_COORDS = [30, 40, 0]
 const MOCK_ROBOT_NAME = 'otie'
 const HOST_CONFIG: HostConfig = {

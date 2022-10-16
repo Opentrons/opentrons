@@ -11,7 +11,7 @@ import type {
   PickUpTipCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 
-export type DeprecatedSection = keyof typeof SECTIONS
+export type DeprecatedSection = keyof typeof DEPRECATED_SECTIONS
 
 export type LabwarePositionCheckCreateCommand =
   | MoveToWellCreateCommand

@@ -1,5 +1,3 @@
-import * as React from 'react'
-import last from 'lodash/last'
 import {
   useProtocolAnalysesQuery,
   useRunQuery,

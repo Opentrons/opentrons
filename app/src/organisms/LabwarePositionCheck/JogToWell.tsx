@@ -2,7 +2,6 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
-  Box,
   RobotWorkSpace,
   LabwareRender,
   PipetteRender,
