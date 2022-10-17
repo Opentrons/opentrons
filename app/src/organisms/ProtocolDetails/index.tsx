@@ -342,7 +342,9 @@ export function ProtocolDetails(
         width="100%"
         marginBottom={SPACING.spacing4}
       >
-        <Box
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing4}
           padding={`${SPACING.spacing4} 0 ${SPACING.spacing4} ${SPACING.spacing4}`}
           width="100%"
         >
@@ -451,7 +453,7 @@ export function ProtocolDetails(
               ) : null}
             </Flex>
           </Flex>
-        </Box>
+        </Flex>
         <Box
           position={POSITION_RELATIVE}
           top={SPACING.spacing1}
@@ -469,8 +471,9 @@ export function ProtocolDetails(
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
-        <Box
-          flex="0 0 20rem"
+        <Flex
+          // flex="0 0 20rem"
+          flexDirection={DIRECTION_COLUMN}
           backgroundColor={COLORS.white}
           data-testid="ProtocolDetails_deckMap"
           border={`1px solid ${COLORS.medGreyEnabled}`}
@@ -489,28 +492,30 @@ export function ProtocolDetails(
             {
               {
                 missing: (
-                  <Box size="15rem" backgroundColor={COLORS.medGreyEnabled} />
+                  <Box size="13rem" backgroundColor={COLORS.medGreyEnabled} />
                 ),
                 loading: (
-                  <Box size="15rem" backgroundColor={COLORS.medGreyEnabled} />
+                  <Box size="13rem" backgroundColor={COLORS.medGreyEnabled} />
                 ),
                 error: (
-                  <Box size="15rem" backgroundColor={COLORS.medGreyEnabled} />
+                  <Box size="13rem" backgroundColor={COLORS.medGreyEnabled} />
                 ),
                 complete: (
-                  <DeckThumbnail
-                    commands={mostRecentAnalysis?.commands ?? []}
-                    liquids={
-                      mostRecentAnalysis?.liquids != null
-                        ? mostRecentAnalysis?.liquids
-                        : []
-                    }
-                  />
+                  <Box size="13rem">
+                    <DeckThumbnail
+                      commands={mostRecentAnalysis?.commands ?? []}
+                      liquids={
+                        mostRecentAnalysis?.liquids != null
+                          ? mostRecentAnalysis?.liquids
+                          : []
+                      }
+                    />
+                  </Box>
                 ),
               }[analysisStatus]
             }
           </Box>
-        </Box>
+        </Flex>
 
         <Flex
           width="100%"

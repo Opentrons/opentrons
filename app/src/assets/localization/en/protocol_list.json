@@ -1,6 +1,5 @@
 {
   "a_software_update_is_available_please_update": "A software update is available for this robot. Update to run protocols. <robotLink>Go to Robot</robotLink>",
-  "delete_protocol": "Delete protocol",
   "should_delete_this_protocol": "Delete this protocol?",
   "yes_delete_this_protocol": "Yes, delete protocol",
   "last_updated_at": "Updated {{date}}",
@@ -8,11 +7,12 @@
   "loading_data": "Loading data...",
   "modules": "modules",
   "no_data": "No data",
-  "protocol_analysis_failure": "Protocol analysis failure",
+  "protocol_analysis_failure": "Protocol analysis failure.",
   "reanalyze_or_view_error": "<analysisLink>Reanalyze</analysisLink> protocol or view <errorLink>error details</errorLink>",
   "right_mount": "right mount",
   "robot": "robot",
-  "run": "Run",
+  "run_now": "Run now",
+  "send_to_ot3": "Send to OT-3",
   "show_in_folder": "Show in folder",
   "this_protocol_will_be_trashed": "This protocol will be moved to this computer’s trash and may be unrecoverable.",
   "updated": "Updated"
