@@ -1,7 +1,7 @@
 {
   "otId": "ot3_standard",
   "schemaVersion": 3,
-  "cornerOffsetFromOrigin": [ -194.69, -75.59, 0],
+  "cornerOffsetFromOrigin": [ -204.31, -76.59, 0],
   "dimensions": [854.995, 581.740, 0],
   "metadata": {
     "displayName": "OT-3 Standard Deck",
