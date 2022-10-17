@@ -78,7 +78,7 @@ async def _bowtie_ot3(api: OT3API, cycles: int = 1) -> None:
 
 async def _main(is_simulating: bool) -> None:
     api = await build_async_ot3_hardware_api(is_simulating=is_simulating)
-    set_gantry_load_per_axis_settings_ot3(api, SETTINGS, load=LOAD)
+    await set_gantry_load_per_axis_settings_ot3(api, SETTINGS, load=LOAD)
     await api.set_gantry_load(gantry_load=LOAD)
     await home_ot3(api)
     await _bowtie_ot3(api, cycles=CYCLES)

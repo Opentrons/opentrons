@@ -1,7 +1,7 @@
 """OT3 Homing Accuracy Test."""
 import argparse
 import asyncio
-import os
+import os, time
 
 from opentrons.hardware_control.ot3api import OT3API
 
@@ -67,13 +67,13 @@ async def random_move(api: OT3API) -> None:
     y_pos = randrange(step_y)
 
     print(f"Random move to: ({x_pos},{y_pos})")
-    # await api.move_rel(mount=MOUNT, delta=Point(x=x_pos, y_pos), speed=default_speed)
-    await api.move_to(mount=MOUNT, abs_position(x_pos, y_pos))
+    # await api.move_rel(mount=MOUNT, delta=Point(x=x_pos, y=y_pos), speed=default_speed)
+    await api.move_to(mount=MOUNT, abs_position=Point(x=x_pos, y=y_pos), speed=default_speed)
 
 
 async def _main(is_simulating: bool) -> None:
     api = await build_async_ot3_hardware_api(is_simulating=is_simulating)
-    set_gantry_load_per_axis_settings_ot3(api, SETTINGS, load=LOAD)
+    await set_gantry_load_per_axis_settings_ot3(api, SETTINGS, load=LOAD)
     await api.set_gantry_load(gantry_load=LOAD)
 
     # ***
@@ -136,9 +136,9 @@ if __name__ == "__main__":
     parser.add_argument("--speed-xy", type=int, default=SPEED_XY)
     parser.add_argument("--speed-z", type=int, default=SPEED_Z)
     parser.add_argument("--mod_port_x", type=str, required=False, \
-                        default = "/dev/ttyUSB0")
-    parser.add_argument("--mod_port_y", type=str, required=False, \
                         default = "/dev/ttyUSB1")
+    parser.add_argument("--mod_port_y", type=str, required=False, \
+                        default = "/dev/ttyUSB0")
     args = parser.parse_args()
 
     CYCLES = args.cycles
@@ -149,9 +149,9 @@ if __name__ == "__main__":
     SETTINGS[OT3Axis.Z_L].max_speed = SPEED_Z
     SETTINGS[OT3Axis.Z_R].max_speed = SPEED_Z
 
-    gauge_x = dial.mitutoyo_digimatic_indicator(port=args.mod_port_x)
+    gauge_x = dial.Mitutoyo_Digimatic_Indicator(port=args.mod_port_x)
     gauge_x.connect()
-    gauge_y = dial.mitutoyo_digimatic_indicator(port=args.mod_port_y)
+    gauge_y = dial.Mitutoyo_Digimatic_Indicator(port=args.mod_port_y)
     gauge_y.connect()
 
     asyncio.run(_main(args.simulate))
