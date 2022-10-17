@@ -5,6 +5,7 @@ import os, time
 
 from opentrons.hardware_control.ot3api import OT3API
 
+from hardware_testing import data
 from hardware_testing.opentrons_api.types import GantryLoad, OT3Mount, OT3Axis, Point
 from hardware_testing.opentrons_api.helpers_ot3 import (
     build_async_ot3_hardware_api,
@@ -76,15 +77,9 @@ async def _main(is_simulating: bool) -> None:
     await set_gantry_load_per_axis_settings_ot3(api, SETTINGS, load=LOAD)
     await api.set_gantry_load(gantry_load=LOAD)
 
-    # ***
-    test_folder = 'opentrons_hardware/scripts/homing_repeatability_results'
-    if not os.path.exists(test_folder):
-        os.makedirs(test_folder)
-    # ***
-
-    csv_name = '/OT3_EVT_homing_xy_{0}.csv'.format(time.strftime \
-                ('%m-%d_%H-%M', time.localtime()))
-    f_name = test_folder + csv_name
+    test_name = "homing-repeatability"
+    file_name = data.create_file_name(test_name=test_name,
+                                    run_id=data.create_run_id(), tag="XY")
 
     await home_ot3(api)
 
@@ -96,24 +91,25 @@ async def _main(is_simulating: bool) -> None:
 
     input("Press enter to begin test...\n")
 
-    with open(f_name, 'w', newline='') as f:
-        header = ['Cycle', 'Init Read X (mm)', 'Return Read X (mm)', 'Init Read Y (mm)', 'Return Read Y (mm)']
-        data = ['0', reading, 'Initial Reading', test_axis, test_load, test_current, test_type]
-        log_file = csv.writer(f)
-        log_file.writerow(header)
-        log_file.writerow(data)
-        f.flush()
+    header = ['Cycle', 'Init Read X (mm)', 'Return Read X (mm)', 'Init Read Y (mm)', 'Return Read Y (mm)']
+    header_str = data.convert_list_to_csv_line(header)
+    data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
+    
+    init_reading = ['0', reading, 'Initial Reading', test_axis, test_load, test_current, test_type]
+    init_reading_str = data.convert_list_to_csv_line(init_reading)
+    data.append_data_to_file(test_name=test_name, file_name=file_name, data=init_reading_str)
 
-        for cycle in CYCLES:
-            await random_move(api)
-            await home_ot3(api)
-            return_reading_x = gauge_x.gauge_read() - init_reading_x
-            return_reading_y = gauge_y.gauge_read() - init_reading_y
-            print(f"\tReturn reading:\n\t X:{return_reading_x} mm, Y: {return_reading_y} mm")
 
-            data = [cycle, init_reading_x, return_reading_x, init_reading_y, return_reading_y]
-            log_file.writerow(data)
-            f.flush()
+    for cycle in CYCLES:
+        await random_move(api)
+        await home_ot3(api)
+        return_reading_x = gauge_x.gauge_read() - init_reading_x
+        return_reading_y = gauge_y.gauge_read() - init_reading_y
+        print(f"\tReturn reading:\n\t X:{return_reading_x} mm, Y: {return_reading_y} mm")
+
+        data = [cycle, init_reading_x, return_reading_x, init_reading_y, return_reading_y]
+        data_str = data.convert_list_to_csv_line(data)
+        data.append_data_to_file(test_name=test_name, file_name=file_name, data=data_str)
 
     await api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
 
