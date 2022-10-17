@@ -1,12 +1,10 @@
 """Opentrons helper methods."""
-import asyncio
 from dataclasses import dataclass, replace
 from datetime import datetime
 from subprocess import run
 from typing import List, Optional, Dict, Tuple
 
 from opentrons.config.robot_configs import build_config_ot3, load_ot3 as load_ot3_config
-from opentrons.config.defaults_ot3 import DEFAULT_MAX_SPEED_DISCONTINUITY
 from opentrons.hardware_control.instruments.pipette import Pipette
 from opentrons.hardware_control.ot3api import OT3API
 
@@ -194,17 +192,17 @@ async def set_gantry_load_per_axis_settings_ot3(
 
 async def home_ot3(api: OT3API, axes: Optional[List[OT3Axis]] = None) -> None:
     """Home OT3 gantry."""
-    default_home_speed = 10
-    default_home_speed_xy = 40
+    default_home_speed = 10.0
+    default_home_speed_xy = 40.0
 
-    homing_speeds = {
+    homing_speeds: Dict[OT3Axis, float] = {
         OT3Axis.X: default_home_speed_xy,
         OT3Axis.Y: default_home_speed_xy,
         OT3Axis.Z_L: default_home_speed,
         OT3Axis.Z_R: default_home_speed,
         OT3Axis.Z_G: default_home_speed,
         OT3Axis.P_L: default_home_speed,
-        OT3Axis.P_R: default_home_speed
+        OT3Axis.P_R: default_home_speed,
     }
 
     # save our current script's settings
