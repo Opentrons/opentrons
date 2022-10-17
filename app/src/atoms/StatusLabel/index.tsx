@@ -15,11 +15,13 @@ import { StyledText } from '../text'
 interface StatusLabelProps {
   status: string
   backgroundColor: string
-  iconColor: string
+  showIcon?: boolean
+  iconColor?: string
   textColor?: string
   fontWeight?: number
   iconSize?: string
   pulse?: boolean
+  id?: string
 }
 
 export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
@@ -31,6 +33,8 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
     fontWeight,
     iconSize,
     pulse,
+    showIcon = true,
+    id,
   } = props
 
   return (
@@ -44,25 +48,27 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
         alignItems={ALIGN_CENTER}
         marginTop={SPACING.spacing2}
         marginBottom={SPACING.spacing2}
-        data-testid={`status_label+${status}`}
+        data-testid={`status_label_${status}_${id}`}
       >
-        <Icon
-          name="circle"
-          color={iconColor}
-          size={iconSize ?? '0.25rem'}
-          data-testid="status_circle"
-        >
-          {pulse != null && pulse ? (
-            <animate
-              attributeName="fill"
-              values={`${iconColor}; transparent`}
-              dur="1s"
-              calcMode="discrete"
-              repeatCount="indefinite"
-              data-testid="pulsing_status_circle"
-            />
-          ) : null}
-        </Icon>
+        {showIcon ? (
+          <Icon
+            name="circle"
+            color={iconColor}
+            size={iconSize ?? '0.25rem'}
+            data-testid="status_circle"
+          >
+            {pulse != null && pulse ? (
+              <animate
+                attributeName="fill"
+                values={`${iconColor}; transparent`}
+                dur="1s"
+                calcMode="discrete"
+                repeatCount="indefinite"
+                data-testid="pulsing_status_circle"
+              />
+            ) : null}
+          </Icon>
+        ) : null}
         <StyledText
           fontSize={TYPOGRAPHY.fontSizeLabel}
           fontWeight={fontWeight ?? TYPOGRAPHY.fontWeightRegular}

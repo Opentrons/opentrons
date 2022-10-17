@@ -2,7 +2,7 @@ import * as React from 'react'
 import { resetAllWhenMocks, when } from 'jest-when'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import { LEFT, RIGHT } from '@opentrons/shared-data'
+import { isOT3Pipette, LEFT, RIGHT } from '@opentrons/shared-data'
 import { i18n } from '../../../../i18n'
 import { getHasCalibrationBlock } from '../../../../redux/config'
 import { Banner } from '../../../../atoms/Banner'
@@ -25,6 +25,14 @@ import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
 
 import type { DeckCalibrationInfo } from '../../../../redux/calibration/api-types'
 import type { DispatchApiRequestType } from '../../../../redux/robot-api'
+
+jest.mock('@opentrons/shared-data', () => {
+  const actualSharedData = jest.requireActual('@opentrons/shared-data')
+  return {
+    ...actualSharedData,
+    isOT3Pipette: jest.fn(),
+  }
+})
 
 jest.mock('../PipetteOverflowMenu')
 jest.mock('../../../../redux/config')
@@ -60,6 +68,9 @@ const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
   typeof useDispatchApiRequest
 >
 const mockBanner = Banner as jest.MockedFunction<typeof Banner>
+const mockIsOT3Pipette = isOT3Pipette as jest.MockedFunction<
+  typeof isOT3Pipette
+>
 
 const render = (props: React.ComponentProps<typeof PipetteCard>) => {
   return renderWithProviders(<PipetteCard {...props} />, {
@@ -215,5 +226,15 @@ describe('PipetteCard', () => {
     const overflowMenu = getByText('mock pipette overflow menu')
     overflowMenu.click()
     expect(queryByText('mock pipette overflow menu')).toBeNull()
+  })
+  it('does not render the pipette offset calibration banner for GEN3 pipettes', () => {
+    mockIsOT3Pipette.mockReturnValue(true)
+    const { queryByText } = render({
+      pipetteInfo: mockRightSpecs,
+      mount: RIGHT,
+      robotName: mockRobotName,
+      pipetteId: 'id',
+    })
+    expect(queryByText('mock banner')).toBeNull()
   })
 })

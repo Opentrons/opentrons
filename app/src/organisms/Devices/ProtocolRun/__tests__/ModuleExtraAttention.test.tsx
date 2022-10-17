@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { HeaterShakerModule } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
@@ -78,6 +78,13 @@ const mockThermocycler = {
   },
   twoDimensionalRendering: { children: [] },
   quirks: [],
+}
+
+const mockThermocyclerGen2 = {
+  moduleId: 'someThermocyclerModule',
+  model: 'thermocyclerModuleV2' as ModuleModel,
+  moduleType: 'thermocyclerModuleType' as ModuleType,
+  displayName: 'Thermocycler Module GEN2',
 }
 
 const mockHeaterShakerLatchClosed: HeaterShakerModule = {
@@ -246,5 +253,33 @@ describe('ModuleExtraAttention', () => {
       'Labware must be secured with the module’s latch. Thermocycler lid must be open when robot moves to the slots it occupies. Opentrons will automatically open the lid to move to these slots during Labware Position Check.'
     )
     getByText('View instructions')
+  })
+
+  it('renders the correct information when a thermocycler gen 2 is attached', () => {
+    props = {
+      moduleTypes: [mockThermocycler.moduleType],
+      modulesInfo: {
+        [mockThermocycler.moduleId]: {
+          moduleId: mockThermocycler.moduleId,
+          x: 1,
+          y: 1,
+          z: 1,
+          moduleDef: mockThermocyclerGen2 as any,
+          nestedLabwareDisplayName: 'Source Plate',
+          nestedLabwareDef: null,
+          nestedLabwareId: null,
+          protocolLoadOrder: 0,
+          slotName: '7',
+          attachedModuleMatch: mockThermocyclerAttachedModule as AttachedModule,
+        },
+      },
+    }
+
+    const { getByText } = render(props)
+    getByText('Thermocycler Module GEN2 in Slot 7')
+    getByText(
+      'The lid will automatically open when moving to these slots during Labware Position Check.'
+    )
+    expect(screen.queryByText('View instructions')).not.toBeInTheDocument()
   })
 })

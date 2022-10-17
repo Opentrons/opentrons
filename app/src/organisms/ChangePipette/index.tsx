@@ -29,19 +29,19 @@ import {
   HOME,
 } from '../../redux/robot-controls'
 
-import { INTENT_CALIBRATE_PIPETTE_OFFSET } from '../../organisms/CalibrationPanels'
+import { INTENT_CALIBRATE_PIPETTE_OFFSET } from '../../organisms/DeprecatedCalibrationPanels'
+import { AskForCalibrationBlockModal } from '../DeprecatedCalibrateTipLength/AskForCalibrationBlockModal'
 import { useFeatureFlag } from '../../redux/config'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { StyledText } from '../../atoms/text'
-import { useCalibratePipetteOffset } from '../CalibratePipetteOffset/useCalibratePipetteOffset'
+import { useDeprecatedCalibratePipetteOffset } from '../DeprecatedCalibratePipetteOffset/useDeprecatedCalibratePipetteOffset'
 import { ExitModal } from './ExitModal'
 import { Instructions } from './Instructions'
 import { ClearDeckModal } from './ClearDeckModal/index'
 import { ConfirmPipette } from './ConfirmPipette'
-//  remove lines 40 - 46 when removing FF
-import { AskForCalibrationBlockModal } from '../CalibrateTipLength/AskForCalibrationBlockModal'
+//  remove lines 40 - 46 when removing enableChangePipette FF
 import { ExitAlertModal } from './ExitAlertModal'
 import { DeprecatedInstructions } from './DeprecatedInstructions'
 import { DeprecatedConfirmPipette } from './DeprecatedConfirmPipette'
@@ -138,7 +138,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
   const [
     startPipetteOffsetCalibration,
     PipetteOffsetCalibrationWizard,
-  ] = useCalibratePipetteOffset(robotName, { mount }, closeModal)
+  ] = useDeprecatedCalibratePipetteOffset(robotName, { mount }, closeModal)
 
   const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
   const [showCalBlockModal, setShowCalBlockModal] = React.useState<boolean>(
@@ -379,8 +379,14 @@ export function ChangePipette(props: Props): JSX.Element | null {
       <ModalShell width="42.375rem">
         <WizardHeader
           totalSteps={eightChannel ? EIGHT_CHANNEL_STEPS : SINGLE_CHANNEL_STEPS}
-          currentStep={isSelectPipetteStep ? 0 : currentStep}
-          isErrorState={!success && wizardStep === CONFIRM}
+          currentStep={
+            // TODO (BC, 2022-09-13): the logic that calculates the current step is very complex, reduce it to a util for clarity and testing
+            !success && wizardStep === CONFIRM
+              ? null
+              : isSelectPipetteStep
+              ? 0
+              : currentStep
+          }
           title={wizardTitle}
           onExit={exitWizardHeader}
         />

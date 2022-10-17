@@ -24,7 +24,7 @@ async def subject(usb_port: USBPort) -> modules.AbstractModule:
     temp = await modules.build(
         port="/dev/ot_module_sim_tempdeck0",
         usb_port=usb_port,
-        which="tempdeck",
+        type=modules.ModuleType.TEMPERATURE,
         simulating=True,
         loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
@@ -53,12 +53,12 @@ async def test_sim_state(subject: modules.AbstractModule):
 
 
 async def test_sim_update(subject: modules.AbstractModule):
-    await subject.set_temperature(10)
+    await subject.start_set_temperature(10)
+    await subject.await_temperature(None)
     assert subject.temperature == 10
     assert subject.target == 10
     assert subject.status == "holding at target"
     await subject.deactivate()
-    await subject.wait_next_poll()
     assert subject.temperature == 23
     assert subject.target is None
     assert subject.status == "idle"

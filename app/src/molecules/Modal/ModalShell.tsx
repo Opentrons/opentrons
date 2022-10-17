@@ -119,7 +119,7 @@ export function ModalShell(props: ModalShellProps): JSX.Element {
           }}
         >
           {header != null ? <Box {...HEADER_STYLE}>{header}</Box> : null}
-          <Box>{children}</Box>
+          {children}
           {footer != null ? <Box {...FOOTER_STYLE}>{footer}</Box> : null}
         </Box>
       </Flex>

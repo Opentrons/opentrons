@@ -77,7 +77,7 @@ describe('ThermocyclerModuleSlideout', () => {
     }
     const { getByText } = render(props)
 
-    getByText('Set Lid Temperature for Thermocycler Module')
+    getByText('Set Lid Temperature for Thermocycler Module GEN1')
     getByText(
       'Pre heat or cool your Thermocycler Lid. Enter a whole number between 37 °C and 110 °C.'
     )
@@ -95,7 +95,7 @@ describe('ThermocyclerModuleSlideout', () => {
     }
     const { getByText } = render(props)
 
-    getByText('Set Block Temperature for Thermocycler Module')
+    getByText('Set Block Temperature for Thermocycler Module GEN1')
     getByText(
       'Pre heat or cool your Thermocycler Block. Enter a whole number between 4 °C and 99 °C.'
     )

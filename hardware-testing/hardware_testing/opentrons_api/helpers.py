@@ -1,12 +1,13 @@
 """Opentrons helper methods."""
 from types import MethodType
-from typing import Any, List
+from typing import Any, List, Dict
 
 from opentrons import protocol_api, execute, simulate
 from opentrons.protocol_api.labware import Well
 from opentrons.hardware_control.thread_manager import ThreadManagerException
 
 from .workarounds import is_running_in_app, store_robot_acceleration
+from .types import Axis, Point
 
 
 def _add_fake_simulate(
@@ -81,3 +82,8 @@ def get_list_of_wells_affected(
 def get_pipette_unique_name(pipette: protocol_api.InstrumentContext) -> str:
     """Get a pipette's unique name."""
     return str(pipette.hw_pipette["pipette_id"])
+
+
+def gantry_position_as_point(position: Dict[Axis, float]) -> Point:
+    """Helper to convert Dict[Axis, float] to a Point()."""
+    return Point(x=position[Axis.X], y=position[Axis.Y], z=position[Axis.Z])

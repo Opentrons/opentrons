@@ -40,7 +40,9 @@ interface OffsetParams {
 export type AspDispAirgapParams = FlowRateParams &
   PipetteAccessParams &
   VolumeParams &
-  OffsetParams
+  OffsetParams & {
+    isAirGap?: boolean
+  }
 
 export type AspirateParams = AspDispAirgapParams
 export type DispenseParams = AspDispAirgapParams

@@ -3003,7 +3003,7 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@storybook/addon-actions@6.5.12", "@storybook/addon-actions@^6.5.9":
+"@storybook/addon-actions@6.5.12", "@storybook/addon-actions@^6.5.12":
   version "6.5.12"
   resolved "https://registry.yarnpkg.com/@storybook/addon-actions/-/addon-actions-6.5.12.tgz#9d2bf3bffa41cf4f92c7220c8f6e3a3f5da55019"
   integrity sha512-yEbyKjBsSRUr61SlS+SOTqQwdumO8Wa3GoHO3AfmvoKfzdGrM7w8G5Zs9Iev16khWg/7bQvoH3KZsg/hQuKnNg==
@@ -3099,7 +3099,7 @@
     ts-dedent "^2.0.0"
     util-deprecate "^1.0.2"
 
-"@storybook/addon-essentials@^6.5.9":
+"@storybook/addon-essentials@^6.5.12":
   version "6.5.12"
   resolved "https://registry.yarnpkg.com/@storybook/addon-essentials/-/addon-essentials-6.5.12.tgz#c492587e6e47221257dd1e18ca8c566a1f4dfc7a"
   integrity sha512-4AAV0/mQPSk3V0Pie1NIqqgBgScUc0VtBEXDm8BgPeuDNVhPEupnaZgVt+I3GkzzPPo6JjdCsp2L11f3bBSEjw==
@@ -3120,7 +3120,7 @@
     regenerator-runtime "^0.13.7"
     ts-dedent "^2.0.0"
 
-"@storybook/addon-links@^6.5.9":
+"@storybook/addon-links@^6.5.12":
   version "6.5.12"
   resolved "https://registry.yarnpkg.com/@storybook/addon-links/-/addon-links-6.5.12.tgz#57ec0c651ef29f9d969a2d715f85a69d5ce29e60"
   integrity sha512-Dyt922J5nTBwM/9KtuuDIt3sX8xdTkKh+aXSoOX6OzT04Xwm5NumFOvuQ2YA00EM+3Ihn7Ayc3urvxnHTixmKg==
@@ -3671,7 +3671,7 @@
     react-docgen-typescript "^2.1.1"
     tslib "^2.0.0"
 
-"@storybook/react@^6.5.9":
+"@storybook/react@^6.5.12":
   version "6.5.12"
   resolved "https://registry.yarnpkg.com/@storybook/react/-/react-6.5.12.tgz#0c6b02a583f478ace6cd957a358d84a728a8d232"
   integrity sha512-1tG8EdSfp+OZAKAWPT2UrexF4o007jEMwQFFXw1atIQrQOADzSnZ7lTYJ08o5TyJwksswtr18tH3oJJ9sG3KPw==

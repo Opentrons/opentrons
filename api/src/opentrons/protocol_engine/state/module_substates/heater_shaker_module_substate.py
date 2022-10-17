@@ -52,8 +52,8 @@ class HeaterShakerModuleSubState:
             return celsius
         else:
             raise InvalidTargetTemperatureError(
-                f"Heater-Shaker got an invalid temperature {celsius} degree Celsius."
-                f" Valid range is {HEATER_SHAKER_TEMPERATURE_RANGE}."
+                f"Cannot set Heater-Shaker to {celsius} °C."
+                f" Valid range is {HEATER_SHAKER_TEMPERATURE_RANGE} °C."
             )
 
     @staticmethod
@@ -64,20 +64,20 @@ class HeaterShakerModuleSubState:
             return rpm_int
         else:
             raise InvalidTargetSpeedError(
-                f"Heater-Shaker got invalid speed of {rpm}RPM. Valid range is "
-                f"{HEATER_SHAKER_SPEED_RANGE}."
+                f"Cannot set Heater-Shaker to shake at {rpm} rpm. Valid speed range is "
+                f"{HEATER_SHAKER_SPEED_RANGE} rpm."
             )
 
     def raise_if_labware_latch_not_closed(self) -> None:
         """Raise an error if labware is not latched on the heater-shaker."""
         if not self.is_labware_latch_closed:
             raise CannotPerformModuleAction(
-                "Heater-Shaker can't start shaking while the labware latch is open."
+                "Heater-Shaker cannot start shaking while the labware latch is open."
             )
 
     def raise_if_shaking(self) -> None:
         """Raise an error if the heater-shaker is currently shaking."""
         if self.is_plate_shaking:
             raise CannotPerformModuleAction(
-                "Heater-Shaker can't open its labware latch while it is shaking."
+                "Heater-Shaker cannot open its labware latch while it is shaking."
             )

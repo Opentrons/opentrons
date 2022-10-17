@@ -26,7 +26,7 @@ async def simulating_module(usb_port):
     module = await modules.build(
         port=usb_port.device_path,
         usb_port=usb_port,
-        which="heatershaker",
+        type=modules.ModuleType.HEATER_SHAKER,
         simulating=True,
         loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
@@ -64,7 +64,8 @@ async def test_sim_state(simulating_module):
 
 
 async def test_sim_update(simulating_module):
-    await simulating_module.set_temperature(10)
+    await simulating_module.start_set_temperature(10)
+    await simulating_module.await_temperature(10)
     assert simulating_module.temperature == 10
     assert simulating_module.target_temperature == 10
     assert simulating_module.temperature_status == TemperatureStatus.HOLDING
@@ -77,7 +78,6 @@ async def test_sim_update(simulating_module):
     assert simulating_module.status == HeaterShakerStatus.RUNNING
 
     await simulating_module.deactivate()
-    await simulating_module.wait_next_poll()
     assert simulating_module.temperature == 23
     assert simulating_module.speed == 0
     assert simulating_module.target_temperature is None
@@ -88,8 +88,8 @@ async def test_sim_update(simulating_module):
 
 async def test_await_both(simulating_module):
     await simulating_module.start_set_temperature(10)
-    await simulating_module.start_set_speed(2000)
-    await simulating_module.await_speed_and_temperature(speed=2000, temperature=10)
+    await simulating_module.set_speed(2000)
+    await simulating_module.await_temperature(10)
     assert simulating_module.temperature_status == TemperatureStatus.HOLDING
     assert simulating_module.speed_status == SpeedStatus.HOLDING
 
@@ -128,8 +128,7 @@ async def test_updated_live_data(simulating_module):
     """Should update live data after module commands."""
     await simulating_module.close_labware_latch()
     await simulating_module.start_set_temperature(50)
-    await simulating_module.start_set_speed(100)
-    await simulating_module.wait_next_poll()
+    await simulating_module.set_speed(100)
     assert simulating_module.live_data == {
         "data": {
             "labwareLatchStatus": "idle_closed",
@@ -149,7 +148,7 @@ async def test_deactivated_updated_live_data(simulating_module):
     """Should update live data after module commands."""
     await simulating_module.close_labware_latch()
     await simulating_module.start_set_temperature(50)
-    await simulating_module.start_set_speed(100)
+    await simulating_module.set_speed(100)
     await simulating_module.wait_next_poll()
     assert simulating_module.live_data == {
         "data": {

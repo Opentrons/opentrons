@@ -10,7 +10,11 @@ from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocol_api import labware
 from opentrons.protocols.geometry import module_geometry
 from opentrons.hardware_control.types import CriticalPoint
-from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
+from opentrons.hardware_control.modules.types import (
+    ThermocyclerModuleModel,
+    TemperatureModuleModel,
+    MagneticModuleModel,
+)
 
 tall_lw_name = "opentrons_96_tiprack_1000ul"
 labware_name = "corning_96_wellplate_360ul_flat"
@@ -279,29 +283,33 @@ def test_direct_cp():
 
 def test_gen2_module_transforms():
     deck = Deck()
-    tmod = module_geometry.load_module(
-        module_geometry.TemperatureModuleModel.TEMPERATURE_V2,
-        deck.position_for("1"),
-        MAX_SUPPORTED_VERSION,
+    tmod = module_geometry.create_geometry(
+        definition=module_geometry.load_definition(
+            TemperatureModuleModel.TEMPERATURE_V2
+        ),
+        parent=deck.position_for("1"),
+        configuration=None,
     )
     assert tmod.labware_offset == Point(-1.45, -0.15, 80.09)
-    tmod2 = module_geometry.load_module(
-        module_geometry.TemperatureModuleModel.TEMPERATURE_V2,
-        deck.position_for("3"),
-        MAX_SUPPORTED_VERSION,
+    tmod2 = module_geometry.create_geometry(
+        definition=module_geometry.load_definition(
+            TemperatureModuleModel.TEMPERATURE_V2
+        ),
+        parent=deck.position_for("3"),
+        configuration=None,
     )
     assert tmod2.labware_offset == Point(1.15, -0.15, 80.09)
 
-    mmod = module_geometry.load_module(
-        module_geometry.MagneticModuleModel.MAGNETIC_V2,
-        deck.position_for("1"),
-        MAX_SUPPORTED_VERSION,
+    mmod = module_geometry.create_geometry(
+        definition=module_geometry.load_definition(MagneticModuleModel.MAGNETIC_V2),
+        parent=deck.position_for("1"),
+        configuration=None,
     )
     assert mmod.labware_offset == Point(-1.175, -0.125, 82.25)
-    mmod2 = module_geometry.load_module(
-        module_geometry.MagneticModuleModel.MAGNETIC_V2,
-        deck.position_for("3"),
-        MAX_SUPPORTED_VERSION,
+    mmod2 = module_geometry.create_geometry(
+        definition=module_geometry.load_definition(MagneticModuleModel.MAGNETIC_V2),
+        parent=deck.position_for("3"),
+        configuration=None,
     )
     assert mmod2.labware_offset == Point(1.425, -0.125, 82.25)
 
@@ -361,8 +369,12 @@ def test_should_dodge():
     assert not should_dodge_thermocycler(
         deck, deck.position_for(4), deck.position_for(9)
     )
-    deck[7] = module_geometry.load_module(
-        module_geometry.ThermocyclerModuleModel.THERMOCYCLER_V1, deck.position_for(7)
+    deck[7] = module_geometry.create_geometry(
+        definition=module_geometry.load_definition(
+            ThermocyclerModuleModel.THERMOCYCLER_V1
+        ),
+        parent=deck.position_for(7),
+        configuration=None,
     )
     # with a tc loaded, some positions should require dodging
     assert should_dodge_thermocycler(deck, deck.position_for(12), deck.position_for(1))
@@ -411,8 +423,12 @@ def test_thermocycler_present() -> None:
     assert not deck.thermocycler_present
 
     # Add a thermocycler
-    deck[7] = module_geometry.load_module(
-        module_geometry.ThermocyclerModuleModel.THERMOCYCLER_V1, deck.position_for(7)
+    deck[7] = module_geometry.create_geometry(
+        definition=module_geometry.load_definition(
+            ThermocyclerModuleModel.THERMOCYCLER_V1
+        ),
+        parent=deck.position_for(7),
+        configuration=None,
     )
     assert deck.thermocycler_present
 

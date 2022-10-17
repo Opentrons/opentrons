@@ -28,6 +28,15 @@ export interface LoadLabwareRunTimeCommand
     LoadLabwareCreateCommand {
   result: LoadLabwareResult
 }
+export interface MoveLabwareCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'moveLabware'
+  params: MoveLabwareParams
+}
+export interface MoveLabwareRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    MoveLabwareCreateCommand {
+  result: MoveLabwareResult
+}
 export interface LoadModuleCreateCommand extends CommonCommandCreateInfo {
   commandType: 'loadModule'
   params: LoadModuleParams
@@ -55,11 +64,13 @@ export type SetupRunTimeCommand =
   | LoadLabwareRunTimeCommand
   | LoadModuleRunTimeCommand
   | LoadLiquidRunTimeCommand
+  | MoveLabwareRunTimeCommand
 export type SetupCreateCommand =
   | LoadPipetteCreateCommand
   | LoadLabwareCreateCommand
   | LoadModuleCreateCommand
   | LoadLiquidCreateCommand
+  | MoveLabwareCreateCommand
 
 export type LabwareLocation = { slotName: string } | { moduleId: string }
 
@@ -70,7 +81,6 @@ interface LoadPipetteParams {
   pipetteId: string
   mount: 'left' | 'right'
 }
-
 interface LoadPipetteResult {
   pipetteId: string
 }
@@ -79,11 +89,17 @@ interface LoadLabwareParams {
   location: LabwareLocation
   displayName?: string
 }
-
 interface LoadLabwareResult {
   labwareId: string
   definition: LabwareDefinition2
   offset: LabwareOffset
+}
+interface MoveLabwareParams {
+  labwareId: string
+  newLocation: LabwareLocation
+}
+interface MoveLabwareResult {
+  offsetId: string
 }
 interface LoadModuleParams {
   moduleId: string
@@ -92,13 +108,11 @@ interface LoadModuleParams {
 interface LoadModuleResult {
   moduleId: string
 }
-
 interface LoadLiquidParams {
   liquidId: string
   labwareId: string
   volumeByWell: { [wellName: string]: number }
 }
-
 interface LoadLiquidResult {
   liquidId: string
 }

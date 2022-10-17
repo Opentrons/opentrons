@@ -31,6 +31,18 @@
         "y": { "type": "number" },
         "z": { "type": "number" }
       }
+    },
+    "positiveNumber": {
+      "type": "number",
+      "minimum": 0
+    },
+    "jawWidthValue": {
+      "type": "object",
+      "required": ["min", "max"],
+      "properties": {
+        "min": { "$ref": "#/definitions/positiveNumber" },
+        "max": { "$ref": "#/definitions/positiveNumber" }
+      }
     }
   },
 
@@ -48,7 +60,8 @@
     "jawCenterOffsetFromBase",
     "pinOneOffsetFromBase",
     "pinTwoOffsetFromBase",
-    "quirks"
+    "quirks",
+    "jawSizes_um"
   ],
   "additionalProperties": false,
   "properties": {
@@ -90,6 +103,9 @@
       "type": "array",
       "description": "Array of valid quirks for a given gripper",
       "items": { "type": "string" }
+    },
+    "jawSizes_mm": {
+      "$ref": "#/definitions/configValue"
     }
   }
 }

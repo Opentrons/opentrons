@@ -15,8 +15,8 @@ import { PrimaryButton } from '../../atoms/buttons'
 import { DeprecatedControlContainer } from './DeprecatedControlContainer'
 
 import type { IconName } from '@opentrons/components'
-import type { Jog, Plane, Sign, Bearing, Axis } from '../JogControls/types'
-import { HORIZONTAL_PLANE, VERTICAL_PLANE } from '../JogControls/constants'
+import type { Jog, Plane, Sign, Bearing, Axis } from './types'
+import { HORIZONTAL_PLANE, VERTICAL_PLANE } from './constants'
 
 interface Control {
   bearing: Bearing

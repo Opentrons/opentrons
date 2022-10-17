@@ -1,8 +1,15 @@
-"""Core module logic abstract interfaces."""
+"""Core module control interfaces."""
 from abc import ABC, abstractmethod
-from typing import Any, Generic, TypeVar
+from typing import Any, Generic, Optional, TypeVar
 
-from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
+from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
+from opentrons.hardware_control.modules.types import (
+    ModuleModel,
+    ModuleType,
+    TemperatureStatus,
+    MagneticStatus,
+    SpeedStatus,
+)
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.types import DeckSlotName
 
@@ -10,7 +17,7 @@ from .labware import LabwareCoreType
 
 
 class AbstractModuleCore(ABC, Generic[LabwareCoreType]):
-    """Abstract core module interface."""
+    """Abstract core module control interface."""
 
     @property
     @abstractmethod
@@ -40,5 +47,144 @@ class AbstractModuleCore(ABC, Generic[LabwareCoreType]):
     def get_deck_slot(self) -> DeckSlotName:
         """Get the module's deck slot."""
 
+    @abstractmethod
+    def add_labware_core(self, labware_core: LabwareCoreType) -> None:
+        """Add a labware to the module."""
+
 
 ModuleCoreType = TypeVar("ModuleCoreType", bound=AbstractModuleCore[Any])
+
+
+class AbstractTemperatureModuleCore(AbstractModuleCore[LabwareCoreType]):
+    """Core control interface for an attached Temperature Module."""
+
+    @abstractmethod
+    def set_target_temperature(self, celsius: float) -> None:
+        """Set the Temperature Module's target temperature in °C."""
+
+    @abstractmethod
+    def wait_for_target_temperature(self, celsius: Optional[float] = None) -> None:
+        """Wait until the module's target temperature is reached.
+
+        Specifying a value for ``celsius`` that is different than
+        the module's current target temperature may beahave unpredictably.
+        """
+
+    @abstractmethod
+    def deactivate(self) -> None:
+        """Deactivate the Temperature Module."""
+
+    @abstractmethod
+    def get_current_temperature(self) -> float:
+        """Get the module's current temperature in °C."""
+
+    @abstractmethod
+    def get_target_temperature(self) -> Optional[float]:
+        """Get the module's target temperature in °C, if set."""
+
+    @abstractmethod
+    def get_status(self) -> TemperatureStatus:
+        """Get the module's current temperature status."""
+
+
+class AbstractMagneticModuleCore(AbstractModuleCore[LabwareCoreType]):
+    """Core control interface for an attached Magnetic Module."""
+
+    @abstractmethod
+    def engage(
+        self,
+        height_from_base: Optional[float] = None,
+        height_from_home: Optional[float] = None,
+    ) -> None:
+        """Raise the module's magnets.
+
+        Only one of `height_from_base` or `height_from_home` may be specified.
+
+        Args:
+            height_from_base: Distance from labware base to raise the magnets.
+            height_from_home: Distance from motor home position to raise the magnets.
+        """
+
+    @abstractmethod
+    def engage_to_labware(
+        self, offset: float = 0, preserve_half_mm: bool = False
+    ) -> None:
+        """Raise the module's magnets up to its loaded labware.
+
+        Args:
+            offset: Offset from the labware's default engage height.
+            preserve_half_mm: For labware whose definitions
+                erroneously use half-mm for their defined default engage height,
+                use the value directly instead of converting it to real millimeters.
+
+        Raises:
+            Exception: Labware is not loaded or has no default engage height.
+        """
+
+    @abstractmethod
+    def disengage(self) -> None:
+        """Lower the magnets back into the module."""
+
+    @abstractmethod
+    def get_status(self) -> MagneticStatus:
+        """Get the module's current magnet status."""
+
+
+class AbstractHeaterShakerCore(AbstractModuleCore[LabwareCoreType]):
+    """Core control interface for an attached Heater-Shaker Module."""
+
+    @abstractmethod
+    def set_target_temperature(self, celsius: float) -> None:
+        """Set the labware plate's target temperature in °C."""
+
+    @abstractmethod
+    def wait_for_target_temperature(self) -> None:
+        """Wait for the labware plate's target temperature to be reached."""
+
+    @abstractmethod
+    def set_and_wait_for_shake_speed(self, rpm: int) -> None:
+        """Set the shaker's target shake speed and wait for it to spin up."""
+
+    @abstractmethod
+    def open_labware_latch(self) -> None:
+        """Open the labware latch."""
+
+    @abstractmethod
+    def close_labware_latch(self) -> None:
+        """Close the labware latch."""
+
+    @abstractmethod
+    def deactivate_shaker(self) -> None:
+        """Stop shaking."""
+
+    @abstractmethod
+    def deactivate_heater(self) -> None:
+        """Stop heating."""
+
+    @abstractmethod
+    def get_current_temperature(self) -> float:
+        """Get the labware plate's current temperature in °C."""
+
+    @abstractmethod
+    def get_target_temperature(self) -> Optional[float]:
+        """Get the labware plate's target temperature in °C, if set."""
+
+    @abstractmethod
+    def get_current_speed(self) -> int:
+        """Get the shaker's current speed in RPM."""
+
+    @abstractmethod
+    def get_target_speed(self) -> Optional[int]:
+        """Get the shaker's target speed in RPM, if set."""
+
+    @abstractmethod
+    def get_temperature_status(self) -> TemperatureStatus:
+        """Get the module's heater status."""
+
+    @abstractmethod
+    def get_speed_status(self) -> SpeedStatus:
+        """Get the module's heater status."""
+
+    @abstractmethod
+    def get_labware_latch_status(self) -> HeaterShakerLabwareLatchStatus:
+        """Get the module's labware latch status."""

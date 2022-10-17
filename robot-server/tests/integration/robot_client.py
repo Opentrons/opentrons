@@ -4,7 +4,7 @@ import asyncio
 import concurrent.futures
 import contextlib
 from pathlib import Path
-from typing import Any, AsyncGenerator, Dict, List
+from typing import Any, AsyncGenerator, Dict, List, Optional
 
 import httpx
 from httpx import Response
@@ -173,10 +173,21 @@ class RobotClient:
         response.raise_for_status()
         return response
 
-    async def get_run_commands(self, run_id: str) -> Response:
+    async def get_run_commands(
+        self,
+        run_id: str,
+        cursor: Optional[int] = None,
+        page_length: Optional[int] = None,
+    ) -> Response:
         """GET /runs/:run_id/commands."""
+        query_params = {}
+        if cursor is not None:
+            query_params["cursor"] = cursor
+        if page_length is not None:
+            query_params["pageLength"] = page_length
+
         response = await self.httpx_client.get(
-            url=f"{self.base_url}/runs/{run_id}/commands",
+            url=f"{self.base_url}/runs/{run_id}/commands", params=query_params
         )
         response.raise_for_status()
         return response

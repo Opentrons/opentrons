@@ -12,7 +12,6 @@ from typing import (
     Union,
     List,
     Optional,
-    Tuple,
     Sequence,
     Set,
     Any,
@@ -28,7 +27,7 @@ from opentrons.config.types import (
     GantryLoad,
     CapacitivePassSettings,
 )
-from .backends.ot3utils import get_system_constraints
+from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons_hardware.hardware_control.motion_planning import (
     MoveManager,
     MoveTarget,
@@ -44,6 +43,7 @@ from .instruments.pipette import (
 from .instruments.gripper import compare_gripper_config_and_check_skip
 from .backends.ot3controller import OT3Controller
 from .backends.ot3simulator import OT3Simulator
+from .backends.ot3utils import get_system_constraints
 from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
@@ -367,6 +367,22 @@ class OT3API(
     @property
     def attached_modules(self) -> List[modules.AbstractModule]:
         return self._backend.module_controls.available_modules
+
+    async def create_simulating_module(
+        self,
+        model: modules.types.ModuleModel,
+    ) -> modules.AbstractModule:
+        """Create a simulating module hardware interface."""
+        assert (
+            self.is_simulator
+        ), "Cannot build simulating module from non-simulating hardware control API"
+
+        return await self._backend.module_controls.build_module(
+            port="",
+            usb_port=USBPort(name="", port_number=0),
+            type=modules.ModuleType.from_model(model),
+            sim_model=model.value,
+        )
 
     async def update_firmware(
         self,
@@ -834,7 +850,7 @@ class OT3API(
         check_motion_bounds(to_check, target_position, bounds, check_bounds)
 
         # TODO: (2022-02-10) Use actual max speed for MoveTarget
-        checked_speed = speed or 500
+        checked_speed = speed or 400
         self._move_manager.update_constraints(
             get_system_constraints(self._config.motion_settings, self._gantry_load)
         )
@@ -856,14 +872,19 @@ class OT3API(
                 await stack.enter_async_context(self._motion_lock)
             try:
                 await self._backend.move(origin, moves[0])
-                encoder_pos = await self._backend.update_encoder_position()
+                encoder_machine_pos = await self._backend.update_encoder_position()
             except Exception:
                 self._log.exception("Move failed")
                 self._current_position.clear()
                 raise
             else:
                 self._current_position.update(target_position)
-                self._encoder_current_position.update(encoder_pos)
+                encoder_position = deck_from_machine(
+                    encoder_machine_pos,
+                    self._transforms.deck_calibration.attitude,
+                    self._transforms.carriage_offset,
+                )
+                self._encoder_current_position.update(encoder_position)
 
     @ExecutionManagerProvider.wait_for_running
     async def home(
@@ -888,14 +909,19 @@ class OT3API(
                 raise
             else:
                 machine_pos = await self._backend.update_position()
-                encoder_pos = await self._backend.update_encoder_position()
+                encoder_machine_pos = await self._backend.update_encoder_position()
                 position = deck_from_machine(
                     machine_pos,
                     self._transforms.deck_calibration.attitude,
                     self._transforms.carriage_offset,
                 )
                 self._current_position.update(position)
-                self._encoder_current_position.update(encoder_pos)
+                encoder_position = deck_from_machine(
+                    encoder_machine_pos,
+                    self._transforms.deck_calibration.attitude,
+                    self._transforms.carriage_offset,
+                )
+                self._encoder_current_position.update(encoder_position)
                 if OT3Axis.G in checked_axes:
                     try:
                         gripper = self._gripper_handler.get_gripper()
@@ -914,6 +940,14 @@ class OT3API(
     async def disengage_axes(self, which: Union[List[Axis], List[OT3Axis]]) -> None:
         axes = [OT3Axis.from_axis(ax) for ax in which]
         await self._backend.disengage_axes(axes)
+
+    async def engage_axes(self, which: Union[List[Axis], List[OT3Axis]]) -> None:
+        axes = [OT3Axis.from_axis(ax) for ax in which]
+        await self._backend.engage_axes(axes)
+
+    async def get_limit_switches(self) -> Dict[OT3Axis, bool]:
+        res = await self._backend.get_limit_switches()
+        return {ax: val for ax, val in res.items()}
 
     async def _fast_home(
         self, axes: Sequence[OT3Axis], margin: float
@@ -981,7 +1015,9 @@ class OT3API(
     async def _grip(self, duty_cycle: float) -> None:
         """Move the gripper jaw inward to close."""
         try:
-            await self._backend.gripper_move_jaw(duty_cycle=duty_cycle)
+            await self._backend.gripper_grip_jaw(duty_cycle=duty_cycle)
+            encoder_pos = await self._backend.update_encoder_position()
+            self._encoder_current_position.update(encoder_pos)
         except Exception:
             self._log.exception("Gripper grip failed")
             raise
@@ -991,8 +1027,37 @@ class OT3API(
         """Move the gripper jaw outward to reach the homing switch."""
         try:
             await self._backend.gripper_home_jaw()
+            encoder_pos = await self._backend.update_encoder_position()
+            self._encoder_current_position.update(encoder_pos)
         except Exception:
             self._log.exception("Gripper home failed")
+            raise
+
+    @ExecutionManagerProvider.wait_for_running
+    async def _hold_jaw_width(self, jaw_width_mm: float) -> None:
+        """Move the gripper jaw to a specific width."""
+        try:
+            if (
+                jaw_width_mm
+                < self._gripper_handler.get_gripper().config.jaw_sizes_mm["min"]
+                or jaw_width_mm
+                > self._gripper_handler.get_gripper().config.jaw_sizes_mm["max"]
+            ):
+                raise ValueError("Setting gripper jaw width out of bounds")
+            await self._backend.gripper_hold_jaw(
+                int(
+                    1000
+                    * (
+                        self._gripper_handler.get_gripper().config.jaw_sizes_mm["max"]
+                        - jaw_width_mm
+                    )
+                    / 2
+                )
+            )
+            encoder_pos = await self._backend.update_encoder_position()
+            self._encoder_current_position.update(encoder_pos)
+        except Exception:
+            self._log.exception("Gripper set width failed")
             raise
 
     async def grip(self, force_newtons: float) -> None:
@@ -1006,6 +1071,11 @@ class OT3API(
         self._gripper_handler.check_ready_for_jaw_move()
         await self._ungrip()
         self._gripper_handler.set_jaw_state(GripperJawState.HOMED_READY)
+
+    async def hold_jaw_width(self, jaw_width_mm: int) -> None:
+        self._gripper_handler.check_ready_for_jaw_move()
+        await self._hold_jaw_width(jaw_width_mm)
+        self._gripper_handler.set_jaw_state(GripperJawState.HOLDING_CLOSED)
 
     # Pipette action API
     async def prepare_for_aspirate(
@@ -1138,7 +1208,7 @@ class OT3API(
 
     async def pick_up_tip(
         self,
-        mount: top_types.Mount,
+        mount: Union[top_types.Mount, OT3Mount],
         tip_length: float,
         presses: Optional[int] = None,
         increment: Optional[float] = None,
@@ -1249,16 +1319,6 @@ class OT3API(
             }
         )
         _remove()
-
-    async def find_modules(
-        self,
-        by_model: modules.types.ModuleModel,
-        resolved_type: modules.types.ModuleType,
-    ) -> Tuple[List[modules.AbstractModule], Optional[modules.AbstractModule]]:
-        modules_result = await self._backend.module_controls.parse_modules(
-            by_model, resolved_type
-        )
-        return modules_result
 
     async def clean_up(self) -> None:
         """Get the API ready to stop cleanly."""

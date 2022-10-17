@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.1.0](https://github.com/Opentrons/opentrons/compare/v6.0.1...v6.1.0) (2022-09-27)
+
+
+### Bug Fixes
+
+* **engine:** pause hardware API when engine is paused ([#10882](https://github.com/Opentrons/opentrons/issues/10882)) ([78658f6](https://github.com/Opentrons/opentrons/commit/78658f60e58e90621e79a048105913175e7d9a57))
+* **robot-server:** fully delete current run ([#11070](https://github.com/Opentrons/opentrons/issues/11070)) ([da45a96](https://github.com/Opentrons/opentrons/commit/da45a96a12f7641cde8712a5a636c7393123163f))
+
+
+### Features
+
+* **robot-server:** allow live commands when run is current and unstarted ([#11267](https://github.com/Opentrons/opentrons/issues/11267)) ([3af065a](https://github.com/Opentrons/opentrons/commit/3af065a7302df639c2e0f4079e1ce63ec8a2bb5d))
+
+
+### Performance Improvements
+
+* **robot-server:** Minimize selected columns to speed up `GET /runs` ([#11002](https://github.com/Opentrons/opentrons/issues/11002)) ([4000e5b](https://github.com/Opentrons/opentrons/commit/4000e5bf543ea56260e441e47e561e97103fe435))
+
+
+
+
+
 ## [6.0.1](https://github.com/Opentrons/opentrons/compare/v6.0.0...v6.0.1) (2022-08-09)
 
 **Note:** Version bump only for package @opentrons/robot-server

@@ -46,3 +46,20 @@ async def test_engage_cycle(magdeck: MagDeck):
         "data": {"engaged": False, "height": 0.0},
         "status": "disengaged",
     }
+
+
+async def test_engage_from_base_cycle(magdeck: MagDeck):
+    """It should cycle engage/disengage, taking the offset from base into account."""
+    await magdeck.engage(height_from_base=1)
+    assert magdeck.current_height == 3.5
+    assert magdeck.live_data == {
+        "data": {"engaged": True, "height": 3.5},
+        "status": "engaged",
+    }
+
+    await magdeck.deactivate()
+    assert magdeck.current_height == 0
+    assert magdeck.live_data == {
+        "data": {"engaged": False, "height": 0.0},
+        "status": "disengaged",
+    }

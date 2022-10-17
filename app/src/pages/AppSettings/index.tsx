@@ -20,7 +20,7 @@ import { GeneralSettings } from './GeneralSettings'
 import { PrivacySettings } from './PrivacySettings'
 import { AdvancedSettings } from './AdvancedSettings'
 import { FeatureFlags } from '../../organisms/AppSettings/FeatureFlags'
-import { NavTab } from '../../atoms/NavTab'
+import { NavTab } from '../../molecules/NavTab'
 import { Line } from '../../atoms/structure'
 
 import type { NavRouteParams, AppSettingsTab } from '../../App/types'
@@ -50,7 +50,6 @@ export function AppSettings(): JSX.Element {
         backgroundColor={COLORS.white}
         height="100%"
         width="100%"
-        margin={SPACING.spacing4}
         border={`${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.medGreyEnabled}`}
         borderRadius={BORDERS.radiusSoftCorners}
         minHeight="95%"

@@ -96,6 +96,7 @@ describe('protocol storage directory utilities', () => {
     it('returns failed analysis if parsing error', () => {
       expect(getParsedAnalysisFromPath('non-existent-path.json')).toEqual({
         commands: [],
+        liquids: [],
         config: {},
         createdAt: expect.any(String),
         errors: [
@@ -108,6 +109,9 @@ describe('protocol storage directory utilities', () => {
         ],
         files: [],
         metadata: [],
+        pipettes: [],
+        modules: [],
+        labware: [],
       })
     })
   })

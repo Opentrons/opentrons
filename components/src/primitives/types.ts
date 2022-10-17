@@ -59,8 +59,10 @@ export interface FlexboxProps {
 
 export interface GridProps {
   gridGap?: string | number
+  gridTemplateAreas?: string
   gridTemplateRows?: string
   gridTemplateColumns?: string
+  gridArea?: string | number
   gridRow?: string | number
   gridColumn?: string | number
 }
