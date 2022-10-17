@@ -189,7 +189,7 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
                 ) : (
                   <Flex justifyContent={JUSTIFY_FLEX_END}>
                     {[vector.x, vector.y, vector.z].map((axis, index) => (
-                      <>
+                      <React.Fragment key={index}>
                         <StyledText
                           as="p"
                           marginLeft={SPACING.spacing3}
@@ -199,7 +199,7 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
                           {['X', 'Y', 'Z'][index]}
                         </StyledText>
                         <StyledText as="p">{axis.toFixed(1)}</StyledText>
-                      </>
+                      </React.Fragment>
                     ))}
                   </Flex>
                 )}

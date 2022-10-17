@@ -197,22 +197,23 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
           position,
         })
         createRunCommand({
+
           command: {
-            commandType: 'moveLabware' as const,
-            params: { labwareId: labwareId, newLocation: 'offDeck' },
+            commandType: 'moveToWell' as const,
+            params: {
+              pipetteId: pipetteId,
+              labwareId: FIXED_TRASH_ID,
+              wellName: 'A1',
+              wellLocation: { origin: 'top' as const },
+            },
           },
           waitUntilComplete: true,
         })
           .then(_moveResponse => {
             createRunCommand({
               command: {
-                commandType: 'moveToWell' as const,
-                params: {
-                  pipetteId: pipetteId,
-                  labwareId: FIXED_TRASH_ID,
-                  wellName: 'A1',
-                  wellLocation: { origin: 'top' as const },
-                },
+                commandType: 'moveLabware' as const,
+                params: { labwareId: labwareId, newLocation: 'offDeck' },
               },
               waitUntilComplete: true,
             })

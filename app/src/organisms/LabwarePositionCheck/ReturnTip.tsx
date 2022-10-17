@@ -67,22 +67,48 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
       },
       {
         onSuccess: () => {
-          createRunCommand(
-            {
-              command: {
-                commandType: 'dropTip' as const,
-                params: {
-                  pipetteId: pipetteId,
-                  labwareId: labwareId,
-                  wellName: 'A1',
-                  wellLocation: { offset: tipPickUpOffset ?? undefined },
-                },
+          createRunCommand({
+            command: {
+              commandType: 'moveToWell' as const,
+              params: {
+                pipetteId: pipetteId,
+                labwareId: labwareId,
+                wellName: 'A1',
+                wellLocation: { origin: 'top' as const, offset: tipPickUpOffset ?? undefined },
               },
-              waitUntilComplete: true,
             },
-            { onSuccess: proceed }
-          ).catch((e: Error) => {
-            console.error(`error dropping tip ${e.message}`)
+            waitUntilComplete: true,
+          }, {
+            onSuccess: () => {
+              createRunCommand(
+                {
+                  command: {
+                    commandType: 'dropTip' as const,
+                    params: {
+                      pipetteId: pipetteId,
+                      labwareId: labwareId,
+                      wellName: 'A1',
+                      wellLocation: { offset: tipPickUpOffset ?? undefined },
+                    },
+                  },
+                  waitUntilComplete: true,
+                },
+                {
+                  onSuccess: () => {
+                    createRunCommand(
+                      {
+                        command: {
+                          commandType: 'moveLabware' as const,
+                          params: { labwareId: labwareId, newLocation: 'offDeck' },
+                        },
+                        waitUntilComplete: true,
+                      }, { onSuccess: proceed })
+                  }
+                }
+              ).catch((e: Error) => {
+                console.error(`error dropping tip ${e.message}`)
+              })
+            }
           })
         },
       }
