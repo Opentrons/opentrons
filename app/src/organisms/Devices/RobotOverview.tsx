@@ -22,13 +22,14 @@ import {
 } from '@opentrons/components'
 
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
+import OT3_PNG from '../../assets/images/OT3.png'
 import { ToggleButton, PrimaryButton } from '../../atoms/buttons'
 import { Tooltip } from '../../atoms/Tooltip'
 import { StyledText } from '../../atoms/text'
 import { useDispatchApiRequest } from '../../redux/robot-api'
 import { fetchLights } from '../../redux/robot-controls'
 import { ChooseProtocolSlideout } from '../ChooseProtocolSlideout'
-import { CONNECTABLE } from '../../redux/discovery'
+import { CONNECTABLE, getRobotModelByName } from '../../redux/discovery'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
 import { RobotStatusBanner } from './RobotStatusBanner'
@@ -58,6 +59,9 @@ export function RobotOverview({
   )
 
   const robot = useRobot(robotName)
+  const robotModel = useSelector((state: State) =>
+    getRobotModelByName(state, robotName)
+  )
   const [
     showChooseProtocolSlideout,
     setShowChooseProtocolSlideout,
@@ -86,7 +90,7 @@ export function RobotOverview({
       width="100%"
     >
       <img
-        src={OT2_PNG}
+        src={robotModel === 'OT-2' ? OT2_PNG : OT3_PNG}
         style={{ paddingTop: SPACING.spacing3, width: '6rem' }}
         id="RobotOverview_robotImage"
       />
@@ -96,7 +100,11 @@ export function RobotOverview({
           <UpdateRobotBanner robot={robot} marginBottom={SPACING.spacing3} />
         ) : null}
         {robot?.status === CONNECTABLE ? (
-          <RobotStatusBanner name={robot.name} local={robot.local} />
+          <RobotStatusBanner
+            name={robot.name}
+            local={robot.local}
+            robotModel={robotModel}
+          />
         ) : null}
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Flex

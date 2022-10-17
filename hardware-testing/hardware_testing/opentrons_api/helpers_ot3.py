@@ -1,11 +1,10 @@
 """Opentrons helper methods."""
-import asyncio
 from dataclasses import dataclass, replace
+from datetime import datetime
 from subprocess import run
 from typing import List, Optional, Dict, Tuple
 
 from opentrons.config.robot_configs import build_config_ot3, load_ot3 as load_ot3_config
-from opentrons.config.defaults_ot3 import DEFAULT_MAX_SPEED_DISCONTINUITY
 from opentrons.hardware_control.instruments.pipette import Pipette
 from opentrons.hardware_control.ot3api import OT3API
 
@@ -23,18 +22,50 @@ def stop_on_device_display_ot3() -> None:
     run(["systemctl", "stop", "opentrons-robot-app"])
 
 
+def _create_fake_pipette_id(mount: OT3Mount, model: Optional[str]) -> Optional[str]:
+    if model is None:
+        return None
+    items = model.split("_")
+    assert len(items) == 3
+    size = "P1K" if items[0] == "p1000" else "P50"
+    channels = "S" if items[1] == "single" else "M"
+    version = items[2].upper().replace(".", "")
+    date = datetime.now().strftime("%y%m%d")
+    unique_number = 1 if mount == OT3Mount.LEFT else 2
+    return f"{size}{channels}{version}{date}A0{unique_number}"
+
+
+def _create_attached_instruments_dict(
+    pipette_left: Optional[str] = None, pipette_right: Optional[str] = None
+) -> Dict[OT3Mount, Dict[str, Optional[str]]]:
+    fake_id_left = _create_fake_pipette_id(OT3Mount.LEFT, pipette_left)
+    fake_id_right = _create_fake_pipette_id(OT3Mount.RIGHT, pipette_right)
+    sim_pip_left = {"model": pipette_left, "id": fake_id_left}
+    sim_pip_right = {"model": pipette_right, "id": fake_id_right}
+    return {OT3Mount.LEFT: sim_pip_left, OT3Mount.RIGHT: sim_pip_right}
+
+
 async def build_async_ot3_hardware_api(
-    is_simulating: Optional[bool] = False, use_defaults: Optional[bool] = False
+    is_simulating: Optional[bool] = False,
+    use_defaults: Optional[bool] = True,
+    pipette_left: Optional[str] = None,
+    pipette_right: Optional[str] = None,
 ) -> OT3API:
     """Built an OT3 Hardware API instance."""
-    """TODO: CF-Need a way to simulate pipettes attached """
     config = build_config_ot3({}) if use_defaults else load_ot3_config()
+    kwargs = {"config": config}
     if is_simulating:
         builder = OT3API.build_hardware_simulator
+        # TODO (andy s): add ability to simulate:
+        #                - gripper
+        #                - 96-channel
+        #                - modules
+        sim_pips = _create_attached_instruments_dict(pipette_left, pipette_right)
+        kwargs["attached_instruments"] = sim_pips  # type: ignore[assignment]
     else:
         builder = OT3API.build_hardware_controller
         stop_server_ot3()
-    return await builder(config=config)
+    return await builder(**kwargs)  # type: ignore[arg-type]
 
 
 def set_gantry_per_axis_setting_ot3(
@@ -161,34 +192,34 @@ async def set_gantry_load_per_axis_settings_ot3(
 
 async def home_ot3(api: OT3API, axes: Optional[List[OT3Axis]] = None) -> None:
     """Home OT3 gantry."""
-    _all_axes = [
-        OT3Axis.X,
-        OT3Axis.Y,
-        OT3Axis.Z_L,
-        OT3Axis.Z_R,
-        OT3Axis.Z_G,
-        OT3Axis.P_L,
-        OT3Axis.P_R,
-    ]
-    default_home_speed = 10
-    max_speeds_for_load = DEFAULT_MAX_SPEED_DISCONTINUITY[api.gantry_load]
+    default_home_speed = 10.0
+    default_home_speed_xy = 40.0
+
     homing_speeds: Dict[OT3Axis, float] = {
-        ax: max_speeds_for_load.get(OT3Axis.to_kind(ax), default_home_speed)
-        for ax in _all_axes
+        OT3Axis.X: default_home_speed_xy,
+        OT3Axis.Y: default_home_speed_xy,
+        OT3Axis.Z_L: default_home_speed,
+        OT3Axis.Z_R: default_home_speed,
+        OT3Axis.Z_G: default_home_speed,
+        OT3Axis.P_L: default_home_speed,
+        OT3Axis.P_R: default_home_speed,
     }
+
+    # save our current script's settings
     cached_discontinuities: Dict[OT3Axis, float] = {
         ax: api.config.motion_settings.max_speed_discontinuity[api.gantry_load].get(
-            OT3Axis.to_kind(ax), default_home_speed
+            OT3Axis.to_kind(ax), homing_speeds[ax]
         )
-        for ax in _all_axes
+        for ax in homing_speeds
     }
+    # overwrite current settings with API settings
     for ax, val in homing_speeds.items():
         set_gantry_load_per_axis_motion_settings_ot3(
             api, ax, max_speed_discontinuity=val
         )
-    await api.engage_axes(which=axes)  # type: ignore[arg-type]
-    await asyncio.sleep(0.5)
+    # actually home
     await api.home(axes=axes)
+    # revert back to our script's settings
     for ax, val in cached_discontinuities.items():
         set_gantry_load_per_axis_motion_settings_ot3(
             api, ax, max_speed_discontinuity=val

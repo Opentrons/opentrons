@@ -50,8 +50,13 @@ class CalibrationPoint(TypedDict):
     displayName: str
 
 
-class Feature(TypedDict):
-    footprint: str
+class INode(TypedDict):
+    name: str
+    type: str
+    value: str
+    attributes: Dict[str, str]
+    # this should be a recursive call to INode but we need to upgrade mypy
+    children: List[Dict[str, Any]]
 
 
 class FixedLabwareBySlot(TypedDict):
@@ -101,7 +106,7 @@ class DeckDefinitionV3(TypedDict):
     metadata: Metadata
     robot: Robot
     locations: LocationsV3
-    layers: Dict[str, List[Feature]]
+    layers: List[INode]
 
 
 DeckDefinition = DeckDefinitionV3
