@@ -153,6 +153,7 @@ class OT3API(
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
         self._current_position: OT3AxisMap[float] = {}
         self._encoder_current_position: OT3AxisMap[float] = {}
+        self._last_homed_position: OT3AxisMap[float] = {}
 
         self._last_moved_mount: Optional[OT3Mount] = None
         # The motion lock synchronizes calls to long-running physical tasks
@@ -180,6 +181,10 @@ class OT3API(
 
     def reset_robot_calibration(self) -> None:
         self._transforms = build_ot3_transforms(self._config)
+
+    @property
+    def last_homed_position(self) -> OT3AxisMap:
+        return self._last_homed_position
 
     @property
     def robot_calibration(self) -> OT3Transforms:
@@ -916,6 +921,7 @@ class OT3API(
                     self._transforms.carriage_offset,
                 )
                 self._current_position.update(position)
+                self._last_homed_position.update(position)
                 encoder_position = deck_from_machine(
                     encoder_machine_pos,
                     self._transforms.deck_calibration.attitude,
