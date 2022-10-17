@@ -1,32 +1,32 @@
-"""
-mitutoyo_digimatic_indicator.py
-
-This is a simple driver to communicate with Mitutoyo ABSOLUTE Digimatic Indicator ID-S.
-
-Author: Thassyo Pinto
-thassyo.pinto@opentrons.com
-Last Revision: 10-12-2022
-"""
-import sys
-import csv
+"""Mitutoyo ABSOLUTE Digimatic Indicator ID-S."""
 import time
 import numpy
-import serial
+import serial  # type: ignore[import]
+
 
 class Timer:
-    def __init__(self):
-        self.start_time = None
-        self.elapsed_time = None
+    """Timer class to track time."""
 
-    def start(self):
+    def __init__(self) -> None:
+        """Initialize class."""
+        self.start_time = 0.0
+        self.elapsed_time = 0.0
+
+    def start(self) -> None:
+        """Start timer."""
         self.start_time = time.perf_counter()
 
-    def elapsed(self):
+    def elapsed(self) -> float:
+        """Calculate elapsed time."""
         self.elapsed_time = time.perf_counter() - self.start_time
         return self.elapsed_time
 
+
 class Mitutoyo_Digimatic_Indicator:
-    def __init__(self, port='/dev/ttyUSB0', baudrate=9600):
+    """Driver class to use dial indicator."""
+
+    def __init__(self, port: str = "/dev/ttyUSB0", baudrate: int = 9600) -> None:
+        """Initialize class."""
         self.PORT = port
         self.BAUDRATE = baudrate
         self.TIMEOUT = 0.1
@@ -34,51 +34,57 @@ class Mitutoyo_Digimatic_Indicator:
         self.max_errors = 100
         self.unlimited_errors = False
         self.raise_exceptions = True
-        self.reading_raw = ''
+        self.reading_raw = ""
         self.GCODE = {
-            "READ":"r",
+            "READ": "r",
         }
         self.timer = Timer()
-        self.gauge = None
-        self.packet = None
+        self.gauge = serial.Serial()
+        self.packet = ""
 
-    def connect(self):
+    def connect(self) -> None:
+        """Connect communication ports."""
         try:
-            self.gauge = serial.Serial(port = self.PORT,
-                                        baudrate = self.BAUDRATE,
-                                        parity = serial.PARITY_NONE,
-                                        stopbits = serial.STOPBITS_ONE,
-                                        bytesize = serial.EIGHTBITS,
-                                        timeout = self.TIMEOUT)
+            self.gauge = serial.Serial(
+                port=self.PORT,
+                baudrate=self.BAUDRATE,
+                parity=serial.PARITY_NONE,
+                stopbits=serial.STOPBITS_ONE,
+                bytesize=serial.EIGHTBITS,
+                timeout=self.TIMEOUT,
+            )
         except serial.SerialException:
             error = "Unable to access Serial port"
             raise serial.SerialException(error)
 
-    def disconnect(self):
+    def disconnect(self) -> None:
+        """Disconnect communication ports."""
         self.gauge.close()
 
-    def send_packet(self, packet):
+    def _send_packet(self, packet: str) -> None:
         self.gauge.flush()
         self.gauge.flushInput()
         self.gauge.write(packet.encode("utf-8"))
 
-    def get_packet(self):
+    def _get_packet(self) -> str:
         self.gauge.flushOutput()
         packet = self.gauge.readline().decode("utf-8")
         return packet
 
-    def read(self):
+    def read(self) -> float:
+        """Reads dial indicator."""
         self.packet = self.GCODE["READ"]
-        self.send_packet(self.packet)
+        self._send_packet(self.packet)
         time.sleep(0.001)
         reading = True
         while reading:
-            data = self.get_packet()
+            data = self._get_packet()
             if data != "":
                 reading = False
         return float(data)
 
-    def read_stable(self,  timeout: float = 5):
+    def read_stable(self, timeout: float = 5) -> float:
+        """Reads dial indicator with stable reading."""
         then = time.time()
         values = [self.read(), self.read(), self.read(), self.read(), self.read()]
         while (time.time() - then) < timeout:
@@ -87,7 +93,8 @@ class Mitutoyo_Digimatic_Indicator:
             values = values[1:] + [self.read()]
         raise RuntimeError("Couldn't settle")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     print("Mitutoyo ABSOLUTE Digimatic Indicator")
     gauge = Mitutoyo_Digimatic_Indicator(port="/dev/ttyUSB0")
     gauge.connect()
