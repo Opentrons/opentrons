@@ -21,6 +21,7 @@ from ..labware import LabwareLoadParams
 from .labware import LabwareCore
 from .instrument import InstrumentCore
 from .module_core import ModuleCore
+from .exceptions import InvalidModuleLocationError
 
 
 # TODO(mc, 2022-08-24): many of these methods are likely unnecessary
@@ -119,7 +120,16 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         configuration: Optional[str],
     ) -> ModuleCore:
         """Load a module into the protocol."""
-        raise NotImplementedError("ProtocolEngine PAPI core not implemented")
+        if location is None:
+            if model == ModuleModel.ThermocyclerModuleModel:
+                location = "7"
+            else:
+                raise InvalidModuleLocationError(location, model)
+
+        result = self._engine_client.load_module(
+            model=model,
+            location=DeckSlotLocation(slotName=DeckSlotName.from_primitive(location)),
+        )
 
     def load_instrument(
         self, instrument_name: PipetteNameType, mount: Mount

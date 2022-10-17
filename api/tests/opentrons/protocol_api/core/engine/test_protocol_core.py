@@ -17,6 +17,8 @@ from opentrons.protocol_engine.types import DeckSlotLocation, ModuleLocation
 from opentrons.protocol_api.core.labware import LabwareLoadParams
 from opentrons.protocol_api.core.engine import ProtocolCore, InstrumentCore, LabwareCore, ModuleCore
 
+from opentrons.hardware_control.modules.types import TemperatureModuleModel
+
 
 @pytest.fixture
 def mock_engine_client(decoy: Decoy) -> EngineClient:
@@ -31,9 +33,9 @@ def subject(mock_engine_client: EngineClient) -> ProtocolCore:
 
 
 def test_load_instrument(
-    decoy: Decoy,
-    mock_engine_client: EngineClient,
-    subject: ProtocolCore,
+        decoy: Decoy,
+        mock_engine_client: EngineClient,
+        subject: ProtocolCore,
 ) -> None:
     """It should issue a LoadPipette command."""
     decoy.when(
@@ -51,9 +53,9 @@ def test_load_instrument(
 
 
 def test_load_labware(
-    decoy: Decoy,
-    mock_engine_client: EngineClient,
-    subject: ProtocolCore,
+        decoy: Decoy,
+        mock_engine_client: EngineClient,
+        subject: ProtocolCore,
 ) -> None:
     """It should issue a LoadLabware command."""
     decoy.when(
@@ -85,9 +87,9 @@ def test_load_labware(
 
 
 def test_load_labware_on_module(
-    decoy: Decoy,
-    mock_engine_client: EngineClient,
-    subject: ProtocolCore,
+        decoy: Decoy,
+        mock_engine_client: EngineClient,
+        subject: ProtocolCore,
 ) -> None:
     """It should issue a LoadLabware command."""
     decoy.when(
@@ -119,10 +121,10 @@ def test_load_labware_on_module(
 
 
 def test_add_labware_definition(
-    decoy: Decoy,
-    minimal_labware_def: LabwareDefDict,
-    mock_engine_client: EngineClient,
-    subject: ProtocolCore,
+        decoy: Decoy,
+        minimal_labware_def: LabwareDefDict,
+        mock_engine_client: EngineClient,
+        subject: ProtocolCore,
 ) -> None:
     """It should add a laware definition to the engine."""
     decoy.when(
@@ -134,3 +136,12 @@ def test_add_labware_definition(
     result = subject.add_labware_definition(minimal_labware_def)
 
     assert result == LabwareLoadParams("hello", "world", 123)
+
+
+def test_load_module(
+        decoy: Decoy,
+        mock_engine_client: EngineClient,
+        subject: ProtocolCore) -> None:
+    """It should issue a load module engine command."""
+    model = TemperatureModuleModel.TEMPERATURE_V2
+    subject.load_module(model=model, location=DeckSlotName.SLOT_1, configuration="")
