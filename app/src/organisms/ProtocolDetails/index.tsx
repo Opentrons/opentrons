@@ -18,6 +18,7 @@ import {
   COLORS,
   BORDERS,
   SIZE_1,
+  SIZE_5,
   DIRECTION_COLUMN,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
@@ -472,12 +473,13 @@ export function ProtocolDetails(
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
         <Flex
-          // flex="0 0 20rem"
+          flex={`0 0 ${SIZE_5}`}
           flexDirection={DIRECTION_COLUMN}
           backgroundColor={COLORS.white}
-          data-testid="ProtocolDetails_deckMap"
           border={`1px solid ${COLORS.medGreyEnabled}`}
           borderRadius={BORDERS.radiusSoftCorners}
+          height="100%"
+          data-testid="ProtocolDetails_deckMap"
         >
           <StyledText
             as="h3"
@@ -492,16 +494,16 @@ export function ProtocolDetails(
             {
               {
                 missing: (
-                  <Box size="13rem" backgroundColor={COLORS.medGreyEnabled} />
+                  <Box size="14rem" backgroundColor={COLORS.medGreyEnabled} />
                 ),
                 loading: (
-                  <Box size="13rem" backgroundColor={COLORS.medGreyEnabled} />
+                  <Box size="14rem" backgroundColor={COLORS.medGreyEnabled} />
                 ),
                 error: (
-                  <Box size="13rem" backgroundColor={COLORS.medGreyEnabled} />
+                  <Box size="14rem" backgroundColor={COLORS.medGreyEnabled} />
                 ),
                 complete: (
-                  <Box size="13rem">
+                  <Box size="14rem" height="auto">
                     <DeckThumbnail
                       commands={mostRecentAnalysis?.commands ?? []}
                       liquids={
