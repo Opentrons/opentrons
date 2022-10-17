@@ -1,5 +1,7 @@
 """SQLite table schemas."""
 import sqlalchemy
+
+from . import legacy_pickle
 from .utc_datetime import UTCDateTime
 
 _metadata = sqlalchemy.MetaData()
@@ -81,9 +83,17 @@ run_table = sqlalchemy.Table(
         nullable=True,
     ),
     # column added in schema v1
-    sqlalchemy.Column("state_summary", sqlalchemy.PickleType, nullable=True),
+    sqlalchemy.Column(
+        "state_summary",
+        sqlalchemy.PickleType(pickler=legacy_pickle),
+        nullable=True,
+    ),
     # column added in schema v1
-    sqlalchemy.Column("commands", sqlalchemy.PickleType, nullable=True),
+    sqlalchemy.Column(
+        "commands",
+        sqlalchemy.PickleType(pickler=legacy_pickle),
+        nullable=True,
+    ),
     # column added in schema v1
     sqlalchemy.Column("engine_status", sqlalchemy.String, nullable=True),
     # column added in schema v1
