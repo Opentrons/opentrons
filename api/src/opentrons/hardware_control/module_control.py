@@ -31,7 +31,8 @@ _MODULE_SYMLINK_NAME_SUBRE = (
 )
 
 # when connecting a module, regardless of what udev rules exist the kernel + udev conspire
-# to create a "tmpnode", a dev node with the guaranteed-unique name "NAME.tmp-cMAJ:MIN". this
+# to create a "tmpnode", a dev node with the guaranteed-unique name "NAME.tmp-cMAJ:MIN",
+# for instance /dev/ot_module_tempdeck0.tmp-c229:1 . this
 # device only exists until the rest of the nodes and symlinks are established, and cannot be
 # used after udev finishes processing. we'll pick it up from inotify, but by the time we try
 # to open it it'll be gone and we'll error - so we need to separately capture the temp node
