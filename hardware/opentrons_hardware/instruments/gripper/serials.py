@@ -8,7 +8,7 @@ from opentrons_hardware.instruments.serial_utils import ensure_serial_length
 SERIAL_RE = re.compile("^(?:GRPV)(?P<model>[0-9]{2,2})(?P<code>.{,12})$")
 
 SERIAL_FORMAT_MSG = (
-    "Serial numbers must have the format GRVMMXXXXXX... where"
+    "Serial numbers must have the format GRPVMMXXXXXX... where"
     "MM is a two-digit model number, and the rest is some serial code."
 )
 
