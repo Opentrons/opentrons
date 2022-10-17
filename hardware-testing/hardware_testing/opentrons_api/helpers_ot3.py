@@ -194,34 +194,34 @@ async def set_gantry_load_per_axis_settings_ot3(
 
 async def home_ot3(api: OT3API, axes: Optional[List[OT3Axis]] = None) -> None:
     """Home OT3 gantry."""
-    _all_axes = [
-        OT3Axis.X,
-        OT3Axis.Y,
-        OT3Axis.Z_L,
-        OT3Axis.Z_R,
-        OT3Axis.Z_G,
-        OT3Axis.P_L,
-        OT3Axis.P_R,
-    ]
     default_home_speed = 10
-    max_speeds_for_load = DEFAULT_MAX_SPEED_DISCONTINUITY[api.gantry_load]
-    homing_speeds: Dict[OT3Axis, float] = {
-        ax: max_speeds_for_load.get(OT3Axis.to_kind(ax), default_home_speed)
-        for ax in _all_axes
+    default_home_speed_xy = 40
+
+    homing_speeds = {
+        OT3Axis.X: default_home_speed_xy,
+        OT3Axis.Y: default_home_speed_xy,
+        OT3Axis.Z_L: default_home_speed,
+        OT3Axis.Z_R: default_home_speed,
+        OT3Axis.Z_G: default_home_speed,
+        OT3Axis.P_L: default_home_speed,
+        OT3Axis.P_R: default_home_speed
     }
+
+    # save our current script's settings
     cached_discontinuities: Dict[OT3Axis, float] = {
         ax: api.config.motion_settings.max_speed_discontinuity[api.gantry_load].get(
-            OT3Axis.to_kind(ax), default_home_speed
+            OT3Axis.to_kind(ax), homing_speeds[ax]
         )
-        for ax in _all_axes
+        for ax in homing_speeds
     }
+    # overwrite current settings with API settings
     for ax, val in homing_speeds.items():
         set_gantry_load_per_axis_motion_settings_ot3(
             api, ax, max_speed_discontinuity=val
         )
-    await api.engage_axes(which=axes)  # type: ignore[arg-type]
-    await asyncio.sleep(0.5)
+    # actually home
     await api.home(axes=axes)
+    # revert back to our script's settings
     for ax, val in cached_discontinuities.items():
         set_gantry_load_per_axis_motion_settings_ot3(
             api, ax, max_speed_discontinuity=val
