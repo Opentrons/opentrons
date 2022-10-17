@@ -1,8 +1,8 @@
 {
   "otId": "ot3_standard",
   "schemaVersion": 3,
-  "cornerOffsetFromOrigin": [-115.65, -68.03, 0],
-  "dimensions": [580, 430, 0],
+  "cornerOffsetFromOrigin": [ -194.69, -75.59, 0],
+  "dimensions": [854.995, 581.740, 0],
   "metadata": {
     "displayName": "OT-3 Standard Deck",
     "tags": ["ot3", "12 slots", "standard"]
@@ -175,7 +175,7 @@
       },
       {
         "id": "11",
-        "position": [145.0, 321.0, 0.0],
+        "position": [164.0, 321.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
