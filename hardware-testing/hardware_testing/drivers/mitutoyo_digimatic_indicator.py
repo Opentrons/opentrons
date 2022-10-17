@@ -4,24 +4,6 @@ import numpy
 import serial  # type: ignore[import]
 
 
-class Timer:
-    """Timer class to track time."""
-
-    def __init__(self) -> None:
-        """Initialize class."""
-        self.start_time = 0.0
-        self.elapsed_time = 0.0
-
-    def start(self) -> None:
-        """Start timer."""
-        self.start_time = time.perf_counter()
-
-    def elapsed(self) -> float:
-        """Calculate elapsed time."""
-        self.elapsed_time = time.perf_counter() - self.start_time
-        return self.elapsed_time
-
-
 class Mitutoyo_Digimatic_Indicator:
     """Driver class to use dial indicator."""
 
@@ -38,7 +20,6 @@ class Mitutoyo_Digimatic_Indicator:
         self.GCODE = {
             "READ": "r",
         }
-        self.timer = Timer()
         self.gauge = serial.Serial()
         self.packet = ""
 
@@ -98,8 +79,8 @@ if __name__ == "__main__":
     print("Mitutoyo ABSOLUTE Digimatic Indicator")
     gauge = Mitutoyo_Digimatic_Indicator(port="/dev/ttyUSB0")
     gauge.connect()
-    gauge.timer.start()
+    start_time = time.time()
     while True:
-        elapsed_time = round(gauge.timer.elapsed(), 3)
+        elapsed_time = round(time.time() - start_time, 3)
         distance = gauge.read()
         print("Time: {} Distance: {}".format(elapsed_time, distance))
