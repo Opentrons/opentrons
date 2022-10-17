@@ -29,6 +29,7 @@ import {
 import { StyledText } from '../../../../atoms/text'
 import { SecureLabwareModal } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/SecureLabwareModal'
 import { useProtocolDetailsForRun } from '../../../Devices/hooks'
+import { getAllLabwareAndTiprackIdsInOrder } from './utils'
 import type {
   LoadLabwareRunTimeCommand,
   LoadModuleRunTimeCommand,
@@ -57,7 +58,6 @@ const StyledTableCell = styled.td`
   padding: ${SPACING.spacing3};
   text-overflow: ${WRAP};
 `
-
 interface SetupLabwareListProps {
   runId: string
   extraAttentionModules: ModuleTypesThatRequiresExtraAttention[]
@@ -69,10 +69,18 @@ export function SetupLabwareList(
   const protocolData = useProtocolDetailsForRun(runId).protocolData
   const { t } = useTranslation('protocol_setup')
   if (protocolData == null) return null
+  const labwareIdsInOrder = getAllLabwareAndTiprackIdsInOrder(
+    protocolData.labware,
+    protocolData.labwareDefinitions,
+    protocolData.commands
+  )
   const labwareCommands = protocolData.commands.filter(
     command =>
       command.commandType === 'loadLabware' &&
       command.result.definition.metadata.displayCategory !== 'trash'
+  )
+  const labwareCommandsInOrder = labwareIdsInOrder.map(id =>
+    labwareCommands.find(command => command.result.labwareId === id)
   )
   return (
     <Flex padding={SPACING.spacing4}>
@@ -87,16 +95,18 @@ export function SetupLabwareList(
             </StyledTableHeader>
           </tr>
         </thead>
-        {labwareCommands.map((command, index) => (
-          <LabwareListItem
-            key={`${command.id}_${index}`}
-            extraAttentionModules={extraAttentionModules}
-            id={index}
-            runId={runId}
-            params={command.params as LoadLabwareRunTimeCommand['params']}
-            definition={command.result.definition}
-          />
-        ))}
+        {labwareCommandsInOrder.map((command, index) =>
+          command != null ? (
+            <LabwareListItem
+              key={`${command.id}_${index}`}
+              extraAttentionModules={extraAttentionModules}
+              id={index}
+              runId={runId}
+              params={command.params as LoadLabwareRunTimeCommand['params']}
+              definition={command.result.definition}
+            />
+          ) : null
+        )}
       </StyledTable>
     </Flex>
   )
