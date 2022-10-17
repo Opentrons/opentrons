@@ -1,5 +1,9 @@
 from serial import Serial
 import time
+from abc import ABC, abstractmethod
+from typing import Tuple, Optional
+
+from random import uniform
 
 class Timer:
     def __init__(self):
@@ -20,6 +24,48 @@ class Timer:
             raise TimerError(f"Timer is not running. Use .start() to start it")
         stop_time = time.perf_counter()
 
+class Mark10Base(ABC):
+    """Base Class if Mark10 Force Gauge Driver."""
+
+    @classmethod
+    def vid_pid(cls) -> Tuple[int, int]:
+        """Mark10 Force Gauge VID:PID"""
+        # Check what's the VID and PID for this device
+        return 0x0483, 0xA1AD
+
+    @abstractmethod
+    def connect(self) -> None:
+        """Connect to the Mark10 Force Gauge"""
+        ...
+
+    @abstractmethod
+    def disconnect(self) -> None:
+        """Disconnect from the Mark10 Force Gauge"""
+        ...
+
+    @abstractmethod
+    def read_force(self) -> float:
+        """Read Force in Newtons"""
+        ...
+
+
+class SimMark10(Mark10Base):
+    """Simulating Mark 10 Driver"""
+
+    def connect(self) -> None:
+        """Connect."""
+        return
+
+    def disconnect(self) -> None:
+        """Disconnect"""
+        return
+
+    def read_force(self) -> float:
+        """Read Force."""
+        return uniform(2.5, 2)
+
+
+
 class Mark10():
     def __init__(self, connection: Serial) -> None:
         """Constructor."""
@@ -30,7 +76,7 @@ class Mark10():
     @classmethod
     def create(
         cls, port: str, baudrate: int = 115200, timeout: float = 1
-    ) -> "RadwagScale":
+    ) -> "Mark10":
         """Create a Radwag scale driver."""
         conn = Serial()
         conn.port = port
@@ -46,7 +92,7 @@ class Mark10():
         """Disconnect"""
         self._force_guage.close()
 
-    def get_reading(self) -> tuple:
+    def read_force(self) -> float:
         self._force_guage.flushInput()
         self._force_guage.flushOutput()
         self._force_guage.write('?\r\n'.encode("utf-8"))
@@ -62,4 +108,4 @@ class Mark10():
             print(f"Gauge units are not correct, expected 'N' currently is {units}. \
                         Please change units to N")
         force_val = str(force_val,'utf-8')
-        return (force_val, units)
+        return float(force_val)
