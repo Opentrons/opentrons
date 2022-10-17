@@ -13,6 +13,9 @@ import {
   RobotWorkSpace,
   LabwareRender,
   Btn,
+  BORDERS,
+  WRAP,
+  POSITION_FIXED,
 } from '@opentrons/components'
 import {
   getLabwareDisplayName,
@@ -34,7 +37,7 @@ import type { ModuleTypesThatRequiresExtraAttention } from '../../../ProtocolSet
 
 const LABWARE_CARD_STYLE = css`
   box-shadow: 0 0 0 1px ${COLORS.medGreyEnabled};
-  border-radius: 4px;
+  border-radius: ${BORDERS.radiusSoftCorners};
   &:hover {
     cursor: pointer;
     box-shadow: 0 0 0 1px ${COLORS.medGreyHover};
@@ -42,8 +45,8 @@ const LABWARE_CARD_STYLE = css`
 `
 const StyledTable = styled.table`
   width: 100%;
-  text-align: left;
-  table-layout: fixed;
+  text-align: ${TYPOGRAPHY.textAlignLeft};
+  table-layout: ${POSITION_FIXED};
 `
 const StyledTableHeader = styled.th`
   ${TYPOGRAPHY.labelSemiBold}
@@ -52,7 +55,7 @@ const StyledTableHeader = styled.th`
 const StyledTableRow = styled.tr``
 const StyledTableCell = styled.td`
   padding: ${SPACING.spacing3};
-  text-overflow: wrap;
+  text-overflow: ${WRAP};
 `
 
 interface SetupLabwareListProps {
@@ -86,7 +89,7 @@ export function SetupLabwareList(
         </thead>
         {labwareCommands.map((command, index) => (
           <LabwareListItem
-            key={index}
+            key={`${command.id}_${index}`}
             extraAttentionModules={extraAttentionModules}
             id={index}
             runId={runId}
@@ -139,7 +142,7 @@ export function LabwareListItem(
     const moduleType = getModuleType(moduleModel)
 
     const moduleTypeNeedsAttention = extraAttentionModules.find(
-      mod => mod === moduleType
+      extraAttentionModType => extraAttentionModType === moduleType
     )
     if (moduleName?.includes('Thermocycler')) {
       moduleSlotName = '7+10'
@@ -172,6 +175,7 @@ export function LabwareListItem(
           </Btn>
         )
         break
+      //  TODO(jr, 10/17/22): add case for Heater-Shaker Module
     }
   }
   return (
@@ -198,6 +202,7 @@ export function LabwareListItem(
                   {labwareDisplayName}
                 </StyledText>
                 <StyledText as="p" color={COLORS.darkGreyEnabled}>
+                  {/* params.displayName is the nickName, different from labareDisplayName */}
                   {params.displayName !== null &&
                   params.displayName !== labwareDisplayName
                     ? params.displayName
