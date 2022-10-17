@@ -193,7 +193,7 @@ export function LabwareListItem(
       <tbody css={LABWARE_CARD_STYLE}>
         <StyledTableRow key={id}>
           <StyledTableCell>
-            <Flex flex-Direction={DIRECTION_ROW}>
+            <Flex flexDirection={DIRECTION_ROW}>
               <Flex width="4.1rem">
                 <RobotWorkSpace
                   data-testid={`${id}_${runId}`}
@@ -229,9 +229,16 @@ export function LabwareListItem(
           </StyledTableCell>
         </StyledTableRow>
       </tbody>
-      {/* TODO(jr, 10/14/22): find a way to add a border to a table row (tr). Right now, we are faking it with
-      a box-shadow and this Flex */}
-      <Flex height={SPACING.spacing2} />
+      <tbody>
+        {/* TODO(jr, 10/17/22): find a way to add a border to a table row (tr). Right now,
+        we are faking it with a box-shadow and this StyledTableRow  */}
+        <StyledTableRow
+          key={`StyledTableRow_${id}`}
+          css={css`
+            height: ${SPACING.spacing2};
+          `}
+        />
+      </tbody>
       {secureLabwareModalType != null && (
         <SecureLabwareModal
           type={secureLabwareModalType as ModuleTypesThatRequiresExtraAttention}
