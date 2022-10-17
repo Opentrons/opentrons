@@ -277,7 +277,7 @@ async def _main() -> None:
                                     speed = pick_up_speed
                             )
             await hw_api.add_tip(MOUNT, 58.5)
-            await asyncio.sleep(1)
+            await asyncio.sleep(2)
             encoder_end = await get_encoder_position(hw_api, MOUNT)
             encoder_end = encoder_end[Axis.Z]
             stop_threads = True
