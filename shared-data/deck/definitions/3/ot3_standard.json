@@ -30,7 +30,7 @@
       },
       {
         "id": "2",
-        "position": [145.0, 0.0, 0.0],
+        "position": [164.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -46,7 +46,7 @@
       },
       {
         "id": "3",
-        "position": [290.0, 0.0, 0.0],
+        "position": [328.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -78,7 +78,7 @@
       },
       {
         "id": "5",
-        "position": [145.0, 107, 0.0],
+        "position": [164.0, 107, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -94,7 +94,7 @@
       },
       {
         "id": "6",
-        "position": [290.0, 107, 0.0],
+        "position": [328.0, 107, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -127,7 +127,7 @@
       },
       {
         "id": "8",
-        "position": [145.0, 214.0, 0.0],
+        "position": [164.0, 214.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -143,7 +143,7 @@
       },
       {
         "id": "9",
-        "position": [290.0, 214.0, 0.0],
+        "position": [328.0, 214.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -191,7 +191,7 @@
       },
       {
         "id": "12",
-        "position": [290.0, 321.0, 0.0],
+        "position": [328.0, 321.0, 0.0],
         "boundingBox": {
           "xDimension": 128.0,
           "yDimension": 86.0,
