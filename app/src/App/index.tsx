@@ -107,7 +107,7 @@ export const AppComponent = (): JSX.Element => {
       Component: ODDSplash,
       exact: true,
       name: 'ODD Splash',
-      path: '/device',
+      path: '/start',
     },
   ]
 
@@ -129,7 +129,7 @@ export const AppComponent = (): JSX.Element => {
         onDrop={stopEvent}
       >
         <TopPortalRoot />
-        <Navbar routes={routes} />
+        {!isOnDevice && (<Navbar routes={routes} />)}
         <Box width="100%">
           <Switch>
             {routes.map(({ Component, exact, path }: RouteProps) => {
