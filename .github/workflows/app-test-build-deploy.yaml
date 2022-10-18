@@ -154,13 +154,12 @@ jobs:
           HOST_PYTHON: python
         # TODO kj 10/17/2022 this run will be used make -C when all issues are solved.
         run: |
-          make -C app-shell dist-${{ matrix.os }}
-          # if [ '${{ matrix.os}}' == 'ubuntu-22.04']
-          # then
-          #   make -C app-shell dist-${{ matrix.os }}
-          # else
-          #   CPPFLAGS="-std=c++17" make -C app-shell dist-${{ matrix.os }}
-          # fi
+          if [ '${{ matrix.os}}' == 'ubuntu-22.04']
+          then
+            make -C app-shell dist-${{ matrix.os }}
+          else
+            CPPFLAGS="-std=c++17" make -C app-shell dist-${{ matrix.os }}
+          fi
 
       - if: github.event_name != 'pull_request'
         name: 'upload github artifact'
