@@ -7,7 +7,7 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from opentrons.types import Mount, MountType, Location, DeckSlotName
 from opentrons.hardware_control import SyncHardwareAPI
-from opentrons.hardware_control.modules.types import ModuleModel
+from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.protocols.geometry.deck import Deck
@@ -20,7 +20,7 @@ from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 from .labware import LabwareCore
 from .instrument import InstrumentCore
-from .module_core import ModuleCore
+from .module_core import ModuleCore, TemperatureModuleCore
 from .exceptions import InvalidModuleLocationError
 
 
@@ -93,21 +93,16 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         """Load a labware using its identifying parameters."""
         if isinstance(location, ModuleCore):
             moduleLocation = ModuleLocation(moduleId=location.module_id)
-            load_result = self._engine_client.load_labware(
-                load_name=load_name,
-                location=moduleLocation,
-                namespace=namespace if namespace is not None else OPENTRONS_NAMESPACE,
-                version=version or 1,
-                display_name=label,
-            )
         else:
-            load_result = self._engine_client.load_labware(
-                load_name=load_name,
-                location=DeckSlotLocation(slotName=location),
-                namespace=namespace if namespace is not None else OPENTRONS_NAMESPACE,
-                version=version or 1,
-                display_name=label,
-            )
+            moduleLocation = DeckSlotLocation(slotName=location)
+
+        load_result = self._engine_client.load_labware(
+            load_name=load_name,
+            location=moduleLocation,
+            namespace=namespace if namespace is not None else OPENTRONS_NAMESPACE,
+            version=version or 1,
+            display_name=label,
+        )
         return LabwareCore(
             labware_id=load_result.labwareId,
             engine_client=self._engine_client,
@@ -130,6 +125,20 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             model=model,
             location=DeckSlotLocation(slotName=DeckSlotName.from_primitive(location)),
         )
+
+        # if result.definition.moduleType == ModuleType.MAGNETIC:
+        #     return MagneticModuleCore(
+        #         engine_client=self._engine_client, module_id=result.moduleId
+        #     )
+        # el
+        if result.definition.moduleType == ModuleType.TEMPERATURE:
+            return TemperatureModuleCore(module_id=result.moduleId)
+        # elif result.definition.moduleType == ModuleType.THERMOCYCLER:
+        #     return ThermocyclerModuleCore(
+        #         engine_client=self._engine_client, module_id=result.moduleId
+        #     )
+        else:
+            assert False, "Unsupported module definition"
 
     def load_instrument(
         self, instrument_name: PipetteNameType, mount: Mount

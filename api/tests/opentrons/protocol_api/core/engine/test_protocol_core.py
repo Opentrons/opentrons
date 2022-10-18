@@ -8,16 +8,24 @@ from opentrons_shared_data.labware.dev_types import (
     LabwareUri,
 )
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data import load_shared_data
 
 from opentrons.types import Mount, MountType, DeckSlotName
 from opentrons.protocol_engine import commands
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons.protocol_engine.types import DeckSlotLocation, ModuleLocation
+from opentrons.protocol_engine.types import DeckSlotLocation, ModuleLocation, ModuleDefinition
 
 from opentrons.protocol_api.core.labware import LabwareLoadParams
 from opentrons.protocol_api.core.engine import ProtocolCore, InstrumentCore, LabwareCore, ModuleCore
 
 from opentrons.hardware_control.modules.types import TemperatureModuleModel
+
+
+@pytest.fixture(scope="session")
+def tempdeck_v2_def() -> ModuleDefinition:
+    """Get the definition of a V2 tempdeck."""
+    definition = load_shared_data("module/definitions/3/temperatureModuleV2.json")
+    return ModuleDefinition.parse_raw(definition)
 
 
 @pytest.fixture
@@ -141,7 +149,19 @@ def test_add_labware_definition(
 def test_load_module(
         decoy: Decoy,
         mock_engine_client: EngineClient,
-        subject: ProtocolCore) -> None:
+        subject: ProtocolCore,
+        tempdeck_v2_def: ModuleDefinition
+) -> None:
     """It should issue a load module engine command."""
     model = TemperatureModuleModel.TEMPERATURE_V2
-    subject.load_module(model=model, location=DeckSlotName.SLOT_1, configuration="")
+
+    decoy.when(mock_engine_client.load_module(model=model, location=DeckSlotLocation(DeckSlotName.SLOT_1))).then_return(
+        commands.LoadModuleResult(
+            moduleId="abc123",
+            definition=tempdeck_v2_def,
+            model=tempdeck_v2_def.model,
+            serialNumber="xyz789",
+        ))
+
+    result = subject.load_module(model=model, location=DeckSlotName.SLOT_1, configuration="")
+
