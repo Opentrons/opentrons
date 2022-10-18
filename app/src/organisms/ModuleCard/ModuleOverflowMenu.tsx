@@ -7,8 +7,6 @@ import { useRunStatuses, useIsLegacySessionInProgress } from '../Devices/hooks'
 import { useModuleOverflowMenu } from './hooks'
 
 import type { AttachedModule } from '../../redux/modules/types'
-import type { ModuleType } from '@opentrons/shared-data'
-import type { MenuItemsByModuleType } from './hooks'
 
 interface ModuleOverflowMenuProps {
   module: AttachedModule
@@ -56,9 +54,7 @@ export const ModuleOverflowMenu = (
     <Flex position={POSITION_RELATIVE}>
       <MenuList
         buttons={[
-          (menuOverflowItemsByModuleType[
-            module.moduleType
-          ] as MenuItemsByModuleType[ModuleType]).map(
+          menuOverflowItemsByModuleType[module.moduleType].map(
             (item: any, index: number) => {
               return (
                 <React.Fragment key={`${index}_${module.moduleType}`}>
@@ -66,7 +62,8 @@ export const ModuleOverflowMenu = (
                     key={`${index}_${module.moduleModel}`}
                     onClick={() => item.onClick(item.isSecondary)}
                     data-testid={`module_setting_${module.moduleModel}`}
-                    disabled={isDisabled}
+                    disabled={item.disabledReason || isDisabled}
+                    whiteSpace="nowrap"
                   >
                     {item.setSetting}
                   </MenuItem>

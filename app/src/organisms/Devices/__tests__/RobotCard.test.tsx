@@ -31,6 +31,7 @@ import {
   useAttachedPipettes,
   useProtocolDetailsForRun,
 } from '../hooks'
+import { useFeatureFlag } from '../../../redux/config'
 import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../../organisms/RunTimeControl/hooks'
 import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
@@ -48,8 +49,10 @@ jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../hooks')
 jest.mock('../../UpdateRobotBanner')
 jest.mock('../../ChooseProtocolSlideout')
+jest.mock('../../../redux/config')
 
 const OT2_PNG_FILE_NAME = 'OT2-R_HERO.png'
+const OT3_PNG_FILE_NAME = 'OT3.png'
 const MOCK_STATE: State = {
   discovery: {
     robot: { connection: { connectedTo: null } },
@@ -119,6 +122,9 @@ const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.
 const mockGetRobotModelByName = getRobotModelByName as jest.MockedFunction<
   typeof getRobotModelByName
 >
+const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
+  typeof useFeatureFlag
+>
 
 const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnalysisFile<{}>
 const PROTOCOL_DETAILS = {
@@ -144,6 +150,7 @@ describe('RobotCard', () => {
 
   beforeEach(() => {
     props = { robot: mockConnectableRobot }
+    mockUseFeatureFlag.mockReturnValue(false)
     mockUseAttachedModules.mockReturnValue(
       mockFetchModulesSuccessActionPayloadModules
     )
@@ -180,11 +187,22 @@ describe('RobotCard', () => {
     resetAllWhenMocks()
   })
 
-  it('renders an OT image', () => {
+  it('renders an OT-2 image when robot model is OT-2', () => {
     const [{ getByRole }] = render(props)
     const image = getByRole('img')
 
     expect(image.getAttribute('src')).toEqual(OT2_PNG_FILE_NAME)
+  })
+
+  it('renders an OT-3 image when robot model is OT-3', () => {
+    props = { robot: { ...mockConnectableRobot, name: 'buzz' } }
+    when(mockGetRobotModelByName)
+      .calledWith(MOCK_STATE, 'buzz')
+      .mockReturnValue('OT-3')
+    const [{ getByRole }] = render(props)
+    const image = getByRole('img')
+
+    expect(image.getAttribute('src')).toEqual(OT3_PNG_FILE_NAME)
   })
 
   it('renders a UpdateRobotBanner component', () => {

@@ -81,7 +81,9 @@ class OT3Mount(enum.Enum):
     GRIPPER = enum.auto()
 
     @classmethod
-    def from_mount(cls, mount: Union[top_types.Mount, "OT3Mount"]) -> "OT3Mount":
+    def from_mount(
+        cls, mount: Union[top_types.Mount, top_types.MountType, "OT3Mount"]
+    ) -> "OT3Mount":
         return cls[mount.name]
 
     def to_mount(self) -> top_types.Mount:

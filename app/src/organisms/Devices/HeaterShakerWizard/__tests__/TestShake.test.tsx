@@ -347,8 +347,9 @@ describe('TestShake', () => {
     }
 
     const { getByRole } = render(props)
-    const button = getByRole('button', { name: /Stop Shaking/i })
     const input = getByRole('spinbutton')
+    expect(input).toBeDisabled()
+    const button = getByRole('button', { name: /Stop Shaking/i })
     fireEvent.change(input, { target: { value: '200' } })
     fireEvent.click(button)
 

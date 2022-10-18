@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import { css } from 'styled-components'
 
@@ -78,10 +78,12 @@ export function AdvancedSettings(): JSX.Element {
   const isLabwareOffsetCodeSnippetsOn = useSelector(
     Config.getIsLabwareOffsetCodeSnippetsOn
   )
+  const sendAllProtocolsToOT3 = useSelector(Config.getSendAllProtocolsToOT3)
   const isHeaterShakerAttachmentModalVisible = useSelector(
     Config.getIsHeaterShakerAttached
   )
   const pathToPythonInterpreter = useSelector(Config.getPathToPythonOverride)
+  const enableExtendedHardware = Config.useFeatureFlag('enableExtendedHardware')
 
   const dispatch = useDispatch<Dispatch>()
   const [showSuccessToast, setShowSuccessToast] = React.useState(false)
@@ -133,21 +135,32 @@ export function AdvancedSettings(): JSX.Element {
     return status === OUTDATED
   })
 
-  const toggleLabwareOffsetData = (): unknown =>
+  const toggleLabwareOffsetData = (): void => {
     dispatch(
       Config.updateConfigValue(
         'labware.showLabwareOffsetCodeSnippets',
         Boolean(!isLabwareOffsetCodeSnippetsOn)
       )
     )
+  }
 
-  const toggleHeaterShakerModalVisibilty = (): unknown =>
+  const toggleSendAllProtocolsToOT3 = (): void => {
+    dispatch(
+      Config.updateConfigValue(
+        'protocols.sendAllProtocolsToOT3',
+        Boolean(!sendAllProtocolsToOT3)
+      )
+    )
+  }
+
+  const toggleHeaterShakerModalVisibilty = (): void => {
     dispatch(
       Config.updateConfigValue(
         'modules.heaterShaker.isAttached',
         Boolean(!isHeaterShakerAttachmentModalVisible)
       )
     )
+  }
 
   const handleClickPythonDirectoryChange: React.MouseEventHandler<HTMLButtonElement> = _event => {
     dispatch(ProtocolAnalysis.changePythonPathOverrideConfig())
@@ -186,7 +199,7 @@ export function AdvancedSettings(): JSX.Element {
         <Flex
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
-          gridGap={SPACING.spacing4}
+          gridGap={SPACING.spacingXXL}
         >
           {showSuccessToast && (
             <Toast
@@ -238,7 +251,7 @@ export function AdvancedSettings(): JSX.Element {
               </Modal>
             </Portal>
           ) : null}
-          <Box width="70%">
+          <Flex flexDirection={DIRECTION_COLUMN}>
             <StyledText
               css={TYPOGRAPHY.h3SemiBold}
               paddingBottom={SPACING.spacing3}
@@ -249,21 +262,30 @@ export function AdvancedSettings(): JSX.Element {
             <StyledText as="p" paddingBottom={SPACING.spacing3}>
               {t('update_description')}
             </StyledText>
-          </Box>
-          <SelectField
-            name={'__UpdateChannel__'}
-            options={channelOptions}
-            onValueChange={handleChannel}
-            value={channel}
-            placeholder={channel}
-            formatOptionLabel={formatOptionLabel}
-            isSearchable={false}
-            width="10rem"
-          />
+          </Flex>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+            <StyledText css={TYPOGRAPHY.labelSemiBold}>
+              {t('channel')}
+            </StyledText>
+            <SelectField
+              name={'__UpdateChannel__'}
+              options={channelOptions}
+              onValueChange={handleChannel}
+              value={channel}
+              placeholder={channel}
+              formatOptionLabel={formatOptionLabel}
+              isSearchable={false}
+              width="10rem"
+            />
+          </Flex>
         </Flex>
         <Divider marginY={SPACING.spacing5} />
-        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Box width="70%">
+        <Flex
+          alignItems={ALIGN_CENTER}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          gridGap={SPACING.spacingXXL}
+        >
+          <Flex flexDirection={DIRECTION_COLUMN}>
             <StyledText
               css={TYPOGRAPHY.h3SemiBold}
               paddingBottom={SPACING.spacing3}
@@ -302,7 +324,7 @@ export function AdvancedSettings(): JSX.Element {
             ) : (
               <StyledText as="p">{t('no_folder')}</StyledText>
             )}
-          </Box>
+          </Flex>
           {
             <TertiaryButton
               marginLeft={SPACING_AUTO}
@@ -367,13 +389,21 @@ export function AdvancedSettings(): JSX.Element {
               paddingBottom={SPACING.spacing3}
               id="AdvancedSettings_unavailableRobots"
             >
-              {t('disable_robot_caching')}
-            </StyledText>
-            <StyledText as="p" marginBottom={SPACING.spacing4}>
-              {t('note_this_will_clear_caching')}
+              {t('prevent_robot_caching')}
             </StyledText>
             <StyledText as="p">
-              {t('disable_robot_caching_descriptions')}
+              <Trans
+                t={t}
+                i18nKey="prevent_robot_caching_description"
+                components={{
+                  strong: (
+                    <StyledText
+                      as="span"
+                      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                    />
+                  ),
+                }}
+              />
             </StyledText>
           </Box>
           <ToggleButton
@@ -384,6 +414,30 @@ export function AdvancedSettings(): JSX.Element {
             }
             id="AdvancedSettings_unavailableRobotsToggleButton"
           />
+        </Flex>
+        <Divider marginY={SPACING.spacing5} />
+        <Flex
+          alignItems={ALIGN_CENTER}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          gridGap={SPACING.spacingXXL}
+        >
+          <Box>
+            <StyledText
+              css={TYPOGRAPHY.h3SemiBold}
+              paddingBottom={SPACING.spacing3}
+              id="AdvancedSettings_clearRobots"
+            >
+              {t('clear_unavail_robots')}
+            </StyledText>
+            <StyledText as="p">{t('clear_robots_description')}</StyledText>
+          </Box>
+          <TertiaryButton
+            marginLeft={SPACING_AUTO}
+            onClick={confirmDeleteUnavailRobots}
+            id="AdvancedSettings_clearUnavailableRobots"
+          >
+            {t('clear_robots_button')}
+          </TertiaryButton>
         </Flex>
         <Divider marginY={SPACING.spacing5} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -467,27 +521,6 @@ export function AdvancedSettings(): JSX.Element {
             <StyledText
               css={TYPOGRAPHY.h3SemiBold}
               paddingBottom={SPACING.spacing3}
-              id="AdvancedSettings_showLink"
-            >
-              {t('show_link_labware_data')}
-            </StyledText>
-            <StyledText as="p">
-              {t('show_link_labware_data_description')}
-            </StyledText>
-          </Box>
-          <ToggleButton
-            label="show_link_to_get_labware_offset_data"
-            toggledOn={isLabwareOffsetCodeSnippetsOn}
-            onClick={toggleLabwareOffsetData}
-            id="AdvancedSettings_showLinkToggleButton"
-          />
-        </Flex>
-        <Divider marginY={SPACING.spacing5} />
-        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Box width="70%">
-            <StyledText
-              css={TYPOGRAPHY.h3SemiBold}
-              paddingBottom={SPACING.spacing3}
               id="AdvancedSettings_showHeaterShakerAttachmentModal"
             >
               {t('heater_shaker_attach_visible')}
@@ -509,22 +542,50 @@ export function AdvancedSettings(): JSX.Element {
             <StyledText
               css={TYPOGRAPHY.h3SemiBold}
               paddingBottom={SPACING.spacing3}
-              id="AdvancedSettings_clearRobots"
+              id="AdvancedSettings_showLink"
             >
-              {t('clear_unavail_robots')}
+              {t('show_link_labware_data')}
             </StyledText>
-            <StyledText as="p">{t('clear_robots_description')}</StyledText>
+            <StyledText as="p">
+              {t('show_link_labware_data_description')}
+            </StyledText>
           </Box>
-          <TertiaryButton
-            marginLeft={SPACING_AUTO}
-            onClick={confirmDeleteUnavailRobots}
-            id="AdvancedSettings_clearUnavailableRobots"
-          >
-            {t('clear_robots_button')}
-          </TertiaryButton>
+          <ToggleButton
+            label="show_link_to_get_labware_offset_data"
+            toggledOn={isLabwareOffsetCodeSnippetsOn}
+            onClick={toggleLabwareOffsetData}
+            id="AdvancedSettings_showLinkToggleButton"
+          />
         </Flex>
         <Divider marginY={SPACING.spacing5} />
-
+        {enableExtendedHardware ? (
+          <>
+            <Flex
+              alignItems={ALIGN_CENTER}
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
+            >
+              <Box width="70%">
+                <StyledText
+                  css={TYPOGRAPHY.h3SemiBold}
+                  paddingBottom={SPACING.spacing3}
+                  id="AdvancedSettings_showLink"
+                >
+                  {t('allow_sending_all_protocols_to_ot3')}
+                </StyledText>
+                <StyledText as="p">
+                  {t('allow_sending_all_protocols_to_ot3_description')}
+                </StyledText>
+              </Box>
+              <ToggleButton
+                label="allow_sending_all_protocols_to_ot3"
+                toggledOn={sendAllProtocolsToOT3}
+                onClick={toggleSendAllProtocolsToOT3}
+                id="AdvancedSettings_sendAllProtocolsToggleButton"
+              />
+            </Flex>
+            <Divider marginY={SPACING.spacing5} />
+          </>
+        ) : null}
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box width="70%">
             <StyledText

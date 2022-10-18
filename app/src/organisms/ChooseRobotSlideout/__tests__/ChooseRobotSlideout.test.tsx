@@ -28,7 +28,9 @@ import {
   mockUnreachableRobot,
 } from '../../../redux/discovery/__fixtures__'
 import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
+import { useFeatureFlag } from '../../../redux/config'
 import { useCreateRunFromProtocol } from '../useCreateRunFromProtocol'
+import { useOffsetCandidatesForAnalysis } from '../../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { ChooseRobotSlideout } from '../'
 
 import type { ProtocolDetails } from '../../../organisms/Devices/hooks'
@@ -39,8 +41,16 @@ jest.mock('../../../organisms/ProtocolUpload/hooks')
 jest.mock('../../../organisms/RunTimeControl/hooks')
 jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/buildroot')
+jest.mock('../../../redux/config')
 jest.mock('../useCreateRunFromProtocol')
+jest.mock('../../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis')
 
+const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
+  typeof useFeatureFlag
+>
+const mockUseOffsetCandidatesForAnalysis = useOffsetCandidatesForAnalysis as jest.MockedFunction<
+  typeof useOffsetCandidatesForAnalysis
+>
 const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
   typeof getBuildrootUpdateDisplayInfo
 >
@@ -122,13 +132,28 @@ describe('ChooseRobotSlideout', () => {
     mockUseProtocolDetailsForRun.mockReturnValue({
       displayName: 'A Protocol for Otie',
     } as ProtocolDetails)
-    mockUseCreateRunFromProtocol.mockReturnValue({
-      createRunFromProtocolSource: mockCreateRunFromProtocolSource,
-      reset: mockResetCreateRun,
-    } as any)
+    when(mockUseCreateRunFromProtocol)
+      .calledWith(
+        expect.any(Object),
+        { hostname: expect.any(String) },
+        expect.any(Array)
+      )
+      .mockReturnValue({
+        createRunFromProtocolSource: mockCreateRunFromProtocolSource,
+        reset: mockResetCreateRun,
+      } as any)
     mockUseTrackCreateProtocolRunEvent.mockReturnValue({
       trackCreateProtocolRunEvent: mockTrackCreateProtocolRunEvent,
     })
+    when(mockUseFeatureFlag)
+      .calledWith('enableManualDeckStateModification')
+      .mockReturnValue(true)
+    when(mockUseOffsetCandidatesForAnalysis)
+      .calledWith(
+        storedProtocolDataFixture.mostRecentAnalysis,
+        expect.any(String)
+      )
+      .mockReturnValue([])
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -282,5 +307,98 @@ describe('ChooseRobotSlideout', () => {
     const link = getByRole('link', { name: 'Go to Robot' })
     fireEvent.click(link)
     expect(link.getAttribute('href')).toEqual('/devices/opentrons-robot-name')
+  })
+
+  it('renders apply historic offsets as determinate if candidates available', () => {
+    const mockOffsetCandidate = {
+      id: 'third_offset_id',
+      labwareDisplayName: 'Third Fake Labware Display Name',
+      location: { slotName: '3' },
+      vector: { x: 7, y: 8, z: 9 },
+      definitionUri: 'thirdFakeDefURI',
+      createdAt: '2022-05-11T13:34:51.012179+00:00',
+      runCreatedAt: '2022-05-11T13:33:51.012179+00:00',
+    }
+    when(mockUseOffsetCandidatesForAnalysis)
+      .calledWith(storedProtocolDataFixture.mostRecentAnalysis, '127.0.0.1')
+      .mockReturnValue([mockOffsetCandidate])
+    mockGetConnectableRobots.mockReturnValue([
+      mockConnectableRobot,
+      { ...mockConnectableRobot, name: 'otherRobot', ip: 'otherIp' },
+    ])
+    const [{ getByRole }] = render({
+      storedProtocolData: storedProtocolDataFixture,
+      onCloseClick: jest.fn(),
+      showSlideout: true,
+    })
+    expect(mockUseCreateRunFromProtocol).toHaveBeenCalledWith(
+      expect.any(Object),
+      { hostname: '127.0.0.1' },
+      [
+        {
+          vector: mockOffsetCandidate.vector,
+          location: mockOffsetCandidate.location,
+          definitionUri: mockOffsetCandidate.definitionUri,
+        },
+      ]
+    )
+    expect(getByRole('checkbox')).toBeChecked()
+    const proceedButton = getByRole('button', { name: 'Proceed to setup' })
+    proceedButton.click()
+    expect(mockCreateRunFromProtocolSource).toHaveBeenCalledWith({
+      files: [expect.any(File)],
+      protocolKey: storedProtocolDataFixture.protocolKey,
+    })
+  })
+
+  it('renders apply historic offsets as indeterminate if no candidates available', () => {
+    const mockOffsetCandidate = {
+      id: 'third_offset_id',
+      labwareDisplayName: 'Third Fake Labware Display Name',
+      location: { slotName: '3' },
+      vector: { x: 7, y: 8, z: 9 },
+      definitionUri: 'thirdFakeDefURI',
+      createdAt: '2022-05-11T13:34:51.012179+00:00',
+      runCreatedAt: '2022-05-11T13:33:51.012179+00:00',
+    }
+    when(mockUseOffsetCandidatesForAnalysis)
+      .calledWith(storedProtocolDataFixture.mostRecentAnalysis, '127.0.0.1')
+      .mockReturnValue([mockOffsetCandidate])
+    when(mockUseOffsetCandidatesForAnalysis)
+      .calledWith(storedProtocolDataFixture.mostRecentAnalysis, 'otherIp')
+      .mockReturnValue([])
+    mockGetConnectableRobots.mockReturnValue([
+      mockConnectableRobot,
+      { ...mockConnectableRobot, name: 'otherRobot', ip: 'otherIp' },
+    ])
+    const [{ getByRole, getByText }] = render({
+      storedProtocolData: storedProtocolDataFixture,
+      onCloseClick: jest.fn(),
+      showSlideout: true,
+    })
+    const otherRobot = getByText('otherRobot')
+    otherRobot.click() // unselect default robot
+
+    expect(getByRole('checkbox')).toBeChecked()
+    const proceedButton = getByRole('button', { name: 'Proceed to setup' })
+    proceedButton.click()
+    expect(mockUseCreateRunFromProtocol).nthCalledWith(
+      1,
+      expect.any(Object),
+      { hostname: '127.0.0.1' },
+      [
+        {
+          vector: mockOffsetCandidate.vector,
+          location: mockOffsetCandidate.location,
+          definitionUri: mockOffsetCandidate.definitionUri,
+        },
+      ]
+    )
+    expect(mockUseCreateRunFromProtocol).nthCalledWith(
+      2,
+      expect.any(Object),
+      { hostname: 'otherIp' },
+      []
+    )
   })
 })

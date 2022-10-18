@@ -14,9 +14,12 @@ describe('StatusLabel', () => {
       status: 'Engaged',
       backgroundColor: C_SKY_BLUE,
       iconColor: COLORS.blueEnabled,
+      id: 'engaged_status',
+      showIcon: true,
     }
-    const { getByText } = render(props)
+    const { getByText, getByTestId } = render(props)
     expect(getByText('Engaged')).toHaveStyle('backgroundColor: C_SKY_BLUE')
+    getByTestId('status_label_Engaged_engaged_status')
   })
 
   it('renders a disengaged status label with a blue background and text', () => {
@@ -35,6 +38,7 @@ describe('StatusLabel', () => {
       backgroundColor: COLORS.medGreyEnabled,
       iconColor: COLORS.darkGrey,
       textColor: COLORS.darkBlackEnabled,
+      showIcon: false,
     }
     const { getByText } = render(props)
     expect(getByText('Idle')).toHaveStyle('backgroundColor: C_SILVER_GRAY')

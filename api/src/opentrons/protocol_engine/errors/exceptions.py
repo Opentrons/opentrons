@@ -47,6 +47,10 @@ class LabwareNotLoadedError(ProtocolEngineError):
     """An error raised when referencing a labware that has not been loaded."""
 
 
+class LabwareNotOnDeckError(ProtocolEngineError):
+    """An error raised when a labware can't be used because it's off-deck."""
+
+
 class LiquidDoesNotExistError(ProtocolEngineError):
     """An error raised when referencing a liquid that has not been loaded."""
 
@@ -167,3 +171,7 @@ class CannotPerformModuleAction(ProtocolEngineError):
 
 class ProtocolCommandFailedError(ProtocolEngineError):
     """An error raised if a fatal command execution error has occurred."""
+
+
+class HardwareNotSupportedError(ProtocolEngineError):
+    """An error raised when executing a command on the wrong hardware."""

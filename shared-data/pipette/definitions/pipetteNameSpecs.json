@@ -458,7 +458,7 @@
   },
   "p50_single_gen3": {
     "displayName": "P50 Single-Channel GEN3",
-    "displayCategory": "GEN2",
+    "displayCategory": "GEN3",
     "defaultAspirateFlowRate": {
       "value": 7.85,
       "min": 3,
@@ -498,7 +498,7 @@
   },
   "p1000_single_gen3": {
     "displayName": "P1000 Single-Channel GEN3",
-    "displayCategory": "GEN2",
+    "displayCategory": "GEN3",
     "defaultAspirateFlowRate": {
       "value": 137.35,
       "min": 3,
@@ -542,14 +542,14 @@
   },
   "p1000_multi_gen3": {
     "displayName": "P1000 8-Channel GEN3",
-    "displayCategory": "GEN2",
+    "displayCategory": "GEN3",
     "defaultAspirateFlowRate": {
-      "value": 137.35,
+      "value": 159.04,
       "min": 3,
       "max": 812,
       "valuesByApiLevel": {
-        "2.0": 137.35,
-        "2.6": 274.7
+        "2.0": 159.04,
+        "2.6": 159.04
       }
     },
     "defaultDispenseFlowRate": {
@@ -561,15 +561,15 @@
       }
     },
     "defaultBlowOutFlowRate": {
-      "value": 159.04,
+      "value": 78.52,
       "min": 3,
       "max": 812,
       "valuesByApiLevel": {
-        "2.0": 159.04
+        "2.0": 78.52
       }
     },
     "channels": 8,
-    "minVolume": 5,
+    "minVolume": 1,
     "maxVolume": 1000,
     "smoothieConfigs": {
       "stepsPerMM": 2133.33,
@@ -584,7 +584,7 @@
   },
   "p50_multi_gen3": {
     "displayName": "P50 8-Channel GEN3",
-    "displayCategory": "GEN2",
+    "displayCategory": "GEN3",
     "defaultAspirateFlowRate": {
       "value": 7.85,
       "min": 3,
