@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { map } from 'lodash'
 import { useTranslation } from 'react-i18next'
+import map from 'lodash/map'
 import isEmpty from 'lodash/isEmpty'
 import some from 'lodash/some'
 import {

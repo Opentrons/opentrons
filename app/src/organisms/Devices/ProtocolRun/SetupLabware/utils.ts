@@ -1,4 +1,4 @@
-import { reduce } from 'lodash'
+import reduce from 'lodash/reduce'
 import { getSlotHasMatingSurfaceUnitVector } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import { orderBySlot } from '../../../LabwarePositionCheck/utils/labware'
