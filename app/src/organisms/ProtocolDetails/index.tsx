@@ -7,11 +7,13 @@ import { format } from 'date-fns'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { useFeatureFlag } from '../../redux/config'
+
 import {
   Box,
   Btn,
   Flex,
+  Icon,
+  ALIGN_CENTER,
   DIRECTION_ROW,
   SPACING,
   TYPOGRAPHY,
@@ -32,30 +34,30 @@ import {
   parseInitialLoadedLabwareBySlot,
   parseInitialLoadedLabwareByModuleId,
 } from '@opentrons/api-client'
+import { protocolHasLiquids } from '@opentrons/shared-data'
 
-import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
-import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
-import { DeckThumbnail } from '../../molecules/DeckThumbnail'
-import { StyledText } from '../../atoms/text'
+import { Portal } from '../../App/portal'
 import { PrimaryButton } from '../../atoms/buttons'
 import { Divider } from '../../atoms/structure'
+import { StyledText } from '../../atoms/text'
+import { DeckThumbnail } from '../../molecules/DeckThumbnail'
+import { Modal } from '../../molecules/Modal'
+import { useFeatureFlag } from '../../redux/config'
+import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
 import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
-import { OverflowMenu } from './OverflowMenu'
-import { RobotConfigurationDetails } from './RobotConfigurationDetails'
-import { ProtocolLabwareDetails } from './ProtocolLabwareDetails'
-import { ProtocolLiquidsDetails } from './ProtocolLiquidsDetails'
+import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
 import {
   getAnalysisStatus,
   getProtocolDisplayName,
 } from '../ProtocolsLanding/utils'
+import { OverflowMenu } from './OverflowMenu'
+import { ProtocolLabwareDetails } from './ProtocolLabwareDetails'
+import { ProtocolLiquidsDetails } from './ProtocolLiquidsDetails'
+import { RobotConfigurationDetails } from './RobotConfigurationDetails'
 
-import type { State } from '../../redux/types'
+import type { JsonConfig, PythonConfig } from '@opentrons/shared-data'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
-import {
-  JsonConfig,
-  protocolHasLiquids,
-  PythonConfig,
-} from '@opentrons/shared-data'
+import type { State } from '../../redux/types'
 
 const defaultTabStyle = css`
   ${TYPOGRAPHY.pSemiBold}
@@ -73,7 +75,6 @@ const inactiveTabStyle = css`
   &:hover {
     color: ${COLORS.darkGreyEnabled};
     background-color: ${COLORS.fundamentalsBackgroundShade};
-    border-radius: 4px 4px 0px 0px;
   }
 `
 
@@ -131,10 +132,52 @@ function RoundTab({
   )
 }
 
-interface ReadMoreContentProps {
-  metadata: {
-    [key: string]: any
+interface Metadata {
+  [key: string]: any
+}
+
+interface MetadataDetailsProps {
+  description: string
+  metadata: Metadata
+  protocolType: string
+}
+
+function MetadataDetails({
+  description,
+  metadata,
+  protocolType,
+}: MetadataDetailsProps): JSX.Element {
+  if (protocolType === 'json') {
+    return <StyledText as="p">{description}</StyledText>
+  } else {
+    const filteredMetaData = Object.entries(
+      omit(metadata, ['description', 'protocolName', 'author', 'apiLevel'])
+    ).map(item => ({ label: item[0], value: item[1] }))
+
+    return (
+      <Flex
+        flex="1"
+        flexDirection={DIRECTION_COLUMN}
+        data-testid="ProtocolDetails_description"
+      >
+        <StyledText as="p">{description}</StyledText>
+        {filteredMetaData.map((item, index) => {
+          return (
+            <React.Fragment key={index}>
+              <StyledText as="h6" marginTop={SPACING.spacing3}>
+                {startCase(item.label)}
+              </StyledText>
+              <StyledText as="p">{item.value}</StyledText>
+            </React.Fragment>
+          )
+        })}
+      </Flex>
+    )
   }
+}
+
+interface ReadMoreContentProps {
+  metadata: Metadata
   protocolType: 'json' | 'python'
 }
 
@@ -147,45 +190,16 @@ const ReadMoreContent = (props: ReadMoreContentProps): JSX.Element => {
     ? t('shared:no_data')
     : metadata.description
 
-  const getMetadataDetails = (
-    description: string,
-    protocolType: string
-  ): string | JSX.Element => {
-    if (protocolType === 'json') {
-      return <StyledText as="p">{description}</StyledText>
-    } else {
-      const filteredMetaData = Object.entries(
-        omit(metadata, ['description', 'protocolName', 'author', 'apiLevel'])
-      ).map(item => ({ label: item[0], value: item[1] }))
-
-      return (
-        <Flex
-          flex="1"
-          flexDirection={DIRECTION_COLUMN}
-          data-testid="ProtocolDetails_description"
-        >
-          <StyledText as="p">{description}</StyledText>
-          {filteredMetaData.map((item, index) => {
-            return (
-              <React.Fragment key={index}>
-                <StyledText as="h6" marginTop={SPACING.spacing3}>
-                  {startCase(item.label)}
-                </StyledText>
-                <StyledText as="p">{item.value}</StyledText>
-              </React.Fragment>
-            )
-          })}
-        </Flex>
-      )
-    }
-  }
-
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       {isReadMore ? (
         <StyledText as="p">{description.slice(0, 160)}</StyledText>
       ) : (
-        getMetadataDetails(description, protocolType)
+        <MetadataDetails
+          description={description}
+          metadata={metadata}
+          protocolType={protocolType}
+        />
       )}
       {(description.length > 160 || protocolType === 'python') && (
         <Link
@@ -213,6 +227,7 @@ export function ProtocolDetails(
     'robot_config' | 'labware' | 'liquids'
   >('robot_config')
   const [showSlideout, setShowSlideout] = React.useState(false)
+  const [showDeckViewModal, setShowDeckViewModal] = React.useState(false)
   const isAnalyzing = useSelector((state: State) =>
     getIsProtocolAnalysisInProgress(state, protocolKey)
   )
@@ -286,299 +301,303 @@ export function ProtocolDetails(
       ? format(new Date(mostRecentAnalysis.createdAt), 'MMMM dd, yyyy HH:mm')
       : t('shared:no_data')
 
-  const getTabContents = (): JSX.Element => {
-    switch (currentTab) {
-      case 'labware':
-        return (
-          <ProtocolLabwareDetails
-            requiredLabwareDetails={requiredLabwareDetails}
-          />
-        )
+  const contentsByTabName = {
+    labware: (
+      <ProtocolLabwareDetails requiredLabwareDetails={requiredLabwareDetails} />
+    ),
+    robot_config: (
+      <RobotConfigurationDetails
+        leftMountPipetteName={leftMountPipetteName}
+        rightMountPipetteName={rightMountPipetteName}
+        requiredModuleDetails={requiredModuleDetails}
+        isLoading={analysisStatus === 'loading'}
+      />
+    ),
+    liquids: (
+      <ProtocolLiquidsDetails
+        commands={
+          mostRecentAnalysis?.commands != null
+            ? mostRecentAnalysis?.commands
+            : []
+        }
+        liquids={
+          mostRecentAnalysis?.liquids != null ? mostRecentAnalysis?.liquids : []
+        }
+      />
+    ),
+  }
 
-      case 'robot_config':
-        return (
-          <RobotConfigurationDetails
-            leftMountPipetteName={leftMountPipetteName}
-            rightMountPipetteName={rightMountPipetteName}
-            requiredModuleDetails={requiredModuleDetails}
-            isLoading={analysisStatus === 'loading'}
-          />
-        )
+  const deckThumbnail = (
+    <DeckThumbnail
+      commands={mostRecentAnalysis?.commands ?? []}
+      liquids={
+        mostRecentAnalysis?.liquids != null ? mostRecentAnalysis?.liquids : []
+      }
+    />
+  )
 
-      case 'liquids':
-        return (
-          <ProtocolLiquidsDetails
-            commands={
-              mostRecentAnalysis?.commands != null
-                ? mostRecentAnalysis?.commands
-                : []
-            }
-            liquids={
-              mostRecentAnalysis?.liquids != null
-                ? mostRecentAnalysis?.liquids
-                : []
-            }
-          />
-        )
-    }
+  const deckViewByAnalysisStatus = {
+    missing: <Box size="14rem" backgroundColor={COLORS.medGreyEnabled} />,
+    loading: <Box size="14rem" backgroundColor={COLORS.medGreyEnabled} />,
+    error: <Box size="14rem" backgroundColor={COLORS.medGreyEnabled} />,
+    complete: (
+      <Box size="14rem" height="auto">
+        {deckThumbnail}
+      </Box>
+    ),
   }
 
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      padding={SPACING.spacing4}
-      width="100%"
-    >
-      <ChooseRobotSlideout
-        onCloseClick={() => setShowSlideout(false)}
-        showSlideout={showSlideout}
-        storedProtocolData={props}
-      />
-      <Flex
-        backgroundColor={COLORS.white}
-        border={`1px solid ${COLORS.medGreyEnabled}`}
-        borderRadius={BORDERS.radiusSoftCorners}
-        position={POSITION_RELATIVE}
-        flexDirection={DIRECTION_ROW}
-        width="100%"
-        marginBottom={SPACING.spacing4}
-      >
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing4}
-          padding={`${SPACING.spacing4} 0 ${SPACING.spacing4} ${SPACING.spacing4}`}
-          width="100%"
-        >
-          {analysisStatus !== 'loading' &&
-          mostRecentAnalysis != null &&
-          mostRecentAnalysis.errors.length > 0 ? (
-            <ProtocolAnalysisFailure
-              protocolKey={protocolKey}
-              errors={mostRecentAnalysis.errors.map(e => e.detail)}
-            />
-          ) : null}
-          <StyledText
-            css={TYPOGRAPHY.h2SemiBold}
-            marginBottom={SPACING.spacing4}
-            data-testid={`ProtocolDetails_${protocolDisplayName}`}
+    <>
+      <Portal level="top">
+        {showDeckViewModal ? (
+          <Modal
+            title={t('deck_setup')}
+            onClose={() => setShowDeckViewModal(false)}
           >
-            {protocolDisplayName}
-          </StyledText>
-          <Flex css={GRID_STYLE}>
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              data-testid="ProtocolDetails_creationMethod"
-            >
-              <StyledText as="h6" color={COLORS.darkGreyEnabled}>
-                {t('creation_method')}
-              </StyledText>
-              <StyledText as="p">
-                {analysisStatus === 'loading'
-                  ? t('shared:loading')
-                  : creationMethod}
-              </StyledText>
-            </Flex>
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              data-testid="ProtocolDetails_lastUpdated"
-            >
-              <StyledText as="h6" color={COLORS.darkGreyEnabled}>
-                {t('last_updated')}
-              </StyledText>
-              <StyledText as="p">
-                {analysisStatus === 'loading'
-                  ? t('shared:loading')
-                  : format(new Date(modified), 'MMMM dd, yyyy HH:mm')}
-              </StyledText>
-            </Flex>
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              data-testid="ProtocolDetails_lastAnalyzed"
-            >
-              <StyledText as="h6" color={COLORS.darkGreyEnabled}>
-                {t('last_analyzed')}
-              </StyledText>
-              <StyledText as="p">
-                {analysisStatus === 'loading'
-                  ? t('shared:loading')
-                  : lastAnalyzed}
-              </StyledText>
-            </Flex>
-            <Flex
-              css={css`
-                display: grid;
-                justify-self: end;
-              `}
-            >
-              <PrimaryButton
-                onClick={() => setShowSlideout(true)}
-                data-testid="ProtocolDetails_runProtocol"
-                disabled={analysisStatus === 'loading'}
-              >
-                {t('run_protocol')}
-              </PrimaryButton>
-            </Flex>
-          </Flex>
-          <Divider marginY={SPACING.spacing4} />
-          <Flex css={GRID_STYLE}>
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              data-testid="ProtocolDetails_author"
-            >
-              <StyledText as="h6" color={COLORS.darkGreyEnabled}>
-                {t('org_or_author')}
-              </StyledText>
-              <StyledText
-                as="p"
-                marginRight={SPACING.spacingM}
-                overflowWrap="anywhere"
-              >
-                {analysisStatus === 'loading' ? t('shared:loading') : author}
-              </StyledText>
-            </Flex>
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              data-testid="ProtocolDetails_description"
-            >
-              <StyledText as="h6" color={COLORS.darkGreyEnabled}>
-                {t('description')}
-              </StyledText>
-              {analysisStatus === 'loading' ? (
-                <StyledText as="p">{t('shared:loading')}</StyledText>
-              ) : null}
-              {mostRecentAnalysis != null ? (
-                <ReadMoreContent
-                  metadata={mostRecentAnalysis.metadata}
-                  protocolType={mostRecentAnalysis.config.protocolType}
-                />
-              ) : null}
-            </Flex>
-          </Flex>
-        </Flex>
-        <Box
-          position={POSITION_RELATIVE}
-          top={SPACING.spacing1}
-          right={SPACING.spacing1}
-        >
-          <OverflowMenu
-            protocolKey={protocolKey}
-            protocolType={mostRecentAnalysis?.config?.protocolType ?? 'python'}
-            data-testid="ProtocolDetails_overFlowMenu"
-          />
-        </Box>
-      </Flex>
-
+            {deckThumbnail}
+          </Modal>
+        ) : null}
+      </Portal>
       <Flex
-        flexDirection={DIRECTION_ROW}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        flexDirection={DIRECTION_COLUMN}
+        padding={SPACING.spacing4}
+        width="100%"
       >
+        <ChooseRobotSlideout
+          onCloseClick={() => setShowSlideout(false)}
+          showSlideout={showSlideout}
+          storedProtocolData={props}
+        />
         <Flex
-          flex={`0 0 ${SIZE_5}`}
-          flexDirection={DIRECTION_COLUMN}
           backgroundColor={COLORS.white}
           border={`1px solid ${COLORS.medGreyEnabled}`}
           borderRadius={BORDERS.radiusSoftCorners}
-          height="100%"
-          data-testid="ProtocolDetails_deckMap"
-        >
-          <StyledText
-            as="h3"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            textTransform={TYPOGRAPHY.textTransformCapitalize}
-            margin={SPACING.spacing4}
-          >
-            {t('deck_setup')}
-          </StyledText>
-          <Divider />
-          <Box padding={SPACING.spacing4} backgroundColor={COLORS.white}>
-            {
-              {
-                missing: (
-                  <Box size="14rem" backgroundColor={COLORS.medGreyEnabled} />
-                ),
-                loading: (
-                  <Box size="14rem" backgroundColor={COLORS.medGreyEnabled} />
-                ),
-                error: (
-                  <Box size="14rem" backgroundColor={COLORS.medGreyEnabled} />
-                ),
-                complete: (
-                  <Box size="14rem" height="auto">
-                    <DeckThumbnail
-                      commands={mostRecentAnalysis?.commands ?? []}
-                      liquids={
-                        mostRecentAnalysis?.liquids != null
-                          ? mostRecentAnalysis?.liquids
-                          : []
-                      }
-                    />
-                  </Box>
-                ),
-              }[analysisStatus]
-            }
-          </Box>
-        </Flex>
-
-        <Flex
+          position={POSITION_RELATIVE}
+          flexDirection={DIRECTION_ROW}
           width="100%"
-          height="100%"
-          flexDirection={DIRECTION_COLUMN}
-          marginLeft={SPACING.spacing4}
+          marginBottom={SPACING.spacing4}
         >
-          <Flex>
-            <RoundTab
-              data-testid="ProtocolDetails_robotConfig"
-              isCurrent={currentTab === 'robot_config'}
-              onClick={() => setCurrentTab('robot_config')}
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing4}
+            padding={`${SPACING.spacing4} 0 ${SPACING.spacing4} ${SPACING.spacing4}`}
+            width="100%"
+          >
+            {analysisStatus !== 'loading' &&
+            mostRecentAnalysis != null &&
+            mostRecentAnalysis.errors.length > 0 ? (
+              <ProtocolAnalysisFailure
+                protocolKey={protocolKey}
+                errors={mostRecentAnalysis.errors.map(e => e.detail)}
+              />
+            ) : null}
+            <StyledText
+              css={TYPOGRAPHY.h2SemiBold}
+              marginBottom={SPACING.spacing4}
+              data-testid={`ProtocolDetails_${protocolDisplayName}`}
             >
-              <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
-                {t('robot_configuration')}
-              </StyledText>
-            </RoundTab>
-            <RoundTab
-              data-testid="ProtocolDetails_labware"
-              isCurrent={currentTab === 'labware'}
-              onClick={() => setCurrentTab('labware')}
-            >
-              <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
-                {t('labware')}
-              </StyledText>
-            </RoundTab>
-            {liquidSetupEnabled &&
-              mostRecentAnalysis != null &&
-              protocolHasLiquids(mostRecentAnalysis) && (
-                <RoundTab
-                  data-testid="ProtocolDetails_liquids"
-                  isCurrent={currentTab === 'liquids'}
-                  onClick={() => setCurrentTab('liquids')}
+              {protocolDisplayName}
+            </StyledText>
+            <Flex css={GRID_STYLE}>
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                data-testid="ProtocolDetails_creationMethod"
+              >
+                <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                  {t('creation_method')}
+                </StyledText>
+                <StyledText as="p">
+                  {analysisStatus === 'loading'
+                    ? t('shared:loading')
+                    : creationMethod}
+                </StyledText>
+              </Flex>
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                data-testid="ProtocolDetails_lastUpdated"
+              >
+                <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                  {t('last_updated')}
+                </StyledText>
+                <StyledText as="p">
+                  {analysisStatus === 'loading'
+                    ? t('shared:loading')
+                    : format(new Date(modified), 'MMMM dd, yyyy HH:mm')}
+                </StyledText>
+              </Flex>
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                data-testid="ProtocolDetails_lastAnalyzed"
+              >
+                <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                  {t('last_analyzed')}
+                </StyledText>
+                <StyledText as="p">
+                  {analysisStatus === 'loading'
+                    ? t('shared:loading')
+                    : lastAnalyzed}
+                </StyledText>
+              </Flex>
+              <Flex
+                css={css`
+                  display: grid;
+                  justify-self: end;
+                `}
+              >
+                <PrimaryButton
+                  onClick={() => setShowSlideout(true)}
+                  data-testid="ProtocolDetails_runProtocol"
+                  disabled={analysisStatus === 'loading'}
                 >
-                  <StyledText
-                    textTransform={TYPOGRAPHY.textTransformCapitalize}
-                  >
-                    {t('liquids')}
-                  </StyledText>
-                </RoundTab>
-              )}
+                  {t('run_protocol')}
+                </PrimaryButton>
+              </Flex>
+            </Flex>
+            <Divider marginY={SPACING.spacing4} />
+            <Flex css={GRID_STYLE}>
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                data-testid="ProtocolDetails_author"
+              >
+                <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                  {t('org_or_author')}
+                </StyledText>
+                <StyledText
+                  as="p"
+                  marginRight={SPACING.spacingM}
+                  overflowWrap="anywhere"
+                >
+                  {analysisStatus === 'loading' ? t('shared:loading') : author}
+                </StyledText>
+              </Flex>
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                data-testid="ProtocolDetails_description"
+              >
+                <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                  {t('description')}
+                </StyledText>
+                {analysisStatus === 'loading' ? (
+                  <StyledText as="p">{t('shared:loading')}</StyledText>
+                ) : null}
+                {mostRecentAnalysis != null ? (
+                  <ReadMoreContent
+                    metadata={mostRecentAnalysis.metadata}
+                    protocolType={mostRecentAnalysis.config.protocolType}
+                  />
+                ) : null}
+              </Flex>
+            </Flex>
           </Flex>
           <Box
-            backgroundColor={COLORS.white}
-            border={`${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.medGreyEnabled}`}
-            // remove left upper corner border radius when first tab is active
-            borderRadius={`${
-              currentTab === 'robot_config' ? '0' : BORDERS.radiusSoftCorners
-            } ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} ${
-              BORDERS.radiusSoftCorners
-            }`}
-            padding={
-              currentTab === 'robot_config'
-                ? `${SPACING.spacing5} ${SPACING.spacing4}`
-                : `${SPACING.spacing4} ${SPACING.spacing4} 0 ${SPACING.spacing4}`
-            }
+            position={POSITION_RELATIVE}
+            top={SPACING.spacing1}
+            right={SPACING.spacing1}
           >
-            {getTabContents()}
+            <OverflowMenu
+              protocolKey={protocolKey}
+              protocolType={
+                mostRecentAnalysis?.config?.protocolType ?? 'python'
+              }
+              data-testid="ProtocolDetails_overFlowMenu"
+            />
           </Box>
         </Flex>
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+        >
+          <Flex
+            flex={`0 0 ${SIZE_5}`}
+            flexDirection={DIRECTION_COLUMN}
+            backgroundColor={COLORS.white}
+            border={`1px solid ${COLORS.medGreyEnabled}`}
+            borderRadius={BORDERS.radiusSoftCorners}
+            height="100%"
+            data-testid="ProtocolDetails_deckMap"
+          >
+            <Flex
+              alignItems={ALIGN_CENTER}
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
+              padding={SPACING.spacing4}
+            >
+              <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                {t('deck_setup')}
+              </StyledText>
+              {analysisStatus === 'complete' ? (
+                <Btn onClick={() => setShowDeckViewModal(true)}>
+                  <Icon name="union" size={SIZE_1} />
+                </Btn>
+              ) : null}
+            </Flex>
+            <Divider />
+            <Box padding={SPACING.spacing4} backgroundColor={COLORS.white}>
+              {deckViewByAnalysisStatus[analysisStatus]}
+            </Box>
+          </Flex>
+
+          <Flex
+            width="100%"
+            height="100%"
+            flexDirection={DIRECTION_COLUMN}
+            marginLeft={SPACING.spacing4}
+          >
+            <Flex>
+              <RoundTab
+                data-testid="ProtocolDetails_robotConfig"
+                isCurrent={currentTab === 'robot_config'}
+                onClick={() => setCurrentTab('robot_config')}
+              >
+                <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
+                  {t('robot_configuration')}
+                </StyledText>
+              </RoundTab>
+              <RoundTab
+                data-testid="ProtocolDetails_labware"
+                isCurrent={currentTab === 'labware'}
+                onClick={() => setCurrentTab('labware')}
+              >
+                <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
+                  {t('labware')}
+                </StyledText>
+              </RoundTab>
+              {liquidSetupEnabled &&
+                mostRecentAnalysis != null &&
+                protocolHasLiquids(mostRecentAnalysis) && (
+                  <RoundTab
+                    data-testid="ProtocolDetails_liquids"
+                    isCurrent={currentTab === 'liquids'}
+                    onClick={() => setCurrentTab('liquids')}
+                  >
+                    <StyledText
+                      textTransform={TYPOGRAPHY.textTransformCapitalize}
+                    >
+                      {t('liquids')}
+                    </StyledText>
+                  </RoundTab>
+                )}
+            </Flex>
+            <Box
+              backgroundColor={COLORS.white}
+              border={`${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.medGreyEnabled}`}
+              // remove left upper corner border radius when first tab is active
+              borderRadius={`${
+                currentTab === 'robot_config' ? '0' : BORDERS.radiusSoftCorners
+              } ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} ${
+                BORDERS.radiusSoftCorners
+              }`}
+              padding={
+                currentTab === 'robot_config'
+                  ? `${SPACING.spacing5} ${SPACING.spacing4}`
+                  : `${SPACING.spacing4} ${SPACING.spacing4} 0 ${SPACING.spacing4}`
+              }
+            >
+              {contentsByTabName[currentTab]}
+            </Box>
+          </Flex>
+        </Flex>
       </Flex>
-    </Flex>
+    </>
   )
 }
