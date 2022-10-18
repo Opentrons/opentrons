@@ -1,14 +1,12 @@
 """Equipment command side-effect logic."""
 from dataclasses import dataclass
-from typing import Optional, overload, Union, List
+from typing import Optional, overload
 
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons.config import feature_flags
-from opentrons.types import MountType, Point
+from opentrons.types import MountType
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.types import OT3Mount, OT3Axis
 from opentrons.hardware_control.modules import (
     AbstractModule,
     MagDeck,
@@ -26,8 +24,6 @@ from ..errors import (
     FailedToLoadPipetteError,
     LabwareDefinitionDoesNotExistError,
     ModuleNotAttachedError,
-    GripperNotAttachedError,
-    UnsupportedLabwareMovement,
 )
 from ..resources import LabwareDataProvider, ModuleDataProvider, ModelUtils
 from ..state import StateStore, HardwareModule
@@ -38,12 +34,7 @@ from ..types import (
     LabwareOffsetLocation,
     ModuleModel,
     ModuleDefinition,
-    OFF_DECK_LOCATION,
 )
-
-# TODO: remove once hardware control is able to calibrate & handle the offsets
-GRIPPER_OFFSET = Point(0.0, 1.0, 0.0)
-GRIP_FORCE = 20  # Newtons
 
 
 @dataclass(frozen=True)
@@ -149,103 +140,6 @@ class EquipmentHandler:
         return LoadedLabwareData(
             labware_id=labware_id, definition=definition, offsetId=offset_id
         )
-
-    async def move_labware_with_gripper(
-        self, labware_id: str, new_location: LabwareLocation
-    ) -> None:
-        """Move a loaded labware from one location to another."""
-        if not feature_flags.enable_ot3_hardware_controller():
-            raise UnsupportedLabwareMovement(
-                "Labware movement w/ gripper is only available on the OT3"
-            )
-        from opentrons.hardware_control.ot3api import OT3API
-
-        assert isinstance(
-            self._hardware_api, OT3API
-        ), "Gripper is only available on the OT3"
-
-        if self._hardware_api.attached_gripper is None:
-            raise GripperNotAttachedError(
-                "No gripper found in order to perform labware movement with."
-            )
-
-        from_location = self._state_store.labware.get_location(labware_id=labware_id)
-        assert isinstance(
-            from_location, (DeckSlotLocation, ModuleLocation)
-        ), "Off-deck labware movements are not supported using the gripper."
-        assert isinstance(
-            new_location, (DeckSlotLocation, ModuleLocation)
-        ), "Off-deck labware movements are not supported using the gripper."
-
-        gripper_mount = OT3Mount.GRIPPER
-
-        # Retract all mounts
-        await self._hardware_api.home(axes=[OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.Z_G])
-        # TODO: reset well location cache upon completion of command execution
-        await self._hardware_api.home_gripper_jaw()
-
-        gripper_homed_position = await self._hardware_api.gantry_position(
-            mount=gripper_mount
-        )
-        waypoints_to_labware = self._get_gripper_movement_waypoints(
-            labware_id=labware_id,
-            location=from_location,
-            current_position=await self._hardware_api.gantry_position(
-                mount=gripper_mount
-            ),
-            gripper_home_z=gripper_homed_position.z,
-        )
-        for waypoint in waypoints_to_labware:
-            await self._hardware_api.move_to(mount=gripper_mount, abs_position=waypoint)
-
-        await self._hardware_api.grip(force_newtons=GRIP_FORCE)
-
-        waypoints_to_new_location = self._get_gripper_movement_waypoints(
-            labware_id=labware_id,
-            location=new_location,
-            current_position=waypoints_to_labware[-1],
-            gripper_home_z=gripper_homed_position.z,
-        )
-        for waypoint in waypoints_to_new_location:
-            await self._hardware_api.move_to(mount=gripper_mount, abs_position=waypoint)
-
-        await self._hardware_api.ungrip()
-        await self._hardware_api.move_to(
-            mount=OT3Mount.GRIPPER,
-            abs_position=Point(
-                waypoints_to_new_location[-1].x,
-                waypoints_to_new_location[-1].y,
-                gripper_homed_position.z,
-            ),
-        )
-
-    def _get_gripper_movement_waypoints(
-        self,
-        labware_id: str,
-        location: Union[DeckSlotLocation, ModuleLocation],
-        current_position: Point,
-        gripper_home_z: float,
-    ) -> List[Point]:
-        """Get waypoints for gripper to move to a specified location."""
-        # TODO: remove this after support for module locations is added
-        assert isinstance(
-            location, DeckSlotLocation
-        ), "Moving labware to & from modules with a gripper is not implemented yet."
-
-        # Keeping grip height as half of overall height of labware
-        grip_height = (
-            self._state_store.labware.get_dimensions(labware_id=labware_id).z / 2
-        )
-        slot_loc = (
-            self._state_store.labware.get_slot_center_position(location.slotName)
-            + GRIPPER_OFFSET
-        )
-        waypoints: List[Point] = [
-            Point(current_position.x, current_position.y, gripper_home_z),
-            Point(slot_loc.x, slot_loc.y, gripper_home_z),
-            Point(slot_loc.x, slot_loc.y, grip_height),
-        ]
-        return waypoints
 
     async def load_pipette(
         self,
@@ -385,6 +279,7 @@ class EquipmentHandler:
             f' for module ID "{module_id}".'
         )
 
+    # TODO (spp, 2022-10-18): move this to labware state view
     def find_applicable_labware_offset_id(
         self, labware_definition_uri: str, labware_location: LabwareLocation
     ) -> Optional[str]:

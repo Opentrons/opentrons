@@ -5,11 +5,11 @@ from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from ..types import LabwareLocation
+from ..types import LabwareLocation, DeckSlotLocation, ModuleLocation
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
-    from ..execution import EquipmentHandler, RunControlHandler
+    from ..execution import EquipmentHandler, RunControlHandler, LabwareMovementHandler
     from ..state import StateView
 
 
@@ -53,11 +53,13 @@ class MoveLabwareImplementation(
         self,
         state_view: StateView,
         equipment: EquipmentHandler,
+        labware_movement: LabwareMovementHandler,
         run_control: RunControlHandler,
         **kwargs: object,
     ) -> None:
-        self._equipment = equipment
         self._state_view = state_view
+        self._equipment = equipment
+        self._labware_movement = labware_movement
         self._run_control = run_control
 
     async def execute(self, params: MoveLabwareParams) -> MoveLabwareResult:
@@ -72,8 +74,20 @@ class MoveLabwareImplementation(
         )
 
         if params.useGripper:
-            await self._equipment.move_labware_with_gripper(
-                labware_id=params.labwareId, new_location=params.newLocation
+            from_location = current_labware.location
+
+            assert isinstance(
+                from_location, (DeckSlotLocation, ModuleLocation)
+            ), "Off-deck labware movements are not supported using the gripper."
+
+            assert isinstance(
+                params.newLocation, (DeckSlotLocation, ModuleLocation)
+            ), "Off-deck labware movements are not supported using the gripper."
+
+            await self._labware_movement.move_labware_with_gripper(
+                labware_id=params.labwareId,
+                current_location=from_location,
+                new_location=params.newLocation
             )
         else:
             # Pause to allow for manual labware movement

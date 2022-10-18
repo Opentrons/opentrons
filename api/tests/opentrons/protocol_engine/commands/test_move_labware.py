@@ -10,25 +10,30 @@ from opentrons.protocol_engine.types import (
     LoadedLabware,
 )
 from opentrons.protocol_engine.state import StateView
-from opentrons.protocol_engine.execution import EquipmentHandler, RunControlHandler
-
 from opentrons.protocol_engine.commands.move_labware import (
     MoveLabwareParams,
     MoveLabwareResult,
     MoveLabwareImplementation,
+)
+from opentrons.protocol_engine.execution import (
+    EquipmentHandler,
+    RunControlHandler,
+    LabwareMovementHandler,
 )
 
 
 async def test_manual_move_labware_implementation(
     decoy: Decoy,
     equipment: EquipmentHandler,
+    labware_movement: LabwareMovementHandler,
     state_view: StateView,
     run_control: RunControlHandler,
 ) -> None:
     """It should execute a pause and return the new offset."""
     subject = MoveLabwareImplementation(
-        equipment=equipment,
         state_view=state_view,
+        equipment=equipment,
+        labware_movement=labware_movement,
         run_control=run_control,
     )
 
@@ -65,13 +70,15 @@ async def test_manual_move_labware_implementation(
 async def test_gripper_move_labware_implementation(
     decoy: Decoy,
     equipment: EquipmentHandler,
+    labware_movement: LabwareMovementHandler,
     state_view: StateView,
     run_control: RunControlHandler,
 ) -> None:
     """It should delegate to the equipment handler and return the new offset."""
     subject = MoveLabwareImplementation(
-        equipment=equipment,
         state_view=state_view,
+        equipment=equipment,
+        labware_movement=labware_movement,
         run_control=run_control,
     )
 
@@ -100,8 +107,9 @@ async def test_gripper_move_labware_implementation(
 
     result = await subject.execute(data)
     decoy.verify(
-        await equipment.move_labware_with_gripper(
+        await labware_movement.move_labware_with_gripper(
             labware_id="my-cool-labware-id",
+            current_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
         ),
         times=1,
@@ -114,14 +122,16 @@ async def test_gripper_move_labware_implementation(
 async def test_move_labware_raises(
     decoy: Decoy,
     equipment: EquipmentHandler,
+    labware_movement: LabwareMovementHandler,
     run_control: RunControlHandler,
     state_view: StateView,
 ) -> None:
     """It should raise an error when specified labware/ module is not found."""
     subject = MoveLabwareImplementation(
         state_view=state_view,
-        run_control=run_control,
+        labware_movement=labware_movement,
         equipment=equipment,
+        run_control=run_control,
     )
     move_non_existent_labware_params = MoveLabwareParams(
         labwareId="my-cool-labware-id",
