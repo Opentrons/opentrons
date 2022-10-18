@@ -147,9 +147,7 @@ export const RunLogProtocolSetupInfo = ({
         i18nKey={'load_liquids_info_protocol_setup'}
         values={{
           liquid: liquidDisplayName ?? 'liquid',
-          labware: getLabwareDisplayName(
-            labwareRenderInfoById[labwareId].labwareDef
-          ),
+          labware: protocolData.labware[labwareId].displayName,
         }}
       />
     )
