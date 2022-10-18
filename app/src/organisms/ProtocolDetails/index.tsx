@@ -50,7 +50,7 @@ import {
   getAnalysisStatus,
   getProtocolDisplayName,
 } from '../ProtocolsLanding/utils'
-import { OverflowMenu } from './OverflowMenu'
+import { ProtocolOverflowMenu } from '../ProtocolsLanding/ProtocolOverflowMenu'
 import { ProtocolLabwareDetails } from './ProtocolLabwareDetails'
 import { ProtocolLiquidsDetails } from './ProtocolLiquidsDetails'
 import { RobotConfigurationDetails } from './RobotConfigurationDetails'
@@ -495,11 +495,9 @@ export function ProtocolDetails(
             top={SPACING.spacing1}
             right={SPACING.spacing1}
           >
-            <OverflowMenu
+            <ProtocolOverflowMenu
+              handleRunProtocol={() => setShowSlideout(true)}
               protocolKey={protocolKey}
-              protocolType={
-                mostRecentAnalysis?.config?.protocolType ?? 'python'
-              }
               data-testid="ProtocolDetails_overFlowMenu"
             />
           </Box>
