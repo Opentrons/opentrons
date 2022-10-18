@@ -352,7 +352,7 @@ export function ProtocolDetails(
       <Portal level="top">
         {showDeckViewModal ? (
           <Modal
-            title={t('deck_setup')}
+            title={t('deck_view')}
             onClose={() => setShowDeckViewModal(false)}
           >
             {deckThumbnail}
@@ -523,7 +523,7 @@ export function ProtocolDetails(
               padding={SPACING.spacing4}
             >
               <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-                {t('deck_setup')}
+                {t('deck_view')}
               </StyledText>
               {analysisStatus === 'complete' ? (
                 <Btn onClick={() => setShowDeckViewModal(true)}>
@@ -531,7 +531,6 @@ export function ProtocolDetails(
                 </Btn>
               ) : null}
             </Flex>
-            <Divider />
             <Box padding={SPACING.spacing4} backgroundColor={COLORS.white}>
               {deckViewByAnalysisStatus[analysisStatus]}
             </Box>
@@ -580,18 +579,14 @@ export function ProtocolDetails(
             </Flex>
             <Box
               backgroundColor={COLORS.white}
-              border={`${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.medGreyEnabled}`}
+              border={BORDERS.lineBorder}
               // remove left upper corner border radius when first tab is active
               borderRadius={`${
                 currentTab === 'robot_config' ? '0' : BORDERS.radiusSoftCorners
               } ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} ${
                 BORDERS.radiusSoftCorners
               }`}
-              padding={
-                currentTab === 'robot_config'
-                  ? `${SPACING.spacing5} ${SPACING.spacing4}`
-                  : `${SPACING.spacing4} ${SPACING.spacing4} 0 ${SPACING.spacing4}`
-              }
+              padding={`${SPACING.spacing4} ${SPACING.spacing4} 0 ${SPACING.spacing4}`}
             >
               {contentsByTabName[currentTab]}
             </Box>
