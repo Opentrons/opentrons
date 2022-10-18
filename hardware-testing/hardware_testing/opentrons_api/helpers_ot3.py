@@ -277,20 +277,18 @@ async def move_plunger_absolute_ot3(
     if not api.hardware_pipettes[mount.to_mount()]:
         raise PipetteNotAttachedError(f"No pipette found on mount: {mount}")
     plunger_axis = OT3Axis.of_main_tool_actuator(mount)
+    _move_coro = api._move(
+        target_position={plunger_axis: position},  # type: ignore[arg-type]
+        speed=speed,
+    )
     if motor_current is None:
-        await api._move(
-            target_position={plunger_axis: position},  # type: ignore[arg-type]
-            speed=speed,
-        )
+        await _move_coro
     else:
         async with api._backend.restore_current():
             await api._backend.set_active_current(
                 {OT3Axis.of_main_tool_actuator(mount): motor_current}  # type: ignore[dict-item]
             )
-            await api._move(
-                target_position={plunger_axis: position},  # type: ignore[arg-type]
-                speed=speed,
-            )
+            await _move_coro
 
 
 async def move_plunger_relative_ot3(
