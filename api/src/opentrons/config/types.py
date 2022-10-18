@@ -162,6 +162,7 @@ class OT3Config:
     log_level: str
     motion_settings: OT3MotionSettings
     current_settings: OT3CurrentSettings
+    homing_speeds: PerPipetteAxisSettings
     z_retract_distance: float
     deck_transform: OT3Transform
     carriage_offset: Offset

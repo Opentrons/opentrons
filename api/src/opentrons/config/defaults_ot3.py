@@ -236,6 +236,36 @@ DEFAULT_RUN_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoa
     },
 )
 
+DEFAULT_HOMING_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
+    none={
+        OT3AxisKind.X: 40,
+        OT3AxisKind.Y: 40,
+        OT3AxisKind.Z: 15,
+        OT3AxisKind.P: 10,
+        OT3AxisKind.Z_G: 10,
+    },
+    high_throughput={
+        OT3AxisKind.X: 40,
+        OT3AxisKind.Y: 40,
+        OT3AxisKind.Z: 15,
+        OT3AxisKind.P: 10,
+    },
+    low_throughput={
+        OT3AxisKind.X: 40,
+        OT3AxisKind.Y: 40,
+        OT3AxisKind.Z: 15,
+        OT3AxisKind.P: 10,
+    },
+    two_low_throughput={
+        OT3AxisKind.X: 40,
+        OT3AxisKind.Y: 40,
+    },
+    gripper={
+        OT3AxisKind.Z: 15,
+        OT3AxisKind.Z_G: 10,
+    },
+)
+
 
 def _build_dict_with_default(
     from_conf: Any,
@@ -402,6 +432,10 @@ def build_with_defaults(robot_settings: Dict[str, Any]) -> OT3Config:
                 current_settings.get("run_current", {}),
                 DEFAULT_RUN_CURRENT,
             ),
+        ),
+        homing_speeds=_build_default_bpk(
+            robot_settings.get("homing_speeds", {}),
+            DEFAULT_HOMING_SPEEDS,
         ),
         z_retract_distance=robot_settings.get(
             "z_retract_distance", DEFAULT_Z_RETRACT_DISTANCE

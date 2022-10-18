@@ -232,9 +232,7 @@ class OT3Controller:
     def _build_home_pipettes_runner(
         self, axes: Sequence[OT3Axis]
     ) -> Optional[MoveGroupRunner]:
-        speed_settings = (
-            self._configuration.motion_settings.max_speed_discontinuity.none
-        )
+        speed_settings = self._configuration.homing_speeds.none
 
         distances_pipette = {
             ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
@@ -261,9 +259,7 @@ class OT3Controller:
     def _build_home_gantry_z_runner(
         self, axes: Sequence[OT3Axis]
     ) -> Optional[MoveGroupRunner]:
-        speed_settings = (
-            self._configuration.motion_settings.max_speed_discontinuity.none
-        )
+        speed_settings = self._configuration.homing_speeds.none
 
         distances_gantry = {
             ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
