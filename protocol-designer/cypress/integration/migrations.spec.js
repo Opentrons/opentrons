@@ -58,7 +58,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       title:
         'mix 5.0.x (schema 3, PD version 5.0.0) -> should migrate to 6.0.x, schema v6',
       importFixture: '../../fixtures/protocol/5/mix_5_0_x.json',
-      expectedExportFixture: '../../fixtures/protocol/6/mix_6_0_0.json',
+      expectedExportFixture: '../../fixtures/protocol/6/mix_6_0_1.json',
       migrationModal: 'noBehaviorChange',
       unusedPipettes: false,
     },
