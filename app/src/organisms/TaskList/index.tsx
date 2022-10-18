@@ -46,7 +46,7 @@ function ProgressTrackerItem({
   // a connector between task icons
   const taskConnector = (
     <Flex
-      flex={1}
+      flex="1"
       borderLeft={BORDERS.lineBorder}
       borderColor={
         isTaskListComplete || isPastTask || isActiveTaskWithSubtasks
@@ -68,11 +68,9 @@ function ProgressTrackerItem({
     <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_CENTER}>
       {isComplete || isTaskListComplete || isPastTask ? (
         <Icon
-          size={SPACING.spacing4}
+          size="1.25rem"
           margin={SPACING.spacing4}
           name="ot-check"
-          height="20px"
-          width="20px"
           color={
             isTaskListComplete || isPastTask
               ? COLORS.blueEnabled
@@ -89,9 +87,9 @@ function ProgressTrackerItem({
           }
           color={COLORS.white}
           margin={SPACING.spacing4}
-          height="20px"
-          width="20px"
-          borderRadius="10px"
+          height="1.25rem"
+          width="1.25rem"
+          borderRadius="0.625rem"
         >
           <StyledText as="label">{(taskIndex + 1).toString()}</StyledText>
         </Flex>
@@ -147,13 +145,13 @@ function ProgressTrackerItem({
                   borderWidth={SPACING.spacing1}
                   color={COLORS.white}
                   margin={SPACING.spacing4}
-                  height="12px"
-                  width="12px"
-                  borderRadius="6px"
+                  height="0.75rem"
+                  width="0.75rem"
+                  borderRadius="0.375rem"
                 />
                 {/* subtask connector component */}
                 <Flex
-                  flex={1}
+                  flex="1"
                   borderLeft={
                     // do not show the subtask connector if it's the final subtask of the task list
                     isFinalSubTaskOfTaskList
