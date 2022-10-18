@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from opentrons import __version__
 
 from .errors import exception_handlers
-from .hardware import initialize_hardware, cleanup_hardware
+from .hardware import start_initializing_hardware, clean_up_hardware
 from .router import router
 from .service import initialize_logging
 from .service.task_runner import (
@@ -53,7 +53,7 @@ async def on_startup() -> None:
     get_settings()
 
     initialize_logging()
-    initialize_hardware(app.state)
+    start_initializing_hardware(app.state)
     initialize_task_runner(app.state)
 
 
@@ -61,7 +61,7 @@ async def on_startup() -> None:
 async def on_shutdown() -> None:
     """Handle app shutdown."""
     shutdown_results = await asyncio.gather(
-        cleanup_hardware(app.state),
+        clean_up_hardware(app.state),
         clean_up_task_runner(app.state),
         return_exceptions=True,
     )
