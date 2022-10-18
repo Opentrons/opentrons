@@ -3,10 +3,10 @@ import asyncio
 import logging
 import select
 import time
-from typing import NoReturn, Optional
+from typing import NoReturn, Optional, List, Any
 import serial  # type: ignore[import]
 
-from .src import cli, usb_config, default_config, usb_monitor
+from .src import cli, usb_config, default_config, usb_monitor, tcp_conn
 
 LOG = logging.getLogger(__name__)
 
@@ -15,7 +15,10 @@ POLL_TIMEOUT = 1.0
 
 
 def update_ser_handle(
-    config: usb_config.SerialGadget, ser: Optional[serial.Serial], connected: bool
+    config: usb_config.SerialGadget,
+    ser: Optional[serial.Serial],
+    connected: bool,
+    tcp: tcp_conn.TCPConnection,
 ) -> Optional[serial.Serial]:
     """Updates the serial handle for connections and disconnections.
 
@@ -26,13 +29,18 @@ def update_ser_handle(
 
         connected: Whether the monitor reports the serial handle as
         connected or not
+
+        tcp: The TCP Connection handle, which will be connected/disconnected
+        based on the serial port presence.
     """
     if ser and not connected:
         LOG.debug("USB host disconnected")
         ser = None
+        tcp.disconnect()
     elif connected and not ser:
         LOG.debug("New USB host connected")
         ser = config.get_handle()
+        tcp.connect(default_config.DEFAULT_IP, default_config.DEFAULT_PORT)
     return ser
 
 
@@ -54,6 +62,7 @@ def listen(
     monitor: usb_monitor.USBConnectionMonitor,
     config: usb_config.SerialGadget,
     ser: Optional[serial.Serial],
+    tcp: tcp_conn.TCPConnection,
 ) -> Optional[serial.Serial]:
     """Process any available incoming data.
 
@@ -69,15 +78,19 @@ def listen(
         config: Serial gadget configuration
 
         ser: Handle for the serial port
+
+        tcp: Handle for the socket connection to the internal server
     """
-    rlist = [monitor]
-    if ser:
+    rlist: List[Any] = [monitor]
+    if ser is not None:
         rlist.append(ser)
+        rlist.append(tcp)
+
     ready = select.select(rlist, [], [], POLL_TIMEOUT)[0]
     if len(ready) == 0 or monitor in ready:
         # Read a new udev messages
         check_monitor(monitor, monitor in ready)
-        ser = update_ser_handle(config, ser, monitor.host_connected())
+        ser = update_ser_handle(config, ser, monitor.host_connected(), tcp)
         # ALWAYS exit early if we had a change in udev messages
         return ser
     if ser and ser in ready:
@@ -85,11 +98,14 @@ def listen(
         try:
             data = ser.read_all()
             LOG.debug(f"Received: {data}")
-            ser.write(data)
+            tcp.send(data)
         except OSError:
             LOG.debug("Got an OSError when disconnecting")
             monitor.update_state()
-            ser = update_ser_handle(config, ser, monitor.host_connected())
+            ser = update_ser_handle(config, ser, monitor.host_connected(), tcp)
+    if ser and tcp in ready:
+        # Ready TCP data to echo to serial
+        ser.write(tcp.read())
     return ser
 
 
@@ -139,8 +155,11 @@ async def main() -> NoReturn:
         LOG.debug("USB connected on startup")
         ser = config.get_handle()
 
+    # Create a tcp connection that will be managed by `listen`
+    tcp = tcp_conn.TCPConnection()
+
     while True:
-        ser = listen(monitor, config, ser)
+        ser = listen(monitor, config, ser, tcp)
 
 
 if __name__ == "__main__":
