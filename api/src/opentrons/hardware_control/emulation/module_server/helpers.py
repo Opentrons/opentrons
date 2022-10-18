@@ -124,7 +124,7 @@ async def wait_emulators(
                         module_set.remove(c.module_type)
             elif m.status == "disconnected":
                 for c in m.connections:
-                    if c.module_type in module_set:
+                    if c.module_type not in module_set:
                         module_set.add(c.module_type)
 
             log.debug(f"after message: {m}, awaiting module set is: {module_set}")
