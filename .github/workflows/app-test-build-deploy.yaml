@@ -154,7 +154,7 @@ jobs:
           HOST_PYTHON: python
         # TODO kj 10/17/2022 this run will be used make -C when all issues are solved.
         run: |
-          if [ '${{ matrix.os}}' == 'ubuntu-22.04']
+          if [ '${{ matrix.os}}' == 'windows-2022']
           then
             make -C app-shell dist-${{ matrix.os }}
           else
