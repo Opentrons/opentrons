@@ -36,8 +36,7 @@ function ProgressTrackerItem({
 }: ProgressTrackerItemProps): JSX.Element {
   const [activeTaskIndex, activeSubTaskIndex] = activeIndex ?? []
 
-  const isTaskListComplete =
-    activeTaskIndex == null || activeSubTaskIndex == null
+  const isTaskListComplete = activeIndex == null
   const isPastTask = activeTaskIndex != null && taskIndex < activeTaskIndex
   const isLastTask = taskIndex === taskListLength - 1
   const hasSubTasks = subTasks.length > 0
@@ -54,9 +53,11 @@ function ProgressTrackerItem({
           ? COLORS.blueEnabled
           : ''
       }
-      marginTop={`-0.75rem`}
+      marginTop="-0.75rem"
       // shorten connector length when subtasks are present
-      marginBottom={hasSubTasks ? '-0.5rem' : '-1.25rem'}
+      marginBottom={
+        hasSubTasks ? `-${SPACING.spacing3}` : `-${SPACING.spacingM}`
+      }
       height="100%"
     />
   )
@@ -164,10 +165,12 @@ function ProgressTrackerItem({
                       ? COLORS.blueEnabled
                       : ''
                   }
-                  marginTop={`-0.5rem`}
+                  marginTop={`-${SPACING.spacing3}`}
                   marginBottom={
                     // extend connector for last subtask
-                    isLastSubTask ? '-1.25rem' : '-0.5rem'
+                    isLastSubTask
+                      ? `-${SPACING.spacingM}`
+                      : `-${SPACING.spacing3}`
                   }
                   height="100%"
                 />
@@ -207,9 +210,7 @@ function SubTask({
 }: SubTaskProps): JSX.Element {
   const [activeTaskIndex, activeSubTaskIndex] = activeIndex ?? []
 
-  // TODO: pass as props?
-  const isTaskListComplete =
-    activeTaskIndex == null || activeSubTaskIndex == null
+  const isTaskListComplete = activeIndex == null
   const isActiveSubTask =
     activeSubTaskIndex === subTaskIndex && activeTaskIndex === taskIndex
   const isPastSubTask =
@@ -276,7 +277,8 @@ function Task({
 
   const [activeTaskIndex] = activeIndex ?? []
 
-  const isTaskListComplete = activeTaskIndex == null
+  // TODO(bh, 2022-10-18): pass booleans to children as props
+  const isTaskListComplete = activeIndex == null
   const isPastTask = activeTaskIndex != null && taskIndex < activeTaskIndex
   const isActiveTask = activeTaskIndex === taskIndex
   const hasSubTasks = subTasks.length > 0
