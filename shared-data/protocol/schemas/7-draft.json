@@ -475,6 +475,11 @@
                 "newLocation": {
                   "$ref": "#/definitions/labwareLocation",
                   "description": "Where to move the labware."
+                },
+                "useGripper": {
+                  "type": "boolean",
+                  "default": false,
+                  "description": "Whether to use the gripper to move the labware. Gripper is only available on the OT3."
                 }
               }
             }

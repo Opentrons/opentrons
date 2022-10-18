@@ -49,7 +49,7 @@ def subject(
     state_store: StateStore,
     model_utils: ModelUtils,
 ) -> LabwareMovementHandler:
-    """Get EquipmentHandler test subject for OT3, with its dependencies mocked out."""
+    """Get LabwareMovementHandler for OT3, with its dependencies mocked out."""
     return LabwareMovementHandler(
         hardware_api=ot3_hardware_api,
         state_store=state_store,

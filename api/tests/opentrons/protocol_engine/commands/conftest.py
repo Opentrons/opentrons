@@ -64,9 +64,6 @@ def movement(decoy: Decoy) -> MovementHandler:
     return decoy.mock(cls=MovementHandler)
 
 
-"" ""
-
-
 @pytest.fixture
 def labware_movement(decoy: Decoy) -> LabwareMovementHandler:
     """Get a mocked out LabwareMovementHandler."""
