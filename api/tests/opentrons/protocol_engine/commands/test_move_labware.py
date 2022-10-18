@@ -35,7 +35,7 @@ async def test_manual_move_labware_implementation(
     data = MoveLabwareParams(
         labwareId="my-cool-labware-id",
         newLocation=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
-        use_gripper=False,
+        useGripper=False,
     )
 
     decoy.when(state_view.labware.get(labware_id="my-cool-labware-id")).then_return(
@@ -78,7 +78,7 @@ async def test_gripper_move_labware_implementation(
     data = MoveLabwareParams(
         labwareId="my-cool-labware-id",
         newLocation=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
-        use_gripper=True,
+        useGripper=True,
     )
 
     decoy.when(state_view.labware.get(labware_id="my-cool-labware-id")).then_return(
@@ -100,7 +100,7 @@ async def test_gripper_move_labware_implementation(
 
     result = await subject.execute(data)
     decoy.verify(
-        equipment.move_labware_with_gripper(
+        await equipment.move_labware_with_gripper(
             labware_id="my-cool-labware-id",
             new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
         ),

@@ -2,7 +2,7 @@
 import pytest
 from datetime import datetime
 from decoy import Decoy, matchers
-from typing import Any, cast
+from typing import Any, cast, TYPE_CHECKING
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
@@ -15,6 +15,7 @@ from opentrons.hardware_control.modules import (
     HeaterShaker,
     AbstractModule,
 )
+from opentrons.hardware_control.dev_types import GripperDict
 from opentrons.protocols.models import LabwareDefinition
 
 from opentrons.protocol_engine import errors
@@ -42,6 +43,9 @@ from opentrons.protocol_engine.execution.equipment import (
     LoadedPipetteData,
     LoadedModuleData,
 )
+
+if TYPE_CHECKING:
+    from opentrons.hardware_control.ot3api import OT3API
 
 
 @pytest.fixture
@@ -105,6 +109,24 @@ def subject(
     """Get an EquipmentHandler test subject with its dependencies mocked out."""
     return EquipmentHandler(
         hardware_api=hardware_api,
+        state_store=state_store,
+        labware_data_provider=labware_data_provider,
+        module_data_provider=module_data_provider,
+        model_utils=model_utils,
+    )
+
+
+@pytest.mark.ot3_only
+def ot3_subject(
+    ot3_hardware_api: HardwareControlAPI,
+    state_store: StateStore,
+    labware_data_provider: LabwareDataProvider,
+    module_data_provider: ModuleDataProvider,
+    model_utils: ModelUtils,
+) -> EquipmentHandler:
+    """Get EquipmentHandler test subject for OT3, with its dependencies mocked out."""
+    return EquipmentHandler(
+        hardware_api=ot3_hardware_api,
         state_store=state_store,
         labware_data_provider=labware_data_provider,
         module_data_provider=module_data_provider,
@@ -352,7 +374,7 @@ def test_find_offset_id_of_labware_on_deck_slot(
     assert result == "labware-offset-id"
 
 
-def test_move_labware_to_module(
+def test_find_offset_id_of_labware_on_module(
     decoy: Decoy,
     state_store: StateStore,
     subject: EquipmentHandler,
@@ -668,10 +690,22 @@ def test_get_module_hardware_api_missing(
         subject.get_module_hardware_api(cast(Any, "module-id"))
 
 
-def test_move_labware_with_gripper(
+@pytest.mark.ot3_only
+async def test_move_labware_with_gripper(
     decoy: Decoy,
     state_store: StateStore,
-    hardware_api: HardwareControlAPI,
+    ot3_hardware_api: OT3API,
     subject: EquipmentHandler,
 ) -> None:
     """It should perform a labware movement with gripper by delegating to OT3API."""
+    decoy.when(ot3_hardware_api.attached_gripper).then_return(GripperDict(
+        name="gripper", display_name="abc", model=GripperModel("abc"), state=0, gripper_id="123"
+    ))
+
+    decoy.when(state_store.labware.get_location(labware_id="my-teleporting-labware"))
+
+    await subject.move_labware_with_gripper(
+        labware_id="my-teleporting-labware",
+        new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
+    )
+    # TODO: complete this test

@@ -21,7 +21,7 @@ class MoveLabwareParams(BaseModel):
 
     labwareId: str = Field(..., description="The ID of the labware to move.")
     newLocation: LabwareLocation = Field(..., description="Where to move the labware.")
-    use_gripper: Optional[bool] = Field(
+    useGripper: Optional[bool] = Field(
         False, description="Whether to use the gripper to perform the labware movement."
     )
 
@@ -71,7 +71,7 @@ class MoveLabwareImplementation(
             labware_definition_uri=definition_uri, labware_location=params.newLocation
         )
 
-        if params.use_gripper:
+        if params.useGripper:
             await self._equipment.move_labware_with_gripper(
                 labware_id=params.labwareId, new_location=params.newLocation
             )
