@@ -194,7 +194,7 @@ export function LabwareListItem(
         <StyledTableRow key={id}>
           <StyledTableCell>
             <Flex flexDirection={DIRECTION_ROW}>
-              <Flex width="4.1rem">
+              <Flex width="4.1rem" height="3.6rem">
                 <RobotWorkSpace
                   data-testid={`${id}_${runId}`}
                   key={id}
