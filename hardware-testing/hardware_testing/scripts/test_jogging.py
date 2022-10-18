@@ -10,7 +10,6 @@ MOUNT = types.OT3Mount.RIGHT
 
 async def _main(is_simulating: bool) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating)
-    print(api.hardware_pipettes)
     await api.home()
     final_position = await helpers_ot3.jog_mount_ot3(api, MOUNT)
     print(f"Jogged the mount to deck coordinate: {final_position}")
