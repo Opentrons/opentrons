@@ -61,5 +61,5 @@ async def build_module(
             _log.warning(f"Module build attempt {retry_attempt} failed.", exc_info=e)
             retry_attempt += 1
 
-    assert module is not None, f"Failed to build module after {retry_attempt} attempts."
+    assert module is not None, f"Failed to build module after {_CONNECT_RETRIES} tries."
     return cast(ModuleType, module)

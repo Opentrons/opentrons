@@ -82,4 +82,4 @@ async def execution_manager() -> AsyncGenerator[ExecutionManager, None]:
 @pytest.fixture
 def poll_interval_seconds() -> float:
     """The polling interval used for the module tests."""
-    return 0.01
+    return 0.05
