@@ -7,8 +7,16 @@ from typing import List, Optional, Dict, Tuple
 from opentrons.config.robot_configs import build_config_ot3, load_ot3 as load_ot3_config
 from opentrons.hardware_control.instruments.pipette import Pipette
 from opentrons.hardware_control.ot3api import OT3API
+from opentrons.types import PipetteNotAttachedError
 
-from .types import GantryLoad, PerPipetteAxisSettings, OT3Axis, OT3Mount, Point
+from .types import (
+    GantryLoad,
+    PerPipetteAxisSettings,
+    OT3Axis,
+    OT3Mount,
+    Point,
+    CriticalPoint,
+)
 
 
 def stop_server_ot3() -> None:
@@ -262,32 +270,42 @@ async def move_plunger_absolute_ot3(
     api: OT3API,
     mount: OT3Mount,
     position: float,
+    motor_current: Optional[float] = None,
     speed: Optional[float] = None,
 ) -> None:
     """Move OT3 plunger position to an absolute position."""
-    await api._move(
-        target_position={OT3Axis.of_main_tool_actuator(mount): position},  # type: ignore[arg-type]
-        speed=speed,
-    )
+    if not api.hardware_pipettes[mount.to_mount()]:
+        raise PipetteNotAttachedError(f"No pipette found on mount: {mount}")
+    plunger_axis = OT3Axis.of_main_tool_actuator(mount)
+    if motor_current is None:
+        await api._move(
+            target_position={plunger_axis: position},  # type: ignore[arg-type]
+            speed=speed,
+        )
+    else:
+        async with api._backend.restore_current():
+            await api._backend.set_active_current(
+                {OT3Axis.of_main_tool_actuator(mount): motor_current}  # type: ignore[dict-item]
+            )
+            await api._move(
+                target_position={plunger_axis: position},  # type: ignore[arg-type]
+                speed=speed,
+            )
 
 
 async def move_plunger_relative_ot3(
     api: OT3API,
     mount: OT3Mount,
-    position: float,
-    motor_current: Optional[float] = 1.0,
+    delta: float,
+    motor_current: Optional[float] = None,
     speed: Optional[float] = None,
 ) -> None:
     """Move OT3 plunger position in a relative direction."""
-    current_pos = await api.current_position(mount=mount)
-    await api._backend.set_active_current(
-        {OT3Axis.of_main_tool_actuator(mount): motor_current}  # type: ignore[dict-item]
-    )
-    plunger_pos = current_pos[OT3Axis.of_main_tool_actuator(mount)]  # type: ignore[index]
-    target_pos = {OT3Axis.of_main_tool_actuator(mount): plunger_pos + position}
-    await api._move(
-        target_position=target_pos,  # type: ignore[arg-type]
-        speed=speed,
+    current_pos = await api.current_position_ot3(mount=mount)
+    plunger_axis = OT3Axis.of_main_tool_actuator(mount)
+    plunger_pos = current_pos[plunger_axis]
+    return await move_plunger_absolute_ot3(
+        api, mount, plunger_pos + delta, motor_current, speed
     )
 
 
@@ -306,3 +324,91 @@ def get_endstop_position_ot3(api: OT3API, mount: OT3Mount) -> Point:
         y=api.config.carriage_offset[1] + mount_offset[1],
         z=api.config.carriage_offset[2] + mount_offset[2],
     )
+
+
+class OT3JogTermination(Exception):
+    """Jogging terminated."""
+
+    pass
+
+
+class OT3JogNoInput(Exception):
+    """No jogging input from user."""
+
+    pass
+
+
+def _jog_read_user_input(terminator: str) -> Tuple[str, float]:
+    user_input = input(f'Jog eg: x-10.5 ("{terminator}" to stop): ')
+    user_input = user_input.strip().replace(" ", "")
+    if user_input == terminator:
+        raise OT3JogTermination()
+    if not user_input:
+        raise OT3JogNoInput()
+    if len(user_input) < 2:
+        raise ValueError(f"Unexpected jog input: {user_input}")
+    axis = user_input[0].upper()
+    if axis not in "XYZPG":
+        raise ValueError(f'Unexpected axis: "{axis}"')
+    distance = float(user_input[1:])
+    return axis, distance
+
+
+async def _jog_axis_some_distance(
+    api: OT3API, mount: OT3Mount, axis: str, distance: float
+) -> None:
+    if not axis or distance == 0.0:
+        return
+    elif axis == "G":
+        raise RuntimeError("Gripper jogging not yet supported")
+    elif axis == "P":
+        await move_plunger_relative_ot3(api, mount, distance)
+    else:
+        delta = Point(**{axis.lower(): distance})
+        await api.move_rel(mount=mount, delta=delta)
+
+
+async def _jog_print_current_position(
+    api: OT3API, mount: OT3Mount, critical_point: Optional[CriticalPoint] = None
+) -> None:
+    z_axis = OT3Axis.by_mount(mount)
+    plunger_axis = OT3Axis.of_main_tool_actuator(mount)
+    current_pos = await api.current_position_ot3(
+        mount=mount, critical_point=critical_point
+    )
+    x, y, z, p = [
+        current_pos.get(ax) for ax in [OT3Axis.X, OT3Axis.Y, z_axis, plunger_axis]
+    ]
+    print(f"Deck Coordinate: X={x}, Y={y}, Z={z}, P={p}")
+
+
+async def jog_mount_ot3(
+    api: OT3API, mount: OT3Mount, critical_point: Optional[CriticalPoint] = None
+) -> Dict[OT3Axis, float]:
+    """Jog an OT3 mount's gantry XYZ and pipettes axes."""
+    axis = ""
+    distance = 0.0
+    while True:
+        current_pos = await api.current_position_ot3(
+            mount=mount, critical_point=critical_point
+        )
+        await _jog_print_current_position(api, mount, critical_point)
+        try:
+            axis, distance = _jog_read_user_input("stop")
+        except ValueError as e:
+            print(e)
+            continue
+        except OT3JogTermination:
+            print("Done jogging")
+            break
+        except OT3JogNoInput:
+            if axis and distance:
+                print(
+                    f"No input, repeating previous jog (axis={axis}, distance={distance})"
+                )
+            pass
+        try:
+            await _jog_axis_some_distance(api, mount, axis, distance)
+        except PipetteNotAttachedError as e:
+            print(e)
+    return current_pos
