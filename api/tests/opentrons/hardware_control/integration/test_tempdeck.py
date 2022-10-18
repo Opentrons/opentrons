@@ -58,7 +58,7 @@ async def test_start_set_temperature_cool(tempdeck: TempDeck) -> None:
     await tempdeck.start_set_temperature(new_temp)
     assert tempdeck.live_data == {
         "status": "cooling",
-        "data": {"currentTemp": current, "targetTemp": new_temp},
+        "data": {"currentTemp": pytest.approx(current, abs=5), "targetTemp": new_temp},
     }
 
     # Wait for temperature to be reached
@@ -77,7 +77,7 @@ async def test_start_set_temperature_heat(tempdeck: TempDeck) -> None:
     await tempdeck.start_set_temperature(new_temp)
     assert tempdeck.live_data == {
         "status": "heating",
-        "data": {"currentTemp": current, "targetTemp": new_temp},
+        "data": {"currentTemp": pytest.approx(current, abs=5), "targetTemp": new_temp},
     }
 
     # Wait for temperature to be reached
