@@ -21,9 +21,7 @@ export const InstrumentContainer = (
       paddingY={SPACING.spacing1}
       width="max-content"
     >
-      <StyledText as="p" color={COLORS.darkBlackEnabled}>
-        {displayName}
-      </StyledText>
+      <StyledText as="p">{displayName}</StyledText>
     </Flex>
   )
 }
