@@ -40,6 +40,7 @@ from .exceptions import (
     PauseNotAllowedError,
     ProtocolCommandFailedError,
     GripperNotAttachedError,
+    HardwareNotSupportedError,
     UnsupportedLabwareMovement,
 )
 
@@ -86,6 +87,7 @@ __all__ = [
     "PauseNotAllowedError",
     "ProtocolCommandFailedError",
     "GripperNotAttachedError",
+    "HardwareNotSupportedError",
     "UnsupportedLabwareMovement",
     # error occurrence models
     "ErrorOccurrence",

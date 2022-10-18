@@ -2,7 +2,7 @@
 import pytest
 from datetime import datetime
 from decoy import Decoy, matchers
-from typing import Any, cast, TYPE_CHECKING
+from typing import Any, cast
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 

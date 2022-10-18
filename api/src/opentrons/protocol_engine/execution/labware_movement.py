@@ -1,7 +1,6 @@
 """Labware movement command handling."""
 from typing import Optional, Union, List
 
-# from opentrons.config import feature_flags
 from opentrons.types import Point
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.ot3api import OT3API
@@ -11,7 +10,7 @@ from opentrons.protocol_engine.state import StateStore
 
 from ..errors import (
     GripperNotAttachedError,
-    # UnsupportedLabwareMovement,
+    HardwareNotSupportedError,
 )
 
 from ..types import (
@@ -33,10 +32,10 @@ class LabwareMovementHandler:
     _model_utils: ModelUtils
 
     def __init__(
-            self,
-            hardware_api: HardwareControlAPI,
-            state_store: StateStore,
-            model_utils: Optional[ModelUtils] = None,
+        self,
+        hardware_api: HardwareControlAPI,
+        state_store: StateStore,
+        model_utils: Optional[ModelUtils] = None,
     ) -> None:
         """Initialize a LabwareMovementHandler instance."""
         self._hardware_api = hardware_api
@@ -50,18 +49,12 @@ class LabwareMovementHandler:
         new_location: Union[DeckSlotLocation, ModuleLocation],
     ) -> None:
         """Move a loaded labware from one location to another."""
-        # if not feature_flags.enable_ot3_hardware_controller():
-        #     raise UnsupportedLabwareMovement(
-        #         "Labware movement w/ gripper is only available on the OT3"
-        #     )
-
-        assert isinstance(
-            self._hardware_api, OT3API
-        ), "Gripper is only available on the OT3"
+        if not isinstance(self._hardware_api, OT3API):
+            raise HardwareNotSupportedError("Gripper is only available on the OT3")
 
         if self._hardware_api.attached_gripper is None:
             raise GripperNotAttachedError(
-                "No gripper found in order to perform labware movement with."
+                "No gripper found for performing labware movements."
             )
 
         gripper_mount = OT3Mount.GRIPPER

@@ -87,7 +87,7 @@ class MoveLabwareImplementation(
             await self._labware_movement.move_labware_with_gripper(
                 labware_id=params.labwareId,
                 current_location=from_location,
-                new_location=params.newLocation
+                new_location=params.newLocation,
             )
         else:
             # Pause to allow for manual labware movement
