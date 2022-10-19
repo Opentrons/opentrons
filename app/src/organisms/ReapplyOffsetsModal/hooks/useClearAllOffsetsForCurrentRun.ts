@@ -12,17 +12,18 @@ export function useClearAllOffsetsForCurrentRun(): () => void {
 
   return () => {
     if (currentRunId == null || protocolData == null) return
-    Object.keys(protocolData.labware).forEach(labwareId => {
+    //  @ts-expect-error
+    protocolData.labware.forEach(item => {
       createLabwareOffset({
         runId: currentRunId,
         data: {
           definitionUri: getLabwareDefinitionUri(
-            labwareId,
+            item.id,
             protocolData.labware,
             protocolData.labwareDefinitions
           ),
           location: getLabwareOffsetLocation(
-            labwareId,
+            item.id,
             protocolData.commands,
             protocolData.modules
           ),

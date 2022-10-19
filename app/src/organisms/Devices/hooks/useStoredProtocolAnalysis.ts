@@ -1,7 +1,7 @@
 import { useSelector } from 'react-redux'
 import {
   parseAllRequiredModuleModelsById,
-  parseInitialLoadedLabwareById,
+  parseInitialLoadedLabwareEntity,
   parseInitialLoadedLabwareDefinitionsById,
   parsePipetteEntity,
 } from '@opentrons/api-client'
@@ -11,7 +11,7 @@ import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 import { getStoredProtocol } from '../../../redux/protocol-storage'
 
 import type {
-  LoadedLabwareById,
+  LoadedLabwareEntity,
   LoadedLabwareDefinitionsById,
   ModuleModelsById,
   PipetteNamesById,
@@ -25,7 +25,7 @@ export interface StoredProtocolAnalysis
   extends Omit<ProtocolAnalysisOutput, 'pipettes' | 'modules' | 'labware'> {
   pipettes: PipetteNamesById[]
   modules: ModuleModelsById
-  labware: LoadedLabwareById
+  labware: LoadedLabwareEntity[]
   labwareDefinitions: LoadedLabwareDefinitionsById
 }
 
@@ -38,13 +38,12 @@ export const parseProtocolAnalysisOutput = (
   const moduleModelsById = parseAllRequiredModuleModelsById(
     storedProtocolAnalysis?.commands ?? []
   )
-  const labwareById = parseInitialLoadedLabwareById(
+  const labwareById = parseInitialLoadedLabwareEntity(
     storedProtocolAnalysis?.commands ?? []
   )
   const labwareDefinitionsById = parseInitialLoadedLabwareDefinitionsById(
     storedProtocolAnalysis?.commands ?? []
   )
-
   return storedProtocolAnalysis != null
     ? {
         ...storedProtocolAnalysis,
@@ -71,6 +70,7 @@ export function useStoredProtocolAnalysis(
   const storedProtocolAnalysis =
     useSelector((state: State) => getStoredProtocol(state, protocolKey))
       ?.mostRecentAnalysis ?? null
+
   // @ts-expect-error
   return storedProtocolAnalysis != null && 'modules' in storedProtocolAnalysis
     ? schemaV6Adapter(storedProtocolAnalysis)

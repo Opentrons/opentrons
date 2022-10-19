@@ -36,7 +36,8 @@ export const DeprecatedStepDetailText = (
   ] = React.useState<boolean>(false)
   if (protocolData == null) return null
   //  @ts-expect-error: will be an error until we remove the schemaV6Adapter
-  const labwareDefId = protocolData.labware[labwareId].definitionUri
+  const labwareDefId = protocolData.labware.find(item => item.id === labwareId)
+    .definitionUri
   const labwareDef = protocolData.labwareDefinitions[labwareDefId]
   const { displayName } = labwareDef.metadata
   const { isTiprack } = labwareDef.parameters

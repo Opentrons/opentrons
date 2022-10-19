@@ -7,11 +7,11 @@ import {
   getSlotHasMatingSurfaceUnitVector,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
+import { getLabwareLocation } from '../../Devices/ProtocolRun/utils/getLabwareLocation'
+import { getModuleInitialLoadInfo } from '../../Devices/ProtocolRun/utils/getModuleInitialLoadInfo'
 import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { LabwareToOrder } from '../types'
-import { getLabwareLocation } from '../../Devices/ProtocolRun/utils/getLabwareLocation'
-import { getModuleInitialLoadInfo } from '../../Devices/ProtocolRun/utils/getModuleInitialLoadInfo'
 
 export const tipRackOrderSort = (
   tiprack1: LabwareToOrder,
@@ -43,12 +43,16 @@ export const getTiprackIdsInOrder = (
 ): string[] => {
   const unorderedTipracks = reduce<typeof labware, LabwareToOrder[]>(
     labware,
-    (tipracks, currentLabware, labwareId) => {
+    (tipracks, currentLabware, labwareIndex) => {
       //  @ts-expect-error: will be an error until we remove the schemaV6Adapter
       const labwareDef = labwareDefinitions[currentLabware.definitionUri]
       const isTiprack = getIsTiprack(labwareDef)
       if (isTiprack) {
-        const labwareLocation = getLabwareLocation(labwareId, commands)
+        const labwareLocation = getLabwareLocation(
+          //  @ts-expect-error: id will exist when we remove the schemaV6Adapter
+          labware[labwareIndex].id,
+          commands
+        )
         if (!('slotName' in labwareLocation)) {
           throw new Error('expected tiprack location to be a slot')
         }
@@ -57,7 +61,8 @@ export const getTiprackIdsInOrder = (
           ...tipracks,
           {
             definition: labwareDef,
-            labwareId: labwareId,
+            //  @ts-expect-error: id will exist when we remove the schemaV6Adapter
+            labwareId: labware[labwareIndex].id,
             slot: labwareLocation.slotName,
           },
         ]
@@ -96,9 +101,10 @@ export const getAllTipracksIdsThatPipetteUsesInOrder = (
 
   const orderedTiprackIds = tipracksVisited
     .map<LabwareToOrder>(tiprackId => {
-      //  @ts-expect-error: will be an error until we remove the schemaV6Adapter
-      const labwareDefId = labware[tiprackId].definitionUri
-      const definition = labwareDefinitions[labwareDefId]
+      //  @ts-expect-error
+      const labwareDefinitionUri = labware.find(item => item.id === tiprackId)
+        .definitionUri
+      const definition = labwareDefinitions[labwareDefinitionUri]
       const tiprackLocation = getLabwareLocation(tiprackId, commands)
       if (!('slotName' in tiprackLocation)) {
         throw new Error('expected tiprack location to be a slot')
@@ -123,11 +129,15 @@ export const getLabwareIdsInOrder = (
 ): string[] => {
   const unorderedLabware = reduce<typeof labware, LabwareToOrder[]>(
     labware,
-    (unorderedLabware, currentLabware, labwareId) => {
-      //  @ts-expect-error: will be an error until we remove the schemaV6Adapter
+    (unorderedLabware, currentLabware, labwareIndex) => {
+      //  @ts-expect-error: definitionUri will exist when we remove the schemaV6Adapter
       const labwareDef = labwareDefinitions[currentLabware.definitionUri]
       const isTiprack = getIsTiprack(labwareDef)
-      const labwareLocation = getLabwareLocation(labwareId, commands)
+      const labwareLocation = getLabwareLocation(
+        //  @ts-expect-error: id will exist when we remove the schemaV6Adapter
+        labware[labwareIndex].id,
+        commands
+      )
       // skip any labware that is not a tiprack
       if (!isTiprack) {
         if ('moduleId' in labwareLocation) {
@@ -135,7 +145,9 @@ export const getLabwareIdsInOrder = (
             ...unorderedLabware,
             {
               definition: labwareDef,
-              labwareId: labwareId,
+              //  @ts-expect-error: id will exist when we remove the schemaV6Adapter
+              labwareId: labware[labwareIndex].id,
+
               slot: getModuleInitialLoadInfo(labwareLocation.moduleId, commands)
                 .location.slotName,
             },
@@ -155,7 +167,8 @@ export const getLabwareIdsInOrder = (
           ...unorderedLabware,
           {
             definition: labwareDef,
-            labwareId: labwareId,
+            //  @ts-expect-error: id will exist when we remove the schemaV6Adapter
+            labwareId: labware[labwareIndex].id,
             slot: labwareLocation.slotName,
           },
         ]

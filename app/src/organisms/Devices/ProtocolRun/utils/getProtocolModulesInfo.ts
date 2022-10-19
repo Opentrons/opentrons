@@ -47,15 +47,21 @@ export const getProtocolModulesInfo = (
                 'moduleId' in command.params.location &&
                 command.params.location.moduleId === moduleId
             )?.result?.labwareId ?? null
-
-        const nestedLabware =
-          nestedLabwareId != null ? protocolData.labware[nestedLabwareId] : null
+        //  @ts-expect-error
+        const nestedLabware = protocolData.labware.filter(
+          //  @ts-expect-error
+          item => nestedLabwareId != null && item.id === nestedLabwareId
+        )
         const nestedLabwareDef =
           nestedLabware != null
-            ? //  @ts-expect-error: will be an error until we remove the schemaV6Adapter
-              protocolData.labwareDefinitions[nestedLabware.definitionUri]
+            ? protocolData.labwareDefinitions[
+                //  @ts-expect-error
+                nestedLabware.map(item => item.definitionUri)
+              ]
             : null
-        const nestedLabwareDisplayName = nestedLabware?.displayName ?? null
+        const nestedLabwareDisplayName =
+          //  @ts-expect-error
+          nestedLabware.map(item => item.displayName).toString() ?? null
         const moduleInitialLoadInfo = getModuleInitialLoadInfo(
           moduleId,
           protocolData.commands
