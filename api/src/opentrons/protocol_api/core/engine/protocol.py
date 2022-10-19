@@ -128,19 +128,19 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
     def load_module(
         self,
         model: ModuleModel,
-        location: Optional[DeckSlotName],
+        deck_slot: Optional[DeckSlotName],
         configuration: Optional[str],
     ) -> ModuleCore:
         """Load a module into the protocol."""
-        if location is None:
+        if deck_slot is None:
             if isinstance(model, ThermocyclerModuleModel):
-                location = DeckSlotName.SLOT_7
+                deck_slot = DeckSlotName.SLOT_7
             else:
-                raise InvalidModuleLocationError(location, model.name)
+                raise InvalidModuleLocationError(deck_slot, model.name)
 
         result = self._engine_client.load_module(
             model=EngineModuleModel(model),
-            location=DeckSlotLocation(slotName=location),
+            location=DeckSlotLocation(slotName=deck_slot),
         )
         module_type = result.model.as_type()
 

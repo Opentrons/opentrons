@@ -229,7 +229,7 @@ def test_load_module(
 
     result = subject.load_module(
         model=requested_model,
-        location=DeckSlotName.SLOT_1,
+        deck_slot=DeckSlotName.SLOT_1,
         configuration="",
     )
 
@@ -276,7 +276,7 @@ def test_load_module_thermocycler_with_no_location(
 
     result = subject.load_module(
         model=requested_model,
-        location=None,
+        deck_slot=None,
         configuration="",
     )
 
@@ -302,4 +302,4 @@ def test_load_module_no_location(
 ) -> None:
     """Should raise an InvalidModuleLocationError exception."""
     with pytest.raises(InvalidModuleLocationError):
-        subject.load_module(model=requested_model, location=None, configuration="")
+        subject.load_module(model=requested_model, deck_slot=None, configuration="")
