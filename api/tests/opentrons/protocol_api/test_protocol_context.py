@@ -20,7 +20,13 @@ from opentrons.protocol_api import (
 )
 from opentrons.protocol_api.core.labware import LabwareLoadParams
 
-from .types import InstrumentCore, LabwareCore, ModuleCore, ProtocolCore
+from .types import (
+    InstrumentCore,
+    LabwareCore,
+    ModuleCore,
+    ProtocolCore,
+    TemperatureModuleCore,
+)
 
 
 @pytest.fixture(autouse=True)
@@ -185,8 +191,8 @@ def test_load_module(
     subject: ProtocolContext,
 ) -> None:
     """It should load a module."""
-    mock_module_core = decoy.mock(cls=ModuleCore)
-
+    mock_module_core = decoy.mock(cls=TemperatureModuleCore)
+    print(mock_module_core)
     decoy.when(validation.ensure_module_model("spline reticulator")).then_return(
         TemperatureModuleModel.TEMPERATURE_V1
     )
@@ -200,7 +206,6 @@ def test_load_module(
         )
     ).then_return(mock_module_core)
 
-    decoy.when(mock_module_core.get_type()).then_return(ModuleType.TEMPERATURE)
     decoy.when(mock_module_core.get_model()).then_return(
         TemperatureModuleModel.TEMPERATURE_V2
     )
