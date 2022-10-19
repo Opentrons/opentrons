@@ -134,7 +134,7 @@ def test_load_labware_on_module(
 
     result = subject.load_labware(
         load_name="some_labware",
-        location=ModuleCore(module_id="module-id"),
+        location=ModuleCore(module_id="module-id", engine_client=mock_engine_client),
         label="some_display_name",  # maps to optional display name
         namespace="some_explicit_namespace",
         version=9001,

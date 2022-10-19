@@ -15,6 +15,7 @@ from opentrons.drivers.types import (
 )
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.types import DeckSlotName
+from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 
 from ..module import (
     AbstractModuleCore,
@@ -33,8 +34,9 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
         module_id: ProtocolEngine ID of the loaded modules.
     """
 
-    def __init__(self, module_id: str) -> None:
+    def __init__(self, module_id: str, engine_client: ProtocolEngineClient) -> None:
         self._module_id = module_id
+        self._engine_client = engine_client
 
     @property
     def module_id(self) -> str:
@@ -67,7 +69,8 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
 
     def get_deck_slot(self) -> DeckSlotName:
         """Get the module's deck slot."""
-        raise NotImplementedError("get_deck_slot not implemented")
+        modules_view = self._engine_client.state.modules
+        return modules_view.state.slot_by_module_id[self.module_id]
 
     def add_labware_core(self, labware_core: LabwareCore) -> None:
         """Add a labware to the module."""

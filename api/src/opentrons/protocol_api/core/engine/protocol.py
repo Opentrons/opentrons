@@ -156,7 +156,9 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         else:
             assert False, "Unsupported module definition"
 
-        return module_core_cls(module_id=result.moduleId)
+        return module_core_cls(
+            module_id=result.moduleId, engine_client=self._engine_client
+        )
 
     def load_instrument(
         self, instrument_name: PipetteNameType, mount: Mount
