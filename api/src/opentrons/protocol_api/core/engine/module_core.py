@@ -1,18 +1,22 @@
 """Protocol API module implementation logic."""
 from typing import Optional
 
-from ..module import AbstractModuleCore, AbstractTemperatureModuleCore
-from .labware import LabwareCore
-from ..labware import LabwareCoreType
-
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     ModuleType,
     TemperatureStatus,
+    MagneticStatus,
 )
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.types import DeckSlotName
+
+from ..module import (
+    AbstractModuleCore,
+    AbstractTemperatureModuleCore,
+    AbstractMagneticModuleCore,
+)
+from .labware import LabwareCore
 
 
 class ModuleCore(AbstractModuleCore[LabwareCore]):
@@ -58,17 +62,13 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
         """Get the module's deck slot."""
         raise NotImplementedError("get_deck_slot not implemented")
 
-    def add_labware_core(self, labware_core: LabwareCoreType) -> None:
+    def add_labware_core(self, labware_core: LabwareCore) -> None:
         """Add a labware to the module."""
         raise NotImplementedError("add_labware_core not implemented")
 
 
 class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore[LabwareCore]):
-    """Temperature module core logic implementation for Python protocols.
-
-    Args:
-        module_id: ProtocolEngine ID of the loaded modules.
-    """
+    """Temperature Module core logic implementation for Python protocols."""
 
     def set_target_temperature(self, celsius: float) -> None:
         """Set the Temperature Module's target temperature in °C."""
@@ -97,3 +97,46 @@ class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore[LabwareCor
     def get_status(self) -> TemperatureStatus:
         """Get the module's current temperature status."""
         raise NotImplementedError("get_status not implemented")
+
+
+class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
+    """Magnetic Module control interface via a ProtocolEngine."""
+
+    def engage(
+        self,
+        height_from_base: Optional[float] = None,
+        height_from_home: Optional[float] = None,
+    ) -> None:
+        """Raise the module's magnets.
+
+        Only one of `height_from_base` or `height_from_home` may be specified.
+
+        Args:
+            height_from_base: Distance from labware base to raise the magnets.
+            height_from_home: Distance from motor home position to raise the magnets.
+        """
+        raise NotImplementedError("MagneticCore")
+
+    def engage_to_labware(
+        self, offset: float = 0, preserve_half_mm: bool = False
+    ) -> None:
+        """Raise the module's magnets up to its loaded labware.
+
+        Args:
+            offset: Offset from the labware's default engage height.
+            preserve_half_mm: For labware whose definitions
+                erroneously use half-mm for their defined default engage height,
+                use the value directly instead of converting it to real millimeters.
+
+        Raises:
+            Exception: Labware is not loaded or has no default engage height.
+        """
+        raise NotImplementedError("MagneticCore")
+
+    def disengage(self) -> None:
+        """Lower the magnets back into the module."""
+        raise NotImplementedError("MagneticCore")
+
+    def get_status(self) -> MagneticStatus:
+        """Get the module's current magnet status."""
+        raise NotImplementedError("MagneticCore")

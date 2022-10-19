@@ -1,4 +1,6 @@
 """Test for the ProtocolEngine-based protocol API core."""
+from typing import Type
+
 import pytest
 from decoy import Decoy
 
@@ -11,13 +13,21 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data import load_shared_data
 
 from opentrons.types import Mount, MountType, DeckSlotName
-from opentrons.protocol_engine import commands
-from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons.protocol_engine.types import (
+from opentrons.hardware_control.modules.types import (
+    ModuleModel,
+    TemperatureModuleModel,
+    MagneticModuleModel,
+    ThermocyclerModuleModel,
+    HeaterShakerModuleModel,
+)
+from opentrons.protocol_engine import (
+    ModuleModel as EngineModuleModel,
     DeckSlotLocation,
     ModuleLocation,
     ModuleDefinition,
+    commands,
 )
+from opentrons.protocol_engine.clients import SyncClient as EngineClient
 
 from opentrons.protocol_api.core.labware import LabwareLoadParams
 from opentrons.protocol_api.core.engine import (
@@ -26,9 +36,10 @@ from opentrons.protocol_api.core.engine import (
     LabwareCore,
     ModuleCore,
 )
-from opentrons.protocol_api.core.engine.module_core import TemperatureModuleCore
-
-from opentrons.protocol_engine.types import ModuleModel
+from opentrons.protocol_api.core.engine.module_core import (
+    TemperatureModuleCore,
+    MagneticModuleCore,
+)
 
 
 @pytest.fixture(scope="session")
@@ -156,32 +167,70 @@ def test_add_labware_definition(
     assert result == LabwareLoadParams("hello", "world", 123)
 
 
+@pytest.mark.parametrize(
+    ("requested_model", "engine_model", "expected_core_cls"),
+    [
+        (
+            TemperatureModuleModel.TEMPERATURE_V1,
+            EngineModuleModel.TEMPERATURE_MODULE_V1,
+            TemperatureModuleCore,
+        ),
+        (
+            TemperatureModuleModel.TEMPERATURE_V2,
+            EngineModuleModel.TEMPERATURE_MODULE_V2,
+            TemperatureModuleCore,
+        ),
+        (
+            MagneticModuleModel.MAGNETIC_V1,
+            EngineModuleModel.MAGNETIC_MODULE_V1,
+            MagneticModuleCore,
+        ),
+        (
+            MagneticModuleModel.MAGNETIC_V2,
+            EngineModuleModel.MAGNETIC_MODULE_V2,
+            MagneticModuleCore,
+        ),
+        # (
+        #     ThermocyclerModuleModel.THERMOCYCLER_V1,
+        #     EngineModuleModel.TEMPERATURE_MODULE_V1,
+        #     TemperatureModuleCore,
+        # ),
+        # (
+        #     ThermocyclerModuleModel.THERMOCYCLER_V2,
+        #     EngineModuleModel.TEMPERATURE_MODULE_V1,
+        #     TemperatureModuleCore,
+        # ),
+    ],
+)
 def test_load_module(
     decoy: Decoy,
     mock_engine_client: EngineClient,
+    requested_model: ModuleModel,
+    engine_model: EngineModuleModel,
+    expected_core_cls: Type[ModuleCore],
     subject: ProtocolCore,
-    tempdeck_v2_def: ModuleDefinition,
 ) -> None:
     """It should issue a load module engine command."""
-    model = ModuleModel.MAGNETIC_MODULE_V1
-
+    definition = ModuleDefinition.construct()  # type: ignore[call-arg]
     decoy.when(
         mock_engine_client.load_module(
-            model=model, location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+            model=engine_model,
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         )
     ).then_return(
         commands.LoadModuleResult(
             moduleId="abc123",
-            definition=tempdeck_v2_def,
-            model=tempdeck_v2_def.model,
+            definition=definition,
+            model=engine_model,
             serialNumber="xyz789",
         )
     )
 
     result = subject.load_module(
-        model=model, location=DeckSlotName.SLOT_1, configuration=""
+        model=requested_model,
+        location=DeckSlotName.SLOT_1,
+        configuration="",
     )
 
-    assert result == TemperatureModuleCore(
-        module_id="abc123"
-    )
+    assert isinstance(result, expected_core_cls)
+    assert result.module_id == "abc123"

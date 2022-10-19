@@ -1,5 +1,5 @@
 """ProtocolEngine-based Protocol API core implementation."""
-from typing import Dict, Optional, Union
+from typing import Dict, Optional, Type, Union
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
@@ -8,22 +8,25 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import Mount, MountType, Location, DeckSlotName
 from opentrons.hardware_control import SyncHardwareAPI
 
-# is this here by mistake?
-# from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
+
+from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
 
-from opentrons.protocol_engine import DeckSlotLocation, ModuleLocation
+from opentrons.protocol_engine import (
+    DeckSlotLocation,
+    ModuleLocation,
+    ModuleModel as EngineModuleModel,
+)
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
-from opentrons.protocol_engine.types import ModuleModel, ModuleType
 
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 from .labware import LabwareCore
 from .instrument import InstrumentCore
-from .module_core import ModuleCore, TemperatureModuleCore
+from .module_core import ModuleCore, TemperatureModuleCore, MagneticModuleCore
 from .exceptions import InvalidModuleLocationError
 
 
@@ -94,14 +97,15 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         version: Optional[int],
     ) -> LabwareCore:
         """Load a labware using its identifying parameters."""
+        module_location: Union[ModuleLocation, DeckSlotLocation]
         if isinstance(location, ModuleCore):
-            moduleLocation = ModuleLocation(moduleId=location.module_id)
+            module_location = ModuleLocation(moduleId=location.module_id)
         else:
-            moduleLocation = DeckSlotLocation(slotName=location)
+            module_location = DeckSlotLocation(slotName=location)
 
         load_result = self._engine_client.load_labware(
             load_name=load_name,
-            location=moduleLocation,
+            location=module_location,
             namespace=namespace if namespace is not None else OPENTRONS_NAMESPACE,
             version=version or 1,
             display_name=label,
@@ -118,30 +122,28 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         configuration: Optional[str],
     ) -> ModuleCore:
         """Load a module into the protocol."""
-        if location is None:
-            if model.as_type() == ModuleType.THERMOCYCLER:
-                location = DeckSlotName("7")
-            else:
-                raise InvalidModuleLocationError(location, model)
-
         result = self._engine_client.load_module(
-            model=model,
+            model=EngineModuleModel(model),
             location=DeckSlotLocation(slotName=DeckSlotName.from_primitive(location)),
         )
+        module_type = result.model.as_type()
 
         # if result.definition.moduleType == ModuleType.MAGNETIC:
         #     return MagneticModuleCore(
         #         engine_client=self._engine_client, module_id=result.moduleId
         #     )
         # el
-        if result.definition.moduleType == ModuleType.TEMPERATURE:
-            return TemperatureModuleCore(module_id=result.moduleId)
+        module_core_cls: Type[ModuleCore] = ModuleCore
+        if module_type == ModuleType.TEMPERATURE:
+            module_core_cls = TemperatureModuleCore
+        elif module_type == ModuleType.MAGNETIC:
+            module_core_cls = MagneticModuleCore
         # elif result.definition.moduleType == ModuleType.THERMOCYCLER:
         #     return ThermocyclerModuleCore(
         #         engine_client=self._engine_client, module_id=result.moduleId
         #     )
-        else:
-            assert False, "Unsupported module definition"
+
+        return module_core_cls(module_id=result.moduleId)
 
     def load_instrument(
         self, instrument_name: PipetteNameType, mount: Mount
