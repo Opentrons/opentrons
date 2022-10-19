@@ -208,7 +208,7 @@ def test_close_lid(
     subject: ThermocyclerContext,
 ) -> None:
     """It should close the lid via the core."""
-    decoy.when(mock_core.close_lid()).then_return("close")
+    decoy.when(mock_core.close_lid()).then_return("closed")
 
     result = subject.close_lid()
 
@@ -227,7 +227,7 @@ def test_close_lid(
             matchers.DictMatching({"$": "after"}),
         ),
     )
-    assert result == "close"
+    assert result == "closed"
 
 
 def test_set_block_temperature(

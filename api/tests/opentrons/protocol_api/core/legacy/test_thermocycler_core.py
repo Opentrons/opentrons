@@ -118,7 +118,7 @@ def test_get_lid_position(
         ThermocyclerLidStatus.OPEN
     )
     result = subject.get_lid_position()
-    assert result == "open"
+    assert result == ThermocyclerLidStatus.OPEN
 
 
 def test_get_block_temperature_status(
@@ -129,7 +129,7 @@ def test_get_block_temperature_status(
     """It should report the current block temperature status."""
     decoy.when(mock_sync_module_hardware.status).then_return(TemperatureStatus.IDLE)
     result = subject.get_block_temperature_status()
-    assert result == "idle"
+    assert result == TemperatureStatus.IDLE
 
 
 def test_get_lid_temperature_status(
@@ -142,7 +142,7 @@ def test_get_lid_temperature_status(
         TemperatureStatus.IDLE
     )
     result = subject.get_lid_temperature_status()
-    assert result == "idle"
+    assert result == TemperatureStatus.IDLE
 
 
 def test_get_block_temperature(
@@ -261,6 +261,7 @@ def test_open_lid(
     mock_sync_hardware_api: SyncHardwareAPI,
     mock_protocol_core: ProtocolContextImplementation,
     mock_instrument_core: InstrumentContextImplementation,
+    mock_geometry: ThermocyclerGeometry,
     mock_labware: Labware,
     mock_well: Well,
     subject: LegacyThermocyclerCore,
@@ -291,6 +292,7 @@ def test_open_lid(
             minimum_z_height=None,
             speed=None,
         ),
+        decoy.prop(mock_geometry.lid_status).set("open"),
     )
     assert result == "open"
 
@@ -301,6 +303,7 @@ def test_close_lid(
     mock_sync_hardware_api: SyncHardwareAPI,
     mock_protocol_core: ProtocolContextImplementation,
     mock_instrument_core: InstrumentContextImplementation,
+    mock_geometry: ThermocyclerGeometry,
     mock_labware: Labware,
     mock_well: Well,
     subject: LegacyThermocyclerCore,
@@ -319,7 +322,7 @@ def test_close_lid(
         Location(point=Point(x=1, y=2, z=3), labware=mock_well)
     )
 
-    decoy.when(mock_sync_module_hardware.close()).then_return("close")
+    decoy.when(mock_sync_module_hardware.close()).then_return("closed")
 
     result = subject.close_lid()
 
@@ -331,8 +334,9 @@ def test_close_lid(
             minimum_z_height=None,
             speed=None,
         ),
+        decoy.prop(mock_geometry.lid_status).set("closed"),
     )
-    assert result == "close"
+    assert result == "closed"
 
 
 def test_set_target_block_temperature(

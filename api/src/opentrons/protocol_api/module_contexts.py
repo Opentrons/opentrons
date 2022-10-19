@@ -38,6 +38,7 @@ from .module_validation_and_errors import (
     validate_heater_shaker_speed,
 )
 from .labware import Labware
+from . import validation
 
 
 ENGAGE_HEIGHT_UNIT_CNV = 2
@@ -443,8 +444,6 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     .. versionadded:: 2.0
     """
 
-    # TODO(mc, 2022-02-05): this type annotation is misleading;
-    # a SynchronousAdapter wrapper is actually passed in
     _core: AbstractThermocyclerCore[AbstractLabware[AbstractWellCore]]
 
     def flag_unsafe_move(
@@ -502,13 +501,16 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
             specified, the Thermocycler will proceed to the next command
             after ``temperature`` is reached.
         """
-        if hold_time_minutes is not None:
-            if hold_time_seconds is None:
-                hold_time_seconds = 0
-            hold_time_seconds += hold_time_minutes * 60
+        seconds = validation.ensure_hold_time_seconds(
+            seconds=hold_time_seconds, minutes=hold_time_minutes
+        )
+        # if hold_time_minutes is not None:
+        #     if hold_time_seconds is None:
+        #         hold_time_seconds = 0
+        #     hold_time_seconds += hold_time_minutes * 60
         self._core.set_target_block_temperature(
             celsius=temperature,
-            hold_time_seconds=hold_time_seconds,
+            hold_time_seconds=seconds,
             block_max_volume=block_max_volume,
         )
         self._core.wait_for_block_temperature()

@@ -1,6 +1,6 @@
 """Core module control interfaces."""
 from abc import ABC, abstractmethod
-from typing import Any, Generic, Optional, TypeVar, List
+from typing import Any, Generic, List, Optional, TypeVar
 
 from opentrons.drivers.types import (
     HeaterShakerLabwareLatchStatus,
@@ -139,11 +139,11 @@ class AbstractThermocyclerCore(AbstractModuleCore[LabwareCoreType]):
 
     @abstractmethod
     def open_lid(self) -> str:
-        """Open the thermocycler's lid."""
+        """Open the Thermocycler's lid."""
 
     @abstractmethod
     def close_lid(self) -> str:
-        """Close the thermocycler's lid."""
+        """Close the Thermocycler's lid."""
 
     @abstractmethod
     def set_target_block_temperature(
@@ -154,22 +154,16 @@ class AbstractThermocyclerCore(AbstractModuleCore[LabwareCoreType]):
     ) -> None:
         """Set the target temperature for the well block, in °C.
 
-        Valid operational range yet to be determined.
-
-        :param celsius: The target temperature, in °C.
-        :param hold_time_seconds: The number of seconds to hold, after reaching
-                                  ``temperature``, before proceeding to the
-                                  next command. If `not specified, the
-                                  Thermocycler will proceed to the next
-                                  command after ``temperature`` is reached.
-        :param block_max_volume: The maximum volume of any individual well
-                                 of the loaded labware. If not supplied,
-                                 the thermocycler will default to 25µL/well.
-
-        .. note:
-
+        Note:
             If ``hold_time_seconds`` is not specified, the Thermocycler
             will proceed to the next command after ``temperature`` is reached.
+        Args:
+            celsius: The target temperature, in °C.
+            hold_time_seconds: The number of seconds to hold, after reaching
+                ``temperature``, before proceeding to the next command.
+            block_max_volume: The maximum volume of any individual well
+                of the loaded labware. If not supplied, the thermocycler
+                will default to 25µL/well.
         """
 
     @abstractmethod
@@ -191,25 +185,24 @@ class AbstractThermocyclerCore(AbstractModuleCore[LabwareCoreType]):
         repetitions: int,
         block_max_volume: Optional[float] = None,
     ) -> None:
-        """Execute a Thermocycler Profile defined as a cycle of
-        ``steps`` to repeat for a given number of ``repetitions``.
+        """Execute a Thermocycler Profile.
 
-        :param steps: List of unique steps that make up a single cycle.
-                      Each list item should be a dictionary that maps to
-                      the parameters of the :py:meth:`set_block_temperature`
-                      method with keys 'temperature', 'hold_time_seconds',
-                      and 'hold_time_minutes'.
-        :param repetitions: The number of times to repeat the cycled steps.
-        :param block_max_volume: The maximum volume of any individual well
-                                 of the loaded labware. If not supplied,
-                                 the thermocycler will default to 25µL/well.
+        Profile defined as a cycle of ``steps`` to repeat for a given number of ``repetitions``
 
-        .. note:
-
+        Note:
             Unlike the :py:meth:`set_block_temperature`, either or both of
             'hold_time_minutes' and 'hold_time_seconds' must be defined
             and finite for each step.
-
+        Args:
+            steps: List of unique steps that make up a single cycle.
+                Each list item should be a dictionary that maps to
+                the parameters of the :py:meth:`set_block_temperature`
+                method with keys 'temperature', 'hold_time_seconds',
+                and 'hold_time_minutes'.
+            repetitions: The number of times to repeat the cycled steps.
+            block_max_volume: The maximum volume of any individual well
+                of the loaded labware. If not supplied, the thermocycler
+                will default to 25µL/well.
         """
 
     @abstractmethod
@@ -226,35 +219,35 @@ class AbstractThermocyclerCore(AbstractModuleCore[LabwareCoreType]):
 
     @abstractmethod
     def get_lid_position(self) -> Optional[ThermocyclerLidStatus]:
-        """Get the thermocycler's lid position."""
+        """Get the Thermocycler's lid position."""
 
     @abstractmethod
     def get_block_temperature_status(self) -> TemperatureStatus:
-        """Get the thermocycler's block temperature status."""
+        """Get the Thermocycler's block temperature status."""
 
     @abstractmethod
     def get_lid_temperature_status(self) -> Optional[TemperatureStatus]:
-        """Get the thermocycler's lid temperature status."""
+        """Get the Thermocycler's lid temperature status."""
 
     @abstractmethod
     def get_block_temperature(self) -> Optional[float]:
-        """Get the thermocycler's current block temperature in °C."""
+        """Get the Thermocycler's current block temperature in °C."""
 
     @abstractmethod
     def get_block_target_temperature(self) -> Optional[float]:
-        """Get the thermocycler's target block temperature in °C."""
+        """Get the Thermocycler's target block temperature in °C."""
 
     @abstractmethod
     def get_lid_temperature(self) -> Optional[float]:
-        """Get the thermocycler's current lid temperature in °C."""
+        """Get the Thermocycler's current lid temperature in °C."""
 
     @abstractmethod
     def get_lid_target_temperature(self) -> Optional[float]:
-        """Get the thermocycler's target lid temperature in °C."""
+        """Get the Thermocycler's target lid temperature in °C."""
 
     @abstractmethod
     def get_ramp_rate(self) -> Optional[float]:
-        """Get the thermocycler's current rampe rate in °C/sec."""
+        """Get the Thermocycler's current ramp rate in °C/sec."""
 
     @abstractmethod
     def get_hold_time(self) -> Optional[float]:
