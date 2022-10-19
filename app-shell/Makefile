@@ -105,12 +105,12 @@ dist-posix: package-deps
 .PHONY: dist-osx
 dist-osx: package-deps
 	$(builder) --mac
-	$(MAKE) CPPFLAGS="-std=c++17" _dist-collect-artifacts
+	$(MAKE) _dist-collect-artifacts
 
 .PHONY: dist-linux
 dist-linux: package-deps
 	$(builder) --linux
-	$(MAKE) CPPFLAGS="-std=c++17" _dist-collect-artifacts
+	$(MAKE) _dist-collect-artifacts
 
 .PHONY: dist-win
 dist-win: package-deps
