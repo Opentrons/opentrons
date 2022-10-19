@@ -1,12 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useFeatureFlag } from '../../../../redux/config'
-import { useRunHasStarted, useUnmatchedModulesForProtocol } from '../../hooks'
-import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
-import { PrimaryButton } from '../../../../atoms/buttons'
-import { Tooltip } from '../../../../atoms/Tooltip'
-import { SetupModulesMap } from './SetupModulesMap'
-import { SetupModulesList } from './SetupModulesList'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -14,6 +7,13 @@ import {
   SPACING,
   useHoverTooltip,
 } from '@opentrons/components'
+import { useFeatureFlag } from '../../../../redux/config'
+import { useRunHasStarted, useUnmatchedModulesForProtocol } from '../../hooks'
+import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
+import { PrimaryButton } from '../../../../atoms/buttons'
+import { Tooltip } from '../../../../atoms/Tooltip'
+import { SetupModulesMap } from './SetupModulesMap'
+import { SetupModulesList } from './SetupModulesList'
 
 interface SetupModulesProps {
   expandLabwareSetupStep: () => void

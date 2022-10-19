@@ -1,7 +1,6 @@
 import * as React from 'react'
 import map from 'lodash/map'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 import {
   BORDERS,
   Box,
@@ -12,10 +11,9 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  TYPOGRAPHY,
 } from '@opentrons/components'
-import { useModuleRenderInfoForProtocolById } from '../../hooks'
 import { getModuleType } from '@opentrons/shared-data'
+import { useModuleRenderInfoForProtocolById } from '../../hooks'
 import { getModuleImage } from './utils'
 import { StyledText } from '../../../../atoms/text'
 import { StatusLabel } from '../../../../atoms/StatusLabel'
@@ -45,8 +43,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
         marginLeft={SPACING.spacingM}
       >
         <StyledText
-          as="label"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          as="labelSemiBold"
           marginBottom={SPACING.spacing3}
           data-testid="SetupModulesList_module_name"
           width="45%"
@@ -54,8 +51,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
           {t('module_name')}
         </StyledText>
         <StyledText
-          as="label"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          as="labelSemiBold"
           data-testid="SetupModulesList_location"
           marginRight={SPACING.spacing4}
           width="15%"
@@ -63,8 +59,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
           {t('location')}
         </StyledText>
         <StyledText
-          as="label"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          as="labelSemiBold"
           data-testid="SetupModulesList_connection_status"
           marginRight={SPACING.spacing4}
           width="15%"
@@ -114,9 +109,6 @@ export const ModulesListItem = ({
   attachedModuleMatch,
 }: ModulesListItemProps): JSX.Element => {
   const { t } = useTranslation('protocol_setup')
-  const MODULES_CARD_STYLE = css`
-    ${BORDERS.cardOutlineBorder}
-  `
 
   const moduleConnectionStatus =
     attachedModuleMatch != null
@@ -125,7 +117,7 @@ export const ModulesListItem = ({
 
   return (
     <Box
-      css={MODULES_CARD_STYLE}
+      css={BORDERS.cardOutlineBorder}
       padding={SPACING.spacing4}
       backgroundColor={COLORS.white}
       data-testid="ModulesListItem_Row"
@@ -137,7 +129,7 @@ export const ModulesListItem = ({
       >
         <Flex alignItems={JUSTIFY_CENTER} width="45%">
           <img width="60px" height="54px" src={getModuleImage(moduleModel)} />
-          <StyledText marginLeft={SPACING.spacingM} as="pSemiBold">
+          <StyledText as="pSemiBold" marginLeft={SPACING.spacingM}>
             {displayName}
           </StyledText>
         </Flex>
