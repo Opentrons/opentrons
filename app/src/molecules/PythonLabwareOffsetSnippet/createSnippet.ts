@@ -22,10 +22,13 @@ export function createSnippet(
       let addendum = null
       if (command.commandType === 'loadLabware') {
         labwareCount = labwareCount + 1
-        const loadedLabware = protocol.labware[command.result.labwareId]
+        //  @ts-expect-error
+        const loadedLabware = protocol.labware.find(
+          //  @ts-expect-error
+          item => item.id === command.result.labwareId
+        )
         if (loadedLabware == null) return acc
         const { loadName } = protocol.labwareDefinitions[
-          //  @ts-expect-error
           loadedLabware.definitionUri
         ].parameters
         if ('slotName' in command.params.location) {

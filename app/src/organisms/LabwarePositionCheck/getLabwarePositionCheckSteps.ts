@@ -27,18 +27,21 @@ export const getLabwarePositionCheckSteps = (
     )
     //  @ts-expect-error: pipetteName should be name until we remove the schemaV6Adapter
     const pipetteNames = values(pipettes).map(({ pipetteName }) => pipetteName)
-    const labware = omitBy(
-      protocolData.labware,
-      (labware, id) =>
-        //  @ts-expect-error: will be an error until we remove the schemaV6Adapter
-        protocolData.labwareDefinitions[labware.definitionUri]?.parameters
+    //  @ts-expect-error
+    const labware = protocolData.labware.filter(
+      //  @ts-expect-error
+      labware =>
+        !protocolData.labwareDefinitions[labware.definitionUri]?.parameters
+          .isTiprack ||
+        (protocolData.labwareDefinitions[labware.definitionUri]?.parameters
           .isTiprack &&
-        !protocolData.commands.some(
-          command =>
-            command.commandType === 'pickUpTip' &&
-            command.params.labwareId === id
-        )
+          protocolData.commands.some(
+            command =>
+              command.commandType === 'pickUpTip' &&
+              command.params.labwareId === labware.id
+          ))
     )
+
     const modules: ProtocolAnalysisFile['modules'] = protocolData.modules
     const labwareDefinitions = protocolData.labwareDefinitions
     const commands: RunTimeCommand[] = protocolData.commands

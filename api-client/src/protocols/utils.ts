@@ -155,47 +155,38 @@ export function parseInitialLoadedLabwareByModuleId(
   )
 }
 
-export interface LoadedLabwareById {
-  [labwareId: string]: {
-    definitionUri: string
-    displayName?: string
-  }
+export interface LoadedLabwareEntity {
+  id: string
+  loadName: string
+  definitionUri: string
+  displayName?: string
 }
 
-export function parseInitialLoadedLabwareById(
+export function parseInitialLoadedLabwareEntity(
   commands: RunTimeCommand[]
-): LoadedLabwareById {
-  const loadLabwareCommandsReversed = commands
-    .filter(
-      (command): command is LoadLabwareRunTimeCommand =>
-        command.commandType === 'loadLabware'
-    )
-    .reverse()
-  return reduce<LoadLabwareRunTimeCommand, LoadedLabwareById>(
-    loadLabwareCommandsReversed,
-    (acc, command) => {
-      const quirks = command.result.definition.parameters.quirks ?? []
-      if (quirks.includes('fixedTrash')) {
-        return { ...acc }
-      }
-      const labwareId = command.result.labwareId ?? ''
-      const {
-        namespace,
-        version,
-        parameters: { loadName },
-      } = command.result.definition
-      const definitionUri = `${namespace}/${loadName}/${version}`
-
-      return {
-        ...acc,
-        [labwareId]: {
-          definitionUri,
-          displayName: command.params.displayName,
-        },
-      }
-    },
-    {}
+): LoadedLabwareEntity[] {
+  const loadLabwareCommands = commands.filter(
+    (command): command is LoadLabwareRunTimeCommand =>
+      command.commandType === 'loadLabware'
   )
+  const filterOutTrashCommands = loadLabwareCommands.filter(
+    command => command.result.definition.metadata.displayCategory !== 'trash'
+  )
+  return filterOutTrashCommands.map(command => {
+    const labwareId = command.result.labwareId ?? ''
+    const {
+      namespace,
+      version,
+      parameters: { loadName },
+    } = command.result.definition
+    const definitionUri = `${namespace}/${loadName}/${version}`
+    return {
+      id: labwareId,
+      loadName,
+      definitionUri,
+      displayName: command.params.displayName,
+    }
+  })
 }
 
 export interface LoadedLabwareDefinitionsById {
@@ -204,7 +195,7 @@ export interface LoadedLabwareDefinitionsById {
 export function parseInitialLoadedLabwareDefinitionsById(
   commands: RunTimeCommand[]
 ): LoadedLabwareDefinitionsById {
-  const labware = parseInitialLoadedLabwareById(commands)
+  const labware = parseInitialLoadedLabwareEntity(commands)
   const loadLabwareCommandsReversed = commands
     .filter(
       (command): command is LoadLabwareRunTimeCommand =>
@@ -220,7 +211,8 @@ export function parseInitialLoadedLabwareDefinitionsById(
       }
       const labwareDef: LabwareDefinition2 = command.result?.definition
       const labwareId = command.result?.labwareId ?? ''
-      const definitionUri = labware[labwareId]?.definitionUri
+      const definitionUri =
+        labware.find(item => item.id === labwareId)?.definitionUri ?? ''
 
       return {
         ...acc,
