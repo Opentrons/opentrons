@@ -5,25 +5,6 @@ from typing import Tuple, Optional
 
 from random import uniform
 
-class Timer:
-    def __init__(self):
-        self._start_time = None
-        self._elasped_time = None
-
-    def start(self):
-        """Start a new timer"""
-        self._start_time = time.perf_counter()
-
-    def elasped_time(self):
-        """report the elapsed time"""
-        self._elasped_time = time.perf_counter() - self._start_time
-        return self._elasped_time
-
-    def stop_time(self):
-        if self._start_time is None:
-            raise TimerError(f"Timer is not running. Use .start() to start it")
-        stop_time = time.perf_counter()
-
 class Mark10Base(ABC):
     """Base Class if Mark10 Force Gauge Driver."""
 
@@ -66,11 +47,10 @@ class SimMark10(Mark10Base):
 
 
 
-class Mark10():
+class Mark10(Mark10Base):
     def __init__(self, connection: Serial) -> None:
         """Constructor."""
         self._force_guage = connection
-        self._timer = Timer()
         self._units = None
 
     @classmethod
