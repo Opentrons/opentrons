@@ -1,7 +1,7 @@
 """Provides an interface to open & close the TCP interface on."""
 import socket
 import logging
-from typing import Optional
+from typing import Optional, Tuple
 
 LOG = logging.getLogger(__name__)
 
@@ -14,6 +14,7 @@ class TCPConnection:
     def __init__(self) -> None:
         """Create a new TCPConnection, not connected to any socket yet."""
         self._sock: Optional[socket.socket] = None
+        self._host: Optional[Tuple[str, int]] = None
 
     def connect(self, ip: str, port: int) -> bool:
         """Open the connection.
@@ -26,15 +27,27 @@ class TCPConnection:
             port: The port on the ip to connect to
         """
         self.disconnect()
-        self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
-            self._sock.connect((ip, port))
+            self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self._host = (ip, port)
+            self._sock.connect(self._host)
         except Exception as err:
-            LOG.error(f'Could not open TCP: {str(err)}')
+            LOG.error(f"Could not open TCP: {str(err)}")
             self._sock = None
             return False
         LOG.debug(f"Opened socket to {ip}:{port}")
         return True
+
+    def _reconnect(self) -> None:
+        """If connection died, reconnect it.
+
+        NGINX will occasionally kill the tcp connection, so it is important
+        to handle reconnection scenarios gracefully.
+        """
+        if self._host is not None:
+            LOG.debug("Reconnecting")
+            self.disconnect()
+            self.connect(self._host[0], self._host[1])
 
     def disconnect(self) -> None:
         """If a connection exists, disconnect it."""
@@ -63,8 +76,8 @@ class TCPConnection:
             return bytes()
         ret = self._sock.recv(MAX_BUF)
         if len(ret) == 0:
-            # The socket connection died!
-            self._sock = None
+            # The socket connection died! Just reconnect to the server.
+            self._reconnect()
         LOG.debug(f"Received [{len(ret)}] bytes")
         return ret
 

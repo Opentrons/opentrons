@@ -105,7 +105,9 @@ def listen(
             ser = update_ser_handle(config, ser, monitor.host_connected(), tcp)
     if ser and tcp in ready:
         # Ready TCP data to echo to serial
-        ser.write(tcp.read())
+        data = tcp.read()
+        if len(data) > 0:
+            ser.write(data)
     return ser
 
 
@@ -146,6 +148,9 @@ async def main() -> NoReturn:
         phy_udev_name=default_config.PHY_NAME, udc_folder=config.udc_folder()
     )
 
+    # Create a tcp connection that will be managed by `listen`
+    tcp = tcp_conn.TCPConnection()
+
     # After the gadget starts up, need time to populate state
     time.sleep(1)
 
@@ -153,10 +158,7 @@ async def main() -> NoReturn:
 
     if monitor.host_connected():
         LOG.debug("USB connected on startup")
-        ser = config.get_handle()
-
-    # Create a tcp connection that will be managed by `listen`
-    tcp = tcp_conn.TCPConnection()
+        ser = update_ser_handle(config, ser, True, tcp)
 
     while True:
         ser = listen(monitor, config, ser, tcp)
