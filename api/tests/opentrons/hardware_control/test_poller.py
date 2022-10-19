@@ -1,87 +1,90 @@
 import asyncio
-from typing import Callable
+from typing import AsyncGenerator, Tuple
 
 import pytest
-from mock import AsyncMock, MagicMock
-from opentrons.hardware_control.poller import Poller, Listener, Reader, WaitableListener
+from decoy import Decoy, matchers
+from opentrons.hardware_control.poller import Poller, Reader
 
 
-async def test_poll_error() -> None:
-    """It should call error callback on error."""
-    exc = AssertionError()
-
-    async def raiser() -> None:
-        raise exc
-
-    reader = AsyncMock(spec=Reader)
-    reader.read.side_effect = raiser
-    listener = MagicMock(spec=Listener)
-
-    p: Poller[int] = Poller(interval_seconds=0.01, reader=reader, listener=listener)
-    await p.stop_and_wait()
-
-    listener.on_error.assert_called_once_with(exc)
-    listener.on_terminated.assert_called_once()
+POLLING_INTERVAL = 0.1
 
 
-async def test_notify() -> None:
-    """It should call on_poll with new result."""
-    reader = AsyncMock(spec=Reader)
-    reader.read.return_value = 23
-    listener = MagicMock(spec=Listener)
-
-    p: Poller[int] = Poller(interval_seconds=0.01, reader=reader, listener=listener)
-    await p.stop_and_wait()
-
-    listener.on_poll.assert_called_once_with(23)
-    listener.on_terminated.assert_called_once()
+@pytest.fixture
+def mock_reader(decoy: Decoy) -> Reader:
+    return decoy.mock(cls=Reader)
 
 
-async def test_await_poll_error() -> None:
-    """It should raise in wait_next_poll if reader raises."""
-    exc = AssertionError()
+@pytest.fixture
+async def mock_reader_flow_control(
+    decoy: Decoy, mock_reader: Reader
+) -> Tuple[asyncio.Event, asyncio.Event]:
+    read_started_event = asyncio.Event()
+    ok_to_finish_read_event = asyncio.Event()
 
-    async def raiser() -> None:
-        raise exc
+    async def _mock_read() -> None:
+        read_started_event.set()
+        ok_to_finish_read_event.clear()
+        await ok_to_finish_read_event.wait()
 
-    reader = AsyncMock(spec=Reader)
-    reader.read.side_effect = raiser
-    listener = WaitableListener[int]()
+    decoy.when(await mock_reader.read()).then_do(_mock_read)
 
-    p: Poller[int] = Poller(interval_seconds=0.01, reader=reader, listener=listener)
-    with pytest.raises(exc.__class__):
-        await listener.wait_next_poll()
-    await p.stop_and_wait()
+    return (read_started_event, ok_to_finish_read_event)
 
 
-@pytest.mark.parametrize(
-    argnames=["func"],
-    argvalues=[
-        [
-            # Notifies that a poll is complete
-            lambda x: x.on_poll(1)
-        ],
-        [
-            # Notifies that an error occurred
-            lambda x: x.on_error(ValueError("Hi!"))
-        ],
-        [
-            # Notifies poller terminated
-            lambda x: x.on_terminated()
-        ],
-    ],
-)
-async def test_on_poll_canceled_future(
-    func: Callable[[WaitableListener[int]], None]
+@pytest.fixture
+async def subject(mock_reader: Reader) -> AsyncGenerator[Poller, None]:
+    """Create a poller, kicking off the interval and the first read."""
+    poller = Poller(reader=mock_reader, interval=POLLING_INTERVAL)
+    yield poller
+    await poller.stop()
+
+
+async def test_poller(decoy: Decoy, mock_reader: Reader, subject: Poller) -> None:
+    decoy.verify(await mock_reader.read(), times=1)
+
+    await subject.wait_next_poll()
+    decoy.verify(await mock_reader.read(), times=2)
+
+    await subject.wait_next_poll()
+    decoy.verify(await mock_reader.read(), times=3)
+
+
+async def test_poller_concurrency(
+    mock_reader_flow_control: Tuple[asyncio.Event, asyncio.Event],
+    subject: Poller,
 ) -> None:
-    """It should ignore canceled futures"""
-    listener = WaitableListener[int]()
-    # Create a task that waits for a poll
-    task = asyncio.create_task(listener.wait_next_poll())
-    # Let it start
-    await asyncio.sleep(0.001)
-    # Cancel the task
-    task.cancel()
-    # Notify.
-    func(listener)
-    # There should be no exception
+    """It should wait for a full poll before notifying."""
+    read_started_event, ok_to_finish_read_event = mock_reader_flow_control
+
+    # wait for the first read to start, then subscribe in the middle of the first read
+    await read_started_event.wait()
+    poll_notification = asyncio.create_task(subject.wait_next_poll())
+
+    # allow the first read to finish, then wait for the second read to start
+    read_started_event.clear()
+    ok_to_finish_read_event.set()
+    await read_started_event.wait()
+
+    # verify that our wait isn't done, because it was kicked off after the first read started
+    assert poll_notification.done() is False
+
+    # allow the second read to complete and wait for the third read to start
+    read_started_event.clear()
+    ok_to_finish_read_event.set()
+    await read_started_event.wait()
+
+    # verify the waiter has now been notified since it's been through the full second read
+    assert poll_notification.done() is True
+
+
+async def test_poller_error(decoy: Decoy, mock_reader: Reader, subject: Poller) -> None:
+    """It should raise if read errors"""
+    decoy.when(await mock_reader.read()).then_raise(RuntimeError("oh no"))
+
+    with pytest.raises(RuntimeError, match="oh no"):
+        await subject.wait_next_poll()
+
+    decoy.verify(
+        mock_reader.on_error(matchers.ErrorMatching(RuntimeError, match="oh no")),
+        times=1,
+    )

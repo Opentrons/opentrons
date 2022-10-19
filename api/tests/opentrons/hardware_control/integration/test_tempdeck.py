@@ -95,9 +95,8 @@ async def test_start_set_temperature_heat(tempdeck: TempDeck) -> None:
 async def test_deactivate(tempdeck: TempDeck) -> None:
     """It should deactivate and move to room temperature"""
     await tempdeck.deactivate()
-
-    # Wait for temperature to be reached
     await tempdeck.await_temperature(awaiting_temperature=23)
+
     assert tempdeck.live_data == {
         "status": "idle",
         "data": {"currentTemp": 23, "targetTemp": None},
