@@ -58,8 +58,8 @@ jobs:
       - uses: 'actions/setup-node@v3'
         with:
           node-version: '16'
-      - name: 'install udev'
-        run: sudo apt-get update && sudo apt-get install libudev-dev
+      - name: 'install udev, systemd, and fuse2'
+        run: sudo apt-get update && sudo apt-get install libudev-dev libsystemd-dev libfuse2
       - name: 'set complex environment variables'
         id: 'set-vars'
         uses: actions/github-script@v6.1.1
@@ -109,7 +109,7 @@ jobs:
         run: npm install -g npm@6
       - name: 'install libudev'
         if: startsWith(matrix.os, 'ubuntu')
-        run: sudo apt-get update && sudo apt-get upgrade && sudo apt-get install libudev-dev
+        run: sudo apt-get update && sudo apt-get upgrade && sudo apt-get install libudev-dev libsystemd-dev libfuse2
       - name: 'set complex environment variables'
         id: 'set-vars'
         uses: actions/github-script@v6.1.1
