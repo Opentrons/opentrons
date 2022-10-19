@@ -9,7 +9,7 @@ from opentrons.types import Mount, MountType, Location, DeckSlotName
 from opentrons.hardware_control import SyncHardwareAPI
 
 
-from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
+from opentrons.hardware_control.modules.types import ModuleModel, ModuleType, ThermocyclerModuleModel
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.protocols.geometry.deck import Deck
@@ -26,7 +26,13 @@ from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 from .labware import LabwareCore
 from .instrument import InstrumentCore
-from .module_core import ModuleCore, TemperatureModuleCore, MagneticModuleCore, ThermocyclerModuleCore, HeaterShakerModuleCore
+from .module_core import (
+    ModuleCore,
+    TemperatureModuleCore,
+    MagneticModuleCore,
+    ThermocyclerModuleCore,
+    HeaterShakerModuleCore,
+)
 from .exceptions import InvalidModuleLocationError
 
 
@@ -122,11 +128,16 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         configuration: Optional[str],
     ) -> ModuleCore:
         """Load a module into the protocol."""
+        if location is None:
+            if isinstance(model, ThermocyclerModuleModel):
+                location = "7"
+            else:
+                raise InvalidModuleLocationError(location, model.name)
+
         result = self._engine_client.load_module(
             model=EngineModuleModel(model),
-            location=DeckSlotLocation(slotName=DeckSlotName.from_primitive(location)),
+            location=DeckSlotLocation(slotName=location),
         )
-        print(result.model)
         module_type = result.model.as_type()
 
         module_core_cls: Type[ModuleCore] = ModuleCore

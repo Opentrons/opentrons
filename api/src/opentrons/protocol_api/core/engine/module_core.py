@@ -8,7 +8,7 @@ from opentrons.hardware_control.modules.types import (
     TemperatureStatus,
     MagneticStatus,
     ThermocyclerStep,
-    SpeedStatus
+    SpeedStatus,
 )
 from opentrons.drivers.types import (
     HeaterShakerLabwareLatchStatus,
@@ -22,7 +22,7 @@ from ..module import (
     AbstractTemperatureModuleCore,
     AbstractMagneticModuleCore,
     AbstractThermocyclerCore,
-    AbstractHeaterShakerCore
+    AbstractHeaterShakerCore,
 )
 from .labware import LabwareCore
 
@@ -314,4 +314,3 @@ class HeaterShakerModuleCore(ModuleCore, AbstractHeaterShakerCore[LabwareCore]):
 
     def get_labware_latch_status(self) -> HeaterShakerLabwareLatchStatus:
         """Get the module's labware latch status."""
-

@@ -35,11 +35,12 @@ from opentrons.protocol_api.core.engine import (
     LabwareCore,
     ModuleCore,
 )
+from opentrons.protocol_api.core.engine.exceptions import InvalidModuleLocationError
 from opentrons.protocol_api.core.engine.module_core import (
     TemperatureModuleCore,
     MagneticModuleCore,
     ThermocyclerModuleCore,
-    HeaterShakerModuleCore
+    HeaterShakerModuleCore,
 )
 
 
@@ -195,10 +196,10 @@ def test_add_labware_definition(
             ThermocyclerModuleCore,
         ),
         (
-                HeaterShakerModuleModel.HEATER_SHAKER_V1,
-                EngineModuleModel.HEATER_SHAKER_MODULE_V1,
-                HeaterShakerModuleCore,
-        )
+            HeaterShakerModuleModel.HEATER_SHAKER_V1,
+            EngineModuleModel.HEATER_SHAKER_MODULE_V1,
+            HeaterShakerModuleCore,
+        ),
     ],
 )
 def test_load_module(
@@ -211,7 +212,7 @@ def test_load_module(
 ) -> None:
     """It should issue a load module engine command."""
     definition = ModuleDefinition.construct()  # type: ignore[call-arg]
-    print(definition)
+
     decoy.when(
         mock_engine_client.load_module(
             model=engine_model,
@@ -234,3 +235,67 @@ def test_load_module(
 
     assert isinstance(result, expected_core_cls)
     assert result.module_id == "abc123"
+
+
+@pytest.mark.parametrize(
+    ("requested_model", "engine_model"),
+    [
+        (
+            ThermocyclerModuleModel.THERMOCYCLER_V1,
+            EngineModuleModel.THERMOCYCLER_MODULE_V1,
+        ),
+        (
+            ThermocyclerModuleModel.THERMOCYCLER_V2,
+            EngineModuleModel.THERMOCYCLER_MODULE_V2,
+        )
+    ]
+)
+def test_load_module_thermocycler_with_no_location(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    requested_model: ModuleModel,
+    engine_model: EngineModuleModel,
+    subject: ProtocolCore
+) -> None:
+    """It should issue a load module engine command with location at 7."""
+    definition = ModuleDefinition.construct()  # type: ignore[call-arg]
+
+    decoy.when(
+        mock_engine_client.load_module(
+            model=requested_model,
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_7),
+        )
+    ).then_return(
+        commands.LoadModuleResult(
+            moduleId="abc123",
+            definition=definition,
+            model=engine_model,
+            serialNumber="xyz789",
+        )
+    )
+
+    result = subject.load_module(
+        model=requested_model,
+        location=None,
+        configuration="",
+    )
+
+    assert isinstance(result, ThermocyclerModuleCore)
+    assert result.module_id == "abc123"
+
+
+@pytest.mark.parametrize("requested_model", [HeaterShakerModuleModel.HEATER_SHAKER_V1, MagneticModuleModel.MAGNETIC_V1, MagneticModuleModel.MAGNETIC_V2, TemperatureModuleModel.TEMPERATURE_V1, TemperatureModuleModel.TEMPERATURE_V2])
+def test_load_module_no_location(
+        decoy: Decoy,
+        mock_engine_client: EngineClient,
+        requested_model: ModuleModel,
+        subject: ProtocolCore
+) -> None:
+    """Should raise an InvalidModuleLocationError exception."""
+
+    with pytest.raises(InvalidModuleLocationError):
+        result = subject.load_module(
+            model=requested_model,
+            location=None,
+            configuration=""
+        )
