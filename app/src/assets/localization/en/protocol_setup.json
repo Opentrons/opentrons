@@ -131,6 +131,9 @@
   "volume": "Volume",
   "slot_location": "Slot {{slotName}}",
   "slot_number": "Slot Number",
+  "module_slot_location": "Slot {{slotName}}, {{moduleName}}",
+  "initial_location": "Initial Location",
+  "secure_labware_instructions": "Secure labware instructions",
   "module_name": "Module Name",
   "connection_status": "Connection Status"
 }

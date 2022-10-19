@@ -266,12 +266,6 @@ export interface DeckMetadata {
   tags: string[]
 }
 
-export interface DeckLayerFeature {
-  footprint: string
-}
-
-export type DeckLayer = DeckLayerFeature[]
-
 export interface DeckDefinition {
   otId: string
   cornerOffsetFromOrigin: CoordinateTuple
@@ -279,7 +273,7 @@ export interface DeckDefinition {
   robot: DeckRobot
   locations: DeckLocations
   metadata: DeckMetadata
-  layers: Record<string, DeckLayer>
+  layers: INode[]
 }
 
 export interface ModuleDimensions {
