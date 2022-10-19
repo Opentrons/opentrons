@@ -3,15 +3,12 @@ from typing import Optional, Union, List
 
 from opentrons.types import Point
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.types import OT3Mount, OT3Axis
 from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.state import StateStore
+from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 
-from ..errors import (
-    GripperNotAttachedError,
-    HardwareNotSupportedError,
-)
+from ..errors import GripperNotAttachedError
 
 from ..types import (
     DeckSlotLocation,
@@ -49,10 +46,12 @@ class LabwareMovementHandler:
         new_location: Union[DeckSlotLocation, ModuleLocation],
     ) -> None:
         """Move a loaded labware from one location to another."""
-        if not isinstance(self._hardware_api, OT3API):
-            raise HardwareNotSupportedError("Gripper is only available on the OT3")
+        ot3api = ensure_ot3_hardware(
+            hardware_api=self._hardware_api,
+            error_msg="Gripper is only available on the OT-3",
+        )
 
-        if self._hardware_api.attached_gripper is None:
+        if not ot3api.has_gripper():
             raise GripperNotAttachedError(
                 "No gripper found for performing labware movements."
             )
@@ -60,25 +59,21 @@ class LabwareMovementHandler:
         gripper_mount = OT3Mount.GRIPPER
 
         # Retract all mounts
-        await self._hardware_api.home(axes=[OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.Z_G])
+        await ot3api.home(axes=[OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.Z_G])
         # TODO: reset well location cache upon completion of command execution
-        await self._hardware_api.home_gripper_jaw()
+        await ot3api.home_gripper_jaw()
 
-        gripper_homed_position = await self._hardware_api.gantry_position(
-            mount=gripper_mount
-        )
+        gripper_homed_position = await ot3api.gantry_position(mount=gripper_mount)
         waypoints_to_labware = self._get_gripper_movement_waypoints(
             labware_id=labware_id,
             location=current_location,
-            current_position=await self._hardware_api.gantry_position(
-                mount=gripper_mount
-            ),
+            current_position=await ot3api.gantry_position(mount=gripper_mount),
             gripper_home_z=gripper_homed_position.z,
         )
         for waypoint in waypoints_to_labware:
-            await self._hardware_api.move_to(mount=gripper_mount, abs_position=waypoint)
+            await ot3api.move_to(mount=gripper_mount, abs_position=waypoint)
 
-        await self._hardware_api.grip(force_newtons=GRIP_FORCE)
+        await ot3api.grip(force_newtons=GRIP_FORCE)
 
         waypoints_to_new_location = self._get_gripper_movement_waypoints(
             labware_id=labware_id,
@@ -87,10 +82,10 @@ class LabwareMovementHandler:
             gripper_home_z=gripper_homed_position.z,
         )
         for waypoint in waypoints_to_new_location:
-            await self._hardware_api.move_to(mount=gripper_mount, abs_position=waypoint)
+            await ot3api.move_to(mount=gripper_mount, abs_position=waypoint)
 
-        await self._hardware_api.ungrip()
-        await self._hardware_api.move_to(
+        await ot3api.ungrip()
+        await ot3api.move_to(
             mount=OT3Mount.GRIPPER,
             abs_position=Point(
                 waypoints_to_new_location[-1].x,

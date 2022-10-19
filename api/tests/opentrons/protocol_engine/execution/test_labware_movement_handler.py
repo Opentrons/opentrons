@@ -1,16 +1,15 @@
 """Test labware movement command execution side effects."""
+from __future__ import annotations
+
 import pytest
 from decoy import Decoy
+from typing import TYPE_CHECKING
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.types import DeckSlotName, Point
 
-from opentrons_shared_data.gripper.dev_types import GripperModel
-from opentrons.hardware_control.dev_types import GripperDict
-from opentrons.hardware_control.types import GripperJawState, OT3Mount, OT3Axis
-from opentrons.hardware_control.ot3api import OT3API
-
+from opentrons.hardware_control.types import OT3Mount, OT3Axis
 from opentrons.protocol_engine.types import DeckSlotLocation, Dimensions
 from opentrons.protocol_engine.execution.labware_movement import (
     LabwareMovementHandler,
@@ -21,6 +20,9 @@ from opentrons.protocol_engine.errors import (
     GripperNotAttachedError,
 )
 from opentrons.protocol_engine.state import StateStore
+
+if TYPE_CHECKING:
+    from opentrons.hardware_control.ot3api import OT3API
 
 
 @pytest.fixture
@@ -33,13 +35,6 @@ def state_store(decoy: Decoy) -> StateStore:
 def model_utils(decoy: Decoy) -> ModelUtils:
     """Get a mocked out ModelUtils instance."""
     return decoy.mock(cls=ModelUtils)
-
-
-@pytest.mark.ot3_only
-@pytest.fixture
-def ot3_hardware_api(decoy: Decoy) -> OT3API:
-    """Get a mocked out OT3API."""
-    return decoy.mock(cls=OT3API)
 
 
 @pytest.mark.ot3_only
@@ -66,15 +61,7 @@ async def test_move_labware_with_gripper(
     subject: LabwareMovementHandler,
 ) -> None:
     """It should perform a labware movement with gripper by delegating to OT3API."""
-    decoy.when(ot3_hardware_api.attached_gripper).then_return(
-        GripperDict(
-            name="gripper",
-            display_name="abc",
-            model=GripperModel.V1,
-            state=GripperJawState.HOMED_READY,
-            gripper_id="123",
-        )
-    )
+    decoy.when(ot3_hardware_api.has_gripper()).then_return(True)
 
     decoy.when(
         await ot3_hardware_api.gantry_position(mount=OT3Mount.GRIPPER)
@@ -148,6 +135,7 @@ async def test_labware_movement_raises_on_ot2(
         )
 
 
+@pytest.mark.ot3_only
 async def test_labware_movement_raises_without_gripper(
     decoy: Decoy,
     state_store: StateStore,
@@ -155,7 +143,7 @@ async def test_labware_movement_raises_without_gripper(
     subject: LabwareMovementHandler,
 ) -> None:
     """It should raise an error when attempting a gripper movement without a gripper."""
-    decoy.when(ot3_hardware_api.attached_gripper).then_return(None)
+    decoy.when(ot3_hardware_api.has_gripper()).then_return(False)
     with pytest.raises(GripperNotAttachedError):
         await subject.move_labware_with_gripper(
             labware_id="labware-id",
