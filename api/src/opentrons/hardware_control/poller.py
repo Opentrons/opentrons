@@ -1,155 +1,73 @@
 import asyncio
-from abc import abstractmethod, ABC
-from collections import deque
-from typing import TypeVar, Generic, Deque, Optional
 import logging
+from abc import ABC, abstractmethod
+from typing import List
 
-DataT = TypeVar("DataT")
+
 log = logging.getLogger(__name__)
 
 
-class Reader(ABC, Generic[DataT]):
-    """Interface of poller target."""
-
+class Reader(ABC):
     @abstractmethod
-    async def read(self) -> DataT:
-        """
-        Read a new poll sample.
+    async def read(self) -> None:
+        """Read some data from an external source."""
 
-        Returns: The next poll result.
-        """
-        ...
-
-
-class Listener(ABC, Generic[DataT]):
-    """Interface of poller listener"""
-
-    @abstractmethod
-    def on_poll(self, result: DataT) -> None:
-        """
-        Called by poller notifying result of new poll.
-
-        Args:
-            result: The latest poll result.
-
-        Returns: None
-        """
-        ...
-
-    @abstractmethod
     def on_error(self, exception: Exception) -> None:
-        """
-        Called by poller to notify of a poll error.
-
-        Args:
-            exception: The raised exception
-
-        Returns: None
-        """
-        ...
-
-    @abstractmethod
-    def on_terminated(self) -> None:
-        """
-        Called by poller when it is terminating.
-
-        Returns: None
-        """
-        ...
+        """Handle an error from calling `read`."""
 
 
-class WaitableListener(Listener[DataT]):
-    """A listener that can be waited on."""
+class Poller:
+    """A poller to call a given reader on an interval.
 
-    def __init__(self, loop: Optional[asyncio.AbstractEventLoop] = None) -> None:
-        """Constructor."""
-        self._loop = loop or asyncio.get_running_loop()
-        self._futures: Deque["asyncio.Future[DataT]"] = deque()
+    Args:
+        reader: An interface to read data.
+        interval: The poll interval, in seconds.
+    """
 
-    async def wait_next_poll(self) -> DataT:
-        """
-        Wait for the next poll.
+    interval: float
 
-        Returns: The next poll result.
-        """
-        f: "asyncio.Future[DataT]" = self._loop.create_future()
-        self._futures.append(f)
-        return await f
-
-    def on_poll(self, result: DataT) -> None:
-        """Handle a new poll"""
-        self._notify(result)
-
-    def on_error(self, exc: Exception) -> None:
-        """Handle a poller error."""
-        self._cancel(exc)
-
-    def on_terminated(self) -> None:
-        """Handle the poller finishing up."""
-        self._cancel(Exception("Poller has terminated."))
-
-    def _notify(self, val: DataT) -> None:
-        """Notify all futures of a new poll result."""
-        while self._futures:
-            f = self._futures.popleft()
-            if not f.done():
-                f.set_result(val)
-
-    def _cancel(self, exc: Exception) -> None:
-        """Notify all futures of an error."""
-        while self._futures:
-            f = self._futures.popleft()
-            if not f.done():
-                f.set_exception(exc)
-
-
-class Poller(Generic[DataT]):
-    """Asyncio poller."""
-
-    def __init__(
-        self,
-        interval_seconds: float,
-        reader: Reader[DataT],
-        listener: Listener[DataT],
-    ) -> None:
-        """
-        Constructor.
-
-        Args:
-            interval_seconds: time in between polls.
-            reader: The data reader.
-            listener: event listener.
-        """
-        self._shutdown_event = asyncio.Event()
-        self._interval = interval_seconds
-        self._listener = listener
+    def __init__(self, reader: Reader, interval: float) -> None:
+        self.interval = interval
         self._reader = reader
-        self._task = asyncio.create_task(self._poller())
+        self._poll_waiters: List["asyncio.Future[None]"] = []
+        self._poll_forever_task = asyncio.create_task(self._poll_forever())
 
-    def stop(self) -> None:
-        """Signal poller to stop."""
-        self._shutdown_event.set()
+    async def stop(self) -> None:
+        """Stop polling."""
+        self._poll_forever_task.cancel()
+        await asyncio.gather(self._poll_forever_task, return_exceptions=True)
 
-    async def stop_and_wait(self) -> None:
-        """Stop poller and wait for it to terminate."""
-        self.stop()
-        await self._task
+    async def wait_next_poll(self) -> None:
+        """Wait for the next poll to complete.
 
-    async def _poller(self) -> None:
-        """Poll task entrypoint."""
+        If called in the middle of a read, it will not return until
+        the next complete read. If a read raises an exception,
+        it will be passed through to `wait_next_poll`.
+        """
+        poll_future = asyncio.get_running_loop().create_future()
+        self._poll_waiters.append(poll_future)
+        await poll_future
+
+    async def _poll_forever(self) -> None:
+        """Polling loop."""
         while True:
-            try:
-                poll = await self._reader.read()
-                self._listener.on_poll(poll)
-            except Exception as e:
-                log.exception("Polling exception")
-                self._listener.on_error(e)
+            await self._poll_once()
+            await asyncio.sleep(self.interval)
 
-            try:
-                await asyncio.wait_for(self._shutdown_event.wait(), self._interval)
-            except asyncio.TimeoutError:
-                pass
-            else:
-                break
+    async def _poll_once(self) -> None:
+        """Trigger a single read, notifying listeners of success or error."""
+        previous_waiters = self._poll_waiters
+        self._poll_waiters = []
 
-        self._listener.on_terminated()
+        try:
+            await self._reader.read()
+        except asyncio.CancelledError:
+            raise
+        except Exception as e:
+            log.exception("Polling exception")
+            self._reader.on_error(e)
+            for waiter in previous_waiters:
+                waiter.set_exception(e)
+        else:
+            for waiter in previous_waiters:
+                waiter.set_result(None)
