@@ -9,7 +9,11 @@ from opentrons.types import Mount, MountType, Location, DeckSlotName
 from opentrons.hardware_control import SyncHardwareAPI
 
 
-from opentrons.hardware_control.modules.types import ModuleModel, ModuleType, ThermocyclerModuleModel
+from opentrons.hardware_control.modules.types import (
+    ModuleModel,
+    ModuleType,
+    ThermocyclerModuleModel,
+)
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.protocols.geometry.deck import Deck
@@ -130,7 +134,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         """Load a module into the protocol."""
         if location is None:
             if isinstance(model, ThermocyclerModuleModel):
-                location = "7"
+                location = DeckSlotName.SLOT_7
             else:
                 raise InvalidModuleLocationError(location, model.name)
 

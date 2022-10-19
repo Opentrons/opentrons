@@ -247,22 +247,22 @@ def test_load_module(
         (
             ThermocyclerModuleModel.THERMOCYCLER_V2,
             EngineModuleModel.THERMOCYCLER_MODULE_V2,
-        )
-    ]
+        ),
+    ],
 )
 def test_load_module_thermocycler_with_no_location(
     decoy: Decoy,
     mock_engine_client: EngineClient,
     requested_model: ModuleModel,
     engine_model: EngineModuleModel,
-    subject: ProtocolCore
+    subject: ProtocolCore,
 ) -> None:
     """It should issue a load module engine command with location at 7."""
     definition = ModuleDefinition.construct()  # type: ignore[call-arg]
 
     decoy.when(
         mock_engine_client.load_module(
-            model=requested_model,
+            model=engine_model,
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_7),
         )
     ).then_return(
@@ -284,18 +284,22 @@ def test_load_module_thermocycler_with_no_location(
     assert result.module_id == "abc123"
 
 
-@pytest.mark.parametrize("requested_model", [HeaterShakerModuleModel.HEATER_SHAKER_V1, MagneticModuleModel.MAGNETIC_V1, MagneticModuleModel.MAGNETIC_V2, TemperatureModuleModel.TEMPERATURE_V1, TemperatureModuleModel.TEMPERATURE_V2])
+@pytest.mark.parametrize(
+    "requested_model",
+    [
+        HeaterShakerModuleModel.HEATER_SHAKER_V1,
+        MagneticModuleModel.MAGNETIC_V1,
+        MagneticModuleModel.MAGNETIC_V2,
+        TemperatureModuleModel.TEMPERATURE_V1,
+        TemperatureModuleModel.TEMPERATURE_V2,
+    ],
+)
 def test_load_module_no_location(
-        decoy: Decoy,
-        mock_engine_client: EngineClient,
-        requested_model: ModuleModel,
-        subject: ProtocolCore
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    requested_model: ModuleModel,
+    subject: ProtocolCore,
 ) -> None:
     """Should raise an InvalidModuleLocationError exception."""
-
     with pytest.raises(InvalidModuleLocationError):
-        result = subject.load_module(
-            model=requested_model,
-            location=None,
-            configuration=""
-        )
+        subject.load_module(model=requested_model, location=None, configuration="")

@@ -1,7 +1,6 @@
 """Protocol API module implementation logic."""
 from typing import Optional, List
 
-from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     ModuleType,
