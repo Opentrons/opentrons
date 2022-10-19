@@ -32,6 +32,7 @@ export const LABWAREV2_DO_NOT_LIST = [
   'tipone_96_tiprack_200ul',
   'opentrons_1_trash_850ml_fixed',
   'opentrons_1_trash_1100ml_fixed',
+  'opentrons_1_trash_3200ml_fixed',
   'eppendorf_96_tiprack_1000ul_eptips',
   'eppendorf_96_tiprack_10ul_eptips',
   'opentrons_calibrationblock_short_side_left',

@@ -293,6 +293,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   well: sourceWell,
                   flowRate: aspirateFlowRateUlSec,
                   offsetFromBottomMm: airGapOffsetSourceWell,
+                  isAirGap: true,
                 }),
                 ...(aspirateDelay != null
                   ? [
@@ -312,6 +313,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   well: destWell,
                   flowRate: dispenseFlowRateUlSec,
                   offsetFromBottomMm: airGapOffsetDestWell,
+                  isAirGap: true,
                 }),
                 ...(dispenseDelay != null
                   ? [

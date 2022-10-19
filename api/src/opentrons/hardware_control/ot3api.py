@@ -872,14 +872,19 @@ class OT3API(
                 await stack.enter_async_context(self._motion_lock)
             try:
                 await self._backend.move(origin, moves[0])
-                encoder_pos = await self._backend.update_encoder_position()
+                encoder_machine_pos = await self._backend.update_encoder_position()
             except Exception:
                 self._log.exception("Move failed")
                 self._current_position.clear()
                 raise
             else:
                 self._current_position.update(target_position)
-                self._encoder_current_position.update(encoder_pos)
+                encoder_position = deck_from_machine(
+                    encoder_machine_pos,
+                    self._transforms.deck_calibration.attitude,
+                    self._transforms.carriage_offset,
+                )
+                self._encoder_current_position.update(encoder_position)
 
     @ExecutionManagerProvider.wait_for_running
     async def home(
@@ -904,14 +909,19 @@ class OT3API(
                 raise
             else:
                 machine_pos = await self._backend.update_position()
-                encoder_pos = await self._backend.update_encoder_position()
+                encoder_machine_pos = await self._backend.update_encoder_position()
                 position = deck_from_machine(
                     machine_pos,
                     self._transforms.deck_calibration.attitude,
                     self._transforms.carriage_offset,
                 )
                 self._current_position.update(position)
-                self._encoder_current_position.update(encoder_pos)
+                encoder_position = deck_from_machine(
+                    encoder_machine_pos,
+                    self._transforms.deck_calibration.attitude,
+                    self._transforms.carriage_offset,
+                )
+                self._encoder_current_position.update(encoder_position)
                 if OT3Axis.G in checked_axes:
                     try:
                         gripper = self._gripper_handler.get_gripper()
@@ -1006,6 +1016,8 @@ class OT3API(
         """Move the gripper jaw inward to close."""
         try:
             await self._backend.gripper_grip_jaw(duty_cycle=duty_cycle)
+            encoder_pos = await self._backend.update_encoder_position()
+            self._encoder_current_position.update(encoder_pos)
         except Exception:
             self._log.exception("Gripper grip failed")
             raise
@@ -1015,6 +1027,8 @@ class OT3API(
         """Move the gripper jaw outward to reach the homing switch."""
         try:
             await self._backend.gripper_home_jaw()
+            encoder_pos = await self._backend.update_encoder_position()
+            self._encoder_current_position.update(encoder_pos)
         except Exception:
             self._log.exception("Gripper home failed")
             raise
@@ -1040,6 +1054,8 @@ class OT3API(
                     / 2
                 )
             )
+            encoder_pos = await self._backend.update_encoder_position()
+            self._encoder_current_position.update(encoder_pos)
         except Exception:
             self._log.exception("Gripper set width failed")
             raise
