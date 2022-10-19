@@ -7,6 +7,7 @@ import { RobotMotionLoader } from './RobotMotionLoader'
 import { PrepareSpace } from './PrepareSpace'
 import { JogToWell } from './JogToWell'
 import {
+  CreateCommand,
   FIXED_TRASH_ID,
   getIsTiprack,
   getLabwareDefURI,
@@ -30,6 +31,8 @@ import type {
 import type { Jog } from '../../molecules/DeprecatedJogControls/types'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { getDisplayLocation } from './utils/getDisplayLocation'
+import { escapeRegExp } from 'lodash'
+import { chainRunCommands } from './utils/chainRunCommands'
 interface CheckItemProps extends Omit<CheckLabwareStep, 'section'> {
   section: 'CHECK_LABWARE' | 'CHECK_TIP_RACKS'
   protocolData: CompletedProtocolAnalysis
@@ -61,51 +64,28 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   const labwareDef = getLabwareDef(labwareId, protocolData)
   const pipetteName =
     protocolData.pipettes.find(p => p.id === pipetteId)?.pipetteName ?? null
+  let modulePrepCommands: CreateCommand[] = []
+  const moduleType = (moduleId != null && 'moduleModel' in location && location.moduleModel != null && getModuleType(location.moduleModel)) ?? null
+  if (moduleId != null && moduleType === THERMOCYCLER_MODULE_TYPE) {
+    modulePrepCommands = [{
+      commandType: 'thermocycler/openLid',
+      params: { moduleId },
+    }]
+  } else if (moduleId != null && moduleType === HEATERSHAKER_MODULE_TYPE) {
+    modulePrepCommands = [
+      {
+        commandType: 'heaterShaker/deactivateShaker',
+        params: { moduleId },
+      },
+      {
+        commandType: 'heaterShaker/openLabwareLatch',
+        params: { moduleId },
+      },
+    ]
+  }
 
   React.useEffect(() => {
-    if (
-      moduleId != null &&
-      'moduleModel' in location &&
-      location.moduleModel != null
-    ) {
-      const moduleType = getModuleType(location.moduleModel)
-      if (moduleType === THERMOCYCLER_MODULE_TYPE) {
-        createRunCommand({
-          command: {
-            commandType: 'thermocycler/openLid',
-            params: { moduleId },
-          },
-          waitUntilComplete: true,
-        }).catch((e: Error) => {
-          console.error(`error opening thermocycler lid: ${e.message}`)
-        })
-      } else if (moduleType === HEATERSHAKER_MODULE_TYPE) {
-        createRunCommand(
-          {
-            command: {
-              commandType: 'heaterShaker/closeLabwareLatch',
-              params: { moduleId },
-            },
-            waitUntilComplete: true,
-          },
-          {
-            onSuccess: _r => {
-              createRunCommand({
-                command: {
-                  commandType: 'heaterShaker/deactivateShaker',
-                  params: { moduleId },
-                },
-                waitUntilComplete: true,
-              }).catch((e: Error) => {
-                console.error(`error deactivating heater shaker: ${e.message}`)
-              })
-            },
-          }
-        ).catch((e: Error) => {
-          console.error(`error closing labware latch: ${e.message}`)
-        })
-      }
-    }
+    chainRunCommands(modulePrepCommands, createRunCommand)
   }, [moduleId])
 
   if (pipetteName == null || labwareDef == null) return null
@@ -136,59 +116,59 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
     />
   )
 
-  const handleConfirmPlacement = (): void => {
-    createRunCommand({
-      command: {
-        commandType: 'moveLabware' as const,
-        params: { labwareId: labwareId, newLocation: location },
+  let confirmPlacementCommands: CreateCommand[] = [
+    {
+      commandType: 'moveLabware' as const,
+      params: {
+        labwareId: labwareId,
+        newLocation: moduleId != null ? { moduleId } : { slotName: location.slotName }
       },
-      waitUntilComplete: true,
-    })
-      .then(_moveLabwareResponse => {
-        createRunCommand({
-          command: {
-            commandType: 'moveToWell' as const,
-            params: {
-              pipetteId: pipetteId,
-              labwareId: labwareId,
-              wellName: 'A1',
-              wellLocation: { origin: 'top' as const },
-            },
-          },
-          waitUntilComplete: true,
-        })
-          .then(_response => {
-            createRunCommand({
-              command: { commandType: 'savePosition', params: { pipetteId } },
-              waitUntilComplete: true,
-            })
-              .then(response => {
-                const { position } = response.data.result
-                registerPosition({
-                  type: 'initialPosition',
-                  labwareId,
-                  location,
-                  position,
-                })
-              })
-              .catch((e: Error) => {
-                console.error(`error saving position: ${e.message}`)
-              })
-          })
-          .catch((e: Error) => {
-            console.error(`error moving to well: ${e.message}`)
-          })
-      })
-      .catch((e: Error) => {
-        console.error(`error moving labware: ${e.message}`)
-      })
+    },
+    {
+      commandType: 'moveToWell' as const,
+      params: {
+        pipetteId: pipetteId,
+        labwareId: labwareId,
+        wellName: 'A1',
+        wellLocation: { origin: 'top' as const },
+      },
+    }
+  ]
+
+  if (moduleId != null && moduleType != null) {
+    confirmPlacementCommands = moduleType === HEATERSHAKER_MODULE_TYPE ? [{
+      commandType: 'heaterShaker/closeLabwareLatch',
+      params: { moduleId },
+    }, ...confirmPlacementCommands] : confirmPlacementCommands
   }
+
+  const handleConfirmPlacement = (): void => {
+    chainRunCommands(confirmPlacementCommands, createRunCommand, () => {
+      createRunCommand({
+        command: { commandType: 'savePosition', params: { pipetteId } },
+        waitUntilComplete: true,
+      })
+        .then(response => {
+          const { position } = response.data.result
+          registerPosition({
+            type: 'initialPosition',
+            labwareId,
+            location,
+            position,
+          })
+        })
+        .catch((e: Error) => {
+          console.error(`error saving position: ${e.message}`)
+        })
+    })
+  }
+
   const handleConfirmPosition = (): void => {
     createRunCommand({
       command: { commandType: 'savePosition', params: { pipetteId } },
       waitUntilComplete: true,
-    })
-      .then(response => {
+    }, {
+      onSuccess: response => {
         const { position } = response.data.result
         registerPosition({
           type: 'finalPosition',
@@ -196,9 +176,8 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
           location,
           position,
         })
-        createRunCommand({
-
-          command: {
+        const confirmPositionCommands: CreateCommand[] = [
+          {
             commandType: 'moveToWell' as const,
             params: {
               pipetteId: pipetteId,
@@ -207,37 +186,20 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
               wellLocation: { origin: 'top' as const },
             },
           },
-          waitUntilComplete: true,
-        })
-          .then(_moveResponse => {
-            createRunCommand({
-              command: {
-                commandType: 'moveLabware' as const,
-                params: { labwareId: labwareId, newLocation: 'offDeck' },
-              },
-              waitUntilComplete: true,
-            })
-              .then(_homeResponse => {
-                proceed()
-              })
-              .catch((e: Error) => {
-                console.error(`error homing: ${e.message}`)
-              })
-          })
-          .catch((e: Error) => {
-            console.error(`error moving labware: ${e.message}`)
-          })
-      })
-      .catch((e: Error) => {
-        console.error(`error saving position: ${e.message}`)
-      })
+          {
+            commandType: 'moveLabware' as const,
+            params: { labwareId: labwareId, newLocation: 'offDeck' },
+          },
+        ]
+        chainRunCommands(confirmPositionCommands, createRunCommand, proceed)
+      }
+    })
   }
   const handleGoBack = (): void => {
-    createRunCommand({
-      command: { commandType: 'home', params: {} },
-      waitUntilComplete: true,
-    })
-      .then(_response => {
+    chainRunCommands(
+      [...modulePrepCommands, { commandType: 'home', params: {} }],
+      createRunCommand,
+      () => {
         registerPosition({
           type: 'initialPosition',
           labwareId,
@@ -245,10 +207,8 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
           position: null,
         })
       })
-      .catch((e: Error) => {
-        console.error(`error homing: ${e.message}`)
-      })
   }
+
   const initialPosition = workingOffsets.find(
     o =>
       o.labwareId === labwareId &&

@@ -1,6 +1,7 @@
+import { FIXED_TRASH_ID, getModuleType, HEATERSHAKER_MODULE_TYPE, THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
+
 import type {
   RunTimeCommand,
-  CreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type {
   SetupRunTimeCommand,
@@ -11,52 +12,86 @@ import type {
   HeaterShakerDeactivateShakerCreateCommand,
   TCOpenLidCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { HomeCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
+import type { DropTipCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 
 type LPCPrepCommand =
   | HomeCreateCommand
   | SetupRunTimeCommand
+  | DropTipCreateCommand
   | TCOpenLidCreateCommand
   | HeaterShakerDeactivateShakerCreateCommand
   | HeaterShakerCloseLatchCreateCommand
 
 export function getPrepCommands(
-  protocolCommands: RunTimeCommand[]
+  protocolData: CompletedProtocolAnalysis
 ): LPCPrepCommand[] {
   // load commands come from the protocol resource
-  const loadCommands: SetupRunTimeCommand[] =
-    protocolCommands.filter(isLoadCommand).map(command => {
+  const loadCommands: LPCPrepCommand[] =
+    protocolData.commands.filter(isLoadCommand).reduce<LPCPrepCommand[]>((acc, command) => {
       if (command.commandType === 'loadPipette') {
-        const commandWithPipetteId = {
+        const pipetteId = command.result?.pipetteId
+        const loadWithPipetteId = {
           ...command,
           params: {
             ...command.params,
-            pipetteId: command.result?.pipetteId,
+            pipetteId,
           },
         }
-        return commandWithPipetteId
+        const dropTipToBeSafe = {
+          commandType: 'dropTip' as const,
+          params: {
+            pipetteId: pipetteId,
+            labwareId: FIXED_TRASH_ID,
+            wellName: 'A1',
+            wellLocation: {},
+          }
+        }
+        return [...acc, loadWithPipetteId, dropTipToBeSafe]
       } else if (command.commandType === 'loadLabware') {
         // load all labware off-deck so that LPC can move them on individually later
-        return {
+        return [...acc, {
           ...command,
           params: { ...command.params, location: 'offDeck' },
-        }
+        }]
       }
-      return command
-    }) ?? []
-  // TODO: move logic from command generator for TC and HS into this function
-  // TC open lid commands + HS commands come from the LPC command generator
-  // const TCOpenCommands = LPCCommands.filter(isTCOpenCommand) ?? []
-  // const HSCommands = LPCCommands.filter(isHSCommand) ?? []
+      return [...acc, command]
+    }, []) ?? []
+
+  const TCCommands = protocolData.modules.reduce<TCOpenLidCreateCommand[]>((acc, module) => {
+    if (getModuleType(module.model) === THERMOCYCLER_MODULE_TYPE) {
+      return [
+        ...acc,
+        {
+          commandType: 'thermocycler/openLid',
+          params: { moduleId: module.id },
+        }
+      ]
+    }
+    return acc
+  }, [])
+
+  const HSCommands = protocolData.modules.reduce<HeaterShakerCloseLatchCreateCommand[]>((acc, module) => {
+    if (getModuleType(module.model) === HEATERSHAKER_MODULE_TYPE) {
+      return [
+        ...acc,
+        {
+          commandType: 'heaterShaker/closeLabwareLatch',
+          params: { moduleId: module.id },
+        }
+      ]
+    }
+    return acc
+  }, [])
   const homeCommand: HomeCreateCommand = {
-    commandType: 'home',
-    params: {},
+    commandType: 'home', params: {},
   }
   // prepCommands will be run when a user starts LPC
   return [
     ...loadCommands,
-    // ...TCOpenCommands,
-    // ...HSCommands,
+    ...TCCommands,
+    ...HSCommands,
     homeCommand,
   ]
 }
@@ -72,21 +107,4 @@ function isLoadCommand(
   ]
   // @ts-expect-error SetupCommand is more specific than Command, but the whole point of this util :)
   return loadCommands.includes(command.commandType)
-}
-
-function isTCOpenCommand(
-  command: CreateCommand
-): command is TCOpenLidCreateCommand {
-  return command.commandType === 'thermocycler/openLid'
-}
-
-function isHSCommand(
-  command: CreateCommand
-): command is
-  | HeaterShakerDeactivateShakerCreateCommand
-  | HeaterShakerCloseLatchCreateCommand {
-  return (
-    command.commandType === 'heaterShaker/deactivateShaker' ||
-    command.commandType === 'heaterShaker/closeLabwareLatch'
-  )
 }

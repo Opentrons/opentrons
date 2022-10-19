@@ -6,7 +6,9 @@ import { RobotMotionLoader } from './RobotMotionLoader'
 import { PrepareSpace } from './PrepareSpace'
 import {
   CompletedProtocolAnalysis,
+  CreateCommand,
   getLabwareDisplayName,
+  getModuleType,
 } from '@opentrons/shared-data'
 import { getLabwareDef } from './utils/labware'
 import { UnorderedList } from '../../molecules/UnorderedList'
@@ -14,6 +16,7 @@ import { UnorderedList } from '../../molecules/UnorderedList'
 import type { CreateRunCommand, ReturnTipStep } from './types'
 import { VectorOffset } from '@opentrons/api-client'
 import { getDisplayLocation } from './utils/getDisplayLocation'
+import { chainRunCommands } from './utils/chainRunCommands'
 
 interface ReturnTipProps extends ReturnTipStep {
   protocolData: CompletedProtocolAnalysis
@@ -57,64 +60,48 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
   ]
 
   const handleConfirmPlacement = (): void => {
-    createRunCommand(
+    const modulePrepCommands = protocolData.modules.reduce<CreateCommand[]>((acc, module) => {
+      if (getModuleType(module.model)) {
+        return [...acc, {
+          commandType: 'heaterShaker/closeLabwareLatch',
+          params: { moduleId: module.id },
+        }]
+      }
+      return acc
+    }, [])
+    chainRunCommands([
+      ...modulePrepCommands,
       {
-        command: {
-          commandType: 'moveLabware' as const,
-          params: { labwareId: labwareId, newLocation: location },
-        },
-        waitUntilComplete: true,
+        commandType: 'moveLabware' as const,
+        params: { labwareId: labwareId, newLocation: location },
       },
       {
-        onSuccess: () => {
-          createRunCommand({
-            command: {
-              commandType: 'moveToWell' as const,
-              params: {
-                pipetteId: pipetteId,
-                labwareId: labwareId,
-                wellName: 'A1',
-                wellLocation: { origin: 'top' as const, offset: tipPickUpOffset ?? undefined },
-              },
-            },
-            waitUntilComplete: true,
-          }, {
-            onSuccess: () => {
-              createRunCommand(
-                {
-                  command: {
-                    commandType: 'dropTip' as const,
-                    params: {
-                      pipetteId: pipetteId,
-                      labwareId: labwareId,
-                      wellName: 'A1',
-                      wellLocation: { offset: tipPickUpOffset ?? undefined },
-                    },
-                  },
-                  waitUntilComplete: true,
-                },
-                {
-                  onSuccess: () => {
-                    createRunCommand(
-                      {
-                        command: {
-                          commandType: 'moveLabware' as const,
-                          params: { labwareId: labwareId, newLocation: 'offDeck' },
-                        },
-                        waitUntilComplete: true,
-                      }, { onSuccess: proceed })
-                  }
-                }
-              ).catch((e: Error) => {
-                console.error(`error dropping tip ${e.message}`)
-              })
-            }
-          })
+        commandType: 'moveToWell' as const,
+        params: {
+          pipetteId: pipetteId,
+          labwareId: labwareId,
+          wellName: 'A1',
+          wellLocation: { origin: 'top' as const, offset: tipPickUpOffset ?? undefined },
         },
-      }
-    ).catch((e: Error) => {
-      console.error(`error moving labware onto deck ${e.message}`)
-    })
+      },
+      {
+        commandType: 'dropTip' as const,
+        params: {
+          pipetteId: pipetteId,
+          labwareId: labwareId,
+          wellName: 'A1',
+          wellLocation: { offset: tipPickUpOffset ?? undefined },
+        },
+      },
+      {
+        commandType: 'moveLabware' as const,
+        params: { labwareId: labwareId, newLocation: 'offDeck' },
+      },
+      { commandType: 'home' as const, params: {} }
+    ],
+      createRunCommand,
+      proceed
+    )
   }
 
   if (isRobotMoving) return <RobotMotionLoader />

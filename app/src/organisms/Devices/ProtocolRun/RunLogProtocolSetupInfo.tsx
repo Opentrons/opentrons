@@ -139,6 +139,7 @@ export const RunLogProtocolSetupInfo = ({
       protocolData.commands
     )
     const { liquidId, labwareId } = setupCommand.params
+    console.log('setupCommand', setupCommand)
     const liquidDisplayName = liquidInfo.find(liquid => liquid.id === liquidId)
       ?.displayName
     setupCommandText = (
@@ -148,9 +149,11 @@ export const RunLogProtocolSetupInfo = ({
         i18nKey={'load_liquids_info_protocol_setup'}
         values={{
           liquid: liquidDisplayName ?? 'liquid',
-          labware: getLabwareDisplayName(
-            labwareRenderInfoById[labwareId].labwareDef
-          ),
+          labware: '',
+          // TODO: REMOVE THIS IMMEDIATELY, THIS IS TO PREVENT A WHITESCREEN WHEN LW IS ON HS
+          //  getLabwareDisplayName(
+          //   labwareRenderInfoById[labwareId].labwareDef
+          // ),
         }}
       />
     )

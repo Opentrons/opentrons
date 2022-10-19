@@ -19,9 +19,10 @@ import {
 } from '@opentrons/react-api-client'
 
 import type { LabwareOffset } from '@opentrons/api-client'
-import type {
+import {
   CompletedProtocolAnalysis,
   Coordinates,
+  FIXED_TRASH_ID,
 } from '@opentrons/shared-data'
 import type {
   Axis,
@@ -35,6 +36,8 @@ import type {
 } from './types'
 import { LabwareOffsetCreateData } from '@opentrons/api-client'
 import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
+import { chainRunCommands } from './utils/chainRunCommands'
+import { DropTipCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 
 const JOG_COMMAND_TIMEOUT = 10000 // 10 seconds
 interface LabwarePositionCheckModalProps {
@@ -123,14 +126,10 @@ export const LabwarePositionCheckInner = (
     { workingOffsets: [], tipPickUpOffset: null }
   )
   const {
-    confirm: confirmExitLPC,
-    showConfirmation,
-    cancel: cancelExitLPC,
-  } = useConditionalConfirm(props.onCloseClick, true)
-  const {
     createCommand,
     isLoading: isCommandMutationLoading,
   } = useCreateCommandMutation()
+  const { createCommand: createSilentCommand } = useCreateCommandMutation()
   const createRunCommand: CreateRunCommand = (variables, ...options) => {
     return createCommand({ ...variables, runId }, ...options)
   }
@@ -146,6 +145,33 @@ export const LabwarePositionCheckInner = (
   }, [isCommandMutationLoading])
 
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
+  const handleCleanUpAndClose = () => {
+    const dropTipToBeSafeCommands: DropTipCreateCommand[] = (protocolData?.pipettes ?? []).map(pip => (
+      {
+        commandType: 'dropTip' as const,
+        params: {
+          pipetteId: pip.id,
+          labwareId: FIXED_TRASH_ID,
+          wellName: 'A1',
+          wellLocation: { origin: 'top' as const },
+        }
+      }
+    ))
+    chainRunCommands(
+      [
+        ...dropTipToBeSafeCommands,
+        { commandType: 'home' as const, params: {} }
+      ],
+      createRunCommand,
+      props.onCloseClick
+    )
+
+  }
+  const {
+    confirm: confirmExitLPC,
+    showConfirmation,
+    cancel: cancelExitLPC,
+  } = useConditionalConfirm(handleCleanUpAndClose, true)
 
   const proceed = (): void => {
     if (!isCommandMutationLoading) {
@@ -170,7 +196,7 @@ export const LabwarePositionCheckInner = (
   ): void => {
     const pipetteId = 'pipetteId' in currentStep ? currentStep.pipetteId : null
     if (pipetteId != null) {
-      createCommand({
+      createSilentCommand({
         runId,
         command: {
           commandType: 'moveRelative',
@@ -226,7 +252,7 @@ export const LabwarePositionCheckInner = (
     currentStep.section === 'CHECK_TIP_RACKS' ||
     currentStep.section === 'CHECK_LABWARE'
   ) {
-    modalContent = <CheckItem {...currentStep} {...movementStepProps} {...{currentStepIndex}} />
+    modalContent = <CheckItem {...currentStep} {...movementStepProps} {...{ currentStepIndex }} />
   } else if (currentStep.section === 'PICK_UP_TIP') {
     modalContent = <PickUpTip {...currentStep} {...movementStepProps} />
   } else if (currentStep.section === 'RETURN_TIP') {

@@ -7,9 +7,11 @@ import { PrepareSpace } from './PrepareSpace'
 import { JogToWell } from './JogToWell'
 import {
   CompletedProtocolAnalysis,
+  CreateCommand,
   FIXED_TRASH_ID,
   getLabwareDefURI,
   getLabwareDisplayName,
+  getModuleType,
   getVectorDifference,
   IDENTITY_VECTOR,
 } from '@opentrons/shared-data'
@@ -17,6 +19,8 @@ import { getLabwareDef } from './utils/labware'
 import { UnorderedList } from '../../molecules/UnorderedList'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { TipConfirmation } from './TipConfirmation'
+import { getDisplayLocation } from './utils/getDisplayLocation'
+import { chainRunCommands } from './utils/chainRunCommands'
 
 import type { Jog } from '../../molecules/DeprecatedJogControls/types'
 import type {
@@ -26,7 +30,6 @@ import type {
   WorkingOffset,
 } from './types'
 import type { LabwareOffset, VectorOffset } from '@opentrons/api-client'
-import { getDisplayLocation } from './utils/getDisplayLocation'
 
 interface PickUpTipProps extends PickUpTipStep {
   protocolData: CompletedProtocolAnalysis
@@ -81,58 +84,50 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
   ]
 
   const handleConfirmPlacement = (): void => {
-    createRunCommand(
-      {
-        command: {
+    const modulePrepCommands = protocolData.modules.reduce<CreateCommand[]>((acc, module) => {
+      if (getModuleType(module.model)) {
+        return [...acc, {
+          commandType: 'heaterShaker/closeLabwareLatch',
+          params: { moduleId: module.id },
+        }]
+      }
+      return acc
+    }, [])
+    chainRunCommands(
+      [
+        ...modulePrepCommands,
+        {
           commandType: 'moveLabware' as const,
           params: { labwareId: labwareId, newLocation: location },
         },
-        waitUntilComplete: true,
-      },
-      {
-        onSuccess: () => {
-          createRunCommand(
-            {
-              command: {
-                commandType: 'moveToWell' as const,
-                params: {
-                  pipetteId: pipetteId,
-                  labwareId: labwareId,
-                  wellName: 'A1',
-                  wellLocation: { origin: 'top' as const },
-                },
-              },
-              waitUntilComplete: true,
+        {
+          commandType: 'moveToWell' as const,
+          params: {
+            pipetteId: pipetteId,
+            labwareId: labwareId,
+            wellName: 'A1',
+            wellLocation: { origin: 'top' as const },
+          }
+        }
+      ],
+      createRunCommand,
+      () => {
+        createRunCommand(
+          {
+            command: {
+              commandType: 'savePosition',
+              params: { pipetteId },
             },
-            {
-              onSuccess: () => {
-                createRunCommand(
-                  {
-                    command: {
-                      commandType: 'savePosition',
-                      params: { pipetteId },
-                    },
-                    waitUntilComplete: true,
-                  },
-                  {
-                    onSuccess: response => {
-                      const { position } = response.data.result
-                      setInitialPosition(position)
-                    },
-                  }
-                ).catch((e: Error) => {
-                  console.error(`error saving position ${e.message}`)
-                })
-              },
-            }
-          ).catch((e: Error) => {
-            console.error(`error moving to tip rack ${e.message}`)
-          })
-        },
+            waitUntilComplete: true,
+          },
+          {
+            onSuccess: response => {
+              setInitialPosition(response.data.result.position)
+            },
+          }
+        )
       }
-    ).catch((e: Error) => {
-      console.error(`error moving labware onto deck ${e.message}`)
-    })
+    )
   }
   const handleConfirmPosition = (): void => {
     createRunCommand(
@@ -149,7 +144,20 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
       },
       {
         onSuccess: () => {
-          setShowTipConfirmation(true)
+          createRunCommand({
+            command: { commandType: 'savePosition', params: { pipetteId } },
+            waitUntilComplete: true,
+          }, {
+            onSuccess: (response) => {
+              const { position } = response.data.result
+              const offset =
+                initialPosition != null
+                  ? getVectorDifference(position, initialPosition)
+                  : position
+              registerPosition({ type: 'tipPickUpOffset', offset })
+              setShowTipConfirmation(true)
+            }
+          })
         },
       }
     ).catch((e: Error) => {
@@ -219,6 +227,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
       },
       {
         onSuccess: () => {
+          registerPosition({ type: 'tipPickUpOffset', offset: null })
           setShowTipConfirmation(false)
           setInitialPosition(null)
         },
