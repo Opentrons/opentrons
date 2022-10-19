@@ -129,6 +129,7 @@ async def test_wait_for_temperatures(thermocycler: Thermocycler) -> None:
 # TODO(mm, 2022-07-01): This test is a flakiness hazard because it's sensitive to
 # timing and async task scheduling.
 async def test_cycle_cannot_be_interrupted_by_pause(
+    poll_interval_seconds: int,
     thermocycler: Thermocycler,
     execution_manager: ExecutionManager,
 ) -> None:
@@ -150,11 +151,10 @@ async def test_cycle_cannot_be_interrupted_by_pause(
     # in the middle of it, but not so long that makes the test take a disruptively
     # long time.
     steps = [
-        *[
-            {"temperature": temp_1},
-            {"temperature": temp_2},
-        ]
-        * 5,
+        {"temperature": temp_1, "hold_time_seconds": poll_interval_seconds * 2},
+        {"temperature": temp_2, "hold_time_seconds": poll_interval_seconds * 2},
+        {"temperature": temp_1, "hold_time_seconds": poll_interval_seconds * 2},
+        {"temperature": temp_2, "hold_time_seconds": poll_interval_seconds * 2},
         {"temperature": final_temp},
     ]
 
