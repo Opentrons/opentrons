@@ -155,16 +155,16 @@ export function parseInitialLoadedLabwareByModuleId(
   )
 }
 
-export interface LoadedLabwareById {
+export interface LoadedLabwareEntity {
   id: string
   loadName: string
   definitionUri: string
   displayName?: string
 }
 
-export function parseLoadedLabwareById(
+export function parseInitialLoadedLabwareEntity(
   commands: RunTimeCommand[]
-): LoadedLabwareById[] {
+): LoadedLabwareEntity[] {
   const loadLabwareCommands = commands.filter(
     (command): command is LoadLabwareRunTimeCommand =>
       command.commandType === 'loadLabware'
@@ -195,7 +195,7 @@ export interface LoadedLabwareDefinitionsById {
 export function parseInitialLoadedLabwareDefinitionsById(
   commands: RunTimeCommand[]
 ): LoadedLabwareDefinitionsById {
-  const labware = parseLoadedLabwareById(commands)
+  const labware = parseInitialLoadedLabwareEntity(commands)
   const loadLabwareCommandsReversed = commands
     .filter(
       (command): command is LoadLabwareRunTimeCommand =>

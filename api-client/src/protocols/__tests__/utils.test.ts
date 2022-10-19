@@ -4,7 +4,7 @@ import {
   parseInitialPipetteNamesByMount,
   parseAllRequiredModuleModels,
   parseAllRequiredModuleModelsById,
-  parseLoadedLabwareById,
+  parseInitialLoadedLabwareEntity,
   parseInitialLoadedLabwareBySlot,
   parseInitialLoadedLabwareByModuleId,
   parseInitialLoadedLabwareDefinitionsById,
@@ -227,7 +227,9 @@ describe('parseInitialLoadedLabwareById', () => {
           'Opentrons 24 Well Aluminum Block with Generic 2 mL Screwcap',
       },
     ]
-    expect(parseLoadedLabwareById(mockRunTimeCommands)).toEqual(expected)
+    expect(parseInitialLoadedLabwareEntity(mockRunTimeCommands)).toEqual(
+      expected
+    )
   })
 })
 describe('parseInitialLoadedLabwareDefinitionsById', () => {
