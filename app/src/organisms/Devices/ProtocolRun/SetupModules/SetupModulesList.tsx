@@ -11,6 +11,7 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getModuleType } from '@opentrons/shared-data'
 import { useModuleRenderInfoForProtocolById } from '../../hooks'
@@ -43,7 +44,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
         marginLeft={SPACING.spacingM}
       >
         <StyledText
-          as="labelSemiBold"
+          css={TYPOGRAPHY.labelSemiBold}
           marginBottom={SPACING.spacing3}
           data-testid="SetupModulesList_module_name"
           width="45%"
@@ -51,7 +52,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
           {t('module_name')}
         </StyledText>
         <StyledText
-          as="labelSemiBold"
+          css={TYPOGRAPHY.labelSemiBold}
           data-testid="SetupModulesList_location"
           marginRight={SPACING.spacing4}
           width="15%"
@@ -59,7 +60,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
           {t('location')}
         </StyledText>
         <StyledText
-          as="labelSemiBold"
+          css={TYPOGRAPHY.labelSemiBold}
           data-testid="SetupModulesList_connection_status"
           marginRight={SPACING.spacing4}
           width="15%"
@@ -129,7 +130,7 @@ export const ModulesListItem = ({
       >
         <Flex alignItems={JUSTIFY_CENTER} width="45%">
           <img width="60px" height="54px" src={getModuleImage(moduleModel)} />
-          <StyledText as="pSemiBold" marginLeft={SPACING.spacingM}>
+          <StyledText css={TYPOGRAPHY.pSemiBold} marginLeft={SPACING.spacingM}>
             {displayName}
           </StyledText>
         </Flex>
