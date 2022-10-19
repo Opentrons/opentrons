@@ -10,7 +10,6 @@ from opentrons_shared_data.labware.dev_types import (
     LabwareUri,
 )
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons_shared_data import load_shared_data
 
 from opentrons.types import Mount, MountType, DeckSlotName
 from opentrons.hardware_control.modules.types import (
@@ -39,14 +38,9 @@ from opentrons.protocol_api.core.engine import (
 from opentrons.protocol_api.core.engine.module_core import (
     TemperatureModuleCore,
     MagneticModuleCore,
+    ThermocyclerModuleCore,
+    HeaterShakerModuleCore
 )
-
-
-@pytest.fixture(scope="session")
-def tempdeck_v2_def() -> ModuleDefinition:
-    """Get the definition of a V2 tempdeck."""
-    definition = load_shared_data("module/definitions/3/temperatureModuleV2.json")
-    return ModuleDefinition.parse_raw(definition)
 
 
 @pytest.fixture
@@ -190,16 +184,21 @@ def test_add_labware_definition(
             EngineModuleModel.MAGNETIC_MODULE_V2,
             MagneticModuleCore,
         ),
-        # (
-        #     ThermocyclerModuleModel.THERMOCYCLER_V1,
-        #     EngineModuleModel.TEMPERATURE_MODULE_V1,
-        #     TemperatureModuleCore,
-        # ),
-        # (
-        #     ThermocyclerModuleModel.THERMOCYCLER_V2,
-        #     EngineModuleModel.TEMPERATURE_MODULE_V1,
-        #     TemperatureModuleCore,
-        # ),
+        (
+            ThermocyclerModuleModel.THERMOCYCLER_V1,
+            EngineModuleModel.THERMOCYCLER_MODULE_V1,
+            ThermocyclerModuleCore,
+        ),
+        (
+            ThermocyclerModuleModel.THERMOCYCLER_V2,
+            EngineModuleModel.THERMOCYCLER_MODULE_V2,
+            ThermocyclerModuleCore,
+        ),
+        (
+                HeaterShakerModuleModel.HEATER_SHAKER_V1,
+                EngineModuleModel.HEATER_SHAKER_MODULE_V1,
+                HeaterShakerModuleCore,
+        )
     ],
 )
 def test_load_module(
@@ -212,6 +211,7 @@ def test_load_module(
 ) -> None:
     """It should issue a load module engine command."""
     definition = ModuleDefinition.construct()  # type: ignore[call-arg]
+    print(definition)
     decoy.when(
         mock_engine_client.load_module(
             model=engine_model,

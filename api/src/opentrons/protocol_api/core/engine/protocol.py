@@ -26,7 +26,7 @@ from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 from .labware import LabwareCore
 from .instrument import InstrumentCore
-from .module_core import ModuleCore, TemperatureModuleCore, MagneticModuleCore
+from .module_core import ModuleCore, TemperatureModuleCore, MagneticModuleCore, ThermocyclerModuleCore, HeaterShakerModuleCore
 from .exceptions import InvalidModuleLocationError
 
 
@@ -126,22 +126,20 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             model=EngineModuleModel(model),
             location=DeckSlotLocation(slotName=DeckSlotName.from_primitive(location)),
         )
+        print(result.model)
         module_type = result.model.as_type()
 
-        # if result.definition.moduleType == ModuleType.MAGNETIC:
-        #     return MagneticModuleCore(
-        #         engine_client=self._engine_client, module_id=result.moduleId
-        #     )
-        # el
         module_core_cls: Type[ModuleCore] = ModuleCore
         if module_type == ModuleType.TEMPERATURE:
             module_core_cls = TemperatureModuleCore
         elif module_type == ModuleType.MAGNETIC:
             module_core_cls = MagneticModuleCore
-        # elif result.definition.moduleType == ModuleType.THERMOCYCLER:
-        #     return ThermocyclerModuleCore(
-        #         engine_client=self._engine_client, module_id=result.moduleId
-        #     )
+        elif module_type == ModuleType.THERMOCYCLER:
+            module_core_cls = ThermocyclerModuleCore
+        elif module_type == ModuleType.HEATER_SHAKER:
+            module_core_cls = HeaterShakerModuleCore
+        else:
+            assert False, "Unsupported module definition"
 
         return module_core_cls(module_id=result.moduleId)
 
