@@ -60,16 +60,23 @@ class GeometryView:
     # TODO(mc, 2022-06-24): rename this method
     def get_all_labware_highest_z(self) -> float:
         """Get the highest Z-point across all labware."""
-        return max(
-            *(
+        all_labware = self._labware.get_all()
+        all_modules = self._modules.get_all()
+        highest_labware_z = 0.0
+        highest_module_z = 0.0
+
+        if len(all_labware) > 0:
+            highest_labware_z = max(
                 self._get_highest_z_from_labware_data(lw_data)
-                for lw_data in self._labware.get_all()
-            ),
-            *(
-                self._modules.get_overall_height(module.id)
-                for module in self._modules.get_all()
-            ),
-        )
+                for lw_data in all_labware
+            )
+
+        if len(all_modules) > 0:
+            highest_module_z = max(
+                self._modules.get_overall_height(module.id) for module in all_modules
+            )
+
+        return max(highest_labware_z, highest_module_z)
 
     def get_labware_parent_position(self, labware_id: str) -> Point:
         """Get the position of the labware's parent slot (deck or module)."""
