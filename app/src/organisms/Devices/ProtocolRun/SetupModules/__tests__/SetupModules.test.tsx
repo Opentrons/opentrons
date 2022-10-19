@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { when } from 'jest-when'
 import { i18n } from '../../../../../i18n'
 import { renderWithProviders } from '@opentrons/components'
 import { useFeatureFlag } from '../../../../../redux/config'

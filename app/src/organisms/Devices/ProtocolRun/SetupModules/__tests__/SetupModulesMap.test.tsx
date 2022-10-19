@@ -24,7 +24,6 @@ import { MultipleModulesModal } from '../../../../ProtocolSetup/RunSetupCard/Mod
 import {
   mockThermocycler as mockThermocyclerFixture,
   mockMagneticModule as mockMagneticModuleFixture,
-  mockTemperatureModule,
 } from '../../../../../redux/modules/__fixtures__/index'
 import {
   useModuleRenderInfoForProtocolById,

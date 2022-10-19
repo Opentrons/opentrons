@@ -13,7 +13,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { getModuleType } from '@opentrons/shared-data'
+import { getModuleType, TC_MODULE_LOCATION } from '@opentrons/shared-data'
 import { useModuleRenderInfoForProtocolById } from '../../hooks'
 import { getModuleImage } from './utils'
 import { StyledText } from '../../../../atoms/text'
@@ -138,7 +138,7 @@ export const ModulesListItem = ({
           {t('slot_location', {
             slotName:
               getModuleType(moduleModel) === 'thermocyclerModuleType'
-                ? '7+10'
+                ? TC_MODULE_LOCATION
                 : location,
           })}
         </StyledText>
