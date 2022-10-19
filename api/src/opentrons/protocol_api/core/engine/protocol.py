@@ -7,7 +7,9 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from opentrons.types import Mount, MountType, Location, DeckSlotName
 from opentrons.hardware_control import SyncHardwareAPI
-from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
+
+# is this here by mistake?
+# from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.protocols.geometry.deck import Deck
@@ -15,6 +17,7 @@ from opentrons.protocols.geometry.deck_item import DeckItem
 
 from opentrons.protocol_engine import DeckSlotLocation, ModuleLocation
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
+from opentrons.protocol_engine.types import ModuleModel, ModuleType
 
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
@@ -116,8 +119,8 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
     ) -> ModuleCore:
         """Load a module into the protocol."""
         if location is None:
-            if model == ModuleModel.ThermocyclerModuleModel:
-                location = "7"
+            if model.as_type() == ModuleType.THERMOCYCLER:
+                location = DeckSlotName("7")
             else:
                 raise InvalidModuleLocationError(location, model)
 

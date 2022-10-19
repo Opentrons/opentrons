@@ -9,7 +9,7 @@ from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     ModuleType,
-    TemperatureStatus
+    TemperatureStatus,
 )
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.types import DeckSlotName
@@ -63,16 +63,12 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
         raise NotImplementedError("add_labware_core not implemented")
 
 
-class TemperatureModuleCore(AbstractTemperatureModuleCore):
+class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore[LabwareCore]):
     """Temperature module core logic implementation for Python protocols.
 
     Args:
         module_id: ProtocolEngine ID of the loaded modules.
     """
-    
-    def __init__(self, module_id: str, engine_client: ProtocolEngineClient) -> None:
-        self._module_id = module_id
-        self._engine_client = engine_client
 
     def set_target_temperature(self, celsius: float) -> None:
         """Set the Temperature Module's target temperature in °C."""
