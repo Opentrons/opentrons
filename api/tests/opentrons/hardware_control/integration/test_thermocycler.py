@@ -1,4 +1,5 @@
 import asyncio
+import sys
 from typing import AsyncGenerator
 
 import anyio
@@ -127,7 +128,10 @@ async def test_wait_for_temperatures(thermocycler: Thermocycler) -> None:
 
 
 # TODO(mm, 2022-07-01): This test is a flakiness hazard because it's sensitive to
-# timing and async task scheduling.
+# timing and async task scheduling. Move to an isolated unit test, instead
+@pytest.mark.xfail(
+    condition=(sys.platform == "darwin"), reason="Timing flakiness on macOS"
+)
 async def test_cycle_cannot_be_interrupted_by_pause(
     poll_interval_seconds: int,
     thermocycler: Thermocycler,
