@@ -7,13 +7,13 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { useProtocolDetailsForRun } from '../../Devices/hooks'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
+import { useLPCSuccessToast } from '../../ProtocolSetup/hooks'
 import { SectionList } from '../SectionList'
 import { DeckMap } from '../DeckMap'
 import { SummaryScreen } from '../SummaryScreen'
 import { LabwareOffsetsSummary } from '../LabwareOffsetsSummary'
 import { useIntroInfo, useLabwareOffsets } from '../hooks'
 import { Section } from '../types'
-import { useLPCSuccessToast } from '../../ProtocolSetup/hooks'
 
 jest.mock('../../../redux/analytics')
 jest.mock('../../ProtocolUpload/hooks')
@@ -92,13 +92,16 @@ describe('SummaryScreen', () => {
       .calledWith(MOCK_RUN_ID)
       .mockReturnValue({
         protocolData: {
-          labware: {
-            '1d57fc10-67ad-11ea-9f8b-3b50068bd62d:opentrons/opentrons_96_filtertiprack_200ul/1': {
+          labware: [
+            {
+              id:
+                '1d57fc10-67ad-11ea-9f8b-3b50068bd62d:opentrons/opentrons_96_filtertiprack_200ul/1',
               slot: '1',
               displayName: 'someDisplayName',
               definitionId: LABWARE_DEF_ID,
+              loadName: 'someLoadName',
             },
-          },
+          ],
           labwareDefinitions: {
             [LABWARE_DEF_ID]: LABWARE_DEF,
           },

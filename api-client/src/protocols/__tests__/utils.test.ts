@@ -1,10 +1,10 @@
 import { RunTimeCommand } from '@opentrons/shared-data'
 import {
-  parseInitialPipetteNamesById,
+  parsePipetteEntity,
   parseInitialPipetteNamesByMount,
   parseAllRequiredModuleModels,
   parseAllRequiredModuleModelsById,
-  parseInitialLoadedLabwareById,
+  parseInitialLoadedLabwareEntity,
   parseInitialLoadedLabwareBySlot,
   parseInitialLoadedLabwareByModuleId,
   parseInitialLoadedLabwareDefinitionsById,
@@ -140,12 +140,10 @@ describe('parseInitialPipetteNamesByMount', () => {
     expect(parseInitialPipetteNamesByMount(onlyRightMount)).toEqual(expected)
   })
 })
-describe('parseInitialPipetteNamesById', () => {
+describe('parsePipetteEntity', () => {
   it('returns pipette names by id if loaded', () => {
-    const expected = {
-      'pipette-0': { name: 'p300_single_gen2' },
-    }
-    expect(parseInitialPipetteNamesById(mockRunTimeCommands)).toEqual(expected)
+    const expected = [{ id: 'pipette-0', pipetteName: 'p300_single_gen2' }]
+    expect(parsePipetteEntity(mockRunTimeCommands)).toEqual(expected)
   })
 })
 describe('parseAllRequiredModuleModels', () => {
@@ -209,37 +207,45 @@ describe('parseInitialLoadedLabwareByModuleId', () => {
 })
 describe('parseInitialLoadedLabwareById', () => {
   it('returns labware loaded by id', () => {
-    const expected = {
-      'labware-1': {
-        definitionId: 'opentrons/opentrons_96_tiprack_300ul/1_id',
+    const expected = [
+      {
+        id: 'labware-1',
+        loadName: 'opentrons_96_tiprack_300ul',
+        definitionUri: 'opentrons/opentrons_96_tiprack_300ul/1',
         displayName: 'Opentrons 96 Tip Rack 300 µL',
       },
-      'labware-2': {
-        definitionId: 'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1_id',
+      {
+        id: 'labware-2',
+        loadName: 'nest_96_wellplate_100ul_pcr_full_skirt',
+        definitionUri: 'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1',
         displayName: 'NEST 96 Well Plate 100 µL PCR Full Skirt',
       },
-      'labware-3': {
-        definitionId:
-          'opentrons/opentrons_24_aluminumblock_generic_2ml_screwcap/1_id',
+      {
+        id: 'labware-3',
+        loadName: 'opentrons_24_aluminumblock_generic_2ml_screwcap',
+        definitionUri:
+          'opentrons/opentrons_24_aluminumblock_generic_2ml_screwcap/1',
         displayName:
           'Opentrons 24 Well Aluminum Block with Generic 2 mL Screwcap',
       },
-    }
-    expect(parseInitialLoadedLabwareById(mockRunTimeCommands)).toEqual(expected)
+    ]
+    expect(parseInitialLoadedLabwareEntity(mockRunTimeCommands)).toEqual(
+      expected
+    )
   })
 })
 describe('parseInitialLoadedLabwareDefinitionsById', () => {
   it('returns labware definitions loaded by id', () => {
     const expected = {
-      'opentrons/opentrons_96_tiprack_300ul/1_id': mockRunTimeCommands.find(
+      'opentrons/opentrons_96_tiprack_300ul/1': mockRunTimeCommands.find(
         c =>
           c.commandType === 'loadLabware' && c.result.labwareId === 'labware-1'
       )?.result.definition,
-      'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1_id': mockRunTimeCommands.find(
+      'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1': mockRunTimeCommands.find(
         c =>
           c.commandType === 'loadLabware' && c.result.labwareId === 'labware-2'
       )?.result.definition,
-      'opentrons/opentrons_24_aluminumblock_generic_2ml_screwcap/1_id': mockRunTimeCommands.find(
+      'opentrons/opentrons_24_aluminumblock_generic_2ml_screwcap/1': mockRunTimeCommands.find(
         c =>
           c.commandType === 'loadLabware' && c.result.labwareId === 'labware-3'
       )?.result.definition,

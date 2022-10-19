@@ -4,12 +4,14 @@ import { LoadPipetteRunTimeCommand } from '@opentrons/shared-data/protocol/types
 
 describe('getPrimaryPipetteId', () => {
   it('should return the one and only pipette if there is only one pipette in the protocol', () => {
-    const mockPipette: ProtocolFile<{}>['pipettes'] = {
-      p10SingleId: {
-        //  @ts-expect-error
+    const mockPipette: ProtocolFile<{}>['pipettes'] = [
+      {
+        //  @ts-expect-error: id will exist when we remove the schemaV6Adapter
+        id: 'p10SingleId',
         pipetteName: 'p10_single',
       },
-    }
+    ]
+
     expect(getPrimaryPipetteId({ ...mockPipette }, [])).toBe('p10SingleId')
   })
   it('should throw an error if there are two pipettes with the same mount', () => {
@@ -32,23 +34,19 @@ describe('getPrimaryPipetteId', () => {
       },
     ] as any
 
-    const p10Single: ProtocolFile<{}>['pipettes'] = {
-      p10SingleId: {
-        //  @ts-expect-error
+    const pipettes: ProtocolFile<{}>['pipettes'] = [
+      {
+        //  @ts-expect-error: id will exist when we remove the schemaV6Adapter
+        id: 'p10SingleId',
         pipetteName: 'p10_single',
       },
-    }
-    const p10Multi: ProtocolFile<{}>['pipettes'] = {
-      p10MultiId: {
-        //  @ts-expect-error
+      {
+        //  @ts-expect-error: id will exist when we remove the schemaV6Adapter
+        id: 'p10MultiId',
         pipetteName: 'p10_multi',
       },
-    }
+    ]
 
-    const pipettes = {
-      ...p10Single,
-      ...p10Multi,
-    }
     expect(() => getPrimaryPipetteId(pipettes, loadPipetteCommands)).toThrow(
       'expected to find both left pipette and right pipette but could not'
     )
@@ -78,23 +76,18 @@ describe('getPrimaryPipetteId', () => {
         },
       },
     ] as any
-    const p10Single: ProtocolFile<{}>['pipettes'] = {
-      p10SingleId: {
-        //  @ts-expect-error
+    const pipettes: ProtocolFile<{}>['pipettes'] = [
+      {
+        //  @ts-expect-error: id will exist when we remove the schemaV6Adapter
+        id: 'p10SingleId',
         pipetteName: 'p10_single',
       },
-    }
-    const p10Multi: ProtocolFile<{}>['pipettes'] = {
-      p10MultiId: {
-        //  @ts-expect-error
+      {
+        //  @ts-expect-error: id will exist when we remove the schemaV6Adapter
+        id: 'p10MultiId',
         pipetteName: 'p10_multi',
       },
-    }
-
-    const pipettes = {
-      ...p10Single,
-      ...p10Multi,
-    }
+    ]
     expect(getPrimaryPipetteId(pipettes, loadPipetteCommands)).toBe(
       'p10SingleId'
     )
@@ -125,23 +118,19 @@ describe('getPrimaryPipetteId', () => {
       },
     ] as any
 
-    const p10Single: ProtocolFile<{}>['pipettes'] = {
-      p10SingleId: {
-        //  @ts-expect-error
+    const pipettes: ProtocolFile<{}>['pipettes'] = [
+      {
+        //  @ts-expect-error: id will exist when we remove the schemaV6Adapter
+        id: 'p10SingleId',
         pipetteName: 'p10_single',
       },
-    }
-    const p50Multi: ProtocolFile<{}>['pipettes'] = {
-      p50MultiId: {
-        //  @ts-expect-error
+      {
+        //  @ts-expect-error: id will exist when we remove the schemaV6Adapter
+        id: 'p50MultiId',
         pipetteName: 'p50_single',
       },
-    }
+    ]
 
-    const pipettes = {
-      ...p10Single,
-      ...p50Multi,
-    }
     expect(getPrimaryPipetteId(pipettes, loadPipetteCommands)).toBe(
       'p10SingleId'
     )
@@ -172,23 +161,19 @@ describe('getPrimaryPipetteId', () => {
       },
     ] as any
 
-    const p300Single: ProtocolFile<{}>['pipettes'] = {
-      p300SingleId: {
-        //  @ts-expect-error
+    const pipettes: ProtocolFile<{}>['pipettes'] = [
+      {
+        //  @ts-expect-error: id will exist when we remove the schemaV6Adapter
+        id: 'p300SingleId',
         pipetteName: 'p300_single',
       },
-    }
-    const p300SingleGen2: ProtocolFile<{}>['pipettes'] = {
-      p300SingleGen2Id: {
-        //  @ts-expect-error
+      {
+        //  @ts-expect-error: id will exist when we remove the schemaV6Adapter
+        id: 'p300SingleGen2Id',
         pipetteName: 'p300_single_gen2',
       },
-    }
+    ]
 
-    const pipettes = {
-      ...p300Single,
-      ...p300SingleGen2,
-    }
     expect(getPrimaryPipetteId(pipettes, loadPipetteCommands)).toBe(
       'p300SingleGen2Id'
     )
@@ -220,23 +205,19 @@ describe('getPrimaryPipetteId', () => {
       },
     ] as any
 
-    const p300SingleLeft: ProtocolFile<{}>['pipettes'] = {
-      p300SingleLeftId: {
-        //  @ts-expect-error
+    const pipettes: ProtocolFile<{}>['pipettes'] = [
+      {
+        //  @ts-expect-error: id will exist when we remove the schemaV6Adapter
+        id: 'p300SingleLeftId',
         pipetteName: 'p300_single',
       },
-    }
-    const p300SingleRight: ProtocolFile<{}>['pipettes'] = {
-      p300SingleRightId: {
-        //  @ts-expect-error
+      {
+        //  @ts-expect-error: id will exist when we remove the schemaV6Adapter
+        id: 'p300SingleRightId',
         pipetteName: 'p300_single',
       },
-    }
+    ]
 
-    const pipettes = {
-      ...p300SingleLeft,
-      ...p300SingleRight,
-    }
     expect(getPrimaryPipetteId(pipettes, loadPipetteCommands)).toBe(
       'p300SingleLeftId'
     )

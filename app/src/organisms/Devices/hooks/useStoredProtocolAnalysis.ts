@@ -1,9 +1,9 @@
 import { useSelector } from 'react-redux'
 import {
   parseAllRequiredModuleModelsById,
-  parseInitialLoadedLabwareById,
+  parseInitialLoadedLabwareEntity,
   parseInitialLoadedLabwareDefinitionsById,
-  parseInitialPipetteNamesById,
+  parsePipetteEntity,
 } from '@opentrons/api-client'
 import { schemaV6Adapter } from '@opentrons/shared-data'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
@@ -11,7 +11,7 @@ import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 import { getStoredProtocol } from '../../../redux/protocol-storage'
 
 import type {
-  LoadedLabwareById,
+  LoadedLabwareEntity,
   LoadedLabwareDefinitionsById,
   ModuleModelsById,
   PipetteNamesById,
@@ -20,28 +20,27 @@ import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { State } from '../../../redux/types'
 
 export interface StoredProtocolAnalysis extends ProtocolAnalysisOutput {
-  pipettes: PipetteNamesById
+  pipettes: PipetteNamesById[]
   modules: ModuleModelsById
-  labware: LoadedLabwareById
+  labware: LoadedLabwareEntity[]
   labwareDefinitions: LoadedLabwareDefinitionsById
 }
 
 export const parseProtocolAnalysisOutput = (
   storedProtocolAnalysis: ProtocolAnalysisOutput | null
 ): StoredProtocolAnalysis | null => {
-  const pipettesNamesById = parseInitialPipetteNamesById(
+  const pipettesNamesById = parsePipetteEntity(
     storedProtocolAnalysis?.commands ?? []
   )
   const moduleModelsById = parseAllRequiredModuleModelsById(
     storedProtocolAnalysis?.commands ?? []
   )
-  const labwareById = parseInitialLoadedLabwareById(
+  const labwareById = parseInitialLoadedLabwareEntity(
     storedProtocolAnalysis?.commands ?? []
   )
   const labwareDefinitionsById = parseInitialLoadedLabwareDefinitionsById(
     storedProtocolAnalysis?.commands ?? []
   )
-
   return storedProtocolAnalysis != null
     ? {
         ...storedProtocolAnalysis,
@@ -68,6 +67,7 @@ export function useStoredProtocolAnalysis(
   const storedProtocolAnalysis =
     useSelector((state: State) => getStoredProtocol(state, protocolKey))
       ?.mostRecentAnalysis ?? null
+
   // @ts-expect-error
   return storedProtocolAnalysis != null && 'modules' in storedProtocolAnalysis
     ? schemaV6Adapter(storedProtocolAnalysis)

@@ -85,7 +85,8 @@ export const LabwarePositionCheckStepDetail = (
 
   if (protocolData == null) return null
   //  @ts-expect-error: will be an error until we remove the schemaV6Adapter
-  const labwareDefUri = protocolData.labware[labwareId].definitionUri
+  const labwareDefUri = protocolData.labware.find(item => item.id === labwareId)
+    .definitionUri
   const labwareDef = protocolData.labwareDefinitions[labwareDefUri]
   // filter out the TC open lid command as it does not have an associated pipette id
   const stepMovementCommands = selectedStep.commands.filter(
@@ -99,8 +100,11 @@ export const LabwarePositionCheckStepDetail = (
   const command = stepMovementCommands[0]
 
   const pipetteId = command.params.pipetteId
-  //  @ts-expect-error: pipetteName should be name until we remove the schemaV6Adapter
-  const pipetteName = protocolData.pipettes[pipetteId].pipetteName
+  //  @ts-expect-error
+  const pipetteName = protocolData.pipettes.find(
+    //  @ts-expect-error
+    pipette => pipette.id === pipetteId
+  ).pipetteName
   let wellsToHighlight: string[] = []
   const pipetteChannels = getPipetteNameSpecs(pipetteName)?.channels
   if (pipetteChannels === 8) {

@@ -62,22 +62,27 @@ export function useRunPipetteInfoByMount(
       command.commandType === 'pickUpTip'
   )
 
-  return Object.entries(pipettes).reduce((acc, [pipetteId, pipette]) => {
+  //  @ts-expect-error
+  return pipettes.reduce((acc, pipette) => {
     const loadCommand = loadPipetteCommands.find(
-      command => command.result?.pipetteId === pipetteId
+      command => command.result?.pipetteId === pipette.id
     )
     if (loadCommand != null) {
       const { mount } = loadCommand.params
-      const requestedPipetteName = pipette.pipetteName
+      const { pipetteId } = loadCommand.result
+      const pipetteName = pipette.pipetteName
+      const requestedPipetteName = pipetteName
       const pipetteSpecs = getPipetteNameSpecs(requestedPipetteName)
-
       if (pipetteSpecs != null) {
         const tipRackDefs: LabwareDefinition2[] = pickUpTipCommands.reduce<
           LabwareDefinition2[]
         >((acc, command) => {
           if (pipetteId === command.params?.pipetteId) {
-            const tipRack = labware[command.params?.labwareId]
             //  @ts-expect-error: will be an error until we remove the schemaV6Adapter
+            const tipRack = labware.find(
+              //  @ts-expect-error: will be an error until we remove the schemaV6Adapter
+              item => item.id === command.params?.labwareId
+            )
             const tipRackDefinition = labwareDefinitions[tipRack.definitionUri]
 
             if (tipRackDefinition != null && !acc.includes(tipRackDefinition)) {
@@ -89,10 +94,9 @@ export function useRunPipetteInfoByMount(
 
         const attachedPipette = attachedPipettes[mount as Mount]
         const requestedPipetteMatch = getRequestedPipetteMatch(
-          pipette.pipetteName,
+          pipetteName,
           attachedPipette
         )
-
         const tipRacksForPipette = tipRackDefs.map(tipRackDef => {
           const tlcDataMatch = last(
             tipLengthCalibrations.filter(
@@ -102,7 +106,6 @@ export function useRunPipetteInfoByMount(
                 tlcData.pipette === attachedPipette.id
             )
           )
-
           const lastModifiedDate =
             tlcDataMatch != null && requestedPipetteMatch !== INCOMPATIBLE
               ? tlcDataMatch.lastModified
@@ -121,7 +124,7 @@ export function useRunPipetteInfoByMount(
         return {
           ...acc,
           [mount]: {
-            name: requestedPipetteName,
+            pipetteName: requestedPipetteName,
             id: pipetteId,
             pipetteSpecs,
             tipRacksForPipette,

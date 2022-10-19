@@ -88,32 +88,43 @@ describe('DeprecatedStepDetailText', () => {
       .mockReturnValue({
         protocolData: {
           ...withSinglechannelProtocol,
-          labware: {
-            trashId: {
+          labware: [
+            {
+              id: 'trashId',
               slot: '12',
               displayName: 'Trash',
               definitionUri: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
+              loadName: 'opentrons_1_trash_1100ml_fixed',
             },
-            '1d57fc10-67ad-11ea-9f8b-3b50068bd62d:opentrons/opentrons_96_filtertiprack_200ul/1': {
+            {
+              id:
+                '1d57fc10-67ad-11ea-9f8b-3b50068bd62d:opentrons/opentrons_96_filtertiprack_200ul/1',
               slot: '2',
               displayName: 'Opentrons 96 Filter Tip Rack 200 µL',
               definitionUri: 'opentrons/opentrons_96_filtertiprack_200ul/1',
+              loadName: 'opentrons_96_filtertiprack_200ul',
             },
-            '24274d20-67ad-11ea-9f8b-3b50068bd62d:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1': {
+            {
+              id:
+                '24274d20-67ad-11ea-9f8b-3b50068bd62d:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1',
               slot: '1d57adf0-67ad-11ea-9f8b-3b50068bd62d:magneticModuleType',
               displayName: 'NEST 96 Well Plate 100 µL PCR Full Skirt',
               definitionUri:
                 'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1',
+              loadName: 'nest_96_wellplate_100ul_pcr_full_skirt',
             },
-            '269518d0-67ad-11ea-9f8b-3b50068bd62d:opentrons/opentrons_24_aluminumblock_nest_1.5ml_screwcap/1': {
+            {
+              id:
+                '269518d0-67ad-11ea-9f8b-3b50068bd62d:opentrons/opentrons_24_aluminumblock_nest_1.5ml_screwcap/1',
               slot:
                 '1d57d500-67ad-11ea-9f8b-3b50068bd62d:temperatureModuleType',
               displayName:
                 'Opentrons 24 Well Aluminum Block with NEST 1.5 mL Screwcap',
               definitionUri:
                 'opentrons/opentrons_24_aluminumblock_nest_1.5ml_screwcap/1',
+              loadName: 'opentrons_24_aluminumblock_nest_1.5ml_screwcap',
             },
-          },
+          ],
         },
       } as any)
   })
@@ -175,32 +186,43 @@ describe('DeprecatedStepDetailText', () => {
       .mockReturnValue({
         protocolData: {
           ...withMultiChannelProtocol,
-          labware: {
-            trashId: {
+          labware: [
+            {
+              id: 'trashId',
               slot: '12',
               displayName: 'Trash',
               definitionUri: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
+              loadName: 'opentrons_1_trash_1100ml_fixed',
             },
-            '1d57fc10-67ad-11ea-9f8b-3b50068bd62d:opentrons/opentrons_96_filtertiprack_200ul/1': {
+            {
+              id:
+                '1d57fc10-67ad-11ea-9f8b-3b50068bd62d:opentrons/opentrons_96_filtertiprack_200ul/1',
               slot: '2',
               displayName: 'Opentrons 96 Filter Tip Rack 200 µL',
               definitionUri: 'opentrons/opentrons_96_filtertiprack_200ul/1',
+              loadName: 'opentrons_96_filtertiprack_200ul',
             },
-            '24274d20-67ad-11ea-9f8b-3b50068bd62d:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1': {
+            {
+              id:
+                '24274d20-67ad-11ea-9f8b-3b50068bd62d:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1',
               slot: '1d57adf0-67ad-11ea-9f8b-3b50068bd62d:magneticModuleType',
               displayName: 'NEST 96 Well Plate 100 µL PCR Full Skirt',
               definitionUri:
                 'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1',
+              loadName: 'nest_96_wellplate_100ul_pcr_full_skirt',
             },
-            '269518d0-67ad-11ea-9f8b-3b50068bd62d:opentrons/opentrons_24_aluminumblock_nest_1.5ml_screwcap/1': {
+            {
+              id:
+                '269518d0-67ad-11ea-9f8b-3b50068bd62d:opentrons/opentrons_24_aluminumblock_nest_1.5ml_screwcap/1',
               slot:
                 '1d57d500-67ad-11ea-9f8b-3b50068bd62d:temperatureModuleType',
               displayName:
                 'Opentrons 24 Well Aluminum Block with NEST 1.5 mL Screwcap',
               definitionUri:
                 'opentrons/opentrons_24_aluminumblock_nest_1.5ml_screwcap/1',
+              loadName: 'opentrons_24_aluminumblock_nest_1.5ml_screwcap',
             },
-          },
+          ],
         },
       } as any)
 
@@ -224,32 +246,43 @@ describe('DeprecatedStepDetailText', () => {
       .mockReturnValue({
         protocolData: {
           ...withMultiChannelProtocol,
-          labware: {
-            trashId: {
+          labware: [
+            {
+              id: 'trashId',
               slot: '12',
               displayName: 'Trash',
               definitionUri: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
+              loadName: 'opentrons_1_trash_1100ml_fixed',
             },
-            '1d57fc10-67ad-11ea-9f8b-3b50068bd62d:opentrons/opentrons_96_filtertiprack_200ul/1': {
+            {
+              id:
+                '1d57fc10-67ad-11ea-9f8b-3b50068bd62d:opentrons/opentrons_96_filtertiprack_200ul/1',
               slot: '2',
               displayName: 'Opentrons 96 Filter Tip Rack 200 µL',
               definitionUri: 'opentrons/opentrons_96_filtertiprack_200ul/1',
+              loadName: 'opentrons_96_filtertiprack_200ul',
             },
-            '24274d20-67ad-11ea-9f8b-3b50068bd62d:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1': {
+            {
+              id:
+                '24274d20-67ad-11ea-9f8b-3b50068bd62d:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1',
               slot: '1d57adf0-67ad-11ea-9f8b-3b50068bd62d:magneticModuleType',
               displayName: 'NEST 96 Well Plate 100 µL PCR Full Skirt',
               definitionUri:
                 'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1',
+              loadName: 'nest_96_wellplate_100ul_pcr_full_skirt',
             },
-            '269518d0-67ad-11ea-9f8b-3b50068bd62d:opentrons/opentrons_24_aluminumblock_nest_1.5ml_screwcap/1': {
+            {
+              id:
+                '269518d0-67ad-11ea-9f8b-3b50068bd62d:opentrons/opentrons_24_aluminumblock_nest_1.5ml_screwcap/1',
               slot:
                 '1d57d500-67ad-11ea-9f8b-3b50068bd62d:temperatureModuleType',
               displayName:
                 'Opentrons 24 Well Aluminum Block with NEST 1.5 mL Screwcap',
               definitionUri:
                 'opentrons/opentrons_24_aluminumblock_nest_1.5ml_screwcap/1',
+              loadName: 'opentrons_24_aluminumblock_nest_1.5ml_screwcap',
             },
-          },
+          ],
         },
       } as any)
 

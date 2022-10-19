@@ -16,12 +16,15 @@ describe('getLabwareDefinitionUri', () => {
   })
   it('should return the definition uri of a given labware', () => {
     const MOCK_LABWARE_ID = 'some_labware'
-    const mockLabware = {
-      [MOCK_LABWARE_ID]: {
+    const mockLabware = [
+      {
+        id: MOCK_LABWARE_ID,
+        loadName: 'some loadname',
         definitionUri: MOCK_DEFINITION_URI,
         displayName: 'some dope labware',
       },
-    }
+    ]
+
     const mockLabwareDefinitions = {
       [MOCK_DEFINITION_URI]: MOCK_DEF,
     }

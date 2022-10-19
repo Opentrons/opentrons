@@ -160,22 +160,25 @@ describe('LabwarePositionCheckStepDetail', () => {
       .calledWith(MOCK_RUN_ID)
       .mockReturnValue({
         protocolData: {
-          labware: {
-            [mockLabwarePositionCheckStepTipRack.labwareId]: {
+          labware: [
+            {
+              id: mockLabwarePositionCheckStepTipRack.labwareId,
               slot: '1',
               displayName: 'someDislpayName',
               definitionUri: LABWARE_DEF_URI,
+              loadName: 'someLoadName',
             },
-          },
+          ],
           labwareDefinitions: {
             [LABWARE_DEF_URI]: LABWARE_DEF,
           },
-          pipettes: {
-            [PRIMARY_PIPETTE_ID]: {
+          pipettes: [
+            {
+              id: PRIMARY_PIPETTE_ID,
               pipetteName: PRIMARY_PIPETTE_NAME,
               mount: 'left',
             },
-          },
+          ],
         },
       } as any)
 
@@ -240,22 +243,25 @@ describe('LabwarePositionCheckStepDetail', () => {
       .calledWith(MOCK_RUN_ID)
       .mockReturnValue({
         protocolData: {
-          labware: {
-            [mockLabwarePositionCheckStepTipRack.labwareId]: {
+          labware: [
+            {
+              id: mockLabwarePositionCheckStepTipRack.labwareId,
               slot: '1',
               displayName: 'someDislpayName',
-              definitionUri: TIPRACK_DEF_URI,
+              definitionUri: LABWARE_DEF_URI,
+              loadName: 'someLoadName',
             },
-          },
+          ],
           labwareDefinitions: {
             [TIPRACK_DEF_URI]: LABWARE_DEF,
           },
-          pipettes: {
-            [PRIMARY_PIPETTE_ID]: {
-              name: PRIMARY_PIPETTE_NAME,
+          pipettes: [
+            {
+              id: PRIMARY_PIPETTE_ID,
+              pipetteName: PRIMARY_PIPETTE_NAME,
               mount: 'left',
             },
-          },
+          ],
         },
       } as any)
     render(props)

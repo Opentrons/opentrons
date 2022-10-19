@@ -7,24 +7,34 @@ import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schem
 // TODO: update these fixtures to be v6 protocols
 const protocolMultipleTipracks = (_uncastedProtocolMultipleTipracks as unknown) as ProtocolAnalysisFile
 const protocolOneTiprack = (_uncastedProtocolOneTiprack as unknown) as ProtocolAnalysisFile
-const labwareWithDefinitionUri = {
-  fixedTrash: {
+const labwareWithDefinitionUri = [
+  {
+    id: 'fixedTrash',
     displayName: 'Trash',
     definitionUri: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
+    loadName: 'opentrons_1_trash_1100ml_fixed',
   },
-  '50d3ebb0-0042-11ec-8258-f7ffdf5ad45a:opentrons/opentrons_96_tiprack_300ul/1': {
+  {
+    id:
+      '50d3ebb0-0042-11ec-8258-f7ffdf5ad45a:opentrons/opentrons_96_tiprack_300ul/1',
     displayName: 'Opentrons 96 Tip Rack 300 µL',
     definitionUri: 'opentrons/opentrons_96_tiprack_300ul/1',
+    loadName: 'opentrons_96_tiprack_300ul',
   },
-  '9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1': {
+  {
+    id:
+      '9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1',
     displayName: 'NEST 12 Well Reservoir 15 mL',
     definitionUri: 'opentrons/nest_12_reservoir_15ml/1',
+    loadName: 'nest_12_reservoir_15ml',
   },
-  'e24818a0-0042-11ec-8258-f7ffdf5ad45a': {
+  {
+    id: 'e24818a0-0042-11ec-8258-f7ffdf5ad45a',
     displayName: 'Opentrons 96 Tip Rack 300 µL (1)',
     definitionUri: 'opentrons/opentrons_96_tiprack_300ul/1',
+    loadName: 'opentrons_96_tiprack_300ul',
   },
-}
+]
 
 describe('doesPipetteVisitAllTipracks', () => {
   it('should return true when the pipette visits both tipracks', () => {
@@ -61,24 +71,32 @@ describe('doesPipetteVisitAllTipracks', () => {
   })
   it('should return true when there is only one tiprack and pipette visits it', () => {
     const pipetteId = 'pipetteId' // this is just taken from the protocol fixture
-    const labware = {
-      fixedTrash: {
+    const labware = [
+      {
+        id: 'fixedTrash',
         displayName: 'Trash',
         definitionUri: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
+        loadName: 'opentrons_1_trash_1100ml_fixed',
       },
-      tiprackId: {
+      {
+        id: 'tiprackId',
         displayName: 'Opentrons 96 Tip Rack 10 µL',
         definitionUri: 'opentrons/opentrons_96_tiprack_10ul/1',
+        loadName: 'opentrons_96_tiprack_10ul',
       },
-      sourcePlateId: {
+      {
+        id: 'sourcePlateId',
         displayName: 'Source Plate',
         definitionUri: 'example/plate/1',
+        loadName: 'plate',
       },
-      destPlateId: {
+      {
+        id: 'destPlateId',
         displayName: 'Dest Plate',
         definitionUri: 'example/plate/1',
+        loadName: 'plate',
       },
-    }
+    ]
     const labwareDefinitions = protocolOneTiprack.labwareDefinitions
     const commands: RunTimeCommand[] = protocolOneTiprack.commands
 

@@ -33,14 +33,12 @@ export const getOnePipettePositionCheckSteps = (args: {
     labwareDefinitions,
     commands
   )
-
   const orderedLabwareIds = getLabwareIdsInOrder(
     labware,
     labwareDefinitions,
     modules,
     commands
   )
-
   const moveToTiprackSteps = getMoveToTiprackSteps(
     orderedTiprackIds,
     primaryPipetteId,

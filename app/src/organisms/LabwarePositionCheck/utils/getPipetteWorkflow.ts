@@ -21,6 +21,7 @@ export const getPipetteWorkflow = (args: {
     labwareDefinitions,
     commands,
   } = args
+
   const uniquePipetteNames = uniq(pipetteNames)
   if (uniquePipetteNames.length === 1) {
     return 1

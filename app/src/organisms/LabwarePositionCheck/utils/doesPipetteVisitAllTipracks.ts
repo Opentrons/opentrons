@@ -23,7 +23,6 @@ export const doesPipetteVisitAllTipracks = (
     },
     0
   )
-
   const pickUpTipCommandsWithPipette = getPickUpTipCommandsWithPipette(
     commands,
     pipetteId
