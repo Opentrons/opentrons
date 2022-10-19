@@ -81,5 +81,9 @@ async def execution_manager() -> AsyncGenerator[ExecutionManager, None]:
 
 @pytest.fixture
 def poll_interval_seconds() -> float:
-    """The polling interval used for the module tests."""
-    return 0.05
+    """The polling interval used for the module tests.
+
+    If too fast, tests may fail due to stale data in the serial buffers.
+    If too slow, tests will take too long and may time out.
+    """
+    return 0.1
