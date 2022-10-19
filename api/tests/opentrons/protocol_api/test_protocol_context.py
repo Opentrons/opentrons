@@ -23,7 +23,6 @@ from opentrons.protocol_api.core.labware import LabwareLoadParams
 from .types import (
     InstrumentCore,
     LabwareCore,
-    ModuleCore,
     ProtocolCore,
     TemperatureModuleCore,
 )
