@@ -191,8 +191,10 @@ def test_load_module(
     subject: ProtocolContext,
 ) -> None:
     """It should load a module."""
-    mock_module_core = decoy.mock(cls=TemperatureModuleCore)
-    print(mock_module_core)
+    # TODO: replace with `decoy.mock(cls=TemperatureModuleCore)` with decoy >= 1.11.1
+    mock_module_core = cast(
+        TemperatureModuleCore, decoy.mock(cls=TemperatureModuleCore.__origin__)  # type: ignore[attr-defined]
+    )
     decoy.when(validation.ensure_module_model("spline reticulator")).then_return(
         TemperatureModuleModel.TEMPERATURE_V1
     )
@@ -224,7 +226,10 @@ def test_load_module_default_location(
     subject: ProtocolContext,
 ) -> None:
     """It should load a module without specifying a location explicitely."""
-    mock_module_core = decoy.mock(cls=ModuleCore)
+    # TODO: replace with `decoy.mock(cls=TemperatureModuleCore)` with decoy >= 1.11.1
+    mock_module_core = cast(
+        TemperatureModuleCore, decoy.mock(cls=TemperatureModuleCore.__origin__)  # type: ignore[attr-defined]
+    )
 
     decoy.when(validation.ensure_module_model("spline reticulator")).then_return(
         TemperatureModuleModel.TEMPERATURE_V1
