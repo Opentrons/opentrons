@@ -24,6 +24,7 @@ import {
   LabwareDefinition2,
   MAGNETIC_MODULE_TYPE,
   ModuleType,
+  TC_MODULE_LOCATION,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { StyledText } from '../../../../atoms/text'
@@ -155,7 +156,7 @@ export function LabwareListItem(
       extraAttentionModType => extraAttentionModType === moduleType
     )
     if (moduleName?.includes('Thermocycler')) {
-      moduleSlotName = '7+10'
+      moduleSlotName = TC_MODULE_LOCATION
     }
     slotInfo = t('module_slot_location', {
       slotName: moduleSlotName,

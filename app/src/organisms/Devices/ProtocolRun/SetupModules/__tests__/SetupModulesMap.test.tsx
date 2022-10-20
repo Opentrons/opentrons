@@ -16,22 +16,21 @@ import {
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 
-import { i18n } from '../../../../i18n'
-import { HeaterShakerBanner } from '../../../../organisms/ProtocolSetup/RunSetupCard/ModuleSetup/HeaterShakerSetupWizard/HeaterShakerBanner'
-import { ModuleInfo } from '../../../../organisms/ProtocolSetup/RunSetupCard/ModuleSetup/ModuleInfo'
-import { UnMatchedModuleWarning } from '../../../../organisms/ProtocolSetup/RunSetupCard/ModuleSetup/UnMatchedModuleWarning'
-import { MultipleModulesModal } from '../../../../organisms/ProtocolSetup/RunSetupCard/ModuleSetup/MultipleModulesModal'
+import { i18n } from '../../../../../i18n'
+import { HeaterShakerBanner } from '../../../../ProtocolSetup/RunSetupCard/ModuleSetup/HeaterShakerSetupWizard/HeaterShakerBanner'
+import { ModuleInfo } from '../../../../ProtocolSetup/RunSetupCard/ModuleSetup/ModuleInfo'
+import { UnMatchedModuleWarning } from '../../../../ProtocolSetup/RunSetupCard/ModuleSetup/UnMatchedModuleWarning'
+import { MultipleModulesModal } from '../../../../ProtocolSetup/RunSetupCard/ModuleSetup/MultipleModulesModal'
 import {
   mockThermocycler as mockThermocyclerFixture,
   mockMagneticModule as mockMagneticModuleFixture,
-  mockTemperatureModule,
-} from '../../../../redux/modules/__fixtures__/index'
+} from '../../../../../redux/modules/__fixtures__/index'
 import {
   useModuleRenderInfoForProtocolById,
   useRunHasStarted,
   useUnmatchedModulesForProtocol,
-} from '../../hooks'
-import { SetupModules } from '../SetupModules'
+} from '../../../hooks'
+import { SetupModulesMap } from '../SetupModulesMap'
 
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
@@ -48,18 +47,16 @@ jest.mock('@opentrons/shared-data', () => {
   }
 })
 jest.mock(
-  '../../../../organisms/ProtocolSetup/RunSetupCard/ModuleSetup/HeaterShakerSetupWizard/HeaterShakerBanner'
+  '../../../../ProtocolSetup/RunSetupCard/ModuleSetup/HeaterShakerSetupWizard/HeaterShakerBanner'
+)
+jest.mock('../../../../ProtocolSetup/RunSetupCard/ModuleSetup/ModuleInfo')
+jest.mock(
+  '../../../../ProtocolSetup/RunSetupCard/ModuleSetup/UnMatchedModuleWarning'
 )
 jest.mock(
-  '../../../../organisms/ProtocolSetup/RunSetupCard/ModuleSetup/ModuleInfo'
+  '../../../../ProtocolSetup/RunSetupCard/ModuleSetup/MultipleModulesModal'
 )
-jest.mock(
-  '../../../../organisms/ProtocolSetup/RunSetupCard/ModuleSetup/UnMatchedModuleWarning'
-)
-jest.mock(
-  '../../../../organisms/ProtocolSetup/RunSetupCard/ModuleSetup/MultipleModulesModal'
-)
-jest.mock('../../hooks')
+jest.mock('../../../hooks')
 
 const mockMultipleModulesModal = MultipleModulesModal as jest.MockedFunction<
   typeof MultipleModulesModal
@@ -92,10 +89,10 @@ const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
   {}
 )
 
-const render = (props: React.ComponentProps<typeof SetupModules>) => {
+const render = (props: React.ComponentProps<typeof SetupModulesMap>) => {
   return renderWithProviders(
     <StaticRouter>
-      <SetupModules {...props} />
+      <SetupModulesMap {...props} />
     </StaticRouter>,
     {
       i18nInstance: i18n,
@@ -144,13 +141,12 @@ const mockTCModule = {
   twoDimensionalRendering: { children: [] },
 }
 
-describe('SetupModules', () => {
-  let props: React.ComponentProps<typeof SetupModules>
+describe('SetupModulesMap', () => {
+  let props: React.ComponentProps<typeof SetupModulesMap>
   beforeEach(() => {
     props = {
       robotName: MOCK_ROBOT_NAME,
       runId: MOCK_RUN_ID,
-      expandLabwareSetupStep: () => {},
     }
 
     when(mockInferModuleOrientationFromXCoordinate)
@@ -268,80 +264,8 @@ describe('SetupModules', () => {
     getByText('mock module info magneticModuleV2')
     expect(queryByText('mock Moam modal')).toBeNull()
   })
-  it('should render a deck WITH modules with CTA disabled if the protocol requests modules and they are not all attached to the robot', () => {
-    when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
-      .mockReturnValue({
-        [mockMagneticModule.moduleId]: {
-          moduleId: mockMagneticModule.moduleId,
-          x: MOCK_MAGNETIC_MODULE_COORDS[0],
-          y: MOCK_MAGNETIC_MODULE_COORDS[1],
-          z: MOCK_MAGNETIC_MODULE_COORDS[2],
-          moduleDef: mockMagneticModule as any,
-          nestedLabwareDef: null,
-          nestedLabwareId: null,
-          protocolLoadOrder: 0,
-          attachedModuleMatch: null,
-        },
-        [mockTCModule.moduleId]: {
-          moduleId: mockTCModule.moduleId,
-          x: MOCK_TC_COORDS[0],
-          y: MOCK_TC_COORDS[1],
-          z: MOCK_TC_COORDS[2],
-          moduleDef: mockTCModule,
-          nestedLabwareDef: null,
-          nestedLabwareId: null,
-          protocolLoadOrder: 1,
-          attachedModuleMatch: null,
-        },
-      } as any)
 
-    when(mockModuleInfo)
-      .calledWith(
-        partialComponentPropsMatcher({
-          moduleModel: mockMagneticModule.model,
-          isAttached: false,
-          usbPort: null,
-          hubPort: null,
-          runId: MOCK_RUN_ID,
-        })
-      )
-      .mockReturnValue(<div>mock module info {mockMagneticModule.model}</div>)
-
-    when(mockModuleInfo)
-      .calledWith(
-        partialComponentPropsMatcher({
-          moduleModel: mockTCModule.model,
-          isAttached: false,
-          usbPort: null,
-          hubPort: null,
-          runId: MOCK_RUN_ID,
-        })
-      )
-      .mockReturnValue(<div>mock module info {mockTCModule.model} </div>)
-
-    when(mockUnMatchedModuleWarning)
-      .calledWith(
-        componentPropsMatcher({
-          isAnyModuleUnnecessary: true,
-        })
-      )
-      .mockReturnValue(<div>mock modules mismatch</div>)
-
-    when(mockUseUnmatchedModulesForProtocol)
-      .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
-      .mockReturnValue({
-        missingModuleIds: ['foo'],
-        remainingAttachedModules: [mockTemperatureModule],
-      })
-
-    const { getByText, getByRole } = render(props)
-    getByText('mock module info magneticModuleV2')
-    const button = getByRole('button', { name: 'Proceed to labware setup' })
-    expect(button).toHaveAttribute('disabled')
-  })
-
-  it('should render a deck WITH modules with CTA enabled if all protocol requested modules have a matching attached module', () => {
+  it('should render a deck WITH modules', () => {
     when(mockUseUnmatchedModulesForProtocol)
       .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
       .mockReturnValue({
@@ -410,86 +334,8 @@ describe('SetupModules', () => {
       )
       .mockReturnValue(<div>mock module info {mockTCModule.model} </div>)
 
-    const { getByText, getByRole } = render(props)
+    const { getByText } = render(props)
     getByText('mock module info magneticModuleV2')
-    const button = getByRole('button', { name: 'Proceed to labware setup' })
-    expect(button).not.toBeDisabled()
-  })
-
-  it('should render a deck WITH modules with CTA disabled if run has started', () => {
-    when(mockUseRunHasStarted).calledWith(MOCK_RUN_ID).mockReturnValue(true)
-    when(mockUseUnmatchedModulesForProtocol)
-      .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
-      .mockReturnValue({
-        missingModuleIds: [],
-        remainingAttachedModules: [],
-      })
-
-    when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
-      .mockReturnValue({
-        [mockMagneticModule.moduleId]: {
-          moduleId: mockMagneticModule.moduleId,
-          x: MOCK_MAGNETIC_MODULE_COORDS[0],
-          y: MOCK_MAGNETIC_MODULE_COORDS[1],
-          z: MOCK_MAGNETIC_MODULE_COORDS[2],
-          moduleDef: mockMagneticModule as any,
-          nestedLabwareDef: null,
-          nestedLabwareId: null,
-          nestedLabwareDisplayName: null,
-          protocolLoadOrder: 1,
-          attachedModuleMatch: {
-            ...mockMagneticModuleFixture,
-            model: mockMagneticModule.model,
-          } as any,
-          slotName: '1',
-        },
-        [mockTCModule.moduleId]: {
-          moduleId: mockTCModule.moduleId,
-          x: MOCK_TC_COORDS[0],
-          y: MOCK_TC_COORDS[1],
-          z: MOCK_TC_COORDS[2],
-          moduleDef: mockTCModule,
-          nestedLabwareDef: null,
-          nestedLabwareId: null,
-          nestedLabwareDisplayName: null,
-          protocolLoadOrder: 0,
-          attachedModuleMatch: {
-            ...mockThermocyclerFixture,
-            model: mockTCModule.model,
-          } as any,
-          slotName: '7',
-        },
-      })
-
-    when(mockModuleInfo)
-      .calledWith(
-        componentPropsMatcher({
-          moduleModel: mockMagneticModule.model,
-          isAttached: true,
-          usbPort: mockMagneticModuleFixture.usbPort.port,
-          hubPort: mockMagneticModuleFixture.usbPort.hub,
-          runId: MOCK_RUN_ID,
-        })
-      )
-      .mockReturnValue(<div>mock module info {mockMagneticModule.model} </div>)
-
-    when(mockModuleInfo)
-      .calledWith(
-        componentPropsMatcher({
-          moduleModel: mockTCModule.model,
-          isAttached: true,
-          usbPort: mockThermocyclerFixture.usbPort.port,
-          hubPort: mockThermocyclerFixture.usbPort.hub,
-          runId: MOCK_RUN_ID,
-        })
-      )
-      .mockReturnValue(<div>mock module info {mockTCModule.model} </div>)
-
-    const { getByText, getByRole } = render(props)
-    getByText('mock module info magneticModuleV2')
-    const button = getByRole('button', { name: 'Proceed to labware setup' })
-    expect(button).toBeDisabled()
   })
 
   it('renders Moam with the correct module in the correct slot', () => {
@@ -568,10 +414,8 @@ describe('SetupModules', () => {
       )
       .mockReturnValue(<div>mock module info {mockTCModule.model} </div>)
 
-    const { getByText, getByRole } = render(props)
+    const { getByText } = render(props)
     getByText('mock module info magneticModuleV2')
-    const button = getByRole('button', { name: 'Proceed to labware setup' })
-    expect(button).not.toBeDisabled()
   })
   it.todo('renders heater shaker banner correctly')
 })
