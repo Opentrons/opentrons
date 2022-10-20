@@ -42,6 +42,13 @@ from opentrons.protocol_api.core.engine.module_core import (
     ThermocyclerModuleCore,
     HeaterShakerModuleCore,
 )
+from opentrons.protocols.geometry.module_geometry import ModuleGeometry
+
+
+@pytest.fixture
+def mock_module_geometry(decoy: Decoy) -> ModuleGeometry:
+    """Get a mock of ModuleGeometry."""
+    return decoy.mock(cls=ModuleGeometry)
 
 
 @pytest.fixture
@@ -113,6 +120,7 @@ def test_load_labware(
 def test_load_labware_on_module(
     decoy: Decoy,
     mock_engine_client: EngineClient,
+    mock_module_geometry: ModuleGeometry,
     subject: ProtocolCore,
 ) -> None:
     """It should issue a LoadLabware command."""
@@ -134,7 +142,11 @@ def test_load_labware_on_module(
 
     result = subject.load_labware(
         load_name="some_labware",
-        location=ModuleCore(module_id="module-id", engine_client=mock_engine_client),
+        location=ModuleCore(
+            module_id="module-id",
+            engine_client=mock_engine_client,
+            geometry=mock_module_geometry,
+        ),
         label="some_display_name",  # maps to optional display name
         namespace="some_explicit_namespace",
         version=9001,

@@ -34,8 +34,14 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
         module_id: ProtocolEngine ID of the loaded modules.
     """
 
-    def __init__(self, module_id: str, engine_client: ProtocolEngineClient) -> None:
+    def __init__(
+        self,
+        module_id: str,
+        engine_client: ProtocolEngineClient,
+        geometry: ModuleGeometry,
+    ) -> None:
         self._module_id = module_id
+        self._geometry = geometry
         self._engine_client = engine_client
 
     @property
@@ -46,7 +52,7 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
     @property
     def geometry(self) -> ModuleGeometry:
         """Get the module's geometry interface."""
-        raise NotImplementedError("geometry not implemented")
+        return self._geometry
 
     def get_model(self) -> ModuleModel:
         """Get the module's model identifier."""
@@ -69,7 +75,7 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
 
     def get_deck_slot(self) -> DeckSlotName:
         """Get the module's deck slot."""
-        return self._engine_client.state.modules.get_location(self.module_id)
+        return self._engine_client.state.modules.get_location(self.module_id).slotName
 
     def add_labware_core(self, labware_core: LabwareCore) -> None:
         """Add a labware to the module."""
