@@ -1,5 +1,6 @@
 import ast
 import json
+from textwrap import dedent
 from typing import Optional
 
 import pytest
@@ -25,21 +26,23 @@ from opentrons.protocols.api_support.types import APIVersion
 def test_extract_metadata():
     expected = {"hello": "world", "what?": "no"}
 
-    prot = """
-this = 0
-that = 1
-metadata = {
-'what?': 'no',
-'hello': 'world'
-}
-fakedata = {
-'who?': 'me',
-'what?': 'green eggs'
-}
-print('wat?')
-metadata['hello'] = 'moon'
-fakedata['what?'] = 'ham'
-"""
+    prot = dedent(
+        """
+        this = 0
+        that = 1
+        metadata = {
+        'what?': 'no',
+        'hello': 'world'
+        }
+        fakedata = {
+        'who?': 'me',
+        'what?': 'green eggs'
+        }
+        print('wat?')
+        metadata['hello'] = 'moon'
+        fakedata['what?'] = 'ham'
+        """
+    )
 
     parsed = ast.parse(prot, filename="testy", mode="exec")
     metadata = extract_metadata(parsed)
@@ -49,107 +52,107 @@ fakedata['what?'] = 'ham'
 infer_version_cases = [
     (
         """
-from opentrons import instruments
+        from opentrons import instruments
 
-p = instruments.P10_Single(mount='right')
-""",
+        p = instruments.P10_Single(mount='right')
+        """,
         APIVersion(1, 0),
     ),
     (
         """
-import opentrons.instruments
+        import opentrons.instruments
 
-p = instruments.P10_Single(mount='right')
-""",
+        p = instruments.P10_Single(mount='right')
+        """,
         APIVersion(1, 0),
     ),
     (
         """
-from opentrons import instruments as instr
+        from opentrons import instruments as instr
 
-p = instr.P10_Single(mount='right')
-""",
+        p = instr.P10_Single(mount='right')
+        """,
         APIVersion(1, 0),
     ),
     (
         """
-from opentrons import instruments
+        from opentrons import instruments
 
-metadata = {
-  'apiLevel': '1'
-  }
+        metadata = {
+          'apiLevel': '1'
+          }
 
-p = instruments.P10_Single(mount='right')
-""",
+        p = instruments.P10_Single(mount='right')
+        """,
         APIVersion(1, 0),
     ),
     (
         """
-from opentrons import types
+        from opentrons import types
 
-metadata = {
-    'apiLevel': '2.0'
-}
+        metadata = {
+            'apiLevel': '2.0'
+        }
 
-def run(ctx):
-    right = ctx.load_instrument('p300_single', types.Mount.RIGHT)
-""",
+        def run(ctx):
+            right = ctx.load_instrument('p300_single', types.Mount.RIGHT)
+        """,
         APIVersion(2, 0),
     ),
     (
         """
-from opentrons import types
+        from opentrons import types
 
-metadata = {
-  'apiLevel': '1'
-  }
+        metadata = {
+          'apiLevel': '1'
+          }
 
-def run(ctx):
-    right = ctx.load_instrument('p300_single', types.Mount.RIGHT)
-""",
+        def run(ctx):
+            right = ctx.load_instrument('p300_single', types.Mount.RIGHT)
+        """,
         APIVersion(1, 0),
     ),
     (
         """
-from opentrons import types
+        from opentrons import types
 
-metadata = {
-  'apiLevel': '2.0'
-  }
+        metadata = {
+          'apiLevel': '2.0'
+          }
 
-def run(ctx):
-    right = ctx.load_instrument('p300_single', types.Mount.RIGHT)
-""",
+        def run(ctx):
+            right = ctx.load_instrument('p300_single', types.Mount.RIGHT)
+        """,
         APIVersion(2, 0),
     ),
     (
         """
-from opentrons import labware, instruments
+        from opentrons import labware, instruments
 
-p = instruments.P10_Single(mount='right')
-    """,
+        p = instruments.P10_Single(mount='right')
+        """,
         APIVersion(1, 0),
     ),
     (
         """
-from opentrons import types, containers
-    """,
+        from opentrons import types, containers
+        """,
         APIVersion(1, 0),
     ),
     (
         """
-from opentrons import types, instruments
+        from opentrons import types, instruments
 
-p = instruments.P10_Single(mount='right')
-    """,
+        p = instruments.P10_Single(mount='right')
+        """,
         APIVersion(1, 0),
     ),
     (
         """
-from opentrons import instruments as instr
+        from opentrons import instruments as instr
 
-p = instr.P300_Single('right')
-    """,
+        p = instr.P300_Single('right')
+        """,
         APIVersion(1, 0),
     ),
 ]
@@ -157,6 +160,7 @@ p = instr.P300_Single('right')
 
 @pytest.mark.parametrize("proto,version", infer_version_cases)
 def test_get_version(proto, version):
+    proto = dedent(proto)
     if version == APIVersion(1, 0):
         with pytest.raises(ApiDeprecationError):
             parse(proto)
@@ -329,25 +333,25 @@ def test_extra_contents(get_labware_fixture, protocol_file, protocol):
     "bad_protocol",
     [
         """
-metadata={"apiLevel": "2.0"}
-def run(ctx): pass
-def run(ctx): pass
-""",
+        metadata={"apiLevel": "2.0"}
+        def run(ctx): pass
+        def run(ctx): pass
+        """,
         """
-metadata = {"apiLevel": "2.0"}
+        metadata = {"apiLevel": "2.0"}
 
-print('hi')
-""",
+        print('hi')
+        """,
         """
-metadata = {"apiLevel": "2.0"}
-def run(ctx):
-  pass
+        metadata = {"apiLevel": "2.0"}
+        def run(ctx):
+          pass
 
-def run(blahblah):
-  pass
-""",
+        def run(blahblah):
+          pass
+        """,
     ],
 )
 def test_bad_structure(bad_protocol):
     with pytest.raises(MalformedProtocolError):
-        parse(bad_protocol)
+        parse(dedent(bad_protocol))
