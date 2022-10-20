@@ -519,6 +519,23 @@
           },
 
           {
+            "description": "[PROVISIONAL AND EXPERIMENTAL] Initiate automatic calibration of a pipette.",
+            "type": "object",
+            "required": ["commandType", "params"],
+            "properties": {
+              "key": { "type": "string" },
+              "commandType": { "enum": ["calibration/calibratePipette"] },
+              "params": {
+                "required": ["mount"],
+                "labwareId": {
+                  "enum": ["left", "right"],
+                  "description": "Instrument mount to calibrate."
+                }
+              }
+            }
+          },
+
+          {
             "description": "Save Position",
             "type": "object",
             "required": ["commandType", "params"],
