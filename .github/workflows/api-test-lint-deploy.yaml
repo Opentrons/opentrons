@@ -84,12 +84,12 @@ jobs:
             buildComplexEnvVars(core, context)
       - name: Test OT-2
         if: matrix.os != 'windows-2019'
-        run: make -C api test-ot2
+        run: make -C api test-cov-ot2
       - name: Test OT-3
         if: matrix.os != 'windows-2019'
-        run: make -C api test-cov
+        run: make -C api test-cov-ot3
       - name: Test app
-        run: make -C api test-app
+        run: make -C api test-cov-app
       - name: Ensure assets build
         if: matrix.os != 'windows-2019'
         run: make -C api sdist wheel

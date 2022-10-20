@@ -97,8 +97,15 @@ sdist: $(sdist_file)
 test: test-ot2 test-ot3
 
 .PHONY: test-cov
+test-cov: test-cov-ot2 test-cov-ot3
+
+.PHONY: test-cov-ot3
 test-cov:
 	$(call pytest,ot-3/robot-server) $(tests) $(test_opts) $(cov_opts)
+
+.PHONY: test-cov-ot2
+test-cov:
+	$(call pytest,ot-2) $(tests) $(test_opts)  --ot2-only --ignore-glob="**/*ot3*" $(cov_opts)
 
 .PHONY: test-ot2
 test-ot2:
@@ -111,6 +118,10 @@ test-ot3:
 .PHONY: test-app
 test-app:
 	$(call pytest,app) $(tests) $(test_opts) --ot2-only --ignore-glob="**/*ot3*"
+
+.PHONY: test-cov-app
+test-app:
+	$(call pytest,app) $(tests) $(test_opts) --ot2-only --ignore-glob="**/*ot3*" $(cov_opts)
 
 .PHONY: black-check
 black-check:
