@@ -4,9 +4,10 @@ from decoy import Decoy
 
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_api.core.engine.module_core import ModuleCore
-from opentrons.protocol_engine.types import DeckSlotLocation
+from opentrons.protocol_engine.types import DeckSlotLocation, ModuleModel as EngineModuleModel
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.types import DeckSlotName
+from opentrons.hardware_control.modules.types import MagneticModuleModel
 
 
 @pytest.fixture
@@ -41,3 +42,12 @@ def test_get_deck_slot(
     )
 
     assert subject.get_deck_slot() == DeckSlotName.SLOT_1
+
+
+def test_get_model(decoy: Decoy, subject: ModuleCore, mock_engine_client: EngineClient) -> None:
+    """Should return a ModuleModel."""
+    decoy.when(mock_engine_client.state.modules.get_model("1234")).then_return(EngineModuleModel.MAGNETIC_MODULE_V1)
+
+    result = subject.get_model()
+
+    assert result == MagneticModuleModel.MAGNETIC_V1
