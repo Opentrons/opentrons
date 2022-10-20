@@ -97,7 +97,6 @@ def test_load_labware(
     )
 
     assert result is mock_labware
-    decoy.verify(mock_deck.recalculate_high_z(), times=1)
 
 
 def test_load_labware_from_definition(
