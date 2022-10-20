@@ -86,4 +86,4 @@ def poll_interval_seconds() -> float:
     If too fast, tests may fail due to stale data in the serial buffers.
     If too slow, tests will take too long and may time out.
     """
-    return 0.01
+    return 0.1
