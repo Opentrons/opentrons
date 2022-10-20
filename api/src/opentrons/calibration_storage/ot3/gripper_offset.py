@@ -10,10 +10,10 @@ from opentrons.util.helpers import utc_now
 
 from .. import file_operators as io, types as local_types
 
-from .schemas import v1
+from .models import v1
 
 
-GripperCalibrations = Dict[local_types.GripperId, v1.InstrumentOffsetSchema]
+GripperCalibrations = Dict[local_types.GripperId, v1.InstrumentOffsetModel]
 
 # Gripper Offset Calibrations Look-Up
 
@@ -26,7 +26,7 @@ def _gripper_offset_calibrations() -> GripperCalibrations:
         if file.is_file() and ".json" in file.name:
             gripper_id = cast(local_types.GripperId, file.name.split(".json")[0])
             try:
-                gripper_calibration_dict[gripper_id] = v1.InstrumentOffsetSchema(
+                gripper_calibration_dict[gripper_id] = v1.InstrumentOffsetModel(
                     **io.read_cal_file(file.path)
                 )
             except (json.JSONDecodeError, ValidationError):
@@ -79,7 +79,7 @@ def save_gripper_calibration(
     else:
         cal_status_model = v1.CalibrationStatus()
 
-    gripper_calibration = v1.InstrumentOffsetSchema(
+    gripper_calibration = v1.InstrumentOffsetModel(
         offset=offset,
         lastModified=utc_now(),
         source=local_types.SourceType.user,
@@ -93,7 +93,7 @@ def save_gripper_calibration(
 
 def get_gripper_calibration_offset(
     gripper_id: local_types.GripperId,
-) -> Optional[v1.InstrumentOffsetSchema]:
+) -> Optional[v1.InstrumentOffsetModel]:
     """
     Return the requested gripper offset data.
     """

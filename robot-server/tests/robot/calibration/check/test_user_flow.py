@@ -10,7 +10,7 @@ from opentrons.calibration_storage import (
     ot2_deck_attitude,
     ot2_pipette_offset,
     ot2_tip_length,
-    ot2_schemas,
+    ot2_models,
 )
 from opentrons.config import robot_configs
 from opentrons.config.pipette_config import load
@@ -31,7 +31,7 @@ from robot_server.robot.calibration.constants import (
 )
 
 
-PIP_OFFSET = ot2_schemas.v1.InstrumentOffsetSchema(
+PIP_OFFSET = ot2_models.v1.InstrumentOffsetModel(
     offset=robot_configs.defaults_ot2.DEFAULT_PIPETTE_OFFSET,
     tiprack="some_tiprack",
     uri="custom/some_tiprack/1",
@@ -127,7 +127,7 @@ async def test_switching_to_second_pipette(pipettes, target_mount, hardware):
 def build_mock_stored_pipette_offset(kind="normal"):
     if kind == "normal":
         return MagicMock(
-            return_value=ot2_schemas.v1.InstrumentOffsetSchema(
+            return_value=ot2_models.v1.InstrumentOffsetModel(
                 offset=[0, 1, 2],
                 tiprack="tiprack-id",
                 uri="opentrons/opentrons_96_filtertiprack_200ul/1",
@@ -137,7 +137,7 @@ def build_mock_stored_pipette_offset(kind="normal"):
         )
     elif kind == "custom_tiprack":
         return MagicMock(
-            return_value=ot2_schemas.v1.InstrumentOffsetSchema(
+            return_value=ot2_models.v1.InstrumentOffsetModel(
                 offset=[0, 1, 2],
                 tiprack="tiprack-id",
                 uri="custom/minimal_labware_def/1",
@@ -151,7 +151,7 @@ def build_mock_stored_pipette_offset(kind="normal"):
 
 def build_mock_stored_tip_length(kind="normal"):
     if kind == "normal":
-        tip_length = ot2_schemas.v1.TipLengthCalibration(
+        tip_length = ot2_models.v1.TipLengthCalibration(
             tipLength=30,
             pipette="fake id",
             tiprack="fake_hash",
@@ -161,7 +161,7 @@ def build_mock_stored_tip_length(kind="normal"):
         )
         return MagicMock(return_value=tip_length)
     elif kind == "custom_tiprack":
-        tip_length = ot2_schemas.v1.TipLengthCalibration(
+        tip_length = ot2_models.v1.TipLengthCalibration(
             tipLength=30,
             pipette="fake id",
             tiprack="fake_hash",
@@ -178,7 +178,7 @@ def build_mock_deck_calibration(kind="normal"):
     if kind == "normal":
         attitude = [[1.0008, 0.0052, 0.0], [-0.1, 0.9, 0.0], [0.0, 0.0, 1.0]]
         return MagicMock(
-            return_value=ot2_schemas.v1.DeckCalibrationSchema(
+            return_value=ot2_models.v1.DeckCalibrationModel(
                 attitude=attitude,
                 source=CSTypes.SourceType.user,
                 last_modified=datetime.datetime.now(),
@@ -186,7 +186,7 @@ def build_mock_deck_calibration(kind="normal"):
         )
     elif kind == "identity":
         return MagicMock(
-            return_value=ot2_schemas.v1.DeckCalibrationSchema(
+            return_value=ot2_models.v1.DeckCalibrationModel(
                 attitude=robot_configs.defaults_ot2.DEFAULT_DECK_CALIBRATION_V2,
                 source=CSTypes.SourceType.user,
                 last_modified=None,

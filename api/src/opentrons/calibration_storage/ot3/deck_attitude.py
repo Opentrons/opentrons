@@ -10,18 +10,18 @@ from opentrons.util.helpers import utc_now
 
 from .. import file_operators as io, types as local_types
 
-from .schemas import v1
+from .models import v1
 
 
 # Deck Calibration Look-Up
 
 
-def _deck_calibration() -> Optional[v1.DeckCalibrationSchema]:
+def _deck_calibration() -> Optional[v1.DeckCalibrationModel]:
     deck_calibration_dir = config.get_opentrons_path("robot_calibration_dir")
     for file in os.scandir(deck_calibration_dir):
         if file.name == "deck_calibration.json":
             try:
-                return v1.DeckCalibrationSchema(**io.read_cal_file(file.path))
+                return v1.DeckCalibrationModel(**io.read_cal_file(file.path))
             except (json.JSONDecodeError, ValidationError):
                 pass
     return None
@@ -66,7 +66,7 @@ def save_robot_deck_attitude(
     else:
         cal_status_model = v1.CalibrationStatus()
 
-    gantry_calibration = v1.DeckCalibrationSchema(
+    gantry_calibration = v1.DeckCalibrationModel(
         attitude=transform,
         pipetteCalibratedWith=pip_id,
         lastModified=utc_now(),
@@ -80,5 +80,5 @@ def save_robot_deck_attitude(
 # Get Deck Calibration
 
 
-def get_robot_deck_attitude() -> Optional[v1.DeckCalibrationSchema]:
+def get_robot_deck_attitude() -> Optional[v1.DeckCalibrationModel]:
     return _deck_calibration()

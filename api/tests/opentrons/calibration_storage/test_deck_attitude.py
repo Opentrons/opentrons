@@ -24,14 +24,14 @@ def _deck(
 
 @no_type_check
 @pytest.fixture
-def schema(
+def model(
     request: pytest.FixtureRequest,
 ) -> Generator[ModuleType, None, None]:
     robot_type = request.param
     if robot_type == "ot3":
-        yield importlib.import_module("opentrons.calibration_storage.ot3.schemas")
+        yield importlib.import_module("opentrons.calibration_storage.ot3.models")
     else:
-        yield importlib.import_module("opentrons.calibration_storage.ot2.schemas")
+        yield importlib.import_module("opentrons.calibration_storage.ot2.models")
 
 
 @no_type_check
@@ -75,33 +75,33 @@ def test_save_deck_attitude(ot_config_tempdir: Any, _deck: ModuleType) -> None:
 
 @no_type_check
 @pytest.mark.parametrize(
-    argnames=["_deck", "starting_calibration_data", "schema"],
+    argnames=["_deck", "starting_calibration_data", "model"],
     argvalues=[["ot2", "ot2", "ot2"], ["ot3", "ot3", "ot3"]],
     indirect=True,
 )
 def test_get_deck_calibration(
-    _deck: Tuple[ModuleType, str], starting_calibration_data: Any, schema: ModuleType
+    _deck: Tuple[ModuleType, str], starting_calibration_data: Any, model: ModuleType
 ) -> None:
     """
-    Test ability to get a deck calibration schema.
+    Test ability to get a deck calibration model.
     """
     deck, robot_type = _deck
     robot_deck = deck.get_robot_deck_attitude()
     if robot_type == "ot3":
-        assert robot_deck == schema.v1.DeckCalibrationSchema(
+        assert robot_deck == model.v1.DeckCalibrationModel(
             attitude=[[1, 0, 0], [0, 1, 0], [0, 0, 1]],
             lastModified=robot_deck.lastModified,
             source=cs_types.SourceType.user,
             pipetteCalibratedWith="pip1",
-            status=schema.v1.CalibrationStatus(),
+            status=model.v1.CalibrationStatus(),
         )
     else:
-        assert robot_deck == schema.v1.DeckCalibrationSchema(
+        assert robot_deck == model.v1.DeckCalibrationModel(
             attitude=[[1, 0, 0], [0, 1, 0], [0, 0, 1]],
             last_modified=robot_deck.last_modified,
             source=cs_types.SourceType.user,
             pipette_calibrated_with="pip1",
-            status=schema.v1.CalibrationStatus(),
+            status=model.v1.CalibrationStatus(),
             tiprack="mytiprack",
         )
 

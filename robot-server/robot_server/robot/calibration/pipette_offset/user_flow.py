@@ -13,7 +13,7 @@ from opentrons.calibration_storage import (
     helpers,
     ot2_pipette_offset,
     ot2_tip_length,
-    ot2_schemas,
+    ot2_models,
 )
 from opentrons.calibration_storage.types import (
     TipLengthCalNotFound,
@@ -312,7 +312,7 @@ class PipetteOffsetCalibrationUserFlow:
 
     def _get_stored_pipette_offset_cal(
         self,
-    ) -> Optional[ot2_schemas.v1.InstrumentOffsetSchema]:
+    ) -> Optional[ot2_models.v1.InstrumentOffsetModel]:
         return ot2_pipette_offset.get_pipette_offset(
             self._hw_pipette.pipette_id, self._mount  # type: ignore[arg-type]
         )
@@ -339,7 +339,7 @@ class PipetteOffsetCalibrationUserFlow:
     @staticmethod
     def _get_tr_lw(
         tip_rack_def: Optional[LabwareDefinition],
-        existing_calibration: Optional[ot2_schemas.v1.InstrumentOffsetSchema],
+        existing_calibration: Optional[ot2_models.v1.InstrumentOffsetModel],
         volume: float,
         position: Location,
     ) -> Tuple[bool, labware.Labware]:
@@ -368,7 +368,7 @@ class PipetteOffsetCalibrationUserFlow:
     def _load_tip_rack(
         self,
         tip_rack_def: Optional[LabwareDefinition],
-        existing_calibration: Optional[ot2_schemas.v1.InstrumentOffsetSchema],
+        existing_calibration: Optional[ot2_models.v1.InstrumentOffsetModel],
     ):
         """
         load onto the deck the default opentrons tip rack labware for this

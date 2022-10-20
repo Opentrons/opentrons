@@ -11,14 +11,14 @@ from .. import file_operators as io, helpers, types as local_types
 from opentrons.util.helpers import utc_now
 
 
-from .schemas import v1
+from .models import v1
 
 if typing.TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
 TipLengthCalibrations = typing.Dict[
-    local_types.PipetteId, typing.Dict[local_types.TiprackHash, v1.TipLengthSchema]
+    local_types.PipetteId, typing.Dict[local_types.TiprackHash, v1.TipLengthModel]
 ]
 
 
@@ -39,7 +39,7 @@ def _tip_length_calibrations() -> TipLengthCalibrations:
                 try:
                     tip_length_calibrations[pipette_id][
                         typing.cast(local_types.TiprackHash, tiprack)
-                    ] = v1.TipLengthSchema(**data)
+                    ] = v1.TipLengthModel(**data)
                 except (json.JSONDecodeError, ValidationError):
                     pass
     return tip_length_calibrations
@@ -47,7 +47,7 @@ def _tip_length_calibrations() -> TipLengthCalibrations:
 
 def _tip_lengths_for_pipette(
     pipette_id: local_types.PipetteId,
-) -> typing.Dict[local_types.TiprackHash, v1.TipLengthSchema]:
+) -> typing.Dict[local_types.TiprackHash, v1.TipLengthModel]:
     try:
         return _tip_length_calibrations()[pipette_id]
     except KeyError:
@@ -100,7 +100,7 @@ def clear_tip_length_calibration() -> None:
 
 def save_tip_length_calibration(
     pip_id: local_types.PipetteId,
-    tip_length_cal: typing.Dict[local_types.TiprackHash, v1.TipLengthSchema],
+    tip_length_cal: typing.Dict[local_types.TiprackHash, v1.TipLengthModel],
 ) -> None:
     """
     Function used to save tip length calibration to file.
@@ -130,7 +130,7 @@ def save_tip_length_calibration(
 
 def load_tip_length_calibration(
     pip_id: local_types.PipetteId, definition: "LabwareDefinition"
-) -> v1.TipLengthSchema:
+) -> v1.TipLengthModel:
     """
     Function used to grab the current tip length associated
     with a particular tiprack.
@@ -156,7 +156,7 @@ def create_tip_length_data(
     cal_status: typing.Optional[
         typing.Union[local_types.CalibrationStatus, v1.CalibrationStatus]
     ] = None,
-) -> typing.Dict[local_types.TiprackHash, v1.TipLengthSchema]:
+) -> typing.Dict[local_types.TiprackHash, v1.TipLengthModel]:
     """
     Function to correctly format tip length data.
 
@@ -172,7 +172,7 @@ def create_tip_length_data(
         cal_status_model = cal_status
     else:
         cal_status_model = v1.CalibrationStatus()
-    tip_length_data = v1.TipLengthSchema(
+    tip_length_data = v1.TipLengthModel(
         tipLength=length,
         lastModified=utc_now(),
         source=local_types.SourceType.user,

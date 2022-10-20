@@ -22,7 +22,7 @@ from opentrons.hardware_control.types import Axis
 from opentrons.protocols.advanced_control import transfers as tf
 from opentrons.config.pipette_config import config_names
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.calibration_storage import types as cs_types, ot2_schemas, ot2_tip_length
+from opentrons.calibration_storage import types as cs_types, ot2_models, ot2_tip_length
 from opentrons.util.helpers import utc_now
 
 import pytest
@@ -1019,11 +1019,11 @@ def test_tip_length_for_caldata(ctx, monkeypatch):
     instr = ctx.load_instrument("p20_single_gen2", "left")
     tiprack = ctx.load_labware("geb_96_tiprack_10ul", "1")
     mock_tip_length = mock.Mock()
-    mock_tip_length.return_value = ot2_schemas.v1.TipLengthSchema(
+    mock_tip_length.return_value = ot2_models.v1.TipLengthModel(
         tipLength=2,
         lastModified=utc_now(),
         source=cs_types.SourceType.user,
-        status=ot2_schemas.v1.CalibrationStatus(markedBad=False),
+        status=ot2_models.v1.CalibrationStatus(markedBad=False),
         uri=LabwareUri("opentrons/geb_96_tiprack_10ul/1"),
     )
     monkeypatch.setattr(ot2_tip_length, "load_tip_length_calibration", mock_tip_length)

@@ -27,14 +27,14 @@ def _pipette(
 
 @no_type_check
 @pytest.fixture
-def schema(
+def model(
     request: pytest.FixtureRequest,
 ) -> Generator[ModuleType, None, None]:
     robot_type = request.param
     if robot_type == "ot3":
-        yield importlib.import_module("opentrons.calibration_storage.ot3.schemas")
+        yield importlib.import_module("opentrons.calibration_storage.ot3.models")
     else:
-        yield importlib.import_module("opentrons.calibration_storage.ot2.schemas")
+        yield importlib.import_module("opentrons.calibration_storage.ot2.models")
 
 
 @no_type_check
@@ -137,26 +137,26 @@ def test_save_pipette_calibration(ot_config_tempdir: Any, _pipette: ModuleType) 
 
 @no_type_check
 @pytest.mark.parametrize(
-    argnames=["_pipette", "starting_calibration_data", "schema"],
+    argnames=["_pipette", "starting_calibration_data", "model"],
     argvalues=[["ot2", "ot2", "ot2"], ["ot3", "ot3", "ot3"]],
     indirect=True,
 )
 def test_get_pipette_calibration(
-    _pipette: Tuple[ModuleType, str], starting_calibration_data: Any, schema: ModuleType
+    _pipette: Tuple[ModuleType, str], starting_calibration_data: Any, model: ModuleType
 ) -> None:
     """
-    Test ability to get a pipette calibration schema.
+    Test ability to get a pipette calibration model.
     """
     pipette, robot_type = _pipette
     pipette_data = pipette.get_pipette_offset("pip1", Mount.LEFT)
     if robot_type == "ot3":
-        assert pipette_data == schema.v1.InstrumentOffsetSchema(
+        assert pipette_data == model.v1.InstrumentOffsetModel(
             offset=Point(1, 1, 1),
             lastModified=pipette_data.lastModified,
             source=cs_types.SourceType.user,
         )
     else:
-        assert pipette_data == schema.v1.InstrumentOffsetSchema(
+        assert pipette_data == model.v1.InstrumentOffsetModel(
             offset=Point(1, 1, 1),
             tiprack="mytiprack",
             uri="opentrons/tip_rack/1",

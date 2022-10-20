@@ -8,7 +8,7 @@ from opentrons.calibration_storage import (
     ot2_deck_attitude,
     ot2_tip_length,
     ot2_pipette_offset,
-    ot2_schemas,
+    ot2_models,
     mark_bad_calibration,
 )
 from opentrons.types import Mount, Point, Location
@@ -339,7 +339,7 @@ class CheckCalibrationUserFlow:
 
     def _get_tip_length_from_pipette(
         self, mount: Mount, pipette: Pipette
-    ) -> Optional[ot2_schemas.v1.TipLengthSchema]:
+    ) -> Optional[ot2_models.v1.TipLengthModel]:
         if not pipette.pipette_id:
             return None
         pip_offset = ot2_pipette_offset.get_pipette_offset(
@@ -411,7 +411,7 @@ class CheckCalibrationUserFlow:
         self,
         pipette: Optional[Pipette] = None,
         mount: Optional[Mount] = None,
-    ) -> ot2_schemas.v1.InstrumentOffsetSchema:
+    ) -> ot2_models.v1.InstrumentOffsetModel:
         if not pipette or not mount:
             pip_offset = ot2_pipette_offset.get_pipette_offset(
                 self.hw_pipette.pipette_id, self.mount  # type: ignore
@@ -426,7 +426,7 @@ class CheckCalibrationUserFlow:
     @staticmethod
     def _get_tr_lw(
         tip_rack_def: Optional[LabwareDefinition],
-        existing_calibration: ot2_schemas.v1.InstrumentOffsetSchema,
+        existing_calibration: ot2_models.v1.InstrumentOffsetModel,
         volume: float,
         position: Location,
     ) -> labware.Labware:
@@ -479,7 +479,7 @@ class CheckCalibrationUserFlow:
         return tr_lw
 
     def _get_tiprack_by_pipette_volume(
-        self, volume: float, existing_calibration: ot2_schemas.v1.InstrumentOffsetSchema
+        self, volume: float, existing_calibration: ot2_models.v1.InstrumentOffsetModel
     ) -> labware.Labware:
         tip_rack_def = None
         if self._tip_racks:

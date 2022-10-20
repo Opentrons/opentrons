@@ -63,14 +63,14 @@ def _tip_length(
 
 @no_type_check
 @pytest.fixture
-def schema(
+def model(
     request: pytest.FixtureRequest,
 ) -> Generator[ModuleType, None, None]:
     robot_type = request.param
     if robot_type == "ot3":
-        yield importlib.import_module("opentrons.calibration_storage.ot3.schemas")
+        yield importlib.import_module("opentrons.calibration_storage.ot3.models")
     else:
-        yield importlib.import_module("opentrons.calibration_storage.ot2.schemas")
+        yield importlib.import_module("opentrons.calibration_storage.ot2.models")
 
 
 @no_type_check
@@ -119,21 +119,21 @@ def test_save_tip_length_calibration(
 
 @no_type_check
 @pytest.mark.parametrize(
-    argnames=["_tip_length", "starting_calibration_data", "schema"],
+    argnames=["_tip_length", "starting_calibration_data", "model"],
     argvalues=[["ot2", "ot2", "ot2"], ["ot3", "ot3", "ot3"]],
     indirect=True,
 )
 def test_get_tip_length_calibration(
     _tip_length: Tuple[ModuleType, str],
     starting_calibration_data: Any,
-    schema: ModuleType,
+    model: ModuleType,
 ) -> None:
     """
-    Test ability to get a tip length calibration schema.
+    Test ability to get a tip length calibration model.
     """
     tip_length, _ = _tip_length
     tip_length_data = tip_length.load_tip_length_calibration("pip1", minimalLabwareDef)
-    assert tip_length_data == schema.v1.TipLengthSchema(
+    assert tip_length_data == model.v1.TipLengthModel(
         tipLength=22.0,
         source=cs_types.SourceType.user,
         lastModified=tip_length_data.lastModified,

@@ -6,7 +6,7 @@ from opentrons import types as ot_types
 from opentrons.calibration_storage import (
     types as cal_types,
     ot2_pipette_offset,
-    ot2_schemas,
+    ot2_models,
 )
 
 from robot_server.errors import ErrorBody
@@ -18,7 +18,7 @@ router = APIRouter()
 
 
 def _format_calibration(
-    calibration: ot2_schemas.v1.PipetteOffsetCalibration,
+    calibration: ot2_models.v1.PipetteOffsetCalibration,
 ) -> pip_models.PipetteOffsetCalibration:
     # TODO (lc 09-20-2022) We should use the calibration
     # status model in calibration storage.

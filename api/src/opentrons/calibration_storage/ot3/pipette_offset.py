@@ -10,11 +10,11 @@ from opentrons import config, types
 from .. import file_operators as io, types as local_types
 from opentrons.util.helpers import utc_now
 
-from .schemas import v1
+from .models import v1
 
 
 PipetteCalibrations = Dict[
-    types.MountType, Dict[local_types.PipetteId, v1.InstrumentOffsetSchema]
+    types.MountType, Dict[local_types.PipetteId, v1.InstrumentOffsetModel]
 ]
 
 
@@ -35,7 +35,7 @@ def _pipette_offset_calibrations() -> PipetteCalibrations:
                 try:
                     pipette_calibration_dict[mount][
                         pipette_id
-                    ] = v1.InstrumentOffsetSchema(**io.read_cal_file(file.path))
+                    ] = v1.InstrumentOffsetModel(**io.read_cal_file(file.path))
                 except (json.JSONDecodeError, ValidationError):
                     pass
 
@@ -91,7 +91,7 @@ def save_pipette_calibration(
     else:
         cal_status_model = v1.CalibrationStatus()
 
-    pipette_calibration = v1.InstrumentOffsetSchema(
+    pipette_calibration = v1.InstrumentOffsetModel(
         offset=offset,
         lastModified=utc_now(),
         source=local_types.SourceType.user,
@@ -105,7 +105,7 @@ def save_pipette_calibration(
 
 def get_pipette_offset(
     pipette_id: local_types.PipetteId, mount: types.Mount
-) -> Optional[v1.InstrumentOffsetSchema]:
+) -> Optional[v1.InstrumentOffsetModel]:
     if mount == types.Mount.LEFT:
         mount_type = types.MountType.LEFT
     else:

@@ -5,7 +5,7 @@ from typing import Optional, cast
 from opentrons.calibration_storage import (
     types as cal_types,
     ot2_tip_length,
-    ot2_schemas,
+    ot2_models,
 )
 
 from robot_server.errors import ErrorBody
@@ -18,7 +18,7 @@ router = APIRouter()
 
 
 def _format_calibration(
-    calibration: ot2_schemas.v1.TipLengthCalibration,
+    calibration: ot2_models.v1.TipLengthCalibration,
 ) -> tl_models.TipLengthCalibration:
     # TODO (lc 09-20-2022) We should use the calibration
     # status model in calibration storage.

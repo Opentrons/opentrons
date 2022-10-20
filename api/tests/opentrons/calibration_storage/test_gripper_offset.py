@@ -5,7 +5,7 @@ from opentrons.types import Point
 from opentrons.calibration_storage import (
     types as cs_types,
     ot3_gripper_offset as gripper,
-    ot3_schemas as schema,
+    ot3_models as model,
 )
 
 
@@ -60,7 +60,7 @@ def test_get_gripper_calibration(
         cs_types.GripperId("gripper1")
     )
     assert gripper_data is not None
-    assert gripper_data == schema.v1.InstrumentOffsetSchema(
+    assert gripper_data == model.v1.InstrumentOffsetModel(
         offset=Point(1, 1, 1),
         lastModified=gripper_data.lastModified,
         source=cs_types.SourceType.user,

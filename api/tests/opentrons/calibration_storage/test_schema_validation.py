@@ -12,12 +12,12 @@ from opentrons.calibration_storage import encoder_decoder as ed, types as cal_ty
 
 @no_type_check
 @pytest.fixture
-def schema(request: pytest.FixtureRequest) -> Generator[ModuleType, None, None]:
+def model(request: pytest.FixtureRequest) -> Generator[ModuleType, None, None]:
     robot_type = request.param
     if robot_type == "ot3":
-        yield importlib.import_module("opentrons.calibration_storage.ot3.schemas")
+        yield importlib.import_module("opentrons.calibration_storage.ot3.models")
     else:
-        yield importlib.import_module("opentrons.calibration_storage.ot2.schemas")
+        yield importlib.import_module("opentrons.calibration_storage.ot2.models")
 
 
 def test_json_datetime_encoder() -> None:
@@ -31,16 +31,16 @@ def test_json_datetime_encoder() -> None:
 
 @no_type_check
 @pytest.mark.parametrize(
-    argnames=["schema"],
+    argnames=["model"],
     argvalues=[["ot2"], ["ot3"]],
     indirect=True,
 )
-def test_tip_length_positive(schema: ModuleType) -> None:
+def test_tip_length_positive(model: ModuleType) -> None:
     with pytest.raises(ValidationError):
-        schema.v1.TipLengthSchema(
+        model.v1.TipLengthModel(
             tipLength=-10,
             lastModified=utc_now(),
             source=cal_types.SourceType.user,
-            status=schema.v1.CalibrationStatus(),
+            status=model.v1.CalibrationStatus(),
             uri="opentrons/tiprack/1",
         )

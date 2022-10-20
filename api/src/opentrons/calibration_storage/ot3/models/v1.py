@@ -16,7 +16,7 @@ class CalibrationStatus(BaseModel):
     markedAt: typing.Optional[datetime] = None
 
 
-class TipLengthSchema(BaseModel):
+class TipLengthModel(BaseModel):
     tipLength: float = Field(..., description="Tip length data found from calibration.")
     lastModified: datetime = Field(
         ..., description="The last time this tip length was calibrated."
@@ -43,7 +43,7 @@ class TipLengthSchema(BaseModel):
         json_decoders = {datetime: lambda obj: datetime.fromisoformat(obj)}
 
 
-class DeckCalibrationSchema(BaseModel):
+class DeckCalibrationModel(BaseModel):
     attitude: types.AttitudeMatrix = Field(
         ..., description="Attitude matrix found from calibration."
     )
@@ -66,7 +66,7 @@ class DeckCalibrationSchema(BaseModel):
         json_decoders = {datetime: lambda obj: datetime.fromisoformat(obj)}
 
 
-class InstrumentOffsetSchema(BaseModel):
+class InstrumentOffsetModel(BaseModel):
     offset: Point = Field(..., description="Instrument offset found from calibration.")
     lastModified: datetime = Field(
         ..., description="The last time this instrument was calibrated."

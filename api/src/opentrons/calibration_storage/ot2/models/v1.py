@@ -20,7 +20,7 @@ class CalibrationStatus(BaseModel):
 # TODO(lc 09-01-2022) We should ensure that all pydantic models are
 # in camel case, but for now, the schemas are following the format
 # they are currently saved in on the OT-2 to avoid a large migration.
-class TipLengthSchema(BaseModel):
+class TipLengthModel(BaseModel):
     tipLength: float = Field(..., description="Tip length data found from calibration.")
     lastModified: datetime = Field(
         ..., description="The last time this tip length was calibrated."
@@ -47,7 +47,7 @@ class TipLengthSchema(BaseModel):
         json_decoders = {datetime: lambda obj: datetime.fromisoformat(obj)}
 
 
-class DeckCalibrationSchema(BaseModel):
+class DeckCalibrationModel(BaseModel):
     attitude: types.AttitudeMatrix = Field(
         ..., description="Attitude matrix found from calibration."
     )
@@ -73,7 +73,7 @@ class DeckCalibrationSchema(BaseModel):
         json_decoders = {datetime: lambda obj: datetime.fromisoformat(obj)}
 
 
-class InstrumentOffsetSchema(BaseModel):
+class InstrumentOffsetModel(BaseModel):
     offset: Point = Field(..., description="Instrument offset found from calibration.")
     tiprack: str = Field(..., description="Tiprack used to calibrate this offset")
     uri: str = Field(
