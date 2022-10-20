@@ -455,13 +455,13 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     @requires_version(2, 0)
     def open_lid(self) -> str:
         """Opens the lid"""
-        return self._core.open_lid()
+        return self._core.open_lid().value
 
     @publish(command=cmds.thermocycler_close)
     @requires_version(2, 0)
     def close_lid(self) -> str:
         """Closes the lid"""
-        return self._core.close_lid()
+        return self._core.close_lid().value
 
     @publish(command=cmds.thermocycler_set_block_temp)
     @requires_version(2, 0)

@@ -124,12 +124,12 @@ def test_ensure_module_model_invalid() -> None:
         (42.42, None, 42.42),
         (None, 1.2, 72.0),
         (42.42, 1.2, 114.42),
-        (None, None, None),
+        (None, None, 0),
     ],
 )
 def test_ensure_hold_time_seconds(
     seconds: Optional[float], minutes: Optional[float], expected: Optional[float]
 ) -> None:
-    """It should ensure hold time is in seconds only if seconds and/or minutes are provided."""
+    """It should ensure hold time is in seconds only."""
     result = subject.ensure_hold_time_seconds(seconds=seconds, minutes=minutes)
     assert result == expected
