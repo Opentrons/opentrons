@@ -84,11 +84,3 @@ def test_get_serial_number(
     decoy.when(mock_sync_module_hardware.device_info).then_return({"serial": "abc123"})
     result = subject.get_serial_number()
     assert result == "abc123"
-
-
-def test_add_labware_core(
-    decoy: Decoy,
-    mock_sync_module_hardware: SynchronousAdapter[AbstractModule],
-    subject: LegacyModuleCore,
-) -> None:
-    """Should return a Labware object."""

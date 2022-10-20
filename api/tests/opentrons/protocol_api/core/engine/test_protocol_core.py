@@ -47,12 +47,6 @@ from opentrons.protocols.api_support.types import APIVersion
 
 
 @pytest.fixture
-def mock_module_geometry(decoy: Decoy) -> ModuleGeometry:
-    """Get a mock of ModuleGeometry."""
-    return decoy.mock(cls=ModuleGeometry)
-
-
-@pytest.fixture
 def mock_engine_client(decoy: Decoy) -> EngineClient:
     """Get a mock ProtocolEngine synchronous client."""
     return decoy.mock(cls=EngineClient)
@@ -121,7 +115,6 @@ def test_load_labware(
 def test_load_labware_on_module(
     decoy: Decoy,
     mock_engine_client: EngineClient,
-    mock_module_geometry: ModuleGeometry,
     subject: ProtocolCore,
 ) -> None:
     """It should issue a LoadLabware command."""
