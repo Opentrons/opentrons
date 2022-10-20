@@ -504,10 +504,6 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
         seconds = validation.ensure_hold_time_seconds(
             seconds=hold_time_seconds, minutes=hold_time_minutes
         )
-        # if hold_time_minutes is not None:
-        #     if hold_time_seconds is None:
-        #         hold_time_seconds = 0
-        #     hold_time_seconds += hold_time_minutes * 60
         self._core.set_target_block_temperature(
             celsius=temperature,
             hold_time_seconds=seconds,
