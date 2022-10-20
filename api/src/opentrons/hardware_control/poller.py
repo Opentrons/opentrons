@@ -1,7 +1,8 @@
 import asyncio
+import contextlib
 import logging
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from typing import AsyncGenerator, List, Optional
 
 
 log = logging.getLogger(__name__)
@@ -29,6 +30,7 @@ class Poller:
     def __init__(self, reader: Reader, interval: float) -> None:
         self.interval = interval
         self._reader = reader
+        self._read_lock: Optional["asyncio.Lock"] = None
         self._poll_waiters: List["asyncio.Future[None]"] = []
         self._poll_forever_task: Optional["asyncio.Task[None]"] = None
 
@@ -42,7 +44,10 @@ class Poller:
         task = self._poll_forever_task
 
         assert task is not None, "Poller never started"
-        task.cancel()
+
+        async with self._use_read_lock():
+            task.cancel()
+
         await asyncio.gather(task, return_exceptions=True)
 
     async def wait_next_poll(self) -> None:
@@ -56,6 +61,13 @@ class Poller:
         self._poll_waiters.append(poll_future)
         await poll_future
 
+    @contextlib.asynccontextmanager
+    async def _use_read_lock(self) -> AsyncGenerator[None, None]:
+        self._read_lock = self._read_lock or asyncio.Lock()
+
+        async with self._read_lock:
+            yield
+
     async def _poll_forever(self) -> None:
         """Polling loop."""
         while True:
@@ -68,7 +80,8 @@ class Poller:
         self._poll_waiters = []
 
         try:
-            await self._reader.read()
+            async with self._use_read_lock():
+                await self._reader.read()
         except asyncio.CancelledError:
             raise
         except Exception as e:
