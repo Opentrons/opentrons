@@ -1,6 +1,4 @@
 """ProtocolEngine-based Protocol API core implementation."""
-import logging
-
 from typing import Dict, Optional, Type, Union
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
@@ -18,7 +16,6 @@ from opentrons.hardware_control.modules.types import (
 )
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
-from opentrons.protocols.geometry import module_geometry
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
 
@@ -42,7 +39,6 @@ from .module_core import (
 )
 from .exceptions import InvalidModuleLocationError
 
-log = logging.getLogger(__name__)
 
 # TODO(mc, 2022-08-24): many of these methods are likely unnecessary
 # in a ProtocolEngine world. As we develop this core, we should remove
@@ -117,7 +113,6 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         else:
             module_location = DeckSlotLocation(slotName=location)
 
-        log.info(f"display name {label}")
         load_result = self._engine_client.load_labware(
             load_name=load_name,
             location=module_location,
@@ -161,17 +156,9 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         else:
             assert False, "Unsupported module definition"
 
-        selected_definition = module_geometry.load_definition(model)
-        # Load geometry to match the hardware module that we found connected.
-        geometry = module_geometry.create_geometry(
-            definition=selected_definition,
-            parent=self._deck_layout.position_for(deck_slot),
-            configuration=configuration,
-        )
         return module_core_cls(
             module_id=result.moduleId,
             engine_client=self._engine_client,
-            geometry=geometry,
         )
 
     def load_instrument(

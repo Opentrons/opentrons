@@ -145,7 +145,6 @@ def test_load_labware_on_module(
         location=ModuleCore(
             module_id="module-id",
             engine_client=mock_engine_client,
-            geometry=mock_module_geometry,
         ),
         label="some_display_name",  # maps to optional display name
         namespace="some_explicit_namespace",

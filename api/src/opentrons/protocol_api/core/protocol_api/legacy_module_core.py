@@ -95,9 +95,11 @@ class LegacyModuleCore(AbstractModuleCore[LabwareImplementation]):
         """Get the module's deck slot."""
         return DeckSlotName.from_primitive(self._geometry.parent)  # type: ignore[arg-type]
 
-    def add_labware_core(self, labware_core: LabwareImplementation) -> None:
+    def add_labware_core(self, labware_core: LabwareImplementation) -> Labware:
         """Add a labware to the module."""
-        pass
+        # TODO(mc, 2022-09-02): add API version
+        # https://opentrons.atlassian.net/browse/RSS-97
+        return self.geometry.add_labware(Labware(implementation=labware_core))
 
 
 class LegacyTemperatureModuleCore(
@@ -219,8 +221,11 @@ class LegacyMagneticModuleCore(
         """Get the module's current magnet status."""
         return self._sync_module_hardware.status  # type: ignore[no-any-return]
 
-    def add_labware_core(self, labware_core: LabwareImplementation) -> None:
+    def add_labware_core(self, labware_core: LabwareImplementation) -> Labware:
         """Add a labware to the module."""
+        # TODO(mc, 2022-09-02): add API version
+        # https://opentrons.atlassian.net/browse/RSS-97
+        return super().add_labware_core(labware_core)
         if labware_core.get_default_magnet_engage_height() is None:
             name = labware_core.get_name()
             _log.warning(

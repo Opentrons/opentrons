@@ -142,11 +142,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
             location=self._core,
         )
 
-        self._core.add_labware_core(labware_core)
-
-        # TODO(mc, 2022-09-02): add API version
-        # https://opentrons.atlassian.net/browse/RSS-97
-        labware = self._core.geometry.add_labware(Labware(implementation=labware_core))
+        labware = self._core.add_labware_core(labware_core)
 
         # TODO(mc, 2022-09-08): move this into legacy PAPIv2 implementation
         # by reworking the `Deck` and/or `ModuleGeometry` interface

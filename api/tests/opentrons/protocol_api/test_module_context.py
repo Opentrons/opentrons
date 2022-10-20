@@ -87,7 +87,7 @@ def test_load_labware(
 
     decoy.when(mock_labware_core.get_name()).then_return("Full Name")
 
-    decoy.when(mock_core.geometry.add_labware(matchers.IsA(Labware))).then_return(
+    decoy.when(mock_core.add_labware_core(mock_labware_core)).then_return(
         mock_labware
     )
 
@@ -99,7 +99,6 @@ def test_load_labware(
     )
 
     assert result is mock_labware
-    decoy.verify(mock_core.add_labware_core(mock_labware_core), times=1)
     decoy.verify(mock_deck.recalculate_high_z(), times=1)
 
 
@@ -122,7 +121,7 @@ def test_load_labware_from_definition(
 
     decoy.when(mock_labware_core.get_name()).then_return("Full Name")
 
-    decoy.when(mock_core.geometry.add_labware(matchers.IsA(Labware))).then_return(
+    decoy.when(mock_core.add_labware_core(mock_labware_core)).then_return(
         mock_labware
     )
 

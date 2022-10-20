@@ -16,6 +16,7 @@ from opentrons.drivers.types import (
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
+from opentrons.protocol_api import Labware
 
 from ..module import (
     AbstractModuleCore,
@@ -38,10 +39,8 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
         self,
         module_id: str,
         engine_client: ProtocolEngineClient,
-        geometry: ModuleGeometry,
     ) -> None:
         self._module_id = module_id
-        self._geometry = geometry
         self._engine_client = engine_client
 
     @property
@@ -52,7 +51,7 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
     @property
     def geometry(self) -> ModuleGeometry:
         """Get the module's geometry interface."""
-        return self._geometry
+        raise NotImplementedError("get_model not implemented")
 
     def get_model(self) -> ModuleModel:
         """Get the module's model identifier."""
@@ -77,9 +76,9 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
         """Get the module's deck slot."""
         return self._engine_client.state.modules.get_location(self.module_id).slotName
 
-    def add_labware_core(self, labware_core: LabwareCore) -> None:
+    def add_labware_core(self, labware_core: LabwareCore) -> Labware:
         """Add a labware to the module."""
-        raise NotImplementedError("add_labware_core not implemented")
+        pass
 
 
 class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore[LabwareCore]):
