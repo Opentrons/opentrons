@@ -128,7 +128,7 @@ def test_ensure_module_model_invalid() -> None:
     ],
 )
 def test_ensure_hold_time_seconds(
-    seconds: Optional[float], minutes: Optional[float], expected: Optional[float]
+    seconds: Optional[float], minutes: Optional[float], expected: float
 ) -> None:
     """It should ensure hold time is in seconds only."""
     result = subject.ensure_hold_time_seconds(seconds=seconds, minutes=minutes)

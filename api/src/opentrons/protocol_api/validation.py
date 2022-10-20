@@ -100,7 +100,7 @@ def ensure_module_model(load_name: str) -> ModuleModel:
 
 def ensure_hold_time_seconds(
     seconds: Optional[float], minutes: Optional[float]
-) -> Optional[float]:
+) -> float:
     """Ensure that hold time is expressed in seconds."""
     if seconds is None:
         seconds = 0
