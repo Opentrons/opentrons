@@ -40,21 +40,14 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
         self,
         module_id: str,
         engine_client: ProtocolEngineClient,
-        api_version: APIVersion,
     ) -> None:
         self._module_id = module_id
         self._engine_client = engine_client
-        self._api_version = api_version
 
     @property
     def module_id(self) -> str:
         """The module's unique ProtocolEngine ID."""
         return self._module_id
-
-    @property
-    def api_version(self) -> APIVersion:
-        """Return the API version supported by this protocol."""
-        return self._api_version
 
     @property
     def geometry(self) -> ModuleGeometry:
@@ -84,9 +77,11 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
         """Get the module's deck slot."""
         return self._engine_client.state.modules.get_location(self.module_id).slotName
 
-    def add_labware_core(self, labware_core: LabwareCore) -> Labware:
+    def add_labware_core(
+        self, labware_core: LabwareCore, api_version: APIVersion
+    ) -> Labware:
         """Add a labware to the module."""
-        return Labware(implementation=labware_core, api_level=self.api_version)
+        return Labware(implementation=labware_core, api_level=api_version)
 
 
 class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore[LabwareCore]):

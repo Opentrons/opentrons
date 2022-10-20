@@ -24,6 +24,7 @@ from opentrons.protocols.geometry.module_geometry import (
     ThermocyclerGeometry,
     HeaterShakerGeometry,
 )
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import DeckSlotName, Location
 
 from ..module import (
@@ -95,9 +96,13 @@ class LegacyModuleCore(AbstractModuleCore[LabwareImplementation]):
         """Get the module's deck slot."""
         return DeckSlotName.from_primitive(self._geometry.parent)  # type: ignore[arg-type]
 
-    def add_labware_core(self, labware_core: LabwareImplementation) -> Labware:
+    def add_labware_core(
+        self, labware_core: LabwareImplementation, api_version: APIVersion
+    ) -> Labware:
         """Add a labware to the module."""
-        labware = self.geometry.add_labware(Labware(implementation=labware_core))
+        labware = self.geometry.add_labware(
+            Labware(implementation=labware_core, api_level=api_version)
+        )
         self._protocol_core.get_deck().recalculate_high_z()
         return labware
 
@@ -221,9 +226,11 @@ class LegacyMagneticModuleCore(
         """Get the module's current magnet status."""
         return self._sync_module_hardware.status  # type: ignore[no-any-return]
 
-    def add_labware_core(self, labware_core: LabwareImplementation) -> Labware:
+    def add_labware_core(
+        self, labware_core: LabwareImplementation, api_version: APIVersion
+    ) -> Labware:
         """Add a labware to the module."""
-        labware = super().add_labware_core(labware_core)
+        labware = super().add_labware_core(labware_core, api_version)
         if labware_core.get_default_magnet_engage_height() is None:
             name = labware_core.get_name()
             _log.warning(

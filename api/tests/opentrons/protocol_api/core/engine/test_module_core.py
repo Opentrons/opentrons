@@ -9,7 +9,6 @@ from opentrons.protocol_engine.types import (
 )
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.types import DeckSlotName
-from opentrons.protocols.api_support.types import APIVersion
 
 
 @pytest.fixture
@@ -32,7 +31,6 @@ def subject(
     return ModuleCore(
         module_id="1234",
         engine_client=mock_engine_client,
-        api_version=APIVersion(2, 12),
     )
 
 

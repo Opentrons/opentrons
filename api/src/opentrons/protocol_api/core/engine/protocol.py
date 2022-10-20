@@ -168,7 +168,6 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         return module_core_cls(
             module_id=result.moduleId,
             engine_client=self._engine_client,
-            api_version=self.api_version,
         )
 
     def load_instrument(

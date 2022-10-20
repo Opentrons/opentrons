@@ -142,7 +142,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
             location=self._core,
         )
 
-        labware = self._core.add_labware_core(labware_core)
+        labware = self._core.add_labware_core(labware_core, self._api_version)
 
         return labware
 
