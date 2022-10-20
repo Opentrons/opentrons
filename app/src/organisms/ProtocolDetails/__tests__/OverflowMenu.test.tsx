@@ -49,7 +49,7 @@ describe('ProtocolDetailsOverflowMenu', () => {
     fireEvent.click(button)
     getByText('Show in folder')
     getByText('Reanalyze')
-    getByText('Delete protocol')
+    getByText('Delete')
     getByRole('link', { name: 'Open Protocol Designer' })
   })
 
@@ -71,11 +71,11 @@ describe('ProtocolDetailsOverflowMenu', () => {
     expect(mockAnalyzeProtocol).toHaveBeenCalled()
   })
 
-  it('should render modal when clicking delete protocol button', () => {
+  it('should render modal when clicking delete button', () => {
     const [{ getByTestId, getByText, getByRole }] = render()
     const button = getByTestId('ProtocolDetailsOverflowMenu_overflowBtn')
     fireEvent.click(button)
-    const deleteButton = getByText('Delete protocol')
+    const deleteButton = getByText('Delete')
     fireEvent.click(deleteButton)
     getByText('Delete this protocol?')
     getByText(
@@ -85,11 +85,11 @@ describe('ProtocolDetailsOverflowMenu', () => {
     getByRole('button', { name: 'cancel' })
   })
 
-  it('should call detele function when clicking yes button', () => {
+  it('should call delete function when clicking yes button', () => {
     const [{ getByTestId, getByText, getByRole }] = render()
     const button = getByTestId('ProtocolDetailsOverflowMenu_overflowBtn')
     fireEvent.click(button)
-    const deleteButton = getByText('Delete protocol')
+    const deleteButton = getByText('Delete')
     fireEvent.click(deleteButton)
     const yesButton = getByRole('button', { name: 'Yes, delete protocol' })
     fireEvent.click(yesButton)
@@ -100,7 +100,7 @@ describe('ProtocolDetailsOverflowMenu', () => {
     const [{ getByTestId, getByText, getByRole, queryByText }] = render()
     const button = getByTestId('ProtocolDetailsOverflowMenu_overflowBtn')
     fireEvent.click(button)
-    const deleteButton = getByText('Delete protocol')
+    const deleteButton = getByText('Delete')
     fireEvent.click(deleteButton)
     const cancelButton = getByRole('button', { name: 'cancel' })
     fireEvent.click(cancelButton)
