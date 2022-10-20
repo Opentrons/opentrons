@@ -179,7 +179,7 @@ def test_open_lid(
     subject: ThermocyclerContext,
 ) -> None:
     """It should open the lid via the core."""
-    decoy.when(mock_core.open_lid()).then_return("open")
+    decoy.when(mock_core.open_lid()).then_return(ThermocyclerLidStatus.OPEN)
 
     result = subject.open_lid()
 
@@ -208,7 +208,7 @@ def test_close_lid(
     subject: ThermocyclerContext,
 ) -> None:
     """It should close the lid via the core."""
-    decoy.when(mock_core.close_lid()).then_return("closed")
+    decoy.when(mock_core.close_lid()).then_return(ThermocyclerLidStatus.CLOSED)
 
     result = subject.close_lid()
 

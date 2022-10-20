@@ -292,9 +292,9 @@ def test_open_lid(
             minimum_z_height=None,
             speed=None,
         ),
-        decoy.prop(mock_geometry.lid_status).set("open"),
+        decoy.prop(mock_geometry.lid_status).set(ThermocyclerLidStatus.OPEN),
     )
-    assert result == "open"
+    assert result == ThermocyclerLidStatus.OPEN
 
 
 def test_close_lid(
@@ -334,9 +334,9 @@ def test_close_lid(
             minimum_z_height=None,
             speed=None,
         ),
-        decoy.prop(mock_geometry.lid_status).set("closed"),
+        decoy.prop(mock_geometry.lid_status).set(ThermocyclerLidStatus.CLOSED),
     )
-    assert result == "closed"
+    assert result == ThermocyclerLidStatus.CLOSED
 
 
 def test_set_target_block_temperature(

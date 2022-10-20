@@ -238,13 +238,13 @@ class LegacyThermocyclerCore(
     _sync_module_hardware: SynchronousAdapter[hw_modules.Thermocycler]
     _geometry: ThermocyclerGeometry
 
-    def open_lid(self) -> str:
+    def open_lid(self) -> ThermocyclerLidStatus:
         """Open the thermocycler's lid."""
         self._prepare_for_lid_move()
         self._geometry.lid_status = self._sync_module_hardware.open()
         return self._geometry.lid_status
 
-    def close_lid(self) -> str:
+    def close_lid(self) -> ThermocyclerLidStatus:
         """Close the thermocycler's lid."""
         self._prepare_for_lid_move()
         self._geometry.lid_status = self._sync_module_hardware.close()
