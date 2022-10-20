@@ -117,9 +117,12 @@ class LabwareMovementHandler:
     ) -> List[Point]:
         """Get waypoints for gripper to move to a specified location."""
         # TODO: remove this after support for module locations is added
-        assert isinstance(
+        if not isinstance(
             location, DeckSlotLocation
-        ), "Moving labware to & from modules with a gripper is not implemented yet."
+        ):
+            raise NotImplementedError(
+                "Moving labware to & from modules with a gripper is not implemented yet."
+            )
 
         # Keeping grip height as half of overall height of labware
         grip_height = (
