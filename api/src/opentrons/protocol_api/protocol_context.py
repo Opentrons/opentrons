@@ -685,7 +685,6 @@ def _create_module_context(
     api_version: APIVersion,
     broker: Broker,
 ) -> ModuleTypes:
-    print(module_core)
     module_cls: Optional[Type[ModuleTypes]] = None
     if isinstance(module_core, AbstractTemperatureModuleCore):
         module_cls = TemperatureModuleContext
