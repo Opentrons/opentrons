@@ -407,7 +407,7 @@ export interface LoadedLabware {
   }
 }
 
-export interface LoadedLiquid {
+export interface Liquid {
   id: string
   displayName: string
   description: string
@@ -426,7 +426,7 @@ export interface CompletedProtocolAnalysis {
   result: 'ok' | 'not-ok' | 'error'
   pipettes: LoadedPipette[]
   labware: LoadedLabware[]
-  liquids: LoadedLiquid[]
+  liquids: Liquid[]
   commands: RunTimeCommand[]
   errors: AnalysisError[]
 }

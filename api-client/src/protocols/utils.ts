@@ -6,7 +6,7 @@ import type {
   LabwareDefinition2,
   ModuleModel,
   PipetteName,
-  LoadedLiquid,
+  Liquid,
 } from '@opentrons/shared-data'
 import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type {
@@ -245,18 +245,10 @@ export function parseInitialLoadedModulesBySlot(
   )
 }
 
-export interface LoadedLiquidsById {
-  [liquidId: string]: {
-    displayName: string
-    description: string
-    displayColor?: string
-  }
-}
-
 export function parseLiquidsInLoadOrder(
-  liquids: LoadedLiquid[],
+  liquids: Liquid[],
   commands: RunTimeCommand[]
-): LoadedLiquid[] {
+): Liquid[] {
   const loadLiquidCommands = commands.filter(
     (command): command is LoadLiquidRunTimeCommand =>
       command.commandType === 'loadLiquid'
@@ -270,7 +262,7 @@ export function parseLiquidsInLoadOrder(
     }
   })
 
-  return reduce<LoadLiquidRunTimeCommand, LoadedLiquid[]>(
+  return reduce<LoadLiquidRunTimeCommand, Liquid[]>(
     loadLiquidCommands,
     (acc, command) => {
       const liquid = loadedLiquids.find(
