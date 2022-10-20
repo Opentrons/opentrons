@@ -1506,7 +1506,6 @@ class OT3API(
                 pass_settings.prep_distance_mm + pass_settings.max_overrun_distance_mm
             )
         else:
-
             pass_start = target_pos + pass_settings.prep_distance_mm
             pass_distance = -1.0 * (
                 pass_settings.prep_distance_mm + pass_settings.max_overrun_distance_mm
@@ -1520,10 +1519,7 @@ class OT3API(
         pass_start_pos = moving_axis.set_in_point(here, pass_start)
         await self.move_to(mount, pass_start_pos)
         await self._backend.capacitive_probe(
-            mount,
-            moving_axis,
-            machine_pass_distance,
-            pass_settings.speed_mm_per_s,
+            mount, moving_axis, machine_pass_distance, pass_settings
         )
         end_pos = await self.gantry_position(mount, refresh=True)
         await self.move_to(mount, pass_start_pos)

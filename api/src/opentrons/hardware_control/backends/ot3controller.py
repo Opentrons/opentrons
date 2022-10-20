@@ -18,7 +18,7 @@ from typing import (
     TypeVar,
     Iterator,
 )
-from opentrons.config.types import OT3Config, GantryLoad
+from opentrons.config.types import OT3Config, GantryLoad, CapacitivePassSettings
 from opentrons.config import pipette_config, gripper_config
 from .ot3utils import (
     axis_convert,
@@ -770,14 +770,15 @@ class OT3Controller:
         mount: OT3Mount,
         moving: OT3Axis,
         distance_mm: float,
-        speed_mm_per_s: float,
+        capacitive_settings: CapacitivePassSettings,
     ) -> None:
         pos, _ = await capacitive_probe(
             self._messenger,
             sensor_node_for_mount(mount),
             axis_to_node(moving),
             distance_mm,
-            speed_mm_per_s,
+            capacitive_settings.speed_mm_per_s,
+            relative_threshold_pf=capacitive_settings.sensor_threshold_pf,
             log_sensor_values=True,
         )
 

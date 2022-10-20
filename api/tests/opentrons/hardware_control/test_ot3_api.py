@@ -218,7 +218,9 @@ async def test_capacitive_probe(
 
     # This is a negative probe because the current position is the home position
     # which is very large.
-    mock_backend_capacitive_probe.assert_called_once_with(mount, moving, 3, 4)
+    mock_backend_capacitive_probe.assert_called_once_with(
+        mount, moving, 3.0, fake_settings
+    )
 
     original = moving.set_in_point(here, 0)
     for call in mock_move_to.call_args_list:
