@@ -144,10 +144,6 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
 
         labware = self._core.add_labware_core(labware_core)
 
-        # TODO(mc, 2022-09-08): move this into legacy PAPIv2 implementation
-        # by reworking the `Deck` and/or `ModuleGeometry` interface
-        self._protocol_core.get_deck().recalculate_high_z()
-
         return labware
 
     @requires_version(2, 0)

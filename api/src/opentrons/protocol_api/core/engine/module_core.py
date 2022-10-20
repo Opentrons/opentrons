@@ -26,7 +26,6 @@ from ..module import (
     AbstractHeaterShakerCore,
 )
 from .labware import LabwareCore
-from ...validation import ensure_module_model
 
 
 class ModuleCore(AbstractModuleCore[LabwareCore]):
@@ -56,8 +55,7 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
 
     def get_model(self) -> ModuleModel:
         """Get the module's model identifier."""
-        model = self._engine_client.state.modules.get_model(self.module_id)
-        return ensure_module_model(model)
+        raise NotImplementedError("get_model not implemented")
 
     def get_type(self) -> ModuleType:
         """Get the module's general type identifier."""
