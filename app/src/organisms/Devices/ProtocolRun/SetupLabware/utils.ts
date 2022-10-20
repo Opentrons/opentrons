@@ -15,18 +15,18 @@ export const getAllLabwareAndTiprackIdsInOrder = (
   labwareDefinitions: Record<string, LabwareDefinition2>,
   commands: RunTimeCommand[]
 ): string[] => {
-  const unorderedLabware = labware.reduce<LabwareToOrder[]>(
-    (unorderedLabware, currentLabware) => {
+  const orderedLabware = labware.reduce<LabwareToOrder[]>(
+    (orderedLabware, currentLabware) => {
       const labwareDef = labwareDefinitions[currentLabware.definitionUri]
       const slotName = getSlotLabwareName(currentLabware.id, commands).slotName
 
       if (
         !getSlotHasMatingSurfaceUnitVector(standardDeckDef as any, slotName)
       ) {
-        return [...unorderedLabware]
+        return [...orderedLabware]
       }
       return [
-        ...unorderedLabware,
+        ...orderedLabware,
         {
           definition: labwareDef,
           labwareId: currentLabware.id,
@@ -36,7 +36,7 @@ export const getAllLabwareAndTiprackIdsInOrder = (
     },
     []
   )
-  const orderedLabwareIds = unorderedLabware
+  const orderedLabwareIds = orderedLabware
     .sort(orderBySlot)
     .map(({ labwareId }) => labwareId)
 
