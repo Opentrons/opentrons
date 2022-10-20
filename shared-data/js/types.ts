@@ -22,6 +22,7 @@ import {
 import type { INode } from 'svgson'
 import type { RunTimeCommand } from '../protocol'
 import type { PipetteName } from './pipettes'
+import { LabwareLocation } from '../protocol/types/schemaV6/command/setup'
 
 export type RobotName = 'OT-2 Standard' | 'OT-3 Standard'
 
@@ -265,12 +266,6 @@ export interface DeckMetadata {
   tags: string[]
 }
 
-export interface DeckLayerFeature {
-  footprint: string
-}
-
-export type DeckLayer = DeckLayerFeature[]
-
 export interface DeckDefinition {
   otId: string
   cornerOffsetFromOrigin: CoordinateTuple
@@ -278,7 +273,7 @@ export interface DeckDefinition {
   robot: DeckRobot
   locations: DeckLocations
   metadata: DeckMetadata
-  layers: Record<string, DeckLayer>
+  layers: INode[]
 }
 
 export interface ModuleDimensions {
@@ -402,17 +397,25 @@ export interface LoadedLabware {
   id: string
   loadName: string
   definitionUri: string
-  location: {
-    slotName: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
-  }
+  location: LabwareLocation
+  offsetId?: string
+  displayName?: string
 }
-
+export interface LoadedModule {
+  id: string
+  model: ModuleModel
+  location: {
+    slotName: string
+  }
+  serialNumber: string
+}
 export interface Liquid {
   id: string
   displayName: string
   description: string
-  displayColor: string
+  displayColor?: string
 }
+
 export interface AnalysisError {
   id: string
   detail: string

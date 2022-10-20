@@ -15,10 +15,6 @@ from opentrons.hardware_control.modules import ModuleType as ModuleType
 from opentrons_shared_data.pipette.dev_types import (  # noqa: F401
     # convenience re-export of LabwareUri type
     LabwareUri as LabwareUri,
-    # TODO(mc, 2022-09-01): re-consider pickle usage in robot-server.
-    # This re-export of PipetteName prevents pickle breakage
-    # https://opentrons.atlassian.net/browse/RSS-94
-    PipetteNameType as PipetteName,
 )
 
 
@@ -51,8 +47,11 @@ class ModuleLocation(BaseModel):
     )
 
 
-LabwareLocation = Union[DeckSlotLocation, ModuleLocation]
-"""Union of all locations where it's legal to load a labware."""
+_OffDeckLocationType = Literal["offDeck"]
+OFF_DECK_LOCATION: _OffDeckLocationType = "offDeck"
+
+LabwareLocation = Union[DeckSlotLocation, ModuleLocation, _OffDeckLocationType]
+"""Union of all locations where it's legal to keep a labware."""
 
 
 class WellOrigin(str, Enum):

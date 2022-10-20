@@ -5,7 +5,8 @@ import pytest
 
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.temp_deck import AbstractTempDeckDriver
-from opentrons.hardware_control import modules, ExecutionManager
+from opentrons.hardware_control import modules, poller, ExecutionManager
+from opentrons.hardware_control.modules.tempdeck import TempDeckReader
 
 
 @pytest.fixture
@@ -53,12 +54,12 @@ async def test_sim_state(subject: modules.AbstractModule):
 
 
 async def test_sim_update(subject: modules.AbstractModule):
-    await subject.set_temperature(10)
+    await subject.start_set_temperature(10)
+    await subject.await_temperature(None)
     assert subject.temperature == 10
     assert subject.target == 10
     assert subject.status == "holding at target"
     await subject.deactivate()
-    await subject.wait_next_poll()
     assert subject.temperature == 23
     assert subject.target is None
     assert subject.status == "idle"
@@ -77,16 +78,18 @@ async def test_revision_model_parsing(subject: modules.AbstractModule):
 
 async def test_poll_error(usb_port: USBPort) -> None:
     mock_driver = AsyncMock(spec=AbstractTempDeckDriver)
-    mock_driver.get_temperature.side_effect = ValueError("hello!")
+    mock_reader = AsyncMock(spec=TempDeckReader)
+    mock_reader.read.side_effect = ValueError("hello!")
 
     tempdeck = modules.TempDeck(
         port="",
         usb_port=usb_port,
         execution_manager=AsyncMock(spec=ExecutionManager),
         driver=mock_driver,
+        reader=mock_reader,
+        poller=poller.Poller(reader=mock_reader, interval=0.1),
         device_info={},
         loop=asyncio.get_running_loop(),
-        polling_frequency=1,
     )
     with pytest.raises(ValueError, match="hello!"):
         await tempdeck.wait_next_poll()

@@ -245,10 +245,24 @@ export function parseInitialLoadedModulesBySlot(
   )
 }
 
+export interface LiquidsById {
+  [liquidId: string]: {
+    displayName: string
+    description: string
+    displayColor?: string
+  }
+}
+
+// NOTE: a parsed liquid only differs from an analysis liquid in that
+// it will always have a displayColor
+export interface ParsedLiquid extends Omit<Liquid, 'displayColor'> {
+  displayColor: string
+}
+
 export function parseLiquidsInLoadOrder(
   liquids: Liquid[],
   commands: RunTimeCommand[]
-): Liquid[] {
+): ParsedLiquid[] {
   const loadLiquidCommands = commands.filter(
     (command): command is LoadLiquidRunTimeCommand =>
       command.commandType === 'loadLiquid'
@@ -262,7 +276,7 @@ export function parseLiquidsInLoadOrder(
     }
   })
 
-  return reduce<LoadLiquidRunTimeCommand, Liquid[]>(
+  return reduce<LoadLiquidRunTimeCommand, ParsedLiquid[]>(
     loadLiquidCommands,
     (acc, command) => {
       const liquid = loadedLiquids.find(

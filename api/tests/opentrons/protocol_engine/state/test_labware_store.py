@@ -16,6 +16,7 @@ from opentrons.protocol_engine.types import (
     LabwareOffsetLocation,
     DeckSlotLocation,
     LoadedLabware,
+    OFF_DECK_LOCATION,
 )
 from opentrons.protocol_engine.actions import (
     AddLabwareOffsetAction,
@@ -24,7 +25,11 @@ from opentrons.protocol_engine.actions import (
 )
 from opentrons.protocol_engine.state.labware import LabwareStore, LabwareState
 
-from .command_fixtures import create_load_labware_command
+from .command_fixtures import (
+    create_load_labware_command,
+    create_move_labware_command,
+    create_move_labware_off_deck_command,
+)
 
 
 @pytest.fixture
@@ -164,3 +169,76 @@ def test_handles_add_labware_definition(
     subject.handle_action(AddLabwareDefinitionAction(definition=well_plate_def))
 
     assert subject.state.definitions_by_uri[expected_uri] == well_plate_def
+
+
+def test_handles_move_labware(
+    subject: LabwareStore,
+    well_plate_def: LabwareDefinition,
+) -> None:
+    """It should update labware state with new location & offset."""
+    load_labware_command = create_load_labware_command(
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        labware_id="my-labware-id",
+        definition=well_plate_def,
+        offset_id="old-offset-id",
+        display_name="display-name",
+    )
+    offset_request = LabwareOffsetCreate(
+        definitionUri="offset-definition-uri",
+        location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
+        vector=LabwareOffsetVector(x=1, y=2, z=3),
+    )
+    subject.handle_action(
+        AddLabwareOffsetAction(
+            request=offset_request,
+            labware_offset_id="old-offset-id",
+            created_at=datetime(year=2021, month=1, day=2),
+        )
+    )
+    subject.handle_action(UpdateCommandAction(command=load_labware_command))
+
+    move_command = create_move_labware_command(
+        labware_id="my-labware-id",
+        new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        offset_id="my-new-offset",
+    )
+    subject.handle_action(UpdateCommandAction(command=move_command))
+
+    assert subject.state.labware_by_id["my-labware-id"].location == DeckSlotLocation(
+        slotName=DeckSlotName.SLOT_4
+    )
+    assert subject.state.labware_by_id["my-labware-id"].offsetId == "my-new-offset"
+
+
+def test_handles_move_labware_off_deck(
+    subject: LabwareStore,
+    well_plate_def: LabwareDefinition,
+) -> None:
+    """It should update labware state with new location & offset."""
+    load_labware_command = create_load_labware_command(
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        labware_id="my-labware-id",
+        definition=well_plate_def,
+        offset_id="old-offset-id",
+        display_name="display-name",
+    )
+    offset_request = LabwareOffsetCreate(
+        definitionUri="offset-definition-uri",
+        location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
+        vector=LabwareOffsetVector(x=1, y=2, z=3),
+    )
+    subject.handle_action(
+        AddLabwareOffsetAction(
+            request=offset_request,
+            labware_offset_id="old-offset-id",
+            created_at=datetime(year=2021, month=1, day=2),
+        )
+    )
+    subject.handle_action(UpdateCommandAction(command=load_labware_command))
+
+    move_labware_off_deck_cmd = create_move_labware_off_deck_command(
+        labware_id="my-labware-id"
+    )
+    subject.handle_action(UpdateCommandAction(command=move_labware_off_deck_cmd))
+    assert subject.state.labware_by_id["my-labware-id"].location == OFF_DECK_LOCATION
+    assert subject.state.labware_by_id["my-labware-id"].offsetId is None
