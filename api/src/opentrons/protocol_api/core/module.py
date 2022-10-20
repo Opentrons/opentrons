@@ -53,6 +53,7 @@ class AbstractModuleCore(ABC, Generic[LabwareCoreType]):
         """Get the module's deck slot."""
 
     @abstractmethod
+    # TODO(mc, 2022-10-20): make this a side-effect, not a return
     def add_labware_core(self, labware_core: LabwareCoreType) -> Labware:
         """Add a labware to the module."""
 
