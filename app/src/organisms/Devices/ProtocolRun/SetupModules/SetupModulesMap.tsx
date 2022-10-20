@@ -10,26 +10,20 @@ import {
   RobotWorkSpace,
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
-  useHoverTooltip,
-  ALIGN_CENTER,
   COLORS,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { inferModuleOrientationFromXCoordinate } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
-
-import { PrimaryButton } from '../../../atoms/buttons'
-import { Tooltip } from '../../../atoms/Tooltip'
-import { HeaterShakerBanner } from '../../../organisms/ProtocolSetup/RunSetupCard/ModuleSetup/HeaterShakerSetupWizard/HeaterShakerBanner'
-import { ModuleInfo } from '../../../organisms/ProtocolSetup/RunSetupCard/ModuleSetup/ModuleInfo'
-import { UnMatchedModuleWarning } from '../../../organisms/ProtocolSetup/RunSetupCard/ModuleSetup/UnMatchedModuleWarning'
-import { MultipleModulesModal } from '../../../organisms/ProtocolSetup/RunSetupCard/ModuleSetup/MultipleModulesModal'
+import { HeaterShakerBanner } from '../../../ProtocolSetup/RunSetupCard/ModuleSetup/HeaterShakerSetupWizard/HeaterShakerBanner'
+import { ModuleInfo } from '../../../ProtocolSetup/RunSetupCard/ModuleSetup/ModuleInfo'
+import { UnMatchedModuleWarning } from '../../../ProtocolSetup/RunSetupCard/ModuleSetup/UnMatchedModuleWarning'
+import { MultipleModulesModal } from '../../../ProtocolSetup/RunSetupCard/ModuleSetup/MultipleModulesModal'
 import {
   useModuleRenderInfoForProtocolById,
-  useRunHasStarted,
   useUnmatchedModulesForProtocol,
-} from '../hooks'
+} from '../../hooks'
 
 const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
@@ -42,28 +36,26 @@ const DECK_LAYER_BLOCKLIST = [
 ]
 const DECK_VIEW_BOX = '-80 -40 550 510'
 
-interface SetupModulesProps {
-  expandLabwareSetupStep: () => void
+interface SetupModulesMapProps {
   robotName: string
   runId: string
 }
 
-export const SetupModules = ({
-  expandLabwareSetupStep,
+export const SetupModulesMap = ({
   robotName,
   runId,
-}: SetupModulesProps): JSX.Element => {
+}: SetupModulesMapProps): JSX.Element => {
   const { t } = useTranslation('protocol_setup')
-  const [targetProps, tooltipProps] = useHoverTooltip()
+
   const moduleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById(
     robotName,
     runId
   )
+
   const {
     missingModuleIds,
     remainingAttachedModules,
   } = useUnmatchedModulesForProtocol(robotName, runId)
-  const runHasStarted = useRunHasStarted(runId)
 
   const [
     showMultipleModulesModal,
@@ -154,24 +146,6 @@ export const SetupModules = ({
           )}
         </RobotWorkSpace>
       </Box>
-      <PrimaryButton
-        title={t('proceed_to_labware_setup_step')}
-        disabled={missingModuleIds.length > 0 || runHasStarted}
-        onClick={expandLabwareSetupStep}
-        id="ModuleSetup_proceedToLabwareSetup"
-        alignSelf={ALIGN_CENTER}
-        padding={`${SPACING.spacing3} ${SPACING.spacing4}`}
-        {...targetProps}
-      >
-        {t('proceed_to_labware_setup_step')}
-      </PrimaryButton>
-      {missingModuleIds.length > 0 || runHasStarted ? (
-        <Tooltip tooltipProps={tooltipProps}>
-          {runHasStarted
-            ? t('protocol_run_started')
-            : t('plug_in_required_module', { count: missingModuleIds.length })}
-        </Tooltip>
-      ) : null}
     </Flex>
   )
 }

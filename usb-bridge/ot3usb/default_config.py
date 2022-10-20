@@ -25,3 +25,6 @@ default_gadget = SerialGadgetConfig(
 
 # The name of the PHY in sysfs for the OT3
 PHY_NAME = "usbphynop1"
+
+DEFAULT_IP = "localhost"
+DEFAULT_PORT = 31950
