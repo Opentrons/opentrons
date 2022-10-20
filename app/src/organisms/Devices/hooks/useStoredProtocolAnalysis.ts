@@ -73,6 +73,7 @@ export function useStoredProtocolAnalysis(
 
   // @ts-expect-error
   return storedProtocolAnalysis != null && 'modules' in storedProtocolAnalysis
-    ? schemaV6Adapter(storedProtocolAnalysis)
+    ? // @ts-expect-error
+      schemaV6Adapter(storedProtocolAnalysis)
     : parseProtocolAnalysisOutput(storedProtocolAnalysis)
 }
