@@ -9,7 +9,7 @@ import { useProtocolDetailsForRun } from '../../Devices/hooks'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { SectionList } from '../SectionList'
 import { DeckMap } from '../DeckMap'
-import { SummaryScreen } from '../SummaryScreen'
+import { ResultsSummary } from '../ResultsSummary'
 import { LabwareOffsetsSummary } from '../LabwareOffsetsSummary'
 import { useIntroInfo, useLabwareOffsets } from '../hooks'
 import { DeprecatedSection } from '../types'
@@ -58,20 +58,27 @@ const LABWARE_DEF = {
 }
 const MOCK_RUN_ID = 'fake_run_id'
 
-const render = (props: React.ComponentProps<typeof SummaryScreen>) => {
-  return renderWithProviders(<SummaryScreen {...props} />, {
+const render = (props: React.ComponentProps<typeof ResultsSummary>) => {
+  return renderWithProviders(<ResultsSummary {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
+const mockWorkingOffset = {
+  labwareId: 'labwareId1' ,
+  location: {slotName: '1'} ,
+  initialPosition: {x: '1', y: '2', z: '3'} ,
+  finalPosition: {x: '2', y: '3', z: '4'}
+}
 let mockTrackEvent: jest.Mock
-describe('SummaryScreen', () => {
-  let props: React.ComponentProps<typeof SummaryScreen>
+describe('ResultsSummary', () => {
+  let props: React.ComponentProps<typeof ResultsSummary>
 
   beforeEach(() => {
     props = {
-      savePositionCommandData: { someLabwareIf: ['commandId1', 'commandId2'] },
-      onCloseClick: jest.fn(),
+      protocolData: {},
+      workingOffsets: [],
+      handleApplyOffsets: jest.fn(),
     }
     mockUseCurrentRunId.mockReturnValue(MOCK_RUN_ID)
     mockSectionList.mockReturnValue(<div>Mock SectionList</div>)
