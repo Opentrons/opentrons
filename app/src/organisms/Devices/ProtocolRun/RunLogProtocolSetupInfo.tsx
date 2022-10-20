@@ -2,11 +2,18 @@ import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
 import { SPACING } from '@opentrons/components'
-import { getModuleDisplayName } from '@opentrons/shared-data'
+import {
+  getModuleDisplayName,
+  getLabwareDisplayName,
+} from '@opentrons/shared-data'
 import { parseLiquidsInLoadOrder } from '@opentrons/api-client'
 
 import { StyledText } from '../../../atoms/text'
-import { useProtocolDetailsForRun, useRunPipetteInfoByMount } from '../hooks'
+import {
+  useProtocolDetailsForRun,
+  useRunPipetteInfoByMount,
+  useLabwareRenderInfoForRunById,
+} from '../hooks'
 
 import type { RunCommandSummary } from '@opentrons/api-client'
 import type { Mount } from '@opentrons/components'
@@ -27,6 +34,7 @@ export const RunLogProtocolSetupInfo = ({
   const { t } = useTranslation('run_details')
   const { protocolData } = useProtocolDetailsForRun(runId)
   const protocolPipetteData = useRunPipetteInfoByMount(robotName, runId)
+  const labwareRenderInfoById = useLabwareRenderInfoForRunById(runId)
 
   if (protocolData == null) return null
   if (setupCommand === undefined) return null
@@ -139,7 +147,9 @@ export const RunLogProtocolSetupInfo = ({
         i18nKey={'load_liquids_info_protocol_setup'}
         values={{
           liquid: liquidDisplayName ?? 'liquid',
-          labware: protocolData.labware[labwareId].displayName,
+          labware: getLabwareDisplayName(
+            labwareRenderInfoById[labwareId].labwareDef
+          ),
         }}
       />
     )

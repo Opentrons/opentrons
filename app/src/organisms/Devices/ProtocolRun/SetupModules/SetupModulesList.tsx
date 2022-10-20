@@ -144,8 +144,13 @@ export const ModulesListItem = ({
         </StyledText>
         <Flex width="15%">
           <StatusLabel
+            id={location}
             status={moduleConnectionStatus}
-            backgroundColor={COLORS.successBackgroundLight}
+            backgroundColor={
+              attachedModuleMatch != null
+                ? COLORS.successBackgroundLight
+                : COLORS.warningBackgroundLight
+            }
             iconColor={
               attachedModuleMatch != null
                 ? COLORS.successEnabled
