@@ -78,7 +78,7 @@ async def test_poller_concurrency(
     """It should wait for a full poll before notifying."""
     # wait for the first read to start
     asyncio.create_task(subject.start())
-    await asyncio.wait_for(read_started_event.wait(), timeout=2 * subject.interval)
+    await asyncio.wait_for(read_started_event.wait(), timeout=4 * subject.interval)
 
     # subscribe in the middle of the first read
     poll_notification = asyncio.create_task(subject.wait_next_poll())
@@ -86,7 +86,7 @@ async def test_poller_concurrency(
     # allow the first read to finish, then wait for the second read to start
     read_started_event.clear()
     ok_to_finish_read_event.set()
-    await asyncio.wait_for(read_started_event.wait(), timeout=2 * subject.interval)
+    await asyncio.wait_for(read_started_event.wait(), timeout=4 * subject.interval)
 
     # verify that our wait isn't done, because it was kicked off after the first read started
     assert poll_notification.done() is False
@@ -94,7 +94,7 @@ async def test_poller_concurrency(
     # allow the second read to complete and wait for the third read to start
     read_started_event.clear()
     ok_to_finish_read_event.set()
-    await asyncio.wait_for(read_started_event.wait(), timeout=2 * subject.interval)
+    await asyncio.wait_for(read_started_event.wait(), timeout=4 * subject.interval)
 
     # verify the waiter has now been notified since it's been through the full second read
     assert poll_notification.done() is True
@@ -108,15 +108,15 @@ async def test_poller_stop_waits_for_poll(
 ) -> None:
     # wait for the first read to start
     asyncio.create_task(subject.start())
-    await asyncio.wait_for(read_started_event.wait(), timeout=2 * subject.interval)
+    await asyncio.wait_for(read_started_event.wait(), timeout=4 * subject.interval)
 
     # request a stop in the middle of the first read
     stop_request = asyncio.create_task(subject.stop())
-    await asyncio.sleep(2 * subject.interval)
+    await asyncio.sleep(4 * subject.interval)
     assert stop_request.done() is False
 
     ok_to_finish_read_event.set()
-    await asyncio.sleep(subject.interval)
+    await asyncio.sleep(2 * subject.interval)
     assert stop_request.done() is True
 
 
