@@ -519,7 +519,7 @@
           },
 
           {
-            "description": "[PROVISIONAL AND EXPERIMENTAL] Initiate automatic calibration of a pipette.",
+            "description": "[This command is for internal use only and should NOT be used in protocols.] Initiate automatic calibration of a pipette.",
             "type": "object",
             "required": ["commandType", "params"],
             "properties": {
