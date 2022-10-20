@@ -97,13 +97,9 @@ class LegacyModuleCore(AbstractModuleCore[LabwareImplementation]):
 
     def add_labware_core(self, labware_core: LabwareImplementation) -> Labware:
         """Add a labware to the module."""
-        # TODO(mc, 2022-09-08): move this into legacy PAPIv2 implementation
-        # by reworking the `Deck` and/or `ModuleGeometry` interface
+        labware = self.geometry.add_labware(Labware(implementation=labware_core))
         self._protocol_core.get_deck().recalculate_high_z()
-
-        # TODO(mc, 2022-09-02): add API version
-        # https://opentrons.atlassian.net/browse/RSS-97
-        return self.geometry.add_labware(Labware(implementation=labware_core))
+        return labware
 
 
 class LegacyTemperatureModuleCore(
@@ -227,9 +223,7 @@ class LegacyMagneticModuleCore(
 
     def add_labware_core(self, labware_core: LabwareImplementation) -> Labware:
         """Add a labware to the module."""
-        # TODO(mc, 2022-09-02): add API version
-        # https://opentrons.atlassian.net/browse/RSS-97
-        return super().add_labware_core(labware_core)
+        labware = super().add_labware_core(labware_core)
         if labware_core.get_default_magnet_engage_height() is None:
             name = labware_core.get_name()
             _log.warning(
@@ -237,6 +231,7 @@ class LegacyMagneticModuleCore(
                 " default engagement height for use with the Magnetic Module;"
                 " you must specify a height explicitly when calling engage()."
             )
+        return labware
 
 
 class LegacyThermocyclerCore(

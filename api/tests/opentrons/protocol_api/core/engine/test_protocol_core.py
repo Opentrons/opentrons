@@ -43,6 +43,7 @@ from opentrons.protocol_api.core.engine.module_core import (
     HeaterShakerModuleCore,
 )
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry
+from opentrons.protocols.api_support.types import APIVersion
 
 
 @pytest.fixture
@@ -60,7 +61,7 @@ def mock_engine_client(decoy: Decoy) -> EngineClient:
 @pytest.fixture
 def subject(mock_engine_client: EngineClient) -> ProtocolCore:
     """Get a ProtocolCore test subject with its dependencies mocked out."""
-    return ProtocolCore(engine_client=mock_engine_client)
+    return ProtocolCore(engine_client=mock_engine_client, api_version=APIVersion(2, 12))
 
 
 def test_load_instrument(
@@ -145,6 +146,7 @@ def test_load_labware_on_module(
         location=ModuleCore(
             module_id="module-id",
             engine_client=mock_engine_client,
+            api_version=APIVersion(2, 12),
         ),
         label="some_display_name",  # maps to optional display name
         namespace="some_explicit_namespace",

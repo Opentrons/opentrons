@@ -16,6 +16,7 @@ from opentrons.hardware_control.modules.types import (
 )
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
 
@@ -52,8 +53,16 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             that is executing the protocol.
     """
 
-    def __init__(self, engine_client: ProtocolEngineClient) -> None:
+    def __init__(
+        self, engine_client: ProtocolEngineClient, api_version: APIVersion
+    ) -> None:
         self._engine_client = engine_client
+        self._api_version = api_version
+
+    @property
+    def api_version(self) -> APIVersion:
+        """Get the api version protocol target."""
+        return self._api_version
 
     def get_bundled_data(self) -> Dict[str, bytes]:
         """Get a map of file names to byte contents.
@@ -159,6 +168,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         return module_core_cls(
             module_id=result.moduleId,
             engine_client=self._engine_client,
+            api_version=self.api_version,
         )
 
     def load_instrument(

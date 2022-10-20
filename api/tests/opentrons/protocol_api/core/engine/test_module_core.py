@@ -6,11 +6,10 @@ from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_api.core.engine.module_core import ModuleCore
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
-    ModuleModel as EngineModuleModel,
 )
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.types import DeckSlotName
-from opentrons.hardware_control.modules.types import MagneticModuleModel
+from opentrons.protocols.api_support.types import APIVersion
 
 
 @pytest.fixture
@@ -33,6 +32,7 @@ def subject(
     return ModuleCore(
         module_id="1234",
         engine_client=mock_engine_client,
+        api_version=APIVersion(2, 12),
     )
 
 
@@ -45,4 +45,3 @@ def test_get_deck_slot(
     )
 
     assert subject.get_deck_slot() == DeckSlotName.SLOT_1
-

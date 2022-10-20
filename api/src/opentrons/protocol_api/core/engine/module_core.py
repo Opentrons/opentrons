@@ -17,6 +17,7 @@ from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_api import Labware
+from opentrons.protocols.api_support.types import APIVersion
 
 from ..module import (
     AbstractModuleCore,
@@ -39,14 +40,21 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
         self,
         module_id: str,
         engine_client: ProtocolEngineClient,
+        api_version: APIVersion,
     ) -> None:
         self._module_id = module_id
         self._engine_client = engine_client
+        self._api_version = api_version
 
     @property
     def module_id(self) -> str:
         """The module's unique ProtocolEngine ID."""
         return self._module_id
+
+    @property
+    def api_version(self) -> APIVersion:
+        """Return the API version supported by this protocol."""
+        return self._api_version
 
     @property
     def geometry(self) -> ModuleGeometry:
@@ -78,7 +86,7 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
 
     def add_labware_core(self, labware_core: LabwareCore) -> Labware:
         """Add a labware to the module."""
-        pass
+        return Labware(implementation=labware_core, api_level=self.api_version)
 
 
 class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore[LabwareCore]):
