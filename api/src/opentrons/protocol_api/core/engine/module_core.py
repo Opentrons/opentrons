@@ -69,8 +69,7 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
 
     def get_deck_slot(self) -> DeckSlotName:
         """Get the module's deck slot."""
-        modules_view = self._engine_client.state.modules
-        return modules_view.state.slot_by_module_id[self.module_id]
+        return self._engine_client.state.modules.get_location(self.module_id)
 
     def add_labware_core(self, labware_core: LabwareCore) -> None:
         """Add a labware to the module."""

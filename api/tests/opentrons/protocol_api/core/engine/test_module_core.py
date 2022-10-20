@@ -1,0 +1,26 @@
+"""Tests for opentrons.protocol_api.core.engine.ModuleCore."""
+import pytest
+from decoy import Decoy
+
+from opentrons.protocol_engine.clients import SyncClient as EngineClient
+from opentrons.protocol_api.core.engine.module_core import ModuleCore
+from opentrons.types import DeckSlotName
+
+
+@pytest.fixture
+def mock_engine_client(decoy: Decoy) -> EngineClient:
+    """Get a mock ProtocolEngine synchronous client."""
+    return decoy.mock(cls=EngineClient)
+
+
+@pytest.fixture()
+def subject(mock_engine_client: EngineClient) -> ModuleCore:
+    """Get a ModuleCore test subject."""
+    return ModuleCore(module_id="1234", engine_client=mock_engine_client)
+
+
+def test_get_deck_slot(decoy: Decoy, subject: ModuleCore, mock_engine_client: EngineClient) -> None:
+    """Should return the deck slot accosiated to the module id."""
+    decoy.when(mock_engine_client.state.modules.get_location("1234")).then_return(DeckSlotName.SLOT_1)
+
+    assert subject.get_deck_slot() == DeckSlotName.SLOT_1
