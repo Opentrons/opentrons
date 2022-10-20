@@ -19,16 +19,22 @@ export const getAllLabwareAndTiprackIdsInOrder = (
 ): string[] => {
   const unorderedLabware = reduce<typeof labware, LabwareToOrder[]>(
     labware,
-    (unorderedLabware, currentLabware, labwareId) => {
-      const labwareDef = labwareDefinitions[currentLabware.definitionId]
-      const labwareLocation = getLabwareLocation(labwareId, commands)
+    (unorderedLabware, currentLabware, labwareIndex) => {
+      //  @ts-expect-error: definitionUri will exist when we remove the schemaV6Adapter
+      const labwareDef = labwareDefinitions[currentLabware.definitionUri]
+      const labwareLocation = getLabwareLocation(
+        //  @ts-expect-error: id will exist when we remove the schemaV6Adapter
+        labware[labwareIndex].id,
+        commands
+      )
 
       if ('moduleId' in labwareLocation) {
         return [
           ...unorderedLabware,
           {
             definition: labwareDef,
-            labwareId: labwareId,
+            //  @ts-expect-error: id will exist when we remove the schemaV6Adapter
+            labwareId: labware[labwareIndex].id,
             slot: getModuleInitialLoadInfo(labwareLocation.moduleId, commands)
               .location.slotName,
           },
@@ -47,7 +53,8 @@ export const getAllLabwareAndTiprackIdsInOrder = (
         ...unorderedLabware,
         {
           definition: labwareDef,
-          labwareId: labwareId,
+          //  @ts-expect-error: id will exist when we remove the schemaV6Adapter
+          labwareId: labware[labwareIndex].id,
           slot: labwareLocation.slotName,
         },
       ]
