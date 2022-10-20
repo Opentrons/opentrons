@@ -4,8 +4,8 @@ import pytest
 import mock
 import socket
 
-from ot3usb.src import default_config
-from ot3usb.src.tcp_conn import TCPConnection
+from ot3usb import default_config
+from ot3usb.tcp_conn import TCPConnection
 
 IP = default_config.DEFAULT_IP
 PORT = default_config.DEFAULT_PORT
