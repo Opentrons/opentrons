@@ -1,14 +1,13 @@
-import reduce from 'lodash/reduce'
 import {
   getIsTiprack,
   getTiprackVolume,
-  ProtocolFile,
+  LoadedLabware,
   LabwareDefinition2,
   getSlotHasMatingSurfaceUnitVector,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import { getLabwareLocation } from '../../Devices/ProtocolRun/utils/getLabwareLocation'
-import { getModuleInitialLoadInfo } from '../../Devices/ProtocolRun/utils/getModuleInitialLoadInfo'
+import { getSlotLabwareName } from '../../Devices/ProtocolRun/utils/getSlotLabwareName'
 import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { LabwareToOrder } from '../types'
@@ -37,22 +36,16 @@ export const orderBySlot = (
 }
 
 export const getTiprackIdsInOrder = (
-  labware: ProtocolFile<{}>['labware'],
+  labware: LoadedLabware[],
   labwareDefinitions: Record<string, LabwareDefinition2>,
   commands: RunTimeCommand[]
 ): string[] => {
-  const unorderedTipracks = reduce<typeof labware, LabwareToOrder[]>(
-    labware,
-    (tipracks, currentLabware, labwareIndex) => {
-      //  @ts-expect-error: will be an error until we remove the schemaV6Adapter
+  const unorderedTipracks = labware.reduce<LabwareToOrder[]>(
+    (tipracks, currentLabware) => {
       const labwareDef = labwareDefinitions[currentLabware.definitionUri]
       const isTiprack = getIsTiprack(labwareDef)
       if (isTiprack) {
-        const labwareLocation = getLabwareLocation(
-          //  @ts-expect-error: id will exist when we remove the schemaV6Adapter
-          labware[labwareIndex].id,
-          commands
-        )
+        const labwareLocation = getLabwareLocation(currentLabware.id, commands)
         if (!('slotName' in labwareLocation)) {
           throw new Error('expected tiprack location to be a slot')
         }
@@ -61,8 +54,7 @@ export const getTiprackIdsInOrder = (
           ...tipracks,
           {
             definition: labwareDef,
-            //  @ts-expect-error: id will exist when we remove the schemaV6Adapter
-            labwareId: labware[labwareIndex].id,
+            labwareId: currentLabware.id,
             slot: labwareLocation.slotName,
           },
         ]
@@ -81,7 +73,7 @@ export const getTiprackIdsInOrder = (
 export const getAllTipracksIdsThatPipetteUsesInOrder = (
   pipetteId: string,
   commands: RunTimeCommand[],
-  labware: ProtocolFile<{}>['labware'],
+  labware: LoadedLabware[],
   labwareDefinitions: Record<string, LabwareDefinition2>
 ): string[] => {
   const pickUpTipCommandsWithPipette: PickUpTipRunTimeCommand[] = commands
@@ -122,54 +114,29 @@ export const getAllTipracksIdsThatPipetteUsesInOrder = (
 }
 
 export const getLabwareIdsInOrder = (
-  labware: ProtocolFile<{}>['labware'],
+  labware: LoadedLabware[],
   labwareDefinitions: Record<string, LabwareDefinition2>,
-  modules: ProtocolFile<{}>['modules'],
   commands: RunTimeCommand[]
 ): string[] => {
-  const unorderedLabware = reduce<typeof labware, LabwareToOrder[]>(
-    labware,
-    (unorderedLabware, currentLabware, labwareIndex) => {
-      //  @ts-expect-error: definitionUri will exist when we remove the schemaV6Adapter
+  const unorderedLabware = labware.reduce<LabwareToOrder[]>(
+    (unorderedLabware, currentLabware) => {
       const labwareDef = labwareDefinitions[currentLabware.definitionUri]
       const isTiprack = getIsTiprack(labwareDef)
-      const labwareLocation = getLabwareLocation(
-        //  @ts-expect-error: id will exist when we remove the schemaV6Adapter
-        labware[labwareIndex].id,
-        commands
-      )
+      const slotName = getSlotLabwareName(currentLabware.id, commands).slotName
       // skip any labware that is not a tiprack
       if (!isTiprack) {
-        if ('moduleId' in labwareLocation) {
-          return [
-            ...unorderedLabware,
-            {
-              definition: labwareDef,
-              //  @ts-expect-error: id will exist when we remove the schemaV6Adapter
-              labwareId: labware[labwareIndex].id,
-
-              slot: getModuleInitialLoadInfo(labwareLocation.moduleId, commands)
-                .location.slotName,
-            },
-          ]
-        } else {
-          // if we're in a slot where we can't have labware, don't include the definition (i.e. the trash bin)
-          if (
-            !getSlotHasMatingSurfaceUnitVector(
-              standardDeckDef as any,
-              labwareLocation.slotName.toString()
-            )
-          ) {
-            return [...unorderedLabware]
-          }
+        // if we're in a slot where we can't have labware, don't include the definition (i.e. the trash bin)
+        if (
+          !getSlotHasMatingSurfaceUnitVector(standardDeckDef as any, slotName)
+        ) {
+          return [...unorderedLabware]
         }
         return [
           ...unorderedLabware,
           {
             definition: labwareDef,
-            //  @ts-expect-error: id will exist when we remove the schemaV6Adapter
-            labwareId: labware[labwareIndex].id,
-            slot: labwareLocation.slotName,
+            labwareId: currentLabware.id,
+            slot: slotName,
           },
         ]
       }

@@ -1,61 +1,36 @@
-import reduce from 'lodash/reduce'
 import { getSlotHasMatingSurfaceUnitVector } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import { orderBySlot } from '../../../LabwarePositionCheck/utils/labware'
-import { getLabwareLocation } from '../utils/getLabwareLocation'
-import { getModuleInitialLoadInfo } from '../utils/getModuleInitialLoadInfo'
+import { getSlotLabwareName } from '../utils/getSlotLabwareName'
 
 import type {
   LabwareDefinition2,
-  ProtocolFile,
+  LoadedLabware,
   RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { LabwareToOrder } from '../../../LabwarePositionCheck/types'
 
 export const getAllLabwareAndTiprackIdsInOrder = (
-  labware: ProtocolFile<{}>['labware'],
+  labware: LoadedLabware[],
   labwareDefinitions: Record<string, LabwareDefinition2>,
   commands: RunTimeCommand[]
 ): string[] => {
-  const unorderedLabware = reduce<typeof labware, LabwareToOrder[]>(
-    labware,
-    (unorderedLabware, currentLabware, labwareIndex) => {
-      //  @ts-expect-error: definitionUri will exist when we remove the schemaV6Adapter
+  const unorderedLabware = labware.reduce<LabwareToOrder[]>(
+    (unorderedLabware, currentLabware) => {
       const labwareDef = labwareDefinitions[currentLabware.definitionUri]
-      const labwareLocation = getLabwareLocation(
-        //  @ts-expect-error: id will exist when we remove the schemaV6Adapter
-        labware[labwareIndex].id,
-        commands
-      )
+      const slotName = getSlotLabwareName(currentLabware.id, commands).slotName
 
-      if ('moduleId' in labwareLocation) {
-        return [
-          ...unorderedLabware,
-          {
-            definition: labwareDef,
-            //  @ts-expect-error: id will exist when we remove the schemaV6Adapter
-            labwareId: labware[labwareIndex].id,
-            slot: getModuleInitialLoadInfo(labwareLocation.moduleId, commands)
-              .location.slotName,
-          },
-        ]
-      } else {
-        if (
-          !getSlotHasMatingSurfaceUnitVector(
-            standardDeckDef as any,
-            labwareLocation.slotName.toString()
-          )
-        ) {
-          return [...unorderedLabware]
-        }
+      if (
+        !getSlotHasMatingSurfaceUnitVector(standardDeckDef as any, slotName)
+      ) {
+        return [...unorderedLabware]
       }
       return [
         ...unorderedLabware,
         {
           definition: labwareDef,
-          //  @ts-expect-error: id will exist when we remove the schemaV6Adapter
-          labwareId: labware[labwareIndex].id,
-          slot: labwareLocation.slotName,
+          labwareId: currentLabware.id,
+          slot: slotName,
         },
       ]
     },
