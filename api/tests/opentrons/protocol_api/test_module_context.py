@@ -8,7 +8,6 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition as Labware
 
 from opentrons.broker import Broker
 from opentrons.protocols.geometry.deck import Deck
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, ModuleContext, Labware
 from opentrons.protocol_api.core.labware import LabwareLoadParams
 
@@ -88,9 +87,7 @@ def test_load_labware(
 
     decoy.when(mock_labware_core.get_name()).then_return("Full Name")
 
-    decoy.when(
-        mock_core.add_labware_core(mock_labware_core, APIVersion(2, 13))
-    ).then_return(mock_labware)
+    decoy.when(mock_core.add_labware_core(mock_labware_core)).then_return(mock_labware)
 
     result = subject.load_labware(
         name="infinite tip rack",
@@ -121,9 +118,7 @@ def test_load_labware_from_definition(
 
     decoy.when(mock_labware_core.get_name()).then_return("Full Name")
 
-    decoy.when(
-        mock_core.add_labware_core(mock_labware_core, APIVersion(2, 13))
-    ).then_return(mock_labware)
+    decoy.when(mock_core.add_labware_core(mock_labware_core)).then_return(mock_labware)
 
     decoy.when(
         mock_protocol_core.load_labware(

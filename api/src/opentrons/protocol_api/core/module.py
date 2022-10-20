@@ -15,7 +15,6 @@ from opentrons.hardware_control.modules.types import (
     SpeedStatus,
 )
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import DeckSlotName
 from opentrons.protocol_api.labware import Labware
 
@@ -54,9 +53,7 @@ class AbstractModuleCore(ABC, Generic[LabwareCoreType]):
         """Get the module's deck slot."""
 
     @abstractmethod
-    def add_labware_core(
-        self, labware_core: LabwareCoreType, api_version: APIVersion
-    ) -> Labware:
+    def add_labware_core(self, labware_core: LabwareCoreType) -> Labware:
         """Add a labware to the module."""
 
 

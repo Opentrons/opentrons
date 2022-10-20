@@ -8,6 +8,7 @@ from opentrons.protocol_engine.types import (
     DeckSlotLocation,
 )
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import DeckSlotName
 
 
@@ -31,6 +32,7 @@ def subject(
     return ModuleCore(
         module_id="1234",
         engine_client=mock_engine_client,
+        api_version=APIVersion(2, 13),
     )
 
 

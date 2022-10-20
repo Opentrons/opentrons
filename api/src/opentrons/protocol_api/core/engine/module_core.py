@@ -40,9 +40,12 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
         self,
         module_id: str,
         engine_client: ProtocolEngineClient,
+        api_version: APIVersion,
     ) -> None:
         self._module_id = module_id
         self._engine_client = engine_client
+        # tz,(10-20-22): if the only method that uses this is the add_labware_core figure out a better way to pass this along.
+        self._api_version = api_version
 
     @property
     def module_id(self) -> str:
@@ -52,7 +55,7 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
     @property
     def geometry(self) -> ModuleGeometry:
         """Get the module's geometry interface."""
-        raise NotImplementedError("get_model not implemented")
+        raise NotImplementedError("geometry not implemented")
 
     def get_model(self) -> ModuleModel:
         """Get the module's model identifier."""
@@ -77,11 +80,9 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
         """Get the module's deck slot."""
         return self._engine_client.state.modules.get_location(self.module_id).slotName
 
-    def add_labware_core(
-        self, labware_core: LabwareCore, api_version: APIVersion
-    ) -> Labware:
+    def add_labware_core(self, labware_core: LabwareCore) -> Labware:
         """Add a labware to the module."""
-        return Labware(implementation=labware_core, api_level=api_version)
+        return Labware(implementation=labware_core, api_level=self._api_version)
 
 
 class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore[LabwareCore]):
