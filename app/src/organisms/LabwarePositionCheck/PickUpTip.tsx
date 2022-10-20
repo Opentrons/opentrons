@@ -130,87 +130,60 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
     )
   }
   const handleConfirmPosition = (): void => {
-    createRunCommand(
-      {
-        command: {
-          commandType: 'pickUpTip',
-          params: {
-            pipetteId,
-            labwareId,
-            wellName: 'A1',
-          },
-        },
-        waitUntilComplete: true,
-      },
-      {
-        onSuccess: () => {
-          createRunCommand({
-            command: { commandType: 'savePosition', params: { pipetteId } },
-            waitUntilComplete: true,
-          }, {
-            onSuccess: (response) => {
-              const { position } = response.data.result
-              const offset =
-                initialPosition != null
-                  ? getVectorDifference(position, initialPosition)
-                  : position
-              registerPosition({ type: 'tipPickUpOffset', offset })
-              setShowTipConfirmation(true)
-            }
-          })
-        },
-      }
-    ).catch((e: Error) => {
-      console.error(`error picking up tip ${e.message}`)
-    })
-  }
-
-  const handleConfirmTipAttached = (): void => {
     createRunCommand({
       command: { commandType: 'savePosition', params: { pipetteId } },
       waitUntilComplete: true,
-    })
-      .then(response => {
+    }, {
+      onSuccess: (response) => {
         const { position } = response.data.result
         const offset =
           initialPosition != null
             ? getVectorDifference(position, initialPosition)
             : position
         registerPosition({ type: 'tipPickUpOffset', offset })
-        createRunCommand({
-          command: {
-            commandType: 'moveLabware' as const,
-            params: { labwareId: labwareId, newLocation: 'offDeck' },
-          },
-          waitUntilComplete: true,
-        })
-          .then(_moveResponse => {
-            createRunCommand({
-              command: {
-                commandType: 'moveToWell' as const,
-                params: {
-                  pipetteId: pipetteId,
-                  labwareId: FIXED_TRASH_ID,
-                  wellName: 'A1',
-                  wellLocation: { origin: 'top' as const },
-                },
+        createRunCommand(
+          {
+            command: {
+              commandType: 'pickUpTip',
+              params: {
+                pipetteId,
+                labwareId,
+                wellName: 'A1',
+                wellLocation: { origin: 'top', offset }
               },
-              waitUntilComplete: true,
-            })
-              .then(_homeResponse => {
-                proceed()
-              })
-              .catch((e: Error) => {
-                console.error(`error moving to tip ${e.message}`)
-              })
+            },
+            waitUntilComplete: true,
+          },
+          {
+            onSuccess: () => { setShowTipConfirmation(true) }
           })
-          .catch((e: Error) => {
-            console.error(`error moving labware: ${e.message}`)
-          })
-      })
-      .catch((e: Error) => {
-        console.error(`error saving position: ${e.message}`)
-      })
+      },
+    }
+    ).catch((e: Error) => {
+      console.error(`error picking up tip ${e.message}`)
+    })
+  }
+
+  const handleConfirmTipAttached = (): void => {
+    chainRunCommands(
+      [
+        {
+          commandType: 'moveLabware' as const,
+          params: { labwareId: labwareId, newLocation: 'offDeck' },
+        },
+        {
+          commandType: 'moveToWell' as const,
+          params: {
+            pipetteId: pipetteId,
+            labwareId: FIXED_TRASH_ID,
+            wellName: 'A1',
+            wellLocation: { origin: 'top' as const },
+          },
+        },
+      ],
+      createRunCommand,
+      proceed
+    )
   }
   const handleInvalidateTip = (): void => {
     createRunCommand(

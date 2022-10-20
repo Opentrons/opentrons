@@ -90,7 +90,7 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
           pipetteId: pipetteId,
           labwareId: labwareId,
           wellName: 'A1',
-          wellLocation: { offset: tipPickUpOffset ?? undefined },
+          wellLocation: { origin: 'top', offset: tipPickUpOffset ?? undefined },
         },
       },
       {

@@ -45,7 +45,6 @@ export function getPrepCommands(
             pipetteId: pipetteId,
             labwareId: FIXED_TRASH_ID,
             wellName: 'A1',
-            wellLocation: {},
           }
         }
         return [...acc, loadWithPipetteId, dropTipToBeSafe]

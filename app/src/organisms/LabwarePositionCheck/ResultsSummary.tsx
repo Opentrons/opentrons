@@ -30,11 +30,7 @@ import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/uti
 import { getLabwareDefinitionsFromCommands } from './utils/labware'
 
 import type { ResultsSummaryStep, WorkingOffset } from './types'
-import type {
-  LabwareOffset,
-  LabwareOffsetCreateData,
-  LabwareOffsetLocation,
-} from '@opentrons/api-client'
+import type { LabwareOffset, LabwareOffsetCreateData } from '@opentrons/api-client'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 
 const LPC_HELP_LINK_URL =
@@ -61,7 +57,6 @@ export const ResultsSummary = (
   )
 
   const offsetsToApply = React.useMemo(() => {
-    if (protocolData == null) return []
     return workingOffsets.map<LabwareOffsetCreateData>(
       ({ initialPosition, finalPosition, labwareId, location }) => {
         const definitionUri =

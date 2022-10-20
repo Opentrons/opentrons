@@ -16,6 +16,7 @@ import { getPrepCommands } from './getPrepCommands'
 import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { CreateRunCommand, RegisterPositionAction } from '../types'
 import type { Jog } from '../../../molecules/JogControls'
+import { chainRunCommands } from '../utils/chainRunCommands'
 
 export const INTERVAL_MS = 3000
 
@@ -32,21 +33,14 @@ export const IntroScreen = (props: {
 
   const handleClickStartLPC = (): void => {
     const prepCommands = getPrepCommands(protocolData)
-    Promise.all(
-      prepCommands.map(command =>
-        createRunCommand({ command, waitUntilComplete: true })
-      )
-    )
-      .then(proceed)
-      .catch((e: Error) =>
-        console.error(`error preparing to robot for LPC: ${e.message}`)
-      )
+    chainRunCommands(prepCommands, createRunCommand, proceed)
   }
 
-  if (isRobotMoving)
+  if (isRobotMoving) {
     return (
       <RobotMotionLoader header={t('shared:stand_back_robot_is_in_motion')} />
     )
+  }
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}

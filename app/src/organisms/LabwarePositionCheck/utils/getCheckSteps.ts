@@ -110,8 +110,8 @@ function getCheckTipRackSectionSteps(args: LPCArgs): CheckTipRacksStep[] {
   }, [])
 
   return [
-    ...uniqPrimaryPipettePickUpTipCommands,
     ...onlySecondaryPipettePickUpTipCommands,
+    ...uniqPrimaryPipettePickUpTipCommands,
   ].reduce<CheckTipRacksStep[]>((acc, { params }) => {
     const labwareLocations = labwareLocationCombos.filter(
       combo => combo.labwareId === params.labwareId
