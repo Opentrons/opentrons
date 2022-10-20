@@ -1,6 +1,8 @@
 from typing import Optional
 
 
+# TODO(mc, 2022-10-20): move to public ProtocolContext
+# once `Deck` and `ProtocolEngine` play nicely together
 class InvalidModuleLocationError(ValueError):
     """Error raised if a load location for a module is invalid."""
 

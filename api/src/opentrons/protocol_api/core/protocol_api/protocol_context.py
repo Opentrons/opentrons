@@ -206,7 +206,7 @@ class ProtocolContextImplementation(
         configuration: Optional[str],
     ) -> legacy_module_core.LegacyModuleCore:
         """Load a module."""
-        resolved_type = ModuleType.from_model(model)
+        resolved_type = ModuleType.from_hardware_model(model)
         resolved_location = self._deck_layout.resolve_module_location(
             resolved_type, deck_slot
         )

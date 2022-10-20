@@ -44,7 +44,6 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
     ) -> None:
         self._module_id = module_id
         self._engine_client = engine_client
-        # tz,(10-20-22): if the only method that uses this is the add_labware_core figure out a better way to pass this along.
         self._api_version = api_version
 
     @property

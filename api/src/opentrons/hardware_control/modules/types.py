@@ -41,7 +41,7 @@ class ModuleType(str, Enum):
     HEATER_SHAKER: HeaterShakerModuleType = "heaterShakerModuleType"
 
     @classmethod
-    def from_model(cls, model: ModuleModel) -> ModuleType:
+    def from_hardware_model(cls, model: ModuleModel) -> ModuleType:
         if isinstance(model, MagneticModuleModel):
             return cls.MAGNETIC
         if isinstance(model, TemperatureModuleModel):
