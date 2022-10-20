@@ -340,11 +340,13 @@ def create_move_labware_command(
     new_location: LabwareLocation,
     labware_id: str = "labware-id",
     offset_id: Optional[str] = None,
+    use_gripper: Optional[bool] = False,
 ) -> cmd.MoveLabware:
     """Get a completed MoveLabware command."""
     params = cmd.MoveLabwareParams(
         labwareId=labware_id,
         newLocation=new_location,
+        useGripper=use_gripper,
     )
     result = cmd.MoveLabwareResult(offsetId=offset_id)
 

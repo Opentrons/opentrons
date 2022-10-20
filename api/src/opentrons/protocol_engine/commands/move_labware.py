@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from ..types import LabwareLocation, DeckSlotLocation, ModuleLocation
+from ..types import LabwareLocation
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
@@ -74,20 +74,19 @@ class MoveLabwareImplementation(
         )
 
         if params.useGripper:
-            from_location = current_labware.location
-
-            assert isinstance(
-                from_location, (DeckSlotLocation, ModuleLocation)
-            ), "Off-deck labware movements are not supported using the gripper."
-
-            assert isinstance(
-                params.newLocation, (DeckSlotLocation, ModuleLocation)
-            ), "Off-deck labware movements are not supported using the gripper."
-
+            validated_current_loc = (
+                self._labware_movement.ensure_valid_gripper_location(
+                    current_labware.location
+                )
+            )
+            validated_new_loc = self._labware_movement.ensure_valid_gripper_location(
+                params.newLocation
+            )
             await self._labware_movement.move_labware_with_gripper(
                 labware_id=params.labwareId,
-                current_location=from_location,
-                new_location=params.newLocation,
+                current_location=validated_current_loc,
+                new_location=validated_new_loc,
+                new_offset_id=new_offset_id,
             )
         else:
             # Pause to allow for manual labware movement

@@ -8,11 +8,12 @@ from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.state import StateStore
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 
-from ..errors import GripperNotAttachedError
-
+from ..errors import GripperNotAttachedError, UnsupportedLabwareMovementError
 from ..types import (
     DeckSlotLocation,
     ModuleLocation,
+    LabwareLocation,
+    LabwareOffsetVector,
 )
 
 
@@ -44,6 +45,7 @@ class LabwareMovementHandler:
         labware_id: str,
         current_location: Union[DeckSlotLocation, ModuleLocation],
         new_location: Union[DeckSlotLocation, ModuleLocation],
+        new_offset_id: Optional[str],
     ) -> None:
         """Move a loaded labware from one location to another."""
         ot3api = ensure_ot3_hardware(
@@ -69,17 +71,26 @@ class LabwareMovementHandler:
             location=current_location,
             current_position=await ot3api.gantry_position(mount=gripper_mount),
             gripper_home_z=gripper_homed_position.z,
+            labware_offset_vector=self._state_store.labware.get_labware_offset_vector(
+                labware_id
+            ),
         )
         for waypoint in waypoints_to_labware:
             await ot3api.move_to(mount=gripper_mount, abs_position=waypoint)
 
         await ot3api.grip(force_newtons=GRIP_FORCE)
 
+        new_labware_offset = (
+            self._state_store.labware.get_labware_offset(new_offset_id).vector
+            if new_offset_id
+            else None
+        )
         waypoints_to_new_location = self._get_gripper_movement_waypoints(
             labware_id=labware_id,
             location=new_location,
             current_position=waypoints_to_labware[-1],
             gripper_home_z=gripper_homed_position.z,
+            labware_offset_vector=new_labware_offset,
         )
         for waypoint in waypoints_to_new_location:
             await ot3api.move_to(mount=gripper_mount, abs_position=waypoint)
@@ -94,12 +105,15 @@ class LabwareMovementHandler:
             ),
         )
 
+    # TODO (spp, 2022-10-19): Move this to motion planning and
+    #  test waypoints generation in isolation.
     def _get_gripper_movement_waypoints(
         self,
         labware_id: str,
         location: Union[DeckSlotLocation, ModuleLocation],
         current_position: Point,
         gripper_home_z: float,
+        labware_offset_vector: Optional[LabwareOffsetVector],
     ) -> List[Point]:
         """Get waypoints for gripper to move to a specified location."""
         # TODO: remove this after support for module locations is added
@@ -115,9 +129,31 @@ class LabwareMovementHandler:
             self._state_store.labware.get_slot_center_position(location.slotName)
             + GRIPPER_OFFSET
         )
+        labware_offset_vector = labware_offset_vector or LabwareOffsetVector(
+            x=0, y=0, z=0
+        )
         waypoints: List[Point] = [
             Point(current_position.x, current_position.y, gripper_home_z),
-            Point(slot_loc.x, slot_loc.y, gripper_home_z),
-            Point(slot_loc.x, slot_loc.y, grip_height),
+            Point(
+                slot_loc.x + labware_offset_vector.x,
+                slot_loc.y + labware_offset_vector.y,
+                gripper_home_z,
+            ),
+            Point(
+                slot_loc.x + labware_offset_vector.x,
+                slot_loc.y + labware_offset_vector.y,
+                grip_height + labware_offset_vector.z,
+            ),
         ]
         return waypoints
+
+    @staticmethod
+    def ensure_valid_gripper_location(
+        location: LabwareLocation,
+    ) -> Union[DeckSlotLocation, ModuleLocation]:
+        """Ensure valid on-deck location for gripper, otherwise raise error."""
+        if not isinstance(location, (DeckSlotLocation, ModuleLocation)):
+            raise UnsupportedLabwareMovementError(
+                "Off-deck labware movements are not supported using the gripper."
+            )
+        return location

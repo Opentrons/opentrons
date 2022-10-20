@@ -279,7 +279,6 @@ class EquipmentHandler:
             f' for module ID "{module_id}".'
         )
 
-    # TODO (spp, 2022-10-18): move this to labware state view
     def find_applicable_labware_offset_id(
         self, labware_definition_uri: str, labware_location: LabwareLocation
     ) -> Optional[str]:

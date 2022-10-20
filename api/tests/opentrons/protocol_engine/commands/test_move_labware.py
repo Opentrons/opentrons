@@ -81,10 +81,12 @@ async def test_gripper_move_labware_implementation(
         labware_movement=labware_movement,
         run_control=run_control,
     )
+    from_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+    new_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_5)
 
     data = MoveLabwareParams(
         labwareId="my-cool-labware-id",
-        newLocation=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
+        newLocation=new_location,
         useGripper=True,
     )
 
@@ -93,7 +95,7 @@ async def test_gripper_move_labware_implementation(
             id="my-cool-labware-id",
             loadName="load-name",
             definitionUri="opentrons-test/load-name/1",
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            location=from_location,
             offsetId=None,
         )
     )
@@ -101,16 +103,24 @@ async def test_gripper_move_labware_implementation(
     decoy.when(
         equipment.find_applicable_labware_offset_id(
             labware_definition_uri="opentrons-test/load-name/1",
-            labware_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
+            labware_location=new_location,
         )
     ).then_return("wowzers-a-new-offset-id")
+
+    decoy.when(
+        labware_movement.ensure_valid_gripper_location(from_location)
+    ).then_return(from_location)
+    decoy.when(
+        labware_movement.ensure_valid_gripper_location(new_location)
+    ).then_return(new_location)
 
     result = await subject.execute(data)
     decoy.verify(
         await labware_movement.move_labware_with_gripper(
             labware_id="my-cool-labware-id",
-            current_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-            new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
+            current_location=from_location,
+            new_location=new_location,
+            new_offset_id="wowzers-a-new-offset-id",
         ),
         times=1,
     )

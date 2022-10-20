@@ -1,6 +1,8 @@
 """Test labware movement command execution side effects."""
 from __future__ import annotations
 
+from datetime import datetime
+
 import pytest
 from decoy import Decoy
 from typing import TYPE_CHECKING
@@ -10,7 +12,16 @@ from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.types import DeckSlotName, Point
 
 from opentrons.hardware_control.types import OT3Mount, OT3Axis
-from opentrons.protocol_engine.types import DeckSlotLocation, Dimensions
+from opentrons.protocol_engine.types import (
+    DeckSlotLocation,
+    Dimensions,
+    ModuleLocation,
+    OFF_DECK_LOCATION,
+    LabwareOffset,
+    LabwareOffsetLocation,
+    LabwareOffsetVector,
+)
+
 from opentrons.protocol_engine.execution.labware_movement import (
     LabwareMovementHandler,
     GRIPPER_OFFSET,
@@ -18,6 +29,7 @@ from opentrons.protocol_engine.execution.labware_movement import (
 from opentrons.protocol_engine.errors import (
     HardwareNotSupportedError,
     GripperNotAttachedError,
+    UnsupportedLabwareMovementError,
 )
 from opentrons.protocol_engine.state import StateStore
 
@@ -52,7 +64,9 @@ def subject(
     )
 
 
-# TODO (spp, 2022-10-18): Should write an acceptance test w/ real labware on ot3 deck
+# TODO (spp, 2022-10-18):
+#  1. Should write an acceptance test w/ real labware on ot3 deck.
+#  2. This test will be split once waypoints generation is moved to motion planning.
 @pytest.mark.ot3_only
 async def test_move_labware_with_gripper(
     decoy: Decoy,
@@ -78,22 +92,39 @@ async def test_move_labware_with_gripper(
         state_store.labware.get_slot_center_position(DeckSlotName.SLOT_3)
     ).then_return(Point(x=201, y=202, z=203))
 
+    decoy.when(
+        state_store.labware.get_labware_offset_vector("my-teleporting-labware")
+    ).then_return(LabwareOffsetVector(x=0.1, y=0.2, z=0.3))
+
+    decoy.when(state_store.labware.get_labware_offset("new-offset-id")).then_return(
+        LabwareOffset(
+            id="new-offset-id",
+            createdAt=datetime(year=2022, month=10, day=20),
+            definitionUri="my-labware",
+            location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_3),
+            vector=LabwareOffsetVector(x=0.5, y=0.6, z=0.7),
+        )
+    )
+
     await subject.move_labware_with_gripper(
         labware_id="my-teleporting-labware",
         current_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+        new_offset_id="new-offset-id",
     )
 
     expected_moves = [
         Point(777, 888, 999),  # gripper retract at current location
-        Point(101, 102 + GRIPPER_OFFSET.y, 999),  # move to above slot 1
-        Point(101, 102 + GRIPPER_OFFSET.y, 16.5),  # move to labware on slot 1
-        Point(101, 102 + GRIPPER_OFFSET.y, 999),  # gripper retract at current location
-        Point(201, 202 + GRIPPER_OFFSET.y, 999),  # move to above slot 3
+        Point(101.1, 102.2 + GRIPPER_OFFSET.y, 999),  # move to above slot 1
+        Point(101.1, 102.2 + GRIPPER_OFFSET.y, 16.8),  # move to labware on slot 1
         Point(
-            201, 202 + GRIPPER_OFFSET.y, 16.5
+            101.1, 102.2 + GRIPPER_OFFSET.y, 999
+        ),  # gripper retract at current location
+        Point(201.5, 202.6 + GRIPPER_OFFSET.y, 999),  # move to above slot 3
+        Point(
+            201.5, 202.6 + GRIPPER_OFFSET.y, 17.2
         ),  # move down to labware drop height on slot 3
-        Point(201, 202 + GRIPPER_OFFSET.y, 999),  # retract in place
+        Point(201.5, 202.6 + GRIPPER_OFFSET.y, 999),  # retract in place
     ]
 
     gripper = OT3Mount.GRIPPER
@@ -132,6 +163,7 @@ async def test_labware_movement_raises_on_ot2(
             labware_id="labware-id",
             current_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
             new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            new_offset_id=None,
         )
 
 
@@ -149,4 +181,18 @@ async def test_labware_movement_raises_without_gripper(
             labware_id="labware-id",
             current_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
             new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            new_offset_id=None,
         )
+
+
+def test_ensure_valid_gripper_location(subject: LabwareMovementHandler) -> None:
+    """It should validate on-deck gripper locations."""
+    slot_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
+    module_location = ModuleLocation(moduleId="dummy-module")
+    off_deck_location = OFF_DECK_LOCATION
+
+    assert subject.ensure_valid_gripper_location(slot_location) == slot_location
+    assert subject.ensure_valid_gripper_location(module_location) == module_location
+
+    with pytest.raises(UnsupportedLabwareMovementError):
+        subject.ensure_valid_gripper_location(off_deck_location)
