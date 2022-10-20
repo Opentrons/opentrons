@@ -107,19 +107,21 @@ async def test_gripper_move_labware_implementation(
         )
     ).then_return("wowzers-a-new-offset-id")
 
+    validated_from_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_6)
+    validated_new_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_7)
     decoy.when(
         labware_movement.ensure_valid_gripper_location(from_location)
-    ).then_return(from_location)
+    ).then_return(validated_from_location)
     decoy.when(
         labware_movement.ensure_valid_gripper_location(new_location)
-    ).then_return(new_location)
+    ).then_return(validated_new_location)
 
     result = await subject.execute(data)
     decoy.verify(
         await labware_movement.move_labware_with_gripper(
             labware_id="my-cool-labware-id",
-            current_location=from_location,
-            new_location=new_location,
+            current_location=validated_from_location,
+            new_location=validated_new_location,
             new_offset_id="wowzers-a-new-offset-id",
         ),
         times=1,

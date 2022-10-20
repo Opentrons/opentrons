@@ -22,6 +22,8 @@ GRIPPER_OFFSET = Point(0.0, 1.0, 0.0)
 GRIP_FORCE = 20  # Newtons
 
 
+# TODO (spp, 2022-10-20): name this GripperMovementHandler if it doesn't handle
+#  any non-gripper implementations
 class LabwareMovementHandler:
     """Implementation logic for labware movement."""
 
@@ -117,9 +119,7 @@ class LabwareMovementHandler:
     ) -> List[Point]:
         """Get waypoints for gripper to move to a specified location."""
         # TODO: remove this after support for module locations is added
-        if not isinstance(
-            location, DeckSlotLocation
-        ):
+        if not isinstance(location, DeckSlotLocation):
             raise NotImplementedError(
                 "Moving labware to & from modules with a gripper is not implemented yet."
             )
@@ -150,6 +150,7 @@ class LabwareMovementHandler:
         ]
         return waypoints
 
+    # TODO (spp, 2022-10-20): move to labware view
     @staticmethod
     def ensure_valid_gripper_location(
         location: LabwareLocation,
