@@ -246,12 +246,15 @@ class Controller:
         try:
             event = await self._event_watcher.get_event()
         except asyncio.IncompleteReadError:
-            MODULE_LOG.debug("incomplete read error when quitting watcher")
+            MODULE_LOG.warning("incomplete read error from watcher")
             return
         if event is not None:
+            flags = aionotify.Flags.parse(event.flags)
+            MODULE_LOG.info(
+                f"aionotify event on {event.name}: {event} with flags {flags}"
+            )
             if "ot_module" in event.name:
                 event_name = event.name
-                flags = aionotify.Flags.parse(event.flags)
                 event_description = AionotifyEvent.build(event_name, flags)
                 await self.module_controls.handle_module_appearance(event_description)
 

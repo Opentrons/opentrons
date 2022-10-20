@@ -20,7 +20,28 @@ if TYPE_CHECKING:
 
 log = logging.getLogger(__name__)
 
-MODULE_PORT_REGEX = re.compile("|".join(modules.MODULE_HW_BY_NAME.keys()), re.I)
+# All names joined with alternators in a named group for later access
+_MODULE_NAME_SUBRE = (
+    r"(?P<module_name>" + r"|".join(modules.MODULE_HW_BY_NAME.keys()) + r")"
+)
+# group that requires a module name (non-capturing) and a number (non-zero if more than one of the same
+# module is connected) and bundles the whole thing into a named capture
+_MODULE_SYMLINK_NAME_SUBRE = (
+    r"(?P<symlink_name>ot_module_" + _MODULE_NAME_SUBRE + r"\d+\d*)"
+)
+
+# when connecting a module, regardless of what udev rules exist the kernel + udev conspire
+# to create a "tmpnode", a dev node with the guaranteed-unique name "NAME.tmp-cMAJ:MIN",
+# for instance /dev/ot_module_tempdeck0.tmp-c229:1 . this
+# device only exists until the rest of the nodes and symlinks are established, and cannot be
+# used after udev finishes processing. we'll pick it up from inotify, but by the time we try
+# to open it it'll be gone and we'll error - so we need to separately capture the temp node
+# so we can just pay attention to the module symlink part. Make sure this is called on a
+# stripped line since it uses an EOL anchor.
+_MODULE_OPTIONAL_TMPNODE_SUBRE = r"(?:.tmp-c\d+:\d+)?$"
+MODULE_PORT_REGEX = re.compile(
+    _MODULE_SYMLINK_NAME_SUBRE + _MODULE_OPTIONAL_TMPNODE_SUBRE, re.I
+)
 
 
 class AttachedModulesControl:
@@ -225,13 +246,18 @@ class AttachedModulesControl:
         """Given a port, returns either a ModuleAtPort
         if it is a recognized module, or None if not recognized.
         """
-        match = MODULE_PORT_REGEX.search(port)
+        log.info(f"Checking port {port}")
+        match = MODULE_PORT_REGEX.search(port.strip())
         if match:
-            name = match.group().lower()
+            name = match.group("module_name").lower()
+            log.info(f"matched module {name} from {port}")
             if name not in modules.MODULE_HW_BY_NAME:
                 log.warning(f"Unexpected module connected: {name} on {port}")
                 return None
-            return modules.ModuleAtPort(port=f"/dev/{port}", name=name)
+            symlink_name = match.group("symlink_name")
+            return modules.ModuleAtPort(port=f"/dev/{symlink_name}", name=name)
+        else:
+            log.info(f"discarding non-matching module {port}")
         return None
 
     async def handle_module_appearance(self, event: AionotifyEvent) -> None:

@@ -1,7 +1,7 @@
 """Tests for opentrons.hardware_control.module_control."""
 import pytest
 from decoy import Decoy, matchers
-from typing import Awaitable, Callable, cast
+from typing import Awaitable, Callable, cast, Optional
 
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.rpi_drivers.interfaces import USBDriverInterface
@@ -130,3 +130,45 @@ async def test_register_modules_sort(
     result = subject.available_modules
 
     assert result == [module_2, module_1, module_4, module_3]
+
+
+@pytest.mark.parametrize(
+    "portname,result",
+    [
+        (
+            "ot_module_magdeck0",
+            ModuleAtPort(port="/dev/ot_module_magdeck0", name="magdeck"),
+        ),
+        (
+            "ot_module_magdeck0.tmp-c166:0",
+            ModuleAtPort(port="/dev/ot_module_magdeck0", name="magdeck"),
+        ),
+        (
+            "ot_module_thermocycler2",
+            ModuleAtPort(port="/dev/ot_module_thermocycler2", name="thermocycler"),
+        ),
+        ("/dev/asdasfasd", None),
+        (
+            "ot_module_heatershaker29",
+            ModuleAtPort(port="/dev/ot_module_heatershaker29", name="heatershaker"),
+        ),
+        (
+            "ot_module_tempdeck1000.tmp-c166:0",
+            ModuleAtPort(port="/dev/ot_module_tempdeck1000", name="tempdeck"),
+        ),
+        (
+            "ot_module_tempdeck1000",
+            ModuleAtPort(port="/dev/ot_module_tempdeck1000", name="tempdeck"),
+        ),
+        (
+            "/dev/ot_module_tempdeck999",
+            ModuleAtPort(port="/dev/ot_module_tempdeck999", name="tempdeck"),
+        ),
+        (
+            "/dev/ot_module_heatershaker0.tmp-c166:0",
+            ModuleAtPort(port="/dev/ot_module_heatershaker0", name="heatershaker"),
+        ),
+    ],
+)
+def test_port_filtering(portname: str, result: Optional[ModuleAtPort]) -> None:
+    assert AttachedModulesControl.get_module_at_port(portname) == result
