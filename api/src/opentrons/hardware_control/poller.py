@@ -47,8 +47,7 @@ class Poller:
 
         async with self._use_read_lock():
             task.cancel()
-
-        await asyncio.gather(task, return_exceptions=True)
+            await asyncio.gather(task, return_exceptions=True)
 
     async def wait_next_poll(self) -> None:
         """Wait for the next poll to complete.
