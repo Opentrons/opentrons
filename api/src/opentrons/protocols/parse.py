@@ -97,6 +97,7 @@ def version_from_static_python_info(
     # - Forbid protocols from specifying `apiLevel` in both `requirements` and
     #   `metadata`?
     # - Be more careful with falsey values, like `"apiLevel": ""`?
+    # - Forbid unrecognized keys in `requirements`?
 
     from_requirements = (static_python_info.requirements or {}).get("apiLevel", None)
     from_metadata = (static_python_info.metadata or {}).get("apiLevel", None)
