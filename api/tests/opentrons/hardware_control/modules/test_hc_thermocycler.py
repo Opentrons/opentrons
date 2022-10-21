@@ -7,6 +7,8 @@ import pytest
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.thermocycler import SimulatingDriver
 from opentrons.hardware_control import modules, ExecutionManager
+from opentrons.hardware_control.poller import Poller
+from opentrons.hardware_control.modules.thermocycler import ThermocyclerReader
 
 
 @pytest.fixture
@@ -27,7 +29,7 @@ async def subject(usb_port: USBPort) -> AsyncGenerator[modules.Thermocycler, Non
         usb_port=usb_port,
         type=modules.ModuleType.THERMOCYCLER,
         simulating=True,
-        loop=asyncio.get_running_loop(),
+        hw_control_loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
     )
     yield cast(modules.Thermocycler, therm)
@@ -40,19 +42,15 @@ async def test_sim_initialization(subject: modules.Thermocycler) -> None:
 
 async def test_lid(subject: modules.Thermocycler) -> None:
     await subject.open()
-    await subject.wait_next_poll()
     assert subject.lid_status == "open"
 
     await subject.close()
-    await subject.wait_next_poll()
     assert subject.lid_status == "closed"
 
     await subject.close()
-    await subject.wait_next_poll()
     assert subject.lid_status == "closed"
 
     await subject.open()
-    await subject.wait_next_poll()
     assert subject.lid_status == "open"
 
 
@@ -73,13 +71,11 @@ async def test_sim_update(subject: modules.Thermocycler) -> None:
     await subject.set_temperature(
         temperature=10, hold_time_seconds=None, hold_time_minutes=None, volume=50
     )
-    await subject.wait_next_poll()
     assert subject.temperature == 10
     assert subject.target == 10
     assert subject.status == "holding at target"
 
     await subject.deactivate_block()
-    await subject.wait_next_poll()
     assert subject.temperature == 23
     assert subject.target is None
     assert subject.status == "idle"
@@ -89,7 +85,6 @@ async def test_sim_update(subject: modules.Thermocycler) -> None:
     assert subject.lid_target == 80
 
     await subject.deactivate_lid()
-    await subject.wait_next_poll()
     assert subject.lid_temp == 23
     assert subject.lid_target is None
 
@@ -100,7 +95,6 @@ async def test_sim_update(subject: modules.Thermocycler) -> None:
     assert subject.lid_temp == 70
     assert subject.lid_target == 70
     await subject.deactivate()
-    await subject.wait_next_poll()
     assert subject.temperature == 23
     assert subject.target is None
     assert subject.status == "idle"
@@ -142,15 +136,21 @@ async def set_temperature_subject(
     usb_port: USBPort, simulator_set_plate_spy: SimulatingDriver
 ) -> AsyncGenerator[modules.Thermocycler, None]:
     """Fixture that spys on set_plate_temperature"""
+    reader = ThermocyclerReader(driver=simulator_set_plate_spy)
+    poller = Poller(reader=reader, interval=0.01)
+
     hw_tc = modules.Thermocycler(
         port="/dev/ot_module_sim_thermocycler0",
         usb_port=usb_port,
-        loop=asyncio.get_running_loop(),
+        hw_control_loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
         driver=simulator_set_plate_spy,
+        reader=reader,
+        poller=poller,
         device_info={},
-        polling_interval_sec=0.001,
     )
+
+    await poller.start()
     yield hw_tc
     await hw_tc.cleanup()
 
@@ -190,20 +190,6 @@ async def test_set_temperature_just_minutes_hold(
     just minutes."""
     await set_temperature_subject.set_temperature(40, hold_time_minutes=5.5)
     set_plate_temp_spy.assert_called_once_with(temp=40, hold_time=330, volume=None)
-
-
-async def test_set_temperature_fuzzy(
-    set_temperature_subject: modules.Thermocycler, set_plate_temp_spy: mock.AsyncMock
-) -> None:
-    """ "It should call set_plate_temperature with passed in hold time when under
-    fuzzy seconds."""
-    # Test hold_time < _hold_time_fuzzy_seconds. Here we know
-    # that wait_for_hold will be called with the direct hold
-    # time rather than increments of 0.1
-    set_temperature_subject._wait_for_hold = mock.AsyncMock()  # type: ignore[assignment]
-    await set_temperature_subject.set_temperature(40, hold_time_seconds=2)
-    set_temperature_subject._wait_for_hold.assert_called_once_with(2)
-    set_plate_temp_spy.assert_called_once_with(temp=40, hold_time=2, volume=None)
 
 
 async def test_cycle_temperature(

@@ -210,6 +210,14 @@ class LabwareOffsetVector(BaseModel):
     z: float
 
 
+class InstrumentOffsetVector(BaseModel):
+    """Instrument Offset from home position to robot deck."""
+
+    x: float
+    y: float
+    z: float
+
+
 class ModuleDefinition(BaseModel):
     """Module definition class."""
 

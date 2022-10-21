@@ -52,8 +52,7 @@ export function ConnectRobotSlideout({
     return (
       <Link
         role="button"
-        css={TYPOGRAPHY.pSemiBold}
-        color={COLORS.blueEnabled}
+        css={TYPOGRAPHY.linkPSemiBold}
         onClick={refreshDiscovery}
         id="AppSettings_Connection_Button"
         textTransform={TYPOGRAPHY.textTransformCapitalize}

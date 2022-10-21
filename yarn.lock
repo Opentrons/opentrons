@@ -18884,6 +18884,11 @@ react-shallow-renderer@^16.13.1:
     object-assign "^4.1.1"
     react-is "^16.12.0 || ^17.0.0"
 
+react-simple-keyboard@^3.4.187:
+  version "3.4.226"
+  resolved "https://registry.yarnpkg.com/react-simple-keyboard/-/react-simple-keyboard-3.4.226.tgz#84a05dadf32c9c8d13855e3ecc73d4e92b15a7d8"
+  integrity sha512-ZoLmHAQZ+Rv7U8D/plWKQy2nkhLfkMJj5iz+/O/VlFKk1rp7yp9XFDqz/josaalZIgjaSAGm4cWZ/wE+w8mLwA==
+
 react-snap@^1.23.0:
   version "1.23.0"
   resolved "https://registry.yarnpkg.com/react-snap/-/react-snap-1.23.0.tgz#bf857a1810cd1ec8f9c54f5746568bccfb7447e5"

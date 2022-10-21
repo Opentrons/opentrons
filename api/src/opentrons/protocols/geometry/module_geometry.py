@@ -22,6 +22,7 @@ from opentrons.motion_planning.adjacent_slots_getters import (
     get_adjacent_slots,
 )
 
+from opentrons.drivers.types import ThermocyclerLidStatus
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     ModuleType,
@@ -219,7 +220,7 @@ class ThermocyclerGeometry(ModuleGeometry):
             parent,
         )
         self._lid_height = lid_height
-        self._lid_status = "open"  # Needs to reflect true status
+        self._lid_status = ThermocyclerLidStatus.OPEN  # Needs to reflect true status
         self._configuration = configuration
         if self.is_semi_configuration:
             self._offset = self._offset + Point(-23.28, 0, 0)
@@ -238,7 +239,7 @@ class ThermocyclerGeometry(ModuleGeometry):
         return super().highest_z
 
     @property
-    def lid_status(self) -> str:
+    def lid_status(self) -> ThermocyclerLidStatus:
         return self._lid_status
 
     @lid_status.setter
