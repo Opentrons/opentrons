@@ -31,6 +31,7 @@ def test_analyze(fixture_path: Path, tmp_path: Path) -> None:
 
     assert result.exit_code == 0
 
+    assert "robotType" in analysis_output_json
     assert "pipettes" in analysis_output_json
     assert "commands" in analysis_output_json
     assert "labware" in analysis_output_json
