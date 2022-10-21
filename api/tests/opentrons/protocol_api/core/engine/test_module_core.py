@@ -4,6 +4,7 @@ from decoy import Decoy
 
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_api.core.engine.module_core import ModuleCore
+from opentrons.protocol_api.core.engine.labware import LabwareCore
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
 )
@@ -45,3 +46,11 @@ def test_get_deck_slot(
     )
 
     assert subject.get_deck_slot() == DeckSlotName.SLOT_1
+
+
+def test_add_labware_core(decoy: Decoy, subject: ModuleCore) -> None:
+    """Should return a Labware obejct."""
+    labware_core = decoy.mock(cls=LabwareCore)
+    result = subject.add_labware_core(labware_core=labware_core)
+
+    assert result.api_version == APIVersion(2, 13)

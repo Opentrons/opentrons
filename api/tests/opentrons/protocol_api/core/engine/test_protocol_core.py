@@ -42,7 +42,6 @@ from opentrons.protocol_api.core.engine.module_core import (
     ThermocyclerModuleCore,
     HeaterShakerModuleCore,
 )
-from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.protocols.api_support.types import APIVersion
 
 
@@ -56,6 +55,11 @@ def mock_engine_client(decoy: Decoy) -> EngineClient:
 def subject(mock_engine_client: EngineClient) -> ProtocolCore:
     """Get a ProtocolCore test subject with its dependencies mocked out."""
     return ProtocolCore(engine_client=mock_engine_client, api_version=APIVersion(2, 12))
+
+
+def test_api_version(decoy: Decoy, subject: ProtocolCore) -> None:
+    """Should return the protocol version."""
+    assert subject.api_version == APIVersion(2, 12)
 
 
 def test_load_instrument(

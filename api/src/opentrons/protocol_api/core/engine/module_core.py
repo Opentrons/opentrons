@@ -162,11 +162,13 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
 class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
     """Core control interface for an attached Thermocycler Module."""
 
-    def open_lid(self) -> str:
-        """Open the thermocycler's lid."""
+    def open_lid(self) -> ThermocyclerLidStatus:
+        """Open the Thermocycler's lid."""
+        raise NotImplementedError("MagneticCore")
 
-    def close_lid(self) -> str:
-        """Close the thermocycler's lid."""
+    def close_lid(self) -> ThermocyclerLidStatus:
+        """Close the Thermocycler's lid."""
+        raise NotImplementedError("MagneticCore")
 
     def set_target_block_temperature(
         self,
@@ -193,15 +195,19 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
             If ``hold_time_seconds`` is not specified, the Thermocycler
             will proceed to the next command after ``temperature`` is reached.
         """
+        raise NotImplementedError("MagneticCore")
 
     def wait_for_block_temperature(self) -> None:
         """Wait for target block temperature to be reached."""
+        raise NotImplementedError("MagneticCore")
 
     def set_target_lid_temperature(self, celsius: float) -> None:
         """Set the target temperature for the heated lid, in °C."""
+        raise NotImplementedError("MagneticCore")
 
     def wait_for_lid_temperature(self) -> None:
         """Wait for target lid temperature to be reached."""
+        raise NotImplementedError("MagneticCore")
 
     def execute_profile(
         self,
@@ -229,54 +235,71 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
             and finite for each step.
 
         """
+        raise NotImplementedError("MagneticCore")
 
     def deactivate_lid(self) -> None:
         """Turn off the heated lid."""
+        raise NotImplementedError("MagneticCore")
 
     def deactivate_block(self) -> None:
         """Turn off the well block temperature controller"""
+        raise NotImplementedError("MagneticCore")
 
     def deactivate(self) -> None:
         """Turn off the well block temperature controller, and heated lid"""
+        raise NotImplementedError("MagneticCore")
 
     def get_lid_position(self) -> Optional[ThermocyclerLidStatus]:
         """Get the thermocycler's lid position."""
+        raise NotImplementedError("MagneticCore")
 
     def get_block_temperature_status(self) -> TemperatureStatus:
         """Get the thermocycler's block temperature status."""
+        raise NotImplementedError("MagneticCore")
 
     def get_lid_temperature_status(self) -> Optional[TemperatureStatus]:
         """Get the thermocycler's lid temperature status."""
+        raise NotImplementedError("MagneticCore")
 
     def get_block_temperature(self) -> Optional[float]:
         """Get the thermocycler's current block temperature in °C."""
+        raise NotImplementedError("MagneticCore")
 
     def get_block_target_temperature(self) -> Optional[float]:
         """Get the thermocycler's target block temperature in °C."""
+        raise NotImplementedError("MagneticCore")
 
     def get_lid_temperature(self) -> Optional[float]:
         """Get the thermocycler's current lid temperature in °C."""
+        raise NotImplementedError("MagneticCore")
 
     def get_lid_target_temperature(self) -> Optional[float]:
         """Get the thermocycler's target lid temperature in °C."""
+        raise NotImplementedError("MagneticCore")
 
     def get_ramp_rate(self) -> Optional[float]:
         """Get the thermocycler's current rampe rate in °C/sec."""
+        raise NotImplementedError("MagneticCore")
 
     def get_hold_time(self) -> Optional[float]:
         """Get the remaining hold time in seconds."""
+        raise NotImplementedError("MagneticCore")
 
     def get_total_cycle_count(self) -> Optional[int]:
         """Get number of repetitions for current set cycle."""
+        raise NotImplementedError("MagneticCore")
 
     def get_current_cycle_index(self) -> Optional[int]:
         """Get index of the current set cycle repetition."""
+        raise NotImplementedError("MagneticCore")
 
     def get_total_step_count(self) -> Optional[int]:
         """Get number of steps within the current cycle."""
+        raise NotImplementedError("MagneticCore")
 
     def get_current_step_index(self) -> Optional[int]:
         """Get the index of the current step within the current cycle."""
+        raise NotImplementedError("MagneticCore")
 
 
 class HeaterShakerModuleCore(ModuleCore, AbstractHeaterShakerCore[LabwareCore]):
@@ -284,42 +307,56 @@ class HeaterShakerModuleCore(ModuleCore, AbstractHeaterShakerCore[LabwareCore]):
 
     def set_target_temperature(self, celsius: float) -> None:
         """Set the labware plate's target temperature in °C."""
+        raise NotImplementedError("MagneticCore")
 
     def wait_for_target_temperature(self) -> None:
         """Wait for the labware plate's target temperature to be reached."""
+        raise NotImplementedError("MagneticCore")
 
     def set_and_wait_for_shake_speed(self, rpm: int) -> None:
         """Set the shaker's target shake speed and wait for it to spin up."""
+        raise NotImplementedError("MagneticCore")
 
     def open_labware_latch(self) -> None:
         """Open the labware latch."""
+        raise NotImplementedError("MagneticCore")
 
     def close_labware_latch(self) -> None:
         """Close the labware latch."""
+        raise NotImplementedError("MagneticCore")
 
     def deactivate_shaker(self) -> None:
         """Stop shaking."""
+        raise NotImplementedError("MagneticCore")
 
     def deactivate_heater(self) -> None:
         """Stop heating."""
+        raise NotImplementedError("MagneticCore")
 
     def get_current_temperature(self) -> float:
         """Get the labware plate's current temperature in °C."""
+        raise NotImplementedError("MagneticCore")
 
     def get_target_temperature(self) -> Optional[float]:
         """Get the labware plate's target temperature in °C, if set."""
+        raise NotImplementedError("MagneticCore")
 
     def get_current_speed(self) -> int:
         """Get the shaker's current speed in RPM."""
+        raise NotImplementedError("MagneticCore")
 
     def get_target_speed(self) -> Optional[int]:
         """Get the shaker's target speed in RPM, if set."""
+        raise NotImplementedError("MagneticCore")
 
     def get_temperature_status(self) -> TemperatureStatus:
         """Get the module's heater status."""
+        raise NotImplementedError("MagneticCore")
 
     def get_speed_status(self) -> SpeedStatus:
         """Get the module's heater status."""
+        raise NotImplementedError("MagneticCore")
 
     def get_labware_latch_status(self) -> HeaterShakerLabwareLatchStatus:
         """Get the module's labware latch status."""
+        raise NotImplementedError("MagneticCore")
