@@ -166,6 +166,8 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
           const labwareDef = labwareDefinitions.find(
             def => getLabwareDefURI(def) === definitionUri
           )
+          console.log(labwareDefinitions)
+          console.log(labwareDef)
           const labwareDisplayName =
             labwareDef != null ? getLabwareDisplayName(labwareDef) : ''
           return (
