@@ -61,10 +61,16 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
         #: the critical point geometry based on gripper mount calibration
         self._gripper_id = gripper_id
         self._state = GripperJawState.UNHOMED
+        self._current_jaw_displacement = 0.0
         self._log = mod_log.getChild(self._gripper_id)
         self._log.info(
             f"loaded: {self._model}, gripper offset: {self._calibration_offset}"
         )
+
+    @property
+    def current_jaw_displacement(self) -> float:
+        """The distance one side of the jaw has traveled from home."""
+        return self._current_jaw_displacement
 
     @property
     def state(self) -> GripperJawState:
@@ -105,12 +111,16 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
         between the center of the gripper engagement volume and the calibration pins.
         """
         if cp_override == CriticalPoint.GRIPPER_FRONT_CALIBRATION_PIN:
-            return self._front_calibration_pin_offset + Point(
-                *self._calibration_offset.offset
+            return (
+                self._front_calibration_pin_offset
+                + Point(*self._calibration_offset.offset)
+                - Point(y=self.current_jaw_displacement)
             )
         elif cp_override == CriticalPoint.GRIPPER_REAR_CALIBRATION_PIN:
-            return self._rear_calibration_pin_offset + Point(
-                *self._calibration_offset.offset
+            return (
+                self._rear_calibration_pin_offset
+                + Point(*self._calibration_offset.offset)
+                + Point(y=self.current_jaw_displacement)
             )
         elif cp_override == CriticalPoint.GRIPPER_JAW_CENTER or not cp_override:
             return self._jaw_center_offset + Point(*self._calibration_offset.offset)
