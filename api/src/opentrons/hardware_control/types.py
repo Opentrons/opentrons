@@ -408,7 +408,7 @@ class CriticalPoint(enum.Enum):
     front calibration pin slot.
     """
 
-    GRIPPER_BACK_CALIBRATION_PIN = enum.auto()
+    GRIPPER_REAR_CALIBRATION_PIN = enum.auto()
     """
     The center of the bottom face of a calibration pin inserted in the gripper's
     back calibration pin slot.

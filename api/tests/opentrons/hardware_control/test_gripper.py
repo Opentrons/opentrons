@@ -40,8 +40,8 @@ def test_id_get_added_to_dict():
             lambda g: g._front_calibration_pin_offset,
         ),
         (
-            CriticalPoint.GRIPPER_BACK_CALIBRATION_PIN,
-            lambda g: g._back_calibration_pin_offset,
+            CriticalPoint.GRIPPER_REAR_CALIBRATION_PIN,
+            lambda g: g._rear_calibration_pin_offset,
         ),
     ],
 )

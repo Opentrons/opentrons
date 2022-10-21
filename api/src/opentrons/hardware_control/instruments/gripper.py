@@ -51,10 +51,10 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
         )
         #: the distance between the gripper mount and the front calibration pin
         #: at home
-        self._back_calibration_pin_offset = (
+        self._rear_calibration_pin_offset = (
             Point(*self._config.pin_two_offset_from_base) + base_offset
         )
-        #: the distance between the gripper mount and the back calibration pin
+        #: the distance between the gripper mount and the rear calibration pin
         #: at home
         self._calibration_offset = gripper_cal_offset
         #: The output value of calibration - the additional vector added into
@@ -108,8 +108,8 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
             return self._front_calibration_pin_offset + Point(
                 *self._calibration_offset.offset
             )
-        elif cp_override == CriticalPoint.GRIPPER_BACK_CALIBRATION_PIN:
-            return self._back_calibration_pin_offset + Point(
+        elif cp_override == CriticalPoint.GRIPPER_REAR_CALIBRATION_PIN:
+            return self._rear_calibration_pin_offset + Point(
                 *self._calibration_offset.offset
             )
         elif cp_override == CriticalPoint.GRIPPER_JAW_CENTER or not cp_override:
