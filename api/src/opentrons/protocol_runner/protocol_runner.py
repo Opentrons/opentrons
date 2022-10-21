@@ -159,7 +159,7 @@ class ProtocolRunner:
         commands = self._json_translator.translate_commands(protocol)
 
         if not feature_flags.enable_load_liquid() and any(
-            c.commandType != "loadLiquid" for c in commands
+            c.commandType == "loadLiquid" for c in commands
         ):
             raise CommandDoesNotExistError("loadLiquid command is not yet supported.")
 
