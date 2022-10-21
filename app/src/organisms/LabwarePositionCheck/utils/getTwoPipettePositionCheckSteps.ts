@@ -32,6 +32,7 @@ export const getTwoPipettePositionCheckSteps = (args: {
   const orderedTiprackIdsThatSecondaryPipetteUses = getAllTipracksIdsThatPipetteUsesInOrder(
     secondaryPipetteId,
     commands,
+    // @ts-expect-error these types will match once schemaV6 output is updated
     labware,
     labwareDefinitions
   )
@@ -39,6 +40,7 @@ export const getTwoPipettePositionCheckSteps = (args: {
   const orderedTiprackIdsThatPrimaryPipetteUses = getAllTipracksIdsThatPipetteUsesInOrder(
     primaryPipetteId,
     commands,
+    // @ts-expect-error these types will match once schemaV6 output is updated
     labware,
     labwareDefinitions
   )
@@ -53,9 +55,9 @@ export const getTwoPipettePositionCheckSteps = (args: {
   )
 
   const orderedLabwareIds = getLabwareIdsInOrder(
+    // @ts-expect-error these types will match once schemaV6 output is updated
     labware,
     labwareDefinitions,
-    modules,
     commands
   )
 
