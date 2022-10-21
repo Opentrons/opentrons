@@ -232,6 +232,7 @@ def test_load_json(
         main_file=Path("/dev/null/abc.json"),
         files=[],
         metadata={},
+        robot_type="OT-2 Standard",
         config=JsonProtocolConfig(schema_version=6),
         labware_definitions=[],
     )
@@ -290,6 +291,7 @@ def test_load_python(
         main_file=Path("/dev/null/abc.py"),
         files=[],
         metadata={},
+        robot_type="OT-2 Standard",
         config=PythonProtocolConfig(api_version=APIVersion(3, 0)),
         labware_definitions=[],
     )
@@ -332,6 +334,7 @@ def test_load_legacy_python(
         main_file=Path("/dev/null/abc.py"),
         files=[],
         metadata={},
+        robot_type="OT-2 Standard",
         config=PythonProtocolConfig(api_version=APIVersion(2, 11)),
         labware_definitions=[labware_definition],
     )
@@ -392,6 +395,7 @@ def test_load_legacy_python_with_pe_papi_core(
         main_file=Path("/dev/null/abc.py"),
         files=[],
         metadata={},
+        robot_type="OT-2 Standard",
         config=PythonProtocolConfig(api_version=APIVersion(2, 11)),
         labware_definitions=[],
     )
@@ -443,6 +447,7 @@ def test_load_legacy_json(
         main_file=Path("/dev/null/abc.json"),
         files=[],
         metadata={},
+        robot_type="OT-2 Standard",
         config=JsonProtocolConfig(schema_version=5),
         labware_definitions=[labware_definition],
     )
@@ -453,7 +458,7 @@ def test_load_legacy_json(
         filename="protocol.json",
         api_level=APIVersion(2, 11),
         schema_version=5,
-        metadata={"foo": "bar"},
+        metadata={"protocolName": "A Very Impressive Protocol"},
     )
 
     legacy_context = decoy.mock(cls=LegacyProtocolContext)

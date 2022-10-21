@@ -74,6 +74,8 @@ async def _analyze(
     except ProtocolFilesInvalidError as error:
         raise click.ClickException(str(error))
 
+    # TODO(mm, 2022-10-21): If protocol_source says it's for an OT-3, configure this
+    # runner to use an OT-3 simulating hardware controller.
     runner = await create_simulating_runner()
     analysis = await runner.run(protocol_source)
 
