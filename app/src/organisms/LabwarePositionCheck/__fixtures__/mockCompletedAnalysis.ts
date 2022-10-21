@@ -1,5 +1,6 @@
 import { getLabwareDefURI } from "@opentrons/shared-data"
 import { mockTipRackDef } from './mockTipRackDef'
+import { mockLabwareDef } from './mockLabwareDef'
 
 import type { CompletedProtocolAnalysis } from "@opentrons/shared-data"
 
@@ -13,7 +14,14 @@ export const mockCompletedAnalysis: CompletedProtocolAnalysis = {
     loadName: 'fakeLoadName',
     definitionUri: getLabwareDefURI(mockTipRackDef),
     location: { slotName: '1' }
-  }],
+  },
+{
+    id: 'labwareId2',
+    loadName: 'fakeSecondLoadName',
+    definitionUri: getLabwareDefURI(mockLabwareDef),
+    location: { slotName: '2' }
+  }
+],
   pipettes: [{
     id: 'pipetteId1',
     pipetteName: 'p10_single',
@@ -37,6 +45,24 @@ export const mockCompletedAnalysis: CompletedProtocolAnalysis = {
       result: {
         labwareId: 'labwareId1',
         definition: mockTipRackDef,
+        offset: {x: 0, y: 0, z: 0} 
+      }
+    },
+    {
+      commandType: 'loadLabware',
+      id: 'fakeSecondCommandId',
+      status: 'succeeded',
+      createdAt: 'fakeCreatedAtTimestamp',
+      startedAt: 'fakeStartedAtTimestamp',
+      completedAt: 'fakecompletedAtTimestamp',
+      error: null,
+      params: {
+        labwareId: 'labwareId2',
+        location: {slotName: '2'},
+      },
+      result: {
+        labwareId: 'labwareId2',
+        definition: mockLabwareDef,
         offset: {x: 0, y: 0, z: 0} 
       }
     }

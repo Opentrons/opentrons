@@ -31,7 +31,6 @@ import type {
 import type { Jog } from '../../molecules/DeprecatedJogControls/types'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { getDisplayLocation } from './utils/getDisplayLocation'
-import { escapeRegExp } from 'lodash'
 import { chainRunCommands } from './utils/chainRunCommands'
 interface CheckItemProps extends Omit<CheckLabwareStep, 'section'> {
   section: 'CHECK_LABWARE' | 'CHECK_TIP_RACKS'
@@ -43,7 +42,6 @@ interface CheckItemProps extends Omit<CheckLabwareStep, 'section'> {
   existingOffsets: LabwareOffset[]
   handleJog: Jog
   isRobotMoving: boolean
-  currentStepIndex: number // ensure rerendering on proceed
 }
 export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   const {
@@ -147,19 +145,18 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
       createRunCommand({
         command: { commandType: 'savePosition', params: { pipetteId } },
         waitUntilComplete: true,
+      }, {
+        onSuccess:
+          response => {
+            const { position } = response.data.result
+            registerPosition({
+              type: 'initialPosition',
+              labwareId,
+              location,
+              position,
+            })
+          }
       })
-        .then(response => {
-          const { position } = response.data.result
-          registerPosition({
-            type: 'initialPosition',
-            labwareId,
-            location,
-            position,
-          })
-        })
-        .catch((e: Error) => {
-          console.error(`error saving position: ${e.message}`)
-        })
     })
   }
 
@@ -256,7 +253,6 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
           body={
             <UnorderedList
               items={[
-                t('place_modules'),
                 t('clear_all_slots'),
                 placeItemInstruction,
               ]}

@@ -7,7 +7,6 @@ import { SECTIONS } from '../constants'
 import { mockCompletedAnalysis, mockExistingOffsets, mockWorkingOffsets } from '../__fixtures__'
 import { chainRunCommands } from '../utils/chainRunCommands'
 import { HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
-import { CreateRunCommand } from '../types'
 import { CommandData } from '@opentrons/api-client'
 import { resetAllWhenMocks, when } from 'jest-when'
 

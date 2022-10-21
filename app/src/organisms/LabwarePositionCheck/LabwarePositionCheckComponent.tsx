@@ -252,7 +252,7 @@ export const LabwarePositionCheckInner = (
     currentStep.section === 'CHECK_TIP_RACKS' ||
     currentStep.section === 'CHECK_LABWARE'
   ) {
-    modalContent = <CheckItem {...currentStep} {...movementStepProps} {...{ currentStepIndex }} />
+    modalContent = <CheckItem {...currentStep} {...movementStepProps} />
   } else if (currentStep.section === 'PICK_UP_TIP') {
     modalContent = <PickUpTip {...currentStep} {...movementStepProps} />
   } else if (currentStep.section === 'RETURN_TIP') {
