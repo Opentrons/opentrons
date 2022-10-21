@@ -61,13 +61,9 @@ class OT3GPIO:
         self._estop_out_line.set_value(1)
 
     def activate_nsync_out(self) -> None:
-        """Assert the emergency stop, which will disable all motors."""
+        """Assert the nsync out line."""
         self._nsync_out_line.set_value(0)
 
     def deactivate_nsync_out(self) -> None:
-        """Stop asserting the emergency stop.
-
-        If no other node is asserting estop, then motors can be enabled
-        again.
-        """
+        """Stop asserting the nsync out line."""
         self._nsync_out_line.set_value(1)
