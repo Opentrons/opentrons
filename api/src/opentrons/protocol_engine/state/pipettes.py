@@ -16,7 +16,6 @@ from ..commands import (
     DispenseResult,
     DispenseInPlaceResult,
     MoveLabwareResult,
-    MoveLabwareOffDeckResult,
     MoveToCoordinatesResult,
     MoveToWellResult,
     PickUpTipResult,
@@ -173,12 +172,9 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         #
         # This is necessary for safe motion planning in case the next movement
         # goes to the same labware (now in a new place).
-        elif isinstance(command.result, (MoveLabwareResult, MoveLabwareOffDeckResult)):
+        elif isinstance(command.result, MoveLabwareResult):
             moved_labware_id = command.params.labwareId
-            if (
-                isinstance(command.result, MoveLabwareResult)
-                and command.params.useGripper
-            ):
+            if command.params.strategy == "usingGripper":
                 # All mounts will have been retracted.
                 self._state.current_well = None
             elif (

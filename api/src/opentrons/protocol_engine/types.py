@@ -54,6 +54,11 @@ LabwareLocation = Union[DeckSlotLocation, ModuleLocation, _OffDeckLocationType]
 """Union of all locations where it's legal to keep a labware."""
 
 
+LabwareMovementStrategyType = Literal[
+    "usingGripper", "manualMoveWithPause", "manualMoveWithoutPause"
+]
+
+
 class WellOrigin(str, Enum):
     """Origin of WellLocation offset."""
 
