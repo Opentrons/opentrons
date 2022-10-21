@@ -26,6 +26,11 @@ import { ProtocolDetails } from '../pages/Protocols/ProtocolDetails'
 import { AppSettings } from '../pages/AppSettings'
 import { Labware } from '../pages/Labware'
 import { ODDSplash } from '../pages/ODD/ODDSplash'
+import { SearchNetwork } from '../pages/ODD/SearchNetwork'
+import { ConnectingNetwork } from '../pages/ODD/ConnectingNetwork'
+import { ConnectionResult } from '../pages/ODD/ConnectionResult'
+import { ConnectedNetworkInfo } from '../pages/ODD/ConnectedNetworkInfo'
+import { SelectNetwork } from '../pages/ODD/SelectNetwork'
 import { getIsOnDevice } from '../redux/config'
 import { getLocalRobot } from '../redux/discovery'
 import { useSoftwareUpdatePoll } from './hooks'
@@ -109,6 +114,36 @@ export const AppComponent = (): JSX.Element => {
       name: 'ODD Splash',
       path: '/start',
     },
+    {
+      Component: SearchNetwork,
+      exact: true,
+      name: 'Search Network',
+      path: '/searchNetwork',
+    },
+    {
+      Component: ConnectingNetwork,
+      exact: true,
+      name: 'Connecting Network',
+      path: '/connectingNetwork',
+    },
+    {
+      Component: ConnectionResult,
+      exact: true,
+      name: 'Connection Result',
+      path: '/connectionResult',
+    },
+    {
+      Component: ConnectedNetworkInfo,
+      exact: true,
+      name: 'Connected Network Info',
+      path: '/connectedNetworkInfo',
+    },
+    {
+      Component: SelectNetwork,
+      exact: true,
+      name: 'Select Network',
+      path: '/selectNetwork',
+    },
   ]
 
   const isOnDeviceRoutes = allRoutes.filter(route => route.path !== '/devices')
@@ -129,7 +164,8 @@ export const AppComponent = (): JSX.Element => {
         onDrop={stopEvent}
       >
         <TopPortalRoot />
-        {!isOnDevice && (<Navbar routes={routes} />)}
+        {/* {!isOnDevice && <Navbar routes={routes} />} */}
+        <Navbar routes={routes} />
         <Box width="100%">
           <Switch>
             {routes.map(({ Component, exact, path }: RouteProps) => {
