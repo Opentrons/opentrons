@@ -18,6 +18,17 @@ log = logging.getLogger(__name__)
 DEFAULT_GRIPPER_CALIBRATION_OFFSET = [0.0, 0.0, 0.0]
 
 
+"""
+Gripper load measurement
+========================
+10/13/2022
+
+To lift a 1.5 kg load,
+the velocity should be 19 mm/s & acceleration at 19 mm/s^2.
+Run current: 0.7 A and Hold current: 0.2 A.
+"""
+
+
 @dataclass(frozen=True)
 class GripperConfig:
     display_name: str
@@ -48,8 +59,9 @@ def _get_offset(def_offset: GripperOffset) -> Offset:
 
 
 def info_num_to_model(num: str) -> GripperModel:
+    major_model = num[0]
     model_map = {"0": GripperModel.V1, "1": GripperModel.V1}
-    return model_map[num]
+    return model_map[major_model]
 
 
 def load(
