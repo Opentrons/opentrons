@@ -104,6 +104,17 @@ const GRID_STYLE = css`
   width: 100%;
   grid-template-columns: 26.6% 26.6% 26.6% 20.2%;
 `
+
+const ZOOM_ICON_STYLE = css`
+  border-radius: ${BORDERS.radiusSoftCorners};
+  &:hover {
+    background: ${COLORS.lightGreyHover};
+  }
+  &:active {
+    background: ${COLORS.lightGreyEnabled};
+  }
+`
+
 interface RoundTabProps extends React.ComponentProps<typeof Btn> {
   isCurrent: boolean
 }
