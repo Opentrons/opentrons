@@ -134,3 +134,8 @@ term:
 
 .PHONY: push-all-and-term
 push-all-and-term: push-all term
+
+.PHONY: pull-data
+pull-data-ot3:
+	mkdir -p ./.pulled-data
+	scp -r root@$(host):/data/testing_data/$(test) ./.pulled-data
