@@ -1,20 +1,16 @@
 import asyncio
+import sys
 from typing import AsyncGenerator
 
 import anyio
 import pytest
 
-from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.emulation.settings import Settings
 from opentrons.hardware_control.modules import Thermocycler
 from opentrons.hardware_control.modules.types import TemperatureStatus
 
-
-@pytest.fixture
-def execution_manager() -> ExecutionManager:
-    """Return the ExecutionManager used by the Thermocycler test subject."""
-    return ExecutionManager()
+from .build_module import build_module
 
 
 @pytest.fixture
@@ -22,17 +18,16 @@ async def thermocycler(
     emulation_app: None,
     emulator_settings: Settings,
     execution_manager: ExecutionManager,
+    poll_interval_seconds: float,
 ) -> AsyncGenerator[Thermocycler, None]:
     """Return a Thermocycler test subject."""
-    module = await Thermocycler.build(
-        port=f"socket://127.0.0.1:{emulator_settings.thermocycler_proxy.driver_port}",
+    module = await build_module(
+        Thermocycler,
+        port=emulator_settings.thermocycler_proxy.driver_port,
         execution_manager=execution_manager,
-        usb_port=USBPort(name="", port_number=1, device_path="", hub=1),
-        loop=asyncio.get_running_loop(),
-        polling_frequency=0.01,
+        poll_interval_seconds=poll_interval_seconds,
     )
     yield module
-    await execution_manager.cancel()
     await module.cleanup()
 
 
@@ -47,7 +42,6 @@ def test_device_info(thermocycler: Thermocycler) -> None:
 
 async def test_lid_status(thermocycler: Thermocycler) -> None:
     """It should run open and close lid."""
-    await thermocycler.wait_next_poll()
     assert thermocycler.lid_status == "open"
 
     await thermocycler.close()
@@ -66,7 +60,6 @@ async def test_lid_temperature(thermocycler: Thermocycler) -> None:
     assert thermocycler.lid_target == 40
 
     await thermocycler.deactivate_lid()
-    await thermocycler.wait_next_poll()
     assert thermocycler.lid_target is None
 
 
@@ -82,7 +75,6 @@ async def test_plate_temperature(thermocycler: Thermocycler) -> None:
     assert thermocycler.temperature == 80
 
     await thermocycler.deactivate_block()
-    await thermocycler.wait_next_poll()
     assert thermocycler.target is None
 
 
@@ -136,8 +128,12 @@ async def test_wait_for_temperatures(thermocycler: Thermocycler) -> None:
 
 
 # TODO(mm, 2022-07-01): This test is a flakiness hazard because it's sensitive to
-# timing and async task scheduling.
+# timing and async task scheduling. Move to an isolated unit test, instead
+@pytest.mark.xfail(
+    condition=(sys.platform == "darwin"), reason="Timing flakiness on macOS"
+)
 async def test_cycle_cannot_be_interrupted_by_pause(
+    poll_interval_seconds: int,
     thermocycler: Thermocycler,
     execution_manager: ExecutionManager,
 ) -> None:
@@ -159,11 +155,10 @@ async def test_cycle_cannot_be_interrupted_by_pause(
     # in the middle of it, but not so long that makes the test take a disruptively
     # long time.
     steps = [
-        *[
-            {"temperature": temp_1},
-            {"temperature": temp_2},
-        ]
-        * 5,
+        {"temperature": temp_1, "hold_time_seconds": poll_interval_seconds * 2},
+        {"temperature": temp_2, "hold_time_seconds": poll_interval_seconds * 2},
+        {"temperature": temp_1, "hold_time_seconds": poll_interval_seconds * 2},
+        {"temperature": temp_2, "hold_time_seconds": poll_interval_seconds * 2},
         {"temperature": final_temp},
     ]
 
@@ -185,7 +180,7 @@ async def test_cycle_cannot_be_interrupted_by_pause(
     # For this test to be meaningful, this task needs to have woken up before the steps
     # have completed. Double-check that this is actually the case.
     # Note that current_step_index is 1-based.
-    assert thermocycler.current_step_index <= thermocycler.total_step_count
+    assert thermocycler.current_step_index <= thermocycler.total_step_count  # type: ignore[operator]
     assert thermocycler.temperature != final_temp
 
     # Issue a pause now that we're in the middle of the steps.
