@@ -1519,7 +1519,11 @@ class OT3API(
         pass_start_pos = moving_axis.set_in_point(here, pass_start)
         await self.move_to(mount, pass_start_pos)
         await self._backend.capacitive_probe(
-            mount, moving_axis, machine_pass_distance, pass_settings
+            mount,
+            moving_axis,
+            machine_pass_distance,
+            pass_settings.speed_mm_per_s,
+            pass_settings.sensor_threshold_pf,
         )
         end_pos = await self.gantry_position(mount, refresh=True)
         await self.move_to(mount, pass_start_pos)

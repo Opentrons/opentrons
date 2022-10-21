@@ -17,7 +17,7 @@ from typing import (
     Mapping,
 )
 
-from opentrons.config.types import OT3Config, GantryLoad, CapacitivePassSettings
+from opentrons.config.types import OT3Config, GantryLoad
 from opentrons.config import pipette_config, gripper_config
 from opentrons_shared_data.pipette import dummy_model_for_name
 from .ot3utils import (
@@ -479,7 +479,8 @@ class OT3Simulator:
         mount: OT3Mount,
         moving: OT3Axis,
         distance_mm: float,
-        capacitive_settings: CapacitivePassSettings,
+        speed_mm_per_s: float,
+        sensor_threshold_pf: float,
     ) -> None:
         self._position[axis_to_node(moving)] += distance_mm
 
