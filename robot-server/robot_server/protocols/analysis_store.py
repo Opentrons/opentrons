@@ -125,7 +125,8 @@ class AnalysisStore:
             pipettes: See `CompletedAnalysis.pipettes`.
             errors: See `CompletedAnalysis.errors`. Also used to infer whether
                 the completed analysis result is `OK` or `NOT_OK`.
-            liquids: See `CompletedAnalysis.liquids
+            liquids: See `CompletedAnalysis.liquids`.
+            robot_type: See `CompletedAnalysis.robotType`.
         """
         protocol_id = self._pending_store.get_protocol_id(analysis_id=analysis_id)
 
