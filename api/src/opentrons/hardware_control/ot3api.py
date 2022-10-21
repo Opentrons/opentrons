@@ -926,6 +926,7 @@ class OT3API(
                     try:
                         gripper = self._gripper_handler.get_gripper()
                         gripper.state = GripperJawState.HOMED_READY
+                        gripper.current_jaw_displacement = encoder_position[OT3Axis.G]
                     except GripperNotAttachedError:
                         pass
 
@@ -1018,6 +1019,7 @@ class OT3API(
             await self._backend.gripper_grip_jaw(duty_cycle=duty_cycle)
             encoder_pos = await self._backend.update_encoder_position()
             self._encoder_current_position.update(encoder_pos)
+            self._gripper_handler.set_jaw_displacement(encoder_pos[OT3Axis.G])
         except Exception:
             self._log.exception("Gripper grip failed")
             raise
@@ -1029,6 +1031,7 @@ class OT3API(
             await self._backend.gripper_home_jaw()
             encoder_pos = await self._backend.update_encoder_position()
             self._encoder_current_position.update(encoder_pos)
+            self._gripper_handler.set_jaw_displacement(encoder_pos[OT3Axis.G])
         except Exception:
             self._log.exception("Gripper home failed")
             raise
@@ -1056,6 +1059,7 @@ class OT3API(
             )
             encoder_pos = await self._backend.update_encoder_position()
             self._encoder_current_position.update(encoder_pos)
+            self._gripper_handler.set_jaw_displacement(encoder_pos[OT3Axis.G])
         except Exception:
             self._log.exception("Gripper set width failed")
             raise
