@@ -1,13 +1,18 @@
 """Tests for pipette state changes in the protocol_engine state store."""
 import pytest
 from datetime import datetime
-from typing import Optional, Union
+from typing import Optional
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from opentrons.types import DeckSlotName, MountType
 from opentrons.protocol_engine import commands as cmd
-from opentrons.protocol_engine.types import DeckPoint, DeckSlotLocation, LoadedPipette
+from opentrons.protocol_engine.types import (
+    DeckPoint,
+    DeckSlotLocation,
+    LoadedPipette,
+    OFF_DECK_LOCATION,
+)
 from opentrons.protocol_engine.actions import UpdateCommandAction
 from opentrons.protocol_engine.state.pipettes import (
     PipetteStore,
@@ -25,7 +30,6 @@ from .command_fixtures import (
     create_move_to_well_command,
     create_blow_out_command,
     create_move_labware_command,
-    create_move_labware_off_deck_command,
 )
 
 
@@ -394,6 +398,7 @@ def test_heater_shaker_command_without_movement(
         (
             create_move_labware_command(
                 labware_id="non-matching-labware-id",
+                strategy="manualMoveWithPause",
                 new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
                 offset_id=None,
             ),
@@ -408,6 +413,7 @@ def test_heater_shaker_command_without_movement(
         (
             create_move_labware_command(
                 labware_id="matching-labware-id",
+                strategy="manualMoveWithPause",
                 new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
                 offset_id=None,
             ),
@@ -416,9 +422,14 @@ def test_heater_shaker_command_without_movement(
             None,
         ),
         (
-            create_move_labware_off_deck_command(labware_id="non-matching-labware-id"),
+            create_move_labware_command(
+                labware_id="non-matching-labware-id",
+                strategy="manualMoveWithoutPause",
+                new_location=OFF_DECK_LOCATION,
+                offset_id=None,
+            ),
             # Current well NOT cleared,
-            # because MoveLabwareOffDeck command had "non-matching-labware-id".
+            # because MoveLabware command had "non-matching-labware-id".
             CurrentWell(
                 pipette_id="pipette-id",
                 labware_id="matching-labware-id",
@@ -426,16 +437,21 @@ def test_heater_shaker_command_without_movement(
             ),
         ),
         (
-            create_move_labware_off_deck_command(labware_id="matching-labware-id"),
+            create_move_labware_command(
+                labware_id="matching-labware-id",
+                strategy="manualMoveWithoutPause",
+                new_location=OFF_DECK_LOCATION,
+                offset_id=None,
+            ),
             # Current well IS cleared,
-            # because MoveLabwareOffDeck command had "matching-labware-id".
+            # because MoveLabware command had "matching-labware-id".
             None,
         ),
         (
             create_move_labware_command(
                 labware_id="non-matching-labware-id",
                 new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-                use_gripper=True,
+                strategy="usingGripper",
                 offset_id=None,
             ),
             # Current well IS cleared,
@@ -446,7 +462,7 @@ def test_heater_shaker_command_without_movement(
 )
 def test_move_labware_clears_current_well(
     subject: PipetteStore,
-    move_labware_command: Union[cmd.MoveLabware, cmd.MoveLabwareOffDeck],
+    move_labware_command: cmd.MoveLabware,
     expected_current_well: Optional[CurrentWell],
 ) -> None:
     """Labware movement commands should sometimes clear the current well.

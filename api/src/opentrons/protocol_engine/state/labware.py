@@ -20,7 +20,6 @@ from ..commands import (
     Command,
     LoadLabwareResult,
     MoveLabwareResult,
-    MoveLabwareOffDeckResult,
 )
 from ..types import (
     DeckSlotLocation,
@@ -30,7 +29,6 @@ from ..types import (
     LabwareOffsetLocation,
     LabwareLocation,
     LoadedLabware,
-    OFF_DECK_LOCATION,
 )
 from ..actions import (
     Action,
@@ -157,11 +155,6 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
 
             self._state.labware_by_id[labware_id].offsetId = new_offset_id
             self._state.labware_by_id[labware_id].location = new_location
-
-        elif isinstance(command.result, MoveLabwareOffDeckResult):
-            labware_id = command.params.labwareId
-            self._state.labware_by_id[labware_id].location = OFF_DECK_LOCATION
-            self._state.labware_by_id[labware_id].offsetId = None
 
     def _add_labware_offset(self, labware_offset: LabwareOffset) -> None:
         """Add a new labware offset to state.
