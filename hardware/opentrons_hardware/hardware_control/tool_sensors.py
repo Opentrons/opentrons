@@ -44,6 +44,7 @@ async def capacitive_probe(
     mover: NodeId,
     distance: float,
     speed: float,
+    sensor_id: SensorId = SensorId.S0,
     relative_threshold_pf: float = 1.0,
     log_sensor_values: bool = False,
 ) -> Tuple[float, float]:
@@ -56,7 +57,7 @@ async def capacitive_probe(
     either by negating speed or negating distance.
     """
     sensor_scheduler = SensorScheduler()
-    sensor_info = SensorInformation(SensorType.capacitive, SensorId.S0, tool)
+    sensor_info = SensorInformation(SensorType.capacitive, sensor_id, tool)
     threshold = await sensor_scheduler.send_threshold(
         SensorThresholdInformation(
             sensor=sensor_info,
@@ -85,11 +86,12 @@ async def capacitive_pass(
     mover: NodeId,
     distance: float,
     speed: float,
+    sensor_id: SensorId = SensorId.S0,
 ) -> List[float]:
     """Move the specified axis while capturing capacitive sensor readings."""
     sensor_scheduler = SensorScheduler()
     sensor_info = SensorInformation(
-        sensor_type=SensorType.capacitive, sensor_id=SensorId.S0, node_id=tool
+        sensor_type=SensorType.capacitive, sensor_id=sensor_id, node_id=tool
     )
     pass_group = _build_pass_step(mover, distance, speed)
     runner = MoveGroupRunner(move_groups=[[pass_group]])
