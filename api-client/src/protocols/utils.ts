@@ -259,23 +259,15 @@ export interface ParsedLiquid extends Omit<Liquid, 'displayColor'> {
   displayColor: string
 }
 
-// TODO(sh, 2022-09-12): This util currently accepts liquids in two different shapes, one that adheres to the V6 schema
-// and the other in array form coming from ProtocolAnalysisOutput. This should be reconciled to use a single type so
-// conversion of the shape is not needed in the util and the type is consistent across the board.
 export function parseLiquidsInLoadOrder(
-  liquids: LiquidsById | Liquid[],
+  liquids: Liquid[],
   commands: RunTimeCommand[]
 ): ParsedLiquid[] {
   const loadLiquidCommands = commands.filter(
     (command): command is LoadLiquidRunTimeCommand =>
       command.commandType === 'loadLiquid'
   )
-  const transformedLiquids = Array.isArray(liquids)
-    ? liquids
-    : Object.keys(liquids).map(key => {
-        return { id: key, ...liquids[key] }
-      })
-  const loadedLiquids = transformedLiquids.map((liquid, index) => {
+  const loadedLiquids = liquids.map((liquid, index) => {
     return {
       ...liquid,
       displayColor:

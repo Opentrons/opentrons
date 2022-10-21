@@ -82,22 +82,6 @@ export const schemaV6Adapter = (
         }
       }, {})
 
-    const liquids: {
-      [liquidId: string]: {
-        displayName: string
-        description: string
-        displayColor?: string
-      }
-    } = protocolAnalysis.liquids?.reduce((acc, liquid) => {
-      return {
-        ...acc,
-        [liquid.id]: {
-          displayName: liquid.displayName,
-          description: liquid.description,
-          displayColor: liquid.displayColor,
-        },
-      }
-    }, {})
     return {
       ...protocolAnalysis,
       //  @ts-expect-error
@@ -105,7 +89,8 @@ export const schemaV6Adapter = (
       //  @ts-expect-error
       labware,
       modules,
-      liquids,
+      //  @ts-expect-error
+      liquids: protocolAnalysis.liquids,
       labwareDefinitions,
       commands: protocolAnalysis.commands,
     }

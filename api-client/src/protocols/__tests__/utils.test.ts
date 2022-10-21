@@ -102,18 +102,20 @@ const mockLoadLiquidRunTimeCommands = [
     completedAt: '2022-09-07T19:47:42.786412+00:00',
   },
 ]
-const mockLiquids = {
-  '0': {
+const mockLiquids = [
+  {
+    id: '0',
     displayName: 'Water',
     description: 'mock liquid 1',
     displayColor: '#50d5ff',
   },
-  '1': {
+  {
+    id: '1',
     displayName: 'Saline',
     description: 'mock liquid 2',
     displayColor: '#b925ff',
   },
-}
+]
 
 describe('parseInitialPipetteNamesByMount', () => {
   it('returns pipette names for each mount if loaded and null if nothing loaded', () => {
