@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   Flex,
-  Box,
   ALIGN_CENTER,
+  DIRECTION_COLUMN,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
@@ -25,17 +25,17 @@ export function FeatureFlags(): JSX.Element {
     dispatch(Config.toggleDevInternalFlag(flag))
 
   return (
-    <Box
-      height="calc(100vh - 8.5rem)"
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      minHeight="calc(100vh - 8.5rem)"
       paddingX={SPACING.spacing4}
       paddingY={SPACING.spacing5}
     >
       {Config.DEV_INTERNAL_FLAGS.map((flag, index) => (
-        <>
+        <React.Fragment key={flag}>
           <Flex
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
-            key={flag}
           >
             <StyledText
               as="h3"
@@ -54,8 +54,8 @@ export function FeatureFlags(): JSX.Element {
           {index !== Config.DEV_INTERNAL_FLAGS.length - 1 && (
             <Divider marginY={SPACING.spacing5} />
           )}
-        </>
+        </React.Fragment>
       ))}
-    </Box>
+    </Flex>
   )
 }

@@ -23,6 +23,7 @@ export interface CommonCommandRunTimeInfo {
 }
 export interface CommonCommandCreateInfo {
   key?: string
+  meta?: { [key: string]: any }
 }
 
 export type CreateCommand =

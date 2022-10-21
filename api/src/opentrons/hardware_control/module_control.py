@@ -77,7 +77,7 @@ class AttachedModulesControl:
             usb_port=usb_port,
             type=type,
             simulating=self._api.is_simulator,
-            loop=self._api.loop,
+            hw_control_loop=self._api.loop,
             execution_manager=self._api._execution_manager,
             sim_model=sim_model,
         )
@@ -100,11 +100,11 @@ class AttachedModulesControl:
                 self._available_modules.remove(removed_mod)
             except ValueError:
                 log.exception(
-                    f"Removed Module {removed_mod} not" " found in attached modules"
+                    f"Removed Module {removed_mod} not found in attached modules"
                 )
         for removed_mod in removed_modules:
             log.info(
-                f"Module {removed_mod.name()} detached" f" from port {removed_mod.port}"
+                f"Module {removed_mod.name()} detached from port {removed_mod.port}"
             )
             await removed_mod.cleanup()
         self._available_modules = sorted(

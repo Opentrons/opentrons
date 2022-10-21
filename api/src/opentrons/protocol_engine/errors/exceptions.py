@@ -175,3 +175,11 @@ class ProtocolCommandFailedError(ProtocolEngineError):
 
 class HardwareNotSupportedError(ProtocolEngineError):
     """An error raised when executing a command on the wrong hardware."""
+
+
+class GripperNotAttachedError(ProtocolEngineError):
+    """An error raised when executing a gripper action without an attached gripper."""
+
+
+class UnsupportedLabwareMovementError(ProtocolEngineError):
+    """An error raised when attempting an illegal labware movement."""

@@ -137,6 +137,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
               well: args.sourceWell,
               flowRate: aspirateFlowRateUlSec,
               offsetFromBottomMm: airGapOffsetSourceWell,
+              isAirGap: true,
             }),
             ...(aspirateDelay != null
               ? [
@@ -156,6 +157,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
               well: firstDestWell,
               flowRate: dispenseFlowRateUlSec,
               offsetFromBottomMm: airGapOffsetDestWell,
+              isAirGap: true,
             }),
             ...(dispenseDelay != null
               ? [
@@ -257,6 +259,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
                 well: dispenseAirGapWell,
                 flowRate: aspirateFlowRateUlSec,
                 offsetFromBottomMm: airGapOffsetDestWell,
+                isAirGap: true,
               }),
               ...(aspirateDelay != null
                 ? [
