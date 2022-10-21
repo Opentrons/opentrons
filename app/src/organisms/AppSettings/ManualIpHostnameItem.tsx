@@ -31,7 +31,7 @@ const CLOSE_ICON_STYLE = css`
     background: ${COLORS.lightGreyHover};
   }
   &:active {
-    background: ${COLORS.lightGreyEnabled};
+    background: ${COLORS.lightGreyPressed};
   }
 `
 interface IpHostnameItemProps {

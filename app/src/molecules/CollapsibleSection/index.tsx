@@ -18,7 +18,7 @@ const ACCORDION_STYLE = css`
     background: ${COLORS.lightGreyHover};
   }
   &:active {
-    background: ${COLORS.lightGreyEnabled};
+    background: ${COLORS.lightGreyPressed};
   }
 `
 

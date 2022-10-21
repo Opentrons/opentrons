@@ -34,7 +34,7 @@ export const dandelionYellowHover = '#eca20f'
 export const dandelionYellowPressed = '#eca20f'
 
 // colors grey
-export const lightGreyEnabled = `${darkBlackEnabled}${opacity17HexCode}`
+export const lightGreyPressed = `${darkBlackEnabled}${opacity17HexCode}`
 export const lightGreyHover = `${darkBlackEnabled}${opacity10HexCode}`
 export const medGreyEnabled = '#e3e3e3'
 export const medGreyHover = '#b8b8b8'

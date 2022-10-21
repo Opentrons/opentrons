@@ -15,7 +15,7 @@ const overflowButtonStyles = css`
 
   &:active,
   &:focus {
-    background-color: ${COLORS.lightGreyEnabled};
+    background-color: ${COLORS.lightGreyPressed};
   }
 
   &:active circle,

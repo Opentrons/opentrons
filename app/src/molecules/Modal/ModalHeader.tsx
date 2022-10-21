@@ -35,7 +35,7 @@ const closeIconStyles = css`
   }
 
   &:active {
-    background-color: ${COLORS.lightGreyEnabled};
+    background-color: ${COLORS.lightGreyPressed};
   }
 `
 
