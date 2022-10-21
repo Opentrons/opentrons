@@ -96,3 +96,7 @@ class GripperHandler:
         if not newton:
             newton = DEFAULT_GRIP_FORCE_IN_NEWTON
         return gripper.duty_cycle_by_force(newton)
+
+    def set_jaw_displacement(self, mm: float) -> None:
+        gripper = self.get_gripper()
+        gripper.current_jaw_displacement = mm

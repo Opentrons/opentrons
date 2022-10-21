@@ -72,6 +72,18 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
         """The distance one side of the jaw has traveled from home."""
         return self._current_jaw_displacement
 
+    def _max_jaw_displacement(self) -> float:
+        return (self._config.jaw_sizes_mm["max"] - self._config.jaw_sizes_mm["min"]) / 2
+
+    @current_jaw_displacement.setter
+    def current_jaw_displacement(self, mm: float) -> None:
+        assert mm >= 0.0, "jaw displacement from home should always be positive"
+        assert mm <= (self._max_jaw_displacement() + 0.5), (
+            "jaw displacement exceeds max expected value: "
+            f"{self._max_jaw_displacement() + 0.5} mm"
+        )
+        self._current_jaw_displacement = mm
+
     @property
     def state(self) -> GripperJawState:
         return self._state
