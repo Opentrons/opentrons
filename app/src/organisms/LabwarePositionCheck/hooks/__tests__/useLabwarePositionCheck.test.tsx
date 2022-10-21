@@ -21,7 +21,7 @@ import {
 import { getLabwareLocation } from '../../../Devices/ProtocolRun/utils/getLabwareLocation'
 import { getModuleInitialLoadInfo } from '../../../Devices/ProtocolRun/utils/getModuleInitialLoadInfo'
 import { useDeprecatedSteps } from '../useDeprecatedSteps'
-import { useLabwarePositionCheck } from '../useLabwarePositionCheck'
+import { useDeprecatedLabwarePositionCheck } from '../useDeprecatedLabwarePositionCheck'
 
 import type { HostConfig } from '@opentrons/api-client'
 import type { DeprecatedLabwarePositionCheckStep } from '../../types'
@@ -76,7 +76,7 @@ const mockGetModuleInitialLoadInfo = getModuleInitialLoadInfo as jest.MockedFunc
   typeof getModuleInitialLoadInfo
 >
 let mockTrackEvent: jest.Mock
-describe('useLabwarePositionCheck', () => {
+describe('useDeprecatedLabwarePositionCheck', () => {
   const MOCK_ROBOT_NAME = 'otie'
   const MOCK_RUN_ID = 'MOCK_RUN_ID'
   const HOST_CONFIG: HostConfig = {
@@ -112,7 +112,7 @@ describe('useLabwarePositionCheck', () => {
           ],
           labwareId: MOCK_LABWARE_ID,
           section: 'PRIMARY_PIPETTE_TIPRACKS',
-        } as LabwarePositionCheckStep,
+        } as DeprecatedLabwarePositionCheckStep,
       ])
     mockCreateCommand = jest.fn(() =>
       Promise.resolve({ data: { id: MOCK_COMMAND_ID } })
@@ -139,7 +139,7 @@ describe('useLabwarePositionCheck', () => {
   describe('beginLPC', () => {
     it('should track a mixpanel event', async () => {
       const { result, waitForNextUpdate } = renderHook(
-        () => useLabwarePositionCheck(() => null, {}),
+        () => useDeprecatedLabwarePositionCheck(() => null, {}),
         { wrapper }
       )
       if ('error' in result.current) {
@@ -185,10 +185,10 @@ describe('useLabwarePositionCheck', () => {
             ],
             labwareId: MOCK_LABWARE_ID,
             section: 'PRIMARY_PIPETTE_TIPRACKS',
-          } as LabwarePositionCheckStep,
+          } as DeprecatedLabwarePositionCheckStep,
         ])
       const { result, waitForNextUpdate } = renderHook(
-        () => useLabwarePositionCheck(() => null, {}),
+        () => useDeprecatedLabwarePositionCheck(() => null, {}),
         { wrapper }
       )
       if ('error' in result.current) {
@@ -234,7 +234,7 @@ describe('useLabwarePositionCheck', () => {
   describe('jog', () => {
     it('should NOT queue up a new jog command when a previous jog command has NOT completed', async () => {
       const { result, waitForNextUpdate } = renderHook(
-        () => useLabwarePositionCheck(() => null, {}),
+        () => useDeprecatedLabwarePositionCheck(() => null, {}),
         { wrapper }
       )
       if ('error' in result.current) {
@@ -288,7 +288,7 @@ describe('useLabwarePositionCheck', () => {
             ],
             labwareId: MOCK_LABWARE_ID,
             section: 'PRIMARY_PIPETTE_TIPRACKS',
-          } as LabwarePositionCheckStep,
+          } as DeprecatedLabwarePositionCheckStep,
           {
             commands: [
               {
@@ -301,10 +301,10 @@ describe('useLabwarePositionCheck', () => {
             ],
             labwareId: MOCK_LABWARE_ID,
             section: 'RETURN_TIP',
-          } as LabwarePositionCheckStep,
+          } as DeprecatedLabwarePositionCheckStep,
         ])
       const { result, waitForNextUpdate } = renderHook(
-        () => useLabwarePositionCheck(() => null, {}),
+        () => useDeprecatedLabwarePositionCheck(() => null, {}),
         { wrapper }
       )
       if ('error' in result.current) {
@@ -348,11 +348,11 @@ describe('useLabwarePositionCheck', () => {
             ],
             labwareId: MOCK_LABWARE_ID,
             section: 'PRIMARY_PIPETTE_TIPRACKS',
-          } as LabwarePositionCheckStep,
+          } as DeprecatedLabwarePositionCheckStep,
         ])
 
       const { result, waitForNextUpdate } = renderHook(
-        () => useLabwarePositionCheck(() => null, {}),
+        () => useDeprecatedLabwarePositionCheck(() => null, {}),
         { wrapper }
       )
       if ('error' in result.current) {

@@ -20,7 +20,10 @@ import {
 } from '../hooks'
 import { DeprecatedDeckMap } from './DeprecatedDeckMap'
 import type { Jog } from '../../../molecules/DeprecatedJogControls'
-import type { DeprecatedLabwarePositionCheckStep, SavePositionCommandData } from './types'
+import type {
+  DeprecatedLabwarePositionCheckStep,
+  SavePositionCommandData,
+} from './types'
 
 interface GenericStepScreenProps {
   selectedStep: DeprecatedLabwarePositionCheckStep

@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import { useConditionalConfirm } from '@opentrons/components'
 import { Portal } from '../../App/portal'
 // import { useTrackEvent } from '../../redux/analytics'
-import { useSteps } from './hooks'
 import { IntroScreen } from './IntroScreen'
 import { ExitConfirmation } from './ExitConfirmation'
 import { CheckItem } from './CheckItem'
@@ -146,26 +145,25 @@ export const LabwarePositionCheckInner = (
 
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const handleCleanUpAndClose = () => {
-    const dropTipToBeSafeCommands: DropTipCreateCommand[] = (protocolData?.pipettes ?? []).map(pip => (
-      {
-        commandType: 'dropTip' as const,
-        params: {
-          pipetteId: pip.id,
-          labwareId: FIXED_TRASH_ID,
-          wellName: 'A1',
-          wellLocation: { origin: 'top' as const },
-        }
-      }
-    ))
+    const dropTipToBeSafeCommands: DropTipCreateCommand[] = (
+      protocolData?.pipettes ?? []
+    ).map(pip => ({
+      commandType: 'dropTip' as const,
+      params: {
+        pipetteId: pip.id,
+        labwareId: FIXED_TRASH_ID,
+        wellName: 'A1',
+        wellLocation: { origin: 'top' as const },
+      },
+    }))
     chainRunCommands(
       [
         ...dropTipToBeSafeCommands,
-        { commandType: 'home' as const, params: {} }
+        { commandType: 'home' as const, params: {} },
       ],
       createRunCommand,
       props.onCloseClick
     )
-
   }
   const {
     confirm: confirmExitLPC,

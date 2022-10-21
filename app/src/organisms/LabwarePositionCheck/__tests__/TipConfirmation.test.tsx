@@ -26,14 +26,14 @@ describe('TipConfirmation', () => {
   it('should render correct copy', () => {
     const { getByText, getByRole } = render(props)
     getByText('Did pipette pick up tip successfully?')
-    getByRole('button', {name: 'yes'})
-    getByRole('button', {name: 'try again'})
+    getByRole('button', { name: 'yes' })
+    getByRole('button', { name: 'try again' })
   })
   it('should invoke callback props when ctas are clicked', () => {
     const { getByRole } = render(props)
-    getByRole('button', {name: 'yes'}).click()
+    getByRole('button', { name: 'yes' }).click()
     expect(props.invalidateTip).toHaveBeenCalled()
-    getByRole('button', {name: 'try again'}).click()
+    getByRole('button', { name: 'try again' }).click()
     expect(props.confirmTip).toHaveBeenCalled()
   })
 })

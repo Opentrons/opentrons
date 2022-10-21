@@ -5,7 +5,11 @@ import { i18n } from '../../../i18n'
 import { ResultsSummary } from '../ResultsSummary'
 import { SECTIONS } from '../constants'
 import { mockTipRackDefinition } from '../../../redux/custom-labware/__fixtures__'
-import { mockCompletedAnalysis, mockExistingOffsets, mockWorkingOffsets } from '../__fixtures__'
+import {
+  mockCompletedAnalysis,
+  mockExistingOffsets,
+  mockWorkingOffsets,
+} from '../__fixtures__'
 
 const render = (props: React.ComponentProps<typeof ResultsSummary>) => {
   return renderWithProviders(<ResultsSummary {...props} />, {
@@ -44,11 +48,15 @@ describe('ResultsSummary', () => {
     expect(props.handleApplyOffsets).toHaveBeenCalled()
   })
   it('renders a row per offset to apply', () => {
-    const { getByRole, queryAllByRole  } = render(props)
-    expect(queryAllByRole('cell', { name: mockTipRackDefinition.metadata.displayName})).toHaveLength(2)
-    getByRole('cell', { name: 'slot 1'})
-    getByRole('cell', { name: 'slot 3'})
-    getByRole('cell', { name: 'X 1.0 Y 1.0 Z 1.0'})
-    getByRole('cell', { name: 'X 3.0 Y 3.0 Z 3.0'})
+    const { getByRole, queryAllByRole } = render(props)
+    expect(
+      queryAllByRole('cell', {
+        name: mockTipRackDefinition.metadata.displayName,
+      })
+    ).toHaveLength(2)
+    getByRole('cell', { name: 'slot 1' })
+    getByRole('cell', { name: 'slot 3' })
+    getByRole('cell', { name: 'X 1.0 Y 1.0 Z 1.0' })
+    getByRole('cell', { name: 'X 3.0 Y 3.0 Z 3.0' })
   })
 })

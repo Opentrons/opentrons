@@ -1,32 +1,35 @@
-import { getLabwareDefURI } from "@opentrons/shared-data"
+import { getLabwareDefURI } from '@opentrons/shared-data'
 import { mockTipRackDef } from './mockTipRackDef'
 import { mockLabwareDef } from './mockLabwareDef'
 
-import type { CompletedProtocolAnalysis } from "@opentrons/shared-data"
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 export const mockCompletedAnalysis: CompletedProtocolAnalysis = {
   id: 'fakeAnalysisId',
   status: 'completed',
   result: 'ok',
   errors: [],
-  labware: [{
-    id: 'labwareId1',
-    loadName: 'fakeLoadName',
-    definitionUri: getLabwareDefURI(mockTipRackDef),
-    location: { slotName: '1' }
-  },
-{
-    id: 'labwareId2',
-    loadName: 'fakeSecondLoadName',
-    definitionUri: getLabwareDefURI(mockLabwareDef),
-    location: { slotName: '2' }
-  }
-],
-  pipettes: [{
-    id: 'pipetteId1',
-    pipetteName: 'p10_single',
-    mount: 'left',
-  }],
+  labware: [
+    {
+      id: 'labwareId1',
+      loadName: 'fakeLoadName',
+      definitionUri: getLabwareDefURI(mockTipRackDef),
+      location: { slotName: '1' },
+    },
+    {
+      id: 'labwareId2',
+      loadName: 'fakeSecondLoadName',
+      definitionUri: getLabwareDefURI(mockLabwareDef),
+      location: { slotName: '2' },
+    },
+  ],
+  pipettes: [
+    {
+      id: 'pipetteId1',
+      pipetteName: 'p10_single',
+      mount: 'left',
+    },
+  ],
   modules: [],
   liquids: [],
   commands: [
@@ -40,13 +43,13 @@ export const mockCompletedAnalysis: CompletedProtocolAnalysis = {
       error: null,
       params: {
         labwareId: 'labwareId1',
-        location: {slotName: '1'},
+        location: { slotName: '1' },
       },
       result: {
         labwareId: 'labwareId1',
         definition: mockTipRackDef,
-        offset: {x: 0, y: 0, z: 0} 
-      }
+        offset: { x: 0, y: 0, z: 0 },
+      },
     },
     {
       commandType: 'loadLabware',
@@ -58,13 +61,13 @@ export const mockCompletedAnalysis: CompletedProtocolAnalysis = {
       error: null,
       params: {
         labwareId: 'labwareId2',
-        location: {slotName: '2'},
+        location: { slotName: '2' },
       },
       result: {
         labwareId: 'labwareId2',
         definition: mockLabwareDef,
-        offset: {x: 0, y: 0, z: 0} 
-      }
-    }
-  ]
+        offset: { x: 0, y: 0, z: 0 },
+      },
+    },
+  ],
 }

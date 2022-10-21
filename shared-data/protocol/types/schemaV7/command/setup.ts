@@ -75,6 +75,7 @@ export type SetupCreateCommand =
 export type LabwareLocation =
   | { slotName: string }
   | { moduleId: string }
+  | 'offDeck'
 
 export interface ModuleLocation {
   slotName: string

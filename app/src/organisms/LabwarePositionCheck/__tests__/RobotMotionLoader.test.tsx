@@ -14,6 +14,6 @@ const render = () => {
 describe('Robot in Motion Modal', () => {
   it('should render robot in motion loader with header', () => {
     const { getByRole } = render()
-    getByRole('heading', {name: mockHeader})
+    getByRole('heading', { name: mockHeader })
   })
 })

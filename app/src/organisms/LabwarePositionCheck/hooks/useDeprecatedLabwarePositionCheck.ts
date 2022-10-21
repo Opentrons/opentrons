@@ -58,14 +58,14 @@ import type {
 import type {
   LabwarePositionCheckCreateCommand,
   LabwarePositionCheckMovementCommand,
-  LabwarePositionCheckStep,
+  DeprecatedLabwarePositionCheckStep,
   SavePositionCommandData,
 } from '../types'
 
 export type LabwarePositionCheckUtils =
   | {
       currentCommandIndex: number
-      currentStep: LabwarePositionCheckStep
+      currentStep: DeprecatedLabwarePositionCheckStep
       titleText: string
       isLoading: boolean
       showPickUpTipConfirmationModal: boolean
@@ -319,7 +319,7 @@ export function useDeprecatedLabwarePositionCheck(
       command => prevCommand != null && isEqual(command, prevCommand)
     )
     return matchingCommand
-  }) as LabwarePositionCheckStep
+  }) as DeprecatedLabwarePositionCheckStep
 
   const ctaText = useLpcCtaText(currentCommand, currentRunId)
   const robotCommands = useCurrentRunCommands()

@@ -5,7 +5,7 @@ import { I18nextProvider } from 'react-i18next'
 import { getLabwareLocation } from '../../../Devices/ProtocolRun/utils/getLabwareLocation'
 import { useProtocolDetailsForRun } from '../../../Devices/hooks'
 import { i18n } from '../../../../i18n'
-import { useTitleText } from '../useLabwarePositionCheck'
+import { useTitleText } from '../useDeprecatedLabwarePositionCheck'
 import type { MoveToWellCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
 import type {
   DropTipCreateCommand,

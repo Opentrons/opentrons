@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
+import { resetAllWhenMocks } from 'jest-when'
+import { renderWithProviders } from '@opentrons/components'
 import { ExitConfirmation } from '../ExitConfirmation'
 import { i18n } from '../../../i18n'
-import { renderWithProviders } from '@opentrons/components'
 
 const render = (props: React.ComponentProps<typeof ExitConfirmation>) => {
   return renderWithProviders(<ExitConfirmation {...props} />, {
@@ -10,39 +10,33 @@ const render = (props: React.ComponentProps<typeof ExitConfirmation>) => {
   })[0]
 }
 
-describe('Exit Prevention Modal', () => {
+describe('ExitConfirmation', () => {
   let props: React.ComponentProps<typeof ExitConfirmation>
+
   beforeEach(() => {
-    props = { onGoBack: jest.fn(), onConfirmExit: jest.fn() }
+    props = {
+      onGoBack: jest.fn(),
+      onConfirmExit: jest.fn(),
+    }
   })
-  it('should render the correct header', () => {
-    const { getByRole } = render(props)
-    expect(
-      getByRole('heading', {
-        name: 'Exit before completing Labware Position Check?',
-      })
-    ).toBeTruthy()
+  afterEach(() => {
+    resetAllWhenMocks()
+    jest.restoreAllMocks()
   })
-  it('should render the correct body text', () => {
-    const { getByText } = render(props)
+  it('should render correct copy', () => {
+    const { getByText, getByRole } = render(props)
+    getByText('Exit before completing Labware Position Check?')
     getByText(
       'If you exit now, all labware offsets will be discarded. This cannot be undone.'
     )
+    getByRole('button', { name: 'yes' })
+    getByRole('button', { name: 'try again' })
   })
-  it('should call onGoBack when left button is pressed', () => {
+  it('should invoke callback props when ctas are clicked', () => {
     const { getByRole } = render(props)
-    const goBackButton = getByRole('button', {
-      name: 'Go back to labware position check',
-    })
-    fireEvent.click(goBackButton)
+    getByRole('button', { name: 'Go back' }).click()
     expect(props.onGoBack).toHaveBeenCalled()
-  })
-  it('should call onConfirmExit when right button is pressed', () => {
-    const { getByRole } = render(props)
-    const confirmExitButton = getByRole('button', {
-      name: 'Exit and discard all labware offsets',
-    })
-    fireEvent.click(confirmExitButton)
+    getByRole('button', { name: 'exit' }).click()
     expect(props.onConfirmExit).toHaveBeenCalled()
   })
 })

@@ -61,45 +61,58 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
   ]
 
   const handleConfirmPlacement = (): void => {
-    const modulePrepCommands = protocolData.modules.reduce<CreateCommand[]>((acc, module) => {
-      if (getModuleType(module.model) === HEATERSHAKER_MODULE_TYPE) {
-        return [...acc, {
-          commandType: 'heaterShaker/closeLabwareLatch',
-          params: { moduleId: module.id },
-        }]
-      }
-      return acc
-    }, [])
-    chainRunCommands([
-      ...modulePrepCommands,
-      {
-        commandType: 'moveLabware' as const,
-        params: { labwareId: labwareId, newLocation: location },
+    const modulePrepCommands = protocolData.modules.reduce<CreateCommand[]>(
+      (acc, module) => {
+        if (getModuleType(module.model) === HEATERSHAKER_MODULE_TYPE) {
+          return [
+            ...acc,
+            {
+              commandType: 'heaterShaker/closeLabwareLatch',
+              params: { moduleId: module.id },
+            },
+          ]
+        }
+        return acc
       },
-      {
-        commandType: 'moveToWell' as const,
-        params: {
-          pipetteId: pipetteId,
-          labwareId: labwareId,
-          wellName: 'A1',
-          wellLocation: { origin: 'top' as const, offset: tipPickUpOffset ?? undefined },
+      []
+    )
+    chainRunCommands(
+      [
+        ...modulePrepCommands,
+        {
+          commandType: 'moveLabware' as const,
+          params: { labwareId: labwareId, newLocation: location },
         },
-      },
-      {
-        commandType: 'dropTip' as const,
-        params: {
-          pipetteId: pipetteId,
-          labwareId: labwareId,
-          wellName: 'A1',
-          wellLocation: { origin: 'top', offset: tipPickUpOffset ?? undefined },
+        {
+          commandType: 'moveToWell' as const,
+          params: {
+            pipetteId: pipetteId,
+            labwareId: labwareId,
+            wellName: 'A1',
+            wellLocation: {
+              origin: 'top' as const,
+              offset: tipPickUpOffset ?? undefined,
+            },
+          },
         },
-      },
-      {
-        commandType: 'moveLabware' as const,
-        params: { labwareId: labwareId, newLocation: 'offDeck' },
-      },
-      { commandType: 'home' as const, params: {} }
-    ],
+        {
+          commandType: 'dropTip' as const,
+          params: {
+            pipetteId: pipetteId,
+            labwareId: labwareId,
+            wellName: 'A1',
+            wellLocation: {
+              origin: 'top',
+              offset: tipPickUpOffset ?? undefined,
+            },
+          },
+        },
+        {
+          commandType: 'moveLabware' as const,
+          params: { labwareId: labwareId, newLocation: 'offDeck' },
+        },
+        { commandType: 'home' as const, params: {} },
+      ],
       createRunCommand,
       proceed
     )

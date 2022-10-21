@@ -30,7 +30,10 @@ import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/uti
 import { getLabwareDefinitionsFromCommands } from './utils/labware'
 
 import type { ResultsSummaryStep, WorkingOffset } from './types'
-import type { LabwareOffset, LabwareOffsetCreateData } from '@opentrons/api-client'
+import type {
+  LabwareOffset,
+  LabwareOffsetCreateData,
+} from '@opentrons/api-client'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 
 const LPC_HELP_LINK_URL =
@@ -155,9 +158,7 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
         <tr>
           <TableHeader>{t('location')}</TableHeader>
           <TableHeader>{t('labware')}</TableHeader>
-          <TableHeader>
-            {t('labware_offset_data')}
-          </TableHeader>
+          <TableHeader>{t('labware_offset_data')}</TableHeader>
         </tr>
       </thead>
 
@@ -173,7 +174,10 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
           return (
             <TableRow key={index}>
               <TableDatum>
-                <StyledText as="p" textTransform={TYPOGRAPHY.textTransformCapitalize}>
+                <StyledText
+                  as="p"
+                  textTransform={TYPOGRAPHY.textTransformCapitalize}
+                >
                   {getDisplayLocation(location, t)}
                 </StyledText>
               </TableDatum>
@@ -208,4 +212,3 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
     </Table>
   )
 }
-

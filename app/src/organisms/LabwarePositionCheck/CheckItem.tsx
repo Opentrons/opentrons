@@ -63,12 +63,19 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   const pipetteName =
     protocolData.pipettes.find(p => p.id === pipetteId)?.pipetteName ?? null
   let modulePrepCommands: CreateCommand[] = []
-  const moduleType = (moduleId != null && 'moduleModel' in location && location.moduleModel != null && getModuleType(location.moduleModel)) ?? null
+  const moduleType =
+    (moduleId != null &&
+      'moduleModel' in location &&
+      location.moduleModel != null &&
+      getModuleType(location.moduleModel)) ??
+    null
   if (moduleId != null && moduleType === THERMOCYCLER_MODULE_TYPE) {
-    modulePrepCommands = [{
-      commandType: 'thermocycler/openLid',
-      params: { moduleId },
-    }]
+    modulePrepCommands = [
+      {
+        commandType: 'thermocycler/openLid',
+        params: { moduleId },
+      },
+    ]
   } else if (moduleId != null && moduleType === HEATERSHAKER_MODULE_TYPE) {
     modulePrepCommands = [
       {
@@ -119,7 +126,8 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
       commandType: 'moveLabware' as const,
       params: {
         labwareId: labwareId,
-        newLocation: moduleId != null ? { moduleId } : { slotName: location.slotName }
+        newLocation:
+          moduleId != null ? { moduleId } : { slotName: location.slotName },
       },
     },
     {
@@ -130,24 +138,31 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
         wellName: 'A1',
         wellLocation: { origin: 'top' as const },
       },
-    }
+    },
   ]
 
   if (moduleId != null && moduleType != null) {
-    confirmPlacementCommands = moduleType === HEATERSHAKER_MODULE_TYPE ? [{
-      commandType: 'heaterShaker/closeLabwareLatch',
-      params: { moduleId },
-    }, ...confirmPlacementCommands] : confirmPlacementCommands
+    confirmPlacementCommands =
+      moduleType === HEATERSHAKER_MODULE_TYPE
+        ? [
+            {
+              commandType: 'heaterShaker/closeLabwareLatch',
+              params: { moduleId },
+            },
+            ...confirmPlacementCommands,
+          ]
+        : confirmPlacementCommands
   }
 
   const handleConfirmPlacement = (): void => {
     chainRunCommands(confirmPlacementCommands, createRunCommand, () => {
-      createRunCommand({
-        command: { commandType: 'savePosition', params: { pipetteId } },
-        waitUntilComplete: true,
-      }, {
-        onSuccess:
-          response => {
+      createRunCommand(
+        {
+          command: { commandType: 'savePosition', params: { pipetteId } },
+          waitUntilComplete: true,
+        },
+        {
+          onSuccess: response => {
             const { position } = response.data.result
             registerPosition({
               type: 'initialPosition',
@@ -155,42 +170,46 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
               location,
               position,
             })
-          }
-      })
+          },
+        }
+      )
     })
   }
 
   const handleConfirmPosition = (): void => {
-    createRunCommand({
-      command: { commandType: 'savePosition', params: { pipetteId } },
-      waitUntilComplete: true,
-    }, {
-      onSuccess: response => {
-        const { position } = response.data.result
-        registerPosition({
-          type: 'finalPosition',
-          labwareId,
-          location,
-          position,
-        })
-        const confirmPositionCommands: CreateCommand[] = [
-          {
-            commandType: 'moveToWell' as const,
-            params: {
-              pipetteId: pipetteId,
-              labwareId: FIXED_TRASH_ID,
-              wellName: 'A1',
-              wellLocation: { origin: 'top' as const },
+    createRunCommand(
+      {
+        command: { commandType: 'savePosition', params: { pipetteId } },
+        waitUntilComplete: true,
+      },
+      {
+        onSuccess: response => {
+          const { position } = response.data.result
+          registerPosition({
+            type: 'finalPosition',
+            labwareId,
+            location,
+            position,
+          })
+          const confirmPositionCommands: CreateCommand[] = [
+            {
+              commandType: 'moveToWell' as const,
+              params: {
+                pipetteId: pipetteId,
+                labwareId: FIXED_TRASH_ID,
+                wellName: 'A1',
+                wellLocation: { origin: 'top' as const },
+              },
             },
-          },
-          {
-            commandType: 'moveLabware' as const,
-            params: { labwareId: labwareId, newLocation: 'offDeck' },
-          },
-        ]
-        chainRunCommands(confirmPositionCommands, createRunCommand, proceed)
+            {
+              commandType: 'moveLabware' as const,
+              params: { labwareId: labwareId, newLocation: 'offDeck' },
+            },
+          ]
+          chainRunCommands(confirmPositionCommands, createRunCommand, proceed)
+        },
       }
-    })
+    )
   }
   const handleGoBack = (): void => {
     chainRunCommands(
@@ -203,7 +222,8 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
           location,
           position: null,
         })
-      })
+      }
+    )
   }
 
   const initialPosition = workingOffsets.find(
@@ -252,10 +272,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
           })}
           body={
             <UnorderedList
-              items={[
-                t('clear_all_slots'),
-                placeItemInstruction,
-              ]}
+              items={[t('clear_all_slots'), placeItemInstruction]}
             />
           }
           labwareDef={labwareDef}

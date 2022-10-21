@@ -74,7 +74,9 @@ const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
   (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
   {}
 )
-const MOCK_DEPRECATED_SECTIONS = ['MOCK_PRIMARY_PIPETTE_TIPRACKS' as DeprecatedSection]
+const MOCK_DEPRECATED_SECTIONS = [
+  'MOCK_PRIMARY_PIPETTE_TIPRACKS' as DeprecatedSection,
+]
 const MOCK_300_UL_TIPRACK_COORDS = [30, 40, 0]
 const MOCK_ROBOT_NAME = 'otie'
 const HOST_CONFIG: HostConfig = {

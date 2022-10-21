@@ -10,12 +10,12 @@ import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
 import { useProtocolDetailsForRun } from '../../../Devices/hooks/useProtocolDetailsForRun'
 import { useIntroInfo } from '../useIntroInfo'
 import { getLabwareLocation } from '../../../Devices/ProtocolRun/utils/getLabwareLocation'
-import { getLabwarePositionCheckSteps } from '../../getLabwarePositionCheckSteps'
+import { deprecatedGetLabwarePositionCheckSteps } from '../../deprecatedUtils/deprecatedGetLabwarePositionCheckSteps'
 import type { PickUpTipCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import type { LoadLabwareCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
 jest.mock('@opentrons/shared-data')
-jest.mock('../../getLabwarePositionCheckSteps')
+jest.mock('../../deprecatedGetLabwarePositionCheckSteps')
 jest.mock('../../../Devices/ProtocolRun/utils/getPipetteMount')
 jest.mock('../../../Devices/ProtocolRun/utils/getLabwareLocation')
 jest.mock('../../../Devices/hooks/useProtocolDetailsForRun')
@@ -38,8 +38,8 @@ const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunc
 const mockGetPipetteNameSpecs = getPipetteNameSpecs as jest.MockedFunction<
   typeof getPipetteNameSpecs
 >
-const mockGetLabwarePositionCheckSteps = getLabwarePositionCheckSteps as jest.MockedFunction<
-  typeof getLabwarePositionCheckSteps
+const mockdeprecatedGetLabwarePositionCheckSteps = deprecatedGetLabwarePositionCheckSteps as jest.MockedFunction<
+  typeof deprecatedGetLabwarePositionCheckSteps
 >
 const mockGetPipetteMount = getPipetteMount as jest.MockedFunction<
   typeof getPipetteMount
@@ -68,7 +68,7 @@ describe('useIntroInfo', () => {
         },
       } as LoadLabwareCreateCommand,
     ] as any
-    mockGetLabwarePositionCheckSteps.mockReturnValue([
+    mockdeprecatedGetLabwarePositionCheckSteps.mockReturnValue([
       {
         labwareId: PICKUP_TIP_LABWARE_ID,
         section: 'PRIMARY_PIPETTE_TIPRACKS',

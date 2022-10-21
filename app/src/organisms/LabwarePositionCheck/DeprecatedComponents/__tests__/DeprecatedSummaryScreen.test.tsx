@@ -53,7 +53,9 @@ const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
 
-const MOCK_DEPRECATED_SECTIONS = ['PRIMARY_PIPETTE_TIPRACKS' as DeprecatedSection]
+const MOCK_DEPRECATED_SECTIONS = [
+  'PRIMARY_PIPETTE_TIPRACKS' as DeprecatedSection,
+]
 const LABWARE_DEF_ID = 'LABWARE_DEF_ID'
 const PRIMARY_PIPETTE_ID = 'PRIMARY_PIPETTE_ID'
 const PRIMARY_PIPETTE_NAME = 'PRIMARY_PIPETTE_NAME'

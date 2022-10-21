@@ -10,15 +10,19 @@ import { HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
 
 jest.mock('../utils/chainRunCommands')
 
-const mockChainRunCommands = chainRunCommands as jest.Mock<typeof chainRunCommands>
+const mockChainRunCommands = chainRunCommands as jest.Mock<
+  typeof chainRunCommands
+>
 
-const matchTextWithSpans: (text: string) => MatcherFunction = (text: string) => (_content, node) => {
+const matchTextWithSpans: (text: string) => MatcherFunction = (
+  text: string
+) => (_content, node) => {
   const nodeHasText = node?.textContent === text
   const childrenDontHaveText = Array.from(node?.children ?? []).every(
-    (child) => child?.textContent !== text
+    child => child?.textContent !== text
   )
 
-  return nodeHasText && childrenDontHaveText;
+  return nodeHasText && childrenDontHaveText
 }
 
 const render = (props: React.ComponentProps<typeof ReturnTip>) => {
@@ -42,21 +46,17 @@ describe('ReturnTip', () => {
       tipPickUpOffset: null,
       isRobotMoving: false,
     }
-    mockChainRunCommands.mockImplementation((
-      commands,
-      createRunCommand,
-      onAllSuccess,
-    ) => {
-      return commands.forEach((c: any) => {
-        createRunCommand(
-          {
+    mockChainRunCommands.mockImplementation(
+      (commands, createRunCommand, onAllSuccess) => {
+        return commands.forEach((c: any) => {
+          createRunCommand({
             command: c,
             waitUntilComplete: true,
-          }
-        )
-        onAllSuccess()
-      })
-    })
+          })
+          onAllSuccess()
+        })
+      }
+    )
   })
   afterEach(() => {
     jest.restoreAllMocks()
@@ -65,7 +65,11 @@ describe('ReturnTip', () => {
     const { getByText, getByRole } = render(props)
     getByRole('heading', { name: 'Prepare tip rack in slot 1' })
     getByText('Clear all deck slots of labware')
-    getByText(matchTextWithSpans('Place Mock TipRack Definition with tip removed into slot 1'))
+    getByText(
+      matchTextWithSpans(
+        'Place Mock TipRack Definition with tip removed into slot 1'
+      )
+    )
     getByRole('link', { name: 'Need help?' })
   })
   it('executes correct chained commands when CTA is clicked', () => {
@@ -79,8 +83,7 @@ describe('ReturnTip', () => {
       waitUntilComplete: true,
     })
     expect(props.createRunCommand).toHaveBeenNthCalledWith(2, {
-      command:
-      {
+      command: {
         commandType: 'moveToWell',
         params: {
           pipetteId: 'pipetteId1',
@@ -119,7 +122,7 @@ describe('ReturnTip', () => {
   it('executes correct chained commands with tip pick up offset when CTA is clicked', () => {
     props = {
       ...props,
-      tipPickUpOffset: { x: 10, y: 11, z: 12 }
+      tipPickUpOffset: { x: 10, y: 11, z: 12 },
     }
     const { getByRole } = render(props)
     getByRole('button', { name: 'Confirm placement' }).click()
@@ -131,8 +134,7 @@ describe('ReturnTip', () => {
       waitUntilComplete: true,
     })
     expect(props.createRunCommand).toHaveBeenNthCalledWith(2, {
-      command:
-      {
+      command: {
         commandType: 'moveToWell',
         params: {
           pipetteId: 'pipetteId1',
@@ -174,19 +176,21 @@ describe('ReturnTip', () => {
       tipPickUpOffset: { x: 10, y: 11, z: 12 },
       protocolData: {
         ...props.protocolData,
-        modules: [{
-          id: 'firstHSId',
-          model: HEATERSHAKER_MODULE_V1,
-          location: { slotName: '3' },
-          serialNumber: 'firstHSSerial',
-        }, {
-          id: 'secondHSId',
-          model: HEATERSHAKER_MODULE_V1,
-          location: { slotName: '10' },
-          serialNumber: 'secondHSSerial',
-        }
-        ]
-      }
+        modules: [
+          {
+            id: 'firstHSId',
+            model: HEATERSHAKER_MODULE_V1,
+            location: { slotName: '3' },
+            serialNumber: 'firstHSSerial',
+          },
+          {
+            id: 'secondHSId',
+            model: HEATERSHAKER_MODULE_V1,
+            location: { slotName: '10' },
+            serialNumber: 'secondHSSerial',
+          },
+        ],
+      },
     }
     const { getByRole } = render(props)
     getByRole('button', { name: 'Confirm placement' }).click()
@@ -212,8 +216,7 @@ describe('ReturnTip', () => {
       waitUntilComplete: true,
     })
     expect(props.createRunCommand).toHaveBeenNthCalledWith(4, {
-      command:
-      {
+      command: {
         commandType: 'moveToWell',
         params: {
           pipetteId: 'pipetteId1',
