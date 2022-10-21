@@ -149,7 +149,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             loading: <Icon name="ot-spinner" spin size={SIZE_3} />,
             error: <Box size="6rem" backgroundColor={COLORS.medGreyEnabled} />,
             complete: (
-              <DeckThumbnail commands={mostRecentAnalysis?.commands ?? []} />
+              <DeckThumbnail commands={mostRecentAnalysis?.commands ?? []} labware={mostRecentAnalysis?.labware ?? []} />
             ),
           }[analysisStatus]
         }
@@ -181,97 +181,97 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             {t('loading_data')}
           </StyledText>
         ) : (
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
-            <Flex gridGap={SPACING.spacing4}>
-              <Flex
-                flex={`0 0 ${SIZE_2}`}
-                flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing2}
-              >
-                <StyledText as="h6" color={COLORS.darkGreyEnabled}>
-                  {t('robot')}
-                </StyledText>
-                {/* TODO(bh, 2022-10-14): read intended robot from protocol */}
-                <StyledText as="p">OT-2</StyledText>
-              </Flex>
-              <Flex
-                flex="1"
-                flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing2}
-                data-testid={`ProtocolCard_instruments_${protocolDisplayName}`}
-                minWidth="10.625rem"
-              >
-                <StyledText as="h6" color={COLORS.darkGreyEnabled}>
-                  {t('shared:instruments')}
-                </StyledText>
-                {
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+              <Flex gridGap={SPACING.spacing4}>
+                <Flex
+                  flex={`0 0 ${SIZE_2}`}
+                  flexDirection={DIRECTION_COLUMN}
+                  gridGap={SPACING.spacing2}
+                >
+                  <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                    {t('robot')}
+                  </StyledText>
+                  {/* TODO(bh, 2022-10-14): read intended robot from protocol */}
+                  <StyledText as="p">OT-2</StyledText>
+                </Flex>
+                <Flex
+                  flex="1"
+                  flexDirection={DIRECTION_COLUMN}
+                  gridGap={SPACING.spacing2}
+                  data-testid={`ProtocolCard_instruments_${protocolDisplayName}`}
+                  minWidth="10.625rem"
+                >
+                  <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                    {t('shared:instruments')}
+                  </StyledText>
                   {
-                    missing: <StyledText as="p">{t('no_data')}</StyledText>,
-                    loading: <StyledText as="p">{t('no_data')}</StyledText>,
-                    error: <StyledText as="p">{t('no_data')}</StyledText>,
-                    complete: (
-                      <Flex flexWrap={WRAP} gridGap={SPACING.spacing2}>
-                        {/* TODO(bh, 2022-10-14): insert 96-channel pipette if found */}
-                        {leftMountPipetteName != null ? (
-                          <InstrumentContainer
-                            displayName={
-                              getPipetteNameSpecs(leftMountPipetteName)
-                                ?.displayName as string
-                            }
+                    {
+                      missing: <StyledText as="p">{t('no_data')}</StyledText>,
+                      loading: <StyledText as="p">{t('no_data')}</StyledText>,
+                      error: <StyledText as="p">{t('no_data')}</StyledText>,
+                      complete: (
+                        <Flex flexWrap={WRAP} gridGap={SPACING.spacing2}>
+                          {/* TODO(bh, 2022-10-14): insert 96-channel pipette if found */}
+                          {leftMountPipetteName != null ? (
+                            <InstrumentContainer
+                              displayName={
+                                getPipetteNameSpecs(leftMountPipetteName)
+                                  ?.displayName as string
+                              }
+                            />
+                          ) : null}
+                          {rightMountPipetteName != null ? (
+                            <InstrumentContainer
+                              displayName={
+                                getPipetteNameSpecs(rightMountPipetteName)
+                                  ?.displayName as string
+                              }
+                            />
+                          ) : null}
+                          {/* TODO(bh, 2022-10-14): insert gripper if found */}
+                        </Flex>
+                      ),
+                    }[analysisStatus]
+                  }
+                </Flex>
+                <Flex
+                  flex="0 0 6rem"
+                  flexDirection={DIRECTION_COLUMN}
+                  gridGap={SPACING.spacing2}
+                >
+                  {requiredModuleTypes.length > 0 ? (
+                    <>
+                      <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                        {t('modules')}
+                      </StyledText>
+                      <Flex>
+                        {requiredModuleTypes.map((moduleType, index) => (
+                          <ModuleIcon
+                            key={index}
+                            color={COLORS.darkGreyEnabled}
+                            moduleType={moduleType}
+                            height="1rem"
+                            marginRight={SPACING.spacing3}
                           />
-                        ) : null}
-                        {rightMountPipetteName != null ? (
-                          <InstrumentContainer
-                            displayName={
-                              getPipetteNameSpecs(rightMountPipetteName)
-                                ?.displayName as string
-                            }
-                          />
-                        ) : null}
-                        {/* TODO(bh, 2022-10-14): insert gripper if found */}
+                        ))}
                       </Flex>
-                    ),
-                  }[analysisStatus]
-                }
+                    </>
+                  ) : null}
+                </Flex>
               </Flex>
               <Flex
-                flex="0 0 6rem"
-                flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing2}
+                justifyContent={JUSTIFY_FLEX_END}
+                data-testid={`ProtocolCard_date_${protocolDisplayName}`}
               >
-                {requiredModuleTypes.length > 0 ? (
-                  <>
-                    <StyledText as="h6" color={COLORS.darkGreyEnabled}>
-                      {t('modules')}
-                    </StyledText>
-                    <Flex>
-                      {requiredModuleTypes.map((moduleType, index) => (
-                        <ModuleIcon
-                          key={index}
-                          color={COLORS.darkGreyEnabled}
-                          moduleType={moduleType}
-                          height="1rem"
-                          marginRight={SPACING.spacing3}
-                        />
-                      ))}
-                    </Flex>
-                  </>
-                ) : null}
+                <StyledText as="label" color={COLORS.darkGreyEnabled}>
+                  {`${t('updated')} ${format(
+                    new Date(modified),
+                    'MM/dd/yy HH:mm:ss'
+                  )}`}
+                </StyledText>
               </Flex>
             </Flex>
-            <Flex
-              justifyContent={JUSTIFY_FLEX_END}
-              data-testid={`ProtocolCard_date_${protocolDisplayName}`}
-            >
-              <StyledText as="label" color={COLORS.darkGreyEnabled}>
-                {`${t('updated')} ${format(
-                  new Date(modified),
-                  'MM/dd/yy HH:mm:ss'
-                )}`}
-              </StyledText>
-            </Flex>
-          </Flex>
-        )}
+          )}
       </Flex>
     </Flex>
   )
