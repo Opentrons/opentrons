@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "protocolName": "schema v6 fixture protocol with mag, temp, and TC",
+    "protocolName": "schema v6 fixture protocol with Heater-Shaker",
     "author": "",
     "description": "",
     "created": 1606853851893,
@@ -2520,32 +2520,6 @@
       },
       "result": {
         "moduleId": "3e012450-3412-11eb-ad93-ed232a2337cf:heaterShakerModuleType"
-      }
-    },
-    {
-      "id": "3",
-      "commandType": "loadModule",
-      "params": {
-        "moduleId": "3e0283e0-3412-11eb-ad93-ed232a2337cf:temperatureModuleType",
-        "location": {
-          "slotName": "3"
-        }
-      },
-      "result": {
-        "moduleId": "3e0283e0-3412-11eb-ad93-ed232a2337cf:temperatureModuleType"
-      }
-    },
-    {
-      "id": "4",
-      "commandType": "loadModule",
-      "params": {
-        "moduleId": "3e039550-3412-11eb-ad93-ed232a2337cf:thermocyclerModuleType",
-        "location": {
-          "slotName": "7"
-        }
-      },
-      "result": {
-        "moduleId": "3e039550-3412-11eb-ad93-ed232a2337cf:thermocyclerModuleType"
       }
     },
     {
