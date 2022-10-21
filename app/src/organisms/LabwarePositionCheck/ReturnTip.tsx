@@ -9,6 +9,7 @@ import {
   CreateCommand,
   getLabwareDisplayName,
   getModuleType,
+  HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { getLabwareDef } from './utils/labware'
 import { UnorderedList } from '../../molecules/UnorderedList'
@@ -61,7 +62,7 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
 
   const handleConfirmPlacement = (): void => {
     const modulePrepCommands = protocolData.modules.reduce<CreateCommand[]>((acc, module) => {
-      if (getModuleType(module.model)) {
+      if (getModuleType(module.model) === HEATERSHAKER_MODULE_TYPE) {
         return [...acc, {
           commandType: 'heaterShaker/closeLabwareLatch',
           params: { moduleId: module.id },

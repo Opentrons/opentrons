@@ -5,7 +5,7 @@ import { i18n } from '../../../i18n'
 import { ResultsSummary } from '../ResultsSummary'
 import { SECTIONS } from '../constants'
 import { mockTipRackDefinition } from '../../../redux/custom-labware/__fixtures__'
-import { CompletedProtocolAnalysis, getLabwareDefURI } from '@opentrons/shared-data'
+import { mockCompletedAnalysis, mockExistingOffsets, mockWorkingOffsets } from '../__fixtures__'
 
 const render = (props: React.ComponentProps<typeof ResultsSummary>) => {
   return renderWithProviders(<ResultsSummary {...props} />, {
@@ -13,61 +13,6 @@ const render = (props: React.ComponentProps<typeof ResultsSummary>) => {
   })[0]
 }
 
-const mockCompletedAnalysis: CompletedProtocolAnalysis = {
-  id: 'fakeAnalysisId',
-  status: 'completed',
-  result: 'ok',
-  errors: [],
-  labware: [{
-    id: 'labwareId1',
-    loadName: 'fakeLoadName',
-    definitionUri: getLabwareDefURI(mockTipRackDefinition),
-    location: { slotName: '1' }
-  }],
-  pipettes: [],
-  modules: [],
-  liquids: [],
-  commands: [
-    {
-      commandType: 'loadLabware',
-      id: 'fakeCommandId',
-      status: 'succeeded',
-      createdAt: 'fakeCreatedAtTimestamp',
-      startedAt: 'fakeStartedAtTimestamp',
-      completedAt: 'fakecompletedAtTimestamp',
-      error: null,
-      params: {
-        labwareId: 'labwareId1',
-        location: {slotName: '1'},
-      },
-      result: {
-        labwareId: 'labwareId1',
-        definition: mockTipRackDefinition,
-        offset: {x: 0, y: 0, z: 0} 
-      }
-    }
-  ]
-}
-
-const mockExistingOffset = {
-  id: 'offset1',
-  createdAt: 'fake_timestamp',
-  definitionUri: getLabwareDefURI(mockTipRackDefinition),
-  location: { slotName: '2' },
-  vector: { x: 1, y: 2, z: 3 },
-}
-const mockWorkingOffset = {
-  labwareId: 'labwareId1',
-  location: { slotName: '1' },
-  initialPosition: { x: 1, y: 2, z: 3 },
-  finalPosition: { x: 2, y: 3, z: 4 }
-}
-const mockOtherWorkingOffset = {
-  labwareId: 'labwareId1',
-  location: { slotName: '3' },
-  initialPosition: { x: 3, y: 4, z: 5 },
-  finalPosition: { x: 6, y: 7, z: 8 }
-}
 describe('ResultsSummary', () => {
   let props: React.ComponentProps<typeof ResultsSummary>
 
@@ -75,8 +20,8 @@ describe('ResultsSummary', () => {
     props = {
       section: SECTIONS.RESULTS_SUMMARY,
       protocolData: mockCompletedAnalysis,
-      workingOffsets: [mockWorkingOffset, mockOtherWorkingOffset],
-      existingOffsets: [mockExistingOffset],
+      workingOffsets: mockWorkingOffsets,
+      existingOffsets: mockExistingOffsets,
       handleApplyOffsets: jest.fn(),
     }
   })

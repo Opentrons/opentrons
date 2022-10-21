@@ -69,7 +69,7 @@
   "prepare_item_in_location": "Prepare {{item}} in {{location}}",
   "slot_name": "slot {{slotName}}",
   "place_modules": "Place modules on deck",
-  "clear_all_slots": "Clear all deck slots and modules of labware",
+  "clear_all_slots": "Clear all deck slots of labware",
   "place_a_full_tip_rack_in_location": "Place a full <bold>{{tip_rack}}</bold> into <bold>{{location}}</bold>",
   "place_previous_tip_rack_in_location": "Place <bold>{{tip_rack}}</bold> with tip removed into <bold>{{location}}</bold>",
   "place_labware_in_location": "Place a <bold>{{labware}}</bold> into <bold>{{location}}</bold>",
