@@ -3,6 +3,7 @@ import {
   Icon,
   Flex,
   COLORS,
+  SPACING,
   SIZE_4,
   JUSTIFY_CENTER,
   ALIGN_CENTER,
@@ -30,7 +31,7 @@ export function RobotMotionLoader(props: RobotMotionLoaderProps): JSX.Element {
         size={SIZE_4}
         color={COLORS.darkGreyEnabled}
       />
-      {header != null ? <StyledText as="h1">{header}</StyledText> : null}
+      {header != null ? <StyledText as="h1" marginTop={SPACING.spacing5}>{header}</StyledText> : null}
       {body != null ? <StyledText as="p">{body}</StyledText> : null}
     </Flex>
   )
