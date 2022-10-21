@@ -8,9 +8,7 @@ import {
   useInterval,
   ALIGN_CENTER,
   ALIGN_START,
-  C_MED_LIGHT_GRAY,
   COLORS,
-  C_WHITE,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
@@ -81,8 +79,8 @@ export function RobotOverview({
   return robot != null ? (
     <Flex
       alignItems={ALIGN_START}
-      backgroundColor={C_WHITE}
-      borderBottom={`1px solid ${C_MED_LIGHT_GRAY}`}
+      backgroundColor={COLORS.white}
+      borderBottom={`1px solid ${COLORS.medGreyEnabled}`}
       flexDirection={DIRECTION_ROW}
       marginBottom={SPACING.spacing4}
       padding={SPACING.spacing3}
