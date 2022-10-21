@@ -114,10 +114,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
       () => {
         createRunCommand(
           {
-            command: {
-              commandType: 'savePosition',
-              params: { pipetteId },
-            },
+            command: { commandType: 'savePosition', params: { pipetteId } },
             waitUntilComplete: true,
           },
           {
@@ -155,12 +152,10 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
             waitUntilComplete: true,
           },
           {
-            onSuccess: () => { setShowTipConfirmation(true) }
+            onSuccess: () => { 
+              setShowTipConfirmation(true) }
           })
       },
-    }
-    ).catch((e: Error) => {
-      console.error(`error picking up tip ${e.message}`)
     })
   }
 
@@ -205,9 +200,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           setInitialPosition(null)
         },
       }
-    ).catch((e: Error) => {
-      console.error(`error dropping tip: ${e.message}`)
-    })
+    )
   }
   const existingOffset =
     getCurrentOffsetForLabwareInLocation(

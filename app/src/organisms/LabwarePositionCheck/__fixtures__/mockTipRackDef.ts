@@ -1,24 +1,11 @@
 import type { LabwareDefinition2 } from "@opentrons/shared-data";
+import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 
 export const mockTipRackDef: LabwareDefinition2 = {
-  version: 1,
-  schemaVersion: 2,
-  namespace: 'custom',
+  ...fixture_tiprack_10_ul as LabwareDefinition2,
   metadata: {
     displayName: 'Mock TipRack Definition',
     displayCategory: 'tipRack',
     displayVolumeUnits: 'mL',
   },
-  dimensions: { xDimension: 0, yDimension: 0, zDimension: 0 },
-  cornerOffsetFromSlot: { x: 0, y: 0, z: 0 },
-  parameters: {
-    loadName: 'mock_tiprack_definition',
-    format: 'mock',
-    isTiprack: true,
-    isMagneticModuleCompatible: false,
-  },
-  brand: { brand: 'Opentrons' },
-  ordering: [],
-  wells: {},
-  groups: [],
 }

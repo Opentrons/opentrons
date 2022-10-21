@@ -70,7 +70,7 @@
   "slot_name": "slot {{slotName}}",
   "place_modules": "Place modules on deck",
   "clear_all_slots": "Clear all deck slots of labware",
-  "place_a_full_tip_rack_in_location": "Place a full <bold>{{tip_rack}}</bold> into <bold>{{location}}</bold>",
+  "place_a_full_tip_rack_in_location": "Place <bold>a full {{tip_rack}}</bold> into <bold>{{location}}</bold>",
   "place_previous_tip_rack_in_location": "Place <bold>{{tip_rack}}</bold> with tip removed into <bold>{{location}}</bold>",
   "place_labware_in_location": "Place a <bold>{{labware}}</bold> into <bold>{{location}}</bold>",
   "ensure_nozzle_is_above_tip": "Ensure that the pipette nozzle closest to you is centered above and level with the top of the tip in the A1 position. If it isn't, use the controls below or your keyboard to jog the pipette until it is properly aligned",
