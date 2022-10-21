@@ -1,7 +1,6 @@
 """Tests for the JSON JsonTranslator interface."""
 import pytest
 from typing import Dict, List
-from pydantic import ValidationError
 
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
@@ -415,20 +414,7 @@ def _make_json_protocol(
     liquids: Dict[str, protocol_schema_v6.Liquid] = {
         "liquid-id-555": protocol_schema_v6.Liquid(
             displayName="water", description="water description", displayColor="#F00"
-        ),
-        "liquid-id-666": protocol_schema_v6.Liquid(
-            displayName="coke", description="coke description", displayColor="#FFCC00CC"
-        ),
-        "liquid-id-777": protocol_schema_v6.Liquid(
-            displayName="diet-coke",
-            description="coke description",
-            displayColor="#FC0C",
-        ),
-        "liquid-id-888": protocol_schema_v6.Liquid(
-            displayName="coke-zero",
-            description="coke description",
-            displayColor="#98e2d1",
-        ),
+        )
     },
 ) -> protocol_schema_v6.ProtocolSchemaV6:
     """Return a minimal JsonProtocol with the given elements, to use as test input."""
@@ -472,34 +458,5 @@ def test_load_liquid(
             displayName="water",
             description="water description",
             displayColor=HexColor(__root__="#F00"),
-        ),
-        Liquid(
-            id="liquid-id-666",
-            displayName="coke",
-            description="coke description",
-            displayColor=HexColor(__root__="#FFCC00CC"),
-        ),
-        Liquid(
-            id="liquid-id-777",
-            displayName="diet-coke",
-            description="coke description",
-            displayColor=HexColor(__root__="#FC0C"),
-        ),
-        Liquid(
-            id="liquid-id-888",
-            displayName="coke-zero",
-            description="coke description",
-            displayColor=HexColor(__root__="#98e2d1"),
-        ),
-    ]
-
-
-def test_handles_add_liquid_invalid_hex(subject: JsonTranslator) -> None:
-    """Should raise a validation error."""
-    with pytest.raises(ValidationError):
-        Liquid(
-            id="water-id",
-            displayName="water",
-            description="water-desc",
-            displayColor=HexColor(__root__="#123456789"),
         )
+    ]
