@@ -13,20 +13,22 @@ import {
   Btn,
   Flex,
   Icon,
+  Link,
   ALIGN_CENTER,
-  DIRECTION_ROW,
-  SPACING,
-  TYPOGRAPHY,
-  COLORS,
   BORDERS,
-  SIZE_1,
-  SIZE_5,
+  COLORS,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  DISPLAY_BLOCK,
+  DISPLAY_FLEX,
+  JUSTIFY_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
-  DISPLAY_BLOCK,
-  Link,
-  JUSTIFY_SPACE_BETWEEN,
+  SIZE_1,
+  SIZE_5,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   parseInitialPipetteNamesByMount,
@@ -112,6 +114,12 @@ const ZOOM_ICON_STYLE = css`
   }
   &:active {
     background: ${COLORS.lightGreyEnabled};
+  }
+  &:disabled {
+    background: ${COLORS.white};
+  }
+  &:focus-visible {
+    box-shadow: 0 0 0 3px ${COLORS.fundamentalsFocus};
   }
 `
 
@@ -534,11 +542,18 @@ export function ProtocolDetails(
               <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                 {t('deck_view')}
               </StyledText>
-              {analysisStatus === 'complete' ? (
-                <Btn onClick={() => setShowDeckViewModal(true)}>
-                  <Icon name="union" size={SIZE_1} />
-                </Btn>
-              ) : null}
+              <Btn
+                alignItems={ALIGN_CENTER}
+                disabled={analysisStatus !== 'complete'}
+                display={DISPLAY_FLEX}
+                justifyContent={JUSTIFY_CENTER}
+                height={SPACING.spacing5}
+                width={SPACING.spacing5}
+                css={ZOOM_ICON_STYLE}
+                onClick={() => setShowDeckViewModal(true)}
+              >
+                <Icon name="union" size={SIZE_1} />
+              </Btn>
             </Flex>
             <Box padding={SPACING.spacing4} backgroundColor={COLORS.white}>
               {deckViewByAnalysisStatus[analysisStatus]}
