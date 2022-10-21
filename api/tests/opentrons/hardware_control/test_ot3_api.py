@@ -374,6 +374,17 @@ async def test_cache_gripper(ot3_hardware: ThreadManager[OT3API]) -> None:
     assert ot3_hardware.attached_gripper["gripper_id"] == "g12345"
 
 
+async def test_has_gripper(
+    ot3_hardware: ThreadManager[OT3API],
+) -> None:
+    """It should return whether the robot has a gripper attached."""
+    assert ot3_hardware.has_gripper() is False
+    gripper_config = gc.load(GripperModel.V1, "g12345")
+    instr_data = AttachedGripper(config=gripper_config, id="g12345")
+    await ot3_hardware.cache_gripper(instr_data)
+    assert ot3_hardware.has_gripper() is True
+
+
 async def test_gripper_action(
     ot3_hardware: ThreadManager[OT3API],
     mock_grip: AsyncMock,

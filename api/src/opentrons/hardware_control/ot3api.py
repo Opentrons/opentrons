@@ -1401,6 +1401,9 @@ class OT3API(
     def attached_gripper(self) -> Optional[GripperDict]:
         return self._gripper_handler.get_gripper_dict()
 
+    def has_gripper(self) -> bool:
+        return self._gripper_handler.has_gripper()
+
     def calibrate_plunger(
         self,
         mount: Union[top_types.Mount, OT3Mount],

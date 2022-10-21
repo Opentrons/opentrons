@@ -111,23 +111,20 @@ async def wait_emulators(
         asyncio.TimeoutError on timeout.
     """
 
-    async def _wait_modules(cl: ModuleStatusClient, module_set: Set[str]) -> None:
+    async def _wait_modules() -> None:
         """Read messages from module server waiting for modules in module_set to
         be connected."""
+        module_set: Set[str] = set(modules)
+
         while module_set:
-            m: Message = await cl.read()
+            m: Message = await client.read()
             if m.status == "dump" or m.status == "connected":
                 for c in m.connections:
-                    if c.module_type in module_set:
-                        module_set.remove(c.module_type)
+                    module_set.discard(c.module_type)
             elif m.status == "disconnected":
                 for c in m.connections:
-                    if c.module_type in module_set:
-                        module_set.add(c.module_type)
+                    module_set.add(c.module_type)
 
             log.debug(f"after message: {m}, awaiting module set is: {module_set}")
 
-    await asyncio.wait_for(
-        _wait_modules(cl=client, module_set=set(n.value for n in modules)),
-        timeout=timeout,
-    )
+    await asyncio.wait_for(_wait_modules(), timeout=timeout)

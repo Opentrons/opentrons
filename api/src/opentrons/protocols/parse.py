@@ -14,7 +14,12 @@ from typing import Any, Dict, Optional, Union, Tuple, TYPE_CHECKING
 
 import jsonschema  # type: ignore
 
-from opentrons_shared_data import load_shared_data, protocol
+from opentrons_shared_data.labware import load_schema as load_labware_schema
+from opentrons_shared_data.protocol import (
+    Schema as JSONProtocolSchema,
+    load_schema as load_protocol_schema,
+)
+
 from .api_support.types import APIVersion
 from .types import (
     Protocol,
@@ -38,7 +43,7 @@ MAX_SUPPORTED_JSON_SCHEMA_VERSION = 5
 API_VERSION_FOR_JSON_V5_AND_BELOW = APIVersion(2, 8)
 
 
-def _validate_v2_ast(protocol_ast: ast.Module):
+def _validate_v2_ast(protocol_ast: ast.Module) -> None:
     defs = [fdef for fdef in protocol_ast.body if isinstance(fdef, ast.FunctionDef)]
     rundefs = [fdef for fdef in defs if fdef.name == "run"]
     # There must be precisely 1 one run function
@@ -73,7 +78,7 @@ def version_from_string(vstr: str) -> APIVersion:
     return APIVersion(major=int(matches.group(1)), minor=int(matches.group(2)))
 
 
-def _parse_json(protocol_contents: str, filename: str = None) -> JsonProtocol:
+def _parse_json(protocol_contents: str, filename: Optional[str] = None) -> JsonProtocol:
     """Parse a protocol known or at least suspected to be json"""
     protocol_json = json.loads(protocol_contents)
     version, validated = validate_json(protocol_json)
@@ -89,11 +94,11 @@ def _parse_json(protocol_contents: str, filename: str = None) -> JsonProtocol:
 
 def _parse_python(
     protocol_contents: str,
-    filename: str = None,
-    bundled_labware: Dict[str, "LabwareDefinition"] = None,
-    bundled_data: Dict[str, bytes] = None,
-    bundled_python: Dict[str, str] = None,
-    extra_labware: Dict[str, "LabwareDefinition"] = None,
+    filename: Optional[str] = None,
+    bundled_labware: Optional[Dict[str, "LabwareDefinition"]] = None,
+    bundled_data: Optional[Dict[str, bytes]] = None,
+    bundled_python: Optional[Dict[str, str]] = None,
+    extra_labware: Optional[Dict[str, "LabwareDefinition"]] = None,
 ) -> PythonProtocol:
     """Parse a protocol known or at least suspected to be python"""
     filename_checked = filename or "<protocol>"
@@ -128,7 +133,7 @@ def _parse_python(
     return result
 
 
-def _parse_bundle(bundle: ZipFile, filename: str = None) -> PythonProtocol:
+def _parse_bundle(bundle: ZipFile, filename: Optional[str] = None) -> PythonProtocol:
     """Parse a bundled Python protocol"""
     contents = extract_bundle(bundle)
 
@@ -150,9 +155,9 @@ def _parse_bundle(bundle: ZipFile, filename: str = None) -> PythonProtocol:
 
 def parse(
     protocol_file: Union[str, bytes],
-    filename: str = None,
-    extra_labware: Dict[str, "LabwareDefinition"] = None,
-    extra_data: Dict[str, bytes] = None,
+    filename: Optional[str] = None,
+    extra_labware: Optional[Dict[str, "LabwareDefinition"]] = None,
+    extra_data: Optional[Dict[str, bytes]] = None,
 ) -> Protocol:
     """Parse a protocol from text.
 
@@ -373,7 +378,7 @@ def _get_protocol_schema_version(protocol_json: Dict[Any, Any]) -> int:
     )
 
 
-def _get_schema_for_protocol(version_num: int) -> protocol.Schema:
+def _get_schema_for_protocol(version_num: int) -> JSONProtocolSchema:
     """Retrieve the json schema for a protocol schema version"""
     # TODO(IL, 2020/03/05): use $otSharedSchema, but maybe wait until
     # deprecating v1/v2 JSON protocols?
@@ -383,22 +388,17 @@ def _get_schema_for_protocol(version_num: int) -> protocol.Schema:
             + "supported in this version of the API"
         )
     try:
-        schema = load_shared_data(f"protocol/schemas/{version_num}.json")
+        return load_protocol_schema(version=version_num)
     except FileNotFoundError:
-        schema = None  # type: ignore
-    if not schema:
         raise RuntimeError(
             'JSON Protocol schema "{}" does not exist'.format(version_num)
-        )
-    return json.loads(schema.decode("utf-8"))
+        ) from None
 
 
 def validate_json(protocol_json: Dict[Any, Any]) -> Tuple[int, "JsonProtocolDef"]:
     """Validates a json protocol and returns its schema version"""
     # Check if this is actually a labware
-    labware_schema_v2 = json.loads(
-        load_shared_data("labware/schemas/2.json").decode("utf-8")
-    )
+    labware_schema_v2 = load_labware_schema()
     try:
         jsonschema.validate(protocol_json, labware_schema_v2)
     except jsonschema.ValidationError:

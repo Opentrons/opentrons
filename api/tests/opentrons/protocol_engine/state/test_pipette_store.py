@@ -431,18 +431,31 @@ def test_heater_shaker_command_without_movement(
             # because MoveLabwareOffDeck command had "matching-labware-id".
             None,
         ),
+        (
+            create_move_labware_command(
+                labware_id="non-matching-labware-id",
+                new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+                use_gripper=True,
+                offset_id=None,
+            ),
+            # Current well IS cleared,
+            # because MoveLabware command used gripper.
+            None,
+        ),
     ),
 )
-def test_move_labware_clears_current_well_if_belonged_to_moved_labware(
+def test_move_labware_clears_current_well(
     subject: PipetteStore,
     move_labware_command: Union[cmd.MoveLabware, cmd.MoveLabwareOffDeck],
     expected_current_well: Optional[CurrentWell],
 ) -> None:
     """Labware movement commands should sometimes clear the current well.
 
-    * When the current well belongs to the labware that was moved,
-      it should be cleared.
-    * Otherwise, it should be left alone.
+    It should be cleared when-
+    * the current well belongs to the labware that was moved,
+    * or gripper was used to move labware
+
+    Otherwise, it should be left alone.
     """
     load_pipette_command = create_load_pipette_command(
         pipette_id="pipette-id",
