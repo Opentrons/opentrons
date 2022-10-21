@@ -109,7 +109,7 @@
   "lpc_disabled_no_tipracks_used": "Labware Position Check requires that the protocol has at least one pipette that picks up a tip",
   "get_labware_offset_data": "Get Labware Offset Data",
   "module_mismatch_title": "This robot has connected modules that are not specified in this protocol",
-  "module_mismatch_body": "If you’re having trouble connecting the modules specified below, make sure the module’s generation (GEN1 vs GEN2) is correct.",
+  "module_mismatch_body": "Make sure the modules connected to this robot are of the right type and generation.",
   "tip_length_calibration": "tip length calibration",
   "calibrate_deck_to_proceed_to_pipette_calibration": "Calibrate your deck in order to proceed to pipette calibration",
   "calibrate_deck_to_proceed_to_tip_length_calibration": "Calibrate your deck in order to proceed to tip length calibration",
@@ -135,5 +135,9 @@
   "initial_location": "Initial Location",
   "secure_labware_instructions": "Secure labware instructions",
   "module_name": "Module Name",
-  "connection_status": "Connection Status"
+  "connection_status": "Connection Status",
+  "heater_shaker_labware_list_view": "To add labware, use the toggle to control the latch",
+  "labware_latch": "Labware Latch",
+  "multiple_modules": "Multiple modules of the same type",
+  "view_moam": "View setup instructions for placing modules of the same type to the robot."
 }

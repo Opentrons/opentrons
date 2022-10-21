@@ -196,23 +196,16 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
             {toggleGroup}
             {selectedValue === t('list_view') ? (
               <SetupLabwareList
+                attachedModuleInfo={moduleRenderInfoById}
                 runId={runId}
                 extraAttentionModules={moduleTypesThatRequireExtraAttention}
               />
             ) : (
-              <SetupLabwareMap
-                runId={runId}
-                extraAttentionModules={moduleTypesThatRequireExtraAttention}
-                robotName={robotName}
-              />
+              <SetupLabwareMap runId={runId} robotName={robotName} />
             )}
           </>
         ) : (
-          <SetupLabwareMap
-            runId={runId}
-            robotName={robotName}
-            extraAttentionModules={moduleTypesThatRequireExtraAttention}
-          />
+          <SetupLabwareMap runId={runId} robotName={robotName} />
         )}
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
           <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_FLEX_END}>

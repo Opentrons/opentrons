@@ -73,4 +73,14 @@ describe('Banner', () => {
     getByLabelText('icon_warning')
     getByText('TITLE')
   })
+  it('renders custom close', () => {
+    props = {
+      type: 'warning',
+      children: 'TITLE',
+      close: 'close button',
+      onCloseClick: jest.fn(),
+    }
+    const { getByText } = render(props)
+    getByText('close button')
+  })
 })

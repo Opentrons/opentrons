@@ -19,13 +19,11 @@ import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fi
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 
 import { i18n } from '../../../../../i18n'
-import { ModuleExtraAttention } from '../../ModuleExtraAttention'
 import { LabwareInfoOverlay } from '../../LabwareInfoOverlay'
 import { LabwareOffsetModal } from '../../../../ProtocolSetup/RunSetupCard/LabwareSetup/LabwareOffsetModal'
 import {
   useLabwareRenderInfoForRunById,
   useModuleRenderInfoForProtocolById,
-  useRunHasStarted,
 } from '../../../hooks'
 import { SetupLabwareMap } from '../SetupLabwareMap'
 
@@ -46,7 +44,6 @@ jest.mock('@opentrons/shared-data', () => {
   }
 })
 jest.mock('../../../../ProtocolSetup/hooks')
-jest.mock('../../ModuleExtraAttention')
 jest.mock('../../LabwareInfoOverlay')
 jest.mock(
   '../../../../ProtocolSetup/RunSetupCard/LabwareSetup/LabwareOffsetModal'
@@ -75,19 +72,11 @@ const mockLabwareRender = LabwareRender as jest.MockedFunction<
 const mockLabwareOffsetModal = LabwareOffsetModal as jest.MockedFunction<
   typeof LabwareOffsetModal
 >
-
-const mockModuleExtraAttention = ModuleExtraAttention as jest.MockedFunction<
-  typeof ModuleExtraAttention
->
 const mockUseLabwareRenderInfoForRunById = useLabwareRenderInfoForRunById as jest.MockedFunction<
   typeof useLabwareRenderInfoForRunById
 >
 const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById as jest.MockedFunction<
   typeof useModuleRenderInfoForProtocolById
->
-
-const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
-  typeof useRunHasStarted
 >
 const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
   (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
@@ -198,7 +187,6 @@ describe('SetupLabwareMap', () => {
           })}
         </svg>
       ))
-    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -213,7 +201,6 @@ describe('SetupLabwareMap', () => {
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({})
 
-    render({ extraAttentionModules: [], robotName: ROBOT_NAME, runId: RUN_ID })
     expect(mockModule).not.toHaveBeenCalled()
     expect(mockLabwareRender).not.toHaveBeenCalled()
     expect(mockLabwareInfoOverlay).not.toHaveBeenCalled()
@@ -236,7 +223,6 @@ describe('SetupLabwareMap', () => {
       .mockReturnValue({})
 
     const { getByText } = render({
-      extraAttentionModules: [],
       robotName: ROBOT_NAME,
       runId: RUN_ID,
     })
@@ -309,7 +295,6 @@ describe('SetupLabwareMap', () => {
       .mockReturnValue(<div>mock module viz {mockTCModule.type} </div>)
 
     const { getByText } = render({
-      extraAttentionModules: [],
       robotName: ROBOT_NAME,
       runId: RUN_ID,
     })
@@ -318,59 +303,5 @@ describe('SetupLabwareMap', () => {
     getByText('mock module viz thermocyclerModuleType')
     getByText('mock labware render of 300ul Tiprack FIXTURE')
     getByText('mock labware info overlay of 300ul Tiprack FIXTURE')
-  })
-  it('should render the module extra attention banner when there are modules/labware that need extra attention', () => {
-    when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith(ROBOT_NAME, RUN_ID)
-      .mockReturnValue({
-        [mockMagneticModule.moduleId]: {
-          moduleId: mockMagneticModule.moduleId,
-          x: MOCK_MAGNETIC_MODULE_COORDS[0],
-          y: MOCK_MAGNETIC_MODULE_COORDS[1],
-          z: MOCK_MAGNETIC_MODULE_COORDS[2],
-          moduleDef: mockMagneticModule as any,
-          nestedLabwareDisplayName: 'Source Plate',
-          nestedLabwareDef: null,
-          nestedLabwareId: null,
-          protocolLoadOrder: 0,
-          slotName: '3',
-          attachedModuleMatch: null,
-        },
-      } as any)
-
-    when(mockModuleExtraAttention)
-      .calledWith(
-        componentPropsMatcher({
-          moduleTypes: ['magneticModuleType'],
-          modulesInfo: {
-            [mockMagneticModule.moduleId]: {
-              moduleId: mockMagneticModule.moduleId,
-              x: MOCK_MAGNETIC_MODULE_COORDS[0],
-              y: MOCK_MAGNETIC_MODULE_COORDS[1],
-              z: MOCK_MAGNETIC_MODULE_COORDS[2],
-              moduleDef: mockMagneticModule as any,
-              nestedLabwareDisplayName: 'Source Plate',
-              nestedLabwareDef: null,
-              nestedLabwareId: null,
-              protocolLoadOrder: 0,
-              slotName: '3',
-              attachedModuleMatch: null,
-            },
-          },
-        })
-      )
-      .mockReturnValue(
-        <div>
-          mock module extra attention banner with magnetic module and TC
-        </div>
-      )
-
-    const { getByText } = render({
-      extraAttentionModules: ['magneticModuleType'],
-      robotName: ROBOT_NAME,
-      runId: RUN_ID,
-    })
-
-    getByText('mock module extra attention banner with magnetic module and TC')
   })
 })
