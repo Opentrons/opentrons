@@ -235,7 +235,7 @@ export function LabwareListItem(
               : 'heaterShaker/closeLabwareLatch',
             params: { moduleId: matchingHeaterShaker.id },
           }
-          //  Labware latch button only renders if correct H-S is attached
+          //  Labware latch button is disabled unless the correct H-S is attached
           //  this is for MoaM support
           isCorrectHeaterShakerAttached = true
         }
