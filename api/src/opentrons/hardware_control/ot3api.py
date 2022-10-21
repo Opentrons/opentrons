@@ -380,7 +380,7 @@ class OT3API(
         return await self._backend.module_controls.build_module(
             port="",
             usb_port=USBPort(name="", port_number=0),
-            type=modules.ModuleType.from_hardware_model(model),
+            type=modules.ModuleType.from_model(model),
             sim_model=model.value,
         )
 

@@ -141,7 +141,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         # TODO(mc, 2022-10-20): move to public ProtocolContext
         # once `Deck` and `ProtocolEngine` play nicely together
         if deck_slot is None:
-            if ModuleType.from_hardware_model(model) == ModuleType.THERMOCYCLER:
+            if ModuleType.from_model(model) == ModuleType.THERMOCYCLER:
                 deck_slot = DeckSlotName.SLOT_7
             else:
                 raise InvalidModuleLocationError(deck_slot, model.name)
