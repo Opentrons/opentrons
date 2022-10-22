@@ -68,7 +68,7 @@ all: package
 # must be wrapped in yarn run otherwise `prebuild-install` will fail silently
 # due to how `electron-rebuild` calls `prebuild-install`
 setup:
-	yarn electron-rebuild -c.electronVersion=21.1.0
+	yarn electron-rebuild -m -c.electronVersion=21.1.0
 
 .PHONY: clean
 clean:
