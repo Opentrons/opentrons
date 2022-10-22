@@ -67,7 +67,7 @@ This function is not present in the current protocol and must be added.
 
 PYTHON_API_VERSION_DEPRECATED = """
 
-The python protocol you uploaded has the Python API Version {0}.  Robot server version 4.0.0 is
+The Python protocol you uploaded has the Python API Version {0}.  Robot server version 4.0.0 is
 the official end of life of Python API Version {0}. The minimum supported Python API Version is {1}. This means that this protocol
 will not run in robot server version 4.0.0 and above.
 Please downgrade your robot server version if you wish to run this protocol. Otherwise, please upgrade this
@@ -82,14 +82,14 @@ through the downgrade process.
 
 
 class MalformedProtocolError(Exception):
-    def __init__(self, message):
+    def __init__(self, message: str) -> None:
         self.message = message
         super().__init__(message)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.message + PROTOCOL_MALFORMED
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<{}: {}>".format(self.__class__.__name__, self.message)
 
 
@@ -98,8 +98,8 @@ class ApiDeprecationError(Exception):
         self.version = version
         super().__init__(version)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return PYTHON_API_VERSION_DEPRECATED.format(self.version, MIN_SUPPORTED_VERSION)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<{}: {}>".format(self.__class__.__name__, self.version)

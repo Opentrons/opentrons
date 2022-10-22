@@ -1,5 +1,5 @@
 """Tests for Protocol API input validation."""
-from typing import List, Union
+from typing import List, Union, Optional
 
 import pytest
 
@@ -116,3 +116,20 @@ def test_ensure_module_model_invalid() -> None:
 
     with pytest.raises(TypeError, match="must be a string"):
         subject.ensure_module_model(42)  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize(
+    ["seconds", "minutes", "expected"],
+    [
+        (42.42, None, 42.42),
+        (None, 1.2, 72.0),
+        (42.42, 1.2, 114.42),
+        (None, None, 0),
+    ],
+)
+def test_ensure_hold_time_seconds(
+    seconds: Optional[float], minutes: Optional[float], expected: float
+) -> None:
+    """It should ensure hold time is in seconds only."""
+    result = subject.ensure_hold_time_seconds(seconds=seconds, minutes=minutes)
+    assert result == expected

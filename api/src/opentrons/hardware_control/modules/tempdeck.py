@@ -35,10 +35,10 @@ class TempDeck(mod_abc.AbstractModule):
         port: str,
         usb_port: USBPort,
         execution_manager: ExecutionManager,
+        hw_control_loop: asyncio.AbstractEventLoop,
+        poll_interval_seconds: Optional[float] = None,
         simulating: bool = False,
-        loop: Optional[asyncio.AbstractEventLoop] = None,
         sim_model: Optional[str] = None,
-        **kwargs: float,
     ) -> "TempDeck":
         """
         Build a TempDeck
@@ -47,39 +47,41 @@ class TempDeck(mod_abc.AbstractModule):
             port: The port to connect to
             usb_port: USB Port
             execution_manager: Execution manager.
+            hw_control_loop: The event loop running in the hardware control thread.
+            poll_interval_seconds: Poll interval override.
             simulating: whether to build a simulating driver
-            loop: Loop
             sim_model: The model name used by simulator
-            **kwargs: Module specific values.
-                can be 'polling_frequency' to specify the polling frequency in
-                seconds
 
         Returns:
             Tempdeck instance
         """
-        polling_frequency = kwargs.get("polling_frequency")
         driver: AbstractTempDeckDriver
         if not simulating:
-            driver = await TempDeckDriver.create(port=port, loop=loop)
-            polling_frequency = polling_frequency or TEMP_POLL_INTERVAL_SECS
+            driver = await TempDeckDriver.create(port=port, loop=hw_control_loop)
+            poll_interval_seconds = poll_interval_seconds or TEMP_POLL_INTERVAL_SECS
         else:
             driver = SimulatingDriver(sim_model=sim_model)
-            polling_frequency = polling_frequency or SIM_TEMP_POLL_INTERVAL_SECS
+            poll_interval_seconds = poll_interval_seconds or SIM_TEMP_POLL_INTERVAL_SECS
 
         reader = TempDeckReader(driver=driver)
-        poller = Poller(reader=reader, interval=polling_frequency)
-        device_info = await driver.get_device_info()
-
-        return cls(
+        poller = Poller(reader=reader, interval=poll_interval_seconds)
+        module = cls(
             port=port,
             usb_port=usb_port,
             execution_manager=execution_manager,
             driver=driver,
             reader=reader,
             poller=poller,
-            device_info=device_info,
-            loop=loop,
+            device_info=await driver.get_device_info(),
+            hw_control_loop=hw_control_loop,
         )
+
+        try:
+            await poller.start()
+        except Exception:
+            log.exception(f"First read of Temperature Module on port {port} failed")
+
+        return module
 
     def __init__(
         self,
@@ -90,11 +92,14 @@ class TempDeck(mod_abc.AbstractModule):
         reader: TempDeckReader,
         poller: Poller,
         device_info: Mapping[str, str],
-        loop: Optional[asyncio.AbstractEventLoop] = None,
+        hw_control_loop: asyncio.AbstractEventLoop,
     ) -> None:
         """Constructor"""
         super().__init__(
-            port=port, usb_port=usb_port, loop=loop, execution_manager=execution_manager
+            port=port,
+            usb_port=usb_port,
+            hw_control_loop=hw_control_loop,
+            execution_manager=execution_manager,
         )
         self._device_info = device_info
         self._driver = driver
@@ -119,11 +124,6 @@ class TempDeck(mod_abc.AbstractModule):
 
     def bootloader(self) -> types.UploadFunction:
         return update.upload_via_avrdude
-
-    # TODO(mc, 2022-10-08): not publicly used; remove
-    async def wait_next_poll(self) -> None:
-        """Wait for the next poll to complete."""
-        await self._poller.wait_next_poll()
 
     async def start_set_temperature(self, celsius: float) -> None:
         """Set the target temperature in degrees Celsius.
@@ -159,7 +159,7 @@ class TempDeck(mod_abc.AbstractModule):
         async def _await_temperature() -> None:
             if awaiting_temperature is None:
                 while self.status != TemperatureStatus.HOLDING:
-                    await self.wait_next_poll()
+                    await self._poller.wait_next_poll()
             elif self.status == TemperatureStatus.HEATING:
                 while self.temperature < awaiting_temperature:
                     await self._poller.wait_next_poll()

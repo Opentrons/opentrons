@@ -29,7 +29,7 @@ async def subject(usb_port: USBPort) -> AsyncGenerator[modules.Thermocycler, Non
         usb_port=usb_port,
         type=modules.ModuleType.THERMOCYCLER,
         simulating=True,
-        loop=asyncio.get_running_loop(),
+        hw_control_loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
     )
     yield cast(modules.Thermocycler, therm)
@@ -76,7 +76,6 @@ async def test_sim_update(subject: modules.Thermocycler) -> None:
     assert subject.status == "holding at target"
 
     await subject.deactivate_block()
-    await subject.wait_next_poll()
     assert subject.temperature == 23
     assert subject.target is None
     assert subject.status == "idle"
@@ -143,13 +142,15 @@ async def set_temperature_subject(
     hw_tc = modules.Thermocycler(
         port="/dev/ot_module_sim_thermocycler0",
         usb_port=usb_port,
-        loop=asyncio.get_running_loop(),
+        hw_control_loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
         driver=simulator_set_plate_spy,
         reader=reader,
         poller=poller,
         device_info={},
     )
+
+    await poller.start()
     yield hw_tc
     await hw_tc.cleanup()
 
