@@ -194,10 +194,11 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
           </SecondaryButton>
         </Flex>
       </Flex>
-      <StyledText as="p" paddingBottom={SPACING.spacing4}>
-        {t('all_protocols')}
-      </StyledText>
-      <Flex flexDirection="column" marginBottom={SPACING.spacing6}>
+      <Flex
+        flexDirection="column"
+        gridGap={SPACING.spacing3}
+        marginBottom={SPACING.spacingXXL}
+      >
         {sortedStoredProtocols.map(storedProtocol => (
           <ProtocolCard
             key={storedProtocol.protocolKey}

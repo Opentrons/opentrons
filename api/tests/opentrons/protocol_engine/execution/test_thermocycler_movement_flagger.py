@@ -105,8 +105,8 @@ class LidStatusAndRaiseSpec(NamedTuple):
             expected_raise_cm=pytest.raises(ThermocyclerNotOpenError),
         ),
         LidStatusAndRaiseSpec(
-            lid_status=None,
-            expected_raise_cm=pytest.raises(AssertionError),
+            lid_status=ThermocyclerLidStatus.UNKNOWN,
+            expected_raise_cm=pytest.raises(ThermocyclerNotOpenError),
         ),
         LidStatusAndRaiseSpec(
             lid_status=ThermocyclerLidStatus.OPEN,
@@ -115,7 +115,7 @@ class LidStatusAndRaiseSpec(NamedTuple):
     ],
 )
 async def test_raises_depending_on_thermocycler_hardware_lid_status(
-    lid_status: Optional[ThermocyclerLidStatus],
+    lid_status: ThermocyclerLidStatus,
     expected_raise_cm: ContextManager[Any],
     subject: ThermocyclerMovementFlagger,
     state_store: StateStore,

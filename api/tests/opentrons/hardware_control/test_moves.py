@@ -84,7 +84,8 @@ async def test_home(ot3_hardware, mock_home):
         dfm_mock.return_value = {OT3Axis.X: 20}
         await ot3_hardware.home([OT3Axis.X])
         mock_home.assert_called_once_with([OT3Axis.X])
-        dfm_mock.assert_called_once_with(
+        assert dfm_mock.call_count == 2
+        dfm_mock.assert_called_with(
             mock_home.return_value,
             ot3_hardware._transforms.deck_calibration.attitude,
             ot3_hardware._transforms.carriage_offset,

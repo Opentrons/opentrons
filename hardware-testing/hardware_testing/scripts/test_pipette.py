@@ -22,11 +22,13 @@ MAX_SPEED_PIP = 20
 
 
 async def _main(is_simulating: bool) -> None:
-    api = await build_async_ot3_hardware_api(is_simulating=is_simulating)
-    await api.set_gantry_load(gantry_load=LOAD)
-
-    attached_pips = api.get_attached_pipettes()
-    assert attached_pips[MOUNT.to_mount()]
+    api = await build_async_ot3_hardware_api(
+        is_simulating=is_simulating,
+        pipette_left="p1000_single_v3.3",
+        pipette_right="p50_single_v4.3",
+    )
+    assert api.hardware_pipettes[OT3Mount.LEFT.to_mount()], "No pipette on the left!"
+    assert api.hardware_pipettes[OT3Mount.RIGHT.to_mount()], "No pipette on the right!"
 
     await home_ot3(api, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
     await api.home_plunger(mount=MOUNT)

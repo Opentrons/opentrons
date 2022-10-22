@@ -5965,14 +5965,14 @@
         "type": "float"
       },
       "pickUpCurrent": {
-        "value": 0.125,
+        "value": 0.25,
         "min": 0.05,
         "max": 2.0,
         "units": "amps",
         "type": "float"
       },
       "pickUpDistance": {
-        "value": 17,
+        "value": 15,
         "min": 1,
         "max": 30,
         "units": "mm",
@@ -5993,7 +5993,7 @@
         "type": "int"
       },
       "pickUpSpeed": {
-        "value": 10,
+        "value": 5,
         "min": 1,
         "max": 30,
         "units": "mm/s",
@@ -6493,14 +6493,14 @@
         "type": "float"
       },
       "pickUpCurrent": {
-        "value": 0.125,
+        "value": 0.25,
         "min": 0.05,
         "max": 2.0,
         "units": "amps",
         "type": "float"
       },
       "pickUpDistance": {
-        "value": 17,
+        "value": 15,
         "min": 1,
         "max": 30,
         "units": "mm",
@@ -6521,7 +6521,7 @@
         "type": "int"
       },
       "pickUpSpeed": {
-        "value": 10,
+        "value": 5,
         "min": 1,
         "max": 30,
         "units": "mm/s",
@@ -6662,14 +6662,14 @@
         "type": "float"
       },
       "pickUpCurrent": {
-        "value": 0.125,
+        "value": 0.25,
         "min": 0.05,
         "max": 2.0,
         "units": "amps",
         "type": "float"
       },
       "pickUpDistance": {
-        "value": 17,
+        "value": 15,
         "min": 1,
         "max": 30,
         "units": "mm",
@@ -6690,7 +6690,7 @@
         "type": "int"
       },
       "pickUpSpeed": {
-        "value": 10,
+        "value": 5,
         "min": 1,
         "max": 30,
         "units": "mm/s",

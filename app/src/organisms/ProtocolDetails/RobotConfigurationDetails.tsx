@@ -15,6 +15,7 @@ import {
   getModuleDisplayName,
   getModuleType,
   getPipetteNameSpecs,
+  TC_MODULE_LOCATION,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { Divider } from '../../atoms/structure'
@@ -84,7 +85,7 @@ export const RobotConfigurationDetails = (
                       slot_number:
                         getModuleType(module.params.model) ===
                         THERMOCYCLER_MODULE_TYPE
-                          ? '7/10'
+                          ? TC_MODULE_LOCATION
                           : module.params.location.slotName,
                     })}
                   </StyledText>

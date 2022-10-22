@@ -42,6 +42,7 @@
   "plug_in_required_module": "Plug in and power up the required module to continue",
   "plug_in_required_module_plural": "Plug in and power up the required modules to continue",
   "proceed_to_labware_setup_step": "Proceed to labware setup",
+  "proceed_to_labware_setup_prep": "Proceed to labware prep",
   "proceed_to_module_setup_step": "Proceed to module setup",
   "proceed_to_liquid_setup_step": "Proceed to liquid setup",
   "attach_pipette_cta": "Attach Pipette",
@@ -129,5 +130,10 @@
   "labware_name": "Labware Name",
   "volume": "Volume",
   "slot_location": "Slot {{slotName}}",
-  "slot_number": "Slot Number"
+  "slot_number": "Slot Number",
+  "module_slot_location": "Slot {{slotName}}, {{moduleName}}",
+  "initial_location": "Initial Location",
+  "secure_labware_instructions": "Secure labware instructions",
+  "module_name": "Module Name",
+  "connection_status": "Connection Status"
 }

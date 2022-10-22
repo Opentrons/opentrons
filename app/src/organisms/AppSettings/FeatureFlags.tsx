@@ -32,11 +32,10 @@ export function FeatureFlags(): JSX.Element {
       paddingY={SPACING.spacing5}
     >
       {Config.DEV_INTERNAL_FLAGS.map((flag, index) => (
-        <>
+        <React.Fragment key={flag}>
           <Flex
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
-            key={flag}
           >
             <StyledText
               as="h3"
@@ -55,7 +54,7 @@ export function FeatureFlags(): JSX.Element {
           {index !== Config.DEV_INTERNAL_FLAGS.length - 1 && (
             <Divider marginY={SPACING.spacing5} />
           )}
-        </>
+        </React.Fragment>
       ))}
     </Flex>
   )
