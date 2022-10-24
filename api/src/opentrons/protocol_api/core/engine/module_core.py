@@ -109,7 +109,7 @@ class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore[LabwareCor
 
     def get_target_temperature(self) -> Optional[float]:
         """Get the module's target temperature in °C, if set."""
-        raise NotImplementedError("get_target_temperature not implemented")
+        return self._engine_client.state.modules.get_temperature_module_substate(self.module_id).get_plate_target_temperature()
 
     def get_status(self) -> TemperatureStatus:
         """Get the module's current temperature status."""

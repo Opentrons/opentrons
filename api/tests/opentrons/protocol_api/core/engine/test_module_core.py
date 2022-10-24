@@ -79,4 +79,9 @@ def test_deactivate(decoy: Decoy, temp_deck_subject: TemperatureModuleCore, mock
     temp_deck_subject.deactivate()
 
     decoy.verify(mock_engine_client.temperature_deactivate(module_id="1234"))
+
+
+def test_get_target_temperature(decoy: Decoy, temp_deck_subject: TemperatureModuleCore, mock_engine_client: EngineClient) -> None:
+    """Should return the current temperature."""
+    result = temp_deck_subject.get_target_temperature()
 # </editor-fold>
