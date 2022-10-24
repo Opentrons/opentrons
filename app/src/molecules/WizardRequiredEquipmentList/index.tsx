@@ -52,15 +52,15 @@ export function WizardRequiredEquipmentList(
 }
 
 interface RequiredEquipmentCardProps {
-  displayName: string
   loadName: string
+  displayName: string
   subtitle?: string
 }
 
 function RequiredEquipmentCard(props: RequiredEquipmentCardProps): JSX.Element {
   const { loadName, displayName, subtitle } = props
 
-  let src: string = labwareImages.generic_custom_tiprack
+  let imageSrc: string = labwareImages.generic_custom_tiprack
   if (loadName in labwareImages) {
     src = labwareImages[loadName as keyof typeof labwareImages]
   } else if (loadName in equipmentImages) {
@@ -88,7 +88,7 @@ function RequiredEquipmentCard(props: RequiredEquipmentCardProps): JSX.Element {
               flex: 0 1 5rem;
               display: block;
             `}
-            src={src}
+            src={imageSrc}
           />
         </Flex>
         <Flex
