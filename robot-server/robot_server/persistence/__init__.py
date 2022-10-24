@@ -16,7 +16,7 @@ from typing_extensions import Final
 from robot_server.app_state import AppState, AppStateAccessor, get_app_state
 from robot_server.errors import ErrorDetails
 
-from .database import create_sql_engine, sqlite_rowid
+from ._database import create_sql_engine, sqlite_rowid
 from .tables import protocol_table, analysis_table, run_table, action_table
 
 
@@ -208,6 +208,7 @@ async def _prepare_persistence_directory(path: Optional[Path]) -> Path:
 __all__ = [
     "get_persistence_directory",
     "get_sql_engine",
+    "create_sql_engine",
     "PersistenceResetter",
     "get_persistence_resetter",
     # database tables

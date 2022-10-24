@@ -6,7 +6,7 @@ import pytest
 import sqlalchemy
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 
-from robot_server.persistence.database import create_sql_engine
+from robot_server.persistence import create_sql_engine
 from robot_server.persistence.tables import (
     migration_table,
     run_table,
