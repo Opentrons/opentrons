@@ -93,6 +93,9 @@ from opentrons.protocols.api_support.types import APIVersion
         ),
         (
             # Later assignments should override earlier assignments:
+            # TODO(mm, 2022-10-24): Reconsider whether we actually want this behavior.
+            # Protocols probably shouldn't do this. Note that metadata["k"] = "v" is
+            # unsupported.
             """
             metadata = {"k1": "v1"}
             metadata = {"k2": "v2"}
