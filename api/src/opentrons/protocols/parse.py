@@ -80,38 +80,6 @@ def version_from_string(vstr: str) -> APIVersion:
     return APIVersion(major=int(matches.group(1)), minor=int(matches.group(2)))
 
 
-def version_from_static_python_info(
-    static_python_info: StaticPythonInfo,
-) -> Optional[APIVersion]:
-    """Get an explicitly specified apiLevel from static info, if we can.
-
-    If the protocol doesn't declare apiLevel at all, return None.
-    If the protocol declares apiLevel incorrectly, raise a ValueError.
-    """
-    # TODO(mm, 2022-10-21):
-    #
-    # This logic is quick and dirty, and might allow things that we don't want.
-    #
-    # - Require protocols with new `apiLevel`s to specify `apiLevel` in `requirements`
-    #   and not in `metadata`?
-    # - Forbid protocols from specifying `apiLevel` in both `requirements` and
-    #   `metadata`?
-    # - Be more careful with falsey values, like `"apiLevel": ""`?
-    # - Forbid unrecognized keys in `requirements`?
-
-    from_requirements = (static_python_info.requirements or {}).get("apiLevel", None)
-    from_metadata = (static_python_info.metadata or {}).get("apiLevel", None)
-    requested_level = from_requirements or from_metadata
-    if requested_level is None:
-        return None
-    elif requested_level == "1":
-        # TODO(mm, 2022-10-21): Can we safely move this special case to
-        # version_from_string()?
-        return APIVersion(1, 0)
-    else:
-        return version_from_string(requested_level)
-
-
 def _parse_json(protocol_contents: str, filename: Optional[str] = None) -> JsonProtocol:
     """Parse a protocol known or at least suspected to be json"""
     protocol_json = json.loads(protocol_contents)
@@ -361,6 +329,38 @@ def _has_api_v1_imports(parsed: ast.Module) -> bool:
     opentrons_imports = set(ot_imports + ot_from_imports)
     v1_markers = set(("robot", "instruments", "modules", "containers"))
     return bool(v1_markers.intersection(opentrons_imports))
+
+
+def version_from_static_python_info(
+    static_python_info: StaticPythonInfo,
+) -> Optional[APIVersion]:
+    """Get an explicitly specified apiLevel from static info, if we can.
+
+    If the protocol doesn't declare apiLevel at all, return None.
+    If the protocol declares apiLevel incorrectly, raise a ValueError.
+    """
+    # TODO(mm, 2022-10-21):
+    #
+    # This logic is quick and dirty, and might allow things that we don't want.
+    #
+    # - Require protocols with new `apiLevel`s to specify `apiLevel` in `requirements`
+    #   and not in `metadata`?
+    # - Forbid protocols from specifying `apiLevel` in both `requirements` and
+    #   `metadata`?
+    # - Be more careful with falsey values, like `"apiLevel": ""`?
+    # - Forbid unrecognized keys in `requirements`?
+
+    from_requirements = (static_python_info.requirements or {}).get("apiLevel", None)
+    from_metadata = (static_python_info.metadata or {}).get("apiLevel", None)
+    requested_level = from_requirements or from_metadata
+    if requested_level is None:
+        return None
+    elif requested_level == "1":
+        # TODO(mm, 2022-10-21): Can we safely move this special case to
+        # version_from_string()?
+        return APIVersion(1, 0)
+    else:
+        return version_from_string(requested_level)
 
 
 def get_version(static_python_info: StaticPythonInfo, parsed: ast.Module) -> APIVersion:
