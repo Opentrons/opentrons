@@ -379,13 +379,12 @@ def get_version(static_python_info: StaticPythonInfo, parsed: ast.Module) -> API
     APIv2 protocol (note that 'labware' is not in this list, as there is a
     valid APIv2 import named 'labware').
     """
-    static_version = version_from_static_python_info(static_python_info)
-    if static_version:
-        return static_version
+    declared_version = version_from_static_python_info(static_python_info)
+    if declared_version:
+        return declared_version
     else:
         # No apiLevel key, may be apiv1
-        inferred = _has_api_v1_imports(parsed)
-        if not inferred:
+        if not _has_api_v1_imports(parsed):
             raise RuntimeError(
                 "If this is not an API v1 protocol, you must specify the target "
                 "api level in the apiLevel key of the metadata. For instance, "
