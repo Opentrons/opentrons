@@ -62,9 +62,9 @@ function RequiredEquipmentCard(props: RequiredEquipmentCardProps): JSX.Element {
 
   let imageSrc: string = labwareImages.generic_custom_tiprack
   if (loadName in labwareImages) {
-    src = labwareImages[loadName as keyof typeof labwareImages]
+    imageSrc = labwareImages[loadName as keyof typeof labwareImages]
   } else if (loadName in equipmentImages) {
-    src = equipmentImages[loadName as keyof typeof equipmentImages]
+    imageSrc = equipmentImages[loadName as keyof typeof equipmentImages]
   }
 
   return (
