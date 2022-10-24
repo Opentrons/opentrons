@@ -101,7 +101,7 @@ class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore[LabwareCor
 
     def deactivate(self) -> None:
         """Deactivate the Temperature Module."""
-        raise NotImplementedError("deactivate not implemented")
+        self._engine_client.temperature_deactivate(module_id=self.module_id)
 
     def get_current_temperature(self) -> float:
         """Get the module's current temperature in °C."""

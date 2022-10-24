@@ -478,3 +478,21 @@ def test_temperature_wait_for_target_temperature(
     result = subject.temperature_wait_for_target_temperature(module_id="module-id", celsius=38.7)
 
     assert result == response
+
+
+def test_temperature_deactivate(
+        decoy: Decoy,
+        transport: AbstractSyncTransport,
+        subject: SyncClient) -> None:
+    """Should execute a PE deactivate temperature command."""
+    request = commands.temperature_module.DeactivateTemperatureCreate(
+        commandType="temperatureModule/deactivate",
+        params=commands.temperature_module.DeactivateTemperatureParams(moduleId="module-id")
+    )
+    response = commands.temperature_module.DeactivateTemperatureResult()
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.temperature_deactivate(module_id="module-id")
+
+    assert result == response

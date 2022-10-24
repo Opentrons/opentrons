@@ -298,3 +298,12 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
         return cast(commands.temperature_module.WaitForTemperatureResult, result)
+
+    def temperature_deactivate(self, module_id: str) -> commands.temperature_module.DeactivateTemperatureResult:
+        """Execute a `temperatureModule/deactivate` command and return the result."""
+        request = commands.temperature_module.DeactivateTemperatureCreate(
+            commandType="temperatureModule/deactivate",
+            params=commands.temperature_module.DeactivateTemperatureParams(moduleId=module_id)
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.temperature_module.DeactivateTemperatureResult, result)

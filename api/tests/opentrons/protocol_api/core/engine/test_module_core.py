@@ -72,4 +72,11 @@ def test_wait_for_target_temperature(decoy: Decoy, temp_deck_subject: Temperatur
     temp_deck_subject.wait_for_target_temperature()
 
     decoy.verify(mock_engine_client.temperature_wait_for_target_temperature(module_id="1234", celsius=None))
+
+
+def test_deactivate(decoy: Decoy, temp_deck_subject: TemperatureModuleCore, mock_engine_client: EngineClient) -> None:
+    """Should verify EngineClient call to deactivate temp module."""
+    temp_deck_subject.deactivate()
+
+    decoy.verify(mock_engine_client.temperature_deactivate(module_id="1234"))
 # </editor-fold>
