@@ -2,7 +2,7 @@
 import sqlalchemy
 
 from . import legacy_pickle
-from .utc_datetime import UTCDateTime
+from ._utc_datetime import UTCDateTime
 
 _metadata = sqlalchemy.MetaData()
 
