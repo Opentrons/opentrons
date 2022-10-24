@@ -24,7 +24,6 @@ def test_analyze(
 ) -> None:
     """Should return with no errors and a non-empty output."""
     analysis_output_path = tmp_path / "analysis_output.json"
-    print(fixture_path)
     runner = CliRunner()
     result = runner.invoke(
         analyze,
