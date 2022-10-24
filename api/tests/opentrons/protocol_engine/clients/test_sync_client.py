@@ -444,7 +444,7 @@ def test_blow_out(
     assert result == response
 
 
-def test_set_target_temperature(
+def test_temperature_set_target_temperature(
         decoy: Decoy,
         transport: AbstractSyncTransport,
         subject: SyncClient) -> None:
@@ -458,5 +458,23 @@ def test_set_target_temperature(
     decoy.when(transport.execute_command(request=request)).then_return(response)
 
     result = subject.temperature_set_target_temperature(module_id="module-id", celsius=38.7)
+
+    assert result == response
+
+
+def test_temperature_wait_for_target_temperature(
+        decoy: Decoy,
+        transport: AbstractSyncTransport,
+        subject: SyncClient) -> None:
+    """Should execute a PE wait_for_target_temperature command."""
+    request = commands.temperature_module.WaitForTemperatureCreate(
+        commandType="temperatureModule/waitForTemperature",
+        params=commands.temperature_module.WaitForTemperatureParams(moduleId="module-id", celsius=38.7)
+    )
+    response = commands.temperature_module.WaitForTemperatureResult()
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.temperature_wait_for_target_temperature(module_id="module-id", celsius=38.7)
 
     assert result == response

@@ -89,7 +89,7 @@ class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore[LabwareCor
 
     def set_target_temperature(self, celsius: float) -> None:
         """Set the Temperature Module's target temperature in °C."""
-        self._engine_client.set_target_temperature(celsius)
+        self._engine_client.temperature_set_target_temperature(module_id=self.module_id, celsius=celsius)
 
     def wait_for_target_temperature(self, celsius: Optional[float] = None) -> None:
         """Wait until the module's target temperature is reached.
@@ -97,7 +97,7 @@ class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore[LabwareCor
         Specifying a value for ``celsius`` that is different than
         the module's current target temperature may beahave unpredictably.
         """
-        raise NotImplementedError("wait_for_target_temperature not implemented")
+        self._engine_client.temperature_wait_for_target_temperature(module_id=self.module_id, celsius=celsius)
 
     def deactivate(self) -> None:
         """Deactivate the Temperature Module."""

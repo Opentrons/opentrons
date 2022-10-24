@@ -1,7 +1,6 @@
 """Tests for opentrons.protocol_api.core.engine.ModuleCore."""
 import pytest
 from decoy import Decoy
-from mock import mock
 
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_api.core.engine.module_core import ModuleCore, TemperatureModuleCore
@@ -62,8 +61,15 @@ def test_add_labware_core(decoy: Decoy, subject: ModuleCore) -> None:
 
 # <editor-fold desc="temp deck tests">
 def test_set_target_temperature(decoy: Decoy, temp_deck_subject: TemperatureModuleCore, mock_engine_client: EngineClient) -> None:
-    """Should verify EngineCall to set_target_temperature."""
+    """Should verify EngineClient call to set_target_temperature."""
     temp_deck_subject.set_target_temperature(38.9)
 
-    decoy.verify(mock_engine_client.set_target_temperature(38.9))
+    decoy.verify(mock_engine_client.temperature_set_target_temperature(module_id="1234", celsius=38.9))
+
+
+def test_wait_for_target_temperature(decoy: Decoy, temp_deck_subject: TemperatureModuleCore, mock_engine_client: EngineClient) -> None:
+    """Should verify EngineClient call to wait_for_target_temperature."""
+    temp_deck_subject.wait_for_target_temperature()
+
+    decoy.verify(mock_engine_client.temperature_wait_for_target_temperature(module_id="1234", celsius=None))
 # </editor-fold>
