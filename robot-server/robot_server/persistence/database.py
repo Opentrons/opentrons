@@ -4,7 +4,7 @@ from pathlib import Path
 import sqlalchemy
 
 from .tables import add_tables_to_db
-from .migrations import migrate
+from ._migrations import migrate
 
 
 # A reference to SQLite's built-in ROWID column.
