@@ -527,9 +527,27 @@
               "commandType": { "enum": ["calibration/calibratePipette"] },
               "params": {
                 "required": ["mount"],
-                "labwareId": {
+                "mount": {
                   "enum": ["left", "right"],
                   "description": "Instrument mount to calibrate."
+                }
+              }
+            }
+          },
+
+          {
+            "description": "[This command is for internal use only and should NOT be used in protocols.] Move pipette to start position for attach/detach or calibration start.",
+            "type": "object",
+            "required": ["commandType", "params"],
+            "properties": {
+              "key": { "type": "string" },
+              "commandType": { "enum": ["calibration/moveToLocation"] },
+              "params": {
+                "required": ["pipetteId", "deckSlot"],
+                "pipetteId": { "type": "string" },
+                "deckSlot": {
+                  "description": "Slot location to move to before starting calibration.",
+                  "enum": ["attach_or_detach", "probe_position"]
                 }
               }
             }
