@@ -25,7 +25,7 @@ import {
 } from '../../../../../redux/modules/__fixtures__/index'
 import {
   useModuleRenderInfoForProtocolById,
-  useRunHasStarted,
+  useUnmatchedModulesForProtocol,
 } from '../../../hooks'
 import { SetupModulesMap } from '../SetupModulesMap'
 
@@ -50,8 +50,8 @@ jest.mock('../../../hooks')
 const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById as jest.MockedFunction<
   typeof useModuleRenderInfoForProtocolById
 >
-const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
-  typeof useRunHasStarted
+const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jest.MockedFunction<
+  typeof useUnmatchedModulesForProtocol
 >
 const mockModuleInfo = ModuleInfo as jest.MockedFunction<typeof ModuleInfo>
 const mockInferModuleOrientationFromXCoordinate = inferModuleOrientationFromXCoordinate as jest.MockedFunction<
@@ -127,6 +127,12 @@ describe('SetupModulesMap', () => {
       robotName: MOCK_ROBOT_NAME,
       runId: MOCK_RUN_ID,
     }
+    when(mockUseUnmatchedModulesForProtocol)
+      .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
+      .mockReturnValue({
+        missingModuleIds: [],
+        remainingAttachedModules: [],
+      })
     when(mockUseFeatureFlag).mockReturnValue(false)
     when(mockInferModuleOrientationFromXCoordinate)
       .calledWith(expect.anything())

@@ -21,7 +21,10 @@ import { HeaterShakerBanner } from '../../../ProtocolSetup/RunSetupCard/ModuleSe
 import { ModuleInfo } from '../../../ProtocolSetup/RunSetupCard/ModuleSetup/ModuleInfo'
 import { UnMatchedModuleWarning } from '../../../ProtocolSetup/RunSetupCard/ModuleSetup/UnMatchedModuleWarning'
 import { MultipleModulesModal } from '../../../ProtocolSetup/RunSetupCard/ModuleSetup/MultipleModulesModal'
-import { useModuleRenderInfoForProtocolById } from '../../hooks'
+import {
+  useModuleRenderInfoForProtocolById,
+  useUnmatchedModulesForProtocol,
+} from '../../hooks'
 
 const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
@@ -49,6 +52,10 @@ export const SetupModulesMap = ({
     robotName,
     runId
   )
+  const {
+    missingModuleIds,
+    remainingAttachedModules,
+  } = useUnmatchedModulesForProtocol(robotName, runId)
 
   const [
     showMultipleModulesModal,
@@ -92,7 +99,11 @@ export const SetupModulesMap = ({
           {t('multiple_modules_help_link_title')}
         </Link>
       ) : null}
-      <UnMatchedModuleWarning />
+      {!enableLiquidSetup &&
+      remainingAttachedModules.length !== 0 &&
+      missingModuleIds.length !== 0 ? (
+        <UnMatchedModuleWarning />
+      ) : null}
       <Box margin="0 auto" maxWidth="46.25rem" width="100%">
         <RobotWorkSpace
           deckDef={standardDeckDef as any}
