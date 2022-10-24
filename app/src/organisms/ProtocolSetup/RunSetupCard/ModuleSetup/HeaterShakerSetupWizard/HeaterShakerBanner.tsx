@@ -56,7 +56,7 @@ export function HeaterShakerBanner(
             >
               <Flex flexDirection={DIRECTION_COLUMN}>
                 <StyledText css={TYPOGRAPHY.pSemiBold}>
-                  {t('module_in_slot', {
+                  {t('heater_shaker_in_slot', {
                     moduleName: module.moduleDef.displayName,
                     slotName: module.slotName,
                   })}
