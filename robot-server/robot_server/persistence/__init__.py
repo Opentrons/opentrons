@@ -17,7 +17,13 @@ from robot_server.app_state import AppState, AppStateAccessor, get_app_state
 from robot_server.errors import ErrorDetails
 
 from ._database import create_sql_engine, sqlite_rowid
-from .tables import protocol_table, analysis_table, run_table, action_table
+from ._tables import (
+    migration_table,
+    protocol_table,
+    analysis_table,
+    run_table,
+    action_table,
+)
 
 
 _TEMP_PERSISTENCE_DIR_PREFIX: Final = "opentrons-robot-server-"
@@ -212,6 +218,7 @@ __all__ = [
     "PersistenceResetter",
     "get_persistence_resetter",
     # database tables
+    "migration_table",
     "protocol_table",
     "analysis_table",
     "run_table",

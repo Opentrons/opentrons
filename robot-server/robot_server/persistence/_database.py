@@ -3,7 +3,7 @@ from pathlib import Path
 
 import sqlalchemy
 
-from .tables import add_tables_to_db
+from ._tables import add_tables_to_db
 from ._migrations import migrate
 
 
