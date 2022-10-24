@@ -1501,7 +1501,7 @@ class OT3API(
                 " tool"
             )
 
-        here = await self.gantry_position(mount)
+        here = await self.gantry_position(mount, refresh=True)
         origin_pos = moving_axis.of_point(here)
         if origin_pos < target_pos:
             pass_start = target_pos - pass_settings.prep_distance_mm
