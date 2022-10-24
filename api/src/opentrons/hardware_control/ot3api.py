@@ -43,7 +43,7 @@ from .instruments.pipette import (
 from .instruments.gripper import compare_gripper_config_and_check_skip
 from .backends.ot3controller import OT3Controller
 from .backends.ot3simulator import OT3Simulator
-from .backends.ot3utils import get_system_constraints
+from .backends.ot3utils import get_system_constraints, sensor_id_for_gripper
 from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
@@ -1502,6 +1502,13 @@ class OT3API(
                 " tool"
             )
 
+        sensor_id = None
+        if mount == OT3Mount.GRIPPER:
+            probe = self._gripper_handler.get_attached_probe()
+            if not probe:
+                raise RuntimeError("Must attach probe to gripper before calibrating.")
+            sensor_id = sensor_id_for_gripper(probe)
+
         here = await self.gantry_position(mount)
         origin_pos = moving_axis.of_point(here)
         if origin_pos < target_pos:
@@ -1528,6 +1535,7 @@ class OT3API(
             moving_axis,
             machine_pass_distance,
             pass_settings.speed_mm_per_s,
+            sensor_id,
         )
         end_pos = await self.gantry_position(mount, refresh=True)
         await self.move_to(mount, pass_start_pos)
@@ -1555,9 +1563,16 @@ class OT3API(
             )
         )
 
+        sensor_id = None
+        if mount == OT3Mount.GRIPPER:
+            probe = self._gripper_handler.get_attached_probe()
+            if not probe:
+                raise RuntimeError("Must attach probe to gripper before calibrating.")
+            sensor_id = sensor_id_for_gripper(probe)
+
         await self.move_to(mount, begin)
         values = await self._backend.capacitive_pass(
-            mount, moving_axis, sweep_distance, speed_mm_s
+            mount, moving_axis, sweep_distance, speed_mm_s, sensor_id
         )
         await self.move_to(mount, begin)
         return values

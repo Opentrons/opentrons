@@ -63,28 +63,29 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
         self._gripper_id = gripper_id
         self._state = GripperJawState.UNHOMED
         self._current_jaw_displacement = 0.0
-        self._attached_probe = None
+        self._attached_probe: Optional[GripperProbe] = None
         self._log = mod_log.getChild(self._gripper_id)
         self._log.info(
             f"loaded: {self._model}, gripper offset: {self._calibration_offset}"
         )
 
-    def attached_probe(self, probe: GripperProbe) -> None:
+    @property
+    def attached_probe(self) -> Optional[GripperProbe]:
+        return self._attached_probe
+
+    def add_probe(self, probe: GripperProbe) -> None:
         """This is used for finding the critical point during calibration."""
-        assert not self._attached_probe
+        assert not self.attached_probe
         self._attached_probe = probe
 
     def remove_probe(self) -> None:
-        assert self._attached_probe
+        assert self.attached_probe
         self._attached_probe = None
 
     @property
     def current_jaw_displacement(self) -> float:
         """The distance one side of the jaw has traveled from home."""
         return self._current_jaw_displacement
-
-    def _max_jaw_displacement(self) -> float:
-        return (self._config.jaw_sizes_mm["max"] - self._config.jaw_sizes_mm["min"]) / 2
 
     @current_jaw_displacement.setter
     def current_jaw_displacement(self, mm: float) -> None:
@@ -94,6 +95,9 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
             f"{self._max_jaw_displacement() + 0.5} mm"
         )
         self._current_jaw_displacement = mm
+
+    def _max_jaw_displacement(self) -> float:
+        return (self._config.jaw_sizes_mm["max"] - self._config.jaw_sizes_mm["min"]) / 2
 
     @property
     def state(self) -> GripperJawState:

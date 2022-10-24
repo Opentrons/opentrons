@@ -6,6 +6,7 @@ from opentrons.hardware_control.dev_types import GripperDict
 from opentrons.hardware_control.types import (
     CriticalPoint,
     GripperJawState,
+    GripperProbe,
     InvalidMoveError,
     GripperNotAttachedError,
 )
@@ -14,6 +15,12 @@ from .gripper import Gripper
 
 class GripError(Exception):
     """An error raised if a gripper action is blocked"""
+
+    pass
+
+
+class CalibrationError(Exception):
+    """An error raised if a gripper calibration is blocked"""
 
     pass
 
@@ -72,6 +79,15 @@ class GripperHandler:
             return None
         else:
             return self._gripper.as_dict()
+
+    def get_attached_probe(self) -> Optional[GripperProbe]:
+        return self.get_gripper().attached_probe
+
+    def check_ready_for_calibration(self) -> None:
+        """Raise an exception if a probe is not attached before calibration."""
+        gripper = self.get_gripper()
+        if not gripper._attached_probe:
+            raise CalibrationError("Must attach a probe before starting calibration.")
 
     def check_ready_for_grip(self) -> None:
         """Raise an exception if it is not currently valid to grip."""

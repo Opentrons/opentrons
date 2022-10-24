@@ -408,6 +408,8 @@ async def calibrate_mount(
     the plane of the deck. This value is suitable for vector-subtracting
     from the current instrument offset to set a new instrument offset.
     """
+    if mount == OT3Mount.GRIPPER:
+        hcapi._gripper_handler.check_ready_for_calibration()
     # First, find the deck. This will become our z offset value, and will
     # also be used to baseline the edge detection points.
     z_pos = await find_deck_position(hcapi, mount)
