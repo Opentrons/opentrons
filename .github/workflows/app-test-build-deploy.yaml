@@ -112,6 +112,8 @@ jobs:
       - name: 'install libudev'
         if: startsWith(matrix.os, 'ubuntu')
         run: sudo apt-get update && sudo apt-get upgrade && sudo apt-get install libudev-dev
+      - name: 'clean cache'
+        run: yarn cache clean
       - name: 'set complex environment variables'
         id: 'set-vars'
         uses: actions/github-script@v6.1.1
