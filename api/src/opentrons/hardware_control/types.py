@@ -386,7 +386,7 @@ class CriticalPoint(enum.Enum):
     the critical point under consideration is the XY center of the pipette.
     This changes nothing for single pipettes, but makes multipipettes
     move their centers - so between channels 4 and 5 - to the specified
-    point.
+    point. This is the same as the GRIPPER_JAW_CENTER for grippers.
     """
 
     FRONT_NOZZLE = enum.auto()
@@ -489,6 +489,11 @@ class GripperJawState(enum.Enum):
     @property
     def ready_for_grip(self) -> bool:
         return self in [GripperJawState.HOMED_READY, GripperJawState.HOLDING_OPENED]
+
+
+class GripperProbe(enum.Enum):
+    FRONT = enum.auto()
+    REAR = enum.auto()
 
 
 class InvalidMoveError(ValueError):

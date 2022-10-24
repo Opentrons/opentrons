@@ -10,6 +10,7 @@ from opentrons.types import Point
 from opentrons.calibration_storage.types import GripperCalibrationOffset
 from opentrons.config import gripper_config
 from opentrons.hardware_control.types import (
+    GripperProbe,
     CriticalPoint,
     GripperJawState,
     InvalidMoveError,
@@ -62,10 +63,20 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
         self._gripper_id = gripper_id
         self._state = GripperJawState.UNHOMED
         self._current_jaw_displacement = 0.0
+        self._attached_probe = None
         self._log = mod_log.getChild(self._gripper_id)
         self._log.info(
             f"loaded: {self._model}, gripper offset: {self._calibration_offset}"
         )
+
+    def attached_probe(self, probe: GripperProbe) -> None:
+        """This is used for finding the critical point during calibration."""
+        assert not self._attached_probe
+        self._attached_probe = probe
+
+    def remove_probe(self) -> None:
+        assert self._attached_probe
+        self._attached_probe = None
 
     @property
     def current_jaw_displacement(self) -> float:
@@ -122,20 +133,34 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
         The vector from the gripper mount to the critical point, which is selectable
         between the center of the gripper engagement volume and the calibration pins.
         """
-        if cp_override == CriticalPoint.GRIPPER_FRONT_CALIBRATION_PIN:
+        if cp_override in [CriticalPoint.NOZZLE, CriticalPoint.TIP]:
+            raise InvalidMoveError(
+                f"Critical point {cp_override.name} is not valid for a gripper"
+            )
+
+        if not self._attached_probe or cp_override in [
+            CriticalPoint.GRIPPER_JAW_CENTER,
+            CriticalPoint.XY_CENTER,
+        ]:
+            return self._jaw_center_offset + Point(*self._calibration_offset.offset)
+        elif (
+            self._attached_probe is GripperProbe.FRONT
+            or cp_override is CriticalPoint.GRIPPER_FRONT_CALIBRATION_PIN
+        ):
             return (
                 self._front_calibration_pin_offset
                 + Point(*self._calibration_offset.offset)
                 - Point(y=self.current_jaw_displacement)
             )
-        elif cp_override == CriticalPoint.GRIPPER_REAR_CALIBRATION_PIN:
+        elif (
+            self._attached_probe is GripperProbe.REAR
+            or cp_override is CriticalPoint.GRIPPER_REAR_CALIBRATION_PIN
+        ):
             return (
                 self._rear_calibration_pin_offset
                 + Point(*self._calibration_offset.offset)
                 + Point(y=self.current_jaw_displacement)
             )
-        elif cp_override == CriticalPoint.GRIPPER_JAW_CENTER or not cp_override:
-            return self._jaw_center_offset + Point(*self._calibration_offset.offset)
         else:
             raise InvalidMoveError(
                 f"Critical point {cp_override.name} is not valid for a gripper"
