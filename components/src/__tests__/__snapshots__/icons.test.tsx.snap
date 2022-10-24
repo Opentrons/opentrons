@@ -2501,6 +2501,30 @@ exports[`icons unfold-more-horizontal renders correctly 1`] = `
 </svg>
 `;
 
+exports[`icons union renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
+<svg
+  aria-hidden="true"
+  className="sc-fznyAO c0 foo"
+  fill="currentColor"
+  version="1.1"
+  viewBox="0 0 16 16"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path
+    d="M0.950195 15.3672V10.6192H2.2002V13.2352L6.17278 9.26258L7.05666 10.1465L3.08593 14.1172H5.69824L5.69824 15.3672H0.950195Z M7.05666 5.7764L3.08593 1.80566L5.69824 1.80566L5.69824 0.555664H0.950195V5.3037H2.2002V2.68769L6.17278 6.66028L7.05666 5.7764Z M9.5112 5.82913L13.5347 1.80566L10.8164 1.80566V0.555664H15.5644V5.3037H14.3144V2.58152L10.289 6.60695L9.5112 5.82913Z M9.45846 10.1474L13.4292 14.1182L10.8164 14.1182L10.8164 15.3682H15.5644V10.6201H14.3144V13.2357L10.3423 9.26356L9.45846 10.1474Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
 exports[`icons upload renders correctly 1`] = `
 .c0.spin {
   -webkit-animation: GLFYz 0.8s steps(8) infinite;
