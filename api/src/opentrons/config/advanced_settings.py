@@ -184,6 +184,11 @@ settings = [
             " Do not enable."
         ),
     ),
+    SettingDefinition(
+        _id="enableLoadLiquid",
+        title="Enable load liquid command and liquids translation",
+        description="Allow load liquid command and liquids translation.",
+    ),
 ]
 
 if ARCHITECTURE == SystemArchitecture.BUILDROOT:
@@ -480,6 +485,16 @@ def _migrate16to17(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate17to18(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 18 of the advanced settings file.
+
+    - Adds enableLoadLiquid option
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["enableLoadLiquid"] = None
+    return newmap
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -498,6 +513,7 @@ _MIGRATIONS = [
     _migrate14to15,
     _migrate15to16,
     _migrate16to17,
+    _migrate17to18,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below
