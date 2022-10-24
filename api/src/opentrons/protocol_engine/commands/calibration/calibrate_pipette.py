@@ -8,13 +8,16 @@ from ..command import (
     BaseCommand,
     BaseCommandCreate,
 )
+from ...types import InstrumentOffsetVector
+
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
+
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import OT3Mount
 from opentrons.hardware_control import ot3_calibration as calibration
 
-from opentrons.types import Point, MountType
+from opentrons.types import MountType
 
 CalibratePipetteCommandType = Literal["calibration/calibratePipette"]
 
@@ -28,7 +31,9 @@ class CalibratePipetteParams(BaseModel):
 class CalibratePipetteResult(BaseModel):
     """Result data from the execution of a calibrate-pipette command."""
 
-    pipetteOffset: Point = Field(..., description="Offset of calibrated pipette.")
+    pipetteOffset: InstrumentOffsetVector = Field(
+        ..., description="Offset of calibrated pipette."
+    )
 
 
 class CalibratePipetteImplementation(
@@ -55,7 +60,11 @@ class CalibratePipetteImplementation(
             hcapi=ot3_api, mount=ot3_mount
         )
 
-        return CalibratePipetteResult(pipetteOffset=pipette_offset)
+        return CalibratePipetteResult(
+            pipetteOffset=InstrumentOffsetVector(
+                x=pipette_offset.x, y=pipette_offset.y, z=pipette_offset.z
+            )
+        )
 
 
 class CalibratePipette(BaseCommand[CalibratePipetteParams, CalibratePipetteResult]):
