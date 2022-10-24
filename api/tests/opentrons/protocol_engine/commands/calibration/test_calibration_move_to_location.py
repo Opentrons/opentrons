@@ -1,4 +1,3 @@
-
 """Test for Calibration Set Up Position Implementation."""
 from decoy import Decoy
 import pytest
