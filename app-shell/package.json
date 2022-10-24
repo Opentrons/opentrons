@@ -44,6 +44,7 @@
     "@types/uuid": "^3.4.7",
     "ajv": "6.10.2",
     "dateformat": "3.0.3",
+    "electron": "21.1.0",
     "electron-context-menu": "^3.5.0",
     "electron-debug": "3.0.1",
     "electron-devtools-installer": "3.2.0",
