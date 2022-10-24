@@ -9386,7 +9386,7 @@ electron-publisher-s3@^20.17.2:
     fs-extra-p "^4.6.1"
     mime "^2.3.1"
 
-electron-rebuild@3.2.9, electron-rebuild@^3.2.9:
+electron-rebuild@^3.2.9:
   version "3.2.9"
   resolved "https://registry.yarnpkg.com/electron-rebuild/-/electron-rebuild-3.2.9.tgz#ea372be15f591f8d6d978ee9bca6526dadbcf20f"
   integrity sha512-FkEZNFViUem3P0RLYbZkUjC8LUFIK+wKq09GHoOITSJjfDAVQv964hwaNseTTWt58sITQX3/5fHNYcTefqaCWw==
