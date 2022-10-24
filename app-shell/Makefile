@@ -140,7 +140,7 @@ dist-ubuntu-latest: dist-linux
 dist-ubuntu-22.04: dist-linux
 
 .PHONY: dist-windows-2022
-dist-windows-2019: dist-win
+dist-windows-2022: dist-win
 
 # copy distributable artifacts to the publish directory
 # update files will not exist for all OSs, so noop if cp errors
