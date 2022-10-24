@@ -25,13 +25,13 @@ MoveToLocationCommandType = Literal["calibration/moveToLocation"]
 class CalibrationPositions(str, Enum):
     """Deck slot to move to."""
 
-    probePosition = "probePosition"
-    attachOrDetach = "attachOrDetach"
+    probe_position = "probe_position"
+    attach_or_detach = "attach_or_detach"
 
     @property
     def offset(self) -> DeckPoint:
         """Return offset values for the given position."""
-        if self.value == "probePosition":
+        if self.value == "probe_position":
             return DeckPoint(x=10, y=0, z=3)
         else:
             return DeckPoint(x=0, y=0, z=0)
@@ -69,17 +69,18 @@ class MoveToLocationImplementation(
     async def execute(self, params: MoveToLocationParams) -> MoveToLocationResult:
         """Move the requested pipette to a given deck slot."""
         offset = params.deckSlot.offset
-        if params.deckSlot == CalibrationPositions.probePosition:
+        if params.deckSlot == CalibrationPositions.probe_position:
             deck_center = self._state_view.labware.get_slot_center_position(
                 DeckSlotName.SLOT_5
             )
             z_position = offset.z
         else:
+            # get current z coordinate and pass it into movement destination
             deck_center = self._state_view.labware.get_slot_center_position(
                 DeckSlotName.SLOT_2
             )
             current_position = await self._movement.save_position(
-                pipette_id=params.pipetteId, position_id="slot 2"
+                pipette_id=params.pipetteId, position_id=params.deckSlot.value
             )
             z_position = current_position.position.z
         destination = DeckPoint(
@@ -94,7 +95,7 @@ class MoveToLocationImplementation(
         )
 
         new_position = await self._movement.save_position(
-            pipette_id=params.pipetteId, position_id=str(params.deckSlot.name)
+            pipette_id=params.pipetteId, position_id=str(params.deckSlot.value)
         )
 
         return MoveToLocationResult(
