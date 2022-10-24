@@ -77,7 +77,7 @@ export const TestShakeSlideout = (
   const { toggleLatch, isLatchClosed } = useLatchControls(module)
   const { moduleIdFromRun } = useModuleIdFromRun(module, currentRunId ?? null)
   const configHasHeaterShakerAttached = useSelector(getIsHeaterShakerAttached)
-  const [shakeValue, setShakeValue] = React.useState<string | null>(null)
+  const [shakeValue, setShakeValue] = React.useState<number | null>(null)
   const [showWizard, setShowWizard] = React.useState<boolean>(false)
   const isShaking = module.data.speedStatus !== 'idle'
   const moduleId = isRunIdle ? moduleIdFromRun : module.id
@@ -86,7 +86,7 @@ export const TestShakeSlideout = (
     commandType: 'heaterShaker/setAndWaitForShakeSpeed',
     params: {
       moduleId,
-      rpm: shakeValue !== null ? parseInt(shakeValue) : 0,
+      rpm: shakeValue !== null ? shakeValue : 0,
     },
   }
 
@@ -141,8 +141,7 @@ export const TestShakeSlideout = (
   } = useConditionalConfirm(sendCommands, !configHasHeaterShakerAttached)
 
   const errorMessage =
-    shakeValue != null &&
-    (parseInt(shakeValue) < HS_RPM_MIN || parseInt(shakeValue) > HS_RPM_MAX)
+    shakeValue != null && (shakeValue < HS_RPM_MIN || shakeValue > HS_RPM_MAX)
       ? t('device_details:input_out_of_range')
       : null
 
@@ -273,15 +272,17 @@ export const TestShakeSlideout = (
           >
             <InputField
               data-testid="TestShakeSlideout_shake_input"
+              autoFocus
               units={RPM}
-              value={shakeValue}
-              onChange={e => setShakeValue(e.target.value)}
+              value={shakeValue != null ? Math.round(shakeValue) : null}
+              onChange={e => setShakeValue(e.target.valueAsNumber)}
               type="number"
               caption={t('min_max_rpm', {
                 min: HS_RPM_MIN,
                 max: HS_RPM_MAX,
               })}
               error={errorMessage}
+              disabled={isShaking}
             />
             <StyledText
               color={COLORS.darkGreyEnabled}
@@ -292,7 +293,7 @@ export const TestShakeSlideout = (
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             marginLeft={SIZE_AUTO}
             marginTop={SPACING.spacing3}
-            onClick={confirmAttachment}
+            onClick={isShaking ? sendCommands : confirmAttachment}
             disabled={
               !isLatchClosed ||
               (shakeValue === null && !isShaking) ||

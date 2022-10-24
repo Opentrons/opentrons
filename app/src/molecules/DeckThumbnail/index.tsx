@@ -18,11 +18,11 @@ import {
   parseLabwareInfoByLiquidId,
 } from '@opentrons/api-client'
 import { getWellFillFromLabwareId } from '../../organisms/Devices/ProtocolRun/SetupLiquids/utils'
-import type { DeckSlot, RunTimeCommand } from '@opentrons/shared-data'
+import type { DeckSlot, Liquid, RunTimeCommand } from '@opentrons/shared-data'
 
 interface DeckThumbnailProps {
   commands: RunTimeCommand[]
-  showLiquids?: boolean
+  liquids?: Liquid[]
 }
 const deckSetupLayerBlocklist = [
   'calibrationMarkings',
@@ -36,16 +36,20 @@ const deckSetupLayerBlocklist = [
 
 export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
   const deckDef = React.useMemo(() => getDeckDefinitions().ot2_standard, [])
-  const { commands, showLiquids } = props
+  const { commands, liquids } = props
   const liquidSetupEnabled = useFeatureFlag('enableLiquidSetup')
+  const enableThermocyclerGen2 = useFeatureFlag('enableThermocyclerGen2')
 
   const initialLoadedLabwareBySlot = parseInitialLoadedLabwareBySlot(commands)
   const initialLoadedModulesBySlot = parseInitialLoadedModulesBySlot(commands)
   const initialLoadedLabwareByModuleId = parseInitialLoadedLabwareByModuleId(
     commands
   )
-  const liquidsInLoadOrder = parseLiquidsInLoadOrder()
-  const labwareByLiquidId = parseLabwareInfoByLiquidId()
+  const liquidsInLoadOrder = parseLiquidsInLoadOrder(
+    liquids != null ? liquids : {},
+    commands
+  )
+  const labwareByLiquidId = parseLabwareInfoByLiquidId(commands)
 
   return (
     // PR #10488 changed size
@@ -78,7 +82,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
             ? labwareInModule.result.labwareId
             : labwareId
           const wellFill =
-            labwareId && showLiquids && liquidSetupEnabled
+            labwareId && liquids != null && liquidSetupEnabled
               ? getWellFillFromLabwareId(
                   labwareId,
                   liquidsInLoadOrder,
@@ -87,7 +91,11 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
               : null
           return (
             <React.Fragment key={slotId}>
-              {moduleInSlot != null ? (
+              {/* TODO(jr, 9/28/22): revert this logic to only moduleInSlot != null when we remove the enableThermocyclerGen2 FF */}
+              {(moduleInSlot != null && enableThermocyclerGen2) ||
+              (moduleInSlot != null &&
+                !enableThermocyclerGen2 &&
+                moduleInSlot.params.model !== 'thermocyclerModuleV2') ? (
                 <Module
                   x={slot.position[0]}
                   y={slot.position[1]}

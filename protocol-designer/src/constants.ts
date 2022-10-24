@@ -12,11 +12,12 @@ import {
   HEATERSHAKER_MODULE_V1,
   LabwareDefinition2,
   DeckSlot as DeckDefSlot,
-  ModuleType,
-  ModuleModel,
+  THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 import { i18n } from './localization'
-import { DeckSlot, WellVolumes } from './types'
+import type { DeckSlot, WellVolumes } from './types'
+import type { ModuleType, ModuleModel } from '@opentrons/shared-data'
+
 export const getMaxVolumes = (def: LabwareDefinition2): WellVolumes =>
   mapValues(def.wells, well => well.totalLiquidVolume)
 
@@ -81,19 +82,20 @@ export const MIN_TC_LID_TEMP = 37
 export const MAX_TC_LID_TEMP = 110
 export const MIN_TC_DURATION_SECONDS = 0
 export const MAX_TC_DURATION_SECONDS = 60
+export const MIN_TC_PROFILE_VOLUME = 0
+export const MAX_TC_PROFILE_VOLUME = 100
 export const MODELS_FOR_MODULE_TYPE: Record<
   ModuleType,
   Array<{
     name: string
-    value: string
+    value: ModuleModel
     disabled?: boolean
   }>
 > = {
   [MAGNETIC_MODULE_TYPE]: [
     {
       name: i18n.t(`modules.model_display_name.${MAGNETIC_MODULE_V1}`),
-      // downcast required because the module models are now enums rather than strings
-      value: MAGNETIC_MODULE_V1 as string,
+      value: MAGNETIC_MODULE_V1,
     },
     {
       name: i18n.t(`modules.model_display_name.${MAGNETIC_MODULE_V2}`),
@@ -103,8 +105,7 @@ export const MODELS_FOR_MODULE_TYPE: Record<
   [TEMPERATURE_MODULE_TYPE]: [
     {
       name: i18n.t(`modules.model_display_name.${TEMPERATURE_MODULE_V1}`),
-      // downcast required because the module models are now enums rather than strings
-      value: TEMPERATURE_MODULE_V1 as string,
+      value: TEMPERATURE_MODULE_V1,
     },
     {
       name: i18n.t(`modules.model_display_name.${TEMPERATURE_MODULE_V2}`),
@@ -114,17 +115,63 @@ export const MODELS_FOR_MODULE_TYPE: Record<
   [THERMOCYCLER_MODULE_TYPE]: [
     {
       name: i18n.t(`modules.model_display_name.${THERMOCYCLER_MODULE_V1}`),
-      // downcast required because the module models are now enums rather than strings
-      value: THERMOCYCLER_MODULE_V1 as string,
+      value: THERMOCYCLER_MODULE_V1,
+    },
+    {
+      name: i18n.t(`modules.model_display_name.${THERMOCYCLER_MODULE_V2}`),
+      value: THERMOCYCLER_MODULE_V2,
     },
   ],
   [HEATERSHAKER_MODULE_TYPE]: [
     {
       name: i18n.t(`modules.model_display_name.${HEATERSHAKER_MODULE_V1}`),
-      value: HEATERSHAKER_MODULE_V1 as string,
+      value: HEATERSHAKER_MODULE_V1,
     },
   ],
 }
+
+export const MODELS_FOR_MODULE_TYPE_NO_FF: Record<
+  ModuleType,
+  Array<{
+    name: string
+    value: ModuleModel
+    disabled?: boolean
+  }>
+> = {
+  [MAGNETIC_MODULE_TYPE]: [
+    {
+      name: i18n.t(`modules.model_display_name.${MAGNETIC_MODULE_V1}`),
+      value: MAGNETIC_MODULE_V1,
+    },
+    {
+      name: i18n.t(`modules.model_display_name.${MAGNETIC_MODULE_V2}`),
+      value: MAGNETIC_MODULE_V2,
+    },
+  ],
+  [TEMPERATURE_MODULE_TYPE]: [
+    {
+      name: i18n.t(`modules.model_display_name.${TEMPERATURE_MODULE_V1}`),
+      value: TEMPERATURE_MODULE_V1,
+    },
+    {
+      name: i18n.t(`modules.model_display_name.${TEMPERATURE_MODULE_V2}`),
+      value: TEMPERATURE_MODULE_V2,
+    },
+  ],
+  [THERMOCYCLER_MODULE_TYPE]: [
+    {
+      name: i18n.t(`modules.model_display_name.${THERMOCYCLER_MODULE_V1}`),
+      value: THERMOCYCLER_MODULE_V1,
+    },
+  ],
+  [HEATERSHAKER_MODULE_TYPE]: [
+    {
+      name: i18n.t(`modules.model_display_name.${HEATERSHAKER_MODULE_V1}`),
+      value: HEATERSHAKER_MODULE_V1,
+    },
+  ],
+}
+
 export const DEFAULT_MODEL_FOR_MODULE_TYPE: Record<ModuleType, ModuleModel> = {
   [MAGNETIC_MODULE_TYPE]: MAGNETIC_MODULE_V1,
   [TEMPERATURE_MODULE_TYPE]: TEMPERATURE_MODULE_V1,

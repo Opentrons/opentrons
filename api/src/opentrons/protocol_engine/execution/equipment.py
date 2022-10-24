@@ -30,6 +30,7 @@ from ..state import StateStore, HardwareModule
 from ..types import (
     LabwareLocation,
     DeckSlotLocation,
+    ModuleLocation,
     LabwareOffsetLocation,
     ModuleModel,
     ModuleDefinition,
@@ -131,7 +132,7 @@ class EquipmentHandler:
             )
 
         # Allow propagation of ModuleNotLoadedError.
-        offset_id = self._find_applicable_labware_offset_id(
+        offset_id = self.find_applicable_labware_offset_id(
             labware_definition_uri=definition_uri,
             labware_location=location,
         )
@@ -139,31 +140,6 @@ class EquipmentHandler:
         return LoadedLabwareData(
             labware_id=labware_id, definition=definition, offsetId=offset_id
         )
-
-    def move_labware(
-        self, labware_id: str, new_location: LabwareLocation
-    ) -> Optional[str]:
-        """Gather required info to move a loaded labware from one lcation to another.
-
-        Raises:
-            LabwareNotLoadedError: If `labware_id` doesn't point to a valid
-                loaded labware.
-            ModuleNotLoadedError: If `new_location` references a module ID
-                that doesn't point to a valid loaded module.
-
-        Returns:
-            The ID of the labware's new labware offset.
-        """
-        # Allow propagation of LabwareNotLoadedError.
-        current_labware = self._state_store.labware.get(labware_id=labware_id)
-        definition_uri = current_labware.definitionUri
-
-        # Allow propagation of ModuleNotLoadedError.
-        offset_id = self._find_applicable_labware_offset_id(
-            labware_definition_uri=definition_uri, labware_location=new_location
-        )
-
-        return offset_id
 
     async def load_pipette(
         self,
@@ -303,7 +279,7 @@ class EquipmentHandler:
             f' for module ID "{module_id}".'
         )
 
-    def _find_applicable_labware_offset_id(
+    def find_applicable_labware_offset_id(
         self, labware_definition_uri: str, labware_location: LabwareLocation
     ) -> Optional[str]:
         """Figure out what offset would apply to a labware in the given location.
@@ -319,7 +295,7 @@ class EquipmentHandler:
         if isinstance(labware_location, DeckSlotLocation):
             slot_name = labware_location.slotName
             module_model = None
-        else:
+        elif isinstance(labware_location, ModuleLocation):
             module_id = labware_location.moduleId
             # Allow ModuleNotLoadedError to propagate.
             module_model = self._state_store.modules.get_model(module_id=module_id)
@@ -327,6 +303,11 @@ class EquipmentHandler:
                 module_id=module_id
             )
             slot_name = module_location.slotName
+        else:
+            # No offset for off-deck location.
+            # Returning None instead of raising an exception
+            # allows loading a labware with 'off-deck' as valid location.
+            return None
 
         offset = self._state_store.labware.find_applicable_labware_offset(
             definition_uri=labware_definition_uri,

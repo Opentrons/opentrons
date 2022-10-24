@@ -92,6 +92,19 @@ def mock_ungrip(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
 
 
 @pytest.fixture
+def mock_hold_jaw_width(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+    with patch.object(
+        ot3_hardware.managed_obj,
+        "_hold_jaw_width",
+        AsyncMock(
+            spec=ot3_hardware.managed_obj._hold_jaw_width,
+            wraps=ot3_hardware.managed_obj._hold_jaw_width,
+        ),
+    ) as mock_move:
+        yield mock_move
+
+
+@pytest.fixture
 async def mock_backend_move(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
     with patch.object(
         ot3_hardware.managed_obj._backend,
@@ -146,7 +159,11 @@ def mock_backend_capacitive_probe(
     ) as mock_probe:
 
         def _update_position(
-            mount: OT3Mount, moving: OT3Axis, distance_mm: float, speed_mm_per_s: float
+            mount: OT3Mount,
+            moving: OT3Axis,
+            distance_mm: float,
+            speed_mm_per_s: float,
+            threshold_pf: float,
         ) -> None:
             ot3_hardware._backend._position[axis_to_node(moving)] += distance_mm / 2
 
@@ -205,7 +222,7 @@ async def test_capacitive_probe(
 
     # This is a negative probe because the current position is the home position
     # which is very large.
-    mock_backend_capacitive_probe.assert_called_once_with(mount, moving, 3, 4)
+    mock_backend_capacitive_probe.assert_called_once_with(mount, moving, 3.0, 4, 1.0)
 
     original = moving.set_in_point(here, 0)
     for call in mock_move_to.call_args_list:
@@ -361,10 +378,22 @@ async def test_cache_gripper(ot3_hardware: ThreadManager[OT3API]) -> None:
     assert ot3_hardware.attached_gripper["gripper_id"] == "g12345"
 
 
+async def test_has_gripper(
+    ot3_hardware: ThreadManager[OT3API],
+) -> None:
+    """It should return whether the robot has a gripper attached."""
+    assert ot3_hardware.has_gripper() is False
+    gripper_config = gc.load(GripperModel.V1, "g12345")
+    instr_data = AttachedGripper(config=gripper_config, id="g12345")
+    await ot3_hardware.cache_gripper(instr_data)
+    assert ot3_hardware.has_gripper() is True
+
+
 async def test_gripper_action(
     ot3_hardware: ThreadManager[OT3API],
     mock_grip: AsyncMock,
     mock_ungrip: AsyncMock,
+    mock_hold_jaw_width: AsyncMock,
 ) -> None:
     with pytest.raises(
         GripperNotAttachedError, match="Cannot perform action without gripper attached"
@@ -396,6 +425,13 @@ async def test_gripper_action(
 
     await ot3_hardware.ungrip()
     mock_ungrip.assert_called_once()
+
+    with pytest.raises(ValueError, match="Setting gripper jaw width out of bounds"):
+        await ot3_hardware.hold_jaw_width(200)
+    mock_hold_jaw_width.reset_mock()
+
+    await ot3_hardware.hold_jaw_width(80)
+    mock_hold_jaw_width.assert_called_once()
 
 
 async def test_gripper_move_fails_with_no_gripper(

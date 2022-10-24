@@ -7,7 +7,8 @@ import {
   getWellRangeForLiquidLabwarePair,
   getDisabledWellGroupForLiquidId,
 } from '../utils'
-import type { LabwareByLiquidId, Liquid } from '@opentrons/api-client'
+import type { LabwareByLiquidId } from '@opentrons/api-client'
+import type { Liquid } from '@opentrons/shared-data'
 
 const LABWARE_ID =
   '60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1'
@@ -17,25 +18,25 @@ const MOCK_LIQUIDS_IN_LOAD_ORDER: Liquid[] = [
     description: 'water',
     displayColor: '#00d781',
     displayName: 'liquid 2',
-    liquidId: '7',
+    id: '7',
   },
   {
     description: 'saline',
     displayColor: '#0076ff',
     displayName: 'liquid 1',
-    liquidId: '123',
+    id: '123',
   },
   {
     description: 'reagent',
     displayColor: '#ff4888',
     displayName: 'liquid 3',
-    liquidId: '19',
+    id: '19',
   },
   {
     description: 'saliva',
     displayColor: '#B925FF',
     displayName: 'liquid 4',
-    liquidId: '4',
+    id: '4',
   },
 ]
 const MOCK_LABWARE_BY_LIQUID_ID: LabwareByLiquidId = {

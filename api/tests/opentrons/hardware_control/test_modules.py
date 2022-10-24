@@ -79,80 +79,16 @@ async def test_module_caching():
 
 
 @pytest.mark.parametrize(
-    argnames=[
-        "module_model",
-        "module_type",
-        "expected_found_type",
-        "expected_found_number",
-    ],
+    argnames=["module_model", "expected_sim_type"],
     argvalues=[
-        (MagneticModuleModel.MAGNETIC_V1, ModuleType.MAGNETIC, MagDeck, 2),
-        (TemperatureModuleModel.TEMPERATURE_V2, ModuleType.TEMPERATURE, TempDeck, 2),
-        (
-            ThermocyclerModuleModel.THERMOCYCLER_V1,
-            ModuleType.THERMOCYCLER,
-            Thermocycler,
-            1,
-        ),
-        (
-            HeaterShakerModuleModel.HEATER_SHAKER_V1,
-            ModuleType.HEATER_SHAKER,
-            HeaterShaker,
-            1,
-        ),
+        (MagneticModuleModel.MAGNETIC_V1, MagDeck),
+        (TemperatureModuleModel.TEMPERATURE_V1, TempDeck),
+        (ThermocyclerModuleModel.THERMOCYCLER_V1, Thermocycler),
+        (HeaterShakerModuleModel.HEATER_SHAKER_V1, HeaterShaker),
     ],
 )
-async def test_filtering_modules(
+async def test_create_simulating_module(
     module_model: ModuleModel,
-    module_type: ModuleType,
-    expected_found_type: AbstractModule,
-    expected_found_number: int,
-) -> None:
-    """It should parse available modules and filter out the specified ones."""
-    import opentrons.hardware_control as hardware_control
-
-    mods = [
-        "tempdeck",
-        "tempdeck",
-        "magdeck",
-        "magdeck",
-        "thermocycler",
-        "heatershaker",
-    ]
-    api = await hardware_control.API.build_hardware_simulator(attached_modules=mods)
-    await asyncio.sleep(0.05)
-
-    filtered_modules, _ = await api.find_modules(module_model, module_type)
-
-    assert len(filtered_modules) == expected_found_number
-    for mod in filtered_modules:
-        assert isinstance(mod, expected_found_type)
-
-    await _.cleanup()
-    for m in api.attached_modules:
-        await m.cleanup()
-
-
-@pytest.mark.parametrize(
-    argnames=["module_model", "module_type", "expected_sim_type"],
-    argvalues=[
-        (MagneticModuleModel.MAGNETIC_V1, ModuleType.MAGNETIC, MagDeck),
-        (TemperatureModuleModel.TEMPERATURE_V1, ModuleType.TEMPERATURE, TempDeck),
-        (
-            ThermocyclerModuleModel.THERMOCYCLER_V1,
-            ModuleType.THERMOCYCLER,
-            Thermocycler,
-        ),
-        (
-            HeaterShakerModuleModel.HEATER_SHAKER_V1,
-            ModuleType.HEATER_SHAKER,
-            HeaterShaker,
-        ),
-    ],
-)
-async def test_get_simulating_module(
-    module_model: ModuleModel,
-    module_type: ModuleType,
     expected_sim_type: AbstractModule,
 ) -> None:
     """It should create simulating module instance for specified module."""
@@ -161,7 +97,7 @@ async def test_get_simulating_module(
     api = await hardware_control.API.build_hardware_simulator(attached_modules=[])
     await asyncio.sleep(0.05)
 
-    _, simulating_module = await api.find_modules(module_model, module_type)
+    simulating_module = await api.create_simulating_module(module_model)
     assert isinstance(simulating_module, expected_sim_type)
 
     await simulating_module.cleanup()
@@ -170,8 +106,6 @@ async def test_get_simulating_module(
 @pytest.fixture
 async def mod_tempdeck():
     from opentrons.hardware_control import modules
-
-    loop = asyncio.get_running_loop()
 
     usb_port = USBPort(
         name="",
@@ -183,9 +117,9 @@ async def mod_tempdeck():
     tempdeck = await modules.build(
         port="/dev/ot_module_sim_tempdeck0",
         usb_port=usb_port,
-        which="tempdeck",
+        type=ModuleType.TEMPERATURE,
         simulating=True,
-        loop=loop,
+        hw_control_loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
         sim_model="temperatureModuleV2",
     )
@@ -197,8 +131,6 @@ async def mod_tempdeck():
 async def mod_magdeck():
     from opentrons.hardware_control import modules
 
-    loop = asyncio.get_running_loop()
-
     usb_port = USBPort(
         name="",
         hub=None,
@@ -209,9 +141,9 @@ async def mod_magdeck():
     magdeck = await modules.build(
         port="/dev/ot_module_sim_magdeck0",
         usb_port=usb_port,
-        which="magdeck",
+        type=ModuleType.MAGNETIC,
         simulating=True,
-        loop=loop,
+        hw_control_loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
     )
     yield magdeck
@@ -222,8 +154,6 @@ async def mod_magdeck():
 async def mod_thermocycler():
     from opentrons.hardware_control import modules
 
-    loop = asyncio.get_running_loop()
-
     usb_port = USBPort(
         name="",
         hub=None,
@@ -234,9 +164,9 @@ async def mod_thermocycler():
     thermocycler = await modules.build(
         port="/dev/ot_module_sim_thermocycler0",
         usb_port=usb_port,
-        which="thermocycler",
+        type=ModuleType.THERMOCYCLER,
         simulating=True,
-        loop=loop,
+        hw_control_loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
     )
     yield thermocycler
@@ -247,8 +177,6 @@ async def mod_thermocycler():
 async def mod_thermocycler_gen2():
     from opentrons.hardware_control import modules
 
-    loop = asyncio.get_running_loop()
-
     usb_port = USBPort(
         name="",
         hub=None,
@@ -259,9 +187,9 @@ async def mod_thermocycler_gen2():
     thermocycler = await modules.build(
         port="/dev/ot_module_sim_thermocycler0",
         usb_port=usb_port,
-        which="thermocycler",
+        type=ModuleType.THERMOCYCLER,
         simulating=True,
-        loop=loop,
+        hw_control_loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
         sim_model="thermocyclerModuleV2",
     )
@@ -273,8 +201,6 @@ async def mod_thermocycler_gen2():
 async def mod_heatershaker():
     from opentrons.hardware_control import modules
 
-    loop = asyncio.get_running_loop()
-
     usb_port = USBPort(
         name="",
         hub=None,
@@ -285,9 +211,9 @@ async def mod_heatershaker():
     heatershaker = await modules.build(
         port="/dev/ot_module_sim_heatershaker0",
         usb_port=usb_port,
-        which="heatershaker",
+        type=ModuleType.HEATER_SHAKER,
         simulating=True,
-        loop=loop,
+        hw_control_loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
     )
     yield heatershaker

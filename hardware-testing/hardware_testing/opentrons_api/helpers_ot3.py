@@ -1,41 +1,79 @@
 """Opentrons helper methods."""
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
+from datetime import datetime
 from subprocess import run
-from typing import List, Optional, Dict, Union, Type
+from typing import List, Optional, Dict, Tuple
 
 from opentrons.config.robot_configs import build_config_ot3, load_ot3 as load_ot3_config
-from opentrons.config.defaults_ot3 import DEFAULT_MAX_SPEED_DISCONTINUITY
-from opentrons.hardware_control.api import API as OT2API
+from opentrons.hardware_control.instruments.pipette import Pipette
 from opentrons.hardware_control.ot3api import OT3API
-from opentrons.hardware_control.protocols import HardwareControlAPI
-from opentrons.hardware_control.thread_manager import ThreadManager
+from opentrons.types import PipetteNotAttachedError
 
-from .types import GantryLoad, PerPipetteAxisSettings, OT3Axis, OT3Mount, Point
-
-HWApiOT3: Union[Type[OT3API], Type[OT2API]] = OT3API
-ThreadManagedHardwareAPI = ThreadManager[HardwareControlAPI]
+from .types import (
+    GantryLoad,
+    PerPipetteAxisSettings,
+    OT3Axis,
+    OT3Mount,
+    Point,
+    CriticalPoint,
+)
 
 
 def stop_server_ot3() -> None:
     """Stop opentrons-robot-server on the OT3."""
+    print('Stopping "opentrons-robot-server"...')
     run(["systemctl", "stop", "opentrons-robot-server"])
 
 
-def build_ot3_hardware_api(
-    is_simulating: Optional[bool] = False, use_defaults: Optional[bool] = False
-) -> ThreadManagedHardwareAPI:
+def stop_on_device_display_ot3() -> None:
+    """Stop opentrons on-device-display on the OT3."""
+    run(["systemctl", "stop", "opentrons-robot-app"])
+
+
+def _create_fake_pipette_id(mount: OT3Mount, model: Optional[str]) -> Optional[str]:
+    if model is None:
+        return None
+    items = model.split("_")
+    assert len(items) == 3
+    size = "P1K" if items[0] == "p1000" else "P50"
+    channels = "S" if items[1] == "single" else "M"
+    version = items[2].upper().replace(".", "")
+    date = datetime.now().strftime("%y%m%d")
+    unique_number = 1 if mount == OT3Mount.LEFT else 2
+    return f"{size}{channels}{version}{date}A0{unique_number}"
+
+
+def _create_attached_instruments_dict(
+    pipette_left: Optional[str] = None, pipette_right: Optional[str] = None
+) -> Dict[OT3Mount, Dict[str, Optional[str]]]:
+    fake_id_left = _create_fake_pipette_id(OT3Mount.LEFT, pipette_left)
+    fake_id_right = _create_fake_pipette_id(OT3Mount.RIGHT, pipette_right)
+    sim_pip_left = {"model": pipette_left, "id": fake_id_left}
+    sim_pip_right = {"model": pipette_right, "id": fake_id_right}
+    return {OT3Mount.LEFT: sim_pip_left, OT3Mount.RIGHT: sim_pip_right}
+
+
+async def build_async_ot3_hardware_api(
+    is_simulating: Optional[bool] = False,
+    use_defaults: Optional[bool] = True,
+    pipette_left: Optional[str] = None,
+    pipette_right: Optional[str] = None,
+) -> OT3API:
     """Built an OT3 Hardware API instance."""
-    if use_defaults:
-        config = build_config_ot3({})
-    else:
-        config = load_ot3_config()
+    config = build_config_ot3({}) if use_defaults else load_ot3_config()
+    kwargs = {"config": config}
     if is_simulating:
-        hw_api = ThreadManager(HWApiOT3.build_hardware_simulator, config=config)
+        builder = OT3API.build_hardware_simulator
+        # TODO (andy s): add ability to simulate:
+        #                - gripper
+        #                - 96-channel
+        #                - modules
+        sim_pips = _create_attached_instruments_dict(pipette_left, pipette_right)
+        kwargs["attached_instruments"] = sim_pips  # type: ignore[assignment]
     else:
+        builder = OT3API.build_hardware_controller
         stop_server_ot3()
-        hw_api = ThreadManager(HWApiOT3.build_hardware_controller, config=config)
-    hw_api.managed_thread_ready_blocking()
-    return hw_api
+    return await builder(**kwargs)  # type: ignore[arg-type]
 
 
 def set_gantry_per_axis_setting_ot3(
@@ -56,7 +94,7 @@ def set_gantry_per_axis_setting_ot3(
 
 
 def set_gantry_load_per_axis_current_settings_ot3(
-    api: ThreadManagedHardwareAPI,
+    api: OT3API,
     axis: OT3Axis,
     load: Optional[GantryLoad] = None,
     hold_current: Optional[float] = None,
@@ -82,7 +120,7 @@ def set_gantry_load_per_axis_current_settings_ot3(
 
 
 def set_gantry_load_per_axis_motion_settings_ot3(
-    api: ThreadManagedHardwareAPI,
+    api: OT3API,
     axis: OT3Axis,
     load: Optional[GantryLoad] = None,
     default_max_speed: Optional[float] = None,
@@ -135,8 +173,8 @@ class GantryLoadSettings:
     run_current: float  # amps
 
 
-def set_gantry_load_per_axis_settings_ot3(
-    api: ThreadManagedHardwareAPI,
+async def set_gantry_load_per_axis_settings_ot3(
+    api: OT3API,
     settings: Dict[OT3Axis, GantryLoadSettings],
     load: Optional[GantryLoad] = None,
 ) -> None:
@@ -156,43 +194,120 @@ def set_gantry_load_per_axis_settings_ot3(
         set_gantry_load_per_axis_current_settings_ot3(
             api, ax, load, hold_current=stg.hold_current, run_current=stg.run_current
         )
+    if load == api.gantry_load:
+        await api.set_gantry_load(gantry_load=load)
 
 
-async def home_ot3(
-    api: ThreadManagedHardwareAPI, axes: Optional[List[OT3Axis]] = None
-) -> None:
+async def home_ot3(api: OT3API, axes: Optional[List[OT3Axis]] = None) -> None:
     """Home OT3 gantry."""
-    _all_axes = [
-        OT3Axis.X,
-        OT3Axis.Y,
-        OT3Axis.Z_L,
-        OT3Axis.Z_R,
-        OT3Axis.Z_G,
-        OT3Axis.P_L,
-        OT3Axis.P_R,
-    ]
+    default_home_speed = 10.0
+    default_home_speed_xy = 40.0
+
     homing_speeds: Dict[OT3Axis, float] = {
-        ax: DEFAULT_MAX_SPEED_DISCONTINUITY[api.gantry_load][OT3Axis.to_kind(ax)]
-        for ax in _all_axes
+        OT3Axis.X: default_home_speed_xy,
+        OT3Axis.Y: default_home_speed_xy,
+        OT3Axis.Z_L: default_home_speed,
+        OT3Axis.Z_R: default_home_speed,
+        OT3Axis.Z_G: default_home_speed,
+        OT3Axis.P_L: default_home_speed,
+        OT3Axis.P_R: default_home_speed,
     }
+
+    # save our current script's settings
     cached_discontinuities: Dict[OT3Axis, float] = {
-        ax: api.config.motion_settings.max_speed_discontinuity[api.gantry_load][
-            OT3Axis.to_kind(ax)
-        ]
-        for ax in _all_axes
+        ax: api.config.motion_settings.max_speed_discontinuity[api.gantry_load].get(
+            OT3Axis.to_kind(ax), homing_speeds[ax]
+        )
+        for ax in homing_speeds
     }
+    # overwrite current settings with API settings
     for ax, val in homing_speeds.items():
         set_gantry_load_per_axis_motion_settings_ot3(
             api, ax, max_speed_discontinuity=val
         )
+    # actually home
     await api.home(axes=axes)
+    # revert back to our script's settings
     for ax, val in cached_discontinuities.items():
         set_gantry_load_per_axis_motion_settings_ot3(
             api, ax, max_speed_discontinuity=val
         )
 
 
-def get_endstop_position_ot3(api: ThreadManagedHardwareAPI, mount: OT3Mount) -> Point:
+def _get_pipette_from_mount(api: OT3API, mount: OT3Mount) -> Pipette:
+    pipette = api.hardware_pipettes[mount.to_mount()]
+    if pipette is None:
+        raise RuntimeError(f"No pipette currently attaced to mount {mount}")
+    return pipette
+
+
+def get_plunger_positions_ot3(
+    api: OT3API, mount: OT3Mount
+) -> Tuple[float, float, float, float]:
+    """Update plunger current."""
+    pipette = _get_pipette_from_mount(api, mount)
+    cfg = pipette.config
+    return cfg.top, cfg.bottom, cfg.blow_out, cfg.drop_tip
+
+
+async def update_pick_up_current(
+    api: OT3API, mount: OT3Mount, current: Optional[float] = 0.125
+) -> None:
+    """Update pick-up-tip current."""
+    pipette = _get_pipette_from_mount(api, mount)
+    pipette._config = replace(pipette.config, pick_up_current=current)
+
+
+async def update_pick_up_distance(
+    api: OT3API, mount: OT3Mount, distance: Optional[float] = 17.0
+) -> None:
+    """Update pick-up-tip current."""
+    pipette = _get_pipette_from_mount(api, mount)
+    pipette._config = replace(pipette.config, pick_up_distance=distance)
+
+
+async def move_plunger_absolute_ot3(
+    api: OT3API,
+    mount: OT3Mount,
+    position: float,
+    motor_current: Optional[float] = None,
+    speed: Optional[float] = None,
+) -> None:
+    """Move OT3 plunger position to an absolute position."""
+    if not api.hardware_pipettes[mount.to_mount()]:
+        raise PipetteNotAttachedError(f"No pipette found on mount: {mount}")
+    plunger_axis = OT3Axis.of_main_tool_actuator(mount)
+    _move_coro = api._move(
+        target_position={plunger_axis: position},  # type: ignore[arg-type]
+        speed=speed,
+    )
+    if motor_current is None:
+        await _move_coro
+    else:
+        async with api._backend.restore_current():
+            await api._backend.set_active_current(
+                {OT3Axis.of_main_tool_actuator(mount): motor_current}  # type: ignore[dict-item]
+            )
+            await _move_coro
+
+
+async def move_plunger_relative_ot3(
+    api: OT3API,
+    mount: OT3Mount,
+    delta: float,
+    motor_current: Optional[float] = None,
+    speed: Optional[float] = None,
+) -> None:
+    """Move OT3 plunger position in a relative direction."""
+    current_pos = await api.current_position_ot3(mount=mount)
+    plunger_axis = OT3Axis.of_main_tool_actuator(mount)
+    plunger_pos = current_pos[plunger_axis]
+    return await move_plunger_absolute_ot3(
+        api, mount, plunger_pos + delta, motor_current, speed
+    )
+
+
+def get_endstop_position_ot3(api: OT3API, mount: OT3Mount) -> Point:
     """Get the endstop's position per mount."""
     if mount == OT3Mount.LEFT:
         mount_offset = api.config.left_mount_offset
@@ -207,3 +322,91 @@ def get_endstop_position_ot3(api: ThreadManagedHardwareAPI, mount: OT3Mount) -> 
         y=api.config.carriage_offset[1] + mount_offset[1],
         z=api.config.carriage_offset[2] + mount_offset[2],
     )
+
+
+class OT3JogTermination(Exception):
+    """Jogging terminated."""
+
+    pass
+
+
+class OT3JogNoInput(Exception):
+    """No jogging input from user."""
+
+    pass
+
+
+def _jog_read_user_input(terminator: str) -> Tuple[str, float]:
+    user_input = input(f'Jog eg: x-10.5 ("{terminator}" to stop): ')
+    user_input = user_input.strip().replace(" ", "")
+    if user_input == terminator:
+        raise OT3JogTermination()
+    if not user_input:
+        raise OT3JogNoInput()
+    if len(user_input) < 2:
+        raise ValueError(f"Unexpected jog input: {user_input}")
+    axis = user_input[0].upper()
+    if axis not in "XYZPG":
+        raise ValueError(f'Unexpected axis: "{axis}"')
+    distance = float(user_input[1:])
+    return axis, distance
+
+
+async def _jog_axis_some_distance(
+    api: OT3API, mount: OT3Mount, axis: str, distance: float
+) -> None:
+    if not axis or distance == 0.0:
+        return
+    elif axis == "G":
+        raise RuntimeError("Gripper jogging not yet supported")
+    elif axis == "P":
+        await move_plunger_relative_ot3(api, mount, distance)
+    else:
+        delta = Point(**{axis.lower(): distance})
+        await api.move_rel(mount=mount, delta=delta)
+
+
+async def _jog_print_current_position(
+    api: OT3API, mount: OT3Mount, critical_point: Optional[CriticalPoint] = None
+) -> None:
+    z_axis = OT3Axis.by_mount(mount)
+    plunger_axis = OT3Axis.of_main_tool_actuator(mount)
+    current_pos = await api.current_position_ot3(
+        mount=mount, critical_point=critical_point
+    )
+    x, y, z, p = [
+        current_pos.get(ax) for ax in [OT3Axis.X, OT3Axis.Y, z_axis, plunger_axis]
+    ]
+    print(f"Deck Coordinate: X={x}, Y={y}, Z={z}, P={p}")
+
+
+async def jog_mount_ot3(
+    api: OT3API, mount: OT3Mount, critical_point: Optional[CriticalPoint] = None
+) -> Dict[OT3Axis, float]:
+    """Jog an OT3 mount's gantry XYZ and pipettes axes."""
+    axis = ""
+    distance = 0.0
+    while True:
+        current_pos = await api.current_position_ot3(
+            mount=mount, critical_point=critical_point
+        )
+        await _jog_print_current_position(api, mount, critical_point)
+        try:
+            axis, distance = _jog_read_user_input("stop")
+        except ValueError as e:
+            print(e)
+            continue
+        except OT3JogTermination:
+            print("Done jogging")
+            break
+        except OT3JogNoInput:
+            if axis and distance:
+                print(
+                    f"No input, repeating previous jog (axis={axis}, distance={distance})"
+                )
+            pass
+        try:
+            await _jog_axis_some_distance(api, mount, axis, distance)
+        except PipetteNotAttachedError as e:
+            print(e)
+    return current_pos

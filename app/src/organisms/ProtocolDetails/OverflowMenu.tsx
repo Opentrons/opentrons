@@ -34,7 +34,7 @@ interface OverflowMenuProps {
 
 export function OverflowMenu(props: OverflowMenuProps): JSX.Element {
   const { protocolKey, protocolType } = props
-  const { t } = useTranslation(['protocol_details', 'protocol_list', 'shared'])
+  const { t } = useTranslation(['protocol_details', 'shared'])
   const {
     menuOverlay,
     handleOverflowClick,
@@ -103,7 +103,7 @@ export function OverflowMenu(props: OverflowMenuProps): JSX.Element {
             onClick={handleClickDelete}
             data-testid="ProtocolDetailsOverflowMenu_deleteProtocol"
           >
-            {t('protocol_list:delete_protocol')}
+            {t('shared:delete')}
           </MenuItem>
           {protocolType === 'json' ? (
             <>

@@ -77,13 +77,13 @@ test-integration:
 
 .PHONY: lint
 lint:
-	$(python) -m mypy hardware_testing tests protocols scripts
-	$(python) -m black --check hardware_testing tests protocols scripts setup.py
-	$(python) -m flake8 hardware_testing tests protocols scripts setup.py
+	$(python) -m mypy hardware_testing tests protocols
+	$(python) -m black --check hardware_testing tests protocols setup.py
+	$(python) -m flake8 hardware_testing tests protocols setup.py
 
 .PHONY: format
 format:
-	$(python) -m black hardware_testing tests protocols scripts setup.py
+	$(python) -m black hardware_testing tests protocols setup.py
 
 define move-plot-webpage
 ssh -i $(2) $(3) root@$(1) \
@@ -134,3 +134,8 @@ term:
 
 .PHONY: push-all-and-term
 push-all-and-term: push-all term
+
+.PHONY: pull-data
+pull-data-ot3:
+	mkdir -p ./.pulled-data
+	scp -r root@$(host):/data/testing_data/$(test) ./.pulled-data

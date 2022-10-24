@@ -3,7 +3,7 @@ import os
 import logging
 import asyncio
 import argparse
-from numpy import float32, float64
+from numpy import float32, float64, int32
 
 from typing import Callable
 from logging.config import dictConfig
@@ -101,6 +101,7 @@ async def run(args: argparse.Namespace) -> None:
                     duration_sec=float64(3),
                     pwm_frequency=float32(pwm_freq),
                     pwm_duty_cycle=float32(pwm_duty),
+                    encoder_position_um=int32(0),
                 )
             }
         ]
@@ -113,6 +114,7 @@ async def run(args: argparse.Namespace) -> None:
                     pwm_frequency=float32(pwm_freq),
                     pwm_duty_cycle=float32(pwm_duty),
                     move_type=MoveType.home,
+                    encoder_position_um=int32(0),
                 )
             }
         ]

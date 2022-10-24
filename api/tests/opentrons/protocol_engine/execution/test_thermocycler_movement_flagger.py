@@ -23,11 +23,6 @@ from opentrons.protocol_engine.errors import (
 )
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.modules import Thermocycler as HardwareThermocycler
-from opentrons.hardware_control.modules.types import (
-    # Renamed to avoid conflicting with ..types.ModuleModel.
-    ModuleType as OpentronsModuleType,
-    ThermocyclerModuleModel as OpentronsThermocyclerModuleModel,
-)
 from opentrons.drivers.types import ThermocyclerLidStatus
 
 from opentrons.protocol_engine.execution.thermocycler_movement_flagger import (
@@ -110,8 +105,8 @@ class LidStatusAndRaiseSpec(NamedTuple):
             expected_raise_cm=pytest.raises(ThermocyclerNotOpenError),
         ),
         LidStatusAndRaiseSpec(
-            lid_status=None,
-            expected_raise_cm=pytest.raises(AssertionError),
+            lid_status=ThermocyclerLidStatus.UNKNOWN,
+            expected_raise_cm=pytest.raises(ThermocyclerNotOpenError),
         ),
         LidStatusAndRaiseSpec(
             lid_status=ThermocyclerLidStatus.OPEN,
@@ -120,7 +115,7 @@ class LidStatusAndRaiseSpec(NamedTuple):
     ],
 )
 async def test_raises_depending_on_thermocycler_hardware_lid_status(
-    lid_status: Optional[ThermocyclerLidStatus],
+    lid_status: ThermocyclerLidStatus,
     expected_raise_cm: ContextManager[Any],
     subject: ThermocyclerMovementFlagger,
     state_store: StateStore,
@@ -152,12 +147,7 @@ async def test_raises_depending_on_thermocycler_hardware_lid_status(
     thermocycler = decoy.mock(cls=HardwareThermocycler)
     decoy.when(thermocycler.device_info).then_return({"serial": "module-serial"})
     decoy.when(thermocycler.lid_status).then_return(lid_status)
-    decoy.when(
-        await hardware_api.find_modules(
-            by_model=OpentronsThermocyclerModuleModel.THERMOCYCLER_V1,
-            resolved_type=OpentronsModuleType.THERMOCYCLER,
-        )
-    ).then_return(([thermocycler], None))
+    decoy.when(hardware_api.attached_modules).then_return([thermocycler])
 
     with expected_raise_cm:
         await subject.raise_if_labware_in_non_open_thermocycler(
@@ -190,13 +180,7 @@ async def test_raises_if_hardware_module_has_gone_missing(
     decoy.when(
         state_store.modules.get_serial_number(module_id="module-id")
     ).then_return("module-serial")
-
-    decoy.when(
-        await hardware_api.find_modules(
-            by_model=OpentronsThermocyclerModuleModel.THERMOCYCLER_V1,
-            resolved_type=OpentronsModuleType.THERMOCYCLER,
-        )
-    ).then_return(([], None))
+    decoy.when(hardware_api.attached_modules).then_return([])
 
     with pytest.raises(ThermocyclerNotOpenError):
         await subject.raise_if_labware_in_non_open_thermocycler(

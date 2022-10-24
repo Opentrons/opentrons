@@ -7,19 +7,24 @@ from decoy import Decoy
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
 
 from opentrons.types import DeckSlotName, Location, Mount, Point
 from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.hardware_control.modules.types import TemperatureModuleModel
+
+from opentrons.hardware_control.modules import AbstractModule
+from opentrons.hardware_control.modules.types import ModuleType, TemperatureModuleModel
 from opentrons.protocols import labware as mock_labware
 from opentrons.protocols.geometry.deck import Deck
+from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocol_api.core.protocol_api.load_info import (
     LoadInfo,
     LabwareLoadInfo,
     InstrumentLoadInfo,
+    ModuleLoadInfo,
 )
 from opentrons.protocol_api.core.labware import LabwareLoadParams
 from opentrons.protocol_api.core.protocol_api.labware_offset_provider import (
@@ -35,12 +40,33 @@ from opentrons.protocol_api.core.protocol_api.protocol_context import (
     ProtocolContextImplementation,
 )
 
+from opentrons.protocols.geometry import module_geometry as mock_module_geometry
+from opentrons.protocol_api.core.protocol_api import (
+    legacy_module_core as mock_legacy_module_core,
+)
+
 
 @pytest.fixture(autouse=True)
 def _mock_labware_module(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
     """Mock out opentrons.protocols.labware functions."""
     for name, func in inspect.getmembers(mock_labware, inspect.isfunction):
         monkeypatch.setattr(mock_labware, name, decoy.mock(func=func))
+
+
+@pytest.fixture(autouse=True)
+def _mock_module_geometry_module(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Mock out opentrons.protocols.geometry.module_geometry functions."""
+    for name, func in inspect.getmembers(mock_module_geometry, inspect.isfunction):
+        monkeypatch.setattr(mock_module_geometry, name, decoy.mock(func=func))
+
+
+@pytest.fixture(autouse=True)
+def _mock_legacy_module_core_module(
+    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Mock out opentrons.protocol_api.core.protocol_api.legacy_module_core functions."""
+    for name, func in inspect.getmembers(mock_legacy_module_core, inspect.isfunction):
+        monkeypatch.setattr(mock_legacy_module_core, name, decoy.mock(func=func))
 
 
 @pytest.fixture
@@ -58,6 +84,9 @@ def mock_deck(decoy: Decoy) -> Deck:
 
     deck = _MockDeck()
     setattr(deck, "position_for", decoy.mock(name="Deck.position_for"))
+    setattr(
+        deck, "resolve_module_location", decoy.mock(name="Deck.resolve_module_location")
+    )
     return cast(Deck, deck)
 
 
@@ -286,6 +315,108 @@ def test_load_labware_on_module(
                 on_module=True,
                 offset_id="offset-789",
                 labware_display_name="cool label",
+            )
+        ),
+        times=1,
+    )
+
+
+def test_load_module(
+    decoy: Decoy,
+    mock_deck: Deck,
+    mock_sync_hardware_api: SyncHardwareAPI,
+    mock_equipment_broker: EquipmentBroker[LoadInfo],
+    subject: ProtocolContextImplementation,
+) -> None:
+    """It should load a module core.
+
+    Note: this test does not fully test the the loading logic,
+    including (but not limited to) module simulation logic.
+    Since this code is being replaced and refactoring would be
+    prohibitively expensive, this should be good enough
+    given existing high-level acceptance tests.
+    """
+    mock_hw_mod_1 = decoy.mock(cls=AbstractModule)
+    mock_hw_mod_2 = decoy.mock(cls=AbstractModule)
+
+    defn_1 = cast(ModuleDefinitionV3, {"model": "model-1"})
+    defn_2 = cast(ModuleDefinitionV3, {"model": "model-2"})
+
+    mock_geometry = decoy.mock(cls=ModuleGeometry)
+    mock_module_core = decoy.mock(cls=LegacyModuleCore)
+
+    decoy.when(mock_hw_mod_1.model()).then_return("model-1")
+    decoy.when(mock_hw_mod_2.model()).then_return("model-2")
+
+    decoy.when(
+        mock_deck.resolve_module_location(ModuleType.TEMPERATURE, DeckSlotName.SLOT_1)
+    ).then_return(42)
+
+    decoy.when(mock_deck.position_for(42)).then_return(Location(Point(1, 2, 3), None))
+
+    decoy.when(mock_sync_hardware_api.attached_modules).then_return(
+        [mock_hw_mod_1, mock_hw_mod_2]
+    )
+
+    decoy.when(mock_module_geometry.load_definition("model-1")).then_return(defn_1)
+    decoy.when(mock_module_geometry.load_definition("model-2")).then_return(defn_2)
+
+    decoy.when(
+        mock_module_geometry.models_compatible(
+            TemperatureModuleModel.TEMPERATURE_V1, defn_1
+        )
+    ).then_return(False)
+
+    decoy.when(
+        mock_module_geometry.models_compatible(
+            TemperatureModuleModel.TEMPERATURE_V1, defn_2
+        )
+    ).then_return(True)
+
+    decoy.when(
+        mock_module_geometry.create_geometry(
+            definition=defn_2,
+            parent=Location(Point(1, 2, 3), None),
+            configuration=None,
+        )
+    ).then_return(mock_geometry)
+
+    decoy.when(mock_hw_mod_2.device_info).then_return({"serial": "serial-number"})
+
+    decoy.when(mock_geometry.parent).then_return("1")
+    decoy.when(mock_geometry.model).then_return(TemperatureModuleModel.TEMPERATURE_V2)
+
+    decoy.when(
+        mock_legacy_module_core.create_module_core(
+            module_hardware_api=mock_hw_mod_2,
+            requested_model=TemperatureModuleModel.TEMPERATURE_V1,
+            geometry=mock_geometry,
+            protocol_core=subject,
+        )
+    ).then_return(mock_module_core)
+
+    decoy.when(mock_module_core.get_model()).then_return(
+        TemperatureModuleModel.TEMPERATURE_V2
+    )
+    decoy.when(mock_module_core.get_serial_number()).then_return("cap'n crunch")
+    decoy.when(mock_module_core.get_deck_slot()).then_return(DeckSlotName.SLOT_1)
+
+    result = subject.load_module(
+        model=TemperatureModuleModel.TEMPERATURE_V1,
+        deck_slot=DeckSlotName.SLOT_1,
+        configuration=None,
+    )
+
+    assert result is mock_module_core
+
+    decoy.verify(
+        mock_equipment_broker.publish(
+            ModuleLoadInfo(
+                requested_model=TemperatureModuleModel.TEMPERATURE_V1,
+                loaded_model=TemperatureModuleModel.TEMPERATURE_V2,
+                module_serial="cap'n crunch",
+                deck_slot=DeckSlotName.SLOT_1,
+                configuration=None,
             )
         ),
         times=1,

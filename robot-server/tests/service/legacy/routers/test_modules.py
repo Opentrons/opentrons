@@ -6,6 +6,7 @@ import asyncio
 from decoy import matchers
 from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.modules import (
+    ModuleType,
     MagDeck,
     Thermocycler,
     TempDeck,
@@ -26,10 +27,10 @@ async def magdeck():
     m = await utils.build(
         port="/dev/ot_module_magdeck1",
         usb_port=usb_port,
-        which="magdeck",
+        type=ModuleType.MAGNETIC,
         simulating=True,
         execution_manager=ExecutionManager(),
-        loop=asyncio.get_running_loop(),
+        hw_control_loop=asyncio.get_running_loop(),
     )
     MagDeck.current_height = PropertyMock(return_value=321)
 
@@ -49,10 +50,10 @@ async def tempdeck():
     t = await utils.build(
         port="/dev/ot_module_tempdeck1",
         usb_port=usb_port,
-        which="tempdeck",
+        type=ModuleType.TEMPERATURE,
         simulating=True,
         execution_manager=ExecutionManager(),
-        loop=asyncio.get_running_loop(),
+        hw_control_loop=asyncio.get_running_loop(),
     )
     TempDeck.temperature = PropertyMock(return_value=123.0)
     TempDeck.target = PropertyMock(return_value=321.0)
@@ -73,10 +74,10 @@ async def thermocycler():
     t = await utils.build(
         port="/dev/ot_module_thermocycler1",
         usb_port=usb_port,
-        which="thermocycler",
+        type=ModuleType.THERMOCYCLER,
         simulating=True,
         execution_manager=ExecutionManager(),
-        loop=asyncio.get_running_loop(),
+        hw_control_loop=asyncio.get_running_loop(),
     )
 
     Thermocycler.lid_status = PropertyMock(return_value="open")
@@ -107,10 +108,10 @@ async def heater_shaker():
     heatershaker = await utils.build(
         port="/dev/ot_module_heatershaker1",
         usb_port=usb_port,
-        which="heatershaker",
+        type=ModuleType.HEATER_SHAKER,
         simulating=True,
         execution_manager=ExecutionManager(),
-        loop=asyncio.get_running_loop(),
+        hw_control_loop=asyncio.get_running_loop(),
     )
 
     HeaterShaker.live_data = PropertyMock(

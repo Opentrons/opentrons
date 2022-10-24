@@ -21,6 +21,7 @@ from opentrons_hardware.hardware_control.gripper_settings import (
     set_reference_voltage,
     grip,
     home,
+    move,
 )
 from opentrons_hardware.firmware_bindings.utils import UInt8Field
 from opentrons_hardware.hardware_control.constants import (
@@ -88,6 +89,7 @@ async def run_test(messenger: CanMessenger) -> None:
     """Run the for test."""
     print("Gripper testing begins... \n")
     pwm_duty = prompt_int_input("PWM duty cycle in % (int)")
+    lm_target = prompt_int_input("Linear move target in um % (int)")
 
     """Setup gripper"""
     try:
@@ -106,6 +108,11 @@ async def run_test(messenger: CanMessenger) -> None:
 
             await home(messenger, 0, 0, 0)
             await execute_move(messenger)
+
+            input(in_green("press enter to move...\n"))
+            await move(messenger, 0, 0, 0, lm_target)
+            await execute_move(messenger)
+            input(in_green("HOLD\n"))
 
     except asyncio.CancelledError:
         pass

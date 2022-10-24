@@ -28,7 +28,10 @@ import { SetupLiquids } from '../SetupLiquids'
 import { ProtocolRunSetup } from '../ProtocolRunSetup'
 import { SetupModules } from '../SetupModules'
 
-import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
+import {
+  ProtocolAnalysisFile,
+  protocolHasLiquids,
+} from '@opentrons/shared-data'
 import type { StoredProtocolAnalysis } from '../../hooks'
 
 jest.mock('@opentrons/api-client')
@@ -38,6 +41,7 @@ jest.mock('../SetupRobotCalibration')
 jest.mock('../SetupModules')
 jest.mock('../SetupLiquids')
 jest.mock('../../../../redux/config')
+jest.mock('@opentrons/shared-data/js/helpers/parseProtocolData')
 
 const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
@@ -68,13 +72,14 @@ const mockSetupRobotCalibration = SetupRobotCalibration as jest.MockedFunction<
 const mockSetupModules = SetupModules as jest.MockedFunction<
   typeof SetupModules
 >
-
 const mockSetupLiquids = SetupLiquids as jest.MockedFunction<
   typeof SetupLiquids
 >
-
 const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
   typeof useFeatureFlag
+>
+const mockProtocolHasLiquids = protocolHasLiquids as jest.MockedFunction<
+  typeof protocolHasLiquids
 >
 
 const ROBOT_NAME = 'otie'
@@ -234,6 +239,17 @@ describe('ProtocolRunSetup', () => {
       when(mockUseFeatureFlag)
         .calledWith('enableLiquidSetup')
         .mockReturnValue(true)
+      when(mockUseProtocolDetailsForRun)
+        .calledWith(RUN_ID)
+        .mockReturnValue({
+          protocolData: ({
+            ...noModulesProtocol,
+            liquids: [{ displayName: 'water', description: 'liquid H2O' }],
+          } as unknown) as ProtocolAnalysisFile,
+          displayName: 'mock display name',
+          protocolKey: 'fakeProtocolKey',
+        })
+      mockProtocolHasLiquids.mockReturnValue(true)
 
       const { getByText } = render()
       getByText('STEP 3')

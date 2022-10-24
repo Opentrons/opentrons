@@ -91,8 +91,7 @@ class HeaterShakerModuleContext:
         """
         if not MIN_ALLOWED_SPEED <= rpm <= MAX_ALLOWED_SPEED:
             raise InvalidTargetSpeedError(
-                f"Speed should be in range {MIN_ALLOWED_SPEED} - {MAX_ALLOWED_SPEED}"
-                f"RPM."
+                f"Speed should be in range {MIN_ALLOWED_SPEED}-{MAX_ALLOWED_SPEED} rpm."
             )
         raise NotImplementedError()
 

@@ -18,6 +18,7 @@ import {
   COLORS,
   BORDERS,
   SIZE_1,
+  SIZE_5,
   DIRECTION_COLUMN,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
@@ -50,7 +51,11 @@ import {
 
 import type { State } from '../../redux/types'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
-import type { JsonConfig, PythonConfig } from '@opentrons/shared-data'
+import {
+  JsonConfig,
+  protocolHasLiquids,
+  PythonConfig,
+} from '@opentrons/shared-data'
 
 const defaultTabStyle = css`
   ${TYPOGRAPHY.pSemiBold}
@@ -301,7 +306,20 @@ export function ProtocolDetails(
         )
 
       case 'liquids':
-        return <ProtocolLiquidsDetails />
+        return (
+          <ProtocolLiquidsDetails
+            commands={
+              mostRecentAnalysis?.commands != null
+                ? mostRecentAnalysis?.commands
+                : []
+            }
+            liquids={
+              mostRecentAnalysis?.liquids != null
+                ? mostRecentAnalysis?.liquids
+                : []
+            }
+          />
+        )
     }
   }
 
@@ -316,7 +334,6 @@ export function ProtocolDetails(
         showSlideout={showSlideout}
         storedProtocolData={props}
       />
-
       <Flex
         backgroundColor={COLORS.white}
         border={`1px solid ${COLORS.medGreyEnabled}`}
@@ -326,7 +343,9 @@ export function ProtocolDetails(
         width="100%"
         marginBottom={SPACING.spacing4}
       >
-        <Box
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing4}
           padding={`${SPACING.spacing4} 0 ${SPACING.spacing4} ${SPACING.spacing4}`}
           width="100%"
         >
@@ -435,7 +454,7 @@ export function ProtocolDetails(
               ) : null}
             </Flex>
           </Flex>
-        </Box>
+        </Flex>
         <Box
           position={POSITION_RELATIVE}
           top={SPACING.spacing1}
@@ -453,12 +472,14 @@ export function ProtocolDetails(
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
-        <Box
-          flex="0 0 20rem"
+        <Flex
+          flex={`0 0 ${SIZE_5}`}
+          flexDirection={DIRECTION_COLUMN}
           backgroundColor={COLORS.white}
-          data-testid="ProtocolDetails_deckMap"
           border={`1px solid ${COLORS.medGreyEnabled}`}
           borderRadius={BORDERS.radiusSoftCorners}
+          height="100%"
+          data-testid="ProtocolDetails_deckMap"
         >
           <StyledText
             as="h3"
@@ -473,24 +494,30 @@ export function ProtocolDetails(
             {
               {
                 missing: (
-                  <Box size="15rem" backgroundColor={COLORS.medGreyEnabled} />
+                  <Box size="14rem" backgroundColor={COLORS.medGreyEnabled} />
                 ),
                 loading: (
-                  <Box size="15rem" backgroundColor={COLORS.medGreyEnabled} />
+                  <Box size="14rem" backgroundColor={COLORS.medGreyEnabled} />
                 ),
                 error: (
-                  <Box size="15rem" backgroundColor={COLORS.medGreyEnabled} />
+                  <Box size="14rem" backgroundColor={COLORS.medGreyEnabled} />
                 ),
                 complete: (
-                  <DeckThumbnail
-                    commands={mostRecentAnalysis?.commands ?? []}
-                    showLiquids
-                  />
+                  <Box size="14rem" height="auto">
+                    <DeckThumbnail
+                      commands={mostRecentAnalysis?.commands ?? []}
+                      liquids={
+                        mostRecentAnalysis?.liquids != null
+                          ? mostRecentAnalysis?.liquids
+                          : []
+                      }
+                    />
+                  </Box>
                 ),
               }[analysisStatus]
             }
           </Box>
-        </Box>
+        </Flex>
 
         <Flex
           width="100%"
@@ -517,17 +544,21 @@ export function ProtocolDetails(
                 {t('labware')}
               </StyledText>
             </RoundTab>
-            {liquidSetupEnabled && (
-              <RoundTab
-                data-testid="ProtocolDetails_liquids"
-                isCurrent={currentTab === 'liquids'}
-                onClick={() => setCurrentTab('liquids')}
-              >
-                <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
-                  {t('liquids')}
-                </StyledText>
-              </RoundTab>
-            )}
+            {liquidSetupEnabled &&
+              mostRecentAnalysis != null &&
+              protocolHasLiquids(mostRecentAnalysis) && (
+                <RoundTab
+                  data-testid="ProtocolDetails_liquids"
+                  isCurrent={currentTab === 'liquids'}
+                  onClick={() => setCurrentTab('liquids')}
+                >
+                  <StyledText
+                    textTransform={TYPOGRAPHY.textTransformCapitalize}
+                  >
+                    {t('liquids')}
+                  </StyledText>
+                </RoundTab>
+              )}
           </Flex>
           <Box
             backgroundColor={COLORS.white}

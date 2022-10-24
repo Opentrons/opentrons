@@ -22,6 +22,7 @@ import {
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
+import OT3_PNG from '../../assets/images/OT3.png'
 import { StyledText } from '../../atoms/text'
 import { SecondaryTertiaryButton } from '../../atoms/buttons'
 import {
@@ -30,6 +31,7 @@ import {
   getRobotModelByName,
 } from '../../redux/discovery'
 import { ModuleIcon } from '../../molecules/ModuleIcon'
+import { useFeatureFlag } from '../../redux/config'
 import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../organisms/RunTimeControl/hooks'
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
@@ -101,7 +103,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
       cursor="pointer"
     >
       <img
-        src={OT2_PNG}
+        src={robotModel === 'OT-2' ? OT2_PNG : OT3_PNG}
         style={{ width: '6rem' }}
         id={`RobotCard_${robotName}_robotImage`}
       />
@@ -159,6 +161,8 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
   const { robotName } = props
   const { t } = useTranslation('devices_landing')
   const attachedModules = useAttachedModules()
+  const enableThermocyclerGen2 = useFeatureFlag('enableThermocyclerGen2')
+
   return attachedModules.length > 0 ? (
     <Box
       display="grid"
@@ -174,15 +178,20 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
         {t('modules')}
       </StyledText>
       <Flex>
-        {attachedModules.map((module, i) => (
-          <ModuleIcon
-            key={`${module.moduleModel}_${i}_${robotName}`}
-            tooltipText={t('this_robot_has_connected_and_power_on_module', {
-              moduleName: getModuleDisplayName(module.moduleModel),
-            })}
-            module={module}
-          />
-        ))}
+        {attachedModules.map((module, i) =>
+          //  TODO(jr, 9/28/22): remove this logic when we remove enableThermocyclerGen2 FF
+          enableThermocyclerGen2 ||
+          (!enableThermocyclerGen2 &&
+            module.moduleModel !== 'thermocyclerModuleV2') ? (
+            <ModuleIcon
+              key={`${module.moduleModel}_${i}_${robotName}`}
+              tooltipText={t('this_robot_has_connected_and_power_on_module', {
+                moduleName: getModuleDisplayName(module.moduleModel),
+              })}
+              module={module}
+            />
+          ) : null
+        )}
       </Flex>
     </Box>
   ) : (

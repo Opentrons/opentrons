@@ -42,6 +42,7 @@
   "plug_in_required_module": "Plug in and power up the required module to continue",
   "plug_in_required_module_plural": "Plug in and power up the required modules to continue",
   "proceed_to_labware_setup_step": "Proceed to labware setup",
+  "proceed_to_labware_setup_prep": "Proceed to labware prep",
   "proceed_to_module_setup_step": "Proceed to module setup",
   "proceed_to_liquid_setup_step": "Proceed to liquid setup",
   "attach_pipette_cta": "Attach Pipette",
@@ -114,7 +115,8 @@
   "calibrate_deck_to_proceed_to_tip_length_calibration": "Calibrate your deck in order to proceed to tip length calibration",
   "heater_shaker_extra_attention": "Use latch controls for easy placement of labware.",
   "magnetic_module_extra_attention": "Opentrons recommends securing labware with the module’s bracket",
-  "thermocycler_extra_attention": "Labware must be secured with the module’s latch. Thermocycler lid must be open when robot moves to the slots it occupies. Opentrons will automatically open the lid to move to these slots during Labware Position Check.",
+  "thermocycler_extra_attention_gen_1": "Labware must be secured with the module’s latch. Thermocycler lid must be open when robot moves to the slots it occupies. Opentrons will automatically open the lid to move to these slots during Labware Position Check.",
+  "thermocycler_extra_attention_gen_2": "The lid will automatically open when moving to these slots during Labware Position Check.",
   "calibration_data_not_available": "Calibration data not available once run has started",
   "connection_info_not_available": "Connection info not available once run has started",
   "setup_is_view_only": "Setup is view-only once run has started",
@@ -128,5 +130,10 @@
   "labware_name": "Labware Name",
   "volume": "Volume",
   "slot_location": "Slot {{slotName}}",
-  "slot_number": "Slot Number"
+  "slot_number": "Slot Number",
+  "module_slot_location": "Slot {{slotName}}, {{moduleName}}",
+  "initial_location": "Initial Location",
+  "secure_labware_instructions": "Secure labware instructions",
+  "module_name": "Module Name",
+  "connection_status": "Connection Status"
 }

@@ -9,13 +9,17 @@ import {
 } from '@opentrons/components'
 import { parseLiquidsInLoadOrder } from '@opentrons/api-client'
 import { getSlotLabwareName } from '../../utils/getSlotLabwareName'
+import { getSlotLabwareDefinition } from '../../utils/getSlotLabwareDefinition'
 import { getLiquidsByIdForLabware, getWellFillFromLabwareId } from '../utils'
 import {
   useLabwareRenderInfoForRunById,
   useProtocolDetailsForRun,
 } from '../../../../Devices/hooks'
+import { mockDefinition } from '../../../../../redux/custom-labware/__fixtures__'
 import { LiquidsLabwareDetailsModal } from '../LiquidsLabwareDetailsModal'
 import { LiquidDetailCard } from '../LiquidDetailCard'
+
+import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
@@ -26,6 +30,7 @@ jest.mock('@opentrons/components', () => {
 })
 jest.mock('@opentrons/api-client')
 jest.mock('../../utils/getSlotLabwareName')
+jest.mock('../../utils/getSlotLabwareDefinition')
 jest.mock('../utils')
 jest.mock('../LiquidDetailCard')
 jest.mock('../../../../Devices/hooks')
@@ -35,6 +40,9 @@ const mockLiquidDetailCard = LiquidDetailCard as jest.MockedFunction<
 >
 const mockGetSlotLabwareName = getSlotLabwareName as jest.MockedFunction<
   typeof getSlotLabwareName
+>
+const mockGetSlotLabwareDefinition = getSlotLabwareDefinition as jest.MockedFunction<
+  typeof getSlotLabwareDefinition
 >
 const mockGetLiquidsByIdForLabware = getLiquidsByIdForLabware as jest.MockedFunction<
   typeof getLiquidsByIdForLabware
@@ -76,6 +84,7 @@ describe('LiquidsLabwareDetailsModal', () => {
       labwareName: 'mock labware name',
       slotName: '5',
     })
+    mockGetSlotLabwareDefinition.mockReturnValue(mockDefinition)
     mockGetLiquidsByIdForLabware.mockReturnValue({
       '4': [
         {
@@ -95,7 +104,7 @@ describe('LiquidsLabwareDetailsModal', () => {
     })
     mockParseLiquidsInLoadOrder.mockReturnValue([
       {
-        liquidId: '4',
+        id: '4',
         displayName: 'liquid 4',
         description: 'saliva',
         displayColor: '#B925FF',
@@ -108,7 +117,11 @@ describe('LiquidsLabwareDetailsModal', () => {
         labwareDef: {},
       },
     } as any)
-    mockUseProtocolDetailsForRun.mockReturnValue({} as any)
+    mockUseProtocolDetailsForRun.mockReturnValue({
+      displayName: null,
+      protocolData: {} as ProtocolAnalysisFile<{}>,
+      protocolKey: null,
+    } as any)
 
     when(mockLabwareRender)
       .mockReturnValue(<div></div>) // this (default) empty div will be returned when LabwareRender isn't called with expected props

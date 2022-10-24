@@ -6,6 +6,7 @@ from ..state import StateStore
 from ..actions import ActionDispatcher
 from .equipment import EquipmentHandler
 from .movement import MovementHandler
+from .labware_movement import LabwareMovementHandler
 from .pipetting import PipettingHandler
 from .run_control import RunControlHandler
 from .command_executor import CommandExecutor
@@ -34,6 +35,11 @@ def create_queue_worker(
         state_store=state_store,
     )
 
+    labware_movement_handler = LabwareMovementHandler(
+        hardware_api=hardware_api,
+        state_store=state_store,
+    )
+
     pipetting_handler = PipettingHandler(
         hardware_api=hardware_api,
         state_store=state_store,
@@ -54,6 +60,7 @@ def create_queue_worker(
         action_dispatcher=action_dispatcher,
         equipment=equipment_handler,
         movement=movement_handler,
+        labware_movement=labware_movement_handler,
         pipetting=pipetting_handler,
         run_control=run_control_handler,
         rail_lights=rail_lights_handler,

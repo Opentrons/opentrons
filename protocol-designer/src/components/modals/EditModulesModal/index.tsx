@@ -16,9 +16,9 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
-  THERMOCYCLER_MODULE_V1,
   ModuleType,
   ModuleModel,
+  THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import {
@@ -36,7 +36,10 @@ import {
   getAllModuleSlotsByType,
 } from '../../../modules/moduleData'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
-import { MODELS_FOR_MODULE_TYPE } from '../../../constants'
+import {
+  MODELS_FOR_MODULE_TYPE,
+  MODELS_FOR_MODULE_TYPE_NO_FF,
+} from '../../../constants'
 import { PDAlert } from '../../alerts/PDAlert'
 import { isModuleWithCollisionIssue } from '../../modules'
 import modalStyles from '../modal.css'
@@ -76,6 +79,9 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
     onCloseClick,
     moduleOnDeck,
   } = props
+  const enableThermocyclerGen2 = useSelector(
+    featureFlagSelectors.getEnabledThermocyclerGen2
+  )
   const supportedModuleSlot = SUPPORTED_MODULE_SLOTS[moduleType][0].value
   const initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const dispatch = useDispatch()
@@ -103,7 +109,9 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
   const initialValues = moduleIsThermocycler
     ? {
         selectedSlot: moduleOnDeck?.slot || supportedModuleSlot,
-        selectedModel: THERMOCYCLER_MODULE_V1,
+        selectedModel: enableThermocyclerGen2
+          ? moduleOnDeck?.model || null
+          : THERMOCYCLER_MODULE_V1,
       }
     : {
         selectedSlot: moduleOnDeck?.slot || supportedModuleSlot,
@@ -224,6 +232,9 @@ const EditModulesModalComponent = (
   const { moduleType, onCloseClick, supportedModuleSlot } = props
   const { values, errors, isValid } = useFormikContext<EditModulesFormValues>()
   const { selectedModel } = values
+  const enableThermocyclerGen2 = useSelector(
+    featureFlagSelectors.getEnabledThermocyclerGen2
+  )
 
   const disabledModuleRestriction = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
@@ -272,7 +283,11 @@ const EditModulesModalComponent = (
               <ModelDropdown
                 fieldName={'selectedModel'}
                 tabIndex={0}
-                options={MODELS_FOR_MODULE_TYPE[moduleType]}
+                options={
+                  enableThermocyclerGen2
+                    ? MODELS_FOR_MODULE_TYPE[moduleType]
+                    : MODELS_FOR_MODULE_TYPE_NO_FF[moduleType]
+                }
               />
             </FormGroup>
             {showSlotOption && (

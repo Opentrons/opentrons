@@ -45,7 +45,12 @@ const HIDE_SCROLLBAR = css`
 `
 
 export function SetupLiquidsList(props: SetupLiquidsListProps): JSX.Element {
-  const liquidsInLoadOrder = parseLiquidsInLoadOrder()
+  const { runId } = props
+  const protocolData = useProtocolDetailsForRun(runId).protocolData
+  const liquidsInLoadOrder = parseLiquidsInLoadOrder(
+    protocolData?.liquids ?? {},
+    protocolData?.commands ?? []
+  )
 
   return (
     <Flex
@@ -58,8 +63,8 @@ export function SetupLiquidsList(props: SetupLiquidsListProps): JSX.Element {
     >
       {liquidsInLoadOrder?.map(liquid => (
         <LiquidsListItem
-          key={liquid.liquidId}
-          liquidId={liquid.liquidId}
+          key={liquid.id}
+          liquidId={liquid.id}
           description={liquid.description}
           displayColor={liquid.displayColor}
           displayName={liquid.displayName}
@@ -86,7 +91,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
     string | null
   >(null)
   const commands = useProtocolDetailsForRun(runId).protocolData?.commands
-  const labwareByLiquidId = parseLabwareInfoByLiquidId()
+  const labwareByLiquidId = parseLabwareInfoByLiquidId(commands ?? [])
 
   const LIQUID_CARD_STYLE = css`
     ${BORDERS.cardOutlineBorder}

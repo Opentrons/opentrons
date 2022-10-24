@@ -6,15 +6,11 @@ This module provides things like :py:class:`ModuleGeometry` and
 objects on the deck (as opposed to calling commands on them, which is handled
 by :py:mod:`.module_contexts`)
 """
-import functools
+from __future__ import annotations
 import logging
-import re
-from typing import Mapping, Optional, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 import numpy as np
-import jsonschema  # type: ignore[import]
-
-from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
 
 from opentrons_shared_data import module
 from opentrons_shared_data.labware.dev_types import LabwareUri
@@ -26,6 +22,7 @@ from opentrons.motion_planning.adjacent_slots_getters import (
     get_adjacent_slots,
 )
 
+from opentrons.drivers.types import ThermocyclerLidStatus
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     ModuleType,
@@ -34,52 +31,24 @@ from opentrons.hardware_control.modules.types import (
     ThermocyclerModuleModel,
     HeaterShakerModuleModel,
 )
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.definitions import (
-    MAX_SUPPORTED_VERSION,
-    POST_V1_MODULE_DEF_VERSION,
-)
 from opentrons.protocols.geometry.deck_item import DeckItem
-from opentrons.protocol_api.labware import Labware
 
-from .types import GenericConfiguration, ThermocyclerConfiguration
+from .types import ThermocyclerConfiguration
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.module.dev_types import (
-        ModuleDefinitionV1,
-        ModuleDefinitionV3,
-    )
-
-
-def module_model_from_string(model_string: str) -> ModuleModel:
-    for model_enum in {
-        MagneticModuleModel,
-        TemperatureModuleModel,
-        ThermocyclerModuleModel,
-        HeaterShakerModuleModel,
-    }:
-        try:
-            return model_enum(model_string)
-        except ValueError:
-            pass
-    raise AttributeError(f"No such module model {model_string}")
+    from opentrons.protocol_api.labware import Labware
+    from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
 
 
 log = logging.getLogger(__name__)
 
 
-class NoSuchModuleError(Exception):
-    def __init__(self, message: str, requested_module: ModuleModel) -> None:
-        self.message = message
-        self.requested_module = requested_module
-        super().__init__()
-
-    def __str__(self) -> str:
-        return self.message
+class NoSuchModuleError(ValueError):
+    """An error raised if a requested model does not match a known module."""
 
 
 class PipetteMovementRestrictedByHeaterShakerError(Exception):
-    """Error raised when trying to move to labware restricted by heater-shaker."""
+    """Error raised when trying to move to labware restricted by Heater-Shaker."""
 
 
 # TODO (spp, 2022-05-09): add tests
@@ -105,7 +74,6 @@ class ModuleGeometry(DeckItem):
         overall_height: float,
         height_over_labware: float,
         parent: Location,
-        api_level: APIVersion,
     ) -> None:
         """
         Create a Module for tracking the position of a module.
@@ -131,12 +99,7 @@ class ModuleGeometry(DeckItem):
                        the outside of the module (usually the front-left corner
                        of a slot on the deck).
         :type parent: :py:class:`.Location`
-        :param APIVersion api_level: the API version to set for the loaded
-                                     :py:class:`ModuleGeometry` instance. The
-                                     :py:class:`ModuleGeometry` will
-                                     conform to this level.
         """
-        self._api_version = api_level
         self._parent = parent
         self._module_type = module_type
 
@@ -148,10 +111,6 @@ class ModuleGeometry(DeckItem):
         self._over_labware = height_over_labware
         self._labware: Optional[Labware] = None
         self._location = Location(point=self._offset + self._parent.point, labware=self)
-
-    @property
-    def api_version(self) -> APIVersion:
-        return self._api_version
 
     def add_labware(self, labware: Labware) -> Labware:
         assert not self._labware, "{} is already on this module".format(self._labware)
@@ -220,8 +179,7 @@ class ThermocyclerGeometry(ModuleGeometry):
         height_over_labware: float,
         lid_height: float,
         parent: Location,
-        api_level: APIVersion,
-        configuration: GenericConfiguration = ThermocyclerConfiguration.FULL,
+        configuration: ThermocyclerConfiguration = ThermocyclerConfiguration.FULL,
     ) -> None:
         """
         Create a Module for tracking the position of a module.
@@ -247,10 +205,6 @@ class ThermocyclerGeometry(ModuleGeometry):
                        the outside of the module (usually the front-left corner
                        of a slot on the deck).
         :type parent: :py:class:`.Location`
-        :param APIVersion api_level: the API version to set for the loaded
-                                     :py:class:`ModuleGeometry` instance. The
-                                     :py:class:`ModuleGeometry` will
-                                     conform to this level.
         :param configuration: Used to specify the slot configuration of
                               the Thermocycler. It should by of type
                               :py:class:`.ThermocyclerConfiguration` and can
@@ -264,10 +218,9 @@ class ThermocyclerGeometry(ModuleGeometry):
             overall_height,
             height_over_labware,
             parent,
-            api_level,
         )
         self._lid_height = lid_height
-        self._lid_status = "open"  # Needs to reflect true status
+        self._lid_status = ThermocyclerLidStatus.OPEN  # Needs to reflect true status
         self._configuration = configuration
         if self.is_semi_configuration:
             self._offset = self._offset + Point(-23.28, 0, 0)
@@ -286,7 +239,7 @@ class ThermocyclerGeometry(ModuleGeometry):
         return super().highest_z
 
     @property
-    def lid_status(self) -> str:
+    def lid_status(self) -> ThermocyclerLidStatus:
         return self._lid_status
 
     @lid_status.setter
@@ -306,12 +259,16 @@ class ThermocyclerGeometry(ModuleGeometry):
 
     # NOTE: this func is unused until "semi" configuration
     def labware_accessor(self, labware: Labware) -> Labware:
+        from opentrons.protocol_api.labware import Labware
+        from opentrons.protocol_api.core.protocol_api.labware import (
+            LabwareImplementation,
+        )
+
         # Block first three columns from being accessed
         definition = labware._implementation.get_definition()
         definition["ordering"] = definition["ordering"][2::]
         return Labware(
             implementation=LabwareImplementation(definition, super().location),
-            api_level=self._api_version,
         )
 
     def add_labware(self, labware: Labware) -> Labware:
@@ -344,14 +301,14 @@ class ThermocyclerGeometry(ModuleGeometry):
 
 
 class HeaterShakerGeometry(ModuleGeometry):
-    """Class holding the state of a heater-shaker's physical geometry."""
+    """Class holding the state of a Heater-Shaker's physical geometry."""
 
     # TODO(mc, 2022-06-16): move these constants to the module definition
     MAX_X_ADJACENT_ITEM_HEIGHT = 53.0
     """Maximum height of an adjacent item in the x-direction.
 
     This value selected to avoid interference
-    with the heater-shaker's labware latch.
+    with the Heater-Shaker's labware latch.
 
     For background, see: https://github.com/Opentrons/opentrons/issues/10316
     """
@@ -372,29 +329,6 @@ class HeaterShakerGeometry(ModuleGeometry):
     For background, see: https://github.com/Opentrons/opentrons/issues/10316
     """
 
-    def __init__(
-        self,
-        display_name: str,
-        model: ModuleModel,
-        module_type: ModuleType,
-        offset: Point,
-        overall_height: float,
-        height_over_labware: float,
-        parent: Location,
-        api_level: APIVersion,
-    ) -> None:
-        """Heater-Shaker geometry constructor. Inherits from ModuleGeometry."""
-        super().__init__(
-            display_name,
-            model,
-            module_type,
-            offset,
-            overall_height,
-            height_over_labware,
-            parent,
-            api_level,
-        )
-
     def flag_unsafe_move(
         self,
         to_slot: int,
@@ -403,7 +337,7 @@ class HeaterShakerGeometry(ModuleGeometry):
         is_labware_latch_closed: bool,
         is_plate_shaking: bool,
     ) -> None:
-        """Raise error if unsafe to move pipette due to heater-shaker placement."""
+        """Raise error if unsafe to move pipette due to Heater-Shaker placement."""
         assert isinstance(self.parent, str), "Could not determine module slot location"
 
         heater_shaker_slot = int(self.parent)
@@ -411,7 +345,7 @@ class HeaterShakerGeometry(ModuleGeometry):
         dest_north_south = to_slot in get_north_south_slots(heater_shaker_slot)
         dest_heater_shaker = to_slot == heater_shaker_slot
 
-        # If heater-shaker is running, can't move to or around it
+        # If Heater-Shaker is running, can't move to or around it
         if (
             any([dest_east_west, dest_north_south, dest_heater_shaker])
             and is_plate_shaking
@@ -420,31 +354,31 @@ class HeaterShakerGeometry(ModuleGeometry):
                 "Cannot move pipette to Heater-Shaker or adjacent slot while module is shaking"
             )
 
-        # If heater-shaker's latch is open, can't move to it or east and west of it
+        # If Heater-Shaker's latch is open, can't move to it or east and west of it
         elif (dest_east_west or dest_heater_shaker) and not is_labware_latch_closed:
             raise PipetteMovementRestrictedByHeaterShakerError(
-                "Cannot move pipette east or west of or to Heater-Shaker while latch is open"
+                "Cannot move pipette to Heater-Shaker or adjacent slot to the left or right while labware latch is open"
             )
 
         elif is_using_multichannel:
             # Can't go to east/west slot under any circumstances if pipette is multi-channel
             if dest_east_west:
                 raise PipetteMovementRestrictedByHeaterShakerError(
-                    "Cannot move multi-channel pipette east or west of Heater-Shaker"
+                    "Cannot move 8-Channel pipette to slot adjacent to the left or right of Heater-Shaker"
                 )
             # Can only go north/south if the labware is a tip rack
             elif dest_north_south and not is_tiprack:
                 raise PipetteMovementRestrictedByHeaterShakerError(
-                    "Cannot move multi-channel pipette to non-tip rack labware north or south of Heater-Shaker"
+                    "Cannot move 8-Channel pipette to non-tip-rack labware directly in front of or behind a Heater-Shaker"
                 )
 
     def is_pipette_blocking_shake_movement(
         self, pipette_location: Optional[Location]
     ) -> bool:
-        """Check whether pipette is parked adjacent to heater-shaker.
+        """Check whether pipette is parked adjacent to Heater-Shaker.
 
-        Returns True if pipette's last known location was on east/west/north/south of or
-        on the heater-shaker. Also returns True if last location is not known or is
+        Returns True if pipette's last known location was in a slot adjacent to or
+        on the Heater-Shaker. Also returns True if last location is not known or is
         not associated with a slot.
         """
         if pipette_location is None:
@@ -472,11 +406,11 @@ class HeaterShakerGeometry(ModuleGeometry):
     def is_pipette_blocking_latch_movement(
         self, pipette_location: Optional[Location]
     ) -> bool:
-        """Check whether pipette is parked east or west of heater-shaker.
+        """Check whether pipette is parked left or right of Heater-Shaker.
 
-        Returns True is pipette's last known location was on east/west of or on the
-        heater-shaker. Also returns True if last location is not known or is not
-        associated with a slot.
+        Returns True is pipette's last known location was on the Heater-Shaker
+        or in a slot adjacent to its left or right. Also returns True if last
+        location is not known or is not associated with a slot.
         """
         if pipette_location is None:
             # If we don't know the pipette's latest location then let's be extra
@@ -501,71 +435,15 @@ class HeaterShakerGeometry(ModuleGeometry):
         ) in get_east_west_slots(int(heater_shaker_slot))
 
 
-def _load_from_v1(
-    definition: "ModuleDefinitionV1", parent: Location, api_level: APIVersion
+def create_geometry(
+    definition: ModuleDefinitionV3,
+    parent: Location,
+    configuration: Optional[str],
 ) -> ModuleGeometry:
-    """Load a module geometry from a v1 definition.
+    """Create a module geometry object from the module's definition and location.
 
     The definition should be schema checked before being passed to this
     function; all definitions passed here are assumed to be valid.
-    """
-    mod_name = definition["loadName"]
-    model_lookup: Mapping[str, ModuleModel] = {
-        "thermocycler": ThermocyclerModuleModel.THERMOCYCLER_V1,
-        "magdeck": MagneticModuleModel.MAGNETIC_V1,
-        "tempdeck": TemperatureModuleModel.TEMPERATURE_V1,
-    }
-    type_lookup = {
-        "thermocycler": ModuleType.THERMOCYCLER,
-        "tempdeck": ModuleType.TEMPERATURE,
-        "magdeck": ModuleType.MAGNETIC,
-    }
-    model = model_lookup[mod_name]
-    offset = Point(
-        definition["labwareOffset"]["x"],
-        definition["labwareOffset"]["y"],
-        definition["labwareOffset"]["z"],
-    )
-    overall_height = definition["dimensions"]["bareOverallHeight"]
-    height_over_labware = definition["dimensions"]["overLabwareHeight"]
-
-    if model in ThermocyclerModuleModel:
-        lid_height = definition["dimensions"]["lidHeight"]
-        mod: ModuleGeometry = ThermocyclerGeometry(
-            definition["displayName"],
-            model,
-            type_lookup[mod_name],
-            offset,
-            overall_height,
-            height_over_labware,
-            lid_height,
-            parent,
-            api_level,
-        )
-    else:
-        mod = ModuleGeometry(
-            definition["displayName"],
-            model,
-            type_lookup[mod_name],
-            offset,
-            overall_height,
-            height_over_labware,
-            parent,
-            api_level,
-        )
-    return mod
-
-
-def _load_from_v3(
-    definition: "ModuleDefinitionV3",
-    parent: Location,
-    api_level: APIVersion,
-    configuration: GenericConfiguration,
-) -> ModuleGeometry:
-    """Load a module geometry from a v3 definition.
-
-    The definition should be schema checked before being passed to this
-     function; all definitions passed here are assumed to be valid.
     """
     pre_transform = np.array(
         (definition["labwareOffset"]["x"], definition["labwareOffset"]["y"], 1)
@@ -591,13 +469,11 @@ def _load_from_v3(
     # apply the slot transform if any
     xform = np.array(xform_ser)
     xformed = np.dot(xform, pre_transform)
-    if definition["moduleType"] in {
-        ModuleType.MAGNETIC.value,
-        ModuleType.TEMPERATURE.value,
-    }:
+    module_type = ModuleType(definition["moduleType"])
+
+    if module_type == ModuleType.MAGNETIC or module_type == ModuleType.TEMPERATURE:
         return ModuleGeometry(
             parent=parent,
-            api_level=api_level,
             offset=Point(xformed[0], xformed[1], definition["labwareOffset"]["z"]),
             overall_height=definition["dimensions"]["bareOverallHeight"],
             height_over_labware=definition["dimensions"]["overLabwareHeight"],
@@ -605,10 +481,9 @@ def _load_from_v3(
             module_type=ModuleType(definition["moduleType"]),
             display_name=definition["displayName"],
         )
-    elif definition["moduleType"] == ModuleType.THERMOCYCLER.value:
+    elif module_type == ModuleType.THERMOCYCLER:
         return ThermocyclerGeometry(
             parent=parent,
-            api_level=api_level,
             offset=Point(xformed[0], xformed[1], definition["labwareOffset"]["z"]),
             overall_height=definition["dimensions"]["bareOverallHeight"],
             height_over_labware=definition["dimensions"]["overLabwareHeight"],
@@ -616,12 +491,15 @@ def _load_from_v3(
             module_type=ModuleType(definition["moduleType"]),
             display_name=definition["displayName"],
             lid_height=definition["dimensions"]["lidHeight"],
-            configuration=configuration,
+            configuration=(
+                ThermocyclerConfiguration(configuration)
+                if configuration is not None
+                else ThermocyclerConfiguration.FULL
+            ),
         )
-    elif definition["moduleType"] == ModuleType.HEATER_SHAKER.value:
+    elif module_type == ModuleType.HEATER_SHAKER:
         return HeaterShakerGeometry(
             parent=parent,
-            api_level=api_level,
             offset=Point(xformed[0], xformed[1], definition["labwareOffset"]["z"]),
             overall_height=definition["dimensions"]["bareOverallHeight"],
             height_over_labware=definition["dimensions"]["overLabwareHeight"],
@@ -629,210 +507,38 @@ def _load_from_v3(
             module_type=ModuleType(definition["moduleType"]),
             display_name=definition["displayName"],
         )
+
     else:
-        raise RuntimeError(f'Unknown module type {definition["moduleType"]}')
+        raise AssertionError(f"Module type {module_type} is invalid")
 
 
-def load_module_from_definition(
-    definition: Union["ModuleDefinitionV1", "ModuleDefinitionV3"],
-    parent: Location,
-    api_level: APIVersion = None,
-    configuration: GenericConfiguration = ThermocyclerConfiguration.FULL,
-) -> ModuleGeometry:
-    """
-    Return a :py:class:`ModuleGeometry` object from a specified definition
-    matching the v1 module definition schema
-
-    :param definition: A dict representing the full module definition adhering
-                       to the v1 module schema
-    :param parent: A :py:class:`.Location` representing the location where
-                   the front and left most point of the outside of the module
-                   is (often the front-left corner of a slot on the deck).
-    :param APIVersion api_level: the API version to set for the loaded
-                                 :py:class:`ModuleGeometry` instance. The
-                                 :py:class:`ModuleGeometry` will
-                                 conform to this level. If not specified,
-                                 defaults to :py:attr:`.MAX_SUPPORTED_VERSION`.
-    """
-    api_level = api_level or MAX_SUPPORTED_VERSION
-    # def not yet discriminated, mypy returns `object` type
-    schema = definition.get("$otSharedSchema")
-    if not schema:
-        # v1 definitions don't have schema versions
-        # but unfortunately we can't tell mypy that because it can only
-        # discriminate unions based on literal tags or similar, not the
-        # presence or absence of keys
-        v1def: "ModuleDefinitionV1" = definition  # type: ignore
-        return _load_from_v1(v1def, parent, api_level)
-
-    if schema == "module/schemas/3":
-        schema_doc = module.load_schema("3")
-        try:
-            jsonschema.validate(definition, schema_doc)
-        except jsonschema.ValidationError:
-            log.exception("Failed to validate module def schema")
-            raise RuntimeError("The specified module definition is not valid.")
-        # mypy can't tell these apart, but we've schema validated it - this is
-        # the right type
-        v3def: "ModuleDefinitionV3" = definition  # type: ignore[assignment]
-        return _load_from_v3(v3def, parent, api_level, configuration)
-
-    elif isinstance(schema, str):
-        maybe_schema = re.match("^module/schemas/([0-9]+)$", schema)
-        if maybe_schema:
-            raise RuntimeError(
-                f"Module definitions of schema version {maybe_schema.group(1)}"
-                " are not supported in this robot software release."
-            )
-    log.error(f"Bad module definition (schema specifier {schema})")
-    raise RuntimeError("The specified module definition is not valid.")
-
-
-def _load_v1_module_def(module_model: ModuleModel) -> "ModuleDefinitionV1":
-    v1names = {
-        MagneticModuleModel.MAGNETIC_V1: "magdeck",
-        TemperatureModuleModel.TEMPERATURE_V1: "tempdeck",
-        ThermocyclerModuleModel.THERMOCYCLER_V1: "thermocycler",
-    }
+def load_definition(model: str) -> ModuleDefinitionV3:
+    """Load the geometry definition of a given module by model."""
     try:
-        name = v1names[module_model]
-    except KeyError:
-        raise NoSuchModuleError(
-            f"Could not find module {module_model.value}", module_model
-        )
-    return module.load_definition("1", name)
-
-
-def _load_v3_module_def(module_model: ModuleModel) -> "ModuleDefinitionV3":
-    try:
-        return module.load_definition("3", module_model.value)
+        return module.load_definition("3", model)
     except module.ModuleNotFoundError:
-        raise NoSuchModuleError(
-            f"Could not find the module {module_model.value} in the "
-            f"specified API version.",
-            module_model,
-        )
+        raise NoSuchModuleError(f'Could not find a module with model "{model}"')
 
 
-@functools.lru_cache(maxsize=128)
-def _load_module_definition(
-    api_level: APIVersion, module_model: ModuleModel
-) -> Union["ModuleDefinitionV3", "ModuleDefinitionV1"]:
-    """
-    Load the appropriate module definition for this api version
-    """
-
-    if api_level < POST_V1_MODULE_DEF_VERSION:
-        try:
-            return _load_v1_module_def(module_model)
-        except NoSuchModuleError:
-            try:
-                dname = _load_v3_module_def(module_model)["displayName"]
-            except NoSuchModuleError:
-                dname = module_model.value
-            raise NoSuchModuleError(
-                f"API version {api_level} does not support the module "
-                f"{dname}. Please use at least version "
-                f"{POST_V1_MODULE_DEF_VERSION} to use this module.",
-                module_model,
-            )
-    else:
-        return _load_v3_module_def(module_model)
-
-
-def load_module(
-    model: ModuleModel,
-    parent: Location,
-    api_level: APIVersion = None,
-    configuration: str = None,
-) -> ModuleGeometry:
-    """
-    Return a :py:class:`ModuleGeometry` object from a definition looked up
-    by name.
-
-    :param model: The module model to use. This should be one of the strings
-                  returned by :py:func:`ModuleGeometry.resolve_module_model`
-    :param parent: A :py:class:`.Location` representing the location where
-                   the front and left most point of the outside of the module
-                   is (often the front-left corner of a slot on the deck).
-    :param APIVersion api_level: the API version to set for the loaded
-                                 :py:class:`ModuleGeometry` instance. The
-                                 :py:class:`ModuleGeometry` will
-                                 conform to this level. If not specified,
-                                 defaults to :py:attr:`.MAX_SUPPORTED_VERSION`.
-    :param configuration: Used to specify the slot configuration of
-                        the Thermocycler. Only Valid in Python API
-                        Version 2.4 and later. If you wish to use
-                        the non-full plate configuration, you must
-                        pass in the key word value `semi`
-    """
-    api_level = api_level or MAX_SUPPORTED_VERSION
-    defn = _load_module_definition(api_level, model)
-    if configuration:
-        # Here we are converting the string passed in to a
-        # configuration type. For now we only have
-        # Thermocycler configurations, but there could be others
-        # in the future
-        return load_module_from_definition(
-            defn,
-            parent,
-            api_level,
-            ThermocyclerConfiguration.configuration_type(configuration),
-        )
-    else:
-        return load_module_from_definition(defn, parent, api_level)
-
-
-def resolve_module_model(module_model_or_load_name: str) -> ModuleModel:
-    """Turn any of the supported APIv2 load names into module model names."""
-
-    model_map: Mapping[str, ModuleModel] = {
-        "magneticModuleV1": MagneticModuleModel.MAGNETIC_V1,
-        "magneticModuleV2": MagneticModuleModel.MAGNETIC_V2,
-        "temperatureModuleV1": TemperatureModuleModel.TEMPERATURE_V1,
-        "temperatureModuleV2": TemperatureModuleModel.TEMPERATURE_V2,
-        "thermocyclerModuleV1": ThermocyclerModuleModel.THERMOCYCLER_V1,
-        "thermocyclerModuleV2": ThermocyclerModuleModel.THERMOCYCLER_V2,
-        "heaterShakerModuleV1": HeaterShakerModuleModel.HEATER_SHAKER_V1,
-    }
-
-    alias_map: Mapping[str, ModuleModel] = {
-        "magdeck": MagneticModuleModel.MAGNETIC_V1,
-        "magnetic module": MagneticModuleModel.MAGNETIC_V1,
-        "magnetic module gen2": MagneticModuleModel.MAGNETIC_V2,
-        "tempdeck": TemperatureModuleModel.TEMPERATURE_V1,
-        "temperature module": TemperatureModuleModel.TEMPERATURE_V1,
-        "temperature module gen2": TemperatureModuleModel.TEMPERATURE_V2,
-        "thermocycler": ThermocyclerModuleModel.THERMOCYCLER_V1,
-        "thermocycler module": ThermocyclerModuleModel.THERMOCYCLER_V1,
-        "thermocycler module gen2": ThermocyclerModuleModel.THERMOCYCLER_V2,
-        # No alias for heater-shaker. Use heater-shaker model name for loading.
-    }
-
-    lower_name = module_model_or_load_name.lower()
-    resolved_name = model_map.get(module_model_or_load_name, None) or alias_map.get(
-        lower_name, None
+def models_compatible(
+    requested_model: ModuleModel, candidate_definition: ModuleDefinitionV3
+) -> bool:
+    """Check if a requested model is compatible with a given definition."""
+    return (
+        requested_model.value == candidate_definition["model"]
+        or requested_model.value in candidate_definition["compatibleWith"]
     )
-    if not resolved_name:
-        raise ValueError(
-            f"{module_model_or_load_name} is not a valid module load name.\n"
-            "Valid names (ignoring case): "
-            '"'
-            + '", "'.join(alias_map.keys())
-            + '"\n'
-            + "You can also refer to modules by their "
-            + "exact model: "
-            '"' + '", "'.join(model_map.keys()) + '"'
-        )
-    return resolved_name
 
 
-def resolve_module_type(module_model: ModuleModel) -> ModuleType:
-    return ModuleType(_load_v3_module_def(module_model)["moduleType"])
-
-
-def models_compatible(model_a: ModuleModel, model_b: ModuleModel) -> bool:
-    """Check if two module models may be considered the same"""
-    if model_a == model_b:
-        return True
-    return model_b.value in _load_v3_module_def(model_a)["compatibleWith"]
+def module_model_from_string(model_string: str) -> ModuleModel:
+    for model_enum in {
+        MagneticModuleModel,
+        TemperatureModuleModel,
+        ThermocyclerModuleModel,
+        HeaterShakerModuleModel,
+    }:
+        try:
+            return model_enum(model_string)
+        except ValueError:
+            pass
+    raise ValueError(f"No such module model {model_string}")

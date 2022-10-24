@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 typing-extensions = "==3.10.0.0"
 pyserial = "==3.5"
+pyudev = "==0.24.0"
 
 [dev-packages]
 ot3usb = {path = ".", editable = true}
@@ -13,10 +14,13 @@ flake8 = "~=3.9.0"
 flake8-annotations = "~=2.6.2"
 flake8-docstrings = "~=1.6.0"
 flake8-noqa = "~=1.1.0"
-pytest = "==6.1.0"
+pytest = "==7.0.1"
+pytest-asyncio = "~=0.18"
+pytest-lazy-fixture = "==0.6.3"
 pytest-watch = "~=4.2.0"
 pytest-cov = "==2.10.1"
 pytest-aiohttp = "==0.3.0"
+pytest-xdist = "~=2.2.1"
 coverage = "==5.1"
 # atomicwrites and colorama are pytest dependencies on windows,
 # spec'd here to force lockfile inclusion
@@ -26,6 +30,8 @@ colorama = {version="==0.4.4", sys_platform="== 'win32'"}
 mypy = "==0.940"
 black = "==22.3.0"
 decoy = "~=1.10"
+mock = "~=4.0.2"
+types-mock = "==4.0.1"
 
 [requires]
 python_version = "3.7"

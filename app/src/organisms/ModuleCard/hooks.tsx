@@ -32,6 +32,8 @@ import type {
   TCDeactivateBlockCreateCommand,
   TCDeactivateLidCreateCommand,
   TemperatureModuleDeactivateCreateCommand,
+  TCOpenLidCreateCommand,
+  TCCloseLidCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 import type { AttachedModule } from '../../redux/modules/types'
@@ -87,7 +89,6 @@ export type MenuItemsByModuleType = {
   [moduleType in AttachedModule['moduleType']]: Array<{
     setSetting: string
     isSecondary: boolean
-    disabledReason: boolean
     menuButtons: JSX.Element[] | null
     onClick: (isSecondary: boolean) => void
   }>
@@ -172,6 +173,7 @@ export function useModuleOverflowMenu(
       key={`hs_attach_to_deck_${module.moduleModel}`}
       data-testid={`hs_attach_to_deck_${module.moduleModel}`}
       onClick={() => handleWizardClick()}
+      whiteSpace="nowrap"
     >
       {t('heater_shaker:show_attachment_instructions')}
     </MenuItem>
@@ -235,6 +237,46 @@ export function useModuleOverflowMenu(
     }
   }
 
+  const lidCommand: TCOpenLidCreateCommand | TCCloseLidCreateCommand = {
+    commandType:
+      module.moduleType === THERMOCYCLER_MODULE_TYPE &&
+      module.data.lidStatus === 'open'
+        ? 'thermocycler/closeLid'
+        : 'thermocycler/openLid',
+    params: {
+      moduleId: module.id,
+    },
+  }
+
+  const controlTCLid = (): void => {
+    createLiveCommand({
+      command: lidCommand,
+    }).catch((e: Error) => {
+      console.error(
+        `error setting thermocycler module status with command type ${lidCommand.commandType}: ${e.message}`
+      )
+    })
+  }
+
+  const sendBlockTempCommand =
+    module.moduleType === THERMOCYCLER_MODULE_TYPE &&
+    module.data.targetTemperature != null
+      ? () => handleDeactivationCommand('thermocycler/deactivateBlock')
+      : () => handleSlideoutClick(false)
+
+  const thermoSetBlockTempBtn = (
+    <MenuItem
+      key={`thermocycler_block_temp_command_btn_${module.moduleModel}`}
+      onClick={sendBlockTempCommand}
+      disabled={isDisabled}
+      whiteSpace="nowrap"
+    >
+      {module.data.status !== 'idle'
+        ? t('overflow_menu_deactivate_block')
+        : t('overflow_menu_set_block_temp')}
+    </MenuItem>
+  )
+
   const menuOverflowItemsByModuleType = {
     thermocyclerModuleType: [
       {
@@ -244,7 +286,6 @@ export function useModuleOverflowMenu(
             ? t('overflow_menu_deactivate_lid')
             : t('overflow_menu_lid_temp'),
         isSecondary: true,
-        disabledReason: false,
         menuButtons: null,
         onClick:
           module.moduleType === THERMOCYCLER_MODULE_TYPE &&
@@ -255,17 +296,12 @@ export function useModuleOverflowMenu(
       {
         setSetting:
           module.moduleType === THERMOCYCLER_MODULE_TYPE &&
-          module.data.status !== 'idle'
-            ? t('overflow_menu_deactivate_block')
-            : t('overflow_menu_set_block_temp'),
+          module.data.lidStatus === 'open'
+            ? t('close_lid')
+            : t('open_lid'),
         isSecondary: false,
-        disabledReason: false,
-        menuButtons: [aboutModuleBtn],
-        onClick:
-          module.moduleType === THERMOCYCLER_MODULE_TYPE &&
-          module.data.targetTemperature != null
-            ? () => handleDeactivationCommand('thermocycler/deactivateBlock')
-            : () => handleSlideoutClick(false),
+        menuButtons: [thermoSetBlockTempBtn, aboutModuleBtn],
+        onClick: controlTCLid,
       },
     ],
     temperatureModuleType: [
@@ -276,7 +312,6 @@ export function useModuleOverflowMenu(
             ? t('overflow_menu_deactivate_temp')
             : t('overflow_menu_mod_temp'),
         isSecondary: false,
-        disabledReason: false,
         menuButtons: [aboutModuleBtn],
         onClick:
           module.data.status !== 'idle'
@@ -292,7 +327,6 @@ export function useModuleOverflowMenu(
             ? t('overflow_menu_disengage')
             : t('overflow_menu_engage'),
         isSecondary: false,
-        disabledReason: false,
         menuButtons: [aboutModuleBtn],
         onClick:
           module.data.status !== 'disengaged'
@@ -308,7 +342,6 @@ export function useModuleOverflowMenu(
             ? t('heater_shaker:deactivate_heater')
             : t('heater_shaker:set_temperature'),
         isSecondary: false,
-        disabledReason: false,
         menuButtons: [
           labwareLatchBtn,
           aboutModuleBtn,

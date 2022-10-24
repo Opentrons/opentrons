@@ -43,14 +43,14 @@ const mockProtocolDetails: ProtocolDetails = {
 }
 const FAKE_OFFSET_TIPRACK_IN_2: LabwareOffset = {
   id: 'fakeOffsetId',
-  createdAt: 'fakeCreatedAtTimestampTiprack',
+  createdAt: '2021-10-07T18:44:49.366581+00:00',
   location: { slotName: '2' },
   vector: { x: 1, y: 2, z: 3 },
   definitionUri: 'opentrons/opentrons_96_tiprack_300ul/1',
 }
 const FAKE_OFFSET_PLATE_ON_TC: LabwareOffset = {
   id: 'fakeOffsetIdOnTC',
-  createdAt: 'fakeCreatedAtTimestampPlate',
+  createdAt: '2021-09-06T18:44:49.366581+00:00',
   location: { slotName: '7', moduleModel: 'thermocyclerModuleV1' },
   vector: { x: 4, y: 5, z: 6 },
   definitionUri: 'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1',
@@ -96,9 +96,34 @@ describe('useOffsetCandidatesForCurrentRun', () => {
       .mockReturnValue([
         {
           ...mockRunningRun,
+          createdAt: '2021-10-07T18:44:30.366581+00:00',
           labwareOffsets: [
-            { ...FAKE_OFFSET_TIPRACK_IN_2, id: 'first' },
-            { ...FAKE_OFFSET_TIPRACK_IN_2, id: 'second' },
+            {
+              ...FAKE_OFFSET_TIPRACK_IN_2,
+              createdAt: '2021-10-07T18:44:38.366581+00:00',
+              id: 'third',
+            },
+            {
+              ...FAKE_OFFSET_TIPRACK_IN_2,
+              createdAt: '2021-10-07T18:44:49.366581+00:00',
+              id: 'fourth',
+            },
+          ],
+        },
+        {
+          ...mockRunningRun,
+          createdAt: '2021-09-06T18:44:30.366581+00:00',
+          labwareOffsets: [
+            {
+              ...FAKE_OFFSET_TIPRACK_IN_2,
+              createdAt: '2021-09-06T18:44:38.366581+00:00',
+              id: 'first',
+            },
+            {
+              ...FAKE_OFFSET_TIPRACK_IN_2,
+              createdAt: '2021-09-06T18:44:49.366581+00:00',
+              id: 'second',
+            },
           ],
         },
       ])
@@ -109,9 +134,10 @@ describe('useOffsetCandidatesForCurrentRun', () => {
     expect(result.current).toEqual([
       {
         ...FAKE_OFFSET_TIPRACK_IN_2,
-        id: 'first',
+        createdAt: '2021-10-07T18:44:49.366581+00:00',
+        id: 'fourth',
         labwareDisplayName: 'Opentrons 96 Tip Rack 300 µL',
-        runCreatedAt: mockRunningRun.createdAt,
+        runCreatedAt: '2021-10-07T18:44:30.366581+00:00',
       },
     ])
   })

@@ -15,13 +15,11 @@ import {
   TYPOGRAPHY,
   LabwareRender,
 } from '@opentrons/components'
-import {
-  useProtocolDetailsForRun,
-  useLabwareRenderInfoForRunById,
-} from '../../../Devices/hooks'
+import { useProtocolDetailsForRun } from '../../../Devices/hooks'
 import { Modal } from '../../../../molecules/Modal'
 import { StyledText } from '../../../../atoms/text'
 import { getSlotLabwareName } from '../utils/getSlotLabwareName'
+import { getSlotLabwareDefinition } from '../utils/getSlotLabwareDefinition'
 import { LiquidDetailCard } from './LiquidDetailCard'
 import {
   getLiquidsByIdForLabware,
@@ -43,10 +41,13 @@ export const LiquidsLabwareDetailsModal = (
   const { liquidId, labwareId, runId, closeModal } = props
   const { t } = useTranslation('protocol_setup')
   const currentLiquidRef = React.useRef<HTMLDivElement>(null)
-  const labwareRenderInfo = useLabwareRenderInfoForRunById(runId)[labwareId]
-  const commands = useProtocolDetailsForRun(runId).protocolData?.commands
-  const liquids = parseLiquidsInLoadOrder()
-  const labwareByLiquidId = parseLabwareInfoByLiquidId()
+  const protocolData = useProtocolDetailsForRun(runId).protocolData
+  const commands = protocolData?.commands ?? []
+  const liquids = parseLiquidsInLoadOrder(
+    protocolData?.liquids != null ? protocolData?.liquids : {},
+    commands
+  )
+  const labwareByLiquidId = parseLabwareInfoByLiquidId(commands)
   const wellFill = getWellFillFromLabwareId(
     labwareId,
     liquids,
@@ -59,10 +60,10 @@ export const LiquidsLabwareDetailsModal = (
     ?.find(command => command.result.labwareId === labwareId)
   const labwareWellOrdering = loadLabwareCommand?.result.definition.ordering
   const filteredLiquidsInLoadOrder = liquids.filter(liquid => {
-    return Object.keys(labwareInfo).some(key => key === liquid.liquidId)
+    return Object.keys(labwareInfo).some(key => key === liquid.id)
   })
   const [selectedValue, setSelectedValue] = React.useState<typeof liquidId>(
-    liquidId ?? filteredLiquidsInLoadOrder[0].liquidId
+    liquidId ?? filteredLiquidsInLoadOrder[0].id
   )
   const scrollToCurrentItem = (): void => {
     currentLiquidRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -75,7 +76,9 @@ export const LiquidsLabwareDetailsModal = (
       display: none;
     }
   `
-  const liquidIds = filteredLiquidsInLoadOrder.map(liquid => liquid.liquidId)
+  if (protocolData == null) return null
+
+  const liquidIds = filteredLiquidsInLoadOrder.map(liquid => liquid.id)
   const disabledLiquidIds = liquidIds.filter(id => id !== selectedValue)
 
   return (
@@ -103,20 +106,19 @@ export const LiquidsLabwareDetailsModal = (
           >
             {filteredLiquidsInLoadOrder.map((liquid, index) => {
               const labwareInfoEntry = Object.entries(labwareInfo).find(
-                entry => entry[0] === liquid.liquidId
+                entry => entry[0] === liquid.id
               )
               return (
                 labwareInfoEntry != null && (
                   <Flex
                     key={index}
                     ref={
-                      selectedValue === liquid.liquidId
-                        ? currentLiquidRef
-                        : undefined
+                      selectedValue === liquid.id ? currentLiquidRef : undefined
                     }
                   >
                     <LiquidDetailCard
                       {...liquid}
+                      liquidId={liquid.id}
                       volumeByWell={labwareInfoEntry[1][0].volumeByWell}
                       labwareWellOrdering={labwareWellOrdering}
                       setSelectedValue={setSelectedValue}
@@ -174,7 +176,10 @@ export const LiquidsLabwareDetailsModal = (
             <Flex flex="1 1 30rem" flexDirection={DIRECTION_COLUMN}>
               <svg viewBox="0 -10 130 100" transform="scale(1, -1)">
                 <LabwareRender
-                  definition={labwareRenderInfo.labwareDef}
+                  definition={getSlotLabwareDefinition(
+                    labwareId,
+                    protocolData.commands
+                  )}
                   wellFill={wellFill}
                   wellLabelOption="SHOW_LABEL_INSIDE"
                   highlightedWells={

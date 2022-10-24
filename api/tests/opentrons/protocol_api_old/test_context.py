@@ -981,8 +981,8 @@ def test_order_of_module_load():
     temp1 = ctx1.load_module("tempdeck", 4)
     ctx1.load_module("thermocycler")
     temp2 = ctx1.load_module("tempdeck", 1)
-    async_temp1 = temp1._module._obj_to_adapt  # type: ignore[union-attr]
-    async_temp2 = temp2._module._obj_to_adapt  # type: ignore[union-attr]
+    async_temp1 = temp1._module._obj_to_adapt
+    async_temp2 = temp2._module._obj_to_adapt
 
     assert id(async_temp1) == id(hw_temp1)
     assert id(async_temp2) == id(hw_temp2)
@@ -999,8 +999,8 @@ def test_order_of_module_load():
     temp1 = ctx2.load_module("tempdeck", 1)
     temp2 = ctx2.load_module("tempdeck", 4)
 
-    async_temp1 = temp1._module._obj_to_adapt  # type: ignore[union-attr]
-    async_temp2 = temp2._module._obj_to_adapt  # type: ignore[union-attr]
+    async_temp1 = temp1._module._obj_to_adapt
+    async_temp2 = temp2._module._obj_to_adapt
     assert id(async_temp1) == id(hw_temp1)
     assert id(async_temp2) == id(hw_temp2)
 

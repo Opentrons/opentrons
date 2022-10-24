@@ -87,7 +87,8 @@ export function UpdateBuildroot(props: UpdateBuildrootProps): JSX.Element {
         robot={robot}
         robotUpdateType={robotUpdateType}
         close={ignoreUpdate}
-        proceed={goToViewUpdate}
+        goToViewUpdate={goToViewUpdate}
+        installUpdate={installUpdate}
       />
     )
   }
