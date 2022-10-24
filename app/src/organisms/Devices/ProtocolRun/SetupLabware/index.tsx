@@ -201,11 +201,19 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
                 extraAttentionModules={moduleTypesThatRequireExtraAttention}
               />
             ) : (
-              <SetupLabwareMap runId={runId} robotName={robotName} />
+              <SetupLabwareMap
+                runId={runId}
+                robotName={robotName}
+                extraAttentionModules={moduleTypesThatRequireExtraAttention}
+              />
             )}
           </>
         ) : (
-          <SetupLabwareMap runId={runId} robotName={robotName} />
+          <SetupLabwareMap
+            runId={runId}
+            robotName={robotName}
+            extraAttentionModules={moduleTypesThatRequireExtraAttention}
+          />
         )}
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
           <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_FLEX_END}>

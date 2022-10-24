@@ -19,6 +19,7 @@ import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fi
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 
 import { i18n } from '../../../../../i18n'
+import { useFeatureFlag } from '../../../../../redux/config'
 import { LabwareInfoOverlay } from '../../LabwareInfoOverlay'
 import { LabwareOffsetModal } from '../../../../ProtocolSetup/RunSetupCard/LabwareSetup/LabwareOffsetModal'
 import {
@@ -27,6 +28,7 @@ import {
 } from '../../../hooks'
 import { SetupLabwareMap } from '../SetupLabwareMap'
 
+jest.mock('../../../../../redux/config')
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
   return {
@@ -77,6 +79,9 @@ const mockUseLabwareRenderInfoForRunById = useLabwareRenderInfoForRunById as jes
 >
 const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById as jest.MockedFunction<
   typeof useModuleRenderInfoForProtocolById
+>
+const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
+  typeof useFeatureFlag
 >
 const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
   (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
@@ -131,6 +136,7 @@ const render = (props: React.ComponentProps<typeof SetupLabwareMap>) => {
 
 describe('SetupLabwareMap', () => {
   beforeEach(() => {
+    when(mockUseFeatureFlag).mockReturnValue(false)
     when(mockInferModuleOrientationFromXCoordinate)
       .calledWith(expect.anything())
       .mockReturnValue(STUBBED_ORIENTATION_VALUE)
@@ -225,6 +231,7 @@ describe('SetupLabwareMap', () => {
     const { getByText } = render({
       robotName: ROBOT_NAME,
       runId: RUN_ID,
+      extraAttentionModules: [],
     })
 
     expect(mockModule).not.toHaveBeenCalled()
@@ -297,6 +304,7 @@ describe('SetupLabwareMap', () => {
     const { getByText } = render({
       robotName: ROBOT_NAME,
       runId: RUN_ID,
+      extraAttentionModules: [],
     })
 
     getByText('mock module viz magneticModuleType')

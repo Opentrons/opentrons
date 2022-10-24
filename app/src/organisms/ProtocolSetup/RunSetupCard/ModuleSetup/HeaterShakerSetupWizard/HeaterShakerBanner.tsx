@@ -25,7 +25,7 @@ export function HeaterShakerBanner(
   const { t } = useTranslation('heater_shaker')
 
   return (
-    <Box marginTop={SPACING.spacing3}>
+    <>
       {modules.map((module, index) => (
         <React.Fragment key={index}>
           {wizardId === module.moduleId && (
@@ -41,32 +41,34 @@ export function HeaterShakerBanner(
               }
             />
           )}
-          <Banner
-            type="informing"
-            onCloseClick={() => setWizardId(module.moduleId)}
-            close={
-              <StyledText
-                as="p"
-                textDecoration={TYPOGRAPHY.textDecorationUnderline}
-              >
-                {t('view_instructions')}
-              </StyledText>
-            }
-          >
-            <Flex flexDirection={DIRECTION_COLUMN}>
-              <StyledText css={TYPOGRAPHY.pSemiBold}>
-                {t('module_in_slot', {
-                  moduleName: module.moduleDef.displayName,
-                  slotName: module.slotName,
-                })}
-              </StyledText>
-              <StyledText as="p">
-                {t('improperly_fastened_description')}
-              </StyledText>
-            </Flex>
-          </Banner>
+          <Box marginTop={SPACING.spacing3}>
+            <Banner
+              type="informing"
+              onCloseClick={() => setWizardId(module.moduleId)}
+              close={
+                <StyledText
+                  as="p"
+                  textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                >
+                  {t('view_instructions')}
+                </StyledText>
+              }
+            >
+              <Flex flexDirection={DIRECTION_COLUMN}>
+                <StyledText css={TYPOGRAPHY.pSemiBold}>
+                  {t('module_in_slot', {
+                    moduleName: module.moduleDef.displayName,
+                    slotName: module.slotName,
+                  })}
+                </StyledText>
+                <StyledText as="p">
+                  {t('improperly_fastened_description')}
+                </StyledText>
+              </Flex>
+            </Banner>
+          </Box>
         </React.Fragment>
       ))}
-    </Box>
+    </>
   )
 }

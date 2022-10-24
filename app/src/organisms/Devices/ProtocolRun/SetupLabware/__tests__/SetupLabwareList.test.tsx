@@ -94,6 +94,17 @@ const mockHeaterShakerAttachedModule = {
   },
   usbPort: { path: '/dev/ot_module_heatershaker0', hub: null, port: 1 },
 }
+
+const mockClosedHeaterShakerAttachedModule = {
+  id: '3e012450-3412-11eb-ad93-ed232a2337cf:heaterShakerModuleType',
+  moduleModel: 'heaterShakerModuleV1',
+  moduleType: 'heaterShakerModuleType',
+  hardwareRevision: 'heatershaker_v4.0',
+  data: {
+    labwareLatchStatus: 'closing',
+  },
+}
+
 describe('SetupLabwareList', () => {
   let props: React.ComponentProps<typeof SetupLabwareList>
   let mockCreateLiveCommand = jest.fn()
@@ -176,7 +187,7 @@ describe('SetupLabwareList', () => {
     expect(hS).toBeDisabled()
   })
 
-  it('renders the correct info when heater shaker is in the protocol and is attached, pressing on button sends command', () => {
+  it('renders the correct info when heater shaker is in the protocol and is attached, pressing on button sends close command', () => {
     when(mockUseProtocolDetailsForRun).calledWith(RUN_ID_1).mockReturnValue({
       displayName: null,
       protocolData: protocolWithHS,
@@ -209,6 +220,47 @@ describe('SetupLabwareList', () => {
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
         commandType: 'heaterShaker/closeLabwareLatch',
+        params: {
+          moduleId: mockHeaterShakerAttachedModule.id,
+        },
+      },
+    })
+  })
+
+  it('renders the correct info when heater shaker is in the protocol and is attached, pressing on button sends open command', () => {
+    when(mockUseProtocolDetailsForRun).calledWith(RUN_ID_1).mockReturnValue({
+      displayName: null,
+      protocolData: protocolWithHS,
+      protocolKey: null,
+    })
+    props = {
+      runId: RUN_ID_1,
+      extraAttentionModules: ['heaterShakerModuleType'],
+      attachedModuleInfo: {
+        [heaterShakerId]: {
+          moduleId: heaterShakerId,
+          x: 1,
+          y: 1,
+          z: 1,
+          moduleDef: mockHeaterShaker as any,
+          nestedLabwareDisplayName: 'Source Plate',
+          nestedLabwareDef: null,
+          nestedLabwareId: null,
+          protocolLoadOrder: 0,
+          slotName: '1',
+          attachedModuleMatch: mockClosedHeaterShakerAttachedModule as AttachedModule,
+        },
+      },
+    }
+    const [{ getByRole, getByText }] = render(props)
+    getByText('To add labware, use the toggle to control the latch')
+    getByText('Labware Latch')
+    getByText('Secure')
+    const toggle = getByRole('switch', { name: 'heaterShaker_0' })
+    toggle.click()
+    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
+      command: {
+        commandType: 'heaterShaker/openLabwareLatch',
         params: {
           moduleId: mockHeaterShakerAttachedModule.id,
         },

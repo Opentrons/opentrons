@@ -17,14 +17,19 @@ import {
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 
 import { i18n } from '../../../../../i18n'
+import { useFeatureFlag } from '../../../../../redux/config'
 import { ModuleInfo } from '../../../../ProtocolSetup/RunSetupCard/ModuleSetup/ModuleInfo'
 import {
   mockThermocycler as mockThermocyclerFixture,
   mockMagneticModule as mockMagneticModuleFixture,
 } from '../../../../../redux/modules/__fixtures__/index'
-import { useModuleRenderInfoForProtocolById } from '../../../hooks'
+import {
+  useModuleRenderInfoForProtocolById,
+  useRunHasStarted,
+} from '../../../hooks'
 import { SetupModulesMap } from '../SetupModulesMap'
 
+jest.mock('../../../../../redux/config')
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
   return {
@@ -45,12 +50,18 @@ jest.mock('../../../hooks')
 const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById as jest.MockedFunction<
   typeof useModuleRenderInfoForProtocolById
 >
+const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
+  typeof useRunHasStarted
+>
 const mockModuleInfo = ModuleInfo as jest.MockedFunction<typeof ModuleInfo>
 const mockInferModuleOrientationFromXCoordinate = inferModuleOrientationFromXCoordinate as jest.MockedFunction<
   typeof inferModuleOrientationFromXCoordinate
 >
 const mockRobotWorkSpace = RobotWorkSpace as jest.MockedFunction<
   typeof RobotWorkSpace
+>
+const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
+  typeof useFeatureFlag
 >
 const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
   (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
@@ -116,7 +127,7 @@ describe('SetupModulesMap', () => {
       robotName: MOCK_ROBOT_NAME,
       runId: MOCK_RUN_ID,
     }
-
+    when(mockUseFeatureFlag).mockReturnValue(false)
     when(mockInferModuleOrientationFromXCoordinate)
       .calledWith(expect.anything())
       .mockReturnValue(STUBBED_ORIENTATION_VALUE)

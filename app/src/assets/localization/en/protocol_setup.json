@@ -139,5 +139,6 @@
   "heater_shaker_labware_list_view": "To add labware, use the toggle to control the latch",
   "labware_latch": "Labware Latch",
   "multiple_modules": "Multiple modules of the same type",
-  "view_moam": "View setup instructions for placing modules of the same type to the robot."
+  "view_moam": "View setup instructions for placing modules of the same type to the robot.",
+  "secure": "Secure"
 }

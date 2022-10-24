@@ -299,13 +299,24 @@ export function LabwareListItem(
                 <StyledText as="h6" minWidth="4.62rem">
                   {t('labware_latch')}
                 </StyledText>
-                <ToggleButton
-                  label={`heaterShaker_${id}`}
-                  disabled={!isCorrectHeaterShakerAttached}
-                  toggledOn={isLatchClosed}
-                  onClick={toggleLatch}
-                  data-testId={`SetupLabwareList_toggleHeaterShaker_${id}`}
-                />
+                <Flex flexDirection={DIRECTION_ROW}>
+                  <ToggleButton
+                    label={`heaterShaker_${id}`}
+                    disabled={!isCorrectHeaterShakerAttached}
+                    toggledOn={isLatchClosed}
+                    onClick={toggleLatch}
+                    data-testId={`SetupLabwareList_toggleHeaterShaker_${id}`}
+                  />
+                  {isLatchClosed ? (
+                    <StyledText
+                      as="p"
+                      marginTop={SPACING.spacing1}
+                      marginLeft={SPACING.spacing2}
+                    >
+                      {t('secure')}
+                    </StyledText>
+                  ) : null}
+                </Flex>
               </Flex>
             </StyledTableCell>
           ) : null}
