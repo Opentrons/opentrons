@@ -410,3 +410,21 @@ async def jog_mount_ot3(
         except PipetteNotAttachedError as e:
             print(e)
     return current_pos
+
+
+async def move_to_arched_ot3(api: OT3API,
+                             mount: OT3Mount,
+                             abs_position: Point,
+                             **kwargs) -> None:
+    """Move OT3 gantry in an arched path."""
+    arch_z = get_endstop_position_ot3(api, mount).z - 1
+    here = await api.current_position_ot3(mount=mount, refresh=True)
+    points = [
+        Point(x=here[OT3Axis.X], y=here[OT3Axis.X], z=arch_z),
+        Point(x=abs_position.x, y=abs_position.y, z=arch_z),
+        Point(x=abs_position.x, y=abs_position.y, z=abs_position.z)
+    ]
+    for p in points:
+        print(p)
+        await api.move_to(mount=mount, abs_position=p, **kwargs)
+    return
