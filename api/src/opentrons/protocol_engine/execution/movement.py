@@ -175,22 +175,6 @@ class MovementHandler:
             position=DeckPoint(x=point.x, y=point.y, z=point.z),
         )
 
-    # async def get_gantry_position(self, pipette_id: str) -> Point:
-    #    pipette_location = self._state_store.motion.get_pipette_location(
-    #        pipette_id=pipette_id,
-    #    )
-    #
-    #    hw_mount = pipette_location.mount.to_hw_mount()
-    #    try:
-    #        point = await self._hardware_api.gantry_position(
-    #            mount=hw_mount,
-    #            critical_point=pip_cp,
-    #            fail_on_not_homed=True,
-    #        )
-    #        return point
-    #    except HardwareMustHomeError as e:
-    #        raise MustHomeError(str(e)) from e
-
     async def save_position(
         self,
         pipette_id: str,
