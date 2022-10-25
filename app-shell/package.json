@@ -32,6 +32,7 @@
     "@opentrons/app": "6.1.0",
     "@opentrons/discovery-client": "6.1.0",
     "@opentrons/shared-data": "6.1.0",
+    "electron": "21.1.0",
     "patch-package": "^6.4.7",
     "postinstall-postinstall": "^2.1.0"
   },
