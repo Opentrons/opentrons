@@ -23,7 +23,12 @@ sqlite_rowid = sqlalchemy.column("_ROWID_")
 
 
 def create_sql_engine(path: Path) -> sqlalchemy.engine.Engine:
-    """Create a SQL engine with tables and migrations."""
+    """Create a SQL engine with tables and migrations.
+
+    Warning:
+        Migrations can take several minutes. If calling this from an async function,
+        offload this to a thread to avoid blocking the event loop.
+    """
     sql_engine = _open_db_no_cleanup(db_file_path=path)
 
     try:
