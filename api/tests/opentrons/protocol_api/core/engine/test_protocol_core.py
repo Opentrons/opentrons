@@ -65,7 +65,9 @@ def subject(mock_engine_client: EngineClient, api_version: APIVersion) -> Protoc
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 3)])
-def test_api_version(decoy: Decoy, subject: ProtocolCore, api_version: APIVersion) -> None:
+def test_api_version(
+    decoy: Decoy, subject: ProtocolCore, api_version: APIVersion
+) -> None:
     """Should return the protocol version."""
     assert subject.api_version == api_version
 
@@ -129,7 +131,7 @@ def test_load_labware_on_module(
     decoy: Decoy,
     mock_engine_client: EngineClient,
     subject: ProtocolCore,
-    api_version: APIVersion
+    api_version: APIVersion,
 ) -> None:
     """It should issue a LoadLabware command."""
     decoy.when(
