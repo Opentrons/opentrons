@@ -16,13 +16,14 @@ import {
 import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
 import { labwareImages } from '../../organisms/CalibrationPanels/labwareImages'
+import { equipmentImages } from './equipmentImages'
 
-interface WizardRequiredLabwareListProps {
-  equipmentList: Array<React.ComponentProps<typeof RequiredLabwareCard>>
+interface WizardRequiredEquipmentListProps {
+  equipmentList: Array<React.ComponentProps<typeof RequiredEquipmentCard>>
   footer: string
 }
-export function WizardRequiredLabwareList(
-  props: WizardRequiredLabwareListProps
+export function WizardRequiredEquipmentList(
+  props: WizardRequiredEquipmentListProps
 ): JSX.Element {
   const { t } = useTranslation('robot_calibration')
   const { equipmentList, footer } = props
@@ -33,10 +34,10 @@ export function WizardRequiredLabwareList(
         {t('you_will_need')}
       </StyledText>
       <Divider />
-      {equipmentList.map(requiredLabwareProps => (
-        <RequiredLabwareCard
-          key={requiredLabwareProps.loadName}
-          {...requiredLabwareProps}
+      {equipmentList.map(requiredEquipmentProps => (
+        <RequiredEquipmentCard
+          key={requiredEquipmentProps.loadName}
+          {...requiredEquipmentProps}
         />
       ))}
       <StyledText
@@ -50,18 +51,21 @@ export function WizardRequiredLabwareList(
   )
 }
 
-interface RequiredLabwareCardProps {
+interface RequiredEquipmentCardProps {
   loadName: string
   displayName: string
   subtitle?: string
 }
 
-function RequiredLabwareCard(props: RequiredLabwareCardProps): JSX.Element {
+function RequiredEquipmentCard(props: RequiredEquipmentCardProps): JSX.Element {
   const { loadName, displayName, subtitle } = props
-  const imageSrc =
-    loadName in labwareImages
-      ? labwareImages[loadName as keyof typeof labwareImages]
-      : labwareImages.generic_custom_tiprack
+
+  let imageSrc: string = labwareImages.generic_custom_tiprack
+  if (loadName in labwareImages) {
+    imageSrc = labwareImages[loadName as keyof typeof labwareImages]
+  } else if (loadName in equipmentImages) {
+    imageSrc = equipmentImages[loadName as keyof typeof equipmentImages]
+  }
 
   return (
     <>

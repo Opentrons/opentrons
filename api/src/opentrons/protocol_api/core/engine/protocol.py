@@ -1,5 +1,5 @@
 """ProtocolEngine-based Protocol API core implementation."""
-from typing import Dict, Optional, Union
+from typing import Dict, Optional, Type, Union
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
@@ -7,20 +7,35 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from opentrons.types import Mount, MountType, Location, DeckSlotName
 from opentrons.hardware_control import SyncHardwareAPI
-from opentrons.hardware_control.modules.types import ModuleModel
+from opentrons.hardware_control.modules.types import (
+    ModuleModel,
+    ModuleType,
+)
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
 
-from opentrons.protocol_engine import DeckSlotLocation
+from opentrons.protocol_engine import (
+    DeckSlotLocation,
+    ModuleLocation,
+    ModuleModel as EngineModuleModel,
+)
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 from .labware import LabwareCore
 from .instrument import InstrumentCore
-from .module_core import ModuleCore
+from .module_core import (
+    ModuleCore,
+    TemperatureModuleCore,
+    MagneticModuleCore,
+    ThermocyclerModuleCore,
+    HeaterShakerModuleCore,
+)
+from .exceptions import InvalidModuleLocationError
 
 
 # TODO(mc, 2022-08-24): many of these methods are likely unnecessary
@@ -35,8 +50,16 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             that is executing the protocol.
     """
 
-    def __init__(self, engine_client: ProtocolEngineClient) -> None:
+    def __init__(
+        self, engine_client: ProtocolEngineClient, api_version: APIVersion
+    ) -> None:
         self._engine_client = engine_client
+        self._api_version = api_version
+
+    @property
+    def api_version(self) -> APIVersion:
+        """Get the api version protocol target."""
+        return self._api_version
 
     def get_bundled_data(self) -> Dict[str, bytes]:
         """Get a map of file names to byte contents.
@@ -90,12 +113,15 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         version: Optional[int],
     ) -> LabwareCore:
         """Load a labware using its identifying parameters."""
+        module_location: Union[ModuleLocation, DeckSlotLocation]
         if isinstance(location, ModuleCore):
-            raise NotImplementedError("Load labware on module not yet implemented")
+            module_location = ModuleLocation(moduleId=location.module_id)
+        else:
+            module_location = DeckSlotLocation(slotName=location)
 
         load_result = self._engine_client.load_labware(
             load_name=load_name,
-            location=DeckSlotLocation(slotName=location),
+            location=module_location,
             namespace=namespace if namespace is not None else OPENTRONS_NAMESPACE,
             version=version or 1,
             display_name=label,
@@ -108,11 +134,40 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
     def load_module(
         self,
         model: ModuleModel,
-        location: Optional[DeckSlotName],
+        deck_slot: Optional[DeckSlotName],
         configuration: Optional[str],
     ) -> ModuleCore:
         """Load a module into the protocol."""
-        raise NotImplementedError("ProtocolEngine PAPI core not implemented")
+        # TODO(mc, 2022-10-20): move to public ProtocolContext
+        # once `Deck` and `ProtocolEngine` play nicely together
+        if deck_slot is None:
+            if ModuleType.from_model(model) == ModuleType.THERMOCYCLER:
+                deck_slot = DeckSlotName.SLOT_7
+            else:
+                raise InvalidModuleLocationError(deck_slot, model.name)
+
+        result = self._engine_client.load_module(
+            model=EngineModuleModel(model),
+            location=DeckSlotLocation(slotName=deck_slot),
+        )
+        module_type = result.model.as_type()
+
+        # TODO(mc, 2022-10-25): move to module core factory function
+        module_core_cls: Type[ModuleCore] = ModuleCore
+        if module_type == ModuleType.TEMPERATURE:
+            module_core_cls = TemperatureModuleCore
+        elif module_type == ModuleType.MAGNETIC:
+            module_core_cls = MagneticModuleCore
+        elif module_type == ModuleType.THERMOCYCLER:
+            module_core_cls = ThermocyclerModuleCore
+        elif module_type == ModuleType.HEATER_SHAKER:
+            module_core_cls = HeaterShakerModuleCore
+
+        return module_core_cls(
+            module_id=result.moduleId,
+            engine_client=self._engine_client,
+            api_version=self.api_version,
+        )
 
     def load_instrument(
         self, instrument_name: PipetteNameType, mount: Mount
