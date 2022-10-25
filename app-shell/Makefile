@@ -41,7 +41,7 @@ build_id := $(or $(and $(OT_BUILD),b$(OT_BUILD)$(branch_suffix)),dev)
 # make dist no_python_bundle=true or =1 or whatever
 no_python_bundle ?=
 
-builder := electron-builder \
+builder := yarn electron-builder \
 	--config electron-builder.config.js \
 	--publish never
 
