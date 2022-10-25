@@ -119,27 +119,27 @@ DEFAULT_MAX_SPEED_DISCONTINUITY: Final[
     ByGantryLoad[Dict[OT3AxisKind, float]]
 ] = ByGantryLoad(
     none={
-        OT3AxisKind.X: 10,
-        OT3AxisKind.Y: 10,
+        OT3AxisKind.X: 20,
+        OT3AxisKind.Y: 20,
         OT3AxisKind.Z: 10,
-        OT3AxisKind.Z_G: 10,
-        OT3AxisKind.P: 10,
+        OT3AxisKind.Z_G: 15,
+        OT3AxisKind.P: 20,
     },
     high_throughput={
-        OT3AxisKind.X: 10,
-        OT3AxisKind.Y: 10,
+        OT3AxisKind.X: 20,
+        OT3AxisKind.Y: 20,
         OT3AxisKind.Z: 10,
         OT3AxisKind.P: 10,
     },
     low_throughput={
-        OT3AxisKind.X: 10,
-        OT3AxisKind.Y: 10,
+        OT3AxisKind.X: 20,
+        OT3AxisKind.Y: 20,
         OT3AxisKind.Z: 10,
         OT3AxisKind.P: 10,
     },
     two_low_throughput={
-        OT3AxisKind.X: 10,
-        OT3AxisKind.Y: 10,
+        OT3AxisKind.X: 20,
+        OT3AxisKind.Y: 20,
     },
     gripper={
         OT3AxisKind.Z: 10,
