@@ -6,7 +6,7 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition as Labware
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from opentrons.types import Mount, MountType, Location, DeckSlotName
-from opentrons.hardware_control import SyncHardwareAPI
+from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     ModuleType,
@@ -51,10 +51,14 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
     """
 
     def __init__(
-        self, engine_client: ProtocolEngineClient, api_version: APIVersion
+        self,
+        engine_client: ProtocolEngineClient,
+        api_version: APIVersion,
+        sync_hardware: SyncHardwareAPI,
     ) -> None:
         self._engine_client = engine_client
         self._api_version = api_version
+        self._sync_hardware = sync_hardware
 
     @property
     def api_version(self) -> APIVersion:
@@ -88,7 +92,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def get_hardware(self) -> SyncHardwareAPI:
         """Get direct access to a hardware control interface."""
-        raise NotImplementedError("ProtocolEngine PAPI core not implemented")
+        return self._sync_hardware
 
     def is_simulating(self) -> bool:
         """Get whether the protocol is being analyzed or actually run."""
@@ -152,6 +156,13 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         )
         module_type = result.model.as_type()
 
+        for module_hardware in self._sync_hardware.attached_modules:
+            if result.serialNumber == module_hardware.device_info["serial"]:
+                selected_hardware = module_hardware
+                break
+        else:
+            raise RuntimeError(f"Could not find specified module: {model.value}")
+
         # TODO(mc, 2022-10-25): move to module core factory function
         module_core_cls: Type[ModuleCore] = ModuleCore
         if module_type == ModuleType.TEMPERATURE:
@@ -167,6 +178,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             module_id=result.moduleId,
             engine_client=self._engine_client,
             api_version=self.api_version,
+            sync_module_hardware=SynchronousAdapter(selected_hardware),
         )
 
     def load_instrument(

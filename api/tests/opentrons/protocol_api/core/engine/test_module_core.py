@@ -2,6 +2,8 @@
 import pytest
 from decoy import Decoy
 
+from opentrons.hardware_control import SynchronousAdapter
+from opentrons.hardware_control.modules import AbstractModule
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_api.core.engine.module_core import ModuleCore
 from opentrons.protocol_api.core.engine.labware import LabwareCore
@@ -26,12 +28,23 @@ def mock_engine_client(decoy: Decoy) -> EngineClient:
 
 
 @pytest.fixture
-def subject(mock_engine_client: EngineClient, api_version: APIVersion) -> ModuleCore:
+def mock_sync_module_hardware(decoy: Decoy) -> SynchronousAdapter[AbstractModule]:
+    """Get a mock synchronous module hardware."""
+    return decoy.mock(name="SynchronousAdapter[AbstractModule]")  # type: ignore[no-any-return]
+
+
+@pytest.fixture()
+def subject(
+    mock_engine_client: EngineClient,
+    api_version: APIVersion,
+    mock_sync_module_hardware: SynchronousAdapter[AbstractModule],
+) -> ModuleCore:
     """Get a ModuleCore test subject."""
     return ModuleCore(
         module_id="1234",
         engine_client=mock_engine_client,
         api_version=api_version,
+        sync_module_hardware=mock_sync_module_hardware,
     )
 
 
