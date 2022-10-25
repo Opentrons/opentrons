@@ -153,7 +153,7 @@ async def get_persistence_directory(
     return await initialize_task
 
 
-def get_persistence_resetter(
+async def get_persistence_resetter(
     persistence_directory: Path = Depends(get_persistence_directory),
 ) -> PersistenceResetter:
     """Get a `PersistenceResetter` to reset the robot-server's stored data."""
