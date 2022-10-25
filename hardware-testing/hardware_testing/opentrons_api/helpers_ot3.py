@@ -28,7 +28,7 @@ def stop_server_ot3() -> None:
 
 def restart_canbus_ot3() -> None:
     """Restart opentrons-ot3-canbus on the OT3."""
-    print('Stopping "opentrons-robot-server"...')
+    print('Restarting "opentrons-ot3-canbus"...')
     run(["systemctl", "restart", "opentrons-ot3-canbus"])
 
 
