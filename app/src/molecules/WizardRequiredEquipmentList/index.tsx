@@ -16,7 +16,7 @@ import {
 import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
 import { labwareImages } from '../../organisms/CalibrationPanels/labwareImages'
-import { equipmentImages } from './EquipmentImages'
+import { equipmentImages } from './equipmentImages'
 
 interface WizardRequiredEquipmentListProps {
   equipmentList: Array<React.ComponentProps<typeof RequiredEquipmentCard>>
