@@ -64,6 +64,7 @@ from .types import (
     OT3AxisMap,
     OT3SubSystem,
     GripperJawState,
+    GripperProbe,
     GripperNotAttachedError,
 )
 from . import modules
