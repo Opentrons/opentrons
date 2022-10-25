@@ -33,7 +33,7 @@ def mock_sync_module_hardware(decoy: Decoy) -> SynchronousAdapter[AbstractModule
     return decoy.mock(name="SynchronousAdapter[AbstractModule]")  # type: ignore[no-any-return]
 
 
-@pytest.fixture()
+@pytest.fixture
 def subject(
     mock_engine_client: EngineClient,
     api_version: APIVersion,
