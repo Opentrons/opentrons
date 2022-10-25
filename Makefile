@@ -49,7 +49,7 @@ setup: setup-js setup-py
 # front-end dependecies handled by yarn
 .PHONY: setup-js
 setup-js:
-	yarn config set network-timeout 60000
+	yarn config set network-timeout 60000 --frozen-lockfile
 	yarn
 	$(MAKE) -C $(APP_SHELL_DIR) setup
 	$(MAKE) -C $(SHARED_DATA_DIR) setup-js
