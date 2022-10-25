@@ -2,6 +2,7 @@
 
 
 from dataclasses import dataclass
+from functools import lru_cache
 from io import BytesIO
 from logging import getLogger
 from pickle import (  # noqa: F401
@@ -14,7 +15,7 @@ from pickle import (  # noqa: F401
     # unknown types.
     dumps as dumps,
 )
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 
 _log = getLogger(__name__)
@@ -31,16 +32,12 @@ class LegacyUnpickler(Unpickler):
     even if we've moved or renamed their types.
     """
 
-    def __init__(self, file: BytesIO) -> None:
-        self._types_by_original_name: Optional[Dict[str, type]] = None
-        super().__init__(file)
-
     def find_class(self, module: str, name: str) -> object:  # noqa: D102
         try:
             # We match purely on the type name, ignoring the name of the containing
             # module. This is to avoid potential confusion and false negatives
             # with types that could be imported through multiple paths.
-            return self._get_types_by_original_name_cached()[name]
+            return _get_types_by_original_name()[name]
 
         except KeyError:
             # The type of the object that we're unpickling doesn't appear to be an
@@ -70,11 +67,6 @@ class LegacyUnpickler(Unpickler):
                 )
 
             return super().find_class(module, name)
-
-    def _get_types_by_original_name_cached(self) -> Dict[str, type]:
-        if self._types_by_original_name is None:
-            self._types_by_original_name = _get_types_by_original_name()
-        return self._types_by_original_name
 
 
 def loads(data: bytes) -> object:
@@ -198,6 +190,7 @@ def _get_legacy_ot_types() -> List[_LegacyTypeInfo]:
     # fmt: on
 
 
+@lru_cache(maxsize=1)
 def _get_types_by_original_name() -> Dict[str, type]:
     types_by_original_name: Dict[str, type] = {}
 
