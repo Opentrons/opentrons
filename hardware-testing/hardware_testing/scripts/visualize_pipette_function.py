@@ -70,6 +70,26 @@ def _plot_table(model: str, table: List[List[float]]) -> None:
     plt.show()
 
 
+def _print_errors(table: List[List[float]]) -> None:
+    input_list = table[0]
+    output_list = table[1]
+    assert len(input_list) == len(output_list)
+
+    def _tot_vol_at_sample(index: int) -> float:
+        return input_list[index] + output_list[index]
+
+    num_error = 0
+    for i in range(1, len(input_list)):
+        prev_vol = _tot_vol_at_sample(i - 1)
+        vol = _tot_vol_at_sample(i)
+        if prev_vol > vol:
+            num_error += 1
+            print(
+                f"{num_error}) Error at input volume {round(input_list[i], 3)} "
+                f"({round(prev_vol, 3)} > {round(vol, 3)})"
+            )
+
+
 async def _main(length: int) -> None:
     while True:
         model = _user_select_model()
@@ -77,6 +97,7 @@ async def _main(length: int) -> None:
         pipette = api.hardware_pipettes[OT3Mount.LEFT.to_mount()]
         assert pipette, "No pipette on the left!"
         table = _get_accuracy_adjustment_table(pipette, length)
+        _print_errors(table)
         _plot_table(model, table)
 
 
