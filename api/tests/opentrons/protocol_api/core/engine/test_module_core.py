@@ -18,7 +18,7 @@ def mock_engine_client(decoy: Decoy) -> EngineClient:
     return decoy.mock(cls=EngineClient)
 
 
-@pytest.fixture()
+@pytest.fixture
 def subject(mock_engine_client: EngineClient) -> ModuleCore:
     """Get a ModuleCore test subject."""
     return ModuleCore(
