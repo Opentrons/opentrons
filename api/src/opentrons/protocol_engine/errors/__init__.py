@@ -39,6 +39,9 @@ from .exceptions import (
     CannotPerformModuleAction,
     PauseNotAllowedError,
     ProtocolCommandFailedError,
+    GripperNotAttachedError,
+    HardwareNotSupportedError,
+    UnsupportedLabwareMovementError,
 )
 
 from .error_occurrence import ErrorOccurrence
@@ -83,6 +86,9 @@ __all__ = [
     "CannotPerformModuleAction",
     "PauseNotAllowedError",
     "ProtocolCommandFailedError",
+    "GripperNotAttachedError",
+    "HardwareNotSupportedError",
+    "UnsupportedLabwareMovementError",
     # error occurrence models
     "ErrorOccurrence",
 ]

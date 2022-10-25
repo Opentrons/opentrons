@@ -1406,6 +1406,9 @@ class OT3API(
     def attached_gripper(self) -> Optional[GripperDict]:
         return self._gripper_handler.get_gripper_dict()
 
+    def has_gripper(self) -> bool:
+        return self._gripper_handler.has_gripper()
+
     def calibrate_plunger(
         self,
         mount: Union[top_types.Mount, OT3Mount],
@@ -1516,7 +1519,7 @@ class OT3API(
                 raise RuntimeError("Must attach probe to gripper before calibrating.")
             sensor_id = sensor_id_for_gripper(probe)
 
-        here = await self.gantry_position(mount)
+        here = await self.gantry_position(mount, refresh=True)
         origin_pos = moving_axis.of_point(here)
         if origin_pos < target_pos:
             pass_start = target_pos - pass_settings.prep_distance_mm
@@ -1524,7 +1527,6 @@ class OT3API(
                 pass_settings.prep_distance_mm + pass_settings.max_overrun_distance_mm
             )
         else:
-
             pass_start = target_pos + pass_settings.prep_distance_mm
             pass_distance = -1.0 * (
                 pass_settings.prep_distance_mm + pass_settings.max_overrun_distance_mm
@@ -1543,6 +1545,7 @@ class OT3API(
             machine_pass_distance,
             pass_settings.speed_mm_per_s,
             sensor_id,
+            pass_settings.sensor_threshold_pf,
         )
         end_pos = await self.gantry_position(mount, refresh=True)
         await self.move_to(mount, pass_start_pos)

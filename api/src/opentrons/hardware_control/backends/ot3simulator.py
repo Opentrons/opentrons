@@ -481,6 +481,7 @@ class OT3Simulator:
         distance_mm: float,
         speed_mm_per_s: float,
         sensor_id: Optional[SensorId] = SensorId.S0,
+        sensor_threshold_pf: float,
     ) -> None:
         self._position[axis_to_node(moving)] += distance_mm
 

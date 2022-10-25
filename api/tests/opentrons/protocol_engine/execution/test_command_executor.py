@@ -27,6 +27,7 @@ from opentrons.protocol_engine.execution import (
     CommandExecutor,
     EquipmentHandler,
     MovementHandler,
+    LabwareMovementHandler,
     PipettingHandler,
     RunControlHandler,
     RailLightsHandler,
@@ -64,6 +65,12 @@ def movement(decoy: Decoy) -> MovementHandler:
 
 
 @pytest.fixture
+def labware_movement(decoy: Decoy) -> LabwareMovementHandler:
+    """Get a mocked out LabwareMovementHandler."""
+    return decoy.mock(cls=LabwareMovementHandler)
+
+
+@pytest.fixture
 def pipetting(decoy: Decoy) -> PipettingHandler:
     """Get a mocked out PipettingHandler."""
     return decoy.mock(cls=PipettingHandler)
@@ -94,6 +101,7 @@ def subject(
     action_dispatcher: ActionDispatcher,
     equipment: EquipmentHandler,
     movement: MovementHandler,
+    labware_movement: LabwareMovementHandler,
     pipetting: PipettingHandler,
     run_control: RunControlHandler,
     rail_lights: RailLightsHandler,
@@ -106,6 +114,7 @@ def subject(
         action_dispatcher=action_dispatcher,
         equipment=equipment,
         movement=movement,
+        labware_movement=labware_movement,
         pipetting=pipetting,
         run_control=run_control,
         model_utils=model_utils,
@@ -133,13 +142,14 @@ async def test_execute(
     action_dispatcher: ActionDispatcher,
     equipment: EquipmentHandler,
     movement: MovementHandler,
+    labware_movement: LabwareMovementHandler,
     pipetting: PipettingHandler,
     run_control: RunControlHandler,
     rail_lights: RailLightsHandler,
     model_utils: ModelUtils,
     subject: CommandExecutor,
 ) -> None:
-    """It should be able execute a command."""
+    """It should be able to execute a command."""
     TestCommandImplCls = decoy.mock(func=_TestCommandImpl)
     command_impl = decoy.mock(cls=_TestCommandImpl)
 
@@ -202,6 +212,7 @@ async def test_execute(
             hardware_api=hardware_api,
             equipment=equipment,
             movement=movement,
+            labware_movement=labware_movement,
             pipetting=pipetting,
             run_control=run_control,
             rail_lights=rail_lights,
@@ -245,6 +256,7 @@ async def test_execute_raises_protocol_engine_error(
     action_dispatcher: ActionDispatcher,
     equipment: EquipmentHandler,
     movement: MovementHandler,
+    labware_movement: LabwareMovementHandler,
     pipetting: PipettingHandler,
     run_control: RunControlHandler,
     rail_lights: RailLightsHandler,
@@ -301,6 +313,7 @@ async def test_execute_raises_protocol_engine_error(
             hardware_api=hardware_api,
             equipment=equipment,
             movement=movement,
+            labware_movement=labware_movement,
             pipetting=pipetting,
             run_control=run_control,
             rail_lights=rail_lights,

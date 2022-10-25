@@ -107,6 +107,10 @@
               "type": "string"
             }
           }
+        },
+        {
+          "const": "offDeck",
+          "description": "String literal 'offDeck'. Used to load a labware without placing it on the deck"
         }
       ]
     }
@@ -471,6 +475,11 @@
                 "newLocation": {
                   "$ref": "#/definitions/labwareLocation",
                   "description": "Where to move the labware."
+                },
+                "useGripper": {
+                  "type": "boolean",
+                  "default": false,
+                  "description": "Whether to use the gripper to move the labware. Gripper is only available on the OT3."
                 }
               }
             }

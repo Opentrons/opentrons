@@ -266,7 +266,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               <StyledText as="label" color={COLORS.darkGreyEnabled}>
                 {`${t('updated')} ${format(
                   new Date(modified),
-                  'MM/dd/yy HH:mm:ss'
+                  'MMM dd yy HH:mm'
                 )}`}
               </StyledText>
             </Flex>

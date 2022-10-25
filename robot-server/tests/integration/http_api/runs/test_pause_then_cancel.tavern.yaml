@@ -3,7 +3,7 @@ test_name: Test a JSONv6 run can be paused and then cancelled.
 marks:
   - usefixtures:
       - run_server
-
+      - set_enable_load_liquid
 stages:
   - name: Upload a JSONv6 protocol
     request:
