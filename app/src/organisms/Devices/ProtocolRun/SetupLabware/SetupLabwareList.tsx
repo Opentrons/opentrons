@@ -139,7 +139,7 @@ export function LabwareListItem(
   })
   let extraAttentionText: JSX.Element | null = null
 
-  if ('moduleId' in params.location) {
+  if (typeof params.location === 'object' && 'moduleId' in params.location) {
     const moduleId = params.location.moduleId
     const moduleModel = protocolData.modules[moduleId].model
     const moduleRunTimeCommand = protocolData.commands

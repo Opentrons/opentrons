@@ -27,7 +27,7 @@ export type LabwarePositionCheckMovementCommand =
   | DropTipCreateCommand
 export interface DeprecatedLabwarePositionCheckStep {
   labwareId: string
-  section: Section
+  section: DeprecatedSection
   commands: LabwarePositionCheckCreateCommand[]
 }
 export interface LabwareToOrder {

@@ -27,7 +27,9 @@ export function createSnippet(
         const { loadName } = protocol.labwareDefinitions[
           loadedLabware.definitionId
         ].parameters
-        if ('slotName' in command.params.location) {
+        if (command.params.location === 'offDeck') {
+          loadStatement = `labware_${labwareCount} = protocol.load_labware("${loadName}", location="offDeck")`
+        } else if ('slotName' in command.params.location) {
           // load labware on deck
           const { slotName } = command.params.location
           loadStatement = `labware_${labwareCount} = protocol.load_labware("${loadName}", location="${slotName}")`

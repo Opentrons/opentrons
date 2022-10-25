@@ -25,6 +25,7 @@ const getDisplayLocation = (
 ): string => {
   let location = ''
   const labwareLocation = getLabwareLocation(labwareId, protocolData.commands)
+  if (labwareLocation === 'offDeck') return 'Off Deck'
   if ('moduleId' in labwareLocation) {
     if (
       getModuleType(protocolData.modules[labwareLocation.moduleId].model) ===
@@ -79,6 +80,8 @@ export const useLabwareOffsets = (
         protocolData.commands,
         protocolData.modules
       )
+      // skip if location is offDeck
+      if (labwareOffsetLocation == null) return labwareOffsets
       const labwareDefinitionUri = getLabwareDefinitionUri(
         labwareId,
         protocolData.labware,
