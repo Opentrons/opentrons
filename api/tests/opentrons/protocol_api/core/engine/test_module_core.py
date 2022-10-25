@@ -31,7 +31,7 @@ def subject(mock_engine_client: EngineClient) -> ModuleCore:
 def test_get_deck_slot(
     decoy: Decoy, subject: ModuleCore, mock_engine_client: EngineClient
 ) -> None:
-    """Should return the deck slot accosiated to the module id."""
+    """Should return the deck slot associated to the module id."""
     decoy.when(mock_engine_client.state.modules.get_location("1234")).then_return(
         DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
     )
