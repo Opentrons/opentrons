@@ -124,6 +124,7 @@ def test_load_labware(
     assert result.labware_id == "abc123"
 
 
+@pytest.mark.parametrize("api_version", [APIVersion(2, 3)])
 def test_load_labware_on_module(
     decoy: Decoy,
     mock_engine_client: EngineClient,
