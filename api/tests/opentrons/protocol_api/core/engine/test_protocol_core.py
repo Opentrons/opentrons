@@ -42,6 +42,7 @@ from opentrons.protocol_api.core.engine.module_core import (
     ThermocyclerModuleCore,
     HeaterShakerModuleCore,
 )
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion
 
 
@@ -52,14 +53,21 @@ def mock_engine_client(decoy: Decoy) -> EngineClient:
 
 
 @pytest.fixture
-def subject(mock_engine_client: EngineClient) -> ProtocolCore:
+def api_version() -> APIVersion:
+    """Get an API version to apply to the interface."""
+    return MAX_SUPPORTED_VERSION
+
+
+@pytest.fixture
+def subject(mock_engine_client: EngineClient, api_version: APIVersion) -> ProtocolCore:
     """Get a ProtocolCore test subject with its dependencies mocked out."""
-    return ProtocolCore(engine_client=mock_engine_client, api_version=APIVersion(2, 12))
+    return ProtocolCore(engine_client=mock_engine_client, api_version=api_version)
 
 
-def test_api_version(decoy: Decoy, subject: ProtocolCore) -> None:
+@pytest.mark.parametrize("api_version", [APIVersion(2, 3)])
+def test_api_version(decoy: Decoy, subject: ProtocolCore, api_version: APIVersion) -> None:
     """Should return the protocol version."""
-    assert subject.api_version == APIVersion(2, 12)
+    assert subject.api_version == api_version
 
 
 def test_load_instrument(
@@ -120,6 +128,7 @@ def test_load_labware_on_module(
     decoy: Decoy,
     mock_engine_client: EngineClient,
     subject: ProtocolCore,
+    api_version: APIVersion
 ) -> None:
     """It should issue a LoadLabware command."""
     decoy.when(
@@ -143,7 +152,7 @@ def test_load_labware_on_module(
         location=ModuleCore(
             module_id="module-id",
             engine_client=mock_engine_client,
-            api_version=APIVersion(2, 13),
+            api_version=api_version,
         ),
         label="some_display_name",  # maps to optional display name
         namespace="some_explicit_namespace",
