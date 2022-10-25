@@ -2,6 +2,7 @@
 import argparse
 import asyncio
 from math import pi as PI
+from typing import Optional
 
 try:
     import matplotlib.pyplot as plt  # type: ignore[import]
@@ -11,34 +12,50 @@ except ModuleNotFoundError:
     )
 from typing import List
 
+from opentrons.calibration_storage.types import (
+    PipetteOffsetByPipetteMount,
+    SourceType,
+    CalibrationStatus,
+)
+from opentrons.config.robot_configs import default_pipette_offset
+from opentrons.config import pipette_config
 from opentrons.hardware_control.instruments.pipette import Pipette
-
-from hardware_testing.opentrons_api.types import OT3Mount
-from hardware_testing.opentrons_api.helpers_ot3 import build_async_ot3_hardware_api
 
 from opentrons_shared_data.pipette import model_config
 
 
-def _user_select_model() -> str:
+def _user_select_model(model_includes: Optional[str] = None) -> str:
     cfg = model_config()["config"]
-    gen_3_pips = []
+    found_pips = []
     for model, pip in cfg.items():
-        if "gen3" in pip["name"]:
-            gen_3_pips.append(model)
-    gen_3_pips.sort()
+        if not model_includes or model_includes in pip["name"]:
+            found_pips.append(model)
+    found_pips.sort()
     print("Select model by number:")
-    for i, mod in enumerate(gen_3_pips):
+    for i, mod in enumerate(found_pips):
         print(f"\t{i + 1} -\t{mod}")
     model_idx = int(input("Enter number next to desired model: ")) - 1
-    return gen_3_pips[model_idx]
+    return found_pips[model_idx]
 
 
 def _get_plunger_displacement_at_volume(pipette: Pipette, volume: float) -> float:
     distance = volume / pipette.ul_per_mm(volume, "dispense")
-    if pipette.working_volume == 1000:
-        diameter = 4.5
-    elif pipette.working_volume == 50:
-        diameter = 1.0
+    if "gen3" in pipette.name:
+        if pipette.working_volume == 1000:
+            diameter = 4.5
+        elif pipette.working_volume == 50:
+            diameter = 1.0
+        else:
+            raise ValueError(f"Unexpected pipette: {pipette.model}")
+    elif "gen2" in pipette.name:
+        if pipette.working_volume == 1000:
+            diameter = 6.0
+        elif pipette.working_volume == 300:
+            diameter = 3.5
+        elif pipette.working_volume == 20:
+            diameter = 1.0
+        else:
+            raise ValueError(f"Unexpected pipette: {pipette.model}")
     else:
         raise ValueError(f"Unexpected pipette: {pipette.model}")
     cross_section_area = PI * ((diameter / 2) ** 2)
@@ -65,8 +82,8 @@ def _plot_table(model: str, table: List[List[float]]) -> None:
     plt.suptitle(model)
     plt.plot(*table)
     ax = plt.gca()
-    ax.set_xlim([0, None])
-    ax.set_ylim([0, None])
+    ax.set_xlim([min(table[0]), max(table[0])])
+    ax.set_ylim([min(table[1]), max(table[1])])
     plt.show()
 
 
@@ -88,14 +105,20 @@ def _print_errors(table: List[List[float]]) -> None:
                 f"{num_error}) Error at input volume {round(input_list[i], 3)} "
                 f"({round(prev_vol, 3)} > {round(vol, 3)})"
             )
+    if num_error:
+        input("\nReview the errors above, ENTER to continue:")
 
 
 async def _main(length: int) -> None:
     while True:
         model = _user_select_model()
-        api = await build_async_ot3_hardware_api(is_simulating=True, pipette_left=model)
-        pipette = api.hardware_pipettes[OT3Mount.LEFT.to_mount()]
-        assert pipette, "No pipette on the left!"
+        config = pipette_config.load(pipette_model=model)  # type: ignore[arg-type]
+        pip_cal_obj = PipetteOffsetByPipetteMount(
+            offset=default_pipette_offset(),
+            source=SourceType.default,
+            status=CalibrationStatus(),
+        )
+        pipette = Pipette(config=config, pipette_offset_cal=pip_cal_obj)
         table = _get_accuracy_adjustment_table(pipette, length)
         _print_errors(table)
         _plot_table(model, table)
