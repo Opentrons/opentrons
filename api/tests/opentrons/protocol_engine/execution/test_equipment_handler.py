@@ -177,17 +177,9 @@ async def test_load_labware_off_deck(
     """It should load labware definition and offset data and generate an ID."""
     decoy.when(model_utils.generate_id()).then_return("unique-id")
 
-    decoy.when(state_store.labware.get_definition_by_uri(matchers.IsA(str))).then_raise(
-        errors.LabwareDefinitionDoesNotExistError("oh no")
+    decoy.when(state_store.labware.get_definition_by_uri("opentrons-test/load-name/1").then_return(
+        minimal_labware_def
     )
-
-    decoy.when(
-        await labware_data_provider.get_labware_definition(
-            load_name="load-name",
-            namespace="opentrons-test",
-            version=1,
-        )
-    ).then_return(minimal_labware_def)
 
     result = await subject.load_labware(
         location=OFF_DECK_LOCATION,
