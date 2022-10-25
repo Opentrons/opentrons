@@ -142,33 +142,30 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
                 f"Critical point {cp_override.name} is not valid for a gripper"
             )
 
-        if not self._attached_probe or cp_override in [
-            CriticalPoint.GRIPPER_JAW_CENTER,
-            CriticalPoint.XY_CENTER,
-        ]:
+        if not self._attached_probe:
+            cp = cp_override or CriticalPoint.GRIPPER_JAW_CENTER
+        else:
+            if self._attached_probe is GripperProbe.FRONT:
+                cp = cp_override or CriticalPoint.GRIPPER_FRONT_CALIBRATION_PIN
+            else:
+                cp = cp_override or CriticalPoint.GRIPPER_REAR_CALIBRATION_PIN
+
+        if cp in [CriticalPoint.GRIPPER_JAW_CENTER, CriticalPoint.XY_CENTER]:
             return self._jaw_center_offset + Point(*self._calibration_offset.offset)
-        elif (
-            self._attached_probe is GripperProbe.FRONT
-            or cp_override is CriticalPoint.GRIPPER_FRONT_CALIBRATION_PIN
-        ):
+        elif cp == CriticalPoint.GRIPPER_FRONT_CALIBRATION_PIN:
             return (
                 self._front_calibration_pin_offset
                 + Point(*self._calibration_offset.offset)
                 - Point(y=self.current_jaw_displacement)
             )
-        elif (
-            self._attached_probe is GripperProbe.REAR
-            or cp_override is CriticalPoint.GRIPPER_REAR_CALIBRATION_PIN
-        ):
+        elif cp == CriticalPoint.GRIPPER_REAR_CALIBRATION_PIN:
             return (
                 self._rear_calibration_pin_offset
                 + Point(*self._calibration_offset.offset)
                 + Point(y=self.current_jaw_displacement)
             )
         else:
-            raise InvalidMoveError(
-                f"Critical point {cp_override.name} is not valid for a gripper"
-            )
+            raise InvalidMoveError(f"Critical point {cp_override} is not valid")
 
     def duty_cycle_by_force(self, newton: float) -> float:
         return gripper_config.piecewise_force_conversion(
