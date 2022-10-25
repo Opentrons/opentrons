@@ -132,7 +132,7 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
             height_from_base: Distance from labware base to raise the magnets.
             height_from_home: Distance from motor home position to raise the magnets.
         """
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("engage not implemented")
 
     def engage_to_labware(
         self, offset: float = 0, preserve_half_mm: bool = False
@@ -148,15 +148,15 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
         Raises:
             Exception: Labware is not loaded or has no default engage height.
         """
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("engage_to_labware not implemented")
 
     def disengage(self) -> None:
         """Lower the magnets back into the module."""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("disengage not implemented")
 
     def get_status(self) -> MagneticStatus:
         """Get the module's current magnet status."""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("get_status not implemented")
 
 
 class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
@@ -164,11 +164,11 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
 
     def open_lid(self) -> ThermocyclerLidStatus:
         """Open the Thermocycler's lid."""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("open_lid not implemeted")
 
     def close_lid(self) -> ThermocyclerLidStatus:
         """Close the Thermocycler's lid."""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("close_lid not implemented")
 
     def set_target_block_temperature(
         self,
@@ -189,19 +189,19 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
                 of the loaded labware. If not supplied, the thermocycler
                 will default to 25µL/well.
         """
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("set_target_block_temperature not implemented")
 
     def wait_for_block_temperature(self) -> None:
         """Wait for target block temperature to be reached."""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("wait_for_block_temperature not implemented")
 
     def set_target_lid_temperature(self, celsius: float) -> None:
         """Set the target temperature for the heated lid, in °C."""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("set_target_lid_temperature not implemented")
 
     def wait_for_lid_temperature(self) -> None:
         """Wait for target lid temperature to be reached."""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("wait_for_lid_temperature not implemented")
 
     def execute_profile(
         self,
@@ -228,71 +228,71 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
                 of the loaded labware. If not supplied, the thermocycler
                 will default to 25µL/well.
         """
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("execute_profile not implemented")
 
     def deactivate_lid(self) -> None:
         """Turn off the heated lid."""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("deactivate_lid not implemented")
 
     def deactivate_block(self) -> None:
         """Turn off the well block temperature controller"""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("deactivate_block not implemented")
 
     def deactivate(self) -> None:
         """Turn off the well block temperature controller, and heated lid"""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("deactivate not implemented")
 
     def get_lid_position(self) -> Optional[ThermocyclerLidStatus]:
         """Get the thermocycler's lid position."""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("get_lid_position not implemented")
 
     def get_block_temperature_status(self) -> TemperatureStatus:
         """Get the thermocycler's block temperature status."""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("get_block_temperature_status not implemented")
 
     def get_lid_temperature_status(self) -> Optional[TemperatureStatus]:
         """Get the thermocycler's lid temperature status."""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("get_lid_temperature_status not implemented")
 
     def get_block_temperature(self) -> Optional[float]:
         """Get the thermocycler's current block temperature in °C."""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("get_block_temperature not implemented")
 
     def get_block_target_temperature(self) -> Optional[float]:
         """Get the thermocycler's target block temperature in °C."""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("get_block_target_temperature not implemented")
 
     def get_lid_temperature(self) -> Optional[float]:
         """Get the thermocycler's current lid temperature in °C."""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("get_lid_temperature not implemented")
 
     def get_lid_target_temperature(self) -> Optional[float]:
         """Get the thermocycler's target lid temperature in °C."""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("get_lid_target_temperature not implemented")
 
     def get_ramp_rate(self) -> Optional[float]:
         """Get the thermocycler's current rampe rate in °C/sec."""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("get_ramp_rate not implemented")
 
     def get_hold_time(self) -> Optional[float]:
         """Get the remaining hold time in seconds."""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("get_hold_time not implemented")
 
     def get_total_cycle_count(self) -> Optional[int]:
         """Get number of repetitions for current set cycle."""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("get_total_cycle_count not implemented")
 
     def get_current_cycle_index(self) -> Optional[int]:
         """Get index of the current set cycle repetition."""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("get_current_cycle_index not implemented")
 
     def get_total_step_count(self) -> Optional[int]:
         """Get number of steps within the current cycle."""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("get_total_step_count not implemented")
 
     def get_current_step_index(self) -> Optional[int]:
         """Get the index of the current step within the current cycle."""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("get_current_step_index not implemented")
 
 
 class HeaterShakerModuleCore(ModuleCore, AbstractHeaterShakerCore[LabwareCore]):
@@ -300,56 +300,56 @@ class HeaterShakerModuleCore(ModuleCore, AbstractHeaterShakerCore[LabwareCore]):
 
     def set_target_temperature(self, celsius: float) -> None:
         """Set the labware plate's target temperature in °C."""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("set_target_temperature not implemented")
 
     def wait_for_target_temperature(self) -> None:
         """Wait for the labware plate's target temperature to be reached."""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("wait_for_target_temperature not implemented")
 
     def set_and_wait_for_shake_speed(self, rpm: int) -> None:
         """Set the shaker's target shake speed and wait for it to spin up."""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("set_and_wait_for_shake_speed not implemented")
 
     def open_labware_latch(self) -> None:
         """Open the labware latch."""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("open_labware_latch not implemented")
 
     def close_labware_latch(self) -> None:
         """Close the labware latch."""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("close_labware_latch not implemented")
 
     def deactivate_shaker(self) -> None:
         """Stop shaking."""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("deactivate_shaker not implemented")
 
     def deactivate_heater(self) -> None:
         """Stop heating."""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("deactivate_heater not implemented")
 
     def get_current_temperature(self) -> float:
         """Get the labware plate's current temperature in °C."""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("not implemented")
 
     def get_target_temperature(self) -> Optional[float]:
         """Get the labware plate's target temperature in °C, if set."""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("get_current_temperature not implemented")
 
     def get_current_speed(self) -> int:
         """Get the shaker's current speed in RPM."""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("get_current_speed not implemented")
 
     def get_target_speed(self) -> Optional[int]:
         """Get the shaker's target speed in RPM, if set."""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("get_target_speed not implemented")
 
     def get_temperature_status(self) -> TemperatureStatus:
         """Get the module's heater status."""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("get_temperature_status not implemented")
 
     def get_speed_status(self) -> SpeedStatus:
         """Get the module's heater status."""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("get_speed_status not implemented")
 
     def get_labware_latch_status(self) -> HeaterShakerLabwareLatchStatus:
         """Get the module's labware latch status."""
-        raise NotImplementedError("MagneticCore")
+        raise NotImplementedError("get_labware_latch_status not implemented")
