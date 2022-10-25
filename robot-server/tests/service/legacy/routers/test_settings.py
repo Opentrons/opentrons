@@ -1,10 +1,16 @@
 import logging
-import pytest
 from mock import patch, call
 from dataclasses import make_dataclass
+from typing import Generator
+
+import pytest
+from decoy import Decoy
 
 from opentrons.config.reset import ResetOptionId
 from opentrons.config import advanced_settings
+
+from robot_server import app
+from robot_server.persistence import PersistenceResetter, get_persistence_resetter
 
 
 # TODO(isk: 3/20/20): test validation errors after refactor
@@ -226,6 +232,20 @@ def mock_reset():
         yield m
 
 
+@pytest.fixture
+def mock_persistence_resetter(
+    decoy: Decoy,
+) -> Generator[PersistenceResetter, None, None]:
+    mock_persistence_resetter = decoy.mock(cls=PersistenceResetter)
+
+    async def mock_get_persistence_resetter() -> PersistenceResetter:
+        return mock_persistence_resetter
+
+    app.dependency_overrides[get_persistence_resetter] = mock_get_persistence_resetter
+    yield mock_persistence_resetter
+    del app.dependency_overrides[get_persistence_resetter]
+
+
 @pytest.mark.parametrize(
     argnames="body,called_with",
     argvalues=[
@@ -256,6 +276,10 @@ def mock_reset():
                 ResetOptionId.deck_calibration,
                 ResetOptionId.pipette_offset,
                 ResetOptionId.tip_length_calibrations,
+                # TODO(mm, 2022-10-25): Verify that the subject endpoint function calls
+                # PersistenceResetter.mark_directory_reset(). Currently blocked by
+                # mark_directory_reset() being an async method, and api_client having
+                # its own event loop that interferes with making this test async.
                 ResetOptionId.runs_history,
             },
         ],
@@ -264,18 +288,20 @@ def mock_reset():
         [{"tipLengthCalibrations": True}, {ResetOptionId.tip_length_calibrations}],
     ],
 )
-def test_reset_success(api_client, mock_reset, body, called_with):
+def test_reset_success(
+    api_client, mock_reset, mock_persistence_resetter, body, called_with
+):
     resp = api_client.post("/settings/reset", json=body)
     assert resp.status_code == 200
     mock_reset.assert_called_once_with(called_with)
 
 
-def test_reset_invalid_option(api_client, mock_reset):
+def test_reset_invalid_option(api_client, mock_reset, mock_persistence_resetter):
     resp = api_client.post("/settings/reset", json={"aksgjajhadjasl": False})
     assert resp.status_code == 422
     body = resp.json()
-    assert 'message' in body
-    assert 'not a valid enumeration member' in body['message']
+    assert "message" in body
+    assert "not a valid enumeration member" in body["message"]
 
 
 @pytest.fixture()
