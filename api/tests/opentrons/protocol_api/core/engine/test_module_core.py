@@ -40,7 +40,7 @@ def test_get_deck_slot(
 
 
 def test_add_labware_core(decoy: Decoy, subject: ModuleCore) -> None:
-    """Should return a Labware obejct."""
+    """Should return a Labware object."""
     labware_core = decoy.mock(cls=LabwareCore)
     result = subject.add_labware_core(labware_core=labware_core)
 
