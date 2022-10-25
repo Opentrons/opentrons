@@ -8,15 +8,8 @@ from opentrons.protocol_api.core.engine.labware import LabwareCore
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
 )
-from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import DeckSlotName
-
-
-@pytest.fixture
-def mock_module_geometry(decoy: Decoy) -> ModuleGeometry:
-    """Get a mock of ModuleGeometry."""
-    return decoy.mock(cls=ModuleGeometry)
 
 
 @pytest.fixture
@@ -26,9 +19,7 @@ def mock_engine_client(decoy: Decoy) -> EngineClient:
 
 
 @pytest.fixture()
-def subject(
-    mock_engine_client: EngineClient, mock_module_geometry: ModuleGeometry
-) -> ModuleCore:
+def subject(mock_engine_client: EngineClient) -> ModuleCore:
     """Get a ModuleCore test subject."""
     return ModuleCore(
         module_id="1234",
