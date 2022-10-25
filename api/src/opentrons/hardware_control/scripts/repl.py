@@ -113,6 +113,7 @@ def do_interact(api: ThreadManager[HardwareControlAPI]) -> None:
             "Axis": Axis,
             "OT3Axis": OT3Axis,
             "OT3Mount": OT3Mount,
+            "GripperProbe": GripperProbe,
             "calibrate_mount": wrap_async_util_fn(calibrate_mount, api),
             "find_edge": wrap_async_util_fn(find_edge, api),
             "find_deck_position": wrap_async_util_fn(find_deck_position, api),
