@@ -55,7 +55,7 @@ const LABWARE_CARD_STYLE = css`
 const StyledTable = styled.table`
   width: 100%;
   text-align: ${TYPOGRAPHY.textAlignLeft};
-  table-layout: auto;
+  table-layout: ${SPACING.spacingAuto};
 `
 const StyledTableHeader = styled.th`
   ${TYPOGRAPHY.labelSemiBold}

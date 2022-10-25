@@ -45,7 +45,7 @@ export function HeaterShakerBanner(
             <Banner
               type="informing"
               onCloseClick={() => setWizardId(module.moduleId)}
-              close={
+              closeButton={
                 <StyledText
                   as="p"
                   textDecoration={TYPOGRAPHY.textDecorationUnderline}

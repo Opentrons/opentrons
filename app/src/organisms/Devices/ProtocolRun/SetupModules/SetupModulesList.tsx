@@ -77,7 +77,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
           <Banner
             type="informing"
             onCloseClick={() => setShowMultipleModulesModal(true)}
-            close={
+            closeButton={
               <StyledText
                 as="p"
                 textDecoration={TYPOGRAPHY.textDecorationUnderline}

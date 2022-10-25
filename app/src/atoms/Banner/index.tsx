@@ -35,7 +35,7 @@ export interface BannerProps extends StyleProps {
   /** some banner onCloseClicks fire events, this allows a spinner after click but before event finishes */
   isCloseActionLoading?: boolean
   /** Override the Exit icon */
-  close?: React.ReactNode
+  closeButton?: React.ReactNode
 }
 
 const BANNER_PROPS_BY_TYPE: Record<
@@ -77,7 +77,7 @@ export function Banner(props: BannerProps): JSX.Element {
     children,
     isCloseActionLoading,
     padding,
-    close,
+    closeButton,
     ...styleProps
   } = props
   const bannerProps = BANNER_PROPS_BY_TYPE[type]
@@ -111,9 +111,9 @@ export function Banner(props: BannerProps): JSX.Element {
       <Flex flex="1" alignItems={ALIGN_CENTER}>
         {props.children}
       </Flex>
-      {onCloseClick && !isCloseActionLoading && (
+      {onCloseClick && !isCloseActionLoading ? (
         <Btn data-testid="Banner_close-button" onClick={props.onCloseClick}>
-          {close ?? (
+          {closeButton ?? (
             <Icon
               width={SPACING.spacing5}
               height={SPACING.spacing5}
@@ -122,7 +122,7 @@ export function Banner(props: BannerProps): JSX.Element {
             />
           )}
         </Btn>
-      )}
+      ) : null}
       {isCloseActionLoading && (
         <Icon name="ot-spinner" size={SIZE_1} aria-label="ot-spinner" spin />
       )}

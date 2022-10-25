@@ -77,10 +77,12 @@ describe('Banner', () => {
     props = {
       type: 'warning',
       children: 'TITLE',
-      close: 'close button',
+      closeButton: 'close button',
       onCloseClick: jest.fn(),
     }
     const { getByText } = render(props)
-    getByText('close button')
+    const btn = getByText('close button')
+    fireEvent.click(btn)
+    expect(props.onCloseClick).toHaveBeenCalled()
   })
 })

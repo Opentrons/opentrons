@@ -12,7 +12,7 @@ import { Banner } from '../../../../atoms/Banner'
 
 export const UnMatchedModuleWarning = (): JSX.Element | null => {
   const { t } = useTranslation('protocol_setup')
-  const [showBanner, setShowBanner] = React.useState(true)
+  const [showBanner, setShowBanner] = React.useState<boolean>(true)
   if (!showBanner) return null
 
   return (
