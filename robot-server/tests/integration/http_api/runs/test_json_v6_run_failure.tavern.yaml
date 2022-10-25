@@ -3,6 +3,7 @@ test_name: Upload and run a JSON v6 protocol that should fail.
 marks:
   - usefixtures:
       - run_server
+      - set_enable_load_liquid
 stages:
   - name: Upload a protocol
     request:

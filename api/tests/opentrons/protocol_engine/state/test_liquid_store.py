@@ -1,6 +1,5 @@
 """Liquid state store tests."""
 import pytest
-
 from opentrons.protocol_engine.state.liquids import LiquidStore
 from opentrons.protocol_engine import Liquid
 from opentrons.protocol_engine.actions.actions import AddLiquidAction

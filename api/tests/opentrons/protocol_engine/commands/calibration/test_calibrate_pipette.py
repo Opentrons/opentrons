@@ -12,10 +12,11 @@ from opentrons.protocol_engine.commands.calibration.calibrate_pipette import (
     CalibratePipetteParams,
 )
 from opentrons.protocol_engine.errors.exceptions import HardwareNotSupportedError
+from opentrons.protocol_engine.types import InstrumentOffsetVector
 
 from opentrons.hardware_control.api import API
 from opentrons.hardware_control.types import OT3Mount
-from opentrons.types import Point, MountType
+from opentrons.types import MountType, Point
 
 from opentrons.hardware_control import ot3_calibration as calibration
 
@@ -47,7 +48,9 @@ async def test_calibrate_pipette_implementation(
 
     result = await subject.execute(params)
 
-    assert result == CalibratePipetteResult(pipetteOffset=Point(x=3, y=4, z=6))
+    assert result == CalibratePipetteResult(
+        pipetteOffset=InstrumentOffsetVector(x=3, y=4, z=6)
+    )
 
 
 @pytest.mark.ot3_only

@@ -45,7 +45,7 @@ async def test_with_thermocycler():
             "currentCycleIndex": None,
             "currentStepIndex": None,
             "currentTemp": 3,
-            "holdTime": 121,
+            "holdTime": 0,
             "lid": "open",
             "lidTarget": None,
             "lidTemp": 23,
@@ -55,7 +55,7 @@ async def test_with_thermocycler():
             "totalCycleCount": None,
             "totalStepCount": None,
         },
-        "status": "heating",
+        "status": "holding at target",
     }
 
 

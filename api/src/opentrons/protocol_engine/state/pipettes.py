@@ -176,6 +176,12 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         elif isinstance(command.result, (MoveLabwareResult, MoveLabwareOffDeckResult)):
             moved_labware_id = command.params.labwareId
             if (
+                isinstance(command.result, MoveLabwareResult)
+                and command.params.useGripper
+            ):
+                # All mounts will have been retracted.
+                self._state.current_well = None
+            elif (
                 self._state.current_well is not None
                 and self._state.current_well.labware_id == moved_labware_id
             ):

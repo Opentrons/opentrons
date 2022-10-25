@@ -5,7 +5,7 @@ import mock
 from pathlib import Path
 import os
 
-from ot3usb.src import usb_config, default_config
+from ot3usb import usb_config, default_config
 
 # Fake UDC handle to use in tests
 UDC_HANDLE_NAME = "usb123"

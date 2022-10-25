@@ -1,9 +1,10 @@
 """Public protocol engine value types and models."""
 from __future__ import annotations
+import re
 from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 from typing import Optional, Union, List, Dict, Any, NamedTuple
 from typing_extensions import Literal, TypeGuard
 
@@ -15,10 +16,6 @@ from opentrons.hardware_control.modules import ModuleType as ModuleType
 from opentrons_shared_data.pipette.dev_types import (  # noqa: F401
     # convenience re-export of LabwareUri type
     LabwareUri as LabwareUri,
-    # TODO(mc, 2022-09-01): re-consider pickle usage in robot-server.
-    # This re-export of PipetteName prevents pickle breakage
-    # https://opentrons.atlassian.net/browse/RSS-94
-    PipetteNameType as PipetteName,
 )
 
 
@@ -214,6 +211,14 @@ class LabwareOffsetVector(BaseModel):
     z: float
 
 
+class InstrumentOffsetVector(BaseModel):
+    """Instrument Offset from home position to robot deck."""
+
+    x: float
+    y: float
+    z: float
+
+
 class ModuleDefinition(BaseModel):
     """Module definition class."""
 
@@ -340,13 +345,26 @@ class LoadedLabware(BaseModel):
     )
 
 
+class HexColor(BaseModel):
+    """Hex color representation."""
+
+    __root__: str
+
+    @validator("__root__")
+    def _color_is_a_valid_hex(cls, v: str) -> str:
+        match = re.search(r"^#(?:[0-9a-fA-F]{3,4}){1,2}$", v)
+        if not match:
+            raise ValueError("Color is not a valid hex color.")
+        return v
+
+
 class Liquid(BaseModel):
     """Payload required to create a liquid."""
 
     id: str
     displayName: str
     description: str
-    displayColor: Optional[str]
+    displayColor: Optional[HexColor]
 
 
 class SpeedRange(NamedTuple):

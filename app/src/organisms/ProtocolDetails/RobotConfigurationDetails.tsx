@@ -1,5 +1,6 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -15,10 +16,14 @@ import {
   getModuleDisplayName,
   getModuleType,
   getPipetteNameSpecs,
+  TC_MODULE_LOCATION,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+
+import { InstrumentContainer } from '../../atoms/InstrumentContainer'
 import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
+import { useFeatureFlag } from '../../redux/config'
 
 import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import type { PipetteName } from '@opentrons/shared-data'
@@ -40,70 +45,125 @@ export const RobotConfigurationDetails = (
     isLoading,
   } = props
   const { t } = useTranslation(['protocol_details', 'shared'])
+  const enableExtendedHardware = useFeatureFlag('enableExtendedHardware')
+
+  const loadingText = <StyledText as="p">{t('shared:loading')}</StyledText>
+  const emptyText = (
+    <StyledText as="p" textTransform={TYPOGRAPHY.textTransformCapitalize}>
+      {t('shared:empty')}
+    </StyledText>
+  )
+
+  // TODO(bh, 2022-10-18): insert 96-channel display name
+  // const leftAndRightMountsPipetteDisplayName = 'P20 96-Channel GEN1'
+  const leftAndRightMountsPipetteDisplayName = null
+  const leftAndRightMountsItem =
+    leftAndRightMountsPipetteDisplayName != null ? (
+      <RobotConfigurationDetailsItem
+        label={t('left_and_right_mounts')}
+        item={
+          isLoading ? (
+            loadingText
+          ) : (
+            <InstrumentContainer
+              displayName={leftAndRightMountsPipetteDisplayName}
+            />
+          )
+        }
+      />
+    ) : null
+
+  const leftMountPipetteDisplayName =
+    getPipetteNameSpecs(leftMountPipetteName as PipetteName)?.displayName ??
+    null
+  const leftMountItem =
+    leftMountPipetteDisplayName != null ? (
+      <InstrumentContainer displayName={leftMountPipetteDisplayName} />
+    ) : (
+      emptyText
+    )
+
+  const rightMountPipetteDisplayName =
+    getPipetteNameSpecs(rightMountPipetteName as PipetteName)?.displayName ??
+    null
+  const rightMountItem =
+    rightMountPipetteDisplayName != null ? (
+      <InstrumentContainer displayName={rightMountPipetteDisplayName} />
+    ) : (
+      emptyText
+    )
+
+  // TODO(bh, 2022-10-18): insert gripper display name
+  // const extensionMountDisplayName = 'Gripper GEN1'
+  const extensionMountDisplayName = null
+  const extensionMountItem =
+    extensionMountDisplayName != null ? (
+      <InstrumentContainer displayName={extensionMountDisplayName} />
+    ) : (
+      emptyText
+    )
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <Flex flexDirection={DIRECTION_COLUMN} paddingBottom={SPACING.spacing5}>
       <RobotConfigurationDetailsItem
-        label={t('left_mount')}
-        item={
-          isLoading
-            ? t('shared:loading')
-            : getPipetteNameSpecs(leftMountPipetteName as PipetteName)
-                ?.displayName ?? t('shared:not_used')
-        }
+        label={t('robot')}
+        // TODO(bh, 2022-10-18): read intended robot from protocol
+        item={isLoading ? loadingText : <StyledText as="p">OT-2</StyledText>}
       />
-      <Divider width="100%" />
-      <RobotConfigurationDetailsItem
-        label={t('right_mount')}
-        item={
-          isLoading
-            ? t('shared:loading')
-            : getPipetteNameSpecs(rightMountPipetteName as PipetteName)
-                ?.displayName ?? t('shared:not_used')
-        }
-      />
+      <Divider marginY="0.75rem" width="100%" />
+      {leftAndRightMountsItem ?? (
+        <>
+          <RobotConfigurationDetailsItem
+            label={t('left_mount')}
+            item={isLoading ? loadingText : leftMountItem}
+          />
+          <Divider marginY="0.75rem" width="100%" />
+          <RobotConfigurationDetailsItem
+            label={t('right_mount')}
+            item={isLoading ? loadingText : rightMountItem}
+          />
+        </>
+      )}
+      {enableExtendedHardware ? (
+        <>
+          <Divider marginY="0.75rem" width="100%" />
+          <RobotConfigurationDetailsItem
+            label={t('extension_mount')}
+            item={isLoading ? loadingText : extensionMountItem}
+          />
+        </>
+      ) : null}
       {requiredModuleDetails != null
         ? requiredModuleDetails.map((module, index) => {
             return (
               <React.Fragment key={index}>
-                <Divider width="100%" />
-                <Flex
-                  flexDirection={DIRECTION_ROW}
-                  alignItems={ALIGN_CENTER}
-                  marginY={SPACING.spacing3}
-                  data-testid={`RobotConfigurationDetails__${module.params.model}_slot_${module.params.location.slotName}`}
-                >
-                  <StyledText
-                    as="h6"
-                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                    color={COLORS.darkGreyPressed}
-                    textTransform={TYPOGRAPHY.textTransformUppercase}
-                    minWidth="6rem"
-                  >
-                    {t('run_details:module_slot_number', {
-                      slot_number:
-                        getModuleType(module.params.model) ===
-                        THERMOCYCLER_MODULE_TYPE
-                          ? '7/10'
-                          : module.params.location.slotName,
-                    })}
-                  </StyledText>
-                  <Flex paddingLeft={SPACING.spacing4}>
-                    <ModuleIcon
-                      key={index}
-                      moduleType={getModuleType(module.params.model)}
-                      marginRight={SPACING.spacing2}
-                      alignSelf={ALIGN_CENTER}
-                      height={SIZE_1}
-                      minWidth={SIZE_1}
-                      minHeight={SIZE_1}
-                    />
-
-                    <StyledText as="p">
-                      {getModuleDisplayName(module.params.model)}
-                    </StyledText>
-                  </Flex>
-                </Flex>
+                <Divider marginY="0.75rem" width="100%" />
+                <RobotConfigurationDetailsItem
+                  label={t('run_details:module_slot_number', {
+                    slot_number:
+                      getModuleType(module.params.model) ===
+                      THERMOCYCLER_MODULE_TYPE
+                        ? TC_MODULE_LOCATION
+                        : module.params.location.slotName,
+                  })}
+                  item={
+                    <>
+                      <ModuleIcon
+                        key={index}
+                        moduleType={getModuleType(module.params.model)}
+                        marginRight={SPACING.spacing2}
+                        alignSelf={ALIGN_CENTER}
+                        color={COLORS.darkGreyEnabled}
+                        height={SIZE_1}
+                        minWidth={SIZE_1}
+                        minHeight={SIZE_1}
+                      />
+                      <StyledText as="p">
+                        {getModuleDisplayName(module.params.model)}
+                      </StyledText>
+                    </>
+                  }
+                />
               </React.Fragment>
             )
           })
@@ -114,7 +174,7 @@ export const RobotConfigurationDetails = (
 
 interface RobotConfigurationDetailsItemProps {
   label: string
-  item: string
+  item: React.ReactNode
 }
 
 export const RobotConfigurationDetailsItem = (
@@ -123,29 +183,22 @@ export const RobotConfigurationDetailsItem = (
   const { label, item } = props
   return (
     <Flex
+      flex="1 0 100%"
       flexDirection={DIRECTION_ROW}
       alignItems={ALIGN_CENTER}
-      marginY={SPACING.spacing3}
     >
       <StyledText
-        as="h6"
+        as="label"
+        flex="0 0 auto"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         marginRight={SPACING.spacing4}
-        color={COLORS.darkGreyPressed}
-        textTransform={TYPOGRAPHY.textTransformUppercase}
-        minWidth="6rem"
+        color={COLORS.darkGreyEnabled}
+        textTransform={TYPOGRAPHY.textTransformCapitalize}
+        width="4.625rem"
       >
         {label}
       </StyledText>
-      <Flex>
-        <StyledText
-          as="p"
-          textTransform={TYPOGRAPHY.textTransformCapitalize}
-          data-testid={`RobotConfigurationDetails_${label}`}
-        >
-          {item}
-        </StyledText>
-      </Flex>
+      <Flex data-testid={`RobotConfigurationDetails_${label}`}>{item}</Flex>
     </Flex>
   )
 }
