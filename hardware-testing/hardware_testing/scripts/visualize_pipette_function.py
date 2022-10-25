@@ -2,7 +2,13 @@
 import argparse
 import asyncio
 from math import pi as PI
-import matplotlib.pyplot as plt  # type: ignore[import]
+
+try:
+    import matplotlib.pyplot as plt  # type: ignore[import]
+except ModuleNotFoundError:
+    raise RuntimeError(
+        "Do NOT run this script on a robot. Please install matplotlib on this computer."
+    )
 from typing import List
 
 from opentrons.hardware_control.instruments.pipette import Pipette
