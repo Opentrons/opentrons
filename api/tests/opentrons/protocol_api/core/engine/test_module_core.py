@@ -36,7 +36,9 @@ def subject(mock_engine_client: EngineClient, api_version: APIVersion) -> Module
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 3)])
-def test_api_version(decoy: Decoy, subject: ModuleCore, api_version: APIVersion) -> None:
+def test_api_version(
+    decoy: Decoy, subject: ModuleCore, api_version: APIVersion
+) -> None:
     """Should return the api_version property."""
     assert subject.api_version == api_version
 
@@ -53,7 +55,9 @@ def test_get_deck_slot(
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 3)])
-def test_add_labware_core(decoy: Decoy, subject: ModuleCore, api_version: APIVersion) -> None:
+def test_add_labware_core(
+    decoy: Decoy, subject: ModuleCore, api_version: APIVersion
+) -> None:
     """Should return a Labware object."""
     labware_core = decoy.mock(cls=LabwareCore)
     result = subject.add_labware_core(labware_core=labware_core)
