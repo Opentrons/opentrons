@@ -172,7 +172,7 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
     """Serves /update/:session/file
 
     Requires multipart (encoding doesn't matter) with a file field in the
-    body called 'ot2-system.zip'.
+    body called 'system_update.zip'.
     """
     if session.stage != Stages.AWAITING_FILE:
         return web.json_response(
@@ -184,9 +184,7 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
         )
     reader = await request.multipart()
     async for part in reader:
-        # TODO (al, 2022-04-18): This check should not be here. All ot2 and
-        #  ot3 disambiguation should happen in update actions.
-        if part.name != "ot2-system.zip" and part.name != UPDATE_PKG:
+        if part.name != "system_update.zip":
             LOG.info(f"Unknown field name {part.name} in file_upload, ignoring")
             await part.release()
         else:

@@ -1,4 +1,5 @@
 """OE Updater and dependency injection classes."""
+import os
 import contextlib
 import lzma
 import tempfile
@@ -7,6 +8,7 @@ from otupdate.common.file_actions import (
     unzip_update,
     hash_file,
     HashMismatch,
+    InvalidPKGName,
     verify_signature,
 )
 from otupdate.common.update_actions import UpdateActionsInterface, Partition
@@ -16,10 +18,10 @@ import subprocess
 
 import logging
 
-UPDATE_PKG = "ot3-system.zip"
-ROOTFS_SIG_NAME = "rootfs.xz.hash.sig"
-ROOTFS_HASH_NAME = "rootfs.xz.sha256"
-ROOTFS_NAME = "rootfs.xz"
+UPDATE_PKG = "system_update.zip"
+ROOTFS_SIG_NAME = "systemfs.xz.hash.sig"
+ROOTFS_HASH_NAME = "systemfs.xz.sha256"
+ROOTFS_NAME = "systemfs.xz"
 UPDATE_FILES = [ROOTFS_NAME, ROOTFS_SIG_NAME, ROOTFS_HASH_NAME]
 
 LOG = logging.getLogger(__name__)
@@ -155,6 +157,13 @@ class Updater(UpdateActionsInterface):
         Will also raise an exception if validation fails
         """
 
+        # make sure we have the correct file
+        if UPDATE_PKG not in filepath:
+            filename = os.path.basename(filepath)
+            msg = (f"invalid filename {filepath} {filename}")
+            LOG.error(msg)
+            raise InvalidPKGName(msg)
+
         def zip_callback(progress):
             progress_callback(progress / 2.0)
 
@@ -171,7 +180,9 @@ class Updater(UpdateActionsInterface):
         rootfs_hash = hash_file(rootfs, hash_callback, file_size=sizes[ROOTFS_NAME])
         hashfile = files.get(ROOTFS_HASH_NAME)
         assert hashfile
-        packaged_hash = open(hashfile, "rb").read().strip()
+        packaged_hash = b""
+        with open(hashfile, "rb") as fh:
+            packaged_hash = fh.readline().strip()
         if packaged_hash != rootfs_hash:
             msg = (
                 f"Hash mismatch: calculated {rootfs_hash!r} != "
