@@ -1,8 +1,16 @@
 import * as React from 'react'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
+import { useFeatureFlag } from '../../../redux/config'
 import { RobotConfigurationDetails } from '../RobotConfigurationDetails'
 import { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+
+jest.mock('../../../redux/config')
+
+const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
+  typeof useFeatureFlag
+>
 
 const mockRequiredModuleDetails = [
   {
@@ -62,7 +70,22 @@ const render = (
 
 describe('RobotConfigurationDetails', () => {
   let props: React.ComponentProps<typeof RobotConfigurationDetails>
-  beforeEach(() => {})
+
+  beforeEach(() => {
+    when(mockUseFeatureFlag)
+      .calledWith('enableExtendedHardware')
+      .mockReturnValue(false)
+  })
+
+  afterEach(() => {
+    resetAllWhenMocks()
+  })
+  it('renders a robot section showing the intended robot model for a protocol', () => {
+    const { getByText } = render(props)
+    getByText('robot')
+    getByText('OT-2')
+  })
+
   it('renders left mount pipette when there is a pipette only in the left mount', () => {
     props = {
       leftMountPipetteName: 'p10_single',
@@ -74,7 +97,7 @@ describe('RobotConfigurationDetails', () => {
     getByText('left mount')
     getByText('P10 Single-Channel GEN1')
     getByText('right mount')
-    getByText('Not Used')
+    getByText('empty')
   })
 
   it('renders right mount pipette when there is a pipette only in the right mount', () => {
@@ -88,7 +111,16 @@ describe('RobotConfigurationDetails', () => {
     getByText('left mount')
     getByText('P10 Single-Channel GEN1')
     getByText('right mount')
-    getByText('Not Used')
+    getByText('empty')
+  })
+
+  it('renders extension mount section when extended hardware feature flag is on', () => {
+    when(mockUseFeatureFlag)
+      .calledWith('enableExtendedHardware')
+      .mockReturnValue(true)
+
+    const { getByText } = render(props)
+    getByText('extension mount')
   })
 
   it('renders the magnetic module when the protocol contains a magnetic module', () => {
