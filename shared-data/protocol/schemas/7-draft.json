@@ -477,7 +477,11 @@
                   "description": "Where to move the labware."
                 },
                 "strategy": {
-                  "enum": ["usingGripper", "manualMoveWithPause", "manualMoveWithoutPause"],
+                  "enum": [
+                    "usingGripper",
+                    "manualMoveWithPause",
+                    "manualMoveWithoutPause"
+                  ],
                   "description": "Strategy to use for moving labware. Note that 'usingGripper' is only available on the OT-3."
                 }
               }
