@@ -1,6 +1,7 @@
 interface File {
-    /**
-     * The real path to the file on the users filesystem
-     */
-     path: string;
-   }
+  /**
+   * The real path to the file on the users filesystem
+   */
+  path: string
+}
+å
