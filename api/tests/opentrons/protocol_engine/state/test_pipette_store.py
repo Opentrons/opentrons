@@ -12,6 +12,7 @@ from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     LoadedPipette,
     OFF_DECK_LOCATION,
+    LabwareMovementStrategy,
 )
 from opentrons.protocol_engine.actions import UpdateCommandAction
 from opentrons.protocol_engine.state.pipettes import (
@@ -398,7 +399,7 @@ def test_heater_shaker_command_without_movement(
         (
             create_move_labware_command(
                 labware_id="non-matching-labware-id",
-                strategy="manualMoveWithPause",
+                strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
                 new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
                 offset_id=None,
             ),
@@ -413,7 +414,7 @@ def test_heater_shaker_command_without_movement(
         (
             create_move_labware_command(
                 labware_id="matching-labware-id",
-                strategy="manualMoveWithPause",
+                strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
                 new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
                 offset_id=None,
             ),
@@ -424,7 +425,7 @@ def test_heater_shaker_command_without_movement(
         (
             create_move_labware_command(
                 labware_id="non-matching-labware-id",
-                strategy="manualMoveWithoutPause",
+                strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
                 new_location=OFF_DECK_LOCATION,
                 offset_id=None,
             ),
@@ -439,7 +440,7 @@ def test_heater_shaker_command_without_movement(
         (
             create_move_labware_command(
                 labware_id="matching-labware-id",
-                strategy="manualMoveWithoutPause",
+                strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
                 new_location=OFF_DECK_LOCATION,
                 offset_id=None,
             ),
@@ -451,7 +452,7 @@ def test_heater_shaker_command_without_movement(
             create_move_labware_command(
                 labware_id="non-matching-labware-id",
                 new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-                strategy="usingGripper",
+                strategy=LabwareMovementStrategy.USING_GRIPPER,
                 offset_id=None,
             ),
             # Current well IS cleared,

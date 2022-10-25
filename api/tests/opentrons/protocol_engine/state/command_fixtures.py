@@ -10,7 +10,7 @@ from opentrons.protocol_engine import ErrorOccurrence, commands as cmd
 from opentrons.protocol_engine.types import (
     WellLocation,
     LabwareLocation,
-    LabwareMovementStrategyType,
+    LabwareMovementStrategy,
 )
 
 
@@ -339,7 +339,7 @@ def create_blow_out_command(
 
 def create_move_labware_command(
     new_location: LabwareLocation,
-    strategy: LabwareMovementStrategyType,
+    strategy: LabwareMovementStrategy,
     labware_id: str = "labware-id",
     offset_id: Optional[str] = None,
 ) -> cmd.MoveLabware:

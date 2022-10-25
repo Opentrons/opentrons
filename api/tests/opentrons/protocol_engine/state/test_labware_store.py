@@ -17,6 +17,7 @@ from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     LoadedLabware,
     OFF_DECK_LOCATION,
+    LabwareMovementStrategy,
 )
 from opentrons.protocol_engine.actions import (
     AddLabwareOffsetAction,
@@ -200,7 +201,7 @@ def test_handles_move_labware(
         labware_id="my-labware-id",
         new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
         offset_id="my-new-offset",
-        strategy="manualMoveWithPause",
+        strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
     )
     subject.handle_action(UpdateCommandAction(command=move_command))
 
@@ -239,7 +240,7 @@ def test_handles_move_labware_off_deck(
     move_labware_off_deck_cmd = create_move_labware_command(
         labware_id="my-labware-id",
         new_location=OFF_DECK_LOCATION,
-        strategy="manualMoveWithPause",
+        strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
     )
     subject.handle_action(UpdateCommandAction(command=move_labware_off_deck_cmd))
     assert subject.state.labware_by_id["my-labware-id"].location == OFF_DECK_LOCATION

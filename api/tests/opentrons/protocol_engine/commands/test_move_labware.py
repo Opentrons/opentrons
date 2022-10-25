@@ -1,6 +1,4 @@
 """Test the ``moveLabware`` command."""
-from typing_extensions import Literal
-
 import pytest
 from decoy import Decoy
 
@@ -10,6 +8,7 @@ from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     ModuleLocation,
     LoadedLabware,
+    LabwareMovementStrategy,
 )
 from opentrons.protocol_engine.state import StateView
 from opentrons.protocol_engine.commands.move_labware import (
@@ -26,7 +25,10 @@ from opentrons.protocol_engine.execution import (
 
 @pytest.mark.parametrize(
     argnames=["strategy", "times_pause_called"],
-    argvalues=[["manualMoveWithPause", 1], ["manualMoveWithoutPause", 0]],
+    argvalues=[
+        [LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE, 1],
+        [LabwareMovementStrategy.MANUAL_MOVE_WITHOUT_PAUSE, 0],
+    ],
 )
 async def test_manual_move_labware_implementation(
     decoy: Decoy,
@@ -34,7 +36,7 @@ async def test_manual_move_labware_implementation(
     labware_movement: LabwareMovementHandler,
     state_view: StateView,
     run_control: RunControlHandler,
-    strategy: Literal["manualMoveWithPause", "manualMoveWithoutPause"],
+    strategy: LabwareMovementStrategy,
     times_pause_called: int,
 ) -> None:
     """It should execute a pause and return the new offset."""
@@ -95,7 +97,7 @@ async def test_gripper_move_labware_implementation(
     data = MoveLabwareParams(
         labwareId="my-cool-labware-id",
         newLocation=new_location,
-        strategy="usingGripper",
+        strategy=LabwareMovementStrategy.USING_GRIPPER,
     )
 
     decoy.when(state_view.labware.get(labware_id="my-cool-labware-id")).then_return(
@@ -156,7 +158,7 @@ async def test_move_labware_raises(
     move_non_existent_labware_params = MoveLabwareParams(
         labwareId="my-cool-labware-id",
         newLocation=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
-        strategy="usingGripper",
+        strategy=LabwareMovementStrategy.USING_GRIPPER,
     )
     decoy.when(state_view.labware.get(labware_id="my-cool-labware-id")).then_raise(
         errors.LabwareNotLoadedError("Woops!")
@@ -168,7 +170,7 @@ async def test_move_labware_raises(
     move_labware_from_questionable_module_params = MoveLabwareParams(
         labwareId="real-labware-id",
         newLocation=ModuleLocation(moduleId="imaginary-module-id"),
-        strategy="usingGripper",
+        strategy=LabwareMovementStrategy.USING_GRIPPER,
     )
     decoy.when(state_view.labware.get(labware_id="real-labware-id")).then_return(
         LoadedLabware(
