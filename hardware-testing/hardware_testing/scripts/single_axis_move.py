@@ -29,7 +29,7 @@ SETTINGS = {
         acceleration=1000,
         max_start_stop_speed=20,
         max_change_dir_speed=5,
-        hold_current=0.1,
+        hold_current=1.5,
         run_current=1.5,
     ),
     OT3Axis.Y: GantryLoadSettings(
@@ -37,7 +37,7 @@ SETTINGS = {
         acceleration=ACCEL_Y,
         max_start_stop_speed=20,
         max_change_dir_speed=5,
-        hold_current=0.1,
+        hold_current=1.5,
         run_current=1.5,
     ),
     OT3Axis.Z_L: GantryLoadSettings(
@@ -45,7 +45,7 @@ SETTINGS = {
         acceleration=50,
         max_start_stop_speed=1,
         max_change_dir_speed=5,
-        hold_current=0.1,
+        hold_current=1.5,
         run_current=1.5,
     ),
     OT3Axis.Z_R: GantryLoadSettings(
@@ -53,7 +53,7 @@ SETTINGS = {
         acceleration=400,
         max_start_stop_speed=20,
         max_change_dir_speed=5,
-        hold_current=0.1,
+        hold_current=1.5,
         run_current=1.5,
     ),
 }
