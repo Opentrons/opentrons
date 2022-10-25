@@ -5,6 +5,7 @@ from decoy import Decoy, matchers
 from typing import Any, cast
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.labware.dev_types import LabwareUri
 
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.types import Mount as HwMount, MountType, DeckSlotName
@@ -177,9 +178,11 @@ async def test_load_labware_off_deck(
     """It should load labware definition and offset data and generate an ID."""
     decoy.when(model_utils.generate_id()).then_return("unique-id")
 
-    decoy.when(state_store.labware.get_definition_by_uri("opentrons-test/load-name/1").then_return(
-        minimal_labware_def
-    )
+    decoy.when(
+        state_store.labware.get_definition_by_uri(
+            cast("LabwareUri", "opentrons-test/load-name/1")
+        )
+    ).then_return(minimal_labware_def)
 
     result = await subject.load_labware(
         location=OFF_DECK_LOCATION,
