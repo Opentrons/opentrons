@@ -4,4 +4,3 @@ interface File {
    */
   path: string
 }
-å
