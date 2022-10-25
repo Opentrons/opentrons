@@ -47,7 +47,7 @@ import type {
   SavePositionCommandData,
 } from './types'
 import { StyledText } from '../../../atoms/text'
-import { useLabwareOffsetForLabware } from '../hooks/useLabwareOffsetForLabware'
+import { useLabwareOffsetForLabware } from '../deprecatedHooks/useLabwareOffsetForLabware'
 import { useCommandQuery } from '@opentrons/react-api-client'
 import type { Coordinates } from '@opentrons/shared-data'
 

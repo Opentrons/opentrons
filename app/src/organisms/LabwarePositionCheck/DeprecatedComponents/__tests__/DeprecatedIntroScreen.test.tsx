@@ -19,12 +19,12 @@ import {
 import { useCurrentRun, useCurrentRunId } from '../../../ProtocolUpload/hooks'
 import { getLatestLabwareOffsetCount } from '../../deprecatedUtils/getLatestLabwareOffsetCount'
 import { DeprecatedSectionList } from '../DeprecatedSectionList'
-import { useIntroInfo, useLabwareIdsBySection } from '../../hooks'
+import { useIntroInfo, useLabwareIdsBySection } from '../../deprecatedHooks'
 import { DeprecatedIntroScreen, INTERVAL_MS } from '../DeprecatedIntroScreen'
 import type { DeprecatedSection } from '../types'
 import type { HostConfig, LabwareOffset } from '@opentrons/api-client'
 
-jest.mock('../../hooks')
+jest.mock('../../deprecatedHooks')
 jest.mock('../DeprecatedSectionList')
 jest.mock('../../../Devices/hooks')
 jest.mock('../../../ProtocolUpload/hooks')

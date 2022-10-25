@@ -11,7 +11,7 @@ import { DeprecatedSectionList } from '../DeprecatedSectionList'
 import { DeprecatedDeckMap } from '../DeprecatedDeckMap'
 import { DeprecatedSummaryScreen } from '../DeprecatedSummaryScreen'
 import { DeprecatedLabwareOffsetsSummary } from '../DeprecatedLabwareOffsetsSummary'
-import { useIntroInfo, useLabwareOffsets } from '../../hooks'
+import { useIntroInfo, useLabwareOffsets } from '../../deprecatedHooks'
 import { DeprecatedSection } from '../types'
 import { useLPCSuccessToast } from '../../../ProtocolSetup/hooks'
 
@@ -20,7 +20,7 @@ jest.mock('../../../ProtocolUpload/hooks')
 jest.mock('../../../Devices/hooks')
 jest.mock('../../../ProtocolSetup/hooks')
 jest.mock('../DeprecatedSectionList')
-jest.mock('../../hooks')
+jest.mock('../../deprecatedHooks')
 jest.mock('../DeprecatedDeckMap')
 jest.mock('../DeprecatedLabwareOffsetsSummary')
 

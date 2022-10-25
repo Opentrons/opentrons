@@ -17,7 +17,7 @@ import {
   useIntroInfo,
   useLabwareIdsBySection,
   useDeprecatedSteps,
-} from '../hooks'
+} from '../deprecatedHooks'
 import { DeprecatedDeckMap } from './DeprecatedDeckMap'
 import type { Jog } from '../../../molecules/DeprecatedJogControls'
 import type {

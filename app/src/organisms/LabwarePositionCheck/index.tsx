@@ -6,7 +6,7 @@ import { useLogger } from '../../logger'
 import { useFeatureFlag } from '../../redux/config'
 import { LabwarePositionCheckComponent } from './LabwarePositionCheckComponent'
 import { DeprecatedLabwarePositionCheckComponent } from './DeprecatedComponents/DeprecatedLabwarePositionCheckComponent'
-import { useMostRecentCompletedAnalysis } from './hooks/useMostRecentCompletedAnalysis'
+import { useMostRecentCompletedAnalysis } from './useMostRecentCompletedAnalysis'
 import { useRunQuery } from '@opentrons/react-api-client'
 
 interface LabwarePositionCheckModalProps {

@@ -13,13 +13,13 @@ import {
   useIntroInfo,
   useLabwareIdsBySection,
   useDeprecatedSteps,
-} from '../../hooks'
+} from '../../deprecatedHooks'
 import { DeprecatedSection } from '../types'
 
 jest.mock('../DeprecatedLabwarePositionCheckStepDetail')
 jest.mock('../DeprecatedSectionList')
 jest.mock('../DeprecatedDeckMap')
-jest.mock('../../hooks')
+jest.mock('../../deprecatedHooks')
 
 const mockDeprecatedLabwarePositionCheckStepDetail = DeprecatedLabwarePositionCheckStepDetail as jest.MockedFunction<
   typeof DeprecatedLabwarePositionCheckStepDetail
