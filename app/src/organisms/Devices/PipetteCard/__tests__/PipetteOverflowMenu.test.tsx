@@ -100,14 +100,15 @@ describe('PipetteOverflowMenu', () => {
 
     const { getByRole, queryByRole } = render(props)
 
-    const calibrate = queryByRole('button', {
+    const calibrate = getByRole('button', {
       name: 'Calibrate pipette offset',
     })
     const detach = queryByRole('button', { name: 'Detach pipette' })
     const settings = queryByRole('button', { name: 'Pipette Settings' })
     const about = getByRole('button', { name: 'About pipette' })
 
-    expect(calibrate).toBeNull()
+    fireEvent.click(calibrate)
+    expect(props.handleCalibrate).toHaveBeenCalled()
     expect(detach).toBeNull()
     expect(settings).toBeNull()
     fireEvent.click(about)

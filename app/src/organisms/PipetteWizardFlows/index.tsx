@@ -6,20 +6,28 @@ import { Portal } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { getPipetteWizardSteps } from './getPipetteWizardSteps'
 import { SECTIONS } from './constants'
+import { BeforeBeginning } from './BeforeBeginning'
+import { AttachStem } from './AttachStem'
+import { DetachStem } from './DetachStem'
+import { Results } from './Results'
 
 // import type { State } from '../../redux/types'
 import type { PipetteWizardFlow } from './types'
 import type { PipetteMount } from '@opentrons/shared-data'
 
-export const PipetteWizardFlows = (
-  flowType: PipetteWizardFlow,
-  mount: PipetteMount,
+interface PipetteWizardFlowsProps {
+  flowType: PipetteWizardFlow
+  mount: PipetteMount
   robotName: string
+  closeFlow: () => void
+}
+export const PipetteWizardFlows = (
+  props: PipetteWizardFlowsProps
 ): JSX.Element | null => {
+  const { flowType, mount, closeFlow } = props
   //   const attachedPipette = useSelector(
   //     (state: State) => getAttachedPipettes(state, robotName)[mount]
   //   )
-
   const pipetteWizardSteps = getPipetteWizardSteps(flowType)
 
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
@@ -36,13 +44,13 @@ export const PipetteWizardFlows = (
 
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
   if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
-    modalContent = <div>BEFORE BEGINNING</div>
+    modalContent = <BeforeBeginning mount={mount} nextStep={proceed} />
   } else if (currentStep.section === SECTIONS.ATTACH_STEM) {
-    modalContent = <div>ATTACH STEM</div>
+    modalContent = <AttachStem mount={mount} nextStep={proceed} />
   } else if (currentStep.section === SECTIONS.DETACH_STEM) {
-    modalContent = <div>DETACH STEM</div>
+    modalContent = <DetachStem mount={mount} nextStep={proceed} />
   } else if (currentStep.section === SECTIONS.RESULTS) {
-    modalContent = <div>RESULTS</div>
+    modalContent = <Results mount={mount} nextStep={closeFlow} />
   }
 
   return (

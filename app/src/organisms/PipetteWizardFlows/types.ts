@@ -1,5 +1,6 @@
 import { SECTIONS, FLOWS } from './constants'
 import { useCreateCommandMutation } from '@opentrons/react-api-client'
+import { PipetteMount } from '@opentrons/shared-data'
 
 export type PipetteWizardStep =
   | BeforeBeginningStep
@@ -35,3 +36,8 @@ export type CreateRunCommand = (
   params: Parameters<CreateCommandMutate>,
   options?: Parameters<CreateCommandMutate>[1]
 ) => ReturnType<CreateCommandMutate>
+
+export interface PipetteWizardStepProps {
+  mount: PipetteMount
+  nextStep: () => void
+}

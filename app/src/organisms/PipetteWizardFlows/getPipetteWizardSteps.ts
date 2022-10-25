@@ -1,5 +1,5 @@
-import type { PipetteWizardStep, PipetteWizardFlow } from './types'
 import { FLOWS, SECTIONS } from './constants'
+import type { PipetteWizardStep, PipetteWizardFlow } from './types'
 
 export const getPipetteWizardSteps = (
   flowType: PipetteWizardFlow
