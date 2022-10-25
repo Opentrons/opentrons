@@ -100,12 +100,20 @@ test: test-ot2 test-ot3
 test-cov: test-cov-ot2 test-cov-ot3
 
 .PHONY: test-cov-ot3
-test-cov:
+test-cov-ot3:
 	$(call pytest,ot-3/robot-server) $(tests) $(test_opts) $(cov_opts)
 
 .PHONY: test-cov-ot2
-test-cov:
+test-cov-ot2:
 	$(call pytest,ot-2) $(tests) $(test_opts)  --ot2-only --ignore-glob="**/*ot3*" $(cov_opts)
+
+.PHONY: test-cov-dev
+test-cov-dev:
+	$(call pytest,dev) $(tests) $(test_opts) $(cov_opts)
+
+.PHONY: test-dev
+test-dev:
+	$(call pytest,dev) $(tests) $(test_opts)
 
 .PHONY: test-ot2
 test-ot2:

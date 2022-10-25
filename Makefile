@@ -48,6 +48,8 @@ endif
 usb_host=$(shell yarn run -s discovery find -i 169.254)
 
 # install all project dependencies
+# may be run with -j
+# setup-py requires setup-js be run first due to use of yarn installed tools like shx
 .PHONY: setup
 setup: setup-js setup-py
 

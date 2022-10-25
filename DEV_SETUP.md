@@ -12,7 +12,7 @@ You will need the following tools installed to develop on the Opentrons platform
 - git
 - curl
 - ssh
-- Pyenv (see below) with a recent interpreter of your choice, like 3.10
+- pyenv (see below) with a recent interpreter of your choice, like 3.10
 - Node.js v14
 
 ### pyenv
@@ -219,7 +219,7 @@ On Windows, we rely on:
 
 - [scoop][] to install general dependencies
 - [Node Version Switcher][nvs] to install and manage Node.js
-- For the Python side, native Windows development is not recommended
+- For the Python side, native Windows development is not supported for most of the environments.
   - [environments/app](/environments/app) is supported for Windows opentrons and shared-data package testing
   - [environments/dev](/environments/dev) may work on Windows but is not guaranteed
   - **Instead use Windows Subsystem for Linux (WSL)**
@@ -239,6 +239,12 @@ On Windows, we rely on:
 This setup will depend heavily on your exact distribution of Linux and your preferred workflows. For this example, we will provide instructions for an Ubuntu and Fedora variant using Bash. If your setup is different, consult the documentation of your distribution and the tools listed below.
 
 #### 0. Install general dependencies
+
+This list is not exhaustive but on Ubuntu 22.04 these were needed `libudev-dev` `libsystemd-dev`
+
+```shell
+sudo apt install libudev-dev libsystemd-dev -y
+```
 
 #### 1. Install `nvs` and Node.js
 
@@ -282,7 +288,7 @@ Once you are inside the repository for the first time, you should do two things:
 # confirm Node v14
 node --version
 
-# confirm Pyenv has 3.8 and 3.10 with a star by them
+# confirm pyenv has 3.8 and 3.10 with a star by them
 pyenv versions
 ```
 

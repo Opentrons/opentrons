@@ -99,6 +99,14 @@ test-ot2:
 test-ot3:
 	$(call pytest,ot-3/robot-server) $(tests) $(test_opts)
 
+.PHONY: test-dev
+test-dev:
+	$(call pytest,dev) $(tests) $(test_opts)
+
+.PHONY: test-cov-dev
+test-cov-dev:
+	$(call pytest,dev) $(tests) $(test_opts) $(cov_opts)
+
 .PHONY: test-cov
 test-cov:
 	$(call pytest,ot-2) $(tests) $(test_opts) $(cov_opts)
