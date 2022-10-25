@@ -305,6 +305,7 @@ def test_load_json_raises_error_when_ff_disabled(
         main_file=Path("/dev/null/abc.json"),
         files=[],
         metadata={},
+        robot_type="OT-2 Standard",
         config=JsonProtocolConfig(schema_version=6),
         labware_definitions=[],
     )
