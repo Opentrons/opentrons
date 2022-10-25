@@ -37,12 +37,12 @@ async def test_calibration_set_up_position_implementation(
     )
     decoy.when(
         await movement.save_position(
-            pipette_id="pipette-id", position_id="probe_position"
+            pipette_id="pipette-id", position_id="probePosition"
         )
     ).then_return(probe_position)
     decoy.when(
         await movement.save_position(
-            pipette_id="pipette-id", position_id="attach_or_detach"
+            pipette_id="pipette-id", position_id="attachOrDetach"
         )
     ).then_return(attach_or_detach)
 

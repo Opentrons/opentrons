@@ -25,13 +25,13 @@ MoveToLocationCommandType = Literal["calibration/moveToLocation"]
 class CalibrationPositions(str, Enum):
     """Deck slot to move to."""
 
-    probe_position = "probe_position"
-    attach_or_detach = "attach_or_detach"
+    probe_position = "probePosition"
+    attach_or_detach = "attachOrDetach"
 
     @property
     def offset(self) -> DeckPoint:
         """Return offset values for the given position."""
-        if self.value == "probe_position":
+        if self.value == "probePosition":
             return DeckPoint(x=10, y=0, z=3)
         else:
             return DeckPoint(x=0, y=0, z=0)
