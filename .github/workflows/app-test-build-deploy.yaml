@@ -128,6 +128,8 @@ jobs:
           key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
       - name: setup-js
         run: |
+          npm cache clean
+          yarn cache clean
           npm config set cache ${{ github.workspace }}/.npm-cache
           yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
           make setup-js
@@ -154,7 +156,6 @@ jobs:
           APPLE_ID: ${{ secrets.OT_APP_APPLE_ID }}
           APPLE_ID_PASSWORD: ${{ secrets.OT_APP_APPLE_ID_PASSWORD }}
           HOST_PYTHON: python
-        # TODO kj 10/17/2022 this run will be used make -C when all issues are solved.
         run: |
           make -C app-shell dist-${{ matrix.os }}
 
