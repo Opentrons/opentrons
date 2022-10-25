@@ -109,7 +109,8 @@ def _override_sql_engine_with_mock() -> Iterator[None]:
 
 @pytest.fixture
 def api_client(
-    _override_hardware_with_mock: None, _override_sql_engine_with_mock: None,
+    _override_hardware_with_mock: None,
+    _override_sql_engine_with_mock: None,
 ) -> TestClient:
     client = TestClient(app)
     client.headers.update({API_VERSION_HEADER: LATEST_API_VERSION_HEADER_VALUE})
