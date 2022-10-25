@@ -10,6 +10,7 @@ from opentrons.protocol_engine.types import (
 )
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import DeckSlotName
+from opentrons.protocol_engine.state.module_substates.temperature_module_substate import TemperatureModuleSubState
 
 
 @pytest.fixture
@@ -83,5 +84,11 @@ def test_deactivate(decoy: Decoy, temp_deck_subject: TemperatureModuleCore, mock
 
 def test_get_target_temperature(decoy: Decoy, temp_deck_subject: TemperatureModuleCore, mock_engine_client: EngineClient) -> None:
     """Should return the current temperature."""
+    decoy.when(mock_engine_client.state.modules.get_temperature_module_substate("1234")).then_return(
+        TemperatureModuleSubState(module_id="1234", plate_target_temperature=38.9)
+    )
+
     result = temp_deck_subject.get_target_temperature()
+    assert result == 38.9
+
 # </editor-fold>
