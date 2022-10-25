@@ -7,7 +7,7 @@ from opentrons.config.advanced_settings import _migrate, _ensure
 
 @pytest.fixture
 def migrated_file_version() -> int:
-    return 17
+    return 18
 
 
 @pytest.fixture
@@ -22,6 +22,7 @@ def default_file_settings() -> Dict[str, Any]:
         "disableFastProtocolUpload": None,
         "enableOT3HardwareController": None,
         "enableProtocolEnginePAPICore": None,
+        "enableLoadLiquid": None,
     }
 
 
@@ -225,6 +226,18 @@ def v17_config(v16_config: Dict[str, Any]) -> Dict[str, Any]:
     return r
 
 
+@pytest.fixture
+def v18_config(v17_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = v17_config.copy()
+    r.update(
+        {
+            "_version": 18,
+            "enableLoadLiquid": True,
+        }
+    )
+    return r
+
+
 @pytest.fixture(
     scope="session",
     params=[
@@ -247,6 +260,7 @@ def v17_config(v16_config: Dict[str, Any]) -> Dict[str, Any]:
         lazy_fixture("v15_config"),
         lazy_fixture("v16_config"),
         lazy_fixture("v17_config"),
+        lazy_fixture("v18_config"),
     ],
 )
 def old_settings(request: pytest.FixtureRequest) -> Dict[str, Any]:
@@ -328,4 +342,5 @@ def test_ensures_config() -> None:
         "disableFastProtocolUpload": None,
         "enableOT3HardwareController": None,
         "enableProtocolEnginePAPICore": None,
+        "enableLoadLiquid": None,
     }

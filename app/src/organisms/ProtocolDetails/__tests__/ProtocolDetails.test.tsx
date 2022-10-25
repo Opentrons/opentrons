@@ -138,7 +138,7 @@ describe('ProtocolDetails', () => {
     })
     expect(getByText('fakeSrcFileName')).toBeInTheDocument()
   })
-  it('renders deck setup section', () => {
+  it('renders deck view section', () => {
     const { getByRole, getByText } = render({
       mostRecentAnalysis: {
         ...mockMostRecentAnalysis,
@@ -153,7 +153,7 @@ describe('ProtocolDetails', () => {
         },
       },
     })
-    expect(getByRole('heading', { name: 'deck setup' })).toBeInTheDocument()
+    expect(getByRole('heading', { name: 'Deck View' })).toBeInTheDocument()
     expect(getByText('mock Deck Thumbnail')).toBeInTheDocument()
   })
   it('opens choose robot slideout when run protocol button is clicked', () => {
