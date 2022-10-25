@@ -139,14 +139,18 @@ describe('getLabwareLocationCombos', () => {
     expect(getLabwareLocationCombos(commands, labware, modules)).toEqual([
       {
         location: { slotName: '1' },
+        labwareId: 'firstLabwareId',
         definitionUri: getLabwareDefURI(mockLabwareDef),
       },
       {
         location: { slotName: '2' },
+        labwareId: 'secondLabwareId',
         definitionUri: getLabwareDefURI(mockLabwareDef),
       },
       {
         location: { slotName: '3', moduleModel: 'heaterShakerModuleV1' },
+        labwareId: 'onModuleLabwareId',
+        moduleId: 'firstModuleId',
         definitionUri: getLabwareDefURI(mockLabwareDef),
       },
     ])
@@ -236,22 +240,28 @@ describe('getLabwareLocationCombos', () => {
     expect(getLabwareLocationCombos(commands, labware, modules)).toEqual([
       {
         location: { slotName: '1' },
+        labwareId: 'firstLabwareId',
         definitionUri: getLabwareDefURI(mockLabwareDef),
       },
       {
         location: { slotName: '2' },
+        labwareId: 'secondLabwareId',
         definitionUri: getLabwareDefURI(mockLabwareDef),
       },
       {
         location: { slotName: '3', moduleModel: 'heaterShakerModuleV1' },
+        labwareId: 'onModuleLabwareId',
+        moduleId: 'firstModuleId',
         definitionUri: getLabwareDefURI(mockLabwareDef),
       },
       {
         location: { slotName: '4' },
+        labwareId: 'firstLabwareId',
         definitionUri: getLabwareDefURI(mockLabwareDef),
       },
       {
         location: { slotName: '5' },
+        labwareId: 'secondLabwareId',
         definitionUri: getLabwareDefURI(mockLabwareDef),
       },
     ])
