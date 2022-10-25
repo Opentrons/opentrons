@@ -30,7 +30,7 @@ health_router = APIRouter()
 )
 async def get_health(
     hardware: HardwareControlAPI = Depends(get_hardware),
-    # This endpoint doesn't actually need sql_engine. We require it to artificially
+    # This endpoint doesn't actually need sql_engine. We use it in order to artificially
     # fail requests until the database has finished initializing. This plays into the
     # Opentrons App's current error handling. With a non-healthy /health, the app will
     # block off most of its robot details UI. This prevents the user from trying things
