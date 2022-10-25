@@ -57,30 +57,30 @@ def start_initializing_persistence(
     It will return immediately while initialization continues in the background.
     """
 
-    async def background_directory_prep() -> Path:
+    async def init_directory_and_log() -> Path:
         try:
             return await prepare_persistence_directory(
                 persistence_directory=persistence_directory
             )
         except Exception:
             _log.exception(
-                "Exception preparing persistence directory in the background."
+                "Exception initializing persistence directory in the background."
             )
             raise
 
-    async def background_engine_init() -> SQLEngine:
+    async def init_sql_engine_and_log() -> SQLEngine:
         try:
             directory_prep_task = _directory_init_task_accessor.get_from(
                 app_state=app_state
             )
-            assert (
-                directory_prep_task is not None
-            ), "Must start initialization of persistence directory before starting initialization of SQL engine."
+            assert directory_prep_task is not None
             prepared_persistence_directory = await directory_prep_task
+
             sql_engine = await to_thread.run_sync(
                 create_sql_engine, prepared_persistence_directory / _DATABASE_FILE
             )
             return sql_engine
+
         except Exception:
             _log.exception("Exception initializing SQL engine in the background.")
             raise
@@ -90,10 +90,10 @@ def start_initializing_persistence(
         and _sql_engine_init_task_accessor.get_from(app_state=app_state) is None
     ), "Cannot initialize more than once."
 
-    directory_prep_task = asyncio.create_task(background_directory_prep())
-    _directory_init_task_accessor.set_on(app_state=app_state, value=directory_prep_task)
+    directory_init_task = asyncio.create_task(init_directory_and_log())
+    _directory_init_task_accessor.set_on(app_state=app_state, value=directory_init_task)
 
-    sql_engine_init_task = asyncio.create_task(background_engine_init())
+    sql_engine_init_task = asyncio.create_task(init_sql_engine_and_log())
     _sql_engine_init_task_accessor.set_on(
         app_state=app_state, value=sql_engine_init_task
     )
