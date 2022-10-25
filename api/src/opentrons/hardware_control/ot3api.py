@@ -1463,6 +1463,12 @@ class OT3API(
     async def remove_tip(self, mount: Union[top_types.Mount, OT3Mount]) -> None:
         await self._pipette_handler.remove_tip(OT3Mount.from_mount(mount))
 
+    async def add_gripper_probe(self, probe: GripperProbe) -> None:
+        await self._gripper_handler.add_probe(probe)
+
+    async def remove_gripper_probe(self) -> None:
+        await self._gripper_handler.remove_probe()
+
     async def capacitive_probe(
         self,
         mount: OT3Mount,
