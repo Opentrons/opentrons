@@ -2,11 +2,29 @@
 import argparse
 import asyncio
 from math import pi as PI
+import matplotlib.pyplot as plt  # type: ignore[import]
+from typing import List
 
 from opentrons.hardware_control.instruments.pipette import Pipette
 
 from hardware_testing.opentrons_api.types import OT3Mount
 from hardware_testing.opentrons_api.helpers_ot3 import build_async_ot3_hardware_api
+
+from opentrons_shared_data.pipette import model_config
+
+
+def _user_select_model() -> str:
+    cfg = model_config()["config"]
+    gen_3_pips = []
+    for model, pip in cfg.items():
+        if "gen3" in pip["name"]:
+            gen_3_pips.append(model)
+    gen_3_pips.sort()
+    print("Select model by number:")
+    for i, mod in enumerate(gen_3_pips):
+        print(f"\t{i + 1} -\t{mod}")
+    model_idx = int(input("Enter number next to desired model: ")) - 1
+    return gen_3_pips[model_idx]
 
 
 def _get_plunger_displacement_at_volume(pipette: Pipette, volume: float) -> float:
@@ -17,47 +35,47 @@ def _get_plunger_displacement_at_volume(pipette: Pipette, volume: float) -> floa
         diameter = 1.0
     else:
         raise ValueError(f"Unexpected pipette: {pipette.model}")
-    cross_section_area = PI * ((diameter / 2)**2)
+    cross_section_area = PI * ((diameter / 2) ** 2)
     return cross_section_area * distance
 
 
-async def _main(is_simulating: bool) -> None:
-    api = await build_async_ot3_hardware_api(
-        is_simulating=is_simulating,
-        pipette_left="p50_single_v4.3",
-    )
-    assert api.hardware_pipettes[OT3Mount.LEFT.to_mount()], "No pipette on the left!"
-    instr = api.hardware_pipettes[OT3Mount.LEFT.to_mount()]
-    num_steps = 1000
-    step_size_ul = instr.working_volume / float(num_steps)
-    prev_volume = 0.0
+def _get_accuracy_adjustment_table(pipette: Pipette, length: int) -> List[List[float]]:
+    _max_vol = pipette.working_volume + 1
+    _step_size_ul = _max_vol / float(length)
 
     def _vol_at_step(step: int) -> float:
-        return float(step) * step_size_ul
+        return float(step) * _step_size_ul
 
-    def _print_error(step: int) -> None:
-        print("Error:")
-        for i in range(-1, 2):
-            vol = _vol_at_step(step + i)
-            disp_vol = _get_plunger_displacement_at_volume(instr, vol)
-            print(f"\t{round(vol, 3)},{round(disp_vol, 3)}")
+    _ret: List[List[float]] = [[], []]
+    for i in range(length):
+        _ul = _vol_at_step(i)
+        _plunger_displaced_ul = _get_plunger_displacement_at_volume(pipette, _ul)
+        _ret[0].append(_ul)
+        _ret[1].append(_plunger_displaced_ul - _ul)
+    return _ret
 
-    errors = []
-    for step in range(num_steps):
-        ul = _vol_at_step(step)
-        plunger_dispalaced_ul = _get_plunger_displacement_at_volume(instr, ul)
-        print(f"{ul},{plunger_dispalaced_ul}")
-        if plunger_dispalaced_ul < prev_volume:
-            errors.append(step)
-        prev_volume = plunger_dispalaced_ul
 
-    print("******** ERRORS *********")
-    for e in errors:
-        _print_error(e)
+def _plot_table(model: str, table: List[List[float]]) -> None:
+    plt.suptitle(model)
+    plt.plot(*table)
+    ax = plt.gca()
+    ax.set_xlim([0, None])
+    ax.set_ylim([0, None])
+    plt.show()
+
+
+async def _main(length: int) -> None:
+    while True:
+        model = _user_select_model()
+        api = await build_async_ot3_hardware_api(is_simulating=True, pipette_left=model)
+        pipette = api.hardware_pipettes[OT3Mount.LEFT.to_mount()]
+        assert pipette, "No pipette on the left!"
+        table = _get_accuracy_adjustment_table(pipette, length)
+        _plot_table(model, table)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--simulate", action="store_true")
+    parser.add_argument("--length", type=int, default=1000)
     args = parser.parse_args()
-    asyncio.run(_main(args.simulate))
+    asyncio.run(_main(args.length))
