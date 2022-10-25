@@ -47,6 +47,11 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
         self._api_version = api_version
 
     @property
+    def api_version(self) -> APIVersion:
+        """Get the api version protocol module target."""
+        return self._api_version
+
+    @property
     def module_id(self) -> str:
         """The module's unique ProtocolEngine ID."""
         return self._module_id

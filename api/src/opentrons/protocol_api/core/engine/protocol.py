@@ -152,6 +152,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         )
         module_type = result.model.as_type()
 
+        # TODO(mc, 2022-10-25): move to module core factory function
         module_core_cls: Type[ModuleCore] = ModuleCore
         if module_type == ModuleType.TEMPERATURE:
             module_core_cls = TemperatureModuleCore
