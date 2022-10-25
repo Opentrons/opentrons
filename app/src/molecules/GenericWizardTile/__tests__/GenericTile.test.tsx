@@ -2,16 +2,16 @@ import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-import { GenericTile } from '..'
+import { GenericWizardTile } from '..'
 
-const render = (props: React.ComponentProps<typeof GenericTile>) => {
-  return renderWithProviders(<GenericTile {...props} />, {
+const render = (props: React.ComponentProps<typeof GenericWizardTile>) => {
+  return renderWithProviders(<GenericWizardTile {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
-describe('GenericTile', () => {
-  let props: React.ComponentProps<typeof GenericTile>
+describe('GenericWizardTile', () => {
+  let props: React.ComponentProps<typeof GenericWizardTile>
 
   beforeEach(() => {
     props = {

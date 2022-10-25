@@ -16,7 +16,7 @@ import { StyledText } from '../../atoms/text'
 import { PrimaryButton } from '../../atoms/buttons'
 import { NeedHelpLink } from '../../organisms/CalibrationPanels'
 
-export interface GenericTileProps {
+export interface GenericWizardTileProps {
   rightHandBody: React.ReactNode
   bodyText: React.ReactNode
   header: string
@@ -36,7 +36,7 @@ const GO_BACK_BUTTON_STYLE = css`
   }
 `
 
-export function GenericTile(props: GenericTileProps): JSX.Element {
+export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
   const {
     rightHandBody,
     bodyText,

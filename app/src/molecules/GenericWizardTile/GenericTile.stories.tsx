@@ -3,19 +3,21 @@ import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { ModalShell } from '../Modal'
 import { WizardHeader } from '../WizardHeader'
-import { GenericTile } from './index'
+import { GenericWizardTile } from './index'
 
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'App/Molecules/GenericTile',
-  component: GenericTile,
+  title: 'App/Molecules/GenericWizardTile',
+  component: GenericWizardTile,
 } as Meta
 
-const Template: Story<React.ComponentProps<typeof GenericTile>> = args => (
+const Template: Story<
+  React.ComponentProps<typeof GenericWizardTile>
+> = args => (
   <ModalShell>
     <WizardHeader currentStep={3} totalSteps={4} title="Example Title" />
-    <GenericTile {...args} />
+    <GenericWizardTile {...args} />
   </ModalShell>
 )
 const body = (
