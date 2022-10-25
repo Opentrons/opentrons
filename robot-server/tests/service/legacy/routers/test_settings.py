@@ -273,10 +273,9 @@ def test_reset_success(api_client, mock_reset, body, called_with):
 def test_reset_invalid_option(api_client, mock_reset):
     resp = api_client.post("/settings/reset", json={"aksgjajhadjasl": False})
     assert resp.status_code == 422
-    # TODO Blocked by https://github.com/Opentrons/opentrons/issues/5285
-    # body = resp.json()
-    # assert 'message' in body
-    # assert 'aksgjajhadjasl' in body['message']
+    body = resp.json()
+    assert 'message' in body
+    assert 'not a valid enumeration member' in body['message']
 
 
 @pytest.fixture()
