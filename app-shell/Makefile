@@ -46,7 +46,7 @@ builder := electron-builder \
 	--publish never
 
 
-electron := electron . \
+electron := yarn electron . \
 	--devtools \
 	--log.level.console="debug" \
 	--disable_ui.webPreferences.webSecurity \
@@ -68,7 +68,7 @@ all: package
 # must be wrapped in yarn run otherwise `prebuild-install` will fail silently
 # due to how `electron-rebuild` calls `prebuild-install`
 setup:
-	yarn electron-rebuild
+	yarn rebuild
 
 .PHONY: clean
 clean:

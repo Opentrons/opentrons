@@ -27,7 +27,7 @@
     }
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=16"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",
@@ -83,10 +83,6 @@
     "cz-conventional-changelog": "2.1.0",
     "decompress": "4.2.1",
     "download": "8.0.0",
-    "electron-builder": "24.0.0-alpha.1",
-    "electron-notarize": "^1.2.1",
-    "electron-publisher-s3": "^20.17.2",
-    "electron-rebuild": "^3.2.9",
     "enzyme": "^3.11.0",
     "enzyme-to-json": "^3.4.4",
     "eslint": "^7.22.0",
