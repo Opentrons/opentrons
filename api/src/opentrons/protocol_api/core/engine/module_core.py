@@ -90,7 +90,9 @@ class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore[LabwareCor
 
     def set_target_temperature(self, celsius: float) -> None:
         """Set the Temperature Module's target temperature in °C."""
-        self._engine_client.temperature_set_target_temperature(module_id=self.module_id, celsius=celsius)
+        self._engine_client.temperature_set_target_temperature(
+            module_id=self.module_id, celsius=celsius
+        )
 
     def wait_for_target_temperature(self, celsius: Optional[float] = None) -> None:
         """Wait until the module's target temperature is reached.
@@ -98,7 +100,9 @@ class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore[LabwareCor
         Specifying a value for ``celsius`` that is different than
         the module's current target temperature may beahave unpredictably.
         """
-        self._engine_client.temperature_wait_for_target_temperature(module_id=self.module_id, celsius=celsius)
+        self._engine_client.temperature_wait_for_target_temperature(
+            module_id=self.module_id, celsius=celsius
+        )
 
     def deactivate(self) -> None:
         """Deactivate the Temperature Module."""
@@ -110,7 +114,9 @@ class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore[LabwareCor
 
     def get_target_temperature(self) -> Optional[float]:
         """Get the module's target temperature in °C, if set."""
-        return self._state.get_temperature_module_substate(self.module_id).get_plate_target_temperature()
+        return self._state.get_temperature_module_substate(
+            self.module_id
+        ).get_plate_target_temperature()
 
     def get_status(self) -> TemperatureStatus:
         """Get the module's current temperature status."""

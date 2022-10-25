@@ -445,49 +445,58 @@ def test_blow_out(
 
 
 def test_temperature_set_target_temperature(
-        decoy: Decoy,
-        transport: AbstractSyncTransport,
-        subject: SyncClient) -> None:
+    decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
+) -> None:
     """Should execute a PE set_target_temperature command."""
     request = commands.temperature_module.SetTargetTemperatureCreate(
         commandType="temperatureModule/setTargetTemperature",
-        params=commands.temperature_module.SetTargetTemperatureParams(moduleId="module-id", celsius=38.7)
+        params=commands.temperature_module.SetTargetTemperatureParams(
+            moduleId="module-id", celsius=38.7
+        ),
     )
-    response = commands.temperature_module.SetTargetTemperatureResult(targetTemperature=38.7)
+    response = commands.temperature_module.SetTargetTemperatureResult(
+        targetTemperature=38.7
+    )
 
     decoy.when(transport.execute_command(request=request)).then_return(response)
 
-    result = subject.temperature_set_target_temperature(module_id="module-id", celsius=38.7)
+    result = subject.temperature_set_target_temperature(
+        module_id="module-id", celsius=38.7
+    )
 
     assert result == response
 
 
 def test_temperature_wait_for_target_temperature(
-        decoy: Decoy,
-        transport: AbstractSyncTransport,
-        subject: SyncClient) -> None:
+    decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
+) -> None:
     """Should execute a PE wait_for_target_temperature command."""
     request = commands.temperature_module.WaitForTemperatureCreate(
         commandType="temperatureModule/waitForTemperature",
-        params=commands.temperature_module.WaitForTemperatureParams(moduleId="module-id", celsius=38.7)
+        params=commands.temperature_module.WaitForTemperatureParams(
+            moduleId="module-id", celsius=38.7
+        ),
     )
     response = commands.temperature_module.WaitForTemperatureResult()
 
     decoy.when(transport.execute_command(request=request)).then_return(response)
 
-    result = subject.temperature_wait_for_target_temperature(module_id="module-id", celsius=38.7)
+    result = subject.temperature_wait_for_target_temperature(
+        module_id="module-id", celsius=38.7
+    )
 
     assert result == response
 
 
 def test_temperature_deactivate(
-        decoy: Decoy,
-        transport: AbstractSyncTransport,
-        subject: SyncClient) -> None:
+    decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
+) -> None:
     """Should execute a PE deactivate temperature command."""
     request = commands.temperature_module.DeactivateTemperatureCreate(
         commandType="temperatureModule/deactivate",
-        params=commands.temperature_module.DeactivateTemperatureParams(moduleId="module-id")
+        params=commands.temperature_module.DeactivateTemperatureParams(
+            moduleId="module-id"
+        ),
     )
     response = commands.temperature_module.DeactivateTemperatureResult()
 
