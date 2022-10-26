@@ -31,6 +31,7 @@ async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount) -> None
         print(f"Cycle {i + 1}/{cycles}")
         for p in bowtie_points:
             await api.move_to(mount, p)
+    await api.move_to(mount, bowtie_points[0])
     await api.disengage_axes([types.OT3Axis.X, types.OT3Axis.Y])
 
 
