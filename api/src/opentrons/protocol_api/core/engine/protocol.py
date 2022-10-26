@@ -70,25 +70,25 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
         Deprecated method for past experiment with ZIP protocols.
         """
-        raise NotImplementedError("ProtocolEngine PAPI core not implemented")
+        raise NotImplementedError("ProtocolCore.get_bundled_data not implemented")
 
     def get_bundled_labware(self) -> Optional[Dict[str, LabwareDefDict]]:
         """Get a map of labware names to definition dicts.
 
         Deprecated method used for past experiment with ZIP protocols.
         """
-        raise NotImplementedError("ProtocolEngine PAPI core not implemented")
+        raise NotImplementedError("ProtocolCore.get_bundled_labware not implemented")
 
     def get_extra_labware(self) -> Optional[Dict[str, LabwareDefDict]]:
         """Get a map of extra labware names to definition dicts.
 
         Used to assist load custom labware definitions.
         """
-        raise NotImplementedError("ProtocolEngine PAPI core not implemented")
+        raise NotImplementedError("ProtocolCore.get_extra_labware not implemented")
 
     def get_max_speeds(self) -> AxisMaxSpeeds:
         """Get a control interface for maximum move speeds."""
-        raise NotImplementedError("ProtocolEngine PAPI core not implemented")
+        raise NotImplementedError("ProtocolCore.get_max_speeds not implemented")
 
     def get_hardware(self) -> SyncHardwareAPI:
         """Get direct access to a hardware control interface."""
@@ -96,7 +96,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def is_simulating(self) -> bool:
         """Get whether the protocol is being analyzed or actually run."""
-        raise NotImplementedError("ProtocolEngine PAPI core not implemented")
+        raise NotImplementedError("ProtocolCore.is_simulating not implemented")
 
     def add_labware_definition(
         self,
@@ -200,54 +200,54 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def get_loaded_instruments(self) -> Dict[Mount, Optional[InstrumentCore]]:
         """Get all loaded instruments by mount."""
-        raise NotImplementedError("ProtocolEngine PAPI core not implemented")
+        raise NotImplementedError("ProtocolCore.add_labware_definition not implemented")
 
     def pause(self, msg: Optional[str]) -> None:
         """Pause the protocol."""
-        raise NotImplementedError("ProtocolEngine PAPI core not implemented")
+        raise NotImplementedError("ProtocolCore.pause not implemented")
 
     def resume(self) -> None:
         """Resume the protocol."""
-        raise NotImplementedError("ProtocolEngine PAPI core not implemented")
+        raise NotImplementedError("ProtocolCore.resume not implemented")
 
     def comment(self, msg: str) -> None:
         """Create a comment in the protocol to be shown in the log."""
-        raise NotImplementedError("ProtocolEngine PAPI core not implemented")
+        raise NotImplementedError("ProtocolCore.comment not implemented")
 
     def delay(self, seconds: float, msg: Optional[str]) -> None:
         """Wait for a period of time before proceeding."""
-        raise NotImplementedError("ProtocolEngine PAPI core not implemented")
+        raise NotImplementedError("ProtocolCore.delay not implemented")
 
     def home(self) -> None:
         """Move all axes to their home positions."""
-        raise NotImplementedError("ProtocolEngine PAPI core not implemented")
+        raise NotImplementedError("ProtocolCore.home not implemented")
 
     def get_deck(self) -> Deck:
         """Get an interface to get and modify the deck layout."""
-        raise NotImplementedError("ProtocolEngine PAPI core not implemented")
+        raise NotImplementedError("ProtocolCore.get_deck not implemented")
 
     def get_fixed_trash(self) -> DeckItem:
         """Get the fixed trash labware."""
-        raise NotImplementedError("ProtocolEngine PAPI core not implemented")
+        raise NotImplementedError("ProtocolCore.get_fixed_trash not implemented")
 
     def set_rail_lights(self, on: bool) -> None:
         """Set the device's rail lights."""
-        raise NotImplementedError("ProtocolEngine PAPI core not implemented")
+        raise NotImplementedError("ProtocolCore.set_rail_lights not implemented")
 
     def get_rail_lights_on(self) -> bool:
         """Get whether the device's rail lights are on."""
-        raise NotImplementedError("ProtocolEngine PAPI core not implemented")
+        raise NotImplementedError("ProtocolCore.get_rail_lights_on not implemented")
 
     def door_closed(self) -> bool:
         """Get whether the device's front door is closed."""
-        raise NotImplementedError("ProtocolEngine PAPI core not implemented")
+        raise NotImplementedError("ProtocolCore.door_closed not implemented")
 
     def get_last_location(
         self,
         mount: Optional[Mount] = None,
     ) -> Optional[Location]:
         """Get the last accessed location."""
-        raise NotImplementedError("ProtocolEngine PAPI core not implemented")
+        raise NotImplementedError("ProtocolCore.get_last_location not implemented")
 
     def set_last_location(
         self,
@@ -255,4 +255,4 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         mount: Optional[Mount] = None,
     ) -> None:
         """Set the last accessed location."""
-        raise NotImplementedError("ProtocolEngine PAPI core not implemented")
+        raise NotImplementedError("ProtocolCore.set_last_location not implemented")

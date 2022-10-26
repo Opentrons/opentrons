@@ -31,17 +31,14 @@ from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
-from .core.instrument import AbstractInstrument
+from .core.common import ModuleCore, ProtocolCore
 from .core.labware import AbstractLabware
 from .core.module import (
-    AbstractModuleCore,
     AbstractTemperatureModuleCore,
     AbstractMagneticModuleCore,
     AbstractThermocyclerCore,
     AbstractHeaterShakerCore,
 )
-from .core.protocol import AbstractProtocol
-from .core.well import AbstractWellCore
 
 from . import validation
 from .instrument_context import InstrumentContext
@@ -63,12 +60,6 @@ ModuleTypes = Union[
     ThermocyclerContext,
     HeaterShakerContext,
 ]
-
-
-InstrumentCore = AbstractInstrument[AbstractWellCore]
-LabwareCore = AbstractLabware[AbstractWellCore]
-ModuleCore = AbstractModuleCore[LabwareCore]
-ProtocolCore = AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]
 
 
 class HardwareManager(NamedTuple):
