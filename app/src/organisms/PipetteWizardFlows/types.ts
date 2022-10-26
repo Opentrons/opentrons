@@ -38,6 +38,7 @@ export type CreateRunCommand = (
 ) => ReturnType<CreateCommandMutate>
 
 export interface PipetteWizardStepProps {
+  flowType: PipetteWizardFlow
   mount: PipetteMount
   nextStep: () => void
 }

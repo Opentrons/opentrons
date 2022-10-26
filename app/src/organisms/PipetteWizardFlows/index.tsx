@@ -5,7 +5,7 @@ import { ModalShell } from '../../molecules/Modal'
 import { Portal } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { getPipetteWizardSteps } from './getPipetteWizardSteps'
-import { SECTIONS } from './constants'
+import { FLOWS, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
 import { AttachStem } from './AttachStem'
 import { DetachStem } from './DetachStem'
@@ -44,13 +44,25 @@ export const PipetteWizardFlows = (
 
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
   if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
-    modalContent = <BeforeBeginning mount={mount} nextStep={proceed} />
+    modalContent = (
+      <BeforeBeginning
+        mount={mount}
+        flowType={FLOWS.CALIBRATE}
+        nextStep={proceed}
+      />
+    )
   } else if (currentStep.section === SECTIONS.ATTACH_STEM) {
-    modalContent = <AttachStem mount={mount} nextStep={proceed} />
+    modalContent = (
+      <AttachStem mount={mount} flowType={FLOWS.CALIBRATE} nextStep={proceed} />
+    )
   } else if (currentStep.section === SECTIONS.DETACH_STEM) {
-    modalContent = <DetachStem mount={mount} nextStep={proceed} />
+    modalContent = (
+      <DetachStem mount={mount} flowType={FLOWS.CALIBRATE} nextStep={proceed} />
+    )
   } else if (currentStep.section === SECTIONS.RESULTS) {
-    modalContent = <Results mount={mount} nextStep={closeFlow} />
+    modalContent = (
+      <Results mount={mount} flowType={FLOWS.CALIBRATE} nextStep={closeFlow} />
+    )
   }
 
   return (
