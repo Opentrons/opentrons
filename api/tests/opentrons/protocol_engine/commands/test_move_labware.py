@@ -141,7 +141,7 @@ async def test_gripper_move_labware_implementation(
     )
 
 
-async def test_move_labware_raises(
+async def test_move_labware_raises_for_labware_or_module_not_found(
     decoy: Decoy,
     equipment: EquipmentHandler,
     labware_movement: LabwareMovementHandler,
@@ -190,3 +190,50 @@ async def test_move_labware_raises(
 
     with pytest.raises(errors.ModuleNotLoadedError):
         await subject.execute(move_labware_from_questionable_module_params)
+
+
+async def test_move_labware_raises_if_movement_obstructed(
+    decoy: Decoy,
+    equipment: EquipmentHandler,
+    labware_movement: LabwareMovementHandler,
+    state_view: StateView,
+    run_control: RunControlHandler,
+) -> None:
+    """It should execute a pause and return the new offset."""
+    subject = MoveLabwareImplementation(
+        state_view=state_view,
+        equipment=equipment,
+        labware_movement=labware_movement,
+        run_control=run_control,
+    )
+
+    data = MoveLabwareParams(
+        labwareId="my-cool-labware-id",
+        newLocation=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
+        strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
+    )
+    decoy.when(state_view.labware.get(labware_id="my-cool-labware-id")).then_return(
+        LoadedLabware(
+            id="my-cool-labware-id",
+            loadName="load-name",
+            definitionUri="opentrons-test/load-name/1",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            offsetId=None,
+        )
+    )
+    decoy.when(
+        equipment.find_applicable_labware_offset_id(
+            labware_definition_uri="opentrons-test/load-name/1",
+            labware_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
+        )
+    ).then_return("wowzers-a-new-offset-id")
+
+    decoy.when(
+        await labware_movement.ensure_movement_not_obstructed_by_module(
+            labware_id="my-cool-labware-id",
+            new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
+        )
+    ).then_raise(errors.LabwareMovementNotAllowedError("Oh boy"))
+
+    with pytest.raises(errors.LabwareMovementNotAllowedError):
+        await subject.execute(data)

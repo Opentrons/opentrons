@@ -8,7 +8,14 @@ from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.state import StateStore
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 
-from ..errors import GripperNotAttachedError, UnsupportedLabwareMovementError
+from .thermocycler_movement_flagger import ThermocyclerMovementFlagger
+
+from ..errors import (
+    GripperNotAttachedError,
+    LabwareMovementNotAllowedError,
+    ThermocyclerNotOpenError,
+)
+
 from ..types import (
     DeckSlotLocation,
     ModuleLocation,
@@ -36,11 +43,18 @@ class LabwareMovementHandler:
         hardware_api: HardwareControlAPI,
         state_store: StateStore,
         model_utils: Optional[ModelUtils] = None,
+        thermocycler_movement_flagger: Optional[ThermocyclerMovementFlagger] = None,
     ) -> None:
         """Initialize a LabwareMovementHandler instance."""
         self._hardware_api = hardware_api
         self._state_store = state_store
         self._model_utils = model_utils or ModelUtils()
+        self._tc_movement_flagger = (
+            thermocycler_movement_flagger
+            or ThermocyclerMovementFlagger(
+                state_store=self._state_store, hardware_api=self._hardware_api
+            )
+        )
 
     async def move_labware_with_gripper(
         self,
@@ -157,7 +171,50 @@ class LabwareMovementHandler:
     ) -> Union[DeckSlotLocation, ModuleLocation]:
         """Ensure valid on-deck location for gripper, otherwise raise error."""
         if not isinstance(location, (DeckSlotLocation, ModuleLocation)):
-            raise UnsupportedLabwareMovementError(
+            raise LabwareMovementNotAllowedError(
                 "Off-deck labware movements are not supported using the gripper."
             )
         return location
+
+    async def ensure_movement_not_obstructed_by_module(
+        self, labware_id: str, new_location: LabwareLocation
+    ) -> None:
+        """Ensure that the labware movement is not obstructed by a parent module.
+
+        Raises: LabwareMovementNotAllowedError if either current location or
+        new location is a module that is in a state that prevents the labware from
+        being moved (either manually or using gripper).
+        """
+        current_parent = self._state_store.labware.get_location(labware_id=labware_id)
+        for parent in (current_parent, new_location):
+            try:
+                await self._tc_movement_flagger.raise_if_labware_in_non_open_thermocycler(
+                    labware_parent=parent
+                )
+            except ThermocyclerNotOpenError:
+                raise LabwareMovementNotAllowedError(
+                    "Cannot move labware from/to a thermocycler with closed lid."
+                )
+            # if not isinstance(parent, ModuleLocation):
+            #     continue
+            # module_id = parent.moduleId
+            # modules_view = self._state_store.modules
+            # module = modules_view.get(module_id)
+            # if ModuleModel.is_thermocycler_module_model(module.model):
+            #     tc_substate = modules_view.get_thermocycler_module_substate(module_id)
+            #     try:
+            #         await self._tc_movement_flagger.raise_if_thermocycler_is_not_open(tc_substate)
+            #     except ThermocyclerNotOpenError:
+            #         raise LabwareMovementNotAllowedError(
+            #             "Cannot move labware from/to a thermocycler with closed lid.")
+            # elif ModuleModel.is_heater_shaker_module_model(module.model):
+            #     hs_substate = modules_view.get_heater_shaker_module_substate(module_id)
+            #     if hs_substate.is_labware_latch_closed:
+            #         raise LabwareMovementNotAllowedError(
+            #             "Cannot move labware from/to a heater-shaker "
+            #             "with labware latch closed.")
+            #     # TODO: query hardware to verify that latch is indeed open
+            # elif ModuleModel.is_temperature_module_model(module.model):
+            #     raise LabwareMovementNotAllowedError(
+            #         "Cannot move labware from/to temperature module yet.")
+            # Do nothing for magnetic module/ mag plate

@@ -20,6 +20,11 @@ from opentrons.protocol_engine.types import (
     LabwareOffset,
     LabwareOffsetLocation,
     LabwareOffsetVector,
+    LabwareLocation,
+)
+
+from opentrons.protocol_engine.execution.thermocycler_movement_flagger import (
+    ThermocyclerMovementFlagger,
 )
 
 from opentrons.protocol_engine.execution.labware_movement import (
@@ -29,7 +34,8 @@ from opentrons.protocol_engine.execution.labware_movement import (
 from opentrons.protocol_engine.errors import (
     HardwareNotSupportedError,
     GripperNotAttachedError,
-    UnsupportedLabwareMovementError,
+    LabwareMovementNotAllowedError,
+    ThermocyclerNotOpenError,
 )
 from opentrons.protocol_engine.state import StateStore
 
@@ -49,18 +55,26 @@ def model_utils(decoy: Decoy) -> ModelUtils:
     return decoy.mock(cls=ModelUtils)
 
 
+@pytest.fixture
+def thermocycler_movement_flagger(decoy: Decoy) -> ThermocyclerMovementFlagger:
+    """Get a mocked out ThermocyclerMovementFlagger instance."""
+    return decoy.mock(cls=ThermocyclerMovementFlagger)
+
+
 @pytest.mark.ot3_only
 @pytest.fixture
 def subject(
     ot3_hardware_api: OT3API,
     state_store: StateStore,
     model_utils: ModelUtils,
+    thermocycler_movement_flagger: ThermocyclerMovementFlagger,
 ) -> LabwareMovementHandler:
     """Get LabwareMovementHandler for OT3, with its dependencies mocked out."""
     return LabwareMovementHandler(
         hardware_api=ot3_hardware_api,
         state_store=state_store,
         model_utils=model_utils,
+        thermocycler_movement_flagger=thermocycler_movement_flagger,
     )
 
 
@@ -194,5 +208,98 @@ def test_ensure_valid_gripper_location(subject: LabwareMovementHandler) -> None:
     assert subject.ensure_valid_gripper_location(slot_location) == slot_location
     assert subject.ensure_valid_gripper_location(module_location) == module_location
 
-    with pytest.raises(UnsupportedLabwareMovementError):
+    with pytest.raises(LabwareMovementNotAllowedError):
         subject.ensure_valid_gripper_location(off_deck_location)
+
+
+@pytest.mark.parametrize(
+    argnames=["from_loc", "to_loc"],
+    argvalues=[
+        (
+            ModuleLocation(moduleId="a-thermocycler-id"),
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+        ),
+        (
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+            ModuleLocation(moduleId="a-thermocycler-id"),
+        ),
+    ],
+)
+async def test_ensure_movement_not_obstructed_by_thermocycler_raises(
+    decoy: Decoy,
+    subject: LabwareMovementHandler,
+    state_store: StateStore,
+    thermocycler_movement_flagger: ThermocyclerMovementFlagger,
+    from_loc: LabwareLocation,
+    to_loc: LabwareLocation,
+) -> None:
+    """It should raise error when labware movement is obstructed by thermocycler."""
+    decoy.when(state_store.labware.get_location(labware_id="labware-id")).then_return(
+        from_loc
+    )
+
+    decoy.when(
+        await thermocycler_movement_flagger.raise_if_labware_in_non_open_thermocycler(
+            labware_parent=ModuleLocation(moduleId="a-thermocycler-id")
+        )
+    ).then_raise(ThermocyclerNotOpenError("Thou shall not pass!"))
+
+    # Raises when thermocycler_movement_flagger raises
+    with pytest.raises(LabwareMovementNotAllowedError):
+        await subject.ensure_movement_not_obstructed_by_module(
+            labware_id="labware-id", new_location=to_loc
+        )
+
+
+async def test_ensure_movement_not_obstructed_by_thermocycler(
+    decoy: Decoy,
+    subject: LabwareMovementHandler,
+    state_store: StateStore,
+    thermocycler_movement_flagger: ThermocyclerMovementFlagger,
+) -> None:
+    """It should not raise error when labware movement is not obstructed by thermocycler."""
+    decoy.when(state_store.labware.get_location(labware_id="labware-id")).then_return(
+        ModuleLocation(moduleId="a-thermocycler-id")
+    )
+    await subject.ensure_movement_not_obstructed_by_module(
+        labware_id="labware-id",
+        new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+    )
+
+
+@pytest.mark.parametrize(
+    argnames=["from_loc", "to_loc"],
+    argvalues=[
+        (
+            ModuleLocation(moduleId="a-heater-shaker-id"),
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+        ),
+        (
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+            ModuleLocation(moduleId="a-heater-shaker-id"),
+        ),
+    ],
+)
+async def test_ensure_movement_not_obstructed_by_heater_shaker_raises(
+    decoy: Decoy,
+    subject: LabwareMovementHandler,
+    state_store: StateStore,
+    from_loc: LabwareLocation,
+    to_loc: LabwareLocation,
+) -> None:
+    """It should raise error when labware movement is obstructed by thermocycler."""
+
+
+async def test_ensure_movement_not_obstructed_does_not_raise_for_slot_locations(
+    decoy: Decoy,
+    subject: LabwareMovementHandler,
+    state_store: StateStore,
+) -> None:
+    """It should not raise error when moving from slot to slot."""
+    decoy.when(state_store.labware.get_location(labware_id="labware-id")).then_return(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+    )
+    await subject.ensure_movement_not_obstructed_by_module(
+        labware_id="labware-id",
+        new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+    )

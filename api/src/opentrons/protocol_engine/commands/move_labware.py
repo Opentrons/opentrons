@@ -75,6 +75,10 @@ class MoveLabwareImplementation(
             labware_definition_uri=definition_uri, labware_location=params.newLocation
         )
 
+        await self._labware_movement.ensure_movement_not_obstructed_by_module(
+            labware_id=params.labwareId, new_location=params.newLocation
+        )
+
         if params.strategy == LabwareMovementStrategy.USING_GRIPPER:
             validated_current_loc = (
                 self._labware_movement.ensure_valid_gripper_location(

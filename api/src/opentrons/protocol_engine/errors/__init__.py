@@ -41,7 +41,7 @@ from .exceptions import (
     ProtocolCommandFailedError,
     GripperNotAttachedError,
     HardwareNotSupportedError,
-    UnsupportedLabwareMovementError,
+    LabwareMovementNotAllowedError,
 )
 
 from .error_occurrence import ErrorOccurrence
@@ -88,7 +88,7 @@ __all__ = [
     "ProtocolCommandFailedError",
     "GripperNotAttachedError",
     "HardwareNotSupportedError",
-    "UnsupportedLabwareMovementError",
+    "LabwareMovementNotAllowedError",
     # error occurrence models
     "ErrorOccurrence",
 ]

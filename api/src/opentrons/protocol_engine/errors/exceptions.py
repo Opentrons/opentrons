@@ -181,5 +181,5 @@ class GripperNotAttachedError(ProtocolEngineError):
     """An error raised when executing a gripper action without an attached gripper."""
 
 
-class UnsupportedLabwareMovementError(ProtocolEngineError):
+class LabwareMovementNotAllowedError(ProtocolEngineError):
     """An error raised when attempting an illegal labware movement."""
