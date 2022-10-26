@@ -41,4 +41,5 @@ export interface PipetteWizardStepProps {
   flowType: PipetteWizardFlow
   mount: PipetteMount
   nextStep: () => void
+  goBack: () => void
 }

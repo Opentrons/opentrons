@@ -41,28 +41,31 @@ export const PipetteWizardFlows = (
         : currentStepIndex
     )
   }
+  const goBack = (): void => {
+    setCurrentStepIndex(
+      currentStepIndex !== pipetteWizardSteps.length - 1
+        ? currentStepIndex - 1
+        : currentStepIndex
+    )
+  }
+
+  const calibrateBaseProps = {
+    mount,
+    flowType: FLOWS.CALIBRATE,
+    goBack,
+  }
 
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
   if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
     modalContent = (
-      <BeforeBeginning
-        mount={mount}
-        flowType={FLOWS.CALIBRATE}
-        nextStep={proceed}
-      />
+      <BeforeBeginning {...calibrateBaseProps} nextStep={proceed} />
     )
   } else if (currentStep.section === SECTIONS.ATTACH_STEM) {
-    modalContent = (
-      <AttachStem mount={mount} flowType={FLOWS.CALIBRATE} nextStep={proceed} />
-    )
+    modalContent = <AttachStem {...calibrateBaseProps} nextStep={proceed} />
   } else if (currentStep.section === SECTIONS.DETACH_STEM) {
-    modalContent = (
-      <DetachStem mount={mount} flowType={FLOWS.CALIBRATE} nextStep={proceed} />
-    )
+    modalContent = <DetachStem {...calibrateBaseProps} nextStep={proceed} />
   } else if (currentStep.section === SECTIONS.RESULTS) {
-    modalContent = (
-      <Results mount={mount} flowType={FLOWS.CALIBRATE} nextStep={closeFlow} />
-    )
+    modalContent = <Results {...calibrateBaseProps} nextStep={closeFlow} />
   }
 
   return (
@@ -74,6 +77,7 @@ export const PipetteWizardFlows = (
             title="Calibrate Pipette Title"
             currentStep={currentStepIndex}
             totalSteps={totalStepCount}
+            onExit={closeFlow}
           />
         }
       >

@@ -10,3 +10,11 @@ export const FLOWS = {
   DETACH: 'DETACH',
   CALIBRATE: 'CALIBRATE',
 }
+
+export const CALIBRATION_PROBE_DISPLAYNAME = 'Calibration Probe'
+
+//  required equipment list
+export const CALIBRATION_PROBE = {
+  loadName: 'calibration_probe',
+  displayName: CALIBRATION_PROBE_DISPLAYNAME,
+}
