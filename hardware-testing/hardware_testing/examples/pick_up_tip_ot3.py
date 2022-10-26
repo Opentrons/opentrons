@@ -2,90 +2,34 @@
 import argparse
 import asyncio
 
-from hardware_testing.opentrons_api.types import (
-    GantryLoad,
-    OT3Mount,
-    OT3Axis,
-    Point,
-    CriticalPoint,
-)
-from hardware_testing.opentrons_api.helpers_ot3 import (
-    OT3API,
-    build_async_ot3_hardware_api,
-    GantryLoadSettings,
-    set_gantry_load_per_axis_settings_ot3,
-    home_ot3,
-)
+from hardware_testing.opentrons_api import types
+from hardware_testing.opentrons_api import helpers_ot3
 
-MOUNT = OT3Mount.LEFT
-LOAD = GantryLoad.LOW_THROUGHPUT
-SPEED_XY = 500
-SPEED_Z = 250
-
-SETTINGS = {
-    OT3Axis.X: GantryLoadSettings(
-        max_speed=SPEED_XY,
-        acceleration=2000,
-        max_start_stop_speed=0,
-        max_change_dir_speed=0,
-        hold_current=0.1,
-        run_current=1.4,
-    ),
-    OT3Axis.Y: GantryLoadSettings(
-        max_speed=SPEED_XY,
-        acceleration=2000,
-        max_start_stop_speed=0,
-        max_change_dir_speed=0,
-        hold_current=0.1,
-        run_current=1.4,
-    ),
-    OT3Axis.Z_L: GantryLoadSettings(
-        max_speed=SPEED_Z,
-        acceleration=1500,
-        max_start_stop_speed=0,
-        max_change_dir_speed=0,
-        hold_current=0.1,
-        run_current=1.4,
-    ),
-    OT3Axis.Z_R: GantryLoadSettings(
-        max_speed=SPEED_Z,
-        acceleration=1500,
-        max_start_stop_speed=0,
-        max_change_dir_speed=0,
-        hold_current=0.1,
-        run_current=1.4,
-    ),
-}
-
-
-async def _safe_home(api: OT3API, offset: Point) -> None:
-    await home_ot3(api)
-    await api.move_rel(mount=MOUNT, delta=Point(y=offset.y))
-    await api.move_rel(mount=MOUNT, delta=Point(x=offset.x))
+TIP_POS = types.Point(x=100, y=100, z=100)
 
 
 async def _main(is_simulating: bool) -> None:
-    api: OT3API = await build_async_ot3_hardware_api(is_simulating=is_simulating)
-    safe_home_offset = Point(x=-10, y=-10)
-    set_gantry_load_per_axis_settings_ot3(api, SETTINGS, load=LOAD)
-
-    tip_position = Point(x=100, y=100, z=100)
-
-    await _safe_home(api, safe_home_offset)
-    input("ENTER to move Nozzle to tip rack: ")
-    await api.move_to(
-        mount=MOUNT, abs_position=tip_position, critical_point=CriticalPoint.NOZZLE
+    mount = types.OT3Mount.LEFT
+    api = await helpers_ot3.build_async_ot3_hardware_api(
+        is_simulating=is_simulating, pipette_left="p1000_single_v3.3"
     )
-    input("ENTER to pick up tip(s): ")
-    await api.pick_up_tip(mount=MOUNT, tip_length=40, presses=3)  # type: ignore[arg-type]
-    input("ENTER to drop tip(s): ")
-    await api.drop_tip(mount=MOUNT)
-    input("ENTER to exit script: ")
-    await api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
+    # home
+    await helpers_ot3.home_ot3(api)
+    # move to the tip
+    await helpers_ot3.move_to_arched_ot3(api, mount, TIP_POS)
+    # overwrite the default current/distance
+    await helpers_ot3.update_pick_up_current(api, mount, current=0.25)
+    await helpers_ot3.update_pick_up_distance(api, mount, distance=0.25)
+    # pickup the tip
+    await api.pick_up_tip(mount, tip_length=40)
+    # drop the tip (in place)
+    await api.drop_tip(mount)
+    # disengage XY axes when done
+    await api.disengage_axes([types.OT3Axis.X, types.OT3Axis.Y])
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
     args = parser.parse_args()
-    asyncio.run(_main(args.simulat))
+    asyncio.run(_main(args.simulate))
