@@ -101,19 +101,25 @@ const useLpcCtaText = (
       const labwareLocation = getLabwareLocation(labwareId, commands)
       return t('confirm_position_and_return_tip', {
         next_slot:
-          'slotName' in labwareLocation ? labwareLocation.slotName : '',
+          labwareLocation !== 'offDeck' && 'slotName' in labwareLocation
+            ? labwareLocation.slotName
+            : '',
       })
     }
     case 'moveToWell': {
       const labwareId = command.params.labwareId
       const labwareLocation = getLabwareLocation(labwareId, commands)
-      return t('confirm_position_and_move', {
-        next_slot:
+      let nextSlot = ''
+      if (labwareLocation === 'offDeck') {
+        nextSlot = 'offDeck'
+      } else {
+        nextSlot =
           'slotName' in labwareLocation
             ? labwareLocation.slotName
             : getModuleInitialLoadInfo(labwareLocation.moduleId, commands)
-                .location.slotName,
-      })
+                .location.slotName
+      }
+      return t('confirm_position_and_move', { next_slot: nextSlot })
     }
     case 'heaterShaker/deactivateShaker':
     case 'heaterShaker/closeLabwareLatch':
@@ -149,11 +155,16 @@ export const useTitleText = (
 
   const labwareId = command.params.labwareId
   const labwareLocation = getLabwareLocation(labwareId, commands)
-  const slot =
-    'slotName' in labwareLocation
-      ? labwareLocation.slotName
-      : getModuleInitialLoadInfo(labwareLocation.moduleId, commands).location
-          .slotName
+  let slot = ''
+  if (labwareLocation === 'offDeck') {
+    slot = 'offDeck'
+  } else {
+    slot =
+      'slotName' in labwareLocation
+        ? labwareLocation.slotName
+        : getModuleInitialLoadInfo(labwareLocation.moduleId, commands).location
+            .slotName
+  }
 
   if (loading) {
     switch (command.commandType) {

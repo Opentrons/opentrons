@@ -25,6 +25,7 @@ export function useLabwareOffsetForLabware(
     protocolData?.commands ?? [],
     protocolData.modules
   )
+  if (labwareLocation == null) return null
   const labwareOffsets = runRecord?.data?.labwareOffsets ?? []
 
   return (

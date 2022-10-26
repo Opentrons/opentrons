@@ -48,7 +48,7 @@ export const getTiprackIdsInOrder = (
       const isTiprack = getIsTiprack(labwareDef)
       if (isTiprack) {
         const labwareLocation = getLabwareLocation(labwareId, commands)
-        if (!('slotName' in labwareLocation)) {
+        if (labwareLocation === 'offDeck' || !('slotName' in labwareLocation)) {
           throw new Error('expected tiprack location to be a slot')
         }
 
@@ -98,7 +98,7 @@ export const getAllTipracksIdsThatPipetteUsesInOrder = (
       const labwareDefId = labware[tiprackId].definitionId
       const definition = labwareDefinitions[labwareDefId]
       const tiprackLocation = getLabwareLocation(tiprackId, commands)
-      if (!('slotName' in tiprackLocation)) {
+      if (tiprackLocation === 'offDeck' || !('slotName' in tiprackLocation)) {
         throw new Error('expected tiprack location to be a slot')
       }
       return {
@@ -127,7 +127,7 @@ export const getLabwareIdsInOrder = (
       const labwareLocation = getLabwareLocation(labwareId, commands)
       // skip any labware that is not a tiprack
       if (!isTiprack) {
-        if ('moduleId' in labwareLocation) {
+        if (labwareLocation !== 'offDeck' && 'moduleId' in labwareLocation) {
           return [
             ...unorderedLabware,
             {
@@ -140,6 +140,7 @@ export const getLabwareIdsInOrder = (
         } else {
           // if we're in a slot where we can't have labware, don't include the definition (i.e. the trash bin)
           if (
+            labwareLocation !== 'offDeck' &&
             !getSlotHasMatingSurfaceUnitVector(
               standardDeckDef as any,
               labwareLocation.slotName.toString()
@@ -153,7 +154,10 @@ export const getLabwareIdsInOrder = (
           {
             definition: labwareDef,
             labwareId: labwareId,
-            slot: labwareLocation.slotName,
+            slot:
+              labwareLocation === 'offDeck'
+                ? 'offDeck'
+                : labwareLocation.slotName,
           },
         ]
       }

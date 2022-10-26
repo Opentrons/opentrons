@@ -12,7 +12,7 @@ export const getLabwareOffsetLocation = (
   commands: ProtocolAnalysisFile['commands'],
   modules: ProtocolAnalysisFile['modules']
 ): LabwareOffsetLocation | null => {
-  let location: LabwareOffsetLocation
+  let location: LabwareOffsetLocation | null
   const labwareLocation = getLabwareLocation(labwareId, commands)
   if (labwareLocation === 'offDeck') {
     location = null

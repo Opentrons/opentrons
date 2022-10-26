@@ -25,6 +25,7 @@ const getIsLabwareOnTopOfTC = (
 ): boolean => {
   const labwareLocation = getLabwareLocation(labwareId, commands)
   return (
+    labwareLocation !== 'offDeck' &&
     'moduleId' in labwareLocation &&
     getModuleType(modules[labwareLocation.moduleId].model) ===
       THERMOCYCLER_MODULE_TYPE
@@ -38,6 +39,7 @@ const getIsLabwareOnTopOfHS = (
 ): boolean => {
   const labwareLocation = getLabwareLocation(labwareId, commands)
   return (
+    labwareLocation !== 'offDeck' &&
     'moduleId' in labwareLocation &&
     getModuleType(modules[labwareLocation.moduleId].model) ===
       HEATERSHAKER_MODULE_TYPE

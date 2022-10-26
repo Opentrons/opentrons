@@ -47,7 +47,10 @@ export function useIntroInfo(): IntroInfo | null {
     firstTiprackToCheckId,
     protocolData.commands
   )
-  if (!('slotName' in firstTiprackLocation)) {
+  if (
+    firstTiprackLocation === 'offDeck' ||
+    !('slotName' in firstTiprackLocation)
+  ) {
     throw new Error('expected tiprack location to be a slot')
   }
 

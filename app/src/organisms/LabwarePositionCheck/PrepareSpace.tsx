@@ -23,7 +23,7 @@ import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_stand
 
 import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
-import { CheckTipRacksStep } from './types'
+import { CheckLabwareStep } from './types'
 import { NeedHelpLink } from '../CalibrationPanels'
 
 const LPC_HELP_LINK_URL =
@@ -39,7 +39,7 @@ const DECK_LAYER_BLOCKLIST = [
   'removableDeckOutline',
   'screwHoles',
 ]
-interface PrepareSpaceProps extends Omit<CheckTipRacksStep, 'section'> {
+interface PrepareSpaceProps extends Omit<CheckLabwareStep, 'section'> {
   section: 'CHECK_LABWARE' | 'CHECK_TIP_RACKS' | 'PICK_UP_TIP' | 'RETURN_TIP'
   labwareDef: LabwareDefinition2
   protocolData: CompletedProtocolAnalysis

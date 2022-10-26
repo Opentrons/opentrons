@@ -63,7 +63,7 @@ export const getTiprackIdsInOrder = (
           ...tipRackLocations.map(loc => ({
             definition: labwareDef,
             labwareId: labwareId,
-            slot: 'slotName' in loc ? loc.slotName : '',
+            slot: loc !== 'offDeck' && 'slotName' in loc ? loc.slotName : '',
           })),
         ]
       }
@@ -123,7 +123,7 @@ export const getAllTipracksIdsThatPipetteUsesInOrder = (
         ...tipRackLocations.map(loc => ({
           labwareId: tipRackId,
           definition,
-          slot: 'slotName' in loc ? loc.slotName : '',
+          slot: loc !== 'offDeck' && 'slotName' in loc ? loc.slotName : '',
         })),
       ]
     }, [])
@@ -162,16 +162,21 @@ export const getLabwareIdsInOrder = (
           if (
             !getSlotHasMatingSurfaceUnitVector(
               OT2_STANDARD_DECK_DEF,
-              'slotName' in loc ? loc.slotName : ''
+              loc !== 'offDeck' && 'slotName' in loc ? loc.slotName : ''
             )
           ) {
             return innerAcc
           }
-          const slot =
-            'moduleId' in loc
-              ? getModuleInitialLoadInfo(loc.moduleId, commands).location
-                  .slotName
-              : loc.slotName
+          let slot = ''
+          if (loc === 'offDeck') {
+            slot = 'offDeck'
+          } else {
+            slot =
+              'moduleId' in loc
+                ? getModuleInitialLoadInfo(loc.moduleId, commands).location
+                    .slotName
+                : loc.slotName
+          }
           return [
             ...innerAcc,
             { definition: labwareDef, labwareId: currentLabware.id, slot },
