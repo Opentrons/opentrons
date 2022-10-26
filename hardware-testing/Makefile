@@ -77,13 +77,13 @@ test-integration:
 
 .PHONY: lint
 lint:
-	$(python) -m mypy hardware_testing tests protocols examples
-	$(python) -m black --check hardware_testing tests protocols examples setup.py
-	$(python) -m flake8 hardware_testing tests protocols examples setup.py
+	$(python) -m mypy hardware_testing tests protocols
+	$(python) -m black --check hardware_testing tests protocols setup.py
+	$(python) -m flake8 hardware_testing tests protocols setup.py
 
 .PHONY: format
 format:
-	$(python) -m black hardware_testing tests protocols examples setup.py
+	$(python) -m black hardware_testing tests protocols setup.py
 
 define move-plot-webpage
 ssh -i $(2) $(3) root@$(1) \
@@ -134,19 +134,11 @@ push-protocols:
 push-protocols-ot3:
 	scp -r protocols root@$(host):/opt/opentrons-robot-server
 
-.PHONY: push-examples
-push-examples:
-	scp -r examples root@$(host):/data/user_storage/opentrons_data
-
-.PHONY: push-examples-ot3
-push-examples-ot3:
-	scp -r examples root@$(host):/opt/opentrons-robot-server
-
 .PHONY: push-all
-push-all: clean wheel push-no-restart push-plot-webpage push-protocols push-examples
+push-all: clean wheel push-no-restart push-plot-webpage push-protocols
 
 .PHONY: push-all-ot3
-push-all: clean wheel push-no-restart-ot3 push-plot-webpage-ot3 push-protocols-ot3 push-examples-ot3
+push-all: clean wheel push-no-restart-ot3 push-plot-webpage-ot3 push-protocols-ot3
 
 .PHONY: term
 term:
@@ -161,7 +153,7 @@ miniterm:
 	$(python) -m serial.tools.miniterm $(port) 115200 --eol LF
 
 .PHONY: push-all-and-term
-push-all-and-term: push-all term
+push-all-and-term: push-all teerm
 
 .PHONY: pull-data-ot3
 pull-data-ot3:
