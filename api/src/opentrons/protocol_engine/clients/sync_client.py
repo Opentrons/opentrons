@@ -12,6 +12,7 @@ from ..state import StateView
 from ..types import (
     DeckSlotLocation,
     LabwareLocation,
+    LabwareMovementStrategy,
     ModuleModel,
     WellLocation,
 )
@@ -59,28 +60,18 @@ class SyncClient:
 
         return cast(commands.LoadLabwareResult, result)
 
-    def move_labware_off_deck(
-        self,
-        labware_id: str,
-    ) -> commands.MoveLabwareOffDeckResult:
-        """Execute a MoveLabwareOffDeck command and return the result."""
-        request = commands.MoveLabwareOffDeckCreate(
-            params=commands.MoveLabwareOffDeckParams(labwareId=labware_id)
-        )
-        result = self._transport.execute_command(request=request)
-
-        return cast(commands.MoveLabwareOffDeckResult, result)
-
     def move_labware(
         self,
         labware_id: str,
         new_location: LabwareLocation,
+        strategy: LabwareMovementStrategy,
     ) -> commands.MoveLabwareResult:
         """Execute a MoveLabware command and return the result."""
         request = commands.MoveLabwareCreate(
             params=commands.MoveLabwareParams(
                 labwareId=labware_id,
                 newLocation=new_location,
+                strategy=strategy
             )
         )
         result = self._transport.execute_command(request=request)
