@@ -44,5 +44,6 @@ if __name__ == "__main__":
         mount = types.OT3Mount.LEFT
     else:
         mount = types.OT3Mount.RIGHT
-    input("BOWTIE-OT3: Is the deck totally empty? (press ENTER to continue)")
+    if not args.simulate:
+        input("BOWTIE-OT3: Is the deck totally empty? (press ENTER to continue)")
     asyncio.run(_main(args.simulate, args.cycles, mount))
