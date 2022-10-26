@@ -423,7 +423,7 @@ async def move_to_arched_ot3(
     mount: OT3Mount,
     abs_position: Point,
     speed: Optional[float] = None,
-    safe_height: float = 0.0,
+    safe_height: float = -100.0,
 ) -> None:
     """Move OT3 gantry in an arched path."""
     z_ax = OT3Axis.by_mount(mount)

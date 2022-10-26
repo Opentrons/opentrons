@@ -78,6 +78,7 @@ test-integration:
 	$(python) -m hardware_testing.examples.endstop_encoder_ot3 --simulate
 	$(python) -m hardware_testing.examples.pick_up_tip_ot3 --simulate
 	$(python) -m hardware_testing.examples.plunger_ot3 --simulate
+	$(python) -m hardware_testing.examples.capacitive_probe_ot3 --simulate
 	$(python) -m hardware_testing.scripts.bowtie_ot3 --simulate
 
 .PHONY: lint
