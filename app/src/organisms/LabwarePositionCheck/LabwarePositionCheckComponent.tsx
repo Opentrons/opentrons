@@ -144,7 +144,7 @@ export const LabwarePositionCheckInner = (
   }, [isCommandMutationLoading])
 
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
-  const handleCleanUpAndClose = () => {
+  const handleCleanUpAndClose = (): void => {
     const dropTipToBeSafeCommands: DropTipCreateCommand[] = (
       protocolData?.pipettes ?? []
     ).map(pip => ({

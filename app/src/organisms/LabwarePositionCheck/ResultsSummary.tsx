@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
@@ -7,13 +7,10 @@ import {
   CompletedProtocolAnalysis,
   getLabwareDefURI,
   getLabwareDisplayName,
-  getModuleDisplayName,
-  getModuleType,
   getVectorDifference,
   getVectorSum,
   IDENTITY_VECTOR,
   LabwareDefinition2,
-  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { NeedHelpLink } from '../CalibrationPanels'
 import {
