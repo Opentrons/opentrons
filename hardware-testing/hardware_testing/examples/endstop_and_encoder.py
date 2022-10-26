@@ -1,4 +1,4 @@
-"""Demo OT3 Gantry Functionality."""
+"""Endstop and encoder."""
 import argparse
 import asyncio
 
@@ -9,6 +9,7 @@ from hardware_testing.opentrons_api import helpers_ot3
 async def _main(is_simulating: bool) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating)
     mount = types.OT3Mount.LEFT
+    z_ax = types.OT3Axis.by_mount(mount)
 
     # home the gantry
     await helpers_ot3.home_ot3(api)
@@ -17,21 +18,25 @@ async def _main(is_simulating: bool) -> None:
     encoder_start = await api.encoder_current_position(mount, refresh=True)
     await api.move_rel(mount, types.Point(z=-100))
     encoder_end = await api.encoder_current_position(mount, refresh=True)
-    z_ax = types.OT3Axis.by_mount(mount)
-    print(f"Encoder tracked the Z moved "
-          f"from {encoder_start[z_ax.to_axis()]} "
-          f"to {encoder_end[z_ax.to_axis()]}")
-
-    # use the Endstops to find quickly move back to the homing position
-    endstop_pos_by_axis = helpers_ot3.get_endstop_position_ot3(api, mount)
-    endstop_pos = types.Point(
-        x=endstop_pos_by_axis[types.OT3Axis.X],
-        y=endstop_pos_by_axis[types.OT3Axis.Y],
-        z=endstop_pos_by_axis[z_ax]
+    print(
+        f"Encoder tracked the Z moved "
+        f"from {encoder_start[z_ax.to_axis()]} "
+        f"to {encoder_end[z_ax.to_axis()]}"
     )
-    await api.move_to(mount, endstop_pos)
+
+    # use the Endstops to quickly move back to the homing position
+    switch_pos = helpers_ot3.get_endstop_position_ot3(api, mount)
+    await api.move_to(
+        mount,
+        types.Point(
+            x=switch_pos[types.OT3Axis.X],
+            y=switch_pos[types.OT3Axis.Y],
+            z=switch_pos[z_ax],
+        ),
+    )
     switches = await api.get_limit_switches()
-    assert switches[z_ax], "ERROR: Limit switch is NOT pressed when it should be"
+    if not api.is_simulator and switches[z_ax]:
+        raise RuntimeError("Limit switch is NOT pressed when it should be")
 
     # disengage the XY motors when done
     await api.disengage_axes([types.OT3Axis.X, types.OT3Axis.Y])
