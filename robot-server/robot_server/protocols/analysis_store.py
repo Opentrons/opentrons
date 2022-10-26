@@ -303,7 +303,7 @@ class _CompletedAnalysisResource:
         Avoid calling this from inside a SQL transaction, since it might be slow.
         """
 
-        def serialize_completed_analysis() -> UnparsedPydanticJSON[CompletedAnalysis]:
+        def serialize_completed_analysis() -> UnparsedPydanticJSON:
             return pydantic_to_sql(data=self.completed_analysis)
 
         serialized_completed_analysis = await anyio.to_thread.run_sync(

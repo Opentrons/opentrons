@@ -2,29 +2,24 @@
 
 from __future__ import annotations
 
-from typing import Generic, Optional, Type, TypeVar
+from dataclasses import dataclass
+from typing import Optional, Type, TypeVar
 from pydantic import BaseModel
 import sqlalchemy
 import sqlalchemy.ext.compiler
 
 
-_PydanticModelT = TypeVar("_PydanticModelT", bound=BaseModel)
-
-
-class UnparsedPydanticJSON(Generic[_PydanticModelT]):
+@dataclass(frozen=True)
+class UnparsedPydanticJSON:
     """
     Raw JSON string, paired with the Python model that the JSON string conforms to.
     """
 
-    def __init__(self, declared_model: Type[_PydanticModelT], raw_json: str) -> None:
-        self._declared_model = declared_model
-        self._raw_json = raw_json
+    declared_model: Type[BaseModel]
+    raw_json: str
 
 
-class PydanticJSON(
-    Generic[_PydanticModelT],
-    sqlalchemy.types.TypeDecorator[UnparsedPydanticJSON[_PydanticModelT]],
-):
+class PydanticJSON(sqlalchemy.types.TypeDecorator[UnparsedPydanticJSON]):
     # Make SQLAlchemy insert the data into the SQLite as a string,
     # and use Python `str`s for passing data between our code and SQLAlchemy.
     #
@@ -40,31 +35,40 @@ class PydanticJSON(
 
     cache_ok = True
 
-    def __init__(self, model: Type[_PydanticModelT]) -> None:
+    def __init__(self, model: Type[BaseModel]) -> None:
         self._model = model
         super().__init__()
 
     def process_bind_param(
         self,
-        value: Optional[UnparsedPydanticJSON[_PydanticModelT]],
+        value: Optional[UnparsedPydanticJSON],
         dialect: object,
     ) -> Optional[str]:
-        """Prepare to insert via SQLAlchemy."""
-        if value is None:
+        """Prepare a value to be inserted via SQLAlchemy."""
+        if isinstance(value, UnparsedPydanticJSON):
+            if value.declared_model == self._model:
+                return value.raw_json
+            else:
+                raise TypeError(
+                    f"This SQL column is declared to contain serialized {self._model}"
+                    f" objects, but you're trying to insert a serialized"
+                    f" {value.declared_model} object."
+                )
+        elif value is None:
             return None  # Inserting a SQL NULL value.
         else:
-            assert isinstance(value, UnparsedPydanticJSON)
-            # TODO: Should we loosen the type annotation of value?
-            # TODO: Assert message.
-            assert value._declared_model == self._model
-            return value._raw_json
+            raise TypeError(
+                f"This SQL column is declared to contain serialized {self._model}"
+                f" objects, but you're trying to insert a {type(value)} object."
+                f" Forgot to use pydantic_to_sql()?"
+            )
 
     def process_result_value(
         self,
         value: Optional[str],
         dialect: object,
-    ) -> Optional[UnparsedPydanticJSON[_PydanticModelT]]:
-        """Fix up a string extracted from SQLAlchemy."""
+    ) -> Optional[UnparsedPydanticJSON]:
+        """Fix up a string value extracted by SQLAlchemy."""
         if value is None:
             return None  # Extracting a SQL NULL value.
         else:
@@ -84,24 +88,37 @@ def _compile_as_blob(type_: object, compiler: object, **kwargs: object) -> str:
     return "BLOB"
 
 
+_ModelToExtract = TypeVar("_ModelToExtract", bound=BaseModel)
+
+
 def sql_to_pydantic(
-    model: Type[_PydanticModelT],
-    sql_value: object,
-) -> _PydanticModelT:
+    model: Type[_ModelToExtract],
+    sql_value: UnparsedPydanticJSON,
+) -> _ModelToExtract:
     """
     Warning: Heavy parsing from JSON to dict and from dict to Pydantic.
     Do this outside of a SQL transaction and in its own process.
     """
-    assert isinstance(sql_value, UnparsedPydanticJSON)
-    assert sql_value._declared_model == model
-    return model.parse_raw(sql_value._raw_json)
+    if isinstance(sql_value, UnparsedPydanticJSON):
+        if sql_value.declared_model == model:
+            return model.parse_raw(sql_value.raw_json)
+        else:
+            raise TypeError(
+                f"This value came from a SQL column declared to contain"
+                f" {sql_value.declared_model}, but you're trying to read it as"
+                f" {model}."
+            )
+    else:
+        raise TypeError(
+            "This value did not come from a SQL column that's"
+            " declared to contain Pydantic objects."
+        )
 
 
-def pydantic_to_sql(data: _PydanticModelT) -> UnparsedPydanticJSON[_PydanticModelT]:
+def pydantic_to_sql(data: BaseModel) -> UnparsedPydanticJSON:
     return UnparsedPydanticJSON(
         declared_model=type(data),
         raw_json=data.json(
-            by_alias=True,
-            # TODO: exclude_none, etc.?
+            by_alias=True,  # For consistency with how models are serialized over HTTP.
         ),
     )
