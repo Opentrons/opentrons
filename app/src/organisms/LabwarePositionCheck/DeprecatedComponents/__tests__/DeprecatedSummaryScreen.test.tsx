@@ -11,8 +11,8 @@ import { DeprecatedSectionList } from '../DeprecatedSectionList'
 import { DeprecatedDeckMap } from '../DeprecatedDeckMap'
 import { DeprecatedSummaryScreen } from '../DeprecatedSummaryScreen'
 import { DeprecatedLabwareOffsetsSummary } from '../DeprecatedLabwareOffsetsSummary'
-import { useIntroInfo, useLabwareOffsets } from '../../hooks'
-import { Section } from '../types'
+import { useIntroInfo, useLabwareOffsets } from '../../deprecatedHooks'
+import { DeprecatedSection } from '../types'
 import { useLPCSuccessToast } from '../../../ProtocolSetup/hooks'
 
 jest.mock('../../../../redux/analytics')
@@ -20,7 +20,7 @@ jest.mock('../../../ProtocolUpload/hooks')
 jest.mock('../../../Devices/hooks')
 jest.mock('../../../ProtocolSetup/hooks')
 jest.mock('../DeprecatedSectionList')
-jest.mock('../../hooks')
+jest.mock('../../deprecatedHooks')
 jest.mock('../DeprecatedDeckMap')
 jest.mock('../DeprecatedLabwareOffsetsSummary')
 
@@ -53,7 +53,9 @@ const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
 
-const MOCK_SECTIONS = ['PRIMARY_PIPETTE_TIPRACKS' as Section]
+const MOCK_DEPRECATED_SECTIONS = [
+  'PRIMARY_PIPETTE_TIPRACKS' as DeprecatedSection,
+]
 const LABWARE_DEF_ID = 'LABWARE_DEF_ID'
 const PRIMARY_PIPETTE_ID = 'PRIMARY_PIPETTE_ID'
 const PRIMARY_PIPETTE_NAME = 'PRIMARY_PIPETTE_NAME'
@@ -91,7 +93,7 @@ describe('DeprecatedSummaryScreen', () => {
       primaryPipetteMount: 'left',
       secondaryPipetteMount: '',
       firstTiprackSlot: '2',
-      sections: MOCK_SECTIONS,
+      sections: MOCK_DEPRECATED_SECTIONS,
     })
 
     when(mockUseProtocolDetailsForRun)

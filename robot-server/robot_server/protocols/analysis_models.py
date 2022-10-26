@@ -9,6 +9,7 @@ from opentrons.protocol_engine import (
     Command,
     ErrorOccurrence,
     LoadedLabware,
+    LoadedModule,
     LoadedPipette,
     Liquid,
 )
@@ -97,8 +98,10 @@ class CompletedAnalysis(BaseModel):
             " not its *initial* location."
         ),
     )
-    # TODO(mm, 2022-08-31): We're missing modules here, but there is a modules field
-    # in run results. Add modules here, for consistency?
+    modules: List[LoadedModule] = Field(
+        default_factory=list,
+        description="Modules that have been loaded into the run.",
+    )
     commands: List[Command] = Field(
         ...,
         description="The protocol commands the run is expected to produce",

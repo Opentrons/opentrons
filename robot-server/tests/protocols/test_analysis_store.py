@@ -121,6 +121,7 @@ async def test_returned_in_order_added(
         await subject.update(
             analysis_id=analysis_id,
             labware=[],
+            modules=[],
             pipettes=[],
             commands=[],
             errors=[],
@@ -171,6 +172,7 @@ async def test_update_adds_details_and_completes_analysis(
         pipettes=[pipette],
         # TODO(mm, 2022-10-21): Give the subject some commands, errors, and liquids here
         # and assert that we can retrieve them.
+        modules=[],
         commands=[],
         errors=[],
         liquids=[],
@@ -184,6 +186,7 @@ async def test_update_adds_details_and_completes_analysis(
         result=AnalysisResult.OK,
         labware=[labware],
         pipettes=[pipette],
+        modules=[],
         commands=[],
         errors=[],
         liquids=[],
@@ -246,6 +249,7 @@ async def test_update_infers_status_from_errors(
         commands=commands,
         errors=errors,
         labware=[],
+        modules=[],
         pipettes=[],
         liquids=[],
         robot_type="OT-2 Standard",
