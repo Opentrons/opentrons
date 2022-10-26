@@ -99,7 +99,7 @@ class CompletedAnalysis(BaseModel):
         ),
     )
     modules: List[LoadedModule] = Field(
-        ...,
+        default_factory=list,
         description="Modules that have been loaded into the run.",
     )
     commands: List[Command] = Field(
