@@ -107,11 +107,8 @@ def save_pipette_calibration(
 def get_pipette_offset(
     pipette_id: local_types.PipetteId, mount: Mount
 ) -> typing.Optional[v1.InstrumentOffsetModel]:
-    if mount == types.Mount.LEFT:
-        mount_type = types.MountType.LEFT
-    else:
-        mount_type = types.MountType.RIGHT
     try:
+        mount_type = types.MountType[mount.name]
         return _pipette_offset_calibrations()[mount_type][pipette_id]
     except KeyError:
         return None
