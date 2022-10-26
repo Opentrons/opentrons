@@ -286,7 +286,6 @@ class SyncClient:
     ) -> commands.temperature_module.SetTargetTemperatureResult:
         """Execute a `temperatureModule/setTargetTemperature` command and return the result."""
         request = commands.temperature_module.SetTargetTemperatureCreate(
-            commandType="temperatureModule/setTargetTemperature",
             params=commands.temperature_module.SetTargetTemperatureParams(
                 moduleId=module_id, celsius=celsius
             ),
@@ -299,7 +298,6 @@ class SyncClient:
     ) -> commands.temperature_module.WaitForTemperatureResult:
         """Execute a `temperatureModule/waitForTemperature` command and return the result."""
         request = commands.temperature_module.WaitForTemperatureCreate(
-            commandType="temperatureModule/waitForTemperature",
             params=commands.temperature_module.WaitForTemperatureParams(
                 moduleId=module_id, celsius=celsius
             ),
@@ -312,7 +310,6 @@ class SyncClient:
     ) -> commands.temperature_module.DeactivateTemperatureResult:
         """Execute a `temperatureModule/deactivate` command and return the result."""
         request = commands.temperature_module.DeactivateTemperatureCreate(
-            commandType="temperatureModule/deactivate",
             params=commands.temperature_module.DeactivateTemperatureParams(
                 moduleId=module_id
             ),

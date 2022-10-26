@@ -449,7 +449,6 @@ def test_temperature_set_target_temperature(
 ) -> None:
     """Should execute a PE set_target_temperature command."""
     request = commands.temperature_module.SetTargetTemperatureCreate(
-        commandType="temperatureModule/setTargetTemperature",
         params=commands.temperature_module.SetTargetTemperatureParams(
             moduleId="module-id", celsius=38.7
         ),
@@ -472,7 +471,6 @@ def test_temperature_wait_for_target_temperature(
 ) -> None:
     """Should execute a PE wait_for_target_temperature command."""
     request = commands.temperature_module.WaitForTemperatureCreate(
-        commandType="temperatureModule/waitForTemperature",
         params=commands.temperature_module.WaitForTemperatureParams(
             moduleId="module-id", celsius=38.7
         ),
@@ -493,7 +491,6 @@ def test_temperature_deactivate(
 ) -> None:
     """Should execute a PE deactivate temperature command."""
     request = commands.temperature_module.DeactivateTemperatureCreate(
-        commandType="temperatureModule/deactivate",
         params=commands.temperature_module.DeactivateTemperatureParams(
             moduleId="module-id"
         ),
