@@ -317,7 +317,6 @@ export const getRobotNameFromLoadedLabware = (
 export const getDeckDefFromRobotName = (
   robotName: RobotName
 ): DeckDefinition => {
-  console.log('called')
   // @ts-expect-error imported JSON not playing nice with TS. see https://github.com/microsoft/TypeScript/issues/32063
   return robotName === 'OT-3 Standard' ? standardDeckDefOt3 : standardDeckDefOt2
 }
