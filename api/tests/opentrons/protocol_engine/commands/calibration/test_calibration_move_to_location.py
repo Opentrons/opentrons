@@ -16,8 +16,8 @@ from opentrons.protocol_engine.types import DeckPoint
 @pytest.mark.parametrize(
     argnames=["slot_name"],
     argvalues=[
-        [CalibrationPositions.probe_position],
-        [CalibrationPositions.attach_or_detach],
+        [CalibrationPositions.PROBE_POSITION],
+        [CalibrationPositions.ATTACH_OR_DETACH],
     ],
 )
 async def test_calibration_set_up_position_implementation(
@@ -54,7 +54,7 @@ async def test_calibration_set_up_position_implementation(
     ).then_return(Point(x=4, y=5, z=6))
 
     def movement_coordinate(slot: CalibrationPositions) -> SavedPositionData:
-        if slot == CalibrationPositions.probe_position:
+        if slot == CalibrationPositions.PROBE_POSITION:
             return probe_position
         else:
             return attach_or_detach

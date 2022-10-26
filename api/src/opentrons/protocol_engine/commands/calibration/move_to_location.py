@@ -25,8 +25,8 @@ MoveToLocationCommandType = Literal["calibration/moveToLocation"]
 class CalibrationPositions(str, Enum):
     """Deck slot to move to."""
 
-    probe_position = "probePosition"
-    attach_or_detach = "attachOrDetach"
+    PROBE_POSITION = "probePosition"
+    ATTACH_OR_DETACH = "attachOrDetach"
 
     @property
     def offset(self) -> DeckPoint:
@@ -69,7 +69,7 @@ class MoveToLocationImplementation(
     async def execute(self, params: MoveToLocationParams) -> MoveToLocationResult:
         """Move the requested pipette to a given deck slot."""
         offset = params.deckSlot.offset
-        if params.deckSlot == CalibrationPositions.probe_position:
+        if params.deckSlot == CalibrationPositions.PROBE_POSITION:
             deck_center = self._state_view.labware.get_slot_center_position(
                 DeckSlotName.SLOT_5
             )
