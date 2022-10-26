@@ -43,8 +43,13 @@ async def _test_limit_switch(
 ) -> None:
     def _points_before_after_switch(tolerance_delta: Point) -> Tuple[Point, Point]:
         endstop_pos = get_endstop_position_ot3(api, mount=MOUNT)
-        pos_not_touching = endstop_pos - tolerance_delta
-        pos_touching = endstop_pos + tolerance_delta
+        endstop_point = Point(
+            x=endstop_pos[OT3Axis.X],
+            y=endstop_pos[OT3Axis.Y],
+            z=endstop_pos[OT3Axis.by_mount(MOUNT)],
+        )
+        pos_not_touching = endstop_point - tolerance_delta
+        pos_touching = endstop_point + tolerance_delta
         return pos_not_touching, pos_touching
 
     # calculate two positions: 1) before the switch, and 2) after the switch
