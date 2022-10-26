@@ -69,9 +69,7 @@ class SyncClient:
         """Execute a MoveLabware command and return the result."""
         request = commands.MoveLabwareCreate(
             params=commands.MoveLabwareParams(
-                labwareId=labware_id,
-                newLocation=new_location,
-                strategy=strategy
+                labwareId=labware_id, newLocation=new_location, strategy=strategy
             )
         )
         result = self._transport.execute_command(request=request)
