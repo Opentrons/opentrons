@@ -36,6 +36,7 @@ export type CreateCommand =
   | ModuleCreateCommand // directed at a hardware module
   | SetupCreateCommand // only effecting robot's equipment setup (pipettes, labware, modules, liquid), no hardware side-effects
   | TimingCreateCommand // effecting the timing of command execution
+  // TODO (sb 10/26/22): Separate out calibration commands from protocol schema in RAUT-272
   | CalibrationCreateCommand // for automatic pipette calibration
   | ({
       commandType: 'custom'
@@ -49,6 +50,7 @@ export type RunTimeCommand =
   | ModuleRunTimeCommand // directed at a hardware module
   | SetupRunTimeCommand // only effecting robot's equipment setup (pipettes, labware, modules, liquid), no hardware side-effects
   | TimingRunTimeCommand // effecting the timing of command execution
+  // TODO (sb 10/26/22): Separate out calibration commands from protocol schema in RAUT-272
   | CalibrationRunTimeCommand // for automatic pipette calibration
   | ({
       commandType: 'custom'

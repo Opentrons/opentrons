@@ -1,6 +1,6 @@
 import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
 import type { PipetteMount, LabwareOffset } from '../../../../js/types'
-
+// TODO (sb 10/26/22): Separate out calibration commands from protocol schema in RAUT-272
 export interface CalibratePipetteCreateCommand extends CommonCommandCreateInfo {
   commandType: 'calibration/calibratePipette'
   params: CalibratePipetteParams
@@ -30,8 +30,8 @@ export type CalibrationCreateCommand =
   | CalibratePipetteCreateCommand
   | MoveToLocationCreateCommand
 
-export const ATTACH_DETACH_POSITION = 'attach_or_detach'
-export const PROBE_POSITION = 'probe_position'
+export const ATTACH_DETACH_POSITION = 'attachOrDetach'
+export const PROBE_POSITION = 'probePosition'
 export type SetupPosition =
   | typeof ATTACH_DETACH_POSITION
   | typeof PROBE_POSITION

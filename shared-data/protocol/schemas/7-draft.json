@@ -547,7 +547,7 @@
                 "pipetteId": { "type": "string" },
                 "deckSlot": {
                   "description": "Slot location to move to before starting calibration.",
-                  "enum": ["attach_or_detach", "probe_position"]
+                  "enum": ["attachOrDetach", "probePosition"]
                 }
               }
             }
