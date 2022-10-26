@@ -65,6 +65,7 @@ if ff.enable_ot3_hardware_controller():
 
     def calibrate_gripper(api: ThreadManager[OT3API], probe: GripperProbe) -> Point:
         api.sync.add_gripper_probe(probe)
+        api.grip(20)
         try:
             result = asyncio.get_event_loop().run_until_complete(
                 calibrate_mount(cast(OT3API, api), OT3Mount.GRIPPER)
