@@ -72,6 +72,7 @@ if ff.enable_ot3_hardware_controller():
             )
         finally:
             api.sync.remove_gripper_probe()
+        api.ungrip()
         return result
 
     def wrap_async_util_fn(fn: Any, *bind_args: Any, **bind_kwargs: Any) -> Any:
