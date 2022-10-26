@@ -1561,6 +1561,13 @@ class OT3API(
         await self.move_to(mount, begin)
         return values
 
+    async def capacitive_read(
+        self,
+        mount: OT3Mount,
+    ) -> float:
+        data = await self._backend.capacitive_read(mount)
+        return data
+
     AMKey = TypeVar("AMKey")
 
     @staticmethod

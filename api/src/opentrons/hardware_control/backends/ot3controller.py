@@ -87,6 +87,7 @@ from opentrons_hardware.hardware_control.tools import detector, types as ohc_too
 from opentrons_hardware.hardware_control.tool_sensors import (
     capacitive_probe,
     capacitive_pass,
+    capacitive_read,
 )
 from opentrons_hardware.drivers.gpio import OT3GPIO
 
