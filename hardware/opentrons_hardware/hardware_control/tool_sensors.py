@@ -22,6 +22,7 @@ from opentrons_hardware.hardware_control.motion import (
     MoveGroupStep,
 )
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
+from opentrons_hardware.sensors import sensor_driver, sensor_types
 
 LOG = getLogger(__name__)
 ProbeTarget = Union[Literal[NodeId.pipette_left, NodeId.pipette_right, NodeId.gripper]]
@@ -105,3 +106,13 @@ async def capacitive_pass(
                 break
 
     return list(_drain())
+
+async def capacitive_read(
+    messenger: CanMessenger,
+    node_id: NodeId,
+) -> float:
+    """Read capacitive sensor."""
+    capacitive = sensor_types.CapacitiveSensor.build(SensorId.S0, node_id)
+    s_driver = sensor_driver.SensorDriver()
+    data = await s_driver.read(messenger, capacitive, offset=False, timeout=10)
+    return data.to_float()
