@@ -19,7 +19,6 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons.types import Mount, Location, DeckLocation, DeckSlotName
 from opentrons.broker import Broker
 from opentrons.hardware_control import SyncHardwareAPI
-from opentrons.hardware_control.modules import ModuleType
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
 from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support.types import APIVersion
@@ -32,11 +31,14 @@ from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
-from .core.instrument import AbstractInstrument
+from .core.common import ModuleCore, ProtocolCore
 from .core.labware import AbstractLabware
-from .core.module import AbstractModuleCore
-from .core.protocol import AbstractProtocol
-from .core.well import AbstractWellCore
+from .core.module import (
+    AbstractTemperatureModuleCore,
+    AbstractMagneticModuleCore,
+    AbstractThermocyclerCore,
+    AbstractHeaterShakerCore,
+)
 
 from . import validation
 from .instrument_context import InstrumentContext
@@ -58,12 +60,6 @@ ModuleTypes = Union[
     ThermocyclerContext,
     HeaterShakerContext,
 ]
-
-
-InstrumentCore = AbstractInstrument[AbstractWellCore]
-LabwareCore = AbstractLabware[AbstractWellCore]
-ModuleCore = AbstractModuleCore[LabwareCore]
-ProtocolCore = AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]
 
 
 class HardwareManager(NamedTuple):
@@ -680,14 +676,17 @@ def _create_module_context(
     api_version: APIVersion,
     broker: Broker,
 ) -> ModuleTypes:
-    # TODO(mc, 2022-09-07): create distinct module cores
-    module_constructors: Dict[ModuleType, Type[ModuleTypes]] = {
-        ModuleType.MAGNETIC: MagneticModuleContext,
-        ModuleType.TEMPERATURE: TemperatureModuleContext,
-        ModuleType.THERMOCYCLER: ThermocyclerContext,
-        ModuleType.HEATER_SHAKER: HeaterShakerContext,
-    }
-    module_cls = module_constructors[module_core.get_type()]
+    module_cls: Optional[Type[ModuleTypes]] = None
+    if isinstance(module_core, AbstractTemperatureModuleCore):
+        module_cls = TemperatureModuleContext
+    elif isinstance(module_core, AbstractMagneticModuleCore):
+        module_cls = MagneticModuleContext
+    elif isinstance(module_core, AbstractThermocyclerCore):
+        module_cls = ThermocyclerContext
+    elif isinstance(module_core, AbstractHeaterShakerCore):
+        module_cls = HeaterShakerContext
+    else:
+        assert False, "Unsupported module type"
 
     return module_cls(
         core=module_core,

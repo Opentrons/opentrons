@@ -3,6 +3,7 @@ test_name: Upload, analyze, delete basic_transfer_standalone protocol.
 marks:
   - usefixtures:
       - run_server
+      - set_enable_load_liquid
 stages:
   - name: Upload simple v6 protocol
     request:
@@ -524,3 +525,4 @@ stages:
                 displayName: Water
                 description: Liquid H2O
                 displayColor: '#7332a8'
+            robotType: "OT-2 Standard"

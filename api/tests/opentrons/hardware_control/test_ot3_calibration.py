@@ -3,6 +3,7 @@ import copy
 from dataclasses import replace
 import pytest
 import json
+from math import isclose
 from typing import Iterator, Tuple
 from typing_extensions import Literal
 from mock import patch, AsyncMock, Mock
@@ -205,8 +206,8 @@ async def test_find_deck_checks_z_only(
     assert first_move_point.y == config_point.y
 
     second_move_point = mock_move_to.call_args_list[1][0][1]
-    assert second_move_point.x == config_point.x
-    assert second_move_point.y == config_point.y
+    assert isclose(second_move_point.x, config_point.x)
+    assert isclose(second_move_point.y, config_point.y)
 
 
 async def test_method_enum(ot3_hardware: ThreadManager[OT3API]) -> None:

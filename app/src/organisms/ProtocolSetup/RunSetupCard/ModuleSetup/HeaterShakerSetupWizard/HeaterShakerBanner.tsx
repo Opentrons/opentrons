@@ -1,15 +1,19 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { COLORS } from '@opentrons/components'
-import { Divider } from '../../../../../atoms/structure/Divider'
-import { TertiaryButton } from '../../../../../atoms/buttons'
+import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
+import {
+  TYPOGRAPHY,
+  DIRECTION_COLUMN,
+  Flex,
+  SPACING,
+  Box,
+} from '@opentrons/components'
+import { Banner } from '../../../../../atoms/Banner'
+import { StyledText } from '../../../../../atoms/text'
 import { HeaterShakerWizard } from '../../../../Devices/HeaterShakerWizard'
 import { ModuleRenderInfoForProtocol } from '../../../../Devices/hooks'
-import { Banner, BannerItem } from '../Banner/Banner'
-import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 
 interface HeaterShakerBannerProps {
-  displayName: string
   modules: ModuleRenderInfoForProtocol[]
 }
 
@@ -17,11 +21,11 @@ export function HeaterShakerBanner(
   props: HeaterShakerBannerProps
 ): JSX.Element | null {
   const [wizardId, setWizardId] = React.useState<String | null>(null)
-  const { displayName, modules } = props
+  const { modules } = props
   const { t } = useTranslation('heater_shaker')
 
   return (
-    <Banner title={t('attach_heater_shaker_to_deck', { name: displayName })}>
+    <>
       {modules.map((module, index) => (
         <React.Fragment key={index}>
           {wizardId === module.moduleId && (
@@ -37,24 +41,34 @@ export function HeaterShakerBanner(
               }
             />
           )}
-          {index > 0 && <Divider color={COLORS.medGreyEnabled} />}
-          <BannerItem
-            title={t('module_in_slot', {
-              moduleName: module.moduleDef.displayName,
-              slotName: module.slotName,
-            })}
-            body={t('improperly_fastened_description')}
-            button={
-              <TertiaryButton
-                data-testid="HeaterShakerBanner_Button"
-                onClick={() => setWizardId(module.moduleId)}
-              >
-                {t('view_instructions')}
-              </TertiaryButton>
-            }
-          />
+          <Box marginTop={SPACING.spacing3}>
+            <Banner
+              type="informing"
+              onCloseClick={() => setWizardId(module.moduleId)}
+              closeButton={
+                <StyledText
+                  as="p"
+                  textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                >
+                  {t('view_instructions')}
+                </StyledText>
+              }
+            >
+              <Flex flexDirection={DIRECTION_COLUMN}>
+                <StyledText css={TYPOGRAPHY.pSemiBold}>
+                  {t('heater_shaker_in_slot', {
+                    moduleName: module.moduleDef.displayName,
+                    slotName: module.slotName,
+                  })}
+                </StyledText>
+                <StyledText as="p">
+                  {t('improperly_fastened_description')}
+                </StyledText>
+              </Flex>
+            </Banner>
+          </Box>
         </React.Fragment>
       ))}
-    </Banner>
+    </>
   )
 }

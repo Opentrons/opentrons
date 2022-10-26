@@ -45,10 +45,10 @@ class HeaterShaker(mod_abc.AbstractModule):
         port: str,
         usb_port: USBPort,
         execution_manager: ExecutionManager,
+        hw_control_loop: asyncio.AbstractEventLoop,
+        poll_interval_seconds: Optional[float] = None,
         simulating: bool = False,
-        loop: Optional[asyncio.AbstractEventLoop] = None,
         sim_model: Optional[str] = None,
-        **kwargs: float,
     ) -> "HeaterShaker":
         """
         Build a HeaterShaker
@@ -57,38 +57,42 @@ class HeaterShaker(mod_abc.AbstractModule):
             port: The port to connect to
             usb_port: USB Port
             execution_manager: Execution manager.
+            hw_control_loop: The event loop running in the hardware control thread.
+            poll_interval_seconds: Poll interval override.
             simulating: whether to build a simulating driver
             loop: Loop
             sim_model: The model name used by simulator
-            polling_period: the polling period in seconds
-            kwargs: further kwargs are in starargs because of inheritance rules.
-            possible values include polling_period: float, a time in seconds to poll
 
         Returns:
             HeaterShaker instance
         """
         driver: AbstractHeaterShakerDriver
         if not simulating:
-            driver = await HeaterShakerDriver.create(port=port, loop=loop)
-            polling_period = kwargs.get("polling_period", POLL_PERIOD)
+            driver = await HeaterShakerDriver.create(port=port, loop=hw_control_loop)
+            poll_interval_seconds = poll_interval_seconds or POLL_PERIOD
         else:
             driver = SimulatingDriver()
-            polling_period = SIMULATING_POLL_PERIOD
+            poll_interval_seconds = poll_interval_seconds or SIMULATING_POLL_PERIOD
 
-        device_info = await driver.get_device_info()
         reader = HeaterShakerReader(driver=driver)
-        poller = Poller(reader=reader, interval=polling_period)
-
-        return cls(
+        poller = Poller(reader=reader, interval=poll_interval_seconds)
+        module = cls(
             port=port,
             usb_port=usb_port,
-            device_info=device_info,
+            device_info=await driver.get_device_info(),
             execution_manager=execution_manager,
             driver=driver,
             reader=reader,
             poller=poller,
-            loop=loop,
+            hw_control_loop=hw_control_loop,
         )
+
+        try:
+            await poller.start()
+        except Exception:
+            log.exception(f"First read of Heater-Shaker on port {port} failed")
+
+        return module
 
     def __init__(
         self,
@@ -99,10 +103,13 @@ class HeaterShaker(mod_abc.AbstractModule):
         reader: HeaterShakerReader,
         poller: Poller,
         device_info: Mapping[str, str],
-        loop: Optional[asyncio.AbstractEventLoop] = None,
+        hw_control_loop: asyncio.AbstractEventLoop,
     ):
         super().__init__(
-            port=port, usb_port=usb_port, loop=loop, execution_manager=execution_manager
+            port=port,
+            usb_port=usb_port,
+            hw_control_loop=hw_control_loop,
+            execution_manager=execution_manager,
         )
         self._device_info = device_info
         self._driver = driver
@@ -112,6 +119,7 @@ class HeaterShaker(mod_abc.AbstractModule):
     async def cleanup(self) -> None:
         """Stop the poller task"""
         await self._poller.stop()
+        await self._driver.disconnect()
 
     @classmethod
     def name(cls) -> str:
@@ -178,11 +186,6 @@ class HeaterShaker(mod_abc.AbstractModule):
 
     def bootloader(self) -> UploadFunction:
         return update.upload_via_dfu
-
-    # TODO(mc, 2022-10-08): not publicly used; remove
-    async def wait_next_poll(self) -> None:
-        """Wait for the next poll to complete."""
-        await self._poller.wait_next_poll()
 
     @property
     def device_info(self) -> Mapping[str, str]:
