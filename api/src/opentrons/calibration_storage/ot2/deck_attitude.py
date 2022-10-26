@@ -21,7 +21,9 @@ def delete_robot_deck_attitude() -> None:
     """
     Delete the robot deck attitude calibration.
     """
-    legacy_deck_calibration_file = Path(config.get_opentrons_path("deck_calibration_file"))
+    legacy_deck_calibration_file = Path(
+        config.get_opentrons_path("deck_calibration_file")
+    )
     robot_dir = Path(config.get_opentrons_path("robot_calibration_dir"))
     gantry_path = robot_dir / "deck_calibration.json"
 

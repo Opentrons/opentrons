@@ -18,113 +18,28 @@ if typing.TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
-TipLengthCalibrations = typing.Dict[
-    local_types.PipetteId, typing.Dict[local_types.TiprackHash, v1.TipLengthModel]
-]
+# Get Tip Length Calibration
 
 
-# Tip Length Calibrations Look-Up
-
-
-def _tip_length_calibrations() -> TipLengthCalibrations:
-    tip_length_dir = Path(config.get_tip_length_cal_path())
-    tip_length_calibrations: TipLengthCalibrations = {}
-    for file in os.scandir(tip_length_dir):
-        if file.name == "index.json":
-            continue
-        if file.is_file() and ".json" in file.name:
-            pipette_id = typing.cast(local_types.PipetteId, file.name.split(".json")[0])
-            tip_length_calibrations[pipette_id] = {}
-            all_tip_lengths_for_pipette = io.read_cal_file(Path(file.path))
-            for tiprack, data in all_tip_lengths_for_pipette.items():
-                try:
-                    tip_length_calibrations[pipette_id][
-                        typing.cast(local_types.TiprackHash, tiprack)
-                    ] = v1.TipLengthModel(**data)
-                except (json.JSONDecodeError, ValidationError):
-                    pass
-    return tip_length_calibrations
-
-
-def _tip_lengths_for_pipette(
+def tip_lengths_for_pipette(
     pipette_id: local_types.PipetteId,
 ) -> typing.Dict[local_types.TiprackHash, v1.TipLengthModel]:
+    tip_lengths = {}
     try:
-        return _tip_length_calibrations()[pipette_id]
-    except KeyError:
-        return {}
-
-
-# Delete Tip Length Calibration
-
-
-def delete_tip_length_calibration(
-    tiprack: local_types.TiprackHash, pipette_id: local_types.PipetteId
-) -> None:
-    """
-    Delete tip length calibration based on tiprack hash and
-    pipette serial number
-
-    :param tiprack: tiprack hash
-    :param pipette: pipette serial number
-    """
-    tip_lengths_for_pipette = _tip_lengths_for_pipette(pipette_id)
-    if tiprack in tip_lengths_for_pipette:
-        # maybe make modify and delete same file?
-        del tip_lengths_for_pipette[tiprack]
-        tip_length_directory = Path(config.get_tip_length_cal_path())
-        if tip_lengths_for_pipette:
-            io.save_to_file(tip_length_directory, pipette_id, tip_lengths_for_pipette)
-        else:
-            io.delete_file(tip_length_directory / f"{pipette_id}.json")
-    else:
-        raise local_types.TipLengthCalNotFound(
-            f"Tip length for hash {tiprack} has not been "
-            f"calibrated for this pipette: {pipette_id} and cannot"
-            "be loaded"
+        tip_length_filepath = (
+            Path(config.get_tip_length_cal_path()) / f"{pipette_id}.json"
         )
-
-
-def clear_tip_length_calibration() -> None:
-    """
-    Delete all tip length calibration files.
-    """
-    offset_dir = config.get_tip_length_cal_path()
-    try:
-        io._remove_json_files_in_directories(offset_dir)
+        all_tip_lengths_for_pipette = io.read_cal_file(tip_length_filepath)
+        for tiprack, data in all_tip_lengths_for_pipette.items():
+            try:
+                tip_lengths[
+                    typing.cast(local_types.TiprackHash, tiprack)
+                ] = v1.TipLengthModel(**data)
+            except (json.JSONDecodeError, ValidationError):
+                pass
+        return tip_lengths
     except FileNotFoundError:
-        pass
-
-
-# Save Tip Length Calibration
-
-
-def save_tip_length_calibration(
-    pip_id: local_types.PipetteId,
-    tip_length_cal: typing.Dict[local_types.TiprackHash, v1.TipLengthModel],
-) -> None:
-    """
-    Function used to save tip length calibration to file.
-
-    :param pip_id: pipette id to associate with this tip length
-    :param tip_length_cal: results of the data created using
-           :meth:`create_tip_length_data`
-    """
-    tip_length_dir_path = Path(config.get_tip_length_cal_path())
-
-    all_tip_lengths = _tip_lengths_for_pipette(pip_id)
-
-    all_tip_lengths.update(tip_length_cal)
-
-    # This is a workaround since pydantic doesn't have a nice way to
-    # add encoders when converting to a dict.
-    dict_of_tip_lengths = {}
-    for key, item in all_tip_lengths.items():
-        dict_of_tip_lengths[key] = json.loads(item.json())
-    io.save_to_file(tip_length_dir_path, pip_id, dict_of_tip_lengths)
-
-
-# Get Tip Length Calibration
+        return tip_lengths
 
 
 def load_tip_length_calibration(
@@ -140,7 +55,7 @@ def load_tip_length_calibration(
     labware_hash = helpers.hash_labware_def(definition)
     load_name = definition["parameters"]["loadName"]
     try:
-        return _tip_length_calibrations()[pip_id][labware_hash]
+        return tip_lengths_for_pipette(pip_id)[labware_hash]
     except KeyError:
         raise local_types.TipLengthCalNotFound(
             f"Tip length of {load_name} has not been "
@@ -181,3 +96,72 @@ def create_tip_length_data(
 
     data = {labware_hash: tip_length_data}
     return data
+
+
+# Delete Tip Length Calibration
+
+
+def delete_tip_length_calibration(
+    tiprack: local_types.TiprackHash, pipette_id: local_types.PipetteId
+) -> None:
+    """
+    Delete tip length calibration based on tiprack hash and
+    pipette serial number
+
+    :param tiprack: tiprack hash
+    :param pipette: pipette serial number
+    """
+    tip_lengths = tip_lengths_for_pipette(pipette_id)
+    if tiprack in tip_lengths:
+        # maybe make modify and delete same file?
+        del tip_lengths[tiprack]
+        tip_length_directory = Path(config.get_tip_length_cal_path())
+        if tip_lengths:
+            io.save_to_file(tip_length_directory, pipette_id, tip_lengths)
+        else:
+            io.delete_file(tip_length_directory / f"{pipette_id}.json")
+    else:
+        raise local_types.TipLengthCalNotFound(
+            f"Tip length for hash {tiprack} has not been "
+            f"calibrated for this pipette: {pipette_id} and cannot"
+            "be loaded"
+        )
+
+
+def clear_tip_length_calibration() -> None:
+    """
+    Delete all tip length calibration files.
+    """
+    offset_dir = config.get_tip_length_cal_path()
+    try:
+        io._remove_json_files_in_directories(offset_dir)
+    except FileNotFoundError:
+        pass
+
+
+# Save Tip Length Calibration
+
+
+def save_tip_length_calibration(
+    pip_id: local_types.PipetteId,
+    tip_length_cal: typing.Dict[local_types.TiprackHash, v1.TipLengthModel],
+) -> None:
+    """
+    Function used to save tip length calibration to file.
+
+    :param pip_id: pipette id to associate with this tip length
+    :param tip_length_cal: results of the data created using
+           :meth:`create_tip_length_data`
+    """
+    tip_length_dir_path = Path(config.get_tip_length_cal_path())
+
+    all_tip_lengths = tip_lengths_for_pipette(pip_id)
+
+    all_tip_lengths.update(tip_length_cal)
+
+    # This is a workaround since pydantic doesn't have a nice way to
+    # add encoders when converting to a dict.
+    dict_of_tip_lengths = {}
+    for key, item in all_tip_lengths.items():
+        dict_of_tip_lengths[key] = json.loads(item.json())
+    io.save_to_file(tip_length_dir_path, pip_id, dict_of_tip_lengths)

@@ -14,27 +14,6 @@ from .. import file_operators as io, types as local_types
 from .models import v1
 
 
-GripperCalibrations = Dict[local_types.GripperId, v1.InstrumentOffsetModel]
-
-# Gripper Offset Calibrations Look-Up
-
-
-def _gripper_offset_calibrations() -> GripperCalibrations:
-    gripper_calibration_dir = Path(config.get_opentrons_path("gripper_calibration_dir"))
-    gripper_calibration_dict: GripperCalibrations = {}
-
-    for file in os.scandir(gripper_calibration_dir):
-        if file.is_file() and ".json" in file.name:
-            gripper_id = cast(local_types.GripperId, file.name.split(".json")[0])
-            try:
-                gripper_calibration_dict[gripper_id] = v1.InstrumentOffsetModel(
-                    **io.read_cal_file(Path(file.path))
-                )
-            except (json.JSONDecodeError, ValidationError):
-                pass
-    return gripper_calibration_dict
-
-
 # Delete Gripper Offset Calibrations
 
 
@@ -99,6 +78,14 @@ def get_gripper_calibration_offset(
     if not config.feature_flags.enable_ot3_hardware_controller():
         raise NotImplementedError("Gripper calibrations are only valid on the OT-3")
     try:
-        return _gripper_offset_calibrations()[gripper_id]
-    except KeyError:
+        gripper_calibration_filepath = (
+            Path(config.get_opentrons_path("gripper_calibration_dir"))
+            / f"{gripper_id}.json"
+        )
+        return v1.InstrumentOffsetModel(
+            **io.read_cal_file(gripper_calibration_filepath)
+        )
+    except FileNotFoundError:
+        return None
+    except (json.JSONDecodeError, ValidationError):
         return None

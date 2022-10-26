@@ -1,5 +1,6 @@
 import numpy as np
 
+from pathlib import Path
 from opentrons import config
 from opentrons.calibration_storage import file_operators as io, ot2_pipette_offset
 
@@ -47,32 +48,29 @@ def test_save_calibration(ot_config_tempdir):
 
 
 def test_load_calibration(ot_config_tempdir):
-    pathway = (
-        config.get_opentrons_path("robot_calibration_dir") / "deck_calibration.json"
-    )
+    pathway = Path(config.get_opentrons_path("robot_calibration_dir"))
+    
     data = {
         "attitude": [[1, 0, 1], [0, 1, -0.5], [0, 0, 1]],
         "pipette_calibrated_with": "fake",
         "last_modified": utc_now(),
         "tiprack": "hash",
     }
-    io.save_to_file(pathway, data)
+    io.save_to_file(pathway, "deck_calibration", data)
     obj = robot_calibration.load_attitude_matrix()
     transform = [[1, 0, 1], [0, 1, -0.5], [0, 0, 1]]
     assert np.allclose(obj.attitude, transform)
 
 
 def test_load_malformed_calibration(ot_config_tempdir):
-    pathway = (
-        config.get_opentrons_path("robot_calibration_dir") / "deck_calibration.json"
-    )
+    pathway = Path(config.get_opentrons_path("robot_calibration_dir"))
     data = {
         "atsadasitude": [[1, 0, 1], [0, 1, -0.5], [0, 0, 1]],
         "last_modified": utc_now(),
         "tiprack": "hash",
         "statu": [1, 2, 3],
     }
-    io.save_to_file(pathway, data)
+    io.save_to_file(pathway, "deck_calibration", data)
     obj = robot_calibration.load_attitude_matrix()
     assert np.allclose(obj.attitude, [[1, 0, 0], [0, 1, 0], [0, 0, 1]])
 

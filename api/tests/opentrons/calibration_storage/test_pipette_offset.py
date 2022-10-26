@@ -72,12 +72,11 @@ def test_delete_all_pipette_calibration(
     Test delete all pipette calibrations.
     """
     pipette, _ = _pipette
-    assert pipette._pipette_offset_calibrations() != {}
+    assert pipette.get_pipette_offset("pip1", Mount.LEFT) is not None
+    assert pipette.get_pipette_offset("pip2", Mount.RIGHT) is not None
     pipette.clear_pipette_offset_calibrations()
-    assert pipette._pipette_offset_calibrations() == {
-        MountType.LEFT: {},
-        MountType.RIGHT: {},
-    }
+    assert pipette.get_pipette_offset("pip1", Mount.LEFT) is None
+    assert pipette.get_pipette_offset("pip2", Mount.RIGHT) is None
 
 
 @no_type_check
@@ -93,7 +92,6 @@ def test_delete_specific_pipette_offset(
     Test delete a specific pipette calibration.
     """
     pipette, _ = _pipette
-    assert pipette._pipette_offset_calibrations() != {}
     assert pipette.get_pipette_offset("pip1", Mount.LEFT) is not None
     pipette.delete_pipette_offset_file("pip1", Mount.LEFT)
     assert pipette.get_pipette_offset("pip1", Mount.LEFT) is None
@@ -110,10 +108,7 @@ def test_save_pipette_calibration(ot_config_tempdir: Any, _pipette: ModuleType) 
     Test saving pipette calibrations.
     """
     pipette, robot_type = _pipette
-    assert pipette._pipette_offset_calibrations() == {
-        MountType.LEFT: {},
-        MountType.RIGHT: {},
-    }
+    assert pipette.get_pipette_offset("pip1", Mount.LEFT) is None
     if robot_type == "ot3":
         pipette.save_pipette_calibration(Point(1, 1, 1), "pip1", Mount.LEFT)
         pipette.save_pipette_calibration(Point(1, 1, 1), "pip2", Mount.RIGHT)
@@ -124,15 +119,10 @@ def test_save_pipette_calibration(ot_config_tempdir: Any, _pipette: ModuleType) 
         pipette.save_pipette_calibration(
             Point(1, 1, 1), "pip2", Mount.RIGHT, "mytiprack", "opentrons/tip_rack/1"
         )
-    assert pipette._pipette_offset_calibrations() != {}
-    assert pipette._pipette_offset_calibrations()[MountType.LEFT] != {}
-    assert pipette._pipette_offset_calibrations()[MountType.RIGHT] != {}
-    assert pipette._pipette_offset_calibrations()[MountType.LEFT][
-        "pip1"
-    ].offset == Point(1, 1, 1)
-    assert pipette._pipette_offset_calibrations()[MountType.RIGHT][
-        "pip2"
-    ].offset == Point(1, 1, 1)
+    assert pipette.get_pipette_offset("pip1", Mount.LEFT) is not None
+    assert pipette.get_pipette_offset("pip2", Mount.RIGHT) is not None
+    assert pipette.get_pipette_offset("pip1", Mount.LEFT).offset == Point(1, 1, 1)
+    assert pipette.get_pipette_offset("pip1", Mount.LEFT).offset == Point(1, 1, 1)
 
 
 @no_type_check

@@ -14,35 +14,6 @@ from opentrons.util.helpers import utc_now
 from .models import v1
 
 
-PipetteCalibrations = Dict[
-    types.MountType, Dict[local_types.PipetteId, v1.InstrumentOffsetModel]
-]
-
-
-# Pipette Offset Calibrations Look-Up
-
-
-def _pipette_offset_calibrations() -> PipetteCalibrations:
-    pipette_calibration_dir = config.get_opentrons_path("pipette_calibration_dir")
-    pipette_calibration_dict: PipetteCalibrations = {}
-    for mount in types.MountType:
-        pipette_calibration_dict[mount] = {}
-        mount_dir = pipette_calibration_dir / mount.value
-        if not mount_dir.exists():
-            continue
-        for file in os.scandir(mount_dir):
-            if file.is_file() and ".json" in file.name:
-                pipette_id = cast(local_types.PipetteId, file.name.split(".json")[0])
-                try:
-                    pipette_calibration_dict[mount][
-                        pipette_id
-                    ] = v1.InstrumentOffsetModel(**io.read_cal_file(Path(file.path)))
-                except (json.JSONDecodeError, ValidationError):
-                    pass
-
-    return pipette_calibration_dict
-
-
 # Delete Pipette Offset Calibrations
 
 
@@ -80,7 +51,9 @@ def save_pipette_calibration(
         Union[local_types.CalibrationStatus, v1.CalibrationStatus]
     ] = None,
 ) -> None:
-    pip_dir = Path(config.get_opentrons_path("pipette_calibration_dir")) / mount.name.lower()
+    pip_dir = (
+        Path(config.get_opentrons_path("pipette_calibration_dir")) / mount.name.lower()
+    )
 
     if cal_status and isinstance(cal_status, local_types.CalibrationStatus):
         cal_status_model = v1.CalibrationStatus(**asdict(cal_status))
@@ -105,7 +78,15 @@ def get_pipette_offset(
     pipette_id: local_types.PipetteId, mount: types.Mount
 ) -> Optional[v1.InstrumentOffsetModel]:
     try:
-        mount_type = types.MountType[mount.name]
-        return _pipette_offset_calibrations()[mount_type][pipette_id]
-    except KeyError:
+        pipette_calibration_filepath = (
+            Path(config.get_opentrons_path("pipette_calibration_dir"))
+            / mount.name.lower()
+            / f"{pipette_id}.json"
+        )
+        return v1.InstrumentOffsetModel(
+            **io.read_cal_file(pipette_calibration_filepath)
+        )
+    except FileNotFoundError:
+        return None
+    except (json.JSONDecodeError, ValidationError):
         return None

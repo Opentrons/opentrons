@@ -19,40 +19,98 @@ if typing.TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
-TipLengthCalibrations = typing.Dict[
-    local_types.PipetteId, typing.Dict[local_types.TiprackHash, v1.TipLengthModel]
-]
-
-# Tip Length Calibrations Look-Up
+# Get Tip Length Calibration
 
 
-def _tip_length_calibrations() -> TipLengthCalibrations:
-    tip_length_dir = config.get_tip_length_cal_path()
-    tip_length_calibrations: TipLengthCalibrations = {}
-    for file in os.scandir(tip_length_dir):
-        if file.name == "index.json":
-            continue
-        if file.is_file() and ".json" in file.name:
-            pipette_id = typing.cast(local_types.PipetteId, file.name.split(".json")[0])
-            tip_length_calibrations[pipette_id] = {}
-            all_tip_lengths_for_pipette = io.read_cal_file(Path(file.path))
-            for tiprack, data in all_tip_lengths_for_pipette.items():
-                try:
-                    tip_length_calibrations[pipette_id][
-                        typing.cast(local_types.TiprackHash, tiprack)
-                    ] = v1.TipLengthModel(**data)
-                except (json.JSONDecodeError, ValidationError):
-                    pass
-    return tip_length_calibrations
-
-
-def _tip_lengths_for_pipette(
+def tip_lengths_for_pipette(
     pipette_id: local_types.PipetteId,
 ) -> typing.Dict[local_types.TiprackHash, v1.TipLengthModel]:
+    tip_lengths = {}
     try:
-        return _tip_length_calibrations()[pipette_id]
+        tip_length_filepath = (
+            Path(config.get_tip_length_cal_path()) / f"{pipette_id}.json"
+        )
+        all_tip_lengths_for_pipette = io.read_cal_file(tip_length_filepath)
+        for tiprack, data in all_tip_lengths_for_pipette.items():
+            try:
+                tip_lengths[
+                    typing.cast(local_types.TiprackHash, tiprack)
+                ] = v1.TipLengthModel(**data)
+            except (json.JSONDecodeError, ValidationError):
+                pass
+        return tip_lengths
+    except FileNotFoundError:
+        return tip_lengths
+
+
+def load_tip_length_calibration(
+    pip_id: local_types.PipetteId, definition: "LabwareDefinition"
+) -> v1.TipLengthModel:
+    """
+    Function used to grab the current tip length associated
+    with a particular tiprack.
+
+    :param pip_id: pipette you are using
+    :param definition: full definition of the tiprack
+    """
+    labware_hash = helpers.hash_labware_def(definition)
+    load_name = definition["parameters"]["loadName"]
+    try:
+        return tip_lengths_for_pipette(pip_id)[labware_hash]
     except KeyError:
-        return {}
+        raise local_types.TipLengthCalNotFound(
+            f"Tip length of {load_name} has not been "
+            f"calibrated for this pipette: {pip_id} and cannot"
+            "be loaded"
+        )
+
+
+def get_all_tip_length_calibrations() -> typing.List[v1.TipLengthCalibration]:
+    """
+    A helper function that will list all of the tip length calibrations.
+
+    :return: A list of dictionary objects representing all of the
+    tip length calibration files found on the robot.
+    """
+    all_tip_lengths_available = []
+    tip_length_dir_path = Path(config.get_tip_length_cal_path())
+    for filepath in tip_length_dir_path.glob("**/*.json"):
+        tip_lengths = tip_lengths_for_pipette(filepath.stem)
+        for tiprack_hash, tip_length in tip_lengths.items():
+            all_tip_lengths_available.append(
+                v1.TipLengthCalibration(
+                    pipette=filepath.stem,
+                    tiprack=tiprack_hash,
+                    tipLength=tip_length.tipLength,
+                    lastModified=tip_length.lastModified,
+                    source=tip_length.source,
+                    status=tip_length.status,
+                    uri=tip_length.uri,
+                )
+            )
+    return all_tip_lengths_available
+
+
+def get_custom_tiprack_definition_for_tlc(labware_uri: str) -> "LabwareDefinition":
+    """
+    Return the custom tiprack definition saved in the custom tiprack directory
+    during tip length calibration
+    """
+    custom_tiprack_dir = config.get_custom_tiprack_def_path()
+    custom_tiprack_path = custom_tiprack_dir / f"{labware_uri}.json"
+    try:
+        with open(custom_tiprack_path, "rb") as f:
+            return typing.cast(
+                "LabwareDefinition",
+                json.loads(f.read().decode("utf-8")),
+            )
+    except FileNotFoundError:
+        raise FileNotFoundError(
+            f"Custom tiprack {labware_uri} not found in the custom tiprack"
+            "directory on the robot. Please recalibrate tip length and "
+            "pipette offset with this tiprack before performing calibration "
+            "health check."
+        )
 
 
 # Delete Tip Length Calibration
@@ -68,13 +126,13 @@ def delete_tip_length_calibration(
     :param tiprack: tiprack hash
     :param pipette: pipette serial number
     """
-    tip_lengths_for_pipette = _tip_lengths_for_pipette(pipette_id)
-    if tiprack in tip_lengths_for_pipette:
+    tip_lengths = tip_lengths_for_pipette(pipette_id)
+    if tiprack in tip_lengths:
         # maybe make modify and delete same file?
-        del tip_lengths_for_pipette[tiprack]
+        del tip_lengths[tiprack]
         tip_length_dir = Path(config.get_tip_length_cal_path())
-        if tip_lengths_for_pipette:
-            io.save_to_file(tip_length_dir, pipette_id, tip_lengths_for_pipette)
+        if tip_lengths:
+            io.save_to_file(tip_length_dir, pipette_id, tip_lengths)
         else:
             io.delete_file(tip_length_dir / f"{pipette_id}.json")
     else:
@@ -160,7 +218,7 @@ def save_tip_length_calibration(
     """
     tip_length_dir_path = Path(config.get_tip_length_cal_path())
 
-    all_tip_lengths = _tip_lengths_for_pipette(pip_id)
+    all_tip_lengths = tip_lengths_for_pipette(pip_id)
 
     all_tip_lengths.update(tip_length_cal)
 
@@ -170,74 +228,3 @@ def save_tip_length_calibration(
     for key, item in all_tip_lengths.items():
         dict_of_tip_lengths[key] = json.loads(item.json())
     io.save_to_file(tip_length_dir_path, pip_id, dict_of_tip_lengths)
-
-
-# Get Tip Length Calibration
-
-
-def load_tip_length_calibration(
-    pip_id: local_types.PipetteId, definition: "LabwareDefinition"
-) -> v1.TipLengthModel:
-    """
-    Function used to grab the current tip length associated
-    with a particular tiprack.
-
-    :param pip_id: pipette you are using
-    :param definition: full definition of the tiprack
-    """
-    labware_hash = helpers.hash_labware_def(definition)
-    load_name = definition["parameters"]["loadName"]
-    try:
-        return _tip_length_calibrations()[pip_id][labware_hash]
-    except KeyError:
-        raise local_types.TipLengthCalNotFound(
-            f"Tip length of {load_name} has not been "
-            f"calibrated for this pipette: {pip_id} and cannot"
-            "be loaded"
-        )
-
-
-def get_all_tip_length_calibrations() -> typing.List[v1.TipLengthCalibration]:
-    """
-    A helper function that will list all of the tip length calibrations.
-
-    :return: A list of dictionary objects representing all of the
-    tip length calibration files found on the robot.
-    """
-    all_tip_lengths_available = []
-    for pipette, tiprack_hashs in _tip_length_calibrations().items():
-        for tiprack_hash, tip_length in tiprack_hashs.items():
-            all_tip_lengths_available.append(
-                v1.TipLengthCalibration(
-                    pipette=pipette,
-                    tiprack=tiprack_hash,
-                    tipLength=tip_length.tipLength,
-                    lastModified=tip_length.lastModified,
-                    source=tip_length.source,
-                    status=tip_length.status,
-                    uri=tip_length.uri,
-                )
-            )
-    return all_tip_lengths_available
-
-
-def get_custom_tiprack_definition_for_tlc(labware_uri: str) -> "LabwareDefinition":
-    """
-    Return the custom tiprack definition saved in the custom tiprack directory
-    during tip length calibration
-    """
-    custom_tiprack_dir = config.get_custom_tiprack_def_path()
-    custom_tiprack_path = custom_tiprack_dir / f"{labware_uri}.json"
-    try:
-        with open(custom_tiprack_path, "rb") as f:
-            return typing.cast(
-                "LabwareDefinition",
-                json.loads(f.read().decode("utf-8")),
-            )
-    except FileNotFoundError:
-        raise FileNotFoundError(
-            f"Custom tiprack {labware_uri} not found in the custom tiprack"
-            "directory on the robot. Please recalibrate tip length and "
-            "pipette offset with this tiprack before performing calibration "
-            "health check."
-        )

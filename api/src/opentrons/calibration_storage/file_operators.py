@@ -87,8 +87,6 @@ def save_to_file(
     directorypath.mkdir(parents=True, exist_ok=True)
     filepath = directorypath / f"{file_name}.json"
     json_data = (
-        data.json()
-        if isinstance(data, BaseModel)
-        else json.dumps(data, cls=encoder)
+        data.json() if isinstance(data, BaseModel) else json.dumps(data, cls=encoder)
     )
     filepath.write_text(json_data, encoding="utf-8")

@@ -102,19 +102,15 @@ def test_save_tip_length_calibration(
     Test saving tip length calibrations.
     """
     tip_length, _ = _tip_length
-    assert tip_length._tip_length_calibrations() == {}
+    assert tip_length.tip_lengths_for_pipette("pip1") == {}
+    assert tip_length.tip_lengths_for_pipette("pip2") == {}
     tip_rack_hash = helpers.hash_labware_def(minimalLabwareDef)
     tip_length1 = tip_length.create_tip_length_data(minimalLabwareDef, 22.0)
     tip_length2 = tip_length.create_tip_length_data(minimalLabwareDef, 31.0)
     tip_length.save_tip_length_calibration("pip1", tip_length1)
     tip_length.save_tip_length_calibration("pip2", tip_length2)
-    assert tip_length._tip_length_calibrations() != {}
-    assert (
-        tip_length._tip_length_calibrations()["pip1"][tip_rack_hash].tipLength == 22.0
-    )
-    assert (
-        tip_length._tip_length_calibrations()["pip2"][tip_rack_hash].tipLength == 31.0
-    )
+    assert tip_length.tip_lengths_for_pipette("pip1")[tip_rack_hash].tipLength == 22.0
+    assert tip_length.tip_lengths_for_pipette("pip2")[tip_rack_hash].tipLength == 31.0
 
 
 @no_type_check
@@ -157,13 +153,12 @@ def test_delete_specific_tip_calibration(
     Test delete a specific tip length calibration.
     """
     tip_length, _ = _tip_length
-    assert tip_length._tip_length_calibrations() != {}
-    assert tip_length._tip_lengths_for_pipette("pip1") != {}
-    assert tip_length._tip_lengths_for_pipette("pip2") != {}
+    assert tip_length.tip_lengths_for_pipette("pip1") != {}
+    assert tip_length.tip_lengths_for_pipette("pip2") != {}
     tip_rack_hash = helpers.hash_labware_def(minimalLabwareDef)
     tip_length.delete_tip_length_calibration(tip_rack_hash, "pip1")
-    assert tip_length._tip_lengths_for_pipette("pip1") == {}
-    assert tip_length._tip_lengths_for_pipette("pip2") != {}
+    assert tip_length.tip_lengths_for_pipette("pip1") == {}
+    assert tip_length.tip_lengths_for_pipette("pip2") != {}
 
 
 @no_type_check
@@ -179,8 +174,8 @@ def test_delete_all_tip_calibration(
     Test delete all tip length calibration.
     """
     tip_length, _ = _tip_length
-    assert tip_length._tip_length_calibrations() != {}
-    assert tip_length._tip_lengths_for_pipette("pip1") != {}
-    assert tip_length._tip_lengths_for_pipette("pip2") != {}
+    assert tip_length.tip_lengths_for_pipette("pip1") != {}
+    assert tip_length.tip_lengths_for_pipette("pip2") != {}
     tip_length.clear_tip_length_calibration()
-    assert tip_length._tip_length_calibrations() == {}
+    assert tip_length.tip_lengths_for_pipette("pip1") == {}
+    assert tip_length.tip_lengths_for_pipette("pip2") == {}
