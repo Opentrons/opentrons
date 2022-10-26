@@ -46,7 +46,7 @@ interface CalibratePipetteResult {
 
 interface MoveToLocationParams {
   pipetteId: string
-  deckSlot: SetupPosition
+  location: SetupPosition
 }
 
 interface MoveToLocationResult {
@@ -55,5 +55,4 @@ interface MoveToLocationResult {
     y: number
     z: number
   }
-  positionId: string
 }

@@ -543,10 +543,10 @@
               "key": { "type": "string" },
               "commandType": { "enum": ["calibration/moveToLocation"] },
               "params": {
-                "required": ["pipetteId", "deckSlot"],
+                "required": ["pipetteId", "location"],
                 "pipetteId": { "type": "string" },
-                "deckSlot": {
-                  "description": "Slot location to move to before starting calibration.",
+                "location": {
+                  "description": "Location to move to before starting calibration.",
                   "enum": ["attachOrDetach", "probePosition"]
                 }
               }
