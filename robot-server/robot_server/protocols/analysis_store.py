@@ -14,6 +14,7 @@ from opentrons.protocol_engine import (
     ErrorOccurrence,
     LoadedPipette,
     LoadedLabware,
+    LoadedModule,
     Liquid,
 )
 
@@ -109,7 +110,7 @@ class AnalysisStore:
         analysis_id: str,
         commands: List[Command],
         labware: List[LoadedLabware],
-        modules: List[LoadedModules],
+        modules: List[LoadedModule],
         pipettes: List[LoadedPipette],
         errors: List[ErrorOccurrence],
         liquids: List[Liquid],
