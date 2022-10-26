@@ -10,6 +10,7 @@ from opentrons.protocol_engine import ErrorOccurrence, commands as cmd
 from opentrons.protocol_engine.types import (
     WellLocation,
     LabwareLocation,
+    LabwareMovementStrategy,
 )
 
 
@@ -338,35 +339,19 @@ def create_blow_out_command(
 
 def create_move_labware_command(
     new_location: LabwareLocation,
+    strategy: LabwareMovementStrategy,
     labware_id: str = "labware-id",
     offset_id: Optional[str] = None,
-    use_gripper: Optional[bool] = False,
 ) -> cmd.MoveLabware:
     """Get a completed MoveLabware command."""
     params = cmd.MoveLabwareParams(
         labwareId=labware_id,
         newLocation=new_location,
-        useGripper=use_gripper,
+        strategy=strategy,
     )
     result = cmd.MoveLabwareResult(offsetId=offset_id)
 
     return cmd.MoveLabware(
-        id="command-id",
-        key="command-key",
-        status=cmd.CommandStatus.SUCCEEDED,
-        createdAt=datetime(year=2022, month=1, day=1),
-        params=params,
-        result=result,
-    )
-
-
-def create_move_labware_off_deck_command(
-    labware_id: str = "labware-id",
-) -> cmd.MoveLabwareOffDeck:
-    """Get a completed MoveLabwareOffDeck command."""
-    params = cmd.MoveLabwareOffDeckParams(labwareId=labware_id)
-    result = cmd.MoveLabwareOffDeckResult()
-    return cmd.MoveLabwareOffDeck(
         id="command-id",
         key="command-key",
         status=cmd.CommandStatus.SUCCEEDED,

@@ -1,6 +1,8 @@
 """Core module control interfaces."""
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
-from typing import Any, Generic, List, Optional, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, List, Optional, TypeVar
 
 from opentrons.drivers.types import (
     HeaterShakerLabwareLatchStatus,
@@ -18,6 +20,9 @@ from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.types import DeckSlotName
 
 from .labware import LabwareCoreType
+
+if TYPE_CHECKING:
+    from opentrons.protocol_api.labware import Labware
 
 
 class AbstractModuleCore(ABC, Generic[LabwareCoreType]):
@@ -52,7 +57,8 @@ class AbstractModuleCore(ABC, Generic[LabwareCoreType]):
         """Get the module's deck slot."""
 
     @abstractmethod
-    def add_labware_core(self, labware_core: LabwareCoreType) -> None:
+    # TODO(mc, 2022-10-20): make this a side-effect, not a return
+    def add_labware_core(self, labware_core: LabwareCoreType) -> Labware:
         """Add a labware to the module."""
 
 

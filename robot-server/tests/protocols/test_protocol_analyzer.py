@@ -62,6 +62,7 @@ async def test_analyze(
             config=JsonProtocolConfig(schema_version=123),
             files=[],
             metadata={},
+            robot_type="OT-3 Standard",
             labware_definitions=[],
         ),
         protocol_key="dummy-data-111",
@@ -125,5 +126,6 @@ async def test_analyze(
             pipettes=[analysis_pipette],
             errors=[analysis_error],
             liquids=[],
+            robot_type="OT-3 Standard",
         ),
     )

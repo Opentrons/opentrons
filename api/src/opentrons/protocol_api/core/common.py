@@ -1,19 +1,22 @@
-"""Convenience type aliases for ProtocolContext tests."""
-from opentrons.protocol_api.core.protocol import AbstractProtocol
-from opentrons.protocol_api.core.instrument import AbstractInstrument
-from opentrons.protocol_api.core.labware import AbstractLabware
-from opentrons.protocol_api.core.module import (
+"""Common APIs for protocol core interfaces."""
+
+# TODO(mc, 2022-08-22): move to __init__ when dependency cycles are resolved
+from .instrument import AbstractInstrument
+from .labware import AbstractLabware
+from .module import (
     AbstractModuleCore,
     AbstractTemperatureModuleCore,
     AbstractMagneticModuleCore,
     AbstractThermocyclerCore,
     AbstractHeaterShakerCore,
 )
-from opentrons.protocol_api.core.well import AbstractWellCore
+from .protocol import AbstractProtocol
+from .well import AbstractWellCore
 
 
-InstrumentCore = AbstractInstrument[AbstractWellCore]
-LabwareCore = AbstractLabware[AbstractWellCore]
+WellCore = AbstractWellCore
+LabwareCore = AbstractLabware[WellCore]
+InstrumentCore = AbstractInstrument[WellCore]
 ModuleCore = AbstractModuleCore[LabwareCore]
 TemperatureModuleCore = AbstractTemperatureModuleCore[LabwareCore]
 MagneticModuleCore = AbstractMagneticModuleCore[LabwareCore]

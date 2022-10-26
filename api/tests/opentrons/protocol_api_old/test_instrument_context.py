@@ -78,16 +78,24 @@ def mock_labware(decoy: Decoy) -> Labware:
 
 
 @pytest.fixture
+def mock_trash(decoy: Decoy) -> Labware:
+    return decoy.mock(cls=Labware)
+
+
+@pytest.fixture
 def subject(
     mock_instrument_implementation: AbstractInstrument[AbstractWellCore],
     mock_protocol_context: ProtocolContext,
+    mock_trash: Labware,
 ) -> InstrumentContext:
-
     subject = InstrumentContext(
         implementation=mock_instrument_implementation,
         ctx=mock_protocol_context,
         broker=Broker(),
-        at_version=APIVersion(2, 0),
+        api_version=APIVersion(2, 0),
+        tip_racks=[],
+        trash=mock_trash,
+        requested_as="some-pipette-name",
     )
 
     return subject

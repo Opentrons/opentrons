@@ -112,5 +112,12 @@ class CompletedAnalysis(BaseModel):
         description="Liquids used by the protocol",
     )
 
+    # TODO(mm, 2022-10-21): Make this an enum when we figure out where it should live.
+    robotType: Literal["OT-2 Standard", "OT-3 Standard"] = Field(
+        # This robotType field was added later. Analyses stored in the database before
+        # then could only possibly have been for OT-2s.
+        default="OT-2 Standard"
+    )
+
 
 ProtocolAnalysis = Union[PendingAnalysis, CompletedAnalysis]

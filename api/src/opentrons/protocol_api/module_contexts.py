@@ -21,17 +21,14 @@ from opentrons.protocols.geometry.module_geometry import (
     HeaterShakerGeometry,
 )
 
-from .core.protocol import AbstractProtocol
-from .core.instrument import AbstractInstrument
-from .core.labware import AbstractLabware
-from .core.module import (
-    AbstractModuleCore,
-    AbstractTemperatureModuleCore,
-    AbstractMagneticModuleCore,
-    AbstractThermocyclerCore,
-    AbstractHeaterShakerCore,
+from .core.common import (
+    ProtocolCore,
+    ModuleCore,
+    TemperatureModuleCore,
+    MagneticModuleCore,
+    ThermocyclerCore,
+    HeaterShakerCore,
 )
-from .core.well import AbstractWellCore
 
 from .module_validation_and_errors import (
     validate_heater_shaker_temperature,
@@ -47,11 +44,6 @@ ENGAGE_HEIGHT_UNIT_CNV = 2
 _log = logging.getLogger(__name__)
 
 GeometryType = TypeVar("GeometryType", bound=ModuleGeometry)
-
-InstrumentCore = AbstractInstrument[AbstractWellCore]
-LabwareCore = AbstractLabware[AbstractWellCore]
-ModuleCore = AbstractModuleCore[LabwareCore]
-ProtocolCore = AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]
 
 
 class ModuleContext(CommandPublisher, Generic[GeometryType]):
@@ -142,15 +134,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
             location=self._core,
         )
 
-        self._core.add_labware_core(labware_core)
-
-        # TODO(mc, 2022-09-02): add API version
-        # https://opentrons.atlassian.net/browse/RSS-97
-        labware = self._core.geometry.add_labware(Labware(implementation=labware_core))
-
-        # TODO(mc, 2022-09-08): move this into legacy PAPIv2 implementation
-        # by reworking the `Deck` and/or `ModuleGeometry` interface
-        self._protocol_core.get_deck().recalculate_high_z()
+        labware = self._core.add_labware_core(labware_core)
 
         return labware
 
@@ -264,7 +248,7 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
 
     """
 
-    _core: AbstractTemperatureModuleCore[AbstractLabware[AbstractWellCore]]
+    _core: TemperatureModuleCore
 
     @publish(command=cmds.tempdeck_set_temp)
     @requires_version(2, 0)
@@ -337,7 +321,7 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
     .. versionadded:: 2.0
     """
 
-    _core: AbstractMagneticModuleCore[AbstractLabware[AbstractWellCore]]
+    _core: MagneticModuleCore
 
     @publish(command=cmds.magdeck_calibrate)
     @requires_version(2, 0)
@@ -444,7 +428,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     .. versionadded:: 2.0
     """
 
-    _core: AbstractThermocyclerCore[AbstractLabware[AbstractWellCore]]
+    _core: ThermocyclerCore
 
     def flag_unsafe_move(
         self, to_loc: types.Location, from_loc: types.Location
@@ -666,7 +650,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     .. versionadded:: 2.13
     """
 
-    _core: AbstractHeaterShakerCore[AbstractLabware[AbstractWellCore]]
+    _core: HeaterShakerCore
 
     @property  # type: ignore[misc]
     @requires_version(2, 13)

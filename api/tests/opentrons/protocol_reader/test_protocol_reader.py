@@ -113,6 +113,7 @@ async def test_read_files(
     )
     analyzed_config = ConfigAnalysis(
         metadata={"hey": "there"},
+        robot_type="OT-2 Standard",
         config=PythonProtocolConfig(api_version=APIVersion(123, 456)),
     )
 
@@ -136,6 +137,7 @@ async def test_read_files(
             ),
         ],
         metadata={"hey": "there"},
+        robot_type="OT-2 Standard",
         config=PythonProtocolConfig(api_version=APIVersion(123, 456)),
         labware_definitions=[labware_data],
     )
@@ -265,6 +267,7 @@ async def test_read_files_no_copy(
     )
     analyzed_config = ConfigAnalysis(
         metadata={"hey": "there"},
+        robot_type="OT-2 Standard",
         config=PythonProtocolConfig(api_version=APIVersion(123, 456)),
     )
 
@@ -284,6 +287,7 @@ async def test_read_files_no_copy(
             ),
         ],
         metadata={"hey": "there"},
+        robot_type="OT-2 Standard",
         config=PythonProtocolConfig(api_version=APIVersion(123, 456)),
         labware_definitions=[],
     )

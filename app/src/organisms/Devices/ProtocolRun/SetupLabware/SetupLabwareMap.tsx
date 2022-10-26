@@ -15,6 +15,7 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
+import { useFeatureFlag } from '../../../../redux/config'
 import { ModuleExtraAttention } from '../ModuleExtraAttention'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import {
@@ -54,10 +55,13 @@ export function SetupLabwareMap({
   )
   const labwareRenderInfoById = useLabwareRenderInfoForRunById(runId)
   const runHasStarted = useRunHasStarted(runId)
+  const enableLiquidSetup = useFeatureFlag('enableLiquidSetup')
+
   return (
     <Flex flex="1" maxHeight="180vh" flexDirection={DIRECTION_COLUMN}>
       <Flex flexDirection={DIRECTION_COLUMN} marginY={SPACING.spacing4}>
         {!runHasStarted &&
+        !enableLiquidSetup &&
         extraAttentionModules.length > 0 &&
         moduleRenderInfoById ? (
           <ModuleExtraAttention

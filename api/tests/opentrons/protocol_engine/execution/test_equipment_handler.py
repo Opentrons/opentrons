@@ -5,6 +5,7 @@ from decoy import Decoy, matchers
 from typing import Any, cast
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.labware.dev_types import LabwareUri
 
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.types import Mount as HwMount, MountType, DeckSlotName
@@ -27,6 +28,7 @@ from opentrons.protocol_engine.types import (
     LabwareOffsetLocation,
     ModuleModel,
     ModuleDefinition,
+    OFF_DECK_LOCATION,
 )
 
 from opentrons.protocol_engine.state import Config, StateStore
@@ -162,6 +164,38 @@ async def test_load_labware(
         labware_id="unique-id",
         definition=minimal_labware_def,
         offsetId="labware-offset-id",
+    )
+
+
+async def test_load_labware_off_deck(
+    decoy: Decoy,
+    model_utils: ModelUtils,
+    state_store: StateStore,
+    labware_data_provider: LabwareDataProvider,
+    minimal_labware_def: LabwareDefinition,
+    subject: EquipmentHandler,
+) -> None:
+    """It should load labware definition and offset data and generate an ID."""
+    decoy.when(model_utils.generate_id()).then_return("unique-id")
+
+    decoy.when(
+        state_store.labware.get_definition_by_uri(
+            cast("LabwareUri", "opentrons-test/load-name/1")
+        )
+    ).then_return(minimal_labware_def)
+
+    result = await subject.load_labware(
+        location=OFF_DECK_LOCATION,
+        load_name="load-name",
+        namespace="opentrons-test",
+        version=1,
+        labware_id=None,
+    )
+
+    assert result == LoadedLabwareData(
+        labware_id="unique-id",
+        definition=minimal_labware_def,
+        offsetId=None,
     )
 
 
@@ -392,6 +426,19 @@ def test_find_offset_id_of_labware_on_module(
     )
 
     assert result == "labware-offset-id"
+
+
+def test_find_offset_id_of_labware_off_deck(
+    decoy: Decoy,
+    state_store: StateStore,
+    subject: EquipmentHandler,
+) -> None:
+    """It should return None for offset_id of labware off-deck."""
+    result = subject.find_applicable_labware_offset_id(
+        labware_definition_uri="opentrons-test/load-name/1",
+        labware_location=OFF_DECK_LOCATION,
+    )
+    assert result is None
 
 
 async def test_load_pipette(

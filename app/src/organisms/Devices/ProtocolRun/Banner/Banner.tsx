@@ -13,14 +13,15 @@ import {
   JUSTIFY_CENTER,
   ALIGN_CENTER,
 } from '@opentrons/components'
-
-import { StyledText } from '../../../../../atoms/text'
+import { StyledText } from '../../../../atoms/text'
 
 interface BannerProps {
   title: string
   children?: React.ReactNode
 }
-
+/**
+ * @deprecated When enable liquid setup FF is removed, this component will no longer be used
+ */
 export function Banner(props: BannerProps): JSX.Element | null {
   const { title, children } = props
 
@@ -63,7 +64,9 @@ interface BannerItemProps {
   body: string
   button: JSX.Element | null
 }
-
+/**
+ * @deprecated When enable liquid setup FF is removed, this component will no longer be used
+ */
 export const BannerItem = (props: BannerItemProps): JSX.Element => {
   const { title, body, button } = props
   return (

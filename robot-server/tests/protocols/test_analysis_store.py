@@ -69,6 +69,7 @@ def make_dummy_protocol_resource(protocol_id: str) -> ProtocolResource:
             config=JsonProtocolConfig(schema_version=123),
             files=[],
             metadata={},
+            robot_type="OT-2 Standard",
             labware_definitions=[],
         ),
         protocol_key=None,
@@ -115,35 +116,17 @@ async def test_returned_in_order_added(
     """It should return analyses from least-recently-added to most-recently-added."""
     protocol_store.insert(make_dummy_protocol_resource(protocol_id="protocol-id"))
 
-    subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id-1")
-    await subject.update(
-        analysis_id="analysis-id-1",
-        labware=[],
-        pipettes=[],
-        commands=[],
-        errors=[],
-        liquids=[],
-    )
-
-    subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id-2")
-    await subject.update(
-        analysis_id="analysis-id-2",
-        labware=[],
-        pipettes=[],
-        commands=[],
-        errors=[],
-        liquids=[],
-    )
-
-    subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id-3")
-    await subject.update(
-        analysis_id="analysis-id-3",
-        labware=[],
-        pipettes=[],
-        commands=[],
-        errors=[],
-        liquids=[],
-    )
+    for analysis_id in ["analysis-id-1", "analysis-id-2", "analysis-id-3"]:
+        subject.add_pending(protocol_id="protocol-id", analysis_id=analysis_id)
+        await subject.update(
+            analysis_id=analysis_id,
+            labware=[],
+            pipettes=[],
+            commands=[],
+            errors=[],
+            liquids=[],
+            robot_type="OT-2 Standard",
+        )
 
     subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id-4")
     # Leave as pending, to test that we interleave completed & pending analyses
@@ -161,10 +144,10 @@ async def test_returned_in_order_added(
     assert [a.id for a in full_analyses] == expected_order
 
 
-async def test_add_analysis_equipment(
+async def test_update_adds_details_and_completes_analysis(
     subject: AnalysisStore, protocol_store: ProtocolStore
 ) -> None:
-    """It should add labware and pipettes to the stored analysis."""
+    """It should add details to the stored analysis and mark it completed."""
     protocol_store.insert(make_dummy_protocol_resource(protocol_id="protocol-id"))
 
     labware = pe_types.LoadedLabware(
@@ -186,9 +169,12 @@ async def test_add_analysis_equipment(
         analysis_id="analysis-id",
         labware=[labware],
         pipettes=[pipette],
+        # TODO(mm, 2022-10-21): Give the subject some commands, errors, and liquids here
+        # and assert that we can retrieve them.
         commands=[],
         errors=[],
         liquids=[],
+        robot_type="OT-3 Standard",
     )
 
     result = await subject.get("analysis-id")
@@ -201,6 +187,7 @@ async def test_add_analysis_equipment(
         commands=[],
         errors=[],
         liquids=[],
+        robotType="OT-3 Standard",
     )
     assert await subject.get_by_protocol("protocol-id") == [result]
 
@@ -261,6 +248,7 @@ async def test_update_infers_status_from_errors(
         labware=[],
         pipettes=[],
         liquids=[],
+        robot_type="OT-2 Standard",
     )
     analysis = (await subject.get_by_protocol("protocol-id"))[0]
     assert isinstance(analysis, CompletedAnalysis)

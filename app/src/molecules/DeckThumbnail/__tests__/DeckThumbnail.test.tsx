@@ -1,6 +1,9 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { getRobotNameFromLoadedLabware, getDeckDefFromRobotName } from '@opentrons/shared-data'
+import {
+  getRobotNameFromLoadedLabware,
+  getDeckDefFromRobotName,
+} from '@opentrons/shared-data'
 import ot2StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import { renderWithProviders } from '@opentrons/components'
 import { simpleAnalysisFileFixture } from '@opentrons/api-client'
@@ -13,7 +16,7 @@ jest.mock('@opentrons/shared-data', () => {
   return {
     ...actualSharedData,
     getRobotNameFromLoadedLabware: jest.fn(),
-    getDeckDefFromRobotName: jest.fn()
+    getDeckDefFromRobotName: jest.fn(),
   }
 })
 jest.mock('@opentrons/components', () => {
@@ -51,8 +54,12 @@ const render = (props: React.ComponentProps<typeof DeckThumbnail>) => {
 
 describe('DeckThumbnail', () => {
   beforeEach(() => {
-    when(mockGetRobotNameFromLoadedLabware).calledWith(labware).mockReturnValue('OT-2 Standard')
-    when(mockGetDeckDefFromRobotName).calledWith('OT-2 Standard').mockReturnValue(ot2StandardDeckDef as any)
+    when(mockGetRobotNameFromLoadedLabware)
+      .calledWith(labware)
+      .mockReturnValue('OT-2 Standard')
+    when(mockGetDeckDefFromRobotName)
+      .calledWith('OT-2 Standard')
+      .mockReturnValue(ot2StandardDeckDef as any)
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -77,13 +84,16 @@ describe('DeckThumbnail', () => {
     ).not.toBeFalsy()
   })
   it('renders an OT-2 deckmap when the protocol is an OT-2 protocol', () => {
-    when(mockGetRobotNameFromLoadedLabware).calledWith(labware).mockReturnValue('OT-2 Standard')
+    when(mockGetRobotNameFromLoadedLabware)
+      .calledWith(labware)
+      .mockReturnValue('OT-2 Standard')
     render({ commands, labware })
     expect(mockGetDeckDefFromRobotName).toHaveBeenCalledWith('OT-2 Standard')
-
   })
   it('renders an OT-3 deckmap when the protocol is an OT-3 protocol', () => {
-    when(mockGetRobotNameFromLoadedLabware).calledWith(labware).mockReturnValue('OT-3 Standard')
+    when(mockGetRobotNameFromLoadedLabware)
+      .calledWith(labware)
+      .mockReturnValue('OT-3 Standard')
     render({ commands, labware })
     expect(mockGetDeckDefFromRobotName).toHaveBeenCalledWith('OT-3 Standard')
   })

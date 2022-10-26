@@ -67,9 +67,9 @@ export function ChooseProtocolSlideoutComponent(
   const srcFileObjects =
     selectedProtocol != null
       ? selectedProtocol.srcFiles.map((srcFileBuffer, index) => {
-          const srcFilePath = selectedProtocol.srcFileNames[index]
-          return new File([srcFileBuffer], path.basename(srcFilePath))
-        })
+        const srcFilePath = selectedProtocol.srcFileNames[index]
+        return new File([srcFileBuffer], path.basename(srcFilePath))
+      })
       : []
 
   const [shouldApplyOffsets, setShouldApplyOffsets] = React.useState(true)
@@ -103,10 +103,10 @@ export function ChooseProtocolSlideoutComponent(
     { hostname: robot.ip },
     shouldApplyOffsets
       ? offsetCandidates.map(({ vector, location, definitionUri }) => ({
-          vector,
-          location,
-          definitionUri,
-        }))
+        vector,
+        location,
+        definitionUri,
+      }))
       : []
   )
 
@@ -142,8 +142,8 @@ export function ChooseProtocolSlideoutComponent(
             {isCreatingRun ? (
               <Icon name="ot-spinner" spin size={SIZE_1} />
             ) : (
-              t('shared:proceed_to_setup')
-            )}
+                t('shared:proceed_to_setup')
+              )}
           </PrimaryButton>
         </ApiHostProvider>
       }
@@ -180,6 +180,7 @@ export function ChooseProtocolSlideoutComponent(
                       commands={
                         storedProtocol.mostRecentAnalysis?.commands ?? []
                       }
+                      labware={storedProtocol.mostRecentAnalysis?.labware ?? []}
                     />
                   </Box>
                   <StyledText
@@ -230,53 +231,53 @@ export function ChooseProtocolSlideoutComponent(
                       }}
                     />
                   ) : (
-                    runCreationError
-                  )}
+                      runCreationError
+                    )}
                 </StyledText>
               ) : null}
             </Flex>
           )
         })
       ) : (
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          alignItems={ALIGN_CENTER}
-          justifyContent={JUSTIFY_CENTER}
-          width="100%"
-          minHeight="11rem"
-          padding={SPACING.spacing4}
-          css={BORDERS.cardOutlineBorder}
-        >
-          <Icon
-            size="1.25rem"
-            name="alert-circle"
-            color={COLORS.medGreyEnabled}
-          />
-          <StyledText
-            as="p"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            marginTop={SPACING.spacing3}
-            role="heading"
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            alignItems={ALIGN_CENTER}
+            justifyContent={JUSTIFY_CENTER}
+            width="100%"
+            minHeight="11rem"
+            padding={SPACING.spacing4}
+            css={BORDERS.cardOutlineBorder}
           >
-            {t('no_protocols_found')}
-          </StyledText>
-          <StyledText
-            as="p"
-            marginTop={SPACING.spacing3}
-            textAlign={TYPOGRAPHY.textAlignCenter}
-          >
-            <Trans
-              t={t}
-              i18nKey="to_run_protocol_go_to_protocols_page"
-              components={{
-                navlink: (
-                  <Link to="/protocols" css={TYPOGRAPHY.linkPSemiBold} />
-                ),
-              }}
+            <Icon
+              size="1.25rem"
+              name="alert-circle"
+              color={COLORS.medGreyEnabled}
             />
-          </StyledText>
-        </Flex>
-      )}
+            <StyledText
+              as="p"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              marginTop={SPACING.spacing3}
+              role="heading"
+            >
+              {t('no_protocols_found')}
+            </StyledText>
+            <StyledText
+              as="p"
+              marginTop={SPACING.spacing3}
+              textAlign={TYPOGRAPHY.textAlignCenter}
+            >
+              <Trans
+                t={t}
+                i18nKey="to_run_protocol_go_to_protocols_page"
+                components={{
+                  navlink: (
+                    <Link to="/protocols" css={TYPOGRAPHY.linkPSemiBold} />
+                  ),
+                }}
+              />
+            </StyledText>
+          </Flex>
+        )}
     </Slideout>
   )
 }
@@ -310,9 +311,9 @@ export function DeprecatedChooseProtocolSlideout(
   const srcFileObjects =
     selectedProtocol != null
       ? selectedProtocol.srcFiles.map((srcFileBuffer, index) => {
-          const srcFilePath = selectedProtocol.srcFileNames[index]
-          return new File([srcFileBuffer], path.basename(srcFilePath))
-        })
+        const srcFilePath = selectedProtocol.srcFileNames[index]
+        return new File([srcFileBuffer], path.basename(srcFilePath))
+      })
       : []
 
   const {
@@ -364,8 +365,8 @@ export function DeprecatedChooseProtocolSlideout(
             {isCreatingRun ? (
               <Icon name="ot-spinner" spin size={SIZE_1} />
             ) : (
-              t('shared:proceed_to_setup')
-            )}
+                t('shared:proceed_to_setup')
+              )}
           </PrimaryButton>
         </ApiHostProvider>
       }
@@ -401,6 +402,9 @@ export function DeprecatedChooseProtocolSlideout(
                     <DeckThumbnail
                       commands={
                         storedProtocol.mostRecentAnalysis?.commands ?? []
+                      }
+                      labware={
+                        storedProtocol.mostRecentAnalysis?.labware ?? []
                       }
                     />
                   </Box>
@@ -452,53 +456,53 @@ export function DeprecatedChooseProtocolSlideout(
                       }}
                     />
                   ) : (
-                    runCreationError
-                  )}
+                      runCreationError
+                    )}
                 </StyledText>
               ) : null}
             </Flex>
           )
         })
       ) : (
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          alignItems={ALIGN_CENTER}
-          justifyContent={JUSTIFY_CENTER}
-          width="100%"
-          minHeight="11rem"
-          padding={SPACING.spacing4}
-          css={BORDERS.cardOutlineBorder}
-        >
-          <Icon
-            size="1.25rem"
-            name="alert-circle"
-            color={COLORS.medGreyEnabled}
-          />
-          <StyledText
-            as="p"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            marginTop={SPACING.spacing3}
-            role="heading"
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            alignItems={ALIGN_CENTER}
+            justifyContent={JUSTIFY_CENTER}
+            width="100%"
+            minHeight="11rem"
+            padding={SPACING.spacing4}
+            css={BORDERS.cardOutlineBorder}
           >
-            {t('no_protocols_found')}
-          </StyledText>
-          <StyledText
-            as="p"
-            marginTop={SPACING.spacing3}
-            textAlign={TYPOGRAPHY.textAlignCenter}
-          >
-            <Trans
-              t={t}
-              i18nKey="to_run_protocol_go_to_protocols_page"
-              components={{
-                navlink: (
-                  <Link to="/protocols" css={TYPOGRAPHY.linkPSemiBold} />
-                ),
-              }}
+            <Icon
+              size="1.25rem"
+              name="alert-circle"
+              color={COLORS.medGreyEnabled}
             />
-          </StyledText>
-        </Flex>
-      )}
+            <StyledText
+              as="p"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              marginTop={SPACING.spacing3}
+              role="heading"
+            >
+              {t('no_protocols_found')}
+            </StyledText>
+            <StyledText
+              as="p"
+              marginTop={SPACING.spacing3}
+              textAlign={TYPOGRAPHY.textAlignCenter}
+            >
+              <Trans
+                t={t}
+                i18nKey="to_run_protocol_go_to_protocols_page"
+                components={{
+                  navlink: (
+                    <Link to="/protocols" css={TYPOGRAPHY.linkPSemiBold} />
+                  ),
+                }}
+              />
+            </StyledText>
+          </Flex>
+        )}
     </Slideout>
   )
 }
@@ -512,6 +516,6 @@ export function ChooseProtocolSlideout(
   return enableManualDeckStateMod ? (
     <ChooseProtocolSlideoutComponent {...props} />
   ) : (
-    <DeprecatedChooseProtocolSlideout {...props} />
-  )
+      <DeprecatedChooseProtocolSlideout {...props} />
+    )
 }
