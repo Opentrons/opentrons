@@ -165,6 +165,7 @@ describe('getLabwareLocationCombos', () => {
         params: {
           labwareId: 'firstLabwareId',
           newLocation: { slotName: '4' },
+          strategy: 'usingGripper',
         },
         result: { offsetId: 'fakeOffsetId' },
         id: 'CommandId3',
@@ -180,6 +181,7 @@ describe('getLabwareLocationCombos', () => {
         params: {
           labwareId: 'secondLabwareId',
           newLocation: { slotName: '5' },
+          strategy: 'usingGripper',
         },
         result: { offsetId: 'fakeOffsetId' },
         id: 'CommandId4',
@@ -195,6 +197,7 @@ describe('getLabwareLocationCombos', () => {
         params: {
           labwareId: 'duplicateLabwareId',
           newLocation: { slotName: '5' },
+          strategy: 'usingGripper',
         },
         result: { offsetId: 'fakeOffsetId' },
         id: 'CommandId5',
