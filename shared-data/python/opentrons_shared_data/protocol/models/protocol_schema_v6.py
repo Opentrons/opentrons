@@ -63,10 +63,12 @@ class Params(BaseModel):
     height: Optional[float]
     offset: Optional[OffsetVector]
     profile: Optional[List[ProfileStep]]
-    # TODO: remove this newLocation as soon as there is moveLabware support in PAPIv2,
-    # this is only to unblock internal testing of LPC with JSON protocols
-    # that include 'moveLabware' commands in the meantime
+    # TODO: remove these 'newLocation' and 'strategy' params as soon as 
+    # there is moveLabware support in PAPIv2, this is only to unblock 
+    # internal testing of LPC with JSON protocols that include 
+    # 'moveLabware' commands in the meantime
     newLocation: Optional[Location]
+    strategy: Optional[str]
 
 
 class Command(BaseModel):
