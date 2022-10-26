@@ -13,20 +13,6 @@ from .. import file_operators as io, types as local_types
 from .models import v1
 
 
-# Deck Calibration Look-Up
-
-
-def _deck_calibration() -> Optional[v1.DeckCalibrationModel]:
-    deck_calibration_dir = config.get_opentrons_path("robot_calibration_dir")
-    for file in os.scandir(deck_calibration_dir):
-        if file.name == "deck_calibration.json":
-            try:
-                return v1.DeckCalibrationModel(**io.read_cal_file(file.path))
-            except (json.JSONDecodeError, ValidationError):
-                pass
-    return None
-
-
 # Delete Deck Calibration
 
 
@@ -81,4 +67,11 @@ def save_robot_deck_attitude(
 
 
 def get_robot_deck_attitude() -> Optional[v1.DeckCalibrationModel]:
-    return _deck_calibration()
+    deck_calibration_dir = config.get_opentrons_path("robot_calibration_dir")
+    for file in os.scandir(deck_calibration_dir):
+        if file.name == "deck_calibration.json":
+            try:
+                return v1.DeckCalibrationModel(**io.read_cal_file(file.path))
+            except (json.JSONDecodeError, ValidationError):
+                pass
+    return None
