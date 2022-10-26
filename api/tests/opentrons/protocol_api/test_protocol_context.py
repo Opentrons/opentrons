@@ -20,7 +20,12 @@ from opentrons.protocol_api import (
 )
 from opentrons.protocol_api.core.labware import LabwareLoadParams
 
-from .types import InstrumentCore, LabwareCore, ModuleCore, ProtocolCore
+from .types import (
+    InstrumentCore,
+    LabwareCore,
+    ProtocolCore,
+    TemperatureModuleCore,
+)
 
 
 @pytest.fixture(autouse=True)
@@ -185,8 +190,10 @@ def test_load_module(
     subject: ProtocolContext,
 ) -> None:
     """It should load a module."""
-    mock_module_core = decoy.mock(cls=ModuleCore)
-
+    # TODO: replace with `decoy.mock(cls=TemperatureModuleCore)` with decoy >= 1.11.1
+    mock_module_core = cast(
+        TemperatureModuleCore, decoy.mock(cls=TemperatureModuleCore.__origin__)  # type: ignore[attr-defined]
+    )
     decoy.when(validation.ensure_module_model("spline reticulator")).then_return(
         TemperatureModuleModel.TEMPERATURE_V1
     )
@@ -200,7 +207,6 @@ def test_load_module(
         )
     ).then_return(mock_module_core)
 
-    decoy.when(mock_module_core.get_type()).then_return(ModuleType.TEMPERATURE)
     decoy.when(mock_module_core.get_model()).then_return(
         TemperatureModuleModel.TEMPERATURE_V2
     )
@@ -219,7 +225,10 @@ def test_load_module_default_location(
     subject: ProtocolContext,
 ) -> None:
     """It should load a module without specifying a location explicitely."""
-    mock_module_core = decoy.mock(cls=ModuleCore)
+    # TODO: replace with `decoy.mock(cls=TemperatureModuleCore)` with decoy >= 1.11.1
+    mock_module_core = cast(
+        TemperatureModuleCore, decoy.mock(cls=TemperatureModuleCore.__origin__)  # type: ignore[attr-defined]
+    )
 
     decoy.when(validation.ensure_module_model("spline reticulator")).then_return(
         TemperatureModuleModel.TEMPERATURE_V1

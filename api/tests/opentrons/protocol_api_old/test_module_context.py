@@ -50,6 +50,7 @@ def ctx_with_tempdeck(
 ) -> ProtocolContext:
     """Context fixture with a mock temp deck."""
     mock_module_controller.model.return_value = "temperatureModuleV2"
+    mock_module_controller.mock_add_spec(hw_modules.TempDeck)
     mock_hardware.attached_modules = [mock_module_controller]
 
     return papi.create_protocol_context(
@@ -64,6 +65,7 @@ def ctx_with_magdeck(
 ) -> ProtocolContext:
     """Context fixture with a mock mag deck."""
     mock_module_controller.model.return_value = "magneticModuleV1"
+    mock_module_controller.mock_add_spec(hw_modules.MagDeck)
     mock_hardware.attached_modules = [mock_module_controller]
 
     return papi.create_protocol_context(
@@ -77,8 +79,8 @@ async def ctx_with_thermocycler(
     mock_hardware: mock.AsyncMock, mock_module_controller: mock.MagicMock
 ) -> ProtocolContext:
     """Context fixture with a mock thermocycler."""
-    mock_module_controller.mock_add_spec(hw_modules.Thermocycler)
     mock_module_controller.model.return_value = "thermocyclerModuleV1"
+    mock_module_controller.mock_add_spec(hw_modules.Thermocycler)
     mock_hardware.attached_modules = [mock_module_controller]
 
     return papi.create_protocol_context(
@@ -95,6 +97,7 @@ def ctx_with_heater_shaker(
 ) -> ProtocolContext:
     """Context fixture with a mock heater-shaker."""
     mock_module_controller.model.return_value = "heaterShakerModuleV1"
+    mock_module_controller.mock_add_spec(hw_modules.HeaterShaker)
     mock_hardware.attached_modules = [mock_module_controller]
 
     ctx = papi.create_protocol_context(
@@ -185,15 +188,6 @@ def test_load_simulating_module(ctx, loadname, klass, model):
 def test_magdeck(ctx_with_magdeck, mock_module_controller):
     mod = ctx_with_magdeck.load_module("Magnetic Module", 1)
     assert ctx_with_magdeck.deck[1] == mod.geometry
-
-
-def test_magdeck_calibrate(ctx_with_magdeck, mock_module_controller):
-    mod = ctx_with_magdeck.load_module("Magnetic Module", 1)
-    mod.calibrate()
-    assert "calibrating magnetic" in ",".join(
-        cmd.lower() for cmd in ctx_with_magdeck.commands()
-    )
-    mock_module_controller.calibrate.assert_called_once()
 
 
 # _________ Thermocycler tests __________
