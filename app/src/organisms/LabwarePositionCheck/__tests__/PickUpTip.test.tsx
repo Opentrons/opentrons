@@ -139,7 +139,11 @@ describe('PickUpTip', () => {
     expect(props.createRunCommand).toHaveBeenNthCalledWith(1, {
       command: {
         commandType: 'moveLabware',
-        params: { labwareId: 'labwareId1', newLocation: { slotName: '1' } },
+        params: {
+          labwareId: 'labwareId1',
+          newLocation: { slotName: '1' },
+          strategy: 'manualMoveWithoutPause'
+        },
       },
       waitUntilComplete: true,
     })
@@ -389,7 +393,11 @@ describe('PickUpTip', () => {
     expect(props.createRunCommand).toHaveBeenNthCalledWith(12, {
       command: {
         commandType: 'moveLabware',
-        params: { labwareId: 'labwareId1', newLocation: 'offDeck' },
+        params: {
+          labwareId: 'labwareId1',
+          newLocation: 'offDeck',
+          strategy: 'manualMoveWithoutPause'
+        },
       },
       waitUntilComplete: true,
     })

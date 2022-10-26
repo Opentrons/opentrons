@@ -78,7 +78,11 @@ describe('ReturnTip', () => {
     expect(props.createRunCommand).toHaveBeenNthCalledWith(1, {
       command: {
         commandType: 'moveLabware',
-        params: { labwareId: 'labwareId1', newLocation: { slotName: '1' } },
+        params: {
+          labwareId: 'labwareId1',
+          newLocation: { slotName: '1' },
+          strategy: 'manualMoveWithoutPause'
+        },
       },
       waitUntilComplete: true,
     })
@@ -109,7 +113,11 @@ describe('ReturnTip', () => {
     expect(props.createRunCommand).toHaveBeenNthCalledWith(4, {
       command: {
         commandType: 'moveLabware',
-        params: { labwareId: 'labwareId1', newLocation: 'offDeck' },
+        params: {
+          labwareId: 'labwareId1',
+          newLocation: 'offDeck',
+          strategy: 'manualMoveWithoutPause'
+        },
       },
       waitUntilComplete: true,
     })
@@ -129,7 +137,11 @@ describe('ReturnTip', () => {
     expect(props.createRunCommand).toHaveBeenNthCalledWith(1, {
       command: {
         commandType: 'moveLabware',
-        params: { labwareId: 'labwareId1', newLocation: { slotName: '1' } },
+        params: {
+          labwareId: 'labwareId1',
+          newLocation: { slotName: '1' },
+          strategy: 'manualMoveWithoutPause'
+        },
       },
       waitUntilComplete: true,
     })
@@ -160,7 +172,11 @@ describe('ReturnTip', () => {
     expect(props.createRunCommand).toHaveBeenNthCalledWith(4, {
       command: {
         commandType: 'moveLabware',
-        params: { labwareId: 'labwareId1', newLocation: 'offDeck' },
+        params: {
+          labwareId: 'labwareId1',
+          newLocation: 'offDeck',
+          strategy: 'manualMoveWithoutPause'
+        },
       },
       waitUntilComplete: true,
     })
@@ -211,7 +227,11 @@ describe('ReturnTip', () => {
     expect(props.createRunCommand).toHaveBeenNthCalledWith(3, {
       command: {
         commandType: 'moveLabware',
-        params: { labwareId: 'labwareId1', newLocation: { slotName: '1' } },
+        params: {
+          labwareId: 'labwareId1',
+          newLocation: { slotName: '1' },
+          strategy: 'manualMoveWithoutPause'
+        },
       },
       waitUntilComplete: true,
     })
@@ -242,7 +262,11 @@ describe('ReturnTip', () => {
     expect(props.createRunCommand).toHaveBeenNthCalledWith(6, {
       command: {
         commandType: 'moveLabware',
-        params: { labwareId: 'labwareId1', newLocation: 'offDeck' },
+        params: {
+          labwareId: 'labwareId1',
+          newLocation: 'offDeck',
+          strategy: 'manualMoveWithoutPause'
+        },
       },
       waitUntilComplete: true,
     })

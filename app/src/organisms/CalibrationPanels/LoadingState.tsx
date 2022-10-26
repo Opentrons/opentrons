@@ -22,7 +22,7 @@ export function LoadingState(props: LoadingStateProps): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_CENTER}
       alignItems={ALIGN_CENTER}
-      minHeight="25rem"
+      minHeight="32rem"
     >
       <Icon
         name="ot-spinner"

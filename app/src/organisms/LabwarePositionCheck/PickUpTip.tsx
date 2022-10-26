@@ -104,7 +104,11 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
         ...modulePrepCommands,
         {
           commandType: 'moveLabware' as const,
-          params: { labwareId: labwareId, newLocation: location },
+          params: {
+            labwareId: labwareId,
+            newLocation: location,
+            strategy: 'manualMoveWithoutPause'
+          },
         },
         {
           commandType: 'moveToWell' as const,
@@ -175,7 +179,11 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
       [
         {
           commandType: 'moveLabware' as const,
-          params: { labwareId: labwareId, newLocation: 'offDeck' },
+          params: {
+            labwareId: labwareId,
+            newLocation: 'offDeck',
+            strategy: 'manualMoveWithoutPause'
+          },
         },
         {
           commandType: 'moveToWell' as const,

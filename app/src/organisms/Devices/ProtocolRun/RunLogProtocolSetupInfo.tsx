@@ -131,7 +131,6 @@ export const RunLogProtocolSetupInfo = ({
       protocolData.commands
     )
     const { liquidId, labwareId } = setupCommand.params
-    console.log('setupCommand', setupCommand)
     const liquidDisplayName = liquidInfo.find(liquid => liquid.id === liquidId)
       ?.displayName
     setupCommandText = (

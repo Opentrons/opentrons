@@ -128,6 +128,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
         labwareId: labwareId,
         newLocation:
           moduleId != null ? { moduleId } : { slotName: location.slotName },
+        strategy: 'manualMoveWithoutPause'
       },
     },
     {
@@ -145,12 +146,12 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
     confirmPlacementCommands =
       moduleType === HEATERSHAKER_MODULE_TYPE
         ? [
-            {
-              commandType: 'heaterShaker/closeLabwareLatch',
-              params: { moduleId },
-            },
-            ...confirmPlacementCommands,
-          ]
+          {
+            commandType: 'heaterShaker/closeLabwareLatch',
+            params: { moduleId },
+          },
+          ...confirmPlacementCommands,
+        ]
         : confirmPlacementCommands
   }
 
@@ -203,7 +204,11 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
             },
             {
               commandType: 'moveLabware' as const,
-              params: { labwareId: labwareId, newLocation: 'offDeck' },
+              params: {
+                labwareId: labwareId,
+                newLocation: 'offDeck',
+                strategy: 'manualMoveWithoutPause'
+              },
             },
           ]
           chainRunCommands(confirmPositionCommands, createRunCommand, proceed)

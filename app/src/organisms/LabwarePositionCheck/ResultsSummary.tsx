@@ -1,6 +1,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
+import isEqual from 'lodash/isEqual'
 import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import {
@@ -164,8 +165,6 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
           const labwareDef = labwareDefinitions.find(
             def => getLabwareDefURI(def) === definitionUri
           )
-          console.log(labwareDefinitions)
-          console.log(labwareDef)
           const labwareDisplayName =
             labwareDef != null ? getLabwareDisplayName(labwareDef) : ''
           return (
@@ -182,7 +181,7 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
                 <StyledText as="p">{labwareDisplayName}</StyledText>
               </TableDatum>
               <TableDatum>
-                {vector.x === 0 && vector.y === 0 && vector.z === 0 ? (
+                {isEqual(vector, IDENTITY_VECTOR) ? (
                   <StyledText>{t('no_labware_offsets')}</StyledText>
                 ) : (
                   <Flex justifyContent={JUSTIFY_FLEX_END}>
@@ -209,3 +208,4 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
     </Table>
   )
 }
+  

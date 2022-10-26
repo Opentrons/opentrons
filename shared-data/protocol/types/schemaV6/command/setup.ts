@@ -13,7 +13,7 @@ export interface LoadPipetteCreateCommand extends CommonCommandCreateInfo {
 }
 export interface LoadPipetteRunTimeCommand
   extends CommonCommandRunTimeInfo,
-    Omit<LoadPipetteCreateCommand, 'params'> {
+  Omit<LoadPipetteCreateCommand, 'params'> {
   params: LoadPipetteParams & {
     pipetteName: PipetteName
   }
@@ -25,7 +25,7 @@ export interface LoadLabwareCreateCommand extends CommonCommandCreateInfo {
 }
 export interface LoadLabwareRunTimeCommand
   extends CommonCommandRunTimeInfo,
-    LoadLabwareCreateCommand {
+  LoadLabwareCreateCommand {
   result: LoadLabwareResult
 }
 export interface MoveLabwareCreateCommand extends CommonCommandCreateInfo {
@@ -34,7 +34,7 @@ export interface MoveLabwareCreateCommand extends CommonCommandCreateInfo {
 }
 export interface MoveLabwareRunTimeCommand
   extends CommonCommandRunTimeInfo,
-    MoveLabwareCreateCommand {
+  MoveLabwareCreateCommand {
   result: MoveLabwareResult
 }
 export interface LoadModuleCreateCommand extends CommonCommandCreateInfo {
@@ -43,7 +43,7 @@ export interface LoadModuleCreateCommand extends CommonCommandCreateInfo {
 }
 export interface LoadModuleRunTimeCommand
   extends CommonCommandRunTimeInfo,
-    Omit<LoadModuleCreateCommand, 'params'> {
+  Omit<LoadModuleCreateCommand, 'params'> {
   params: LoadModuleParams & {
     model: ModuleModel
   }
@@ -55,7 +55,7 @@ export interface LoadLiquidCreateCommand extends CommonCommandCreateInfo {
 }
 export interface LoadLiquidRunTimeCommand
   extends CommonCommandRunTimeInfo,
-    LoadLiquidCreateCommand {
+  LoadLiquidCreateCommand {
   result: LoadLiquidResult
 }
 
@@ -76,6 +76,11 @@ export type LabwareLocation =
   | { slotName: string }
   | { moduleId: string }
   | 'offDeck'
+
+export type LabwareMovementStrategy =
+  | "usingGripper"
+  | "manualMoveWithPause"
+  | "manualMoveWithoutPause"
 
 export interface ModuleLocation {
   slotName: string
@@ -100,6 +105,7 @@ interface LoadLabwareResult {
 interface MoveLabwareParams {
   labwareId: string
   newLocation: LabwareLocation
+  strategy: LabwareMovementStrategy
 }
 interface MoveLabwareResult {
   offsetId: string
