@@ -207,7 +207,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def get_loaded_instruments(self) -> Dict[Mount, Optional[InstrumentCore]]:
         """Get all loaded instruments by mount."""
-        raise NotImplementedError("ProtocolCore.add_labware_definition not implemented")
+        raise NotImplementedError("ProtocolCore.get_loaded_instruments not implemented")
 
     def pause(self, msg: Optional[str]) -> None:
         """Pause the protocol."""
