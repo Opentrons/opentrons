@@ -120,7 +120,7 @@ class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore[LabwareCor
 
     def get_current_temperature(self) -> float:
         """Get the module's current temperature in °C."""
-        raise NotImplementedError("get_current_temperature not implemented")
+        return self._sync_module_hardware.temperature  # type: ignore[no-any-return]
 
     def get_target_temperature(self) -> Optional[float]:
         """Get the module's target temperature in °C, if set."""
@@ -130,7 +130,7 @@ class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore[LabwareCor
 
     def get_status(self) -> TemperatureStatus:
         """Get the module's current temperature status."""
-        raise NotImplementedError("get_status not implemented")
+        return self._sync_module_hardware.status  # type: ignore[no-any-return]
 
 
 class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
