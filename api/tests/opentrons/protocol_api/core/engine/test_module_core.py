@@ -7,7 +7,6 @@ from opentrons.hardware_control.modules import AbstractModule
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_api.core.engine.module_core import (
     ModuleCore,
-    TemperatureModuleCore,
 )
 from opentrons.protocol_api.core.engine.labware import LabwareCore
 from opentrons.protocol_engine.types import (
@@ -16,10 +15,6 @@ from opentrons.protocol_engine.types import (
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import DeckSlotName
-from opentrons.protocol_engine.state.module_substates.temperature_module_substate import (
-    TemperatureModuleSubState,
-    TemperatureModuleId,
-)
 
 
 @pytest.fixture
@@ -55,21 +50,6 @@ def subject(
     )
 
 
-@pytest.fixture
-def temp_deck_subject(
-    decoy: Decoy,
-    mock_engine_client: EngineClient,
-    mock_sync_module_hardware: SynchronousAdapter[AbstractModule],
-) -> TemperatureModuleCore:
-    """Get a mock of TemperatureModuleCore."""
-    return TemperatureModuleCore(
-        module_id="1234",
-        engine_client=mock_engine_client,
-        api_version=APIVersion(2, 13),
-        sync_module_hardware=mock_sync_module_hardware,
-    )
-
-
 @pytest.mark.parametrize("api_version", [APIVersion(2, 3)])
 def test_api_version(
     decoy: Decoy, subject: ModuleCore, api_version: APIVersion
@@ -98,67 +78,3 @@ def test_add_labware_core(
     result = subject.add_labware_core(labware_core=labware_core)
 
     assert result.api_version == api_version
-
-
-# <editor-fold desc="temp deck tests">
-def test_set_target_temperature(
-    decoy: Decoy,
-    temp_deck_subject: TemperatureModuleCore,
-    mock_engine_client: EngineClient,
-) -> None:
-    """Should verify EngineClient call to set_target_temperature."""
-    temp_deck_subject.set_target_temperature(38.9)
-
-    decoy.verify(
-        mock_engine_client.temperature_set_target_temperature(
-            module_id="1234", celsius=38.9
-        )
-    )
-
-
-def test_wait_for_target_temperature(
-    decoy: Decoy,
-    temp_deck_subject: TemperatureModuleCore,
-    mock_engine_client: EngineClient,
-) -> None:
-    """Should verify EngineClient call to wait_for_target_temperature."""
-    temp_deck_subject.wait_for_target_temperature()
-
-    decoy.verify(
-        mock_engine_client.temperature_wait_for_target_temperature(
-            module_id="1234", celsius=None
-        )
-    )
-
-
-def test_deactivate(
-    decoy: Decoy,
-    temp_deck_subject: TemperatureModuleCore,
-    mock_engine_client: EngineClient,
-) -> None:
-    """Should verify EngineClient call to deactivate temp module."""
-    temp_deck_subject.deactivate()
-
-    decoy.verify(mock_engine_client.temperature_deactivate(module_id="1234"))
-
-
-def test_get_target_temperature(
-    decoy: Decoy,
-    temp_deck_subject: TemperatureModuleCore,
-    mock_engine_client: EngineClient,
-) -> None:
-    """Should return the current temperature."""
-    decoy.when(
-        mock_engine_client.state.modules.get_temperature_module_substate("1234")
-    ).then_return(
-        TemperatureModuleSubState(
-            TemperatureModuleId("1234"), plate_target_temperature=38.9
-        )
-    )
-
-    result = temp_deck_subject.get_target_temperature()
-
-    assert result == 38.9
-
-
-# </editor-fold>
