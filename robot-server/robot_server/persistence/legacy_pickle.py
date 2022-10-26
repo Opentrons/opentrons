@@ -86,6 +86,11 @@ _legacy_ot_types.append(
     _LegacyTypeInfo(original_name="EngineStatus", current_type=EngineStatus)
 )
 
+from opentrons.protocol_engine.types import LabwareMovementStrategy  # noqa: E402
+_legacy_ot_types.append(
+    _LegacyTypeInfo(original_name="LabwareMovementStrategy", current_type=LabwareMovementStrategy)
+)
+
 from opentrons.protocol_engine import ModuleModel  # noqa: E402
 _legacy_ot_types.append(
     _LegacyTypeInfo(original_name="ModuleModel", current_type=ModuleModel)
