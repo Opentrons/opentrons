@@ -48,7 +48,6 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
         self._engine_client = engine_client
         self._api_version = api_version
         self._sync_module_hardware = sync_module_hardware
-        self._state = engine_client.state.modules
 
     @property
     def api_version(self) -> APIVersion:
@@ -86,7 +85,7 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
 
     def get_deck_slot(self) -> DeckSlotName:
         """Get the module's deck slot."""
-        return self._state.get_location(self.module_id).slotName
+        return self._engine_client.state.modules.get_location(self.module_id).slotName
 
     def add_labware_core(self, labware_core: LabwareCore) -> Labware:
         """Add a labware to the module."""
@@ -124,9 +123,7 @@ class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore[LabwareCor
 
     def get_target_temperature(self) -> Optional[float]:
         """Get the module's target temperature in °C, if set."""
-        return self._state.get_temperature_module_substate(
-            self.module_id
-        ).get_plate_target_temperature()
+        return self._sync_module_hardware.target  # type: ignore[no-any-return]
 
     def get_status(self) -> TemperatureStatus:
         """Get the module's current temperature status."""

@@ -7,10 +7,6 @@ from opentrons.hardware_control.modules import TempDeck
 from opentrons.hardware_control.modules.types import TemperatureStatus
 
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons.protocol_engine.state.module_substates.temperature_module_substate import (
-    TemperatureModuleSubState,
-    TemperatureModuleId,
-)
 
 from opentrons.protocol_api.core.engine.module_core import TemperatureModuleCore
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
@@ -90,15 +86,10 @@ def test_get_target_temperature(
     decoy: Decoy,
     subject: TemperatureModuleCore,
     mock_engine_client: EngineClient,
+    mock_sync_module_hardware: TempDeckHardware,
 ) -> None:
     """Should return the target temperature."""
-    decoy.when(
-        mock_engine_client.state.modules.get_temperature_module_substate("1234")
-    ).then_return(
-        TemperatureModuleSubState(
-            TemperatureModuleId("1234"), plate_target_temperature=38.9
-        )
-    )
+    decoy.when(mock_sync_module_hardware.target).then_return(38.9)
 
     result = subject.get_target_temperature()
 
