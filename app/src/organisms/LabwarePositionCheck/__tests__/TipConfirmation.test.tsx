@@ -31,9 +31,9 @@ describe('TipConfirmation', () => {
   })
   it('should invoke callback props when ctas are clicked', () => {
     const { getByRole } = render(props)
-    getByRole('button', { name: 'yes' }).click()
-    expect(props.invalidateTip).toHaveBeenCalled()
     getByRole('button', { name: 'try again' }).click()
+    expect(props.invalidateTip).toHaveBeenCalled()
+    getByRole('button', { name: 'yes' }).click()
     expect(props.confirmTip).toHaveBeenCalled()
   })
 })

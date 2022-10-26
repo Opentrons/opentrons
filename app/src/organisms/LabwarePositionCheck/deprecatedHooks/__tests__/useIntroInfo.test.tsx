@@ -15,7 +15,7 @@ import type { PickUpTipCreateCommand } from '@opentrons/shared-data/protocol/typ
 import type { LoadLabwareCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
 jest.mock('@opentrons/shared-data')
-jest.mock('../../deprecatedGetLabwarePositionCheckSteps')
+jest.mock('../../deprecatedUtils/deprecatedGetLabwarePositionCheckSteps')
 jest.mock('../../../Devices/ProtocolRun/utils/getPipetteMount')
 jest.mock('../../../Devices/ProtocolRun/utils/getLabwareLocation')
 jest.mock('../../../Devices/hooks/useProtocolDetailsForRun')

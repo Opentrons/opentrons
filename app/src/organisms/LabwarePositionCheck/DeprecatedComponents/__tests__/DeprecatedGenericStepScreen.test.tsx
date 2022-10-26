@@ -42,7 +42,9 @@ const mockDeprecatedDeckmap = DeprecatedDeckMap as jest.MockedFunction<
 
 const PICKUP_TIP_LABWARE_ID = 'PICKUP_TIP_LABWARE_ID'
 const PRIMARY_PIPETTE_ID = 'PRIMARY_PIPETTE_ID'
-const MOCK_DEPRECATED_SECTIONS = ['PRIMARY_PIPETTE_TIPRACKS' as DeprecatedSection]
+const MOCK_DEPRECATED_SECTIONS = [
+  'PRIMARY_PIPETTE_TIPRACKS' as DeprecatedSection,
+]
 const MOCK_RUN_ID = 'fakeRunId'
 
 const MOCK_LABWARE_POSITION_CHECK_STEP_TIPRACK = {

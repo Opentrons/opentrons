@@ -28,7 +28,7 @@ jest.mock('../../deprecatedHooks')
 jest.mock('../DeprecatedSectionList')
 jest.mock('../../../Devices/hooks')
 jest.mock('../../../ProtocolUpload/hooks')
-jest.mock('../../utils/getLatestLabwareOffsetCount')
+jest.mock('../../deprecatedUtils/getLatestLabwareOffsetCount')
 
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')

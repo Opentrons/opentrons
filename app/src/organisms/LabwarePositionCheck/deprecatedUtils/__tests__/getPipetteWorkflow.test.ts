@@ -4,7 +4,7 @@ import { getPipetteWorkflow } from '../getPipetteWorkflow'
 import { doesPipetteVisitAllTipracks } from '../../utils/doesPipetteVisitAllTipracks'
 import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 
-jest.mock('../doesPipetteVisitAllTipracks')
+jest.mock('../../utils/doesPipetteVisitAllTipracks')
 
 const mockDoesPipetteVisitAllTipracks = doesPipetteVisitAllTipracks as jest.MockedFunction<
   typeof doesPipetteVisitAllTipracks

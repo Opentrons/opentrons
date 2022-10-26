@@ -29,8 +29,8 @@ describe('ExitConfirmation', () => {
     getByText(
       'If you exit now, all labware offsets will be discarded. This cannot be undone.'
     )
-    getByRole('button', { name: 'yes' })
-    getByRole('button', { name: 'try again' })
+    getByRole('button', { name: 'exit' })
+    getByRole('button', { name: 'Go back' })
   })
   it('should invoke callback props when ctas are clicked', () => {
     const { getByRole } = render(props)

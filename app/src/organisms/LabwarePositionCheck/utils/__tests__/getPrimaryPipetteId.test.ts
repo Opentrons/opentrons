@@ -111,11 +111,11 @@ describe('getPrimaryPipetteId', () => {
         id: '1',
         commandType: 'loadPipette',
         params: {
-          pipetteId: 'p50MultiId',
+          pipetteId: 'p50SingleId',
           mount: 'right',
         },
         result: {
-          pipetteId: 'p50MultiId',
+          pipetteId: 'p50SingleId',
         },
       },
     ] as any

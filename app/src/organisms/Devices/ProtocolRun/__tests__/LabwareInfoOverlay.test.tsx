@@ -16,7 +16,9 @@ import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { getLabwareDefinitionUri } from '../utils/getLabwareDefinitionUri'
 
 jest.mock('../../../ProtocolUpload/hooks')
-jest.mock('../../../LabwarePositionCheck/hooks/useLabwareOffsetForLabware')
+jest.mock(
+  '../../../LabwarePositionCheck/deprecatedHooks/useLabwareOffsetForLabware'
+)
 jest.mock('../utils/getLabwareLocation')
 jest.mock('../../hooks')
 jest.mock('../utils/getLabwareDefinitionUri')
