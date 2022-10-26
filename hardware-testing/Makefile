@@ -77,13 +77,13 @@ test-integration:
 
 .PHONY: lint
 lint:
-	$(python) -m mypy hardware_testing tests protocols
-	$(python) -m black --check hardware_testing tests protocols setup.py
-	$(python) -m flake8 hardware_testing tests protocols setup.py
+	$(python) -m mypy hardware_testing tests protocols examples
+	$(python) -m black --check hardware_testing tests protocols examples setup.py
+	$(python) -m flake8 hardware_testing tests protocols examples setup.py
 
 .PHONY: format
 format:
-	$(python) -m black hardware_testing tests protocols setup.py
+	$(python) -m black hardware_testing tests protocols examples setup.py
 
 define move-plot-webpage
 ssh -i $(2) $(3) root@$(1) \
@@ -98,6 +98,11 @@ endef
 push-plot-webpage:
 	scp -r hardware_testing/tools/plot root@$(host):/data
 	$(call move-plot-webpage,$(host),$(br_ssh_key),$(ssh_opts))
+
+.PHONY: push-plot-webpage-ot3
+push-plot-webpage:
+	scp -r hardware_testing/tools/plot root@$(host):/data
+	$(call move-plot-webpage-ot3,$(host),$(br_ssh_key),$(ssh_opts))
 
 .PHONY: restart
 restart:
@@ -125,8 +130,23 @@ push-ot3: push-no-restart-ot3 restart-ot3
 push-protocols:
 	scp -r protocols root@$(host):/data/user_storage/opentrons_data
 
+.PHONY: push-protocols-ot3
+push-protocols-ot3:
+	scp -r protocols root@$(host):/opt/opentrons-robot-server
+
+.PHONY: push-examples
+push-examples:
+	scp -r examples root@$(host):/data/user_storage/opentrons_data
+
+.PHONY: push-examples-ot3
+push-examples-ot3:
+	scp -r examples root@$(host):/opt/opentrons-robot-server
+
 .PHONY: push-all
-push-all: clean wheel push-no-restart push-plot-webpage push-protocols
+push-all: clean wheel push-no-restart push-plot-webpage push-protocols push-examples
+
+.PHONY: push-all-ot3
+push-all: clean wheel push-no-restart-ot3 push-plot-webpage-ot3 push-protocols-ot3 push-examples-ot3
 
 .PHONY: term
 term:
@@ -143,7 +163,7 @@ miniterm:
 .PHONY: push-all-and-term
 push-all-and-term: push-all term
 
-.PHONY: pull-data
+.PHONY: pull-data-ot3
 pull-data-ot3:
 	mkdir -p ./.pulled-data
 	scp -r root@$(host):/data/testing_data/$(test) ./.pulled-data
