@@ -40,7 +40,7 @@ from ._tables import (
 )
 
 from . import legacy_pickle
-from . import pydantic_json
+from . import _pydantic_json
 
 _LATEST_SCHEMA_VERSION: Final = 2
 
@@ -182,7 +182,7 @@ def _migrate_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
             legacy_pickle.loads(v1_analysis.completed_analysis)
         )
 
-        new_raw = pydantic_json.pydantic_to_sql(data=parsed_analysis)
+        new_raw = _pydantic_json.pydantic_to_sql(data=parsed_analysis)
 
         update_statement = (
             sqlalchemy.update(newest_analysis_table)
