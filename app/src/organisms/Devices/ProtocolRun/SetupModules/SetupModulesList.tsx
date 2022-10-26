@@ -14,11 +14,17 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getModuleType, TC_MODULE_LOCATION } from '@opentrons/shared-data'
-import { useModuleRenderInfoForProtocolById } from '../../hooks'
-import { getModuleImage } from './utils'
+import { Banner } from '../../../../atoms/Banner'
 import { StyledText } from '../../../../atoms/text'
 import { StatusLabel } from '../../../../atoms/StatusLabel'
-
+import { HeaterShakerBanner } from '../../../ProtocolSetup/RunSetupCard/ModuleSetup/HeaterShakerSetupWizard/HeaterShakerBanner'
+import { UnMatchedModuleWarning } from '../../../ProtocolSetup/RunSetupCard/ModuleSetup/UnMatchedModuleWarning'
+import { MultipleModulesModal } from '../../../ProtocolSetup/RunSetupCard/ModuleSetup/MultipleModulesModal'
+import {
+  useModuleRenderInfoForProtocolById,
+  useUnmatchedModulesForProtocol,
+} from '../../hooks'
+import { getModuleImage } from './utils'
 import type { ModuleModel } from '@opentrons/shared-data'
 import type { AttachedModule } from '../../../../redux/modules/types'
 
@@ -35,8 +41,64 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
     runId
   )
 
+  const {
+    missingModuleIds,
+    remainingAttachedModules,
+  } = useUnmatchedModulesForProtocol(robotName, runId)
+
+  const [
+    showMultipleModulesModal,
+    setShowMultipleModulesModal,
+  ] = React.useState<boolean>(false)
+
+  const heaterShakerModules = Object.values(
+    moduleRenderInfoForProtocolById
+  ).filter(module => module.moduleDef.model === 'heaterShakerModuleV1')
+
+  const moduleModels = map(
+    moduleRenderInfoForProtocolById,
+    ({ moduleDef }) => moduleDef.model
+  )
+
+  const hasADuplicateModule = new Set(moduleModels).size !== moduleModels.length
+
   return (
     <>
+      {heaterShakerModules.length !== 0 ? (
+        <HeaterShakerBanner modules={heaterShakerModules} />
+      ) : null}
+      {showMultipleModulesModal ? (
+        <MultipleModulesModal
+          onCloseClick={() => setShowMultipleModulesModal(false)}
+        />
+      ) : null}
+      {hasADuplicateModule ? (
+        <Box marginTop={SPACING.spacing3}>
+          <Banner
+            type="informing"
+            onCloseClick={() => setShowMultipleModulesModal(true)}
+            closeButton={
+              <StyledText
+                as="p"
+                textDecoration={TYPOGRAPHY.textDecorationUnderline}
+              >
+                {t('learn_more')}
+              </StyledText>
+            }
+          >
+            <Flex flexDirection={DIRECTION_COLUMN}>
+              <StyledText css={TYPOGRAPHY.pSemiBold}>
+                {t('multiple_modules')}
+              </StyledText>
+              <StyledText as="p">{t('view_moam')}</StyledText>
+            </Flex>
+          </Banner>
+        </Box>
+      ) : null}
+      {remainingAttachedModules.length !== 0 &&
+      missingModuleIds.length !== 0 ? (
+        <UnMatchedModuleWarning />
+      ) : null}
       <Flex
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}

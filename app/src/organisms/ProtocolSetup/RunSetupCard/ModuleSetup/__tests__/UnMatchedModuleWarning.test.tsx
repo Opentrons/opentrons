@@ -1,41 +1,33 @@
 import * as React from 'react'
-import { i18n } from '../../../../../i18n'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
+import { i18n } from '../../../../../i18n'
 import { UnMatchedModuleWarning } from '../UnMatchedModuleWarning'
 
-const render = (props: React.ComponentProps<typeof UnMatchedModuleWarning>) => {
-  return renderWithProviders(<UnMatchedModuleWarning {...props} />, {
+const render = () => {
+  return renderWithProviders(<UnMatchedModuleWarning />, {
     i18nInstance: i18n,
   })[0]
 }
 
 describe('UnMatchedModuleWarning', () => {
-  let props: React.ComponentProps<typeof UnMatchedModuleWarning>
-  beforeEach(() => {
-    props = { isAnyModuleUnnecessary: true }
-  })
-
   it('should render the correct title', () => {
-    const { getByText, getByLabelText } = render(props)
+    const { getByText } = render()
     getByText(
       'This robot has connected modules that are not specified in this protocol'
     )
-    getByLabelText('information_icon')
   })
-  it('should render the correct body', () => {
-    const { getByText } = render(props)
+  it('should render the correct body, clicking on exit button closes banner', () => {
+    const { getByText, getByTestId } = render()
     getByText(
-      'If you’re having trouble connecting the modules specified below, make sure the module’s generation (GEN1 vs GEN2) is correct.'
+      'Make sure the modules connected to this robot are of the right type and generation.'
     )
-  })
-
-  it('should not render text when boolean is false', () => {
-    props = { isAnyModuleUnnecessary: false }
-    const { queryByText } = render(props)
+    const exit = getByTestId('Banner_close-button')
+    fireEvent.click(exit)
     expect(
-      queryByText(
-        'This robot has connected modules that are not specified in this protocol'
+      screen.queryByText(
+        'Make sure the modules connected to this robot are of the right type and generation.'
       )
-    ).toBeNull()
+    ).not.toBeInTheDocument()
   })
 })
