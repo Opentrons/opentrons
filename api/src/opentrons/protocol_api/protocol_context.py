@@ -21,6 +21,7 @@ from opentrons.broker import Broker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
 from opentrons.commands.publisher import CommandPublisher, publish
+from opentrons.protocols.api_support import instrument as instrument_support
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
     AxisMaxSpeeds,
@@ -478,7 +479,7 @@ class ProtocolContext(CommandPublisher):
 
         checked_mount = validation.ensure_mount(mount)
         checked_instrument_name = validation.ensure_pipette_name(instrument_name)
-
+        tip_racks = tip_racks or []
         existing_instrument = self._instruments[checked_mount]
 
         if existing_instrument is not None and not replace:
@@ -497,13 +498,21 @@ class ProtocolContext(CommandPublisher):
             mount=checked_mount,
         )
 
+        for tip_rack in tip_racks:
+            instrument_support.validate_tiprack(
+                instrument_name=instrument_core.get_pipette_name(),
+                tip_rack=tip_rack,
+                log=logger,
+            )
+
         instrument = InstrumentContext(
             ctx=self,
             broker=self._broker,
             implementation=instrument_core,
-            at_version=self._api_version,
-            # TODO(mc, 2022-08-25): test instrument tip racks
+            api_version=self._api_version,
             tip_racks=tip_racks,
+            trash=self.fixed_trash,
+            requested_as=instrument_name,
         )
 
         self._instruments[checked_mount] = instrument

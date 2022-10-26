@@ -414,7 +414,7 @@ def test_select_next_tip(
             definition=opentrons_96_tiprack_300ul_def,
             parent=Location(Point(0, 0, 0), "Test Slot"),
         ),
-        api_level=APIVersion(2, 1),
+        api_version=APIVersion(2, 1),
     )
     early_tr.use_tips(well_list[0])
     with pytest.raises(AssertionError):
@@ -587,7 +587,7 @@ def test_labware_hash_func_same_implementation(minimal_labware_def) -> None:
         minimal_labware_def, Location(Point(0, 0, 0), "Test Slot")
     )
     s = set(
-        labware.Labware(implementation=impl, api_level=APIVersion(2, 3))
+        labware.Labware(implementation=impl, api_version=APIVersion(2, 3))
         for i in range(10)
     )
     assert len(s) == 1
@@ -602,8 +602,8 @@ def test_labware_hash_func_same_implementation_different_version(
         minimal_labware_def, Location(Point(0, 0, 0), "Test Slot")
     )
 
-    l1 = labware.Labware(implementation=impl, api_level=APIVersion(2, 3))
-    l2 = labware.Labware(implementation=impl, api_level=APIVersion(2, 4))
+    l1 = labware.Labware(implementation=impl, api_version=APIVersion(2, 3))
+    l2 = labware.Labware(implementation=impl, api_version=APIVersion(2, 4))
 
     assert len({l1, l2}) == 2
 
@@ -620,8 +620,8 @@ def test_labware_hash_func_diff_implementation_same_version(
         minimal_labware_def, Location(Point(0, 0, 0), "Test Slot2")
     )
 
-    l1 = labware.Labware(implementation=impl1, api_level=APIVersion(2, 3))
-    l2 = labware.Labware(implementation=impl2, api_level=APIVersion(2, 3))
+    l1 = labware.Labware(implementation=impl1, api_version=APIVersion(2, 3))
+    l2 = labware.Labware(implementation=impl2, api_version=APIVersion(2, 3))
 
     assert len({l1, l2}) == 2
 
@@ -634,6 +634,8 @@ def test_set_offset(decoy: Decoy) -> None:
     subject.set_offset(x=1.1, y=2.2, z=3.3)
     decoy.verify(labware_impl.set_calibration(Point(1.1, 2.2, 3.3)))
 
-    subject = labware.Labware(implementation=labware_impl, api_level=APIVersion(2, 11))
+    subject = labware.Labware(
+        implementation=labware_impl, api_version=APIVersion(2, 11)
+    )
     with pytest.raises(APIVersionError):
         subject.set_offset(x=4.4, y=5.5, z=6.6)

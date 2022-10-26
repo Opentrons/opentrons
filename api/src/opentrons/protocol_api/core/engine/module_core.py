@@ -89,7 +89,7 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
 
     def add_labware_core(self, labware_core: LabwareCore) -> Labware:
         """Add a labware to the module."""
-        return Labware(implementation=labware_core, api_level=self._api_version)
+        return Labware(implementation=labware_core, api_version=self._api_version)
 
 
 class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore[LabwareCore]):

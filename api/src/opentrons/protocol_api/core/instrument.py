@@ -77,10 +77,6 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
-    def get_instrument_name(self) -> str:
-        ...
-
-    @abstractmethod
     def get_pipette_name(self) -> str:
         ...
 
