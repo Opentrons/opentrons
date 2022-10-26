@@ -107,7 +107,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           params: {
             labwareId: labwareId,
             newLocation: location,
-            strategy: 'manualMoveWithoutPause'
+            strategy: 'manualMoveWithoutPause',
           },
         },
         {
@@ -182,7 +182,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           params: {
             labwareId: labwareId,
             newLocation: 'offDeck',
-            strategy: 'manualMoveWithoutPause'
+            strategy: 'manualMoveWithoutPause',
           },
         },
         {

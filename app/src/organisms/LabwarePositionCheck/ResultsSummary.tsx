@@ -208,4 +208,3 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
     </Table>
   )
 }
-  

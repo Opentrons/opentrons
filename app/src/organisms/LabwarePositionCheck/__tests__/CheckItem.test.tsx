@@ -4,10 +4,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { CheckItem } from '../CheckItem'
 import { SECTIONS } from '../constants'
-import {
-  mockCompletedAnalysis,
-  mockExistingOffsets,
-} from '../__fixtures__'
+import { mockCompletedAnalysis, mockExistingOffsets } from '../__fixtures__'
 import { chainRunCommands } from '../utils/chainRunCommands'
 import {
   HEATERSHAKER_MODULE_V1,
@@ -129,7 +126,7 @@ describe('CheckItem', () => {
         params: {
           labwareId: 'labwareId1',
           newLocation: { slotName: '1' },
-          strategy: 'manualMoveWithoutPause'
+          strategy: 'manualMoveWithoutPause',
         },
       },
       waitUntilComplete: true,
@@ -254,7 +251,7 @@ describe('CheckItem', () => {
         params: {
           labwareId: 'labwareId1',
           newLocation: 'offDeck',
-          strategy: 'manualMoveWithoutPause'
+          strategy: 'manualMoveWithoutPause',
         },
       },
       waitUntilComplete: true,
@@ -319,7 +316,7 @@ describe('CheckItem', () => {
         params: {
           labwareId: 'labwareId1',
           newLocation: { moduleId: 'firstHSId' },
-          strategy: 'manualMoveWithoutPause'
+          strategy: 'manualMoveWithoutPause',
         },
       },
       waitUntilComplete: true,

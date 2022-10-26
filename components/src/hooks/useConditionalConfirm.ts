@@ -40,7 +40,7 @@ export const useConditionalConfirm = <T extends any[]>(
   handleContinue: (...args: T) => void,
   shouldBlock: boolean
 ): {
-  confirm: (...args: T) => void,
+  confirm: (...args: T) => void
   showConfirmation: boolean
   cancel: () => unknown
 } => {

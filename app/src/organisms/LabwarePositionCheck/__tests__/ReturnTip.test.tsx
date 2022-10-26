@@ -81,7 +81,7 @@ describe('ReturnTip', () => {
         params: {
           labwareId: 'labwareId1',
           newLocation: { slotName: '1' },
-          strategy: 'manualMoveWithoutPause'
+          strategy: 'manualMoveWithoutPause',
         },
       },
       waitUntilComplete: true,
@@ -116,7 +116,7 @@ describe('ReturnTip', () => {
         params: {
           labwareId: 'labwareId1',
           newLocation: 'offDeck',
-          strategy: 'manualMoveWithoutPause'
+          strategy: 'manualMoveWithoutPause',
         },
       },
       waitUntilComplete: true,
@@ -140,7 +140,7 @@ describe('ReturnTip', () => {
         params: {
           labwareId: 'labwareId1',
           newLocation: { slotName: '1' },
-          strategy: 'manualMoveWithoutPause'
+          strategy: 'manualMoveWithoutPause',
         },
       },
       waitUntilComplete: true,
@@ -175,7 +175,7 @@ describe('ReturnTip', () => {
         params: {
           labwareId: 'labwareId1',
           newLocation: 'offDeck',
-          strategy: 'manualMoveWithoutPause'
+          strategy: 'manualMoveWithoutPause',
         },
       },
       waitUntilComplete: true,
@@ -230,7 +230,7 @@ describe('ReturnTip', () => {
         params: {
           labwareId: 'labwareId1',
           newLocation: { slotName: '1' },
-          strategy: 'manualMoveWithoutPause'
+          strategy: 'manualMoveWithoutPause',
         },
       },
       waitUntilComplete: true,
@@ -265,7 +265,7 @@ describe('ReturnTip', () => {
         params: {
           labwareId: 'labwareId1',
           newLocation: 'offDeck',
-          strategy: 'manualMoveWithoutPause'
+          strategy: 'manualMoveWithoutPause',
         },
       },
       waitUntilComplete: true,

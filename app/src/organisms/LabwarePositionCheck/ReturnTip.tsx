@@ -84,7 +84,7 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
           params: {
             labwareId: labwareId,
             newLocation: location,
-            strategy: 'manualMoveWithoutPause'
+            strategy: 'manualMoveWithoutPause',
           },
         },
         {
@@ -116,7 +116,7 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
           params: {
             labwareId: labwareId,
             newLocation: 'offDeck',
-            strategy: 'manualMoveWithoutPause'
+            strategy: 'manualMoveWithoutPause',
           },
         },
         { commandType: 'home' as const, params: {} },
