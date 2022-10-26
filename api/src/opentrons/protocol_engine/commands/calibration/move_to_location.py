@@ -52,7 +52,7 @@ class MoveToLocationResult(BaseModel):
     """Result data from the execution of a CalibrationSetUpPosition command."""
 
     position: DeckPoint = Field(
-        ..., description="Deck Point position after the move command has been executed"
+        ..., description="Position in deck coordinates after this movement has been executed"
     )
     positionId: str = Field(..., description="Deck Point position id")
 
