@@ -158,7 +158,7 @@ miniterm:
 	$(python) -m serial.tools.miniterm $(port) 115200 --eol LF
 
 .PHONY: push-all-and-term
-push-all-and-term: push-all teerm
+push-all-and-term: push-all term
 
 .PHONY: pull-data-ot3
 pull-data-ot3:
