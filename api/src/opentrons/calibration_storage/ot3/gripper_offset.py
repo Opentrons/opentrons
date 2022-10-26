@@ -69,7 +69,6 @@ def save_gripper_calibration(
     ] = None,
 ) -> None:
     gripper_dir = config.get_opentrons_path("gripper_calibration_dir")
-    gripper_dir.mkdir(parents=True, exist_ok=True)
     gripper_path = gripper_dir / f"{gripper_id}.json"
 
     if cal_status and isinstance(cal_status, local_types.CalibrationStatus):

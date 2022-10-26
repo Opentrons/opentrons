@@ -110,7 +110,6 @@ def save_tip_length_calibration(
            :meth:`create_tip_length_data`
     """
     tip_length_dir_path = config.get_tip_length_cal_path()
-    tip_length_dir_path.mkdir(parents=True, exist_ok=True)
     pip_tip_length_path = tip_length_dir_path / f"{pip_id}.json"
 
     all_tip_lengths = _tip_lengths_for_pipette(pip_id)

@@ -43,7 +43,6 @@ def save_robot_deck_attitude(
     ] = None,
 ) -> None:
     robot_dir = config.get_opentrons_path("robot_calibration_dir")
-    robot_dir.mkdir(parents=True, exist_ok=True)
     gantry_path = robot_dir / "deck_calibration.json"
 
     if cal_status and isinstance(cal_status, local_types.CalibrationStatus):

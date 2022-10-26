@@ -142,7 +142,6 @@ def _save_custom_tiprack_definition(
     namespace, load_name, version = labware_uri.split("/")
     custom_tr_dir_path = config.get_custom_tiprack_def_path()
     custom_namespace_dir = custom_tr_dir_path / f"{namespace}/{load_name}"
-    custom_namespace_dir.mkdir(parents=True, exist_ok=True)
 
     custom_tr_def_path = custom_namespace_dir / f"{version}.json"
     io.save_to_file(custom_tr_def_path, definition)
@@ -160,7 +159,6 @@ def save_tip_length_calibration(
            :meth:`create_tip_length_data`
     """
     tip_length_dir_path = config.get_tip_length_cal_path()
-    tip_length_dir_path.mkdir(parents=True, exist_ok=True)
     pip_tip_length_path = tip_length_dir_path / f"{pip_id}.json"
 
     all_tip_lengths = _tip_lengths_for_pipette(pip_id)

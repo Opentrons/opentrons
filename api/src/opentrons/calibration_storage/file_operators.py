@@ -83,6 +83,7 @@ def save_to_file(
     :param encoder: if there is any specialized encoder needed.
     The default encoder is the date time encoder.
     """
+    filepath.mkdir(parents=True, exist_ok=True)
     with open(filepath, "w") as f:
         if isinstance(data, BaseModel):
             f.write(data.json())

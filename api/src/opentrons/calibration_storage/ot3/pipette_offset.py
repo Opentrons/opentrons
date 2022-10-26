@@ -80,7 +80,6 @@ def save_pipette_calibration(
     ] = None,
 ) -> None:
     pip_dir = config.get_opentrons_path("pipette_calibration_dir") / mount.name.lower()
-    pip_dir.mkdir(parents=True, exist_ok=True)
 
     offset_path = pip_dir / f"{pip_id}.json"
 
