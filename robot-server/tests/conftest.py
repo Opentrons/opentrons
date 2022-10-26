@@ -258,6 +258,18 @@ def set_disable_fast_analysis(
 
 
 @pytest.fixture
+def set_enable_load_liquid(request_session: requests.Session) -> Iterator[None]:
+    """For integration tests that need to set then clear the
+    enableLoadLiquid feature flag"""
+    url = "http://localhost:31950/settings"
+    data = {"id": "enableLoadLiquid", "value": True}
+    request_session.post(url, json=data)
+    yield None
+    data["value"] = None
+    request_session.post(url, json=data)
+
+
+@pytest.fixture
 def get_labware_fixture() -> Callable[[str], LabwareDefinition]:
     def _get_labware_fixture(fixture_name: str) -> LabwareDefinition:
         with open(

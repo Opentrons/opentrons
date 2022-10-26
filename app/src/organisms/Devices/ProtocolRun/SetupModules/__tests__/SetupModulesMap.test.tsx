@@ -17,21 +17,19 @@ import {
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 
 import { i18n } from '../../../../../i18n'
-import { HeaterShakerBanner } from '../../../../ProtocolSetup/RunSetupCard/ModuleSetup/HeaterShakerSetupWizard/HeaterShakerBanner'
+import { useFeatureFlag } from '../../../../../redux/config'
 import { ModuleInfo } from '../../../../ProtocolSetup/RunSetupCard/ModuleSetup/ModuleInfo'
-import { UnMatchedModuleWarning } from '../../../../ProtocolSetup/RunSetupCard/ModuleSetup/UnMatchedModuleWarning'
-import { MultipleModulesModal } from '../../../../ProtocolSetup/RunSetupCard/ModuleSetup/MultipleModulesModal'
 import {
   mockThermocycler as mockThermocyclerFixture,
   mockMagneticModule as mockMagneticModuleFixture,
 } from '../../../../../redux/modules/__fixtures__/index'
 import {
   useModuleRenderInfoForProtocolById,
-  useRunHasStarted,
   useUnmatchedModulesForProtocol,
 } from '../../../hooks'
 import { SetupModulesMap } from '../SetupModulesMap'
 
+jest.mock('../../../../../redux/config')
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
   return {
@@ -46,26 +44,11 @@ jest.mock('@opentrons/shared-data', () => {
     inferModuleOrientationFromXCoordinate: jest.fn(),
   }
 })
-jest.mock(
-  '../../../../ProtocolSetup/RunSetupCard/ModuleSetup/HeaterShakerSetupWizard/HeaterShakerBanner'
-)
 jest.mock('../../../../ProtocolSetup/RunSetupCard/ModuleSetup/ModuleInfo')
-jest.mock(
-  '../../../../ProtocolSetup/RunSetupCard/ModuleSetup/UnMatchedModuleWarning'
-)
-jest.mock(
-  '../../../../ProtocolSetup/RunSetupCard/ModuleSetup/MultipleModulesModal'
-)
 jest.mock('../../../hooks')
 
-const mockMultipleModulesModal = MultipleModulesModal as jest.MockedFunction<
-  typeof MultipleModulesModal
->
 const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById as jest.MockedFunction<
   typeof useModuleRenderInfoForProtocolById
->
-const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
-  typeof useRunHasStarted
 >
 const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jest.MockedFunction<
   typeof useUnmatchedModulesForProtocol
@@ -77,13 +60,9 @@ const mockInferModuleOrientationFromXCoordinate = inferModuleOrientationFromXCoo
 const mockRobotWorkSpace = RobotWorkSpace as jest.MockedFunction<
   typeof RobotWorkSpace
 >
-const mockUnMatchedModuleWarning = UnMatchedModuleWarning as jest.MockedFunction<
-  typeof UnMatchedModuleWarning
+const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
+  typeof useFeatureFlag
 >
-const mockHeaterShakerBanner = HeaterShakerBanner as jest.MockedFunction<
-  typeof HeaterShakerBanner
->
-
 const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
   (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
   {}
@@ -148,18 +127,16 @@ describe('SetupModulesMap', () => {
       robotName: MOCK_ROBOT_NAME,
       runId: MOCK_RUN_ID,
     }
-
+    when(mockUseUnmatchedModulesForProtocol)
+      .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
+      .mockReturnValue({
+        missingModuleIds: [],
+        remainingAttachedModules: [],
+      })
+    when(mockUseFeatureFlag).mockReturnValue(false)
     when(mockInferModuleOrientationFromXCoordinate)
       .calledWith(expect.anything())
       .mockReturnValue(STUBBED_ORIENTATION_VALUE)
-
-    when(mockUnMatchedModuleWarning)
-      .calledWith(
-        componentPropsMatcher({
-          isAnyModuleUnnecessary: false,
-        })
-      )
-      .mockReturnValue(<div></div>)
 
     when(mockRobotWorkSpace)
       .mockReturnValue(<div></div>) // this (default) empty div will be returned when RobotWorkSpace isn't called with expected props
@@ -178,11 +155,6 @@ describe('SetupModulesMap', () => {
           })}
         </div>
       ))
-
-    when(mockHeaterShakerBanner).mockReturnValue(
-      <div>mock Heater Shaker Banner</div>
-    )
-    when(mockUseRunHasStarted).calledWith(MOCK_RUN_ID).mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -194,26 +166,10 @@ describe('SetupModulesMap', () => {
       .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
       .mockReturnValue({})
 
-    when(mockUseUnmatchedModulesForProtocol)
-      .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
-      .mockReturnValue({
-        missingModuleIds: [],
-        remainingAttachedModules: [],
-      })
-
     render(props)
     expect(mockModuleInfo).not.toHaveBeenCalled()
   })
-  it('should render a deck WITH MoaM along with the MoaM link', () => {
-    when(mockMultipleModulesModal)
-      .calledWith(
-        componentPropsMatcher({
-          onCloseClick: expect.anything(),
-        })
-      )
-      .mockImplementation(({ onCloseClick }) => (
-        <div onClick={onCloseClick}>mock Moam modal</div>
-      ))
+  it('should render a deck WITH MoaM', () => {
     when(mockUseModuleRenderInfoForProtocolById)
       .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
       .mockReturnValue({
@@ -241,13 +197,6 @@ describe('SetupModulesMap', () => {
         },
       } as any)
 
-    when(mockUseUnmatchedModulesForProtocol)
-      .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
-      .mockReturnValue({
-        missingModuleIds: [],
-        remainingAttachedModules: [],
-      })
-
     when(mockModuleInfo)
       .calledWith(
         partialComponentPropsMatcher({
@@ -260,19 +209,11 @@ describe('SetupModulesMap', () => {
       )
       .mockReturnValue(<div>mock module info {mockMagneticModule.model}</div>)
 
-    const { getByText, queryByText } = render(props)
+    const { getByText } = render(props)
     getByText('mock module info magneticModuleV2')
-    expect(queryByText('mock Moam modal')).toBeNull()
   })
 
   it('should render a deck WITH modules', () => {
-    when(mockUseUnmatchedModulesForProtocol)
-      .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
-      .mockReturnValue({
-        missingModuleIds: [],
-        remainingAttachedModules: [],
-      })
-
     when(mockUseModuleRenderInfoForProtocolById)
       .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
       .mockReturnValue({
@@ -339,13 +280,6 @@ describe('SetupModulesMap', () => {
   })
 
   it('renders Moam with the correct module in the correct slot', () => {
-    when(mockUseUnmatchedModulesForProtocol)
-      .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
-      .mockReturnValue({
-        missingModuleIds: [],
-        remainingAttachedModules: [],
-      })
-
     const dupModId = `${mockMagneticModule.moduleId}duplicate`
     const dupModPort = 10
     const dupModHub = 2
@@ -417,5 +351,4 @@ describe('SetupModulesMap', () => {
     const { getByText } = render(props)
     getByText('mock module info magneticModuleV2')
   })
-  it.todo('renders heater shaker banner correctly')
 })

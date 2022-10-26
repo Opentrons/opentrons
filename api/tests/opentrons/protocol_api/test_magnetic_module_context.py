@@ -6,8 +6,7 @@ from opentrons.broker import Broker
 from opentrons.hardware_control.modules import MagneticStatus
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, MagneticModuleContext
-
-from .types import ProtocolCore, MagneticModuleCore
+from opentrons.protocol_api.core.common import ProtocolCore, MagneticModuleCore
 
 
 @pytest.fixture

@@ -31,8 +31,6 @@ from opentrons.protocols.labware import (  # noqa: F401
 )
 
 from .core.labware import AbstractLabware
-from .core.well import AbstractWellCore
-
 from .core.protocol_api.labware import LabwareImplementation
 
 if TYPE_CHECKING:
@@ -43,6 +41,7 @@ if TYPE_CHECKING:
         LabwareDefinition,
         LabwareParameters,
     )
+    from .core.common import LabwareCore, WellCore
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -66,7 +65,7 @@ class Well:
 
     def __init__(
         self,
-        well_implementation: AbstractWellCore,
+        well_implementation: WellCore,
         api_level: Optional[APIVersion] = None,
     ):
         """
@@ -276,7 +275,7 @@ class Labware(DeckItem):
                 f"version or update your robot."
             )
         self._api_version = api_level
-        self._implementation: AbstractLabware[AbstractWellCore] = implementation
+        self._implementation: LabwareCore = implementation
 
     @property
     def separate_calibration(self) -> bool:
@@ -698,7 +697,7 @@ class Labware(DeckItem):
         if self._is_tiprack:
             self._implementation.reset_tips()
 
-    def _well_from_impl(self, well: AbstractWellCore) -> Well:
+    def _well_from_impl(self, well: WellCore) -> Well:
         return Well(well_implementation=well, api_level=self._api_version)
 
 

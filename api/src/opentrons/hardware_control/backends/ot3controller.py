@@ -771,6 +771,7 @@ class OT3Controller:
         moving: OT3Axis,
         distance_mm: float,
         speed_mm_per_s: float,
+        sensor_threshold_pf: float,
     ) -> None:
         pos, _ = await capacitive_probe(
             self._messenger,
@@ -778,6 +779,7 @@ class OT3Controller:
             axis_to_node(moving),
             distance_mm,
             speed_mm_per_s,
+            relative_threshold_pf=sensor_threshold_pf,
             log_sensor_values=True,
         )
 
