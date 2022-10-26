@@ -196,14 +196,15 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
             {toggleGroup}
             {selectedValue === t('list_view') ? (
               <SetupLabwareList
+                attachedModuleInfo={moduleRenderInfoById}
                 runId={runId}
                 extraAttentionModules={moduleTypesThatRequireExtraAttention}
               />
             ) : (
               <SetupLabwareMap
                 runId={runId}
-                extraAttentionModules={moduleTypesThatRequireExtraAttention}
                 robotName={robotName}
+                extraAttentionModules={moduleTypesThatRequireExtraAttention}
               />
             )}
           </>

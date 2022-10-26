@@ -4,6 +4,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from logging import getLogger
 from typing import Dict, List, Optional
+from typing_extensions import Literal
 
 import anyio
 import sqlalchemy
@@ -112,6 +113,8 @@ class AnalysisStore:
         pipettes: List[LoadedPipette],
         errors: List[ErrorOccurrence],
         liquids: List[Liquid],
+        # TODO(mm, 2022-10-21): Find an enum for this.
+        robot_type: Literal["OT-2 Standard", "OT-3 Standard"],
     ) -> None:
         """Promote a pending analysis to completed, adding details of its results.
 
@@ -124,7 +127,8 @@ class AnalysisStore:
             pipettes: See `CompletedAnalysis.pipettes`.
             errors: See `CompletedAnalysis.errors`. Also used to infer whether
                 the completed analysis result is `OK` or `NOT_OK`.
-            liquids: See `CompletedAnalysis.liquids
+            liquids: See `CompletedAnalysis.liquids`.
+            robot_type: See `CompletedAnalysis.robotType`.
         """
         protocol_id = self._pending_store.get_protocol_id(analysis_id=analysis_id)
 
@@ -147,6 +151,7 @@ class AnalysisStore:
             pipettes=pipettes,
             errors=errors,
             liquids=liquids,
+            robotType=robot_type,
         )
         completed_analysis_resource = _CompletedAnalysisResource(
             id=completed_analysis.id,

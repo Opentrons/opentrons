@@ -124,14 +124,6 @@ from .move_labware import (
     MoveLabwareCommandType,
 )
 
-from .move_labware_off_deck import (
-    MoveLabwareOffDeck,
-    MoveLabwareOffDeckParams,
-    MoveLabwareOffDeckCreate,
-    MoveLabwareOffDeckResult,
-    MoveLabwareOffDeckCommandType,
-)
-
 from .move_relative import (
     MoveRelative,
     MoveRelativeParams,
@@ -284,12 +276,6 @@ __all__ = [
     "MoveLabwareParams",
     "MoveLabwareResult",
     "MoveLabwareCommandType",
-    # move labware off-deck command models
-    "MoveLabwareOffDeck",
-    "MoveLabwareOffDeckCreate",
-    "MoveLabwareOffDeckParams",
-    "MoveLabwareOffDeckResult",
-    "MoveLabwareOffDeckCommandType",
     # move relative command models
     "MoveRelative",
     "MoveRelativeParams",

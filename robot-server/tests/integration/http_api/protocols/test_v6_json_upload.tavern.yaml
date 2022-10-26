@@ -525,3 +525,4 @@ stages:
                 displayName: Water
                 description: Liquid H2O
                 displayColor: '#7332a8'
+            robotType: "OT-2 Standard"

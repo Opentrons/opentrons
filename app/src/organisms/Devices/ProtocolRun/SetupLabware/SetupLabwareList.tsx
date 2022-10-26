@@ -15,18 +15,20 @@ import {
   Btn,
   BORDERS,
   WRAP,
-  POSITION_FIXED,
 } from '@opentrons/components'
 import {
   getLabwareDisplayName,
   getModuleDisplayName,
   getModuleType,
+  HEATERSHAKER_MODULE_TYPE,
   LabwareDefinition2,
   MAGNETIC_MODULE_TYPE,
   ModuleType,
   TC_MODULE_LOCATION,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import { ToggleButton } from '../../../../atoms/buttons'
 import { StyledText } from '../../../../atoms/text'
 import { SecureLabwareModal } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/SecureLabwareModal'
 import { useProtocolDetailsForRun } from '../../../Devices/hooks'
@@ -35,7 +37,12 @@ import type {
   LoadLabwareRunTimeCommand,
   LoadModuleRunTimeCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import type {
+  HeaterShakerCloseLatchCreateCommand,
+  HeaterShakerOpenLatchCreateCommand,
+} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 import type { ModuleTypesThatRequiresExtraAttention } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
+import type { ModuleRenderInfoForProtocol } from '../../hooks'
 
 const LABWARE_CARD_STYLE = css`
   box-shadow: 0 0 0 1px ${COLORS.medGreyEnabled};
@@ -48,7 +55,7 @@ const LABWARE_CARD_STYLE = css`
 const StyledTable = styled.table`
   width: 100%;
   text-align: ${TYPOGRAPHY.textAlignLeft};
-  table-layout: ${POSITION_FIXED};
+  table-layout: ${SPACING.spacingAuto};
 `
 const StyledTableHeader = styled.th`
   ${TYPOGRAPHY.labelSemiBold}
@@ -60,13 +67,14 @@ const StyledTableCell = styled.td`
   text-overflow: ${WRAP};
 `
 interface SetupLabwareListProps {
+  attachedModuleInfo: { [moduleId: string]: ModuleRenderInfoForProtocol }
   runId: string
   extraAttentionModules: ModuleTypesThatRequiresExtraAttention[]
 }
 export function SetupLabwareList(
   props: SetupLabwareListProps
 ): JSX.Element | null {
-  const { runId, extraAttentionModules } = props
+  const { attachedModuleInfo, runId, extraAttentionModules } = props
   const protocolData = useProtocolDetailsForRun(runId).protocolData
   const { t } = useTranslation('protocol_setup')
   if (protocolData == null) return null
@@ -99,6 +107,7 @@ export function SetupLabwareList(
         {labwareCommandsInOrder.map((command, index) =>
           command != null ? (
             <LabwareListItem
+              attachedModuleInfo={attachedModuleInfo}
               key={`${command.id}_${index}`}
               extraAttentionModules={extraAttentionModules}
               id={index}
@@ -114,6 +123,7 @@ export function SetupLabwareList(
 }
 
 interface LabwareListItemProps {
+  attachedModuleInfo: { [moduleId: string]: ModuleRenderInfoForProtocol }
   id: number
   runId: string
   params: LoadLabwareRunTimeCommand['params']
@@ -124,7 +134,14 @@ interface LabwareListItemProps {
 export function LabwareListItem(
   props: LabwareListItemProps
 ): JSX.Element | null {
-  const { id, params, runId, definition, extraAttentionModules } = props
+  const {
+    attachedModuleInfo,
+    id,
+    params,
+    runId,
+    definition,
+    extraAttentionModules,
+  } = props
   const { t } = useTranslation('protocol_setup')
   const [
     secureLabwareModalType,
@@ -132,26 +149,32 @@ export function LabwareListItem(
   ] = React.useState<ModuleType | null>(null)
   const protocolData = useProtocolDetailsForRun(runId).protocolData
   const labwareDisplayName = getLabwareDisplayName(definition)
+  const { createLiveCommand } = useCreateLiveCommandMutation()
   if (protocolData == null) return null
 
   let slotInfo: JSX.Element = t('slot_location', {
     slotName: Object.values(params.location),
   })
   let extraAttentionText: JSX.Element | null = null
+  let isCorrectHeaterShakerAttached: boolean = false
+  let isHeaterShakerInProtocol: boolean = false
+  let isLatchClosed: boolean = false
+  let latchCommand:
+    | HeaterShakerOpenLatchCreateCommand
+    | HeaterShakerCloseLatchCreateCommand
 
   if (typeof params.location === 'object' && 'moduleId' in params.location) {
-    const moduleId = params.location.moduleId
-    const moduleModel = protocolData.modules[moduleId].model
+    const moduleIdFromProtocol = params.location.moduleId
+    const moduleModel = protocolData.modules[moduleIdFromProtocol].model
     const moduleRunTimeCommand = protocolData.commands
       .filter(
         (command): command is LoadModuleRunTimeCommand =>
           command.commandType === 'loadModule'
       )
-      .find(command => command.params.moduleId === moduleId)
+      .find(command => command.params.moduleId === moduleIdFromProtocol)
     let moduleSlotName = moduleRunTimeCommand?.params.location.slotName
     const moduleName = getModuleDisplayName(moduleModel)
     const moduleType = getModuleType(moduleModel)
-
     const moduleTypeNeedsAttention = extraAttentionModules.find(
       extraAttentionModType => extraAttentionModType === moduleType
     )
@@ -186,14 +209,56 @@ export function LabwareListItem(
           </Btn>
         )
         break
-      //  TODO(jr, 10/17/22): add case for Heater-Shaker Module
+      case HEATERSHAKER_MODULE_TYPE:
+        isHeaterShakerInProtocol = true
+        extraAttentionText = (
+          <StyledText as="p" color={COLORS.darkGreyEnabled}>
+            {t('heater_shaker_labware_list_view')}
+          </StyledText>
+        )
+        const matchingHeaterShaker =
+          attachedModuleInfo != null &&
+          attachedModuleInfo[moduleIdFromProtocol] != null
+            ? attachedModuleInfo[moduleIdFromProtocol].attachedModuleMatch
+            : null
+        if (
+          matchingHeaterShaker != null &&
+          matchingHeaterShaker.moduleType === HEATERSHAKER_MODULE_TYPE
+        ) {
+          isLatchClosed =
+            matchingHeaterShaker.data.labwareLatchStatus === 'idle_closed' ||
+            matchingHeaterShaker.data.labwareLatchStatus === 'closing'
+
+          latchCommand = {
+            commandType: isLatchClosed
+              ? 'heaterShaker/openLabwareLatch'
+              : 'heaterShaker/closeLabwareLatch',
+            params: { moduleId: matchingHeaterShaker.id },
+          }
+          //  Labware latch button is disabled unless the correct H-S is attached
+          //  this is for MoaM support
+          isCorrectHeaterShakerAttached = true
+        }
     }
+  }
+  const toggleLatch = (): void => {
+    createLiveCommand({
+      command: latchCommand,
+    }).catch((e: Error) => {
+      console.error(
+        `error setting module status with command type ${latchCommand.commandType}: ${e.message}`
+      )
+    })
   }
   return (
     <>
       <tbody css={LABWARE_CARD_STYLE}>
         <StyledTableRow key={id}>
-          <StyledTableCell>
+          <StyledTableCell
+            css={css`
+              width: 50%;
+            `}
+          >
             <Flex flexDirection={DIRECTION_ROW}>
               <Flex width="4.1rem" height="3.6rem">
                 <RobotWorkSpace
@@ -228,6 +293,33 @@ export function LabwareListItem(
               {extraAttentionText != null ? extraAttentionText : null}
             </>
           </StyledTableCell>
+          {isHeaterShakerInProtocol ? (
+            <StyledTableCell>
+              <Flex marginLeft="0.75rem" flexDirection={DIRECTION_COLUMN}>
+                <StyledText as="h6" minWidth="4.62rem">
+                  {t('labware_latch')}
+                </StyledText>
+                <Flex flexDirection={DIRECTION_ROW}>
+                  <ToggleButton
+                    label={`heaterShaker_${id}`}
+                    disabled={!isCorrectHeaterShakerAttached}
+                    toggledOn={isLatchClosed}
+                    onClick={toggleLatch}
+                    data-testId={`SetupLabwareList_toggleHeaterShaker_${id}`}
+                  />
+                  {isLatchClosed ? (
+                    <StyledText
+                      as="p"
+                      marginTop={SPACING.spacing1}
+                      marginLeft={SPACING.spacing2}
+                    >
+                      {t('secure')}
+                    </StyledText>
+                  ) : null}
+                </Flex>
+              </Flex>
+            </StyledTableCell>
+          ) : null}
         </StyledTableRow>
       </tbody>
       <tbody>
