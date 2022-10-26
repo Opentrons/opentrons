@@ -7,8 +7,8 @@ import { useFeatureFlag } from '../../redux/config'
 import {
   inferModuleOrientationFromXCoordinate,
   getModuleDef2,
-  getDeckDefFromLoadedLabware,
-  getRobotTypeFromLoadedLabware,
+  getDeckDefFromRobotName,
+  getRobotNameFromLoadedLabware,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import {
@@ -19,7 +19,7 @@ import {
   parseLabwareInfoByLiquidId,
 } from '@opentrons/api-client'
 import { getWellFillFromLabwareId } from '../../organisms/Devices/ProtocolRun/SetupLiquids/utils'
-import type { DeckSlot, Liquid, LoadedLabware, RunTimeCommand } from '@opentrons/shared-data'
+import type { DeckSlot, Liquid, LoadedLabware, RunTimeCommand, RobotName } from '@opentrons/shared-data'
 
 interface DeckThumbnailProps {
   commands: RunTimeCommand[],
@@ -34,15 +34,28 @@ const deckSetupLayerBlocklist = [
   'removalHandle',
   'removableDeckOutline',
   'screwHoles',
+  'DECK_BASE',
+  'BARCODE_COVERS',
 ]
 
 const OT2_VIEWBOX = "-75 -20 586 480"
-const OT3_VIEWBOX = "-75 -20 586 480"
+const OT3_VIEWBOX = "-144.31 -76.59 750 681.74"
+
+const getViewBox = (robotType: RobotName): string | null => {
+  switch (robotType) {
+    case 'OT-2 Standard':
+      return OT2_VIEWBOX
+    case 'OT-3 Standard':
+      return OT3_VIEWBOX
+    default:
+      return null
+  }
+}
 
 export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
   const { commands, liquids, labware = [] } = props
-  const robotType = getRobotTypeFromLoadedLabware(labware)
-  const deckDef = getDeckDefFromLoadedLabware("OT-3")
+  const robotName = getRobotNameFromLoadedLabware(labware)
+  const deckDef = getDeckDefFromRobotName(robotName)
   const liquidSetupEnabled = useFeatureFlag('enableLiquidSetup')
   const enableThermocyclerGen2 = useFeatureFlag('enableThermocyclerGen2')
 
@@ -64,7 +77,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
     <RobotWorkSpace
       deckLayerBlocklist={deckSetupLayerBlocklist}
       deckDef={deckDef}
-      viewBox={OT3_VIEWBOX}
+      viewBox={getViewBox(robotName)}
     >
       {({ deckSlotsById }) =>
         map<DeckSlot>(deckSlotsById, (slot: DeckSlot, slotId: string) => {

@@ -1,6 +1,6 @@
-import { getRobotTypeFromLoadedLabware } from '..'
+import { getRobotNameFromLoadedLabware } from '..'
 
-describe('getRobotTypeFromLoadedLabware', () => {
+describe('getRobotNameFromLoadedLabware', () => {
   it('should return an OT-2 when an OT-2 trash is loaded into the protocol', () => {
     const labware = [
       {
@@ -13,7 +13,7 @@ describe('getRobotTypeFromLoadedLabware', () => {
         offsetId: null,
       },
     ]
-    expect(getRobotTypeFromLoadedLabware(labware)).toBe('OT-2')
+    expect(getRobotNameFromLoadedLabware(labware)).toBe('OT-2')
   })
   it('should return an OT-3 when an OT-3 trash is loaded into the protocol', () => {
     const labware = [
@@ -27,6 +27,6 @@ describe('getRobotTypeFromLoadedLabware', () => {
           offsetId: null,
         },
       ]
-      expect(getRobotTypeFromLoadedLabware(labware)).toBe('OT-3')
+      expect(getRobotNameFromLoadedLabware(labware)).toBe('OT-3')
   })
 })

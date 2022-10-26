@@ -5,7 +5,7 @@ import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
 import standardDeckDefOt2 from '../../deck/definitions/3/ot2_standard.json'
 import standardDeckDefOt3 from '../../deck/definitions/3/ot3_standard.json'
 import type { DeckDefinition, LabwareDefinition2 } from '../types'
-import type { LoadedLabware, ThermalAdapterName } from '..'
+import type { LoadedLabware, RobotName, ThermalAdapterName } from '..'
 
 export { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 export { getWellTotalVolume } from './getWellTotalVolume'
@@ -305,18 +305,19 @@ export const getAdapterName = (labwareLoadname: string): ThermalAdapterName => {
   return adapterName
 }
 
-export const getRobotTypeFromLoadedLabware = (
+export const getRobotNameFromLoadedLabware = (
   labware: LoadedLabware[]
-): 'OT-2' | 'OT-3' => {
+): RobotName => {
   const isProtocolForOT3 = labware.some(
     l => l.loadName === 'opentrons_1_trash_3200ml_fixed'
   )
-  return isProtocolForOT3 ? 'OT-3' : 'OT-2'
+  return isProtocolForOT3 ? 'OT-3 Standard' : 'OT-2 Standard'
 }
 
-export const getDeckDefFromLoadedLabware = (
-  robotType: 'OT-2' | 'OT-3'
+export const getDeckDefFromRobotName = (
+  robotName: RobotName
 ): DeckDefinition => {
+  console.log('called')
   // @ts-expect-error imported JSON not playing nice with TS. see https://github.com/microsoft/TypeScript/issues/32063
-  return robotType === 'OT-3' ? standardDeckDefOt3 : standardDeckDefOt2
+  return robotName === 'OT-3 Standard' ? standardDeckDefOt3 : standardDeckDefOt2
 }
