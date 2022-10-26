@@ -89,11 +89,11 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
 
     @current_jaw_displacement.setter
     def current_jaw_displacement(self, mm: float) -> None:
-        # assert mm >= 0.0, "jaw displacement from home should always be positive"
-        #  mm <= (self._max_jaw_displacement() + 0.5), (
-        #     "jaw displacement exceeds max expected value: "
-        #     f"{self._max_jaw_displacement() + 0.5} mm"
-        # )
+        assert mm >= 0.0, "jaw displacement from home should always be positive"
+        mm <= (self._max_jaw_displacement() + 0.5), (
+            "jaw displacement exceeds max expected value: "
+            f"{self._max_jaw_displacement() + 0.5} mm"
+        )
         self._current_jaw_displacement = mm
 
     def _max_jaw_displacement(self) -> float:

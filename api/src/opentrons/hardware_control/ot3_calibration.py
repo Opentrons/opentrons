@@ -397,6 +397,11 @@ async def calibrate_mount(
     tip has been attached, or the conductive probe has been attached,
     or the probe has been lowered). The robot should be homed.
 
+    Note: To calibrate a gripper, this process must be performed on the front
+    and rear calibration pins separately. The gripper calibration offset is
+    the average of the pin offsets, which can be obtained by passing the
+    two offsets into the `gripper_pin_offsets_mean` func.
+
     Params
     ------
     hcapi: a hardware control api to run commands against
@@ -427,3 +432,21 @@ async def calibrate_mount(
     center = Point(x_center, y_center, z_pos)
     LOG.info(f"Found calibration value {center} for mount {mount.name}")
     return center
+
+
+def gripper_pin_offsets_mean(front: Point, rear: Point) -> Point:
+    """
+    Get calibration offset of a gripper from its front and rear pin offsets.
+
+    This function should be used for gripper calibration only.
+
+    Params
+    ------
+    front: gripper's front pin calibration offset
+    rear: gripper's rear pin calibration offset
+
+    Returns
+    -------
+    The gripper calibration offset.
+    """
+    return 1 / 2 * (front + rear)

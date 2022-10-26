@@ -41,6 +41,7 @@ from opentrons.hardware_control.ot3_calibration import (  # noqa: E402
     find_deck_position,
     CalibrationMethod,
     find_axis_center,
+    gripper_pin_offsets_mean,
 )
 from opentrons.hardware_control.protocols import HardwareControlAPI  # noqa: E402
 from opentrons.hardware_control.thread_manager import ThreadManager  # noqa: E402
@@ -119,6 +120,7 @@ def do_interact(api: ThreadManager[HardwareControlAPI]) -> None:
             "find_deck_position": wrap_async_util_fn(find_deck_position, api),
             "calibrate_pipette": partial(calibrate_pipette, api),
             "calibrate_gripper": partial(calibrate_gripper, api),
+            "gripper_pin_offsets_mean": gripper_pin_offsets_mean,
             "CalibrationMethod": CalibrationMethod,
             "find_axis_center": wrap_async_util_fn(find_axis_center, api),
             "CriticalPoint": CriticalPoint,

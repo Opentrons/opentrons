@@ -167,8 +167,8 @@ def mock_backend_capacitive_probe(
             moving: OT3Axis,
             distance_mm: float,
             speed_mm_per_s: float,
-            sensor_id: Optional[SensorId] = None,
             threshold_pf: float,
+            sensor_id: Optional[SensorId] = None,
         ) -> None:
             ot3_hardware._backend._position[axis_to_node(moving)] += distance_mm / 2
 
@@ -231,7 +231,9 @@ async def test_capacitive_probe(
 
     # This is a negative probe because the current position is the home position
     # which is very large.
-    mock_backend_capacitive_probe.assert_called_once_with(mount, moving, 3, 4, None, 1.0)
+    mock_backend_capacitive_probe.assert_called_once_with(
+        mount, moving, 3, 4, 1.0, None
+    )
 
     original = moving.set_in_point(here, 0)
     for call in mock_move_to.call_args_list:
@@ -375,7 +377,7 @@ async def test_gripper_capacitive_sweep(
     gripper_config = gc.load(GripperModel.V1, "g12345")
     instr_data = AttachedGripper(config=gripper_config, id="g12345")
     await ot3_hardware.cache_gripper(instr_data)
-    ot3_hardware._gripper_handler.add_probe(probe)
+    await ot3_hardware._gripper_handler.add_probe(probe)
     data = await ot3_hardware.capacitive_sweep(OT3Mount.GRIPPER, axis, begin, end, 3)
     assert data == [1, 2, 3, 4, 5, 6, 8]
     mock_backend_capacitive_pass.assert_called_once_with(
