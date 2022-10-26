@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from ..types import LabwareLocation
+from ..types import LabwareLocation, LabwareMovementStrategy
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
@@ -21,8 +21,10 @@ class MoveLabwareParams(BaseModel):
 
     labwareId: str = Field(..., description="The ID of the labware to move.")
     newLocation: LabwareLocation = Field(..., description="Where to move the labware.")
-    useGripper: Optional[bool] = Field(
-        False, description="Whether to use the gripper to perform the labware movement."
+    strategy: LabwareMovementStrategy = Field(
+        ...,
+        description="Whether to use the gripper to perform the labware movement"
+        " or to perform a manual movement with an option to pause.",
     )
 
 
@@ -73,7 +75,7 @@ class MoveLabwareImplementation(
             labware_definition_uri=definition_uri, labware_location=params.newLocation
         )
 
-        if params.useGripper:
+        if params.strategy == LabwareMovementStrategy.USING_GRIPPER:
             validated_current_loc = (
                 self._labware_movement.ensure_valid_gripper_location(
                     current_labware.location
@@ -88,7 +90,7 @@ class MoveLabwareImplementation(
                 new_location=validated_new_loc,
                 new_offset_id=new_offset_id,
             )
-        else:
+        elif params.strategy == LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE:
             # Pause to allow for manual labware movement
             await self._run_control.wait_for_resume()
 

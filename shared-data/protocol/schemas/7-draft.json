@@ -467,7 +467,7 @@
               "key": { "type": "string" },
               "commandType": { "enum": ["moveLabware"] },
               "params": {
-                "required": ["labwareId", "newLocation"],
+                "required": ["labwareId", "newLocation", "strategy"],
                 "labwareId": {
                   "type": "string",
                   "description": "The ID of the labware to move. Must be a key from the top-level `labware` object."
@@ -476,27 +476,13 @@
                   "$ref": "#/definitions/labwareLocation",
                   "description": "Where to move the labware."
                 },
-                "useGripper": {
-                  "type": "boolean",
-                  "default": false,
-                  "description": "Whether to use the gripper to move the labware. Gripper is only available on the OT3."
-                }
-              }
-            }
-          },
-
-          {
-            "description": "[PROVISIONAL AND EXPERIMENTAL] Move Labware Off-Deck: Move a loaded labware off the deck.",
-            "type": "object",
-            "required": ["commandType", "params"],
-            "properties": {
-              "key": { "type": "string" },
-              "commandType": { "enum": ["moveLabwareOffDeck"] },
-              "params": {
-                "required": ["labwareId"],
-                "labwareId": {
-                  "type": "string",
-                  "description": "The ID of the labware to move. Must be a key from the top-level `labware` object."
+                "strategy": {
+                  "enum": [
+                    "usingGripper",
+                    "manualMoveWithPause",
+                    "manualMoveWithoutPause"
+                  ],
+                  "description": "Strategy to use for moving labware. Note that 'usingGripper' is only available on the OT-3."
                 }
               }
             }

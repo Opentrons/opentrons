@@ -7,7 +7,9 @@
   "main": "lib/main.js",
   "types": "lib/main.d.ts",
   "scripts": {
-    "start": "make dev"
+    "start": "make dev",
+    "postinstall": "patch-package",
+    "rebuild": "electron-rebuild"
   },
   "repository": {
     "type": "git",
@@ -30,7 +32,14 @@
   "devDependencies": {
     "@opentrons/app": "6.1.0",
     "@opentrons/discovery-client": "6.1.0",
-    "@opentrons/shared-data": "6.1.0"
+    "@opentrons/shared-data": "6.1.0",
+    "electron": "21.1.0",
+    "electron-builder": "24.0.0-alpha.1",
+    "electron-notarize": "^1.2.1",
+    "electron-publisher-s3": "^20.17.2",
+    "electron-rebuild": "^3.2.9",
+    "patch-package": "^6.4.7",
+    "postinstall-postinstall": "^2.1.0"
   },
   "dependencies": {
     "@thi.ng/paths": "1.6.5",
@@ -41,9 +50,9 @@
     "@types/uuid": "^3.4.7",
     "ajv": "6.10.2",
     "dateformat": "3.0.3",
-    "electron-context-menu": "^3.3.0",
+    "electron-context-menu": "^3.5.0",
     "electron-debug": "3.0.1",
-    "electron-devtools-installer": "3.1.1",
+    "electron-devtools-installer": "3.2.0",
     "electron-dl": "1.14.0",
     "electron-store": "5.1.1",
     "electron-updater": "4.1.2",
@@ -56,12 +65,12 @@
     "node-stream-zip": "1.8.2",
     "pump": "3.0.0",
     "semver": "5.5.0",
-    "tempy": "0.3.0",
+    "tempy": "1.0.1",
     "uuid": "3.2.1",
     "winston": "3.1.0",
     "yargs-parser": "10.0.0"
   },
   "optionalDependencies": {
-    "usb-detection": "4.10.0"
+    "usb-detection": "4.14.1"
   }
 }

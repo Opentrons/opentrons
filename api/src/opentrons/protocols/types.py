@@ -11,29 +11,40 @@ if TYPE_CHECKING:
     )
 
 
-# This metadata type reflects existing behavior,
-# but there's no reason we couldn't change this to allow types other than strings.
-# Issue for fleshing out metadata spec: github.com/Opentrons/opentrons/issues/8334
-Metadata = Dict[str, str]
+PythonProtocolMetadata = Optional[Dict[str, str]]
+"""The contents of a Python protocol's `metadata` dict, if there is one."""
+
+
+PythonProtocolRequirements = Optional[Dict[str, str]]
+"""The contents of a Python protocol's `requirements` dict, if there is one."""
 
 
 @dataclass(frozen=True)
-class ProtocolCommon:
+class StaticPythonInfo:
+    """Information statically extracted from a Python Protocol API file."""
+
+    metadata: PythonProtocolMetadata
+    requirements: PythonProtocolRequirements
+
+
+@dataclass(frozen=True)
+class _ProtocolCommon:
     text: str
     filename: Optional[str]
     api_level: "APIVersion"
-    metadata: Union[Metadata, "JsonProtocolMetadata"]
 
 
 @dataclass(frozen=True)
-class JsonProtocol(ProtocolCommon):
+class JsonProtocol(_ProtocolCommon):
     schema_version: int
     contents: "JsonProtocolDef"
+    metadata: "JsonProtocolMetadata"
 
 
 @dataclass(frozen=True)
-class PythonProtocol(ProtocolCommon):
+class PythonProtocol(_ProtocolCommon):
     contents: Any  # This is the output of compile() which we can't type
+    metadata: PythonProtocolMetadata
     # these 'bundled_' attrs should only be included when the protocol is a zip
     bundled_labware: Optional[Dict[str, "LabwareDefinition"]]
     bundled_data: Optional[Dict[str, bytes]]
