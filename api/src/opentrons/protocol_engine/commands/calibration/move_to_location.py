@@ -42,7 +42,7 @@ class CalibrationPositions(str, Enum):
 class MoveToLocationParams(PipetteIdMixin):
     """Calibration set up position command parameters."""
 
-    deckSlot: CalibrationPositions = Field(
+    location: CalibrationPositions = Field(
         ...,
         description="Slot location to move to before starting calibration.",
     )
@@ -54,7 +54,6 @@ class MoveToLocationResult(BaseModel):
     position: DeckPoint = Field(
         ..., description="Position in deck coordinates after this movement has been executed"
     )
-    positionId: str = Field(..., description="Deck Point position id")
 
 
 class MoveToLocationImplementation(
@@ -70,19 +69,19 @@ class MoveToLocationImplementation(
 
     async def execute(self, params: MoveToLocationParams) -> MoveToLocationResult:
         """Move the requested pipette to a given deck slot."""
-        offset = params.deckSlot.offset
-        if params.deckSlot == CalibrationPositions.PROBE_POSITION:
+        offset = params.location.offset
+        if params.location == CalibrationPositions.PROBE_POSITION:
             deck_center = self._state_view.labware.get_slot_center_position(
-                DeckSlotName.SLOT_5
+                locationName.SLOT_5
             )
             z_position = offset.z
         else:
             # get current z coordinate and pass it into movement destination
             deck_center = self._state_view.labware.get_slot_center_position(
-                DeckSlotName.SLOT_2
+                locationName.SLOT_2
             )
             current_position = await self._movement.save_position(
-                pipette_id=params.pipetteId, position_id=params.deckSlot.value
+                pipette_id=params.pipetteId, position_id=params.location.value
             )
             z_position = current_position.position.z
         destination = DeckPoint(
@@ -97,11 +96,11 @@ class MoveToLocationImplementation(
         )
 
         new_position = await self._movement.save_position(
-            pipette_id=params.pipetteId, position_id=str(params.deckSlot.value)
+            pipette_id=params.pipetteId, position_id=None
         )
 
         return MoveToLocationResult(
-            position=new_position.position, positionId=new_position.positionId
+            position=new_position.position, positionId=None
         )
 
 

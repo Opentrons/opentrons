@@ -7,10 +7,11 @@ from opentrons.protocol_engine.commands.calibration.move_to_location import (
     MoveToLocationImplementation,
     CalibrationPositions,
 )
-from opentrons.protocol_engine.execution import MovementHandler, SavedPositionData
-from opentrons.protocol_engine.state import StateView
-from opentrons.types import DeckSlotName, Point
-from opentrons.protocol_engine.types import DeckPoint
+if TYPE_CHECKING:
+    from opentrons.protocol_engine.execution import MovementHandler, SavedPositionData
+    from opentrons.protocol_engine.state import StateView
+    from opentrons.types import DeckSlotName, Point
+    from opentrons.protocol_engine.types import DeckPoint
 
 
 @pytest.mark.parametrize(
@@ -37,14 +38,17 @@ async def test_calibration_set_up_position_implementation(
     )
     decoy.when(
         await movement.save_position(
-            pipette_id="pipette-id", position_id="probePosition"
+            pipette_id="pipette-id", position_id=None
         )
-    ).then_return(probe_position)
-    decoy.when(
-        await movement.save_position(
-            pipette_id="pipette-id", position_id="attachOrDetach"
-        )
-    ).then_return(attach_or_detach)
+    ).then_return(
+        probe_position if slot_name == CalibrationPositions.PROBE_POSITION
+        else attach_or_detach
+    )
+    # decoy.when(
+    #     await movement.save_position(
+    #         pipette_id="pipette-id", position_id="attachOrDetach"
+    #     )
+    # ).then_return(attach_or_detach)
 
     decoy.when(
         state_view.labware.get_slot_center_position(DeckSlotName.SLOT_2)
@@ -61,7 +65,7 @@ async def test_calibration_set_up_position_implementation(
 
     params = MoveToLocationParams(
         pipetteId="pipette-id",
-        deckSlot=slot_name,
+        location=slot_name,
     )
     subject = MoveToLocationImplementation(state_view=state_view, movement=movement)
     result = await subject.execute(params=params)
