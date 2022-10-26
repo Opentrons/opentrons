@@ -25,7 +25,7 @@ from robot_server.persistence import (
     sqlite_rowid,
 )
 
-from .analysis_models import (
+from robot_server.analysis_models import (
     AnalysisSummary,
     ProtocolAnalysis,
     PendingAnalysis,

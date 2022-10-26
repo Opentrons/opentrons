@@ -16,6 +16,7 @@ from opentrons.protocol_reader import (
 )
 from opentrons_shared_data.robot.dev_types import RobotType
 
+from robot_server.analysis_models import ProtocolAnalysis
 from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.hardware import get_robot_type
 from robot_server.service.task_runner import TaskRunner, get_task_runner
@@ -32,7 +33,6 @@ from .protocol_auto_deleter import ProtocolAutoDeleter
 from .protocol_models import Protocol, ProtocolFile, Metadata
 from .protocol_analyzer import ProtocolAnalyzer
 from .analysis_store import AnalysisStore, AnalysisNotFoundError
-from .analysis_models import ProtocolAnalysis
 from .protocol_store import (
     ProtocolStore,
     ProtocolResource,

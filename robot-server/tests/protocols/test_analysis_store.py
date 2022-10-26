@@ -20,7 +20,7 @@ from opentrons.protocol_reader import (
     JsonProtocolConfig,
 )
 
-from robot_server.protocols.analysis_models import (
+from robot_server.analysis_models import (
     AnalysisResult,
     AnalysisStatus,
     AnalysisSummary,

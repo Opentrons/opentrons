@@ -31,7 +31,7 @@ from typing_extensions import Final
 
 import sqlalchemy
 
-from robot_server.protocols.analysis_models import CompletedAnalysis
+from robot_server.analysis_models import CompletedAnalysis
 
 from ._tables import (
     analysis_table as newest_analysis_table,

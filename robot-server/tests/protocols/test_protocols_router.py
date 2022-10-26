@@ -20,19 +20,19 @@ from opentrons.protocol_reader import (
     BufferedFile,
 )
 
-from robot_server.errors import ApiError
-from robot_server.service.json_api import SimpleEmptyBody, MultiBodyMeta
-from robot_server.service.task_runner import TaskRunner
-from robot_server.protocols.analysis_store import AnalysisStore, AnalysisNotFoundError
-from robot_server.protocols.protocol_analyzer import ProtocolAnalyzer
-from robot_server.protocols.protocol_auto_deleter import ProtocolAutoDeleter
-from robot_server.protocols.analysis_models import (
+from robot_server.analysis_models import (
     AnalysisStatus,
     AnalysisSummary,
     CompletedAnalysis,
     PendingAnalysis,
     AnalysisResult,
 )
+from robot_server.errors import ApiError
+from robot_server.service.json_api import SimpleEmptyBody, MultiBodyMeta
+from robot_server.service.task_runner import TaskRunner
+from robot_server.protocols.analysis_store import AnalysisStore, AnalysisNotFoundError
+from robot_server.protocols.protocol_analyzer import ProtocolAnalyzer
+from robot_server.protocols.protocol_auto_deleter import ProtocolAutoDeleter
 
 from robot_server.protocols.protocol_models import (
     Metadata,

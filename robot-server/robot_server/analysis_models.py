@@ -1,5 +1,4 @@
 """Response models for protocol analysis."""
-# TODO(mc, 2021-08-25): add modules to simulation result
 from enum import Enum
 from pydantic import BaseModel, Field
 from typing import List, Union

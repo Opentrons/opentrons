@@ -1,7 +1,7 @@
 """SQLite table schemas."""
 import sqlalchemy
 
-from robot_server.protocols.analysis_models import CompletedAnalysis
+from robot_server.analysis_models import CompletedAnalysis
 
 from . import legacy_pickle
 from ._pydantic_json import PydanticJSON

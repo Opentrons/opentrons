@@ -113,12 +113,12 @@ def _get_legacy_ot_types() -> List[_LegacyTypeInfo]:
     # fmt: off
     _legacy_ot_types: List[_LegacyTypeInfo] = []
 
-    from robot_server.protocols.analysis_models import AnalysisResult
+    from robot_server.analysis_models import AnalysisResult
     _legacy_ot_types.append(
         _LegacyTypeInfo(original_name="AnalysisResult", current_type=AnalysisResult)
     )
 
-    from robot_server.protocols.analysis_models import AnalysisStatus
+    from robot_server.analysis_models import AnalysisStatus
     _legacy_ot_types.append(
         _LegacyTypeInfo(original_name="AnalysisStatus", current_type=AnalysisStatus)
     )
