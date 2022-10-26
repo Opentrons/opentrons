@@ -132,6 +132,14 @@ push-all: clean wheel push-no-restart push-plot-webpage push-protocols
 term:
 	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host)
 
+.PHONY: list-ports
+list-ports:
+	$(python) -m serial.tools.list_ports
+
+.PHONY: miniterm
+miniterm:
+	$(python) -m serial.tools.miniterm $(port) 115200 --eol LF
+
 .PHONY: push-all-and-term
 push-all-and-term: push-all term
 

@@ -11,6 +11,7 @@ from opentrons.protocol_reader import (
     JsonProtocolConfig,
 )
 from opentrons.protocol_engine import ProtocolEngine, StateSummary, Command
+from opentrons.protocol_engine.errors.exceptions import CommandDoesNotExistError
 
 from .task_queue import TaskQueue
 from .json_file_reader import JsonFileReader
@@ -156,9 +157,17 @@ class ProtocolRunner:
     def _load_json(self, protocol_source: ProtocolSource) -> None:
         protocol = self._json_file_reader.read(protocol_source)
         commands = self._json_translator.translate_commands(protocol)
-        liquids = self._json_translator.translate_liquids(protocol)
-        for liquid in liquids:
-            self._protocol_engine.add_liquid(liquid=liquid)
+
+        if not feature_flags.enable_load_liquid() and any(
+            c.commandType == "loadLiquid" for c in commands
+        ):
+            raise CommandDoesNotExistError("loadLiquid command is not yet supported.")
+
+        if feature_flags.enable_load_liquid():
+            liquids = self._json_translator.translate_liquids(protocol)
+            for liquid in liquids:
+                self._protocol_engine.add_liquid(liquid=liquid)
+
         for command in commands:
             self._protocol_engine.add_command(request=command)
         self._task_queue.set_run_func(func=self._protocol_engine.wait_until_complete)

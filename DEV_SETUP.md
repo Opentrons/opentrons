@@ -13,7 +13,7 @@ You will need the following tools installed to develop on the Opentrons platform
 - curl
 - ssh
 - Python v3.7
-- Node.js v16.8.0
+- Node.js v16
 
 ### macOS
 
@@ -85,7 +85,7 @@ nvs --version
 Now we can use nvs to install Node.js v14 and switch on `auto` mode, which will make sure Node.js v14 is used any time we're in the `opentrons` project directory.
 
 ```shell
-nvs add 16.8.0
+nvs add 16
 nvs auto on
 ```
 

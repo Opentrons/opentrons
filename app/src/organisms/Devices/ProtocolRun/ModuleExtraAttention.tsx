@@ -11,13 +11,9 @@ import {
 import { COLORS } from '@opentrons/components'
 import { Divider } from '../../../atoms/structure/Divider'
 import { TertiaryButton } from '../../../atoms/buttons'
-import {
-  Banner,
-  BannerItem,
-} from '../../ProtocolSetup/RunSetupCard/ModuleSetup/Banner/Banner'
 import { SecureLabwareModal } from '../../ProtocolSetup/RunSetupCard/LabwareSetup/SecureLabwareModal'
-
 import { ModuleRenderInfoForProtocol } from '../hooks'
+import { Banner, BannerItem } from './Banner/Banner'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
@@ -28,7 +24,9 @@ interface ModuleExtraAttentionProps {
   moduleTypes: ModuleType[]
   modulesInfo: { [moduleId: string]: ModuleRenderInfoForProtocol }
 }
-
+/**
+ * @deprecated When enable liquid setup FF is removed, this component will no longer be used
+ */
 export const ModuleExtraAttention = (
   props: ModuleExtraAttentionProps
 ): JSX.Element => {

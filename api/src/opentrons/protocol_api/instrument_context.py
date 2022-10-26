@@ -24,8 +24,7 @@ from opentrons.protocols.api_support.util import (
     APIVersionError,
 )
 
-from .core.instrument import AbstractInstrument
-from .core.well import AbstractWellCore
+from .core.common import InstrumentCore
 from .module_contexts import ThermocyclerContext, HeaterShakerContext
 from . import labware
 
@@ -62,7 +61,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
     def __init__(
         self,
-        implementation: AbstractInstrument[AbstractWellCore],
+        implementation: InstrumentCore,
         ctx: ProtocolContext,
         broker: Broker,
         at_version: APIVersion,

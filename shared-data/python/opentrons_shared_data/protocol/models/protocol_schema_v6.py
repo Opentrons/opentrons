@@ -134,7 +134,7 @@ class Pipette(BaseModel):
 
 
 class Robot(BaseModel):
-    model: str
+    model: Literal["OT-2 Standard", "OT-3 Standard"]
     deckId: str
 
 

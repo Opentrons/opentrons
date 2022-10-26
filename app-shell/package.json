@@ -8,7 +8,8 @@
   "types": "lib/main.d.ts",
   "scripts": {
     "start": "make dev",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "rebuild": "electron-rebuild"
   },
   "repository": {
     "type": "git",
@@ -32,6 +33,11 @@
     "@opentrons/app": "6.1.0",
     "@opentrons/discovery-client": "6.1.0",
     "@opentrons/shared-data": "6.1.0",
+    "electron": "21.1.0",
+    "electron-builder": "24.0.0-alpha.1",
+    "electron-notarize": "^1.2.1",
+    "electron-publisher-s3": "^20.17.2",
+    "electron-rebuild": "^3.2.9",
     "patch-package": "^6.4.7",
     "postinstall-postinstall": "^2.1.0"
   },
