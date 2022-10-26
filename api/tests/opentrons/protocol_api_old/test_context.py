@@ -22,7 +22,7 @@ from opentrons.hardware_control.types import Axis
 from opentrons.protocols.advanced_control import transfers as tf
 from opentrons.config.pipette_config import config_names
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.calibration_storage import types as cs_types, ot2_models, ot2_tip_length
+from opentrons.calibration_storage import types as cs_types
 from opentrons.util.helpers import utc_now
 
 import pytest
@@ -1015,24 +1015,31 @@ def test_tip_length_for(ctx, monkeypatch):
     )
 
 
-def test_tip_length_for_caldata(ctx, monkeypatch):
+@pytest.mark.ot2_only
+def test_tip_length_for_caldata(ctx, decoy, monkeypatch):
+    from opentrons.hardware_control.instruments.ot2 import instrument_calibration as instr_cal
+    from opentrons.calibration_storage import types as CSTypes
+
     instr = ctx.load_instrument("p20_single_gen2", "left")
     tiprack = ctx.load_labware("geb_96_tiprack_10ul", "1")
-    mock_tip_length = mock.Mock()
-    mock_tip_length.return_value = ot2_models.v1.TipLengthModel(
-        tipLength=2,
-        lastModified=utc_now(),
+
+    mock_load_tip_length=decoy.mock(func=instr_cal.load_tip_length_for_pipette)
+    decoy.when(
+        mock_load_tip_length(
+            None, tiprack._implementation.get_definition()
+        )
+    ).then_return(
+        instr_cal.TipLengthCalibration(
+        tip_length=2,
+        last_modified=utc_now(),
         source=cs_types.SourceType.user,
-        status=ot2_models.v1.CalibrationStatus(markedBad=False),
+        status=CSTypes.CalibrationStatus(markedBad=False),
         uri=LabwareUri("opentrons/geb_96_tiprack_10ul/1"),
-    )
-    monkeypatch.setattr(ot2_tip_length, "load_tip_length_calibration", mock_tip_length)
+        tiprack="somehash",
+        pipette=None
+    ))
+    monkeypatch.setattr(instr_cal, 'load_tip_length_for_pipette', mock_load_tip_length)
     assert instr._tip_length_for(tiprack) == 2
-    mock_tip_length.side_effect = cs_types.TipLengthCalNotFound
-    assert instr._tip_length_for(tiprack) == (
-        tiprack._implementation.get_definition()["parameters"]["tipLength"]
-        - instr.hw_pipette["tip_overlap"]["opentrons/geb_96_tiprack_10ul/1"]
-    )
 
 
 def test_bundled_labware(get_labware_fixture, hardware):

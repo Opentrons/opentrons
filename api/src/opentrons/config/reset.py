@@ -5,17 +5,11 @@ from enum import Enum
 from pathlib import Path
 from typing import NamedTuple, Dict, Set
 
-from opentrons.config import IS_ROBOT, feature_flags
-
-# (lc 09-15-2022) Choosing to import both libraries rather than type
-# ignore an import_module command using importlib.
+from opentrons.config import IS_ROBOT
 from opentrons.calibration_storage import (
-    ot2_deck_attitude,
-    ot2_tip_length,
-    ot2_pipette_offset,
-    ot3_deck_attitude,
-    ot3_tip_length,
-    ot3_pipette_offset,
+    delete_robot_deck_attitude,
+    clear_tip_length_calibration,
+    clear_pipette_offset_calibrations,
 )
 
 
@@ -106,25 +100,14 @@ def reset_boot_scripts() -> None:
 # (lc 09-15-2022) Choosing to import both ot2 and ot3 delete modules
 # rather than type ignore an import_module command using importlib.
 def reset_deck_calibration() -> None:
-    if feature_flags.enable_ot3_hardware_controller():
-        ot3_deck_attitude.delete_robot_deck_attitude()
-        ot3_pipette_offset.clear_pipette_offset_calibrations()
-    else:
-        ot2_deck_attitude.delete_robot_deck_attitude()
-        ot2_pipette_offset.clear_pipette_offset_calibrations()
+    delete_robot_deck_attitude()
+    clear_pipette_offset_calibrations()
 
 
 def reset_pipette_offset() -> None:
-    if feature_flags.enable_ot3_hardware_controller():
-        ot3_pipette_offset.clear_pipette_offset_calibrations()
-    else:
-        ot2_pipette_offset.clear_pipette_offset_calibrations()
+    clear_pipette_offset_calibrations()
 
 
 def reset_tip_length_calibrations() -> None:
-    if feature_flags.enable_ot3_hardware_controller():
-        ot3_tip_length.clear_tip_length_calibration()
-        ot3_pipette_offset.clear_pipette_offset_calibrations()
-    else:
-        ot2_tip_length.clear_tip_length_calibration()
-        ot2_pipette_offset.clear_pipette_offset_calibrations()
+    clear_tip_length_calibration()
+    clear_pipette_offset_calibrations()

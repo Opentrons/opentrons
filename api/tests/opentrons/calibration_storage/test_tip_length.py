@@ -1,12 +1,19 @@
 import pytest
 import importlib
-from types import ModuleType
-from typing import no_type_check, Generator, Any, Tuple
+import opentrons
+from typing import no_type_check, Any, TYPE_CHECKING
 
 from opentrons.calibration_storage import (
     types as cs_types,
     helpers,
 )
+
+if TYPE_CHECKING:
+    from opentrons_shared_data.deck.dev_types import RobotModel
+
+@pytest.fixture(autouse=True)
+def reload_module(robot_model: "RobotModel"):
+    importlib.reload(opentrons.calibration_storage)
 
 
 minimalLabwareDef = {
@@ -47,89 +54,54 @@ minimalLabwareDef = {
 
 @no_type_check
 @pytest.fixture
-def _tip_length(
-    request: pytest.FixtureRequest,
-) -> Generator[Tuple[ModuleType, str], None, None]:
-    robot_type = request.param
-    if robot_type == "ot3":
-        yield importlib.import_module(
-            "opentrons.calibration_storage.ot3.tip_length"
-        ), robot_type
-    else:
-        yield importlib.import_module(
-            "opentrons.calibration_storage.ot2.tip_length"
-        ), robot_type
-
-
-@no_type_check
-@pytest.fixture
-def model(
-    request: pytest.FixtureRequest,
-) -> Generator[ModuleType, None, None]:
-    robot_type = request.param
-    if robot_type == "ot3":
-        yield importlib.import_module("opentrons.calibration_storage.ot3.models")
-    else:
-        yield importlib.import_module("opentrons.calibration_storage.ot2.models")
-
-
-@no_type_check
-@pytest.fixture
-def starting_calibration_data(_tip_length, ot_config_tempdir: Any) -> None:
+def starting_calibration_data(ot_config_tempdir: Any) -> None:
     """
     Starting calibration data fixture.
 
     Adds dummy data to a temporary directory to test delete commands against.
     """
-    tip_length, robot_type = _tip_length
+    from opentrons.calibration_storage import (
+        create_tip_length_data,
+        save_tip_length_calibration,
+    )
 
-    tip_length1 = tip_length.create_tip_length_data(minimalLabwareDef, 22.0)
-    tip_length2 = tip_length.create_tip_length_data(minimalLabwareDef, 31.0)
-    tip_length.save_tip_length_calibration("pip1", tip_length1)
-    tip_length.save_tip_length_calibration("pip2", tip_length2)
+    tip_length1 = create_tip_length_data(minimalLabwareDef, 22.0)
+    tip_length2 = create_tip_length_data(minimalLabwareDef, 31.0)
+    save_tip_length_calibration("pip1", tip_length1)
+    save_tip_length_calibration("pip2", tip_length2)
 
 
-@no_type_check
-@pytest.mark.parametrize(
-    argnames=["_tip_length"],
-    argvalues=[["ot2"], ["ot3"]],
-    indirect=True,
-)
-def test_save_tip_length_calibration(
-    ot_config_tempdir: Any, _tip_length: ModuleType
-) -> None:
+def test_save_tip_length_calibration(ot_config_tempdir: Any) -> None:
     """
     Test saving tip length calibrations.
     """
-    tip_length, _ = _tip_length
-    assert tip_length.tip_lengths_for_pipette("pip1") == {}
-    assert tip_length.tip_lengths_for_pipette("pip2") == {}
+    from opentrons.calibration_storage import (
+        tip_lengths_for_pipette,
+        create_tip_length_data,
+        save_tip_length_calibration,
+    )
+
+    assert tip_lengths_for_pipette("pip1") == {}
+    assert tip_lengths_for_pipette("pip2") == {}
     tip_rack_hash = helpers.hash_labware_def(minimalLabwareDef)
-    tip_length1 = tip_length.create_tip_length_data(minimalLabwareDef, 22.0)
-    tip_length2 = tip_length.create_tip_length_data(minimalLabwareDef, 31.0)
-    tip_length.save_tip_length_calibration("pip1", tip_length1)
-    tip_length.save_tip_length_calibration("pip2", tip_length2)
-    assert tip_length.tip_lengths_for_pipette("pip1")[tip_rack_hash].tipLength == 22.0
-    assert tip_length.tip_lengths_for_pipette("pip2")[tip_rack_hash].tipLength == 31.0
+    tip_length1 = create_tip_length_data(minimalLabwareDef, 22.0)
+    tip_length2 = create_tip_length_data(minimalLabwareDef, 31.0)
+    save_tip_length_calibration("pip1", tip_length1)
+    save_tip_length_calibration("pip2", tip_length2)
+    assert tip_lengths_for_pipette("pip1")[tip_rack_hash].tipLength == 22.0
+    assert tip_lengths_for_pipette("pip2")[tip_rack_hash].tipLength == 31.0
 
 
-@no_type_check
-@pytest.mark.parametrize(
-    argnames=["_tip_length", "starting_calibration_data", "model"],
-    argvalues=[["ot2", "ot2", "ot2"], ["ot3", "ot3", "ot3"]],
-    indirect=True,
-)
 def test_get_tip_length_calibration(
-    _tip_length: Tuple[ModuleType, str],
     starting_calibration_data: Any,
-    model: ModuleType,
 ) -> None:
     """
     Test ability to get a tip length calibration model.
     """
-    tip_length, _ = _tip_length
-    tip_length_data = tip_length.load_tip_length_calibration("pip1", minimalLabwareDef)
-    assert tip_length_data == model.v1.TipLengthModel(
+    from opentrons.calibration_storage import load_tip_length_calibration, models
+
+    tip_length_data = load_tip_length_calibration("pip1", minimalLabwareDef)
+    assert tip_length_data == models.v1.TipLengthModel(
         tipLength=22.0,
         source=cs_types.SourceType.user,
         lastModified=tip_length_data.lastModified,
@@ -137,45 +109,37 @@ def test_get_tip_length_calibration(
     )
 
     with pytest.raises(cs_types.TipLengthCalNotFound):
-        tip_length.load_tip_length_calibration("nopipette", minimalLabwareDef)
+        load_tip_length_calibration("nopipette", minimalLabwareDef)
 
 
-@no_type_check
-@pytest.mark.parametrize(
-    argnames=["_tip_length", "starting_calibration_data"],
-    argvalues=[["ot2", "ot2"], ["ot3", "ot3"]],
-    indirect=True,
-)
-def test_delete_specific_tip_calibration(
-    starting_calibration_data: Any, _tip_length: ModuleType
-) -> None:
+def test_delete_specific_tip_calibration(starting_calibration_data: Any) -> None:
     """
     Test delete a specific tip length calibration.
     """
-    tip_length, _ = _tip_length
-    assert tip_length.tip_lengths_for_pipette("pip1") != {}
-    assert tip_length.tip_lengths_for_pipette("pip2") != {}
+    from opentrons.calibration_storage import (
+        tip_lengths_for_pipette,
+        delete_tip_length_calibration,
+    )
+
+    assert tip_lengths_for_pipette("pip1") != {}
+    assert tip_lengths_for_pipette("pip2") != {}
     tip_rack_hash = helpers.hash_labware_def(minimalLabwareDef)
-    tip_length.delete_tip_length_calibration(tip_rack_hash, "pip1")
-    assert tip_length.tip_lengths_for_pipette("pip1") == {}
-    assert tip_length.tip_lengths_for_pipette("pip2") != {}
+    delete_tip_length_calibration(tip_rack_hash, "pip1")
+    assert tip_lengths_for_pipette("pip1") == {}
+    assert tip_lengths_for_pipette("pip2") != {}
 
 
-@no_type_check
-@pytest.mark.parametrize(
-    argnames=["_tip_length", "starting_calibration_data"],
-    argvalues=[["ot2", "ot2"], ["ot3", "ot3"]],
-    indirect=True,
-)
-def test_delete_all_tip_calibration(
-    starting_calibration_data: Any, _tip_length: ModuleType
-) -> None:
+def test_delete_all_tip_calibration(starting_calibration_data: Any) -> None:
     """
     Test delete all tip length calibration.
     """
-    tip_length, _ = _tip_length
-    assert tip_length.tip_lengths_for_pipette("pip1") != {}
-    assert tip_length.tip_lengths_for_pipette("pip2") != {}
-    tip_length.clear_tip_length_calibration()
-    assert tip_length.tip_lengths_for_pipette("pip1") == {}
-    assert tip_length.tip_lengths_for_pipette("pip2") == {}
+    from opentrons.calibration_storage import (
+        tip_lengths_for_pipette,
+        clear_tip_length_calibration,
+    )
+
+    assert tip_lengths_for_pipette("pip1") != {}
+    assert tip_lengths_for_pipette("pip2") != {}
+    clear_tip_length_calibration()
+    assert tip_lengths_for_pipette("pip1") == {}
+    assert tip_lengths_for_pipette("pip2") == {}

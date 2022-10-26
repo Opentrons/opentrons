@@ -2,7 +2,7 @@ import pytest
 import datetime
 from mock import MagicMock, call
 from typing import List, Tuple
-from opentrons.calibration_storage import types as cal_types, ot2_models
+from opentrons.calibration_storage import types as cal_types, models
 from opentrons.types import Mount, Point
 from opentrons.hardware_control.instruments.ot2 import pipette
 from opentrons.config import robot_configs
@@ -21,7 +21,7 @@ from robot_server.robot.calibration.deck.constants import (
 )
 
 
-PIP_OFFSET = ot2_models.v1.InstrumentOffsetModel(
+PIP_OFFSET = models.v1.InstrumentOffsetModel(
     offset=robot_configs.defaults_ot2.DEFAULT_PIPETTE_OFFSET,
     tiprack="some_tiprack",
     uri="custom/some_tiprack/1",

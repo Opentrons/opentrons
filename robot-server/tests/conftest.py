@@ -25,9 +25,10 @@ from opentrons.hardware_control import API, HardwareControlAPI, ThreadedAsyncLoc
 from opentrons.calibration_storage import (
     helpers,
     types as cal_types,
-    ot2_pipette_offset,
-    ot2_tip_length,
-    ot2_deck_attitude,
+    save_pipette_calibration,
+    create_tip_length_data,
+    save_tip_length_calibration,
+    save_robot_deck_attitude,
 )
 from opentrons.protocol_api import labware
 from opentrons.types import Point, Mount
@@ -208,7 +209,7 @@ def set_up_pipette_offset_temp_directory(server_temp_directory: str) -> None:
     definition = labware.get_labware_definition("opentrons_96_filtertiprack_200ul")
     def_hash = helpers.hash_labware_def(definition)
     for pip, mount in zip(attached_pip_list, mount_list):
-        ot2_pipette_offset.save_pipette_calibration(
+        save_pipette_calibration(
             offset=Point(0, 0, 0),
             pip_id=cast(cal_types.PipetteId, pip),
             mount=mount,
@@ -223,16 +224,14 @@ def set_up_tip_length_temp_directory(server_temp_directory: str) -> None:
     tip_length_list = [30.5, 31.5]
     definition = labware.get_labware_definition("opentrons_96_filtertiprack_200ul")
     for pip, tip_len in zip(attached_pip_list, tip_length_list):
-        cal_data = ot2_tip_length.create_tip_length_data(definition, tip_len)
-        ot2_tip_length.save_tip_length_calibration(
-            cast(cal_types.PipetteId, pip), cal_data
-        )
+        cal_data = create_tip_length_data(definition, tip_len)
+        save_tip_length_calibration(cast(cal_types.PipetteId, pip), cal_data)
 
 
 @pytest.fixture
 def set_up_deck_calibration_temp_directory(server_temp_directory: str) -> None:
     attitude = [[1.0008, 0.0052, 0.0], [-0.0, 0.992, 0.0], [0.0, 0.0, 1.0]]
-    ot2_deck_attitude.save_robot_deck_attitude(
+    save_robot_deck_attitude(
         attitude,
         cast(cal_types.PipetteId, "pip_1"),
         cast(cal_types.TiprackHash, "fakehash"),

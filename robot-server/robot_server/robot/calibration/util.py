@@ -8,7 +8,12 @@ from opentrons.hardware_control.types import CriticalPoint
 from opentrons.protocol_api import labware
 from opentrons.protocols.geometry import planning
 from opentrons.protocols.geometry.deck import Deck
-from opentrons.calibration_storage import helpers, types as cal_types, ot2_tip_length
+from opentrons.calibration_storage import (
+    helpers,
+    types as cal_types,
+    create_tip_length_data,
+    save_tip_length_calibration as cal_storage_save_tip_length,
+)
 from opentrons.types import Point, Location
 
 from robot_server.service.errors import RobotServerError
@@ -199,12 +204,10 @@ def save_tip_length_calibration(
     # TODO: 07-22-2020 parent slot is not important when tracking
     # tip length data, hence the empty string, we should remove it
     # from create_tip_length_data in a refactor
-    tip_length_data = ot2_tip_length.create_tip_length_data(
+    tip_length_data = create_tip_length_data(
         tip_rack._implementation.get_definition(), tip_length_offset
     )
-    ot2_tip_length.save_tip_length_calibration(
-        cast(cal_types.PipetteId, pipette_id), tip_length_data
-    )
+    cal_storage_save_tip_length(cast(cal_types.PipetteId, pipette_id), tip_length_data)
 
 
 def get_default_tipracks(default_uris: List["LabwareUri"]) -> List["LabwareDefinition"]:

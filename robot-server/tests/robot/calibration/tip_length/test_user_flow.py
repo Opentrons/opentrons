@@ -8,7 +8,7 @@ from opentrons.hardware_control.instruments.ot2 import pipette
 from opentrons.protocol_api.labware import get_labware_definition
 from opentrons.config.pipette_config import load
 from opentrons.util.helpers import utc_now
-from opentrons.calibration_storage import types as cal_types, ot2_models
+from opentrons.calibration_storage import types as cal_types, models
 
 from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models.command_definitions import CalibrationCommand
@@ -16,7 +16,7 @@ from robot_server.robot.calibration.tip_length.user_flow import TipCalibrationUs
 
 stub_jog_data = {"vector": Point(1, 1, 1)}
 
-PIP_CAL = ot2_models.v1.InstrumentOffsetModel(
+PIP_CAL = models.v1.InstrumentOffsetModel(
     offset=[0, 0, 0],
     tiprack="some_tiprack",
     uri="custom/some_tiprack/1",
@@ -289,7 +289,7 @@ async def test_get_reference_location(mock_user_flow_all_combos):
 
 async def test_save_offsets(mock_user_flow):
     with patch(
-        "opentrons.calibration_storage.ot2_tip_length.create_tip_length_data"
+        "robot_server.robot.calibration.util.save_tip_length_calibration"
     ) as create_tip_length_data_patch:
         uf = mock_user_flow
         uf._current_state = "measuringNozzleOffset"

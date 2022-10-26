@@ -4,7 +4,7 @@ import pytest
 from mock import MagicMock, call, patch
 from typing import List, Tuple, Dict, Any
 from opentrons import config
-from opentrons.calibration_storage import helpers, types as CSTypes, ot2_models
+from opentrons.calibration_storage import helpers, types as CSTypes, models
 from opentrons.types import Mount, Point
 from opentrons.hardware_control.instruments.ot2 import pipette
 from opentrons.config.pipette_config import load
@@ -25,7 +25,7 @@ from robot_server.robot.calibration.pipette_offset.constants import (
 
 stub_jog_data = {"vector": Point(1, 1, 1)}
 
-PIP_CAL = ot2_models.v1.InstrumentOffsetModel(
+PIP_CAL = models.v1.InstrumentOffsetModel(
     offset=[0, 0, 0],
     tiprack="some_tiprack",
     uri="custom/some_tiprack/1",
@@ -52,7 +52,7 @@ pipette_map = {
 def build_mock_stored_pipette_offset(kind="normal"):
     if kind == "normal":
         return MagicMock(
-            return_value=ot2_models.v1.InstrumentOffsetModel(
+            return_value=models.v1.InstrumentOffsetModel(
                 offset=[0, 1, 2],
                 tiprack="tiprack-id",
                 uri="opentrons/opentrons_96_filtertiprack_200ul/1",
@@ -524,7 +524,7 @@ def test_no_pipette(hardware, mount):
 @pytest.fixture
 def mock_save_pipette():
     with patch(
-        "opentrons.calibration_storage.ot2.ot2_pipette_offset.save_pipette_calibration",
+        "robot_server.robot.calibration.pipette_offset.user_flow.save_pipette_calibration",
         autospec=True,
     ) as mock_save:
         yield mock_save
@@ -533,7 +533,7 @@ def mock_save_pipette():
 @pytest.fixture
 def mock_delete_pipette():
     with patch(
-        "opentrons.calibration_storage.ot2.ot2_pipette_offset.delete_pipette_offset_file",
+        "robot_server.robot.calibration.pipette_offset.user_flow.delete_pipette_offset_file",
         autospec=True,
     ) as mock_delete:
         yield mock_delete

@@ -2,7 +2,7 @@ import numpy as np
 
 from pathlib import Path
 from opentrons import config
-from opentrons.calibration_storage import file_operators as io, ot2_pipette_offset
+from opentrons.calibration_storage import file_operators as io, save_pipette_calibration
 
 from opentrons.hardware_control import robot_calibration
 from opentrons.hardware_control.instruments.ot2 import instrument_calibration
@@ -49,7 +49,7 @@ def test_save_calibration(ot_config_tempdir):
 
 def test_load_calibration(ot_config_tempdir):
     pathway = Path(config.get_opentrons_path("robot_calibration_dir"))
-    
+
     data = {
         "attitude": [[1, 0, 1], [0, 1, -0.5], [0, 0, 1]],
         "pipette_calibrated_with": "fake",
@@ -87,7 +87,7 @@ def test_load_pipette_offset(ot_config_tempdir):
     mount = Mount.LEFT
     offset = Point(1, 2, 3)
 
-    ot2_pipette_offset.save_pipette_calibration(
+    save_pipette_calibration(
         offset, pip_id, mount, "hash", "opentrons/opentrons_96_tiprack_10ul/1"
     )
     obj = instrument_calibration.load_pipette_offset(pip_id, mount)

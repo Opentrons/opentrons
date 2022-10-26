@@ -4,8 +4,9 @@ from typing import Optional, cast
 
 from opentrons.calibration_storage import (
     types as cal_types,
-    ot2_tip_length,
-    ot2_models,
+    get_all_tip_length_calibrations as all_tip_lengths,
+    delete_tip_length_calibration,
+    models,
 )
 
 from robot_server.errors import ErrorBody
@@ -18,7 +19,7 @@ router = APIRouter()
 
 
 def _format_calibration(
-    calibration: ot2_models.v1.TipLengthCalibration,
+    calibration: models.v1.TipLengthCalibration,
 ) -> tl_models.TipLengthCalibration:
     # TODO (lc 09-20-2022) We should use the calibration
     # status model in calibration storage.
@@ -52,8 +53,7 @@ async def get_all_tip_length_calibrations(
     pipette_id: Optional[str] = None,
     tiprack_uri: Optional[str] = None,
 ) -> tl_models.MultipleCalibrationsResponse:
-    all_calibrations = ot2_tip_length.get_all_tip_length_calibrations()
-    print(all_calibrations)
+    all_calibrations = all_tip_lengths()
     if not all_calibrations:
         return tl_models.MultipleCalibrationsResponse(
             data=[_format_calibration(cal) for cal in all_calibrations],
@@ -85,7 +85,7 @@ async def get_all_tip_length_calibrations(
 )
 async def delete_specific_tip_length_calibration(tiprack_hash: str, pipette_id: str):
     try:
-        ot2_tip_length.delete_tip_length_calibration(
+        delete_tip_length_calibration(
             cast(cal_types.TiprackHash, tiprack_hash),
             cast(cal_types.PipetteId, pipette_id),
         )

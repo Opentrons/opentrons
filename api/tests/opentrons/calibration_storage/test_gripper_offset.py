@@ -1,11 +1,12 @@
 import pytest
 import typing
+import opentrons
+import importlib
 
 from opentrons.types import Point
 from opentrons.calibration_storage import (
     types as cs_types,
     ot3_gripper_offset as gripper,
-    ot3_models as model,
 )
 
 
@@ -77,16 +78,19 @@ def test_save_gripper_calibration(
 
 
 def test_get_gripper_calibration(
-    starting_calibration_data: typing.Any,
+    starting_calibration_data: typing.Any, enable_ot3_hardware_controller: typing.Any
 ) -> None:
     """
     Test ability to get a gripper calibration schema.
     """
+    importlib.reload(opentrons.calibration_storage)
+    from opentrons.calibration_storage import models
+
     gripper_data = gripper.get_gripper_calibration_offset(
         cs_types.GripperId("gripper1")
     )
     assert gripper_data is not None
-    assert gripper_data == model.v1.InstrumentOffsetModel(
+    assert gripper_data == models.v1.InstrumentOffsetModel(
         offset=Point(1, 1, 1),
         lastModified=gripper_data.lastModified,
         source=cs_types.SourceType.user,

@@ -9,7 +9,7 @@ from opentrons.config.robot_configs import (
 from opentrons.types import Point
 from opentrons.calibration_storage import (
     types as cal_top_types,
-    ot3_pipette_offset,
+    get_pipette_offset,
     ot3_gripper_offset,
 )
 from opentrons.hardware_control.types import OT3Mount
@@ -58,7 +58,7 @@ def load_pipette_offset(
     else:
         checked_mount = mount
     if pip_id:
-        pip_offset_data = ot3_pipette_offset.get_pipette_offset(
+        pip_offset_data = get_pipette_offset(
             typing.cast(cal_top_types.PipetteId, pip_id), checked_mount
         )
         if pip_offset_data:

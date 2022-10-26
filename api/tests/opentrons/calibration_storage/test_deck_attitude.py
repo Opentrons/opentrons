@@ -1,125 +1,90 @@
 import pytest
 import importlib
-from types import ModuleType
-from typing import no_type_check, Generator, Any, Tuple
-
-from opentrons.calibration_storage import types as cs_types
+import opentrons
+from typing import Any, TYPE_CHECKING
 
 
-@no_type_check
+if TYPE_CHECKING:
+    from opentrons_shared_data.deck.dev_types import RobotModel
+
+
+@pytest.fixture(autouse=True)
+def reload_module(robot_model: "RobotModel"):
+    importlib.reload(opentrons.calibration_storage)
+
+
 @pytest.fixture
-def _deck(
-    request: pytest.FixtureRequest,
-) -> Generator[Tuple[ModuleType, str], None, None]:
-    robot_type = request.param
-    if robot_type == "ot3":
-        yield importlib.import_module(
-            "opentrons.calibration_storage.ot3.deck_attitude"
-        ), robot_type
-    else:
-        yield importlib.import_module(
-            "opentrons.calibration_storage.ot2.deck_attitude"
-        ), robot_type
-
-
-@no_type_check
-@pytest.fixture
-def model(
-    request: pytest.FixtureRequest,
-) -> Generator[ModuleType, None, None]:
-    robot_type = request.param
-    if robot_type == "ot3":
-        yield importlib.import_module("opentrons.calibration_storage.ot3.models")
-    else:
-        yield importlib.import_module("opentrons.calibration_storage.ot2.models")
-
-
-@no_type_check
-@pytest.fixture
-def starting_calibration_data(_deck: ModuleType, ot_config_tempdir: Any) -> None:
+def starting_calibration_data(
+    robot_model: "RobotModel", ot_config_tempdir: Any
+) -> None:
     """
     Starting calibration data fixture.
 
     Adds dummy data to a temporary directory to test delete commands against.
     """
-    deck, robot_type = _deck
+    from opentrons.calibration_storage import save_robot_deck_attitude
 
-    if robot_type == "ot3":
-        deck.save_robot_deck_attitude([[1, 0, 0], [0, 1, 0], [0, 0, 1]], "pip1")
+    if robot_model == "OT-3 Standard":
+        save_robot_deck_attitude([[1, 0, 0], [0, 1, 0], [0, 0, 1]], "pip1")
     else:
-        deck.save_robot_deck_attitude(
-            [[1, 0, 0], [0, 1, 0], [0, 0, 1]], "pip1", "mytiprack"
-        )
+        save_robot_deck_attitude([[1, 0, 0], [0, 1, 0], [0, 0, 1]], "pip1", "mytiprack")
 
 
-@no_type_check
-@pytest.mark.parametrize(
-    argnames=["_deck"],
-    argvalues=[["ot2"], ["ot3"]],
-    indirect=True,
-)
-def test_save_deck_attitude(ot_config_tempdir: Any, _deck: ModuleType) -> None:
+def test_save_deck_attitude(ot_config_tempdir: Any, robot_model: "RobotModel") -> None:
     """
     Test saving deck attitude calibrations.
     """
-    deck, robot_type = _deck
-    assert deck.get_robot_deck_attitude() is None
-    if robot_type == "ot3":
-        deck.save_robot_deck_attitude([[1, 0, 0], [0, 1, 0], [0, 0, 1]], "pip1")
+    from opentrons.calibration_storage import (
+        get_robot_deck_attitude,
+        save_robot_deck_attitude,
+    )
+
+    assert get_robot_deck_attitude() is None
+    if robot_model == "OT-3 Standard":
+        save_robot_deck_attitude([[1, 0, 0], [0, 1, 0], [0, 0, 1]], "pip1")
     else:
-        deck.save_robot_deck_attitude(
-            [[1, 0, 0], [0, 1, 0], [0, 0, 1]], "pip1", "mytiprack"
-        )
-    assert deck.get_robot_deck_attitude() != {}
+        save_robot_deck_attitude([[1, 0, 0], [0, 1, 0], [0, 0, 1]], "pip1", "mytiprack")
+    assert get_robot_deck_attitude() != {}
 
 
-@no_type_check
-@pytest.mark.parametrize(
-    argnames=["_deck", "starting_calibration_data", "model"],
-    argvalues=[["ot2", "ot2", "ot2"], ["ot3", "ot3", "ot3"]],
-    indirect=True,
-)
 def test_get_deck_calibration(
-    _deck: Tuple[ModuleType, str], starting_calibration_data: Any, model: ModuleType
+    starting_calibration_data: Any, robot_model: "RobotModel"
 ) -> None:
     """
     Test ability to get a deck calibration model.
     """
-    deck, robot_type = _deck
-    robot_deck = deck.get_robot_deck_attitude()
-    if robot_type == "ot3":
-        assert robot_deck == model.v1.DeckCalibrationModel(
+    from opentrons.calibration_storage import get_robot_deck_attitude, models
+
+    robot_deck = get_robot_deck_attitude()
+    if robot_model == "OT-3 Standard":
+        assert robot_deck == models.v1.DeckCalibrationModel(
             attitude=[[1, 0, 0], [0, 1, 0], [0, 0, 1]],
             lastModified=robot_deck.lastModified,
-            source=cs_types.SourceType.user,
+            source=robot_deck.source,
             pipetteCalibratedWith="pip1",
-            status=model.v1.CalibrationStatus(),
+            status=models.v1.CalibrationStatus(),
         )
     else:
-        assert robot_deck == model.v1.DeckCalibrationModel(
+        assert robot_deck == models.v1.DeckCalibrationModel(
             attitude=[[1, 0, 0], [0, 1, 0], [0, 0, 1]],
             last_modified=robot_deck.last_modified,
-            source=cs_types.SourceType.user,
+            source=robot_deck.source,
             pipette_calibrated_with="pip1",
-            status=model.v1.CalibrationStatus(),
+            status=models.v1.CalibrationStatus(),
             tiprack="mytiprack",
         )
 
 
-@no_type_check
-@pytest.mark.parametrize(
-    argnames=["_deck", "starting_calibration_data"],
-    argvalues=[["ot2", "ot2"], ["ot3", "ot3"]],
-    indirect=True,
-)
-def test_delete_deck_calibration(
-    starting_calibration_data: Any, _deck: ModuleType
-) -> None:
+def test_delete_deck_calibration(starting_calibration_data: Any) -> None:
     """
     Test delete deck calibration.
     """
-    deck, _ = _deck
-    assert deck.get_robot_deck_attitude() != {}
-    assert deck.get_robot_deck_attitude().attitude == [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
-    deck.delete_robot_deck_attitude()
-    assert deck.get_robot_deck_attitude() is None
+    from opentrons.calibration_storage import (
+        get_robot_deck_attitude,
+        delete_robot_deck_attitude,
+    )
+
+    assert get_robot_deck_attitude() != {}
+    assert get_robot_deck_attitude().attitude == [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+    delete_robot_deck_attitude()
+    assert get_robot_deck_attitude() is None
