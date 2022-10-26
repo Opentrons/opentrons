@@ -31,6 +31,7 @@ import { ConnectingNetwork } from '../pages/ODD/ConnectingNetwork'
 import { ConnectionResult } from '../pages/ODD/ConnectionResult'
 import { ConnectedNetworkInfo } from '../pages/ODD/ConnectedNetworkInfo'
 import { SelectNetwork } from '../pages/ODD/SelectNetwork'
+import { InputNetworkInfo } from '../pages/ODD/InputNetworkInfo'
 import { getIsOnDevice } from '../redux/config'
 import { getLocalRobot } from '../redux/discovery'
 import { useSoftwareUpdatePoll } from './hooks'
@@ -143,6 +144,12 @@ export const AppComponent = (): JSX.Element => {
       exact: true,
       name: 'Select Network',
       path: '/selectNetwork',
+    },
+    {
+      Component: InputNetworkInfo,
+      exact: true,
+      name: 'Input Network Info',
+      path: '/inputNetworkInfo',
     },
   ]
 

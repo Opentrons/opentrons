@@ -1,6 +1,16 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Flex, DIRECTION_COLUMN, useInterval } from '@opentrons/components'
+import {
+  Flex,
+  DIRECTION_COLUMN,
+  useInterval,
+  SPACING,
+  ALIGN_CENTER,
+  DIRECTION_ROW,
+  Icon,
+  COLORS,
+  Btn,
+} from '@opentrons/components'
 
 import * as Networking from '../../redux/networking'
 import { getLocalRobot } from '../../redux/discovery'
@@ -8,6 +18,7 @@ import { getLocalRobot } from '../../redux/discovery'
 
 import type { State, Dispatch } from '../../redux/types'
 import { StyledText } from '../../atoms/text'
+import { TertiaryButton } from '../../atoms/buttons'
 
 const LIST_REFRESH_MS = 10000
 
@@ -28,14 +39,37 @@ export function SelectNetwork(): JSX.Element {
     true
   )
 
+  const handleConnect = (): void => {
+    console.log('tapped')
+  }
+
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacingXXL}>
+      <Flex alignItems={ALIGN_CENTER}>
+        <StyledText>{'Connect to a network'}</StyledText>
+        <TertiaryButton>{'Search again'}</TertiaryButton>
+      </Flex>
       {/* <StyledText>{localRobot}</StyledText> */}
-      <StyledText>{robotName}</StyledText>
-      <StyledText>{'network list'}</StyledText>
-      {list.map(nw => (
-        <Flex key={nw.ssid}>{nw.ssid}</Flex>
-      ))}
+      {list.length > 0
+        ? list.map(nw => (
+            <Flex
+              width="59rem"
+              height="4rem"
+              flexDirection={DIRECTION_ROW}
+              padding={SPACING.spacing4}
+              key={nw.ssid}
+              backgroundColor="#d6d6d6"
+              alignItems={ALIGN_CENTER}
+              marginBottom={SPACING.spacing3}
+              borderRadius="0.75rem"
+            >
+              <Icon name="wifi" size="2.25rem" />
+              <StyledText marginLeft={SPACING.spacing4} color="#000">
+                {nw.ssid}
+              </StyledText>
+            </Flex>
+          ))
+        : null}
     </Flex>
   )
 }
