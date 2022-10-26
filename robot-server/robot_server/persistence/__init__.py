@@ -10,6 +10,7 @@ from ._fastapi_dependencies import (
     get_persistence_resetter,
 )
 from ._persistence_directory import PersistenceResetter
+from ._pydantic_json import UnparsedPydanticJSON, pydantic_to_sql, sql_to_pydantic
 from ._tables import (
     migration_table,
     protocol_table,
@@ -23,6 +24,9 @@ __all__ = [
     # database utilities and helpers
     "create_sql_engine",
     "sqlite_rowid",
+    "UnparsedPydanticJSON",
+    "pydantic_to_sql",
+    "sql_to_pydantic",
     # database tables
     "migration_table",
     "protocol_table",

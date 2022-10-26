@@ -1,7 +1,10 @@
 """SQLite table schemas."""
 import sqlalchemy
 
+from robot_server.protocols.analysis_models import CompletedAnalysis
+
 from . import legacy_pickle
+from ._pydantic_json import PydanticJSON
 from ._utc_datetime import UTCDateTime
 
 _metadata = sqlalchemy.MetaData()
@@ -56,7 +59,7 @@ analysis_table = sqlalchemy.Table(
     ),
     sqlalchemy.Column(
         "completed_analysis",
-        sqlalchemy.LargeBinary,
+        PydanticJSON(model=CompletedAnalysis),
         nullable=False,
     ),
 )
@@ -82,12 +85,14 @@ run_table = sqlalchemy.Table(
         nullable=True,
     ),
     # column added in schema v1
+    # TODO(mm, 2022-10-13): Migrate from PickleType to PydanticJSON.
     sqlalchemy.Column(
         "state_summary",
         sqlalchemy.PickleType(pickler=legacy_pickle),
         nullable=True,
     ),
     # column added in schema v1
+    # TODO(mm, 2022-10-13): Migrate from PickleType to PydanticJSON.
     sqlalchemy.Column(
         "commands",
         sqlalchemy.PickleType(pickler=legacy_pickle),

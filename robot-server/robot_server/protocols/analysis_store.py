@@ -17,8 +17,13 @@ from opentrons.protocol_engine import (
     Liquid,
 )
 
-from robot_server.persistence import analysis_table, sqlite_rowid
-from robot_server.persistence import legacy_pickle
+from robot_server.persistence import (
+    UnparsedPydanticJSON,
+    pydantic_to_sql,
+    sql_to_pydantic,
+    analysis_table,
+    sqlite_rowid,
+)
 
 from .analysis_models import (
     AnalysisSummary,
@@ -298,8 +303,8 @@ class _CompletedAnalysisResource:
         Avoid calling this from inside a SQL transaction, since it might be slow.
         """
 
-        def serialize_completed_analysis() -> bytes:
-            return legacy_pickle.dumps(self.completed_analysis.dict())
+        def serialize_completed_analysis() -> UnparsedPydanticJSON[CompletedAnalysis]:
+            return pydantic_to_sql(data=self.completed_analysis)
 
         serialized_completed_analysis = await anyio.to_thread.run_sync(
             serialize_completed_analysis,
@@ -341,8 +346,8 @@ class _CompletedAnalysisResource:
         assert isinstance(protocol_id, str)
 
         def parse_completed_analysis() -> CompletedAnalysis:
-            return CompletedAnalysis.parse_obj(
-                legacy_pickle.loads(sql_row.completed_analysis)
+            return sql_to_pydantic(
+                model=CompletedAnalysis, sql_value=sql_row.completed_analysis
             )
 
         completed_analysis = await anyio.to_thread.run_sync(
