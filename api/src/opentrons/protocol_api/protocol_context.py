@@ -500,7 +500,7 @@ class ProtocolContext(CommandPublisher):
 
         for tip_rack in tip_racks:
             instrument_support.validate_tiprack(
-                instrument_name=instrument_core.get_pipette_load_name(),
+                instrument_name=instrument_core.get_pipette_name(),
                 tip_rack=tip_rack,
                 log=logger,
             )

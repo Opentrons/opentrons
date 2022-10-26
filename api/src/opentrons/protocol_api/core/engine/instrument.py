@@ -18,13 +18,13 @@ class InstrumentCore(AbstractInstrument[WellCore]):
     """
 
     def __init__(self, pipette_id: str, engine_client: EngineClient) -> None:
-        self._id = pipette_id
+        self._pipette_id = pipette_id
         self._engine_client = engine_client
 
     @property
     def pipette_id(self) -> str:
         """The instrument's unique ProtocolEngine ID."""
-        return self._id
+        return self._pipette_id
 
     def get_default_speed(self) -> float:
         raise NotImplementedError("InstrumentCore.get_default_speed not implemented")
@@ -81,13 +81,15 @@ class InstrumentCore(AbstractInstrument[WellCore]):
     def get_mount(self) -> Mount:
         raise NotImplementedError("InstrumentCore.get_mount not implemented")
 
-    def get_pipette_load_name(self) -> str:
+    def get_pipette_name(self) -> str:
         """Get the pipette's load name as a string.
 
         Will match the load name of the actually loaded pipette,
         which may differ from the requested load name.
         """
-        return self._engine_client.state.pipettes.get(self._id).pipetteName.value
+        return self._engine_client.state.pipettes.get(
+            self._pipette_id
+        ).pipetteName.value
 
     def get_model(self) -> str:
         raise NotImplementedError("InstrumentCore.get_model not implemented")

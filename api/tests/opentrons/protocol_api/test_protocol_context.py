@@ -90,9 +90,7 @@ def test_load_instrument(
         )
     ).then_return(mock_instrument_core)
 
-    decoy.when(mock_instrument_core.get_pipette_load_name()).then_return(
-        "Gandalf the Grey"
-    )
+    decoy.when(mock_instrument_core.get_pipette_name()).then_return("Gandalf the Grey")
 
     result = subject.load_instrument(
         instrument_name="gandalf", mount="shadowfax", tip_racks=mock_tip_racks
@@ -135,7 +133,7 @@ def test_load_instrument_replace(
             mount=matchers.IsA(Mount),
         )
     ).then_return(mock_instrument_core)
-    decoy.when(mock_instrument_core.get_pipette_load_name()).then_return("Ada Lovelace")
+    decoy.when(mock_instrument_core.get_pipette_name()).then_return("Ada Lovelace")
 
     pipette_1 = subject.load_instrument(instrument_name="ada", mount=Mount.RIGHT)
     assert subject.loaded_instruments["right"] is pipette_1

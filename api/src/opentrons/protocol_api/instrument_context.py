@@ -1375,7 +1375,7 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         The name string for the pipette (e.g. 'p300_single')
         """
-        return self._implementation.get_pipette_load_name()
+        return self._implementation.get_pipette_name()
 
     @property  # type: ignore
     @requires_version(2, 0)

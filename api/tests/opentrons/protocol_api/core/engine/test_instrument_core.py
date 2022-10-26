@@ -26,7 +26,7 @@ def test_pipette_id(subject: InstrumentCore) -> None:
     assert subject.pipette_id == "abc123"
 
 
-def test_get_pipette_load_name(
+def test_get_pipette_name(
     decoy: Decoy, mock_engine_client: EngineClient, subject: InstrumentCore
 ) -> None:
     """It should get the pipette's load name."""
@@ -34,6 +34,6 @@ def test_get_pipette_load_name(
         LoadedPipette.construct(pipetteName=PipetteNameType.P300_SINGLE)  # type: ignore[call-arg]
     )
 
-    result = subject.get_pipette_load_name()
+    result = subject.get_pipette_name()
 
     assert result == "p300_single"

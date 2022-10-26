@@ -208,7 +208,7 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
         """Get the instrument name."""
         return self._instrument_name
 
-    def get_pipette_load_name(self) -> str:
+    def get_pipette_name(self) -> str:
         """Get the pipette name."""
         return self.get_pipette()["name"]
 
