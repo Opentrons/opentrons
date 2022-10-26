@@ -100,7 +100,7 @@ push-plot-webpage:
 	$(call move-plot-webpage,$(host),$(br_ssh_key),$(ssh_opts))
 
 .PHONY: push-plot-webpage-ot3
-push-plot-webpage:
+push-plot-webpage-ot3:
 	scp -r hardware_testing/tools/plot root@$(host):/data
 	$(call move-plot-webpage-ot3,$(host),$(br_ssh_key),$(ssh_opts))
 
