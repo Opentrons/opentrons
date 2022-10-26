@@ -8,5 +8,6 @@
   "remove_stem": "Remove Calibration Stem",
   "remove_probe": "Now you’ll be guided through removing your calibration stem. Undo the latch to remove the stem",
   "complete_cal": "Complete calibration",
-  "pip_cal_success": "Pipette Successfully Calibrated"
+  "pip_cal_success": "Pipette Successfully Calibrated",
+  "calibrate_pipette": "Calibrate a pipette"
 }

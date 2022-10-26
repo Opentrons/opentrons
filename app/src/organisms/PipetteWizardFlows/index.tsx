@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 // import { useSelector } from 'react-redux'
 // import { getAttachedPipettes } from '../../redux/pipettes'
 import { ModalShell } from '../../molecules/Modal'
@@ -25,6 +26,7 @@ export const PipetteWizardFlows = (
   props: PipetteWizardFlowsProps
 ): JSX.Element | null => {
   const { flowType, mount, closeFlow } = props
+  const { t } = useTranslation('pipette_wizard_flows')
   //   const attachedPipette = useSelector(
   //     (state: State) => getAttachedPipettes(state, robotName)[mount]
   //   )
@@ -68,13 +70,20 @@ export const PipetteWizardFlows = (
     modalContent = <Results {...calibrateBaseProps} nextStep={closeFlow} />
   }
 
+  let wizardTitle: string = 'unknown page'
+  switch (flowType) {
+    case FLOWS.CALIBRATE: {
+      wizardTitle = t('calibrate_pipette')
+      break
+    }
+  }
   return (
     <Portal level="top">
       <ModalShell
         width="47rem"
         header={
           <WizardHeader
-            title="Calibrate Pipette Title"
+            title={wizardTitle}
             currentStep={currentStepIndex}
             totalSteps={totalStepCount}
             onExit={closeFlow}
