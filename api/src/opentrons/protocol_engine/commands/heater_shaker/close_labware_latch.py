@@ -70,7 +70,7 @@ class CloseLabwareLatch(BaseCommand[CloseLabwareLatchParams, CloseLabwareLatchRe
 class CloseLabwareLatchCreate(BaseCommandCreate[CloseLabwareLatchParams]):
     """A request to create a Heater-Shaker's close latch command."""
 
-    commandType: CloseLabwareLatchCommandType
+    commandType: CloseLabwareLatchCommandType = "heaterShaker/closeLabwareLatch"
     params: CloseLabwareLatchParams
 
     _CommandCls: Type[CloseLabwareLatch] = CloseLabwareLatch

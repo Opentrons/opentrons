@@ -98,7 +98,7 @@ class OpenLabwareLatch(BaseCommand[OpenLabwareLatchParams, OpenLabwareLatchResul
 class OpenLabwareLatchCreate(BaseCommandCreate[OpenLabwareLatchParams]):
     """A request to create a Heater-Shaker's open labware latch command."""
 
-    commandType: OpenLabwareLatchCommandType
+    commandType: OpenLabwareLatchCommandType = "heaterShaker/openLabwareLatch"
     params: OpenLabwareLatchParams
 
     _CommandCls: Type[OpenLabwareLatch] = OpenLabwareLatch

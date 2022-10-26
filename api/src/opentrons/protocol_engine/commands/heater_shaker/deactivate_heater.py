@@ -69,7 +69,7 @@ class DeactivateHeater(BaseCommand[DeactivateHeaterParams, DeactivateHeaterResul
 class DeactivateHeaterCreate(BaseCommandCreate[DeactivateHeaterParams]):
     """A request to create a Heater-Shaker's deactivate heater command."""
 
-    commandType: DeactivateHeaterCommandType
+    commandType: DeactivateHeaterCommandType = "heaterShaker/deactivateHeater"
     params: DeactivateHeaterParams
 
     _CommandCls: Type[DeactivateHeater] = DeactivateHeater
