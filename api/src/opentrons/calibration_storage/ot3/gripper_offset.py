@@ -1,5 +1,6 @@
 import os
 import json
+from pathlib import Path
 from pydantic import ValidationError
 from typing import Dict, cast, Optional, Union
 
@@ -19,7 +20,7 @@ GripperCalibrations = Dict[local_types.GripperId, v1.InstrumentOffsetModel]
 
 
 def _gripper_offset_calibrations() -> GripperCalibrations:
-    gripper_calibration_dir = config.get_opentrons_path("gripper_calibration_dir")
+    gripper_calibration_dir = Path(config.get_opentrons_path("gripper_calibration_dir"))
     gripper_calibration_dict: GripperCalibrations = {}
 
     for file in os.scandir(gripper_calibration_dir):
@@ -27,7 +28,7 @@ def _gripper_offset_calibrations() -> GripperCalibrations:
             gripper_id = cast(local_types.GripperId, file.name.split(".json")[0])
             try:
                 gripper_calibration_dict[gripper_id] = v1.InstrumentOffsetModel(
-                    **io.read_cal_file(file.path)
+                    **io.read_cal_file(Path(file.path))
                 )
             except (json.JSONDecodeError, ValidationError):
                 pass
@@ -44,9 +45,9 @@ def delete_gripper_calibration_file(gripper: local_types.GripperId) -> None:
     :param gripper: gripper serial number
     """
     offset_path = (
-        config.get_opentrons_path("gripper_calibration_dir") / f"{gripper}.json"
+        Path(config.get_opentrons_path("gripper_calibration_dir")) / f"{gripper}.json"
     )
-    io._delete_file(offset_path)
+    io.delete_file(offset_path)
 
 
 def clear_gripper_calibration_offsets() -> None:
@@ -54,7 +55,7 @@ def clear_gripper_calibration_offsets() -> None:
     Delete all gripper calibration data files.
     """
 
-    offset_dir = config.get_opentrons_path("gripper_calibration_dir")
+    offset_dir = Path(config.get_opentrons_path("gripper_calibration_dir"))
     io._remove_json_files_in_directories(offset_dir)
 
 
@@ -68,8 +69,7 @@ def save_gripper_calibration(
         Union[local_types.CalibrationStatus, v1.CalibrationStatus]
     ] = None,
 ) -> None:
-    gripper_dir = config.get_opentrons_path("gripper_calibration_dir")
-    gripper_path = gripper_dir / f"{gripper_id}.json"
+    gripper_dir = Path(config.get_opentrons_path("gripper_calibration_dir"))
 
     if cal_status and isinstance(cal_status, local_types.CalibrationStatus):
         cal_status_model = v1.CalibrationStatus(**asdict(cal_status))
@@ -84,7 +84,7 @@ def save_gripper_calibration(
         source=local_types.SourceType.user,
         status=cal_status_model,
     )
-    io.save_to_file(gripper_path, gripper_calibration)
+    io.save_to_file(gripper_dir, gripper_id, gripper_calibration)
 
 
 # Get Gripper Offset Calibrations

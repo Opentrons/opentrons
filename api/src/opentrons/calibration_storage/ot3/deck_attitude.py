@@ -1,5 +1,6 @@
 import os
 import json
+from pathlib import Path
 from pydantic import ValidationError
 from typing import Optional, Union
 from dataclasses import asdict
@@ -20,14 +21,10 @@ def delete_robot_deck_attitude() -> None:
     """
     Delete the robot deck attitude calibration.
     """
-    legacy_deck_calibration_file = config.get_opentrons_path("deck_calibration_file")
-    robot_dir = config.get_opentrons_path("robot_calibration_dir")
+    robot_dir = Path(config.get_opentrons_path("robot_calibration_dir"))
     gantry_path = robot_dir / "deck_calibration.json"
 
-    # TODO(mc, 2022-06-08): this leaves legacy deck calibration backup files in place
-    # we should eventually clean them up, too, because they can really crowd /data/
-    io._delete_file(legacy_deck_calibration_file)
-    io._delete_file(gantry_path)
+    io.delete_file(gantry_path)
 
 
 # Save Deck Calibration
@@ -41,8 +38,7 @@ def save_robot_deck_attitude(
         Union[local_types.CalibrationStatus, local_types.CalibrationStatus]
     ] = None,
 ) -> None:
-    robot_dir = config.get_opentrons_path("robot_calibration_dir")
-    gantry_path = robot_dir / "deck_calibration.json"
+    robot_dir = Path(config.get_opentrons_path("robot_calibration_dir"))
 
     if cal_status and isinstance(cal_status, local_types.CalibrationStatus):
         cal_status_model = v1.CalibrationStatus(**asdict(cal_status))
@@ -59,18 +55,18 @@ def save_robot_deck_attitude(
         status=cal_status_model,
     )
     # convert to schema + validate json conversion
-    io.save_to_file(gantry_path, gantry_calibration)
+    io.save_to_file(robot_dir, "deck_calibration", gantry_calibration)
 
 
 # Get Deck Calibration
 
 
 def get_robot_deck_attitude() -> Optional[v1.DeckCalibrationModel]:
-    deck_calibration_dir = config.get_opentrons_path("robot_calibration_dir")
+    deck_calibration_dir = Path(config.get_opentrons_path("robot_calibration_dir"))
     for file in os.scandir(deck_calibration_dir):
         if file.name == "deck_calibration.json":
             try:
-                return v1.DeckCalibrationModel(**io.read_cal_file(file.path))
+                return v1.DeckCalibrationModel(**io.read_cal_file(Path(file.path)))
             except (json.JSONDecodeError, ValidationError):
                 pass
     return None

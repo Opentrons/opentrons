@@ -21,7 +21,7 @@ EncoderType = typing.Type[json.JSONEncoder]
 
 # TODO(mc, 2022-06-07): replace with Path.unlink(missing_ok=True)
 # when we are on Python >= 3.8
-def _delete_file(path: Path) -> None:
+def delete_file(path: Path) -> None:
     try:
         path.unlink()
     except FileNotFoundError:
@@ -34,11 +34,11 @@ def _remove_json_files_in_directories(p: Path) -> None:
         if item.is_dir():
             _remove_json_files_in_directories(item)
         elif item.suffix == ".json":
-            _delete_file(item)
+            delete_file(item)
 
 
 def read_cal_file(
-    filepath: StrPath, decoder: DecoderType = DateTimeDecoder
+    filepath: Path, decoder: DecoderType = DateTimeDecoder
 ) -> typing.Dict[str, typing.Any]:
     """
     Function used to read data from a file
@@ -71,7 +71,8 @@ def read_cal_file(
 
 
 def save_to_file(
-    filepath: StrPath,
+    directorypath: Path,
+    file_name: str,
     data: typing.Union[BaseModel, typing.Dict[str, typing.Any], typing.Any],
     encoder: EncoderType = DateTimeEncoder,
 ) -> None:
@@ -83,9 +84,11 @@ def save_to_file(
     :param encoder: if there is any specialized encoder needed.
     The default encoder is the date time encoder.
     """
-    filepath.mkdir(parents=True, exist_ok=True)
-    with open(filepath, "w") as f:
-        if isinstance(data, BaseModel):
-            f.write(data.json())
-        else:
-            json.dump(data, f, cls=encoder)
+    directorypath.mkdir(parents=True, exist_ok=True)
+    filepath = directorypath / f"{file_name}.json"
+    json_data = (
+        data.json()
+        if isinstance(data, BaseModel)
+        else json.dumps(data, cls=encoder)
+    )
+    filepath.write_text(json_data, encoding="utf-8")

@@ -63,14 +63,14 @@ def test_save_deck_attitude(ot_config_tempdir: Any, _deck: ModuleType) -> None:
     Test saving deck attitude calibrations.
     """
     deck, robot_type = _deck
-    assert deck._deck_calibration() is None
+    assert deck.get_robot_deck_attitude() is None
     if robot_type == "ot3":
         deck.save_robot_deck_attitude([[1, 0, 0], [0, 1, 0], [0, 0, 1]], "pip1")
     else:
         deck.save_robot_deck_attitude(
             [[1, 0, 0], [0, 1, 0], [0, 0, 1]], "pip1", "mytiprack"
         )
-    assert deck._deck_calibration() != {}
+    assert deck.get_robot_deck_attitude() != {}
 
 
 @no_type_check
@@ -119,7 +119,7 @@ def test_delete_deck_calibration(
     Test delete deck calibration.
     """
     deck, _ = _deck
-    assert deck._deck_calibration() != {}
-    assert deck._deck_calibration().attitude == [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+    assert deck.get_robot_deck_attitude() != {}
+    assert deck.get_robot_deck_attitude().attitude == [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
     deck.delete_robot_deck_attitude()
-    assert deck._deck_calibration() is None
+    assert deck.get_robot_deck_attitude() is None

@@ -1,6 +1,7 @@
 import os
 import json
 import typing
+from pathlib import Path
 from pydantic import ValidationError
 from dataclasses import asdict
 
@@ -26,7 +27,7 @@ TipLengthCalibrations = typing.Dict[
 
 
 def _tip_length_calibrations() -> TipLengthCalibrations:
-    tip_length_dir = config.get_tip_length_cal_path()
+    tip_length_dir = Path(config.get_tip_length_cal_path())
     tip_length_calibrations: TipLengthCalibrations = {}
     for file in os.scandir(tip_length_dir):
         if file.name == "index.json":
@@ -34,7 +35,7 @@ def _tip_length_calibrations() -> TipLengthCalibrations:
         if file.is_file() and ".json" in file.name:
             pipette_id = typing.cast(local_types.PipetteId, file.name.split(".json")[0])
             tip_length_calibrations[pipette_id] = {}
-            all_tip_lengths_for_pipette = io.read_cal_file(file.path)
+            all_tip_lengths_for_pipette = io.read_cal_file(Path(file.path))
             for tiprack, data in all_tip_lengths_for_pipette.items():
                 try:
                     tip_length_calibrations[pipette_id][
@@ -71,11 +72,11 @@ def delete_tip_length_calibration(
     if tiprack in tip_lengths_for_pipette:
         # maybe make modify and delete same file?
         del tip_lengths_for_pipette[tiprack]
-        tip_length_path = config.get_tip_length_cal_path() / f"{pipette_id}.json"
+        tip_length_directory = Path(config.get_tip_length_cal_path())
         if tip_lengths_for_pipette:
-            io.save_to_file(tip_length_path, tip_lengths_for_pipette)
+            io.save_to_file(tip_length_directory, pipette_id, tip_lengths_for_pipette)
         else:
-            tip_length_path.unlink()
+            io.delete_file(tip_length_directory / f"{pipette_id}.json")
     else:
         raise local_types.TipLengthCalNotFound(
             f"Tip length for hash {tiprack} has not been "
@@ -109,8 +110,7 @@ def save_tip_length_calibration(
     :param tip_length_cal: results of the data created using
            :meth:`create_tip_length_data`
     """
-    tip_length_dir_path = config.get_tip_length_cal_path()
-    pip_tip_length_path = tip_length_dir_path / f"{pip_id}.json"
+    tip_length_dir_path = Path(config.get_tip_length_cal_path())
 
     all_tip_lengths = _tip_lengths_for_pipette(pip_id)
 
@@ -121,7 +121,7 @@ def save_tip_length_calibration(
     dict_of_tip_lengths = {}
     for key, item in all_tip_lengths.items():
         dict_of_tip_lengths[key] = json.loads(item.json())
-    io.save_to_file(pip_tip_length_path, dict_of_tip_lengths)
+    io.save_to_file(tip_length_dir_path, pip_id, dict_of_tip_lengths)
 
 
 # Get Tip Length Calibration
