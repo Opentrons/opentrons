@@ -5,9 +5,7 @@ from decoy import Decoy
 from opentrons.hardware_control import SynchronousAdapter
 from opentrons.hardware_control.modules import AbstractModule
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons.protocol_api.core.engine.module_core import (
-    ModuleCore,
-)
+from opentrons.protocol_api.core.engine.module_core import ModuleCore
 from opentrons.protocol_api.core.engine.labware import LabwareCore
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
