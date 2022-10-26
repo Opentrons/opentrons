@@ -24,25 +24,17 @@ if TYPE_CHECKING:
 MoveToLocationCommandType = Literal["calibration/moveToLocation"]
 
 
-class CalibrationPositions(str, Enum):
+class CalibrationPosition(str, Enum):
     """Deck slot to move to."""
 
     PROBE_POSITION = "probePosition"
     ATTACH_OR_DETACH = "attachOrDetach"
 
-    @property
-    def offset(self) -> DeckPoint:
-        """Return offset values for the given position."""
-        if self.value == "probePosition":
-            return DeckPoint(x=10, y=0, z=3)
-        else:
-            return DeckPoint(x=0, y=0, z=0)
-
 
 class MoveToLocationParams(PipetteIdMixin):
     """Calibration set up position command parameters."""
 
-    location: CalibrationPositions = Field(
+    location: CalibrationPosition = Field(
         ...,
         description="Slot location to move to before starting calibration.",
     )
@@ -52,7 +44,8 @@ class MoveToLocationResult(BaseModel):
     """Result data from the execution of a CalibrationSetUpPosition command."""
 
     position: DeckPoint = Field(
-        ..., description="Position in deck coordinates after this movement has been executed"
+        ...,
+        description="Position in deck coordinates after this movement has been executed",
     )
 
 
@@ -69,19 +62,20 @@ class MoveToLocationImplementation(
 
     async def execute(self, params: MoveToLocationParams) -> MoveToLocationResult:
         """Move the requested pipette to a given deck slot."""
-        offset = params.location.offset
-        if params.location == CalibrationPositions.PROBE_POSITION:
+        if params.location == CalibrationPosition.PROBE_POSITION:
+            offset = DeckPoint(x=10, y=0, z=3)
             deck_center = self._state_view.labware.get_slot_center_position(
-                locationName.SLOT_5
+                DeckSlotName.SLOT_5
             )
             z_position = offset.z
         else:
             # get current z coordinate and pass it into movement destination
+            offset = DeckPoint(x=0, y=0, z=0)
             deck_center = self._state_view.labware.get_slot_center_position(
-                locationName.SLOT_2
+                DeckSlotName.SLOT_2
             )
             current_position = await self._movement.save_position(
-                pipette_id=params.pipetteId, position_id=params.location.value
+                pipette_id=params.pipetteId, position_id=None
             )
             z_position = current_position.position.z
         destination = DeckPoint(
@@ -99,9 +93,7 @@ class MoveToLocationImplementation(
             pipette_id=params.pipetteId, position_id=None
         )
 
-        return MoveToLocationResult(
-            position=new_position.position, positionId=None
-        )
+        return MoveToLocationResult(position=new_position.position)
 
 
 class MoveToLocation(BaseCommand[MoveToLocationParams, MoveToLocationResult]):
