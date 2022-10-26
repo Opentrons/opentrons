@@ -38,18 +38,18 @@ class LabwareCore(AbstractLabware[WellCore]):
 
     @property
     def highest_z(self) -> float:
-        raise NotImplementedError("LabwareCore not implemented")
+        raise NotImplementedError("LabwareCore.highest_z not implemented")
 
     @property
     def separate_calibration(self) -> bool:
-        raise NotImplementedError("LabwareCore not implemented")
+        raise NotImplementedError("LabwareCore.separate_calibration not implemented")
 
     @property
     def load_name(self) -> str:
-        raise NotImplementedError("LabwareCore not implemented")
+        raise NotImplementedError("LabwareCore.load_name not implemented")
 
     def get_uri(self) -> str:
-        raise NotImplementedError("LabwareCore not implemented")
+        raise NotImplementedError("LabwareCore.get_uri not implemented")
 
     def get_load_params(self) -> LabwareLoadParams:
         return LabwareLoadParams(
@@ -60,63 +60,65 @@ class LabwareCore(AbstractLabware[WellCore]):
 
     def get_display_name(self) -> str:
         """Get a display name for the labware, falling back to the definition."""
-        raise NotImplementedError("LabwareCore not implemented")
+        raise NotImplementedError("LabwareCore.get_display_name not implemented")
 
     def get_user_display_name(self) -> Optional[str]:
         """Get the user-specified display name of the labware, if set."""
         return self._user_display_name
 
     def get_name(self) -> str:
-        raise NotImplementedError("LabwareCore not implemented")
+        raise NotImplementedError("LabwareCore.get_name not implemented")
 
     def set_name(self, new_name: str) -> None:
-        raise NotImplementedError("LabwareCore not implemented")
+        raise NotImplementedError("LabwareCore.set_name not implemented")
 
     def get_definition(self) -> LabwareDefinitionDict:
         """Get the labware's definition as a plain dictionary."""
         return cast(LabwareDefinitionDict, self._definition.dict(exclude_none=True))
 
     def get_parameters(self) -> LabwareParameters:
-        raise NotImplementedError("LabwareCore not implemented")
+        raise NotImplementedError("LabwareCore.get_parameters not implemented")
 
     def get_quirks(self) -> List[str]:
-        raise NotImplementedError("LabwareCore not implemented")
+        raise NotImplementedError("LabwareCore.get_quirks not implemented")
 
     def set_calibration(self, delta: Point) -> None:
         # TODO(jbl 2022-09-01): implement set calibration through the engine
         pass
 
     def get_calibrated_offset(self) -> Point:
-        raise NotImplementedError("LabwareCore not implemented")
+        raise NotImplementedError("LabwareCore.get_calibrated_offset not implemented")
 
     def is_tiprack(self) -> bool:
-        raise NotImplementedError("LabwareCore not implemented")
+        raise NotImplementedError("LabwareCore.is_tiprack not implemented")
 
     def get_tip_length(self) -> float:
-        raise NotImplementedError("LabwareCore not implemented")
+        raise NotImplementedError("LabwareCore.get_tip_length not implemented")
 
     def set_tip_length(self, length: float) -> None:
-        raise NotImplementedError("LabwareCore not implemented")
+        raise NotImplementedError("LabwareCore.set_tip_length not implemented")
 
     def reset_tips(self) -> None:
-        raise NotImplementedError("LabwareCore not implemented")
+        raise NotImplementedError("LabwareCore.reset_tips not implemented")
 
     def get_tip_tracker(self) -> TipTracker:
-        raise NotImplementedError("LabwareCore not implemented")
+        raise NotImplementedError("LabwareCore.get_tip_tracker not implemented")
 
     def get_well_grid(self) -> WellGrid:
-        raise NotImplementedError("LabwareCore not implemented")
+        raise NotImplementedError("LabwareCore.get_well_grid not implemented")
 
     def get_wells(self) -> List[WellCore]:
-        raise NotImplementedError("LabwareCore not implemented")
+        raise NotImplementedError("LabwareCore.get_wells not implemented")
 
     def get_wells_by_name(self) -> Dict[str, WellCore]:
-        raise NotImplementedError("LabwareCore not implemented")
+        raise NotImplementedError("LabwareCore.get_wells_by_name not implemented")
 
     def get_geometry(self) -> LabwareGeometry:
-        raise NotImplementedError("LabwareCore not implemented")
+        raise NotImplementedError("LabwareCore.get_geometry not implemented")
 
     def get_default_magnet_engage_height(
         self, preserve_half_mm: bool = False
     ) -> Optional[float]:
-        raise NotImplementedError("LabwareCore not implemented")
+        raise NotImplementedError(
+            "LabwareCore.get_default_magnet_engage_height not implemented"
+        )

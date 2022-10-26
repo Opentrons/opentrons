@@ -19,8 +19,7 @@ from opentrons.protocol_api import (
     validation,
 )
 from opentrons.protocol_api.core.labware import LabwareLoadParams
-
-from .types import (
+from opentrons.protocol_api.core.common import (
     InstrumentCore,
     LabwareCore,
     ProtocolCore,

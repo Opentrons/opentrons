@@ -9,10 +9,8 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition as Labware
 from opentrons.broker import Broker
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, ModuleContext, Labware
+from opentrons.protocol_api.core.common import LabwareCore, ModuleCore, ProtocolCore
 from opentrons.protocol_api.core.labware import LabwareLoadParams
-
-
-from .types import LabwareCore, ModuleCore, ProtocolCore
 
 
 @pytest.fixture
