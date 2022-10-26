@@ -801,3 +801,13 @@ class OT3Controller:
         )
         self._position[axis_to_node(moving)] += distance_mm
         return data
+
+    async def capacitive_read(
+        self,
+        mount: OT3Mount,
+    ) -> float:
+        data = await capacitive_read(
+            self._messenger,
+            sensor_node_for_mount(mount),
+        )
+        return data
