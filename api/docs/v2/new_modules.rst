@@ -364,50 +364,29 @@ The ``location`` parameter of :py:meth:`.load_module` isn't required for the The
    Added support for Thermocycler Module GEN2.
 
 
-Lid Motor Control
-=================
+Lid Control
+===========
 
-The Thermocycler can control its temperature with the lid open or closed. When the lid of the Thermocycler is open, the pipettes can access the loaded labware. You can control the lid position with the methods below.
+The Thermocycler can control the position and temperature of its lid. 
 
-Open Lid
---------
+To change the lid position, use :py:meth:`~.ThermocyclerContext.open_lid` and :py:meth:`~.ThermocyclerContext.close_lid`  When the lid is open, the pipettes can access the loaded labware. 
 
-.. code-block:: python
-
-    tc_mod.open_lid()
-
-
-.. versionadded:: 2.0
-
-Close Lid
----------
+You can also control the target temperature of the lid. Acceptable target temperatures are between 37 and 110 °C. To set the lid temperature, use :py:meth:`~.ThermocyclerContext.set_lid_temperature`, which takes one parameter: the target ``temperature`` (in degrees Celsius) as an integer. For example, to set the lid to 50 °C:
 
 .. code-block:: python
 
-    tc_mod.close_lid()
+    tc_mod.set_lid_temperature(50)
+
+The protocol will only proceed once the lid temperature reaches 50 °C. This is the case whether the previous temperature was lower than 50 °C (in which case the lid will actively heat) or higher than 50 °C (in which case the lid will passively cool).
+
+.. note::
+
+    Lid temperature is not affected by Thermocycler profiles. Therefore you should set an appropriate lid temperature to hold during your profile *before* executing it. See :ref:`thermocycler-profiles` for more information on defining and executing profiles.
 
 .. versionadded:: 2.0
 
-Lid Temperature Control
-=======================
-
-You can control when a lid temperature is set. It is recommended that you set
-the lid temperature before executing a Thermocycler profile (see :ref:`thermocycler-profiles`). The range of the Thermocycler lid is
-37 °C to 110 °C.
-
-Set Lid Temperature
--------------------
-
-:py:meth:`.ThermocyclerContext.set_lid_temperature` takes one parameter: the ``temperature`` you wish the lid to be set to. The protocol will only proceed once the lid temperature has been reached.
-
-.. code-block:: python
-
-    tc_mod.set_lid_temperature(temperature)
-
-.. versionadded:: 2.0
-
-Block Temperature Control
-=========================
+Block Control
+=============
 
 To set the block temperature inside the Thermocycler, you can use the method :py:meth:`.ThermocyclerContext.set_block_temperature`. It takes five parameters:
 ``temperature``, ``hold_time_seconds``, ``hold_time_minutes``, ``ramp_rate`` and ``block_max_volume``. Only ``temperature`` is required; the two ``hold_time`` parameters, ``ramp_rate``, and ``block_max_volume`` are optional.
