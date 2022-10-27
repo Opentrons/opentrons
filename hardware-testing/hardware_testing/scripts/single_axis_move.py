@@ -77,9 +77,6 @@ NEG_POINT_MAP = {'Y': Point(y=-step_y),
              'R': Point(z=-step_z)}
 
 async def _single_axis_move(api: OT3API, cycles: int = 1) -> None:
-    # await api.move_rel(mount=MOUNT, delta=Point(y=-20))
-    # await api.move_rel(mount=MOUNT, delta=Point(x=-5))
-    default_speed = 400
     for _ in range(cycles):
         if(AXIS == 'R'):
             MOUNT = MOUNT = OT3Mount.RIGHT
@@ -87,18 +84,6 @@ async def _single_axis_move(api: OT3API, cycles: int = 1) -> None:
             MOUNT = MOUNT = OT3Mount.LEFT
         await api.move_rel(mount=MOUNT, delta=NEG_POINT_MAP[AXIS], speed=AXIS_SPEED)
         await api.move_rel(mount=MOUNT, delta=POINT_MAP[AXIS], speed=AXIS_SPEED)
-        # await api.move_rel(mount=MOUNT, delta=Point(x=-step_x), speed=default_speed)
-        # await api.move_rel(mount=MOUNT, delta=Point(z=-step_z), speed=default_speed)
-        # await api.move_rel(
-        #     mount=MOUNT, delta=Point(x=step_x, y=-step_y), speed=default_speed
-        # )
-        # await api.move_rel(mount=MOUNT, delta=Point(z=step_z), speed=default_speed)
-        # await api.move_rel(mount=MOUNT, delta=Point(x=-step_x), speed=default_speed)
-        # await api.move_rel(mount=MOUNT, delta=Point(z=-step_z), speed=default_speed)
-        # await api.move_rel(
-        #     mount=MOUNT, delta=Point(x=step_x, y=step_y), speed=default_speed
-        # )
-        # await api.move_rel(mount=MOUNT, delta=Point(z=step_z), speed=default_speed)
 
 
 async def _main(is_simulating: bool) -> None:
