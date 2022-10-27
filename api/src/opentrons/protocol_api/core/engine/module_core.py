@@ -148,7 +148,8 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
             height_from_base: Distance from labware base to raise the magnets.
             height_from_home: Distance from motor home position to raise the magnets.
         """
-        raise NotImplementedError("engage not implemented")
+        height = height_from_home if height_from_home else height_from_base
+        self._engine_client.magnetic_module_engage(module_id=self.module_id, engage_height=height)
 
     def engage_to_labware(
         self, offset: float = 0, preserve_half_mm: bool = False
