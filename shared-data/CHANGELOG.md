@@ -3,6 +3,45 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.2.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v6.1.0...v6.2.0-alpha.0) (2022-10-27)
+
+
+### Bug Fixes
+
+* **api:** Disallow uploading a protocol with non matching references ([#11418](https://github.com/Opentrons/opentrons/issues/11418)) ([2b6f6f1](https://github.com/Opentrons/opentrons/commit/2b6f6f10ae47d891126e4670b3c113ce00457a9b))
+* **app:** update schemaV6Adapter logic for missing liquids key ([#11512](https://github.com/Opentrons/opentrons/issues/11512)) ([27830ab](https://github.com/Opentrons/opentrons/commit/27830abb59e738285a4aa6e230220b05a864716e))
+* **labware-library:** do not render OT-3 trash def ([#11575](https://github.com/Opentrons/opentrons/issues/11575)) ([956c512](https://github.com/Opentrons/opentrons/commit/956c512a122d83adff7127078d8691ef0c69e06f))
+* **shared-data:** gen3 multi updates ([#11403](https://github.com/Opentrons/opentrons/issues/11403)) ([5f912bc](https://github.com/Opentrons/opentrons/commit/5f912bc78b258c0998cbed4e67543d2d13bc1617))
+* **shared-data:** Make JSONv6 loadLabware match implementation by changing .location and .displayName ([#11408](https://github.com/Opentrons/opentrons/issues/11408)) ([3e19f5a](https://github.com/Opentrons/opentrons/commit/3e19f5a497954240397824551839d3d1e0e696fd))
+* **shared-data:** ot3 trash below deck ([#11420](https://github.com/Opentrons/opentrons/issues/11420)) ([220c15c](https://github.com/Opentrons/opentrons/commit/220c15c4b7fa3776bdf0bbc564006234ecd26220))
+* **shared-data:** overlaps for gen3 pipettes ([#11419](https://github.com/Opentrons/opentrons/issues/11419)) ([97ff375](https://github.com/Opentrons/opentrons/commit/97ff375f3f97907aecbf9665375e3d8f141ce5d6))
+* **step-generation, shared-data:** do not change liquid state of airGap command ([#11564](https://github.com/Opentrons/opentrons/issues/11564)) ([464f4e8](https://github.com/Opentrons/opentrons/commit/464f4e8806dffa995570d33c0b3e0a8589d19edc))
+
+
+### Features
+
+* **api:** Add labware, modules, liquids, and pipettes to cli analyze result ([#11451](https://github.com/Opentrons/opentrons/issues/11451)) ([129ffa8](https://github.com/Opentrons/opentrons/commit/129ffa8a28d7fe7d793b72a352f1dd7968676e66))
+* **api, robot-server:** Allow loadLiquid commands and liquids support in protocol engine and analysis ([#11310](https://github.com/Opentrons/opentrons/issues/11310)) ([1c6d0b3](https://github.com/Opentrons/opentrons/commit/1c6d0b3cbb2646d6ad791800dec2e5d81e194f13))
+* **app:** add list view and map view to module setup ([#11588](https://github.com/Opentrons/opentrons/issues/11588)) ([b0a1e57](https://github.com/Opentrons/opentrons/commit/b0a1e574b7ca698a58a61c497d95dae4da550b55))
+* **app:** deprecate Instructions in pipette flow and create new ([#11356](https://github.com/Opentrons/opentrons/issues/11356)) ([2c24801](https://github.com/Opentrons/opentrons/commit/2c248016b5920b6ec6fcd8dd9d95eb729155d0f3))
+* **app:** Thermocycler GEN2 app support ([#11492](https://github.com/Opentrons/opentrons/issues/11492)) ([c83a94d](https://github.com/Opentrons/opentrons/commit/c83a94d23ef5c9d8deb062c263f7bb254c950356))
+* **app:** wire up the use attached pipette button and fix various bugs ([#11440](https://github.com/Opentrons/opentrons/issues/11440)) ([79b65ac](https://github.com/Opentrons/opentrons/commit/79b65accda22f9481663ebd5d385c6e94b1033d0))
+* **app, api-client:** wire up liquid setup and protocol details ([#11455](https://github.com/Opentrons/opentrons/issues/11455)) ([0c6ee3d](https://github.com/Opentrons/opentrons/commit/0c6ee3d7ced0afd1a27bb42da4f6760cb93f71a5))
+* **engine:** implement moving labware off deck ([#11521](https://github.com/Opentrons/opentrons/issues/11521)) ([b202843](https://github.com/Opentrons/opentrons/commit/b202843069f8fc7654c1fac6c40fd77a61981ba0))
+* **engine:** implement slot-to-slot labware movement using gripper ([#11590](https://github.com/Opentrons/opentrons/issues/11590)) ([43c6e4f](https://github.com/Opentrons/opentrons/commit/43c6e4ff3f517fef7832fdfea5e587d3f96c04dd))
+* **hardware-testing:** Adds simple script to show moving a plunger up/down ([#11557](https://github.com/Opentrons/opentrons/issues/11557)) ([013ec0a](https://github.com/Opentrons/opentrons/commit/013ec0aaa3ce747ac3fee3ff478ac03461c75be8))
+* **protocol-designer:** add OT-3 pipettes, tip racks, and robot model ([#11525](https://github.com/Opentrons/opentrons/issues/11525)) ([07756fd](https://github.com/Opentrons/opentrons/commit/07756fd30e5c1a927158a8efd3f1070944c5cd4e))
+* **protocol-engine:** Add provisional `moveLabware` command ([#11407](https://github.com/Opentrons/opentrons/issues/11407)) ([2041697](https://github.com/Opentrons/opentrons/commit/20416972f68ce79bc5601001e5653a64830f0061))
+* **shared_data:** update OT-3 deck def dimensions and slot positions ([#11581](https://github.com/Opentrons/opentrons/issues/11581)) ([1e35379](https://github.com/Opentrons/opentrons/commit/1e35379c05f4fd84dc09df38fd84e018cd50efd3))
+* **shared-data:** Add configurations for EVT pipettes ([#11551](https://github.com/Opentrons/opentrons/issues/11551)) ([71b0b73](https://github.com/Opentrons/opentrons/commit/71b0b73a4171a87226b18b283d4812dc26f436cb))
+* **shared-data:** add initial OT-3 labware definitions  ([#11393](https://github.com/Opentrons/opentrons/issues/11393)) ([8df206b](https://github.com/Opentrons/opentrons/commit/8df206bda7558aaa90e84f7d4ca73dadb3957a20))
+* **shared-data:** add robot definitions ([#11428](https://github.com/Opentrons/opentrons/issues/11428)) ([7e3f1e6](https://github.com/Opentrons/opentrons/commit/7e3f1e69c9f9bd7898bfee9d52008f9d38706aa7))
+* **shared-data, components:** add OT-3 deckmap component ([#11543](https://github.com/Opentrons/opentrons/issues/11543)) ([95a8a37](https://github.com/Opentrons/opentrons/commit/95a8a37922cfd5f46ad26c983bcc1659fa13b6e1))
+
+
+
+
+
 # [6.1.0](https://github.com/Opentrons/opentrons/compare/v6.0.1...v6.1.0) (2022-09-27)
 
 

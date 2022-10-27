@@ -3,6 +3,44 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.2.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v6.1.0...v6.2.0-alpha.0) (2022-10-27)
+
+
+### Bug Fixes
+
+* **api:** allow relative threshold value to be set for capacitive probe ([#11601](https://github.com/Opentrons/opentrons/issues/11601)) ([8d6519b](https://github.com/Opentrons/opentrons/commit/8d6519bd679317e3ee354f96e1065e3f7f048ecf))
+* **api:** correct critical points for gen3 multis ([#11405](https://github.com/Opentrons/opentrons/issues/11405)) ([797048e](https://github.com/Opentrons/opentrons/commit/797048e749ab733c573a69c85d62da1cb692e5bc))
+* **api:** ensure first module read completes during HW API build ([#11573](https://github.com/Opentrons/opentrons/issues/11573)) ([52ae103](https://github.com/Opentrons/opentrons/commit/52ae1031c08c7cc75dc13b8b8fc4e44a459e6874))
+* **api:** ensure module polling waits for full poll to notify ([#11548](https://github.com/Opentrons/opentrons/issues/11548)) ([fc01a77](https://github.com/Opentrons/opentrons/commit/fc01a77612b09afbb7497e0ede171b38260177fc))
+* **api:** Fix LabwareNotOnDeckError when unrelated labware are off-deck ([#11614](https://github.com/Opentrons/opentrons/issues/11614)) ([6eef7c5](https://github.com/Opentrons/opentrons/commit/6eef7c5ee4d18020d64cb5c7cf7a073b3f6cb349))
+* **api:** refresh the current position in capacitive probe ([#11608](https://github.com/Opentrons/opentrons/issues/11608)) ([6d39339](https://github.com/Opentrons/opentrons/commit/6d393399d9514bcef1d9ac60963be224156eb764))
+* **engine:** return highest 0 of zero if labware or modules not loaded ([#11593](https://github.com/Opentrons/opentrons/issues/11593)) ([33fcda2](https://github.com/Opentrons/opentrons/commit/33fcda27324418af14dfc6fa0f76962a1c6971bb))
+* **engine:** thermocycler gen 2 dodging ([#11509](https://github.com/Opentrons/opentrons/issues/11509)) ([8b2f982](https://github.com/Opentrons/opentrons/commit/8b2f9829b1f01e950f640aeb47fb03771009ef2c))
+
+
+### Features
+
+* **api:** Add labware, modules, liquids, and pipettes to cli analyze result ([#11451](https://github.com/Opentrons/opentrons/issues/11451)) ([129ffa8](https://github.com/Opentrons/opentrons/commit/129ffa8a28d7fe7d793b72a352f1dd7968676e66))
+* **api:** Enable calibrate-pipette command for OT3 hardware ([#11482](https://github.com/Opentrons/opentrons/issues/11482)) ([d3d71e3](https://github.com/Opentrons/opentrons/commit/d3d71e3e263b68d07c0c9fa775adfeddd2b4e406))
+* **api:** thermocycler-gen2 firmware update ([#11305](https://github.com/Opentrons/opentrons/issues/11305)) ([011d900](https://github.com/Opentrons/opentrons/commit/011d90044cbf0889aba0453122987447aee05018))
+* **api:** Validates liquid hex color in json protocols ([#11558](https://github.com/Opentrons/opentrons/issues/11558)) ([d1e45db](https://github.com/Opentrons/opentrons/commit/d1e45dbb4066336018b1c54d71e9eaa94652936e))
+* **api, robot-server:** add thermocycler lid temperature status to get modules endpoint ([#11500](https://github.com/Opentrons/opentrons/issues/11500)) ([74849f7](https://github.com/Opentrons/opentrons/commit/74849f7b1d9804ed9ea8039294f0dc085c46d680))
+* **api, robot-server:** Allow loadLiquid commands and liquids support in protocol engine and analysis ([#11310](https://github.com/Opentrons/opentrons/issues/11310)) ([1c6d0b3](https://github.com/Opentrons/opentrons/commit/1c6d0b3cbb2646d6ad791800dec2e5d81e194f13))
+* **app, api:** map PAPIv2 liquid handling commands to JSON v6 commands ([#11296](https://github.com/Opentrons/opentrons/issues/11296)) ([ccca75f](https://github.com/Opentrons/opentrons/commit/ccca75fe6b8564f078af957ddd88656d28e3e2a1)), closes [#11187](https://github.com/Opentrons/opentrons/issues/11187)
+* **engine:** implement moving labware off deck ([#11521](https://github.com/Opentrons/opentrons/issues/11521)) ([b202843](https://github.com/Opentrons/opentrons/commit/b202843069f8fc7654c1fac6c40fd77a61981ba0))
+* **engine:** implement slot-to-slot labware movement using gripper ([#11590](https://github.com/Opentrons/opentrons/issues/11590)) ([43c6e4f](https://github.com/Opentrons/opentrons/commit/43c6e4ff3f517fef7832fdfea5e587d3f96c04dd))
+* **hardware:** Load pipette model from pipette serial ([#11349](https://github.com/Opentrons/opentrons/issues/11349)) ([5d2f483](https://github.com/Opentrons/opentrons/commit/5d2f4831c4ca8543e2249fa93b03f6a3ff38d95a))
+* **hardware:** ot3: set per-axis max speeds ([#11425](https://github.com/Opentrons/opentrons/issues/11425)) ([0e1a357](https://github.com/Opentrons/opentrons/commit/0e1a357067a444be632eab460ea1752e35150692))
+* **ot3, api:** add gripper test script  ([#11334](https://github.com/Opentrons/opentrons/issues/11334)) ([88f18ef](https://github.com/Opentrons/opentrons/commit/88f18ef175194d7087c9b54c159b5416fe006a7d))
+* **ot3, hardware:** add gripper serial number formatter and provision script ([#11429](https://github.com/Opentrons/opentrons/issues/11429)) ([e481958](https://github.com/Opentrons/opentrons/commit/e48195848da581ad129545b5d1b2bda405c3fdbb))
+* **protocol-engine:** Add `dispenseInPlace` command ([#11332](https://github.com/Opentrons/opentrons/issues/11332)) ([d45a2d4](https://github.com/Opentrons/opentrons/commit/d45a2d460e6ac42157a81fe06840890356d38231))
+* **protocol-engine:** Add provisional `moveLabware` command ([#11407](https://github.com/Opentrons/opentrons/issues/11407)) ([2041697](https://github.com/Opentrons/opentrons/commit/20416972f68ce79bc5601001e5653a64830f0061))
+* **thermocycler-gen2:** update hardware controller ([#11490](https://github.com/Opentrons/opentrons/issues/11490)) ([28a0822](https://github.com/Opentrons/opentrons/commit/28a08223ef3cebdb40f14b21c93d6307ee438e41))
+
+
+
+
+
 # [6.1.0](https://github.com/Opentrons/opentrons/compare/v6.0.1...v6.1.0) (2022-09-27)
 
 

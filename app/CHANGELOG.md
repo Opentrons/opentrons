@@ -3,6 +3,57 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.2.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v6.1.0...v6.2.0-alpha.0) (2022-10-27)
+
+
+### Bug Fixes
+
+* **app:** add reanalyze to overflowMenu on landing page ([#11311](https://github.com/Opentrons/opentrons/issues/11311)) ([e29a7f4](https://github.com/Opentrons/opentrons/commit/e29a7f4f9056f01be8e8d99b2226b7df2e7f52ae))
+* **app:** change isDeckCalibrated's checked condition ([#11353](https://github.com/Opentrons/opentrons/issues/11353)) ([aac525a](https://github.com/Opentrons/opentrons/commit/aac525a3d73f6c8320fb556670734137aecbffd6))
+* **app:** fix connect to a robot via ip unique key issue ([#11541](https://github.com/Opentrons/opentrons/issues/11541)) ([45c89af](https://github.com/Opentrons/opentrons/commit/45c89afa1be017fe33876a9b6182bb6361143ad1))
+* **app:** fix displaying a wrong image when a robot is unavailable ([#11603](https://github.com/Opentrons/opentrons/issues/11603)) ([17ab639](https://github.com/Opentrons/opentrons/commit/17ab639cf716ff68ffe9b68dcd5f962a2f3bafeb))
+* **app:** fix invalid dom nesting issue on labware ([#11294](https://github.com/Opentrons/opentrons/issues/11294)) ([549a63f](https://github.com/Opentrons/opentrons/commit/549a63f1d325dea7879bbf36fa04793a07e2fb8e))
+* **app:** fix labware color const mis-match ([#11318](https://github.com/Opentrons/opentrons/issues/11318)) ([55e29b3](https://github.com/Opentrons/opentrons/commit/55e29b389bebcba57451d634c0453a8ef07ee594))
+* **app:** fix RobotSettings calibration conditions for buttons ([#11229](https://github.com/Opentrons/opentrons/issues/11229)) ([c9f05ef](https://github.com/Opentrons/opentrons/commit/c9f05efc191cc2823ca129ec207adb23e6f93b53)), closes [#11201](https://github.com/Opentrons/opentrons/issues/11201)
+* **app:** hide device error screen while scanning ([#11365](https://github.com/Opentrons/opentrons/issues/11365)) ([03c5a51](https://github.com/Opentrons/opentrons/commit/03c5a51c16aaded80b1ffe0acebc7c31ec4136e6))
+* **app:** prevent white screen in protocols with liquids on nested labware ([#11600](https://github.com/Opentrons/opentrons/issues/11600)) ([c5091bb](https://github.com/Opentrons/opentrons/commit/c5091bb433882daa4ff7364b04f21fbe83e7f464))
+* **app:** stop popping up the update modal after dismissing the modal ([#11328](https://github.com/Opentrons/opentrons/issues/11328)) ([2f7b672](https://github.com/Opentrons/opentrons/commit/2f7b672706f1519cf8908383c25582411eecd776))
+* **app:** update schemaV6Adapter logic for missing liquids key ([#11512](https://github.com/Opentrons/opentrons/issues/11512)) ([27830ab](https://github.com/Opentrons/opentrons/commit/27830abb59e738285a4aa6e230220b05a864716e))
+
+
+### Features
+
+* **app:** Add  virtual keyboard components ([#11464](https://github.com/Opentrons/opentrons/issues/11464)) ([9f20d71](https://github.com/Opentrons/opentrons/commit/9f20d71a73d7dcf69a096329e7c4161d9e7b24d2))
+* **app:** add dsm feature flag and deprecate LabwarePositionCheck components ([#11404](https://github.com/Opentrons/opentrons/issues/11404)) ([343eaa3](https://github.com/Opentrons/opentrons/commit/343eaa3b761fa454b439dfc4545cc4d2f146c3f1))
+* **app:** add dummy OT-3 image ([#11477](https://github.com/Opentrons/opentrons/issues/11477)) ([3244ebc](https://github.com/Opentrons/opentrons/commit/3244ebc1138516d1a1c00c834821c80721f2aa0c))
+* **app:** add list view and map view to module setup ([#11588](https://github.com/Opentrons/opentrons/issues/11588)) ([b0a1e57](https://github.com/Opentrons/opentrons/commit/b0a1e574b7ca698a58a61c497d95dae4da550b55))
+* **app:** add test and stories for ModuleIcon ([#11452](https://github.com/Opentrons/opentrons/issues/11452)) ([5057af0](https://github.com/Opentrons/opentrons/commit/5057af00cae86978278c324ef15c622a7db76893))
+* **app:** add test and stories for NavTab ([#11458](https://github.com/Opentrons/opentrons/issues/11458)) ([3bef486](https://github.com/Opentrons/opentrons/commit/3bef4868ad035923f9c6bc12b1bba53e2a47ba53))
+* **app:** add test and stories for Tooltip ([#11333](https://github.com/Opentrons/opentrons/issues/11333)) ([fdb72e3](https://github.com/Opentrons/opentrons/commit/fdb72e32a78d45410c9edf4b2ababab9e2414777))
+* **app:** add Toast stories to Storybook ([#11375](https://github.com/Opentrons/opentrons/issues/11375)) ([273a25e](https://github.com/Opentrons/opentrons/commit/273a25e40acc9051c584de6a95c804359563f5f0))
+* **app:** create ClearDeckModal and deprecate ClearDeckAlertModal ([#11348](https://github.com/Opentrons/opentrons/issues/11348)) ([ffd951e](https://github.com/Opentrons/opentrons/commit/ffd951e1e0a502a830cb2aad166c7f09b8899415))
+* **app:** create enableChangePipetteWizard feature flag ([#11336](https://github.com/Opentrons/opentrons/issues/11336)) ([fe6b8e1](https://github.com/Opentrons/opentrons/commit/fe6b8e1d2ac1af03006cbf1e5edf103ecd8777fc))
+* **app:** create new ExitModal for Change pipette flow ([#11387](https://github.com/Opentrons/opentrons/issues/11387)) ([5b7eca5](https://github.com/Opentrons/opentrons/commit/5b7eca5906faec2bf069c787925cd07e1672eb3c))
+* **app:** create shared SimpleWizardModal component ([#11377](https://github.com/Opentrons/opentrons/issues/11377)) ([c68209b](https://github.com/Opentrons/opentrons/commit/c68209b372ff897abfdbb65fb013b70cec6ddaac))
+* **app:** create StepMeter and WizardHeader components ([#11307](https://github.com/Opentrons/opentrons/issues/11307)) ([5b857d3](https://github.com/Opentrons/opentrons/commit/5b857d3dd759fb7d07be0bea50c8f4185fde2d09))
+* **app:** deprecate Instructions in pipette flow and create new ([#11356](https://github.com/Opentrons/opentrons/issues/11356)) ([2c24801](https://github.com/Opentrons/opentrons/commit/2c248016b5920b6ec6fcd8dd9d95eb729155d0f3))
+* **app:** deprecate RequestInProgress modal and create new one ([#11366](https://github.com/Opentrons/opentrons/issues/11366)) ([2f07f09](https://github.com/Opentrons/opentrons/commit/2f07f0922dc6c36d7ab3aaee51a3b6547a2b93c8))
+* **app:** feat add copy labware api name feedback ([#11292](https://github.com/Opentrons/opentrons/issues/11292)) ([769509a](https://github.com/Opentrons/opentrons/commit/769509a52f27fae69586de5de32cc34392f4eb15))
+* **app:** organize LabwareSetup to add map vs list view ([#11576](https://github.com/Opentrons/opentrons/issues/11576)) ([d9ca5fd](https://github.com/Opentrons/opentrons/commit/d9ca5fd6e29d84dd268513dedd133cbc40ff62bd))
+* **app:** revamp LevelPipette component wizard style ([#11381](https://github.com/Opentrons/opentrons/issues/11381)) ([c641879](https://github.com/Opentrons/opentrons/commit/c6418790115d04abd77851b5d46dced907b4fad0))
+* **app:** Thermocycler GEN2 app support ([#11492](https://github.com/Opentrons/opentrons/issues/11492)) ([c83a94d](https://github.com/Opentrons/opentrons/commit/c83a94d23ef5c9d8deb062c263f7bb254c950356))
+* **app:** update style for ChangePipette confirm Attach/Detach screens ([#11396](https://github.com/Opentrons/opentrons/issues/11396)) ([9a7cc0e](https://github.com/Opentrons/opentrons/commit/9a7cc0efe39faa008e47708e0dc568fa1123213c))
+* **app:** wire up the use attached pipette button and fix various bugs ([#11440](https://github.com/Opentrons/opentrons/issues/11440)) ([79b65ac](https://github.com/Opentrons/opentrons/commit/79b65accda22f9481663ebd5d385c6e94b1033d0))
+* **app:** wire up WizardHeader and StepMeter in ChangePipette ([#11414](https://github.com/Opentrons/opentrons/issues/11414)) ([3135bff](https://github.com/Opentrons/opentrons/commit/3135bff11200dd9094ecb65ee4373fb99cb62d86))
+* **app, api-client:** wire up liquid setup and protocol details ([#11455](https://github.com/Opentrons/opentrons/issues/11455)) ([0c6ee3d](https://github.com/Opentrons/opentrons/commit/0c6ee3d7ced0afd1a27bb42da4f6760cb93f71a5))
+* **app, protocol-designer:** fix well highlighted state for liquid setup ([#11398](https://github.com/Opentrons/opentrons/issues/11398)) ([422677e](https://github.com/Opentrons/opentrons/commit/422677ecfe8f746a28db9d437713a4e9c553b347))
+* **app, protocol-designer:** remove Thermocycler Gen2 feature flags ([#11631](https://github.com/Opentrons/opentrons/issues/11631)) ([bd0f1df](https://github.com/Opentrons/opentrons/commit/bd0f1dfbdeeee740975d4e2916d695c4371edeec))
+* **app,app-shell:** add config and routing for app on device ([#11191](https://github.com/Opentrons/opentrons/issues/11191)) ([615b8df](https://github.com/Opentrons/opentrons/commit/615b8df3206de31d00b8b13cec5508cdb4c5a0da))
+
+
+
+
+
 # [6.1.0](https://github.com/Opentrons/opentrons/compare/v6.0.1...v6.1.0) (2022-09-27)
 
 

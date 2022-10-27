@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.2.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v6.1.0...v6.2.0-alpha.0) (2022-10-27)
+
+
+### Features
+
+* **app:** Thermocycler GEN2 app support ([#11492](https://github.com/Opentrons/opentrons/issues/11492)) ([c83a94d](https://github.com/Opentrons/opentrons/commit/c83a94d23ef5c9d8deb062c263f7bb254c950356))
+* **app, api-client:** wire up liquid setup and protocol details ([#11455](https://github.com/Opentrons/opentrons/issues/11455)) ([0c6ee3d](https://github.com/Opentrons/opentrons/commit/0c6ee3d7ced0afd1a27bb42da4f6760cb93f71a5))
+
+
+
+
+
 # [6.1.0](https://github.com/Opentrons/opentrons/compare/v6.0.1...v6.1.0) (2022-09-27)
 
 **Note:** Version bump only for package @opentrons/api-client

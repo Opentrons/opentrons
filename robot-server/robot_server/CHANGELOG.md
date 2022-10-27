@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.2.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v6.1.0...v6.2.0-alpha.0) (2022-10-27)
+
+
+### Features
+
+* **api, robot-server:** add thermocycler lid temperature status to get modules endpoint ([#11500](https://github.com/Opentrons/opentrons/issues/11500)) ([74849f7](https://github.com/Opentrons/opentrons/commit/74849f7b1d9804ed9ea8039294f0dc085c46d680))
+* **api, robot-server:** Allow loadLiquid commands and liquids support in protocol engine and analysis ([#11310](https://github.com/Opentrons/opentrons/issues/11310)) ([1c6d0b3](https://github.com/Opentrons/opentrons/commit/1c6d0b3cbb2646d6ad791800dec2e5d81e194f13))
+* **protocol-engine:** Add provisional `moveLabware` command ([#11407](https://github.com/Opentrons/opentrons/issues/11407)) ([2041697](https://github.com/Opentrons/opentrons/commit/20416972f68ce79bc5601001e5653a64830f0061))
+
+
+
+
+
 # [6.1.0](https://github.com/Opentrons/opentrons/compare/v6.0.1...v6.1.0) (2022-09-27)
 
 

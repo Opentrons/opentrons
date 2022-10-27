@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.2.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v6.1.0...v6.2.0-alpha.0) (2022-10-27)
+
+
+### Bug Fixes
+
+* **protocol-designer:** add thermocycler profile volume error boundary ([#11560](https://github.com/Opentrons/opentrons/issues/11560)) ([3db5828](https://github.com/Opentrons/opentrons/commit/3db5828f7ae431eb13194cbb7f1e34aa91549c5d))
+
+
+### Features
+
+* **app, protocol-designer:** remove Thermocycler Gen2 feature flags ([#11631](https://github.com/Opentrons/opentrons/issues/11631)) ([bd0f1df](https://github.com/Opentrons/opentrons/commit/bd0f1dfbdeeee740975d4e2916d695c4371edeec))
+* **protocol-designer:** add OT-3 pipettes, tip racks, and robot model ([#11525](https://github.com/Opentrons/opentrons/issues/11525)) ([07756fd](https://github.com/Opentrons/opentrons/commit/07756fd30e5c1a927158a8efd3f1070944c5cd4e))
+* **protocol-designer:** add OT-3 support feature flag ([#11507](https://github.com/Opentrons/opentrons/issues/11507)) ([ad0484d](https://github.com/Opentrons/opentrons/commit/ad0484dacea881cd0cdfa3d095e11a450ab2cf9a))
+* **protocol-designer:** bump up PD version  in settings to 6.0.1 ([#11589](https://github.com/Opentrons/opentrons/issues/11589)) ([e3aeb49](https://github.com/Opentrons/opentrons/commit/e3aeb49f76794d10761989093d40a9ffafe951f7))
+* **protocol-designer:** thermocycler gen2 support ([#11494](https://github.com/Opentrons/opentrons/issues/11494)) ([71f28c0](https://github.com/Opentrons/opentrons/commit/71f28c0411bc8ac6b7335797356348db2a81a7b2))
+
+
+
+
+
 # [6.1.0](https://github.com/Opentrons/opentrons/compare/v6.0.1...v6.1.0) (2022-09-27)
 
 

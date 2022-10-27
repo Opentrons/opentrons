@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.2.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v6.1.0...v6.2.0-alpha.0) (2022-10-27)
+
+
+### Bug Fixes
+
+* **step-generation, shared-data:** do not change liquid state of airGap command ([#11564](https://github.com/Opentrons/opentrons/issues/11564)) ([464f4e8](https://github.com/Opentrons/opentrons/commit/464f4e8806dffa995570d33c0b3e0a8589d19edc))
+
+
+
+
+
 # [6.1.0](https://github.com/Opentrons/opentrons/compare/v6.0.1...v6.1.0) (2022-09-27)
 
 

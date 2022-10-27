@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.2.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v6.1.0...v6.2.0-alpha.0) (2022-10-27)
+
+
+### Features
+
+* **app:** Thermocycler GEN2 app support ([#11492](https://github.com/Opentrons/opentrons/issues/11492)) ([c83a94d](https://github.com/Opentrons/opentrons/commit/c83a94d23ef5c9d8deb062c263f7bb254c950356))
+* **app, protocol-designer:** fix well highlighted state for liquid setup ([#11398](https://github.com/Opentrons/opentrons/issues/11398)) ([422677e](https://github.com/Opentrons/opentrons/commit/422677ecfe8f746a28db9d437713a4e9c553b347))
+* **protocol-designer:** add OT-3 pipettes, tip racks, and robot model ([#11525](https://github.com/Opentrons/opentrons/issues/11525)) ([07756fd](https://github.com/Opentrons/opentrons/commit/07756fd30e5c1a927158a8efd3f1070944c5cd4e))
+* **shared-data, components:** add OT-3 deckmap component ([#11543](https://github.com/Opentrons/opentrons/issues/11543)) ([95a8a37](https://github.com/Opentrons/opentrons/commit/95a8a37922cfd5f46ad26c983bcc1659fa13b6e1))
+
+
+
+
+
 # [6.1.0](https://github.com/Opentrons/opentrons/compare/v6.0.1...v6.1.0) (2022-09-27)
 
 

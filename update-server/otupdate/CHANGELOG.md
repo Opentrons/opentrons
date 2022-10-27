@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.2.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v6.1.0...v6.2.0-alpha.0) (2022-10-27)
+
+
+### Features
+
+* **update-server:** advertise robotModel ([#11295](https://github.com/Opentrons/opentrons/issues/11295)) ([248b476](https://github.com/Opentrons/opentrons/commit/248b476aa3e69f6a453902d236003cb318198e0a))
+
+
+
+
+
 # [6.1.0](https://github.com/Opentrons/opentrons/compare/v6.0.1...v6.1.0) (2022-09-27)
 
 
