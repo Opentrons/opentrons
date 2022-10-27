@@ -390,7 +390,15 @@ class LabwareView(HasState[LabwareState]):
 
         The returned value is measured in millimeters above the labware base plane.
         """
-        raise NotImplementedError()
+        parameters = self.get_definition(labware_id).parameters
+        default_engage_height = parameters.magneticModuleEngageHeight
+        if (
+            parameters.isMagneticModuleCompatible is False
+            or default_engage_height is None
+        ):
+            return None
+
+        return default_engage_height
 
     def get_labware_offset_vector(self, labware_id: str) -> LabwareOffsetVector:
         """Get the labware's calibration offset."""
