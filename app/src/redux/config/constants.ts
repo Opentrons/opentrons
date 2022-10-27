@@ -9,7 +9,6 @@ export const DEV_INTERNAL_FLAGS: DevInternalFlag[] = [
   'enableLiquidSetup',
   'enableManualDeckStateModification',
   'enableCalibrationWizards',
-  'enableThermocyclerGen2',
   'enableExtendedHardware',
 ]
 

@@ -29,7 +29,6 @@ import {
 } from '../../../../step-forms/utils'
 import * as moduleData from '../../../../modules/moduleData'
 import { MODELS_FOR_MODULE_TYPE } from '../../../../constants'
-import { getEnabledThermocyclerGen2 } from '../../../../feature-flags/selectors'
 import { selectors as featureSelectors } from '../../../../feature-flags'
 import { getLabwareIsCompatible } from '../../../../utils/labwareModuleCompatibility'
 import { isModuleWithCollisionIssue } from '../../../modules/utils'
@@ -52,7 +51,6 @@ jest.mock('../../../../step-forms/selectors')
 jest.mock('../../../modules/utils')
 jest.mock('../../../../step-forms/utils')
 jest.mock('../form-state')
-jest.mock('../../../../feature-flags/selectors')
 
 const MODEL_FIELD = 'selectedModel'
 const SLOT_FIELD = 'selectedSlot'
@@ -75,13 +73,10 @@ const getLabwareOnSlotMock: jest.MockedFunction<any> = getLabwareOnSlot
 
 const getIsLabwareAboveHeightMock: jest.MockedFunction<any> = getIsLabwareAboveHeight
 
-const getEnabledThermocyclerGen2Mock: jest.MockedFunction<any> = getEnabledThermocyclerGen2
-
 describe('Edit Modules Modal', () => {
   let mockStore: any
   let props: EditModulesModalProps
   beforeEach(() => {
-    getEnabledThermocyclerGen2Mock.mockReturnValue(false)
     getInitialDeckSetupMock.mockReturnValue(getMockDeckSetup())
     getSlotsBlockedBySpanningMock.mockReturnValue([])
     getLabwareOnSlotMock.mockReturnValue({})

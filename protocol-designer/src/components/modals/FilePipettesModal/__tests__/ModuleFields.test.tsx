@@ -10,14 +10,9 @@ import {
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 import { CheckboxField } from '@opentrons/components'
-import { getEnabledThermocyclerGen2 } from '../../../../feature-flags/selectors'
 import { DEFAULT_MODEL_FOR_MODULE_TYPE } from '../../../../constants'
 import { ModuleDiagram } from '../../../modules'
 import { ModuleFields, ModuleFieldsProps } from '../ModuleFields'
-
-jest.mock('../../../../feature-flags/selectors')
-
-const getEnabledThermocyclerGen2Mock: jest.MockedFunction<any> = getEnabledThermocyclerGen2
 
 describe('ModuleFields', () => {
   let magnetModuleOnDeck,
@@ -27,7 +22,6 @@ describe('ModuleFields', () => {
   let props: ModuleFieldsProps
   let store: any
   beforeEach(() => {
-    getEnabledThermocyclerGen2Mock.mockReturnValue(false)
     store = {
       dispatch: jest.fn(),
       subscribe: jest.fn(),
@@ -180,8 +174,7 @@ describe('ModuleFields', () => {
     })
   })
 
-  it('displays Thermocycler gen2 module img when model has been selected and FF is turned on', () => {
-    getEnabledThermocyclerGen2Mock.mockReturnValue(true)
+  it('displays Thermocycler gen2 module img when model has been selected', () => {
     props.values[THERMOCYCLER_MODULE_TYPE].model = THERMOCYCLER_MODULE_V2
 
     const wrapper = render(props)

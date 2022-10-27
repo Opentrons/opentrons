@@ -31,7 +31,6 @@ import {
   getRobotModelByName,
 } from '../../redux/discovery'
 import { ModuleIcon } from '../../molecules/ModuleIcon'
-import { useFeatureFlag } from '../../redux/config'
 import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../organisms/RunTimeControl/hooks'
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
@@ -161,7 +160,6 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
   const { robotName } = props
   const { t } = useTranslation('devices_landing')
   const attachedModules = useAttachedModules()
-  const enableThermocyclerGen2 = useFeatureFlag('enableThermocyclerGen2')
 
   return attachedModules.length > 0 ? (
     <Box
@@ -178,20 +176,15 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
         {t('modules')}
       </StyledText>
       <Flex>
-        {attachedModules.map((module, i) =>
-          //  TODO(jr, 9/28/22): remove this logic when we remove enableThermocyclerGen2 FF
-          enableThermocyclerGen2 ||
-          (!enableThermocyclerGen2 &&
-            module.moduleModel !== 'thermocyclerModuleV2') ? (
-            <ModuleIcon
-              key={`${module.moduleModel}_${i}_${robotName}`}
-              tooltipText={t('this_robot_has_connected_and_power_on_module', {
-                moduleName: getModuleDisplayName(module.moduleModel),
-              })}
-              module={module}
-            />
-          ) : null
-        )}
+        {attachedModules.map((module, i) => (
+          <ModuleIcon
+            key={`${module.moduleModel}_${i}_${robotName}`}
+            tooltipText={t('this_robot_has_connected_and_power_on_module', {
+              moduleName: getModuleDisplayName(module.moduleModel),
+            })}
+            module={module}
+          />
+        ))}
       </Flex>
     </Box>
   ) : (
