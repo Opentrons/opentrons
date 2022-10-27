@@ -20,16 +20,16 @@ def mock_engine_client(decoy: Decoy) -> EngineClient:
 
 
 @pytest.fixture
-def mock_sync_module_hardware(decoy: Decoy) -> MagDeck:
+def mock_sync_module_hardware(decoy: Decoy) -> MagDeckHardware:
     """Get a mock synchronous module hardware."""
-    return decoy.mock(name="MagDeck")  # type: ignore[no-any-return]
+    return decoy.mock(name="MagDeckHardware")  # type: ignore[no-any-return]
 
 
 @pytest.fixture
 def subject(
     decoy: Decoy,
     mock_engine_client: EngineClient,
-    mock_sync_module_hardware: MagDeck,
+    mock_sync_module_hardware: MagDeckHardware,
 ) -> MagneticModuleCore:
     """Get a mock of MagneticModuleCore."""
     return MagneticModuleCore(
@@ -40,8 +40,21 @@ def subject(
     )
 
 
-def test_engage(decoy: Decoy, subject: MagneticModuleCore, mock_engine_client: EngineClient) -> None:
+def test_engage(
+    decoy: Decoy, subject: MagneticModuleCore, mock_engine_client: EngineClient
+) -> None:
     """Should verify a call to sync client engage method."""
     subject.engage(height_from_base=7.0)
 
-    decoy.verify(mock_engine_client.magnetic_module_engage(module_id="1234", engage_height=7.0))
+    decoy.verify(
+        mock_engine_client.magnetic_module_engage(module_id="1234", engage_height=7.0)
+    )
+
+
+def test_disengage(
+    decoy: Decoy, subject: MagneticModuleCore, mock_engine_client: EngineClient
+) -> None:
+    """Should verify a call to sync client disengage method."""
+    subject.disengage()
+
+    decoy.verify(mock_engine_client.magnetic_module_disengage(module_id="1234"))

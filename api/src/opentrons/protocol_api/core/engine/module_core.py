@@ -148,8 +148,10 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
             height_from_base: Distance from labware base to raise the magnets.
             height_from_home: Distance from motor home position to raise the magnets.
         """
-        height = height_from_home if height_from_home else height_from_base
-        self._engine_client.magnetic_module_engage(module_id=self.module_id, engage_height=height)
+        height = height_from_home if height_from_home is not None else height_from_base
+        self._engine_client.magnetic_module_engage(
+            module_id=self.module_id, engage_height=height  # type: ignore[arg-type]
+        )
 
     def engage_to_labware(
         self, offset: float = 0, preserve_half_mm: bool = False
@@ -169,7 +171,7 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
 
     def disengage(self) -> None:
         """Lower the magnets back into the module."""
-        raise NotImplementedError("disengage not implemented")
+        self._engine_client.magnetic_module_disengage(module_id=self.module_id)
 
     def get_status(self) -> MagneticStatus:
         """Get the module's current magnet status."""
