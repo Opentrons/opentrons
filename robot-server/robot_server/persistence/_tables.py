@@ -5,7 +5,7 @@ from opentrons.protocol_engine import StateSummary
 from robot_server.analysis_models import CompletedAnalysis
 
 from ._command_list import CommandList
-from ._pydantic_json import PydanticJSON
+from ._pydantic_col import PydanticCol
 from ._utc_datetime import UTCDateTime
 
 _metadata = sqlalchemy.MetaData()
@@ -60,7 +60,7 @@ analysis_table = sqlalchemy.Table(
     ),
     sqlalchemy.Column(
         "completed_analysis",
-        PydanticJSON(model=CompletedAnalysis),
+        PydanticCol(model=CompletedAnalysis),
         nullable=False,
     ),
 )
@@ -88,13 +88,13 @@ run_table = sqlalchemy.Table(
     # column added in schema v1
     sqlalchemy.Column(
         "state_summary",
-        PydanticJSON(model=StateSummary),
+        PydanticCol(model=StateSummary),
         nullable=True,
     ),
     # column added in schema v1
     sqlalchemy.Column(
         "commands",
-        PydanticJSON(model=CommandList),
+        PydanticCol(model=CommandList),
         nullable=True,
     ),
     # column added in schema v1

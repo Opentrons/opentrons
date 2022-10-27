@@ -43,7 +43,7 @@ from ._tables import (
 )
 
 from . import _legacy_pickle
-from . import _pydantic_json
+from . import _pydantic_col
 
 _LATEST_SCHEMA_VERSION: Final = 2
 
@@ -176,7 +176,9 @@ def _migrate_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
 
 def _migrate_analysis_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
     v1_completed_analysis_column = sqlalchemy.column(
-        "completed_analysis", sqlalchemy.LargeBinary
+        "completed_analysis",
+        sqlalchemy.LargeBinary
+        # Originally declared nullable=False in schema v1.
     )
 
     # Extract using the old column definitions.
@@ -191,7 +193,7 @@ def _migrate_analysis_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
         completed_analysis_dict = _legacy_pickle.loads(row.completed_analysis)
         completed_analysis = CompletedAnalysis.parse_obj(completed_analysis_dict)
 
-        new_serialized = _pydantic_json.pydantic_to_sql(data=completed_analysis)
+        new_serialized = _pydantic_col.pydantic_to_sql(value=completed_analysis)
 
         # Reinsert using the new column definitions.
         update_statement = (
@@ -206,12 +208,12 @@ def _migrate_run_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
     v1_state_summary_column = sqlalchemy.column(
         "state_summary",
         sqlalchemy.PickleType(pickler=_legacy_pickle),
-        # Originally declared nullable=True.
+        # Originally declared nullable=True in schema v1.
     )
     v1_commands_column = sqlalchemy.column(
         "commands",
         sqlalchemy.PickleType(pickler=_legacy_pickle),
-        # Originally declared nullable=True.
+        # Originally declared nullable=True in schema v1.
     )
 
     # Extract using the old column definitions.
@@ -228,10 +230,10 @@ def _migrate_run_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
         command_dicts = row.commands
         commands = CommandList.parse_obj(command_dicts)
 
-        new_serialized_state_summary = _pydantic_json.pydantic_to_sql(
-            data=state_summary
+        new_serialized_state_summary = _pydantic_col.pydantic_to_sql(
+            value=state_summary
         )
-        new_serialized_commands = _pydantic_json.pydantic_to_sql(data=commands)
+        new_serialized_commands = _pydantic_col.pydantic_to_sql(value=commands)
 
         # Reinsert using the new column definitions.
         update_statement = (

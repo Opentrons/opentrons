@@ -18,9 +18,9 @@ class CommandList(BaseModel):
         JSON into a `List[Command]`, it's unclear how to go the other way, because
         `List[Command]` doesn't have a `.json()` method like normal Pydantic models.
 
-      * One of our database columns is a list of commands stored via `PydanticJSON`.
-        Using this class for that column instead of `List[Command]` simplifies
-        the implementation of `PydanticJSON` and lets it provide better error-checking.
+      * One of our database columns is a list of commands stored via `PydanticCol`.
+        Using a Pydantic model for that column instead of `List[Command]` simplifies
+        the implementation of `PydanticCol` and lets it provide better error-checking.
     """
 
     __root__: List[Command]
