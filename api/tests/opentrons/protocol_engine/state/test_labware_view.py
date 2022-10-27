@@ -628,3 +628,37 @@ def test_get_display_name() -> None:
 
     assert subject.get_display_name("plate_with_display_name") == "Fancy Plate Name"
     assert subject.get_display_name("reservoir_without_display_name") is None
+
+
+def test_get_fixed_trash_id() -> None:
+    """It should return the ID of the labware loaded into the fixed trash slot."""
+    subject = get_labware_view(
+        labware_by_id={
+            "abc123": LoadedLabware(
+                id="abc123",
+                loadName="trash-load-name",
+                location=DeckSlotLocation(slotName=DeckSlotName.FIXED_TRASH),
+                definitionUri="trash-definition-uri",
+                offsetId=None,
+                displayName=None,
+            )
+        },
+    )
+
+    assert subject.get_fixed_trash_id() == "abc123"
+
+    subject = get_labware_view(
+        labware_by_id={
+            "abc123": LoadedLabware(
+                id="abc123",
+                loadName="trash-load-name",
+                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+                definitionUri="trash-definition-uri",
+                offsetId=None,
+                displayName=None,
+            )
+        },
+    )
+
+    with pytest.raises(errors.LabwareNotLoadedError):
+        subject.get_fixed_trash_id()

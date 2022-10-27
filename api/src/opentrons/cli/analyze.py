@@ -74,6 +74,8 @@ async def _analyze(
     except ProtocolFilesInvalidError as error:
         raise click.ClickException(str(error))
 
+    # TODO(mm, 2022-10-21): If protocol_source says it's for an OT-3, configure this
+    # runner to use an OT-3 simulating hardware controller.
     runner = await create_simulating_runner()
     analysis = await runner.run(protocol_source)
 
@@ -90,6 +92,7 @@ async def _analyze(
                 else PythonConfig(apiVersion=protocol_source.config.api_version)
             ),
             metadata=protocol_source.metadata,
+            robotType=protocol_source.robot_type,
             commands=analysis.commands,
             errors=analysis.state_summary.errors,
             labware=analysis.state_summary.labware,
@@ -137,6 +140,7 @@ class AnalyzeResults(BaseModel):
     files: List[ProtocolFile]
     config: Union[JsonConfig, PythonConfig]
     metadata: Dict[str, Any]
+    robotType: Literal["OT-2 Standard", "OT-3 Standard"]
     commands: List[Command]
     labware: List[LoadedLabware]
     pipettes: List[LoadedPipette]

@@ -9,14 +9,16 @@ import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fi
 import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { useCurrentRun } from '../../../ProtocolUpload/hooks'
-import { useLabwareOffsetForLabware } from '../../../LabwarePositionCheck/hooks/useLabwareOffsetForLabware'
+import { useLabwareOffsetForLabware } from '../../../LabwarePositionCheck/deprecatedHooks/useLabwareOffsetForLabware'
 import { useProtocolDetailsForRun } from '../../hooks'
 import { getLabwareLocation } from '../utils/getLabwareLocation'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { getLabwareDefinitionUri } from '../utils/getLabwareDefinitionUri'
 
 jest.mock('../../../ProtocolUpload/hooks')
-jest.mock('../../../LabwarePositionCheck/hooks/useLabwareOffsetForLabware')
+jest.mock(
+  '../../../LabwarePositionCheck/deprecatedHooks/useLabwareOffsetForLabware'
+)
 jest.mock('../utils/getLabwareLocation')
 jest.mock('../../hooks')
 jest.mock('../utils/getLabwareDefinitionUri')
