@@ -28,6 +28,7 @@ from ..module import (
     AbstractHeaterShakerCore,
 )
 from .labware import LabwareCore
+from .exceptions import InvalidMagnetEngageHeightError
 
 
 class ModuleCore(AbstractModuleCore[LabwareCore]):
@@ -148,9 +149,32 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
             height_from_base: Distance from labware base to raise the magnets.
             height_from_home: Distance from motor home position to raise the magnets.
         """
-        height = height_from_home if height_from_home is not None else height_from_base
+        if height_from_home is not None and height_from_base is not None:
+            raise InvalidMagnetEngageHeightError(
+                "You may only specify one of"
+                " `height`, `height_from_base`, and `offset`."
+            )
+
+        model = self._engine_client.state.modules.get_model(module_id=self.module_id)
+
+        if height_from_home is not None:
+            calculated_height = (
+                self._engine_client.state.modules.calculate_magnet_height(
+                    module_model=model,
+                    height_from_home=height_from_home,
+                )
+            )
+
+        elif height_from_base is not None:
+            calculated_height = (
+                self._engine_client.state.modules.calculate_magnet_height(
+                    module_model=model,
+                    height_from_base=height_from_base,
+                )
+            )
+
         self._engine_client.magnetic_module_engage(
-            module_id=self.module_id, engage_height=height  # type: ignore[arg-type]
+            module_id=self.module_id, engage_height=calculated_height
         )
 
     def engage_to_labware(
