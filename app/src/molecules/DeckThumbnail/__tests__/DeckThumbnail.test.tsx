@@ -83,14 +83,14 @@ describe('DeckThumbnail', () => {
       queryByText('mock LabwareRender nest_96_wellplate_100ul_pcr_full_skirt')
     ).not.toBeFalsy()
   })
-  it('renders an OT-2 deckmap when the protocol is an OT-2 protocol', () => {
+  it('renders an OT-2 deck view when the protocol is an OT-2 protocol', () => {
     when(mockGetRobotNameFromLoadedLabware)
       .calledWith(labware)
       .mockReturnValue('OT-2 Standard')
     render({ commands, labware })
     expect(mockGetDeckDefFromRobotName).toHaveBeenCalledWith('OT-2 Standard')
   })
-  it('renders an OT-3 deckmap when the protocol is an OT-3 protocol', () => {
+  it('renders an OT-3 deck view when the protocol is an OT-3 protocol', () => {
     when(mockGetRobotNameFromLoadedLabware)
       .calledWith(labware)
       .mockReturnValue('OT-3 Standard')
