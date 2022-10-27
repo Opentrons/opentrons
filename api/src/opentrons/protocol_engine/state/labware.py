@@ -29,6 +29,7 @@ from ..types import (
     LabwareOffsetLocation,
     LabwareLocation,
     LoadedLabware,
+    ModuleLocation
 )
 from ..actions import (
     Action,
@@ -192,7 +193,9 @@ class LabwareView(HasState[LabwareState]):
 
     def get_id_by_module(self, module_id: str) -> Optional[str]:
         """Return the ID of the labware loaded on the given module."""
-        raise NotImplementedError()
+        for (key, value) in self.state.labware_by_id.items():
+            if isinstance(value.location, ModuleLocation) and value.location.moduleId == module_id:
+                return key
 
     def get_definition(self, labware_id: str) -> LabwareDefinition:
         """Get labware definition by the labware's unique identifier."""
