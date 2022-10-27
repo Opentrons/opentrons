@@ -145,6 +145,10 @@ class PipetteMovementRestrictedByHeaterShakerError(ProtocolEngineError):
     """An error raised when trying to move to labware that's restricted by a module."""
 
 
+class HeaterShakerLabwareLatchNotOpenError(ProtocolEngineError):
+    """An error raised when heater-shaker latch is not open when it is expected to be so."""
+
+
 class EngageHeightOutOfRangeError(ProtocolEngineError):
     """An error raised when a Magnetic Module engage height is out of bounds."""
 

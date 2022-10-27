@@ -9,11 +9,14 @@ from opentrons.protocol_engine.state import StateStore
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 
 from .thermocycler_movement_flagger import ThermocyclerMovementFlagger
+from .heater_shaker_movement_flagger import HeaterShakerMovementFlagger
 
 from ..errors import (
     GripperNotAttachedError,
     LabwareMovementNotAllowedError,
     ThermocyclerNotOpenError,
+    HeaterShakerLabwareLatchNotOpenError,
+    WrongModuleTypeError,
 )
 
 from ..types import (
@@ -44,6 +47,7 @@ class LabwareMovementHandler:
         state_store: StateStore,
         model_utils: Optional[ModelUtils] = None,
         thermocycler_movement_flagger: Optional[ThermocyclerMovementFlagger] = None,
+        heater_shaker_movement_flagger: Optional[HeaterShakerMovementFlagger] = None,
     ) -> None:
         """Initialize a LabwareMovementHandler instance."""
         self._hardware_api = hardware_api
@@ -52,6 +56,12 @@ class LabwareMovementHandler:
         self._tc_movement_flagger = (
             thermocycler_movement_flagger
             or ThermocyclerMovementFlagger(
+                state_store=self._state_store, hardware_api=self._hardware_api
+            )
+        )
+        self._hs_movement_flagger = (
+            heater_shaker_movement_flagger
+            or HeaterShakerMovementFlagger(
                 state_store=self._state_store, hardware_api=self._hardware_api
             )
         )
@@ -139,9 +149,12 @@ class LabwareMovementHandler:
             )
 
         # Keeping grip height as half of overall height of labware
+        # TODO: measure grip height from top of labware
         grip_height = (
             self._state_store.labware.get_dimensions(labware_id=labware_id).z / 2
         )
+
+        # TODO: get slot center for labware on modules too
         slot_loc = (
             self._state_store.labware.get_slot_center_position(location.slotName)
             + GRIPPER_OFFSET
@@ -191,30 +204,15 @@ class LabwareMovementHandler:
                 await self._tc_movement_flagger.raise_if_labware_in_non_open_thermocycler(
                     labware_parent=parent
                 )
+                await self._hs_movement_flagger.raise_if_labware_latched_on_heater_shaker(
+                    labware_parent=parent
+                )
             except ThermocyclerNotOpenError:
                 raise LabwareMovementNotAllowedError(
                     "Cannot move labware from/to a thermocycler with closed lid."
                 )
-            # if not isinstance(parent, ModuleLocation):
-            #     continue
-            # module_id = parent.moduleId
-            # modules_view = self._state_store.modules
-            # module = modules_view.get(module_id)
-            # if ModuleModel.is_thermocycler_module_model(module.model):
-            #     tc_substate = modules_view.get_thermocycler_module_substate(module_id)
-            #     try:
-            #         await self._tc_movement_flagger.raise_if_thermocycler_is_not_open(tc_substate)
-            #     except ThermocyclerNotOpenError:
-            #         raise LabwareMovementNotAllowedError(
-            #             "Cannot move labware from/to a thermocycler with closed lid.")
-            # elif ModuleModel.is_heater_shaker_module_model(module.model):
-            #     hs_substate = modules_view.get_heater_shaker_module_substate(module_id)
-            #     if hs_substate.is_labware_latch_closed:
-            #         raise LabwareMovementNotAllowedError(
-            #             "Cannot move labware from/to a heater-shaker "
-            #             "with labware latch closed.")
-            #     # TODO: query hardware to verify that latch is indeed open
-            # elif ModuleModel.is_temperature_module_model(module.model):
-            #     raise LabwareMovementNotAllowedError(
-            #         "Cannot move labware from/to temperature module yet.")
-            # Do nothing for magnetic module/ mag plate
+            except HeaterShakerLabwareLatchNotOpenError:
+                raise LabwareMovementNotAllowedError(
+                    "Cannot move labware from/to a heater-shaker"
+                    " with its labware latch open."
+                )

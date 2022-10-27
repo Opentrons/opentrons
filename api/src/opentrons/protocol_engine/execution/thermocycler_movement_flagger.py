@@ -14,7 +14,7 @@ from ..errors import ThermocyclerNotOpenError, WrongModuleTypeError
 class ThermocyclerMovementFlagger:
     """A helper for flagging unsafe movements to a Thermocycler Module.
 
-    This is only intended for use by MovementHandler.
+    This is only intended for use by movement handlers.
     It's a separate class for independent testability.
     """
 
