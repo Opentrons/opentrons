@@ -24,5 +24,6 @@ async def main() -> None:
     print("CURRENT = ", await api.gantry_position(mount))
     await api.move_to(mount, homed_position)
 
+# Main
 if __name__ == '__main__':
     asyncio.run(main())
