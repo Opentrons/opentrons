@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 // import { useSelector } from 'react-redux'
 // import { getAttachedPipettes } from '../../redux/pipettes'
 import { ModalShell } from '../../molecules/Modal'
@@ -25,6 +26,7 @@ export const PipetteWizardFlows = (
   props: PipetteWizardFlowsProps
 ): JSX.Element | null => {
   const { flowType, mount, closeFlow } = props
+  const { t } = useTranslation('pipette_wizard_flows')
   //   const attachedPipette = useSelector(
   //     (state: State) => getAttachedPipettes(state, robotName)[mount]
   //   )
@@ -41,39 +43,48 @@ export const PipetteWizardFlows = (
         : currentStepIndex
     )
   }
-
-  let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
-  if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
-    modalContent = (
-      <BeforeBeginning
-        mount={mount}
-        flowType={FLOWS.CALIBRATE}
-        nextStep={proceed}
-      />
-    )
-  } else if (currentStep.section === SECTIONS.ATTACH_STEM) {
-    modalContent = (
-      <AttachStem mount={mount} flowType={FLOWS.CALIBRATE} nextStep={proceed} />
-    )
-  } else if (currentStep.section === SECTIONS.DETACH_STEM) {
-    modalContent = (
-      <DetachStem mount={mount} flowType={FLOWS.CALIBRATE} nextStep={proceed} />
-    )
-  } else if (currentStep.section === SECTIONS.RESULTS) {
-    modalContent = (
-      <Results mount={mount} flowType={FLOWS.CALIBRATE} nextStep={closeFlow} />
+  const goBack = (): void => {
+    setCurrentStepIndex(
+      currentStepIndex !== pipetteWizardSteps.length - 1
+        ? currentStepIndex - 1
+        : currentStepIndex
     )
   }
 
+  const calibrateBaseProps = {
+    mount,
+    flowType: FLOWS.CALIBRATE,
+    goBack,
+  }
+
+  let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
+  if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
+    modalContent = <BeforeBeginning {...calibrateBaseProps} proceed={proceed} />
+  } else if (currentStep.section === SECTIONS.ATTACH_STEM) {
+    modalContent = <AttachStem {...calibrateBaseProps} proceed={proceed} />
+  } else if (currentStep.section === SECTIONS.DETACH_STEM) {
+    modalContent = <DetachStem {...calibrateBaseProps} proceed={proceed} />
+  } else if (currentStep.section === SECTIONS.RESULTS) {
+    modalContent = <Results {...calibrateBaseProps} proceed={closeFlow} />
+  }
+
+  let wizardTitle: string = 'unknown page'
+  switch (flowType) {
+    case FLOWS.CALIBRATE: {
+      wizardTitle = t('calibrate_pipette')
+      break
+    }
+  }
   return (
     <Portal level="top">
       <ModalShell
         width="47rem"
         header={
           <WizardHeader
-            title="Calibrate Pipette Title"
+            title={wizardTitle}
             currentStep={currentStepIndex}
             totalSteps={totalStepCount}
+            onExit={closeFlow}
           />
         }
       >
