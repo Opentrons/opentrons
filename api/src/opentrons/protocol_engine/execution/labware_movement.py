@@ -1,7 +1,7 @@
 """Labware movement command handling."""
 from typing import Optional, Union, List
 
-from opentrons.types import Point
+from opentrons.types import Point, DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import OT3Mount, OT3Axis
 from opentrons.protocol_engine.resources import ModelUtils
@@ -16,7 +16,6 @@ from ..errors import (
     LabwareMovementNotAllowedError,
     ThermocyclerNotOpenError,
     HeaterShakerLabwareLatchNotOpenError,
-    WrongModuleTypeError,
 )
 
 from ..types import (
@@ -26,9 +25,6 @@ from ..types import (
     LabwareOffsetVector,
 )
 
-
-# TODO: remove once hardware control is able to calibrate & handle the offsets
-GRIPPER_OFFSET = Point(0.0, 1.0, 0.0)
 GRIP_FORCE = 20  # Newtons
 
 
@@ -142,37 +138,39 @@ class LabwareMovementHandler:
         labware_offset_vector: Optional[LabwareOffsetVector],
     ) -> List[Point]:
         """Get waypoints for gripper to move to a specified location."""
-        # TODO: remove this after support for module locations is added
-        if not isinstance(location, DeckSlotLocation):
-            raise NotImplementedError(
-                "Moving labware to & from modules with a gripper is not implemented yet."
+        module_offset = LabwareOffsetVector(x=0, y=0, z=0)
+        location_slot: DeckSlotName
+        if isinstance(location, ModuleLocation):
+            module_offset = self._state_store.modules.get_module_offset(
+                location.moduleId
             )
+            location_slot = self._state_store.modules.get_location(
+                location.moduleId
+            ).slotName
+        else:
+            location_slot = location.slotName
+        labware_center = self._state_store.labware.get_labware_center_position(
+            labware_id
+        )
 
         # Keeping grip height as half of overall height of labware
-        # TODO: measure grip height from top of labware
-        grip_height = (
-            self._state_store.labware.get_dimensions(labware_id=labware_id).z / 2
-        )
+        grip_height = labware_center.z
 
-        # TODO: get slot center for labware on modules too
-        slot_loc = (
-            self._state_store.labware.get_slot_center_position(location.slotName)
-            + GRIPPER_OFFSET
-        )
+        slot_center = self._state_store.labware.get_slot_center_position(location_slot)
         labware_offset_vector = labware_offset_vector or LabwareOffsetVector(
             x=0, y=0, z=0
         )
         waypoints: List[Point] = [
             Point(current_position.x, current_position.y, gripper_home_z),
             Point(
-                slot_loc.x + labware_offset_vector.x,
-                slot_loc.y + labware_offset_vector.y,
+                slot_center.x + module_offset.x + labware_offset_vector.x,
+                slot_center.y + module_offset.y + labware_offset_vector.y,
                 gripper_home_z,
             ),
             Point(
-                slot_loc.x + labware_offset_vector.x,
-                slot_loc.y + labware_offset_vector.y,
-                grip_height + labware_offset_vector.z,
+                slot_center.x + module_offset.x + labware_offset_vector.x,
+                slot_center.y + module_offset.y + labware_offset_vector.y,
+                grip_height + module_offset.z + labware_offset_vector.z,
             ),
         ]
         return waypoints
