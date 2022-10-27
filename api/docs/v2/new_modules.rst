@@ -63,7 +63,10 @@ Some modules were added to the Protocol API later than others, and some modules 
    | GEN2               |                               |                     |
    +--------------------+-------------------------------+---------------------+
    | Thermocycler       | ``thermocycler module``       | 2.0                 |
-   | Module             | or ``thermocycler``           |                     |
+   | Module GEN1        | or ``thermocycler``           |                     |
+   +--------------------+-------------------------------+---------------------+
+   | Thermocycler       | ``thermocycler module gen2``  | 2.14                |
+   | Module GEN2        | or ``thermocyclerModuleV2``   |                     |
    +--------------------+-------------------------------+---------------------+
    | Heater-Shaker      | ``heaterShakerModuleV1``      | 2.13                |
    | Module             |                               |                     |
@@ -319,7 +322,7 @@ Changes with the GEN2 Magnetic Module
 The GEN2 Magnetic Module uses smaller magnets than the GEN1 version.
 This mitigates an issue where beads would be attracted even when the magnets were retracted.
 
-This means it will take longer for the GEN2 module to attract beads.
+This means it will take longer for the GEN2 module to attract beads. If you need additional strength for your application, use the available `Adapter Magnets <https://support.opentrons.com/s/article/Adapter-magnets>`_.
 
 Recommended Magnetic Module GEN2 bead attraction time:
     - Total liquid volume <= 50 uL: 5 minutes
@@ -333,34 +336,33 @@ Using a Thermocycler Module
 ***************************
 
 
-The Thermocycler Module allows users to perform complete experiments that require temperature sensitive reactions such as PCR.
+The Thermocycler Module provides on-deck, fully automated thermocycling and can heat and cool very quickly during operation. The module's block can heat and cool between 4 °C and 99 °C, and the module's lid can heat up to 110 °C.
 
-There are two heating mechanisms in the Thermocycler. One is the block in which samples are located; the other is the lid heating pad.
+The Thermocycler is represented in code by a :py:class:`.ThermocyclerContext` object, which has methods for controlling the lid, controlling the block, and setting *profiles* — timed heating and cooling routines that can be automatically repeated. 
 
-The block can control its temperature between 4 °C and 99 °C to the nearest 1 °C.
-
-The lid can control its temperature between 37 °C to 110 °C. Please see our `support article <https://support.opentrons.com/en/articles/3469797-thermocycler-module>`_ on controlling the Thermocycler in the Opentrons App.
-
-For the purposes of this section, assume we have the following already:
+The examples in this section will use a Thermocycler loaded as follows:
 
 .. code-block:: python
     :substitutions:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata = {'apiLevel': '2.14'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        tc_mod = protocol.load_module('Thermocycler Module')
+        tc_mod = protocol.load_module('thermocyclerModuleV2')
         plate = tc_mod.load_labware('nest_96_wellplate_100ul_pcr_full_skirt')
+        
+The ``location`` parameter of :py:meth:`.load_module` isn't required for the Thermocycler, since it only has one valid deck location, which covers slots 7, 8, 10, and 11. Attempting to load any other modules or labware in these four slots will raise a ``DeckConflictError``. 
 
 .. note::
 
-    When loading the Thermocycler, it is not necessary to specify a slot.
-    This is because the Thermocycler has a default position that covers Slots 7, 8, 10, and 11.
-    This is the only valid location for the Thermocycler on the OT-2 deck.
+    If you want to specify a slot for the Thermocycler (for parallelism with other ``load_module()`` calls in your protocol), you can do so: the only accepted value is ``7``.
 
 .. versionadded:: 2.0
+.. versionchanged:: 2.14
+   Added support for Thermocycler Module GEN2.
+
 
 Lid Motor Control
 =================
@@ -594,6 +596,11 @@ This deactivates only the well block of the Thermocycler.
 
 .. versionadded:: 2.0
 
+
+Changes with the GEN2 Magnetic Module
+=====================================
+
+TK
 
 .. _heater-shaker-module:
 
