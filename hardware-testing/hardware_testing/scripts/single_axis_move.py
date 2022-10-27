@@ -1,4 +1,4 @@
-"""OT3 Bowtie Test."""
+"""OT3 Single Axis Movement Test."""
 import argparse
 import asyncio
 
@@ -63,9 +63,9 @@ AXIS_MAP = {'Y': OT3Axis.Y,
                 'L': OT3Axis.Z_L,
                 'R': OT3Axis.Z_R}
 
-step_x = 460
-step_y = 370
-step_z = 200
+step_x = 530
+step_y = 400
+step_z = 210
 POINT_MAP = {'Y': Point(y=step_y),
              'X': Point(x=step_x),
              'L': Point(z=step_z),
