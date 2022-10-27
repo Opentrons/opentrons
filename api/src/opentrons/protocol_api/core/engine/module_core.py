@@ -175,8 +175,7 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
 
     def get_status(self) -> MagneticStatus:
         """Get the module's current magnet status."""
-        raise NotImplementedError("get_status not implemented")
-
+        return self._sync_module_hardware.status
 
 class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
     """Core control interface for an attached Thermocycler Module."""
