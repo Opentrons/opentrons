@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional, Type, TypeVar
+from typing import List, Optional, Type, TypeVar, Union
 from pydantic import BaseModel
 import sqlalchemy
 import sqlalchemy.ext.compiler
@@ -108,10 +108,13 @@ def sql_to_pydantic(
                 f" {sql_value.declared_model}, but you're trying to read it as"
                 f" {model}."
             )
+    elif sql_value is None:
+        raise TypeError("Value from SQL is None. Maybe the column is nullable?")
     else:
         raise TypeError(
-            "This value did not come from a SQL column that's"
-            " declared to contain Pydantic objects."
+            f"This value, of type {type(sql_value)},"
+            f" did not come from a SQL column that's declared"
+            f" to contain Pydantic objects."
         )
 
 

@@ -31,15 +31,18 @@ from typing_extensions import Final
 
 import sqlalchemy
 
+from opentrons.protocol_engine import StateSummary
+
 from robot_server.analysis_models import CompletedAnalysis
 
+from ._command_list import CommandList
 from ._tables import (
     analysis_table as newest_analysis_table,
     migration_table as newest_migration_table,
     run_table as newest_run_table,
 )
 
-from . import legacy_pickle
+from . import _legacy_pickle
 from . import _pydantic_json
 
 _LATEST_SCHEMA_VERSION: Final = 2
@@ -167,28 +170,76 @@ def _migrate_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
     * Column "commands" of table "run"
     """
 
+    _migrate_analysis_1_to_2(transaction)
+    _migrate_run_1_to_2(transaction)
+
+
+def _migrate_analysis_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
     v1_completed_analysis_column = sqlalchemy.column(
         "completed_analysis", sqlalchemy.LargeBinary
     )
+
+    # Extract using the old column definitions.
     select_statement = sqlalchemy.select(
         newest_analysis_table.c.id, v1_completed_analysis_column
     ).select_from(newest_analysis_table)
 
-    v1_analyses = transaction.execute(select_statement)
+    rows = transaction.execute(select_statement)
 
-    for v1_analysis in v1_analyses:
-        id = v1_analysis.id
-        parsed_analysis = CompletedAnalysis.parse_obj(
-            legacy_pickle.loads(v1_analysis.completed_analysis)
-        )
+    for row in rows:
+        id = row.id
+        completed_analysis_dict = _legacy_pickle.loads(row.completed_analysis)
+        completed_analysis = CompletedAnalysis.parse_obj(completed_analysis_dict)
 
-        new_raw = _pydantic_json.pydantic_to_sql(data=parsed_analysis)
+        new_serialized = _pydantic_json.pydantic_to_sql(data=completed_analysis)
 
+        # Reinsert using the new column definitions.
         update_statement = (
             sqlalchemy.update(newest_analysis_table)
             .where(newest_analysis_table.c.id == id)
-            .values(completed_analysis=new_raw)
+            .values(completed_analysis=new_serialized)
         )
         transaction.execute(update_statement)
 
-    # TODO(mm, 2022-10-13): Also migrate columns run.state_summary and run.commands.
+
+def _migrate_run_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
+    v1_state_summary_column = sqlalchemy.column(
+        "state_summary",
+        sqlalchemy.PickleType(pickler=_legacy_pickle),
+        # Originally declared nullable=True.
+    )
+    v1_commands_column = sqlalchemy.column(
+        "commands",
+        sqlalchemy.PickleType(pickler=_legacy_pickle),
+        # Originally declared nullable=True.
+    )
+
+    # Extract using the old column definitions.
+    select_statement = sqlalchemy.select(
+        newest_run_table.c.id, v1_state_summary_column, v1_commands_column
+    ).select_from(newest_run_table)
+
+    rows = transaction.execute(select_statement)
+
+    for row in rows:
+        id = row.id
+        state_summary_dict = row.state_summary
+        state_summary = StateSummary.parse_obj(state_summary_dict)
+        command_dicts = row.commands
+        commands = CommandList.parse_obj(command_dicts)
+
+        new_serialized_state_summary = _pydantic_json.pydantic_to_sql(
+            data=state_summary
+        )
+        new_serialized_commands = _pydantic_json.pydantic_to_sql(data=commands)
+
+        # Reinsert using the new column definitions.
+        update_statement = (
+            sqlalchemy.update(newest_run_table)
+            .where(newest_run_table.c.id == id)
+            .values(
+                state_summary=new_serialized_state_summary,
+                commands=new_serialized_commands,
+            )
+        )
+        transaction.execute(update_statement)

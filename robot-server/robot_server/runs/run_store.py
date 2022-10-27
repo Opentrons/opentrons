@@ -3,16 +3,21 @@ from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime
 from functools import lru_cache
-from typing import Any, Dict, List, Optional, cast
+from typing import Dict, List, Optional
 
 import sqlalchemy
-from pydantic import parse_obj_as
 
 from opentrons.util.helpers import utc_now
 from opentrons.protocol_engine import StateSummary, CommandSlice
 from opentrons.protocol_engine.commands import Command
 
-from robot_server.persistence import run_table, action_table
+from robot_server.persistence import (
+    run_table,
+    action_table,
+    CommandList,
+    sql_to_pydantic,
+    pydantic_to_sql,
+)
 from robot_server.protocols import ProtocolNotFoundError
 
 from .action_models import RunAction, RunActionType
@@ -252,14 +257,13 @@ class RunStore:
         with self._sql_engine.begin() as transaction:
             row = transaction.execute(select_run_data).one()
 
-        return (
-            StateSummary.parse_obj(row.state_summary)
-            if row.state_summary is not None
-            else None
-        )
+        if row.state_summary is None:
+            return None
+        else:
+            return sql_to_pydantic(model=StateSummary, sql_value=row.state_summary)
 
     @lru_cache(maxsize=_CACHE_ENTRIES)
-    def _get_all_unparsed_commands(self, run_id: str) -> List[Dict[str, Any]]:
+    def _get_all_commands(self, run_id: str) -> List[Command]:
         select_run_commands = sqlalchemy.select(run_table.c.commands).where(
             run_table.c.id == run_id
         )
@@ -270,9 +274,15 @@ class RunStore:
             except sqlalchemy.exc.NoResultFound:
                 raise RunNotFoundError(run_id=run_id)
 
-        return (
-            cast(List[Dict[str, Any]], row.commands) if row.commands is not None else []
-        )
+        if row.commands is None:
+            return []
+        else:
+            serialized_commands = row.commands
+            # FIXME(mm, 2022-10-26): This can block the event loop for tens of seconds.
+            # This class's methods needs to be made async and this needs to be offloaded
+            # to a thread.
+            commands = sql_to_pydantic(model=CommandList, sql_value=serialized_commands)
+            return commands.__root__
 
     def get_commands_slice(
         self,
@@ -294,18 +304,15 @@ class RunStore:
         Raises:
             RunNotFoundError: The given run ID was not found.
         """
-        command_intent_dicts = self._get_all_unparsed_commands(run_id)
-        commands_length = len(command_intent_dicts)
+        commands = self._get_all_commands(run_id=run_id)
+        commands_length = len(commands)
         if cursor is None:
             cursor = commands_length - length
 
         # start is inclusive, stop is exclusive
         actual_cursor = max(0, min(cursor, commands_length - 1))
         stop = min(commands_length, actual_cursor + length)
-        sliced_commands: List[Command] = [
-            parse_obj_as(Command, command)  # type: ignore[arg-type]
-            for command in command_intent_dicts[actual_cursor:stop]
-        ]
+        sliced_commands = commands[actual_cursor:stop]
 
         return CommandSlice(
             cursor=actual_cursor,
@@ -328,21 +335,11 @@ class RunStore:
             RunNotFoundError: The given run ID was not found in the store.
             CommandNotFoundError: The given command ID was not found in the store.
         """
-        select_run_commands = sqlalchemy.select(run_table.c.commands).where(
-            run_table.c.id == run_id
-        )
-        with self._sql_engine.begin() as transaction:
-            try:
-                row = transaction.execute(select_run_commands).one()
-            except sqlalchemy.exc.NoResultFound as e:
-                raise RunNotFoundError(run_id=run_id) from e
-
+        commands = self._get_all_commands(run_id=run_id)
         try:
-            command = next(c for c in row.commands if c["id"] == command_id)
+            return next(c for c in commands if c.id == command_id)
         except StopIteration as e:
             raise CommandNotFoundError(command_id=command_id) from e
-
-        return parse_obj_as(Command, command)  # type: ignore[arg-type]
 
     def remove(self, run_id: str) -> None:
         """Remove a run by its unique identifier.
@@ -372,7 +369,7 @@ class RunStore:
         self.get_all.cache_clear()
         self.get_state_summary.cache_clear()
         self.get_command.cache_clear()
-        self._get_all_unparsed_commands.cache_clear()
+        self._get_all_commands.cache_clear()
 
 
 # The columns that must be present in a row passed to _convert_row_to_run().
@@ -431,8 +428,8 @@ def _convert_state_to_sql_values(
     engine_status: str,
 ) -> Dict[str, object]:
     return {
-        "state_summary": state_summary.dict(),
+        "state_summary": pydantic_to_sql(state_summary),
         "engine_status": engine_status,
-        "commands": [command.dict() for command in commands],
+        "commands": pydantic_to_sql(CommandList(__root__=commands)),
         "_updated_at": utc_now(),
     }

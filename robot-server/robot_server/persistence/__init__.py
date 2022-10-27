@@ -1,6 +1,7 @@
 """Data access initialization and management."""
 
 
+from ._command_list import CommandList
 from ._database import create_sql_engine, sqlite_rowid
 from ._fastapi_dependencies import (
     start_initializing_persistence,
@@ -27,6 +28,7 @@ __all__ = [
     "UnparsedPydanticJSON",
     "pydantic_to_sql",
     "sql_to_pydantic",
+    "CommandList",
     # database tables
     "migration_table",
     "protocol_table",
