@@ -144,17 +144,14 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         self, serial_number: str, model: ModuleModel
     ) -> AbstractModule:
         """Resolve a module serial number to module hardware API."""
-        selected_hardware: AbstractModule
+        if self.is_simulating():
+            return self._sync_hardware.create_simulating_module(model)  # type: ignore[no-any-return]
+
         for module_hardware in self._sync_hardware.attached_modules:
             if serial_number == module_hardware.device_info["serial"]:
-                selected_hardware = module_hardware
-                break
-        else:
-            if self.is_simulating():
-                selected_hardware = self._sync_hardware.create_simulating_module(model)
-            else:
-                raise RuntimeError(f"Could not find specified module: {model.value}")
-        return selected_hardware
+                return module_hardware  # type: ignore[no-any-return]
+
+        raise RuntimeError(f"Could not find specified module: {model.value}")
 
     def load_module(
         self,
