@@ -9,5 +9,9 @@
   "remove_probe": "Now you’ll be guided through removing your calibration stem. Undo the latch to remove the stem",
   "complete_cal": "Complete calibration",
   "pip_cal_success": "Pipette Successfully Calibrated",
-  "calibrate_pipette": "Calibrate a pipette"
+  "calibrate_pipette": "Calibrate a pipette",
+  "stand_back": "Stand Back, Robot is in Motion",
+  "pipette_calibrating": "Stand Back, Pipette is Calibrating",
+  "progress_will_be_lost": "{{flow}} progress will be lost",
+  "are_you_sure_exit": "Are you sure you want to exit before completing {{flow}}?"
 }

@@ -10,7 +10,9 @@ import { FLOWS, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
 import { AttachStem } from './AttachStem'
 import { DetachStem } from './DetachStem'
+import { InProgress } from './InProgress'
 import { Results } from './Results'
+import { ExitModal } from './ExitModal'
 
 // import type { State } from '../../redux/types'
 import type { PipetteWizardFlow } from './types'
@@ -33,6 +35,8 @@ export const PipetteWizardFlows = (
   const pipetteWizardSteps = getPipetteWizardSteps(flowType)
 
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
+  const [confirmExit, setConfirmExit] = React.useState<boolean>(false)
+
   const totalStepCount = pipetteWizardSteps.length - 1
   const currentStep = pipetteWizardSteps?.[currentStepIndex]
   if (currentStep == null) return null
@@ -50,22 +54,55 @@ export const PipetteWizardFlows = (
         : currentStepIndex
     )
   }
-
   const calibrateBaseProps = {
     mount,
     flowType: FLOWS.CALIBRATE,
     goBack,
   }
 
+  const movement = true // TODO(jr, 10/27/22): wire this up!
+  const exitModal = (
+    <ExitModal
+      goBack={() => setConfirmExit(false)}
+      proceed={closeFlow}
+      flowType={flowType}
+      mount={mount}
+    />
+  )
+  let onExit
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
-  if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
+  if (movement) {
+    modalContent = (
+      <InProgress
+        mount={mount}
+        flowType={FLOWS.CALIBRATE}
+        currentStepSection={currentStep.section}
+      />
+    )
+  } else if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
+    onExit = closeFlow
     modalContent = <BeforeBeginning {...calibrateBaseProps} proceed={proceed} />
   } else if (currentStep.section === SECTIONS.ATTACH_STEM) {
-    modalContent = <AttachStem {...calibrateBaseProps} proceed={proceed} />
+    onExit = confirmExit ? closeFlow : () => setConfirmExit(true)
+    modalContent = confirmExit ? (
+      exitModal
+    ) : (
+      <AttachStem {...calibrateBaseProps} proceed={proceed} />
+    )
   } else if (currentStep.section === SECTIONS.DETACH_STEM) {
-    modalContent = <DetachStem {...calibrateBaseProps} proceed={proceed} />
+    onExit = confirmExit ? closeFlow : () => setConfirmExit(true)
+    modalContent = confirmExit ? (
+      exitModal
+    ) : (
+      <DetachStem {...calibrateBaseProps} proceed={proceed} />
+    )
   } else if (currentStep.section === SECTIONS.RESULTS) {
-    modalContent = <Results {...calibrateBaseProps} proceed={closeFlow} />
+    onExit = confirmExit ? closeFlow : () => setConfirmExit(true)
+    modalContent = confirmExit ? (
+      exitModal
+    ) : (
+      <Results {...calibrateBaseProps} proceed={closeFlow} />
+    )
   }
 
   let wizardTitle: string = 'unknown page'
@@ -84,7 +121,7 @@ export const PipetteWizardFlows = (
             title={wizardTitle}
             currentStep={currentStepIndex}
             totalSteps={totalStepCount}
-            onExit={closeFlow}
+            onExit={onExit}
           />
         }
       >
