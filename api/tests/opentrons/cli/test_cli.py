@@ -17,10 +17,13 @@ def _list_fixtures(version: int) -> Iterator[Path]:
 
 
 @pytest.mark.parametrize("fixture_path", _list_fixtures(6))
-def test_analyze(fixture_path: Path, tmp_path: Path) -> None:
+def test_analyze(
+    fixture_path: Path,
+    tmp_path: Path,
+    enable_load_liquid: None,
+) -> None:
     """Should return with no errors and a non-empty output."""
     analysis_output_path = tmp_path / "analysis_output.json"
-
     runner = CliRunner()
     result = runner.invoke(
         analyze,
@@ -31,6 +34,7 @@ def test_analyze(fixture_path: Path, tmp_path: Path) -> None:
 
     assert result.exit_code == 0
 
+    assert "robotType" in analysis_output_json
     assert "pipettes" in analysis_output_json
     assert "commands" in analysis_output_json
     assert "labware" in analysis_output_json

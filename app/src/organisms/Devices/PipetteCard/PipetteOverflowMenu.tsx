@@ -71,7 +71,7 @@ export const PipetteOverflowMenu = (
           </MenuItem>
         ) : (
           <>
-            {!isOT3PipetteAttached && (
+            {
               <MenuItem
                 key={`${pipetteDisplayName}_${mount}_calibrate_offset`}
                 onClick={() => handleCalibrate()}
@@ -83,7 +83,7 @@ export const PipetteOverflowMenu = (
                     : 'calibrate_pipette_offset'
                 )}
               </MenuItem>
-            )}
+            }
             {!isOT3PipetteAttached && (
               <MenuItem
                 key={`${pipetteDisplayName}_${mount}_detach`}

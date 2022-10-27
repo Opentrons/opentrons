@@ -40,6 +40,15 @@ describe('getLabwareOffsetLocation', () => {
       getLabwareOffsetLocation(MOCK_LABWARE_ID, MOCK_COMMANDS, MOCK_MODULES)
     ).toEqual({ slotName: MOCK_SLOT })
   })
+  it('should return null if the location is off deck', () => {
+    when(mockGetLabwareLocation)
+      .calledWith(MOCK_LABWARE_ID, MOCK_COMMANDS)
+      .mockReturnValue('offDeck')
+
+    expect(
+      getLabwareOffsetLocation(MOCK_LABWARE_ID, MOCK_COMMANDS, MOCK_MODULES)
+    ).toEqual(null)
+  })
   it('should return the slot name and module model if the labware is on top of a module', () => {
     const TCIdInProtocol =
       '18f0c1b0-0122-11ec-88a3-f1745cf9b36c:thermocyclerModuleType' // this is just taken from the protocol fixture

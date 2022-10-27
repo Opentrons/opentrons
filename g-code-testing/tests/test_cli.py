@@ -25,7 +25,6 @@ from g_code_test_data.http.modules.magdeck import (
 
 from g_code_test_data.http.modules.tempdeck import (
     TEMPDECK_DEACTIVATE,
-    TEMPDECK_SET_TEMPERATURE,
     TEMPDECK_START_SET_TEMPERATURE,
 )
 
@@ -49,7 +48,6 @@ ALL_MAGDECK_CONFIGS = {
 }
 ALL_TEMPDECK_CONFIGS = {
     RunnableConfiguration(TEMPDECK_DEACTIVATE, None),
-    RunnableConfiguration(TEMPDECK_SET_TEMPERATURE, None),
     RunnableConfiguration(TEMPDECK_START_SET_TEMPERATURE, None),
 }
 ALL_MODULE_CONFIGS = ALL_MAGDECK_CONFIGS.union(ALL_TEMPDECK_CONFIGS)
@@ -99,7 +97,6 @@ MOCK_CONFIGURATIONS_DICT: Dict[
     "http/magdeck_deactivate": MAGDECK_DEACTIVATE,
     "http/magdeck_engage": MAGDECK_ENGAGE,
     "http/tempdeck_deactivate": TEMPDECK_DEACTIVATE,
-    "http/tempdeck_set_temperature": TEMPDECK_SET_TEMPERATURE,
     "http/tempdeck_start_set_temperature": TEMPDECK_START_SET_TEMPERATURE,
     "protocols/2_modules/2.12": TWO_MODULES,
     "protocols/2_modules/2.13": TWO_MODULES,

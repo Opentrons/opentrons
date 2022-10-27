@@ -49,23 +49,23 @@ class MagDeck(mod_abc.AbstractModule):
         port: str,
         usb_port: USBPort,
         execution_manager: ExecutionManager,
+        hw_control_loop: asyncio.AbstractEventLoop,
+        poll_interval_seconds: Optional[float] = None,
         simulating: bool = False,
-        loop: Optional[asyncio.AbstractEventLoop] = None,
         sim_model: Optional[str] = None,
-        **kwargs: float,
     ) -> "MagDeck":
         """Factory function."""
         driver: AbstractMagDeckDriver
         if not simulating:
-            driver = await MagDeckDriver.create(port=port, loop=loop)
+            driver = await MagDeckDriver.create(port=port, loop=hw_control_loop)
         else:
             driver = SimulatingDriver(sim_model=sim_model)
 
         mod = cls(
             port=port,
             usb_port=usb_port,
-            loop=loop,
             execution_manager=execution_manager,
+            hw_control_loop=hw_control_loop,
             device_info=await driver.get_device_info(),
             driver=driver,
         )
@@ -76,13 +76,16 @@ class MagDeck(mod_abc.AbstractModule):
         port: str,
         usb_port: USBPort,
         execution_manager: ExecutionManager,
+        hw_control_loop: asyncio.AbstractEventLoop,
         driver: AbstractMagDeckDriver,
         device_info: Mapping[str, str],
-        loop: Optional[asyncio.AbstractEventLoop] = None,
     ) -> None:
         """Constructor"""
         super().__init__(
-            port=port, usb_port=usb_port, loop=loop, execution_manager=execution_manager
+            port=port,
+            usb_port=usb_port,
+            hw_control_loop=hw_control_loop,
+            execution_manager=execution_manager,
         )
         self._device_info = device_info
         self._driver = driver

@@ -10,6 +10,7 @@ import {
   Btn,
   JUSTIFY_FLEX_END,
   TYPOGRAPHY,
+  WRAP_REVERSE,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
@@ -49,13 +50,11 @@ export function ProtocolAnalysisFailure(
     dispatch(analyzeProtocol(protocolKey))
   }
   return (
-    <Banner
-      type="error"
-      marginBottom={SPACING.spacing4}
-      paddingRight={SPACING.spacing4}
-      marginRight={SPACING.spacing5}
-    >
+    <Banner type="warning" marginRight={SPACING.spacing5}>
       <Flex
+        columnGap={SPACING.spacing3}
+        flex="1"
+        flexWrap={WRAP_REVERSE}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
         width="100%"

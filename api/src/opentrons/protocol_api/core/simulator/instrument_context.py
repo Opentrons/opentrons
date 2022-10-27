@@ -142,7 +142,7 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
     def get_mount(self) -> types.Mount:
         return self._mount
 
-    def get_instrument_name(self) -> str:
+    def get_requested_as_name(self) -> str:
         return self._instrument_name
 
     def get_pipette_name(self) -> str:

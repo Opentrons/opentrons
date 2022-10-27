@@ -99,7 +99,7 @@ async def update_serial_and_confirm(
                         wc.read(), (target - datetime.datetime.now()).total_seconds()
                     )
                     if (
-                        isinstance(message, message_definitions.PipetteInfoResponse)
+                        isinstance(message, message_definitions.GripperInfoResponse)
                         and arb.parts.originating_node_id == NodeId.gripper
                     ):
                         if message.payload.model == UInt16Field(

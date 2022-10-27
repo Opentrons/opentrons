@@ -1277,7 +1277,8 @@
       "commandType": "moveLabware",
       "params": {
         "labwareId": "wellPlateId",
-        "newLocation": { "slotName": "3" }
+        "newLocation": { "slotName": "3" },
+        "strategy": "manualMoveWithPause"
       }
     },
     {
