@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 // import { useSelector } from 'react-redux'
 // import { getAttachedPipettes } from '../../redux/pipettes'
+import { useConditionalConfirm } from '@opentrons/components'
 import { ModalShell } from '../../molecules/Modal'
 import { Portal } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
@@ -35,10 +36,16 @@ export const PipetteWizardFlows = (
   const pipetteWizardSteps = getPipetteWizardSteps(flowType)
 
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
-  const [confirmExit, setConfirmExit] = React.useState<boolean>(false)
 
   const totalStepCount = pipetteWizardSteps.length - 1
   const currentStep = pipetteWizardSteps?.[currentStepIndex]
+
+  const {
+    confirm: confirmExit,
+    showConfirmation: showConfirmExit,
+    cancel: cancelExit,
+  } = useConditionalConfirm(closeFlow, true)
+
   if (currentStep == null) return null
   const proceed = (): void => {
     setCurrentStepIndex(
@@ -59,11 +66,10 @@ export const PipetteWizardFlows = (
     flowType: FLOWS.CALIBRATE,
     goBack,
   }
-
   const movement = false // TODO(jr, 10/27/22): wire this up!
   const exitModal = (
     <ExitModal
-      goBack={() => setConfirmExit(false)}
+      goBack={cancelExit}
       proceed={closeFlow}
       flowType={flowType}
       mount={mount}
@@ -72,33 +78,27 @@ export const PipetteWizardFlows = (
   let onExit
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
   if (movement) {
-    modalContent = (
-      <InProgress
-        mount={mount}
-        flowType={FLOWS.CALIBRATE}
-        currentStepSection={currentStep.section}
-      />
-    )
+    modalContent = <InProgress />
   } else if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
     onExit = closeFlow
     modalContent = <BeforeBeginning {...calibrateBaseProps} proceed={proceed} />
   } else if (currentStep.section === SECTIONS.ATTACH_STEM) {
-    onExit = confirmExit ? closeFlow : () => setConfirmExit(true)
-    modalContent = confirmExit ? (
+    onExit = confirmExit
+    modalContent = showConfirmExit ? (
       exitModal
     ) : (
       <AttachStem {...calibrateBaseProps} proceed={proceed} />
     )
   } else if (currentStep.section === SECTIONS.DETACH_STEM) {
-    onExit = confirmExit ? closeFlow : () => setConfirmExit(true)
-    modalContent = confirmExit ? (
+    onExit = confirmExit
+    modalContent = showConfirmExit ? (
       exitModal
     ) : (
       <DetachStem {...calibrateBaseProps} proceed={proceed} />
     )
   } else if (currentStep.section === SECTIONS.RESULTS) {
-    onExit = confirmExit ? closeFlow : () => setConfirmExit(true)
-    modalContent = confirmExit ? (
+    onExit = confirmExit
+    modalContent = showConfirmExit ? (
       exitModal
     ) : (
       <Results {...calibrateBaseProps} proceed={closeFlow} />

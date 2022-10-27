@@ -14,14 +14,14 @@ export function ExitModal(props: PipetteWizardStepProps): JSX.Element {
   const { goBack, proceed, flowType } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
 
-  let flowTitle: string = 'Pipette Calibration'
+  let flowTitle: string = t('pipette_calibration')
   switch (flowType) {
     case FLOWS.ATTACH: {
-      flowTitle = 'Attach Pipette'
+      flowTitle = t('attach')
       break
     }
     case FLOWS.DETACH: {
-      flowTitle = 'Detach Pipette'
+      flowTitle = t('detach')
       break
     }
   }
