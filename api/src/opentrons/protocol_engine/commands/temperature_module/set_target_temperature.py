@@ -84,7 +84,7 @@ class SetTargetTemperature(
 class SetTargetTemperatureCreate(BaseCommandCreate[SetTargetTemperatureParams]):
     """A request to create a Temperature Module's set temperature command."""
 
-    commandType: SetTargetTemperatureCommandType = (
+    commandType: SetTargetTemperatureCommandType = "temperatureModule/setTargetTemperature"
         "temperatureModule/setTargetTemperature"
     )
     params: SetTargetTemperatureParams
