@@ -394,10 +394,21 @@ def test_get_dimensions(well_plate_def: LabwareDefinition) -> None:
     )
 
 
-@pytest.mark.xfail(strict=True, raises=NotImplementedError)
-def test_get_default_magnet_height() -> None:  # noqa: D103
-    subject = get_labware_view()
-    _ = subject.get_default_magnet_height("labware-id")
+def test_get_default_magnet_height(magdeck_well_plate_def: LabwareDefinition) -> None:  # noqa: D103
+    well_plate = LoadedLabware(
+        id="well-plate-id",
+        loadName="load-name",
+        location=ModuleLocation(moduleId=1),
+        definitionUri="well-plate-uri",
+        offsetId=None,
+    )
+
+    subject = get_labware_view(
+        labware_by_id={"well-plate-id": well_plate},
+        definitions_by_uri={"well-plate-uri": magdeck_well_plate_def},
+    )
+
+    assert subject.get_default_magnet_height("well-plate-id") == 6.8
 
 
 def test_get_deck_definition(standard_deck_def: DeckDefinitionV3) -> None:

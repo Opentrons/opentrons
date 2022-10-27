@@ -132,6 +132,14 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.MagDeck]
 
+    # URIs of labware whose definitions accidentally specify an engage height
+    # in units of half-millimeters instead of millimeters.
+    _MAGDECK_HALF_MM_LABWARE = {
+        "opentrons/biorad_96_wellplate_200ul_pcr/1",
+        "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",
+        "opentrons/usascientific_96_wellplate_2.4ml_deep/1",
+    }
+
     def engage(
         self,
         height_from_base: Optional[float] = None,
@@ -209,6 +217,13 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
                 " so you must specify an engage height"
                 " with the `height` or `height_from_base` parameter."
             )
+
+        uri = self._engine_client.state.labware.get_definition_uri(labware_id)
+
+        if uri in self._MAGDECK_HALF_MM_LABWARE and not preserve_half_mm:
+            # TODO(mc, 2022-09-26): this value likely _also_ needs a few mm subtracted
+            # https://opentrons.atlassian.net/browse/RSS-111
+            default_height = default_height / 2.0
 
         calculated_height = self._engine_client.state.modules.calculate_magnet_height(
             module_model=model,
