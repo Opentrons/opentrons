@@ -607,7 +607,7 @@ class InstrumentContext(publisher.CommandPublisher):
     def return_tip(self, home_after: bool = True) -> InstrumentContext:
         """
         If a tip is currently attached to the pipette, then the pipette will
-        return the tip to its location in the tiprack.
+        return the tip to its location in the tip rack.
 
         This will not reset tip tracking, so the well flag will remain ``False``.
 
