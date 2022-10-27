@@ -104,7 +104,9 @@ def test_get_pipette_calibration(
     """
     Test ability to get a pipette calibration model.
     """
-    from opentrons.calibration_storage import get_pipette_offset, models
+    from opentrons.calibration_storage import get_pipette_offset
+
+    # needed for proper type checking unfortunately
     from opentrons.calibration_storage.ot3.models.v1 import (
         InstrumentOffsetModel as OT3InstrModel,
     )
@@ -114,17 +116,14 @@ def test_get_pipette_calibration(
 
     pipette_data = get_pipette_offset("pip1", Mount.LEFT)
     if robot_model == "OT-3 Standard":
-        # needed for proper type checking unfortunately
-        assert isinstance(models.v1.InstrumentOffsetModel, OT3InstrModel)
-        assert pipette_data == models.v1.InstrumentOffsetModel(
+        assert pipette_data == OT3InstrModel(
             offset=Point(1, 1, 1),
             lastModified=pipette_data.lastModified,
             source=cs_types.SourceType.user,
         )
     else:
-        # needed for proper type checking unfortunately
-        assert isinstance(models.v1.InstrumentOffsetModel, OT2InstrModel)
-        assert pipette_data == models.v1.InstrumentOffsetModel(
+
+        assert pipette_data == OT2InstrModel(
             offset=Point(1, 1, 1),
             tiprack="mytiprack",
             uri="opentrons/tip_rack/1",

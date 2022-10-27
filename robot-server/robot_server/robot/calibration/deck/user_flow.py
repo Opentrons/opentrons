@@ -10,7 +10,6 @@ from typing import (
     Optional,
     Tuple,
     Union,
-    cast,
 )
 
 from opentrons.calibration_storage import (
@@ -345,7 +344,7 @@ class DeckCalibrationUserFlow:
         assert pip_id
         try:
             return load_tip_length_calibration(
-                cast(cal_types.PipetteId, pip_id),
+                pip_id,
                 self._tip_rack._implementation.get_definition(),
             ).tipLength
         except cal_types.TipLengthCalNotFound:

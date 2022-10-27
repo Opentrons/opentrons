@@ -1,11 +1,8 @@
 from starlette import status
 from fastapi import APIRouter
-from typing import Optional, cast
+from typing import Optional
 
 from opentrons import types as ot_types
-from opentrons.calibration_storage import (
-    types as cal_types,
-)
 from opentrons.calibration_storage.ot2 import pipette_offset, models
 
 from robot_server.errors import ErrorBody
@@ -82,7 +79,7 @@ async def delete_specific_pipette_offset_calibration(
 ):
     try:
         pipette_offset.delete_pipette_offset_file(
-            cast(cal_types.PipetteId, pipette_id), ot_types.Mount[mount.upper()]
+            pipette_id, ot_types.Mount[mount.upper()]
         )
     except FileNotFoundError:
         raise RobotServerError(

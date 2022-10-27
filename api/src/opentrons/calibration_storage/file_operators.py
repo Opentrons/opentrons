@@ -36,6 +36,16 @@ def _remove_json_files_in_directories(p: Path) -> None:
             delete_file(item)
 
 
+def _assert_last_modified_value(calibration_dict: typing.Dict[str, typing.Any]) -> None:
+    last_modified = calibration_dict.get("lastModified")
+    if last_modified:
+        assert isinstance(calibration_dict["lastModified"], datetime.datetime), (
+            "invalid decoded value type for lastModified: got "
+            f"{type(calibration_dict['lastModified']).__name__},"
+            "expected datetime"
+        )
+
+
 def read_cal_file(
     filepath: Path, decoder: DecoderType = DateTimeDecoder
 ) -> typing.Dict[str, typing.Any]:
@@ -59,13 +69,9 @@ def read_cal_file(
             json.load(f, cls=decoder),
         )
     if isinstance(calibration_data.values(), dict):
-        for value in calibration_data.values():
-            if value.get("lastModified"):
-                assert isinstance(value["lastModified"], datetime.datetime), (
-                    "invalid decoded value type for lastModified: got "
-                    f"{type(value['lastModified']).__name__},"
-                    "expected datetime"
-                )
+        _assert_last_modified_value(dict(calibration_data.values()))
+    else:
+        _assert_last_modified_value(calibration_data)
     return calibration_data
 
 

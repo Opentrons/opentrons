@@ -1,6 +1,6 @@
 import logging
 import contextlib
-from typing import Set, Dict, Any, Union, List, Optional, TYPE_CHECKING, cast
+from typing import Set, Dict, Any, Union, List, Optional, TYPE_CHECKING
 
 from opentrons.hardware_control.instruments import Pipette
 from opentrons.hardware_control.util import plan_arc
@@ -10,7 +10,6 @@ from opentrons.protocols.geometry import planning
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.calibration_storage import (
     helpers,
-    types as cal_types,
     create_tip_length_data,
     save_tip_length_calibration as cal_storage_save_tip_length,
 )
@@ -207,7 +206,7 @@ def save_tip_length_calibration(
     tip_length_data = create_tip_length_data(
         tip_rack._implementation.get_definition(), tip_length_offset
     )
-    cal_storage_save_tip_length(cast(cal_types.PipetteId, pipette_id), tip_length_data)
+    cal_storage_save_tip_length(pipette_id, tip_length_data)
 
 
 def get_default_tipracks(default_uris: List["LabwareUri"]) -> List["LabwareDefinition"]:

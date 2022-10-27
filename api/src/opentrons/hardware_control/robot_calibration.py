@@ -161,8 +161,8 @@ def save_attitude_matrix(
     attitude = linal.solve_attitude(expected, actual)
     save_robot_deck_attitude(
         attitude,
-        cast(types.PipetteId, pipette_id),
-        cast(types.TiprackHash, tiprack_hash),
+        pipette_id,
+        tiprack_hash,
     )
 
 

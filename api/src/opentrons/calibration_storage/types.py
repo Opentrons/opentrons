@@ -6,10 +6,6 @@ from enum import Enum
 
 AttitudeMatrix = typing.List[typing.List[float]]
 
-TiprackHash = typing.NewType("TiprackHash", str)
-PipetteId = typing.NewType("PipetteId", str)
-GripperId = typing.NewType("GripperId", str)
-
 
 class SourceType(str, Enum):
     """Calibration source type"""

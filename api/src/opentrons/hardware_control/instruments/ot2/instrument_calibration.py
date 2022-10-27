@@ -80,9 +80,7 @@ def load_pipette_offset(
     else:
         checked_mount = mount
     if pip_id:
-        pip_offset_data = get_pipette_offset(
-            typing.cast(types.PipetteId, pip_id), checked_mount
-        )
+        pip_offset_data = get_pipette_offset(pip_id, checked_mount)
         if pip_offset_data:
             return PipetteOffsetByPipetteMount(
                 offset=pip_offset_data.offset,
@@ -106,9 +104,7 @@ def load_tip_length_for_pipette(
 ) -> TipLengthCalibration:
     if isinstance(tiprack, LabwareDefinition):
         tiprack = typing.cast("TypeDictLabwareDef", tiprack.dict())
-    tip_length_data = load_tip_length_calibration(
-        typing.cast(types.PipetteId, pipette_id), tiprack
-    )
+    tip_length_data = load_tip_length_calibration(pipette_id, tiprack)
     # TODO (lc 09-26-2022) We shouldn't have to do a hash twice. We should figure out what
     # information we actually need from the labware definition and pass it into
     # the `load_tip_length_calibration` function.

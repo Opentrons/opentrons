@@ -43,7 +43,7 @@ def convert_to_dict(obj: Any) -> Dict[str, Any]:
 # produce a different hash than a value of `10.0`. Hashing should be produce
 # identical hashes for `==` values. This could be done by running defs through
 # Pydantic or similar rather via json.dumps
-def hash_labware_def(labware_def: "LabwareDefinition") -> local_types.TiprackHash:
+def hash_labware_def(labware_def: "LabwareDefinition") -> str:
     """
     Helper function to take in a labware definition and return
     a hashed string of key elements from the labware definition
@@ -57,9 +57,7 @@ def hash_labware_def(labware_def: "LabwareDefinition") -> local_types.TiprackHas
     def_no_metadata = {k: v for k, v in labware_def.items() if k not in blocklist}
     sorted_def_str = json.dumps(def_no_metadata, sort_keys=True, separators=(",", ":"))
 
-    return cast(
-        local_types.TiprackHash, sha256(sorted_def_str.encode("utf-8")).hexdigest()
-    )
+    return sha256(sorted_def_str.encode("utf-8")).hexdigest()
 
 
 def details_from_uri(uri: str, delimiter: str = "/") -> local_types.UriDetails:

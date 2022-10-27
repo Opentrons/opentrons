@@ -1,48 +1,16 @@
+import typing
 from opentrons.protocol_api import labware
 from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
 from opentrons.types import Point, Location
 
-
-minimalLabwareDef = {
-    "metadata": {"displayName": "minimal labware"},
-    "cornerOffsetFromSlot": {"x": 10, "y": 10, "z": 5},
-    "parameters": {
-        "isTiprack": True,
-        "tipLength": 55.3,
-        "tipOverlap": 2.8,
-        "loadName": "minimal_labware_def",
-    },
-    "ordering": [["A1"], ["A2"]],
-    "wells": {
-        "A1": {
-            "depth": 40,
-            "totalLiquidVolume": 100,
-            "diameter": 30,
-            "x": 0,
-            "y": 0,
-            "z": 0,
-            "shape": "circular",
-        },
-        "A2": {
-            "depth": 40,
-            "totalLiquidVolume": 100,
-            "diameter": 30,
-            "x": 10,
-            "y": 0,
-            "z": 0,
-            "shape": "circular",
-        },
-    },
-    "dimensions": {"xDimension": 1.0, "yDimension": 2.0, "zDimension": 3.0},
-    "namespace": "custom",
-    "version": 1,
-}
+if typing.TYPE_CHECKING:
+    from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
-def test_wells_rebuilt_with_offset():
+def test_wells_rebuilt_with_offset(minimal_labware_def: "LabwareDefinition") -> None:
     test_labware = labware.Labware(
         implementation=LabwareImplementation(
-            minimalLabwareDef, Location(Point(0, 0, 0), "deck")  # type: ignore[arg-type]
+            minimal_labware_def, Location(Point(0, 0, 0), "deck")
         )
     )
     old_wells = test_labware.wells()

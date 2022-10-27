@@ -16,7 +16,7 @@ from .models import v1
 # Delete Gripper Offset Calibrations
 
 
-def delete_gripper_calibration_file(gripper: local_types.GripperId) -> None:
+def delete_gripper_calibration_file(gripper: str) -> None:
     """
     Delete gripper calibration offset file based on gripper serial number
 
@@ -42,7 +42,7 @@ def clear_gripper_calibration_offsets() -> None:
 
 def save_gripper_calibration(
     offset: types.Point,
-    gripper_id: local_types.GripperId,
+    gripper_id: str,
     cal_status: Optional[
         Union[local_types.CalibrationStatus, v1.CalibrationStatus]
     ] = None,
@@ -69,7 +69,7 @@ def save_gripper_calibration(
 
 
 def get_gripper_calibration_offset(
-    gripper_id: local_types.GripperId,
+    gripper_id: str,
 ) -> Optional[v1.InstrumentOffsetModel]:
     """
     Return the requested gripper offset data.
