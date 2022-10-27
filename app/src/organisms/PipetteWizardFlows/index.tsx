@@ -3,9 +3,11 @@ import { useTranslation } from 'react-i18next'
 // import { useSelector } from 'react-redux'
 // import { getAttachedPipettes } from '../../redux/pipettes'
 import { useConditionalConfirm } from '@opentrons/components'
+import { useHost, useCreateRunMutation } from '@opentrons/react-api-client'
 import { ModalShell } from '../../molecules/Modal'
 import { Portal } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
+import { useChainRunCommands } from '../../resources/runs/hooks'
 import { getPipetteWizardSteps } from './getPipetteWizardSteps'
 import { FLOWS, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
@@ -15,7 +17,6 @@ import { InProgress } from './InProgress'
 import { Results } from './Results'
 import { ExitModal } from './ExitModal'
 
-// import type { State } from '../../redux/types'
 import type { PipetteWizardFlow } from './types'
 import type { PipetteMount } from '@opentrons/shared-data'
 
@@ -25,6 +26,12 @@ interface PipetteWizardFlowsProps {
   robotName: string
   closeFlow: () => void
 }
+export interface PipetteWizardStepProps {
+  flowType: PipetteWizardFlow
+  mount: PipetteMount
+  nextStep: () => void
+}
+
 export const PipetteWizardFlows = (
   props: PipetteWizardFlowsProps
 ): JSX.Element | null => {
@@ -33,8 +40,9 @@ export const PipetteWizardFlows = (
   //   const attachedPipette = useSelector(
   //     (state: State) => getAttachedPipettes(state, robotName)[mount]
   //   )
-  const pipetteWizardSteps = getPipetteWizardSteps(flowType)
-
+  const pipetteWizardSteps = getPipetteWizardSteps(flowType, mount)
+  const host = useHost()
+  const [runId, setRunId] = React.useState<string>('')
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
 
   const totalStepCount = pipetteWizardSteps.length - 1
@@ -46,7 +54,6 @@ export const PipetteWizardFlows = (
     cancel: cancelExit,
   } = useConditionalConfirm(closeFlow, true)
 
-  if (currentStep == null) return null
   const proceed = (): void => {
     setCurrentStepIndex(
       currentStepIndex !== pipetteWizardSteps.length - 1
@@ -61,9 +68,25 @@ export const PipetteWizardFlows = (
         : currentStepIndex
     )
   }
+
+  const { createRun, isLoading: isCreatingRun } = useCreateRunMutation(
+    {
+      onSuccess: response => {
+        setRunId(response.data.id)
+      },
+    },
+    host
+  )
+
+  const { chainRunCommands, isCommandMutationLoading } = useChainRunCommands(
+    runId
+  )
+
   const calibrateBaseProps = {
-    mount,
-    flowType: FLOWS.CALIBRATE,
+    chainRunCommands,
+    isCommandMutationLoading,
+    nextStep: proceed,
+    runId,
     goBack,
   }
   const movement = false // TODO(jr, 10/27/22): wire this up!
@@ -76,32 +99,39 @@ export const PipetteWizardFlows = (
     />
   )
   let onExit
+  if (currentStep == null) return null
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
   if (movement) {
     modalContent = <InProgress />
   } else if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
     onExit = closeFlow
-    modalContent = <BeforeBeginning {...calibrateBaseProps} proceed={proceed} />
+    modalContent = (
+      <BeforeBeginning
+        {...currentStep}
+        {...calibrateBaseProps}
+        proceed={proceed}
+      />
+    )
   } else if (currentStep.section === SECTIONS.ATTACH_STEM) {
     onExit = confirmExit
-    modalContent = showConfirmExit ? (
+    modalContent = modalContent = showConfirmExit ? (
       exitModal
     ) : (
-      <AttachStem {...calibrateBaseProps} proceed={proceed} />
+      <AttachStem {...currentStep} {...calibrateBaseProps} proceed={proceed} />
     )
   } else if (currentStep.section === SECTIONS.DETACH_STEM) {
     onExit = confirmExit
-    modalContent = showConfirmExit ? (
+    modalContent = modalContent = showConfirmExit ? (
       exitModal
     ) : (
-      <DetachStem {...calibrateBaseProps} proceed={proceed} />
+      <DetachStem {...currentStep} {...calibrateBaseProps} proceed={proceed} />
     )
   } else if (currentStep.section === SECTIONS.RESULTS) {
     onExit = confirmExit
-    modalContent = showConfirmExit ? (
+    modalContent = modalContent = showConfirmExit ? (
       exitModal
     ) : (
-      <Results {...calibrateBaseProps} proceed={closeFlow} />
+      <Results {...currentStep} {...calibrateBaseProps} proceed={closeFlow} />
     )
   }
 

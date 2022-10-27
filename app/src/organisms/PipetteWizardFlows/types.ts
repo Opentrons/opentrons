@@ -15,18 +15,26 @@ export type PipetteWizardFlow =
 
 export interface BeforeBeginningStep {
   section: typeof SECTIONS.BEFORE_BEGINNING
+  mount: PipetteMount
+  flowType: PipetteWizardFlow
 }
 
 export interface DetachStemStep {
   section: typeof SECTIONS.DETACH_STEM
+  mount: PipetteMount
+  flowType: PipetteWizardFlow
 }
 
 export interface AttachStemStep {
   section: typeof SECTIONS.ATTACH_STEM
+  mount: PipetteMount
+  flowType: PipetteWizardFlow
 }
 
 export interface ResultsStep {
   section: typeof SECTIONS.RESULTS
+  mount: PipetteMount
+  flowType: PipetteWizardFlow
 }
 
 type CreateCommandMutate = ReturnType<
