@@ -350,6 +350,110 @@ def test_magnetic_module_engage(
     assert result == response
 
 
+def test_thermocycler_set_target_lid_temperature(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a Thermocycler's set target lid temperature command."""
+    request = commands.thermocycler.SetTargetLidTemperatureCreate(
+        params=commands.thermocycler.SetTargetLidTemperatureParams(
+            moduleId="module-id", celsius=45.6
+        )
+    )
+    response = commands.thermocycler.SetTargetLidTemperatureResult(
+        targetLidTemperature=45.6
+    )
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+    result = subject.thermocycler_set_target_lid_temperature(
+        module_id="module-id", celsius=45.6
+    )
+
+    assert result == response
+
+
+def test_thermocycler_set_target_block_temperature(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a Thermocycler's set target block temperature command."""
+    request = commands.thermocycler.SetTargetBlockTemperatureCreate(
+        params=commands.thermocycler.SetTargetBlockTemperatureParams(
+            moduleId="module-id", celsius=45.6, blockMaxVolumeUl=12.3
+        )
+    )
+    response = commands.thermocycler.SetTargetBlockTemperatureResult(
+        targetBlockTemperature=45.6
+    )
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+    result = subject.thermocycler_set_target_block_temperature(
+        module_id="module-id", celsius=45.6, block_max_volume=12.3
+    )
+
+    assert result == response
+
+
+def test_thermocycler_wait_for_lid_temperature(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a Thermocycler's wait for lid temperature command."""
+    request = commands.thermocycler.WaitForLidTemperatureCreate(
+        params=commands.thermocycler.WaitForLidTemperatureParams(moduleId="module-id")
+    )
+    response = commands.thermocycler.WaitForLidTemperatureResult()
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+    result = subject.thermocycler_wait_for_lid_temperature(module_id="module-id")
+
+    assert result == response
+
+
+def test_thermocycler_wait_for_block_temperature(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a Thermocycler's wait for block temperature command."""
+    request = commands.thermocycler.WaitForBlockTemperatureCreate(
+        params=commands.thermocycler.WaitForBlockTemperatureParams(moduleId="module-id")
+    )
+    response = commands.thermocycler.WaitForBlockTemperatureResult()
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+    result = subject.thermocycler_wait_for_block_temperature(module_id="module-id")
+
+    assert result == response
+
+
+def test_thermocycler_run_profile(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a Thermocycler's run profile command."""
+    request = commands.thermocycler.RunProfileCreate(
+        params=commands.thermocycler.RunProfileParams(
+            moduleId="module-id",
+            profile=[
+                commands.thermocycler.RunProfileStepParams(
+                    celsius=42.0, holdSeconds=12.3
+                )
+            ],
+            blockMaxVolumeUl=45.6,
+        )
+    )
+    response = commands.thermocycler.RunProfileResult()
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+    result = subject.thermocycler_run_profile(
+        module_id="module-id",
+        steps=[{"temperature": 42.0, "hold_time_seconds": 12.3}],
+        block_max_volume=45.6,
+    )
+
+    assert result == response
+
+
 def test_thermocycler_deactivate_block(
     decoy: Decoy,
     transport: AbstractSyncTransport,

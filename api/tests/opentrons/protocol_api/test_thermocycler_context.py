@@ -345,8 +345,7 @@ def test_execute_profile(
             steps=[
                 {
                     "temperature": 42.0,
-                    "hold_time_minutes": 12.3,
-                    "hold_time_seconds": 45.6,
+                    "hold_time_seconds": 783.6,
                 }
             ],
             repetitions=12,
@@ -370,6 +369,28 @@ def test_execute_profile(
                     ),
                 }
             ),
+        ),
+    )
+
+
+@pytest.mark.parametrize(
+    "repetitions",
+    [0, -1, -999],
+)
+def test_execute_profile_invalid_repetitions_raises(
+    decoy: Decoy,
+    repetitions: int,
+    mock_broker: Broker,
+    subject: ThermocyclerContext,
+) -> None:
+    """It should raise if given an invalid amount of repetitions."""
+    with pytest.raises(ValueError) as exc_info:
+        subject.execute_profile(steps=[], repetitions=repetitions)
+
+    decoy.verify(
+        mock_broker.publish(
+            "command",
+            matchers.DictMatching({"$": "after", "error": exc_info.value}),
         ),
     )
 

@@ -540,8 +540,13 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
             and finite for each step.
 
         """
+        if repetitions <= 0:
+            raise ValueError("repetitions must be a positive integer")
+        validated_steps = validation.ensure_thermocycler_profile_steps(steps)
         self._core.execute_profile(
-            steps=steps, repetitions=repetitions, block_max_volume=block_max_volume
+            steps=validated_steps,
+            repetitions=repetitions,
+            block_max_volume=block_max_volume,
         )
 
     @publish(command=cmds.thermocycler_deactivate_lid)

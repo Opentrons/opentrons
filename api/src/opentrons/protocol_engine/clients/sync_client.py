@@ -1,11 +1,12 @@
 """Synchronous ProtocolEngine client module."""
-from typing import cast, Optional
+from typing import cast, List, Optional
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from opentrons.types import MountType
+from opentrons.hardware_control.modules.types import ThermocyclerStep
 
 from .. import commands
 from ..state import StateView
@@ -257,6 +258,75 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
         return cast(commands.magnetic_module.EngageResult, result)
+
+    def thermocycler_set_target_lid_temperature(
+        self, module_id: str, celsius: float
+    ) -> commands.thermocycler.SetTargetLidTemperatureResult:
+        """Execute a `thermocycler/setTargetLidTemperature` command and return the result."""
+        request = commands.thermocycler.SetTargetLidTemperatureCreate(
+            params=commands.thermocycler.SetTargetLidTemperatureParams(
+                moduleId=module_id, celsius=celsius
+            )
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.thermocycler.SetTargetLidTemperatureResult, result)
+
+    def thermocycler_set_target_block_temperature(
+        self, module_id: str, celsius: float, block_max_volume: Optional[float]
+    ) -> commands.thermocycler.SetTargetBlockTemperatureResult:
+        """Execute a `thermocycler/setTargetLidTemperature` command and return the result."""
+        request = commands.thermocycler.SetTargetBlockTemperatureCreate(
+            params=commands.thermocycler.SetTargetBlockTemperatureParams(
+                moduleId=module_id, celsius=celsius, blockMaxVolumeUl=block_max_volume
+            )
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.thermocycler.SetTargetBlockTemperatureResult, result)
+
+    def thermocycler_wait_for_lid_temperature(
+        self, module_id: str
+    ) -> commands.thermocycler.WaitForLidTemperatureResult:
+        """Execute a `thermocycler/waitForLidTemperature` command and return the result."""
+        request = commands.thermocycler.WaitForLidTemperatureCreate(
+            params=commands.thermocycler.WaitForLidTemperatureParams(moduleId=module_id)
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.thermocycler.WaitForLidTemperatureResult, result)
+
+    def thermocycler_wait_for_block_temperature(
+        self, module_id: str
+    ) -> commands.thermocycler.WaitForBlockTemperatureResult:
+        """Execute a `thermocycler/waitForBlockTemperature` command and return the result."""
+        request = commands.thermocycler.WaitForBlockTemperatureCreate(
+            params=commands.thermocycler.WaitForBlockTemperatureParams(
+                moduleId=module_id
+            )
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.thermocycler.WaitForBlockTemperatureResult, result)
+
+    def thermocycler_run_profile(
+        self,
+        module_id: str,
+        steps: List[ThermocyclerStep],
+        block_max_volume: Optional[float],
+    ) -> commands.thermocycler.RunProfileResult:
+        """Execute a `thermocycler/runProfile` command and return the result."""
+        request = commands.thermocycler.RunProfileCreate(
+            params=commands.thermocycler.RunProfileParams(
+                moduleId=module_id,
+                profile=[
+                    commands.thermocycler.RunProfileStepParams(
+                        celsius=step["temperature"],
+                        holdSeconds=step["hold_time_seconds"],
+                    )
+                    for step in steps
+                ],
+                blockMaxVolumeUl=block_max_volume,
+            )
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.thermocycler.RunProfileResult, result)
 
     def thermocycler_deactivate_block(
         self, module_id: str
