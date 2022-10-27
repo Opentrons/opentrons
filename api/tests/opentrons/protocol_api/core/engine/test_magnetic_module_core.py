@@ -61,9 +61,13 @@ def test_disengage(
     decoy.verify(mock_engine_client.magnetic_module_disengage(module_id="1234"))
 
 
-def test_get_status(decoy: Decoy, subject: MagneticModuleCore, mock_engine_client: EngineClient, mock_sync_module_hardware: MagDeckHardware) -> None:
+def test_get_status(
+    decoy: Decoy,
+    subject: MagneticModuleCore,
+    mock_engine_client: EngineClient,
+    mock_sync_module_hardware: MagDeckHardware,
+) -> None:
     """Should get the magnetic module status."""
     decoy.when(mock_sync_module_hardware.status).then_return(MagneticStatus.ENGAGED)
 
     assert subject.get_status() == MagneticStatus.ENGAGED
-
