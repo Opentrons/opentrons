@@ -136,7 +136,7 @@ class GeometryView:
         well_name: str,
         well_location: Optional[WellLocation] = None,
     ) -> Point:
-        """Get the absolute position of a well in a labware."""
+        """Given relative well location in a labware, get absolute position."""
         labware_pos = self.get_labware_position(labware_id)
         well_def = self._labware.get_well_definition(labware_id, well_name)
         well_depth = well_def.depth
@@ -154,6 +154,17 @@ class GeometryView:
             x=labware_pos.x + offset.x + well_def.x,
             y=labware_pos.y + offset.y + well_def.y,
             z=labware_pos.z + offset.z + well_def.z,
+        )
+
+    def get_relative_well_location(
+        self,
+        labware_id: str,
+        well_name: str,
+        absolute_point: Point,
+    ) -> WellLocation:
+        """Given absolute position, get relative location of a well in a labware."""
+        raise NotImplementedError(
+            "GeometryView.get_relative_well_location not implemented"
         )
 
     def get_well_edges(

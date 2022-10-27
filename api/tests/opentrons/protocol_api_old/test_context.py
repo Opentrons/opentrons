@@ -1173,11 +1173,11 @@ def test_move_to_with_thermocycler(
     mod = ctx.load_module("thermocycler")
 
     assert isinstance(mod, ThermocyclerContext)
-    mod.flag_unsafe_move = mock.MagicMock(side_effect=raiser)  # type: ignore[assignment]
+    mod._core.flag_unsafe_move = mock.MagicMock(side_effect=raiser)  # type: ignore[attr-defined, assignment]
     instr = ctx.load_instrument("p1000_single", "left")
     with pytest.raises(RuntimeError, match="Cannot"):
         instr.move_to(Location(Point(0, 0, 0), None))
-    mod.flag_unsafe_move.assert_called_once_with(
+    mod._core.flag_unsafe_move.assert_called_once_with(  # type: ignore[attr-defined]
         to_loc=Location(Point(0, 0, 0), None), from_loc=Location(Point(0, 0, 0), None)
     )
 
@@ -1194,12 +1194,12 @@ def test_move_to_with_heater_shaker(
     mod = ctx.load_module("heaterShakerModuleV1", 1)
 
     assert isinstance(mod, HeaterShakerContext)
-    mod.flag_unsafe_move = mock.MagicMock(side_effect=raiser)  # type: ignore[assignment]
+    mod._core.flag_unsafe_move = mock.MagicMock(side_effect=raiser)  # type: ignore[attr-defined]
 
     instr = ctx.load_instrument("p300_multi", "left")
     with pytest.raises(RuntimeError, match="Cannot"):
         instr.move_to(Location(Point(0, 0, 0), None))
-    mod.flag_unsafe_move.assert_called_once_with(
+    mod._core.flag_unsafe_move.assert_called_once_with(  # type: ignore[attr-defined]
         to_loc=Location(Point(0, 0, 0), None),
         is_multichannel=True,
     )

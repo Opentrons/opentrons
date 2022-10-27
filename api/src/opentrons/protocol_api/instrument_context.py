@@ -25,7 +25,6 @@ from opentrons.protocols.api_support.util import (
 )
 
 from .core.common import InstrumentCore
-from .module_contexts import ThermocyclerContext, HeaterShakerContext
 from . import labware
 
 if TYPE_CHECKING:
@@ -1240,16 +1239,6 @@ class InstrumentContext(publisher.CommandPublisher):
         :param publish: Whether a call to this function should publish to the
                         runlog or not.
         """
-        from_loc = self._ctx.location_cache
-        if not from_loc:
-            from_loc = types.Location(types.Point(0, 0, 0), LabwareLike(None))
-
-        for mod in self._ctx._modules.values():
-            if isinstance(mod, ThermocyclerContext):
-                mod.flag_unsafe_move(to_loc=location, from_loc=from_loc)
-            elif isinstance(mod, HeaterShakerContext):
-                mod.flag_unsafe_move(to_loc=location, is_multichannel=self.channels > 1)
-
         publish_ctx = nullcontext()
 
         if publish:
@@ -1258,8 +1247,11 @@ class InstrumentContext(publisher.CommandPublisher):
                 command=cmds.move_to(instrument=self, location=location),
             )
         with publish_ctx:
+            _, well = location.labware.get_parent_labware_and_well()
+
             self._implementation.move_to(
                 location=location,
+                well_core=well._impl if well is not None else None,
                 force_direct=force_direct,
                 minimum_z_height=minimum_z_height,
                 speed=speed,

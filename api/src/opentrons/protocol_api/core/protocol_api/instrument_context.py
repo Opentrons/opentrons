@@ -18,6 +18,7 @@ from opentrons.protocols.geometry import planning
 
 from ..instrument import AbstractInstrument
 from .well import WellImplementation
+from .legacy_module_core import LegacyThermocyclerCore, LegacyHeaterShakerCore
 
 if TYPE_CHECKING:
     from .protocol_context import ProtocolContextImplementation
@@ -25,15 +26,6 @@ if TYPE_CHECKING:
 
 class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
     """Implementation of the InstrumentContext interface."""
-
-    _api_version: APIVersion
-    _protocol_interface: ProtocolContextImplementation
-    _mount: types.Mount
-    _instrument_name: str
-    _default_speed: float
-    _well_bottom_clearances: Clearances
-    _flow_rates: FlowRates
-    _speeds: PlungerSpeeds
 
     def __init__(
         self,
@@ -43,7 +35,6 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
         default_speed: float,
         api_version: Optional[APIVersion] = None,
     ):
-        """ "Constructor"""
         self._api_version = api_version or MAX_SUPPORTED_VERSION
         self._protocol_interface = protocol_interface
         self._mount = mount
@@ -89,10 +80,16 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
         #  an unpleasant compromise until refactoring build_edges to support
         #  WellImplementation.
         #  Also, build_edges should not require api_version.
-        from opentrons.protocol_api.labware import Well
+        from opentrons.protocol_api.labware import Labware, Well
 
         edges = build_edges(
-            where=Well(well_implementation=location),
+            # TODO(mc, 2022-10-26): respect api_version
+            # https://opentrons.atlassian.net/browse/RSS-97
+            where=Well(
+                parent=Labware(implementation=location.get_geometry().parent),
+                well_implementation=location,
+                api_version=MAX_SUPPORTED_VERSION,
+            ),
             offset=v_offset,
             mount=self._mount,
             deck=self._protocol_interface.get_deck(),
@@ -142,11 +139,14 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
     def move_to(
         self,
         location: types.Location,
+        well_core: Optional[WellImplementation],
         force_direct: bool,
         minimum_z_height: Optional[float],
         speed: Optional[float],
     ) -> None:
         """Move the instrument."""
+        self.flag_unsafe_move(location)
+
         # prevent direct movement bugs in PAPI version >= 2.10
         location_cache_mount = (
             self._mount if self._api_version >= APIVersion(2, 10) else None
@@ -299,3 +299,18 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
             dispense=dispense,
             blow_out=blow_out,
         )
+
+    def flag_unsafe_move(self, location: types.Location) -> None:
+        from_loc = self._protocol_interface.get_last_location()
+
+        if not from_loc:
+            from_loc = types.Location(types.Point(0, 0, 0), LabwareLike(None))
+
+        for mod in self._protocol_interface.get_module_cores():
+            if isinstance(mod, LegacyThermocyclerCore):
+                mod.flag_unsafe_move(to_loc=location, from_loc=from_loc)
+            elif isinstance(mod, LegacyHeaterShakerCore):
+                mod.flag_unsafe_move(
+                    to_loc=location,
+                    is_multichannel=self.get_channels() > 1,
+                )

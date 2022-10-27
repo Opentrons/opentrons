@@ -116,6 +116,7 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
     def move_to(
         self,
         location: types.Location,
+        well_core: Optional[WellImplementation],
         force_direct: bool,
         minimum_z_height: Optional[float],
         speed: Optional[float],

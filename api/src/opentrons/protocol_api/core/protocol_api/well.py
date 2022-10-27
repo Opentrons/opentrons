@@ -2,8 +2,10 @@
 
 import re
 
-from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
+
+from opentrons.protocols.geometry.well_geometry import WellGeometry
+from opentrons.types import Point
 
 from ..well import AbstractWellCore
 
@@ -21,10 +23,7 @@ class WellImplementation(AbstractWellCore):
 
     pattern = re.compile(WELL_NAME_PATTERN, re.X)
 
-    def __init__(
-        self, well_geometry: WellGeometry, display_name: str, has_tip: bool, name: str
-    ) -> None:
-        self._display_name = display_name
+    def __init__(self, well_geometry: WellGeometry, has_tip: bool, name: str) -> None:
         self._has_tip = has_tip
         self._name = name
 
@@ -45,10 +44,6 @@ class WellImplementation(AbstractWellCore):
         """Set the well as containing or not containing a tip."""
         self._has_tip = value
 
-    def get_display_name(self) -> str:
-        """Get the well's full display name."""
-        return self._display_name
-
     def get_name(self) -> str:
         """Get the name of the well (e.g. "A1")."""
         return self._name
@@ -65,13 +60,21 @@ class WellImplementation(AbstractWellCore):
         """Get the well's maximum liquid volume."""
         return self._geometry.max_volume
 
+    def get_top(self, z_offset: float) -> Point:
+        """Get the coordinate of the well's top, with an z-offset."""
+        return self._geometry.top(z_offset)
+
+    def get_bottom(self, z_offset: float) -> Point:
+        """Get the coordinate of the well's bottom, with an z-offset."""
+        return self._geometry.bottom(z_offset)
+
+    def get_center(self) -> Point:
+        """Get the coordinate of the well's center."""
+        return self._geometry.center()
+
     def get_geometry(self) -> WellGeometry:
         """Get the well's geometry information interface."""
         return self._geometry
-
-    def __repr__(self) -> str:
-        """Use the well's display name as its repr."""
-        return self.get_display_name()
 
     # TODO(mc, 2022-08-24): comparing only names seems insufficient
     def __eq__(self, other: object) -> bool:

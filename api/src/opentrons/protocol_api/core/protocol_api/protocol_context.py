@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Optional, Set, Union
+from typing import Dict, List, Optional, Set, Union
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -83,6 +83,7 @@ class ProtocolContextImplementation(
         self._last_location: Optional[Location] = None
         self._last_mount: Optional[Mount] = None
         self._loaded_modules: Set["AbstractModule"] = set()
+        self._module_cores: List[legacy_module_core.LegacyModuleCore] = []
 
     @property
     def equipment_broker(self) -> EquipmentBroker[LoadInfo]:
@@ -247,6 +248,7 @@ class ProtocolContextImplementation(
         )
 
         self._deck_layout[resolved_location] = geometry
+        self._module_cores.append(module_core)
 
         self.equipment_broker.publish(
             ModuleLoadInfo(
@@ -359,3 +361,7 @@ class ProtocolContextImplementation(
         """Set the most recent moved to location."""
         self._last_location = location
         self._last_mount = mount
+
+    def get_module_cores(self) -> List[legacy_module_core.LegacyModuleCore]:
+        """Get loaded module cores."""
+        return self._module_cores

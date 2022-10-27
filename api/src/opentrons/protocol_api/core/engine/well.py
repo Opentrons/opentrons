@@ -1,6 +1,8 @@
 """ProtocolEngine-based Well core implementations."""
+from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.geometry.well_geometry import WellGeometry
+from opentrons.types import Point
 
 from ..well import AbstractWellCore
 
@@ -54,6 +56,30 @@ class WellCore(AbstractWellCore):
     def get_max_volume(self) -> float:
         """Get the well's maximum liquid volume."""
         return self._definition.totalLiquidVolume
+
+    def get_top(self, z_offset: float) -> Point:
+        """Get the coordinate of the well's top, with an z-offset."""
+        return self._engine_client.state.geometry.get_well_position(
+            well_name=self._name,
+            labware_id=self._labware_id,
+            well_location=WellLocation(
+                origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=z_offset)
+            ),
+        )
+
+    def get_bottom(self, z_offset: float) -> Point:
+        """Get the coordinate of the well's bottom, with an z-offset."""
+        return self._engine_client.state.geometry.get_well_position(
+            well_name=self._name,
+            labware_id=self._labware_id,
+            well_location=WellLocation(
+                origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=z_offset)
+            ),
+        )
+
+    def get_center(self) -> Point:
+        """Get the coordinate of the well's center, with an z-offset."""
+        raise NotImplementedError("WellCore.get_center not implemented")
 
     def get_geometry(self) -> WellGeometry:
         """Get the well's geometry information interface."""

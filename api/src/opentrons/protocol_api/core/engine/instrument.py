@@ -4,6 +4,7 @@ from typing import Optional
 from opentrons.types import Location, Mount
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support.util import Clearances, PlungerSpeeds, FlowRates
+from opentrons.protocol_engine import DeckPoint
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 
 from ..instrument import AbstractInstrument
@@ -72,11 +73,54 @@ class InstrumentCore(AbstractInstrument[WellCore]):
     def move_to(
         self,
         location: Location,
+        well_core: Optional[WellCore],
         force_direct: bool,
         minimum_z_height: Optional[float],
         speed: Optional[float],
     ) -> None:
-        raise NotImplementedError("InstrumentCore.move_to not implemented")
+        if speed is not None:
+            raise NotImplementedError(
+                "InstrumentCore.move_to with explicit speed not implemented"
+            )
+
+        if well_core is not None and (
+            force_direct is True or minimum_z_height is not None
+        ):
+            raise NotImplementedError(
+                "InstrumentCore.move_to with well and extra move paramaters not implemented"
+            )
+
+        if well_core is not None:
+            if force_direct is True or minimum_z_height is not None:
+                raise NotImplementedError(
+                    "InstrumentCore.move_to with well and extra move paramaters not implemented"
+                )
+
+            labware_id = well_core.labware_id
+            well_name = well_core.get_name()
+            well_location = (
+                self._engine_client.state.geometry.get_relative_well_location(
+                    labware_id=labware_id,
+                    well_name=well_name,
+                    absolute_point=location.point,
+                )
+            )
+
+            self._engine_client.move_to_well(
+                pipette_id=self._pipette_id,
+                labware_id=labware_id,
+                well_name=well_name,
+                well_location=well_location,
+            )
+        else:
+            self._engine_client.move_to_coordinates(
+                pipette_id=self._pipette_id,
+                coordinates=DeckPoint(
+                    x=location.point.x, y=location.point.y, z=location.point.z
+                ),
+                minimum_z_height=minimum_z_height,
+                force_direct=force_direct,
+            )
 
     def get_mount(self) -> Mount:
         raise NotImplementedError("InstrumentCore.get_mount not implemented")

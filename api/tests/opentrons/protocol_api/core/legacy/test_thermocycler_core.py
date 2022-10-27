@@ -288,6 +288,7 @@ def test_open_lid(
         mock_sync_hardware_api.retract(Mount.RIGHT),
         mock_instrument_core.move_to(
             Location(Point(x=1, y=2, z=4), None),
+            well_core=None,
             force_direct=True,
             minimum_z_height=None,
             speed=None,
@@ -329,7 +330,8 @@ def test_close_lid(
     decoy.verify(
         mock_sync_hardware_api.retract(Mount.LEFT),
         mock_instrument_core.move_to(
-            Location(Point(x=1, y=2, z=4), None),
+            location=Location(Point(x=1, y=2, z=4), None),
+            well_core=None,
             force_direct=True,
             minimum_z_height=None,
             speed=None,

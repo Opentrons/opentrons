@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from typing import TypeVar
 
 from opentrons.protocols.geometry.well_geometry import WellGeometry
+from opentrons.types import Point
 
 
 class AbstractWellCore(ABC):
@@ -17,11 +18,6 @@ class AbstractWellCore(ABC):
     @abstractmethod
     def set_has_tip(self, value: bool) -> None:
         """Set the well as containing or not containing a tip."""
-        ...
-
-    @abstractmethod
-    def get_display_name(self) -> str:
-        """Get the well's full display name."""
         ...
 
     @abstractmethod
@@ -42,6 +38,21 @@ class AbstractWellCore(ABC):
     @abstractmethod
     def get_max_volume(self) -> float:
         """Get the well's maximum liquid volume."""
+        ...
+
+    @abstractmethod
+    def get_top(self, z_offset: float) -> Point:
+        """Get the coordinate of the well's top, with an z-offset."""
+        ...
+
+    @abstractmethod
+    def get_bottom(self, z_offset: float) -> Point:
+        """Get the coordinate of the well's bottom, with an z-offset."""
+        ...
+
+    @abstractmethod
+    def get_center(self) -> Point:
+        """Get the coordinate of the well's center."""
         ...
 
     @abstractmethod

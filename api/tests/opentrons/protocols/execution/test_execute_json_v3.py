@@ -305,6 +305,7 @@ def test_dispense():
 def test_touch_tip():
     location = Location(Point(1, 2, 3), "deck")
     well = labware.Well(
+        parent=None,  # type: ignore[arg-type]
         well_implementation=WellImplementation(
             well_geometry=WellGeometry(
                 {
@@ -320,10 +321,9 @@ def test_touch_tip():
                 parent_object=1,
             ),
             has_tip=False,
-            display_name="some well",
             name="A2",
         ),
-        api_level=MAX_SUPPORTED_VERSION,
+        api_version=MAX_SUPPORTED_VERSION,
     )
 
     pipette_mock = mock.create_autospec(InstrumentContext, name="pipette_mock")
