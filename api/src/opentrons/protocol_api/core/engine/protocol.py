@@ -7,6 +7,7 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from opentrons.types import Mount, MountType, Location, DeckSlotName
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
+from opentrons.hardware_control.modules import AbstractModule
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     ModuleType,
@@ -100,7 +101,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def is_simulating(self) -> bool:
         """Get whether the protocol is being analyzed or actually run."""
-        raise NotImplementedError("ProtocolCore.is_simulating not implemented")
+        return self._sync_hardware.is_simulator  # type: ignore[no-any-return]
 
     def add_labware_definition(
         self,
@@ -139,6 +140,19 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             engine_client=self._engine_client,
         )
 
+    def _resolve_module_hardware(
+        self, serial_number: str, model: ModuleModel
+    ) -> AbstractModule:
+        """Resolve a module serial number to module hardware API."""
+        if self.is_simulating():
+            return self._sync_hardware.create_simulating_module(model)  # type: ignore[no-any-return]
+
+        for module_hardware in self._sync_hardware.attached_modules:
+            if serial_number == module_hardware.device_info["serial"]:
+                return module_hardware  # type: ignore[no-any-return]
+
+        raise RuntimeError(f"Could not find specified module: {model.value}")
+
     def load_module(
         self,
         model: ModuleModel,
@@ -160,12 +174,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         )
         module_type = result.model.as_type()
 
-        for module_hardware in self._sync_hardware.attached_modules:
-            if result.serialNumber == module_hardware.device_info["serial"]:
-                selected_hardware = module_hardware
-                break
-        else:
-            raise RuntimeError(f"Could not find specified module: {model.value}")
+        selected_hardware = self._resolve_module_hardware(result.serialNumber, model)
 
         # TODO(mc, 2022-10-25): move to module core factory function
         module_core_cls: Type[ModuleCore] = ModuleCore
