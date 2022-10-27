@@ -203,6 +203,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         return InstrumentCore(
             pipette_id=load_result.pipetteId,
             engine_client=self._engine_client,
+            sync_hardware_api=self._sync_hardware,
         )
 
     def get_loaded_instruments(self) -> Dict[Mount, Optional[InstrumentCore]]:

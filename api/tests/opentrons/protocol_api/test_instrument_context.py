@@ -23,7 +23,7 @@ def mock_instrument_core(decoy: Decoy) -> InstrumentCore:
     """Get a mock instrument implementation core."""
     instrument_core = decoy.mock(cls=InstrumentCore)
     decoy.when(instrument_core.get_mount()).then_return(Mount.LEFT)
-    decoy.when(instrument_core.get_pipette()).then_return(
+    decoy.when(instrument_core.get_hardware_state()).then_return(
         cast(PipetteDict, {"display_name": "Cool Pipette"})
     )
     return instrument_core

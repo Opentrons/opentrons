@@ -102,7 +102,8 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
-    def get_pipette(self) -> PipetteDict:
+    def get_hardware_state(self) -> PipetteDict:
+        """Get the current state of the pipette hardware as a dictionary."""
         ...
 
     @abstractmethod

@@ -1,9 +1,13 @@
 """Test for the ProtocolEngine-based instrument API core."""
+from typing import cast
+
 import pytest
 from decoy import Decoy
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
+from opentrons.hardware_control import SyncHardwareAPI
+from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocol_engine import (
     DeckPoint,
     LoadedPipette,
@@ -23,9 +27,21 @@ def mock_engine_client(decoy: Decoy) -> EngineClient:
 
 
 @pytest.fixture
-def subject(mock_engine_client: EngineClient) -> InstrumentCore:
+def mock_sync_hardware(decoy: Decoy) -> SyncHardwareAPI:
+    """Get a mock SyncHardwareAPI synchronous client."""
+    return decoy.mock(cls=SyncHardwareAPI)
+
+
+@pytest.fixture
+def subject(
+    mock_engine_client: EngineClient, mock_sync_hardware: SyncHardwareAPI
+) -> InstrumentCore:
     """Get a InstrumentCore test subject with its dependencies mocked out."""
-    return InstrumentCore(pipette_id="abc123", engine_client=mock_engine_client)
+    return InstrumentCore(
+        pipette_id="abc123",
+        engine_client=mock_engine_client,
+        sync_hardware_api=mock_sync_hardware,
+    )
 
 
 def test_pipette_id(subject: InstrumentCore) -> None:
@@ -57,6 +73,25 @@ def test_get_mount(
     result = subject.get_mount()
 
     assert result == Mount.LEFT
+
+
+def test_get_hardware_state(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_sync_hardware: SyncHardwareAPI,
+    subject: InstrumentCore,
+) -> None:
+    """It should return the actual state of the pipette hardware."""
+    pipette_dict = cast(PipetteDict, {"display_name": "Cool Pipette"})
+
+    decoy.when(mock_engine_client.state.pipettes.get("abc123")).then_return(
+        LoadedPipette.construct(mount=MountType.LEFT)  # type: ignore[call-arg]
+    )
+    decoy.when(mock_sync_hardware.get_attached_instrument(Mount.LEFT)).then_return(
+        pipette_dict
+    )
+
+    assert subject.get_hardware_state() == pipette_dict
 
 
 def test_move_to_well(

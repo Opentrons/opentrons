@@ -1426,7 +1426,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :raises: a :py:class:`.types.PipetteNotAttachedError` if the pipette is
                  no longer attached (should not happen).
         """
-        return self._implementation.get_pipette()
+        return self._implementation.get_hardware_state()
 
     @property  # type: ignore
     @requires_version(2, 0)

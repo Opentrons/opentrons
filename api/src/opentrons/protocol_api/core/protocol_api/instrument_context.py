@@ -210,29 +210,29 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
 
     def get_pipette_name(self) -> str:
         """Get the pipette name."""
-        return self.get_pipette()["name"]
+        return self.get_hardware_state()["name"]
 
     def get_model(self) -> str:
         """Get the model name."""
-        return self.get_pipette()["model"]
+        return self.get_hardware_state()["model"]
 
     def get_min_volume(self) -> float:
         """Get the min volume."""
-        return self.get_pipette()["min_volume"]
+        return self.get_hardware_state()["min_volume"]
 
     def get_max_volume(self) -> float:
         """Get the max volume."""
-        return self.get_pipette()["max_volume"]
+        return self.get_hardware_state()["max_volume"]
 
     def get_current_volume(self) -> float:
         """Get the current volume."""
-        return self.get_pipette()["current_volume"]
+        return self.get_hardware_state()["current_volume"]
 
     def get_available_volume(self) -> float:
         """Get the available volume."""
-        return self.get_pipette()["available_volume"]
+        return self.get_hardware_state()["available_volume"]
 
-    def get_pipette(self) -> PipetteDict:
+    def get_hardware_state(self) -> PipetteDict:
         """Get the hardware pipette dictionary."""
         sync_hw_api = self._protocol_interface.get_hardware()
         pipette: Optional[PipetteDict] = sync_hw_api.get_attached_instrument(
@@ -246,21 +246,21 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
 
     def get_channels(self) -> int:
         """Number of channels."""
-        return self.get_pipette()["channels"]
+        return self.get_hardware_state()["channels"]
 
     def has_tip(self) -> bool:
         """Whether a tip is attached."""
-        return self.get_pipette()["has_tip"]
+        return self.get_hardware_state()["has_tip"]
 
     def is_ready_to_aspirate(self) -> bool:
-        return self.get_pipette()["ready_to_aspirate"]
+        return self.get_hardware_state()["ready_to_aspirate"]
 
     def prepare_for_aspirate(self) -> None:
         self._protocol_interface.get_hardware().prepare_for_aspirate(self._mount)
 
     def get_return_height(self) -> float:
         """The height to return a tip to its tiprack."""
-        return self.get_pipette().get("return_tip_height", 0.5)
+        return self.get_hardware_state().get("return_tip_height", 0.5)
 
     def get_well_bottom_clearance(self) -> Clearances:
         """The distance above the bottom of a well to aspirate or dispense."""

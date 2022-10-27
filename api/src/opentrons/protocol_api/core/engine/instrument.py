@@ -1,7 +1,8 @@
 """ProtocolEngine-based InstrumentContext core implementation."""
-from typing import Optional, cast
+from typing import Optional
 
 from opentrons.types import Location, Mount
+from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support.util import Clearances, PlungerSpeeds, FlowRates
 from opentrons.protocol_engine import DeckPoint
@@ -18,9 +19,15 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         pipette_id: ProtocolEngine ID of the loaded instrument.
     """
 
-    def __init__(self, pipette_id: str, engine_client: EngineClient) -> None:
+    def __init__(
+        self,
+        pipette_id: str,
+        engine_client: EngineClient,
+        sync_hardware_api: SyncHardwareAPI,
+    ) -> None:
         self._pipette_id = pipette_id
         self._engine_client = engine_client
+        self._sync_hardware_api = sync_hardware_api
 
     @property
     def pipette_id(self) -> str:
@@ -87,13 +94,13 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             force_direct is True or minimum_z_height is not None
         ):
             raise NotImplementedError(
-                "InstrumentCore.move_to with well and extra move paramaters not implemented"
+                "InstrumentCore.move_to with well and extra move parameters not implemented"
             )
 
         if well_core is not None:
             if force_direct is True or minimum_z_height is not None:
                 raise NotImplementedError(
-                    "InstrumentCore.move_to with well and extra move paramaters not implemented"
+                    "InstrumentCore.move_to with well and extra move parameters not implemented"
                 )
 
             labware_id = well_core.labware_id
@@ -153,9 +160,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
     def get_available_volume(self) -> float:
         raise NotImplementedError("InstrumentCore.get_available_volume not implemented")
 
-    def get_pipette(self) -> PipetteDict:
-        # TODO(mc, 2022-10-27): implement
-        return cast(PipetteDict, {"display_name": "A pipette"})
+    def get_hardware_state(self) -> PipetteDict:
+        """Get the current state of the pipette hardware as a dictionary."""
+        return self._sync_hardware_api.get_attached_instrument(self.get_mount())  # type: ignore[no-any-return]
 
     def get_channels(self) -> int:
         raise NotImplementedError("InstrumentCore.get_channels not implemented")
