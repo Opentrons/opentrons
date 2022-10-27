@@ -17,7 +17,7 @@ from opentrons.protocol_engine.types import (
     LabwareOffsetLocation,
     LoadedLabware,
     ModuleModel,
-    ModuleLocation
+    ModuleLocation,
 )
 
 from opentrons.protocol_engine.state.labware import LabwareState, LabwareView
@@ -89,11 +89,18 @@ def test_get_labware_data_by_id() -> None:
     assert subject.get("plate-id") == plate
 
 
-# @pytest.mark.xfail(strict=True, raises=NotImplementedError)
-def test_get_id_by_module() -> None:  # noqa: D103
-    subject = get_labware_view(labware_by_id={"labware-id":
-                                                  LoadedLabware(id="labware-id",
-                                                                          loadName="test", definitionUri="test-uri", location=ModuleLocation(moduleId="module-id"))})
+def test_get_id_by_module() -> None:
+    """Should return the labware id associated to the module."""
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id": LoadedLabware(
+                id="labware-id",
+                loadName="test",
+                definitionUri="test-uri",
+                location=ModuleLocation(moduleId="module-id"),
+            )
+        }
+    )
     assert subject.get_id_by_module(module_id="module-id") == "labware-id"
 
 

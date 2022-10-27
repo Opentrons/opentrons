@@ -83,12 +83,41 @@ def test_engage_from_base(
     )
 
 
-def test_engage_raises_error(
-    decoy: Decoy, subject: MagneticModuleCore, mock_engine_client: EngineClient
-) -> None:
+def test_engage_raises_error(decoy: Decoy, subject: MagneticModuleCore) -> None:
     """Should raise an error that 2 args should not be supplied."""
     with pytest.raises(InvalidMagnetEngageHeightError):
         subject.engage(height_from_base=7.0, height_from_home=7.0)
+
+
+def test_engage_to_labware(
+    decoy: Decoy, subject: MagneticModuleCore, mock_engine_client: EngineClient
+) -> None:
+    """Should verify a call to sync client engage method."""
+    decoy.when(
+        mock_engine_client.state.modules.get_model(module_id="1234")
+    ).then_return(ModuleModel.MAGNETIC_MODULE_V1)
+
+    decoy.when(
+        mock_engine_client.state.labware.get_id_by_module(module_id="1234")
+    ).then_return("555")
+
+    decoy.when(
+        mock_engine_client.state.labware.get_default_magnet_height(labware_id="555")
+    ).then_return(3.0)
+
+    decoy.when(
+        mock_engine_client.state.modules.calculate_magnet_height(
+            module_model=ModuleModel.MAGNETIC_MODULE_V1,
+            labware_default_height=3.0,
+            offset_from_labware_default=0.6,
+        )
+    ).then_return(6.0)
+
+    subject.engage_to_labware(offset=0.6)
+
+    decoy.verify(
+        mock_engine_client.magnetic_module_engage(module_id="1234", engage_height=6.0)
+    )
 
 
 def test_disengage(
