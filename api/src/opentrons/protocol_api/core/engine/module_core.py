@@ -187,7 +187,38 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
         Raises:
             Exception: Labware is not loaded or has no default engage height.
         """
-        raise NotImplementedError("engage_to_labware not implemented")
+        model = self._engine_client.state.modules.get_model(module_id=self.module_id)
+
+        labware_id = self._engine_client.state.labware.get_id_by_module(
+            module_id=self._module_id
+        )
+        if labware_id is None:
+            raise InvalidMagnetEngageHeightError(
+                "There is no labware loaded on this Magnetic Module,"
+                " so you must specify an engage height"
+                " with the `height` or `height_from_base` parameter."
+            )
+
+        default_height = self._engine_client.state.labware.get_default_magnet_height(
+            labware_id=labware_id
+        )
+        if default_height is None:
+            raise InvalidMagnetEngageHeightError(
+                "The labware loaded on this Magnetic Module"
+                " does not have a default engage height,"
+                " so you must specify an engage height"
+                " with the `height` or `height_from_base` parameter."
+            )
+
+        calculated_height = self._engine_client.state.modules.calculate_magnet_height(
+            module_model=model,
+            labware_default_height=default_height,
+            offset_from_labware_default=offset,
+        )
+
+        self._engine_client.magnetic_module_engage(
+            module_id=self.module_id, engage_height=calculated_height
+        )
 
     def disengage(self) -> None:
         """Lower the magnets back into the module."""
