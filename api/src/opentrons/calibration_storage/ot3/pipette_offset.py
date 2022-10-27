@@ -1,8 +1,7 @@
-import os
 import json
 from pathlib import Path
 from pydantic import ValidationError
-from typing import Dict, cast, Optional, Union
+from typing import Optional, Union, no_type_check
 from dataclasses import asdict
 
 from opentrons import config, types
@@ -17,9 +16,8 @@ from .models import v1
 # Delete Pipette Offset Calibrations
 
 
-def delete_pipette_offset_file(
-    pipette: local_types.PipetteId, mount: types.Mount
-) -> None:
+@no_type_check
+def delete_pipette_offset_file(pipette: str, mount: types.Mount) -> None:
     """
     Delete pipette offset file based on mount and pipette serial number
 
@@ -43,9 +41,10 @@ def clear_pipette_offset_calibrations() -> None:
 # Save Pipette Offset Calibrations
 
 
+@no_type_check
 def save_pipette_calibration(
     offset: types.Point,
-    pip_id: local_types.PipetteId,
+    pip_id: str,
     mount: types.Mount,
     cal_status: Optional[
         Union[local_types.CalibrationStatus, v1.CalibrationStatus]
@@ -74,8 +73,9 @@ def save_pipette_calibration(
 # Get Pipette Offset Calibrations
 
 
+@no_type_check
 def get_pipette_offset(
-    pipette_id: local_types.PipetteId, mount: types.Mount
+    pipette_id: str, mount: types.Mount
 ) -> Optional[v1.InstrumentOffsetModel]:
     try:
         pipette_calibration_filepath = (

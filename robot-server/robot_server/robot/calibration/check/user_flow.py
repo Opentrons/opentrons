@@ -7,16 +7,15 @@ from opentrons.calibration_storage import (
     types as cal_types,
     get_robot_deck_attitude,
     save_robot_deck_attitude,
-    load_tip_length_calibration,
     get_custom_tiprack_definition_for_tlc,
     load_tip_length_calibration,
     save_tip_length_calibration,
     create_tip_length_data,
     get_pipette_offset,
     save_pipette_calibration,
-    models,
     mark_bad_calibration,
 )
+from opentrons.calibration_storage.ot2 import models
 from opentrons.types import Mount, Point, Location
 from opentrons.hardware_control import (
     HardwareControlAPI,
@@ -415,11 +414,9 @@ class CheckCalibrationUserFlow:
         mount: Optional[Mount] = None,
     ) -> models.v1.InstrumentOffsetModel:
         if not pipette or not mount:
-            pip_offset = get_pipette_offset(
-                self.hw_pipette.pipette_id, self.mount  # type: ignore
-            )
+            pip_offset = get_pipette_offset(self.hw_pipette.pipette_id, self.mount)
         else:
-            pip_offset = get_pipette_offset(pipette.pipette_id, mount)  # type: ignore
+            pip_offset = get_pipette_offset(pipette.pipette_id, mount)
         assert pip_offset, "No Pipette Offset Found"
         return pip_offset
 

@@ -1017,28 +1017,31 @@ def test_tip_length_for(ctx, monkeypatch):
 
 @pytest.mark.ot2_only
 def test_tip_length_for_caldata(ctx, decoy, monkeypatch):
-    from opentrons.hardware_control.instruments.ot2 import instrument_calibration as instr_cal
+    # TODO (lc 10-27-2022) We need to investigate why the pipette id is
+    # being reported as none for this test (and probably all the others)
+    from opentrons.hardware_control.instruments.ot2 import (
+        instrument_calibration as instr_cal,
+    )
     from opentrons.calibration_storage import types as CSTypes
 
     instr = ctx.load_instrument("p20_single_gen2", "left")
     tiprack = ctx.load_labware("geb_96_tiprack_10ul", "1")
 
-    mock_load_tip_length=decoy.mock(func=instr_cal.load_tip_length_for_pipette)
+    mock_load_tip_length = decoy.mock(func=instr_cal.load_tip_length_for_pipette)
     decoy.when(
-        mock_load_tip_length(
-            None, tiprack._implementation.get_definition()
-        )
+        mock_load_tip_length(None, tiprack._implementation.get_definition())
     ).then_return(
         instr_cal.TipLengthCalibration(
-        tip_length=2,
-        last_modified=utc_now(),
-        source=cs_types.SourceType.user,
-        status=CSTypes.CalibrationStatus(markedBad=False),
-        uri=LabwareUri("opentrons/geb_96_tiprack_10ul/1"),
-        tiprack="somehash",
-        pipette=None
-    ))
-    monkeypatch.setattr(instr_cal, 'load_tip_length_for_pipette', mock_load_tip_length)
+            tip_length=2,
+            last_modified=utc_now(),
+            source=cs_types.SourceType.user,
+            status=CSTypes.CalibrationStatus(markedBad=False),
+            uri=LabwareUri("opentrons/geb_96_tiprack_10ul/1"),
+            tiprack="somehash",
+            pipette=None,  # type: ignore[arg-type]
+        )
+    )
+    monkeypatch.setattr(instr_cal, "load_tip_length_for_pipette", mock_load_tip_length)
     assert instr._tip_length_for(tiprack) == 2
 
 

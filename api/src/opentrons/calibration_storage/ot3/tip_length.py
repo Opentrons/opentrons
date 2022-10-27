@@ -1,4 +1,3 @@
-import os
 import json
 import typing
 from pathlib import Path
@@ -21,9 +20,10 @@ if typing.TYPE_CHECKING:
 # Get Tip Length Calibration
 
 
+@typing.no_type_check
 def tip_lengths_for_pipette(
-    pipette_id: local_types.PipetteId,
-) -> typing.Dict[local_types.TiprackHash, v1.TipLengthModel]:
+    pipette_id: str,
+) -> typing.Dict[str, v1.TipLengthModel]:
     tip_lengths = {}
     try:
         tip_length_filepath = (
@@ -32,9 +32,7 @@ def tip_lengths_for_pipette(
         all_tip_lengths_for_pipette = io.read_cal_file(tip_length_filepath)
         for tiprack, data in all_tip_lengths_for_pipette.items():
             try:
-                tip_lengths[
-                    typing.cast(local_types.TiprackHash, tiprack)
-                ] = v1.TipLengthModel(**data)
+                tip_lengths[tiprack] = v1.TipLengthModel(**data)
             except (json.JSONDecodeError, ValidationError):
                 pass
         return tip_lengths
@@ -42,8 +40,9 @@ def tip_lengths_for_pipette(
         return tip_lengths
 
 
+@typing.no_type_check
 def load_tip_length_calibration(
-    pip_id: local_types.PipetteId, definition: "LabwareDefinition"
+    pip_id: str, definition: "LabwareDefinition"
 ) -> v1.TipLengthModel:
     """
     Function used to grab the current tip length associated
@@ -64,13 +63,14 @@ def load_tip_length_calibration(
         )
 
 
+@typing.no_type_check
 def create_tip_length_data(
     definition: "LabwareDefinition",
     length: float,
     cal_status: typing.Optional[
         typing.Union[local_types.CalibrationStatus, v1.CalibrationStatus]
     ] = None,
-) -> typing.Dict[local_types.TiprackHash, v1.TipLengthModel]:
+) -> typing.Dict[str, v1.TipLengthModel]:
     """
     Function to correctly format tip length data.
 
@@ -101,9 +101,8 @@ def create_tip_length_data(
 # Delete Tip Length Calibration
 
 
-def delete_tip_length_calibration(
-    tiprack: local_types.TiprackHash, pipette_id: local_types.PipetteId
-) -> None:
+@typing.no_type_check
+def delete_tip_length_calibration(tiprack: str, pipette_id: str) -> None:
     """
     Delete tip length calibration based on tiprack hash and
     pipette serial number
@@ -128,6 +127,7 @@ def delete_tip_length_calibration(
         )
 
 
+@typing.no_type_check
 def clear_tip_length_calibration() -> None:
     """
     Delete all tip length calibration files.
@@ -142,9 +142,10 @@ def clear_tip_length_calibration() -> None:
 # Save Tip Length Calibration
 
 
+@typing.no_type_check
 def save_tip_length_calibration(
-    pip_id: local_types.PipetteId,
-    tip_length_cal: typing.Dict[local_types.TiprackHash, v1.TipLengthModel],
+    pip_id: str,
+    tip_length_cal: typing.Dict[str, v1.TipLengthModel],
 ) -> None:
     """
     Function used to save tip length calibration to file.

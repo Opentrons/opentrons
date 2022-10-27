@@ -15,8 +15,8 @@ from opentrons.calibration_storage import (
     save_pipette_calibration,
     delete_pipette_offset_file,
     load_tip_length_calibration,
-    models,
 )
+from opentrons.calibration_storage.ot2 import models
 from opentrons.calibration_storage.types import (
     TipLengthCalNotFound,
 )
@@ -306,7 +306,7 @@ class PipetteOffsetCalibrationUserFlow:
     def _get_stored_tip_length_cal(self) -> Optional[float]:
         try:
             return load_tip_length_calibration(
-                self._hw_pipette.pipette_id,  # type: ignore[arg-type]
+                self._hw_pipette.pipette_id,
                 self._tip_rack._implementation.get_definition(),
             ).tipLength
         except TipLengthCalNotFound:
@@ -315,9 +315,7 @@ class PipetteOffsetCalibrationUserFlow:
     def _get_stored_pipette_offset_cal(
         self,
     ) -> Optional[models.v1.InstrumentOffsetModel]:
-        return get_pipette_offset(
-            self._hw_pipette.pipette_id, self._mount  # type: ignore[arg-type]
-        )
+        return get_pipette_offset(self._hw_pipette.pipette_id, self._mount)
 
     def _get_tip_length(self) -> float:
         stored_tip_length_cal = self._get_stored_tip_length_cal()
@@ -449,7 +447,7 @@ class PipetteOffsetCalibrationUserFlow:
             save_pipette_calibration(
                 offset=offset,
                 mount=self._mount,
-                pip_id=self._hw_pipette.pipette_id,  # type: ignore[arg-type]
+                pip_id=self._hw_pipette.pipette_id,
                 tiprack_hash=tiprack_hash,
                 tiprack_uri=self._tip_rack.uri,
             )
@@ -472,9 +470,7 @@ class PipetteOffsetCalibrationUserFlow:
                 tip_length_offset=noz_pt.z - self._nozzle_height_at_reference,
                 tip_rack=self._tip_rack,
             )
-            delete_pipette_offset_file(
-                self._hw_pipette.pipette_id, self.mount  # type: ignore[arg-type]
-            )
+            delete_pipette_offset_file(self._hw_pipette.pipette_id, self.mount)
             new_tip_length = self._get_stored_tip_length_cal()
             self._has_calibrated_tip_length = new_tip_length is not None
             # load the new tip length for the rest of the session

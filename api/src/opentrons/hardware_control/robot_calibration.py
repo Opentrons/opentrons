@@ -16,7 +16,6 @@ from opentrons.calibration_storage import (
     types,
     save_robot_deck_attitude,
     get_robot_deck_attitude,
-    save_robot_deck_attitude,
 )
 from opentrons.types import Point
 from opentrons.util import linal

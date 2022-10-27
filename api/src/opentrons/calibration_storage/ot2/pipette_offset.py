@@ -1,4 +1,3 @@
-import os
 import json
 import typing
 from pathlib import Path
@@ -17,7 +16,8 @@ from opentrons.util.helpers import utc_now
 # Delete Pipette Offset Calibrations
 
 
-def delete_pipette_offset_file(pipette: local_types.PipetteId, mount: Mount) -> None:
+@typing.no_type_check
+def delete_pipette_offset_file(pipette: str, mount: Mount) -> None:
     """
     Delete pipette offset file based on mount and pipette serial number
 
@@ -29,6 +29,7 @@ def delete_pipette_offset_file(pipette: local_types.PipetteId, mount: Mount) -> 
     io.delete_file(offset_path)
 
 
+@typing.no_type_check
 def clear_pipette_offset_calibrations() -> None:
     """
     Delete all pipette offset calibration files.
@@ -41,11 +42,12 @@ def clear_pipette_offset_calibrations() -> None:
 # Save Pipette Offset Calibrations
 
 
+@typing.no_type_check
 def save_pipette_calibration(
     offset: Point,
-    pip_id: local_types.PipetteId,
+    pip_id: str,
     mount: Mount,
-    tiprack_hash: local_types.TiprackHash,
+    tiprack_hash: str,
     tiprack_uri: str,
     cal_status: typing.Optional[
         typing.Union[local_types.CalibrationStatus, v1.CalibrationStatus]
@@ -76,8 +78,9 @@ def save_pipette_calibration(
 # Get Pipette Offset Calibrations
 
 
+@typing.no_type_check
 def get_pipette_offset(
-    pipette_id: local_types.PipetteId, mount: Mount
+    pipette_id: str, mount: Mount
 ) -> typing.Optional[v1.InstrumentOffsetModel]:
     try:
         pipette_calibration_filepath = (
@@ -94,6 +97,7 @@ def get_pipette_offset(
         return None
 
 
+@typing.no_type_check
 def get_all_pipette_offset_calibrations() -> typing.List[v1.PipetteOffsetCalibration]:
     """
     A helper function that will list all of the pipette offset
@@ -108,16 +112,17 @@ def get_all_pipette_offset_calibrations() -> typing.List[v1.PipetteOffsetCalibra
         pipette_id = filepath.stem
         mount = Mount.string_to_mount(filepath.parent.stem)
         calibration = get_pipette_offset(pipette_id, mount)
-        pipette_calibration_list.append(
-            v1.PipetteOffsetCalibration(
-                pipette=pipette_id,
-                mount=mount.name.lower(),
-                offset=types.Point(*calibration.offset),
-                tiprack=calibration.tiprack,
-                uri=calibration.uri,
-                last_modified=calibration.last_modified,
-                source=calibration.source,
-                status=calibration.status,
+        if calibration:
+            pipette_calibration_list.append(
+                v1.PipetteOffsetCalibration(
+                    pipette=pipette_id,
+                    mount=mount.name.lower(),
+                    offset=types.Point(*calibration.offset),
+                    tiprack=calibration.tiprack,
+                    uri=calibration.uri,
+                    last_modified=calibration.last_modified,
+                    source=calibration.source,
+                    status=calibration.status,
+                )
             )
-        )
     return pipette_calibration_list

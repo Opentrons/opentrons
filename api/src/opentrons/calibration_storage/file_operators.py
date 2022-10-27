@@ -11,7 +11,6 @@ import typing
 from pydantic import BaseModel
 from pathlib import Path
 
-from .types import StrPath
 from .encoder_decoder import DateTimeEncoder, DateTimeDecoder
 
 

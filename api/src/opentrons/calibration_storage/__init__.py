@@ -2,10 +2,15 @@ from opentrons import config
 
 from .ot3 import ot3_gripper_offset
 from .ot2 import mark_bad_calibration
+
 # TODO these functions are only used in robot server. We should think about moving them and/or
 # abstracting it away from a robot specific function. We should also check if the tip rack
 # definition information is still needed.
-from .ot2.tip_length import get_custom_tiprack_definition_for_tlc, get_all_tip_length_calibrations, _save_custom_tiprack_definition
+from .ot2.tip_length import (
+    get_custom_tiprack_definition_for_tlc,
+    get_all_tip_length_calibrations,
+    _save_custom_tiprack_definition,
+)
 from .ot2.pipette_offset import get_all_pipette_offset_calibrations
 
 if config.feature_flags.enable_ot3_hardware_controller():
@@ -49,7 +54,7 @@ else:
         load_tip_length_calibration,
         delete_tip_length_calibration,
     )
-    from .ot2 import models
+    from .ot2 import models  # type: ignore[no-redef]
 
 __all__ = [
     # deck calibration functions

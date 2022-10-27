@@ -2,7 +2,7 @@ import os
 import json
 from pathlib import Path
 from pydantic import ValidationError
-from typing import Optional, Union
+from typing import Optional, Union, no_type_check
 from dataclasses import asdict
 
 from opentrons import config
@@ -17,6 +17,7 @@ from .models import v1
 # Delete Deck Calibration
 
 
+@no_type_check
 def delete_robot_deck_attitude() -> None:
     """
     Delete the robot deck attitude calibration.
@@ -30,9 +31,10 @@ def delete_robot_deck_attitude() -> None:
 # Save Deck Calibration
 
 
+@no_type_check
 def save_robot_deck_attitude(
     transform: local_types.AttitudeMatrix,
-    pip_id: Optional[local_types.PipetteId],
+    pip_id: Optional[str],
     source: Optional[local_types.SourceType] = None,
     cal_status: Optional[
         Union[local_types.CalibrationStatus, local_types.CalibrationStatus]
@@ -61,6 +63,7 @@ def save_robot_deck_attitude(
 # Get Deck Calibration
 
 
+@no_type_check
 def get_robot_deck_attitude() -> Optional[v1.DeckCalibrationModel]:
     deck_calibration_dir = Path(config.get_opentrons_path("robot_calibration_dir"))
     for file in os.scandir(deck_calibration_dir):

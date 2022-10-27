@@ -1,13 +1,9 @@
 from starlette import status
 from fastapi import APIRouter
-from typing import Optional, cast
+from typing import Optional
 
-from opentrons.calibration_storage import (
-    types as cal_types,
-    get_all_tip_length_calibrations as all_tip_lengths,
-    delete_tip_length_calibration,
-    models,
-)
+from opentrons.calibration_storage import types as cal_types
+from opentrons.calibration_storage.ot2 import tip_length, models
 
 from robot_server.errors import ErrorBody
 from robot_server.service.tip_length import models as tl_models
@@ -53,7 +49,7 @@ async def get_all_tip_length_calibrations(
     pipette_id: Optional[str] = None,
     tiprack_uri: Optional[str] = None,
 ) -> tl_models.MultipleCalibrationsResponse:
-    all_calibrations = all_tip_lengths()
+    all_calibrations = tip_length.get_all_tip_length_calibrations()
     if not all_calibrations:
         return tl_models.MultipleCalibrationsResponse(
             data=[_format_calibration(cal) for cal in all_calibrations],
@@ -85,10 +81,7 @@ async def get_all_tip_length_calibrations(
 )
 async def delete_specific_tip_length_calibration(tiprack_hash: str, pipette_id: str):
     try:
-        delete_tip_length_calibration(
-            cast(cal_types.TiprackHash, tiprack_hash),
-            cast(cal_types.PipetteId, pipette_id),
-        )
+        tip_length.delete_tip_length_calibration(tiprack_hash, pipette_id)
     except cal_types.TipLengthCalNotFound:
         raise RobotServerError(
             definition=CommonErrorDef.RESOURCE_NOT_FOUND,

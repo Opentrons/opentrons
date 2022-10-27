@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 
 @pytest.fixture(autouse=True)
-def reload_module(robot_model: "RobotModel"):
+def reload_module(robot_model: "RobotModel") -> None:
     importlib.reload(opentrons.calibration_storage)
 
 
@@ -54,9 +54,17 @@ def test_get_deck_calibration(
     Test ability to get a deck calibration model.
     """
     from opentrons.calibration_storage import get_robot_deck_attitude, models
+    from opentrons.calibration_storage.ot3.models.v1 import (
+        DeckCalibrationModel as OT3DeckCalModel,
+    )
+    from opentrons.calibration_storage.ot2.models.v1 import (
+        DeckCalibrationModel as OT2DeckCalModel,
+    )
 
     robot_deck = get_robot_deck_attitude()
     if robot_model == "OT-3 Standard":
+        # needed for proper type checking unfortunately
+        assert isinstance(models.v1.DeckCalibrationModel, OT3DeckCalModel)
         assert robot_deck == models.v1.DeckCalibrationModel(
             attitude=[[1, 0, 0], [0, 1, 0], [0, 0, 1]],
             lastModified=robot_deck.lastModified,
@@ -65,6 +73,8 @@ def test_get_deck_calibration(
             status=models.v1.CalibrationStatus(),
         )
     else:
+        # needed for proper type checking unfortunately
+        assert isinstance(models.v1.DeckCalibrationModel, OT2DeckCalModel)
         assert robot_deck == models.v1.DeckCalibrationModel(
             attitude=[[1, 0, 0], [0, 1, 0], [0, 0, 1]],
             last_modified=robot_deck.last_modified,

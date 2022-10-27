@@ -68,13 +68,11 @@ def test_save_gripper_calibration(
         gripper.get_gripper_calibration_offset(cs_types.GripperId("gripper1")) is None
     )
     gripper.save_gripper_calibration(Point(1, 1, 1), cs_types.GripperId("gripper1"))
-    assert (
-        gripper.get_gripper_calibration_offset(cs_types.GripperId("gripper1"))
-        is not None
-    )
-    assert gripper.get_gripper_calibration_offset(
+    gripper_offset = gripper.get_gripper_calibration_offset(
         cs_types.GripperId("gripper1")
-    ).offset == Point(1, 1, 1)
+    )
+    assert gripper_offset is not None
+    assert gripper_offset.offset == Point(1, 1, 1)
 
 
 def test_get_gripper_calibration(

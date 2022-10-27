@@ -12,7 +12,7 @@ def verify_settings_value(response: Response, id: str, value: str) -> None:
 
 def verify_pipette_calibration_response(response: Response) -> None:
     """Verify we get an unordered list of pipette calibrations."""
-    assert response.json().get("links") == None
+    assert response.json().get("links") is None
     for pipette_offsets in response.json().get("data"):
         assert pipette_offsets.get("mount") in ["left", "right"]
         assert pipette_offsets.get("pipette") in ["123", "321"]
