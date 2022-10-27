@@ -12,6 +12,8 @@ from opentrons_shared_data.labware.dev_types import (
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from opentrons.types import Mount, MountType, DeckSlotName
+from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
+from opentrons.hardware_control.modules import AbstractModule
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     TemperatureModuleModel,
@@ -59,9 +61,39 @@ def api_version() -> APIVersion:
 
 
 @pytest.fixture
-def subject(mock_engine_client: EngineClient, api_version: APIVersion) -> ProtocolCore:
+def mock_sync_module_hardware(decoy: Decoy) -> SynchronousAdapter[AbstractModule]:
+    """Get a mock synchronous module hardware."""
+    return decoy.mock(name="SynchronousAdapter[AbstractModule]")  # type: ignore[no-any-return]
+
+
+@pytest.fixture
+def mock_sync_hardware_api(decoy: Decoy) -> SyncHardwareAPI:
+    """Get a mock hardware API."""
+    return decoy.mock(cls=SyncHardwareAPI)
+
+
+@pytest.fixture
+def subject(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    api_version: APIVersion,
+    mock_sync_hardware_api: SyncHardwareAPI,
+) -> ProtocolCore:
     """Get a ProtocolCore test subject with its dependencies mocked out."""
-    return ProtocolCore(engine_client=mock_engine_client, api_version=api_version)
+    decoy.when(mock_engine_client.state.labware.get_fixed_trash_id()).then_return(
+        "fixed-trash-123"
+    )
+    decoy.when(
+        mock_engine_client.state.labware.get_definition("fixed-trash-123")
+    ).then_return(
+        LabwareDefinition.construct(ordering=[["A1"]])  # type: ignore[call-arg]
+    )
+
+    return ProtocolCore(
+        engine_client=mock_engine_client,
+        api_version=api_version,
+        sync_hardware=mock_sync_hardware_api,
+    )
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 3)])
@@ -70,6 +102,17 @@ def test_api_version(
 ) -> None:
     """Should return the protocol version."""
     assert subject.api_version == api_version
+
+
+def test_get_fixed_trash(subject: ProtocolCore) -> None:
+    """It should have a single labware core for the fixed trash."""
+    result = subject.get_fixed_trash()
+
+    assert isinstance(result, LabwareCore)
+    assert result.labware_id == "fixed-trash-123"
+
+    # verify it's the same core every time
+    assert subject.get_fixed_trash() is result
 
 
 def test_load_instrument(
@@ -114,6 +157,10 @@ def test_load_labware(
         )
     )
 
+    decoy.when(mock_engine_client.state.labware.get_definition("abc123")).then_return(
+        LabwareDefinition.construct(ordering=[])  # type: ignore[call-arg]
+    )
+
     result = subject.load_labware(
         load_name="some_labware",
         location=DeckSlotName.SLOT_5,
@@ -130,6 +177,7 @@ def test_load_labware(
 def test_load_labware_on_module(
     decoy: Decoy,
     mock_engine_client: EngineClient,
+    mock_sync_module_hardware: SynchronousAdapter[AbstractModule],
     subject: ProtocolCore,
     api_version: APIVersion,
 ) -> None:
@@ -150,12 +198,17 @@ def test_load_labware_on_module(
         )
     )
 
+    decoy.when(mock_engine_client.state.labware.get_definition("abc123")).then_return(
+        LabwareDefinition.construct(ordering=[])  # type: ignore[call-arg]
+    )
+
     result = subject.load_labware(
         load_name="some_labware",
         location=ModuleCore(
             module_id="module-id",
             engine_client=mock_engine_client,
             api_version=api_version,
+            sync_module_hardware=mock_sync_module_hardware,
         ),
         label="some_display_name",  # maps to optional display name
         namespace="some_explicit_namespace",
@@ -228,6 +281,7 @@ def test_add_labware_definition(
 def test_load_module(
     decoy: Decoy,
     mock_engine_client: EngineClient,
+    mock_sync_hardware_api: SyncHardwareAPI,
     requested_model: ModuleModel,
     engine_model: EngineModuleModel,
     expected_core_cls: Type[ModuleCore],
@@ -235,6 +289,15 @@ def test_load_module(
 ) -> None:
     """It should issue a load module engine command."""
     definition = ModuleDefinition.construct()  # type: ignore[call-arg]
+
+    mock_hw_mod_1 = decoy.mock(cls=AbstractModule)
+    mock_hw_mod_2 = decoy.mock(cls=AbstractModule)
+
+    decoy.when(mock_hw_mod_1.device_info).then_return({"serial": "abc123"})
+    decoy.when(mock_hw_mod_2.device_info).then_return({"serial": "xyz789"})
+    decoy.when(mock_sync_hardware_api.attached_modules).then_return(
+        [mock_hw_mod_1, mock_hw_mod_2]
+    )
 
     decoy.when(
         mock_engine_client.load_module(
@@ -276,12 +339,17 @@ def test_load_module(
 def test_load_module_thermocycler_with_no_location(
     decoy: Decoy,
     mock_engine_client: EngineClient,
+    mock_sync_hardware_api: SyncHardwareAPI,
     requested_model: ModuleModel,
     engine_model: EngineModuleModel,
     subject: ProtocolCore,
 ) -> None:
     """It should issue a load module engine command with location at 7."""
     definition = ModuleDefinition.construct()  # type: ignore[call-arg]
+
+    mock_hw_mod = decoy.mock(cls=AbstractModule)
+    decoy.when(mock_hw_mod.device_info).then_return({"serial": "xyz789"})
+    decoy.when(mock_sync_hardware_api.attached_modules).then_return([mock_hw_mod])
 
     decoy.when(
         mock_engine_client.load_module(

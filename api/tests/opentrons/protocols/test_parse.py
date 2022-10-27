@@ -6,50 +6,113 @@ from typing import Optional
 import pytest
 
 from opentrons.protocols.parse import (
-    extract_metadata,
+    extract_static_python_info,
     _get_protocol_schema_version,
     validate_json,
     parse,
     API_VERSION_FOR_JSON_V5_AND_BELOW,
     MAX_SUPPORTED_JSON_SCHEMA_VERSION,
-    version_from_metadata,
+    version_from_static_python_info,
 )
 from opentrons.protocols.types import (
     JsonProtocol,
     PythonProtocol,
+    StaticPythonInfo,
     MalformedProtocolError,
     ApiDeprecationError,
 )
 from opentrons.protocols.api_support.types import APIVersion
 
 
-def test_extract_metadata():
-    expected = {"hello": "world", "what?": "no"}
+@pytest.mark.parametrize(
+    "protocol_source,expected_result",
+    [
+        (
+            # Neither metadata nor requirements:
+            "",
+            StaticPythonInfo(metadata=None, requirements=None),
+        ),
+        (
+            # Just metadata:
+            """
+            metadata = {
+                'k1': 'v1',
+                'k2': 'v2'
+            }
+            """,
+            StaticPythonInfo(metadata={"k1": "v1", "k2": "v2"}, requirements=None),
+        ),
+        (
+            # Just requirements:
+            """
+            requirements = {
+                'k1': 'v1',
+                'k2': 'v2'
+            }
+            """,
+            StaticPythonInfo(metadata=None, requirements={"k1": "v1", "k2": "v2"}),
+        ),
+        (
+            # Both:
+            """
+            metadata = {
+                'mk1': 'mv1',
+                'mk2': 'mv2'
+            }
+            requirements = {
+                'rk1': 'rv1',
+                'rk2': 'rv2'
+            }
+            """,
+            StaticPythonInfo(
+                metadata={"mk1": "mv1", "mk2": "mv2"},
+                requirements={"rk1": "rv1", "rk2": "rv2"},
+            ),
+        ),
+        (
+            # Surrounded by other stuff:
+            """
+            this = 0
+            that = 1
+            metadata = {
+                'mk1': 'mv1',
+                'mk2': 'mv2'
+            }
+            requirements = {
+                'rk1': 'rv1',
+                'rk2': 'rv2'
+            }
+            print('wat?')
+            metadata['hello'] = 'moon'
+            fakedata['what?'] = 'ham'
+            """,
+            StaticPythonInfo(
+                metadata={"mk1": "mv1", "mk2": "mv2"},
+                requirements={"rk1": "rv1", "rk2": "rv2"},
+            ),
+        ),
+        (
+            # Later assignments should override earlier assignments:
+            # TODO(mm, 2022-10-24): Reconsider whether we actually want this behavior.
+            # Protocols probably shouldn't do this. Note that metadata["k"] = "v" is
+            # unsupported.
+            """
+            metadata = {"k1": "v1"}
+            metadata = {"k2": "v2"}
+            """,
+            StaticPythonInfo(metadata={"k2": "v2"}, requirements=None),
+        ),
+    ],
+)
+def test_extract_static_python_info(
+    protocol_source: str, expected_result: StaticPythonInfo
+) -> None:
+    parsed = ast.parse(dedent(protocol_source), filename="testy", mode="exec")
+    actual_result = extract_static_python_info(parsed)
+    assert actual_result == expected_result
 
-    prot = dedent(
-        """
-        this = 0
-        that = 1
-        metadata = {
-        'what?': 'no',
-        'hello': 'world'
-        }
-        fakedata = {
-        'who?': 'me',
-        'what?': 'green eggs'
-        }
-        print('wat?')
-        metadata['hello'] = 'moon'
-        fakedata['what?'] = 'ham'
-        """
-    )
 
-    parsed = ast.parse(prot, filename="testy", mode="exec")
-    metadata = extract_metadata(parsed)
-    assert metadata == expected
-
-
-infer_version_cases = [
+parse_version_cases = [
     (
         """
         from opentrons import instruments
@@ -158,8 +221,8 @@ infer_version_cases = [
 ]
 
 
-@pytest.mark.parametrize("proto,version", infer_version_cases)
-def test_get_version(proto, version):
+@pytest.mark.parametrize("proto,version", parse_version_cases)
+def test_parse_get_version(proto, version):
     proto = dedent(proto)
     if version == APIVersion(1, 0):
         with pytest.raises(ApiDeprecationError):
@@ -169,34 +232,93 @@ def test_get_version(proto, version):
         assert parsed.api_level == version
 
 
-test_valid_metadata = [
-    ({"apiLevel": "1"}, APIVersion(1, 0)),
-    ({"apiLevel": "1.0"}, APIVersion(1, 0)),
-    ({"apiLevel": "1.2"}, APIVersion(1, 2)),
-    ({"apiLevel": "2.0"}, APIVersion(2, 0)),
-    ({"apiLevel": "2.6"}, APIVersion(2, 6)),
-    ({"apiLevel": "10.23123151"}, APIVersion(10, 23123151)),
-]
+@pytest.mark.parametrize(
+    "static_info,expected_version",
+    [
+        # Basic extraction:
+        (
+            StaticPythonInfo(metadata={"apiLevel": "1"}, requirements=None),
+            APIVersion(1, 0),
+        ),
+        (
+            StaticPythonInfo(metadata={"apiLevel": "1.0"}, requirements=None),
+            APIVersion(1, 0),
+        ),
+        (
+            StaticPythonInfo(metadata={"apiLevel": "1.2"}, requirements=None),
+            APIVersion(1, 2),
+        ),
+        (
+            StaticPythonInfo(metadata={"apiLevel": "2.0"}, requirements=None),
+            APIVersion(2, 0),
+        ),
+        (
+            StaticPythonInfo(metadata={"apiLevel": "2.6"}, requirements=None),
+            APIVersion(2, 6),
+        ),
+        (
+            StaticPythonInfo(metadata={"apiLevel": "10.23123151"}, requirements=None),
+            APIVersion(10, 23123151),
+        ),
+        # When one or both is missing:
+        # TODO(mm, 2022-10-21): The expected behavior here is still to be decided.
+        (
+            StaticPythonInfo(metadata=None, requirements=None),
+            None,
+        ),
+        (
+            StaticPythonInfo(metadata=None, requirements={}),
+            None,
+        ),
+        (
+            StaticPythonInfo(metadata=None, requirements={"apiLevel": "123.456"}),
+            APIVersion(123, 456),
+        ),
+        (
+            StaticPythonInfo(metadata={}, requirements=None),
+            None,
+        ),
+        (
+            StaticPythonInfo(metadata={}, requirements={}),
+            None,
+        ),
+        (
+            StaticPythonInfo(metadata={}, requirements={"apiLevel": "123.456"}),
+            APIVersion(123, 456),
+        ),
+        (
+            StaticPythonInfo(metadata={"apiLevel": "123.456"}, requirements=None),
+            APIVersion(123, 456),
+        ),
+        (
+            StaticPythonInfo(metadata={"apiLevel": "123.456"}, requirements={}),
+            APIVersion(123, 456),
+        ),
+        # Overriding:
+        # TODO(mm, 2022-10-21): The expected behavior here is still to be decided.
+        (
+            StaticPythonInfo(
+                metadata={"apiLevel": "123.456"}, requirements={"apiLevel": "789.0"}
+            ),
+            APIVersion(789, 0),
+        ),
+    ],
+)
+def test_version_from_static_python_info_valid(static_info, expected_version):
+    assert version_from_static_python_info(static_info) == expected_version
 
 
 test_invalid_metadata = [
-    ({}, KeyError),
-    ({"sasdaf": "asdaf"}, KeyError),
-    ({"apiLevel": "2"}, ValueError),
-    ({"apiLevel": "2.0.0"}, ValueError),
-    ({"apiLevel": "asda"}, ValueError),
+    (StaticPythonInfo(metadata={"apiLevel": "2"}, requirements=None), ValueError),
+    (StaticPythonInfo(metadata={"apiLevel": "2.0.0"}, requirements=None), ValueError),
+    (StaticPythonInfo(metadata={"apiLevel": "asda"}, requirements=None), ValueError),
 ]
 
 
-@pytest.mark.parametrize("metadata,version", test_valid_metadata)
-def test_valid_version_from_metadata(metadata, version):
-    assert version_from_metadata(metadata) == version
-
-
 @pytest.mark.parametrize("metadata,exc", test_invalid_metadata)
-def test_invalid_version_from_metadata(metadata, exc):
+def test_version_from_static_python_info_invalid(metadata, exc):
     with pytest.raises(exc):
-        version_from_metadata(metadata)
+        version_from_static_python_info(metadata)
 
 
 def test_get_protocol_schema_version():
@@ -315,7 +437,7 @@ def test_parse_bundle_details(get_bundle_fixture):
 
 
 @pytest.mark.parametrize("protocol_file", ["testosaur_v2.py"])
-def test_extra_contents(get_labware_fixture, protocol_file, protocol):
+def test_parse_extra_contents(get_labware_fixture, protocol_file, protocol):
     fixture_96_plate = get_labware_fixture("fixture_96_plate")
     bundled_labware = {"fixture/fixture_96_plate/1": fixture_96_plate}
     extra_data = {"hi": b"there"}
@@ -352,6 +474,6 @@ def test_extra_contents(get_labware_fixture, protocol_file, protocol):
         """,
     ],
 )
-def test_bad_structure(bad_protocol):
+def test_parse_bad_structure(bad_protocol):
     with pytest.raises(MalformedProtocolError):
         parse(dedent(bad_protocol))

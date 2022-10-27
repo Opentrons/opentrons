@@ -93,7 +93,11 @@ def create_protocol_context(
             engine=protocol_engine, loop=protocol_engine_loop
         )
         engine_client = SyncClient(transport=engine_client_transport)
-        core = ProtocolCore(engine_client=engine_client, api_version=api_version)
+        core = ProtocolCore(
+            engine_client=engine_client,
+            api_version=api_version,
+            sync_hardware=sync_hardware,
+        )
 
     # TODO(mc, 2022-8-22): remove `disable_fast_protocol_upload`
     elif use_simulating_core and not feature_flags.disable_fast_protocol_upload():

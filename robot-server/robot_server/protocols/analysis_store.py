@@ -4,6 +4,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from logging import getLogger
 from typing import Dict, List, Optional
+from typing_extensions import Literal
 
 import anyio
 import sqlalchemy
@@ -13,6 +14,7 @@ from opentrons.protocol_engine import (
     ErrorOccurrence,
     LoadedPipette,
     LoadedLabware,
+    LoadedModule,
     Liquid,
 )
 
@@ -108,9 +110,12 @@ class AnalysisStore:
         analysis_id: str,
         commands: List[Command],
         labware: List[LoadedLabware],
+        modules: List[LoadedModule],
         pipettes: List[LoadedPipette],
         errors: List[ErrorOccurrence],
         liquids: List[Liquid],
+        # TODO(mm, 2022-10-21): Find an enum for this.
+        robot_type: Literal["OT-2 Standard", "OT-3 Standard"],
     ) -> None:
         """Promote a pending analysis to completed, adding details of its results.
 
@@ -119,10 +124,12 @@ class AnalysisStore:
                 Must point to a valid pending analysis.
             commands: See `CompletedAnalysis.commands`.
             labware: See `CompletedAnalysis.labware`.
+            modules: See `CompletedAnalysis.modules`.
             pipettes: See `CompletedAnalysis.pipettes`.
             errors: See `CompletedAnalysis.errors`. Also used to infer whether
                 the completed analysis result is `OK` or `NOT_OK`.
-            liquids: See `CompletedAnalysis.liquids
+            liquids: See `CompletedAnalysis.liquids`.
+            robot_type: See `CompletedAnalysis.robotType`.
         """
         protocol_id = self._pending_store.get_protocol_id(analysis_id=analysis_id)
 
@@ -141,9 +148,11 @@ class AnalysisStore:
             result=result,
             commands=commands,
             labware=labware,
+            modules=modules,
             pipettes=pipettes,
             errors=errors,
             liquids=liquids,
+            robotType=robot_type,
         )
         completed_analysis_resource = _CompletedAnalysisResource(
             id=completed_analysis.id,

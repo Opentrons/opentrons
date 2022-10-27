@@ -1,6 +1,8 @@
 """Core module control interfaces."""
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
-from typing import Any, Generic, List, Optional, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, List, Optional, TypeVar
 
 from opentrons.drivers.types import (
     HeaterShakerLabwareLatchStatus,
@@ -16,9 +18,11 @@ from opentrons.hardware_control.modules.types import (
 )
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.types import DeckSlotName
-from opentrons.protocol_api.labware import Labware
 
 from .labware import LabwareCoreType
+
+if TYPE_CHECKING:
+    from opentrons.protocol_api.labware import Labware
 
 
 class AbstractModuleCore(ABC, Generic[LabwareCoreType]):
