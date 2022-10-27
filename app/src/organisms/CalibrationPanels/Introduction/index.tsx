@@ -16,7 +16,7 @@ import { NeedHelpLink } from '../NeedHelpLink'
 import { ChooseTipRack } from '../ChooseTipRack'
 
 import { TRASH_BIN_LOAD_NAME } from '../constants'
-import { WizardRequiredLabwareList } from '../../../molecules/WizardRequiredLabwareList'
+import { WizardRequiredEquipmentList } from '../../../molecules/WizardRequiredEquipmentList'
 import { Body } from './Body'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -135,7 +135,7 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
           <Body sessionType={sessionType} />
         </Flex>
         <Flex flex="1">
-          <WizardRequiredLabwareList
+          <WizardRequiredEquipmentList
             equipmentList={equipmentList}
             footer={
               sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK

@@ -7,8 +7,7 @@ from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
 from opentrons.hardware_control.modules import TemperatureStatus, SpeedStatus
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, HeaterShakerContext
-
-from .types import ProtocolCore, HeaterShakerCore
+from opentrons.protocol_api.core.common import ProtocolCore, HeaterShakerCore
 
 
 @pytest.fixture

@@ -13,6 +13,7 @@ from opentrons.protocol_engine import (
     DeckSlotLocation,
     Liquid,
 )
+from opentrons.protocol_engine.types import HexColor
 
 
 class CommandTranslatorError(Exception):
@@ -121,7 +122,9 @@ class JsonTranslator:
                 id=liquid_id,
                 displayName=liquid.displayName,
                 description=liquid.description,
-                displayColor=liquid.displayColor,
+                displayColor=HexColor(__root__=liquid.displayColor)
+                if liquid.displayColor is not None
+                else None,
             )
             for liquid_id, liquid in protocol_liquids.items()
         ]

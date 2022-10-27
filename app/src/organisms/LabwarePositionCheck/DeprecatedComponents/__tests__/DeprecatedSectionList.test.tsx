@@ -2,23 +2,23 @@ import { renderWithProviders } from '@opentrons/components'
 import * as React from 'react'
 import { i18n } from '../../../../i18n'
 import { DeprecatedSectionList } from '../DeprecatedSectionList'
-import { Section } from '../types'
+import { DeprecatedSection } from '../types'
 
 const MOCK_SECTIONS_1_PIPETTE_2_STEPS = [
   'PRIMARY_PIPETTE_TIPRACKS',
   'RETURN_TIP',
-] as Section[]
+] as DeprecatedSection[]
 const MOCK_SECTIONS_2_PIPETTES_3_STEPS = [
   'PRIMARY_PIPETTE_TIPRACKS',
   'SECONDARY_PIPETTE_TIPRACKS',
   'RETURN_TIP',
-] as Section[]
+] as DeprecatedSection[]
 const MOCK_SECTIONS_2_PIPETTES_4_STEPS = [
   'PRIMARY_PIPETTE_TIPRACKS',
   'SECONDARY_PIPETTE_TIPRACKS',
   'CHECK_REMAINING_LABWARE_WITH_PRIMARY_PIPETTE',
   'RETURN_TIP',
-] as Section[]
+] as DeprecatedSection[]
 
 const render = (props: React.ComponentProps<typeof DeprecatedSectionList>) => {
   return renderWithProviders(<DeprecatedSectionList {...props} />, {

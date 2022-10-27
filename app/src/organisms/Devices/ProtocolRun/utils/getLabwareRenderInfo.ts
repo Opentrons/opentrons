@@ -59,9 +59,7 @@ export const getLabwareRenderInfo = (
       const location = command.params.location
       const displayName = command.params.displayName ?? null
       const labwareDef = command.result?.definition
-      if ('moduleId' in location) {
-        return { ...acc }
-      }
+      if (location === 'offDeck' || 'moduleId' in location) return acc
       if (labwareId == null) {
         throw new Error('expected to find labware id but could not')
       }

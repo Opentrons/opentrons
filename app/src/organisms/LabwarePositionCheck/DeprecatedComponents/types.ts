@@ -1,4 +1,4 @@
-import { SECTIONS } from './constants'
+import { DEPRECATED_SECTIONS } from './constants'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { MoveToWellCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
 import type {
@@ -11,7 +11,7 @@ import type {
   PickUpTipCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 
-export type Section = keyof typeof SECTIONS
+export type DeprecatedSection = keyof typeof DEPRECATED_SECTIONS
 
 export type LabwarePositionCheckCreateCommand =
   | MoveToWellCreateCommand
@@ -25,9 +25,9 @@ export type LabwarePositionCheckMovementCommand =
   | MoveToWellCreateCommand
   | PickUpTipCreateCommand
   | DropTipCreateCommand
-export interface LabwarePositionCheckStep {
+export interface DeprecatedLabwarePositionCheckStep {
   labwareId: string
-  section: Section
+  section: DeprecatedSection
   commands: LabwarePositionCheckCreateCommand[]
 }
 export interface LabwareToOrder {

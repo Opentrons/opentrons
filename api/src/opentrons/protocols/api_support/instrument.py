@@ -74,18 +74,21 @@ VALID_PIP_TIPRACK_VOL = {
 
 
 def validate_tiprack(
-    instrument_name: str, tiprack: Labware, log: logging.Logger
+    instrument_name: str, tip_rack: Labware, log: logging.Logger
 ) -> None:
     """Validate a tiprack logging a warning message."""
+    if not tip_rack.is_tiprack:
+        raise ValueError(f"Labware {tip_rack.load_name} is not a tip rack.")
+
     # TODO AA 2020-06-24 - we should instead add the acceptable Opentrons
     #  tipracks to the pipette as a refactor
-    if tiprack._implementation.get_definition()["namespace"] == "opentrons":
-        tiprack_vol = tiprack.wells()[0].max_volume
+    if tip_rack.uri.startswith("opentrons/"):
+        tiprack_vol = tip_rack.wells()[0].max_volume
         valid_vols = VALID_PIP_TIPRACK_VOL[instrument_name.split("_")[0]]
         if tiprack_vol not in valid_vols:
             log.warning(
-                f"The pipette {instrument_name} and its tiprack "
-                f"{tiprack.load_name} in slot {tiprack.parent} appear to "
+                f"The pipette {instrument_name} and its tip rack "
+                f"{tip_rack.load_name} in slot {tip_rack.parent} appear to "
                 "be mismatched. Please check your protocol before running "
                 "on the robot."
             )

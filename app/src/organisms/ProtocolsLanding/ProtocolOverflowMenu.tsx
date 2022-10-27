@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useTrackEvent } from '../../redux/analytics'
 import {
   Flex,
@@ -16,8 +16,8 @@ import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { Portal } from '../../App/portal'
+import { getSendAllProtocolsToOT3 } from '../../redux/config'
 import {
-  analyzeProtocol,
   removeProtocol,
   viewProtocolSourceFolder,
 } from '../../redux/protocol-storage'
@@ -52,6 +52,7 @@ export function ProtocolOverflowMenu(
     dispatch(removeProtocol(protocolKey))
     trackEvent({ name: 'deleteProtocolFromApp', properties: {} })
   }, true)
+  const sendAllProtocolsToOT3 = useSelector(getSendAllProtocolsToOT3)
 
   const handleClickShowInFolder: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
@@ -65,11 +66,11 @@ export function ProtocolOverflowMenu(
     handleRunProtocol()
     setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }
-  const handleClickReanalyze: React.MouseEventHandler<HTMLButtonElement> = e => {
+  const handleClickSendToOT3: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
-    dispatch(analyzeProtocol(protocolKey))
-    setShowOverflowMenu(!showOverflowMenu)
+    console.log('TODO(bh, 2022-10-12): implement send to ot-3')
+    setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }
   const handleClickDelete: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
@@ -104,14 +105,16 @@ export function ProtocolOverflowMenu(
             onClick={handleClickRun}
             data-testid="ProtocolOverflowMenu_run"
           >
-            {t('run')}
+            {t('run_now')}
           </MenuItem>
-          <MenuItem
-            onClick={handleClickReanalyze}
-            data-testid="ProtocolOverflowMenu_reanalyze"
-          >
-            {t('shared:reanalyze')}
-          </MenuItem>
+          {sendAllProtocolsToOT3 ? (
+            <MenuItem
+              onClick={handleClickSendToOT3}
+              data-testid="ProtocolOverflowMenu_reanalyze"
+            >
+              {t('send_to_ot3')}
+            </MenuItem>
+          ) : null}
           <MenuItem
             onClick={handleClickShowInFolder}
             data-testid="ProtocolOverflowMenu_showInFolder"
@@ -122,7 +125,7 @@ export function ProtocolOverflowMenu(
             onClick={handleClickDelete}
             data-testid="ProtocolOverflowMenu_deleteProtocol"
           >
-            {t('delete_protocol')}
+            {t('shared:delete')}
           </MenuItem>
         </Flex>
       ) : null}
