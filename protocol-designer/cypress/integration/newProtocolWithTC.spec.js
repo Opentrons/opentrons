@@ -81,11 +81,13 @@ describe('Protocols with Modules', () => {
 
       // Re-add thermocycler
       cy.get(addThermocycler).click()
-      cy.get('button').contains('save', { matchCase: false }).click()
+      cy.get('button')
+        .contains('save', { matchCase: false })
+        .click({ force: true })
     })
 
-    it('adds two liquids', () => {
-      cy.get('button').contains('Continue to Liquids').click()
+    it('adds one liquid', () => {
+      cy.get('button').contains('Continue to Liquids').click({ force: true })
       cy.addLiquid('Water', 'pure H2O', true)
     })
 
