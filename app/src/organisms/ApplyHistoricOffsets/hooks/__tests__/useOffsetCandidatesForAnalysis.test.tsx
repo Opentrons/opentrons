@@ -77,10 +77,20 @@ describe('useOffsetCandidatesForAnalysis', () => {
     when(mockGetLabwareLocationCombos)
       .calledWith(expect.any(Array), expect.any(Array), expect.any(Array))
       .mockReturnValue([
-        { location: { slotName: '1' }, definitionUri: 'firstFakeDefURI' },
-        { location: { slotName: '2' }, definitionUri: 'secondFakeDefURI' },
+        {
+          location: { slotName: '1' },
+          definitionUri: 'firstFakeDefURI',
+          labwareId: 'firstFakeId',
+        },
+        {
+          location: { slotName: '2' },
+          definitionUri: 'secondFakeDefURI',
+          labwareId: 'secondFakeId',
+        },
         {
           location: { slotName: '3', moduleModel: 'heaterShakerModuleV1' },
+          labwareId: 'thirdFakeId',
+          moduleId: 'fakeHSId',
           definitionUri: 'thirdFakeDefURI',
         },
       ])

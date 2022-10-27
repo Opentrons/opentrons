@@ -2,9 +2,14 @@
 from dataclasses import dataclass, replace
 from datetime import datetime
 from subprocess import run
+from time import time
 from typing import List, Optional, Dict, Tuple
 
+from opentrons_hardware.firmware_bindings.constants import SensorId
+from opentrons_hardware.sensors import sensor_driver, sensor_types
+
 from opentrons.config.robot_configs import build_config_ot3, load_ot3 as load_ot3_config
+from opentrons.hardware_control.backends.ot3utils import sensor_node_for_mount
 from opentrons.hardware_control.instruments.pipette import Pipette
 from opentrons.hardware_control.motion_utilities import deck_from_machine
 from opentrons.hardware_control.ot3api import OT3API
@@ -423,7 +428,7 @@ async def move_to_arched_ot3(
     mount: OT3Mount,
     abs_position: Point,
     speed: Optional[float] = None,
-    safe_height: float = 0.0,
+    safe_height: float = -100.0,
 ) -> None:
     """Move OT3 gantry in an arched path."""
     z_ax = OT3Axis.by_mount(mount)
@@ -437,3 +442,68 @@ async def move_to_arched_ot3(
     ]
     for p in points:
         await api.move_to(mount=mount, abs_position=p, speed=speed)
+
+
+async def get_capacitance_ot3(api: OT3API, mount: OT3Mount) -> float:
+    """Get the capacitance reading from the pipette."""
+    if api.is_simulator:
+        return 0.0
+    node_id = sensor_node_for_mount(mount)
+    capacitive = sensor_types.CapacitiveSensor.build(SensorId.S0, node_id)
+    s_driver = sensor_driver.SensorDriver()
+    data = await s_driver.read(
+        api._backend._messenger, capacitive, offset=False, timeout=1  # type: ignore[union-attr]
+    )
+    if data is None:
+        raise ValueError("Unexpected None value from sensor")
+    return data.to_float()  # type: ignore[union-attr]
+
+
+async def wait_for_stable_capacitance_ot3(
+    api: OT3API,
+    mount: OT3Mount,
+    threshold_pf: float,
+    duration: float,
+    retries: int = 10,
+) -> None:
+    """Wait for the pipette capacitance to be stable."""
+    if api.is_simulator:
+        return
+    data = list()
+
+    async def _read() -> None:
+        cap_val = await get_capacitance_ot3(api, mount)
+        data.append(
+            (
+                time(),
+                cap_val,
+            )
+        )
+
+    def _data_duration() -> float:
+        if len(data) < 2:
+            return 0.0
+        return data[-1][0] - data[0][0]
+
+    def _data_stats() -> Tuple[float, float]:
+        cap_data = [d[1] for d in data]
+        avg = sum(cap_data) / len(cap_data)
+        var = max(cap_data) - min(cap_data)
+        return avg, var
+
+    print(f"Waiting for {duration} seconds of stable capacitance, please wait...")
+    while _data_duration() < duration:
+        await _read()
+
+    average, variance = _data_stats()
+    print(
+        f"Read {len(data)} samples in {_data_duration()} seconds "
+        f"(average={average}, variance={variance})"
+    )
+    if variance > threshold_pf or variance == 0.0:
+        if retries <= 0:
+            raise RuntimeError("Unable to get stable capacitance reading")
+        print("Unstable, repeating...")
+        await wait_for_stable_capacitance_ot3(
+            api, mount, threshold_pf, duration, retries - 1
+        )

@@ -40,6 +40,11 @@ class AbstractWellCore(ABC):
         ...
 
     @abstractmethod
+    def get_max_volume(self) -> float:
+        """Get the well's maximum liquid volume."""
+        ...
+
+    @abstractmethod
     def get_geometry(self) -> WellGeometry:
         """Get the well's geometry information interface."""
         ...

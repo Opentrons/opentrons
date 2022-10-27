@@ -4,6 +4,7 @@ from typing import Optional
 from opentrons.types import Location, Mount
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support.util import Clearances, PlungerSpeeds, FlowRates
+from opentrons.protocol_engine.clients import SyncClient as EngineClient
 
 from ..instrument import AbstractInstrument
 from .well import WellCore
@@ -16,8 +17,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         pipette_id: ProtocolEngine ID of the loaded instrument.
     """
 
-    def __init__(self, pipette_id: str) -> None:
+    def __init__(self, pipette_id: str, engine_client: EngineClient) -> None:
         self._pipette_id = pipette_id
+        self._engine_client = engine_client
 
     @property
     def pipette_id(self) -> str:
@@ -79,11 +81,15 @@ class InstrumentCore(AbstractInstrument[WellCore]):
     def get_mount(self) -> Mount:
         raise NotImplementedError("InstrumentCore.get_mount not implemented")
 
-    def get_instrument_name(self) -> str:
-        raise NotImplementedError("InstrumentCore.get_instrument_name not implemented")
-
     def get_pipette_name(self) -> str:
-        raise NotImplementedError("InstrumentCore.get_pipette_name not implemented")
+        """Get the pipette's load name as a string.
+
+        Will match the load name of the actually loaded pipette,
+        which may differ from the requested load name.
+        """
+        return self._engine_client.state.pipettes.get(
+            self._pipette_id
+        ).pipetteName.value
 
     def get_model(self) -> str:
         raise NotImplementedError("InstrumentCore.get_model not implemented")

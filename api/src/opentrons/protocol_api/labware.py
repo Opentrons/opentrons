@@ -75,7 +75,6 @@ class Well:
         """
         self._api_version = api_level or MAX_SUPPORTED_VERSION
         self._impl = well_implementation
-        self._geometry = well_implementation.get_geometry()
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -85,7 +84,10 @@ class Well:
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def parent(self) -> Labware:
-        return Labware(implementation=self._geometry.parent, api_level=self.api_version)
+        return Labware(
+            implementation=self.geometry.parent,
+            api_version=self.api_version,
+        )
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
@@ -98,16 +100,16 @@ class Well:
 
     @property
     def max_volume(self) -> float:
-        return self._geometry.max_volume
+        return self._impl.get_max_volume()
 
     @property
     def geometry(self) -> WellGeometry:
-        return self._geometry
+        return self._impl.get_geometry()
 
     @property  # type: ignore
     @requires_version(2, 0)
     def diameter(self) -> Optional[float]:
-        return self._geometry.diameter
+        return self.geometry.diameter
 
     @property  # type: ignore
     @requires_version(2, 9)
@@ -116,7 +118,7 @@ class Well:
         The length of a well, if the labware has
         square wells.
         """
-        return self._geometry._length
+        return self.geometry._length
 
     @property  # type: ignore
     @requires_version(2, 9)
@@ -125,7 +127,7 @@ class Well:
         The width of a well, if the labware has
         square wells.
         """
-        return self._geometry._width
+        return self.geometry._width
 
     @property  # type: ignore
     @requires_version(2, 9)
@@ -133,7 +135,7 @@ class Well:
         """
         The depth of a well in a labware.
         """
-        return self._geometry._depth
+        return self.geometry._depth
 
     @property
     def display_name(self) -> str:
@@ -153,7 +155,7 @@ class Well:
                  front-left corner of slot 1 as (0,0,0)). If z is specified,
                  returns a point offset by z mm from top-center
         """
-        return Location(self._geometry.top(z), self)
+        return Location(self.geometry.top(z), self)
 
     @requires_version(2, 0)
     def bottom(self, z: float = 0.0) -> Location:
@@ -164,7 +166,7 @@ class Well:
                  slot 1 as (0,0,0)). If z is specified, returns a point
                  offset by z mm from bottom-center
         """
-        return Location(self._geometry.bottom(z), self)
+        return Location(self.geometry.bottom(z), self)
 
     @requires_version(2, 0)
     def center(self) -> Location:
@@ -173,7 +175,7 @@ class Well:
                  of the well relative to the deck (with the front-left corner
                  of slot 1 as (0,0,0))
         """
-        return Location(self._geometry.center(), self)
+        return Location(self.geometry.center(), self)
 
     @requires_version(2, 8)
     def from_center_cartesian(self, x: float, y: float, z: float) -> Point:
@@ -196,7 +198,7 @@ class Well:
         :return: a :py:class:`opentrons.types.Point` representing the specified
                  location in absolute deck coordinates
         """
-        return self._geometry.from_center_cartesian(x, y, z)
+        return self.geometry.from_center_cartesian(x, y, z)
 
     def _from_center_cartesian(self, x: float, y: float, z: float) -> Point:
         """
@@ -255,7 +257,7 @@ class Labware(DeckItem):
     def __init__(
         self,
         implementation: AbstractLabware[Any],
-        api_level: Optional[APIVersion] = None,
+        api_version: Optional[APIVersion] = None,
     ) -> None:
         """
         :param implementation: The class that implements the public interface
@@ -266,15 +268,10 @@ class Labware(DeckItem):
                                      defaults to
                                      :py:attr:`.MAX_SUPPORTED_VERSION`.
         """
-        if not api_level:
-            api_level = MAX_SUPPORTED_VERSION
-        if api_level > MAX_SUPPORTED_VERSION:
-            raise RuntimeError(
-                f"API version {api_level} is not supported by this "
-                f"robot software. Please either reduce your requested API "
-                f"version or update your robot."
-            )
-        self._api_version = api_level
+        if not api_version:
+            api_version = MAX_SUPPORTED_VERSION
+
+        self._api_version = api_version
         self._implementation: LabwareCore = implementation
 
     @property
@@ -564,7 +561,7 @@ class Labware(DeckItem):
     @property
     def _is_tiprack(self) -> bool:
         """as is_tiprack but not subject to version checking for speed"""
-        return self._implementation.is_tiprack()
+        return self._implementation.is_tip_rack()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
@@ -783,7 +780,7 @@ def load_from_definition(
             parent=parent,
             label=label,
         ),
-        api_level=api_level,
+        api_version=api_level,
     )
 
 

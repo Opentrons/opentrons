@@ -123,7 +123,7 @@ export function ProtocolRunSetup({
               ) + 1
             ]
           }
-          expandStep={nextStep => setExpandedStepKey(nextStep)}
+          expandStep={setExpandedStepKey}
           calibrationStatus={calibrationStatus}
         />
       ),
@@ -156,7 +156,7 @@ export function ProtocolRunSetup({
               ? null
               : LIQUID_SETUP_KEY
           }
-          expandStep={nextStep => setExpandedStepKey(nextStep)}
+          expandStep={setExpandedStepKey}
         />
       ),
       description: t(`${LABWARE_SETUP_KEY}_description`),

@@ -14,6 +14,7 @@ from opentrons.protocol_engine import (
     ErrorOccurrence,
     LoadedPipette,
     LoadedLabware,
+    LoadedModule,
     Liquid,
 )
 
@@ -109,6 +110,7 @@ class AnalysisStore:
         analysis_id: str,
         commands: List[Command],
         labware: List[LoadedLabware],
+        modules: List[LoadedModule],
         pipettes: List[LoadedPipette],
         errors: List[ErrorOccurrence],
         liquids: List[Liquid],
@@ -122,6 +124,7 @@ class AnalysisStore:
                 Must point to a valid pending analysis.
             commands: See `CompletedAnalysis.commands`.
             labware: See `CompletedAnalysis.labware`.
+            modules: See `CompletedAnalysis.modules`.
             pipettes: See `CompletedAnalysis.pipettes`.
             errors: See `CompletedAnalysis.errors`. Also used to infer whether
                 the completed analysis result is `OK` or `NOT_OK`.
@@ -145,6 +148,7 @@ class AnalysisStore:
             result=result,
             commands=commands,
             labware=labware,
+            modules=modules,
             pipettes=pipettes,
             errors=errors,
             liquids=liquids,

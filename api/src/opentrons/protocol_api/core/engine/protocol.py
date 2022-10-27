@@ -59,6 +59,10 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         self._engine_client = engine_client
         self._api_version = api_version
         self._sync_hardware = sync_hardware
+        self._fixed_trash_core = LabwareCore(
+            labware_id=engine_client.state.labware.get_fixed_trash_id(),
+            engine_client=engine_client,
+        )
 
     @property
     def api_version(self) -> APIVersion:
@@ -196,11 +200,14 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         engine_mount = MountType[mount.name]
         load_result = self._engine_client.load_pipette(instrument_name, engine_mount)
 
-        return InstrumentCore(pipette_id=load_result.pipetteId)
+        return InstrumentCore(
+            pipette_id=load_result.pipetteId,
+            engine_client=self._engine_client,
+        )
 
     def get_loaded_instruments(self) -> Dict[Mount, Optional[InstrumentCore]]:
         """Get all loaded instruments by mount."""
-        raise NotImplementedError("ProtocolCore.add_labware_definition not implemented")
+        raise NotImplementedError("ProtocolCore.get_loaded_instruments not implemented")
 
     def pause(self, msg: Optional[str]) -> None:
         """Pause the protocol."""
@@ -228,7 +235,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def get_fixed_trash(self) -> DeckItem:
         """Get the fixed trash labware."""
-        raise NotImplementedError("ProtocolCore.get_fixed_trash not implemented")
+        return self._fixed_trash_core
 
     def set_rail_lights(self, on: bool) -> None:
         """Set the device's rail lights."""

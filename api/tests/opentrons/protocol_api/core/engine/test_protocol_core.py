@@ -74,11 +74,21 @@ def mock_sync_hardware_api(decoy: Decoy) -> SyncHardwareAPI:
 
 @pytest.fixture
 def subject(
+    decoy: Decoy,
     mock_engine_client: EngineClient,
     api_version: APIVersion,
     mock_sync_hardware_api: SyncHardwareAPI,
 ) -> ProtocolCore:
     """Get a ProtocolCore test subject with its dependencies mocked out."""
+    decoy.when(mock_engine_client.state.labware.get_fixed_trash_id()).then_return(
+        "fixed-trash-123"
+    )
+    decoy.when(
+        mock_engine_client.state.labware.get_definition("fixed-trash-123")
+    ).then_return(
+        LabwareDefinition.construct(ordering=[["A1"]])  # type: ignore[call-arg]
+    )
+
     return ProtocolCore(
         engine_client=mock_engine_client,
         api_version=api_version,
@@ -92,6 +102,17 @@ def test_api_version(
 ) -> None:
     """Should return the protocol version."""
     assert subject.api_version == api_version
+
+
+def test_get_fixed_trash(subject: ProtocolCore) -> None:
+    """It should have a single labware core for the fixed trash."""
+    result = subject.get_fixed_trash()
+
+    assert isinstance(result, LabwareCore)
+    assert result.labware_id == "fixed-trash-123"
+
+    # verify it's the same core every time
+    assert subject.get_fixed_trash() is result
 
 
 def test_load_instrument(
@@ -136,6 +157,10 @@ def test_load_labware(
         )
     )
 
+    decoy.when(mock_engine_client.state.labware.get_definition("abc123")).then_return(
+        LabwareDefinition.construct(ordering=[])  # type: ignore[call-arg]
+    )
+
     result = subject.load_labware(
         load_name="some_labware",
         location=DeckSlotName.SLOT_5,
@@ -171,6 +196,10 @@ def test_load_labware_on_module(
             definition=LabwareDefinition.construct(),  # type: ignore[call-arg]
             offsetId=None,
         )
+    )
+
+    decoy.when(mock_engine_client.state.labware.get_definition("abc123")).then_return(
+        LabwareDefinition.construct(ordering=[])  # type: ignore[call-arg]
     )
 
     result = subject.load_labware(
