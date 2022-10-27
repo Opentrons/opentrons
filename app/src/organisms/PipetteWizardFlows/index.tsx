@@ -60,7 +60,7 @@ export const PipetteWizardFlows = (
     goBack,
   }
 
-  const movement = true // TODO(jr, 10/27/22): wire this up!
+  const movement = false // TODO(jr, 10/27/22): wire this up!
   const exitModal = (
     <ExitModal
       goBack={() => setConfirmExit(false)}
