@@ -8,6 +8,7 @@ import {
   Flex,
   ALIGN_CENTER,
   ALIGN_FLEX_START,
+  COLORS,
   DIRECTION_COLUMN,
   JUSTIFY_CENTER,
   SIZE_3,
@@ -17,20 +18,21 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
+import { InstrumentCard } from '../../molecules/InstrumentCard'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ModuleCard } from '../ModuleCard'
-import { useIsRobotViewable, useRunStatuses } from './hooks'
+import { useIsOT3, useIsRobotViewable, useRunStatuses } from './hooks'
 import { PipetteCard } from './PipetteCard'
 
 const EQUIPMENT_POLL_MS = 5000
-interface PipettesAndModulesProps {
+interface InstrumentsAndModulesProps {
   robotName: string
 }
 
-export function PipettesAndModules({
+export function InstrumentsAndModules({
   robotName,
-}: PipettesAndModulesProps): JSX.Element | null {
-  const { t } = useTranslation('device_details')
+}: InstrumentsAndModulesProps): JSX.Element | null {
+  const { t } = useTranslation(['device_details', 'shared'])
 
   const attachedPipettes = usePipettesQuery({
     refetchInterval: EQUIPMENT_POLL_MS,
@@ -38,12 +40,15 @@ export function PipettesAndModules({
   const isRobotViewable = useIsRobotViewable(robotName)
   const currentRunId = useCurrentRunId()
   const { isRunTerminal } = useRunStatuses()
+  const isOT3 = useIsOT3(robotName)
 
   const attachedModules =
     useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
   // split modules in half and map into each column separately to avoid
   // the need for hardcoded heights without limitation, array will be split equally
   // or left column will contain 1 more item than right column
+  // TODO: adjust floor/ceil depending on OT-3
+  // TODO: OR, instead, map the pipette/extension mount/module data into columns pre-render, make the JSX layout less opinionated
   const halfAttachedModulesSize = Math.ceil(attachedModules?.length / 2)
   const leftColumnModules = attachedModules?.slice(0, halfAttachedModulesSize)
   const rightColumnModules = attachedModules?.slice(halfAttachedModulesSize)
@@ -58,9 +63,9 @@ export function PipettesAndModules({
         as="h3"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         marginBottom={SPACING.spacing4}
-        id="PipettesAndModules_title"
+        id="InstrumentsAndModules_title"
       >
-        {t('pipettes_and_modules')}
+        {t('instruments_and_modules')}
       </StyledText>
       <Flex
         alignItems={ALIGN_CENTER}
@@ -106,7 +111,21 @@ export function PipettesAndModules({
               />
             </Flex>
             <Flex gridGap={SPACING.spacing3}>
-              <Box flex="50%">
+              <Flex
+                flex="50%"
+                flexDirection={DIRECTION_COLUMN}
+                gridGap={SPACING.spacing3}
+              >
+                {/* extension mount here */}
+                {isOT3 ? (
+                  <InstrumentCard
+                    description={t('shared:empty')}
+                    isGripper
+                    // TODO: localization
+                    label="extension mount"
+                    menuOverlayItems={[]}
+                  />
+                ) : null}
                 {leftColumnModules.map((module, index) => (
                   <ModuleCard
                     key={`moduleCard_${module.moduleType}_${index}`}
@@ -115,8 +134,12 @@ export function PipettesAndModules({
                     isLoadedInRun={false}
                   />
                 ))}
-              </Box>
-              <Box flex="50%">
+              </Flex>
+              <Flex
+                flex="50%"
+                flexDirection={DIRECTION_COLUMN}
+                gridGap={SPACING.spacing3}
+              >
                 {rightColumnModules.map((module, index) => (
                   <ModuleCard
                     key={`moduleCard_${module.moduleType}_${index}`}
@@ -125,13 +148,30 @@ export function PipettesAndModules({
                     isLoadedInRun={false}
                   />
                 ))}
-              </Box>
+              </Flex>
             </Flex>
           </Box>
         ) : (
-          <StyledText as="p" id="PipettesAndModules_offline">
-            {t('offline_pipettes_and_modules')}
-          </StyledText>
+          <Flex
+            alignItems={ALIGN_CENTER}
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacingSM}
+            justifyContent={JUSTIFY_CENTER}
+            minHeight={SIZE_3}
+            padding={SPACING.spacingSM}
+          >
+            {/**
+             * TODO(bh, 2022-10-20): insert "offline" image when provided by illustrator
+             * <img width="105px" height="105px" src={opentronsLogo} />
+             *  */}
+            <StyledText
+              as="p"
+              color={COLORS.errorDisabled}
+              id="InstrumentsAndModules_offline"
+            >
+              {t('offline_instruments_and_modules')}
+            </StyledText>
+          </Flex>
         )}
       </Flex>
     </Flex>

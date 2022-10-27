@@ -15,7 +15,7 @@ import {
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { useRobot, useSyncRobotClock } from '../../../organisms/Devices/hooks'
-import { PipettesAndModules } from '../../../organisms/Devices/PipettesAndModules'
+import { InstrumentsAndModules } from '../../../organisms/Devices/InstrumentsAndModules'
 import { RecentProtocolRuns } from '../../../organisms/Devices/RecentProtocolRuns'
 import { RobotOverview } from '../../../organisms/Devices/RobotOverview'
 import { getScanning } from '../../../redux/discovery'
@@ -53,7 +53,7 @@ export function DeviceDetails(): JSX.Element | null {
           width="100%"
         >
           <RobotOverview robotName={robotName} />
-          <PipettesAndModules robotName={robotName} />
+          <InstrumentsAndModules robotName={robotName} />
         </Flex>
         <RecentProtocolRuns robotName={robotName} />
       </Box>

@@ -9,7 +9,6 @@ import {
   ALIGN_START,
   DIRECTION_COLUMN,
   SPACING,
-  FONT_WEIGHT_REGULAR,
   useInterval,
   TYPOGRAPHY,
   COLORS,
@@ -274,9 +273,9 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
             ) : null}
             <StyledText
               textTransform={TYPOGRAPHY.textTransformUppercase}
-              color={COLORS.darkGrey}
-              fontWeight={FONT_WEIGHT_REGULAR}
-              fontSize={TYPOGRAPHY.fontSizeCaption}
+              color={COLORS.darkGreyEnabled}
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              fontSize={TYPOGRAPHY.fontSizeH6}
               paddingBottom={SPACING.spacing2}
               data-testid={`PipetteCard_mount_${pipetteDisplayName}`}
             >

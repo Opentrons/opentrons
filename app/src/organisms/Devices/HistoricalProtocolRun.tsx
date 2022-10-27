@@ -66,10 +66,11 @@ export function HistoricalProtocolRun(
         justifyContent={JUSTIFY_SPACE_AROUND}
         alignItems={ALIGN_CENTER}
         padding={SPACING.spacing3}
-        borderBottom={offsetDrawerOpen ? '' : BORDERS.lineBorder}
+        borderTop={BORDERS.lineBorder}
         backgroundColor={
           run.status === 'running' ? COLORS.lightBlue : COLORS.white
         }
+        width="100%"
       >
         <Box
           onClick={() => setOffsetDrawerOpen(!offsetDrawerOpen)}

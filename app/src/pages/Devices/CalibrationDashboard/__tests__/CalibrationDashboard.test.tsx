@@ -6,12 +6,6 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { CalibrationDashboard } from '..'
 
-jest.mock('../../../../organisms/Devices/hooks')
-jest.mock('../../../../organisms/Devices/PipettesAndModules')
-jest.mock('../../../../organisms/Devices/RecentProtocolRuns')
-jest.mock('../../../../organisms/Devices/RobotOverview')
-jest.mock('../../../../redux/discovery')
-
 const render = (path = '/') => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
