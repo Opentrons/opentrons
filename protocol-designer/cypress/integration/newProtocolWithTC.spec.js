@@ -66,13 +66,11 @@ describe('Protocols with Modules', () => {
         cy.contains('Slot 7').should('exist')
       })
 
-      // Edit Thermocycler module (should not have slot option and not have another gen)
-      //  TODO(jr, 9/23/22): remove line 75 and replace with line 74 when we remove the TC gen2 FF
+      // Edit Thermocycler module (should not have slot option but have another gen)
       cy.get(editThermocycler).click()
       cy.get(editModuleModal).within(() => {
         cy.contains('Position').should('not.exist')
-        // cy.get(moduleModelDropdown).contains('GEN2').should('exist')
-        cy.get(moduleModelDropdown).contains('GEN2').should('not.exist')
+        cy.get(moduleModelDropdown).contains('GEN2').should('exist')
         cy.get('button').contains('cancel', { matchCase: false }).click()
       })
 
@@ -83,10 +81,13 @@ describe('Protocols with Modules', () => {
 
       // Re-add thermocycler
       cy.get(addThermocycler).click()
-      cy.get('button').contains('save', { matchCase: false }).click()
+      cy.get(editModuleModal).within(() => {
+        cy.get(moduleModelDropdown).select('GEN1')
+        cy.get('button').contains('save', { matchCase: false }).click()
+      })
     })
 
-    it('adds two liquids', () => {
+    it('adds one liquid', () => {
       cy.get('button').contains('Continue to Liquids').click()
       cy.addLiquid('Water', 'pure H2O', true)
     })
@@ -257,7 +258,10 @@ describe('Protocols with Modules', () => {
       cy.get(slotSeven).contains('Delete').click()
       cy.openFilePage()
       cy.get(addThermocycler).click()
-      cy.get('button').contains('save', { matchCase: false }).click()
+      cy.get(editModuleModal).within(() => {
+        cy.get(moduleModelDropdown).select('GEN1')
+        cy.get('button').contains('save', { matchCase: false }).click()
+      })
       cy.openDesignPage()
       cy.get('[class*="alert_title"]').should('not.exist')
       cy.get('[class*="error_icon"]').should('not.exist')

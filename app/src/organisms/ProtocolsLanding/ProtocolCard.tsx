@@ -8,7 +8,6 @@ import {
   getModuleType,
   getPipetteNameSpecs,
   ProtocolAnalysisOutput,
-  THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 import {
   Box,
@@ -33,7 +32,6 @@ import {
   parseAllRequiredModuleModels,
 } from '@opentrons/api-client'
 
-import { useFeatureFlag } from '../../redux/config'
 import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
 import { InstrumentContainer } from '../../atoms/InstrumentContainer'
 import { StyledText } from '../../atoms/text'
@@ -115,7 +113,6 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
     modified,
   } = props
   const { t } = useTranslation(['protocol_list', 'shared'])
-  const enableThermocyclerGen2 = useFeatureFlag('enableThermocyclerGen2')
   const analysisStatus = getAnalysisStatus(isAnalyzing, mostRecentAnalysis)
 
   const { left: leftMountPipetteName, right: rightMountPipetteName } =
@@ -126,11 +123,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
     mostRecentAnalysis != null ? mostRecentAnalysis.commands : []
   )
 
-  const requiredModuleModelsWithFF = enableThermocyclerGen2
-    ? requiredModuleModels
-    : requiredModuleModels.filter(mod => mod !== THERMOCYCLER_MODULE_V2)
-
-  const requiredModuleTypes = requiredModuleModelsWithFF.map(getModuleType)
+  const requiredModuleTypes = requiredModuleModels.map(getModuleType)
 
   return (
     <Flex

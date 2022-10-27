@@ -1,14 +1,11 @@
 import * as React from 'react'
 import { CheckboxField, DropdownField, FormGroup } from '@opentrons/components'
-import { useSelector } from 'react-redux'
 import { i18n } from '../../../localization'
 import {
   DEFAULT_MODEL_FOR_MODULE_TYPE,
   MODELS_FOR_MODULE_TYPE,
-  MODELS_FOR_MODULE_TYPE_NO_FF,
 } from '../../../constants'
 import { FormModulesByType } from '../../../step-forms'
-import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import { ModuleDiagram } from '../../modules'
 import styles from './FilePipettesModal.css'
 import type { ModuleType } from '@opentrons/shared-data'
@@ -66,10 +63,6 @@ export function ModuleFields(props: ModuleFieldsProps): JSX.Element {
     errors,
     touched,
   } = props
-
-  const enableThermocyclerGen2 = useSelector(
-    featureFlagSelectors.getEnabledThermocyclerGen2
-  )
 
   // @ts-expect-error(sa, 2021-6-21): Object.keys not smart enough to take the keys of FormModulesByType
   const modules: ModuleType[] = Object.keys(values)
@@ -130,11 +123,7 @@ export function ModuleFields(props: ModuleFieldsProps): JSX.Element {
                     }
                     tabIndex={i}
                     name={`${moduleTypeAccessor}.model`}
-                    options={
-                      enableThermocyclerGen2
-                        ? MODELS_FOR_MODULE_TYPE[moduleType]
-                        : MODELS_FOR_MODULE_TYPE_NO_FF[moduleType]
-                    }
+                    options={MODELS_FOR_MODULE_TYPE[moduleType]}
                     value={selectedModel}
                     onChange={onFieldChange}
                     onBlur={onBlur}
