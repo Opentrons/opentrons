@@ -6,7 +6,7 @@ import removeProbe from '../../assets/images/change-pip/attach-stem.png'
 import type { PipetteWizardStepProps } from './types'
 
 export const DetachStem = (props: PipetteWizardStepProps): JSX.Element => {
-  const { nextStep, goBack } = props
+  const { proceed, goBack } = props
   const { t } = useTranslation('pipette_wizard_flows')
 
   return (
@@ -16,7 +16,7 @@ export const DetachStem = (props: PipetteWizardStepProps): JSX.Element => {
       rightHandBody={<img src={removeProbe} width="100%" alt="Remove stem" />}
       bodyText={<StyledText as="p">{t('remove_probe')}</StyledText>}
       proceedButtonText={t('complete_cal')}
-      proceed={nextStep}
+      proceed={proceed}
       back={goBack}
     />
   )

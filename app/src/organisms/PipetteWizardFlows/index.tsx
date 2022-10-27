@@ -59,15 +59,13 @@ export const PipetteWizardFlows = (
 
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
   if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
-    modalContent = (
-      <BeforeBeginning {...calibrateBaseProps} nextStep={proceed} />
-    )
+    modalContent = <BeforeBeginning {...calibrateBaseProps} proceed={proceed} />
   } else if (currentStep.section === SECTIONS.ATTACH_STEM) {
-    modalContent = <AttachStem {...calibrateBaseProps} nextStep={proceed} />
+    modalContent = <AttachStem {...calibrateBaseProps} proceed={proceed} />
   } else if (currentStep.section === SECTIONS.DETACH_STEM) {
-    modalContent = <DetachStem {...calibrateBaseProps} nextStep={proceed} />
+    modalContent = <DetachStem {...calibrateBaseProps} proceed={proceed} />
   } else if (currentStep.section === SECTIONS.RESULTS) {
-    modalContent = <Results {...calibrateBaseProps} nextStep={closeFlow} />
+    modalContent = <Results {...calibrateBaseProps} proceed={closeFlow} />
   }
 
   let wizardTitle: string = 'unknown page'

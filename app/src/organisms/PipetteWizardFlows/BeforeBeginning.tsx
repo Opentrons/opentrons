@@ -9,13 +9,16 @@ import type { PipetteWizardStepProps } from './types'
 const BEFORE_YOU_BEGIN_URL = '' //  TODO(jr, 10/26/22): link real URL!
 
 export const BeforeBeginning = (props: PipetteWizardStepProps): JSX.Element => {
-  const { nextStep, flowType } = props
+  const { proceed, flowType } = props
   const { t } = useTranslation('pipette_wizard_flows')
   //  TODO(jr, 10/26/22): when we wire up other flows, const will turn into let
   //  for proceedButtonText and rightHandBody
   const proceedButtonText: string = t('get_started')
   const rightHandBody = (
-    <WizardRequiredEquipmentList equipmentList={[CALIBRATION_PROBE]} />
+    <WizardRequiredEquipmentList
+      width="100%"
+      equipmentList={[CALIBRATION_PROBE]}
+    />
   )
   switch (flowType) {
     case FLOWS.CALIBRATE: {
@@ -36,7 +39,7 @@ export const BeforeBeginning = (props: PipetteWizardStepProps): JSX.Element => {
         />
       }
       proceedButtonText={proceedButtonText}
-      proceed={nextStep}
+      proceed={proceed}
     />
   )
 }

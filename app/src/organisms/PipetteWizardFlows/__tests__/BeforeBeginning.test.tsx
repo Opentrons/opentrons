@@ -24,7 +24,7 @@ describe('BeforeBeginning', () => {
   beforeEach(() => {
     props = {
       mount: LEFT,
-      nextStep: jest.fn(),
+      proceed: jest.fn(),
       flowType: FLOWS.CALIBRATE,
       goBack: jest.fn(),
     }
@@ -44,6 +44,6 @@ describe('BeforeBeginning', () => {
     getByAltText('Calibration Probe')
     const proceedBtn = getByRole('button', { name: 'Get started' })
     fireEvent.click(proceedBtn)
-    expect(props.nextStep).toHaveBeenCalled()
+    expect(props.proceed).toHaveBeenCalled()
   })
 })

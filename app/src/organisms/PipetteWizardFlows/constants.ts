@@ -11,10 +11,10 @@ export const FLOWS = {
   CALIBRATE: 'CALIBRATE',
 }
 
-export const CALIBRATION_PROBE_DISPLAYNAME = 'Calibration Probe'
+export const CALIBRATION_PROBE_DISPLAY_NAME = 'Calibration Probe'
 
 //  required equipment list
 export const CALIBRATION_PROBE = {
   loadName: 'calibration_probe',
-  displayName: CALIBRATION_PROBE_DISPLAYNAME,
+  displayName: CALIBRATION_PROBE_DISPLAY_NAME,
 }

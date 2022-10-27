@@ -7,7 +7,7 @@ import { FLOWS } from './constants'
 import type { PipetteWizardStepProps } from './types'
 
 export const Results = (props: PipetteWizardStepProps): JSX.Element => {
-  const { nextStep, flowType } = props
+  const { proceed, flowType } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
 
   //  TODO(jr, 10/26/22): change header to let when we plug in other flows
@@ -29,7 +29,7 @@ export const Results = (props: PipetteWizardStepProps): JSX.Element => {
     >
       <PrimaryButton
         textTransform={TEXT_TRANSFORM_CAPITALIZE}
-        onClick={nextStep}
+        onClick={proceed}
       >
         {t('shared:exit')}
       </PrimaryButton>

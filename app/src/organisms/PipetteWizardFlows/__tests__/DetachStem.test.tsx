@@ -17,7 +17,7 @@ describe('DetachStem', () => {
   beforeEach(() => {
     props = {
       mount: LEFT,
-      nextStep: jest.fn(),
+      proceed: jest.fn(),
       flowType: FLOWS.CALIBRATE,
       goBack: jest.fn(),
     }
@@ -31,7 +31,7 @@ describe('DetachStem', () => {
     getByAltText('Remove stem')
     const proceedBtn = getByRole('button', { name: 'Complete calibration' })
     fireEvent.click(proceedBtn)
-    expect(props.nextStep).toHaveBeenCalled()
+    expect(props.proceed).toHaveBeenCalled()
     const backBtn = getByRole('button', { name: 'Go back' })
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()

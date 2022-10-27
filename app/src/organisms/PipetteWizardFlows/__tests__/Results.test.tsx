@@ -15,7 +15,7 @@ describe('Results', () => {
   let props: React.ComponentProps<typeof Results>
   beforeEach(() => {
     props = {
-      nextStep: jest.fn(),
+      proceed: jest.fn(),
       goBack: jest.fn(),
       mount: LEFT,
       flowType: FLOWS.CALIBRATE,
@@ -26,6 +26,6 @@ describe('Results', () => {
     getByText('Pipette Successfully Calibrated')
     const exit = getByRole('button', { name: 'exit' })
     fireEvent.click(exit)
-    expect(props.nextStep).toHaveBeenCalled()
+    expect(props.proceed).toHaveBeenCalled()
   })
 })

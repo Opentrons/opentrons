@@ -6,7 +6,7 @@ import attachProbe from '../../assets/images/change-pip/attach-stem.png'
 import type { PipetteWizardStepProps } from './types'
 
 export const AttachStem = (props: PipetteWizardStepProps): JSX.Element => {
-  const { nextStep, goBack } = props
+  const { proceed, goBack } = props
   const { t } = useTranslation('pipette_wizard_flows')
   return (
     <GenericWizardTile
@@ -15,7 +15,7 @@ export const AttachStem = (props: PipetteWizardStepProps): JSX.Element => {
       rightHandBody={<img src={attachProbe} width="100%" alt="Attach stem" />}
       bodyText={<StyledText as="p">{t('install_probe')}</StyledText>}
       proceedButtonText={t('initiate_calibration')}
-      proceed={nextStep}
+      proceed={proceed}
       back={goBack}
     />
   )
