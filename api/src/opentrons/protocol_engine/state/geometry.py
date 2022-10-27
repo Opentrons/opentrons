@@ -163,9 +163,10 @@ class GeometryView:
         absolute_point: Point,
     ) -> WellLocation:
         """Given absolute position, get relative location of a well in a labware."""
-        raise NotImplementedError(
-            "GeometryView.get_relative_well_location not implemented"
-        )
+        well_absolute_point = self.get_well_position(labware_id, well_name)
+        delta = absolute_point - well_absolute_point
+
+        return WellLocation(offset=WellOffset(x=delta.x, y=delta.y, z=delta.z))
 
     def get_well_edges(
         self,

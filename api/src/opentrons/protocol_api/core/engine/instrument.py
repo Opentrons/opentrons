@@ -1,5 +1,5 @@
 """ProtocolEngine-based InstrumentContext core implementation."""
-from typing import Optional
+from typing import Optional, cast
 
 from opentrons.types import Location, Mount
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -123,7 +123,10 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             )
 
     def get_mount(self) -> Mount:
-        raise NotImplementedError("InstrumentCore.get_mount not implemented")
+        """Get the mount the pipette is attached to."""
+        return self._engine_client.state.pipettes.get(
+            self._pipette_id
+        ).mount.to_hw_mount()
 
     def get_pipette_name(self) -> str:
         """Get the pipette's load name as a string.
@@ -151,7 +154,8 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         raise NotImplementedError("InstrumentCore.get_available_volume not implemented")
 
     def get_pipette(self) -> PipetteDict:
-        raise NotImplementedError("InstrumentCore.get_pipette not implemented")
+        # TODO(mc, 2022-10-27): implement
+        return cast(PipetteDict, {"display_name": "A pipette"})
 
     def get_channels(self) -> int:
         raise NotImplementedError("InstrumentCore.get_channels not implemented")

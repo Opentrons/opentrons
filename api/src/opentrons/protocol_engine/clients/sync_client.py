@@ -101,7 +101,17 @@ class SyncClient:
         well_location: WellLocation,
     ) -> commands.MoveToWellResult:
         """Execute a MoveToWell command and return the result."""
-        raise NotImplementedError("SyncClient.move_to_well not implemented")
+        request = commands.MoveToWellCreate(
+            params=commands.MoveToWellParams(
+                pipetteId=pipette_id,
+                labwareId=labware_id,
+                wellName=well_name,
+                wellLocation=well_location,
+            )
+        )
+        result = self._transport.execute_command(request=request)
+
+        return cast(commands.MoveToWellResult, result)
 
     def move_to_coordinates(
         self,
@@ -111,7 +121,17 @@ class SyncClient:
         force_direct: bool,
     ) -> commands.MoveToCoordinatesResult:
         """Execute a MoveToCoordinates command and return the result."""
-        raise NotImplementedError("SyncClient.move_to_coordinates not implemented")
+        request = commands.MoveToCoordinatesCreate(
+            params=commands.MoveToCoordinatesParams(
+                pipetteId=pipette_id,
+                coordinates=coordinates,
+                minimumZHeight=minimum_z_height,
+                forceDirect=force_direct,
+            )
+        )
+        result = self._transport.execute_command(request=request)
+
+        return cast(commands.MoveToCoordinatesResult, result)
 
     def load_module(
         self,

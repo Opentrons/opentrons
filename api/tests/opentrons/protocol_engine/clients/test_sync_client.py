@@ -16,7 +16,7 @@ from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from opentrons.types import DeckSlotName, MountType
-from opentrons.protocol_engine import DeckSlotLocation, commands
+from opentrons.protocol_engine import DeckSlotLocation, DeckPoint, commands
 from opentrons.protocol_engine.clients import SyncClient, AbstractSyncTransport
 from opentrons.protocol_engine.types import (
     ModuleDefinition,
@@ -154,6 +154,66 @@ def test_load_pipette(
     )
 
     assert result == expected_result
+
+
+def test_move_to_well(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a move to well command."""
+    request = commands.MoveToWellCreate(
+        params=commands.MoveToWellParams(
+            pipetteId="123",
+            labwareId="456",
+            wellName="A2",
+            wellLocation=WellLocation(
+                origin=WellOrigin.BOTTOM, offset=WellOffset(x=1, y=2, z=3)
+            ),
+        )
+    )
+    response = commands.MoveToWellResult()
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.move_to_well(
+        pipette_id="123",
+        labware_id="456",
+        well_name="A2",
+        well_location=WellLocation(
+            origin=WellOrigin.BOTTOM, offset=WellOffset(x=1, y=2, z=3)
+        ),
+    )
+
+    assert result == response
+
+
+def test_move_to_coordinates(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a move to coordinates command."""
+    request = commands.MoveToCoordinatesCreate(
+        params=commands.MoveToCoordinatesParams(
+            pipetteId="123",
+            coordinates=DeckPoint(x=1, y=2, z=3),
+            forceDirect=True,
+            minimumZHeight=42.0,
+        )
+    )
+    response = commands.MoveToCoordinatesResult()
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.move_to_coordinates(
+        pipette_id="123",
+        coordinates=DeckPoint(x=1, y=2, z=3),
+        force_direct=True,
+        minimum_z_height=42.0,
+    )
+
+    assert result == response
 
 
 def test_pick_up_tip(

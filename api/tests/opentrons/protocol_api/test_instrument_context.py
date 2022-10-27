@@ -104,6 +104,15 @@ def test_tip_racks(decoy: Decoy, subject: InstrumentContext) -> None:
     assert subject.tip_racks == tip_racks
 
 
+def test_mount(
+    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
+) -> None:
+    """It should have a mount property."""
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
+
+    assert subject.mount == "right"
+
+
 def test_move_to(
     decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
 ) -> None:
