@@ -1,6 +1,7 @@
 import asyncio
 import mock
 from typing import AsyncGenerator, cast
+from opentrons.drivers.types import Temperature, PlateTemperature, ThermocyclerLidStatus
 
 import pytest
 
@@ -9,6 +10,10 @@ from opentrons.drivers.thermocycler import SimulatingDriver
 from opentrons.hardware_control import modules, ExecutionManager
 from opentrons.hardware_control.poller import Poller
 from opentrons.hardware_control.modules.thermocycler import ThermocyclerReader
+
+
+POLL_PERIOD = 1.0
+SIMULATING_POLL_PERIOD = POLL_PERIOD / 20.0
 
 
 @pytest.fixture
@@ -155,6 +160,36 @@ async def set_temperature_subject(
     await hw_tc.cleanup()
 
 
+@pytest.fixture
+def mock_driver(simulator: SimulatingDriver) -> mock.AsyncMock:
+    return mock.AsyncMock(spec=simulator)
+
+
+@pytest.fixture
+async def subject_mocked_driver(
+    usb_port: USBPort,
+    mock_driver: mock.AsyncMock,
+) -> AsyncGenerator[modules.Thermocycler, None]:
+    """Test subject with mocked driver"""
+    therm = modules.Thermocycler(
+        port="/dev/ot_module_sim_thermocycler0",
+        usb_port=usb_port,
+        execution_manager=ExecutionManager(),
+        driver=mock_driver,
+        device_info={
+            "serial": "dummySerialTC",
+            "model": "dummyModelTC",
+            "version": "dummyVersionTC",
+        },
+        loop=asyncio.get_running_loop(),
+        polling_interval_sec=SIMULATING_POLL_PERIOD,
+    )
+    try:
+        yield therm
+    finally:
+        await therm.cleanup()
+
+
 async def test_set_temperature_with_volume(
     set_temperature_subject: modules.Thermocycler, set_plate_temp_spy: mock.AsyncMock
 ) -> None:
@@ -220,3 +255,41 @@ async def test_cycle_temperature(
         ]
         * 5
     )
+
+
+async def test_sync_error_response_to_poller(
+    subject_mocked_driver: modules.Thermocycler,
+    mock_driver: mock.AsyncMock,
+):
+    """Test that poll after synchronous temperature response with error updates module live data and status."""
+    mock_driver.get_plate_temperature.return_value = PlateTemperature(
+        current=50, target=50, hold=None
+    )
+    mock_driver.get_lid_temperature.return_value = Exception()
+    mock_driver.get_lid_status.return_value = ThermocyclerLidStatus.OPEN
+
+    async def fake_temperature_setter(*args, **kwargs):
+        pass
+
+    mock_driver.set_plate_temperature.return_value = (  # to trigger the poll
+        fake_temperature_setter
+    )
+
+    with pytest.raises(Exception):
+        await subject_mocked_driver.set_temperature(20)
+    assert subject_mocked_driver.live_data["status"] == "error"
+    assert subject_mocked_driver.status == modules.TemperatureStatus.ERROR
+
+
+async def test_async_error_response_to_poller(
+    subject_mocked_driver: modules.Thermocycler,
+    mock_driver: mock.AsyncMock,
+):
+    """Test that asynchronous error is detected by poller and module live data and status are updated."""
+    mock_driver.get_lid_temperature.return_value = Temperature(current=50, target=50)
+    mock_driver.get_lid_status.return_value = ThermocyclerLidStatus.OPEN
+    mock_driver.get_plate_temperature.return_value = Exception()
+    with pytest.raises(Exception):
+        await subject_mocked_driver.wait_next_poll()
+    assert subject_mocked_driver.live_data["status"] == "error"
+    assert subject_mocked_driver.status == modules.TemperatureStatus.ERROR
