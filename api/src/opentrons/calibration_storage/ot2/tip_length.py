@@ -75,6 +75,8 @@ def get_all_tip_length_calibrations() -> typing.List[v1.TipLengthCalibration]:
     all_tip_lengths_available = []
     tip_length_dir_path = Path(config.get_tip_length_cal_path())
     for filepath in tip_length_dir_path.glob("**/*.json"):
+        if filepath.stem == "index":
+            continue
         tip_lengths = tip_lengths_for_pipette(filepath.stem)
         for tiprack_hash, tip_length in tip_lengths.items():
             all_tip_lengths_available.append(
