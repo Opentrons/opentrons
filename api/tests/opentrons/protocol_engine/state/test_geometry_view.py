@@ -777,7 +777,9 @@ def test_get_default_magnet_engage_height(
 
     decoy.when(labware_view.get_default_magnet_height("labware-id")).then_return(6.0)
 
-    decoy.when(labware_view.is_mag_deck_uri_in_half_mil("labware-id")).then_return(True)
+    decoy.when(
+        labware_view.is_magnetic_module_uri_in_half_millimeter("labware-id")
+    ).then_return(True)
 
     result = subject.get_default_magnet_engage_height(
         module_id="module-id", preserve_half_mm=False

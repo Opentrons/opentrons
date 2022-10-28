@@ -479,7 +479,7 @@ class LabwareView(HasState[LabwareState]):
             "No labware loaded into fixed trash location by this deck type."
         )
 
-    def is_mag_deck_uri_in_half_mil(self, labware_id: str) -> bool:
+    def is_magnetic_module_uri_in_half_millimeter(self, labware_id: str) -> bool:
         """Check whether the labware uri needs to be calculated in half a millimeter."""
         uri = self.get_definition_uri(labware_id)
         return uri in _MAGDECK_HALF_MM_LABWARE
