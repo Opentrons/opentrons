@@ -2,10 +2,21 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
-import { Box, SPACING, IconProps } from '@opentrons/components'
+import {
+  Box,
+  SPACING,
+  IconProps,
+  Flex,
+  ALIGN_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 
 import { Divider } from '../../../atoms/structure'
 import { Toast } from '../../../atoms/Toast'
+import { StyledText } from '../../../atoms/text'
+import { ToggleButton } from '../../../atoms/buttons'
+import { updateSetting } from '../../../redux/robot-settings'
 import { useIsOT3, useIsRobotBusy, useRobot } from '../hooks'
 import { DisplayRobotName } from './AdvancedTab/DisplayRobotName'
 import { RobotInformation } from './AdvancedTab/RobotInformation'
@@ -74,6 +85,7 @@ export function RobotSettingsAdvanced({
   const settings = useSelector<State, RobotSettings>((state: State) =>
     getRobotSettings(state, robotName)
   )
+  console.log('SETTINGS', settings)
   const reachable = robot?.status !== UNREACHABLE
 
   const [isRobotReachable, setIsRobotReachable] = React.useState<boolean>(
@@ -119,8 +131,8 @@ export function RobotSettingsAdvanced({
   return (
     <>
       {showSoftwareUpdateModal &&
-      robot != null &&
-      robot.status !== UNREACHABLE ? (
+        robot != null &&
+        robot.status !== UNREACHABLE ? (
         <UpdateBuildroot
           robot={robot}
           close={() => setShowSoftwareUpdateModal(false)}
@@ -228,7 +240,67 @@ export function RobotSettingsAdvanced({
             />
           </>
         )}
+        <StyledText as="h1">TEMP FF DIVIDER</StyledText>
+        {settings.map(field =>
+          <FeatureFlagToggle
+            settingField={field}
+            robotName={robotName}
+            isRobotBusy={isRobotBusy}
+          />)}
       </Box>
     </>
   )
 }
+
+
+
+
+interface FeatureFlagToggleProps {
+  settingField: RobotSettingsField
+  robotName: string
+  isRobotBusy: boolean
+}
+
+export function FeatureFlagToggle({
+  settingField,
+  robotName,
+  isRobotBusy,
+}: FeatureFlagToggleProps): JSX.Element | null {
+  const dispatch = useDispatch<Dispatch>()
+  const { value, id, title, description } = settingField
+
+  if (id == null) return null
+
+  const handleClick: React.MouseEventHandler<Element> = () => {
+    if (!isRobotBusy) {
+      dispatch(updateSetting(robotName, id, !value))
+    }
+  }
+
+  return (
+    <Flex
+      alignItems={ALIGN_CENTER}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      marginBottom={SPACING.spacing4}
+    >
+      <Box width="70%">
+        <StyledText
+          css={TYPOGRAPHY.pSemiBold}
+          paddingBottom={SPACING.spacing2}
+        >
+          {title}
+        </StyledText>
+        <StyledText as="p">
+          {description}
+        </StyledText>
+      </Box>
+      <ToggleButton
+        label={title}
+        toggledOn={value === true}
+        onClick={handleClick}
+        disabled={isRobotBusy}
+      />
+    </Flex>
+  )
+}
+
