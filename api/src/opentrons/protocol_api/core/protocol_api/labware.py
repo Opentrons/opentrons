@@ -109,7 +109,7 @@ class LabwareImplementation(AbstractLabware[WellImplementation]):
     def get_calibrated_offset(self) -> Point:
         return self._calibrated_offset
 
-    def is_tiprack(self) -> bool:
+    def is_tip_rack(self) -> bool:
         return self._parameters["isTiprack"]
 
     def get_tip_length(self) -> float:
@@ -119,7 +119,7 @@ class LabwareImplementation(AbstractLabware[WellImplementation]):
         self._parameters["tipLength"] = length
 
     def reset_tips(self) -> None:
-        if self.is_tiprack():
+        if self.is_tip_rack():
             for well in self._wells:
                 well.set_has_tip(True)
 
@@ -183,7 +183,7 @@ class LabwareImplementation(AbstractLabware[WellImplementation]):
                     parent_object=self,
                 ),
                 display_name="{} of {}".format(well, self._display_name),
-                has_tip=self.is_tiprack(),
+                has_tip=self.is_tip_rack(),
                 name=well,
             )
             for well in self._ordering

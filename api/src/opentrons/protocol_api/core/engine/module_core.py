@@ -89,7 +89,7 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
 
     def add_labware_core(self, labware_core: LabwareCore) -> Labware:
         """Add a labware to the module."""
-        return Labware(implementation=labware_core, api_level=self._api_version)
+        return Labware(implementation=labware_core, api_version=self._api_version)
 
 
 class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore[LabwareCore]):
@@ -320,56 +320,60 @@ class HeaterShakerModuleCore(ModuleCore, AbstractHeaterShakerCore[LabwareCore]):
 
     def set_target_temperature(self, celsius: float) -> None:
         """Set the labware plate's target temperature in °C."""
-        raise NotImplementedError("set_target_temperature not implemented")
+        self._engine_client.heater_shaker_set_target_temperature(
+            module_id=self.module_id, celsius=celsius
+        )
 
     def wait_for_target_temperature(self) -> None:
         """Wait for the labware plate's target temperature to be reached."""
-        raise NotImplementedError("wait_for_target_temperature not implemented")
+        self._engine_client.heater_shaker_wait_for_temperature(module_id=self.module_id)
 
     def set_and_wait_for_shake_speed(self, rpm: int) -> None:
         """Set the shaker's target shake speed and wait for it to spin up."""
-        raise NotImplementedError("set_and_wait_for_shake_speed not implemented")
+        self._engine_client.heater_shaker_set_and_wait_for_shake_speed(
+            module_id=self.module_id, rpm=rpm
+        )
 
     def open_labware_latch(self) -> None:
         """Open the labware latch."""
-        raise NotImplementedError("open_labware_latch not implemented")
+        self._engine_client.heater_shaker_open_labware_latch(module_id=self.module_id)
 
     def close_labware_latch(self) -> None:
         """Close the labware latch."""
-        raise NotImplementedError("close_labware_latch not implemented")
+        self._engine_client.heater_shaker_close_labware_latch(module_id=self.module_id)
 
     def deactivate_shaker(self) -> None:
         """Stop shaking."""
-        raise NotImplementedError("deactivate_shaker not implemented")
+        self._engine_client.heater_shaker_deactivate_shaker(module_id=self.module_id)
 
     def deactivate_heater(self) -> None:
         """Stop heating."""
-        raise NotImplementedError("deactivate_heater not implemented")
+        self._engine_client.heater_shaker_deactivate_heater(module_id=self.module_id)
 
     def get_current_temperature(self) -> float:
         """Get the labware plate's current temperature in °C."""
-        raise NotImplementedError("not implemented")
+        return self._sync_module_hardware.temperature  # type: ignore[no-any-return]
 
     def get_target_temperature(self) -> Optional[float]:
         """Get the labware plate's target temperature in °C, if set."""
-        raise NotImplementedError("get_current_temperature not implemented")
+        return self._sync_module_hardware.target_temperature  # type: ignore[no-any-return]
 
     def get_current_speed(self) -> int:
         """Get the shaker's current speed in RPM."""
-        raise NotImplementedError("get_current_speed not implemented")
+        return self._sync_module_hardware.speed  # type: ignore[no-any-return]
 
     def get_target_speed(self) -> Optional[int]:
         """Get the shaker's target speed in RPM, if set."""
-        raise NotImplementedError("get_target_speed not implemented")
+        return self._sync_module_hardware.target_speed  # type: ignore[no-any-return]
 
     def get_temperature_status(self) -> TemperatureStatus:
         """Get the module's heater status."""
-        raise NotImplementedError("get_temperature_status not implemented")
+        return self._sync_module_hardware.temperature_status  # type: ignore[no-any-return]
 
     def get_speed_status(self) -> SpeedStatus:
         """Get the module's heater status."""
-        raise NotImplementedError("get_speed_status not implemented")
+        return self._sync_module_hardware.speed_status  # type: ignore[no-any-return]
 
     def get_labware_latch_status(self) -> HeaterShakerLabwareLatchStatus:
         """Get the module's labware latch status."""
-        raise NotImplementedError("get_labware_latch_status not implemented")
+        return self._sync_module_hardware.labware_latch_status  # type: ignore[no-any-return]

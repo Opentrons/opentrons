@@ -110,14 +110,14 @@ describe('RobotOverviewOverflowMenu', () => {
     getByRole('button', { name: 'Robot settings' })
   })
 
-  it('should not render menu items when the robot is reachable', () => {
+  it('should render menu items when the robot is reachable', () => {
     when(mockUseIsRobotBusy).calledWith().mockReturnValue(true)
     when(mockUseCurrentRunStatus)
       .calledWith()
       .mockReturnValue(RUN_STATUS_RUNNING)
     const { getByRole } = render({ robot: mockReachableRobot })
     const btn = getByRole('button')
-    expect(btn).toBeDisabled()
+    expect(btn).not.toBeDisabled()
   })
 
   it('clicking home gantry should home the gantry', () => {

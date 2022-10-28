@@ -444,6 +444,128 @@ def test_blow_out(
     assert result == response
 
 
+def test_heater_shaker_set_target_temperature(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a Heater-Shaker's set target temperature command."""
+    request = commands.heater_shaker.SetTargetTemperatureCreate(
+        params=commands.heater_shaker.SetTargetTemperatureParams(
+            moduleId="module-id", celsius=42.0
+        )
+    )
+    response = commands.heater_shaker.SetTargetTemperatureResult()
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+    result = subject.heater_shaker_set_target_temperature(
+        module_id="module-id", celsius=42.0
+    )
+
+    assert result == response
+
+
+def test_heater_shaker_wait_for_temperature(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a Heater-Shaker's wait for temperature command."""
+    request = commands.heater_shaker.WaitForTemperatureCreate(
+        params=commands.heater_shaker.WaitForTemperatureParams(moduleId="module-id")
+    )
+    response = commands.heater_shaker.WaitForTemperatureResult()
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+    result = subject.heater_shaker_wait_for_temperature(module_id="module-id")
+
+    assert result == response
+
+
+def test_heater_shaker_set_and_wait_for_shake_speed(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a Heater-Shaker's set and wait for shake speed command."""
+    request = commands.heater_shaker.SetAndWaitForShakeSpeedCreate(
+        params=commands.heater_shaker.SetAndWaitForShakeSpeedParams(
+            moduleId="module-id", rpm=1337
+        )
+    )
+    response = commands.heater_shaker.SetAndWaitForShakeSpeedResult(
+        pipetteRetracted=False
+    )
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+    result = subject.heater_shaker_set_and_wait_for_shake_speed(
+        module_id="module-id", rpm=1337
+    )
+
+    assert result == response
+
+
+def test_heater_shaker_open_labware_latch(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a Heater-Shaker's open labware latch command."""
+    request = commands.heater_shaker.OpenLabwareLatchCreate(
+        params=commands.heater_shaker.OpenLabwareLatchParams(moduleId="module-id")
+    )
+    response = commands.heater_shaker.OpenLabwareLatchResult(pipetteRetracted=False)
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+    result = subject.heater_shaker_open_labware_latch(module_id="module-id")
+
+    assert result == response
+
+
+def test_heater_shaker_close_labware_latch(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a Heater-Shaker's close labware latch command."""
+    request = commands.heater_shaker.CloseLabwareLatchCreate(
+        params=commands.heater_shaker.CloseLabwareLatchParams(moduleId="module-id")
+    )
+    response = commands.heater_shaker.CloseLabwareLatchResult()
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+    result = subject.heater_shaker_close_labware_latch(module_id="module-id")
+
+    assert result == response
+
+
+def test_heater_shaker_deactivate_shaker(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a Heater-Shaker's deactivate shaker command."""
+    request = commands.heater_shaker.DeactivateShakerCreate(
+        params=commands.heater_shaker.DeactivateShakerParams(moduleId="module-id")
+    )
+    response = commands.heater_shaker.DeactivateShakerResult()
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+    result = subject.heater_shaker_deactivate_shaker(module_id="module-id")
+
+    assert result == response
+
+
+def test_heater_shaker_deactivate_heater(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a Heater-Shaker's deactivate heater command."""
+    request = commands.heater_shaker.DeactivateHeaterCreate(
+        params=commands.heater_shaker.DeactivateHeaterParams(moduleId="module-id")
+    )
+    response = commands.heater_shaker.DeactivateHeaterResult()
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+    result = subject.heater_shaker_deactivate_heater(module_id="module-id")
+
+    assert result == response
+    
+    
 def test_temperature_module_set_target_temperature(
     decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
 ) -> None:
@@ -462,27 +584,7 @@ def test_temperature_module_set_target_temperature(
     result = subject.temperature_module_set_target_temperature(
         module_id="module-id", celsius=38.7
     )
-
-    assert result == response
-
-
-def test_temperature_module_wait_for_target_temperature(
-    decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
-) -> None:
-    """Should execute a PE wait_for_target_temperature command."""
-    request = commands.temperature_module.WaitForTemperatureCreate(
-        params=commands.temperature_module.WaitForTemperatureParams(
-            moduleId="module-id", celsius=38.7
-        ),
-    )
-    response = commands.temperature_module.WaitForTemperatureResult()
-
-    decoy.when(transport.execute_command(request=request)).then_return(response)
-
-    result = subject.temperature_module_wait_for_target_temperature(
-        module_id="module-id", celsius=38.7
-    )
-
+    
     assert result == response
 
 
@@ -500,5 +602,25 @@ def test_temperature_module_deactivate(
     decoy.when(transport.execute_command(request=request)).then_return(response)
 
     result = subject.temperature_module_deactivate(module_id="module-id")
+    
+    assert result == response
+    
+    
+def test_temperature_module_wait_for_target_temperature(
+    decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
+) -> None:
+    """Should execute a PE wait_for_target_temperature command."""
+    request = commands.temperature_module.WaitForTemperatureCreate(
+        params=commands.temperature_module.WaitForTemperatureParams(
+            moduleId="module-id", celsius=38.7
+        ),
+    )
+    response = commands.temperature_module.WaitForTemperatureResult()
 
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.temperature_module_wait_for_target_temperature(
+        module_id="module-id", celsius=38.7
+    )
+    
     assert result == response

@@ -12,6 +12,7 @@ from ..state import StateView
 from ..types import (
     DeckSlotLocation,
     LabwareLocation,
+    LabwareMovementStrategy,
     ModuleModel,
     WellLocation,
 )
@@ -58,6 +59,22 @@ class SyncClient:
         result = self._transport.execute_command(request=request)
 
         return cast(commands.LoadLabwareResult, result)
+
+    def move_labware(
+        self,
+        labware_id: str,
+        new_location: LabwareLocation,
+        strategy: LabwareMovementStrategy,
+    ) -> commands.MoveLabwareResult:
+        """Execute a MoveLabware command and return the result."""
+        request = commands.MoveLabwareCreate(
+            params=commands.MoveLabwareParams(
+                labwareId=labware_id, newLocation=new_location, strategy=strategy
+            )
+        )
+        result = self._transport.execute_command(request=request)
+
+        return cast(commands.MoveLabwareResult, result)
 
     def load_pipette(
         self,
@@ -280,6 +297,83 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
         return cast(commands.thermocycler.CloseLidResult, result)
+
+    def heater_shaker_set_target_temperature(
+        self, module_id: str, celsius: float
+    ) -> commands.heater_shaker.SetTargetTemperatureResult:
+        """Execute a `heaterShaker/setTargetTemperature` command and return the result."""
+        request = commands.heater_shaker.SetTargetTemperatureCreate(
+            params=commands.heater_shaker.SetTargetTemperatureParams(
+                moduleId=module_id, celsius=celsius
+            )
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.heater_shaker.SetTargetTemperatureResult, result)
+
+    def heater_shaker_wait_for_temperature(
+        self,
+        module_id: str,
+    ) -> commands.heater_shaker.WaitForTemperatureResult:
+        """Execute a `heaterShaker/waitForTemperature` command and return the result."""
+        request = commands.heater_shaker.WaitForTemperatureCreate(
+            params=commands.heater_shaker.WaitForTemperatureParams(
+                moduleId=module_id,
+            )
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.heater_shaker.WaitForTemperatureResult, result)
+
+    def heater_shaker_set_and_wait_for_shake_speed(
+        self, module_id: str, rpm: float
+    ) -> commands.heater_shaker.SetAndWaitForShakeSpeedResult:
+        """Execute a `heaterShaker/setAndWaitForShakeSpeed` command and return the result."""
+        request = commands.heater_shaker.SetAndWaitForShakeSpeedCreate(
+            params=commands.heater_shaker.SetAndWaitForShakeSpeedParams(
+                moduleId=module_id, rpm=rpm
+            )
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.heater_shaker.SetAndWaitForShakeSpeedResult, result)
+
+    def heater_shaker_open_labware_latch(
+        self, module_id: str
+    ) -> commands.heater_shaker.OpenLabwareLatchResult:
+        """Execute a `heaterShaker/openLabwareLatch` command and return the result."""
+        request = commands.heater_shaker.OpenLabwareLatchCreate(
+            params=commands.heater_shaker.OpenLabwareLatchParams(moduleId=module_id)
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.heater_shaker.OpenLabwareLatchResult, result)
+
+    def heater_shaker_close_labware_latch(
+        self, module_id: str
+    ) -> commands.heater_shaker.CloseLabwareLatchResult:
+        """Execute a `heaterShaker/closeLabwareLatch` command and return the result."""
+        request = commands.heater_shaker.CloseLabwareLatchCreate(
+            params=commands.heater_shaker.CloseLabwareLatchParams(moduleId=module_id)
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.heater_shaker.CloseLabwareLatchResult, result)
+
+    def heater_shaker_deactivate_shaker(
+        self, module_id: str
+    ) -> commands.heater_shaker.DeactivateShakerResult:
+        """Execute a `heaterShaker/deactivateShaker` command and return the result."""
+        request = commands.heater_shaker.DeactivateShakerCreate(
+            params=commands.heater_shaker.DeactivateShakerParams(moduleId=module_id)
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.heater_shaker.DeactivateShakerResult, result)
+
+    def heater_shaker_deactivate_heater(
+        self, module_id: str
+    ) -> commands.heater_shaker.DeactivateHeaterResult:
+        """Execute a `heaterShaker/deactivateHeater` command and return the result."""
+        request = commands.heater_shaker.DeactivateHeaterCreate(
+            params=commands.heater_shaker.DeactivateHeaterParams(moduleId=module_id)
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.heater_shaker.DeactivateHeaterResult, result)
 
     def temperature_module_set_target_temperature(
         self, module_id: str, celsius: float

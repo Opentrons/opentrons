@@ -514,6 +514,41 @@
           },
 
           {
+            "description": "[This command is for internal use only and should NOT be used in protocols.] Initiate automatic calibration of a pipette.",
+            "type": "object",
+            "required": ["commandType", "params"],
+            "properties": {
+              "key": { "type": "string" },
+              "commandType": { "enum": ["calibration/calibratePipette"] },
+              "params": {
+                "required": ["mount"],
+                "mount": {
+                  "enum": ["left", "right"],
+                  "description": "Instrument mount to calibrate."
+                }
+              }
+            }
+          },
+
+          {
+            "description": "[This command is for internal use only and should NOT be used in protocols.] Move pipette to start position for attach/detach or calibration start.",
+            "type": "object",
+            "required": ["commandType", "params"],
+            "properties": {
+              "key": { "type": "string" },
+              "commandType": { "enum": ["calibration/moveToLocation"] },
+              "params": {
+                "required": ["pipetteId", "location"],
+                "pipetteId": { "type": "string" },
+                "location": {
+                  "description": "Location to move to before starting calibration.",
+                  "enum": ["attachOrDetach", "probePosition"]
+                }
+              }
+            }
+          },
+
+          {
             "description": "Save Position",
             "type": "object",
             "required": ["commandType", "params"],

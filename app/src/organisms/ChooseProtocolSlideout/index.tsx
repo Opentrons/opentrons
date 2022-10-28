@@ -180,6 +180,7 @@ export function ChooseProtocolSlideoutComponent(
                       commands={
                         storedProtocol.mostRecentAnalysis?.commands ?? []
                       }
+                      labware={storedProtocol.mostRecentAnalysis?.labware ?? []}
                     />
                   </Box>
                   <StyledText
@@ -402,6 +403,7 @@ export function DeprecatedChooseProtocolSlideout(
                       commands={
                         storedProtocol.mostRecentAnalysis?.commands ?? []
                       }
+                      labware={storedProtocol.mostRecentAnalysis?.labware ?? []}
                     />
                   </Box>
                   <StyledText
