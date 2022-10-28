@@ -52,7 +52,8 @@ def test_set_target_temperature(
     decoy.verify(
         mock_engine_client.temperature_module_set_target_temperature(
             module_id="1234", celsius=38.9
-        )
+        ),
+        times=1,
     )
 
 
@@ -67,7 +68,8 @@ def test_wait_for_target_temperature(
     decoy.verify(
         mock_engine_client.temperature_module_wait_for_target_temperature(
             module_id="1234", celsius=None
-        )
+        ),
+        times=1,
     )
 
 
@@ -79,7 +81,9 @@ def test_deactivate(
     """Should verify EngineClient call to deactivate temp module."""
     subject.deactivate()
 
-    decoy.verify(mock_engine_client.temperature_module_deactivate(module_id="1234"))
+    decoy.verify(
+        mock_engine_client.temperature_module_deactivate(module_id="1234"), times=1
+    )
 
 
 def test_get_target_temperature(
