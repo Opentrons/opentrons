@@ -1,5 +1,4 @@
 import json
-from pathlib import Path
 from pydantic import ValidationError
 from typing import Optional, Union
 
@@ -23,8 +22,9 @@ def delete_gripper_calibration_file(gripper: str) -> None:
     :param gripper: gripper serial number
     """
     offset_path = (
-        Path(config.get_opentrons_path("gripper_calibration_dir")) / f"{gripper}.json"
+        config.get_opentrons_path("gripper_calibration_dir") / f"{gripper}.json"
     )
+
     io.delete_file(offset_path)
 
 
@@ -33,7 +33,7 @@ def clear_gripper_calibration_offsets() -> None:
     Delete all gripper calibration data files.
     """
 
-    offset_dir = Path(config.get_opentrons_path("gripper_calibration_dir"))
+    offset_dir = config.get_opentrons_path("gripper_calibration_dir")
     io._remove_json_files_in_directories(offset_dir)
 
 
@@ -47,11 +47,11 @@ def save_gripper_calibration(
         Union[local_types.CalibrationStatus, v1.CalibrationStatus]
     ] = None,
 ) -> None:
-    gripper_dir = Path(config.get_opentrons_path("gripper_calibration_dir"))
+    gripper_dir = config.get_opentrons_path("gripper_calibration_dir")
 
-    if cal_status and isinstance(cal_status, local_types.CalibrationStatus):
+    if isinstance(cal_status, local_types.CalibrationStatus):
         cal_status_model = v1.CalibrationStatus(**asdict(cal_status))
-    elif cal_status and isinstance(cal_status, v1.CalibrationStatus):
+    elif isinstance(cal_status, v1.CalibrationStatus):
         cal_status_model = cal_status
     else:
         cal_status_model = v1.CalibrationStatus()
@@ -78,8 +78,7 @@ def get_gripper_calibration_offset(
         raise NotImplementedError("Gripper calibrations are only valid on the OT-3")
     try:
         gripper_calibration_filepath = (
-            Path(config.get_opentrons_path("gripper_calibration_dir"))
-            / f"{gripper_id}.json"
+            config.get_opentrons_path("gripper_calibration_dir") / f"{gripper_id}.json"
         )
         return v1.InstrumentOffsetModel(
             **io.read_cal_file(gripper_calibration_filepath)

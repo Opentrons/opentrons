@@ -1,6 +1,5 @@
-import os
 import json
-from pathlib import Path
+import logging
 from pydantic import ValidationError
 from typing import Optional, Union, no_type_check
 from dataclasses import asdict
@@ -13,6 +12,8 @@ from .. import file_operators as io, types as local_types
 
 from .models import v1
 
+log = logging.getLogger(__name__)
+
 
 # Delete Deck Calibration
 
@@ -22,8 +23,9 @@ def delete_robot_deck_attitude() -> None:
     """
     Delete the robot deck attitude calibration.
     """
-    robot_dir = Path(config.get_opentrons_path("robot_calibration_dir"))
-    gantry_path = robot_dir / "deck_calibration.json"
+    gantry_path = (
+        config.get_opentrons_path("robot_calibration_dir") / "deck_calibration.json"
+    )
 
     io.delete_file(gantry_path)
 
@@ -40,11 +42,11 @@ def save_robot_deck_attitude(
         Union[local_types.CalibrationStatus, local_types.CalibrationStatus]
     ] = None,
 ) -> None:
-    robot_dir = Path(config.get_opentrons_path("robot_calibration_dir"))
+    robot_dir = config.get_opentrons_path("robot_calibration_dir")
 
-    if cal_status and isinstance(cal_status, local_types.CalibrationStatus):
+    if isinstance(cal_status, local_types.CalibrationStatus):
         cal_status_model = v1.CalibrationStatus(**asdict(cal_status))
-    elif cal_status and isinstance(cal_status, v1.CalibrationStatus):
+    elif isinstance(cal_status, v1.CalibrationStatus):
         cal_status_model = cal_status
     else:
         cal_status_model = v1.CalibrationStatus()
@@ -65,11 +67,17 @@ def save_robot_deck_attitude(
 
 @no_type_check
 def get_robot_deck_attitude() -> Optional[v1.DeckCalibrationModel]:
-    deck_calibration_dir = Path(config.get_opentrons_path("robot_calibration_dir"))
-    for file in os.scandir(deck_calibration_dir):
-        if file.name == "deck_calibration.json":
-            try:
-                return v1.DeckCalibrationModel(**io.read_cal_file(Path(file.path)))
-            except (json.JSONDecodeError, ValidationError):
-                pass
+    deck_calibration_path = (
+        config.get_opentrons_path("robot_calibration_dir") / "deck_calibration.json"
+    )
+    try:
+        return v1.DeckCalibrationModel(**io.read_cal_file(deck_calibration_path))
+    except FileNotFoundError:
+        log.warning("Deck calibration not found.")
+        pass
+    except (json.JSONDecodeError, ValidationError):
+        log.warning(
+            "Deck calibration is malformed. Please factory reset your calibrations."
+        )
+        pass
     return None

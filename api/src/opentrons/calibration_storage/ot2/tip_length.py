@@ -1,6 +1,6 @@
 import json
 import typing
-from pathlib import Path
+import logging
 from pydantic import ValidationError
 from dataclasses import asdict
 
@@ -18,30 +18,31 @@ if typing.TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
+log = logging.getLogger(__name__)
 # Get Tip Length Calibration
 
 
-@typing.no_type_check
 def tip_lengths_for_pipette(
     pipette_id: str,
 ) -> typing.Dict[str, v1.TipLengthModel]:
     tip_lengths = {}
     try:
-        tip_length_filepath = (
-            Path(config.get_tip_length_cal_path()) / f"{pipette_id}.json"
-        )
+        tip_length_filepath = config.get_tip_length_cal_path() / f"{pipette_id}.json"
         all_tip_lengths_for_pipette = io.read_cal_file(tip_length_filepath)
         for tiprack, data in all_tip_lengths_for_pipette.items():
             try:
                 tip_lengths[tiprack] = v1.TipLengthModel(**data)
             except (json.JSONDecodeError, ValidationError):
+                log.warning(
+                    f"Tip length calibration is malformed for {tiprack} on {pipette_id}"
+                )
                 pass
         return tip_lengths
     except FileNotFoundError:
+        log.warning(f"Tip length calibrations not found for {pipette_id}")
         return tip_lengths
 
 
-@typing.no_type_check
 def load_tip_length_calibration(
     pip_id: str, definition: "LabwareDefinition"
 ) -> v1.TipLengthModel:
@@ -64,7 +65,6 @@ def load_tip_length_calibration(
         )
 
 
-@typing.no_type_check
 def get_all_tip_length_calibrations() -> typing.List[v1.TipLengthCalibration]:
     """
     A helper function that will list all of the tip length calibrations.
@@ -73,7 +73,7 @@ def get_all_tip_length_calibrations() -> typing.List[v1.TipLengthCalibration]:
     tip length calibration files found on the robot.
     """
     all_tip_lengths_available = []
-    tip_length_dir_path = Path(config.get_tip_length_cal_path())
+    tip_length_dir_path = config.get_tip_length_cal_path()
     for filepath in tip_length_dir_path.glob("**/*.json"):
         if filepath.stem == "index":
             continue
@@ -93,7 +93,6 @@ def get_all_tip_length_calibrations() -> typing.List[v1.TipLengthCalibration]:
     return all_tip_lengths_available
 
 
-@typing.no_type_check
 def get_custom_tiprack_definition_for_tlc(labware_uri: str) -> "LabwareDefinition":
     """
     Return the custom tiprack definition saved in the custom tiprack directory
@@ -119,7 +118,6 @@ def get_custom_tiprack_definition_for_tlc(labware_uri: str) -> "LabwareDefinitio
 # Delete Tip Length Calibration
 
 
-@typing.no_type_check
 def delete_tip_length_calibration(tiprack: str, pipette_id: str) -> None:
     """
     Delete tip length calibration based on tiprack hash and
@@ -132,7 +130,7 @@ def delete_tip_length_calibration(tiprack: str, pipette_id: str) -> None:
     if tiprack in tip_lengths:
         # maybe make modify and delete same file?
         del tip_lengths[tiprack]
-        tip_length_dir = Path(config.get_tip_length_cal_path())
+        tip_length_dir = config.get_tip_length_cal_path()
         if tip_lengths:
             io.save_to_file(tip_length_dir, pipette_id, tip_lengths)
         else:
@@ -145,7 +143,6 @@ def delete_tip_length_calibration(tiprack: str, pipette_id: str) -> None:
         )
 
 
-@typing.no_type_check
 def clear_tip_length_calibration() -> None:
     """
     Delete all tip length calibration files.
@@ -160,7 +157,6 @@ def clear_tip_length_calibration() -> None:
 # Save Tip Length Calibration
 
 
-@typing.no_type_check
 def create_tip_length_data(
     definition: "LabwareDefinition",
     length: float,
@@ -177,9 +173,9 @@ def create_tip_length_data(
     labware_hash = helpers.hash_labware_def(definition)
     labware_uri = helpers.uri_from_definition(definition)
 
-    if cal_status and isinstance(cal_status, local_types.CalibrationStatus):
+    if isinstance(cal_status, local_types.CalibrationStatus):
         cal_status_model = v1.CalibrationStatus(**asdict(cal_status))
-    elif cal_status and isinstance(cal_status, v1.CalibrationStatus):
+    elif isinstance(cal_status, v1.CalibrationStatus):
         cal_status_model = cal_status
     else:
         cal_status_model = v1.CalibrationStatus()
@@ -209,7 +205,6 @@ def _save_custom_tiprack_definition(
     io.save_to_file(custom_namespace_dir, version, definition)
 
 
-@typing.no_type_check
 def save_tip_length_calibration(
     pip_id: str,
     tip_length_cal: typing.Dict[str, v1.TipLengthModel],
@@ -221,7 +216,7 @@ def save_tip_length_calibration(
     :param tip_length_cal: results of the data created using
            :meth:`create_tip_length_data`
     """
-    tip_length_dir_path = Path(config.get_tip_length_cal_path())
+    tip_length_dir_path = config.get_tip_length_cal_path()
 
     all_tip_lengths = tip_lengths_for_pipette(pip_id)
 
