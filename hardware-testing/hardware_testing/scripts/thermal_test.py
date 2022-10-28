@@ -18,7 +18,7 @@ LOAD = GantryLoad.NONE
 CYCLES = 1
 SPEED_X = 600
 SPEED_Y = 600
-SPEED_Z = 200
+SPEED_Z = 150
 
 ACCEL_X = 1500
 ACCEL_Y = 1500
@@ -65,9 +65,9 @@ AXIS_MAP = {'Y': OT3Axis.Y,
                 'L': OT3Axis.Z_L,
                 'R': OT3Axis.Z_R}
 
-step_x = 530
-step_y = 400
-step_z = 210
+step_x = 400
+step_y = 300
+step_z = 100
 POINT_MAP = {'Y': Point(y=step_y),
              'X': Point(x=step_x),
              'L': Point(z=step_z),
@@ -79,25 +79,49 @@ NEG_POINT_MAP = {'Y': Point(y=-step_y),
              'R': Point(z=-step_z)}
 
 async def _thermal_test(api: OT3API, cycles: int = 1) -> None:
+    await api.move_rel(mount=OT3Mount.LEFT,
+                       delta=Point(x=-30,
+                                   y=-30),
+                       speed=SPEED_X)
+
+    home_pos_left = await api.current_position(mount=OT3Mount.LEFT)
+    print(home_pos_left)
+    home_pos_right = await api.current_position(mount=OT3Mount.RIGHT)
+    print(home_pos_right)
+
     for _ in range(cycles):
         if (AXIS == 'g'):
             await api.move_rel(mount=OT3Mount.LEFT,
-                               delta=Point(x=NEG_POINT_MAP[X],
-                                           y=NEG_POINT_MAP[Y]),
+                               delta=Point(x=-step_x,
+                                           y=-step_y),
                                speed=SPEED_X)
             await api.move_rel(mount=OT3Mount.LEFT,
-                               delta=Point(x=POINT_MAP[X],
-                                           y=POINT_MAP[Y]),
+                               delta=Point(x=step_x,
+                                           y=step_y),
                                speed=SPEED_X)
-        else:
-            await api.move_rel(mount=OT3Mount.LEFT, delta=NEG_POINT_MAP[Z_L],
-                               speed=SPEED_Z)
-            await api.move_rel(mount=OT3Mount.RIGHT, delta=NEG_POINT_MAP[Z_R],
-                               speed=SPEED_Z)
-            await api.move_rel(mount=OT3Mount.LEFT, delta=POINT_MAP[Z_L],
-                               speed=SPEED_Z)
-            await api.move_rel(mount=OT3Mount.RIGHT, delta=POINT_MAP[Z_R],
-                               speed=SPEED_Z)
+        elif (AXIS == 'z'):
+            print('z axis')
+            # need to fix - want Z and A to move up and down max travel distance
+            # await api.move_to(mount=OT3Mount.LEFT,
+            #                   abs_position=Point(x=home_pos_left[OT3Axis.X],
+            #                                      y=home_pos_left[OT3Axis.Y],
+            #                                      z=0),
+            #                    speed=SPEED_Z)
+            # await api.move_to(mount=OT3Mount.RIGHT,
+            #                   abs_position=Point(x=home_pos_right[OT3Axis.X],
+            #                                      y=home_pos_right[OT3Axis.Y],
+            #                                      z=0),
+            #                    speed=SPEED_Z)
+            # await api.move_to(mount=OT3Mount.LEFT,
+            #                   abs_position=Point(x=home_pos_left[OT3Axis.X],
+            #                                      y=home_pos_left[OT3Axis.Y],
+            #                                      z=200),
+            #                    speed=SPEED_Z)
+            # await api.move_to(mount=OT3Mount.RIGHT,
+            #                   abs_position=Point(x=home_pos_right[OT3Axis.X],
+            #                                      y=home_pos_right[OT3Axis.Y],
+            #                                      z=200),
+            #                    speed=SPEED_Z)
 
 
 async def _main(is_simulating: bool) -> None:
