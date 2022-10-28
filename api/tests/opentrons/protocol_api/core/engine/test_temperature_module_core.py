@@ -50,7 +50,7 @@ def test_set_target_temperature(
     subject.set_target_temperature(38.9)
 
     decoy.verify(
-        mock_engine_client.temperature_set_target_temperature(
+        mock_engine_client.temperature_module_set_target_temperature(
             module_id="1234", celsius=38.9
         )
     )
