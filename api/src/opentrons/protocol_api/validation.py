@@ -1,4 +1,4 @@
-from typing import Dict, Union
+from typing import Dict, Union, Optional
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
@@ -96,3 +96,14 @@ def ensure_module_model(load_name: str) -> ModuleModel:
         )
 
     return model
+
+
+def ensure_hold_time_seconds(
+    seconds: Optional[float], minutes: Optional[float]
+) -> float:
+    """Ensure that hold time is expressed in seconds."""
+    if seconds is None:
+        seconds = 0
+    if minutes is not None:
+        seconds += minutes * 60
+    return seconds

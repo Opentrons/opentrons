@@ -61,6 +61,10 @@ class WellImplementation(AbstractWellCore):
         """Get the row portion of the well name (e.g. "1")."""
         return self._row_name
 
+    def get_max_volume(self) -> float:
+        """Get the well's maximum liquid volume."""
+        return self._geometry.max_volume
+
     def get_geometry(self) -> WellGeometry:
         """Get the well's geometry information interface."""
         return self._geometry

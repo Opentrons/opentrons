@@ -41,6 +41,10 @@ class AbstractLabware(DeckItem, ABC, Generic[WellCoreType]):
 
     @abstractmethod
     def get_uri(self) -> str:
+        """Get the URI string string of the labware's definition.
+
+        The URI is unique for a given namespace, load name, and definition version.
+        """
         ...
 
     @abstractmethod
@@ -88,7 +92,8 @@ class AbstractLabware(DeckItem, ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
-    def is_tiprack(self) -> bool:
+    def is_tip_rack(self) -> bool:
+        "Whether the labware is a tip rack."
         ...
 
     @abstractmethod
@@ -122,6 +127,18 @@ class AbstractLabware(DeckItem, ABC, Generic[WellCoreType]):
     @abstractmethod
     def get_geometry(self) -> AbstractLabwareGeometry:
         ...
+
+    @abstractmethod
+    def get_default_magnet_engage_height(
+        self,
+        preserve_half_mm: bool = False,
+    ) -> Optional[float]:
+        """Get the labware's default magnet engage height, if defined.
+
+        Value returned is in real millimeters from the labware's base,
+        unless `preserve_half_mm` is specified, in which case
+        some definitions will return half-millimeters.
+        """
 
 
 LabwareCoreType = TypeVar("LabwareCoreType", bound=AbstractLabware[Any])

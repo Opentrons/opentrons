@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 typing-extensions = "==3.10.0.0"
 pyserial = "==3.5"
+pyudev = "==0.24.0"
 
 [dev-packages]
 ot3usb = {path = ".", editable = true}

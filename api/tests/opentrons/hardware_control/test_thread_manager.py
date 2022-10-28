@@ -1,7 +1,9 @@
 import asyncio
+import weakref
+from typing import Any
 
 import pytest
-import weakref
+
 from opentrons.hardware_control.modules import ModuleAtPort
 from opentrons.hardware_control.thread_manager import (
     ThreadManagerException,
@@ -10,17 +12,17 @@ from opentrons.hardware_control.thread_manager import (
 from opentrons.hardware_control.api import API
 
 
+async def _raise_exception() -> Any:
+    raise Exception("oh no")
+
+
 def test_build_fail_raises_exception():
     """
     Test that a builder that raises an exception raises
     a ThreadManagerException
     """
-
-    def f():
-        raise Exception()
-
     with pytest.raises(ThreadManagerException):
-        ThreadManager(f)
+        ThreadManager(_raise_exception)
 
 
 def test_module_cache_add_entry():

@@ -16,7 +16,7 @@ import { StepMeter } from '../../atoms/StepMeter'
 
 interface WizardHeaderProps {
   title: string
-  onExit?: () => void
+  onExit?: (() => void) | null
   totalSteps?: number
   currentStep?: number | null
 }

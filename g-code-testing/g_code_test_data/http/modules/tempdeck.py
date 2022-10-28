@@ -16,19 +16,6 @@ TEMPDECK_DEACTIVATE = HTTPGCodeConfirmConfig(
     settings=HTTP_SETTINGS,
 )
 
-TEMPDECK_SET_TEMPERATURE = HTTPGCodeConfirmConfig(
-    name='tempdeck_set_temperature',
-    executable=partial(
-        post_serial_command,
-        # Keep the args at a low value because the temp starts and 0.0 and only
-        # changes 0.25 degrees every second
-        command=SerialCommand(command_type='set_temperature', args=[2.0]),
-        serial=HTTP_SETTINGS.tempdeck.serial_number,
-        requested_version=2
-    ),
-    settings=HTTP_SETTINGS,
-)
-
 TEMPDECK_START_SET_TEMPERATURE = HTTPGCodeConfirmConfig(
     name='tempdeck_start_set_temperature',
     executable=partial(
@@ -44,6 +31,5 @@ TEMPDECK_START_SET_TEMPERATURE = HTTPGCodeConfirmConfig(
 
 TEMPDECK_CONFIGURATIONS = [
     TEMPDECK_DEACTIVATE,
-    TEMPDECK_SET_TEMPERATURE,
     TEMPDECK_START_SET_TEMPERATURE,
 ]

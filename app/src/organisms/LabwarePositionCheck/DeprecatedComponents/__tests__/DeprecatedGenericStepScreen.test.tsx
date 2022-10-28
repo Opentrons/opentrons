@@ -9,13 +9,17 @@ import { DeprecatedGenericStepScreen } from '../DeprecatedGenericStepScreen'
 import { DeprecatedLabwarePositionCheckStepDetail } from '../DeprecatedLabwarePositionCheckStepDetail'
 import { DeprecatedSectionList } from '../DeprecatedSectionList'
 import { DeprecatedDeckMap } from '../DeprecatedDeckMap'
-import { useIntroInfo, useLabwareIdsBySection, useSteps } from '../../hooks'
-import { Section } from '../types'
+import {
+  useIntroInfo,
+  useLabwareIdsBySection,
+  useDeprecatedSteps,
+} from '../../deprecatedHooks'
+import { DeprecatedSection } from '../types'
 
 jest.mock('../DeprecatedLabwarePositionCheckStepDetail')
 jest.mock('../DeprecatedSectionList')
 jest.mock('../DeprecatedDeckMap')
-jest.mock('../../hooks')
+jest.mock('../../deprecatedHooks')
 
 const mockDeprecatedLabwarePositionCheckStepDetail = DeprecatedLabwarePositionCheckStepDetail as jest.MockedFunction<
   typeof DeprecatedLabwarePositionCheckStepDetail
@@ -26,7 +30,9 @@ const mockDeprecatedSectionList = DeprecatedSectionList as jest.MockedFunction<
 const mockUseIntroInfo = useIntroInfo as jest.MockedFunction<
   typeof useIntroInfo
 >
-const mockUseSteps = useSteps as jest.MockedFunction<typeof useSteps>
+const mockUseSteps = useDeprecatedSteps as jest.MockedFunction<
+  typeof useDeprecatedSteps
+>
 const mockUseLabwareIdsBySection = useLabwareIdsBySection as jest.MockedFunction<
   typeof useLabwareIdsBySection
 >
@@ -36,7 +42,9 @@ const mockDeprecatedDeckmap = DeprecatedDeckMap as jest.MockedFunction<
 
 const PICKUP_TIP_LABWARE_ID = 'PICKUP_TIP_LABWARE_ID'
 const PRIMARY_PIPETTE_ID = 'PRIMARY_PIPETTE_ID'
-const MOCK_SECTIONS = ['PRIMARY_PIPETTE_TIPRACKS' as Section]
+const MOCK_DEPRECATED_SECTIONS = [
+  'PRIMARY_PIPETTE_TIPRACKS' as DeprecatedSection,
+]
 const MOCK_RUN_ID = 'fakeRunId'
 
 const MOCK_LABWARE_POSITION_CHECK_STEP_TIPRACK = {
@@ -88,7 +96,7 @@ describe('DeprecatedGenericStepScreen', () => {
       primaryPipetteMount: 'left',
       secondaryPipetteMount: '',
       firstTiprackSlot: '2',
-      sections: MOCK_SECTIONS,
+      sections: MOCK_DEPRECATED_SECTIONS,
     })
   })
   it('renders LabwarePositionCheckStepDetail component', () => {

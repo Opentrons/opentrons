@@ -32,6 +32,7 @@ export const LABWAREV2_DO_NOT_LIST = [
   'tipone_96_tiprack_200ul',
   'opentrons_1_trash_850ml_fixed',
   'opentrons_1_trash_1100ml_fixed',
+  'opentrons_1_trash_3200ml_fixed',
   'eppendorf_96_tiprack_1000ul_eptips',
   'eppendorf_96_tiprack_10ul_eptips',
   'opentrons_calibrationblock_short_side_left',
@@ -43,6 +44,7 @@ export const LABWAREV2_DO_NOT_LIST = [
   'opentrons_ot3_96_tiprack_20ul',
   'opentrons_ot3_96_tiprack_200ul',
   'opentrons_ot3_96_tiprack_1000ul',
+  'opentrons_ot3_96_tiprack_50ul',
 ]
 // NOTE(sa, 2020-7-14): in PD we do not want to list calibration blocks
 // but we still might want the rest of the labware in LABWAREV2_DO_NOT_LIST
@@ -50,13 +52,6 @@ export const LABWAREV2_DO_NOT_LIST = [
 export const PD_DO_NOT_LIST = [
   'opentrons_calibrationblock_short_side_left',
   'opentrons_calibrationblock_short_side_right',
-  // TODO(lc 8-24-2022) We are temporarily filtering
-  // out ot-3 labware definitions right now. We should
-  // have a way to filter these in the future to display
-  // the definitions. See RLIQ-117 for details.
-  'opentrons_ot3_96_tiprack_20ul',
-  'opentrons_ot3_96_tiprack_200ul',
-  'opentrons_ot3_96_tiprack_1000ul',
 ]
 
 export function getLabwareV1Def(

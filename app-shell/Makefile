@@ -41,12 +41,12 @@ build_id := $(or $(and $(OT_BUILD),b$(OT_BUILD)$(branch_suffix)),dev)
 # make dist no_python_bundle=true or =1 or whatever
 no_python_bundle ?=
 
-builder := electron-builder \
+builder := yarn electron-builder \
 	--config electron-builder.config.js \
 	--publish never
 
 
-electron := electron . \
+electron := yarn electron . \
 	--devtools \
 	--log.level.console="debug" \
 	--disable_ui.webPreferences.webSecurity \
@@ -68,7 +68,7 @@ all: package
 # must be wrapped in yarn run otherwise `prebuild-install` will fail silently
 # due to how `electron-rebuild` calls `prebuild-install`
 setup:
-	yarn electron-rebuild
+	yarn rebuild
 
 .PHONY: clean
 clean:
@@ -120,10 +120,10 @@ dist-win: package-deps
 .PHONY: dist-ot3
 dist-ot3: package-deps
 	NO_PYTHON=true NO_USB_DETECTION=true $(builder) --linux --arm64 --dir
-	cd dist/linux-arm64-unpacked && rm libEGL.so libGLESv2.so libvulkan.so.1
+	cd dist/linux-arm64-unpacked
 
 .PHONY: push-ot3
-push-ot3: dist-ot3  
+push-ot3: dist-ot3
 	ssh $(ssh_opts) root@$(host) "systemctl stop opentrons-robot-app && rm -rf /opt/opentrons-app && mkdir -p /opt/opentrons-app"
 	scp -r $(ssh_opts) ./dist/linux-arm64-unpacked/* root@$(host):/opt/opentrons-app
 	ssh $(ssh_opts) root@$(host) "systemctl start opentrons-robot-app"
@@ -139,8 +139,8 @@ dist-ubuntu-latest: dist-linux
 .PHONY: dist-ubuntu-22.04
 dist-ubuntu-22.04: dist-linux
 
-.PHONY: dist-windows-2019
-dist-windows-2019: dist-win
+.PHONY: dist-windows-2022
+dist-windows-2022: dist-win
 
 # copy distributable artifacts to the publish directory
 # update files will not exist for all OSs, so noop if cp errors

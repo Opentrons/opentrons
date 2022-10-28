@@ -1,22 +1,24 @@
 from functools import lru_cache
 import logging
 import numpy as np
+from datetime import datetime
 from dataclasses import dataclass
-from typing import Optional, List, Union, Any, cast
+from typing import Optional, List, Any, cast
 
 from opentrons import config
 
 from opentrons.config.robot_configs import (
     get_legacy_gantry_calibration,
     default_deck_calibration,
-    default_pipette_offset,
-    default_gripper_calibration_offset,
 )
 from opentrons.config.types import OT3Config
-from opentrons.calibration_storage import modify, types, get
-from opentrons.types import Mount, Point
+from opentrons.calibration_storage import (
+    types,
+    save_robot_deck_attitude,
+    get_robot_deck_attitude,
+)
+from opentrons.types import Point
 from opentrons.util import linal
-from .types import OT3Mount
 
 from .util import DeckTransformState
 
@@ -24,8 +26,18 @@ log = logging.getLogger(__name__)
 
 
 @dataclass
+class DeckCalibration:
+    attitude: types.AttitudeMatrix
+    source: types.SourceType
+    status: types.CalibrationStatus
+    last_modified: Optional[datetime] = None
+    pipette_calibrated_with: Optional[str] = None
+    tiprack: Optional[str] = None
+
+
+@dataclass
 class RobotCalibration:
-    deck_calibration: types.DeckCalibration
+    deck_calibration: DeckCalibration
 
 
 @dataclass
@@ -38,7 +50,7 @@ class OT3Transforms(RobotCalibration):
 
 def build_ot3_transforms(config: OT3Config) -> OT3Transforms:
     return OT3Transforms(
-        deck_calibration=types.DeckCalibration(
+        deck_calibration=DeckCalibration(
             attitude=config.deck_transform,
             source=types.SourceType.default,
             status=types.CalibrationStatus(),
@@ -56,7 +68,7 @@ def build_temporary_identity_calibration() -> RobotCalibration:
     calibration
     """
     return RobotCalibration(
-        deck_calibration=types.DeckCalibration(
+        deck_calibration=DeckCalibration(
             attitude=default_deck_calibration(),
             source=types.SourceType.default,
             status=types.CalibrationStatus(),
@@ -65,7 +77,7 @@ def build_temporary_identity_calibration() -> RobotCalibration:
 
 
 def validate_attitude_deck_calibration(
-    deck_cal: types.DeckCalibration,
+    deck_cal: DeckCalibration,
 ) -> DeckTransformState:
     """
     This function determines whether the deck calibration is valid
@@ -147,11 +159,15 @@ def save_attitude_matrix(
     tiprack_hash: str,
 ) -> None:
     attitude = linal.solve_attitude(expected, actual)
-    modify.save_robot_deck_attitude(attitude, pipette_id, tiprack_hash)
+    save_robot_deck_attitude(
+        attitude,
+        pipette_id,
+        tiprack_hash,
+    )
 
 
-def load_attitude_matrix() -> types.DeckCalibration:
-    calibration_data = get.get_robot_deck_attitude()
+def load_attitude_matrix() -> DeckCalibration:
+    calibration_data = get_robot_deck_attitude()
     gantry_cal = get_legacy_gantry_calibration()
     if not calibration_data and gantry_cal:
         if validate_gantry_calibration(gantry_cal) == DeckTransformState.OK:
@@ -162,59 +178,30 @@ def load_attitude_matrix() -> types.DeckCalibration:
                 )
             )
             attitude = migrate_affine_xy_to_attitude(gantry_cal)
-            modify.save_robot_deck_attitude(
+            save_robot_deck_attitude(
                 transform=attitude,
                 pip_id=None,
                 lw_hash=None,
                 source=types.SourceType.legacy,
             )
-            calibration_data = get.get_robot_deck_attitude()
+            calibration_data = get_robot_deck_attitude()
 
     if calibration_data:
-        return calibration_data
+        return DeckCalibration(
+            attitude=calibration_data.attitude,
+            source=calibration_data.source,
+            status=types.CalibrationStatus(**calibration_data.status.dict()),
+            last_modified=calibration_data.last_modified,
+            pipette_calibrated_with=calibration_data.pipette_calibrated_with,
+            tiprack=calibration_data.tiprack,
+        )
     else:
         # load default if deck calibration data do not exist
-        return types.DeckCalibration(
+        return DeckCalibration(
             attitude=default_deck_calibration(),
             source=types.SourceType.default,
             status=types.CalibrationStatus(),
         )
-
-
-def load_pipette_offset(
-    pip_id: Optional[str], mount: Union[Mount, OT3Mount]
-) -> types.PipetteOffsetByPipetteMount:
-    # load default if pipette offset data do not exist
-    pip_cal_obj = types.PipetteOffsetByPipetteMount(
-        offset=default_pipette_offset(),
-        source=types.SourceType.default,
-        status=types.CalibrationStatus(),
-    )
-    if isinstance(mount, OT3Mount):
-        checked_mount = mount.to_mount()
-    else:
-        checked_mount = mount
-    if pip_id:
-        pip_offset_data = get.get_pipette_offset(pip_id, checked_mount)
-        if pip_offset_data:
-            return pip_offset_data
-    return pip_cal_obj
-
-
-def load_gripper_calibration_offset(
-    gripper_id: Optional[str],
-) -> types.GripperCalibrationOffset:
-    # load default if gripper offset data do not exist
-    grip_cal_obj = types.GripperCalibrationOffset(
-        offset=default_gripper_calibration_offset(),
-        source=types.SourceType.default,
-        status=types.CalibrationStatus(),
-    )
-    if gripper_id:
-        grip_offset_data = get.get_gripper_calibration_offset(gripper_id)
-        if grip_offset_data:
-            return grip_offset_data
-    return grip_cal_obj
 
 
 def load() -> RobotCalibration:

@@ -70,7 +70,7 @@ export function StepText(props: Props): JSX.Element | null {
         labwareId,
         protocolData.commands
       )
-      if (!('slotName' in labwareLocation)) {
+      if (labwareLocation === 'offDeck' || !('slotName' in labwareLocation)) {
         throw new Error('expected tip rack to be in a slot')
       }
       messageNode = t('drop_tip', {
@@ -93,7 +93,7 @@ export function StepText(props: Props): JSX.Element | null {
         labwareId,
         protocolData.commands
       )
-      if (!('slotName' in labwareLocation)) {
+      if (labwareLocation === 'offDeck' || !('slotName' in labwareLocation)) {
         throw new Error('expected tip rack to be in a slot')
       }
       messageNode = t('pickup_tip', {

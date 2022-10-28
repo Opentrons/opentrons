@@ -7,6 +7,7 @@ from .exceptions import (
     PipetteNotAttachedError,
     CommandDoesNotExistError,
     LabwareNotLoadedError,
+    LabwareNotOnDeckError,
     LiquidDoesNotExistError,
     LabwareDefinitionDoesNotExistError,
     LabwareOffsetDoesNotExistError,
@@ -38,6 +39,9 @@ from .exceptions import (
     CannotPerformModuleAction,
     PauseNotAllowedError,
     ProtocolCommandFailedError,
+    GripperNotAttachedError,
+    HardwareNotSupportedError,
+    UnsupportedLabwareMovementError,
 )
 
 from .error_occurrence import ErrorOccurrence
@@ -50,6 +54,7 @@ __all__ = [
     "PipetteNotAttachedError",
     "CommandDoesNotExistError",
     "LabwareNotLoadedError",
+    "LabwareNotOnDeckError",
     "LiquidDoesNotExistError",
     "LabwareDefinitionDoesNotExistError",
     "LabwareOffsetDoesNotExistError",
@@ -81,6 +86,9 @@ __all__ = [
     "CannotPerformModuleAction",
     "PauseNotAllowedError",
     "ProtocolCommandFailedError",
+    "GripperNotAttachedError",
+    "HardwareNotSupportedError",
+    "UnsupportedLabwareMovementError",
     # error occurrence models
     "ErrorOccurrence",
 ]

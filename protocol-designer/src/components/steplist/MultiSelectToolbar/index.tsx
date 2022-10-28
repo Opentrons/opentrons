@@ -160,7 +160,6 @@ export const MultiSelectToolbar = (props: Props): JSX.Element => {
   const selectProps: ClickableIconProps = {
     iconName: isAllStepsSelected ? 'checkbox-marked' : 'minus-box',
     tooltipText: isAllStepsSelected ? 'Deselect All' : 'Select All',
-    // @ts-expect-error(sa, 2021-6-21): type issue with useConditionalConfirm
     onClick: confirmSelect,
   }
 
@@ -169,14 +168,12 @@ export const MultiSelectToolbar = (props: Props): JSX.Element => {
     tooltipText: 'Delete',
     width: '1.5rem',
     alignRight: true,
-    // @ts-expect-error(sa, 2021-6-21): type issue with useConditionalConfirm
     onClick: confirmDelete,
   }
 
   const copyProps: ClickableIconProps = {
     iconName: 'content-copy',
     tooltipText: 'Duplicate',
-    // @ts-expect-error(sa, 2021-6-21): type issue with useConditionalConfirm
     onClick: confirmDuplicate,
   }
 

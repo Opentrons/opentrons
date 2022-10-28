@@ -5,6 +5,7 @@ from decoy import Decoy, matchers
 from typing import Any, cast
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.labware.dev_types import LabwareUri
 
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.types import Mount as HwMount, MountType, DeckSlotName
@@ -21,13 +22,13 @@ from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     ModuleLocation,
-    LoadedLabware,
     LoadedPipette,
     LabwareOffset,
     LabwareOffsetVector,
     LabwareOffsetLocation,
     ModuleModel,
     ModuleDefinition,
+    OFF_DECK_LOCATION,
 )
 
 from opentrons.protocol_engine.state import Config, StateStore
@@ -163,6 +164,38 @@ async def test_load_labware(
         labware_id="unique-id",
         definition=minimal_labware_def,
         offsetId="labware-offset-id",
+    )
+
+
+async def test_load_labware_off_deck(
+    decoy: Decoy,
+    model_utils: ModelUtils,
+    state_store: StateStore,
+    labware_data_provider: LabwareDataProvider,
+    minimal_labware_def: LabwareDefinition,
+    subject: EquipmentHandler,
+) -> None:
+    """It should load labware definition and offset data and generate an ID."""
+    decoy.when(model_utils.generate_id()).then_return("unique-id")
+
+    decoy.when(
+        state_store.labware.get_definition_by_uri(
+            cast("LabwareUri", "opentrons-test/load-name/1")
+        )
+    ).then_return(minimal_labware_def)
+
+    result = await subject.load_labware(
+        location=OFF_DECK_LOCATION,
+        load_name="load-name",
+        namespace="opentrons-test",
+        version=1,
+        labware_id=None,
+    )
+
+    assert result == LoadedLabwareData(
+        labware_id="unique-id",
+        definition=minimal_labware_def,
+        offsetId=None,
     )
 
 
@@ -318,22 +351,12 @@ async def test_load_labware_on_module(
     )
 
 
-def test_move_labware_to_deck(
+def test_find_offset_id_of_labware_on_deck_slot(
     decoy: Decoy,
     state_store: StateStore,
     subject: EquipmentHandler,
 ) -> None:
-    """It should find a new offset by resolving the new location."""
-    decoy.when(state_store.labware.get(labware_id="input-labware-id")).then_return(
-        LoadedLabware(
-            id="input-labware-id",
-            loadName="load-name",
-            definitionUri="opentrons-test/load-name/1",
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-            offsetId=None,
-        )
-    )
-
+    """It should find the offset by resolving the provided location."""
     decoy.when(
         state_store.labware.find_applicable_labware_offset(
             definition_uri="opentrons-test/load-name/1",
@@ -355,29 +378,20 @@ def test_move_labware_to_deck(
         )
     )
 
-    result = subject.move_labware(
-        labware_id="input-labware-id",
-        new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+    result = subject.find_applicable_labware_offset_id(
+        labware_definition_uri="opentrons-test/load-name/1",
+        labware_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
     )
 
     assert result == "labware-offset-id"
 
 
-def test_move_labware_to_module(
+def test_find_offset_id_of_labware_on_module(
     decoy: Decoy,
     state_store: StateStore,
     subject: EquipmentHandler,
 ) -> None:
     """It should find a new offset by resolving the new location."""
-    decoy.when(state_store.labware.get(labware_id="input-labware-id")).then_return(
-        LoadedLabware(
-            id="input-labware-id",
-            loadName="load-name",
-            definitionUri="opentrons-test/load-name/1",
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-            offsetId=None,
-        )
-    )
     decoy.when(state_store.modules.get_model("input-module-id")).then_return(
         ModuleModel.THERMOCYCLER_MODULE_V1
     )
@@ -406,12 +420,25 @@ def test_move_labware_to_module(
         )
     )
 
-    result = subject.move_labware(
-        labware_id="input-labware-id",
-        new_location=ModuleLocation(moduleId="input-module-id"),
+    result = subject.find_applicable_labware_offset_id(
+        labware_definition_uri="opentrons-test/load-name/1",
+        labware_location=ModuleLocation(moduleId="input-module-id"),
     )
 
     assert result == "labware-offset-id"
+
+
+def test_find_offset_id_of_labware_off_deck(
+    decoy: Decoy,
+    state_store: StateStore,
+    subject: EquipmentHandler,
+) -> None:
+    """It should return None for offset_id of labware off-deck."""
+    result = subject.find_applicable_labware_offset_id(
+        labware_definition_uri="opentrons-test/load-name/1",
+        labware_location=OFF_DECK_LOCATION,
+    )
+    assert result is None
 
 
 async def test_load_pipette(

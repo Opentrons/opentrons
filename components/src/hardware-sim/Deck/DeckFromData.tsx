@@ -1,15 +1,8 @@
 import * as React from 'react'
-import cx from 'classnames'
-import map from 'lodash/map'
-import snakeCase from 'lodash/snakeCase'
+import parseHtml from 'html-react-parser'
+import { stringify } from 'svgson'
 
-import styles from './Deck.css'
-
-import type {
-  DeckDefinition,
-  DeckLayer,
-  DeckLayerFeature,
-} from '@opentrons/shared-data'
+import type { DeckDefinition } from '@opentrons/shared-data'
 
 export interface DeckFromDataProps {
   def: DeckDefinition
@@ -17,24 +10,27 @@ export interface DeckFromDataProps {
 }
 
 export function DeckFromData(props: DeckFromDataProps): JSX.Element {
-  const { def, layerBlocklist } = props
+  const { def, layerBlocklist = [] } = props
+
+  const layerGroupNodes = def.layers.filter(
+    g => !layerBlocklist.includes(g.attributes?.id)
+  )
+
+  const groupNodeWrapper = {
+    name: 'g',
+    type: 'element',
+    value: '',
+    attributes: { id: 'deckLayers' },
+    children: layerGroupNodes,
+  }
+
   return (
     <g>
-      {map(def.layers, (layer: DeckLayer, layerId: string) => {
-        if (layerBlocklist.includes(layerId)) return null
-        return (
-          <g id={layerId} key={layerId}>
-            <path
-              className={cx(
-                styles.deck_outline,
-                styles[def.otId],
-                styles[snakeCase(layerId)]
-              )}
-              d={layer.map((l: DeckLayerFeature) => l.footprint).join(' ')}
-            />
-          </g>
-        )
-      })}
+      {parseHtml(
+        stringify(groupNodeWrapper, {
+          selfClose: false,
+        })
+      )}
     </g>
   )
 }

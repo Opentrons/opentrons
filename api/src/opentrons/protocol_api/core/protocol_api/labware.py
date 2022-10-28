@@ -13,6 +13,15 @@ from ..labware import AbstractLabware, LabwareLoadParams
 from .well import WellImplementation
 
 
+# URIs of labware whose definitions accidentally specify an engage height
+# in units of half-millimeters instead of millimeters.
+_MAGDECK_HALF_MM_LABWARE = {
+    "opentrons/biorad_96_wellplate_200ul_pcr/1",
+    "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",
+    "opentrons/usascientific_96_wellplate_2.4ml_deep/1",
+}
+
+
 class LabwareImplementation(AbstractLabware[WellImplementation]):
     """Labware implementation core based on legacy PAPIv2 behavior.
 
@@ -100,7 +109,7 @@ class LabwareImplementation(AbstractLabware[WellImplementation]):
     def get_calibrated_offset(self) -> Point:
         return self._calibrated_offset
 
-    def is_tiprack(self) -> bool:
+    def is_tip_rack(self) -> bool:
         return self._parameters["isTiprack"]
 
     def get_tip_length(self) -> float:
@@ -110,7 +119,7 @@ class LabwareImplementation(AbstractLabware[WellImplementation]):
         self._parameters["tipLength"] = length
 
     def reset_tips(self) -> None:
-        if self.is_tiprack():
+        if self.is_tip_rack():
             for well in self._wells:
                 well.set_has_tip(True)
 
@@ -141,6 +150,30 @@ class LabwareImplementation(AbstractLabware[WellImplementation]):
     def load_name(self) -> str:
         return self._parameters["loadName"]
 
+    # TODO(mc, 2022-09-26): codify "from labware's base" in defintion schema
+    # https://opentrons.atlassian.net/browse/RSS-110
+    def get_default_magnet_engage_height(
+        self, preserve_half_mm: bool = False
+    ) -> Optional[float]:
+        """Get the labware's default magnet engage height, if defined.
+
+        Value returned is in real millimeters from the labware's base,
+        unless `preserve_half_mm` is used, in which case
+        some definitions will return half-millimeters.
+        """
+        is_compatible = self._parameters.get("isMagneticModuleCompatible", False)
+        default_engage_height = self._parameters.get("magneticModuleEngageHeight")
+
+        if not is_compatible or default_engage_height is None:
+            return None
+
+        if self.get_uri() in _MAGDECK_HALF_MM_LABWARE and not preserve_half_mm:
+            # TODO(mc, 2022-09-26): this value likely _also_ needs a few mm subtracted
+            # https://opentrons.atlassian.net/browse/RSS-111
+            return default_engage_height / 2.0
+
+        return default_engage_height
+
     def _build_wells(self) -> List[WellImplementation]:
         return [
             WellImplementation(
@@ -150,7 +183,7 @@ class LabwareImplementation(AbstractLabware[WellImplementation]):
                     parent_object=self,
                 ),
                 display_name="{} of {}".format(well, self._display_name),
-                has_tip=self.is_tiprack(),
+                has_tip=self.is_tip_rack(),
                 name=well,
             )
             for well in self._ordering

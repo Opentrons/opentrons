@@ -13,6 +13,7 @@ from ..types import (
     WellOffset,
     DeckSlotLocation,
     ModuleLocation,
+    OFF_DECK_LOCATION,
 )
 from .labware import LabwareView
 from .modules import ModuleView
@@ -59,16 +60,24 @@ class GeometryView:
     # TODO(mc, 2022-06-24): rename this method
     def get_all_labware_highest_z(self) -> float:
         """Get the highest Z-point across all labware."""
-        return max(
-            *(
+        highest_labware_z = max(
+            (
                 self._get_highest_z_from_labware_data(lw_data)
                 for lw_data in self._labware.get_all()
+                if lw_data.location != OFF_DECK_LOCATION
             ),
-            *(
+            default=0.0,
+        )
+
+        highest_module_z = max(
+            (
                 self._modules.get_overall_height(module.id)
                 for module in self._modules.get_all()
             ),
+            default=0.0,
         )
+
+        return max(highest_labware_z, highest_module_z)
 
     def get_labware_parent_position(self, labware_id: str) -> Point:
         """Get the position of the labware's parent slot (deck or module)."""
@@ -77,9 +86,15 @@ class GeometryView:
 
         if isinstance(labware_data.location, DeckSlotLocation):
             slot_name = labware_data.location.slotName
-        else:
+        elif isinstance(labware_data.location, ModuleLocation):
             module_id = labware_data.location.moduleId
             slot_name = self._modules.get_location(module_id).slotName
+        elif labware_data.location == OFF_DECK_LOCATION:
+            # Labware is off-deck
+            raise errors.LabwareNotOnDeckError(
+                f"Labware {labware_id} does not have a parent associated with it"
+                f" since it is no longer on the deck."
+            )
 
         slot_pos = self._labware.get_slot_position(slot_name)
 
@@ -274,7 +289,13 @@ class GeometryView:
 
         if isinstance(labware.location, DeckSlotLocation):
             slot_name = labware.location.slotName
-        else:
+        elif isinstance(labware.location, ModuleLocation):
             module_id = labware.location.moduleId
             slot_name = self._modules.get_location(module_id).slotName
+        elif labware.location == OFF_DECK_LOCATION:
+            raise errors.LabwareNotOnDeckError(
+                f"Labware {labware_id} does not have a slot associated with it"
+                f" since it is no longer on the deck."
+            )
+
         return slot_name
