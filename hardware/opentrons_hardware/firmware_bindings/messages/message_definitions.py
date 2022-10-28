@@ -34,10 +34,11 @@ class BaseMessage(object):
     def __post_init__(self) -> None:
         """Update the message index from the singleton."""
         try:
-            index_generator = SingletonMessageIndexGenerator()
-            self.payload.message_index = utils.UInt32Field(  # type: ignore[attr-defined]
-                index_generator.get_next_index()
-            )
+            if self.payload.message_index == 0: # type: ignore[attr-defined]
+                index_generator = SingletonMessageIndexGenerator()
+                self.payload.message_index = utils.UInt32Field(  # type: ignore[attr-defined]
+                    index_generator.get_next_index()
+                )
         except AttributeError:
             # we are probably constructing this instance from binary and it doesn't
             # have a payload yet
