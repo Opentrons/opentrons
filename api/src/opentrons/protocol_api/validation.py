@@ -128,6 +128,8 @@ def ensure_thermocycler_profile_steps(
             )
         validated_seconds = ensure_hold_time_seconds(hold_secs, hold_mins)
         validated_steps.append(
-            {"temperature": temperature, "hold_time_seconds": validated_seconds}
+            ThermocyclerStep(
+                temperature=temperature, hold_time_seconds=validated_seconds
+            )
         )
     return validated_steps
