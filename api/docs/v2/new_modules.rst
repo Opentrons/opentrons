@@ -412,7 +412,8 @@ You can optionally instruct the Thermocycler to hold its block temperature for a
 
 .. code-block:: python
 
-        tc_mod.set_block_temperature(temperature=4, hold_time_minutes=4,  hold_time_seconds=15)
+        tc_mod.set_block_temperature(temperature=4, hold_time_minutes=4,
+                                     hold_time_seconds=15)
 
 .. note ::
 
@@ -436,20 +437,6 @@ If the Thermocycler assumes these samples are 25 µL, it may not cool them to 4 
 
 .. versionadded:: 2.0
 
-Ramp Rate
----------
-
-Lastly, you can modify the ``ramp_rate`` in °C/sec for a given ``temperature``.
-
-.. code-block:: python
-
-        tc_mod.set_block_temperature(4, hold_time_seconds=60, ramp_rate=0.5)
-
-.. warning::
-
-  Do not modify the ``ramp_rate`` unless you know what you're doing.
-
-.. versionadded:: 2.0
 
 .. _thermocycler-profiles:
 
