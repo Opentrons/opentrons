@@ -36,11 +36,14 @@ from opentrons_hardware.hardware_control.motion_planning import (
 
 
 from .util import use_or_initialize_loop, check_motion_bounds
-from .instruments.pipette import (
+
+# TODO (lc 09-23-2022) Pull in correct OT3 instrument once
+# instrument model re-working is complete.
+from .instruments.ot2.pipette import (
     generate_hardware_configs_ot3,
     load_from_config_and_check_skip,
 )
-from .instruments.gripper import compare_gripper_config_and_check_skip
+from .instruments.ot3.gripper import compare_gripper_config_and_check_skip
 from .backends.ot3controller import OT3Controller
 from .backends.ot3simulator import OT3Simulator
 from .backends.ot3utils import get_system_constraints
@@ -68,16 +71,22 @@ from .types import (
 )
 from . import modules
 from .robot_calibration import (
-    load_pipette_offset,
-    load_gripper_calibration_offset,
     OT3Transforms,
     RobotCalibration,
     build_ot3_transforms,
 )
 
 from .protocols import HardwareControlAPI
-from .instruments.pipette_handler import OT3PipetteHandler, InstrumentsByMount
-from .instruments.gripper_handler import GripperHandler
+
+# TODO (lc 09/15/2022) We should update our pipette handler to reflect OT-3 properties
+# in a follow-up PR.
+from .instruments.ot2.pipette_handler import OT3PipetteHandler, InstrumentsByMount
+from .instruments.ot2.instrument_calibration import load_pipette_offset
+from .instruments.ot3.gripper_handler import GripperHandler
+from .instruments.ot3.instrument_calibration import (
+    load_gripper_calibration_offset,
+)
+
 from .motion_utilities import (
     target_position_from_absolute,
     target_position_from_relative,
@@ -822,7 +831,7 @@ class OT3API(
         :py:attr:`_last_moved_mount` to contain `mount`.
         """
         if mount != self._last_moved_mount and self._last_moved_mount:
-            await self.retract(self._last_moved_mount.to_mount(), 10)
+            await self.retract(self._last_moved_mount, 10)
         self._last_moved_mount = mount
 
     @ExecutionManagerProvider.wait_for_running
@@ -850,7 +859,7 @@ class OT3API(
         check_motion_bounds(to_check, target_position, bounds, check_bounds)
 
         # TODO: (2022-02-10) Use actual max speed for MoveTarget
-        checked_speed = speed or 500
+        checked_speed = speed or 400
         self._move_manager.update_constraints(
             get_system_constraints(self._config.motion_settings, self._gantry_load)
         )
@@ -872,14 +881,19 @@ class OT3API(
                 await stack.enter_async_context(self._motion_lock)
             try:
                 await self._backend.move(origin, moves[0])
-                encoder_pos = await self._backend.update_encoder_position()
+                encoder_machine_pos = await self._backend.update_encoder_position()
             except Exception:
                 self._log.exception("Move failed")
                 self._current_position.clear()
                 raise
             else:
                 self._current_position.update(target_position)
-                self._encoder_current_position.update(encoder_pos)
+                encoder_position = deck_from_machine(
+                    encoder_machine_pos,
+                    self._transforms.deck_calibration.attitude,
+                    self._transforms.carriage_offset,
+                )
+                self._encoder_current_position.update(encoder_position)
 
     @ExecutionManagerProvider.wait_for_running
     async def home(
@@ -904,14 +918,19 @@ class OT3API(
                 raise
             else:
                 machine_pos = await self._backend.update_position()
-                encoder_pos = await self._backend.update_encoder_position()
+                encoder_machine_pos = await self._backend.update_encoder_position()
                 position = deck_from_machine(
                     machine_pos,
                     self._transforms.deck_calibration.attitude,
                     self._transforms.carriage_offset,
                 )
                 self._current_position.update(position)
-                self._encoder_current_position.update(encoder_pos)
+                encoder_position = deck_from_machine(
+                    encoder_machine_pos,
+                    self._transforms.deck_calibration.attitude,
+                    self._transforms.carriage_offset,
+                )
+                self._encoder_current_position.update(encoder_position)
                 if OT3Axis.G in checked_axes:
                     try:
                         gripper = self._gripper_handler.get_gripper()
@@ -1006,6 +1025,8 @@ class OT3API(
         """Move the gripper jaw inward to close."""
         try:
             await self._backend.gripper_grip_jaw(duty_cycle=duty_cycle)
+            encoder_pos = await self._backend.update_encoder_position()
+            self._encoder_current_position.update(encoder_pos)
         except Exception:
             self._log.exception("Gripper grip failed")
             raise
@@ -1015,6 +1036,8 @@ class OT3API(
         """Move the gripper jaw outward to reach the homing switch."""
         try:
             await self._backend.gripper_home_jaw()
+            encoder_pos = await self._backend.update_encoder_position()
+            self._encoder_current_position.update(encoder_pos)
         except Exception:
             self._log.exception("Gripper home failed")
             raise
@@ -1040,6 +1063,8 @@ class OT3API(
                     / 2
                 )
             )
+            encoder_pos = await self._backend.update_encoder_position()
+            self._encoder_current_position.update(encoder_pos)
         except Exception:
             self._log.exception("Gripper set width failed")
             raise
@@ -1192,7 +1217,7 @@ class OT3API(
 
     async def pick_up_tip(
         self,
-        mount: top_types.Mount,
+        mount: Union[top_types.Mount, OT3Mount],
         tip_length: float,
         presses: Optional[int] = None,
         increment: Optional[float] = None,
@@ -1385,6 +1410,9 @@ class OT3API(
     def attached_gripper(self) -> Optional[GripperDict]:
         return self._gripper_handler.get_gripper_dict()
 
+    def has_gripper(self) -> bool:
+        return self._gripper_handler.has_gripper()
+
     def calibrate_plunger(
         self,
         mount: Union[top_types.Mount, OT3Mount],
@@ -1482,7 +1510,7 @@ class OT3API(
                 " tool"
             )
 
-        here = await self.gantry_position(mount)
+        here = await self.gantry_position(mount, refresh=True)
         origin_pos = moving_axis.of_point(here)
         if origin_pos < target_pos:
             pass_start = target_pos - pass_settings.prep_distance_mm
@@ -1490,7 +1518,6 @@ class OT3API(
                 pass_settings.prep_distance_mm + pass_settings.max_overrun_distance_mm
             )
         else:
-
             pass_start = target_pos + pass_settings.prep_distance_mm
             pass_distance = -1.0 * (
                 pass_settings.prep_distance_mm + pass_settings.max_overrun_distance_mm
@@ -1508,6 +1535,7 @@ class OT3API(
             moving_axis,
             machine_pass_distance,
             pass_settings.speed_mm_per_s,
+            pass_settings.sensor_threshold_pf,
         )
         end_pos = await self.gantry_position(mount, refresh=True)
         await self.move_to(mount, pass_start_pos)

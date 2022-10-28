@@ -1,12 +1,10 @@
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import type {
-  RunTimeCommand,
-  ProtocolFile,
-} from '@opentrons/shared-data/protocol'
-import { LoadPipetteRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import type { LoadedPipette } from '@opentrons/shared-data'
+import type { RunTimeCommand } from '@opentrons/shared-data/protocol'
+import type { LoadPipetteRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
 export const getPrimaryPipetteId = (
-  pipettesById: ProtocolFile<{}>['pipettes'],
+  pipettesById: { [id: string]: LoadedPipette },
   commands: RunTimeCommand[]
 ): string => {
   if (Object.keys(pipettesById).length === 1) {
@@ -31,14 +29,18 @@ export const getPrimaryPipetteId = (
   const leftPipette = pipettesById[leftPipetteId]
   const rightPipette = pipettesById[rightPipetteId]
 
-  const leftPipetteSpecs = getPipetteNameSpecs(leftPipette.name)
-  const rightPipetteSpecs = getPipetteNameSpecs(rightPipette.name)
+  const leftPipetteSpecs = getPipetteNameSpecs(leftPipette.pipetteName)
+  const rightPipetteSpecs = getPipetteNameSpecs(rightPipette.pipetteName)
 
   if (leftPipetteSpecs == null) {
-    throw new Error(`could not find pipette specs for ${leftPipette.name}`)
+    throw new Error(
+      `could not find pipette specs for ${leftPipette.pipetteName}`
+    )
   }
   if (rightPipetteSpecs == null) {
-    throw new Error(`could not find pipette specs for ${rightPipette.name}`)
+    throw new Error(
+      `could not find pipette specs for ${rightPipette.pipetteName}`
+    )
   }
 
   // prefer pipettes with fewer channels

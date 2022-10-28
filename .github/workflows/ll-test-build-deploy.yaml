@@ -40,12 +40,12 @@ jobs:
   js-unit-test:
     name: 'labware library unit tests'
     timeout-minutes: 20
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-20.04'
     steps:
       - uses: 'actions/checkout@v3'
       - uses: 'actions/setup-node@v3'
         with:
-          node-version: '14'
+          node-version: '16'
       - name: 'install libudev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
@@ -75,12 +75,12 @@ jobs:
     name: 'labware library e2e tests'
     needs: ['js-unit-test']
     timeout-minutes: 30
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-20.04'
     steps:
       - uses: 'actions/checkout@v3'
       - uses: 'actions/setup-node@v3'
         with:
-          node-version: '14'
+          node-version: '16'
       - name: 'install libudev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
@@ -105,13 +105,13 @@ jobs:
   build-ll:
     name: 'build labware library artifact'
     needs: ['js-unit-test']
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-20.04'
     if: github.event_name != 'pull_request'
     steps:
       - uses: 'actions/checkout@v3'
       - uses: 'actions/setup-node@v3'
         with:
-          node-version: '14'
+          node-version: '16'
       - name: 'install libudev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
@@ -141,14 +141,14 @@ jobs:
           path: labware-library/dist
   deploy-ll:
     name: 'deploy LL artifact to S3'
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-20.04'
     needs: ['js-unit-test', 'e2e-test', 'build-ll']
     if: github.event_name != 'pull_request'
     steps:
       - uses: 'actions/checkout@v3'
       - uses: 'actions/setup-node@v3'
         with:
-          node-version: '14'
+          node-version: '16'
       - name: 'install udev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'set complex environment variables'

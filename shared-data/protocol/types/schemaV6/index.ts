@@ -1,4 +1,10 @@
-import type { LoadedLiquid, PipetteName } from '../../../js'
+import {
+  LoadedPipette,
+  LoadedLabware,
+  LoadedModule,
+  Liquid,
+  PipetteName,
+} from '../../../js'
 import type { CreateCommand, RunTimeCommand } from './command'
 import type { LabwareDefinition2, ModuleModel } from '../../../js/types'
 
@@ -25,7 +31,7 @@ export interface ProtocolFile<DesignerApplicationData = {}> {
   }
   robot: {
     model: 'OT-2 Standard' | 'OT-3 Standard'
-    deckId: 'ot2_standard' | 'ot2_short_trash'
+    deckId: 'ot2_standard' | 'ot2_short_trash' | 'ot3_standard'
   }
   pipettes: {
     [pipetteId: string]: { name: PipetteName }
@@ -83,7 +89,10 @@ export interface ProtocolAnalysisOutput {
   config: JsonConfig | PythonConfig
   metadata: { [key: string]: any }
   commands: RunTimeCommand[]
-  liquids: LoadedLiquid[]
+  labware: LoadedLabware[]
+  pipettes: LoadedPipette[]
+  modules: LoadedModule[]
+  liquids: Liquid[]
   errors: AnalysisError[]
 }
 

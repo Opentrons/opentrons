@@ -5,7 +5,7 @@ import mock
 from pathlib import Path
 import os
 
-from ot3usb.src import usb_config, default_config
+from ot3usb import usb_config, default_config
 
 # Fake UDC handle to use in tests
 UDC_HANDLE_NAME = "usb123"
@@ -30,6 +30,12 @@ def write_file_mock(contents: str, filename: str) -> bool:
     return True
 
 
+def write_file_mock_err_on_udc(contents: str, filename: str) -> bool:
+    if filename == "UDC":
+        raise Exception("failed to write")
+    return True
+
+
 def test_serial_gadget_failure(
     subject: usb_config.SerialGadget,
     os_driver: mock.Mock,
@@ -44,6 +50,18 @@ def test_serial_gadget_failure(
 
     # If UDC seems to not exist AND we can't make it, expect exception
     os_driver.exists.return_value = False
+    with pytest.raises(Exception):
+        subject.configure_and_activate()
+
+    # If os driver returns an empty symlink directory, should throw an error
+    os_driver.exists.return_value = True
+    os_driver.listdir.return_value = []
+    with pytest.raises(Exception):
+        subject.configure_and_activate()
+
+    # If os driver fails to write to the UDC, should get an exception
+    os_driver.listdir.return_value = [UDC_HANDLE_NAME]
+    monkeypatch.setattr(subject, "_write_file", write_file_mock_err_on_udc)
     with pytest.raises(Exception):
         subject.configure_and_activate()
 
@@ -140,6 +158,10 @@ def test_get_serial_handle_path(
     # Test success
     port_num_path.write_text("0")
     assert subject._get_handle_path() == "/dev/ttyGS0"
+    # Test error with an empty file
+    port_num_path.write_text("")
+    with pytest.raises(Exception):
+        subject._get_handle_path()
 
 
 def test_serial_handle(
@@ -161,3 +183,20 @@ def test_serial_handle(
     assert not subject.handle_exists()
     dummy_handle.write_text("existence")
     assert subject.handle_exists()
+
+    def mocked_exists(path: str) -> bool:
+        raise OSError("Fake Exception")
+
+    # Use mocked method to test exception handling
+    os_driver.exists = mocked_exists
+    assert not subject.handle_exists()
+
+
+def test_get_udc_folder(subject: usb_config.SerialGadget) -> None:
+    # Calling uninitialized
+    subject._udc_name = None
+    with pytest.raises(Exception):
+        subject.udc_folder()
+    subject._udc_name = "fake_name"
+    expected = usb_config.UDC_HANDLE_FOLDER + "fake_name"
+    assert subject.udc_folder() == expected

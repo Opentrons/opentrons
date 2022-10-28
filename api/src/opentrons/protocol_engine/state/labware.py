@@ -16,7 +16,11 @@ from opentrons.calibration_storage.helpers import uri_from_details
 
 from .. import errors
 from ..resources import DeckFixedLabware
-from ..commands import Command, LoadLabwareResult, MoveLabwareResult
+from ..commands import (
+    Command,
+    LoadLabwareResult,
+    MoveLabwareResult,
+)
 from ..types import (
     DeckSlotLocation,
     Dimensions,
@@ -432,3 +436,21 @@ class LabwareView(HasState[LabwareState]):
             ):
                 return candidate
         return None
+
+    def get_fixed_trash_id(self) -> str:
+        """Get the identifier of labware loaded into the fixed trash location.
+
+        Raises:
+            LabwareNotLoadedError: a fixed trash was not loaded by the deck definition
+                that is currently in use for the protocol run.
+        """
+        for labware in self._state.labware_by_id.values():
+            if (
+                isinstance(labware.location, DeckSlotLocation)
+                and labware.location.slotName == DeckSlotName.FIXED_TRASH
+            ):
+                return labware.id
+
+        raise errors.LabwareNotLoadedError(
+            "No labware loaded into fixed trash location by this deck type."
+        )

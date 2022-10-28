@@ -47,6 +47,10 @@ class LabwareNotLoadedError(ProtocolEngineError):
     """An error raised when referencing a labware that has not been loaded."""
 
 
+class LabwareNotOnDeckError(ProtocolEngineError):
+    """An error raised when a labware can't be used because it's off-deck."""
+
+
 class LiquidDoesNotExistError(ProtocolEngineError):
     """An error raised when referencing a liquid that has not been loaded."""
 
@@ -171,3 +175,11 @@ class ProtocolCommandFailedError(ProtocolEngineError):
 
 class HardwareNotSupportedError(ProtocolEngineError):
     """An error raised when executing a command on the wrong hardware."""
+
+
+class GripperNotAttachedError(ProtocolEngineError):
+    """An error raised when executing a gripper action without an attached gripper."""
+
+
+class UnsupportedLabwareMovementError(ProtocolEngineError):
+    """An error raised when attempting an illegal labware movement."""

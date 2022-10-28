@@ -17,6 +17,7 @@ export const tabBorder = css`
   border-bottom-color: ${blueEnabled};
 `
 
+export const activeLineBorder = `${spacingXXS} ${styleSolid} ${blueEnabled}`
 export const lineBorder = `${spacingXXS} ${styleSolid} ${medGreyEnabled}`
 export const transparentLineBorder = `${spacingXXS} ${styleSolid} ${transparent}`
 export const cardOutlineBorder = css`

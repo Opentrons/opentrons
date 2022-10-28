@@ -20,9 +20,9 @@ MAX_ENGAGE_HEIGHT = {
 }
 
 # Measured in model-specific units (half-mm for GEN1, mm for GEN2).
-# TODO(mc, 2022-06-13): the value for gen1 is off by 1.5 mm
-# The correct value is 8.0 half-mm (4.0 mm)
-# https://github.com/Opentrons/opentrons/issues/9529
+# TODO(mc, 2022-06-13): the value for gen1 is off by ~1.5 mm
+# The correct value is ~8.0 half-mm (4.0 mm)
+# https://opentrons.atlassian.net/browse/RET-1242
 OFFSET_TO_LABWARE_BOTTOM = {"magneticModuleV1": 5, "magneticModuleV2": 2.5}
 
 
@@ -49,23 +49,23 @@ class MagDeck(mod_abc.AbstractModule):
         port: str,
         usb_port: USBPort,
         execution_manager: ExecutionManager,
+        hw_control_loop: asyncio.AbstractEventLoop,
+        poll_interval_seconds: Optional[float] = None,
         simulating: bool = False,
-        loop: Optional[asyncio.AbstractEventLoop] = None,
         sim_model: Optional[str] = None,
-        **kwargs: float,
     ) -> "MagDeck":
         """Factory function."""
         driver: AbstractMagDeckDriver
         if not simulating:
-            driver = await MagDeckDriver.create(port=port, loop=loop)
+            driver = await MagDeckDriver.create(port=port, loop=hw_control_loop)
         else:
             driver = SimulatingDriver(sim_model=sim_model)
 
         mod = cls(
             port=port,
             usb_port=usb_port,
-            loop=loop,
             execution_manager=execution_manager,
+            hw_control_loop=hw_control_loop,
             device_info=await driver.get_device_info(),
             driver=driver,
         )
@@ -76,13 +76,16 @@ class MagDeck(mod_abc.AbstractModule):
         port: str,
         usb_port: USBPort,
         execution_manager: ExecutionManager,
+        hw_control_loop: asyncio.AbstractEventLoop,
         driver: AbstractMagDeckDriver,
         device_info: Mapping[str, str],
-        loop: Optional[asyncio.AbstractEventLoop] = None,
     ) -> None:
         """Constructor"""
         super().__init__(
-            port=port, usb_port=usb_port, loop=loop, execution_manager=execution_manager
+            port=port,
+            usb_port=usb_port,
+            hw_control_loop=hw_control_loop,
+            execution_manager=execution_manager,
         )
         self._device_info = device_info
         self._driver = driver
@@ -114,13 +117,24 @@ class MagDeck(mod_abc.AbstractModule):
         await self._driver.probe_plate()
         # return if successful or not?
 
-    async def engage(self, height: float) -> None:
+    # TODO(mc, 2022-09-23): refactor this method to take real mm,
+    # hardware API should abstract away the idea of "short millimeters"
+    # https://opentrons.atlassian.net/browse/RET-1242
+    async def engage(
+        self,
+        height: Optional[float] = None,
+        height_from_base: Optional[float] = None,
+    ) -> None:
         """Move the magnet to a specific height, measured from home position.
 
         The units of position depend on the module model.
         For GEN1, it's half millimeters ("short millimeters").
         For GEN2, it's millimeters.
         """
+        if height is None:
+            assert height_from_base is not None, "An engage height must be specified"
+            height = height_from_base + OFFSET_TO_LABWARE_BOTTOM[self.model()]
+
         await self.wait_for_is_running()
         if not engage_height_is_in_range(self.model(), height):
             raise ValueError(
@@ -152,11 +166,11 @@ class MagDeck(mod_abc.AbstractModule):
         return self._device_info
 
     @property
-    def status(self) -> str:
+    def status(self) -> types.MagneticStatus:
         if self.current_height > 0:
-            return "engaged"
+            return types.MagneticStatus.ENGAGED
         else:
-            return "disengaged"
+            return types.MagneticStatus.DISENGAGED
 
     @property
     def engaged(self) -> bool:

@@ -35,7 +35,6 @@ async def test_set_target_block_temperature(
         state_view.modules.get_thermocycler_module_substate("input-thermocycler-id")
     ).then_return(tc_module_substate)
 
-    decoy.when(tc_module_substate.get_target_block_temperature()).then_return(76.6)
     decoy.when(tc_module_substate.module_id).then_return(
         ThermocyclerModuleId("thermocycler-id")
     )
@@ -48,6 +47,7 @@ async def test_set_target_block_temperature(
     result = await subject.execute(data)
 
     decoy.verify(
-        await tc_hardware.wait_for_block_temperature(temperature=76.6), times=1
+        tc_module_substate.get_target_block_temperature(),
+        await tc_hardware.wait_for_block_target(),
     )
     assert result == expected_result

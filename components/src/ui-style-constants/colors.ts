@@ -10,6 +10,13 @@ export const fundamentalsBackgroundShade = '#eeeeee'
 // this will be fixed in the future
 export const darkGrey = '#4a4a4a'
 
+// opacity hex codes to append to 6-digit color hex codes
+// taken from table: https://davidwalsh.name/hex-opacity
+export const opacity10HexCode = '1a' // 10% opacity
+export const opacity12HexCode = '1f' // 12% opacity
+export const opacity17HexCode = '2b' // 17% opacity
+export const opacity35HexCode = '59' // 35% opacity
+
 // colors blue
 export const blueEnabled = '#006cfa'
 export const blueHover = '#0061e0'
@@ -27,8 +34,8 @@ export const dandelionYellowHover = '#eca20f'
 export const dandelionYellowPressed = '#eca20f'
 
 // colors grey
-export const lightGreyEnabled = '#16212d26'
-export const lightGreyHover = '#16212d40'
+export const lightGreyPressed = `${darkBlackEnabled}${opacity17HexCode}`
+export const lightGreyHover = `${darkBlackEnabled}${opacity10HexCode}`
 export const medGreyEnabled = '#e3e3e3'
 export const medGreyHover = '#b8b8b8'
 export const medGreyPressed = '#5a5a5e'
@@ -63,8 +70,6 @@ export const errorDisabled = '#8f8f8f'
 
 // others
 export const transparent = 'transparent'
-export const opacity12HexCode = '1f' // 12% opacity
-export const opacity35HexCode = '59' // 35% opacity
 export const backgroundOverlay = `${darkBlackEnabled}${opacity35HexCode}`
 
 // colors pd liquid

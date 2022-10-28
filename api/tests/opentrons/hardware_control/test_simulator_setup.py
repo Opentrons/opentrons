@@ -45,7 +45,7 @@ async def test_with_thermocycler():
             "currentCycleIndex": None,
             "currentStepIndex": None,
             "currentTemp": 3,
-            "holdTime": 121,
+            "holdTime": 0,
             "lid": "open",
             "lidTarget": None,
             "lidTemp": 23,
@@ -55,7 +55,7 @@ async def test_with_thermocycler():
             "totalCycleCount": None,
             "totalStepCount": None,
         },
-        "status": "heating",
+        "status": "holding at target",
     }
 
 
@@ -63,7 +63,12 @@ async def test_with_tempdeck():
     setup = simulator_setup.SimulatorSetup(
         attached_modules={
             "tempdeck": [
-                simulator_setup.ModuleCall("set_temperature", kwargs={"celsius": 23})
+                simulator_setup.ModuleCall(
+                    "start_set_temperature", kwargs={"celsius": 23}
+                ),
+                simulator_setup.ModuleCall(
+                    "await_temperature", kwargs={"awaiting_temperature": None}
+                ),
             ]
         }
     )

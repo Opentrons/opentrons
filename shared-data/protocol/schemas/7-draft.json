@@ -107,6 +107,10 @@
               "type": "string"
             }
           }
+        },
+        {
+          "const": "offDeck",
+          "description": "String literal 'offDeck'. Used to load a labware without placing it on the deck"
         }
       ]
     }
@@ -463,7 +467,7 @@
               "key": { "type": "string" },
               "commandType": { "enum": ["moveLabware"] },
               "params": {
-                "required": ["labwareId", "newLocation"],
+                "required": ["labwareId", "newLocation", "strategy"],
                 "labwareId": {
                   "type": "string",
                   "description": "The ID of the labware to move. Must be a key from the top-level `labware` object."
@@ -471,6 +475,14 @@
                 "newLocation": {
                   "$ref": "#/definitions/labwareLocation",
                   "description": "Where to move the labware."
+                },
+                "strategy": {
+                  "enum": [
+                    "usingGripper",
+                    "manualMoveWithPause",
+                    "manualMoveWithoutPause"
+                  ],
+                  "description": "Strategy to use for moving labware. Note that 'usingGripper' is only available on the OT-3."
                 }
               }
             }
@@ -496,6 +508,41 @@
                     "description": "Distance in mm to move the gantry (negative numbers are allowed)",
                     "type": "number"
                   }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "[This command is for internal use only and should NOT be used in protocols.] Initiate automatic calibration of a pipette.",
+            "type": "object",
+            "required": ["commandType", "params"],
+            "properties": {
+              "key": { "type": "string" },
+              "commandType": { "enum": ["calibration/calibratePipette"] },
+              "params": {
+                "required": ["mount"],
+                "mount": {
+                  "enum": ["left", "right"],
+                  "description": "Instrument mount to calibrate."
+                }
+              }
+            }
+          },
+
+          {
+            "description": "[This command is for internal use only and should NOT be used in protocols.] Move pipette to start position for attach/detach or calibration start.",
+            "type": "object",
+            "required": ["commandType", "params"],
+            "properties": {
+              "key": { "type": "string" },
+              "commandType": { "enum": ["calibration/moveToLocation"] },
+              "params": {
+                "required": ["pipetteId", "location"],
+                "pipetteId": { "type": "string" },
+                "location": {
+                  "description": "Location to move to before starting calibration.",
+                  "enum": ["attachOrDetach", "probePosition"]
                 }
               }
             }

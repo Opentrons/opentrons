@@ -11,6 +11,7 @@ from ..actions import ActionDispatcher, UpdateCommandAction, FailCommandAction
 from ..errors import ProtocolEngineError, UnexpectedProtocolError
 from .equipment import EquipmentHandler
 from .movement import MovementHandler
+from .labware_movement import LabwareMovementHandler
 from .pipetting import PipettingHandler
 from .run_control import RunControlHandler
 from .rail_lights import RailLightsHandler
@@ -33,6 +34,7 @@ class CommandExecutor:
         action_dispatcher: ActionDispatcher,
         equipment: EquipmentHandler,
         movement: MovementHandler,
+        labware_movement: LabwareMovementHandler,
         pipetting: PipettingHandler,
         run_control: RunControlHandler,
         rail_lights: RailLightsHandler,
@@ -44,6 +46,7 @@ class CommandExecutor:
         self._action_dispatcher = action_dispatcher
         self._equipment = equipment
         self._movement = movement
+        self._labware_movement = labware_movement
         self._pipetting = pipetting
         self._run_control = run_control
         self._rail_lights = rail_lights
@@ -62,6 +65,7 @@ class CommandExecutor:
             hardware_api=self._hardware_api,
             equipment=self._equipment,
             movement=self._movement,
+            labware_movement=self._labware_movement,
             pipetting=self._pipetting,
             run_control=self._run_control,
             rail_lights=self._rail_lights,

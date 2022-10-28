@@ -1,10 +1,24 @@
 import * as React from 'react'
+import { when, resetAllWhenMocks } from 'jest-when'
+import {
+  getRobotNameFromLoadedLabware,
+  getDeckDefFromRobotName,
+} from '@opentrons/shared-data'
+import ot2StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import { renderWithProviders } from '@opentrons/components'
 import { simpleAnalysisFileFixture } from '@opentrons/api-client'
 import { i18n } from '../../../i18n'
 import { DeckThumbnail } from '../'
-import { RunTimeCommand } from '@opentrons/shared-data'
+import type { LoadedLabware, RunTimeCommand } from '@opentrons/shared-data'
 
+jest.mock('@opentrons/shared-data', () => {
+  const actualSharedData = jest.requireActual('@opentrons/shared-data')
+  return {
+    ...actualSharedData,
+    getRobotNameFromLoadedLabware: jest.fn(),
+    getDeckDefFromRobotName: jest.fn(),
+  }
+})
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
   return {
@@ -21,7 +35,16 @@ jest.mock('@opentrons/components', () => {
 })
 jest.mock('../../../redux/config')
 
+const mockGetRobotNameFromLoadedLabware = getRobotNameFromLoadedLabware as jest.MockedFunction<
+  typeof getRobotNameFromLoadedLabware
+>
+
+const mockGetDeckDefFromRobotName = getDeckDefFromRobotName as jest.MockedFunction<
+  typeof getDeckDefFromRobotName
+>
+
 const commands: RunTimeCommand[] = simpleAnalysisFileFixture.commands as any
+const labware: LoadedLabware[] = simpleAnalysisFileFixture.labware as any
 
 const render = (props: React.ComponentProps<typeof DeckThumbnail>) => {
   return renderWithProviders(<DeckThumbnail {...props} />, {
@@ -30,8 +53,20 @@ const render = (props: React.ComponentProps<typeof DeckThumbnail>) => {
 }
 
 describe('DeckThumbnail', () => {
+  beforeEach(() => {
+    when(mockGetRobotNameFromLoadedLabware)
+      .calledWith(labware)
+      .mockReturnValue('OT-2 Standard')
+    when(mockGetDeckDefFromRobotName)
+      .calledWith('OT-2 Standard')
+      .mockReturnValue(ot2StandardDeckDef as any)
+  })
+  afterEach(() => {
+    resetAllWhenMocks()
+  })
+
   it('renders loaded equipment from protocol analysis file', () => {
-    const { queryByText } = render({ commands })
+    const { queryByText } = render({ commands, labware })
     expect(queryByText('mock Module (0,0) magneticModuleV2')).not.toBeFalsy()
     expect(
       queryByText('mock Module (265,0) temperatureModuleV2')
@@ -47,5 +82,19 @@ describe('DeckThumbnail', () => {
     expect(
       queryByText('mock LabwareRender nest_96_wellplate_100ul_pcr_full_skirt')
     ).not.toBeFalsy()
+  })
+  it('renders an OT-2 deck view when the protocol is an OT-2 protocol', () => {
+    when(mockGetRobotNameFromLoadedLabware)
+      .calledWith(labware)
+      .mockReturnValue('OT-2 Standard')
+    render({ commands, labware })
+    expect(mockGetDeckDefFromRobotName).toHaveBeenCalledWith('OT-2 Standard')
+  })
+  it('renders an OT-3 deck view when the protocol is an OT-3 protocol', () => {
+    when(mockGetRobotNameFromLoadedLabware)
+      .calledWith(labware)
+      .mockReturnValue('OT-3 Standard')
+    render({ commands, labware })
+    expect(mockGetDeckDefFromRobotName).toHaveBeenCalledWith('OT-3 Standard')
   })
 })

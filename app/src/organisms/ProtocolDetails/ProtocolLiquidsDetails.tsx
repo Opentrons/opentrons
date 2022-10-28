@@ -8,11 +8,11 @@ import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import { Divider } from '../../atoms/structure'
 import { LiquidsListItemDetails } from '../Devices/ProtocolRun/SetupLiquids/SetupLiquidsList'
 
-import type { LoadedLiquid, RunTimeCommand } from '@opentrons/shared-data'
+import type { Liquid, RunTimeCommand } from '@opentrons/shared-data'
 
 interface ProtocolLiquidsDetailsProps {
   commands: RunTimeCommand[]
-  liquids: LoadedLiquid[]
+  liquids: Liquid[]
 }
 
 export const ProtocolLiquidsDetails = (

@@ -33,7 +33,7 @@ stages:
             tipLength: !anyfloat
             lastModified: !anystr
             uri: !anystr
-            source: 'unknown'
+            source: 'user'
             status:
               markedAt: null
               markedBad: false
@@ -43,7 +43,7 @@ stages:
             tiprack: !anystr
             tipLength: !anyfloat
             lastModified: !anystr
-            source: 'unknown'
+            source: 'user'
             uri: !anystr
             status:
               markedAt: null
@@ -66,7 +66,7 @@ stages:
             tiprack: !anystr
             tipLength: 30.5
             lastModified: !anystr
-            source: 'unknown'
+            source: 'user'
             uri: !anystr
             status:
               markedAt: null
@@ -90,7 +90,7 @@ stages:
             tiprack: !anystr
             tipLength: !anyfloat
             lastModified: !anystr
-            source: 'unknown'
+            source: 'user'
             uri: !anystr
             status:
               markedAt: null
@@ -101,7 +101,7 @@ stages:
             tiprack: !anystr
             tipLength: !anyfloat
             lastModified: !anystr
-            source: 'unknown'
+            source: 'user'
             uri: !anystr
             status:
               markedAt: null
@@ -125,7 +125,7 @@ stages:
             tiprack: !anystr
             tipLength: 30.5
             lastModified: !anystr
-            source: 'unknown'
+            source: 'user'
             uri: !anystr
             status:
               markedAt: null
