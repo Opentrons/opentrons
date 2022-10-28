@@ -479,7 +479,7 @@ def test_temperature_wait_for_target_temperature(
 
     decoy.when(transport.execute_command(request=request)).then_return(response)
 
-    result = subject.temperature_wait_for_target_temperature(
+    result = subject.temperature_module_wait_for_target_temperature(
         module_id="module-id", celsius=38.7
     )
 
