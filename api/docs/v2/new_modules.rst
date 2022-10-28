@@ -379,6 +379,8 @@ You can also control the target temperature of the lid. Acceptable target temper
 
 The protocol will only proceed once the lid temperature reaches 50 °C. This is the case whether the previous temperature was lower than 50 °C (in which case the lid will actively heat) or higher than 50 °C (in which case the lid will passively cool).
 
+You can turn off the lid heater at any time with :py:meth:`~.ThermocyclerContext.deactivate_lid`.
+
 .. note::
 
     Lid temperature is not affected by Thermocycler profiles. Therefore you should set an appropriate lid temperature to hold during your profile *before* executing it. See :ref:`thermocycler-profiles` for more information on defining and executing profiles.
@@ -388,47 +390,49 @@ The protocol will only proceed once the lid temperature reaches 50 °C. This is 
 Block Control
 =============
 
-To set the block temperature inside the Thermocycler, you can use the method :py:meth:`.ThermocyclerContext.set_block_temperature`. It takes five parameters:
-``temperature``, ``hold_time_seconds``, ``hold_time_minutes``, ``ramp_rate`` and ``block_max_volume``. Only ``temperature`` is required; the two ``hold_time`` parameters, ``ramp_rate``, and ``block_max_volume`` are optional.
-
+The Thermocycler can control its block temperature, including holding at a temperature and adjusting for the volume of liquid held in its loaded plate.
 
 Temperature
 -----------
 
-If you only specify a ``temperature`` in °C, the Thermocycler will hold this temperature indefinitely until powered off.
+To set the block temperature inside the Thermocycler, use :py:meth:`.ThermocyclerContext.set_block_temperature`. At minimum you have to specify a ``temperature`` in degrees Celsius:
 
 .. code-block:: python
 
-        tc_mod.set_block_temperature(4)
+        tc_mod.set_block_temperature(temperature=4)
+        
+If you only specify a ``temperature`` in °C, the Thermocycler will hold this temperature until a new temperature is set, :py:meth:`~.ThermocyclerContext.deactivate_block` is called, or the module is powered off.
 
 .. versionadded:: 2.0
 
 Hold Time
 ---------
 
-If you set a ``temperature`` and a ``hold_time``, the Thermocycler will hold the temperature for the specified amount of time. Time can be passed in as minutes or seconds.
-
-With a hold time, it is important to also include the ``block_max_volume`` parameter. This is to ensure that the sample reaches the target temperature before the hold time counts down.
-
-In the example below, the Thermocycler will hold the 50 µl samples at the specified temperature for 45 minutes and 15 seconds.
-
-If you do not specify a hold time the protocol will proceed once the temperature specified is reached.
+You can optionally instruct the Thermocycler to hold its block temperature for a specific amount of time. You can specify ``hold_time_minutes``, ``hold_time_seconds``, or both (in which case they will be added). For example, this will set the block to 4 °C for 4 minutes and 15 seconds:
 
 .. code-block:: python
 
-        tc_mod.set_block_temperature(4, hold_time_seconds=15, hold_time_minutes=45, block_max_volume=50)
+        tc_mod.set_block_temperature(temperature=4, hold_time_minutes=4,  hold_time_seconds=15)
+
+.. note ::
+
+    Holding at a temperature will block execution of later commands in your protocol. Further commands will proceed once the hold time has elapsed.(If you don't specify a hold time, the protocol will proceed as soon as the target temperature is reached.)
 
 .. versionadded:: 2.0
 
 Block Max Volume
 ----------------
 
-The Thermocycler's block temperature controller varies its behavior based on the amount of liquid in the wells of its labware. Specifying an accurate volume allows the Thermocycler to precisely track the temperature of the samples. The ``block_max_volume`` parameter is specified in µL and is the volume of the most-full well in the labware that is loaded on the Thermocycler's block. If not specified, it defaults to 25 µL.
+The Thermocycler's block temperature controller varies its behavior based on the amount of liquid in the wells of its labware. Accurately specifying the liquid volume allows the Thermocycler to more precisely control the temperature of the samples. You should set the ``block_max_volume`` parameter to the amount of liquid in the *fullest* well, measured in µL. If not specified, the Thermocycler will assume samples of 25 µL.
+
+It is especially important to specify ``block_max_volume`` when holding at a temperature. For example, say you want to hold larger samples at a temperature for a short time:
 
 .. code-block:: python
 
-        tc_mod.set_block_temperature(4, hold_time_seconds=20, block_max_volume=80)
+        tc_mod.set_block_temperature(temperature=4, hold_time_seconds=20,
+                                     block_max_volume=80)
 
+If the Thermocycler assumes these samples are 25 µL, it may not cool them to 4 °C before starting the 20-second timer. In fact, with such a short hold time they may not reach 4 °C at all!
 
 .. versionadded:: 2.0
 
@@ -576,8 +580,8 @@ This deactivates only the well block of the Thermocycler.
 .. versionadded:: 2.0
 
 
-Changes with the GEN2 Magnetic Module
-=====================================
+Changes with the GEN2 Thermocycler Module
+=========================================
 
 TK
 
