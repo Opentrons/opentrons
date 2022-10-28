@@ -822,7 +822,7 @@ class OT3API(
         :py:attr:`_last_moved_mount` to contain `mount`.
         """
         if mount != self._last_moved_mount and self._last_moved_mount:
-            await self.retract(self._last_moved_mount.to_mount(), 10)
+            await self.retract(self._last_moved_mount, 10)
         self._last_moved_mount = mount
 
     @ExecutionManagerProvider.wait_for_running
