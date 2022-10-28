@@ -3,12 +3,23 @@ import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { LEFT } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
+import {
+  mockAttachedPipette,
+  mockP300PipetteSpecs,
+} from '../../../redux/pipettes/__fixtures__'
+import { InProgressModal } from '../../../molecules/InProgressModal/InProgressModal'
 import { NeedHelpLink } from '../../CalibrationPanels'
+import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { BeforeBeginning } from '../BeforeBeginning'
 import { FLOWS } from '../constants'
+import type { AttachedPipette } from '../../../redux/pipettes/types'
 
 jest.mock('../../CalibrationPanels')
+jest.mock('../../../molecules/InProgressModal/InProgressModal')
 
+const mockInProgressModal = InProgressModal as jest.MockedFunction<
+  typeof InProgressModal
+>
 const mockNeedHelpLink = NeedHelpLink as jest.MockedFunction<
   typeof NeedHelpLink
 >
@@ -18,17 +29,26 @@ const render = (props: React.ComponentProps<typeof BeforeBeginning>) => {
     i18nInstance: i18n,
   })[0]
 }
-
+const mockPipette: AttachedPipette = {
+  ...mockAttachedPipette,
+  modelSpecs: mockP300PipetteSpecs,
+}
 describe('BeforeBeginning', () => {
   let props: React.ComponentProps<typeof BeforeBeginning>
   beforeEach(() => {
     props = {
       mount: LEFT,
-      proceed: jest.fn(),
-      flowType: FLOWS.CALIBRATE,
       goBack: jest.fn(),
+      proceed: jest.fn(),
+      chainRunCommands: jest.fn(),
+      runId: RUN_ID_1,
+      attachedPipette: { left: mockPipette, right: null },
+      flowType: FLOWS.CALIBRATE,
+      createRun: jest.fn(),
+      isRobotMoving: false,
     }
     mockNeedHelpLink.mockReturnValue(<div>mock need help link</div>)
+    mockInProgressModal.mockReturnValue(<div>mock in progress</div>)
   })
   it('returns the correct information for calibrate flow', () => {
     const { getByText, getByAltText, getByRole } = render(props)
@@ -44,6 +64,14 @@ describe('BeforeBeginning', () => {
     getByAltText('Calibration Probe')
     const proceedBtn = getByRole('button', { name: 'Get started' })
     fireEvent.click(proceedBtn)
-    expect(props.proceed).toHaveBeenCalled()
+    expect(props.chainRunCommands).toHaveBeenCalled()
+  })
+  it('returns the correct information for in progress modal when robot is moving', () => {
+    props = {
+      ...props,
+      isRobotMoving: true,
+    }
+    const { getByText } = render(props)
+    getByText('mock in progress')
   })
 })
