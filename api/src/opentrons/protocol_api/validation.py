@@ -110,6 +110,13 @@ def ensure_hold_time_seconds(
     return seconds
 
 
+def ensure_thermocycler_repetition_count(repetitions: int) -> int:
+    """Ensure thermocycler repetitions is a positive integer."""
+    if repetitions <= 0:
+        raise ValueError("repetitions must be a positive integer")
+    return repetitions
+
+
 def ensure_thermocycler_profile_steps(
     steps: List[ThermocyclerStep],
 ) -> List[ThermocyclerStep]:

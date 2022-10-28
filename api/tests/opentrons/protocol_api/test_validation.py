@@ -137,6 +137,20 @@ def test_ensure_hold_time_seconds(
 
 
 @pytest.mark.parametrize(
+    "repetitions",
+    [
+        0,
+        -1,
+        -999,
+    ],
+)
+def test_ensure_thermocycler_repetition_count_raises(repetitions: int) -> None:
+    """It should raise if repetitions is zero or negative."""
+    with pytest.raises(ValueError):
+        subject.ensure_thermocycler_repetition_count(repetitions)
+
+
+@pytest.mark.parametrize(
     ["steps", "expected"],
     [
         (

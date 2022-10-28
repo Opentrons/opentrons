@@ -540,8 +540,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
             and finite for each step.
 
         """
-        if repetitions <= 0:
-            raise ValueError("repetitions must be a positive integer")
+        repetitions = validation.ensure_thermocycler_repetition_count(repetitions)
         validated_steps = validation.ensure_thermocycler_profile_steps(steps)
         self._core.execute_profile(
             steps=validated_steps,
