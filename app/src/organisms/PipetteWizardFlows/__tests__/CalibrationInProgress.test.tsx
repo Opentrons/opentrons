@@ -1,15 +1,15 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-import { AttachStemInProgress } from '../AttachStemInProgress'
+import { CalibrationInProgress } from '../CalibrationInProgress'
 
 const render = () => {
-  return renderWithProviders(<AttachStemInProgress />, {
+  return renderWithProviders(<CalibrationInProgress />, {
     i18nInstance: i18n,
   })[0]
 }
 
-describe('AttachStemInProgress', () => {
+describe('CalibrationInProgress', () => {
   it('returns the correct information ', () => {
     const { getByText, getByAltText } = render()
     getByText('Stand Back, Pipette is Calibrating')

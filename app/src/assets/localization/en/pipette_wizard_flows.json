@@ -15,6 +15,6 @@
   "progress_will_be_lost": "{{flow}} progress will be lost",
   "are_you_sure_exit": "Are you sure you want to exit before completing {{flow}}?",
   "pipette_calibration": "Pipette Calibration",
-  "attach": "Attach Pipette",
-  "detach": "Detach Pipette"
+  "attach": "Attaching Pipette",
+  "detach": "Detaching Pipette"
 }

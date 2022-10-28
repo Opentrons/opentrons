@@ -5,7 +5,7 @@ import { StyledText } from '../../atoms/text'
 import pipetteCalibrating from '../../assets/images/change-pip/pipette-is-calibrating.png'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 
-export function AttachStemInProgress(): JSX.Element {
+export function CalibrationInProgress(): JSX.Element {
   const { t } = useTranslation('pipette_wizard_flows')
   const pipetteCalibratingImage = (
     <img src={pipetteCalibrating} alt="Pipette is calibrating" />
