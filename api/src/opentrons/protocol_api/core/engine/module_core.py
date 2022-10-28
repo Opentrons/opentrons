@@ -136,14 +136,6 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.MagDeck]
 
-    # URIs of labware whose definitions accidentally specify an engage height
-    # in units of half-millimeters instead of millimeters.
-    _MAGDECK_HALF_MM_LABWARE = {
-        "opentrons/biorad_96_wellplate_200ul_pcr/1",
-        "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",
-        "opentrons/usascientific_96_wellplate_2.4ml_deep/1",
-    }
-
     def engage(
         self,
         height_from_base: Optional[float] = None,
@@ -195,39 +187,14 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
             preserve_half_mm: For labware whose definitions
                 erroneously use half-mm for their defined default engage height,
                 use the value directly instead of converting it to real millimeters.
-
-        Raises:
-            Exception: Labware is not loaded or has no default engage height.
         """
         model = self._engine_client.state.modules.get_model(module_id=self.module_id)
 
-        labware_id = self._engine_client.state.labware.get_id_by_module(
-            module_id=self._module_id
+        default_height = self._engine_client.state.geometry.get_default_magnet_engage_height(
+            module_id=self.module_id,
+            offset=offset,
+            preserve_half_mm=preserve_half_mm
         )
-        if labware_id is None:
-            raise InvalidMagnetEngageHeightError(
-                "There is no labware loaded on this Magnetic Module,"
-                " so you must specify an engage height"
-                " with the `height` or `height_from_base` parameter."
-            )
-
-        default_height = self._engine_client.state.labware.get_default_magnet_height(
-            labware_id=labware_id
-        )
-        if default_height is None:
-            raise InvalidMagnetEngageHeightError(
-                "The labware loaded on this Magnetic Module"
-                " does not have a default engage height,"
-                " so you must specify an engage height"
-                " with the `height` or `height_from_base` parameter."
-            )
-
-        uri = self._engine_client.state.labware.get_definition_uri(labware_id)
-
-        if uri in self._MAGDECK_HALF_MM_LABWARE and not preserve_half_mm:
-            # TODO(mc, 2022-09-26): this value likely _also_ needs a few mm subtracted
-            # https://opentrons.atlassian.net/browse/RSS-111
-            default_height = default_height / 2.0
 
         calculated_height = self._engine_client.state.modules.calculate_magnet_height(
             module_model=model,

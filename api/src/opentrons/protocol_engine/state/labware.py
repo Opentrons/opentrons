@@ -42,6 +42,13 @@ from .abstract_store import HasState, HandlesActions
 
 _TRASH_LOCATION = DeckSlotLocation(slotName=DeckSlotName.FIXED_TRASH)
 
+# URIs of labware whose definitions accidentally specify an engage height
+# in units of half-millimeters instead of millimeters.
+_MAGDECK_HALF_MM_LABWARE = {
+    "opentrons/biorad_96_wellplate_200ul_pcr/1",
+    "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",
+    "opentrons/usascientific_96_wellplate_2.4ml_deep/1",
+}
 
 @dataclass
 class LabwareState:
@@ -470,3 +477,7 @@ class LabwareView(HasState[LabwareState]):
         raise errors.LabwareNotLoadedError(
             "No labware loaded into fixed trash location by this deck type."
         )
+
+    def is_mag_deck_uri_in_half_mil(self, labware_id: str) -> bool:
+        uri = self.get_definition_uri(labware_id)
+        return uri in _MAGDECK_HALF_MM_LABWARE

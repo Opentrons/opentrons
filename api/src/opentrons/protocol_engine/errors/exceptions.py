@@ -149,6 +149,10 @@ class EngageHeightOutOfRangeError(ProtocolEngineError):
     """An error raised when a Magnetic Module engage height is out of bounds."""
 
 
+class InvalidMagnetEngageHeightError(ValueError):
+    """Error raised if a Magnetic Module engage height is invalid."""
+
+
 class NoTargetTemperatureSetError(ProtocolEngineError):
     """An error raised when awaiting temperature when no target was set."""
 
