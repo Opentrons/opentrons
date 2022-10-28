@@ -293,7 +293,7 @@ class SyncClient:
         result = self._transport.execute_command(request=request)
         return cast(commands.temperature_module.SetTargetTemperatureResult, result)
 
-    def temperature_wait_for_target_temperature(
+    def temperature_module_wait_for_target_temperature(
         self, module_id: str, celsius: Optional[float]
     ) -> commands.temperature_module.WaitForTemperatureResult:
         """Execute a `temperatureModule/waitForTemperature` command and return the result."""
