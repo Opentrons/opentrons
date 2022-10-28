@@ -79,7 +79,7 @@ def test_deactivate(
     """Should verify EngineClient call to deactivate temp module."""
     subject.deactivate()
 
-    decoy.verify(mock_engine_client.temperature_deactivate(module_id="1234"))
+    decoy.verify(mock_engine_client.temperature_module_deactivate(module_id="1234"))
 
 
 def test_get_target_temperature(
