@@ -443,34 +443,42 @@ If the Thermocycler assumes these samples are 25 µL, it may not cool them to 4 
 Thermocycler Profiles
 =====================
 
-The Thermocycler can rapidly cycle through temperatures to execute heat-sensitive reactions. These cycles are defined as profiles.
-
-
-Thermocycler profiles are defined for the Protocol API as lists of dicts. Each dict should have a ``temperature`` key, which specifies the temperature of a profile step, and either or both of ``hold_time_seconds`` or ``hold_time_minutes``, which specify the duration of the step. For instance, this profile commands the Thermocycler to drive its temperature to 10 °C for 30 seconds, and then 60 °C for 45 seconds:
-
+In addition to executing individual temperature commands, the Thermocycler can automatically cycle through a sequence of block temperatures to perform heat-sensitive reactions. These sequences are called *profiles*, which are defined in the Protocol API as lists of dicts. Each dict should have a ``temperature`` key, which specifies the temperature of a profile step, and either or both of ``hold_time_seconds`` or ``hold_time_minutes``, which specify the duration of the step. For instance, this profile commands the Thermocycler to reach 10 °C and hold for 30 seconds, and then to reach 60 °C and hold for 45 seconds:
 
 .. code-block:: python
 
         profile = [
-          {'temperature': 10, 'hold_time_seconds': 30},
-          {'temperature': 60, 'hold_time_seconds': 45}]
+            {'temperature': 10, 'hold_time_seconds': 30},
+            {'temperature': 60, 'hold_time_seconds': 45}
+        ]
 
-Once you have written your profile, you command the Thermocycler to execute it using :py:meth:`.ThermocyclerContext.execute_profile`. This function executes your profile steps multiple times depending on the ``repetitions`` parameter. It also takes a ``block_max_volume`` parameter, which is the same as that of the :py:meth:`.ThermocyclerContext.set_block_temperature` function.
+Once you have written the steps of your profile, execute it with :py:meth:`~.ThermocyclerContext.execute_profile`. This function executes your profile steps multiple times depending on the ``repetitions`` parameter. It also takes a ``block_max_volume`` parameter, which is the same as that of the :py:meth:`~.ThermocyclerContext.set_block_temperature` function.
 
-For instance, you can execute the profile defined above 100 times for a 30 µL-per-well volume like this:
+For instance, a PCR prep protocol might define and execute a profile like this:
 
 .. code-block:: python
 
         profile = [
-          {'temperature': 10, 'hold_time_seconds': 30},
-          {'temperature': 60, 'hold_time_seconds': 30}]
+            {'temperature': 95, 'hold_time_seconds': 30},
+            {'temperature': 57, 'hold_time_seconds': 30},
+            {'temperature': 72, 'hold_time_seconds': 60}
+        ]
+        tc_mod.execute_profile(steps=profile, repetitions=20, block_max_volume=32)
 
-        tc_mod.execute_profile(steps=profile, repetitions=100, block_max_volume=30)
+In terms of the actions that the Thermocycler performs, this would be equivalent to nesting ``set_block_temperature`` commands in a ``for`` loop:
 
+.. code-block:: python
+
+        for i in range(20):
+            tc_mod.set_block_temperature(95, hold_time_seconds=30, block_max_volume=32)
+            tc_mod.set_block_temperature(57, hold_time_seconds=30, block_max_volume=32)
+            tc_mod.set_block_temperature(72, hold_time_seconds=60, block_max_volume=32)
+            
+However, this code would generate 60 lines in the protocol's run log, while executing a profile is summarized in a single line. Additionally, you can set a profile once and execute it multiple times (with different numbers of repetitions and maximum volumes, if needed).
 
 .. note::
 
-    Temperature profiles only control the temperature of the `block` in the Thermocycler. You should set a lid temperature before executing the profile using :py:meth:`.ThermocyclerContext.set_lid_temperature`.
+    Temperature profiles only control the temperature of the `block` in the Thermocycler. You should set a lid temperature before executing the profile using :py:meth:`~.ThermocyclerContext.set_lid_temperature`.
 
 .. versionadded:: 2.0
 
