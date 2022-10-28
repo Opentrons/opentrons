@@ -1,8 +1,12 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
+import { when, resetAllWhenMocks } from 'jest-when'
+
 import { renderWithProviders } from '@opentrons/components'
+
 import { i18n } from '../../../../i18n'
 import { getShellUpdateState } from '../../../../redux/shell'
+import { useIsOT3 } from '../../hooks'
 import { DisplayRobotName } from '../AdvancedTab/DisplayRobotName'
 import { DisableHoming } from '../AdvancedTab/DisableHoming'
 import { FactoryReset } from '../AdvancedTab/FactoryReset'
@@ -27,6 +31,7 @@ jest.mock('../../../../redux/shell/update', () => ({
   ...jest.requireActual<{}>('../../../../redux/shell/update'),
   getShellUpdateState: jest.fn(),
 }))
+jest.mock('../../hooks/useIsOT3')
 jest.mock('../AdvancedTab/DisplayRobotName')
 jest.mock('../AdvancedTab/DisableHoming')
 jest.mock('../AdvancedTab/FactoryReset')
@@ -84,6 +89,7 @@ const mockUseOlderAspirateBehavior = UseOlderAspirateBehavior as jest.MockedFunc
 const mockUseOlderProtocol = UseOlderProtocol as jest.MockedFunction<
   typeof UseOlderProtocol
 >
+const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
 
 const mockUpdateRobotStatus = jest.fn()
 
@@ -131,10 +137,12 @@ describe('RobotSettings Advanced tab', () => {
     mockUseOlderProtocol.mockReturnValue(
       <div>Mock UseOlderProtocol Section</div>
     )
+    when(mockUseIsOT3).calledWith('otie').mockReturnValue(false)
   })
 
   afterAll(() => {
     jest.resetAllMocks()
+    resetAllWhenMocks()
   })
 
   it('should render AboutRobotName section', () => {
@@ -152,9 +160,15 @@ describe('RobotSettings Advanced tab', () => {
     getByText('Mock FactoryReset Section')
   })
 
-  it('should render LegacySettings section', () => {
+  it('should render LegacySettings section for OT-2', () => {
     const [{ getByText }] = render()
     getByText('Mock LegacySettings Section')
+  })
+
+  it('should not render LegacySettings section for OT-3', () => {
+    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    const [{ queryByText }] = render()
+    expect(queryByText('Mock LegacySettings Section')).toBeNull()
   })
 
   it('should render OpenJupyterControl section', () => {
@@ -172,9 +186,15 @@ describe('RobotSettings Advanced tab', () => {
     getByText('Mock RobotServerVersion Section')
   })
 
-  it('should render ShortTrashBin section', () => {
+  it('should render ShortTrashBin section for OT-2', () => {
     const [{ getByText }] = render()
     getByText('Mock ShortTrashBin Section')
+  })
+
+  it('should not render ShortTrashBin section for OT-3', () => {
+    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    const [{ queryByText }] = render()
+    expect(queryByText('Mock ShortTrashBin Section')).toBeNull()
   })
 
   it('should render Troubleshooting section', () => {
@@ -192,13 +212,25 @@ describe('RobotSettings Advanced tab', () => {
     getByText('Mock UsageSettings Section')
   })
 
-  it('should render UseOlderAspirateBehavior section', () => {
+  it('should render UseOlderAspirateBehavior section for OT-2', () => {
     const [{ getByText }] = render()
     getByText('Mock UseOlderAspirateBehavior Section')
   })
 
-  it('should render UseOlderProtocol section', () => {
+  it('should not render UseOlderAspirateBehavior section for OT-3', () => {
+    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    const [{ queryByText }] = render()
+    expect(queryByText('Mock UseOlderAspirateBehavior Section')).toBeNull()
+  })
+
+  it('should render UseOlderProtocol section for OT-2', () => {
     const [{ getByText }] = render()
     getByText('Mock UseOlderProtocol Section')
+  })
+
+  it('should not render UseOlderProtocol section for OT-3', () => {
+    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    const [{ queryByText }] = render()
+    expect(queryByText('Mock UseOlderProtocol Section')).toBeNull()
   })
 })

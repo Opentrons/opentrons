@@ -10,6 +10,7 @@ export const DEV_INTERNAL_FLAGS: DevInternalFlag[] = [
   'enableManualDeckStateModification',
   'enableCalibrationWizards',
   'enableThermocyclerGen2',
+  'enableExtendedHardware',
 ]
 
 // action type constants

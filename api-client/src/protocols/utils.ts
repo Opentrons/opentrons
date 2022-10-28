@@ -6,7 +6,7 @@ import type {
   LabwareDefinition2,
   ModuleModel,
   PipetteName,
-  LoadedLiquid,
+  Liquid,
 } from '@opentrons/shared-data'
 import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type {
@@ -121,6 +121,7 @@ export function parseInitialLoadedLabwareBySlot(
   return reduce<LoadLabwareRunTimeCommand, LoadedLabwareBySlot>(
     loadLabwareCommandsReversed,
     (acc, command) =>
+      typeof command.params.location === 'object' &&
       'slotName' in command.params.location
         ? { ...acc, [command.params.location.slotName]: command }
         : acc,
@@ -143,6 +144,7 @@ export function parseInitialLoadedLabwareByModuleId(
   return reduce<LoadLabwareRunTimeCommand, LoadedLabwareByModuleId>(
     loadLabwareCommandsReversed,
     (acc, command) =>
+      typeof command.params.location === 'object' &&
       'moduleId' in command.params.location
         ? { ...acc, [command.params.location.moduleId]: command }
         : acc,
@@ -248,7 +250,7 @@ export function parseInitialLoadedModulesBySlot(
   )
 }
 
-export interface LoadedLiquidsById {
+export interface LiquidsById {
   [liquidId: string]: {
     displayName: string
     description: string
@@ -256,13 +258,19 @@ export interface LoadedLiquidsById {
   }
 }
 
+// NOTE: a parsed liquid only differs from an analysis liquid in that
+// it will always have a displayColor
+export interface ParsedLiquid extends Omit<Liquid, 'displayColor'> {
+  displayColor: string
+}
+
 // TODO(sh, 2022-09-12): This util currently accepts liquids in two different shapes, one that adheres to the V6 schema
 // and the other in array form coming from ProtocolAnalysisOutput. This should be reconciled to use a single type so
 // conversion of the shape is not needed in the util and the type is consistent across the board.
 export function parseLiquidsInLoadOrder(
-  liquids: LoadedLiquidsById | LoadedLiquid[],
+  liquids: LiquidsById | Liquid[],
   commands: RunTimeCommand[]
-): LoadedLiquid[] {
+): ParsedLiquid[] {
   const loadLiquidCommands = commands.filter(
     (command): command is LoadLiquidRunTimeCommand =>
       command.commandType === 'loadLiquid'
@@ -281,7 +289,7 @@ export function parseLiquidsInLoadOrder(
     }
   })
 
-  return reduce<LoadLiquidRunTimeCommand, LoadedLiquid[]>(
+  return reduce<LoadLiquidRunTimeCommand, ParsedLiquid[]>(
     loadLiquidCommands,
     (acc, command) => {
       const liquid = loadedLiquids.find(

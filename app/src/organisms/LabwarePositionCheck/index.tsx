@@ -1,11 +1,13 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { AlertModal, Box, SPACING_2, Text } from '@opentrons/components'
+import { useRunQuery } from '@opentrons/react-api-client'
 import { Portal } from '../../App/portal'
 import { useLogger } from '../../logger'
 import { useFeatureFlag } from '../../redux/config'
 import { LabwarePositionCheckComponent } from './LabwarePositionCheckComponent'
 import { DeprecatedLabwarePositionCheckComponent } from './DeprecatedComponents/DeprecatedLabwarePositionCheckComponent'
+import { useMostRecentCompletedAnalysis } from './useMostRecentCompletedAnalysis'
 
 interface LabwarePositionCheckModalProps {
   onCloseClick: () => unknown
@@ -25,10 +27,18 @@ export const LabwarePositionCheck = (
     'enableManualDeckStateModification'
   )
 
+  const mostRecentAnalysis = useMostRecentCompletedAnalysis(props.runId)
+
+  const existingOffsets =
+    useRunQuery(props.runId).data?.data?.labwareOffsets ?? []
+
   return (
     <ErrorBoundary logger={logger} ErrorComponent={CrashingErrorModal}>
       {manualDeckStateModificationEnabled ? (
-        <LabwarePositionCheckComponent {...props} />
+        <LabwarePositionCheckComponent
+          {...props}
+          {...{ mostRecentAnalysis, existingOffsets }}
+        />
       ) : (
         <DeprecatedLabwarePositionCheckComponent {...props} />
       )}

@@ -24,4 +24,11 @@ describe('InProgressModal', () => {
     getByText('Moving gantry...')
     getByLabelText('spinner')
   })
+  it('renders the correct info when spinner is overriden', () => {
+    props = {
+      alternativeSpinner: <div>alternative spinner</div>,
+    }
+    const { getByText } = render(props)
+    getByText('alternative spinner')
+  })
 })

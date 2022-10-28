@@ -6,6 +6,7 @@ import {
   getPipetteNameSpecs,
   GEN1,
   GEN2,
+  GEN3,
 } from '@opentrons/shared-data'
 import { PipetteSelect } from '../PipetteSelect'
 import { Select } from '../../forms'
@@ -48,10 +49,14 @@ describe('PipetteSelect', () => {
       .map(getPipetteNameSpecs)
       .filter((specs): specs is PipetteNameSpecs => specs !== null)
 
+    const gen3Specs = pipetteSpecs.filter(s => s.displayCategory === GEN3)
     const gen2Specs = pipetteSpecs.filter(s => s.displayCategory === GEN2)
     const gen1Specs = pipetteSpecs.filter(s => s.displayCategory === GEN1)
 
     expect(wrapper.find(Select).prop('options')).toEqual([
+      {
+        options: gen3Specs.map(s => ({ value: s.name, label: s.displayName })),
+      },
       {
         options: gen2Specs.map(s => ({ value: s.name, label: s.displayName })),
       },
@@ -69,6 +74,7 @@ describe('PipetteSelect', () => {
       .map(getPipetteNameSpecs)
       .filter((specs): specs is PipetteNameSpecs => specs !== null)
 
+    const gen3Specs = pipetteSpecs.filter(s => s.displayCategory === GEN3)
     const gen2Specs = pipetteSpecs.filter(s => s.displayCategory === GEN2)
     const nameBlocklist = pipetteSpecs
       .filter(s => s.displayCategory === GEN1)
@@ -82,6 +88,9 @@ describe('PipetteSelect', () => {
     )
 
     expect(wrapper.find(Select).prop('options')).toEqual([
+      {
+        options: gen3Specs.map(s => ({ value: s.name, label: s.displayName })),
+      },
       {
         options: gen2Specs.map(s => ({ value: s.name, label: s.displayName })),
       },

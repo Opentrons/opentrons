@@ -26,9 +26,9 @@ describe('analytics selectors', () => {
       })
     })
 
-    it('should return false with getAnalyticsOptedIn if no config', () => {
+    it('should return true with getAnalyticsOptedIn if no config', () => {
       const mockState = { config: null } as any
-      expect(Selectors.getAnalyticsOptedIn(mockState)).toBe(false)
+      expect(Selectors.getAnalyticsOptedIn(mockState)).toBe(true)
     })
 
     it('should return config.analytics.optedIn with getAnalyticsOptedIn', () => {

@@ -239,7 +239,16 @@ describe('ProtocolRunSetup', () => {
       when(mockUseFeatureFlag)
         .calledWith('enableLiquidSetup')
         .mockReturnValue(true)
-
+      when(mockUseProtocolDetailsForRun)
+        .calledWith(RUN_ID)
+        .mockReturnValue({
+          protocolData: ({
+            ...noModulesProtocol,
+            liquids: [{ displayName: 'water', description: 'liquid H2O' }],
+          } as unknown) as ProtocolAnalysisFile,
+          displayName: 'mock display name',
+          protocolKey: 'fakeProtocolKey',
+        })
       mockProtocolHasLiquids.mockReturnValue(true)
 
       const { getByText } = render()

@@ -36,6 +36,7 @@ export const AboutPipetteSlideout = (
         <PrimaryButton
           onClick={onCloseClick}
           width="100%"
+          textTransform={TYPOGRAPHY.textTransformCapitalize}
           data-testid="AboutPipette_slideout_close"
         >
           {t('shared:close')}

@@ -15,13 +15,11 @@ import {
   TYPOGRAPHY,
   LabwareRender,
 } from '@opentrons/components'
-import {
-  useProtocolDetailsForRun,
-  useLabwareRenderInfoForRunById,
-} from '../../../Devices/hooks'
+import { useProtocolDetailsForRun } from '../../../Devices/hooks'
 import { Modal } from '../../../../molecules/Modal'
 import { StyledText } from '../../../../atoms/text'
 import { getSlotLabwareName } from '../utils/getSlotLabwareName'
+import { getSlotLabwareDefinition } from '../utils/getSlotLabwareDefinition'
 import { LiquidDetailCard } from './LiquidDetailCard'
 import {
   getLiquidsByIdForLabware,
@@ -43,7 +41,6 @@ export const LiquidsLabwareDetailsModal = (
   const { liquidId, labwareId, runId, closeModal } = props
   const { t } = useTranslation('protocol_setup')
   const currentLiquidRef = React.useRef<HTMLDivElement>(null)
-  const labwareRenderInfo = useLabwareRenderInfoForRunById(runId)[labwareId]
   const protocolData = useProtocolDetailsForRun(runId).protocolData
   const commands = protocolData?.commands ?? []
   const liquids = parseLiquidsInLoadOrder(
@@ -79,6 +76,8 @@ export const LiquidsLabwareDetailsModal = (
       display: none;
     }
   `
+  if (protocolData == null) return null
+
   const liquidIds = filteredLiquidsInLoadOrder.map(liquid => liquid.id)
   const disabledLiquidIds = liquidIds.filter(id => id !== selectedValue)
 
@@ -177,7 +176,10 @@ export const LiquidsLabwareDetailsModal = (
             <Flex flex="1 1 30rem" flexDirection={DIRECTION_COLUMN}>
               <svg viewBox="0 -10 130 100" transform="scale(1, -1)">
                 <LabwareRender
-                  definition={labwareRenderInfo.labwareDef}
+                  definition={getSlotLabwareDefinition(
+                    labwareId,
+                    protocolData.commands
+                  )}
                   wellFill={wellFill}
                   wellLabelOption="SHOW_LABEL_INSIDE"
                   highlightedWells={

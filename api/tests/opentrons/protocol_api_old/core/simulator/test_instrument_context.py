@@ -6,15 +6,7 @@ from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 
 from opentrons.hardware_control import NoTipAttachedError
 from opentrons.hardware_control.types import TipAttachedError
-from opentrons.protocol_api.core.labware import AbstractLabware as BaseAbstractLabware
-from opentrons.protocol_api.core.well import AbstractWellCore
-from opentrons.protocol_api.core.instrument import (
-    AbstractInstrument as BaseAbstractInstrument,
-)
-
-
-AbstractInstrument = BaseAbstractInstrument[AbstractWellCore]
-AbstractLabware = BaseAbstractLabware[AbstractWellCore]
+from opentrons.protocol_api.core.common import InstrumentCore, LabwareCore
 
 
 @pytest.fixture(
@@ -23,13 +15,13 @@ AbstractLabware = BaseAbstractLabware[AbstractWellCore]
         lazy_fixture("simulating_instrument_context"),
     ]
 )
-def subject(request: pytest.FixtureRequest) -> AbstractInstrument:
+def subject(request: pytest.FixtureRequest) -> InstrumentCore:
     return request.param  # type: ignore[attr-defined, no-any-return]
 
 
 def test_same_pipette(
-    instrument_context: AbstractInstrument,
-    simulating_instrument_context: AbstractInstrument,
+    instrument_context: InstrumentCore,
+    simulating_instrument_context: InstrumentCore,
 ) -> None:
     """It should have the same pipette as hardware backed instrument context."""
     assert (
@@ -37,39 +29,37 @@ def test_same_pipette(
     )
 
 
-def test_aspirate_no_tip(subject: AbstractInstrument) -> None:
+def test_aspirate_no_tip(subject: InstrumentCore) -> None:
     """It should raise an error if a tip is not attached."""
     with pytest.raises(NoTipAttachedError, match="Cannot perform ASPIRATE"):
         subject.aspirate(volume=1, rate=1)
 
 
-def test_prepare_to_aspirate_no_tip(subject: AbstractInstrument) -> None:
+def test_prepare_to_aspirate_no_tip(subject: InstrumentCore) -> None:
     """It should raise an error if a tip is not attached."""
     with pytest.raises(NoTipAttachedError, match="Cannot perform PREPARE_ASPIRATE"):
         subject.prepare_for_aspirate()
 
 
-def test_dispense_no_tip(subject: AbstractInstrument) -> None:
+def test_dispense_no_tip(subject: InstrumentCore) -> None:
     """It should raise an error if a tip is not attached."""
     with pytest.raises(NoTipAttachedError, match="Cannot perform DISPENSE"):
         subject.dispense(volume=1, rate=1)
 
 
-def test_drop_tip_no_tip(subject: AbstractInstrument) -> None:
+def test_drop_tip_no_tip(subject: InstrumentCore) -> None:
     """It should raise an error if a tip is not attached."""
     with pytest.raises(NoTipAttachedError, match="Cannot perform DROPTIP"):
         subject.drop_tip(home_after=False)
 
 
-def test_blow_out_no_tip(subject: AbstractInstrument) -> None:
+def test_blow_out_no_tip(subject: InstrumentCore) -> None:
     """It should raise an error if a tip is not attached."""
     with pytest.raises(NoTipAttachedError, match="Cannot perform BLOWOUT"):
         subject.blow_out()
 
 
-def test_pick_up_tip_no_tip(
-    subject: AbstractInstrument, labware: AbstractLabware
-) -> None:
+def test_pick_up_tip_no_tip(subject: InstrumentCore, labware: LabwareCore) -> None:
     """It should raise an error if a tip is already attached."""
     subject.home()
     subject.pick_up_tip(
@@ -89,9 +79,7 @@ def test_pick_up_tip_no_tip(
         )
 
 
-def test_pick_up_tip_prep_after(
-    subject: AbstractInstrument, labware: AbstractLabware
-) -> None:
+def test_pick_up_tip_prep_after(subject: InstrumentCore, labware: LabwareCore) -> None:
     """It should not raise an error, regardless of prep_after value."""
     subject.home()
     subject.pick_up_tip(
@@ -117,9 +105,7 @@ def test_pick_up_tip_prep_after(
     subject.drop_tip(home_after=True)
 
 
-def test_aspirate_too_much(
-    subject: AbstractInstrument, labware: AbstractLabware
-) -> None:
+def test_aspirate_too_much(subject: InstrumentCore, labware: LabwareCore) -> None:
     """It should raise an error if try to aspirate more than possible."""
     subject.home()
     subject.pick_up_tip(
@@ -136,7 +122,7 @@ def test_aspirate_too_much(
         subject.aspirate(subject.get_max_volume() + 1, rate=1)
 
 
-def test_working_volume(subject: AbstractInstrument, labware: AbstractLabware) -> None:
+def test_working_volume(subject: InstrumentCore, labware: LabwareCore) -> None:
     """It should have the correct working volume."""
     subject.home()
     assert subject.get_pipette()["working_volume"] == 300
@@ -159,9 +145,9 @@ def test_working_volume(subject: AbstractInstrument, labware: AbstractLabware) -
     ],
 )
 def test_pipette_dict(
-    side_effector: Callable[[AbstractInstrument], None],
-    instrument_context: AbstractInstrument,
-    simulating_instrument_context: AbstractInstrument,
+    side_effector: Callable[[InstrumentCore], None],
+    instrument_context: InstrumentCore,
+    simulating_instrument_context: InstrumentCore,
 ) -> None:
     """It should be the same."""
     side_effector(instrument_context)
@@ -171,20 +157,20 @@ def test_pipette_dict(
     )
 
 
-def _aspirate(i: AbstractInstrument) -> None:
+def _aspirate(i: InstrumentCore) -> None:
     """pipette dict with tip fixture."""
     i.prepare_for_aspirate()
     i.aspirate(12, 10)
 
 
-def _aspirate_dispense(i: AbstractInstrument) -> None:
+def _aspirate_dispense(i: InstrumentCore) -> None:
     """pipette dict with tip fixture."""
     i.prepare_for_aspirate()
     i.aspirate(12, 10)
     i.dispense(2, 2)
 
 
-def _aspirate_blowout(i: AbstractInstrument) -> None:
+def _aspirate_blowout(i: InstrumentCore) -> None:
     """pipette dict with tip fixture."""
     i.prepare_for_aspirate()
     i.aspirate(11, 13)
@@ -201,10 +187,10 @@ def _aspirate_blowout(i: AbstractInstrument) -> None:
     ],
 )
 def test_pipette_dict_with_tip(
-    side_effector: Callable[[AbstractInstrument], None],
-    instrument_context: AbstractInstrument,
-    simulating_instrument_context: AbstractInstrument,
-    labware: AbstractLabware,
+    side_effector: Callable[[InstrumentCore], None],
+    instrument_context: InstrumentCore,
+    simulating_instrument_context: InstrumentCore,
+    labware: LabwareCore,
 ) -> None:
     """It should be the same."""
     # Home first

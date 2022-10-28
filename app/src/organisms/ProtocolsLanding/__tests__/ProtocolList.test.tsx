@@ -65,7 +65,6 @@ describe('ProtocolList', () => {
     getByText('Sort by')
     getByText('Alphabetical')
     getByRole('button', { name: 'Import' })
-    getByText('All Protocols')
     getByText('mock empty state links')
     const cards = getAllByText('mock protocol card')
     expect(cards.length).toBe(2)

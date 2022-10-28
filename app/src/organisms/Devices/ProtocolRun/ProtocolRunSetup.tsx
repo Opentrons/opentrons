@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import size from 'lodash/size'
 
 import { parseAllRequiredModuleModels } from '@opentrons/api-client'
 import {
@@ -23,7 +24,6 @@ import {
   useProtocolAnalysisErrors,
   useStoredProtocolAnalysis,
 } from '../hooks'
-import { protocolHasLiquids } from '@opentrons/shared-data'
 
 import { SetupLabware } from './SetupLabware'
 import { SetupRobotCalibration } from './SetupRobotCalibration'
@@ -79,7 +79,8 @@ export function ProtocolRunSetup({
     const showLiquidSetup =
       liquidSetupEnabled &&
       protocolData != null &&
-      protocolHasLiquids(protocolData)
+      'liquids' in protocolData &&
+      size(protocolData.liquids) > 0
 
     if (showModuleSetup && showLiquidSetup) {
       nextStepKeysInOrder = [
@@ -122,7 +123,7 @@ export function ProtocolRunSetup({
               ) + 1
             ]
           }
-          expandStep={nextStep => setExpandedStepKey(nextStep)}
+          expandStep={setExpandedStepKey}
           calibrationStatus={calibrationStatus}
         />
       ),
@@ -155,7 +156,7 @@ export function ProtocolRunSetup({
               ? null
               : LIQUID_SETUP_KEY
           }
-          expandStep={nextStep => setExpandedStepKey(nextStep)}
+          expandStep={setExpandedStepKey}
         />
       ),
       description: t(`${LABWARE_SETUP_KEY}_description`),

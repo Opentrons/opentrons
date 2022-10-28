@@ -44,7 +44,7 @@ export function UsageSettings({
     <Flex
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      marginTop={SPACING.spacingXXL}
+      marginTop={SPACING.spacing5}
     >
       <Box width="70%">
         <StyledText
@@ -54,7 +54,11 @@ export function UsageSettings({
         >
           {t('usage_settings')}
         </StyledText>
-        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        <StyledText
+          as="p"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          marginBottom={SPACING.spacing2}
+        >
           {t('pause_protocol')}
         </StyledText>
         <StyledText as="p">{t('pause_protocol_description')}</StyledText>

@@ -107,8 +107,6 @@ async def test_create_simulating_module(
 async def mod_tempdeck():
     from opentrons.hardware_control import modules
 
-    loop = asyncio.get_running_loop()
-
     usb_port = USBPort(
         name="",
         hub=None,
@@ -121,7 +119,7 @@ async def mod_tempdeck():
         usb_port=usb_port,
         type=ModuleType.TEMPERATURE,
         simulating=True,
-        loop=loop,
+        hw_control_loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
         sim_model="temperatureModuleV2",
     )
@@ -132,8 +130,6 @@ async def mod_tempdeck():
 @pytest.fixture
 async def mod_magdeck():
     from opentrons.hardware_control import modules
-
-    loop = asyncio.get_running_loop()
 
     usb_port = USBPort(
         name="",
@@ -147,7 +143,7 @@ async def mod_magdeck():
         usb_port=usb_port,
         type=ModuleType.MAGNETIC,
         simulating=True,
-        loop=loop,
+        hw_control_loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
     )
     yield magdeck
@@ -158,8 +154,6 @@ async def mod_magdeck():
 async def mod_thermocycler():
     from opentrons.hardware_control import modules
 
-    loop = asyncio.get_running_loop()
-
     usb_port = USBPort(
         name="",
         hub=None,
@@ -172,7 +166,7 @@ async def mod_thermocycler():
         usb_port=usb_port,
         type=ModuleType.THERMOCYCLER,
         simulating=True,
-        loop=loop,
+        hw_control_loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
     )
     yield thermocycler
@@ -183,8 +177,6 @@ async def mod_thermocycler():
 async def mod_thermocycler_gen2():
     from opentrons.hardware_control import modules
 
-    loop = asyncio.get_running_loop()
-
     usb_port = USBPort(
         name="",
         hub=None,
@@ -197,7 +189,7 @@ async def mod_thermocycler_gen2():
         usb_port=usb_port,
         type=ModuleType.THERMOCYCLER,
         simulating=True,
-        loop=loop,
+        hw_control_loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
         sim_model="thermocyclerModuleV2",
     )
@@ -208,8 +200,6 @@ async def mod_thermocycler_gen2():
 @pytest.fixture
 async def mod_heatershaker():
     from opentrons.hardware_control import modules
-
-    loop = asyncio.get_running_loop()
 
     usb_port = USBPort(
         name="",
@@ -223,7 +213,7 @@ async def mod_heatershaker():
         usb_port=usb_port,
         type=ModuleType.HEATER_SHAKER,
         simulating=True,
-        loop=loop,
+        hw_control_loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
     )
     yield heatershaker

@@ -18,7 +18,7 @@ import {
 import { useCurrentRun } from '../../ProtocolUpload/hooks'
 import { DeprecatedSectionList } from './DeprecatedSectionList'
 import { DeprecatedDeckMap } from './DeprecatedDeckMap'
-import { useIntroInfo, useLabwareIdsBySection } from '../hooks'
+import { useIntroInfo, useLabwareIdsBySection } from '../deprecatedHooks'
 
 export const INTERVAL_MS = 3000
 
