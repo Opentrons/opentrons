@@ -98,11 +98,9 @@ def test_engage_to_labware(
     ).then_return(ModuleModel.MAGNETIC_MODULE_V1)
 
     decoy.when(
-        mock_engine_client.state.labware.get_id_by_module(module_id="1234")
-    ).then_return("555")
-
-    decoy.when(
-        mock_engine_client.state.labware.get_default_magnet_height(labware_id="555")
+        mock_engine_client.state.geometry.get_default_magnet_engage_height(
+            module_id="1234", preserve_half_mm=False
+        )
     ).then_return(3.0)
 
     decoy.when(
