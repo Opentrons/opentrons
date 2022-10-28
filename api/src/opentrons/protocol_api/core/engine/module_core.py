@@ -109,7 +109,7 @@ class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore[LabwareCor
         Specifying a value for ``celsius`` that is different than
         the module's current target temperature may beahave unpredictably.
         """
-        self._engine_client.temperature_wait_for_target_temperature(
+        self._engine_client.temperature_module_wait_for_target_temperature(
             module_id=self.module_id, celsius=celsius
         )
 
