@@ -17,6 +17,11 @@ from opentrons.drivers.types import (
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
+from opentrons.protocol_engine.errors.exceptions import (
+    LabwareNotLoadedOnModuleError,
+    NoMagnetEngageHeightError,
+)
+
 from opentrons.protocol_api import Labware
 from opentrons.protocols.api_support.types import APIVersion
 
@@ -28,6 +33,7 @@ from ..module import (
     AbstractHeaterShakerCore,
 )
 from .labware import LabwareCore
+from .exceptions import InvalidMagnetEngageHeightError
 
 
 class ModuleCore(AbstractModuleCore[LabwareCore]):
@@ -166,23 +172,29 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
                 erroneously use half-mm for their defined default engage height,
                 use the value directly instead of converting it to real millimeters.
         """
-        model = self._engine_client.state.modules.get_model(module_id=self.module_id)
-
-        default_height = (
-            self._engine_client.state.geometry.get_default_magnet_engage_height(
-                module_id=self.module_id,
-                preserve_half_mm=preserve_half_mm,
+        try:
+            default_height = (
+                self._engine_client.state.labware.get_default_magnet_height(
+                    module_id=self.module_id,
+                    offset=offset
+                )
             )
-        )
-
-        calculated_height = self._engine_client.state.modules.calculate_magnet_height(
-            module_model=model,
-            labware_default_height=default_height,
-            offset_from_labware_default=offset,
-        )
+        except LabwareNotLoadedOnModuleError:
+            raise InvalidMagnetEngageHeightError(
+                "There is no labware loaded on this Magnetic Module,"
+                " so you must specify an engage height"
+                " with the `height` or `height_from_base` parameter."
+            )
+        except NoMagnetEngageHeightError:
+            raise InvalidMagnetEngageHeightError(
+                "The labware loaded on this Magnetic Module"
+                " does not have a default engage height,"
+                " so you must specify an engage height"
+                " with the `height` or `height_from_base` parameter."
+            )
 
         self._engine_client.magnetic_module_engage(
-            module_id=self.module_id, engage_height=calculated_height
+            module_id=self.module_id, engage_height=default_height
         )
 
     def disengage(self) -> None:

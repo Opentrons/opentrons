@@ -10,7 +10,11 @@ from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.types import ModuleModel
 
 from opentrons.protocol_api.core.engine.module_core import MagneticModuleCore
-from opentrons.protocol_engine.errors.exceptions import InvalidMagnetEngageHeightError
+from opentrons.protocol_api.core.engine.exceptions import InvalidMagnetEngageHeightError
+from opentrons.protocol_engine.errors.exceptions import (
+    LabwareNotLoadedOnModuleError,
+    NoMagnetEngageHeightError,
+)
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 
 MagDeckHardware = SynchronousAdapter[MagDeck]
@@ -67,15 +71,9 @@ def test_engage_from_base(
     subject.engage(height_from_base=7.0)
 
     decoy.verify(
-        mock_engine_client.magnetic_module_engage(module_id="1234", engage_height=9.0),
+        mock_engine_client.magnetic_module_engage(module_id="1234", engage_height=7.0),
         times=1,
     )
-
-
-def test_engage_raises_error(decoy: Decoy, subject: MagneticModuleCore) -> None:
-    """Should raise an error that 2 args should not be supplied."""
-    with pytest.raises(InvalidMagnetEngageHeightError):
-        subject.engage(height_from_base=7.0, height_from_home=7.0)
 
 
 def test_engage_to_labware(
@@ -87,9 +85,7 @@ def test_engage_to_labware(
     ).then_return(ModuleModel.MAGNETIC_MODULE_V1)
 
     decoy.when(
-        mock_engine_client.state.geometry.get_default_magnet_engage_height(
-            module_id="1234", preserve_half_mm=False
-        )
+        mock_engine_client.state.labware.get_default_magnet_height(module_id="1234")
     ).then_return(3.0)
 
     decoy.when(
@@ -106,6 +102,36 @@ def test_engage_to_labware(
         mock_engine_client.magnetic_module_engage(module_id="1234", engage_height=6.0),
         times=1,
     )
+
+
+def test_engage_to_labware_raises_no_labware_error(
+    decoy: Decoy, subject: MagneticModuleCore, mock_engine_client: EngineClient
+) -> None:
+    """Should raise an error that the labware was not found."""
+    decoy.when(
+        mock_engine_client.state.labware.get_default_magnet_height(module_id="1234")
+    ).then_raise(
+        LabwareNotLoadedOnModuleError  # type: ignore[arg-type]
+    )
+
+    with pytest.raises(InvalidMagnetEngageHeightError, match="no labware loaded"):
+        subject.engage_to_labware(offset=0.6)
+
+
+def test_engage_to_labware_raises_no_height_error(
+    decoy: Decoy, subject: MagneticModuleCore, mock_engine_client: EngineClient
+) -> None:
+    """Should raise an error that the a magnetic default height was not found."""
+    decoy.when(
+        mock_engine_client.state.labware.get_default_magnet_height(module_id="1234")
+    ).then_raise(
+        NoMagnetEngageHeightError  # type: ignore[arg-type]
+    )
+
+    with pytest.raises(
+        InvalidMagnetEngageHeightError, match="does not have a default engage height"
+    ):
+        subject.engage_to_labware(offset=0.6)
 
 
 def test_disengage(

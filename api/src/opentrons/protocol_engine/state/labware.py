@@ -395,11 +395,12 @@ class LabwareView(HasState[LabwareState]):
             z=dims.zDimension,
         )
 
-    def get_default_magnet_height(self, labware_id: str) -> Optional[float]:
+    def get_default_magnet_height(self, module_id: str, offset: float) -> float:
         """Return a labware's default Magnetic Module engage height.
 
         The returned value is measured in millimeters above the labware base plane.
         """
+        labware_id = self.get_id_by_module(module_id)
         parameters = self.get_definition(labware_id).parameters
         default_engage_height = parameters.magneticModuleEngageHeight
         if (
@@ -414,10 +415,9 @@ class LabwareView(HasState[LabwareState]):
         if self._is_magnetic_module_uri_in_half_millimeter(labware_id):
             # TODO(mc, 2022-09-26): this value likely _also_ needs a few mm subtracted
             # https://opentrons.atlassian.net/browse/RSS-111
-            print(default_engage_height)
-            return default_engage_height / 2.0
+            return default_engage_height / 2.0 + offset
 
-        return default_engage_height
+        return default_engage_height + offset
 
     def get_labware_offset_vector(self, labware_id: str) -> LabwareOffsetVector:
         """Get the labware's calibration offset."""

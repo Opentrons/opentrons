@@ -6,6 +6,10 @@ from typing import Optional, overload
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
+from opentrons.protocol_engine.errors.exceptions import (
+    LabwareNotLoadedOnModuleError,
+    NoMagnetEngageHeightError,
+)
 from opentrons.protocols.api_support.types import APIVersion
 
 from ..constants import DEFAULT_LABWARE_NAMESPACE
@@ -139,18 +143,17 @@ class MagneticModuleContext:  # noqa: D101
             )
 
         else:
-            labware_id = state.labware.get_id_by_module(module_id=self._module_id)
-            if labware_id is None:
+            try:
+                default_height = state.labware.get_default_magnet_height(
+                    module_id=self._module_id
+                )
+            except LabwareNotLoadedOnModuleError:
                 raise InvalidMagnetEngageHeightError(
                     "There is no labware loaded on this Magnetic Module,"
                     " so you must specify an engage height"
                     " with the `height` or `height_from_base` parameter."
                 )
-
-            default_height = state.labware.get_default_magnet_height(
-                labware_id=labware_id
-            )
-            if default_height is None:
+            except NoMagnetEngageHeightError:
                 raise InvalidMagnetEngageHeightError(
                     "The labware loaded on this Magnetic Module"
                     " does not have a default engage height,"

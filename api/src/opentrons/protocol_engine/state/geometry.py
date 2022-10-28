@@ -299,14 +299,3 @@ class GeometryView:
             )
 
         return slot_name
-
-    def get_default_magnet_engage_height(
-        self, module_id: str, preserve_half_mm: bool
-    ) -> float:
-        """Return a labware's default Magnetic Module engage height.
-
-        The returned value is measured in millimeters above the labware base plane.
-        """
-        labware_id = self._labware.get_id_by_module(module_id)
-
-        return self._labware.get_default_magnet_height(labware_id)

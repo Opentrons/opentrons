@@ -1,6 +1,5 @@
 """Tests for `magnetic_module_context`."""
 
-
 from decoy import Decoy
 import pytest
 
@@ -12,6 +11,10 @@ from opentrons.protocol_engine import (
     commands as pe_commands,
 )
 from opentrons.protocol_engine.clients import SyncClient
+from opentrons.protocol_engine.errors.exceptions import (
+    LabwareNotLoadedOnModuleError,
+    NoMagnetEngageHeightError,
+)
 
 from opentrons.protocol_api_experimental import (
     Labware,
@@ -202,12 +205,13 @@ def test_engage_with_offset(
     decoy.when(
         engine_client.state.modules.get_model(module_id=subject_module_id)
     ).then_return(ModuleModel.MAGNETIC_MODULE_V1)
+
     decoy.when(
-        engine_client.state.labware.get_id_by_module(module_id=subject_module_id)
-    ).then_return("labware-id")
-    decoy.when(
-        engine_client.state.labware.get_default_magnet_height(labware_id="labware-id")
+        engine_client.state.labware.get_default_magnet_height(
+            module_id=subject_module_id
+        )
     ).then_return(1.23)
+
     decoy.when(
         engine_client.state.modules.calculate_magnet_height(
             module_model=ModuleModel.MAGNETIC_MODULE_V1,
@@ -233,12 +237,13 @@ def test_engage_with_no_arguments(
     decoy.when(
         engine_client.state.modules.get_model(module_id=subject_module_id)
     ).then_return(ModuleModel.MAGNETIC_MODULE_V1)
+
     decoy.when(
-        engine_client.state.labware.get_id_by_module(module_id=subject_module_id)
-    ).then_return("labware-id")
-    decoy.when(
-        engine_client.state.labware.get_default_magnet_height(labware_id="labware-id")
+        engine_client.state.labware.get_default_magnet_height(
+            module_id=subject_module_id
+        )
     ).then_return(1.23)
+
     decoy.when(
         engine_client.state.modules.calculate_magnet_height(
             module_model=ModuleModel.MAGNETIC_MODULE_V1,
@@ -262,8 +267,13 @@ def test_engage_based_on_labware_errors_when_no_labware_loaded(
 ) -> None:
     """It should raise when there is no labware loaded on the module."""
     decoy.when(
-        engine_client.state.labware.get_id_by_module(module_id=subject_module_id)
-    ).then_return(None)
+        engine_client.state.labware.get_default_magnet_height(
+            module_id=subject_module_id
+        )
+    ).then_raise(
+        LabwareNotLoadedOnModuleError  # type: ignore[arg-type]
+    )
+
     expected_exception_text = "no labware loaded"
     with pytest.raises(InvalidMagnetEngageHeightError, match=expected_exception_text):
         subject.engage(offset=1.23)
@@ -281,11 +291,13 @@ def test_engage_based_on_labware_errors_when_labware_has_no_default_height(
 ) -> None:
     """It should raise when there is a labware, but it has no default magnet height."""
     decoy.when(
-        engine_client.state.labware.get_id_by_module(module_id=subject_module_id)
-    ).then_return("labware-id")
-    decoy.when(
-        engine_client.state.labware.get_default_magnet_height(labware_id="labware-id")
-    ).then_return(None)
+        engine_client.state.labware.get_default_magnet_height(
+            module_id=subject_module_id
+        )
+    ).then_raise(
+        NoMagnetEngageHeightError  # type: ignore[arg-type]
+    )
+
     expected_exception_text = "does not have a default"
     with pytest.raises(InvalidMagnetEngageHeightError, match=expected_exception_text):
         subject.engage(offset=1.23)

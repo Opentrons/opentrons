@@ -92,7 +92,9 @@ def falcon_tuberack_def() -> LabwareDefinition:
 @pytest.fixture
 def magdeck_well_plate_def() -> LabwareDefinition:
     """Get the definition of a well place compatible with magdeck."""
-    return LabwareDefinition.parse_obj(load_definition("nest_96_wellplate_100ul_pcr_full_skirt", 1))
+    return LabwareDefinition.parse_obj(
+        load_definition("nest_96_wellplate_100ul_pcr_full_skirt", 1)
+    )
 
 
 @pytest.fixture(scope="session")

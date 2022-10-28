@@ -427,7 +427,7 @@ def test_get_default_magnet_height(
         definitions_by_uri={"well-plate-uri": magdeck_well_plate_def},
     )
 
-    assert subject.get_default_magnet_height("well-plate-id") == 10.0
+    assert subject.get_default_magnet_height(module_id="module-id", offset=2) == 12.0
 
 
 def test_get_deck_definition(standard_deck_def: DeckDefinitionV3) -> None:
