@@ -320,6 +320,7 @@ def test_touch_tip():
                 parent_point=Point(10, 20, 30),
                 parent_object=1,
             ),
+            display_name="some well",
             has_tip=False,
             name="A2",
         ),

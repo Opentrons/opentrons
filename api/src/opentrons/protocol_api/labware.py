@@ -130,7 +130,7 @@ class Well:
 
     @property
     def display_name(self) -> str:
-        return repr(self)
+        return self._impl.get_display_name()
 
     @property  # type: ignore
     @requires_version(2, 7)
@@ -202,7 +202,7 @@ class Well:
         return self.from_center_cartesian(x, y, z)
 
     def __repr__(self) -> str:
-        return f"{self._impl.get_name()} of {repr(self.parent)}"
+        return self._impl.get_display_name()
 
     def __eq__(self, other: object) -> bool:
         """

@@ -29,7 +29,6 @@ def test_determine_drop_target(api_version, expected_point):
     lw_mock = mock.MagicMock()
     lw_mock.is_tiprack = mock.MagicMock(return_value=True)
     lw_mock.get_tip_length = mock.MagicMock(return_value=1)
-    lw_mock.get_display_name = mock.MagicMock(return_value="Display Name")
     well = Well(
         parent=Labware(implementation=lw_mock),
         well_implementation=WellImplementation(
@@ -46,6 +45,7 @@ def test_determine_drop_target(api_version, expected_point):
                 parent_point=Point(0, 0, 0),
                 parent_object=lw_mock,
             ),
+            display_name="",
             has_tip=False,
             name="A1",
         ),

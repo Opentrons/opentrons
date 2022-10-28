@@ -15,7 +15,7 @@ def names_96_well() -> List[str]:
 @pytest.fixture()
 def wells(names_96_well) -> List[WellImplementation]:
     return [
-        WellImplementation(well_geometry=None, has_tip=True, name=n)
+        WellImplementation(well_geometry=None, display_name=n, has_tip=True, name=n)
         for n in names_96_well
     ]
 

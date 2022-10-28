@@ -55,6 +55,17 @@ def test_name(subject: WellCore) -> None:
     assert subject.labware_id == "labware-id"
 
 
+def test_display_name(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: WellCore
+) -> None:
+    """It should have a display name."""
+    decoy.when(
+        mock_engine_client.state.labware.get_display_name("labware-id")
+    ).then_return("Cool Labware")
+
+    assert subject.get_display_name() == "well-name of Cool Labware"
+
+
 @pytest.mark.parametrize(
     "well_definition",
     [WellDefinition.construct(totalLiquidVolume=101)],  # type: ignore[call-arg]

@@ -39,7 +39,8 @@ class WellCore(AbstractWellCore):
 
     def get_display_name(self) -> str:
         """Get the well's full display name."""
-        raise NotImplementedError("WellCore.get_display_name not implemented")
+        parent = self._engine_client.state.labware.get_display_name(self._labware_id)
+        return f"{self._name} of {parent}"
 
     def get_name(self) -> str:
         """Get the name of the well (e.g. "A1")."""

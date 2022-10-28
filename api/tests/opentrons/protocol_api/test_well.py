@@ -11,7 +11,9 @@ from opentrons.types import Point, Location
 @pytest.fixture
 def mock_well_core(decoy: Decoy) -> WellCore:
     """Get a mock labware implementation core."""
-    return decoy.mock(cls=WellCore)
+    core = decoy.mock(cls=WellCore)
+    decoy.when(core.get_display_name()).then_return("A1 of Cool Labware")
+    return core
 
 
 @pytest.fixture
@@ -53,10 +55,8 @@ def test_repr(
     decoy: Decoy, mock_well_core: WellCore, mock_parent: Labware, subject: Well
 ) -> None:
     """It should have a string representation."""
-    decoy.when(mock_well_core.get_name()).then_return("A1")
-
-    assert subject.display_name == f"A1 of {repr(mock_parent)}"
-    assert repr(subject) == subject.display_name
+    assert subject.display_name == "A1 of Cool Labware"
+    assert repr(subject) == "A1 of Cool Labware"
 
 
 def test_well_max_volume(decoy: Decoy, mock_well_core: WellCore, subject: Well) -> None:

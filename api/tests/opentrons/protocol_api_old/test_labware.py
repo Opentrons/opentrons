@@ -60,6 +60,7 @@ def test_well_init() -> None:
                 parent_point=slot.point,
                 parent_object=slot.labware,  # type: ignore[arg-type]
             ),
+            display_name=well_name,
             has_tip=has_tip,
             name="A1",
         ),
@@ -78,6 +79,7 @@ def test_well_init() -> None:
                 parent_point=slot.point,
                 parent_object=slot.labware,  # type: ignore[arg-type]
             ),
+            display_name=well2_name,
             has_tip=has_tip,
             name="A1",
         ),
@@ -100,6 +102,7 @@ def test_top() -> None:
                 parent_point=slot.point,
                 parent_object=slot.labware,  # type: ignore[arg-type]
             ),
+            display_name=well_name,
             has_tip=has_tip,
             name="A1",
         ),
@@ -124,6 +127,7 @@ def test_bottom() -> None:
                 parent_point=slot.point,
                 parent_object=slot.labware,  # type: ignore[arg-type]
             ),
+            display_name=well_name,
             has_tip=has_tip,
             name="A1",
         ),
@@ -148,6 +152,7 @@ def test_from_center_cartesian():
                 parent_point=slot1.point,
                 parent_object=slot1.labware,  # type: ignore[arg-type]
             ),
+            display_name=well_name,
             has_tip=has_tip,
             name="A1",
         ),
@@ -181,6 +186,7 @@ def test_from_center_cartesian():
                 parent_point=slot2.point,
                 parent_object=slot2.labware,  # type: ignore[arg-type]
             ),
+            display_name=well2_name,
             has_tip=has_tip,
             name="A1",
         ),
@@ -294,6 +300,7 @@ def test_well_parent(corning_96_wellplate_360ul_flat) -> None:
                 parent_point=parent.point,
                 parent_object=parent.labware.as_labware()._implementation,
             ),
+            display_name=well_name,
             has_tip=has_tip,
             name="A1",
         ),

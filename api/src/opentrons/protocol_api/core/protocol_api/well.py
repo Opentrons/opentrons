@@ -23,7 +23,10 @@ class WellImplementation(AbstractWellCore):
 
     pattern = re.compile(WELL_NAME_PATTERN, re.X)
 
-    def __init__(self, well_geometry: WellGeometry, has_tip: bool, name: str) -> None:
+    def __init__(
+        self, well_geometry: WellGeometry, display_name: str, has_tip: bool, name: str
+    ) -> None:
+        self._display_name = display_name
         self._has_tip = has_tip
         self._name = name
 
@@ -43,6 +46,10 @@ class WellImplementation(AbstractWellCore):
     def set_has_tip(self, value: bool) -> None:
         """Set the well as containing or not containing a tip."""
         self._has_tip = value
+
+    def get_display_name(self) -> str:
+        """Get the well's full display name."""
+        return self._display_name
 
     def get_name(self) -> str:
         """Get the name of the well (e.g. "A1")."""
@@ -75,6 +82,11 @@ class WellImplementation(AbstractWellCore):
     def get_geometry(self) -> WellGeometry:
         """Get the well's geometry information interface."""
         return self._geometry
+
+    # TODO(mc, 2022-10-28): is this used and/or necessary?
+    def __repr__(self) -> str:
+        """Use the well's display name as its repr."""
+        return self.get_display_name()
 
     # TODO(mc, 2022-08-24): comparing only names seems insufficient
     def __eq__(self, other: object) -> bool:

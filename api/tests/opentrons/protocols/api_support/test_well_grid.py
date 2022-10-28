@@ -40,7 +40,9 @@ TWELVE_BY_TWELVE = [n for x in TWELVE_BY_TWELVE_GRID for n in x]
 
 def wells_from_names(names: List[str]) -> List[WellImplementation]:
     return [
-        WellImplementation(well_geometry=None, has_tip=None, name=name)
+        WellImplementation(
+            well_geometry=None, display_name=None, has_tip=None, name=name
+        )
         for name in names
     ]
 
