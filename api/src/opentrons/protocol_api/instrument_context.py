@@ -606,15 +606,15 @@ class InstrumentContext(publisher.CommandPublisher):
     @requires_version(2, 0)
     def return_tip(self, home_after: bool = True) -> InstrumentContext:
         """
-        If a tip is currently attached to the pipette, then it will return the
-        tip to it's location in the tiprack.
+        If a tip is currently attached to the pipette, then the pipette will
+        return the tip to its location in the tip rack.
 
-        It will not reset tip tracking so the well flag will remain False.
+        This will not reset tip tracking, so the well flag will remain ``False``.
 
         :returns: This instance
 
         :param home_after:
-            See the ``home_after`` parameter in :py:obj:`drop_tip`.
+            See the ``home_after`` parameter of :py:obj:`drop_tip`.
         """
         if not self._implementation.has_tip():
             logger.warning("Pipette has no tip to return")
