@@ -17,6 +17,7 @@ from opentrons.drivers.types import (
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
+from opentrons.protocol_engine.errors.exceptions import InvalidMagnetEngageHeightError
 from opentrons.protocol_api import Labware
 from opentrons.protocols.api_support.types import APIVersion
 
@@ -28,7 +29,6 @@ from ..module import (
     AbstractHeaterShakerCore,
 )
 from .labware import LabwareCore
-from .exceptions import InvalidMagnetEngageHeightError
 
 
 class ModuleCore(AbstractModuleCore[LabwareCore]):
@@ -186,10 +186,11 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
         """
         model = self._engine_client.state.modules.get_model(module_id=self.module_id)
 
-        default_height = self._engine_client.state.geometry.get_default_magnet_engage_height(
-            module_id=self.module_id,
-            offset=offset,
-            preserve_half_mm=preserve_half_mm
+        default_height = (
+            self._engine_client.state.geometry.get_default_magnet_engage_height(
+                module_id=self.module_id,
+                preserve_half_mm=preserve_half_mm,
+            )
         )
 
         calculated_height = self._engine_client.state.modules.calculate_magnet_height(

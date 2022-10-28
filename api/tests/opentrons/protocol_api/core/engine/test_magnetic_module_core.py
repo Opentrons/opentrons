@@ -10,7 +10,7 @@ from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.types import ModuleModel
 
 from opentrons.protocol_api.core.engine.module_core import MagneticModuleCore
-from opentrons.protocol_api.core.engine.exceptions import InvalidMagnetEngageHeightError
+from opentrons.protocol_engine.errors.exceptions import InvalidMagnetEngageHeightError
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 
 MagDeckHardware = SynchronousAdapter[MagDeck]

@@ -300,7 +300,9 @@ class GeometryView:
 
         return slot_name
 
-    def get_default_magnet_engage_height(self, module_id: str, offset: float, preserve_half_mm: bool) -> float:
+    def get_default_magnet_engage_height(
+        self, module_id: str, preserve_half_mm: bool
+    ) -> float:
         """Return a labware's default Magnetic Module engage height.
 
         The returned value is measured in millimeters above the labware base plane.
@@ -322,7 +324,10 @@ class GeometryView:
                 " with the `height` or `height_from_base` parameter."
             )
 
-        if self._labware.is_mag_deck_uri_in_half_mil(labware_id) and not preserve_half_mm:
+        if (
+            self._labware.is_mag_deck_uri_in_half_mil(labware_id)
+            and not preserve_half_mm
+        ):
             # TODO(mc, 2022-09-26): this value likely _also_ needs a few mm subtracted
             # https://opentrons.atlassian.net/browse/RSS-111
             return default_height / 2.0

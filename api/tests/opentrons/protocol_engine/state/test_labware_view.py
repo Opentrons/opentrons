@@ -394,11 +394,14 @@ def test_get_dimensions(well_plate_def: LabwareDefinition) -> None:
     )
 
 
-def test_get_default_magnet_height(magdeck_well_plate_def: LabwareDefinition) -> None:  # noqa: D103
+def test_get_default_magnet_height(
+    magdeck_well_plate_def: LabwareDefinition,
+) -> None:
+    """Should get get the default value for magnetic height."""
     well_plate = LoadedLabware(
         id="well-plate-id",
         loadName="load-name",
-        location=ModuleLocation(moduleId=1),
+        location=ModuleLocation(moduleId="module-id"),
         definitionUri="well-plate-uri",
         offsetId=None,
     )
