@@ -18,7 +18,7 @@ LOAD = GantryLoad.NONE
 CYCLES = 1
 SPEED_X = 600
 SPEED_Y = 600
-SPEED_Z = 150
+SPEED_Z = 60
 
 ACCEL_X = 1000
 ACCEL_Y = 1000
@@ -47,7 +47,7 @@ SETTINGS = {
         acceleration=ACCEL_Z,
         max_start_stop_speed=20,
         max_change_dir_speed=5,
-        hold_current=0.1,
+        hold_current=1,
         run_current=1.5,
     ),
     OT3Axis.Z_R: GantryLoadSettings(
@@ -55,7 +55,7 @@ SETTINGS = {
         acceleration=ACCEL_Z,
         max_start_stop_speed=20,
         max_change_dir_speed=5,
-        hold_current=0.1,
+        hold_current=0.5,
         run_current=1.5,
     ),
 }
@@ -67,7 +67,7 @@ AXIS_MAP = {'Y': OT3Axis.Y,
 
 step_x = 400
 step_y = 300
-step_z = 100
+step_z = 200
 POINT_MAP = {'Y': Point(y=step_y),
              'X': Point(x=step_x),
              'L': Point(z=step_z),
@@ -84,9 +84,9 @@ async def _thermal_test(api: OT3API, cycles: int = 1) -> None:
                                    y=-30),
                        speed=SPEED_X)
 
-    home_pos_left = await api.current_position(mount=OT3Mount.LEFT)
+    home_pos_left = await api.current_position_ot3(mount=OT3Mount.LEFT)
     print(home_pos_left)
-    home_pos_right = await api.current_position(mount=OT3Mount.RIGHT)
+    home_pos_right = await api.current_position_ot3(mount=OT3Mount.RIGHT)
     print(home_pos_right)
 
     for _ in range(cycles):
@@ -108,6 +108,9 @@ async def _thermal_test(api: OT3API, cycles: int = 1) -> None:
             #                                      y=home_pos_left[OT3Axis.Y],
             #                                      z=0),
             #                    speed=SPEED_Z)
+            await api.move_rel(mount=OT3Mount.LEFT,
+                               delta=Point(z=-step_z),
+                               speed=SPEED_Z)
             # await api.move_to(mount=OT3Mount.RIGHT,
             #                   abs_position=Point(x=home_pos_right[OT3Axis.X],
             #                                      y=home_pos_right[OT3Axis.Y],
@@ -118,6 +121,9 @@ async def _thermal_test(api: OT3API, cycles: int = 1) -> None:
             #                                      y=home_pos_left[OT3Axis.Y],
             #                                      z=200),
             #                    speed=SPEED_Z)
+            await api.move_rel(mount=OT3Mount.LEFT,
+                               delta=Point(z=step_z),
+                               speed=SPEED_Z)
             # await api.move_to(mount=OT3Mount.RIGHT,
             #                   abs_position=Point(x=home_pos_right[OT3Axis.X],
             #                                      y=home_pos_right[OT3Axis.Y],
