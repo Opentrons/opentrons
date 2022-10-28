@@ -444,7 +444,7 @@ def test_blow_out(
     assert result == response
 
 
-def test_temperature_set_target_temperature(
+def test_temperature_module_set_target_temperature(
     decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
 ) -> None:
     """Should execute a PE set_target_temperature command."""
