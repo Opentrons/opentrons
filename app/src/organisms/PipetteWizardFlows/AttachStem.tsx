@@ -40,7 +40,7 @@ export const AttachStem = (props: PipetteWizardStepProps): JSX.Element => {
         },
       },
     ]).then(() => {
-      console.log('completed attach stem')e
+      console.log('completed attach stem')
       proceed()
     })
   }
