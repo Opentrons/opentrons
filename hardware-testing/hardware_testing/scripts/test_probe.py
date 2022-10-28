@@ -128,6 +128,8 @@ async def run_test(api, mount):
         edge_y_plus = round(edge_y_plus, 3)
         print(f"Cycle {cycle}: +Y = {edge_y_plus}mm")
 
+        print(f"Completed Cycle {cycle}!")
+
         current_pos = await api.gantry_position(mount, refresh=True)
         await api.move_to(mount, center_xy._replace(z=current_pos.z), speed=20)
         await api.move_to(mount, center_xy._replace(z=home.z))
