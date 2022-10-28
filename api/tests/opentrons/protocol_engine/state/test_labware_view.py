@@ -104,6 +104,22 @@ def test_get_id_by_module() -> None:
     assert subject.get_id_by_module(module_id="module-id") == "labware-id"
 
 
+def test_get_id_by_module_raises_error() -> None:
+    """Should raise error that labware not found."""
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id": LoadedLabware(
+                id="labware-id",
+                loadName="test",
+                definitionUri="test-uri",
+                location=ModuleLocation(moduleId="module-id"),
+            )
+        }
+    )
+    with pytest.raises(errors.exceptions.LabwareNotLoadedOnModuleError):
+        assert subject.get_id_by_module(module_id="no-module-id")
+
+
 def test_get_labware_definition(well_plate_def: LabwareDefinition) -> None:
     """It should get a labware's definition from the state."""
     subject = get_labware_view(
@@ -411,7 +427,7 @@ def test_get_default_magnet_height(
         definitions_by_uri={"well-plate-uri": magdeck_well_plate_def},
     )
 
-    assert subject.get_default_magnet_height("well-plate-id") == 6.8
+    assert subject.get_default_magnet_height("well-plate-id") == 10.0
 
 
 def test_get_deck_definition(standard_deck_def: DeckDefinitionV3) -> None:

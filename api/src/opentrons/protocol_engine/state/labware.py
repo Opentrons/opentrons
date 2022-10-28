@@ -199,7 +199,7 @@ class LabwareView(HasState[LabwareState]):
                 f"Labware {labware_id} not found."
             ) from e
 
-    def get_id_by_module(self, module_id: str) -> Optional[str]:
+    def get_id_by_module(self, module_id: str) -> str:
         """Return the ID of the labware loaded on the given module."""
         for (key, value) in self.state.labware_by_id.items():
             if (
@@ -208,7 +208,9 @@ class LabwareView(HasState[LabwareState]):
             ):
                 return key
 
-        return None
+        raise errors.exceptions.LabwareNotLoadedOnModuleError(
+            "There is no labware loaded on this Module"
+        )
 
     def get_definition(self, labware_id: str) -> LabwareDefinition:
         """Get labware definition by the labware's unique identifier."""
@@ -404,7 +406,16 @@ class LabwareView(HasState[LabwareState]):
             parameters.isMagneticModuleCompatible is False
             or default_engage_height is None
         ):
-            return None
+            raise errors.exceptions.NoMagnetEngageHeightError(
+                "The labware loaded on this Magnetic Module"
+                " does not have a default engage height."
+            )
+
+        if self._is_magnetic_module_uri_in_half_millimeter(labware_id):
+            # TODO(mc, 2022-09-26): this value likely _also_ needs a few mm subtracted
+            # https://opentrons.atlassian.net/browse/RSS-111
+            print(default_engage_height)
+            return default_engage_height / 2.0
 
         return default_engage_height
 
@@ -479,7 +490,7 @@ class LabwareView(HasState[LabwareState]):
             "No labware loaded into fixed trash location by this deck type."
         )
 
-    def is_magnetic_module_uri_in_half_millimeter(self, labware_id: str) -> bool:
+    def _is_magnetic_module_uri_in_half_millimeter(self, labware_id: str) -> bool:
         """Check whether the labware uri needs to be calculated in half a millimeter."""
-        uri = self.get_definition_uri(labware_id)
+        uri = self.get_uri_from_definition(self.get_definition(labware_id))
         return uri in _MAGDECK_HALF_MM_LABWARE

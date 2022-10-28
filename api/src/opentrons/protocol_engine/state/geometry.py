@@ -308,28 +308,5 @@ class GeometryView:
         The returned value is measured in millimeters above the labware base plane.
         """
         labware_id = self._labware.get_id_by_module(module_id)
-        if labware_id is None:
-            raise errors.exceptions.InvalidMagnetEngageHeightError(
-                "There is no labware loaded on this Magnetic Module,"
-                " so you must specify an engage height"
-                " with the `height` or `height_from_base` parameter."
-            )
 
-        default_height = self._labware.get_default_magnet_height(labware_id)
-        if default_height is None:
-            raise errors.exceptions.InvalidMagnetEngageHeightError(
-                "The labware loaded on this Magnetic Module"
-                " does not have a default engage height,"
-                " so you must specify an engage height"
-                " with the `height` or `height_from_base` parameter."
-            )
-
-        if (
-            self._labware.is_magnetic_module_uri_in_half_millimeter(labware_id)
-            and not preserve_half_mm
-        ):
-            # TODO(mc, 2022-09-26): this value likely _also_ needs a few mm subtracted
-            # https://opentrons.atlassian.net/browse/RSS-111
-            return default_height / 2.0
-
-        return default_height
+        return self._labware.get_default_magnet_height(labware_id)
