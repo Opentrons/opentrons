@@ -475,7 +475,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     ) -> None:
         """Set the target temperature for the well block, in °C.
 
-        :param temperature: A value between 4 and 99, representing the target 
+        :param temperature: A value between 4 and 99, representing the target
                             temperature in °C.
         :param hold_time_minutes: The number of minutes to hold, after reaching
                                   ``temperature``, before proceeding to the
@@ -485,8 +485,8 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
                                   ``temperature``, before proceeding to the
                                   next command. If ``hold_time_minutes`` is also
                                   specified, the times are added together.
-        :param block_max_volume: The greatest volume of liquid contained in any 
-                                 individual well of the loaded labware, in µL. 
+        :param block_max_volume: The greatest volume of liquid contained in any
+                                 individual well of the loaded labware, in µL.
                                  If not specified, the default is 25 µL.
 
         .. note:
@@ -510,7 +510,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     def set_lid_temperature(self, temperature: float) -> None:
         """Set the target temperature for the heated lid, in °C.
 
-        :param temperature: A value between 37 and 110, representing the target 
+        :param temperature: A value between 37 and 110, representing the target
                             temperature in °C.
 
         .. note:
@@ -539,8 +539,8 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
                       method with keys ``temperature``, ``hold_time_seconds``,
                       and ``hold_time_minutes``.
         :param repetitions: The number of times to repeat the cycled steps.
-        :param block_max_volume: The greatest volume of liquid contained in any 
-                                 individual well of the loaded labware, in µL. 
+        :param block_max_volume: The greatest volume of liquid contained in any
+                                 individual well of the loaded labware, in µL.
                                  If not specified, the default is 25 µL.
 
         .. note:
@@ -588,7 +588,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     @requires_version(2, 0)
     def block_temperature_status(self) -> str:
         """One of five possible temperature statuses:
-        
+
         - ``holding at target``: The module has reached its target temperature
             and is actively maintaining that temperature.
         - ``cooling``: The module has previously heated and is now passively cooling.
@@ -603,7 +603,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     @requires_version(2, 0)
     def lid_temperature_status(self) -> Optional[str]:
         """One of five possible temperature statuses:
-        
+
         - ``holding at target``: The module has reached its target temperature
             and is actively maintaining that temperature.
         - ``cooling``: The module has previously heated and is now passively cooling.
