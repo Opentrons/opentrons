@@ -1,6 +1,8 @@
 import { SECTIONS, FLOWS } from './constants'
 import { useCreateCommandMutation } from '@opentrons/react-api-client'
 import { PipetteMount } from '@opentrons/shared-data'
+import { CreateCommand } from '@opentrons/shared-data'
+import { AttachedPipettesByMount } from '../../redux/pipettes/types'
 
 export type PipetteWizardStep =
   | BeforeBeginningStep
@@ -48,6 +50,10 @@ export type CreateRunCommand = (
 export interface PipetteWizardStepProps {
   flowType: PipetteWizardFlow
   mount: PipetteMount
-  proceed?: () => void
-  goBack?: () => void
+  proceed: () => void
+  goBack: () => void
+  chainRunCommands: (commands: CreateCommand[]) => Promise<unknown>
+  isRobotMoving: boolean
+  runId: string
+  attachedPipette: AttachedPipettesByMount
 }
