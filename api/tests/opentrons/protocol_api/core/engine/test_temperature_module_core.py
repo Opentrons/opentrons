@@ -65,7 +65,7 @@ def test_wait_for_target_temperature(
     subject.wait_for_target_temperature()
 
     decoy.verify(
-        mock_engine_client.temperature_wait_for_target_temperature(
+        mock_engine_client.temperature_module_wait_for_target_temperature(
             module_id="1234", celsius=None
         )
     )
