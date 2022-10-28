@@ -486,7 +486,7 @@ def test_temperature_wait_for_target_temperature(
     assert result == response
 
 
-def test_temperature_deactivate(
+def test_temperature_module_deactivate(
     decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
 ) -> None:
     """Should execute a PE deactivate temperature command."""
