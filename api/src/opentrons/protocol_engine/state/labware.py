@@ -50,6 +50,7 @@ _MAGDECK_HALF_MM_LABWARE = {
     "opentrons/usascientific_96_wellplate_2.4ml_deep/1",
 }
 
+
 @dataclass
 class LabwareState:
     """State of all loaded labware resources."""
@@ -479,5 +480,6 @@ class LabwareView(HasState[LabwareState]):
         )
 
     def is_mag_deck_uri_in_half_mil(self, labware_id: str) -> bool:
+        """Check whether the labware uri needs to be calculated in half a millimeter."""
         uri = self.get_definition_uri(labware_id)
         return uri in _MAGDECK_HALF_MM_LABWARE

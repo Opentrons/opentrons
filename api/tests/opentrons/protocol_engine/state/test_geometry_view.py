@@ -764,3 +764,55 @@ def test_get_ancestor_slot_name(
         DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
     )
     assert subject.get_ancestor_slot_name("labware-2") == DeckSlotName.SLOT_1
+
+
+def test_get_default_magnet_engage_height(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    subject: GeometryView,
+) -> None:
+    """Should return the default magnet engage height."""
+    decoy.when(labware_view.get_id_by_module("module-id")).then_return("labware-id")
+
+    decoy.when(labware_view.get_default_magnet_height("labware-id")).then_return(6.0)
+
+    decoy.when(labware_view.is_mag_deck_uri_in_half_mil("labware-id")).then_return(True)
+
+    result = subject.get_default_magnet_engage_height(
+        module_id="module-id", preserve_half_mm=False
+    )
+
+    assert result == 3.0
+
+
+def test_get_default_magnet_engage_height_raises_error_when_no_labware(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    subject: GeometryView,
+) -> None:
+    """Should raise an error that the labware was not found."""
+    decoy.when(labware_view.get_id_by_module("module-id")).then_return(None)
+
+    with pytest.raises(errors.exceptions.InvalidMagnetEngageHeightError):
+        subject.get_default_magnet_engage_height(
+            module_id="module-id", preserve_half_mm=False
+        )
+
+
+def test_get_default_magnet_engage_height_raises_error_when_no_default_height(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    subject: GeometryView,
+) -> None:
+    """Should raise an error that the labware was not found."""
+    decoy.when(labware_view.get_id_by_module("module-id")).then_return("labware-id")
+
+    decoy.when(labware_view.get_default_magnet_height("labware-id")).then_return(None)
+
+    with pytest.raises(errors.exceptions.InvalidMagnetEngageHeightError):
+        subject.get_default_magnet_engage_height(
+            module_id="module-id", preserve_half_mm=False
+        )
