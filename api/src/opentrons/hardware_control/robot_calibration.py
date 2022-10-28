@@ -187,7 +187,14 @@ def load_attitude_matrix() -> DeckCalibration:
             calibration_data = get_robot_deck_attitude()
 
     if calibration_data:
-        return DeckCalibration(**calibration_data.dict())
+        return DeckCalibration(
+            attitude=calibration_data.attitude,
+            source=calibration_data.source,
+            status=types.CalibrationStatus(**calibration_data.status.dict()),
+            last_modified=calibration_data.last_modified,
+            pipette_calibrated_with=calibration_data.pipette_calibrated_with,
+            tiprack=calibration_data.tiprack,
+        )
     else:
         # load default if deck calibration data do not exist
         return DeckCalibration(
