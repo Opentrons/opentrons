@@ -499,6 +499,6 @@ def test_temperature_deactivate(
 
     decoy.when(transport.execute_command(request=request)).then_return(response)
 
-    result = subject.temperature_deactivate(module_id="module-id")
+    result = subject.temperature_module_deactivate(module_id="module-id")
 
     assert result == response
