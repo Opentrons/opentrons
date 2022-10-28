@@ -140,5 +140,6 @@
   "labware_latch": "Labware Latch",
   "multiple_modules": "Multiple modules of the same type",
   "view_moam": "View setup instructions for placing modules of the same type to the robot.",
-  "secure": "Secure"
+  "secure": "Secure",
+  "additional_off_deck_labware": "Additional Off-Deck Labware"
 }
