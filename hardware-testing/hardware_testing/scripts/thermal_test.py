@@ -20,8 +20,8 @@ SPEED_X = 600
 SPEED_Y = 600
 SPEED_Z = 150
 
-ACCEL_X = 1500
-ACCEL_Y = 1500
+ACCEL_X = 1000
+ACCEL_Y = 1000
 ACCEL_Z = 400
 
 
@@ -90,6 +90,7 @@ async def _thermal_test(api: OT3API, cycles: int = 1) -> None:
     print(home_pos_right)
 
     for _ in range(cycles):
+        print(_)
         if (AXIS == 'g'):
             await api.move_rel(mount=OT3Mount.LEFT,
                                delta=Point(x=-step_x,
