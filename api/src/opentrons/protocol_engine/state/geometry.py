@@ -325,7 +325,7 @@ class GeometryView:
             )
 
         if (
-            self._labware.is_mag_deck_uri_in_half_mil(labware_id)
+            self._labware.is_magnetic_module_uri_in_half_millimeter(labware_id)
             and not preserve_half_mm
         ):
             # TODO(mc, 2022-09-26): this value likely _also_ needs a few mm subtracted
