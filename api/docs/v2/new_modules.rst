@@ -408,7 +408,7 @@ If you only specify a ``temperature`` in °C, the Thermocycler will hold this te
 Hold Time
 ---------
 
-You can optionally instruct the Thermocycler to hold its block temperature for a specific amount of time. You can specify ``hold_time_minutes``, ``hold_time_seconds``, or both (in which case they will be added). For example, this will set the block to 4 °C for 4 minutes and 15 seconds:
+You can optionally instruct the Thermocycler to hold its block temperature for a specific amount of time. You can specify ``hold_time_minutes``, ``hold_time_seconds``, or both (in which case they will be added together). For example, this will set the block to 4 °C for 4 minutes and 15 seconds:
 
 .. code-block:: python
 
@@ -482,103 +482,14 @@ However, this code would generate 60 lines in the protocol's run log, while exec
 
 .. versionadded:: 2.0
 
-Thermocycler Status
-===================
-
-Throughout your protocol, you may want particular information on the current status of your Thermocycler. Below are
-a few methods that allow you to do that.
-
-Basic Status
-------------
-
-..
-    TODO(mm, 2021-09-30): We should be able to cross-reference to ThermocyclerContext.status, but it appears to not actually exist?
-
-The ``ThermocyclerContext.status`` property is one of the strings ``‘holding at target’``, ``‘cooling’``, ``‘heating’``, or ``‘idle’``.
-
-.. code-block:: python
-
-    tc_mod.status
-
-.. versionadded:: 2.0
-
-Lid Position
-------------
-
-The current status of the lid position. It can be one of the strings ``'open'``, ``'closed'`` or ``'in_between'``.
-
-.. code-block:: python
-
-    tc_mod.lid_position
-
-.. versionadded:: 2.0
-
-Heated Lid Temperature Status
------------------------------
-
-The current status of the heated lid temperature controller. It can be one of the strings ``'holding at target'``, ``'heating'``, ``'idle'``,  or ``'error'``.
-
-.. code-block:: python
-
-    tc_mod.lid_temperature_status
-
-.. versionadded:: 2.0
-
-Block Temperature Status
-------------------------
-
-The current status of the well block temperature controller. It can be one of the strings ``'holding at target'``, ``'cooling'``, ``'heating'``, ``'idle'``, or ``'error'``.
-
-.. code-block:: python
-
-    tc_mod.block_temperature_status
-
-.. versionadded:: 2.0
-
-.. _thermocycler-deactivation:
-
-Thermocycler Deactivate
-=======================
-
-At some points in your protocol, you may want to deactivate specific temperature controllers of your Thermocycler. This can be done with three methods,
-:py:meth:`.ThermocyclerContext.deactivate`, :py:meth:`.ThermocyclerContext.deactivate_lid`, :py:meth:`.ThermocyclerContext.deactivate_block`.
-
-Deactivate
-----------
-
-This deactivates both the well block and the heated lid of the Thermocycler.
-
-.. code-block:: python
-
-  tc_mod.deactivate()
-
-Deactivate Lid
---------------
-
-This deactivates only the heated lid of the Thermocycler.
-
-.. code-block:: python
-
-  tc_mod.deactivate_lid()
-
-.. versionadded:: 2.0
-
-Deactivate Block
-----------------
-
-This deactivates only the well block of the Thermocycler.
-
-.. code-block:: python
-
-  tc_mod.deactivate_block()
-
-.. versionadded:: 2.0
-
 
 Changes with the GEN2 Thermocycler Module
 =========================================
 
-TK
+All methods of :py:class:`.ThermocyclerContext` work with both the GEN1 and GEN2 Thermocycler. One difference is that the GEN2 module has an automatic plate lift feature. When executing :py:meth:`~.ThermocyclerContext.open_lid`,  the GEN2 module physically moves the loaded plate upward to make it easier to remove the plate from the module.
+
+.. versionchanged: 2.14
+
 
 .. _heater-shaker-module:
 
