@@ -466,7 +466,7 @@ def test_temperature_set_target_temperature(
     assert result == response
 
 
-def test_temperature_wait_for_target_temperature(
+def test_temperature_module_wait_for_target_temperature(
     decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
 ) -> None:
     """Should execute a PE wait_for_target_temperature command."""
