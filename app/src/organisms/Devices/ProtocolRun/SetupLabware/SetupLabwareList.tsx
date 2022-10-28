@@ -104,19 +104,21 @@ export function SetupLabwareList(
             </StyledTableHeader>
           </tr>
         </thead>
-        {labwareCommandsInOrder.map((command, index) =>
-          command != null ? (
-            <LabwareListItem
-              attachedModuleInfo={attachedModuleInfo}
-              key={`${command.id}_${index}`}
-              extraAttentionModules={extraAttentionModules}
-              id={index}
-              runId={runId}
-              params={command.params as LoadLabwareRunTimeCommand['params']}
-              definition={command.result.definition}
-            />
-          ) : null
-        )}
+        <tbody >
+          {labwareCommandsInOrder.map((command, index) =>
+            command != null ? (
+              <LabwareListItem
+                attachedModuleInfo={attachedModuleInfo}
+                key={`${command.id}_${index}`}
+                extraAttentionModules={extraAttentionModules}
+                id={index}
+                runId={runId}
+                params={command.params as LoadLabwareRunTimeCommand['params']}
+                definition={command.result.definition}
+              />
+            ) : null
+          )}
+        </tbody>
       </StyledTable>
     </Flex>
   )
@@ -218,7 +220,7 @@ export function LabwareListItem(
         )
         const matchingHeaterShaker =
           attachedModuleInfo != null &&
-          attachedModuleInfo[moduleIdFromProtocol] != null
+            attachedModuleInfo[moduleIdFromProtocol] != null
             ? attachedModuleInfo[moduleIdFromProtocol].attachedModuleMatch
             : null
         if (
@@ -252,86 +254,72 @@ export function LabwareListItem(
   }
   return (
     <>
-      <tbody css={LABWARE_CARD_STYLE}>
-        <StyledTableRow key={id}>
-          <StyledTableCell
-            css={css`
+      <StyledTableRow key={id}>
+        <StyledTableCell
+          css={css`
               width: 50%;
             `}
-          >
-            <Flex flexDirection={DIRECTION_ROW}>
-              <Flex width="4.1rem" height="3.6rem">
-                <RobotWorkSpace
-                  data-testid={`${id}_${runId}`}
-                  key={id}
-                  viewBox={`0 0 ${definition.dimensions.xDimension} ${definition.dimensions.yDimension}`}
-                >
-                  {() => <LabwareRender definition={definition} />}
-                </RobotWorkSpace>
-              </Flex>
-              <Flex
-                flexDirection={DIRECTION_COLUMN}
-                justifyContent={JUSTIFY_CENTER}
-                marginLeft={SPACING.spacing4}
+        >
+          <Flex flexDirection={DIRECTION_ROW}>
+            <Flex width="4.1rem" height="3.6rem">
+              <RobotWorkSpace
+                data-testid={`${id}_${runId}`}
+                key={id}
+                viewBox={`0 0 ${definition.dimensions.xDimension} ${definition.dimensions.yDimension}`}
               >
-                <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-                  {labwareDisplayName}
-                </StyledText>
-                <StyledText as="p" color={COLORS.darkGreyEnabled}>
-                  {/* params.displayName is the nickName, different from labareDisplayName */}
-                  {params.displayName !== null &&
+                {() => <LabwareRender definition={definition} />}
+              </RobotWorkSpace>
+            </Flex>
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              justifyContent={JUSTIFY_CENTER}
+              marginLeft={SPACING.spacing4}
+            >
+              <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                {labwareDisplayName}
+              </StyledText>
+              <StyledText as="p" color={COLORS.darkGreyEnabled}>
+                {/* params.displayName is the nickName, different from labareDisplayName */}
+                {params.displayName !== null &&
                   params.displayName !== labwareDisplayName
-                    ? params.displayName
-                    : null}
-                </StyledText>
+                  ? params.displayName
+                  : null}
+              </StyledText>
+            </Flex>
+          </Flex>
+        </StyledTableCell>
+        <StyledTableCell>
+          <StyledText as="p">{slotInfo}</StyledText>
+          {extraAttentionText != null ? extraAttentionText : null}
+        </StyledTableCell>
+        {isHeaterShakerInProtocol ? (
+          <StyledTableCell>
+            <Flex marginLeft="0.75rem" flexDirection={DIRECTION_COLUMN}>
+              <StyledText as="h6" minWidth="4.62rem">
+                {t('labware_latch')}
+              </StyledText>
+              <Flex flexDirection={DIRECTION_ROW}>
+                <ToggleButton
+                  label={`heaterShaker_${id}`}
+                  disabled={!isCorrectHeaterShakerAttached}
+                  toggledOn={isLatchClosed}
+                  onClick={toggleLatch}
+                  data-testId={`SetupLabwareList_toggleHeaterShaker_${id}`}
+                />
+                {isLatchClosed ? (
+                  <StyledText
+                    as="p"
+                    marginTop={SPACING.spacing1}
+                    marginLeft={SPACING.spacing2}
+                  >
+                    {t('secure')}
+                  </StyledText>
+                ) : null}
               </Flex>
             </Flex>
           </StyledTableCell>
-          <StyledTableCell>
-            <>
-              <StyledText as="p">{slotInfo}</StyledText>
-              {extraAttentionText != null ? extraAttentionText : null}
-            </>
-          </StyledTableCell>
-          {isHeaterShakerInProtocol ? (
-            <StyledTableCell>
-              <Flex marginLeft="0.75rem" flexDirection={DIRECTION_COLUMN}>
-                <StyledText as="h6" minWidth="4.62rem">
-                  {t('labware_latch')}
-                </StyledText>
-                <Flex flexDirection={DIRECTION_ROW}>
-                  <ToggleButton
-                    label={`heaterShaker_${id}`}
-                    disabled={!isCorrectHeaterShakerAttached}
-                    toggledOn={isLatchClosed}
-                    onClick={toggleLatch}
-                    data-testId={`SetupLabwareList_toggleHeaterShaker_${id}`}
-                  />
-                  {isLatchClosed ? (
-                    <StyledText
-                      as="p"
-                      marginTop={SPACING.spacing1}
-                      marginLeft={SPACING.spacing2}
-                    >
-                      {t('secure')}
-                    </StyledText>
-                  ) : null}
-                </Flex>
-              </Flex>
-            </StyledTableCell>
-          ) : null}
-        </StyledTableRow>
-      </tbody>
-      <tbody>
-        {/* TODO(jr, 10/17/22): find a way to add a border to a table row (tr). Right now,
-        we are faking it with a box-shadow and this StyledTableRow  */}
-        <StyledTableRow
-          key={`StyledTableRow_${id}`}
-          css={css`
-            height: ${SPACING.spacing2};
-          `}
-        />
-      </tbody>
+        ) : null}
+      </StyledTableRow>
       {secureLabwareModalType != null && (
         <SecureLabwareModal
           type={secureLabwareModalType as ModuleTypesThatRequiresExtraAttention}
