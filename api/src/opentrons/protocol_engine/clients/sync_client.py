@@ -281,7 +281,7 @@ class SyncClient:
         result = self._transport.execute_command(request=request)
         return cast(commands.thermocycler.CloseLidResult, result)
 
-    def temperature_set_target_temperature(
+    def temperature_module_set_target_temperature(
         self, module_id: str, celsius: float
     ) -> commands.temperature_module.SetTargetTemperatureResult:
         """Execute a `temperatureModule/setTargetTemperature` command and return the result."""
