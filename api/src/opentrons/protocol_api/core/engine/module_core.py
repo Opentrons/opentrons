@@ -99,7 +99,7 @@ class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore[LabwareCor
 
     def set_target_temperature(self, celsius: float) -> None:
         """Set the Temperature Module's target temperature in °C."""
-        self._engine_client.temperature_set_target_temperature(
+        self._engine_client.temperature_module_set_target_temperature(
             module_id=self.module_id, celsius=celsius
         )
 
