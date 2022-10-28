@@ -147,7 +147,10 @@ def test_execute_profile(
     decoy.verify(
         mock_engine_client.thermocycler_run_profile(
             module_id="1234",
-            steps=[{"temperature": 45.6, "hold_time_seconds": 12.3}],
+            steps=[
+                {"temperature": 45.6, "hold_time_seconds": 12.3},
+                {"temperature": 45.6, "hold_time_seconds": 12.3},
+            ],
             block_max_volume=78.9,
         )
     )
@@ -290,34 +293,25 @@ def test_get_hold_time(
     assert result == 13.37
 
 
-def test_get_total_cycle_count(
-    decoy: Decoy,
-    mock_sync_module_hardware: SyncThermocyclerHardware,
+def test_cycle_counting(
     subject: ThermocyclerModuleCore,
 ) -> None:
-    """It should report the total cycle count."""
-    decoy.when(mock_sync_module_hardware.total_cycle_count).then_return(321)
-    result = subject.get_total_cycle_count()
-    assert result == 321
+    """It should keep track of cycle and step counts and indices."""
+    subject.execute_profile(
+        [
+            {"temperature": 45.6, "hold_time_seconds": 12.3},
+            {"temperature": 78.9, "hold_time_seconds": 45.6},
+        ],
+        repetitions=3,
+    )
+    assert subject.get_total_cycle_count() == 3
+    assert subject.get_current_cycle_index() == 4
+    assert subject.get_total_step_count() == 2
+    assert subject.get_current_step_index() == 3
 
+    subject.deactivate_block()
 
-def test_get_current_cycle_index(
-    decoy: Decoy,
-    mock_sync_module_hardware: SyncThermocyclerHardware,
-    subject: ThermocyclerModuleCore,
-) -> None:
-    """It should report the current cycle index."""
-    decoy.when(mock_sync_module_hardware.current_cycle_index).then_return(123)
-    result = subject.get_current_cycle_index()
-    assert result == 123
-
-
-def test_get_total_step_count(
-    decoy: Decoy,
-    mock_sync_module_hardware: SyncThermocyclerHardware,
-    subject: ThermocyclerModuleCore,
-) -> None:
-    """It should report the total step count."""
-    decoy.when(mock_sync_module_hardware.total_step_count).then_return(1337)
-    result = subject.get_total_step_count()
-    assert result == 1337
+    assert subject.get_total_cycle_count() is None
+    assert subject.get_current_cycle_index() is None
+    assert subject.get_total_step_count() is None
+    assert subject.get_current_step_index() is None

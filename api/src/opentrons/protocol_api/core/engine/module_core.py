@@ -175,6 +175,8 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
     """Core control interface for an attached Thermocycler Module."""
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.Thermocycler]
+    _repetitions: Optional[int] = None
+    _step_count: Optional[int] = None
 
     def open_lid(self) -> ThermocyclerLidStatus:
         """Open the Thermocycler's lid."""
@@ -222,8 +224,12 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
         block_max_volume: Optional[float] = None,
     ) -> None:
         """Execute a Thermocycler Profile."""
+        self._repetitions = repetitions
+        self._step_count = len(steps)
         self._engine_client.thermocycler_run_profile(
-            module_id=self.module_id, steps=steps, block_max_volume=block_max_volume
+            module_id=self.module_id,
+            steps=steps * repetitions,
+            block_max_volume=block_max_volume,
         )
 
     def deactivate_lid(self) -> None:
@@ -232,12 +238,13 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
 
     def deactivate_block(self) -> None:
         """Turn off the well block temperature controller"""
+        self._clear_cycle_counters()
         self._engine_client.thermocycler_deactivate_block(module_id=self.module_id)
 
     def deactivate(self) -> None:
         """Turn off the well block temperature controller, and heated lid"""
-        self._engine_client.thermocycler_deactivate_block(module_id=self.module_id)
-        self._engine_client.thermocycler_deactivate_lid(module_id=self.module_id)
+        self.deactivate_block()
+        self.deactivate_lid()
 
     def get_lid_position(self) -> Optional[ThermocyclerLidStatus]:
         """Get the thermocycler's lid position."""
@@ -277,19 +284,24 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
 
     def get_total_cycle_count(self) -> Optional[int]:
         """Get number of repetitions for current set cycle."""
-        return self._sync_module_hardware.total_cycle_count  # type: ignore[no-any-return]
+        return self._repetitions
 
     def get_current_cycle_index(self) -> Optional[int]:
         """Get index of the current set cycle repetition."""
-        return self._sync_module_hardware.current_cycle_index  # type: ignore[no-any-return]
+        return None if self._repetitions is None else self._repetitions + 1
 
     def get_total_step_count(self) -> Optional[int]:
         """Get number of steps within the current cycle."""
-        return self._sync_module_hardware.total_step_count  # type: ignore[no-any-return]
+        return self._step_count
 
     def get_current_step_index(self) -> Optional[int]:
         """Get the index of the current step within the current cycle."""
-        return self._sync_module_hardware.current_step_index  # type: ignore[no-any-return]
+        return None if self._step_count is None else self._step_count + 1
+
+    def _clear_cycle_counters(self) -> None:
+        """Clear core-tracked cycle counters."""
+        self._repetitions = None
+        self._step_count = None
 
 
 class HeaterShakerModuleCore(ModuleCore, AbstractHeaterShakerCore[LabwareCore]):
