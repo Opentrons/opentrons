@@ -564,8 +564,8 @@ def test_heater_shaker_deactivate_heater(
     result = subject.heater_shaker_deactivate_heater(module_id="module-id")
 
     assert result == response
-    
-    
+
+
 def test_temperature_module_set_target_temperature(
     decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
 ) -> None:
@@ -584,7 +584,7 @@ def test_temperature_module_set_target_temperature(
     result = subject.temperature_module_set_target_temperature(
         module_id="module-id", celsius=38.7
     )
-    
+
     assert result == response
 
 
@@ -602,10 +602,10 @@ def test_temperature_module_deactivate(
     decoy.when(transport.execute_command(request=request)).then_return(response)
 
     result = subject.temperature_module_deactivate(module_id="module-id")
-    
+
     assert result == response
-    
-    
+
+
 def test_temperature_module_wait_for_target_temperature(
     decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
 ) -> None:
@@ -622,5 +622,5 @@ def test_temperature_module_wait_for_target_temperature(
     result = subject.temperature_module_wait_for_target_temperature(
         module_id="module-id", celsius=38.7
     )
-    
+
     assert result == response
