@@ -19,8 +19,8 @@ async def main() -> None:
     print("ABOVE POINT = ", above_point)
     await api.move_to(mount, above_point)
 
-    print("UNREFRESHED:", await api.current_position_ot3(mount))
-    print("REFRESHED:", await api.current_position_ot3(mount, refresh=True))
+    print("UNREFRESHED = ", await api.current_position_ot3(mount))
+    print("REFRESHED = ", await api.current_position_ot3(mount, refresh=True))
     print("CURRENT = ", await api.gantry_position(mount))
     await api.move_to(mount, homed_position)
 
