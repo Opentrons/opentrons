@@ -144,8 +144,8 @@ class MagneticModuleContext:  # noqa: D101
 
         else:
             try:
-                default_height = state.labware.get_default_magnet_height(
-                    module_id=self._module_id
+                calculated_height = state.labware.get_default_magnet_height(
+                    module_id=self._module_id, offset=(0 if offset is None else offset)
                 )
             except LabwareNotLoadedOnModuleError:
                 raise InvalidMagnetEngageHeightError(
@@ -160,12 +160,6 @@ class MagneticModuleContext:  # noqa: D101
                     " so you must specify an engage height"
                     " with the `height` or `height_from_base` parameter."
                 )
-
-            calculated_height = state.modules.calculate_magnet_height(
-                module_model=model,
-                labware_default_height=default_height,
-                offset_from_labware_default=(0 if offset is None else offset),
-            )
 
         self._engine_client.magnetic_module_engage(
             module_id=self._module_id,

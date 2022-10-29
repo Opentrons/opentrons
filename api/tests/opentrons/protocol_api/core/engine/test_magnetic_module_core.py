@@ -85,18 +85,12 @@ def test_engage_to_labware(
     ).then_return(ModuleModel.MAGNETIC_MODULE_V1)
 
     decoy.when(
-        mock_engine_client.state.labware.get_default_magnet_height(module_id="1234")
-    ).then_return(3.0)
-
-    decoy.when(
-        mock_engine_client.state.modules.calculate_magnet_height(
-            module_model=ModuleModel.MAGNETIC_MODULE_V1,
-            labware_default_height=3.0,
-            offset_from_labware_default=0.6,
+        mock_engine_client.state.labware.get_default_magnet_height(
+            module_id="1234", offset=2.0
         )
     ).then_return(6.0)
 
-    subject.engage_to_labware(offset=0.6)
+    subject.engage_to_labware(offset=2.0)
 
     decoy.verify(
         mock_engine_client.magnetic_module_engage(module_id="1234", engage_height=6.0),
@@ -109,13 +103,15 @@ def test_engage_to_labware_raises_no_labware_error(
 ) -> None:
     """Should raise an error that the labware was not found."""
     decoy.when(
-        mock_engine_client.state.labware.get_default_magnet_height(module_id="1234")
+        mock_engine_client.state.labware.get_default_magnet_height(
+            module_id="1234", offset=0
+        )
     ).then_raise(
         LabwareNotLoadedOnModuleError  # type: ignore[arg-type]
     )
 
     with pytest.raises(InvalidMagnetEngageHeightError, match="no labware loaded"):
-        subject.engage_to_labware(offset=0.6)
+        subject.engage_to_labware(offset=0)
 
 
 def test_engage_to_labware_raises_no_height_error(
@@ -123,7 +119,9 @@ def test_engage_to_labware_raises_no_height_error(
 ) -> None:
     """Should raise an error that the a magnetic default height was not found."""
     decoy.when(
-        mock_engine_client.state.labware.get_default_magnet_height(module_id="1234")
+        mock_engine_client.state.labware.get_default_magnet_height(
+            module_id="1234", offset=0
+        )
     ).then_raise(
         NoMagnetEngageHeightError  # type: ignore[arg-type]
     )
@@ -131,7 +129,7 @@ def test_engage_to_labware_raises_no_height_error(
     with pytest.raises(
         InvalidMagnetEngageHeightError, match="does not have a default engage height"
     ):
-        subject.engage_to_labware(offset=0.6)
+        subject.engage_to_labware(offset=0)
 
 
 def test_disengage(

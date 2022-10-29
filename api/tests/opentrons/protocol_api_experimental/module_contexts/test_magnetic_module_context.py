@@ -2,6 +2,7 @@
 
 from decoy import Decoy
 import pytest
+from typing import Optional
 
 from opentrons.protocols.models import LabwareDefinition
 
@@ -208,7 +209,7 @@ def test_engage_with_offset(
 
     decoy.when(
         engine_client.state.labware.get_default_magnet_height(
-            module_id=subject_module_id
+            module_id=subject_module_id, offset=0
         )
     ).then_return(1.23)
 
@@ -240,7 +241,7 @@ def test_engage_with_no_arguments(
 
     decoy.when(
         engine_client.state.labware.get_default_magnet_height(
-            module_id=subject_module_id
+            module_id=subject_module_id, offset=0
         )
     ).then_return(1.23)
 
@@ -268,7 +269,7 @@ def test_engage_based_on_labware_errors_when_no_labware_loaded(
     """It should raise when there is no labware loaded on the module."""
     decoy.when(
         engine_client.state.labware.get_default_magnet_height(
-            module_id=subject_module_id
+            module_id=subject_module_id, offset=0
         )
     ).then_raise(
         LabwareNotLoadedOnModuleError  # type: ignore[arg-type]
@@ -283,16 +284,19 @@ def test_engage_based_on_labware_errors_when_no_labware_loaded(
         subject.engage()
 
 
+@pytest.mark.parametrize("input_offset, output_offset", [(0, 0), (1.23, 1.23), (None, 0)])
 def test_engage_based_on_labware_errors_when_labware_has_no_default_height(
     decoy: Decoy,
     engine_client: SyncClient,
     subject_module_id: str,
     subject: MagneticModuleContext,
+    input_offset: Optional[float],
+    output_offset: float,
 ) -> None:
     """It should raise when there is a labware, but it has no default magnet height."""
     decoy.when(
         engine_client.state.labware.get_default_magnet_height(
-            module_id=subject_module_id
+            module_id=subject_module_id, offset=output_offset
         )
     ).then_raise(
         NoMagnetEngageHeightError  # type: ignore[arg-type]
@@ -300,11 +304,7 @@ def test_engage_based_on_labware_errors_when_labware_has_no_default_height(
 
     expected_exception_text = "does not have a default"
     with pytest.raises(InvalidMagnetEngageHeightError, match=expected_exception_text):
-        subject.engage(offset=1.23)
-    with pytest.raises(InvalidMagnetEngageHeightError, match=expected_exception_text):
-        subject.engage(offset=0)
-    with pytest.raises(InvalidMagnetEngageHeightError, match=expected_exception_text):
-        subject.engage()
+        subject.engage(offset=input_offset)
 
 
 @pytest.mark.xfail(strict=True, raises=NotImplementedError)

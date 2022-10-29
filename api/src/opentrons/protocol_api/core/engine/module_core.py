@@ -175,8 +175,7 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
         try:
             default_height = (
                 self._engine_client.state.labware.get_default_magnet_height(
-                    module_id=self.module_id,
-                    offset=offset
+                    module_id=self.module_id, offset=offset
                 )
             )
         except LabwareNotLoadedOnModuleError:

@@ -415,9 +415,11 @@ class LabwareView(HasState[LabwareState]):
         if self._is_magnetic_module_uri_in_half_millimeter(labware_id):
             # TODO(mc, 2022-09-26): this value likely _also_ needs a few mm subtracted
             # https://opentrons.atlassian.net/browse/RSS-111
-            return default_engage_height / 2.0 + offset
+            calculated_height = default_engage_height / 2.0
+        else:
+            calculated_height = default_engage_height
 
-        return default_engage_height + offset
+        return calculated_height + offset
 
     def get_labware_offset_vector(self, labware_id: str) -> LabwareOffsetVector:
         """Get the labware's calibration offset."""
