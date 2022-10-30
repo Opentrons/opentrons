@@ -238,7 +238,9 @@ def test_engage_with_no_arguments(
     )
 
 
-@pytest.mark.parametrize("input_offset, output_offset", [(0, 0), (1.23, 1.23), (None, 0)])
+@pytest.mark.parametrize(
+    "input_offset, output_offset", [(0, 0), (1.23, 1.23), (None, 0)]
+)
 def test_engage_based_on_labware_errors_when_no_labware_loaded(
     decoy: Decoy,
     engine_client: SyncClient,
@@ -261,7 +263,9 @@ def test_engage_based_on_labware_errors_when_no_labware_loaded(
         subject.engage(offset=input_offset)
 
 
-@pytest.mark.parametrize("input_offset, output_offset", [(0, 0), (1.23, 1.23), (None, 0)])
+@pytest.mark.parametrize(
+    "input_offset, output_offset", [(0, 0), (1.23, 1.23), (None, 0)]
+)
 def test_engage_based_on_labware_errors_when_labware_has_no_default_height(
     decoy: Decoy,
     engine_client: SyncClient,
