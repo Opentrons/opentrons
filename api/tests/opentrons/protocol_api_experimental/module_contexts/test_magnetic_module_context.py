@@ -204,26 +204,15 @@ def test_engage_with_offset(
 ) -> None:
     """It should use the offset combined with the labware's default engage height."""
     decoy.when(
-        engine_client.state.modules.get_model(module_id=subject_module_id)
-    ).then_return(ModuleModel.MAGNETIC_MODULE_V1)
-
-    decoy.when(
         engine_client.state.labware.get_default_magnet_height(
-            module_id=subject_module_id, offset=0
+            module_id=subject_module_id, offset=4.56
         )
-    ).then_return(1.23)
+    ).then_return(7.23)
 
-    decoy.when(
-        engine_client.state.modules.calculate_magnet_height(
-            module_model=ModuleModel.MAGNETIC_MODULE_V1,
-            labware_default_height=1.23,
-            offset_from_labware_default=4.56,
-        )
-    ).then_return(7.89)
     subject.engage(offset=4.56)
     decoy.verify(
         engine_client.magnetic_module_engage(
-            module_id=subject_module_id, engage_height=7.89
+            module_id=subject_module_id, engage_height=7.23
         )
     )
 
@@ -236,40 +225,32 @@ def test_engage_with_no_arguments(
 ) -> None:
     """It should use the default engage height from the labware."""
     decoy.when(
-        engine_client.state.modules.get_model(module_id=subject_module_id)
-    ).then_return(ModuleModel.MAGNETIC_MODULE_V1)
-
-    decoy.when(
         engine_client.state.labware.get_default_magnet_height(
             module_id=subject_module_id, offset=0
         )
     ).then_return(1.23)
 
-    decoy.when(
-        engine_client.state.modules.calculate_magnet_height(
-            module_model=ModuleModel.MAGNETIC_MODULE_V1,
-            labware_default_height=1.23,
-            offset_from_labware_default=0,
-        )
-    ).then_return(7.89)
     subject.engage()
     decoy.verify(
         engine_client.magnetic_module_engage(
-            module_id=subject_module_id, engage_height=7.89
+            module_id=subject_module_id, engage_height=1.23
         )
     )
 
 
+@pytest.mark.parametrize("input_offset, output_offset", [(0, 0), (1.23, 1.23), (None, 0)])
 def test_engage_based_on_labware_errors_when_no_labware_loaded(
     decoy: Decoy,
     engine_client: SyncClient,
     subject_module_id: str,
     subject: MagneticModuleContext,
+    input_offset: Optional[float],
+    output_offset: float,
 ) -> None:
     """It should raise when there is no labware loaded on the module."""
     decoy.when(
         engine_client.state.labware.get_default_magnet_height(
-            module_id=subject_module_id, offset=0
+            module_id=subject_module_id, offset=output_offset
         )
     ).then_raise(
         LabwareNotLoadedOnModuleError  # type: ignore[arg-type]
@@ -277,11 +258,7 @@ def test_engage_based_on_labware_errors_when_no_labware_loaded(
 
     expected_exception_text = "no labware loaded"
     with pytest.raises(InvalidMagnetEngageHeightError, match=expected_exception_text):
-        subject.engage(offset=1.23)
-    with pytest.raises(InvalidMagnetEngageHeightError, match=expected_exception_text):
-        subject.engage(offset=0)
-    with pytest.raises(InvalidMagnetEngageHeightError, match=expected_exception_text):
-        subject.engage()
+        subject.engage(offset=input_offset)
 
 
 @pytest.mark.parametrize("input_offset, output_offset", [(0, 0), (1.23, 1.23), (None, 0)])
