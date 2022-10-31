@@ -48,6 +48,7 @@ class Capacitive_Probe_Test:
         )
         self.test_data ={
             "Time":None,
+            "Cycle":None,
             "Z Height":None,
             "X Right":None,
             "X Left":None,
@@ -95,7 +96,7 @@ class Capacitive_Probe_Test:
         return point
 
     async def _probe_sequence(
-        self, api: OT3API, mount: OT3Mount
+        self, api: OT3API, mount: OT3Mount, cycle: int
     ) -> None:
         # Home grantry
         await home_ot3(api, self.axes)
@@ -142,6 +143,7 @@ class Capacitive_Probe_Test:
         # Save data to file
         elapsed_time = time.time() - self.start_time
         self.test_data["Time"] = str(round(elapsed_time, 3))
+        self.test_data["Cycle"] = str(cycle)
         test_data = self.dict_values_to_line(self.test_data)
         data.append_data_to_file(self.test_name, self.test_file, test_data)
 
@@ -162,9 +164,9 @@ class Capacitive_Probe_Test:
     async def run(self) -> None:
         try:
             await self.test_setup()
-            for c in range(self.cycles):
-                print(f"\n--> Starting Cycle {c + 1}/{self.cycles}")
-                await self._probe_sequence(self.api, self.mount)
+            for cycle in range(self.cycles):
+                print(f"\n--> Starting Cycle {cycle + 1}/{self.cycles}")
+                await self._probe_sequence(self.api, self.mount, cycle)
         except Exception as e:
             await self.exit()
             raise e
