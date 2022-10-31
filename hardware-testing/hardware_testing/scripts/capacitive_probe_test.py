@@ -29,6 +29,7 @@ class Capacitive_Probe_Test:
         self.simulate = simulate
         self.cycles = cycles
         self.axes = [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R]
+        self.SAFE_HEIGHT = 10
         self.PROBE_LENGTH = 34.5
         self.CUTOUT_SIZE = 20
         self.CUTOUT_HALF = self.CUTOUT_SIZE / 2
@@ -52,8 +53,10 @@ class Capacitive_Probe_Test:
             "Z Height":None,
             "X Right":None,
             "X Left":None,
+            "X Center":None,
             "Y Back":None,
             "Y Front":None,
+            "Y Center":None,
         }
 
     async def test_setup(self):
@@ -107,7 +110,6 @@ class Capacitive_Probe_Test:
         await api.move_to(mount, above_point)
 
         # Probe deck Z-Axis height
-        # deck_z = 0.25
         deck_z = await self._probe_axis(OT3Axis.by_mount(mount), self.CENTER_Z.z)
         print(f"Deck Z-Axis height = {deck_z} mm")
         self.test_data["Z Height"] = str(round(deck_z, 3))
@@ -141,15 +143,19 @@ class Capacitive_Probe_Test:
         self.test_data["Y Front"] = str(round(y_front, 3))
 
         # Save data to file
-        elapsed_time = time.time() - self.start_time
+        elapsed_time = (time.time() - self.start_time)/60
+        x_center = x_left + (x_right - x_left)/2
+        y_center = y_front + (y_back - y_front)/2
         self.test_data["Time"] = str(round(elapsed_time, 3))
         self.test_data["Cycle"] = str(cycle)
+        self.test_data["X Center"] = str(round(x_center, 3))
+        self.test_data["Y Center"] = str(round(y_center, 3))
         test_data = self.dict_values_to_line(self.test_data)
         data.append_data_to_file(self.test_name, self.test_file, test_data)
 
         # Home Z-Axis
         current_position = await api.gantry_position(mount)
-        safe_z = current_position._replace(z=deck_z + 10)
+        safe_z = current_position._replace(z=deck_z + self.SAFE_HEIGHT)
         home_z = current_position._replace(z=home_position.z)
         await api.move_to(mount, safe_z, speed=20)
         await api.move_to(mount, home_z)
