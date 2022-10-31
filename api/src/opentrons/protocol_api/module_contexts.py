@@ -572,7 +572,6 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
         """Turn off both the well block temperature controller and the lid heater."""
         self._core.deactivate()
 
-    # TODO(ec, 2022-10-31): what the `max` value means
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def lid_position(self) -> Optional[str]:
