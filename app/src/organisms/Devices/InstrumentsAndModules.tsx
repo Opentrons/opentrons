@@ -53,6 +53,10 @@ export function InstrumentsAndModules({
   const leftColumnModules = attachedModules?.slice(0, halfAttachedModulesSize)
   const rightColumnModules = attachedModules?.slice(halfAttachedModulesSize)
 
+  // TODO(bh, 2022-10-27): get gripper data, create interface
+  // const gripper = { model: null }
+  const gripper = { model: 'Opentrons Gripper GEN1' }
+
   return (
     <Flex
       alignItems={ALIGN_FLEX_START}
@@ -119,11 +123,24 @@ export function InstrumentsAndModules({
                 {/* extension mount here */}
                 {isOT3 ? (
                   <InstrumentCard
-                    description={t('shared:empty')}
-                    isGripper
-                    // TODO: localization
-                    label="extension mount"
-                    menuOverlayItems={[]}
+                    description={
+                      gripper.model != null ? gripper.model : t('shared:empty')
+                    }
+                    isGripperAttached={gripper.model != null}
+                    label={t('shared:extension_mount')}
+                    // TODO(bh, 2022-10-27): insert gripper recalibrate and detach functions, empty mount menu items
+                    menuOverlayItems={[
+                      {
+                        label: 'Recalibrate gripper',
+                        disabled: gripper.model == null,
+                        onClick: () => console.log('Recalibrate gripper'),
+                      },
+                      {
+                        label: 'Detach gripper',
+                        disabled: gripper.model == null,
+                        onClick: () => console.log('Detach gripper'),
+                      },
+                    ]}
                   />
                 ) : null}
                 {leftColumnModules.map((module, index) => (
@@ -160,10 +177,7 @@ export function InstrumentsAndModules({
             minHeight={SIZE_3}
             padding={SPACING.spacingSM}
           >
-            {/**
-             * TODO(bh, 2022-10-20): insert "offline" image when provided by illustrator
-             * <img width="105px" height="105px" src={opentronsLogo} />
-             *  */}
+            {/* TODO(bh, 2022-10-20): insert "offline" image when provided by illustrator */}
             <StyledText
               as="p"
               color={COLORS.errorDisabled}

@@ -14,8 +14,9 @@ import { Divider } from '../../atoms/structure'
 import type { StyleProps } from '@opentrons/components'
 
 export interface MenuOverlayItemProps {
-  children: React.ReactNode
+  label: React.ReactNode
   onClick: (e: React.MouseEvent) => unknown
+  disabled?: boolean
 }
 
 interface MenuOverlayProps extends StyleProps {
@@ -48,8 +49,11 @@ export function MenuOverlay(props: MenuOverlayProps): JSX.Element {
         <React.Fragment key={`menuItem_${i}`}>
           {/* insert a divider before the last item if desired */}
           {hasDivider && i === menuOverlayItems.length - 1 ? <Divider /> : null}
-          <MenuItem onClick={menuOverlayItem.onClick}>
-            {menuOverlayItem.children}
+          <MenuItem
+            disabled={menuOverlayItem.disabled}
+            onClick={menuOverlayItem.onClick}
+          >
+            {menuOverlayItem.label}
           </MenuItem>
         </React.Fragment>
       ))}

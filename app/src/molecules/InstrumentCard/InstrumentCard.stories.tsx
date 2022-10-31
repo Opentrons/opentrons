@@ -12,16 +12,59 @@ const Template: Story<React.ComponentProps<typeof InstrumentCard>> = args => (
   <InstrumentCard {...args} />
 )
 
-export const Primary = Template.bind({})
-Primary.args = {
+export const Attached = Template.bind({})
+Attached.args = {
   onClick: () => {},
   label: 'extension mount',
   description: 'Opentrons Gripper GEN1',
-  isGripper: true,
+  isGripperAttached: true,
   menuOverlayItems: [
     {
-      children: 'menu option',
-      onClick: () => console.log('item click'),
+      label: 'menu option 1',
+      onClick: () => console.log('item click 1'),
+    },
+    {
+      label: 'menu option 2',
+      onClick: () => console.log('item click 2'),
+    },
+  ],
+}
+
+export const Divider = Template.bind({})
+Divider.args = {
+  onClick: () => {},
+  label: 'extension mount',
+  description: 'Opentrons Gripper GEN1',
+  hasDivider: true,
+  isGripperAttached: true,
+  menuOverlayItems: [
+    {
+      label: 'menu option 1',
+      onClick: () => console.log('item click 1'),
+    },
+    {
+      label: 'menu option 2',
+      onClick: () => console.log('item click 2'),
+    },
+  ],
+}
+
+export const Empty = Template.bind({})
+Empty.args = {
+  onClick: () => {},
+  label: 'extension mount',
+  description: 'Empty',
+  isGripperAttached: false,
+  menuOverlayItems: [
+    {
+      label: 'menu option 1',
+      disabled: true,
+      onClick: () => console.log('item click 1'),
+    },
+    {
+      label: 'menu option 2',
+      disabled: true,
+      onClick: () => console.log('item click 2'),
     },
   ],
 }

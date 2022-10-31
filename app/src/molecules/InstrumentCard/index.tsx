@@ -27,19 +27,22 @@ interface InstrumentCardProps extends StyleProps {
   description: string
   label: string
   menuOverlayItems: MenuOverlayItemProps[]
+  hasDivider?: boolean
   instrumentDiagramProps?: InstrumentDiagramProps
-  isGripper?: boolean
+  // special casing the gripper at least for now
+  isGripperAttached?: boolean
 }
 
 /**
- * a design system component for a gripper or pipette instrument
- * TODO(bh, 2022-10-26): add banner section, use within PipetteCard component
+ * a component for a gripper or pipette instrument
+ * TODO(bh, 2022-10-26): explore adding banner section, using within PipetteCard component
  */
 export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
   const {
     description,
+    hasDivider = false,
     instrumentDiagramProps,
-    isGripper = false,
+    isGripperAttached = false,
     label,
     menuOverlayItems,
     ...styleProps
@@ -62,7 +65,7 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
       position={POSITION_RELATIVE}
       {...styleProps}
     >
-      {isGripper ? (
+      {isGripperAttached ? (
         // TODO(bh, 2022-10-26): temp "greyed-out" pipette image, update with gripper image when available
         <Flex
           justifyContent={JUSTIFY_CENTER}
@@ -116,6 +119,7 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
         {menuOverlay}
         {showOverflowMenu ? (
           <MenuOverlay
+            hasDivider={hasDivider}
             menuOverlayItems={menuOverlayItems}
             setShowMenuOverlay={setShowOverflowMenu}
           />
