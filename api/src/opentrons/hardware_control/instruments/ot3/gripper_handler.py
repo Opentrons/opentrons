@@ -60,6 +60,22 @@ class GripperHandler:
     def gripper(self, gripper: Optional[Gripper] = None) -> None:
         self._gripper = gripper
 
+    def reset_instrument_offset(self) -> None:
+        """
+        Tempoarily reset the gripper offsets to default values.
+        """
+        gripper = self.get_gripper()
+        gripper.reset_offset()
+
+    def save_instrument_offset(self, delta: Point) -> None:
+        """
+        Save a new instrument offset the pipette offset to a particular value.
+        :param mount: Modify the given mount.
+        :param delta: The offset to set for the pipette.
+        """
+        gripper = self.get_gripper()
+        gripper.save_offset(delta)
+
     def get_critical_point(self, cp_override: Optional[CriticalPoint] = None) -> Point:
         if not self._gripper:
             raise GripperNotAttachedError()

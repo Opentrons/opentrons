@@ -410,6 +410,8 @@ async def calibrate_mount(
     """
     # First, find the deck. This will become our z offset value, and will
     # also be used to baseline the edge detection points.
+    # reset instrument offset
+    await hcapi.reset_instrument_offset(mount)
     z_pos = await find_deck_position(hcapi, mount)
     LOG.info(f"Found deck at {z_pos}mm")
 
@@ -424,4 +426,7 @@ async def calibrate_mount(
     # the absolute sense value out-of-plane
     center = Point(x_center, y_center, z_pos)
     LOG.info(f"Found calibration value {center} for mount {mount.name}")
+    # save new offset
+    # reload
+    await hcapi.save_instrument_offset(mount, center)
     return center

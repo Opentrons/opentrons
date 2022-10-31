@@ -11,6 +11,7 @@ from opentrons.hardware_control import ThreadManager
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.types import OT3Mount, OT3Axis
 from opentrons.config.types import OT3CalibrationSettings, Offset
+from opentrons.hardware_control.instruments.ot2.pipette_handler import OT3PipetteHandler
 from opentrons.hardware_control.ot3_calibration import (
     find_edge,
     find_axis_center,
@@ -220,7 +221,9 @@ async def test_method_enum(ot3_hardware: ThreadManager[OT3API]) -> None:
     ) as noncontact, patch(
         "opentrons.hardware_control.ot3_calibration.find_deck_position",
         AsyncMock(spec=find_deck_position),
-    ) as find_deck:
+    ) as find_deck, patch.object(
+        ot3_hardware.managed_obj, "_pipette_handler", Mock(spec=OT3PipetteHandler)
+    ):
         find_deck.return_value = 10
         binary.return_value = (1.0, 2.0)
         noncontact.return_value = (3.0, 4.0)
