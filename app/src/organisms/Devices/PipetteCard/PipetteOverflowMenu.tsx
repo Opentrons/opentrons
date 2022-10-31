@@ -47,6 +47,14 @@ export const PipetteOverflowMenu = (
   const pipetteDisplayName =
     pipetteSpecs?.displayName != null ? pipetteSpecs.displayName : t('empty')
   const isOT3PipetteAttached = isOT3Pipette(pipetteName as PipetteName)
+  console.log('isOT3PipetteAttached', isOT3PipetteAttached)
+
+  const calibratePipetteText = isOT3PipetteAttached
+    ? 'calibrate_pipette'
+    : 'calibrate_pipette_offset'
+  const recalibratePipetteText = isOT3PipetteAttached
+    ? 'recalibrate_pipette'
+    : 'recalibrate_pipette_offset'
 
   return (
     <Flex position={POSITION_RELATIVE}>
@@ -78,8 +86,8 @@ export const PipetteOverflowMenu = (
             >
               {t(
                 isPipetteCalibrated
-                  ? 'recalibrate_pipette_offset'
-                  : 'calibrate_pipette_offset'
+                  ? recalibratePipetteText
+                  : calibratePipetteText
               )}
             </MenuItem>
             {!isOT3PipetteAttached && (
