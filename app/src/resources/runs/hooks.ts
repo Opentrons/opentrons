@@ -1,6 +1,6 @@
 import { useCreateCommandMutation } from '@opentrons/react-api-client'
-import type { CreateCommand } from '@opentrons/shared-data'
 import { chainRunCommands } from './utils'
+import type { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/index'
 
 type CreateCommandMutate = ReturnType<
   typeof useCreateCommandMutation

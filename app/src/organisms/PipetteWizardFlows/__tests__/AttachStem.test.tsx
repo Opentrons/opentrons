@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { LEFT } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
@@ -23,29 +23,28 @@ const mockPipette: AttachedPipette = {
 }
 describe('AttachStem', () => {
   let props: React.ComponentProps<typeof AttachStem>
-  let mockCreateCommand = jest.fn()
   beforeEach(() => {
-    mockCreateCommand = jest.fn()
-    mockCreateCommand.mockResolvedValue(null)
     props = {
       mount: LEFT,
       goBack: jest.fn(),
       proceed: jest.fn(),
-      chainRunCommands: { createCommand: mockCreateCommand } as any,
+      chainRunCommands: jest
+        .fn()
+        .mockImplementationOnce(() => Promise.resolve()),
       runId: RUN_ID_1,
       attachedPipette: { left: mockPipette, right: null },
       flowType: FLOWS.CALIBRATE,
       isRobotMoving: false,
     }
   })
-  it('returns the correct information, buttons work as expected', () => {
+  it('returns the correct information, buttons work as expected', async () => {
     const { getByText, getByAltText, getByRole } = render(props)
     getByText('Attach Calibration Stem')
     getByText('Grab your calibration probe, install')
     getByAltText('Attach stem')
     const proceedBtn = getByRole('button', { name: 'Initiate calibration' })
     fireEvent.click(proceedBtn)
-    expect(mockCreateCommand).toHaveBeenCalledWith([
+    expect(props.chainRunCommands).toHaveBeenCalledWith([
       {
         commandType: 'calibration/moveToLocation',
         params: { pipetteId: 'abc', location: 'probePosition' },
@@ -59,7 +58,10 @@ describe('AttachStem', () => {
         params: { pipetteId: 'abc', location: 'attachOrDetach' },
       },
     ])
-    expect(props.proceed).toHaveBeenCalled()
+    await waitFor(() => {
+      expect(props.proceed).toHaveBeenCalled()
+    })
+
     const backBtn = getByRole('button', { name: 'Go back' })
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()

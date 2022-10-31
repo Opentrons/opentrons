@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { LEFT } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
@@ -40,7 +40,9 @@ describe('BeforeBeginning', () => {
       mount: LEFT,
       goBack: jest.fn(),
       proceed: jest.fn(),
-      chainRunCommands: jest.fn(),
+      chainRunCommands: jest
+        .fn()
+        .mockImplementationOnce(() => Promise.resolve()),
       runId: RUN_ID_1,
       attachedPipette: { left: mockPipette, right: null },
       flowType: FLOWS.CALIBRATE,
@@ -50,7 +52,7 @@ describe('BeforeBeginning', () => {
     mockNeedHelpLink.mockReturnValue(<div>mock need help link</div>)
     mockInProgressModal.mockReturnValue(<div>mock in progress</div>)
   })
-  it('returns the correct information for calibrate flow', () => {
+  it('returns the correct information for calibrate flow', async () => {
     const { getByText, getByAltText, getByRole } = render(props)
     getByText('Before you begin')
     getByText(
@@ -64,7 +66,15 @@ describe('BeforeBeginning', () => {
     getByAltText('Calibration Probe')
     const proceedBtn = getByRole('button', { name: 'Get started' })
     fireEvent.click(proceedBtn)
-    expect(props.chainRunCommands).toHaveBeenCalled()
+    expect(props.chainRunCommands).toHaveBeenCalledWith([
+      {
+        commandType: 'calibration/moveToLocation',
+        params: { pipetteId: 'abc', location: 'attachOrDetach' },
+      },
+    ])
+    await waitFor(() => {
+      expect(props.proceed).toHaveBeenCalled()
+    })
   })
   it('returns the correct information for in progress modal when robot is moving', () => {
     props = {
