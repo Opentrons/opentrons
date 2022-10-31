@@ -28,7 +28,6 @@ export interface GenericWizardTileProps {
 
 const GO_BACK_BUTTON_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
-  text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   color: ${COLORS.darkGreyEnabled};
 
   &:hover {
@@ -55,18 +54,17 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
         paddingX={SPACING.spacing6}
         paddingTop={SPACING.spacing6}
         marginBottom={SPACING.spacing7}
+        gridGap={SPACING.spacingXXL}
       >
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          width="50%"
-          marginRight={SPACING.spacingXXL}
+          flex="1"
+          gridGap={SPACING.spacing4}
         >
-          <StyledText as="h1" marginBottom={SPACING.spacing4}>
-            {header}
-          </StyledText>
+          <StyledText as="h1">{header}</StyledText>
           {bodyText}
         </Flex>
-        {rightHandBody}
+        <Flex flex="1">{rightHandBody}</Flex>
       </Flex>
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}

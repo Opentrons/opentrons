@@ -2,9 +2,13 @@ import logging
 from typing import Optional, Any
 
 from opentrons import types
-from opentrons.calibration_storage import get
 from opentrons.calibration_storage.types import TipLengthCalNotFound
 from opentrons.hardware_control.dev_types import PipetteDict
+
+# TODO (lc 09-26-2022) We should conditionally import ot2 or ot3 calibration
+from opentrons.hardware_control.instruments.ot2 import (
+    instrument_calibration as instr_cal,
+)
 from opentrons.protocol_api.labware import Labware, Well
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons_shared_data.protocol.dev_types import (
@@ -57,7 +61,7 @@ def tip_length_for(pipette: PipetteDict, tiprack: Labware) -> float:
         return tip_length - tip_overlap
 
     try:
-        return get.load_tip_length_calibration(
+        return instr_cal.load_tip_length_for_pipette(
             pipette["pipette_id"], tiprack._implementation.get_definition()
         ).tip_length
     except TipLengthCalNotFound:
