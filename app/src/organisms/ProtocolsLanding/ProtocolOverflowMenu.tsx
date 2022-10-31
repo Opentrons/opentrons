@@ -18,7 +18,6 @@ import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { Portal } from '../../App/portal'
 import { getSendAllProtocolsToOT3 } from '../../redux/config'
 import {
-  analyzeProtocol,
   removeProtocol,
   viewProtocolSourceFolder,
 } from '../../redux/protocol-storage'
@@ -79,12 +78,6 @@ export function ProtocolOverflowMenu(
     confirmDeleteProtocol()
     setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }
-  const handleClickReanalyze: React.MouseEventHandler<HTMLButtonElement> = e => {
-    e.preventDefault()
-    e.stopPropagation()
-    dispatch(analyzeProtocol(protocolKey))
-    setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
-  }
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -113,12 +106,6 @@ export function ProtocolOverflowMenu(
             data-testid="ProtocolOverflowMenu_run"
           >
             {t('run_now')}
-          </MenuItem>
-          <MenuItem
-            onClick={handleClickReanalyze}
-            data-testid="ProtocolOverflowMenu_reanalyze"
-          >
-            {t('shared:reanalyze')}
           </MenuItem>
           {sendAllProtocolsToOT3 ? (
             <MenuItem
