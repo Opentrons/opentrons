@@ -11,7 +11,6 @@ import type { PrimitiveComponent } from '@opentrons/components'
 
 type BtnComponent = PrimitiveComponent<'button'>
 
-// TODO: replace opacity color hex code with const
 export const MenuItem: BtnComponent = styled(Btn)`
   text-align: ${TEXT_ALIGN_LEFT};
   font-size: ${TYPOGRAPHY.fontSizeP};
@@ -26,6 +25,6 @@ export const MenuItem: BtnComponent = styled(Btn)`
   &:disabled,
   &.disabled {
     background-color: ${COLORS.transparent};
-    color: ${COLORS.black}80;
+    color: ${COLORS.black}${COLORS.opacity50HexCode};
   }
 `
