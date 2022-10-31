@@ -201,7 +201,7 @@ class LabwareView(HasState[LabwareState]):
 
     def get_id_by_module(self, module_id: str) -> str:
         """Return the ID of the labware loaded on the given module."""
-        for (key, value) in self.state.labware_by_id.items():
+        for labware_id, labware in self.state.labware_by_id.items():
             if (
                 isinstance(value.location, ModuleLocation)
                 and value.location.moduleId == module_id
