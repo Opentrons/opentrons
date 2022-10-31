@@ -4,7 +4,6 @@ import { getPipetteModelSpecs, LEFT, RIGHT } from '@opentrons/shared-data'
 import { useModulesQuery, usePipettesQuery } from '@opentrons/react-api-client'
 
 import {
-  Box,
   Flex,
   ALIGN_CENTER,
   ALIGN_FLEX_START,
@@ -47,9 +46,10 @@ export function InstrumentsAndModules({
   // split modules in half and map into each column separately to avoid
   // the need for hardcoded heights without limitation, array will be split equally
   // or left column will contain 1 more item than right column
-  // TODO: adjust floor/ceil depending on OT-3
-  // TODO: OR, instead, map the pipette/extension mount/module data into columns pre-render, make the JSX layout less opinionated
-  const halfAttachedModulesSize = Math.ceil(attachedModules?.length / 2)
+  // TODO(bh, 2022-10-27): once we're using real gripper data, combine the extension mount/module data into columns pre-render
+  const halfAttachedModulesSize = isOT3
+    ? Math.floor(attachedModules?.length / 2)
+    : Math.ceil(attachedModules?.length / 2)
   const leftColumnModules = attachedModules?.slice(0, halfAttachedModulesSize)
   const rightColumnModules = attachedModules?.slice(halfAttachedModulesSize)
 
@@ -90,8 +90,12 @@ export function InstrumentsAndModules({
           </Flex>
         )}
         {isRobotViewable ? (
-          <Box width="100%">
-            <Flex gridGap={SPACING.spacing3}>
+          <Flex gridGap={SPACING.spacing3} width="100%">
+            <Flex
+              flex="50%"
+              flexDirection={DIRECTION_COLUMN}
+              gridGap={SPACING.spacing3}
+            >
               <PipetteCard
                 pipetteId={attachedPipettes.left?.id}
                 pipetteInfo={
@@ -102,6 +106,43 @@ export function InstrumentsAndModules({
                 mount={LEFT}
                 robotName={robotName}
               />
+              {/* extension mount here */}
+              {isOT3 ? (
+                <InstrumentCard
+                  description={
+                    gripper.model != null ? gripper.model : t('shared:empty')
+                  }
+                  isGripperAttached={gripper.model != null}
+                  label={t('shared:extension_mount')}
+                  // TODO(bh, 2022-10-27): insert gripper recalibrate and detach functions, empty mount menu items
+                  menuOverlayItems={[
+                    {
+                      label: 'Recalibrate gripper',
+                      disabled: gripper.model == null,
+                      onClick: () => console.log('Recalibrate gripper'),
+                    },
+                    {
+                      label: 'Detach gripper',
+                      disabled: gripper.model == null,
+                      onClick: () => console.log('Detach gripper'),
+                    },
+                  ]}
+                />
+              ) : null}
+              {leftColumnModules.map((module, index) => (
+                <ModuleCard
+                  key={`moduleCard_${module.moduleType}_${index}`}
+                  robotName={robotName}
+                  module={module}
+                  isLoadedInRun={false}
+                />
+              ))}
+            </Flex>
+            <Flex
+              flex="50%"
+              flexDirection={DIRECTION_COLUMN}
+              gridGap={SPACING.spacing3}
+            >
               <PipetteCard
                 pipetteId={attachedPipettes.right?.id}
                 pipetteInfo={
@@ -113,61 +154,16 @@ export function InstrumentsAndModules({
                 mount={RIGHT}
                 robotName={robotName}
               />
+              {rightColumnModules.map((module, index) => (
+                <ModuleCard
+                  key={`moduleCard_${module.moduleType}_${index}`}
+                  robotName={robotName}
+                  module={module}
+                  isLoadedInRun={false}
+                />
+              ))}
             </Flex>
-            <Flex gridGap={SPACING.spacing3}>
-              <Flex
-                flex="50%"
-                flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing3}
-              >
-                {/* extension mount here */}
-                {isOT3 ? (
-                  <InstrumentCard
-                    description={
-                      gripper.model != null ? gripper.model : t('shared:empty')
-                    }
-                    isGripperAttached={gripper.model != null}
-                    label={t('shared:extension_mount')}
-                    // TODO(bh, 2022-10-27): insert gripper recalibrate and detach functions, empty mount menu items
-                    menuOverlayItems={[
-                      {
-                        label: 'Recalibrate gripper',
-                        disabled: gripper.model == null,
-                        onClick: () => console.log('Recalibrate gripper'),
-                      },
-                      {
-                        label: 'Detach gripper',
-                        disabled: gripper.model == null,
-                        onClick: () => console.log('Detach gripper'),
-                      },
-                    ]}
-                  />
-                ) : null}
-                {leftColumnModules.map((module, index) => (
-                  <ModuleCard
-                    key={`moduleCard_${module.moduleType}_${index}`}
-                    robotName={robotName}
-                    module={module}
-                    isLoadedInRun={false}
-                  />
-                ))}
-              </Flex>
-              <Flex
-                flex="50%"
-                flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing3}
-              >
-                {rightColumnModules.map((module, index) => (
-                  <ModuleCard
-                    key={`moduleCard_${module.moduleType}_${index}`}
-                    robotName={robotName}
-                    module={module}
-                    isLoadedInRun={false}
-                  />
-                ))}
-              </Flex>
-            </Flex>
-          </Box>
+          </Flex>
         ) : (
           <Flex
             alignItems={ALIGN_CENTER}

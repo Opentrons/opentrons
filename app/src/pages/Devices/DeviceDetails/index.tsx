@@ -8,7 +8,6 @@ import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   OVERFLOW_SCROLL,
-  SIZE_6,
   SPACING,
   COLORS,
 } from '@opentrons/components'
@@ -34,7 +33,7 @@ export function DeviceDetails(): JSX.Element | null {
   return robot != null ? (
     <ApiHostProvider key={robot.name} hostname={robot.ip ?? null}>
       <Box
-        minWidth={SIZE_6}
+        minWidth="36rem"
         height="100%"
         overflow={OVERFLOW_SCROLL}
         paddingX={SPACING.spacing4}

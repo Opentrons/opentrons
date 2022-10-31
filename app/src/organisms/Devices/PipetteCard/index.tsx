@@ -161,7 +161,6 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     <Flex
       backgroundColor={COLORS.fundamentalsBackground}
       borderRadius={BORDERS.radiusSoftCorners}
-      marginBottom={SPACING.spacing3}
       width="100%"
       data-testid={`PipetteCard_${pipetteDisplayName}`}
     >
