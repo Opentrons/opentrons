@@ -128,6 +128,23 @@ class PipetteHandlerProvider(Generic[MountType]):
         else:
             _reset(mount)
 
+    def reset_instrument_offset(self, mount: MountType) -> None:
+        """
+        Tempoarily rest the pipette offset to default values.
+        :param mount: Modify the given mount.
+        """
+        pipette = self.get_pipette(mount)
+        pipette.reset_pipette_offset(mount)
+
+    def save_instrument_offset(self, mount: MountType, delta: top_types.Point) -> None:
+        """
+        Save a new instrument offset the pipette offset to a particular value.
+        :param mount: Modify the given mount.
+        :param delta: The offset to set for the pipette.
+        """
+        pipette = self.get_pipette(mount)
+        pipette.save_pipette_offset(mount, delta)
+
     # TODO(mc, 2022-01-11): change returned map value type to `Optional[PipetteDict]`
     # instead of potentially returning an empty dict
     def get_attached_instruments(self) -> Dict[MountType, PipetteDict]:

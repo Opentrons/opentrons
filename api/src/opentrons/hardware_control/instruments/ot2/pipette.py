@@ -11,11 +11,15 @@ from typing import Any, Dict, Optional, Set, Tuple, Union
 from opentrons_shared_data.pipette import name_config as pipette_name_config
 
 from opentrons.types import Point
-from opentrons.config import pipette_config, robot_configs
+from opentrons.config import pipette_config, robot_configs, feature_flags
 from opentrons.config.types import RobotConfig, OT3Config
 from opentrons.drivers.types import MoveSplit
-from ..instrument_abc import AbstractInstrument
-from .instrument_calibration import PipetteOffsetByPipetteMount
+from ..instrument_abc import AbstractInstrument, MountType
+from ..ot3.instrument_calibration import save_pipette_offset_calibration
+from .instrument_calibration import (
+    PipetteOffsetByPipetteMount,
+    load_pipette_offset,
+)
 from opentrons.hardware_control.types import (
     CriticalPoint,
     BoardRevision,
@@ -109,10 +113,6 @@ class Pipette(AbstractInstrument[pipette_config.PipetteConfig]):
     def acting_as(self) -> PipetteName:
         return self._acting_as
 
-    def update_pipette_offset(self, offset_cal: PipetteOffsetByPipetteMount) -> None:
-        self._log.info("updating pipette offset to {}".format(offset_cal.offset))
-        self._pipette_offset = offset_cal
-
     @property
     def config(self) -> pipette_config.PipetteConfig:
         return self._config
@@ -121,11 +121,27 @@ class Pipette(AbstractInstrument[pipette_config.PipetteConfig]):
     def nozzle_offset(self) -> Tuple[float, float, float]:
         return self._nozzle_offset
 
+    @property
+    def pipette_offset(self) -> PipetteOffsetByPipetteMount:
+        return self._pipette_offset
+
     def update_config_item(self, elem_name: str, elem_val: Any) -> None:
         self._log.info("updated config: {}={}".format(elem_name, elem_val))
         self._config = replace(self._config, **{elem_name: elem_val})
         # Update the cached dict representation
         self._config_as_dict = asdict(self._config)
+
+    def reset_pipette_offset(self, mount: MountType) -> None:
+        """Reset the pipette offset to system defaults."""
+        self._pipette_offset = load_pipette_offset(pip_id=None, mount=mount)
+
+    def save_pipette_offset(self, mount: MountType, offset: Point) -> None:
+        """Update the pipette offset to a new value."""
+        # TODO (lc 10-31-2022) We should have this command be supported properly by
+        # ot-3 and ot-2 when we split out the pipette class
+        if feature_flags.enable_ot3_hardware_controller():
+            save_pipette_offset_calibration(self._pipette_id, mount, offset)
+        self._pipette_offset = load_pipette_offset(self._pipette_id, mount)
 
     @property
     def name(self) -> PipetteName:

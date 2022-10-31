@@ -1382,6 +1382,26 @@ class OT3API(
         else:
             self._pipette_handler.reset_instrument(checked_mount)
 
+    async def reset_instrument_offset(
+        self, mount: Union[top_types.Mount, OT3Mount]
+    ) -> None:
+        """Reset the given instrument to system offsets."""
+        checked_mount = OT3Mount.from_mount(mount)
+        if checked_mount == OT3Mount.GRIPPER:
+            self._gripper_handler.reset_instrument_offset()
+        else:
+            self._pipette_handler.reset_instrument_offset(checked_mount)
+
+    async def save_instrument_offset(
+        self, mount: Union[top_types.Mount, OT3Mount], delta: top_types.Point
+    ) -> None:
+        """Save a new offset for a given instrument."""
+        checked_mount = OT3Mount.from_mount(mount)
+        if checked_mount == OT3Mount.GRIPPER:
+            self._gripper_handler.save_instrument_offset(delta)
+        else:
+            self._pipette_handler.save_instrument_offset(checked_mount, delta)
+
     def get_attached_pipette(
         self, mount: Union[top_types.Mount, OT3Mount]
     ) -> PipetteDict:
