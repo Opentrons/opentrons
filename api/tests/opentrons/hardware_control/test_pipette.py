@@ -1,11 +1,11 @@
 import pytest
 from opentrons.calibration_storage import types as cal_types
 from opentrons.types import Point
-from opentrons.hardware_control.instruments import pipette
+from opentrons.hardware_control.instruments.ot2 import pipette, instrument_calibration
 from opentrons.hardware_control import types
 from opentrons.config import pipette_config
 
-PIP_CAL = cal_types.PipetteOffsetByPipetteMount(
+PIP_CAL = instrument_calibration.PipetteOffsetByPipetteMount(
     offset=[0, 0, 0],
     source=cal_types.SourceType.user,
     status=cal_types.CalibrationStatus(),
@@ -54,7 +54,7 @@ def test_critical_points_nozzle_offset(model):
 def test_critical_points_pipette_offset(model):
     loaded = pipette_config.load(model)
     # set pipette offset calibration
-    pip_cal = cal_types.PipetteOffsetByPipetteMount(
+    pip_cal = instrument_calibration.PipetteOffsetByPipetteMount(
         offset=[10, 10, 10],
         source=cal_types.SourceType.user,
         status=cal_types.CalibrationStatus(),
