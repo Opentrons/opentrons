@@ -20,7 +20,9 @@ import type {
   RobotSettingsField,
 } from '../../../redux/robot-settings/types'
 
-interface RobotSettingsFeatureFlagsProps { robotName: string }
+interface RobotSettingsFeatureFlagsProps {
+  robotName: string
+}
 
 const NON_FEATURE_FLAG_SETTINGS = [
   'enableDoorSafetySwitch',
@@ -39,7 +41,9 @@ export function RobotSettingsFeatureFlags({
   const settings = useSelector<State, RobotSettings>((state: State) =>
     getRobotSettings(state, robotName)
   )
-  const featureFlags = settings.filter(({ id }) => !NON_FEATURE_FLAG_SETTINGS.includes(id))
+  const featureFlags = settings.filter(
+    ({ id }) => !NON_FEATURE_FLAG_SETTINGS.includes(id)
+  )
 
   const dispatch = useDispatch<Dispatch>()
 
@@ -49,7 +53,13 @@ export function RobotSettingsFeatureFlags({
 
   return (
     <>
-      {featureFlags.map(field => <FeatureFlagToggle settingField={field} robotName={robotName} />)}
+      {featureFlags.map(field => (
+        <FeatureFlagToggle
+          key={field.id}
+          settingField={field}
+          robotName={robotName}
+        />
+      ))}
     </>
   )
 }
@@ -79,10 +89,7 @@ export function FeatureFlagToggle({
       marginBottom={SPACING.spacing4}
     >
       <Box width="70%">
-        <StyledText
-          css={TYPOGRAPHY.pSemiBold}
-          paddingBottom={SPACING.spacing2}
-        >
+        <StyledText css={TYPOGRAPHY.pSemiBold} paddingBottom={SPACING.spacing2}>
           {title}
         </StyledText>
         <StyledText as="p">{description}</StyledText>
@@ -95,4 +102,3 @@ export function FeatureFlagToggle({
     </Flex>
   )
 }
-

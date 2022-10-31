@@ -68,9 +68,7 @@ export function RobotSettings(): JSX.Element | null {
         updateRobotStatus={updateRobotStatus}
       />
     ),
-    'feature-flags': (
-      <RobotSettingsFeatureFlags robotName={robotName} />
-    ),
+    'feature-flags': <RobotSettingsFeatureFlags robotName={robotName} />,
   }
 
   const devToolsOn = useSelector(getDevtoolsEnabled)
@@ -83,8 +81,10 @@ export function RobotSettings(): JSX.Element | null {
   ) {
     return <Redirect to={`/devices/${robotName}`} />
   }
-  const cannotViewCalibration = robotSettingsTab === 'calibration' && isCalibrationDisabled
-  const cannotViewFeatureFlags = robotSettingsTab === 'feature-flags' && !devToolsOn
+  const cannotViewCalibration =
+    robotSettingsTab === 'calibration' && isCalibrationDisabled
+  const cannotViewFeatureFlags =
+    robotSettingsTab === 'feature-flags' && !devToolsOn
   if (cannotViewCalibration || cannotViewFeatureFlags) {
     return <Redirect to={`/devices/${robotName}/robot-settings/networking`} />
   }
@@ -140,12 +140,12 @@ export function RobotSettings(): JSX.Element | null {
               to={`/devices/${robotName}/robot-settings/advanced`}
               tabName={t('advanced')}
             />
-            {devToolsOn ?
+            {devToolsOn ? (
               <NavTab
                 to={`/devices/${robotName}/robot-settings/feature-flags`}
                 tabName={t('feature_flags')}
               />
-              : null}
+            ) : null}
           </Flex>
         </Box>
         <Line />

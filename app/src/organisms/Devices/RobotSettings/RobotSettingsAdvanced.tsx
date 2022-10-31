@@ -2,11 +2,7 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
-import {
-  Box,
-  SPACING,
-  IconProps,
-} from '@opentrons/components'
+import { Box, SPACING, IconProps } from '@opentrons/components'
 
 import { Divider } from '../../../atoms/structure'
 import { Toast } from '../../../atoms/Toast'
@@ -123,8 +119,8 @@ export function RobotSettingsAdvanced({
   return (
     <>
       {showSoftwareUpdateModal &&
-        robot != null &&
-        robot.status !== UNREACHABLE ? (
+      robot != null &&
+      robot.status !== UNREACHABLE ? (
         <UpdateBuildroot
           robot={robot}
           close={() => setShowSoftwareUpdateModal(false)}
