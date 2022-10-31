@@ -12,6 +12,7 @@ import {
 } from '@opentrons/components'
 import {
   inferModuleOrientationFromXCoordinate,
+  RunTimeCommand,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
@@ -25,6 +26,8 @@ import {
 } from '../../hooks'
 import type { DeckDefinition } from '@opentrons/shared-data'
 import type { ModuleTypesThatRequiresExtraAttention } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
+import { getLabwareSetupItemGroups } from './utils'
+import { OffDeckLabwareList } from './OffDeckLabwareList'
 
 const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
@@ -41,6 +44,7 @@ const DECK_MAP_VIEWBOX = '-80 -40 550 500'
 interface SetupLabwareMapProps {
   robotName: string
   runId: string
+  commands: RunTimeCommand[]
   extraAttentionModules: ModuleTypesThatRequiresExtraAttention[]
 }
 
@@ -48,6 +52,7 @@ export function SetupLabwareMap({
   robotName,
   runId,
   extraAttentionModules,
+  commands,
 }: SetupLabwareMapProps): JSX.Element {
   const moduleRenderInfoById = useModuleRenderInfoForProtocolById(
     robotName,
@@ -57,13 +62,14 @@ export function SetupLabwareMap({
   const runHasStarted = useRunHasStarted(runId)
   const enableLiquidSetup = useFeatureFlag('enableLiquidSetup')
 
+  const { offDeckItems } = getLabwareSetupItemGroups(commands)
   return (
     <Flex flex="1" maxHeight="180vh" flexDirection={DIRECTION_COLUMN}>
       <Flex flexDirection={DIRECTION_COLUMN} marginY={SPACING.spacing4}>
         {!runHasStarted &&
-        !enableLiquidSetup &&
-        extraAttentionModules.length > 0 &&
-        moduleRenderInfoById ? (
+          !enableLiquidSetup &&
+          extraAttentionModules.length > 0 &&
+          moduleRenderInfoById ? (
           <ModuleExtraAttention
             moduleTypes={extraAttentionModules}
             modulesInfo={moduleRenderInfoById}
@@ -140,6 +146,7 @@ export function SetupLabwareMap({
             )}
           </RobotWorkSpace>
         </Box>
+        <OffDeckLabwareList labwareItems={offDeckItems} />
       </Flex>
     </Flex>
   )

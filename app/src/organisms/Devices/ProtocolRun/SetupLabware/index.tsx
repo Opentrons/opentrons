@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import map from 'lodash/map'
 import isEmpty from 'lodash/isEmpty'
 import some from 'lodash/some'
@@ -12,14 +12,14 @@ import {
   ALIGN_CENTER,
   TYPOGRAPHY,
   COLORS,
-  DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
-  SIZE_1,
-  ALIGN_FLEX_END,
   Link,
   Icon,
   TOOLTIP_LEFT,
   useHoverTooltip,
+  JUSTIFY_FLEX_END,
+  BORDERS,
+  SIZE_1,
 } from '@opentrons/components'
 import {
   getIsLabwareOffsetCodeSnippetsOn,
@@ -27,7 +27,7 @@ import {
 } from '../../../../redux/config'
 import { useLPCSuccessToast } from '../../../ProtocolSetup/hooks'
 import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
-import { PrimaryButton, SecondaryButton } from '../../../../atoms/buttons'
+import { PrimaryButton, SecondaryButton, TertiaryButton } from '../../../../atoms/buttons'
 import { Tooltip } from '../../../../atoms/Tooltip'
 import { StyledText } from '../../../../atoms/text'
 import { getModuleTypesThatRequireExtraAttention } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
@@ -164,6 +164,10 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
     (currentRun?.data?.labwareOffsets == null ||
       currentRun?.data?.labwareOffsets.length === 0)
 
+  const handleClickViewCurrentOffsets: React.MouseEventHandler<HTMLAnchorElement> = () => {
+    console.log('TODO launch view offsets modal')
+  }
+
   return (
     <>
       {showReapplyOffsetsModal ? <ReapplyOffsetsModal runId={runId} /> : null}
@@ -203,6 +207,7 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
             ) : (
               <SetupLabwareMap
                 runId={runId}
+                commands={protocolData?.commands ?? []}
                 robotName={robotName}
                 extraAttentionModules={moduleTypesThatRequireExtraAttention}
               />
@@ -211,107 +216,94 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
         ) : (
           <SetupLabwareMap
             runId={runId}
+            commands={protocolData?.commands ?? []}
             robotName={robotName}
             extraAttentionModules={moduleTypesThatRequireExtraAttention}
           />
         )}
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
-          <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_FLEX_END}>
-            <Flex color={COLORS.darkGreyEnabled} alignItems={ALIGN_CENTER}>
-              <Icon
-                name="information"
-                size={SIZE_1}
-                marginRight={SPACING.spacing2}
-              />
-              <StyledText css={TYPOGRAPHY.labelRegular}>
-                {t('recommended')}
+        <Flex gridGap={SPACING.spacing4} backgroundColor={COLORS.lightBlue} padding={SPACING.spacing4} borderRadius={BORDERS.radiusSoftCorners}>
+          <Icon name="reticle" size="18px" />
+          <Flex flex="5" gridGap={SPACING.spacing3} flexDirection={DIRECTION_COLUMN}>
+            <Flex flexDirection={DIRECTION_COLUMN}>
+              <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+                <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold} textTransform={TYPOGRAPHY.textTransformCapitalize}>
+                  {t('run_labware_position_check')}
+                </StyledText>
+                {isLabwareOffsetCodeSnippetsOn ? (
+                  <Link
+                    role="link"
+                    css={TYPOGRAPHY.labelSemiBold}
+                    color={COLORS.darkBlackEnabled}
+                    onClick={() => showDownloadOffsetDataModal(true)}
+                  >
+                    {t('get_labware_offset_data')}
+                  </Link>
+                ) : null}
+              </Flex>
+              <StyledText as="p">
+                <Trans
+                  t={t}
+                  i18nKey='recommended_workflow_for_labware_positioning'
+                  components={{
+                    anchor: (
+                      <Link
+                        textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                        onClick={() => setShowLabwareHelpModal(true)}
+                      />
+                    )
+                  }}
+                />
               </StyledText>
             </Flex>
           </Flex>
           <Flex
-            flexDirection={DIRECTION_COLUMN}
+            alignItems={ALIGN_CENTER}
+            justifyContent={JUSTIFY_FLEX_END}
+            flex="1 0 auto"
             gridGap={SPACING.spacing4}
-            backgroundColor={COLORS.fundamentalsBackground}
-            padding={SPACING.spacing5}
           >
-            <Flex
-              alignItems={ALIGN_CENTER}
-              flexDirection={DIRECTION_ROW}
-              justifyContent={JUSTIFY_SPACE_BETWEEN}
+            <Link
+              color={COLORS.blueEnabled}
+              fontSize={TYPOGRAPHY.fontSizeP}
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              onClick={handleClickViewCurrentOffsets}
+              role="button"
             >
-              <StyledText
-                css={TYPOGRAPHY.h3SemiBold}
-                color={COLORS.darkBlackEnabled}
-              >
-                {t('lpc_and_offset_data_title')}
-              </StyledText>
-              {isLabwareOffsetCodeSnippetsOn ? (
-                <Link
-                  role="link"
-                  css={TYPOGRAPHY.labelSemiBold}
-                  color={COLORS.darkBlackEnabled}
-                  onClick={() => showDownloadOffsetDataModal(true)}
-                  id="DownloadOffsetData"
-                >
-                  {t('get_labware_offset_data')}
-                </Link>
-              ) : null}
-            </Flex>
-            <StyledText
-              color={COLORS.darkBlackEnabled}
-              css={TYPOGRAPHY.pRegular}
+              {t('view_current_offsets')}
+            </Link>
+            <SecondaryButton
+              textTransform={TYPOGRAPHY.textTransformCapitalize}
+              title={t('run_labware_position_check')}
+              onClick={() => {
+                setShowLabwarePositionCheckModal(true)
+                setIsShowingLPCSuccessToast(false)
+              }}
+              id="LabwareSetup_checkLabwarePositionsButton"
+              {...targetProps}
+              disabled={lpcDisabledReason !== null}
             >
-              {t('labware_position_check_text')}
-            </StyledText>
-            <Flex
-              alignItems={ALIGN_CENTER}
-              flexDirection={DIRECTION_ROW}
-              justifyContent={JUSTIFY_SPACE_BETWEEN}
-            >
-              <Link
-                role="link"
-                css={TYPOGRAPHY.darkLinkLabelSemiBold}
-                onClick={() => setShowLabwareHelpModal(true)}
-                data-test="LabwareSetup_helpLink"
-              >
-                {t('labware_help_link_title')}
-              </Link>
-              <Flex justifyContent={JUSTIFY_CENTER}>
-                <SecondaryButton
-                  textTransform={TYPOGRAPHY.textTransformCapitalize}
-                  title={t('run_labware_position_check')}
-                  onClick={() => {
-                    setShowLabwarePositionCheckModal(true)
-                    setIsShowingLPCSuccessToast(false)
-                  }}
-                  id="LabwareSetup_checkLabwarePositionsButton"
-                  {...targetProps}
-                  disabled={lpcDisabledReason !== null}
-                >
-                  {t('run_labware_position_check')}
-                </SecondaryButton>
-                {lpcDisabledReason !== null ? (
-                  <Tooltip tooltipProps={tooltipProps}>
-                    {lpcDisabledReason}
-                  </Tooltip>
-                ) : null}
-              </Flex>
-            </Flex>
+              {t('run_labware_position_check')}
+            </SecondaryButton>
+            {lpcDisabledReason !== null ? (
+              <Tooltip tooltipProps={tooltipProps}>
+                {lpcDisabledReason}
+              </Tooltip>
+            ) : null}
           </Flex>
         </Flex>
-        <Flex justifyContent={JUSTIFY_CENTER}>
-          {nextStep == null ? (
-            <ProceedToRunButton
-              protocolRunHeaderRef={protocolRunHeaderRef}
-              robotName={robotName}
-              runId={runId}
-            />
-          ) : (
-            <PrimaryButton onClick={() => expandStep(nextStep)}>
-              {t('proceed_to_liquid_setup_step')}
-            </PrimaryButton>
-          )}
-        </Flex>
+      </Flex>
+      <Flex justifyContent={JUSTIFY_CENTER} marginTop={SPACING.spacing4}>
+        {nextStep == null ? (
+          <ProceedToRunButton
+            protocolRunHeaderRef={protocolRunHeaderRef}
+            robotName={robotName}
+            runId={runId}
+          />
+        ) : (
+          <PrimaryButton onClick={() => expandStep(nextStep)}>
+            {t('proceed_to_liquid_setup_step')}
+          </PrimaryButton>
+        )}
       </Flex>
     </>
   )

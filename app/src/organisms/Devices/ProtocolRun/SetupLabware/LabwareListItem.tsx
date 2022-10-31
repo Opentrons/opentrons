@@ -44,7 +44,9 @@ const LabwareRow = styled.div`
   display: grid;
   grid-template-columns: 6fr 5fr;
   grip-gap: ${SPACING.spacing3};
-  box-shadow: 0 0 0 1px ${COLORS.medGreyEnabled};
+  border-style: ${BORDERS.styleSolid};
+  border-width: ${SPACING.spacingXXS};
+  border-color: ${COLORS.medGreyEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
   padding: ${SPACING.spacing4};
 `
@@ -74,7 +76,7 @@ export function LabwareListItem(
   const labwareDisplayName = getLabwareDisplayName(definition)
   const { createLiveCommand } = useCreateLiveCommandMutation()
 
-  let slotInfo: JSX.Element = t('slot_location', {
+  let slotInfo: JSX.Element | null = initialLocation === 'offDeck' ? null : t('slot_location', {
     slotName: Object.values(initialLocation),
   })
   let extraAttentionText: JSX.Element | null = null

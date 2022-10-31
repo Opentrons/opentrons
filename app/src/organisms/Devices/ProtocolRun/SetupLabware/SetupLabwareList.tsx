@@ -35,11 +35,7 @@ export function SetupLabwareList(
   const { offDeckItems, onDeckItems } = getLabwareSetupItemGroups(commands)
 
   return (
-    <Flex
-      padding={SPACING.spacing4}
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing2}
-    >
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
       <HeaderRow>
         <StyledText as="label" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {t('labware_name')}
@@ -56,10 +52,7 @@ export function SetupLabwareList(
           {...labwareItem}
         />
       ))}
-      <OffDeckLabwareList
-        labwareItems={offDeckItems}
-        attachedModuleInfo={attachedModuleInfo}
-        extraAttentionModules={extraAttentionModules} />
+      <OffDeckLabwareList labwareItems={offDeckItems} />
     </Flex>
   )
 }
