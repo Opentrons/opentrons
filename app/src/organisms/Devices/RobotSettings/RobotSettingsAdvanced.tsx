@@ -16,7 +16,6 @@ import { Divider } from '../../../atoms/structure'
 import { Toast } from '../../../atoms/Toast'
 import { StyledText } from '../../../atoms/text'
 import { ToggleButton } from '../../../atoms/buttons'
-import { updateSetting } from '../../../redux/robot-settings'
 import { useIsOT3, useIsRobotBusy, useRobot } from '../hooks'
 import { DisplayRobotName } from './AdvancedTab/DisplayRobotName'
 import { RobotInformation } from './AdvancedTab/RobotInformation'
@@ -31,7 +30,7 @@ import { UseOlderProtocol } from './AdvancedTab/UseOlderProtocol'
 import { LegacySettings } from './AdvancedTab/LegacySettings'
 import { ShortTrashBin } from './AdvancedTab/ShortTrashBin'
 import { UseOlderAspirateBehavior } from './AdvancedTab/UseOlderAspirateBehavior'
-import { getRobotSettings, fetchSettings } from '../../../redux/robot-settings'
+import { updateSetting, getRobotSettings, fetchSettings } from '../../../redux/robot-settings'
 import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRobotSlideout'
 import { FactoryResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetSlideout'
 import { FactoryResetModal } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetModal'
@@ -85,7 +84,6 @@ export function RobotSettingsAdvanced({
   const settings = useSelector<State, RobotSettings>((state: State) =>
     getRobotSettings(state, robotName)
   )
-  console.log('SETTINGS', settings)
   const reachable = robot?.status !== UNREACHABLE
 
   const [isRobotReachable, setIsRobotReachable] = React.useState<boolean>(
@@ -240,14 +238,6 @@ export function RobotSettingsAdvanced({
             />
           </>
         )}
-        <StyledText as="h1">TEMP FF DIVIDER</StyledText>
-        {settings.map(field => (
-          <FeatureFlagToggle
-            settingField={field}
-            robotName={robotName}
-            isRobotBusy={isRobotBusy}
-          />
-        ))}
       </Box>
     </>
   )
