@@ -378,6 +378,12 @@ def test_get_dimensions(well_plate_def: LabwareDefinition) -> None:
     )
 
 
+@pytest.mark.xfail(strict=True, raises=NotImplementedError)
+def test_get_default_magnet_height() -> None:  # noqa: D103
+    subject = get_labware_view()
+    _ = subject.get_default_magnet_height("labware-id")
+
+
 def test_get_deck_definition(standard_deck_def: DeckDefinitionV3) -> None:
     """It should get the deck definition from the state."""
     subject = get_labware_view(deck_definition=standard_deck_def)
