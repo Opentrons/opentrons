@@ -194,7 +194,11 @@ class BinarySerializable:
                 if not (v.name == "message_index")
             }
             message_index = next(
-                (v.type.build(b[i]) for i, v in enumerate(fields(cls)) if v.name == "message_index"),
+                (
+                    v.type.build(b[i])
+                    for i, v in enumerate(fields(cls))
+                    if v.name == "message_index"
+                ),
                 None,
             )
             # Mypy is not liking constructing the derived types.
