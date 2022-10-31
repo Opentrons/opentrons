@@ -22,6 +22,7 @@ from opentrons.protocol_engine import (
     DeckSlotLocation,
     ModuleLocation,
     ModuleModel as EngineModuleModel,
+    LabwareMovementStrategy,
 )
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 
@@ -138,6 +139,31 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         return LabwareCore(
             labware_id=load_result.labwareId,
             engine_client=self._engine_client,
+        )
+
+    def move_labware(
+        self,
+        labware_core: LabwareCore,
+        new_location: Union[DeckSlotName, ModuleCore],
+        use_gripper: bool,
+    ) -> None:
+        """Move the given labware to a new location."""
+        to_location: Union[ModuleLocation, DeckSlotLocation]
+        if isinstance(new_location, ModuleCore):
+            to_location = ModuleLocation(moduleId=new_location.module_id)
+        else:
+            to_location = DeckSlotLocation(slotName=new_location)
+
+        strategy = (
+            LabwareMovementStrategy.USING_GRIPPER
+            if use_gripper
+            else LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE
+        )
+
+        self._engine_client.move_labware(
+            labware_id=labware_core.labware_id,
+            new_location=to_location,
+            strategy=strategy,
         )
 
     def _resolve_module_hardware(
