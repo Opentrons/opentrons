@@ -1,7 +1,12 @@
 import logging
 from typing import Optional, Any
 
+from opentrons_shared_data.labware.dev_types import (
+    LabwareDefinition as LabwareDefinitionDict,
+)
+
 from opentrons import types
+from opentrons.calibration_storage.helpers import uri_from_definition
 from opentrons.calibration_storage.types import TipLengthCalNotFound
 from opentrons.hardware_control.dev_types import PipetteDict
 
@@ -50,22 +55,21 @@ def validate_blowout_location(
         )
 
 
-def tip_length_for(pipette: PipetteDict, tiprack: Labware) -> float:
+def tip_length_for(
+    pipette: PipetteDict, tip_rack_definition: LabwareDefinitionDict
+) -> float:
     """Get the tip length, including overlap, for a tip from this rack"""
-
-    def _build_length_from_overlap() -> float:
-        tip_overlap = pipette["tip_overlap"].get(
-            tiprack.uri, pipette["tip_overlap"]["default"]
-        )
-        tip_length = tiprack.tip_length
-        return tip_length - tip_overlap
-
     try:
         return instr_cal.load_tip_length_for_pipette(
-            pipette["pipette_id"], tiprack._implementation.get_definition()
+            pipette["pipette_id"], tip_rack_definition
         ).tip_length
     except TipLengthCalNotFound:
-        return _build_length_from_overlap()
+        tip_overlap = pipette["tip_overlap"].get(
+            uri_from_definition(tip_rack_definition),
+            pipette["tip_overlap"]["default"],
+        )
+        tip_length = tip_rack_definition["parameters"]["tipLength"]
+        return tip_length - tip_overlap
 
 
 VALID_PIP_TIPRACK_VOL = {

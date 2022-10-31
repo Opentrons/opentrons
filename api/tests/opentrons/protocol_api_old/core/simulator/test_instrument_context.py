@@ -7,6 +7,7 @@ from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 from opentrons.hardware_control import NoTipAttachedError
 from opentrons.hardware_control.types import TipAttachedError
 from opentrons.protocol_api.core.common import InstrumentCore, LabwareCore
+from opentrons.types import Location
 
 
 @pytest.fixture(
@@ -60,32 +61,38 @@ def test_blow_out_no_tip(subject: InstrumentCore) -> None:
         subject.blow_out()
 
 
-def test_pick_up_tip_no_tip(subject: InstrumentCore, labware: LabwareCore) -> None:
+def test_pick_up_tip_no_tip(subject: InstrumentCore, tip_rack: LabwareCore) -> None:
     """It should raise an error if a tip is already attached."""
     subject.home()
     subject.pick_up_tip(
-        well=labware.get_wells()[0],
-        tip_length=1,
+        location=Location(
+            point=tip_rack.get_wells()[0].get_top(z_offset=0), labware=None
+        ),
+        well_core=tip_rack.get_wells()[0],
         presses=None,
         increment=None,
         prep_after=False,
     )
     with pytest.raises(TipAttachedError):
         subject.pick_up_tip(
-            well=labware.get_wells()[0],
-            tip_length=1,
+            location=Location(
+                point=tip_rack.get_wells()[0].get_top(z_offset=0), labware=None
+            ),
+            well_core=tip_rack.get_wells()[0],
             presses=None,
             increment=None,
             prep_after=False,
         )
 
 
-def test_pick_up_tip_prep_after(subject: InstrumentCore, labware: LabwareCore) -> None:
+def test_pick_up_tip_prep_after(subject: InstrumentCore, tip_rack: LabwareCore) -> None:
     """It should not raise an error, regardless of prep_after value."""
     subject.home()
     subject.pick_up_tip(
-        well=labware.get_wells()[0],
-        tip_length=1,
+        location=Location(
+            point=tip_rack.get_wells()[0].get_top(z_offset=0), labware=None
+        ),
+        well_core=tip_rack.get_wells()[0],
         presses=None,
         increment=None,
         prep_after=True,
@@ -95,8 +102,10 @@ def test_pick_up_tip_prep_after(subject: InstrumentCore, labware: LabwareCore) -
     subject.drop_tip(home_after=True)
     # and again, without preparing for aspirate
     subject.pick_up_tip(
-        well=labware.get_wells()[0],
-        tip_length=1,
+        location=Location(
+            point=tip_rack.get_wells()[0].get_top(z_offset=0), labware=None
+        ),
+        well_core=tip_rack.get_wells()[0],
         presses=None,
         increment=None,
         prep_after=False,
@@ -106,12 +115,14 @@ def test_pick_up_tip_prep_after(subject: InstrumentCore, labware: LabwareCore) -
     subject.drop_tip(home_after=True)
 
 
-def test_aspirate_too_much(subject: InstrumentCore, labware: LabwareCore) -> None:
+def test_aspirate_too_much(subject: InstrumentCore, tip_rack: LabwareCore) -> None:
     """It should raise an error if try to aspirate more than possible."""
     subject.home()
     subject.pick_up_tip(
-        well=labware.get_wells()[0],
-        tip_length=1,
+        location=Location(
+            point=tip_rack.get_wells()[0].get_top(z_offset=0), labware=None
+        ),
+        well_core=tip_rack.get_wells()[0],
         presses=None,
         increment=None,
         prep_after=False,
@@ -123,13 +134,15 @@ def test_aspirate_too_much(subject: InstrumentCore, labware: LabwareCore) -> Non
         subject.aspirate(subject.get_max_volume() + 1, rate=1)
 
 
-def test_working_volume(subject: InstrumentCore, labware: LabwareCore) -> None:
+def test_working_volume(subject: InstrumentCore, tip_rack: LabwareCore) -> None:
     """It should have the correct working volume."""
     subject.home()
     assert subject.get_hardware_state()["working_volume"] == 300
     subject.pick_up_tip(
-        well=labware.get_wells()[0],
-        tip_length=1,
+        location=Location(
+            point=tip_rack.get_wells()[0].get_top(z_offset=0), labware=None
+        ),
+        well_core=tip_rack.get_wells()[0],
         presses=None,
         increment=None,
         prep_after=False,
@@ -192,7 +205,7 @@ def test_pipette_dict_with_tip(
     side_effector: Callable[[InstrumentCore], None],
     instrument_context: InstrumentCore,
     simulating_instrument_context: InstrumentCore,
-    labware: LabwareCore,
+    tip_rack: LabwareCore,
 ) -> None:
     """It should be the same."""
     # Home first
@@ -200,15 +213,19 @@ def test_pipette_dict_with_tip(
     simulating_instrument_context.home()
     # Pickup tip
     instrument_context.pick_up_tip(
-        well=labware.get_wells()[0],
-        tip_length=2,
+        location=Location(
+            point=tip_rack.get_wells()[0].get_top(z_offset=0), labware=None
+        ),
+        well_core=tip_rack.get_wells()[0],
         presses=3,
         increment=4,
         prep_after=False,
     )
     simulating_instrument_context.pick_up_tip(
-        well=labware.get_wells()[0],
-        tip_length=2,
+        location=Location(
+            point=tip_rack.get_wells()[0].get_top(z_offset=0), labware=None
+        ),
+        well_core=tip_rack.get_wells()[0],
         presses=3,
         increment=4,
         prep_after=False,
