@@ -43,17 +43,17 @@ import type { Jog } from '../../../molecules/DeprecatedJogControls/types'
 import type {
   LabwarePositionCheckCreateCommand,
   LabwarePositionCheckMovementCommand,
-  LabwarePositionCheckStep,
+  DeprecatedLabwarePositionCheckStep,
   SavePositionCommandData,
 } from './types'
 import { StyledText } from '../../../atoms/text'
-import { useLabwareOffsetForLabware } from '../hooks/useLabwareOffsetForLabware'
+import { useLabwareOffsetForLabware } from '../deprecatedHooks/useLabwareOffsetForLabware'
 import { useCommandQuery } from '@opentrons/react-api-client'
 import type { Coordinates } from '@opentrons/shared-data'
 
 const DECK_MAP_VIEWBOX = '-30 -20 170 115'
 interface LabwarePositionCheckStepDetailProps {
-  selectedStep: LabwarePositionCheckStep
+  selectedStep: DeprecatedLabwarePositionCheckStep
   jog: Jog
   runId: string
   savePositionCommandData: SavePositionCommandData

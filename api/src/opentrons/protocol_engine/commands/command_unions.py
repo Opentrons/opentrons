@@ -104,14 +104,6 @@ from .move_labware import (
     MoveLabwareCommandType,
 )
 
-from .move_labware_off_deck import (
-    MoveLabwareOffDeck,
-    MoveLabwareOffDeckParams,
-    MoveLabwareOffDeckCreate,
-    MoveLabwareOffDeckResult,
-    MoveLabwareOffDeckCommandType,
-)
-
 from .move_relative import (
     MoveRelative,
     MoveRelativeParams,
@@ -197,7 +189,6 @@ Command = Union[
     LoadModule,
     LoadPipette,
     MoveLabware,
-    MoveLabwareOffDeck,
     MoveRelative,
     MoveToCoordinates,
     MoveToWell,
@@ -229,6 +220,7 @@ Command = Union[
     thermocycler.CloseLid,
     thermocycler.RunProfile,
     calibration.CalibratePipette,
+    calibration.MoveToLocation,
 ]
 
 CommandParams = Union[
@@ -244,7 +236,6 @@ CommandParams = Union[
     LoadModuleParams,
     LoadPipetteParams,
     MoveLabwareParams,
-    MoveLabwareOffDeckParams,
     MoveRelativeParams,
     MoveToCoordinatesParams,
     MoveToWellParams,
@@ -277,6 +268,7 @@ CommandParams = Union[
     thermocycler.RunProfileParams,
     thermocycler.RunProfileStepParams,
     calibration.CalibratePipetteParams,
+    calibration.MoveToLocationParams,
 ]
 
 CommandType = Union[
@@ -292,7 +284,6 @@ CommandType = Union[
     LoadModuleCommandType,
     LoadPipetteCommandType,
     MoveLabwareCommandType,
-    MoveLabwareOffDeckCommandType,
     MoveRelativeCommandType,
     MoveToCoordinatesCommandType,
     MoveToWellCommandType,
@@ -324,6 +315,7 @@ CommandType = Union[
     thermocycler.CloseLidCommandType,
     thermocycler.RunProfileCommandType,
     calibration.CalibratePipetteCommandType,
+    calibration.MoveToLocationCommandType,
 ]
 
 CommandCreate = Union[
@@ -338,7 +330,6 @@ CommandCreate = Union[
     LoadModuleCreate,
     LoadPipetteCreate,
     MoveLabwareCreate,
-    MoveLabwareOffDeckCreate,
     MoveRelativeCreate,
     MoveToCoordinatesCreate,
     MoveToWellCreate,
@@ -370,6 +361,7 @@ CommandCreate = Union[
     thermocycler.CloseLidCreate,
     thermocycler.RunProfileCreate,
     calibration.CalibratePipetteCreate,
+    calibration.MoveToLocationCreate,
 ]
 
 CommandResult = Union[
@@ -385,7 +377,6 @@ CommandResult = Union[
     LoadModuleResult,
     LoadPipetteResult,
     MoveLabwareResult,
-    MoveLabwareOffDeckResult,
     MoveRelativeResult,
     MoveToCoordinatesResult,
     MoveToWellResult,
@@ -417,4 +408,5 @@ CommandResult = Union[
     thermocycler.CloseLidResult,
     thermocycler.RunProfileResult,
     calibration.CalibratePipetteResult,
+    calibration.MoveToLocationResult,
 ]

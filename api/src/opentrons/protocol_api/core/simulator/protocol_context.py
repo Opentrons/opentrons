@@ -31,7 +31,7 @@ class ProtocolContextSimulation(
 
         if (
             existing_instrument
-            and existing_instrument.get_instrument_name() == instrument_name.value
+            and existing_instrument.get_requested_as_name() == instrument_name.value
         ):
             # Replacing with the exact same instrument name. Just return the
             # existing instrument instance.

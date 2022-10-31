@@ -24,8 +24,7 @@ from opentrons.protocols.api_support.util import (
     APIVersionError,
 )
 
-from .core.instrument import AbstractInstrument
-from .core.well import AbstractWellCore
+from .core.common import InstrumentCore
 from .module_contexts import ThermocyclerContext, HeaterShakerContext
 from . import labware
 
@@ -62,31 +61,25 @@ class InstrumentContext(publisher.CommandPublisher):
 
     def __init__(
         self,
-        implementation: AbstractInstrument[AbstractWellCore],
+        implementation: InstrumentCore,
         ctx: ProtocolContext,
         broker: Broker,
-        at_version: APIVersion,
-        tip_racks: Optional[List[labware.Labware]] = None,
-        trash: Optional[labware.Labware] = None,
+        api_version: APIVersion,
+        tip_racks: List[labware.Labware],
+        trash: labware.Labware,
+        requested_as: str,
     ) -> None:
 
         super().__init__(broker)
-        self._api_version = at_version
+        self._api_version = api_version
         self._implementation = implementation
         self._ctx = ctx
-
-        self._tip_racks = tip_racks or list()
-        for tip_rack in self.tip_racks:
-            assert tip_rack.is_tiprack
-            instrument.validate_tiprack(self.name, tip_rack, logger)
-        if trash is None:
-            self.trash_container = self._ctx.fixed_trash
-        else:
-            self.trash_container = trash
-
+        self._tip_racks = tip_racks
         self._last_tip_picked_up_from: Union[labware.Well, None] = None
         self._starting_tip: Union[labware.Well, None] = None
-        self.requested_as = self._implementation.get_instrument_name()
+
+        self.trash_container = trash
+        self.requested_as = requested_as
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -613,15 +606,15 @@ class InstrumentContext(publisher.CommandPublisher):
     @requires_version(2, 0)
     def return_tip(self, home_after: bool = True) -> InstrumentContext:
         """
-        If a tip is currently attached to the pipette, then it will return the
-        tip to it's location in the tiprack.
+        If a tip is currently attached to the pipette, then the pipette will
+        return the tip to its location in the tip rack.
 
-        It will not reset tip tracking so the well flag will remain False.
+        This will not reset tip tracking, so the well flag will remain ``False``.
 
         :returns: This instance
 
         :param home_after:
-            See the ``home_after`` parameter in :py:obj:`drop_tip`.
+            See the ``home_after`` parameter of :py:obj:`drop_tip`.
         """
         if not self._implementation.has_tip():
             logger.warning("Pipette has no tip to return")

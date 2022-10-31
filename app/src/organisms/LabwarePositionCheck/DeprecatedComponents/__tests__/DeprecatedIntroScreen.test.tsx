@@ -17,18 +17,18 @@ import {
   useModuleRenderInfoForProtocolById,
 } from '../../../Devices/hooks'
 import { useCurrentRun, useCurrentRunId } from '../../../ProtocolUpload/hooks'
-import { getLatestLabwareOffsetCount } from '../../utils/getLatestLabwareOffsetCount'
+import { getLatestLabwareOffsetCount } from '../../deprecatedUtils/getLatestLabwareOffsetCount'
 import { DeprecatedSectionList } from '../DeprecatedSectionList'
-import { useIntroInfo, useLabwareIdsBySection } from '../../hooks'
+import { useIntroInfo, useLabwareIdsBySection } from '../../deprecatedHooks'
 import { DeprecatedIntroScreen, INTERVAL_MS } from '../DeprecatedIntroScreen'
-import type { Section } from '../types'
+import type { DeprecatedSection } from '../types'
 import type { HostConfig, LabwareOffset } from '@opentrons/api-client'
 
-jest.mock('../../hooks')
+jest.mock('../../deprecatedHooks')
 jest.mock('../DeprecatedSectionList')
 jest.mock('../../../Devices/hooks')
 jest.mock('../../../ProtocolUpload/hooks')
-jest.mock('../../utils/getLatestLabwareOffsetCount')
+jest.mock('../../deprecatedUtils/getLatestLabwareOffsetCount')
 
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
@@ -74,7 +74,9 @@ const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
   (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
   {}
 )
-const MOCK_SECTIONS = ['MOCK_PRIMARY_PIPETTE_TIPRACKS' as Section]
+const MOCK_DEPRECATED_SECTIONS = [
+  'MOCK_PRIMARY_PIPETTE_TIPRACKS' as DeprecatedSection,
+]
 const MOCK_300_UL_TIPRACK_COORDS = [30, 40, 0]
 const MOCK_ROBOT_NAME = 'otie'
 const HOST_CONFIG: HostConfig = {
@@ -145,9 +147,11 @@ describe('DeprecatedIntroScreen', () => {
       primaryPipetteMount: 'left',
       secondaryPipetteMount: '',
       firstTiprackSlot: '2',
-      sections: MOCK_SECTIONS,
+      sections: MOCK_DEPRECATED_SECTIONS,
     })
-    mockDeprecatedSectionList.mockReturnValue(<div>Mock Section List</div>)
+    mockDeprecatedSectionList.mockReturnValue(
+      <div>Mock DeprecatedSection List</div>
+    )
     when(mockUseCurrentRun)
       .calledWith()
       .mockReturnValue({
@@ -170,7 +174,7 @@ describe('DeprecatedIntroScreen', () => {
     getByText(
       'When you check a labware, the OT-2’s pipette nozzle or attached tip will stop at the center of the A1 well. If the pipette nozzle or tip is not centered, you can reveal the OT-2’s jog controls to make an adjustment. This Labware Offset will be applied to the entire labware. Offset data is measured to the nearest 1/10th mm and can be made in the X, Y and/or Z directions.'
     )
-    getByText('Mock Section List')
+    getByText('Mock DeprecatedSection List')
   })
   it('should call beginLPC when the CTA button is pressed', () => {
     const { getByRole } = render(props)

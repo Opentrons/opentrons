@@ -13,13 +13,20 @@ import {
 import { StyledText } from '../../../atoms/text'
 import { DeprecatedLabwarePositionCheckStepDetail } from './DeprecatedLabwarePositionCheckStepDetail'
 import { DeprecatedSectionList } from './DeprecatedSectionList'
-import { useIntroInfo, useLabwareIdsBySection, useSteps } from '../hooks'
+import {
+  useIntroInfo,
+  useLabwareIdsBySection,
+  useDeprecatedSteps,
+} from '../deprecatedHooks'
 import { DeprecatedDeckMap } from './DeprecatedDeckMap'
 import type { Jog } from '../../../molecules/DeprecatedJogControls'
-import type { LabwarePositionCheckStep, SavePositionCommandData } from './types'
+import type {
+  DeprecatedLabwarePositionCheckStep,
+  SavePositionCommandData,
+} from './types'
 
 interface GenericStepScreenProps {
-  selectedStep: LabwarePositionCheckStep
+  selectedStep: DeprecatedLabwarePositionCheckStep
   ctaText: string
   proceed: () => void
   jog: Jog
@@ -37,7 +44,7 @@ export const DeprecatedGenericStepScreen = (
 ): JSX.Element | null => {
   const introInfo = useIntroInfo()
   const labwareIdsBySection = useLabwareIdsBySection(props.runId)
-  const allSteps = useSteps(props.runId)
+  const allSteps = useDeprecatedSteps(props.runId)
   if (introInfo == null) return null
   const { sections, primaryPipetteMount, secondaryPipetteMount } = introInfo
   const labwareIdsToHighlight = labwareIdsBySection[props.selectedStep.section]

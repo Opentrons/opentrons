@@ -11,10 +11,12 @@ export const getLabwareOffsetLocation = (
   labwareId: string,
   commands: ProtocolAnalysisFile['commands'],
   modules: ProtocolAnalysisFile['modules']
-): LabwareOffsetLocation => {
-  let location: LabwareOffsetLocation
+): LabwareOffsetLocation | null => {
+  let location: LabwareOffsetLocation | null
   const labwareLocation = getLabwareLocation(labwareId, commands)
-  if ('moduleId' in labwareLocation) {
+  if (labwareLocation === 'offDeck') {
+    location = null
+  } else if ('moduleId' in labwareLocation) {
     const moduleModel = modules[labwareLocation.moduleId].model
     const slotName = getModuleInitialLoadInfo(
       labwareLocation.moduleId,

@@ -38,6 +38,7 @@ class ConfigAnalyzerErrorSpec(NamedTuple):
 # TODO(mc, 2021-11-30): add JSON v6 spec when JsonProtocol model
 # supports parsing schema v6
 CONFIG_ANALYZER_SPECS: List[ConfigAnalyzerSpec] = [
+    # Basic Python:
     ConfigAnalyzerSpec(
         main_file=RoleAnalysisFile(
             name="protocol.py",
@@ -55,9 +56,11 @@ CONFIG_ANALYZER_SPECS: List[ConfigAnalyzerSpec] = [
         ),
         expected=ConfigAnalysis(
             metadata={"author": "Dr. Sy. N. Tist", "apiLevel": "2.11"},
+            robot_type="OT-2 Standard",
             config=PythonProtocolConfig(api_version=APIVersion(2, 11)),
         ),
     ),
+    # Basic JSON:
     ConfigAnalyzerSpec(
         main_file=RoleAnalysisFile(
             name="protocol.json",
@@ -76,6 +79,7 @@ CONFIG_ANALYZER_SPECS: List[ConfigAnalyzerSpec] = [
                 "created": 1223131231,
                 "tags": ["unitTest"],
             },
+            robot_type="OT-2 Standard",
             config=JsonProtocolConfig(schema_version=5),
         ),
     ),
@@ -97,6 +101,7 @@ CONFIG_ANALYZER_SPECS: List[ConfigAnalyzerSpec] = [
                 "created": 1223131231,
                 "tags": ["unitTest"],
             },
+            robot_type="OT-2 Standard",
             config=JsonProtocolConfig(schema_version=4),
         ),
     ),
@@ -118,9 +123,11 @@ CONFIG_ANALYZER_SPECS: List[ConfigAnalyzerSpec] = [
                 "created": 1223131231,
                 "tags": ["unitTest"],
             },
+            robot_type="OT-2 Standard",
             config=JsonProtocolConfig(schema_version=3),
         ),
     ),
+    # Uppercase file extension:
     ConfigAnalyzerSpec(
         main_file=RoleAnalysisFile(
             name="protocol.PY",
@@ -138,7 +145,72 @@ CONFIG_ANALYZER_SPECS: List[ConfigAnalyzerSpec] = [
         ),
         expected=ConfigAnalysis(
             metadata={"author": "Dr. Sy. N. Tist", "apiLevel": "2.11"},
+            robot_type="OT-2 Standard",
+            config=PythonProtocolConfig(
+                api_version=APIVersion(2, 11),
+            ),
+        ),
+    ),
+    # Explicitly specified robotType:
+    ConfigAnalyzerSpec(
+        main_file=RoleAnalysisFile(
+            name="protocol.py",
+            data=None,
+            path=None,
+            role=ProtocolFileRole.MAIN,
+            contents=textwrap.dedent(
+                """
+                metadata = {"apiLevel": "2.11"}
+                requirements = {"robotType": "OT-2"}
+                """
+            ).encode(),
+        ),
+        expected=ConfigAnalysis(
+            metadata={"apiLevel": "2.11"},
+            robot_type="OT-2 Standard",
             config=PythonProtocolConfig(api_version=APIVersion(2, 11)),
+        ),
+    ),
+    ConfigAnalyzerSpec(
+        main_file=RoleAnalysisFile(
+            name="protocol.py",
+            data=None,
+            path=None,
+            role=ProtocolFileRole.MAIN,
+            contents=textwrap.dedent(
+                """
+                metadata = {"apiLevel": "2.11"}
+                requirements = {"robotType": "OT-3"}
+                """
+            ).encode(),
+        ),
+        expected=ConfigAnalysis(
+            metadata={"apiLevel": "2.11"},
+            robot_type="OT-3 Standard",
+            config=PythonProtocolConfig(
+                api_version=APIVersion(2, 11),
+            ),
+        ),
+    ),
+    # apiLevel in `requirements`, instead of `metadata`:
+    ConfigAnalyzerSpec(
+        main_file=RoleAnalysisFile(
+            name="protocol.py",
+            data=None,
+            path=None,
+            role=ProtocolFileRole.MAIN,
+            contents=textwrap.dedent(
+                """
+                requirements = {"apiLevel": "2.11"}
+                """
+            ).encode(),
+        ),
+        expected=ConfigAnalysis(
+            metadata={},
+            robot_type="OT-2 Standard",
+            config=PythonProtocolConfig(
+                api_version=APIVersion(2, 11),
+            ),
         ),
     ),
 ]
@@ -179,7 +251,7 @@ CONFIG_ANALYZER_ERROR_SPECS: List[ConfigAnalyzerErrorSpec] = [
                 """
             ).encode(),
         ),
-        expected_message="metadata.apiLevel missing",
+        expected_message="apiLevel not declared in protocol.py",
     ),
     ConfigAnalyzerErrorSpec(
         main_file=RoleAnalysisFile(
@@ -194,7 +266,7 @@ CONFIG_ANALYZER_ERROR_SPECS: List[ConfigAnalyzerErrorSpec] = [
                 """
             ).encode(),
         ),
-        expected_message="metadata.apiLevel missing",
+        expected_message="apiLevel not declared in protocol.py",
     ),
     ConfigAnalyzerErrorSpec(
         main_file=RoleAnalysisFile(
@@ -209,7 +281,7 @@ CONFIG_ANALYZER_ERROR_SPECS: List[ConfigAnalyzerErrorSpec] = [
                 """
             ).encode(),
         ),
-        expected_message="metadata.apiLevel missing",
+        expected_message="apiLevel not declared in protocol.py",
     ),
     ConfigAnalyzerErrorSpec(
         main_file=RoleAnalysisFile(
@@ -257,7 +329,7 @@ CONFIG_ANALYZER_ERROR_SPECS: List[ConfigAnalyzerErrorSpec] = [
                 """
             ).encode(),
         ),
-        expected_message="is not of the format X.Y",
+        expected_message="is incorrectly formatted",
     ),
     ConfigAnalyzerErrorSpec(
         main_file=RoleAnalysisFile(
@@ -274,11 +346,27 @@ CONFIG_ANALYZER_ERROR_SPECS: List[ConfigAnalyzerErrorSpec] = [
         ),
         expected_message="API version 123.456 is not supported by this robot software. Please either reduce your requested API version or update your robot.",
     ),
+    ConfigAnalyzerErrorSpec(
+        main_file=RoleAnalysisFile(
+            name="protocol.py",
+            data=None,
+            path=None,
+            role=ProtocolFileRole.MAIN,
+            contents=textwrap.dedent(
+                """
+                metadata = {"apiLevel": "2.11"}
+                # robotType provided, but not a valid string.
+                requirements = {"robotType": "ot2"}
+                """
+            ).encode(),
+        ),
+        expected_message="robotType must be 'OT-2' or 'OT-3', not 'ot2'.",
+    ),
 ]
 
 
 @pytest.mark.parametrize(ConfigAnalyzerSpec._fields, CONFIG_ANALYZER_SPECS)
-def test_role_analyzer(main_file: RoleAnalysisFile, expected: ConfigAnalysis) -> None:
+def test_config_analyzer(main_file: RoleAnalysisFile, expected: ConfigAnalysis) -> None:
     """It should analyze a main file for config properly."""
     subject = ConfigAnalyzer()
     result = subject.analyze(main_file)
@@ -287,7 +375,7 @@ def test_role_analyzer(main_file: RoleAnalysisFile, expected: ConfigAnalysis) ->
 
 
 @pytest.mark.parametrize(ConfigAnalyzerErrorSpec._fields, CONFIG_ANALYZER_ERROR_SPECS)
-def test_role_analyzer_error(
+def test_config_analyzer_error(
     main_file: RoleAnalysisFile,
     expected_message: str,
 ) -> None:

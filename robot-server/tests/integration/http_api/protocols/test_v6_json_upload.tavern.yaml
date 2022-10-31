@@ -110,6 +110,17 @@ stages:
                 displayName: Opentrons 96 Tip Rack 10 µL
                 location:
                   slotName: '8'
+            modules: 
+              - id: magneticModuleId 
+                serialNumber: !anystr
+                model: magneticModuleV2 
+                location: 
+                  slotName: '3'
+              - id: temperatureModuleId 
+                serialNumber: !anystr
+                model: temperatureModuleV2 
+                location: 
+                  slotName: '1'
             commands:
               - id: !anystr
                 createdAt: !anystr
@@ -525,3 +536,4 @@ stages:
                 displayName: Water
                 description: Liquid H2O
                 displayColor: '#7332a8'
+            robotType: "OT-2 Standard"
