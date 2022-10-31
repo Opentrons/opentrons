@@ -530,14 +530,14 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
         repetitions: int,
         block_max_volume: Optional[float] = None,
     ) -> None:
-        """Execute a Thermocycler Profile defined as a cycle of
-        ``steps`` to repeat for a given number of ``repetitions``.
+        """Execute a Thermocycler profile, defined as a cycle of
+        ``steps``, for a given number of ``repetitions``.
 
         :param steps: List of unique steps that make up a single cycle.
                       Each list item should be a dictionary that maps to
                       the parameters of the :py:meth:`set_block_temperature`
-                      method with keys ``temperature``, ``hold_time_seconds``,
-                      and ``hold_time_minutes``.
+                      method with a ``temperature`` key, and either or both of
+                      ``hold_time_seconds`` and ``hold_time_minutes``.
         :param repetitions: The number of times to repeat the cycled steps.
         :param block_max_volume: The greatest volume of liquid contained in any
                                  individual well of the loaded labware, in µL.
@@ -572,15 +572,15 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
         """Turn off both the well block temperature controller and the lid heater."""
         self._core.deactivate()
 
+    # TODO(ec, 2022-10-31): what the `max` value means
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def lid_position(self) -> Optional[str]:
-        """One of five possible lid statuses:
+        """One of these possible lid statuses:
         - ``closed``: The lid is closed.
         - ``in_between``: The lid is neither open nor closed.
         - ``open``: The lid is open.
-        - ``unknown``: The status can't be determined.
-        # - ``max``: TODO what MAX means
+        - ``unknown``: The lid position can't be determined.
         """
         return self._core.get_lid_position()
 
@@ -589,12 +589,11 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     def block_temperature_status(self) -> str:
         """One of five possible temperature statuses:
 
-        - ``holding at target``: The module has reached its target temperature
+        - ``holding at target``: The block has reached its target temperature
             and is actively maintaining that temperature.
-        - ``cooling``: The module has previously heated and is now passively cooling.
-            `The Heater-Shaker does not have active cooling.`
-        - ``heating``: The module is heating to a target temperature.
-        - ``idle``: The module has not heated since the beginning of the protocol.
+        - ``cooling``: The block is cooling to a target temperature.
+        - ``heating``: The block is heating to a target temperature.
+        - ``idle``: The block has not heated or cooled since the beginning of the protocol.
         - ``error``: The temperature status can't be determined.
         """
         return self._core.get_block_temperature_status()
@@ -604,12 +603,12 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     def lid_temperature_status(self) -> Optional[str]:
         """One of five possible temperature statuses:
 
-        - ``holding at target``: The module has reached its target temperature
+        - ``holding at target``: The lid has reached its target temperature
             and is actively maintaining that temperature.
-        - ``cooling``: The module has previously heated and is now passively cooling.
-            `The Heater-Shaker does not have active cooling.`
-        - ``heating``: The module is heating to a target temperature.
-        - ``idle``: The module has not heated since the beginning of the protocol.
+        - ``cooling``: The lid has previously heated and is now passively cooling.
+            `The Thermocycler lid does not have active cooling.`
+        - ``heating``: The lid is heating to a target temperature.
+        - ``idle``: The lid has not heated since the beginning of the protocol.
         - ``error``: The temperature status can't be determined.
         """
         return self._core.get_lid_temperature_status()

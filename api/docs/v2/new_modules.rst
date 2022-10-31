@@ -369,9 +369,9 @@ Lid Control
 
 The Thermocycler can control the position and temperature of its lid. 
 
-To change the lid position, use :py:meth:`~.ThermocyclerContext.open_lid` and :py:meth:`~.ThermocyclerContext.close_lid`  When the lid is open, the pipettes can access the loaded labware. 
+To change the lid position, use :py:meth:`~.ThermocyclerContext.open_lid` and :py:meth:`~.ThermocyclerContext.close_lid`. When the lid is open, the pipettes can access the loaded labware. 
 
-You can also control the target temperature of the lid. Acceptable target temperatures are between 37 and 110 °C. To set the lid temperature, use :py:meth:`~.ThermocyclerContext.set_lid_temperature`, which takes one parameter: the target ``temperature`` (in degrees Celsius) as an integer. For example, to set the lid to 50 °C:
+You can also control the temperature of the lid. Acceptable target temperatures are between 37 and 110 °C. Use :py:meth:`~.ThermocyclerContext.set_lid_temperature`, which takes one parameter: the target ``temperature`` (in degrees Celsius) as an integer. For example, to set the lid to 50 °C:
 
 .. code-block:: python
 
@@ -395,13 +395,13 @@ The Thermocycler can control its block temperature, including holding at a tempe
 Temperature
 -----------
 
-To set the block temperature inside the Thermocycler, use :py:meth:`.ThermocyclerContext.set_block_temperature`. At minimum you have to specify a ``temperature`` in degrees Celsius:
+To set the block temperature inside the Thermocycler, use :py:meth:`~.ThermocyclerContext.set_block_temperature`. At minimum you have to specify a ``temperature`` in degrees Celsius:
 
 .. code-block:: python
 
         tc_mod.set_block_temperature(temperature=4)
         
-If you only specify a ``temperature`` in °C, the Thermocycler will hold this temperature until a new temperature is set, :py:meth:`~.ThermocyclerContext.deactivate_block` is called, or the module is powered off.
+If you don't specify any other parameters, the Thermocycler will hold this temperature until a new temperature is set, :py:meth:`~.ThermocyclerContext.deactivate_block` is called, or the module is powered off.
 
 .. versionadded:: 2.0
 
@@ -417,7 +417,7 @@ You can optionally instruct the Thermocycler to hold its block temperature for a
 
 .. note ::
 
-    Holding at a temperature will block execution of later commands in your protocol. Further commands will proceed once the hold time has elapsed.(If you don't specify a hold time, the protocol will proceed as soon as the target temperature is reached.)
+    Your protocol will not proceed to further commands while holding at a temperature. If you don't specify a hold time, the protocol will proceed as soon as the target temperature is reached.
 
 .. versionadded:: 2.0
 
@@ -443,7 +443,9 @@ If the Thermocycler assumes these samples are 25 µL, it may not cool them to 4 
 Thermocycler Profiles
 =====================
 
-In addition to executing individual temperature commands, the Thermocycler can automatically cycle through a sequence of block temperatures to perform heat-sensitive reactions. These sequences are called *profiles*, which are defined in the Protocol API as lists of dicts. Each dict should have a ``temperature`` key, which specifies the temperature of a profile step, and either or both of ``hold_time_seconds`` or ``hold_time_minutes``, which specify the duration of the step. For instance, this profile commands the Thermocycler to reach 10 °C and hold for 30 seconds, and then to reach 60 °C and hold for 45 seconds:
+In addition to executing individual temperature commands, the Thermocycler can automatically cycle through a sequence of block temperatures to perform heat-sensitive reactions. These sequences are called *profiles*, which are defined in the Protocol API as lists of dicts. Each dict should have a ``temperature`` key, which specifies the temperature of the step, and either or both of ``hold_time_seconds`` and ``hold_time_minutes``, which specify the duration of the step. 
+
+For example, this profile commands the Thermocycler to reach 10 °C and hold for 30 seconds, and then to reach 60 °C and hold for 45 seconds:
 
 .. code-block:: python
 
