@@ -197,7 +197,6 @@ class BinarySerializable:
                 (v.type.build(b[i]) for i, v in enumerate(fields(cls)) if v.name == "message_index"),
                 None,
             )
-            print("\n\n\nbuild message index: " + str(message_index) + "\n\n\n")
             # Mypy is not liking constructing the derived types.
             ret_instance = cls(**args)  # type: ignore[call-arg]
             if message_index is not None:
