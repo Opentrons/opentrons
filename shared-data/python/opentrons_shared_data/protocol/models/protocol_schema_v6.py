@@ -67,7 +67,7 @@ class Params(BaseModel):
     # there is moveLabware support in PAPIv2, this is only to unblock
     # internal testing of LPC with JSON protocols that include
     # 'moveLabware' commands in the meantime
-    newLocation: Union[Optional[Location], Literal['offDeck']]
+    newLocation: Optional[Union[Location, Literal["offDeck"]]]
     strategy: Optional[str]
 
 
