@@ -34,8 +34,8 @@ class BaseMessage(object):
     def __post_init__(self) -> None:
         """Update the message index from the singleton."""
         try:
-            if self.payload.message_index == 0:  # type: ignore[attr-defined]
-                index_generator = SingletonMessageIndexGenerator()
+            index_generator = SingletonMessageIndexGenerator()
+            if (self.payload.message_index.value == 0):  # type: ignore[attr-defined]
                 self.payload.message_index = utils.UInt32Field(  # type: ignore[attr-defined]
                     index_generator.get_next_index()
                 )
