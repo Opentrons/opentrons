@@ -16,7 +16,6 @@ export function ODDSplash(): JSX.Element {
   React.useEffect(() => {
     // After 4 sec, looking for WiFi SSIDs
     const splashTimer = setTimeout(() => {
-      console.log('hello')
       history.push(`/selectNetwork`)
     }, SPLASH_DURATION)
     return () => {

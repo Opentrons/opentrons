@@ -39,4 +39,5 @@ export interface NavRouteParams {
   robotSettingsTab: RobotSettingsTab
   runId: string
   protocolRunDetailsTab: ProtocolRunDetailsTab
+  ssid: string
 }

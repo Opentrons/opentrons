@@ -60,6 +60,8 @@ export interface InputFieldProps {
   /** if input type is number, these are the min and max values */
   max?: number
   min?: number
+  /** input height for odd */
+  height?: string
 }
 
 export function InputField(props: InputFieldProps): JSX.Element {
@@ -128,7 +130,7 @@ function Input(props: InputFieldProps): JSX.Element {
 
   return (
     <Flex width="100%" flexDirection={DIRECTION_COLUMN}>
-      <Flex css={INPUT_FIELD}>
+      <Flex css={INPUT_FIELD} height={props.height && props.height}>
         <input
           {...props}
           data-testid={props.id}

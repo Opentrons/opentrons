@@ -26,12 +26,11 @@ import { ProtocolDetails } from '../pages/Protocols/ProtocolDetails'
 import { AppSettings } from '../pages/AppSettings'
 import { Labware } from '../pages/Labware'
 import { ODDSplash } from '../pages/ODD/ODDSplash'
-import { SearchNetwork } from '../pages/ODD/SearchNetwork'
 import { ConnectingNetwork } from '../pages/ODD/ConnectingNetwork'
 import { ConnectionResult } from '../pages/ODD/ConnectionResult'
 import { ConnectedNetworkInfo } from '../pages/ODD/ConnectedNetworkInfo'
 import { SelectNetwork } from '../pages/ODD/SelectNetwork'
-import { InputNetworkInfo } from '../pages/ODD/InputNetworkInfo'
+import { SetWifiCred } from '../organisms/SetupNetworks/SetWifiCred'
 import { getIsOnDevice } from '../redux/config'
 import { getLocalRobot } from '../redux/discovery'
 import { useSoftwareUpdatePoll } from './hooks'
@@ -112,14 +111,8 @@ export const AppComponent = (): JSX.Element => {
     {
       Component: ODDSplash,
       exact: true,
-      name: 'ODD Splash',
-      path: '/start',
-    },
-    {
-      Component: SearchNetwork,
-      exact: true,
-      name: 'Search Network',
-      path: '/searchNetwork',
+      name: 'ODD Setup',
+      path: '/deviceSetup',
     },
     {
       Component: ConnectingNetwork,
@@ -146,10 +139,11 @@ export const AppComponent = (): JSX.Element => {
       path: '/selectNetwork',
     },
     {
-      Component: InputNetworkInfo,
+      Component: SetWifiCred,
       exact: true,
-      name: 'Input Network Info',
-      path: '/inputNetworkInfo',
+      name: 'Set Wifi Password',
+      path: '/setWifiCred/:ssid',
+      // path: '/setWifiCred',
     },
   ]
 
@@ -171,8 +165,8 @@ export const AppComponent = (): JSX.Element => {
         onDrop={stopEvent}
       >
         <TopPortalRoot />
-        {/* {!isOnDevice && <Navbar routes={routes} />} */}
-        <Navbar routes={routes} />
+        {!isOnDevice && <Navbar routes={routes} />}
+        {/* <Navbar routes={routes} /> */}
         <Box width="100%">
           <Switch>
             {routes.map(({ Component, exact, path }: RouteProps) => {
@@ -196,7 +190,7 @@ export const AppComponent = (): JSX.Element => {
               exact
               from="/"
               // to={isOnDevice ? '/device/start' : '/protocols'}
-              to="/start"
+              to="/deviceSetup"
             />
           </Switch>
           <Alerts />

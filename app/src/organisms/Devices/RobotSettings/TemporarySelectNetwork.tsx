@@ -73,6 +73,9 @@ export const TemporarySelectNetwork = ({
     true
   )
 
+  console.log('eapOptions', eapOptions)
+  console.log('keys', keys)
+
   React.useEffect(() => {
     // if we're connecting to a network, ensure we get the info needed to
     // populate the configuration forms
