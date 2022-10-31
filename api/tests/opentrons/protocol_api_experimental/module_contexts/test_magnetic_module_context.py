@@ -2,25 +2,18 @@
 
 from decoy import Decoy
 import pytest
-from typing import Optional
 
 from opentrons.protocols.models import LabwareDefinition
 
 from opentrons.protocol_engine import (
     ModuleLocation,
-    ModuleModel,
     commands as pe_commands,
 )
 from opentrons.protocol_engine.clients import SyncClient
-from opentrons.protocol_engine.errors.exceptions import (
-    LabwareNotLoadedOnModuleError,
-    NoMagnetEngageHeightError,
-)
 
 from opentrons.protocol_api_experimental import (
     Labware,
     MagneticModuleContext,
-    InvalidMagnetEngageHeightError,
 )
 
 
@@ -125,167 +118,9 @@ def test_labware_property(subject: MagneticModuleContext) -> None:  # noqa: D103
     _ = subject.labware
 
 
-def test_engage_only_one_height_allowed(subject: MagneticModuleContext) -> None:
-    """It should raise if you provide conflicting height arguments."""
-    # These [call-overload] ignores are because the type-checker wants to stop us
-    # from miscalling this function, but we need to test that the function protects
-    # itself when there is no type-checker.
-
-    with pytest.raises(InvalidMagnetEngageHeightError):
-        subject.engage(height=1, height_from_base=2, offset=3)  # type: ignore[call-overload]
-    with pytest.raises(InvalidMagnetEngageHeightError):
-        subject.engage(height=1, height_from_base=2)  # type: ignore[call-overload]
-    with pytest.raises(InvalidMagnetEngageHeightError):
-        subject.engage(height=1, offset=3)  # type: ignore[call-overload]
-    with pytest.raises(InvalidMagnetEngageHeightError):
-        subject.engage(height_from_base=2, offset=3)  # type: ignore[call-overload]
-
-    # Explicitly providing an offset value of 0 is intuitively equivalent to not
-    # providing any offset, but it should still be mutually exclusive with other args.
-    with pytest.raises(InvalidMagnetEngageHeightError):
-        subject.engage(height=123, offset=0)  # type: ignore[call-overload]
-    with pytest.raises(InvalidMagnetEngageHeightError):
-        subject.engage(height_from_base=123, offset=0)  # type: ignore[call-overload]
-
-
-def test_engage_with_height_from_home(
-    decoy: Decoy,
-    engine_client: SyncClient,
-    subject_module_id: str,
-    subject: MagneticModuleContext,
-) -> None:
-    """It should pass the correct height to the Protocol Engine command."""
-    decoy.when(
-        engine_client.state.modules.get_model(module_id=subject_module_id)
-    ).then_return(ModuleModel.MAGNETIC_MODULE_V1)
-    decoy.when(
-        engine_client.state.modules.calculate_magnet_height(
-            module_model=ModuleModel.MAGNETIC_MODULE_V1,
-            height_from_home=12.34,
-        )
-    ).then_return(56.78)
-    subject.engage(height=12.34)
-    decoy.verify(
-        engine_client.magnetic_module_engage(
-            module_id=subject_module_id, engage_height=56.78
-        ),
-    )
-
-
-def test_engage_with_height_from_base(
-    decoy: Decoy,
-    engine_client: SyncClient,
-    subject_module_id: str,
-    subject: MagneticModuleContext,
-) -> None:
-    """It should pass the correct height to the Protocol Engine command."""
-    decoy.when(
-        engine_client.state.modules.get_model(module_id=subject_module_id)
-    ).then_return(ModuleModel.MAGNETIC_MODULE_V1)
-    decoy.when(
-        engine_client.state.modules.calculate_magnet_height(
-            module_model=ModuleModel.MAGNETIC_MODULE_V1,
-            height_from_base=12.34,
-        )
-    ).then_return(56.78)
-    subject.engage(height_from_base=12.34)
-    decoy.verify(
-        engine_client.magnetic_module_engage(
-            module_id=subject_module_id, engage_height=56.78
-        )
-    )
-
-
-def test_engage_with_offset(
-    decoy: Decoy,
-    engine_client: SyncClient,
-    subject_module_id: str,
-    subject: MagneticModuleContext,
-) -> None:
-    """It should use the offset combined with the labware's default engage height."""
-    decoy.when(
-        engine_client.state.labware.get_default_magnet_height(
-            module_id=subject_module_id, offset=4.56
-        )
-    ).then_return(7.23)
-
-    subject.engage(offset=4.56)
-    decoy.verify(
-        engine_client.magnetic_module_engage(
-            module_id=subject_module_id, engage_height=7.23
-        )
-    )
-
-
-def test_engage_with_no_arguments(
-    decoy: Decoy,
-    engine_client: SyncClient,
-    subject_module_id: str,
-    subject: MagneticModuleContext,
-) -> None:
-    """It should use the default engage height from the labware."""
-    decoy.when(
-        engine_client.state.labware.get_default_magnet_height(
-            module_id=subject_module_id, offset=0
-        )
-    ).then_return(1.23)
-
-    subject.engage()
-    decoy.verify(
-        engine_client.magnetic_module_engage(
-            module_id=subject_module_id, engage_height=1.23
-        )
-    )
-
-
-@pytest.mark.parametrize(
-    "input_offset, output_offset", [(0, 0), (1.23, 1.23), (None, 0)]
-)
-def test_engage_based_on_labware_errors_when_no_labware_loaded(
-    decoy: Decoy,
-    engine_client: SyncClient,
-    subject_module_id: str,
-    subject: MagneticModuleContext,
-    input_offset: Optional[float],
-    output_offset: float,
-) -> None:
-    """It should raise when there is no labware loaded on the module."""
-    decoy.when(
-        engine_client.state.labware.get_default_magnet_height(
-            module_id=subject_module_id, offset=output_offset
-        )
-    ).then_raise(
-        LabwareNotLoadedOnModuleError  # type: ignore[arg-type]
-    )
-
-    expected_exception_text = "no labware loaded"
-    with pytest.raises(InvalidMagnetEngageHeightError, match=expected_exception_text):
-        subject.engage(offset=input_offset)
-
-
-@pytest.mark.parametrize(
-    "input_offset, output_offset", [(0, 0), (1.23, 1.23), (None, 0)]
-)
-def test_engage_based_on_labware_errors_when_labware_has_no_default_height(
-    decoy: Decoy,
-    engine_client: SyncClient,
-    subject_module_id: str,
-    subject: MagneticModuleContext,
-    input_offset: Optional[float],
-    output_offset: float,
-) -> None:
-    """It should raise when there is a labware, but it has no default magnet height."""
-    decoy.when(
-        engine_client.state.labware.get_default_magnet_height(
-            module_id=subject_module_id, offset=output_offset
-        )
-    ).then_raise(
-        NoMagnetEngageHeightError  # type: ignore[arg-type]
-    )
-
-    expected_exception_text = "does not have a default"
-    with pytest.raises(InvalidMagnetEngageHeightError, match=expected_exception_text):
-        subject.engage(offset=input_offset)
+@pytest.mark.xfail(strict=True, raises=NotImplementedError)
+def test_engage(subject: MagneticModuleContext) -> None:  # noqa: D103
+    _ = subject.engage(offset=3.0)
 
 
 @pytest.mark.xfail(strict=True, raises=NotImplementedError)
