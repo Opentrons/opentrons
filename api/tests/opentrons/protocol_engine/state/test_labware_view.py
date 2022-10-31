@@ -17,7 +17,6 @@ from opentrons.protocol_engine.types import (
     LabwareOffsetLocation,
     LoadedLabware,
     ModuleModel,
-    ModuleLocation,
 )
 
 from opentrons.protocol_engine.state.labware import LabwareState, LabwareView
@@ -87,21 +86,6 @@ def test_get_labware_data_by_id() -> None:
     subject = get_labware_view(labware_by_id={"plate-id": plate})
 
     assert subject.get("plate-id") == plate
-
-
-def test_get_id_by_module() -> None:
-    """Should return the labware id associated to the module."""
-    subject = get_labware_view(
-        labware_by_id={
-            "labware-id": LoadedLabware(
-                id="labware-id",
-                loadName="test",
-                definitionUri="test-uri",
-                location=ModuleLocation(moduleId="module-id"),
-            )
-        }
-    )
-    assert subject.get_id_by_module(module_id="module-id") == "labware-id"
 
 
 def test_get_labware_definition(well_plate_def: LabwareDefinition) -> None:
@@ -392,26 +376,6 @@ def test_get_dimensions(well_plate_def: LabwareDefinition) -> None:
         y=well_plate_def.dimensions.yDimension,
         z=well_plate_def.dimensions.zDimension,
     )
-
-
-def test_get_default_magnet_height(
-    magdeck_well_plate_def: LabwareDefinition,
-) -> None:
-    """Should get get the default value for magnetic height."""
-    well_plate = LoadedLabware(
-        id="well-plate-id",
-        loadName="load-name",
-        location=ModuleLocation(moduleId="module-id"),
-        definitionUri="well-plate-uri",
-        offsetId=None,
-    )
-
-    subject = get_labware_view(
-        labware_by_id={"well-plate-id": well_plate},
-        definitions_by_uri={"well-plate-uri": magdeck_well_plate_def},
-    )
-
-    assert subject.get_default_magnet_height("well-plate-id") == 6.8
 
 
 def test_get_deck_definition(standard_deck_def: DeckDefinitionV3) -> None:

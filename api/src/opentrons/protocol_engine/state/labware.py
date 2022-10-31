@@ -29,7 +29,6 @@ from ..types import (
     LabwareOffsetLocation,
     LabwareLocation,
     LoadedLabware,
-    ModuleLocation,
 )
 from ..actions import (
     Action,
@@ -41,14 +40,6 @@ from .abstract_store import HasState, HandlesActions
 
 
 _TRASH_LOCATION = DeckSlotLocation(slotName=DeckSlotName.FIXED_TRASH)
-
-# URIs of labware whose definitions accidentally specify an engage height
-# in units of half-millimeters instead of millimeters.
-_MAGDECK_HALF_MM_LABWARE = {
-    "opentrons/biorad_96_wellplate_200ul_pcr/1",
-    "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",
-    "opentrons/usascientific_96_wellplate_2.4ml_deep/1",
-}
 
 
 @dataclass
@@ -201,14 +192,7 @@ class LabwareView(HasState[LabwareState]):
 
     def get_id_by_module(self, module_id: str) -> Optional[str]:
         """Return the ID of the labware loaded on the given module."""
-        for (key, value) in self.state.labware_by_id.items():
-            if (
-                isinstance(value.location, ModuleLocation)
-                and value.location.moduleId == module_id
-            ):
-                return key
-
-        return None
+        raise NotImplementedError()
 
     def get_definition(self, labware_id: str) -> LabwareDefinition:
         """Get labware definition by the labware's unique identifier."""
@@ -398,15 +382,7 @@ class LabwareView(HasState[LabwareState]):
 
         The returned value is measured in millimeters above the labware base plane.
         """
-        parameters = self.get_definition(labware_id).parameters
-        default_engage_height = parameters.magneticModuleEngageHeight
-        if (
-            parameters.isMagneticModuleCompatible is False
-            or default_engage_height is None
-        ):
-            return None
-
-        return default_engage_height
+        raise NotImplementedError()
 
     def get_labware_offset_vector(self, labware_id: str) -> LabwareOffsetVector:
         """Get the labware's calibration offset."""
@@ -478,8 +454,3 @@ class LabwareView(HasState[LabwareState]):
         raise errors.LabwareNotLoadedError(
             "No labware loaded into fixed trash location by this deck type."
         )
-
-    def is_magnetic_module_uri_in_half_millimeter(self, labware_id: str) -> bool:
-        """Check whether the labware uri needs to be calculated in half a millimeter."""
-        uri = self.get_definition_uri(labware_id)
-        return uri in _MAGDECK_HALF_MM_LABWARE

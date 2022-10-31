@@ -148,16 +148,7 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
             height_from_base: Distance from labware base to raise the magnets.
             height_from_home: Distance from motor home position to raise the magnets.
         """
-        if height_from_home is not None:
-            raise NotImplementedError(
-                "MagneticModuleCore.engage with height_from_home not implemented"
-            )
-
-        assert height_from_base is not None, "Expected engage height"
-
-        self._engine_client.magnetic_module_engage(
-            module_id=self._module_id, engage_height=height_from_base
-        )
+        raise NotImplementedError("MagneticModuleCore.engage not implemented")
 
     def engage_to_labware(
         self, offset: float = 0, preserve_half_mm: bool = False
@@ -170,32 +161,17 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
                 erroneously use half-mm for their defined default engage height,
                 use the value directly instead of converting it to real millimeters.
         """
-        model = self._engine_client.state.modules.get_model(module_id=self.module_id)
-
-        default_height = (
-            self._engine_client.state.geometry.get_default_magnet_engage_height(
-                module_id=self.module_id,
-                preserve_half_mm=preserve_half_mm,
-            )
-        )
-
-        calculated_height = self._engine_client.state.modules.calculate_magnet_height(
-            module_model=model,
-            labware_default_height=default_height,
-            offset_from_labware_default=offset,
-        )
-
-        self._engine_client.magnetic_module_engage(
-            module_id=self.module_id, engage_height=calculated_height
+        raise NotImplementedError(
+            "MagneticModuleCore.engage_to_labware not implemented"
         )
 
     def disengage(self) -> None:
         """Lower the magnets back into the module."""
-        self._engine_client.magnetic_module_disengage(module_id=self.module_id)
+        raise NotImplementedError("MagneticModuleCore.disengage not implemented")
 
     def get_status(self) -> MagneticStatus:
         """Get the module's current magnet status."""
-        return self._sync_module_hardware.status  # type: ignore[no-any-return]
+        raise NotImplementedError("MagneticModuleCore.get_status not implemented")
 
 
 class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
