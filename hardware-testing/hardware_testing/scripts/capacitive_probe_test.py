@@ -32,8 +32,8 @@ class Capacitive_Probe_Test:
         self.PROBE_LENGTH = 34.5
         self.CUTOUT_SIZE = 20
         self.CUTOUT_HALF = self.CUTOUT_SIZE / 2
-        self.CENTER_Z = Point(x=239, y=162, z=1)
-        self.CENTER_XY = Point(x=226.25, y=148, z=self.CENTER_Z.z)
+        self.CENTER_Z = Point(x=239, y=160, z=1)
+        self.CENTER_XY = Point(x=227.25, y=145.5, z=self.CENTER_Z.z)
         self.PROBE_SETTINGS_Z_AXIS = CapacitivePassSettings(
             prep_distance_mm=5,
             max_overrun_distance_mm=5,
