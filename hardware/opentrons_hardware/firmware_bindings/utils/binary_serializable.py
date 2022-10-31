@@ -194,7 +194,7 @@ class BinarySerializable:
                 if not (v.name == "message_index")
             }
             message_index = next(
-                (v for i, v in enumerate(fields(cls)) if v.name == "message_index"),
+                (v.type.build(b[i]) for i, v in enumerate(fields(cls)) if v.name == "message_index"),
                 None,
             )
             print("\n\n\nbuild message index: " + str(message_index) + "\n\n\n")
