@@ -577,6 +577,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     @requires_version(2, 0)
     def lid_position(self) -> Optional[str]:
         """One of these possible lid statuses:
+
         - ``closed``: The lid is closed.
         - ``in_between``: The lid is neither open nor closed.
         - ``open``: The lid is open.
