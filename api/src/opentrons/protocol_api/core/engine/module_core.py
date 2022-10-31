@@ -291,6 +291,8 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
         if self._repetitions is None:
             return None
         step_index = self._sync_module_hardware.current_step_index
+        # TODO(jbl 2022-10-31) this is intended to work even if execute profile is non-blocking, but it is blocking so
+        #   this is not guaranteed to be accurate
         return (step_index - 1) // self._step_count + 1  # type: ignore[no-any-return]
 
     def get_total_step_count(self) -> Optional[int]:
@@ -302,6 +304,8 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
         if self._step_count is None:
             return None
         step_index = self._sync_module_hardware.current_step_index
+        # TODO(jbl 2022-10-31) this is intended to work even if execute profile is non-blocking, but it is blocking so
+        #   this is not guaranteed to be accurate
         return (step_index - 1) % self._step_count + 1  # type: ignore[no-any-return]
 
     def _clear_cycle_counters(self) -> None:
