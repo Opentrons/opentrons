@@ -36,7 +36,7 @@
     "is-ip": "3.1.0",
     "lodash": "4.17.15",
     "mixpanel-browser": "2.22.1",
-    "netmask": "1.0.6",
+    "netmask": "2.0.2",
     "path-to-regexp": "3.0.0",
     "react": "17.0.1",
     "react-dom": "17.0.1",
