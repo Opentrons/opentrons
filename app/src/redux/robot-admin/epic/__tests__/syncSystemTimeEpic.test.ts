@@ -1,4 +1,7 @@
-import { cloneDeep, set, get } from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
+import get from 'lodash/get'
+import set from 'lodash/set'
+
 import { subSeconds, differenceInSeconds, parseISO } from 'date-fns'
 
 import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
