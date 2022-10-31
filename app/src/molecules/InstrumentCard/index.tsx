@@ -18,10 +18,10 @@ import {
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { StyledText } from '../../atoms/text'
-import { MenuOverlay } from '../../molecules/MenuOverlay'
+import { MenuOverlay } from './MenuOverlay'
 
 import type { InstrumentDiagramProps, StyleProps } from '@opentrons/components'
-import type { MenuOverlayItemProps } from '../../molecules/MenuOverlay'
+import type { MenuOverlayItemProps } from './MenuOverlay'
 
 interface InstrumentCardProps extends StyleProps {
   description: string

@@ -25,6 +25,7 @@ interface MenuOverlayProps extends StyleProps {
   hasDivider?: boolean
 }
 
+// TODO(bh, 2022-10-31): consider making this a generic molecule if other overflow menus are refactored to use
 export function MenuOverlay(props: MenuOverlayProps): JSX.Element {
   const { hasDivider = false, menuOverlayItems, setShowMenuOverlay } = props
 
