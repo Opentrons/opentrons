@@ -61,7 +61,9 @@ describe('InstrumentsAndModules', () => {
     mockUseIsRobotViewable.mockReturnValue(false)
     const [{ getByText }] = render()
 
-    getByText('Robot must be on the network to see pipettes and modules')
+    getByText(
+      'Robot must be on the network to see connected instruments and modules'
+    )
   })
 
   it('renders a Module card when a robot is viewable', () => {

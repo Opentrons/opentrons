@@ -1,12 +1,9 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
 import { when, resetAllWhenMocks } from 'jest-when'
 
 import { renderWithProviders } from '@opentrons/components'
 import {
-  mockOT2HealthResponse,
-  mockOT2ServerHealthResponse,
   mockOT3HealthResponse,
   mockOT3ServerHealthResponse,
 } from '@opentrons/discovery-client/src/__fixtures__'
@@ -21,7 +18,6 @@ import { fetchLights } from '../../../redux/robot-controls'
 import { getRobotModelByName } from '../../../redux/discovery'
 import {
   HEALTH_STATUS_OK,
-  ROBOT_MODEL_OT2,
   ROBOT_MODEL_OT3,
 } from '../../../redux/discovery/constants'
 import { useLights, useRobot, useRunStatuses } from '../hooks'
@@ -51,23 +47,7 @@ const MOCK_STATE: State = {
   discovery: {
     robot: { connection: { connectedTo: null } },
     robotsByName: {
-      otie: {
-        name: 'otie',
-        health: mockOT2HealthResponse,
-        serverHealth: mockOT2ServerHealthResponse,
-        addresses: [
-          {
-            ip: '10.0.0.3',
-            port: 31950,
-            seen: true,
-            healthStatus: HEALTH_STATUS_OK,
-            serverHealthStatus: HEALTH_STATUS_OK,
-            healthError: null,
-            serverHealthError: null,
-            advertisedModel: ROBOT_MODEL_OT2,
-          },
-        ],
-      },
+      [mockConnectableRobot.name]: mockConnectableRobot,
       buzz: {
         name: 'buzz',
         health: mockOT3HealthResponse,
@@ -139,7 +119,7 @@ describe('RobotOverview', () => {
   let props: React.ComponentProps<typeof RobotOverview>
 
   beforeEach(() => {
-    props = { robotName: 'otie' }
+    props = { robotName: mockConnectableRobot.name }
     dispatchApiRequest = jest.fn()
     mockUseRunStatuses.mockReturnValue({
       isRunRunning: false,
@@ -170,7 +150,7 @@ describe('RobotOverview', () => {
       <div>mock RobotOverviewOverflowMenu</div>
     )
     when(mockGetRobotModelByName)
-      .calledWith(MOCK_STATE, 'otie')
+      .calledWith(MOCK_STATE, mockConnectableRobot.name)
       .mockReturnValue('OT-2')
   })
   afterEach(() => {
@@ -185,9 +165,8 @@ describe('RobotOverview', () => {
   })
 
   it('renders an OT-3 image', () => {
-    props.robotName = 'buzz'
     when(mockGetRobotModelByName)
-      .calledWith(MOCK_STATE, props.robotName)
+      .calledWith(MOCK_STATE, mockConnectableRobot.name)
       .mockReturnValue('OT-3')
     const [{ getByRole }] = render(props)
     const image = getByRole('img')
@@ -206,7 +185,9 @@ describe('RobotOverview', () => {
 
   it('fetches lights status', () => {
     render(props)
-    expect(dispatchApiRequest).toBeCalledWith(mockFetchLights('otie'))
+    expect(dispatchApiRequest).toBeCalledWith(
+      mockFetchLights(mockConnectableRobot.name)
+    )
   })
 
   it('renders a lights toggle button', () => {
@@ -219,63 +200,9 @@ describe('RobotOverview', () => {
     expect(mockToggleLights).toBeCalled()
   })
 
-  it('renders a Run a Protocol button', () => {
-    const [{ getByText }] = render(props)
-
-    getByText('Run a protocol')
-  })
-
-  it('renders a choose protocol slideout hidden by default, expanded after launch', () => {
-    const [{ getByText, getByRole }] = render(props)
-
-    getByText('Mock Choose Protocol Slideout hidden')
-    const runButton = getByRole('button', { name: 'Run a protocol' })
-    fireEvent.click(runButton)
-    getByText('Mock Choose Protocol Slideout showing')
-  })
-
   it('renders an overflow menu for the robot overview', () => {
     const [{ getByText }] = render(props)
 
     getByText('mock RobotOverviewOverflowMenu')
-  })
-
-  it('renders run a protocol button as disabled when run is not terminal and run id is not null', () => {
-    mockUseCurrentRunId.mockReturnValue('id')
-    mockUseRunStatuses.mockReturnValue({
-      isRunRunning: false,
-      isRunStill: false,
-      isRunTerminal: false,
-      isRunIdle: false,
-    })
-    const [{ getByRole }] = render(props)
-    const runButton = getByRole('button', { name: 'Run a protocol' })
-    expect(runButton).toBeDisabled()
-  })
-
-  it('disables the run a protocol button if robot software update is available', () => {
-    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
-      autoUpdateAction: 'upgrade',
-      autoUpdateDisabledReason: null,
-      updateFromFileDisabledReason: null,
-    })
-
-    const [{ getByRole }] = render(props)
-    const button = getByRole('button', { name: 'Run a protocol' })
-    expect(button).toBeDisabled()
-  })
-
-  it('renders run a protocol button as not disabled when run id is null but run status is not terminal', () => {
-    mockUseCurrentRunId.mockReturnValue(null)
-    mockUseRunStatuses.mockReturnValue({
-      isRunRunning: false,
-      isRunStill: false,
-      isRunTerminal: true,
-      isRunIdle: false,
-    })
-    const [{ getByText, getByRole }] = render(props)
-    const runButton = getByRole('button', { name: 'Run a protocol' })
-    fireEvent.click(runButton)
-    getByText('Mock Choose Protocol Slideout showing')
   })
 })
