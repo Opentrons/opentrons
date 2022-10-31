@@ -12,8 +12,11 @@ import {
 
 import { StyledText } from '../../../atoms/text'
 import { ToggleButton } from '../../../atoms/buttons'
-import { updateSetting } from '../../../redux/robot-settings'
-import { getRobotSettings, fetchSettings } from '../../../redux/robot-settings'
+import {
+  updateSetting,
+  getRobotSettings,
+  fetchSettings,
+} from '../../../redux/robot-settings'
 import type { State, Dispatch } from '../../../redux/types'
 import type {
   RobotSettings,
@@ -26,7 +29,6 @@ interface RobotSettingsFeatureFlagsProps {
 
 const NON_FEATURE_FLAG_SETTINGS = [
   'enableDoorSafetySwitch',
-  'disableHomeOnBoot',
   'disableHomeOnBoot',
   'deckCalibrationDots',
   'shortFixedTrash',
