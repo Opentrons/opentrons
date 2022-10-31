@@ -115,6 +115,7 @@ export function HistoricalProtocolRun(
             width="35%"
             data-testid={`RecentProtocolRuns_Protocol_${protocolKey}`}
             overflowWrap="anywhere"
+            marginRight={SPACING.spacing4}
           >
             {protocolName}
           </StyledText>

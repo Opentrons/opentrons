@@ -49,7 +49,9 @@ export function MenuOverlay(props: MenuOverlayProps): JSX.Element {
       {menuOverlayItems.map((menuOverlayItem, i) => (
         <React.Fragment key={`menuItem_${i}`}>
           {/* insert a divider before the last item if desired */}
-          {hasDivider && i === menuOverlayItems.length - 1 ? <Divider /> : null}
+          {hasDivider && i === menuOverlayItems.length - 1 ? (
+            <Divider marginY="0" />
+          ) : null}
           <MenuItem
             disabled={menuOverlayItem.disabled}
             onClick={menuOverlayItem.onClick}
