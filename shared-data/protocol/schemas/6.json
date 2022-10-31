@@ -1039,11 +1039,11 @@
                 "enum": ["loadPipette"]
               },
               "params": {
-                "required": ["pipetteId", "mount"],
+                "required": ["pipetteName", "mount"],
                 "properties": {
-                  "pipetteId": {
-                    "type": "string",
-                    "description": "Unique identifier of pipette to load"
+                  "pipetteName": {
+                    "type": "enum",
+                    "$ref": "#/definitions/pipetteName"
                   },
                   "mount": {
                     "type": "string",

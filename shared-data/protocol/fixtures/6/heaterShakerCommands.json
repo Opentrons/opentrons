@@ -1244,7 +1244,8 @@
       "id": "0abc123",
       "params": {
         "pipetteId": "pipetteId",
-        "mount": "left"
+        "mount": "left",
+        "pipetteName": "p300_single"
       }
     },
     {

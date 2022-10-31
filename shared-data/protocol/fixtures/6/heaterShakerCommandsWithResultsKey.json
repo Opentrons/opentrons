@@ -2498,7 +2498,8 @@
       "commandType": "loadPipette",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
-        "mount": "left"
+        "mount": "left",
+        "pipetteName": "p300_single"
       }
     },
     {
@@ -2506,7 +2507,8 @@
       "commandType": "loadPipette",
       "params": {
         "pipetteId": "4da579b0-a9bf-11eb-bce6-9f1d5b9c1a1b",
-        "mount": "right"
+        "mount": "right",
+        "pipetteName": "p300_single"
       }
     },
     {

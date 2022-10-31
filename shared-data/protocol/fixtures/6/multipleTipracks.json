@@ -1968,7 +1968,8 @@
       "id": "0abc1",
       "params": {
         "pipetteId": "50d23e00-0042-11ec-8258-f7ffdf5ad45a",
-        "mount": "left"
+        "mount": "left",
+        "pipetteName": "p300_single"
       },
       "result": {
         "pipetteId": "50d23e00-0042-11ec-8258-f7ffdf5ad45a"
@@ -1979,7 +1980,8 @@
       "id": "0abc2",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
-        "mount": "right"
+        "mount": "right",
+        "pipetteName": "p300_single"
       },
       "result": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a"
