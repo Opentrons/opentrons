@@ -137,6 +137,20 @@ def test_ensure_hold_time_seconds(
 
 
 @pytest.mark.parametrize(
+    ["repetitions", "expected"],
+    [
+        (1, 1),
+        (2, 2),
+        (999, 999),
+    ],
+)
+def test_ensure_thermocycler_repetition_count(repetitions: int, expected: int) -> None:
+    """It should return a given positive integer."""
+    result = subject.ensure_thermocycler_repetition_count(repetitions)
+    assert result == expected
+
+
+@pytest.mark.parametrize(
     "repetitions",
     [
         0,
@@ -170,6 +184,16 @@ def test_ensure_thermocycler_repetition_count_raises(repetitions: int) -> None:
         (
             [{"temperature": 42.0, "hold_time_minutes": 12.3}],
             [{"temperature": 42.0, "hold_time_seconds": 738.0}],
+        ),
+        (
+            [
+                {"temperature": 42.0, "hold_time_seconds": 12.3},
+                {"temperature": 52.0, "hold_time_minutes": 12.3},
+            ],
+            [
+                {"temperature": 42.0, "hold_time_seconds": 12.3},
+                {"temperature": 52.0, "hold_time_seconds": 738.0},
+            ],
         ),
         ([], []),
     ],
