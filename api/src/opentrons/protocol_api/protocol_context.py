@@ -394,11 +394,11 @@ class ProtocolContext(CommandPublisher):
                 f"Expected labware of type 'Labware' but got {type(labware)}."
             )
 
-        location: Union[DeckSlotName, ModuleCore]
-        if isinstance(new_location, ModuleContext):
-            location = new_location._core
-        else:
-            location = validation.ensure_deck_slot(new_location)
+        location = (
+            new_location._core
+            if isinstance(new_location, ModuleContext)
+            else validation.ensure_deck_slot(new_location)
+        )
 
         self._implementation.move_labware(
             labware=labware._implementation,

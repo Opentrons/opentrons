@@ -154,18 +154,17 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         else:
             to_location = DeckSlotLocation(slotName=new_location)
 
-        if use_gripper:
-            self._engine_client.move_labware(
-                labware_id=labware.labware_id,
-                new_location=to_location,
-                strategy=LabwareMovementStrategy.USING_GRIPPER,
-            )
-        else:
-            self._engine_client.move_labware(
-                labware_id=labware.labware_id,
-                new_location=to_location,
-                strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
-            )
+        strategy = (
+            LabwareMovementStrategy.USING_GRIPPER
+            if use_gripper
+            else LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE
+        )
+
+        self._engine_client.move_labware(
+            labware_id=labware.labware_id,
+            new_location=to_location,
+            strategy=strategy,
+        )
 
     def _resolve_module_hardware(
         self, serial_number: str, model: ModuleModel

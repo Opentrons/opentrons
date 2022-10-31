@@ -207,7 +207,7 @@ class ProtocolContextImplementation(
     ) -> None:
         """Move labware to new location."""
         raise UnsupportedAPIError(
-            "Labware movement is not " "supported in this API version"
+            "Labware movement is not supported in this API version"
         )
 
     def load_module(

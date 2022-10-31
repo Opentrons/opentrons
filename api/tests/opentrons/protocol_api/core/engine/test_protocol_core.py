@@ -26,8 +26,8 @@ from opentrons.protocol_engine import (
     DeckSlotLocation,
     ModuleLocation,
     ModuleDefinition,
-    commands,
     LabwareMovementStrategy,
+    commands,
 )
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 
