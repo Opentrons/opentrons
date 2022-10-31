@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, validator
-from typing import Any, List, Optional, Dict, Union
+from typing import Any, List, Optional, Dict
 from typing_extensions import Literal
 from enum import Enum
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
@@ -38,7 +38,7 @@ class Params(BaseModel):
     pipetteId: Optional[str]
     mount: Optional[str]
     moduleId: Optional[str]
-    location: Union[Optional[Location], Literal['offDeck']]
+    location: Optional[Location]
     labwareId: Optional[str]
     displayName: Optional[str]
     liquidId: Optional[str]
@@ -67,7 +67,7 @@ class Params(BaseModel):
     # there is moveLabware support in PAPIv2, this is only to unblock
     # internal testing of LPC with JSON protocols that include
     # 'moveLabware' commands in the meantime
-    newLocation: Union[Optional[Location], Literal['offDeck']]
+    newLocation: Optional[Location]
     strategy: Optional[str]
 
 

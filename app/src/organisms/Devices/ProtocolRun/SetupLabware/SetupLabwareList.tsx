@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import partition from 'lodash/partition'
 import styled, { css } from 'styled-components'
 import {
   Flex,
@@ -11,24 +10,20 @@ import {
   DIRECTION_COLUMN,
   TYPOGRAPHY,
   JUSTIFY_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
-  ALIGN_CENTER,
+  RobotWorkSpace,
   LabwareRender,
   Btn,
   BORDERS,
-  WELL_LABEL_OPTIONS,
+  WRAP,
 } from '@opentrons/components'
 import {
-  CompletedProtocolAnalysis,
   getLabwareDisplayName,
   getModuleDisplayName,
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   LabwareDefinition2,
   MAGNETIC_MODULE_TYPE,
-  ModuleModel,
   ModuleType,
-  RunTimeCommand,
   TC_MODULE_LOCATION,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
@@ -39,10 +34,8 @@ import { SecureLabwareModal } from '../../../ProtocolSetup/RunSetupCard/LabwareS
 import { useProtocolDetailsForRun } from '../../../Devices/hooks'
 import { getAllLabwareAndTiprackIdsInOrder } from './utils'
 import type {
-  LabwareLocation,
   LoadLabwareRunTimeCommand,
   LoadModuleRunTimeCommand,
-  ModuleLocation,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import type {
   HeaterShakerCloseLatchCreateCommand,
@@ -51,143 +44,90 @@ import type {
 import type { ModuleTypesThatRequiresExtraAttention } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
 import type { ModuleRenderInfoForProtocol } from '../../hooks'
 
-const HeaderRow = styled.div`
-  display: grid;
-  grid-template-columns: 6fr 5fr;
-  grip-gap: ${SPACING.spacing3};
-  padding: ${SPACING.spacing4};
-`
-const LabwareRow = styled.div`
-  display: grid;
-  grid-template-columns: 6fr 5fr;
-  grip-gap: ${SPACING.spacing3};
+const LABWARE_CARD_STYLE = css`
   box-shadow: 0 0 0 1px ${COLORS.medGreyEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
-  padding: ${SPACING.spacing4};
+  &:hover {
+    cursor: pointer;
+    box-shadow: 0 0 0 1px ${COLORS.medGreyHover};
+  }
 `
-
-interface LabwareSetupItem {
-  definition: LabwareDefinition2
-  nickName: string | null,
-  initialLocation: LabwareLocation
-  moduleModel: ModuleModel | null
-  moduleLocation: ModuleLocation | null
-}
-
+const StyledTable = styled.table`
+  width: 100%;
+  text-align: ${TYPOGRAPHY.textAlignLeft};
+  table-layout: ${SPACING.spacingAuto};
+`
+const StyledTableHeader = styled.th`
+  ${TYPOGRAPHY.labelSemiBold}
+  padding: ${SPACING.spacing3};
+`
+const StyledTableRow = styled.tr``
+const StyledTableCell = styled.td`
+  padding: ${SPACING.spacing3};
+  text-overflow: ${WRAP};
+`
 interface SetupLabwareListProps {
   attachedModuleInfo: { [moduleId: string]: ModuleRenderInfoForProtocol }
-  commands: RunTimeCommand[]
+  runId: string
   extraAttentionModules: ModuleTypesThatRequiresExtraAttention[]
 }
 export function SetupLabwareList(
   props: SetupLabwareListProps
 ): JSX.Element | null {
-  const { attachedModuleInfo, commands, extraAttentionModules } = props
+  const { attachedModuleInfo, runId, extraAttentionModules } = props
+  const protocolData = useProtocolDetailsForRun(runId).protocolData
   const { t } = useTranslation('protocol_setup')
-  let beyondInitialLoadCommands = false
-  const [offDeckLabware, onDeckLabware] = partition(commands.reduce<LabwareSetupItem[]>(
-    (acc, { commandType, result, params }) => {
-      if (
-        commandType === 'loadLabware' &&
-        result.definition.metadata.displayCategory !== 'trash'
-      ) {
-        const { location, displayName } = params
-        const { definition } = result
-        let moduleModel = null
-        let moduleLocation = null
-        if (location !== 'offDeck' && 'moduleId' in location) {
-          const loadModuleCommand = commands
-            .find(
-              (c): c is LoadModuleRunTimeCommand =>
-                c.commandType === 'loadModule' &&
-                c.params.moduleId === location.moduleId
-            )
-          if (loadModuleCommand == null) {
-            console.error(`could not find load module command for module with id ${location.moduleId}`)
-          } else {
-            moduleModel = loadModuleCommand.params.model
-            moduleLocation = loadModuleCommand.params.location
-          }
-        }
-        // NOTE: params.displayName is the user-assigned nickName, different from labareDisplayName from def
-        const nickName = displayName != null && displayName !== getLabwareDisplayName(definition)
-          ? displayName
-          : null
-
-        return [
-          ...acc,
-          {
-            // NOTE: for the purposes of the labware setup step, anything loaded after
-            // the initial load commands will be treated as "initially off deck"
-            // even if technically loaded directly onto the deck later in the protocol
-            initialLocation: beyondInitialLoadCommands ? 'offDeck' : params.location,
-            definition,
-            moduleModel,
-            moduleLocation,
-            nickName
-          },
-        ]
-      } else if (
-        !beyondInitialLoadCommands &&
-        !['loadLabware', 'loadModule', 'loadPipette', 'loadLiquid', 'moveLabware'].includes(commandType)
-      ) {
-        beyondInitialLoadCommands = true
-      }
-
-      return acc
-    }
-    , []),
-    ({ initialLocation }) => (initialLocation === 'offDeck')
+  if (protocolData == null) return null
+  const labwareIdsInOrder = getAllLabwareAndTiprackIdsInOrder(
+    protocolData.labware,
+    protocolData.labwareDefinitions,
+    protocolData.commands
   )
-
+  const labwareCommands = protocolData.commands.filter(
+    command =>
+      command.commandType === 'loadLabware' &&
+      command.result.definition.metadata.displayCategory !== 'trash'
+  )
+  const labwareCommandsInOrder = labwareIdsInOrder.map(id =>
+    labwareCommands.find(command => command.result.labwareId === id)
+  )
   return (
-    <Flex padding={SPACING.spacing4} flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
-      <HeaderRow>
-        <StyledText as="label" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-          {t('labware_name')}
-        </StyledText>
-        <StyledText as="label" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-          {t('initial_location')}
-        </StyledText>
-      </HeaderRow>
-      {onDeckLabware.map((labwareItem, index) =>
-        <LabwareListItem
-          key={index}
-          attachedModuleInfo={attachedModuleInfo}
-          extraAttentionModules={extraAttentionModules}
-          {...labwareItem}
-        />
-      )}
-      {offDeckLabware.length > 0 ? (
-        <>
-          <StyledText
-            as="h3"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            textTransform={TYPOGRAPHY.textTransformCapitalize}
-            marginTop={SPACING.spacing4}
-            marginBottom={SPACING.spacing3}>
-            {t('additional_off_deck_labware')}
-          </StyledText>
-          {
-            offDeckLabware.map((labwareItem, index) =>
-              <LabwareListItem
-                key={index}
-                attachedModuleInfo={attachedModuleInfo}
-                extraAttentionModules={extraAttentionModules}
-                {...labwareItem}
-              />
-            )
-          }
-        </>
-      )
-        : null
-      }
+    <Flex padding={SPACING.spacing4}>
+      <StyledTable key={runId}>
+        <thead>
+          <tr>
+            <StyledTableHeader key="labware_name">
+              {t('labware_name')}
+            </StyledTableHeader>
+            <StyledTableHeader key="initial_location">
+              {t('initial_location')}
+            </StyledTableHeader>
+          </tr>
+        </thead>
+        {labwareCommandsInOrder.map((command, index) =>
+          command != null ? (
+            <LabwareListItem
+              attachedModuleInfo={attachedModuleInfo}
+              key={`${command.id}_${index}`}
+              extraAttentionModules={extraAttentionModules}
+              id={index}
+              runId={runId}
+              params={command.params as LoadLabwareRunTimeCommand['params']}
+              definition={command.result.definition}
+            />
+          ) : null
+        )}
+      </StyledTable>
     </Flex>
   )
 }
 
-interface LabwareListItemProps extends LabwareSetupItem {
+interface LabwareListItemProps {
   attachedModuleInfo: { [moduleId: string]: ModuleRenderInfoForProtocol }
+  id: number
+  runId: string
+  params: LoadLabwareRunTimeCommand['params']
+  definition: LabwareDefinition2
   extraAttentionModules: ModuleTypesThatRequiresExtraAttention[]
 }
 
@@ -196,11 +136,10 @@ export function LabwareListItem(
 ): JSX.Element | null {
   const {
     attachedModuleInfo,
-    nickName,
-    initialLocation,
+    id,
+    params,
+    runId,
     definition,
-    moduleModel,
-    moduleLocation,
     extraAttentionModules,
   } = props
   const { t } = useTranslation('protocol_setup')
@@ -208,11 +147,13 @@ export function LabwareListItem(
     secureLabwareModalType,
     setSecureLabwareModalType,
   ] = React.useState<ModuleType | null>(null)
+  const protocolData = useProtocolDetailsForRun(runId).protocolData
   const labwareDisplayName = getLabwareDisplayName(definition)
   const { createLiveCommand } = useCreateLiveCommandMutation()
+  if (protocolData == null) return null
 
   let slotInfo: JSX.Element = t('slot_location', {
-    slotName: Object.values(initialLocation),
+    slotName: Object.values(params.location),
   })
   let extraAttentionText: JSX.Element | null = null
   let isCorrectHeaterShakerAttached: boolean = false
@@ -222,19 +163,22 @@ export function LabwareListItem(
     | HeaterShakerOpenLatchCreateCommand
     | HeaterShakerCloseLatchCreateCommand
 
-  if (
-    initialLocation !== 'offDeck' &&
-    'moduleId' in initialLocation &&
-    moduleLocation != null &&
-    moduleModel != null
-  ) {
+  if (typeof params.location === 'object' && 'moduleId' in params.location) {
+    const moduleIdFromProtocol = params.location.moduleId
+    const moduleModel = protocolData.modules[moduleIdFromProtocol].model
+    const moduleRunTimeCommand = protocolData.commands
+      .filter(
+        (command): command is LoadModuleRunTimeCommand =>
+          command.commandType === 'loadModule'
+      )
+      .find(command => command.params.moduleId === moduleIdFromProtocol)
+    let moduleSlotName = moduleRunTimeCommand?.params.location.slotName
     const moduleName = getModuleDisplayName(moduleModel)
     const moduleType = getModuleType(moduleModel)
     const moduleTypeNeedsAttention = extraAttentionModules.find(
       extraAttentionModType => extraAttentionModType === moduleType
     )
-    let moduleSlotName = moduleLocation.slotName
-    if (moduleType === THERMOCYCLER_MODULE_TYPE) {
+    if (moduleName?.includes('Thermocycler')) {
       moduleSlotName = TC_MODULE_LOCATION
     }
     slotInfo = t('module_slot_location', {
@@ -248,6 +192,7 @@ export function LabwareListItem(
           <Btn
             color={COLORS.darkGreyEnabled}
             marginTop={SPACING.spacing3}
+            data-testid={`SetupLabwareList_${moduleType}_${id}`}
             onClick={() => setSecureLabwareModalType(moduleType)}
           >
             <Flex flexDirection={DIRECTION_ROW}>
@@ -256,6 +201,7 @@ export function LabwareListItem(
                 size="0.75rem"
                 marginTop={SPACING.spacingXS}
               />
+
               <StyledText marginLeft={SPACING.spacing2} as="p">
                 {t('secure_labware_instructions')}
               </StyledText>
@@ -272,8 +218,8 @@ export function LabwareListItem(
         )
         const matchingHeaterShaker =
           attachedModuleInfo != null &&
-            attachedModuleInfo[initialLocation.moduleId] != null
-            ? attachedModuleInfo[initialLocation.moduleId].attachedModuleMatch
+          attachedModuleInfo[moduleIdFromProtocol] != null
+            ? attachedModuleInfo[moduleIdFromProtocol].attachedModuleMatch
             : null
         if (
           matchingHeaterShaker != null &&
@@ -305,67 +251,93 @@ export function LabwareListItem(
     })
   }
   return (
-    <LabwareRow>
-      <Flex>
-        <StandaloneLabware definition={definition} />
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          justifyContent={JUSTIFY_CENTER}
-          marginLeft={SPACING.spacing4}
-        >
-          <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-            {labwareDisplayName}
-          </StyledText>
-          <StyledText as="p" color={COLORS.darkGreyEnabled}>
-            {nickName}
-          </StyledText>
-        </Flex>
-      </Flex>
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
-        <Flex flexDirection={DIRECTION_COLUMN} justifyContent={JUSTIFY_CENTER}>
-          <StyledText as="p">{slotInfo}</StyledText>
-          {extraAttentionText != null ? extraAttentionText : null}
-        </Flex>
-        {isHeaterShakerInProtocol ? (
-          <Flex flexDirection={DIRECTION_COLUMN}>
-            <StyledText as="h6" minWidth="4.62rem">
-              {t('labware_latch')}
-            </StyledText>
-            <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-              <ToggleButton
-                label={`heater_shaker_${moduleLocation?.slotName ?? ''}_latch_toggle`}
-                disabled={!isCorrectHeaterShakerAttached}
-                toggledOn={isLatchClosed}
-                onClick={toggleLatch}
-                display="flex"
-                alignItems={ALIGN_CENTER}
-              />
-              {isLatchClosed ? <StyledText as="p">{t('secure')}</StyledText> : null}
+    <>
+      <tbody css={LABWARE_CARD_STYLE}>
+        <StyledTableRow key={id}>
+          <StyledTableCell
+            css={css`
+              width: 50%;
+            `}
+          >
+            <Flex flexDirection={DIRECTION_ROW}>
+              <Flex width="4.1rem" height="3.6rem">
+                <RobotWorkSpace
+                  data-testid={`${id}_${runId}`}
+                  key={id}
+                  viewBox={`0 0 ${definition.dimensions.xDimension} ${definition.dimensions.yDimension}`}
+                >
+                  {() => <LabwareRender definition={definition} />}
+                </RobotWorkSpace>
+              </Flex>
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                justifyContent={JUSTIFY_CENTER}
+                marginLeft={SPACING.spacing4}
+              >
+                <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                  {labwareDisplayName}
+                </StyledText>
+                <StyledText as="p" color={COLORS.darkGreyEnabled}>
+                  {/* params.displayName is the nickName, different from labareDisplayName */}
+                  {params.displayName !== null &&
+                  params.displayName !== labwareDisplayName
+                    ? params.displayName
+                    : null}
+                </StyledText>
+              </Flex>
             </Flex>
-          </Flex>
-        ) : null}
-      </Flex>
+          </StyledTableCell>
+          <StyledTableCell>
+            <>
+              <StyledText as="p">{slotInfo}</StyledText>
+              {extraAttentionText != null ? extraAttentionText : null}
+            </>
+          </StyledTableCell>
+          {isHeaterShakerInProtocol ? (
+            <StyledTableCell>
+              <Flex marginLeft="0.75rem" flexDirection={DIRECTION_COLUMN}>
+                <StyledText as="h6" minWidth="4.62rem">
+                  {t('labware_latch')}
+                </StyledText>
+                <Flex flexDirection={DIRECTION_ROW}>
+                  <ToggleButton
+                    label={`heaterShaker_${id}`}
+                    disabled={!isCorrectHeaterShakerAttached}
+                    toggledOn={isLatchClosed}
+                    onClick={toggleLatch}
+                    data-testId={`SetupLabwareList_toggleHeaterShaker_${id}`}
+                  />
+                  {isLatchClosed ? (
+                    <StyledText
+                      as="p"
+                      marginTop={SPACING.spacing1}
+                      marginLeft={SPACING.spacing2}
+                    >
+                      {t('secure')}
+                    </StyledText>
+                  ) : null}
+                </Flex>
+              </Flex>
+            </StyledTableCell>
+          ) : null}
+        </StyledTableRow>
+      </tbody>
+      <tbody>
+        {/* TODO(jr, 10/17/22): find a way to add a border to a table row (tr). Right now,
+        we are faking it with a box-shadow and this StyledTableRow  */}
+        <StyledTableRow
+          key={`StyledTableRow_${id}`}
+          css={css`
+            height: ${SPACING.spacing2};
+          `}
+        />
+      </tbody>
       {secureLabwareModalType != null && (
         <SecureLabwareModal
           type={secureLabwareModalType as ModuleTypesThatRequiresExtraAttention}
           onCloseClick={() => setSecureLabwareModalType(null)}
         />
       )}
-    </LabwareRow>
-  )
-}
-
-const LabwareThumbnail = styled.svg`
-  transform: scale(1, -1);
-  width: 4.2rem;
-  flex-shrink: 0;
-`
-
-function StandaloneLabware(props: { definition: LabwareDefinition2 }): JSX.Element {
-  const { definition } = props
-  return (
-    <LabwareThumbnail viewBox={` 0 0 ${definition.dimensions.xDimension} ${definition.dimensions.yDimension}`}>
-      <LabwareRender definition={definition} wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE} />
-    </LabwareThumbnail>
+    </>
   )
 }

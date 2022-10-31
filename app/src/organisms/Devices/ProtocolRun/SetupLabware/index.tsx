@@ -197,7 +197,7 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
             {selectedValue === t('list_view') ? (
               <SetupLabwareList
                 attachedModuleInfo={moduleRenderInfoById}
-                commands={protocolData?.commands ?? []}
+                runId={runId}
                 extraAttentionModules={moduleTypesThatRequireExtraAttention}
               />
             ) : (
