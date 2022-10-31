@@ -1,5 +1,5 @@
 """Test for the ProtocolEngine-based protocol API core."""
-from typing import Type, Optional
+from typing import Type
 
 import pytest
 from decoy import Decoy
@@ -179,7 +179,6 @@ def test_load_labware(
     argvalues=[
         (True, LabwareMovementStrategy.USING_GRIPPER),
         (False, LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE),
-        (None, LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE),
     ],
 )
 def test_move_labware(
@@ -188,7 +187,7 @@ def test_move_labware(
     mock_engine_client: EngineClient,
     api_version: APIVersion,
     expected_strategy: LabwareMovementStrategy,
-    use_gripper: Optional[bool],
+    use_gripper: bool,
 ) -> None:
     """It should issue a move labware command to the engine."""
     decoy.when(
@@ -198,7 +197,7 @@ def test_move_labware(
     )
     labware = LabwareCore(labware_id="labware-id", engine_client=mock_engine_client)
     subject.move_labware(
-        labware=labware, new_location=DeckSlotName.SLOT_5, use_gripper=use_gripper
+        labware_core=labware, new_location=DeckSlotName.SLOT_5, use_gripper=use_gripper
     )
     decoy.verify(
         mock_engine_client.move_labware(

@@ -365,7 +365,7 @@ class ProtocolContext(CommandPublisher):
         self,
         labware: Labware,
         new_location: Union[DeckLocation, ModuleTypes],
-        use_gripper: Optional[bool] = None,
+        use_gripper: bool = False,
     ) -> None:
         """Move a loaded labware to a new location.
 
@@ -401,7 +401,7 @@ class ProtocolContext(CommandPublisher):
         )
 
         self._implementation.move_labware(
-            labware=labware._implementation,
+            labware_core=labware._implementation,
             new_location=location,
             use_gripper=use_gripper,
         )

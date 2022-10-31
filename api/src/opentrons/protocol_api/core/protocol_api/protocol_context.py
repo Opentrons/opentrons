@@ -201,9 +201,9 @@ class ProtocolContextImplementation(
 
     def move_labware(
         self,
-        labware: LabwareImplementation,
+        labware_core: LabwareImplementation,
         new_location: Union[DeckSlotName, legacy_module_core.LegacyModuleCore],
-        use_gripper: Optional[bool],
+        use_gripper: bool,
     ) -> None:
         """Move labware to new location."""
         raise UnsupportedAPIError(

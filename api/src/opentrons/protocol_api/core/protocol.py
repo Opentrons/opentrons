@@ -70,9 +70,9 @@ class AbstractProtocol(
     @abstractmethod
     def move_labware(
         self,
-        labware: LabwareCoreType,
+        labware_core: LabwareCoreType,
         new_location: Union[DeckSlotName, ModuleCoreType],
-        use_gripper: Optional[bool],
+        use_gripper: bool,
     ) -> None:
         ...
 

@@ -238,9 +238,9 @@ def test_move_labware_to_slot(
     )
     decoy.verify(
         mock_core.move_labware(
-            labware=mock_labware_core,
+            labware_core=mock_labware_core,
             new_location=DeckSlotName.SLOT_1,
-            use_gripper=None,
+            use_gripper=False,
         )
     )
 
@@ -265,7 +265,9 @@ def test_move_labware_to_module(
     subject.move_labware(labware=movable_labware, new_location=module_location)
     decoy.verify(
         mock_core.move_labware(
-            labware=mock_labware_core, new_location=mock_module_core, use_gripper=None
+            labware_core=mock_labware_core,
+            new_location=mock_module_core,
+            use_gripper=False,
         )
     )
 

@@ -143,9 +143,9 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def move_labware(
         self,
-        labware: LabwareCore,
+        labware_core: LabwareCore,
         new_location: Union[DeckSlotName, ModuleCore],
-        use_gripper: Optional[bool],
+        use_gripper: bool,
     ) -> None:
         """Move the given labware to a new location."""
         to_location: Union[ModuleLocation, DeckSlotLocation]
@@ -161,7 +161,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         )
 
         self._engine_client.move_labware(
-            labware_id=labware.labware_id,
+            labware_id=labware_core.labware_id,
             new_location=to_location,
             strategy=strategy,
         )
