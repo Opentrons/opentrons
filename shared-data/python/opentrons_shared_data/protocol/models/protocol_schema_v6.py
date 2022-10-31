@@ -38,7 +38,7 @@ class Params(BaseModel):
     pipetteId: Optional[str]
     mount: Optional[str]
     moduleId: Optional[str]
-    location: Union[Optional[Location], Literal['offDeck']]
+    location: Optional[Union[Location, Literal["offDeck"]]]
     labwareId: Optional[str]
     displayName: Optional[str]
     liquidId: Optional[str]
