@@ -10,7 +10,7 @@ from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules import AbstractModule, ModuleModel, ModuleType
 from opentrons.hardware_control.types import DoorState, PauseType
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import AxisMaxSpeeds
+from opentrons.protocols.api_support.util import AxisMaxSpeeds, UnsupportedAPIError
 from opentrons.protocols.geometry import module_geometry
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
@@ -198,6 +198,17 @@ class ProtocolContextImplementation(
         )
 
         return labware_core
+
+    def move_labware(
+        self,
+        labware: LabwareImplementation,
+        new_location: Union[DeckSlotName, legacy_module_core.LegacyModuleCore],
+        use_gripper: Optional[bool],
+    ) -> None:
+        """Move labware to new location."""
+        raise UnsupportedAPIError(
+            "Labware movement is not " "supported in this API version"
+        )
 
     def load_module(
         self,

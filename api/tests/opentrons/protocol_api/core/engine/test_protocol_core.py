@@ -1,5 +1,5 @@
 """Test for the ProtocolEngine-based protocol API core."""
-from typing import Type
+from typing import Type, Optional
 
 import pytest
 from decoy import Decoy
@@ -27,6 +27,7 @@ from opentrons.protocol_engine import (
     ModuleLocation,
     ModuleDefinition,
     commands,
+    LabwareMovementStrategy,
 )
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 
@@ -171,6 +172,41 @@ def test_load_labware(
 
     assert isinstance(result, LabwareCore)
     assert result.labware_id == "abc123"
+
+
+@pytest.mark.parametrize(
+    argnames=["use_gripper", "expected_strategy"],
+    argvalues=[
+        (True, LabwareMovementStrategy.USING_GRIPPER),
+        (False, LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE),
+        (None, LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE),
+    ],
+)
+def test_move_labware(
+    decoy: Decoy,
+    subject: ProtocolCore,
+    mock_engine_client: EngineClient,
+    api_version: APIVersion,
+    expected_strategy: LabwareMovementStrategy,
+    use_gripper: Optional[bool],
+) -> None:
+    """It should issue a move labware command to the engine."""
+    decoy.when(
+        mock_engine_client.state.labware.get_definition("labware-id")
+    ).then_return(
+        LabwareDefinition.construct(ordering=[])  # type: ignore[call-arg]
+    )
+    labware = LabwareCore(labware_id="labware-id", engine_client=mock_engine_client)
+    subject.move_labware(
+        labware=labware, new_location=DeckSlotName.SLOT_5, use_gripper=use_gripper
+    )
+    decoy.verify(
+        mock_engine_client.move_labware(
+            labware_id="labware-id",
+            new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
+            strategy=expected_strategy,
+        )
+    )
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 3)])
