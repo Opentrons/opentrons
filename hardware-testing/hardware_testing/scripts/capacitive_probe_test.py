@@ -1,141 +1,163 @@
 """Capacitive Probe Test."""
-import argparse
 import asyncio
+import argparse
+import time
 
-from opentrons.config.types import CapacitivePassSettings
 from opentrons.hardware_control.ot3api import OT3API
-
-from hardware_testing.opentrons_api import types
-from hardware_testing.opentrons_api import helpers_ot3
-
-PROBE_LENGTH = 34.5
-PROBE_DIAMETER = 4
-CUTOUT_SIZE = 20
-STABLE_CAP_PF = 0.1
-
-# ASSUMED_Z_LOCATION = types.Point(x=300, y=300, z=150)  # keep is SAFE
-# ASSUMED_XY_LOCATION = types.Point(x=285, y=285, z=ASSUMED_Z_LOCATION.z)
-ASSUMED_Z_LOCATION = types.Point(x=239, y=162, z=1)
-ASSUMED_XY_LOCATION = types.Point(x=226.25, y=148, z=ASSUMED_Z_LOCATION.z)
-
-PROBE_SETTINGS_Z_AXIS = CapacitivePassSettings(
-    prep_distance_mm=10,
-    max_overrun_distance_mm=3,
-    speed_mm_per_s=1,
-    sensor_threshold_pf=STABLE_CAP_PF,
+from hardware_testing import data
+from hardware_testing.opentrons_api.types import OT3Mount, OT3Axis, Point
+from hardware_testing.opentrons_api.helpers_ot3 import (
+    home_ot3,
+    build_async_ot3_hardware_api,
 )
-PROBE_SETTINGS_XY_AXIS = CapacitivePassSettings(
-    prep_distance_mm=CUTOUT_SIZE / 2,
-    max_overrun_distance_mm=3,
-    speed_mm_per_s=1,
-    sensor_threshold_pf=STABLE_CAP_PF,
+from opentrons.config.types import (
+    CapacitivePassSettings,
 )
 
-async def _probe_sequence(
-    api: OT3API, mount: types.OT3Mount, stable: bool
-) -> types.Point:
-    z_ax = types.OT3Axis.by_mount(mount)
+def build_arg_parser():
+    arg_parser = argparse.ArgumentParser(description='OT-3 Capacitive Probe Testing')
+    arg_parser.add_argument('-m', '--mount', choices=['l','r'], required=False, help='The pipette mount to be tested', default='l')
+    arg_parser.add_argument('-c', '--cycles', type=int, required=False, help='Number of testing cycles', default=1)
+    arg_parser.add_argument('-s', '--simulate', action="store_true", required=False, help='Simulate this test script')
+    return arg_parser
 
-    print("Align the XY axes above Z probe location...")
-    home_pos_z = helpers_ot3.get_endstop_position_ot3(api, mount)[z_ax]
-    await api.move_to(mount, ASSUMED_Z_LOCATION._replace(z=home_pos_z))
-
-    if stable:
-        await helpers_ot3.wait_for_stable_capacitance_ot3(
-            api, mount, threshold_pf=STABLE_CAP_PF, duration=1.0
+class Capacitive_Probe_Test:
+    def __init__(self, simulate: bool, cycles: int) -> None:
+        self.simulate = simulate
+        self.cycles = cycles
+        self.mount = OT3Mount.LEFT if args.mount == "l" else OT3Mount.RIGHT
+        self.axes = [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R]
+        self.CUTOUT_SIZE = 20
+        self.CUTOUT_HALF = self.CUTOUT_SIZE / 2
+        self.CENTER_Z = Point(x=239, y=162, z=0)
+        self.CENTER_XY = Point(x=226.25, y=148, z=self.CENTER_Z.z)
+        self.PROBE_SETTINGS_Z_AXIS = CapacitivePassSettings(
+            prep_distance_mm=5,
+            max_overrun_distance_mm=5,
+            speed_mm_per_s=1,
+            sensor_threshold_pf=1.0,
         )
-    found_z = await api.capacitive_probe(
-        mount, z_ax, ASSUMED_Z_LOCATION.z, PROBE_SETTINGS_Z_AXIS
-    )
-    print(f"Found deck Z location = {found_z} mm")
-
-    # move to 1mm inside the cutout
-    # we know for certain we will be 1mm inside, because we just probed the deck
-    updated_assumed_xy = ASSUMED_XY_LOCATION._replace(z=found_z - 1)
-    print("Moving to the center of the cutout...")
-    await helpers_ot3.move_to_arched_ot3(
-        api, mount, updated_assumed_xy, safe_height=found_z + 10
-    )
-
-    # probe each edge of the cutout
-    half_cutout = CUTOUT_SIZE / 2
-    if stable:
-        await helpers_ot3.wait_for_stable_capacitance_ot3(
-            api, mount, threshold_pf=STABLE_CAP_PF, duration=1.0
+        self.PROBE_SETTINGS_XY_AXIS = CapacitivePassSettings(
+            prep_distance_mm=self.CUTOUT_SIZE / 2,
+            max_overrun_distance_mm=5,
+            speed_mm_per_s=1,
+            sensor_threshold_pf=1.0,
         )
-    found_x_left = await api.capacitive_probe(
-        mount,
-        types.OT3Axis.X,
-        ASSUMED_XY_LOCATION.x - half_cutout,
-        PROBE_SETTINGS_XY_AXIS,
-    )
-    if stable:
-        await helpers_ot3.wait_for_stable_capacitance_ot3(
-            api, mount, threshold_pf=STABLE_CAP_PF, duration=1.0
+        self.test_data ={
+            "Time":None,
+            "Z Height":None,
+            "X Right":None,
+            "X Left":None,
+            "Y Back":None,
+            "Y Front":None,
+        }
+        self.file_setup()
+
+    def file_setup(self):
+        self.test_name = "capacitive_probe_test"
+        self.test_tag = "slot5"
+        self.test_header = self.dict_keys_to_line(self.test_data)
+        self.test_id = data.create_run_id()
+        self.test_path = data.create_folder_for_test_data(self.test_name)
+        self.test_file = data.create_file_name(self.test_name, self.test_id, self.test_tag)
+        data.append_data_to_file(self.test_name, self.test_file, self.test_header)
+        print("FILE PATH = ", self.test_path)
+        print("FILE NAME = ", self.test_file)
+
+    def dict_keys_to_line(self, dict):
+        return str.join(",", list(dict.keys()))+"\n"
+
+    def dict_values_to_line(self, dict):
+        return str.join(",", list(dict.values()))+"\n"
+
+    async def _probe_axis(
+        self, axis: OT3Axis, target: float
+    ) -> float:
+        if axis == OT3Axis.by_mount(self.mount):
+            settings = self.PROBE_SETTINGS_Z_AXIS
+        else:
+            settings = self.PROBE_SETTINGS_XY_AXIS
+        point = await self.api.capacitive_probe(
+            self.mount, axis, target, settings
         )
-    found_x_right = await api.capacitive_probe(
-        mount,
-        types.OT3Axis.X,
-        ASSUMED_XY_LOCATION.x + half_cutout,
-        PROBE_SETTINGS_XY_AXIS,
-    )
-    print(f"Found X axis cutout edges: left={found_x_left}, right={found_x_right}")
-    if stable:
-        await helpers_ot3.wait_for_stable_capacitance_ot3(
-            api, mount, threshold_pf=STABLE_CAP_PF, duration=1.0
-        )
-    found_y_front = await api.capacitive_probe(
-        mount,
-        types.OT3Axis.Y,
-        ASSUMED_XY_LOCATION.y - half_cutout,
-        PROBE_SETTINGS_XY_AXIS,
-    )
-    if stable:
-        await helpers_ot3.wait_for_stable_capacitance_ot3(
-            api, mount, threshold_pf=STABLE_CAP_PF, duration=1.0
-        )
-    found_y_back = await api.capacitive_probe(
-        mount,
-        types.OT3Axis.Y,
-        ASSUMED_XY_LOCATION.y + half_cutout,
-        PROBE_SETTINGS_XY_AXIS,
-    )
-    print(f"Found Y axis cutout edges: front={found_y_front}, back={found_y_back}")
+        return point
 
-    # calculate the center XYZ position of the cutout
-    center_x = (found_x_right + found_x_left) / 2
-    center_y = (found_y_back + found_y_front) / 2
-    cutout_center = types.Point(x=center_x, y=center_y, z=found_z)
-    print(f"Found cutout center = {cutout_center}")
-    return cutout_center
+    async def _probe_sequence(
+        self, api: OT3API, mount: OT3Mount
+    ) -> None:
+        # Home grantry
+        await home_ot3(api, self.axes)
 
-async def _main(is_simulating: bool, cycles: int, stable: bool) -> None:
-    api = await helpers_ot3.build_async_ot3_hardware_api(
-        is_simulating=is_simulating, pipette_left="p1000_single_v3.3"
-    )
-    mount = types.OT3Mount.LEFT
-    if not api.hardware_pipettes[mount.to_mount()]:
-        raise RuntimeError("No pipette attached")
+        # Move above deck Z-Axis point
+        home_position = await api.gantry_position(mount)
+        above_point = self.CENTER_Z._replace(z=home_position.z)
+        await api.move_to(mount, above_point)
 
-    # add length to the pipette, to account for the attached probe
-    await api.add_tip(mount, PROBE_LENGTH)
+        # Probe deck Z-Axis height
+        deck_z = await self._probe_axis(OT3Axis.by_mount(mount), self.CENTER_Z.z)
+        print(f"Deck Z-Axis height = {deck_z} mm")
+        self.test_data["Z Height"] = str(round(deck_z, 3))
 
-    await helpers_ot3.home_ot3(api)
-    for c in range(cycles):
-        print(f"Cycle {c + 1}/{cycles}")
-        await _probe_sequence(api, mount, stable)
+        # Move inside the cutout
+        below_z = deck_z - 1
+        below_z = deck_z + 6
+        current_position = await api.gantry_position(mount)
+        center_xy_above = self.CENTER_XY._replace(z=current_position.z)
+        center_xy_below = self.CENTER_XY._replace(z=below_z)
+        await api.move_to(mount, center_xy_above, speed=20)
+        await api.move_to(mount, center_xy_below, speed=20)
 
-    # move up, "remove" the probe, then disengage the XY motors when done
-    z_ax = types.OT3Axis.by_mount(mount)
-    top_z = helpers_ot3.get_endstop_position_ot3(api, mount)[z_ax]
-    await api.move_to(mount, ASSUMED_XY_LOCATION._replace(z=top_z))
-    await api.remove_tip(mount)
-    await api.disengage_axes([types.OT3Axis.X, types.OT3Axis.Y])
+        # Probe slot X-Axis right edge
+        x_right = await self._probe_axis(OT3Axis.X, self.CENTER_XY.x + self.CUTOUT_HALF)
+        print(f"X-Axis right edge = {x_right} mm")
+        self.test_data["X Right"] = str(round(x_right, 3))
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--simulate", action="store_true")
-    parser.add_argument("--cycles", type=int, default=1)
-    parser.add_argument("--stable", type=bool, default=True)
-    args = parser.parse_args()
-    asyncio.run(_main(args.simulate, args.cycles, args.stable))
+        # Probe slot X-Axis left edge
+        x_left = await self._probe_axis(OT3Axis.X, self.CENTER_XY.x - self.CUTOUT_HALF)
+        print(f"X-Axis left edge = {x_left} mm")
+        self.test_data["X Left"] = str(round(x_left, 3))
+
+        # Probe slot Y-Axis back edge
+        y_back = await self._probe_axis(OT3Axis.Y, self.CENTER_XY.y + self.CUTOUT_HALF)
+        print(f"Y-Axis back edge = {y_back} mm")
+        self.test_data["Y Back"] = str(round(y_back, 3))
+
+        # Probe slot Y-Axis front edge
+        y_front = await self._probe_axis(OT3Axis.Y, self.CENTER_XY.y - self.CUTOUT_HALF)
+        print(f"Y-Axis front edge = {y_front} mm")
+        self.test_data["Y Front"] = str(round(y_front, 3))
+
+        # Save data to file
+        elapsed_time = time.time() - self.start_time
+        self.test_data["Time"] = str(round(elapsed_time, 3))
+        test_data = self.dict_values_to_line(self.test_data)
+        data.append_data_to_file(self.test_name, self.test_file, test_data)
+
+        # Home Z-Axis
+        current_position = await api.gantry_position(mount)
+        home_z = home_position._replace(z=current_position.z)
+        await api.move_to(mount, home_z)
+
+        # Move to home
+        await api.move_to(mount, home_position)
+
+    async def run(self) -> None:
+        try:
+            self.api = await build_async_ot3_hardware_api(is_simulating=self.simulate, use_defaults=True)
+            self.start_time = time.time()
+            for c in range(self.cycles):
+                print(f"\n--> Starting Cycle {c + 1}/{self.cycles}")
+                await self._probe_sequence(self.api, self.mount)
+        except Exception as e:
+            raise e
+        except KeyboardInterrupt:
+            print("Test Cancelled!")
+        finally:
+            print("Test Completed!")
+
+if __name__ == '__main__':
+    print("\nOT-3 Capacitive Probe Test\n")
+    arg_parser = build_arg_parser()
+    args = arg_parser.parse_args()
+    test = Capacitive_Probe_Test(args.simulate, args.cycles)
+    asyncio.run(test.run())
