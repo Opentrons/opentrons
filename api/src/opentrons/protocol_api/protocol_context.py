@@ -360,6 +360,7 @@ class ProtocolContext(CommandPublisher):
 
         return dict(_only_labwares())
 
+    # TODO: gate move_labware behind API version
     def move_labware(
         self,
         labware: Labware,
