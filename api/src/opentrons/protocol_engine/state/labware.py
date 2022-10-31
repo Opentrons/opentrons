@@ -396,7 +396,7 @@ class LabwareView(HasState[LabwareState]):
         )
 
     def get_default_magnet_height(self, module_id: str, offset: float) -> float:
-        """Return a labware's default Magnetic Module engage height.
+        """Return a labware's default Magnetic Module engage height with added offset, if supplied.
 
         The returned value is measured in millimeters above the labware base plane.
         """
