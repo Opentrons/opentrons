@@ -203,10 +203,10 @@ class LabwareView(HasState[LabwareState]):
         """Return the ID of the labware loaded on the given module."""
         for labware_id, labware in self.state.labware_by_id.items():
             if (
-                isinstance(value.location, ModuleLocation)
-                and value.location.moduleId == module_id
+                isinstance(labware.location, ModuleLocation)
+                and labware.location.moduleId == module_id
             ):
-                return key
+                return labware_id
 
         raise errors.exceptions.LabwareNotLoadedOnModuleError(
             "There is no labware loaded on this Module"
