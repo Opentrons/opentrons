@@ -164,8 +164,9 @@ class Capacitive_Probe_Test:
     async def run(self) -> None:
         try:
             await self.test_setup()
-            for cycle in range(self.cycles):
-                print(f"\n--> Starting Cycle {cycle + 1}/{self.cycles}")
+            for i in range(self.cycles):
+                cycle = i + 1
+                print(f"\n--> Starting Cycle {cycle}/{self.cycles}")
                 await self._probe_sequence(self.api, self.mount, cycle)
         except Exception as e:
             await self.exit()
