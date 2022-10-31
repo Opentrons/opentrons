@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import partition from 'lodash/partition'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 import {
   Flex,
   SPACING,
@@ -19,7 +19,6 @@ import {
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
 import {
-  CompletedProtocolAnalysis,
   getLabwareDisplayName,
   getModuleDisplayName,
   getModuleType,
@@ -36,11 +35,8 @@ import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { ToggleButton } from '../../../../atoms/buttons'
 import { StyledText } from '../../../../atoms/text'
 import { SecureLabwareModal } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/SecureLabwareModal'
-import { useProtocolDetailsForRun } from '../../../Devices/hooks'
-import { getAllLabwareAndTiprackIdsInOrder } from './utils'
 import type {
   LabwareLocation,
-  LoadLabwareRunTimeCommand,
   LoadModuleRunTimeCommand,
   ModuleLocation,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
@@ -68,7 +64,7 @@ const LabwareRow = styled.div`
 
 interface LabwareSetupItem {
   definition: LabwareDefinition2
-  nickName: string | null,
+  nickName: string | null
   initialLocation: LabwareLocation
   moduleModel: ModuleModel | null
   moduleLocation: ModuleLocation | null
@@ -85,63 +81,80 @@ export function SetupLabwareList(
   const { attachedModuleInfo, commands, extraAttentionModules } = props
   const { t } = useTranslation('protocol_setup')
   let beyondInitialLoadCommands = false
-  const [offDeckLabware, onDeckLabware] = partition(commands.reduce<LabwareSetupItem[]>(
-    (acc, { commandType, result, params }) => {
-      if (
-        commandType === 'loadLabware' &&
-        result.definition.metadata.displayCategory !== 'trash'
-      ) {
-        const { location, displayName } = params
-        const { definition } = result
-        let moduleModel = null
-        let moduleLocation = null
-        if (location !== 'offDeck' && 'moduleId' in location) {
-          const loadModuleCommand = commands
-            .find(
+  const [offDeckLabware, onDeckLabware] = partition(
+    commands.reduce<LabwareSetupItem[]>(
+      (acc, { commandType, result, params }) => {
+        if (
+          commandType === 'loadLabware' &&
+          result.definition.metadata.displayCategory !== 'trash'
+        ) {
+          const { location, displayName } = params
+          const { definition } = result
+          let moduleModel = null
+          let moduleLocation = null
+          if (location !== 'offDeck' && 'moduleId' in location) {
+            const loadModuleCommand = commands.find(
               (c): c is LoadModuleRunTimeCommand =>
                 c.commandType === 'loadModule' &&
                 c.params.moduleId === location.moduleId
             )
-          if (loadModuleCommand == null) {
-            console.error(`could not find load module command for module with id ${location.moduleId}`)
-          } else {
-            moduleModel = loadModuleCommand.params.model
-            moduleLocation = loadModuleCommand.params.location
+            if (loadModuleCommand == null) {
+              console.error(
+                `could not find load module command for module with id ${location.moduleId}`
+              )
+            } else {
+              moduleModel = loadModuleCommand.params.model
+              moduleLocation = loadModuleCommand.params.location
+            }
           }
+          // NOTE: params.displayName is the user-assigned nickName, different from labareDisplayName from def
+          const nickName =
+            displayName != null &&
+              displayName !== getLabwareDisplayName(definition)
+              ? displayName
+              : null
+
+          return [
+            ...acc,
+            {
+              // NOTE: for the purposes of the labware setup step, anything loaded after
+              // the initial load commands will be treated as "initially off deck"
+              // even if technically loaded directly onto the deck later in the protocol
+              initialLocation: beyondInitialLoadCommands
+                ? 'offDeck'
+                : params.location,
+              definition,
+              moduleModel,
+              moduleLocation,
+              nickName,
+            },
+          ]
+        } else if (
+          !beyondInitialLoadCommands &&
+          ![
+            'loadLabware',
+            'loadModule',
+            'loadPipette',
+            'loadLiquid',
+            'moveLabware',
+          ].includes(commandType)
+        ) {
+          beyondInitialLoadCommands = true
         }
-        // NOTE: params.displayName is the user-assigned nickName, different from labareDisplayName from def
-        const nickName = displayName != null && displayName !== getLabwareDisplayName(definition)
-          ? displayName
-          : null
 
-        return [
-          ...acc,
-          {
-            // NOTE: for the purposes of the labware setup step, anything loaded after
-            // the initial load commands will be treated as "initially off deck"
-            // even if technically loaded directly onto the deck later in the protocol
-            initialLocation: beyondInitialLoadCommands ? 'offDeck' : params.location,
-            definition,
-            moduleModel,
-            moduleLocation,
-            nickName
-          },
-        ]
-      } else if (
-        !beyondInitialLoadCommands &&
-        !['loadLabware', 'loadModule', 'loadPipette', 'loadLiquid', 'moveLabware'].includes(commandType)
-      ) {
-        beyondInitialLoadCommands = true
-      }
-
-      return acc
-    }
-    , []),
-    ({ initialLocation }) => (initialLocation === 'offDeck')
+        return acc
+      },
+      []
+    ),
+    ({ initialLocation }) => initialLocation === 'offDeck'
   )
 
   return (
-    <Flex padding={SPACING.spacing4} flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
+    <Flex
+      padding={SPACING.spacing4}
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing2}
+    >
       <HeaderRow>
         <StyledText as="label" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {t('labware_name')}
@@ -150,14 +163,14 @@ export function SetupLabwareList(
           {t('initial_location')}
         </StyledText>
       </HeaderRow>
-      {onDeckLabware.map((labwareItem, index) =>
+      {onDeckLabware.map((labwareItem, index) => (
         <LabwareListItem
           key={index}
           attachedModuleInfo={attachedModuleInfo}
           extraAttentionModules={extraAttentionModules}
           {...labwareItem}
         />
-      )}
+      ))}
       {offDeckLabware.length > 0 ? (
         <>
           <StyledText
@@ -165,23 +178,20 @@ export function SetupLabwareList(
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             marginTop={SPACING.spacing4}
-            marginBottom={SPACING.spacing3}>
+            marginBottom={SPACING.spacing3}
+          >
             {t('additional_off_deck_labware')}
           </StyledText>
-          {
-            offDeckLabware.map((labwareItem, index) =>
-              <LabwareListItem
-                key={index}
-                attachedModuleInfo={attachedModuleInfo}
-                extraAttentionModules={extraAttentionModules}
-                {...labwareItem}
-              />
-            )
-          }
+          {offDeckLabware.map((labwareItem, index) => (
+            <LabwareListItem
+              key={index}
+              attachedModuleInfo={attachedModuleInfo}
+              extraAttentionModules={extraAttentionModules}
+              {...labwareItem}
+            />
+          ))}
         </>
-      )
-        : null
-      }
+      ) : null}
     </Flex>
   )
 }
@@ -321,7 +331,11 @@ export function LabwareListItem(
           </StyledText>
         </Flex>
       </Flex>
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
+      <Flex
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        alignItems={ALIGN_CENTER}
+        gridGap={SPACING.spacing3}
+      >
         <Flex flexDirection={DIRECTION_COLUMN} justifyContent={JUSTIFY_CENTER}>
           <StyledText as="p">{slotInfo}</StyledText>
           {extraAttentionText != null ? extraAttentionText : null}
@@ -331,16 +345,23 @@ export function LabwareListItem(
             <StyledText as="h6" minWidth="4.62rem">
               {t('labware_latch')}
             </StyledText>
-            <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+            <Flex
+              flexDirection={DIRECTION_ROW}
+              alignItems={ALIGN_CENTER}
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
+            >
               <ToggleButton
-                label={`heater_shaker_${moduleLocation?.slotName ?? ''}_latch_toggle`}
+                label={`heater_shaker_${moduleLocation?.slotName ?? ''
+                  }_latch_toggle`}
                 disabled={!isCorrectHeaterShakerAttached}
                 toggledOn={isLatchClosed}
                 onClick={toggleLatch}
                 display="flex"
                 alignItems={ALIGN_CENTER}
               />
-              {isLatchClosed ? <StyledText as="p">{t('secure')}</StyledText> : null}
+              {isLatchClosed ? (
+                <StyledText as="p">{t('secure')}</StyledText>
+              ) : null}
             </Flex>
           </Flex>
         ) : null}
@@ -361,11 +382,18 @@ const LabwareThumbnail = styled.svg`
   flex-shrink: 0;
 `
 
-function StandaloneLabware(props: { definition: LabwareDefinition2 }): JSX.Element {
+function StandaloneLabware(props: {
+  definition: LabwareDefinition2
+}): JSX.Element {
   const { definition } = props
   return (
-    <LabwareThumbnail viewBox={` 0 0 ${definition.dimensions.xDimension} ${definition.dimensions.yDimension}`}>
-      <LabwareRender definition={definition} wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE} />
+    <LabwareThumbnail
+      viewBox={` 0 0 ${definition.dimensions.xDimension} ${definition.dimensions.yDimension}`}
+    >
+      <LabwareRender
+        definition={definition}
+        wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE}
+      />
     </LabwareThumbnail>
   )
 }

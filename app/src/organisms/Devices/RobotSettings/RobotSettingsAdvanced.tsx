@@ -131,8 +131,8 @@ export function RobotSettingsAdvanced({
   return (
     <>
       {showSoftwareUpdateModal &&
-        robot != null &&
-        robot.status !== UNREACHABLE ? (
+      robot != null &&
+      robot.status !== UNREACHABLE ? (
         <UpdateBuildroot
           robot={robot}
           close={() => setShowSoftwareUpdateModal(false)}
@@ -241,19 +241,17 @@ export function RobotSettingsAdvanced({
           </>
         )}
         <StyledText as="h1">TEMP FF DIVIDER</StyledText>
-        {settings.map(field =>
+        {settings.map(field => (
           <FeatureFlagToggle
             settingField={field}
             robotName={robotName}
             isRobotBusy={isRobotBusy}
-          />)}
+          />
+        ))}
       </Box>
     </>
   )
 }
-
-
-
 
 interface FeatureFlagToggleProps {
   settingField: RobotSettingsField
@@ -284,15 +282,10 @@ export function FeatureFlagToggle({
       marginBottom={SPACING.spacing4}
     >
       <Box width="70%">
-        <StyledText
-          css={TYPOGRAPHY.pSemiBold}
-          paddingBottom={SPACING.spacing2}
-        >
+        <StyledText css={TYPOGRAPHY.pSemiBold} paddingBottom={SPACING.spacing2}>
           {title}
         </StyledText>
-        <StyledText as="p">
-          {description}
-        </StyledText>
+        <StyledText as="p">{description}</StyledText>
       </Box>
       <ToggleButton
         label={title}
@@ -303,4 +296,3 @@ export function FeatureFlagToggle({
     </Flex>
   )
 }
-

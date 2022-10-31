@@ -6,7 +6,6 @@ import type {
 
 const TRASH_ID = 'fixedTrash'
 
-
 /**
  * @deprecated use `getInitialLabwareLocation` instead
  */
