@@ -10,7 +10,6 @@ import {
 
 import { i18n } from '../../../i18n'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
-import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { useDispatchApiRequest } from '../../../redux/robot-api'
 import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
@@ -77,9 +76,6 @@ const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
 const mockRobotStatusBanner = RobotStatusBanner as jest.MockedFunction<
   typeof RobotStatusBanner
 >
-const mockChooseProtocolSlideout = ChooseProtocolSlideout as jest.MockedFunction<
-  typeof ChooseProtocolSlideout
->
 const mockUpdateRobotBanner = UpdateRobotBanner as jest.MockedFunction<
   typeof UpdateRobotBanner
 >
@@ -139,11 +135,6 @@ describe('RobotOverview', () => {
     })
     mockUseRobot.mockReturnValue(mockConnectableRobot)
     mockRobotStatusBanner.mockReturnValue(<div>Mock RobotStatusBanner</div>)
-    mockChooseProtocolSlideout.mockImplementation(({ showSlideout }) => (
-      <div>
-        Mock Choose Protocol Slideout {showSlideout ? 'showing' : 'hidden'}
-      </div>
-    ))
     mockUpdateRobotBanner.mockReturnValue(<div>Mock UpdateRobotBanner</div>)
     mockUseCurrentRunId.mockReturnValue(null)
     mockRobotOverviewOverflowMenu.mockReturnValue(
