@@ -294,6 +294,8 @@ def test_get_hold_time(
 
 
 def test_cycle_counting(
+    decoy: Decoy,
+    mock_sync_module_hardware: SyncThermocyclerHardware,
     subject: ThermocyclerModuleCore,
 ) -> None:
     """It should keep track of cycle and step counts and indices."""
@@ -304,10 +306,13 @@ def test_cycle_counting(
         ],
         repetitions=3,
     )
+
+    decoy.when(mock_sync_module_hardware.current_step_index).then_return(6)
+
     assert subject.get_total_cycle_count() == 3
-    assert subject.get_current_cycle_index() == 4
+    assert subject.get_current_cycle_index() == 3
     assert subject.get_total_step_count() == 2
-    assert subject.get_current_step_index() == 3
+    assert subject.get_current_step_index() == 2
 
     subject.deactivate_block()
 

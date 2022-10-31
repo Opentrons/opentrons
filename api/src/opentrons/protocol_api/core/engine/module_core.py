@@ -288,7 +288,10 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
 
     def get_current_cycle_index(self) -> Optional[int]:
         """Get index of the current set cycle repetition."""
-        return None if self._repetitions is None else self._repetitions + 1
+        if self._repetitions is None:
+            return None
+        step_index = self._sync_module_hardware.current_step_index
+        return (step_index - 1) // self._step_count + 1  # type: ignore[no-any-return]
 
     def get_total_step_count(self) -> Optional[int]:
         """Get number of steps within the current cycle."""
@@ -296,7 +299,10 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
 
     def get_current_step_index(self) -> Optional[int]:
         """Get the index of the current step within the current cycle."""
-        return None if self._step_count is None else self._step_count + 1
+        if self._step_count is None:
+            return None
+        step_index = self._sync_module_hardware.current_step_index
+        return (step_index - 1) % self._step_count + 1  # type: ignore[no-any-return]
 
     def _clear_cycle_counters(self) -> None:
         """Clear core-tracked cycle counters."""
