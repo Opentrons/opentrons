@@ -837,11 +837,13 @@ class OT3API(
         check_bounds: MotionChecks = MotionChecks.NONE,
     ) -> None:
         """Worker function to apply robot motion."""
+        print(f"current target_position: {target_position}")
         machine_pos = machine_from_deck(
             target_position,
             self._transforms.deck_calibration.attitude,
             self._transforms.carriage_offset,
         )
+        print(f"current machine_pos: {machine_pos}")
         bounds = self._backend.axis_bounds
         to_check = {
             ax: machine_pos[ax]
@@ -1020,7 +1022,7 @@ class OT3API(
             await self._backend.gripper_grip_jaw(duty_cycle=duty_cycle)
             encoder_pos = await self._backend.update_encoder_position()
             self._encoder_current_position = deck_from_machine(
-                await self._backend.update_encoder_position(),
+                encoder_pos,
                 self._transforms.deck_calibration.attitude,
                 self._transforms.carriage_offset,
             )
@@ -1497,6 +1499,7 @@ class OT3API(
         moving_axis: OT3Axis,
         target_pos: float,
         pass_settings: CapacitivePassSettings,
+        start_fresh: bool = False,
     ) -> float:
         """Determine the position of something using the capacitive sensor.
 
@@ -1564,6 +1567,7 @@ class OT3API(
             pass_settings.speed_mm_per_s,
             pass_settings.sensor_threshold_pf,
             sensor_id,
+            start_fresh,
         )
         end_pos = await self.gantry_position(mount, refresh=True)
         await self.move_to(mount, pass_start_pos)
