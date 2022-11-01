@@ -5,7 +5,7 @@ from datetime import datetime
 
 import pytest
 from decoy import Decoy
-from typing import TYPE_CHECKING, List, Union, Optional
+from typing import TYPE_CHECKING, Union
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.resources import ModelUtils
@@ -92,49 +92,15 @@ def subject(
 #  1. Should write an acceptance test w/ real labware on ot3 deck.
 #  2. This test will be split once waypoints generation is moved to motion planning.
 @pytest.mark.parametrize(
-    argnames=["from_location", "to_location", "module_location", "expected_waypoints"],
+    argnames=["from_location", "to_location"],
     argvalues=[
         (
             DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
-            None,
-            [
-                Point(777, 888, 999),  # gripper retract at current location
-                Point(101.1, 102.2, 999),  # move to above slot 1
-                Point(101.1, 102.2, 16.8),  # move to labware on slot 1
-                Point(101.1, 102.2, 999),  # gripper retract at current location
-                Point(201.5, 202.6, 999),  # move to above slot 3
-                Point(201.5, 202.6, 17.2),  # move down to labware drop height on slot 3
-                Point(201.5, 202.6, 999),  # retract in place
-            ],
         ),
         (
             DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             ModuleLocation(moduleId="module-id"),
-            DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
-            [
-                Point(777, 888, 999),  # gripper retract at current location
-                Point(101.1, 102.2, 999),  # move to above slot 1
-                Point(101.1, 102.2, 16.8),  # move to labware on slot 1
-                Point(101.1, 102.2, 999),  # gripper retract at current location
-                Point(211.5, 222.6, 999),  # move to above slot 3
-                Point(211.5, 222.6, 47.2),  # move down to labware drop height on module
-                Point(211.5, 222.6, 999),  # retract in place
-            ],
-        ),
-        (
-            ModuleLocation(moduleId="module-id"),
-            DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
-            DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-            [
-                Point(777, 888, 999),  # gripper retract at current location
-                Point(111.1, 122.2, 999),  # move to above slot 1
-                Point(111.1, 122.2, 46.8),  # move to labware on slot 1
-                Point(111.1, 122.2, 999),  # gripper retract at current location
-                Point(201.5, 202.6, 999),  # move to above slot 3
-                Point(201.5, 202.6, 17.2),  # move down to labware drop height on module
-                Point(201.5, 202.6, 999),  # retract in place
-            ],
         ),
     ],
 )
@@ -146,8 +112,6 @@ async def test_move_labware_with_gripper(
     subject: LabwareMovementHandler,
     from_location: Union[DeckSlotLocation, ModuleLocation],
     to_location: Union[DeckSlotLocation, ModuleLocation],
-    expected_waypoints: List[Point],
-    module_location: Optional[DeckSlotLocation],
 ) -> None:
     """It should perform a labware movement with gripper by delegating to OT3API."""
     decoy.when(ot3_hardware_api.has_gripper()).then_return(True)
@@ -155,28 +119,18 @@ async def test_move_labware_with_gripper(
     decoy.when(
         await ot3_hardware_api.gantry_position(mount=OT3Mount.GRIPPER)
     ).then_return(Point(x=777, y=888, z=999))
-    decoy.when(
-        state_store.labware.get_labware_center_position(
-            labware_id="my-teleporting-labware"
-        )
-    ).then_return(Point(x=5.5, y=11, z=16.5))
-
-    if module_location:
-        decoy.when(state_store.modules.get_module_offset("module-id")).then_return(
-            LabwareOffsetVector(x=10, y=20, z=30)
-        )
-
-        decoy.when(state_store.modules.get_location("module-id")).then_return(
-            module_location
-        )
 
     decoy.when(
-        state_store.labware.get_slot_center_position(DeckSlotName.SLOT_1)
-    ).then_return(Point(x=101, y=102, z=103))
+        state_store.geometry.get_labware_center(
+            labware_id="my-teleporting-labware", location=from_location
+        )
+    ).then_return(Point(101, 102, 119.5))
 
     decoy.when(
-        state_store.labware.get_slot_center_position(DeckSlotName.SLOT_3)
-    ).then_return(Point(x=201, y=202, z=203))
+        state_store.geometry.get_labware_center(
+            labware_id="my-teleporting-labware", location=to_location
+        )
+    ).then_return(Point(201, 202, 219.5))
 
     decoy.when(
         state_store.labware.get_labware_offset_vector("my-teleporting-labware")
@@ -193,6 +147,15 @@ async def test_move_labware_with_gripper(
             vector=LabwareOffsetVector(x=0.5, y=0.6, z=0.7),
         )
     )
+    expected_waypoints = [
+        Point(777, 888, 999),  # gripper retract at current location
+        Point(101.1, 102.2, 999),  # move to above slot 1
+        Point(101.1, 102.2, 119.8),  # move to labware on slot 1
+        Point(101.1, 102.2, 999),  # gripper retract at current location
+        Point(201.5, 202.6, 999),  # move to above slot 3
+        Point(201.5, 202.6, 220.2),  # move down to labware drop height on slot 3
+        Point(201.5, 202.6, 999),  # retract in place
+    ]
 
     await subject.move_labware_with_gripper(
         labware_id="my-teleporting-labware",

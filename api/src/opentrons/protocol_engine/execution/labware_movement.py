@@ -1,7 +1,7 @@
 """Labware movement command handling."""
 from typing import Optional, Union, List
 
-from opentrons.types import Point, DeckSlotName
+from opentrons.types import Point
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import OT3Mount, OT3Axis
 from opentrons.protocol_engine.resources import ModelUtils
@@ -138,39 +138,23 @@ class LabwareMovementHandler:
         labware_offset_vector: Optional[LabwareOffsetVector],
     ) -> List[Point]:
         """Get waypoints for gripper to move to a specified location."""
-        module_offset = LabwareOffsetVector(x=0, y=0, z=0)
-        location_slot: DeckSlotName
-        if isinstance(location, ModuleLocation):
-            module_offset = self._state_store.modules.get_module_offset(
-                location.moduleId
-            )
-            location_slot = self._state_store.modules.get_location(
-                location.moduleId
-            ).slotName
-        else:
-            location_slot = location.slotName
-        labware_center = self._state_store.labware.get_labware_center_position(
-            labware_id
+        labware_center = self._state_store.geometry.get_labware_center(
+            labware_id=labware_id, location=location
         )
-
-        # Keeping grip height as half of overall height of labware
-        grip_height = labware_center.z
-
-        slot_center = self._state_store.labware.get_slot_center_position(location_slot)
         labware_offset_vector = labware_offset_vector or LabwareOffsetVector(
             x=0, y=0, z=0
         )
         waypoints: List[Point] = [
             Point(current_position.x, current_position.y, gripper_home_z),
             Point(
-                slot_center.x + module_offset.x + labware_offset_vector.x,
-                slot_center.y + module_offset.y + labware_offset_vector.y,
+                labware_center.x + labware_offset_vector.x,
+                labware_center.y + labware_offset_vector.y,
                 gripper_home_z,
             ),
             Point(
-                slot_center.x + module_offset.x + labware_offset_vector.x,
-                slot_center.y + module_offset.y + labware_offset_vector.y,
-                grip_height + module_offset.z + labware_offset_vector.z,
+                labware_center.x + labware_offset_vector.x,
+                labware_center.y + labware_offset_vector.y,
+                labware_center.z + labware_offset_vector.z,
             ),
         ]
         return waypoints

@@ -1,7 +1,7 @@
 """Test state getters for retrieving geometry views of state."""
 import pytest
 from decoy import Decoy
-from typing import cast, ContextManager, Any
+from typing import cast, ContextManager, Any, Union
 from contextlib import nullcontext as does_not_raise
 
 from opentrons.calibration_storage.helpers import uri_from_details
@@ -22,6 +22,7 @@ from opentrons.protocol_engine.types import (
     OFF_DECK_LOCATION,
     LabwareLocation,
     ModuleModel,
+    Dimensions,
 )
 from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.modules import ModuleView
@@ -831,3 +832,42 @@ def test_ensure_location_not_occupied_raises(
     )
     with expected_raise:
         subject.ensure_location_not_occupied(location=location)
+
+
+@pytest.mark.parametrize(
+    argnames=["location", "expected_center_point"],
+    argvalues=[
+        (DeckSlotLocation(slotName=DeckSlotName.SLOT_1), Point(101.0, 102.0, 119.5)),
+        (ModuleLocation(moduleId="module-id"), Point(111.0, 122.0, 149.5)),
+    ],
+)
+def test_get_labware_center(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    subject: GeometryView,
+    location: Union[DeckSlotLocation, ModuleLocation],
+    expected_center_point: Point,
+) -> None:
+    """It should get the center point of the labware at the specified location."""
+    decoy.when(labware_view.get_dimensions(labware_id="labware-id")).then_return(
+        Dimensions(x=11, y=22, z=33)
+    )
+
+    if isinstance(location, ModuleLocation):
+        decoy.when(module_view.get_module_offset("module-id")).then_return(
+            LabwareOffsetVector(x=10, y=20, z=30)
+        )
+
+        decoy.when(module_view.get_location("module-id")).then_return(
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+        )
+
+    decoy.when(labware_view.get_slot_center_position(DeckSlotName.SLOT_1)).then_return(
+        Point(x=101, y=102, z=103)
+    )
+    labware_center = subject.get_labware_center(
+        labware_id="labware-id", location=location
+    )
+
+    assert labware_center == expected_center_point
