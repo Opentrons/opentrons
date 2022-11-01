@@ -32,11 +32,6 @@ interface PipetteWizardFlowsProps {
   robotName: string
   closeFlow: () => void
 }
-export interface PipetteWizardStepProps {
-  flowType: PipetteWizardFlow
-  mount: PipetteMount
-  nextStep: () => void
-}
 
 export const PipetteWizardFlows = (
   props: PipetteWizardFlowsProps
@@ -53,7 +48,6 @@ export const PipetteWizardFlows = (
 
   const totalStepCount = pipetteWizardSteps.length - 1
   const currentStep = pipetteWizardSteps?.[currentStepIndex]
-
   const goBack = (): void => {
     setCurrentStepIndex(
       currentStepIndex !== pipetteWizardSteps.length - 1
@@ -89,9 +83,19 @@ export const PipetteWizardFlows = (
     },
   })
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
+  const [isBetweenCommands, setIsBetweenCommands] = React.useState<boolean>(
+    false
+  )
 
   const proceed = (): void => {
-    if (!(isCommandMutationLoading || isStopLoading || isDeleteLoading)) {
+    if (
+      !(
+        isCommandMutationLoading ||
+        isStopLoading ||
+        isDeleteLoading ||
+        isBetweenCommands
+      )
+    ) {
       setCurrentStepIndex(
         currentStepIndex !== pipetteWizardSteps.length - 1
           ? currentStepIndex + 1
@@ -100,12 +104,14 @@ export const PipetteWizardFlows = (
     }
   }
   const handleCleanUpAndClose = (): void => {
+    setIsBetweenCommands(true)
     chainRunCommands([
       {
         commandType: 'home' as const,
         params: {},
       },
     ]).then(() => {
+      setIsBetweenCommands(false)
       if (runId !== '') stopRun(runId)
     })
   }
@@ -116,14 +122,25 @@ export const PipetteWizardFlows = (
   } = useConditionalConfirm(handleCleanUpAndClose, true)
 
   const [isRobotMoving, setIsRobotMoving] = React.useState<boolean>(false)
+
   React.useEffect(() => {
-    if (isCommandMutationLoading || isStopLoading || isDeleteLoading) {
+    if (
+      isCommandMutationLoading ||
+      isStopLoading ||
+      isDeleteLoading ||
+      isBetweenCommands
+    ) {
       const timer = setTimeout(() => setIsRobotMoving(true), 700)
       return () => clearTimeout(timer)
     } else {
       setIsRobotMoving(false)
     }
-  }, [isCommandMutationLoading, isStopLoading, isDeleteLoading])
+  }, [
+    isCommandMutationLoading,
+    isStopLoading,
+    isDeleteLoading,
+    isBetweenCommands,
+  ])
 
   const calibrateBaseProps = {
     chainRunCommands,
@@ -132,6 +149,8 @@ export const PipetteWizardFlows = (
     runId,
     goBack,
     attachedPipette,
+    setIsBetweenCommands,
+    isBetweenCommands,
   }
   const exitModal = (
     <ExitModal
@@ -190,6 +209,11 @@ export const PipetteWizardFlows = (
       break
     }
   }
+  let exitWizardButton = onExit
+  if (isRobotMoving) {
+    exitWizardButton = undefined
+  } else if (showConfirmExit) exitWizardButton = handleCleanUpAndClose
+
   return (
     <Portal level="top">
       <ModalShell
@@ -199,7 +223,7 @@ export const PipetteWizardFlows = (
             title={wizardTitle}
             currentStep={currentStepIndex}
             totalSteps={totalStepCount}
-            onExit={isRobotMoving ? undefined : onExit}
+            onExit={exitWizardButton}
           />
         }
       >

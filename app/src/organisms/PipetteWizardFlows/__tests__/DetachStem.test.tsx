@@ -5,7 +5,7 @@ import { LEFT } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import {
   mockAttachedPipette,
-  mockP300PipetteSpecs,
+  mockGen3P1000PipetteSpecs,
 } from '../../../redux/pipettes/__fixtures__'
 import { InProgressModal } from '../../../molecules/InProgressModal/InProgressModal'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
@@ -25,7 +25,7 @@ const render = (props: React.ComponentProps<typeof DetachStem>) => {
 }
 const mockPipette: AttachedPipette = {
   ...mockAttachedPipette,
-  modelSpecs: mockP300PipetteSpecs,
+  modelSpecs: mockGen3P1000PipetteSpecs,
 }
 describe('DetachStem', () => {
   let props: React.ComponentProps<typeof DetachStem>
@@ -39,6 +39,7 @@ describe('DetachStem', () => {
       attachedPipette: { left: mockPipette, right: null },
       flowType: FLOWS.CALIBRATE,
       handleCleanUp: jest.fn(),
+      setIsBetweenCommands: jest.fn(),
       isRobotMoving: false,
     }
     mockInProgressModal.mockReturnValue(<div>mock in progress</div>)

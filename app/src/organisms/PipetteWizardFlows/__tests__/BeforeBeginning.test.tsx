@@ -5,7 +5,7 @@ import { LEFT } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import {
   mockAttachedPipette,
-  mockP300PipetteSpecs,
+  mockGen3P1000PipetteSpecs,
 } from '../../../redux/pipettes/__fixtures__'
 import { InProgressModal } from '../../../molecules/InProgressModal/InProgressModal'
 import { NeedHelpLink } from '../../CalibrationPanels'
@@ -31,7 +31,7 @@ const render = (props: React.ComponentProps<typeof BeforeBeginning>) => {
 }
 const mockPipette: AttachedPipette = {
   ...mockAttachedPipette,
-  modelSpecs: mockP300PipetteSpecs,
+  modelSpecs: mockGen3P1000PipetteSpecs,
 }
 describe('BeforeBeginning', () => {
   let props: React.ComponentProps<typeof BeforeBeginning>
@@ -47,6 +47,8 @@ describe('BeforeBeginning', () => {
       attachedPipette: { left: mockPipette, right: null },
       flowType: FLOWS.CALIBRATE,
       createRun: jest.fn(),
+      setIsBetweenCommands: jest.fn(),
+      isCreateLoading: false,
       isRobotMoving: false,
     }
     mockNeedHelpLink.mockReturnValue(<div>mock need help link</div>)
@@ -66,13 +68,27 @@ describe('BeforeBeginning', () => {
     getByAltText('Calibration Probe')
     const proceedBtn = getByRole('button', { name: 'Get started' })
     fireEvent.click(proceedBtn)
+    expect(props.setIsBetweenCommands).toHaveBeenCalled()
     expect(props.chainRunCommands).toHaveBeenCalledWith([
+      {
+        commandType: 'home',
+        params: {},
+      },
+      {
+        commandType: 'loadPipette',
+        params: {
+          mount: LEFT,
+          pipetteId: 'abc',
+          pipetteName: 'p1000_single_gen3',
+        },
+      },
       {
         commandType: 'calibration/moveToLocation',
         params: { pipetteId: 'abc', location: 'attachOrDetach' },
       },
     ])
     await waitFor(() => {
+      expect(props.setIsBetweenCommands).toHaveBeenCalled()
       expect(props.proceed).toHaveBeenCalled()
     })
   })
@@ -83,5 +99,15 @@ describe('BeforeBeginning', () => {
     }
     const { getByText } = render(props)
     getByText('mock in progress')
+  })
+
+  it('continue button is disabled when isCreateLoading is true', () => {
+    props = {
+      ...props,
+      isCreateLoading: true,
+    }
+    const { getByRole } = render(props)
+    const proceedBtn = getByRole('button', { name: 'Get started' })
+    expect(proceedBtn).toBeDisabled()
   })
 })

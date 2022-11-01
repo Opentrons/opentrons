@@ -4,7 +4,7 @@ import { LEFT } from '@opentrons/shared-data'
 import { renderWithProviders } from '@opentrons/components'
 import {
   mockAttachedPipette,
-  mockP300PipetteSpecs,
+  mockGen3P1000PipetteSpecs,
 } from '../../../redux/pipettes/__fixtures__'
 import { i18n } from '../../../i18n'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
@@ -19,7 +19,7 @@ const render = (props: React.ComponentProps<typeof Results>) => {
 }
 const mockPipette: AttachedPipette = {
   ...mockAttachedPipette,
-  modelSpecs: mockP300PipetteSpecs,
+  modelSpecs: mockGen3P1000PipetteSpecs,
 }
 describe('Results', () => {
   let props: React.ComponentProps<typeof Results>
@@ -32,13 +32,14 @@ describe('Results', () => {
       isRobotMoving: false,
       runId: RUN_ID_1,
       attachedPipette: { left: mockPipette, right: null },
+      setIsBetweenCommands: jest.fn(),
       flowType: FLOWS.CALIBRATE,
     }
   })
   it('renders the correct information when pipette cal is a success for calibrate flow', () => {
     const { getByText, getByRole } = render(props)
     getByText('Pipette Successfully Calibrated')
-    const exit = getByRole('button', { name: 'exit' })
+    const exit = getByRole('button', { name: 'Results_exit' })
     fireEvent.click(exit)
     expect(props.proceed).toHaveBeenCalled()
   })

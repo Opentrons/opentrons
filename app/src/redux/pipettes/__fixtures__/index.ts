@@ -301,3 +301,9 @@ export const mockRightPipetteCalibration: any = {
   tiprack: 'some-other-tiprack',
   lastModified: '2020-08-25T20:25',
 }
+
+export const mockGen3P1000PipetteSpecs: any = {
+  displayName: 'P1000 Single-Channel GEN3',
+  name: 'p1000_single_gen3',
+  backCompatNames: ['p1000_single'],
+}

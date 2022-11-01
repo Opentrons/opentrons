@@ -27,6 +27,7 @@ export const BeforeBeginning = (props: BeforeBeginningProps): JSX.Element => {
     isCreateLoading,
     mount,
     isRobotMoving,
+    setIsBetweenCommands,
   } = props
   const { t } = useTranslation('pipette_wizard_flows')
   //  TODO(jr, 10/26/22): when we wire up other flows, const will turn into let
@@ -38,6 +39,7 @@ export const BeforeBeginning = (props: BeforeBeginningProps): JSX.Element => {
   const pipetteId = attachedPipette[mount]?.id
 
   const handleOnClick = (): void => {
+    setIsBetweenCommands(true)
     chainRunCommands([
       {
         commandType: 'home' as const,
@@ -60,6 +62,7 @@ export const BeforeBeginning = (props: BeforeBeginningProps): JSX.Element => {
         },
       },
     ]).then(() => {
+      setIsBetweenCommands(false)
       proceed()
     })
   }

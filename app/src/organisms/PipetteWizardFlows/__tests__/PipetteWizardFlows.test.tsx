@@ -5,14 +5,16 @@ import { LEFT } from '@opentrons/shared-data'
 import {
   useCreateRunMutation,
   useDeleteRunMutation,
+  useStopRunMutation,
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import { getAttachedPipettes } from '../../../redux/pipettes'
 import { useChainRunCommands } from '../../../resources/runs/hooks'
 import {
   mockAttachedPipette,
-  mockP300PipetteSpecs,
+  mockGen3P1000PipetteSpecs,
 } from '../../../redux/pipettes/__fixtures__'
+import { useCloseCurrentRun } from '../../ProtocolUpload/hooks'
 import { getPipetteWizardSteps } from '../getPipetteWizardSteps'
 import { ExitModal } from '../ExitModal'
 import { FLOWS, SECTIONS } from '../constants'
@@ -25,6 +27,7 @@ jest.mock('../getPipetteWizardSteps')
 jest.mock('../../../resources/runs/hooks')
 jest.mock('@opentrons/react-api-client')
 jest.mock('../ExitModal')
+jest.mock('../../ProtocolUpload/hooks')
 
 const mockGetAttachedPipettes = getAttachedPipettes as jest.MockedFunction<
   typeof getAttachedPipettes
@@ -38,8 +41,14 @@ const mockUseChainRunCommands = useChainRunCommands as jest.MockedFunction<
 const mockUseCreateRunMutation = useCreateRunMutation as jest.MockedFunction<
   typeof useCreateRunMutation
 >
+const mockUseStopRunMutation = useStopRunMutation as jest.MockedFunction<
+  typeof useStopRunMutation
+>
 const mockUseDeleteRunMutation = useDeleteRunMutation as jest.MockedFunction<
   typeof useDeleteRunMutation
+>
+const mockUseCloseCurrentRun = useCloseCurrentRun as jest.MockedFunction<
+  typeof useCloseCurrentRun
 >
 const mockExitModal = ExitModal as jest.MockedFunction<typeof ExitModal>
 const render = (props: React.ComponentProps<typeof PipetteWizardFlows>) => {
@@ -49,12 +58,14 @@ const render = (props: React.ComponentProps<typeof PipetteWizardFlows>) => {
 }
 const mockPipette: AttachedPipette = {
   ...mockAttachedPipette,
-  modelSpecs: mockP300PipetteSpecs,
+  modelSpecs: mockGen3P1000PipetteSpecs,
 }
 describe('PipetteWizardFlows', () => {
   let props: React.ComponentProps<typeof PipetteWizardFlows>
   const mockCreateRun = jest.fn()
   const mockDeleteRun = jest.fn()
+  const mockStopRun = jest.fn()
+  const mockCloseCurrentRun = jest.fn()
   const mockChainRunCommands = jest
     .fn()
     .mockImplementation(() => Promise.resolve())
@@ -65,6 +76,7 @@ describe('PipetteWizardFlows', () => {
       robotName: 'otie',
       closeFlow: jest.fn(),
     }
+    mockUseStopRunMutation.mockReturnValue({ stopRun: mockStopRun } as any)
     mockExitModal.mockReturnValue(<div>mock exit modal</div>)
     mockUseCreateRunMutation.mockReturnValue({
       createRun: mockCreateRun,
@@ -76,6 +88,9 @@ describe('PipetteWizardFlows', () => {
       chainRunCommands: mockChainRunCommands,
       isCommandMutationLoading: false,
     })
+    mockUseCloseCurrentRun.mockReturnValue({
+      closeCurrenRun: mockCloseCurrentRun,
+    } as any)
     mockGetAttachedPipettes.mockReturnValue({ left: mockPipette, right: null })
     mockGetPipetteWizardSteps.mockReturnValue([
       {
@@ -116,6 +131,18 @@ describe('PipetteWizardFlows', () => {
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith([
         {
+          commandType: 'home',
+          params: {},
+        },
+        {
+          commandType: 'loadPipette',
+          params: {
+            mount: LEFT,
+            pipetteId: 'abc',
+            pipetteName: 'p300_single_gen2',
+          },
+        },
+        {
           commandType: 'calibration/moveToLocation',
           params: { pipetteId: 'abc', location: 'attachOrDetach' },
         },
@@ -130,6 +157,18 @@ describe('PipetteWizardFlows', () => {
     fireEvent.click(initiate)
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith([
+        {
+          commandType: 'calibration/moveToLocation',
+          params: { pipetteId: 'abc', location: 'probePosition' },
+        },
+        {
+          commandType: 'calibration/calibratePipette',
+          params: { mount: 'left' },
+        },
+        {
+          commandType: 'home',
+          params: { axes: ['leftZ'] },
+        },
         {
           commandType: 'calibration/moveToLocation',
           params: { pipetteId: 'abc', location: 'attachOrDetach' },
@@ -151,7 +190,7 @@ describe('PipetteWizardFlows', () => {
           params: {},
         },
       ])
-      expect(mockDeleteRun).toHaveBeenCalled()
+      expect(mockStopRun).toHaveBeenCalled()
     })
     //  last page
     getByText('Step 3 / 3')

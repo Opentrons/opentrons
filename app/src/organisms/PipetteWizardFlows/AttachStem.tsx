@@ -16,10 +16,12 @@ export const AttachStem = (props: PipetteWizardStepProps): JSX.Element => {
     mount,
     isRobotMoving,
     goBack,
+    setIsBetweenCommands,
   } = props
   const motorAxis = mount === 'left' ? 'leftZ' : 'rightZ'
   const pipetteId = attachedPipette[mount].id
   const handleOnClick = (): void => {
+    setIsBetweenCommands(true)
     chainRunCommands([
       {
         commandType: 'calibration/moveToLocation' as const,
@@ -48,6 +50,7 @@ export const AttachStem = (props: PipetteWizardStepProps): JSX.Element => {
         },
       },
     ]).then(() => {
+      setIsBetweenCommands(false)
       proceed()
     })
   }

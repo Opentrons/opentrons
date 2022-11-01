@@ -56,4 +56,5 @@ export interface PipetteWizardStepProps {
   isRobotMoving: boolean
   runId: string
   attachedPipette: AttachedPipettesByMount
+  setIsBetweenCommands: React.Dispatch<React.SetStateAction<boolean>>
 }

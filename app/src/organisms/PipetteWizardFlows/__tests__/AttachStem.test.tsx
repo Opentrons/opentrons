@@ -6,6 +6,7 @@ import { i18n } from '../../../i18n'
 import {
   mockAttachedPipette,
   mockP300PipetteSpecs,
+  mockGen3P1000PipetteSpecs,
 } from '../../../redux/pipettes/__fixtures__'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { FLOWS } from '../constants'
@@ -19,7 +20,7 @@ const render = (props: React.ComponentProps<typeof AttachStem>) => {
 }
 const mockPipette: AttachedPipette = {
   ...mockAttachedPipette,
-  modelSpecs: mockP300PipetteSpecs,
+  modelSpecs: mockGen3P1000PipetteSpecs,
 }
 describe('AttachStem', () => {
   let props: React.ComponentProps<typeof AttachStem>
@@ -34,6 +35,7 @@ describe('AttachStem', () => {
       runId: RUN_ID_1,
       attachedPipette: { left: mockPipette, right: null },
       flowType: FLOWS.CALIBRATE,
+      setIsBetweenCommands: jest.fn(),
       isRobotMoving: false,
     }
   })
@@ -44,6 +46,7 @@ describe('AttachStem', () => {
     getByAltText('Attach stem')
     const proceedBtn = getByRole('button', { name: 'Initiate calibration' })
     fireEvent.click(proceedBtn)
+    expect(props.setIsBetweenCommands).toHaveBeenCalled()
     expect(props.chainRunCommands).toHaveBeenCalledWith([
       {
         commandType: 'calibration/moveToLocation',
@@ -54,11 +57,16 @@ describe('AttachStem', () => {
         params: { mount: 'left' },
       },
       {
+        commandType: 'home',
+        params: { axes: ['leftZ'] },
+      },
+      {
         commandType: 'calibration/moveToLocation',
         params: { pipetteId: 'abc', location: 'attachOrDetach' },
       },
     ])
     await waitFor(() => {
+      expect(props.setIsBetweenCommands).toHaveBeenCalled()
       expect(props.proceed).toHaveBeenCalled()
     })
 
