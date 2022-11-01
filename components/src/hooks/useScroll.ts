@@ -7,7 +7,7 @@ import {
 } from 'react'
 import interact from 'interactjs'
 
-interface UseSwipeResult {
+interface UseScrollResult {
   ref: MutableRefObject<null>
   style: CSSProperties
   isEnabled: boolean
@@ -15,7 +15,7 @@ interface UseSwipeResult {
   disable: () => void
 }
 
-export const useScroll = (): UseSwipeResult => {
+export const useScroll = (): UseScrollResult => {
   const [isEnabled, setIsEnabled] = useState<boolean>(true)
   const interactiveRef = useRef(null)
   const swipeDirs = ['up', 'down', 'left', 'right']

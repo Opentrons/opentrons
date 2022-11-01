@@ -1,8 +1,8 @@
 import { renderHook } from '@testing-library/react-hooks'
 import { useScroll } from '..'
 
-describe('useSwipe hook', () => {
-  it('useSwipe returns UseSwipeResult object', () => {
+describe('useScroll hook', () => {
+  it('useSwipe returns UseScrollResult object', () => {
     const { result } = renderHook(() => useScroll())
     expect(result.current.style.touchAction).toBe('none')
     expect(result.current.isEnabled).toBe(true)
