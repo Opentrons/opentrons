@@ -91,12 +91,14 @@ class MoveLabwareImplementation(
             validated_new_loc = self._labware_movement.ensure_valid_gripper_location(
                 empty_new_location,
             )
-            await self._labware_movement.move_labware_with_gripper(
-                labware_id=params.labwareId,
-                current_location=validated_current_loc,
-                new_location=validated_new_loc,
-                new_offset_id=new_offset_id,
-            )
+            use_virtual_gripper = self._state_view.config.use_virtual_gripper
+            if not use_virtual_gripper:
+                await self._labware_movement.move_labware_with_gripper(
+                    labware_id=params.labwareId,
+                    current_location=validated_current_loc,
+                    new_location=validated_new_loc,
+                    new_offset_id=new_offset_id,
+                )
         elif params.strategy == LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE:
             # Pause to allow for manual labware movement
             await self._run_control.wait_for_resume()

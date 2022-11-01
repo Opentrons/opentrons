@@ -134,6 +134,7 @@ async def test_gripper_move_labware_implementation(
         labware_movement.ensure_valid_gripper_location(new_location)
     ).then_return(validated_new_location)
 
+    decoy.when(state_view.config.use_virtual_gripper).then_return(False)
     result = await subject.execute(data)
     decoy.verify(
         await labware_movement.move_labware_with_gripper(
