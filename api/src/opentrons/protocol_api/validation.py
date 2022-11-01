@@ -1,4 +1,4 @@
-from typing import Dict, Union, Optional
+from typing import List, Dict, Union, Optional
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
@@ -9,6 +9,7 @@ from opentrons.hardware_control.modules.types import (
     TemperatureModuleModel,
     ThermocyclerModuleModel,
     HeaterShakerModuleModel,
+    ThermocyclerStep,
 )
 
 
@@ -107,3 +108,35 @@ def ensure_hold_time_seconds(
     if minutes is not None:
         seconds += minutes * 60
     return seconds
+
+
+def ensure_thermocycler_repetition_count(repetitions: int) -> int:
+    """Ensure thermocycler repetitions is a positive integer."""
+    if repetitions <= 0:
+        raise ValueError("repetitions must be a positive integer")
+    return repetitions
+
+
+def ensure_thermocycler_profile_steps(
+    steps: List[ThermocyclerStep],
+) -> List[ThermocyclerStep]:
+    """Ensure thermocycler steps are valid and hold time is expressed in seconds only."""
+    validated_steps = []
+    for step in steps:
+        temperature = step.get("temperature")
+        hold_mins = step.get("hold_time_minutes")
+        hold_secs = step.get("hold_time_seconds")
+        if temperature is None:
+            raise ValueError("temperature must be defined for each step in cycle")
+        if hold_mins is None and hold_secs is None:
+            raise ValueError(
+                "either hold_time_minutes or hold_time_seconds must be"
+                "defined for each step in cycle"
+            )
+        validated_seconds = ensure_hold_time_seconds(hold_secs, hold_mins)
+        validated_steps.append(
+            ThermocyclerStep(
+                temperature=temperature, hold_time_seconds=validated_seconds
+            )
+        )
+    return validated_steps

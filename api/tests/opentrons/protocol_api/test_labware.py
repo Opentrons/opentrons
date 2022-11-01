@@ -21,7 +21,7 @@ def api_version() -> APIVersion:
 
 @pytest.fixture
 def subject(mock_labware_core: LabwareCore, api_version: APIVersion) -> Labware:
-    """Get a ProtocolContext test subject with its dependencies mocked out."""
+    """Get a Labware test subject with its dependencies mocked out."""
     return Labware(implementation=mock_labware_core, api_version=api_version)
 
 
@@ -62,15 +62,3 @@ def test_wells(decoy: Decoy, mock_labware_core: LabwareCore, subject: Labware) -
     assert result[0].well_name == "Z42"
     assert isinstance(result[1], Well)
     assert result[1].well_name == "X1"
-
-
-def test_well_max_volume(
-    decoy: Decoy, mock_labware_core: LabwareCore, subject: Labware
-) -> None:
-    """It should get the well's max volume from the core."""
-    mock_well_core = decoy.mock(cls=WellCore)
-
-    decoy.when(mock_labware_core.get_wells()).then_return([mock_well_core])
-    decoy.when(mock_well_core.get_max_volume()).then_return(101)
-
-    assert subject.wells()[0].max_volume == 101
