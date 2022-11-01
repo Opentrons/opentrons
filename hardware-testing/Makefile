@@ -169,6 +169,7 @@ pull-data-ot3:
 define extract-and-update-fw
 ssh -i $(2) $(3) root@$(1) \
 "cd /opt/opentrons-robot-server &&\
+(rm -rf ot3-firmware || true) &&\
 tar -xvf ot3-firmware.tar.gz &&\
 ls ./ot3-firmware &&\
 python3 -m hardware_testing.scripts.update_fw_ot3 --folder /opt/opentrons-robot-server/ot3-firmware &&\
