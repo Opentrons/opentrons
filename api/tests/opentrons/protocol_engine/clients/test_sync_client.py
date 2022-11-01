@@ -564,3 +564,63 @@ def test_heater_shaker_deactivate_heater(
     result = subject.heater_shaker_deactivate_heater(module_id="module-id")
 
     assert result == response
+
+
+def test_temperature_module_set_target_temperature(
+    decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
+) -> None:
+    """Should execute a PE set_target_temperature command."""
+    request = commands.temperature_module.SetTargetTemperatureCreate(
+        params=commands.temperature_module.SetTargetTemperatureParams(
+            moduleId="module-id", celsius=38.7
+        ),
+    )
+    response = commands.temperature_module.SetTargetTemperatureResult(
+        targetTemperature=38.7
+    )
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.temperature_module_set_target_temperature(
+        module_id="module-id", celsius=38.7
+    )
+
+    assert result == response
+
+
+def test_temperature_module_deactivate(
+    decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
+) -> None:
+    """Should execute a PE deactivate temperature command."""
+    request = commands.temperature_module.DeactivateTemperatureCreate(
+        params=commands.temperature_module.DeactivateTemperatureParams(
+            moduleId="module-id"
+        ),
+    )
+    response = commands.temperature_module.DeactivateTemperatureResult()
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.temperature_module_deactivate(module_id="module-id")
+
+    assert result == response
+
+
+def test_temperature_module_wait_for_target_temperature(
+    decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
+) -> None:
+    """Should execute a PE wait_for_target_temperature command."""
+    request = commands.temperature_module.WaitForTemperatureCreate(
+        params=commands.temperature_module.WaitForTemperatureParams(
+            moduleId="module-id", celsius=38.7
+        ),
+    )
+    response = commands.temperature_module.WaitForTemperatureResult()
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.temperature_module_wait_for_target_temperature(
+        module_id="module-id", celsius=38.7
+    )
+
+    assert result == response

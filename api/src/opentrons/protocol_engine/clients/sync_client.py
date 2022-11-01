@@ -374,3 +374,39 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
         return cast(commands.heater_shaker.DeactivateHeaterResult, result)
+
+    def temperature_module_set_target_temperature(
+        self, module_id: str, celsius: float
+    ) -> commands.temperature_module.SetTargetTemperatureResult:
+        """Execute a `temperatureModule/setTargetTemperature` command and return the result."""
+        request = commands.temperature_module.SetTargetTemperatureCreate(
+            params=commands.temperature_module.SetTargetTemperatureParams(
+                moduleId=module_id, celsius=celsius
+            ),
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.temperature_module.SetTargetTemperatureResult, result)
+
+    def temperature_module_wait_for_target_temperature(
+        self, module_id: str, celsius: Optional[float]
+    ) -> commands.temperature_module.WaitForTemperatureResult:
+        """Execute a `temperatureModule/waitForTemperature` command and return the result."""
+        request = commands.temperature_module.WaitForTemperatureCreate(
+            params=commands.temperature_module.WaitForTemperatureParams(
+                moduleId=module_id, celsius=celsius
+            ),
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.temperature_module.WaitForTemperatureResult, result)
+
+    def temperature_module_deactivate(
+        self, module_id: str
+    ) -> commands.temperature_module.DeactivateTemperatureResult:
+        """Execute a `temperatureModule/deactivate` command and return the result."""
+        request = commands.temperature_module.DeactivateTemperatureCreate(
+            params=commands.temperature_module.DeactivateTemperatureParams(
+                moduleId=module_id
+            ),
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.temperature_module.DeactivateTemperatureResult, result)

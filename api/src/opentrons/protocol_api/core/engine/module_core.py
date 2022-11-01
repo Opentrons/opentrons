@@ -99,7 +99,9 @@ class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore[LabwareCor
 
     def set_target_temperature(self, celsius: float) -> None:
         """Set the Temperature Module's target temperature in °C."""
-        raise NotImplementedError("set_target_temperature not implemented")
+        self._engine_client.temperature_module_set_target_temperature(
+            module_id=self.module_id, celsius=celsius
+        )
 
     def wait_for_target_temperature(self, celsius: Optional[float] = None) -> None:
         """Wait until the module's target temperature is reached.
@@ -107,23 +109,25 @@ class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore[LabwareCor
         Specifying a value for ``celsius`` that is different than
         the module's current target temperature may beahave unpredictably.
         """
-        raise NotImplementedError("wait_for_target_temperature not implemented")
+        self._engine_client.temperature_module_wait_for_target_temperature(
+            module_id=self.module_id, celsius=celsius
+        )
 
     def deactivate(self) -> None:
         """Deactivate the Temperature Module."""
-        raise NotImplementedError("deactivate not implemented")
+        self._engine_client.temperature_module_deactivate(module_id=self.module_id)
 
     def get_current_temperature(self) -> float:
         """Get the module's current temperature in °C."""
-        raise NotImplementedError("get_current_temperature not implemented")
+        return self._sync_module_hardware.temperature  # type: ignore[no-any-return]
 
     def get_target_temperature(self) -> Optional[float]:
         """Get the module's target temperature in °C, if set."""
-        raise NotImplementedError("get_target_temperature not implemented")
+        return self._sync_module_hardware.target  # type: ignore[no-any-return]
 
     def get_status(self) -> TemperatureStatus:
         """Get the module's current temperature status."""
-        raise NotImplementedError("get_status not implemented")
+        return self._sync_module_hardware.status  # type: ignore[no-any-return]
 
 
 class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
@@ -144,7 +148,7 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
             height_from_base: Distance from labware base to raise the magnets.
             height_from_home: Distance from motor home position to raise the magnets.
         """
-        raise NotImplementedError("engage not implemented")
+        raise NotImplementedError("MagneticModuleCore.engage not implemented")
 
     def engage_to_labware(
         self, offset: float = 0, preserve_half_mm: bool = False
@@ -156,19 +160,18 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
             preserve_half_mm: For labware whose definitions
                 erroneously use half-mm for their defined default engage height,
                 use the value directly instead of converting it to real millimeters.
-
-        Raises:
-            Exception: Labware is not loaded or has no default engage height.
         """
-        raise NotImplementedError("engage_to_labware not implemented")
+        raise NotImplementedError(
+            "MagneticModuleCore.engage_to_labware not implemented"
+        )
 
     def disengage(self) -> None:
         """Lower the magnets back into the module."""
-        raise NotImplementedError("disengage not implemented")
+        raise NotImplementedError("MagneticModuleCore.disengage not implemented")
 
     def get_status(self) -> MagneticStatus:
         """Get the module's current magnet status."""
-        raise NotImplementedError("get_status not implemented")
+        raise NotImplementedError("MagneticModuleCore.get_status not implemented")
 
 
 class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
