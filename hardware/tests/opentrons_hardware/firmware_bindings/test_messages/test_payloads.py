@@ -18,7 +18,7 @@ def test_create_firmware_updata_data(
     address: int, data: bytes, expected_checksum: int
 ) -> None:
     """It should create a complete firmware update data payload."""
-    obj = payloads.FirmwareUpdateData.create(address, data)
+    obj = payloads.FirmwareUpdateData.create(address, data, 0)
     assert obj == payloads.FirmwareUpdateData(
         address=utils.UInt32Field(address),
         num_bytes=utils.UInt8Field(len(data)),
