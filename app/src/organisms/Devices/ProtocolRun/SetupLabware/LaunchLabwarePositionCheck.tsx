@@ -18,6 +18,7 @@ import {
   JUSTIFY_FLEX_END,
   BORDERS,
 } from '@opentrons/components'
+import { useRunQuery } from '@opentrons/react-api-client'
 import { getIsLabwareOffsetCodeSnippetsOn, } from '../../../../redux/config'
 import { useLPCSuccessToast } from '../../../ProtocolSetup/hooks'
 import { SecondaryButton } from '../../../../atoms/buttons'
@@ -33,18 +34,22 @@ import {
   useStoredProtocolAnalysis,
   useUnmatchedModulesForProtocol,
 } from '../../hooks'
+import { CurrentOffsetsModal } from './CurrentOffsetsModal'
 
-interface SetupLabwareProps {
+interface LaunchLabwarePositionCheckProps {
   robotName: string
   runId: string
 }
 
-export function SetupLabware(props: SetupLabwareProps): JSX.Element {
+export function LaunchLabwarePositionCheck(props: LaunchLabwarePositionCheckProps): JSX.Element {
   const { robotName, runId } = props
   const { t } = useTranslation('protocol_setup')
   const { protocolData: robotProtocolAnalysis } = useProtocolDetailsForRun(
     runId
   )
+  const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
+  const currentOffsets = runRecord?.data?.labwareOffsets ?? []
+
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
   const runHasStarted = useRunHasStarted(runId)
@@ -52,9 +57,10 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
     robotName,
     runId
   )
-  
+
   const [showHelpModal, setShowHelpModal] = React.useState(false)
   const [showLabwarePositionCheckModal, setShowLabwarePositionCheckModal] = React.useState(false)
+  const [showCurrentOffsetsModal, setShowCurrentOffsetsModal] = React.useState(false)
   const unmatchedModuleResults = useUnmatchedModulesForProtocol(robotName, runId)
   const { missingModuleIds } = unmatchedModuleResults
   const calibrationIncomplete =
@@ -65,8 +71,8 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
     missingModuleIds.length > 0 && !isCalibrationComplete
 
   const [
-    downloadOffsetDataModal,
-    showDownloadOffsetDataModal,
+    showSnippetModal,
+    setShowSnippetModal,
   ] = React.useState<boolean>(false)
 
   const [targetProps, tooltipProps] = useHoverTooltip({
@@ -110,7 +116,7 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
   }
 
   const handleClickViewCurrentOffsets: React.MouseEventHandler<HTMLAnchorElement> = () => {
-    console.log('TODO launch view offsets modal')
+    setShowCurrentOffsetsModal(true)
   }
 
   return (
@@ -127,7 +133,7 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
                 role="link"
                 css={TYPOGRAPHY.labelSemiBold}
                 color={COLORS.darkBlackEnabled}
-                onClick={() => showDownloadOffsetDataModal(true)}
+                onClick={() => setShowSnippetModal(true)}
               >
                 {t('get_labware_offset_data')}
               </Link>
@@ -155,15 +161,17 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
         flex="1 0 auto"
         gridGap={SPACING.spacing4}
       >
-        <Link
-          color={COLORS.blueEnabled}
-          fontSize={TYPOGRAPHY.fontSizeP}
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          onClick={handleClickViewCurrentOffsets}
-          role="button"
-        >
-          {t('view_current_offsets')}
-        </Link>
+        {currentOffsets.length > 0 ?
+          <Link
+            color={COLORS.blueEnabled}
+            fontSize={TYPOGRAPHY.fontSizeP}
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            onClick={handleClickViewCurrentOffsets}
+            role="button"
+          >
+            {t('view_current_offsets')}
+          </Link>
+          : null}
         <SecondaryButton
           textTransform={TYPOGRAPHY.textTransformCapitalize}
           title={t('run_labware_position_check')}
@@ -190,10 +198,17 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
           runId={runId}
         />
       )}
-      {downloadOffsetDataModal && (
+      {showSnippetModal && (
         <DownloadOffsetDataModal
-          onCloseClick={() => showDownloadOffsetDataModal(false)}
+          onCloseClick={() => setShowSnippetModal(false)}
           runId={runId}
+        />
+      )}
+      {showCurrentOffsetsModal && (
+        <CurrentOffsetsModal
+          currentOffsets={currentOffsets}
+          commands={protocolData?.commands ?? []}
+          onCloseClick={() => setShowCurrentOffsetsModal(false)}
         />
       )}
     </Flex>
