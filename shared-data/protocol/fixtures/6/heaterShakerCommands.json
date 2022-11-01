@@ -1245,7 +1245,7 @@
       "params": {
         "pipetteId": "pipetteId",
         "mount": "left",
-        "pipetteName": "p300_single"
+        "pipetteName": "p10_single"
       }
     },
     {
