@@ -300,6 +300,16 @@ class SyncClient:
         result = self._transport.execute_command(request=request)
         return cast(commands.magnetic_module.EngageResult, result)
 
+    def magnetic_module_disengage(
+        self, module_id: str
+    ) -> commands.magnetic_module.DisengageResult:
+        """Execute a ``MagneticModuleDisengage`` command and return the result."""
+        request = commands.magnetic_module.DisengageCreate(
+            params=commands.magnetic_module.DisengageParams(moduleId=module_id)
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.magnetic_module.DisengageResult, result)
+
     def thermocycler_set_target_lid_temperature(
         self, module_id: str, celsius: float
     ) -> commands.thermocycler.SetTargetLidTemperatureResult:

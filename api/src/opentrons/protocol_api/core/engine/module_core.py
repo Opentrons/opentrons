@@ -17,6 +17,11 @@ from opentrons.drivers.types import (
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
+from opentrons.protocol_engine.errors.exceptions import (
+    LabwareNotLoadedOnModuleError,
+    NoMagnetEngageHeightError,
+)
+
 from opentrons.protocol_api import Labware
 from opentrons.protocols.api_support.types import APIVersion
 
@@ -28,6 +33,7 @@ from ..module import (
     AbstractHeaterShakerCore,
 )
 from .labware import LabwareCore
+from .exceptions import InvalidMagnetEngageHeightError
 
 
 class ModuleCore(AbstractModuleCore[LabwareCore]):
@@ -148,7 +154,16 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
             height_from_base: Distance from labware base to raise the magnets.
             height_from_home: Distance from motor home position to raise the magnets.
         """
-        raise NotImplementedError("MagneticModuleCore.engage not implemented")
+        if height_from_home is not None:
+            raise NotImplementedError(
+                "MagneticModuleCore.engage with height_from_home not implemented"
+            )
+
+        assert height_from_base is not None, "Expected engage height"
+
+        self._engine_client.magnetic_module_engage(
+            module_id=self._module_id, engage_height=height_from_base
+        )
 
     def engage_to_labware(
         self, offset: float = 0, preserve_half_mm: bool = False
@@ -161,17 +176,37 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
                 erroneously use half-mm for their defined default engage height,
                 use the value directly instead of converting it to real millimeters.
         """
-        raise NotImplementedError(
-            "MagneticModuleCore.engage_to_labware not implemented"
+        try:
+            default_height = (
+                self._engine_client.state.labware.get_default_magnet_height(
+                    module_id=self.module_id, offset=offset
+                )
+            )
+        except LabwareNotLoadedOnModuleError:
+            raise InvalidMagnetEngageHeightError(
+                "There is no labware loaded on this Magnetic Module,"
+                " so you must specify an engage height"
+                " with the `height_from_base` parameter."
+            )
+        except NoMagnetEngageHeightError:
+            raise InvalidMagnetEngageHeightError(
+                "The labware loaded on this Magnetic Module"
+                " does not have a default engage height,"
+                " so you must specify an engage height"
+                " with the `height_from_base` parameter."
+            )
+
+        self._engine_client.magnetic_module_engage(
+            module_id=self.module_id, engage_height=default_height
         )
 
     def disengage(self) -> None:
         """Lower the magnets back into the module."""
-        raise NotImplementedError("MagneticModuleCore.disengage not implemented")
+        self._engine_client.magnetic_module_disengage(module_id=self.module_id)
 
     def get_status(self) -> MagneticStatus:
         """Get the module's current magnet status."""
-        raise NotImplementedError("MagneticModuleCore.get_status not implemented")
+        return self._sync_module_hardware.status  # type: ignore[no-any-return]
 
 
 class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):

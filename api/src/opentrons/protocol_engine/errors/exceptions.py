@@ -47,6 +47,10 @@ class LabwareNotLoadedError(ProtocolEngineError):
     """An error raised when referencing a labware that has not been loaded."""
 
 
+class LabwareNotLoadedOnModuleError(ProtocolEngineError):
+    """An error raised when referencing a labware on a module that has not been loaded."""
+
+
 class LabwareNotOnDeckError(ProtocolEngineError):
     """An error raised when a labware can't be used because it's off-deck."""
 
@@ -147,6 +151,10 @@ class PipetteMovementRestrictedByHeaterShakerError(ProtocolEngineError):
 
 class EngageHeightOutOfRangeError(ProtocolEngineError):
     """An error raised when a Magnetic Module engage height is out of bounds."""
+
+
+class NoMagnetEngageHeightError(ProtocolEngineError):
+    """Error raised if a Magnetic Module engage height is missing."""
 
 
 class NoTargetTemperatureSetError(ProtocolEngineError):
