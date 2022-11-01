@@ -40,7 +40,7 @@ Modules
 
 .. autoclass:: opentrons.protocol_api.ThermocyclerContext
    :members:
-   :exclude-members: total_step_count, current_cycle_index, total_cycle_count, hold_time, ramp_rate, current_step_index, flag_unsafe_move, broker, geometry
+   :exclude-members: total_step_count, current_cycle_index, total_cycle_count, hold_time, ramp_rate, current_step_index, broker, geometry
    :inherited-members:
    
 .. autoclass:: opentrons.protocol_api.HeaterShakerContext
