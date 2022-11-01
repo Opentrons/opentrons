@@ -198,6 +198,7 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
 
         self._engine_client.magnetic_module_engage(
             module_id=self.module_id, engage_height=default_height
+        )
 
     def disengage(self) -> None:
         """Lower the magnets back into the module."""
