@@ -540,8 +540,12 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
             and finite for each step.
 
         """
+        repetitions = validation.ensure_thermocycler_repetition_count(repetitions)
+        validated_steps = validation.ensure_thermocycler_profile_steps(steps)
         self._core.execute_profile(
-            steps=steps, repetitions=repetitions, block_max_volume=block_max_volume
+            steps=validated_steps,
+            repetitions=repetitions,
+            block_max_volume=block_max_volume,
         )
 
     @publish(command=cmds.thermocycler_deactivate_lid)

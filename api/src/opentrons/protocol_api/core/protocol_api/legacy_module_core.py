@@ -287,18 +287,6 @@ class LegacyThermocyclerCore(
         block_max_volume: Optional[float] = None,
     ) -> None:
         """Execute a Thermocycler Profile."""
-        if repetitions <= 0:
-            raise ValueError("repetitions must be a positive integer")
-        for step in steps:
-            if step.get("temperature") is None:
-                raise ValueError("temperature must be defined for each step in cycle")
-            hold_mins = step.get("hold_time_minutes")
-            hold_secs = step.get("hold_time_seconds")
-            if hold_mins is None and hold_secs is None:
-                raise ValueError(
-                    "either hold_time_minutes or hold_time_seconds must be"
-                    "defined for each step in cycle"
-                )
         self._sync_module_hardware.cycle_temperatures(
             steps=steps, repetitions=repetitions, volume=block_max_volume
         )
@@ -316,15 +304,15 @@ class LegacyThermocyclerCore(
         self._sync_module_hardware.deactivate()
 
     def get_lid_position(self) -> Optional[ThermocyclerLidStatus]:
-        """Get the thermoycler's lid position."""
+        """Get the thermocycler's lid position."""
         return self._sync_module_hardware.lid_status  # type: ignore[no-any-return]
 
     def get_block_temperature_status(self) -> TemperatureStatus:
-        """Get the thermoycler's block temperature status."""
+        """Get the thermocycler's block temperature status."""
         return self._sync_module_hardware.status  # type: ignore[no-any-return]
 
     def get_lid_temperature_status(self) -> Optional[TemperatureStatus]:
-        """Get the thermoycler's lid temperature status."""
+        """Get the thermocycler's lid temperature status."""
         return self._sync_module_hardware.lid_temp_status  # type: ignore[no-any-return]
 
     def get_block_temperature(self) -> Optional[float]:
