@@ -14,6 +14,7 @@ const BEFORE_YOU_BEGIN_URL = '' //  TODO(jr, 10/26/22): link real URL!
 
 interface BeforeBeginningProps extends PipetteWizardStepProps {
   createRun: UseMutateFunction<Run, AxiosError<any>, CreateRunData, unknown>
+  isCreateLoading: boolean
 }
 
 export const BeforeBeginning = (props: BeforeBeginningProps): JSX.Element => {
@@ -23,6 +24,7 @@ export const BeforeBeginning = (props: BeforeBeginningProps): JSX.Element => {
     createRun,
     attachedPipette,
     chainRunCommands,
+    isCreateLoading,
     mount,
     isRobotMoving,
   } = props
@@ -33,10 +35,23 @@ export const BeforeBeginning = (props: BeforeBeginningProps): JSX.Element => {
     createRun({})
   }, [])
 
-  const pipetteId = attachedPipette[mount].id
+  const pipetteId = attachedPipette[mount]?.id
 
   const handleOnClick = (): void => {
     chainRunCommands([
+      {
+        commandType: 'home' as const,
+        params: {},
+      },
+      {
+        commandType: 'loadPipette' as const,
+        params: {
+          // @ts-expect-error pipetteName is required but missing in schema v6 type
+          pipetteName: attachedPipette[mount]?.name,
+          pipetteId: pipetteId,
+          mount: mount,
+        },
+      },
       {
         commandType: 'calibration/moveToLocation' as const,
         params: {
@@ -76,6 +91,7 @@ export const BeforeBeginning = (props: BeforeBeginningProps): JSX.Element => {
         />
       }
       proceedButtonText={proceedButtonText}
+      proceedIsDisabled={isCreateLoading}
       proceed={handleOnClick}
     />
   )

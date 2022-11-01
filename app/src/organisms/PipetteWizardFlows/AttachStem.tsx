@@ -17,6 +17,7 @@ export const AttachStem = (props: PipetteWizardStepProps): JSX.Element => {
     isRobotMoving,
     goBack,
   } = props
+  const motorAxis = mount === 'left' ? 'leftZ' : 'rightZ'
   const pipetteId = attachedPipette[mount].id
   const handleOnClick = (): void => {
     chainRunCommands([
@@ -34,6 +35,12 @@ export const AttachStem = (props: PipetteWizardStepProps): JSX.Element => {
         },
       },
       {
+        commandType: 'home' as const,
+        params: {
+          axes: [motorAxis],
+        },
+      },
+      {
         commandType: 'calibration/moveToLocation' as const,
         params: {
           pipetteId: pipetteId,
@@ -41,7 +48,6 @@ export const AttachStem = (props: PipetteWizardStepProps): JSX.Element => {
         },
       },
     ]).then(() => {
-      console.log('completed attach stem')
       proceed()
     })
   }

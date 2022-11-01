@@ -7,7 +7,7 @@ import removeProbe from '../../assets/images/change-pip/attach-stem.png'
 import type { PipetteWizardStepProps } from './types'
 
 interface DetachStemProps extends PipetteWizardStepProps {
-  handleCleanUp: (success?: boolean) => void
+  handleCleanUp: () => void
 }
 
 export const DetachStem = (props: DetachStemProps): JSX.Element => {
@@ -22,7 +22,7 @@ export const DetachStem = (props: DetachStemProps): JSX.Element => {
       rightHandBody={<img src={removeProbe} width="100%" alt="Remove stem" />}
       bodyText={<StyledText as="p">{t('remove_probe')}</StyledText>}
       proceedButtonText={t('complete_cal')}
-      proceed={() => handleCleanUp(true)}
+      proceed={handleCleanUp}
       back={goBack}
     />
   )
