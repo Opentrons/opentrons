@@ -3,7 +3,7 @@ import argparse
 import asyncio
 import logging
 from logging.config import dictConfig
-from typing import Dict
+from typing import Dict, Any
 
 from typing_extensions import Final
 
@@ -68,7 +68,6 @@ async def run(args: argparse.Namespace) -> None:
 
 def main() -> None:
     """Entry point."""
-
     parser = argparse.ArgumentParser(description="FW Update.")
     add_can_args(parser)
 
@@ -109,7 +108,7 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    def _set_log_lvl_info(d: Dict) -> None:
+    def _set_log_lvl_info(d: Dict[str, Any]) -> None:
         for k in d.keys():
             if isinstance(d[k], dict):
                 _set_log_lvl_info(d[k])

@@ -17,6 +17,8 @@ CMD = (
 
 @dataclass
 class HexPathAndTarget:
+    """HEX absolute path, and OT3 target."""
+
     name: str
     path: Optional[str]
     target: str
