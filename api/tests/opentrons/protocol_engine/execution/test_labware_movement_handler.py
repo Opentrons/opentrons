@@ -220,6 +220,7 @@ async def test_labware_movement_raises_on_ot2(
         )
 
 
+@pytest.mark.ot3_only
 async def test_labware_movement_skips_for_virtual_gripper(
     decoy: Decoy,
     state_store: StateStore,
