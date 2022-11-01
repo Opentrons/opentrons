@@ -1,13 +1,15 @@
-import pytest
 import json
-import mock
 from typing import cast
+
+import mock
+import pytest
 
 import opentrons.protocol_api as papi
 import opentrons.protocols.geometry as papi_geometry
 
 from opentrons.types import Point, Location
 from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
+from opentrons.hardware_control import modules as hw_modules
 from opentrons.hardware_control.modules.magdeck import OFFSET_TO_LABWARE_BOTTOM
 from opentrons.hardware_control.modules.types import (
     SpeedStatus,
@@ -48,6 +50,7 @@ def ctx_with_tempdeck(
 ) -> ProtocolContext:
     """Context fixture with a mock temp deck."""
     mock_module_controller.model.return_value = "temperatureModuleV2"
+    mock_module_controller.mock_add_spec(hw_modules.TempDeck)
     mock_hardware.attached_modules = [mock_module_controller]
 
     return papi.create_protocol_context(
@@ -62,6 +65,7 @@ def ctx_with_magdeck(
 ) -> ProtocolContext:
     """Context fixture with a mock mag deck."""
     mock_module_controller.model.return_value = "magneticModuleV1"
+    mock_module_controller.mock_add_spec(hw_modules.MagDeck)
     mock_hardware.attached_modules = [mock_module_controller]
 
     return papi.create_protocol_context(
@@ -71,11 +75,12 @@ def ctx_with_magdeck(
 
 
 @pytest.fixture
-def ctx_with_thermocycler(
+async def ctx_with_thermocycler(
     mock_hardware: mock.AsyncMock, mock_module_controller: mock.MagicMock
 ) -> ProtocolContext:
     """Context fixture with a mock thermocycler."""
     mock_module_controller.model.return_value = "thermocyclerModuleV1"
+    mock_module_controller.mock_add_spec(hw_modules.Thermocycler)
     mock_hardware.attached_modules = [mock_module_controller]
 
     return papi.create_protocol_context(
@@ -92,6 +97,7 @@ def ctx_with_heater_shaker(
 ) -> ProtocolContext:
     """Context fixture with a mock heater-shaker."""
     mock_module_controller.model.return_value = "heaterShakerModuleV1"
+    mock_module_controller.mock_add_spec(hw_modules.HeaterShaker)
     mock_hardware.attached_modules = [mock_module_controller]
 
     ctx = papi.create_protocol_context(
@@ -184,15 +190,6 @@ def test_magdeck(ctx_with_magdeck, mock_module_controller):
     assert ctx_with_magdeck.deck[1] == mod.geometry
 
 
-def test_magdeck_calibrate(ctx_with_magdeck, mock_module_controller):
-    mod = ctx_with_magdeck.load_module("Magnetic Module", 1)
-    mod.calibrate()
-    assert "calibrating magnetic" in ",".join(
-        cmd.lower() for cmd in ctx_with_magdeck.commands()
-    )
-    mock_module_controller.calibrate.assert_called_once()
-
-
 # _________ Thermocycler tests __________
 
 
@@ -206,89 +203,6 @@ def test_thermocycler_lid_status(ctx_with_thermocycler, mock_module_controller):
     m = mock.PropertyMock(return_value="open")
     type(mock_module_controller).lid_status = m
     assert mod.lid_position == "open"
-
-
-def test_thermocycler_lid(ctx_with_thermocycler, mock_module_controller):
-    mod = ctx_with_thermocycler.load_module("thermocycler")
-    # Open should work if the lid is open (no status change)
-    mock_module_controller.open.return_value = "open"
-    mod.open_lid()
-    assert "opening thermocycler lid" in ",".join(
-        cmd.lower() for cmd in ctx_with_thermocycler.commands()
-    )
-    mock_module_controller.open.assert_called_once()
-    assert mod.geometry.lid_status == "open"
-    assert mod.geometry.highest_z == 98.0
-
-    mock_module_controller.close.return_value = "closed"
-    mod.close_lid()
-    assert "closing thermocycler lid" in ",".join(
-        cmd.lower() for cmd in ctx_with_thermocycler.commands()
-    )
-    mock_module_controller.close.assert_called_once()
-    assert mod.geometry.lid_status == "closed"
-    assert mod.geometry.highest_z == 98.0  # ignore 37.7mm lid for now
-
-
-def test_thermocycler_set_lid_temperature(
-    ctx_with_thermocycler, mock_module_controller
-):
-    mod = ctx_with_thermocycler.load_module("thermocycler")
-    mod.set_lid_temperature(123)
-    mock_module_controller.set_lid_temperature.assert_called_once_with(123)
-
-
-def test_thermocycler_temp_default_ramp_rate(
-    ctx_with_thermocycler, mock_module_controller
-):
-    mod = ctx_with_thermocycler.load_module("thermocycler")
-
-    # Test default ramp rate
-    mod.set_block_temperature(20, hold_time_seconds=5.0, hold_time_minutes=1.0)
-    assert "setting thermocycler" in ",".join(
-        cmd.lower() for cmd in ctx_with_thermocycler.commands()
-    )
-    mock_module_controller.set_temperature.assert_called_once_with(
-        temperature=20,
-        hold_time_seconds=5.0,
-        hold_time_minutes=1.0,
-        ramp_rate=None,
-        volume=None,
-    )
-
-
-def test_thermocycler_temp_specific_ramp_rate(
-    ctx_with_thermocycler, mock_module_controller
-):
-    mod = ctx_with_thermocycler.load_module("thermocycler")
-    # Test specified ramp rate
-    mod.set_block_temperature(41.3, hold_time_seconds=25.5, ramp_rate=2.0)
-    assert "setting thermocycler" in ",".join(
-        cmd.lower() for cmd in ctx_with_thermocycler.commands()
-    )
-    mock_module_controller.set_temperature.assert_called_once_with(
-        temperature=41.3,
-        hold_time_seconds=25.5,
-        hold_time_minutes=None,
-        ramp_rate=2.0,
-        volume=None,
-    )
-
-
-def test_thermocycler_temp_infinite_hold(ctx_with_thermocycler, mock_module_controller):
-    mod = ctx_with_thermocycler.load_module("thermocycler")
-    # Test infinite hold and volume
-    mod.set_block_temperature(13.2, block_max_volume=123)
-    assert "setting thermocycler" in ",".join(
-        cmd.lower() for cmd in ctx_with_thermocycler.commands()
-    )
-    mock_module_controller.set_temperature.assert_called_once_with(
-        temperature=13.2,
-        hold_time_seconds=None,
-        hold_time_minutes=None,
-        ramp_rate=None,
-        volume=123,
-    )
 
 
 def test_thermocycler_profile_invalid_repetitions(
@@ -331,29 +245,6 @@ def test_thermocycler_profile_no_hold(ctx_with_thermocycler, mock_module_control
         )
 
 
-def test_thermocycler_profile(ctx_with_thermocycler, mock_module_controller):
-    mod = ctx_with_thermocycler.load_module("thermocycler")
-    mod.execute_profile(
-        steps=[
-            {"temperature": 10, "hold_time_seconds": 30},
-            {"temperature": 30, "hold_time_seconds": 90},
-        ],
-        repetitions=5,
-        block_max_volume=123,
-    )
-    assert "thermocycler starting" in ",".join(
-        cmd.lower() for cmd in ctx_with_thermocycler.commands()
-    )
-    mock_module_controller.cycle_temperatures.assert_called_once_with(
-        steps=[
-            {"temperature": 10, "hold_time_seconds": 30},
-            {"temperature": 30, "hold_time_seconds": 90},
-        ],
-        repetitions=5,
-        volume=123,
-    )
-
-
 def test_thermocycler_semi_plate_configuration(ctx):
     labware_name = "nest_96_wellplate_100ul_pcr_full_skirt"
     mod = ctx.load_module("thermocycler", configuration="semi")
@@ -383,9 +274,9 @@ def test_thermocycler_flag_unsafe_move(ctx_with_thermocycler, mock_module_contro
     type(mock_module_controller).lid_status = m
 
     with pytest.raises(RuntimeError, match="Cannot move to labware"):
-        mod.flag_unsafe_move(with_tc_labware, without_tc_labware)
+        mod._core.flag_unsafe_move(with_tc_labware, without_tc_labware)
     with pytest.raises(RuntimeError, match="Cannot move to labware"):
-        mod.flag_unsafe_move(without_tc_labware, with_tc_labware)
+        mod._core.flag_unsafe_move(without_tc_labware, with_tc_labware)
 
 
 # __________ Heater Shaker tests __________
@@ -416,7 +307,7 @@ def test_heater_shaker_unsafe_move_flagger(
 
     mod._core.geometry.flag_unsafe_move = mock.MagicMock()  # type: ignore[attr-defined]
 
-    mod.flag_unsafe_move(to_loc=labware.wells()[1].top(), is_multichannel=False)
+    mod._core.flag_unsafe_move(to_loc=labware.wells()[1].top(), is_multichannel=False)  # type: ignore[attr-defined]
 
     mod._core.geometry.flag_unsafe_move.assert_called_once_with(  # type: ignore[attr-defined]
         to_slot=5,
@@ -442,7 +333,7 @@ def test_hs_flag_unsafe_move_raises(
     mod._core.geometry.flag_unsafe_move = mock.MagicMock(side_effect=raiser)  # type: ignore[attr-defined]
 
     with pytest.raises(PipetteMovementRestrictedByHeaterShakerError, match="uh oh"):
-        mod.flag_unsafe_move(to_loc=labware.wells()[1].top(), is_multichannel=False)
+        mod._core.flag_unsafe_move(to_loc=labware.wells()[1].top(), is_multichannel=False)  # type: ignore[attr-defined]
 
 
 def test_hs_flag_unsafe_move_skips_non_labware_locations(
@@ -454,7 +345,7 @@ def test_hs_flag_unsafe_move_skips_non_labware_locations(
     assert isinstance(mod, HeaterShakerContext)
     mod._core.geometry.flag_unsafe_move = mock.MagicMock()  # type: ignore[attr-defined]
 
-    mod.flag_unsafe_move(
+    mod._core.flag_unsafe_move(  # type: ignore[attr-defined]
         to_loc=Location(point=Point(1, 2, 3), labware=None), is_multichannel=False
     )
     mod._core.geometry.flag_unsafe_move.assert_not_called()  # type: ignore[attr-defined]

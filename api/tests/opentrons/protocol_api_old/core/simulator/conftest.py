@@ -74,7 +74,7 @@ def simulating_instrument_context(
     """A simulating instrument context."""
     return InstrumentContextSimulation(
         protocol_interface=simulating_protocol_context,
-        pipette_dict=instrument_context.get_pipette(),
+        pipette_dict=instrument_context.get_hardware_state(),
         mount=types.Mount.RIGHT,
         instrument_name="p300_single_gen2",
     )
@@ -88,7 +88,7 @@ def second_simulating_instrument_context(
     """A simulating instrument context."""
     return InstrumentContextSimulation(
         protocol_interface=simulating_protocol_context,
-        pipette_dict=second_instrument_context.get_pipette(),
+        pipette_dict=second_instrument_context.get_hardware_state(),
         mount=types.Mount.LEFT,
         instrument_name="p300_single_gen2",
     )

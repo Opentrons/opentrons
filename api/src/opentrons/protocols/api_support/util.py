@@ -141,7 +141,7 @@ class FlowRates:
         self._instr = instr
 
     def set_defaults(self, api_level: APIVersion):
-        pipette = self._instr.get_pipette()
+        pipette = self._instr.get_hardware_state()
         self.aspirate = _find_value_for_api_version(
             api_level, pipette["default_aspirate_flow_rates"]
         )
@@ -154,7 +154,7 @@ class FlowRates:
 
     @property
     def aspirate(self) -> float:
-        return self._instr.get_pipette()["aspirate_flow_rate"]
+        return self._instr.get_hardware_state()["aspirate_flow_rate"]
 
     @aspirate.setter
     def aspirate(self, new_val: float):
@@ -166,7 +166,7 @@ class FlowRates:
 
     @property
     def dispense(self) -> float:
-        return self._instr.get_pipette()["dispense_flow_rate"]
+        return self._instr.get_hardware_state()["dispense_flow_rate"]
 
     @dispense.setter
     def dispense(self, new_val: float):
@@ -178,7 +178,7 @@ class FlowRates:
 
     @property
     def blow_out(self) -> float:
-        return self._instr.get_pipette()["blow_out_flow_rate"]
+        return self._instr.get_hardware_state()["blow_out_flow_rate"]
 
     @blow_out.setter
     def blow_out(self, new_val: float):
@@ -216,7 +216,7 @@ class PlungerSpeeds:
 
     @property
     def aspirate(self) -> float:
-        return self._instr.get_pipette()["aspirate_speed"]
+        return self._instr.get_hardware_state()["aspirate_speed"]
 
     @aspirate.setter
     def aspirate(self, new_val: float):
@@ -226,7 +226,7 @@ class PlungerSpeeds:
 
     @property
     def dispense(self) -> float:
-        return self._instr.get_pipette()["dispense_speed"]
+        return self._instr.get_hardware_state()["dispense_speed"]
 
     @dispense.setter
     def dispense(self, new_val: float):
@@ -236,7 +236,7 @@ class PlungerSpeeds:
 
     @property
     def blow_out(self) -> float:
-        return self._instr.get_pipette()["blow_out_speed"]
+        return self._instr.get_hardware_state()["blow_out_speed"]
 
     @blow_out.setter
     def blow_out(self, new_val: float):

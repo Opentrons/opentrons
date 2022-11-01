@@ -24,9 +24,7 @@ from opentrons.protocols.api_support.util import (
     APIVersionError,
 )
 
-from .core.instrument import AbstractInstrument
-from .core.well import AbstractWellCore
-from .module_contexts import ThermocyclerContext, HeaterShakerContext
+from .core.common import InstrumentCore
 from . import labware
 
 if TYPE_CHECKING:
@@ -62,31 +60,25 @@ class InstrumentContext(publisher.CommandPublisher):
 
     def __init__(
         self,
-        implementation: AbstractInstrument[AbstractWellCore],
+        implementation: InstrumentCore,
         ctx: ProtocolContext,
         broker: Broker,
-        at_version: APIVersion,
-        tip_racks: Optional[List[labware.Labware]] = None,
-        trash: Optional[labware.Labware] = None,
+        api_version: APIVersion,
+        tip_racks: List[labware.Labware],
+        trash: labware.Labware,
+        requested_as: str,
     ) -> None:
 
         super().__init__(broker)
-        self._api_version = at_version
+        self._api_version = api_version
         self._implementation = implementation
         self._ctx = ctx
-
-        self._tip_racks = tip_racks or list()
-        for tip_rack in self.tip_racks:
-            assert tip_rack.is_tiprack
-            instrument.validate_tiprack(self.name, tip_rack, logger)
-        if trash is None:
-            self.trash_container = self._ctx.fixed_trash
-        else:
-            self.trash_container = trash
-
+        self._tip_racks = tip_racks
         self._last_tip_picked_up_from: Union[labware.Well, None] = None
         self._starting_tip: Union[labware.Well, None] = None
-        self.requested_as = self._implementation.get_instrument_name()
+
+        self.trash_container = trash
+        self.requested_as = requested_as
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -613,15 +605,15 @@ class InstrumentContext(publisher.CommandPublisher):
     @requires_version(2, 0)
     def return_tip(self, home_after: bool = True) -> InstrumentContext:
         """
-        If a tip is currently attached to the pipette, then it will return the
-        tip to it's location in the tiprack.
+        If a tip is currently attached to the pipette, then the pipette will
+        return the tip to its location in the tip rack.
 
-        It will not reset tip tracking so the well flag will remain False.
+        This will not reset tip tracking, so the well flag will remain ``False``.
 
         :returns: This instance
 
         :param home_after:
-            See the ``home_after`` parameter in :py:obj:`drop_tip`.
+            See the ``home_after`` parameter of :py:obj:`drop_tip`.
         """
         if not self._implementation.has_tip():
             logger.warning("Pipette has no tip to return")
@@ -1247,16 +1239,6 @@ class InstrumentContext(publisher.CommandPublisher):
         :param publish: Whether a call to this function should publish to the
                         runlog or not.
         """
-        from_loc = self._ctx.location_cache
-        if not from_loc:
-            from_loc = types.Location(types.Point(0, 0, 0), LabwareLike(None))
-
-        for mod in self._ctx._modules.values():
-            if isinstance(mod, ThermocyclerContext):
-                mod.flag_unsafe_move(to_loc=location, from_loc=from_loc)
-            elif isinstance(mod, HeaterShakerContext):
-                mod.flag_unsafe_move(to_loc=location, is_multichannel=self.channels > 1)
-
         publish_ctx = nullcontext()
 
         if publish:
@@ -1265,8 +1247,11 @@ class InstrumentContext(publisher.CommandPublisher):
                 command=cmds.move_to(instrument=self, location=location),
             )
         with publish_ctx:
+            _, well = location.labware.get_parent_labware_and_well()
+
             self._implementation.move_to(
                 location=location,
+                well_core=well._impl if well is not None else None,
                 force_direct=force_direct,
                 minimum_z_height=minimum_z_height,
                 speed=speed,
@@ -1441,7 +1426,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :raises: a :py:class:`.types.PipetteNotAttachedError` if the pipette is
                  no longer attached (should not happen).
         """
-        return self._implementation.get_pipette()
+        return self._implementation.get_hardware_state()
 
     @property  # type: ignore
     @requires_version(2, 0)

@@ -78,16 +78,24 @@ def mock_labware(decoy: Decoy) -> Labware:
 
 
 @pytest.fixture
+def mock_trash(decoy: Decoy) -> Labware:
+    return decoy.mock(cls=Labware)
+
+
+@pytest.fixture
 def subject(
     mock_instrument_implementation: AbstractInstrument[AbstractWellCore],
     mock_protocol_context: ProtocolContext,
+    mock_trash: Labware,
 ) -> InstrumentContext:
-
     subject = InstrumentContext(
         implementation=mock_instrument_implementation,
         ctx=mock_protocol_context,
         broker=Broker(),
-        at_version=APIVersion(2, 0),
+        api_version=APIVersion(2, 0),
+        tip_racks=[],
+        trash=mock_trash,
+        requested_as="some-pipette-name",
     )
 
     return subject
@@ -108,6 +116,7 @@ def test_pick_up_from_exact_well_location(
     decoy.verify(
         mock_instrument_implementation.move_to(
             location=expected_location,
+            well_core=mock_well._impl,
             force_direct=False,
             minimum_z_height=None,
             speed=None,
@@ -138,6 +147,7 @@ def test_pick_up_from_exact_labware_location(
     decoy.verify(
         mock_instrument_implementation.move_to(
             location=expected_location,
+            well_core=mock_well._impl,
             force_direct=False,
             minimum_z_height=None,
             speed=None,
@@ -162,6 +172,7 @@ def test_pick_up_from_manipulated_location(
     decoy.verify(
         mock_instrument_implementation.move_to(
             location=move_to_location,
+            well_core=mock_well._impl,
             force_direct=False,
             minimum_z_height=None,
             speed=None,
@@ -192,6 +203,7 @@ def test_pick_up_from_well(
     decoy.verify(
         mock_instrument_implementation.move_to(
             location=expected_location,
+            well_core=mock_well._impl,
             force_direct=False,
             minimum_z_height=None,
             speed=None,
@@ -225,6 +237,7 @@ def test_pick_up_from_no_location(
     decoy.verify(
         mock_instrument_implementation.move_to(
             location=expected_location,
+            well_core=mock_well._impl,
             force_direct=False,
             minimum_z_height=None,
             speed=None,

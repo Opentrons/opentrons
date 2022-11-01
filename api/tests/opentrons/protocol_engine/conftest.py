@@ -1,5 +1,9 @@
 """ProtocolEngine shared test fixtures."""
+from __future__ import annotations
+
 import pytest
+from typing import TYPE_CHECKING
+from decoy import Decoy
 
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.deck import load as load_deck
@@ -11,6 +15,22 @@ from opentrons.protocols.api_support.constants import (
     SHORT_TRASH_DECK,
 )
 from opentrons.protocol_engine.types import ModuleDefinition
+
+if TYPE_CHECKING:
+    from opentrons.hardware_control.ot3api import OT3API
+
+
+@pytest.mark.ot3_only
+@pytest.fixture
+def ot3_hardware_api(decoy: Decoy) -> OT3API:
+    """Get a mocked out OT3API."""
+    try:
+        from opentrons.hardware_control.ot3api import OT3API
+
+        return decoy.mock(cls=OT3API)
+    except ImportError:
+        # TODO (tz, 9-23-22) Figure out a better way to use this fixture with OT-3 api only.
+        return None  # type: ignore[return-value]
 
 
 @pytest.fixture(scope="session")
@@ -66,6 +86,14 @@ def falcon_tuberack_def() -> LabwareDefinition:
     """Get the definition of the 6-well Falcon tuberack."""
     return LabwareDefinition.parse_obj(
         load_definition("opentrons_6_tuberack_falcon_50ml_conical", 1)
+    )
+
+
+@pytest.fixture
+def magdeck_well_plate_def() -> LabwareDefinition:
+    """Get the definition of a well place compatible with magdeck."""
+    return LabwareDefinition.parse_obj(
+        load_definition("nest_96_wellplate_100ul_pcr_full_skirt", 1)
     )
 
 

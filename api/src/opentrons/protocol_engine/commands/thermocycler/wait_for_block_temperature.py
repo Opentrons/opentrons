@@ -52,14 +52,14 @@ class WaitForBlockTemperatureImpl(
         )
 
         # Raises error if no target temperature
-        target_temperature = thermocycler_state.get_target_block_temperature()
+        thermocycler_state.get_target_block_temperature()
 
         thermocycler_hardware = self._equipment.get_module_hardware_api(
             thermocycler_state.module_id
         )
 
         if thermocycler_hardware is not None:
-            await thermocycler_hardware.wait_for_block_temperature(target_temperature)
+            await thermocycler_hardware.wait_for_block_target()
 
         return WaitForBlockTemperatureResult()
 
@@ -81,7 +81,9 @@ class WaitForBlockTemperature(
 class WaitForBlockTemperatureCreate(BaseCommandCreate[WaitForBlockTemperatureParams]):
     """A request to create Thermocycler's wait for block temperature command."""
 
-    commandType: WaitForBlockTemperatureCommandType
+    commandType: WaitForBlockTemperatureCommandType = (
+        "thermocycler/waitForBlockTemperature"
+    )
     params: WaitForBlockTemperatureParams
 
     _CommandCls: Type[WaitForBlockTemperature] = WaitForBlockTemperature

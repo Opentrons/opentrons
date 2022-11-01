@@ -112,7 +112,6 @@ async def random_move(api: OT3API) -> str:
 async def _main(is_simulating: bool) -> None:
     api = await build_async_ot3_hardware_api(is_simulating=is_simulating)
     await set_gantry_load_per_axis_settings_ot3(api, SETTINGS, load=LOAD)
-    await api.set_gantry_load(gantry_load=LOAD)
 
     if args.test_z_axis:
         test_tag = "Z"

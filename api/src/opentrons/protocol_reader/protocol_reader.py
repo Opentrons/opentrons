@@ -76,6 +76,7 @@ class ProtocolReader:
             files=output_files,
             config=config_analysis.config,
             metadata=config_analysis.metadata,
+            robot_type=config_analysis.robot_type,
             labware_definitions=role_analysis.labware_definitions,
         )
 
@@ -127,5 +128,6 @@ class ProtocolReader:
             files=output_files,
             config=config_analysis.config,
             metadata=config_analysis.metadata,
+            robot_type=config_analysis.robot_type,
             labware_definitions=role_analysis.labware_definitions,
         )

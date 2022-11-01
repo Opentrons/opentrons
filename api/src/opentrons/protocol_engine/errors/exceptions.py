@@ -47,6 +47,10 @@ class LabwareNotLoadedError(ProtocolEngineError):
     """An error raised when referencing a labware that has not been loaded."""
 
 
+class LabwareNotLoadedOnModuleError(ProtocolEngineError):
+    """An error raised when referencing a labware on a module that has not been loaded."""
+
+
 class LabwareNotOnDeckError(ProtocolEngineError):
     """An error raised when a labware can't be used because it's off-deck."""
 
@@ -149,6 +153,10 @@ class EngageHeightOutOfRangeError(ProtocolEngineError):
     """An error raised when a Magnetic Module engage height is out of bounds."""
 
 
+class NoMagnetEngageHeightError(ProtocolEngineError):
+    """Error raised if a Magnetic Module engage height is missing."""
+
+
 class NoTargetTemperatureSetError(ProtocolEngineError):
     """An error raised when awaiting temperature when no target was set."""
 
@@ -175,3 +183,11 @@ class ProtocolCommandFailedError(ProtocolEngineError):
 
 class HardwareNotSupportedError(ProtocolEngineError):
     """An error raised when executing a command on the wrong hardware."""
+
+
+class GripperNotAttachedError(ProtocolEngineError):
+    """An error raised when executing a gripper action without an attached gripper."""
+
+
+class UnsupportedLabwareMovementError(ProtocolEngineError):
+    """An error raised when attempting an illegal labware movement."""

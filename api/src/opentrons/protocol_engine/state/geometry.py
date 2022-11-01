@@ -60,16 +60,24 @@ class GeometryView:
     # TODO(mc, 2022-06-24): rename this method
     def get_all_labware_highest_z(self) -> float:
         """Get the highest Z-point across all labware."""
-        return max(
-            *(
+        highest_labware_z = max(
+            (
                 self._get_highest_z_from_labware_data(lw_data)
                 for lw_data in self._labware.get_all()
+                if lw_data.location != OFF_DECK_LOCATION
             ),
-            *(
+            default=0.0,
+        )
+
+        highest_module_z = max(
+            (
                 self._modules.get_overall_height(module.id)
                 for module in self._modules.get_all()
             ),
+            default=0.0,
         )
+
+        return max(highest_labware_z, highest_module_z)
 
     def get_labware_parent_position(self, labware_id: str) -> Point:
         """Get the position of the labware's parent slot (deck or module)."""
@@ -128,7 +136,7 @@ class GeometryView:
         well_name: str,
         well_location: Optional[WellLocation] = None,
     ) -> Point:
-        """Get the absolute position of a well in a labware."""
+        """Given relative well location in a labware, get absolute position."""
         labware_pos = self.get_labware_position(labware_id)
         well_def = self._labware.get_well_definition(labware_id, well_name)
         well_depth = well_def.depth
@@ -147,6 +155,18 @@ class GeometryView:
             y=labware_pos.y + offset.y + well_def.y,
             z=labware_pos.z + offset.z + well_def.z,
         )
+
+    def get_relative_well_location(
+        self,
+        labware_id: str,
+        well_name: str,
+        absolute_point: Point,
+    ) -> WellLocation:
+        """Given absolute position, get relative location of a well in a labware."""
+        well_absolute_point = self.get_well_position(labware_id, well_name)
+        delta = absolute_point - well_absolute_point
+
+        return WellLocation(offset=WellOffset(x=delta.x, y=delta.y, z=delta.z))
 
     def get_well_edges(
         self,

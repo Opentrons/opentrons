@@ -1,9 +1,10 @@
 import pytest
+import datetime
 from mock import MagicMock, call
 from typing import List, Tuple
-from opentrons.calibration_storage import types as cal_types
+from opentrons.calibration_storage import types as cal_types, models
 from opentrons.types import Mount, Point
-from opentrons.hardware_control.instruments import pipette
+from opentrons.hardware_control.instruments.ot2 import pipette
 from opentrons.config import robot_configs
 from opentrons.config.pipette_config import load
 from opentrons.protocol_api import labware
@@ -20,10 +21,12 @@ from robot_server.robot.calibration.deck.constants import (
 )
 
 
-PIP_OFFSET = cal_types.PipetteOffsetByPipetteMount(
+PIP_OFFSET = models.v1.InstrumentOffsetModel(
     offset=robot_configs.defaults_ot2.DEFAULT_PIPETTE_OFFSET,
+    tiprack="some_tiprack",
+    uri="custom/some_tiprack/1",
     source=cal_types.SourceType.user,
-    status=cal_types.CalibrationStatus(),
+    last_modified=datetime.datetime.now(),
 )
 
 

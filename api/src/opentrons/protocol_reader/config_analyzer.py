@@ -2,10 +2,14 @@
 import ast
 from dataclasses import dataclass
 from typing import Union
+from typing_extensions import Literal
 
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
-from opentrons.protocols.parse import extract_metadata as extract_python_metadata
+from opentrons.protocols.parse import (
+    extract_static_python_info,
+    version_from_static_python_info,
+)
+from opentrons.protocols.types import StaticPythonInfo
 from opentrons.protocols.models import JsonProtocol as ProtocolSchemaV5
 from opentrons_shared_data.protocol.models import ProtocolSchemaV6
 
@@ -18,6 +22,9 @@ class ConfigAnalysis:
     """Protocol config analyzed from main file."""
 
     metadata: Metadata
+    # TODO(mm, 2022-10-21): Make robot_type an enum when we figure out where it should
+    # live.
+    robot_type: Literal["OT-2 Standard", "OT-3 Standard"]
     config: Union[PythonProtocolConfig, JsonProtocolConfig]
 
 
@@ -34,15 +41,22 @@ class ConfigAnalyzer:
         if isinstance(main_file.data, (ProtocolSchemaV5, ProtocolSchemaV6)):
             return ConfigAnalysis(
                 metadata=main_file.data.metadata.dict(exclude_none=True),
-                config=JsonProtocolConfig(schema_version=main_file.data.schemaVersion),
+                robot_type=main_file.data.robot.model,
+                config=JsonProtocolConfig(
+                    schema_version=main_file.data.schemaVersion,
+                ),
             )
 
         else:
             return _analyze_python(main_file)
 
 
-# todo(mm, 2021-09-13): Deduplicate with opentrons.protocols.parse.
-def _analyze_python(main_file: RoleAnalysisFile) -> ConfigAnalysis:  # noqa: C901
+# todo(mm, 2021-09-13): This duplicates opentrons.protocols.parse.parse()
+# and misses some of its functionality. For example, this misses looking at import
+# statements to see if a protocol looks like APIv1, and this misses statically
+# validating the structure of an APIv2 protocol to make sure it has exactly 1 run()
+# function, etc.
+def _analyze_python(main_file: RoleAnalysisFile) -> ConfigAnalysis:
     assert main_file.name.lower().endswith(".py"), "Expected main_file to be Python"
 
     try:
@@ -56,34 +70,18 @@ def _analyze_python(main_file: RoleAnalysisFile) -> ConfigAnalysis:  # noqa: C90
         raise ConfigAnalysisError(f"Unable to parse {main_file.name}.") from e
 
     try:
-        metadata = extract_python_metadata(module_ast)
+        static_info = extract_static_python_info(module_ast)
     except ValueError as e:
         raise ConfigAnalysisError(
             f"Unable to extract metadata from {main_file.name}."
         ) from e
 
     try:
-        api_level = metadata["apiLevel"]
-    except KeyError as e:
-        raise ConfigAnalysisError(
-            "metadata.apiLevel missing or not statically analyzable"
-            f" in {main_file.name}."
-        ) from e
-
-    if not isinstance(api_level, str):
-        raise ConfigAnalysisError(
-            f"metadata.apiLevel must be a string, but it instead has type"
-            f' "{type(api_level)}" in {main_file.name}.'
-        )
-
-    try:
-        api_version = APIVersion.from_string(api_level)
+        api_version = version_from_static_python_info(static_info)
     except ValueError as e:
-        raise ConfigAnalysisError(
-            f'metadata.apiLevel "{api_level}" is not of the format X.Y'
-            f" in {main_file.name}."
-        ) from e
-
+        raise ConfigAnalysisError(str(e)) from e
+    if api_version is None:
+        raise ConfigAnalysisError(f"apiLevel not declared in {main_file.name}")
     if api_version > MAX_SUPPORTED_VERSION:
         raise ConfigAnalysisError(
             f"API version {api_version} is not supported by this "
@@ -91,7 +89,24 @@ def _analyze_python(main_file: RoleAnalysisFile) -> ConfigAnalysis:  # noqa: C90
             f"version or update your robot."
         )
 
+    robot_type = _robot_type_from_static_python_info(static_info)
+
     return ConfigAnalysis(
-        metadata=metadata,
+        metadata=static_info.metadata or {},
+        robot_type=robot_type,
         config=PythonProtocolConfig(api_version=api_version),
     )
+
+
+def _robot_type_from_static_python_info(
+    static_python_info: StaticPythonInfo,
+) -> Literal["OT-2 Standard", "OT-3 Standard"]:
+    python_robot_type = (static_python_info.requirements or {}).get("robotType", None)
+    if python_robot_type in (None, "OT-2"):
+        return "OT-2 Standard"
+    elif python_robot_type == "OT-3":
+        return "OT-3 Standard"
+    else:
+        raise ConfigAnalysisError(
+            f"robotType must be 'OT-2' or 'OT-3', not {repr(python_robot_type)}."
+        )

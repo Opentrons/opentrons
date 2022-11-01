@@ -19,9 +19,9 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons.types import Mount, Location, DeckLocation, DeckSlotName
 from opentrons.broker import Broker
 from opentrons.hardware_control import SyncHardwareAPI
-from opentrons.hardware_control.modules import ModuleType
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
 from opentrons.commands.publisher import CommandPublisher, publish
+from opentrons.protocols.api_support import instrument as instrument_support
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
     AxisMaxSpeeds,
@@ -32,11 +32,14 @@ from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
-from .core.instrument import AbstractInstrument
+from .core.common import ModuleCore, ProtocolCore
 from .core.labware import AbstractLabware
-from .core.module import AbstractModuleCore
-from .core.protocol import AbstractProtocol
-from .core.well import AbstractWellCore
+from .core.module import (
+    AbstractTemperatureModuleCore,
+    AbstractMagneticModuleCore,
+    AbstractThermocyclerCore,
+    AbstractHeaterShakerCore,
+)
 
 from . import validation
 from .instrument_context import InstrumentContext
@@ -46,6 +49,7 @@ from .module_contexts import (
     TemperatureModuleContext,
     ThermocyclerContext,
     HeaterShakerContext,
+    ModuleContext,
 )
 
 
@@ -58,12 +62,6 @@ ModuleTypes = Union[
     ThermocyclerContext,
     HeaterShakerContext,
 ]
-
-
-InstrumentCore = AbstractInstrument[AbstractWellCore]
-LabwareCore = AbstractLabware[AbstractWellCore]
-ModuleCore = AbstractModuleCore[LabwareCore]
-ProtocolCore = AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]
 
 
 class HardwareManager(NamedTuple):
@@ -362,6 +360,52 @@ class ProtocolContext(CommandPublisher):
 
         return dict(_only_labwares())
 
+    # TODO: gate move_labware behind API version
+    def move_labware(
+        self,
+        labware: Labware,
+        new_location: Union[DeckLocation, ModuleTypes],
+        use_gripper: bool = False,
+    ) -> None:
+        """Move a loaded labware to a new location.
+
+        *** This API method is currently being developed. ***
+        *** Expect changes without API level bump.        ***
+
+        :param labware: Labware to move. Should be a labware already loaded
+                        using :py:meth:`load_labware`
+
+        :param new_location: Deck slot location or a hardware module that is already
+                             loaded on the deck using :py:meth:`load_module`.
+        :param use_gripper: Whether to use gripper to perform this move.
+                            If True, will use the gripper to perform the move (OT3 only).
+                            If False, will pause protocol execution to allow the user
+                            to perform a manual move and click resume to continue
+                            protocol execution.
+        Before moving a labware from or to a hardware module, make sure that the labware
+        and its new location is reachable by the gripper. So, thermocycler lid should be
+        open and heater-shaker's labware latch should be open.
+        """
+        # TODO (spp, 2022-10-31): re-evaluate whether to allow specifying `use_gripper`
+        #  in the args or whether to have it specified in protocol requirements.
+
+        if not isinstance(labware, Labware):
+            raise ValueError(
+                f"Expected labware of type 'Labware' but got {type(labware)}."
+            )
+
+        location = (
+            new_location._core
+            if isinstance(new_location, ModuleContext)
+            else validation.ensure_deck_slot(new_location)
+        )
+
+        self._implementation.move_labware(
+            labware_core=labware._implementation,
+            new_location=location,
+            use_gripper=use_gripper,
+        )
+
     @requires_version(2, 0)
     def load_module(
         self,
@@ -440,7 +484,7 @@ class ProtocolContext(CommandPublisher):
         has only loaded the Temperature Module with :py:meth:`load_module`,
         only the Temperature Module will be present.
 
-        :returns Dict[str, ModuleContext]: Dict mapping slot name to module
+        :returns Dict[int, ModuleContext]: Dict mapping slot name to module
                                            contexts. The elements may not be
                                            ordered by slot number.
         """
@@ -482,7 +526,7 @@ class ProtocolContext(CommandPublisher):
 
         checked_mount = validation.ensure_mount(mount)
         checked_instrument_name = validation.ensure_pipette_name(instrument_name)
-
+        tip_racks = tip_racks or []
         existing_instrument = self._instruments[checked_mount]
 
         if existing_instrument is not None and not replace:
@@ -501,13 +545,21 @@ class ProtocolContext(CommandPublisher):
             mount=checked_mount,
         )
 
+        for tip_rack in tip_racks:
+            instrument_support.validate_tiprack(
+                instrument_name=instrument_core.get_pipette_name(),
+                tip_rack=tip_rack,
+                log=logger,
+            )
+
         instrument = InstrumentContext(
             ctx=self,
             broker=self._broker,
             implementation=instrument_core,
-            at_version=self._api_version,
-            # TODO(mc, 2022-08-25): test instrument tip racks
+            api_version=self._api_version,
             tip_racks=tip_racks,
+            trash=self.fixed_trash,
+            requested_as=instrument_name,
         )
 
         self._instruments[checked_mount] = instrument
@@ -680,14 +732,17 @@ def _create_module_context(
     api_version: APIVersion,
     broker: Broker,
 ) -> ModuleTypes:
-    # TODO(mc, 2022-09-07): create distinct module cores
-    module_constructors: Dict[ModuleType, Type[ModuleTypes]] = {
-        ModuleType.MAGNETIC: MagneticModuleContext,
-        ModuleType.TEMPERATURE: TemperatureModuleContext,
-        ModuleType.THERMOCYCLER: ThermocyclerContext,
-        ModuleType.HEATER_SHAKER: HeaterShakerContext,
-    }
-    module_cls = module_constructors[module_core.get_type()]
+    module_cls: Optional[Type[ModuleTypes]] = None
+    if isinstance(module_core, AbstractTemperatureModuleCore):
+        module_cls = TemperatureModuleContext
+    elif isinstance(module_core, AbstractMagneticModuleCore):
+        module_cls = MagneticModuleContext
+    elif isinstance(module_core, AbstractThermocyclerCore):
+        module_cls = ThermocyclerContext
+    elif isinstance(module_core, AbstractHeaterShakerCore):
+        module_cls = HeaterShakerContext
+    else:
+        assert False, "Unsupported module type"
 
     return module_cls(
         core=module_core,

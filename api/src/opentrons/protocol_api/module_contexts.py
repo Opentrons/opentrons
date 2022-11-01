@@ -5,12 +5,9 @@ from typing import Generic, List, Optional, TypeVar, cast
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
-from opentrons import types
 from opentrons.broker import Broker
-from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
 from opentrons.hardware_control import SynchronousAdapter, modules
-from opentrons.hardware_control.modules import ModuleModel, types as module_types
-from opentrons.hardware_control.types import Axis
+from opentrons.hardware_control.modules import ModuleModel
 from opentrons.commands import module_commands as cmds
 from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support.types import APIVersion
@@ -22,22 +19,21 @@ from opentrons.protocols.geometry.module_geometry import (
     HeaterShakerGeometry,
 )
 
-from .core.protocol import AbstractProtocol
-from .core.instrument import AbstractInstrument
-from .core.labware import AbstractLabware
-from .core.module import (
-    AbstractModuleCore,
-    AbstractTemperatureModuleCore,
-    AbstractMagneticModuleCore,
-    AbstractHeaterShakerCore,
+from .core.common import (
+    ProtocolCore,
+    ModuleCore,
+    TemperatureModuleCore,
+    MagneticModuleCore,
+    ThermocyclerCore,
+    HeaterShakerCore,
 )
-from .core.well import AbstractWellCore
 
 from .module_validation_and_errors import (
     validate_heater_shaker_temperature,
     validate_heater_shaker_speed,
 )
 from .labware import Labware
+from . import validation
 
 
 ENGAGE_HEIGHT_UNIT_CNV = 2
@@ -46,11 +42,6 @@ ENGAGE_HEIGHT_UNIT_CNV = 2
 _log = logging.getLogger(__name__)
 
 GeometryType = TypeVar("GeometryType", bound=ModuleGeometry)
-
-InstrumentCore = AbstractInstrument[AbstractWellCore]
-LabwareCore = AbstractLabware[AbstractWellCore]
-ModuleCore = AbstractModuleCore[LabwareCore]
-ProtocolCore = AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]
 
 
 class ModuleContext(CommandPublisher, Generic[GeometryType]):
@@ -141,15 +132,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
             location=self._core,
         )
 
-        self._core.add_labware_core(labware_core)
-
-        # TODO(mc, 2022-09-02): add API version
-        # https://opentrons.atlassian.net/browse/RSS-97
-        labware = self._core.geometry.add_labware(Labware(implementation=labware_core))
-
-        # TODO(mc, 2022-09-08): move this into legacy PAPIv2 implementation
-        # by reworking the `Deck` and/or `ModuleGeometry` interface
-        self._protocol_core.get_deck().recalculate_high_z()
+        labware = self._core.add_labware_core(labware_core)
 
         return labware
 
@@ -263,7 +246,7 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
 
     """
 
-    _core: AbstractTemperatureModuleCore[AbstractLabware[AbstractWellCore]]
+    _core: TemperatureModuleCore
 
     @publish(command=cmds.tempdeck_set_temp)
     @requires_version(2, 0)
@@ -336,7 +319,7 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
     .. versionadded:: 2.0
     """
 
-    _core: AbstractMagneticModuleCore[AbstractLabware[AbstractWellCore]]
+    _core: MagneticModuleCore
 
     @publish(command=cmds.magdeck_calibrate)
     @requires_version(2, 0)
@@ -443,67 +426,19 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     .. versionadded:: 2.0
     """
 
-    # TODO(mc, 2022-02-05): this type annotation is misleading;
-    # a SynchronousAdapter wrapper is actually passed in
-    _module: modules.thermocycler.Thermocycler  # type: ignore[assignment]
-
-    def _get_fixed_trash(self) -> Labware:
-        trash = self._protocol_core.get_fixed_trash()
-
-        if isinstance(trash, AbstractLabware):
-            trash = Labware(implementation=trash)
-
-        return cast(Labware, trash)
-
-    def _prepare_for_lid_move(self) -> None:
-        loaded_instruments = [
-            instr
-            for mount, instr in self._protocol_core.get_loaded_instruments().items()
-            if instr is not None
-        ]
-        try:
-            instr_impl = loaded_instruments[0]
-        except IndexError:
-            _log.warning(
-                "Cannot assure a safe gantry position to avoid colliding"
-                " with the lid of the Thermocycler Module."
-            )
-        else:
-            ctx_impl = self._protocol_core
-            hardware = ctx_impl.get_hardware()
-            hardware.retract(instr_impl.get_mount())
-            high_point = hardware.current_position(instr_impl.get_mount())
-            trash_top = self._get_fixed_trash().wells()[0].top()
-            safe_point = trash_top.point._replace(
-                z=high_point[Axis.by_mount(instr_impl.get_mount())]
-            )
-            instr_impl.move_to(
-                types.Location(safe_point, None),
-                force_direct=True,
-                minimum_z_height=None,
-                speed=None,
-            )
-
-    def flag_unsafe_move(
-        self, to_loc: types.Location, from_loc: types.Location
-    ) -> None:
-        self.geometry.flag_unsafe_move(to_loc, from_loc, self.lid_position)
+    _core: ThermocyclerCore
 
     @publish(command=cmds.thermocycler_open)
     @requires_version(2, 0)
     def open_lid(self) -> str:
         """Opens the lid"""
-        self._prepare_for_lid_move()
-        self.geometry.lid_status = self._module.open()  # type: ignore[assignment]
-        return self.geometry.lid_status
+        return self._core.open_lid().value
 
     @publish(command=cmds.thermocycler_close)
     @requires_version(2, 0)
     def close_lid(self) -> str:
         """Closes the lid"""
-        self._prepare_for_lid_move()
-        self.geometry.lid_status = self._module.close()  # type: ignore[assignment]
-        return self.geometry.lid_status
+        return self._core.close_lid().value
 
     @publish(command=cmds.thermocycler_set_block_temp)
     @requires_version(2, 0)
@@ -543,13 +478,15 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
             specified, the Thermocycler will proceed to the next command
             after ``temperature`` is reached.
         """
-        self._module.set_temperature(
-            temperature=temperature,
-            hold_time_seconds=hold_time_seconds,
-            hold_time_minutes=hold_time_minutes,
-            ramp_rate=ramp_rate,
-            volume=block_max_volume,
+        seconds = validation.ensure_hold_time_seconds(
+            seconds=hold_time_seconds, minutes=hold_time_minutes
         )
+        self._core.set_target_block_temperature(
+            celsius=temperature,
+            hold_time_seconds=seconds,
+            block_max_volume=block_max_volume,
+        )
+        self._core.wait_for_block_temperature()
 
     @publish(command=cmds.thermocycler_set_lid_temperature)
     @requires_version(2, 0)
@@ -565,7 +502,8 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
             ``temperature`` has been reached.
 
         """
-        self._module.set_lid_temperature(temperature)
+        self._core.set_target_lid_temperature(celsius=temperature)
+        self._core.wait_for_lid_temperature()
 
     @publish(command=cmds.thermocycler_execute_profile)
     @requires_version(2, 0)
@@ -595,115 +533,109 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
             and finite for each step.
 
         """
-        if repetitions <= 0:
-            raise ValueError("repetitions must be a positive integer")
-        for step in steps:
-            if step.get("temperature") is None:
-                raise ValueError("temperature must be defined for each step in cycle")
-            hold_mins = step.get("hold_time_minutes")
-            hold_secs = step.get("hold_time_seconds")
-            if hold_mins is None and hold_secs is None:
-                raise ValueError(
-                    "either hold_time_minutes or hold_time_seconds must be"
-                    "defined for each step in cycle"
-                )
-        self._module.cycle_temperatures(
-            steps=steps, repetitions=repetitions, volume=block_max_volume
+        repetitions = validation.ensure_thermocycler_repetition_count(repetitions)
+        validated_steps = validation.ensure_thermocycler_profile_steps(steps)
+        self._core.execute_profile(
+            steps=validated_steps,
+            repetitions=repetitions,
+            block_max_volume=block_max_volume,
         )
 
     @publish(command=cmds.thermocycler_deactivate_lid)
     @requires_version(2, 0)
     def deactivate_lid(self) -> None:
         """Turn off the heated lid"""
-        self._module.deactivate_lid()
+        self._core.deactivate_lid()
 
     @publish(command=cmds.thermocycler_deactivate_block)
     @requires_version(2, 0)
     def deactivate_block(self) -> None:
         """Turn off the well block temperature controller"""
-        self._module.deactivate_block()
+        self._core.deactivate_block()
 
     @publish(command=cmds.thermocycler_deactivate)
     @requires_version(2, 0)
     def deactivate(self) -> None:
         """Turn off the well block temperature controller, and heated lid"""
-        self._module.deactivate()
+        self._core.deactivate()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def lid_position(self) -> Optional[str]:
         """Lid open/close status string"""
-        return self._module.lid_status
+        return self._core.get_lid_position()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def block_temperature_status(self) -> str:
-        return self._module.status
+        """Block temperature status string"""
+        return self._core.get_block_temperature_status()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def lid_temperature_status(self) -> Optional[str]:
-        return self._module.lid_temp_status
+        """Lid temperature status string"""
+        return self._core.get_lid_temperature_status()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def block_temperature(self) -> Optional[float]:
         """Current temperature in degrees C"""
-        return self._module.temperature
+        return self._core.get_block_temperature()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def block_target_temperature(self) -> Optional[float]:
         """Target temperature in degrees C"""
-        return self._module.target
+        return self._core.get_block_target_temperature()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def lid_temperature(self) -> Optional[float]:
         """Current temperature in degrees C"""
-        return self._module.lid_temp
+        return self._core.get_lid_temperature()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def lid_target_temperature(self) -> Optional[float]:
         """Target temperature in degrees C"""
-        return self._module.lid_target
+        return self._core.get_lid_target_temperature()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def ramp_rate(self) -> Optional[float]:
         """Current ramp rate in degrees C/sec"""
-        return self._module.ramp_rate
+        return self._core.get_ramp_rate()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def hold_time(self) -> Optional[float]:
         """Remaining hold time in sec"""
-        return self._module.hold_time
+        return self._core.get_hold_time()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def total_cycle_count(self) -> Optional[int]:
         """Number of repetitions for current set cycle"""
-        return self._module.total_cycle_count
+        return self._core.get_total_cycle_count()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def current_cycle_index(self) -> Optional[int]:
         """Index of the current set cycle repetition"""
-        return self._module.current_cycle_index
+        return self._core.get_current_cycle_index()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def total_step_count(self) -> Optional[int]:
         """Number of steps within the current cycle"""
-        return self._module.total_step_count
+        return self._core.get_total_step_count()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def current_step_index(self) -> Optional[int]:
         """Index of the current step within the current cycle"""
-        return self._module.current_step_index
+        return self._core.get_current_step_index()
 
 
 class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
@@ -715,7 +647,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     .. versionadded:: 2.13
     """
 
-    _core: AbstractHeaterShakerCore[AbstractLabware[AbstractWellCore]]
+    _core: HeaterShakerCore
 
     @property  # type: ignore[misc]
     @requires_version(2, 13)
@@ -894,50 +826,3 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         The Heater-Shaker does not have active cooling.
         """
         self._core.deactivate_heater()
-
-    def flag_unsafe_move(
-        self,
-        to_loc: types.Location,
-        is_multichannel: bool,
-    ) -> None:
-        """
-        Raise an error if attempting to perform a move that's deemed unsafe due to
-        the presence of the Heater-Shaker.
-
-        :meta private:
-        """
-        destination_slot = to_loc.labware.first_parent()
-        if destination_slot is None:
-            _log.warning(
-                "Pipette movement destination has no slot associated with it. Cannot"
-                " determine whether movement will safely avoid colliding with the Heater-Shaker."
-            )
-            return
-
-        is_labware_latch_closed = (
-            self._module.labware_latch_status
-            == HeaterShakerLabwareLatchStatus.IDLE_CLOSED
-        )
-        is_plate_shaking = self._module.speed_status != module_types.SpeedStatus.IDLE
-
-        to_labware_like = to_loc.labware
-        is_tiprack: bool
-        if (
-            to_labware_like.is_labware
-        ):  # Do we consider this a valid location for move_to?
-            is_tiprack = to_labware_like.as_labware().is_tiprack
-        elif to_labware_like.parent.is_labware:
-            is_tiprack = to_labware_like.parent.as_labware().is_tiprack
-        else:
-            raise Exception(
-                "Invalid destination location type. "
-                "Cannot determine pipette movement safety."
-            )
-
-        self.geometry.flag_unsafe_move(
-            to_slot=int(destination_slot),
-            is_tiprack=is_tiprack,
-            is_using_multichannel=is_multichannel,
-            is_plate_shaking=is_plate_shaking,
-            is_labware_latch_closed=is_labware_latch_closed,
-        )

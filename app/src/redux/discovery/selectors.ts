@@ -243,6 +243,6 @@ export const getRobotModelByName = (
   state: State,
   robotName: string
 ): string | null => {
-  const robot = getRobotByName(state, robotName)
+  const robot = getDiscoverableRobotByName(state, robotName)
   return robot != null ? getRobotModel(robot)?.split(/\s/)[0] : null
 }
