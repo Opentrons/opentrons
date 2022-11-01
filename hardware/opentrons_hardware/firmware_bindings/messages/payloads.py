@@ -45,7 +45,9 @@ class EmptyPayload(utils.BinarySerializable):
     # args of subclasses after this default arg.
     # to work around this in binary_serializable.build() and can_comm.prompt_payload
     # we ignore the message_index when constructing args and then set the value manually after
-    message_index: utils.UInt32Field = field(init=False, default=utils.UInt32Field(None))
+    message_index: utils.UInt32Field = field(
+        init=False, default=utils.UInt32Field(None)
+    )
 
 
 @dataclass(eq=False)
@@ -263,7 +265,9 @@ class FirmwareUpdateData(FirmwareUpdateWithAddress):
             )
 
     @classmethod
-    def create(cls, address: int, data: bytes, message_index: int = None) -> "FirmwareUpdateData":
+    def create(
+        cls, address: int, data: bytes, message_index: int = None
+    ) -> "FirmwareUpdateData":
         """Create a firmware update data payload."""
         # this is a special case, we normally instansiate message_index
         # when building a message, not a payload, but we need to compute
@@ -278,11 +282,11 @@ class FirmwareUpdateData(FirmwareUpdateWithAddress):
             data=FirmwareUpdateDataField(data),
             checksum=utils.UInt16Field(checksum),
         )
-        if (message_index == None):
+        if message_index == None:
             index_generator = message_definitions.SingletonMessageIndexGenerator()
-            obj.message_index=utils.UInt32Field(index_generator.get_next_index())
+            obj.message_index = utils.UInt32Field(index_generator.get_next_index())
         else:
-            obj.message_index=utils.UInt32Field(message_index)
+            obj.message_index = utils.UInt32Field(message_index)
         checksum = (1 + ~sum(obj.serialize())) & 0xFFFF
         obj.checksum.value = checksum
         return obj

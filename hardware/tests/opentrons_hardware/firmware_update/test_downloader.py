@@ -73,14 +73,12 @@ async def test_messaging(
         """Message responder."""
         if isinstance(message, FirmwareUpdateData):
             pld = payloads.FirmwareUpdateDataAcknowledge(
-                        address=message.payload.address,
-                        error_code=ErrorCodeField(ErrorCode.ok),
-                    )
+                address=message.payload.address,
+                error_code=ErrorCodeField(ErrorCode.ok),
+            )
             pld.message_index = message.payload.message_index
             can_message_notifier.notify(
-                FirmwareUpdateDataAcknowledge(
-                    payload=pld
-                ),
+                FirmwareUpdateDataAcknowledge(payload=pld),
                 ArbitrationId(
                     parts=ArbitrationIdParts(
                         message_id=FirmwareUpdateDataAcknowledge.message_id,
@@ -92,13 +90,11 @@ async def test_messaging(
             )
         elif isinstance(message, FirmwareUpdateComplete):
             pld = payloads.FirmwareUpdateAcknowledge(
-                        error_code=ErrorCodeField(ErrorCode.ok)
-                    )
+                error_code=ErrorCodeField(ErrorCode.ok)
+            )
             pld.message_index = message.payload.message_index
             can_message_notifier.notify(
-                FirmwareUpdateCompleteAcknowledge(
-                    payload=pld
-                ),
+                FirmwareUpdateCompleteAcknowledge(payload=pld),
                 ArbitrationId(
                     parts=ArbitrationIdParts(
                         message_id=FirmwareUpdateCompleteAcknowledge.message_id,
@@ -114,21 +110,22 @@ async def test_messaging(
     mock_hex_processor.process.return_value = iter(chunks)
 
     await subject.run(NodeId.gantry_y_bootloader, mock_hex_processor, 10)
-    
+
     # When the downloader runs it creates unique message indecies for each
-    # message, this is a little hack to get the next index it would use 
+    # message, this is a little hack to get the next index it would use
     # so we can caluclate what indecies it gave the messages.
     index_generator = SingletonMessageIndexGenerator()
     msg_index = index_generator.get_next_index() - (len(chunks) + 1)
-    
+
     mock_messenger.send.assert_has_calls(
         [
             call(
                 node_id=NodeId.gantry_y_bootloader,
                 message=FirmwareUpdateData(
                     payload=payloads.FirmwareUpdateData.create(
-                        address=chunk.address, data=bytes(chunk.data),
-                        message_index = msg_index+i,
+                        address=chunk.address,
+                        data=bytes(chunk.data),
+                        message_index=msg_index + i,
                     )
                 ),
             )
