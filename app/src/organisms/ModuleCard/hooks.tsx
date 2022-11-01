@@ -16,11 +16,7 @@ import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocol
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Tooltip } from '../../atoms/Tooltip'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
-import {
-  useProtocolDetailsForRun,
-  useRunStatuses,
-  useIsLegacySessionInProgress,
-} from '../Devices/hooks'
+import { useProtocolDetailsForRun, useRunStatuses } from '../Devices/hooks'
 import { useModuleIdFromRun } from './useModuleIdFromRun'
 
 import type {
@@ -112,7 +108,9 @@ export function useModuleOverflowMenu(
   handleTestShakeClick: () => void,
   handleWizardClick: () => void,
   handleSlideoutClick: (isSecondary: boolean) => void,
-  isLoadedInRun: boolean
+  isLoadedInRun: boolean,
+  isDisabled: boolean,
+  isIncompatibleWithOT3: boolean
 ): ModuleOverflowMenu {
   const { t } = useTranslation(['device_details', 'heater_shaker'])
   const { createLiveCommand } = useCreateLiveCommandMutation()
@@ -120,15 +118,9 @@ export function useModuleOverflowMenu(
   const { toggleLatch, isLatchClosed } = useLatchControls(module)
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { moduleIdFromRun } = useModuleIdFromRun(module, runId)
-  const isLegacySessionInProgress = useIsLegacySessionInProgress()
-  const { isRunTerminal, isRunStill, isRunIdle } = useRunStatuses()
+  const { isRunTerminal, isRunIdle } = useRunStatuses()
   const currentRunId = useCurrentRunId()
-  let isDisabled: boolean = false
-  if (runId != null && isLoadedInRun) {
-    isDisabled = !isRunStill
-  } else if ((runId != null || currentRunId != null) && !isLoadedInRun) {
-    isDisabled = !isLegacySessionInProgress && !isRunTerminal
-  }
+
   const isLatchDisabled =
     module.moduleType === HEATERSHAKER_MODULE_TYPE &&
     module.data.speedStatus !== 'idle'
@@ -162,6 +154,7 @@ export function useModuleOverflowMenu(
       key={`about_module_${module.moduleModel}`}
       id={`about_module_${module.moduleModel}`}
       data-testid={`about_module_${module.moduleModel}`}
+      disabled={isIncompatibleWithOT3}
       onClick={() => handleAboutClick()}
     >
       {t('overflow_menu_about')}

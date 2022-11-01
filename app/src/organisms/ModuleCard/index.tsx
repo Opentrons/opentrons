@@ -414,6 +414,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             <ModuleOverflowMenu
               handleAboutClick={handleAboutClick}
               module={module}
+              robotName={robotName}
               runId={runId}
               handleSlideoutClick={handleMenuItemClick}
               handleTestShakeClick={handleTestShakeClick}
