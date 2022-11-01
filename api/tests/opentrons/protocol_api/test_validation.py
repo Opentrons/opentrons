@@ -11,6 +11,7 @@ from opentrons.hardware_control.modules.types import (
     TemperatureModuleModel,
     ThermocyclerModuleModel,
     HeaterShakerModuleModel,
+    ThermocyclerStep,
 )
 from opentrons.protocol_api import validation as subject
 
@@ -133,3 +134,88 @@ def test_ensure_hold_time_seconds(
     """It should ensure hold time is in seconds only."""
     result = subject.ensure_hold_time_seconds(seconds=seconds, minutes=minutes)
     assert result == expected
+
+
+@pytest.mark.parametrize(
+    ["repetitions", "expected"],
+    [
+        (1, 1),
+        (2, 2),
+        (999, 999),
+    ],
+)
+def test_ensure_thermocycler_repetition_count(repetitions: int, expected: int) -> None:
+    """It should return a given positive integer."""
+    result = subject.ensure_thermocycler_repetition_count(repetitions)
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    "repetitions",
+    [
+        0,
+        -1,
+        -999,
+    ],
+)
+def test_ensure_thermocycler_repetition_count_raises(repetitions: int) -> None:
+    """It should raise if repetitions is zero or negative."""
+    with pytest.raises(ValueError):
+        subject.ensure_thermocycler_repetition_count(repetitions)
+
+
+@pytest.mark.parametrize(
+    ["steps", "expected"],
+    [
+        (
+            [
+                {
+                    "temperature": 42.0,
+                    "hold_time_minutes": 12.3,
+                    "hold_time_seconds": 45.6,
+                }
+            ],
+            [{"temperature": 42.0, "hold_time_seconds": 783.6}],
+        ),
+        (
+            [{"temperature": 42.0, "hold_time_seconds": 45.6}],
+            [{"temperature": 42.0, "hold_time_seconds": 45.6}],
+        ),
+        (
+            [{"temperature": 42.0, "hold_time_minutes": 12.3}],
+            [{"temperature": 42.0, "hold_time_seconds": 738.0}],
+        ),
+        (
+            [
+                {"temperature": 42.0, "hold_time_seconds": 12.3},
+                {"temperature": 52.0, "hold_time_minutes": 12.3},
+            ],
+            [
+                {"temperature": 42.0, "hold_time_seconds": 12.3},
+                {"temperature": 52.0, "hold_time_seconds": 738.0},
+            ],
+        ),
+        ([], []),
+    ],
+)
+def test_ensure_thermocycler_profile_steps(
+    steps: List[ThermocyclerStep], expected: List[ThermocyclerStep]
+) -> None:
+    """It should ensure thermocycler profile steps are valid and hold time is expressed in seconds only."""
+    result = subject.ensure_thermocycler_profile_steps(steps)
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    "steps",
+    [
+        [{"hold_time_minutes": 12.3, "hold_time_seconds": 45.6}],
+        [{"temperature": 42.0}],
+    ],
+)
+def test_ensure_thermocycler_profile_steps_invalid(
+    steps: List[ThermocyclerStep],
+) -> None:
+    """It should raise a ValueError when given invalid thermocycler profile steps."""
+    with pytest.raises(ValueError):
+        subject.ensure_thermocycler_profile_steps(steps)

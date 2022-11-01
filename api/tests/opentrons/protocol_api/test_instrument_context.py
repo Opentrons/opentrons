@@ -1,22 +1,32 @@
 """Tests for the InstrumentContext public interface."""
+from typing import cast
+
 import pytest
 from decoy import Decoy
 
 from opentrons.broker import Broker
+from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
     ProtocolContext,
     InstrumentContext,
     Labware,
+    Well,
 )
 from opentrons.protocol_api.core.common import InstrumentCore
+from opentrons.types import Location, Mount, Point
 
 
 @pytest.fixture
 def mock_instrument_core(decoy: Decoy) -> InstrumentCore:
     """Get a mock instrument implementation core."""
-    return decoy.mock(cls=InstrumentCore)
+    instrument_core = decoy.mock(cls=InstrumentCore)
+    decoy.when(instrument_core.get_mount()).then_return(Mount.LEFT)
+    decoy.when(instrument_core.get_hardware_state()).then_return(
+        cast(PipetteDict, {"display_name": "Cool Pipette"})
+    )
+    return instrument_core
 
 
 # TODO(mc, 2022-10-25): this will be replaced by a protocol core, instead
@@ -92,3 +102,53 @@ def test_tip_racks(decoy: Decoy, subject: InstrumentContext) -> None:
     subject.tip_racks = tip_racks
 
     assert subject.tip_racks == tip_racks
+
+
+def test_mount(
+    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
+) -> None:
+    """It should have a mount property."""
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
+
+    assert subject.mount == "right"
+
+
+def test_move_to(
+    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
+) -> None:
+    """It should move the pipette to a location."""
+    location = Location(point=Point(1, 2, 3), labware=None)
+
+    subject.move_to(location)
+
+    decoy.verify(
+        mock_instrument_core.move_to(
+            well_core=None,
+            location=location,
+            force_direct=False,
+            minimum_z_height=None,
+            speed=None,
+        ),
+        times=1,
+    )
+
+
+def test_move_to_well(
+    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
+) -> None:
+    """It should move the pipette to a location."""
+    mock_well = decoy.mock(cls=Well)
+    location = Location(point=Point(1, 2, 3), labware=mock_well)
+
+    subject.move_to(location)
+
+    decoy.verify(
+        mock_instrument_core.move_to(
+            location=location,
+            well_core=mock_well._impl,
+            force_direct=False,
+            minimum_z_height=None,
+            speed=None,
+        ),
+        times=1,
+    )

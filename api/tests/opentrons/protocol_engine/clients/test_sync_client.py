@@ -16,7 +16,7 @@ from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from opentrons.types import DeckSlotName, MountType
-from opentrons.protocol_engine import DeckSlotLocation, commands
+from opentrons.protocol_engine import DeckSlotLocation, DeckPoint, commands
 from opentrons.protocol_engine.clients import SyncClient, AbstractSyncTransport
 from opentrons.protocol_engine.types import (
     ModuleDefinition,
@@ -154,6 +154,66 @@ def test_load_pipette(
     )
 
     assert result == expected_result
+
+
+def test_move_to_well(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a move to well command."""
+    request = commands.MoveToWellCreate(
+        params=commands.MoveToWellParams(
+            pipetteId="123",
+            labwareId="456",
+            wellName="A2",
+            wellLocation=WellLocation(
+                origin=WellOrigin.BOTTOM, offset=WellOffset(x=1, y=2, z=3)
+            ),
+        )
+    )
+    response = commands.MoveToWellResult()
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.move_to_well(
+        pipette_id="123",
+        labware_id="456",
+        well_name="A2",
+        well_location=WellLocation(
+            origin=WellOrigin.BOTTOM, offset=WellOffset(x=1, y=2, z=3)
+        ),
+    )
+
+    assert result == response
+
+
+def test_move_to_coordinates(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a move to coordinates command."""
+    request = commands.MoveToCoordinatesCreate(
+        params=commands.MoveToCoordinatesParams(
+            pipetteId="123",
+            coordinates=DeckPoint(x=1, y=2, z=3),
+            forceDirect=True,
+            minimumZHeight=42.0,
+        )
+    )
+    response = commands.MoveToCoordinatesResult()
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.move_to_coordinates(
+        pipette_id="123",
+        coordinates=DeckPoint(x=1, y=2, z=3),
+        force_direct=True,
+        minimum_z_height=42.0,
+    )
+
+    assert result == response
 
 
 def test_pick_up_tip(
@@ -350,6 +410,110 @@ def test_magnetic_module_engage(
     assert result == response
 
 
+def test_thermocycler_set_target_lid_temperature(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a Thermocycler's set target lid temperature command."""
+    request = commands.thermocycler.SetTargetLidTemperatureCreate(
+        params=commands.thermocycler.SetTargetLidTemperatureParams(
+            moduleId="module-id", celsius=45.6
+        )
+    )
+    response = commands.thermocycler.SetTargetLidTemperatureResult(
+        targetLidTemperature=45.6
+    )
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+    result = subject.thermocycler_set_target_lid_temperature(
+        module_id="module-id", celsius=45.6
+    )
+
+    assert result == response
+
+
+def test_thermocycler_set_target_block_temperature(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a Thermocycler's set target block temperature command."""
+    request = commands.thermocycler.SetTargetBlockTemperatureCreate(
+        params=commands.thermocycler.SetTargetBlockTemperatureParams(
+            moduleId="module-id", celsius=45.6, blockMaxVolumeUl=12.3
+        )
+    )
+    response = commands.thermocycler.SetTargetBlockTemperatureResult(
+        targetBlockTemperature=45.6
+    )
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+    result = subject.thermocycler_set_target_block_temperature(
+        module_id="module-id", celsius=45.6, block_max_volume=12.3
+    )
+
+    assert result == response
+
+
+def test_thermocycler_wait_for_lid_temperature(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a Thermocycler's wait for lid temperature command."""
+    request = commands.thermocycler.WaitForLidTemperatureCreate(
+        params=commands.thermocycler.WaitForLidTemperatureParams(moduleId="module-id")
+    )
+    response = commands.thermocycler.WaitForLidTemperatureResult()
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+    result = subject.thermocycler_wait_for_lid_temperature(module_id="module-id")
+
+    assert result == response
+
+
+def test_thermocycler_wait_for_block_temperature(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a Thermocycler's wait for block temperature command."""
+    request = commands.thermocycler.WaitForBlockTemperatureCreate(
+        params=commands.thermocycler.WaitForBlockTemperatureParams(moduleId="module-id")
+    )
+    response = commands.thermocycler.WaitForBlockTemperatureResult()
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+    result = subject.thermocycler_wait_for_block_temperature(module_id="module-id")
+
+    assert result == response
+
+
+def test_thermocycler_run_profile(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a Thermocycler's run profile command."""
+    request = commands.thermocycler.RunProfileCreate(
+        params=commands.thermocycler.RunProfileParams(
+            moduleId="module-id",
+            profile=[
+                commands.thermocycler.RunProfileStepParams(
+                    celsius=42.0, holdSeconds=12.3
+                )
+            ],
+            blockMaxVolumeUl=45.6,
+        )
+    )
+    response = commands.thermocycler.RunProfileResult()
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+    result = subject.thermocycler_run_profile(
+        module_id="module-id",
+        steps=[{"temperature": 42.0, "hold_time_seconds": 12.3}],
+        block_max_volume=45.6,
+    )
+
+    assert result == response
+
+
 def test_thermocycler_deactivate_block(
     decoy: Decoy,
     transport: AbstractSyncTransport,
@@ -439,6 +603,188 @@ def test_blow_out(
         labware_id="456",
         well_name="A2",
         well_location=WellLocation(),
+    )
+
+    assert result == response
+
+
+def test_heater_shaker_set_target_temperature(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a Heater-Shaker's set target temperature command."""
+    request = commands.heater_shaker.SetTargetTemperatureCreate(
+        params=commands.heater_shaker.SetTargetTemperatureParams(
+            moduleId="module-id", celsius=42.0
+        )
+    )
+    response = commands.heater_shaker.SetTargetTemperatureResult()
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+    result = subject.heater_shaker_set_target_temperature(
+        module_id="module-id", celsius=42.0
+    )
+
+    assert result == response
+
+
+def test_heater_shaker_wait_for_temperature(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a Heater-Shaker's wait for temperature command."""
+    request = commands.heater_shaker.WaitForTemperatureCreate(
+        params=commands.heater_shaker.WaitForTemperatureParams(moduleId="module-id")
+    )
+    response = commands.heater_shaker.WaitForTemperatureResult()
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+    result = subject.heater_shaker_wait_for_temperature(module_id="module-id")
+
+    assert result == response
+
+
+def test_heater_shaker_set_and_wait_for_shake_speed(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a Heater-Shaker's set and wait for shake speed command."""
+    request = commands.heater_shaker.SetAndWaitForShakeSpeedCreate(
+        params=commands.heater_shaker.SetAndWaitForShakeSpeedParams(
+            moduleId="module-id", rpm=1337
+        )
+    )
+    response = commands.heater_shaker.SetAndWaitForShakeSpeedResult(
+        pipetteRetracted=False
+    )
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+    result = subject.heater_shaker_set_and_wait_for_shake_speed(
+        module_id="module-id", rpm=1337
+    )
+
+    assert result == response
+
+
+def test_heater_shaker_open_labware_latch(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a Heater-Shaker's open labware latch command."""
+    request = commands.heater_shaker.OpenLabwareLatchCreate(
+        params=commands.heater_shaker.OpenLabwareLatchParams(moduleId="module-id")
+    )
+    response = commands.heater_shaker.OpenLabwareLatchResult(pipetteRetracted=False)
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+    result = subject.heater_shaker_open_labware_latch(module_id="module-id")
+
+    assert result == response
+
+
+def test_heater_shaker_close_labware_latch(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a Heater-Shaker's close labware latch command."""
+    request = commands.heater_shaker.CloseLabwareLatchCreate(
+        params=commands.heater_shaker.CloseLabwareLatchParams(moduleId="module-id")
+    )
+    response = commands.heater_shaker.CloseLabwareLatchResult()
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+    result = subject.heater_shaker_close_labware_latch(module_id="module-id")
+
+    assert result == response
+
+
+def test_heater_shaker_deactivate_shaker(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a Heater-Shaker's deactivate shaker command."""
+    request = commands.heater_shaker.DeactivateShakerCreate(
+        params=commands.heater_shaker.DeactivateShakerParams(moduleId="module-id")
+    )
+    response = commands.heater_shaker.DeactivateShakerResult()
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+    result = subject.heater_shaker_deactivate_shaker(module_id="module-id")
+
+    assert result == response
+
+
+def test_heater_shaker_deactivate_heater(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a Heater-Shaker's deactivate heater command."""
+    request = commands.heater_shaker.DeactivateHeaterCreate(
+        params=commands.heater_shaker.DeactivateHeaterParams(moduleId="module-id")
+    )
+    response = commands.heater_shaker.DeactivateHeaterResult()
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+    result = subject.heater_shaker_deactivate_heater(module_id="module-id")
+
+    assert result == response
+
+
+def test_temperature_module_set_target_temperature(
+    decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
+) -> None:
+    """Should execute a PE set_target_temperature command."""
+    request = commands.temperature_module.SetTargetTemperatureCreate(
+        params=commands.temperature_module.SetTargetTemperatureParams(
+            moduleId="module-id", celsius=38.7
+        ),
+    )
+    response = commands.temperature_module.SetTargetTemperatureResult(
+        targetTemperature=38.7
+    )
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.temperature_module_set_target_temperature(
+        module_id="module-id", celsius=38.7
+    )
+
+    assert result == response
+
+
+def test_temperature_module_deactivate(
+    decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
+) -> None:
+    """Should execute a PE deactivate temperature command."""
+    request = commands.temperature_module.DeactivateTemperatureCreate(
+        params=commands.temperature_module.DeactivateTemperatureParams(
+            moduleId="module-id"
+        ),
+    )
+    response = commands.temperature_module.DeactivateTemperatureResult()
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.temperature_module_deactivate(module_id="module-id")
+
+    assert result == response
+
+
+def test_temperature_module_wait_for_target_temperature(
+    decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
+) -> None:
+    """Should execute a PE wait_for_target_temperature command."""
+    request = commands.temperature_module.WaitForTemperatureCreate(
+        params=commands.temperature_module.WaitForTemperatureParams(
+            moduleId="module-id", celsius=38.7
+        ),
+    )
+    response = commands.temperature_module.WaitForTemperatureResult()
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.temperature_module_wait_for_target_temperature(
+        module_id="module-id", celsius=38.7
     )
 
     assert result == response

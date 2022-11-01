@@ -10,7 +10,10 @@ from opentrons_hardware.sensors import sensor_driver, sensor_types
 
 from opentrons.config.robot_configs import build_config_ot3, load_ot3 as load_ot3_config
 from opentrons.hardware_control.backends.ot3utils import sensor_node_for_mount
-from opentrons.hardware_control.instruments.pipette import Pipette
+
+# TODO (lc 10-27-2022) This should be changed to an ot3 pipette object once we
+# have that well defined.
+from opentrons.hardware_control.instruments.ot2.pipette import Pipette
 from opentrons.hardware_control.motion_utilities import deck_from_machine
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.types import PipetteNotAttachedError
