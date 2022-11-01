@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { Flex } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
@@ -47,7 +48,9 @@ export const AttachStem = (props: PipetteWizardStepProps): JSX.Element => {
 
   const { t } = useTranslation('pipette_wizard_flows')
   const pipetteCalibratingImage = (
-    <img src={pipetteCalibrating} alt="Pipette is calibrating" />
+    <Flex marginTop="-5.2rem" height="10.2rem">
+      <img src={pipetteCalibrating} alt="Pipette is calibrating" />
+    </Flex>
   )
 
   if (isRobotMoving)
