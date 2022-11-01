@@ -318,23 +318,19 @@ class GeometryView:
         self, location: LabwareLocation
     ) -> LabwareLocation:
         """Ensure that the location does not already have equipment in it."""
-        if location != OFF_DECK_LOCATION:
-            for labware in self._labware.get_all():
-                if labware.location == location:
-                    raise errors.LocationIsOccupiedError(
-                        f"Labware {labware.loadName} is already present at {location}."
-                    )
-            for module in self._modules.get_all():
-                if module.location == location:
-                    raise errors.LocationIsOccupiedError(
-                        f"Module {module.model} is already present at {location}."
-                    )
+        if isinstance(location, (DeckSlotLocation, ModuleLocation)):
+            self._labware.raise_if_labware_in_location(location)
+            self._modules.raise_if_module_in_location(location)
         return location
 
     def get_labware_center(
         self, labware_id: str, location: Union[DeckSlotLocation, ModuleLocation]
     ) -> Point:
-        """Get the center point of the labware as placed on the given location."""
+        """Get the center point of the labware as placed on the given location.
+
+        Returns the absolute position of the labware as if it were placed on the
+        specified location. Labware offset not included.
+        """
         labware_dimensions = self._labware.get_dimensions(labware_id)
         module_offset = LabwareOffsetVector(x=0, y=0, z=0)
         location_slot: DeckSlotName

@@ -1,7 +1,8 @@
 """Labware state store tests."""
 import pytest
 from datetime import datetime
-from typing import Dict, Optional, cast
+from typing import Dict, Optional, cast, ContextManager, Any, Union
+from contextlib import nullcontext as does_not_raise
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.pipette.dev_types import LabwareUri
@@ -17,6 +18,7 @@ from opentrons.protocol_engine.types import (
     LabwareOffsetLocation,
     LoadedLabware,
     ModuleModel,
+    ModuleLocation,
 )
 
 from opentrons.protocol_engine.state.labware import LabwareState, LabwareView
@@ -662,3 +664,47 @@ def test_get_fixed_trash_id() -> None:
 
     with pytest.raises(errors.LabwareNotLoadedError):
         subject.get_fixed_trash_id()
+
+
+@pytest.mark.parametrize(
+    argnames=["location", "expected_raise"],
+    argvalues=[
+        (
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            pytest.raises(errors.LocationIsOccupiedError),
+        ),
+        (
+            ModuleLocation(moduleId="module-id"),
+            pytest.raises(errors.LocationIsOccupiedError),
+        ),
+        (DeckSlotLocation(slotName=DeckSlotName.SLOT_2), does_not_raise()),
+        (ModuleLocation(moduleId="non-matching-id"), does_not_raise()),
+    ],
+)
+def test_raise_if_labware_in_location(
+    location: Union[DeckSlotLocation, ModuleLocation],
+    expected_raise: ContextManager[Any],
+) -> None:
+    """It should raise if there is labware in specified location."""
+    subject = get_labware_view(
+        labware_by_id={
+            "abc123": LoadedLabware(
+                id="abc123",
+                loadName="labware-1",
+                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+                definitionUri="labware-definition-uri",
+                offsetId=None,
+                displayName=None,
+            ),
+            "xyz456": LoadedLabware(
+                id="xyz456",
+                loadName="labware-2",
+                location=ModuleLocation(moduleId="module-id"),
+                definitionUri="labware-definition-uri",
+                offsetId=None,
+                displayName=None,
+            ),
+        }
+    )
+    with expected_raise:
+        subject.raise_if_labware_in_location(location=location)

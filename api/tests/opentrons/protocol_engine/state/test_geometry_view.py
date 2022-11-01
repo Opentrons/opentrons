@@ -1,8 +1,7 @@
 """Test state getters for retrieving geometry views of state."""
 import pytest
 from decoy import Decoy
-from typing import cast, ContextManager, Any, Union
-from contextlib import nullcontext as does_not_raise
+from typing import cast, Union
 
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
@@ -20,8 +19,6 @@ from opentrons.protocol_engine.types import (
     WellOrigin,
     WellOffset,
     OFF_DECK_LOCATION,
-    LabwareLocation,
-    ModuleModel,
     Dimensions,
 )
 from opentrons.protocol_engine.state.labware import LabwareView
@@ -820,68 +817,40 @@ def test_get_ancestor_slot_name(
     assert subject.get_ancestor_slot_name("labware-2") == DeckSlotName.SLOT_1
 
 
-@pytest.mark.parametrize(
-    argnames=["location", "expected_raise"],
-    argvalues=[
-        (
-            DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
-            pytest.raises(errors.LocationIsOccupiedError),
-        ),
-        (
-            ModuleLocation(moduleId="module-id"),
-            pytest.raises(errors.LocationIsOccupiedError),
-        ),
-        (
-            DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-            pytest.raises(errors.LocationIsOccupiedError),
-        ),
-        (DeckSlotLocation(slotName=DeckSlotName.SLOT_7), does_not_raise()),
-        (ModuleLocation(moduleId="an-empty-module"), does_not_raise()),
-    ],
-)
 def test_ensure_location_not_occupied_raises(
     decoy: Decoy,
     labware_view: LabwareView,
     module_view: ModuleView,
     subject: GeometryView,
-    location: LabwareLocation,
-    expected_raise: ContextManager[Any],
 ) -> None:
     """It should raise error when labware is present in given location."""
-    decoy.when(labware_view.get_all()).then_return(
-        [
-            LoadedLabware(
-                id="id-1",
-                loadName="lab-1-name",
-                definitionUri="lab-1-def-uri",
-                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
-            ),
-            LoadedLabware(
-                id="id-1",
-                loadName="lab-1-name",
-                definitionUri="lab-1-def-uri",
-                location=ModuleLocation(moduleId="module-id"),
-            ),
-            LoadedLabware(
-                id="id-1",
-                loadName="lab-1-name",
-                definitionUri="lab-1-def-uri",
-                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
-            ),
-        ]
+    slot_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_4)
+    # Shouldn't raise if neither labware nor module in location
+    assert subject.ensure_location_not_occupied(slot_location) == slot_location
+
+    # Raise if labware in location
+    decoy.when(labware_view.raise_if_labware_in_location(slot_location)).then_raise(
+        errors.LocationIsOccupiedError("Woops!")
     )
-    decoy.when(module_view.get_all()).then_return(
-        [
-            LoadedModule(
-                id="another-module",
-                model=ModuleModel.TEMPERATURE_MODULE_V1,
-                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-                serialNumber="1234",
-            )
-        ]
+    with pytest.raises(errors.LocationIsOccupiedError):
+        subject.ensure_location_not_occupied(location=slot_location)
+
+    # Raise if module in location
+    module_location = ModuleLocation(moduleId="module-id")
+    decoy.when(labware_view.raise_if_labware_in_location(module_location)).then_return(
+        None
     )
-    with expected_raise:
-        subject.ensure_location_not_occupied(location=location)
+    decoy.when(module_view.raise_if_module_in_location(module_location)).then_raise(
+        errors.LocationIsOccupiedError("Woops again!")
+    )
+    with pytest.raises(errors.LocationIsOccupiedError):
+        subject.ensure_location_not_occupied(location=module_location)
+
+    # Shouldn't raise for off-deck labware
+    assert (
+        subject.ensure_location_not_occupied(location=OFF_DECK_LOCATION)
+        == OFF_DECK_LOCATION
+    )
 
 
 @pytest.mark.parametrize(
