@@ -590,6 +590,56 @@ def test_get_well_position_with_bottom_offset(
     )
 
 
+def test_get_relative_well_location(
+    decoy: Decoy,
+    well_plate_def: LabwareDefinition,
+    labware_view: LabwareView,
+    subject: GeometryView,
+) -> None:
+    """It should get the relative location of a well given an absolute position."""
+    labware_data = LoadedLabware(
+        id="labware-id",
+        loadName="load-name",
+        definitionUri="definition-uri",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        offsetId="offset-id",
+    )
+    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+    slot_pos = Point(4, 5, 6)
+    well_def = well_plate_def.wells["B2"]
+
+    decoy.when(labware_view.get("labware-id")).then_return(labware_data)
+    decoy.when(labware_view.get_definition("labware-id")).then_return(well_plate_def)
+    decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
+        calibration_offset
+    )
+    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_4)).then_return(
+        slot_pos
+    )
+    decoy.when(labware_view.get_well_definition("labware-id", "B2")).then_return(
+        well_def
+    )
+
+    result = subject.get_relative_well_location(
+        labware_id="labware-id",
+        well_name="B2",
+        absolute_point=Point(
+            x=slot_pos[0] + 1 + well_def.x + 7,
+            y=slot_pos[1] - 2 + well_def.y + 8,
+            z=slot_pos[2] + 3 + well_def.z + well_def.depth + 9,
+        ),
+    )
+
+    assert result == WellLocation(
+        origin=WellOrigin.TOP,
+        offset=WellOffset.construct(
+            x=cast(float, pytest.approx(7)),
+            y=cast(float, pytest.approx(8)),
+            z=cast(float, pytest.approx(9)),
+        ),
+    )
+
+
 def test_get_nominal_effective_tip_length(
     decoy: Decoy,
     labware_view: LabwareView,
