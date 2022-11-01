@@ -1040,7 +1040,7 @@ class OT3API(
             await self._backend.gripper_home_jaw()
             encoder_pos = await self._backend.update_encoder_position()
             self._encoder_current_position = deck_from_machine(
-                await self._backend.update_encoder_position(),
+                encoder_pos,
                 self._transforms.deck_calibration.attitude,
                 self._transforms.carriage_offset,
             )
@@ -1074,7 +1074,7 @@ class OT3API(
             )
             encoder_pos = await self._backend.update_encoder_position()
             self._encoder_current_position = deck_from_machine(
-                await self._backend.update_encoder_position(),
+                encoder_pos,
                 self._transforms.deck_calibration.attitude,
                 self._transforms.carriage_offset,
             )
