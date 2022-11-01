@@ -144,7 +144,19 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
         minimum_z_height: Optional[float],
         speed: Optional[float],
     ) -> None:
-        """Move the instrument."""
+        """Move the instrument.
+
+        Args:
+            location: The movement desitination.
+            well_core: Unused in the legacy instrument core.
+            force_direct: Force a direct movement instead of an arc.
+            minumum_z_height: Set a minimum travel height for a movement arc.
+            spped: Override the travel speed in mm/s.
+
+        Raises:
+            LabwareHeightError: An item on the deck is taller than
+                the computed safe travel height.
+        """
         self.flag_unsafe_move(location)
 
         # prevent direct movement bugs in PAPI version >= 2.10
@@ -301,6 +313,14 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
         )
 
     def flag_unsafe_move(self, location: types.Location) -> None:
+        """Check if a movement to a destination is potentially unsafe.
+
+        Args:
+            location: The movement destination.
+
+        Raises:
+            RuntimeError: The movement is unsafe.
+        """
         from_loc = self._protocol_interface.get_last_location()
 
         if not from_loc:

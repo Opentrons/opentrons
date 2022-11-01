@@ -368,7 +368,15 @@ class LegacyThermocyclerCore(
         return self._sync_module_hardware.current_step_index  # type: ignore[no-any-return]
 
     def flag_unsafe_move(self, to_loc: Location, from_loc: Location) -> None:
-        """Flag any move that would be unsafe due to this module's presence."""
+        """Check if a movement may interfere with this Thermocycler.
+
+        Args:
+            to_loc: Movement destination.
+            from_loc: Movement origin.
+
+        Raises:
+            RuntimeError: The movement is unsafe.
+        """
         self._geometry.flag_unsafe_move(to_loc, from_loc, self.get_lid_position())
 
     def _get_fixed_trash(self) -> Labware:
@@ -498,11 +506,16 @@ class LegacyHeaterShakerCore(
         return self._sync_module_hardware.labware_latch_status  # type: ignore[no-any-return]
 
     def flag_unsafe_move(self, to_loc: Location, is_multichannel: bool) -> None:
-        """
-        Raise an error if attempting to perform a move that's deemed unsafe due to
-        the presence of the Heater-Shaker.
+        """Check if a movement may interfere with this Heater-Shaker.
 
-        :meta private:
+        Args:
+            to_loc: Movement destination.
+            is_multichannel: If the pipette is a multi-channel pipette,
+                which has more movement restrictions than a single-channel.
+
+        Raises:
+            TypeError: `to_loc` is an invalid destination.
+            RuntimeError: The movement is unsafe.
         """
         destination_slot = to_loc.labware.first_parent()
         if destination_slot is None:
@@ -527,7 +540,7 @@ class LegacyHeaterShakerCore(
         elif to_labware_like.parent.is_labware:
             is_tiprack = to_labware_like.parent.as_labware().is_tiprack
         else:
-            raise Exception(
+            raise TypeError(
                 "Invalid destination location type. "
                 "Cannot determine pipette movement safety."
             )
