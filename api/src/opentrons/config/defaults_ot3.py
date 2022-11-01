@@ -20,7 +20,7 @@ DEFAULT_PIPETTE_OFFSET = [0.0, 0.0, 0.0]
 
 DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSettings(
     z_offset=ZSenseSettings(
-        point=(209, 170, 0),
+        point=(228, 170, 0),
         pass_settings=CapacitivePassSettings(
             prep_distance_mm=3,
             max_overrun_distance_mm=3,
@@ -29,10 +29,10 @@ DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSett
         ),
     ),
     edge_sense=EdgeSenseSettings(
-        plus_x_pos=(219, 150, 0),
-        minus_x_pos=(199, 150, 0),
-        plus_y_pos=(209, 160, 0),
-        minus_y_pos=(209, 140, 0),
+        plus_x_pos=(238, 150, 0),
+        minus_x_pos=(218, 150, 0),
+        plus_y_pos=(228, 160, 0),
+        minus_y_pos=(228, 140, 0),
         overrun_tolerance_mm=0.5,
         early_sense_tolerance_mm=0.2,
         pass_settings=CapacitivePassSettings(
