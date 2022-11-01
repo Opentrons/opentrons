@@ -8,6 +8,7 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition as Labware
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
     Parameters as LabwareDefinitionParameters,
+    Metadata as LabwareDefinitionMetadata,
 )
 
 from opentrons.types import Point
@@ -86,6 +87,26 @@ def test_get_user_display_name(decoy: Decoy, mock_engine_client: EngineClient) -
     result = subject.get_user_display_name()
 
     assert result == "Cool Label"
+    assert result == subject.get_display_name()
+
+
+def test_get_display_name(decoy: Decoy, mock_engine_client: EngineClient) -> None:
+    """It should get the labware's display name from the definition, if no label."""
+    labware_definition = LabwareDefinition.construct(  # type: ignore[call-arg]
+        ordering=[],
+        metadata=LabwareDefinitionMetadata.construct(  # type: ignore[call-arg]
+            displayName="Cool Display Name"
+        ),
+    )
+
+    decoy.when(
+        mock_engine_client.state.labware.get_definition("cool-labware")
+    ).then_return(labware_definition)
+
+    subject = LabwareCore(labware_id="cool-labware", engine_client=mock_engine_client)
+    result = subject.get_display_name()
+
+    assert result == "Cool Display Name"
 
 
 def test_is_tip_rack(decoy: Decoy, mock_engine_client: EngineClient) -> None:
