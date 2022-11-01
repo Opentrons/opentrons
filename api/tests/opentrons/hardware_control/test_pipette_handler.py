@@ -4,8 +4,8 @@ import pytest
 from decoy import Decoy
 
 from opentrons import types
-from opentrons.hardware_control.instruments.pipette import Pipette
-from opentrons.hardware_control.instruments.pipette_handler import (
+from opentrons.hardware_control.instruments.ot2.pipette import Pipette
+from opentrons.hardware_control.instruments.ot2.pipette_handler import (
     PipetteHandlerProvider,
 )
 

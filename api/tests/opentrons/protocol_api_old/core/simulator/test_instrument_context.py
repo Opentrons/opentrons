@@ -25,7 +25,8 @@ def test_same_pipette(
 ) -> None:
     """It should have the same pipette as hardware backed instrument context."""
     assert (
-        instrument_context.get_pipette() == simulating_instrument_context.get_pipette()
+        instrument_context.get_hardware_state()
+        == simulating_instrument_context.get_hardware_state()
     )
 
 
@@ -125,7 +126,7 @@ def test_aspirate_too_much(subject: InstrumentCore, labware: LabwareCore) -> Non
 def test_working_volume(subject: InstrumentCore, labware: LabwareCore) -> None:
     """It should have the correct working volume."""
     subject.home()
-    assert subject.get_pipette()["working_volume"] == 300
+    assert subject.get_hardware_state()["working_volume"] == 300
     subject.pick_up_tip(
         well=labware.get_wells()[0],
         tip_length=1,
@@ -133,7 +134,7 @@ def test_working_volume(subject: InstrumentCore, labware: LabwareCore) -> None:
         increment=None,
         prep_after=False,
     )
-    assert subject.get_pipette()["working_volume"] == 100
+    assert subject.get_hardware_state()["working_volume"] == 100
 
 
 @pytest.mark.parametrize(
@@ -153,7 +154,8 @@ def test_pipette_dict(
     side_effector(instrument_context)
     side_effector(simulating_instrument_context)
     assert (
-        instrument_context.get_pipette() == simulating_instrument_context.get_pipette()
+        instrument_context.get_hardware_state()
+        == simulating_instrument_context.get_hardware_state()
     )
 
 
@@ -215,7 +217,8 @@ def test_pipette_dict_with_tip(
     side_effector(instrument_context)
     side_effector(simulating_instrument_context)
     assert (
-        instrument_context.get_pipette() == simulating_instrument_context.get_pipette()
+        instrument_context.get_hardware_state()
+        == simulating_instrument_context.get_hardware_state()
     )
 
     # Drop tip and compare again
@@ -223,5 +226,6 @@ def test_pipette_dict_with_tip(
     simulating_instrument_context.drop_tip(home_after=False)
 
     assert (
-        instrument_context.get_pipette() == simulating_instrument_context.get_pipette()
+        instrument_context.get_hardware_state()
+        == simulating_instrument_context.get_hardware_state()
     )

@@ -14,7 +14,7 @@ interface Props {
   iconColor: string
   children: React.ReactNode
   header: string
-  subHeader: string
+  subHeader?: string
   isSuccess: boolean
 }
 
@@ -43,14 +43,16 @@ export function SimpleWizardBody(props: Props): JSX.Element {
         >
           {header}
         </StyledText>
-        <StyledText
-          as="p"
-          marginX="6.25rem"
-          textAlign={ALIGN_CENTER}
-          height="1.75rem"
-        >
-          {subHeader}
-        </StyledText>
+        {subHeader != null ? (
+          <StyledText
+            as="p"
+            marginX="6.25rem"
+            textAlign={ALIGN_CENTER}
+            height="1.75rem"
+          >
+            {subHeader}
+          </StyledText>
+        ) : null}
       </Flex>
       <Flex
         paddingX={SPACING.spacing6}

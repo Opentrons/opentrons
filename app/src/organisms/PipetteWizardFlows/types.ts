@@ -40,5 +40,6 @@ export type CreateRunCommand = (
 export interface PipetteWizardStepProps {
   flowType: PipetteWizardFlow
   mount: PipetteMount
-  nextStep: () => void
+  proceed?: () => void
+  goBack?: () => void
 }

@@ -9,7 +9,6 @@ or axis)  to a deck-absolute point (not a Smoothie-coordinate point).
 This module is not for use outside the opentrons api module. Higher-level
 functions are available elsewhere.
 """
-
 from .adapters import SynchronousAdapter
 from .api import API
 from .pause_manager import PauseManager
@@ -27,6 +26,7 @@ from .execution_manager import ExecutionManager
 from .threaded_async_lock import ThreadedAsyncLock, ThreadedAsyncForbidden
 from .protocols import HardwareControlAPI
 from .instruments import AbstractInstrument, Pipette, Gripper
+
 
 ThreadManagedHardware = ThreadManager[HardwareControlAPI]
 SyncHardwareAPI = SynchronousAdapter[HardwareControlAPI]

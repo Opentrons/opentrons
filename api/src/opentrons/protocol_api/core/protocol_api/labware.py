@@ -182,7 +182,7 @@ class LabwareImplementation(AbstractLabware[WellImplementation]):
                     parent_point=self._calibrated_offset,
                     parent_object=self,
                 ),
-                display_name="{} of {}".format(well, self._display_name),
+                display_name=f"{well} of {self._display_name}",
                 has_tip=self.is_tip_rack(),
                 name=well,
             )

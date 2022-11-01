@@ -49,6 +49,7 @@ from .module_contexts import (
     TemperatureModuleContext,
     ThermocyclerContext,
     HeaterShakerContext,
+    ModuleContext,
 )
 
 
@@ -359,6 +360,52 @@ class ProtocolContext(CommandPublisher):
 
         return dict(_only_labwares())
 
+    # TODO: gate move_labware behind API version
+    def move_labware(
+        self,
+        labware: Labware,
+        new_location: Union[DeckLocation, ModuleTypes],
+        use_gripper: bool = False,
+    ) -> None:
+        """Move a loaded labware to a new location.
+
+        *** This API method is currently being developed. ***
+        *** Expect changes without API level bump.        ***
+
+        :param labware: Labware to move. Should be a labware already loaded
+                        using :py:meth:`load_labware`
+
+        :param new_location: Deck slot location or a hardware module that is already
+                             loaded on the deck using :py:meth:`load_module`.
+        :param use_gripper: Whether to use gripper to perform this move.
+                            If True, will use the gripper to perform the move (OT3 only).
+                            If False, will pause protocol execution to allow the user
+                            to perform a manual move and click resume to continue
+                            protocol execution.
+        Before moving a labware from or to a hardware module, make sure that the labware
+        and its new location is reachable by the gripper. So, thermocycler lid should be
+        open and heater-shaker's labware latch should be open.
+        """
+        # TODO (spp, 2022-10-31): re-evaluate whether to allow specifying `use_gripper`
+        #  in the args or whether to have it specified in protocol requirements.
+
+        if not isinstance(labware, Labware):
+            raise ValueError(
+                f"Expected labware of type 'Labware' but got {type(labware)}."
+            )
+
+        location = (
+            new_location._core
+            if isinstance(new_location, ModuleContext)
+            else validation.ensure_deck_slot(new_location)
+        )
+
+        self._implementation.move_labware(
+            labware_core=labware._implementation,
+            new_location=location,
+            use_gripper=use_gripper,
+        )
+
     @requires_version(2, 0)
     def load_module(
         self,
@@ -437,7 +484,7 @@ class ProtocolContext(CommandPublisher):
         has only loaded the Temperature Module with :py:meth:`load_module`,
         only the Temperature Module will be present.
 
-        :returns Dict[str, ModuleContext]: Dict mapping slot name to module
+        :returns Dict[int, ModuleContext]: Dict mapping slot name to module
                                            contexts. The elements may not be
                                            ordered by slot number.
         """

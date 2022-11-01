@@ -4,9 +4,9 @@ import pytest
 from mock import MagicMock, call, patch
 from typing import List, Tuple, Dict, Any
 from opentrons import config
-from opentrons.calibration_storage import helpers, types as CSTypes
+from opentrons.calibration_storage import helpers, types as CSTypes, models
 from opentrons.types import Mount, Point
-from opentrons.hardware_control.instruments import pipette
+from opentrons.hardware_control.instruments.ot2 import pipette
 from opentrons.config.pipette_config import load
 from opentrons.protocol_api import labware
 
@@ -25,8 +25,12 @@ from robot_server.robot.calibration.pipette_offset.constants import (
 
 stub_jog_data = {"vector": Point(1, 1, 1)}
 
-PIP_CAL = CSTypes.PipetteOffsetByPipetteMount(
-    offset=[0, 0, 0], source=CSTypes.SourceType.user, status=CSTypes.CalibrationStatus()
+PIP_CAL = models.v1.InstrumentOffsetModel(
+    offset=[0, 0, 0],
+    tiprack="some_tiprack",
+    uri="custom/some_tiprack/1",
+    source=CSTypes.SourceType.user,
+    last_modified=datetime.datetime.now(),
 )
 
 pipette_map = {
@@ -48,13 +52,12 @@ pipette_map = {
 def build_mock_stored_pipette_offset(kind="normal"):
     if kind == "normal":
         return MagicMock(
-            return_value=CSTypes.PipetteOffsetByPipetteMount(
+            return_value=models.v1.InstrumentOffsetModel(
                 offset=[0, 1, 2],
                 tiprack="tiprack-id",
                 uri="opentrons/opentrons_96_filtertiprack_200ul/1",
                 last_modified=datetime.datetime.now(),
                 source=CSTypes.SourceType.user,
-                status=CSTypes.CalibrationStatus(markedBad=False),
             )
         )
     elif kind == "empty":
@@ -521,7 +524,8 @@ def test_no_pipette(hardware, mount):
 @pytest.fixture
 def mock_save_pipette():
     with patch(
-        "opentrons.calibration_storage.modify.save_pipette_calibration", autospec=True
+        "robot_server.robot.calibration.pipette_offset.user_flow.save_pipette_calibration",
+        autospec=True,
     ) as mock_save:
         yield mock_save
 
@@ -529,7 +533,8 @@ def mock_save_pipette():
 @pytest.fixture
 def mock_delete_pipette():
     with patch(
-        "opentrons.calibration_storage.delete.delete_pipette_offset_file", autospec=True
+        "robot_server.robot.calibration.pipette_offset.user_flow.delete_pipette_offset_file",
+        autospec=True,
     ) as mock_delete:
         yield mock_delete
 
@@ -552,14 +557,13 @@ async def test_save_tip_length(
     uf._hw_pipette.add_tip(50)
     await uf._hardware.move_to(
         mount=uf._mount,
-        # TODO(mc, 2021-07-27): `abs_poition` is a typo, how is this test passing?
-        abs_poition=Point(x=10, y=10, z=40),
+        abs_position=Point(x=10, y=10, z=40),
         critical_point=uf.critical_point_override,
     )
     await uf.save_offset()
     mock_save_tip_length.assert_called_with(
         pipette_id=uf._hw_pipette.pipette_id,
-        tip_length_offset=-10,
+        tip_length_offset=30,
         tip_rack=uf._tip_rack,
     )
     mock_delete_pipette.assert_called_with(uf._hw_pipette.pipette_id, uf.mount)
@@ -568,6 +572,7 @@ async def test_save_tip_length(
 async def test_save_custom_tiprack_def(
     mock_user_flow_fused, custom_tiprack_def, clear_custom_tiprack_def_dir
 ):
+
     uf = mock_user_flow_fused
     uf._load_tip_rack(custom_tiprack_def, uf._get_stored_pipette_offset_cal())
     uf._sm.set_state(uf._sm.state.measuringTipOffset)
@@ -575,8 +580,7 @@ async def test_save_custom_tiprack_def(
     uf._hw_pipette.add_tip(50)
     await uf._hardware.move_to(
         mount=uf._mount,
-        # TODO(mc, 2021-07-27): `abs_poition` is a typo, how is this test passing?
-        abs_poition=Point(x=10, y=10, z=40),
+        abs_position=Point(x=10, y=10, z=40),
         critical_point=uf.critical_point_override,
     )
 
