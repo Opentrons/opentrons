@@ -23,7 +23,7 @@ class HexPathAndTarget:
 
 FW_GANTRY_X = HexPathAndTarget(name="gantry-x-rev1.hex", path=None, target="gantry-x")
 FW_GANTRY_Y = HexPathAndTarget(name="gantry-y-rev1.hex", path=None, target="gantry-y")
-FW_HEAD = HexPathAndTarget(name="head-proto.hex", path=None, target="head")
+FW_HEAD = HexPathAndTarget(name="head-rev1.hex", path=None, target="head")
 FW_PIP_SINGLE = HexPathAndTarget(
     name="pipettes-single-rev1.hex", path=None, target="pipette-{mount}"
 )
