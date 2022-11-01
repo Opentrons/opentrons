@@ -11,7 +11,7 @@ Protocols and Instruments
 
 .. autoclass:: opentrons.protocol_api.ProtocolContext
    :members:
-   :exclude-members: location_cache, _hw_manager
+   :exclude-members: location_cache, _hw_manager, cleanup, clear_commands, commands
 
 .. autoclass:: opentrons.protocol_api.InstrumentContext
    :members:
@@ -30,20 +30,22 @@ Modules
 -------
 .. autoclass:: opentrons.protocol_api.TemperatureModuleContext
    :members:
-   :exclude-members: start_set_temperature
+   :exclude-members: start_set_temperature, broker, geometry
    :inherited-members:
 
 .. autoclass:: opentrons.protocol_api.MagneticModuleContext
    :members:
+   :exclude-members: broker, geometry
    :inherited-members:
 
 .. autoclass:: opentrons.protocol_api.ThermocyclerContext
    :members:
-   :exclude-members: total_step_count, current_cycle_index, total_cycle_count, hold_time, ramp_rate, current_step_index, flag_unsafe_move
+   :exclude-members: total_step_count, current_cycle_index, total_cycle_count, hold_time, ramp_rate, current_step_index, flag_unsafe_move, broker, geometry
    :inherited-members:
    
 .. autoclass:: opentrons.protocol_api.HeaterShakerContext
    :members:
+   :exclude-members: broker, geometry
    :inherited-members:
 
 
