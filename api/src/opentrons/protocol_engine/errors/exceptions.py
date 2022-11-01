@@ -187,3 +187,7 @@ class GripperNotAttachedError(ProtocolEngineError):
 
 class LabwareMovementNotAllowedError(ProtocolEngineError):
     """An error raised when attempting an illegal labware movement."""
+
+
+class LocationIsOccupiedError(ProtocolEngineError):
+    """An error raised when attempting to place labware in a non-empty location."""

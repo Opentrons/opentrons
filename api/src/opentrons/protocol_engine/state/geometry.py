@@ -14,6 +14,7 @@ from ..types import (
     DeckSlotLocation,
     ModuleLocation,
     OFF_DECK_LOCATION,
+    LabwareLocation,
 )
 from .labware import LabwareView
 from .modules import ModuleView
@@ -299,3 +300,20 @@ class GeometryView:
             )
 
         return slot_name
+
+    def ensure_location_not_occupied(
+        self, location: LabwareLocation
+    ) -> LabwareLocation:
+        """Ensure that the location does not already have equipment in it."""
+        if location != OFF_DECK_LOCATION:
+            for labware in self._labware.get_all():
+                if labware.location == location:
+                    raise errors.LocationIsOccupiedError(
+                        f"Labware {labware.loadName} is already present at {location}."
+                    )
+            for module in self._modules.get_all():
+                if module.location == location:
+                    raise errors.LocationIsOccupiedError(
+                        f"Module {module.model} is already present at {location}."
+                    )
+        return location

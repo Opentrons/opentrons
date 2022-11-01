@@ -43,6 +43,7 @@ from .exceptions import (
     GripperNotAttachedError,
     HardwareNotSupportedError,
     LabwareMovementNotAllowedError,
+    LocationIsOccupiedError,
 )
 
 from .error_occurrence import ErrorOccurrence
@@ -91,6 +92,7 @@ __all__ = [
     "GripperNotAttachedError",
     "HardwareNotSupportedError",
     "LabwareMovementNotAllowedError",
+    "LocationIsOccupiedError",
     # error occurrence models
     "ErrorOccurrence",
 ]
