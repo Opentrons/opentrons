@@ -47,7 +47,6 @@ export const PipetteOverflowMenu = (
   const pipetteDisplayName =
     pipetteSpecs?.displayName != null ? pipetteSpecs.displayName : t('empty')
   const isOT3PipetteAttached = isOT3Pipette(pipetteName as PipetteName)
-  console.log('isOT3PipetteAttached', isOT3PipetteAttached)
 
   const calibratePipetteText = isOT3PipetteAttached
     ? 'calibrate_pipette'
