@@ -70,6 +70,9 @@ class LabwareMovementHandler:
         new_offset_id: Optional[str],
     ) -> None:
         """Move a loaded labware from one location to another."""
+        use_virtual_gripper = self._state_store.config.use_virtual_gripper
+        if use_virtual_gripper:
+            return
         ot3api = ensure_ot3_hardware(
             hardware_api=self._hardware_api,
             error_msg="Gripper is only available on the OT-3",
