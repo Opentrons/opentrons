@@ -35,6 +35,9 @@ cp "$FW_PATH_HEAD" "$TEMP_DIR_NAME/head-proto.hex"
 cp "$FW_PATH_PIPETTES_SINGLE" "$TEMP_DIR_NAME/pipettes-single-rev1.hex"
 cp "$FW_PATH_PIPETTES_MULTI" "$TEMP_DIR_NAME/pipettes-multi-rev1.hex"
 
+# create a dummy file, simply named after the git hash
+touch "$TEMP_DIR_NAME/$GIT_HASH"
+
 # compress folder, then delete
 tar -cf "$TAR_NAME.tar.gz" "$TEMP_DIR_NAME"
 rm -rf "$TEMP_DIR_NAME"

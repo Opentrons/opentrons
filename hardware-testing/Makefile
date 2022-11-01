@@ -170,16 +170,18 @@ define extract-and-update-fw
 ssh -i $(2) $(3) root@$(1) \
 "cd /opt/opentrons-robot-server &&\
 tar -xvf ot3-firmware.tar.gz &&\
-python3 -m opentrons_hardware.scripts.update_fw --file ./ot3-firmware/gantry-x-rev1.hex --target gantry-x &&\
-python3 -m opentrons_hardware.scripts.update_fw --file ./ot3-firmware/gantry-y-rev1.hex --target gantry-y &&\
-python3 -m opentrons_hardware.scripts.update_fw --file ./ot3-firmware/head-proto.hex --target head"
+ls ./ot3-firmware &&\
+python3 -m opentrons_hardware.scripts.update_fw --file ./ot3-firmware/gantry-x-rev1.hex --target gantry-x --less-logs &&\
+python3 -m opentrons_hardware.scripts.update_fw --file ./ot3-firmware/gantry-y-rev1.hex --target gantry-y --less-logs &&\
+python3 -m opentrons_hardware.scripts.update_fw --file ./ot3-firmware/head-proto.hex --target head --less-logs &&\
+ls ./ot3-firmware"
 endef
 
 .PHONY: sync-ot3
 sync-ot3:
-	scp ot3-firmware.tar.gz root@$(host):/opt/opentrons-robot-server
-	$(call extract-and-update-fw,$(host),$(br_ssh_key),$(ssh_opts))
-	$(MAKE) push-no-restart-ot3 host=$(host)
 	cd ../hardware && $(MAKE) push-no-restart-ot3 host=$(host)
 	cd ../api && $(MAKE) push-no-restart-ot3 host=$(host)
 	cd ../shared-data && $(MAKE) push-no-restart-ot3 host=$(host)
+	cd ../hardware-testing && $(MAKE) push-no-restart-ot3 host=$(host)
+	scp ot3-firmware.tar.gz root@$(host):/opt/opentrons-robot-server
+	$(call extract-and-update-fw,$(host),$(br_ssh_key),$(ssh_opts))
