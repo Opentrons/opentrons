@@ -36,6 +36,7 @@ class Params(BaseModel):
     slotName: Optional[str]
     axes: Optional[List[str]]
     pipetteId: Optional[str]
+    pipetteName: Optional[str]
     mount: Optional[str]
     moduleId: Optional[str]
     location: Optional[Location]
