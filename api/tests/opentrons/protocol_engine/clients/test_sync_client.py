@@ -424,7 +424,7 @@ def test_magnetic_module_disengage(
     decoy.when(transport.execute_command(request=request)).then_return(response)
 
     result = subject.magnetic_module_disengage(module_id="module-id")
-    
+
     assert result == response
 
 

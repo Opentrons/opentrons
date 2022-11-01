@@ -186,14 +186,14 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
             raise InvalidMagnetEngageHeightError(
                 "There is no labware loaded on this Magnetic Module,"
                 " so you must specify an engage height"
-                " with the `height` or `height_from_base` parameter."
+                " with the `height_from_base` parameter."
             )
         except NoMagnetEngageHeightError:
             raise InvalidMagnetEngageHeightError(
                 "The labware loaded on this Magnetic Module"
                 " does not have a default engage height,"
                 " so you must specify an engage height"
-                " with the `height` or `height_from_base` parameter."
+                " with the `height_from_base` parameter."
             )
 
         self._engine_client.magnetic_module_engage(
