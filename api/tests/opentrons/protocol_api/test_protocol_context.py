@@ -9,8 +9,10 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 
 from opentrons.types import Mount, DeckSlotName
+from opentrons.broker import Broker
 from opentrons.hardware_control.modules.types import ModuleType, TemperatureModuleModel
 from opentrons.protocols.api_support import instrument as mock_instrument_support
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
     ProtocolContext,
@@ -19,6 +21,7 @@ from opentrons.protocol_api import (
     Labware,
     validation as mock_validation,
 )
+from opentrons.protocol_api.module_contexts import TemperatureModuleContext
 from opentrons.protocol_api.core.labware import LabwareLoadParams
 from opentrons.protocol_api.core.common import (
     InstrumentCore,
@@ -217,6 +220,56 @@ def test_load_labware_from_definition(
 
     assert isinstance(result, Labware)
     assert result.name == "Full Name"
+
+
+def test_move_labware_to_slot(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    subject: ProtocolContext,
+) -> None:
+    """It should move labware to new slot location."""
+    mock_labware_core = decoy.mock(cls=LabwareCore)
+    movable_labware = Labware(implementation=mock_labware_core)
+    decoy.when(mock_validation.ensure_deck_slot(42)).then_return(DeckSlotName.SLOT_1)
+
+    subject.move_labware(
+        labware=movable_labware,
+        new_location=42,
+    )
+    decoy.verify(
+        mock_core.move_labware(
+            labware_core=mock_labware_core,
+            new_location=DeckSlotName.SLOT_1,
+            use_gripper=False,
+        )
+    )
+
+
+def test_move_labware_to_module(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    subject: ProtocolContext,
+) -> None:
+    """It should move labware to new module location."""
+    mock_labware_core = decoy.mock(cls=LabwareCore)
+    mock_module_core = decoy.mock(cls=TemperatureModuleCore)
+    mock_broker = decoy.mock(cls=Broker)
+    movable_labware = Labware(implementation=mock_labware_core)
+    module_location = TemperatureModuleContext(
+        core=mock_module_core,
+        protocol_core=mock_core,
+        api_version=APIVersion(2, 13),
+        broker=mock_broker,
+    )
+
+    subject.move_labware(labware=movable_labware, new_location=module_location)
+    decoy.verify(
+        mock_core.move_labware(
+            labware_core=mock_labware_core,
+            new_location=mock_module_core,
+            use_gripper=False,
+        )
+    )
 
 
 def test_load_module(

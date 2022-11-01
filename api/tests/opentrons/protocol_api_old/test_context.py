@@ -1,7 +1,7 @@
 """ Test the functions and classes in the protocol context """
 
 import json
-from unittest import mock
+import mock
 from typing import Any, Dict
 
 from opentrons_shared_data import load_shared_data
@@ -17,12 +17,13 @@ from opentrons.protocol_api.module_contexts import (
 )
 from opentrons.types import Mount, Point, Location, TransferTipPolicy
 from opentrons.hardware_control import API, NoTipAttachedError, ThreadManagedHardware
-from opentrons.hardware_control.instruments.pipette import Pipette
+from opentrons.hardware_control.instruments import Pipette
 from opentrons.hardware_control.types import Axis
 from opentrons.protocols.advanced_control import transfers as tf
 from opentrons.config.pipette_config import config_names
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.calibration_storage import get, modify, delete, types as cs_types
+from opentrons.calibration_storage import types as cs_types
+from opentrons.util.helpers import utc_now
 
 import pytest
 
@@ -1014,41 +1015,34 @@ def test_tip_length_for(ctx, monkeypatch):
     )
 
 
-def test_tip_length_for_caldata(ctx, monkeypatch):
+@pytest.mark.ot2_only
+def test_tip_length_for_caldata(ctx, decoy, monkeypatch):
+    # TODO (lc 10-27-2022) We need to investigate why the pipette id is
+    # being reported as none for this test (and probably all the others)
+    from opentrons.hardware_control.instruments.ot2 import (
+        instrument_calibration as instr_cal,
+    )
+    from opentrons.calibration_storage import types as CSTypes
+
     instr = ctx.load_instrument("p20_single_gen2", "left")
     tiprack = ctx.load_labware("geb_96_tiprack_10ul", "1")
-    mock_tip_length = mock.Mock()
-    mock_tip_length.return_value = cs_types.TipLengthCalibration(
-        tip_length=2,
-        pipette="fake id",
-        tiprack="fake_hash",
-        last_modified="some time",  # type: ignore[arg-type]
-        source=cs_types.SourceType.user,
-        status=cs_types.CalibrationStatus(markedBad=False),
-        uri=LabwareUri("opentrons/geb_96_tiprack_10ul/1"),
+
+    mock_load_tip_length = decoy.mock(func=instr_cal.load_tip_length_for_pipette)
+    decoy.when(
+        mock_load_tip_length(None, tiprack._implementation.get_definition())
+    ).then_return(
+        instr_cal.TipLengthCalibration(
+            tip_length=2,
+            last_modified=utc_now(),
+            source=cs_types.SourceType.user,
+            status=CSTypes.CalibrationStatus(markedBad=False),
+            uri=LabwareUri("opentrons/geb_96_tiprack_10ul/1"),
+            tiprack="somehash",
+            pipette=None,  # type: ignore[arg-type]
+        )
     )
-    monkeypatch.setattr(get, "load_tip_length_calibration", mock_tip_length)
+    monkeypatch.setattr(instr_cal, "load_tip_length_for_pipette", mock_load_tip_length)
     assert instr._tip_length_for(tiprack) == 2
-    mock_tip_length.side_effect = cs_types.TipLengthCalNotFound
-    assert instr._tip_length_for(tiprack) == (
-        tiprack._implementation.get_definition()["parameters"]["tipLength"]
-        - instr.hw_pipette["tip_overlap"]["opentrons/geb_96_tiprack_10ul/1"]
-    )
-
-
-def test_tip_length_for_load_caldata(ctx):
-    instr = ctx.load_instrument("p20_single_gen2", "left")
-    tiprack = ctx.load_labware("geb_96_tiprack_10ul", "1")
-    pip_id = instr.hw_pipette["pipette_id"]
-    fake_tip_length = 31
-
-    test_data = modify.create_tip_length_data(
-        tiprack._implementation.get_definition(), fake_tip_length
-    )
-    modify.save_tip_length_calibration(pip_id, test_data)
-
-    assert instr._tip_length_for(tiprack) == fake_tip_length
-    delete.clear_tip_length_calibration()
 
 
 def test_bundled_labware(get_labware_fixture, hardware):
@@ -1173,11 +1167,11 @@ def test_move_to_with_thermocycler(
     mod = ctx.load_module("thermocycler")
 
     assert isinstance(mod, ThermocyclerContext)
-    mod.flag_unsafe_move = mock.MagicMock(side_effect=raiser)  # type: ignore[assignment]
+    mod._core.flag_unsafe_move = mock.MagicMock(side_effect=raiser)  # type: ignore[attr-defined, assignment]
     instr = ctx.load_instrument("p1000_single", "left")
     with pytest.raises(RuntimeError, match="Cannot"):
         instr.move_to(Location(Point(0, 0, 0), None))
-    mod.flag_unsafe_move.assert_called_once_with(
+    mod._core.flag_unsafe_move.assert_called_once_with(  # type: ignore[attr-defined]
         to_loc=Location(Point(0, 0, 0), None), from_loc=Location(Point(0, 0, 0), None)
     )
 
@@ -1194,12 +1188,12 @@ def test_move_to_with_heater_shaker(
     mod = ctx.load_module("heaterShakerModuleV1", 1)
 
     assert isinstance(mod, HeaterShakerContext)
-    mod.flag_unsafe_move = mock.MagicMock(side_effect=raiser)  # type: ignore[assignment]
+    mod._core.flag_unsafe_move = mock.MagicMock(side_effect=raiser)  # type: ignore[attr-defined]
 
     instr = ctx.load_instrument("p300_multi", "left")
     with pytest.raises(RuntimeError, match="Cannot"):
         instr.move_to(Location(Point(0, 0, 0), None))
-    mod.flag_unsafe_move.assert_called_once_with(
+    mod._core.flag_unsafe_move.assert_called_once_with(  # type: ignore[attr-defined]
         to_loc=Location(Point(0, 0, 0), None),
         is_multichannel=True,
     )

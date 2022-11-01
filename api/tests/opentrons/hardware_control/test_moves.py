@@ -7,7 +7,6 @@ from decoy import Decoy
 from opentrons import config, types
 from opentrons import hardware_control as hc
 from opentrons.calibration_storage.types import (
-    DeckCalibration,
     SourceType,
     CalibrationStatus,
 )
@@ -19,7 +18,10 @@ from opentrons.hardware_control.types import (
     MustHomeError,
     InvalidMoveError,
 )
-from opentrons.hardware_control.robot_calibration import RobotCalibration
+from opentrons.hardware_control.robot_calibration import (
+    RobotCalibration,
+    DeckCalibration,
+)
 from opentrons.hardware_control.types import OT3Axis
 
 

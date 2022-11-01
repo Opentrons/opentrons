@@ -11,11 +11,11 @@ from typing import Any, Dict, Optional, Set, Tuple, Union
 from opentrons_shared_data.pipette import name_config as pipette_name_config
 
 from opentrons.types import Point
-from opentrons.calibration_storage.types import PipetteOffsetByPipetteMount
 from opentrons.config import pipette_config, robot_configs
 from opentrons.config.types import RobotConfig, OT3Config
 from opentrons.drivers.types import MoveSplit
-from .instrument_abc import AbstractInstrument
+from ..instrument_abc import AbstractInstrument
+from .instrument_calibration import PipetteOffsetByPipetteMount
 from opentrons.hardware_control.types import (
     CriticalPoint,
     BoardRevision,

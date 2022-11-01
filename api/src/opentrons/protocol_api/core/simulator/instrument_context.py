@@ -116,6 +116,7 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
     def move_to(
         self,
         location: types.Location,
+        well_core: Optional[WellImplementation],
         force_direct: bool,
         minimum_z_height: Optional[float],
         speed: Optional[float],
@@ -163,7 +164,7 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
     def get_available_volume(self) -> float:
         return self._pipette_dict["available_volume"]
 
-    def get_pipette(self) -> PipetteDict:
+    def get_hardware_state(self) -> PipetteDict:
         return self._pipette_dict
 
     def get_channels(self) -> int:

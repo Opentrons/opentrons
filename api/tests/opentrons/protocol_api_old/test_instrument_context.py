@@ -116,6 +116,7 @@ def test_pick_up_from_exact_well_location(
     decoy.verify(
         mock_instrument_implementation.move_to(
             location=expected_location,
+            well_core=mock_well._impl,
             force_direct=False,
             minimum_z_height=None,
             speed=None,
@@ -146,6 +147,7 @@ def test_pick_up_from_exact_labware_location(
     decoy.verify(
         mock_instrument_implementation.move_to(
             location=expected_location,
+            well_core=mock_well._impl,
             force_direct=False,
             minimum_z_height=None,
             speed=None,
@@ -170,6 +172,7 @@ def test_pick_up_from_manipulated_location(
     decoy.verify(
         mock_instrument_implementation.move_to(
             location=move_to_location,
+            well_core=mock_well._impl,
             force_direct=False,
             minimum_z_height=None,
             speed=None,
@@ -200,6 +203,7 @@ def test_pick_up_from_well(
     decoy.verify(
         mock_instrument_implementation.move_to(
             location=expected_location,
+            well_core=mock_well._impl,
             force_direct=False,
             minimum_z_height=None,
             speed=None,
@@ -233,6 +237,7 @@ def test_pick_up_from_no_location(
     decoy.verify(
         mock_instrument_implementation.move_to(
             location=expected_location,
+            well_core=mock_well._impl,
             force_direct=False,
             minimum_z_height=None,
             speed=None,
