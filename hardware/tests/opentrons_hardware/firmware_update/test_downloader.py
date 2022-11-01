@@ -17,6 +17,7 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     FirmwareUpdateComplete,
     FirmwareUpdateDataAcknowledge,
     FirmwareUpdateCompleteAcknowledge,
+    SingletonMessageIndexGenerator,
 )
 from opentrons_hardware.firmware_bindings.messages import payloads
 from opentrons_hardware.firmware_bindings.messages.fields import ErrorCodeField
@@ -71,12 +72,14 @@ async def test_messaging(
     def responder(node_id: NodeId, message: MessageDefinition) -> None:
         """Message responder."""
         if isinstance(message, FirmwareUpdateData):
-            can_message_notifier.notify(
-                FirmwareUpdateDataAcknowledge(
-                    payload=payloads.FirmwareUpdateDataAcknowledge(
+            pld = payloads.FirmwareUpdateDataAcknowledge(
                         address=message.payload.address,
                         error_code=ErrorCodeField(ErrorCode.ok),
                     )
+            pld.message_index = message.payload.message_index
+            can_message_notifier.notify(
+                FirmwareUpdateDataAcknowledge(
+                    payload=pld
                 ),
                 ArbitrationId(
                     parts=ArbitrationIdParts(
@@ -88,11 +91,13 @@ async def test_messaging(
                 ),
             )
         elif isinstance(message, FirmwareUpdateComplete):
-            can_message_notifier.notify(
-                FirmwareUpdateCompleteAcknowledge(
-                    payload=payloads.FirmwareUpdateAcknowledge(
+            pld = payloads.FirmwareUpdateAcknowledge(
                         error_code=ErrorCodeField(ErrorCode.ok)
                     )
+            pld.message_index = message.payload.message_index
+            can_message_notifier.notify(
+                FirmwareUpdateCompleteAcknowledge(
+                    payload=pld
                 ),
                 ArbitrationId(
                     parts=ArbitrationIdParts(
@@ -109,18 +114,25 @@ async def test_messaging(
     mock_hex_processor.process.return_value = iter(chunks)
 
     await subject.run(NodeId.gantry_y_bootloader, mock_hex_processor, 10)
-
+    
+    # When the downloader runs it creates unique message indecies for each
+    # message, this is a little hack to get the next index it would use 
+    # so we can caluclate what indecies it gave the messages.
+    index_generator = SingletonMessageIndexGenerator()
+    msg_index = index_generator.get_next_index() - (len(chunks) + 1)
+    
     mock_messenger.send.assert_has_calls(
         [
             call(
                 node_id=NodeId.gantry_y_bootloader,
                 message=FirmwareUpdateData(
                     payload=payloads.FirmwareUpdateData.create(
-                        address=chunk.address, data=bytes(chunk.data)
+                        address=chunk.address, data=bytes(chunk.data),
+                        message_index = msg_index+i,
                     )
                 ),
             )
-            for chunk in chunks
+            for i, chunk in enumerate(chunks)
         ]
         + [
             call(

@@ -3,6 +3,7 @@
 #  dataclass fields interpretation.
 #  from __future__ import annotations
 from dataclasses import dataclass, field
+from . import message_definitions
 
 from .fields import (
     FirmwareShortSHADataField,
@@ -262,8 +263,13 @@ class FirmwareUpdateData(FirmwareUpdateWithAddress):
             )
 
     @classmethod
-    def create(cls, address: int, data: bytes) -> "FirmwareUpdateData":
+    def create(cls, address: int, data: bytes, message_index: int = None) -> "FirmwareUpdateData":
         """Create a firmware update data payload."""
+        # this is a special case, we normally instansiate message_index
+        # when building a message, not a payload, but we need to compute
+        # the checksum so we do it here. you should not normally supply
+        # message index to this function, but i've added it for the unit
+        # tests so the object can have a predictable checksum
         checksum = 0
         obj = FirmwareUpdateData(
             address=utils.UInt32Field(address),
@@ -272,6 +278,11 @@ class FirmwareUpdateData(FirmwareUpdateWithAddress):
             data=FirmwareUpdateDataField(data),
             checksum=utils.UInt16Field(checksum),
         )
+        if (message_index == None):
+            index_generator = message_definitions.SingletonMessageIndexGenerator()
+            obj.message_index=utils.UInt32Field(index_generator.get_next_index())
+        else:
+            obj.message_index=utils.UInt32Field(message_index)
         checksum = (1 + ~sum(obj.serialize())) & 0xFFFF
         obj.checksum.value = checksum
         return obj
