@@ -171,9 +171,7 @@ ssh -i $(2) $(3) root@$(1) \
 "cd /opt/opentrons-robot-server &&\
 tar -xvf ot3-firmware.tar.gz &&\
 ls ./ot3-firmware &&\
-python3 -m opentrons_hardware.scripts.update_fw --file ./ot3-firmware/gantry-x-rev1.hex --target gantry-x --less-logs &&\
-python3 -m opentrons_hardware.scripts.update_fw --file ./ot3-firmware/gantry-y-rev1.hex --target gantry-y --less-logs &&\
-python3 -m opentrons_hardware.scripts.update_fw --file ./ot3-firmware/head-proto.hex --target head --less-logs &&\
+python3 -m hardware_testing.scripts.update_fw_ot3 --folder /opt/opentrons-robot-server/ot3-firmware &&\
 ls ./ot3-firmware"
 endef
 

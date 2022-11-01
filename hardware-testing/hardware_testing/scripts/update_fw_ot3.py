@@ -9,10 +9,7 @@ from typing import Optional, List, Tuple
 from hardware_testing.opentrons_api import helpers_ot3
 
 
-CMD = (
-    "cd /opt/opentrons-robot-server && "
-    "python3 -m opentrons_hardware.scripts.update_fw --file {path} --target {target}"
-)
+CMD = "python3 -m opentrons_hardware.scripts.update_fw --file {path} --target {target} --less-logs"
 
 
 @dataclass
@@ -26,7 +23,7 @@ class HexPathAndTarget:
 
 FW_GANTRY_X = HexPathAndTarget(name="gantry-x-rev1.hex", path=None, target="gantry-x")
 FW_GANTRY_Y = HexPathAndTarget(name="gantry-y-rev1.hex", path=None, target="gantry-y")
-FW_HEAD = HexPathAndTarget(name="head-rev1.hex", path=None, target="head")
+FW_HEAD = HexPathAndTarget(name="head-proto.hex", path=None, target="head")
 FW_PIP_SINGLE = HexPathAndTarget(
     name="pipettes-single-rev1.hex", path=None, target="pipette-{mount}"
 )
