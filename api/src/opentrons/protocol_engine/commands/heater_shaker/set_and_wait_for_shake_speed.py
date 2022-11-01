@@ -20,8 +20,6 @@ class SetAndWaitForShakeSpeedParams(BaseModel):
     """Input parameters to set and wait for a shake speed for a Heater-Shaker Module."""
 
     moduleId: str = Field(..., description="Unique ID of the Heater-Shaker Module.")
-    # TODO(mc, 2022-02-24): for set temperature we use `temperature` (not `celsius`)
-    # but for shake we use `rpm` (not `speed`). This is inconsistent
     rpm: float = Field(..., description="Target speed in rotations per minute.")
 
 
@@ -111,7 +109,9 @@ class SetAndWaitForShakeSpeed(
 class SetAndWaitForShakeSpeedCreate(BaseCommandCreate[SetAndWaitForShakeSpeedParams]):
     """A request to create a Heater-Shaker's set and wait for shake speed command."""
 
-    commandType: SetAndWaitForShakeSpeedCommandType
+    commandType: SetAndWaitForShakeSpeedCommandType = (
+        "heaterShaker/setAndWaitForShakeSpeed"
+    )
     params: SetAndWaitForShakeSpeedParams
 
     _CommandCls: Type[SetAndWaitForShakeSpeed] = SetAndWaitForShakeSpeed

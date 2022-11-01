@@ -7,6 +7,7 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from opentrons.types import Mount, MountType, Location, DeckSlotName
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
+from opentrons.hardware_control.modules import AbstractModule
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     ModuleType,
@@ -21,6 +22,7 @@ from opentrons.protocol_engine import (
     DeckSlotLocation,
     ModuleLocation,
     ModuleModel as EngineModuleModel,
+    LabwareMovementStrategy,
 )
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 
@@ -100,7 +102,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def is_simulating(self) -> bool:
         """Get whether the protocol is being analyzed or actually run."""
-        raise NotImplementedError("ProtocolCore.is_simulating not implemented")
+        return self._sync_hardware.is_simulator  # type: ignore[no-any-return]
 
     def add_labware_definition(
         self,
@@ -139,6 +141,44 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             engine_client=self._engine_client,
         )
 
+    def move_labware(
+        self,
+        labware_core: LabwareCore,
+        new_location: Union[DeckSlotName, ModuleCore],
+        use_gripper: bool,
+    ) -> None:
+        """Move the given labware to a new location."""
+        to_location: Union[ModuleLocation, DeckSlotLocation]
+        if isinstance(new_location, ModuleCore):
+            to_location = ModuleLocation(moduleId=new_location.module_id)
+        else:
+            to_location = DeckSlotLocation(slotName=new_location)
+
+        strategy = (
+            LabwareMovementStrategy.USING_GRIPPER
+            if use_gripper
+            else LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE
+        )
+
+        self._engine_client.move_labware(
+            labware_id=labware_core.labware_id,
+            new_location=to_location,
+            strategy=strategy,
+        )
+
+    def _resolve_module_hardware(
+        self, serial_number: str, model: ModuleModel
+    ) -> AbstractModule:
+        """Resolve a module serial number to module hardware API."""
+        if self.is_simulating():
+            return self._sync_hardware.create_simulating_module(model)  # type: ignore[no-any-return]
+
+        for module_hardware in self._sync_hardware.attached_modules:
+            if serial_number == module_hardware.device_info["serial"]:
+                return module_hardware  # type: ignore[no-any-return]
+
+        raise RuntimeError(f"Could not find specified module: {model.value}")
+
     def load_module(
         self,
         model: ModuleModel,
@@ -160,12 +200,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         )
         module_type = result.model.as_type()
 
-        for module_hardware in self._sync_hardware.attached_modules:
-            if result.serialNumber == module_hardware.device_info["serial"]:
-                selected_hardware = module_hardware
-                break
-        else:
-            raise RuntimeError(f"Could not find specified module: {model.value}")
+        selected_hardware = self._resolve_module_hardware(result.serialNumber, model)
 
         # TODO(mc, 2022-10-25): move to module core factory function
         module_core_cls: Type[ModuleCore] = ModuleCore

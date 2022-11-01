@@ -234,7 +234,6 @@ async def robot_model(
     decoy.when(config.feature_flags.enable_ot3_hardware_controller()).then_return(
         which_machine == "OT-3 Standard"
     )
-
     yield which_machine
 
 

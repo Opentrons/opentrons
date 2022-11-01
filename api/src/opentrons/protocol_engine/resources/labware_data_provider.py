@@ -5,12 +5,15 @@ abstract away rough edges until we can improve those underlying interfaces.
 """
 import logging
 from anyio import to_thread
-from typing import Optional, cast
+from typing import Optional
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocols.labware import get_labware_definition
-from opentrons.calibration_storage.get import load_tip_length_calibration
+
+# TODO (lc 09-26-2022) We should conditionally import ot2 or ot3 calibration
+from opentrons.hardware_control.instruments.ot2 import (
+    instrument_calibration as instr_cal,
+)
 from opentrons.calibration_storage.types import TipLengthCalNotFound
 
 
@@ -68,12 +71,8 @@ class LabwareDataProvider:
         labware_definition: LabwareDefinition,
     ) -> Optional[float]:
         try:
-            return load_tip_length_calibration(
-                pip_id=pipette_serial,
-                definition=cast(
-                    LabwareDefDict,
-                    labware_definition.dict(exclude_none=True),
-                ),
+            return instr_cal.load_tip_length_for_pipette(
+                pipette_serial, labware_definition
             ).tip_length
 
         except TipLengthCalNotFound as e:

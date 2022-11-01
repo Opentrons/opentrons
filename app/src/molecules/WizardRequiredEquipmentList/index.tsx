@@ -18,9 +18,10 @@ import { Divider } from '../../atoms/structure'
 import { labwareImages } from '../../organisms/CalibrationPanels/labwareImages'
 import { equipmentImages } from './equipmentImages'
 
-interface WizardRequiredEquipmentListProps {
+import type { StyleProps } from '@opentrons/components'
+interface WizardRequiredEquipmentListProps extends StyleProps {
   equipmentList: Array<React.ComponentProps<typeof RequiredEquipmentCard>>
-  footer: string
+  footer?: string
 }
 export function WizardRequiredEquipmentList(
   props: WizardRequiredEquipmentListProps
@@ -29,7 +30,10 @@ export function WizardRequiredEquipmentList(
   const { equipmentList, footer } = props
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      width={props.width ?? SPACING.spacingAuto}
+    >
       <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {t('you_will_need')}
       </StyledText>
@@ -40,13 +44,15 @@ export function WizardRequiredEquipmentList(
           {...requiredEquipmentProps}
         />
       ))}
-      <StyledText
-        marginTop={SPACING.spacing3}
-        as="label"
-        color={COLORS.darkGreyEnabled}
-      >
-        {footer}
-      </StyledText>
+      {footer != null ? (
+        <StyledText
+          marginTop={SPACING.spacing3}
+          as="label"
+          color={COLORS.darkGreyEnabled}
+        >
+          {footer}
+        </StyledText>
+      ) : null}
     </Flex>
   )
 }
@@ -70,9 +76,9 @@ function RequiredEquipmentCard(props: RequiredEquipmentCardProps): JSX.Element {
   return (
     <>
       <Flex
-        width="100%"
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
+        width="100%"
       >
         <Flex
           height="6rem"
@@ -85,10 +91,11 @@ function RequiredEquipmentCard(props: RequiredEquipmentCardProps): JSX.Element {
             css={css`
               max-width: 100%;
               max-height: 100%;
-              flex: 0 1 5rem;
+              flex: ${loadName in equipmentImages ? `0` : `0 1 5rem`};
               display: block;
             `}
             src={imageSrc}
+            alt={displayName}
           />
         </Flex>
         <Flex
