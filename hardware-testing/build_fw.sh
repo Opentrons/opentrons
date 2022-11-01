@@ -1,7 +1,8 @@
 #!/bin/sh
 
 GIT_HASH=$(git rev-parse --short=8 HEAD)
-TEMP_DIR_NAME="./ot3-firmware-$GIT_HASH"
+TEMP_DIR_NAME="./ot3-firmware"
+TAR_NAME="$TEMP_DIR_NAME"
 
 REPO_DIR=$1
 echo "Copying images from repository at $REPO_DIR"
@@ -35,6 +36,6 @@ cp "$FW_PATH_PIPETTES_SINGLE" "$TEMP_DIR_NAME/pipettes-single-rev1.hex"
 cp "$FW_PATH_PIPETTES_MULTI" "$TEMP_DIR_NAME/pipettes-multi-rev1.hex"
 
 # compress folder, then delete
-tar -czvf "$TEMP_DIR_NAME.tar.gz" "$TEMP_DIR_NAME"
+tar -cf "$TAR_NAME.tar.gz" "$TEMP_DIR_NAME"
 rm -rf "$TEMP_DIR_NAME"
 echo done.
