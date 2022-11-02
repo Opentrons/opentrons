@@ -52,9 +52,9 @@ def test_get_load_params(decoy: Decoy, mock_engine_client: EngineClient) -> None
     ).then_return(labware_definition)
 
     subject = LabwareCore(labware_id="cool-labware", engine_client=mock_engine_client)
-    result = subject.get_load_params()
 
-    assert result == LabwareLoadParams("hello", "world", 42)
+    assert subject.get_load_params() == LabwareLoadParams("hello", "world", 42)
+    assert subject.load_name == "world"
 
 
 def test_set_calibration(mock_engine_client: EngineClient) -> None:

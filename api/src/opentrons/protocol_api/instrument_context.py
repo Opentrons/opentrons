@@ -751,7 +751,6 @@ class InstrumentContext(publisher.CommandPublisher):
             broker=self.broker,
             command=cmds.pick_up_tip(instrument=self, location=target_well),
         ):
-            # self.move_to(move_to_location, publish=False)
             self._implementation.pick_up_tip(
                 location=move_to_location,
                 well_core=target_well._impl,

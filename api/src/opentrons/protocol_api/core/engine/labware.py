@@ -52,7 +52,7 @@ class LabwareCore(AbstractLabware[WellCore]):
 
     @property
     def load_name(self) -> str:
-        raise NotImplementedError("LabwareCore.load_name not implemented")
+        return self._definition.parameters.loadName
 
     def get_uri(self) -> str:
         """Get the URI string string of the labware's definition.
