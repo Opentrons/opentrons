@@ -36,6 +36,7 @@ describe('AttachStem', () => {
       flowType: FLOWS.CALIBRATE,
       setIsBetweenCommands: jest.fn(),
       isRobotMoving: false,
+      isExiting: false,
     }
   })
   it('returns the correct information, buttons work as expected', async () => {
@@ -47,10 +48,6 @@ describe('AttachStem', () => {
     fireEvent.click(proceedBtn)
     expect(props.setIsBetweenCommands).toHaveBeenCalled()
     expect(props.chainRunCommands).toHaveBeenCalledWith([
-      {
-        commandType: 'calibration/moveToLocation',
-        params: { pipetteId: 'abc', location: 'probePosition' },
-      },
       {
         commandType: 'calibration/calibratePipette',
         params: { mount: 'left' },

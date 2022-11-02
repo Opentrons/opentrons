@@ -158,10 +158,6 @@ describe('PipetteWizardFlows', () => {
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith([
         {
-          commandType: 'calibration/moveToLocation',
-          params: { pipetteId: 'abc', location: 'probePosition' },
-        },
-        {
           commandType: 'calibration/calibratePipette',
           params: { mount: 'left' },
         },
