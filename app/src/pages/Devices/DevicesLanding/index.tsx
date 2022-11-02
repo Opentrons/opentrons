@@ -82,6 +82,7 @@ export function DevicesLanding(): JSX.Element {
       {!noRobots ? (
         <>
           <CollapsibleSection
+            gridGap={SPACING.spacing2}
             marginY={SPACING.spacing3}
             title={t('available', {
               count: [...healthyReachableRobots, ...unhealthyReachableRobots]
@@ -101,8 +102,9 @@ export function DevicesLanding(): JSX.Element {
           </CollapsibleSection>
           <Divider />
           <CollapsibleSection
-            marginY={SPACING.spacing3}
-            title={t('unavailable', {
+            gridGap={SPACING.spacing2}
+            marginY={SPACING.spacing4}
+            title={t('not_available', {
               count: [...recentlySeenRobots, ...unreachableRobots].length,
             })}
             isExpandedInitially={healthyReachableRobots.length === 0}

@@ -410,6 +410,24 @@ def test_magnetic_module_engage(
     assert result == response
 
 
+def test_magnetic_module_disengage(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a Magnetic Module disengage command."""
+    request = commands.magnetic_module.DisengageCreate(
+        params=commands.magnetic_module.DisengageParams(moduleId="module-id")
+    )
+    response = commands.magnetic_module.DisengageResult()
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.magnetic_module_disengage(module_id="module-id")
+
+    assert result == response
+
+
 def test_thermocycler_set_target_lid_temperature(
     decoy: Decoy,
     transport: AbstractSyncTransport,

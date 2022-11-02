@@ -11,7 +11,7 @@ import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../../organisms/RunTimeControl/hooks'
 import { useProtocolDetailsForRun } from '../hooks'
 
-import { RobotStatusBanner } from '../RobotStatusBanner'
+import { RobotStatusHeader } from '../RobotStatusHeader'
 
 import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 
@@ -37,18 +37,18 @@ const PROTOCOL_DETAILS = {
   protocolKey: 'fakeProtocolKey',
 }
 
-const render = (props: React.ComponentProps<typeof RobotStatusBanner>) => {
+const render = (props: React.ComponentProps<typeof RobotStatusHeader>) => {
   return renderWithProviders(
     <MemoryRouter>
-      <RobotStatusBanner {...props} />
+      <RobotStatusHeader {...props} />
     </MemoryRouter>,
     {
       i18nInstance: i18n,
     }
   )
 }
-describe('RobotStatusBanner', () => {
-  let props: React.ComponentProps<typeof RobotStatusBanner>
+describe('RobotStatusHeader', () => {
+  let props: React.ComponentProps<typeof RobotStatusHeader>
 
   beforeEach(() => {
     props = {

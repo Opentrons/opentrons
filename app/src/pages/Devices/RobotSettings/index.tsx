@@ -108,7 +108,11 @@ export function RobotSettings(): JSX.Element | null {
           >
             {t('robot_settings')}
           </Box>
-          {robot != null && <ReachableBanner robot={robot} />}
+          {robot != null && (
+            <Box marginBottom={SPACING.spacing4}>
+              <ReachableBanner robot={robot} />
+            </Box>
+          )}
           {showRobotBusyBanner && (
             <Banner type="warning" marginBottom={SPACING.spacing4}>
               <StyledText as="p">

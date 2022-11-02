@@ -82,6 +82,7 @@ def test_load_instrument(
     mock_tip_racks = [decoy.mock(cls=Labware), decoy.mock(cls=Labware)]
 
     decoy.when(mock_validation.ensure_mount("shadowfax")).then_return(Mount.LEFT)
+    decoy.when(mock_validation.ensure_lowercase_name("Gandalf")).then_return("gandalf")
     decoy.when(mock_validation.ensure_pipette_name("gandalf")).then_return(
         PipetteNameType.P300_SINGLE
     )
@@ -96,7 +97,7 @@ def test_load_instrument(
     decoy.when(mock_instrument_core.get_pipette_name()).then_return("Gandalf the Grey")
 
     result = subject.load_instrument(
-        instrument_name="gandalf", mount="shadowfax", tip_racks=mock_tip_racks
+        instrument_name="Gandalf", mount="shadowfax", tip_racks=mock_tip_racks
     )
 
     assert isinstance(result, InstrumentContext)
@@ -124,6 +125,7 @@ def test_load_instrument_replace(
     """It should allow/disallow pipette replacement."""
     mock_instrument_core = decoy.mock(cls=InstrumentCore)
 
+    decoy.when(mock_validation.ensure_lowercase_name("ada")).then_return("ada")
     decoy.when(mock_validation.ensure_mount(matchers.IsA(Mount))).then_return(
         Mount.RIGHT
     )
@@ -158,11 +160,14 @@ def test_load_labware(
     """It should create a labware using its execution core."""
     mock_labware_core = decoy.mock(cls=LabwareCore)
 
+    decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_LABWARE")).then_return(
+        "lowercase_labware"
+    )
     decoy.when(mock_validation.ensure_deck_slot(42)).then_return(DeckSlotName.SLOT_5)
 
     decoy.when(
         mock_core.load_labware(
-            load_name="some_labware",
+            load_name="lowercase_labware",
             location=DeckSlotName.SLOT_5,
             label="some_display_name",
             namespace="some_namespace",
@@ -173,7 +178,7 @@ def test_load_labware(
     decoy.when(mock_labware_core.get_name()).then_return("Full Name")
 
     result = subject.load_labware(
-        load_name="some_labware",
+        load_name="UPPERCASE_LABWARE",
         location=42,
         label="some_display_name",
         namespace="some_namespace",
@@ -195,6 +200,7 @@ def test_load_labware_from_definition(
     labware_definition_dict = cast(LabwareDefDict, {"labwareDef": True})
     labware_load_params = LabwareLoadParams("you", "are", 1337)
 
+    decoy.when(mock_validation.ensure_lowercase_name("are")).then_return("are")
     decoy.when(mock_validation.ensure_deck_slot(42)).then_return(DeckSlotName.SLOT_1)
     decoy.when(mock_core.add_labware_definition(labware_definition_dict)).then_return(
         labware_load_params
