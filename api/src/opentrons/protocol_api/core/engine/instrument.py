@@ -60,13 +60,42 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
     def pick_up_tip(
         self,
-        well: WellCore,
-        tip_length: float,
+        location: Location,
+        well_core: WellCore,
         presses: Optional[int],
         increment: Optional[float],
-        prep_after: bool,
+        prep_after: bool = True,
     ) -> None:
-        raise NotImplementedError("InstrumentCore.pick_up_tip not implemented")
+        """Move to and pick up a tip from a given well.
+
+        Args:
+            location: The location of the well we're picking up from.
+                Used to calculate the relative well offset for the pick up command.
+            well_core: The "well" to pick up from.
+            presses: Customize the number of presses the pipette does.
+            increment: Customize the movement "distance" of the pipette to press harder.
+            prep_after: Not used by this core, pipette preparation will always happen.
+        """
+        if presses is not None or increment is not None:
+            raise NotImplementedError(
+                "InstrumentCore.pick_up_tip with custom presses or increment not implemented"
+            )
+
+        well_name = well_core.get_name()
+        labware_id = well_core.labware_id
+
+        well_location = self._engine_client.state.geometry.get_relative_well_location(
+            labware_id=labware_id,
+            well_name=well_name,
+            absolute_point=location.point,
+        )
+
+        self._engine_client.pick_up_tip(
+            pipette_id=self._pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
+            well_location=well_location,
+        )
 
     def drop_tip(self, home_after: bool) -> None:
         raise NotImplementedError("InstrumentCore.drop_tip not implemented")

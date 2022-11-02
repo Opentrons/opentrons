@@ -472,6 +472,7 @@ class LabwareView(HasState[LabwareState]):
                 and candidate.location == location
             ):
                 return candidate
+
         return None
 
     def get_fixed_trash_id(self) -> str:

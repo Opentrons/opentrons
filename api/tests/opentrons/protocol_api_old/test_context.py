@@ -21,6 +21,7 @@ from opentrons.hardware_control.instruments import Pipette
 from opentrons.hardware_control.types import Axis
 from opentrons.protocols.advanced_control import transfers as tf
 from opentrons.config.pipette_config import config_names
+from opentrons.protocols.api_support import instrument as instrument_support
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.calibration_storage import types as cs_types
 from opentrons.util.helpers import utc_now
@@ -1006,15 +1007,6 @@ def test_order_of_module_load():
     assert id(async_temp2) == id(hw_temp2)
 
 
-def test_tip_length_for(ctx, monkeypatch):
-    instr = ctx.load_instrument("p20_single_gen2", "left")
-    tiprack = ctx.load_labware("geb_96_tiprack_10ul", "1")
-    assert instr._tip_length_for(tiprack) == (
-        tiprack._implementation.get_definition()["parameters"]["tipLength"]
-        - instr.hw_pipette["tip_overlap"]["opentrons/geb_96_tiprack_10ul/1"]
-    )
-
-
 @pytest.mark.ot2_only
 def test_tip_length_for_caldata(ctx, decoy, monkeypatch):
     # TODO (lc 10-27-2022) We need to investigate why the pipette id is
@@ -1025,11 +1017,13 @@ def test_tip_length_for_caldata(ctx, decoy, monkeypatch):
     from opentrons.calibration_storage import types as CSTypes
 
     instr = ctx.load_instrument("p20_single_gen2", "left")
-    tiprack = ctx.load_labware("geb_96_tiprack_10ul", "1")
+    tip_rack = ctx.load_labware("geb_96_tiprack_10ul", "1")
 
     mock_load_tip_length = decoy.mock(func=instr_cal.load_tip_length_for_pipette)
+    monkeypatch.setattr(instr_cal, "load_tip_length_for_pipette", mock_load_tip_length)
+
     decoy.when(
-        mock_load_tip_length(None, tiprack._implementation.get_definition())
+        mock_load_tip_length(None, tip_rack._implementation.get_definition())
     ).then_return(
         instr_cal.TipLengthCalibration(
             tip_length=2,
@@ -1041,8 +1035,26 @@ def test_tip_length_for_caldata(ctx, decoy, monkeypatch):
             pipette=None,  # type: ignore[arg-type]
         )
     )
-    monkeypatch.setattr(instr_cal, "load_tip_length_for_pipette", mock_load_tip_length)
-    assert instr._tip_length_for(tiprack) == 2
+
+    assert (
+        instrument_support.tip_length_for(
+            pipette=instr.hw_pipette,
+            tip_rack_definition=tip_rack._implementation.get_definition(),
+        )
+        == 2
+    )
+
+    decoy.when(
+        mock_load_tip_length(None, tip_rack._implementation.get_definition())
+    ).then_raise(cs_types.TipLengthCalNotFound("oh no"))
+
+    assert instrument_support.tip_length_for(
+        pipette=instr.hw_pipette,
+        tip_rack_definition=tip_rack._implementation.get_definition(),
+    ) == (
+        tip_rack._implementation.get_definition()["parameters"]["tipLength"]
+        - instr.hw_pipette["tip_overlap"]["opentrons/geb_96_tiprack_10ul/1"]
+    )
 
 
 def test_bundled_labware(get_labware_fixture, hardware):

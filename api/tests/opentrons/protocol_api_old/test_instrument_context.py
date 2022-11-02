@@ -114,12 +114,12 @@ def test_pick_up_from_exact_well_location(
     subject.pick_up_tip(location=input_location)
 
     decoy.verify(
-        mock_instrument_implementation.move_to(
+        mock_instrument_implementation.pick_up_tip(
             location=expected_location,
             well_core=mock_well._impl,
-            force_direct=False,
-            minimum_z_height=None,
-            speed=None,
+            presses=None,
+            increment=None,
+            prep_after=False,
         ),
         times=1,
     )
@@ -145,12 +145,12 @@ def test_pick_up_from_exact_labware_location(
     subject.pick_up_tip(location=input_location)
 
     decoy.verify(
-        mock_instrument_implementation.move_to(
+        mock_instrument_implementation.pick_up_tip(
             location=expected_location,
             well_core=mock_well._impl,
-            force_direct=False,
-            minimum_z_height=None,
-            speed=None,
+            presses=None,
+            increment=None,
+            prep_after=False,
         ),
         times=1,
     )
@@ -170,12 +170,12 @@ def test_pick_up_from_manipulated_location(
     subject.pick_up_tip(location=move_to_location)
 
     decoy.verify(
-        mock_instrument_implementation.move_to(
+        mock_instrument_implementation.pick_up_tip(
             location=move_to_location,
             well_core=mock_well._impl,
-            force_direct=False,
-            minimum_z_height=None,
-            speed=None,
+            presses=None,
+            increment=None,
+            prep_after=False,
         ),
         times=1,
     )
@@ -201,12 +201,12 @@ def test_pick_up_from_well(
     subject.pick_up_tip(location=mock_well)
 
     decoy.verify(
-        mock_instrument_implementation.move_to(
+        mock_instrument_implementation.pick_up_tip(
             location=expected_location,
             well_core=mock_well._impl,
-            force_direct=False,
-            minimum_z_height=None,
-            speed=None,
+            presses=None,
+            increment=None,
+            prep_after=False,
         ),
         times=1,
     )
@@ -235,12 +235,12 @@ def test_pick_up_from_no_location(
     subject.pick_up_tip(location=None)
 
     decoy.verify(
-        mock_instrument_implementation.move_to(
+        mock_instrument_implementation.pick_up_tip(
             location=expected_location,
             well_core=mock_well._impl,
-            force_direct=False,
-            minimum_z_height=None,
-            speed=None,
+            presses=None,
+            increment=None,
+            prep_after=False,
         ),
         times=1,
     )

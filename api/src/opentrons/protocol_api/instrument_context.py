@@ -751,17 +751,15 @@ class InstrumentContext(publisher.CommandPublisher):
             broker=self.broker,
             command=cmds.pick_up_tip(instrument=self, location=target_well),
         ):
-            self.move_to(move_to_location, publish=False)
             self._implementation.pick_up_tip(
-                well=target_well._impl,
-                tip_length=self._tip_length_for(tiprack),
+                location=move_to_location,
+                well_core=target_well._impl,
                 presses=presses,
                 increment=increment,
                 prep_after=prep_after,
             )
             # Note that the hardware API pick_up_tip action includes homing z after
 
-        tiprack.use_tips(target_well, self.channels)
         self._last_tip_picked_up_from = target_well
 
         return self
@@ -1472,7 +1470,3 @@ class InstrumentContext(publisher.CommandPublisher):
 
     def __str__(self) -> str:
         return "{} on {} mount".format(self.hw_pipette["display_name"], self.mount)
-
-    def _tip_length_for(self, tiprack: labware.Labware) -> float:
-        """Get the tip length, including overlap, for a tip from this rack"""
-        return instrument.tip_length_for(self.hw_pipette, tiprack)

@@ -104,6 +104,22 @@ def labware(minimal_labware_def: LabwareDefinition) -> LabwareImplementation:
 
 
 @pytest.fixture
+def tip_rack(minimal_labware_def: LabwareDefinition) -> LabwareImplementation:
+    tip_rack_definition = minimal_labware_def.copy()
+    tip_rack_parameters = minimal_labware_def["parameters"].copy()
+
+    tip_rack_parameters["isTiprack"] = True
+    tip_rack_parameters["tipLength"] = 123
+    tip_rack_definition["parameters"] = tip_rack_parameters
+
+    """Labware fixture."""
+    return LabwareImplementation(
+        definition=tip_rack_definition,
+        parent=types.Location(types.Point(0, 0, 0), "1"),
+    )
+
+
+@pytest.fixture
 def second_labware(minimal_labware_def: LabwareDefinition) -> LabwareImplementation:
     """Labware fixture."""
     return LabwareImplementation(
