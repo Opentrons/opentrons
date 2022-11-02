@@ -158,3 +158,37 @@ def test_move_to_coordinates(
         ),
         times=1,
     )
+
+
+def test_aspirate(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: InstrumentCore,
+) -> None:
+    """It should aspirate from a well."""
+    location = Location(point=Point(1, 2, 3), labware=None)
+
+    well_core = WellCore(
+        name="my cool well", labware_id="123abc", engine_client=mock_engine_client
+    )
+
+    decoy.when(
+        mock_engine_client.state.geometry.get_relative_well_location(
+            labware_id="123abc", well_name="my cool well", absolute_point=Point(1, 2, 3)
+        )
+    ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)))
+
+    subject.aspirate(location=location, well_core=well_core, volume=12.34, rate=5.6)
+
+    decoy.verify(
+        mock_engine_client.aspirate(
+            pipette_id="abc123",
+            labware_id="123abc",
+            well_name="my cool well",
+            well_location=WellLocation(
+                origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
+            ),
+            volume=12.34,
+        ),
+        times=1,
+    )

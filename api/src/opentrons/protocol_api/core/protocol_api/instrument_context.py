@@ -62,7 +62,7 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
     def aspirate(
         self,
         location: types.Location,
-        well_core: WellImplementation,
+        well_core: Optional[WellImplementation],
         volume: float,
         rate: float,
     ) -> None:

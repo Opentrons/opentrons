@@ -118,7 +118,7 @@ class InstrumentContext(publisher.CommandPublisher):
     def default_speed(self, speed: float) -> None:
         self._implementation.set_default_speed(speed)
 
-    @requires_version(2, 0)  # noqa: C901
+    @requires_version(2, 0)
     def aspirate(
         self,
         volume: Optional[float] = None,
@@ -164,6 +164,7 @@ class InstrumentContext(publisher.CommandPublisher):
             )
         )
 
+        well: Optional[labware.Well]
         if isinstance(location, labware.Well):
             dest = location.bottom(z=self.well_bottom_clearance.aspirate)
             well = location

@@ -25,7 +25,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
     def aspirate(
         self,
         location: types.Location,
-        well_core: WellCoreType,
+        well_core: Optional[WellCoreType],
         volume: float,
         rate: float,
     ) -> None:
