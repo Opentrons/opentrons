@@ -176,11 +176,17 @@ python3 -m hardware_testing.scripts.update_fw_ot3 --folder /opt/opentrons-robot-
 ls ./ot3-firmware"
 endef
 
-.PHONY: sync-ot3
-sync-ot3:
+.PHONY: sync-sw-ot3
+sync-sw-ot3:
 	cd ../hardware && $(MAKE) push-no-restart-ot3 host=$(host)
 	cd ../api && $(MAKE) push-no-restart-ot3 host=$(host)
 	cd ../shared-data && $(MAKE) push-no-restart-ot3 host=$(host)
 	cd ../hardware-testing && $(MAKE) push-no-restart-ot3 host=$(host)
+
+.PHONY: sync-fw-ot3
+sync-fw-ot3:
 	scp ot3-firmware.tar.gz root@$(host):/opt/opentrons-robot-server
 	$(call extract-and-update-fw,$(host),$(br_ssh_key),$(ssh_opts))
+
+.PHONY: sync-ot3
+sync-ot3: sync-sw-ot3 sync-fw-ot3
