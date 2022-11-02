@@ -28,6 +28,12 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         self._pipette_id = pipette_id
         self._engine_client = engine_client
         self._sync_hardware_api = sync_hardware_api
+        self._well_bottom_clearances = Clearances(
+            default_aspirate=1.0, default_dispense=1.0
+        )
+        self._flow_rates = FlowRates(self)
+        # TODO this require an API version, and implementing set flow rate for aspirate/dispense/blow-out
+        # self._flow_rates.set_defaults(api_level=self._api_version)
 
     @property
     def pipette_id(self) -> str:
@@ -207,15 +213,13 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         raise NotImplementedError("InstrumentCore.get_return_height not implemented")
 
     def get_well_bottom_clearance(self) -> Clearances:
-        raise NotImplementedError(
-            "InstrumentCore.get_well_bottom_clearance not implemented"
-        )
+        return self._well_bottom_clearances
 
     def get_speed(self) -> PlungerSpeeds:
         raise NotImplementedError("InstrumentCore.get_speed not implemented")
 
     def get_flow_rate(self) -> FlowRates:
-        raise NotImplementedError("InstrumentCore.get_flow_rate not implemented")
+        return self._flow_rates
 
     def set_flow_rate(
         self,
