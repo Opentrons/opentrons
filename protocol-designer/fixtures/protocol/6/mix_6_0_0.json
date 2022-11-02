@@ -2181,7 +2181,11 @@
     {
       "key": "c67db43e-fafe-489e-9a26-19e89476e59d",
       "commandType": "loadPipette",
-      "params": { "pipetteId": "pipetteId", "mount": "left", "pipetteName": "p20_single_gen2" }
+      "params": {
+        "pipetteId": "pipetteId",
+        "mount": "left",
+        "pipetteName": "p20_single_gen2"
+      }
     },
     {
       "key": "10681bc0-87f4-465f-b5d4-906a13cefe56",
