@@ -61,6 +61,7 @@ export function getLabwareLocationCombos(
               location: modLocation,
               definitionUri: labwareEntity.definitionUri,
               labwareId: command.params.labwareId,
+              moduleId: command.params.newLocation.moduleId,
             })
       } else {
         return appendLocationComboIfUniq(acc, {
