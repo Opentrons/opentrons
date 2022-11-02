@@ -72,13 +72,13 @@ async def test_messaging(
     def responder(node_id: NodeId, message: MessageDefinition) -> None:
         """Message responder."""
         if isinstance(message, FirmwareUpdateData):
-            pld = payloads.FirmwareUpdateDataAcknowledge(
+            FwUpData_payload = payloads.FirmwareUpdateDataAcknowledge(
                 address=message.payload.address,
                 error_code=ErrorCodeField(ErrorCode.ok),
             )
-            pld.message_index = message.payload.message_index
+            FwUpData_payload.message_index = message.payload.message_index
             can_message_notifier.notify(
-                FirmwareUpdateDataAcknowledge(payload=pld),
+                FirmwareUpdateDataAcknowledge(payload=FwUpData_payload),
                 ArbitrationId(
                     parts=ArbitrationIdParts(
                         message_id=FirmwareUpdateDataAcknowledge.message_id,
@@ -89,12 +89,12 @@ async def test_messaging(
                 ),
             )
         elif isinstance(message, FirmwareUpdateComplete):
-            pld = payloads.FirmwareUpdateAcknowledge(
+            FwUpCom_payload = payloads.FirmwareUpdateAcknowledge(
                 error_code=ErrorCodeField(ErrorCode.ok)
             )
-            pld.message_index = message.payload.message_index
+            FwUpCom_payload.message_index = message.payload.message_index
             can_message_notifier.notify(
-                FirmwareUpdateCompleteAcknowledge(payload=pld),
+                FirmwareUpdateCompleteAcknowledge(payload=FwUpCom_payload),
                 ArbitrationId(
                     parts=ArbitrationIdParts(
                         message_id=FirmwareUpdateCompleteAcknowledge.message_id,

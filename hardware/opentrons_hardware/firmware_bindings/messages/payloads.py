@@ -46,7 +46,7 @@ class EmptyPayload(utils.BinarySerializable):
     # to work around this in binary_serializable.build() and can_comm.prompt_payload
     # we ignore the message_index when constructing args and then set the value manually after
     message_index: utils.UInt32Field = field(
-        init=False, default=utils.UInt32Field(None)
+        init=False, default=utils.UInt32Field(None)  # type: ignore[arg-type]
     )
 
 
@@ -266,7 +266,7 @@ class FirmwareUpdateData(FirmwareUpdateWithAddress):
 
     @classmethod
     def create(
-        cls, address: int, data: bytes, message_index: int = None
+        cls, address: int, data: bytes, message_index: int = None  # type: ignore[assignment]
     ) -> "FirmwareUpdateData":
         """Create a firmware update data payload."""
         # this is a special case, we normally instansiate message_index
@@ -282,7 +282,7 @@ class FirmwareUpdateData(FirmwareUpdateWithAddress):
             data=FirmwareUpdateDataField(data),
             checksum=utils.UInt16Field(checksum),
         )
-        if message_index == None:
+        if message_index is None:
             index_generator = message_definitions.SingletonMessageIndexGenerator()
             obj.message_index = utils.UInt32Field(index_generator.get_next_index())
         else:
