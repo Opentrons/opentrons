@@ -4127,7 +4127,9 @@
       "commandType": "loadPipette",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
-        "mount": "left"
+        "mount": "left",
+        "pipetteName": "p10_single"
+
       }
     },
     {
@@ -4135,7 +4137,8 @@
       "commandType": "loadPipette",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
-        "mount": "right"
+        "mount": "right",
+        "pipetteName": "p10_multi"
       }
     },
     {

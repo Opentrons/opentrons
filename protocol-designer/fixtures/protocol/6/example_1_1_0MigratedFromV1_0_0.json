@@ -3394,7 +3394,8 @@
       "commandType": "loadPipette",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "mount": "left"
+        "mount": "left",
+        "pipetteName": "p10_single"
       }
     },
     {
@@ -3402,7 +3403,8 @@
       "commandType": "loadPipette",
       "params": {
         "pipetteId": "c6f47740-92a5-11e9-ac62-1b173f839d9e",
-        "mount": "right"
+        "mount": "right",
+        "pipetteName": "p50_single"
       }
     },
     {
