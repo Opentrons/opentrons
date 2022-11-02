@@ -59,7 +59,13 @@ export function getPrepCommands(
             ...acc,
             {
               ...command,
-              params: { ...command.params, location: 'offDeck' },
+              params: {
+                ...command.params,
+                location: 'offDeck',
+                // python protocols won't have labwareId in the params, we want to
+                // use the same labwareIds that came back as the result of analysis
+                labwareId: command.result.labwareId,
+              },
             },
           ]
         }
