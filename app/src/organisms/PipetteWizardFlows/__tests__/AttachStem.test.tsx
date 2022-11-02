@@ -6,7 +6,6 @@ import { i18n } from '../../../i18n'
 import {
   mockAttachedPipette,
   mockP300PipetteSpecs,
-  mockGen3P1000PipetteSpecs,
 } from '../../../redux/pipettes/__fixtures__'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { FLOWS } from '../constants'
@@ -20,7 +19,7 @@ const render = (props: React.ComponentProps<typeof AttachStem>) => {
 }
 const mockPipette: AttachedPipette = {
   ...mockAttachedPipette,
-  modelSpecs: mockGen3P1000PipetteSpecs,
+  modelSpecs: mockP300PipetteSpecs,
 }
 describe('AttachStem', () => {
   let props: React.ComponentProps<typeof AttachStem>

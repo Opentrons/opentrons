@@ -163,13 +163,7 @@ export const PipetteWizardFlows = (
     isBetweenCommands,
   }
   const exitModal = (
-    <ExitModal
-      {...calibrateBaseProps}
-      goBack={cancelExit}
-      proceed={closeFlow}
-      flowType={flowType}
-      mount={mount}
-    />
+    <ExitModal goBack={cancelExit} proceed={closeFlow} flowType={flowType} />
   )
   let onExit
   if (currentStep == null) return null

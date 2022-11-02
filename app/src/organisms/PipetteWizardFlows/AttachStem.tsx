@@ -8,7 +8,9 @@ import attachProbe from '../../assets/images/change-pip/attach-stem.png'
 import pipetteCalibrating from '../../assets/images/change-pip/pipette-is-calibrating.png'
 import type { PipetteWizardStepProps } from './types'
 
-export const AttachStem = (props: PipetteWizardStepProps): JSX.Element => {
+export const AttachStem = (
+  props: PipetteWizardStepProps
+): JSX.Element | null => {
   const {
     proceed,
     attachedPipette,
@@ -18,12 +20,15 @@ export const AttachStem = (props: PipetteWizardStepProps): JSX.Element => {
     goBack,
     setIsBetweenCommands,
   } = props
+  const { t } = useTranslation('pipette_wizard_flows')
   const motorAxis = mount === 'left' ? 'leftZ' : 'rightZ'
-  const pipetteId = attachedPipette[mount].id
+  const pipetteId = attachedPipette[mount]?.id
+  if (pipetteId == null) return null
   const handleOnClick = (): void => {
     setIsBetweenCommands(true)
     chainRunCommands([
       {
+        // @ts-expect-error calibration type not yet supported
         commandType: 'calibration/moveToLocation' as const,
         params: {
           pipetteId: pipetteId,
@@ -31,6 +36,7 @@ export const AttachStem = (props: PipetteWizardStepProps): JSX.Element => {
         },
       },
       {
+        // @ts-expect-error calibration type not yet supported
         commandType: 'calibration/calibratePipette' as const,
         params: {
           mount: mount,
@@ -43,6 +49,7 @@ export const AttachStem = (props: PipetteWizardStepProps): JSX.Element => {
         },
       },
       {
+        // @ts-expect-error calibration type not yet supported
         commandType: 'calibration/moveToLocation' as const,
         params: {
           pipetteId: pipetteId,
@@ -55,7 +62,6 @@ export const AttachStem = (props: PipetteWizardStepProps): JSX.Element => {
     })
   }
 
-  const { t } = useTranslation('pipette_wizard_flows')
   const pipetteCalibratingImage = (
     <Flex marginTop="-5.2rem" height="10.2rem">
       <img src={pipetteCalibrating} alt="Pipette is calibrating" />

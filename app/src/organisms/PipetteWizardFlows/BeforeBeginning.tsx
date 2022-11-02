@@ -17,7 +17,9 @@ interface BeforeBeginningProps extends PipetteWizardStepProps {
   isCreateLoading: boolean
 }
 
-export const BeforeBeginning = (props: BeforeBeginningProps): JSX.Element => {
+export const BeforeBeginning = (
+  props: BeforeBeginningProps
+): JSX.Element | null => {
   const {
     proceed,
     flowType,
@@ -37,7 +39,7 @@ export const BeforeBeginning = (props: BeforeBeginningProps): JSX.Element => {
   }, [])
 
   const pipetteId = attachedPipette[mount]?.id
-
+  if (pipetteId == null) return null
   const handleOnClick = (): void => {
     setIsBetweenCommands(true)
     chainRunCommands([
@@ -55,6 +57,7 @@ export const BeforeBeginning = (props: BeforeBeginningProps): JSX.Element => {
         },
       },
       {
+        // @ts-expect-error calibration type not yet supported
         commandType: 'calibration/moveToLocation' as const,
         params: {
           pipetteId: pipetteId,
