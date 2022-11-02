@@ -86,8 +86,9 @@ export interface ModuleLocation {
   slotName: string
 }
 interface LoadPipetteParams {
-  pipetteId: string
+  pipetteId?: string
   mount: 'left' | 'right'
+  pipetteName: PipetteName
 }
 interface LoadPipetteResult {
   pipetteId: string

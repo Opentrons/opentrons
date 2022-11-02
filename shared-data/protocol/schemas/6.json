@@ -1047,6 +1047,10 @@
                   "mount": {
                     "type": "string",
                     "description": "Unique identifier of physical destination location to load pipette into (e.g. 'left')"
+                  },
+                  "pipetteId": {
+                    "type": "string",
+                    "description": "Unique identifier of pipette to load"
                   }
                 }
               }
