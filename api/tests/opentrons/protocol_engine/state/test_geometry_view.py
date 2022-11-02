@@ -1,7 +1,7 @@
 """Test state getters for retrieving geometry views of state."""
 import pytest
 from decoy import Decoy
-from typing import cast
+from typing import cast, Union
 
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
@@ -19,6 +19,7 @@ from opentrons.protocol_engine.types import (
     WellOrigin,
     WellOffset,
     OFF_DECK_LOCATION,
+    Dimensions,
 )
 from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.modules import ModuleView
@@ -814,3 +815,78 @@ def test_get_ancestor_slot_name(
         DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
     )
     assert subject.get_ancestor_slot_name("labware-2") == DeckSlotName.SLOT_1
+
+
+def test_ensure_location_not_occupied_raises(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    subject: GeometryView,
+) -> None:
+    """It should raise error when labware is present in given location."""
+    slot_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_4)
+    # Shouldn't raise if neither labware nor module in location
+    assert subject.ensure_location_not_occupied(slot_location) == slot_location
+
+    # Raise if labware in location
+    decoy.when(labware_view.raise_if_labware_in_location(slot_location)).then_raise(
+        errors.LocationIsOccupiedError("Woops!")
+    )
+    with pytest.raises(errors.LocationIsOccupiedError):
+        subject.ensure_location_not_occupied(location=slot_location)
+
+    # Raise if module in location
+    module_location = ModuleLocation(moduleId="module-id")
+    decoy.when(labware_view.raise_if_labware_in_location(module_location)).then_return(
+        None
+    )
+    decoy.when(module_view.raise_if_module_in_location(module_location)).then_raise(
+        errors.LocationIsOccupiedError("Woops again!")
+    )
+    with pytest.raises(errors.LocationIsOccupiedError):
+        subject.ensure_location_not_occupied(location=module_location)
+
+    # Shouldn't raise for off-deck labware
+    assert (
+        subject.ensure_location_not_occupied(location=OFF_DECK_LOCATION)
+        == OFF_DECK_LOCATION
+    )
+
+
+@pytest.mark.parametrize(
+    argnames=["location", "expected_center_point"],
+    argvalues=[
+        (DeckSlotLocation(slotName=DeckSlotName.SLOT_1), Point(101.0, 102.0, 119.5)),
+        (ModuleLocation(moduleId="module-id"), Point(111.0, 122.0, 149.5)),
+    ],
+)
+def test_get_labware_center(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    subject: GeometryView,
+    location: Union[DeckSlotLocation, ModuleLocation],
+    expected_center_point: Point,
+) -> None:
+    """It should get the center point of the labware at the specified location."""
+    decoy.when(labware_view.get_dimensions(labware_id="labware-id")).then_return(
+        Dimensions(x=11, y=22, z=33)
+    )
+
+    if isinstance(location, ModuleLocation):
+        decoy.when(module_view.get_module_offset("module-id")).then_return(
+            LabwareOffsetVector(x=10, y=20, z=30)
+        )
+
+        decoy.when(module_view.get_location("module-id")).then_return(
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+        )
+
+    decoy.when(labware_view.get_slot_center_position(DeckSlotName.SLOT_1)).then_return(
+        Point(x=101, y=102, z=103)
+    )
+    labware_center = subject.get_labware_center(
+        labware_id="labware-id", location=location
+    )
+
+    assert labware_center == expected_center_point

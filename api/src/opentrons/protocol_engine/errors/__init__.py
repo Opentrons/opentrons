@@ -31,6 +31,7 @@ from .exceptions import (
     ThermocyclerNotOpenError,
     RobotDoorOpenError,
     PipetteMovementRestrictedByHeaterShakerError,
+    HeaterShakerLabwareLatchNotOpenError,
     EngageHeightOutOfRangeError,
     NoTargetTemperatureSetError,
     InvalidTargetSpeedError,
@@ -41,7 +42,8 @@ from .exceptions import (
     ProtocolCommandFailedError,
     GripperNotAttachedError,
     HardwareNotSupportedError,
-    UnsupportedLabwareMovementError,
+    LabwareMovementNotAllowedError,
+    LocationIsOccupiedError,
 )
 
 from .error_occurrence import ErrorOccurrence
@@ -78,6 +80,7 @@ __all__ = [
     "ThermocyclerNotOpenError",
     "RobotDoorOpenError",
     "PipetteMovementRestrictedByHeaterShakerError",
+    "HeaterShakerLabwareLatchNotOpenError",
     "EngageHeightOutOfRangeError",
     "NoTargetTemperatureSetError",
     "InvalidTargetTemperatureError",
@@ -88,7 +91,8 @@ __all__ = [
     "ProtocolCommandFailedError",
     "GripperNotAttachedError",
     "HardwareNotSupportedError",
-    "UnsupportedLabwareMovementError",
+    "LabwareMovementNotAllowedError",
+    "LocationIsOccupiedError",
     # error occurrence models
     "ErrorOccurrence",
 ]
