@@ -93,6 +93,7 @@ class QueueCommandAction:
     command_id: str
     created_at: datetime
     request: CommandCreate
+    request_hash: Optional[str]
 
 
 @dataclass(frozen=True)
