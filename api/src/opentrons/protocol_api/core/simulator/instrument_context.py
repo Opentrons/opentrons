@@ -59,6 +59,19 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
         volume: float,
         rate: float,
     ) -> None:
+        if self.get_current_volume() == 0:
+            # Make sure we're at the top of the labware and clear of any
+            # liquid to prepare the pipette for aspiration
+            if self._api_version < APIVersion(2, 3) or not self.is_ready_to_aspirate():
+                if location.labware.is_well:
+                    self.move_to(
+                        location=location.labware.as_well().top(), well_core=well_core
+                    )
+                self.prepare_for_aspirate()
+            self.move_to(location=location, well_core=well_core)
+        elif location != self._protocol_interface.get_last_location():
+            self.move_to(location=location, well_core=well_core)
+
         self._raise_if_no_tip(HardwareAction.ASPIRATE.name)
         new_volume = self.get_current_volume() + volume
         assert (
@@ -123,9 +136,9 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
         self,
         location: types.Location,
         well_core: Optional[WellImplementation],
-        force_direct: bool,
-        minimum_z_height: Optional[float],
-        speed: Optional[float],
+        force_direct: bool = False,
+        minimum_z_height: Optional[float] = None,
+        speed: Optional[float] = None,
     ) -> None:
         """Simulation of only the motion planning portion of move_to."""
         last_location = self._protocol_interface.get_last_location()

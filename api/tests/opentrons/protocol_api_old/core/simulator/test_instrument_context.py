@@ -31,17 +31,6 @@ def test_same_pipette(
     )
 
 
-def test_aspirate_no_tip(subject: InstrumentCore, labware: LabwareCore) -> None:
-    """It should raise an error if a tip is not attached."""
-    with pytest.raises(NoTipAttachedError, match="Cannot perform ASPIRATE"):
-        subject.aspirate(
-            location=Location(point=Point(1, 2, 3), labware=None),
-            well_core=labware.get_wells()[0],
-            volume=1,
-            rate=1,
-        )
-
-
 def test_prepare_to_aspirate_no_tip(subject: InstrumentCore) -> None:
     """It should raise an error if a tip is not attached."""
     with pytest.raises(NoTipAttachedError, match="Cannot perform PREPARE_ASPIRATE"):

@@ -53,10 +53,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         volume: float,
         rate: float,
     ) -> None:
-        # TODO check if well_core should be optional, and if so, what we should do here
         if well_core is None:
             raise NotImplementedError(
-                "InstrumentCore.aspirate to non-well not implemented"
+                "InstrumentCore.aspirate with well_core value of None not implemented"
             )
 
         well_name = well_core.get_name()
