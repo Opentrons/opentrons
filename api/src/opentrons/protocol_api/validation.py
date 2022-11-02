@@ -1,4 +1,4 @@
-from typing import Dict, Union, Optional
+from typing import List, Dict, Union, Optional
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
@@ -9,6 +9,7 @@ from opentrons.hardware_control.modules.types import (
     TemperatureModuleModel,
     ThermocyclerModuleModel,
     HeaterShakerModuleModel,
+    ThermocyclerStep,
 )
 
 
@@ -36,6 +37,8 @@ def ensure_mount(mount: Union[str, Mount]) -> Mount:
 
 def ensure_pipette_name(pipette_name: str) -> PipetteNameType:
     """Ensure that an input value represents a valid pipette name."""
+    pipette_name = ensure_lowercase_name(pipette_name)
+
     try:
         return PipetteNameType(pipette_name)
     except ValueError as e:
@@ -53,6 +56,14 @@ def ensure_deck_slot(deck_slot: Union[int, str]) -> DeckSlotName:
         return DeckSlotName(str(deck_slot))
     except ValueError as e:
         raise ValueError(f"'{deck_slot}' is not a valid deck slot") from e
+
+
+def ensure_lowercase_name(name: str) -> str:
+    """Ensure that a given name string is all lowercase."""
+    if not isinstance(name, str):
+        raise TypeError(f"Value must be a string, but got {name}")
+
+    return name.lower()
 
 
 _MODULE_ALIASES: Dict[str, ModuleModel] = {
@@ -107,3 +118,35 @@ def ensure_hold_time_seconds(
     if minutes is not None:
         seconds += minutes * 60
     return seconds
+
+
+def ensure_thermocycler_repetition_count(repetitions: int) -> int:
+    """Ensure thermocycler repetitions is a positive integer."""
+    if repetitions <= 0:
+        raise ValueError("repetitions must be a positive integer")
+    return repetitions
+
+
+def ensure_thermocycler_profile_steps(
+    steps: List[ThermocyclerStep],
+) -> List[ThermocyclerStep]:
+    """Ensure thermocycler steps are valid and hold time is expressed in seconds only."""
+    validated_steps = []
+    for step in steps:
+        temperature = step.get("temperature")
+        hold_mins = step.get("hold_time_minutes")
+        hold_secs = step.get("hold_time_seconds")
+        if temperature is None:
+            raise ValueError("temperature must be defined for each step in cycle")
+        if hold_mins is None and hold_secs is None:
+            raise ValueError(
+                "either hold_time_minutes or hold_time_seconds must be"
+                "defined for each step in cycle"
+            )
+        validated_seconds = ensure_hold_time_seconds(hold_secs, hold_mins)
+        validated_steps.append(
+            ThermocyclerStep(
+                temperature=temperature, hold_time_seconds=validated_seconds
+            )
+        )
+    return validated_steps

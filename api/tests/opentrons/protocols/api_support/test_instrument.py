@@ -2,7 +2,7 @@ from unittest import mock
 
 import pytest
 from opentrons.protocol_api import ProtocolContext
-from opentrons.protocol_api.labware import Well
+from opentrons.protocol_api.labware import Labware, Well
 from opentrons.protocols.api_support.instrument import (
     determine_drop_target,
     validate_takes_liquid,
@@ -30,6 +30,7 @@ def test_determine_drop_target(api_version, expected_point):
     lw_mock.is_tiprack = mock.MagicMock(return_value=True)
     lw_mock.get_tip_length = mock.MagicMock(return_value=1)
     well = Well(
+        parent=Labware(implementation=lw_mock),
         well_implementation=WellImplementation(
             well_geometry=WellGeometry(
                 well_props={
@@ -48,7 +49,7 @@ def test_determine_drop_target(api_version, expected_point):
             has_tip=False,
             name="A1",
         ),
-        api_level=api_version,
+        api_version=api_version,
     )
     r = determine_drop_target(api_version, well, 0.5)
     assert r.labware.object == well

@@ -66,6 +66,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
     def move_to(
         self,
         location: types.Location,
+        well_core: Optional[WellCoreType],
         force_direct: bool,
         minimum_z_height: Optional[float],
         speed: Optional[float],
@@ -101,7 +102,8 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
-    def get_pipette(self) -> PipetteDict:
+    def get_hardware_state(self) -> PipetteDict:
+        """Get the current state of the pipette hardware as a dictionary."""
         ...
 
     @abstractmethod

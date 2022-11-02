@@ -26,7 +26,7 @@ class DeviceLanding:
     def robot_banner(self, robot_name: str) -> None:
         """Look for a robot to be present by name."""
         banner: Element = Element(
-            (By.ID, f"RobotStatusBanner_{robot_name}_robotName"),
+            (By.ID, f"RobotStatusHeader_{robot_name}_robotName"),
             f"Banner with robot name = {robot_name}",
         )
         self.base.present_wrapper(
@@ -58,7 +58,7 @@ class DeviceLanding:
     def get_robot_name_device_detail(self) -> Optional[WebElement]:
         """Get the robot name on device detail page."""
         lights: Element = Element(
-            (By.ID, "RobotStatusBanner_opentrons-dev_robotName"),
+            (By.ID, "RobotStatusHeader_opentrons-dev_robotName"),
             f"the robot name on device detail page.",
         )
         return self.base.clickable_wrapper(lights, 5)
@@ -174,7 +174,7 @@ class DeviceLanding:
 
     def get_pipettes_and_modules_header_text(self) -> str:
         header: Element = Element(
-            (By.ID, "PipettesAndModules_title"), "header 'Pipettes and Modules'"
+            (By.ID, "InstrumentsAndModules_title"), "header 'Instruments and Modules'"
         )
         element = self.base.clickable_wrapper(header, 5)
         if not element:
@@ -325,7 +325,7 @@ class DeviceLanding:
         button: Element = Element(
             (
                 By.ID,
-                "RobotStatusBanner_opentrons-dev_robotName",
+                "RobotStatusHeader_opentrons-dev_robotName",
             ),
             "Clicking on dev robot in device landing page.'",
         )
@@ -375,7 +375,7 @@ class DeviceLanding:
         button: Element = Element(
             (
                 By.ID,
-                "RobotStatusBanner_opentrons-dev_goToRun",
+                "RobotStatusHeader_opentrons-dev_goToRun",
             ),
             "Button to select run protocol from robot landing overflow menu.'",
         )
