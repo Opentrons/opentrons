@@ -91,6 +91,8 @@ class MoveLabwareImplementation(
             validated_new_loc = self._labware_movement.ensure_valid_gripper_location(
                 empty_new_location,
             )
+
+            # Skips gripper moves when using virtual gripper
             await self._labware_movement.move_labware_with_gripper(
                 labware_id=params.labwareId,
                 current_location=validated_current_loc,

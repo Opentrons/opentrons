@@ -114,6 +114,7 @@ async def test_move_labware_with_gripper(
     to_location: Union[DeckSlotLocation, ModuleLocation],
 ) -> None:
     """It should perform a labware movement with gripper by delegating to OT3API."""
+    decoy.when(state_store.config.use_virtual_gripper).then_return(False)
     decoy.when(ot3_hardware_api.has_gripper()).then_return(True)
 
     decoy.when(
@@ -203,6 +204,7 @@ async def test_labware_movement_raises_on_ot2(
     model_utils: ModelUtils,
 ) -> None:
     """It should raise an error when attempting a gripper movement on a non-OT3 bot."""
+    decoy.when(state_store.config.use_virtual_gripper).then_return(False)
     subject = LabwareMovementHandler(
         hardware_api=hardware_api,
         state_store=state_store,
@@ -219,6 +221,29 @@ async def test_labware_movement_raises_on_ot2(
 
 
 @pytest.mark.ot3_only
+async def test_labware_movement_skips_for_virtual_gripper(
+    decoy: Decoy,
+    state_store: StateStore,
+    ot3_hardware_api: OT3API,
+    subject: LabwareMovementHandler,
+    model_utils: ModelUtils,
+) -> None:
+    """It should neither raise error nor move gripper when using virtual gripper."""
+    decoy.when(state_store.config.use_virtual_gripper).then_return(True)
+    await subject.move_labware_with_gripper(
+        labware_id="labware-id",
+        current_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+        new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        new_offset_id=None,
+    )
+    decoy.verify(
+        await ot3_hardware_api.move_to(mount=OT3Mount.GRIPPER),  # type: ignore[call-arg]
+        times=0,
+        ignore_extra_args=True,
+    )
+
+
+@pytest.mark.ot3_only
 async def test_labware_movement_raises_without_gripper(
     decoy: Decoy,
     state_store: StateStore,
@@ -226,6 +251,7 @@ async def test_labware_movement_raises_without_gripper(
     subject: LabwareMovementHandler,
 ) -> None:
     """It should raise an error when attempting a gripper movement without a gripper."""
+    decoy.when(state_store.config.use_virtual_gripper).then_return(False)
     decoy.when(ot3_hardware_api.has_gripper()).then_return(False)
     with pytest.raises(GripperNotAttachedError):
         await subject.move_labware_with_gripper(
