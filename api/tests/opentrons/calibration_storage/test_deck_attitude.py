@@ -1,16 +1,20 @@
 import pytest
-import importlib
 import opentrons
 from typing import Any, TYPE_CHECKING
+from opentrons.calibration_storage import (
+    save_robot_deck_attitude,
+    get_robot_deck_attitude,
+    delete_robot_deck_attitude,
+)
 
 
 if TYPE_CHECKING:
     from opentrons_shared_data.deck.dev_types import RobotModel
 
 
-@pytest.fixture(autouse=True)
-def reload_module(robot_model: "RobotModel") -> None:
-    importlib.reload(opentrons.calibration_storage)
+# @pytest.fixture(autouse=True)
+# def reload_module(robot_model: "RobotModel") -> None:
+#     importlib.reload(opentrons.calibration_storage)
 
 
 @pytest.fixture
@@ -22,7 +26,6 @@ def starting_calibration_data(
 
     Adds dummy data to a temporary directory to test delete commands against.
     """
-    from opentrons.calibration_storage import save_robot_deck_attitude
 
     if robot_model == "OT-3 Standard":
         save_robot_deck_attitude([[1, 0, 0], [0, 1, 0], [0, 0, 1]], "pip1")
@@ -34,10 +37,6 @@ def test_save_deck_attitude(ot_config_tempdir: Any, robot_model: "RobotModel") -
     """
     Test saving deck attitude calibrations.
     """
-    from opentrons.calibration_storage import (
-        get_robot_deck_attitude,
-        save_robot_deck_attitude,
-    )
 
     assert get_robot_deck_attitude() is None
     if robot_model == "OT-3 Standard":
@@ -53,8 +52,6 @@ def test_get_deck_calibration(
     """
     Test ability to get a deck calibration model.
     """
-    from opentrons.calibration_storage import get_robot_deck_attitude
-
     # needed for proper type checking unfortunately
     from opentrons.calibration_storage.ot3.models.v1 import (
         DeckCalibrationModel as OT3DeckCalModel,
@@ -85,10 +82,6 @@ def test_delete_deck_calibration(starting_calibration_data: Any) -> None:
     """
     Test delete deck calibration.
     """
-    from opentrons.calibration_storage import (
-        get_robot_deck_attitude,
-        delete_robot_deck_attitude,
-    )
 
     assert get_robot_deck_attitude() != {}
     assert get_robot_deck_attitude().attitude == [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
