@@ -21,7 +21,7 @@ import {
 } from '../../../redux/discovery/constants'
 import { useLights, useRobot, useRunStatuses } from '../hooks'
 import { UpdateRobotBanner } from '../../UpdateRobotBanner'
-import { RobotStatusBanner } from '../RobotStatusBanner'
+import { RobotStatusHeader } from '../RobotStatusHeader'
 import { RobotOverview } from '../RobotOverview'
 import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
 
@@ -34,9 +34,8 @@ jest.mock('../../../redux/buildroot/selectors')
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../hooks')
-jest.mock('../RobotStatusBanner')
+jest.mock('../RobotStatusHeader')
 jest.mock('../../UpdateRobotBanner')
-jest.mock('../../ChooseProtocolSlideout')
 jest.mock('../RobotOverviewOverflowMenu')
 
 const OT2_PNG_FILE_NAME = 'OT2-R_HERO.png'
@@ -73,8 +72,8 @@ const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
 >
-const mockRobotStatusBanner = RobotStatusBanner as jest.MockedFunction<
-  typeof RobotStatusBanner
+const mockRobotStatusHeader = RobotStatusHeader as jest.MockedFunction<
+  typeof RobotStatusHeader
 >
 const mockUpdateRobotBanner = UpdateRobotBanner as jest.MockedFunction<
   typeof UpdateRobotBanner
@@ -134,7 +133,7 @@ describe('RobotOverview', () => {
       toggleLights: mockToggleLights,
     })
     mockUseRobot.mockReturnValue(mockConnectableRobot)
-    mockRobotStatusBanner.mockReturnValue(<div>Mock RobotStatusBanner</div>)
+    mockRobotStatusHeader.mockReturnValue(<div>Mock RobotStatusHeader</div>)
     mockUpdateRobotBanner.mockReturnValue(<div>Mock UpdateRobotBanner</div>)
     mockUseCurrentRunId.mockReturnValue(null)
     mockRobotOverviewOverflowMenu.mockReturnValue(
@@ -164,9 +163,9 @@ describe('RobotOverview', () => {
     expect(image.getAttribute('src')).toEqual(OT3_PNG_FILE_NAME)
   })
 
-  it('renders a RobotStatusBanner component', () => {
+  it('renders a RobotStatusHeader component', () => {
     const [{ getByText }] = render(props)
-    getByText('Mock RobotStatusBanner')
+    getByText('Mock RobotStatusHeader')
   })
 
   it('renders a UpdateRobotBanner component', () => {

@@ -23,14 +23,16 @@ import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../organisms/RunTimeControl/hooks'
 import { useProtocolDetailsForRun } from './hooks'
 
+import type { StyleProps } from '@opentrons/components'
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 
-type RobotStatusBannerProps = Pick<DiscoveredRobot, 'name' | 'local'> & {
-  robotModel: string | null
-}
+type RobotStatusHeaderProps = StyleProps &
+  Pick<DiscoveredRobot, 'name' | 'local'> & {
+    robotModel: string | null
+  }
 
-export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
-  const { name, local, robotModel } = props
+export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
+  const { name, local, robotModel, ...styleProps } = props
   const { t } = useTranslation([
     'devices_landing',
     'device_settings',
@@ -44,8 +46,8 @@ export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
   const { displayName } = useProtocolDetailsForRun(currentRunId)
 
   const runningProtocolBanner: JSX.Element | null =
-    currentRunId != null ? (
-      <Flex alignItems={ALIGN_CENTER}>
+    currentRunId != null && currentRunStatus != null && displayName != null ? (
+      <Flex alignItems={ALIGN_CENTER} onClick={e => e.stopPropagation()}>
         <StyledText
           as="label"
           paddingRight={SPACING.spacing3}
@@ -57,7 +59,7 @@ export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
           to={`/devices/${name}/protocol-runs/${currentRunId}/${
             currentRunStatus === RUN_STATUS_IDLE ? 'setup' : 'run-log'
           }`}
-          id={`RobotStatusBanner_${name}_goToRun`}
+          id={`RobotStatusHeader_${name}_goToRun`}
         >
           <SecondaryTertiaryButton>{t('go_to_run')}</SecondaryTertiaryButton>
         </Link>
@@ -65,22 +67,22 @@ export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
     ) : null
 
   return (
-    <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+    <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} {...styleProps}>
       <Flex flexDirection={DIRECTION_COLUMN}>
         <StyledText
           as="h6"
           color={COLORS.darkGreyEnabled}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           paddingBottom={SPACING.spacing1}
-          id={`RobotStatusBanner_${name}_robotModel`}
+          id={`RobotStatusHeader_${name}_robotModel`}
         >
           {robotModel}
         </StyledText>
-        <Flex alignItems={ALIGN_CENTER} paddingBottom={SPACING.spacing4}>
+        <Flex alignItems={ALIGN_CENTER}>
           <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
             <StyledText
               as="h3"
-              id={`RobotStatusBanner_${name}_robotName`}
+              id={`RobotStatusHeader_${name}_robotName`}
               overflowWrap="anywhere"
             >
               {name}
