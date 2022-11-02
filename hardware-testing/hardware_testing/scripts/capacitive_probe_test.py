@@ -19,13 +19,15 @@ def build_arg_parser():
     arg_parser = argparse.ArgumentParser(description='OT-3 Capacitive Probe Testing')
     arg_parser.add_argument('-m', '--mount', choices=['l','r'], required=False, help='The pipette mount to be tested', default='l')
     arg_parser.add_argument('-c', '--cycles', type=int, required=False, help='Number of testing cycles', default=1)
+    arg_parser.add_argument('-o', '--slot', type=int, required=False, help='Deck slot number', default=5)
     arg_parser.add_argument('-s', '--simulate', action="store_true", required=False, help='Simulate this test script')
     return arg_parser
 
 class Capacitive_Probe_Test:
-    def __init__(self, simulate: bool, cycles: int) -> None:
+    def __init__(self, simulate: bool, cycles: int, slot: int) -> None:
         self.api = None
         self.mount = None
+        self.slot = slot
         self.simulate = simulate
         self.cycles = cycles
         self.axes = [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R]
@@ -33,8 +35,8 @@ class Capacitive_Probe_Test:
         self.PROBE_LENGTH = 34.5
         self.CUTOUT_SIZE = 20
         self.CUTOUT_HALF = self.CUTOUT_SIZE / 2
-        self.CENTER_Z = Point(x=239, y=160, z=1)
-        self.CENTER_XY = Point(x=227.25, y=145.5, z=self.CENTER_Z.z)
+        # self.CENTER_Z = Point(x=239, y=160, z=1)
+        # self.CENTER_XY = Point(x=227.25, y=145.5, z=self.CENTER_Z.z)
         # self.CENTER_Z = Point(x=245, y=160, z=1)
         # self.CENTER_XY = Point(x=231.25, y=145.5, z=self.CENTER_Z.z)
         self.PROBE_SETTINGS_Z_AXIS = CapacitivePassSettings(
@@ -44,7 +46,7 @@ class Capacitive_Probe_Test:
             sensor_threshold_pf=1.0,
         )
         self.PROBE_SETTINGS_XY_AXIS = CapacitivePassSettings(
-            prep_distance_mm=self.CUTOUT_SIZE / 2,
+            prep_distance_mm=self.CUTOUT_HALF,
             max_overrun_distance_mm=5,
             speed_mm_per_s=1,
             sensor_threshold_pf=1.0,
@@ -60,6 +62,50 @@ class Capacitive_Probe_Test:
             "Y Front":None,
             "Y Center":None,
         }
+        self.SLOT_OFFSET_X = 164
+        self.SLOT_OFFSET_Y = 106.5
+        self.SLOT1_Z = Point(x=77.5, y=54, z=1)
+        self.SLOT1_XY = Point(x=63, y=39.5, z=1)
+        self.slot_center = {
+            "1":{
+                    "Z":self.SLOT1_Z,
+                    "XY":self.SLOT1_XY
+                },
+            "2":{
+                    "Z":self.SLOT1_Z._replace(x=self.SLOT1_Z.x + self.SLOT_OFFSET_X),
+                    "XY":self.SLOT1_XY._replace(x=self.SLOT1_XY.x + self.SLOT_OFFSET_X)
+                },
+            "3":{
+                    "Z":self.SLOT1_Z._replace(x=self.SLOT1_Z.x + self.SLOT_OFFSET_X*2),
+                    "XY":self.SLOT1_XY._replace(x=self.SLOT1_XY.x + self.SLOT_OFFSET_X*2)
+                },
+            "4":{
+                    "Z":self.SLOT1_Z._replace(y=self.SLOT1_Z.y + self.SLOT_OFFSET_Y),
+                    "XY":self.SLOT1_XY._replace(y=self.SLOT1_XY.y + self.SLOT_OFFSET_Y)
+                },
+            "5":{
+                    "Z":self.SLOT1_Z._replace(
+                            x=self.SLOT1_Z.x + self.SLOT_OFFSET_X,
+                            y=self.SLOT1_Z.y + self.SLOT_OFFSET_Y
+                        ),
+                    "XY":self.SLOT1_XY._replace(
+                            x=self.SLOT1_XY.x + self.SLOT_OFFSET_X,
+                            y=self.SLOT1_XY.y + self.SLOT_OFFSET_Y
+                        )
+                },
+            "6":{
+                    "Z":self.SLOT1_Z._replace(
+                            x=self.SLOT1_Z.x + self.SLOT_OFFSET_X*2,
+                            y=self.SLOT1_Z.y + self.SLOT_OFFSET_Y
+                        ),
+                    "XY":self.SLOT1_XY._replace(
+                            x=self.SLOT1_XY.x + self.SLOT_OFFSET_X*2,
+                            y=self.SLOT1_XY.y + self.SLOT_OFFSET_Y
+                        )
+                }
+        }
+        self.CENTER_Z = self.slot_center[str(self.slot)]["Z"]
+        self.CENTER_XY = self.slot_center[str(self.slot)]["XY"]
 
     async def test_setup(self):
         self.file_setup()
@@ -67,10 +113,11 @@ class Capacitive_Probe_Test:
         self.mount = OT3Mount.LEFT if args.mount == "l" else OT3Mount.RIGHT
         await self.api.add_tip(self.mount, self.PROBE_LENGTH)
         self.start_time = time.time()
+        print(f"\nStarting Test on Deck Slot #{self.slot}:\n")
 
     def file_setup(self):
         self.test_name = "capacitive_probe_test"
-        self.test_tag = "slot5"
+        self.test_tag = f"slot{self.slot}"
         self.test_header = self.dict_keys_to_line(self.test_data)
         self.test_id = data.create_run_id()
         self.test_path = data.create_folder_for_test_data(self.test_name)
@@ -92,9 +139,9 @@ class Capacitive_Probe_Test:
             settings = self.PROBE_SETTINGS_Z_AXIS
         else:
             settings = self.PROBE_SETTINGS_XY_AXIS
-        await wait_for_stable_capacitance_ot3(
-            self.api, self.mount, threshold_pf=0.1, duration=1.0
-        )
+        # await wait_for_stable_capacitance_ot3(
+        #     self.api, self.mount, threshold_pf=0.1, duration=1.0
+        # )
         point = await self.api.capacitive_probe(
             self.mount, axis, target, settings
         )
@@ -110,6 +157,7 @@ class Capacitive_Probe_Test:
         home_position = await api.gantry_position(mount)
         above_point = self.CENTER_Z._replace(z=home_position.z)
         await api.move_to(mount, above_point)
+        time.sleep(1.0)
 
         # Probe deck Z-Axis height
         deck_z = await self._probe_axis(OT3Axis.by_mount(mount), self.CENTER_Z.z)
@@ -123,6 +171,7 @@ class Capacitive_Probe_Test:
         center_xy_below = self.CENTER_XY._replace(z=below_z)
         await api.move_to(mount, center_xy_above, speed=20)
         await api.move_to(mount, center_xy_below, speed=20)
+        time.sleep(1.0)
 
         # Probe slot X-Axis right edge
         x_right = await self._probe_axis(OT3Axis.X, self.CENTER_XY.x + self.CUTOUT_HALF)
@@ -190,5 +239,5 @@ if __name__ == '__main__':
     print("\nOT-3 Capacitive Probe Test\n")
     arg_parser = build_arg_parser()
     args = arg_parser.parse_args()
-    test = Capacitive_Probe_Test(args.simulate, args.cycles)
+    test = Capacitive_Probe_Test(args.simulate, args.cycles, args.slot)
     asyncio.run(test.run())
