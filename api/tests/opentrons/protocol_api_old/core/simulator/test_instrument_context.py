@@ -7,6 +7,7 @@ from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 from opentrons.hardware_control import NoTipAttachedError
 from opentrons.hardware_control.types import TipAttachedError
 from opentrons.protocol_api.core.common import InstrumentCore, LabwareCore
+from opentrons.types import Location, Point
 
 
 @pytest.fixture(
@@ -30,10 +31,15 @@ def test_same_pipette(
     )
 
 
-def test_aspirate_no_tip(subject: InstrumentCore) -> None:
+def test_aspirate_no_tip(subject: InstrumentCore, labware: LabwareCore) -> None:
     """It should raise an error if a tip is not attached."""
     with pytest.raises(NoTipAttachedError, match="Cannot perform ASPIRATE"):
-        subject.aspirate(volume=1, rate=1)
+        subject.aspirate(
+            location=Location(point=Point(1, 2, 3), labware=None),
+            well_core=labware.get_wells()[0],
+            volume=1,
+            rate=1,
+        )
 
 
 def test_prepare_to_aspirate_no_tip(subject: InstrumentCore) -> None:
@@ -90,7 +96,12 @@ def test_pick_up_tip_prep_after(subject: InstrumentCore, labware: LabwareCore) -
         increment=None,
         prep_after=True,
     )
-    subject.aspirate(1, rate=1)
+    subject.aspirate(
+        location=Location(point=Point(1, 2, 3), labware=None),
+        well_core=labware.get_wells()[0],
+        volume=1,
+        rate=1,
+    )
     subject.dispense(1, rate=1)
     subject.drop_tip(home_after=True)
     # and again, without preparing for aspirate
@@ -101,7 +112,12 @@ def test_pick_up_tip_prep_after(subject: InstrumentCore, labware: LabwareCore) -
         increment=None,
         prep_after=False,
     )
-    subject.aspirate(1, rate=1)
+    subject.aspirate(
+        location=Location(point=Point(1, 2, 3), labware=None),
+        well_core=labware.get_wells()[0],
+        volume=1,
+        rate=1,
+    )
     subject.dispense(1, rate=1)
     subject.drop_tip(home_after=True)
 
@@ -120,7 +136,12 @@ def test_aspirate_too_much(subject: InstrumentCore, labware: LabwareCore) -> Non
     with pytest.raises(
         AssertionError, match="Cannot aspirate more than pipette max volume"
     ):
-        subject.aspirate(subject.get_max_volume() + 1, rate=1)
+        subject.aspirate(
+            location=Location(point=Point(1, 2, 3), labware=None),
+            well_core=labware.get_wells()[0],
+            volume=subject.get_max_volume() + 1,
+            rate=1,
+        )
 
 
 def test_working_volume(subject: InstrumentCore, labware: LabwareCore) -> None:
@@ -159,37 +180,52 @@ def test_pipette_dict(
     )
 
 
-def _aspirate(i: InstrumentCore) -> None:
+def _aspirate(i: InstrumentCore, labware: LabwareCore) -> None:
     """pipette dict with tip fixture."""
     i.prepare_for_aspirate()
-    i.aspirate(12, 10)
+    i.aspirate(
+        location=Location(point=Point(1, 2, 3), labware=None),
+        well_core=labware.get_wells()[0],
+        volume=12,
+        rate=10,
+    )
 
 
-def _aspirate_dispense(i: InstrumentCore) -> None:
+def _aspirate_dispense(i: InstrumentCore, labware: LabwareCore) -> None:
     """pipette dict with tip fixture."""
     i.prepare_for_aspirate()
-    i.aspirate(12, 10)
+    i.aspirate(
+        location=Location(point=Point(1, 2, 3), labware=None),
+        well_core=labware.get_wells()[0],
+        volume=12,
+        rate=10,
+    )
     i.dispense(2, 2)
 
 
-def _aspirate_blowout(i: InstrumentCore) -> None:
+def _aspirate_blowout(i: InstrumentCore, labware: LabwareCore) -> None:
     """pipette dict with tip fixture."""
     i.prepare_for_aspirate()
-    i.aspirate(11, 13)
+    i.aspirate(
+        location=Location(point=Point(1, 2, 3), labware=None),
+        well_core=labware.get_wells()[0],
+        volume=11,
+        rate=13,
+    )
     i.blow_out()
 
 
 @pytest.mark.parametrize(
     argnames=["side_effector"],
     argvalues=[
-        [lambda i: None],
+        [lambda i, l: None],
         [_aspirate],
         [_aspirate_dispense],
         [_aspirate_blowout],
     ],
 )
 def test_pipette_dict_with_tip(
-    side_effector: Callable[[InstrumentCore], None],
+    side_effector: Callable[[InstrumentCore, LabwareCore], None],
     instrument_context: InstrumentCore,
     simulating_instrument_context: InstrumentCore,
     labware: LabwareCore,
@@ -214,8 +250,8 @@ def test_pipette_dict_with_tip(
         prep_after=False,
     )
 
-    side_effector(instrument_context)
-    side_effector(simulating_instrument_context)
+    side_effector(instrument_context, labware)
+    side_effector(simulating_instrument_context, labware)
     assert (
         instrument_context.get_hardware_state()
         == simulating_instrument_context.get_hardware_state()
