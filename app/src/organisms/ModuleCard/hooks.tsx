@@ -47,9 +47,7 @@ export function useIsHeaterShakerInProtocol(): boolean {
   const loadedLabware = getLoadedLabwareFromCommands(protocolData.commands)
   const robotType = getRobotTypeFromLoadedLabware(loadedLabware)
 
-  const deckDef = getDeckDefFromRobotType(
-    robotType
-  )
+  const deckDef = getDeckDefFromRobotType(robotType)
   const protocolModulesInfo = getProtocolModulesInfo(protocolData, deckDef)
   return protocolModulesInfo.some(
     module => module.moduleDef.model === 'heaterShakerModuleV1'

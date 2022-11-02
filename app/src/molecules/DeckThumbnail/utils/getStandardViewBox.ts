@@ -13,15 +13,3 @@ export const getStandardDeckViewBox = (robotType: RobotType): string | null => {
       return null
   }
 }
-
-export const STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
-  'calibrationMarkings',
-  'fixedBase',
-  'doorStops',
-  'metalFrame',
-  'removalHandle',
-  'removableDeckOutline',
-  'screwHoles',
-  'DECK_BASE',
-  'BARCODE_COVERS',
-]

@@ -19,16 +19,14 @@ import {
   parseLabwareInfoByLiquidId,
 } from '@opentrons/api-client'
 import { getWellFillFromLabwareId } from '../../organisms/Devices/ProtocolRun/SetupLiquids/utils'
+import { getStandardDeckViewLayerBlockList } from './utils/getStandardDeckViewLayerBlockList'
+import { getStandardDeckViewBox } from './utils/getStandardViewBox'
 import type {
   DeckSlot,
   Liquid,
   LoadedLabware,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import {
-  getStandardDeckViewBox,
-  STANDARD_DECK_VIEW_LAYER_BLOCK_LIST,
-} from '../../utils'
 
 interface DeckThumbnailProps {
   commands: RunTimeCommand[]
@@ -38,8 +36,8 @@ interface DeckThumbnailProps {
 
 export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
   const { commands, liquids, labware = [] } = props
-  const robotName = getRobotTypeFromLoadedLabware(labware)
-  const deckDef = getDeckDefFromRobotType(robotName)
+  const robotType = getRobotTypeFromLoadedLabware(labware)
+  const deckDef = getDeckDefFromRobotType(robotType)
   const liquidSetupEnabled = useFeatureFlag('enableLiquidSetup')
   const enableThermocyclerGen2 = useFeatureFlag('enableThermocyclerGen2')
 
@@ -59,9 +57,9 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
     // revert the height
     // Note add offset 18px to right and left
     <RobotWorkSpace
-      deckLayerBlocklist={STANDARD_DECK_VIEW_LAYER_BLOCK_LIST}
+      deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
       deckDef={deckDef}
-      viewBox={getStandardDeckViewBox(robotName)}
+      viewBox={getStandardDeckViewBox(robotType)}
     >
       {({ deckSlotsById }) =>
         map<DeckSlot>(deckSlotsById, (slot: DeckSlot, slotId: string) => {

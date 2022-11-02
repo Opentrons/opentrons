@@ -20,10 +20,6 @@ import {
   getRobotTypeFromLoadedLabware,
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
-import {
-  getStandardDeckViewBox,
-  STANDARD_DECK_VIEW_LAYER_BLOCK_LIST,
-} from '../../../../utils'
 import { useFeatureFlag } from '../../../../redux/config'
 import { HeaterShakerBanner } from '../../../ProtocolSetup/RunSetupCard/ModuleSetup/HeaterShakerSetupWizard/HeaterShakerBanner'
 import { ModuleInfo } from '../../../ProtocolSetup/RunSetupCard/ModuleSetup/ModuleInfo'
@@ -34,6 +30,8 @@ import {
   useProtocolDetailsForRun,
   useUnmatchedModulesForProtocol,
 } from '../../hooks'
+import { getStandardDeckViewBox } from '../utils/getStandardDeckViewBox'
+import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
 
 interface SetupModulesMapProps {
   robotName: string
@@ -112,7 +110,7 @@ export const SetupModulesMap = ({
         <RobotWorkSpace
           deckDef={deckDef}
           viewBox={getStandardDeckViewBox(robotType)}
-          deckLayerBlocklist={STANDARD_DECK_VIEW_LAYER_BLOCK_LIST}
+          deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
           id="ModuleSetup_deckMap"
         >
           {() => (

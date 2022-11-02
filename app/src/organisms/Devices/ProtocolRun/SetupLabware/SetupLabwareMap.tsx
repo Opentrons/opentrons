@@ -27,7 +27,7 @@ import {
   useRunHasStarted,
 } from '../../hooks'
 import type { ModuleTypesThatRequiresExtraAttention } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
-import { STANDARD_DECK_VIEW_LAYER_BLOCK_LIST } from '../../../../utils'
+import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
 
 interface SetupLabwareMapProps {
   robotName: string
@@ -48,7 +48,9 @@ export function SetupLabwareMap({
   const labwareRenderInfoById = useLabwareRenderInfoForRunById(runId)
   const runHasStarted = useRunHasStarted(runId)
   const enableLiquidSetup = useFeatureFlag('enableLiquidSetup')
-  const loadedLabware = getLoadedLabwareFromCommands(protocolData?.commands ?? [])
+  const loadedLabware = getLoadedLabwareFromCommands(
+    protocolData?.commands ?? []
+  )
   const robotType = getRobotTypeFromLoadedLabware(loadedLabware)
   const deckDef = getDeckDefFromRobotType(robotType)
 
@@ -67,7 +69,7 @@ export function SetupLabwareMap({
         <Box margin="0 auto" maxWidth="46.25rem" width="100%">
           <RobotWorkSpace
             deckDef={deckDef}
-            deckLayerBlocklist={STANDARD_DECK_VIEW_LAYER_BLOCK_LIST}
+            deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
             id="LabwareSetup_deckMap"
           >
             {() => (
