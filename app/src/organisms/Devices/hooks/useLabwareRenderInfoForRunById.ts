@@ -1,8 +1,8 @@
+import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 import { getLabwareRenderInfo } from '../ProtocolRun/utils/getLabwareRenderInfo'
 import { useProtocolDetailsForRun, useStoredProtocolAnalysis } from '.'
 
 import type { LabwareRenderInfoById } from '../ProtocolRun/utils/getLabwareRenderInfo'
-import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 
 export function useLabwareRenderInfoForRunById(
   runId: string
