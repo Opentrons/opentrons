@@ -214,7 +214,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     <Flex
       backgroundColor={COLORS.fundamentalsBackground}
       borderRadius={SPACING.spacing2}
-      marginBottom={SPACING.spacing3}
       width="100%"
       data-testid={`ModuleCard_${module.serialNumber}`}
     >
@@ -346,9 +345,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               <>
                 <StyledText
                   textTransform={TYPOGRAPHY.textTransformUppercase}
-                  color={COLORS.darkGrey}
-                  fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  fontSize={TYPOGRAPHY.fontSizeCaption}
+                  color={COLORS.darkGreyEnabled}
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  fontSize={TYPOGRAPHY.fontSizeH6}
                   paddingBottom={SPACING.spacing2}
                   data-testid={`module_card_usb_port_${module.serialNumber}`}
                 >
@@ -415,6 +414,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             <ModuleOverflowMenu
               handleAboutClick={handleAboutClick}
               module={module}
+              robotName={robotName}
               runId={runId}
               handleSlideoutClick={handleMenuItemClick}
               handleTestShakeClick={handleTestShakeClick}

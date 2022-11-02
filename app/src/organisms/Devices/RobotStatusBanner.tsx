@@ -1,20 +1,24 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
+  Btn,
   Flex,
   Icon,
+  useHoverTooltip,
   ALIGN_CENTER,
+  COLORS,
   DIRECTION_COLUMN,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  COLORS,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { SecondaryTertiaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
+import { Tooltip } from '../../atoms/Tooltip'
 import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../organisms/RunTimeControl/hooks'
 import { useProtocolDetailsForRun } from './hooks'
@@ -27,7 +31,13 @@ type RobotStatusBannerProps = Pick<DiscoveredRobot, 'name' | 'local'> & {
 
 export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
   const { name, local, robotModel } = props
-  const { t } = useTranslation(['devices_landing', 'run_details'])
+  const { t } = useTranslation([
+    'devices_landing',
+    'device_settings',
+    'run_details',
+  ])
+  const history = useHistory()
+  const [targetProps, tooltipProps] = useHoverTooltip()
 
   const currentRunId = useCurrentRunId()
   const currentRunStatus = useCurrentRunStatus()
@@ -60,27 +70,41 @@ export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
         <StyledText
           as="h6"
           color={COLORS.darkGreyEnabled}
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           paddingBottom={SPACING.spacing1}
           id={`RobotStatusBanner_${name}_robotModel`}
         >
           {robotModel}
         </StyledText>
         <Flex alignItems={ALIGN_CENTER} paddingBottom={SPACING.spacing4}>
-          <Flex alignItems={ALIGN_CENTER}>
+          <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
             <StyledText
               as="h3"
-              marginRight={SPACING.spacing3}
               id={`RobotStatusBanner_${name}_robotName`}
               overflowWrap="anywhere"
             >
               {name}
             </StyledText>
-            <Icon
-              // local boolean corresponds to a wired usb connection
-              name={local ? 'usb' : 'wifi'}
-              size="1.25rem"
+            <Btn
+              {...targetProps}
               marginRight={SPACING.spacing3}
-            />
+              onClick={() =>
+                history.push(`/devices/${name}/robot-settings/networking`)
+              }
+            >
+              <Icon
+                // local boolean corresponds to a wired usb connection for OT-2
+                // TODO(bh, 2022-10-19): for OT-3, determine what robot data looks like for wired usb and ethernet connections
+                name={local != null && local ? 'usb' : 'wifi'}
+                color={COLORS.darkGreyEnabled}
+                size="1.25rem"
+              />
+            </Btn>
+            <Tooltip tooltipProps={tooltipProps} width="auto">
+              {local != null && local
+                ? t('device_settings:wired_usb')
+                : t('device_settings:wifi')}
+            </Tooltip>
           </Flex>
         </Flex>
       </Flex>

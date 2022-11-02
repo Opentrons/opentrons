@@ -174,7 +174,7 @@ class DeviceLanding:
 
     def get_pipettes_and_modules_header_text(self) -> str:
         header: Element = Element(
-            (By.ID, "PipettesAndModules_title"), "header 'Pipettes and Modules'"
+            (By.ID, "InstrumentsAndModules_title"), "header 'Instruments and Modules'"
         )
         element = self.base.clickable_wrapper(header, 5)
         if not element:

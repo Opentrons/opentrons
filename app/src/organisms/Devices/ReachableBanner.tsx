@@ -14,15 +14,11 @@ export function ReachableBanner(
 ): JSX.Element | null {
   const { robot } = props
   const { t } = useTranslation('shared')
-  return robot.status === REACHABLE ? (
+  return robot.status === REACHABLE && robot.serverHealthStatus === 'ok' ? (
     <Banner type="error" marginBottom={SPACING.spacing4}>
-      {robot.serverHealthStatus === 'ok'
-        ? t('robot_is_reachable_but_not_responding', {
-            hostname: robot.ip,
-          })
-        : t('robot_was_seen_but_is_unreachable', {
-            hostname: robot.ip,
-          })}
+      {t('robot_is_reachable_but_not_responding', {
+        hostname: robot.ip,
+      })}
     </Banner>
   ) : null
 }
