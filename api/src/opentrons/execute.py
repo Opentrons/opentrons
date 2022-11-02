@@ -24,8 +24,6 @@ from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control import API as OT2API, ThreadManager, HardwareControlAPI
 from opentrons.hardware_control.types import MachineType
 
-if should_use_ot3():
-    from opentrons.hardware_control.ot3api import OT3API
 from .util.entrypoint_util import labware_from_paths, datafiles_from_paths
 
 if TYPE_CHECKING:
@@ -380,6 +378,8 @@ def _create_hardware_controller(machine: Optional[MachineType]) -> None:
     global _THREAD_MANAGED_HW
     if not _THREAD_MANAGED_HW:
         if machine == "ot3" or should_use_ot3():
+            from opentrons.hardware_control.ot3api import OT3API
+
             _THREAD_MANAGED_HW = ThreadManager(OT3API.build_hardware_controller)
         else:
             _THREAD_MANAGED_HW = ThreadManager(OT2API.build_hardware_controller)

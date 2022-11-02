@@ -31,8 +31,6 @@ from opentrons.hardware_control import (
 )
 from opentrons.hardware_control.types import MachineType
 
-if should_use_ot3():
-    from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.simulator_setup import load_simulator
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocols.duration import DurationEstimator
@@ -216,6 +214,8 @@ def _check_hardware_simulator(
     if hardware_simulator:
         return hardware_simulator
     elif machine == "ot3" or should_use_ot3():
+        from opentrons.hardware_control.ot3api import OT3API
+
         return ThreadManager(OT3API.build_hardware_simulator)
     else:
         return ThreadManager(OT2API.build_hardware_simulator)
