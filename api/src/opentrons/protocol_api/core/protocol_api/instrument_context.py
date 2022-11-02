@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING, Optional
 
 from opentrons import types
@@ -22,6 +23,9 @@ from .legacy_module_core import LegacyThermocyclerCore, LegacyHeaterShakerCore
 
 if TYPE_CHECKING:
     from .protocol_context import ProtocolContextImplementation
+
+
+logger = logging.getLogger(__name__)
 
 
 class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
@@ -55,9 +59,38 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
         """Sets the speed at which the robot's gantry moves."""
         self._default_speed = speed
 
-    def aspirate(self, volume: float, rate: float) -> None:
+    def aspirate(
+        self,
+        location: types.Location,
+        well_core: WellImplementation,
+        volume: float,
+        rate: float,
+    ) -> None:
         """Aspirate a given volume of liquid from the specified location, using
         this pipette."""
+        if self.get_current_volume() == 0:
+            # Make sure we're at the top of the labware and clear of any
+            # liquid to prepare the pipette for aspiration
+            if self._api_version < APIVersion(2, 3) or not self.is_ready_to_aspirate():
+                if location.labware.is_well:
+                    self.move_to(
+                        location=location.labware.as_well().top(), well_core=well_core
+                    )
+                else:
+                    # TODO(seth,2019/7/29): This should be a warning exposed
+                    #  via rpc to the runapp
+                    logger.warning(
+                        "When aspirate is called on something other than a "
+                        "well relative position, we can't move to the top of"
+                        " the well to prepare for aspiration. This might "
+                        "cause over aspiration if the previous command is a "
+                        "blow_out."
+                    )
+                self.prepare_for_aspirate()
+            self.move_to(location=location, well_core=well_core)
+        elif location != self._protocol_interface.get_last_location():
+            self.move_to(location=location, well_core=well_core)
+
         self._protocol_interface.get_hardware().aspirate(self._mount, volume, rate)
 
     def dispense(self, volume: float, rate: float) -> None:
@@ -140,9 +173,9 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
         self,
         location: types.Location,
         well_core: Optional[WellImplementation],
-        force_direct: bool,
-        minimum_z_height: Optional[float],
-        speed: Optional[float],
+        force_direct: bool = False,
+        minimum_z_height: Optional[float] = None,
+        speed: Optional[float] = None,
     ) -> None:
         """Move the instrument.
 

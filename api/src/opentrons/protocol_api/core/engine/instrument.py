@@ -40,7 +40,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
     def set_default_speed(self, speed: float) -> None:
         raise NotImplementedError("InstrumentCore.set_default_speed not implemented")
 
-    def aspirate(self, volume: float, rate: float) -> None:
+    def aspirate(
+        self, location: Location, well_core: WellCore, volume: float, rate: float
+    ) -> None:
         raise NotImplementedError("InstrumentCore.aspirate not implemented")
 
     def dispense(self, volume: float, rate: float) -> None:

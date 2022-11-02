@@ -52,7 +52,13 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
     def set_default_speed(self, speed: float) -> None:
         self._default_speed = speed
 
-    def aspirate(self, volume: float, rate: float) -> None:
+    def aspirate(
+        self,
+        location: types.Location,
+        well_core: WellImplementation,
+        volume: float,
+        rate: float,
+    ) -> None:
         self._raise_if_no_tip(HardwareAction.ASPIRATE.name)
         new_volume = self.get_current_volume() + volume
         assert (

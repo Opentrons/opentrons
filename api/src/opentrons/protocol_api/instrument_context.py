@@ -165,17 +165,18 @@ class InstrumentContext(publisher.CommandPublisher):
         )
 
         if isinstance(location, labware.Well):
-            dest = location.bottom().move(
-                types.Point(0, 0, self.well_bottom_clearance.aspirate)
-            )
+            dest = location.bottom(z=self.well_bottom_clearance.aspirate)
+            well = location
         elif isinstance(location, types.Location):
             dest = location
+            _, well = dest.labware.get_parent_labware_and_well()
         elif location is not None:
             raise TypeError(
                 "location should be a Well or Location, but it is {}".format(location)
             )
         elif self._ctx.location_cache:
             dest = self._ctx.location_cache
+            _, well = dest.labware.get_parent_labware_and_well()
         else:
             raise RuntimeError(
                 "If aspirate is called without an explicit location, another"
@@ -188,31 +189,6 @@ class InstrumentContext(publisher.CommandPublisher):
                 location=dest, reject_module=self.api_version >= APIVersion(2, 13)
             )
 
-        if self.current_volume == 0:
-            # Make sure we're at the top of the labware and clear of any
-            # liquid to prepare the pipette for aspiration
-
-            if (
-                self.api_version < APIVersion(2, 3)
-                or not self._implementation.is_ready_to_aspirate()
-            ):
-                if dest.labware.is_well:
-                    self.move_to(dest.labware.as_well().top(), publish=False)
-                else:
-                    # TODO(seth,2019/7/29): This should be a warning exposed
-                    #  via rpc to the runapp
-                    logger.warning(
-                        "When aspirate is called on something other than a "
-                        "well relative position, we can't move to the top of"
-                        " the well to prepare for aspiration. This might "
-                        "cause over aspiration if the previous command is a "
-                        "blow_out."
-                    )
-                self._implementation.prepare_for_aspirate()
-            self.move_to(dest, publish=False)
-        elif dest != self._ctx.location_cache:
-            self.move_to(dest, publish=False)
-
         c_vol = self._implementation.get_available_volume() if not volume else volume
 
         with publisher.publish_context(
@@ -221,10 +197,16 @@ class InstrumentContext(publisher.CommandPublisher):
                 instrument=self,
                 volume=c_vol,
                 location=dest,
+                flow_rate=self._implementation.get_flow_rate().aspirate * rate,
                 rate=rate,
             ),
         ):
-            self._implementation.aspirate(volume=c_vol, rate=rate)
+            self._implementation.aspirate(
+                location=dest,
+                well_core=well._impl if well is not None else None,
+                volume=c_vol,
+                rate=rate,
+            )
 
         return self
 
