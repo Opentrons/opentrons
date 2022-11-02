@@ -165,6 +165,7 @@ export const migrateFile = (
         params: {
           pipetteId: pipetteId,
           mount: pipette.mount,
+          pipetteName: pipette.name
         },
       }
       return loadPipetteCommand
