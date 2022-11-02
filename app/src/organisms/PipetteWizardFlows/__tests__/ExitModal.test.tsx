@@ -1,25 +1,14 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import { LEFT } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
-import {
-  mockAttachedPipette,
-  mockP300PipetteSpecs,
-} from '../../../redux/pipettes/__fixtures__'
-import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { FLOWS } from '../constants'
 import { ExitModal } from '../ExitModal'
-import type { AttachedPipette } from '../../../redux/pipettes/types'
 
 const render = (props: React.ComponentProps<typeof ExitModal>) => {
   return renderWithProviders(<ExitModal {...props} />, {
     i18nInstance: i18n,
   })[0]
-}
-const mockPipette: AttachedPipette = {
-  ...mockAttachedPipette,
-  modelSpecs: mockP300PipetteSpecs,
 }
 
 describe('ExitModal', () => {
@@ -27,13 +16,8 @@ describe('ExitModal', () => {
 
   beforeEach(() => {
     props = {
-      mount: LEFT,
       goBack: jest.fn(),
       proceed: jest.fn(),
-      chainRunCommands: jest.fn(),
-      isRobotMoving: false,
-      runId: RUN_ID_1,
-      attachedPipette: { left: mockPipette, right: null },
       flowType: FLOWS.CALIBRATE,
     }
   })

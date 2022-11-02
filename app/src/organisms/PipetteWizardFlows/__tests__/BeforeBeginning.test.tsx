@@ -4,7 +4,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { LEFT } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import {
-  mockAttachedPipette,
+  mockAttachedGen3Pipette,
   mockGen3P1000PipetteSpecs,
 } from '../../../redux/pipettes/__fixtures__'
 import { InProgressModal } from '../../../molecules/InProgressModal/InProgressModal'
@@ -30,7 +30,7 @@ const render = (props: React.ComponentProps<typeof BeforeBeginning>) => {
   })[0]
 }
 const mockPipette: AttachedPipette = {
-  ...mockAttachedPipette,
+  ...mockAttachedGen3Pipette,
   modelSpecs: mockGen3P1000PipetteSpecs,
 }
 describe('BeforeBeginning', () => {
