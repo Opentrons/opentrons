@@ -90,10 +90,35 @@ def test_get_labware_data_by_id() -> None:
     assert subject.get("plate-id") == plate
 
 
-@pytest.mark.xfail(strict=True, raises=NotImplementedError)
-def test_get_id_by_module() -> None:  # noqa: D103
-    subject = get_labware_view()
-    _ = subject.get_id_by_module(module_id="module-id")
+def test_get_id_by_module() -> None:
+    """Should return the labware id associated to the module."""
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id": LoadedLabware(
+                id="labware-id",
+                loadName="test",
+                definitionUri="test-uri",
+                location=ModuleLocation(moduleId="module-id"),
+            )
+        }
+    )
+    assert subject.get_id_by_module(module_id="module-id") == "labware-id"
+
+
+def test_get_id_by_module_raises_error() -> None:
+    """Should raise error that labware not found."""
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id": LoadedLabware(
+                id="labware-id",
+                loadName="test",
+                definitionUri="test-uri",
+                location=ModuleLocation(moduleId="module-id"),
+            )
+        }
+    )
+    with pytest.raises(errors.exceptions.LabwareNotLoadedOnModuleError):
+        assert subject.get_id_by_module(module_id="no-module-id")
 
 
 def test_get_labware_definition(well_plate_def: LabwareDefinition) -> None:
@@ -386,10 +411,24 @@ def test_get_dimensions(well_plate_def: LabwareDefinition) -> None:
     )
 
 
-@pytest.mark.xfail(strict=True, raises=NotImplementedError)
-def test_get_default_magnet_height() -> None:  # noqa: D103
-    subject = get_labware_view()
-    _ = subject.get_default_magnet_height("labware-id")
+def test_get_default_magnet_height(
+    magdeck_well_plate_def: LabwareDefinition,
+) -> None:
+    """Should get get the default value for magnetic height."""
+    well_plate = LoadedLabware(
+        id="well-plate-id",
+        loadName="load-name",
+        location=ModuleLocation(moduleId="module-id"),
+        definitionUri="well-plate-uri",
+        offsetId=None,
+    )
+
+    subject = get_labware_view(
+        labware_by_id={"well-plate-id": well_plate},
+        definitions_by_uri={"well-plate-uri": magdeck_well_plate_def},
+    )
+
+    assert subject.get_default_magnet_height(module_id="module-id", offset=2) == 12.0
 
 
 def test_get_deck_definition(standard_deck_def: DeckDefinitionV3) -> None:
