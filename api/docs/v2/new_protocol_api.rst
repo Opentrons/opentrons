@@ -15,6 +15,7 @@ Protocols and Instruments
 
 .. autoclass:: opentrons.protocol_api.InstrumentContext
    :members:
+   :exclude-members: delay
 
 .. _protocol-api-labware:
 
