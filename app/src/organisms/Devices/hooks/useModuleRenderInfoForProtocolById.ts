@@ -1,5 +1,9 @@
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
-import { checkModuleCompatibility } from '@opentrons/shared-data'
+import {
+  checkModuleCompatibility,
+  getDeckDefFromRobotType,
+  getLoadedLabwareFromCommands,
+  getRobotTypeFromLoadedLabware,
+} from '@opentrons/shared-data'
 
 import { getProtocolModulesInfo } from '../ProtocolRun/utils/getProtocolModulesInfo'
 import {
@@ -28,11 +32,13 @@ export function useModuleRenderInfoForProtocolById(
   const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
   const attachedModules = useAttachedModules()
   if (protocolData == null) return {}
+  const loadedLabware = getLoadedLabwareFromCommands(protocolData.commands)
 
-  const protocolModulesInfo = getProtocolModulesInfo(
-    protocolData,
-    standardDeckDef as any
+  const deckDef = getDeckDefFromRobotType(
+    getRobotTypeFromLoadedLabware(loadedLabware)
   )
+
+  const protocolModulesInfo = getProtocolModulesInfo(protocolData, deckDef)
 
   const protocolModulesInfoInLoadOrder = protocolModulesInfo.sort(
     (modA, modB) => modA.protocolLoadOrder - modB.protocolLoadOrder

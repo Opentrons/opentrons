@@ -11,7 +11,7 @@ import {
   useCreateCommandMutation,
 } from '@opentrons/react-api-client'
 import { ModuleModel, ModuleType } from '@opentrons/shared-data'
-import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
+import heaterShakerCommandsWithResultsKey from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommandsWithResultsKey.json'
 import { getProtocolModulesInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import {
@@ -678,7 +678,7 @@ describe('useIsHeaterShakerInProtocol', () => {
     when(mockUseProtocolDetailsForRun)
       .calledWith('1')
       .mockReturnValue({
-        protocolData: heaterShakerCommands,
+        protocolData: heaterShakerCommandsWithResultsKey,
       } as any)
   })
 

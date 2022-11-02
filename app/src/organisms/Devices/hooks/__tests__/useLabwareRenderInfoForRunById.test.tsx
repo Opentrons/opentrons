@@ -2,7 +2,7 @@ import { renderHook } from '@testing-library/react-hooks'
 import { when, resetAllWhenMocks } from 'jest-when'
 
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
-import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
+import _heaterShakerCommandsWithResultsKey from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommandsWithResultsKey.json'
 
 import { getLabwareRenderInfo } from '../../ProtocolRun/utils/getLabwareRenderInfo'
 import {
@@ -28,11 +28,11 @@ const mockUseStoredProtocolAnalysis = useStoredProtocolAnalysis as jest.MockedFu
   typeof useStoredProtocolAnalysis
 >
 
-const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnalysisFile<{}>
+const heaterShakerCommandsWithResultsKey = (_heaterShakerCommandsWithResultsKey as unknown) as ProtocolAnalysisFile<{}>
 
 const PROTOCOL_DETAILS = {
   displayName: 'fake protocol',
-  protocolData: simpleV6Protocol,
+  protocolData: heaterShakerCommandsWithResultsKey,
   protocolKey: 'fakeProtocolKey',
 }
 
@@ -119,7 +119,7 @@ describe('useLabwareRenderInfoForRunById hook', () => {
       .calledWith('1')
       .mockReturnValue((PROTOCOL_DETAILS as unknown) as StoredProtocolAnalysis)
     when(mockGetLabwareRenderInfo)
-      .calledWith(simpleV6Protocol, standardDeckDef as any)
+      .calledWith(heaterShakerCommandsWithResultsKey, standardDeckDef as any)
       .mockReturnValue(LABWARE_RENDER_INFO)
   })
   afterEach(() => {
