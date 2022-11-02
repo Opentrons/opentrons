@@ -48,11 +48,8 @@ export const SetupModulesMap = ({
     robotName,
     runId
   )
-  const { protocolData } = useProtocolDetailsForRun(runId)
-  const loadedLabware = getLoadedLabwareFromCommands(
-    protocolData?.commands ?? []
-  )
-  const robotType = getRobotTypeFromLoadedLabware(loadedLabware)
+  const { robotType } = useProtocolDetailsForRun(runId)
+
   const deckDef = getDeckDefFromRobotType(robotType)
   const {
     missingModuleIds,

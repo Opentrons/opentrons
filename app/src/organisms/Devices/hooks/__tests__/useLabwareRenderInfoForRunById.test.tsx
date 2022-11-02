@@ -34,6 +34,7 @@ const PROTOCOL_DETAILS = {
   displayName: 'fake protocol',
   protocolData: heaterShakerCommandsWithResultsKey,
   protocolKey: 'fakeProtocolKey',
+  robotType: 'OT-2 Standard' as const,
 }
 
 // these are just taken from the ot-2 deck def for readability

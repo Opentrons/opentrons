@@ -87,6 +87,7 @@ describe('useProtocolDetailsForRun hook', () => {
       protocolData: null,
       protocolKey: null,
       isProtocolAnalyzing: false,
+      robotType: 'OT-2 Standard',
     })
   })
 
@@ -95,7 +96,8 @@ describe('useProtocolDetailsForRun hook', () => {
     const PROTOCOL_ANALYSIS = {
       id: 'fake analysis',
       status: 'completed',
-    } as CompletedProtocolAnalysis
+      labware: []
+    } as any
     when(mockUseRunQuery)
       .calledWith(RUN_ID_2, { staleTime: Infinity })
       .mockReturnValue({
@@ -120,6 +122,7 @@ describe('useProtocolDetailsForRun hook', () => {
       protocolData: simpleV6Protocol,
       protocolKey: 'fakeProtocolKey',
       isProtocolAnalyzing: false,
+      robotType: 'OT-2 Standard'
     })
   })
 })

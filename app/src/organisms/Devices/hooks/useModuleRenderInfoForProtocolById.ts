@@ -1,8 +1,6 @@
 import {
   checkModuleCompatibility,
   getDeckDefFromRobotType,
-  getLoadedLabwareFromCommands,
-  getRobotTypeFromLoadedLabware,
 } from '@opentrons/shared-data'
 
 import { getProtocolModulesInfo } from '../ProtocolRun/utils/getProtocolModulesInfo'
@@ -25,18 +23,16 @@ export function useModuleRenderInfoForProtocolById(
 ): {
   [moduleId: string]: ModuleRenderInfoForProtocol
 } {
-  const { protocolData: robotProtocolAnalysis } = useProtocolDetailsForRun(
-    runId
-  )
+  const {
+    protocolData: robotProtocolAnalysis,
+    robotType,
+  } = useProtocolDetailsForRun(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
   const attachedModules = useAttachedModules()
   if (protocolData == null) return {}
-  const loadedLabware = getLoadedLabwareFromCommands(protocolData.commands)
 
-  const deckDef = getDeckDefFromRobotType(
-    getRobotTypeFromLoadedLabware(loadedLabware)
-  )
+  const deckDef = getDeckDefFromRobotType(robotType)
 
   const protocolModulesInfo = getProtocolModulesInfo(protocolData, deckDef)
 

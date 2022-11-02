@@ -59,15 +59,11 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
     runId
   )
   const labwareRenderInfoById = useLabwareRenderInfoForRunById(runId)
-  const protocolData = useProtocolDetailsForRun(runId).protocolData
+  const { protocolData, robotType } = useProtocolDetailsForRun(runId)
   const liquids = parseLiquidsInLoadOrder(
     protocolData?.liquids != null ? protocolData?.liquids : {},
     protocolData?.commands ?? []
   )
-  const loadedLabware = getLoadedLabwareFromCommands(
-    protocolData?.commands ?? []
-  )
-  const robotType = getRobotTypeFromLoadedLabware(loadedLabware)
   const deckDef = getDeckDefFromRobotType(robotType)
   const labwareByLiquidId = parseLabwareInfoByLiquidId(
     protocolData?.commands ?? []

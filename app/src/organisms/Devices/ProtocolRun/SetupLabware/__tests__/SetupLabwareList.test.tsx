@@ -119,6 +119,7 @@ describe('SetupLabwareList', () => {
       displayName: null,
       protocolData: protocolWithMagTempTC,
       protocolKey: null,
+      robotType: 'OT-2 Standard'
     })
     mockSecureLabwareModal.mockReturnValue(<div>mock secure labware modal</div>)
     mockGetAllLabwareAndTiprackIdsInOrder.mockReturnValue([
@@ -174,6 +175,7 @@ describe('SetupLabwareList', () => {
       displayName: null,
       protocolData: protocolWithHS,
       protocolKey: null,
+      robotType: 'OT-2 Standard'
     })
     props = {
       runId: RUN_ID_1,
@@ -192,6 +194,7 @@ describe('SetupLabwareList', () => {
       displayName: null,
       protocolData: protocolWithHS,
       protocolKey: null,
+      robotType: 'OT-2 Standard'
     })
     props = {
       runId: RUN_ID_1,
@@ -232,6 +235,7 @@ describe('SetupLabwareList', () => {
       displayName: null,
       protocolData: protocolWithHS,
       protocolKey: null,
+      robotType: 'OT-2 Standard'
     })
     props = {
       runId: RUN_ID_1,

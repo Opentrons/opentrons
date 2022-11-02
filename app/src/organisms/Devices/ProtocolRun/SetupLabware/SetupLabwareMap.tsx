@@ -44,14 +44,11 @@ export function SetupLabwareMap({
     robotName,
     runId
   )
-  const { protocolData } = useProtocolDetailsForRun(runId)
+  const { robotType } = useProtocolDetailsForRun(runId)
   const labwareRenderInfoById = useLabwareRenderInfoForRunById(runId)
   const runHasStarted = useRunHasStarted(runId)
   const enableLiquidSetup = useFeatureFlag('enableLiquidSetup')
-  const loadedLabware = getLoadedLabwareFromCommands(
-    protocolData?.commands ?? []
-  )
-  const robotType = getRobotTypeFromLoadedLabware(loadedLabware)
+
   const deckDef = getDeckDefFromRobotType(robotType)
 
   return (

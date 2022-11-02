@@ -25,6 +25,7 @@ import type {
   DeckSlot,
   Liquid,
   LoadedLabware,
+  RobotType,
   RunTimeCommand,
 } from '@opentrons/shared-data'
 

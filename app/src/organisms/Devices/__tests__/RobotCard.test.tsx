@@ -131,6 +131,7 @@ const PROTOCOL_DETAILS = {
   displayName: 'Testosaur',
   protocolData: simpleV6Protocol,
   protocolKey: 'fakeProtocolKey',
+  robotType: 'OT-2 Standard' as const,
 }
 
 const render = (props: React.ComponentProps<typeof RobotCard>) => {
@@ -177,6 +178,7 @@ describe('RobotCard', () => {
         displayName: null,
         protocolData: {} as ProtocolAnalysisFile<{}>,
         protocolKey: null,
+        robotType: 'OT-2 Standard',
       })
     when(mockGetRobotModelByName)
       .calledWith(MOCK_STATE, mockConnectableRobot.name)
