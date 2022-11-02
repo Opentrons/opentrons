@@ -16,8 +16,6 @@ import {
 } from '@opentrons/components'
 import {
   getDeckDefFromRobotType,
-  getLoadedLabwareFromCommands,
-  getRobotTypeFromLoadedLabware,
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
 import { useFeatureFlag } from '../../../../redux/config'

@@ -12,8 +12,6 @@ import {
 } from '@opentrons/components'
 import {
   getDeckDefFromRobotType,
-  getLoadedLabwareFromCommands,
-  getRobotTypeFromLoadedLabware,
   inferModuleOrientationFromXCoordinate,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'

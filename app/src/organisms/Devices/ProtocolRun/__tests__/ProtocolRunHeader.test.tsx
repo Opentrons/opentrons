@@ -178,7 +178,7 @@ const PROTOCOL_DETAILS = {
   protocolData: simpleV6Protocol,
   protocolKey: 'fakeProtocolKey',
   isProtocolAnalyzing: false,
-  robotType: 'OT-2 Standard' as const
+  robotType: 'OT-2 Standard' as const,
 }
 
 const mockMovingHeaterShaker = {
@@ -347,7 +347,7 @@ describe('ProtocolRunHeader', () => {
       protocolData: null,
       protocolKey: null,
       isProtocolAnalyzing: true,
-      robotType: 'OT-2 Standard'
+      robotType: 'OT-2 Standard',
     })
 
     const [{ getByRole }] = render()
