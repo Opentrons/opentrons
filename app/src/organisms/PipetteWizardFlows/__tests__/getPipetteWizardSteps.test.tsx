@@ -50,11 +50,6 @@ describe('getPipetteWizardSteps', () => {
         flowType: FLOWS.ATTACH,
       },
       {
-        section: SECTIONS.PIPETTE_DETECTED,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      {
         section: SECTIONS.RESULTS,
         mount: LEFT,
         flowType: FLOWS.ATTACH,

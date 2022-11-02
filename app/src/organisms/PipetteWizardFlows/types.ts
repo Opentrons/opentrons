@@ -11,7 +11,6 @@ export type PipetteWizardStep =
   | ResultsStep
   | ChoosePipetteStep
   | MountPipetteStep
-  | PipetteDetectedStep
   | DetachPipetteStep
 
 export type PipetteWizardFlow =
@@ -53,9 +52,6 @@ export interface ChoosePipetteStep extends BaseStep {
 
 export interface MountPipetteStep extends BaseStep {
   section: typeof SECTIONS.MOUNT_PIPETTE
-}
-export interface PipetteDetectedStep extends BaseStep {
-  section: typeof SECTIONS.PIPETTE_DETECTED
 }
 export interface DetachPipetteStep extends BaseStep {
   section: typeof SECTIONS.DETACH_PIPETTE
