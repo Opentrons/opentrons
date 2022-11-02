@@ -69,6 +69,8 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         """Move to and pick up a tip from a given well.
 
         Args:
+            location: The location of the well we're picking up from.
+                Used to calculate the relative well offset for the pick up command.
             well_core: The "well" to pick up from.
             presses: Customize the number of presses the pipette does.
             increment: Customize the movement "distance" of the pipette to press harder.
