@@ -6,14 +6,12 @@ import { useConditionalConfirm } from '@opentrons/components'
 import {
   useHost,
   useCreateRunMutation,
-  // useDeleteRunMutation,
   useStopRunMutation,
 } from '@opentrons/react-api-client'
 import { ModalShell } from '../../molecules/Modal'
 import { Portal } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { useChainRunCommands } from '../../resources/runs/hooks'
-// import { useRunStatuses } from '../Devices/hooks'
 import { getPipetteWizardSteps } from './getPipetteWizardSteps'
 import { FLOWS, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
@@ -45,7 +43,6 @@ export const PipetteWizardFlows = (
   const host = useHost()
   const [runId, setRunId] = React.useState<string>('')
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
-  // const { isRunTerminal } = useRunStatuses()
   const totalStepCount = pipetteWizardSteps.length - 1
   const currentStep = pipetteWizardSteps?.[currentStepIndex]
 
@@ -68,15 +65,6 @@ export const PipetteWizardFlows = (
     },
     host
   )
-  // const { deleteRun, isLoading: isDeleteLoading } = useDeleteRunMutation({
-  //   onSuccess: () => {
-  //     if (currentStep.section === SECTIONS.DETACH_STEM) {
-  //       proceed()
-  //     } else {
-  //       closeFlow()
-  //     }
-  //   },
-  // })
   const { stopRun, isLoading: isStopLoading } = useStopRunMutation({
     onSuccess: () => {
       if (currentStep.section === SECTIONS.DETACH_STEM) {
@@ -84,26 +72,21 @@ export const PipetteWizardFlows = (
       } else {
         closeFlow()
       }
-      // deleteRun(runId)
     },
   })
-  // React.useEffect(() => {
-  //   if (isRunTerminal) {
-  //     deleteRun(runId)
-  //   }
-  // }, [isRunTerminal, deleteRun, runId])
 
   const [isBetweenCommands, setIsBetweenCommands] = React.useState<boolean>(
     false
   )
+  const [isExiting, setIsExiting] = React.useState<boolean>(false)
 
   const proceed = (): void => {
     if (
       !(
         isCommandMutationLoading ||
         isStopLoading ||
-        // isDeleteLoading ||
-        isBetweenCommands
+        isBetweenCommands ||
+        isExiting
       )
     ) {
       setCurrentStepIndex(
@@ -114,14 +97,14 @@ export const PipetteWizardFlows = (
     }
   }
   const handleCleanUpAndClose = (): void => {
-    setIsBetweenCommands(true)
+    setIsExiting(true)
     chainRunCommands([
       {
         commandType: 'home' as const,
         params: {},
       },
     ]).then(() => {
-      setIsBetweenCommands(false)
+      setIsExiting(false)
       if (runId !== '') stopRun(runId)
     })
   }
@@ -137,20 +120,15 @@ export const PipetteWizardFlows = (
     if (
       isCommandMutationLoading ||
       isStopLoading ||
-      // isDeleteLoading ||
-      isBetweenCommands
+      isBetweenCommands ||
+      isExiting
     ) {
       const timer = setTimeout(() => setIsRobotMoving(true), 700)
       return () => clearTimeout(timer)
     } else {
       setIsRobotMoving(false)
     }
-  }, [
-    isCommandMutationLoading,
-    isStopLoading,
-    // isDeleteLoading,
-    isBetweenCommands,
-  ])
+  }, [isCommandMutationLoading, isStopLoading, isBetweenCommands, isExiting])
 
   const calibrateBaseProps = {
     chainRunCommands,
@@ -163,7 +141,7 @@ export const PipetteWizardFlows = (
     isBetweenCommands,
   }
   const exitModal = (
-    <ExitModal goBack={cancelExit} proceed={closeFlow} flowType={flowType} />
+    <ExitModal goBack={cancelExit} proceed={confirmExit} flowType={flowType} />
   )
   let onExit
   if (currentStep == null) return null
@@ -184,7 +162,11 @@ export const PipetteWizardFlows = (
     modalContent = modalContent = showConfirmExit ? (
       exitModal
     ) : (
-      <AttachStem {...currentStep} {...calibrateBaseProps} />
+      <AttachStem
+        {...currentStep}
+        {...calibrateBaseProps}
+        isExiting={isExiting}
+      />
     )
   } else if (currentStep.section === SECTIONS.DETACH_STEM) {
     onExit = confirmExit

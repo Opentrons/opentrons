@@ -8,9 +8,11 @@ import attachProbe from '../../assets/images/change-pip/attach-stem.png'
 import pipetteCalibrating from '../../assets/images/change-pip/pipette-is-calibrating.png'
 import type { PipetteWizardStepProps } from './types'
 
-export const AttachStem = (
-  props: PipetteWizardStepProps
-): JSX.Element | null => {
+interface AttachStemProps extends PipetteWizardStepProps {
+  isExiting: boolean
+}
+
+export const AttachStem = (props: AttachStemProps): JSX.Element | null => {
   const {
     proceed,
     attachedPipette,
@@ -19,6 +21,7 @@ export const AttachStem = (
     isRobotMoving,
     goBack,
     setIsBetweenCommands,
+    isExiting,
   } = props
   const { t } = useTranslation('pipette_wizard_flows')
   const motorAxis = mount === 'left' ? 'leftZ' : 'rightZ'
@@ -27,14 +30,6 @@ export const AttachStem = (
   const handleOnClick = (): void => {
     setIsBetweenCommands(true)
     chainRunCommands([
-      {
-        // @ts-expect-error calibration type not yet supported
-        commandType: 'calibration/moveToLocation' as const,
-        params: {
-          pipetteId: pipetteId,
-          location: 'probePosition',
-        },
-      },
       {
         // @ts-expect-error calibration type not yet supported
         commandType: 'calibration/calibratePipette' as const,
@@ -71,7 +66,7 @@ export const AttachStem = (
   if (isRobotMoving)
     return (
       <InProgressModal
-        alternativeSpinner={pipetteCalibratingImage}
+        alternativeSpinner={isExiting ? null : pipetteCalibratingImage}
         description={t('pipette_calibrating')}
       />
     )
