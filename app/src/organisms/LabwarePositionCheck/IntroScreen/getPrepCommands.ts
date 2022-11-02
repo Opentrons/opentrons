@@ -68,6 +68,19 @@ export function getPrepCommands(
               },
             },
           ]
+        } else if (command.commandType === 'loadModule') {
+          return [
+            ...acc,
+            {
+              ...command,
+              params: {
+                ...command.params,
+                // python protocols won't have moduleId in the params, we want to
+                // use the same moduleIds that came back as the result of analysis
+                moduleId: command.result.moduleId,
+              },
+            },
+          ]
         }
         return [...acc, command]
       }, []) ?? []
