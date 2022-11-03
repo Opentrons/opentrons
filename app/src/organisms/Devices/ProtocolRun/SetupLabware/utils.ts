@@ -48,7 +48,7 @@ export function getLabwareSetupItemGroups(
           // NOTE: params.displayName is the user-assigned nickName, different from labareDisplayName from def
           const nickName =
             displayName != null &&
-              displayName !== getLabwareDisplayName(definition)
+            displayName !== getLabwareDisplayName(definition)
               ? displayName
               : null
 

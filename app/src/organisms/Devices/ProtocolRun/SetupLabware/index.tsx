@@ -7,13 +7,9 @@ import {
   SPACING,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
-import {
-  useFeatureFlag,
-} from '../../../../redux/config'
+import { useFeatureFlag } from '../../../../redux/config'
 import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
-import {
-  PrimaryButton,
-} from '../../../../atoms/buttons'
+import { PrimaryButton } from '../../../../atoms/buttons'
 import { getModuleTypesThatRequireExtraAttention } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
 import { ReapplyOffsetsModal } from '../../../ReapplyOffsetsModal'
 import { useCurrentRun } from '../../../ProtocolUpload/hooks'

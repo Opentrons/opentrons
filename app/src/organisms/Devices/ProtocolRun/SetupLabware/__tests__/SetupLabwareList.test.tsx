@@ -108,7 +108,7 @@ describe('SetupLabwareList', () => {
   beforeEach(() => {
     props = {
       extraAttentionModules: ['thermocyclerModuleType', 'magneticModuleType'],
-      commands: [],
+      commands: protocolWithMagTempTC.commands,
       attachedModuleInfo: {},
     }
 
@@ -165,7 +165,7 @@ describe('SetupLabwareList', () => {
       robotType: 'OT-2 Standard',
     })
     props = {
-      commands: [],
+      commands: protocolWithHS.commands,
       extraAttentionModules: ['heaterShakerModuleType'],
       attachedModuleInfo: {},
     }
@@ -184,7 +184,7 @@ describe('SetupLabwareList', () => {
       robotType: 'OT-2 Standard',
     })
     props = {
-      commands: [],
+      commands: protocolWithHS.commands,
       extraAttentionModules: ['heaterShakerModuleType'],
       attachedModuleInfo: {
         [heaterShakerId]: {
@@ -225,7 +225,7 @@ describe('SetupLabwareList', () => {
       robotType: 'OT-2 Standard',
     })
     props = {
-      commands: [],
+      commands: protocolWithHS.commands,
       extraAttentionModules: ['heaterShakerModuleType'],
       attachedModuleInfo: {
         [heaterShakerId]: {

@@ -1,12 +1,9 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { StaticRouter } from 'react-router-dom'
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent } from '@testing-library/react'
 
-import {
-  renderWithProviders,
-  componentPropsMatcher,
-} from '@opentrons/components'
+import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import { useLPCSuccessToast } from '../../../../ProtocolSetup/hooks'
 import { LabwarePositionCheck } from '../../../../LabwarePositionCheck'
@@ -200,13 +197,9 @@ describe('SetupLabwareMap', () => {
     getByText('mock setup labware map')
   })
 
-  it('should render the Labware Position Check and Labware Offset Data text', () => {
-    const { getByText } = render()
-    getByText('Labware Position Check and Labware Offset Data')
-    getByText(
-      'Labware Position Check is a recommended workflow that helps you verify the position of each labware on the deck. During this check, you can create Labware Offsets that adjust how the robot moves to each labware in the X, Y and Z directions.'
-    )
-  })
+  it.todo(
+    'should render the Labware Position Check and curren offset data text'
+  )
   it('should render LPC button and clicking should launch modal', () => {
     const { getByRole, getByText } = render()
     const button = getByRole('button', {
@@ -363,16 +356,5 @@ describe('SetupLabwareMap', () => {
       name: 'run labware position check',
     })
     expect(button).toBeDisabled()
-  })
-  it('should render a get labware offset data link only when setting is true', () => {
-    when(mockGetIsLabwareOffsetCodeSnippetsOn).mockReturnValue(true)
-    const { getByRole } = render()
-    const getOffsetDataLink = getByRole('link', {
-      name: 'Get Labware Offset Data',
-    })
-    fireEvent.click(getOffsetDataLink)
-    getByRole('button', {
-      name: 'Jupyter Notebook',
-    })
   })
 })
