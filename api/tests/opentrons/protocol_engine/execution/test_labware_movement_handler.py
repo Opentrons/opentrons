@@ -4,7 +4,7 @@ from __future__ import annotations
 from datetime import datetime
 
 import pytest
-from decoy import Decoy
+from decoy import Decoy, matchers
 from typing import TYPE_CHECKING, Union
 
 from opentrons.hardware_control import HardwareControlAPI
@@ -237,7 +237,9 @@ async def test_labware_movement_skips_for_virtual_gripper(
         new_offset_id=None,
     )
     decoy.verify(
-        await ot3_hardware_api.move_to(mount=OT3Mount.GRIPPER),  # type: ignore[call-arg]
+        await ot3_hardware_api.move_to(
+            mount=matchers.Anything(), abs_position=matchers.Anything()
+        ),
         times=0,
         ignore_extra_args=True,
     )

@@ -617,16 +617,13 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         if not self._implementation.has_tip():
             logger.warning("Pipette has no tip to return")
+
         loc = self._last_tip_picked_up_from
+
         if not isinstance(loc, labware.Well):
-            raise TypeError(
-                "Last tip location should be a Well but it is: " "{}".format(loc)
-            )
-        return_height = self._implementation.get_return_height()
-        drop_loc = instrument.determine_drop_target(
-            self.api_version, loc, return_height, APIVersion(2, 3)
-        )
-        self.drop_tip(drop_loc, home_after=home_after)
+            raise TypeError(f"Last tip location should be a Well but it is: {loc}")
+
+        self.drop_tip(loc, home_after=home_after)
 
         return self
 
@@ -838,59 +835,43 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :returns: This instance
         """
-        if location and isinstance(location, types.Location):
-            if location.labware.is_well:
-                target = location
-            else:
+        if location is None:
+            well = self.trash_container.wells()[0]
+
+        elif isinstance(location, labware.Well) or location is None:
+            well = location
+            location = None
+
+        elif isinstance(location, types.Location):
+            _, maybe_well = location.labware.get_parent_labware_and_well()
+
+            if maybe_well is None:
                 raise TypeError(
-                    "If a location is specified as a types.Location (for "
-                    "instance, as the result of a call to "
-                    "tiprack.wells()[0].top()) it must be a location "
-                    "relative to a well, since that is where a tip is "
-                    "dropped. The passed location, however, is in "
-                    "reference to {}".format(location.labware)
+                    "If a location is specified as a `types.Location`"
+                    " (for instance, as the result of a call to `Well.top()`),"
+                    " it must be a location relative to a well,"
+                    " since that is where a tip is dropped."
+                    f" However, the given location refers to {location.labware}"
                 )
-        elif location and isinstance(location, labware.Well):
-            if LabwareLike(location).is_fixed_trash():
-                target = location.top()
-            else:
-                return_height = self._implementation.get_return_height()
-                target = instrument.determine_drop_target(
-                    self.api_version, location, return_height
-                )
-        elif not location:
-            target = self.trash_container.wells()[0].top()
+
+            well = maybe_well
+
         else:
             raise TypeError(
-                "If specified, location should be an instance of "
-                "types.Location (e.g. the return value from "
-                "tiprack.wells()[0].top()) or a Well (e.g. tiprack.wells()[0]."
-                " However, it is a {}".format(location)
+                "If specified, location should be an instance of"
+                " `types.Location` (e.g. the return value from `Well.top()`)"
+                " or `Well` (e.g. `tiprack.wells()[0]`)."
+                f" However, it is {location}"
             )
 
         with publisher.publish_context(
             broker=self.broker,
-            command=cmds.drop_tip(instrument=self, location=target),
+            command=cmds.drop_tip(instrument=self, location=well),
         ):
-            self.move_to(target, publish=False)
-            self._implementation.drop_tip(home_after=home_after)
+            self._implementation.drop_tip(
+                location=location, well_core=well._impl, home_after=home_after
+            )
 
-        if (
-            self.api_version < APIVersion(2, 2)
-            and target.labware.is_well
-            and target.labware.as_well().parent.is_tiprack
-        ):
-            # If this is a tiprack we can try and add the tip back to the
-            # tracker
-            try:
-                target.labware.as_well().parent.return_tips(
-                    target.labware.as_well(), self.channels
-                )
-            except AssertionError:
-                # Similarly to :py:meth:`return_tips`, the failure case here
-                # just means the tip can't be reused, so don't actually stop
-                # the protocol
-                logger.exception(f"Could not return tip to {target}")
         self._last_tip_picked_up_from = None
         return self
 

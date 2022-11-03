@@ -5,7 +5,7 @@ from opentrons.types import Location, Mount
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support.util import Clearances, PlungerSpeeds, FlowRates
-from opentrons.protocol_engine import DeckPoint
+from opentrons.protocol_engine import DeckPoint, WellLocation
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 
 from ..instrument import AbstractInstrument
@@ -97,8 +97,37 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             well_location=well_location,
         )
 
-    def drop_tip(self, home_after: bool) -> None:
-        raise NotImplementedError("InstrumentCore.drop_tip not implemented")
+    def drop_tip(
+        self, location: Optional[Location], well_core: WellCore, home_after: bool
+    ) -> None:
+        """Move to and drop a tip into a given well.
+
+        Args:
+            location: The location of the well we're picking up from.
+                Used to calculate the relative well offset for the drop command.
+            well_core: The well we're dropping into
+            home_after: Whether to home the pipette after the tip is dropped.
+        """
+        if location is not None:
+            raise NotImplementedError(
+                "InstrumentCore.drop_tip with non-default drop location not implemented"
+            )
+
+        if home_after is False:
+            raise NotImplementedError(
+                "InstrumentCore.drop_tip with home_after=False not implemented"
+            )
+
+        well_name = well_core.get_name()
+        labware_id = well_core.labware_id
+        well_location = WellLocation()
+
+        self._engine_client.drop_tip(
+            pipette_id=self._pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
+            well_location=well_location,
+        )
 
     def home(self) -> None:
         raise NotImplementedError("InstrumentCore.home not implemented")
@@ -197,7 +226,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         raise NotImplementedError("InstrumentCore.get_channels not implemented")
 
     def has_tip(self) -> bool:
-        raise NotImplementedError("InstrumentCore.has_tip not implemented")
+        return self.get_hardware_state()["has_tip"]
 
     def is_ready_to_aspirate(self) -> bool:
         raise NotImplementedError("InstrumentCore.is_ready_to_aspirate not implemented")

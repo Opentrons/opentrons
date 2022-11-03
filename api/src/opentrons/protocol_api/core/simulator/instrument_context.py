@@ -116,7 +116,12 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
             fail_if_full=self._api_version < APIVersion(2, 2),
         )
 
-    def drop_tip(self, home_after: bool) -> None:
+    def drop_tip(
+        self,
+        location: Optional[types.Location],
+        well_core: WellImplementation,
+        home_after: bool,
+    ) -> None:
         self._raise_if_no_tip(HardwareAction.DROPTIP.name)
         self._pipette_dict["has_tip"] = False
         self._pipette_dict["tip_length"] = 0.0

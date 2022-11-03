@@ -172,6 +172,7 @@ class SyncClient:
         pipette_id: str,
         labware_id: str,
         well_name: str,
+        well_location: WellLocation,
     ) -> commands.DropTipResult:
         """Execute a DropTip command and return the result."""
         request = commands.DropTipCreate(
@@ -179,6 +180,7 @@ class SyncClient:
                 pipetteId=pipette_id,
                 labwareId=labware_id,
                 wellName=well_name,
+                wellLocation=well_location,
             )
         )
         result = self._transport.execute_command(request=request)
