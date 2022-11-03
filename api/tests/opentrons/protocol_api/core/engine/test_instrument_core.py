@@ -34,9 +34,24 @@ def mock_sync_hardware(decoy: Decoy) -> SyncHardwareAPI:
 
 @pytest.fixture
 def subject(
-    mock_engine_client: EngineClient, mock_sync_hardware: SyncHardwareAPI
+    decoy: Decoy, mock_engine_client: EngineClient, mock_sync_hardware: SyncHardwareAPI
 ) -> InstrumentCore:
     """Get a InstrumentCore test subject with its dependencies mocked out."""
+    decoy.when(mock_engine_client.state.pipettes.get("abc123")).then_return(
+        LoadedPipette.construct(mount=MountType.LEFT)  # type: ignore[call-arg]
+    )
+    pipette_dict = cast(
+        PipetteDict,
+        {
+            "default_aspirate_flow_rates": {"1.1": 22},
+            "aspirate_flow_rate": 2.0,
+            "default_dispense_flow_rates": {"3.3": 44},
+            "default_blow_out_flow_rates": {"5.5": 66},
+        },
+    )
+    decoy.when(mock_sync_hardware.get_attached_instrument(Mount.LEFT)).then_return(
+        pipette_dict
+    )
     return InstrumentCore(
         pipette_id="abc123",
         engine_client=mock_engine_client,
@@ -160,7 +175,7 @@ def test_move_to_coordinates(
     )
 
 
-def test_aspirate(
+def test_aspirate_from_well(
     decoy: Decoy,
     mock_engine_client: EngineClient,
     subject: InstrumentCore,
@@ -189,6 +204,7 @@ def test_aspirate(
                 origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
             ),
             volume=12.34,
+            flow_rate=11.2,
         ),
         times=1,
     )

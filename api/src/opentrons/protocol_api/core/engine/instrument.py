@@ -31,9 +31,10 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         self._well_bottom_clearances = Clearances(
             default_aspirate=1.0, default_dispense=1.0
         )
+        # TODO(jbl 2022-11-03) flow_rates should not live in the cores, and should be moved to the protocol context
+        #   along with other rate related refactors (for the hardware API)
         self._flow_rates = FlowRates(self)
-        # TODO this require an API version, and implementing set flow rate for aspirate/dispense/blow-out
-        # self._flow_rates.set_defaults(api_level=self._api_version)
+        self._flow_rates.set_defaults()
 
     @property
     def pipette_id(self) -> str:
@@ -73,6 +74,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             well_name=well_name,
             well_location=well_location,
             volume=volume,
+            flow_rate=self.get_absolute_aspirate_flow_rate(rate),
         )
 
     def dispense(self, volume: float, rate: float) -> None:
@@ -220,13 +222,21 @@ class InstrumentCore(AbstractInstrument[WellCore]):
     def get_flow_rate(self) -> FlowRates:
         return self._flow_rates
 
+    def get_absolute_aspirate_flow_rate(self, rate: float) -> float:
+        return self._flow_rates.aspirate * rate
+
     def set_flow_rate(
         self,
         aspirate: Optional[float] = None,
         dispense: Optional[float] = None,
         blow_out: Optional[float] = None,
     ) -> None:
-        raise NotImplementedError("InstrumentCore.set_flow_rate not implemented")
+        self._sync_hardware_api.set_flow_rate(
+            mount=self.get_mount(),
+            aspirate=aspirate,
+            dispense=dispense,
+            blow_out=blow_out,
+        )
 
     def set_pipette_speed(
         self,

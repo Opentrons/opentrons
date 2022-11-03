@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING, Optional
 
 from opentrons import types
@@ -17,6 +18,9 @@ from ..protocol_api.well import WellImplementation
 
 if TYPE_CHECKING:
     from .protocol_context import ProtocolContextSimulation
+
+
+logger = logging.getLogger(__name__)
 
 
 class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
@@ -66,6 +70,16 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
                 if location.labware.is_well:
                     self.move_to(
                         location=location.labware.as_well().top(), well_core=well_core
+                    )
+                else:
+                    # TODO(seth,2019/7/29): This should be a warning exposed
+                    #  via rpc to the runapp
+                    logger.warning(
+                        "When aspirate is called on something other than a "
+                        "well relative position, we can't move to the top of"
+                        " the well to prepare for aspiration. This might "
+                        "cause over aspiration if the previous command is a "
+                        "blow_out."
                     )
                 self.prepare_for_aspirate()
             self.move_to(location=location, well_core=well_core)
@@ -209,6 +223,9 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
 
     def get_flow_rate(self) -> FlowRates:
         return self._flow_rate
+
+    def get_absolute_aspirate_flow_rate(self, rate: float) -> float:
+        return self._flow_rate.aspirate * rate
 
     def set_flow_rate(
         self,

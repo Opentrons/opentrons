@@ -145,6 +145,10 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
+    def get_absolute_aspirate_flow_rate(self, rate: float) -> float:
+        ...
+
+    @abstractmethod
     def set_flow_rate(
         self,
         aspirate: Optional[float] = None,

@@ -268,7 +268,7 @@ def test_aspirate(
                 offset=WellOffset(x=0, y=0, z=1),
             ),
             volume=123.45,
-            flowRate=2.0,
+            flowRate=6.7,
         )
     )
 
@@ -287,6 +287,7 @@ def test_aspirate(
             offset=WellOffset(x=0, y=0, z=1),
         ),
         volume=123.45,
+        flow_rate=6.7,
     )
 
     assert result == result_from_transport

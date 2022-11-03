@@ -9,7 +9,7 @@ from opentrons.broker import Broker
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support import instrument as mock_instrument_support
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import Clearances, FlowRates
+from opentrons.protocols.api_support.util import Clearances
 from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
     ProtocolContext,
@@ -177,19 +177,18 @@ def test_aspirate(
     )
 
     decoy.when(mock_well.bottom(z=1.2)).then_return(bottom_location)
+    decoy.when(mock_instrument_core.get_absolute_aspirate_flow_rate(1.23)).then_return(
+        123
+    )
 
-    mock_flow_rate = decoy.mock(cls=FlowRates)
-    decoy.when(mock_instrument_core.get_flow_rate()).then_return(mock_flow_rate)
-    decoy.when(mock_flow_rate.aspirate).then_return(123)
-
-    subject.aspirate(volume=42.0, location=mock_well)
+    subject.aspirate(volume=42.0, location=mock_well, rate=1.23)
 
     decoy.verify(
         mock_instrument_core.aspirate(
             location=bottom_location,
             well_core=mock_well._impl,
             volume=42.0,
-            rate=1.0,
+            rate=1.23,
         ),
         times=1,
     )

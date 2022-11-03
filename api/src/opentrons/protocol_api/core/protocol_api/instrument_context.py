@@ -180,11 +180,11 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
         """Move the instrument.
 
         Args:
-            location: The movement desitination.
+            location: The movement destination.
             well_core: Unused in the legacy instrument core.
             force_direct: Force a direct movement instead of an arc.
-            minumum_z_height: Set a minimum travel height for a movement arc.
-            spped: Override the travel speed in mm/s.
+            minimum_z_height: Set a minimum travel height for a movement arc.
+            speed: Override the travel speed in mm/s.
 
         Raises:
             LabwareHeightError: An item on the deck is taller than
@@ -313,6 +313,9 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
 
     def get_flow_rate(self) -> FlowRates:
         return self._flow_rates
+
+    def get_absolute_aspirate_flow_rate(self, rate: float) -> float:
+        return self._flow_rates.aspirate * rate
 
     def get_speed(self) -> PlungerSpeeds:
         return self._speeds

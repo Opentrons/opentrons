@@ -198,7 +198,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 instrument=self,
                 volume=c_vol,
                 location=dest,
-                flow_rate=self._implementation.get_flow_rate().aspirate * rate,
+                flow_rate=self._implementation.get_absolute_aspirate_flow_rate(rate),
                 rate=rate,
             ),
         ):
