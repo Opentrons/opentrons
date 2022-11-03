@@ -9,6 +9,8 @@ import { LabwareOffsetLocation } from '@opentrons/api-client'
 interface LabwareLocationCombo {
   location: LabwareOffsetLocation
   definitionUri: string
+  labwareId: string
+  moduleId?: string
 }
 export function getLabwareLocationCombos(
   commands: RunTimeCommand[],
@@ -18,21 +20,24 @@ export function getLabwareLocationCombos(
   return commands.reduce<LabwareLocationCombo[]>((acc, command) => {
     if (command.commandType === 'loadLabware') {
       const definitionUri = getLabwareDefURI(command.result.definition)
-      if ('moduleId' in command.params.location) {
-        const modLocation = resolveModuleLocation(
-          modules,
-          command.params.location.moduleId
-        )
+      if (command.params.location === 'offDeck') {
+        return acc
+      } else if ('moduleId' in command.params.location) {
+        const { moduleId } = command.params.location
+        const modLocation = resolveModuleLocation(modules, moduleId)
         return modLocation == null
           ? acc
           : appendLocationComboIfUniq(acc, {
               location: modLocation,
               definitionUri,
+              labwareId: command.result.labwareId,
+              moduleId,
             })
       } else {
         return appendLocationComboIfUniq(acc, {
           location: command.params.location,
           definitionUri,
+          labwareId: command.result.labwareId,
         })
       }
     } else if (command.commandType === 'moveLabware') {
@@ -43,8 +48,9 @@ export function getLabwareLocationCombos(
         )
         return acc
       }
-
-      if ('moduleId' in command.params.newLocation) {
+      if (command.params.newLocation === 'offDeck') {
+        return acc
+      } else if ('moduleId' in command.params.newLocation) {
         const modLocation = resolveModuleLocation(
           modules,
           command.params.newLocation.moduleId
@@ -54,11 +60,14 @@ export function getLabwareLocationCombos(
           : appendLocationComboIfUniq(acc, {
               location: modLocation,
               definitionUri: labwareEntity.definitionUri,
+              labwareId: command.params.labwareId,
+              moduleId: command.params.newLocation.moduleId,
             })
       } else {
         return appendLocationComboIfUniq(acc, {
           location: command.params.newLocation,
           definitionUri: labwareEntity.definitionUri,
+          labwareId: command.params.labwareId,
         })
       }
     } else {

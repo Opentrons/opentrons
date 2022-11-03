@@ -17,8 +17,9 @@ from . import heater_shaker
 from . import magnetic_module
 from . import temperature_module
 from . import thermocycler
-
 from . import calibration
+
+from .hash_command_params import hash_command_params
 
 from .command import (
     AbstractCommandImpl,
@@ -217,6 +218,8 @@ __all__ = [
     "BaseCommandCreate",
     "CommandStatus",
     "CommandIntent",
+    # command parameter hashing
+    "hash_command_params",
     # aspirate command models
     "Aspirate",
     "AspirateCreate",

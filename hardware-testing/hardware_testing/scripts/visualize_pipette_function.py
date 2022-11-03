@@ -12,15 +12,20 @@ except ModuleNotFoundError:
     )
 from typing import List
 
+from opentrons.types import Point
 from opentrons.calibration_storage.types import (
-    PipetteOffsetByPipetteMount,
     SourceType,
     CalibrationStatus,
 )
 from opentrons.config.robot_configs import default_pipette_offset
 from opentrons.config import pipette_config
-from opentrons.hardware_control.instruments.pipette import Pipette
 
+# TODO (lc 10-27-2022) This should be changed to an ot3 pipette object once we
+# have that well defined.
+from opentrons.hardware_control.instruments.ot2.pipette import Pipette
+from opentrons.hardware_control.instruments.ot2.instrument_calibration import (
+    PipetteOffsetByPipetteMount,
+)
 from opentrons_shared_data.pipette import model_config
 
 
@@ -114,7 +119,7 @@ async def _main(length: int) -> None:
         model = _user_select_model()
         config = pipette_config.load(pipette_model=model)  # type: ignore[arg-type]
         pip_cal_obj = PipetteOffsetByPipetteMount(
-            offset=default_pipette_offset(),
+            offset=Point(*default_pipette_offset()),
             source=SourceType.default,
             status=CalibrationStatus(),
         )

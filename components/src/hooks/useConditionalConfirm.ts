@@ -36,17 +36,17 @@ import { useState } from 'react'
  * ```
  */
 
-export const useConditionalConfirm = <T>(
-  handleContinue: (...args: T[]) => unknown,
+export const useConditionalConfirm = <T extends any[]>(
+  handleContinue: (...args: T) => void,
   shouldBlock: boolean
 ): {
-  confirm: (...args: T[]) => unknown
+  confirm: (...args: T) => void
   showConfirmation: boolean
   cancel: () => unknown
 } => {
-  const [pendingArgs, setPendingArgs] = useState<T[] | null>(null)
+  const [pendingArgs, setPendingArgs] = useState<T | null>(null)
   const pendingConfirm = pendingArgs !== null
-  const confirm = (...confirmArgs: T[]): void => {
+  const confirm: (...args: T) => void = (...confirmArgs) => {
     if (shouldBlock && !pendingConfirm) {
       setPendingArgs(confirmArgs)
     } else {

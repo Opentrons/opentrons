@@ -38,6 +38,7 @@ const mockProtocolDetails: ProtocolDetails = {
   } as any,
   displayName: 'fake protocol name',
   protocolKey: 'fakeProtocolKey',
+  robotType: 'OT-2 Standard',
 }
 
 describe('useClearAllOffsetsForCurrentRun', () => {

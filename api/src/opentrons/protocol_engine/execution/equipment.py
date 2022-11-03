@@ -306,7 +306,7 @@ class EquipmentHandler:
         else:
             # No offset for off-deck location.
             # Returning None instead of raising an exception allows loading a labware
-            # with 'off-deck' as valid location.
+            # with 'offDeck' as valid location.
             # Also allows using `moveLabware` with 'offDeck' location.
             return None
 

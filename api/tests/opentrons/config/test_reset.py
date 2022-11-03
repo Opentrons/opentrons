@@ -1,9 +1,11 @@
-from typing import Generator
+import pytest
+from typing import Generator, TYPE_CHECKING
 from unittest.mock import MagicMock, patch
 
-import pytest
-
 from opentrons.config import reset
+
+if TYPE_CHECKING:
+    from opentrons_shared_data.deck.dev_types import RobotModel
 
 
 @pytest.fixture
@@ -31,8 +33,24 @@ def mock_reset_tip_length_calibrations() -> Generator[MagicMock, None, None]:
 
 
 @pytest.fixture
-def mock_cal_storage_delete() -> Generator[MagicMock, None, None]:
-    with patch("opentrons.config.reset.delete", autospec=True) as m:
+def mock_cal_pipette_offset(
+    robot_model: "RobotModel",
+) -> Generator[MagicMock, None, None]:
+    with patch("opentrons.config.reset.clear_pipette_offset_calibrations") as m:
+        yield m
+
+
+@pytest.fixture
+def mock_cal_tip_length(robot_model: "RobotModel") -> Generator[MagicMock, None, None]:
+    with patch("opentrons.config.reset.clear_tip_length_calibration") as m:
+        yield m
+
+
+@pytest.fixture
+def mock_cal_robot_attitude(
+    robot_model: "RobotModel",
+) -> Generator[MagicMock, None, None]:
+    with patch("opentrons.config.reset.delete_robot_deck_attitude") as m:
         yield m
 
 
@@ -69,18 +87,22 @@ def test_reset_all_set(
     mock_reset_tip_length_calibrations.assert_called_once()
 
 
-def test_deck_calibration_reset(mock_cal_storage_delete: MagicMock) -> None:
+def test_deck_calibration_reset(
+    mock_cal_pipette_offset: MagicMock, mock_cal_robot_attitude: MagicMock
+) -> None:
     reset.reset_deck_calibration()
-    mock_cal_storage_delete.delete_robot_deck_attitude.assert_called_once()
-    mock_cal_storage_delete.clear_pipette_offset_calibrations.assert_called_once()
+    mock_cal_robot_attitude.assert_called_once()
+    mock_cal_pipette_offset.assert_called_once()
 
 
-def test_tip_length_calibrations_reset(mock_cal_storage_delete: MagicMock) -> None:
+def test_tip_length_calibrations_reset(
+    mock_cal_pipette_offset: MagicMock, mock_cal_tip_length: MagicMock
+) -> None:
     reset.reset_tip_length_calibrations()
-    mock_cal_storage_delete.clear_tip_length_calibration.assert_called_once()
-    mock_cal_storage_delete.clear_pipette_offset_calibrations.assert_called_once()
+    mock_cal_tip_length.assert_called_once()
+    mock_cal_pipette_offset.assert_called_once()
 
 
-def test_pipette_offset_reset(mock_cal_storage_delete: MagicMock) -> None:
+def test_pipette_offset_reset(mock_cal_pipette_offset: MagicMock) -> None:
     reset.reset_pipette_offset()
-    mock_cal_storage_delete.clear_pipette_offset_calibrations.assert_called_once()
+    mock_cal_pipette_offset.assert_called_once()

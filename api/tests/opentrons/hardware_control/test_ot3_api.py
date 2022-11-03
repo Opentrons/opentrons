@@ -10,7 +10,7 @@ from opentrons.hardware_control.dev_types import (
     InstrumentDict,
     AttachedGripper,
 )
-from opentrons.hardware_control.instruments.gripper_handler import (
+from opentrons.hardware_control.instruments.ot3.gripper_handler import (
     GripError,
 )
 from opentrons.hardware_control.types import (
@@ -522,6 +522,7 @@ async def test_gripper_fails_for_pipette_cps(
         )
 
 
+@pytest.mark.xfail
 async def test_gripper_position(ot3_hardware: ThreadManager[OT3API]):
     gripper_config = gc.load(GripperModel.V1, "g12345")
     instr_data = AttachedGripper(config=gripper_config, id="g12345")

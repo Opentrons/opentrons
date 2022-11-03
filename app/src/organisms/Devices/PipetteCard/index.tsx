@@ -9,7 +9,6 @@ import {
   ALIGN_START,
   DIRECTION_COLUMN,
   SPACING,
-  FONT_WEIGHT_REGULAR,
   useInterval,
   TYPOGRAPHY,
   COLORS,
@@ -36,6 +35,8 @@ import {
   INTENT_CALIBRATE_PIPETTE_OFFSET,
   INTENT_RECALIBRATE_PIPETTE_OFFSET,
 } from '../../DeprecatedCalibrationPanels'
+import { FLOWS } from '../../PipetteWizardFlows/constants'
+import { PipetteWizardFlows } from '../../PipetteWizardFlows'
 import { AskForCalibrationBlockModal } from '../../CalibrateTipLength'
 import { useDeckCalibrationData, usePipetteOffsetCalibration } from '../hooks'
 import { PipetteOverflowMenu } from './PipetteOverflowMenu'
@@ -46,9 +47,11 @@ import type { AttachedPipette, Mount } from '../../../redux/pipettes/types'
 import {
   isOT3Pipette,
   PipetteModelSpecs,
+  PipetteMount,
   PipetteName,
 } from '@opentrons/shared-data'
 import type { Dispatch, State } from '../../../redux/types'
+import type { PipetteWizardFlow } from '../../PipetteWizardFlows/types'
 
 interface PipetteCardProps {
   pipetteInfo: PipetteModelSpecs | null
@@ -75,9 +78,13 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const pipetteOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => setShowOverflowMenu(false),
   })
+  const isOT3PipetteAttached = isOT3Pipette(pipetteName as PipetteName)
   const [showChangePipette, setChangePipette] = React.useState(false)
   const [showBanner, setShowBanner] = React.useState(true)
   const [showSlideout, setShowSlideout] = React.useState(false)
+  const [showPipetteWizardFlows, setShowPipetteWizardFlows] = React.useState(
+    false
+  )
   const [showAboutSlideout, setShowAboutSlideout] = React.useState(false)
   const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
   const configHasCalibrationBlock = useSelector(getHasCalibrationBlock)
@@ -139,7 +146,9 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     setChangePipette(true)
   }
   const handleCalibrate = (): void => {
-    startPipetteOffsetCalibrationBlockModal(null)
+    isOT3PipetteAttached
+      ? setShowPipetteWizardFlows(true)
+      : startPipetteOffsetCalibrationBlockModal(null)
   }
   const handleAboutSlideout = (): void => {
     setShowAboutSlideout(true)
@@ -152,10 +161,17 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     <Flex
       backgroundColor={COLORS.fundamentalsBackground}
       borderRadius={BORDERS.radiusSoftCorners}
-      marginBottom={SPACING.spacing3}
       width="100%"
       data-testid={`PipetteCard_${pipetteDisplayName}`}
     >
+      {showPipetteWizardFlows ? (
+        <PipetteWizardFlows
+          flowType={FLOWS.CALIBRATE as PipetteWizardFlow}
+          mount={mount as PipetteMount}
+          closeFlow={() => setShowPipetteWizardFlows(false)}
+          robotName={robotName}
+        />
+      ) : null}
       {showChangePipette && (
         <ChangePipette
           robotName={robotName}
@@ -274,9 +290,9 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
             ) : null}
             <StyledText
               textTransform={TYPOGRAPHY.textTransformUppercase}
-              color={COLORS.darkGrey}
-              fontWeight={FONT_WEIGHT_REGULAR}
-              fontSize={TYPOGRAPHY.fontSizeCaption}
+              color={COLORS.darkGreyEnabled}
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              fontSize={TYPOGRAPHY.fontSizeH6}
               paddingBottom={SPACING.spacing2}
               data-testid={`PipetteCard_mount_${pipetteDisplayName}`}
             >

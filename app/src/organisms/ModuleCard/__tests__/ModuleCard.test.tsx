@@ -232,7 +232,7 @@ describe('ModuleCard', () => {
     })
     getByText('Magnetic Module GEN1')
     getByText('Mock Magnetic Module Data')
-    getByText('usb port 1')
+    getByText('usb-1')
     getByAltText('magneticModuleV1')
   })
   it('renders information if module is connected via hub', () => {
@@ -244,7 +244,7 @@ describe('ModuleCard', () => {
     })
     getByText('Magnetic Module GEN1')
     getByText('Mock Magnetic Module Data')
-    getByText('usb port 2 via hub')
+    getByText('usb-2 via hub')
     getByAltText('magneticModuleV1')
   })
   it('renders information for a temperature module with mocked status', () => {
@@ -260,7 +260,7 @@ describe('ModuleCard', () => {
     })
     getByText('Temperature Module GEN2')
     getByText('Mock Temperature Module Data')
-    getByText('usb port 1')
+    getByText('usb-1')
     getByAltText('temperatureModuleV2')
   })
 
@@ -276,7 +276,7 @@ describe('ModuleCard', () => {
 
     getByText('Thermocycler Module GEN1')
     getByText('Mock Thermocycler Module Data')
-    getByText('usb port 1')
+    getByText('usb-1')
     getByAltText('thermocyclerModuleV1')
   })
 
@@ -293,7 +293,7 @@ describe('ModuleCard', () => {
 
     getByText('Heater-Shaker Module GEN1')
     getByText('Mock Heater Shaker Module Data')
-    getByText('usb port 1')
+    getByText('usb-1')
     getByAltText('heaterShakerModuleV1')
   })
 

@@ -25,6 +25,7 @@ import { LabwareOffsetModal } from '../../../../ProtocolSetup/RunSetupCard/Labwa
 import {
   useLabwareRenderInfoForRunById,
   useModuleRenderInfoForProtocolById,
+  useProtocolDetailsForRun,
 } from '../../../hooks'
 import { SetupLabwareMap } from '../SetupLabwareMap'
 
@@ -73,6 +74,9 @@ const mockLabwareRender = LabwareRender as jest.MockedFunction<
 >
 const mockLabwareOffsetModal = LabwareOffsetModal as jest.MockedFunction<
   typeof LabwareOffsetModal
+>
+const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
+  typeof useProtocolDetailsForRun
 >
 const mockUseLabwareRenderInfoForRunById = useLabwareRenderInfoForRunById as jest.MockedFunction<
   typeof useLabwareRenderInfoForRunById
@@ -163,6 +167,10 @@ describe('SetupLabwareMap', () => {
           mock labware render of {fixture_tiprack_300_ul.metadata.displayName}
         </div>
       )
+
+    when(mockUseProtocolDetailsForRun)
+      .calledWith(RUN_ID)
+      .mockReturnValue({ protocolData: {} } as any)
 
     when(mockLabwareInfoOverlay)
       .mockReturnValue(<div></div>) // this (default) empty div will be returned when LabwareInfoOverlay isn't called with expected props

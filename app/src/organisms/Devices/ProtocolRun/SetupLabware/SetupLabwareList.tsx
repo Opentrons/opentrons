@@ -163,7 +163,7 @@ export function LabwareListItem(
     | HeaterShakerOpenLatchCreateCommand
     | HeaterShakerCloseLatchCreateCommand
 
-  if ('moduleId' in params.location) {
+  if (typeof params.location === 'object' && 'moduleId' in params.location) {
     const moduleIdFromProtocol = params.location.moduleId
     const moduleModel = protocolData.modules[moduleIdFromProtocol].model
     const moduleRunTimeCommand = protocolData.commands

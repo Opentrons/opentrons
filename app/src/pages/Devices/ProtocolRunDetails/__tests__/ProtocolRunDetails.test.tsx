@@ -124,6 +124,7 @@ describe('ProtocolRunDetails', () => {
       protocolData: (noModulesProtocol as unknown) as ProtocolAnalysisFile,
       displayName: 'mock display name',
       protocolKey: 'fakeProtocolKey',
+      robotType: 'OT-2 Standard',
     })
   })
   afterEach(() => {
@@ -240,6 +241,7 @@ describe('ProtocolRunDetails', () => {
       protocolData: null,
       displayName: null,
       protocolKey: null,
+      robotType: 'OT-2 Standard',
     })
     const [{ getByText, queryByText }] = render(
       `/devices/otie/protocol-runs/${RUN_ID}`

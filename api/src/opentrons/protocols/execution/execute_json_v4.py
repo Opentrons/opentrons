@@ -1,5 +1,6 @@
 import logging
 from typing import Dict, List, TYPE_CHECKING, Union
+from opentrons.hardware_control.modules.types import ThermocyclerStep
 from opentrons.protocol_api import (
     ProtocolContext,
     MagneticModuleContext,
@@ -164,7 +165,7 @@ def _thermocycler_run_profile(
 ) -> None:
     volume = params["volume"]
     profile = [
-        {"temperature": p["temperature"], "hold_time_seconds": p["holdTime"]}
+        ThermocyclerStep(temperature=p["temperature"], hold_time_seconds=p["holdTime"])
         for p in params["profile"]
     ]
     module.execute_profile(steps=profile, block_max_volume=volume, repetitions=1)
