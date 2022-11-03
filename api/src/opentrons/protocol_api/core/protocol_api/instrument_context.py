@@ -61,7 +61,13 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
         this pipette."""
         self._protocol_interface.get_hardware().aspirate(self._mount, volume, rate)
 
-    def dispense(self, volume: float, rate: float) -> None:
+    def dispense(
+        self,
+        volume: float,
+        rate: float,
+        location: types.Location,
+        well_core: Optional[WellImplementation],
+    ) -> None:
         """Dispense a volume of liquid (in microliters/uL) using this pipette
         into the specified location."""
         self._protocol_interface.get_hardware().dispense(self._mount, volume, rate)
