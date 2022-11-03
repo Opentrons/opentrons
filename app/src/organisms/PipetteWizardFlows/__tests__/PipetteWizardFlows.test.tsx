@@ -99,12 +99,12 @@ describe('PipetteWizardFlows', () => {
         flowType: FLOWS.CALIBRATE,
       },
       {
-        section: SECTIONS.ATTACH_STEM,
+        section: SECTIONS.ATTACH_PROBE,
         mount: LEFT,
         flowType: FLOWS.CALIBRATE,
       },
       {
-        section: SECTIONS.DETACH_STEM,
+        section: SECTIONS.DETACH_PROBE,
         mount: LEFT,
         flowType: FLOWS.CALIBRATE,
       },

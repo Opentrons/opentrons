@@ -8,21 +8,23 @@ import {
   mockGen3P1000PipetteSpecs,
 } from '../../../redux/pipettes/__fixtures__'
 import { InProgressModal } from '../../../molecules/InProgressModal/InProgressModal'
-import { NeedHelpLink } from '../../CalibrationPanels'
+// import { NeedHelpLink } from '../../CalibrationPanels'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { BeforeBeginning } from '../BeforeBeginning'
 import { FLOWS } from '../constants'
 import type { AttachedPipette } from '../../../redux/pipettes/types'
 
-jest.mock('../../CalibrationPanels')
+//  TODO(jr, 11/3/22): uncomment out the get help link when we have
+//  the correct URL to link it to
+// jest.mock('../../CalibrationPanels')
 jest.mock('../../../molecules/InProgressModal/InProgressModal')
 
 const mockInProgressModal = InProgressModal as jest.MockedFunction<
   typeof InProgressModal
 >
-const mockNeedHelpLink = NeedHelpLink as jest.MockedFunction<
-  typeof NeedHelpLink
->
+// const mockNeedHelpLink = NeedHelpLink as jest.MockedFunction<
+//   typeof NeedHelpLink
+// >
 
 const render = (props: React.ComponentProps<typeof BeforeBeginning>) => {
   return renderWithProviders(<BeforeBeginning {...props} />, {
@@ -51,7 +53,7 @@ describe('BeforeBeginning', () => {
       isCreateLoading: false,
       isRobotMoving: false,
     }
-    mockNeedHelpLink.mockReturnValue(<div>mock need help link</div>)
+    // mockNeedHelpLink.mockReturnValue(<div>mock need help link</div>)
     mockInProgressModal.mockReturnValue(<div>mock in progress</div>)
   })
   it('returns the correct information for calibrate flow', async () => {
@@ -64,7 +66,7 @@ describe('BeforeBeginning', () => {
       'The calibration probe is included with the robot and should be stored on the right hand side of the door opening.'
     )
     getByText('You will need:')
-    getByText('mock need help link')
+    // getByText('mock need help link')
     getByAltText('Calibration Probe')
     const proceedBtn = getByRole('button', { name: 'Get started' })
     fireEvent.click(proceedBtn)
