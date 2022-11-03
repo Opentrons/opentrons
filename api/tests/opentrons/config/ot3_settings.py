@@ -199,6 +199,6 @@ ot3_dummy_settings = {
             "search_initial_tolerance_mm": 18,
             "search_iteration_limit": 3,
         },
-        "probe_length": 40
+        "probe_length": 40,
     },
 }
