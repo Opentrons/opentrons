@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import { LEFT } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import { FLOWS } from '../constants'
 import { ExitModal } from '../ExitModal'
@@ -14,9 +13,9 @@ const render = (props: React.ComponentProps<typeof ExitModal>) => {
 
 describe('ExitModal', () => {
   let props: React.ComponentProps<typeof ExitModal>
+
   beforeEach(() => {
     props = {
-      mount: LEFT,
       goBack: jest.fn(),
       proceed: jest.fn(),
       flowType: FLOWS.CALIBRATE,

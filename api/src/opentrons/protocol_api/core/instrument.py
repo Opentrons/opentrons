@@ -48,12 +48,21 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
     @abstractmethod
     def pick_up_tip(
         self,
-        well: WellCoreType,
-        tip_length: float,
+        location: types.Location,
+        well_core: WellCoreType,
         presses: Optional[int],
         increment: Optional[float],
-        prep_after: bool,
+        prep_after: bool = True,
     ) -> None:
+        """Move to and pick up a tip from a given well.
+
+        Args:
+            location: The location of the well we're picking up from.
+            well_core: The well to pick up from.
+            presses: Customize the number of presses the pipette does.
+            increment: Customize the movement "distance" of the pipette to press harder.
+            prep_after: Move plunger to the "ready to aspirate" position after pick up.
+        """
         ...
 
     @abstractmethod

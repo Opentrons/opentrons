@@ -297,6 +297,7 @@ class ProtocolContext(CommandPublisher):
         :param int version: The version of the labware definition. If
             unspecified, will use version 1.
         """
+        load_name = validation.ensure_lowercase_name(load_name)
         deck_slot = validation.ensure_deck_slot(location)
 
         labware_core = self._implementation.load_labware(
@@ -523,7 +524,7 @@ class ProtocolContext(CommandPublisher):
                              `mount` (if such an instrument exists) should be
                              replaced by `instrument_name`.
         """
-
+        instrument_name = validation.ensure_lowercase_name(instrument_name)
         checked_mount = validation.ensure_mount(mount)
         checked_instrument_name = validation.ensure_pipette_name(instrument_name)
         tip_racks = tip_racks or []

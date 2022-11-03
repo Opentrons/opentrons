@@ -37,6 +37,8 @@ def ensure_mount(mount: Union[str, Mount]) -> Mount:
 
 def ensure_pipette_name(pipette_name: str) -> PipetteNameType:
     """Ensure that an input value represents a valid pipette name."""
+    pipette_name = ensure_lowercase_name(pipette_name)
+
     try:
         return PipetteNameType(pipette_name)
     except ValueError as e:
@@ -54,6 +56,14 @@ def ensure_deck_slot(deck_slot: Union[int, str]) -> DeckSlotName:
         return DeckSlotName(str(deck_slot))
     except ValueError as e:
         raise ValueError(f"'{deck_slot}' is not a valid deck slot") from e
+
+
+def ensure_lowercase_name(name: str) -> str:
+    """Ensure that a given name string is all lowercase."""
+    if not isinstance(name, str):
+        raise TypeError(f"Value must be a string, but got {name}")
+
+    return name.lower()
 
 
 _MODULE_ALIASES: Dict[str, ModuleModel] = {

@@ -43,26 +43,6 @@ def subject(engine_client: EngineClient, pipette_id: str) -> PipetteContext:
     return PipetteContext(engine_client=engine_client, pipette_id=pipette_id)
 
 
-def test_pick_up_tip(
-    decoy: Decoy,
-    engine_client: EngineClient,
-    pipette_id: str,
-    labware_id: str,
-    well: Well,
-    subject: PipetteContext,
-) -> None:
-    """It should send a pick up tip command."""
-    subject.pick_up_tip(location=well)
-
-    decoy.verify(
-        engine_client.pick_up_tip(
-            pipette_id=pipette_id,
-            labware_id=labware_id,
-            well_name=well.well_name,
-        )
-    )
-
-
 def test_drop_tip(
     decoy: Decoy,
     engine_client: EngineClient,

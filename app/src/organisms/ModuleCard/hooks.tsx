@@ -6,12 +6,14 @@ import {
 import { useTranslation } from 'react-i18next'
 import { useHoverTooltip } from '@opentrons/components'
 import {
+  getDeckDefFromRobotType,
+  getLoadedLabwareFromCommands,
+  getRobotTypeFromLoadedLabware,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Tooltip } from '../../atoms/Tooltip'
@@ -38,10 +40,11 @@ export function useIsHeaterShakerInProtocol(): boolean {
   const currentRunId = useCurrentRunId()
   const { protocolData } = useProtocolDetailsForRun(currentRunId)
   if (protocolData == null) return false
-  const protocolModulesInfo = getProtocolModulesInfo(
-    protocolData,
-    standardDeckDef as any
-  )
+  const loadedLabware = getLoadedLabwareFromCommands(protocolData.commands)
+  const robotType = getRobotTypeFromLoadedLabware(loadedLabware)
+
+  const deckDef = getDeckDefFromRobotType(robotType)
+  const protocolModulesInfo = getProtocolModulesInfo(protocolData, deckDef)
   return protocolModulesInfo.some(
     module => module.moduleDef.model === 'heaterShakerModuleV1'
   )

@@ -41,10 +41,17 @@ def test_ensure_mount_input_invalid() -> None:
         subject.ensure_mount(42)  # type: ignore[arg-type]
 
 
-def test_ensure_pipette_name() -> None:
+@pytest.mark.parametrize(
+    ["input_value", "expected"],
+    [
+        ("p300_single", PipetteNameType.P300_SINGLE),
+        ("P300_muLTI_gen2", PipetteNameType.P300_MULTI_GEN2),
+    ],
+)
+def test_ensure_pipette_name(input_value: str, expected: PipetteNameType) -> None:
     """It should properly map strings and PipetteNameType enums."""
-    result = subject.ensure_pipette_name("p300_single")
-    assert result == PipetteNameType.P300_SINGLE
+    result = subject.ensure_pipette_name(input_value)
+    assert result == expected
 
 
 def test_ensure_pipette_input_invalid() -> None:
@@ -78,6 +85,18 @@ def test_ensure_deck_slot_invalid() -> None:
 
     with pytest.raises(TypeError, match="must be a string or integer"):
         subject.ensure_deck_slot(1.23)  # type: ignore[arg-type]
+
+
+def test_ensure_lowercase_name() -> None:
+    """It should properly map strings and PipetteNameType enums."""
+    result = subject.ensure_lowercase_name("aBcDeFg")
+    assert result == "abcdefg"
+
+
+def test_ensure_lowercase_name_invalid() -> None:
+    """It should raise a ValueError if given an invalid name."""
+    with pytest.raises(TypeError, match="must be a string"):
+        subject.ensure_lowercase_name(101)  # type: ignore[arg-type]
 
 
 @pytest.mark.parametrize(

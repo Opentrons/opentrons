@@ -27,7 +27,7 @@ import { useDispatchApiRequest } from '../../redux/robot-api'
 import { fetchLights } from '../../redux/robot-controls'
 import { CONNECTABLE, getRobotModelByName } from '../../redux/discovery'
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
-import { RobotStatusBanner } from './RobotStatusBanner'
+import { RobotStatusHeader } from './RobotStatusHeader'
 import { ReachableBanner } from './ReachableBanner'
 import { RobotOverviewOverflowMenu } from './RobotOverviewOverflowMenu'
 import { useIsRobotViewable, useLights, useRobot } from './hooks'
@@ -82,46 +82,48 @@ export function RobotOverview({
         {robot != null ? (
           <UpdateRobotBanner robot={robot} marginBottom={SPACING.spacing3} />
         ) : null}
-        <RobotStatusBanner
-          name={robot.name}
-          local={robot.local}
-          robotModel={robotModel}
-        />
-        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            paddingRight={SPACING.spacing4}
-          >
-            <StyledText
-              as="h6"
-              color={COLORS.darkGreyEnabled}
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              paddingBottom={SPACING.spacing2}
-              textTransform={TYPOGRAPHY.textTransformUppercase}
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+          <RobotStatusHeader
+            name={robot.name}
+            local={robot.local}
+            robotModel={robotModel}
+          />
+          <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              paddingRight={SPACING.spacing4}
             >
-              {t('controls')}
-            </StyledText>
-            <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
-              <Flex paddingBottom={SPACING.spacing2}>
-                <ToggleButton
-                  label={t('lights')}
-                  toggledOn={lightsOn != null ? lightsOn : false}
-                  disabled={lightsOn === null || robot.status !== CONNECTABLE}
-                  onClick={toggleLights}
-                  height="0.813rem"
-                  id="RobotOverview_lightsToggle"
-                />
-              </Flex>
               <StyledText
-                as="p"
-                color={
-                  isRobotViewable
-                    ? COLORS.darkBlackEnabled
-                    : COLORS.errorDisabled
-                }
+                as="h6"
+                color={COLORS.darkGreyEnabled}
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                paddingBottom={SPACING.spacing2}
+                textTransform={TYPOGRAPHY.textTransformUppercase}
               >
-                {t('lights')}
+                {t('controls')}
               </StyledText>
+              <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
+                <Flex paddingBottom={SPACING.spacing2}>
+                  <ToggleButton
+                    label={t('lights')}
+                    toggledOn={lightsOn != null ? lightsOn : false}
+                    disabled={lightsOn === null || robot.status !== CONNECTABLE}
+                    onClick={toggleLights}
+                    height="0.813rem"
+                    id="RobotOverview_lightsToggle"
+                  />
+                </Flex>
+                <StyledText
+                  as="p"
+                  color={
+                    isRobotViewable
+                      ? COLORS.darkBlackEnabled
+                      : COLORS.errorDisabled
+                  }
+                >
+                  {t('lights')}
+                </StyledText>
+              </Flex>
             </Flex>
           </Flex>
         </Flex>

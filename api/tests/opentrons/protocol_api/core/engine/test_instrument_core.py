@@ -175,6 +175,46 @@ def test_move_to_coordinates(
     )
 
 
+def test_pick_up_tip(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: InstrumentCore
+) -> None:
+    """It should pick up a tip from a well."""
+    location = Location(point=Point(1, 2, 3), labware=None)
+
+    well_core = WellCore(
+        name="well-name",
+        labware_id="labware-id",
+        engine_client=mock_engine_client,
+    )
+
+    decoy.when(
+        mock_engine_client.state.geometry.get_relative_well_location(
+            labware_id="labware-id",
+            well_name="well-name",
+            absolute_point=Point(1, 2, 3),
+        )
+    ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)))
+
+    subject.pick_up_tip(
+        location=location,
+        well_core=well_core,
+        presses=None,
+        increment=None,
+    )
+
+    decoy.verify(
+        mock_engine_client.pick_up_tip(
+            pipette_id="abc123",
+            labware_id="labware-id",
+            well_name="well-name",
+            well_location=WellLocation(
+                origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
+            ),
+        ),
+        times=1,
+    )
+
+
 def test_aspirate_from_well(
     decoy: Decoy,
     mock_engine_client: EngineClient,
