@@ -52,7 +52,9 @@ export function SimpleWizardBody(props: Props): JSX.Element {
           >
             {subHeader}
           </StyledText>
-        ) : null}
+        ) : (
+          <Flex height="1.75rem" />
+        )}
       </Flex>
       <Flex
         paddingX={SPACING.spacing6}
