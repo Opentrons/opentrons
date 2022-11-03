@@ -83,50 +83,6 @@ def test_drop_tip(
     )
 
 
-def test_aspirate(
-    decoy: Decoy,
-    engine_client: EngineClient,
-    pipette_id: str,
-    labware_id: str,
-    well: Well,
-    subject: PipetteContext,
-) -> None:
-    """It should send an aspirate command to the SyncClient."""
-    subject.aspirate(volume=12345.6789, location=well, rate=1.0)
-
-    decoy.verify(
-        engine_client.aspirate(
-            pipette_id=pipette_id,
-            labware_id=labware_id,
-            well_name=well.well_name,
-            well_location=WellLocation(
-                origin=WellOrigin.BOTTOM,
-                offset=WellOffset(x=0, y=0, z=1),
-            ),
-            volume=12345.6789,
-        )
-    )
-
-
-def test_aspirate_not_implemented_errors(
-    subject: PipetteContext,
-    well: Well,
-) -> None:
-    """It should raise NotImplementedError when appropriate."""
-    with pytest.raises(NotImplementedError):
-        # location other than a Well not supported.
-        subject.aspirate(12345.6789, well.bottom(1), 1)
-    with pytest.raises(NotImplementedError):
-        # Non-default rate not supported.
-        subject.aspirate(12345.6789, well, 0.9)
-    with pytest.raises(NotImplementedError):
-        # 0 volume not supported.
-        subject.aspirate(0, well, 1)
-    with pytest.raises(NotImplementedError):
-        # None volume not supported.
-        subject.aspirate(None, well, 1)
-
-
 def test_dispense(
     decoy: Decoy,
     engine_client: EngineClient,
