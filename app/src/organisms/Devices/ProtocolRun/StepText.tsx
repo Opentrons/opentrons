@@ -72,13 +72,6 @@ export function StepText(props: Props): JSX.Element | null {
         //  @ts-expect-error
         item => item.id === labwareId
       )
-      const labwareLocation = getLabwareLocation(
-        labwareId,
-        protocolData.commands
-      )
-      if (labwareLocation === 'offDeck' || !('slotName' in labwareLocation)) {
-        throw new Error('expected tip rack to be in a slot')
-      }
       messageNode = t('drop_tip', {
         well_name: wellName,
         labware:
@@ -87,25 +80,16 @@ export function StepText(props: Props): JSX.Element | null {
             : getLabwareDisplayName(
                 protocolData.labwareDefinitions[matchingLabware.definitionUri]
               ),
-        labware_location: labwareLocation.slotName,
       })
       break
     }
     case 'pickUpTip': {
       const { wellName, labwareId } = displayCommand.params
-      const labwareLocation = getLabwareLocation(
-        labwareId,
-        protocolData.commands
-      )
-      if (labwareLocation === 'offDeck' || !('slotName' in labwareLocation)) {
-        throw new Error('expected tip rack to be in a slot')
-      }
       messageNode = t('pickup_tip', {
         well_name: wellName,
         labware: getLabwareDisplayName(
           labwareRenderInfoById[labwareId].labwareDef
         ),
-        labware_location: labwareLocation.slotName,
       })
       break
     }
