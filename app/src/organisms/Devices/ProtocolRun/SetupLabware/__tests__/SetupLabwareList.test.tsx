@@ -9,7 +9,6 @@ import { i18n } from '../../../../../i18n'
 import { SecureLabwareModal } from '../../../../ProtocolSetup/RunSetupCard/LabwareSetup/SecureLabwareModal'
 import { RUN_ID_1 } from '../../../../RunTimeControl/__fixtures__'
 import { useProtocolDetailsForRun } from '../../../hooks'
-import { getAllLabwareAndTiprackIdsInOrder } from '../utils'
 import { SetupLabwareList } from '../SetupLabwareList'
 import type {
   ModuleModel,
@@ -40,9 +39,6 @@ const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunc
 >
 const mockSecureLabwareModal = SecureLabwareModal as jest.MockedFunction<
   typeof SecureLabwareModal
->
-const mockGetAllLabwareAndTiprackIdsInOrder = getAllLabwareAndTiprackIdsInOrder as jest.MockedFunction<
-  typeof getAllLabwareAndTiprackIdsInOrder
 >
 const render = (props: React.ComponentProps<typeof SetupLabwareList>) => {
   return renderWithProviders(<SetupLabwareList {...props} />, {
@@ -105,13 +101,14 @@ const mockClosedHeaterShakerAttachedModule = {
   },
 }
 
+// TODO: build out test coverage for this component with additional labware
 describe('SetupLabwareList', () => {
   let props: React.ComponentProps<typeof SetupLabwareList>
   let mockCreateLiveCommand = jest.fn()
   beforeEach(() => {
     props = {
-      runId: RUN_ID_1,
       extraAttentionModules: ['thermocyclerModuleType', 'magneticModuleType'],
+      commands: [],
       attachedModuleInfo: {},
     }
 
@@ -122,16 +119,6 @@ describe('SetupLabwareList', () => {
       robotType: 'OT-2 Standard',
     })
     mockSecureLabwareModal.mockReturnValue(<div>mock secure labware modal</div>)
-    mockGetAllLabwareAndTiprackIdsInOrder.mockReturnValue([
-      'aac5d680-3412-11eb-ad93-ed232a2337cf:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1',
-      '3e047fb0-3412-11eb-ad93-ed232a2337cf:opentrons/opentrons_96_tiprack_1000ul/1',
-      'ada13110-3412-11eb-ad93-ed232a2337cf:opentrons/opentrons_96_aluminumblock_generic_pcr_strip_200ul/1',
-      '5ae317e0-3412-11eb-ad93-ed232a2337cf:opentrons/nest_1_reservoir_195ml/1',
-      '60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1',
-      '53d3b350-a9c0-11eb-bce6-9f1d5b9c1a1b',
-      'b0103540-3412-11eb-ad93-ed232a2337cf:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1',
-      'faa13a50-a9bf-11eb-bce6-9f1d5b9c1a1b:opentrons/opentrons_96_tiprack_20ul/1',
-    ])
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
     mockUseCreateLiveCommandMutation.mockReturnValue({
