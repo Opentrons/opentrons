@@ -11,9 +11,9 @@ def test_access_tip_length_calibration(api_client, set_up_tip_length_temp_direct
         "pipette": PIPETTE_ID,
         "tiprack": LW_HASH,
         "lastModified": None,
-        "source": "unknown",
+        "source": "user",
         "status": {"markedAt": None, "markedBad": False, "source": None},
-        "uri": "",
+        "uri": "opentrons/opentrons_96_filtertiprack_200ul/1",
     }
 
     resp = api_client.get(

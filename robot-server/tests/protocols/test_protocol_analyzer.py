@@ -123,6 +123,7 @@ async def test_analyze(
             analysis_id="analysis-id",
             commands=[analysis_command],
             labware=[analysis_labware],
+            modules=[],
             pipettes=[analysis_pipette],
             errors=[analysis_error],
             liquids=[],

@@ -2,9 +2,16 @@ import assert from 'assert'
 import uniq from 'lodash/uniq'
 
 import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
-import standardDeckDef from '../../deck/definitions/3/ot2_standard.json'
+import standardDeckDefOt2 from '../../deck/definitions/3/ot2_standard.json'
+import standardDeckDefOt3 from '../../deck/definitions/3/ot3_standard.json'
+import type { LoadLabwareRunTimeCommand } from '../../protocol/types/schemaV6/command/setup'
 import type { DeckDefinition, LabwareDefinition2 } from '../types'
-import type { ThermalAdapterName } from '..'
+import type {
+  LoadedLabware,
+  RobotType,
+  RunTimeCommand,
+  ThermalAdapterName,
+} from '..'
 
 export { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 export { getWellTotalVolume } from './getWellTotalVolume'
@@ -210,7 +217,7 @@ export const getAreSlotsHorizontallyAdjacent = (
   if (isNaN(slotBNumber) || isNaN(slotANumber)) {
     return false
   }
-  const orderedSlots = standardDeckDef.locations.orderedSlots
+  const orderedSlots = standardDeckDefOt2.locations.orderedSlots
   // intentionally not substracting by 1 because trash (slot 12) should not count
   const numSlots = orderedSlots.length
 
@@ -246,7 +253,7 @@ export const getAreSlotsVerticallyAdjacent = (
   if (isNaN(slotBNumber) || isNaN(slotANumber)) {
     return false
   }
-  const orderedSlots = standardDeckDef.locations.orderedSlots
+  const orderedSlots = standardDeckDefOt2.locations.orderedSlots
   // intentionally not substracting by 1 because trash (slot 12) should not count
   const numSlots = orderedSlots.length
 
@@ -302,4 +309,42 @@ export const getAdapterName = (labwareLoadname: string): ThermalAdapterName => {
   }
 
   return adapterName
+}
+
+export const getRobotTypeFromLoadedLabware = (
+  labware: LoadedLabware[]
+): RobotType => {
+  const isProtocolForOT3 = labware.some(
+    l => l.loadName === 'opentrons_1_trash_3200ml_fixed'
+  )
+  return isProtocolForOT3 ? 'OT-3 Standard' : 'OT-2 Standard'
+}
+
+export const getDeckDefFromRobotType = (
+  robotType: RobotType
+): DeckDefinition => {
+  // @ts-expect-error imported JSON not playing nice with TS. see https://github.com/microsoft/TypeScript/issues/32063
+  return robotType === 'OT-3 Standard' ? standardDeckDefOt3 : standardDeckDefOt2
+}
+
+/**
+ * @deprecated This should be deleted as soon as schema v6 adapter work is merged.
+ * The only reason this util exists is because we need data to be shaped as ProtocolAnalysisOutput
+ * rather than ProtocolAnalysisFile (which is a result of the schema v6 adapter)
+ */
+export const getLoadedLabwareFromCommands = (
+  commands: RunTimeCommand[]
+): LoadedLabware[] => {
+  return commands
+    .filter(
+      (command): command is LoadLabwareRunTimeCommand =>
+        command.commandType === 'loadLabware'
+    )
+    .map((loadLabwareCommand: LoadLabwareRunTimeCommand) => ({
+      id: loadLabwareCommand.id,
+      loadName: loadLabwareCommand.result.definition.parameters.loadName,
+      definitionUri: getLabwareDefURI(loadLabwareCommand.result.definition),
+      location: loadLabwareCommand.params.location,
+      displayName: loadLabwareCommand.result.definition.metadata.displayName,
+    }))
 }

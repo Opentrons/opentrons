@@ -21,6 +21,7 @@ class LabwareCore(AbstractLabware[WellCore]):
 
     Args:
         labware_id: ProtocolEngine ID of the loaded labware.
+        engine_client: ProtocolEngine synchronous client.
     """
 
     def __init__(self, labware_id: str, engine_client: ProtocolEngineClient) -> None:
@@ -30,6 +31,11 @@ class LabwareCore(AbstractLabware[WellCore]):
         labware_state = engine_client.state.labware
         self._definition = labware_state.get_definition(labware_id)
         self._user_display_name = labware_state.get_display_name(labware_id)
+        self._wells = [
+            WellCore(name=well_name, labware_id=labware_id, engine_client=engine_client)
+            for column in self._definition.ordering
+            for well_name in column
+        ]
 
     @property
     def labware_id(self) -> str:
@@ -46,10 +52,14 @@ class LabwareCore(AbstractLabware[WellCore]):
 
     @property
     def load_name(self) -> str:
-        raise NotImplementedError("LabwareCore.load_name not implemented")
+        return self._definition.parameters.loadName
 
     def get_uri(self) -> str:
-        raise NotImplementedError("LabwareCore.get_uri not implemented")
+        """Get the URI string string of the labware's definition.
+
+        The URI is unique for a given namespace, load name, and definition version.
+        """
+        return self._engine_client.state.labware.get_definition_uri(self._labware_id)
 
     def get_load_params(self) -> LabwareLoadParams:
         return LabwareLoadParams(
@@ -60,7 +70,7 @@ class LabwareCore(AbstractLabware[WellCore]):
 
     def get_display_name(self) -> str:
         """Get a display name for the labware, falling back to the definition."""
-        raise NotImplementedError("LabwareCore.get_display_name not implemented")
+        return self._user_display_name or self._definition.metadata.displayName
 
     def get_user_display_name(self) -> Optional[str]:
         """Get the user-specified display name of the labware, if set."""
@@ -89,8 +99,9 @@ class LabwareCore(AbstractLabware[WellCore]):
     def get_calibrated_offset(self) -> Point:
         raise NotImplementedError("LabwareCore.get_calibrated_offset not implemented")
 
-    def is_tiprack(self) -> bool:
-        raise NotImplementedError("LabwareCore.is_tiprack not implemented")
+    def is_tip_rack(self) -> bool:
+        "Whether the labware is a tip rack."
+        return self._definition.parameters.isTiprack
 
     def get_tip_length(self) -> float:
         raise NotImplementedError("LabwareCore.get_tip_length not implemented")
@@ -108,7 +119,7 @@ class LabwareCore(AbstractLabware[WellCore]):
         raise NotImplementedError("LabwareCore.get_well_grid not implemented")
 
     def get_wells(self) -> List[WellCore]:
-        raise NotImplementedError("LabwareCore.get_wells not implemented")
+        return self._wells
 
     def get_wells_by_name(self) -> Dict[str, WellCore]:
         raise NotImplementedError("LabwareCore.get_wells_by_name not implemented")

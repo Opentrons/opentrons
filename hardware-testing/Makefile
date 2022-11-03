@@ -74,6 +74,12 @@ test-cov:
 .PHONY: test-integration
 test-integration:
 	$(python) protocols/ot2_p300_single_channel_gravimetric.py --simulate
+	$(python) -m hardware_testing.examples.custom_axis_settings_ot3 --simulate
+	$(python) -m hardware_testing.examples.endstop_encoder_ot3 --simulate
+	$(python) -m hardware_testing.examples.pick_up_tip_ot3 --simulate
+	$(python) -m hardware_testing.examples.plunger_ot3 --simulate
+	$(python) -m hardware_testing.examples.capacitive_probe_ot3 --simulate
+	$(python) -m hardware_testing.scripts.bowtie_ot3 --simulate
 
 .PHONY: lint
 lint:
@@ -98,6 +104,11 @@ endef
 push-plot-webpage:
 	scp -r hardware_testing/tools/plot root@$(host):/data
 	$(call move-plot-webpage,$(host),$(br_ssh_key),$(ssh_opts))
+
+.PHONY: push-plot-webpage-ot3
+push-plot-webpage-ot3:
+	scp -r hardware_testing/tools/plot root@$(host):/data
+	$(call move-plot-webpage-ot3,$(host),$(br_ssh_key),$(ssh_opts))
 
 .PHONY: restart
 restart:
@@ -125,8 +136,15 @@ push-ot3: push-no-restart-ot3 restart-ot3
 push-protocols:
 	scp -r protocols root@$(host):/data/user_storage/opentrons_data
 
+.PHONY: push-protocols-ot3
+push-protocols-ot3:
+	scp -r protocols root@$(host):/opt/opentrons-robot-server
+
 .PHONY: push-all
 push-all: clean wheel push-no-restart push-plot-webpage push-protocols
+
+.PHONY: push-all-ot3
+push-all: clean wheel push-no-restart-ot3 push-plot-webpage-ot3 push-protocols-ot3
 
 .PHONY: term
 term:
@@ -143,7 +161,32 @@ miniterm:
 .PHONY: push-all-and-term
 push-all-and-term: push-all term
 
-.PHONY: pull-data
+.PHONY: pull-data-ot3
 pull-data-ot3:
 	mkdir -p ./.pulled-data
 	scp -r root@$(host):/data/testing_data/$(test) ./.pulled-data
+
+define extract-and-update-fw
+ssh -i $(2) $(3) root@$(1) \
+"cd /opt/opentrons-robot-server &&\
+(rm -rf ot3-firmware || true) &&\
+tar -xvf ot3-firmware.tar.gz &&\
+ls ./ot3-firmware &&\
+python3 -m hardware_testing.scripts.update_fw_ot3 --folder /opt/opentrons-robot-server/ot3-firmware &&\
+ls ./ot3-firmware"
+endef
+
+.PHONY: sync-sw-ot3
+sync-sw-ot3:
+	cd ../hardware && $(MAKE) push-no-restart-ot3 host=$(host)
+	cd ../api && $(MAKE) push-no-restart-ot3 host=$(host)
+	cd ../shared-data && $(MAKE) push-no-restart-ot3 host=$(host)
+	cd ../hardware-testing && $(MAKE) push-no-restart-ot3 host=$(host)
+
+.PHONY: sync-fw-ot3
+sync-fw-ot3:
+	scp ot3-firmware.tar.gz root@$(host):/opt/opentrons-robot-server
+	$(call extract-and-update-fw,$(host),$(br_ssh_key),$(ssh_opts))
+
+.PHONY: sync-ot3
+sync-ot3: sync-sw-ot3 sync-fw-ot3

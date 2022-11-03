@@ -11,7 +11,7 @@ import {
 import { Portal } from '../../../App/portal'
 import { useTrackEvent } from '../../../redux/analytics'
 import { useRestartRun } from '../../ProtocolUpload/hooks'
-import { useLabwarePositionCheck } from '../hooks'
+import { useDeprecatedLabwarePositionCheck } from '../deprecatedHooks'
 import { DeprecatedIntroScreen } from './DeprecatedIntroScreen'
 import { DeprecatedGenericStepScreen } from './DeprecatedGenericStepScreen'
 import { DeprecatedSummaryScreen } from './DeprecatedSummaryScreen'
@@ -72,7 +72,7 @@ export const DeprecatedLabwarePositionCheckComponent = (
   ): void => {
     savePositionCommandDataDispatch({ labwareId, commandId })
   }
-  const labwarePositionCheckUtils = useLabwarePositionCheck(
+  const labwarePositionCheckUtils = useDeprecatedLabwarePositionCheck(
     addSavePositionCommandData,
     savePositionCommandData
   )

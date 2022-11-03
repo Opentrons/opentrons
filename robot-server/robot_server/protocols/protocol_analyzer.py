@@ -36,6 +36,7 @@ class ProtocolAnalyzer:
             analysis_id=analysis_id,
             commands=result.commands,
             labware=result.state_summary.labware,
+            modules=result.state_summary.modules,
             pipettes=result.state_summary.pipettes,
             errors=result.state_summary.errors,
             liquids=result.state_summary.liquids,

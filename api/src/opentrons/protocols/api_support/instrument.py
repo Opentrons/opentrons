@@ -1,10 +1,19 @@
 import logging
 from typing import Optional, Any
 
+from opentrons_shared_data.labware.dev_types import (
+    LabwareDefinition as LabwareDefinitionDict,
+)
+
 from opentrons import types
-from opentrons.calibration_storage import get
+from opentrons.calibration_storage.helpers import uri_from_definition
 from opentrons.calibration_storage.types import TipLengthCalNotFound
 from opentrons.hardware_control.dev_types import PipetteDict
+
+# TODO (lc 09-26-2022) We should conditionally import ot2 or ot3 calibration
+from opentrons.hardware_control.instruments.ot2 import (
+    instrument_calibration as instr_cal,
+)
 from opentrons.protocol_api.labware import Labware, Well
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons_shared_data.protocol.dev_types import (
@@ -46,46 +55,48 @@ def validate_blowout_location(
         )
 
 
-def tip_length_for(pipette: PipetteDict, tiprack: Labware) -> float:
+def tip_length_for(
+    pipette: PipetteDict, tip_rack_definition: LabwareDefinitionDict
+) -> float:
     """Get the tip length, including overlap, for a tip from this rack"""
-
-    def _build_length_from_overlap() -> float:
-        tip_overlap = pipette["tip_overlap"].get(
-            tiprack.uri, pipette["tip_overlap"]["default"]
-        )
-        tip_length = tiprack.tip_length
-        return tip_length - tip_overlap
-
     try:
-        return get.load_tip_length_calibration(
-            pipette["pipette_id"], tiprack._implementation.get_definition()
+        return instr_cal.load_tip_length_for_pipette(
+            pipette["pipette_id"], tip_rack_definition
         ).tip_length
     except TipLengthCalNotFound:
-        return _build_length_from_overlap()
+        tip_overlap = pipette["tip_overlap"].get(
+            uri_from_definition(tip_rack_definition),
+            pipette["tip_overlap"]["default"],
+        )
+        tip_length = tip_rack_definition["parameters"]["tipLength"]
+        return tip_length - tip_overlap
 
 
 VALID_PIP_TIPRACK_VOL = {
     "p10": [10, 20],
     "p20": [10, 20],
-    "p50": [200, 300],
+    "p50": [50, 200, 300],
     "p300": [200, 300],
     "p1000": [1000],
 }
 
 
 def validate_tiprack(
-    instrument_name: str, tiprack: Labware, log: logging.Logger
+    instrument_name: str, tip_rack: Labware, log: logging.Logger
 ) -> None:
     """Validate a tiprack logging a warning message."""
+    if not tip_rack.is_tiprack:
+        raise ValueError(f"Labware {tip_rack.load_name} is not a tip rack.")
+
     # TODO AA 2020-06-24 - we should instead add the acceptable Opentrons
     #  tipracks to the pipette as a refactor
-    if tiprack._implementation.get_definition()["namespace"] == "opentrons":
-        tiprack_vol = tiprack.wells()[0].max_volume
+    if tip_rack.uri.startswith("opentrons/"):
+        tiprack_vol = tip_rack.wells()[0].max_volume
         valid_vols = VALID_PIP_TIPRACK_VOL[instrument_name.split("_")[0]]
         if tiprack_vol not in valid_vols:
             log.warning(
-                f"The pipette {instrument_name} and its tiprack "
-                f"{tiprack.load_name} in slot {tiprack.parent} appear to "
+                f"The pipette {instrument_name} and its tip rack "
+                f"{tip_rack.load_name} in slot {tip_rack.parent} appear to "
                 "be mismatched. Please check your protocol before running "
                 "on the robot."
             )

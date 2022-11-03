@@ -6,12 +6,13 @@ import { StyledText } from '../text'
 
 interface InstrumentContainerProps {
   displayName: string
+  id?: string
 }
 
 export const InstrumentContainer = (
   props: InstrumentContainerProps
 ): JSX.Element => {
-  const { displayName } = props
+  const { displayName, id } = props
 
   return (
     <Flex
@@ -21,7 +22,9 @@ export const InstrumentContainer = (
       paddingY={SPACING.spacing1}
       width="max-content"
     >
-      <StyledText as="p">{displayName}</StyledText>
+      <StyledText as="p" id={id}>
+        {displayName}
+      </StyledText>
     </Flex>
   )
 }

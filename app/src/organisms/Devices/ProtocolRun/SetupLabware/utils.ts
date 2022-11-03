@@ -23,6 +23,7 @@ export const getAllLabwareAndTiprackIdsInOrder = (
       const labwareDef = labwareDefinitions[currentLabware.definitionId]
       const labwareLocation = getLabwareLocation(labwareId, commands)
 
+      if (labwareLocation === 'offDeck') return unorderedLabware
       if ('moduleId' in labwareLocation) {
         return [
           ...unorderedLabware,
@@ -33,15 +34,13 @@ export const getAllLabwareAndTiprackIdsInOrder = (
               .location.slotName,
           },
         ]
-      } else {
-        if (
-          !getSlotHasMatingSurfaceUnitVector(
-            standardDeckDef as any,
-            labwareLocation.slotName.toString()
-          )
-        ) {
-          return [...unorderedLabware]
-        }
+      } else if (
+        !getSlotHasMatingSurfaceUnitVector(
+          standardDeckDef as any,
+          labwareLocation.slotName.toString()
+        )
+      ) {
+        return unorderedLabware
       }
       return [
         ...unorderedLabware,

@@ -18,6 +18,7 @@ import { useSelector } from 'react-redux'
 
 import { CONNECTABLE, UNREACHABLE, REACHABLE } from '../../../redux/discovery'
 import { getBuildrootSession } from '../../../redux/buildroot'
+import { getDevtoolsEnabled } from '../../../redux/config'
 import { StyledText } from '../../../atoms/text'
 import { Banner } from '../../../atoms/Banner'
 import { useRobot } from '../../../organisms/Devices/hooks'
@@ -26,6 +27,7 @@ import { NavTab } from '../../../molecules/NavTab'
 import { RobotSettingsCalibration } from '../../../organisms/RobotSettingsCalibration'
 import { RobotSettingsAdvanced } from '../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced'
 import { RobotSettingsNetworking } from '../../../organisms/Devices/RobotSettings/RobotSettingsNetworking'
+import { RobotSettingsFeatureFlags } from '../../../organisms/Devices/RobotSettings/RobotSettingsFeatureFlags'
 import { ReachableBanner } from '../../../organisms/Devices/ReachableBanner'
 
 import type { NavRouteParams, RobotSettingsTab } from '../../../App/types'
@@ -66,7 +68,10 @@ export function RobotSettings(): JSX.Element | null {
         updateRobotStatus={updateRobotStatus}
       />
     ),
+    'feature-flags': <RobotSettingsFeatureFlags robotName={robotName} />,
   }
+
+  const devToolsOn = useSelector(getDevtoolsEnabled)
 
   if (
     (robot == null ||
@@ -76,7 +81,11 @@ export function RobotSettings(): JSX.Element | null {
   ) {
     return <Redirect to={`/devices/${robotName}`} />
   }
-  if (robotSettingsTab === 'calibration' && isCalibrationDisabled) {
+  const cannotViewCalibration =
+    robotSettingsTab === 'calibration' && isCalibrationDisabled
+  const cannotViewFeatureFlags =
+    robotSettingsTab === 'feature-flags' && !devToolsOn
+  if (cannotViewCalibration || cannotViewFeatureFlags) {
     return <Redirect to={`/devices/${robotName}/robot-settings/networking`} />
   }
 
@@ -108,7 +117,11 @@ export function RobotSettings(): JSX.Element | null {
           >
             {t('robot_settings')}
           </Box>
-          {robot != null && <ReachableBanner robot={robot} />}
+          {robot != null && (
+            <Box marginBottom={SPACING.spacing4}>
+              <ReachableBanner robot={robot} />
+            </Box>
+          )}
           {showRobotBusyBanner && (
             <Banner type="warning" marginBottom={SPACING.spacing4}>
               <StyledText as="p">
@@ -131,6 +144,12 @@ export function RobotSettings(): JSX.Element | null {
               to={`/devices/${robotName}/robot-settings/advanced`}
               tabName={t('advanced')}
             />
+            {devToolsOn ? (
+              <NavTab
+                to={`/devices/${robotName}/robot-settings/feature-flags`}
+                tabName={t('feature_flags')}
+              />
+            ) : null}
           </Flex>
         </Box>
         <Line />

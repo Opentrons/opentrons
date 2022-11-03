@@ -46,6 +46,7 @@
   "factory_reset_slideout_title": "Factory Reset",
   "factory_reset": "Factory reset",
   "factory_resets_cannot_be_undone": "Factory resets cannot be undone",
+  "feature_flags": "Feature Flags",
   "firmware_version": "Firmware Version",
   "fully_calibrate_before_checking_health": "Fully calibrate your robot before checking calibration health",
   "go_to_advanced_settings": "Go to Advanced App Settings",

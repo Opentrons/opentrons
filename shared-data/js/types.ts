@@ -24,11 +24,11 @@ import type { RunTimeCommand } from '../protocol'
 import type { PipetteName } from './pipettes'
 import { LabwareLocation } from '../protocol/types/schemaV6/command/setup'
 
-export type RobotName = 'OT-2 Standard' | 'OT-3 Standard'
+export type RobotType = 'OT-2 Standard' | 'OT-3 Standard'
 
 export interface RobotDefinition {
   displayName: string
-  robotName: RobotName
+  robotType: RobotType
   models: string[]
 }
 
@@ -429,6 +429,7 @@ export interface CompletedProtocolAnalysis {
   result: 'ok' | 'not-ok' | 'error'
   pipettes: LoadedPipette[]
   labware: LoadedLabware[]
+  modules: LoadedModule[]
   liquids: Liquid[]
   commands: RunTimeCommand[]
   errors: AnalysisError[]

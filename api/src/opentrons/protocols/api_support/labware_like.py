@@ -33,6 +33,8 @@ class LabwareLike:
         self._labware_like = labware_like
         self._type = LabwareLikeType.NONE
 
+        # TODO(mc 2022-10-28): for the love of all that is holy
+        # do not use __repr__ or __str__ to do this; it's so confusing
         if isinstance(self._labware_like, Well):
             self._type = LabwareLikeType.WELL
             self._as_str = repr(self._labware_like)

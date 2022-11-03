@@ -2,8 +2,10 @@
 
 import re
 
-from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
+
+from opentrons.protocols.geometry.well_geometry import WellGeometry
+from opentrons.types import Point
 
 from ..well import AbstractWellCore
 
@@ -61,10 +63,27 @@ class WellImplementation(AbstractWellCore):
         """Get the row portion of the well name (e.g. "1")."""
         return self._row_name
 
+    def get_max_volume(self) -> float:
+        """Get the well's maximum liquid volume."""
+        return self._geometry.max_volume
+
+    def get_top(self, z_offset: float) -> Point:
+        """Get the coordinate of the well's top, with an z-offset."""
+        return self._geometry.top(z_offset)
+
+    def get_bottom(self, z_offset: float) -> Point:
+        """Get the coordinate of the well's bottom, with an z-offset."""
+        return self._geometry.bottom(z_offset)
+
+    def get_center(self) -> Point:
+        """Get the coordinate of the well's center."""
+        return self._geometry.center()
+
     def get_geometry(self) -> WellGeometry:
         """Get the well's geometry information interface."""
         return self._geometry
 
+    # TODO(mc, 2022-10-28): is this used and/or necessary?
     def __repr__(self) -> str:
         """Use the well's display name as its repr."""
         return self.get_display_name()

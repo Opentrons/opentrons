@@ -2,12 +2,13 @@ import * as React from 'react'
 import map from 'lodash/map'
 
 import { RobotWorkSpace, Module, LabwareRender } from '@opentrons/components'
-import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
 import { useFeatureFlag } from '../../redux/config'
 
 import {
   inferModuleOrientationFromXCoordinate,
   getModuleDef2,
+  getDeckDefFromRobotType,
+  getRobotTypeFromLoadedLabware,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import {
@@ -18,25 +19,25 @@ import {
   parseLabwareInfoByLiquidId,
 } from '@opentrons/api-client'
 import { getWellFillFromLabwareId } from '../../organisms/Devices/ProtocolRun/SetupLiquids/utils'
-import type { DeckSlot, Liquid, RunTimeCommand } from '@opentrons/shared-data'
+import { getStandardDeckViewLayerBlockList } from './utils/getStandardDeckViewLayerBlockList'
+import { getStandardDeckViewBox } from './utils/getStandardViewBox'
+import type {
+  DeckSlot,
+  Liquid,
+  LoadedLabware,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
 
 interface DeckThumbnailProps {
   commands: RunTimeCommand[]
+  labware: LoadedLabware[]
   liquids?: Liquid[]
 }
-const deckSetupLayerBlocklist = [
-  'calibrationMarkings',
-  'fixedBase',
-  'doorStops',
-  'metalFrame',
-  'removalHandle',
-  'removableDeckOutline',
-  'screwHoles',
-]
 
 export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
-  const deckDef = React.useMemo(() => getDeckDefinitions().ot2_standard, [])
-  const { commands, liquids } = props
+  const { commands, liquids, labware = [] } = props
+  const robotType = getRobotTypeFromLoadedLabware(labware)
+  const deckDef = getDeckDefFromRobotType(robotType)
   const liquidSetupEnabled = useFeatureFlag('enableLiquidSetup')
   const enableThermocyclerGen2 = useFeatureFlag('enableThermocyclerGen2')
 
@@ -56,9 +57,9 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
     // revert the height
     // Note add offset 18px to right and left
     <RobotWorkSpace
-      deckLayerBlocklist={deckSetupLayerBlocklist}
+      deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
       deckDef={deckDef}
-      viewBox="-75 -20 586 480"
+      viewBox={getStandardDeckViewBox(robotType)}
     >
       {({ deckSlotsById }) =>
         map<DeckSlot>(deckSlotsById, (slot: DeckSlot, slotId: string) => {
