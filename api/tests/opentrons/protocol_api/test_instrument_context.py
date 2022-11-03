@@ -152,3 +152,26 @@ def test_move_to_well(
         ),
         times=1,
     )
+
+
+def test_pick_up_explicit_tip(
+    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
+) -> None:
+    """It should pick up a specific tip."""
+    mock_well = decoy.mock(cls=Well)
+    top_location = Location(point=Point(1, 2, 3), labware=mock_well)
+
+    decoy.when(mock_well.top()).then_return(top_location)
+
+    subject.pick_up_tip(mock_well, presses=1, increment=2.0, prep_after=False)
+
+    decoy.verify(
+        mock_instrument_core.pick_up_tip(
+            location=top_location,
+            well_core=mock_well._impl,
+            presses=1,
+            increment=2.0,
+            prep_after=False,
+        ),
+        times=1,
+    )

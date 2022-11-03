@@ -93,6 +93,7 @@ const PROTOCOL_DETAILS = {
   displayName: 'fake protocol',
   protocolData: modifiedSimpleV6Protocol,
   protocolKey: 'fakeProtocolKey',
+  robotType: 'OT-2 Standard' as const,
 }
 
 describe('useRunPipetteInfoByMount hook', () => {

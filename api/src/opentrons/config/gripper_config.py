@@ -15,7 +15,8 @@ from .types import Offset
 
 log = logging.getLogger(__name__)
 
-DEFAULT_GRIPPER_CALIBRATION_OFFSET = [0.0, 0.0, 0.0]
+# TODO we need to change this back to zero this is a workaround
+DEFAULT_GRIPPER_CALIBRATION_OFFSET = [0.0, -1.3, 0.0]
 
 
 """

@@ -19,6 +19,7 @@
   "ending": "ending",
   "error": "error",
   "exit": "exit",
+  "extension_mount": "extension mount",
   "flow_complete": "{{flowName}} complete!",
   "go_back": "Go back",
   "instruments": "instruments",
