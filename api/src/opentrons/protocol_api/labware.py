@@ -64,17 +64,11 @@ class Well:
     """
 
     def __init__(
-        self,
-        well_implementation: WellCore,
-        api_level: Optional[APIVersion] = None,
+        self, parent: Labware, well_implementation: WellCore, api_version: APIVersion
     ):
-        """
-        Create a well, and track the Point corresponding to the top-center of
-        the well (this Point is in absolute deck coordinates)
-
-        """
-        self._api_version = api_level or MAX_SUPPORTED_VERSION
+        self._parent = parent
         self._impl = well_implementation
+        self._api_version = api_version
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -84,10 +78,7 @@ class Well:
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def parent(self) -> Labware:
-        return Labware(
-            implementation=self.geometry.parent,
-            api_version=self.api_version,
-        )
+        return self._parent
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
@@ -155,7 +146,7 @@ class Well:
                  front-left corner of slot 1 as (0,0,0)). If z is specified,
                  returns a point offset by z mm from top-center
         """
-        return Location(self.geometry.top(z), self)
+        return Location(self._impl.get_top(z_offset=z), self)
 
     @requires_version(2, 0)
     def bottom(self, z: float = 0.0) -> Location:
@@ -166,7 +157,7 @@ class Well:
                  slot 1 as (0,0,0)). If z is specified, returns a point
                  offset by z mm from bottom-center
         """
-        return Location(self.geometry.bottom(z), self)
+        return Location(self._impl.get_bottom(z_offset=z), self)
 
     @requires_version(2, 0)
     def center(self) -> Location:
@@ -175,7 +166,7 @@ class Well:
                  of the well relative to the deck (with the front-left corner
                  of slot 1 as (0,0,0))
         """
-        return Location(self.geometry.center(), self)
+        return Location(self._impl.get_center(), self)
 
     @requires_version(2, 8)
     def from_center_cartesian(self, x: float, y: float, z: float) -> Point:
@@ -206,7 +197,7 @@ class Well:
         compatibility.
         """
         MODULE_LOG.warning(
-            "This method is deprecated. Please use " "'from_center_cartesian' instead."
+            "This method is deprecated. Please use 'from_center_cartesian' instead."
         )
         return self.from_center_cartesian(x, y, z)
 
@@ -695,7 +686,11 @@ class Labware(DeckItem):
             self._implementation.reset_tips()
 
     def _well_from_impl(self, well: WellCore) -> Well:
-        return Well(well_implementation=well, api_level=self._api_version)
+        return Well(
+            parent=self,
+            well_implementation=well,
+            api_version=self._api_version,
+        )
 
 
 def split_tipracks(tip_racks: List[Labware]) -> Tuple[Labware, List[Labware]]:

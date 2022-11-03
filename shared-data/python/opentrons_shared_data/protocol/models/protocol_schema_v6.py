@@ -38,7 +38,7 @@ class Params(BaseModel):
     pipetteId: Optional[str]
     mount: Optional[str]
     moduleId: Optional[str]
-    location: Union[Optional[Location], Literal['offDeck']]
+    location: Optional[Union[Location, Literal["offDeck"]]]
     labwareId: Optional[str]
     displayName: Optional[str]
     liquidId: Optional[str]
@@ -67,7 +67,7 @@ class Params(BaseModel):
     # there is moveLabware support in PAPIv2, this is only to unblock
     # internal testing of LPC with JSON protocols that include
     # 'moveLabware' commands in the meantime
-    newLocation: Union[Optional[Location], Literal['offDeck']]
+    newLocation: Optional[Union[Location, Literal["offDeck"]]]
     strategy: Optional[str]
 
 

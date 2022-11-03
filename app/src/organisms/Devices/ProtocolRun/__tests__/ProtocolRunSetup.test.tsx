@@ -107,6 +107,7 @@ describe('ProtocolRunSetup', () => {
         protocolData: (noModulesProtocol as unknown) as ProtocolAnalysisFile,
         displayName: 'mock display name',
         protocolKey: 'fakeProtocolKey',
+        robotType: 'OT-2 Standard',
       })
     when(mockUseProtocolAnalysisErrors).calledWith(RUN_ID).mockReturnValue({
       analysisErrors: null,
@@ -157,6 +158,7 @@ describe('ProtocolRunSetup', () => {
       protocolData: null,
       displayName: null,
       protocolKey: null,
+      robotType: 'OT-2 Standard',
     })
     when(mockUseStoredProtocolAnalysis).calledWith(RUN_ID).mockReturnValue(null)
     const { getByText } = render()
@@ -248,6 +250,7 @@ describe('ProtocolRunSetup', () => {
           } as unknown) as ProtocolAnalysisFile,
           displayName: 'mock display name',
           protocolKey: 'fakeProtocolKey',
+          robotType: 'OT-2 Standard',
         })
       mockProtocolHasLiquids.mockReturnValue(true)
 
@@ -271,6 +274,7 @@ describe('ProtocolRunSetup', () => {
           protocolData: (withModulesProtocol as unknown) as ProtocolAnalysisFile,
           displayName: 'mock display name',
           protocolKey: 'fakeProtocolKey',
+          robotType: 'OT-2 Standard',
         })
       when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
     })
@@ -320,6 +324,7 @@ describe('ProtocolRunSetup', () => {
           } as unknown) as ProtocolAnalysisFile,
           displayName: 'mock display name',
           protocolKey: 'fakeProtocolKey',
+          robotType: 'OT-2 Standard',
         })
       when(mockParseAllRequiredModuleModels).mockReturnValue([
         'magneticModuleV1',

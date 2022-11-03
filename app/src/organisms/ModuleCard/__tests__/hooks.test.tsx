@@ -11,11 +11,10 @@ import {
   useCreateCommandMutation,
 } from '@opentrons/react-api-client'
 import { ModuleModel, ModuleType } from '@opentrons/shared-data'
-import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
+import heaterShakerCommandsWithResultsKey from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommandsWithResultsKey.json'
 import { getProtocolModulesInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import {
-  useIsLegacySessionInProgress,
   useIsRobotBusy,
   useProtocolDetailsForRun,
   useRunStatuses,
@@ -68,9 +67,6 @@ const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
 >
 const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
   typeof useRunStatuses
->
-const mockUseIsLegacySessionsInProgress = useIsLegacySessionInProgress as jest.MockedFunction<
-  typeof useIsLegacySessionInProgress
 >
 
 const mockCloseLatchHeaterShaker = {
@@ -284,7 +280,6 @@ describe('useModuleOverflowMenu', () => {
     store.dispatch = jest.fn()
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
-    mockUseIsLegacySessionsInProgress.mockReturnValue(true)
     mockUseRunStatuses.mockReturnValue({
       isRunRunning: false,
       isRunStill: true,
@@ -320,6 +315,8 @@ describe('useModuleOverflowMenu', () => {
           jest.fn(),
           jest.fn(),
           jest.fn(),
+          false,
+          false,
           false
         ),
       {
@@ -359,6 +356,8 @@ describe('useModuleOverflowMenu', () => {
           mockTestShakeClick,
           mockHandleWizard,
           mockHandleSlideoutClick,
+          false,
+          false,
           false
         ),
       {
@@ -389,6 +388,8 @@ describe('useModuleOverflowMenu', () => {
           jest.fn(),
           jest.fn(),
           mockHandleClick,
+          false,
+          false,
           false
         ),
       {
@@ -417,6 +418,8 @@ describe('useModuleOverflowMenu', () => {
           jest.fn(),
           jest.fn(),
           jest.fn(),
+          false,
+          false,
           false
         ),
       {
@@ -453,6 +456,8 @@ describe('useModuleOverflowMenu', () => {
           jest.fn(),
           jest.fn(),
           mockHandleClick,
+          false,
+          false,
           false
         ),
       {
@@ -480,6 +485,8 @@ describe('useModuleOverflowMenu', () => {
           jest.fn(),
           jest.fn(),
           jest.fn(),
+          false,
+          false,
           false
         ),
       {
@@ -515,6 +522,8 @@ describe('useModuleOverflowMenu', () => {
           jest.fn(),
           jest.fn(),
           mockHandleClick,
+          false,
+          false,
           false
         ),
       {
@@ -542,6 +551,8 @@ describe('useModuleOverflowMenu', () => {
           jest.fn(),
           jest.fn(),
           jest.fn(),
+          false,
+          false,
           false
         ),
       {
@@ -578,6 +589,8 @@ describe('useModuleOverflowMenu', () => {
           jest.fn(),
           jest.fn(),
           jest.fn(),
+          false,
+          false,
           false
         ),
       {
@@ -614,6 +627,8 @@ describe('useModuleOverflowMenu', () => {
           jest.fn(),
           jest.fn(),
           jest.fn(),
+          false,
+          false,
           false
         ),
       {
@@ -678,7 +693,7 @@ describe('useIsHeaterShakerInProtocol', () => {
     when(mockUseProtocolDetailsForRun)
       .calledWith('1')
       .mockReturnValue({
-        protocolData: heaterShakerCommands,
+        protocolData: heaterShakerCommandsWithResultsKey,
       } as any)
   })
 

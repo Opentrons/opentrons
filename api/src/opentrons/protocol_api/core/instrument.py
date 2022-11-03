@@ -42,12 +42,21 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
     @abstractmethod
     def pick_up_tip(
         self,
-        well: WellCoreType,
-        tip_length: float,
+        location: types.Location,
+        well_core: WellCoreType,
         presses: Optional[int],
         increment: Optional[float],
-        prep_after: bool,
+        prep_after: bool = True,
     ) -> None:
+        """Move to and pick up a tip from a given well.
+
+        Args:
+            location: The location of the well we're picking up from.
+            well_core: The well to pick up from.
+            presses: Customize the number of presses the pipette does.
+            increment: Customize the movement "distance" of the pipette to press harder.
+            prep_after: Move plunger to the "ready to aspirate" position after pick up.
+        """
         ...
 
     @abstractmethod
@@ -66,6 +75,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
     def move_to(
         self,
         location: types.Location,
+        well_core: Optional[WellCoreType],
         force_direct: bool,
         minimum_z_height: Optional[float],
         speed: Optional[float],
@@ -101,7 +111,8 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
-    def get_pipette(self) -> PipetteDict:
+    def get_hardware_state(self) -> PipetteDict:
+        """Get the current state of the pipette hardware as a dictionary."""
         ...
 
     @abstractmethod

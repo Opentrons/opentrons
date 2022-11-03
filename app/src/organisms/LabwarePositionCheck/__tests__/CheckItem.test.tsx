@@ -305,13 +305,6 @@ describe('CheckItem', () => {
     getByRole('button', { name: 'Confirm placement' }).click()
     expect(props.createRunCommand).toHaveBeenNthCalledWith(3, {
       command: {
-        commandType: 'heaterShaker/closeLabwareLatch',
-        params: { moduleId: 'firstHSId' },
-      },
-      waitUntilComplete: true,
-    })
-    expect(props.createRunCommand).toHaveBeenNthCalledWith(4, {
-      command: {
         commandType: 'moveLabware',
         params: {
           labwareId: 'labwareId1',
@@ -321,6 +314,14 @@ describe('CheckItem', () => {
       },
       waitUntilComplete: true,
     })
+    expect(props.createRunCommand).toHaveBeenNthCalledWith(4, {
+      command: {
+        commandType: 'heaterShaker/closeLabwareLatch',
+        params: { moduleId: 'firstHSId' },
+      },
+      waitUntilComplete: true,
+    })
+
     expect(props.createRunCommand).toHaveBeenNthCalledWith(5, {
       command: {
         commandType: 'moveToWell',

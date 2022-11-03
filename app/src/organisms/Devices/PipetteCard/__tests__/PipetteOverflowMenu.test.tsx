@@ -95,13 +95,33 @@ describe('PipetteOverflowMenu', () => {
     expect(props.handleCalibrate).toHaveBeenCalled()
   })
 
+  it('renders recalibrate pipette text for OT-3 pipette', () => {
+    mockIsOT3Pipette.mockReturnValue(true)
+
+    props = {
+      pipetteSpecs: mockLeftProtoPipette.modelSpecs,
+      mount: LEFT,
+      handleChangePipette: jest.fn(),
+      handleCalibrate: jest.fn(),
+      handleAboutSlideout: jest.fn(),
+      handleSettingsSlideout: jest.fn(),
+      isPipetteCalibrated: true,
+    }
+    const { getByRole } = render(props)
+    const recalibrate = getByRole('button', {
+      name: 'Recalibrate pipette',
+    })
+    fireEvent.click(recalibrate)
+    expect(props.handleCalibrate).toHaveBeenCalled()
+  })
+
   it('renders only the about pipette button if OT-3/GEN3 pipette is attached', () => {
     mockIsOT3Pipette.mockReturnValue(true)
 
     const { getByRole, queryByRole } = render(props)
 
     const calibrate = getByRole('button', {
-      name: 'Calibrate pipette offset',
+      name: 'Calibrate pipette',
     })
     const detach = queryByRole('button', { name: 'Detach pipette' })
     const settings = queryByRole('button', { name: 'Pipette Settings' })

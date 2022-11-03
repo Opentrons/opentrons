@@ -5,11 +5,9 @@ from typing import Generic, List, Optional, TypeVar, cast
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
-from opentrons import types
 from opentrons.broker import Broker
-from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
 from opentrons.hardware_control import SynchronousAdapter, modules
-from opentrons.hardware_control.modules import ModuleModel, types as module_types
+from opentrons.hardware_control.modules import ModuleModel
 from opentrons.commands import module_commands as cmds
 from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support.types import APIVersion
@@ -430,11 +428,6 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
 
     _core: ThermocyclerCore
 
-    def flag_unsafe_move(
-        self, to_loc: types.Location, from_loc: types.Location
-    ) -> None:
-        self.geometry.flag_unsafe_move(to_loc, from_loc, self.lid_position)
-
     @publish(command=cmds.thermocycler_open)
     @requires_version(2, 0)
     def open_lid(self) -> str:
@@ -540,8 +533,12 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
             and finite for each step.
 
         """
+        repetitions = validation.ensure_thermocycler_repetition_count(repetitions)
+        validated_steps = validation.ensure_thermocycler_profile_steps(steps)
         self._core.execute_profile(
-            steps=steps, repetitions=repetitions, block_max_volume=block_max_volume
+            steps=validated_steps,
+            repetitions=repetitions,
+            block_max_volume=block_max_volume,
         )
 
     @publish(command=cmds.thermocycler_deactivate_lid)
@@ -829,50 +826,3 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         The Heater-Shaker does not have active cooling.
         """
         self._core.deactivate_heater()
-
-    def flag_unsafe_move(
-        self,
-        to_loc: types.Location,
-        is_multichannel: bool,
-    ) -> None:
-        """
-        Raise an error if attempting to perform a move that's deemed unsafe due to
-        the presence of the Heater-Shaker.
-
-        :meta private:
-        """
-        destination_slot = to_loc.labware.first_parent()
-        if destination_slot is None:
-            _log.warning(
-                "Pipette movement destination has no slot associated with it. Cannot"
-                " determine whether movement will safely avoid colliding with the Heater-Shaker."
-            )
-            return
-
-        is_labware_latch_closed = (
-            self._module.labware_latch_status
-            == HeaterShakerLabwareLatchStatus.IDLE_CLOSED
-        )
-        is_plate_shaking = self._module.speed_status != module_types.SpeedStatus.IDLE
-
-        to_labware_like = to_loc.labware
-        is_tiprack: bool
-        if (
-            to_labware_like.is_labware
-        ):  # Do we consider this a valid location for move_to?
-            is_tiprack = to_labware_like.as_labware().is_tiprack
-        elif to_labware_like.parent.is_labware:
-            is_tiprack = to_labware_like.parent.as_labware().is_tiprack
-        else:
-            raise Exception(
-                "Invalid destination location type. "
-                "Cannot determine pipette movement safety."
-            )
-
-        self.geometry.flag_unsafe_move(
-            to_slot=int(destination_slot),
-            is_tiprack=is_tiprack,
-            is_using_multichannel=is_multichannel,
-            is_plate_shaking=is_plate_shaking,
-            is_labware_latch_closed=is_labware_latch_closed,
-        )
