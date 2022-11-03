@@ -25,7 +25,7 @@ import {
   useProtocolDetailsForRun,
   useRunHasStarted,
 } from '../../hooks'
-import type { ModuleTypesThatRequiresExtraAttention } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
+import type { ModuleTypesThatRequireExtraAttention } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
 import { getLabwareSetupItemGroups } from './utils'
 import { OffDeckLabwareList } from './OffDeckLabwareList'
 import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
@@ -34,7 +34,7 @@ interface SetupLabwareMapProps {
   robotName: string
   runId: string
   commands: RunTimeCommand[]
-  extraAttentionModules: ModuleTypesThatRequiresExtraAttention[]
+  extraAttentionModules: ModuleTypesThatRequireExtraAttention[]
 }
 
 export function SetupLabwareMap({

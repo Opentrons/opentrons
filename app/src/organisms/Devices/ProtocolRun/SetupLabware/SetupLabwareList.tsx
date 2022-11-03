@@ -12,7 +12,7 @@ import { StyledText } from '../../../../atoms/text'
 import { getLabwareSetupItemGroups } from './utils'
 import { LabwareListItem } from './LabwareListItem'
 
-import type { ModuleTypesThatRequiresExtraAttention } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
+import type { ModuleTypesThatRequireExtraAttention } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
 import type { ModuleRenderInfoForProtocol } from '../../hooks'
 import { OffDeckLabwareList } from './OffDeckLabwareList'
 
@@ -25,7 +25,7 @@ const HeaderRow = styled.div`
 interface SetupLabwareListProps {
   attachedModuleInfo: { [moduleId: string]: ModuleRenderInfoForProtocol }
   commands: RunTimeCommand[]
-  extraAttentionModules: ModuleTypesThatRequiresExtraAttention[]
+  extraAttentionModules: ModuleTypesThatRequireExtraAttention[]
 }
 export function SetupLabwareList(
   props: SetupLabwareListProps

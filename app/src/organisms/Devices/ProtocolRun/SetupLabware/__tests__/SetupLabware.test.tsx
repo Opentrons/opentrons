@@ -10,7 +10,7 @@ import {
 import { i18n } from '../../../../../i18n'
 import { useLPCSuccessToast } from '../../../../ProtocolSetup/hooks'
 import { LabwarePositionCheck } from '../../../../LabwarePositionCheck'
-import { LabwareOffsetModal } from '../../../../ProtocolSetup/RunSetupCard/LabwareSetup/LabwareOffsetModal'
+import { LabwareOffsetModal } from '../../../../ProtocolSetup/RunSetupCard/LabwareSetup/HowLPCWorksModal'
 import { getModuleTypesThatRequireExtraAttention } from '../../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
 import {
   getIsLabwareOffsetCodeSnippetsOn,

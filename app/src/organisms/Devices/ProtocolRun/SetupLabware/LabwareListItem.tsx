@@ -36,7 +36,7 @@ import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
-import type { ModuleTypesThatRequiresExtraAttention } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
+import type { ModuleTypesThatRequireExtraAttention } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
 import type { ModuleRenderInfoForProtocol } from '../../hooks'
 import { LabwareSetupItem } from './types'
 
@@ -53,7 +53,7 @@ const LabwareRow = styled.div`
 
 interface LabwareListItemProps extends LabwareSetupItem {
   attachedModuleInfo: { [moduleId: string]: ModuleRenderInfoForProtocol }
-  extraAttentionModules: ModuleTypesThatRequiresExtraAttention[]
+  extraAttentionModules: ModuleTypesThatRequireExtraAttention[]
 }
 
 export function LabwareListItem(
@@ -227,7 +227,7 @@ export function LabwareListItem(
       </Flex>
       {secureLabwareModalType != null && (
         <SecureLabwareModal
-          type={secureLabwareModalType as ModuleTypesThatRequiresExtraAttention}
+          type={secureLabwareModalType as ModuleTypesThatRequireExtraAttention}
           onCloseClick={() => setSecureLabwareModalType(null)}
         />
       )}
