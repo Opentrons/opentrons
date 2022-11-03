@@ -3,15 +3,24 @@ import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { LEFT } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
+import {
+  mockAttachedPipette,
+  mockGen3P1000PipetteSpecs,
+} from '../../../redux/pipettes/__fixtures__'
+import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { FLOWS } from '../constants'
 import { MountPipette } from '../MountPipette'
+import type { AttachedPipette } from '../../../redux/pipettes/types'
 
 const render = (props: React.ComponentProps<typeof MountPipette>) => {
   return renderWithProviders(<MountPipette {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
-
+const mockPipette: AttachedPipette = {
+  ...mockAttachedPipette,
+  modelSpecs: mockGen3P1000PipetteSpecs,
+}
 describe('MountPipette', () => {
   let props: React.ComponentProps<typeof MountPipette>
   jest.useFakeTimers()
@@ -20,7 +29,12 @@ describe('MountPipette', () => {
       mount: LEFT,
       goBack: jest.fn(),
       proceed: jest.fn(),
+      chainRunCommands: jest.fn(),
+      runId: RUN_ID_1,
+      attachedPipette: { left: mockPipette, right: null },
       flowType: FLOWS.ATTACH,
+      setIsBetweenCommands: jest.fn(),
+      isRobotMoving: false,
     }
   })
   it('returns the correct information, buttons work as expected', async () => {

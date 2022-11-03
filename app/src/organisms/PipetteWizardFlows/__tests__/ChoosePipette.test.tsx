@@ -3,15 +3,24 @@ import { fireEvent } from '@testing-library/react'
 import { COLORS, renderWithProviders } from '@opentrons/components'
 import { LEFT } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
+import {
+  mockAttachedPipette,
+  mockGen3P1000PipetteSpecs,
+} from '../../../redux/pipettes/__fixtures__'
 import { FLOWS } from '../constants'
 import { ChoosePipette } from '../ChoosePipette'
+import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
+import type { AttachedPipette } from '../../../redux/pipettes/types'
 
 const render = (props: React.ComponentProps<typeof ChoosePipette>) => {
   return renderWithProviders(<ChoosePipette {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
-
+const mockPipette: AttachedPipette = {
+  ...mockAttachedPipette,
+  modelSpecs: mockGen3P1000PipetteSpecs,
+}
 describe('ChoosePipette', () => {
   let props: React.ComponentProps<typeof ChoosePipette>
   beforeEach(() => {
@@ -20,6 +29,11 @@ describe('ChoosePipette', () => {
       goBack: jest.fn(),
       proceed: jest.fn(),
       flowType: FLOWS.ATTACH,
+      chainRunCommands: jest.fn(),
+      isRobotMoving: false,
+      runId: RUN_ID_1,
+      attachedPipette: { left: mockPipette, right: null },
+      setIsBetweenCommands: jest.fn(),
     }
   })
   it('returns the correct information, buttons work as expected', () => {

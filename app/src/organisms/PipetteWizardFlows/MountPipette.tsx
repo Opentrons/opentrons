@@ -16,7 +16,7 @@ import screwPatternPt2 from '../../assets/images/change-pip/screw-pattern-pt2.pn
 import type { PipetteWizardStepProps } from './types'
 
 export const MountPipette = (props: PipetteWizardStepProps): JSX.Element => {
-  const { proceed, goBack } = props
+  const { proceed, goBack, attachedPipette, mount } = props
   const { t } = useTranslation('pipette_wizard_flows')
   const proceedButtonText: string = t('continue')
   const [showPipetteDetected, setShowPipetteDetected] = React.useState<boolean>(
@@ -26,9 +26,7 @@ export const MountPipette = (props: PipetteWizardStepProps): JSX.Element => {
     setTimeout(() => setShowPipetteDetected(true), 10000)
   }, [])
 
-  //    TODO(jr, 11/2/22): wire up pipetteName which will be grabbed by attachedPipette
-  //    prop. The prop is added in the PR that wires up the Calibration flow
-  const pipetteName = 'P1000 Single-Channel GEN3'
+  const pipetteName = attachedPipette[mount]?.modelSpecs.displayName
 
   return showPipetteDetected ? (
     <GenericWizardTile
