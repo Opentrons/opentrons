@@ -59,7 +59,9 @@ class CanMessenger:
         """Send a message."""
         # TODO (amit, 2021-11-05): Use function code when it is better defined.
         func = (
-            FunctionCode.error if message.message_id == MessageId.error_message else 0  # type: ignore[comparison-overlap]
+            FunctionCode.error
+            if message.message_id == MessageId.error_message
+            else FunctionCode.network_management
         )
 
         arbitration_id = ArbitrationId(
