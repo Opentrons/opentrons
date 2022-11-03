@@ -3,11 +3,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional
 
 from opentrons import types
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control import CriticalPoint
 from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.protocols.api_support import instrument as instrument_support
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.labware_like import LabwareLike
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
     Clearances,
     build_edges,
@@ -101,20 +102,30 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
 
     def pick_up_tip(
         self,
-        well: WellImplementation,
-        tip_length: float,
+        location: types.Location,
+        well_core: WellImplementation,
         presses: Optional[int],
         increment: Optional[float],
-        prep_after: bool,
+        prep_after: bool = True,
     ) -> None:
         """Pick up a tip for the pipette to run liquid-handling commands."""
         hw = self._protocol_interface.get_hardware()
-        geometry = well.get_geometry()
+        geometry = well_core.get_geometry()
+        tip_rack_core = geometry.parent
+        tip_length = instrument_support.tip_length_for(
+            pipette=self.get_hardware_state(),
+            tip_rack_definition=tip_rack_core.get_definition(),
+        )
 
+        self.move_to(location=location, well_core=well_core)
         hw.set_current_tiprack_diameter(self._mount, geometry.diameter)
-
         hw.pick_up_tip(self._mount, tip_length, presses, increment, prep_after)
         hw.set_working_volume(self._mount, geometry.max_volume)
+        tip_rack_core.get_tip_tracker().use_tips(
+            start_well=well_core,
+            num_channels=self.get_channels(),
+            fail_if_full=self._api_version < APIVersion(2, 2),
+        )
 
     def drop_tip(self, home_after: bool) -> None:
         """Drop the tip."""
@@ -140,9 +151,9 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
         self,
         location: types.Location,
         well_core: Optional[WellImplementation],
-        force_direct: bool,
-        minimum_z_height: Optional[float],
-        speed: Optional[float],
+        force_direct: bool = False,
+        minimum_z_height: Optional[float] = None,
+        speed: Optional[float] = None,
     ) -> None:
         """Move the instrument.
 

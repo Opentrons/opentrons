@@ -149,6 +149,10 @@ class PipetteMovementRestrictedByHeaterShakerError(ProtocolEngineError):
     """An error raised when trying to move to labware that's restricted by a module."""
 
 
+class HeaterShakerLabwareLatchNotOpenError(ProtocolEngineError):
+    """An error raised when heater-shaker latch is not open when it is expected to be so."""
+
+
 class EngageHeightOutOfRangeError(ProtocolEngineError):
     """An error raised when a Magnetic Module engage height is out of bounds."""
 
@@ -189,5 +193,9 @@ class GripperNotAttachedError(ProtocolEngineError):
     """An error raised when executing a gripper action without an attached gripper."""
 
 
-class UnsupportedLabwareMovementError(ProtocolEngineError):
+class LabwareMovementNotAllowedError(ProtocolEngineError):
     """An error raised when attempting an illegal labware movement."""
+
+
+class LocationIsOccupiedError(ProtocolEngineError):
+    """An error raised when attempting to place labware in a non-empty location."""

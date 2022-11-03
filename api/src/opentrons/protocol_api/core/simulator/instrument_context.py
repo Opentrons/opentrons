@@ -6,6 +6,7 @@ from opentrons import types
 from opentrons.hardware_control import NoTipAttachedError, TipAttachedError
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.types import HardwareAction
+from opentrons.protocols.api_support import instrument as instrument_support
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
@@ -14,6 +15,7 @@ from opentrons.protocols.geometry import planning
 
 from ..instrument import AbstractInstrument
 from ..protocol_api.well import WellImplementation
+
 
 if TYPE_CHECKING:
     from .protocol_context import ProtocolContextSimulation
@@ -83,13 +85,20 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
 
     def pick_up_tip(
         self,
-        well: WellImplementation,
-        tip_length: float,
+        location: types.Location,
+        well_core: WellImplementation,
         presses: Optional[int],
         increment: Optional[float],
-        prep_after: bool,
+        prep_after: bool = True,
     ) -> None:
-        geometry = well.get_geometry()
+        geometry = well_core.get_geometry()
+        tip_rack_core = geometry.parent
+        tip_length = instrument_support.tip_length_for(
+            pipette=self._pipette_dict,
+            tip_rack_definition=tip_rack_core.get_definition(),
+        )
+
+        self.move_to(location=location, well_core=well_core)
         self._raise_if_tip("pick up tip")
         self._pipette_dict["has_tip"] = True
         self._pipette_dict["tip_length"] = tip_length
@@ -100,6 +109,12 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
         self._pipette_dict["available_volume"] = self._pipette_dict["working_volume"]
         if prep_after:
             self._pipette_dict["ready_to_aspirate"] = True
+
+        tip_rack_core.get_tip_tracker().use_tips(
+            start_well=well_core,
+            num_channels=self.get_channels(),
+            fail_if_full=self._api_version < APIVersion(2, 2),
+        )
 
     def drop_tip(self, home_after: bool) -> None:
         self._raise_if_no_tip(HardwareAction.DROPTIP.name)
@@ -117,9 +132,9 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
         self,
         location: types.Location,
         well_core: Optional[WellImplementation],
-        force_direct: bool,
-        minimum_z_height: Optional[float],
-        speed: Optional[float],
+        force_direct: bool = False,
+        minimum_z_height: Optional[float] = None,
+        speed: Optional[float] = None,
     ) -> None:
         """Simulation of only the motion planning portion of move_to."""
         last_location = self._protocol_interface.get_last_location()

@@ -16,10 +16,7 @@ import { useProtocolDetailsForRun } from '..'
 import { RUN_ID_2 } from '../../../../organisms/RunTimeControl/__fixtures__'
 
 import type { Protocol, Run, ProtocolAnalyses } from '@opentrons/api-client'
-import type {
-  CompletedProtocolAnalysis,
-  ProtocolAnalysisFile,
-} from '@opentrons/shared-data'
+import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/shared-data', () => {
   const actualSharedData = jest.requireActual('@opentrons/shared-data')
@@ -87,6 +84,7 @@ describe('useProtocolDetailsForRun hook', () => {
       protocolData: null,
       protocolKey: null,
       isProtocolAnalyzing: false,
+      robotType: 'OT-2 Standard',
     })
   })
 
@@ -95,7 +93,8 @@ describe('useProtocolDetailsForRun hook', () => {
     const PROTOCOL_ANALYSIS = {
       id: 'fake analysis',
       status: 'completed',
-    } as CompletedProtocolAnalysis
+      labware: [],
+    } as any
     when(mockUseRunQuery)
       .calledWith(RUN_ID_2, { staleTime: Infinity })
       .mockReturnValue({
@@ -120,6 +119,7 @@ describe('useProtocolDetailsForRun hook', () => {
       protocolData: simpleV6Protocol,
       protocolKey: 'fakeProtocolKey',
       isProtocolAnalyzing: false,
+      robotType: 'OT-2 Standard',
     })
   })
 })

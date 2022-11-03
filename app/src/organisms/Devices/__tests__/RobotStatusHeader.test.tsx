@@ -35,6 +35,7 @@ const PROTOCOL_DETAILS = {
   displayName: 'Testosaur',
   protocolData: simpleV6Protocol,
   protocolKey: 'fakeProtocolKey',
+  robotType: 'OT-2 Standard' as const,
 }
 
 const render = (props: React.ComponentProps<typeof RobotStatusHeader>) => {
@@ -64,6 +65,7 @@ describe('RobotStatusHeader', () => {
         displayName: null,
         protocolData: {} as ProtocolAnalysisFile<{}>,
         protocolKey: null,
+        robotType: 'OT-2 Standard',
       })
   })
   afterEach(() => {

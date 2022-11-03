@@ -1,6 +1,6 @@
 """Geometry state getters."""
 from dataclasses import dataclass
-from typing import Optional, List
+from typing import Optional, List, Union
 
 from opentrons.types import Point, DeckSlotName
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -14,6 +14,8 @@ from ..types import (
     DeckSlotLocation,
     ModuleLocation,
     OFF_DECK_LOCATION,
+    LabwareLocation,
+    LabwareOffsetVector,
 )
 from .labware import LabwareView
 from .modules import ModuleView
@@ -311,3 +313,35 @@ class GeometryView:
             )
 
         return slot_name
+
+    def ensure_location_not_occupied(
+        self, location: LabwareLocation
+    ) -> LabwareLocation:
+        """Ensure that the location does not already have equipment in it."""
+        if isinstance(location, (DeckSlotLocation, ModuleLocation)):
+            self._labware.raise_if_labware_in_location(location)
+            self._modules.raise_if_module_in_location(location)
+        return location
+
+    def get_labware_center(
+        self, labware_id: str, location: Union[DeckSlotLocation, ModuleLocation]
+    ) -> Point:
+        """Get the center point of the labware as placed on the given location.
+
+        Returns the absolute position of the labware as if it were placed on the
+        specified location. Labware offset not included.
+        """
+        labware_dimensions = self._labware.get_dimensions(labware_id)
+        module_offset = LabwareOffsetVector(x=0, y=0, z=0)
+        location_slot: DeckSlotName
+        if isinstance(location, ModuleLocation):
+            module_offset = self._modules.get_module_offset(location.moduleId)
+            location_slot = self._modules.get_location(location.moduleId).slotName
+        else:
+            location_slot = location.slotName
+        slot_center = self._labware.get_slot_center_position(location_slot)
+        return Point(
+            slot_center.x + module_offset.x,
+            slot_center.y + module_offset.y,
+            slot_center.z + module_offset.z + labware_dimensions.z / 2,
+        )

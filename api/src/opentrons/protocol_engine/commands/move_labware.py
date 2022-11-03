@@ -70,9 +70,16 @@ class MoveLabwareImplementation(
         current_labware = self._state_view.labware.get(labware_id=params.labwareId)
         definition_uri = current_labware.definitionUri
 
+        empty_new_location = self._state_view.geometry.ensure_location_not_occupied(
+            location=params.newLocation
+        )
+
         # Allow propagation of ModuleNotLoadedError.
         new_offset_id = self._equipment.find_applicable_labware_offset_id(
-            labware_definition_uri=definition_uri, labware_location=params.newLocation
+            labware_definition_uri=definition_uri, labware_location=empty_new_location
+        )
+        await self._labware_movement.ensure_movement_not_obstructed_by_module(
+            labware_id=params.labwareId, new_location=empty_new_location
         )
 
         if params.strategy == LabwareMovementStrategy.USING_GRIPPER:
@@ -82,8 +89,10 @@ class MoveLabwareImplementation(
                 )
             )
             validated_new_loc = self._labware_movement.ensure_valid_gripper_location(
-                params.newLocation
+                empty_new_location,
             )
+
+            # Skips gripper moves when using virtual gripper
             await self._labware_movement.move_labware_with_gripper(
                 labware_id=params.labwareId,
                 current_location=validated_current_loc,

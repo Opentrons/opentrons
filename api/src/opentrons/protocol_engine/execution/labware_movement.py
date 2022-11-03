@@ -8,7 +8,16 @@ from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.state import StateStore
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 
-from ..errors import GripperNotAttachedError, UnsupportedLabwareMovementError
+from .thermocycler_movement_flagger import ThermocyclerMovementFlagger
+from .heater_shaker_movement_flagger import HeaterShakerMovementFlagger
+
+from ..errors import (
+    GripperNotAttachedError,
+    LabwareMovementNotAllowedError,
+    ThermocyclerNotOpenError,
+    HeaterShakerLabwareLatchNotOpenError,
+)
+
 from ..types import (
     DeckSlotLocation,
     ModuleLocation,
@@ -16,9 +25,6 @@ from ..types import (
     LabwareOffsetVector,
 )
 
-
-# TODO: remove once hardware control is able to calibrate & handle the offsets
-GRIPPER_OFFSET = Point(0.0, 1.0, 0.0)
 GRIP_FORCE = 20  # Newtons
 
 
@@ -36,11 +42,25 @@ class LabwareMovementHandler:
         hardware_api: HardwareControlAPI,
         state_store: StateStore,
         model_utils: Optional[ModelUtils] = None,
+        thermocycler_movement_flagger: Optional[ThermocyclerMovementFlagger] = None,
+        heater_shaker_movement_flagger: Optional[HeaterShakerMovementFlagger] = None,
     ) -> None:
         """Initialize a LabwareMovementHandler instance."""
         self._hardware_api = hardware_api
         self._state_store = state_store
         self._model_utils = model_utils or ModelUtils()
+        self._tc_movement_flagger = (
+            thermocycler_movement_flagger
+            or ThermocyclerMovementFlagger(
+                state_store=self._state_store, hardware_api=self._hardware_api
+            )
+        )
+        self._hs_movement_flagger = (
+            heater_shaker_movement_flagger
+            or HeaterShakerMovementFlagger(
+                state_store=self._state_store, hardware_api=self._hardware_api
+            )
+        )
 
     async def move_labware_with_gripper(
         self,
@@ -50,6 +70,9 @@ class LabwareMovementHandler:
         new_offset_id: Optional[str],
     ) -> None:
         """Move a loaded labware from one location to another."""
+        use_virtual_gripper = self._state_store.config.use_virtual_gripper
+        if use_virtual_gripper:
+            return
         ot3api = ensure_ot3_hardware(
             hardware_api=self._hardware_api,
             error_msg="Gripper is only available on the OT-3",
@@ -118,19 +141,8 @@ class LabwareMovementHandler:
         labware_offset_vector: Optional[LabwareOffsetVector],
     ) -> List[Point]:
         """Get waypoints for gripper to move to a specified location."""
-        # TODO: remove this after support for module locations is added
-        if not isinstance(location, DeckSlotLocation):
-            raise NotImplementedError(
-                "Moving labware to & from modules with a gripper is not implemented yet."
-            )
-
-        # Keeping grip height as half of overall height of labware
-        grip_height = (
-            self._state_store.labware.get_dimensions(labware_id=labware_id).z / 2
-        )
-        slot_loc = (
-            self._state_store.labware.get_slot_center_position(location.slotName)
-            + GRIPPER_OFFSET
+        labware_center = self._state_store.geometry.get_labware_center(
+            labware_id=labware_id, location=location
         )
         labware_offset_vector = labware_offset_vector or LabwareOffsetVector(
             x=0, y=0, z=0
@@ -138,14 +150,14 @@ class LabwareMovementHandler:
         waypoints: List[Point] = [
             Point(current_position.x, current_position.y, gripper_home_z),
             Point(
-                slot_loc.x + labware_offset_vector.x,
-                slot_loc.y + labware_offset_vector.y,
+                labware_center.x + labware_offset_vector.x,
+                labware_center.y + labware_offset_vector.y,
                 gripper_home_z,
             ),
             Point(
-                slot_loc.x + labware_offset_vector.x,
-                slot_loc.y + labware_offset_vector.y,
-                grip_height + labware_offset_vector.z,
+                labware_center.x + labware_offset_vector.x,
+                labware_center.y + labware_offset_vector.y,
+                labware_center.z + labware_offset_vector.z,
             ),
         ]
         return waypoints
@@ -157,7 +169,35 @@ class LabwareMovementHandler:
     ) -> Union[DeckSlotLocation, ModuleLocation]:
         """Ensure valid on-deck location for gripper, otherwise raise error."""
         if not isinstance(location, (DeckSlotLocation, ModuleLocation)):
-            raise UnsupportedLabwareMovementError(
+            raise LabwareMovementNotAllowedError(
                 "Off-deck labware movements are not supported using the gripper."
             )
         return location
+
+    async def ensure_movement_not_obstructed_by_module(
+        self, labware_id: str, new_location: LabwareLocation
+    ) -> None:
+        """Ensure that the labware movement is not obstructed by a parent module.
+
+        Raises: LabwareMovementNotAllowedError if either current location or
+        new location is a module that is in a state that prevents the labware from
+        being moved (either manually or using gripper).
+        """
+        current_parent = self._state_store.labware.get_location(labware_id=labware_id)
+        for parent in (current_parent, new_location):
+            try:
+                await self._tc_movement_flagger.raise_if_labware_in_non_open_thermocycler(
+                    labware_parent=parent
+                )
+                await self._hs_movement_flagger.raise_if_labware_latched_on_heater_shaker(
+                    labware_parent=parent
+                )
+            except ThermocyclerNotOpenError:
+                raise LabwareMovementNotAllowedError(
+                    "Cannot move labware from/to a thermocycler with closed lid."
+                )
+            except HeaterShakerLabwareLatchNotOpenError:
+                raise LabwareMovementNotAllowedError(
+                    "Cannot move labware from/to a heater-shaker"
+                    " with its labware latch open."
+                )

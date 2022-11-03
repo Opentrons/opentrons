@@ -4,7 +4,7 @@ from __future__ import annotations
 import re
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Sequence, Any, Mapping
+from typing import Dict, List, Optional, Sequence, Any, Mapping, Union
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
@@ -472,6 +472,7 @@ class LabwareView(HasState[LabwareState]):
                 and candidate.location == location
             ):
                 return candidate
+
         return None
 
     def get_fixed_trash_id(self) -> str:
@@ -491,6 +492,16 @@ class LabwareView(HasState[LabwareState]):
         raise errors.LabwareNotLoadedError(
             "No labware loaded into fixed trash location by this deck type."
         )
+
+    def raise_if_labware_in_location(
+        self, location: Union[DeckSlotLocation, ModuleLocation]
+    ) -> None:
+        """Raise an error if the specified location has labware in it."""
+        for labware in self.get_all():
+            if labware.location == location:
+                raise errors.LocationIsOccupiedError(
+                    f"Labware {labware.loadName} is already present at {location}."
+                )
 
     def _is_magnetic_module_uri_in_half_millimeter(self, labware_id: str) -> bool:
         """Check whether the labware uri needs to be calculated in half a millimeter."""
