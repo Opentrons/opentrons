@@ -66,11 +66,14 @@ export const getAllLabwareAndTiprackIdsInOrder = (
   return orderedLabwareIds
 }
 
-const SETUP_COMMAND_TYPES = [
-  'loadLabware',
-  'loadModule',
-  'loadPipette',
-  'loadLiquid',
+const LABWARE_ACCESS_COMMAND_TYPES = [
+  'moveToWell',
+  'aspirate',
+  'dispense',
+  'blowout',
+  'pickUpTip',
+  'dropTip',
+  'touchTip',
 ]
 
 export function getLabwareSetupItemGroups(
@@ -127,7 +130,7 @@ export function getLabwareSetupItemGroups(
           ]
         } else if (
           !beyondInitialLoadCommands &&
-          !SETUP_COMMAND_TYPES.includes(commandType) &&
+          LABWARE_ACCESS_COMMAND_TYPES.includes(commandType) &&
           !(
             commandType === 'moveLabware' &&
             params.strategy === 'manualMoveWithoutPause'
