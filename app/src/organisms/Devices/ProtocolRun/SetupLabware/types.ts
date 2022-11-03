@@ -3,10 +3,7 @@ import type {
   ModuleLocation,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
-import type {
-  ModuleModel,
-  LabwareDefinition2
-} from '@opentrons/shared-data'
+import type { ModuleModel, LabwareDefinition2 } from '@opentrons/shared-data'
 
 export interface LabwareSetupItem {
   definition: LabwareDefinition2
