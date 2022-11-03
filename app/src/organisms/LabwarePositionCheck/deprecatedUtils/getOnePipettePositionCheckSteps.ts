@@ -29,15 +29,14 @@ export const getOnePipettePositionCheckSteps = (args: {
   } = args
 
   const orderedTiprackIds = getTiprackIdsInOrder(
-    // @ts-expect-error these types will match once schemaV6 output is updated
     labware,
     labwareDefinitions,
     commands
   )
   const orderedLabwareIds = getLabwareIdsInOrder(
-    // @ts-expect-error these types will match once schemaV6 output is updated
     labware,
     labwareDefinitions,
+    modules,
     commands
   )
   const moveToTiprackSteps = getMoveToTiprackSteps(

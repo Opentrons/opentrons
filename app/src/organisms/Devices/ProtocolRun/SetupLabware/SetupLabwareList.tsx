@@ -79,7 +79,6 @@ export function SetupLabwareList(
   const { t } = useTranslation('protocol_setup')
   if (protocolData == null) return null
   const labwareIdsInOrder = getAllLabwareAndTiprackIdsInOrder(
-    // @ts-expect-error this type will match once we retype the output of the adapter
     protocolData.labware,
     protocolData.labwareDefinitions,
     protocolData.commands
