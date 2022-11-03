@@ -5,11 +5,11 @@ import { StyledText } from '../../../../atoms/text'
 import { LabwareListItem } from './LabwareListItem'
 import type { LabwareSetupItem } from './types'
 
-interface OffDeckLabwareList {
+interface OffDeckLabwareListProps {
   labwareItems: LabwareSetupItem[]
 }
 export function OffDeckLabwareList(
-  props: OffDeckLabwareList
+  props: OffDeckLabwareListProps
 ): JSX.Element | null {
   const { labwareItems } = props
   const { t } = useTranslation('protocol_setup')

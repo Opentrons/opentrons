@@ -165,7 +165,7 @@ describe('SetupLabwareList', () => {
       robotType: 'OT-2 Standard',
     })
     props = {
-      runId: RUN_ID_1,
+      commands: [],
       extraAttentionModules: ['heaterShakerModuleType'],
       attachedModuleInfo: {},
     }
@@ -184,7 +184,7 @@ describe('SetupLabwareList', () => {
       robotType: 'OT-2 Standard',
     })
     props = {
-      runId: RUN_ID_1,
+      commands: [],
       extraAttentionModules: ['heaterShakerModuleType'],
       attachedModuleInfo: {
         [heaterShakerId]: {
@@ -225,7 +225,7 @@ describe('SetupLabwareList', () => {
       robotType: 'OT-2 Standard',
     })
     props = {
-      runId: RUN_ID_1,
+      commands: [],
       extraAttentionModules: ['heaterShakerModuleType'],
       attachedModuleInfo: {
         [heaterShakerId]: {

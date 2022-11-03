@@ -1,41 +1,26 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { Trans, useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import map from 'lodash/map'
-import isEmpty from 'lodash/isEmpty'
-import some from 'lodash/some'
 import {
   JUSTIFY_CENTER,
   Flex,
   SPACING,
   DIRECTION_COLUMN,
-  TOOLTIP_LEFT,
-  useHoverTooltip,
 } from '@opentrons/components'
 import {
-  getIsLabwareOffsetCodeSnippetsOn,
   useFeatureFlag,
 } from '../../../../redux/config'
-import { useLPCSuccessToast } from '../../../ProtocolSetup/hooks'
 import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
 import {
   PrimaryButton,
-  SecondaryButton,
-  TertiaryButton,
 } from '../../../../atoms/buttons'
 import { getModuleTypesThatRequireExtraAttention } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
-import { LabwarePositionCheck } from '../../../LabwarePositionCheck'
-import { DownloadOffsetDataModal } from '../../../ProtocolUpload/DownloadOffsetDataModal'
 import { ReapplyOffsetsModal } from '../../../ReapplyOffsetsModal'
 import { useCurrentRun } from '../../../ProtocolUpload/hooks'
-import { LabwareOffsetModal } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/HowLPCWorksModal'
 import {
   useModuleRenderInfoForProtocolById,
   useProtocolDetailsForRun,
-  useRunCalibrationStatus,
-  useRunHasStarted,
   useStoredProtocolAnalysis,
-  useUnmatchedModulesForProtocol,
 } from '../../hooks'
 import { ProceedToRunButton } from '../ProceedToRunButton'
 import { SetupLabwareMap } from './SetupLabwareMap'

@@ -10,7 +10,6 @@ import {
 import { i18n } from '../../../../../i18n'
 import { useLPCSuccessToast } from '../../../../ProtocolSetup/hooks'
 import { LabwarePositionCheck } from '../../../../LabwarePositionCheck'
-import { LabwareOffsetModal } from '../../../../ProtocolSetup/RunSetupCard/LabwareSetup/HowLPCWorksModal'
 import { getModuleTypesThatRequireExtraAttention } from '../../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
 import {
   getIsLabwareOffsetCodeSnippetsOn,
@@ -31,9 +30,6 @@ jest.mock('../SetupLabwareMap')
 jest.mock('../../../../ProtocolSetup/hooks')
 jest.mock('../../../../LabwarePositionCheck')
 jest.mock(
-  '../../../../ProtocolSetup/RunSetupCard/LabwareSetup/LabwareOffsetModal'
-)
-jest.mock(
   '../../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
 )
 jest.mock('../../../../RunTimeControl/hooks')
@@ -42,9 +38,6 @@ jest.mock('../../../hooks')
 
 const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
   typeof useFeatureFlag
->
-const mockLabwareOffsetModal = LabwareOffsetModal as jest.MockedFunction<
-  typeof LabwareOffsetModal
 >
 const mockGetModuleTypesThatRequireExtraAttention = getModuleTypesThatRequireExtraAttention as jest.MockedFunction<
   typeof getModuleTypesThatRequireExtraAttention
@@ -125,16 +118,6 @@ describe('SetupLabwareMap', () => {
       .calledWith(expect.anything())
       .mockReturnValue([])
 
-    when(mockLabwareOffsetModal)
-      .calledWith(
-        componentPropsMatcher({
-          onCloseClick: expect.anything(),
-        })
-      )
-      .mockImplementation(({ onCloseClick }) => (
-        <div onClick={onCloseClick}>mock LabwareOffsetModal </div>
-      ))
-
     when(mockLabwarePostionCheck).mockReturnValue(
       <div>mock Labware Position Check</div>
     )
@@ -198,26 +181,6 @@ describe('SetupLabwareMap', () => {
 
   afterEach(() => {
     resetAllWhenMocks()
-  })
-
-  describe('See How Labware Offsets Work link', () => {
-    it('opens up the See How Labware Offsets Work modal when clicked', () => {
-      const { getByText } = render()
-
-      expect(screen.queryByText('mock LabwareOffsetModal')).toBeNull()
-      const helpLink = getByText('See How Labware Offsets Work')
-      fireEvent.click(helpLink)
-      getByText('mock LabwareOffsetModal')
-    })
-    it('closes the See How Labware Offsets Work when closed', () => {
-      const { getByText } = render()
-
-      const helpLink = getByText('See How Labware Offsets Work')
-      fireEvent.click(helpLink)
-      const mockModal = getByText('mock LabwareOffsetModal')
-      fireEvent.click(mockModal)
-      expect(screen.queryByText('mock LabwareOffsetModal')).toBeNull()
-    })
   })
 
   it('should render the map view when ff is turned off', () => {

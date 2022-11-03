@@ -27,9 +27,9 @@ import {
 } from '@opentrons/components'
 import { useRunQuery } from '@opentrons/react-api-client'
 
-import { Portal } from '../../App/portal'
-import { PythonLabwareOffsetSnippet } from '../../molecules/PythonLabwareOffsetSnippet'
-import { useProtocolDetailsForRun } from '../../organisms/Devices/hooks'
+import { Portal } from '../../../../App/portal'
+import { PythonLabwareOffsetSnippet } from '../../../../molecules/PythonLabwareOffsetSnippet'
+import { useProtocolDetailsForRun } from '../../../../organisms/Devices/hooks'
 
 const MODES = ['jupyter', 'cli'] as const
 
