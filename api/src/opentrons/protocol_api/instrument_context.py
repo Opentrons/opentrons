@@ -280,23 +280,23 @@ class InstrumentContext(publisher.CommandPublisher):
                 volume, location if location else "current position", rate
             )
         )
-        well: Optional[labware.Well]
         if isinstance(location, labware.Well):
-            well = location
-            # if LabwareLike(location).is_fixed_trash():
-            #     dest = location.top()
-            # else:
-            dest = location.bottom(z=self.well_bottom_clearance.dispense)
+            if LabwareLike(location).is_fixed_trash():
+                loc = location.top()
+            else:
+                loc = location.bottom().move(
+                    types.Point(0, 0, self.well_bottom_clearance.dispense)
+                )
+            self.move_to(loc, publish=False)
         elif isinstance(location, types.Location):
-            dest = location
-            _, well = dest.labware.get_parent_labware_and_well()
+            loc = location
+            self.move_to(location, publish=False)
         elif location is not None:
             raise TypeError(
                 f"location should be a Well or Location, but it is {location}"
             )
         elif self._ctx.location_cache:
-            dest = self._ctx.location_cache
-            _, well = dest.labware.get_parent_labware_and_well()
+            loc = self._ctx.location_cache
         else:
             raise RuntimeError(
                 "If dispense is called without an explicit location, another"
@@ -306,7 +306,7 @@ class InstrumentContext(publisher.CommandPublisher):
             )
         if self.api_version >= APIVersion(2, 11):
             instrument.validate_takes_liquid(
-                location=dest, reject_module=self.api_version >= APIVersion(2, 13)
+                location=loc, reject_module=self.api_version >= APIVersion(2, 13)
             )
 
         c_vol = self.current_volume if not volume else volume
@@ -316,16 +316,11 @@ class InstrumentContext(publisher.CommandPublisher):
             command=cmds.dispense(
                 instrument=self,
                 volume=c_vol,
-                location=dest,
+                location=loc,
                 rate=rate,
             ),
         ):
-            self._implementation.dispense(
-                volume=c_vol,
-                rate=self._implementation.get_flow_rate().dispense * rate,
-                location=dest,
-                well_core=well._impl if well is not None else None,
-            )
+            self._implementation.dispense(volume=c_vol, rate=rate)
 
         return self
 

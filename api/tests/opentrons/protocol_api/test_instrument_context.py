@@ -1,5 +1,4 @@
 """Tests for the InstrumentContext public interface."""
-import inspect
 from typing import cast
 
 import pytest
@@ -8,8 +7,6 @@ from decoy import Decoy
 from opentrons.broker import Broker
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import Clearances, FlowRates
-from opentrons.protocols.api_support import instrument as mock_instrument_support
 from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
     ProtocolContext,
@@ -19,14 +16,6 @@ from opentrons.protocol_api import (
 )
 from opentrons.protocol_api.core.common import InstrumentCore
 from opentrons.types import Location, Mount, Point
-
-
-@pytest.fixture(autouse=True)
-def _mock_instrument_support_module(
-    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    for name, func in inspect.getmembers(mock_instrument_support, inspect.isfunction):
-        monkeypatch.setattr(mock_instrument_support, name, decoy.mock(func=func))
 
 
 @pytest.fixture
@@ -183,36 +172,6 @@ def test_pick_up_explicit_tip(
             presses=1,
             increment=2.0,
             prep_after=False,
-        ),
-        times=1,
-    )
-
-
-def test_dispense(
-        decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
-) -> None:
-    """It should dispense to a well."""
-    mock_well = decoy.mock(cls=Well)
-    bottom_location = Location(point=Point(1, 2, 3), labware=mock_well)
-
-    decoy.when(mock_instrument_core.get_well_bottom_clearance()).then_return(
-        Clearances(default_aspirate=1.2, default_dispense=3.4)
-    )
-
-    decoy.when(mock_well.bottom(z=3.4)).then_return(bottom_location)
-
-    mock_flow_rate = decoy.mock(cls=FlowRates)
-    decoy.when(mock_instrument_core.get_flow_rate()).then_return(mock_flow_rate)
-    decoy.when(mock_flow_rate.dispense).then_return(123)
-
-    subject.dispense(volume=42.0, location=mock_well)
-
-    decoy.verify(
-        mock_instrument_core.aspirate(
-            location=bottom_location,
-            well_core=mock_well._impl,
-            volume=42.0,
-            rate=1.0,
         ),
         times=1,
     )
