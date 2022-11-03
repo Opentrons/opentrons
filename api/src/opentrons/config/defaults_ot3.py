@@ -44,6 +44,7 @@ DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSett
         search_initial_tolerance_mm=5.0,
         search_iteration_limit=10,
     ),
+    probe_length=34.5,
 )
 
 ROBOT_CONFIG_VERSION: Final = 1
@@ -366,6 +367,7 @@ def _build_default_calibration(
         edge_sense=_build_default_edge_sense(
             from_conf.get("edge_sense", {}), default.edge_sense
         ),
+        probe_length=from_conf.get("probe_length", default.probe_length),
     )
 
 
