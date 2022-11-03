@@ -437,7 +437,7 @@ class OT3API(
         """Set up pipette based on scanned information."""
         config = instrument_data.get("config")
         pip_id = instrument_data.get("id")
-        pip_offset_cal = load_pipette_offset(pip_id, mount.to_mount())  # type: ignore[arg-type]
+        pip_offset_cal = load_pipette_offset(pip_id, mount)
         p, may_skip = load_from_config_and_check_skip(
             config,
             self._pipette_handler.hardware_instruments[mount],
