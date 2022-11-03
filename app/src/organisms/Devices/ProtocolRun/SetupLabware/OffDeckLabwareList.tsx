@@ -8,7 +8,9 @@ import type { LabwareSetupItem } from './types'
 interface OffDeckLabwareList {
   labwareItems: LabwareSetupItem[]
 }
-export function OffDeckLabwareList(props: OffDeckLabwareList): JSX.Element | null {
+export function OffDeckLabwareList(
+  props: OffDeckLabwareList
+): JSX.Element | null {
   const { labwareItems } = props
   const { t } = useTranslation('protocol_setup')
   if (labwareItems.length < 1) return null

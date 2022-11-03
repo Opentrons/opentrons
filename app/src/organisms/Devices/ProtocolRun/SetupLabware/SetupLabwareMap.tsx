@@ -59,9 +59,9 @@ export function SetupLabwareMap({
     <Flex flex="1" maxHeight="180vh" flexDirection={DIRECTION_COLUMN}>
       <Flex flexDirection={DIRECTION_COLUMN} marginY={SPACING.spacing4}>
         {!runHasStarted &&
-          !enableLiquidSetup &&
-          extraAttentionModules.length > 0 &&
-          moduleRenderInfoById ? (
+        !enableLiquidSetup &&
+        extraAttentionModules.length > 0 &&
+        moduleRenderInfoById ? (
           <ModuleExtraAttention
             moduleTypes={extraAttentionModules}
             modulesInfo={moduleRenderInfoById}

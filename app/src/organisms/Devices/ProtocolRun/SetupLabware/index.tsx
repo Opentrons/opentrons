@@ -18,7 +18,11 @@ import {
 } from '../../../../redux/config'
 import { useLPCSuccessToast } from '../../../ProtocolSetup/hooks'
 import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
-import { PrimaryButton, SecondaryButton, TertiaryButton } from '../../../../atoms/buttons'
+import {
+  PrimaryButton,
+  SecondaryButton,
+  TertiaryButton,
+} from '../../../../atoms/buttons'
 import { getModuleTypesThatRequireExtraAttention } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
 import { LabwarePositionCheck } from '../../../LabwarePositionCheck'
 import { DownloadOffsetDataModal } from '../../../ProtocolUpload/DownloadOffsetDataModal'
@@ -79,7 +83,7 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
     moduleModels
   )
   const currentRun = useCurrentRun()
-  
+
   const showReapplyOffsetsModal =
     !enableManualDeckStateMod &&
     currentRun?.data.id === runId &&

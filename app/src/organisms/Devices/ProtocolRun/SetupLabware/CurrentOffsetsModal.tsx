@@ -1,8 +1,22 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
-import { getLabwareDisplayName, getModuleDisplayName, RunTimeCommand } from '@opentrons/shared-data'
-import { Flex, DIRECTION_COLUMN, SPACING, TYPOGRAPHY, COLORS, JUSTIFY_SPACE_BETWEEN, JUSTIFY_FLEX_END, ALIGN_CENTER, Link } from '@opentrons/components'
+import {
+  getLabwareDisplayName,
+  getModuleDisplayName,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
+import {
+  Flex,
+  DIRECTION_COLUMN,
+  SPACING,
+  TYPOGRAPHY,
+  COLORS,
+  JUSTIFY_SPACE_BETWEEN,
+  JUSTIFY_FLEX_END,
+  ALIGN_CENTER,
+  Link,
+} from '@opentrons/components'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../redux/config'
 import { ModalHeader, ModalShell } from '../../../../molecules/Modal'
 import { OffsetVector } from '../../../../molecules/OffsetVector'
@@ -46,7 +60,7 @@ export function CurrentOffsetsModal(
   const { currentOffsets, commands, onCloseClick } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const defsByURI = getDefsByURI(commands)
-  const [ showCodeSnippet, setShowCodeSnippet ] = React.useState<boolean>(false)
+  const [showCodeSnippet, setShowCodeSnippet] = React.useState<boolean>(false)
   const isLabwareOffsetCodeSnippetsOn = useSelector(
     getIsLabwareOffsetCodeSnippetsOn
   )
@@ -55,13 +69,14 @@ export function CurrentOffsetsModal(
     <ModalShell
       maxWidth="40rem"
       header={
-        <ModalHeader
-          title={t('applied_offset_data')}
-          onClose={onCloseClick}
-        />
+        <ModalHeader title={t('applied_offset_data')} onClose={onCloseClick} />
       }
     >
-      <Flex flexDirection={DIRECTION_COLUMN} justifyContent={JUSTIFY_SPACE_BETWEEN} padding={SPACING.spacing6}>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        padding={SPACING.spacing6}
+      >
         {isLabwareOffsetCodeSnippetsOn ? (
           <Link
             role="link"
@@ -72,10 +87,12 @@ export function CurrentOffsetsModal(
             {t('get_labware_offset_data')}
           </Link>
         ) : null}
-        {showCodeSnippet
-        ? 
-        :
-        
+        {showCodeSnippet ? (
+          <PrimaryButton onClick={() => setShowCodeSnippet(false)}>
+            TODO ADD JUPYTER/CLI SNIPPET SUPPORT
+          </PrimaryButton>
+        ) : null}
+
         <OffsetTable>
           <thead>
             <tr>
@@ -93,7 +110,9 @@ export function CurrentOffsetsModal(
                     ? ` - ${getModuleDisplayName(offset.location.moduleModel)}`
                     : null}
                 </OffsetTableDatum>
-                <OffsetTableDatum>{getLabwareDisplayName(defsByURI[offset.definitionUri])}</OffsetTableDatum>
+                <OffsetTableDatum>
+                  {getLabwareDisplayName(defsByURI[offset.definitionUri])}
+                </OffsetTableDatum>
                 <OffsetTableDatum>
                   <OffsetVector {...offset.vector} />
                 </OffsetTableDatum>
@@ -101,7 +120,6 @@ export function CurrentOffsetsModal(
             ))}
           </tbody>
         </OffsetTable>
-        }
         <Flex
           width="100%"
           marginTop={SPACING.spacing6}
@@ -121,7 +139,10 @@ export function CurrentOffsetsModal(
           </Link>
           <PrimaryButton
             textTransform={TYPOGRAPHY.textTransformCapitalize}
-            onClick={() => { console.log('TODO, run LPC') }}>
+            onClick={() => {
+              console.log('TODO, run LPC')
+            }}
+          >
             {t('run_labware_position_check')}
           </PrimaryButton>
         </Flex>

@@ -33,9 +33,7 @@ interface HowLPCWorksModalProps {
   onCloseClick: () => unknown
 }
 
-export const HowLPCWorksModal = (
-  props: HowLPCWorksModalProps
-): JSX.Element => {
+export const HowLPCWorksModal = (props: HowLPCWorksModalProps): JSX.Element => {
   const { t } = useTranslation(['protocol_setup', 'shared'])
   return (
     <Portal level="top">

@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
 import { Trans, useTranslation } from 'react-i18next'
 import isEmpty from 'lodash/isEmpty'
 import some from 'lodash/some'
@@ -19,13 +18,11 @@ import {
   BORDERS,
 } from '@opentrons/components'
 import { useRunQuery } from '@opentrons/react-api-client'
-import { getIsLabwareOffsetCodeSnippetsOn, } from '../../../../redux/config'
 import { useLPCSuccessToast } from '../../../ProtocolSetup/hooks'
 import { SecondaryButton } from '../../../../atoms/buttons'
 import { Tooltip } from '../../../../atoms/Tooltip'
 import { StyledText } from '../../../../atoms/text'
 import { LabwarePositionCheck } from '../../../LabwarePositionCheck'
-import { DownloadOffsetDataModal } from '../../../ProtocolUpload/DownloadOffsetDataModal'
 import { HowLPCWorksModal } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/HowLPCWorksModal'
 import {
   useProtocolDetailsForRun,
@@ -41,7 +38,9 @@ interface LaunchLabwarePositionCheckProps {
   runId: string
 }
 
-export function LaunchLabwarePositionCheck(props: LaunchLabwarePositionCheckProps): JSX.Element {
+export function LaunchLabwarePositionCheck(
+  props: LaunchLabwarePositionCheckProps
+): JSX.Element {
   const { robotName, runId } = props
   const { t } = useTranslation('protocol_setup')
   const { protocolData: robotProtocolAnalysis } = useProtocolDetailsForRun(
@@ -59,9 +58,17 @@ export function LaunchLabwarePositionCheck(props: LaunchLabwarePositionCheckProp
   )
 
   const [showHelpModal, setShowHelpModal] = React.useState(false)
-  const [showLabwarePositionCheckModal, setShowLabwarePositionCheckModal] = React.useState(false)
-  const [showCurrentOffsetsModal, setShowCurrentOffsetsModal] = React.useState(false)
-  const unmatchedModuleResults = useUnmatchedModulesForProtocol(robotName, runId)
+  const [
+    showLabwarePositionCheckModal,
+    setShowLabwarePositionCheckModal,
+  ] = React.useState(false)
+  const [showCurrentOffsetsModal, setShowCurrentOffsetsModal] = React.useState(
+    false
+  )
+  const unmatchedModuleResults = useUnmatchedModulesForProtocol(
+    robotName,
+    runId
+  )
   const { missingModuleIds } = unmatchedModuleResults
   const calibrationIncomplete =
     missingModuleIds.length === 0 && !isCalibrationComplete
@@ -70,17 +77,9 @@ export function LaunchLabwarePositionCheck(props: LaunchLabwarePositionCheckProp
   const moduleAndCalibrationIncomplete =
     missingModuleIds.length > 0 && !isCalibrationComplete
 
-  const [
-    showSnippetModal,
-    setShowSnippetModal,
-  ] = React.useState<boolean>(false)
-
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_LEFT,
   })
-  const isLabwareOffsetCodeSnippetsOn = useSelector(
-    getIsLabwareOffsetCodeSnippetsOn
-  )
   const tipRackLoadedInProtocol: boolean = some(
     protocolData?.labwareDefinitions,
     def => def.parameters?.isTiprack
@@ -120,36 +119,42 @@ export function LaunchLabwarePositionCheck(props: LaunchLabwarePositionCheckProp
   }
 
   return (
-    <Flex gridGap={SPACING.spacing4} backgroundColor={COLORS.lightBlue} padding={SPACING.spacing4} borderRadius={BORDERS.radiusSoftCorners}>
+    <Flex
+      gridGap={SPACING.spacing4}
+      backgroundColor={COLORS.lightBlue}
+      padding={SPACING.spacing4}
+      borderRadius={BORDERS.radiusSoftCorners}
+    >
       <Icon name="reticle" size="18px" />
-      <Flex flex="5" gridGap={SPACING.spacing3} flexDirection={DIRECTION_COLUMN}>
+      <Flex
+        flex="5"
+        gridGap={SPACING.spacing3}
+        flexDirection={DIRECTION_COLUMN}
+      >
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-            <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold} textTransform={TYPOGRAPHY.textTransformCapitalize}>
+          <Flex
+            alignItems={ALIGN_CENTER}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+          >
+            <StyledText
+              as="h3"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              textTransform={TYPOGRAPHY.textTransformCapitalize}
+            >
               {t('run_labware_position_check')}
             </StyledText>
-            {isLabwareOffsetCodeSnippetsOn ? (
-              <Link
-                role="link"
-                css={TYPOGRAPHY.labelSemiBold}
-                color={COLORS.darkBlackEnabled}
-                onClick={() => setShowSnippetModal(true)}
-              >
-                {t('get_labware_offset_data')}
-              </Link>
-            ) : null}
           </Flex>
           <StyledText as="p">
             <Trans
               t={t}
-              i18nKey='recommended_workflow_for_labware_positioning'
+              i18nKey="recommended_workflow_for_labware_positioning"
               components={{
                 anchor: (
                   <Link
                     textDecoration={TYPOGRAPHY.textDecorationUnderline}
                     onClick={() => setShowHelpModal(true)}
                   />
-                )
+                ),
               }}
             />
           </StyledText>
@@ -161,7 +166,7 @@ export function LaunchLabwarePositionCheck(props: LaunchLabwarePositionCheckProp
         flex="1 0 auto"
         gridGap={SPACING.spacing4}
       >
-        {currentOffsets.length > 0 ?
+        {currentOffsets.length > 0 ? (
           <Link
             color={COLORS.blueEnabled}
             fontSize={TYPOGRAPHY.fontSizeP}
@@ -171,7 +176,7 @@ export function LaunchLabwarePositionCheck(props: LaunchLabwarePositionCheckProp
           >
             {t('view_current_offsets')}
           </Link>
-          : null}
+        ) : null}
         <SecondaryButton
           textTransform={TYPOGRAPHY.textTransformCapitalize}
           title={t('run_labware_position_check')}
@@ -186,21 +191,15 @@ export function LaunchLabwarePositionCheck(props: LaunchLabwarePositionCheckProp
           {t('run_labware_position_check')}
         </SecondaryButton>
         {lpcDisabledReason !== null ? (
-          <Tooltip tooltipProps={tooltipProps}>
-            {lpcDisabledReason}
-          </Tooltip>
+          <Tooltip tooltipProps={tooltipProps}>{lpcDisabledReason}</Tooltip>
         ) : null}
       </Flex>
-      {showHelpModal && <HowLPCWorksModal onCloseClick={() => setShowHelpModal(false)} />}
+      {showHelpModal && (
+        <HowLPCWorksModal onCloseClick={() => setShowHelpModal(false)} />
+      )}
       {showLabwarePositionCheckModal && (
         <LabwarePositionCheck
           onCloseClick={() => setShowLabwarePositionCheckModal(false)}
-          runId={runId}
-        />
-      )}
-      {showSnippetModal && (
-        <DownloadOffsetDataModal
-          onCloseClick={() => setShowSnippetModal(false)}
           runId={runId}
         />
       )}

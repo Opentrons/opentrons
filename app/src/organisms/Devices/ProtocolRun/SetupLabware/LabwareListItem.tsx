@@ -76,9 +76,12 @@ export function LabwareListItem(
   const labwareDisplayName = getLabwareDisplayName(definition)
   const { createLiveCommand } = useCreateLiveCommandMutation()
 
-  let slotInfo: JSX.Element | null = initialLocation === 'offDeck' ? null : t('slot_location', {
-    slotName: Object.values(initialLocation),
-  })
+  let slotInfo: JSX.Element | null =
+    initialLocation === 'offDeck'
+      ? null
+      : t('slot_location', {
+          slotName: Object.values(initialLocation),
+        })
   let extraAttentionText: JSX.Element | null = null
   let isCorrectHeaterShakerAttached: boolean = false
   let isHeaterShakerInProtocol: boolean = false
@@ -137,7 +140,7 @@ export function LabwareListItem(
         )
         const matchingHeaterShaker =
           attachedModuleInfo != null &&
-            attachedModuleInfo[initialLocation.moduleId] != null
+          attachedModuleInfo[initialLocation.moduleId] != null
             ? attachedModuleInfo[initialLocation.moduleId].attachedModuleMatch
             : null
         if (
@@ -206,8 +209,9 @@ export function LabwareListItem(
               justifyContent={JUSTIFY_SPACE_BETWEEN}
             >
               <ToggleButton
-                label={`heater_shaker_${moduleLocation?.slotName ?? ''
-                  }_latch_toggle`}
+                label={`heater_shaker_${
+                  moduleLocation?.slotName ?? ''
+                }_latch_toggle`}
                 disabled={!isCorrectHeaterShakerAttached}
                 toggledOn={isLatchClosed}
                 onClick={toggleLatch}

@@ -30,7 +30,11 @@ import { UseOlderProtocol } from './AdvancedTab/UseOlderProtocol'
 import { LegacySettings } from './AdvancedTab/LegacySettings'
 import { ShortTrashBin } from './AdvancedTab/ShortTrashBin'
 import { UseOlderAspirateBehavior } from './AdvancedTab/UseOlderAspirateBehavior'
-import { updateSetting, getRobotSettings, fetchSettings } from '../../../redux/robot-settings'
+import {
+  updateSetting,
+  getRobotSettings,
+  fetchSettings,
+} from '../../../redux/robot-settings'
 import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRobotSlideout'
 import { FactoryResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetSlideout'
 import { FactoryResetModal } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetModal'

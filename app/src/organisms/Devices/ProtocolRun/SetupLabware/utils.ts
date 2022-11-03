@@ -1,6 +1,9 @@
 import reduce from 'lodash/reduce'
 import partition from 'lodash/partition'
-import { getLabwareDisplayName, getSlotHasMatingSurfaceUnitVector } from '@opentrons/shared-data'
+import {
+  getLabwareDisplayName,
+  getSlotHasMatingSurfaceUnitVector,
+} from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import { orderBySlot } from '../../../LabwarePositionCheck/utils/labware'
 import { getLabwareLocation } from '../utils/getLabwareLocation'
@@ -70,7 +73,9 @@ const SETUP_COMMAND_TYPES = [
   'loadLiquid',
 ]
 
-export function getLabwareSetupItemGroups(commands: RunTimeCommand[]): GroupedLabwareSetupItems {
+export function getLabwareSetupItemGroups(
+  commands: RunTimeCommand[]
+): GroupedLabwareSetupItems {
   let beyondInitialLoadCommands = false
   const [offDeckItems, onDeckItems] = partition(
     commands.reduce<LabwareSetupItem[]>(
@@ -101,7 +106,7 @@ export function getLabwareSetupItemGroups(commands: RunTimeCommand[]): GroupedLa
           // NOTE: params.displayName is the user-assigned nickName, different from labareDisplayName from def
           const nickName =
             displayName != null &&
-              displayName !== getLabwareDisplayName(definition)
+            displayName !== getLabwareDisplayName(definition)
               ? displayName
               : null
 
@@ -123,7 +128,10 @@ export function getLabwareSetupItemGroups(commands: RunTimeCommand[]): GroupedLa
         } else if (
           !beyondInitialLoadCommands &&
           !SETUP_COMMAND_TYPES.includes(commandType) &&
-          !(commandType === 'moveLabware' && params.strategy === 'manualMoveWithoutPause')
+          !(
+            commandType === 'moveLabware' &&
+            params.strategy === 'manualMoveWithoutPause'
+          )
         ) {
           beyondInitialLoadCommands = true
         }
