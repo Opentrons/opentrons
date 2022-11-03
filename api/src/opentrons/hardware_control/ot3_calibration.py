@@ -412,6 +412,7 @@ async def calibrate_mount(
     # also be used to baseline the edge detection points.
     # reset instrument offset
     await hcapi.reset_instrument_offset(mount)
+    await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
     z_pos = await find_deck_position(hcapi, mount)
     LOG.info(f"Found deck at {z_pos}mm")
 
@@ -429,4 +430,5 @@ async def calibrate_mount(
     # save new offset
     # reload
     await hcapi.save_instrument_offset(mount, center)
+    await hcapi.remove_tip(mount)
     return center
