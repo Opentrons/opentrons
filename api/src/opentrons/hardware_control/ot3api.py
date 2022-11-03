@@ -81,7 +81,7 @@ from .protocols import HardwareControlAPI
 # TODO (lc 09/15/2022) We should update our pipette handler to reflect OT-3 properties
 # in a follow-up PR.
 from .instruments.ot2.pipette_handler import OT3PipetteHandler, InstrumentsByMount
-from .instruments.ot2.instrument_calibration import load_pipette_offset
+from .instruments.ot3.instrument_calibration import load_pipette_offset
 from .instruments.ot3.gripper_handler import GripperHandler
 from .instruments.ot3.instrument_calibration import (
     load_gripper_calibration_offset,
@@ -437,7 +437,7 @@ class OT3API(
         """Set up pipette based on scanned information."""
         config = instrument_data.get("config")
         pip_id = instrument_data.get("id")
-        pip_offset_cal = load_pipette_offset(pip_id, mount.to_mount())
+        pip_offset_cal = load_pipette_offset(pip_id, mount)
         p, may_skip = load_from_config_and_check_skip(
             config,
             self._pipette_handler.hardware_instruments[mount],
