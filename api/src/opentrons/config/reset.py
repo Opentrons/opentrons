@@ -6,7 +6,12 @@ from pathlib import Path
 from typing import NamedTuple, Dict, Set
 
 from opentrons.config import IS_ROBOT
-from opentrons.calibration_storage import delete
+from opentrons.calibration_storage import (
+    delete_robot_deck_attitude,
+    clear_tip_length_calibration,
+    clear_pipette_offset_calibrations,
+)
+
 
 DATA_BOOT_D = Path("/data/boot.d")
 
@@ -92,15 +97,17 @@ def reset_boot_scripts() -> None:
         log.debug(f"Not on pi, not removing {DATA_BOOT_D}")
 
 
+# (lc 09-15-2022) Choosing to import both ot2 and ot3 delete modules
+# rather than type ignore an import_module command using importlib.
 def reset_deck_calibration() -> None:
-    delete.delete_robot_deck_attitude()
-    delete.clear_pipette_offset_calibrations()
+    delete_robot_deck_attitude()
+    clear_pipette_offset_calibrations()
 
 
 def reset_pipette_offset() -> None:
-    delete.clear_pipette_offset_calibrations()
+    clear_pipette_offset_calibrations()
 
 
 def reset_tip_length_calibrations() -> None:
-    delete.clear_tip_length_calibration()
-    delete.clear_pipette_offset_calibrations()
+    clear_tip_length_calibration()
+    clear_pipette_offset_calibrations()

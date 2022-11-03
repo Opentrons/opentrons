@@ -81,6 +81,7 @@ describe('ProtocolRunModuleControls', () => {
       protocolData: _fixtureAnalysis,
       displayName: 'mock display name',
       protocolKey: 'fakeProtocolKey',
+      robotType: 'OT-2 Standard',
     })
   })
 

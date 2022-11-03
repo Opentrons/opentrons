@@ -205,6 +205,7 @@ describe('RunLogProtocolSetupInfo', () => {
       protocolData: simpleV6Protocol,
       displayName: 'mock display name',
       protocolKey: 'fakeProtocolKey',
+      robotType: 'OT-2 Standard',
     })
     const { getByText } = render(props)
     getByText(

@@ -119,7 +119,10 @@ def name() -> str:
         return result[:-1]
 
     else:
-        return "opentrons-dev"
+        robot_name = "opentrons-dev"
+        if "DEV_ROBOT_NAME" in os.environ.keys():
+            robot_name = os.environ["DEV_ROBOT_NAME"]
+        return robot_name
 
 
 class ConfigElementType(enum.Enum):

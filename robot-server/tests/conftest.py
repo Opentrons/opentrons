@@ -4,7 +4,6 @@ import time
 import sys
 import tempfile
 import os
-import shutil
 import json
 import pathlib
 import requests
@@ -14,7 +13,7 @@ from datetime import datetime, timezone
 from fastapi import routing
 from mock import MagicMock
 from starlette.testclient import TestClient
-from typing import Any, Callable, Dict, Generator, Iterator, cast
+from typing import Any, Callable, Generator, Iterator, cast
 from typing_extensions import NoReturn
 from pathlib import Path
 from sqlalchemy.engine import Engine
@@ -23,7 +22,13 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from opentrons import config
 from opentrons.hardware_control import API, HardwareControlAPI, ThreadedAsyncLock
-from opentrons.calibration_storage import modify, helpers
+from opentrons.calibration_storage import (
+    helpers,
+    save_pipette_calibration,
+    create_tip_length_data,
+    save_tip_length_calibration,
+    save_robot_deck_attitude,
+)
 from opentrons.protocol_api import labware
 from opentrons.types import Point, Mount
 
@@ -124,11 +129,7 @@ def server_temp_directory() -> Iterator[str]:
     new_dir = tempfile.mkdtemp()
     os.environ["OT_API_CONFIG_DIR"] = new_dir
     config.reload()
-
     yield new_dir
-    shutil.rmtree(new_dir)
-
-    del os.environ["OT_API_CONFIG_DIR"]
 
 
 @pytest.fixture(scope="session")
@@ -166,7 +167,7 @@ def run_server(
         stdout=None,
         stderr=None,
     ) as proc:
-        # Wait for a bit to get started by polling /health
+        # Wait for a bit to get started by polling /hcpealth
         from requests.exceptions import ConnectionError
 
         while True:
@@ -207,7 +208,7 @@ def set_up_pipette_offset_temp_directory(server_temp_directory: str) -> None:
     definition = labware.get_labware_definition("opentrons_96_filtertiprack_200ul")
     def_hash = helpers.hash_labware_def(definition)
     for pip, mount in zip(attached_pip_list, mount_list):
-        modify.save_pipette_calibration(
+        save_pipette_calibration(
             offset=Point(0, 0, 0),
             pip_id=pip,
             mount=mount,
@@ -221,18 +222,19 @@ def set_up_tip_length_temp_directory(server_temp_directory: str) -> None:
     attached_pip_list = ["123", "321"]
     tip_length_list = [30.5, 31.5]
     definition = labware.get_labware_definition("opentrons_96_filtertiprack_200ul")
-    def_hash = helpers.hash_labware_def(definition)
     for pip, tip_len in zip(attached_pip_list, tip_length_list):
-        cal: Dict[str, Any] = {
-            def_hash: {"tipLength": tip_len, "lastModified": datetime.now()}
-        }
-        modify.save_tip_length_calibration(pip, cal)
+        cal_data = create_tip_length_data(definition, tip_len)
+        save_tip_length_calibration(pip, cal_data)
 
 
 @pytest.fixture
 def set_up_deck_calibration_temp_directory(server_temp_directory: str) -> None:
     attitude = [[1.0008, 0.0052, 0.0], [-0.0, 0.992, 0.0], [0.0, 0.0, 1.0]]
-    modify.save_robot_deck_attitude(attitude, "pip_1", "fakehash")
+    save_robot_deck_attitude(
+        attitude,
+        "pip_1",
+        "fakehash",
+    )
 
 
 @pytest.fixture
