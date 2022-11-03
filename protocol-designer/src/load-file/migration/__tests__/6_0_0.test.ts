@@ -105,6 +105,7 @@ describe('v6 migration', () => {
         params: {
           pipetteId: '0b3f2210-75c7-11ea-b42f-4b64e50f43e5',
           mount: 'left',
+          pipetteName: 'p300_single_gen2',
         },
       },
     ]
