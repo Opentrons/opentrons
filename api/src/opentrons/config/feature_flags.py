@@ -35,3 +35,9 @@ def enable_protocol_engine_papi_core() -> bool:
     """Whether to use the ProtocolEngine core to execute Protocol API v2 protocols."""
 
     return advs.get_setting_with_env_overload("enableProtocolEnginePAPICore")
+
+
+def enable_load_liquid() -> bool:
+    """Whether to enable loadLiquid command."""
+
+    return advs.get_setting_with_env_overload("enableLoadLiquid")

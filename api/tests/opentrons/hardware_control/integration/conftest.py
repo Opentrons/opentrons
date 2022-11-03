@@ -1,9 +1,10 @@
-from typing import Iterator
+import asyncio
 import threading
+from typing import AsyncGenerator, Iterator
 
 import pytest
-import asyncio
 
+from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.emulation.module_server import ModuleStatusClient
 from opentrons.hardware_control.emulation.module_server.helpers import wait_emulators
 from opentrons.hardware_control.emulation.scripts import run_app, run_smoothie
@@ -69,3 +70,20 @@ def emulation_app(emulator_settings: Settings) -> Iterator[None]:
     ready_proc.join()
 
     yield
+
+
+@pytest.fixture
+async def execution_manager() -> AsyncGenerator[ExecutionManager, None]:
+    em = ExecutionManager()
+    yield em
+    await em.cancel()
+
+
+@pytest.fixture
+def poll_interval_seconds() -> float:
+    """The polling interval used for the module tests.
+
+    If too fast, tests may fail due to stale data in the serial buffers.
+    If too slow, tests will take too long and may time out.
+    """
+    return 0.1

@@ -20,7 +20,11 @@ import { useLPCSuccessToast } from '../../ProtocolSetup/hooks'
 import { DeprecatedDeckMap } from './DeprecatedDeckMap'
 import { DeprecatedSectionList } from './DeprecatedSectionList'
 import { DeprecatedLabwareOffsetsSummary } from './DeprecatedLabwareOffsetsSummary'
-import { useIntroInfo, useLabwareOffsets, LabwareOffsets } from '../hooks'
+import {
+  useIntroInfo,
+  useLabwareOffsets,
+  LabwareOffsets,
+} from '../deprecatedHooks'
 import { useProtocolDetailsForRun } from '../../Devices/hooks'
 
 import type { SavePositionCommandData } from './types'

@@ -159,7 +159,11 @@ def mock_backend_capacitive_probe(
     ) as mock_probe:
 
         def _update_position(
-            mount: OT3Mount, moving: OT3Axis, distance_mm: float, speed_mm_per_s: float
+            mount: OT3Mount,
+            moving: OT3Axis,
+            distance_mm: float,
+            speed_mm_per_s: float,
+            threshold_pf: float,
         ) -> None:
             ot3_hardware._backend._position[axis_to_node(moving)] += distance_mm / 2
 
@@ -218,7 +222,7 @@ async def test_capacitive_probe(
 
     # This is a negative probe because the current position is the home position
     # which is very large.
-    mock_backend_capacitive_probe.assert_called_once_with(mount, moving, 3, 4)
+    mock_backend_capacitive_probe.assert_called_once_with(mount, moving, 3.0, 4, 1.0)
 
     original = moving.set_in_point(here, 0)
     for call in mock_move_to.call_args_list:
@@ -372,6 +376,17 @@ async def test_cache_gripper(ot3_hardware: ThreadManager[OT3API]) -> None:
     # make sure the property attached_gripper returns GripperDict
     assert ot3_hardware.attached_gripper is not None
     assert ot3_hardware.attached_gripper["gripper_id"] == "g12345"
+
+
+async def test_has_gripper(
+    ot3_hardware: ThreadManager[OT3API],
+) -> None:
+    """It should return whether the robot has a gripper attached."""
+    assert ot3_hardware.has_gripper() is False
+    gripper_config = gc.load(GripperModel.V1, "g12345")
+    instr_data = AttachedGripper(config=gripper_config, id="g12345")
+    await ot3_hardware.cache_gripper(instr_data)
+    assert ot3_hardware.has_gripper() is True
 
 
 async def test_gripper_action(

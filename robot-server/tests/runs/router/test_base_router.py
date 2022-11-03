@@ -121,6 +121,7 @@ async def test_create_protocol_run(
             config=JsonProtocolConfig(schema_version=123),
             files=[],
             metadata={},
+            robot_type="OT-2 Standard",
             labware_definitions=[],
         ),
     )

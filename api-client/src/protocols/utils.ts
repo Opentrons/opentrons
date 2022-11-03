@@ -126,6 +126,7 @@ export function parseInitialLoadedLabwareBySlot(
   return reduce<LoadLabwareRunTimeCommand, LoadedLabwareBySlot>(
     loadLabwareCommandsReversed,
     (acc, command) =>
+      typeof command.params.location === 'object' &&
       'slotName' in command.params.location
         ? { ...acc, [command.params.location.slotName]: command }
         : acc,
@@ -148,6 +149,7 @@ export function parseInitialLoadedLabwareByModuleId(
   return reduce<LoadLabwareRunTimeCommand, LoadedLabwareByModuleId>(
     loadLabwareCommandsReversed,
     (acc, command) =>
+      typeof command.params.location === 'object' &&
       'moduleId' in command.params.location
         ? { ...acc, [command.params.location.moduleId]: command }
         : acc,

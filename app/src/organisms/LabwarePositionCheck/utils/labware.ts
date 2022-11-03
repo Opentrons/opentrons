@@ -1,16 +1,24 @@
+import reduce from 'lodash/reduce'
 import {
   getIsTiprack,
   getTiprackVolume,
-  LoadedLabware,
+  ProtocolFile,
   LabwareDefinition2,
   getSlotHasMatingSurfaceUnitVector,
+  getLabwareDefURI,
+  CompletedProtocolAnalysis,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
-import { getLabwareLocation } from '../../Devices/ProtocolRun/utils/getLabwareLocation'
-import { getSlotLabwareName } from '../../Devices/ProtocolRun/utils/getSlotLabwareName'
 import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
-import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
+import type {
+  ProtocolAnalysisOutput,
+  RunTimeCommand,
+} from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { LabwareToOrder } from '../types'
+import { getModuleInitialLoadInfo } from '../../Devices/ProtocolRun/utils/getModuleInitialLoadInfo'
+import { LabwareLocation } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+
+const OT2_STANDARD_DECK_DEF = standardDeckDef as any
 
 export const tipRackOrderSort = (
   tiprack1: LabwareToOrder,
@@ -36,30 +44,30 @@ export const orderBySlot = (
 }
 
 export const getTiprackIdsInOrder = (
-  labware: LoadedLabware[],
+  labware: ProtocolFile<{}>['labware'],
   labwareDefinitions: Record<string, LabwareDefinition2>,
   commands: RunTimeCommand[]
 ): string[] => {
-  const unorderedTipracks = labware.reduce<LabwareToOrder[]>(
-    (tipracks, currentLabware) => {
-      const labwareDef = labwareDefinitions[currentLabware.definitionUri]
+  const unorderedTipracks = reduce<typeof labware, LabwareToOrder[]>(
+    labware,
+    (tipracks, currentLabware, labwareId) => {
+      const labwareDef = labwareDefinitions[currentLabware.definitionId]
       const isTiprack = getIsTiprack(labwareDef)
       if (isTiprack) {
-        const labwareLocation = getLabwareLocation(currentLabware.id, commands)
-        if (!('slotName' in labwareLocation)) {
-          throw new Error('expected tiprack location to be a slot')
-        }
-
+        const tipRackLocations = getAllUniqLocationsForLabware(
+          labwareId,
+          commands
+        )
         return [
           ...tipracks,
-          {
+          ...tipRackLocations.map(loc => ({
             definition: labwareDef,
-            labwareId: currentLabware.id,
-            slot: labwareLocation.slotName,
-          },
+            labwareId: labwareId,
+            slot: loc !== 'offDeck' && 'slotName' in loc ? loc.slotName : '',
+          })),
         ]
       }
-      return [...tipracks]
+      return tipracks
     },
     []
   )
@@ -73,40 +81,52 @@ export const getTiprackIdsInOrder = (
 export const getAllTipracksIdsThatPipetteUsesInOrder = (
   pipetteId: string,
   commands: RunTimeCommand[],
-  labware: LoadedLabware[],
-  labwareDefinitions: Record<string, LabwareDefinition2>
+  labware: ProtocolAnalysisOutput['labware']
 ): string[] => {
-  const pickUpTipCommandsWithPipette: PickUpTipRunTimeCommand[] = commands
-    .filter(
-      (command): command is PickUpTipRunTimeCommand =>
-        command.commandType === 'pickUpTip'
-    )
-    .filter(command => command.params.pipetteId === pipetteId)
+  const pickUpTipCommandsWithPipette: PickUpTipRunTimeCommand[] = commands.filter(
+    (command): command is PickUpTipRunTimeCommand =>
+      command.commandType === 'pickUpTip' &&
+      command.params.pipetteId === pipetteId
+  )
 
-  const tipracksVisited = pickUpTipCommandsWithPipette.reduce<string[]>(
-    (visited, command) => {
-      const tiprack = command.params.labwareId
-      return visited.includes(tiprack) ? visited : [...visited, tiprack]
+  const tipRackIdsVisited = pickUpTipCommandsWithPipette.reduce<string[]>(
+    (visitedIds, command) => {
+      const tipRackId = command.params.labwareId
+      return visitedIds.includes(tipRackId)
+        ? visitedIds
+        : [...visitedIds, tipRackId]
     },
     []
   )
 
-  const orderedTiprackIds = tipracksVisited
-    .map<LabwareToOrder>(tiprackId => {
-      //  @ts-expect-error
-      const labwareDefinitionUri = labware.find(item => item.id === tiprackId)
-        .definitionUri
-      const definition = labwareDefinitions[labwareDefinitionUri]
-      const tiprackLocation = getLabwareLocation(tiprackId, commands)
-      if (!('slotName' in tiprackLocation)) {
-        throw new Error('expected tiprack location to be a slot')
+  const labwareDefinitions = getLabwareDefinitionsFromCommands(commands)
+
+  const orderedTiprackIds = tipRackIdsVisited
+    .reduce<LabwareToOrder[]>((acc, tipRackId) => {
+      const tiprackEntity = labware.find(l => l.id === tipRackId)
+      const definition = labwareDefinitions.find(
+        def => getLabwareDefURI(def) === tiprackEntity?.definitionUri
+      )
+
+      const tipRackLocations = getAllUniqLocationsForLabware(
+        tipRackId,
+        commands
+      )
+
+      if (definition == null) {
+        throw new Error(
+          `could not find labware definition within protocol with uri: ${tiprackEntity?.definitionUri}`
+        )
       }
-      return {
-        labwareId: tiprackId,
-        definition,
-        slot: tiprackLocation.slotName,
-      }
-    })
+      return [
+        ...acc,
+        ...tipRackLocations.map(loc => ({
+          labwareId: tipRackId,
+          definition,
+          slot: loc !== 'offDeck' && 'slotName' in loc ? loc.slotName : '',
+        })),
+      ]
+    }, [])
     .sort(tipRackOrderSort)
     .map(({ labwareId }) => labwareId)
 
@@ -114,33 +134,55 @@ export const getAllTipracksIdsThatPipetteUsesInOrder = (
 }
 
 export const getLabwareIdsInOrder = (
-  labware: LoadedLabware[],
-  labwareDefinitions: Record<string, LabwareDefinition2>,
+  labware: ProtocolAnalysisOutput['labware'],
   commands: RunTimeCommand[]
 ): string[] => {
+  const labwareDefinitions = getLabwareDefinitionsFromCommands(commands)
+
   const unorderedLabware = labware.reduce<LabwareToOrder[]>(
-    (unorderedLabware, currentLabware) => {
-      const labwareDef = labwareDefinitions[currentLabware.definitionUri]
-      const isTiprack = getIsTiprack(labwareDef)
-      const slotName = getSlotLabwareName(currentLabware.id, commands).slotName
-      // skip any labware that is not a tiprack
-      if (!isTiprack) {
-        // if we're in a slot where we can't have labware, don't include the definition (i.e. the trash bin)
-        if (
-          !getSlotHasMatingSurfaceUnitVector(standardDeckDef as any, slotName)
-        ) {
-          return [...unorderedLabware]
-        }
-        return [
-          ...unorderedLabware,
-          {
-            definition: labwareDef,
-            labwareId: currentLabware.id,
-            slot: slotName,
-          },
-        ]
+    (acc, currentLabware) => {
+      const labwareDef = labwareDefinitions.find(
+        def => getLabwareDefURI(def) === currentLabware.definitionUri
+      )
+      if (labwareDef == null) {
+        throw new Error(
+          `could not find labware definition within protocol with uri: ${currentLabware.definitionUri}`
+        )
       }
-      return [...unorderedLabware]
+      const isTiprack = getIsTiprack(labwareDef)
+      if (isTiprack) return acc // skip any labware that is a tiprack
+
+      const labwareLocations = getAllUniqLocationsForLabware(
+        currentLabware.id,
+        commands
+      )
+      return [
+        ...acc,
+        ...labwareLocations.reduce<LabwareToOrder[]>((innerAcc, loc) => {
+          if (
+            !getSlotHasMatingSurfaceUnitVector(
+              OT2_STANDARD_DECK_DEF,
+              loc !== 'offDeck' && 'slotName' in loc ? loc.slotName : ''
+            )
+          ) {
+            return innerAcc
+          }
+          let slot = ''
+          if (loc === 'offDeck') {
+            slot = 'offDeck'
+          } else {
+            slot =
+              'moduleId' in loc
+                ? getModuleInitialLoadInfo(loc.moduleId, commands).location
+                    .slotName
+                : loc.slotName
+          }
+          return [
+            ...innerAcc,
+            { definition: labwareDef, labwareId: currentLabware.id, slot },
+          ]
+        }, []),
+      ]
     },
     []
   )
@@ -149,4 +191,57 @@ export const getLabwareIdsInOrder = (
     .map(({ labwareId }) => labwareId)
 
   return orderedLabwareIds
+}
+
+export function getLabwareDefinitionsFromCommands(
+  commands: RunTimeCommand[]
+): LabwareDefinition2[] {
+  return commands.reduce<LabwareDefinition2[]>((acc, command) => {
+    const isLoadingNewDef =
+      command.commandType === 'loadLabware' &&
+      !acc.some(
+        def =>
+          getLabwareDefURI(def) === getLabwareDefURI(command.result.definition)
+      )
+    return isLoadingNewDef ? [...acc, command.result.definition] : acc
+  }, [])
+}
+
+const TRASH_ID = 'fixedTrash'
+
+export const getAllUniqLocationsForLabware = (
+  labwareId: string,
+  commands: RunTimeCommand[]
+): LabwareLocation[] => {
+  if (labwareId === TRASH_ID) {
+    return [{ slotName: '12' }]
+  }
+  const labwareLocation = commands.reduce<LabwareLocation[]>(
+    (acc, command: RunTimeCommand) =>
+      command.commandType === 'loadLabware' &&
+      command.result?.labwareId === labwareId
+        ? [...acc, command.params.location]
+        : acc,
+    []
+  )
+
+  if (labwareLocation.length === 0) {
+    throw new Error(
+      'expected to be able to find at least one labware location, but could not'
+    )
+  }
+
+  return labwareLocation
+}
+
+export function getLabwareDef(
+  labwareId: string,
+  protocolData: CompletedProtocolAnalysis
+): LabwareDefinition2 | undefined {
+  const labwareDefUri = protocolData.labware.find(l => l.id === labwareId)
+    ?.definitionUri
+  const labwareDefinitions = getLabwareDefinitionsFromCommands(
+    protocolData.commands
+  )
+  return labwareDefinitions.find(def => getLabwareDefURI(def) === labwareDefUri)
 }

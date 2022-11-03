@@ -169,12 +169,14 @@ describe('parseInitialLoadedLabwareBySlot', () => {
       2: mockRunTimeCommands.find(
         c =>
           c.commandType === 'loadLabware' &&
+          typeof c.params.location === 'object' &&
           'slotName' in c.params?.location &&
           c.params?.location?.slotName === '2'
       ),
       12: mockRunTimeCommands.find(
         c =>
           c.commandType === 'loadLabware' &&
+          typeof c.params.location === 'object' &&
           'slotName' in c.params?.location &&
           c.params?.location?.slotName === '12'
       ),
@@ -190,12 +192,14 @@ describe('parseInitialLoadedLabwareByModuleId', () => {
       'module-0': mockRunTimeCommands.find(
         c =>
           c.commandType === 'loadLabware' &&
+          typeof c.params.location === 'object' &&
           'moduleId' in c.params?.location &&
           c.params?.location?.moduleId === 'module-0'
       ),
       'module-1': mockRunTimeCommands.find(
         c =>
           c.commandType === 'loadLabware' &&
+          typeof c.params.location === 'object' &&
           'moduleId' in c.params?.location &&
           c.params?.location?.moduleId === 'module-1'
       ),

@@ -1,18 +1,16 @@
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import { LoadPipetteRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-import type {
-  RunTimeCommand,
-  ProtocolFile,
-} from '@opentrons/shared-data/protocol'
+import type { LoadedPipette } from '@opentrons/shared-data'
+import type { RunTimeCommand } from '@opentrons/shared-data/protocol'
+import type { LoadPipetteRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
 export const getPrimaryPipetteId = (
-  pipettes: ProtocolFile<{}>['pipettes'],
+  pipettesById: { [id: string]: LoadedPipette },
   commands: RunTimeCommand[]
 ): string => {
-  if (Object.keys(pipettes).length === 1) {
-    //  @ts-expect-error
-    return pipettes[0].id
+  if (Object.keys(pipettesById).length === 1) {
+    return Object.keys(pipettesById)[0]
   }
+
   const leftPipetteId = commands.find(
     (command: RunTimeCommand): command is LoadPipetteRunTimeCommand =>
       command.commandType === 'loadPipette' && command.params.mount === 'left'
@@ -28,23 +26,19 @@ export const getPrimaryPipetteId = (
     )
   }
 
-  const leftPipette = pipettes[0]
-  const rightPipette = pipettes[1]
+  const leftPipette = pipettesById[leftPipetteId]
+  const rightPipette = pipettesById[rightPipetteId]
 
-  //  @ts-expect-error: pipetteName should be name until we remove the schemaV6Adapter
   const leftPipetteSpecs = getPipetteNameSpecs(leftPipette.pipetteName)
-  //  @ts-expect-error: pipetteName should be name until we remove the schemaV6Adapter
   const rightPipetteSpecs = getPipetteNameSpecs(rightPipette.pipetteName)
 
   if (leftPipetteSpecs == null) {
     throw new Error(
-      //  @ts-expect-error: pipetteName should be name until we remove the schemaV6Adapter
       `could not find pipette specs for ${leftPipette.pipetteName}`
     )
   }
   if (rightPipetteSpecs == null) {
     throw new Error(
-      //  @ts-expect-error: pipetteName should be name until we remove the schemaV6Adapter
       `could not find pipette specs for ${rightPipette.pipetteName}`
     )
   }

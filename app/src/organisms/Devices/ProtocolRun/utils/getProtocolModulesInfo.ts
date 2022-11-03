@@ -44,6 +44,7 @@ export const getProtocolModulesInfo = (
             )
             .find(
               (command: LoadLabwareRunTimeCommand) =>
+                typeof command.params.location === 'object' &&
                 'moduleId' in command.params.location &&
                 command.params.location.moduleId === moduleId
             )?.result?.labwareId ?? null

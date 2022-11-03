@@ -4,7 +4,6 @@ from decoy import Decoy
 from typing import cast
 
 from opentrons.calibration_storage.helpers import uri_from_details
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.types import Point, DeckSlotName
@@ -46,8 +45,6 @@ def subject(labware_view: LabwareView, module_view: ModuleView) -> GeometryView:
 
 def test_get_labware_parent_position(
     decoy: Decoy,
-    standard_deck_def: DeckDefinitionV3,
-    well_plate_def: LabwareDefinition,
     labware_view: LabwareView,
     subject: GeometryView,
 ) -> None:
@@ -71,8 +68,6 @@ def test_get_labware_parent_position(
 
 def test_raise_error_for_off_deck_labware_parent(
     decoy: Decoy,
-    standard_deck_def: DeckDefinitionV3,
-    well_plate_def: LabwareDefinition,
     labware_view: LabwareView,
     subject: GeometryView,
 ) -> None:
@@ -91,8 +86,6 @@ def test_raise_error_for_off_deck_labware_parent(
 
 def test_get_labware_parent_position_on_module(
     decoy: Decoy,
-    standard_deck_def: DeckDefinitionV3,
-    well_plate_def: LabwareDefinition,
     labware_view: LabwareView,
     module_view: ModuleView,
     subject: GeometryView,
@@ -124,7 +117,6 @@ def test_get_labware_parent_position_on_module(
 
 def test_get_labware_origin_position(
     decoy: Decoy,
-    standard_deck_def: DeckDefinitionV3,
     well_plate_def: LabwareDefinition,
     labware_view: LabwareView,
     subject: GeometryView,
@@ -159,7 +151,6 @@ def test_get_labware_origin_position(
 
 def test_get_labware_highest_z(
     decoy: Decoy,
-    standard_deck_def: DeckDefinitionV3,
     well_plate_def: LabwareDefinition,
     labware_view: LabwareView,
     subject: GeometryView,
@@ -191,7 +182,6 @@ def test_get_labware_highest_z(
 
 def test_get_module_labware_highest_z(
     decoy: Decoy,
-    standard_deck_def: DeckDefinitionV3,
     well_plate_def: LabwareDefinition,
     labware_view: LabwareView,
     module_view: ModuleView,
@@ -229,11 +219,26 @@ def test_get_module_labware_highest_z(
     assert highest_z == (well_plate_def.dimensions.zDimension + 3 + 3 + 6 + 0.5)
 
 
+def test_get_all_labware_highest_z_no_equipment(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    subject: GeometryView,
+) -> None:
+    """It should return 0 if no loaded equipment."""
+    decoy.when(module_view.get_all()).then_return([])
+    decoy.when(labware_view.get_all()).then_return([])
+
+    result = subject.get_all_labware_highest_z()
+
+    assert result == 0
+
+
 def test_get_all_labware_highest_z(
     decoy: Decoy,
-    standard_deck_def: DeckDefinitionV3,
     well_plate_def: LabwareDefinition,
     reservoir_def: LabwareDefinition,
+    falcon_tuberack_def: LabwareDefinition,
     labware_view: LabwareView,
     module_view: ModuleView,
     subject: GeometryView,
@@ -246,6 +251,13 @@ def test_get_all_labware_highest_z(
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
         offsetId="plate-offset-id",
     )
+    off_deck_lw = LoadedLabware(
+        id="off-deck-plate-id",
+        loadName="off-deck-plate-load-name",
+        definitionUri="off-deck-plate-definition-uri",
+        location=OFF_DECK_LOCATION,
+        offsetId="plate-offset-id",
+    )
     reservoir = LoadedLabware(
         id="reservoir-id",
         loadName="reservoir-load-name",
@@ -255,19 +267,27 @@ def test_get_all_labware_highest_z(
     )
 
     plate_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+    off_deck_lw_offset = LabwareOffsetVector(x=1, y=-2, z=3)
     reservoir_offset = LabwareOffsetVector(x=1, y=-2, z=3)
 
     decoy.when(module_view.get_all()).then_return([])
 
-    decoy.when(labware_view.get_all()).then_return([plate, reservoir])
+    decoy.when(labware_view.get_all()).then_return([plate, off_deck_lw, reservoir])
     decoy.when(labware_view.get("plate-id")).then_return(plate)
+    decoy.when(labware_view.get("off-deck-plate-id")).then_return(off_deck_lw)
     decoy.when(labware_view.get("reservoir-id")).then_return(reservoir)
 
     decoy.when(labware_view.get_definition("plate-id")).then_return(well_plate_def)
+    decoy.when(labware_view.get_definition("off-deck-plate-id")).then_return(
+        falcon_tuberack_def  # Something tall.
+    )
     decoy.when(labware_view.get_definition("reservoir-id")).then_return(reservoir_def)
 
     decoy.when(labware_view.get_labware_offset_vector("plate-id")).then_return(
         plate_offset
+    )
+    decoy.when(labware_view.get_labware_offset_vector("off-deck-plate-id")).then_return(
+        off_deck_lw_offset
     )
     decoy.when(labware_view.get_labware_offset_vector("reservoir-id")).then_return(
         reservoir_offset
@@ -284,6 +304,7 @@ def test_get_all_labware_highest_z(
     reservoir_z = subject.get_labware_highest_z("reservoir-id")
     all_z = subject.get_all_labware_highest_z()
 
+    # Should exclude the off-deck plate.
     assert all_z == max(plate_z, reservoir_z)
 
 
@@ -310,7 +331,6 @@ def test_get_all_labware_highest_z_with_modules(
 def test_get_labware_position(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
-    standard_deck_def: DeckDefinitionV3,
     labware_view: LabwareView,
     subject: GeometryView,
 ) -> None:
@@ -346,7 +366,6 @@ def test_get_labware_position(
 def test_get_well_position(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
-    standard_deck_def: DeckDefinitionV3,
     labware_view: LabwareView,
     subject: GeometryView,
 ) -> None:
@@ -386,7 +405,6 @@ def test_get_well_position(
 def test_get_well_edges(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
-    standard_deck_def: DeckDefinitionV3,
     labware_view: LabwareView,
     subject: GeometryView,
 ) -> None:
@@ -437,7 +455,6 @@ def test_get_well_edges(
 def test_get_module_labware_well_position(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
-    standard_deck_def: DeckDefinitionV3,
     labware_view: LabwareView,
     module_view: ModuleView,
     subject: GeometryView,
@@ -484,7 +501,6 @@ def test_get_module_labware_well_position(
 def test_get_well_position_with_top_offset(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
-    standard_deck_def: DeckDefinitionV3,
     labware_view: LabwareView,
     subject: GeometryView,
 ) -> None:
@@ -531,7 +547,6 @@ def test_get_well_position_with_top_offset(
 def test_get_well_position_with_bottom_offset(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
-    standard_deck_def: DeckDefinitionV3,
     labware_view: LabwareView,
     subject: GeometryView,
 ) -> None:
@@ -670,7 +685,6 @@ def test_get_nominal_tip_geometry_raises(
 
 def test_get_tip_drop_location(
     decoy: Decoy,
-    tip_rack_def: LabwareDefinition,
     labware_view: LabwareView,
     subject: GeometryView,
 ) -> None:
@@ -709,11 +723,7 @@ def test_get_tip_drop_location_with_trash(
     assert location == WellLocation(offset=WellOffset(x=1, y=2, z=3))
 
 
-def test_get_tip_drop_invalid_origin(
-    decoy: Decoy,
-    labware_view: LabwareView,
-    subject: GeometryView,
-) -> None:
+def test_get_tip_drop_invalid_origin(subject: GeometryView) -> None:
     """It should raise if the given WellLocation is not WellOrigin.TOP."""
     pipette_config: PipetteDict = cast(PipetteDict, {"return_tip_height": 0.5})
 

@@ -24,7 +24,7 @@ import { DeprecatedJogControls } from '../../../../molecules/DeprecatedJogContro
 import { OffsetVector } from '../../../../molecules/OffsetVector'
 import { useProtocolDetailsForRun } from '../../../Devices/hooks'
 import { DeprecatedLabwarePositionCheckStepDetail } from '../DeprecatedLabwarePositionCheckStepDetail'
-import { useLabwareOffsetForLabware } from '../../hooks/useLabwareOffsetForLabware'
+import { useLabwareOffsetForLabware } from '../../deprecatedHooks/useLabwareOffsetForLabware'
 import { DeprecatedStepDetailText } from '../DeprecatedStepDetailText'
 
 jest.mock('@opentrons/components', () => {
@@ -47,7 +47,7 @@ jest.mock('@opentrons/shared-data', () => {
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../molecules/DeprecatedJogControls')
 jest.mock('../../../Devices/hooks')
-jest.mock('../../hooks/useLabwareOffsetForLabware')
+jest.mock('../../deprecatedHooks/useLabwareOffsetForLabware')
 jest.mock('../DeprecatedStepDetailText')
 jest.mock('../../../../molecules/OffsetVector')
 

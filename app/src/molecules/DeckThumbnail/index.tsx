@@ -2,12 +2,13 @@ import * as React from 'react'
 import map from 'lodash/map'
 
 import { RobotWorkSpace, Module, LabwareRender } from '@opentrons/components'
-import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
 import { useFeatureFlag } from '../../redux/config'
 
 import {
   inferModuleOrientationFromXCoordinate,
   getModuleDef2,
+  getDeckDefFromRobotName,
+  getRobotNameFromLoadedLabware,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import {
@@ -18,10 +19,17 @@ import {
   parseLabwareInfoByLiquidId,
 } from '@opentrons/api-client'
 import { getWellFillFromLabwareId } from '../../organisms/Devices/ProtocolRun/SetupLiquids/utils'
-import type { DeckSlot, Liquid, RunTimeCommand } from '@opentrons/shared-data'
+import type {
+  DeckSlot,
+  Liquid,
+  LoadedLabware,
+  RunTimeCommand,
+  RobotName,
+} from '@opentrons/shared-data'
 
 interface DeckThumbnailProps {
   commands: RunTimeCommand[]
+  labware: LoadedLabware[]
   liquids?: Liquid[]
 }
 const deckSetupLayerBlocklist = [
@@ -32,11 +40,28 @@ const deckSetupLayerBlocklist = [
   'removalHandle',
   'removableDeckOutline',
   'screwHoles',
+  'DECK_BASE',
+  'BARCODE_COVERS',
 ]
 
+const OT2_VIEWBOX = '-75 -20 586 480'
+const OT3_VIEWBOX = '-144.31 -76.59 750 681.74'
+
+const getViewBox = (robotType: RobotName): string | null => {
+  switch (robotType) {
+    case 'OT-2 Standard':
+      return OT2_VIEWBOX
+    case 'OT-3 Standard':
+      return OT3_VIEWBOX
+    default:
+      return null
+  }
+}
+
 export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
-  const deckDef = React.useMemo(() => getDeckDefinitions().ot2_standard, [])
-  const { commands, liquids } = props
+  const { commands, liquids, labware = [] } = props
+  const robotName = getRobotNameFromLoadedLabware(labware)
+  const deckDef = getDeckDefFromRobotName(robotName)
   const liquidSetupEnabled = useFeatureFlag('enableLiquidSetup')
   const enableThermocyclerGen2 = useFeatureFlag('enableThermocyclerGen2')
 
@@ -58,7 +83,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
     <RobotWorkSpace
       deckLayerBlocklist={deckSetupLayerBlocklist}
       deckDef={deckDef}
-      viewBox="-75 -20 586 480"
+      viewBox={getViewBox(robotName)}
     >
       {({ deckSlotsById }) =>
         map<DeckSlot>(deckSlotsById, (slot: DeckSlot, slotId: string) => {

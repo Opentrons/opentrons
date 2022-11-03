@@ -92,8 +92,8 @@ def test_schema_validators(
         protocol_schema_v6.ProtocolSchemaV6(
             otSharedSchema="#/protocol/schemas/6",
             schemaVersion=6,
-            metadata={},
-            robot=protocol_schema_v6.Robot(model="", deckId=""),
+            metadata=protocol_schema_v6.Metadata(),
+            robot=protocol_schema_v6.Robot(model="OT-2 Standard", deckId=""),
             labware=labware,
             pipettes=pipettes,
             liquids=liquids,

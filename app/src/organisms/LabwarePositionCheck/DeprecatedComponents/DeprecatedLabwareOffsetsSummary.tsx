@@ -18,7 +18,7 @@ import {
 } from '@opentrons/components'
 import { OffsetVector } from '../../../molecules/OffsetVector'
 import { StyledText } from '../../../atoms/text'
-import type { LabwareOffsets } from '../hooks/useLabwareOffsets'
+import type { LabwareOffsets } from '../deprecatedHooks/useLabwareOffsets'
 
 const OffsetTable = styled('table')`
   ${TYPOGRAPHY.labelRegular}
