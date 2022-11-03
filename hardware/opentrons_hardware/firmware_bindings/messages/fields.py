@@ -71,8 +71,8 @@ class ToolField(utils.UInt8Field):
 
 class FirmwareUpdateDataField(utils.BinaryFieldBase[bytes]):
     """The data field of FirmwareUpdateData."""
-
-    NUM_BYTES = 56
+    # this needs to be a multiple of 8
+    NUM_BYTES = 48
     FORMAT = f"{NUM_BYTES}s"
 
 
