@@ -266,12 +266,19 @@ class InstrumentContext(publisher.CommandPublisher):
         well: Optional[labware.Well]
         if isinstance(location, labware.Well):
             well = location
-            if location.parent.labware.is_fixed_trash():
+            well_parent = location.parent.parent
+            # TODO(tz, 11-4-2022): I hate this. Is there a better way?
+            if (
+                well_parent
+                and isinstance(well_parent, LabwareLike)
+                and well_parent.is_fixed_trash()
+            ):
                 dest = location.top()
             else:
                 dest = location.bottom(
                     self._implementation.get_well_bottom_clearance().dispense
                 )
+            # )
         elif isinstance(location, types.Location):
             dest = location
             _, well = dest.labware.get_parent_labware_and_well()
@@ -309,7 +316,7 @@ class InstrumentContext(publisher.CommandPublisher):
             command=cmds.dispense(
                 instrument=self,
                 volume=c_vol,
-                location=well,
+                location=dest,
                 rate=rate,
                 flow_rate=self._implementation.get_flow_rate().dispense * rate,
             ),

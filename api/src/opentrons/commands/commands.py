@@ -44,7 +44,7 @@ def aspirate(
 def dispense(
     instrument: InstrumentContext,
     volume: float,
-    location: Well,
+    location: Location,
     flow_rate: float,
     rate: float,
 ) -> command_types.DispenseCommand:
