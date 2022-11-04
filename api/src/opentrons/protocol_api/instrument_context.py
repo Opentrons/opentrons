@@ -266,7 +266,7 @@ class InstrumentContext(publisher.CommandPublisher):
         well: Optional[labware.Well]
         if isinstance(location, labware.Well):
             well = location
-            if location.labware.is_fixed_trash():
+            if location.parent.labware.is_fixed_trash():
                 dest = location.top()
             else:
                 dest = location.bottom(
