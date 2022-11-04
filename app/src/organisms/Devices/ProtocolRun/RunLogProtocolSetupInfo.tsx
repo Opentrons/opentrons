@@ -76,7 +76,7 @@ export const RunLogProtocolSetupInfo = ({
   } else if (setupCommand.commandType === 'loadLabware') {
     let moduleName: string | null = null
     let slotNumber = Object.values(setupCommand.params.location)[0]
-    if ('moduleId' in setupCommand.params.location) {
+    if (setupCommand.params.location !== 'offDeck' && 'moduleId' in setupCommand.params.location) {
       const moduleId = setupCommand.params.location.moduleId
       const moduleModel = protocolData.modules[moduleId]
       const moduleRunTimeCommand = protocolData.commands

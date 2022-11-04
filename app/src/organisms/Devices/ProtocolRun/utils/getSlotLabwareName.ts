@@ -21,7 +21,9 @@ export function getSlotLabwareName(
     'location' in loadLabwareCommand.params
       ? loadLabwareCommand.params.location
       : ''
-  if ('slotName' in labwareLocation) {
+  if (labwareLocation === 'offDeck') {
+    slotName = labwareLocation
+  } else if ('slotName' in labwareLocation) {
     slotName = labwareLocation.slotName
   } else {
     const loadModuleCommands = commands?.filter(

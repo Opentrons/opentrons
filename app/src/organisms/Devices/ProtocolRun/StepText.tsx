@@ -14,6 +14,7 @@ import { RunLogProtocolSetupInfo } from './RunLogProtocolSetupInfo'
 
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { RunCommandSummary } from '@opentrons/api-client'
+import { getDisplayLocation } from './utils/getDisplayLocation'
 
 const TRASH_ID = 'fixedTrash'
 
@@ -79,10 +80,10 @@ export function StepText(props: Props): JSX.Element | null {
           labwareId === TRASH_ID
             ? 'Opentrons Fixed Trash'
             : getLabwareDisplayName(
-                protocolData.labwareDefinitions[
-                  protocolData.labware[labwareId].definitionId
-                ]
-              ),
+              protocolData.labwareDefinitions[
+              protocolData.labware[labwareId].definitionId
+              ]
+            ),
         labware_location: labwareLocation.slotName,
       })
       break
@@ -121,6 +122,21 @@ export function StepText(props: Props): JSX.Element | null {
           setupCommand={displayCommand}
         />
       )
+      break
+    }
+    case 'moveLabware': {
+      const { strategy, labwareId, newLocation } = displayCommand.params
+      const labwareDisplayName = ''
+      // getLabwareDisplayName(
+      //   labwareRenderInfoById[labwareId].labwareDef
+      // )
+      console.log(strategy, labwareId, newLocation)
+      console.log(Object.keys(protocolData.modules).map(id => ({ ...protocolData.modules[id], id })))
+      const displayLocation = getDisplayLocation(newLocation, Object.keys(protocolData.modules).map(id => ({ ...protocolData.modules[id], id })), t)
+      console.log('displayLocation', displayLocation)
+      messageNode = strategy === 'usingGripper'
+        ? t('move_labware_with_gripper', { labware: labwareDisplayName, location: displayLocation })
+        : t('move_labware_manually', { labware: labwareDisplayName, location: displayLocation })
       break
     }
     case 'magneticModule/engage': {

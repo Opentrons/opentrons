@@ -36,5 +36,10 @@
   "home_gantry": "Homing all gantry, pipette, and plunger axes",
   "save_position": "Saving position",
   "comment": "Comment",
-  "wait_for_resume": "Pausing protocol"
+  "wait_for_resume": "Pausing protocol",
+  "off_deck": "Off Deck",
+  "module_in_slot": "{{module}} in {{slot}}",
+  "slot_name": "slot {{slot_name}}",
+  "move_labware_with_gripper": "Moving {{labware}} using gripper to {{location}}",
+  "move_labware_manually": "Manually move {{labware}} to {{location}}"
 }
