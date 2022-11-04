@@ -142,7 +142,6 @@ describe('useStoredProtocolAnalysis hook', () => {
       } as UseQueryResult<Protocol>)
     when(mockGetStoredProtocol)
       .calledWith(undefined as any, PROTOCOL_KEY)
-      // @ts-expect-error
       .mockReturnValue(modifiedStoredProtocolData)
 
     const { result } = renderHook(() => useStoredProtocolAnalysis(RUN_ID), {

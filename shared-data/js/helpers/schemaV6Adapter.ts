@@ -2,7 +2,11 @@ import type {
   LoadLabwareRunTimeCommand,
   LoadModuleRunTimeCommand,
 } from '../../protocol/types/schemaV6/command/setup'
-import type { RunTimeCommand, ProtocolAnalysisFile } from '../../protocol'
+import type {
+  RunTimeCommand,
+  ProtocolAnalysisOutput,
+  ProtocolAnalysisFile,
+} from '../../protocol'
 import type {
   PendingProtocolAnalysis,
   CompletedProtocolAnalysis,
@@ -13,8 +17,7 @@ import type {
 // and the protocol schema v6 interface. Much of this logic should be deleted once we resolve
 // these discrepencies on the server side
 
-interface SchemaAdapterOutput
-  extends Omit<CompletedProtocolAnalysis, 'modules'> {
+interface SchemaAdapterOutput extends Omit<ProtocolAnalysisOutput, 'modules'> {
   labwareDefinitions: ProtocolAnalysisFile['labwareDefinitions']
   modules: ProtocolAnalysisFile['modules']
 }

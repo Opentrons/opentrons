@@ -71,9 +71,7 @@ export function useStoredProtocolAnalysis(
     useSelector((state: State) => getStoredProtocol(state, protocolKey))
       ?.mostRecentAnalysis ?? null
 
-  // @ts-expect-error
   return storedProtocolAnalysis != null && 'modules' in storedProtocolAnalysis
-    ? // @ts-expect-error
-      schemaV6Adapter(storedProtocolAnalysis)
+    ? schemaV6Adapter(storedProtocolAnalysis)
     : parseProtocolAnalysisOutput(storedProtocolAnalysis)
 }
