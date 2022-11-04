@@ -8,7 +8,7 @@ from enum import Enum
 from math import copysign, floor
 from logging import getLogger
 
-from .types import OT3Mount, OT3Axis
+from .types import OT3Mount, OT3Axis, GripperProbe
 from opentrons.types import Point
 import json
 
@@ -450,3 +450,14 @@ def gripper_pin_offsets_mean(front: Point, rear: Point) -> Point:
     The gripper calibration offset.
     """
     return 1 / 2 * (front + rear)
+
+
+async def calibrate_gripper(hcapi: OT3API, probe: GripperProbe) -> Point:
+    hcapi.add_gripper_probe(probe)
+    hcapi.grip(20)
+    try:
+        result = await calibrate_mount(hcapi, OT3Mount.GRIPPER)
+    finally:
+        hcapi.remove_gripper_probe()
+        hcapi.grip(20)
+    return result

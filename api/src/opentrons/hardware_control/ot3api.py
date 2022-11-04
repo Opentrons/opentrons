@@ -1576,7 +1576,6 @@ class OT3API(
             pass_settings.speed_mm_per_s,
             pass_settings.sensor_threshold_pf,
             sensor_id,
-            start_fresh,
         )
         end_pos = await self.gantry_position(mount, refresh=True)
         await self.move_to(mount, pass_start_pos)
