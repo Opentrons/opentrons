@@ -171,19 +171,29 @@ async def subject_mocked_driver(
     mock_driver: mock.AsyncMock,
 ) -> AsyncGenerator[modules.Thermocycler, None]:
     """Test subject with mocked driver"""
+    reader = ThermocyclerReader(driver=mock_driver)
+    poller = Poller(reader=reader, interval=SIMULATING_POLL_PERIOD)
     therm = modules.Thermocycler(
         port="/dev/ot_module_sim_thermocycler0",
         usb_port=usb_port,
-        execution_manager=ExecutionManager(),
         driver=mock_driver,
+        reader=reader,
+        poller=poller,
         device_info={
             "serial": "dummySerialTC",
             "model": "dummyModelTC",
             "version": "dummyVersionTC",
         },
         hw_control_loop=asyncio.get_running_loop(),
-        polling_interval_sec=SIMULATING_POLL_PERIOD,
+        execution_manager=ExecutionManager(),
     )
+    mock_driver.get_lid_temperature.return_value = Temperature(current=10, target=None)
+    mock_driver.get_lid_status.return_value = ThermocyclerLidStatus.OPEN
+    mock_driver.get_plate_temperature.return_value = PlateTemperature(
+        current=5, target=None, hold=None
+    )
+
+    await poller.start()
     try:
         yield therm
     finally:
@@ -265,7 +275,7 @@ async def test_sync_error_response_to_poller(
     mock_driver.get_plate_temperature.return_value = PlateTemperature(
         current=50, target=50, hold=None
     )
-    mock_driver.get_lid_temperature.return_value = Exception()
+    mock_driver.get_lid_temperature.side_effect = Exception()
     mock_driver.get_lid_status.return_value = ThermocyclerLidStatus.OPEN
 
     async def fake_temperature_setter(*args, **kwargs):
@@ -288,8 +298,8 @@ async def test_async_error_response_to_poller(
     """Test that asynchronous error is detected by poller and module live data and status are updated."""
     mock_driver.get_lid_temperature.return_value = Temperature(current=50, target=50)
     mock_driver.get_lid_status.return_value = ThermocyclerLidStatus.OPEN
-    mock_driver.get_plate_temperature.return_value = Exception()
+    mock_driver.get_plate_temperature.side_effect = Exception()
     with pytest.raises(Exception):
-        await subject_mocked_driver.wait_next_poll()
+        await subject_mocked_driver._poller.wait_next_poll()
     assert subject_mocked_driver.live_data["status"] == "error"
     assert subject_mocked_driver.status == modules.TemperatureStatus.ERROR
