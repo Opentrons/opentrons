@@ -58,39 +58,6 @@ SETTINGS = {
     ),
 }
 
-# async def random_move(api: OT3API) -> str:
-#     step_x = 440
-#     step_y = 370
-#     step_z = 200
-#     default_speed = 400
-#     c_pos= await api.current_position_ot3(mount=MOUNT)
-#
-#     print("Random move to: ")
-#     if args.test_z_axis:
-#         z_pos = random.randrange(step_z)
-#         print(f"({z_pos} from homed position)")
-#         x_ax = OT3Axis.X
-#         y_ax = OT3Axis.Y
-#         await api.move_rel(mount=MOUNT, delta=Point(z=-z_pos), speed=SPEED_Z)
-#         return f'({z_pos})'
-#     else:
-#         x_pos = random.randrange(step_x)
-#         y_pos = random.randrange(20.0, step_y)
-#         if args.equal_distance:
-#             if x_pos < y_pos:
-#                 y_pos = x_pos
-#             elif x_pos > y_pos:
-#                 x_pos = y_pos
-#         print(f"({x_pos},{y_pos})")
-#         z_ax = OT3Axis.Z_L if MOUNT == OT3Mount.LEFT else OT3Axis.Z_R
-#         if args.equal_distance:
-#             await api.move_rel(mount=MOUNT, delta=Point(x=-x_pos, y=-y_pos), speed=default_speed)
-#         else:
-#             await api.move_to(mount=MOUNT, abs_position=Point(x=x_pos, y=y_pos, z=c_pos[z_ax]), speed=default_speed)
-#         # await api.move_to(mount=MOUNT, abs_position=Point(x=x_pos, y=y_pos, z=c_pos[z_ax]), speed=default_speed)
-#         return f'({x_pos} {y_pos})'
-
-
 async def _main(is_simulating: bool) -> None:
     api = await build_async_ot3_hardware_api(is_simulating=is_simulating)
     await set_gantry_load_per_axis_settings_ot3(api, SETTINGS, load=LOAD)
@@ -101,7 +68,13 @@ async def _main(is_simulating: bool) -> None:
     file_name = data.create_file_name(test_name=test_name, run_id=data.create_run_id(), tag=test_tag)
 
     await home_ot3(api)
+    await api.move_rel(mount=MOUNT, delta=Point(y=-60), speed=200)
+    await api.disengage_axes([OT3Axis.Y])
 
+    print(f"Set digital scale parallel to X-Axis")
+    input("\n\t>> Continue...")
+
+    await api.engage_axes([OT3Axis.Y])
     starting_read_pos = gauge.read()
 
     print(f"Set digital scale to 0\n\t>>Current position: {starting_read_pos}")
@@ -123,17 +96,17 @@ async def _main(is_simulating: bool) -> None:
     header_str = data.convert_list_to_csv_line(header)
     data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
 
-    init_reading = ['0', test_axis, init_reading, init_pos, test_speed]
-    init_reading_str = data.convert_list_to_csv_line(init_reading)
+    init_reading_data = ['0', test_axis, init_reading, init_pos, test_speed]
+    init_reading_str = data.convert_list_to_csv_line(init_reading_data)
     data.append_data_to_file(test_name=test_name, file_name=file_name, data=init_reading_str)
 
-    distances = [440*0.25, 440*0.5, 440*0.75. 440]
+    distances = [440*0.25, 440*0.5, 440*0.75, 440]
 
     for cycle in range(CYCLES):
         print(f"Cycle: {cycle+1} out of {CYCLES}")
         # coordinates = await random_move(api)
         for distance in distances:
-            await api.move_rel(mount=MOUNT, delta=Point(x=distance), speed=400)
+            await api.move_rel(mount=MOUNT, delta=Point(x=-distance), speed=400)
             time.sleep(2)
             pos_reading = gauge.read() - init_reading
             print(f"\tCurrent position reading:\n\t {pos_reading} mm")
