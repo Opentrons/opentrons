@@ -181,7 +181,7 @@ async def subject_mocked_driver(
             "model": "dummyModelTC",
             "version": "dummyVersionTC",
         },
-        loop=asyncio.get_running_loop(),
+        hw_control_loop=asyncio.get_running_loop(),
         polling_interval_sec=SIMULATING_POLL_PERIOD,
     )
     try:
