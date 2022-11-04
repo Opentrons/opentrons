@@ -10,7 +10,7 @@ name: 'opentrons backward test matrix'
 on:
   push:
     branches:
-      - 'add-environment-specs' # remove me before merge
+      - 'add-py-environments-edge' # remove me before merge
   schedule:
     # 8:44 UTC each day
     - cron: '44 8 * * *'
