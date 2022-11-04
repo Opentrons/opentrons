@@ -226,13 +226,15 @@ def test_dispense(
 
     decoy.when(mock_instrument_core.get_flow_rate()).then_return(mock_flow_rate)
 
+    decoy.when(mock_instrument_core.get_well_bottom_clearance()).then_return(Clearances(default_aspirate=3.0, default_dispense=2.0))
+
     decoy.when(mock_flow_rate.dispense).then_return(123)
 
     subject.dispense(volume=42.0, location=mock_well)
 
     decoy.verify(
         mock_instrument_core.dispense(
-            location=mock_well.parent,
+            location=mock_well.top(),
             well_core=mock_well._impl,
             volume=42.0,
             rate=1.0,

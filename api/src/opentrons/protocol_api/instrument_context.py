@@ -266,8 +266,12 @@ class InstrumentContext(publisher.CommandPublisher):
         well: Optional[labware.Well]
         if isinstance(location, labware.Well):
             well = location
-            # Should I do this? I want to pass Location and not a Union of Well and Location.
-            dest = location.parent
+            if location.labware.is_fixed_trash():
+                dest = location.top()
+            else:
+                dest = location.bottom(
+                    self._implementation.get_well_bottom_clearance().dispense
+                )
         elif isinstance(location, types.Location):
             dest = location
             _, well = dest.labware.get_parent_labware_and_well()

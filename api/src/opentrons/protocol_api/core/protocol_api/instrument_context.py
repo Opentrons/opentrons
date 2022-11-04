@@ -103,13 +103,7 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
     ) -> None:
         """Dispense a volume of liquid (in microliters/uL) using this pipette
         into the specified location."""
-        if location.labware.is_well and location.labware.is_fixed_trash():
-            move_to_target = location.labware.as_well().top()
-        elif location.labware.is_well:
-            move_to_target = location.labware.as_well().bottom(self.get_well_bottom_clearance())
-        else:
-            move_to_target = location
-            self.move_to(location=move_to_target, well_core=well_core)
+        self.move_to(location=location, well_core=well_core)
 
         self._protocol_interface.get_hardware().dispense(self._mount, volume, rate)
 
