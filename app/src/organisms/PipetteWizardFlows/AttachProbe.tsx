@@ -72,11 +72,13 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         alternativeSpinner={isExiting ? null : pipetteCalibratingImage}
         description={t('pipette_calibrating')}
       >
-        <Flex marginX="8.5625rem">
-          <StyledText as="p" textAlign={TEXT_ALIGN_CENTER}>
-            {t('calibration_probe_touching', { slotNumber: calSlotNum })}
-          </StyledText>
-        </Flex>
+        {isExiting ? undefined : (
+          <Flex marginX="8.5625rem">
+            <StyledText as="p" textAlign={TEXT_ALIGN_CENTER}>
+              {t('calibration_probe_touching', { slotNumber: calSlotNum })}
+            </StyledText>
+          </Flex>
+        )}
       </InProgressModal>
     )
   return (
