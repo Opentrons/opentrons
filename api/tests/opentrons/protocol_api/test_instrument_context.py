@@ -232,7 +232,7 @@ def test_dispense(
 
     decoy.verify(
         mock_instrument_core.dispense(
-            location=None,
+            location=mock_well.parent,
             well_core=mock_well._impl,
             volume=42.0,
             rate=1.0,

@@ -96,7 +96,13 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
         self._pipette_dict["ready_to_aspirate"] = True
         self._update_volume(new_volume)
 
-    def dispense(self, volume: float, rate: float) -> None:
+    def dispense(
+        self,
+        volume: float,
+        rate: float,
+        location: Optional[types.Location],
+        well_core: Optional[WellImplementation],
+    ) -> None:
         self._raise_if_no_tip(HardwareAction.DISPENSE.name)
         self._update_volume(self.get_current_volume() - volume)
 

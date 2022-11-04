@@ -266,11 +266,8 @@ class InstrumentContext(publisher.CommandPublisher):
         well: Optional[labware.Well]
         if isinstance(location, labware.Well):
             well = location
-            # if LabwareLike(location).is_fixed_trash():
-            #     dest = location.top()
-            # else:
-            dest = None
-            # location.bottom(z=self.well_bottom_clearance.dispense)
+            # Should I do this? I want to pass Location and not a Union of Well and Location.
+            dest = location.parent
         elif isinstance(location, types.Location):
             dest = location
             _, well = dest.labware.get_parent_labware_and_well()
@@ -301,7 +298,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 location=dest, reject_module=self.api_version >= APIVersion(2, 13)
             )
 
-        c_vol = self.current_volume if not volume else volume
+        c_vol = self._implementation.get_current_volume() if not volume else volume
 
         with publisher.publish_context(
             broker=self.broker,
