@@ -7005,21 +7005,21 @@
         "type": "float"
       },
       "bottom": {
-        "value": 71.5,
+        "value": 64.5,
         "min": 55,
         "max": 80,
         "type": "float",
         "units": "mm"
       },
       "blowout": {
-        "value": 76.5,
+        "value": 68.5,
         "min": 60,
         "max": 85,
         "units": "mm",
         "type": "float"
       },
       "dropTip": {
-        "value": 90.5,
+        "value": 80.5,
         "min": 78,
         "max": 110,
         "units": "mm",
