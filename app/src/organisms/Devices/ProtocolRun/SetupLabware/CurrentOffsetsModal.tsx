@@ -1,6 +1,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import {
   getLabwareDisplayName,
   getModuleDisplayName,
@@ -24,7 +25,6 @@ import { getDefsByURI } from '../../../ApplyHistoricOffsets/hooks/getDefsByURI'
 
 import type { LabwareOffset } from '@opentrons/api-client'
 import { PrimaryButton } from '../../../../atoms/buttons'
-import { useSelector } from 'react-redux'
 
 const OffsetTable = styled('table')`
   ${TYPOGRAPHY.labelRegular}
@@ -128,9 +128,7 @@ export function CurrentOffsetsModal(
           gridGap={SPACING.spacing3}
         >
           <Link
-            color={COLORS.blueEnabled}
-            fontSize={TYPOGRAPHY.fontSizeP}
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            css={TYPOGRAPHY.linkPSemiBold}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             onClick={onCloseClick}
             role="button"

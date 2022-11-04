@@ -168,9 +168,7 @@ export function LaunchLabwarePositionCheck(
       >
         {currentOffsets.length > 0 ? (
           <Link
-            color={COLORS.blueEnabled}
-            fontSize={TYPOGRAPHY.fontSizeP}
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            css={TYPOGRAPHY.linkPSemiBold}
             onClick={handleClickViewCurrentOffsets}
             role="button"
           >

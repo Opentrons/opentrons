@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { SPACING, TYPOGRAPHY } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
+import { SPACING, TYPOGRAPHY } from '@opentrons/components'
 import { StyledText } from '../../../../atoms/text'
 import { LabwareListItem } from './LabwareListItem'
 import type { LabwareSetupItem } from './types'
