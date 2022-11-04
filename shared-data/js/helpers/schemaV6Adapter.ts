@@ -13,12 +13,18 @@ import type {
 // and the protocol schema v6 interface. Much of this logic should be deleted once we resolve
 // these discrepencies on the server side
 
+interface SchemaAdapterOutput
+  extends Omit<CompletedProtocolAnalysis, 'modules'> {
+  labwareDefinitions: ProtocolAnalysisFile['labwareDefinitions']
+  modules: ProtocolAnalysisFile['modules']
+}
+
 /**
  * @deprecated No longer necessary, do not use
  */
 export const schemaV6Adapter = (
   protocolAnalysis: PendingProtocolAnalysis | CompletedProtocolAnalysis
-): ProtocolAnalysisFile<{}> | null => {
+): SchemaAdapterOutput | null => {
   if (protocolAnalysis != null && protocolAnalysis.status === 'completed') {
     const labware: Array<{
       id: string
@@ -38,9 +44,7 @@ export const schemaV6Adapter = (
         loadCommand?.params.displayName ?? undefined
 
       return {
-        id: labwareId,
-        loadName: labware.loadName,
-        definitionUri: labware.definitionUri,
+        ...labware,
         displayName: displayName,
       }
     })
@@ -84,7 +88,6 @@ export const schemaV6Adapter = (
 
     return {
       ...protocolAnalysis,
-      //  @ts-expect-error
       labware,
       modules,
       labwareDefinitions,

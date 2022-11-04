@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { Flex, ALIGN_CENTER, SPACING, TYPOGRAPHY } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { StyledText } from '../../../atoms/text'
-import { getLabwareLocation } from '../ProtocolRun/utils/getLabwareLocation'
 import { getSlotLabwareName } from './utils/getSlotLabwareName'
 
 import {
