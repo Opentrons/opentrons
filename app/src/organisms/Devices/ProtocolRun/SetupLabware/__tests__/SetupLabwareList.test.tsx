@@ -1,4 +1,4 @@
-// TODO: build out test coverage for this component with additional labware
+it.todo('build out test coverage for this component with additional labware')
 
 // import * as React from 'react'
 // import { when } from 'jest-when'
