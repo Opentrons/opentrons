@@ -7,9 +7,9 @@ from decoy import Decoy
 
 from opentrons.broker import Broker
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import FlowRates
 from opentrons.protocols.api_support import instrument as mock_instrument_support
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import Clearances
 from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
     ProtocolContext,
@@ -183,6 +183,35 @@ def test_pick_up_explicit_tip(
             presses=1,
             increment=2.0,
             prep_after=False,
+        ),
+        times=1,
+    )
+
+
+def test_aspirate(
+    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
+) -> None:
+    """It should aspirate to a well."""
+    mock_well = decoy.mock(cls=Well)
+    bottom_location = Location(point=Point(1, 2, 3), labware=mock_well)
+
+    decoy.when(mock_instrument_core.get_well_bottom_clearance()).then_return(
+        Clearances(default_aspirate=1.2, default_dispense=3.4)
+    )
+
+    decoy.when(mock_well.bottom(z=1.2)).then_return(bottom_location)
+    decoy.when(mock_instrument_core.get_absolute_aspirate_flow_rate(1.23)).then_return(
+        123
+    )
+
+    subject.aspirate(volume=42.0, location=mock_well, rate=1.23)
+
+    decoy.verify(
+        mock_instrument_core.aspirate(
+            location=bottom_location,
+            well_core=mock_well._impl,
+            volume=42.0,
+            rate=1.23,
         ),
         times=1,
     )

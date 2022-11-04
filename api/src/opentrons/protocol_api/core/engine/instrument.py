@@ -28,6 +28,13 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         self._pipette_id = pipette_id
         self._engine_client = engine_client
         self._sync_hardware_api = sync_hardware_api
+        self._well_bottom_clearances = Clearances(
+            default_aspirate=1.0, default_dispense=1.0
+        )
+        # TODO(jbl 2022-11-03) flow_rates should not live in the cores, and should be moved to the protocol context
+        #   along with other rate related refactors (for the hardware API)
+        self._flow_rates = FlowRates(self)
+        self._flow_rates.set_defaults()
 
     @property
     def pipette_id(self) -> str:
@@ -40,8 +47,35 @@ class InstrumentCore(AbstractInstrument[WellCore]):
     def set_default_speed(self, speed: float) -> None:
         raise NotImplementedError("InstrumentCore.set_default_speed not implemented")
 
-    def aspirate(self, volume: float, rate: float) -> None:
-        raise NotImplementedError("InstrumentCore.aspirate not implemented")
+    def aspirate(
+        self,
+        location: Location,
+        well_core: Optional[WellCore],
+        volume: float,
+        rate: float,
+    ) -> None:
+        if well_core is None:
+            raise NotImplementedError(
+                "InstrumentCore.aspirate with well_core value of None not implemented"
+            )
+
+        well_name = well_core.get_name()
+        labware_id = well_core.labware_id
+
+        well_location = self._engine_client.state.geometry.get_relative_well_location(
+            labware_id=labware_id,
+            well_name=well_name,
+            absolute_point=location.point,
+        )
+
+        self._engine_client.aspirate(
+            pipette_id=self._pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
+            well_location=well_location,
+            volume=volume,
+            flow_rate=self.get_absolute_aspirate_flow_rate(rate),
+        )
 
     def dispense(
         self,
@@ -215,15 +249,16 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         raise NotImplementedError("InstrumentCore.get_return_height not implemented")
 
     def get_well_bottom_clearance(self) -> Clearances:
-        raise NotImplementedError(
-            "InstrumentCore.get_well_bottom_clearance not implemented"
-        )
+        return self._well_bottom_clearances
 
     def get_speed(self) -> PlungerSpeeds:
         raise NotImplementedError("InstrumentCore.get_speed not implemented")
 
     def get_flow_rate(self) -> FlowRates:
-        raise NotImplementedError("InstrumentCore.get_flow_rate not implemented")
+        return self._flow_rates
+
+    def get_absolute_aspirate_flow_rate(self, rate: float) -> float:
+        return self._flow_rates.aspirate * rate
 
     def set_flow_rate(
         self,
@@ -231,7 +266,12 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         dispense: Optional[float] = None,
         blow_out: Optional[float] = None,
     ) -> None:
-        raise NotImplementedError("InstrumentCore.set_flow_rate not implemented")
+        self._sync_hardware_api.set_flow_rate(
+            mount=self.get_mount(),
+            aspirate=aspirate,
+            dispense=dispense,
+            blow_out=blow_out,
+        )
 
     def set_pipette_speed(
         self,

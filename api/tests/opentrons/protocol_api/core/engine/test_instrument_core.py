@@ -34,9 +34,24 @@ def mock_sync_hardware(decoy: Decoy) -> SyncHardwareAPI:
 
 @pytest.fixture
 def subject(
-    mock_engine_client: EngineClient, mock_sync_hardware: SyncHardwareAPI
+    decoy: Decoy, mock_engine_client: EngineClient, mock_sync_hardware: SyncHardwareAPI
 ) -> InstrumentCore:
     """Get a InstrumentCore test subject with its dependencies mocked out."""
+    decoy.when(mock_engine_client.state.pipettes.get("abc123")).then_return(
+        LoadedPipette.construct(mount=MountType.LEFT)  # type: ignore[call-arg]
+    )
+    pipette_dict = cast(
+        PipetteDict,
+        {
+            "default_aspirate_flow_rates": {"1.1": 22},
+            "aspirate_flow_rate": 2.0,
+            "default_dispense_flow_rates": {"3.3": 44},
+            "default_blow_out_flow_rates": {"5.5": 66},
+        },
+    )
+    decoy.when(mock_sync_hardware.get_attached_instrument(Mount.LEFT)).then_return(
+        pipette_dict
+    )
     return InstrumentCore(
         pipette_id="abc123",
         engine_client=mock_engine_client,
@@ -195,6 +210,41 @@ def test_pick_up_tip(
             well_location=WellLocation(
                 origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
             ),
+        ),
+        times=1,
+    )
+
+
+def test_aspirate_from_well(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: InstrumentCore,
+) -> None:
+    """It should aspirate from a well."""
+    location = Location(point=Point(1, 2, 3), labware=None)
+
+    well_core = WellCore(
+        name="my cool well", labware_id="123abc", engine_client=mock_engine_client
+    )
+
+    decoy.when(
+        mock_engine_client.state.geometry.get_relative_well_location(
+            labware_id="123abc", well_name="my cool well", absolute_point=Point(1, 2, 3)
+        )
+    ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)))
+
+    subject.aspirate(location=location, well_core=well_core, volume=12.34, rate=5.6)
+
+    decoy.verify(
+        mock_engine_client.aspirate(
+            pipette_id="abc123",
+            labware_id="123abc",
+            well_name="my cool well",
+            well_location=WellLocation(
+                origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
+            ),
+            volume=12.34,
+            flow_rate=11.2,
         ),
         times=1,
     )
