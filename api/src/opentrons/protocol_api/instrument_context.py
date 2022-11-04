@@ -310,6 +310,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 volume=c_vol,
                 location=well,
                 rate=rate,
+                flow_rate=self._implementation.get_flow_rate().dispense * rate,
             ),
         ):
             self._implementation.dispense(

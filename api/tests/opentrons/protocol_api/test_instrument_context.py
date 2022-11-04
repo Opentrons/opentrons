@@ -9,7 +9,7 @@ from opentrons.broker import Broker
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support import instrument as mock_instrument_support
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import Clearances
+from opentrons.protocols.api_support.util import Clearances, FlowRates
 from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
     ProtocolContext,
@@ -222,11 +222,11 @@ def test_dispense(
 ) -> None:
     """It should dispense to a well."""
     mock_well = decoy.mock(cls=Well)
-    # mock_flow_rate = decoy.mock(cls=FlowRates)
-    #
-    # decoy.when(mock_instrument_core.get_flow_rate()).then_return(mock_flow_rate)
-    #
-    # decoy.when(mock_flow_rate.dispense).then_return(123)
+    mock_flow_rate = decoy.mock(cls=FlowRates)
+
+    decoy.when(mock_instrument_core.get_flow_rate()).then_return(mock_flow_rate)
+
+    decoy.when(mock_flow_rate.dispense).then_return(123)
 
     subject.dispense(volume=42.0, location=mock_well)
 

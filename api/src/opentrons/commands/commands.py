@@ -45,11 +45,11 @@ def dispense(
     instrument: InstrumentContext,
     volume: float,
     location: Well,
+    flow_rate: float,
     rate: float,
 ) -> command_types.DispenseCommand:
     location_text = stringify_location(location)
     template = "Dispensing {volume} uL into {location} at {flow} uL/sec"
-    flow_rate = rate * FlowRates(instrument._implementation).dispense
     text = template.format(volume=float(volume), location=location_text, flow=flow_rate)
 
     return {
