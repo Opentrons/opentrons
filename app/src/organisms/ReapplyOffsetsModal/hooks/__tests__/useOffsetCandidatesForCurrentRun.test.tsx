@@ -74,6 +74,7 @@ const mockProtocolDetails: ProtocolDetails = {
   } as any,
   displayName: 'fake protocol name',
   protocolKey: 'fakeProtocolKey',
+  robotType: 'OT-2 Standard',
 }
 const FAKE_OFFSET_TIPRACK_IN_2: LabwareOffset = {
   id: 'fakeOffsetId',

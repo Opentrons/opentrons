@@ -89,7 +89,7 @@ class WaitForTemperature(
 class WaitForTemperatureCreate(BaseCommandCreate[WaitForTemperatureParams]):
     """A request to create a Temperature Module's wait for temperature command."""
 
-    commandType: WaitForTemperatureCommandType
+    commandType: WaitForTemperatureCommandType = "temperatureModule/waitForTemperature"
     params: WaitForTemperatureParams
 
     _CommandCls: Type[WaitForTemperature] = WaitForTemperature

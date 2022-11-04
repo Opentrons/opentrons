@@ -73,6 +73,7 @@ describe('RunLog', () => {
       protocolData: _fixtureAnalysis,
       displayName: 'mock display name',
       protocolKey: 'fakeProtocolKey',
+      robotType: 'OT-2 Standard',
     })
     when(mockUseRunQuery).mockReturnValue(({
       data: { data: { current: true } },

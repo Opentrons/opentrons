@@ -1,19 +1,27 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-// import { useSelector } from 'react-redux'
-// import { getAttachedPipettes } from '../../redux/pipettes'
+import { useSelector } from 'react-redux'
+import { getAttachedPipettes } from '../../redux/pipettes'
+import { useConditionalConfirm } from '@opentrons/components'
+import {
+  useHost,
+  useCreateRunMutation,
+  useStopRunMutation,
+} from '@opentrons/react-api-client'
 import { ModalShell } from '../../molecules/Modal'
 import { Portal } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
+import { useChainRunCommands } from '../../resources/runs/hooks'
 import { getPipetteWizardSteps } from './getPipetteWizardSteps'
 import { FLOWS, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
 import { AttachStem } from './AttachStem'
 import { DetachStem } from './DetachStem'
 import { Results } from './Results'
+import { ExitModal } from './ExitModal'
 
-// import type { State } from '../../redux/types'
 import type { PipetteWizardFlow } from './types'
+import type { State } from '../../redux/types'
 import type { PipetteMount } from '@opentrons/shared-data'
 
 interface PipetteWizardFlowsProps {
@@ -22,27 +30,22 @@ interface PipetteWizardFlowsProps {
   robotName: string
   closeFlow: () => void
 }
+
 export const PipetteWizardFlows = (
   props: PipetteWizardFlowsProps
 ): JSX.Element | null => {
-  const { flowType, mount, closeFlow } = props
+  const { flowType, mount, closeFlow, robotName } = props
   const { t } = useTranslation('pipette_wizard_flows')
-  //   const attachedPipette = useSelector(
-  //     (state: State) => getAttachedPipettes(state, robotName)[mount]
-  //   )
-  const pipetteWizardSteps = getPipetteWizardSteps(flowType)
-
+  const attachedPipette = useSelector((state: State) =>
+    getAttachedPipettes(state, robotName)
+  )
+  const pipetteWizardSteps = getPipetteWizardSteps(flowType, mount)
+  const host = useHost()
+  const [runId, setRunId] = React.useState<string>('')
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const totalStepCount = pipetteWizardSteps.length - 1
   const currentStep = pipetteWizardSteps?.[currentStepIndex]
-  if (currentStep == null) return null
-  const proceed = (): void => {
-    setCurrentStepIndex(
-      currentStepIndex !== pipetteWizardSteps.length - 1
-        ? currentStepIndex + 1
-        : currentStepIndex
-    )
-  }
+
   const goBack = (): void => {
     setCurrentStepIndex(
       currentStepIndex !== pipetteWizardSteps.length - 1
@@ -50,22 +53,139 @@ export const PipetteWizardFlows = (
         : currentStepIndex
     )
   }
+  const { chainRunCommands, isCommandMutationLoading } = useChainRunCommands(
+    runId
+  )
+
+  const { createRun, isLoading: isCreateLoading } = useCreateRunMutation(
+    {
+      onSuccess: response => {
+        setRunId(response.data.id)
+      },
+    },
+    host
+  )
+  const { stopRun, isLoading: isStopLoading } = useStopRunMutation({
+    onSuccess: () => {
+      if (currentStep.section === SECTIONS.DETACH_STEM) {
+        proceed()
+      } else {
+        closeFlow()
+      }
+    },
+  })
+
+  const [isBetweenCommands, setIsBetweenCommands] = React.useState<boolean>(
+    false
+  )
+  const [isExiting, setIsExiting] = React.useState<boolean>(false)
+
+  const proceed = (): void => {
+    if (
+      !(
+        isCommandMutationLoading ||
+        isStopLoading ||
+        isBetweenCommands ||
+        isExiting
+      )
+    ) {
+      setCurrentStepIndex(
+        currentStepIndex !== pipetteWizardSteps.length - 1
+          ? currentStepIndex + 1
+          : currentStepIndex
+      )
+    }
+  }
+  const handleCleanUpAndClose = (): void => {
+    setIsExiting(true)
+    chainRunCommands([
+      {
+        commandType: 'home' as const,
+        params: {},
+      },
+    ]).then(() => {
+      setIsExiting(false)
+      if (runId !== '') stopRun(runId)
+    })
+  }
+  const {
+    confirm: confirmExit,
+    showConfirmation: showConfirmExit,
+    cancel: cancelExit,
+  } = useConditionalConfirm(handleCleanUpAndClose, true)
+
+  const [isRobotMoving, setIsRobotMoving] = React.useState<boolean>(false)
+
+  React.useEffect(() => {
+    if (
+      isCommandMutationLoading ||
+      isStopLoading ||
+      isBetweenCommands ||
+      isExiting
+    ) {
+      const timer = setTimeout(() => setIsRobotMoving(true), 700)
+      return () => clearTimeout(timer)
+    } else {
+      setIsRobotMoving(false)
+    }
+  }, [isCommandMutationLoading, isStopLoading, isBetweenCommands, isExiting])
 
   const calibrateBaseProps = {
-    mount,
-    flowType: FLOWS.CALIBRATE,
+    chainRunCommands,
+    isRobotMoving,
+    proceed,
+    runId,
     goBack,
+    attachedPipette,
+    setIsBetweenCommands,
+    isBetweenCommands,
   }
-
+  const exitModal = (
+    <ExitModal goBack={cancelExit} proceed={confirmExit} flowType={flowType} />
+  )
+  let onExit
+  if (currentStep == null) return null
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
+
   if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
-    modalContent = <BeforeBeginning {...calibrateBaseProps} proceed={proceed} />
+    onExit = handleCleanUpAndClose
+    modalContent = (
+      <BeforeBeginning
+        {...currentStep}
+        {...calibrateBaseProps}
+        createRun={createRun}
+        isCreateLoading={isCreateLoading}
+      />
+    )
   } else if (currentStep.section === SECTIONS.ATTACH_STEM) {
-    modalContent = <AttachStem {...calibrateBaseProps} proceed={proceed} />
+    onExit = confirmExit
+    modalContent = modalContent = showConfirmExit ? (
+      exitModal
+    ) : (
+      <AttachStem
+        {...currentStep}
+        {...calibrateBaseProps}
+        isExiting={isExiting}
+      />
+    )
   } else if (currentStep.section === SECTIONS.DETACH_STEM) {
-    modalContent = <DetachStem {...calibrateBaseProps} proceed={proceed} />
+    onExit = confirmExit
+    modalContent = modalContent = showConfirmExit ? (
+      exitModal
+    ) : (
+      <DetachStem
+        {...currentStep}
+        {...calibrateBaseProps}
+        handleCleanUp={handleCleanUpAndClose}
+      />
+    )
   } else if (currentStep.section === SECTIONS.RESULTS) {
-    modalContent = <Results {...calibrateBaseProps} proceed={closeFlow} />
+    onExit = confirmExit
+    modalContent = modalContent = showConfirmExit ? (
+      exitModal
+    ) : (
+      <Results {...currentStep} {...calibrateBaseProps} proceed={closeFlow} />
+    )
   }
 
   let wizardTitle: string = 'unknown page'
@@ -75,6 +195,11 @@ export const PipetteWizardFlows = (
       break
     }
   }
+  let exitWizardButton = onExit
+  if (isRobotMoving) {
+    exitWizardButton = undefined
+  } else if (showConfirmExit) exitWizardButton = handleCleanUpAndClose
+
   return (
     <Portal level="top">
       <ModalShell
@@ -84,7 +209,7 @@ export const PipetteWizardFlows = (
             title={wizardTitle}
             currentStep={currentStepIndex}
             totalSteps={totalStepCount}
-            onExit={closeFlow}
+            onExit={exitWizardButton}
           />
         }
       >
