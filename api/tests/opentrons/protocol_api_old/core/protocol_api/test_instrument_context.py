@@ -98,3 +98,19 @@ def test_home_legacy_behavior(
         mock_sync_hardware_api.home_z(mount=mount, allow_home_other=False),
         mock_sync_hardware_api.home_plunger(mount),
     )
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 12)])
+def test_dispense(
+    mount: Mount,
+    decoy: Decoy,
+    mock_sync_hardware_api: SyncHardwareAPI,
+    subject: InstrumentContextImplementation,
+) -> None:
+    """It should move to location and then dispense."""
+    subject.dispense()
+
+    decoy.verify(
+        mock_sync_hardware_api.home_z(mount=mount, allow_home_other=False),
+        mock_sync_hardware_api.home_plunger(mount),
+    )
