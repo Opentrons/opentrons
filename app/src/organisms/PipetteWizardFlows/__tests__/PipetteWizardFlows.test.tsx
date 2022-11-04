@@ -151,8 +151,10 @@ describe('PipetteWizardFlows', () => {
     })
     // second page
     getByText('Step 1 / 3')
-    getByText('Attach Calibration Stem')
-    getByText('Grab your calibration probe, install')
+    getByText('Attach Calibration Probe')
+    getByText(
+      'Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
+    )
     const initiate = getByRole('button', { name: 'Initiate calibration' })
     fireEvent.click(initiate)
     await waitFor(() => {
@@ -173,9 +175,9 @@ describe('PipetteWizardFlows', () => {
     })
     //  third page
     getByText('Step 2 / 3')
-    getByText('Remove Calibration Stem')
+    getByText('Remove Calibration Probe')
     getByText(
-      'Now you’ll be guided through removing your calibration stem. Undo the latch to remove the stem'
+      'Unlatch the calibration probe, remove it from the pipette nozzle, and return it to its storage location.'
     )
     const complete = getByRole('button', { name: 'Complete calibration' })
     fireEvent.click(complete)
