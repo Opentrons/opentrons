@@ -258,7 +258,8 @@ class FirmwareUpdateData(FirmwareUpdateWithAddress):
     def __post_init__(self) -> None:
         """Post init processing."""
         data_length = len(self.data.value)
-        if data_length > FirmwareUpdateDataField.NUM_BYTES:
+        if data_length > FirmwareUpdateDataField.NUM_BYTES or
+           data_length % 8 != 0:
             raise ValueError(
                 f"Data cannot be more than"
                 f" {FirmwareUpdateDataField.NUM_BYTES} bytes."
