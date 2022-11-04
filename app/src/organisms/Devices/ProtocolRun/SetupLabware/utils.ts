@@ -1,4 +1,3 @@
-import reduce from 'lodash/reduce'
 import { getSlotHasMatingSurfaceUnitVector } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import { orderBySlot } from '../../../LabwarePositionCheck/utils/labware'
@@ -7,21 +6,20 @@ import { getModuleInitialLoadInfo } from '../utils/getModuleInitialLoadInfo'
 
 import type {
   LabwareDefinition2,
-  ProtocolFile,
+  LoadedLabware,
   RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { LabwareToOrder } from '../../../LabwarePositionCheck/types'
 
 export const getAllLabwareAndTiprackIdsInOrder = (
-  labware: ProtocolFile<{}>['labware'],
+  labware: LoadedLabware[],
   labwareDefinitions: Record<string, LabwareDefinition2>,
   commands: RunTimeCommand[]
 ): string[] => {
-  const unorderedLabware = reduce<typeof labware, LabwareToOrder[]>(
-    labware,
-    (unorderedLabware, currentLabware, labwareId) => {
+  const unorderedLabware = labware.reduce<LabwareToOrder[]>(
+    (unorderedLabware, currentLabware) => {
       const labwareDef = labwareDefinitions[currentLabware.definitionId]
-      const labwareLocation = getLabwareLocation(labwareId, commands)
+      const labwareLocation = getLabwareLocation(currentLabware.id, commands)
 
       if (labwareLocation === 'offDeck') return unorderedLabware
       if ('moduleId' in labwareLocation) {
@@ -29,7 +27,7 @@ export const getAllLabwareAndTiprackIdsInOrder = (
           ...unorderedLabware,
           {
             definition: labwareDef,
-            labwareId: labwareId,
+            labwareId: currentLabware.id,
             slot: getModuleInitialLoadInfo(labwareLocation.moduleId, commands)
               .location.slotName,
           },
@@ -46,7 +44,7 @@ export const getAllLabwareAndTiprackIdsInOrder = (
         ...unorderedLabware,
         {
           definition: labwareDef,
-          labwareId: labwareId,
+          labwareId: currentLabware.id,
           slot: labwareLocation.slotName,
         },
       ]
