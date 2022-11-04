@@ -286,10 +286,19 @@ class InstrumentContext(publisher.CommandPublisher):
             # if LabwareLike(location).is_fixed_trash():
             #     dest = location.top()
             # else:
-            dest = location.bottom(z=self.well_bottom_clearance.dispense)
+            dest = None
+            # location.bottom(z=self.well_bottom_clearance.dispense)
         elif isinstance(location, types.Location):
             dest = location
             _, well = dest.labware.get_parent_labware_and_well()
+            if well is None:
+                raise TypeError(
+                    "If a location is specified as a `types.Location`"
+                    " (for instance, as the result of a call to `Well.top()`),"
+                    " it must be a location relative to a well,"
+                    " since that is where a tip is dropped."
+                    f" However, the given location refers to {location.labware}"
+                )
         elif location is not None:
             raise TypeError(
                 f"location should be a Well or Location, but it is {location}"
@@ -316,13 +325,13 @@ class InstrumentContext(publisher.CommandPublisher):
             command=cmds.dispense(
                 instrument=self,
                 volume=c_vol,
-                location=dest,
+                location=well,
                 rate=rate,
             ),
         ):
             self._implementation.dispense(
                 volume=c_vol,
-                rate=self._implementation.get_flow_rate().dispense * rate,
+                rate=rate,
                 location=dest,
                 well_core=well._impl if well is not None else None,
             )

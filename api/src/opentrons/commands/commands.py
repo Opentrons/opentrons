@@ -44,7 +44,7 @@ def aspirate(
 def dispense(
     instrument: InstrumentContext,
     volume: float,
-    location: Location,
+    location: Well,
     rate: float,
 ) -> command_types.DispenseCommand:
     location_text = stringify_location(location)

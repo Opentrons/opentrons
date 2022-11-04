@@ -30,7 +30,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         self,
         volume: float,
         rate: float,
-        location: types.Location,
+        location: Optional[types.Location],
         well_core: Optional[WellCoreType],
     ) -> None:
         ...

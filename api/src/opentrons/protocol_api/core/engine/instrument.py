@@ -43,7 +43,13 @@ class InstrumentCore(AbstractInstrument[WellCore]):
     def aspirate(self, volume: float, rate: float) -> None:
         raise NotImplementedError("InstrumentCore.aspirate not implemented")
 
-    def dispense(self, volume: float, rate: float) -> None:
+    def dispense(
+        self,
+        volume: float,
+        rate: float,
+        location: Optional[Location],
+        well_core: Optional[WellCore],
+    ) -> None:
         raise NotImplementedError("InstrumentCore.dispense not implemented")
 
     def blow_out(self) -> None:
