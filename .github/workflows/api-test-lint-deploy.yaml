@@ -101,6 +101,7 @@ jobs:
           opentrons_execute --help
           opentrons_simulate --help
           opentrons_simulate ./docs/v2/example_protocols/dilution_tutorial.py -e -o nothing
+          opentrons_simulate ../robot-server/tests/integration/protocols/simple_v6.json -e -o nothing
           python -m opentrons.cli --help
       - name: Upload coverage report
         if: matrix.os != 'windows-2022'
