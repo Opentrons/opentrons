@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.2.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.1...v6.2.0-alpha.2) (2022-11-04)
+
+
+### Bug Fixes
+
+* **api:** fix ot3 calibration failing test ([#11617](https://github.com/Opentrons/opentrons/issues/11617)) ([ce49a14](https://github.com/Opentrons/opentrons/commit/ce49a1443105d1b5f368be8c5d32d4153ca2b338))
+* **api:** more cherry-pick merge conflict failures ([#11678](https://github.com/Opentrons/opentrons/issues/11678)) ([200b359](https://github.com/Opentrons/opentrons/commit/200b3597190e2402163820d3d3e65ccfe8624a7c))
+* **api:** thermocycler test merge conflict ([#11674](https://github.com/Opentrons/opentrons/issues/11674)) ([a598f4d](https://github.com/Opentrons/opentrons/commit/a598f4d73af6d7e21f37f26e5b1f06f3d7290e99))
+
+
+
+
+
 # [6.2.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.0...v6.2.0-alpha.1) (2022-11-03)
 
 **Note:** Version bump only for package opentrons
