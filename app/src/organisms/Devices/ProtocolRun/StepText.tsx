@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Flex, ALIGN_CENTER, SPACING, TYPOGRAPHY } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { StyledText } from '../../../atoms/text'
+import { getLabwareLocation } from '../ProtocolRun/utils/getLabwareLocation'
 import { getSlotLabwareName } from './utils/getSlotLabwareName'
 
 import {
@@ -46,7 +47,6 @@ export function StepText(props: Props): JSX.Element | null {
     )
     return null
   }
-
   // params will not exist on command summaries
   switch (displayCommand.commandType) {
     case 'delay': {
@@ -66,29 +66,42 @@ export function StepText(props: Props): JSX.Element | null {
     }
     case 'dropTip': {
       const { wellName, labwareId } = displayCommand.params
-      //  @ts-expect-error
-      const matchingLabware = protocolData.labware.find(
-        //  @ts-expect-error
-        item => item.id === labwareId
+      const labwareLocation = getLabwareLocation(
+        labwareId,
+        protocolData.commands
       )
+      if (labwareLocation === 'offDeck' || !('slotName' in labwareLocation)) {
+        throw new Error('expected tip rack to be in a slot')
+      }
       messageNode = t('drop_tip', {
         well_name: wellName,
         labware:
           labwareId === TRASH_ID
             ? 'Opentrons Fixed Trash'
             : getLabwareDisplayName(
-                protocolData.labwareDefinitions[matchingLabware.definitionUri]
+                protocolData.labwareDefinitions[
+                  protocolData.labware[labwareId].definitionId
+                ]
               ),
+        labware_location: labwareLocation.slotName,
       })
       break
     }
     case 'pickUpTip': {
       const { wellName, labwareId } = displayCommand.params
+      const labwareLocation = getLabwareLocation(
+        labwareId,
+        protocolData.commands
+      )
+      if (labwareLocation === 'offDeck' || !('slotName' in labwareLocation)) {
+        throw new Error('expected tip rack to be in a slot')
+      }
       messageNode = t('pickup_tip', {
         well_name: wellName,
         labware: getLabwareDisplayName(
           labwareRenderInfoById[labwareId].labwareDef
         ),
+        labware_location: labwareLocation.slotName,
       })
       break
     }
