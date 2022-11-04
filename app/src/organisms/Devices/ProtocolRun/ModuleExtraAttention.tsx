@@ -18,7 +18,7 @@ import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
-import type { ModuleTypesThatRequiresExtraAttention } from '../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
+import type { ModuleTypesThatRequireExtraAttention } from '../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
 
 interface ModuleExtraAttentionProps {
   moduleTypes: ModuleType[]
@@ -45,7 +45,7 @@ export const ModuleExtraAttention = (
     <Banner title={t('extra_attention_warning_title')}>
       {secureLabwareModalType != null && (
         <SecureLabwareModal
-          type={secureLabwareModalType as ModuleTypesThatRequiresExtraAttention}
+          type={secureLabwareModalType as ModuleTypesThatRequireExtraAttention}
           onCloseClick={() => setSecureLabwareModalType(null)}
         />
       )}
