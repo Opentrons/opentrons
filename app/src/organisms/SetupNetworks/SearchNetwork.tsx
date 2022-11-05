@@ -15,11 +15,6 @@ export function SearchNetwork(): JSX.Element {
   // Note kj 10/18/2022 The fixed value is temporarily
   return (
     <>
-      <Flex justifyContent={JUSTIFY_CENTER}>
-        <StyledText fontSize="2rem" fontWeight="700" lineHeight="2.72375rem">
-          {'Connect to a network'}
-        </StyledText>
-      </Flex>
       <Flex
         height="26.5625rem"
         backgroundColor="#D6D6D6"

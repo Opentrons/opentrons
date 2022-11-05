@@ -26,9 +26,9 @@ import { ProtocolDetails } from '../pages/Protocols/ProtocolDetails'
 import { AppSettings } from '../pages/AppSettings'
 import { Labware } from '../pages/Labware'
 import { ODDSplash } from '../pages/ODD/ODDSplash'
-import { ConnectingNetwork } from '../pages/ODD/ConnectingNetwork'
-import { ConnectionResult } from '../pages/ODD/ConnectionResult'
-import { ConnectedNetworkInfo } from '../pages/ODD/ConnectedNetworkInfo'
+import { ConnectingNetwork } from '../organisms/SetupNetworks/ConnectingNetwork'
+import { ConnectionResult } from '../organisms/SetupNetworks/ConnectionResult'
+import { ConnectedNetworkInfo } from '../organisms/SetupNetworks/ConnectedNetworkInfo'
 import { SelectNetwork } from '../pages/ODD/SelectNetwork'
 import { SetWifiCred } from '../organisms/SetupNetworks/SetWifiCred'
 import { getIsOnDevice } from '../redux/config'
@@ -124,13 +124,13 @@ export const AppComponent = (): JSX.Element => {
       Component: ConnectionResult,
       exact: true,
       name: 'Connection Result',
-      path: '/connectionResult',
+      path: '/connectionResult/:ssid',
     },
     {
       Component: ConnectedNetworkInfo,
       exact: true,
       name: 'Connected Network Info',
-      path: '/connectedNetworkInfo',
+      path: '/connectedNetworkInfo/:ssid',
     },
     {
       Component: SelectNetwork,
@@ -143,15 +143,12 @@ export const AppComponent = (): JSX.Element => {
       exact: true,
       name: 'Set Wifi Password',
       path: '/setWifiCred/:ssid',
-      // path: '/setWifiCred',
     },
   ]
 
   const isOnDeviceRoutes = allRoutes.filter(route => route.path !== '/devices')
 
   const routes = isOnDevice ? isOnDeviceRoutes : allRoutes
-
-  console.log('routes', routes)
 
   return (
     <>

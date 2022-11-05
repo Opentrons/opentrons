@@ -1,4 +1,6 @@
 import * as React from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import { useParams, useHistory } from 'react-router-dom'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -11,11 +13,45 @@ import {
   TYPOGRAPHY,
   JUSTIFY_START,
   ALIGN_CENTER,
+  useInterval,
 } from '@opentrons/components'
+import {
+  getNetworkInterfaces,
+  fetchStatus,
+  fetchWifiList,
+} from '../../redux/networking'
+import { getLocalRobot } from '../../redux/discovery'
 import { StyledText } from '../../atoms/text'
 import { SecondaryButton } from '../../atoms/buttons'
 
+import type { State, Dispatch } from '../../redux/types'
+import type { NavRouteParams } from '../../App/types'
+
+const STATUS_REFRESH_MS = 5000
+const LIST_REFRESH_MS = 10000
+
 export function ConnectedNetworkInfo(): JSX.Element {
+  const { ssid } = useParams<NavRouteParams>()
+  const dispatch = useDispatch<Dispatch>()
+  const localRobot = useSelector(getLocalRobot)
+  const robotName = localRobot?.name != null ? localRobot.name : 'no name'
+  const { wifi, ethernet } = useSelector((state: State) =>
+    getNetworkInterfaces(state, robotName)
+  )
+  const history = useHistory()
+
+  console.log('robot', robotName)
+  console.log('wifi', wifi)
+  console.log('ethernet', ethernet)
+
+  useInterval(() => dispatch(fetchStatus(robotName)), STATUS_REFRESH_MS, true)
+  useInterval(() => dispatch(fetchWifiList(robotName)), LIST_REFRESH_MS, true)
+
+  React.useEffect(() => {
+    dispatch(fetchStatus(robotName))
+    dispatch(fetchWifiList(robotName))
+  }, [robotName, dispatch])
+
   return (
     <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacingXXL}>
       <Flex justifyContent={JUSTIFY_START} marginBottom="3.125rem">
@@ -40,7 +76,7 @@ export function ConnectedNetworkInfo(): JSX.Element {
             lineHeight="1.8rem"
             fontWeight="700"
           >
-            {'Network name'}
+            {ssid}
           </StyledText>
         </Flex>
         <Flex
@@ -49,18 +85,21 @@ export function ConnectedNetworkInfo(): JSX.Element {
           gridColumn={SPACING.spacing2}
         >
           <StyledText fontSize="1.5rem" lineHeight="1.8rem">
-            {'IP Address:  192.68.182'}
+            {/* ToDo: if wifi is undefined no data or empty */}
+            {`IP Address:  ${String(wifi?.ipAddress)}`}
           </StyledText>
           <StyledText fontSize="1.5rem" lineHeight="1.8rem">
-            {'Subnet mask: 255.255.255.0'}
+            {`Subnet mask: ${String(wifi?.subnetMask)}`}
           </StyledText>
           <StyledText fontSize="1.5rem" lineHeight="1.8rem">
-            {'Mac address: 36:b4:d8:17:5c:c8'}
+            {`Mac address: ${String(wifi?.macAddress)}`}
           </StyledText>
         </Flex>
       </Flex>
       <Flex justifyContent={JUSTIFY_FLEX_END}>
-        <SecondaryButton>{'Change network'}</SecondaryButton>
+        <SecondaryButton onClick={() => history.push(`/selectNetwork`)}>
+          {'Change network'}
+        </SecondaryButton>
       </Flex>
     </Flex>
   )

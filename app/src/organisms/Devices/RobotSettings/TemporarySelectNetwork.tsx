@@ -73,8 +73,7 @@ export const TemporarySelectNetwork = ({
     true
   )
 
-  console.log('eapOptions', eapOptions)
-  console.log('keys', keys)
+  console.log('selectNetwork-requestState', requestState)
 
   React.useEffect(() => {
     // if we're connecting to a network, ensure we get the info needed to
@@ -131,7 +130,7 @@ export const TemporarySelectNetwork = ({
         onDisconnect={handleSelectDisconnect}
         isRobotBusy={isRobotBusy}
       />
-      {changeState.type && (
+      {changeState.type != null && (
         <Portal>
           {requestState != null ? (
             <ResultModal

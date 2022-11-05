@@ -25,7 +25,7 @@ import {
   getWifiList,
   /* postWifiDisconnect, */
 } from '../../../redux/networking'
-// import * as RobotApi from '../../../redux/robot-api'
+
 import { useIsRobotBusy } from '../hooks'
 import { TemporarySelectNetwork } from './TemporarySelectNetwork'
 
@@ -48,7 +48,6 @@ export function RobotSettingsNetworking({
   const list = useSelector((state: State) => getWifiList(state, robotName))
   const dispatch = useDispatch<Dispatch>()
   const isRobotBusy = useIsRobotBusy({ poll: true })
-  // const [dispatchApi] = RobotApi.useDispatchApiRequest()
 
   const { wifi, ethernet } = useSelector((state: State) =>
     getNetworkInterfaces(state, robotName)
