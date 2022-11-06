@@ -248,25 +248,7 @@ class PipetteContext:  # noqa: D101
         presses: Optional[int] = None,
         increment: Optional[float] = None,
     ) -> PipetteContext:
-        # TODO(al, 2021-04-12): What about presses and increment? They are not
-        # supported by PE command. They are also not supported by PD protocols
-        # either. https://github.com/Opentrons/opentrons/issues/9523
-        if presses is not None or increment is not None:
-            raise NotImplementedError()
-
-        if isinstance(location, Well):
-            self._engine_client.pick_up_tip(
-                pipette_id=self._pipette_id,
-                labware_id=location.parent.labware_id,
-                well_name=location.well_name,
-            )
-        else:
-            # TODO(al, 2021-04-12): Support for picking up next tip in a labware
-            #  and in tipracks associated with a pipette
-            # https://github.com/Opentrons/opentrons/issues/9461
-            raise NotImplementedError()
-
-        return self
+        raise NotImplementedError("opentrons.protocol_api_experimental to be removed")
 
     def drop_tip(  # noqa: D102
         self,

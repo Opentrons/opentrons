@@ -59,7 +59,26 @@ export function getPrepCommands(
             ...acc,
             {
               ...command,
-              params: { ...command.params, location: 'offDeck' },
+              params: {
+                ...command.params,
+                location: 'offDeck',
+                // python protocols won't have labwareId in the params, we want to
+                // use the same labwareIds that came back as the result of analysis
+                labwareId: command.result.labwareId,
+              },
+            },
+          ]
+        } else if (command.commandType === 'loadModule') {
+          return [
+            ...acc,
+            {
+              ...command,
+              params: {
+                ...command.params,
+                // python protocols won't have moduleId in the params, we want to
+                // use the same moduleIds that came back as the result of analysis
+                moduleId: command.result.moduleId,
+              },
             },
           ]
         }

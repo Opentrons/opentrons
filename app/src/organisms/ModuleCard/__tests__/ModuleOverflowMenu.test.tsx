@@ -12,6 +12,7 @@ import {
 import {
   useRunStatuses,
   useIsLegacySessionInProgress,
+  useIsOT3,
 } from '../../Devices/hooks'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
@@ -34,6 +35,7 @@ const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
 const mockUseIsLegacySessionsInProgress = useIsLegacySessionInProgress as jest.MockedFunction<
   typeof useIsLegacySessionInProgress
 >
+const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
 const render = (props: React.ComponentProps<typeof ModuleOverflowMenu>) => {
   return renderWithProviders(<ModuleOverflowMenu {...props} />, {
     i18nInstance: i18n,
@@ -184,7 +186,9 @@ describe('ModuleOverflowMenu', () => {
       isRunIdle: false,
     })
     mockUseCurrentRunId.mockReturnValue(null)
+    mockUseIsOT3.mockReturnValue(false)
     props = {
+      robotName: 'otie',
       module: mockMagneticModule,
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
@@ -206,6 +210,7 @@ describe('ModuleOverflowMenu', () => {
 
   it('renders the correct temperature module menu', () => {
     props = {
+      robotName: 'otie',
       module: mockTemperatureModuleGen2,
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
@@ -225,6 +230,7 @@ describe('ModuleOverflowMenu', () => {
   })
   it('renders the correct TC module menu', () => {
     props = {
+      robotName: 'otie',
       module: mockThermocycler,
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
@@ -250,6 +256,7 @@ describe('ModuleOverflowMenu', () => {
   })
   it('renders the correct Heater Shaker module menu', () => {
     props = {
+      robotName: 'otie',
       module: mockHeaterShaker,
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
@@ -274,6 +281,7 @@ describe('ModuleOverflowMenu', () => {
   })
   it('renders heater shaker show attachment instructions button and when clicked, launches hs wizard', () => {
     props = {
+      robotName: 'otie',
       module: mockHeaterShaker,
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
@@ -289,6 +297,7 @@ describe('ModuleOverflowMenu', () => {
 
   it('renders heater shaker labware latch button and is disabled when status is not idle', () => {
     props = {
+      robotName: 'otie',
       module: mockMovingHeaterShaker,
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
@@ -306,6 +315,7 @@ describe('ModuleOverflowMenu', () => {
 
   it('renders heater shaker labware latch button and when clicked, moves labware latch open', () => {
     props = {
+      robotName: 'otie',
       module: mockCloseLatchHeaterShaker,
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
@@ -325,6 +335,7 @@ describe('ModuleOverflowMenu', () => {
 
   it('renders heater shaker labware latch button and when clicked, moves labware latch close', () => {
     props = {
+      robotName: 'otie',
       module: mockHeaterShaker,
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
@@ -343,6 +354,7 @@ describe('ModuleOverflowMenu', () => {
 
   it('renders heater shaker overflow menu and deactivates heater when status changes', () => {
     props = {
+      robotName: 'otie',
       module: mockDeactivateHeatHeaterShaker,
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
@@ -362,6 +374,7 @@ describe('ModuleOverflowMenu', () => {
 
   it('renders temperature module overflow menu and deactivates heat when status changes', () => {
     props = {
+      robotName: 'otie',
       module: mockTemperatureModuleHeating,
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
@@ -381,6 +394,7 @@ describe('ModuleOverflowMenu', () => {
 
   it('renders magnetic module overflow menu and disengages when status changes', () => {
     props = {
+      robotName: 'otie',
       module: mockMagDeckEngaged,
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
@@ -400,6 +414,7 @@ describe('ModuleOverflowMenu', () => {
 
   it('renders thermocycler overflow menu and deactivates block when status changes', () => {
     props = {
+      robotName: 'otie',
       module: mockTCBlockHeating,
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
@@ -426,6 +441,7 @@ describe('ModuleOverflowMenu', () => {
       isRunIdle: true,
     })
     props = {
+      robotName: 'otie',
       module: mockTCBlockHeating,
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
@@ -444,8 +460,45 @@ describe('ModuleOverflowMenu', () => {
     fireEvent.click(btn)
   })
 
+  it('should disable overflow menu buttons for thermocycler gen 1 when the robot is an OT-3', () => {
+    props = {
+      robotName: 'otie',
+      module: mockTCBlockHeating,
+      handleSlideoutClick: jest.fn(),
+      handleAboutClick: jest.fn(),
+      handleTestShakeClick: jest.fn(),
+      handleWizardClick: jest.fn(),
+      isLoadedInRun: true,
+      runId: 'id',
+    }
+    mockUseIsOT3.mockReturnValue(true)
+    const { getByRole } = render(props)
+
+    expect(
+      getByRole('button', {
+        name: 'Set lid temperature',
+      })
+    ).toBeDisabled()
+    expect(
+      getByRole('button', {
+        name: 'Close lid',
+      })
+    ).toBeDisabled()
+    expect(
+      getByRole('button', {
+        name: 'Deactivate block',
+      })
+    ).toBeDisabled()
+    expect(
+      getByRole('button', {
+        name: 'About module',
+      })
+    ).toBeDisabled()
+  })
+
   it('renders the correct Thermocycler gen 2 menu', () => {
     props = {
+      robotName: 'otie',
       module: mockThermocyclerGen2,
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
@@ -472,6 +525,7 @@ describe('ModuleOverflowMenu', () => {
 
   it('renders the correct Thermocycler gen 2 menu with the lid closed', () => {
     props = {
+      robotName: 'otie',
       module: mockThermocyclerGen2LidClosed,
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
@@ -506,6 +560,7 @@ describe('ModuleOverflowMenu', () => {
     })
 
     props = {
+      robotName: 'otie',
       module: mockThermocyclerGen2LidClosed,
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),

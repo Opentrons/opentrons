@@ -6,21 +6,19 @@ import {
 import { useTranslation } from 'react-i18next'
 import { useHoverTooltip } from '@opentrons/components'
 import {
+  getDeckDefFromRobotType,
+  getLoadedLabwareFromCommands,
+  getRobotTypeFromLoadedLabware,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Tooltip } from '../../atoms/Tooltip'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
-import {
-  useProtocolDetailsForRun,
-  useRunStatuses,
-  useIsLegacySessionInProgress,
-} from '../Devices/hooks'
+import { useProtocolDetailsForRun, useRunStatuses } from '../Devices/hooks'
 import { useModuleIdFromRun } from './useModuleIdFromRun'
 
 import type {
@@ -42,10 +40,11 @@ export function useIsHeaterShakerInProtocol(): boolean {
   const currentRunId = useCurrentRunId()
   const { protocolData } = useProtocolDetailsForRun(currentRunId)
   if (protocolData == null) return false
-  const protocolModulesInfo = getProtocolModulesInfo(
-    protocolData,
-    standardDeckDef as any
-  )
+  const loadedLabware = getLoadedLabwareFromCommands(protocolData.commands)
+  const robotType = getRobotTypeFromLoadedLabware(loadedLabware)
+
+  const deckDef = getDeckDefFromRobotType(robotType)
+  const protocolModulesInfo = getProtocolModulesInfo(protocolData, deckDef)
   return protocolModulesInfo.some(
     module => module.moduleDef.model === 'heaterShakerModuleV1'
   )
@@ -112,7 +111,9 @@ export function useModuleOverflowMenu(
   handleTestShakeClick: () => void,
   handleWizardClick: () => void,
   handleSlideoutClick: (isSecondary: boolean) => void,
-  isLoadedInRun: boolean
+  isLoadedInRun: boolean,
+  isDisabled: boolean,
+  isIncompatibleWithOT3: boolean
 ): ModuleOverflowMenu {
   const { t } = useTranslation(['device_details', 'heater_shaker'])
   const { createLiveCommand } = useCreateLiveCommandMutation()
@@ -120,15 +121,9 @@ export function useModuleOverflowMenu(
   const { toggleLatch, isLatchClosed } = useLatchControls(module)
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { moduleIdFromRun } = useModuleIdFromRun(module, runId)
-  const isLegacySessionInProgress = useIsLegacySessionInProgress()
-  const { isRunTerminal, isRunStill, isRunIdle } = useRunStatuses()
+  const { isRunTerminal, isRunIdle } = useRunStatuses()
   const currentRunId = useCurrentRunId()
-  let isDisabled: boolean = false
-  if (runId != null && isLoadedInRun) {
-    isDisabled = !isRunStill
-  } else if ((runId != null || currentRunId != null) && !isLoadedInRun) {
-    isDisabled = !isLegacySessionInProgress && !isRunTerminal
-  }
+
   const isLatchDisabled =
     module.moduleType === HEATERSHAKER_MODULE_TYPE &&
     module.data.speedStatus !== 'idle'
@@ -162,6 +157,7 @@ export function useModuleOverflowMenu(
       key={`about_module_${module.moduleModel}`}
       id={`about_module_${module.moduleModel}`}
       data-testid={`about_module_${module.moduleModel}`}
+      disabled={isIncompatibleWithOT3}
       onClick={() => handleAboutClick()}
     >
       {t('overflow_menu_about')}

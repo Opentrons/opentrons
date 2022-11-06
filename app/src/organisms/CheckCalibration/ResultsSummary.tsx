@@ -1,4 +1,5 @@
 import * as React from 'react'
+import find from 'lodash/find'
 import {
   Icon,
   Box,
@@ -33,7 +34,6 @@ import {
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
-import find from 'lodash/find'
 import { PIPETTE_MOUNTS, LEFT, RIGHT } from '../../redux/pipettes'
 import { StyledText } from '../../atoms/text'
 import { saveAs } from 'file-saver'

@@ -2,10 +2,20 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
-import { Box, SPACING, IconProps } from '@opentrons/components'
+import {
+  Box,
+  SPACING,
+  IconProps,
+  Flex,
+  ALIGN_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 
 import { Divider } from '../../../atoms/structure'
 import { Toast } from '../../../atoms/Toast'
+import { StyledText } from '../../../atoms/text'
+import { ToggleButton } from '../../../atoms/buttons'
 import { useIsOT3, useIsRobotBusy, useRobot } from '../hooks'
 import { DisplayRobotName } from './AdvancedTab/DisplayRobotName'
 import { RobotInformation } from './AdvancedTab/RobotInformation'
@@ -20,7 +30,11 @@ import { UseOlderProtocol } from './AdvancedTab/UseOlderProtocol'
 import { LegacySettings } from './AdvancedTab/LegacySettings'
 import { ShortTrashBin } from './AdvancedTab/ShortTrashBin'
 import { UseOlderAspirateBehavior } from './AdvancedTab/UseOlderAspirateBehavior'
-import { getRobotSettings, fetchSettings } from '../../../redux/robot-settings'
+import {
+  updateSetting,
+  getRobotSettings,
+  fetchSettings,
+} from '../../../redux/robot-settings'
 import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRobotSlideout'
 import { FactoryResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetSlideout'
 import { FactoryResetModal } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetModal'
@@ -230,5 +244,49 @@ export function RobotSettingsAdvanced({
         )}
       </Box>
     </>
+  )
+}
+
+interface FeatureFlagToggleProps {
+  settingField: RobotSettingsField
+  robotName: string
+  isRobotBusy: boolean
+}
+
+export function FeatureFlagToggle({
+  settingField,
+  robotName,
+  isRobotBusy,
+}: FeatureFlagToggleProps): JSX.Element | null {
+  const dispatch = useDispatch<Dispatch>()
+  const { value, id, title, description } = settingField
+
+  if (id == null) return null
+
+  const handleClick: React.MouseEventHandler<Element> = () => {
+    if (!isRobotBusy) {
+      dispatch(updateSetting(robotName, id, !value))
+    }
+  }
+
+  return (
+    <Flex
+      alignItems={ALIGN_CENTER}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      marginBottom={SPACING.spacing4}
+    >
+      <Box width="70%">
+        <StyledText css={TYPOGRAPHY.pSemiBold} paddingBottom={SPACING.spacing2}>
+          {title}
+        </StyledText>
+        <StyledText as="p">{description}</StyledText>
+      </Box>
+      <ToggleButton
+        label={title}
+        toggledOn={value === true}
+        onClick={handleClick}
+        disabled={isRobotBusy}
+      />
+    </Flex>
   )
 }

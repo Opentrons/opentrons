@@ -52,7 +52,8 @@ def test_well_init() -> None:
     well_name = "circular_well_json"
     has_tip = False
     well1 = labware.Well(
-        api_level=MAX_SUPPORTED_VERSION,
+        parent=None,  # type: ignore[arg-type]
+        api_version=MAX_SUPPORTED_VERSION,
         well_implementation=WellImplementation(
             well_geometry=WellGeometry(
                 well_props=test_data[well_name],
@@ -70,7 +71,8 @@ def test_well_init() -> None:
 
     well2_name = "rectangular_well_json"
     well2 = labware.Well(
-        api_level=MAX_SUPPORTED_VERSION,
+        parent=None,  # type: ignore[arg-type]
+        api_version=MAX_SUPPORTED_VERSION,
         well_implementation=WellImplementation(
             well_geometry=WellGeometry(
                 well_props=test_data[well2_name],
@@ -92,7 +94,8 @@ def test_top() -> None:
     well_name = "circular_well_json"
     has_tip = False
     well = labware.Well(
-        api_level=MAX_SUPPORTED_VERSION,
+        parent=None,  # type: ignore[arg-type]
+        api_version=MAX_SUPPORTED_VERSION,
         well_implementation=WellImplementation(
             well_geometry=WellGeometry(
                 well_props=test_data[well_name],
@@ -116,7 +119,8 @@ def test_bottom() -> None:
     well_name = "rectangular_well_json"
     has_tip = False
     well = labware.Well(
-        api_level=MAX_SUPPORTED_VERSION,
+        parent=None,  # type: ignore[arg-type]
+        api_version=MAX_SUPPORTED_VERSION,
         well_implementation=WellImplementation(
             well_geometry=WellGeometry(
                 well_props=test_data[well_name],
@@ -140,7 +144,8 @@ def test_from_center_cartesian():
     well_name = "circular_well_json"
     has_tip = False
     well1 = labware.Well(
-        api_level=MAX_SUPPORTED_VERSION,
+        parent=None,  # type: ignore[arg-type]
+        api_version=MAX_SUPPORTED_VERSION,
         well_implementation=WellImplementation(
             well_geometry=WellGeometry(
                 well_props=test_data[well_name],
@@ -173,7 +178,8 @@ def test_from_center_cartesian():
     well2_name = "rectangular_well_json"
     has_tip = False
     well2 = labware.Well(
-        api_level=MAX_SUPPORTED_VERSION,
+        parent=None,  # type: ignore[arg-type]
+        api_version=MAX_SUPPORTED_VERSION,
         well_implementation=WellImplementation(
             well_geometry=WellGeometry(
                 well_props=test_data[well2_name],
@@ -286,7 +292,8 @@ def test_well_parent(corning_96_wellplate_360ul_flat) -> None:
     well_name = "circular_well_json"
     has_tip = True
     well = labware.Well(
-        api_level=MAX_SUPPORTED_VERSION,
+        parent=lw,
+        api_version=MAX_SUPPORTED_VERSION,
         well_implementation=WellImplementation(
             well_geometry=WellGeometry(
                 well_props=test_data[well_name],

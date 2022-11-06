@@ -1,4 +1,6 @@
 import * as React from 'react'
+import uniq from 'lodash/uniq'
+
 import {
   Flex,
   PrimaryBtn,
@@ -8,7 +10,6 @@ import {
   JUSTIFY_CENTER,
   SPACING_3,
 } from '@opentrons/components'
-import uniq from 'lodash/uniq'
 
 import * as Sessions from '../../redux/sessions'
 import type { CalibrationPanelProps } from '../DeprecatedCalibrationPanels/types'
