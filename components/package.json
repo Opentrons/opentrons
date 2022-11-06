@@ -30,7 +30,7 @@
     "@types/webpack-env": "^1.16.0",
     "classnames": "2.2.5",
     "jest-when": "^3.0.1",
-    "lodash": "4.17.15",
+    "lodash": "4.17.21",
     "react-popper": "1.0.0",
     "react-remove-scroll": "2.4.3",
     "react-select": "5.4.0",

@@ -21,10 +21,10 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons#readme",
   "dependencies": {
-    "@types/lodash": "^4.14.168",
+    "@types/lodash": "^4.14.186",
     "@types/node-fetch": "^2.5.8",
     "escape-string-regexp": "1.0.5",
-    "lodash": "4.17.15",
+    "lodash": "4.17.21",
     "mdns-js": "1.0.1",
     "node-fetch": "2.6.0",
     "redux": "4.0.5",

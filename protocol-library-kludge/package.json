@@ -24,7 +24,7 @@
     "@opentrons/components": "6.1.0",
     "@opentrons/shared-data": "6.1.0",
     "classnames": "2.2.5",
-    "lodash": "4.17.15",
+    "lodash": "4.17.21",
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "react-hot-loader": "4.13.0"
