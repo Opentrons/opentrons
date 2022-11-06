@@ -23,6 +23,7 @@ from .session import UpdateSession, Stages
 
 from otupdate.openembedded.update_actions import UPDATE_PKG_OE
 from otupdate.buildroot.update_actions import UPDATE_PKG_BR
+
 VALID_UPDATE_PKG = UPDATE_PKG_OE + UPDATE_PKG_BR
 
 SESSION_VARNAME = APP_VARIABLE_PREFIX + "session"

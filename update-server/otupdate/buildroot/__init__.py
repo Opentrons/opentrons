@@ -1,7 +1,6 @@
 """ update-server implementation for buildroot systems """
 import asyncio
 import logging
-import json
 from typing import Any, Mapping, Optional
 
 from aiohttp import web

@@ -14,7 +14,7 @@ import subprocess
 import tempfile
 from typing import Callable, Generator, Optional
 
-from otupdate.common.constants import MODEL_OT2, MODEL_OT3
+from otupdate.common.constants import MODEL_OT2
 
 from otupdate.common.file_actions import (
     InvalidPKGName,
@@ -27,7 +27,7 @@ from otupdate.common.file_actions import (
 )
 from otupdate.common.update_actions import UpdateActionsInterface, Partition
 
-UPDATE_PKG_BR = ['ot2-system.zip', 'system-update.zip']
+UPDATE_PKG_BR = ["ot2-system.zip", "system-update.zip"]
 UPDATE_PKG_VERSION_FILE = "VERSION.json"
 ROOTFS_SIG_NAME = "rootfs.ext4.hash.sig"
 ROOTFS_HASH_NAME = "rootfs.ext4.hash"
@@ -68,7 +68,7 @@ class OT2UpdateActions(UpdateActionsInterface):
         # make sure we have the correct file
         filename = os.path.basename(filepath)
         if filename not in UPDATE_PKG_BR:
-            msg = (f"invalid filename {filepath} {filename}")
+            msg = f"invalid filename {filepath} {filename}"
             LOG.error(msg)
             raise InvalidPKGName(msg)
 
@@ -83,11 +83,11 @@ class OT2UpdateActions(UpdateActionsInterface):
         def hash_callback(progress):
             progress_callback(progress / 2.0 + 0.5)
 
-        version_file = str(files.get('VERSION.json'))
+        version_file = str(files.get("VERSION.json"))
         version_dict = load_version_file(version_file)
-        robot_model = version_dict.get('robot_model', MODEL_OT2)
+        robot_model = version_dict.get("robot_model", MODEL_OT2)
         if robot_model != MODEL_OT2:
-            msg = (f"Invalid robot_model: expected {MODEL_OT2} != packaged {robot_model}")
+            msg = f"Invalid robot_model: expected {MODEL_OT2} != packaged {robot_model}"
             LOG.error(msg)
             raise InvalidRobotModel(msg)
 

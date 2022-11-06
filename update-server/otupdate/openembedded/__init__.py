@@ -1,7 +1,6 @@
 """ update-server implementation for openembedded systems """
 import asyncio
 import logging
-import json
 
 from aiohttp import web
 from typing import Optional, Mapping, Any
@@ -15,7 +14,11 @@ from otupdate.common import (
     update,
 )
 
-from otupdate.openembedded.update_actions import RootFSInterface, PartitionManager, OT3UpdateActions
+from otupdate.openembedded.update_actions import (
+    RootFSInterface,
+    PartitionManager,
+    OT3UpdateActions,
+)
 from otupdate.common.file_actions import load_version_file
 from otupdate.common.update_actions import FILE_ACTIONS_VARNAME
 

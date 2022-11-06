@@ -12,7 +12,7 @@ from otupdate.common.file_actions import (
     HashMismatch,
     InvalidPKGName,
     verify_signature,
-    load_version_file
+    load_version_file,
 )
 from otupdate.common.update_actions import UpdateActionsInterface, Partition
 from typing import Any, Callable, Generator, Optional
@@ -164,7 +164,7 @@ class OT3UpdateActions(UpdateActionsInterface):
         # make sure we have the correct file
         filename = os.path.basename(filepath)
         if filename not in UPDATE_PKG_OE:
-            msg = (f"invalid filename {filepath} {filename}")
+            msg = f"invalid filename {filepath} {filename}"
             LOG.error(msg)
             raise InvalidPKGName(msg)
 
@@ -179,11 +179,11 @@ class OT3UpdateActions(UpdateActionsInterface):
         def hash_callback(progress: Any) -> None:
             progress_callback(progress / 2.0 + 0.5)
 
-        version_file = str(files.get('VERSION.json'))
+        version_file = str(files.get("VERSION.json"))
         version_dict = load_version_file(version_file)
-        robot_model = version_dict.get('robot_model')
+        robot_model = version_dict.get("robot_model")
         if robot_model != MODEL_OT3:
-            msg = (f"Invalid robot_model: expected {MODEL_OT3} != packaged {robot_model}")
+            msg = f"Invalid robot_model: expected {MODEL_OT3} != packaged {robot_model}"
             LOG.error(msg)
             raise InvalidRobotModel(msg)
 

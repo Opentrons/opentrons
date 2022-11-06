@@ -74,7 +74,9 @@ async def test_commit_fails_wrong_state(test_cli, update_session):
     params=[
         (
             0,
-            lambda: OT3UpdateActions(RootFSInterface(), mock_partition_manager_valid_switch_()),
+            lambda: OT3UpdateActions(
+                RootFSInterface(), mock_partition_manager_valid_switch_()
+            ),
         ),
         (1, lambda: update_actions.OT2UpdateActions()),
     ]
@@ -184,7 +186,6 @@ async def test_update_happypath(
                 )
             },
         )
-
     assert resp.status == 201
     body = await resp.json()
     assert body["stage"] == "validating"
@@ -197,6 +198,7 @@ async def test_update_happypath(
         resp = await test_cli[0].get(session_endpoint(update_session, "status"))
         assert resp.status == 200
         body = await resp.json()
+        print("YOO", body)
 
         last_progress = body["progress"]
         assert loop.time() - then <= 300
