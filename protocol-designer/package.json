@@ -35,7 +35,7 @@
     "formik": "2.1.4",
     "i18next": "11.5.0",
     "immer": "5.1.0",
-    "lodash": "4.17.15",
+    "lodash": "4.17.20",
     "query-string": "6.2.0",
     "react": "17.0.1",
     "react-color": "2.19.3",
