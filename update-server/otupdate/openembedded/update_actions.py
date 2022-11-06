@@ -15,7 +15,7 @@ from otupdate.common.file_actions import (
     load_version_file
 )
 from otupdate.common.update_actions import UpdateActionsInterface, Partition
-from typing import Callable, Generator, Optional
+from typing import Any, Callable, Generator, Optional
 import enum
 import subprocess
 
@@ -168,7 +168,7 @@ class OT3UpdateActions(UpdateActionsInterface):
             LOG.error(msg)
             raise InvalidPKGName(msg)
 
-        def zip_callback(progress) -> None:
+        def zip_callback(progress: Any) -> None:
             progress_callback(progress / 2.0)
 
         required = [ROOTFS_NAME, ROOTFS_HASH_NAME]
@@ -176,10 +176,10 @@ class OT3UpdateActions(UpdateActionsInterface):
             required.append(ROOTFS_SIG_NAME)
         files, sizes = unzip_update(filepath, zip_callback, UPDATE_FILES, required)
 
-        def hash_callback(progress) -> None:
+        def hash_callback(progress: Any) -> None:
             progress_callback(progress / 2.0 + 0.5)
 
-        version_file = files.get('VERSION.json')
+        version_file = str(files.get('VERSION.json'))
         version_dict = load_version_file(version_file)
         robot_model = version_dict.get('robot_model')
         if robot_model != MODEL_OT3:

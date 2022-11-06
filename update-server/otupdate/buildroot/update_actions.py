@@ -83,7 +83,7 @@ class OT2UpdateActions(UpdateActionsInterface):
         def hash_callback(progress):
             progress_callback(progress / 2.0 + 0.5)
 
-        version_file = files.get('VERSION.json')
+        version_file = str(files.get('VERSION.json'))
         version_dict = load_version_file(version_file)
         robot_model = version_dict.get('robot_model', MODEL_OT2)
         if robot_model != MODEL_OT2:
