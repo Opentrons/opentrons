@@ -1,4 +1,7 @@
 import * as React from 'react'
+import find from 'lodash/find'
+import { saveAs } from 'file-saver'
+
 import {
   Icon,
   Box,
@@ -31,12 +34,9 @@ import {
   DISPLAY_INLINE_BLOCK,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
-import find from 'lodash/find'
 import { PIPETTE_MOUNTS, LEFT, RIGHT } from '../../redux/pipettes'
-import { saveAs } from 'file-saver'
 
 import type { Mount } from '../../redux/pipettes/types'
 import type { CalibrationPanelProps } from '../DeprecatedCalibrationPanels/types'

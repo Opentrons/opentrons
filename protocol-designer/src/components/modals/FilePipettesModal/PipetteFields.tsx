@@ -1,5 +1,7 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import isEmpty from 'lodash/isEmpty'
+import reduce from 'lodash/reduce'
 import {
   DropdownField,
   FormGroup,
@@ -13,8 +15,6 @@ import {
   getLabwareDisplayName,
   OT3_PIPETTES,
 } from '@opentrons/shared-data'
-import isEmpty from 'lodash/isEmpty'
-import reduce from 'lodash/reduce'
 import { i18n } from '../../../localization'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import { createCustomTiprackDef } from '../../../labware-defs/actions'

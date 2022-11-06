@@ -3,10 +3,10 @@ import path from 'path'
 import first from 'lodash/first'
 import { Trans, useTranslation } from 'react-i18next'
 import { Link, NavLink, useHistory } from 'react-router-dom'
-import { ApiHostProvider } from '@opentrons/react-api-client'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
+import { ApiHostProvider } from '@opentrons/react-api-client'
 import {
   SPACING,
   SIZE_1,
