@@ -80,7 +80,7 @@ class MovementHandler:
     ) -> None:
         """Move to a specific well."""
         await self._tc_movement_flagger.raise_if_labware_in_non_open_thermocycler(
-            labware_id=labware_id
+            labware_parent=self._state_store.labware.get_location(labware_id=labware_id)
         )
 
         # Check for presence of heater shakers on deck, and if planned

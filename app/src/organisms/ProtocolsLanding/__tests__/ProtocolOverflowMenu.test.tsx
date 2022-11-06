@@ -7,6 +7,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { getSendAllProtocolsToOT3 } from '../../../redux/config'
 import {
+  analyzeProtocol,
   removeProtocol,
   viewProtocolSourceFolder,
 } from '../../../redux/protocol-storage'
@@ -74,6 +75,16 @@ describe('ProtocolOverflowMenu', () => {
     const runButton = getByText('Run now')
     fireEvent.click(runButton)
     expect(mockHandleRunProtocol).toHaveBeenCalled()
+  })
+
+  it('should call reanalyze when clicking reanalyze', () => {
+    const [{ getByTestId, getByText }, store] = render()
+    const button = getByTestId('ProtocolOverflowMenu_overflowBtn')
+    fireEvent.click(button)
+    const reanalyzeButton = getByText('Reanalyze')
+    fireEvent.click(reanalyzeButton)
+
+    expect(store.dispatch).toHaveBeenCalledWith(analyzeProtocol(PROTOCOL_KEY))
   })
 
   it('should call send to OT-3 when clicking send to OT-3', () => {

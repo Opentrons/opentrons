@@ -17,6 +17,11 @@ from opentrons.drivers.types import (
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
+from opentrons.protocol_engine.errors.exceptions import (
+    LabwareNotLoadedOnModuleError,
+    NoMagnetEngageHeightError,
+)
+
 from opentrons.protocol_api import Labware
 from opentrons.protocols.api_support.types import APIVersion
 
@@ -28,6 +33,7 @@ from ..module import (
     AbstractHeaterShakerCore,
 )
 from .labware import LabwareCore
+from .exceptions import InvalidMagnetEngageHeightError
 
 
 class ModuleCore(AbstractModuleCore[LabwareCore]):
@@ -99,7 +105,9 @@ class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore[LabwareCor
 
     def set_target_temperature(self, celsius: float) -> None:
         """Set the Temperature Module's target temperature in °C."""
-        raise NotImplementedError("set_target_temperature not implemented")
+        self._engine_client.temperature_module_set_target_temperature(
+            module_id=self.module_id, celsius=celsius
+        )
 
     def wait_for_target_temperature(self, celsius: Optional[float] = None) -> None:
         """Wait until the module's target temperature is reached.
@@ -107,23 +115,25 @@ class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore[LabwareCor
         Specifying a value for ``celsius`` that is different than
         the module's current target temperature may beahave unpredictably.
         """
-        raise NotImplementedError("wait_for_target_temperature not implemented")
+        self._engine_client.temperature_module_wait_for_target_temperature(
+            module_id=self.module_id, celsius=celsius
+        )
 
     def deactivate(self) -> None:
         """Deactivate the Temperature Module."""
-        raise NotImplementedError("deactivate not implemented")
+        self._engine_client.temperature_module_deactivate(module_id=self.module_id)
 
     def get_current_temperature(self) -> float:
         """Get the module's current temperature in °C."""
-        raise NotImplementedError("get_current_temperature not implemented")
+        return self._sync_module_hardware.temperature  # type: ignore[no-any-return]
 
     def get_target_temperature(self) -> Optional[float]:
         """Get the module's target temperature in °C, if set."""
-        raise NotImplementedError("get_target_temperature not implemented")
+        return self._sync_module_hardware.target  # type: ignore[no-any-return]
 
     def get_status(self) -> TemperatureStatus:
         """Get the module's current temperature status."""
-        raise NotImplementedError("get_status not implemented")
+        return self._sync_module_hardware.status  # type: ignore[no-any-return]
 
 
 class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
@@ -144,7 +154,16 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
             height_from_base: Distance from labware base to raise the magnets.
             height_from_home: Distance from motor home position to raise the magnets.
         """
-        raise NotImplementedError("engage not implemented")
+        if height_from_home is not None:
+            raise NotImplementedError(
+                "MagneticModuleCore.engage with height_from_home not implemented"
+            )
+
+        assert height_from_base is not None, "Expected engage height"
+
+        self._engine_client.magnetic_module_engage(
+            module_id=self._module_id, engage_height=height_from_base
+        )
 
     def engage_to_labware(
         self, offset: float = 0, preserve_half_mm: bool = False
@@ -156,33 +175,56 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
             preserve_half_mm: For labware whose definitions
                 erroneously use half-mm for their defined default engage height,
                 use the value directly instead of converting it to real millimeters.
-
-        Raises:
-            Exception: Labware is not loaded or has no default engage height.
         """
-        raise NotImplementedError("engage_to_labware not implemented")
+        try:
+            default_height = (
+                self._engine_client.state.labware.get_default_magnet_height(
+                    module_id=self.module_id, offset=offset
+                )
+            )
+        except LabwareNotLoadedOnModuleError:
+            raise InvalidMagnetEngageHeightError(
+                "There is no labware loaded on this Magnetic Module,"
+                " so you must specify an engage height"
+                " with the `height_from_base` parameter."
+            )
+        except NoMagnetEngageHeightError:
+            raise InvalidMagnetEngageHeightError(
+                "The labware loaded on this Magnetic Module"
+                " does not have a default engage height,"
+                " so you must specify an engage height"
+                " with the `height_from_base` parameter."
+            )
+
+        self._engine_client.magnetic_module_engage(
+            module_id=self.module_id, engage_height=default_height
+        )
 
     def disengage(self) -> None:
         """Lower the magnets back into the module."""
-        raise NotImplementedError("disengage not implemented")
+        self._engine_client.magnetic_module_disengage(module_id=self.module_id)
 
     def get_status(self) -> MagneticStatus:
         """Get the module's current magnet status."""
-        raise NotImplementedError("get_status not implemented")
+        return self._sync_module_hardware.status  # type: ignore[no-any-return]
 
 
 class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
     """Core control interface for an attached Thermocycler Module."""
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.Thermocycler]
+    _repetitions: Optional[int] = None
+    _step_count: Optional[int] = None
 
     def open_lid(self) -> ThermocyclerLidStatus:
         """Open the Thermocycler's lid."""
-        raise NotImplementedError("open_lid not implemeted")
+        self._engine_client.thermocycler_open_lid(module_id=self.module_id)
+        return ThermocyclerLidStatus.OPEN
 
     def close_lid(self) -> ThermocyclerLidStatus:
         """Close the Thermocycler's lid."""
-        raise NotImplementedError("close_lid not implemented")
+        self._engine_client.thermocycler_close_lid(module_id=self.module_id)
+        return ThermocyclerLidStatus.CLOSED
 
     def set_target_block_temperature(
         self,
@@ -190,32 +232,28 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
         hold_time_seconds: Optional[float] = None,
         block_max_volume: Optional[float] = None,
     ) -> None:
-        """Set the target temperature for the well block, in °C.
-
-        Note:
-            If ``hold_time_seconds`` is not specified, the Thermocycler
-            will proceed to the next command after ``temperature`` is reached.
-        Args:
-            celsius: The target temperature, in °C.
-            hold_time_seconds: The number of seconds to hold, after reaching
-                ``temperature``, before proceeding to the next command.
-            block_max_volume: The maximum volume of any individual well
-                of the loaded labware. If not supplied, the thermocycler
-                will default to 25µL/well.
-        """
-        raise NotImplementedError("set_target_block_temperature not implemented")
+        """Set the target temperature for the well block, in °C."""
+        self._engine_client.thermocycler_set_target_block_temperature(
+            module_id=self.module_id, celsius=celsius, block_max_volume=block_max_volume
+        )
 
     def wait_for_block_temperature(self) -> None:
         """Wait for target block temperature to be reached."""
-        raise NotImplementedError("wait_for_block_temperature not implemented")
+        self._engine_client.thermocycler_wait_for_block_temperature(
+            module_id=self.module_id
+        )
 
     def set_target_lid_temperature(self, celsius: float) -> None:
         """Set the target temperature for the heated lid, in °C."""
-        raise NotImplementedError("set_target_lid_temperature not implemented")
+        self._engine_client.thermocycler_set_target_lid_temperature(
+            module_id=self.module_id, celsius=celsius
+        )
 
     def wait_for_lid_temperature(self) -> None:
         """Wait for target lid temperature to be reached."""
-        raise NotImplementedError("wait_for_lid_temperature not implemented")
+        self._engine_client.thermocycler_wait_for_lid_temperature(
+            module_id=self.module_id
+        )
 
     def execute_profile(
         self,
@@ -223,90 +261,95 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
         repetitions: int,
         block_max_volume: Optional[float] = None,
     ) -> None:
-        """Execute a Thermocycler Profile.
-
-        Profile defined as a cycle of ``steps`` to repeat for a given number of ``repetitions``
-
-        Note:
-            Unlike the :py:meth:`set_block_temperature`, either or both of
-            'hold_time_minutes' and 'hold_time_seconds' must be defined
-            and finite for each step.
-        Args:
-            steps: List of unique steps that make up a single cycle.
-                Each list item should be a dictionary that maps to
-                the parameters of the :py:meth:`set_block_temperature`
-                method with keys 'temperature', 'hold_time_seconds',
-                and 'hold_time_minutes'.
-            repetitions: The number of times to repeat the cycled steps.
-            block_max_volume: The maximum volume of any individual well
-                of the loaded labware. If not supplied, the thermocycler
-                will default to 25µL/well.
-        """
-        raise NotImplementedError("execute_profile not implemented")
+        """Execute a Thermocycler Profile."""
+        self._repetitions = repetitions
+        self._step_count = len(steps)
+        self._engine_client.thermocycler_run_profile(
+            module_id=self.module_id,
+            steps=steps * repetitions,
+            block_max_volume=block_max_volume,
+        )
 
     def deactivate_lid(self) -> None:
         """Turn off the heated lid."""
-        raise NotImplementedError("deactivate_lid not implemented")
+        self._engine_client.thermocycler_deactivate_lid(module_id=self.module_id)
 
     def deactivate_block(self) -> None:
         """Turn off the well block temperature controller"""
-        raise NotImplementedError("deactivate_block not implemented")
+        self._clear_cycle_counters()
+        self._engine_client.thermocycler_deactivate_block(module_id=self.module_id)
 
     def deactivate(self) -> None:
         """Turn off the well block temperature controller, and heated lid"""
-        raise NotImplementedError("deactivate not implemented")
+        self.deactivate_block()
+        self.deactivate_lid()
 
     def get_lid_position(self) -> Optional[ThermocyclerLidStatus]:
         """Get the thermocycler's lid position."""
-        raise NotImplementedError("get_lid_position not implemented")
+        return self._sync_module_hardware.lid_status  # type: ignore[no-any-return]
 
     def get_block_temperature_status(self) -> TemperatureStatus:
         """Get the thermocycler's block temperature status."""
-        raise NotImplementedError("get_block_temperature_status not implemented")
+        return self._sync_module_hardware.status  # type: ignore[no-any-return]
 
     def get_lid_temperature_status(self) -> Optional[TemperatureStatus]:
         """Get the thermocycler's lid temperature status."""
-        raise NotImplementedError("get_lid_temperature_status not implemented")
+        return self._sync_module_hardware.lid_temp_status  # type: ignore[no-any-return]
 
     def get_block_temperature(self) -> Optional[float]:
         """Get the thermocycler's current block temperature in °C."""
-        raise NotImplementedError("get_block_temperature not implemented")
+        return self._sync_module_hardware.temperature  # type: ignore[no-any-return]
 
     def get_block_target_temperature(self) -> Optional[float]:
         """Get the thermocycler's target block temperature in °C."""
-        raise NotImplementedError("get_block_target_temperature not implemented")
+        return self._sync_module_hardware.target  # type: ignore[no-any-return]
 
     def get_lid_temperature(self) -> Optional[float]:
         """Get the thermocycler's current lid temperature in °C."""
-        raise NotImplementedError("get_lid_temperature not implemented")
+        return self._sync_module_hardware.lid_temp  # type: ignore[no-any-return]
 
     def get_lid_target_temperature(self) -> Optional[float]:
         """Get the thermocycler's target lid temperature in °C."""
-        raise NotImplementedError("get_lid_target_temperature not implemented")
+        return self._sync_module_hardware.lid_target  # type: ignore[no-any-return]
 
     def get_ramp_rate(self) -> Optional[float]:
-        """Get the thermocycler's current rampe rate in °C/sec."""
-        raise NotImplementedError("get_ramp_rate not implemented")
+        """Get the thermocycler's current ramp rate in °C/sec."""
+        return self._sync_module_hardware.ramp_rate  # type: ignore[no-any-return]
 
     def get_hold_time(self) -> Optional[float]:
         """Get the remaining hold time in seconds."""
-        raise NotImplementedError("get_hold_time not implemented")
+        return self._sync_module_hardware.hold_time  # type: ignore[no-any-return]
 
     def get_total_cycle_count(self) -> Optional[int]:
         """Get number of repetitions for current set cycle."""
-        raise NotImplementedError("get_total_cycle_count not implemented")
+        return self._repetitions
 
     def get_current_cycle_index(self) -> Optional[int]:
         """Get index of the current set cycle repetition."""
-        raise NotImplementedError("get_current_cycle_index not implemented")
+        if self._repetitions is None:
+            return None
+        step_index = self._sync_module_hardware.current_step_index
+        # TODO(jbl 2022-10-31) this is intended to work even if execute profile is non-blocking, but it is blocking so
+        #   this is not guaranteed to be accurate
+        return (step_index - 1) // self._step_count + 1  # type: ignore[no-any-return]
 
     def get_total_step_count(self) -> Optional[int]:
         """Get number of steps within the current cycle."""
-        raise NotImplementedError("get_total_step_count not implemented")
+        return self._step_count
 
     def get_current_step_index(self) -> Optional[int]:
         """Get the index of the current step within the current cycle."""
-        raise NotImplementedError("get_current_step_index not implemented")
+        if self._step_count is None:
+            return None
+        step_index = self._sync_module_hardware.current_step_index
+        # TODO(jbl 2022-10-31) this is intended to work even if execute profile is non-blocking, but it is blocking so
+        #   this is not guaranteed to be accurate
+        return (step_index - 1) % self._step_count + 1  # type: ignore[no-any-return]
+
+    def _clear_cycle_counters(self) -> None:
+        """Clear core-tracked cycle counters."""
+        self._repetitions = None
+        self._step_count = None
 
 
 class HeaterShakerModuleCore(ModuleCore, AbstractHeaterShakerCore[LabwareCore]):

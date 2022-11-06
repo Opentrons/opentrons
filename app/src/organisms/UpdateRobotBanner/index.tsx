@@ -23,7 +23,9 @@ interface UpdateRobotBannerProps extends StyleProps {
   robot: DiscoveredRobot
 }
 
-export function UpdateRobotBanner(props: UpdateRobotBannerProps): JSX.Element {
+export function UpdateRobotBanner(
+  props: UpdateRobotBannerProps
+): JSX.Element | null {
   const { robot, ...styleProps } = props
   const { t } = useTranslation('device_settings')
 
@@ -41,24 +43,22 @@ export function UpdateRobotBanner(props: UpdateRobotBannerProps): JSX.Element {
     setShowSoftwareUpdateModal(true)
   }
 
-  return (
+  return (autoUpdateAction === 'upgrade' || autoUpdateAction === 'downgrade') &&
+    robot !== null &&
+    robot.healthStatus === 'ok' ? (
     <Flex onClick={e => e.stopPropagation()} flexDirection={DIRECTION_COLUMN}>
-      {(autoUpdateAction === 'upgrade' || autoUpdateAction === 'downgrade') &&
-      robot !== null &&
-      robot.healthStatus === 'ok' ? (
-        <Banner type="error" {...styleProps}>
-          <StyledText as="p" marginRight={SPACING.spacing2}>
-            {t('robot_software_update_required')}
-          </StyledText>
-          <Btn
-            onClick={handleLaunchModal}
-            css={TYPOGRAPHY.pRegular}
-            textDecoration={TYPOGRAPHY.textDecorationUnderline}
-          >
-            {t('view_update')}
-          </Btn>
-        </Banner>
-      ) : null}
+      <Banner type="error" {...styleProps}>
+        <StyledText as="p" marginRight={SPACING.spacing2}>
+          {t('robot_software_update_required')}
+        </StyledText>
+        <Btn
+          onClick={handleLaunchModal}
+          css={TYPOGRAPHY.pRegular}
+          textDecoration={TYPOGRAPHY.textDecorationUnderline}
+        >
+          {t('view_update')}
+        </Btn>
+      </Banner>
       {showSoftwareUpdateModal &&
       robot != null &&
       robot.status !== UNREACHABLE ? (
@@ -70,5 +70,5 @@ export function UpdateRobotBanner(props: UpdateRobotBannerProps): JSX.Element {
         </Portal>
       ) : null}
     </Flex>
-  )
+  ) : null
 }

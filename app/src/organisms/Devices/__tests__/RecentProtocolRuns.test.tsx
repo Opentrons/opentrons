@@ -78,7 +78,7 @@ describe('RecentProtocolRuns', () => {
       },
     } as UseQueryResult<Runs, Error>)
     const [{ getByText }] = render()
-    getByText(`otie's Protocol Runs`)
+    getByText('Recent Protocol Runs')
     getByText('Run')
     getByText('Protocol')
     getByText('Status')

@@ -30,6 +30,7 @@ export const Results = (props: PipetteWizardStepProps): JSX.Element => {
       <PrimaryButton
         textTransform={TEXT_TRANSFORM_CAPITALIZE}
         onClick={proceed}
+        aria-label="Results_exit"
       >
         {t('shared:exit')}
       </PrimaryButton>
