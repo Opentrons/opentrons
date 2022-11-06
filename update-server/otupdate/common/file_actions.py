@@ -247,7 +247,7 @@ def verify_signature(message_path: str, sigfile_path: str, cert_path: str) -> No
         raise SignatureMismatch("Signature check failed")
 
 
-def load_version_file(version_file: Optional[str]) -> Mapping[str, str]:
+def load_version_file(version_file: str) -> Mapping[str, str]:
     version = {}
     LOG.debug(f"Loading version file {version_file}")
     try:

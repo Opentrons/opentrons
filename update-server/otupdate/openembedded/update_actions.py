@@ -15,7 +15,7 @@ from otupdate.common.file_actions import (
     load_version_file
 )
 from otupdate.common.update_actions import UpdateActionsInterface, Partition
-from typing import Callable, Optional
+from typing import Callable, Generator, Optional
 import enum
 import subprocess
 
@@ -87,7 +87,7 @@ class PartitionManager:
         else:
             return False
 
-    def mountpoint_root(self):
+    def mountpoint_root(self) -> str:
         """provides mountpoint location for :py:meth:`mount_update`.
 
         exists only for ease of mocking
@@ -168,7 +168,7 @@ class OT3UpdateActions(UpdateActionsInterface):
             LOG.error(msg)
             raise InvalidPKGName(msg)
 
-        def zip_callback(progress):
+        def zip_callback(progress) -> None:
             progress_callback(progress / 2.0)
 
         required = [ROOTFS_NAME, ROOTFS_HASH_NAME]
@@ -176,7 +176,7 @@ class OT3UpdateActions(UpdateActionsInterface):
             required.append(ROOTFS_SIG_NAME)
         files, sizes = unzip_update(filepath, zip_callback, UPDATE_FILES, required)
 
-        def hash_callback(progress):
+        def hash_callback(progress) -> None:
             progress_callback(progress / 2.0 + 0.5)
 
         version_file = files.get('VERSION.json')
@@ -225,7 +225,7 @@ class OT3UpdateActions(UpdateActionsInterface):
             LOG.info(f"commit_update: committed to booting {new}")
 
     @contextlib.contextmanager
-    def mount_update(self):
+    def mount_update(self) -> Generator[str, None, None]:
         """Mount the freshly-written partition r/w (to update machine-id).
 
         Should be used as a context manager, and the yielded value is the path
