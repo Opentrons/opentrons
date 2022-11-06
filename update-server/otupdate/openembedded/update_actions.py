@@ -4,12 +4,15 @@ import contextlib
 import lzma
 import tempfile
 
+from otupdate.common.constants import MODEL_OT3
 from otupdate.common.file_actions import (
+    InvalidRobotModel,
     unzip_update,
     hash_file,
     HashMismatch,
     InvalidPKGName,
     verify_signature,
+    load_version_file
 )
 from otupdate.common.update_actions import UpdateActionsInterface, Partition
 from typing import Callable, Optional
@@ -18,11 +21,12 @@ import subprocess
 
 import logging
 
-UPDATE_PKG = "system_update.zip"
+UPDATE_PKG_OE = ["system-update.zip"]
+UPDATE_PKG_VERSION_FILE = "VERSION.json"
 ROOTFS_SIG_NAME = "systemfs.xz.hash.sig"
 ROOTFS_HASH_NAME = "systemfs.xz.sha256"
 ROOTFS_NAME = "systemfs.xz"
-UPDATE_FILES = [ROOTFS_NAME, ROOTFS_SIG_NAME, ROOTFS_HASH_NAME]
+UPDATE_FILES = [ROOTFS_NAME, ROOTFS_SIG_NAME, ROOTFS_HASH_NAME, UPDATE_PKG_VERSION_FILE]
 
 LOG = logging.getLogger(__name__)
 
@@ -127,7 +131,7 @@ class RootFSInterface:
             LOG.exception("RootFSInterface::write_update exception reading")
 
 
-class Updater(UpdateActionsInterface):
+class OT3UpdateActions(UpdateActionsInterface):
     """OE updater class."""
 
     def __init__(self, root_FS_intf: RootFSInterface, part_mngr: PartitionManager):
@@ -158,8 +162,8 @@ class Updater(UpdateActionsInterface):
         """
 
         # make sure we have the correct file
-        if UPDATE_PKG not in filepath:
-            filename = os.path.basename(filepath)
+        filename = os.path.basename(filepath)
+        if filename not in UPDATE_PKG_OE:
             msg = (f"invalid filename {filepath} {filename}")
             LOG.error(msg)
             raise InvalidPKGName(msg)
@@ -174,6 +178,14 @@ class Updater(UpdateActionsInterface):
 
         def hash_callback(progress):
             progress_callback(progress / 2.0 + 0.5)
+
+        version_file = files.get('VERSION.json')
+        version_dict = load_version_file(version_file)
+        robot_model = version_dict.get('robot_model')
+        if robot_model != MODEL_OT3:
+            msg = (f"Invalid robot_model: expected {MODEL_OT3} != packaged {robot_model}")
+            LOG.error(msg)
+            raise InvalidRobotModel(msg)
 
         rootfs = files.get(ROOTFS_NAME)
         assert rootfs

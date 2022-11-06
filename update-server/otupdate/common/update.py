@@ -21,7 +21,9 @@ from .constants import APP_VARIABLE_PREFIX, RESTART_LOCK_NAME
 from .handler_type import Handler
 from .session import UpdateSession, Stages
 
-from otupdate.openembedded.updater import UPDATE_PKG
+from otupdate.openembedded.update_actions import UPDATE_PKG_OE
+from otupdate.buildroot.update_actions import UPDATE_PKG_BR
+VALID_UPDATE_PKG = UPDATE_PKG_OE + UPDATE_PKG_BR
 
 SESSION_VARNAME = APP_VARIABLE_PREFIX + "session"
 LOG = logging.getLogger(__name__)
@@ -101,9 +103,9 @@ async def _save_file(part: BodyPartReader, path: str) -> None:
             write.write(decoded)
     try:
         for file in os.listdir(path):
-            LOG.info(f"file written, {file} to path, {path}")
+            LOG.info(f"Downloaded {file} to {path}")
     except Exception:
-        LOG.exception("File not written")
+        LOG.exception("File not Downloaded")
 
 
 def _begin_write(
@@ -129,6 +131,7 @@ def _begin_write(
         if exc:
             session.set_error(getattr(exc, "short", str(type(exc))), str(exc))
         else:
+            LOG.info(f"Finished update session {session}")
             session.set_stage(Stages.DONE)
 
     write_future.add_done_callback(write_done)
@@ -172,7 +175,7 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
     """Serves /update/:session/file
 
     Requires multipart (encoding doesn't matter) with a file field in the
-    body called 'system_update.zip'.
+    body called 'system-update.zip' or 'ot2-system.zip'.
     """
     if session.stage != Stages.AWAITING_FILE:
         return web.json_response(
@@ -184,11 +187,11 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
         )
     reader = await request.multipart()
     async for part in reader:
-        if part.name != "system_update.zip":
+        if part.name not in VALID_UPDATE_PKG:
             LOG.info(f"Unknown field name {part.name} in file_upload, ignoring")
             await part.release()
         else:
-            LOG.info(f"Writing {part.name}")
+            LOG.info(f"Downloading {part.name}")
             await _save_file(part, session.download_path)
 
     maybe_actions = update_actions.UpdateActionsInterface.from_request(request)
@@ -205,7 +208,6 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
         session,
         config.config_from_request(request),
         asyncio.get_event_loop(),
-        # TODO (al, 2022-04-18): Use of part.name should not be here
         os.path.join(session.download_path, part.name),
         maybe_actions,
     )

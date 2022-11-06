@@ -15,6 +15,7 @@ from otupdate.common import (
     update,
 )
 from . import update_actions
+from otupdate.common.file_actions import load_version_file
 
 
 BR_BUILTIN_VERSION_FILE = "/etc/VERSION.json"
@@ -33,11 +34,6 @@ async def log_error_middleware(request, handler):
     return resp
 
 
-def get_version(version_file: str) -> Mapping[str, str]:
-    LOG.debug(f"Loading version file {version_file}")
-    return json.load(open(version_file, "r"))
-
-
 async def get_app(
     name_synchronizer: name_management.NameSynchronizer,
     system_version_file: Optional[str] = None,
@@ -52,7 +48,7 @@ async def get_app(
     if not system_version_file:
         system_version_file = BR_BUILTIN_VERSION_FILE
 
-    version = get_version(system_version_file)
+    version = load_version_file(system_version_file)
     boot_id = boot_id_override or control.get_boot_id()
     config_obj = config.load(config_file_override)
 
@@ -117,6 +113,7 @@ def health_response(version_dict: Mapping[str, str]) -> Mapping[str, Any]:
         "smoothieVersion": "unimplemented",
         "systemVersion": version_dict.get("buildroot_version", "unknown"),
         "capabilities": {
+            "systemUpdate": "/server/update/begin",
             "buildrootUpdate": "/server/update/begin",
             "restart": "/server/restart",
         },
