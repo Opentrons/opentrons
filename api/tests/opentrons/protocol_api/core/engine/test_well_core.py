@@ -5,8 +5,10 @@ from decoy import Decoy
 from opentrons_shared_data.labware.labware_definition import WellDefinition
 
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.types import Point
 
 from opentrons.protocol_api.core.engine import WellCore
 
@@ -23,28 +25,85 @@ def api_version() -> APIVersion:
     return MAX_SUPPORTED_VERSION
 
 
-def test_name(mock_engine_client: EngineClient) -> None:
-    """It should have a name and labware ID."""
-    subject = WellCore(
-        name="Gene", labware_id="Wilder", engine_client=mock_engine_client
-    )
-
-    assert subject.get_name() == "Gene"
-    assert subject.labware_id == "Wilder"
+@pytest.fixture
+def well_definition() -> WellDefinition:
+    """Get a partial WellDefinition value object."""
+    return WellDefinition.construct()  # type: ignore[call-arg]
 
 
-def test_max_volume(decoy: Decoy, mock_engine_client: EngineClient) -> None:
-    """It should have a max volume."""
+@pytest.fixture
+def subject(
+    decoy: Decoy, mock_engine_client: EngineClient, well_definition: WellDefinition
+) -> WellCore:
+    """Get a WellCore test subject with mocked dependencies."""
     decoy.when(
         mock_engine_client.state.labware.get_well_definition(
             labware_id="labware-id", well_name="well-name"
         )
-    ).then_return(
-        WellDefinition.construct(totalLiquidVolume=101)  # type: ignore[call-arg]
+    ).then_return(well_definition)
+
+    return WellCore(
+        name="well-name",
+        labware_id="labware-id",
+        engine_client=mock_engine_client,
     )
 
-    subject = WellCore(
-        name="well-name", labware_id="labware-id", engine_client=mock_engine_client
-    )
 
+def test_name(subject: WellCore) -> None:
+    """It should have a name and labware ID."""
+    assert subject.get_name() == "well-name"
+    assert subject.labware_id == "labware-id"
+
+
+def test_display_name(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: WellCore
+) -> None:
+    """It should have a display name."""
+    decoy.when(
+        mock_engine_client.state.labware.get_display_name("labware-id")
+    ).then_return("Cool Labware")
+
+    assert subject.get_display_name() == "well-name of Cool Labware"
+
+
+@pytest.mark.parametrize(
+    "well_definition",
+    [WellDefinition.construct(totalLiquidVolume=101)],  # type: ignore[call-arg]
+)
+def test_max_volume(subject: WellCore) -> None:
+    """It should have a max volume."""
     assert subject.get_max_volume() == 101
+
+
+def test_get_top(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: WellCore
+) -> None:
+    """It should have a max volume."""
+    decoy.when(
+        mock_engine_client.state.geometry.get_well_position(
+            labware_id="labware-id",
+            well_name="well-name",
+            well_location=WellLocation(
+                origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=42)
+            ),
+        )
+    ).then_return(Point(1, 2, 3))
+
+    assert subject.get_top(z_offset=42.0) == Point(1, 2, 3)
+
+
+def test_get_bottom(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: WellCore
+) -> None:
+    """It should have a max volume."""
+    decoy.when(
+        mock_engine_client.state.geometry.get_well_position(
+            labware_id="labware-id",
+            well_name="well-name",
+            well_location=WellLocation(
+                origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=42)
+            ),
+        )
+    ).then_return(Point(1, 2, 3))
+
+    assert subject.get_bottom(z_offset=42.0) == Point(1, 2, 3)

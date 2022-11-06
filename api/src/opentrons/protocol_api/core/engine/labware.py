@@ -52,7 +52,7 @@ class LabwareCore(AbstractLabware[WellCore]):
 
     @property
     def load_name(self) -> str:
-        raise NotImplementedError("LabwareCore.load_name not implemented")
+        return self._definition.parameters.loadName
 
     def get_uri(self) -> str:
         """Get the URI string string of the labware's definition.
@@ -70,7 +70,7 @@ class LabwareCore(AbstractLabware[WellCore]):
 
     def get_display_name(self) -> str:
         """Get a display name for the labware, falling back to the definition."""
-        raise NotImplementedError("LabwareCore.get_display_name not implemented")
+        return self._user_display_name or self._definition.metadata.displayName
 
     def get_user_display_name(self) -> Optional[str]:
         """Get the user-specified display name of the labware, if set."""

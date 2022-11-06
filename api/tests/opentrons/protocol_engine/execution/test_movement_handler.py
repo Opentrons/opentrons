@@ -21,6 +21,7 @@ from opentrons.protocol_engine.types import (
     WellLocation,
     WellOrigin,
     WellOffset,
+    DeckSlotLocation,
 )
 from opentrons.protocol_engine.state import (
     StateStore,
@@ -107,7 +108,9 @@ async def test_move_to_well(
         origin=WellOrigin.BOTTOM,
         offset=WellOffset(x=0, y=0, z=1),
     )
-
+    decoy.when(state_store.labware.get_location(labware_id="labware-id")).then_return(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+    )
     decoy.when(
         state_store.modules.get_heater_shaker_movement_restrictors()
     ).then_return([])
@@ -174,7 +177,7 @@ async def test_move_to_well(
 
     decoy.verify(
         await thermocycler_movement_flagger.raise_if_labware_in_non_open_thermocycler(
-            labware_id="labware-id"
+            labware_parent=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
         ),
         heater_shaker_movement_flagger.raise_if_movement_restricted(
             hs_movement_restrictors=[],
@@ -214,7 +217,9 @@ async def test_move_to_well_from_starting_location(
         labware_id="labware-id",
         well_name="B2",
     )
-
+    decoy.when(state_store.labware.get_location(labware_id="labware-id")).then_return(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+    )
     decoy.when(
         state_store.modules.get_heater_shaker_movement_restrictors()
     ).then_return([])
@@ -280,7 +285,7 @@ async def test_move_to_well_from_starting_location(
 
     decoy.verify(
         await thermocycler_movement_flagger.raise_if_labware_in_non_open_thermocycler(
-            labware_id="labware-id"
+            labware_parent=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
         ),
         heater_shaker_movement_flagger.raise_if_movement_restricted(
             hs_movement_restrictors=[],

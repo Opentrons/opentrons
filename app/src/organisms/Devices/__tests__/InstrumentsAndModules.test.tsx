@@ -7,7 +7,7 @@ import { mockMagneticModule } from '../../../redux/modules/__fixtures__'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { useIsRobotViewable, useRunStatuses } from '../hooks'
 import { ModuleCard } from '../../ModuleCard'
-import { PipettesAndModules } from '../PipettesAndModules'
+import { InstrumentsAndModules } from '../InstrumentsAndModules'
 import { PipetteCard } from '../PipetteCard'
 
 jest.mock('@opentrons/react-api-client')
@@ -38,12 +38,12 @@ const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
 >
 
 const render = () => {
-  return renderWithProviders(<PipettesAndModules robotName="otie" />, {
+  return renderWithProviders(<InstrumentsAndModules robotName="otie" />, {
     i18nInstance: i18n,
   })
 }
 
-describe('PipettesAndModules', () => {
+describe('InstrumentsAndModules', () => {
   beforeEach(() => {
     mockUseCurrentRunId.mockReturnValue(null)
     mockUseRunStatuses.mockReturnValue({
@@ -61,7 +61,9 @@ describe('PipettesAndModules', () => {
     mockUseIsRobotViewable.mockReturnValue(false)
     const [{ getByText }] = render()
 
-    getByText('Robot must be on the network to see pipettes and modules')
+    getByText(
+      'Robot must be on the network to see connected instruments and modules'
+    )
   })
 
   it('renders a Module card when a robot is viewable', () => {
