@@ -24,6 +24,7 @@
     "@opentrons/react-api-client": "6.1.0",
     "@opentrons/shared-data": "6.1.0",
     "@thi.ng/paths": "1.6.5",
+    "@types/uuid": "8.3.4",
     "classnames": "2.2.5",
     "connected-react-router": "6.8.0",
     "core-js": "3.2.1",
