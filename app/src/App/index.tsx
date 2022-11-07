@@ -26,10 +26,8 @@ import { ProtocolDetails } from '../pages/Protocols/ProtocolDetails'
 import { AppSettings } from '../pages/AppSettings'
 import { Labware } from '../pages/Labware'
 import { ODDSplash } from '../pages/ODD/ODDSplash'
-import { ConnectingNetwork } from '../organisms/SetupNetworks/ConnectingNetwork'
-import { ConnectionResult } from '../organisms/SetupNetworks/ConnectionResult'
 import { ConnectedNetworkInfo } from '../organisms/SetupNetworks/ConnectedNetworkInfo'
-import { SelectNetwork } from '../pages/ODD/SelectNetwork'
+import { SelectNetwork } from '../organisms/SetupNetworks/SelectNetwork'
 import { SetWifiCred } from '../organisms/SetupNetworks/SetWifiCred'
 import { getIsOnDevice } from '../redux/config'
 import { getLocalRobot } from '../redux/discovery'
@@ -113,18 +111,6 @@ export const AppComponent = (): JSX.Element => {
       exact: true,
       name: 'ODD Setup',
       path: '/deviceSetup',
-    },
-    {
-      Component: ConnectingNetwork,
-      exact: true,
-      name: 'Connecting Network',
-      path: '/connectingNetwork',
-    },
-    {
-      Component: ConnectionResult,
-      exact: true,
-      name: 'Connection Result',
-      path: '/connectionResult/:ssid',
     },
     {
       Component: ConnectedNetworkInfo,

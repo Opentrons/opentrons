@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
+
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -15,11 +16,11 @@ import {
   POSITION_RELATIVE,
 } from '@opentrons/components'
 
-import * as Networking from '../../redux/networking'
-import { getLocalRobot } from '../../redux/discovery'
 import { StyledText } from '../../atoms/text'
 import { TertiaryButton } from '../../atoms/buttons'
-import { SearchNetwork } from '../../organisms/SetupNetworks/SearchNetwork'
+import * as Networking from '../../redux/networking'
+import { getLocalRobot } from '../../redux/discovery'
+import { SearchNetwork } from './SearchNetwork'
 
 import type { State, Dispatch } from '../../redux/types'
 

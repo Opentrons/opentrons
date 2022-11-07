@@ -145,9 +145,13 @@
   "show": "Show",
   "search_again": "Search again",
   "searching": "Searching",
+  "searching_for_network": "Searching for network...",
   "connect": "Connect",
   "done": "Done",
   "try_again": "Try again",
   "connected_to_ssid": "Connected to {{ssid}}",
-  "failed_to_connect_to_ssid": "Failed to connect to {{ssid}}"
+  "failed_to_connect_to_ssid": "Failed to connect to {{ssid}}",
+  "ip_address": "IP Address",
+  "subnet_mask": "Subnet Mask",
+  "mac_address": "Mac Address"
 }

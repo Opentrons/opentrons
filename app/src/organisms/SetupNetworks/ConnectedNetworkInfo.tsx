@@ -1,6 +1,8 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import { useParams, useHistory } from 'react-router-dom'
+
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -15,14 +17,15 @@ import {
   ALIGN_CENTER,
   useInterval,
 } from '@opentrons/components'
+
+import { StyledText } from '../../atoms/text'
+import { SecondaryButton } from '../../atoms/buttons'
 import {
   getNetworkInterfaces,
   fetchStatus,
   fetchWifiList,
 } from '../../redux/networking'
 import { getLocalRobot } from '../../redux/discovery'
-import { StyledText } from '../../atoms/text'
-import { SecondaryButton } from '../../atoms/buttons'
 
 import type { State, Dispatch } from '../../redux/types'
 import type { NavRouteParams } from '../../App/types'
@@ -31,18 +34,15 @@ const STATUS_REFRESH_MS = 5000
 const LIST_REFRESH_MS = 10000
 
 export function ConnectedNetworkInfo(): JSX.Element {
+  const { t } = useTranslation('device_settings')
   const { ssid } = useParams<NavRouteParams>()
   const dispatch = useDispatch<Dispatch>()
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
-  const { wifi, ethernet } = useSelector((state: State) =>
+  const { wifi } = useSelector((state: State) =>
     getNetworkInterfaces(state, robotName)
   )
   const history = useHistory()
-
-  console.log('robot', robotName)
-  console.log('wifi', wifi)
-  console.log('ethernet', ethernet)
 
   useInterval(() => dispatch(fetchStatus(robotName)), STATUS_REFRESH_MS, true)
   useInterval(() => dispatch(fetchWifiList(robotName)), LIST_REFRESH_MS, true)
@@ -86,19 +86,19 @@ export function ConnectedNetworkInfo(): JSX.Element {
         >
           <StyledText fontSize="1.5rem" lineHeight="1.8rem">
             {/* ToDo: if wifi is undefined no data or empty */}
-            {`IP Address:  ${String(wifi?.ipAddress)}`}
+            {`${t('ip_address')}:  ${String(wifi?.ipAddress)}`}
           </StyledText>
           <StyledText fontSize="1.5rem" lineHeight="1.8rem">
-            {`Subnet mask: ${String(wifi?.subnetMask)}`}
+            {`${t('subnet_mask')}: ${String(wifi?.subnetMask)}`}
           </StyledText>
           <StyledText fontSize="1.5rem" lineHeight="1.8rem">
-            {`Mac address: ${String(wifi?.macAddress)}`}
+            {`${t('mac_address')}: ${String(wifi?.macAddress)}`}
           </StyledText>
         </Flex>
       </Flex>
       <Flex justifyContent={JUSTIFY_FLEX_END}>
         <SecondaryButton onClick={() => history.push(`/selectNetwork`)}>
-          {'Change network'}
+          {t('change_network')}
         </SecondaryButton>
       </Flex>
     </Flex>

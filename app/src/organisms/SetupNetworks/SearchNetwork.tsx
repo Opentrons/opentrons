@@ -1,4 +1,6 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -9,10 +11,11 @@ import {
   TYPOGRAPHY,
   Icon,
 } from '@opentrons/components'
+
 import { StyledText } from '../../atoms/text'
 
 export function SearchNetwork(): JSX.Element {
-  // Note kj 10/18/2022 The fixed value is temporarily
+  const { t } = useTranslation('device_settings')
   return (
     <>
       <Flex
@@ -38,7 +41,7 @@ export function SearchNetwork(): JSX.Element {
             lineHeight="2.72375rem"
             marginTop={SPACING.spacingXXL}
           >
-            {'Searching for network...'}
+            {t('searching_for_network')}
           </StyledText>
         </Flex>
       </Flex>

@@ -19,19 +19,19 @@ import {
   useInterval,
 } from '@opentrons/components'
 
-import * as RobotApi from '../../redux/robot-api'
-import * as Networking from '../../redux/networking'
-import { getLocalRobot } from '../../redux/discovery'
 import { StyledText } from '../../atoms/text'
 import { InputField } from '../../atoms/InputField'
 import { NormalKeyboard } from '../../atoms/SoftwareKeyboard'
+import { TertiaryButton } from '../../atoms/buttons'
+import * as RobotApi from '../../redux/robot-api'
+import * as Networking from '../../redux/networking'
+import { getLocalRobot } from '../../redux/discovery'
+import { ConnectingNetwork } from './ConnectingNetwork'
+import { ConnectionResult } from './ConnectionResult'
 
 import type { State, Dispatch } from '../../redux/types'
 import type { NavRouteParams } from '../../App/types'
 import type { WifiConfigureRequest } from '../Devices/RobotSettings/ConnectNetwork/types'
-import { TertiaryButton } from '../../atoms/buttons'
-import { ConnectingNetwork } from './ConnectingNetwork'
-import { ConnectionResult } from './ConnectionResult'
 
 const STATUS_REFRESH_MS = 5000
 const LIST_REFRESH_MS = 10000
