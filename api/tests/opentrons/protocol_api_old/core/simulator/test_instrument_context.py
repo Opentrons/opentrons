@@ -39,8 +39,10 @@ def test_prepare_to_aspirate_no_tip(subject: InstrumentCore) -> None:
 
 def test_dispense_no_tip(subject: InstrumentCore) -> None:
     """It should raise an error if a tip is not attached."""
+    subject.home()
+    location = Location(point=Point(1, 2, 3), labware=None)
     with pytest.raises(NoTipAttachedError, match="Cannot perform DISPENSE"):
-        subject.dispense(volume=1, rate=1)
+        subject.dispense(volume=1, rate=1, location=location, well_core=None)
 
 
 def test_drop_tip_no_tip(subject: InstrumentCore) -> None:
@@ -99,7 +101,12 @@ def test_pick_up_tip_prep_after(
         volume=1,
         rate=1,
     )
-    subject.dispense(1, rate=1)
+    subject.dispense(
+        1,
+        rate=1,
+        location=Location(point=Point(2, 2, 3), labware=None),
+        well_core=labware.get_wells()[1],
+    )
     subject.drop_tip(home_after=True)
     # and again, without preparing for aspirate
     subject.pick_up_tip(
@@ -117,7 +124,12 @@ def test_pick_up_tip_prep_after(
         volume=1,
         rate=1,
     )
-    subject.dispense(1, rate=1)
+    subject.dispense(
+        1,
+        rate=1,
+        location=Location(point=Point(2, 2, 3), labware=None),
+        well_core=labware.get_wells()[1],
+    )
     subject.drop_tip(home_after=True)
 
 
@@ -205,7 +217,12 @@ def _aspirate_dispense(i: InstrumentCore, labware: LabwareCore) -> None:
         volume=12,
         rate=10,
     )
-    i.dispense(2, 2)
+    i.dispense(
+        2,
+        2,
+        location=Location(point=Point(2, 2, 3), labware=None),
+        well_core=labware.get_wells()[1],
+    )
 
 
 def _aspirate_blowout(i: InstrumentCore, labware: LabwareCore) -> None:

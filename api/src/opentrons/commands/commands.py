@@ -6,7 +6,6 @@ from .helpers import stringify_location, listify
 from . import types as command_types
 
 from opentrons.types import Location
-from opentrons.protocols.api_support.util import FlowRates
 
 if TYPE_CHECKING:
     from opentrons.protocol_api import InstrumentContext

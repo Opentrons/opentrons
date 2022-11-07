@@ -336,6 +336,9 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
     def get_absolute_aspirate_flow_rate(self, rate: float) -> float:
         return self._flow_rates.aspirate * rate
 
+    def get_absolute_dispense_flow_rate(self, rate: float) -> float:
+        return self._flow_rates.dispense * rate
+
     def get_speed(self) -> PlungerSpeeds:
         return self._speeds
 
