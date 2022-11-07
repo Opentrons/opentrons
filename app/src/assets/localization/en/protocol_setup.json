@@ -13,6 +13,7 @@
   "creating_labware_offset_data": "<h4>Creating Labware Offset Data During Labware Position Check</h4><block>Labware Position Check is a recommended workflow that helps you verify the position of every labware on the deck for an added degree of precision in your protocol. When you check a labware, the OT-2’s pipette nozzle or attached tip will stop at the center of the A1 well. If the pipette nozzle or tip is not centered, you can reveal the OT-2’s jog controls to make an adjustment. This Labware Offset will be applied to the entire labware. Offset data is measured to the nearest 1/10th mm and can be made in the X, Y and/or Z directions.</block>",
   "labware_offset_data_info": "Opentrons offers a second type of positional adjustment, a Labware Offset. Labware Offsets are intended to account for small, real-world variances in the overall position of the labware on an OT-2’s deck. A Labware Offset is unique to a specific combination of the following during a run: labware, module (if present), deck slot, protocol and OT-2. ",
   "learn_more_about_offset_data_link": "Learn more about Labware Offset Data",
+  "learn_how_it_works": "Learn how it works",
   "rerunning_a_protocol": "<h4>Rerunning a Protocol</h4><block>Opentrons displays the connected robot’s last protocol run on on the Protocol Upload page. If you run again, Opentrons loads this protocol and applies Labware Offset data if any exists.</block><block>Clicking “Run Again” will take you directly to the Run tab. If you’d like to review the deck setup or run Labware Position Check before running the protocol, navigate to the Protocol tab.</block>",
   "multiple_modules_help_link_title": "See How To Set Up Modules of the Same Type",
   "multiple_modules_modal_title": "Setting Up Modules of the Same Type",
@@ -140,5 +141,8 @@
   "labware_latch": "Labware Latch",
   "multiple_modules": "Multiple modules of the same type",
   "view_moam": "View setup instructions for placing modules of the same type to the robot.",
-  "secure": "Secure"
+  "secure": "Secure",
+  "additional_off_deck_labware": "Additional Off-Deck Labware",
+  "recommended_workflow_for_labware_positioning": "Recommended workflow that helps you verify the position of each labware on the deck. <anchor>Learn how it works</anchor>",
+  "view_current_offsets": "View current offsets"
 }
