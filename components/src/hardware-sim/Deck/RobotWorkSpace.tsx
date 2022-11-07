@@ -15,7 +15,7 @@ export interface RobotWorkSpaceRenderProps {
 
 export interface RobotWorkSpaceProps {
   deckDef?: DeckDefinition
-  viewBox?: string
+  viewBox?: string | null
   className?: string
   children?: (props: RobotWorkSpaceRenderProps) => React.ReactNode
   deckLayerBlocklist?: string[]

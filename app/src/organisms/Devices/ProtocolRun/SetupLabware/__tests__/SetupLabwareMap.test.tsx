@@ -21,10 +21,10 @@ import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_stand
 import { i18n } from '../../../../../i18n'
 import { useFeatureFlag } from '../../../../../redux/config'
 import { LabwareInfoOverlay } from '../../LabwareInfoOverlay'
-import { LabwareOffsetModal } from '../../../../ProtocolSetup/RunSetupCard/LabwareSetup/LabwareOffsetModal'
 import {
   useLabwareRenderInfoForRunById,
   useModuleRenderInfoForProtocolById,
+  useProtocolDetailsForRun,
 } from '../../../hooks'
 import { SetupLabwareMap } from '../SetupLabwareMap'
 
@@ -48,9 +48,6 @@ jest.mock('@opentrons/shared-data', () => {
 jest.mock('../../../../ProtocolSetup/hooks')
 jest.mock('../../LabwareInfoOverlay')
 jest.mock(
-  '../../../../ProtocolSetup/RunSetupCard/LabwareSetup/LabwareOffsetModal'
-)
-jest.mock(
   '../../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
 )
 jest.mock('../../../../RunTimeControl/hooks')
@@ -71,8 +68,8 @@ const mockRobotWorkSpace = RobotWorkSpace as jest.MockedFunction<
 const mockLabwareRender = LabwareRender as jest.MockedFunction<
   typeof LabwareRender
 >
-const mockLabwareOffsetModal = LabwareOffsetModal as jest.MockedFunction<
-  typeof LabwareOffsetModal
+const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
+  typeof useProtocolDetailsForRun
 >
 const mockUseLabwareRenderInfoForRunById = useLabwareRenderInfoForRunById as jest.MockedFunction<
   typeof useLabwareRenderInfoForRunById
@@ -141,16 +138,6 @@ describe('SetupLabwareMap', () => {
       .calledWith(expect.anything())
       .mockReturnValue(STUBBED_ORIENTATION_VALUE)
 
-    when(mockLabwareOffsetModal)
-      .calledWith(
-        componentPropsMatcher({
-          onCloseClick: expect.anything(),
-        })
-      )
-      .mockImplementation(({ onCloseClick }) => (
-        <div onClick={onCloseClick}>mock LabwareOffsetModal </div>
-      ))
-
     when(mockLabwareRender)
       .mockReturnValue(<div></div>) // this (default) empty div will be returned when LabwareRender isn't called with expected labware definition
       .calledWith(
@@ -163,6 +150,10 @@ describe('SetupLabwareMap', () => {
           mock labware render of {fixture_tiprack_300_ul.metadata.displayName}
         </div>
       )
+
+    when(mockUseProtocolDetailsForRun)
+      .calledWith(RUN_ID)
+      .mockReturnValue({ protocolData: {} } as any)
 
     when(mockLabwareInfoOverlay)
       .mockReturnValue(<div></div>) // this (default) empty div will be returned when LabwareInfoOverlay isn't called with expected props
@@ -231,6 +222,7 @@ describe('SetupLabwareMap', () => {
     const { getByText } = render({
       robotName: ROBOT_NAME,
       runId: RUN_ID,
+      commands: [],
       extraAttentionModules: [],
     })
 
@@ -304,6 +296,7 @@ describe('SetupLabwareMap', () => {
     const { getByText } = render({
       robotName: ROBOT_NAME,
       runId: RUN_ID,
+      commands: [],
       extraAttentionModules: [],
     })
 

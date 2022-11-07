@@ -24,11 +24,11 @@ export interface GenericWizardTileProps {
   back?: () => void
   proceed?: () => void
   proceedButtonText?: string
+  proceedIsDisabled?: boolean
 }
 
 const GO_BACK_BUTTON_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
-  text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   color: ${COLORS.darkGreyEnabled};
 
   &:hover {
@@ -45,34 +45,35 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
     back,
     proceed,
     proceedButtonText,
+    proceedIsDisabled,
   } = props
   const { t } = useTranslation('shared')
 
   return (
-    <>
+    <Flex flexDirection={DIRECTION_COLUMN} height="24.6rem">
       <Flex
         flexDirection={DIRECTION_ROW}
         paddingX={SPACING.spacing6}
         paddingTop={SPACING.spacing6}
         marginBottom={SPACING.spacing7}
+        gridGap={SPACING.spacingXXL}
       >
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          width="50%"
-          marginRight={SPACING.spacingXXL}
+          flex="1"
+          gridGap={SPACING.spacing4}
         >
-          <StyledText as="h1" marginBottom={SPACING.spacing4}>
-            {header}
-          </StyledText>
+          <StyledText as="h1">{header}</StyledText>
           {bodyText}
         </Flex>
-        {rightHandBody}
+        <Flex flex="1">{rightHandBody}</Flex>
       </Flex>
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         marginBottom={SPACING.spacing6}
         marginX={SPACING.spacing6}
         alignItems={ALIGN_FLEX_END}
+        flex="1"
       >
         {back != null ? (
           <Btn onClick={back}>
@@ -80,8 +81,10 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
           </Btn>
         ) : null}
         {getHelp != null ? <NeedHelpLink href={getHelp} /> : null}
-        <PrimaryButton onClick={proceed}>{proceedButtonText}</PrimaryButton>
+        <PrimaryButton disabled={proceedIsDisabled} onClick={proceed}>
+          {proceedButtonText}
+        </PrimaryButton>
       </Flex>
-    </>
+    </Flex>
   )
 }

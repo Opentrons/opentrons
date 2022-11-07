@@ -25,27 +25,8 @@ stages:
     request: *get_offsets
     response:
       status_code: 200
-      json:
-        links: null
-        data:
-          - pipette: '123'
-            mount: 'left'
-            offset: [0.0, 0.0, 0.0]
-            tiprack: !anystr
-            lastModified: !anystr
-            tiprackUri: !anystr
-            source: 'user'
-            status: !anydict
-            id: !anystr
-          - pipette: '321'
-            mount: 'right'
-            offset: [0.0, 0.0, 0.0]
-            tiprack: !anystr
-            lastModified: !anystr
-            tiprackUri: !anystr
-            source: 'user'
-            status: !anydict
-            id: !anystr
+      verify_response_with:
+        function: tests.integration.utils:verify_pipette_calibration_response
 
   - name: GET request returns filter with pipette id
     request:

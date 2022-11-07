@@ -123,6 +123,12 @@ describe('RobotSettings', () => {
     getByText('Mock RobotSettingsNetworking')
   })
 
+  it('redirects to networking tab if feature flags hidden', () => {
+    when(mockUseRobot).calledWith('otie').mockReturnValue(mockReachableRobot)
+    const [{ getByText }] = render('/devices/otie/robot-settings/feature-flags')
+    getByText('Mock RobotSettingsNetworking')
+  })
+
   it('renders calibration content when the calibration tab is clicked', () => {
     const [{ getByText, queryByText }] = render(
       '/devices/otie/robot-settings/advanced'

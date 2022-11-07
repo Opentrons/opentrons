@@ -165,3 +165,28 @@ push-all-and-term: push-all term
 pull-data-ot3:
 	mkdir -p ./.pulled-data
 	scp -r root@$(host):/data/testing_data/$(test) ./.pulled-data
+
+define extract-and-update-fw
+ssh -i $(2) $(3) root@$(1) \
+"cd /opt/opentrons-robot-server &&\
+(rm -rf ot3-firmware || true) &&\
+tar -xvf ot3-firmware.tar.gz &&\
+ls ./ot3-firmware &&\
+python3 -m hardware_testing.scripts.update_fw_ot3 --folder /opt/opentrons-robot-server/ot3-firmware &&\
+ls ./ot3-firmware"
+endef
+
+.PHONY: sync-sw-ot3
+sync-sw-ot3:
+	cd ../hardware && $(MAKE) push-no-restart-ot3 host=$(host)
+	cd ../api && $(MAKE) push-no-restart-ot3 host=$(host)
+	cd ../shared-data && $(MAKE) push-no-restart-ot3 host=$(host)
+	cd ../hardware-testing && $(MAKE) push-no-restart-ot3 host=$(host)
+
+.PHONY: sync-fw-ot3
+sync-fw-ot3:
+	scp ot3-firmware.tar.gz root@$(host):/opt/opentrons-robot-server
+	$(call extract-and-update-fw,$(host),$(br_ssh_key),$(ssh_opts))
+
+.PHONY: sync-ot3
+sync-ot3: sync-sw-ot3 sync-fw-ot3
