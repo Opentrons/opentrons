@@ -26,9 +26,9 @@ import { ProtocolDetails } from '../pages/Protocols/ProtocolDetails'
 import { AppSettings } from '../pages/AppSettings'
 import { Labware } from '../pages/Labware'
 import { InitialSplash } from '../pages/Devices/Setup/InitialSplash'
-import { ConnectedNetworkInfo } from '../organisms/SetupNetworks/ConnectedNetworkInfo'
-import { SelectNetwork } from '../organisms/SetupNetworks/SelectNetwork'
-import { SetWifiCred } from '../organisms/SetupNetworks/SetWifiCred'
+import { ConnectedNetworkInfo } from '../organisms/SetupNetwork/ConnectedNetworkInfo'
+import { SelectNetwork } from '../organisms/SetupNetwork/SelectNetwork'
+import { SetWifiCred } from '../organisms/SetupNetwork/SetWifiCred'
 import { getIsOnDevice } from '../redux/config'
 import { getLocalRobot } from '../redux/discovery'
 import { useSoftwareUpdatePoll } from './hooks'
@@ -146,37 +146,61 @@ export const AppComponent = (): JSX.Element => {
         onDragOver={stopEvent}
         onDrop={stopEvent}
       >
-        <TopPortalRoot />
-        {!isOnDevice && <Navbar routes={routes} />}
-        {/* <Navbar routes={routes} /> */}
-        <Box width="100%">
-          <Switch>
-            {routes.map(({ Component, exact, path }: RouteProps) => {
-              return (
-                <Route key={path} exact={exact} path={path}>
-                  <Breadcrumbs />
-                  <Box
-                    position={POSITION_RELATIVE}
-                    width="100%"
-                    height="100%"
-                    backgroundColor={COLORS.fundamentalsBackground}
-                    overflow={OVERFLOW_SCROLL}
-                  >
-                    <ModalPortalRoot />
-                    <Component />
-                  </Box>
-                </Route>
-              )
-            })}
-            <Redirect
-              exact
-              from="/"
-              to={isOnDevice ? '/deviceSetup' : '/protocols'}
-              // to="/deviceSetup"
-            />
-          </Switch>
-          <Alerts />
-        </Box>
+        {isOnDevice ? (
+          <>
+            <TopPortalRoot />
+            <Box width="100%">
+              <Switch>
+                {routes.map(({ Component, exact, path }: RouteProps) => {
+                  return (
+                    <Route key={path} exact={exact} path={path}>
+                      <Box
+                        position={POSITION_RELATIVE}
+                        width="100%"
+                        height="100%"
+                        backgroundColor={COLORS.fundamentalsBackground}
+                        overflow={OVERFLOW_SCROLL}
+                      >
+                        <ModalPortalRoot />
+                        <Component />
+                      </Box>
+                    </Route>
+                  )
+                })}
+                <Redirect exact from="/" to="/deviceSetup" />
+              </Switch>
+              <Alerts />
+            </Box>
+          </>
+        ) : (
+          <>
+            <TopPortalRoot />
+            <Navbar routes={routes} />
+            <Box width="100%">
+              <Switch>
+                {routes.map(({ Component, exact, path }: RouteProps) => {
+                  return (
+                    <Route key={path} exact={exact} path={path}>
+                      <Breadcrumbs />
+                      <Box
+                        position={POSITION_RELATIVE}
+                        width="100%"
+                        height="100%"
+                        backgroundColor={COLORS.fundamentalsBackground}
+                        overflow={OVERFLOW_SCROLL}
+                      >
+                        <ModalPortalRoot />
+                        <Component />
+                      </Box>
+                    </Route>
+                  )
+                })}
+                <Redirect exact from="/" to="/protocols" />
+              </Switch>
+              <Alerts />
+            </Box>
+          </>
+        )}
       </Flex>
     </>
   )
