@@ -35,7 +35,7 @@ jobs:
       - uses: './.github/actions/python/setup-single-environment'
         with:
           python-version: '${{ matrix.python }}'
-          environment: app
+          environment: 'environments/app'
       - name: 'set complex environment variables'
         uses: actions/github-script@v6.1.1
         with:

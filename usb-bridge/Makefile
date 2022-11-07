@@ -29,7 +29,7 @@ pipenv := PIPENV_PIPFILE=./Pipfile $(pipenv_call)
 
 .PHONY: setup
 setup:
-	$(pipenv) sync $(pipenv_opts)
+	$(pipenv) sync --dev $(pipenv_opts)
 	$(pipenv) run pip freeze
 
 .PHONY: clean

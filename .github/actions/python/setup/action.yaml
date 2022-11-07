@@ -37,4 +37,4 @@ runs:
       run: make install-pipenv
     - shell: bash
       name: setup project ${{ inputs.project }}
-      run: 'make -C ${{ inputs.project }} setup'
+      run: make -C ${{ inputs.project }} setup
