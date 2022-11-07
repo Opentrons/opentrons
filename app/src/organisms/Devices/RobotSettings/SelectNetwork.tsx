@@ -73,8 +73,6 @@ export const SelectNetwork = ({
     true
   )
 
-  console.log('selectNetwork-requestState', requestState)
-
   React.useEffect(() => {
     // if we're connecting to a network, ensure we get the info needed to
     // populate the configuration forms

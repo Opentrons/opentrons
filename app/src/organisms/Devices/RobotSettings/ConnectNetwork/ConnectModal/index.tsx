@@ -59,8 +59,6 @@ export const ConnectModalComponent = (
   const { robotName, network, wifiKeys, eapOptions, onCancel } = props
   const { values, isValid } = useFormikContext<ConnectFormValues>()
 
-  console.log('values', values)
-
   const id = `ConnectForm__${robotName}`
   const fields = getConnectFormFields(
     network,
@@ -69,8 +67,6 @@ export const ConnectModalComponent = (
     wifiKeys,
     values
   )
-
-  console.log('fields', fields)
 
   useResetFormOnSecurityChange()
 

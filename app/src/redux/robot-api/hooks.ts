@@ -40,7 +40,6 @@ export type DispatchRequestsType = (...actions: Action[]) => void
 export function useDispatchApiRequest(): [DispatchApiRequestType, string[]] {
   const dispatch = useDispatch<(a: Action) => void>()
 
-  console.log('called: useDispatchApiRequest')
   // TODO(mc, 2019-11-06): evaluate whether or not this can be a ref
   const [requestIds, addRequestId] = useReducer(
     (ids: string[], next: string) => [...ids, next],
@@ -50,7 +49,6 @@ export function useDispatchApiRequest(): [DispatchApiRequestType, string[]] {
   const dispatchApiRequest = useCallback(
     (a: Action): ActionWithRequestMeta => {
       const requestId = uniqueId('robotApi_request_')
-      console.log('dispatchApiRequest', requestId)
       //  @ts-expect-error(sa, 2021-05-17): type guard a.meta, also robotCommand might not exist on a.meta
       const action = { ...a, meta: { ...a.meta, requestId } }
 
