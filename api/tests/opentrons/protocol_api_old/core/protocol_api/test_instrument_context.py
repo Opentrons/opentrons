@@ -15,7 +15,6 @@ from opentrons.protocol_api.core.protocol_api.protocol_context import (
 from opentrons.protocol_api.core.protocol_api.instrument_context import (
     InstrumentContextImplementation,
 )
-from opentrons.protocol_api.core.protocol_api.legacy_module_core import LegacyModuleCore
 
 
 @pytest.fixture(params=[Mount.LEFT, Mount.RIGHT])
@@ -52,9 +51,6 @@ def mock_protocol_impl(
 ) -> ProtocolContextImplementation:
     protocol_impl = decoy.mock(cls=ProtocolContextImplementation)
     decoy.when(protocol_impl.get_hardware()).then_return(mock_sync_hardware_api)
-    decoy.when(protocol_impl.get_module_cores()).then_return(
-        [decoy.mock(cls=LegacyModuleCore)]
-    )
     return protocol_impl
 
 

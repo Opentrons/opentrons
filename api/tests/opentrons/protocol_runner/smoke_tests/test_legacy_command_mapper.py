@@ -128,7 +128,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
     subject = await create_simulating_runner()
     result = await subject.run(protocol_source)
     commands_result = result.commands
-    print(commands_result)
+
     tiprack_1_result_captor = matchers.Captor()
     tiprack_2_result_captor = matchers.Captor()
     module_1_result_captor = matchers.Captor()
