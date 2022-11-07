@@ -112,7 +112,7 @@ async def test_get_lid_temp(
         [50, None, None, "S50"],
         [50, 2, None, "S50 H2"],
         [50, None, 32, "S50 V32"],
-        [-5, 2, 32, "S0 H2 V32"],
+        [-5, 2, 32, "S4 H2 V32"],
         [102, 2, 32, "S99 H2 V32"],
     ],
 )

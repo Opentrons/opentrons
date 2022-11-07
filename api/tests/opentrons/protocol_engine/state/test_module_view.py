@@ -1241,7 +1241,7 @@ def module_view_with_thermocycler(thermocycler_v1_def: ModuleDefinition) -> Modu
     )
 
 
-@pytest.mark.parametrize("input_temperature", [0, 0.0, 0.001, 98.999, 99, 99.0])
+@pytest.mark.parametrize("input_temperature", [4, 4.0, 4.001, 98.999, 99, 99.0])
 def test_thermocycler_validate_target_block_temperature(
     module_view_with_thermocycler: ModuleView,
     input_temperature: float,
@@ -1255,7 +1255,7 @@ def test_thermocycler_validate_target_block_temperature(
     assert result == input_temperature
 
 
-@pytest.mark.parametrize("input_temperature", [-0.001, 99.001])
+@pytest.mark.parametrize("input_temperature", [-0.001, 3.999, 99.001])
 def test_thermocycler_validate_target_block_temperature_raises(
     module_view_with_thermocycler: ModuleView,
     input_temperature: float,
