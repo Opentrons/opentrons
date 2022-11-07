@@ -1,23 +1,17 @@
-import reduce from 'lodash/reduce'
-import {
-  getIsTiprack,
-  ProtocolFile,
-  LabwareDefinition2,
-} from '@opentrons/shared-data'
+import { getIsTiprack, LabwareDefinition2 } from '@opentrons/shared-data'
 import { getPickUpTipCommandsWithPipette } from '../../Devices/ProtocolRun/utils/getPickUpTipCommandsWithPipette'
 import { getTipracksVisited } from '../../Devices/ProtocolRun/utils/getTipracksVisited'
 import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
+import type { LoadedLabware } from '@opentrons/shared-data'
 
 export const doesPipetteVisitAllTipracks = (
   pipetteId: string,
-  labware: ProtocolFile<{}>['labware'],
+  labware: LoadedLabware[],
   labwareDefinitions: Record<string, LabwareDefinition2>,
   commands: RunTimeCommand[]
 ): boolean => {
-  const numberOfTipracks = reduce(
-    labware,
+  const numberOfTipracks = labware.reduce(
     (numberOfTipracks, currentLabware) => {
-      //  @ts-expect-error: will be an error until we remove the schemaV6Adapter
       const labwareDef = labwareDefinitions[currentLabware.definitionUri]
       return getIsTiprack(labwareDef) ? numberOfTipracks + 1 : numberOfTipracks
     },

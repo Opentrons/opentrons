@@ -7,6 +7,7 @@ import {
   getLabwareDefIsStandard,
   getLabwareDisplayName,
   IDENTITY_VECTOR,
+  LoadedLabware,
 } from '@opentrons/shared-data'
 import {
   useHost,
@@ -141,7 +142,7 @@ export const useTitleText = (
   loading: boolean,
   command: LabwarePositionCheckMovementCommand,
   runId: string | null,
-  labware?: ProtocolFile<{}>['labware'],
+  labware?: LoadedLabware[],
   labwareDefinitions?: ProtocolFile<{}>['labwareDefinitions']
 ): string => {
   const { protocolData } = useProtocolDetailsForRun(runId)

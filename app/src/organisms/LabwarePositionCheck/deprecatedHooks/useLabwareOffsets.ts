@@ -4,7 +4,7 @@ import {
   getModuleDisplayName,
   getLabwareDisplayName,
   getModuleType,
-  ProtocolAnalysisFile,
+  SchemaAdapterOutput,
   THERMOCYCLER_MODULE_TYPE,
   getVectorSum,
 } from '@opentrons/shared-data'
@@ -20,7 +20,7 @@ import { useCurrentRun } from '../../ProtocolUpload/hooks'
 
 const getDisplayLocation = (
   labwareId: string,
-  protocolData: ProtocolAnalysisFile,
+  protocolData: SchemaAdapterOutput,
   t: TFunction<'labware_position_check'>
 ): string => {
   let location = ''
@@ -64,7 +64,7 @@ export type LabwareOffsets = Array<{
 
 export const useLabwareOffsets = (
   savePositionCommandData: SavePositionCommandData,
-  protocolData: ProtocolAnalysisFile
+  protocolData: SchemaAdapterOutput
 ): Promise<LabwareOffsets> => {
   const { t } = useTranslation('labware_position_check')
   const offsetDataByLabwareId = useOffsetDataByLabwareId(
@@ -89,7 +89,6 @@ export const useLabwareOffsets = (
       )
       //   @ts-expect-error: when we remove schemav6Adapter, this logic will be correct
       const definitionUri = protocolData.labware.find(
-        //   @ts-expect-error: when we remove schemav6Adapter, this logic will be correct
         item => item.id === labwareId
       ).definitionUri
       const displayName = getLabwareDisplayName(

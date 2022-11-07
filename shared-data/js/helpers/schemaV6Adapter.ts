@@ -38,12 +38,7 @@ export const schemaV6Adapter = (
   ) {
     return null
   } else if ('labware' in protocolAnalysis) {
-    const labware: Array<{
-      id: string
-      loadName: string
-      definitionUri: string
-      displayName?: string
-    }> = protocolAnalysis.labware.map(labware => {
+    const labware = protocolAnalysis.labware.map(labware => {
       const labwareId = labware.id
       //  TODO(jr, 10/6/22): this logic can be removed when protocol analysis includes displayName
       const loadCommand: LoadLabwareRunTimeCommand | null =
@@ -98,9 +93,9 @@ export const schemaV6Adapter = (
         }
       }, {})
 
+    // @ts-expect-error this type will contain all extra fields on input type
     return {
       ...protocolAnalysis,
-      // @ts-expect-error
       labware,
       modules,
       labwareDefinitions,

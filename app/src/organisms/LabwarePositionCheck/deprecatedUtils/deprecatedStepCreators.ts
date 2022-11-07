@@ -102,6 +102,7 @@ export const getMoveToLabwareSteps = (
     let moveToLabwareCommands: LabwarePositionCheckCreateCommand[] = []
 
     if (isLabwareOnTopOfTC) {
+      // @ts-expect-error moduleId will exist from type narrowing
       const moduleId = getLabwareLocation(labwareId, commands).moduleId
       const openTCLidCommand: TCOpenLidCreateCommand = {
         commandType: 'thermocycler/openLid',
@@ -111,6 +112,7 @@ export const getMoveToLabwareSteps = (
       }
       moveToLabwareCommands = [openTCLidCommand, moveToWellCommand]
     } else if (isLabwareOnTopOfHS) {
+      // @ts-expect-error moduleId will exist from type narrowing
       const moduleId = getLabwareLocation(labwareId, commands).moduleId
       const closeLatchCommand: HeaterShakerCloseLatchCreateCommand = {
         commandType: 'heaterShaker/closeLabwareLatch',

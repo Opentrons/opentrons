@@ -89,9 +89,9 @@ export const DeprecatedLabwarePositionCheckStepDetail = (
       : null
 
   if (protocolData == null) return null
-  //  @ts-expect-error: will be an error until we remove the schemaV6Adapter
-  const labwareDefUri = protocolData.labware.find(item => item.id === labwareId)
-    .definitionUri
+  const labwareDefUri =
+    protocolData.labware.find(item => item.id === labwareId)?.definitionUri ??
+    ''
   const labwareDef = protocolData.labwareDefinitions[labwareDefUri]
   // filter out the TC open lid command as it does not have an associated pipette id
   const stepMovementCommands = selectedStep.commands.filter(
@@ -106,10 +106,11 @@ export const DeprecatedLabwarePositionCheckStepDetail = (
 
   const pipetteId = command.params.pipetteId
   const pipetteName = protocolData.pipettes.find(
-    //  @ts-expect-error
     pipette => pipette.id === pipetteId
-  ).pipetteName
+  )?.pipetteName
   let wellsToHighlight: string[] = []
+
+  // @ts-expect-error pipetteName will not be undefined
   const pipetteChannels = getPipetteNameSpecs(pipetteName)?.channels
   if (pipetteChannels === 8) {
     wellsToHighlight = labwareDef.ordering[0]
@@ -178,6 +179,7 @@ export const DeprecatedLabwarePositionCheckStepDetail = (
               />
               <PipetteRender
                 labwareDef={labwareDef}
+                // @ts-expect-error pipetteName will not be undefined
                 pipetteName={pipetteName}
               />
             </React.Fragment>
