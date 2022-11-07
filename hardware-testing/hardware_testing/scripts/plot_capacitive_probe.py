@@ -12,7 +12,7 @@ class Plot:
         self.PLOT_HEIGHT = 800
         self.PLOT_WIDTH = 1000
         self.PLOT_FONT = 16
-        self.PLOT_PATH = "plots/"
+        self.PLOT_PATH = "plot_probe/"
         self.PLOT_FORMAT = ".png"
         self.plot_param = {
             "figure":None,
