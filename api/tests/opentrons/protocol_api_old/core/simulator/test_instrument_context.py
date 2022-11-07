@@ -102,7 +102,7 @@ def test_pick_up_tip_prep_after(
         rate=1,
     )
     subject.dispense(
-        1,
+        volume=1,
         rate=1,
         location=Location(point=Point(2, 2, 3), labware=None),
         well_core=labware.get_wells()[1],
@@ -125,7 +125,7 @@ def test_pick_up_tip_prep_after(
         rate=1,
     )
     subject.dispense(
-        1,
+        volume=1,
         rate=1,
         location=Location(point=Point(2, 2, 3), labware=None),
         well_core=labware.get_wells()[1],
@@ -218,8 +218,8 @@ def _aspirate_dispense(i: InstrumentCore, labware: LabwareCore) -> None:
         rate=10,
     )
     i.dispense(
-        2,
-        2,
+        volume=2,
+        rate=2,
         location=Location(point=Point(2, 2, 3), labware=None),
         well_core=labware.get_wells()[1],
     )

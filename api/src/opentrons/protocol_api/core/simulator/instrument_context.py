@@ -98,10 +98,10 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
 
     def dispense(
         self,
-        volume: float,
-        rate: float,
         location: types.Location,
         well_core: Optional[WellImplementation],
+        volume: float,
+        rate: float,
     ) -> None:
         self.move_to(location=location, well_core=well_core)
         self._raise_if_no_tip(HardwareAction.DISPENSE.name)

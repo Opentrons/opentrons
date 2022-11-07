@@ -79,10 +79,10 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
     def dispense(
         self,
-        volume: float,
-        rate: float,
         location: Location,
         well_core: Optional[WellCore],
+        volume: float,
+        rate: float,
     ) -> None:
         if well_core is None:
             raise NotImplementedError(
