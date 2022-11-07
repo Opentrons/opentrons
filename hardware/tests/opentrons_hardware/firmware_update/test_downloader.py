@@ -38,7 +38,7 @@ def mock_hex_processor() -> MagicMock:
 def chunks() -> List[Chunk]:
     """Data chunks produced by hex processor."""
     return [
-        Chunk(address=0x000, data=list(range(56))),
+        Chunk(address=0x000, data=list(range(48))),
         Chunk(address=0x100, data=[5, 6, 7, 8]),
         Chunk(address=0x200, data=[100, 121]),
     ]

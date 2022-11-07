@@ -258,11 +258,16 @@ class FirmwareUpdateData(FirmwareUpdateWithAddress):
     def __post_init__(self) -> None:
         """Post init processing."""
         data_length = len(self.data.value)
-        if data_length > FirmwareUpdateDataField.NUM_BYTES or
-           data_length % 8 != 0:
+        address = self.address.value
+        if address % 8 != 0:
+            raise ValueError(
+                f"Data address needs to be doubleword aligned."
+                f" {address} mod 8 equals {address % 8} and should be 0"
+            )
+        if data_length > FirmwareUpdateDataField.NUM_BYTES:
             raise ValueError(
                 f"Data cannot be more than"
-                f" {FirmwareUpdateDataField.NUM_BYTES} bytes."
+                f" {FirmwareUpdateDataField.NUM_BYTES} bytes got {data_length}."
             )
 
     @classmethod
