@@ -185,6 +185,7 @@ export function SetWifiCred(): JSX.Element {
             <ConnectionResult
               isConnected={requestState?.status === RobotApi.SUCCESS}
               requestState={requestState}
+              onConnect={handleConnect}
             />
           )}
         </>

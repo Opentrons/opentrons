@@ -21,11 +21,13 @@ import type { NavRouteParams } from '../../App/types'
 interface ConnectionResultProps {
   isConnected: boolean
   requestState?: any // ToDo update this type
+  onConnect: () => void
 }
 
 export function ConnectionResult({
   isConnected,
   requestState,
+  onConnect,
 }: ConnectionResultProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const { ssid } = useParams<NavRouteParams>()
@@ -97,10 +99,7 @@ export function ConnectionResult({
           </>
         ) : (
           <>
-            <SecondaryButton
-              flex="1"
-              onClick={() => console.log('need to call connect again')}
-            >
+            <SecondaryButton flex="1" onClick={onConnect}>
               {t('try_again')}
             </SecondaryButton>
             <PrimaryButton

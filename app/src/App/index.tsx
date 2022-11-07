@@ -25,7 +25,7 @@ import { ProtocolsLanding } from '../pages/Protocols/ProtocolsLanding'
 import { ProtocolDetails } from '../pages/Protocols/ProtocolDetails'
 import { AppSettings } from '../pages/AppSettings'
 import { Labware } from '../pages/Labware'
-import { ODDSplash } from '../pages/ODD/ODDSplash'
+import { InitialSplash } from '../pages/Devices/Setup/InitialSplash'
 import { ConnectedNetworkInfo } from '../organisms/SetupNetworks/ConnectedNetworkInfo'
 import { SelectNetwork } from '../organisms/SetupNetworks/SelectNetwork'
 import { SetWifiCred } from '../organisms/SetupNetworks/SetWifiCred'
@@ -105,18 +105,11 @@ export const AppComponent = (): JSX.Element => {
       name: 'App Settings',
       path: '/app-settings/:appSettingsTab?',
     },
-    // ODD
     {
-      Component: ODDSplash,
+      Component: InitialSplash,
       exact: true,
-      name: 'ODD Setup',
+      name: 'Start Device Setup',
       path: '/deviceSetup',
-    },
-    {
-      Component: ConnectedNetworkInfo,
-      exact: true,
-      name: 'Connected Network Info',
-      path: '/connectedNetworkInfo/:ssid',
     },
     {
       Component: SelectNetwork,
@@ -127,8 +120,14 @@ export const AppComponent = (): JSX.Element => {
     {
       Component: SetWifiCred,
       exact: true,
-      name: 'Set Wifi Password',
+      name: 'Set Wifi Cred',
       path: '/setWifiCred/:ssid',
+    },
+    {
+      Component: ConnectedNetworkInfo,
+      exact: true,
+      name: 'Connected Network Info',
+      path: '/connectedNetworkInfo/:ssid',
     },
   ]
 
@@ -172,8 +171,8 @@ export const AppComponent = (): JSX.Element => {
             <Redirect
               exact
               from="/"
-              // to={isOnDevice ? '/device/start' : '/protocols'}
-              to="/deviceSetup"
+              to={isOnDevice ? '/deviceSetup' : '/protocols'}
+              // to="/deviceSetup"
             />
           </Switch>
           <Alerts />
