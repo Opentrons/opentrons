@@ -25,7 +25,7 @@ cmake --build --preset=gantry-y --target=gantry-y-rev1-flash || true
 cmake --build --preset=head --target=head-rev1-flash || true
 cmake --build --preset=pipettes-rev1 --target=pipettes-single-rev1-flash || true
 cmake --build --preset=pipettes-rev1 --target=pipettes-multi-rev1-flash || true
-cmake --build --preset=gripper-rev1 --target=gripper-rev1-flash || true
+cmake --build --preset=gripper --target=gripper-rev1-flash || true
 cd "$THIS_DIR" || exit
 
 # move all HEX files to temporary folder
