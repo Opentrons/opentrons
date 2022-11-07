@@ -43,8 +43,14 @@ clean:
 		'**/*.pyc'
 
 .PHONY: test
-test:
+test: test-ot2 test-ot3
+
+.PHONY: test-ot2
+test-ot2:
 	$(call pytest,ot-2) $(test_opts) $(tests)
+
+.PHONY: test-ot3
+test-ot3:
 	$(call pytest,ot-3/update-server) $(test_opts) $(tests)
 
 .PHONY: lint
