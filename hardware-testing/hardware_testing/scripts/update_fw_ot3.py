@@ -104,7 +104,7 @@ async def _main(directory: Path, is_simulating: bool) -> None:
                 is_simulating=is_simulating,
             )
     # flash the gripper
-    if has_gripper:
+    if has_gripper and FW_GRIPPER.path:
         _run_update_fw_command(
             path=FW_GRIPPER.path,
             target=FW_GRIPPER.target,
