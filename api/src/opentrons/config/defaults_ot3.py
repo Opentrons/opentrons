@@ -42,7 +42,8 @@ DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSett
             sensor_threshold_pf=1.0,
         ),
         search_initial_tolerance_mm=5.0,
-        search_iteration_limit=10
+        search_iteration_limit=10,
+        nominal_center=(228, 150, 0),
     ),
     probe_length=34.5,
 )
@@ -356,6 +357,7 @@ def _build_default_edge_sense(
         search_iteration_limit=from_conf.get(
             "search_iteration_limit", default.search_iteration_limit
         ),
+        nominal_center=from_conf.get("nominal_center", default.nominal_center),
     )
 
 

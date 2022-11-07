@@ -198,6 +198,7 @@ ot3_dummy_settings = {
             },
             "search_initial_tolerance_mm": 18,
             "search_iteration_limit": 3,
+            "nominal_center": [8, 8, 0],
         },
         "probe_length": 40,
     },

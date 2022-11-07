@@ -427,8 +427,11 @@ async def calibrate_mount(
     # the absolute sense value out-of-plane
     center = Point(x_center, y_center, z_pos)
     LOG.info(f"Found calibration value {center} for mount {mount.name}")
+    instrument_offset = center - Point(
+        *hcapi.config.calibration.edge_sense.nominal_center
+    )
     # save new offset
     # reload
-    await hcapi.save_instrument_offset(mount, center)
+    await hcapi.save_instrument_offset(mount, instrument_offset)
     await hcapi.remove_tip(mount)
     return center
