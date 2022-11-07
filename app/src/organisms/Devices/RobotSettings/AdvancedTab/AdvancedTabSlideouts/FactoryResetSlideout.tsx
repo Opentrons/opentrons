@@ -72,12 +72,14 @@ export function FactoryResetSlideout({
   )
 
   const ot2CalibrationOptions =
+    // TODO(bh, 2022-11-07): update OT-2 filter when gripper calibration reset config option available
     options != null ? options.filter(opt => opt.id.includes('Calibration')) : []
   const ot3CalibrationOptions =
     options != null
       ? options.filter(
           opt =>
             opt.id === 'pipetteOffsetCalibrations' ||
+            // TODO(bh, 2022-11-07): confirm or update when gripper calibration reset config option available
             opt.id === 'gripperCalibration'
         )
       : []
