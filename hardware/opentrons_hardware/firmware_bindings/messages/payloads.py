@@ -11,6 +11,7 @@ from .fields import (
     TaskNameDataField,
     ToolField,
     FirmwareUpdateDataField,
+    ErrorSeverityField,
     ErrorCodeField,
     SensorTypeField,
     SensorIdField,
@@ -49,6 +50,14 @@ class EmptyPayload(utils.BinarySerializable):
     message_index: utils.UInt32Field = field(
         init=False, default=utils.UInt32Field(None)  # type: ignore[arg-type]
     )
+
+
+@dataclass(eq=False)
+class ErrorMessagePayload(EmptyPayload):
+    """Message sent from firmware in the event of an error."""
+
+    severity: ErrorSeverityField
+    error_code: ErrorCodeField
 
 
 @dataclass(eq=False)
