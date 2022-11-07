@@ -31,7 +31,7 @@ const MOCK_ACTUAL_PIPETTE = {
   tipLength: {
     value: 20,
   },
-} as PipetteModelSpecs
+} as any as PipetteModelSpecs
 
 const MOCK_ACTUAL_PIPETTE_EIGHT_CHANNEL = {
   channels: 8,

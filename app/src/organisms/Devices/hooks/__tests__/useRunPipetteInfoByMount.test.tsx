@@ -29,6 +29,7 @@ import _uncastedModifiedSimpleV6Protocol from '../__fixtures__/modifiedSimpleV6.
 import type {
   LabwareDefinition2,
   PipetteNameSpecs,
+  PipetteName,
   ProtocolAnalysisFile,
 } from '@opentrons/shared-data'
 import type { PipetteInfo, ProtocolDetails, StoredProtocolAnalysis } from '..'
@@ -115,9 +116,9 @@ describe('useRunPipetteInfoByMount hook', () => {
       .mockReturnValue((PROTOCOL_DETAILS as unknown) as StoredProtocolAnalysis)
     when(mockGetPipetteNameSpecs)
       .calledWith('p10_single')
-      .mockReturnValue({
+      .mockReturnValue(({
         displayName: 'P10 Single-Channel GEN1',
-      } as PipetteNameSpecs)
+      } as any) as PipetteNameSpecs & {name: PipetteName})
   })
 
   afterEach(() => {

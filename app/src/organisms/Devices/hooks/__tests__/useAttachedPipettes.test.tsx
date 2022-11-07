@@ -26,7 +26,7 @@ describe('useAttachedPipettes hook', () => {
   beforeEach(() => {
     mockGetPipetteModelSpecs.mockReturnValue({
       name: 'mockName',
-    } as PipetteModelSpecs)
+    } as any as PipetteModelSpecs)
   })
   afterEach(() => {
     resetAllWhenMocks()

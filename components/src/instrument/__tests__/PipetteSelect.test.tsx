@@ -7,6 +7,7 @@ import {
   GEN1,
   GEN2,
   GEN3,
+  PipetteName,
 } from '@opentrons/shared-data'
 import { PipetteSelect } from '../PipetteSelect'
 import { Select } from '../../forms'
@@ -42,12 +43,8 @@ describe('PipetteSelect', () => {
 
   it('passes pipettes as grouped options to Select', () => {
     const wrapper = shallow(<PipetteSelect onPipetteChange={jest.fn()} />)
-    const pipetteSpecs: PipetteNameSpecs[] = getAllPipetteNames(
-      'maxVolume',
-      'channels'
-    )
+    const pipetteSpecs = getAllPipetteNames('maxVolume', 'channels')
       .map(getPipetteNameSpecs)
-      .filter((specs): specs is PipetteNameSpecs => specs !== null)
 
     const gen3Specs = pipetteSpecs.filter(s => s.displayCategory === GEN3)
     const gen2Specs = pipetteSpecs.filter(s => s.displayCategory === GEN2)
@@ -67,12 +64,8 @@ describe('PipetteSelect', () => {
   })
 
   it('can omit pipettes by name', () => {
-    const pipetteSpecs: PipetteNameSpecs[] = getAllPipetteNames(
-      'maxVolume',
-      'channels'
-    )
+    const pipetteSpecs = getAllPipetteNames('maxVolume', 'channels')
       .map(getPipetteNameSpecs)
-      .filter((specs): specs is PipetteNameSpecs => specs !== null)
 
     const gen3Specs = pipetteSpecs.filter(s => s.displayCategory === GEN3)
     const gen2Specs = pipetteSpecs.filter(s => s.displayCategory === GEN2)

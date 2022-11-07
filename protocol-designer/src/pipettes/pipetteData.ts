@@ -1,5 +1,4 @@
 import assert from 'assert'
-import { DropdownOption } from '../../../components/lib/forms/DropdownField.d'
 import {
   getPipetteNameSpecs,
   getTiprackVolume,
@@ -21,16 +20,11 @@ const supportedPipetteNames: PipetteName[] = [
 export const pipetteOptions: Options = supportedPipetteNames
   .map((name: PipetteName) => {
     const pipette = getPipetteNameSpecs(name)
-    return pipette
-      ? {
-          name: pipette.displayName,
-          value: pipette.name,
-        }
-      : null
+    return {
+      name: pipette.displayName,
+      value: pipette.name,
+    }
   })
-  .filter<DropdownOption>(
-    (option: DropdownOption | null): option is DropdownOption => Boolean(option)
-  )
 
 // NOTE: this is similar to getPipetteWithTipMaxVol, the fns could potentially
 // be merged once multiple tiprack types per pipette is supported
@@ -44,8 +38,7 @@ export function getPipetteCapacity(pipetteEntity: PipetteEntity): number {
 
   assert(
     false,
-    `Expected spec and tiprack def for pipette ${
-      pipetteEntity ? pipetteEntity.id : '???'
+    `Expected spec and tiprack def for pipette ${pipetteEntity ? pipetteEntity.id : '???'
     }`
   )
   return NaN

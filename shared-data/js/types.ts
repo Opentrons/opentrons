@@ -21,7 +21,7 @@ import {
 } from './constants'
 import type { INode } from 'svgson'
 import type { RunTimeCommand } from '../protocol'
-import type { PipetteName } from './pipettes'
+import type { PipetteModel, PipetteName } from './pipettes'
 import { LabwareLocation } from '../protocol/types/schemaV6/command/setup'
 
 export type RobotType = 'OT-2 Standard' | 'OT-3 Standard'
@@ -343,7 +343,6 @@ export interface FlowRateSpec {
 }
 
 export interface PipetteNameSpecs {
-  name: string
   displayName: string
   displayCategory: PipetteDisplayCategory
   minVolume: number
@@ -360,14 +359,38 @@ export interface PipetteNameSpecs {
   }
 }
 
-// TODO(bc, 2021-05-27): the type of `model` here should be PipetteModel
-// TODO(mc, 2019-10-14): update this type according to the schema
+interface EditConfigurations {
+  value: number | number[]
+  min?: number
+  max?: number
+  units?: string
+  type?: string
+  displayName?: string
+}
+
 export interface PipetteModelSpecs extends PipetteNameSpecs {
-  model: string
+  name: PipetteName
   backCompatNames?: string[]
-  tipLength: {
-    value: number
-  }
+  top: EditConfigurations
+  bottom: EditConfigurations
+  blowout: EditConfigurations
+  dropTip: EditConfigurations
+  pickUpCurrent: EditConfigurations
+  pickUpDistance: EditConfigurations
+  pickUpPresses: EditConfigurations
+  pickUpIncrement: EditConfigurations
+  pickUpSpeed: EditConfigurations
+  modelOffset: number[]
+  nozzleOffset: number[]
+  plungerCurrent: EditConfigurations
+  dropTipCurrent: EditConfigurations
+  dropTipSpeed: EditConfigurations
+  ulPerMm: Array<{aspirate: number[][], dispense: number[][]}>
+  quirks: string[]
+  tipLength: {value: number} 
+  idleCurrent?: number
+  returnTipHeight?: number 
+  tipOverlap: {default: number, [additionalProperties: string]: number}
 }
 export interface ProtocolMetadata {
   protocolName?: string

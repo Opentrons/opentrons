@@ -12,7 +12,7 @@ import {
 import { Box, Flex } from '@opentrons/components'
 import { Select } from '../../atoms/SelectField/Select'
 
-import type { PipetteNameSpecs } from '@opentrons/shared-data'
+import type { PipetteNameSpecs, PipetteName } from '@opentrons/shared-data'
 import type { ActionMeta, SingleValue, MultiValue } from 'react-select'
 import type { SelectOption } from '../../atoms/SelectField/Select'
 
@@ -34,19 +34,17 @@ export interface PipetteSelectProps {
 
 const PIPETTE_SORT = ['maxVolume', 'channels'] as const
 
-// @ts-expect-error(mc, 2021-04-27): use TS type guard for filter
-const allPipetteNameSpecs: PipetteNameSpecs[] = getAllPipetteNames(
+const allPipetteNameSpecs = getAllPipetteNames(
   ...PIPETTE_SORT
 )
   .map(getPipetteNameSpecs)
-  .filter(Boolean)
 
 const specsByCategory = groupBy(allPipetteNameSpecs, 'displayCategory')
 
 const specToOption = ({
   name,
   displayName,
-}: PipetteNameSpecs): { value: string; label: string } => ({
+}: PipetteNameSpecs & {name: PipetteName}): { value: string; label: string } => ({
   value: name,
   label: displayName,
 })

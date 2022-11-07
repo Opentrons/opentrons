@@ -7,6 +7,7 @@ import {
   GEN1,
   GEN2,
   GEN3,
+  PipetteName,
 } from '@opentrons/shared-data'
 import { Select, CONTEXT_VALUE } from '../forms'
 import styles from './PipetteSelect.css'
@@ -41,19 +42,17 @@ const OPTION_NONE = { value: '', label: NONE }
 
 const PIPETTE_SORT = ['maxVolume', 'channels'] as const
 
-// @ts-expect-error(mc, 2021-04-27): use TS type guard for filter
-const allPipetteNameSpecs: PipetteNameSpecs[] = getAllPipetteNames(
+const allPipetteNameSpecs: Array<PipetteNameSpecs & {name: PipetteName}> = getAllPipetteNames(
   ...PIPETTE_SORT
 )
   .map(getPipetteNameSpecs)
-  .filter(Boolean)
 
 const specsByCategory = groupBy(allPipetteNameSpecs, 'displayCategory')
 
 const specToOption = ({
   name,
   displayName,
-}: PipetteNameSpecs): { value: string; label: string } => ({
+}: PipetteNameSpecs & {name: PipetteName}): { value: string; label: string } => ({
   value: name,
   label: displayName,
 })

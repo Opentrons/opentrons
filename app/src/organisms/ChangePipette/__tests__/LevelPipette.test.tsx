@@ -1,9 +1,11 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
-import { LEFT, PipetteNameSpecs } from '@opentrons/shared-data'
+import { LEFT } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import { LevelPipette } from '../LevelPipette'
+
+import type { PipetteName, PipetteNameSpecs } from '@opentrons/shared-data'
 
 const render = (props: React.ComponentProps<typeof LevelPipette>) => {
   return renderWithProviders(<LevelPipette {...props} />, {
@@ -51,7 +53,7 @@ const MOCK_WANTED_PIPETTE = {
     'opentrons/opentrons_96_filtertiprack_200ul/1',
   ],
   name: 'p300_multi_gen2',
-} as PipetteNameSpecs
+} as PipetteNameSpecs & {name: PipetteName}
 
 describe('LevelPipette', () => {
   let props: React.ComponentProps<typeof LevelPipette>

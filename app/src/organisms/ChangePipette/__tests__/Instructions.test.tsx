@@ -32,7 +32,7 @@ const MOCK_ACTUAL_PIPETTE = {
   tipLength: {
     value: 20,
   },
-} as PipetteModelSpecs
+} as any as PipetteModelSpecs
 
 describe('Instructions', () => {
   let props: React.ComponentProps<typeof Instructions>

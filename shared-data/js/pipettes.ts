@@ -1,15 +1,29 @@
-import pipetteNameSpecs from '../pipette/definitions/pipetteNameSpecs.json'
-import pipetteModelSpecs from '../pipette/definitions/pipetteModelSpecs.json'
+import _pipetteNameSpecs from '../pipette/definitions/pipetteNameSpecs.json'
+import _pipetteModelSpecs from '../pipette/definitions/pipetteModelSpecs.json'
 import { OT3_PIPETTES } from './constants'
 
 import type { PipetteNameSpecs, PipetteModelSpecs } from './types'
 
 type SortableProps = 'maxVolume' | 'channels'
 
+interface ModelSpecsFile {
+  config: { [model: string]: Omit<PipetteModelSpecs, keyof PipetteNameSpecs> }
+  mutableConfigs: Array<keyof PipetteModelSpecs>
+  validQuirks: Array<keyof PipetteModelSpecs['quirks']>
+}
+interface NameSpecsFile {
+  [name: string]: Omit<PipetteNameSpecs, 'name'>
+}
+
+const pipetteModelSpecs = _pipetteModelSpecs as ModelSpecsFile
+const pipetteNameSpecs = _pipetteNameSpecs as NameSpecsFile
+
 // TODO(mc, 2021-04-30): use these types, pulled directly from the JSON,
 // to simplify return types in this module and possibly remove some `null`s
-export type PipetteName = keyof typeof pipetteNameSpecs
-export type PipetteModel = keyof typeof pipetteModelSpecs.config
+export type PipetteName = keyof typeof _pipetteNameSpecs
+export type PipetteModel = keyof typeof _pipetteModelSpecs.config
+
+
 
 // models sorted by channels and then volume by default
 const ALL_PIPETTE_NAMES: PipetteName[] = (Object.keys(
@@ -19,11 +33,9 @@ const ALL_PIPETTE_NAMES: PipetteName[] = (Object.keys(
 // use a name like 'p10_single' to get specs true for all models under that name
 export function getPipetteNameSpecs(
   name: PipetteName
-): PipetteNameSpecs | null {
-  const config = pipetteNameSpecs[name] as
-    | Omit<PipetteNameSpecs, 'name'>
-    | undefined
-  return config != null ? { ...config, name } : null
+): PipetteNameSpecs & {name: PipetteName} {
+  const config = pipetteNameSpecs[name]
+  return { ...config, name }
 }
 
 // specify a model, eg 'p10_single_v1.3' to get
@@ -31,12 +43,10 @@ export function getPipetteNameSpecs(
 // NOTE: this should NEVER be used in PD, which is model-agnostic
 export function getPipetteModelSpecs(
   model: PipetteModel
-): PipetteModelSpecs | null | undefined {
+): PipetteModelSpecs & PipetteNameSpecs {
   const modelSpecificFields = pipetteModelSpecs.config[model]
-  const modelFields =
-    modelSpecificFields &&
-    getPipetteNameSpecs(modelSpecificFields.name as PipetteName)
-  return modelFields && { ...modelFields, ...modelSpecificFields, model }
+  const nameFields = getPipetteNameSpecs(modelSpecificFields.name)
+  return { ...nameFields, ...modelSpecificFields }
 }
 
 export function getAllPipetteNames(...sortBy: SortableProps[]): PipetteName[] {
@@ -75,7 +85,7 @@ export function isOT3Pipette(pipetteName: PipetteName): boolean {
 
 export const getIncompatiblePipetteNames = (
   currentPipette: PipetteName
-): string[] => {
+): PipetteName[] => {
   if (isOT3Pipette(currentPipette)) {
     return getAllPipetteNames().filter(pipette => !isOT3Pipette(pipette))
   } else if (

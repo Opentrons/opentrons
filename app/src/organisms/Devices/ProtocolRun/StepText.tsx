@@ -130,10 +130,8 @@ export function StepText(props: Props): JSX.Element | null {
       // getLabwareDisplayName(
       //   labwareRenderInfoById[labwareId].labwareDef
       // )
-      console.log(strategy, labwareId, newLocation)
-      console.log(Object.keys(protocolData.modules).map(id => ({ ...protocolData.modules[id], id })))
-      const displayLocation = getDisplayLocation(newLocation, Object.keys(protocolData.modules).map(id => ({ ...protocolData.modules[id], id })), t)
-      console.log('displayLocation', displayLocation)
+      const displayLocation = ''
+      // getDisplayLocation(newLocation, protocolData.modules).map(id => ({ ...protocolData.modules[id], id })), t)
       messageNode = strategy === 'usingGripper'
         ? t('move_labware_with_gripper', { labware: labwareDisplayName, location: displayLocation })
         : t('move_labware_manually', { labware: labwareDisplayName, location: displayLocation })

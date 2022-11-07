@@ -20,7 +20,7 @@ import { ExitModal } from '../ExitModal'
 import { ConfirmPipette } from '../ConfirmPipette'
 import { ChangePipette } from '..'
 
-import type { PipetteNameSpecs } from '@opentrons/shared-data'
+import type { PipetteNameSpecs, PipetteName } from '@opentrons/shared-data'
 import type { AttachedPipette } from '../../../redux/pipettes/types'
 import type { DispatchApiRequestType } from '../../../redux/robot-api'
 
@@ -100,11 +100,11 @@ const render = (props: React.ComponentProps<typeof ChangePipette>) => {
 }
 
 const mockP300PipetteNameSpecs = {
-  name: 'p300_single_gen2',
+  name: 'p300_single_gen2' as const,
   displayName: 'P300 Single GEN2',
   channels: 1,
   displayCategory: 'GEN2',
-} as PipetteNameSpecs
+} as any as (PipetteNameSpecs & {name: PipetteName})
 
 const mockAttachedPipettes = {
   id: 'abc',
@@ -135,7 +135,7 @@ describe('ChangePipette', () => {
     mockGetCalibrationForPipette.mockReturnValue(null)
     mockGetHasCalibrationBlock.mockReturnValue(false)
     mockGetMovementStatus.mockReturnValue(null)
-    mockGetPipetteNameSpecs.mockReturnValue(null)
+    mockGetPipetteNameSpecs.mockReturnValue(mockP300PipetteNameSpecs)
 
     when(mockUseDeprecatedCalibratePipetteOffset).mockReturnValue([
       startWizard,
