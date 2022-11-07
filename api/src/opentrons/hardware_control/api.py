@@ -532,6 +532,7 @@ class API(HardwareControlAPI):
                 "blow_out_flow_rate",
                 "working_volume",
                 "tip_overlap",
+                "tip_size",
                 "available_volume",
                 "return_tip_height",
                 "default_aspirate_flow_rates",
@@ -545,6 +546,8 @@ class API(HardwareControlAPI):
             #  this dict newly every time? Any why only a few items are being updated?
             for key in configs:
                 result[key] = instr_dict[key]
+            print("Pipette Dictionay")
+            print(f"{instr_dict}")
             result["has_tip"] = instr.has_tip
             result["tip_length"] = instr.current_tip_length
             result["aspirate_speed"] = self._plunger_speed(

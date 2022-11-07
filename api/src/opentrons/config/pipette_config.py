@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import (
         PipetteName,
         PipetteModel,
+        PipetteTipSize,
         UlPerMm,
         Quirk,
         PipetteFusedSpec,
@@ -48,6 +49,7 @@ class PipetteConfig:
     tip_length: float  # TODO(seth): remove
     # TODO: Replace entirely with tip length calibration
     tip_overlap: Dict[str, float]
+    tip_size: PipetteTipSize
     display_name: str
     name: PipetteName
     back_compat_names: List[PipetteName]
@@ -195,6 +197,7 @@ def load(pipette_model: PipetteModel, pipette_id: str = None) -> PipetteConfig:
         quirks=validate_quirks(ensure_value(cfg, "quirks", MUTABLE_CONFIGS)),
         tip_overlap=cfg["tipOverlap"],
         tip_length=ensure_value(cfg, "tipLength", MUTABLE_CONFIGS),
+        tip_size=ensure_value(cfg, "tipSize", MUTABLE_CONFIGS),
         display_name=ensure_value(cfg, "displayName", MUTABLE_CONFIGS),
         name=cfg["name"],
         back_compat_names=cfg.get("backCompatNames", []),

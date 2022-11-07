@@ -26,6 +26,8 @@ DisplayCategory = Union[Literal['GEN1'], Literal['GEN2']]
 
 ConfigUnit = Union[Literal['mm'], Literal['amps'], Literal['mm/sec']]
 
+PipetteTipSize = Union[Literal['1000uL'], Literal['200uL'], Literal['50uL']]
+
 Quirk = NewType('Quirk', str)
 
 ChannelCount = Union[Literal[1], Literal[8]]
@@ -110,6 +112,7 @@ class PipetteModelSpec(TypedDict, total=False):
     ulPerMm: List[UlPerMm]
     tipOverlap: Dict[str, float]
     tipLength: PipetteCustomizableConfigElementFloat
+    tipSize: PipetteTipSize
     quirks: List[Quirk]
     # these keys are not present in some pipette definitions
     backCompatNames: List[PipetteName]
