@@ -87,7 +87,11 @@ export const ThermocyclerModuleData = (
         <Flex flexDirection={DIRECTION_ROW}>
           <Box marginRight={SPACING.spacing2}>
             <StatusLabel
-              status={data.lidStatus}
+              status={
+                data.lidStatus === 'in_between' || data.lidStatus === 'open'
+                  ? 'open'
+                  : 'closed'
+              }
               backgroundColor={COLORS.medGreyEnabled}
               textColor={COLORS.darkBlackEnabled}
               showIcon={false}
