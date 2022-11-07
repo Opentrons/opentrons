@@ -70,6 +70,7 @@ class WellOrigin(str, Enum):
     BOTTOM = "bottom"
 
 
+# Deliberately separate from Vec3f to let components default to 0.
 class WellOffset(BaseModel):
     """An offset vector in (x, y, z)."""
 
@@ -94,6 +95,7 @@ class Dimensions:
     z: float
 
 
+# TODO(mm, 2022-11-07): Deduplicate with Vec3f.
 class DeckPoint(BaseModel):
     """Coordinates of a point in deck space."""
 
@@ -203,6 +205,13 @@ class ModuleDimensions(BaseModel):
     lidHeight: Optional[float]
 
 
+class Vec3f(BaseModel):
+    x: float
+    y: float
+    z: float
+
+
+# TODO(mm, 2022-11-07): Deduplicate with Vec3f.
 class ModuleCalibrationPoint(BaseModel):
     """Calibration Point type for module definition."""
 
@@ -211,6 +220,7 @@ class ModuleCalibrationPoint(BaseModel):
     z: float
 
 
+# TODO(mm, 2022-11-07): Deduplicate with Vec3f.
 class LabwareOffsetVector(BaseModel):
     """Offset, in deck coordinates from nominal to actual position."""
 
@@ -219,6 +229,7 @@ class LabwareOffsetVector(BaseModel):
     z: float
 
 
+# TODO(mm, 2022-11-07): Deduplicate with Vec3f.
 class InstrumentOffsetVector(BaseModel):
     """Instrument Offset from home position to robot deck."""
 

@@ -1,4 +1,11 @@
 """Calibration commands."""
+from .calibrate_gripper import (
+    CalibrateGripperParams,
+    CalibrateGripperResult,
+    CalibrateGripperCreate,
+    CalibrateGripperCommandType,
+    CalibrateGripper,
+)
 
 from .calibrate_pipette import (
     CalibratePipetteParams,
@@ -17,6 +24,12 @@ from .move_to_location import (
 )
 
 __all__ = [
+    # calibration/calibrateGripper
+    "CalibrateGripper",
+    "CalibrateGripperCreate",
+    "CalibrateGripperParams",
+    "CalibrateGripperResult",
+    "CalibrateGripperCommandType",
     # calibration/calibratePipette
     "CalibratePipette",
     "CalibratePipetteCreate",
