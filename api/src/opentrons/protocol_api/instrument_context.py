@@ -268,6 +268,7 @@ class InstrumentContext(publisher.CommandPublisher):
             well = location
             well_parent = location.parent.parent
             # TODO(tz, 11-4-2022): I hate this. Is there a better way?
+            # PE does not check fixed trash
             if (
                 well_parent
                 and isinstance(well_parent, LabwareLike)
@@ -278,7 +279,6 @@ class InstrumentContext(publisher.CommandPublisher):
                 dest = location.bottom(
                     self._implementation.get_well_bottom_clearance().dispense
                 )
-            # )
         elif isinstance(location, types.Location):
             dest = location
             _, well = dest.labware.get_parent_labware_and_well()

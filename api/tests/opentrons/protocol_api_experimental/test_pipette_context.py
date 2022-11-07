@@ -5,7 +5,6 @@ from decoy import Decoy
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.types import WellOrigin, WellOffset, WellLocation
 from opentrons.protocol_api_experimental import PipetteContext, Labware, Well
-from opentrons.protocol_api.core.protocol_api.well import WellImplementation
 
 
 @pytest.fixture

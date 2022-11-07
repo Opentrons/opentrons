@@ -15,6 +15,7 @@ from opentrons.protocol_api.core.protocol_api.protocol_context import (
 from opentrons.protocol_api.core.protocol_api.instrument_context import (
     InstrumentContextImplementation,
 )
+from opentrons.protocol_api.core.protocol_api.legacy_module_core import LegacyModuleCore
 
 
 @pytest.fixture(params=[Mount.LEFT, Mount.RIGHT])
@@ -51,6 +52,9 @@ def mock_protocol_impl(
 ) -> ProtocolContextImplementation:
     protocol_impl = decoy.mock(cls=ProtocolContextImplementation)
     decoy.when(protocol_impl.get_hardware()).then_return(mock_sync_hardware_api)
+    decoy.when(protocol_impl.get_module_cores()).then_return(
+        [decoy.mock(cls=LegacyModuleCore)]
+    )
     return protocol_impl
 
 
@@ -93,22 +97,6 @@ def test_home_legacy_behavior(
 ) -> None:
     """It should avoid homing other instrument in API version <= 2.12."""
     subject.home()
-
-    decoy.verify(
-        mock_sync_hardware_api.home_z(mount=mount, allow_home_other=False),
-        mock_sync_hardware_api.home_plunger(mount),
-    )
-
-
-@pytest.mark.parametrize("api_version", [APIVersion(2, 12)])
-def test_dispense(
-    mount: Mount,
-    decoy: Decoy,
-    mock_sync_hardware_api: SyncHardwareAPI,
-    subject: InstrumentContextImplementation,
-) -> None:
-    """It should move to location and then dispense."""
-    subject.dispense()
 
     decoy.verify(
         mock_sync_hardware_api.home_z(mount=mount, allow_home_other=False),
