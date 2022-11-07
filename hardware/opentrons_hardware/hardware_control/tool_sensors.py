@@ -1,6 +1,6 @@
 """Functions for commanding motion limited by tool sensors."""
 import asyncio
-from typing import Union, List, Iterator, Tuple, Optional
+from typing import Union, List, Iterator, Tuple
 from logging import getLogger
 from numpy import float64
 from math import copysign
@@ -44,7 +44,7 @@ async def capacitive_probe(
     mover: NodeId,
     distance: float,
     speed: float,
-    sensor_id: Optional[SensorId] = None,
+    sensor_id: SensorId = SensorId.S0,
     relative_threshold_pf: float = 1.0,
     log_sensor_values: bool = False,
 ) -> Tuple[float, float]:
@@ -57,9 +57,7 @@ async def capacitive_probe(
     either by negating speed or negating distance.
     """
     sensor_scheduler = SensorScheduler()
-    sensor_info = SensorInformation(
-        SensorType.capacitive, sensor_id or SensorId.S0, tool
-    )
+    sensor_info = SensorInformation(SensorType.capacitive, sensor_id, tool)
     threshold = await sensor_scheduler.send_threshold(
         SensorThresholdInformation(
             sensor=sensor_info,
@@ -88,13 +86,13 @@ async def capacitive_pass(
     mover: NodeId,
     distance: float,
     speed: float,
-    sensor_id: Optional[SensorId] = SensorId.S0,
+    sensor_id: SensorId = SensorId.S0,
 ) -> List[float]:
     """Move the specified axis while capturing capacitive sensor readings."""
     sensor_scheduler = SensorScheduler()
     sensor_info = SensorInformation(
         sensor_type=SensorType.capacitive,
-        sensor_id=sensor_id or SensorId.S0,
+        sensor_id=sensor_id,
         node_id=tool,
     )
     pass_group = _build_pass_step(mover, distance, speed)
