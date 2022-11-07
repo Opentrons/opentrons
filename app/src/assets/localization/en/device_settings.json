@@ -145,5 +145,9 @@
   "show": "Show",
   "search_again": "Search again",
   "searching": "Searching",
-  "connect": "Connect"
+  "connect": "Connect",
+  "done": "Done",
+  "try_again": "Try again",
+  "connected_to_ssid": "Connected to {{ssid}}",
+  "failed_to_connect_to_ssid": "Failed to connect to {{ssid}}"
 }
