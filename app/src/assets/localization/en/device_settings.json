@@ -143,5 +143,7 @@
   "connect_to_a_network": "Connect to a network",
   "hide": "Hide",
   "show": "Show",
-  "search_again": "Search again"
+  "search_again": "Search again",
+  "searching": "Searching",
+  "connect": "Connect"
 }

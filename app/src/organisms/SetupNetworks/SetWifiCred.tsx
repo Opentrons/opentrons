@@ -22,22 +22,13 @@ import {
 import * as RobotApi from '../../redux/robot-api'
 import * as Networking from '../../redux/networking'
 import { getLocalRobot } from '../../redux/discovery'
-import {
-  CONNECT,
-  DISCONNECT,
-  JOIN_OTHER,
-} from '../Devices/RobotSettings/ConnectNetwork/constants'
 import { StyledText } from '../../atoms/text'
 import { InputField } from '../../atoms/InputField'
 import { NormalKeyboard } from '../../atoms/SoftwareKeyboard'
 
 import type { State, Dispatch } from '../../redux/types'
 import type { NavRouteParams } from '../../App/types'
-import type {
-  NetworkChangeState,
-  WifiConfigureRequest,
-  WifiEapConfig,
-} from '../Devices/RobotSettings/ConnectNetwork/types'
+import type { WifiConfigureRequest } from '../Devices/RobotSettings/ConnectNetwork/types'
 import { TertiaryButton } from '../../atoms/buttons'
 import { ConnectingNetwork } from './ConnectingNetwork'
 import { ConnectionResult } from './ConnectionResult'
@@ -46,7 +37,7 @@ const STATUS_REFRESH_MS = 5000
 const LIST_REFRESH_MS = 10000
 
 export function SetWifiCred(): JSX.Element {
-  const { t } = useTranslation('device_settings')
+  const { t } = useTranslation(['device_settings', 'shared'])
   const { ssid } = useParams<NavRouteParams>()
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
@@ -68,9 +59,8 @@ export function SetWifiCred(): JSX.Element {
   const formatNetworkSettings = (): WifiConfigureRequest => {
     // ToDo kj 11/02/22 eapConfig for TLS
     const securityType = selectedNetwork?.securityType
-    const hidden = false // Need to update for manual connecting process
-    // const psk = password
-    const psk = 'parcel prone treat uneasy'
+    const hidden = false // ToDo update for manual connect when the design is ready for dev
+    const psk = password
 
     return {
       ssid,
@@ -84,11 +74,7 @@ export function SetWifiCred(): JSX.Element {
   const handleConnect = (): void => {
     const options = formatNetworkSettings()
     dispatchApiRequest(Networking.postWifiConfigure(robotName, options))
-    // history.push(`/connectionResult/${options.ssid}`)
-    // console.log(`trying to connect to ${options.ssid}`)
-    // if (changeState.type === JOIN_OTHER) {
-    //   setChangeState({ ...changeState, ssid: options.ssid })
-    // }
+    // ToDo There will be needed codes for manual connect for wpa-2
   }
 
   useInterval(
@@ -125,7 +111,7 @@ export function SetWifiCred(): JSX.Element {
                   lineHeight="2.1875rem"
                   fontWeight="700"
                 >
-                  {'Back'}
+                  {t('shared:back')}
                 </StyledText>
               </Flex>
             </Btn>
@@ -140,7 +126,7 @@ export function SetWifiCred(): JSX.Element {
               lineHeight="2.0425rem"
               onClick={handleConnect}
             >
-              {'Connect'}
+              {t('connect')}
             </TertiaryButton>
           </Flex>
 
@@ -161,6 +147,7 @@ export function SetWifiCred(): JSX.Element {
                   height="3.875rem"
                   css={css`
                     font-size: 1.25rem;
+                    line-height: 1.25rem;
                   `}
                 />
               </Box>
@@ -197,100 +184,11 @@ export function SetWifiCred(): JSX.Element {
           ) : (
             <ConnectionResult
               isConnected={requestState?.status === RobotApi.SUCCESS}
+              requestState={requestState}
             />
           )}
         </>
       )}
     </>
-    // <>
-    //   {requestState?.status === 'pending' ? (
-    //     <ConnectingNetwork />
-    //   ) : (
-    //     <Flex flexDirection={DIRECTION_COLUMN} margin={SPACING.spacingXXL}>
-    //       <Flex
-    //         flexDirection={DIRECTION_ROW}
-    //         justifyContent={JUSTIFY_SPACE_BETWEEN}
-    //         alignItems={ALIGN_CENTER}
-    //         marginBottom="3.0625rem"
-    //       >
-    //         <Btn onClick={() => history.push(`/selectNetwork`)}>
-    //           <Flex flexDirection={DIRECTION_ROW}>
-    //             <Icon
-    //               name="arrow-back"
-    //               marginRight={SPACING.spacing2}
-    //               size="1.875rem"
-    //             />
-    //             <StyledText
-    //               fontSize="1.625rem"
-    //               lineHeight="2.1875rem"
-    //               fontWeight="700"
-    //             >
-    //               {'Back'}
-    //             </StyledText>
-    //           </Flex>
-    //         </Btn>
-    //         <StyledText fontSize="2rem" lineHeight="2.75rem" fontWeight="700">
-    //           {`${ssid}`}
-    //         </StyledText>
-    //         <TertiaryButton
-    //           width="8.9375rem"
-    //           height="3.75rem"
-    //           fontSize="1.5rem"
-    //           fontWeight="500"
-    //           lineHeight="2.0425rem"
-    //           onClick={handleConnect}
-    //         >
-    //           {'Connect'}
-    //         </TertiaryButton>
-    //       </Flex>
-
-    //       <Flex
-    //         width="100%"
-    //         flexDirection={DIRECTION_COLUMN}
-    //         paddingLeft="6.25rem"
-    //       >
-    //         <StyledText marginBottom="0.75rem">{'Enter password'}</StyledText>
-    //         <Flex flexDirection={DIRECTION_ROW}>
-    //           {/* ToDo
-    //     error case 1 not securityType none check input length if zero, show enter password */}
-    //           <Box width="36.375rem">
-    //             <InputField
-    //               data-testid="Set_WiFi_password"
-    //               value={password}
-    //               type={showPassword ? 'text' : 'password'}
-    //               height="3.875rem"
-    //               css={css`
-    //                 font-size: 1.25rem;
-    //               `}
-    //             />
-    //           </Box>
-
-    //           <Btn
-    //             marginLeft="1.5rem"
-    //             onClick={() => setShowPassword(currentState => !currentState)}
-    //           >
-    //             <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-    //               <Icon
-    //                 name={showPassword ? 'eye-slash' : 'eye'}
-    //                 width="2.75rem"
-    //                 height="1.875rem"
-    //               />
-    //               <StyledText marginLeft={SPACING.spacing4}>
-    //                 {showPassword ? t('hide') : t('show')}
-    //               </StyledText>
-    //             </Flex>
-    //           </Btn>
-    //         </Flex>
-    //       </Flex>
-
-    //       <Flex width="100%" position={POSITION_FIXED} left="0" bottom="0">
-    //         <NormalKeyboard
-    //           onChange={e => e != null && setPassword(String(e))}
-    //           keyboardRef={keyboardRef}
-    //         />
-    //       </Flex>
-    //     </Flex>
-    //   )}
-    // </>
   )
 }

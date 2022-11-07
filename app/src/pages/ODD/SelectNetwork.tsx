@@ -10,7 +10,6 @@ import {
   ALIGN_CENTER,
   DIRECTION_ROW,
   Icon,
-  useScroll,
   JUSTIFY_CENTER,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
@@ -28,6 +27,7 @@ const LIST_REFRESH_MS = 10000
 
 export function SelectNetwork(): JSX.Element {
   const { t } = useTranslation('device_settings')
+  const [isSearching, setIsSearching] = React.useState<boolean>(false)
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const dispatch = useDispatch<Dispatch>()
@@ -35,7 +35,6 @@ export function SelectNetwork(): JSX.Element {
     Networking.getWifiList(state, robotName)
   )
   const history = useHistory()
-  const scroll = useScroll()
 
   React.useEffect(() => {
     dispatch(Networking.fetchWifiList(robotName))
@@ -48,6 +47,7 @@ export function SelectNetwork(): JSX.Element {
   )
 
   const handleSearch = (): void => {
+    setIsSearching(true)
     dispatch(Networking.fetchWifiList(robotName))
   }
 
@@ -55,10 +55,12 @@ export function SelectNetwork(): JSX.Element {
     <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacingXXL}>
       {list.length > 0 ? (
         <>
-          <HeaderWithIPs handleSearch={handleSearch} />
+          <HeaderWithIPs
+            handleSearch={handleSearch}
+            isSearching={isSearching}
+          />
           {list.map(nw => (
             <Flex
-              ref={scroll.ref}
               width="59rem"
               height="4rem"
               flexDirection={DIRECTION_ROW}
@@ -97,9 +99,13 @@ export function SelectNetwork(): JSX.Element {
 
 interface HeadWithIPsProps {
   handleSearch: () => void
+  isSearching: boolean
 }
 
-const HeaderWithIPs = ({ handleSearch }: HeadWithIPsProps): JSX.Element => {
+const HeaderWithIPs = ({
+  handleSearch,
+  isSearching,
+}: HeadWithIPsProps): JSX.Element => {
   const { t } = useTranslation('device_settings')
   return (
     <Flex
@@ -124,7 +130,7 @@ const HeaderWithIPs = ({ handleSearch }: HeadWithIPsProps): JSX.Element => {
           lineHeight="2.0425rem"
           onClick={handleSearch}
         >
-          {'Search again'}
+          {!isSearching ? t('search_again') : t('searching')}
         </TertiaryButton>
       </Flex>
     </Flex>

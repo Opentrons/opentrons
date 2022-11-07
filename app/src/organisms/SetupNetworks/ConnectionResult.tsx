@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import { useHistory, useParams } from 'react-router-dom'
-import last from 'lodash/last'
+
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -11,44 +11,24 @@ import {
   SPACING,
   TYPOGRAPHY,
   Icon,
-  useInterval,
 } from '@opentrons/components'
-import { getRequestById, useDispatchApiRequest } from '../../redux/robot-api'
-import { fetchWifiList } from '../../redux/networking'
-import { getLocalRobot } from '../../redux/discovery'
+
 import { StyledText } from '../../atoms/text'
 import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
 
 import type { NavRouteParams } from '../../App/types'
-import type { State, Dispatch } from '../../redux/types'
-
-const LIST_REFRESH_MS = 10000
 
 interface ConnectionResultProps {
   isConnected: boolean
+  requestState?: any
 }
 
 export function ConnectionResult({
   isConnected,
 }: ConnectionResultProps): JSX.Element {
+  const { t } = useTranslation('device_settings')
   const { ssid } = useParams<NavRouteParams>()
-  const localRobot = useSelector(getLocalRobot)
-  const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const history = useHistory()
-  const dispatch = useDispatch<Dispatch>()
-  const [dispatchApi, requestIds] = useDispatchApiRequest()
-  const requestState = useSelector((state: State) => {
-    const lastId = last(requestIds)
-    return lastId != null ? getRequestById(state, lastId) : null
-  })
-
-  useInterval(
-    () => {
-      dispatch(fetchWifiList(robotName))
-    },
-    LIST_REFRESH_MS,
-    true
-  )
 
   // ToDo use isConnected for rendering parts
   return (
@@ -61,7 +41,7 @@ export function ConnectionResult({
               fontWeight="700"
               lineHeight="2.72375rem"
             >
-              {'Connect to a network'}
+              {t('connect_to_a_network')}
             </StyledText>
           </Flex>
           <Flex
