@@ -329,6 +329,7 @@ def test_dispense(
             origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1)
         ),
         volume=10,
+        flow_rate=2.0,
     )
 
     assert result == response

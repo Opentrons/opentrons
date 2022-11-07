@@ -81,10 +81,31 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         self,
         volume: float,
         rate: float,
-        location: Optional[Location],
+        location: Location,
         well_core: Optional[WellCore],
     ) -> None:
-        raise NotImplementedError("InstrumentCore.dispense not implemented")
+        if well_core is None:
+            raise NotImplementedError(
+                "InstrumentCore.dispense with well_core value of None not implemented"
+            )
+
+        well_name = well_core.get_name()
+        labware_id = well_core.labware_id
+
+        well_location = self._engine_client.state.geometry.get_relative_well_location(
+            labware_id=labware_id,
+            well_name=well_name,
+            absolute_point=location.point,
+        )
+
+        self._engine_client.dispense(
+            pipette_id=self._pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
+            well_location=well_location,
+            volume=volume,
+            flow_rate=self.get_absolute_dispense_flow_rate(rate),
+        )
 
     def blow_out(self) -> None:
         raise NotImplementedError("InstrumentCore.blow_out not implemented")
@@ -259,6 +280,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
     def get_absolute_aspirate_flow_rate(self, rate: float) -> float:
         return self._flow_rates.aspirate * rate
+
+    def get_absolute_dispense_flow_rate(self, rate: float) -> float:
+        return self._flow_rates.dispense * rate
 
     def set_flow_rate(
         self,
