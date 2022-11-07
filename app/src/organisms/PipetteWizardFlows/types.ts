@@ -6,8 +6,8 @@ import type { AttachedPipettesByMount } from '../../redux/pipettes/types'
 
 export type PipetteWizardStep =
   | BeforeBeginningStep
-  | DetachStemStep
-  | AttachStemStep
+  | DetachProbeStep
+  | AttachProbeStep
   | ResultsStep
 
 export type PipetteWizardFlow =
@@ -21,14 +21,14 @@ export interface BeforeBeginningStep {
   flowType: PipetteWizardFlow
 }
 
-export interface DetachStemStep {
-  section: typeof SECTIONS.DETACH_STEM
+export interface DetachProbeStep {
+  section: typeof SECTIONS.DETACH_PROBE
   mount: PipetteMount
   flowType: PipetteWizardFlow
 }
 
-export interface AttachStemStep {
-  section: typeof SECTIONS.ATTACH_STEM
+export interface AttachProbeStep {
+  section: typeof SECTIONS.ATTACH_PROBE
   mount: PipetteMount
   flowType: PipetteWizardFlow
 }

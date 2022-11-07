@@ -10,7 +10,7 @@ import {
 import { InProgressModal } from '../../../molecules/InProgressModal/InProgressModal'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { FLOWS } from '../constants'
-import { DetachStem } from '../DetachStem'
+import { DetachProbe } from '../DetachProbe'
 import type { AttachedPipette } from '../../../redux/pipettes/types'
 
 jest.mock('../../../molecules/InProgressModal/InProgressModal')
@@ -18,8 +18,8 @@ jest.mock('../../../molecules/InProgressModal/InProgressModal')
 const mockInProgressModal = InProgressModal as jest.MockedFunction<
   typeof InProgressModal
 >
-const render = (props: React.ComponentProps<typeof DetachStem>) => {
-  return renderWithProviders(<DetachStem {...props} />, {
+const render = (props: React.ComponentProps<typeof DetachProbe>) => {
+  return renderWithProviders(<DetachProbe {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
@@ -27,8 +27,8 @@ const mockPipette: AttachedPipette = {
   ...mockAttachedPipette,
   modelSpecs: mockGen3P1000PipetteSpecs,
 }
-describe('DetachStem', () => {
-  let props: React.ComponentProps<typeof DetachStem>
+describe('DetachProbe', () => {
+  let props: React.ComponentProps<typeof DetachProbe>
   beforeEach(() => {
     props = {
       mount: LEFT,
@@ -46,11 +46,11 @@ describe('DetachStem', () => {
   })
   it('returns the correct information, buttons work as expected', () => {
     const { getByText, getByAltText, getByRole } = render(props)
-    getByText('Remove Calibration Stem')
+    getByText('Remove Calibration Probe')
     getByText(
-      'Now you’ll be guided through removing your calibration stem. Undo the latch to remove the stem'
+      'Unlatch the calibration probe, remove it from the pipette nozzle, and return it to its storage location.'
     )
-    getByAltText('Remove stem')
+    getByAltText('Remove probe')
     const proceedBtn = getByRole('button', { name: 'Complete calibration' })
     fireEvent.click(proceedBtn)
     expect(props.handleCleanUp).toHaveBeenCalled()
