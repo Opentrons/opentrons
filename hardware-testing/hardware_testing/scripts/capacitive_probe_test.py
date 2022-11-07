@@ -35,10 +35,6 @@ class Capacitive_Probe_Test:
         self.PROBE_LENGTH = 34.5
         self.CUTOUT_SIZE = 20
         self.CUTOUT_HALF = self.CUTOUT_SIZE / 2
-        # self.CENTER_Z = Point(x=239, y=160, z=1)
-        # self.CENTER_XY = Point(x=227.25, y=145.5, z=self.CENTER_Z.z)
-        # self.CENTER_Z = Point(x=245, y=160, z=1)
-        # self.CENTER_XY = Point(x=231.25, y=145.5, z=self.CENTER_Z.z)
         self.PROBE_SETTINGS_Z_AXIS = CapacitivePassSettings(
             prep_distance_mm=5,
             max_overrun_distance_mm=5,
@@ -157,7 +153,6 @@ class Capacitive_Probe_Test:
         home_position = await api.gantry_position(mount)
         above_point = self.CENTER_Z._replace(z=home_position.z)
         await api.move_to(mount, above_point)
-        # time.sleep(1.0)
 
         # Probe deck Z-Axis height
         deck_z = await self._probe_axis(OT3Axis.by_mount(mount), self.CENTER_Z.z)
@@ -171,7 +166,6 @@ class Capacitive_Probe_Test:
         center_xy_below = self.CENTER_XY._replace(z=below_z)
         await api.move_to(mount, center_xy_above, speed=20)
         await api.move_to(mount, center_xy_below, speed=20)
-        # time.sleep(1.0)
 
         # Probe slot X-Axis right edge
         x_right = await self._probe_axis(OT3Axis.X, self.CENTER_XY.x + self.CUTOUT_HALF)
