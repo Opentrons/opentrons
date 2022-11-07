@@ -26,7 +26,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const { t } = useTranslation('pipette_wizard_flows')
   const motorAxis = mount === 'left' ? 'leftZ' : 'rightZ'
   const pipetteId = attachedPipette[mount]?.id
-  //  hard coding calibration slow number for now in case it changes
+  //  hard coding calibration slot number for now in case it changes
   //  in the future
   const calSlotNum = '5'
   if (pipetteId == null) return null
