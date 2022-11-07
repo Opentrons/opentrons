@@ -18,7 +18,7 @@ export const getAllLabwareAndTiprackIdsInOrder = (
 ): string[] => {
   const unorderedLabware = labware.reduce<LabwareToOrder[]>(
     (unorderedLabware, currentLabware) => {
-      const labwareDef = labwareDefinitions[currentLabware.definitionId]
+      const labwareDef = labwareDefinitions[currentLabware.definitionUri]
       const labwareLocation = getLabwareLocation(currentLabware.id, commands)
 
       if (labwareLocation === 'offDeck') return unorderedLabware

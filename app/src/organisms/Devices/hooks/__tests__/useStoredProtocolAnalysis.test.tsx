@@ -14,7 +14,10 @@ import {
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 
 import { storedProtocolData } from '../../../../redux/protocol-storage/__fixtures__'
-import { getStoredProtocol } from '../../../../redux/protocol-storage'
+import {
+  getStoredProtocol,
+  StoredProtocolData,
+} from '../../../../redux/protocol-storage'
 import { useStoredProtocolAnalysis } from '../useStoredProtocolAnalysis'
 import {
   LABWARE_ENTITY,
@@ -142,7 +145,7 @@ describe('useStoredProtocolAnalysis hook', () => {
       } as UseQueryResult<Protocol>)
     when(mockGetStoredProtocol)
       .calledWith(undefined as any, PROTOCOL_KEY)
-      .mockReturnValue(modifiedStoredProtocolData)
+      .mockReturnValue(modifiedStoredProtocolData as StoredProtocolData)
 
     const { result } = renderHook(() => useStoredProtocolAnalysis(RUN_ID), {
       wrapper,

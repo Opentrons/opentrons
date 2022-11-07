@@ -12,7 +12,6 @@ export function useClearAllOffsetsForCurrentRun(): () => void {
 
   return () => {
     if (currentRunId == null || protocolData == null) return
-    //  @ts-expect-error
     protocolData.labware.forEach(item => {
       createLabwareOffset({
         runId: currentRunId,

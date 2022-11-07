@@ -105,7 +105,6 @@ export const DeprecatedLabwarePositionCheckStepDetail = (
   const command = stepMovementCommands[0]
 
   const pipetteId = command.params.pipetteId
-  //  @ts-expect-error
   const pipetteName = protocolData.pipettes.find(
     //  @ts-expect-error
     pipette => pipette.id === pipetteId

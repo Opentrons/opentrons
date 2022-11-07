@@ -62,7 +62,6 @@ export function useRunPipetteInfoByMount(
       command.commandType === 'pickUpTip'
   )
 
-  //  @ts-expect-error
   return pipettes.reduce((acc, pipette) => {
     const loadCommand = loadPipetteCommands.find(
       command => command.result?.pipetteId === pipette.id
@@ -78,12 +77,13 @@ export function useRunPipetteInfoByMount(
           LabwareDefinition2[]
         >((acc, command) => {
           if (pipetteId === command.params?.pipetteId) {
-            //  @ts-expect-error: will be an error until we remove the schemaV6Adapter
             const tipRack = labware.find(
-              //  @ts-expect-error: will be an error until we remove the schemaV6Adapter
               item => item.id === command.params?.labwareId
             )
-            const tipRackDefinition = labwareDefinitions[tipRack.definitionUri]
+            const tipRackDefinition =
+              tipRack?.definitionUri != null
+                ? labwareDefinitions[tipRack.definitionUri]
+                : null
 
             if (tipRackDefinition != null && !acc.includes(tipRackDefinition)) {
               return [...acc, tipRackDefinition]

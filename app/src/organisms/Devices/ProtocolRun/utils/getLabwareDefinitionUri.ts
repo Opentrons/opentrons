@@ -1,15 +1,15 @@
 import { getLabwareDefURI } from '@opentrons/shared-data'
 import type { ProtocolFile } from '@opentrons/shared-data'
+import { LoadedLabware } from '@opentrons/shared-data'
 
 // Delete this util once there is a better identifier for labware offsets on the backend
 export function getLabwareDefinitionUri(
   labwareId: string,
-  labware: ProtocolFile<{}>['labware'],
+  labware: LoadedLabware[],
   labwareDefinitions: ProtocolFile<{}>['labwareDefinitions']
 ): string {
-  //  @ts-expect-error
   const labwareDefinitionUri = labware.find(item => item.id === labwareId)
-    .definitionUri
+    ?.definitionUri
   if (labwareDefinitionUri == null) {
     throw new Error(
       'expected to be able to find labware definition uri for labware, but could not'

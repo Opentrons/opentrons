@@ -14,7 +14,7 @@ import { SetupLabwareList } from '../SetupLabwareList'
 import type {
   ModuleModel,
   ModuleType,
-  ProtocolAnalysisFile,
+  SchemaAdapterOutput,
 } from '@opentrons/shared-data'
 import type { AttachedModule } from '@opentrons/api-client'
 
@@ -49,8 +49,8 @@ const render = (props: React.ComponentProps<typeof SetupLabwareList>) => {
     i18nInstance: i18n,
   })
 }
-const protocolWithMagTempTC = (_protocolWithMagTempTC as unknown) as ProtocolAnalysisFile
-const protocolWithHS = (_protocolWithHS as unknown) as ProtocolAnalysisFile
+const protocolWithMagTempTC = (_protocolWithMagTempTC as unknown) as SchemaAdapterOutput
+const protocolWithHS = (_protocolWithHS as unknown) as SchemaAdapterOutput
 const heaterShakerId =
   '3e012450-3412-11eb-ad93-ed232a2337cf:heaterShakerModuleType'
 const mockHeaterShaker = {

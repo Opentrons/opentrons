@@ -15,7 +15,7 @@ import { useProtocolDetailsForRun } from '..'
 import { RUN_ID_2 } from '../../../../organisms/RunTimeControl/__fixtures__'
 
 import type { Protocol, Run, ProtocolAnalyses } from '@opentrons/api-client'
-import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
+import type { SchemaAdapterOutput } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/shared-data', () => {
   const actualSharedData = jest.requireActual('@opentrons/shared-data')
@@ -49,7 +49,7 @@ const PROTOCOL_RESPONSE = {
   },
 } as Protocol
 
-const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnalysisFile<{}>
+const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as SchemaAdapterOutput
 
 describe('useProtocolDetailsForRun hook', () => {
   beforeEach(() => {

@@ -17,7 +17,8 @@ import type {
 // and the protocol schema v6 interface. Much of this logic should be deleted once we resolve
 // these discrepencies on the server side
 
-interface SchemaAdapterOutput extends Omit<ProtocolAnalysisOutput, 'modules'> {
+export interface SchemaAdapterOutput
+  extends Omit<ProtocolAnalysisOutput, 'modules'> {
   labwareDefinitions: ProtocolAnalysisFile['labwareDefinitions']
   modules: ProtocolAnalysisFile['modules']
 }
@@ -26,9 +27,17 @@ interface SchemaAdapterOutput extends Omit<ProtocolAnalysisOutput, 'modules'> {
  * @deprecated No longer necessary, do not use
  */
 export const schemaV6Adapter = (
-  protocolAnalysis: PendingProtocolAnalysis | CompletedProtocolAnalysis
+  protocolAnalysis:
+    | PendingProtocolAnalysis
+    | CompletedProtocolAnalysis
+    | ProtocolAnalysisOutput
 ): SchemaAdapterOutput | null => {
-  if (protocolAnalysis != null && protocolAnalysis.status === 'completed') {
+  if (
+    protocolAnalysis == null ||
+    ('status' in protocolAnalysis && protocolAnalysis.status === 'pending')
+  ) {
+    return null
+  } else if ('labware' in protocolAnalysis) {
     const labware: Array<{
       id: string
       loadName: string
@@ -91,6 +100,7 @@ export const schemaV6Adapter = (
 
     return {
       ...protocolAnalysis,
+      // @ts-expect-error
       labware,
       modules,
       labwareDefinitions,

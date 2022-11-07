@@ -48,7 +48,7 @@ export function SetupLiquidsList(props: SetupLiquidsListProps): JSX.Element {
   const { runId } = props
   const protocolData = useProtocolDetailsForRun(runId).protocolData
   const liquidsInLoadOrder = parseLiquidsInLoadOrder(
-    protocolData?.liquids ?? {},
+    protocolData?.liquids ?? [],
     protocolData?.commands ?? []
   )
 
