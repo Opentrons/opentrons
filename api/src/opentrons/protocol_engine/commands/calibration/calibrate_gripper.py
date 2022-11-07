@@ -7,8 +7,16 @@ from typing_extensions import Literal
 
 from pydantic import BaseModel, Field
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
-from ...types import Vec3f
+from opentrons.hardware_control import HardwareControlAPI, ot3_calibration
+from opentrons.hardware_control.types import GripperProbe as HWAPIGripperProbe
+
+from opentrons.protocol_engine.commands.command import (
+    AbstractCommandImpl,
+    BaseCommand,
+    BaseCommandCreate,
+)
+from opentrons.protocol_engine.types import Vec3f
+from opentrons.protocol_engine.resources import ensure_ot3_hardware
 
 
 CalibrateGripperCommandType = Literal["calibration/calibrateGripper"]
@@ -28,7 +36,7 @@ class CalibrateGripperParams(BaseModel):
             "Which of the gripper's probes to use to measure its offset."
             " The robot will assume that a human operator has already attached"
             " this probe and removed the other probe, if there was one."
-        )
+        ),
     )
 
 
@@ -40,7 +48,7 @@ class CalibrateGripperResult(BaseModel):
         description=(
             "The offset from the probe's nominal position"
             " to its actual measured position."
-        )
+        ),
     )
 
 
@@ -49,8 +57,32 @@ class CalibrateGripperImplementation(
 ):
     """The implementation of a `calibrateGripper` command."""
 
+    def __init__(
+        self,
+        hardware_api: HardwareControlAPI,
+        *args: object,
+        **kwargs: object,
+    ) -> None:
+        self._hardware_api = hardware_api
+
     async def execute(self, params: CalibrateGripperParams) -> CalibrateGripperResult:
-        raise NotImplementedError()
+        ot3_hardware_api = ensure_ot3_hardware(self._hardware_api)
+        result = await ot3_calibration.calibrate_gripper(
+            ot3_hardware_api, self._params_probe_to_hw_api_probe(params.probe)
+        )
+        return CalibrateGripperResult.construct(
+            probeOffset=Vec3f.construct(x=result.x, y=result.y, z=result.z)
+        )
+
+    @staticmethod
+    def _params_probe_to_hw_api_probe(
+        from_params: CalibrateGripperParamsProbe,
+    ) -> HWAPIGripperProbe:
+        if from_params is CalibrateGripperParamsProbe.FRONT:
+            return HWAPIGripperProbe.FRONT
+        elif from_params is CalibrateGripperParamsProbe.REAR:
+            return HWAPIGripperProbe.REAR
+        # No `else`, so mypy will check for exhaustiveness.
 
 
 class CalibrateGripper(BaseCommand[CalibrateGripperParams, CalibrateGripperResult]):
