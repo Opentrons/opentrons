@@ -768,11 +768,11 @@ def test_blow_out(ctx, monkeypatch):
     instr.pick_up_tip()
     instr.aspirate(10, lw.wells()[0])
 
-    def fake_move(loc, publish):
+    def fake_move(location, well_core):
         nonlocal move_location
-        move_location = loc
+        move_location = location
 
-    monkeypatch.setattr(instr, "move_to", fake_move)
+    monkeypatch.setattr(instr._implementation, "move_to", fake_move)
 
     instr.blow_out()
     # pipette should not move, if no location is passed

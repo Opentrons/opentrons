@@ -405,6 +405,8 @@ class InstrumentContext(publisher.CommandPublisher):
         :returns: This instance
         """
 
+        well: Optional[labware.Well]
+        move_to_well = True
         if isinstance(location, labware.Well):
             if location.parent.is_tiprack:
                 logger.warning(
@@ -412,19 +414,21 @@ class InstrumentContext(publisher.CommandPublisher):
                     "Please re-check your code"
                 )
             checked_loc = location.top()
-            self.move_to(checked_loc, publish=False)
+            well = location
         elif isinstance(location, types.Location):
             checked_loc = location
-            self.move_to(checked_loc, publish=False)
+            _, well = location.labware.get_parent_labware_and_well()
         elif location is not None:
             raise TypeError(
                 "location should be a Well or Location, but it is {}".format(location)
             )
         elif self._ctx.location_cache:
             checked_loc = self._ctx.location_cache
+            _, well = checked_loc.labware.get_parent_labware_and_well()
             # if no explicit location given but location cache exists,
             # pipette blows out immediately at
             # current location, no movement is needed
+            move_to_well = False
         else:
             raise RuntimeError(
                 "If blow out is called without an explicit location, another"
@@ -437,7 +441,11 @@ class InstrumentContext(publisher.CommandPublisher):
             broker=self.broker,
             command=cmds.blow_out(instrument=self, location=checked_loc),
         ):
-            self._implementation.blow_out()
+            self._implementation.blow_out(
+                location=checked_loc,
+                well_core=well._impl if well is not None else None,
+                move_to_well=move_to_well,
+            )
 
         return self
 

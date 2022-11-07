@@ -80,8 +80,27 @@ class InstrumentCore(AbstractInstrument[WellCore]):
     def dispense(self, volume: float, rate: float) -> None:
         raise NotImplementedError("InstrumentCore.dispense not implemented")
 
-    def blow_out(self) -> None:
-        raise NotImplementedError("InstrumentCore.blow_out not implemented")
+    def blow_out(self, location: Location, well_core: Optional[WellCore], move_to_well: bool) -> None:
+        if well_core is None:
+            raise NotImplementedError(
+                "InstrumentCore.blow_out with well_core value of None not implemented"
+            )
+
+        well_name = well_core.get_name()
+        labware_id = well_core.labware_id
+
+        well_location = self._engine_client.state.geometry.get_relative_well_location(
+            labware_id=labware_id,
+            well_name=well_name,
+            absolute_point=location.point,
+        )
+
+        self._engine_client.blow_out(
+            pipette_id=self._pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
+            well_location=well_location,
+        )
 
     def touch_tip(
         self,

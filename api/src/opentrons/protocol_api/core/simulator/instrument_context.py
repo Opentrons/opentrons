@@ -100,7 +100,9 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
         self._raise_if_no_tip(HardwareAction.DISPENSE.name)
         self._update_volume(self.get_current_volume() - volume)
 
-    def blow_out(self) -> None:
+    def blow_out(self, location: types.Location, well_core: Optional[WellImplementation], move_to_well: bool) -> None:
+        if move_to_well:
+            self.move_to(location=location, well_core=well_core)
         self._raise_if_no_tip(HardwareAction.BLOWOUT.name)
         self._update_volume(0)
         self._pipette_dict["ready_to_aspirate"] = False

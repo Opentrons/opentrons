@@ -36,7 +36,12 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
-    def blow_out(self) -> None:
+    def blow_out(
+        self,
+        location: types.Location,
+        well_core: Optional[WellCoreType],
+        move_to_well: bool,
+    ) -> None:
         ...
 
     @abstractmethod
