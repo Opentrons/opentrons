@@ -27,7 +27,7 @@ interface TempSelectNetworkProps {
 
 const LIST_REFRESH_MS = 10000
 
-export const TemporarySelectNetwork = ({
+export const SelectNetwork = ({
   robotName,
   isRobotBusy,
 }: TempSelectNetworkProps): JSX.Element => {
@@ -128,7 +128,7 @@ export const TemporarySelectNetwork = ({
         onDisconnect={handleSelectDisconnect}
         isRobotBusy={isRobotBusy}
       />
-      {changeState.type && (
+      {changeState.type != null && (
         <Portal>
           {requestState != null ? (
             <ResultModal
@@ -137,9 +137,9 @@ export const TemporarySelectNetwork = ({
               isPending={requestState.status === RobotApi.PENDING}
               error={
                 'error' in requestState &&
-                requestState.error &&
+                requestState.error != null &&
                 'message' in requestState.error &&
-                requestState.error.message
+                requestState.error.message != null
                   ? requestState.error
                   : null
               }
