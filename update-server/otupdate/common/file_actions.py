@@ -254,5 +254,5 @@ def load_version_file(version_file: str) -> Mapping[str, str]:
         with open(version_file, "r") as fh:
             version = json.load(fh)
     except Exception:
-        logging.exception(f"Could not load version file - {version_file}")
+        LOG.exception(f"Could not load version file - {version_file}")
     return version
