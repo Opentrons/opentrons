@@ -282,14 +282,6 @@ class InstrumentContext(publisher.CommandPublisher):
         elif isinstance(location, types.Location):
             dest = location
             _, well = dest.labware.get_parent_labware_and_well()
-            if well is None:
-                raise TypeError(
-                    "If a location is specified as a `types.Location`"
-                    " (for instance, as the result of a call to `Well.top()`),"
-                    " it must be a location relative to a well,"
-                    " since that is where a tip is dropped."
-                    f" However, the given location refers to {location.labware}"
-                )
         elif location is not None:
             raise TypeError(
                 f"location should be a Well or Location, but it is {location}"
