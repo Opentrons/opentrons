@@ -21,7 +21,6 @@ export const getPipetteWizardSteps = (
     }
     case FLOWS.ATTACH: {
       return [
-        { section: SECTIONS.CHOOSE_PIPETTE, mount: mount, flowType: flowType },
         {
           section: SECTIONS.BEFORE_BEGINNING,
           mount: mount,

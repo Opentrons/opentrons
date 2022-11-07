@@ -35,11 +35,6 @@ describe('getPipetteWizardSteps', () => {
   it('returns the correct array of info for attach pipette flow', () => {
     const mockAttachPipetteFlowSteps = [
       {
-        section: SECTIONS.CHOOSE_PIPETTE,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      {
         section: SECTIONS.BEFORE_BEGINNING,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
