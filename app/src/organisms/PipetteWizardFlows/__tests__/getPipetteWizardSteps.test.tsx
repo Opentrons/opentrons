@@ -32,4 +32,51 @@ describe('getPipetteWizardSteps', () => {
       mockCalibrateFlowSteps
     )
   })
+  it('returns the correct array of info for attach pipette flow', () => {
+    const mockAttachPipetteFlowSteps = [
+      {
+        section: SECTIONS.BEFORE_BEGINNING,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.MOUNT_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+    ] as PipetteWizardStep[]
+
+    expect(getPipetteWizardSteps(FLOWS.ATTACH, LEFT)).toStrictEqual(
+      mockAttachPipetteFlowSteps
+    )
+  })
+
+  it('returns the correct array of info for detach pipette', () => {
+    const mockDetachPipetteFlowSteps = [
+      {
+        section: SECTIONS.BEFORE_BEGINNING,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.DETACH_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+    ] as PipetteWizardStep[]
+
+    expect(getPipetteWizardSteps(FLOWS.DETACH, LEFT)).toStrictEqual(
+      mockDetachPipetteFlowSteps
+    )
+  })
 })
