@@ -6,7 +6,7 @@ import tempfile
 
 from otupdate.common.constants import MODEL_OT3
 from otupdate.common.file_actions import (
-    InvalidRobotModel,
+    InvalidRobotType,
     unzip_update,
     hash_file,
     HashMismatch,
@@ -181,11 +181,11 @@ class OT3UpdateActions(UpdateActionsInterface):
 
         version_file = str(files.get("VERSION.json"))
         version_dict = load_version_file(version_file)
-        robot_model = version_dict.get("robot_model")
-        if robot_model != MODEL_OT3:
-            msg = f"Invalid robot_model: expected {MODEL_OT3} != packaged {robot_model}"
+        robot_type = version_dict.get("robot_type")
+        if robot_type != MODEL_OT3:
+            msg = f"Invalid robot_type: expected {MODEL_OT3} != packaged {robot_type}"
             LOG.error(msg)
-            raise InvalidRobotModel(msg)
+            raise InvalidRobotType(msg)
 
         rootfs = files.get(ROOTFS_NAME)
         assert rootfs

@@ -18,7 +18,7 @@ from otupdate.common.constants import MODEL_OT2
 
 from otupdate.common.file_actions import (
     InvalidPKGName,
-    InvalidRobotModel,
+    InvalidRobotType,
     load_version_file,
     unzip_update,
     hash_file,
@@ -85,11 +85,11 @@ class OT2UpdateActions(UpdateActionsInterface):
 
         version_file = str(files.get("VERSION.json"))
         version_dict = load_version_file(version_file)
-        robot_model = version_dict.get("robot_model", MODEL_OT2)
-        if robot_model != MODEL_OT2:
-            msg = f"Invalid robot_model: expected {MODEL_OT2} != packaged {robot_model}"
+        robot_type = version_dict.get("robot_type", MODEL_OT2)
+        if robot_type != MODEL_OT2:
+            msg = f"Invalid robot_type: expected {MODEL_OT2} != packaged {robot_type}"
             LOG.error(msg)
-            raise InvalidRobotModel(msg)
+            raise InvalidRobotType(msg)
 
         rootfs = files.get(ROOTFS_NAME)
         assert rootfs
