@@ -16,6 +16,7 @@ from opentrons.hardware_control.backends.ot3utils import sensor_node_for_mount
 from opentrons.hardware_control.instruments.ot2.pipette import Pipette
 from opentrons.hardware_control.motion_utilities import deck_from_machine
 from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control.types import GripperJawState
 from opentrons.types import PipetteNotAttachedError
 
 from .types import (
@@ -323,6 +324,13 @@ async def move_plunger_relative_ot3(
     )
 
 
+async def move_gripper_jaw_relative_ot3(api: OT3API, delta: float) -> None:
+    # FIXME: this should be in relative distances
+    #        but the api isn't setup for reporting current position yet
+    print("FIXME: Not using relative distances for gripper, using absolute...")
+    await api.hold_jaw_width(int(delta))
+
+
 def get_endstop_position_ot3(api: OT3API, mount: OT3Mount) -> Dict[OT3Axis, float]:
     """Get the endstop's position per mount."""
     transforms = api._transforms
@@ -372,7 +380,7 @@ async def _jog_axis_some_distance(
     if not axis or distance == 0.0:
         return
     elif axis == "G":
-        raise RuntimeError("Gripper jogging not yet supported")
+        await move_gripper_jaw_relative_ot3(api, distance)
     elif axis == "P":
         await move_plunger_relative_ot3(api, mount, distance)
     else:
@@ -384,14 +392,14 @@ async def _jog_print_current_position(
     api: OT3API, mount: OT3Mount, critical_point: Optional[CriticalPoint] = None
 ) -> None:
     z_axis = OT3Axis.by_mount(mount)
-    plunger_axis = OT3Axis.of_main_tool_actuator(mount)
+    instr_axis = OT3Axis.of_main_tool_actuator(mount)
     current_pos = await api.current_position_ot3(
         mount=mount, critical_point=critical_point
     )
-    x, y, z, p = [
-        current_pos.get(ax) for ax in [OT3Axis.X, OT3Axis.Y, z_axis, plunger_axis]
+    x, y, z, i = [
+        current_pos.get(ax) for ax in [OT3Axis.X, OT3Axis.Y, z_axis, instr_axis]
     ]
-    print(f"Deck Coordinate: X={x}, Y={y}, Z={z}, P={p}")
+    print(f"Deck Coordinate: X={x}, Y={y}, Z={z}, P/G={i}")
 
 
 async def jog_mount_ot3(
