@@ -1,4 +1,4 @@
-"""Slot Center Test."""
+"""Calibration Precision Test."""
 import asyncio
 import argparse
 import time
@@ -17,14 +17,14 @@ from opentrons.config.types import (
 from hardware_testing.drivers import mitutoyo_digimatic_indicator
 
 def build_arg_parser():
-    arg_parser = argparse.ArgumentParser(description='OT-3 Slot Center Testing')
+    arg_parser = argparse.ArgumentParser(description='OT-3 Calibration Precision Testing')
     arg_parser.add_argument('-m', '--mount', choices=['l','r'], required=False, help='The pipette mount to be tested', default='l')
     arg_parser.add_argument('-c', '--cycles', type=int, required=False, help='Number of testing cycles', default=1)
     arg_parser.add_argument('-o', '--slot', type=int, required=False, help='Deck slot number', default=5)
     arg_parser.add_argument('-s', '--simulate', action="store_true", required=False, help='Simulate this test script')
     return arg_parser
 
-class Slot_Center_Test:
+class Calibration_Precision_Test:
     def __init__(self, simulate: bool, cycles: int, slot: int) -> None:
         self.api = None
         self.mount = None
@@ -37,10 +37,6 @@ class Slot_Center_Test:
         self.PROBE_LENGTH = 34.5
         self.CUTOUT_SIZE = 20
         self.CUTOUT_HALF = self.CUTOUT_SIZE / 2
-        # self.CENTER_Z = Point(x=239, y=160, z=1)
-        # self.CENTER_XY = Point(x=227.25, y=145.5, z=self.CENTER_Z.z)
-        # self.CENTER_Z = Point(x=245, y=160, z=1)
-        # self.CENTER_XY = Point(x=231.25, y=145.5, z=self.CENTER_Z.z)
         self.PROBE_SETTINGS_Z_AXIS = CapacitivePassSettings(
             prep_distance_mm=5,
             max_overrun_distance_mm=5,
@@ -132,7 +128,7 @@ class Slot_Center_Test:
         print(f"\nStarting Test on Deck Slot #{self.slot}:\n")
 
     def file_setup(self):
-        self.test_name = "slot_center_test"
+        self.test_name = "calibration_precision_test"
         self.test_tag = f"slot{self.slot}"
         self.test_header = self.dict_keys_to_line(self.test_data)
         self.test_id = data.create_run_id()
@@ -338,8 +334,8 @@ class Slot_Center_Test:
             print("Test Completed!")
 
 if __name__ == '__main__':
-    print("\nOT-3 Slot Center Test\n")
+    print("\nOT-3 Calibration Precision Test\n")
     arg_parser = build_arg_parser()
     args = arg_parser.parse_args()
-    test = Slot_Center_Test(args.simulate, args.cycles, args.slot)
+    test = Calibration_Precision_Test(args.simulate, args.cycles, args.slot)
     asyncio.run(test.run())
