@@ -1,12 +1,15 @@
 import { doesPipetteVisitAllTipracks } from '../doesPipetteVisitAllTipracks'
 import _uncastedProtocolMultipleTipracks from '@opentrons/shared-data/protocol/fixtures/6/multipleTipracks.json'
 import _uncastedProtocolOneTiprack from '@opentrons/shared-data/protocol/fixtures/6/oneTiprack.json'
-import type { ProtocolAnalysisFile } from '@opentrons/shared-data/protocol'
+import type {
+  LegacySchemaAdapterOutput,
+  LoadedLabware,
+} from '@opentrons/shared-data'
 import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 
 // TODO: update these fixtures to be v6 protocols
-const protocolMultipleTipracks = (_uncastedProtocolMultipleTipracks as unknown) as ProtocolAnalysisFile
-const protocolOneTiprack = (_uncastedProtocolOneTiprack as unknown) as ProtocolAnalysisFile
+const protocolMultipleTipracks = (_uncastedProtocolMultipleTipracks as unknown) as LegacySchemaAdapterOutput
+const protocolOneTiprack = (_uncastedProtocolOneTiprack as unknown) as LegacySchemaAdapterOutput
 const labwareWithDefinitionUri = [
   {
     id: 'fixedTrash',
@@ -34,7 +37,7 @@ const labwareWithDefinitionUri = [
     definitionUri: 'opentrons/opentrons_96_tiprack_300ul/1',
     loadName: 'opentrons_96_tiprack_300ul',
   },
-]
+] as LoadedLabware[]
 
 describe('doesPipetteVisitAllTipracks', () => {
   it('should return true when the pipette visits both tipracks', () => {
@@ -46,7 +49,6 @@ describe('doesPipetteVisitAllTipracks', () => {
     expect(
       doesPipetteVisitAllTipracks(
         pipetteId,
-        //  @ts-expect-error
         labware,
         labwareDefinitions,
         commands
@@ -62,7 +64,6 @@ describe('doesPipetteVisitAllTipracks', () => {
     expect(
       doesPipetteVisitAllTipracks(
         pipetteId,
-        //  @ts-expect-error
         labware,
         labwareDefinitions,
         commands
@@ -96,14 +97,13 @@ describe('doesPipetteVisitAllTipracks', () => {
         definitionUri: 'example/plate/1',
         loadName: 'plate',
       },
-    ]
+    ] as LoadedLabware[]
     const labwareDefinitions = protocolOneTiprack.labwareDefinitions
     const commands: RunTimeCommand[] = protocolOneTiprack.commands
 
     expect(
       doesPipetteVisitAllTipracks(
         pipetteId,
-        //  @ts-expect-error
         labware,
         labwareDefinitions,
         commands

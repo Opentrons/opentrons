@@ -2,7 +2,11 @@ import _protocolWithMagTempTC from '@opentrons/shared-data/protocol/fixtures/6/t
 import _protocolWithMultipleTemps from '@opentrons/shared-data/protocol/fixtures/6/multipleTempModules.json'
 import _standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import { getProtocolModulesInfo } from '../getProtocolModulesInfo'
-import { getModuleDef2, ProtocolAnalysisFile } from '@opentrons/shared-data'
+import {
+  getModuleDef2,
+  LegacySchemaAdapterOutput,
+  LoadedLabware,
+} from '@opentrons/shared-data'
 
 const protocolWithMagTempTC = ({
   ..._protocolWithMagTempTC,
@@ -62,7 +66,7 @@ const protocolWithMagTempTC = ({
       definitionUri: 'opentrons/corning_24_wellplate_3.4ml_flat/1',
     },
   ],
-} as unknown) as ProtocolAnalysisFile
+} as unknown) as LegacySchemaAdapterOutput
 const protocolWithMultipleTemps = ({
   ..._protocolWithMultipleTemps,
   labware: [
@@ -121,7 +125,7 @@ const protocolWithMultipleTemps = ({
       definitionUri: 'opentrons/corning_24_wellplate_3.4ml_flat/1',
     },
   ],
-} as unknown) as ProtocolAnalysisFile
+} as unknown) as LegacySchemaAdapterOutput
 const standardDeckDef = _standardDeckDef as any
 
 describe('getProtocolModulesInfo', () => {
@@ -312,12 +316,11 @@ describe('getProtocolModulesInfo', () => {
           modules: { [MAG_MOD_ID]: protocolWithMagTempTC.modules[MAG_MOD_ID] },
           labware: [
             {
-              //  @ts-expect-error
               definitionUri:
                 'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1',
               id: MAG_LW_ID,
               displayName: stubDisplayName,
-            },
+            } as LoadedLabware,
           ],
         },
         standardDeckDef
