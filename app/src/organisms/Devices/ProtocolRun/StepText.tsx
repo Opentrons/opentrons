@@ -73,15 +73,16 @@ export function StepText(props: Props): JSX.Element | null {
       if (labwareLocation === 'offDeck' || !('slotName' in labwareLocation)) {
         throw new Error('expected tip rack to be in a slot')
       }
+      const definitionUri =
+        protocolData.labware.find(labware => labware.id === labwareId)
+          ?.definitionUri ?? ''
       messageNode = t('drop_tip', {
         well_name: wellName,
         labware:
           labwareId === TRASH_ID
             ? 'Opentrons Fixed Trash'
             : getLabwareDisplayName(
-                protocolData.labwareDefinitions[
-                  protocolData.labware[labwareId].definitionUri
-                ]
+                protocolData.labwareDefinitions[definitionUri]
               ),
         labware_location: labwareLocation.slotName,
       })
