@@ -38,12 +38,13 @@ export function parseInitialPipetteNamesByMount(
 }
 
 export interface PipetteNamesById {
-  [pipetteId: string]: { name: PipetteName }
+  id: string
+  pipetteName: PipetteName
 }
 
-export function parseInitialPipetteNamesById(
+export function parsePipetteEntity(
   commands: RunTimeCommand[]
-): PipetteNamesById {
+): PipetteNamesById[] {
   const rightPipette = commands.find(
     (command): command is LoadPipetteRunTimeCommand =>
       command.commandType === 'loadPipette' && command.params.mount === 'right'
@@ -53,25 +54,29 @@ export function parseInitialPipetteNamesById(
       command.commandType === 'loadPipette' && command.params.mount === 'left'
   )
 
-  const rightPipetteById =
+  const rightPipetteEntity =
     rightPipette != null
       ? {
-          [rightPipette.result.pipetteId]: {
-            name: rightPipette.params.pipetteName,
-          },
+          id: rightPipette.result.pipetteId,
+          pipetteName: rightPipette.params.pipetteName,
         }
       : {}
-  const leftPipetteById =
+  const leftPipetteEntity =
     leftPipette != null
       ? {
-          [leftPipette.result.pipetteId]: {
-            name: leftPipette.params.pipetteName,
-          },
+          id: leftPipette.result.pipetteId,
+          pipetteName: leftPipette.params.pipetteName,
         }
       : {}
-  return {
-    ...rightPipetteById,
-    ...leftPipetteById,
+
+  if (leftPipetteEntity.id == null && rightPipetteEntity.id != null) {
+    return [rightPipetteEntity]
+  } else if (rightPipetteEntity.id == null && leftPipetteEntity.id != null) {
+    return [leftPipetteEntity]
+  } else if (rightPipetteEntity.id != null && leftPipetteEntity.id != null) {
+    return [rightPipetteEntity, leftPipetteEntity]
+  } else {
+    return []
   }
 }
 
@@ -152,56 +157,47 @@ export function parseInitialLoadedLabwareByModuleId(
   )
 }
 
-export interface LoadedLabwareById {
-  [labwareId: string]: {
-    definitionId: string
-    displayName?: string
-  }
+export interface LoadedLabwareEntity {
+  id: string
+  loadName: string
+  definitionUri: string
+  displayName?: string
 }
 
-export function parseInitialLoadedLabwareById(
+export function parseInitialLoadedLabwareEntity(
   commands: RunTimeCommand[]
-): LoadedLabwareById {
-  const loadLabwareCommandsReversed = commands
-    .filter(
-      (command): command is LoadLabwareRunTimeCommand =>
-        command.commandType === 'loadLabware'
-    )
-    .reverse()
-  return reduce<LoadLabwareRunTimeCommand, LoadedLabwareById>(
-    loadLabwareCommandsReversed,
-    (acc, command) => {
-      const quirks = command.result.definition.parameters.quirks ?? []
-      if (quirks.includes('fixedTrash')) {
-        return { ...acc }
-      }
-      const labwareId = command.result.labwareId ?? ''
-      const {
-        namespace,
-        version,
-        parameters: { loadName },
-      } = command.result.definition
-      const definitionId = `${namespace}/${loadName}/${version}_id`
-
-      return {
-        ...acc,
-        [labwareId]: {
-          definitionId,
-          displayName: command.params.displayName,
-        },
-      }
-    },
-    {}
+): LoadedLabwareEntity[] {
+  const loadLabwareCommands = commands.filter(
+    (command): command is LoadLabwareRunTimeCommand =>
+      command.commandType === 'loadLabware'
   )
+  const filterOutTrashCommands = loadLabwareCommands.filter(
+    command => command.result.definition.metadata.displayCategory !== 'trash'
+  )
+  return filterOutTrashCommands.map(command => {
+    const labwareId = command.result.labwareId ?? ''
+    const {
+      namespace,
+      version,
+      parameters: { loadName },
+    } = command.result.definition
+    const definitionUri = `${namespace}/${loadName}/${version}`
+    return {
+      id: labwareId,
+      loadName,
+      definitionUri,
+      displayName: command.params.displayName,
+    }
+  })
 }
 
 export interface LoadedLabwareDefinitionsById {
-  [definitionId: string]: LabwareDefinition2
+  [definitionUri: string]: LabwareDefinition2
 }
 export function parseInitialLoadedLabwareDefinitionsById(
   commands: RunTimeCommand[]
 ): LoadedLabwareDefinitionsById {
-  const labware = parseInitialLoadedLabwareById(commands)
+  const labware = parseInitialLoadedLabwareEntity(commands)
   const loadLabwareCommandsReversed = commands
     .filter(
       (command): command is LoadLabwareRunTimeCommand =>
@@ -217,11 +213,12 @@ export function parseInitialLoadedLabwareDefinitionsById(
       }
       const labwareDef: LabwareDefinition2 = command.result?.definition
       const labwareId = command.result?.labwareId ?? ''
-      const definitionId = labware[labwareId]?.definitionId
+      const definitionUri =
+        labware.find(item => item.id === labwareId)?.definitionUri ?? ''
 
       return {
         ...acc,
-        [definitionId]: labwareDef,
+        [definitionUri]: labwareDef,
       }
     },
     {}
@@ -264,23 +261,15 @@ export interface ParsedLiquid extends Omit<Liquid, 'displayColor'> {
   displayColor: string
 }
 
-// TODO(sh, 2022-09-12): This util currently accepts liquids in two different shapes, one that adheres to the V6 schema
-// and the other in array form coming from ProtocolAnalysisOutput. This should be reconciled to use a single type so
-// conversion of the shape is not needed in the util and the type is consistent across the board.
 export function parseLiquidsInLoadOrder(
-  liquids: LiquidsById | Liquid[],
+  liquids: Liquid[],
   commands: RunTimeCommand[]
 ): ParsedLiquid[] {
   const loadLiquidCommands = commands.filter(
     (command): command is LoadLiquidRunTimeCommand =>
       command.commandType === 'loadLiquid'
   )
-  const transformedLiquids = Array.isArray(liquids)
-    ? liquids
-    : Object.keys(liquids).map(key => {
-        return { id: key, ...liquids[key] }
-      })
-  const loadedLiquids = transformedLiquids.map((liquid, index) => {
+  const loadedLiquids = liquids.map((liquid, index) => {
     return {
       ...liquid,
       displayColor:

@@ -2,8 +2,11 @@ import type {
   LoadLabwareRunTimeCommand,
   LoadModuleRunTimeCommand,
 } from '../../protocol/types/schemaV6/command/setup'
-import type { RunTimeCommand, ProtocolAnalysisFile } from '../../protocol'
-import type { PipetteName } from '../pipettes'
+import type {
+  RunTimeCommand,
+  ProtocolAnalysisOutput,
+  ProtocolAnalysisFile,
+} from '../../protocol'
 import type {
   PendingProtocolAnalysis,
   CompletedProtocolAnalysis,
@@ -13,55 +16,48 @@ import type {
 // This adapter exists to resolve the interface mismatch between the PE analysis response
 // and the protocol schema v6 interface. Much of this logic should be deleted once we resolve
 // these discrepencies on the server side
-const TRASH_ID = 'fixedTrash'
+
+export interface LegacySchemaAdapterOutput
+  extends Omit<ProtocolAnalysisOutput, 'modules'> {
+  labwareDefinitions: ProtocolAnalysisFile['labwareDefinitions']
+  modules: ProtocolAnalysisFile['modules']
+}
 
 /**
  * @deprecated No longer necessary, do not use
  */
 export const schemaV6Adapter = (
-  protocolAnalysis: PendingProtocolAnalysis | CompletedProtocolAnalysis
-): ProtocolAnalysisFile<{}> | null => {
-  if (protocolAnalysis != null && protocolAnalysis.status === 'completed') {
-    const pipettes: {
-      [pipetteId: string]: { name: PipetteName }
-    } = protocolAnalysis.pipettes.reduce((acc, pipette) => {
-      return {
-        ...acc,
-        [pipette.id]: {
-          name: pipette.pipetteName,
-        },
-      }
-    }, {})
-
-    const labware: {
-      [labwareId: string]: {
-        definitionId: string
-        displayName?: string
-      }
-    } = protocolAnalysis.labware.reduce((acc, labware) => {
+  protocolAnalysis:
+    | PendingProtocolAnalysis
+    | CompletedProtocolAnalysis
+    | ProtocolAnalysisOutput
+): LegacySchemaAdapterOutput | null => {
+  if (
+    protocolAnalysis == null ||
+    ('status' in protocolAnalysis && protocolAnalysis.status === 'pending')
+  ) {
+    return null
+  } else if ('labware' in protocolAnalysis) {
+    const labware = protocolAnalysis.labware.map(labware => {
       const labwareId = labware.id
-      if (labwareId === TRASH_ID) {
-        return { ...acc }
-      }
+      //  TODO(jr, 10/6/22): this logic can be removed when protocol analysis includes displayName
       const loadCommand: LoadLabwareRunTimeCommand | null =
         protocolAnalysis.commands.find(
           (command: RunTimeCommand): command is LoadLabwareRunTimeCommand =>
             command.commandType === 'loadLabware' &&
             command.result?.labwareId === labwareId
         ) ?? null
-      const displayName: string | null = loadCommand?.params.displayName ?? null
+      const displayName: string | undefined =
+        loadCommand?.params.displayName ?? undefined
 
       return {
-        ...acc,
-        [labwareId]: {
-          definitionId: `${labware.definitionUri}_id`,
-          displayName: displayName,
-        },
+        ...labware,
+        displayName: displayName,
       }
-    }, {})
+    })
 
     const labwareDefinitions: {
-      [definitionId: string]: LabwareDefinition2
+      [definitionUri: string]: LabwareDefinition2
     } = protocolAnalysis.commands
       .filter(
         (command: RunTimeCommand): command is LoadLabwareRunTimeCommand =>
@@ -70,14 +66,13 @@ export const schemaV6Adapter = (
       .reduce((acc, command: LoadLabwareRunTimeCommand) => {
         const labwareDef: LabwareDefinition2 = command.result?.definition
         const labwareId = command.result?.labwareId ?? ''
-        const definitionUri = protocolAnalysis.labware.find(
-          labware => labware.id === labwareId
-        )?.definitionUri
-        const definitionId = `${definitionUri}_id`
+        const definitionUri =
+          protocolAnalysis.labware.find(labware => labware.id === labwareId)
+            ?.definitionUri ?? ''
 
         return {
           ...acc,
-          [definitionId]: labwareDef,
+          [definitionUri]: labwareDef,
         }
       }, {})
 
@@ -98,14 +93,12 @@ export const schemaV6Adapter = (
         }
       }, {})
 
-    // @ts-expect-error this is a v6 like object that does not quite match the v6 spec at the moment
+    // @ts-expect-error this type will contain all extra fields on input type
     return {
       ...protocolAnalysis,
-      pipettes,
       labware,
       modules,
       labwareDefinitions,
-      commands: protocolAnalysis.commands,
     }
   }
   return null

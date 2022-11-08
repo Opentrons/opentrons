@@ -29,7 +29,7 @@ import { ProtocolRunSetup } from '../ProtocolRunSetup'
 import { SetupModules } from '../SetupModules'
 
 import {
-  ProtocolAnalysisFile,
+  LegacySchemaAdapterOutput,
   protocolHasLiquids,
 } from '@opentrons/shared-data'
 import type { StoredProtocolAnalysis } from '../../hooks'
@@ -104,7 +104,7 @@ describe('ProtocolRunSetup', () => {
     when(mockUseProtocolDetailsForRun)
       .calledWith(RUN_ID)
       .mockReturnValue({
-        protocolData: (noModulesProtocol as unknown) as ProtocolAnalysisFile,
+        protocolData: (noModulesProtocol as unknown) as LegacySchemaAdapterOutput,
         displayName: 'mock display name',
         protocolKey: 'fakeProtocolKey',
         robotType: 'OT-2 Standard',
@@ -247,7 +247,7 @@ describe('ProtocolRunSetup', () => {
           protocolData: ({
             ...noModulesProtocol,
             liquids: [{ displayName: 'water', description: 'liquid H2O' }],
-          } as unknown) as ProtocolAnalysisFile,
+          } as unknown) as LegacySchemaAdapterOutput,
           displayName: 'mock display name',
           protocolKey: 'fakeProtocolKey',
           robotType: 'OT-2 Standard',
@@ -271,7 +271,7 @@ describe('ProtocolRunSetup', () => {
       when(mockUseProtocolDetailsForRun)
         .calledWith(RUN_ID)
         .mockReturnValue({
-          protocolData: (withModulesProtocol as unknown) as ProtocolAnalysisFile,
+          protocolData: (withModulesProtocol as unknown) as LegacySchemaAdapterOutput,
           displayName: 'mock display name',
           protocolKey: 'fakeProtocolKey',
           robotType: 'OT-2 Standard',
@@ -321,7 +321,7 @@ describe('ProtocolRunSetup', () => {
               withModulesProtocol.modules,
               Object.keys(withModulesProtocol.modules)[0]
             ),
-          } as unknown) as ProtocolAnalysisFile,
+          } as unknown) as LegacySchemaAdapterOutput,
           displayName: 'mock display name',
           protocolKey: 'fakeProtocolKey',
           robotType: 'OT-2 Standard',

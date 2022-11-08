@@ -7,20 +7,23 @@ import { renderHook } from '@testing-library/react-hooks'
 
 import {
   parseAllRequiredModuleModelsById,
-  parseInitialLoadedLabwareById,
+  parseInitialLoadedLabwareEntity,
   parseInitialLoadedLabwareDefinitionsById,
-  parseInitialPipetteNamesById,
+  parsePipetteEntity,
 } from '@opentrons/api-client'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 
 import { storedProtocolData } from '../../../../redux/protocol-storage/__fixtures__'
-import { getStoredProtocol } from '../../../../redux/protocol-storage'
+import {
+  getStoredProtocol,
+  StoredProtocolData,
+} from '../../../../redux/protocol-storage'
 import { useStoredProtocolAnalysis } from '../useStoredProtocolAnalysis'
 import {
-  LABWARE_BY_ID,
+  LABWARE_ENTITY,
   LABWARE_DEFINITIONS,
   MODULE_MODELS_BY_ID,
-  PIPETTE_NAMES_BY_ID,
+  PIPETTE_NAME_BY_ID,
   STORED_PROTOCOL_ANALYSIS,
 } from '../__fixtures__/storedProtocolAnalysis'
 
@@ -40,16 +43,25 @@ const mockGetStoredProtocol = getStoredProtocol as jest.MockedFunction<
 const mockParseAllRequiredModuleModelsById = parseAllRequiredModuleModelsById as jest.MockedFunction<
   typeof parseAllRequiredModuleModelsById
 >
-const mockParseInitialLoadedLabwareById = parseInitialLoadedLabwareById as jest.MockedFunction<
-  typeof parseInitialLoadedLabwareById
+const mockParseInitialLoadedLabwareEntity = parseInitialLoadedLabwareEntity as jest.MockedFunction<
+  typeof parseInitialLoadedLabwareEntity
 >
 const mockParseInitialLoadedLabwareDefinitionsById = parseInitialLoadedLabwareDefinitionsById as jest.MockedFunction<
   typeof parseInitialLoadedLabwareDefinitionsById
 >
-const mockParseInitialPipetteNamesById = parseInitialPipetteNamesById as jest.MockedFunction<
-  typeof parseInitialPipetteNamesById
+const mockParsePipetteEntity = parsePipetteEntity as jest.MockedFunction<
+  typeof parsePipetteEntity
 >
 const store: Store<any> = createStore(jest.fn(), {})
+
+const modifiedStoredProtocolData = {
+  ...storedProtocolData,
+  mostRecentAnalysis: {
+    commands: storedProtocolData?.mostRecentAnalysis?.commands,
+    liquids: storedProtocolData?.mostRecentAnalysis?.liquids,
+    errors: storedProtocolData?.mostRecentAnalysis?.errors,
+  },
+}
 
 const RUN_ID = 'the_run_id'
 const PROTOCOL_ID = 'the_protocol_id'
@@ -79,11 +91,11 @@ describe('useStoredProtocolAnalysis hook', () => {
     when(mockParseAllRequiredModuleModelsById).mockReturnValue(
       MODULE_MODELS_BY_ID
     )
-    when(mockParseInitialLoadedLabwareById).mockReturnValue(LABWARE_BY_ID)
+    when(mockParseInitialLoadedLabwareEntity).mockReturnValue([LABWARE_ENTITY])
     when(mockParseInitialLoadedLabwareDefinitionsById).mockReturnValue(
       LABWARE_DEFINITIONS
     )
-    when(mockParseInitialPipetteNamesById).mockReturnValue(PIPETTE_NAMES_BY_ID)
+    when(mockParsePipetteEntity).mockReturnValue([PIPETTE_NAME_BY_ID])
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -133,7 +145,7 @@ describe('useStoredProtocolAnalysis hook', () => {
       } as UseQueryResult<Protocol>)
     when(mockGetStoredProtocol)
       .calledWith(undefined as any, PROTOCOL_KEY)
-      .mockReturnValue(storedProtocolData)
+      .mockReturnValue(modifiedStoredProtocolData as StoredProtocolData)
 
     const { result } = renderHook(() => useStoredProtocolAnalysis(RUN_ID), {
       wrapper,

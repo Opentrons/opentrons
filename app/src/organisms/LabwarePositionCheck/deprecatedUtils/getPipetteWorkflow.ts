@@ -1,16 +1,16 @@
 import uniq from 'lodash/uniq'
 import { doesPipetteVisitAllTipracks } from '../utils/doesPipetteVisitAllTipracks'
 import type {
-  ProtocolFile,
   LabwareDefinition2,
   PipetteName,
+  LoadedLabware,
 } from '@opentrons/shared-data'
 import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 
 export const getPipetteWorkflow = (args: {
   pipetteNames: PipetteName[]
   primaryPipetteId: string
-  labware: ProtocolFile<{}>['labware']
+  labware: LoadedLabware[]
   labwareDefinitions: Record<string, LabwareDefinition2>
   commands: RunTimeCommand[]
 }): 1 | 2 => {
@@ -21,6 +21,7 @@ export const getPipetteWorkflow = (args: {
     labwareDefinitions,
     commands,
   } = args
+
   const uniquePipetteNames = uniq(pipetteNames)
   if (uniquePipetteNames.length === 1) {
     return 1

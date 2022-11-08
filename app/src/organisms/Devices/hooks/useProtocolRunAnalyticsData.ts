@@ -38,7 +38,7 @@ export const parseProtocolRunAnalyticsData = (
       protocolSource: protocolAnalysis?.metadata?.source ?? '',
       protocolName: protocolAnalysis?.metadata?.protocolName ?? '',
       pipettes: Object.values(protocolAnalysis?.pipettes ?? {})
-        .map(pipette => pipette.name)
+        .map(pipette => pipette.pipetteName)
         .join(','),
       modules: Object.values(protocolAnalysis?.modules ?? {})
         .map(module => module.model)
