@@ -27,7 +27,9 @@ import {
 } from '../__fixtures__/storedProtocolAnalysis'
 
 import type { Protocol, Run } from '@opentrons/api-client'
+import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
 
+jest.mock('@opentrons/shared-data')
 jest.mock('@opentrons/api-client')
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../redux/protocol-storage/selectors')
@@ -47,6 +49,9 @@ const mockParseInitialLoadedLabwareEntity = parseInitialLoadedLabwareEntity as j
 >
 const mockParsePipetteEntity = parsePipetteEntity as jest.MockedFunction<
   typeof parsePipetteEntity
+>
+const mockGetLoadedLabwareDefinitionsByUri = getLoadedLabwareDefinitionsByUri as jest.MockedFunction<
+  typeof getLoadedLabwareDefinitionsByUri
 >
 const store: Store<any> = createStore(jest.fn(), {})
 
@@ -84,6 +89,11 @@ describe('useStoredProtocolAnalysis hook', () => {
     when(mockGetStoredProtocol)
       .calledWith(undefined as any)
       .mockReturnValue(null)
+    when(mockGetLoadedLabwareDefinitionsByUri)
+      .calledWith(
+        modifiedStoredProtocolData?.mostRecentAnalysis?.commands ?? []
+      )
+      .mockReturnValue(LABWARE_DEFINITIONS)
     when(mockParseAllRequiredModuleModelsById).mockReturnValue(
       MODULE_MODELS_BY_ID
     )

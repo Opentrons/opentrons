@@ -15,6 +15,7 @@ import type { RunCommandSummary } from '@opentrons/api-client'
 import { getLoadedLabwareDefinitionsByUri } from '../../../resources/protocols/utils'
 
 const TRASH_ID = 'fixedTrash'
+const TEMPORARY_LOCATION_STUB = 'a slot'
 
 interface Props {
   analysisCommand: RunTimeCommand | null
@@ -74,7 +75,7 @@ export function StepText(props: Props): JSX.Element | null {
           labwareId === TRASH_ID
             ? 'Opentrons Fixed Trash'
             : getLabwareDisplayName(defsByURI[definitionUri]),
-        labware_location: 'a slot',
+        labware_location: TEMPORARY_LOCATION_STUB,
       })
       break
     }
@@ -85,7 +86,7 @@ export function StepText(props: Props): JSX.Element | null {
         labware: getLabwareDisplayName(
           labwareRenderInfoById[labwareId].labwareDef
         ),
-        labware_location: 'a slot',
+        labware_location: TEMPORARY_LOCATION_STUB,
       })
       break
     }
@@ -229,11 +230,19 @@ export function StepText(props: Props): JSX.Element | null {
     }
     case 'aspirate': {
       const { wellName, labwareId, volume, flowRate } = displayCommand.params
+      const defsByURI = getLoadedLabwareDefinitionsByUri(protocolData.commands)
+      const definitionUri =
+        protocolData.labware.find(l => l.id === labwareId)?.definitionUri ?? ''
+
+      const labwareDisplayName =
+        labwareId === TRASH_ID
+          ? 'Opentrons Fixed Trash'
+          : getLabwareDisplayName(defsByURI[definitionUri])
 
       messageNode = t('aspirate', {
         well_name: wellName,
-        labware: 'a labware',
-        labware_location: 'a slot',
+        labware: labwareDisplayName,
+        labware_location: TEMPORARY_LOCATION_STUB,
         volume: volume,
         flow_rate: flowRate,
       })
@@ -241,10 +250,18 @@ export function StepText(props: Props): JSX.Element | null {
     }
     case 'dispense': {
       const { wellName, labwareId, volume, flowRate } = displayCommand.params
+      const defsByURI = getLoadedLabwareDefinitionsByUri(protocolData.commands)
+      const definitionUri =
+        protocolData.labware.find(l => l.id === labwareId)?.definitionUri ?? ''
+      const labwareDisplayName =
+        labwareId === TRASH_ID
+          ? 'Opentrons Fixed Trash'
+          : getLabwareDisplayName(defsByURI[definitionUri])
+
       messageNode = t('dispense', {
         well_name: wellName,
-        labware: 'a labware',
-        labware_location: 'a slot',
+        labware: labwareDisplayName,
+        labware_location: TEMPORARY_LOCATION_STUB,
         volume: volume,
         flow_rate: flowRate,
       })
@@ -253,10 +270,18 @@ export function StepText(props: Props): JSX.Element | null {
     }
     case 'blowout': {
       const { wellName, labwareId, flowRate } = displayCommand.params
+      const defsByURI = getLoadedLabwareDefinitionsByUri(protocolData.commands)
+      const definitionUri =
+        protocolData.labware.find(l => l.id === labwareId)?.definitionUri ?? ''
+      const labwareDisplayName =
+        labwareId === TRASH_ID
+          ? 'Opentrons Fixed Trash'
+          : getLabwareDisplayName(defsByURI[definitionUri])
+
       messageNode = t('blowout', {
         well_name: wellName,
-        labware: 'a labware',
-        labware_location: 'a slot',
+        labware: labwareDisplayName,
+        labware_location: TEMPORARY_LOCATION_STUB,
         flow_rate: flowRate,
       })
       break
@@ -274,11 +299,18 @@ export function StepText(props: Props): JSX.Element | null {
     }
     case 'moveToWell': {
       const { wellName, labwareId } = displayCommand.params
+      const defsByURI = getLoadedLabwareDefinitionsByUri(protocolData.commands)
+      const definitionUri =
+        protocolData.labware.find(l => l.id === labwareId)?.definitionUri ?? ''
+      const labwareDisplayName =
+        labwareId === TRASH_ID
+          ? 'Opentrons Fixed Trash'
+          : getLabwareDisplayName(defsByURI[definitionUri])
 
       messageNode = t('move_to_well', {
         well_name: wellName,
-        labware: 'a labware',
-        labware_location: 'a slot',
+        labware: labwareDisplayName,
+        labware_location: TEMPORARY_LOCATION_STUB,
       })
       break
     }
