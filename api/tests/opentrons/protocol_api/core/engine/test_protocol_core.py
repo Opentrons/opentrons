@@ -438,6 +438,7 @@ def test_pause(
     subject: ProtocolCore,
     message: Optional[str],
 ) -> None:
+    """It should issue a waitForResume command."""
     subject.pause(msg=message)
     decoy.verify(mock_engine_client.wait_for_resume(message=message))
 
@@ -451,5 +452,6 @@ def test_delay(
     seconds: float,
     message: Optional[str],
 ) -> None:
+    """It should issue a waitForDuration command."""
     subject.delay(seconds=seconds, msg=message)
     decoy.verify(mock_engine_client.wait_for_duration(seconds=seconds, message=message))
