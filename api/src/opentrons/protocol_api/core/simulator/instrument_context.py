@@ -100,7 +100,12 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
         self._raise_if_no_tip(HardwareAction.DISPENSE.name)
         self._update_volume(self.get_current_volume() - volume)
 
-    def blow_out(self, location: types.Location, well_core: Optional[WellImplementation], move_to_well: bool) -> None:
+    def blow_out(
+        self,
+        location: types.Location,
+        well_core: Optional[WellImplementation],
+        move_to_well: bool,
+    ) -> None:
         if move_to_well:
             self.move_to(location=location, well_core=well_core)
         self._raise_if_no_tip(HardwareAction.BLOWOUT.name)
@@ -243,6 +248,9 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
 
     def get_absolute_aspirate_flow_rate(self, rate: float) -> float:
         return self._flow_rate.aspirate * rate
+
+    def get_absolute_blow_out_flow_rate(self, rate: float) -> float:
+        return self._flow_rate.blow_out * rate
 
     def set_flow_rate(
         self,

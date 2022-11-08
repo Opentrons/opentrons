@@ -239,7 +239,10 @@ def test_blow_out_to_well(
 
 
 def test_blow_out_in_place(
-    decoy: Decoy, mock_instrument_core: InstrumentCore, mock_protocol_context: ProtocolContext, subject: InstrumentContext,
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    mock_protocol_context: ProtocolContext,
+    subject: InstrumentContext,
 ) -> None:
     """It should blow out in place."""
     mock_well = decoy.mock(cls=Well)

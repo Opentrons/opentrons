@@ -47,6 +47,7 @@ def subject(
             "aspirate_flow_rate": 2.0,
             "default_dispense_flow_rates": {"3.3": 44},
             "default_blow_out_flow_rates": {"5.5": 66},
+            "blow_out_flow_rate": 1.23,
         },
     )
     decoy.when(mock_sync_hardware.get_attached_instrument(Mount.LEFT)).then_return(
@@ -278,6 +279,7 @@ def test_blow_out_to_well(
             well_location=WellLocation(
                 origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
             ),
+            flow_rate=1.23,
         ),
         times=1,
     )

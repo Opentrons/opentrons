@@ -80,7 +80,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
     def dispense(self, volume: float, rate: float) -> None:
         raise NotImplementedError("InstrumentCore.dispense not implemented")
 
-    def blow_out(self, location: Location, well_core: Optional[WellCore], move_to_well: bool) -> None:
+    def blow_out(
+        self, location: Location, well_core: Optional[WellCore], move_to_well: bool
+    ) -> None:
         if well_core is None:
             raise NotImplementedError(
                 "InstrumentCore.blow_out with well_core value of None not implemented"
@@ -100,6 +102,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             labware_id=labware_id,
             well_name=well_name,
             well_location=well_location,
+            # TODO(jbl 2022-11-07) PAPIv2 does not have an argument for rate and
+            #   this also needs to be refactored along with other flow rate related issues
+            flow_rate=self.get_absolute_blow_out_flow_rate(1.0),
         )
 
     def touch_tip(
@@ -272,6 +277,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
     def get_absolute_aspirate_flow_rate(self, rate: float) -> float:
         return self._flow_rates.aspirate * rate
+
+    def get_absolute_blow_out_flow_rate(self, rate: float) -> float:
+        return self._flow_rates.blow_out * rate
 
     def set_flow_rate(
         self,

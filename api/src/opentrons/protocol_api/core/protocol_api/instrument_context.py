@@ -99,7 +99,12 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
         into the specified location."""
         self._protocol_interface.get_hardware().dispense(self._mount, volume, rate)
 
-    def blow_out(self, location: types.Location, well_core: Optional[WellImplementation], move_to_well: bool) -> None:
+    def blow_out(
+        self,
+        location: types.Location,
+        well_core: Optional[WellImplementation],
+        move_to_well: bool,
+    ) -> None:
         """Blow liquid out of the tip."""
         if move_to_well:
             self.move_to(location=location, well_core=well_core)
@@ -329,6 +334,9 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
 
     def get_absolute_aspirate_flow_rate(self, rate: float) -> float:
         return self._flow_rates.aspirate * rate
+
+    def get_absolute_blow_out_flow_rate(self, rate: float) -> float:
+        return self._flow_rates.blow_out * rate
 
     def get_speed(self) -> PlungerSpeeds:
         return self._speeds
