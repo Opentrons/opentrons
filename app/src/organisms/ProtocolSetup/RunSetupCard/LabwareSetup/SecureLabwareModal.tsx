@@ -26,11 +26,11 @@ import secureTCLatchImage from '../../../../assets/images/secure_tc_latch.png'
 import { getModuleName } from './utils/getModuleName'
 
 import styles from '../../styles.css'
-import type { ModuleTypesThatRequiresExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
+import type { ModuleTypesThatRequireExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
 
 interface SecureLabwareModalProps {
   onCloseClick: () => unknown
-  type: ModuleTypesThatRequiresExtraAttention
+  type: ModuleTypesThatRequireExtraAttention
 }
 
 export const SecureLabwareModal = (

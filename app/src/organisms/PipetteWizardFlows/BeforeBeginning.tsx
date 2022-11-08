@@ -10,8 +10,6 @@ import type { Run, CreateRunData } from '@opentrons/api-client'
 import type { PipetteWizardStepProps } from './types'
 import type { AxiosError } from 'axios'
 
-const BEFORE_YOU_BEGIN_URL = '' //  TODO(jr, 10/26/22): link real URL!
-
 interface BeforeBeginningProps extends PipetteWizardStepProps {
   createRun: UseMutateFunction<Run, AxiosError<any>, CreateRunData, unknown>
   isCreateLoading: boolean
@@ -87,7 +85,8 @@ export const BeforeBeginning = (
   return (
     <GenericWizardTile
       header={t('before_you_begin')}
-      getHelp={BEFORE_YOU_BEGIN_URL}
+      //  TODO(jr, 11/3/22): wire up this URL and unhide the link!
+      // getHelp={BEFORE_YOU_BEGIN_URL}
       rightHandBody={rightHandBody}
       bodyText={
         <Trans
