@@ -203,4 +203,14 @@ describe('ThermocyclerModuleData', () => {
       'backgroundColor: C_SILVER_GRAY'
     )
   })
+
+  it('renders thermocycler lid status to say open even though the status is in_between', () => {
+    props = {
+      data: {
+        lidStatus: 'in_between',
+      } as ThermocyclerData,
+    }
+    const { getByTestId } = render(props)
+    getByTestId('status_label_open_lidStatus')
+  })
 })
