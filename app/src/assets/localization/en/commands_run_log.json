@@ -1,6 +1,6 @@
 {
-  "pickup_tip": "Picking up tip from {{well_name}} of {{labware}} in {{labware_location}}",
-  "drop_tip": "Dropping tip in {{well_name}} of {{labware}} in {{labware_location}}",
+  "pickup_tip": "Picking up tip from {{well_name}} of {{labware}}",
+  "drop_tip": "Dropping tip in {{well_name}} of {{labware}}",
   "engaging_magnetic_module": "Engaging Magnetic Module",
   "disengaging_magnetic_module": "Disengaging Magnetic Module",
   "setting_temperature_module_temp": "Setting Temperature Module to {{temp}}°C (rounded to nearest integer)",

@@ -171,9 +171,6 @@ describe('StepText', () => {
     when(mockGetLabwareDisplayName)
       .calledWith('fake_def' as any)
       .mockReturnValue('fake_display_name')
-    when(mockGetLabwareLocation)
-      .calledWith(labwareId, [])
-      .mockReturnValue({ slotName: 'fake_labware_location' })
     mockUseLabwareRenderInfoForRunById.mockReturnValue({
       labwareId: {
         labwareDef: 'fake_def',
@@ -192,9 +189,7 @@ describe('StepText', () => {
         },
       },
     })
-    getByText(
-      'Picking up tip from wellName of fake_display_name in fake_labware_location'
-    )
+    getByText('Picking up tip from wellName of fake_display_name')
   })
 
   it('renders correct command text for for legacy command with non-string text', () => {

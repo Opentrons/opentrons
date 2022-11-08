@@ -15,14 +15,14 @@ import { useChainRunCommands } from '../../resources/runs/hooks'
 import { getPipetteWizardSteps } from './getPipetteWizardSteps'
 import { FLOWS, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
-import { AttachStem } from './AttachStem'
-import { DetachStem } from './DetachStem'
+import { AttachProbe } from './AttachProbe'
+import { DetachProbe } from './DetachProbe'
 import { Results } from './Results'
 import { ExitModal } from './ExitModal'
 
-import type { PipetteWizardFlow } from './types'
-import type { State } from '../../redux/types'
 import type { PipetteMount } from '@opentrons/shared-data'
+import type { State } from '../../redux/types'
+import type { PipetteWizardFlow } from './types'
 
 interface PipetteWizardFlowsProps {
   flowType: PipetteWizardFlow
@@ -67,7 +67,7 @@ export const PipetteWizardFlows = (
   )
   const { stopRun, isLoading: isStopLoading } = useStopRunMutation({
     onSuccess: () => {
-      if (currentStep.section === SECTIONS.DETACH_STEM) {
+      if (currentStep.section === SECTIONS.DETACH_PROBE) {
         proceed()
       } else {
         closeFlow()
@@ -157,23 +157,23 @@ export const PipetteWizardFlows = (
         isCreateLoading={isCreateLoading}
       />
     )
-  } else if (currentStep.section === SECTIONS.ATTACH_STEM) {
+  } else if (currentStep.section === SECTIONS.ATTACH_PROBE) {
     onExit = confirmExit
     modalContent = modalContent = showConfirmExit ? (
       exitModal
     ) : (
-      <AttachStem
+      <AttachProbe
         {...currentStep}
         {...calibrateBaseProps}
         isExiting={isExiting}
       />
     )
-  } else if (currentStep.section === SECTIONS.DETACH_STEM) {
+  } else if (currentStep.section === SECTIONS.DETACH_PROBE) {
     onExit = confirmExit
     modalContent = modalContent = showConfirmExit ? (
       exitModal
     ) : (
-      <DetachStem
+      <DetachProbe
         {...currentStep}
         {...calibrateBaseProps}
         handleCleanUp={handleCleanUpAndClose}
