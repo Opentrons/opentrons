@@ -15,7 +15,7 @@ def run(ctx: ProtocolContext) -> None:
     pipette.flow_rate.dispense = 80
 
     row = 1
-    wells = [plate[f"{col}{row}"] for col in 'ABCDEFGH']
+    wells = [plate[f"{col}{row}"] for col in "ABCDEFGH"]
     for well in wells:
         pipette.pick_up_tip()
         pipette.aspirate(200, trough["A1"])
