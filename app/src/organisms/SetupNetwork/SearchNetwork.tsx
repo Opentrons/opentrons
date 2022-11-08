@@ -18,6 +18,11 @@ export function SearchNetwork(): JSX.Element {
   const { t } = useTranslation('device_settings')
   return (
     <>
+      <Flex justifyContent={JUSTIFY_CENTER} marginBottom="3.041875rem">
+        <StyledText fontSize="2rem" fontWeight="700" lineHeight="2.72375rem">
+          {t('connect_to_a_network')}
+        </StyledText>
+      </Flex>
       <Flex
         height="26.5625rem"
         backgroundColor="#D6D6D6"

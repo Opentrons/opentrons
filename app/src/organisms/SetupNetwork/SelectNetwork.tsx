@@ -27,7 +27,6 @@ import type { State, Dispatch } from '../../redux/types'
 const LIST_REFRESH_MS = 10000
 
 export function SelectNetwork(): JSX.Element {
-  const { t } = useTranslation('device_settings')
   const [isSearching, setIsSearching] = React.useState<boolean>(false)
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
@@ -71,7 +70,7 @@ export function SelectNetwork(): JSX.Element {
               alignItems={ALIGN_CENTER}
               marginBottom={SPACING.spacing3}
               borderRadius="0.75rem"
-              onClick={() => history.push(`setWifiCred/${nw.ssid}`)}
+              onClick={() => history.push(`/setWifiCred/${nw.ssid}`)}
             >
               <Icon name="wifi" size="2.25rem" />
               <StyledText marginLeft={SPACING.spacing4} color="#000">
@@ -81,18 +80,7 @@ export function SelectNetwork(): JSX.Element {
           ))}
         </>
       ) : (
-        <>
-          <Flex justifyContent={JUSTIFY_CENTER} marginBottom="3.041875rem">
-            <StyledText
-              fontSize="2rem"
-              fontWeight="700"
-              lineHeight="2.72375rem"
-            >
-              {t('connect_to_a_network')}
-            </StyledText>
-          </Flex>
-          <SearchNetwork />
-        </>
+        <SearchNetwork />
       )}
     </Flex>
   )
