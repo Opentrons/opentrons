@@ -13,7 +13,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
   const testCases = [
     {
       title:
-        'preFlexGrandfatheredProtocol 1.0.0 (schema 1, PD version pre-1) -> PD 6.0.x, schema 6',
+        'preFlexGrandfatheredProtocol 1.0.0 (schema 1, PD version pre-1) -> PD 6.1.x, schema 6',
       importFixture:
         '../../fixtures/protocol/1/preFlexGrandfatheredProtocol.json',
       expectedExportFixture:
@@ -22,7 +22,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       migrationModal: 'newLabwareDefs',
     },
     {
-      title: 'example_1_1_0 (schema 1, PD version 1.1.1) -> PD 6.0.x, schema 6',
+      title: 'example_1_1_0 (schema 1, PD version 1.1.1) -> PD 6.1.x, schema 6',
       importFixture: '../../fixtures/protocol/1/example_1_1_0.json',
       expectedExportFixture:
         '../../fixtures/protocol/6/example_1_1_0MigratedFromV1_0_0.json',
@@ -30,7 +30,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       migrationModal: 'newLabwareDefs',
     },
     {
-      title: 'doItAllV3 (schema 3, PD version 4.0.0) -> PD 6.0.x, schema 6',
+      title: 'doItAllV3 (schema 3, PD version 4.0.0) -> PD 6.1.x, schema 6',
       importFixture: '../../fixtures/protocol/4/doItAllV3.json',
       expectedExportFixture:
         '../../fixtures/protocol/6/doItAllV3MigratedToV6.json',
@@ -38,7 +38,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       migrationModal: 'noBehaviorChange',
     },
     {
-      title: 'doItAllV4 (schema 4, PD version 4.0.0) -> PD 6.0.x, schema 6',
+      title: 'doItAllV4 (schema 4, PD version 4.0.0) -> PD 6.1.x, schema 6',
       importFixture: '../../fixtures/protocol/4/doItAllV4.json',
       expectedExportFixture:
         '../../fixtures/protocol/6/doItAllV4MigratedToV6.json',
@@ -47,7 +47,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
     },
     {
       title:
-        'doItAllV6 (schema 6, PD version 6.0.0) -> import and re-export should preserve data',
+        'doItAllV6 (schema 6, PD version 6.1.0) -> import and re-export should preserve data',
       importFixture: '../../fixtures/protocol/6/doItAllV4MigratedToV6.json',
       expectedExportFixture:
         '../../fixtures/protocol/6/doItAllV4MigratedToV6.json',
@@ -56,7 +56,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
     },
     {
       title:
-        'mix 5.0.x (schema 3, PD version 5.0.0) -> should migrate to 6.0.x, schema v6',
+        'mix 5.0.x (schema 3, PD version 5.0.0) -> should migrate to 6.1.x, schema v6',
       importFixture: '../../fixtures/protocol/5/mix_5_0_x.json',
       expectedExportFixture: '../../fixtures/protocol/6/mix_6_0_0.json',
       migrationModal: 'noBehaviorChange',
@@ -144,8 +144,8 @@ describe('Protocol fixtures migrate and match snapshots', () => {
 
               assert.match(
                 savedFile.designerApplication.version,
-                /^6\.0\.\d+$/,
-                'designerApplication.version is 6.0.x'
+                /^6\.1\.\d+$/,
+                'designerApplication.version is 6.1.x'
               )
               ;[savedFile, expectedFile].forEach(f => {
                 // Homogenize fields we don't want to compare
