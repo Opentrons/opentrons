@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory, useParams } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 
 import {
   Flex,
@@ -16,35 +16,24 @@ import {
 import { StyledText } from '../../atoms/text'
 import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
 
-import type { NavRouteParams } from '../../App/types'
-
-interface ConnectionResultProps {
+interface ConnectedResultProps {
+  ssid: string
   isConnected: boolean
   requestState?: any // ToDo update this type
   onConnect: () => void
 }
 
-export function ConnectionResult({
+export function ConnectedResult({
+  ssid,
   isConnected,
   requestState,
   onConnect,
-}: ConnectionResultProps): JSX.Element {
+}: ConnectedResultProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const { ssid } = useParams<NavRouteParams>()
   const history = useHistory()
 
-  // ToDo use isConnected for rendering parts
   return (
     <Flex padding={SPACING.spacingXXL} flexDirection={DIRECTION_COLUMN}>
-      {/* <Flex justifyContent={JUSTIFY_CENTER}>
-            <StyledText
-              fontSize="2rem"
-              fontWeight="700"
-              lineHeight="2.72375rem"
-            >
-              {t('connect_to_a_network')}
-            </StyledText>
-          </Flex> */}
       <Flex
         height="26.5625rem"
         backgroundColor={COLORS.successBackgroundMed}

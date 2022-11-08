@@ -27,7 +27,7 @@ import * as RobotApi from '../../redux/robot-api'
 import * as Networking from '../../redux/networking'
 import { getLocalRobot } from '../../redux/discovery'
 import { ConnectingNetwork } from './ConnectingNetwork'
-import { ConnectionResult } from './ConnectionResult'
+import { ConnectedResult } from './ConnectedResult'
 
 import type { State, Dispatch } from '../../redux/types'
 import type { NavRouteParams } from '../../App/types'
@@ -182,7 +182,8 @@ export function SetWifiCred(): JSX.Element {
           {requestState?.status === RobotApi.PENDING ? (
             <ConnectingNetwork />
           ) : (
-            <ConnectionResult
+            <ConnectedResult
+              ssid={ssid}
               isConnected={requestState?.status === RobotApi.SUCCESS}
               requestState={requestState}
               onConnect={handleConnect}
