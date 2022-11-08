@@ -35,7 +35,7 @@ class CommandNotFound(ErrorDetails):
 
 @commands_router.post(
     path="/commands",
-    summary="Add a command to be executed.",
+    summary="Add a command to be executed",
     description=(
         "Run a single command on the robot. This endpoint is meant for"
         " simple, stateless control of the robot. For complex control,"
