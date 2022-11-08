@@ -72,7 +72,7 @@ jobs:
         if: matrix.os == 'windows-2022'
         uses: './.github/actions/python/setup-single-environment'
         with:
-          environment: 'app'
+          environment: 'environments/app'
           python-version: '3.10'
       - name: setup python environments NOT Windows
         if: matrix.os != 'windows-2022'

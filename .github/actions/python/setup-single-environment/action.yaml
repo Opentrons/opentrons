@@ -35,6 +35,5 @@ runs:
       shell: bash
       run: make install-pipenv
     - shell: bash
-      working-directory: environments
       name: setup ${{ inputs.environment }}
       run: make -C ${{ inputs.environment }} setup
