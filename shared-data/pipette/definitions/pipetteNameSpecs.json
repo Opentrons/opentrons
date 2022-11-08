@@ -548,30 +548,30 @@
     "displayName": "P1000 Multi-Channel GEN3",
     "displayCategory": "GEN3",
     "defaultAspirateFlowRate": {
-      "value": 137.35,
+      "value": 159.04,
       "min": 3,
       "max": 812,
       "valuesByApiLevel": {
-        "2.0": 137.35,
-        "2.6": 274.7
+        "2.0": 159.04,
+        "2.6": 159.04
       }
     },
     "defaultDispenseFlowRate": {
-      "value": 137.35,
+      "value": 159.04,
       "min": 3,
       "max": 812,
       "valuesByApiLevel": {
-        "2.0": 137.35,
-        "2.6": 274.7
+        "2.0": 159.04,
+        "2.6": 159.04
       }
     },
     "defaultBlowOutFlowRate": {
-      "value": 137.35,
+      "value": 79.52,
       "min": 3,
       "max": 812,
       "valuesByApiLevel": {
-        "2.0": 137.35,
-        "2.6": 274.7
+        "2.0": 79.52,
+        "2.6": 79.52
       }
     },
     "channels": 8,
