@@ -191,40 +191,6 @@ export function parseInitialLoadedLabwareEntity(
   })
 }
 
-export interface LoadedLabwareDefinitionsById {
-  [definitionUri: string]: LabwareDefinition2
-}
-export function parseInitialLoadedLabwareDefinitionsById(
-  commands: RunTimeCommand[]
-): LoadedLabwareDefinitionsById {
-  const labware = parseInitialLoadedLabwareEntity(commands)
-  const loadLabwareCommandsReversed = commands
-    .filter(
-      (command): command is LoadLabwareRunTimeCommand =>
-        command.commandType === 'loadLabware'
-    )
-    .reverse()
-  return reduce<LoadLabwareRunTimeCommand, LoadedLabwareDefinitionsById>(
-    loadLabwareCommandsReversed,
-    (acc, command) => {
-      const quirks = command.result.definition.parameters.quirks ?? []
-      if (quirks.includes('fixedTrash')) {
-        return { ...acc }
-      }
-      const labwareDef: LabwareDefinition2 = command.result?.definition
-      const labwareId = command.result?.labwareId ?? ''
-      const definitionUri =
-        labware.find(item => item.id === labwareId)?.definitionUri ?? ''
-
-      return {
-        ...acc,
-        [definitionUri]: labwareDef,
-      }
-    },
-    {}
-  )
-}
-
 interface LoadedModulesBySlot {
   [slotName: string]: LoadModuleRunTimeCommand
 }

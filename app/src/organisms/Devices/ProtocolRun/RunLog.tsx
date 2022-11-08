@@ -225,6 +225,8 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
   }
 
   React.useEffect(() => {
+    console.log('RC', runCommands)
+    console.log('AC', runCommands)
     // if the run's current command key doesn't exist in the analysis commands
     if (
       runCommands.length > 0 &&

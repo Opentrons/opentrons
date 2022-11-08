@@ -3,8 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { Flex, ALIGN_CENTER, SPACING, TYPOGRAPHY } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { StyledText } from '../../../atoms/text'
-import { getLabwareLocation } from '../ProtocolRun/utils/getLabwareLocation'
-import { getSlotLabwareName } from './utils/getSlotLabwareName'
 
 import {
   useLabwareRenderInfoForRunById,
@@ -14,6 +12,7 @@ import { RunLogProtocolSetupInfo } from './RunLogProtocolSetupInfo'
 
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { RunCommandSummary } from '@opentrons/api-client'
+import { getLoadedLabwareDefinitionsByUri } from '../../../resources/protocols/utils'
 
 const TRASH_ID = 'fixedTrash'
 
@@ -66,25 +65,17 @@ export function StepText(props: Props): JSX.Element | null {
     }
     case 'dropTip': {
       const { wellName, labwareId } = displayCommand.params
-      const labwareLocation = getLabwareLocation(
-        labwareId,
-        protocolData.commands
-      )
-      if (labwareLocation === 'offDeck' || !('slotName' in labwareLocation)) {
-        throw new Error('expected tip rack to be in a slot')
-      }
+      const defsByURI = getLoadedLabwareDefinitionsByUri(protocolData.commands)
       const definitionUri =
-        protocolData.labware.find(labware => labware.id === labwareId)
+        protocolData.labware.find(l => l.id === labwareId)
           ?.definitionUri ?? ''
       messageNode = t('drop_tip', {
         well_name: wellName,
         labware:
           labwareId === TRASH_ID
             ? 'Opentrons Fixed Trash'
-            : getLabwareDisplayName(
-                protocolData.labwareDefinitions[definitionUri]
-              ),
-        labware_location: labwareLocation.slotName,
+            : getLabwareDisplayName(defsByURI[definitionUri]),
+        labware_location: 'a slot',
       })
       break
     }
@@ -95,6 +86,7 @@ export function StepText(props: Props): JSX.Element | null {
         labware: getLabwareDisplayName(
           labwareRenderInfoById[labwareId].labwareDef
         ),
+        labware_location: 'a slot',
       })
       break
     }
@@ -238,14 +230,11 @@ export function StepText(props: Props): JSX.Element | null {
     }
     case 'aspirate': {
       const { wellName, labwareId, volume, flowRate } = displayCommand.params
-      const { slotName, labwareName } = getSlotLabwareName(
-        labwareId,
-        protocolData.commands
-      )
+      
       messageNode = t('aspirate', {
         well_name: wellName,
-        labware: labwareName,
-        labware_location: slotName,
+        labware: 'a labware',
+        labware_location: 'a slot',
         volume: volume,
         flow_rate: flowRate,
       })
@@ -253,14 +242,10 @@ export function StepText(props: Props): JSX.Element | null {
     }
     case 'dispense': {
       const { wellName, labwareId, volume, flowRate } = displayCommand.params
-      const { slotName, labwareName } = getSlotLabwareName(
-        labwareId,
-        protocolData.commands
-      )
       messageNode = t('dispense', {
         well_name: wellName,
-        labware: labwareName,
-        labware_location: slotName,
+        labware: 'a labware',
+        labware_location: 'a slot',
         volume: volume,
         flow_rate: flowRate,
       })
@@ -269,14 +254,10 @@ export function StepText(props: Props): JSX.Element | null {
     }
     case 'blowout': {
       const { wellName, labwareId, flowRate } = displayCommand.params
-      const { slotName, labwareName } = getSlotLabwareName(
-        labwareId,
-        protocolData.commands
-      )
       messageNode = t('blowout', {
         well_name: wellName,
-        labware: labwareName,
-        labware_location: slotName,
+        labware: 'a labware',
+        labware_location: 'a slot',
         flow_rate: flowRate,
       })
       break
@@ -294,15 +275,11 @@ export function StepText(props: Props): JSX.Element | null {
     }
     case 'moveToWell': {
       const { wellName, labwareId } = displayCommand.params
-      const { slotName, labwareName } = getSlotLabwareName(
-        labwareId,
-        protocolData.commands
-      )
 
       messageNode = t('move_to_well', {
         well_name: wellName,
-        labware: labwareName,
-        labware_location: slotName,
+        labware: 'a labware',
+        labware_location: 'a slot',
       })
       break
     }
