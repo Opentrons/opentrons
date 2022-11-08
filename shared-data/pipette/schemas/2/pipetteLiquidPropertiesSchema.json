@@ -37,29 +37,39 @@
 	},
 	"type": "object",
 	"required": [
-		"defaultAspirateFlowRate",
-		"defaultDispenseFlowRate",
-		"defaultBlowOutFlowRate",
 		"maxVolume",
 		"minVolume",
-		"ulPerMm",
 		"defaultTipracks"
 	],
 	"additionalProperties": false,
 	"properties": {
-		"defaultAspirateFlowRate": {
-		"$ref": "#/definitions/flowRate"
-		},
-		"defaultDispenseFlowRate": {
-		"$ref": "#/definitions/flowRate"
-		},
-		"defaultBlowOutFlowRate": {
-		"$ref": "#/definitions/flowRate"
-		},
-		"ulPerMm": {
-			"type": "array",
-			"items": { "$ref": "#/definitions/liquidHandlingSpecs" }
-		  },
+		"patternProperties": {
+			"description": "Tip specific liquid handling properties for a given pipette",
+			"type": "object",
+			"$comment": "Example key: 'T50'",
+			"^T[0-9]{2,4}": {
+			  "required": [
+				"defaultAspirateFlowRate",
+				"defaultDispenseFlowRate",
+				"defaultBlowOutFlowRate", "aspirate", "dispense"],
+			  "properties": {
+				"defaultAspirateFlowRate": {
+					"$ref": "#/definitions/flowRate"
+					},
+				"defaultDispenseFlowRate": {
+					"$ref": "#/definitions/flowRate"
+					},
+				"defaultBlowOutFlowRate": {
+					"$ref": "#/definitions/flowRate"
+					},
+				"aspirate": {
+						"type": "array",
+						"items": { "$ref": "#/definitions/liquidHandlingSpecs" }},
+				"dispense": {
+					"type": "array",
+					"items": { "$ref": "#/definitions/liquidHandlingSpecs" }}
+			  }
+		}},
 		"maxVolume": { "$ref": "#/definitions/positiveNumber" },
 		"minVolume": { "$ref": "#/definitions/positiveNumber" },
 		"defaultTipracks": {
