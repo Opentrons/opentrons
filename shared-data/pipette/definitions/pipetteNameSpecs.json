@@ -460,30 +460,30 @@
     "displayName": "P1000 Single-Channel GEN3",
     "displayCategory": "GEN3",
     "defaultAspirateFlowRate": {
-      "value": 137.35,
+      "value": 159.04,
       "min": 3,
       "max": 812,
       "valuesByApiLevel": {
-        "2.0": 137.35,
-        "2.6": 274.7
+        "2.0": 159.04,
+        "2.6": 159.04
       }
     },
     "defaultDispenseFlowRate": {
-      "value": 137.35,
+      "value": 159.04,
       "min": 3,
       "max": 812,
       "valuesByApiLevel": {
-        "2.0": 137.35,
-        "2.6": 274.7
+        "2.0": 159.04,
+        "2.6": 159.04
       }
     },
     "defaultBlowOutFlowRate": {
-      "value": 137.35,
+      "value": 79.52,
       "min": 3,
       "max": 812,
       "valuesByApiLevel": {
-        "2.0": 137.35,
-        "2.6": 274.7
+        "2.0": 79.52,
+        "2.6": 79.52
       }
     },
     "channels": 1,
@@ -501,10 +501,10 @@
     ]
   },
   "p50_single_gen3": {
-    "displayName": "P1000 Single-Channel GEN3",
+    "displayName": "P50 Single-Channel GEN3",
     "displayCategory": "GEN3",
     "defaultAspirateFlowRate": {
-      "value": 137.35,
+      "value": 7.85,
       "min": 3,
       "max": 812,
       "valuesByApiLevel": {
@@ -513,7 +513,7 @@
       }
     },
     "defaultDispenseFlowRate": {
-      "value": 137.35,
+      "value": 7.85,
       "min": 3,
       "max": 812,
       "valuesByApiLevel": {
@@ -522,7 +522,7 @@
       }
     },
     "defaultBlowOutFlowRate": {
-      "value": 137.35,
+      "value": 3.93,
       "min": 3,
       "max": 812,
       "valuesByApiLevel": {

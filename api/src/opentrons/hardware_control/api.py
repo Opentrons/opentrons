@@ -60,7 +60,7 @@ from . import modules, robot_calibration as rb_cal
 from .protocols import HardwareControlAPI
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.pipette.dev_types import UlPerMmAction, PipetteName
+    from opentrons_shared_data.pipette.dev_types import UlPerMmAction, PipetteTipSize, PipetteName
     from .dev_types import PipetteDict
 
 
@@ -546,30 +546,29 @@ class API(HardwareControlAPI):
             #  this dict newly every time? Any why only a few items are being updated?
             for key in configs:
                 result[key] = instr_dict[key]
-            print("Pipette Dictionay")
-            print(f"{instr_dict}")
             result["has_tip"] = instr.has_tip
             result["tip_length"] = instr.current_tip_length
+            result["tip_size"] = instr.current_tip_size
             result["aspirate_speed"] = self._plunger_speed(
-                instr, instr.aspirate_flow_rate, "aspirate"
+                instr, instr.aspirate_flow_rate, instr.current_tip_size, "aspirate"
             )
             result["dispense_speed"] = self._plunger_speed(
-                instr, instr.dispense_flow_rate, "dispense"
+                instr, instr.dispense_flow_rate, instr.current_tip_size, "dispense"
             )
             result["blow_out_speed"] = self._plunger_speed(
-                instr, instr.blow_out_flow_rate, "dispense"
+                instr, instr.blow_out_flow_rate, instr.current_tip_size, "dispense"
             )
             result["ready_to_aspirate"] = instr.ready_to_aspirate
             result["default_blow_out_speeds"] = {
-                alvl: self._plunger_speed(instr, fr, "dispense")
+                alvl: self._plunger_speed(instr, fr, instr.current_tip_size, "dispense")
                 for alvl, fr in instr.config.default_aspirate_flow_rates.items()
             }
             result["default_dispense_speeds"] = {
-                alvl: self._plunger_speed(instr, fr, "dispense")
+                alvl: self._plunger_speed(instr, fr, instr.current_tip_size, "dispense")
                 for alvl, fr in instr.config.default_dispense_flow_rates.items()
             }
             result["default_aspirate_speeds"] = {
-                alvl: self._plunger_speed(instr, fr, "aspirate")
+                alvl: self._plunger_speed(instr, fr, instr.current_tip_size, "aspirate")
                 for alvl, fr in instr.config.default_aspirate_flow_rates.items()
             }
         return cast("PipetteDict", result)
@@ -778,6 +777,13 @@ class API(HardwareControlAPI):
                 self._current_position = self._deck_from_smoothie(smoothie_pos)
             for plunger in plungers:
                 await self._do_plunger_home(axis=plunger, acquire_lock=False)
+
+    async def set_tip_size(self, mount: top_types.Mount, tip: str):
+        instr = self._attached_instruments[mount]
+        attached = self.attached_instruments
+        instr_dict = attached[mount]
+        instr.set_tip_size(tip_size=tip)
+        instr_dict["tip_size"] = tip
 
     async def add_tip(self, mount: top_types.Mount, tip_length: float):
         instr = self._attached_instruments[mount]
@@ -1421,7 +1427,7 @@ class API(HardwareControlAPI):
         with_zero = filter(lambda i: i[0].current_volume == 0, instruments)
         for instr in with_zero:
             speed = self._plunger_speed(
-                instr[0], instr[0].blow_out_flow_rate, "aspirate"
+                instr[0], instr[0].blow_out_flow_rate, instr[0].current_tip_size, "aspirate"
             )
             bottom = (instr[0].config.bottom,)
             await self._move_plunger(instr[1], bottom, speed=(speed * rate))
@@ -1479,12 +1485,12 @@ class API(HardwareControlAPI):
             ), "Cannot aspirate more than pipette max volume"
 
         dist = tuple(
-            self._plunger_position(instr[0], instr[0].current_volume + vol, "aspirate")
+            self._plunger_position(instr[0], instr[0].current_volume + vol, instr[0].current_tip_size, "aspirate")
             for instr, vol in zip(instruments, asp_vol)
         )
         speed = min(
             self._plunger_speed(
-                instr[0], instr[0].aspirate_flow_rate * rate, "aspirate"
+                instr[0], instr[0].aspirate_flow_rate * rate, instr[0].current_tip_size,"aspirate"
             )
             for instr in instruments
         )
@@ -1544,12 +1550,12 @@ class API(HardwareControlAPI):
             raise PairedPipetteConfigValueError("Cannot only dispense from one pipette")
 
         dist = tuple(
-            self._plunger_position(instr[0], instr[0].current_volume - vol, "dispense")
+            self._plunger_position(instr[0], instr[0].current_volume - vol, instr[0].current_tip_size, "dispense")
             for instr, vol in zip(instruments, disp_vol)
         )
         speed = min(
             self._plunger_speed(
-                instr[0], instr[0].dispense_flow_rate * rate, "dispense"
+                instr[0], instr[0].dispense_flow_rate * rate, instr[0].current_tip_size, "dispense"
             )
             for instr in instruments
         )
@@ -1567,23 +1573,34 @@ class API(HardwareControlAPI):
                 instr[0].remove_current_volume(vol)
 
     def _plunger_position(
-        self, instr: Pipette, ul: float, action: "UlPerMmAction"
+        self, instr: Pipette, ul: float, tip_size: "PipetteTipSize", action: "UlPerMmAction"
     ) -> float:
-        mm = ul / instr.ul_per_mm(ul, action)
+        mm = ul / instr.ul_per_mm(ul, tip_size, action)
         position = mm + instr.config.bottom
         return round(position, 6)
 
     def _plunger_speed(
-        self, instr: Pipette, ul_per_s: float, action: "UlPerMmAction"
+        self, instr: Pipette, ul_per_s: float, tip_size: "PipetteTipSize", action: "UlPerMmAction"
     ) -> float:
-        mm_per_s = ul_per_s / instr.ul_per_mm(instr.config.max_volume, action)
+        max_volume = self.return_tip_size_as_float(tip_size)
+        mm_per_s = ul_per_s / instr.ul_per_mm(max_volume, tip_size, action)
         return round(mm_per_s, 6)
 
     def _plunger_flowrate(
-        self, instr: Pipette, mm_per_s: float, action: "UlPerMmAction"
+        self, instr: Pipette, mm_per_s: float, tip_size: "PipetteTipSize", action: "UlPerMmAction"
     ) -> float:
-        ul_per_s = mm_per_s * instr.ul_per_mm(instr.config.max_volume, action)
+        max_volume = self.return_tip_size_as_float(tip_size)
+        ul_per_s = mm_per_s * instr.ul_per_mm(max_volume, tip_size, action)
         return round(ul_per_s, 6)
+
+    def return_tip_size_as_float(self, tip_size) -> float:
+        if tip_size == '1000uL':
+            return 1000.0
+        elif tip_size == '200uL':
+            return 200.0
+        elif tip_size == '50uL':
+            return 50.0
+        raise("Invalid Tip Size!!!")
 
     async def blow_out(self, mount: Union[top_types.Mount, PipettePair]):
         """
@@ -1600,7 +1617,7 @@ class API(HardwareControlAPI):
 
         self._backend.set_active_current(plunger_currents)
         speed = max(
-            self._plunger_speed(instr[0], instr[0].blow_out_flow_rate, "dispense")
+            self._plunger_speed(instr[0], instr[0].blow_out_flow_rate, instr[0].current_tip_size, "dispense")
             for instr in instruments
         )
         try:
@@ -1959,15 +1976,15 @@ class API(HardwareControlAPI):
             )
         if aspirate:
             this_pipette.aspirate_flow_rate = self._plunger_flowrate(
-                this_pipette, aspirate, "aspirate"
+                this_pipette, aspirate, this_pipette.current_tip_size, "aspirate"
             )
         if dispense:
             this_pipette.dispense_flow_rate = self._plunger_flowrate(
-                this_pipette, dispense, "dispense"
+                this_pipette, dispense, this_pipette.current_tip_size, "dispense"
             )
         if blow_out:
             this_pipette.blow_out_flow_rate = self._plunger_flowrate(
-                this_pipette, blow_out, "dispense"
+                this_pipette, blow_out, this_pipette.current_tip_size, "dispense"
             )
 
     def get_instrument_max_height(

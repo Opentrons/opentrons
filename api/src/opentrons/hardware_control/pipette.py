@@ -19,6 +19,7 @@ from .types import CriticalPoint, BoardRevision
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import (
         UlPerMmAction,
+        PipetteTipSize,
         PipetteName,
         PipetteModel,
     )
@@ -59,6 +60,7 @@ class Pipette:
         self._current_tiprack_diameter = 0.0
         self._fallback_tip_length = self._config.tip_length
         self._tip_overlap_map = self._config.tip_overlap
+        self._pipette_tip_size = self._config.tip_size
         self._has_tip = False
         self._pipette_id = pipette_id
         self._log = mod_log.getChild(
@@ -260,6 +262,17 @@ class Pipette:
     def ok_to_add_volume(self, volume_incr: float) -> bool:
         return self.current_volume + volume_incr <= self.working_volume
 
+    def set_tip_size(self, tip_size: str) -> None:
+        """
+        :param tip_length:
+        :return:
+        """
+        self._pipette_tip_size = tip_size
+
+    @property
+    def current_tip_size(self) -> str:
+        return self._pipette_tip_size
+
     def add_tip(self, tip_length: float) -> None:
         """
         Add a tip to the pipette for position tracking and validation
@@ -287,8 +300,8 @@ class Pipette:
     def has_tip(self) -> bool:
         return self._has_tip
 
-    def ul_per_mm(self, ul: float, action: UlPerMmAction) -> float:
-        sequence = self._config.ul_per_mm[action]
+    def ul_per_mm(self, ul: float, tip_size: PipetteTipSize, action: UlPerMmAction) -> float:
+        sequence = self._config.ul_per_mm[tip_size][action]
         return pipette_config.piecewise_volume_conversion(ul, sequence)
 
     def __str__(self) -> str:
@@ -313,6 +326,7 @@ class Pipette:
                 "model": self.model,
                 "pipette_id": self.pipette_id,
                 "has_tip": self.has_tip,
+                "tip_size": self.current_tip_size,
                 "working_volume": self.working_volume,
                 "aspirate_flow_rate": self.aspirate_flow_rate,
                 "dispense_flow_rate": self.dispense_flow_rate,
