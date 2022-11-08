@@ -11,6 +11,9 @@ def run(ctx: ProtocolContext) -> None:
     trough = ctx.load_labware("nest_12_reservoir_15ml", "8")
     pipette = ctx.load_instrument("p1000_single_gen3", "left", tip_racks=[tiprack_200])
 
+    pipette.flow_rate.aspirate = 80
+    pipette.flow_rate.dispense = 80
+
     row = 1
     wells = [plate[f"{col}{row}"] for col in 'ABCDEFGH']
     for well in wells:
