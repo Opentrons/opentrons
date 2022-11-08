@@ -582,19 +582,23 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     @requires_version(2, 0)
     def lid_position(self) -> Optional[str]:
         """Lid open/close status string"""
-        return self._core.get_lid_position()
+        # TODO(mc, 2022-11-08): this will never be None, update typings and logic
+        position = self._core.get_lid_position()
+        return position.value if position is not None else None
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def block_temperature_status(self) -> str:
         """Block temperature status string"""
-        return self._core.get_block_temperature_status()
+        return self._core.get_block_temperature_status().value
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def lid_temperature_status(self) -> Optional[str]:
         """Lid temperature status string"""
-        return self._core.get_lid_temperature_status()
+        # TODO(mc, 2022-11-08): this will never be None, update typings and logic
+        status = self._core.get_lid_temperature_status()
+        return status.value if status is not None else None
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)

@@ -57,7 +57,9 @@ def test_get_lid_position(
     """It should get the lid position status from the core."""
     decoy.when(mock_core.get_lid_position()).then_return(ThermocyclerLidStatus.OPEN)
     result = subject.lid_position
+
     assert result == "open"
+    assert isinstance(result, ThermocyclerLidStatus) is False
 
 
 def test_get_block_temperature_status(
@@ -68,7 +70,9 @@ def test_get_block_temperature_status(
         TemperatureStatus.IDLE
     )
     result = subject.block_temperature_status
+
     assert result == "idle"
+    assert isinstance(result, TemperatureStatus) is False
 
 
 def test_get_lid_temperature_status(
@@ -79,7 +83,9 @@ def test_get_lid_temperature_status(
         TemperatureStatus.IDLE
     )
     result = subject.lid_temperature_status
+
     assert result == "idle"
+    assert isinstance(result, TemperatureStatus) is False
 
 
 def test_get_block_temperature(
@@ -198,7 +204,9 @@ def test_open_lid(
             matchers.DictMatching({"$": "after"}),
         ),
     )
+
     assert result == "open"
+    assert isinstance(result, ThermocyclerLidStatus) is False
 
 
 def test_close_lid(
@@ -227,7 +235,9 @@ def test_close_lid(
             matchers.DictMatching({"$": "after"}),
         ),
     )
+
     assert result == "closed"
+    assert isinstance(result, ThermocyclerLidStatus) is False
 
 
 def test_set_block_temperature(

@@ -8,7 +8,10 @@ import opentrons.protocol_api as papi
 import opentrons.protocols.geometry as papi_geometry
 
 from opentrons.types import Point, Location
-from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
+from opentrons.drivers.types import (
+    HeaterShakerLabwareLatchStatus,
+    ThermocyclerLidStatus,
+)
 from opentrons.hardware_control import modules as hw_modules
 from opentrons.hardware_control.modules.magdeck import OFFSET_TO_LABWARE_BOTTOM
 from opentrons.hardware_control.modules.types import (
@@ -206,7 +209,7 @@ def test_thermocycler(ctx_with_thermocycler, mock_module_controller):
 
 def test_thermocycler_lid_status(ctx_with_thermocycler, mock_module_controller):
     mod = ctx_with_thermocycler.load_module("thermocycler")
-    m = mock.PropertyMock(return_value="open")
+    m = mock.PropertyMock(return_value=ThermocyclerLidStatus.OPEN)
     type(mock_module_controller).lid_status = m
     assert mod.lid_position == "open"
 
@@ -276,7 +279,7 @@ def test_thermocycler_flag_unsafe_move(ctx_with_thermocycler, mock_module_contro
     with_tc_labware = Location(None, tc_labware)  # type: ignore[arg-type]
     without_tc_labware = Location(None, None)  # type: ignore[arg-type]
 
-    m = mock.PropertyMock(return_value="closed")
+    m = mock.PropertyMock(return_value=ThermocyclerLidStatus.CLOSED)
     type(mock_module_controller).lid_status = m
 
     with pytest.raises(RuntimeError, match="Cannot move to labware"):
