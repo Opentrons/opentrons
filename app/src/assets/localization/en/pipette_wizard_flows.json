@@ -28,5 +28,7 @@
   "detach_and_reattach": "Detach and reattach pipette",
   "grab_screwdriver": "While continuing to hold in place, grab your 2.5mm driver and tighten screws as shown in the animation. Test the pipette attachment by giving it a wiggle before pressing continue",
   "name_and_volume_detected": "{{name}} Pipette Detected",
-  "error_encountered": "Error encountered"
+  "error_encountered": "Error encountered",
+  "loose_detach": "Loosen Screws and Detach",
+  "hold_and_loosen": "Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette"
 }
