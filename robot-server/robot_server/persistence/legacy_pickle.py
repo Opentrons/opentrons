@@ -173,7 +173,6 @@ class LegacyUnpickler(Unpickler):
                 known_type = False
 
             if not known_type:
-                raise NotImplementedError
                 _log.warning(
                     f'Unpickling unknown type "{name}" from module "{module}".'
                     f" This may cause problems with reading records created by"
