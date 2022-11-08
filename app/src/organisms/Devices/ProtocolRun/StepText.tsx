@@ -67,8 +67,7 @@ export function StepText(props: Props): JSX.Element | null {
       const { wellName, labwareId } = displayCommand.params
       const defsByURI = getLoadedLabwareDefinitionsByUri(protocolData.commands)
       const definitionUri =
-        protocolData.labware.find(l => l.id === labwareId)
-          ?.definitionUri ?? ''
+        protocolData.labware.find(l => l.id === labwareId)?.definitionUri ?? ''
       messageNode = t('drop_tip', {
         well_name: wellName,
         labware:
@@ -230,7 +229,7 @@ export function StepText(props: Props): JSX.Element | null {
     }
     case 'aspirate': {
       const { wellName, labwareId, volume, flowRate } = displayCommand.params
-      
+
       messageNode = t('aspirate', {
         well_name: wellName,
         labware: 'a labware',

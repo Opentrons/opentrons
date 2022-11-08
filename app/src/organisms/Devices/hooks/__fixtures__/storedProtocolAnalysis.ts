@@ -14,7 +14,7 @@ export const LABWARE_ENTITY: LoadedLabwareEntity = {
   definitionUri: 'fakeLabwareDefinitionUri',
   displayName: 'a fake labware',
 }
-export const LABWARE_DEFINITIONS: {[defUri: string]: LabwareDefinition2}= {
+export const LABWARE_DEFINITIONS: { [defUri: string]: LabwareDefinition2 } = {
   fakeLabwareDefinitionId: {} as LabwareDefinition2,
 }
 export const MODULE_MODELS_BY_ID: ModuleModelsById = {

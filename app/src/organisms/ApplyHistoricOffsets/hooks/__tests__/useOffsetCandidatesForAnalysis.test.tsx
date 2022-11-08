@@ -25,7 +25,7 @@ const mockUseAllHistoricOffsets = useAllHistoricOffsets as jest.MockedFunction<
 const mockGetLabwareLocationCombos = getLabwareLocationCombos as jest.MockedFunction<
   typeof getLabwareLocationCombos
 >
-const mockgetLoadedLabwareDefinitionsByUri = getLoadedLabwareDefinitionsByUri as jest.MockedFunction<
+const mockGetLoadedLabwareDefinitionsByUri = getLoadedLabwareDefinitionsByUri as jest.MockedFunction<
   typeof getLoadedLabwareDefinitionsByUri
 >
 const mockFirstCandidate: OffsetCandidate = {
@@ -94,11 +94,13 @@ describe('useOffsetCandidatesForAnalysis', () => {
           definitionUri: 'thirdFakeDefURI',
         },
       ])
-    when(mockgetLoadedLabwareDefinitionsByUri).calledWith(expect.any(Array)).mockReturnValue({
-      firstFakeDefURI: mockLabwareDef,
-      secondFakeDefURI: mockLabwareDef,
-      thirdFakeDefURI: mockLabwareDef,
-    })
+    when(mockGetLoadedLabwareDefinitionsByUri)
+      .calledWith(expect.any(Array))
+      .mockReturnValue({
+        firstFakeDefURI: mockLabwareDef,
+        secondFakeDefURI: mockLabwareDef,
+        thirdFakeDefURI: mockLabwareDef,
+      })
   })
 
   afterEach(() => {

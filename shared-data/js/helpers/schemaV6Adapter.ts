@@ -57,7 +57,9 @@ export const schemaV6Adapter = (
       }
     })
 
-    const labwareDefinitions = getLoadedLabwareDefinitionsByUri(protocolAnalysis.commands)
+    const labwareDefinitions = getLoadedLabwareDefinitionsByUri(
+      protocolAnalysis.commands
+    )
 
     const modules: {
       [moduleId: string]: { model: ModuleModel }
