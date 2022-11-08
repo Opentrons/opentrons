@@ -17,11 +17,13 @@ if __name__ == "__main__":
     mount_options = {
         "left": types.OT3Mount.LEFT,
         "right": types.OT3Mount.RIGHT,
-        "gripper": types.OT3Mount.GRIPPER
+        "gripper": types.OT3Mount.GRIPPER,
     }
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
-    parser.add_argument("--mount", type=str, choices=list(mount_options.keys()), default="left")
+    parser.add_argument(
+        "--mount", type=str, choices=list(mount_options.keys()), default="left"
+    )
     args = parser.parse_args()
     mount = mount_options[args.mount]
     asyncio.run(_main(args.simulate, mount))

@@ -32,9 +32,11 @@ async def _find_slot_1_spot(api: OT3API, force: float) -> types.Point:
     await api.grip(force)
     input("ENTER to ungrip:")
     await api.ungrip()
-    grip_pnt = types.Point(x=grip_position[types.OT3Axis.X],
-                           y=grip_position[types.OT3Axis.Y],
-                           z=grip_position[types.OT3Axis.Z])
+    grip_pnt = types.Point(
+        x=grip_position[types.OT3Axis.X],
+        y=grip_position[types.OT3Axis.Y],
+        z=grip_position[types.OT3Axis.Z_G],
+    )
     if "y" in input("Try again? (y/n): "):
         grip_pnt = await _find_slot_1_spot(api, force)
     return grip_pnt
@@ -47,7 +49,9 @@ async def _main(is_simulating: bool, jog_to_find: bool, force: float) -> None:
     home_pos = await api.gantry_position(mount)
     near_home_pos = home_pos + types.Point(x=-5, y=-5, z=-5)
 
-    async def _gripper_action(dest_pos: types.Point, is_grip: bool, has_springs: bool) -> None:
+    async def _gripper_action(
+        dest_pos: types.Point, is_grip: bool, has_springs: bool
+    ) -> None:
         current_pos = await api.gantry_position(mount)
         await api.move_to(mount, dest_pos._replace(z=current_pos.z))
         await api.move_to(mount, dest_pos)
@@ -64,7 +68,9 @@ async def _main(is_simulating: bool, jog_to_find: bool, force: float) -> None:
         await _fast_home(api, mount, near_home_pos)
     else:
         grip_position = SLOT_1_POS
-    mag_grip_position = grip_position + types.Point(x=SLOT_SPACING_X) + types.Point(z=MAG_PLATE_HEIGHT)
+    mag_grip_position = (
+        grip_position + types.Point(x=SLOT_SPACING_X) + types.Point(z=MAG_PLATE_HEIGHT)
+    )
     mag_ungrip_position = mag_grip_position + UNGRIP_Z_OFFSET
     ungrip_position = grip_position + SLOT_UNGRIP_OFFSET
 
