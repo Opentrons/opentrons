@@ -16,14 +16,13 @@ export function InitialSplash(): JSX.Element {
   const history = useHistory()
 
   React.useEffect(() => {
-    // Note: After 4 sec, moving selectNetwork
     const splashTimer = setTimeout(() => {
       history.push(`/selectNetwork`)
     }, SPLASH_DURATION)
     return () => {
       clearTimeout(splashTimer)
     }
-  }, [])
+  }, [history])
 
   return (
     <Flex
@@ -32,7 +31,12 @@ export function InitialSplash(): JSX.Element {
       justifyContent={JUSTIFY_CENTER}
       alignItems={ALIGN_CENTER}
     >
-      <img src={logo} alt="logo for splash" width="355px" height="99px" />
+      <img
+        src={logo}
+        alt="logo for splash screen"
+        width="355px"
+        height="99px"
+      />
     </Flex>
   )
 }
