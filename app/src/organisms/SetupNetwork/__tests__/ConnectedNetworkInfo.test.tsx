@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, Route } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
@@ -28,10 +28,12 @@ jest.mock('react-router-dom', () => {
   }
 })
 
-const render = () => {
+const render = (path = '/') => {
   return renderWithProviders(
-    <MemoryRouter>
-      <ConnectedNetworkInfo />
+    <MemoryRouter initialEntries={[path]} initialIndex={0}>
+      <Route path="/connectedNetworkInfo/:ssid">
+        <ConnectedNetworkInfo />
+      </Route>
     </MemoryRouter>,
     {
       i18nInstance: i18n,
@@ -72,8 +74,9 @@ describe('ConnectedNetworkInfo', () => {
   })
 
   it('should render title and description', () => {
-    const [{ getByText }] = render()
+    const [{ getByText }] = render('/connectedNetworkInfo/mockWifi')
     getByText('Set up your robot')
+    getByText('mockWifi')
     getByText('IP Address: 127.0.0.100')
     getByText('Subnet Mask: 255.255.255.230')
     getByText('Mac Address: WI:FI:00:00:00:00')
@@ -81,7 +84,7 @@ describe('ConnectedNetworkInfo', () => {
   })
 
   it('when clicking Change network button, should call mock function', () => {
-    const [{ getByRole }] = render()
+    const [{ getByRole }] = render('/connectedNetworkInfo/mockWifi')
     const button = getByRole('button', { name: 'Change network' })
     fireEvent.click(button)
     expect(mockPush).toHaveBeenCalledWith('/selectNetwork')

@@ -137,12 +137,11 @@ export function SetWifiCred(): JSX.Element {
           >
             <StyledText marginBottom="0.75rem">{'Enter password'}</StyledText>
             <Flex flexDirection={DIRECTION_ROW}>
-              {/* ToDo
-        error case 1 not securityType none check input length if zero, show enter password */}
               <Box width="36.375rem">
                 <InputField
-                  data-testid="Set_WiFi_password"
+                  aria-label="wifi_password"
                   value={password}
+                  onChange={e => setPassword(e.target.value)}
                   type={showPassword ? 'text' : 'password'}
                   height="3.875rem"
                   css={css`
