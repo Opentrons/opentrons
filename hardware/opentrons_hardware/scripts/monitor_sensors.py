@@ -104,7 +104,7 @@ def main() -> None:
         "-s",
         "--sensor",
         type=str,
-        choices=["capacitive"],
+        choices=["capacitive", "pressure", "environment"],
         help="which sensor",
         default="capacitive",
     )
