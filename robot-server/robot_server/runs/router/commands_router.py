@@ -32,7 +32,6 @@ from .base_router import RunNotFound, RunStopped
 
 
 _DEFAULT_COMMAND_LIST_LENGTH: Final = 20
-_DEFAULT_COMMAND_WAIT_MS: Final = 30_000
 
 commands_router = APIRouter()
 
@@ -155,8 +154,8 @@ async def create_run_command(
             " or when the timeout is reached. See the `timeout` query parameter."
         ),
     ),
-    timeout: int = Query(
-        default=_DEFAULT_COMMAND_WAIT_MS,
+    timeout: Optional[int] = Query(
+        default=None,
         gt=0,
         description=(
             "If `waitUntilComplete` is `true`,"
@@ -202,7 +201,8 @@ async def create_run_command(
         raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
 
     if waitUntilComplete:
-        with move_on_after(timeout / 1000.0):
+        timeout_sec = None if timeout is None else timeout / 1000.0
+        with move_on_after(timeout_sec):
             await protocol_engine.wait_for_command(command.id),
 
     response_data = protocol_engine.state_view.commands.get(command.id)

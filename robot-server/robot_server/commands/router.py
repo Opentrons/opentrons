@@ -20,7 +20,6 @@ from robot_server.service.json_api import (
 from .get_default_engine import get_default_engine, RunActive
 from .stateless_commands import StatelessCommand, StatelessCommandCreate
 
-_DEFAULT_COMMAND_WAIT_MS: Final = 30_000
 _DEFAULT_COMMAND_LIST_LENGTH: Final = 20
 
 
@@ -58,8 +57,8 @@ async def create_command(
             " or when the timeout is reached. See the `timeout` query parameter."
         ),
     ),
-    timeout: int = Query(
-        _DEFAULT_COMMAND_WAIT_MS,
+    timeout: Optional[int] = Query(
+        default=None,
         gt=0,
         description=(
             "If `waitUntilComplete` is true, the maximum time in milliseconds to wait,"
@@ -85,7 +84,8 @@ async def create_command(
     command = engine.add_command(command_create)
 
     if waitUntilComplete:
-        with move_on_after(timeout / 1000.0):
+        timeout_sec = None if timeout is None else timeout / 1000.0
+        with move_on_after(timeout_sec):
             await engine.wait_for_command(command.id)
 
     response_data = cast(StatelessCommand, engine.state_view.commands.get(command.id))
