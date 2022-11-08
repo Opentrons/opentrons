@@ -129,10 +129,10 @@ class Plot:
         y_max_xpos = df.loc[y_max_id][x_axis].item()
         y_max_text = f"Y Max = {y_max}mm"
 
-        annotation_xmin = self.set_annotation(x_min_xpos, x_min, x_min_text, ax_pos=200)
-        annotation_xmax = self.set_annotation(x_max_xpos, x_max, x_max_text, ax_pos=-200)
-        annotation_ymin = self.set_annotation(y_min_xpos, y_min, y_min_text, ax_pos=200, y_ref="y2")
-        annotation_ymax = self.set_annotation(y_max_xpos, y_max, y_max_text, ax_pos=200, y_ref="y2")
+        annotation_xmin = self.set_annotation(x_min_xpos, x_min, x_min_text, ax_pos=-100, ay_pos=50)
+        annotation_xmax = self.set_annotation(x_max_xpos, x_max, x_max_text, ax_pos=-100, ay_pos=-50)
+        annotation_ymin = self.set_annotation(y_min_xpos, y_min, y_min_text, ax_pos=-100, ay_pos=50, y_ref="y2")
+        annotation_ymax = self.set_annotation(y_max_xpos, y_max, y_max_text, ax_pos=-100, ay_pos=50, y_ref="y2")
 
         fig1 = px.line(df, x=x_axis, y=[y_axis[0]], markers=True, color_discrete_sequence=self.list_colors[0:])
         fig2 = px.line(df, x=x_axis, y=[y_axis[1]], markers=True, color_discrete_sequence=self.list_colors[1:])
@@ -146,10 +146,8 @@ class Plot:
         self.plot_param["y_title"] = "X Gauge (mm)"
         self.plot_param["y2_title"] = "Y Gauge (mm)"
         self.plot_param["x_range"] = [0, x_last]
-        # self.plot_param["y_range"] = [5.95,6]
-        self.plot_param["y_range"] = [5.935,5.98]
-        # self.plot_param["y2_range"] = [9.64,9.7]
-        self.plot_param["y2_range"] = [10.515,10.565]
+        self.plot_param["y_range"] = [5.85,5.91]
+        self.plot_param["y2_range"] = [9.28,9.34]
         self.plot_param["legend"] = "Gauges"
         self.plot_param["annotation"] = [annotation_xmin, annotation_xmax, annotation_ymin, annotation_ymax]
         self.write_plot(self.plot_param)
@@ -173,8 +171,20 @@ class Plot:
         x_max_xpos = df.loc[x_max_id][x_axis].item()
         x_max_text = f"X Max = {x_max}mm"
 
-        annotation_xmin = self.set_annotation(x_min_xpos, x_min, x_min_text, ax_pos=200)
-        annotation_xmax = self.set_annotation(x_max_xpos, x_max, x_max_text, ax_pos=200)
+        y_min = df[y_axis[1]].min()
+        y_min_id = df[y_axis[1]].idxmin()
+        y_min_xpos = df.loc[y_min_id][x_axis].item()
+        y_min_text = f"Y Min = {y_min}mm"
+
+        y_max = df[y_axis[1]].max()
+        y_max_id = df[y_axis[1]].idxmax()
+        y_max_xpos = df.loc[y_max_id][x_axis].item()
+        y_max_text = f"Y Max = {y_max}mm"
+
+        annotation_xmin = self.set_annotation(x_min_xpos, x_min, x_min_text, ax_pos=100, ay_pos=50)
+        annotation_xmax = self.set_annotation(x_max_xpos, x_max, x_max_text, ax_pos=-100, ay_pos=-50)
+        annotation_ymin = self.set_annotation(y_min_xpos, y_min, y_min_text, ax_pos=100, ay_pos=50, y_ref="y2")
+        annotation_ymax = self.set_annotation(y_max_xpos, y_max, y_max_text, ax_pos=-100, ay_pos=-50, y_ref="y2")
 
         fig1 = px.line(df, x=x_axis, y=[y_axis[0]], markers=True, color_discrete_sequence=self.list_colors[0:])
         fig2 = px.line(df, x=x_axis, y=[y_axis[1]], markers=True, color_discrete_sequence=self.list_colors[1:])
@@ -189,10 +199,10 @@ class Plot:
         self.plot_param["y2_title"] = "Y Encoder (mm)"
         self.plot_param["x_range"] = [0, x_last]
         # self.plot_param["y_range"] = [53.04,53.07]
-        self.plot_param["y_range"] = None
-        self.plot_param["y2_range"] = None
+        self.plot_param["y_range"] = [53.16,53.21]
+        self.plot_param["y2_range"] = [31.52,31.6]
         self.plot_param["legend"] = "Encoders"
-        self.plot_param["annotation"] =  [annotation_xmin, annotation_xmax]
+        self.plot_param["annotation"] = [annotation_xmin, annotation_xmax, annotation_ymin, annotation_ymax]
         self.write_plot(self.plot_param)
 
     def position_plot(self):
@@ -203,6 +213,31 @@ class Plot:
         y_axis = ["X Position","Y Position"]
         x_first = df[x_axis].iloc[0]
         x_last = df[x_axis].iloc[-1]
+
+        x_min = df[y_axis[0]].min()
+        x_min_id = df[y_axis[0]].idxmin()
+        x_min_xpos = df.loc[x_min_id][x_axis].item()
+        x_min_text = f"X Min = {x_min}mm"
+
+        x_max = df[y_axis[0]].max()
+        x_max_id = df[y_axis[0]].idxmax()
+        x_max_xpos = df.loc[x_max_id][x_axis].item()
+        x_max_text = f"X Max = {x_max}mm"
+
+        y_min = df[y_axis[1]].min()
+        y_min_id = df[y_axis[1]].idxmin()
+        y_min_xpos = df.loc[y_min_id][x_axis].item()
+        y_min_text = f"Y Min = {y_min}mm"
+
+        y_max = df[y_axis[1]].max()
+        y_max_id = df[y_axis[1]].idxmax()
+        y_max_xpos = df.loc[y_max_id][x_axis].item()
+        y_max_text = f"Y Max = {y_max}mm"
+
+        annotation_xmin = self.set_annotation(x_min_xpos, x_min, x_min_text, ax_pos=100, ay_pos=50)
+        annotation_xmax = self.set_annotation(x_max_xpos, x_max, x_max_text, ax_pos=-100, ay_pos=-50)
+        annotation_ymin = self.set_annotation(y_min_xpos, y_min, y_min_text, ax_pos=-100, ay_pos=50, y_ref="y2")
+        annotation_ymax = self.set_annotation(y_max_xpos, y_max, y_max_text, ax_pos=-100, ay_pos=-50, y_ref="y2")
 
         fig1 = px.line(df, x=x_axis, y=[y_axis[0]], markers=True, color_discrete_sequence=self.list_colors[0:])
         fig2 = px.line(df, x=x_axis, y=[y_axis[1]], markers=True, color_discrete_sequence=self.list_colors[1:])
@@ -216,12 +251,10 @@ class Plot:
         self.plot_param["y_title"] = "X Position (mm)"
         self.plot_param["y2_title"] = "Y Position (mm)"
         self.plot_param["x_range"] = [0, x_last]
-        # self.plot_param["y_range"] = [62,63]
-        self.plot_param["y_range"] = [389,391]
-        # self.plot_param["y2_range"] = [40,41]
-        self.plot_param["y2_range"] = [39,41]
+        self.plot_param["y_range"] = [62.57,62.63]
+        self.plot_param["y2_range"] = [40.35,40.42]
         self.plot_param["legend"] = "Gantry"
-        self.plot_param["annotation"] = None
+        self.plot_param["annotation"] = [annotation_xmin, annotation_xmax, annotation_ymin, annotation_ymax]
         self.write_plot(self.plot_param)
 
 if __name__ == '__main__':

@@ -58,16 +58,30 @@ async def capacitive_probe(
     """
     sensor_scheduler = SensorScheduler()
     sensor_info = SensorInformation(SensorType.capacitive, SensorId.S0, tool)
-    threshold = await sensor_scheduler.send_threshold(
-        SensorThresholdInformation(
-            sensor=sensor_info,
-            data=SensorDataType.build(relative_threshold_pf, SensorType.capacitive),
-            mode=SensorThresholdMode.auto_baseline,
-        ),
-        messenger,
-    )
-    if not threshold:
-        raise RuntimeError("Could not set threshold for probe")
+    # threshold = await sensor_scheduler.send_threshold(
+    #     SensorThresholdInformation(
+    #         sensor=sensor_info,
+    #         data=SensorDataType.build(relative_threshold_pf, SensorType.capacitive),
+    #         mode=SensorThresholdMode.auto_baseline,
+    #     ),
+    #     messenger,
+    # )
+    # if not threshold:
+    #     raise RuntimeError("Could not set threshold for probe")
+    threshold = None
+    setting_threshold = True
+    while setting_threshold:
+        if not threshold:
+            threshold = await sensor_scheduler.send_threshold(
+                SensorThresholdInformation(
+                    sensor=sensor_info,
+                    data=SensorDataType.build(relative_threshold_pf, SensorType.capacitive),
+                    mode=SensorThresholdMode.auto_baseline,
+                ),
+                messenger,
+            )
+        else:
+            setting_threshold = False
     LOG.info(f"starting capacitive probe with threshold {threshold.to_float()}")
     pass_group = _build_pass_step(mover, distance, speed)
     runner = MoveGroupRunner(move_groups=[[pass_group]])
