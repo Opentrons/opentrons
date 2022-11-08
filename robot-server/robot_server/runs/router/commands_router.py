@@ -149,8 +149,7 @@ async def create_run_command(
         default=False,
         description=(
             "If `false`, return immediately, while the new command is still queued."
-            "\n\n"
-            "If `true`, only return once the new command succeeds or fails,"
+            " If `true`, only return once the new command succeeds or fails,"
             " or when the timeout is reached. See the `timeout` query parameter."
         ),
     ),
@@ -159,18 +158,16 @@ async def create_run_command(
         gt=0,
         description=(
             "If `waitUntilComplete` is `true`,"
-            " the maximum number of milliseconds to wait before returning."
-            " Ignored if `waitUntilComplete` is `false`."
+            " the maximum time in milliseconds to wait before returning."
+            " The default is infinite."
             "\n\n"
-            "The timer starts when the new command is enqueued,"
-            " *not* when it starts running."
-            " So if a different command runs before the new command,"
-            " it may exhaust the timeout even if the new command on its own"
-            " would have completed in time."
+            "The timer starts as soon as you enqueue the new command with this request,"
+            " *not* when the new command starts running. So if there are other commands"
+            " in the queue in front of the new one, they will also count towards the"
+            " timeout."
             "\n\n"
-            "If the timeout triggers, the command will still be returned"
-            " with a `201` HTTP status code."
-            " Inspect the returned command's `status` to detect the timeout."
+            "If the timeout elapses before the command succeeds or fails,"
+            " the command will be returned with its current status."
         ),
     ),
     protocol_engine: ProtocolEngine = Depends(get_current_run_engine_from_url),

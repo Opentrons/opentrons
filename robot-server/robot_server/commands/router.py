@@ -61,9 +61,16 @@ async def create_command(
         default=None,
         gt=0,
         description=(
-            "If `waitUntilComplete` is true, the maximum time in milliseconds to wait,"
-            " **starting from when the command is queued**, before returning."
-            " If the timeout elapses before the command succeeds or fails,"
+            "If `waitUntilComplete` is `true`,"
+            " the maximum time in milliseconds to wait before returning."
+            " The default is infinite."
+            "\n\n"
+            "The timer starts as soon as you enqueue the new command with this request,"
+            " *not* when the new command starts running. So if there are other commands"
+            " in the queue in front of the new one, they will also count towards the"
+            " timeout."
+            "\n\n"
+            "If the timeout elapses before the command succeeds or fails,"
             " the command will be returned with its current status."
         ),
     ),
