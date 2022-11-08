@@ -79,7 +79,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
     def dispense(
         self,
-        location: Location,
+        location: Optional[Location],
         well_core: Optional[WellCore],
         volume: float,
         rate: float,

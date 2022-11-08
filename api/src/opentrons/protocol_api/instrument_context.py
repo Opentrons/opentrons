@@ -266,19 +266,7 @@ class InstrumentContext(publisher.CommandPublisher):
         well: Optional[labware.Well]
         if isinstance(location, labware.Well):
             well = location
-            well_parent = location.parent.parent
-            # TODO(tz, 11-4-2022): I hate this. Is there a better way?
-            # PE does not check fixed trash
-            if (
-                well_parent
-                and isinstance(well_parent, LabwareLike)
-                and well_parent.is_fixed_trash()
-            ):
-                dest = location.top()
-            else:
-                dest = location.bottom(
-                    self._implementation.get_well_bottom_clearance().dispense
-                )
+            dest = None
         elif isinstance(location, types.Location):
             dest = location
             _, well = dest.labware.get_parent_labware_and_well()
@@ -298,7 +286,8 @@ class InstrumentContext(publisher.CommandPublisher):
             )
         if self.api_version >= APIVersion(2, 11):
             instrument.validate_takes_liquid(
-                location=dest, reject_module=self.api_version >= APIVersion(2, 13)
+                location=location,  # type: ignore[arg-type]
+                reject_module=self.api_version >= APIVersion(2, 13),
             )
 
         c_vol = self._implementation.get_current_volume() if not volume else volume
@@ -308,7 +297,7 @@ class InstrumentContext(publisher.CommandPublisher):
             command=cmds.dispense(
                 instrument=self,
                 volume=c_vol,
-                location=dest,
+                location=dest if dest is not None else location.top(),
                 rate=rate,
                 flow_rate=self._implementation.get_absolute_dispense_flow_rate(rate),
             ),

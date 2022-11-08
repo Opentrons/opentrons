@@ -98,7 +98,7 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
 
     def dispense(
         self,
-        location: types.Location,
+        location: Optional[types.Location],
         well_core: Optional[WellImplementation],
         volume: float,
         rate: float,
