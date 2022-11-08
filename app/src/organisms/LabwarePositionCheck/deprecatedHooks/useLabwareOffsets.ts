@@ -4,7 +4,7 @@ import {
   getModuleDisplayName,
   getLabwareDisplayName,
   getModuleType,
-  SchemaAdapterOutput,
+  LegacySchemaAdapterOutput,
   THERMOCYCLER_MODULE_TYPE,
   getVectorSum,
 } from '@opentrons/shared-data'
@@ -20,7 +20,7 @@ import { useCurrentRun } from '../../ProtocolUpload/hooks'
 
 const getDisplayLocation = (
   labwareId: string,
-  protocolData: SchemaAdapterOutput,
+  protocolData: LegacySchemaAdapterOutput,
   t: TFunction<'labware_position_check'>
 ): string => {
   let location = ''
@@ -64,7 +64,7 @@ export type LabwareOffsets = Array<{
 
 export const useLabwareOffsets = (
   savePositionCommandData: SavePositionCommandData,
-  protocolData: SchemaAdapterOutput
+  protocolData: LegacySchemaAdapterOutput
 ): Promise<LabwareOffsets> => {
   const { t } = useTranslation('labware_position_check')
   const offsetDataByLabwareId = useOffsetDataByLabwareId(

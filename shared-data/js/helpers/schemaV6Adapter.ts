@@ -17,7 +17,7 @@ import type {
 // and the protocol schema v6 interface. Much of this logic should be deleted once we resolve
 // these discrepencies on the server side
 
-export interface SchemaAdapterOutput
+export interface LegacySchemaAdapterOutput
   extends Omit<ProtocolAnalysisOutput, 'modules'> {
   labwareDefinitions: ProtocolAnalysisFile['labwareDefinitions']
   modules: ProtocolAnalysisFile['modules']
@@ -31,7 +31,7 @@ export const schemaV6Adapter = (
     | PendingProtocolAnalysis
     | CompletedProtocolAnalysis
     | ProtocolAnalysisOutput
-): SchemaAdapterOutput | null => {
+): LegacySchemaAdapterOutput | null => {
   if (
     protocolAnalysis == null ||
     ('status' in protocolAnalysis && protocolAnalysis.status === 'pending')

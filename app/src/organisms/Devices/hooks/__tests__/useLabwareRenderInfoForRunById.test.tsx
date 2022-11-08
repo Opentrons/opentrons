@@ -11,7 +11,7 @@ import {
   useStoredProtocolAnalysis,
 } from '..'
 
-import type { SchemaAdapterOutput } from '@opentrons/shared-data'
+import type { LegacySchemaAdapterOutput } from '@opentrons/shared-data'
 import type { ProtocolDetails, StoredProtocolAnalysis } from '..'
 
 jest.mock('../../ProtocolRun/utils/getLabwareRenderInfo')
@@ -28,7 +28,7 @@ const mockUseStoredProtocolAnalysis = useStoredProtocolAnalysis as jest.MockedFu
   typeof useStoredProtocolAnalysis
 >
 
-const heaterShakerCommandsWithResultsKey = (_heaterShakerCommandsWithResultsKey as unknown) as SchemaAdapterOutput
+const heaterShakerCommandsWithResultsKey = (_heaterShakerCommandsWithResultsKey as unknown) as LegacySchemaAdapterOutput
 
 const PROTOCOL_DETAILS = {
   displayName: 'fake protocol',

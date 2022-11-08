@@ -10,11 +10,14 @@ import {
   useRunQuery,
 } from '@opentrons/react-api-client'
 
-import type { RobotType, SchemaAdapterOutput } from '@opentrons/shared-data'
+import type {
+  RobotType,
+  LegacySchemaAdapterOutput,
+} from '@opentrons/shared-data'
 
 export interface ProtocolDetails {
   displayName: string | null
-  protocolData: SchemaAdapterOutput | null
+  protocolData: LegacySchemaAdapterOutput | null
   protocolKey: string | null
   isProtocolAnalyzing?: boolean
   robotType: RobotType

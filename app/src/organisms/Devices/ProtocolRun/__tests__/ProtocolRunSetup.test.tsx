@@ -28,7 +28,10 @@ import { SetupLiquids } from '../SetupLiquids'
 import { ProtocolRunSetup } from '../ProtocolRunSetup'
 import { SetupModules } from '../SetupModules'
 
-import { SchemaAdapterOutput, protocolHasLiquids } from '@opentrons/shared-data'
+import {
+  LegacySchemaAdapterOutput,
+  protocolHasLiquids,
+} from '@opentrons/shared-data'
 import type { StoredProtocolAnalysis } from '../../hooks'
 
 jest.mock('@opentrons/api-client')
@@ -101,7 +104,7 @@ describe('ProtocolRunSetup', () => {
     when(mockUseProtocolDetailsForRun)
       .calledWith(RUN_ID)
       .mockReturnValue({
-        protocolData: (noModulesProtocol as unknown) as SchemaAdapterOutput,
+        protocolData: (noModulesProtocol as unknown) as LegacySchemaAdapterOutput,
         displayName: 'mock display name',
         protocolKey: 'fakeProtocolKey',
         robotType: 'OT-2 Standard',
@@ -244,7 +247,7 @@ describe('ProtocolRunSetup', () => {
           protocolData: ({
             ...noModulesProtocol,
             liquids: [{ displayName: 'water', description: 'liquid H2O' }],
-          } as unknown) as SchemaAdapterOutput,
+          } as unknown) as LegacySchemaAdapterOutput,
           displayName: 'mock display name',
           protocolKey: 'fakeProtocolKey',
           robotType: 'OT-2 Standard',
@@ -268,7 +271,7 @@ describe('ProtocolRunSetup', () => {
       when(mockUseProtocolDetailsForRun)
         .calledWith(RUN_ID)
         .mockReturnValue({
-          protocolData: (withModulesProtocol as unknown) as SchemaAdapterOutput,
+          protocolData: (withModulesProtocol as unknown) as LegacySchemaAdapterOutput,
           displayName: 'mock display name',
           protocolKey: 'fakeProtocolKey',
           robotType: 'OT-2 Standard',
@@ -318,7 +321,7 @@ describe('ProtocolRunSetup', () => {
               withModulesProtocol.modules,
               Object.keys(withModulesProtocol.modules)[0]
             ),
-          } as unknown) as SchemaAdapterOutput,
+          } as unknown) as LegacySchemaAdapterOutput,
           displayName: 'mock display name',
           protocolKey: 'fakeProtocolKey',
           robotType: 'OT-2 Standard',

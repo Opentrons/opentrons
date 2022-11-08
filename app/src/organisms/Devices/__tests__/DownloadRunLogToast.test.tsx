@@ -13,7 +13,7 @@ import { downloadFile } from '../utils'
 import { DownloadRunLogToast } from '../DownloadRunLogToast'
 
 import type { CommandsData, Run } from '@opentrons/api-client'
-import type { SchemaAdapterOutput } from '@opentrons/shared-data'
+import type { LegacySchemaAdapterOutput } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../hooks')
@@ -30,7 +30,7 @@ const mockDownloadFile = downloadFile as jest.MockedFunction<
   typeof downloadFile
 >
 
-const _fixtureAnalysis = (fixtureAnalysis as unknown) as SchemaAdapterOutput
+const _fixtureAnalysis = (fixtureAnalysis as unknown) as LegacySchemaAdapterOutput
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'

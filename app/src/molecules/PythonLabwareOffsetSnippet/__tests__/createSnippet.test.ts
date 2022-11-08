@@ -1,6 +1,6 @@
 import _protocolWithMagTempTC from '@opentrons/shared-data/protocol/fixtures/6/transferSettings.json'
 import { createSnippet } from '../createSnippet'
-import { ModuleModel, SchemaAdapterOutput } from '@opentrons/shared-data'
+import { ModuleModel, LegacySchemaAdapterOutput } from '@opentrons/shared-data'
 
 const protocolWithMagTempTC = ({
   ..._protocolWithMagTempTC,
@@ -69,7 +69,7 @@ const protocolWithMagTempTC = ({
       loadName: 'corning_24_wellplate_3.4ml_flat',
     },
   ],
-} as unknown) as SchemaAdapterOutput
+} as unknown) as LegacySchemaAdapterOutput
 
 // module ids come from the fixture protocol, they are just here for readability
 const TIPRACK_DEF_URI = 'opentrons/opentrons_96_tiprack_1000ul/1'

@@ -29,7 +29,7 @@ import _uncastedModifiedSimpleV6Protocol from '../__fixtures__/modifiedSimpleV6.
 import type {
   LabwareDefinition2,
   PipetteNameSpecs,
-  SchemaAdapterOutput,
+  LegacySchemaAdapterOutput,
 } from '@opentrons/shared-data'
 import type { PipetteInfo, ProtocolDetails, StoredProtocolAnalysis } from '..'
 
@@ -121,7 +121,7 @@ const modifiedSimpleV6Protocol = ({
       pipetteName: 'p10_single',
     },
   ],
-} as any) as SchemaAdapterOutput
+} as any) as LegacySchemaAdapterOutput
 
 const PROTOCOL_DETAILS = {
   displayName: 'fake protocol',

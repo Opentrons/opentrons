@@ -21,7 +21,7 @@ import {
 import type {
   ModuleModel,
   ModuleType,
-  SchemaAdapterOutput,
+  LegacySchemaAdapterOutput,
 } from '@opentrons/shared-data'
 import type { ProtocolDetails, StoredProtocolAnalysis } from '..'
 
@@ -43,7 +43,7 @@ const mockUseStoredProtocolAnalysis = useStoredProtocolAnalysis as jest.MockedFu
   typeof useStoredProtocolAnalysis
 >
 
-const heaterShakerCommandsWithResultsKey = (_heaterShakerCommandsWithResultsKey as unknown) as SchemaAdapterOutput
+const heaterShakerCommandsWithResultsKey = (_heaterShakerCommandsWithResultsKey as unknown) as LegacySchemaAdapterOutput
 
 const PROTOCOL_DETAILS = {
   displayName: 'fake protocol',

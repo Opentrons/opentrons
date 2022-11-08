@@ -21,7 +21,7 @@ import fixtureAnalysis from '../../../../organisms/RunDetails/__fixtures__/analy
 import {
   ModuleModel,
   ModuleType,
-  SchemaAdapterOutput,
+  LegacySchemaAdapterOutput,
 } from '@opentrons/shared-data'
 
 jest.mock('../../../ModuleCard')
@@ -35,7 +35,7 @@ const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunc
   typeof useProtocolDetailsForRun
 >
 
-const _fixtureAnalysis = (fixtureAnalysis as unknown) as SchemaAdapterOutput
+const _fixtureAnalysis = (fixtureAnalysis as unknown) as LegacySchemaAdapterOutput
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = 'test123'
