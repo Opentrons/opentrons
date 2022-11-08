@@ -1,4 +1,4 @@
-"""OTManual Calibration."""
+"""OT-3 Manual Calibration."""
 import asyncio
 import argparse
 import time
