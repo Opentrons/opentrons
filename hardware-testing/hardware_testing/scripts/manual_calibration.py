@@ -1,4 +1,4 @@
-"""OT-3 Manual Calibration."""
+"""OTManual Calibration."""
 import asyncio
 import argparse
 import time
@@ -11,94 +11,17 @@ from hardware_testing.opentrons_api.helpers_ot3 import (
     build_async_ot3_hardware_api,
     jog_mount_ot3,
 )
+from opentrons_shared_data.deck import load
+from opentrons.calibration_storage.ot3.pipette_offset import save_pipette_calibration
 
 # List of gantry axes
 list_axes = [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R]
 
+# Load deck definition
+deck_definition = load("ot3_standard", version=3)
+
 # Capacitive probe length
 PROBE_LENGTH = 34.5
-
-# Deck slot positions
-SLOT_OFFSET_X = 164
-SLOT_OFFSET_Y = 106.5
-SLOT1_Z = Point(x=77.5, y=54, z=100)
-SLOT1_XY = Point(x=63, y=39.5, z=50)
-SLOT_POSITION = {
-    "1":{
-        "Z":SLOT1_Z,
-        "XY":SLOT1_XY
-    },
-    "2":{
-        "Z":SLOT1_Z._replace(x=SLOT1_Z.x + SLOT_OFFSET_X),
-        "XY":SLOT1_XY._replace(x=SLOT1_XY.x + SLOT_OFFSET_X)
-    },
-    "3":{
-        "Z":SLOT1_Z._replace(x=SLOT1_Z.x + SLOT_OFFSET_X*2),
-        "XY":SLOT1_XY._replace(x=SLOT1_XY.x + SLOT_OFFSET_X*2)
-    },
-    "4":{
-        "Z":SLOT1_Z._replace(y=SLOT1_Z.y + SLOT_OFFSET_Y),
-        "XY":SLOT1_XY._replace(y=SLOT1_XY.y + SLOT_OFFSET_Y)
-    },
-    "5":{
-        "Z":SLOT1_Z._replace(
-            x=SLOT1_Z.x + SLOT_OFFSET_X,
-            y=SLOT1_Z.y + SLOT_OFFSET_Y
-        ),
-        "XY":SLOT1_XY._replace(
-            x=SLOT1_XY.x + SLOT_OFFSET_X,
-            y=SLOT1_XY.y + SLOT_OFFSET_Y
-        )
-    },
-    "6":{
-        "Z":SLOT1_Z._replace(
-            x=SLOT1_Z.x + SLOT_OFFSET_X*2,
-            y=SLOT1_Z.y + SLOT_OFFSET_Y
-        ),
-        "XY":SLOT1_XY._replace(
-            x=SLOT1_XY.x + SLOT_OFFSET_X*2,
-            y=SLOT1_XY.y + SLOT_OFFSET_Y
-        )
-    },
-    "7":{
-        "Z":SLOT1_Z._replace(y=SLOT1_Z.y + SLOT_OFFSET_Y*2),
-        "XY":SLOT1_XY._replace(y=SLOT1_XY.y + SLOT_OFFSET_Y*2)
-    },
-    "8":{
-        "Z":SLOT1_Z._replace(
-            x=SLOT1_Z.x + SLOT_OFFSET_X,
-            y=SLOT1_Z.y + SLOT_OFFSET_Y*2
-        ),
-        "XY":SLOT1_XY._replace(
-            x=SLOT1_XY.x + SLOT_OFFSET_X,
-            y=SLOT1_XY.y + SLOT_OFFSET_Y*2
-        )
-    },
-    "9":{
-        "Z":SLOT1_Z._replace(
-            x=SLOT1_Z.x + SLOT_OFFSET_X*2,
-            y=SLOT1_Z.y + SLOT_OFFSET_Y*2
-        ),
-        "XY":SLOT1_XY._replace(
-            x=SLOT1_XY.x + SLOT_OFFSET_X*2,
-            y=SLOT1_XY.y + SLOT_OFFSET_Y*2
-        )
-    },
-    "10":{
-        "Z":SLOT1_Z._replace(y=SLOT1_Z.y + SLOT_OFFSET_Y*3),
-        "XY":SLOT1_XY._replace(y=SLOT1_XY.y + SLOT_OFFSET_Y*3)
-    },
-    "11":{
-        "Z":SLOT1_Z._replace(
-            x=SLOT1_Z.x + SLOT_OFFSET_X,
-            y=SLOT1_Z.y + SLOT_OFFSET_Y*3
-        ),
-        "XY":SLOT1_XY._replace(
-            x=SLOT1_XY.x + SLOT_OFFSET_X,
-            y=SLOT1_XY.y + SLOT_OFFSET_Y*3
-        )
-    },
-}
 
 def build_arg_parser():
     arg_parser = argparse.ArgumentParser(description='OT-3 Manual Calibration')
@@ -108,9 +31,14 @@ def build_arg_parser():
     return arg_parser
 
 async def _run_manual_calibration(api: OT3API, mount: OT3Mount, slot: int) -> None:
-    print(f"\nStarting Manual Calibration on Deck Slot #{slot}:\n")
-    CENTER_Z = SLOT_POSITION[str(slot)]["Z"]
-    CENTER_XY = SLOT_POSITION[str(slot)]["XY"]
+    # Get pipette id
+    pipette_id = api._pipette_handler.get_pipette(mount)._pipette_id
+    print(f"\nStarting Manual Calibration on Deck Slot #{slot} and Pipette {pipette_id}:\n")
+
+    # Initialize deck slot position
+    CORNER = Point(*deck_definition["locations"]["orderedSlots"][slot - 1]["position"])
+    CENTER_XY = Point(CORNER.x + 124.0 / 2, CORNER.y + 82.0 / 2, 50)
+    CENTER_Z = Point(CORNER.x + 76, CORNER.y + 54, 100)
 
     # Home grantry
     await home_ot3(api, list_axes)
@@ -120,7 +48,7 @@ async def _run_manual_calibration(api: OT3API, mount: OT3Mount, slot: int) -> No
     above_point = CENTER_Z._replace(z=home_position.z)
     await api.move_to(mount, above_point)
 
-    input("\nCalibrate Deck Height? (Remove all items from deck and press ENTER)\n")
+    input("\n--> Calibrate Deck Height? (Remove all items from deck and press ENTER)\n")
 
     # Move to Z-axis center position
     await api.move_to(mount, CENTER_Z)
@@ -136,7 +64,7 @@ async def _run_manual_calibration(api: OT3API, mount: OT3Mount, slot: int) -> No
     home_z = current_position._replace(z=home_position.z)
     await api.move_to(mount, home_z)
 
-    input("\nCalibrate Slot Center? (Remove all items from deck and press ENTER)\n")
+    input("\n--> Calibrate Slot Center? (Remove all items from deck and press ENTER)\n")
 
     # Move to slot center
     await api.move_to(mount, CENTER_XY)
@@ -151,7 +79,14 @@ async def _run_manual_calibration(api: OT3API, mount: OT3Mount, slot: int) -> No
 
     # Show final calibration results
     slot_center = Point(x=x_center,y=y_center,z=deck_height)
-    print(f"Slot #{slot} Center Position = {slot_center}")
+    print(f"\nSlot #{slot} Center Position = {slot_center}")
+
+    # Save pipette offsets
+    save_offset = input("\n--> Save Pipette Offset? (y/N): " or "n")
+    if save_offset == "y" or save_offset == "Y":
+        offset_position = Point(x=x_center - CENTER_XY.x, y=y_center - CENTER_XY.y, z=deck_height)
+        save_pipette_calibration(offset_position, pipette_id, mount)
+        print("Pipette Offset Saved!")
 
     # Home Z-axis
     current_position = await api.gantry_position(mount)
