@@ -838,7 +838,7 @@ class InstrumentContext(publisher.CommandPublisher):
         if location is None:
             well = self.trash_container.wells()[0]
 
-        elif isinstance(location, labware.Well) or location is None:
+        elif isinstance(location, labware.Well):
             well = location
             location = None
 

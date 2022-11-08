@@ -28,6 +28,9 @@ if TYPE_CHECKING:
 
 _log = logging.getLogger()
 
+_PRE_2_2_TIP_DROP_HEIGHT_MM = 10
+"""In PAPIv2.1 and below, tips are always dropped 10 mm from the bottom of the well."""
+
 
 class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
     """Implementation of the InstrumentContext interface."""
@@ -162,7 +165,7 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
             if LabwareLike(labware).is_fixed_trash():
                 location = well.top()
             elif self._api_version < APIVersion(2, 2):
-                location = well.bottom(z=10)
+                location = well.bottom(z=_PRE_2_2_TIP_DROP_HEIGHT_MM)
             else:
                 assert (
                     labware_core.is_tip_rack()
