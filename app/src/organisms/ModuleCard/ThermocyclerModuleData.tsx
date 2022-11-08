@@ -88,9 +88,9 @@ export const ThermocyclerModuleData = (
           <Box marginRight={SPACING.spacing2}>
             <StatusLabel
               status={
-                data.lidStatus === 'in_between' || data.lidStatus === 'open'
-                  ? 'open'
-                  : 'closed'
+                data.lidStatus === 'in_between'
+                  ? t('in_between')
+                  : data.lidStatus
               }
               backgroundColor={COLORS.medGreyEnabled}
               textColor={COLORS.darkBlackEnabled}

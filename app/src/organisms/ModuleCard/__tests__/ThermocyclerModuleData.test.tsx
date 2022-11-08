@@ -204,13 +204,13 @@ describe('ThermocyclerModuleData', () => {
     )
   })
 
-  it('renders thermocycler lid status to say open even though the status is in_between', () => {
+  it('renders thermocycler lid status says in between when lid status is in_between', () => {
     props = {
       data: {
         lidStatus: 'in_between',
       } as ThermocyclerData,
     }
     const { getByTestId } = render(props)
-    getByTestId('status_label_open_lidStatus')
+    getByTestId('status_label_in between_lidStatus')
   })
 })

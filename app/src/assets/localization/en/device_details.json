@@ -118,5 +118,6 @@
   "module_name_error": "{{moduleName}} error",
   "view": "View",
   "error_details": "error details",
-  "module_error_contact_support": "Try powering the module off and on again. If the error persists, contact Opentrons Support."
+  "module_error_contact_support": "Try powering the module off and on again. If the error persists, contact Opentrons Support.",
+  "in_between": "in between"
 }
