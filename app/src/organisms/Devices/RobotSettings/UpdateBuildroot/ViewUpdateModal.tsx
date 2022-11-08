@@ -14,13 +14,13 @@ import { DownloadUpdateModal } from './DownloadUpdateModal'
 import { ReleaseNotesModal } from './ReleaseNotesModal'
 
 import type {
-  BuildrootUpdateType,
+  SystemUpdateType,
   RobotSystemType,
 } from '../../../../redux/buildroot/types'
 
 export interface ViewUpdateModalProps {
   robotName: string
-  robotUpdateType: BuildrootUpdateType | null
+  robotUpdateType: SystemUpdateType | null
   robotSystemType: RobotSystemType | null
   close: () => unknown
   proceed: () => unknown

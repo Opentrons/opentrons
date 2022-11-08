@@ -35,7 +35,7 @@ export function InstallModal(props: InstallModalProps): JSX.Element {
     } else {
       heading = 'Robot Update: Step 2 of 2'
     }
-  } else if (robotSystemType === 'buildroot') {
+  } else if (robotSystemType === 'system') {
     heading = 'Robot Update'
   }
 

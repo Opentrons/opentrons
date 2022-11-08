@@ -14,7 +14,7 @@ import type { ViewableRobot } from '../discovery/types'
 import type {
   BuildrootUpdateInfo,
   BuildrootUpdateSession,
-  BuildrootUpdateType,
+  SystemUpdateType,
   RobotSystemType,
 } from './types'
 
@@ -105,7 +105,7 @@ export const getBuildrootRobot: (
 const getBuildrootUpdateType = (
   currentVersion: string | null,
   updateVersion: string | null
-): BuildrootUpdateType | null => {
+): SystemUpdateType | null => {
   const validCurrent: string | null = semver.valid(currentVersion)
   const validUpdate: string | null = semver.valid(updateVersion)
   let type = null
@@ -126,7 +126,7 @@ const getBuildrootUpdateType = (
 export function getBuildrootUpdateAvailable(
   state: State,
   robot: ViewableRobot
-): BuildrootUpdateType | null {
+): SystemUpdateType | null {
   const currentVersion = getRobotApiVersion(robot)
   const updateVersion = getBuildrootUpdateVersion(state)
 
@@ -184,7 +184,7 @@ export function getRobotSystemType(
       return Constants.BALENA
     }
 
-    return Constants.BUILDROOT
+    return Constants.SYSTEM
   }
 
   return null

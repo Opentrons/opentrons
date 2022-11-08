@@ -5,11 +5,11 @@ import { UPGRADE } from '../../../../redux/buildroot'
 import styles from './styles.css'
 
 import type { ButtonProps } from '@opentrons/components'
-import type { BuildrootUpdateType } from '../../../../redux/buildroot/types'
+import type { SystemUpdateType } from '../../../../redux/buildroot/types'
 
 export interface MigrationWarningModalProps {
   notNowButton: ButtonProps
-  updateType: BuildrootUpdateType | null
+  updateType: SystemUpdateType | null
   proceed: () => unknown
 }
 

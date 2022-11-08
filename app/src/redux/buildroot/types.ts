@@ -1,8 +1,8 @@
 import type { RobotHost } from '../robot-api/types'
 
-export type BuildrootUpdateType = 'upgrade' | 'downgrade' | 'reinstall'
+export type SystemUpdateType = 'upgrade' | 'downgrade' | 'reinstall'
 
-export type RobotSystemType = 'balena' | 'buildroot'
+export type RobotSystemType = 'balena' | 'system'
 
 export interface BuildrootUpdateInfo {
   releaseNotes: string

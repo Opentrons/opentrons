@@ -46,7 +46,7 @@ describe('UpdateBuildroot wizard', () => {
 
   beforeEach(() => {
     getBuildrootUpdateAvailable.mockReturnValue(Buildroot.UPGRADE)
-    getRobotSystemType.mockReturnValue(Buildroot.BUILDROOT)
+    getRobotSystemType.mockReturnValue(Buildroot.SYSTEM)
   })
 
   afterEach(() => {
@@ -88,7 +88,7 @@ describe('UpdateBuildroot wizard', () => {
     const viewUpdate = wrapper.find(ViewUpdateModal)
     expect(viewUpdate.prop('robotName')).toBe(mockRobot.name)
     expect(viewUpdate.prop('robotUpdateType')).toBe(Buildroot.UPGRADE)
-    expect(viewUpdate.prop('robotSystemType')).toBe(Buildroot.BUILDROOT)
+    expect(viewUpdate.prop('robotSystemType')).toBe(Buildroot.SYSTEM)
     expect(getRobotSystemType).toHaveBeenCalledWith(mockRobot)
 
     viewUpdate.invoke('close')?.()
@@ -122,7 +122,7 @@ describe('UpdateBuildroot wizard', () => {
     const installModal = wrapper.find(InstallModal)
 
     expect(installModal.prop('robot')).toBe(mockRobot)
-    expect(installModal.prop('robotSystemType')).toBe(Buildroot.BUILDROOT)
+    expect(installModal.prop('robotSystemType')).toBe(Buildroot.SYSTEM)
     expect(installModal.prop('session')).toBe(mockSession)
 
     expect(closeModal).not.toHaveBeenCalled()

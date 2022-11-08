@@ -36,7 +36,7 @@ describe('ViewUpdateModal', () => {
     >['robotUpdateType'] = Buildroot.UPGRADE,
     robotSystemType: React.ComponentProps<
       typeof ViewUpdateModal
-    >['robotSystemType'] = Buildroot.BUILDROOT
+    >['robotSystemType'] = Buildroot.SYSTEM
   ) => {
     return mountWithStore<React.ComponentProps<typeof ViewUpdateModal>>(
       <QueryClientProvider client={queryClient}>
@@ -104,7 +104,7 @@ describe('ViewUpdateModal', () => {
 
     expect(releaseNotesModal.prop('robotName')).toBe(MOCK_ROBOT_NAME)
     expect(releaseNotesModal.prop('releaseNotes')).toBe('hey look a release')
-    expect(releaseNotesModal.prop('systemType')).toBe(Buildroot.BUILDROOT)
+    expect(releaseNotesModal.prop('systemType')).toBe(Buildroot.SYSTEM)
     expect(getBuildrootUpdateInfo).toHaveBeenCalledWith(MOCK_STATE)
 
     const closeButtonProps = releaseNotesModal.prop('notNowButton')

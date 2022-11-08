@@ -36,7 +36,7 @@ export function ReleaseNotesModal(props: ReleaseNotesModalProps): JSX.Element {
   } = useConditionalConfirm(proceed, isRobotBusy)
 
   const heading =
-    systemType === 'buildroot'
+    systemType === 'system'
       ? 'Robot Update'
       : 'Robot Operating System Update'
 

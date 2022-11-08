@@ -21,7 +21,7 @@ export const ERROR: 'error' = 'error'
 // system types
 
 export const BALENA: 'balena' = 'balena'
-export const BUILDROOT: 'buildroot' = 'buildroot'
+export const SYSTEM: 'system' = 'system'
 
 // update types
 
