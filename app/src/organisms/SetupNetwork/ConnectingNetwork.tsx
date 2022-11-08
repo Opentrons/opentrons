@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import {
   Flex,
@@ -14,6 +15,7 @@ import {
 import { StyledText } from '../../atoms/text'
 
 export function ConnectingNetwork(): JSX.Element {
+  const { t } = useTranslation('device_settings')
   return (
     <Flex padding={SPACING.spacingXXL} flexDirection={DIRECTION_COLUMN}>
       <Flex
@@ -39,7 +41,7 @@ export function ConnectingNetwork(): JSX.Element {
             lineHeight="2.72375rem"
             marginTop={SPACING.spacingXXL}
           >
-            {'Connecting...'}
+            {t('connecting')}
           </StyledText>
         </Flex>
       </Flex>

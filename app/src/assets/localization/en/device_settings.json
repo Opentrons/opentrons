@@ -153,5 +153,6 @@
   "failed_to_connect_to_ssid": "Failed to connect to {{ssid}}",
   "ip_address": "IP Address",
   "subnet_mask": "Subnet Mask",
-  "mac_address": "Mac Address"
+  "mac_address": "Mac Address",
+  "connecting": "Connecting..."
 }
