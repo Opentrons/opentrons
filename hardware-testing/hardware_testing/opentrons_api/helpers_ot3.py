@@ -359,10 +359,10 @@ def _jog_read_user_input(terminator: str, home_key: str) -> Tuple[str, float, bo
     if home_key in user_input:
         user_input = user_input.replace(home_key, "")
         do_home = True
-        distance = float(user_input[1:])
+        distance = 0.0
     else:
         do_home = False
-        distance = 0.0
+        distance = float(user_input[1:])
     axis = user_input[0].upper()
     if axis not in "XYZPG":
         raise ValueError(f'Unexpected axis: "{axis}"')
@@ -388,13 +388,22 @@ async def _jog_print_current_position(
 ) -> None:
     z_axis = OT3Axis.by_mount(mount)
     plunger_axis = OT3Axis.of_main_tool_actuator(mount)
-    current_pos = await api.current_position_ot3(
+    motors_pos = await api.current_position_ot3(
         mount=mount, critical_point=critical_point
     )
-    x, y, z, p = [
-        current_pos.get(ax) for ax in [OT3Axis.X, OT3Axis.Y, z_axis, plunger_axis]
+    enc_pos = await api.encoder_current_position(
+        mount=mount, critical_point=critical_point
+    )
+    mx, my, mz, mp = [
+        round(motors_pos.get(ax), 2)
+        for ax in [OT3Axis.X, OT3Axis.Y, z_axis, plunger_axis]
     ]
-    print(f"Deck Coordinate: X={x}, Y={y}, Z={z}, P={p}")
+    ex, ey, ez, ep = [
+        round(enc_pos.get(ax.to_axis()), 2)
+        for ax in [OT3Axis.X, OT3Axis.Y, z_axis, plunger_axis]
+    ]
+    print(f"Deck Coordinate: X={mx}, Y={my}, Z={mz}, P={mp}")
+    print(f"Enc. Coordinate: X={ex}, Y={ey}, Z={ez}, P={ep}")
 
 
 async def _jog_do_print_then_input_then_move(
