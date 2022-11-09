@@ -65,11 +65,16 @@ export function ConnectedResult({
               ? t('connected_to_ssid', { ssid: ssid })
               : t('failed_to_connect_to_ssid', { ssid: ssid })}
           </StyledText>
-          {!isConnected && requestState?.error.message && (
-            <StyledText marginTop={SPACING.spacing4}>
-              {requestState.error.message}
-            </StyledText>
-          )}
+          {!isConnected &&
+            requestState != null &&
+            'error' in requestState &&
+            requestState.error != null &&
+            'message' in requestState.error &&
+            requestState.error.message != null && (
+              <StyledText marginTop={SPACING.spacing4}>
+                {requestState.error.message}
+              </StyledText>
+            )}
         </Flex>
       </Flex>
       <Flex gridRow="0.75rem">
