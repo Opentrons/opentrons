@@ -31,11 +31,13 @@ class LabwareCore(AbstractLabware[WellCore]):
         labware_state = engine_client.state.labware
         self._definition = labware_state.get_definition(labware_id)
         self._user_display_name = labware_state.get_display_name(labware_id)
-        self._wells = [
-            WellCore(name=well_name, labware_id=labware_id, engine_client=engine_client)
+        self._wells_by_name = {
+            well_name: WellCore(
+                name=well_name, labware_id=labware_id, engine_client=engine_client
+            )
             for column in self._definition.ordering
             for well_name in column
-        ]
+        }
 
     @property
     def labware_id(self) -> str:
@@ -112,6 +114,22 @@ class LabwareCore(AbstractLabware[WellCore]):
     def reset_tips(self) -> None:
         raise NotImplementedError("LabwareCore.reset_tips not implemented")
 
+    def get_next_tip(
+        self, num_tips: int, starting_tip: Optional[WellCore]
+    ) -> Optional[WellCore]:
+        well_name = self._engine_client.state.tips.get_next_tip(
+            labware_id=self._labware_id,
+            use_column=num_tips != 1,
+            starting_tip_name=(
+                starting_tip.get_name()
+                if starting_tip and starting_tip.labware_id == self._labware_id
+                else None
+            ),
+        )
+
+        return self._wells_by_name[well_name] if well_name is not None else None
+
+    # TODO(mc, 2022-11-09): remove from engine core
     def get_tip_tracker(self) -> TipTracker:
         raise NotImplementedError("LabwareCore.get_tip_tracker not implemented")
 
@@ -119,10 +137,10 @@ class LabwareCore(AbstractLabware[WellCore]):
         raise NotImplementedError("LabwareCore.get_well_grid not implemented")
 
     def get_wells(self) -> List[WellCore]:
-        return self._wells
+        return list(self._wells_by_name.values())
 
     def get_wells_by_name(self) -> Dict[str, WellCore]:
-        raise NotImplementedError("LabwareCore.get_wells_by_name not implemented")
+        return dict(self._wells_by_name)
 
     def get_geometry(self) -> LabwareGeometry:
         raise NotImplementedError("LabwareCore.get_geometry not implemented")
