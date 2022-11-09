@@ -1,5 +1,7 @@
 """ProtocolEngine-based InstrumentContext core implementation."""
-from typing import Optional
+from __future__ import annotations
+
+from typing import Optional, TYPE_CHECKING
 
 from opentrons.types import Location, Mount
 from opentrons.hardware_control import SyncHardwareAPI
@@ -11,6 +13,9 @@ from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
 from ..instrument import AbstractInstrument
 from .well import WellCore
+
+if TYPE_CHECKING:
+    from .protocol import ProtocolCore
 
 
 class InstrumentCore(AbstractInstrument[WellCore]):
@@ -25,10 +30,13 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         pipette_id: str,
         engine_client: EngineClient,
         sync_hardware_api: SyncHardwareAPI,
+        protocol_core: ProtocolCore,
     ) -> None:
         self._pipette_id = pipette_id
         self._engine_client = engine_client
         self._sync_hardware_api = sync_hardware_api
+        self._protocol_core = protocol_core
+
         # TODO(jbl 2022-11-09) clearances should be move out of the core
         self._well_bottom_clearances = Clearances(
             default_aspirate=1.0, default_dispense=1.0
@@ -223,6 +231,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 minimum_z_height=minimum_z_height,
                 force_direct=force_direct,
             )
+        self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
     def get_mount(self) -> Mount:
         """Get the mount the pipette is attached to."""

@@ -16,7 +16,7 @@ from opentrons.protocol_engine import (
     WellOrigin,
 )
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons.protocol_api.core.engine import InstrumentCore, WellCore
+from opentrons.protocol_api.core.engine import InstrumentCore, WellCore, ProtocolCore
 from opentrons.types import Location, Mount, MountType, Point
 
 
@@ -33,8 +33,17 @@ def mock_sync_hardware(decoy: Decoy) -> SyncHardwareAPI:
 
 
 @pytest.fixture
+def mock_protocol_core(decoy: Decoy) -> ProtocolCore:
+    """Get a mock protocol implementation core."""
+    return decoy.mock(cls=ProtocolCore)
+
+
+@pytest.fixture
 def subject(
-    decoy: Decoy, mock_engine_client: EngineClient, mock_sync_hardware: SyncHardwareAPI
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_sync_hardware: SyncHardwareAPI,
+    mock_protocol_core: ProtocolCore,
 ) -> InstrumentCore:
     """Get a InstrumentCore test subject with its dependencies mocked out."""
     decoy.when(mock_engine_client.state.pipettes.get("abc123")).then_return(
@@ -55,6 +64,7 @@ def subject(
         pipette_id="abc123",
         engine_client=mock_engine_client,
         sync_hardware_api=mock_sync_hardware,
+        protocol_core=mock_protocol_core,
     )
 
 

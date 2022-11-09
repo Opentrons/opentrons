@@ -65,6 +65,8 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             labware_id=engine_client.state.labware.get_fixed_trash_id(),
             engine_client=engine_client,
         )
+        self._last_location: Optional[Location] = None
+        self._last_mount: Optional[Mount] = None
 
     @property
     def api_version(self) -> APIVersion:
@@ -239,6 +241,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             pipette_id=load_result.pipetteId,
             engine_client=self._engine_client,
             sync_hardware_api=self._sync_hardware,
+            protocol_core=self,
         )
 
     def get_loaded_instruments(self) -> Dict[Mount, Optional[InstrumentCore]]:
@@ -292,7 +295,10 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         mount: Optional[Mount] = None,
     ) -> Optional[Location]:
         """Get the last accessed location."""
-        raise NotImplementedError("ProtocolCore.get_last_location not implemented")
+        if mount is None or mount == self._last_mount:
+            return self._last_location
+
+        return None
 
     def set_last_location(
         self,
@@ -300,4 +306,5 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         mount: Optional[Mount] = None,
     ) -> None:
         """Set the last accessed location."""
-        raise NotImplementedError("ProtocolCore.set_last_location not implemented")
+        self._last_location = location
+        self._last_mount = mount
