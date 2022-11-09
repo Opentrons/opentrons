@@ -137,6 +137,7 @@ def test_pick_up_tip_prep_after(
         location=Location(point=Point(2, 2, 3), labware=None),
         well_core=labware.get_wells()[1],
     )
+
     subject.drop_tip(location=None, well_core=tip_core, home_after=True)
     
 
