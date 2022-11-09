@@ -191,6 +191,7 @@ class InstrumentContext(publisher.CommandPublisher):
             )
 
         c_vol = self._implementation.get_available_volume() if not volume else volume
+        flow_rate = self._implementation.get_absolute_aspirate_flow_rate(rate)
 
         with publisher.publish_context(
             broker=self.broker,
@@ -198,7 +199,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 instrument=self,
                 volume=c_vol,
                 location=dest,
-                flow_rate=self._implementation.get_absolute_aspirate_flow_rate(rate),
+                flow_rate=flow_rate,
                 rate=rate,
             ),
         ):
@@ -207,6 +208,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 well_core=well._impl if well is not None else None,
                 volume=c_vol,
                 rate=rate,
+                flow_rate=flow_rate,
             )
 
         return self

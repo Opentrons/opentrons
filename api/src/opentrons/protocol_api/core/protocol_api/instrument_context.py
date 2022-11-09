@@ -66,6 +66,7 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
         well_core: Optional[WellImplementation],
         volume: float,
         rate: float,
+        flow_rate: float,
     ) -> None:
         """Aspirate a given volume of liquid from the specified location, using
         this pipette."""
@@ -74,9 +75,7 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
             # liquid to prepare the pipette for aspiration
             if self._api_version < APIVersion(2, 3) or not self.is_ready_to_aspirate():
                 if location.labware.is_well:
-                    self.move_to(
-                        location=location.labware.as_well().top(), well_core=well_core
-                    )
+                    self.move_to(location=location.labware.as_well().top())
                 else:
                     # TODO(seth,2019/7/29): This should be a warning exposed
                     #  via rpc to the runapp
@@ -88,9 +87,9 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
                         "blow_out."
                     )
                 self.prepare_for_aspirate()
-            self.move_to(location=location, well_core=well_core)
+            self.move_to(location=location)
         elif location != self._protocol_interface.get_last_location():
-            self.move_to(location=location, well_core=well_core)
+            self.move_to(location=location)
 
         self._protocol_interface.get_hardware().aspirate(self._mount, volume, rate)
 
@@ -183,7 +182,7 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
     def move_to(
         self,
         location: types.Location,
-        well_core: Optional[WellImplementation],
+        well_core: Optional[WellImplementation] = None,
         force_direct: bool = False,
         minimum_z_height: Optional[float] = None,
         speed: Optional[float] = None,

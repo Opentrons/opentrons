@@ -64,6 +64,7 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
         well_core: Optional[WellImplementation],
         volume: float,
         rate: float,
+        flow_rate: float,
     ) -> None:
         if self.get_current_volume() == 0:
             # Make sure we're at the top of the labware and clear of any

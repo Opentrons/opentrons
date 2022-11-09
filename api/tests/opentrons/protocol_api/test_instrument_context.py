@@ -201,7 +201,7 @@ def test_aspirate(
 
     decoy.when(mock_well.bottom(z=1.2)).then_return(bottom_location)
     decoy.when(mock_instrument_core.get_absolute_aspirate_flow_rate(1.23)).then_return(
-        123
+        5.67
     )
 
     subject.aspirate(volume=42.0, location=mock_well, rate=1.23)
@@ -212,6 +212,7 @@ def test_aspirate(
             well_core=mock_well._impl,
             volume=42.0,
             rate=1.23,
+            flow_rate=5.67,
         ),
         times=1,
     )

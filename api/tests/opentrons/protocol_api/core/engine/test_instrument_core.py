@@ -44,7 +44,6 @@ def subject(
         PipetteDict,
         {
             "default_aspirate_flow_rates": {"1.1": 22},
-            "aspirate_flow_rate": 2.0,
             "default_dispense_flow_rates": {"3.3": 44},
             "default_blow_out_flow_rates": {"5.5": 66},
         },
@@ -233,7 +232,9 @@ def test_aspirate_from_well(
         )
     ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)))
 
-    subject.aspirate(location=location, well_core=well_core, volume=12.34, rate=5.6)
+    subject.aspirate(
+        location=location, well_core=well_core, volume=12.34, rate=5.6, flow_rate=7.8
+    )
 
     decoy.verify(
         mock_engine_client.aspirate(
@@ -244,7 +245,7 @@ def test_aspirate_from_well(
                 origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
             ),
             volume=12.34,
-            flow_rate=11.2,
+            flow_rate=7.8,
         ),
         times=1,
     )

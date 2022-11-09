@@ -7,6 +7,7 @@ from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support.util import Clearances, PlungerSpeeds, FlowRates
 from opentrons.protocol_engine import DeckPoint
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
+from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
 from ..instrument import AbstractInstrument
 from .well import WellCore
@@ -28,13 +29,14 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         self._pipette_id = pipette_id
         self._engine_client = engine_client
         self._sync_hardware_api = sync_hardware_api
+        # TODO(jbl 2022-11-09) clearances should be move out of the core
         self._well_bottom_clearances = Clearances(
             default_aspirate=1.0, default_dispense=1.0
         )
         # TODO(jbl 2022-11-03) flow_rates should not live in the cores, and should be moved to the protocol context
         #   along with other rate related refactors (for the hardware API)
         self._flow_rates = FlowRates(self)
-        self._flow_rates.set_defaults()
+        self._flow_rates.set_defaults(MAX_SUPPORTED_VERSION)
 
     @property
     def pipette_id(self) -> str:
@@ -53,6 +55,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         well_core: Optional[WellCore],
         volume: float,
         rate: float,
+        flow_rate: float,
     ) -> None:
         if well_core is None:
             raise NotImplementedError(
@@ -74,7 +77,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             well_name=well_name,
             well_location=well_location,
             volume=volume,
-            flow_rate=self.get_absolute_aspirate_flow_rate(rate),
+            flow_rate=flow_rate,
         )
 
     def dispense(self, volume: float, rate: float) -> None:

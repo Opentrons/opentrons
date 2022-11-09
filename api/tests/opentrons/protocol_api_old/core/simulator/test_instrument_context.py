@@ -98,6 +98,7 @@ def test_pick_up_tip_prep_after(
         well_core=labware.get_wells()[0],
         volume=1,
         rate=1,
+        flow_rate=1,
     )
     subject.dispense(1, rate=1)
     subject.drop_tip(home_after=True)
@@ -116,6 +117,7 @@ def test_pick_up_tip_prep_after(
         well_core=labware.get_wells()[0],
         volume=1,
         rate=1,
+        flow_rate=1,
     )
     subject.dispense(1, rate=1)
     subject.drop_tip(home_after=True)
@@ -144,6 +146,7 @@ def test_aspirate_too_much(
             well_core=labware.get_wells()[0],
             volume=subject.get_max_volume() + 1,
             rate=1,
+            flow_rate=1,
         )
 
 
@@ -193,6 +196,7 @@ def _aspirate(i: InstrumentCore, labware: LabwareCore) -> None:
         well_core=labware.get_wells()[0],
         volume=12,
         rate=10,
+        flow_rate=10,
     )
 
 
@@ -204,6 +208,7 @@ def _aspirate_dispense(i: InstrumentCore, labware: LabwareCore) -> None:
         well_core=labware.get_wells()[0],
         volume=12,
         rate=10,
+        flow_rate=10,
     )
     i.dispense(2, 2)
 
@@ -216,6 +221,7 @@ def _aspirate_blowout(i: InstrumentCore, labware: LabwareCore) -> None:
         well_core=labware.get_wells()[0],
         volume=11,
         rate=13,
+        flow_rate=13,
     )
     i.blow_out()
 
