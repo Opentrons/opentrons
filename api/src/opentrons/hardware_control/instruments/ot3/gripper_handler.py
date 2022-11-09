@@ -90,7 +90,7 @@ class GripperHandler:
     def get_attached_probe(self) -> Optional[GripperProbe]:
         return self.get_gripper().attached_probe
 
-    async def add_probe(self, probe: GripperProbe) -> None:
+    def add_probe(self, probe: GripperProbe) -> None:
         """This is used for finding the critical point during calibration."""
         gripper = self.get_gripper()
         current_probe = self.get_attached_probe()
@@ -99,7 +99,7 @@ class GripperHandler:
         else:
             self._log.warning("add probe called with a probe already attached.")
 
-    async def remove_probe(self) -> None:
+    def remove_probe(self) -> None:
         gripper = self.get_gripper()
         current_probe = self.get_attached_probe()
         if current_probe:

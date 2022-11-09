@@ -846,13 +846,11 @@ class OT3API(
         check_bounds: MotionChecks = MotionChecks.NONE,
     ) -> None:
         """Worker function to apply robot motion."""
-        print(f"current target_position: {target_position}")
         machine_pos = machine_from_deck(
             target_position,
             self._transforms.deck_calibration.attitude,
             self._transforms.carriage_offset,
         )
-        print(f"current machine_pos: {machine_pos}")
         bounds = self._backend.axis_bounds
         to_check = {
             ax: machine_pos[ax]
@@ -1496,11 +1494,11 @@ class OT3API(
     async def remove_tip(self, mount: Union[top_types.Mount, OT3Mount]) -> None:
         await self._pipette_handler.remove_tip(OT3Mount.from_mount(mount))
 
-    async def add_gripper_probe(self, probe: GripperProbe) -> None:
-        await self._gripper_handler.add_probe(probe)
+    def add_gripper_probe(self, probe: GripperProbe) -> None:
+        self._gripper_handler.add_probe(probe)
 
-    async def remove_gripper_probe(self) -> None:
-        await self._gripper_handler.remove_probe()
+    def remove_gripper_probe(self) -> None:
+        self._gripper_handler.remove_probe()
 
     async def capacitive_probe(
         self,

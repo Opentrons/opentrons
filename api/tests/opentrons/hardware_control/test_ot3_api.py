@@ -377,7 +377,7 @@ async def test_gripper_capacitive_sweep(
     gripper_config = gc.load(GripperModel.V1, "g12345")
     instr_data = AttachedGripper(config=gripper_config, id="g12345")
     await ot3_hardware.cache_gripper(instr_data)
-    await ot3_hardware._gripper_handler.add_probe(probe)
+    ot3_hardware._gripper_handler.add_probe(probe)
     data = await ot3_hardware.capacitive_sweep(OT3Mount.GRIPPER, axis, begin, end, 3)
     assert data == [1, 2, 3, 4, 5, 6, 8]
     mock_backend_capacitive_pass.assert_called_once_with(
