@@ -1,37 +1,36 @@
 {
-	"$otSharedSchema": "pipette/schemas/2/pipettePropertiesSchema",
-	"displayName": "ninetySixChannel",
-	"displayCategory": "GEN1",
-	"pickUpTipConfigurations": {
-		"current": 0.4,
-		"presses": 1,
-		"speed": 10,
-		"increment": 0.5,
-		"distance": 1.0
-	},
-	"dropTipConfigurations":{
-		"current": 1.0,
-		"speed": 10
-	},
-	"plungerMotorConfigurations": {
-		"idle": 0.3,
-		"run": 1.0
-	},
-	"plungerPositionsConfigurations": {
-		"top": 1,
-		"bottom": 1,
-		"blowout": 1,
-		"drop": 1
-	},
-	"availableSensors": {
-		"pressure": 2,
-		"capacitive": 2,
-		"environment": 1
-	},
-	"partialTipConfigurations": {
-		"partialTipSupported": true,
-		"availableConfigurations": [1, 8, 12, 96]
-	},
-	"channels": 96
+  "$otSharedSchema": "pipette/schemas/2/pipettePropertiesSchema",
+  "displayName": "ninetySixChannel",
+  "displayCategory": "GEN1",
+  "pickUpTipConfigurations": {
+    "current": 0.4,
+    "presses": 1,
+    "speed": 10,
+    "increment": 0.5,
+    "distance": 1.0
+  },
+  "dropTipConfigurations": {
+    "current": 1.0,
+    "speed": 10
+  },
+  "plungerMotorConfigurations": {
+    "idle": 0.3,
+    "run": 1.0
+  },
+  "plungerPositionsConfigurations": {
+    "top": 1,
+    "bottom": 1,
+    "blowout": 1,
+    "drop": 1
+  },
+  "availableSensors": {
+    "pressure": 2,
+    "capacitive": 2,
+    "environment": 1
+  },
+  "partialTipConfigurations": {
+    "partialTipSupported": true,
+    "availableConfigurations": [1, 8, 12, 96]
+  },
+  "channels": 96
 }
-

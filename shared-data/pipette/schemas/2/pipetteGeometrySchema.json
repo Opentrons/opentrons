@@ -1,16 +1,11 @@
 {
-	"$schema": "http://json-schema.org/draft-07/schema#",
-	"type": "object",
-	"required": [
-		"model",
-		"nozzleOffset",
-		"pathTo3D"
-	],
-	"additionalProperties": false,
-	"properties": {
-		"model": "",
-		"nozzleOffset": "",
-		"pathTo3D" : ""
-	}
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["model", "nozzleOffset", "pathTo3D"],
+  "additionalProperties": false,
+  "properties": {
+    "model": "",
+    "nozzleOffset": "",
+    "pathTo3D": ""
+  }
 }
-  

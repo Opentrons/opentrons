@@ -1,7 +1,6 @@
 {
-	"$otSharedSchema": "pipette/schemas/2/pipetteGeometrySchema",
-	"model": "eightChannel",
-	"pathTo3D" : "pipette/definitions/2/eight_channel/p50/placeholder.gltf",
-	"nozzleOffset": [-0.5, -16.0, -259.15]
-
+  "$otSharedSchema": "pipette/schemas/2/pipetteGeometrySchema",
+  "model": "eightChannel",
+  "pathTo3D": "pipette/definitions/2/eight_channel/p50/placeholder.gltf",
+  "nozzleOffset": [-0.5, -16.0, -259.15]
 }

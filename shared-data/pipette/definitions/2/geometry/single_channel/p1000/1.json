@@ -1,6 +1,6 @@
 {
-	"$otSharedSchema": "pipette/schemas/2/pipetteGeometrySchema",
-	"model": "oneChannel",
-	"pathTo3D" : "pipette/definitions/2/single_channel/p1000/placeholder.gltf",
-	"nozzleOffset": [-0.5, -22.0, -259.15]
+  "$otSharedSchema": "pipette/schemas/2/pipetteGeometrySchema",
+  "model": "oneChannel",
+  "pathTo3D": "pipette/definitions/2/single_channel/p1000/placeholder.gltf",
+  "nozzleOffset": [-0.5, -22.0, -259.15]
 }
