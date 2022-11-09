@@ -163,11 +163,14 @@ async def create_run_command(
             "\n\n"
             "The timer starts as soon as you enqueue the new command with this request,"
             " *not* when the new command starts running. So if there are other commands"
-            " in the queue in front of the new one, they will also count towards the"
+            " in the queue before the new one, they will also count towards the"
             " timeout."
             "\n\n"
             "If the timeout elapses before the command succeeds or fails,"
             " the command will be returned with its current status."
+            "\n\n"
+            "Compatibility note: on robot software v6.2.0 and older,"
+            " the default was 30 seconds, not infinite."
         ),
     ),
     protocol_engine: ProtocolEngine = Depends(get_current_run_engine_from_url),
