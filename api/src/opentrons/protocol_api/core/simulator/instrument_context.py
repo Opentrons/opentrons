@@ -61,7 +61,37 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
     def set_default_speed(self, speed: float) -> None:
         self._default_speed = speed
 
-    def aspirate(self, volume: float, rate: float) -> None:
+    def aspirate(
+        self,
+        location: types.Location,
+        well_core: Optional[WellImplementation],
+        volume: float,
+        rate: float,
+        flow_rate: float,
+    ) -> None:
+        if self.get_current_volume() == 0:
+            # Make sure we're at the top of the labware and clear of any
+            # liquid to prepare the pipette for aspiration
+            if self._api_version < APIVersion(2, 3) or not self.is_ready_to_aspirate():
+                if location.labware.is_well:
+                    self.move_to(
+                        location=location.labware.as_well().top(), well_core=well_core
+                    )
+                else:
+                    # TODO(seth,2019/7/29): This should be a warning exposed
+                    #  via rpc to the runapp
+                    _log.warning(
+                        "When aspirate is called on something other than a "
+                        "well relative position, we can't move to the top of"
+                        " the well to prepare for aspiration. This might "
+                        "cause over aspiration if the previous command is a "
+                        "blow_out."
+                    )
+                self.prepare_for_aspirate()
+            self.move_to(location=location, well_core=well_core)
+        elif location != self._protocol_interface.get_last_location():
+            self.move_to(location=location, well_core=well_core)
+
         self._raise_if_no_tip(HardwareAction.ASPIRATE.name)
         new_volume = self.get_current_volume() + volume
         assert (
@@ -259,6 +289,9 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
 
     def get_flow_rate(self) -> FlowRates:
         return self._flow_rate
+
+    def get_absolute_aspirate_flow_rate(self, rate: float) -> float:
+        return self._flow_rate.aspirate * rate
 
     def set_flow_rate(
         self,

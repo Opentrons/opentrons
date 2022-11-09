@@ -22,11 +22,11 @@ def aspirate(
     instrument: InstrumentContext,
     volume: float,
     location: Location,
+    flow_rate: float,
     rate: float,
 ) -> command_types.AspirateCommand:
     location_text = stringify_location(location)
     template = "Aspirating {volume} uL from {location} at {flow} uL/sec"
-    flow_rate = rate * FlowRates(instrument._implementation).aspirate
     text = template.format(volume=float(volume), location=location_text, flow=flow_rate)
 
     return {

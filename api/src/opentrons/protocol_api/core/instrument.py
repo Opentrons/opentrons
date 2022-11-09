@@ -22,7 +22,14 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
-    def aspirate(self, volume: float, rate: float) -> None:
+    def aspirate(
+        self,
+        location: types.Location,
+        well_core: Optional[WellCoreType],
+        volume: float,
+        rate: float,
+        flow_rate: float,
+    ) -> None:
         ...
 
     @abstractmethod
@@ -158,6 +165,10 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
 
     @abstractmethod
     def get_flow_rate(self) -> FlowRates:
+        ...
+
+    @abstractmethod
+    def get_absolute_aspirate_flow_rate(self, rate: float) -> float:
         ...
 
     @abstractmethod
