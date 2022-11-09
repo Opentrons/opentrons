@@ -11,6 +11,8 @@ import {
   COLORS,
   Btn,
   ALIGN_FLEX_END,
+  JUSTIFY_FLEX_END,
+  JUSTIFY_START,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { PrimaryButton } from '../../atoms/buttons'
@@ -49,6 +51,15 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
   } = props
   const { t } = useTranslation('shared')
 
+  let buttonPositioning: string = ''
+  if ((back != null || getHelp != null) && proceed != null) {
+    buttonPositioning = JUSTIFY_SPACE_BETWEEN
+  } else if (back == null && getHelp == null && proceed != null) {
+    buttonPositioning = JUSTIFY_FLEX_END
+  } else if ((back != null || getHelp != null) && proceed == null) {
+    buttonPositioning = JUSTIFY_START
+  }
+
   return (
     <Flex flexDirection={DIRECTION_COLUMN} height="24.6rem">
       <Flex
@@ -69,7 +80,7 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
         <Flex flex="1">{rightHandBody}</Flex>
       </Flex>
       <Flex
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        justifyContent={buttonPositioning}
         marginBottom={SPACING.spacing6}
         marginX={SPACING.spacing6}
         alignItems={ALIGN_FLEX_END}

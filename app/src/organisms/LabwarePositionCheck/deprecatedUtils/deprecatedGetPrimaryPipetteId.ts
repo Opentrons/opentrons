@@ -1,16 +1,14 @@
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import type {
-  RunTimeCommand,
-  ProtocolFile,
-} from '@opentrons/shared-data/protocol'
+import type { RunTimeCommand } from '@opentrons/shared-data/protocol'
+import type { LoadedPipette } from '@opentrons/shared-data'
 import { LoadPipetteRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
 export const deprecatedGetPrimaryPipetteId = (
-  pipettesById: ProtocolFile<{}>['pipettes'],
+  pipettes: LoadedPipette[],
   commands: RunTimeCommand[]
 ): string => {
-  if (Object.keys(pipettesById).length === 1) {
-    return Object.keys(pipettesById)[0]
+  if (pipettes.length === 1) {
+    return pipettes[0].id
   }
 
   const leftPipetteId = commands.find(
@@ -28,17 +26,27 @@ export const deprecatedGetPrimaryPipetteId = (
     )
   }
 
-  const leftPipette = pipettesById[leftPipetteId]
-  const rightPipette = pipettesById[rightPipetteId]
+  const leftPipette = pipettes.find(pipette => pipette.id === leftPipetteId)
+  const rightPipette = pipettes.find(pipette => pipette.id === rightPipetteId)
 
-  const leftPipetteSpecs = getPipetteNameSpecs(leftPipette.name)
-  const rightPipetteSpecs = getPipetteNameSpecs(rightPipette.name)
+  const leftPipetteSpecs =
+    leftPipette != null ? getPipetteNameSpecs(leftPipette.pipetteName) : null
+  const rightPipetteSpecs =
+    rightPipette != null ? getPipetteNameSpecs(rightPipette.pipetteName) : null
 
   if (leftPipetteSpecs == null) {
-    throw new Error(`could not find pipette specs for ${leftPipette.name}`)
+    throw new Error(
+      `could not find pipette specs for ${
+        leftPipette != null ? leftPipette.pipetteName : 'left pipette'
+      }`
+    )
   }
   if (rightPipetteSpecs == null) {
-    throw new Error(`could not find pipette specs for ${rightPipette.name}`)
+    throw new Error(
+      `could not find pipette specs for ${
+        rightPipette != null ? rightPipette.pipetteName : 'right pipette'
+      }`
+    )
   }
 
   // prefer pipettes with fewer channels

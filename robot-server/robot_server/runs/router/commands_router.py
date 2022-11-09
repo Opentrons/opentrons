@@ -32,7 +32,6 @@ from .base_router import RunNotFound, RunStopped
 
 
 _DEFAULT_COMMAND_LIST_LENGTH: Final = 20
-_DEFAULT_COMMAND_WAIT_MS: Final = 30_000
 
 commands_router = APIRouter()
 
@@ -150,28 +149,28 @@ async def create_run_command(
         default=False,
         description=(
             "If `false`, return immediately, while the new command is still queued."
-            "\n\n"
-            "If `true`, only return once the new command succeeds or fails,"
+            " If `true`, only return once the new command succeeds or fails,"
             " or when the timeout is reached. See the `timeout` query parameter."
         ),
     ),
-    timeout: int = Query(
-        default=_DEFAULT_COMMAND_WAIT_MS,
+    timeout: Optional[int] = Query(
+        default=None,
         gt=0,
         description=(
             "If `waitUntilComplete` is `true`,"
-            " the maximum number of milliseconds to wait before returning."
-            " Ignored if `waitUntilComplete` is `false`."
+            " the maximum time in milliseconds to wait before returning."
+            " The default is infinite."
             "\n\n"
-            "The timer starts when the new command is enqueued,"
-            " *not* when it starts running."
-            " So if a different command runs before the new command,"
-            " it may exhaust the timeout even if the new command on its own"
-            " would have completed in time."
+            "The timer starts as soon as you enqueue the new command with this request,"
+            " *not* when the new command starts running. So if there are other commands"
+            " in the queue before the new one, they will also count towards the"
+            " timeout."
             "\n\n"
-            "If the timeout triggers, the command will still be returned"
-            " with a `201` HTTP status code."
-            " Inspect the returned command's `status` to detect the timeout."
+            "If the timeout elapses before the command succeeds or fails,"
+            " the command will be returned with its current status."
+            "\n\n"
+            "Compatibility note: on robot software v6.2.0 and older,"
+            " the default was 30 seconds, not infinite."
         ),
     ),
     protocol_engine: ProtocolEngine = Depends(get_current_run_engine_from_url),
@@ -202,7 +201,8 @@ async def create_run_command(
         raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
 
     if waitUntilComplete:
-        with move_on_after(timeout / 1000.0):
+        timeout_sec = None if timeout is None else timeout / 1000.0
+        with move_on_after(timeout_sec):
             await protocol_engine.wait_for_command(command.id),
 
     response_data = protocol_engine.state_view.commands.get(command.id)
