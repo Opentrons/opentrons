@@ -50,7 +50,7 @@ describe('DetachPipette', () => {
       'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette'
     )
     getByAltText('Detach pipette')
-    const proceedBtn = getByRole('button', { name: 'continue' })
+    const proceedBtn = getByRole('button', { name: 'Continue' })
     fireEvent.click(proceedBtn)
     expect(props.proceed).toHaveBeenCalled()
     const backBtn = getByRole('button', { name: 'Go back' })
