@@ -21,8 +21,6 @@ import { PrimaryButton } from '../../../atoms/buttons'
 import { CalibrationHealthCheckResults } from './CalibrationHealthCheckResults'
 import { DeckCalibrationResult } from './DeckCalibrationResult'
 import { RenderMountInformation } from './RenderMountInformation'
-// import { PipetteCalibrationResult } from './PipetteCalibrationResult'
-// import { TipLengthCalibrationResult } from './TipLengthCalibrationResult'
 import { CalibrationResult } from './CalibrationResult'
 
 import type { Mount } from '../../../redux/pipettes/types'
