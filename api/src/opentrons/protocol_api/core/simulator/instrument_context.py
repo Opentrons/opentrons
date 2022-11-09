@@ -106,6 +106,7 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
         well_core: Optional[WellImplementation],
         volume: float,
         rate: float,
+        flow_rate: float,
     ) -> None:
         self.move_to(location=location, well_core=well_core)
         self._raise_if_no_tip(HardwareAction.DISPENSE.name)

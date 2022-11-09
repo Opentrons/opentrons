@@ -302,6 +302,7 @@ def test_dispense_with_location(
             well_core=mock_well._impl,
             volume=42.0,
             rate=1.0,
+            flow_rate=3.0,
         ),
         times=1,
     )
@@ -333,6 +334,7 @@ def test_dispense_with_well_location(
             well_core=mock_well._impl,
             volume=42.0,
             rate=1.0,
+            flow_rate=3.0,
         ),
         times=1,
     )

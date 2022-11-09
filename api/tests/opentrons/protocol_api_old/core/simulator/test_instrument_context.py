@@ -42,7 +42,9 @@ def test_dispense_no_tip(subject: InstrumentCore) -> None:
     subject.home()
     location = Location(point=Point(1, 2, 3), labware=None)
     with pytest.raises(NoTipAttachedError, match="Cannot perform DISPENSE"):
-        subject.dispense(volume=1, rate=1, location=location, well_core=None)
+        subject.dispense(
+            volume=1, rate=1, flow_rate=1, location=location, well_core=None
+        )
 
 
 def test_drop_tip_no_tip(subject: InstrumentCore, tip_rack: LabwareCore) -> None:
@@ -106,6 +108,7 @@ def test_pick_up_tip_prep_after(
     subject.dispense(
         volume=1,
         rate=1,
+        flow_rate=1,
         location=Location(point=Point(2, 2, 3), labware=None),
         well_core=labware.get_wells()[1],
     )
@@ -130,6 +133,7 @@ def test_pick_up_tip_prep_after(
     subject.dispense(
         volume=1,
         rate=1,
+        flow_rate=1,
         location=Location(point=Point(2, 2, 3), labware=None),
         well_core=labware.get_wells()[1],
     )
@@ -226,6 +230,7 @@ def _aspirate_dispense(i: InstrumentCore, labware: LabwareCore) -> None:
     i.dispense(
         volume=2,
         rate=2,
+        flow_rate=2,
         location=Location(point=Point(2, 2, 3), labware=None),
         well_core=labware.get_wells()[1],
     )

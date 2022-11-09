@@ -39,6 +39,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         well_core: Optional[WellCoreType],
         volume: float,
         rate: float,
+        flow_rate: float,
     ) -> None:
         ...
 

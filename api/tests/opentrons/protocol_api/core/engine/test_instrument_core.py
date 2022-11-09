@@ -306,7 +306,9 @@ def test_dispense_to_well(
         )
     ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)))
 
-    subject.dispense(location=location, well_core=well_core, volume=12.34, rate=5.6)
+    subject.dispense(
+        location=location, well_core=well_core, volume=12.34, rate=5.6, flow_rate=6.0
+    )
 
     decoy.verify(
         mock_engine_client.dispense(
@@ -317,7 +319,7 @@ def test_dispense_to_well(
                 origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
             ),
             volume=12.34,
-            flow_rate=11.2,
+            flow_rate=6.0,
         ),
         times=1,
     )

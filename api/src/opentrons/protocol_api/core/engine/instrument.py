@@ -94,6 +94,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         well_core: Optional[WellCore],
         volume: float,
         rate: float,
+        flow_rate: float,
     ) -> None:
         if well_core is None:
             raise NotImplementedError(
@@ -113,7 +114,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             well_name=well_name,
             well_location=well_location,
             volume=volume,
-            flow_rate=self.get_absolute_dispense_flow_rate(rate),
+            flow_rate=flow_rate,
         )
 
     def blow_out(self) -> None:

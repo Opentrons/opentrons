@@ -102,6 +102,7 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
         well_core: Optional[WellImplementation],
         volume: float,
         rate: float,
+        flow_rate: float,
     ) -> None:
         """Dispense a volume of liquid (in microliters/uL) using this pipette
         into the specified location."""
