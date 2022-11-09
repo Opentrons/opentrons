@@ -7,11 +7,6 @@ _firstpath := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
 _possibilities := $(realpath $(_firstpath)/..) $(realpath $(_firstpath)/../..) $(realpath $(_firstpath)/../../..) $(_firstpath)
 monorepo_root := $(firstword $(filter %/opentrons, $(_possibilities)))
 
-ifeq ($(monorepo_root),)
-monorepo_root := $(firstword $(filter %\opentrons, $(_possibilities)))
-monorepo_root :=$(shell cygpath -u $(monorepo_root))
-endif
-
 $(info _possibilities $(_possibilities))
 $(info _firstpath $(_firstpath))
 $(info monorepo_root $(monorepo_root))
