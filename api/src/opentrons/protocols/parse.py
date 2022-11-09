@@ -25,7 +25,9 @@ from .types import (
     Protocol,
     PythonProtocol,
     JsonProtocol,
-    Metadata,
+    StaticPythonInfo,
+    PythonProtocolMetadata,
+    PythonProtocolRequirements,
     MalformedProtocolError,
     ApiDeprecationError,
 )
@@ -55,7 +57,7 @@ def _validate_v2_ast(protocol_ast: ast.Module) -> None:
         )
     if not rundefs:
         raise MalformedProtocolError("No function 'run(ctx)' defined")
-    if infer_version_from_imports(protocol_ast):
+    if _has_api_v1_imports(protocol_ast):
         raise MalformedProtocolError(
             "Protocol API v1 modules such as robot, instruments, and labware "
             "may not be imported in Protocol API V2 protocols"
@@ -109,9 +111,9 @@ def _parse_python(
 
     parsed = ast.parse(protocol_contents, filename=ast_filename)
 
-    metadata = extract_metadata(parsed)
+    static_info = extract_static_python_info(parsed)
     protocol = compile(parsed, filename=ast_filename, mode="exec")
-    version = get_version(metadata, parsed)
+    version = get_version(static_info, parsed)
 
     if version >= APIVersion(2, 0):
         _validate_v2_ast(parsed)
@@ -122,7 +124,7 @@ def _parse_python(
         text=protocol_contents,
         filename=getattr(protocol, "co_filename", "<protocol>"),
         contents=protocol,
-        metadata=metadata,
+        metadata=static_info.metadata,
         api_level=version,
         bundled_labware=bundled_labware,
         bundled_data=bundled_data,
@@ -213,64 +215,89 @@ def parse(
             )
 
 
-def extract_metadata(parsed: ast.Module) -> Metadata:
-    """Return the contents of a Python protocol's ``metadata`` block.
-
-    Returns:
-        The contents of module's ``metadata`` block, if succeeded.
-
-        ``{}``, if the module never assigns a dict to a variable named  ``metadata``.
+def extract_static_python_info(parsed: ast.Module) -> StaticPythonInfo:
+    """Extract statically analyzable info from a Python protocol, like its metadata.
 
     Raises:
-        ``ValueError``, if `parsed` does assign a dict to a variable named ``metadata``,
-        but either:
-
-        * That dict is not statically parsable
-        * That dict contains unsupported types
+        ValueError: If the places that we expect to be statically analyzable are
+            actually not, or if they contain unsupported types.
     """
-    metadata: Metadata = {}
-    assigns = [obj for obj in parsed.body if isinstance(obj, ast.Assign)]
-    for obj in assigns:
-        if (
-            isinstance(obj.targets[0], ast.Name)
-            and obj.targets[0].id == "metadata"
-            and isinstance(obj.value, ast.Dict)
-        ):
-            try:
-                evaluated_literal = ast.literal_eval(obj.value)
-            # Undocumented, but ast.literal_eval() seems to raise ValueError for
-            # expressions that aren't statically or "safely" evaluable, like
-            # `{"o": object()}` or `{"s": "abc"[0]}`.
-            except ValueError as exception:
-                raise ValueError(
-                    "Could not read the contents of the metadata dict."
-                    " Make sure it doesn't contain any complex expressions, such as"
-                    " function calls or array indexings."
-                ) from exception
+    extracted_metadata: PythonProtocolMetadata = None
+    extracted_requirements: PythonProtocolRequirements = None
 
-            # ast.literal_eval() is typed as returning Any, but we're pretty sure it
-            # should return a dict in this case because we passed it an ast.Dict.
-            assert isinstance(evaluated_literal, dict)
+    assignments = (obj for obj in parsed.body if isinstance(obj, ast.Assign))
+    for assignment in assignments:
+        target = assignment.targets[0]
+        assigned_value = assignment.value
 
-            for key, value in evaluated_literal.items():
-                if not isinstance(key, str):
-                    raise ValueError(
-                        f'metadata keys must be strings, but key "{key}"'
-                        f' has type "{type(key).__name__}".'
-                    )
-                if not isinstance(value, str):
-                    raise ValueError(
-                        f'metadata values must be strings, but value "{value}"'
-                        f' has type "{type(value).__name__}".'
-                    )
+        if isinstance(target, ast.Name) and isinstance(assigned_value, ast.Dict):
+            target_name = target.id
+            if target_name == "metadata":
+                extracted_metadata = _extract_static_dict(
+                    static_dict=assigned_value, name="metadata"
+                )
 
-            metadata = evaluated_literal
+            # `requirements` was added later. This is technically a breaking change if
+            # anyone happened to declare a module-level `requirements` variable in their
+            # protocol, since we'll now raise an error if it isn't statically parseable
+            # or if it contains unsupported types.
+            elif target_name == "requirements":
+                extracted_requirements = _extract_static_dict(
+                    static_dict=assigned_value, name="requirements"
+                )
 
-    return metadata
+    return StaticPythonInfo(
+        metadata=extracted_metadata, requirements=extracted_requirements
+    )
+
+
+def _extract_static_dict(static_dict: ast.Dict, name: str) -> Dict[str, str]:
+    """Statically read a `metadata`-like dict from a Python Protocol API file.
+
+    Args:
+        static_dict: The AST node representing the dict.
+        name: The name of the dict in the user's Python source code,
+            for error reporting.
+
+    Raises:
+        ValueError: If the dict is too complex for this function to understand
+            statically, or if it contains unsupported types.
+    """
+    try:
+        evaluated_literal = ast.literal_eval(static_dict)
+    except ValueError as exception:
+        # Undocumented, but ast.literal_eval() seems to raise ValueError for
+        # expressions that aren't statically or "safely" evaluable, like
+        # `{"o": object()}` or `{"s": "abc"[0]}`.
+        raise ValueError(
+            f"Could not read the contents of the {name} dict."
+            f" Make sure it doesn't contain any complex expressions, such as"
+            f" function calls or array indexings."
+        ) from exception
+
+    # ast.literal_eval() is typed as returning Any, but we're pretty sure it
+    # should return a dict in this case because we passed it an ast.Dict.
+    assert isinstance(evaluated_literal, dict)
+
+    # Make sure we don't return anything outside of our declared return type.
+    for key, value in evaluated_literal.items():
+        if not isinstance(key, str):
+            raise ValueError(
+                f'Keys in the {name} dict must be strings, but key "{key}"'
+                f' has type "{type(key).__name__}".'
+            )
+        if not isinstance(value, str):
+            raise ValueError(
+                f'Values in the {name} dict must be strings, but value "{value}"'
+                f' has type "{type(value).__name__}".'
+            )
+
+    return evaluated_literal
 
 
 @functools.lru_cache(1)
-def infer_version_from_imports(parsed: ast.Module) -> Optional[APIVersion]:
+def _has_api_v1_imports(parsed: ast.Module) -> bool:
+    """Return whether a Python protocol has import statements specific to PAPIv1."""
     # Imports in the form of `import opentrons.robot` will have an entry in
     # parsed.body[i].names[j].name in the form "opentrons.robot". Find those
     # imports and transform them to strip away the 'opentrons.' part.
@@ -301,29 +328,42 @@ def infer_version_from_imports(parsed: ast.Module) -> Optional[APIVersion]:
     # If any of these are populated, filter for entries with v1-specific terms
     opentrons_imports = set(ot_imports + ot_from_imports)
     v1_markers = set(("robot", "instruments", "modules", "containers"))
-    v1evidence = v1_markers.intersection(opentrons_imports)
-    if v1evidence:
+    return bool(v1_markers.intersection(opentrons_imports))
+
+
+def version_from_static_python_info(
+    static_python_info: StaticPythonInfo,
+) -> Optional[APIVersion]:
+    """Get an explicitly specified apiLevel from static info, if we can.
+
+    If the protocol doesn't declare apiLevel at all, return None.
+    If the protocol declares apiLevel incorrectly, raise a ValueError.
+    """
+    # TODO(mm, 2022-10-21):
+    #
+    # This logic is quick and dirty, and might allow things that we don't want.
+    #
+    # - Require protocols with new `apiLevel`s to specify `apiLevel` in `requirements`
+    #   and not in `metadata`?
+    # - Forbid protocols from specifying `apiLevel` in both `requirements` and
+    #   `metadata`?
+    # - Be more careful with falsey values, like `"apiLevel": ""`?
+    # - Forbid unrecognized keys in `requirements`?
+
+    from_requirements = (static_python_info.requirements or {}).get("apiLevel", None)
+    from_metadata = (static_python_info.metadata or {}).get("apiLevel", None)
+    requested_level = from_requirements or from_metadata
+    if requested_level is None:
+        return None
+    elif requested_level == "1":
+        # TODO(mm, 2022-10-21): Can we safely move this special case to
+        # version_from_string()?
         return APIVersion(1, 0)
     else:
-        return None
+        return version_from_string(requested_level)
 
 
-def version_from_metadata(metadata: Metadata) -> APIVersion:
-    """Build an API version from metadata, if we can.
-
-    If there is no apiLevel key, raise a KeyError.
-    If the apiLevel value is malformed, raise a ValueError.
-    """
-    if "apiLevel" not in metadata:
-        raise KeyError("apiLevel")
-    requested_level = str(metadata["apiLevel"])
-    if requested_level == "1":
-        return APIVersion(1, 0)
-
-    return version_from_string(requested_level)
-
-
-def get_version(metadata: Metadata, parsed: ast.Module) -> APIVersion:
+def get_version(static_python_info: StaticPythonInfo, parsed: ast.Module) -> APIVersion:
     """
     Infer protocol API version based on a combination of metadata and imports.
 
@@ -339,18 +379,18 @@ def get_version(metadata: Metadata, parsed: ast.Module) -> APIVersion:
     APIv2 protocol (note that 'labware' is not in this list, as there is a
     valid APIv2 import named 'labware').
     """
-    try:
-        return version_from_metadata(metadata)
-    except KeyError:  # No apiLevel key, may be apiv1
-        pass
-    inferred = infer_version_from_imports(parsed)
-    if not inferred:
-        raise RuntimeError(
-            "If this is not an API v1 protocol, you must specify the target "
-            "api level in the apiLevel key of the metadata. For instance, "
-            'metadata={"apiLevel": "2.0"}'
-        )
-    return inferred
+    declared_version = version_from_static_python_info(static_python_info)
+    if declared_version:
+        return declared_version
+    else:
+        # No apiLevel key, may be apiv1
+        if not _has_api_v1_imports(parsed):
+            raise RuntimeError(
+                "If this is not an API v1 protocol, you must specify the target "
+                "api level in the apiLevel key of the metadata. For instance, "
+                'metadata={"apiLevel": "2.0"}'
+            )
+        return APIVersion(1, 0)
 
 
 def _get_protocol_schema_version(protocol_json: Dict[Any, Any]) -> int:

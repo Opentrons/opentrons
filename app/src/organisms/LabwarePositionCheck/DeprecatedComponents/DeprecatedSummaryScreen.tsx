@@ -20,11 +20,15 @@ import { useLPCSuccessToast } from '../../ProtocolSetup/hooks'
 import { DeprecatedDeckMap } from './DeprecatedDeckMap'
 import { DeprecatedSectionList } from './DeprecatedSectionList'
 import { DeprecatedLabwareOffsetsSummary } from './DeprecatedLabwareOffsetsSummary'
-import { useIntroInfo, useLabwareOffsets, LabwareOffsets } from '../hooks'
+import {
+  useIntroInfo,
+  useLabwareOffsets,
+  LabwareOffsets,
+} from '../deprecatedHooks'
 import { useProtocolDetailsForRun } from '../../Devices/hooks'
 
 import type { SavePositionCommandData } from './types'
-import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
+import type { LegacySchemaAdapterOutput } from '@opentrons/shared-data'
 
 /**
  *
@@ -43,7 +47,7 @@ export const DeprecatedSummaryScreen = (props: {
   const trackEvent = useTrackEvent()
   useLabwareOffsets(
     savePositionCommandData,
-    protocolData as ProtocolAnalysisFile
+    protocolData as LegacySchemaAdapterOutput
   )
     .then(offsets => {
       labwareOffsets.length === 0 && setLabwareOffsets(offsets)
@@ -55,9 +59,8 @@ export const DeprecatedSummaryScreen = (props: {
   const { setIsShowingLPCSuccessToast } = useLPCSuccessToast()
 
   if (runId == null || introInfo == null || protocolData == null) return null
-  const labwareIds = Object.keys(protocolData.labware)
+  const labwareIds = protocolData.labware.map(item => item.id)
   const { sections, primaryPipetteMount, secondaryPipetteMount } = introInfo
-
   const applyLabwareOffsets = (): void => {
     trackEvent({ name: 'applyLabwareOffsetData', properties: {} })
     if (labwareOffsets.length > 0) {

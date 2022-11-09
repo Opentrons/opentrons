@@ -149,7 +149,10 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             loading: <Icon name="ot-spinner" spin size={SIZE_3} />,
             error: <Box size="6rem" backgroundColor={COLORS.medGreyEnabled} />,
             complete: (
-              <DeckThumbnail commands={mostRecentAnalysis?.commands ?? []} />
+              <DeckThumbnail
+                commands={mostRecentAnalysis?.commands ?? []}
+                labware={mostRecentAnalysis?.labware ?? []}
+              />
             ),
           }[analysisStatus]
         }
@@ -266,7 +269,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               <StyledText as="label" color={COLORS.darkGreyEnabled}>
                 {`${t('updated')} ${format(
                   new Date(modified),
-                  'MM/dd/yy HH:mm:ss'
+                  'MMM dd yy HH:mm'
                 )}`}
               </StyledText>
             </Flex>

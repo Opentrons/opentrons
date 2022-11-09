@@ -78,16 +78,24 @@ def mock_labware(decoy: Decoy) -> Labware:
 
 
 @pytest.fixture
+def mock_trash(decoy: Decoy) -> Labware:
+    return decoy.mock(cls=Labware)
+
+
+@pytest.fixture
 def subject(
     mock_instrument_implementation: AbstractInstrument[AbstractWellCore],
     mock_protocol_context: ProtocolContext,
+    mock_trash: Labware,
 ) -> InstrumentContext:
-
     subject = InstrumentContext(
         implementation=mock_instrument_implementation,
         ctx=mock_protocol_context,
         broker=Broker(),
-        at_version=APIVersion(2, 0),
+        api_version=APIVersion(2, 0),
+        tip_racks=[],
+        trash=mock_trash,
+        requested_as="some-pipette-name",
     )
 
     return subject
@@ -106,11 +114,12 @@ def test_pick_up_from_exact_well_location(
     subject.pick_up_tip(location=input_location)
 
     decoy.verify(
-        mock_instrument_implementation.move_to(
+        mock_instrument_implementation.pick_up_tip(
             location=expected_location,
-            force_direct=False,
-            minimum_z_height=None,
-            speed=None,
+            well_core=mock_well._impl,
+            presses=None,
+            increment=None,
+            prep_after=False,
         ),
         times=1,
     )
@@ -136,11 +145,12 @@ def test_pick_up_from_exact_labware_location(
     subject.pick_up_tip(location=input_location)
 
     decoy.verify(
-        mock_instrument_implementation.move_to(
+        mock_instrument_implementation.pick_up_tip(
             location=expected_location,
-            force_direct=False,
-            minimum_z_height=None,
-            speed=None,
+            well_core=mock_well._impl,
+            presses=None,
+            increment=None,
+            prep_after=False,
         ),
         times=1,
     )
@@ -160,11 +170,12 @@ def test_pick_up_from_manipulated_location(
     subject.pick_up_tip(location=move_to_location)
 
     decoy.verify(
-        mock_instrument_implementation.move_to(
+        mock_instrument_implementation.pick_up_tip(
             location=move_to_location,
-            force_direct=False,
-            minimum_z_height=None,
-            speed=None,
+            well_core=mock_well._impl,
+            presses=None,
+            increment=None,
+            prep_after=False,
         ),
         times=1,
     )
@@ -190,11 +201,12 @@ def test_pick_up_from_well(
     subject.pick_up_tip(location=mock_well)
 
     decoy.verify(
-        mock_instrument_implementation.move_to(
+        mock_instrument_implementation.pick_up_tip(
             location=expected_location,
-            force_direct=False,
-            minimum_z_height=None,
-            speed=None,
+            well_core=mock_well._impl,
+            presses=None,
+            increment=None,
+            prep_after=False,
         ),
         times=1,
     )
@@ -223,11 +235,12 @@ def test_pick_up_from_no_location(
     subject.pick_up_tip(location=None)
 
     decoy.verify(
-        mock_instrument_implementation.move_to(
+        mock_instrument_implementation.pick_up_tip(
             location=expected_location,
-            force_direct=False,
-            minimum_z_height=None,
-            speed=None,
+            well_core=mock_well._impl,
+            presses=None,
+            increment=None,
+            prep_after=False,
         ),
         times=1,
     )

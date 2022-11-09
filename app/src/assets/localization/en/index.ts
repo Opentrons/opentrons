@@ -11,6 +11,7 @@ import labware_landing from './labware_landing.json'
 import labware_position_check from './labware_position_check.json'
 import more_network_and_system from './more_network_and_system.json'
 import more_panel from './more_panel.json'
+import pipette_wizard_flows from './pipette_wizard_flows.json'
 import protocol_calibration from './protocol_calibration.json'
 import protocol_details from './protocol_details.json'
 import protocol_info from './protocol_info.json'
@@ -38,6 +39,7 @@ export const en = {
   labware_position_check,
   more_network_and_system,
   more_panel,
+  pipette_wizard_flows,
   protocol_calibration,
   protocol_details,
   protocol_info,

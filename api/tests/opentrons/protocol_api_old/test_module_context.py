@@ -50,6 +50,7 @@ def ctx_with_tempdeck(
 ) -> ProtocolContext:
     """Context fixture with a mock temp deck."""
     mock_module_controller.model.return_value = "temperatureModuleV2"
+    mock_module_controller.mock_add_spec(hw_modules.TempDeck)
     mock_hardware.attached_modules = [mock_module_controller]
 
     return papi.create_protocol_context(
@@ -64,6 +65,7 @@ def ctx_with_magdeck(
 ) -> ProtocolContext:
     """Context fixture with a mock mag deck."""
     mock_module_controller.model.return_value = "magneticModuleV1"
+    mock_module_controller.mock_add_spec(hw_modules.MagDeck)
     mock_hardware.attached_modules = [mock_module_controller]
 
     return papi.create_protocol_context(
@@ -77,8 +79,8 @@ async def ctx_with_thermocycler(
     mock_hardware: mock.AsyncMock, mock_module_controller: mock.MagicMock
 ) -> ProtocolContext:
     """Context fixture with a mock thermocycler."""
-    mock_module_controller.mock_add_spec(hw_modules.Thermocycler)
     mock_module_controller.model.return_value = "thermocyclerModuleV1"
+    mock_module_controller.mock_add_spec(hw_modules.Thermocycler)
     mock_hardware.attached_modules = [mock_module_controller]
 
     return papi.create_protocol_context(
@@ -95,6 +97,7 @@ def ctx_with_heater_shaker(
 ) -> ProtocolContext:
     """Context fixture with a mock heater-shaker."""
     mock_module_controller.model.return_value = "heaterShakerModuleV1"
+    mock_module_controller.mock_add_spec(hw_modules.HeaterShaker)
     mock_hardware.attached_modules = [mock_module_controller]
 
     ctx = papi.create_protocol_context(
@@ -187,15 +190,6 @@ def test_magdeck(ctx_with_magdeck, mock_module_controller):
     assert ctx_with_magdeck.deck[1] == mod.geometry
 
 
-def test_magdeck_calibrate(ctx_with_magdeck, mock_module_controller):
-    mod = ctx_with_magdeck.load_module("Magnetic Module", 1)
-    mod.calibrate()
-    assert "calibrating magnetic" in ",".join(
-        cmd.lower() for cmd in ctx_with_magdeck.commands()
-    )
-    mock_module_controller.calibrate.assert_called_once()
-
-
 # _________ Thermocycler tests __________
 
 
@@ -280,9 +274,9 @@ def test_thermocycler_flag_unsafe_move(ctx_with_thermocycler, mock_module_contro
     type(mock_module_controller).lid_status = m
 
     with pytest.raises(RuntimeError, match="Cannot move to labware"):
-        mod.flag_unsafe_move(with_tc_labware, without_tc_labware)
+        mod._core.flag_unsafe_move(with_tc_labware, without_tc_labware)
     with pytest.raises(RuntimeError, match="Cannot move to labware"):
-        mod.flag_unsafe_move(without_tc_labware, with_tc_labware)
+        mod._core.flag_unsafe_move(without_tc_labware, with_tc_labware)
 
 
 # __________ Heater Shaker tests __________
@@ -313,7 +307,7 @@ def test_heater_shaker_unsafe_move_flagger(
 
     mod._core.geometry.flag_unsafe_move = mock.MagicMock()  # type: ignore[attr-defined]
 
-    mod.flag_unsafe_move(to_loc=labware.wells()[1].top(), is_multichannel=False)
+    mod._core.flag_unsafe_move(to_loc=labware.wells()[1].top(), is_multichannel=False)  # type: ignore[attr-defined]
 
     mod._core.geometry.flag_unsafe_move.assert_called_once_with(  # type: ignore[attr-defined]
         to_slot=5,
@@ -339,7 +333,7 @@ def test_hs_flag_unsafe_move_raises(
     mod._core.geometry.flag_unsafe_move = mock.MagicMock(side_effect=raiser)  # type: ignore[attr-defined]
 
     with pytest.raises(PipetteMovementRestrictedByHeaterShakerError, match="uh oh"):
-        mod.flag_unsafe_move(to_loc=labware.wells()[1].top(), is_multichannel=False)
+        mod._core.flag_unsafe_move(to_loc=labware.wells()[1].top(), is_multichannel=False)  # type: ignore[attr-defined]
 
 
 def test_hs_flag_unsafe_move_skips_non_labware_locations(
@@ -351,7 +345,7 @@ def test_hs_flag_unsafe_move_skips_non_labware_locations(
     assert isinstance(mod, HeaterShakerContext)
     mod._core.geometry.flag_unsafe_move = mock.MagicMock()  # type: ignore[attr-defined]
 
-    mod.flag_unsafe_move(
+    mod._core.flag_unsafe_move(  # type: ignore[attr-defined]
         to_loc=Location(point=Point(1, 2, 3), labware=None), is_multichannel=False
     )
     mod._core.geometry.flag_unsafe_move.assert_not_called()  # type: ignore[attr-defined]

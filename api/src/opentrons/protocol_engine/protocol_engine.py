@@ -6,8 +6,8 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
 from opentrons.hardware_control.types import PauseType as HardwarePauseType
 
+from . import commands
 from .resources import ModelUtils, ModuleDataProvider
-from .commands import Command, CommandCreate
 from .types import LabwareOffset, LabwareOffsetCreate, LabwareUri, ModuleModel, Liquid
 from .execution import (
     QueueWorker,
@@ -122,7 +122,7 @@ class ProtocolEngine:
         self._action_dispatcher.dispatch(action)
         self._hardware_api.pause(HardwarePauseType.PAUSE)
 
-    def add_command(self, request: CommandCreate) -> Command:
+    def add_command(self, request: commands.CommandCreate) -> commands.Command:
         """Add a command to the `ProtocolEngine`'s queue.
 
         Arguments:
@@ -139,10 +139,15 @@ class ProtocolEngine:
                 may be added.
         """
         command_id = self._model_utils.generate_id()
+        request_hash = commands.hash_command_params(
+            create=request,
+            last_hash=self._state_store.commands.get_latest_command_hash(),
+        )
 
         action = self.state_view.commands.validate_action_allowed(
             QueueCommandAction(
                 request=request,
+                request_hash=request_hash,
                 command_id=command_id,
                 created_at=self._model_utils.get_timestamp(),
             )
@@ -157,7 +162,9 @@ class ProtocolEngine:
             command_id=command_id,
         )
 
-    async def add_and_execute_command(self, request: CommandCreate) -> Command:
+    async def add_and_execute_command(
+        self, request: commands.CommandCreate
+    ) -> commands.Command:
         """Add a command to the queue and wait for it to complete.
 
         The engine must be started by calling `play` before the command will

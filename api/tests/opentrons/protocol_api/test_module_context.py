@@ -2,17 +2,15 @@
 from typing import Any, cast
 
 import pytest
-from decoy import Decoy, matchers
+from decoy import Decoy
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 
 from opentrons.broker import Broker
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, ModuleContext, Labware
+from opentrons.protocol_api.core.common import LabwareCore, ModuleCore, ProtocolCore
 from opentrons.protocol_api.core.labware import LabwareLoadParams
-
-
-from .types import LabwareCore, ModuleCore, ProtocolCore
 
 
 @pytest.fixture
@@ -87,9 +85,7 @@ def test_load_labware(
 
     decoy.when(mock_labware_core.get_name()).then_return("Full Name")
 
-    decoy.when(mock_core.geometry.add_labware(matchers.IsA(Labware))).then_return(
-        mock_labware
-    )
+    decoy.when(mock_core.add_labware_core(mock_labware_core)).then_return(mock_labware)
 
     result = subject.load_labware(
         name="infinite tip rack",
@@ -99,8 +95,6 @@ def test_load_labware(
     )
 
     assert result is mock_labware
-    decoy.verify(mock_core.add_labware_core(mock_labware_core), times=1)
-    decoy.verify(mock_deck.recalculate_high_z(), times=1)
 
 
 def test_load_labware_from_definition(
@@ -122,9 +116,7 @@ def test_load_labware_from_definition(
 
     decoy.when(mock_labware_core.get_name()).then_return("Full Name")
 
-    decoy.when(mock_core.geometry.add_labware(matchers.IsA(Labware))).then_return(
-        mock_labware
-    )
+    decoy.when(mock_core.add_labware_core(mock_labware_core)).then_return(mock_labware)
 
     decoy.when(
         mock_protocol_core.load_labware(

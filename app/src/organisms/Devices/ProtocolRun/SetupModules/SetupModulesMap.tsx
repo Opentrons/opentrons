@@ -14,27 +14,22 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { inferModuleOrientationFromXCoordinate } from '@opentrons/shared-data'
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
+import {
+  getDeckDefFromRobotType,
+  inferModuleOrientationFromXCoordinate,
+} from '@opentrons/shared-data'
+import { useFeatureFlag } from '../../../../redux/config'
 import { HeaterShakerBanner } from '../../../ProtocolSetup/RunSetupCard/ModuleSetup/HeaterShakerSetupWizard/HeaterShakerBanner'
 import { ModuleInfo } from '../../../ProtocolSetup/RunSetupCard/ModuleSetup/ModuleInfo'
 import { UnMatchedModuleWarning } from '../../../ProtocolSetup/RunSetupCard/ModuleSetup/UnMatchedModuleWarning'
 import { MultipleModulesModal } from '../../../ProtocolSetup/RunSetupCard/ModuleSetup/MultipleModulesModal'
 import {
   useModuleRenderInfoForProtocolById,
+  useProtocolDetailsForRun,
   useUnmatchedModulesForProtocol,
 } from '../../hooks'
-
-const DECK_LAYER_BLOCKLIST = [
-  'calibrationMarkings',
-  'fixedBase',
-  'doorStops',
-  'metalFrame',
-  'removalHandle',
-  'removableDeckOutline',
-  'screwHoles',
-]
-const DECK_VIEW_BOX = '-80 -40 550 510'
+import { getStandardDeckViewBox } from '../utils/getStandardDeckViewBox'
+import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
 
 interface SetupModulesMapProps {
   robotName: string
@@ -46,12 +41,14 @@ export const SetupModulesMap = ({
   runId,
 }: SetupModulesMapProps): JSX.Element => {
   const { t } = useTranslation('protocol_setup')
-
+  const enableLiquidSetup = useFeatureFlag('enableLiquidSetup')
   const moduleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById(
     robotName,
     runId
   )
+  const { robotType } = useProtocolDetailsForRun(runId)
 
+  const deckDef = getDeckDefFromRobotType(robotType)
   const {
     missingModuleIds,
     remainingAttachedModules,
@@ -79,18 +76,15 @@ export const SetupModulesMap = ({
       marginTop={SPACING.spacing4}
       flexDirection={DIRECTION_COLUMN}
     >
-      {heaterShakerModules.length !== 0 ? (
-        <HeaterShakerBanner
-          displayName={heaterShakerModules[0]?.moduleDef.displayName}
-          modules={heaterShakerModules}
-        />
+      {!enableLiquidSetup && heaterShakerModules.length !== 0 ? (
+        <HeaterShakerBanner modules={heaterShakerModules} />
       ) : null}
-      {showMultipleModulesModal ? (
+      {!enableLiquidSetup && showMultipleModulesModal ? (
         <MultipleModulesModal
           onCloseClick={() => setShowMultipleModulesModal(false)}
         />
       ) : null}
-      {hasADuplicateModule ? (
+      {!enableLiquidSetup && hasADuplicateModule ? (
         <Link
           role="link"
           alignSelf={ALIGN_FLEX_END}
@@ -102,16 +96,16 @@ export const SetupModulesMap = ({
           {t('multiple_modules_help_link_title')}
         </Link>
       ) : null}
-      <UnMatchedModuleWarning
-        isAnyModuleUnnecessary={
-          remainingAttachedModules.length !== 0 && missingModuleIds.length !== 0
-        }
-      />
+      {!enableLiquidSetup &&
+      remainingAttachedModules.length !== 0 &&
+      missingModuleIds.length !== 0 ? (
+        <UnMatchedModuleWarning />
+      ) : null}
       <Box margin="0 auto" maxWidth="46.25rem" width="100%">
         <RobotWorkSpace
-          deckDef={standardDeckDef as any}
-          viewBox={DECK_VIEW_BOX}
-          deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
+          deckDef={deckDef}
+          viewBox={getStandardDeckViewBox(robotType)}
+          deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
           id="ModuleSetup_deckMap"
         >
           {() => (

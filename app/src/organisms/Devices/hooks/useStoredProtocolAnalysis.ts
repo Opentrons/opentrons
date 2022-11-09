@@ -1,16 +1,17 @@
 import { useSelector } from 'react-redux'
 import {
   parseAllRequiredModuleModelsById,
-  parseInitialLoadedLabwareById,
+  parseInitialLoadedLabwareEntity,
   parseInitialLoadedLabwareDefinitionsById,
-  parseInitialPipetteNamesById,
+  parsePipetteEntity,
 } from '@opentrons/api-client'
+import { schemaV6Adapter } from '@opentrons/shared-data'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 
 import { getStoredProtocol } from '../../../redux/protocol-storage'
 
 import type {
-  LoadedLabwareById,
+  LoadedLabwareEntity,
   LoadedLabwareDefinitionsById,
   ModuleModelsById,
   PipetteNamesById,
@@ -22,28 +23,27 @@ import type { State } from '../../../redux/types'
 // instead of just extending it, as soon as we remove the need for the schemaV6adapter
 export interface StoredProtocolAnalysis
   extends Omit<ProtocolAnalysisOutput, 'pipettes' | 'modules' | 'labware'> {
-  pipettes: PipetteNamesById
+  pipettes: PipetteNamesById[]
   modules: ModuleModelsById
-  labware: LoadedLabwareById
+  labware: LoadedLabwareEntity[]
   labwareDefinitions: LoadedLabwareDefinitionsById
 }
 
 export const parseProtocolAnalysisOutput = (
   storedProtocolAnalysis: ProtocolAnalysisOutput | null
 ): StoredProtocolAnalysis | null => {
-  const pipettesNamesById = parseInitialPipetteNamesById(
+  const pipettesNamesById = parsePipetteEntity(
     storedProtocolAnalysis?.commands ?? []
   )
   const moduleModelsById = parseAllRequiredModuleModelsById(
     storedProtocolAnalysis?.commands ?? []
   )
-  const labwareById = parseInitialLoadedLabwareById(
+  const labwareById = parseInitialLoadedLabwareEntity(
     storedProtocolAnalysis?.commands ?? []
   )
   const labwareDefinitionsById = parseInitialLoadedLabwareDefinitionsById(
     storedProtocolAnalysis?.commands ?? []
   )
-
   return storedProtocolAnalysis != null
     ? {
         ...storedProtocolAnalysis,
@@ -71,5 +71,7 @@ export function useStoredProtocolAnalysis(
     useSelector((state: State) => getStoredProtocol(state, protocolKey))
       ?.mostRecentAnalysis ?? null
 
-  return parseProtocolAnalysisOutput(storedProtocolAnalysis)
+  return storedProtocolAnalysis != null && 'modules' in storedProtocolAnalysis
+    ? schemaV6Adapter(storedProtocolAnalysis)
+    : parseProtocolAnalysisOutput(storedProtocolAnalysis)
 }

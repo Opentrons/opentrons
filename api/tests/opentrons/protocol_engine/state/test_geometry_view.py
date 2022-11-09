@@ -1,7 +1,7 @@
 """Test state getters for retrieving geometry views of state."""
 import pytest
 from decoy import Decoy
-from typing import cast
+from typing import cast, Union
 
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
@@ -19,6 +19,7 @@ from opentrons.protocol_engine.types import (
     WellOrigin,
     WellOffset,
     OFF_DECK_LOCATION,
+    Dimensions,
 )
 from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.modules import ModuleView
@@ -238,6 +239,7 @@ def test_get_all_labware_highest_z(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
     reservoir_def: LabwareDefinition,
+    falcon_tuberack_def: LabwareDefinition,
     labware_view: LabwareView,
     module_view: ModuleView,
     subject: GeometryView,
@@ -250,6 +252,13 @@ def test_get_all_labware_highest_z(
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
         offsetId="plate-offset-id",
     )
+    off_deck_lw = LoadedLabware(
+        id="off-deck-plate-id",
+        loadName="off-deck-plate-load-name",
+        definitionUri="off-deck-plate-definition-uri",
+        location=OFF_DECK_LOCATION,
+        offsetId="plate-offset-id",
+    )
     reservoir = LoadedLabware(
         id="reservoir-id",
         loadName="reservoir-load-name",
@@ -259,19 +268,27 @@ def test_get_all_labware_highest_z(
     )
 
     plate_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+    off_deck_lw_offset = LabwareOffsetVector(x=1, y=-2, z=3)
     reservoir_offset = LabwareOffsetVector(x=1, y=-2, z=3)
 
     decoy.when(module_view.get_all()).then_return([])
 
-    decoy.when(labware_view.get_all()).then_return([plate, reservoir])
+    decoy.when(labware_view.get_all()).then_return([plate, off_deck_lw, reservoir])
     decoy.when(labware_view.get("plate-id")).then_return(plate)
+    decoy.when(labware_view.get("off-deck-plate-id")).then_return(off_deck_lw)
     decoy.when(labware_view.get("reservoir-id")).then_return(reservoir)
 
     decoy.when(labware_view.get_definition("plate-id")).then_return(well_plate_def)
+    decoy.when(labware_view.get_definition("off-deck-plate-id")).then_return(
+        falcon_tuberack_def  # Something tall.
+    )
     decoy.when(labware_view.get_definition("reservoir-id")).then_return(reservoir_def)
 
     decoy.when(labware_view.get_labware_offset_vector("plate-id")).then_return(
         plate_offset
+    )
+    decoy.when(labware_view.get_labware_offset_vector("off-deck-plate-id")).then_return(
+        off_deck_lw_offset
     )
     decoy.when(labware_view.get_labware_offset_vector("reservoir-id")).then_return(
         reservoir_offset
@@ -288,6 +305,7 @@ def test_get_all_labware_highest_z(
     reservoir_z = subject.get_labware_highest_z("reservoir-id")
     all_z = subject.get_all_labware_highest_z()
 
+    # Should exclude the off-deck plate.
     assert all_z == max(plate_z, reservoir_z)
 
 
@@ -573,6 +591,56 @@ def test_get_well_position_with_bottom_offset(
     )
 
 
+def test_get_relative_well_location(
+    decoy: Decoy,
+    well_plate_def: LabwareDefinition,
+    labware_view: LabwareView,
+    subject: GeometryView,
+) -> None:
+    """It should get the relative location of a well given an absolute position."""
+    labware_data = LoadedLabware(
+        id="labware-id",
+        loadName="load-name",
+        definitionUri="definition-uri",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        offsetId="offset-id",
+    )
+    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+    slot_pos = Point(4, 5, 6)
+    well_def = well_plate_def.wells["B2"]
+
+    decoy.when(labware_view.get("labware-id")).then_return(labware_data)
+    decoy.when(labware_view.get_definition("labware-id")).then_return(well_plate_def)
+    decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
+        calibration_offset
+    )
+    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_4)).then_return(
+        slot_pos
+    )
+    decoy.when(labware_view.get_well_definition("labware-id", "B2")).then_return(
+        well_def
+    )
+
+    result = subject.get_relative_well_location(
+        labware_id="labware-id",
+        well_name="B2",
+        absolute_point=Point(
+            x=slot_pos[0] + 1 + well_def.x + 7,
+            y=slot_pos[1] - 2 + well_def.y + 8,
+            z=slot_pos[2] + 3 + well_def.z + well_def.depth + 9,
+        ),
+    )
+
+    assert result == WellLocation(
+        origin=WellOrigin.TOP,
+        offset=WellOffset.construct(
+            x=cast(float, pytest.approx(7)),
+            y=cast(float, pytest.approx(8)),
+            z=cast(float, pytest.approx(9)),
+        ),
+    )
+
+
 def test_get_nominal_effective_tip_length(
     decoy: Decoy,
     labware_view: LabwareView,
@@ -747,3 +815,78 @@ def test_get_ancestor_slot_name(
         DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
     )
     assert subject.get_ancestor_slot_name("labware-2") == DeckSlotName.SLOT_1
+
+
+def test_ensure_location_not_occupied_raises(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    subject: GeometryView,
+) -> None:
+    """It should raise error when labware is present in given location."""
+    slot_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_4)
+    # Shouldn't raise if neither labware nor module in location
+    assert subject.ensure_location_not_occupied(slot_location) == slot_location
+
+    # Raise if labware in location
+    decoy.when(labware_view.raise_if_labware_in_location(slot_location)).then_raise(
+        errors.LocationIsOccupiedError("Woops!")
+    )
+    with pytest.raises(errors.LocationIsOccupiedError):
+        subject.ensure_location_not_occupied(location=slot_location)
+
+    # Raise if module in location
+    module_location = ModuleLocation(moduleId="module-id")
+    decoy.when(labware_view.raise_if_labware_in_location(module_location)).then_return(
+        None
+    )
+    decoy.when(module_view.raise_if_module_in_location(module_location)).then_raise(
+        errors.LocationIsOccupiedError("Woops again!")
+    )
+    with pytest.raises(errors.LocationIsOccupiedError):
+        subject.ensure_location_not_occupied(location=module_location)
+
+    # Shouldn't raise for off-deck labware
+    assert (
+        subject.ensure_location_not_occupied(location=OFF_DECK_LOCATION)
+        == OFF_DECK_LOCATION
+    )
+
+
+@pytest.mark.parametrize(
+    argnames=["location", "expected_center_point"],
+    argvalues=[
+        (DeckSlotLocation(slotName=DeckSlotName.SLOT_1), Point(101.0, 102.0, 119.5)),
+        (ModuleLocation(moduleId="module-id"), Point(111.0, 122.0, 149.5)),
+    ],
+)
+def test_get_labware_center(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    subject: GeometryView,
+    location: Union[DeckSlotLocation, ModuleLocation],
+    expected_center_point: Point,
+) -> None:
+    """It should get the center point of the labware at the specified location."""
+    decoy.when(labware_view.get_dimensions(labware_id="labware-id")).then_return(
+        Dimensions(x=11, y=22, z=33)
+    )
+
+    if isinstance(location, ModuleLocation):
+        decoy.when(module_view.get_module_offset("module-id")).then_return(
+            LabwareOffsetVector(x=10, y=20, z=30)
+        )
+
+        decoy.when(module_view.get_location("module-id")).then_return(
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+        )
+
+    decoy.when(labware_view.get_slot_center_position(DeckSlotName.SLOT_1)).then_return(
+        Point(x=101, y=102, z=103)
+    )
+    labware_center = subject.get_labware_center(
+        labware_id="labware-id", location=location
+    )
+
+    assert labware_center == expected_center_point

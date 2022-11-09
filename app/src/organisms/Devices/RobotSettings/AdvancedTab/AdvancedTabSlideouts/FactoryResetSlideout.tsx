@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import snakeCase from 'lodash/snakeCase'
 
 import {
   Flex,
@@ -31,6 +32,7 @@ import { useTrackEvent } from '../../../../../redux/analytics'
 import { EVENT_CALIBRATION_DOWNLOADED } from '../../../../../redux/calibration'
 import {
   useDeckCalibrationData,
+  useIsOT3,
   usePipetteOffsetCalibrations,
   useTipLengthCalibrations,
   useRobot,
@@ -59,6 +61,7 @@ export function FactoryResetSlideout({
   const dispatch = useDispatch<Dispatch>()
   const [resetOptions, setResetOptions] = React.useState<ResetConfigRequest>({})
   const runsQueryResponse = useAllRunsQuery()
+  const isOT3 = useIsOT3(robotName)
 
   // Calibration data
   const deckCalibrationData = useDeckCalibrationData(robotName)
@@ -68,8 +71,23 @@ export function FactoryResetSlideout({
     getResetConfigOptions(state, robotName)
   )
 
-  const calibrationOptions =
+  const ot2CalibrationOptions =
+    // TODO(bh, 2022-11-07): update OT-2 filter when gripper calibration reset config option available
     options != null ? options.filter(opt => opt.id.includes('Calibration')) : []
+  const ot3CalibrationOptions =
+    options != null
+      ? options.filter(
+          opt =>
+            opt.id === 'pipetteOffsetCalibrations' ||
+            // TODO(bh, 2022-11-07): confirm or update when gripper calibration reset config option available
+            opt.id === 'gripperCalibration'
+        )
+      : []
+
+  const calibrationOptions = isOT3
+    ? ot3CalibrationOptions
+    : ot2CalibrationOptions
+
   const bootScriptOption =
     options != null ? options.filter(opt => opt.id.includes('bootScript')) : []
   const runHistoryOption =
@@ -161,22 +179,46 @@ export function FactoryResetSlideout({
               {t('download')}
             </Link>
           </Flex>
-          <StyledText as="p" marginBottom={SPACING.spacing3}>
-            {t('calibration_description')}
-          </StyledText>
-          {calibrationOptions.map(opt => (
+          {isOT3 ? null : (
+            <StyledText as="p" marginBottom={SPACING.spacing3}>
+              {t('calibration_description')}
+            </StyledText>
+          )}
+          {calibrationOptions.map(opt => {
+            const calibrationName =
+              isOT3 && opt.id === 'pipetteOffsetCalibrations'
+                ? t('clear_option_pipette_calibrations')
+                : t(`clear_option_${snakeCase(opt.id)}`)
+            return (
+              <CheckboxField
+                key={opt.id}
+                onChange={() =>
+                  setResetOptions({
+                    ...resetOptions,
+                    [opt.id]: !(resetOptions[opt.id] ?? false),
+                  })
+                }
+                value={resetOptions[opt.id]}
+                label={calibrationName}
+              />
+            )
+          })}
+          {/* TODO(bh, 2022-11-02): placeholder, remove when gripper calibration reset config option available */}
+          {isOT3 ? (
             <CheckboxField
-              key={opt.id}
+              key="gripperCalibration"
               onChange={() =>
                 setResetOptions({
                   ...resetOptions,
-                  [opt.id]: !(resetOptions[opt.id] ?? false),
+                  gripperCalibration: !(
+                    resetOptions.gripperCalibration ?? false
+                  ),
                 })
               }
-              value={resetOptions[opt.id]}
-              label={`Clear ${opt.name}`}
+              value={resetOptions.gripperCalibration}
+              label={t('clear_option_gripper_calibration')}
             />
-          ))}
+          ) : null}
         </Box>
         <Box marginTop={SPACING.spacing5}>
           <Flex
@@ -208,7 +250,7 @@ export function FactoryResetSlideout({
                 })
               }
               value={resetOptions[opt.id]}
-              label={`${opt.name}`}
+              label={t(`clear_option_${snakeCase(opt.id)}`)}
             />
           ))}
         </Box>
@@ -230,7 +272,7 @@ export function FactoryResetSlideout({
                 })
               }
               value={resetOptions[opt.id]}
-              label={`Clear ${opt.name}`}
+              label={t(`clear_option_${snakeCase(opt.id)}`)}
             />
           ))}
         </Box>

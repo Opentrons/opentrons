@@ -70,18 +70,19 @@ export function StepText(props: Props): JSX.Element | null {
         labwareId,
         protocolData.commands
       )
-      if (!('slotName' in labwareLocation)) {
+      if (labwareLocation === 'offDeck' || !('slotName' in labwareLocation)) {
         throw new Error('expected tip rack to be in a slot')
       }
+      const definitionUri =
+        protocolData.labware.find(labware => labware.id === labwareId)
+          ?.definitionUri ?? ''
       messageNode = t('drop_tip', {
         well_name: wellName,
         labware:
           labwareId === TRASH_ID
             ? 'Opentrons Fixed Trash'
             : getLabwareDisplayName(
-                protocolData.labwareDefinitions[
-                  protocolData.labware[labwareId].definitionId
-                ]
+                protocolData.labwareDefinitions[definitionUri]
               ),
         labware_location: labwareLocation.slotName,
       })
@@ -89,19 +90,11 @@ export function StepText(props: Props): JSX.Element | null {
     }
     case 'pickUpTip': {
       const { wellName, labwareId } = displayCommand.params
-      const labwareLocation = getLabwareLocation(
-        labwareId,
-        protocolData.commands
-      )
-      if (!('slotName' in labwareLocation)) {
-        throw new Error('expected tip rack to be in a slot')
-      }
       messageNode = t('pickup_tip', {
         well_name: wellName,
         labware: getLabwareDisplayName(
           labwareRenderInfoById[labwareId].labwareDef
         ),
-        labware_location: labwareLocation.slotName,
       })
       break
     }

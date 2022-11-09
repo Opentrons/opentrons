@@ -96,43 +96,7 @@ class PipetteContext:  # noqa: D101
         location: Optional[Union[types.Location, Well]] = None,
         rate: float = 1.0,
     ) -> PipetteContext:
-
-        if volume is None or volume == 0:
-            # TODO(mm, 2021-04-14): If None or 0, use highest volume possible.
-            # https://github.com/Opentrons/opentrons/issues/9513
-            raise NotImplementedError("volume must be specified.")
-
-        if rate != 1:
-            # TODO: https://github.com/Opentrons/opentrons/issues/9465
-            raise NotImplementedError(
-                "Protocol Engine does not yet support adjusting flow rates."
-            )
-
-        if isinstance(location, Well):
-            self._engine_client.aspirate(
-                pipette_id=self._pipette_id,
-                labware_id=location.parent.labware_id,
-                well_name=location.well_name,
-                well_location=WellLocation(
-                    origin=WellOrigin.BOTTOM,
-                    # TODO(mm, 2021-04-14): Get default offset in well via
-                    # self.well_bottom_clearance.aspirate, instead of hard-coding.
-                    # https://github.com/Opentrons/opentrons/issues/9512
-                    offset=WellOffset(x=0, y=0, z=1),
-                ),
-                volume=volume,
-            )
-        else:
-            # TODO(mm, 2021-04-14):
-            #   * If location is None, use current location.
-            #   * If location is a Location (possibly deck coords, or possibly
-            #     something like well.top()), use that.
-            # https://github.com/Opentrons/opentrons/issues/9509
-            raise NotImplementedError(
-                "locations other than Wells are currently unsupported."
-            )
-
-        return self
+        raise NotImplementedError("opentrons.protocol_api_experimental to be removed")
 
     def dispense(  # noqa: D102
         self,
@@ -248,48 +212,14 @@ class PipetteContext:  # noqa: D101
         presses: Optional[int] = None,
         increment: Optional[float] = None,
     ) -> PipetteContext:
-        # TODO(al, 2021-04-12): What about presses and increment? They are not
-        # supported by PE command. They are also not supported by PD protocols
-        # either. https://github.com/Opentrons/opentrons/issues/9523
-        if presses is not None or increment is not None:
-            raise NotImplementedError()
-
-        if isinstance(location, Well):
-            self._engine_client.pick_up_tip(
-                pipette_id=self._pipette_id,
-                labware_id=location.parent.labware_id,
-                well_name=location.well_name,
-            )
-        else:
-            # TODO(al, 2021-04-12): Support for picking up next tip in a labware
-            #  and in tipracks associated with a pipette
-            # https://github.com/Opentrons/opentrons/issues/9461
-            raise NotImplementedError()
-
-        return self
+        raise NotImplementedError("opentrons.protocol_api_experimental to be removed")
 
     def drop_tip(  # noqa: D102
         self,
         location: Optional[Union[types.Location, Well]] = None,
         home_after: bool = True,
     ) -> PipetteContext:
-        # TODO(al, 2021-04-12): What about home_after?
-        # https://github.com/Opentrons/opentrons/issues/9470
-        if not home_after:
-            raise NotImplementedError()
-
-        if isinstance(location, Well):
-            self._engine_client.drop_tip(
-                pipette_id=self._pipette_id,
-                labware_id=location.parent.labware_id,
-                well_name=location.well_name,
-            )
-        else:
-            # TODO(al, 2021-04-12): Support for dropping tip in trash.
-            # https://github.com/Opentrons/opentrons/issues/9521
-            raise NotImplementedError()
-
-        return self
+        raise NotImplementedError("opentrons.protocol_api_experimental to be removed")
 
     def home(self) -> PipetteContext:  # noqa: D102
         # TODO: https://github.com/Opentrons/opentrons/issues/9470

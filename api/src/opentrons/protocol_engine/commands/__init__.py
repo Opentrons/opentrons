@@ -17,8 +17,9 @@ from . import heater_shaker
 from . import magnetic_module
 from . import temperature_module
 from . import thermocycler
-
 from . import calibration
+
+from .hash_command_params import hash_command_params
 
 from .command import (
     AbstractCommandImpl,
@@ -124,14 +125,6 @@ from .move_labware import (
     MoveLabwareCommandType,
 )
 
-from .move_labware_off_deck import (
-    MoveLabwareOffDeck,
-    MoveLabwareOffDeckParams,
-    MoveLabwareOffDeckCreate,
-    MoveLabwareOffDeckResult,
-    MoveLabwareOffDeckCommandType,
-)
-
 from .move_relative import (
     MoveRelative,
     MoveRelativeParams,
@@ -225,6 +218,8 @@ __all__ = [
     "BaseCommandCreate",
     "CommandStatus",
     "CommandIntent",
+    # command parameter hashing
+    "hash_command_params",
     # aspirate command models
     "Aspirate",
     "AspirateCreate",
@@ -284,12 +279,6 @@ __all__ = [
     "MoveLabwareParams",
     "MoveLabwareResult",
     "MoveLabwareCommandType",
-    # move labware off-deck command models
-    "MoveLabwareOffDeck",
-    "MoveLabwareOffDeckCreate",
-    "MoveLabwareOffDeckParams",
-    "MoveLabwareOffDeckResult",
-    "MoveLabwareOffDeckCommandType",
     # move relative command models
     "MoveRelative",
     "MoveRelativeParams",

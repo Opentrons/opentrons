@@ -10,11 +10,11 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { DeprecatedLabwarePositionCheckStepDetailModal } from './DeprecatedLabwarePositionCheckStepDetailModal'
-import type { LabwarePositionCheckStep } from './types'
+import type { DeprecatedLabwarePositionCheckStep } from './types'
 import { useProtocolDetailsForRun } from '../../Devices/hooks'
 
 interface StepDetailTextProps {
-  selectedStep: LabwarePositionCheckStep
+  selectedStep: DeprecatedLabwarePositionCheckStep
   runId: string
   pipetteChannels?: 1 | 8
 }
@@ -35,7 +35,9 @@ export const DeprecatedStepDetailText = (
     setLabwarePositionCheckStepDetailModal,
   ] = React.useState<boolean>(false)
   if (protocolData == null) return null
-  const labwareDefId = protocolData.labware[labwareId].definitionId
+  //  @ts-expect-error: will be an error until we remove the schemaV6Adapter
+  const labwareDefId = protocolData.labware.find(item => item.id === labwareId)
+    .definitionUri
   const labwareDef = protocolData.labwareDefinitions[labwareDefId]
   const { displayName } = labwareDef.metadata
   const { isTiprack } = labwareDef.parameters

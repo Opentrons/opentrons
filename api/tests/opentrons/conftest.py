@@ -117,6 +117,14 @@ async def enable_ot3_hardware_controller(
     decoy.when(config.feature_flags.enable_ot3_hardware_controller()).then_return(True)
 
 
+@pytest.fixture
+async def enable_load_liquid() -> AsyncGenerator[None, None]:
+    """Fixture enabling load-liquid support."""
+    await config.advanced_settings.set_adv_setting("enableLoadLiquid", True)
+    yield
+    await config.advanced_settings.set_adv_setting("enableLoadLiquid", False)
+
+
 @pytest.fixture()
 def protocol_file() -> str:
     return "testosaur_v2.py"
@@ -226,7 +234,6 @@ async def robot_model(
     decoy.when(config.feature_flags.enable_ot3_hardware_controller()).then_return(
         which_machine == "OT-3 Standard"
     )
-
     yield which_machine
 
 

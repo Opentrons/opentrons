@@ -5,7 +5,7 @@ import typeguard
 
 
 from opentrons_shared_data.robot import load
-from opentrons_shared_data.robot.dev_types import RobotDefinition, RobotName
+from opentrons_shared_data.robot.dev_types import RobotDefinition, RobotType
 
 pytestmark = pytest.mark.xfail(
     condition=sys.version_info >= (3, 10),
@@ -14,7 +14,7 @@ pytestmark = pytest.mark.xfail(
 
 
 @pytest.mark.parametrize("defname", ["OT-2 Standard", "OT-3 Standard"])
-def test_v1_defs(defname: RobotName) -> None:
-    defn = load(robot_name=defname, version=1)
+def test_v1_defs(defname: RobotType) -> None:
+    defn = load(robot_type=defname, version=1)
     typeguard.check_type("defn", defn, RobotDefinition)
-    assert defn["robotName"] == defname
+    assert defn["robotType"] == defname

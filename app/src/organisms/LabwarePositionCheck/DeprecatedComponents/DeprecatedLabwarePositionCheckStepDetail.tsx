@@ -43,17 +43,17 @@ import type { Jog } from '../../../molecules/DeprecatedJogControls/types'
 import type {
   LabwarePositionCheckCreateCommand,
   LabwarePositionCheckMovementCommand,
-  LabwarePositionCheckStep,
+  DeprecatedLabwarePositionCheckStep,
   SavePositionCommandData,
 } from './types'
 import { StyledText } from '../../../atoms/text'
-import { useLabwareOffsetForLabware } from '../hooks/useLabwareOffsetForLabware'
+import { useLabwareOffsetForLabware } from '../deprecatedHooks/useLabwareOffsetForLabware'
 import { useCommandQuery } from '@opentrons/react-api-client'
 import type { Coordinates } from '@opentrons/shared-data'
 
 const DECK_MAP_VIEWBOX = '-30 -20 170 115'
 interface LabwarePositionCheckStepDetailProps {
-  selectedStep: LabwarePositionCheckStep
+  selectedStep: DeprecatedLabwarePositionCheckStep
   jog: Jog
   runId: string
   savePositionCommandData: SavePositionCommandData
@@ -89,8 +89,10 @@ export const DeprecatedLabwarePositionCheckStepDetail = (
       : null
 
   if (protocolData == null) return null
-  const labwareDefId = protocolData.labware[labwareId].definitionId
-  const labwareDef = protocolData.labwareDefinitions[labwareDefId]
+  const labwareDefUri =
+    protocolData.labware.find(item => item.id === labwareId)?.definitionUri ??
+    ''
+  const labwareDef = protocolData.labwareDefinitions[labwareDefUri]
   // filter out the TC open lid command as it does not have an associated pipette id
   const stepMovementCommands = selectedStep.commands.filter(
     (
@@ -103,8 +105,12 @@ export const DeprecatedLabwarePositionCheckStepDetail = (
   const command = stepMovementCommands[0]
 
   const pipetteId = command.params.pipetteId
-  const pipetteName = protocolData.pipettes[pipetteId].name
+  const pipetteName = protocolData.pipettes.find(
+    pipette => pipette.id === pipetteId
+  )?.pipetteName
   let wellsToHighlight: string[] = []
+
+  // @ts-expect-error pipetteName will not be undefined
   const pipetteChannels = getPipetteNameSpecs(pipetteName)?.channels
   if (pipetteChannels === 8) {
     wellsToHighlight = labwareDef.ordering[0]
@@ -173,6 +179,7 @@ export const DeprecatedLabwarePositionCheckStepDetail = (
               />
               <PipetteRender
                 labwareDef={labwareDef}
+                // @ts-expect-error pipetteName will not be undefined
                 pipetteName={pipetteName}
               />
             </React.Fragment>

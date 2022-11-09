@@ -45,7 +45,7 @@ The feature flags are part of the configuration under the path `devInternal`. To
 
 - CLI: `--devInternal.nameOfFlag`
 - Environment variable: `OT_APP_DEV_INTERNAL__NAME_OF_FLAG`
-- Configuration JSON: `devInteral.nameOfFlag`
+- Configuration JSON: `devInternal.nameOfFlag`
 
 The app also presents UI for enabling these flags when the [`devtools`](#devtools) setting is enabled.
 

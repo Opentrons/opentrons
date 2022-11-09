@@ -31,11 +31,11 @@ const closeIconStyles = css`
   width: ${SPACING.spacingL};
   height: ${SPACING.spacingL};
   &:hover {
-    background-color: ${COLORS.lightGreyEnabled};
+    background-color: ${COLORS.lightGreyHover};
   }
 
   &:active {
-    background-color: ${COLORS.lightGreyHover};
+    background-color: ${COLORS.lightGreyPressed};
   }
 `
 

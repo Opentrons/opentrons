@@ -1,13 +1,15 @@
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING, Optional
 
 from opentrons import types
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control import CriticalPoint
 from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.protocols.api_support import instrument as instrument_support
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.labware_like import LabwareLike
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
     Clearances,
     build_edges,
@@ -18,22 +20,20 @@ from opentrons.protocols.geometry import planning
 
 from ..instrument import AbstractInstrument
 from .well import WellImplementation
+from .legacy_module_core import LegacyThermocyclerCore, LegacyHeaterShakerCore
 
 if TYPE_CHECKING:
     from .protocol_context import ProtocolContextImplementation
 
 
+_log = logging.getLogger()
+
+_PRE_2_2_TIP_DROP_HEIGHT_MM = 10
+"""In PAPIv2.1 and below, tips are always dropped 10 mm from the bottom of the well."""
+
+
 class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
     """Implementation of the InstrumentContext interface."""
-
-    _api_version: APIVersion
-    _protocol_interface: ProtocolContextImplementation
-    _mount: types.Mount
-    _instrument_name: str
-    _default_speed: float
-    _well_bottom_clearances: Clearances
-    _flow_rates: FlowRates
-    _speeds: PlungerSpeeds
 
     def __init__(
         self,
@@ -43,7 +43,6 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
         default_speed: float,
         api_version: Optional[APIVersion] = None,
     ):
-        """ "Constructor"""
         self._api_version = api_version or MAX_SUPPORTED_VERSION
         self._protocol_interface = protocol_interface
         self._mount = mount
@@ -64,9 +63,37 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
         """Sets the speed at which the robot's gantry moves."""
         self._default_speed = speed
 
-    def aspirate(self, volume: float, rate: float) -> None:
+    def aspirate(
+        self,
+        location: types.Location,
+        well_core: Optional[WellImplementation],
+        volume: float,
+        rate: float,
+        flow_rate: float,
+    ) -> None:
         """Aspirate a given volume of liquid from the specified location, using
         this pipette."""
+        if self.get_current_volume() == 0:
+            # Make sure we're at the top of the labware and clear of any
+            # liquid to prepare the pipette for aspiration
+            if self._api_version < APIVersion(2, 3) or not self.is_ready_to_aspirate():
+                if location.labware.is_well:
+                    self.move_to(location=location.labware.as_well().top())
+                else:
+                    # TODO(seth,2019/7/29): This should be a warning exposed
+                    #  via rpc to the runapp
+                    _log.warning(
+                        "When aspirate is called on something other than a "
+                        "well relative position, we can't move to the top of"
+                        " the well to prepare for aspiration. This might "
+                        "cause over aspiration if the previous command is a "
+                        "blow_out."
+                    )
+                self.prepare_for_aspirate()
+            self.move_to(location=location)
+        elif location != self._protocol_interface.get_last_location():
+            self.move_to(location=location)
+
         self._protocol_interface.get_hardware().aspirate(self._mount, volume, rate)
 
     def dispense(self, volume: float, rate: float) -> None:
@@ -89,10 +116,16 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
         #  an unpleasant compromise until refactoring build_edges to support
         #  WellImplementation.
         #  Also, build_edges should not require api_version.
-        from opentrons.protocol_api.labware import Well
+        from opentrons.protocol_api.labware import Labware, Well
 
         edges = build_edges(
-            where=Well(well_implementation=location),
+            # TODO(mc, 2022-10-26): respect api_version
+            # https://opentrons.atlassian.net/browse/RSS-97
+            where=Well(
+                parent=Labware(implementation=location.get_geometry().parent),
+                well_implementation=location,
+                api_version=MAX_SUPPORTED_VERSION,
+            ),
             offset=v_offset,
             mount=self._mount,
             deck=self._protocol_interface.get_deck(),
@@ -104,26 +137,89 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
 
     def pick_up_tip(
         self,
-        well: WellImplementation,
-        tip_length: float,
+        location: types.Location,
+        well_core: WellImplementation,
         presses: Optional[int],
         increment: Optional[float],
-        prep_after: bool,
+        prep_after: bool = True,
     ) -> None:
         """Pick up a tip for the pipette to run liquid-handling commands."""
         hw = self._protocol_interface.get_hardware()
-        geometry = well.get_geometry()
+        geometry = well_core.get_geometry()
+        tip_rack_core = geometry.parent
+        tip_length = instrument_support.tip_length_for(
+            pipette=self.get_hardware_state(),
+            tip_rack_definition=tip_rack_core.get_definition(),
+        )
 
+        self.move_to(location=location, well_core=well_core)
         hw.set_current_tiprack_diameter(self._mount, geometry.diameter)
-
         hw.pick_up_tip(self._mount, tip_length, presses, increment, prep_after)
         hw.set_working_volume(self._mount, geometry.max_volume)
-
-    def drop_tip(self, home_after: bool) -> None:
-        """Drop the tip."""
-        self._protocol_interface.get_hardware().drop_tip(
-            self._mount, home_after=home_after
+        tip_rack_core.get_tip_tracker().use_tips(
+            start_well=well_core,
+            num_channels=self.get_channels(),
+            fail_if_full=self._api_version < APIVersion(2, 2),
         )
+
+    def drop_tip(
+        self,
+        location: Optional[types.Location],
+        well_core: WellImplementation,
+        home_after: bool,
+    ) -> None:
+        """Move to and drop a tip into a given well.
+
+        Args:
+            location: An absolute location to drop the tip at.
+                If unspecified, use the default drop height of the well.
+            well_core: The well we're dropping into
+            home_after: Whether to home the pipette after the tip is dropped.
+        """
+        labware_core = well_core.get_geometry().parent
+
+        if location is None:
+            from opentrons.protocol_api.labware import Labware, Well
+
+            labware = Labware(
+                implementation=labware_core, api_version=self._api_version
+            )
+            well = Well(
+                parent=labware,
+                well_implementation=well_core,
+                api_version=self._api_version,
+            )
+
+            if LabwareLike(labware).is_fixed_trash():
+                location = well.top()
+            elif self._api_version < APIVersion(2, 2):
+                location = well.bottom(z=_PRE_2_2_TIP_DROP_HEIGHT_MM)
+            else:
+                assert (
+                    labware_core.is_tip_rack()
+                ), "Expected tip drop target to be a tip rack."
+
+                return_height = self.get_return_height()
+                location = well.top(z=-return_height * labware_core.get_tip_length())
+
+        hw = self._protocol_interface.get_hardware()
+        self.move_to(location=location)
+        hw.drop_tip(self._mount, home_after=home_after)
+
+        if self._api_version < APIVersion(2, 2) and labware_core.is_tip_rack():
+            # If this is a tiprack we can try and add the dirty tip back to the tracker
+            try:
+                labware_core.get_tip_tracker().return_tips(
+                    start_well=well_core,
+                    num_channels=self.get_channels(),
+                )
+            except AssertionError:
+                # Similarly to :py:meth:`return_tips`, the failure case here
+                # just means the tip can't be reused, so don't actually stop
+                # the protocol
+                _log.warning(
+                    f"Could not return tip to {labware_core.get_display_name()}"
+                )
 
     def home(self) -> None:
         """Home the mount"""
@@ -142,11 +238,26 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
     def move_to(
         self,
         location: types.Location,
-        force_direct: bool,
-        minimum_z_height: Optional[float],
-        speed: Optional[float],
+        well_core: Optional[WellImplementation] = None,
+        force_direct: bool = False,
+        minimum_z_height: Optional[float] = None,
+        speed: Optional[float] = None,
     ) -> None:
-        """Move the instrument."""
+        """Move the instrument.
+
+        Args:
+            location: The movement destination.
+            well_core: Unused in the legacy instrument core.
+            force_direct: Force a direct movement instead of an arc.
+            minimum_z_height: Set a minimum travel height for a movement arc.
+            speed: Override the travel speed in mm/s.
+
+        Raises:
+            LabwareHeightError: An item on the deck is taller than
+                the computed safe travel height.
+        """
+        self.flag_unsafe_move(location)
+
         # prevent direct movement bugs in PAPI version >= 2.10
         location_cache_mount = (
             self._mount if self._api_version >= APIVersion(2, 10) else None
@@ -210,29 +321,29 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
 
     def get_pipette_name(self) -> str:
         """Get the pipette name."""
-        return self.get_pipette()["name"]
+        return self.get_hardware_state()["name"]
 
     def get_model(self) -> str:
         """Get the model name."""
-        return self.get_pipette()["model"]
+        return self.get_hardware_state()["model"]
 
     def get_min_volume(self) -> float:
         """Get the min volume."""
-        return self.get_pipette()["min_volume"]
+        return self.get_hardware_state()["min_volume"]
 
     def get_max_volume(self) -> float:
         """Get the max volume."""
-        return self.get_pipette()["max_volume"]
+        return self.get_hardware_state()["max_volume"]
 
     def get_current_volume(self) -> float:
         """Get the current volume."""
-        return self.get_pipette()["current_volume"]
+        return self.get_hardware_state()["current_volume"]
 
     def get_available_volume(self) -> float:
         """Get the available volume."""
-        return self.get_pipette()["available_volume"]
+        return self.get_hardware_state()["available_volume"]
 
-    def get_pipette(self) -> PipetteDict:
+    def get_hardware_state(self) -> PipetteDict:
         """Get the hardware pipette dictionary."""
         sync_hw_api = self._protocol_interface.get_hardware()
         pipette: Optional[PipetteDict] = sync_hw_api.get_attached_instrument(
@@ -246,21 +357,21 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
 
     def get_channels(self) -> int:
         """Number of channels."""
-        return self.get_pipette()["channels"]
+        return self.get_hardware_state()["channels"]
 
     def has_tip(self) -> bool:
         """Whether a tip is attached."""
-        return self.get_pipette()["has_tip"]
+        return self.get_hardware_state()["has_tip"]
 
     def is_ready_to_aspirate(self) -> bool:
-        return self.get_pipette()["ready_to_aspirate"]
+        return self.get_hardware_state()["ready_to_aspirate"]
 
     def prepare_for_aspirate(self) -> None:
         self._protocol_interface.get_hardware().prepare_for_aspirate(self._mount)
 
     def get_return_height(self) -> float:
         """The height to return a tip to its tiprack."""
-        return self.get_pipette().get("return_tip_height", 0.5)
+        return self.get_hardware_state().get("return_tip_height", 0.5)
 
     def get_well_bottom_clearance(self) -> Clearances:
         """The distance above the bottom of a well to aspirate or dispense."""
@@ -268,6 +379,9 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
 
     def get_flow_rate(self) -> FlowRates:
         return self._flow_rates
+
+    def get_absolute_aspirate_flow_rate(self, rate: float) -> float:
+        return self._flow_rates.aspirate * rate
 
     def get_speed(self) -> PlungerSpeeds:
         return self._speeds
@@ -299,3 +413,26 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
             dispense=dispense,
             blow_out=blow_out,
         )
+
+    def flag_unsafe_move(self, location: types.Location) -> None:
+        """Check if a movement to a destination is potentially unsafe.
+
+        Args:
+            location: The movement destination.
+
+        Raises:
+            RuntimeError: The movement is unsafe.
+        """
+        from_loc = self._protocol_interface.get_last_location()
+
+        if not from_loc:
+            from_loc = types.Location(types.Point(0, 0, 0), LabwareLike(None))
+
+        for mod in self._protocol_interface.get_module_cores():
+            if isinstance(mod, LegacyThermocyclerCore):
+                mod.flag_unsafe_move(to_loc=location, from_loc=from_loc)
+            elif isinstance(mod, LegacyHeaterShakerCore):
+                mod.flag_unsafe_move(
+                    to_loc=location,
+                    is_multichannel=self.get_channels() > 1,
+                )

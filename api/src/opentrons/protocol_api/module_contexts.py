@@ -5,11 +5,9 @@ from typing import Generic, List, Optional, TypeVar, cast
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
-from opentrons import types
 from opentrons.broker import Broker
-from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
 from opentrons.hardware_control import SynchronousAdapter, modules
-from opentrons.hardware_control.modules import ModuleModel, types as module_types
+from opentrons.hardware_control.modules import ModuleModel
 from opentrons.commands import module_commands as cmds
 from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support.types import APIVersion
@@ -21,17 +19,14 @@ from opentrons.protocols.geometry.module_geometry import (
     HeaterShakerGeometry,
 )
 
-from .core.protocol import AbstractProtocol
-from .core.instrument import AbstractInstrument
-from .core.labware import AbstractLabware
-from .core.module import (
-    AbstractModuleCore,
-    AbstractTemperatureModuleCore,
-    AbstractMagneticModuleCore,
-    AbstractThermocyclerCore,
-    AbstractHeaterShakerCore,
+from .core.common import (
+    ProtocolCore,
+    ModuleCore,
+    TemperatureModuleCore,
+    MagneticModuleCore,
+    ThermocyclerCore,
+    HeaterShakerCore,
 )
-from .core.well import AbstractWellCore
 
 from .module_validation_and_errors import (
     validate_heater_shaker_temperature,
@@ -47,11 +42,6 @@ ENGAGE_HEIGHT_UNIT_CNV = 2
 _log = logging.getLogger(__name__)
 
 GeometryType = TypeVar("GeometryType", bound=ModuleGeometry)
-
-InstrumentCore = AbstractInstrument[AbstractWellCore]
-LabwareCore = AbstractLabware[AbstractWellCore]
-ModuleCore = AbstractModuleCore[LabwareCore]
-ProtocolCore = AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]
 
 
 class ModuleContext(CommandPublisher, Generic[GeometryType]):
@@ -142,15 +132,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
             location=self._core,
         )
 
-        self._core.add_labware_core(labware_core)
-
-        # TODO(mc, 2022-09-02): add API version
-        # https://opentrons.atlassian.net/browse/RSS-97
-        labware = self._core.geometry.add_labware(Labware(implementation=labware_core))
-
-        # TODO(mc, 2022-09-08): move this into legacy PAPIv2 implementation
-        # by reworking the `Deck` and/or `ModuleGeometry` interface
-        self._protocol_core.get_deck().recalculate_high_z()
+        labware = self._core.add_labware_core(labware_core)
 
         return labware
 
@@ -264,7 +246,7 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
 
     """
 
-    _core: AbstractTemperatureModuleCore[AbstractLabware[AbstractWellCore]]
+    _core: TemperatureModuleCore
 
     @publish(command=cmds.tempdeck_set_temp)
     @requires_version(2, 0)
@@ -337,7 +319,7 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
     .. versionadded:: 2.0
     """
 
-    _core: AbstractMagneticModuleCore[AbstractLabware[AbstractWellCore]]
+    _core: MagneticModuleCore
 
     @publish(command=cmds.magdeck_calibrate)
     @requires_version(2, 0)
@@ -444,12 +426,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     .. versionadded:: 2.0
     """
 
-    _core: AbstractThermocyclerCore[AbstractLabware[AbstractWellCore]]
-
-    def flag_unsafe_move(
-        self, to_loc: types.Location, from_loc: types.Location
-    ) -> None:
-        self.geometry.flag_unsafe_move(to_loc, from_loc, self.lid_position)
+    _core: ThermocyclerCore
 
     @publish(command=cmds.thermocycler_open)
     @requires_version(2, 0)
@@ -556,8 +533,12 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
             and finite for each step.
 
         """
+        repetitions = validation.ensure_thermocycler_repetition_count(repetitions)
+        validated_steps = validation.ensure_thermocycler_profile_steps(steps)
         self._core.execute_profile(
-            steps=steps, repetitions=repetitions, block_max_volume=block_max_volume
+            steps=validated_steps,
+            repetitions=repetitions,
+            block_max_volume=block_max_volume,
         )
 
     @publish(command=cmds.thermocycler_deactivate_lid)
@@ -666,7 +647,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     .. versionadded:: 2.13
     """
 
-    _core: AbstractHeaterShakerCore[AbstractLabware[AbstractWellCore]]
+    _core: HeaterShakerCore
 
     @property  # type: ignore[misc]
     @requires_version(2, 13)
@@ -845,50 +826,3 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         The Heater-Shaker does not have active cooling.
         """
         self._core.deactivate_heater()
-
-    def flag_unsafe_move(
-        self,
-        to_loc: types.Location,
-        is_multichannel: bool,
-    ) -> None:
-        """
-        Raise an error if attempting to perform a move that's deemed unsafe due to
-        the presence of the Heater-Shaker.
-
-        :meta private:
-        """
-        destination_slot = to_loc.labware.first_parent()
-        if destination_slot is None:
-            _log.warning(
-                "Pipette movement destination has no slot associated with it. Cannot"
-                " determine whether movement will safely avoid colliding with the Heater-Shaker."
-            )
-            return
-
-        is_labware_latch_closed = (
-            self._module.labware_latch_status
-            == HeaterShakerLabwareLatchStatus.IDLE_CLOSED
-        )
-        is_plate_shaking = self._module.speed_status != module_types.SpeedStatus.IDLE
-
-        to_labware_like = to_loc.labware
-        is_tiprack: bool
-        if (
-            to_labware_like.is_labware
-        ):  # Do we consider this a valid location for move_to?
-            is_tiprack = to_labware_like.as_labware().is_tiprack
-        elif to_labware_like.parent.is_labware:
-            is_tiprack = to_labware_like.parent.as_labware().is_tiprack
-        else:
-            raise Exception(
-                "Invalid destination location type. "
-                "Cannot determine pipette movement safety."
-            )
-
-        self.geometry.flag_unsafe_move(
-            to_slot=int(destination_slot),
-            is_tiprack=is_tiprack,
-            is_using_multichannel=is_multichannel,
-            is_plate_shaking=is_plate_shaking,
-            is_labware_latch_closed=is_labware_latch_closed,
-        )

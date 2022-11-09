@@ -9,16 +9,17 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   StyleProps,
   COLORS,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 
 const ACCORDION_STYLE = css`
   border-radius: 50%;
   &:hover {
-    background: ${COLORS.lightGreyEnabled};
+    background: ${COLORS.lightGreyHover};
   }
   &:active {
-    background: ${COLORS.lightGreyHover};
+    background: ${COLORS.lightGreyPressed};
   }
 `
 
@@ -42,7 +43,9 @@ export function CollapsibleSection(
           cursor: 'pointer',
         }}
       >
-        <StyledText as="p">{title}</StyledText>
+        <StyledText as="p" textTransform={TYPOGRAPHY.textTransformCapitalize}>
+          {title}
+        </StyledText>
         <Btn
           onClick={() => setIsExpanded(!isExpanded)}
           data-testid={
