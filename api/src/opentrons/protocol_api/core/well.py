@@ -67,7 +67,7 @@ class AbstractWellCore(ABC):
 
     @abstractmethod
     def is_fixed_trash(self) -> bool:
-        """Check if well is a fixed trash."""
+        """Check if given well is a fixed trash."""
         ...
 
 
