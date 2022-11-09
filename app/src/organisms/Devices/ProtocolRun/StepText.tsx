@@ -87,11 +87,15 @@ export function StepText(props: Props): JSX.Element | null {
     }
     case 'pickUpTip': {
       const { wellName, labwareId } = displayCommand.params
+      const defsByURI = getLoadedLabwareDefinitionsByUri(allCommands)
+      const definitionUri =
+        labwareEntities.find(l => l.id === labwareId)?.definitionUri ?? ''
       messageNode = t('pickup_tip', {
         well_name: wellName,
-        labware: getLabwareDisplayName(
-          labwareRenderInfoById[labwareId].labwareDef
-        ),
+        labware:
+          labwareId === TRASH_ID
+            ? 'Opentrons Fixed Trash'
+            : getLabwareDisplayName(defsByURI[definitionUri]),
         labware_location: TEMPORARY_LOCATION_STUB,
       })
       break
