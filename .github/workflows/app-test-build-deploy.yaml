@@ -99,12 +99,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: 'actions/checkout@v3'
-      - uses: 'actions/setup-node@v3'
-        with:
-          node-version: '16'
-      - uses: actions/setup-python@v4
+      - uses: './.github/actions/python/setup-single-environment'
         with:
           python-version: '3.10'
+          environment: 'environments/app'
       - name: 'downgrade npm version'
         run: npm install -g npm@6
       - name: check make version

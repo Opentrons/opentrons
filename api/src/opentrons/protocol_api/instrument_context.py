@@ -122,7 +122,7 @@ class InstrumentContext(publisher.CommandPublisher):
         self._implementation.set_default_speed(speed)
 
     @requires_version(2, 0)
-    def aspirate(  # noqa: C901 max-complexity: 10
+    def aspirate(
         self,
         volume: Optional[float] = None,
         location: Optional[Union[types.Location, labware.Well]] = None,

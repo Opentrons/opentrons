@@ -9,6 +9,5 @@ setup:
 teardown:
 	-$(call pipenv,dev) --rm || true
 
-update:
-	teardown
+update: teardown
 	$(call pipenv,dev) update --dev

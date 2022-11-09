@@ -7,7 +7,7 @@ name = "pypi"
 opentrons-shared-data = { editable = true, path = "../../shared-data/python" }
 opentrons = { editable = true, path = "../../api" }
 coverage = "~=5.1"
-pandas = "==1.4.3" # like the app installs
+pandas = ">=0.25.3,<=1.4.3"
 numpydoc = "~=0.9.1"
 pytest = "==7.0.1"
 pytest-asyncio = "~=0.18"
@@ -16,7 +16,6 @@ pytest-lazy-fixture = "==0.6.3"
 pytest-xdist = "~=2.2.1"
 pygments = "==2.9.0"
 sphinx = "==5.0.1"
-twine = "==2.0.0"
 wheel = "==0.30.0"
 typeguard = "==2.12.1"
 sphinx-substitution-extensions = "==2020.9.30.0"

@@ -31,6 +31,9 @@ runs:
         cache-dependency-path: |
           **/setup.*
           **/Pipfile.*
+    - name: Set the OT_PYTHON env variable
+      shell: bash
+      run: echo "OT_PYTHON=$(which python)" >> $GITHUB_ENV
     - name: Install pipenv
       shell: bash
       run: make install-pipenv

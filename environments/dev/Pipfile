@@ -35,7 +35,7 @@ jinja2 = ">=2.3,<3.1"
 sphinx-substitution-extensions = "==2020.9.30.0"
 pygments = "==2.9.0"
 sphinx = "==5.0.1"
-
+numpydoc = "~=0.9.1"
 
 [packages]
 robot-server = { editable = true, path = "../../robot-server" }
