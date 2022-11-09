@@ -66,7 +66,9 @@ async def do_run(
                 d = SensorDataType.build(
                     message.payload.sensor_data, message.payload.sensor
                 )
-                print(f"{ts:.3f}: {s} {d.to_float():5.3f}")
+                rd = message.payload.sensor_data
+                print(f"{ts:.3f}: {s} {d.to_float():5.3f}, \traw data: {str(rd)}")
+                await asyncio.sleep(1.0)
     finally:
         print("cleaning up")
         await messenger.send(target_node, reset_message)
