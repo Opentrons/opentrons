@@ -13,7 +13,7 @@ import { useProtocolDetailsForRun } from '../hooks'
 
 import { RobotStatusHeader } from '../RobotStatusHeader'
 
-import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
+import type { LegacySchemaAdapterOutput } from '@opentrons/shared-data'
 
 jest.mock('../../../organisms/ProtocolUpload/hooks')
 jest.mock('../../../organisms/RunTimeControl/hooks')
@@ -29,7 +29,7 @@ const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunc
   typeof useProtocolDetailsForRun
 >
 
-const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnalysisFile<{}>
+const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as LegacySchemaAdapterOutput
 
 const PROTOCOL_DETAILS = {
   displayName: 'Testosaur',
@@ -63,7 +63,7 @@ describe('RobotStatusHeader', () => {
       .calledWith(null)
       .mockReturnValue({
         displayName: null,
-        protocolData: {} as ProtocolAnalysisFile<{}>,
+        protocolData: {} as LegacySchemaAdapterOutput,
         protocolKey: null,
         robotType: 'OT-2 Standard',
       })

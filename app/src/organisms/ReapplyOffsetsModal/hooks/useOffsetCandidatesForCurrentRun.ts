@@ -6,7 +6,7 @@ import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { useHistoricRunDetails } from './useHistoricRunDetails'
 
 import type { LabwareOffset } from '@opentrons/api-client'
-import type { ProtocolFile } from '@opentrons/shared-data'
+import type { ProtocolFile, LoadedLabware } from '@opentrons/shared-data'
 
 export interface OffsetCandidate extends LabwareOffset {
   labwareDisplayName: string
@@ -39,15 +39,16 @@ export function useOffsetCandidatesForCurrentRun(): OffsetCandidate[] {
   )
     return []
 
-  return Object.keys(protocolData.labware).reduce<OffsetCandidate[]>(
-    (acc: OffsetCandidate[], labwareId: string) => {
+  return protocolData.labware
+    .filter(labware => labware.id !== 'fixedTrash')
+    .reduce<OffsetCandidate[]>((acc: OffsetCandidate[], item) => {
       const location = getLabwareOffsetLocation(
-        labwareId,
+        item.id,
         protocolData.commands,
         protocolData.modules
       )
       const definition = getLabwareDefinition(
-        labwareId,
+        item.id,
         protocolData.labware,
         protocolData.labwareDefinitions
       )
@@ -71,17 +72,16 @@ export function useOffsetCandidatesForCurrentRun(): OffsetCandidate[] {
               labwareDisplayName,
             },
           ]
-    },
-    []
-  )
+    }, [])
 }
 
 function getLabwareDefinition(
   labwareId: string,
-  labware: ProtocolFile<{}>['labware'],
+  labware: LoadedLabware[],
   labwareDefinitions: ProtocolFile<{}>['labwareDefinitions']
 ): ProtocolFile<{}>['labwareDefinitions'][string] {
-  const labwareDefinitionId = labware[labwareId].definitionId
+  const labwareDefinitionId = labware.find(item => item.id === labwareId)
+    ?.definitionUri
   if (labwareDefinitionId == null) {
     throw new Error(
       'expected to be able to find labware definition id for labware, but could not'

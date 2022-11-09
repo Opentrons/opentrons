@@ -54,9 +54,9 @@ def mock_broker(decoy: Decoy) -> Broker:
 
 
 @pytest.fixture
-def mock_trash(decoy: Decoy) -> Broker:
+def mock_trash(decoy: Decoy) -> Labware:
     """Get a mock fixed-trash labware."""
-    return decoy.mock(cls=Broker)
+    return decoy.mock(cls=Labware)
 
 
 @pytest.fixture
@@ -165,7 +165,7 @@ def test_move_to_well(
     )
 
 
-def test_pick_up_explicit_tip(
+def test_pick_up_from_well(
     decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
 ) -> None:
     """It should pick up a specific tip."""
@@ -201,7 +201,7 @@ def test_aspirate(
 
     decoy.when(mock_well.bottom(z=1.2)).then_return(bottom_location)
     decoy.when(mock_instrument_core.get_absolute_aspirate_flow_rate(1.23)).then_return(
-        123
+        5.67
     )
 
     subject.aspirate(volume=42.0, location=mock_well, rate=1.23)
@@ -212,6 +212,7 @@ def test_aspirate(
             well_core=mock_well._impl,
             volume=42.0,
             rate=1.23,
+            flow_rate=5.67,
         ),
         times=1,
     )
@@ -233,6 +234,22 @@ def test_blow_out_to_well(
             location=top_location,
             well_core=mock_well._impl,
             move_to_well=True,
+        ),
+        times=1,
+    )
+
+
+def test_drop_tip_to_well(
+    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
+) -> None:
+    """It should drop a tip in a specific well."""
+    mock_well = decoy.mock(cls=Well)
+
+    subject.drop_tip(mock_well, home_after=False)
+
+    decoy.verify(
+        mock_instrument_core.drop_tip(
+            location=None, well_core=mock_well._impl, home_after=False
         ),
         times=1,
     )
@@ -260,3 +277,52 @@ def test_blow_out_in_place(
         ),
         times=1,
     )
+
+
+def test_drop_tip_to_trash(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    mock_trash: Labware,
+    subject: InstrumentContext,
+) -> None:
+    """It should drop a tip in the trash if not given a location ."""
+    mock_well = decoy.mock(cls=Well)
+
+    decoy.when(mock_trash.wells()).then_return([mock_well])
+
+    subject.drop_tip()
+
+    decoy.verify(
+        mock_instrument_core.drop_tip(
+            location=None, well_core=mock_well._impl, home_after=True
+        ),
+        times=1,
+    )
+
+
+def test_return_tip(
+    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
+) -> None:
+    """It should pick up a tip and return it."""
+    mock_well = decoy.mock(cls=Well)
+    top_location = Location(point=Point(1, 2, 3), labware=mock_well)
+    decoy.when(mock_well.top()).then_return(top_location)
+
+    subject.pick_up_tip(mock_well)
+    subject.return_tip()
+
+    decoy.verify(
+        mock_instrument_core.pick_up_tip(
+            location=top_location,
+            well_core=mock_well._impl,
+            presses=None,
+            increment=None,
+            prep_after=True,
+        ),
+        mock_instrument_core.drop_tip(
+            location=None, well_core=mock_well._impl, home_after=True
+        ),
+    )
+
+    with pytest.raises(TypeError, match="Last tip location"):
+        subject.return_tip()

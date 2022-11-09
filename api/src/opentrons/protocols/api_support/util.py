@@ -21,7 +21,6 @@ from opentrons import types as top_types
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control.types import Axis
 
-from .definitions import MAX_SUPPORTED_VERSION
 
 if TYPE_CHECKING:
     from opentrons.protocol_api.core.instrument import AbstractInstrument
@@ -142,7 +141,7 @@ class FlowRates:
     def __init__(self, instr: AbstractInstrument) -> None:
         self._instr = instr
 
-    def set_defaults(self, api_level: APIVersion = MAX_SUPPORTED_VERSION):
+    def set_defaults(self, api_level: APIVersion):
         pipette = self._instr.get_hardware_state()
         self.aspirate = _find_value_for_api_version(
             api_level, pipette["default_aspirate_flow_rates"]

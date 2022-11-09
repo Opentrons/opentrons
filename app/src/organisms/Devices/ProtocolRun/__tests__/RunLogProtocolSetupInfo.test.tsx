@@ -12,7 +12,7 @@ import { RunLogProtocolSetupInfo } from '../RunLogProtocolSetupInfo'
 import type {
   RunTimeCommand,
   LabwareDefinition2,
-  ProtocolAnalysisFile,
+  LegacySchemaAdapterOutput,
 } from '@opentrons/shared-data'
 
 jest.mock('../../hooks')
@@ -24,7 +24,7 @@ const mockUseRunPipetteInfoByMount = useRunPipetteInfoByMount as jest.MockedFunc
   typeof useRunPipetteInfoByMount
 >
 
-const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnalysisFile
+const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as LegacySchemaAdapterOutput
 
 const TEMP_ID = 'temperature_module_gen2'
 const TC_ID = 'thermocycler'
