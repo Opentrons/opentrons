@@ -14,18 +14,14 @@ import { StyledText } from '../../../atoms/text'
 import { ToggleButton } from '../../../atoms/buttons'
 import {
   updateSetting,
-  getRobotSettings,
-  fetchSettings,
 } from '../../../redux/robot-settings'
-import type { State, Dispatch } from '../../../redux/types'
-import type {
-  RobotSettings,
-  RobotSettingsField,
-} from '../../../redux/robot-settings/types'
+import type {  Dispatch } from '../../../redux/types'
+import type { RobotSettingsField } from '../../../redux/robot-settings/types'
 
 
 interface SettingToggleProps extends RobotSettingsField {
   robotName: string
+  invert: boolean
 }
 
 export function SettingToggle({
@@ -34,6 +30,7 @@ export function SettingToggle({
   title,
   description,
   robotName,
+  invert,
 }: SettingToggleProps): JSX.Element | null {
   const dispatch = useDispatch<Dispatch>()
 
@@ -57,7 +54,7 @@ export function SettingToggle({
       </Box>
       <ToggleButton
         label={title}
-        toggledOn={value === true}
+        toggledOn={invert ? value === false : value === true}
         onClick={handleClick}
       />
     </Flex>

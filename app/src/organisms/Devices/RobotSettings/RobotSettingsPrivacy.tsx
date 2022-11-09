@@ -19,10 +19,11 @@ interface RobotSettingsPrivacyProps {
 
 const PRIVACY_SETTINGS = ['disableLogAggregation']
 
-const TRANSLATION_KEYS_BY_SETTING_ID: { [id: RobotSettingsField['id']]: { titleKey: string, descriptionKey: string } } = {
+const INFO_BY_SETTING_ID: { [id: RobotSettingsField['id']]: { titleKey: string, descriptionKey: string, invert: boolean } } = {
   disableLogAggregation: {
-    titleKey: 'disable_analytics_log_collection',
-    descriptionKey: 'disable_analytics_log_collection_description'
+    titleKey: 'share_logs_with_opentrons',
+    descriptionKey: 'share_logs_with_opentrons_description',
+    invert: true
   }
 }
 
@@ -36,14 +37,16 @@ export function RobotSettingsPrivacy({
   const privacySettings = settings.filter(
     ({ id }) => PRIVACY_SETTINGS.includes(id)
   )
-  const translatedPrivacySettings = privacySettings.map(s => (
-    s.id in TRANSLATION_KEYS_BY_SETTING_ID
+  const translatedPrivacySettings: Array<RobotSettingsField & { invert: boolean }> = privacySettings.map(s => {
+    const { titleKey, descriptionKey, invert } = INFO_BY_SETTING_ID[s.id]
+    return s.id in INFO_BY_SETTING_ID
       ? {
-        ...s, 
-        title: t(TRANSLATION_KEYS_BY_SETTING_ID[s.id].titleKey),
-        description: t(TRANSLATION_KEYS_BY_SETTING_ID[s.id].descriptionKey)
-      } : s
-  ))
+        ...s,
+        title: t(titleKey),
+        description: t(descriptionKey),
+        invert,
+      } : { ...s, invert: false }
+  })
 
   const dispatch = useDispatch<Dispatch>()
 
