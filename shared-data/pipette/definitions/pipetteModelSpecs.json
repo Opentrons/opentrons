@@ -6529,7 +6529,7 @@
       "type": "float"
     },
     "dropTip": {
-      "value": -71.5,
+      "value": -72.5,
       "min": -80,
       "max": 45,
       "units": "mm",
