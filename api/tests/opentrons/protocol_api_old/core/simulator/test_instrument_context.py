@@ -139,7 +139,7 @@ def test_pick_up_tip_prep_after(
     )
 
     subject.drop_tip(location=None, well_core=tip_core, home_after=True)
-    
+
 
 def test_aspirate_too_much(
     subject: InstrumentCore, labware: LabwareCore, tip_rack: LabwareCore
