@@ -768,7 +768,7 @@ def test_blow_out(ctx, monkeypatch):
     instr.pick_up_tip()
     instr.aspirate(10, lw.wells()[0])
 
-    def fake_move(location, well_core):
+    def fake_move(location):
         nonlocal move_location
         move_location = location
 

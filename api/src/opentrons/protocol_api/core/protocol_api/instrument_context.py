@@ -109,7 +109,7 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
     ) -> None:
         """Blow liquid out of the tip."""
         if move_to_well:
-            self.move_to(location=location, well_core=well_core)
+            self.move_to(location=location)
         self._protocol_interface.get_hardware().blow_out(self._mount)
 
     def touch_tip(
