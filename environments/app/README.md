@@ -1,7 +1,5 @@
 # App environment
 
-This is mostly for Windows testing, it only includes testing packages and:
+> This environment is for cross platform/python testing.
 
-- api
-- shared-data/python
-- hardware
+- **Run `make update` on a Windows machine.**

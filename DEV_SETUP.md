@@ -18,9 +18,9 @@ You will need the following tools installed to develop on the Opentrons platform
 
 ### pyenv
 
-In the past, we recommended pyenv on macos and linux because it made it convenient to install the specific version of python used by our stack. However, we now support so many environments, with different versions of python, that we rely on pyenv internally - and its integration with pipenv - to manage the different interpreters we require. You should now install it on all platforms.
+In the past, we recommended pyenv on macos and linux because it made it convenient to install the specific version of python used by our stack. However, we now support so many environments, with different versions of python, that we rely on pyenv internally - and its integration with [pipenv][] - to manage the different interpreters we require. You should now install it on all platforms.
 
-On linux and OSX, use [pyenv][pyenv] (the link has install instructions). On Windows, use [pyenv-win][pyenv-win] which similarly has instructions on installation in the link.
+On linux and OSX, use [pyenv][] (the link has install instructions). On Windows, use [pyenv-win][] which similarly has instructions on installation in the link.
 
 Note: if your system python is 3.10 or 3.8, make sure that you use pyenv to install an interpreter at that minor version with a higher bugfix version than the system; otherwise pipenv will use the wrong one, which will break native code dependencies.
 
@@ -177,11 +177,11 @@ pyenv versions
 
 Python 3.7, 3.8, and 3.10 are available with this pyenv global configuration. Because 3.10.8 is first when you set the configuration, `python` will use that version. Pyenv provides `python3.7`, `python3.8`, and `python3.10` to call minor versions.
 
-With both versions of Python available through pyenv on your system, pipenv will point to the right version given a projects Pipfile.
+With both versions of Python available through pyenv on your system, [pipenv][] will point to the right version given a projects Pipfile.
 
 ### Windows
 
-**This section is a work in progress**
+#### This section is a work in progress
 
 On Windows, we rely on:
 
@@ -189,24 +189,36 @@ On Windows, we rely on:
 - [Node Version Switcher][nvs] to install and manage Node.js
 - For the Python side, native Windows development is not supported for most environments.
   - [environments/app](/environments/app) is supported for Windows opentrons and shared-data package testing
-  - [environments/dev](/environments/dev) may work on Windows but is not guaranteed
-  - **If you must develop on Windows use Windows Subsystem for Linux (WSL)**
+  - **If you must develop on Windows for the python side use Windows Subsystem for Linux (WSL)**
     - [VS Code provides great tools!](https://code.visualstudio.com/docs/remote/wsl)
       - Follow the instructions and then see the [Linux section](#linux)
 
-#### 0. Install `scoop` and general dependencies
+##### 0. Install `scoop` and general dependencies
 
-#### 1. Install `nvs` and Node.js
+##### 1. Install `nvs` and Node.js
 
-#### TODO any instructions for Node side development
+##### 2. Install `pyenv` for windows and python 3.10
+
+##### 3. Install Visual Studio Community with C++ support
+
+- [Install Visual Studio Community 2022](https://visualstudio.microsoft.com/vs/community/)
+  - Install C++ dev env, check the boxes for sections
+    - Universal Windows Platform Development
+    - Desktop Development with C++
+
+##### 4. Make Commands that should work after [Repository Setup](#repository-setup)
+
+- `make install-pipenv`
+- `make -C environments/app setup`
+- `make setup-js`
 
 ### Linux
 
-**This section is a work in progress**
+#### The Linux section is a work in progress
 
 This setup will depend heavily on your exact distribution of Linux and your preferred workflows. For this example, we will provide instructions for an Ubuntu and Fedora variant using Bash. If your setup is different, consult the documentation of your distribution and the tools listed below.
 
-#### 0. Install general dependencies
+##### 0. Install general dependencies Linux
 
 This list is not exhaustive but on Ubuntu 22.04 these were needed `libudev-dev` `libsystemd-dev` in addition to many packages installed by default.
 
@@ -214,7 +226,7 @@ This list is not exhaustive but on Ubuntu 22.04 these were needed `libudev-dev` 
 sudo apt install libudev-dev libsystemd-dev -y
 ```
 
-#### 1. Install `nvs` and Node.js
+##### 1. Install `nvs` and Node.js on Linux
 
 You can follow the [nvs][nvs] instructions to install nvs on your system:
 
@@ -224,7 +236,7 @@ git clone https://github.com/jasongin/nvs "$NVS_HOME"
 . "$NVS_HOME/nvs.sh" install
 ```
 
-#### 2. Install `pyenv` and Python
+##### 2. Install `pyenv` and Python on Linux
 
 You can follow the [pyenv][pyenv] "basic github checkout" instructions to install pyenv on your system:
 
@@ -284,6 +296,7 @@ Once `make setup` completes, you're ready to start developing! Check out our gen
 [scoop]: https://scoop.sh/
 [nvs]: https://github.com/jasongin/nvs
 [pyenv]: https://github.com/pyenv/pyenv
+[pyenv-win]: https://github.com/pyenv-win/pyenv-win
 [yarn]: https://classic.yarnpkg.com/
 [pipenv]: https://github.com/pypa/pipenv
 [contributing guide]: ./CONTRIBUTING.md

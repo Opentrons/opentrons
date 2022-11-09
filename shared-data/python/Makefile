@@ -22,6 +22,7 @@ BUILD_NUMBER ?=
 
 BUILD_DIR := dist
 
+SHX := npx shx
 
 wheel_file = $(BUILD_DIR)/$(call python_get_wheelname,shared-data,opentrons_shared_data,$(BUILD_NUMBER),../../scripts/python_build_utils.py)
 sdist_file = $(BUILD_DIR)/$(call python_get_sdistname,shared-data,opentrons_shared_data,,../../scripts/python_build_utils.py)
@@ -41,7 +42,7 @@ json_sources = $(deck_sources) $(labware_sources) $(module_sources) $(pipette_so
 twine_auth_args := --username $(pypi_username) --password $(pypi_password)
 twine_repository_url ?= $(pypi_test_upload_url)
 
-clean_cmd = $(SHX) rm -rf build $(BUILD_DIR) .coverage coverage.xml Pipfile.lock '*.egg-info' ' **/__pycache__' '**/*.pyc' 'opentrons_shared_data/**/.mypy_cache'
+clean_cmd = $(SHX) rm -rf build $(BUILD_DIR) .coverage coverage.xml '*.egg-info' ' **/__pycache__' '**/*.pyc' 'opentrons_shared_data/**/.mypy_cache'
 
 .PHONY: all
 all: clean sdist wheel

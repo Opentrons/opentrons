@@ -9,13 +9,13 @@ SHX := npx shx
 firmware = $(wildcard smoothie/*.hex)
 
 # python and pipenv config
-sphinx_build := $(call pipenv,app) run sphinx-build -W --keep-going
+sphinx_build := $(call pipenv,dev) run sphinx-build -W --keep-going
 # todo(mm, 2021-10-04):
 # 1. Resolve all Sphinx warnings.
 # 2. Convert all recipes to use $(sphinx_build).
 # 3. Delete $(sphinx_build_allow_warnings).
 # github.com/Opentrons/opentrons/issues/6135
-sphinx_build_allow_warnings := $(call pipenv,app) run sphinx-build
+sphinx_build_allow_warnings := $(call pipenv,dev) run sphinx-build
 
 
 # Find the version of the wheel from package.json using a helper script. We

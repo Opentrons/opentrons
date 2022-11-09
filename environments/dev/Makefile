@@ -10,4 +10,5 @@ teardown:
 	-$(call pipenv,dev) --rm || true
 
 update:
+	teardown
 	$(call pipenv,dev) update --dev

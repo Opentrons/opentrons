@@ -9,5 +9,5 @@ setup:
 teardown:
 	-$(call pipenv,ot-3/robot-server) --rm || true
 
-update:
+update: teardown
 	$(call pipenv,ot-3/robot-server) update --dev

@@ -6,6 +6,9 @@ OT_PYTHON ?= python
 _firstpath := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
 _possibilities := $(realpath $(_firstpath)/..) $(realpath $(_firstpath)/../..) $(realpath $(_firstpath)/../../..) $(_firstpath)
 monorepo_root := $(firstword $(filter %/opentrons, $(_possibilities)))
+$(info _possibilities $(_possibilities))
+$(info _firstpath $(_firstpath))
+$(info monorepo_root $(monorepo_root))
 
 # Use legacy editable installs to avoid breaking mypy type-checking
 # when using newer versions of setuptools
