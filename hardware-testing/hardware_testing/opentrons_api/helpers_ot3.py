@@ -395,11 +395,10 @@ async def _jog_print_current_position(
         mount=mount, critical_point=critical_point
     )
     mx, my, mz, mp = [
-        round(motors_pos.get(ax), 2)
-        for ax in [OT3Axis.X, OT3Axis.Y, z_axis, plunger_axis]
+        round(motors_pos[ax], 2) for ax in [OT3Axis.X, OT3Axis.Y, z_axis, plunger_axis]
     ]
     ex, ey, ez, ep = [
-        round(enc_pos.get(ax.to_axis()), 2)
+        round(enc_pos[ax.to_axis()], 2)
         for ax in [OT3Axis.X, OT3Axis.Y, z_axis, plunger_axis]
     ]
     print(f"Deck Coordinate: X={mx}, Y={my}, Z={mz}, P={mp}")
