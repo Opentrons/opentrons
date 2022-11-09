@@ -8,6 +8,8 @@ import { i18n } from '../../../i18n'
 import { mockFetchModulesSuccessMeta } from '../../../redux/modules/__fixtures__'
 import { ConnectedResult } from '../ConnectedResult'
 
+import type { RequestState } from '../../../redux/robot-api/types'
+
 const render = (props: React.ComponentProps<typeof ConnectedResult>) => {
   return renderWithProviders(
     <MemoryRouter>
@@ -33,7 +35,7 @@ jest.mock('react-router-dom', () => {
 const successState = {
   status: 'success',
   response: mockFetchModulesSuccessMeta,
-}
+} as RequestState
 
 const failureState = {
   status: 'failure',
@@ -41,7 +43,7 @@ const failureState = {
   error: {
     message: 'mockError',
   },
-}
+} as RequestState
 
 describe('ConnectedResult', () => {
   let props: React.ComponentProps<typeof ConnectedResult>
