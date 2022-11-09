@@ -3,7 +3,6 @@ import reduce from 'lodash/reduce'
 
 import { COLORS } from '@opentrons/components/src/ui-style-constants'
 import type {
-  LabwareDefinition2,
   ModuleModel,
   PipetteName,
   Liquid,

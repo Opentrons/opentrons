@@ -10,7 +10,6 @@ import type {
 import type {
   PendingProtocolAnalysis,
   CompletedProtocolAnalysis,
-  LabwareDefinition2,
   ModuleModel,
 } from '../types'
 import { getLoadedLabwareDefinitionsByUri } from './getLoadedLabwareDefinitionsByUri'
