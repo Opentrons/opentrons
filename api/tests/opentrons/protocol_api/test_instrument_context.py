@@ -1,4 +1,5 @@
 """Tests for the InstrumentContext public interface."""
+import inspect
 from typing import cast
 
 import pytest
@@ -6,7 +7,9 @@ from decoy import Decoy
 
 from opentrons.broker import Broker
 from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.protocols.api_support import instrument as mock_instrument_support
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import Clearances
 from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
     ProtocolContext,
@@ -16,6 +19,14 @@ from opentrons.protocol_api import (
 )
 from opentrons.protocol_api.core.common import InstrumentCore
 from opentrons.types import Location, Mount, Point
+
+
+@pytest.fixture(autouse=True)
+def _mock_instrument_support_module(
+    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    for name, func in inspect.getmembers(mock_instrument_support, inspect.isfunction):
+        monkeypatch.setattr(mock_instrument_support, name, decoy.mock(func=func))
 
 
 @pytest.fixture
@@ -43,9 +54,9 @@ def mock_broker(decoy: Decoy) -> Broker:
 
 
 @pytest.fixture
-def mock_trash(decoy: Decoy) -> Broker:
+def mock_trash(decoy: Decoy) -> Labware:
     """Get a mock fixed-trash labware."""
-    return decoy.mock(cls=Broker)
+    return decoy.mock(cls=Labware)
 
 
 @pytest.fixture
@@ -154,7 +165,7 @@ def test_move_to_well(
     )
 
 
-def test_pick_up_explicit_tip(
+def test_pick_up_from_well(
     decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
 ) -> None:
     """It should pick up a specific tip."""
@@ -175,3 +186,98 @@ def test_pick_up_explicit_tip(
         ),
         times=1,
     )
+
+
+def test_aspirate(
+    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
+) -> None:
+    """It should aspirate to a well."""
+    mock_well = decoy.mock(cls=Well)
+    bottom_location = Location(point=Point(1, 2, 3), labware=mock_well)
+
+    decoy.when(mock_instrument_core.get_well_bottom_clearance()).then_return(
+        Clearances(default_aspirate=1.2, default_dispense=3.4)
+    )
+
+    decoy.when(mock_well.bottom(z=1.2)).then_return(bottom_location)
+    decoy.when(mock_instrument_core.get_absolute_aspirate_flow_rate(1.23)).then_return(
+        5.67
+    )
+
+    subject.aspirate(volume=42.0, location=mock_well, rate=1.23)
+
+    decoy.verify(
+        mock_instrument_core.aspirate(
+            location=bottom_location,
+            well_core=mock_well._impl,
+            volume=42.0,
+            rate=1.23,
+            flow_rate=5.67,
+        ),
+        times=1,
+    )
+
+
+def test_drop_tip_to_well(
+    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
+) -> None:
+    """It should drop a tip in a specific well."""
+    mock_well = decoy.mock(cls=Well)
+
+    subject.drop_tip(mock_well, home_after=False)
+
+    decoy.verify(
+        mock_instrument_core.drop_tip(
+            location=None, well_core=mock_well._impl, home_after=False
+        ),
+        times=1,
+    )
+
+
+def test_drop_tip_to_trash(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    mock_trash: Labware,
+    subject: InstrumentContext,
+) -> None:
+    """It should drop a tip in the trash if not given a location ."""
+    mock_well = decoy.mock(cls=Well)
+
+    decoy.when(mock_trash.wells()).then_return([mock_well])
+
+    subject.drop_tip()
+
+    decoy.verify(
+        mock_instrument_core.drop_tip(
+            location=None, well_core=mock_well._impl, home_after=True
+        ),
+        times=1,
+    )
+
+
+def test_return_tip(
+    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
+) -> None:
+    """It should pick up a tip and return it."""
+    mock_well = decoy.mock(cls=Well)
+    top_location = Location(point=Point(1, 2, 3), labware=mock_well)
+    decoy.when(mock_well.top()).then_return(top_location)
+
+    subject.pick_up_tip(mock_well)
+    subject.return_tip()
+
+    decoy.verify(
+        mock_instrument_core.pick_up_tip(
+            location=top_location,
+            well_core=mock_well._impl,
+            presses=None,
+            increment=None,
+            prep_after=True,
+        ),
+        mock_instrument_core.drop_tip(
+            location=None, well_core=mock_well._impl, home_after=True
+        ),
+    )
+
+    with pytest.raises(TypeError, match="Last tip location"):
+        subject.return_tip()

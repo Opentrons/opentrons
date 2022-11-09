@@ -137,6 +137,7 @@ api/LICENSE
 update-server/LICENSE
 notify-server/LICENSE
 shared-data/python/LICENSE
+shared-data/LICENSE
 robot-server/LICENSE
 
 # typescript incremental files
