@@ -8,7 +8,7 @@ _possibilities := $(realpath $(_firstpath)/..) $(realpath $(_firstpath)/../..) $
 monorepo_root := $(firstword $(filter %/opentrons, $(_possibilities)))
 
 ifeq ($(monorepo_root),)
-monorepo_root := $(subst "/","\",$(firstword $(filter %\opentrons, $(_possibilities)))
+monorepo_root := $(subst "/","\",$(firstword $(filter %\opentrons, $(_possibilities))))
 endif
 
 $(info _possibilities $(_possibilities))
