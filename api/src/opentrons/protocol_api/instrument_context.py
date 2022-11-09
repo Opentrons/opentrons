@@ -166,18 +166,18 @@ class InstrumentContext(publisher.CommandPublisher):
 
         well: Optional[labware.Well]
         if isinstance(location, labware.Well):
-            dest = location.bottom(z=self.well_bottom_clearance.aspirate)
+            move_to_location = location.bottom(z=self.well_bottom_clearance.aspirate)
             well = location
         elif isinstance(location, types.Location):
-            dest = location
-            _, well = dest.labware.get_parent_labware_and_well()
+            move_to_location = location
+            _, well = move_to_location.labware.get_parent_labware_and_well()
         elif location is not None:
             raise TypeError(
                 "location should be a Well or Location, but it is {}".format(location)
             )
         elif self._ctx.location_cache:
-            dest = self._ctx.location_cache
-            _, well = dest.labware.get_parent_labware_and_well()
+            move_to_location = self._ctx.location_cache
+            _, well = move_to_location.labware.get_parent_labware_and_well()
         else:
             raise RuntimeError(
                 "If aspirate is called without an explicit location, another"
@@ -187,7 +187,8 @@ class InstrumentContext(publisher.CommandPublisher):
             )
         if self.api_version >= APIVersion(2, 11):
             instrument.validate_takes_liquid(
-                location=dest, reject_module=self.api_version >= APIVersion(2, 13)
+                location=move_to_location,
+                reject_module=self.api_version >= APIVersion(2, 13),
             )
 
         c_vol = self._implementation.get_available_volume() if not volume else volume
@@ -198,13 +199,13 @@ class InstrumentContext(publisher.CommandPublisher):
             command=cmds.aspirate(
                 instrument=self,
                 volume=c_vol,
-                location=dest,
+                location=move_to_location,
                 flow_rate=flow_rate,
                 rate=rate,
             ),
         ):
             self._implementation.aspirate(
-                location=dest,
+                location=move_to_location,
                 well_core=well._impl if well is not None else None,
                 volume=c_vol,
                 rate=rate,
@@ -268,20 +269,22 @@ class InstrumentContext(publisher.CommandPublisher):
         well: Optional[labware.Well]
         if isinstance(location, labware.Well):
             well = location
-            if location.is_fixed_trash():
-                dest = location.top()
+            if well.parent._implementation.is_fixed_trash():
+                move_to_location = location.top()
             else:
-                dest = location.bottom(z=self.well_bottom_clearance.dispense)
+                move_to_location = location.bottom(
+                    z=self.well_bottom_clearance.dispense
+                )
         elif isinstance(location, types.Location):
-            dest = location
-            _, well = dest.labware.get_parent_labware_and_well()
+            move_to_location = location
+            _, well = move_to_location.labware.get_parent_labware_and_well()
         elif location is not None:
             raise TypeError(
                 f"location should be a Well or Location, but it is {location}"
             )
         elif self._ctx.location_cache:
-            dest = self._ctx.location_cache
-            _, well = dest.labware.get_parent_labware_and_well()
+            move_to_location = self._ctx.location_cache
+            _, well = move_to_location.labware.get_parent_labware_and_well()
         else:
             raise RuntimeError(
                 "If dispense is called without an explicit location, another"
@@ -291,7 +294,7 @@ class InstrumentContext(publisher.CommandPublisher):
             )
         if self.api_version >= APIVersion(2, 11):
             instrument.validate_takes_liquid(
-                location=dest,
+                location=move_to_location,
                 reject_module=self.api_version >= APIVersion(2, 13),
             )
 
@@ -304,7 +307,7 @@ class InstrumentContext(publisher.CommandPublisher):
             command=cmds.dispense(
                 instrument=self,
                 volume=c_vol,
-                location=dest,
+                location=move_to_location,
                 rate=rate,
                 flow_rate=flow_rate,
             ),
@@ -312,7 +315,7 @@ class InstrumentContext(publisher.CommandPublisher):
             self._implementation.dispense(
                 volume=c_vol,
                 rate=rate,
-                location=dest,
+                location=move_to_location,
                 well_core=well._impl if well is not None else None,
                 flow_rate=flow_rate,
             )

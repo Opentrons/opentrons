@@ -83,12 +83,6 @@ class WellImplementation(AbstractWellCore):
         """Get the well's geometry information interface."""
         return self._geometry
 
-    def is_fixed_trash(self) -> bool:
-        """Check if given well is a fixed trash."""
-        labware_core = self._geometry.parent
-        quirks = labware_core.get_quirks()
-        return "fixedTrash" in quirks
-
     # TODO(mc, 2022-10-28): is this used and/or necessary?
     def __repr__(self) -> str:
         """Use the well's display name as its repr."""

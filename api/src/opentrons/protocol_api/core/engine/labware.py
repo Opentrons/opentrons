@@ -103,6 +103,12 @@ class LabwareCore(AbstractLabware[WellCore]):
         "Whether the labware is a tip rack."
         return self._definition.parameters.isTiprack
 
+    def is_fixed_trash(self) -> bool:
+        """Check if given well is a fixed trash."""
+        return self._engine_client.state.labware.is_fixed_trash(
+            labware_id=self.labware_id
+        )
+
     def get_tip_length(self) -> float:
         raise NotImplementedError("LabwareCore.get_tip_length not implemented")
 

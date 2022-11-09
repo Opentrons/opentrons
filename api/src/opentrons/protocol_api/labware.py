@@ -148,16 +148,6 @@ class Well:
         """
         return Location(self._impl.get_top(z_offset=z), self)
 
-    def is_fixed_trash(self) -> bool:
-        """
-        :param z: the z distance in mm
-        :return: a Point corresponding to the absolute position of the
-                 top-center of the well relative to the deck (with the
-                 front-left corner of slot 1 as (0,0,0)). If z is specified,
-                 returns a point offset by z mm from top-center
-        """
-        return self._impl.is_fixed_trash()
-
     @requires_version(2, 0)
     def bottom(self, z: float = 0.0) -> Location:
         """

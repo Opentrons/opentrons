@@ -78,12 +78,6 @@ class WellCore(AbstractWellCore):
             ),
         )
 
-    def is_fixed_trash(self) -> bool:
-        """Check if given well is a fixed trash."""
-        return self._engine_client.state.labware.is_fixed_trash(
-            labware_id=self.labware_id
-        )
-
     # TODO(mc, 2022-11-01): implement this with a new `WellOrigin.CENTER` value
     # Make this change carefully with respect to the robot-server because
     # `WellOrigin` is a public enum that may be persisted
