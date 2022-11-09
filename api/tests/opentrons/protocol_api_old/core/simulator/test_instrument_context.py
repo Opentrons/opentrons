@@ -45,10 +45,13 @@ def test_dispense_no_tip(subject: InstrumentCore) -> None:
         subject.dispense(volume=1, rate=1, location=location, well_core=None)
 
 
-def test_drop_tip_no_tip(subject: InstrumentCore) -> None:
+def test_drop_tip_no_tip(subject: InstrumentCore, tip_rack: LabwareCore) -> None:
     """It should raise an error if a tip is not attached."""
+    tip_core = tip_rack.get_wells()[0]
+
+    subject.home()
     with pytest.raises(NoTipAttachedError, match="Cannot perform DROPTIP"):
-        subject.drop_tip(home_after=False)
+        subject.drop_tip(location=None, well_core=tip_core, home_after=False)
 
 
 def test_blow_out_no_tip(subject: InstrumentCore) -> None:
@@ -59,22 +62,20 @@ def test_blow_out_no_tip(subject: InstrumentCore) -> None:
 
 def test_pick_up_tip_no_tip(subject: InstrumentCore, tip_rack: LabwareCore) -> None:
     """It should raise an error if a tip is already attached."""
+    tip_core = tip_rack.get_wells()[0]
+
     subject.home()
     subject.pick_up_tip(
-        location=Location(
-            point=tip_rack.get_wells()[0].get_top(z_offset=0), labware=None
-        ),
-        well_core=tip_rack.get_wells()[0],
+        location=Location(point=tip_core.get_top(z_offset=0), labware=None),
+        well_core=tip_core,
         presses=None,
         increment=None,
         prep_after=False,
     )
     with pytest.raises(TipAttachedError):
         subject.pick_up_tip(
-            location=Location(
-                point=tip_rack.get_wells()[0].get_top(z_offset=0), labware=None
-            ),
-            well_core=tip_rack.get_wells()[0],
+            location=Location(point=tip_core.get_top(z_offset=0), labware=None),
+            well_core=tip_core,
             presses=None,
             increment=None,
             prep_after=False,
@@ -85,12 +86,12 @@ def test_pick_up_tip_prep_after(
     subject: InstrumentCore, labware: LabwareCore, tip_rack: LabwareCore
 ) -> None:
     """It should not raise an error, regardless of prep_after value."""
+    tip_core = tip_rack.get_wells()[0]
+
     subject.home()
     subject.pick_up_tip(
-        location=Location(
-            point=tip_rack.get_wells()[0].get_top(z_offset=0), labware=None
-        ),
-        well_core=tip_rack.get_wells()[0],
+        location=Location(point=tip_core.get_top(z_offset=0), labware=None),
+        well_core=tip_core,
         presses=None,
         increment=None,
         prep_after=True,
@@ -100,6 +101,7 @@ def test_pick_up_tip_prep_after(
         well_core=labware.get_wells()[0],
         volume=1,
         rate=1,
+        flow_rate=1,
     )
     subject.dispense(
         volume=1,
@@ -107,13 +109,13 @@ def test_pick_up_tip_prep_after(
         location=Location(point=Point(2, 2, 3), labware=None),
         well_core=labware.get_wells()[1],
     )
-    subject.drop_tip(home_after=True)
+
+    subject.drop_tip(location=None, well_core=tip_core, home_after=True)
+
     # and again, without preparing for aspirate
     subject.pick_up_tip(
-        location=Location(
-            point=tip_rack.get_wells()[0].get_top(z_offset=0), labware=None
-        ),
-        well_core=tip_rack.get_wells()[0],
+        location=Location(point=tip_core.get_top(z_offset=0), labware=None),
+        well_core=tip_core,
         presses=None,
         increment=None,
         prep_after=False,
@@ -123,6 +125,7 @@ def test_pick_up_tip_prep_after(
         well_core=labware.get_wells()[0],
         volume=1,
         rate=1,
+        flow_rate=1,
     )
     subject.dispense(
         volume=1,
@@ -130,8 +133,8 @@ def test_pick_up_tip_prep_after(
         location=Location(point=Point(2, 2, 3), labware=None),
         well_core=labware.get_wells()[1],
     )
-    subject.drop_tip(home_after=True)
-
+    subject.drop_tip(location=None, well_core=tip_core, home_after=True)
+    
 
 def test_aspirate_too_much(
     subject: InstrumentCore, labware: LabwareCore, tip_rack: LabwareCore
@@ -156,6 +159,7 @@ def test_aspirate_too_much(
             well_core=labware.get_wells()[0],
             volume=subject.get_max_volume() + 1,
             rate=1,
+            flow_rate=1,
         )
 
 
@@ -205,6 +209,7 @@ def _aspirate(i: InstrumentCore, labware: LabwareCore) -> None:
         well_core=labware.get_wells()[0],
         volume=12,
         rate=10,
+        flow_rate=10,
     )
 
 
@@ -216,6 +221,7 @@ def _aspirate_dispense(i: InstrumentCore, labware: LabwareCore) -> None:
         well_core=labware.get_wells()[0],
         volume=12,
         rate=10,
+        flow_rate=10,
     )
     i.dispense(
         volume=2,
@@ -233,6 +239,7 @@ def _aspirate_blowout(i: InstrumentCore, labware: LabwareCore) -> None:
         well_core=labware.get_wells()[0],
         volume=11,
         rate=13,
+        flow_rate=13,
     )
     i.blow_out()
 
@@ -254,24 +261,22 @@ def test_pipette_dict_with_tip(
     tip_rack: LabwareCore,
 ) -> None:
     """It should be the same."""
+    tip_core = tip_rack.get_wells()[0]
+
     # Home first
     instrument_context.home()
     simulating_instrument_context.home()
     # Pickup tip
     instrument_context.pick_up_tip(
-        location=Location(
-            point=tip_rack.get_wells()[0].get_top(z_offset=0), labware=None
-        ),
-        well_core=tip_rack.get_wells()[0],
+        location=Location(point=tip_core.get_top(z_offset=0), labware=None),
+        well_core=tip_core,
         presses=3,
         increment=4,
         prep_after=False,
     )
     simulating_instrument_context.pick_up_tip(
-        location=Location(
-            point=tip_rack.get_wells()[0].get_top(z_offset=0), labware=None
-        ),
-        well_core=tip_rack.get_wells()[0],
+        location=Location(point=tip_core.get_top(z_offset=0), labware=None),
+        well_core=tip_core,
         presses=3,
         increment=4,
         prep_after=False,
@@ -285,8 +290,10 @@ def test_pipette_dict_with_tip(
     )
 
     # Drop tip and compare again
-    instrument_context.drop_tip(home_after=False)
-    simulating_instrument_context.drop_tip(home_after=False)
+    instrument_context.drop_tip(location=None, well_core=tip_core, home_after=False)
+    simulating_instrument_context.drop_tip(
+        location=None, well_core=tip_core, home_after=False
+    )
 
     assert (
         instrument_context.get_hardware_state()

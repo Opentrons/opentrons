@@ -15,7 +15,7 @@ import { ConnectModal } from '../ConnectNetwork/ConnectModal'
 import { DisconnectModal } from '../ConnectNetwork/DisconnectModal'
 import { ResultModal } from '../ConnectNetwork/ResultModal'
 
-import { TemporarySelectNetwork } from '../TemporarySelectNetwork'
+import { SelectNetwork } from '../SelectNetwork'
 
 import type { ReactWrapper } from 'enzyme'
 import { RequestState } from '../../../../redux/robot-api/types'
@@ -75,9 +75,7 @@ describe('<TemporarySelectNetwork />', () => {
   let dispatch: any
   let mockStore: any
 
-  let render: () => ReactWrapper<
-    React.ComponentProps<typeof TemporarySelectNetwork>
-  >
+  let render: () => ReactWrapper<React.ComponentProps<typeof SelectNetwork>>
 
   beforeEach(() => {
     dispatch = jest.fn()
@@ -115,10 +113,7 @@ describe('<TemporarySelectNetwork />', () => {
 
     render = () => {
       return mount(
-        <TemporarySelectNetwork
-          robotName={mockRobotName}
-          isRobotBusy={false}
-        />,
+        <SelectNetwork robotName={mockRobotName} isRobotBusy={false} />,
         {
           wrappingComponent: Provider,
           wrappingComponentProps: { store: mockStore },
@@ -165,9 +160,7 @@ describe('<TemporarySelectNetwork />', () => {
   })
 
   describe('disconnecting from the active network', () => {
-    let wrapper: ReactWrapper<
-      React.ComponentProps<typeof TemporarySelectNetwork>
-    >
+    let wrapper: ReactWrapper<React.ComponentProps<typeof SelectNetwork>>
     let disconnectModal: ReactWrapper<
       React.ComponentProps<typeof DisconnectModal>
     >
@@ -308,9 +301,7 @@ describe('<TemporarySelectNetwork />', () => {
   })
 
   describe('joining a network', () => {
-    let wrapper: ReactWrapper<
-      React.ComponentProps<typeof TemporarySelectNetwork>
-    >
+    let wrapper: ReactWrapper<React.ComponentProps<typeof SelectNetwork>>
     let connectModal: ReactWrapper<React.ComponentProps<typeof ConnectModal>>
 
     beforeEach(() => {

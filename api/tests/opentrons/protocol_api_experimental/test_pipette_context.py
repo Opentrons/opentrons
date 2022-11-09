@@ -43,24 +43,23 @@ def subject(engine_client: EngineClient, pipette_id: str) -> PipetteContext:
     return PipetteContext(engine_client=engine_client, pipette_id=pipette_id)
 
 
-def test_drop_tip(
-    decoy: Decoy,
-    engine_client: EngineClient,
-    pipette_id: str,
-    labware_id: str,
-    well: Well,
+def test_aspirate_not_implemented_errors(
     subject: PipetteContext,
+    well: Well,
 ) -> None:
-    """It should send a drop tip command."""
-    subject.drop_tip(location=well)
-
-    decoy.verify(
-        engine_client.drop_tip(
-            pipette_id=pipette_id,
-            labware_id=labware_id,
-            well_name=well.well_name,
-        )
-    )
+    """It should raise NotImplementedError when appropriate."""
+    with pytest.raises(NotImplementedError):
+        # location other than a Well not supported.
+        subject.aspirate(12345.6789, well.bottom(1), 1)
+    with pytest.raises(NotImplementedError):
+        # Non-default rate not supported.
+        subject.aspirate(12345.6789, well, 0.9)
+    with pytest.raises(NotImplementedError):
+        # 0 volume not supported.
+        subject.aspirate(0, well, 1)
+    with pytest.raises(NotImplementedError):
+        # None volume not supported.
+        subject.aspirate(None, well, 1)
 
 
 @pytest.mark.xfail(strict=True, raises=NotImplementedError)

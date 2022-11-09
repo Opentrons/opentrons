@@ -221,7 +221,7 @@ def pick_up_tip(
 
 
 def drop_tip(
-    instrument: InstrumentContext, location: Location
+    instrument: InstrumentContext, location: Well
 ) -> command_types.DropTipCommand:
     location_text = stringify_location(location)
     text = "Dropping tip into {location}".format(location=location_text)

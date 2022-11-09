@@ -21,7 +21,6 @@ import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_stand
 import { i18n } from '../../../../../i18n'
 import { useFeatureFlag } from '../../../../../redux/config'
 import { LabwareInfoOverlay } from '../../LabwareInfoOverlay'
-import { LabwareOffsetModal } from '../../../../ProtocolSetup/RunSetupCard/LabwareSetup/LabwareOffsetModal'
 import {
   useLabwareRenderInfoForRunById,
   useModuleRenderInfoForProtocolById,
@@ -49,9 +48,6 @@ jest.mock('@opentrons/shared-data', () => {
 jest.mock('../../../../ProtocolSetup/hooks')
 jest.mock('../../LabwareInfoOverlay')
 jest.mock(
-  '../../../../ProtocolSetup/RunSetupCard/LabwareSetup/LabwareOffsetModal'
-)
-jest.mock(
   '../../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
 )
 jest.mock('../../../../RunTimeControl/hooks')
@@ -71,9 +67,6 @@ const mockRobotWorkSpace = RobotWorkSpace as jest.MockedFunction<
 >
 const mockLabwareRender = LabwareRender as jest.MockedFunction<
   typeof LabwareRender
->
-const mockLabwareOffsetModal = LabwareOffsetModal as jest.MockedFunction<
-  typeof LabwareOffsetModal
 >
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
@@ -144,16 +137,6 @@ describe('SetupLabwareMap', () => {
     when(mockInferModuleOrientationFromXCoordinate)
       .calledWith(expect.anything())
       .mockReturnValue(STUBBED_ORIENTATION_VALUE)
-
-    when(mockLabwareOffsetModal)
-      .calledWith(
-        componentPropsMatcher({
-          onCloseClick: expect.anything(),
-        })
-      )
-      .mockImplementation(({ onCloseClick }) => (
-        <div onClick={onCloseClick}>mock LabwareOffsetModal </div>
-      ))
 
     when(mockLabwareRender)
       .mockReturnValue(<div></div>) // this (default) empty div will be returned when LabwareRender isn't called with expected labware definition
@@ -239,6 +222,7 @@ describe('SetupLabwareMap', () => {
     const { getByText } = render({
       robotName: ROBOT_NAME,
       runId: RUN_ID,
+      commands: [],
       extraAttentionModules: [],
     })
 
@@ -312,6 +296,7 @@ describe('SetupLabwareMap', () => {
     const { getByText } = render({
       robotName: ROBOT_NAME,
       runId: RUN_ID,
+      commands: [],
       extraAttentionModules: [],
     })
 

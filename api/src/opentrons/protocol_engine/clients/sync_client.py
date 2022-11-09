@@ -172,6 +172,7 @@ class SyncClient:
         pipette_id: str,
         labware_id: str,
         well_name: str,
+        well_location: WellLocation,
     ) -> commands.DropTipResult:
         """Execute a DropTip command and return the result."""
         request = commands.DropTipCreate(
@@ -179,6 +180,7 @@ class SyncClient:
                 pipetteId=pipette_id,
                 labwareId=labware_id,
                 wellName=well_name,
+                wellLocation=well_location,
             )
         )
         result = self._transport.execute_command(request=request)
@@ -271,6 +273,16 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
         return cast(commands.TouchTipResult, result)
+
+    def wait_for_duration(
+        self, seconds: float, message: Optional[str]
+    ) -> commands.WaitForDurationResult:
+        """Execute a ``waitForDuration`` command and return the result."""
+        request = commands.WaitForDurationCreate(
+            params=commands.WaitForDurationParams(seconds=seconds, message=message)
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.WaitForDurationResult, result)
 
     def wait_for_resume(self, message: Optional[str]) -> commands.WaitForResumeResult:
         """Execute a `WaitForResume` command and return the result."""

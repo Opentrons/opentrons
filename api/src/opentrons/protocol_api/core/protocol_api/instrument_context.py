@@ -26,7 +26,10 @@ if TYPE_CHECKING:
     from .protocol_context import ProtocolContextImplementation
 
 
-logger = logging.getLogger(__name__)
+_log = logging.getLogger()
+
+_PRE_2_2_TIP_DROP_HEIGHT_MM = 10
+"""In PAPIv2.1 and below, tips are always dropped 10 mm from the bottom of the well."""
 
 
 class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
@@ -66,6 +69,7 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
         well_core: Optional[WellImplementation],
         volume: float,
         rate: float,
+        flow_rate: float,
     ) -> None:
         """Aspirate a given volume of liquid from the specified location, using
         this pipette."""
@@ -74,13 +78,11 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
             # liquid to prepare the pipette for aspiration
             if self._api_version < APIVersion(2, 3) or not self.is_ready_to_aspirate():
                 if location.labware.is_well:
-                    self.move_to(
-                        location=location.labware.as_well().top(), well_core=well_core
-                    )
+                    self.move_to(location=location.labware.as_well().top())
                 else:
                     # TODO(seth,2019/7/29): This should be a warning exposed
                     #  via rpc to the runapp
-                    logger.warning(
+                    _log.warning(
                         "When aspirate is called on something other than a "
                         "well relative position, we can't move to the top of"
                         " the well to prepare for aspiration. This might "
@@ -88,9 +90,9 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
                         "blow_out."
                     )
                 self.prepare_for_aspirate()
-            self.move_to(location=location, well_core=well_core)
+            self.move_to(location=location)
         elif location != self._protocol_interface.get_last_location():
-            self.move_to(location=location, well_core=well_core)
+            self.move_to(location=location)
 
         self._protocol_interface.get_hardware().aspirate(self._mount, volume, rate)
 
@@ -168,11 +170,64 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
             fail_if_full=self._api_version < APIVersion(2, 2),
         )
 
-    def drop_tip(self, home_after: bool) -> None:
-        """Drop the tip."""
-        self._protocol_interface.get_hardware().drop_tip(
-            self._mount, home_after=home_after
-        )
+    def drop_tip(
+        self,
+        location: Optional[types.Location],
+        well_core: WellImplementation,
+        home_after: bool,
+    ) -> None:
+        """Move to and drop a tip into a given well.
+
+        Args:
+            location: An absolute location to drop the tip at.
+                If unspecified, use the default drop height of the well.
+            well_core: The well we're dropping into
+            home_after: Whether to home the pipette after the tip is dropped.
+        """
+        labware_core = well_core.get_geometry().parent
+
+        if location is None:
+            from opentrons.protocol_api.labware import Labware, Well
+
+            labware = Labware(
+                implementation=labware_core, api_version=self._api_version
+            )
+            well = Well(
+                parent=labware,
+                well_implementation=well_core,
+                api_version=self._api_version,
+            )
+
+            if LabwareLike(labware).is_fixed_trash():
+                location = well.top()
+            elif self._api_version < APIVersion(2, 2):
+                location = well.bottom(z=_PRE_2_2_TIP_DROP_HEIGHT_MM)
+            else:
+                assert (
+                    labware_core.is_tip_rack()
+                ), "Expected tip drop target to be a tip rack."
+
+                return_height = self.get_return_height()
+                location = well.top(z=-return_height * labware_core.get_tip_length())
+
+        hw = self._protocol_interface.get_hardware()
+        self.move_to(location=location)
+        hw.drop_tip(self._mount, home_after=home_after)
+
+        if self._api_version < APIVersion(2, 2) and labware_core.is_tip_rack():
+            # If this is a tiprack we can try and add the dirty tip back to the tracker
+            try:
+                labware_core.get_tip_tracker().return_tips(
+                    start_well=well_core,
+                    num_channels=self.get_channels(),
+                )
+            except AssertionError:
+                # Similarly to :py:meth:`return_tips`, the failure case here
+                # just means the tip can't be reused, so don't actually stop
+                # the protocol
+                _log.warning(
+                    f"Could not return tip to {labware_core.get_display_name()}"
+                )
 
     def home(self) -> None:
         """Home the mount"""
@@ -191,7 +246,7 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
     def move_to(
         self,
         location: types.Location,
-        well_core: Optional[WellImplementation],
+        well_core: Optional[WellImplementation] = None,
         force_direct: bool = False,
         minimum_z_height: Optional[float] = None,
         speed: Optional[float] = None,

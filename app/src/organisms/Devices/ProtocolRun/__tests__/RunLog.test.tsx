@@ -21,7 +21,7 @@ import { StepItemComponent as StepItem } from '../StepItem'
 import { RunLog } from '../RunLog'
 
 import type { CommandsData, Run } from '@opentrons/api-client'
-import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
+import type { LegacySchemaAdapterOutput } from '@opentrons/shared-data'
 import type { RunTimestamps } from '../../../../organisms/RunTimeControl/hooks'
 
 jest.mock('@opentrons/react-api-client')
@@ -56,7 +56,7 @@ const mockDownloadRunLogToast = DownloadRunLogToast as jest.MockedFunction<
   typeof DownloadRunLogToast
 >
 
-const _fixtureAnalysis = (fixtureAnalysis as unknown) as ProtocolAnalysisFile
+const _fixtureAnalysis = (fixtureAnalysis as unknown) as LegacySchemaAdapterOutput
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'

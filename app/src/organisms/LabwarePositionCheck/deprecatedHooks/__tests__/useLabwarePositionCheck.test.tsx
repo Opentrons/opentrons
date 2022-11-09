@@ -10,6 +10,7 @@ import {
   useHost,
 } from '@opentrons/react-api-client'
 import { useTrackEvent } from '../../../../redux/analytics'
+import { LARGE_STEP_SIZE_MM } from '../../../../molecules/JogControls'
 import {
   useCurrentRunId,
   useCurrentRunCommands,
@@ -25,7 +26,6 @@ import { useDeprecatedLabwarePositionCheck } from '../useDeprecatedLabwarePositi
 
 import type { HostConfig } from '@opentrons/api-client'
 import type { DeprecatedLabwarePositionCheckStep } from '../../types'
-import { LARGE_STEP_SIZE_MM } from '../../../../molecules/JogControls'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../redux/analytics')

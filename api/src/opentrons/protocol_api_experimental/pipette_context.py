@@ -220,23 +220,7 @@ class PipetteContext:  # noqa: D101
         location: Optional[Union[types.Location, Well]] = None,
         home_after: bool = True,
     ) -> PipetteContext:
-        # TODO(al, 2021-04-12): What about home_after?
-        # https://github.com/Opentrons/opentrons/issues/9470
-        if not home_after:
-            raise NotImplementedError()
-
-        if isinstance(location, Well):
-            self._engine_client.drop_tip(
-                pipette_id=self._pipette_id,
-                labware_id=location.parent.labware_id,
-                well_name=location.well_name,
-            )
-        else:
-            # TODO(al, 2021-04-12): Support for dropping tip in trash.
-            # https://github.com/Opentrons/opentrons/issues/9521
-            raise NotImplementedError()
-
-        return self
+        raise NotImplementedError("opentrons.protocol_api_experimental to be removed")
 
     def home(self) -> PipetteContext:  # noqa: D102
         # TODO: https://github.com/Opentrons/opentrons/issues/9470
