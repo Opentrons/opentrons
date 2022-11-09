@@ -16,10 +16,12 @@ import {
 import { StyledText } from '../../atoms/text'
 import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
 
+import type { RequestState } from '../../redux/robot-api/types'
+
 interface ConnectedResultProps {
   ssid: string
   isConnected: boolean
-  requestState?: any // ToDo update this type
+  requestState?: RequestState
   onConnect: () => void
 }
 
