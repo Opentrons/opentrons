@@ -184,3 +184,11 @@ def test_get_next_tip(
     assert result.get_name() == "A2"
     assert result is subject.get_wells()[2]
     assert result is subject.get_wells_by_name()["A2"]
+
+
+def test_reset_tips(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: LabwareCore
+) -> None:
+    """It should reset the tip state of a labware."""
+    subject.reset_tips()
+    decoy.verify(mock_engine_client.reset_tips(labware_id="cool-labware"), times=1)

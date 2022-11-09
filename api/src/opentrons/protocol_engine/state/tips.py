@@ -4,7 +4,7 @@ from enum import Enum
 from typing import Dict, Set, Optional
 
 from .abstract_store import HasState, HandlesActions
-from ..actions import Action, UpdateCommandAction
+from ..actions import Action, UpdateCommandAction, ResetTipsAction
 from ..commands import LoadLabwareResult, PickUpTipResult
 
 
@@ -64,6 +64,14 @@ class TipStore(HasState[TipState], HandlesActions):
             self._state.tips_by_labware_id[labware_id][
                 well_name
             ] = TipRackWellState.USED
+
+        elif isinstance(action, ResetTipsAction):
+            labware_id = action.labware_id
+
+            for well_name in self._state.tips_by_labware_id[labware_id].keys():
+                self._state.tips_by_labware_id[labware_id][
+                    well_name
+                ] = TipRackWellState.CLEAN
 
 
 class TipView(HasState[TipState]):
