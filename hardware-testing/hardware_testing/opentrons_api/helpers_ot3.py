@@ -16,7 +16,6 @@ from opentrons.hardware_control.backends.ot3utils import sensor_node_for_mount
 from opentrons.hardware_control.instruments.ot2.pipette import Pipette
 from opentrons.hardware_control.motion_utilities import deck_from_machine
 from opentrons.hardware_control.ot3api import OT3API
-from opentrons.types import PipetteNotAttachedError
 
 from .types import (
     GantryLoad,
@@ -291,7 +290,7 @@ async def move_plunger_absolute_ot3(
 ) -> None:
     """Move OT3 plunger position to an absolute position."""
     if not api.hardware_pipettes[mount.to_mount()]:
-        raise PipetteNotAttachedError(f"No pipette found on mount: {mount}")
+        raise RuntimeError(f"No pipette found on mount: {mount}")
     plunger_axis = OT3Axis.of_main_tool_actuator(mount)
     _move_coro = api._move(
         target_position={plunger_axis: position},  # type: ignore[arg-type]
@@ -350,20 +349,24 @@ class OT3JogNoInput(Exception):
     pass
 
 
-def _jog_read_user_input(terminator: str) -> Tuple[str, float]:
+def _jog_read_user_input(terminator: str, home_key: str) -> Tuple[str, float, bool]:
     user_input = input(f'Jog eg: x-10.5 ("{terminator}" to stop): ')
     user_input = user_input.strip().replace(" ", "")
     if user_input == terminator:
         raise OT3JogTermination()
     if not user_input:
         raise OT3JogNoInput()
-    if len(user_input) < 2:
-        raise ValueError(f"Unexpected jog input: {user_input}")
+    if home_key in user_input:
+        user_input = user_input.replace(home_key, "")
+        do_home = True
+        distance = float(user_input[1:])
+    else:
+        do_home = False
+        distance = 0.0
     axis = user_input[0].upper()
     if axis not in "XYZPG":
         raise ValueError(f'Unexpected axis: "{axis}"')
-    distance = float(user_input[1:])
-    return axis, distance
+    return axis, distance, do_home
 
 
 async def _jog_axis_some_distance(
@@ -394,36 +397,56 @@ async def _jog_print_current_position(
     print(f"Deck Coordinate: X={x}, Y={y}, Z={z}, P={p}")
 
 
+async def _jog_do_print_then_input_then_move(
+    api: OT3API,
+    mount: OT3Mount,
+    critical_point: Optional[CriticalPoint],
+    axis: str,
+    distance: float,
+    do_home: bool,
+) -> Tuple[str, float, bool]:
+    try:
+        await _jog_print_current_position(api, mount, critical_point)
+        axis, distance, do_home = _jog_read_user_input(
+            terminator="stop", home_key="home"
+        )
+    except OT3JogNoInput:
+        print("No input, repeating previous jog")
+    if do_home:
+        str_to_axes = {
+            "X": OT3Axis.X,
+            "Y": OT3Axis.Y,
+            "Z": OT3Axis.by_mount(mount),
+            "P": OT3Axis.of_main_tool_actuator(mount),
+            "G": OT3Axis.G,
+            "Q": OT3Axis.Q,
+        }
+        await api.home([str_to_axes[axis]])
+    else:
+        await _jog_axis_some_distance(api, mount, axis, distance)
+    return axis, distance, do_home
+
+
 async def jog_mount_ot3(
     api: OT3API, mount: OT3Mount, critical_point: Optional[CriticalPoint] = None
 ) -> Dict[OT3Axis, float]:
     """Jog an OT3 mount's gantry XYZ and pipettes axes."""
-    axis = ""
-    distance = 0.0
+    axis: str = ""
+    distance: float = 0.0
+    do_home: bool = False
     while True:
-        current_pos = await api.current_position_ot3(
-            mount=mount, critical_point=critical_point
-        )
-        await _jog_print_current_position(api, mount, critical_point)
         try:
-            axis, distance = _jog_read_user_input("stop")
+            axis, distance, do_home = await _jog_do_print_then_input_then_move(
+                api, mount, critical_point, axis, distance, do_home
+            )
         except ValueError as e:
             print(e)
             continue
         except OT3JogTermination:
             print("Done jogging")
-            break
-        except OT3JogNoInput:
-            if axis and distance:
-                print(
-                    f"No input, repeating previous jog (axis={axis}, distance={distance})"
-                )
-            pass
-        try:
-            await _jog_axis_some_distance(api, mount, axis, distance)
-        except PipetteNotAttachedError as e:
-            print(e)
-    return current_pos
+            return await api.current_position_ot3(
+                mount=mount, critical_point=critical_point
+            )
 
 
 async def move_to_arched_ot3(
