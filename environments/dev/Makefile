@@ -7,7 +7,7 @@ setup:
 	$(call pipenv,dev) sync --dev
 
 teardown:
-	-$(call pipenv,dev) --rm || true
+	-$(call pipenv,dev) --rm; true
 
 update: teardown
 	$(call pipenv,dev) update --dev

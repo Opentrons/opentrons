@@ -33,7 +33,7 @@ clean:
 
 .PHONY: teardown
 teardown:
-	$(pipenv) --rm || true
+	$(pipenv) --rm; true
 
 .PHONY: test
 test:

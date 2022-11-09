@@ -7,7 +7,7 @@ setup:
 	$(call pipenv,ot-3/robot-server) sync --dev
 
 teardown:
-	-$(call pipenv,ot-3/robot-server) --rm || true
+	-$(call pipenv,ot-3/robot-server) --rm; true
 
 update: teardown
 	$(call pipenv,ot-3/robot-server) update --dev

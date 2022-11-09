@@ -7,4 +7,4 @@ setup: teardown
 	$(call pipenv,app) install --dev --skip-lock --python $(OT_PYTHON)
 
 teardown:
-	$(call pipenv,app) --rm || true
+	$(call pipenv,app) --rm; true

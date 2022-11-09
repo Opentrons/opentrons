@@ -44,7 +44,7 @@ setup:
 
 .PHONY: teardown
 teardown:
-	$(pipenv) --rm || true
+	$(pipenv) --rm; true
 
 .PHONY: clean
 clean:
