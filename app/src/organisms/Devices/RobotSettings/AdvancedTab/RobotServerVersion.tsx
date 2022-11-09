@@ -89,7 +89,7 @@ export function RobotServerVersion({
           </StyledText>
         </Box>
         {autoUpdateAction !== 'reinstall' && robot != null ? null : (
-          <Flex justifyContent={JUSTIFY_FLEX_END} alignItems="center">
+          <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
             <StyledText
               as="label"
               color={COLORS.darkGreyEnabled}
