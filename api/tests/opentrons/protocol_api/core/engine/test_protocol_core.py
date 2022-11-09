@@ -1,5 +1,5 @@
 """Test for the ProtocolEngine-based protocol API core."""
-from typing import Type
+from typing import Optional, Type
 
 import pytest
 from decoy import Decoy
@@ -429,3 +429,29 @@ def test_load_module_no_location(
     """Should raise an InvalidModuleLocationError exception."""
     with pytest.raises(InvalidModuleLocationError):
         subject.load_module(model=requested_model, deck_slot=None, configuration="")
+
+
+@pytest.mark.parametrize("message", [None, "Hello, world!", ""])
+def test_pause(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: ProtocolCore,
+    message: Optional[str],
+) -> None:
+    """It should issue a waitForResume command."""
+    subject.pause(msg=message)
+    decoy.verify(mock_engine_client.wait_for_resume(message=message))
+
+
+@pytest.mark.parametrize("seconds", [0.0, -1.23, 1.23])
+@pytest.mark.parametrize("message", [None, "Hello, world!", ""])
+def test_delay(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: ProtocolCore,
+    seconds: float,
+    message: Optional[str],
+) -> None:
+    """It should issue a waitForDuration command."""
+    subject.delay(seconds=seconds, msg=message)
+    decoy.verify(mock_engine_client.wait_for_duration(seconds=seconds, message=message))

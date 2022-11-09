@@ -8,6 +8,8 @@ the subject's methods in a synchronous context in a child thread to ensure:
 - In the main thread, the Protocol Engine does its work in the main event
     loop, without blocking.
 """
+from typing import Optional
+
 import pytest
 from decoy import Decoy
 
@@ -362,6 +364,28 @@ def test_touch_tip(
         well_name="A2",
         well_location=WellLocation(),
     )
+
+    assert result == response
+
+
+@pytest.mark.parametrize("seconds", [-1.23, 0.0, 1.23])
+@pytest.mark.parametrize("message", [None, "Hello, world!", ""])
+def test_wait_for_duration(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+    seconds: float,
+    message: Optional[str],
+) -> None:
+    """It should execute a wait for resume command."""
+    request = commands.WaitForDurationCreate(
+        params=commands.WaitForDurationParams(seconds=seconds, message=message)
+    )
+    response = commands.WaitForDurationResult()
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.wait_for_duration(seconds=seconds, message=message)
 
     assert result == response
 

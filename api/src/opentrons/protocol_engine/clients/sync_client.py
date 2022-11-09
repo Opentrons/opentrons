@@ -276,6 +276,16 @@ class SyncClient:
         result = self._transport.execute_command(request=request)
         return cast(commands.TouchTipResult, result)
 
+    def wait_for_duration(
+        self, seconds: float, message: Optional[str]
+    ) -> commands.WaitForDurationResult:
+        """Execute a ``waitForDuration`` command and return the result."""
+        request = commands.WaitForDurationCreate(
+            params=commands.WaitForDurationParams(seconds=seconds, message=message)
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.WaitForDurationResult, result)
+
     def wait_for_resume(self, message: Optional[str]) -> commands.WaitForResumeResult:
         """Execute a `WaitForResume` command and return the result."""
         request = commands.WaitForResumeCreate(

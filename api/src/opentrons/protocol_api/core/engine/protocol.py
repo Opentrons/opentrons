@@ -247,10 +247,12 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def pause(self, msg: Optional[str]) -> None:
         """Pause the protocol."""
-        raise NotImplementedError("ProtocolCore.pause not implemented")
+        self._engine_client.wait_for_resume(message=msg)
 
     def resume(self) -> None:
         """Resume the protocol."""
+        # TODO(mm, 2022-11-08): This method is not usable in practice. Consider removing
+        # it from both cores. https://github.com/Opentrons/opentrons/issues/8209
         raise NotImplementedError("ProtocolCore.resume not implemented")
 
     def comment(self, msg: str) -> None:
@@ -259,7 +261,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def delay(self, seconds: float, msg: Optional[str]) -> None:
         """Wait for a period of time before proceeding."""
-        raise NotImplementedError("ProtocolCore.delay not implemented")
+        self._engine_client.wait_for_duration(seconds=seconds, message=msg)
 
     def home(self) -> None:
         """Move all axes to their home positions."""
