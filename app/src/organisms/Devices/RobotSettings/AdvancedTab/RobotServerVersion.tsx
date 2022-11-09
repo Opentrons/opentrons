@@ -14,6 +14,7 @@ import {
 } from '@opentrons/components'
 import { StyledText } from '../../../../atoms/text'
 import { Portal } from '../../../../App/portal'
+import { TertiaryButton } from '../../../../atoms/buttons'
 import { getRobotApiVersion, UNREACHABLE } from '../../../../redux/discovery'
 import { getBuildrootUpdateDisplayInfo } from '../../../../redux/buildroot'
 import { UpdateRobotBanner } from '../../../UpdateRobotBanner'
@@ -89,9 +90,19 @@ export function RobotServerVersion({
         </Box>
         {autoUpdateAction !== 'reinstall' && robot != null ? null : (
           <Flex justifyContent={JUSTIFY_FLEX_END} alignItems="center">
-            <StyledText as="label" color={COLORS.darkGreyEnabled}>
+            <StyledText
+              as="label"
+              color={COLORS.darkGreyEnabled}
+              paddingRight={SPACING.spacing4}
+            >
               {t('up_to_date')}
             </StyledText>
+            <TertiaryButton
+              onClick={() => setShowVersionInfoModal(true)}
+              textTransform={TYPOGRAPHY.textTransformCapitalize}
+            >
+              {t('reinstall')}
+            </TertiaryButton>
           </Flex>
         )}
       </Flex>
