@@ -773,7 +773,7 @@ class OT3Controller:
         distance_mm: float,
         speed_mm_per_s: float,
         sensor_threshold_pf: float,
-        sensor_id: Optional[SensorId] = None,
+        sensor_id: SensorId = SensorId.S0,
     ) -> None:
         pos, _ = await capacitive_probe(
             self._messenger,
@@ -794,7 +794,7 @@ class OT3Controller:
         moving: OT3Axis,
         distance_mm: float,
         speed_mm_per_s: float,
-        sensor_id: Optional[SensorId] = None,
+        sensor_id: SensorId = SensorId.S0,
     ) -> List[float]:
         data = await capacitive_pass(
             self._messenger,

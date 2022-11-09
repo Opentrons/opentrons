@@ -1508,7 +1508,6 @@ class OT3API(
         moving_axis: OT3Axis,
         target_pos: float,
         pass_settings: CapacitivePassSettings,
-        start_fresh: bool = False,
     ) -> float:
         """Determine the position of something using the capacitive sensor.
 
@@ -1542,13 +1541,6 @@ class OT3API(
                 " tool"
             )
 
-        sensor_id = None
-        if mount == OT3Mount.GRIPPER:
-            probe = self._gripper_handler.get_attached_probe()
-            if not probe:
-                raise RuntimeError("Must attach probe to gripper before calibrating.")
-            sensor_id = sensor_id_for_gripper(probe)
-
         here = await self.gantry_position(mount, refresh=True)
         origin_pos = moving_axis.of_point(here)
         if origin_pos < target_pos:
@@ -1569,14 +1561,26 @@ class OT3API(
         )
         pass_start_pos = moving_axis.set_in_point(here, pass_start)
         await self.move_to(mount, pass_start_pos)
-        await self._backend.capacitive_probe(
-            mount,
-            moving_axis,
-            machine_pass_distance,
-            pass_settings.speed_mm_per_s,
-            pass_settings.sensor_threshold_pf,
-            sensor_id,
-        )
+        if mount == OT3Mount.GRIPPER:
+            probe = self._gripper_handler.get_attached_probe()
+            assert probe
+            sensor_id = sensor_id = sensor_id_for_gripper(probe)
+            await self._backend.capacitive_probe(
+                mount,
+                moving_axis,
+                machine_pass_distance,
+                pass_settings.speed_mm_per_s,
+                pass_settings.sensor_threshold_pf,
+                sensor_id,
+            )
+        else:
+            await self._backend.capacitive_probe(
+                mount,
+                moving_axis,
+                machine_pass_distance,
+                pass_settings.speed_mm_per_s,
+                pass_settings.sensor_threshold_pf,
+            )
         end_pos = await self.gantry_position(mount, refresh=True)
         await self.move_to(mount, pass_start_pos)
         return moving_axis.of_point(end_pos)
@@ -1603,17 +1607,18 @@ class OT3API(
             )
         )
 
-        sensor_id = None
+        await self.move_to(mount, begin)
         if mount == OT3Mount.GRIPPER:
             probe = self._gripper_handler.get_attached_probe()
-            if not probe:
-                raise RuntimeError("Must attach probe to gripper before calibrating.")
+            assert probe
             sensor_id = sensor_id_for_gripper(probe)
-
-        await self.move_to(mount, begin)
-        values = await self._backend.capacitive_pass(
-            mount, moving_axis, sweep_distance, speed_mm_s, sensor_id
-        )
+            values = await self._backend.capacitive_pass(
+                mount, moving_axis, sweep_distance, speed_mm_s, sensor_id
+            )
+        else:
+            values = await self._backend.capacitive_pass(
+                mount, moving_axis, sweep_distance, speed_mm_s
+            )
         await self.move_to(mount, begin)
         return values
 

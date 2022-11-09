@@ -449,15 +449,15 @@ def gripper_pin_offsets_mean(front: Point, rear: Point) -> Point:
     -------
     The gripper calibration offset.
     """
-    return 1 / 2 * (front + rear)
+    return 0.5 * (front + rear)
 
 
 async def calibrate_gripper(hcapi: OT3API, probe: GripperProbe) -> Point:
     hcapi.add_gripper_probe(probe)
-    hcapi.grip(20)
     try:
+        await hcapi.grip(20)
         result = await calibrate_mount(hcapi, OT3Mount.GRIPPER)
     finally:
         hcapi.remove_gripper_probe()
-        hcapi.grip(20)
+        await hcapi.ungrip()
     return result
