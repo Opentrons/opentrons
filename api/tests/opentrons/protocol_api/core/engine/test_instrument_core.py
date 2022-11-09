@@ -284,3 +284,46 @@ def test_dispense_to_well(
         ),
         times=1,
     )
+
+
+# def test_dispense_to_trash(
+#     decoy: Decoy,
+#     mock_engine_client: EngineClient,
+#     subject: InstrumentCore,
+# ) -> None:
+#     """It should dispense to a well."""
+#     well_core = WellCore(
+#         name="my cool well", labware_id="123abc", engine_client=mock_engine_client
+#     )
+#
+#     decoy.when(
+#         mock_engine_client.state.labware.get_fixed_trash_id()
+#     ).then_return("123abc")
+#
+#     decoy.when(
+#         mock_engine_client.state.geometry.get_well_position(
+#             labware_id="123abc", well_name="my cool well", well_location=WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1))
+#         )
+#     ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)))
+#
+#     decoy.when(
+#         mock_engine_client.state.geometry.get_relative_well_location(
+#             labware_id="123abc", well_name="my cool well", absolute_point=Point(1, 2, 3)
+#         )
+#     ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)))
+#
+#     subject.dispense(location=None, well_core=well_core, volume=12.34, rate=5.6)
+#
+#     decoy.verify(
+#         mock_engine_client.dispense(
+#             pipette_id="abc123",
+#             labware_id="123abc",
+#             well_name="my cool well",
+#             well_location=WellLocation(
+#                 origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
+#             ),
+#             volume=12.34,
+#             flow_rate=11.2,
+#         ),
+#         times=1,
+#     )

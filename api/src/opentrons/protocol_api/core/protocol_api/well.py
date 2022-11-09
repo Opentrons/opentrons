@@ -83,6 +83,9 @@ class WellImplementation(AbstractWellCore):
         """Get the well's geometry information interface."""
         return self._geometry
 
+    def is_fixed_trash(self) -> bool:
+        raise NotImplementedError("is_fixed_trash not implemented yet.")
+
     # TODO(mc, 2022-10-28): is this used and/or necessary?
     def __repr__(self) -> str:
         """Use the well's display name as its repr."""

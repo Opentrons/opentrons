@@ -65,5 +65,10 @@ class AbstractWellCore(ABC):
         """Get the well's geometry information interface."""
         ...
 
+    @abstractmethod
+    def is_fixed_trash(self) -> bool:
+        """Check if well is a fixed trash."""
+        ...
+
 
 WellCoreType = TypeVar("WellCoreType", bound=AbstractWellCore)

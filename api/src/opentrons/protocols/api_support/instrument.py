@@ -1,5 +1,5 @@
 import logging
-from typing import Optional, Any, Union
+from typing import Optional, Any
 
 from opentrons_shared_data.labware.dev_types import (
     LabwareDefinition as LabwareDefinitionDict,
@@ -122,9 +122,7 @@ def determine_drop_target(
         return location.top(-z_height)
 
 
-def validate_takes_liquid(
-    location: Union[types.Location, Well], reject_module: bool
-) -> None:
+def validate_takes_liquid(location: types.Location, reject_module: bool) -> None:
     """Validate that a location is a valid liquid handling target.
 
     Args:
@@ -135,17 +133,14 @@ def validate_takes_liquid(
     """
     labware = None
 
-    if isinstance(location, types.Location):
-        if location.labware.is_labware:
-            labware = location.labware.as_labware()
+    if location.labware.is_labware:
+        labware = location.labware.as_labware()
 
-        if location.labware.is_well:
-            labware = location.labware.as_well().parent
+    if location.labware.is_well:
+        labware = location.labware.as_well().parent
 
-        if location.labware.is_module and reject_module:
-            raise ValueError("Cannot aspirate/dispense directly to a module")
-    elif isinstance(location, Well):
-        labware = location.parent
+    if location.labware.is_module and reject_module:
+        raise ValueError("Cannot aspirate/dispense directly to a module")
 
     if labware is not None and labware.is_tiprack:
         raise ValueError("Cannot aspirate/dispense to a tip rack")

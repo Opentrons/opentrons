@@ -266,10 +266,12 @@ class InstrumentContext(publisher.CommandPublisher):
         well: Optional[labware.Well]
         if isinstance(location, labware.Well):
             well = location
-            publish_location = location.top()
-            dest = None
+            if location.is_fixed_trash():
+                dest = location.top()
+            else:
+                dest = location.bottom(z=self.well_bottom_clearance.dispense)
+
         elif isinstance(location, types.Location):
-            publish_location = location
             dest = location
             _, well = dest.labware.get_parent_labware_and_well()
         elif location is not None:
@@ -277,7 +279,6 @@ class InstrumentContext(publisher.CommandPublisher):
                 f"location should be a Well or Location, but it is {location}"
             )
         elif self._ctx.location_cache:
-            publish_location = self._ctx.location_cache
             dest = self._ctx.location_cache
             _, well = dest.labware.get_parent_labware_and_well()
         else:
@@ -289,7 +290,7 @@ class InstrumentContext(publisher.CommandPublisher):
             )
         if self.api_version >= APIVersion(2, 11):
             instrument.validate_takes_liquid(
-                location=location,  # type: ignore[arg-type]
+                location=dest,
                 reject_module=self.api_version >= APIVersion(2, 13),
             )
 
@@ -300,7 +301,7 @@ class InstrumentContext(publisher.CommandPublisher):
             command=cmds.dispense(
                 instrument=self,
                 volume=c_vol,
-                location=publish_location,
+                location=dest,
                 rate=rate,
                 flow_rate=self._implementation.get_absolute_dispense_flow_rate(rate),
             ),

@@ -96,33 +96,33 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
 
     def dispense(
         self,
-        location: Optional[types.Location],
+        location: types.Location,
         well_core: Optional[WellImplementation],
         volume: float,
         rate: float,
     ) -> None:
         """Dispense a volume of liquid (in microliters/uL) using this pipette
         into the specified location."""
-        if location is None:
-            from opentrons.protocol_api.labware import Labware, Well
-
-            assert well_core is not None, "Expected well core when location is None."
-
-            labware_core = well_core.get_geometry().parent
-
-            labware = Labware(
-                implementation=labware_core, api_version=self._api_version
-            )
-            well = Well(
-                parent=labware,
-                well_implementation=well_core,
-                api_version=self._api_version,
-            )
-
-            if LabwareLike(labware).is_fixed_trash():
-                location = well.top()
-            else:
-                location = well.bottom(self.get_well_bottom_clearance().dispense)
+        # if location is None:
+        #     from opentrons.protocol_api.labware import Labware, Well
+        #
+        #     assert well_core is not None, "Expected well core when location is None."
+        #
+        #     labware_core = well_core.get_geometry().parent
+        #
+        #     labware = Labware(
+        #         implementation=labware_core, api_version=self._api_version
+        #     )
+        #     well = Well(
+        #         parent=labware,
+        #         well_implementation=well_core,
+        #         api_version=self._api_version,
+        #     )
+        #
+        #     if LabwareLike(labware).is_fixed_trash():
+        #         location = well.top()
+        #     else:
+        #         location = well.bottom(self.get_well_bottom_clearance().dispense)
 
         self.move_to(location=location, well_core=well_core)
 
