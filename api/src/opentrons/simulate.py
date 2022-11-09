@@ -10,6 +10,7 @@ import os
 import pathlib
 import queue
 from typing import (
+    cast,
     Any,
     Dict,
     List,
@@ -22,11 +23,14 @@ from typing import (
 )
 
 import opentrons
+from opentrons import should_use_ot3
 from opentrons.hardware_control import (
-    API as HardwareAPI,
+    API as OT2API,
     ThreadManager,
     ThreadManagedHardware,
 )
+from opentrons.hardware_control.types import MachineType
+
 from opentrons.hardware_control.simulator_setup import load_simulator
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocols.duration import DurationEstimator
@@ -135,6 +139,7 @@ def get_protocol_api(
     bundled_data: Optional[Dict[str, bytes]] = None,
     extra_labware: Optional[Dict[str, LabwareDefinition]] = None,
     hardware_simulator: Optional[ThreadManagedHardware] = None,
+    machine: Optional[MachineType] = None,
 ) -> protocol_api.ProtocolContext:
     """
     Build and return a ``protocol_api.ProtocolContext``
@@ -176,6 +181,8 @@ def get_protocol_api(
                           subdirectory of the Jupyter data directory for
                           custom labware.
     :param hardware_simulator: If specified, a hardware simulator instance.
+    :param machine: Either `"ot2"` or `"ot3"`. If `None`, machine will be
+                    determined from persistent settings.
     :return: The protocol context.
     """
     if isinstance(version, str):
@@ -191,10 +198,7 @@ def get_protocol_api(
     ):
         extra_labware = labware_from_paths([str(JUPYTER_NOTEBOOK_LABWARE_DIR)])
 
-    checked_hardware = hardware_simulator or ThreadManager(
-        HardwareAPI.build_hardware_simulator
-    )
-
+    checked_hardware = _check_hardware_simulator(hardware_simulator, machine)
     return _build_protocol_context(
         version=checked_version,
         hardware_simulator=checked_hardware,
@@ -202,6 +206,19 @@ def get_protocol_api(
         bundled_data=bundled_data,
         extra_labware=extra_labware,
     )
+
+
+def _check_hardware_simulator(
+    hardware_simulator: Optional[ThreadManagedHardware], machine: Optional[MachineType]
+) -> ThreadManagedHardware:
+    if hardware_simulator:
+        return hardware_simulator
+    elif machine == "ot3" or should_use_ot3():
+        from opentrons.hardware_control.ot3api import OT3API
+
+        return ThreadManager(OT3API.build_hardware_simulator)
+    else:
+        return ThreadManager(OT2API.build_hardware_simulator)
 
 
 def _build_protocol_context(
@@ -259,6 +276,7 @@ def simulate(
     hardware_simulator_file_path: Optional[str] = None,
     duration_estimator: Optional[DurationEstimator] = None,
     log_level: str = "warning",
+    machine: Optional[MachineType] = None,
 ) -> Tuple[List[Mapping[str, Any]], Optional[BundleContents]]:
     """
     Simulate the protocol itself.
@@ -319,6 +337,8 @@ def simulate(
     :param log_level: The level of logs to capture in the runlog:
                       ``"debug"``, ``"info"``, ``"warning"``, or ``"error"``.
                       Defaults to ``"warning"``.
+    :param machine: Either `"ot2"` or `"ot3"`. If `None`, machine will be
+                    determined from persistent settings.
     :returns: A tuple of a run log for user output, and possibly the required
               data to write to a bundle to bundle this protocol. The bundle is
               only emitted if bundling is allowed
@@ -361,6 +381,7 @@ def simulate(
         bundled_data=getattr(protocol, "bundled_data", None),
         hardware_simulator=hardware_simulator,
         extra_labware=gpa_extras,
+        machine=machine,
     )
     broker = context.broker
     scraper = CommandScraper(stack_logger, log_level, broker)
@@ -546,6 +567,7 @@ def get_arguments(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
         choices=["runlog", "nothing"],
         default="runlog",
     )
+    parser.add_argument("-m", "--machine", choices=["ot2", "ot3"])
     return parser
 
 
@@ -591,6 +613,7 @@ def main() -> int:
         duration_estimator=duration_estimator,
         hardware_simulator_file_path=getattr(args, "custom_hardware_simulator_file"),
         log_level=args.log_level,
+        machine=cast(Optional[MachineType], args.machine),
     )
 
     if maybe_bundle:
