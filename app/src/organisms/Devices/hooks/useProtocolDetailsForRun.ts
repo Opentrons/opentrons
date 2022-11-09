@@ -4,19 +4,20 @@ import {
   getRobotTypeFromLoadedLabware,
   schemaV6Adapter,
 } from '@opentrons/shared-data'
-import { schemaV6Adapter as schemaV6AdapterWithLiquids } from './utils/schemaV6Adapter'
-import { useFeatureFlag } from '../../../redux/config'
 import {
   useProtocolQuery,
   useProtocolAnalysesQuery,
   useRunQuery,
 } from '@opentrons/react-api-client'
 
-import type { ProtocolAnalysisFile, RobotType } from '@opentrons/shared-data'
+import type {
+  RobotType,
+  LegacySchemaAdapterOutput,
+} from '@opentrons/shared-data'
 
 export interface ProtocolDetails {
   displayName: string | null
-  protocolData: ProtocolAnalysisFile<{}> | null
+  protocolData: LegacySchemaAdapterOutput | null
   protocolKey: string | null
   isProtocolAnalyzing?: boolean
   robotType: RobotType
@@ -25,7 +26,6 @@ export interface ProtocolDetails {
 export function useProtocolDetailsForRun(
   runId: string | null
 ): ProtocolDetails {
-  const liquidSetupEnabled = useFeatureFlag('enableLiquidSetup')
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
   const protocolId = runRecord?.data?.protocolId ?? null
   const [
@@ -62,11 +62,7 @@ export function useProtocolDetailsForRun(
   return {
     displayName: displayName ?? null,
     protocolData:
-      mostRecentAnalysis != null
-        ? liquidSetupEnabled
-          ? schemaV6AdapterWithLiquids(mostRecentAnalysis)
-          : schemaV6Adapter(mostRecentAnalysis)
-        : null,
+      mostRecentAnalysis != null ? schemaV6Adapter(mostRecentAnalysis) : null,
     protocolKey: protocolRecord?.data.key ?? null,
     isProtocolAnalyzing:
       mostRecentAnalysis != null && mostRecentAnalysis?.status === 'pending',

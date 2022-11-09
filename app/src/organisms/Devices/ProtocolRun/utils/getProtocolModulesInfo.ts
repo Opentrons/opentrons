@@ -6,7 +6,7 @@ import type {
   DeckDefinition,
   LabwareDefinition2,
   ModuleDefinition,
-  ProtocolAnalysisFile,
+  LegacySchemaAdapterOutput,
   ModuleModel,
 } from '@opentrons/shared-data'
 import type { StoredProtocolAnalysis } from '../../hooks'
@@ -25,7 +25,7 @@ export interface ProtocolModuleInfo {
 }
 
 export const getProtocolModulesInfo = (
-  protocolData: ProtocolAnalysisFile<{}> | StoredProtocolAnalysis,
+  protocolData: LegacySchemaAdapterOutput | StoredProtocolAnalysis,
   deckDef: DeckDefinition
 ): ProtocolModuleInfo[] => {
   if (protocolData != null && 'modules' in protocolData) {
@@ -48,14 +48,15 @@ export const getProtocolModulesInfo = (
                 'moduleId' in command.params.location &&
                 command.params.location.moduleId === moduleId
             )?.result?.labwareId ?? null
-
-        const nestedLabware =
-          nestedLabwareId != null ? protocolData.labware[nestedLabwareId] : null
+        const nestedLabware = protocolData.labware.find(
+          item => nestedLabwareId != null && item.id === nestedLabwareId
+        )
         const nestedLabwareDef =
           nestedLabware != null
-            ? protocolData.labwareDefinitions[nestedLabware.definitionId]
+            ? protocolData.labwareDefinitions[nestedLabware.definitionUri]
             : null
-        const nestedLabwareDisplayName = nestedLabware?.displayName ?? null
+        const nestedLabwareDisplayName =
+          nestedLabware?.displayName?.toString() ?? null
         const moduleInitialLoadInfo = getModuleInitialLoadInfo(
           moduleId,
           protocolData.commands

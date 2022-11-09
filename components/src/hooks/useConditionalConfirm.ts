@@ -37,7 +37,7 @@ import { useState } from 'react'
  */
 
 export const useConditionalConfirm = <T extends any[]>(
-  handleContinue: (...args: T) => void,
+  handleContinue: (...args: T) => any,
   shouldBlock: boolean
 ): {
   confirm: (...args: T) => void

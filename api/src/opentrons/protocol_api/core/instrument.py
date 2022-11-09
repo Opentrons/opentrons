@@ -22,7 +22,14 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
-    def aspirate(self, volume: float, rate: float) -> None:
+    def aspirate(
+        self,
+        location: types.Location,
+        well_core: Optional[WellCoreType],
+        volume: float,
+        rate: float,
+        flow_rate: float,
+    ) -> None:
         ...
 
     @abstractmethod
@@ -60,7 +67,20 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
-    def drop_tip(self, home_after: bool) -> None:
+    def drop_tip(
+        self,
+        location: Optional[types.Location],
+        well_core: WellCoreType,
+        home_after: bool,
+    ) -> None:
+        """Move to and drop a tip into a given well.
+
+        Args:
+            location: The location of the well we're dropping to.
+                If unspecified, the default drop location of the well will be used.
+            well_core: The well we're dropping into
+            home_after: Whether to home the pipette after the tip is dropped.
+        """
         ...
 
     @abstractmethod
@@ -145,6 +165,10 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
 
     @abstractmethod
     def get_flow_rate(self) -> FlowRates:
+        ...
+
+    @abstractmethod
+    def get_absolute_aspirate_flow_rate(self, rate: float) -> float:
         ...
 
     @abstractmethod

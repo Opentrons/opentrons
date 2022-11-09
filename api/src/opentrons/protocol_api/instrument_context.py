@@ -118,7 +118,7 @@ class InstrumentContext(publisher.CommandPublisher):
     def default_speed(self, speed: float) -> None:
         self._implementation.set_default_speed(speed)
 
-    @requires_version(2, 0)  # noqa: C901
+    @requires_version(2, 0)
     def aspirate(
         self,
         volume: Optional[float] = None,
@@ -164,18 +164,20 @@ class InstrumentContext(publisher.CommandPublisher):
             )
         )
 
+        well: Optional[labware.Well]
         if isinstance(location, labware.Well):
-            dest = location.bottom().move(
-                types.Point(0, 0, self.well_bottom_clearance.aspirate)
-            )
+            dest = location.bottom(z=self.well_bottom_clearance.aspirate)
+            well = location
         elif isinstance(location, types.Location):
             dest = location
+            _, well = dest.labware.get_parent_labware_and_well()
         elif location is not None:
             raise TypeError(
                 "location should be a Well or Location, but it is {}".format(location)
             )
         elif self._ctx.location_cache:
             dest = self._ctx.location_cache
+            _, well = dest.labware.get_parent_labware_and_well()
         else:
             raise RuntimeError(
                 "If aspirate is called without an explicit location, another"
@@ -188,32 +190,8 @@ class InstrumentContext(publisher.CommandPublisher):
                 location=dest, reject_module=self.api_version >= APIVersion(2, 13)
             )
 
-        if self.current_volume == 0:
-            # Make sure we're at the top of the labware and clear of any
-            # liquid to prepare the pipette for aspiration
-
-            if (
-                self.api_version < APIVersion(2, 3)
-                or not self._implementation.is_ready_to_aspirate()
-            ):
-                if dest.labware.is_well:
-                    self.move_to(dest.labware.as_well().top(), publish=False)
-                else:
-                    # TODO(seth,2019/7/29): This should be a warning exposed
-                    #  via rpc to the runapp
-                    logger.warning(
-                        "When aspirate is called on something other than a "
-                        "well relative position, we can't move to the top of"
-                        " the well to prepare for aspiration. This might "
-                        "cause over aspiration if the previous command is a "
-                        "blow_out."
-                    )
-                self._implementation.prepare_for_aspirate()
-            self.move_to(dest, publish=False)
-        elif dest != self._ctx.location_cache:
-            self.move_to(dest, publish=False)
-
         c_vol = self._implementation.get_available_volume() if not volume else volume
+        flow_rate = self._implementation.get_absolute_aspirate_flow_rate(rate)
 
         with publisher.publish_context(
             broker=self.broker,
@@ -221,10 +199,17 @@ class InstrumentContext(publisher.CommandPublisher):
                 instrument=self,
                 volume=c_vol,
                 location=dest,
+                flow_rate=flow_rate,
                 rate=rate,
             ),
         ):
-            self._implementation.aspirate(volume=c_vol, rate=rate)
+            self._implementation.aspirate(
+                location=dest,
+                well_core=well._impl if well is not None else None,
+                volume=c_vol,
+                rate=rate,
+                flow_rate=flow_rate,
+            )
 
         return self
 
@@ -617,16 +602,13 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         if not self._implementation.has_tip():
             logger.warning("Pipette has no tip to return")
+
         loc = self._last_tip_picked_up_from
+
         if not isinstance(loc, labware.Well):
-            raise TypeError(
-                "Last tip location should be a Well but it is: " "{}".format(loc)
-            )
-        return_height = self._implementation.get_return_height()
-        drop_loc = instrument.determine_drop_target(
-            self.api_version, loc, return_height, APIVersion(2, 3)
-        )
-        self.drop_tip(drop_loc, home_after=home_after)
+            raise TypeError(f"Last tip location should be a Well but it is: {loc}")
+
+        self.drop_tip(loc, home_after=home_after)
 
         return self
 
@@ -838,59 +820,43 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :returns: This instance
         """
-        if location and isinstance(location, types.Location):
-            if location.labware.is_well:
-                target = location
-            else:
+        if location is None:
+            well = self.trash_container.wells()[0]
+
+        elif isinstance(location, labware.Well):
+            well = location
+            location = None
+
+        elif isinstance(location, types.Location):
+            _, maybe_well = location.labware.get_parent_labware_and_well()
+
+            if maybe_well is None:
                 raise TypeError(
-                    "If a location is specified as a types.Location (for "
-                    "instance, as the result of a call to "
-                    "tiprack.wells()[0].top()) it must be a location "
-                    "relative to a well, since that is where a tip is "
-                    "dropped. The passed location, however, is in "
-                    "reference to {}".format(location.labware)
+                    "If a location is specified as a `types.Location`"
+                    " (for instance, as the result of a call to `Well.top()`),"
+                    " it must be a location relative to a well,"
+                    " since that is where a tip is dropped."
+                    f" However, the given location refers to {location.labware}"
                 )
-        elif location and isinstance(location, labware.Well):
-            if LabwareLike(location).is_fixed_trash():
-                target = location.top()
-            else:
-                return_height = self._implementation.get_return_height()
-                target = instrument.determine_drop_target(
-                    self.api_version, location, return_height
-                )
-        elif not location:
-            target = self.trash_container.wells()[0].top()
+
+            well = maybe_well
+
         else:
             raise TypeError(
-                "If specified, location should be an instance of "
-                "types.Location (e.g. the return value from "
-                "tiprack.wells()[0].top()) or a Well (e.g. tiprack.wells()[0]."
-                " However, it is a {}".format(location)
+                "If specified, location should be an instance of"
+                " `types.Location` (e.g. the return value from `Well.top()`)"
+                " or `Well` (e.g. `tiprack.wells()[0]`)."
+                f" However, it is {location}"
             )
 
         with publisher.publish_context(
             broker=self.broker,
-            command=cmds.drop_tip(instrument=self, location=target),
+            command=cmds.drop_tip(instrument=self, location=well),
         ):
-            self.move_to(target, publish=False)
-            self._implementation.drop_tip(home_after=home_after)
+            self._implementation.drop_tip(
+                location=location, well_core=well._impl, home_after=home_after
+            )
 
-        if (
-            self.api_version < APIVersion(2, 2)
-            and target.labware.is_well
-            and target.labware.as_well().parent.is_tiprack
-        ):
-            # If this is a tiprack we can try and add the tip back to the
-            # tracker
-            try:
-                target.labware.as_well().parent.return_tips(
-                    target.labware.as_well(), self.channels
-                )
-            except AssertionError:
-                # Similarly to :py:meth:`return_tips`, the failure case here
-                # just means the tip can't be reused, so don't actually stop
-                # the protocol
-                logger.exception(f"Could not return tip to {target}")
         self._last_tip_picked_up_from = None
         return self
 

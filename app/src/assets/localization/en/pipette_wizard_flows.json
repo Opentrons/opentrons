@@ -2,11 +2,11 @@
   "before_you_begin": "Before you begin",
   "get_started": "Get started",
   "remove_labware_to_get_started": "<block>To get started, remove labware from the rest of the deck and clean up the work area to make attachment and calibration easier. Also gather the needed equipment shown on the right hand side</block><block>The calibration probe is included with the robot and should be stored on the right hand side of the door opening.</block>",
-  "attach_stem": "Attach Calibration Stem",
-  "install_probe": "Grab your calibration probe, install",
+  "attach_probe": "Attach Calibration Probe",
+  "install_probe": "Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.",
   "initiate_calibration": "Initiate calibration",
-  "remove_stem": "Remove Calibration Stem",
-  "remove_probe": "Now you’ll be guided through removing your calibration stem. Undo the latch to remove the stem",
+  "remove_cal_probe": "Remove Calibration Probe",
+  "remove_probe": "Unlatch the calibration probe, remove it from the pipette nozzle, and return it to its storage location.",
   "complete_cal": "Complete calibration",
   "pip_cal_success": "Pipette Successfully Calibrated",
   "calibrate_pipette": "Calibrate a pipette",
@@ -16,5 +16,6 @@
   "are_you_sure_exit": "Are you sure you want to exit before completing {{flow}}?",
   "pipette_calibration": "Pipette Calibration",
   "attach": "Attaching Pipette",
-  "detach": "Detaching Pipette"
+  "detach": "Detaching Pipette",
+  "calibration_probe_touching": "The calibration probe will touch the sides of the calibration divot in slot {{slotNumber}} to determine its exact position"
 }

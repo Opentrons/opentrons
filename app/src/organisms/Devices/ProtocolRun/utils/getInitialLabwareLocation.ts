@@ -1,19 +1,15 @@
+import { FIXED_TRASH_ID } from '@opentrons/shared-data/js'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type {
   LoadLabwareRunTimeCommand,
   LabwareLocation,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
-const TRASH_ID = 'fixedTrash'
-
-/**
- * @deprecated use `getInitialLabwareLocation` instead
- */
-export const getLabwareLocation = (
+export const getInitialLabwareLocation = (
   labwareId: string,
   commands: RunTimeCommand[]
 ): LabwareLocation => {
-  if (labwareId === TRASH_ID) {
+  if (labwareId === FIXED_TRASH_ID) {
     return { slotName: '12' }
   }
   const labwareLocation = commands.find(

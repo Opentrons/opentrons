@@ -29,13 +29,11 @@ const ROBOT_CAL_HELP_ARTICLE =
   'https://support.opentrons.com/s/article/How-positional-calibration-works-on-the-OT-2'
 const OFFSET_DATA_HELP_ARTICLE =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
-interface LabwareOffsetModalProps {
+interface HowLPCWorksModalProps {
   onCloseClick: () => unknown
 }
 
-export const LabwareOffsetModal = (
-  props: LabwareOffsetModalProps
-): JSX.Element => {
+export const HowLPCWorksModal = (props: HowLPCWorksModalProps): JSX.Element => {
   const { t } = useTranslation(['protocol_setup', 'shared'])
   return (
     <Portal level="top">
@@ -67,7 +65,7 @@ export const LabwareOffsetModal = (
             fontSize={FONT_SIZE_BODY_1}
             color={C_BLUE}
             href={ROBOT_CAL_HELP_ARTICLE}
-            id="LabwareOffsetModal_helpArticleLink1"
+            id="HowLPCWorksModal_helpArticleLink1"
             external
           >
             {t('learn_more_about_robot_cal_offset_modal_link')}
@@ -84,7 +82,7 @@ export const LabwareOffsetModal = (
             fontSize={FONT_SIZE_BODY_1}
             color={C_BLUE}
             href={OFFSET_DATA_HELP_ARTICLE}
-            id="LabwareOffsetModal_helpArticleLink2"
+            id="HowLPCWorksModal_helpArticleLink2"
             external
           >
             {t('learn_more_about_offset_data_link')}
