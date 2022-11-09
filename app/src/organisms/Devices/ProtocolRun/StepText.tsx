@@ -13,6 +13,7 @@ import { RunLogProtocolSetupInfo } from './RunLogProtocolSetupInfo'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { RunCommandSummary } from '@opentrons/api-client'
 import { getLoadedLabwareDefinitionsByUri } from '../../../resources/protocols/utils'
+import { useRunQuery } from '@opentrons/react-api-client'
 
 const TRASH_ID = 'fixedTrash'
 const TEMPORARY_LOCATION_STUB = 'a slot'
@@ -26,11 +27,16 @@ interface Props {
 export function StepText(props: Props): JSX.Element | null {
   const { analysisCommand, robotName, runCommand, runId } = props
   const { t } = useTranslation('commands_run_log')
+  const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
   const { protocolData } = useProtocolDetailsForRun(runId)
   const labwareRenderInfoById = useLabwareRenderInfoForRunById(runId)
 
   let messageNode = null
 
+  const allCommands =
+    runCommand !== null ? runRecord.commands : protocolData?.commands
+  const labwareEntities =
+    runCommand !== null ? runRecord.labware : protocolData?.labware
   const displayCommand = runCommand !== null ? runCommand : analysisCommand
 
   if (displayCommand === null) {
@@ -66,9 +72,9 @@ export function StepText(props: Props): JSX.Element | null {
     }
     case 'dropTip': {
       const { wellName, labwareId } = displayCommand.params
-      const defsByURI = getLoadedLabwareDefinitionsByUri(protocolData.commands)
+      const defsByURI = getLoadedLabwareDefinitionsByUri(allCommands)
       const definitionUri =
-        protocolData.labware.find(l => l.id === labwareId)?.definitionUri ?? ''
+        labwareEntities.find(l => l.id === labwareId)?.definitionUri ?? ''
       messageNode = t('drop_tip', {
         well_name: wellName,
         labware:
@@ -230,9 +236,9 @@ export function StepText(props: Props): JSX.Element | null {
     }
     case 'aspirate': {
       const { wellName, labwareId, volume, flowRate } = displayCommand.params
-      const defsByURI = getLoadedLabwareDefinitionsByUri(protocolData.commands)
+      const defsByURI = getLoadedLabwareDefinitionsByUri(allCommands)
       const definitionUri =
-        protocolData.labware.find(l => l.id === labwareId)?.definitionUri ?? ''
+        labwareEntities.find(l => l.id === labwareId)?.definitionUri ?? ''
 
       const labwareDisplayName =
         labwareId === TRASH_ID
@@ -250,9 +256,9 @@ export function StepText(props: Props): JSX.Element | null {
     }
     case 'dispense': {
       const { wellName, labwareId, volume, flowRate } = displayCommand.params
-      const defsByURI = getLoadedLabwareDefinitionsByUri(protocolData.commands)
+      const defsByURI = getLoadedLabwareDefinitionsByUri(allCommands)
       const definitionUri =
-        protocolData.labware.find(l => l.id === labwareId)?.definitionUri ?? ''
+        labwareEntities.find(l => l.id === labwareId)?.definitionUri ?? ''
       const labwareDisplayName =
         labwareId === TRASH_ID
           ? 'Opentrons Fixed Trash'
@@ -270,9 +276,9 @@ export function StepText(props: Props): JSX.Element | null {
     }
     case 'blowout': {
       const { wellName, labwareId, flowRate } = displayCommand.params
-      const defsByURI = getLoadedLabwareDefinitionsByUri(protocolData.commands)
+      const defsByURI = getLoadedLabwareDefinitionsByUri(allCommands)
       const definitionUri =
-        protocolData.labware.find(l => l.id === labwareId)?.definitionUri ?? ''
+        labwareEntities.find(l => l.id === labwareId)?.definitionUri ?? ''
       const labwareDisplayName =
         labwareId === TRASH_ID
           ? 'Opentrons Fixed Trash'
@@ -299,9 +305,9 @@ export function StepText(props: Props): JSX.Element | null {
     }
     case 'moveToWell': {
       const { wellName, labwareId } = displayCommand.params
-      const defsByURI = getLoadedLabwareDefinitionsByUri(protocolData.commands)
+      const defsByURI = getLoadedLabwareDefinitionsByUri(allCommands)
       const definitionUri =
-        protocolData.labware.find(l => l.id === labwareId)?.definitionUri ?? ''
+        labwareEntities.find(l => l.id === labwareId)?.definitionUri ?? ''
       const labwareDisplayName =
         labwareId === TRASH_ID
           ? 'Opentrons Fixed Trash'
