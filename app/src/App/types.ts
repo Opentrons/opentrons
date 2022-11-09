@@ -22,6 +22,7 @@ export type RobotSettingsTab =
   | 'calibration'
   | 'networking'
   | 'advanced'
+  | 'privacy'
   | 'feature-flags'
 
 export type AppSettingsTab =
