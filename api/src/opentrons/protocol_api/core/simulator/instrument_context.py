@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING, Optional
 
 from opentrons import types
@@ -19,6 +20,12 @@ from ..protocol_api.well import WellImplementation
 
 if TYPE_CHECKING:
     from .protocol_context import ProtocolContextSimulation
+
+
+_log = logging.getLogger()
+
+_PRE_2_2_TIP_DROP_HEIGHT_MM = 10
+"""In PAPIv2.1 and below, tips are always dropped 10 mm from the bottom of the well."""
 
 
 class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
@@ -98,7 +105,7 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
             tip_rack_definition=tip_rack_core.get_definition(),
         )
 
-        self.move_to(location=location, well_core=well_core)
+        self.move_to(location=location)
         self._raise_if_tip("pick up tip")
         self._pipette_dict["has_tip"] = True
         self._pipette_dict["tip_length"] = tip_length
@@ -116,11 +123,58 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
             fail_if_full=self._api_version < APIVersion(2, 2),
         )
 
-    def drop_tip(self, home_after: bool) -> None:
+    def drop_tip(
+        self,
+        location: Optional[types.Location],
+        well_core: WellImplementation,
+        home_after: bool,
+    ) -> None:
+        labware_core = well_core.get_geometry().parent
+
+        if location is None:
+            from opentrons.protocol_api.labware import Labware, Well
+
+            labware = Labware(
+                implementation=labware_core, api_version=self._api_version
+            )
+            well = Well(
+                parent=labware,
+                well_implementation=well_core,
+                api_version=self._api_version,
+            )
+
+            if LabwareLike(labware).is_fixed_trash():
+                location = well.top()
+            elif self._api_version < APIVersion(2, 2):
+                location = well.bottom(z=_PRE_2_2_TIP_DROP_HEIGHT_MM)
+            else:
+                assert (
+                    labware_core.is_tip_rack()
+                ), "Expected tip drop target to be a tip rack."
+
+                return_height = self.get_return_height()
+                location = well.top(z=-return_height * labware_core.get_tip_length())
+
+        self.move_to(location=location)
         self._raise_if_no_tip(HardwareAction.DROPTIP.name)
         self._pipette_dict["has_tip"] = False
         self._pipette_dict["tip_length"] = 0.0
         self._update_volume(0)
+
+        if self._api_version < APIVersion(2, 2) and labware_core.is_tip_rack():
+            # If this is a tiprack we can try and add the dirty tip back to the tracker
+            try:
+                labware_core.get_tip_tracker().return_tips(
+                    start_well=well_core,
+                    num_channels=self.get_channels(),
+                )
+            except AssertionError:
+                # Similarly to :py:meth:`return_tips`, the failure case here
+                # just means the tip can't be reused, so don't actually stop
+                # the protocol
+                _log.warning(
+                    f"Could not return tip to {labware_core.get_display_name()}"
+                )
 
     def home(self) -> None:
         self._protocol_interface.set_last_location(None)
@@ -131,7 +185,7 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
     def move_to(
         self,
         location: types.Location,
-        well_core: Optional[WellImplementation],
+        well_core: Optional[WellImplementation] = None,
         force_direct: bool = False,
         minimum_z_height: Optional[float] = None,
         speed: Optional[float] = None,

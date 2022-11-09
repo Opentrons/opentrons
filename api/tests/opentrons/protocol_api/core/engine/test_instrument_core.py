@@ -82,7 +82,7 @@ def test_get_hardware_state(
     subject: InstrumentCore,
 ) -> None:
     """It should return the actual state of the pipette hardware."""
-    pipette_dict = cast(PipetteDict, {"display_name": "Cool Pipette"})
+    pipette_dict = cast(PipetteDict, {"display_name": "Cool Pipette", "has_tip": True})
 
     decoy.when(mock_engine_client.state.pipettes.get("abc123")).then_return(
         LoadedPipette.construct(mount=MountType.LEFT)  # type: ignore[call-arg]
@@ -92,6 +92,7 @@ def test_get_hardware_state(
     )
 
     assert subject.get_hardware_state() == pipette_dict
+    assert subject.has_tip() is True
 
 
 def test_move_to_well(
@@ -194,6 +195,31 @@ def test_pick_up_tip(
             well_name="well-name",
             well_location=WellLocation(
                 origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
+            ),
+        ),
+        times=1,
+    )
+
+
+def test_drop_tip_no_location(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: InstrumentCore
+) -> None:
+    """It should drop a tip given a well core."""
+    well_core = WellCore(
+        name="well-name",
+        labware_id="labware-id",
+        engine_client=mock_engine_client,
+    )
+
+    subject.drop_tip(location=None, well_core=well_core, home_after=True)
+
+    decoy.verify(
+        mock_engine_client.drop_tip(
+            pipette_id="abc123",
+            labware_id="labware-id",
+            well_name="well-name",
+            well_location=WellLocation(
+                origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
             ),
         ),
         times=1,
