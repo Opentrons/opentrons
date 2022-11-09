@@ -15,7 +15,7 @@ endif
 ifeq ($(OS),Windows_NT)
 	ifneq ($(OT_PYTHON),python)
 		ifneq ($(suffix $(OT_PYTHON)),.exe)
-			OT_PYTHON := $(OT_PYTHON).exe)
+			OT_PYTHON := $(OT_PYTHON).exe
 		endif
 	endif
 endif
