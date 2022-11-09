@@ -5,12 +5,10 @@ import re
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
 from opentrons.protocols.geometry.well_geometry import WellGeometry
-from opentrons.protocols.api_support.labware_like import LabwareLike
 
 from opentrons.types import Point
 
 from ..well import AbstractWellCore
-from ...labware import Labware
 
 
 class WellImplementation(AbstractWellCore):
@@ -89,8 +87,8 @@ class WellImplementation(AbstractWellCore):
     def is_fixed_trash(self) -> bool:
         """Check if given well is a fixed trash."""
         labware_core = self._geometry.parent
-        labware = Labware(implementation=labware_core)
-        return LabwareLike(labware).is_fixed_trash()
+        quirks = labware_core.get_quirks()
+        return "fixedTrash" in quirks
 
     # TODO(mc, 2022-10-28): is this used and/or necessary?
     def __repr__(self) -> str:
