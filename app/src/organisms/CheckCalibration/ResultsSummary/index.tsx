@@ -21,8 +21,9 @@ import { PrimaryButton } from '../../../atoms/buttons'
 import { CalibrationHealthCheckResults } from './CalibrationHealthCheckResults'
 import { DeckCalibrationResult } from './DeckCalibrationResult'
 import { RenderMountInformation } from './RenderMountInformation'
-import { PipetteCalibrationResult } from './PipetteCalibrationResult'
-import { TipLengthCalibrationResult } from './TipLengthCalibrationResult'
+// import { PipetteCalibrationResult } from './PipetteCalibrationResult'
+// import { TipLengthCalibrationResult } from './TipLengthCalibrationResult'
+import { CalibrationResult } from './CalibrationResult'
 
 import type { Mount } from '../../../redux/pipettes/types'
 import type { CalibrationPanelProps } from '../../../organisms/CalibrationPanels/types'
@@ -142,13 +143,15 @@ export function ResultsSummary(
       <Flex flexDirection={DIRECTION_COLUMN} marginBottom={SPACING.spacing4}>
         {leftPipette != null && (
           <>
-            <PipetteCalibrationResult
+            <CalibrationResult
+              calType="pipetteOffset"
               isBadCal={
                 pipetteResultsBad(calibrationsByMount.left.calibration)
                   .offsetBad
               }
             />
-            <TipLengthCalibrationResult
+            <CalibrationResult
+              calType="tipLength"
               isBadCal={
                 pipetteResultsBad(calibrationsByMount.right.calibration)
                   .tipLengthBad
@@ -161,13 +164,15 @@ export function ResultsSummary(
       <Flex flexDirection={DIRECTION_COLUMN} marginBottom="3.75rem">
         {rightPipette != null && (
           <>
-            <PipetteCalibrationResult
+            <CalibrationResult
+              calType="pipetteOffset"
               isBadCal={
                 pipetteResultsBad(calibrationsByMount.right.calibration)
                   .offsetBad
               }
             />
-            <TipLengthCalibrationResult
+            <CalibrationResult
+              calType="tipLength"
               isBadCal={
                 pipetteResultsBad(calibrationsByMount.right.calibration)
                   .tipLengthBad
