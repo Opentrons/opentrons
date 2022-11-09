@@ -75,7 +75,7 @@ export function VersionInfoModal(props: VersionInfoModalProps): JSX.Element {
     )
     primaryButton = {
       ...primaryButton,
-      onClick: goToViewUpdate,
+      onClick: robotUpdateType === 'upgrade' ? goToViewUpdate : installUpdate,
       children:
         robotUpdateType === 'upgrade' ? 'View Robot Update' : 'Downgrade Robot',
     }

@@ -120,9 +120,9 @@ describe('VersionInfoModal', () => {
     expect(handleClose).not.toHaveBeenCalled()
     closeButton.invoke('onClick')?.({} as React.MouseEvent)
     expect(handleClose).toHaveBeenCalled()
-    expect(mockGoToViewUpdate).not.toHaveBeenCalled()
+    expect(mockInstallUpdate).not.toHaveBeenCalled()
     primaryButton.invoke('onClick')?.({} as React.MouseEvent)
-    expect(mockGoToViewUpdate).toHaveBeenCalled()
+    expect(mockInstallUpdate).toHaveBeenCalled()
   })
 
   it('should render an AlertModal with the proper children for a reinstall', () => {
