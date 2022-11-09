@@ -239,17 +239,24 @@ def test_blow_out_to_well(
     )
 
 
-def test_drop_tip_to_well(
+def test_blow_out_to_location(
     decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
 ) -> None:
-    """It should drop a tip in a specific well."""
+    """It should blow out to a location."""
+    mock_location = decoy.mock(cls=Location)
     mock_well = decoy.mock(cls=Well)
 
-    subject.drop_tip(mock_well, home_after=False)
+    decoy.when(mock_location.labware.get_parent_labware_and_well()).then_return(
+        (None, mock_well)
+    )
+
+    subject.blow_out(location=mock_location)
 
     decoy.verify(
-        mock_instrument_core.drop_tip(
-            location=None, well_core=mock_well._impl, home_after=False
+        mock_instrument_core.blow_out(
+            location=mock_location,
+            well_core=mock_well._impl,
+            move_to_well=True,
         ),
         times=1,
     )
@@ -274,6 +281,35 @@ def test_blow_out_in_place(
             location=location,
             well_core=mock_well._impl,
             move_to_well=False,
+        ),
+        times=1,
+    )
+
+
+def test_blow_out_no_location_cache_raises(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    mock_protocol_context: ProtocolContext,
+    subject: InstrumentContext,
+) -> None:
+    """It should raise if no location or well is provided and the location cache returns None."""
+    decoy.when(mock_protocol_context.location_cache).then_return(None)
+
+    with pytest.raises(RuntimeError):
+        subject.blow_out()
+
+
+def test_drop_tip_to_well(
+    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
+) -> None:
+    """It should drop a tip in a specific well."""
+    mock_well = decoy.mock(cls=Well)
+
+    subject.drop_tip(mock_well, home_after=False)
+
+    decoy.verify(
+        mock_instrument_core.drop_tip(
+            location=None, well_core=mock_well._impl, home_after=False
         ),
         times=1,
     )
