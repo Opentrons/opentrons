@@ -5,7 +5,6 @@ import re
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
 from opentrons.protocols.geometry.well_geometry import WellGeometry
-
 from opentrons.types import Point
 
 from ..well import AbstractWellCore
