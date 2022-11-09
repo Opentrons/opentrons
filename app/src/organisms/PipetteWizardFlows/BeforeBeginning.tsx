@@ -62,10 +62,15 @@ export const BeforeBeginning = (
           location: 'attachOrDetach',
         },
       },
-    ]).then(() => {
-      setIsBetweenCommands(false)
-      proceed()
-    })
+    ])
+      .then(() => {
+        setIsBetweenCommands(false)
+        proceed()
+      })
+      .catch(error => {
+        console.log(error)
+        // let's early return an error modal here
+      })
   }
 
   const proceedButtonText: string = t('get_started')

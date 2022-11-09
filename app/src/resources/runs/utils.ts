@@ -12,6 +12,8 @@ export const chainRunCommands = (
     waitUntilComplete: true,
   })
     .then(response => {
+      console.log(response)
+      // we may want to exit early here and reject the promise if the command status is failed
       if (commands.slice(1).length < 1) {
         return Promise.resolve(response)
       } else {
