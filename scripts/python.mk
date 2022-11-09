@@ -9,7 +9,7 @@ monorepo_root := $(firstword $(filter %/opentrons, $(_possibilities)))
 
 ifeq ($(monorepo_root),)
 	monorepo_root := $(firstword $(filter %\opentrons, $(_possibilities)))
-	monorepo_root := $(shell cygpath -u $(monorepo_root))
+	monorepo_root := $(shell cygpath -m $(monorepo_root))
 endif
 
 $(info _possibilities $(_possibilities))
