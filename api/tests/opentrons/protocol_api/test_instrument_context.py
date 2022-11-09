@@ -217,16 +217,12 @@ def test_aspirate(
     )
 
 
-def test_dispense(
+def test_dispense_with_location(
     decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
 ) -> None:
-    """It should dispense to a well."""
+    """It should dispense to a given location."""
     mock_well = decoy.mock(cls=Well)
     location = Location(point=Point(1, 2, 3), labware=mock_well)
-
-    decoy.when(mock_instrument_core.get_well_bottom_clearance()).then_return(
-        Clearances(default_aspirate=3.0, default_dispense=2.0)
-    )
 
     decoy.when(mock_instrument_core.get_absolute_dispense_flow_rate(1.0)).then_return(
         3.0
@@ -237,6 +233,37 @@ def test_dispense(
     decoy.verify(
         mock_instrument_core.dispense(
             location=location,
+            well_core=mock_well._impl,
+            volume=42.0,
+            rate=1.0,
+        ),
+        times=1,
+    )
+
+
+def test_dispense_with_well_location(
+    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
+) -> None:
+    """It should dispense to a well."""
+    mock_well = decoy.mock(cls=Well)
+
+    decoy.when(mock_well.bottom(2.0)).then_return(
+        Location(point=Point(1, 2, 3), labware=mock_well)
+    )
+
+    decoy.when(mock_instrument_core.get_well_bottom_clearance()).then_return(
+        Clearances(default_aspirate=3.0, default_dispense=2.0)
+    )
+
+    decoy.when(mock_instrument_core.get_absolute_dispense_flow_rate(1.0)).then_return(
+        3.0
+    )
+
+    subject.dispense(volume=42.0, location=mock_well)
+
+    decoy.verify(
+        mock_instrument_core.dispense(
+            location=Location(point=Point(1, 2, 3), labware=mock_well),
             well_core=mock_well._impl,
             volume=42.0,
             rate=1.0,

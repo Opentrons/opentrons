@@ -270,7 +270,6 @@ class InstrumentContext(publisher.CommandPublisher):
                 dest = location.top()
             else:
                 dest = location.bottom(z=self.well_bottom_clearance.dispense)
-
         elif isinstance(location, types.Location):
             dest = location
             _, well = dest.labware.get_parent_labware_and_well()
