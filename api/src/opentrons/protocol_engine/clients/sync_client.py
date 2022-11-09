@@ -5,6 +5,7 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
+from opentrons.commands.protocol_commands import comment as make_legacy_comment_command
 from opentrons.types import MountType
 from opentrons.hardware_control.modules.types import ThermocyclerStep
 
@@ -172,6 +173,7 @@ class SyncClient:
         pipette_id: str,
         labware_id: str,
         well_name: str,
+        well_location: WellLocation,
     ) -> commands.DropTipResult:
         """Execute a DropTip command and return the result."""
         request = commands.DropTipCreate(
@@ -179,6 +181,7 @@ class SyncClient:
                 pipetteId=pipette_id,
                 labwareId=labware_id,
                 wellName=well_name,
+                wellLocation=well_location,
             )
         )
         result = self._transport.execute_command(request=request)
@@ -191,6 +194,7 @@ class SyncClient:
         well_name: str,
         well_location: WellLocation,
         volume: float,
+        flow_rate: float,
     ) -> commands.AspirateResult:
         """Execute an ``Aspirate`` command and return the result."""
         request = commands.AspirateCreate(
@@ -200,9 +204,7 @@ class SyncClient:
                 wellName=well_name,
                 wellLocation=well_location,
                 volume=volume,
-                # TODO(jbl 2022-06-17) replace default with parameter from pipette_context
-                # https://github.com/Opentrons/opentrons/issues/10810
-                flowRate=2.0,
+                flowRate=flow_rate,
             )
         )
         result = self._transport.execute_command(request=request)
@@ -274,6 +276,16 @@ class SyncClient:
         result = self._transport.execute_command(request=request)
         return cast(commands.TouchTipResult, result)
 
+    def wait_for_duration(
+        self, seconds: float, message: Optional[str]
+    ) -> commands.WaitForDurationResult:
+        """Execute a ``waitForDuration`` command and return the result."""
+        request = commands.WaitForDurationCreate(
+            params=commands.WaitForDurationParams(seconds=seconds, message=message)
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.WaitForDurationResult, result)
+
     def wait_for_resume(self, message: Optional[str]) -> commands.WaitForResumeResult:
         """Execute a `WaitForResume` command and return the result."""
         request = commands.WaitForResumeCreate(
@@ -281,6 +293,31 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
         return cast(commands.WaitForResumeResult, result)
+
+    def comment(self, message: str) -> commands.CustomResult:
+        """Execute a comment command and return the result."""
+        # TODO(mm, 2022-11-09): Protocol Engine doesn't yet have a proper comment
+        # command. So, we use a legacy-style command wrapped inside a Protocol Engine
+        # CustomCommand. The Opentrons App knows how to render this in its run log
+        # because this is what we used to do for PAPIv2 commands in general.
+        #
+        # When Protocol Engine has a proper comment command, we should use it here.
+        legacy_comment_command = make_legacy_comment_command(msg=message)
+
+        class LegacyCommentCustomParams(commands.CustomParams):
+            legacyCommandType: str
+            legacyCommandText: str
+
+        request = commands.CustomCreate(
+            params=LegacyCommentCustomParams(
+                # This matches how LegacyCommandWrapper handles comments coming from
+                # protocols running under the older non-ProtocolEngine core.
+                legacyCommandType=legacy_comment_command["name"],
+                legacyCommandText=legacy_comment_command["payload"]["text"],
+            )
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.CustomResult, result)
 
     def set_rail_lights(self, on: bool) -> commands.SetRailLightsResult:
         """Execute a ``setRailLights`` command and return the result."""

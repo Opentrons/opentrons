@@ -43,51 +43,6 @@ def subject(engine_client: EngineClient, pipette_id: str) -> PipetteContext:
     return PipetteContext(engine_client=engine_client, pipette_id=pipette_id)
 
 
-def test_drop_tip(
-    decoy: Decoy,
-    engine_client: EngineClient,
-    pipette_id: str,
-    labware_id: str,
-    well: Well,
-    subject: PipetteContext,
-) -> None:
-    """It should send a drop tip command."""
-    subject.drop_tip(location=well)
-
-    decoy.verify(
-        engine_client.drop_tip(
-            pipette_id=pipette_id,
-            labware_id=labware_id,
-            well_name=well.well_name,
-        )
-    )
-
-
-def test_aspirate(
-    decoy: Decoy,
-    engine_client: EngineClient,
-    pipette_id: str,
-    labware_id: str,
-    well: Well,
-    subject: PipetteContext,
-) -> None:
-    """It should send an aspirate command to the SyncClient."""
-    subject.aspirate(volume=12345.6789, location=well, rate=1.0)
-
-    decoy.verify(
-        engine_client.aspirate(
-            pipette_id=pipette_id,
-            labware_id=labware_id,
-            well_name=well.well_name,
-            well_location=WellLocation(
-                origin=WellOrigin.BOTTOM,
-                offset=WellOffset(x=0, y=0, z=1),
-            ),
-            volume=12345.6789,
-        )
-    )
-
-
 def test_aspirate_not_implemented_errors(
     subject: PipetteContext,
     well: Well,

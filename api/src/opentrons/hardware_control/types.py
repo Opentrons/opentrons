@@ -8,6 +8,8 @@ from opentrons import types as top_types
 
 MODULE_LOG = logging.getLogger(__name__)
 
+MachineType = Literal["ot2", "ot3"]
+
 
 class OutOfBoundsMove(RuntimeError):
     def __init__(self, message: str):
