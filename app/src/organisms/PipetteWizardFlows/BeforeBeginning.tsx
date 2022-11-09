@@ -1,7 +1,9 @@
 import * as React from 'react'
 import { UseMutateFunction } from 'react-query'
+import { COLORS } from '@opentrons/components'
 import { Trans, useTranslation } from 'react-i18next'
 import { StyledText } from '../../atoms/text'
+import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardRequiredEquipmentList } from '../../molecules/WizardRequiredEquipmentList'
@@ -30,6 +32,9 @@ export const BeforeBeginning = (
     setIsBetweenCommands,
   } = props
   const { t } = useTranslation('pipette_wizard_flows')
+  const [errorMessage, setShowErrorMessage] = React.useState<null | string>(
+    null
+  )
   //  TODO(jr, 10/26/22): when we wire up other flows, const will turn into let
   //  for proceedButtonText and rightHandBody
   React.useEffect(() => {
@@ -69,7 +74,7 @@ export const BeforeBeginning = (
       })
       .catch(error => {
         console.log(error)
-        // let's early return an error modal here
+        setShowErrorMessage(error.message)
       })
   }
 
@@ -86,8 +91,17 @@ export const BeforeBeginning = (
     }
     //  TODO(jr, 10/26/22): wire up the other flows
   }
-  if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
-  return (
+  if (isRobotMoving && errorMessage == null)
+    return <InProgressModal description={t('stand_back')} />
+
+  return errorMessage != null ? (
+    <SimpleWizardBody
+      isSuccess={false}
+      iconColor={COLORS.errorEnabled}
+      header={t('error_encountered')}
+      subHeader={errorMessage}
+    />
+  ) : (
     <GenericWizardTile
       header={t('before_you_begin')}
       //  TODO(jr, 11/3/22): wire up this URL and unhide the link!
