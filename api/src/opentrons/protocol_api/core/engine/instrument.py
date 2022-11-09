@@ -92,18 +92,8 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         well_name = well_core.get_name()
         labware_id = well_core.labware_id
 
-        # if location is None:
-        #     if self._engine_client.state.labware.is_fixed_trash(labware_id=labware_id):
-        #         # what should I use for the z height?
-        #         point = well_core.get_top(z_offset=0)
-        #     else:
-        #         point = well_core.get_bottom(self.get_well_bottom_clearance().dispense)
-
         well_location = self._engine_client.state.geometry.get_relative_well_location(
-            labware_id=labware_id,
-            well_name=well_name,
-            absolute_point=location.point
-            # if location is not None else point,
+            labware_id=labware_id, well_name=well_name, absolute_point=location.point
         )
 
         self._engine_client.dispense(
