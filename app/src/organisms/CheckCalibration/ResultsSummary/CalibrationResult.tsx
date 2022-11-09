@@ -19,8 +19,10 @@ export const RESULT_SUMMARY_STYLE = css`
   border-radius: ${BORDERS.radiusSoftCorners};
 `
 
+type CalibrationType = 'deck' | 'pipetteOffset' | 'tipLength'
+
 interface CalibrationResultProps {
-  calType: 'pipetteOffset' | 'tipLength'
+  calType: CalibrationType
   isBadCal: boolean
 }
 
@@ -28,7 +30,15 @@ export function CalibrationResult({
   calType,
   isBadCal,
 }: CalibrationResultProps): JSX.Element {
-  const { t } = useTranslation(['robot_calibration', 'shared'])
+  const { t } = useTranslation('robot_calibration')
+
+  const switchText = (calType: CalibrationType): string => {
+    return calType === 'deck'
+      ? 'deck_calibration'
+      : calType === 'pipetteOffset'
+      ? 'pipette_offset_title'
+      : 'tip_length'
+  }
   return (
     <Flex
       padding="0.75rem"
@@ -41,9 +51,7 @@ export function CalibrationResult({
         css={TYPOGRAPHY.pSemiBold}
         textTransform={TYPOGRAPHY.textTransformCapitalize}
       >
-        {calType === 'pipetteOffset'
-          ? t('pipette_offset_title')
-          : t('tip_length')}
+        {t(switchText(calType))}
       </StyledText>
       <RenderResult isBadCal={isBadCal} />
     </Flex>

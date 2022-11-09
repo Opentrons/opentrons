@@ -23,15 +23,12 @@ describe('CalibrationHealthCheckResults', () => {
     const { getByText, getByTestId } = render(props)
     getByText('Calibration Health Check Results')
     const statusLabel = getByText('Calibration complete')
-    expect(statusLabel).toHaveStyle(`color: ${COLORS.darkBlackEnabled}`)
+    expect(statusLabel).toHaveStyle(`color: ${String(COLORS.darkBlackEnabled)}`)
     expect(statusLabel).toHaveStyle(
-      `font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`
-    )
-    expect(getByTestId('status_label_Calibration complete')).toHaveStyle(
-      `background-color: ${COLORS.successBackgroundLight}`
+      `font-weight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
     )
     expect(getByTestId('status_circle')).toHaveStyle(
-      `color: ${COLORS.successEnabled}`
+      `color: ${String(COLORS.successEnabled)}`
     )
     expect(getByTestId('status_circle')).toHaveStyle(`height: 0.3125rem`)
     expect(getByTestId('status_circle')).toHaveStyle(`width: 0.3125rem`)
@@ -41,11 +38,8 @@ describe('CalibrationHealthCheckResults', () => {
     props.isCalibrationCompleted = false
     const { getByText, getByTestId } = render(props)
     getByText('Calibration recommended')
-    expect(getByTestId('status_label_Calibration recommended')).toHaveStyle(
-      `background-color: ${COLORS.warningBackgroundLight}`
-    )
     expect(getByTestId('status_circle')).toHaveStyle(
-      `color: ${COLORS.warningEnabled}`
+      `color: ${String(COLORS.warningEnabled)}`
     )
   })
 })

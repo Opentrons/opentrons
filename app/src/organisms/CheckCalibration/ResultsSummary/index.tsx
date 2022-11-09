@@ -19,7 +19,6 @@ import { LEFT, RIGHT } from '../../../redux/pipettes'
 import { CHECK_STATUS_OUTSIDE_THRESHOLD } from '../../../redux/sessions'
 import { PrimaryButton } from '../../../atoms/buttons'
 import { CalibrationHealthCheckResults } from './CalibrationHealthCheckResults'
-import { DeckCalibrationResult } from './DeckCalibrationResult'
 import { RenderMountInformation } from './RenderMountInformation'
 import { CalibrationResult } from './CalibrationResult'
 
@@ -135,7 +134,7 @@ export function ResultsSummary(
         />
       </Box>
       <Box marginBottom={SPACING.spacing4}>
-        <DeckCalibrationResult isBadCal={isDeckResultBad} />
+        <CalibrationResult calType="deck" isBadCal={isDeckResultBad} />
       </Box>
       <RenderMountInformation mount={LEFT} pipette={leftPipette} />
       <Flex flexDirection={DIRECTION_COLUMN} marginBottom={SPACING.spacing4}>
