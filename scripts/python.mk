@@ -2,14 +2,10 @@
 # Python executable to use to run pipenv. Note: pipenv will not
 # necessary select this Python to create its virtual environments.
 OT_PYTHON ?= python
-
+export MSYS_NO_PATHCONV=1
 _firstpath := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
 _possibilities := $(realpath $(_firstpath)/..) $(realpath $(_firstpath)/../..) $(realpath $(_firstpath)/../../..) $(_firstpath)
 monorepo_root := $(firstword $(filter %/opentrons, $(_possibilities)))
-
-ifeq ($(monorepo_root),)
-monorepo_root := $(subst "\","/",$(firstword $(filter %\opentrons, $(_possibilities))))
-endif
 
 $(info _possibilities $(_possibilities))
 $(info _firstpath $(_firstpath))
