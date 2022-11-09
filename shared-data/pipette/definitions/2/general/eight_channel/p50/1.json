@@ -1,7 +1,8 @@
 {
-  "$otSharedSchema": "pipette/schemas/2/pipettePropertiesSchema",
-  "displayName": "oneChannel",
-  "displayCategory": "GEN1",
+  "$otSharedSchema": "#/pipette/schemas/2/pipettePropertiesSchema.json",
+  "displayName": "P50 Eight Channel GEN3",
+  "model": "eightChannel",
+  "displayCategory": "GEN3",
   "pickUpTipConfigurations": {
     "current": 0.4,
     "presses": 1,
@@ -24,12 +25,13 @@
     "drop": 90.5
   },
   "availableSensors": {
-    "pressure": 1,
-    "capacitive": 1,
+    "pressure": 2,
+    "capacitive": 2,
     "environment": 1
   },
   "partialTipConfigurations": {
-    "partialTipSupported": false
+    "partialTipSupported": true,
+    "availableConfigurations": [1, 2, 3, 4, 5, 6, 7, 8]
   },
-  "channels": 1
+  "channels": 8
 }

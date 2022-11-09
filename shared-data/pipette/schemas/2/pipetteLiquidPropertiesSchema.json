@@ -36,9 +36,13 @@
     }
   },
   "type": "object",
-  "required": ["maxVolume", "minVolume", "defaultTipracks"],
+  "required": ["$otSharedSchema", "maxVolume", "minVolume", "defaultTipracks"],
   "additionalProperties": false,
   "properties": {
+    "$otSharedSchema": {
+      "type": "string",
+      "description": "The path to a valid Opentrons shared schema relative to the shared-data directory, without its extension. For instance, #/pipette/schemas/2/pipetteLiquidPropertiesSchema.json is a reference to this schema."
+    },
     "patternProperties": {
       "description": "Tip specific liquid handling properties for a given pipette",
       "type": "object",

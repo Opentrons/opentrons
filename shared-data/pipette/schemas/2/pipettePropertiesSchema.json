@@ -73,18 +73,24 @@
   },
   "description": "Version-level pipette specifications, which may vary across different versions of the same pipette",
   "type": "object",
-  "$comment": "Example key: 'p10_single_v1.3'",
   "required": [
+    "$otSharedSchema",
     "pickUpTipConfigurations",
     "dropTipConfigurations",
     "partialTipConfigurations",
     "plungerPositionsConfigurations",
     "plungerMotorConfigurations",
     "displayCategory",
-    "channels"
+    "channels",
+    "model",
+    "displayName"
   ],
   "properties": {
     "additionalProperties": false,
+    "$otSharedSchema": {
+      "type": "string",
+      "description": "The path to a valid Opentrons shared schema relative to the shared-data directory, without its extension. For instance, #/pipette/schemas/2/pipettePropertiesSchema.json is a reference to this schema."
+    },
     "channels": { "$ref": "#/definitions/channels" },
     "partialTipConfigurations": {
       "type": "object",
@@ -147,7 +153,14 @@
     "dropTipConfigurations": {
       "$ref": "#/definitions/tipConfigurations"
     },
-    "displayName": { "type": "string" },
+    "displayName": {
+      "type": "string",
+      "description": "Display name of the pipette include model and generation number in readable format."
+    },
+    "model": {
+      "type": "string",
+      "description": "the model of the pipette, for example an eightChannel pipette"
+    },
     "displayCategory": { "$ref": "#/definitions/displayCategory" }
   }
 }
