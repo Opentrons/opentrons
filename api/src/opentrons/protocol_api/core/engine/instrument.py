@@ -66,16 +66,12 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         flow_rate: float,
     ) -> None:
         """Aspirate a given volume of liquid from the specified location.
-
         Args:
-            volume (float): The volume of liquid to aspirate, in microliters.
-            location (:obj: `Location`): Where to aspirate from. The
-                robot will aspirate from the exact specified location.
-            well_core (:obj: `WellCore`, optional): Protocol engine based well core implementation.
-            rate (float): Not used in engine based dispense.
-                Part of the abstract class for legacy purposes.
-            flow_rate (float): The absolute aspirate flow rate.
-                `rate` * :py:attr:`default_flow_rate.aspirate`.
+            volume: The volume of liquid to aspirate, in microliters.
+            location: The exact location to aspirate from.
+            well_core: The well to aspirate from, if applicable.
+            rate: Not used in this core.
+            flow_rate: The flow rate in µL/s to aspirate at.
         """
         if well_core is None:
             raise NotImplementedError(
@@ -108,18 +104,13 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         rate: float,
         flow_rate: float,
     ) -> None:
-        """Dispense a volume of liquid (in microliters/uL) using this pipette
-        into the specified location.
-
+        """Dispense a given volume of liquid into the specified location.
         Args:
-            volume (float): The volume of liquid to dispense, in microliters.
-            location (:obj: `Location`): Where to dispense into. The
-                robot will dispense into the exact specified location.
-            well_core (:obj: `WellCore`, optional): Protocol engine based well core implementation.
-            rate (float): Not used in engine based dispense.
-                Part of the abstract class for legacy purposes.
-            flow_rate (float): The absolute dispense flow rate.
-                `rate` * :py:attr:`default_flow_rate.dispense`.
+            volume: The volume of liquid to dispense, in microliters.
+            location: The exact location to dispense to.
+            well_core: The well to dispense to, if applicable.
+            rate: Not used in this core.
+            flow_rate: The flow rate in µL/s to dispense at.
         """
         if well_core is None:
             raise NotImplementedError(
