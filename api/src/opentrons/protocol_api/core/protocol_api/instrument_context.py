@@ -106,7 +106,7 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
     ) -> None:
         """Dispense a volume of liquid (in microliters/uL) using this pipette
         into the specified location."""
-        self.move_to(location=location, well_core=well_core)
+        self.move_to(location=location)
 
         self._protocol_interface.get_hardware().dispense(self._mount, volume, rate)
 

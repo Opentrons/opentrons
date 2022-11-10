@@ -338,3 +338,32 @@ def test_dispense_with_well_location(
         ),
         times=1,
     )
+
+
+def test_dispense_with_no_location(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_context: ProtocolContext,
+) -> None:
+    """It should dispense to a well."""
+    decoy.when(mock_protocol_context.location_cache).then_return(
+        Location(point=Point(1, 2, 3), labware=None)
+    )
+
+    decoy.when(mock_instrument_core.get_absolute_dispense_flow_rate(1.0)).then_return(
+        3.0
+    )
+
+    subject.dispense(volume=42.0)
+
+    decoy.verify(
+        mock_instrument_core.dispense(
+            location=Location(point=Point(1, 2, 3), labware=None),
+            well_core=None,
+            volume=42.0,
+            rate=1.0,
+            flow_rate=3.0,
+        ),
+        times=1,
+    )
