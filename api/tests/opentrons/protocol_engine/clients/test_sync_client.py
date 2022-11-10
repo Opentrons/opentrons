@@ -62,6 +62,21 @@ def test_add_labware_definition(
     assert result == expected_labware_uri
 
 
+def test_reset_tips(
+    decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
+) -> None:
+    """It should reset the tip tracking state of a labware."""
+    subject.reset_tips(labware_id="cool-labware")
+
+    decoy.verify(
+        transport.call_method(
+            "reset_tips",
+            labware_id="cool-labware",
+        ),
+        times=1,
+    )
+
+
 def test_load_labware(
     decoy: Decoy,
     transport: AbstractSyncTransport,
@@ -335,6 +350,7 @@ def test_dispense(
             origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1)
         ),
         volume=10,
+        flow_rate=2.0,
     )
 
     assert result == response
@@ -666,7 +682,7 @@ def test_blow_out(
             labwareId="456",
             wellName="A2",
             wellLocation=WellLocation(),
-            flowRate=2.0,
+            flowRate=7.8,
         )
     )
 
@@ -679,6 +695,7 @@ def test_blow_out(
         labware_id="456",
         well_name="A2",
         well_location=WellLocation(),
+        flow_rate=7.8,
     )
 
     assert result == response

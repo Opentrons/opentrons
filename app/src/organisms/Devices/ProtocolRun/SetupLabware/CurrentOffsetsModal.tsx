@@ -21,7 +21,7 @@ import {
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../redux/config'
 import { ModalHeader, ModalShell } from '../../../../molecules/Modal'
 import { OffsetVector } from '../../../../molecules/OffsetVector'
-import { getDefsByURI } from '../../../ApplyHistoricOffsets/hooks/getDefsByURI'
+import { getLoadedLabwareDefinitionsByUri } from '../../../../resources/protocols/utils'
 
 import type { LabwareOffset } from '@opentrons/api-client'
 import { PrimaryButton } from '../../../../atoms/buttons'
@@ -59,7 +59,7 @@ export function CurrentOffsetsModal(
 ): JSX.Element {
   const { currentOffsets, commands, onCloseClick } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
-  const defsByURI = getDefsByURI(commands)
+  const defsByURI = getLoadedLabwareDefinitionsByUri(commands)
   const [showCodeSnippet, setShowCodeSnippet] = React.useState<boolean>(false)
   const isLabwareOffsetCodeSnippetsOn = useSelector(
     getIsLabwareOffsetCodeSnippetsOn

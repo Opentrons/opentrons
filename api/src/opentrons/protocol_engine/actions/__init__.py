@@ -22,6 +22,7 @@ from .actions import (
     AddModuleAction,
     FinishErrorDetails,
     DoorChangeAction,
+    ResetTipsAction,
 )
 
 __all__ = [
@@ -44,6 +45,7 @@ __all__ = [
     "AddLiquidAction",
     "AddModuleAction",
     "DoorChangeAction",
+    "ResetTipsAction",
     # action payload values
     "PauseSource",
     "FinishErrorDetails",

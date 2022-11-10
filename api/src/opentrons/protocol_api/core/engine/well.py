@@ -83,7 +83,10 @@ class WellCore(AbstractWellCore):
     # `WellOrigin` is a public enum that may be persisted
     def get_center(self) -> Point:
         """Get the coordinate of the well's center, with an z-offset."""
-        raise NotImplementedError("WellCore.get_center not implemented")
+        well_height = self._engine_client.state.geometry.get_well_height(
+            labware_id=self.labware_id, well_name=self._name
+        )
+        return self.get_bottom(z_offset=well_height / 2)
 
     def get_geometry(self) -> WellGeometry:
         """Get the well's geometry information interface."""

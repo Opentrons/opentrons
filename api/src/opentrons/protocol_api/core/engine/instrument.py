@@ -65,6 +65,14 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         rate: float,
         flow_rate: float,
     ) -> None:
+        """Aspirate a given volume of liquid from the specified location.
+        Args:
+            volume: The volume of liquid to aspirate, in microliters.
+            location: The exact location to aspirate from.
+            well_core: The well to aspirate from, if applicable.
+            rate: Not used in this core.
+            flow_rate: The flow rate in µL/s to aspirate at.
+        """
         if well_core is None:
             raise NotImplementedError(
                 "InstrumentCore.aspirate with well_core value of None not implemented"
@@ -88,11 +96,74 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             flow_rate=flow_rate,
         )
 
-    def dispense(self, volume: float, rate: float) -> None:
-        raise NotImplementedError("InstrumentCore.dispense not implemented")
+    def dispense(
+        self,
+        location: Location,
+        well_core: Optional[WellCore],
+        volume: float,
+        rate: float,
+        flow_rate: float,
+    ) -> None:
+        """Dispense a given volume of liquid into the specified location.
+        Args:
+            volume: The volume of liquid to dispense, in microliters.
+            location: The exact location to dispense to.
+            well_core: The well to dispense to, if applicable.
+            rate: Not used in this core.
+            flow_rate: The flow rate in µL/s to dispense at.
+        """
+        if well_core is None:
+            raise NotImplementedError(
+                "InstrumentCore.dispense with well_core value of None not implemented"
+            )
 
-    def blow_out(self) -> None:
-        raise NotImplementedError("InstrumentCore.blow_out not implemented")
+        well_name = well_core.get_name()
+        labware_id = well_core.labware_id
+
+        well_location = self._engine_client.state.geometry.get_relative_well_location(
+            labware_id=labware_id, well_name=well_name, absolute_point=location.point
+        )
+
+        self._engine_client.dispense(
+            pipette_id=self._pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
+            well_location=well_location,
+            volume=volume,
+            flow_rate=flow_rate,
+        )
+
+    def blow_out(
+        self, location: Location, well_core: Optional[WellCore], move_to_well: bool
+    ) -> None:
+        """Blow liquid out of the tip.
+
+        Args:
+            location: The location to blow out into.
+            well_core: The well to blow out into.
+            move_to_well: Unused by engine core.
+        """
+        if well_core is None:
+            raise NotImplementedError("In-place blow-out is not implemented")
+
+        well_name = well_core.get_name()
+        labware_id = well_core.labware_id
+
+        well_location = self._engine_client.state.geometry.get_relative_well_location(
+            labware_id=labware_id,
+            well_name=well_name,
+            absolute_point=location.point,
+        )
+
+        self._engine_client.blow_out(
+            pipette_id=self._pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
+            well_location=well_location,
+            # TODO(jbl 2022-11-07) PAPIv2 does not have an argument for rate and
+            #   this also needs to be refactored along with other flow rate related issues
+            flow_rate=self.get_absolute_blow_out_flow_rate(1.0),
+        )
 
     def touch_tip(
         self,
@@ -268,8 +339,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         """Get the current state of the pipette hardware as a dictionary."""
         return self._sync_hardware_api.get_attached_instrument(self.get_mount())  # type: ignore[no-any-return]
 
+    # TODO(mc, 2022-11-09): read pipette config into engine state at load
     def get_channels(self) -> int:
-        raise NotImplementedError("InstrumentCore.get_channels not implemented")
+        return self.get_hardware_state()["channels"]
 
     def has_tip(self) -> bool:
         return self.get_hardware_state()["has_tip"]
@@ -294,6 +366,12 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
     def get_absolute_aspirate_flow_rate(self, rate: float) -> float:
         return self._flow_rates.aspirate * rate
+
+    def get_absolute_dispense_flow_rate(self, rate: float) -> float:
+        return self._flow_rates.dispense * rate
+
+    def get_absolute_blow_out_flow_rate(self, rate: float) -> float:
+        return self._flow_rates.blow_out * rate
 
     def set_flow_rate(
         self,

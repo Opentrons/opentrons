@@ -1,21 +1,17 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Flex, ALIGN_CENTER, SPACING, TYPOGRAPHY } from '@opentrons/components'
-import { getLabwareDisplayName } from '@opentrons/shared-data'
+import { LoadedLabware } from '@opentrons/shared-data'
+import { useRunQuery } from '@opentrons/react-api-client'
 import { StyledText } from '../../../atoms/text'
-import { getLabwareLocation } from '../ProtocolRun/utils/getLabwareLocation'
-import { getSlotLabwareName } from './utils/getSlotLabwareName'
 
-import {
-  useLabwareRenderInfoForRunById,
-  useProtocolDetailsForRun,
-} from '../hooks'
+import { useProtocolDetailsForRun } from '../hooks'
 import { RunLogProtocolSetupInfo } from './RunLogProtocolSetupInfo'
 
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { RunCommandSummary } from '@opentrons/api-client'
 
-const TRASH_ID = 'fixedTrash'
+const TEMPORARY_LOCATION_STUB = 'a slot'
 
 interface Props {
   analysisCommand: RunTimeCommand | null
@@ -26,11 +22,14 @@ interface Props {
 export function StepText(props: Props): JSX.Element | null {
   const { analysisCommand, robotName, runCommand, runId } = props
   const { t } = useTranslation('commands_run_log')
+  const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
   const { protocolData } = useProtocolDetailsForRun(runId)
-  const labwareRenderInfoById = useLabwareRenderInfoForRunById(runId)
 
   let messageNode = null
 
+  const labwareEntities: LoadedLabware[] =
+    (runCommand !== null ? runRecord?.data?.labware : protocolData?.labware) ??
+    []
   const displayCommand = runCommand !== null ? runCommand : analysisCommand
 
   if (displayCommand === null) {
@@ -66,35 +65,23 @@ export function StepText(props: Props): JSX.Element | null {
     }
     case 'dropTip': {
       const { wellName, labwareId } = displayCommand.params
-      const labwareLocation = getLabwareLocation(
-        labwareId,
-        protocolData.commands
-      )
-      if (labwareLocation === 'offDeck' || !('slotName' in labwareLocation)) {
-        throw new Error('expected tip rack to be in a slot')
-      }
       const definitionUri =
-        protocolData.labware.find(labware => labware.id === labwareId)
-          ?.definitionUri ?? ''
+        labwareEntities.find(l => l.id === labwareId)?.definitionUri ?? ''
       messageNode = t('drop_tip', {
         well_name: wellName,
-        labware:
-          labwareId === TRASH_ID
-            ? 'Opentrons Fixed Trash'
-            : getLabwareDisplayName(
-                protocolData.labwareDefinitions[definitionUri]
-              ),
-        labware_location: labwareLocation.slotName,
+        labware: definitionUri,
+        labware_location: TEMPORARY_LOCATION_STUB,
       })
       break
     }
     case 'pickUpTip': {
       const { wellName, labwareId } = displayCommand.params
+      const definitionUri =
+        labwareEntities.find(l => l.id === labwareId)?.definitionUri ?? ''
       messageNode = t('pickup_tip', {
         well_name: wellName,
-        labware: getLabwareDisplayName(
-          labwareRenderInfoById[labwareId].labwareDef
-        ),
+        labware: definitionUri,
+        labware_location: TEMPORARY_LOCATION_STUB,
       })
       break
     }
@@ -238,14 +225,12 @@ export function StepText(props: Props): JSX.Element | null {
     }
     case 'aspirate': {
       const { wellName, labwareId, volume, flowRate } = displayCommand.params
-      const { slotName, labwareName } = getSlotLabwareName(
-        labwareId,
-        protocolData.commands
-      )
+      const definitionUri =
+        labwareEntities.find(l => l.id === labwareId)?.definitionUri ?? ''
       messageNode = t('aspirate', {
         well_name: wellName,
-        labware: labwareName,
-        labware_location: slotName,
+        labware: definitionUri,
+        labware_location: TEMPORARY_LOCATION_STUB,
         volume: volume,
         flow_rate: flowRate,
       })
@@ -253,14 +238,13 @@ export function StepText(props: Props): JSX.Element | null {
     }
     case 'dispense': {
       const { wellName, labwareId, volume, flowRate } = displayCommand.params
-      const { slotName, labwareName } = getSlotLabwareName(
-        labwareId,
-        protocolData.commands
-      )
+      const definitionUri =
+        labwareEntities.find(l => l.id === labwareId)?.definitionUri ?? ''
+
       messageNode = t('dispense', {
         well_name: wellName,
-        labware: labwareName,
-        labware_location: slotName,
+        labware: definitionUri,
+        labware_location: TEMPORARY_LOCATION_STUB,
         volume: volume,
         flow_rate: flowRate,
       })
@@ -269,14 +253,13 @@ export function StepText(props: Props): JSX.Element | null {
     }
     case 'blowout': {
       const { wellName, labwareId, flowRate } = displayCommand.params
-      const { slotName, labwareName } = getSlotLabwareName(
-        labwareId,
-        protocolData.commands
-      )
+      const definitionUri =
+        labwareEntities.find(l => l.id === labwareId)?.definitionUri ?? ''
+
       messageNode = t('blowout', {
         well_name: wellName,
-        labware: labwareName,
-        labware_location: slotName,
+        labware: definitionUri,
+        labware_location: TEMPORARY_LOCATION_STUB,
         flow_rate: flowRate,
       })
       break
@@ -294,15 +277,13 @@ export function StepText(props: Props): JSX.Element | null {
     }
     case 'moveToWell': {
       const { wellName, labwareId } = displayCommand.params
-      const { slotName, labwareName } = getSlotLabwareName(
-        labwareId,
-        protocolData.commands
-      )
+      const definitionUri =
+        labwareEntities.find(l => l.id === labwareId)?.definitionUri ?? ''
 
       messageNode = t('move_to_well', {
         well_name: wellName,
-        labware: labwareName,
-        labware_location: slotName,
+        labware: definitionUri,
+        labware_location: TEMPORARY_LOCATION_STUB,
       })
       break
     }
