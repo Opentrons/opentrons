@@ -111,9 +111,9 @@ class Capacitance_Distance_Test:
             for i in range(10):
                 data = await self.api.capacitive_read(self.mount)
                 capacitance.append(data)
-            _variance = max(capacitance) - min(capacitance)
+            _variance = abs(max(capacitance) - min(capacitance))
             print(f"Variance = {_variance}")
-            if _variance < 1:
+            if _variance < 0.5:
                 _reading = False
         return sum(capacitance) / len(capacitance)
 
