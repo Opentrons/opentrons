@@ -72,7 +72,18 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
         flow_rate: float,
     ) -> None:
         """Aspirate a given volume of liquid from the specified location, using
-        this pipette."""
+        this pipette.
+
+        Args:
+            volume (float): The volume of liquid to aspirate, in microliters.
+            location (:obj: `Location`): Where to aspirate from. The
+                robot will aspirate from the exact specified location.
+            well_core (:obj: `WellCore`, optional): The well to aspirate from.
+            rate (float): A relative modifier for how quickly to aspirate liquid.
+            flow_rate (float): The absolute aspirate flow rate.
+                Not used in legacy core. Used in protocol engine based dispense.
+                `rate` * :py:attr:`default_flow_rate.aspirate`.
+        """
         if self.get_current_volume() == 0:
             # Make sure we're at the top of the labware and clear of any
             # liquid to prepare the pipette for aspiration
@@ -105,7 +116,18 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
         flow_rate: float,
     ) -> None:
         """Dispense a volume of liquid (in microliters/uL) using this pipette
-        into the specified location."""
+        into the specified location.
+
+        Args:
+            volume (float): The volume of liquid to dispense, in microliters.
+            location (:obj: `Location`): Where to dispense into. The
+                robot will dispense into the exact specified location.
+            well_core (:obj: `WellCore`, optional): The well to dispense to.
+            rate (float): A relative modifier for how quickly to dispense liquid.
+            flow_rate (float): The absolute dispense flow rate.
+                Not used in legacy core. Used in protocol engine based dispense.
+                `rate` * :py:attr:`default_flow_rate.dispense`.
+        """
         self.move_to(location=location)
 
         self._protocol_interface.get_hardware().dispense(self._mount, volume, rate)
