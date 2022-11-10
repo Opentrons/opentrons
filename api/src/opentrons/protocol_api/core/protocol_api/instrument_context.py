@@ -107,7 +107,13 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
         well_core: Optional[WellImplementation],
         move_to_well: bool,
     ) -> None:
-        """Blow liquid out of the tip."""
+        """Blow liquid out of the tip.
+
+        Args:
+            location: The location to blow out into.
+            well_core: Unused by legacy core.
+            move_to_well: If pipette should be moved before blow-out.
+        """
         if move_to_well:
             self.move_to(location=location)
         self._protocol_interface.get_hardware().blow_out(self._mount)

@@ -43,6 +43,13 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         well_core: Optional[WellCoreType],
         move_to_well: bool,
     ) -> None:
+        """Blow liquid out of the tip.
+
+        Args:
+            location: The location to blow out into.
+            well_core: The well to blow out into.
+            move_to_well: If pipette should be moved before blow-out.
+        """
         ...
 
     @abstractmethod

@@ -94,10 +94,15 @@ class InstrumentCore(AbstractInstrument[WellCore]):
     def blow_out(
         self, location: Location, well_core: Optional[WellCore], move_to_well: bool
     ) -> None:
+        """Blow liquid out of the tip.
+
+        Args:
+            location: The location to blow out into.
+            well_core: The well to blow out into.
+            move_to_well: Unused by engine core.
+        """
         if well_core is None:
-            raise NotImplementedError(
-                "InstrumentCore.blow_out with well_core value of None not implemented"
-            )
+            raise NotImplementedError("In-place blow-out is not implemented")
 
         well_name = well_core.get_name()
         labware_id = well_core.labware_id

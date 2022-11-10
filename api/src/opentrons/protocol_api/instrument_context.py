@@ -408,6 +408,7 @@ class InstrumentContext(publisher.CommandPublisher):
         """
 
         well: Optional[labware.Well]
+        # TODO(jbl 2022-11-10) refactor this boolean out and make location optional when PE blow-out in place exists
         move_to_well = True
         if isinstance(location, labware.Well):
             if location.parent.is_tiprack:
