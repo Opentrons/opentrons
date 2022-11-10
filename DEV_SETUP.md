@@ -173,11 +173,14 @@ pyenv install 3.8.15
 pyenv install 3.10.8
 pyenv global 3.10.8 3.8.15 3.7.8
 pyenv versions
+make install-pipenv OT_PYTHON=python3.7
+make install-pipenv OT_PYTHON=python3.8
+make install-pipenv OT_PYTHON=python3.10
 ```
 
 Python 3.7, 3.8, and 3.10 are available with this pyenv global configuration. Because 3.10.8 is first when you set the configuration, `python` will use that version. Pyenv provides `python3.7`, `python3.8`, and `python3.10` to call minor versions.
 
-With both versions of Python available through pyenv on your system, [pipenv][] will point to the right version given a projects Pipfile.
+With the versions of Python available through pyenv on your system, [pipenv][] will point to the right version given a projects Pipfile. This is **NOT** true of `environments/app` see the [README.md](./environments/app/README.md).
 
 ### Windows
 
@@ -187,17 +190,34 @@ On Windows, we rely on:
 
 - [scoop][] to install general dependencies
 - [Node Version Switcher][nvs] to install and manage Node.js
-- For the Python side, native Windows development is not supported for most environments.
-  - [environments/app](/environments/app) is supported for Windows opentrons and shared-data package testing
-  - **If you must develop on Windows for the python side use Windows Subsystem for Linux (WSL)**
-    - [VS Code provides great tools!](https://code.visualstudio.com/docs/remote/wsl)
-      - Follow the instructions and then see the [Linux section](#linux)
+- [pyenv-win][]
+  - For the Python side, native Windows development is not supported for most environments.
+    - [environments/app](/environments/app) is supported for Windows opentrons and shared-data package testing
+    - **If you must develop on Windows for the python side, use Windows Subsystem for Linux (WSL)**
+      - [VS Code provides great tools!](https://code.visualstudio.com/docs/remote/wsl)
+        - Follow the linked instructions and then see the [Linux section](#linux)
 
 ##### 0. Install `scoop` and general dependencies
 
-##### 1. Install `nvs` and Node.js
+```shell
+scoop install git gh make nvs
+```
 
-##### 2. Install `pyenv` for windows and python 3.10
+##### 1. Install Node 16 with `nvs`
+
+```shell
+nvs add 16
+```
+
+Select your version in a shell
+
+```shell
+nvs
+```
+
+##### 2. Install `pyenv-win` and python 3.10
+
+Follow instructions [pyenv-win][]
 
 ##### 3. Install Visual Studio Community with C++ support
 
@@ -206,11 +226,14 @@ On Windows, we rely on:
     - Universal Windows Platform Development
     - Desktop Development with C++
 
-##### 4. Make Commands that should work after [Repository Setup](#repository-setup)
+##### 4. Make Commands that should work after [Repository Setup](#repository-setup) on Windows
 
+- `make setup-js`
 - `make install-pipenv`
 - `make -C environments/app setup`
-- `make setup-js`
+- `make -C api test-app`
+- `make -C api test-app-cov`
+- `make -C shared-data/python test-app`
 
 ### Linux
 
@@ -238,7 +261,7 @@ git clone https://github.com/jasongin/nvs "$NVS_HOME"
 
 ##### 2. Install `pyenv` and Python on Linux
 
-You can follow the [pyenv][pyenv] "basic github checkout" instructions to install pyenv on your system:
+You can follow the [pyenv][] "basic github checkout" instructions to install pyenv on your system:
 
 ```shell
 git clone https://github.com/pyenv/pyenv.git ~/.pyenv
@@ -253,6 +276,8 @@ Also add the above to whatever combination of `~/.profile`, `~/.bash_profile`, e
 
 ## Repository Setup
 
+### Clone
+
 Once your system is set up, you're ready to clone the repository and get the development environment set up.
 
 ```shell
@@ -260,7 +285,9 @@ git clone https://github.com/Opentrons/opentrons.git
 cd ./opentrons
 ```
 
-Once you are inside the repository for the first time, you should do two things:
+### Once you are inside the repository
+
+#### Confirm Node.js and python version
 
 1. Confirm that `nvs` selected the proper version of Node.js to use
 
@@ -272,11 +299,15 @@ node --version
 pyenv versions
 ```
 
+#### Install [yarn][]
+
 Once you've confirmed you're running the correct versions of Node.js and have Python ready, you must install [yarn][] to manage JavaScript dependencies.
 
 ```shell
 npm install --global yarn@1
 ```
+
+#### Run `make setup`
 
 Finally, you need to download and install all of our various development dependencies. **This step will take several minutes** the first time you run it!
 

@@ -16,15 +16,15 @@ Search for `,app` in `*Makefile`
 > To test 3.7
 
 ```shell
-make install-pipenv OT_PYTHON=$(pyenv which python3.7)
-make -C environments/app setup OT_PYTHON=$(pyenv which python3.7)
-make -C api test-app OT_PYTHON=$(pyenv which python3.7)
+make install-pipenv OT_PYTHON=python3.7
+make -C environments/app setup OT_PYTHON=python3.7
+make -C api test-app OT_PYTHON=python3.7
 ```
 
 > To test 3.10
 
 ```shell
-make install-pipenv OT_PYTHON=$(pyenv which python3.10)
-make -C environments/app setup OT_PYTHON=$(pyenv which python3.10)
-make -C api test-app OT_PYTHON=$(pyenv which python3.10)
+make install-pipenv OT_PYTHON=python3.10
+make -C environments/app setup OT_PYTHON=python3.10
+make -C api test-app OT_PYTHON=python3.10
 ```

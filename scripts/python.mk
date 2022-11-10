@@ -12,8 +12,11 @@ ifeq ($(CI),true)
 		monorepo_root := $(firstword $(filter %\opentrons, $(_possibilities)))
 		monorepo_root := $(shell cygpath -m $(monorepo_root))
 	endif
-	ifeq ($(OS),Windows_NT)
-		ifneq ($(OT_PYTHON),python)
+endif
+
+ifeq ($(OS),Windows_NT)
+	ifneq ($(OT_PYTHON),python)
+		ifeq ($(CI),true)
 			ifneq ($(suffix $(OT_PYTHON)),.exe)
 				OT_PYTHON := $(OT_PYTHON).exe
 			endif
@@ -31,7 +34,7 @@ pipenv_call := $(pipenv_envvars) $(OT_PYTHON) -m pipenv
 pipenv = PIPENV_PIPFILE=$(monorepo_root)/environments/$(1)/Pipfile $(pipenv_call)
 python = $(call pipenv,$(1)) run python
 pip = $(call pipenv,$(1)) run pip
-pytest = $(call pipenv,$(1)) run py.test
+pytest = $(call pipenv,$(1)) run pytest
 
 poetry := poetry
 poetry_run := $(poetry) run
