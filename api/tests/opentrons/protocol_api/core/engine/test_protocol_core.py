@@ -473,3 +473,13 @@ def test_delay(
     """It should issue a waitForDuration command."""
     subject.delay(seconds=seconds, msg=message)
     decoy.verify(mock_engine_client.wait_for_duration(seconds=seconds, message=message))
+
+
+def test_comment(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: ProtocolCore,
+) -> None:
+    """It should issue a comment command."""
+    subject.comment("Hello, world!")
+    decoy.verify(mock_engine_client.comment("Hello, world!"))
