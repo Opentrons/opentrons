@@ -170,6 +170,15 @@ class GeometryView:
 
         return WellLocation(offset=WellOffset(x=delta.x, y=delta.y, z=delta.z))
 
+    def get_well_height(
+        self,
+        labware_id: str,
+        well_name: str,
+    ) -> float:
+        """Get the height of a specified well for a labware."""
+        well_def = self._labware.get_well_definition(labware_id, well_name)
+        return well_def.depth
+
     def get_well_edges(
         self,
         labware_id: str,

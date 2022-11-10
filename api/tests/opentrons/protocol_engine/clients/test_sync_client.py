@@ -350,6 +350,7 @@ def test_dispense(
             origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1)
         ),
         volume=10,
+        flow_rate=2.0,
     )
 
     assert result == response
@@ -681,7 +682,7 @@ def test_blow_out(
             labwareId="456",
             wellName="A2",
             wellLocation=WellLocation(),
-            flowRate=2.0,
+            flowRate=7.8,
         )
     )
 
@@ -694,6 +695,7 @@ def test_blow_out(
         labware_id="456",
         well_name="A2",
         well_location=WellLocation(),
+        flow_rate=7.8,
     )
 
     assert result == response

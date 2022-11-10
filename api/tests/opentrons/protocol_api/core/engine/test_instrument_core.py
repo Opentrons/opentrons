@@ -53,8 +53,11 @@ def subject(
         PipetteDict,
         {
             "default_aspirate_flow_rates": {"1.1": 22},
+            "aspirate_flow_rate": 2.0,
+            "dispense_flow_rate": 2.0,
             "default_dispense_flow_rates": {"3.3": 44},
             "default_blow_out_flow_rates": {"5.5": 66},
+            "blow_out_flow_rate": 1.23,
         },
     )
     decoy.when(mock_sync_hardware.get_attached_instrument(Mount.LEFT)).then_return(
@@ -120,7 +123,10 @@ def test_get_hardware_state(
 
 
 def test_move_to_well(
-    decoy: Decoy, mock_engine_client: EngineClient, subject: InstrumentCore
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
 ) -> None:
     """It should move the pipette to a location."""
     location = Location(point=Point(1, 2, 3), labware=None)
@@ -156,12 +162,15 @@ def test_move_to_well(
                 origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
             ),
         ),
-        times=1,
+        mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )
 
 
 def test_move_to_coordinates(
-    decoy: Decoy, mock_engine_client: EngineClient, subject: InstrumentCore
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
 ) -> None:
     """It should move the pipette to a location."""
     location = Location(point=Point(1, 2, 3), labware=None)
@@ -181,12 +190,15 @@ def test_move_to_coordinates(
             minimum_z_height=42.0,
             force_direct=True,
         ),
-        times=1,
+        mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )
 
 
 def test_pick_up_tip(
-    decoy: Decoy, mock_engine_client: EngineClient, subject: InstrumentCore
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
 ) -> None:
     """It should pick up a tip from a well."""
     location = Location(point=Point(1, 2, 3), labware=None)
@@ -221,7 +233,7 @@ def test_pick_up_tip(
                 origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
             ),
         ),
-        times=1,
+        mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )
 
 
@@ -253,6 +265,7 @@ def test_drop_tip_no_location(
 def test_aspirate_from_well(
     decoy: Decoy,
     mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
     subject: InstrumentCore,
 ) -> None:
     """It should aspirate from a well."""
@@ -282,5 +295,79 @@ def test_aspirate_from_well(
             ),
             volume=12.34,
             flow_rate=7.8,
+        ),
+        mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
+    )
+
+
+def test_blow_out_to_well(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
+) -> None:
+    """It should aspirate from a well."""
+    location = Location(point=Point(1, 2, 3), labware=None)
+
+    well_core = WellCore(
+        name="my cool well", labware_id="123abc", engine_client=mock_engine_client
+    )
+
+    decoy.when(
+        mock_engine_client.state.geometry.get_relative_well_location(
+            labware_id="123abc", well_name="my cool well", absolute_point=Point(1, 2, 3)
         )
+    ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)))
+
+    subject.blow_out(location=location, well_core=well_core, move_to_well=True)
+
+    decoy.verify(
+        mock_engine_client.blow_out(
+            pipette_id="abc123",
+            labware_id="123abc",
+            well_name="my cool well",
+            well_location=WellLocation(
+                origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
+            ),
+            flow_rate=1.23,
+        ),
+        mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
+    )
+
+
+def test_dispense_to_well(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
+) -> None:
+    """It should dispense to a well."""
+    location = Location(point=Point(1, 2, 3), labware=None)
+
+    well_core = WellCore(
+        name="my cool well", labware_id="123abc", engine_client=mock_engine_client
+    )
+
+    decoy.when(
+        mock_engine_client.state.geometry.get_relative_well_location(
+            labware_id="123abc", well_name="my cool well", absolute_point=Point(1, 2, 3)
+        )
+    ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)))
+
+    subject.dispense(
+        location=location, well_core=well_core, volume=12.34, rate=5.6, flow_rate=6.0
+    )
+
+    decoy.verify(
+        mock_engine_client.dispense(
+            pipette_id="abc123",
+            labware_id="123abc",
+            well_name="my cool well",
+            well_location=WellLocation(
+                origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
+            ),
+            volume=12.34,
+            flow_rate=6.0,
+        ),
+        mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )

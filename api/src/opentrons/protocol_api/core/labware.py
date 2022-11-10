@@ -97,6 +97,11 @@ class AbstractLabware(DeckItem, ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
+    def is_fixed_trash(self) -> bool:
+        "Whether the labware is a fixed trash."
+        ...
+
+    @abstractmethod
     def get_tip_length(self) -> float:
         ...
 

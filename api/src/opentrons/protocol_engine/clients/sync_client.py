@@ -238,6 +238,7 @@ class SyncClient:
         well_name: str,
         well_location: WellLocation,
         volume: float,
+        flow_rate: float,
     ) -> commands.DispenseResult:
         """Execute a ``Dispense`` command and return the result."""
         request = commands.DispenseCreate(
@@ -247,9 +248,7 @@ class SyncClient:
                 wellName=well_name,
                 wellLocation=well_location,
                 volume=volume,
-                # TODO(jbl 2022-06-17) replace default with parameter from pipette_context
-                # https://github.com/Opentrons/opentrons/issues/10810
-                flowRate=2.0,
+                flowRate=flow_rate,
             )
         )
         result = self._transport.execute_command(request=request)
@@ -261,6 +260,7 @@ class SyncClient:
         labware_id: str,
         well_name: str,
         well_location: WellLocation,
+        flow_rate: float,
     ) -> commands.BlowOutResult:
         """Execute a ``BlowOut`` command and return the result."""
         request = commands.BlowOutCreate(
@@ -269,9 +269,7 @@ class SyncClient:
                 labwareId=labware_id,
                 wellName=well_name,
                 wellLocation=well_location,
-                # TODO(jbl 2022-06-17) replace default with parameter from pipette_context
-                # https://github.com/Opentrons/opentrons/issues/10810
-                flowRate=2.0,
+                flowRate=flow_rate,
             )
         )
         result = self._transport.execute_command(request=request)

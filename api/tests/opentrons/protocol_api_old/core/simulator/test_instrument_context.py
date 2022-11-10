@@ -39,8 +39,12 @@ def test_prepare_to_aspirate_no_tip(subject: InstrumentCore) -> None:
 
 def test_dispense_no_tip(subject: InstrumentCore) -> None:
     """It should raise an error if a tip is not attached."""
+    subject.home()
+    location = Location(point=Point(1, 2, 3), labware=None)
     with pytest.raises(NoTipAttachedError, match="Cannot perform DISPENSE"):
-        subject.dispense(volume=1, rate=1)
+        subject.dispense(
+            volume=1, rate=1, flow_rate=1, location=location, well_core=None
+        )
 
 
 def test_drop_tip_no_tip(subject: InstrumentCore, tip_rack: LabwareCore) -> None:
@@ -52,10 +56,14 @@ def test_drop_tip_no_tip(subject: InstrumentCore, tip_rack: LabwareCore) -> None
         subject.drop_tip(location=None, well_core=tip_core, home_after=False)
 
 
-def test_blow_out_no_tip(subject: InstrumentCore) -> None:
+def test_blow_out_no_tip(subject: InstrumentCore, labware: LabwareCore) -> None:
     """It should raise an error if a tip is not attached."""
     with pytest.raises(NoTipAttachedError, match="Cannot perform BLOWOUT"):
-        subject.blow_out()
+        subject.blow_out(
+            location=Location(point=Point(1, 2, 3), labware=None),
+            well_core=labware.get_wells()[0],
+            move_to_well=False,
+        )
 
 
 def test_pick_up_tip_no_tip(subject: InstrumentCore, tip_rack: LabwareCore) -> None:
@@ -101,7 +109,14 @@ def test_pick_up_tip_prep_after(
         rate=1,
         flow_rate=1,
     )
-    subject.dispense(1, rate=1)
+    subject.dispense(
+        volume=1,
+        rate=1,
+        flow_rate=1,
+        location=Location(point=Point(2, 2, 3), labware=None),
+        well_core=labware.get_wells()[1],
+    )
+
     subject.drop_tip(location=None, well_core=tip_core, home_after=True)
 
     # and again, without preparing for aspirate
@@ -119,7 +134,14 @@ def test_pick_up_tip_prep_after(
         rate=1,
         flow_rate=1,
     )
-    subject.dispense(1, rate=1)
+    subject.dispense(
+        volume=1,
+        rate=1,
+        flow_rate=1,
+        location=Location(point=Point(2, 2, 3), labware=None),
+        well_core=labware.get_wells()[1],
+    )
+
     subject.drop_tip(location=None, well_core=tip_core, home_after=True)
 
 
@@ -210,7 +232,13 @@ def _aspirate_dispense(i: InstrumentCore, labware: LabwareCore) -> None:
         rate=10,
         flow_rate=10,
     )
-    i.dispense(2, 2)
+    i.dispense(
+        volume=2,
+        rate=2,
+        flow_rate=2,
+        location=Location(point=Point(2, 2, 3), labware=None),
+        well_core=labware.get_wells()[1],
+    )
 
 
 def _aspirate_blowout(i: InstrumentCore, labware: LabwareCore) -> None:
@@ -223,7 +251,11 @@ def _aspirate_blowout(i: InstrumentCore, labware: LabwareCore) -> None:
         rate=13,
         flow_rate=13,
     )
-    i.blow_out()
+    i.blow_out(
+        location=Location(point=Point(1, 2, 3), labware=None),
+        well_core=labware.get_wells()[0],
+        move_to_well=False,
+    )
 
 
 @pytest.mark.parametrize(
