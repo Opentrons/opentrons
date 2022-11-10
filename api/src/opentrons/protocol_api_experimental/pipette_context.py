@@ -129,6 +129,7 @@ class PipetteContext:  # noqa: D101
                     offset=WellOffset(x=0, y=0, z=1),
                 ),
                 volume=volume,
+                flow_rate=rate,
             )
         else:
             # TODO: https://github.com/Opentrons/opentrons/issues/9509

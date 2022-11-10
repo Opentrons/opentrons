@@ -100,7 +100,15 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
         self._pipette_dict["ready_to_aspirate"] = True
         self._update_volume(new_volume)
 
-    def dispense(self, volume: float, rate: float) -> None:
+    def dispense(
+        self,
+        location: types.Location,
+        well_core: Optional[WellImplementation],
+        volume: float,
+        rate: float,
+        flow_rate: float,
+    ) -> None:
+        self.move_to(location=location, well_core=well_core)
         self._raise_if_no_tip(HardwareAction.DISPENSE.name)
         self._update_volume(self.get_current_volume() - volume)
 
@@ -299,6 +307,9 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
 
     def get_absolute_aspirate_flow_rate(self, rate: float) -> float:
         return self._flow_rate.aspirate * rate
+
+    def get_absolute_dispense_flow_rate(self, rate: float) -> float:
+        return self._flow_rate.dispense * rate
 
     def get_absolute_blow_out_flow_rate(self, rate: float) -> float:
         return self._flow_rate.blow_out * rate

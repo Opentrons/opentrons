@@ -62,6 +62,7 @@ def test_aspirate_not_implemented_errors(
         subject.aspirate(None, well, 1)
 
 
+@pytest.mark.xfail(strict=True, raises=NotImplementedError)
 def test_dispense(
     decoy: Decoy,
     engine_client: EngineClient,
@@ -71,7 +72,7 @@ def test_dispense(
     subject: PipetteContext,
 ) -> None:
     """It should send a dispense command."""
-    subject.dispense(volume=10, location=well)
+    subject.dispense(volume=10, location=well, rate=3.0)
 
     decoy.verify(
         engine_client.dispense(
@@ -83,6 +84,7 @@ def test_dispense(
                 offset=WellOffset(x=0, y=0, z=1),
             ),
             volume=10,
+            flow_rate=3.0,
         )
     )
 

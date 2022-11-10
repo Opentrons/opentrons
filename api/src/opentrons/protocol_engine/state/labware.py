@@ -493,6 +493,10 @@ class LabwareView(HasState[LabwareState]):
             "No labware loaded into fixed trash location by this deck type."
         )
 
+    def is_fixed_trash(self, labware_id: str) -> bool:
+        """Check if labware is fixed trash."""
+        return self.get_fixed_trash_id() == labware_id
+
     def raise_if_labware_in_location(
         self, location: Union[DeckSlotLocation, ModuleLocation]
     ) -> None:

@@ -71,8 +71,14 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
         rate: float,
         flow_rate: float,
     ) -> None:
-        """Aspirate a given volume of liquid from the specified location, using
-        this pipette."""
+        """Aspirate a given volume of liquid from the specified location.
+        Args:
+            volume: The volume of liquid to aspirate, in microliters.
+            location: The exact location to aspirate from.
+            well_core: The well to aspirate from, if applicable.
+            rate: The rate in µL/s to aspirate at.
+            flow_rate: Not used in this core.
+        """
         if self.get_current_volume() == 0:
             # Make sure we're at the top of the labware and clear of any
             # liquid to prepare the pipette for aspiration
@@ -96,9 +102,24 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
 
         self._protocol_interface.get_hardware().aspirate(self._mount, volume, rate)
 
-    def dispense(self, volume: float, rate: float) -> None:
-        """Dispense a volume of liquid (in microliters/uL) using this pipette
-        into the specified location."""
+    def dispense(
+        self,
+        location: types.Location,
+        well_core: Optional[WellImplementation],
+        volume: float,
+        rate: float,
+        flow_rate: float,
+    ) -> None:
+        """Dispense a given volume of liquid into the specified location.
+        Args:
+            volume: The volume of liquid to dispense, in microliters.
+            location: The exact location to dispense to.
+            well_core: The well to dispense to, if applicable.
+            rate: The rate in µL/s to dispense at.
+            flow_rate: Not used in this core.
+        """
+        self.move_to(location=location)
+
         self._protocol_interface.get_hardware().dispense(self._mount, volume, rate)
 
     def blow_out(
@@ -395,6 +416,9 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
 
     def get_absolute_aspirate_flow_rate(self, rate: float) -> float:
         return self._flow_rates.aspirate * rate
+
+    def get_absolute_dispense_flow_rate(self, rate: float) -> float:
+        return self._flow_rates.dispense * rate
 
     def get_absolute_blow_out_flow_rate(self, rate: float) -> float:
         return self._flow_rates.blow_out * rate

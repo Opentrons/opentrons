@@ -30,10 +30,33 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         rate: float,
         flow_rate: float,
     ) -> None:
+        """Aspirate a given volume of liquid from the specified location.
+        Args:
+            volume: The volume of liquid to aspirate, in microliters.
+            location: The exact location to aspirate from.
+            well_core: The well to aspirate from, if applicable.
+            rate: The rate for how quickly to aspirate.
+            flow_rate: The flow rate in µL/s to aspirate at.
+        """
         ...
 
     @abstractmethod
-    def dispense(self, volume: float, rate: float) -> None:
+    def dispense(
+        self,
+        location: types.Location,
+        well_core: Optional[WellCoreType],
+        volume: float,
+        rate: float,
+        flow_rate: float,
+    ) -> None:
+        """Dispense a given volume of liquid into the specified location.
+        Args:
+            volume: The volume of liquid to dispense, in microliters.
+            location: The exact location to dispense to.
+            well_core: The well to dispense to, if applicable.
+            rate: The rate for how quickly to dispense.
+            flow_rate: The flow rate in µL/s to dispense at.
+        """
         ...
 
     @abstractmethod
@@ -184,10 +207,13 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
-    def get_absolute_blow_out_flow_rate(self, rate: float) -> float:
+    def get_absolute_dispense_flow_rate(self, rate: float) -> float:
         ...
 
     @abstractmethod
+    def get_absolute_blow_out_flow_rate(self, rate: float) -> float:
+        ...
+
     def set_flow_rate(
         self,
         aspirate: Optional[float] = None,
