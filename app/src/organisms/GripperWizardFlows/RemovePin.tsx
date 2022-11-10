@@ -5,15 +5,15 @@ import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import type { GripperWizardStepProps } from './types'
 
-interface DetachProbeProps extends GripperWizardStepProps {
+interface RemovePinProps extends GripperWizardStepProps {
   handleCleanUp: () => void
 }
 
-export const DetachProbe = (props: DetachProbeProps): JSX.Element => {
+export const RemovePin = (props: RemovePinProps): JSX.Element => {
   const { isRobotMoving, goBack, handleCleanUp } = props
-  const { t } = useTranslation('gripper_wizard_flows')
+  const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
 
-  if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
+  if (isRobotMoving) return <InProgressModal description={t('stand_back_robot_is_in_motion')} />
   return (
     <GenericWizardTile
       header={t('remove_cal_probe')}

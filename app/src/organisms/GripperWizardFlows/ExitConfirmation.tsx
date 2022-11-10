@@ -7,7 +7,7 @@ import {
 } from '@opentrons/components'
 import { AlertPrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { FLOWS } from './constants'
+import { GRIPPER_FLOW_TYPES } from './constants'
 import type { GripperWizardFlowType } from './types'
 
 interface ExitConfirmationProps {
@@ -18,15 +18,15 @@ interface ExitConfirmationProps {
 
 export function ExitConfirmation(props: ExitConfirmationProps): JSX.Element {
   const { goBack, proceed, flowType } = props
-  const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
+  const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
 
-  let flowTitle: string = t('pipette_calibration')
+  let flowTitle: string = t('gripper_calibration')
   switch (flowType) {
-    case FLOWS.ATTACH: {
+    case GRIPPER_FLOW_TYPES.ATTACH: {
       flowTitle = t('attach')
       break
     }
-    case FLOWS.DETACH: {
+    case GRIPPER_FLOW_TYPES.DETACH: {
       flowTitle = t('detach')
       break
     }

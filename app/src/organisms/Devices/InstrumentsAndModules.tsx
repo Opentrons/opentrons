@@ -22,6 +22,7 @@ import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ModuleCard } from '../ModuleCard'
 import { useIsOT3, useIsRobotViewable, useRunStatuses } from './hooks'
 import { PipetteCard } from './PipetteCard'
+import { GripperCard } from '../GripperCard'
 
 const EQUIPMENT_POLL_MS = 5000
 interface InstrumentsAndModulesProps {
@@ -40,6 +41,8 @@ export function InstrumentsAndModules({
   const currentRunId = useCurrentRunId()
   const { isRunTerminal } = useRunStatuses()
   const isOT3 = useIsOT3(robotName)
+
+  const [tempAttachedGripper, tempSetAttachedGripper] = React.useState<{ model: string, serialNumber: string } | null>(null)
 
   const attachedModules =
     useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
@@ -107,28 +110,13 @@ export function InstrumentsAndModules({
                 robotName={robotName}
               />
               {/* extension mount here */}
-              {isOT3 ? (
-                <InstrumentCard
-                  description={
-                    gripper.model != null ? gripper.model : t('shared:empty')
-                  }
-                  isGripperAttached={gripper.model != null}
-                  label={t('shared:extension_mount')}
-                  // TODO(bh, 2022-10-27): insert gripper recalibrate and detach functions, empty mount menu items
-                  menuOverlayItems={[
-                    {
-                      label: 'Recalibrate gripper',
-                      disabled: gripper.model == null,
-                      onClick: () => console.log('Recalibrate gripper'),
-                    },
-                    {
-                      label: 'Detach gripper',
-                      disabled: gripper.model == null,
-                      onClick: () => console.log('Detach gripper'),
-                    },
-                  ]}
+              {isOT3
+                ? <GripperCard
+                  robotName={robotName}
+                  attachedGripper={tempAttachedGripper}
+                  tempSetAttachedGripper={tempSetAttachedGripper}
                 />
-              ) : null}
+                : null}
               {leftColumnModules.map((module, index) => (
                 <ModuleCard
                   key={`moduleCard_${module.moduleType}_${index}`}
@@ -148,7 +136,7 @@ export function InstrumentsAndModules({
                 pipetteInfo={
                   attachedPipettes.right?.model != null
                     ? getPipetteModelSpecs(attachedPipettes.right?.model) ??
-                      null
+                    null
                     : null
                 }
                 mount={RIGHT}

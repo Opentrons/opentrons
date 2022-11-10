@@ -11,37 +11,39 @@ import { Portal } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { useChainRunCommands } from '../../resources/runs/hooks'
 import { getGripperWizardSteps } from './getGripperWizardSteps'
-import { FLOWS, SECTIONS } from './constants'
+import { GRIPPER_FLOW_TYPES, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
-import { AttachProbe } from './AttachProbe'
-import { DetachProbe } from './DetachProbe'
+import { InsertPin } from './InsertPin'
+import { RemovePin } from './RemovePin'
+import { MountGripper } from './MountGripper'
+import { UnmountGripper } from './UnmountGripper'
 import { Results } from './Results'
 import { ExitConfirmation } from './ExitConfirmation'
 
 import type { GripperWizardFlowType } from './types'
 
-interface GripperWizardFlowTypesProps {
+interface GripperWizardFlowsProps {
   flowType: GripperWizardFlowType
   robotName: string
   closeFlow: () => void
 }
 
-export const GripperWizardFlowTypes = (
-  props: GripperWizardFlowTypesProps
+export const GripperWizardFlows = (
+  props: GripperWizardFlowsProps
 ): JSX.Element | null => {
   const { flowType, closeFlow, robotName } = props
-  const { t } = useTranslation('pipette_wizard_flows')
+  const { t } = useTranslation('gripper_wizard_flows')
   const attachedGripper = {}
-  const GripperWizardSteps = getGripperWizardSteps(flowType)
+  const gripperWizardSteps = getGripperWizardSteps(flowType)
   const host = useHost()
   const [runId, setRunId] = React.useState<string>('')
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
-  const totalStepCount = GripperWizardSteps.length - 1
-  const currentStep = GripperWizardSteps?.[currentStepIndex]
+  const totalStepCount = gripperWizardSteps.length - 1
+  const currentStep = gripperWizardSteps?.[currentStepIndex]
 
   const goBack = (): void => {
     setCurrentStepIndex(
-      currentStepIndex !== GripperWizardSteps.length - 1
+      currentStepIndex !== gripperWizardSteps.length - 1
         ? currentStepIndex - 1
         : currentStepIndex
     )
@@ -60,7 +62,7 @@ export const GripperWizardFlowTypes = (
   )
   const { stopRun, isLoading: isStopLoading } = useStopRunMutation({
     onSuccess: () => {
-      if (currentStep.section === SECTIONS.DETACH_PROBE) {
+      if (currentStep.section === SECTIONS.REMOVE_PIN) {
         proceed()
       } else {
         closeFlow()
@@ -83,7 +85,7 @@ export const GripperWizardFlowTypes = (
       )
     ) {
       setCurrentStepIndex(
-        currentStepIndex !== GripperWizardSteps.length - 1
+        currentStepIndex !== gripperWizardSteps.length - 1
           ? currentStepIndex + 1
           : currentStepIndex
       )
@@ -150,22 +152,38 @@ export const GripperWizardFlowTypes = (
         isCreateLoading={isCreateLoading}
       />
     )
-  } else if (currentStep.section === SECTIONS.ATTACH_PROBE) {
+  } else if (currentStep.section === SECTIONS.INSERT_PIN) {
     onExit = confirmExit
     modalContent = modalContent = (
-      <AttachProbe
+      <InsertPin
         {...currentStep}
         {...calibrateBaseProps}
         isExiting={isExiting}
       />
     )
-  } else if (currentStep.section === SECTIONS.DETACH_PROBE) {
+  } else if (currentStep.section === SECTIONS.REMOVE_PIN) {
     onExit = confirmExit
     modalContent = modalContent = (
-      <DetachProbe
+      <RemovePin
         {...currentStep}
         {...calibrateBaseProps}
         handleCleanUp={handleCleanUpAndClose}
+      />
+    )
+  } else if (currentStep.section === SECTIONS.MOUNT_GRIPPER) {
+    onExit = confirmExit
+    modalContent = modalContent = (
+      <MountGripper
+        {...currentStep}
+        {...calibrateBaseProps}
+      />
+    )
+  } else if (currentStep.section === SECTIONS.UNMOUNT_GRIPPER) {
+    onExit = confirmExit
+    modalContent = modalContent = (
+      <UnmountGripper
+        {...currentStep}
+        {...calibrateBaseProps}
       />
     )
   } else if (currentStep.section === SECTIONS.RESULTS) {
@@ -176,9 +194,9 @@ export const GripperWizardFlowTypes = (
   }
 
   const titleByFlowType: {[flowType in GripperWizardFlowType]: string} = {
-    [FLOWS.CALIBRATE]: t('calibrate_a_gripper'),
-    [FLOWS.ATTACH]: t('attach_a_gripper'),
-    [FLOWS.DETACH]: t('detach_a_gripper')
+    [GRIPPER_FLOW_TYPES.RECALIBRATE]: t('calibrate_a_gripper'),
+    [GRIPPER_FLOW_TYPES.ATTACH]: t('attach_a_gripper'),
+    [GRIPPER_FLOW_TYPES.DETACH]: t('detach_a_gripper')
   }
   const wizardTitle = titleByFlowType[flowType] ?? 'unknown page'
   let handleExit = onExit
@@ -191,7 +209,7 @@ export const GripperWizardFlowTypes = (
   return (
     <Portal level="top">
       <ModalShell
-        width="47rem"
+        width="48rem"
         header={
           <WizardHeader
             title={wizardTitle}

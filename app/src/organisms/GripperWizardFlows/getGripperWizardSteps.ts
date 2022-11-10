@@ -1,41 +1,31 @@
-import { FLOWS, SECTIONS } from './constants'
+import { GRIPPER_FLOW_TYPES, SECTIONS } from './constants'
 import type { GripperWizardStep, GripperWizardFlowType } from './types'
 
 export const getGripperWizardSteps = (
   flowType: GripperWizardFlowType,
 ): GripperWizardStep[] => {
   switch (flowType) {
-    case FLOWS.CALIBRATE: {
+    case GRIPPER_FLOW_TYPES.RECALIBRATE: {
       return [
-        {
-          section: SECTIONS.BEFORE_BEGINNING,
-          flowType: flowType,
-        },
-        { section: SECTIONS.ATTACH_PROBE, flowType: flowType },
-        { section: SECTIONS.DETACH_PROBE, flowType: flowType },
-        { section: SECTIONS.RESULTS, flowType: flowType },
+        { section: SECTIONS.BEFORE_BEGINNING },
+        { section: SECTIONS.INSERT_PIN },
+        { section: SECTIONS.REMOVE_PIN },
+        { section: SECTIONS.RESULTS },
       ]
     }
-    case FLOWS.ATTACH: {
+    case GRIPPER_FLOW_TYPES.ATTACH: {
       return [
-        {
-          section: SECTIONS.BEFORE_BEGINNING,
-
-          flowType: flowType,
-        },
-        { section: SECTIONS.MOUNT_GRIPPER, flowType: flowType },
-        { section: SECTIONS.RESULTS, flowType: flowType },
+        { section: SECTIONS.BEFORE_BEGINNING },
+        { section: SECTIONS.MOUNT_GRIPPER },
+        { section: SECTIONS.SUCCESSFULLY_ATTACHED },
+        { section: SECTIONS.RESULTS },
       ]
     }
-    case FLOWS.DETACH: {
+    case GRIPPER_FLOW_TYPES.DETACH: {
       return [
-        {
-          section: SECTIONS.BEFORE_BEGINNING,
-
-          flowType: flowType,
-        },
-        { section: SECTIONS.DETACH_GRIPPER, flowType: flowType },
-        { section: SECTIONS.RESULTS, flowType: flowType },
+        { section: SECTIONS.BEFORE_BEGINNING },
+        { section: SECTIONS.UNMOUNT_GRIPPER },
+        { section: SECTIONS.RESULTS },
       ]
     }
   }

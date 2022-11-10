@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { COLORS, TEXT_TRANSFORM_CAPITALIZE } from '@opentrons/components'
 import { PrimaryButton } from '../../atoms/buttons'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { FLOWS } from './constants'
+import { GRIPPER_FLOW_TYPES } from './constants'
 import type { GripperWizardFlowType, GripperWizardStepProps } from './types'
 
 export const Results = (props: GripperWizardStepProps): JSX.Element => {
@@ -11,9 +11,9 @@ export const Results = (props: GripperWizardStepProps): JSX.Element => {
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
 
   const headerByFlowType: {[flowType in GripperWizardFlowType]: string} = {
-    [FLOWS.CALIBRATE]: t('gripper_successfully_calibrated'),
-    [FLOWS.ATTACH]: t('gripper_successfully_attached'),
-    [FLOWS.DETACH]: t('gripper_successfully_detached')
+    [GRIPPER_FLOW_TYPES.RECALIBRATE]: t('gripper_successfully_calibrated'),
+    [GRIPPER_FLOW_TYPES.ATTACH]: t('gripper_successfully_attached'),
+    [GRIPPER_FLOW_TYPES.DETACH]: t('gripper_successfully_detached')
   }
 
   return (

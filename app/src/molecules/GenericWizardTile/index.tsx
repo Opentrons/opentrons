@@ -61,18 +61,12 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
   }
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} height="24.6rem">
-      <Flex
-        flexDirection={DIRECTION_ROW}
-        paddingX={SPACING.spacing6}
-        paddingTop={SPACING.spacing6}
-        marginBottom={SPACING.spacing7}
-        gridGap={SPACING.spacingXXL}
-      >
+    <Flex flexDirection={DIRECTION_COLUMN} height="24.625rem" padding={SPACING.spacing6}>
+      <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacingXXL}>
         <Flex
           flexDirection={DIRECTION_COLUMN}
           flex="1"
-          gridGap={SPACING.spacing4}
+          gridGap={SPACING.spacing3}
         >
           <StyledText as="h1">{header}</StyledText>
           {bodyText}
@@ -81,8 +75,6 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
       </Flex>
       <Flex
         justifyContent={buttonPositioning}
-        marginBottom={SPACING.spacing6}
-        marginX={SPACING.spacing6}
         alignItems={ALIGN_FLEX_END}
         flex="1"
       >

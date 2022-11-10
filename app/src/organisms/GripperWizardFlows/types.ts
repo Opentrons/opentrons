@@ -1,48 +1,40 @@
-import { SECTIONS, FLOWS } from './constants'
+import { SECTIONS, GRIPPER_FLOW_TYPES } from './constants'
 import { useCreateCommandMutation } from '@opentrons/react-api-client'
-import { PipetteMount } from '@opentrons/shared-data'
 import type { CreateCommand } from '@opentrons/shared-data'
 
 export type GripperWizardStep =
   | BeforeBeginningStep
-  | DetachProbeStep
-  | AttachProbeStep
+  | RemovePinStep
+  | InsertPinStep
   | ResultsStep
   | MountGripperStep
-  | DetachGripperStep
+  | UnmountGripperStep
 
 export type GripperWizardFlowType =
-  | typeof FLOWS.ATTACH
-  | typeof FLOWS.DETACH
-  | typeof FLOWS.CALIBRATE
+  | typeof GRIPPER_FLOW_TYPES.ATTACH
+  | typeof GRIPPER_FLOW_TYPES.DETACH
+  | typeof GRIPPER_FLOW_TYPES.RECALIBRATE
 
 export interface BaseStep {
   flowType: GripperWizardFlowType
 }
 export interface BeforeBeginningStep extends BaseStep {
   section: typeof SECTIONS.BEFORE_BEGINNING
-  flowType: GripperWizardFlowType
 }
-
-export interface DetachProbeStep extends BaseStep {
-  section: typeof SECTIONS.DETACH_PROBE
-  flowType: GripperWizardFlowType
+export interface RemovePinStep extends BaseStep {
+  section: typeof SECTIONS.REMOVE_PIN
 }
-
-export interface AttachProbeStep extends BaseStep {
-  section: typeof SECTIONS.ATTACH_PROBE
-  flowType: GripperWizardFlowType
+export interface InsertPinStep extends BaseStep {
+  section: typeof SECTIONS.INSERT_PIN
 }
-
 export interface ResultsStep extends BaseStep {
   section: typeof SECTIONS.RESULTS
-  flowType: GripperWizardFlowType
 }
 export interface MountGripperStep extends BaseStep {
   section: typeof SECTIONS.MOUNT_GRIPPER
 }
-export interface DetachGripperStep extends BaseStep {
-  section: typeof SECTIONS.DETACH_GRIPPER
+export interface UnmountGripperStep extends BaseStep {
+  section: typeof SECTIONS.UNMOUNT_GRIPPER
 }
 
 type CreateCommandMutate = ReturnType<

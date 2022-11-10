@@ -5,11 +5,11 @@ import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import type { GripperWizardStepProps } from './types'
 
-interface AttachProbeProps extends GripperWizardStepProps {
+interface InsertPinProps extends GripperWizardStepProps {
   isExiting: boolean
 }
 
-export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
+export const InsertPin = (props: InsertPinProps): JSX.Element | null => {
   const {
     proceed,
     attachedGripper,
@@ -23,29 +23,30 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   if (attachedGripper == null) return null
   const handleOnClick = (): void => {
     setIsBetweenCommands(true)
-    chainRunCommands([
-      {
-        // @ts-expect-error calibration type not yet supported
-        commandType: 'calibration/calibrateGripper' as const,
-        params: { },
-      },
-      {
-        commandType: 'home' as const,
-        params: {
-          axes: [], // TODO: use gripper motor axis const here
-        },
-      },
-      {
-        // @ts-expect-error calibration type not yet supported
-        commandType: 'calibration/moveToLocation' as const,
-        params: {
-          location: 'attachOrDetach',
-        },
-      },
-    ]).then(() => {
-      setIsBetweenCommands(false)
-      proceed()
-    })
+    // chainRunCommands([
+    //   {
+    //     // @ts-expect-error calibration type not yet supported
+    //     commandType: 'calibration/calibrateGripper' as const,
+    //     params: { },
+    //   },
+    //   {
+    //     commandType: 'home' as const,
+    //     params: {
+    //       axes: [], // TODO: use gripper motor axis const here
+    //     },
+    //   },
+    //   {
+    //     // @ts-expect-error calibration type not yet supported
+    //     commandType: 'calibration/moveToLocation' as const,
+    //     params: {
+    //       location: 'attachOrDetach',
+    //     },
+    //   },
+    // ]).then(() => {
+    //   setIsBetweenCommands(false)
+    //   proceed()
+    // })
+    proceed()
   }
 
   if (isRobotMoving)

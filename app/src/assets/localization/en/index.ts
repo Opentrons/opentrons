@@ -5,6 +5,7 @@ import commands_run_log from './commands_run_log.json'
 import device_details from './device_details.json'
 import device_settings from './device_settings.json'
 import devices_landing from './devices_landing.json'
+import gripper_wizard_flows from './gripper_wizard_flows.json'
 import heater_shaker from './heater_shaker.json'
 import labware_details from './labware_details.json'
 import labware_landing from './labware_landing.json'
@@ -33,6 +34,7 @@ export const en = {
   device_details,
   device_settings,
   devices_landing,
+  gripper_wizard_flows,
   heater_shaker,
   labware_details,
   labware_landing,
