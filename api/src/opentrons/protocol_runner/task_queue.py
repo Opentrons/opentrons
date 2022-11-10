@@ -66,12 +66,17 @@ class TaskQueue:
 
     async def _run(self) -> None:
         error = None
-
+        print("entered _run")
         try:
             if self._run_func is not None:
+                print(f"before running {self._run_func().__qualname__}")
                 await self._run_func()
+                print(f"after running {self._run_func().__qualname__}")
         except Exception as e:
+            print(f"exception running function {e}")
             log.info("Exception raised during protocol run", exc_info=e)
             error = e
-
+        print("before cleanup")
         await self._cleanup_func(error=error)
+        print("after cleanup")
+

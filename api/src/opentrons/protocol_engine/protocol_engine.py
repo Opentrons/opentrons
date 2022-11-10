@@ -232,6 +232,7 @@ class ProtocolEngine:
                 If `False`, will set status to `stopped`.
         """
         if error:
+            print("error in finish action")
             error_details: Optional[FinishErrorDetails] = FinishErrorDetails(
                 error_id=self._model_utils.generate_id(),
                 created_at=self._model_utils.get_timestamp(),
@@ -241,9 +242,11 @@ class ProtocolEngine:
         else:
             error_details = None
 
+        print("before dispatching finish action")
         self._action_dispatcher.dispatch(
             FinishAction(error_details=error_details, set_run_status=set_run_status)
         )
+        print("after dispatching finish action")
 
         try:
             print("finish action - queue worker join before")
