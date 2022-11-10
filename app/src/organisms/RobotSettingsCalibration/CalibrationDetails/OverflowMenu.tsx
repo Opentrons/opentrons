@@ -149,7 +149,7 @@ export function OverflowMenu({
     e.preventDefault()
     if (!isRunning) {
       if (calType === 'pipetteOffset' && pipetteName != null) {
-        if (isGen3Pipette) {
+        if (Boolean(isGen3Pipette)) {
           setShowPipetteWizardFlows(true)
         } else {
           if (applicablePipetteOffsetCal != null) {
@@ -267,7 +267,7 @@ export function OverflowMenu({
                 : t('recalibrate_tip_and_pipette')}
             </MenuItem>
           )}
-          {!isGen3Pipette ? (
+          {!Boolean(isGen3Pipette) ? (
             <MenuItem onClick={e => handleDownload(calType, e)}>
               {t('download_calibration_data')}
             </MenuItem>
