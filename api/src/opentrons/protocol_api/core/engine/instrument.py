@@ -67,22 +67,15 @@ class InstrumentCore(AbstractInstrument[WellCore]):
     ) -> None:
         """Aspirate a given volume of liquid from the specified location.
 
-        :param volume: The volume of liquid to aspirate, in microliters.
-        :type volume: int or float
-
-        :param location: Where to aspirate from. The
-                         robot will aspirate from the exact specified location.
-
-        :param well_core: Protocol engine based well core implementation.
-        :type well_core: optional WellCore
-
-        :param rate: Not used in engine based aspirate.
-                        Part of the abstract class for legacy purposes.
-        :type rate: float
-
-        :param flow_rate: The absolute aspirate flow rate. calculated by:
-                        `rate` * :py:attr:`default_flow_rate.aspirate`.
-        :type rate: float
+        Args:
+            volume (float): The volume of liquid to aspirate, in microliters.
+            location (:obj: `Location`): Where to aspirate from. The
+                robot will aspirate from the exact specified location.
+            well_core (:obj: `WellCore`, optional): Protocol engine based well core implementation.
+            rate (float): Not used in engine based dispense.
+                Part of the abstract class for legacy purposes.
+            flow_rate (float): The absolute aspirate flow rate.
+                `rate` * :py:attr:`default_flow_rate.aspirate`.
         """
         if well_core is None:
             raise NotImplementedError(
@@ -118,21 +111,15 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         """Dispense a volume of liquid (in microliters/uL) using this pipette
         into the specified location.
 
-        :param volume: The volume of liquid to dispense, in microliters.
-        :type volume: int or float
-
-        :param location: Where to dispense into. The
-                         robot will dispense into the exact specified location.
-
-        :param well_core: Protocol engine based well core implementation.
-        :type well_core: optional WellCore
-
-        :param rate: Not used in engine based dispense.
-                        Part of the abstract class for legacy purposes.
-
-        :param flow_rate: The absolute dispense flow rate.
-                        `rate` * :py:attr:`default_flow_rate.dispense`.
-        :type rate: float
+        Args:
+            volume (float): The volume of liquid to dispense, in microliters.
+            location (:obj: `Location`): Where to dispense into. The
+                robot will dispense into the exact specified location.
+            well_core (:obj: `WellCore`, optional): Protocol engine based well core implementation.
+            rate (float): Not used in engine based dispense.
+                Part of the abstract class for legacy purposes.
+            flow_rate (float): The absolute dispense flow rate.
+                `rate` * :py:attr:`default_flow_rate.dispense`.
         """
         if well_core is None:
             raise NotImplementedError(
