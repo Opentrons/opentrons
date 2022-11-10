@@ -7,18 +7,23 @@ _firstpath := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
 _possibilities := $(realpath $(_firstpath)/..) $(realpath $(_firstpath)/../..) $(realpath $(_firstpath)/../../..) $(_firstpath)
 monorepo_root := $(firstword $(filter %/opentrons, $(_possibilities)))
 
-ifeq ($(monorepo_root),)
-	monorepo_root := $(firstword $(filter %\opentrons, $(_possibilities)))
-	monorepo_root := $(shell cygpath -m $(monorepo_root))
-endif
-
-ifeq ($(OS),Windows_NT)
-	ifneq ($(OT_PYTHON),python)
-		ifneq ($(suffix $(OT_PYTHON)),.exe)
-			OT_PYTHON := $(OT_PYTHON).exe
+ifeq ($(CI),true)
+	ifeq ($(monorepo_root),)
+		monorepo_root := $(firstword $(filter %\opentrons, $(_possibilities)))
+		monorepo_root := $(shell cygpath -m $(monorepo_root))
+	endif
+	ifeq ($(OS),Windows_NT)
+		ifneq ($(OT_PYTHON),python)
+			ifneq ($(suffix $(OT_PYTHON)),.exe)
+				OT_PYTHON := $(OT_PYTHON).exe
+			endif
+			OT_PYTHON := $(shell cygpath -m $(OT_PYTHON))
 		endif
 	endif
 endif
+
+
+
 
 $(info _possibilities $(_possibilities))
 $(info _firstpath $(_firstpath))
