@@ -65,6 +65,24 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         rate: float,
         flow_rate: float,
     ) -> None:
+        """Aspirate a given volume of liquid from the specified location.
+
+        :param volume: The volume of liquid to aspirate, in microliters.
+        :type volume: int or float
+
+        :param location: Where to aspirate from. The
+                         robot will aspirate from the exact specified location.
+
+        :param well_core: Protocol engine based well core implementation.
+        :type well_core: optional WellCore
+
+        :param rate: A relative modifier for how quickly to aspirate liquid.
+        :type rate: float
+
+        :param flow_rate: The absolute aspirate flow rate.
+                        `rate` * :py:attr:`default_flow_rate.aspirate`.
+        :type rate: float
+        """
         if well_core is None:
             raise NotImplementedError(
                 "InstrumentCore.aspirate with well_core value of None not implemented"
@@ -96,6 +114,25 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         rate: float,
         flow_rate: float,
     ) -> None:
+        """Dispense a volume of liquid (in microliters/uL) using this pipette
+        into the specified location.
+
+        :param volume: The volume of liquid to dispense, in microliters.
+        :type volume: int or float
+
+        :param location: Where to dispense into. The
+                         robot will dispense into the exact specified location.
+
+        :param well_core: Protocol engine based well core implementation.
+        :type well_core: optional WellCore
+
+        :param rate: A relative modifier for how quickly to dispense liquid.
+        :type rate: float
+
+        :param flow_rate: The absolute dispense flow rate.
+                        `rate` * :py:attr:`default_flow_rate.dispense`.
+        :type rate: float
+        """
         if well_core is None:
             raise NotImplementedError(
                 "InstrumentCore.dispense with well_core value of None not implemented"
