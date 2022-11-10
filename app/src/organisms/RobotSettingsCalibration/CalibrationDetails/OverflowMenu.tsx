@@ -39,8 +39,7 @@ import { FLOWS } from '../../PipetteWizardFlows/constants'
 import { useCalibratePipetteOffset } from '../../CalibratePipetteOffset/useCalibratePipetteOffset'
 import { DeckCalibrationConfirmModal } from '../DeckCalibrationConfirmModal'
 
-import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
-import type { PipetteWizardFlow } from '../../PipetteWizardFlows/types'
+import type { PipetteName } from '@opentrons/shared-data'
 
 const CAL_BLOCK_MODAL_CLOSED: 'cal_block_modal_closed' =
   'cal_block_modal_closed'
@@ -97,9 +96,10 @@ export function OverflowMenu({
     setCalBlockModalState,
   ] = React.useState<CalBlockModalState>(CAL_BLOCK_MODAL_CLOSED)
   const { isRunRunning: isRunning } = useRunStatuses()
-  const [showPipetteWizardFlows, setShowPipetteWizardFlows] = React.useState(
-    false
-  )
+  const [
+    showPipetteWizardFlows,
+    setShowPipetteWizardFlows,
+  ] = React.useState<boolean>(false)
   const isGen3Pipette = isOT3Pipette(pipetteName as PipetteName)
   interface StartWizardOptions {
     keepTipLength: boolean
@@ -236,8 +236,8 @@ export function OverflowMenu({
       )}
       {showPipetteWizardFlows ? (
         <PipetteWizardFlows
-          flowType={FLOWS.CALIBRATE as PipetteWizardFlow}
-          mount={mount as PipetteMount}
+          flowType={FLOWS.CALIBRATE}
+          mount={mount}
           closeFlow={() => setShowPipetteWizardFlows(false)}
           robotName={robotName}
         />
