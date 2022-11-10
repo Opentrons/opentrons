@@ -76,10 +76,11 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         :param well_core: Protocol engine based well core implementation.
         :type well_core: optional WellCore
 
-        :param rate: A relative modifier for how quickly to aspirate liquid.
+        :param rate: Not used in engine based aspirate.
+                        Part of the abstract class for legacy purposes.
         :type rate: float
 
-        :param flow_rate: The absolute aspirate flow rate.
+        :param flow_rate: The absolute aspirate flow rate. calculated by:
                         `rate` * :py:attr:`default_flow_rate.aspirate`.
         :type rate: float
         """
@@ -126,8 +127,8 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         :param well_core: Protocol engine based well core implementation.
         :type well_core: optional WellCore
 
-        :param rate: A relative modifier for how quickly to dispense liquid.
-        :type rate: float
+        :param rate: Not used in engine based dispense.
+                        Part of the abstract class for legacy purposes.
 
         :param flow_rate: The absolute dispense flow rate.
                         `rate` * :py:attr:`default_flow_rate.dispense`.
