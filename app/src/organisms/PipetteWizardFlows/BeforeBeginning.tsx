@@ -29,12 +29,10 @@ export const BeforeBeginning = (
     isCreateLoading,
     mount,
     isRobotMoving,
-    setIsBetweenCommands,
+    errorMessage,
+    setShowErrorMessage,
   } = props
   const { t } = useTranslation('pipette_wizard_flows')
-  const [errorMessage, setShowErrorMessage] = React.useState<null | string>(
-    null
-  )
   //  TODO(jr, 10/26/22): when we wire up other flows, const will turn into let
   //  for proceedButtonText and rightHandBody
   React.useEffect(() => {
@@ -44,7 +42,6 @@ export const BeforeBeginning = (
   const pipetteId = attachedPipette[mount]?.id
   if (pipetteId == null) return null
   const handleOnClick = (): void => {
-    setIsBetweenCommands(true)
     chainRunCommands(
       [
         // {
@@ -72,11 +69,9 @@ export const BeforeBeginning = (
       false
     )
       .then(() => {
-        setIsBetweenCommands(false)
         proceed()
       })
       .catch(error => {
-        console.log(error)
         setShowErrorMessage(error.message)
       })
   }
@@ -94,8 +89,7 @@ export const BeforeBeginning = (
     }
     //  TODO(jr, 10/26/22): wire up the other flows
   }
-  if (isRobotMoving && errorMessage == null)
-    return <InProgressModal description={t('stand_back')} />
+  if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
 
   return errorMessage != null ? (
     <SimpleWizardBody

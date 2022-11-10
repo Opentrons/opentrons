@@ -64,11 +64,15 @@ export interface PipetteWizardStepProps {
   mount: PipetteMount
   proceed: () => void
   goBack: () => void
-  chainRunCommands: (commands: CreateCommand[]) => Promise<unknown>
+  chainRunCommands: (
+    commands: CreateCommand[],
+    continuePastCommandFailure: boolean
+  ) => Promise<unknown>
   isRobotMoving: boolean
   runId: string
   attachedPipette: AttachedPipettesByMount
-  setIsBetweenCommands: React.Dispatch<React.SetStateAction<boolean>>
+  setShowErrorMessage: React.Dispatch<React.SetStateAction<string | null>>
+  errorMessage: string | null
 }
 
 export type SelectablePipettes = '96-Channel' | 'Single-Channel_and_8-Channel'
