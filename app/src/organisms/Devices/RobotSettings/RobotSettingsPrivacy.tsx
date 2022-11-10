@@ -2,14 +2,12 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
-import {
-  getRobotSettings,
-  fetchSettings,
-} from '../../../redux/robot-settings'
+import { getRobotSettings, fetchSettings } from '../../../redux/robot-settings'
 
 import type { State, Dispatch } from '../../../redux/types'
 import type {
-  RobotSettings, RobotSettingsField,
+  RobotSettings,
+  RobotSettingsField,
 } from '../../../redux/robot-settings/types'
 import { SettingToggle } from './SettingToggle'
 
@@ -19,12 +17,18 @@ interface RobotSettingsPrivacyProps {
 
 const PRIVACY_SETTINGS = ['disableLogAggregation']
 
-const INFO_BY_SETTING_ID: { [id: RobotSettingsField['id']]: { titleKey: string, descriptionKey: string, invert: boolean } } = {
+const INFO_BY_SETTING_ID: {
+  [id: RobotSettingsField['id']]: {
+    titleKey: string
+    descriptionKey: string
+    invert: boolean
+  }
+} = {
   disableLogAggregation: {
     titleKey: 'share_logs_with_opentrons',
     descriptionKey: 'share_logs_with_opentrons_description',
-    invert: true
-  }
+    invert: true,
+  },
 }
 
 export function RobotSettingsPrivacy({
@@ -34,18 +38,21 @@ export function RobotSettingsPrivacy({
   const settings = useSelector<State, RobotSettings>((state: State) =>
     getRobotSettings(state, robotName)
   )
-  const privacySettings = settings.filter(
-    ({ id }) => PRIVACY_SETTINGS.includes(id)
+  const privacySettings = settings.filter(({ id }) =>
+    PRIVACY_SETTINGS.includes(id)
   )
-  const translatedPrivacySettings: Array<RobotSettingsField & { invert: boolean }> = privacySettings.map(s => {
+  const translatedPrivacySettings: Array<
+    RobotSettingsField & { invert: boolean }
+  > = privacySettings.map(s => {
     const { titleKey, descriptionKey, invert } = INFO_BY_SETTING_ID[s.id]
     return s.id in INFO_BY_SETTING_ID
       ? {
-        ...s,
-        title: t(titleKey),
-        description: t(descriptionKey),
-        invert,
-      } : { ...s, invert: false }
+          ...s,
+          title: t(titleKey),
+          description: t(descriptionKey),
+          invert,
+        }
+      : { ...s, invert: false }
   })
 
   const dispatch = useDispatch<Dispatch>()
@@ -57,11 +64,7 @@ export function RobotSettingsPrivacy({
   return (
     <>
       {translatedPrivacySettings.map(field => (
-        <SettingToggle
-          key={field.id}
-          {...field}
-          robotName={robotName}
-        />
+        <SettingToggle key={field.id} {...field} robotName={robotName} />
       ))}
     </>
   )

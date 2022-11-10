@@ -68,9 +68,7 @@ export function RobotSettings(): JSX.Element | null {
         updateRobotStatus={updateRobotStatus}
       />
     ),
-    privacy: (
-      <RobotSettingsPrivacy robotName={robotName} />
-    ),
+    privacy: <RobotSettingsPrivacy robotName={robotName} />,
   }
 
   if (
@@ -83,8 +81,7 @@ export function RobotSettings(): JSX.Element | null {
   }
   const cannotViewCalibration =
     robotSettingsTab === 'calibration' && isCalibrationDisabled
-  const cannotViewPrivacy =
-    robotSettingsTab === 'privacy' && isPrivacyDisabled
+  const cannotViewPrivacy = robotSettingsTab === 'privacy' && isPrivacyDisabled
   if (cannotViewCalibration || cannotViewPrivacy) {
     return <Redirect to={`/devices/${robotName}/robot-settings/networking`} />
   }

@@ -12,16 +12,18 @@ import {
 
 import { StyledText } from '../../../atoms/text'
 import { ToggleButton } from '../../../atoms/buttons'
-import {
-  updateSetting,
-} from '../../../redux/robot-settings'
-import type {  Dispatch } from '../../../redux/types'
+import { updateSetting } from '../../../redux/robot-settings'
+import type { Dispatch } from '../../../redux/types'
 import type { RobotSettingsField } from '../../../redux/robot-settings/types'
-
 
 interface SettingToggleProps extends RobotSettingsField {
   robotName: string
-  invert: boolean
+  /**
+   * invert the meaning of the setting sent over from the robot
+   * this is helpful when a value the robot exposes "disables" something
+   * and the user experience of the app prefers "enabling"
+   */
+  invert?: boolean
 }
 
 export function SettingToggle({
@@ -30,7 +32,7 @@ export function SettingToggle({
   title,
   description,
   robotName,
-  invert,
+  invert = false,
 }: SettingToggleProps): JSX.Element | null {
   const dispatch = useDispatch<Dispatch>()
 
