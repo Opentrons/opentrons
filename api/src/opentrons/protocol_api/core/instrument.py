@@ -60,7 +60,19 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
-    def blow_out(self) -> None:
+    def blow_out(
+        self,
+        location: types.Location,
+        well_core: Optional[WellCoreType],
+        move_to_well: bool,
+    ) -> None:
+        """Blow liquid out of the tip.
+
+        Args:
+            location: The location to blow out into.
+            well_core: The well to blow out into.
+            move_to_well: If pipette should be moved before blow-out.
+        """
         ...
 
     @abstractmethod
@@ -196,6 +208,10 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
 
     @abstractmethod
     def get_absolute_dispense_flow_rate(self, rate: float) -> float:
+        ...
+
+    @abstractmethod
+    def get_absolute_blow_out_flow_rate(self, rate: float) -> float:
         ...
 
     def set_flow_rate(

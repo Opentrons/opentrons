@@ -133,8 +133,37 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             flow_rate=flow_rate,
         )
 
-    def blow_out(self) -> None:
-        raise NotImplementedError("InstrumentCore.blow_out not implemented")
+    def blow_out(
+        self, location: Location, well_core: Optional[WellCore], move_to_well: bool
+    ) -> None:
+        """Blow liquid out of the tip.
+
+        Args:
+            location: The location to blow out into.
+            well_core: The well to blow out into.
+            move_to_well: Unused by engine core.
+        """
+        if well_core is None:
+            raise NotImplementedError("In-place blow-out is not implemented")
+
+        well_name = well_core.get_name()
+        labware_id = well_core.labware_id
+
+        well_location = self._engine_client.state.geometry.get_relative_well_location(
+            labware_id=labware_id,
+            well_name=well_name,
+            absolute_point=location.point,
+        )
+
+        self._engine_client.blow_out(
+            pipette_id=self._pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
+            well_location=well_location,
+            # TODO(jbl 2022-11-07) PAPIv2 does not have an argument for rate and
+            #   this also needs to be refactored along with other flow rate related issues
+            flow_rate=self.get_absolute_blow_out_flow_rate(1.0),
+        )
 
     def touch_tip(
         self,
@@ -340,6 +369,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
     def get_absolute_dispense_flow_rate(self, rate: float) -> float:
         return self._flow_rates.dispense * rate
+
+    def get_absolute_blow_out_flow_rate(self, rate: float) -> float:
+        return self._flow_rates.blow_out * rate
 
     def set_flow_rate(
         self,

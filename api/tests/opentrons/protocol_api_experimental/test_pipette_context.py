@@ -89,27 +89,6 @@ def test_dispense(
     )
 
 
-def test_blow_out(
-    decoy: Decoy,
-    engine_client: EngineClient,
-    pipette_id: str,
-    labware_id: str,
-    well: Well,
-    subject: PipetteContext,
-) -> None:
-    """It should send a blowout command to the SyncClient."""
-    subject.blow_out(location=well)
-
-    decoy.verify(
-        engine_client.blow_out(
-            pipette_id=pipette_id,
-            labware_id=labware_id,
-            well_name=well.well_name,
-            well_location=WellLocation(),
-        )
-    )
-
-
 def test_touch_tip(
     decoy: Decoy,
     engine_client: EngineClient,

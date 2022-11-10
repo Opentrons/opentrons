@@ -56,10 +56,14 @@ def test_drop_tip_no_tip(subject: InstrumentCore, tip_rack: LabwareCore) -> None
         subject.drop_tip(location=None, well_core=tip_core, home_after=False)
 
 
-def test_blow_out_no_tip(subject: InstrumentCore) -> None:
+def test_blow_out_no_tip(subject: InstrumentCore, labware: LabwareCore) -> None:
     """It should raise an error if a tip is not attached."""
     with pytest.raises(NoTipAttachedError, match="Cannot perform BLOWOUT"):
-        subject.blow_out()
+        subject.blow_out(
+            location=Location(point=Point(1, 2, 3), labware=None),
+            well_core=labware.get_wells()[0],
+            move_to_well=False,
+        )
 
 
 def test_pick_up_tip_no_tip(subject: InstrumentCore, tip_rack: LabwareCore) -> None:
@@ -247,7 +251,11 @@ def _aspirate_blowout(i: InstrumentCore, labware: LabwareCore) -> None:
         rate=13,
         flow_rate=13,
     )
-    i.blow_out()
+    i.blow_out(
+        location=Location(point=Point(1, 2, 3), labware=None),
+        well_core=labware.get_wells()[0],
+        move_to_well=False,
+    )
 
 
 @pytest.mark.parametrize(

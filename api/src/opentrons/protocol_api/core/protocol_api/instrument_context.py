@@ -122,8 +122,21 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
 
         self._protocol_interface.get_hardware().dispense(self._mount, volume, rate)
 
-    def blow_out(self) -> None:
-        """Blow liquid out of the tip."""
+    def blow_out(
+        self,
+        location: types.Location,
+        well_core: Optional[WellImplementation],
+        move_to_well: bool,
+    ) -> None:
+        """Blow liquid out of the tip.
+
+        Args:
+            location: The location to blow out into.
+            well_core: Unused by legacy core.
+            move_to_well: If pipette should be moved before blow-out.
+        """
+        if move_to_well:
+            self.move_to(location=location)
         self._protocol_interface.get_hardware().blow_out(self._mount)
 
     def touch_tip(
@@ -406,6 +419,9 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
 
     def get_absolute_dispense_flow_rate(self, rate: float) -> float:
         return self._flow_rates.dispense * rate
+
+    def get_absolute_blow_out_flow_rate(self, rate: float) -> float:
+        return self._flow_rates.blow_out * rate
 
     def get_speed(self) -> PlungerSpeeds:
         return self._speeds

@@ -403,6 +403,20 @@ def test_get_well_position(
     )
 
 
+def test_get_well_height(
+    decoy: Decoy,
+    well_plate_def: LabwareDefinition,
+    labware_view: LabwareView,
+    subject: GeometryView,
+) -> None:
+    """It should be able to get the well height."""
+    well_def = well_plate_def.wells["B2"]
+    decoy.when(labware_view.get_well_definition("labware-id", "B2")).then_return(
+        well_def
+    )
+    assert subject.get_well_height("labware-id", "B2") == 10.67
+
+
 def test_get_well_edges(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
