@@ -18,7 +18,7 @@ interface RobotSettingsPrivacyProps {
 const PRIVACY_SETTINGS = ['disableLogAggregation']
 
 const INFO_BY_SETTING_ID: {
-  [id: RobotSettingsField['id']]: {
+  [id: string]: {
     titleKey: string
     descriptionKey: string
     invert: boolean
