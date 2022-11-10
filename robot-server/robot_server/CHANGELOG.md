@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.2.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.2...v6.2.0-alpha.3) (2022-11-10)
+
+
+### Bug Fixes
+
+* **robot-server:** Do not raise exception when unpickling unknown types ([#11692](https://github.com/Opentrons/opentrons/issues/11692)) ([78340da](https://github.com/Opentrons/opentrons/commit/78340dadcb973beb9ed4f133b017e1ea784c13bf))
+
+
+
+
+
 # [6.2.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.1...v6.2.0-alpha.2) (2022-11-04)
 
 **Note:** Version bump only for package @opentrons/robot-server

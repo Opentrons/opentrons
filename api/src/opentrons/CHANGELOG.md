@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.2.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.2...v6.2.0-alpha.3) (2022-11-10)
+
+
+### Bug Fixes
+
+* **api:** ensure Thermocycler status APIs return vanilla strings ([#11694](https://github.com/Opentrons/opentrons/issues/11694)) ([10509dd](https://github.com/Opentrons/opentrons/commit/10509ddc11ccd89a1fa995b34e264873c7375e11))
+
+
+
+
+
 # [6.2.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.1...v6.2.0-alpha.2) (2022-11-04)
 
 **Note:** Version bump only for package @opentrons/api-server
