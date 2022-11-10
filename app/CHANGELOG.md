@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.2.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.2...v6.2.0-alpha.3) (2022-11-10)
+
+
+### Bug Fixes
+
+* **app:** downgrading robot software version and install btn fix ([#11707](https://github.com/Opentrons/opentrons/issues/11707)) ([c454b0c](https://github.com/Opentrons/opentrons/commit/c454b0c5ed85ab8d22059a8ef7786905005e2757))
+* **app:** include enabling log aggregation as toggle in robot settings ([#11715](https://github.com/Opentrons/opentrons/issues/11715)) ([29fd028](https://github.com/Opentrons/opentrons/commit/29fd0289d146529a46da503985120e49339349ec))
+* **app:** reintroduce deleted reanalyze menu item ([#11643](https://github.com/Opentrons/opentrons/issues/11643)) ([#11713](https://github.com/Opentrons/opentrons/issues/11713)) ([d320a77](https://github.com/Opentrons/opentrons/commit/d320a7773b1be51a0132df9f7844203d0f52fb54))
+
+
+### Features
+
+* **app:** Thermocycler GEN1 and GEN2 lid status in_between wire up ([#11686](https://github.com/Opentrons/opentrons/issues/11686)) ([8a04fdd](https://github.com/Opentrons/opentrons/commit/8a04fdd1a4a9549bec561f655519ca2f3270f6ca))
+
+
+
+
+
 # [6.2.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.1...v6.2.0-alpha.2) (2022-11-04)
 
 **Note:** Version bump only for package @opentrons/app

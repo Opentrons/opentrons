@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.2.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.2...v6.2.0-alpha.3) (2022-11-10)
+
+
+### Features
+
+* **protocol-designer:** bump PD version up to 6.1.0 ([#11688](https://github.com/Opentrons/opentrons/issues/11688)) ([066d2fd](https://github.com/Opentrons/opentrons/commit/066d2fd12ab06be4a2c240c936d19867fc0710ea))
+
+
+
+
+
 # [6.2.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.1...v6.2.0-alpha.2) (2022-11-04)
 
 **Note:** Version bump only for package protocol-designer
