@@ -1,6 +1,5 @@
 import * as React from 'react'
 import Keyboard from 'react-simple-keyboard'
-// import './CustomKeyboard.css'
 
 interface CustomKeyboardProps {
   onChange: (input: string) => void
