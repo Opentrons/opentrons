@@ -31,6 +31,7 @@ from .actions import (
     AddLiquidAction,
     AddModuleAction,
     HardwareStoppedAction,
+    ResetTipsAction,
 )
 
 
@@ -289,6 +290,10 @@ class ProtocolEngine:
     def add_liquid(self, liquid: Liquid) -> None:
         """Add a liquid to the state for subsequent liquid loads."""
         self._action_dispatcher.dispatch(AddLiquidAction(liquid=liquid))
+
+    def reset_tips(self, labware_id: str) -> None:
+        """Reset the tip state of a given labware."""
+        self._action_dispatcher.dispatch(ResetTipsAction(labware_id=labware_id))
 
     async def use_attached_modules(
         self,

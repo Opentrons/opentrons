@@ -152,6 +152,13 @@ class AddModuleAction:
     module_live_data: LiveData
 
 
+@dataclass(frozen=True)
+class ResetTipsAction:
+    """Reset the tip tracking state of a given tip rack."""
+
+    labware_id: str
+
+
 Action = Union[
     PlayAction,
     PauseAction,
@@ -166,4 +173,5 @@ Action = Union[
     AddLabwareDefinitionAction,
     AddModuleAction,
     AddLiquidAction,
+    ResetTipsAction,
 ]

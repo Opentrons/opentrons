@@ -37,7 +37,10 @@ AdvancedLiquidHandling = Union[
     Sequence[Sequence[labware.Well]],
 ]
 
-logger = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
+
+_PREP_AFTER_ADDED_IN = APIVersion(2, 13)
+"""The version after which the pick-up tip procedure should also prepare the plunger."""
 
 
 class InstrumentContext(publisher.CommandPublisher):
@@ -158,7 +161,7 @@ class InstrumentContext(publisher.CommandPublisher):
             ``instr.aspirate(location=wellplate['A1'])``
 
         """
-        logger.debug(
+        _log.debug(
             "aspirate {} from {} at {}".format(
                 volume, location if location else "current position", rate
             )
@@ -260,7 +263,7 @@ class InstrumentContext(publisher.CommandPublisher):
             ``instr.dispense(location=wellplate['A1'])``
 
         """
-        logger.debug(
+        _log.debug(
             "dispense {} from {} at {}".format(
                 volume, location if location else "current position", rate
             )
@@ -353,7 +356,7 @@ class InstrumentContext(publisher.CommandPublisher):
             ``location`` unless you use keywords.
 
         """
-        logger.debug(
+        _log.debug(
             "mixing {}uL with {} repetitions in {} at rate={}".format(
                 volume, repetitions, location if location else "current position", rate
             )
@@ -412,7 +415,7 @@ class InstrumentContext(publisher.CommandPublisher):
         move_to_well = True
         if isinstance(location, labware.Well):
             if location.parent.is_tiprack:
-                logger.warning(
+                _log.warning(
                     "Blow_out being performed on a tiprack. "
                     "Please re-check your code"
                 )
@@ -519,10 +522,10 @@ class InstrumentContext(publisher.CommandPublisher):
 
         if well.is_well:
             if "touchTipDisabled" in well.quirks_from_any_parent():
-                logger.info(f"Ignoring touch tip on labware {well}")
+                _log.info(f"Ignoring touch tip on labware {well}")
                 return self
             if well.parent.as_labware().is_tiprack:
-                logger.warning(
+                _log.warning(
                     "Touch_tip being performed on a tiprack. "
                     "Please re-check your code"
                 )
@@ -610,7 +613,7 @@ class InstrumentContext(publisher.CommandPublisher):
             See the ``home_after`` parameter of :py:obj:`drop_tip`.
         """
         if not self._implementation.has_tip():
-            logger.warning("Pipette has no tip to return")
+            _log.warning("Pipette has no tip to return")
 
         loc = self._last_tip_picked_up_from
 
@@ -624,13 +627,13 @@ class InstrumentContext(publisher.CommandPublisher):
     @requires_version(2, 0)
     def pick_up_tip(
         self,
-        location: Optional[Union[types.Location, labware.Well]] = None,
+        location: Union[types.Location, labware.Well, labware.Labware, None] = None,
         presses: Optional[int] = None,
         increment: Optional[float] = None,
         prep_after: Optional[bool] = None,
     ) -> InstrumentContext:
         """
-        Pick up a tip for the pipette to run liquid-handling commands with
+        Pick up a tip for the pipette to run liquid-handling commands.
 
         If no location is passed, the Pipette will pick up the next available
         tip in its :py:attr:`InstrumentContext.tip_racks` list.
@@ -645,6 +648,10 @@ class InstrumentContext(publisher.CommandPublisher):
           ``instr.pick_up_tip(tiprack.wells()[0])``. This style of call can
           be used to make the robot pick up a tip from a tip rack that
           was not specified when creating the :py:class:`.InstrumentContext`.
+
+        * If you want to pick up the next available tip(s) in a specific
+          tip rack, you may use the tip rack directly:
+          e.g. ``instr.pick_up_tip(tiprack)``
 
         * If the position to move to in the well needs to be specified,
           for instance to tell the robot to run its pick up tip routine
@@ -697,61 +704,85 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :returns: This instance
         """
-        if location and isinstance(location, types.Location):
-            if location.labware.is_labware:
-                tiprack = location.labware.as_labware()
-                next_tip = tiprack.next_tip(self.channels)
-                if not next_tip:
-                    raise labware.OutOfTipsError
-                target_well = next_tip
-                move_to_location = target_well.top()
-            elif location.labware.is_well:
-                target_well = location.labware.as_well()
-                tiprack = target_well.parent
-                move_to_location = location
-        elif location and isinstance(location, labware.Well):
-            tiprack = location.parent
-            target_well = location
-            move_to_location = target_well.top()
-        elif not location:
-            tiprack, target_well = labware.next_available_tip(
-                self.starting_tip, self.tip_racks, self.channels
-            )
-            move_to_location = target_well.top()
-        else:
-            raise TypeError(
-                "If specified, location should be an instance of "
-                "types.Location (e.g. the return value from "
-                "tiprack.wells()[0].top()) or a Well (e.g. tiprack.wells()[0]."
-                " However, it is a {}".format(location)
-            )
-
-        assert tiprack.is_tiprack, "{} is not a tiprack".format(str(tiprack))
-        instrument.validate_tiprack(self.name, tiprack, logger)
-
-        prep_after_added_in = APIVersion(2, 13)
-        if prep_after is None:
-            prep_after = self.api_version >= prep_after_added_in
-        elif self._api_version < prep_after_added_in:
+        if prep_after is not None and self._api_version < _PREP_AFTER_ADDED_IN:
             raise APIVersionError(
-                f"prep_after is only available in API {prep_after_added_in} and newer,"
+                f"prep_after is only available in API {_PREP_AFTER_ADDED_IN} and newer,"
                 f" but you are using API {self._api_version}."
             )
 
+        well: labware.Well
+        tip_rack: labware.Labware
+        move_to_location: Optional[types.Location] = None
+
+        if location is None:
+            tip_rack, well = labware.next_available_tip(
+                starting_tip=self.starting_tip,
+                tip_racks=self.tip_racks,
+                channels=self.channels,
+            )
+
+        elif isinstance(location, labware.Well):
+            well = location
+            tip_rack = well.parent
+
+        elif isinstance(location, labware.Labware):
+            tip_rack, well = labware.next_available_tip(
+                starting_tip=None,
+                tip_racks=[location],
+                channels=self.channels,
+            )
+
+        elif isinstance(location, types.Location):
+            maybe_tip_rack, maybe_well = location.labware.get_parent_labware_and_well()
+
+            if maybe_well is not None:
+                well = maybe_well
+                tip_rack = well.parent
+                move_to_location = location
+
+            elif maybe_tip_rack is not None:
+                tip_rack, well = labware.next_available_tip(
+                    starting_tip=None,
+                    tip_racks=[maybe_tip_rack],
+                    channels=self.channels,
+                )
+            else:
+                raise TypeError(
+                    "If specified as a `types.Location`,"
+                    " `location` should refer to a ``Labware` or `Well` location."
+                    f" However, it refers to {location.labware}"
+                )
+
+        else:
+            raise TypeError(
+                "If specified, location should be an instance of"
+                " `types.Location` (e.g. the return value from `Well.top()`),"
+                "  `Labware` or `Well` (e.g. `tiprack.wells()[0]`)."
+                f" However, it is {location}"
+            )
+
+        instrument.validate_tiprack(self.name, tip_rack, _log)
+
+        move_to_location = move_to_location or well.top()
+        prep_after = (
+            prep_after
+            if prep_after is not None
+            else self.api_version >= _PREP_AFTER_ADDED_IN
+        )
+
         with publisher.publish_context(
             broker=self.broker,
-            command=cmds.pick_up_tip(instrument=self, location=target_well),
+            command=cmds.pick_up_tip(instrument=self, location=well),
         ):
             self._implementation.pick_up_tip(
                 location=move_to_location,
-                well_core=target_well._impl,
+                well_core=well._impl,
                 presses=presses,
                 increment=increment,
                 prep_after=prep_after,
             )
-            # Note that the hardware API pick_up_tip action includes homing z after
 
-        self._last_tip_picked_up_from = target_well
+        self._last_tip_picked_up_from = well
 
         return self
 
@@ -917,7 +948,7 @@ class InstrumentContext(publisher.CommandPublisher):
                        minimum volume of the pipette
         :returns: This instance
         """
-        logger.debug("Distributing {} from {} to {}".format(volume, source, dest))
+        _log.debug("Distributing {} from {} to {}".format(volume, source, dest))
         kwargs["mode"] = "distribute"
         kwargs["disposal_volume"] = kwargs.get("disposal_volume", self.min_volume)
         kwargs["mix_after"] = (0, 0)
@@ -950,7 +981,7 @@ class InstrumentContext(publisher.CommandPublisher):
                        and ``disposal_volume`` is ignored and set to 0.
         :returns: This instance
         """
-        logger.debug("Consolidate {} from {} to {}".format(volume, source, dest))
+        _log.debug("Consolidate {} from {} to {}".format(volume, source, dest))
         kwargs["mode"] = "consolidate"
         kwargs["mix_before"] = (0, 0)
         kwargs["disposal_volume"] = 0
@@ -1068,7 +1099,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :returns: This instance
         """
-        logger.debug("Transfer {} from {} to {}".format(volume, source, dest))
+        _log.debug("Transfer {} from {} to {}".format(volume, source, dest))
 
         blowout_location = kwargs.get("blowout_location")
         instrument.validate_blowout_location(

@@ -297,8 +297,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         """Get the current state of the pipette hardware as a dictionary."""
         return self._sync_hardware_api.get_attached_instrument(self.get_mount())  # type: ignore[no-any-return]
 
+    # TODO(mc, 2022-11-09): read pipette config into engine state at load
     def get_channels(self) -> int:
-        raise NotImplementedError("InstrumentCore.get_channels not implemented")
+        return self.get_hardware_state()["channels"]
 
     def has_tip(self) -> bool:
         return self.get_hardware_state()["has_tip"]

@@ -109,6 +109,14 @@ class AbstractLabware(DeckItem, ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
+    def get_next_tip(
+        self, num_tips: int, starting_tip: Optional[WellCoreType]
+    ) -> Optional[WellCoreType]:
+        """Get the next available tip(s) in the rack, if available."""
+        ...
+
+    # TODO(mc, 2022-11-09): remove from abstract core
+    @abstractmethod
     def get_tip_tracker(self) -> TipTracker:
         ...
 

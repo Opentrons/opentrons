@@ -62,6 +62,21 @@ def test_add_labware_definition(
     assert result == expected_labware_uri
 
 
+def test_reset_tips(
+    decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
+) -> None:
+    """It should reset the tip tracking state of a labware."""
+    subject.reset_tips(labware_id="cool-labware")
+
+    decoy.verify(
+        transport.call_method(
+            "reset_tips",
+            labware_id="cool-labware",
+        ),
+        times=1,
+    )
+
+
 def test_load_labware(
     decoy: Decoy,
     transport: AbstractSyncTransport,
@@ -405,6 +420,31 @@ def test_wait_for_resume(
     decoy.when(transport.execute_command(request=request)).then_return(response)
 
     result = subject.wait_for_resume(message="hello world")
+
+    assert result == response
+
+
+def test_comment(
+    decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
+) -> None:
+    """It should execute a comment command."""
+    # TODO(mm, 2022-11-09): Use a proper Protocol Engine Comment command instead of
+    # a Custom command, once one exists.
+    class LegacyCommentCustomParams(commands.CustomParams):
+        legacyCommandType: str
+        legacyCommandText: str
+
+    request = commands.CustomCreate(
+        params=LegacyCommentCustomParams(
+            legacyCommandType="command.COMMENT",
+            legacyCommandText="Hello, world!",
+        )
+    )
+    response = commands.CustomResult()
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.comment(message="Hello, world!")
 
     assert result == response
 

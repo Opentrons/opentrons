@@ -2,7 +2,6 @@ import { storedProtocolData } from '../../../../redux/protocol-storage/__fixture
 
 import type {
   LoadedLabwareEntity,
-  LoadedLabwareDefinitionsById,
   ModuleModelsById,
   PipetteNamesById,
 } from '@opentrons/api-client'
@@ -15,7 +14,7 @@ export const LABWARE_ENTITY: LoadedLabwareEntity = {
   definitionUri: 'fakeLabwareDefinitionUri',
   displayName: 'a fake labware',
 }
-export const LABWARE_DEFINITIONS: LoadedLabwareDefinitionsById = {
+export const LABWARE_DEFINITIONS: { [defUri: string]: LabwareDefinition2 } = {
   fakeLabwareDefinitionId: {} as LabwareDefinition2,
 }
 export const MODULE_MODELS_BY_ID: ModuleModelsById = {
