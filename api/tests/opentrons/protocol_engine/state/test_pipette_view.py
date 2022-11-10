@@ -267,6 +267,7 @@ def test_pipette_not_ready_to_aspirate() -> None:
 
 
 def test_get_movement_speed() -> None:
+    """It should return the movement speed that was set for the given pipette."""
     subject = get_pipette_view(
         movement_speed_by_id={
             "pipette-with-movement-speed": 123.456,
@@ -278,5 +279,5 @@ def test_get_movement_speed() -> None:
         subject.get_movement_speed(pipette_id="pipette-with-movement-speed") == 123.456
     )
     assert (
-        subject.get_movement_speed(pipette_id="pipette-without-movement-speed") == None
+        subject.get_movement_speed(pipette_id="pipette-without-movement-speed") is None
     )

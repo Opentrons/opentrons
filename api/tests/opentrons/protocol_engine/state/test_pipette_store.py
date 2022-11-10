@@ -74,7 +74,7 @@ def test_handles_load_pipette(subject: PipetteStore) -> None:
         mount=MountType.LEFT,
     )
     assert result.aspirated_volume_by_id["pipette-id"] == 0
-    assert result.movement_speed_by_id["pipette-id"] == None
+    assert result.movement_speed_by_id["pipette-id"] is None
 
 
 def test_pipette_volume_adds_aspirate(subject: PipetteStore) -> None:
@@ -531,6 +531,7 @@ def test_tip_commands_update_has_tip(subject: PipetteStore) -> None:
 
 
 def test_set_movement_speed(subject: PipetteStore) -> None:
+    """It should issue an action to set the movement speed."""
     pipette_id = "pipette-id"
     load_pipette_command = create_load_pipette_command(
         pipette_id=pipette_id,
