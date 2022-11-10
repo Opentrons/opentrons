@@ -96,6 +96,8 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             flow_rate=flow_rate,
         )
 
+        self._protocol_core.set_last_location(location=location, mount=self.get_mount())
+
     def dispense(
         self,
         location: Location,
@@ -133,6 +135,8 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             flow_rate=flow_rate,
         )
 
+        self._protocol_core.set_last_location(location=location, mount=self.get_mount())
+
     def blow_out(
         self, location: Location, well_core: Optional[WellCore], move_to_well: bool
     ) -> None:
@@ -164,6 +168,8 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             #   this also needs to be refactored along with other flow rate related issues
             flow_rate=self.get_absolute_blow_out_flow_rate(1.0),
         )
+
+        self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
     def touch_tip(
         self,
@@ -213,6 +219,8 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             well_location=well_location,
         )
 
+        self._protocol_core.set_last_location(location=location, mount=self.get_mount())
+
     def drop_tip(
         self, location: Optional[Location], well_core: WellCore, home_after: bool
     ) -> None:
@@ -244,6 +252,8 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             well_name=well_name,
             well_location=well_location,
         )
+
+        self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
     def home(self) -> None:
         raise NotImplementedError("InstrumentCore.home not implemented")
