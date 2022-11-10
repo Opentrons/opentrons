@@ -154,6 +154,10 @@ async def test_move_to_well(
     )
 
     decoy.when(
+        state_store.pipettes.get_movement_speed(pipette_id="pipette-id")
+    ).then_return(39339.5)
+
+    decoy.when(
         state_store.motion.get_movement_waypoints_to_well(
             origin=Point(1, 1, 1),
             origin_cp=CriticalPoint.FRONT_NOZZLE,
@@ -189,11 +193,13 @@ async def test_move_to_well(
             mount=Mount.LEFT,
             abs_position=Point(1, 2, 3),
             critical_point=CriticalPoint.XY_CENTER,
+            speed=39339.5,
         ),
         await hardware_api.move_to(
             mount=Mount.LEFT,
             abs_position=Point(4, 5, 6),
             critical_point=None,
+            speed=39339.5,
         ),
     )
 
@@ -275,6 +281,10 @@ async def test_move_to_well_from_starting_location(
         )
     ).then_return([Waypoint(Point(1, 2, 3), CriticalPoint.XY_CENTER)])
 
+    decoy.when(
+        state_store.pipettes.get_movement_speed(pipette_id="pipette-id")
+    ).then_return(39339.5)
+
     await subject.move_to_well(
         pipette_id="pipette-id",
         labware_id="labware-id",
@@ -297,6 +307,7 @@ async def test_move_to_well_from_starting_location(
             mount=Mount.RIGHT,
             abs_position=Point(1, 2, 3),
             critical_point=CriticalPoint.XY_CENTER,
+            speed=39339.5,
         ),
     )
 
@@ -355,6 +366,10 @@ async def test_move_relative(
         )
     ).then_return(Point(x=1, y=2, z=3))
 
+    decoy.when(
+        state_store.pipettes.get_movement_speed(pipette_id="pipette-id")
+    ).then_return(39339.5)
+
     result = await subject.move_relative(
         pipette_id="pipette-id",
         axis=axis,
@@ -368,6 +383,7 @@ async def test_move_relative(
             mount=Mount.LEFT,
             delta=expected_delta,
             fail_on_not_homed=True,
+            speed=39339.5,
         )
     )
 
@@ -389,10 +405,15 @@ async def test_move_relative_must_home(
     )
 
     decoy.when(
+        state_store.pipettes.get_movement_speed(pipette_id="pipette-id")
+    ).then_return(39339.5)
+
+    decoy.when(
         await hardware_api.move_rel(
             mount=Mount.LEFT,
             delta=Point(x=0, y=0, z=42.0),
             fail_on_not_homed=True,
+            speed=39339.5,
         )
     ).then_raise(HardwareMustHomeError("oh no"))
 
@@ -569,6 +590,10 @@ async def test_move_to_coordinates(
         )
     ).then_return([planned_waypoint_1, planned_waypoint_2])
 
+    decoy.when(
+        state_store.pipettes.get_movement_speed(pipette_id="pipette-id")
+    ).then_return(39339.5)
+
     await subject.move_to_coordinates(
         pipette_id="pipette-id",
         deck_coordinates=destination_deck,
@@ -581,11 +606,13 @@ async def test_move_to_coordinates(
             mount=mount,
             abs_position=planned_waypoint_1.position,
             critical_point=planned_waypoint_1.critical_point,
+            speed=39339.5,
         ),
         await hardware_api.move_to(
             mount=mount,
             abs_position=planned_waypoint_2.position,
             critical_point=planned_waypoint_2.critical_point,
+            speed=39339.5,
         ),
     )
 
