@@ -113,7 +113,7 @@ class LabwareImplementation(AbstractLabware[WellImplementation]):
         return self._parameters["isTiprack"]
 
     def is_fixed_trash(self) -> bool:
-        """Check if given well is a fixed trash."""
+        """Whether the labware is fixed trash."""
         return "fixedTrash" in self.get_quirks()
 
     def get_tip_length(self) -> float:
