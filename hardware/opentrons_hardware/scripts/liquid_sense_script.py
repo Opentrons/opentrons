@@ -14,7 +14,8 @@ from opentrons_hardware.firmware_bindings.constants import (
 )
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 from opentrons_hardware.hardware_control.network import probe
-import opentrons_hardware.sensors.utils as sensor_utils
+import opentrons_hardware.sensors.types as sensor_types
+
 
 from opentrons_hardware.firmware_bindings.messages import (
     message_definitions,
@@ -90,8 +91,8 @@ class Capturer:
         """Callback entry point for capturing messages."""
         if isinstance(message, message_definitions.ReadFromSensorResponse):
             self.response_queue.put_nowait(
-                sensor_utils.SensorDataType.build(
-                    message.payload.sensor_data
+                sensor_types.SensorDataType.build(
+                    message.payload.sensor_data, message.payload.sensor
                 ).to_float()
             )
 
@@ -245,9 +246,9 @@ def main() -> None:
         "-m", "--mount", type=str, choices=["left", "right"], default="left"
     )
     parser.add_argument("-s", "--speed", type=float, default=5)
-    parser.add_argument("-d", "--distance", type=float, default=50)
+    parser.add_argument("-d", "--distance", type=float, default=25)
     parser.add_argument("-pd", "--prep-distance", type=float, default=25)
-    parser.add_argument("-ps", "--prep-speed", type=float, default=50)
+    parser.add_argument("-ps", "--prep-speed", type=float, default=30)
     # parser.add_argument("--ph", "--pipette-height", type=float, default=0)
     parser.add_argument("-v", "--verbose-monitoring", action="store_true")
     parser.add_argument(
