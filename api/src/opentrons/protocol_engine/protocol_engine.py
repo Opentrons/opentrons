@@ -1,4 +1,5 @@
 """ProtocolEngine class definition."""
+import logging
 from typing import Dict, Optional
 
 from opentrons.protocols.models import LabwareDefinition
@@ -34,6 +35,7 @@ from .actions import (
     ResetTipsAction,
 )
 
+logger = logging.getLogger(__name__)
 
 class ProtocolEngine:
     """Main ProtocolEngine class.
@@ -193,7 +195,9 @@ class ProtocolEngine:
         action = self._state_store.commands.validate_action_allowed(StopAction())
         self._action_dispatcher.dispatch(action)
         self._queue_worker.cancel()
+        print("stop action dispatched - before halt")
         await self._hardware_stopper.do_halt()
+        print("stop action dispatched - after halt")
 
     async def wait_until_complete(self) -> None:
         """Wait until there are no more commands to execute.
@@ -233,6 +237,7 @@ class ProtocolEngine:
                 created_at=self._model_utils.get_timestamp(),
                 error=error,
             )
+            print(f"error in finishing {error}")
         else:
             error_details = None
 
@@ -241,7 +246,9 @@ class ProtocolEngine:
         )
 
         try:
+            print("finish action - queue worker join before")
             await self._queue_worker.join()
+            print("finish action - queue worker join after")
 
         # todo(mm, 2022-01-31): We should use something like contextlib.AsyncExitStack
         # to robustly clean up all these resources
@@ -252,13 +259,18 @@ class ProtocolEngine:
             # or even after this .finish() call completes.
             self._door_watcher.stop_soon()
 
+            print("finish action - do_stop_and_recover before")
             await self._hardware_stopper.do_stop_and_recover(drop_tips_and_home)
+            print("finish action - do_stop_and_recover after")
 
             completed_at = self._model_utils.get_timestamp()
             self._action_dispatcher.dispatch(
                 HardwareStoppedAction(completed_at=completed_at)
             )
+            print("finish action - plugin_starter.starter() before")
             await self._plugin_starter.stop()
+            print("finish action - plugin_starter.starter() after")
+
 
     def add_labware_offset(self, request: LabwareOffsetCreate) -> LabwareOffset:
         """Add a new labware offset and return it.
