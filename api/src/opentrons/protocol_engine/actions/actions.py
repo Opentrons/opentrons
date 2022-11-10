@@ -160,7 +160,7 @@ class ResetTipsAction:
 
 
 @dataclass(frozen=True)
-class SetPipetteMotionSpeedAction:
+class SetPipetteMovementSpeedAction:
     """Set the speed of a pipette's X/Y/Z movements. Does not affect plunger speed.
 
     None will use the hardware API's default.
@@ -185,5 +185,5 @@ Action = Union[
     AddModuleAction,
     AddLiquidAction,
     ResetTipsAction,
-    SetPipetteMotionSpeedAction,
+    SetPipetteMovementSpeedAction,
 ]

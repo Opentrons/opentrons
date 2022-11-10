@@ -32,7 +32,7 @@ from .actions import (
     AddModuleAction,
     HardwareStoppedAction,
     ResetTipsAction,
-    SetPipetteMotionSpeedAction,
+    SetPipetteMovementSpeedAction,
 )
 
 
@@ -299,14 +299,14 @@ class ProtocolEngine:
     # TODO(mm, 2022-11-10): This is a method on ProtocolEngine instead of a command
     # as a quick hack to support Python protocols. We should consider making this a
     # command, or adding speed parameters to existing commands.
-    def set_pipette_motion_speed(
+    def set_pipette_movement_speed(
         self, pipette_id: str, speed: Optional[float]
     ) -> None:
         """Set the speed of a pipette's X/Y/Z movements. Does not affect plunger speed.
 
         None will use the hardware API's default.
         """
-        self._action_dispatcher.dispatch(SetPipetteMotionSpeedAction(pipette_id=pipette_id, speed=speed))
+        self._action_dispatcher.dispatch(SetPipetteMovementSpeedAction(pipette_id=pipette_id, speed=speed))
 
     async def use_attached_modules(
         self,

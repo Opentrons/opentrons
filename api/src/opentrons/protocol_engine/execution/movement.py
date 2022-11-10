@@ -130,7 +130,7 @@ class MovementHandler:
             current_well=current_well,
         )
 
-        speed = self._state_store.pipettes.get_motion_speed(pipette_id=pipette_id)
+        speed = self._state_store.pipettes.get_movement_speed(pipette_id=pipette_id)
 
         # move through the waypoints
         for waypoint in waypoints:
@@ -159,7 +159,7 @@ class MovementHandler:
             z=distance if axis == MovementAxis.Z else 0,
         )
 
-        speed = self._state_store.pipettes.get_motion_speed(pipette_id=pipette_id)
+        speed = self._state_store.pipettes.get_movement_speed(pipette_id=pipette_id)
 
         try:
             await self._hardware_api.move_rel(
@@ -268,7 +268,7 @@ class MovementHandler:
             additional_min_travel_z=additional_min_travel_z,
         )
 
-        speed = self._state_store.pipettes.get_motion_speed(pipette_id=pipette_id)
+        speed = self._state_store.pipettes.get_movement_speed(pipette_id=pipette_id)
 
         # move through the waypoints
         for waypoint in waypoints:

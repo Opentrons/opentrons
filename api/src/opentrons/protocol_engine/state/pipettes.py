@@ -26,7 +26,7 @@ from ..commands import (
     thermocycler,
     heater_shaker,
 )
-from ..actions import Action, SetPipetteMotionSpeedAction, UpdateCommandAction
+from ..actions import Action, SetPipetteMovementSpeedAction, UpdateCommandAction
 from .abstract_store import HasState, HandlesActions
 
 
@@ -55,7 +55,7 @@ class PipetteState:
     aspirated_volume_by_id: Dict[str, float]
     current_well: Optional[CurrentWell]
     attached_tip_labware_by_id: Dict[str, str]
-    motion_speed_by_id: Dict[str, Optional[float]]
+    movement_speed_by_id: Dict[str, Optional[float]]
 
 
 
@@ -71,15 +71,15 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             aspirated_volume_by_id={},
             current_well=None,
             attached_tip_labware_by_id={},
-            motion_speed_by_id={},
+            movement_speed_by_id={},
         )
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
         if isinstance(action, UpdateCommandAction):
             self._handle_command(action.command)
-        elif isinstance(action, SetPipetteMotionSpeedAction):
-            self._state.motion_speed_by_id[action.pipette_id] = action.speed
+        elif isinstance(action, SetPipetteMovementSpeedAction):
+            self._state.movement_speed_by_id[action.pipette_id] = action.speed
 
     def _handle_command(self, command: Command) -> None:
         self._update_current_well(command)
@@ -93,7 +93,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 mount=command.params.mount,
             )
             self._state.aspirated_volume_by_id[pipette_id] = 0
-            self._state.motion_speed_by_id[pipette_id] = None
+            self._state.movement_speed_by_id[pipette_id] = None
 
         elif isinstance(command.result, AspirateResult):
             pipette_id = command.params.pipetteId
@@ -274,5 +274,5 @@ class PipetteView(HasState[PipetteState]):
         """Get the tiprack ids of attached tip by pipette ids."""
         return self._state.attached_tip_labware_by_id
 
-    def get_motion_speed(self, pipette_id: str) -> Optional[float]:
-        return self._state.motion_speed_by_id[pipette_id]
+    def get_movement_speed(self, pipette_id: str) -> Optional[float]:
+        return self._state.movement_speed_by_id[pipette_id]

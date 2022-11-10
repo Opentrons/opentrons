@@ -55,14 +55,14 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         return self._pipette_id
 
     def get_default_speed(self) -> float:
-        speed = self._engine_client.state.pipettes.get_motion_speed(
+        speed = self._engine_client.state.pipettes.get_movement_speed(
             pipette_id=self._pipette_id
         )
         assert speed is not None, "Pipette loading should have set a default speed."
         return speed
 
     def set_default_speed(self, speed: float) -> None:
-        self._engine_client.set_pipette_motion_speed(pipette_id=self._pipette_id, speed=speed)
+        self._engine_client.set_pipette_movement_speed(pipette_id=self._pipette_id, speed=speed)
 
     def aspirate(
         self,
