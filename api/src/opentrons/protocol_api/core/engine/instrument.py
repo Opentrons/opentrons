@@ -31,6 +31,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         engine_client: EngineClient,
         sync_hardware_api: SyncHardwareAPI,
         protocol_core: ProtocolCore,
+        default_movement_speed: float,
     ) -> None:
         self._pipette_id = pipette_id
         self._engine_client = engine_client
@@ -46,16 +47,24 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         self._flow_rates = FlowRates(self)
         self._flow_rates.set_defaults(MAX_SUPPORTED_VERSION)
 
+        self.set_default_speed(speed=default_movement_speed)
+
     @property
     def pipette_id(self) -> str:
         """The instrument's unique ProtocolEngine ID."""
         return self._pipette_id
 
     def get_default_speed(self) -> float:
-        raise NotImplementedError("InstrumentCore.get_default_speed not implemented")
+        speed = self._engine_client.state.pipettes.get_movement_speed(
+            pipette_id=self._pipette_id
+        )
+        assert speed is not None, "Pipette loading should have set a default speed."
+        return speed
 
     def set_default_speed(self, speed: float) -> None:
-        raise NotImplementedError("InstrumentCore.set_default_speed not implemented")
+        self._engine_client.set_pipette_movement_speed(
+            pipette_id=self._pipette_id, speed=speed
+        )
 
     def aspirate(
         self,
