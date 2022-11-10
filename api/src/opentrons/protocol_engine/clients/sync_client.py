@@ -41,6 +41,13 @@ class SyncClient:
             definition=definition,
         )
 
+    def reset_tips(self, labware_id: str) -> None:
+        """Reset a labware's tip tracking state.."""
+        self._transport.call_method(
+            "reset_tips",
+            labware_id=labware_id,
+        )
+
     def load_labware(
         self,
         location: LabwareLocation,

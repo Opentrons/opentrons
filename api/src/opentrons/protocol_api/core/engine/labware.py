@@ -112,7 +112,7 @@ class LabwareCore(AbstractLabware[WellCore]):
         raise NotImplementedError("LabwareCore.set_tip_length not implemented")
 
     def reset_tips(self) -> None:
-        raise NotImplementedError("LabwareCore.reset_tips not implemented")
+        self._engine_client.reset_tips(labware_id=self.labware_id)
 
     def get_next_tip(
         self, num_tips: int, starting_tip: Optional[WellCore]

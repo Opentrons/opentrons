@@ -62,6 +62,21 @@ def test_add_labware_definition(
     assert result == expected_labware_uri
 
 
+def test_reset_tips(
+    decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
+) -> None:
+    """It should reset the tip tracking state of a labware."""
+    subject.reset_tips(labware_id="cool-labware")
+
+    decoy.verify(
+        transport.call_method(
+            "reset_tips",
+            labware_id="cool-labware",
+        ),
+        times=1,
+    )
+
+
 def test_load_labware(
     decoy: Decoy,
     transport: AbstractSyncTransport,

@@ -683,9 +683,8 @@ class Labware(DeckItem):
 
     @requires_version(2, 0)
     def reset(self) -> None:
-        """Reset all tips in a tiprack"""
-        if self._is_tiprack:
-            self._implementation.reset_tips()
+        """Reset all tips in a tiprack."""
+        self._implementation.reset_tips()
 
     def _well_from_impl(self, well: WellCore) -> Well:
         return Well(

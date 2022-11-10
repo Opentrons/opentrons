@@ -158,3 +158,22 @@ def test_get_next_tip_with_column_and_starting_tip(
     )
 
     assert result == "A2"
+
+
+def test_reset_tips(
+    subject: TipStore,
+    load_labware_command: commands.LoadLabware,
+    pick_up_tip_command: commands.PickUpTip,
+) -> None:
+    """It should be able to reset tip tracking state."""
+    subject.handle_action(actions.UpdateCommandAction(command=load_labware_command))
+    subject.handle_action(actions.UpdateCommandAction(command=pick_up_tip_command))
+    subject.handle_action(actions.ResetTipsAction(labware_id="cool-labware"))
+
+    result = TipView(subject.state).get_next_tip(
+        labware_id="cool-labware",
+        use_column=False,
+        starting_tip_name=None,
+    )
+
+    assert result == "A1"
