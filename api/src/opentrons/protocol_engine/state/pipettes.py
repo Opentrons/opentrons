@@ -58,7 +58,6 @@ class PipetteState:
     movement_speed_by_id: Dict[str, Optional[float]]
 
 
-
 class PipetteStore(HasState[PipetteState], HandlesActions):
     """Pipette state container."""
 

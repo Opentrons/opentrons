@@ -306,7 +306,9 @@ class ProtocolEngine:
 
         None will use the hardware API's default.
         """
-        self._action_dispatcher.dispatch(SetPipetteMovementSpeedAction(pipette_id=pipette_id, speed=speed))
+        self._action_dispatcher.dispatch(
+            SetPipetteMovementSpeedAction(pipette_id=pipette_id, speed=speed)
+        )
 
     async def use_attached_modules(
         self,

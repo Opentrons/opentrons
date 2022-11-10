@@ -14,7 +14,10 @@ from opentrons.protocol_engine.types import (
     OFF_DECK_LOCATION,
     LabwareMovementStrategy,
 )
-from opentrons.protocol_engine.actions import SetPipetteMovementSpeedAction, UpdateCommandAction
+from opentrons.protocol_engine.actions import (
+    SetPipetteMovementSpeedAction,
+    UpdateCommandAction,
+)
 from opentrons.protocol_engine.state.pipettes import (
     PipetteStore,
     PipetteState,
@@ -535,6 +538,7 @@ def test_set_movement_speed(subject: PipetteStore) -> None:
         mount=MountType.LEFT,
     )
     subject.handle_action(UpdateCommandAction(command=load_pipette_command))
-    subject.handle_action(SetPipetteMovementSpeedAction(pipette_id=pipette_id, speed=123.456))
+    subject.handle_action(
+        SetPipetteMovementSpeedAction(pipette_id=pipette_id, speed=123.456)
+    )
     assert subject.state.movement_speed_by_id[pipette_id] == 123.456
-

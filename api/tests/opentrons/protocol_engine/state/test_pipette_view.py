@@ -21,7 +21,7 @@ def get_pipette_view(
     aspirated_volume_by_id: Optional[Dict[str, float]] = None,
     current_well: Optional[CurrentWell] = None,
     attached_tip_labware_by_id: Optional[Dict[str, str]] = None,
-    movement_speed_by_id: Optional[Dict[str, Optional[float]]] = None
+    movement_speed_by_id: Optional[Dict[str, Optional[float]]] = None,
 ) -> PipetteView:
     """Get a pipette view test subject with the specified state."""
     state = PipetteState(
@@ -29,7 +29,7 @@ def get_pipette_view(
         aspirated_volume_by_id=aspirated_volume_by_id or {},
         current_well=current_well,
         attached_tip_labware_by_id=attached_tip_labware_by_id or {},
-        movement_speed_by_id=movement_speed_by_id or {}
+        movement_speed_by_id=movement_speed_by_id or {},
     )
 
     return PipetteView(state=state)
@@ -270,9 +270,13 @@ def test_get_movement_speed() -> None:
     subject = get_pipette_view(
         movement_speed_by_id={
             "pipette-with-movement-speed": 123.456,
-            "pipette-without-movement-speed": None
+            "pipette-without-movement-speed": None,
         }
     )
 
-    assert subject.get_movement_speed(pipette_id="pipette-with-movement-speed") == 123.456
-    assert subject.get_movement_speed(pipette_id="pipette-without-movement-speed") == None
+    assert (
+        subject.get_movement_speed(pipette_id="pipette-with-movement-speed") == 123.456
+    )
+    assert (
+        subject.get_movement_speed(pipette_id="pipette-without-movement-speed") == None
+    )
