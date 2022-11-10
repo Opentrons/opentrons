@@ -3,7 +3,8 @@ import { CreateRunCommand } from './hooks'
 
 export const chainRunCommands = (
   commands: CreateCommand[],
-  createRunCommand: CreateRunCommand
+  createRunCommand: CreateRunCommand,
+  continuePastCommandFailure: boolean = true
 ): Promise<unknown> => {
   if (commands.length < 1)
     return Promise.reject(new Error('no commands to execute'))
@@ -12,12 +13,19 @@ export const chainRunCommands = (
     waitUntilComplete: true,
   })
     .then(response => {
-      console.log(response)
-      // we may want to exit early here and reject the promise if the command status is failed
+      if (!continuePastCommandFailure && response.data.status === 'failed') {
+        return Promise.reject(
+          new Error(response.data.error.detail ?? 'command failed')
+        )
+      }
       if (commands.slice(1).length < 1) {
         return Promise.resolve(response)
       } else {
-        return chainRunCommands(commands.slice(1), createRunCommand)
+        return chainRunCommands(
+          commands.slice(1),
+          createRunCommand,
+          continuePastCommandFailure
+        )
       }
     })
     .catch(error => {

@@ -45,29 +45,32 @@ export const BeforeBeginning = (
   if (pipetteId == null) return null
   const handleOnClick = (): void => {
     setIsBetweenCommands(true)
-    chainRunCommands([
-      {
-        commandType: 'home' as const,
-        params: {},
-      },
-      {
-        commandType: 'loadPipette' as const,
-        params: {
-          // @ts-expect-error pipetteName is required but missing in schema v6 type
-          pipetteName: attachedPipette[mount]?.name,
-          pipetteId: pipetteId,
-          mount: mount,
+    chainRunCommands(
+      [
+        // {
+        //   commandType: 'home' as const,
+        //   params: {},
+        // },
+        {
+          commandType: 'loadPipette' as const,
+          params: {
+            // @ts-expect-error pipetteName is required but missing in schema v6 type
+            pipetteName: attachedPipette[mount]?.name,
+            pipetteId: pipetteId,
+            mount: mount,
+          },
         },
-      },
-      {
-        // @ts-expect-error calibration type not yet supported
-        commandType: 'calibration/moveToLocation' as const,
-        params: {
-          pipetteId: pipetteId,
-          location: 'attachOrDetach',
+        {
+          // @ts-expect-error calibration type not yet supported
+          commandType: 'calibration/moveToLocation' as const,
+          params: {
+            pipetteId: pipetteId,
+            location: 'attachOrDetach',
+          },
         },
-      },
-    ])
+      ],
+      false
+    )
       .then(() => {
         setIsBetweenCommands(false)
         proceed()
