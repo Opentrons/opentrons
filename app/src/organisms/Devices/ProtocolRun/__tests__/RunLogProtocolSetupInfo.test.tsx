@@ -201,12 +201,21 @@ describe('RunLogProtocolSetupInfo', () => {
       runId: RUN_ID,
       setupCommand: COMMAND_TYPE_LOAD_LABWARE_WITH_MODULE,
     }
-    when(mockUseProtocolDetailsForRun).calledWith(RUN_ID).mockReturnValue({
-      protocolData: simpleV6Protocol,
-      displayName: 'mock display name',
-      protocolKey: 'fakeProtocolKey',
-      robotType: 'OT-2 Standard',
-    })
+    when(mockUseProtocolDetailsForRun)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        protocolData: {
+          ...simpleV6Protocol,
+          commands: simpleV6Protocol.commands.map(c =>
+            c.commandType === 'loadModule'
+              ? { ...c, result: { moduleId: c.params.moduleId } }
+              : c
+          ),
+        },
+        displayName: 'mock display name',
+        protocolKey: 'fakeProtocolKey',
+        robotType: 'OT-2 Standard',
+      })
     const { getByText } = render(props)
     getByText(
       'Load ANSI 96 Standard Microplate v1 in Magnetic Module GEN2 in Slot 3'
