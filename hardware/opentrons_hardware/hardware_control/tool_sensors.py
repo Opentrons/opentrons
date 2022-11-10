@@ -128,5 +128,11 @@ async def capacitive_read(
     """Read capacitive sensor."""
     capacitive = sensor_types.CapacitiveSensor.build(SensorId.S0, node_id)
     s_driver = sensor_driver.SensorDriver()
-    data = await s_driver.read(messenger, capacitive, offset=False, timeout=10)
+    data = None
+    reading = True
+    while reading:
+        if data is None:
+            data = await s_driver.read(messenger, capacitive, offset=False, timeout=10)
+        else:
+            reading = False
     return data.to_float()
