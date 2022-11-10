@@ -16,6 +16,7 @@ from opentrons.protocol_api import (
     InstrumentContext,
     Labware,
     Well,
+    labware,
 )
 from opentrons.protocol_api.core.common import InstrumentCore
 from opentrons.types import Location, Mount, Point
@@ -27,6 +28,12 @@ def _mock_instrument_support_module(
 ) -> None:
     for name, func in inspect.getmembers(mock_instrument_support, inspect.isfunction):
         monkeypatch.setattr(mock_instrument_support, name, decoy.mock(func=func))
+
+
+@pytest.fixture(autouse=True)
+def _mock_labware_module(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+    for name, func in inspect.getmembers(labware, inspect.isfunction):
+        monkeypatch.setattr(labware, name, decoy.mock(func=func))
 
 
 @pytest.fixture
@@ -213,6 +220,128 @@ def test_aspirate(
             volume=42.0,
             rate=1.23,
             flow_rate=5.67,
+        ),
+        times=1,
+    )
+
+
+def test_pick_up_tip_from_labware(
+    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
+) -> None:
+    """It should pick up the next tip from a given labware."""
+    mock_tip_rack = decoy.mock(cls=Labware)
+    mock_well = decoy.mock(cls=Well)
+    top_location = Location(point=Point(1, 2, 3), labware=mock_well)
+
+    decoy.when(mock_instrument_core.get_channels()).then_return(123)
+    decoy.when(
+        labware.next_available_tip(
+            starting_tip=None,
+            tip_racks=[mock_tip_rack],
+            channels=123,
+        )
+    ).then_return((mock_tip_rack, mock_well))
+    decoy.when(mock_well.top()).then_return(top_location)
+
+    subject.pick_up_tip(mock_tip_rack)
+
+    decoy.verify(
+        mock_instrument_core.pick_up_tip(
+            location=top_location,
+            well_core=mock_well._impl,
+            presses=None,
+            increment=None,
+            prep_after=True,
+        ),
+        times=1,
+    )
+
+
+def test_pick_up_tip_from_well_location(
+    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
+) -> None:
+    """It should pick up the next tip from a given well-based Location."""
+    mock_well = decoy.mock(cls=Well)
+    location = Location(point=Point(1, 2, 3), labware=mock_well)
+
+    subject.pick_up_tip(location)
+
+    decoy.verify(
+        mock_instrument_core.pick_up_tip(
+            location=location,
+            well_core=mock_well._impl,
+            presses=None,
+            increment=None,
+            prep_after=True,
+        ),
+        times=1,
+    )
+
+
+def test_pick_up_tip_from_labware_location(
+    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
+) -> None:
+    """It should pick up the next tip from a given labware-based Location."""
+    mock_tip_rack = decoy.mock(cls=Labware)
+    mock_well = decoy.mock(cls=Well)
+    location = Location(point=Point(1, 2, 3), labware=mock_tip_rack)
+    top_location = Location(point=Point(1, 2, 3), labware=mock_well)
+
+    decoy.when(mock_instrument_core.get_channels()).then_return(123)
+    decoy.when(
+        labware.next_available_tip(
+            starting_tip=None,
+            tip_racks=[mock_tip_rack],
+            channels=123,
+        )
+    ).then_return((mock_tip_rack, mock_well))
+    decoy.when(mock_well.top()).then_return(top_location)
+
+    subject.pick_up_tip(location)
+
+    decoy.verify(
+        mock_instrument_core.pick_up_tip(
+            location=top_location,
+            well_core=mock_well._impl,
+            presses=None,
+            increment=None,
+            prep_after=True,
+        ),
+        times=1,
+    )
+
+
+def test_pick_up_from_associated_tip_racks(
+    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
+) -> None:
+    """It should pick up from it associated tip racks."""
+    mock_tip_rack_1 = decoy.mock(cls=Labware)
+    mock_tip_rack_2 = decoy.mock(cls=Labware)
+    mock_starting_tip = decoy.mock(cls=Well)
+    mock_well = decoy.mock(cls=Well)
+    top_location = Location(point=Point(1, 2, 3), labware=mock_well)
+
+    decoy.when(mock_instrument_core.get_channels()).then_return(123)
+    decoy.when(
+        labware.next_available_tip(
+            starting_tip=mock_starting_tip,
+            tip_racks=[mock_tip_rack_1, mock_tip_rack_2],
+            channels=123,
+        )
+    ).then_return((mock_tip_rack_2, mock_well))
+    decoy.when(mock_well.top()).then_return(top_location)
+
+    subject.starting_tip = mock_starting_tip
+    subject.tip_racks = [mock_tip_rack_1, mock_tip_rack_2]
+    subject.pick_up_tip()
+
+    decoy.verify(
+        mock_instrument_core.pick_up_tip(
+            location=top_location,
+            well_core=mock_well._impl,
+            presses=None,
+            increment=None,
+            prep_after=True,
         ),
         times=1,
     )

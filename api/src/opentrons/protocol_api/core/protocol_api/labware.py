@@ -1,4 +1,4 @@
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, cast
 
 from opentrons.calibration_storage import helpers
 from opentrons.protocols.geometry.labware_geometry import LabwareGeometry
@@ -122,6 +122,14 @@ class LabwareImplementation(AbstractLabware[WellImplementation]):
         if self.is_tip_rack():
             for well in self._wells:
                 well.set_has_tip(True)
+
+    def get_next_tip(
+        self, num_tips: int, starting_tip: Optional[WellImplementation]
+    ) -> Optional[WellImplementation]:
+        return cast(
+            Optional[WellImplementation],
+            self._tip_tracker.next_tip(num_tips, starting_tip),
+        )
 
     def get_tip_tracker(self) -> TipTracker:
         return self._tip_tracker
