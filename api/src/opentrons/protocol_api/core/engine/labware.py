@@ -104,7 +104,7 @@ class LabwareCore(AbstractLabware[WellCore]):
         return self._definition.parameters.isTiprack
 
     def is_fixed_trash(self) -> bool:
-        """Check if given well is a fixed trash."""
+        """Whether the labware is a fixed trash."""
         return self._engine_client.state.labware.is_fixed_trash(
             labware_id=self.labware_id
         )
