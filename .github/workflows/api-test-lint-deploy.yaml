@@ -41,6 +41,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
   cancel-in-progress: true
 
+env:
+  MSYS_NO_PATHCONV: 1 # git bash on Windows https://github.com/git-for-windows/build-extra/blob/main/ReleaseNotes.md#known-issues
+
 defaults:
   run:
     shell: bash

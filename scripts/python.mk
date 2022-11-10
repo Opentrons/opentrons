@@ -22,13 +22,6 @@ ifeq ($(CI),true)
 	endif
 endif
 
-
-
-
-$(info _possibilities $(_possibilities))
-$(info _firstpath $(_firstpath))
-$(info monorepo_root $(monorepo_root))
-$(info OT_PYTHON $(OT_PYTHON))
 # Use legacy editable installs to avoid breaking mypy type-checking
 # when using newer versions of setuptools
 export SETUPTOOLS_ENABLE_FEATURES := legacy-editable
