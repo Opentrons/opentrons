@@ -55,9 +55,9 @@ class Capacitance_Distance_Test:
             "Slot":None,
             "Pipette":None,
             "Deck Height":None,
+            "Capacitance":None,
             "Current Position":None,
             "Current Encoder":None,
-            "Capacitance":None,
         }
 
     async def test_setup(self):
@@ -117,7 +117,7 @@ class Capacitance_Distance_Test:
                 _reading = False
         return sum(capacitance) / len(capacitance)
 
-    async def _end_test(
+    async def _reset(
         self, api: OT3API, mount: OT3Mount
     ) -> None:
         # Home Z-Axis
@@ -143,8 +143,8 @@ class Capacitance_Distance_Test:
         print(f"Current Encoder = {encoder_position}")
 
         # Read capacitance
-        # capacitance = await self._get_stable_capacitance()
-        capacitance = await api.capacitive_read(mount)
+        capacitance = await self._get_stable_capacitance()
+        # capacitance = await api.capacitive_read(mount)
         self.test_data["Capacitance"] = str(capacitance)
         print(f"Capacitance = {capacitance}")
 
@@ -183,15 +183,15 @@ class Capacitance_Distance_Test:
     async def run(self) -> None:
         try:
             await self.test_setup()
-            await self._calibrate_deck(self.api, self.mount)
             for i in range(self.cycles):
                 cycle = i + 1
                 print(f"\n--> Starting Cycle {cycle}/{self.cycles}")
+                await self._calibrate_deck(self.api, self.mount)
                 for j in range(self.steps):
                     step = j + 1
                     print(f"---->> Measuring Step {step}/{self.steps}")
                     await self._measure_capacitance(self.api, self.mount, cycle, step)
-            await self._end_test(self.api, self.mount)
+                await self._reset(self.api, self.mount)
         except Exception as e:
             await self.exit()
             raise e
