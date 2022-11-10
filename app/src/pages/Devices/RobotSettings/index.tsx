@@ -70,9 +70,7 @@ export function RobotSettings(): JSX.Element | null {
         updateRobotStatus={updateRobotStatus}
       />
     ),
-    privacy: (
-      <RobotSettingsPrivacy robotName={robotName} />
-    ),
+    privacy: <RobotSettingsPrivacy robotName={robotName} />,
     'feature-flags': <RobotSettingsFeatureFlags robotName={robotName} />,
   }
 
@@ -90,8 +88,7 @@ export function RobotSettings(): JSX.Element | null {
     robotSettingsTab === 'calibration' && isCalibrationDisabled
   const cannotViewFeatureFlags =
     robotSettingsTab === 'feature-flags' && !devToolsOn
-  const cannotViewPrivacy =
-    robotSettingsTab === 'privacy' && isPrivacyDisabled
+  const cannotViewPrivacy = robotSettingsTab === 'privacy' && isPrivacyDisabled
   if (cannotViewCalibration || cannotViewFeatureFlags || cannotViewPrivacy) {
     return <Redirect to={`/devices/${robotName}/robot-settings/networking`} />
   }

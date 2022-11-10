@@ -1,14 +1,9 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
-import {
-  getRobotSettings,
-  fetchSettings,
-} from '../../../redux/robot-settings'
+import { getRobotSettings, fetchSettings } from '../../../redux/robot-settings'
 import type { State, Dispatch } from '../../../redux/types'
-import type {
-  RobotSettings,
-} from '../../../redux/robot-settings/types'
+import type { RobotSettings } from '../../../redux/robot-settings/types'
 import { SettingToggle } from './SettingToggle'
 
 interface RobotSettingsFeatureFlagsProps {
@@ -44,11 +39,7 @@ export function RobotSettingsFeatureFlags({
   return (
     <>
       {featureFlags.map(field => (
-        <SettingToggle
-          key={field.id}
-          {...field}
-          robotName={robotName}
-        />
+        <SettingToggle key={field.id} {...field} robotName={robotName} />
       ))}
     </>
   )
