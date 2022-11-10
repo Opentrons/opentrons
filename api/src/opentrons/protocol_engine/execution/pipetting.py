@@ -269,6 +269,8 @@ class PipettingHandler:
             well_location=well_location,
         )
 
+        speed = self._state_store.pipettes.get_motion_speed(pipette_id=pipette_id)
+
         # this will handle raising if the thermocycler lid is in a bad state
         # so we don't need to put that logic elsewhere
         await self._movement_handler.move_to_well(
@@ -283,6 +285,7 @@ class PipettingHandler:
                 mount=pipette_location.mount.to_hw_mount(),
                 critical_point=pipette_location.critical_point,
                 abs_position=position,
+                speed=speed,
             )
 
     @contextmanager
