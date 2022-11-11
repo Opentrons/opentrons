@@ -17,6 +17,15 @@ export const GRIPPER_FLOW_TYPES = {
   RECALIBRATE: 'RECALIBRATE',
 }
 
+export const FRONT_JAW = 'front_jaw'
+export const REAR_JAW = 'rear_jaw'
+
+// pin movements
+
+export const MOVE_PIN_TO_FRONT_JAW = 'movePinToFrontJaw'
+export const MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW = 'movePinFromFrontJawToRearJaw'
+export const REMOVE_PIN_FROM_REAR_JAW = 'removePinFromRearJaw'
+
 //  required equipment list
 export const CAL_PIN_LOADNAME = 'calibration_pin'
 export const SCREWDRIVER_LOADNAME = 't10_torx_screwdriver'

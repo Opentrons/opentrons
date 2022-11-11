@@ -1,4 +1,4 @@
-import { SECTIONS, GRIPPER_FLOW_TYPES } from './constants'
+import { SECTIONS, GRIPPER_FLOW_TYPES, FRONT_JAW, REAR_JAW } from './constants'
 import { useCreateCommandMutation } from '@opentrons/react-api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
 
@@ -19,37 +19,36 @@ export type GripperWizardFlowType =
   | typeof GRIPPER_FLOW_TYPES.DETACH
   | typeof GRIPPER_FLOW_TYPES.RECALIBRATE
 
-export interface BaseStep {
-  flowType: GripperWizardFlowType
-}
-export interface BeforeBeginningStep extends BaseStep {
+
+export interface BeforeBeginningStep {
   section: typeof SECTIONS.BEFORE_BEGINNING
 }
-export interface RemovePinStep extends BaseStep {
+export interface RemovePinStep {
   section: typeof SECTIONS.REMOVE_PIN
 }
-export interface InsertPinStep extends BaseStep {
+export interface InsertPinStep {
   section: typeof SECTIONS.INSERT_PIN
+  jaw: typeof FRONT_JAW | typeof REAR_JAW
 }
-export interface ResultsStep extends BaseStep {
+export interface ResultsStep {
   section: typeof SECTIONS.RESULTS
 }
-export interface MountGripperStep extends BaseStep {
+export interface MountGripperStep {
   section: typeof SECTIONS.MOUNT_GRIPPER
 }
-export interface UnmountGripperStep extends BaseStep {
+export interface UnmountGripperStep {
   section: typeof SECTIONS.UNMOUNT_GRIPPER
 }
-export interface SuccessfullyAttachedStep extends BaseStep {
+export interface SuccessfullyAttachedStep {
   section: typeof SECTIONS.SUCCESSFULLY_ATTACHED
 }
-export interface SuccessfullyAttachedAndCalibratedStep extends BaseStep {
+export interface SuccessfullyAttachedAndCalibratedStep {
   section: typeof SECTIONS.SUCCESSFULLY_ATTACHED_AND_CALIBRATED
 }
-export interface SuccessfullyRecalibratedStep extends BaseStep {
+export interface SuccessfullyRecalibratedStep {
   section: typeof SECTIONS.SUCCESSFULLY_RECALIBRATED
 }
-export interface SuccessfullyDetachedStep extends BaseStep {
+export interface SuccessfullyDetachedStep {
   section: typeof SECTIONS.SUCCESSFULLY_DETACHED
 }
 

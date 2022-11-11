@@ -1,4 +1,4 @@
-import { GRIPPER_FLOW_TYPES, SECTIONS } from './constants'
+import { GRIPPER_FLOW_TYPES, SECTIONS, FRONT_JAW, REAR_JAW } from './constants'
 import type { GripperWizardStep, GripperWizardFlowType } from './types'
 
 export const getGripperWizardSteps = (
@@ -8,7 +8,7 @@ export const getGripperWizardSteps = (
     case GRIPPER_FLOW_TYPES.RECALIBRATE: {
       return [
         { section: SECTIONS.BEFORE_BEGINNING },
-        { section: SECTIONS.INSERT_PIN },
+        { section: SECTIONS.MOVE_PIN, jaw: FRONT_JAW }
         { section: SECTIONS.REMOVE_PIN },
         { section: SECTIONS.RESULTS },
       ]
@@ -18,6 +18,7 @@ export const getGripperWizardSteps = (
         { section: SECTIONS.BEFORE_BEGINNING },
         { section: SECTIONS.MOUNT_GRIPPER },
         { section: SECTIONS.SUCCESSFULLY_ATTACHED },
+        { section: SECTIONS.INSERT_PIN, jaw: FRONT_JAW }
         { section: SECTIONS.RESULTS },
       ]
     }
