@@ -113,7 +113,7 @@ class Capacitance_Distance_Test:
                 capacitance.append(data)
             _variance = abs(max(capacitance) - min(capacitance))
             print(f"Variance = {_variance}")
-            if _variance < 0.5:
+            if _variance < 0.1:
                 _reading = False
         return sum(capacitance) / len(capacitance)
 
