@@ -155,6 +155,9 @@ export function PipetteOffsetCalibrationItems({
                     mount={calibration.mount}
                     serialNumber={calibration.serialNumber ?? null}
                     updateRobotStatus={updateRobotStatus}
+                    pipetteName={
+                      attachedPipettes[calibration.mount]?.name ?? null
+                    }
                   />
                 </StyledTableCell>
               </StyledTableRow>
