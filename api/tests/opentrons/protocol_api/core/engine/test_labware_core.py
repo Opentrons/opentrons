@@ -4,7 +4,10 @@ from typing import cast
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
+from opentrons_shared_data.labware.dev_types import (
+    LabwareDefinition as LabwareDefDict,
+    LabwareParameters as LabwareParamsDict,
+)
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
     Parameters as LabwareDefinitionParameters,
@@ -69,14 +72,20 @@ def test_set_calibration(subject: LabwareCore) -> None:
 @pytest.mark.parametrize(
     "labware_definition",
     [
-        LabwareDefinition.construct(namespace="hello", ordering=[])  # type: ignore[call-arg]
+        LabwareDefinition.construct(  # type: ignore[call-arg]
+            namespace="hello",
+            parameters=LabwareDefinitionParameters.construct(loadName="world"),  # type: ignore[call-arg]
+            ordering=[],
+        )
     ],
 )
 def test_get_definition(subject: LabwareCore) -> None:
     """It should get the labware's definition as a dictionary."""
-    result = subject.get_definition()
-
-    assert result == cast(LabwareDefDict, {"namespace": "hello", "ordering": []})
+    assert subject.get_definition() == cast(
+        LabwareDefDict,
+        {"namespace": "hello", "parameters": {"loadName": "world"}, "ordering": []},
+    )
+    assert subject.get_parameters() == cast(LabwareParamsDict, {"loadName": "world"})
 
 
 def test_get_user_display_name(decoy: Decoy, mock_engine_client: EngineClient) -> None:

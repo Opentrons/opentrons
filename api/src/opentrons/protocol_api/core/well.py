@@ -32,12 +32,12 @@ class AbstractWellCore(ABC):
 
     @abstractmethod
     def get_column_name(self) -> str:
-        """Get the column portion of the well name (e.g. "A")."""
+        """Get the column portion of the well name (e.g. "1")."""
         ...
 
     @abstractmethod
     def get_row_name(self) -> str:
-        """Get the row portion of the well name (e.g. "1")."""
+        """Get the row portion of the well name (e.g. "A")."""
         ...
 
     @abstractmethod

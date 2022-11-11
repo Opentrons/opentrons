@@ -1,4 +1,8 @@
 """ProtocolEngine-based Well core implementations."""
+import re
+
+from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
+
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.geometry.well_geometry import WellGeometry
@@ -16,13 +20,21 @@ class WellCore(AbstractWellCore):
         engine_client: Synchronous ProtocolEngine client.
     """
 
+    _well_name_pattern = re.compile(WELL_NAME_PATTERN, re.X)
+
     def __init__(self, name: str, labware_id: str, engine_client: EngineClient) -> None:
-        self._name = name
         self._labware_id = labware_id
         self._engine_client = engine_client
         self._definition = engine_client.state.labware.get_well_definition(
             labware_id=labware_id, well_name=name
         )
+
+        # TODO(mc, 2022-11-11): redo this implementation
+        # https://opentrons.atlassian.net/browse/RCORE-380
+        name_match = self._well_name_pattern.match(name)
+        self._name = name
+        self._row_name = name_match.group(1) if name_match is not None else ""
+        self._column_name = name_match.group(2) if name_match is not None else ""
 
     @property
     def labware_id(self) -> str:
@@ -47,12 +59,12 @@ class WellCore(AbstractWellCore):
         return self._name
 
     def get_column_name(self) -> str:
-        """Get the column portion of the well name (e.g. "A")."""
-        raise NotImplementedError("WellCore.get_column_name not implemented")
+        """Get the column portion of the well name (e.g. "1")."""
+        return self._column_name
 
     def get_row_name(self) -> str:
-        """Get the row portion of the well name (e.g. "1")."""
-        raise NotImplementedError("WellCore.get_row_name not implemented")
+        """Get the row portion of the well name (e.g. "A")."""
+        return self._row_name
 
     def get_max_volume(self) -> float:
         """Get the well's maximum liquid volume."""

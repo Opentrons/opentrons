@@ -340,19 +340,24 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         ).pipetteName.value
 
     def get_model(self) -> str:
-        raise NotImplementedError("InstrumentCore.get_model not implemented")
+        # TODO(mc, 2022-11-11): https://opentrons.atlassian.net/browse/RCORE-382
+        return self.get_hardware_state()["model"]
 
     def get_min_volume(self) -> float:
-        raise NotImplementedError("InstrumentCore.get_min_volume not implemented")
+        # TODO(mc, 2022-11-11): https://opentrons.atlassian.net/browse/RCORE-382
+        return self.get_hardware_state()["min_volume"]
 
     def get_max_volume(self) -> float:
-        raise NotImplementedError("InstrumentCore.get_max_volume not implemented")
+        # TODO(mc, 2022-11-11): https://opentrons.atlassian.net/browse/RCORE-382
+        return self.get_hardware_state()["max_volume"]
 
     def get_current_volume(self) -> float:
-        raise NotImplementedError("InstrumentCore.get_current_volume not implemented")
+        # TODO(mc, 2022-11-11): https://opentrons.atlassian.net/browse/RCORE-381
+        return self.get_hardware_state()["current_volume"]
 
     def get_available_volume(self) -> float:
-        raise NotImplementedError("InstrumentCore.get_available_volume not implemented")
+        # TODO(mc, 2022-11-11): https://opentrons.atlassian.net/browse/RCORE-381
+        return self.get_hardware_state()["available_volume"]
 
     def get_hardware_state(self) -> PipetteDict:
         """Get the current state of the pipette hardware as a dictionary."""
@@ -360,6 +365,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
     # TODO(mc, 2022-11-09): read pipette config into engine state at load
     def get_channels(self) -> int:
+        # TODO(mc, 2022-11-11): https://opentrons.atlassian.net/browse/RCORE-382
         return self.get_hardware_state()["channels"]
 
     def has_tip(self) -> bool:
