@@ -25,10 +25,16 @@ def build_arg_parser():
     arg_parser.add_argument('-s', '--simulate', action="store_true", required=False, help='Simulate this test script')
     return arg_parser
 
-class Calibration_Repeatability_Test:
+class Deck_Calibration_Repeatability_Test:
     def __init__(self, simulate: bool, cycles: int, slot: int) -> None:
         self.api = None
         self.mount = None
+        self.home = None
+        self.deck_z = None
+        self.deck_definition = None
+        self.pipette_id = None
+        self.center_xy = None
+        self.center_z = None
         self.slot = slot
         self.simulate = simulate
         self.cycles = cycles
@@ -36,16 +42,8 @@ class Calibration_Repeatability_Test:
         self.DIAL_HEIGHT = 67
         self.SAFE_HEIGHT = 10
         self.PROBE_LENGTH = 34.5
-        self.CUTOUT_SIZE = 20
-        self.CUTOUT_HALF = self.CUTOUT_SIZE / 2
         self.PROBE_SETTINGS_Z_AXIS = CapacitivePassSettings(
             prep_distance_mm=5,
-            max_overrun_distance_mm=5,
-            speed_mm_per_s=1,
-            sensor_threshold_pf=1.0,
-        )
-        self.PROBE_SETTINGS_XY_AXIS = CapacitivePassSettings(
-            prep_distance_mm=self.CUTOUT_HALF,
             max_overrun_distance_mm=5,
             speed_mm_per_s=1,
             sensor_threshold_pf=1.0,
@@ -54,26 +52,15 @@ class Calibration_Repeatability_Test:
             "Time":None,
             "Cycle":None,
             "Z Height":None,
-            "X Right":None,
-            "X Left":None,
-            "X Center":None,
-            "Y Back":None,
-            "Y Front":None,
-            "Y Center":None,
-            "X Gauge":None,
-            "Y Gauge":None,
-            "X Gauge Encoder":None,
-            "Y Gauge Encoder":None,
-            "Slot Center Encoder":None,
-            "Slot Center Position":None,
+            "Z Position":None,
+            "Z Gauge":None,
+            "Z Gauge Zero":None,
+            "Z Gauge Position":None,
+            "Z Gauge Encoder":None,
         }
-        self.HOME = None
-        self.SLOT_CENTER = None
         self.gauges = {}
         self.gauge_ports = {
-            "Gauge X":"/dev/ttyUSB0",
-            "Gauge Y":"/dev/ttyUSB1",
-            # "Gauge Z":"/dev/ttyUSB2",
+            "Gauge Z":"/dev/ttyUSB0",
         }
 
     async def test_setup(self):
@@ -87,7 +74,7 @@ class Calibration_Repeatability_Test:
         print(f"\nStarting Test on Deck Slot #{self.slot}:\n")
 
     def file_setup(self):
-        self.test_name = "calibration_repeatability_test"
+        self.test_name = "deck_calibration_repeatability_test"
         self.test_tag = f"slot{self.slot}"
         self.test_header = self.dict_keys_to_line(self.test_data)
         self.test_id = data.create_run_id()
@@ -115,75 +102,59 @@ class Calibration_Repeatability_Test:
             encoders.append(round(encoder_position[key], 3))
         return encoders
 
-    async def _read_gauge(self, start_position):
-        # Get current position
-        current_position = await self.api.gantry_position(self.mount)
-        # Move to start position
-        await self.api.move_to(self.mount, start_position, speed=100)
-        # Jog gauge
-        if current_position.x != start_position.x:
-            gauge = self.gauges["Gauge X"]
-            encoder = "X Gauge Encoder"
-            jog_position = start_position._replace(x=start_position.x - 10)
-        elif current_position.y != start_position.y:
-            gauge = self.gauges["Gauge Y"]
-            encoder = "Y Gauge Encoder"
-            jog_position = start_position._replace(y=start_position.y - 10)
-        elif current_position.z != start_position.z:
-            gauge = self.gauges["Gauge Z"]
-            encoder = "Z Gauge Encoder"
-            jog_position = start_position._replace(z=start_position.z - 10)
-        await self.api.move_to(self.mount, jog_position, speed=10)
-        encoder_position = await self._get_encoder()
-        self.test_data[encoder] = str(encoder_position).replace(", ",";")
+    def _zero_gauge(self):
+        input(f"\nPlace Gauge Block on Deck Slot #{self.slot} and Press ENTER\n")
+        _reading = True
+        while _reading:
+            zeros = []
+            for i in range(5):
+                z_gauge = self.gauges["Gauge Z"].read_stable(timeout=20)
+                zeros.append(z_gauge)
+            _variance = abs(max(zeros) - min(zeros))
+            print(f"Variance = {_variance}")
+            if _variance < 0.1:
+                _reading = False
+        z_zero = sum(zeros) / len(zeros)
+        self.test_data["Z Gauge Zero"] = str(z_zero)
+        print(f"Z Gauge Zero = {z_zero}mm")
+        input(f"\nRemove Gauge Block from Deck Slot #{self.slot} and Press ENTER\n")
 
+    async def _read_gauge(self):
+        # Get position
+        current_position = await self.api.gantry_position(self.mount)
+        self.test_data["Z Gauge Position"] = str(current_position).replace(", ",";")
+        # Get encoder
+        encoder_position = await self._get_encoder()
+        self.test_data["Z Gauge Encoder"] = str(encoder_position).replace(", ",";")
         # Read gauge
-        read = gauge.read_stable(timeout=20)
-        await self.api.move_to(self.mount, current_position, speed=100)
+        read = self.gauges["Gauge Z"].read_stable(timeout=20)
         return read
 
     async def _probe_axis(
         self, axis: OT3Axis, target: float
     ) -> float:
-        if axis == OT3Axis.by_mount(self.mount):
-            settings = self.PROBE_SETTINGS_Z_AXIS
-        else:
-            settings = self.PROBE_SETTINGS_XY_AXIS
-        # await wait_for_stable_capacitance_ot3(
-        #     self.api, self.mount, threshold_pf=0.1, duration=1.0
-        # )
         point = await self.api.capacitive_probe(
-            self.mount, axis, target, settings
+            self.mount, axis, target, self.PROBE_SETTINGS_Z_AXIS
         )
         return point
 
-    async def _measure_sequence(
+    async def _measure_deck(
         self, api: OT3API, mount: OT3Mount, cycle: int
     ) -> None:
-        # Move to slot center
-        await api.move_to(mount, self.SLOT_CENTER, speed=20)
+        # Move above gauge
+        current_position = await api.gantry_position(mount)
+        above_gauge = self.slot_center._replace(z=current_position.z)
+        await api.move_to(mount, above_gauge, speed=20)
 
-        # Move to measure position
-        measure_position = self.SLOT_CENTER._replace(z=self.DIAL_HEIGHT)
-        await api.move_to(mount, measure_position)
-        encoder_position = await self._get_encoder()
-        slot_position = await api.gantry_position(mount)
-        self.test_data["Slot Center Encoder"] = str(encoder_position).replace(", ",";")
-        self.test_data["Slot Center Position"] = str(slot_position).replace(", ",";")
-        print("SLOT ENCODER = ", self.test_data["Slot Center Encoder"])
-        print("SLOT POSITION = ", self.test_data["Slot Center Position"])
+        # Move to deck height and slot center
+        await api.move_to(mount, self.slot_center)
 
-        # Read X-Axis gauge
-        x_start = measure_position._replace(x=measure_position.x - 35)
-        x_gauge = await self._read_gauge(x_start)
-        self.test_data["X Gauge"] = str(x_gauge)
-        print("X GAUGE = ", self.test_data["X Gauge"])
-
-        # Read Y-Axis gauge
-        y_start = measure_position._replace(y=measure_position.y - 28)
-        y_gauge = await self._read_gauge(y_start)
-        self.test_data["Y Gauge"] = str(y_gauge)
-        print("Y GAUGE = ", self.test_data["Y Gauge"])
+        # Read Z-Axis gauge
+        z_gauge = await self._read_gauge()
+        self.test_data["Z Gauge"] = str(z_gauge)
+        print("Z Gauge Reading = ", self.test_data["Z Gauge"])
+        print("Z Gauge Position = ", self.test_data["Z Gauge Position"])
+        print("Z Gauge Encoder = ", self.test_data["Z Gauge Encoder"])
 
         # Save data to file
         elapsed_time = (time.time() - self.start_time)/60
@@ -193,34 +164,37 @@ class Calibration_Repeatability_Test:
         data.append_data_to_file(self.test_name, self.test_file, test_data)
 
         # Home Z-Axis
-        home_z = self.SLOT_CENTER._replace(z=self.HOME.z)
+        home_z = self.slot_center._replace(z=self.home.z)
         await api.move_to(mount, home_z)
 
         # Move next to home
-        await api.move_to(mount, self.HOME + Point(x=-5, y=-5, z=0))
+        await api.move_to(mount, self.home + Point(x=-5, y=-5, z=0))
 
-    async def _calibrate(
+    async def _calibrate_deck(
         self, api: OT3API, mount: OT3Mount
     ) -> None:
         # Initialize deck slot position
-        CORNER = Point(*self.deck_definition["locations"]["orderedSlots"][self.slot - 1]["position"])
-        self.CENTER_XY = Point(CORNER.x + 124.0 / 2, CORNER.y + 82.0 / 2, 50)
-        self.CENTER_Z = Point(CORNER.x + 76, CORNER.y + 54, 100)
+        corner = Point(*self.deck_definition["locations"]["orderedSlots"][self.slot - 1]["position"])
+        self.center_xy = Point(corner.x + 124.0 / 2, corner.y + 82.0 / 2, 1)
+        self.center_z = Point(corner.x + 76, corner.y + 54, 1)
 
         # Home grantry
         await home_ot3(api, self.axes)
 
         # Move above deck Z-Axis point
-        self.HOME = await api.gantry_position(mount)
-        above_point = self.CENTER_Z._replace(z=self.HOME.z)
+        self.home = await api.gantry_position(mount)
+        above_point = self.center_z._replace(z=self.home.z)
         await api.move_to(mount, above_point)
 
         # Probe deck Z-Axis height
-        deck_z = await self._probe_axis(OT3Axis.by_mount(mount), self.CENTER_Z.z)
-        print(f"Deck Z-Axis height = {deck_z} mm")
-        self.test_data["Z Height"] = str(round(deck_z, 3))
+        self.deck_z = await self._probe_axis(OT3Axis.by_mount(mount), self.center_z.z)
+        print(f"Deck Z-Axis height = {self.deck_z} mm")
 
-        self.SLOT_CENTER = self.CENTER_XY._replace(z=deck_z)
+        # Update test data
+        self.center_z = self.center_z._replace(z=self.deck_z)
+        self.slot_center = self.center_xy._replace(z=self.deck_z)
+        self.test_data["Z Height"] = str(round(self.deck_z, 3))
+        self.test_data["Z Position"] = str(self.center_z).replace(", ",";")
 
     async def exit(self):
         if self.api:
@@ -229,11 +203,12 @@ class Calibration_Repeatability_Test:
     async def run(self) -> None:
         try:
             await self.test_setup()
+            self._zero_gauge()
             for i in range(self.cycles):
                 cycle = i + 1
                 print(f"\n--> Starting Cycle {cycle}/{self.cycles}")
-                await self._calibrate(self.api, self.mount)
-                await self._measure_sequence(self.api, self.mount, cycle)
+                await self._calibrate_deck(self.api, self.mount)
+                await self._measure_deck(self.api, self.mount, cycle)
         except Exception as e:
             await self.exit()
             raise e
@@ -248,5 +223,5 @@ if __name__ == '__main__':
     print("\nOT-3 Deck Calibration Repeatability Test\n")
     arg_parser = build_arg_parser()
     args = arg_parser.parse_args()
-    test = Calibration_Repeatability_Test(args.simulate, args.cycles, args.slot)
+    test = Deck_Calibration_Repeatability_Test(args.simulate, args.cycles, args.slot)
     asyncio.run(test.run())
