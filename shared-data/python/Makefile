@@ -67,13 +67,13 @@ sdist: $(sdist_file)
 
 
 $(wheel_file): setup.py $(py_sources) $(json_sources)
-	$(SHX) mkdir -p build
+	$(SHX) mkdir -p $(BUILD_DIR)
 	$(call python,ot-2) setup.py $(wheel_opts) bdist_wheel
 	$(SHX) ls $(BUILD_DIR)
 
 
 $(sdist_file): setup.py $(py_sources) $(json_sources)
-	$(SHX) mkdir -p build
+	$(SHX) mkdir -p $(BUILD_DIR)
 	$(call python,ot-3/robot-server) setup.py sdist
 	$(SHX) ls $(BUILD_DIR)
 

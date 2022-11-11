@@ -50,9 +50,10 @@ usb_host=$(shell yarn run -s discovery find -i 169.254)
 
 # install all project dependencies
 # may be run with -j
-# setup-py requires setup-js be run first due to use of yarn installed tools like shx
 .PHONY: setup
-setup: setup-js setup-py
+setup:
+	$(MAKE) setup-globals
+	$(MAKE) setup-js setup-py
 
 # front-end dependecies handled by yarn
 .PHONY: setup-js
@@ -62,9 +63,17 @@ setup-js:
 	$(MAKE) -C $(APP_SHELL_DIR) setup
 	$(MAKE) -C $(SHARED_DATA_DIR) setup-js
 
-.PHONY: install-pipenv
-install-pipenv:
+.PHONY: setup-globals
+setup-globals: js-globals python-globals
+
+.PHONY: python-globals
+python-globals:
 	$(OT_PYTHON) -m pip install pipenv==2021.5.29
+
+.PHONY: js-globals
+js-globals:
+	npm i -g npm@6
+	npm i -g yarn@1 shx@0.3.3
 
 PYTHON_SETUP_TARGETS := $(addsuffix -py-setup, $(PYTHON_SETUP_DIRS))
 

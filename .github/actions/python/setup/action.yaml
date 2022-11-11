@@ -24,7 +24,7 @@ runs:
         node-version: '16'
     - shell: bash
       run: |
-        npm install --global shx@0.3.3
+        make js-globals
     - uses: 'actions/setup-python@v4'
       with:
         python-version: ${{ inputs.python-version }}
@@ -34,7 +34,7 @@ runs:
           **/Pipfile.*
     - name: install pipenv
       shell: bash
-      run: make install-pipenv
+      run: make python-globals
     - shell: bash
       name: setup project ${{ inputs.project }}
       run: make -C ${{ inputs.project }} setup

@@ -23,7 +23,7 @@ runs:
       with:
         node-version: '16'
     - shell: bash
-      run: npm install --global shx@0.3.3
+      run: make js-globals
     - uses: 'actions/setup-python@v4'
       with:
         python-version: ${{ inputs.python-version }}
@@ -36,7 +36,7 @@ runs:
       run: echo "OT_PYTHON=$(which python)" >> $GITHUB_ENV
     - name: Install pipenv
       shell: bash
-      run: make install-pipenv
+      run: make python-globals
     - shell: bash
       name: setup ${{ inputs.environment }}
       run: make -C ${{ inputs.environment }} setup
