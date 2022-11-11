@@ -1,6 +1,7 @@
 """Plot Capacitance Distance Test Results."""
 import os
 import sys
+import argparse
 import pandas as pd
 import plotly.express as px
 from plotly.subplots import make_subplots
@@ -54,6 +55,8 @@ class Plot:
         self.relative_plot()
         print("Plotting Average Capacitance...")
         self.average_plot()
+        print("Plotting Normalized Capacitance...")
+        self.normalized_plot()
         print("Plotting Capacitance vs. Encoder...")
         self.encoder_cap_plot()
         print("Plotting Position vs. Encoder...")
@@ -62,8 +65,17 @@ class Plot:
         self.deck_plot()
         print("Plots Saved!")
 
+    def combine_plots(self):
+        self.comparison_plot()
+        print("Plotting Comparison...")
+        self.deck_plot()
+        print("Plots Combined!")
+
     def average_df(self, df):
         df_avg = df.groupby("Step", as_index=False)[["Capacitance","Relative","Z Position"]].mean()
+        df_avg["Normalized"] = df_avg["Z Position"] - df_avg["Z Position"].min()
+        print("Max Value = ", df_avg.iloc[0])
+        print("Min Value = ", df_avg.iloc[-1])
         return df_avg
 
     def set_legend(self, figure, legend):
@@ -119,6 +131,43 @@ class Plot:
         for key, value in self.plot_param.items():
             self.plot_param[key] = None
 
+    def comparison_plot(self):
+        n_files = len(sys.argv) - 1
+        data = []
+        avg = []
+        legend = []
+        prefix = "P50SV43"
+        for i in range(n_files):
+            data.append(self.import_file(sys.argv[i + 1]))
+            avg.append(self.average_df(data[i]))
+            legend.append(prefix + data[i]["Pipette"].iloc[0])
+        x_axis = "Normalized"
+        y_axis = "Relative"
+        fig = []
+        fig_data = ()
+        for i in range(n_files):
+            fig = px.line(avg[i], x=x_axis, y=[y_axis], markers=True, color_discrete_sequence=self.list_colors[i:])
+            fig.update_traces(marker={"size":10,"line":{"width":2, "color":"black"}})
+            fig_data += fig.data
+            self.set_legend(fig, [legend[i]])
+        subfig = make_subplots()
+        subfig.add_traces(fig_data)
+        self.plot_param["figure"] = subfig
+        self.plot_param["filename"] = "plot_comparison"
+        self.plot_param["title"] = "Normalized Average Relative Capacitance Comparison"
+        self.plot_param["x_title"] = "Z-Axis Position (mm)"
+        self.plot_param["y_title"] = "∆C/C<sub>O</sub>"
+        self.plot_param["x_range"] = [0, 2]
+        self.plot_param["y_range"] = [0, 2.5]
+        self.plot_param["legend"] = "Pipettes"
+        self.plot_param["annotation"] = None
+        zoom_param = self.plot_param.copy()
+        self.write_plot(self.plot_param)
+        zoom_param["filename"] = "plot_comparison_zoom"
+        zoom_param["title"] = "Normalized Average Relative Capacitance Comparison Zoom"
+        zoom_param["y_range"] = [0,0.05]
+        self.write_plot(zoom_param)
+
     def sensor_plot(self):
         df = self.df_data
         x_axis = "Time"
@@ -161,7 +210,7 @@ class Plot:
         self.write_plot(self.plot_param)
         zoom_param["filename"] = "plot_absolute_zoom"
         zoom_param["title"] = "Absolute Capacitance Zoom Data"
-        zoom_param["y_range"] = [4.3, 4.6]
+        zoom_param["y_range"] = [3.8, 4.2]
         self.write_plot(zoom_param)
 
     def relative_plot(self):
@@ -211,13 +260,45 @@ class Plot:
         self.plot_param["x_title"] = "Z-Axis Position (mm)"
         self.plot_param["y_title"] = "∆C/C<sub>O</sub>"
         self.plot_param["x_range"] = [0, x_last]
-        self.plot_param["y_range"] = [0, 1.8]
+        self.plot_param["y_range"] = [0, 2.2]
         self.plot_param["legend"] = "Cycles"
         self.plot_param["annotation"] = None
         zoom_param = self.plot_param.copy()
         self.write_plot(self.plot_param)
         zoom_param["filename"] = "plot_average_zoom"
         zoom_param["title"] = "Average Relative Capacitance Zoom Data"
+        zoom_param["y_range"] = [0,0.05]
+        self.write_plot(zoom_param)
+
+    def normalized_plot(self):
+        df = self.df_average
+        x_axis = "Normalized"
+        y_axis = "Relative"
+        x_first = df[x_axis].min()
+        x_last = df[x_axis].max()
+        y_first = df[y_axis].min()
+        y_last = df[y_axis].max()
+        fig = px.line(df, x=x_axis, y=[y_axis], markers=True)
+        fig.update_traces(
+            marker={
+                "size":10,
+                "line":{"width":2, "color":"black"}
+            }
+        )
+        self.set_legend(fig, ["Average"])
+        self.plot_param["figure"] = fig
+        self.plot_param["filename"] = "plot_normalized"
+        self.plot_param["title"] = "Normalized Average Relative Capacitance Data"
+        self.plot_param["x_title"] = "Z-Axis Position (mm)"
+        self.plot_param["y_title"] = "∆C/C<sub>O</sub>"
+        self.plot_param["x_range"] = [0, x_last]
+        self.plot_param["y_range"] = [0, 2.2]
+        self.plot_param["legend"] = "Cycles"
+        self.plot_param["annotation"] = None
+        zoom_param = self.plot_param.copy()
+        self.write_plot(self.plot_param)
+        zoom_param["filename"] = "plot_normalized_zoom"
+        zoom_param["title"] = "Normalized Average Relative Capacitance Zoom Data"
         zoom_param["y_range"] = [0,0.05]
         self.write_plot(zoom_param)
 
@@ -236,7 +317,7 @@ class Plot:
         self.plot_param["x_title"] = "Z-Axis Encoder (mm)"
         self.plot_param["y_title"] = "Capacitance (pF)"
         self.plot_param["x_range"] = [x_first, x_last]
-        self.plot_param["y_range"] = [4.3, 4.6]
+        self.plot_param["y_range"] = [3.8, 4.2]
         self.plot_param["legend"] = "Cycles"
         self.plot_param["annotation"] = None
         self.write_plot(self.plot_param)
@@ -289,7 +370,7 @@ class Plot:
         self.plot_param["x_title"] = "Cycle"
         self.plot_param["y_title"] = "Deck Height (mm)"
         self.plot_param["x_range"] = [x_first, x_last]
-        self.plot_param["y_range"] = [0.1, 0.2]
+        self.plot_param["y_range"] = [0, 0.3]
         self.plot_param["legend"] = "Data"
         self.plot_param["annotation"] = [annotation_zmin, annotation_zmax]
         self.write_plot(self.plot_param)
@@ -297,4 +378,7 @@ class Plot:
 if __name__ == '__main__':
     print("\nPlot Capacitance Distance Test Results\n")
     plot = Plot(sys.argv[1])
-    plot.create_plot()
+    if len(sys.argv) > 2:
+        plot.combine_plots()
+    else:
+        plot.create_plot()
