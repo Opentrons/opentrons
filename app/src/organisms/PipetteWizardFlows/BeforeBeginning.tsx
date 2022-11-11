@@ -33,8 +33,6 @@ export const BeforeBeginning = (
     setShowErrorMessage,
   } = props
   const { t } = useTranslation('pipette_wizard_flows')
-  //  TODO(jr, 10/26/22): when we wire up other flows, const will turn into let
-  //  for proceedButtonText and rightHandBody
   React.useEffect(() => {
     createRun({})
   }, [])
@@ -44,10 +42,10 @@ export const BeforeBeginning = (
   const handleOnClick = (): void => {
     chainRunCommands(
       [
-        // {
-        //   commandType: 'home' as const,
-        //   params: {},
-        // },
+        {
+          commandType: 'home' as const,
+          params: {},
+        },
         {
           commandType: 'loadPipette' as const,
           params: {
@@ -75,7 +73,8 @@ export const BeforeBeginning = (
         setShowErrorMessage(error.message)
       })
   }
-
+  //  TODO(jr, 10/26/22): when we wire up other flows, const will turn into let
+  //  for proceedButtonText and rightHandBody
   const proceedButtonText: string = t('get_started')
   const rightHandBody = (
     <WizardRequiredEquipmentList
