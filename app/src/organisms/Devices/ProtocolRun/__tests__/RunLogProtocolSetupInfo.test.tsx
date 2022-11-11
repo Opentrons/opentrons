@@ -12,7 +12,7 @@ import { RunLogProtocolSetupInfo } from '../RunLogProtocolSetupInfo'
 import type {
   RunTimeCommand,
   LabwareDefinition2,
-  ProtocolAnalysisFile,
+  LegacySchemaAdapterOutput,
 } from '@opentrons/shared-data'
 
 jest.mock('../../hooks')
@@ -24,7 +24,7 @@ const mockUseRunPipetteInfoByMount = useRunPipetteInfoByMount as jest.MockedFunc
   typeof useRunPipetteInfoByMount
 >
 
-const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnalysisFile
+const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as LegacySchemaAdapterOutput
 
 const TEMP_ID = 'temperature_module_gen2'
 const TC_ID = 'thermocycler'
@@ -201,12 +201,21 @@ describe('RunLogProtocolSetupInfo', () => {
       runId: RUN_ID,
       setupCommand: COMMAND_TYPE_LOAD_LABWARE_WITH_MODULE,
     }
-    when(mockUseProtocolDetailsForRun).calledWith(RUN_ID).mockReturnValue({
-      protocolData: simpleV6Protocol,
-      displayName: 'mock display name',
-      protocolKey: 'fakeProtocolKey',
-      robotType: 'OT-2 Standard',
-    })
+    when(mockUseProtocolDetailsForRun)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        protocolData: {
+          ...simpleV6Protocol,
+          commands: simpleV6Protocol.commands.map(c =>
+            c.commandType === 'loadModule'
+              ? { ...c, result: { moduleId: c.params.moduleId } }
+              : c
+          ),
+        },
+        displayName: 'mock display name',
+        protocolKey: 'fakeProtocolKey',
+        robotType: 'OT-2 Standard',
+      })
     const { getByText } = render(props)
     getByText(
       'Load ANSI 96 Standard Microplate v1 in Magnetic Module GEN2 in Slot 3'

@@ -59,7 +59,7 @@ describe('CheckCalibration', () => {
       currentStep: 'returningTip',
     },
     {
-      heading: 'calibration health check results',
+      heading: 'Calibration Health Check Results',
       currentStep: 'resultsSummary',
     },
   ]

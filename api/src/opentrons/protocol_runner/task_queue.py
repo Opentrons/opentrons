@@ -71,7 +71,7 @@ class TaskQueue:
             if self._run_func is not None:
                 await self._run_func()
         except Exception as e:
-            log.info("Exception raised during protocol run", exc_info=e)
+            log.exception("Exception raised by protocol")
             error = e
 
         await self._cleanup_func(error=error)

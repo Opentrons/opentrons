@@ -45,6 +45,7 @@ from opentrons.protocol_engine.actions import (
     FinishErrorDetails,
     QueueCommandAction,
     HardwareStoppedAction,
+    ResetTipsAction,
 )
 
 
@@ -694,4 +695,16 @@ async def test_use_attached_temp_and_mag_modules(
                 module_live_data={"status": "other-status", "data": {}},
             ),
         ),
+    )
+
+
+def test_reset_tips(
+    decoy: Decoy, action_dispatcher: ActionDispatcher, subject: ProtocolEngine
+) -> None:
+    """It should reset tip state by dispatching an action."""
+    subject.reset_tips(labware_id="cool-labware")
+
+    decoy.verify(
+        action_dispatcher.dispatch(ResetTipsAction(labware_id="cool-labware")),
+        times=1,
     )

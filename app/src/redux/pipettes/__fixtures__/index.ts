@@ -288,16 +288,16 @@ export const mockRightSpecs: any = {
   name: 'mock_right',
 }
 
-// NOTE: protocol pipettes use "name" for the exact "model" because reasons
+// NOTE: protocol pipettes use "pipetteName" for the exact "model" because reasons
 export const mockLeftProtoPipette: any = {
   mount: 'left',
-  name: 'mock_left_model',
+  pipetteName: 'mock_left_model',
   modelSpecs: mockLeftSpecs,
 }
 
 export const mockRightProtoPipette: any = {
   mount: 'right',
-  name: 'mock_right_model',
+  pipetteName: 'mock_right_model',
   modelSpecs: mockRightSpecs,
 }
 

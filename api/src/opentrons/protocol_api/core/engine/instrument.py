@@ -1,15 +1,21 @@
 """ProtocolEngine-based InstrumentContext core implementation."""
-from typing import Optional
+from __future__ import annotations
+
+from typing import Optional, TYPE_CHECKING
 
 from opentrons.types import Location, Mount
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support.util import Clearances, PlungerSpeeds, FlowRates
-from opentrons.protocol_engine import DeckPoint
+from opentrons.protocol_engine import DeckPoint, WellLocation
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
+from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
 from ..instrument import AbstractInstrument
 from .well import WellCore
+
+if TYPE_CHECKING:
+    from .protocol import ProtocolCore
 
 
 class InstrumentCore(AbstractInstrument[WellCore]):
@@ -24,10 +30,24 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         pipette_id: str,
         engine_client: EngineClient,
         sync_hardware_api: SyncHardwareAPI,
+        protocol_core: ProtocolCore,
+        default_movement_speed: float,
     ) -> None:
         self._pipette_id = pipette_id
         self._engine_client = engine_client
         self._sync_hardware_api = sync_hardware_api
+        self._protocol_core = protocol_core
+
+        # TODO(jbl 2022-11-09) clearances should be move out of the core
+        self._well_bottom_clearances = Clearances(
+            default_aspirate=1.0, default_dispense=1.0
+        )
+        # TODO(jbl 2022-11-03) flow_rates should not live in the cores, and should be moved to the protocol context
+        #   along with other rate related refactors (for the hardware API)
+        self._flow_rates = FlowRates(self)
+        self._flow_rates.set_defaults(MAX_SUPPORTED_VERSION)
+
+        self.set_default_speed(speed=default_movement_speed)
 
     @property
     def pipette_id(self) -> str:
@@ -35,19 +55,130 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         return self._pipette_id
 
     def get_default_speed(self) -> float:
-        raise NotImplementedError("InstrumentCore.get_default_speed not implemented")
+        speed = self._engine_client.state.pipettes.get_movement_speed(
+            pipette_id=self._pipette_id
+        )
+        assert speed is not None, "Pipette loading should have set a default speed."
+        return speed
 
     def set_default_speed(self, speed: float) -> None:
-        raise NotImplementedError("InstrumentCore.set_default_speed not implemented")
+        self._engine_client.set_pipette_movement_speed(
+            pipette_id=self._pipette_id, speed=speed
+        )
 
-    def aspirate(self, volume: float, rate: float) -> None:
-        raise NotImplementedError("InstrumentCore.aspirate not implemented")
+    def aspirate(
+        self,
+        location: Location,
+        well_core: Optional[WellCore],
+        volume: float,
+        rate: float,
+        flow_rate: float,
+    ) -> None:
+        """Aspirate a given volume of liquid from the specified location.
+        Args:
+            volume: The volume of liquid to aspirate, in microliters.
+            location: The exact location to aspirate from.
+            well_core: The well to aspirate from, if applicable.
+            rate: Not used in this core.
+            flow_rate: The flow rate in µL/s to aspirate at.
+        """
+        if well_core is None:
+            raise NotImplementedError(
+                "InstrumentCore.aspirate with well_core value of None not implemented"
+            )
 
-    def dispense(self, volume: float, rate: float) -> None:
-        raise NotImplementedError("InstrumentCore.dispense not implemented")
+        well_name = well_core.get_name()
+        labware_id = well_core.labware_id
 
-    def blow_out(self) -> None:
-        raise NotImplementedError("InstrumentCore.blow_out not implemented")
+        well_location = self._engine_client.state.geometry.get_relative_well_location(
+            labware_id=labware_id,
+            well_name=well_name,
+            absolute_point=location.point,
+        )
+
+        self._engine_client.aspirate(
+            pipette_id=self._pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
+            well_location=well_location,
+            volume=volume,
+            flow_rate=flow_rate,
+        )
+
+        self._protocol_core.set_last_location(location=location, mount=self.get_mount())
+
+    def dispense(
+        self,
+        location: Location,
+        well_core: Optional[WellCore],
+        volume: float,
+        rate: float,
+        flow_rate: float,
+    ) -> None:
+        """Dispense a given volume of liquid into the specified location.
+        Args:
+            volume: The volume of liquid to dispense, in microliters.
+            location: The exact location to dispense to.
+            well_core: The well to dispense to, if applicable.
+            rate: Not used in this core.
+            flow_rate: The flow rate in µL/s to dispense at.
+        """
+        if well_core is None:
+            raise NotImplementedError(
+                "InstrumentCore.dispense with well_core value of None not implemented"
+            )
+
+        well_name = well_core.get_name()
+        labware_id = well_core.labware_id
+
+        well_location = self._engine_client.state.geometry.get_relative_well_location(
+            labware_id=labware_id, well_name=well_name, absolute_point=location.point
+        )
+
+        self._engine_client.dispense(
+            pipette_id=self._pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
+            well_location=well_location,
+            volume=volume,
+            flow_rate=flow_rate,
+        )
+
+        self._protocol_core.set_last_location(location=location, mount=self.get_mount())
+
+    def blow_out(
+        self, location: Location, well_core: Optional[WellCore], move_to_well: bool
+    ) -> None:
+        """Blow liquid out of the tip.
+
+        Args:
+            location: The location to blow out into.
+            well_core: The well to blow out into.
+            move_to_well: Unused by engine core.
+        """
+        if well_core is None:
+            raise NotImplementedError("In-place blow-out is not implemented")
+
+        well_name = well_core.get_name()
+        labware_id = well_core.labware_id
+
+        well_location = self._engine_client.state.geometry.get_relative_well_location(
+            labware_id=labware_id,
+            well_name=well_name,
+            absolute_point=location.point,
+        )
+
+        self._engine_client.blow_out(
+            pipette_id=self._pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
+            well_location=well_location,
+            # TODO(jbl 2022-11-07) PAPIv2 does not have an argument for rate and
+            #   this also needs to be refactored along with other flow rate related issues
+            flow_rate=self.get_absolute_blow_out_flow_rate(1.0),
+        )
+
+        self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
     def touch_tip(
         self,
@@ -97,8 +228,41 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             well_location=well_location,
         )
 
-    def drop_tip(self, home_after: bool) -> None:
-        raise NotImplementedError("InstrumentCore.drop_tip not implemented")
+        self._protocol_core.set_last_location(location=location, mount=self.get_mount())
+
+    def drop_tip(
+        self, location: Optional[Location], well_core: WellCore, home_after: bool
+    ) -> None:
+        """Move to and drop a tip into a given well.
+
+        Args:
+            location: The location of the well we're picking up from.
+                Used to calculate the relative well offset for the drop command.
+            well_core: The well we're dropping into
+            home_after: Whether to home the pipette after the tip is dropped.
+        """
+        if location is not None:
+            raise NotImplementedError(
+                "InstrumentCore.drop_tip with non-default drop location not implemented"
+            )
+
+        if home_after is False:
+            raise NotImplementedError(
+                "InstrumentCore.drop_tip with home_after=False not implemented"
+            )
+
+        well_name = well_core.get_name()
+        labware_id = well_core.labware_id
+        well_location = WellLocation()
+
+        self._engine_client.drop_tip(
+            pipette_id=self._pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
+            well_location=well_location,
+        )
+
+        self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
     def home(self) -> None:
         raise NotImplementedError("InstrumentCore.home not implemented")
@@ -157,6 +321,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 minimum_z_height=minimum_z_height,
                 force_direct=force_direct,
             )
+        self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
     def get_mount(self) -> Mount:
         """Get the mount the pipette is attached to."""
@@ -193,11 +358,12 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         """Get the current state of the pipette hardware as a dictionary."""
         return self._sync_hardware_api.get_attached_instrument(self.get_mount())  # type: ignore[no-any-return]
 
+    # TODO(mc, 2022-11-09): read pipette config into engine state at load
     def get_channels(self) -> int:
-        raise NotImplementedError("InstrumentCore.get_channels not implemented")
+        return self.get_hardware_state()["channels"]
 
     def has_tip(self) -> bool:
-        raise NotImplementedError("InstrumentCore.has_tip not implemented")
+        return self.get_hardware_state()["has_tip"]
 
     def is_ready_to_aspirate(self) -> bool:
         raise NotImplementedError("InstrumentCore.is_ready_to_aspirate not implemented")
@@ -209,15 +375,22 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         raise NotImplementedError("InstrumentCore.get_return_height not implemented")
 
     def get_well_bottom_clearance(self) -> Clearances:
-        raise NotImplementedError(
-            "InstrumentCore.get_well_bottom_clearance not implemented"
-        )
+        return self._well_bottom_clearances
 
     def get_speed(self) -> PlungerSpeeds:
         raise NotImplementedError("InstrumentCore.get_speed not implemented")
 
     def get_flow_rate(self) -> FlowRates:
-        raise NotImplementedError("InstrumentCore.get_flow_rate not implemented")
+        return self._flow_rates
+
+    def get_absolute_aspirate_flow_rate(self, rate: float) -> float:
+        return self._flow_rates.aspirate * rate
+
+    def get_absolute_dispense_flow_rate(self, rate: float) -> float:
+        return self._flow_rates.dispense * rate
+
+    def get_absolute_blow_out_flow_rate(self, rate: float) -> float:
+        return self._flow_rates.blow_out * rate
 
     def set_flow_rate(
         self,
@@ -225,7 +398,12 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         dispense: Optional[float] = None,
         blow_out: Optional[float] = None,
     ) -> None:
-        raise NotImplementedError("InstrumentCore.set_flow_rate not implemented")
+        self._sync_hardware_api.set_flow_rate(
+            mount=self.get_mount(),
+            aspirate=aspirate,
+            dispense=dispense,
+            blow_out=blow_out,
+        )
 
     def set_pipette_speed(
         self,

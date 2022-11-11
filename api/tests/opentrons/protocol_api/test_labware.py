@@ -62,3 +62,11 @@ def test_wells(decoy: Decoy, mock_labware_core: LabwareCore, subject: Labware) -
     assert result[0].well_name == "Z42"
     assert isinstance(result[1], Well)
     assert result[1].well_name == "X1"
+
+
+def test_reset_tips(
+    decoy: Decoy, mock_labware_core: LabwareCore, subject: Labware
+) -> None:
+    """It should reset and tip state."""
+    subject.reset()
+    decoy.verify(mock_labware_core.reset_tips(), times=1)
