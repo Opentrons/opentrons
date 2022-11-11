@@ -24,6 +24,7 @@ export * from './wellSets'
 export * from './getModuleVizDims'
 export * from './getVectorDifference'
 export * from './getVectorSum'
+export * from './getLoadedLabwareDefinitionsByUri'
 
 export const getLabwareDefIsStandard = (def: LabwareDefinition2): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE

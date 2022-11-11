@@ -2,12 +2,7 @@
 import reduce from 'lodash/reduce'
 
 import { COLORS } from '@opentrons/components/src/ui-style-constants'
-import type {
-  LabwareDefinition2,
-  ModuleModel,
-  PipetteName,
-  Liquid,
-} from '@opentrons/shared-data'
+import type { ModuleModel, PipetteName, Liquid } from '@opentrons/shared-data'
 import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type {
   LoadLabwareRunTimeCommand,
@@ -189,40 +184,6 @@ export function parseInitialLoadedLabwareEntity(
       displayName: command.params.displayName,
     }
   })
-}
-
-export interface LoadedLabwareDefinitionsById {
-  [definitionUri: string]: LabwareDefinition2
-}
-export function parseInitialLoadedLabwareDefinitionsById(
-  commands: RunTimeCommand[]
-): LoadedLabwareDefinitionsById {
-  const labware = parseInitialLoadedLabwareEntity(commands)
-  const loadLabwareCommandsReversed = commands
-    .filter(
-      (command): command is LoadLabwareRunTimeCommand =>
-        command.commandType === 'loadLabware'
-    )
-    .reverse()
-  return reduce<LoadLabwareRunTimeCommand, LoadedLabwareDefinitionsById>(
-    loadLabwareCommandsReversed,
-    (acc, command) => {
-      const quirks = command.result.definition.parameters.quirks ?? []
-      if (quirks.includes('fixedTrash')) {
-        return { ...acc }
-      }
-      const labwareDef: LabwareDefinition2 = command.result?.definition
-      const labwareId = command.result?.labwareId ?? ''
-      const definitionUri =
-        labware.find(item => item.id === labwareId)?.definitionUri ?? ''
-
-      return {
-        ...acc,
-        [definitionUri]: labwareDef,
-      }
-    },
-    {}
-  )
 }
 
 interface LoadedModulesBySlot {

@@ -10,9 +10,9 @@ import type {
 import type {
   PendingProtocolAnalysis,
   CompletedProtocolAnalysis,
-  LabwareDefinition2,
   ModuleModel,
 } from '../types'
+import { getLoadedLabwareDefinitionsByUri } from './getLoadedLabwareDefinitionsByUri'
 // This adapter exists to resolve the interface mismatch between the PE analysis response
 // and the protocol schema v6 interface. Much of this logic should be deleted once we resolve
 // these discrepencies on the server side
@@ -56,25 +56,9 @@ export const schemaV6Adapter = (
       }
     })
 
-    const labwareDefinitions: {
-      [definitionUri: string]: LabwareDefinition2
-    } = protocolAnalysis.commands
-      .filter(
-        (command: RunTimeCommand): command is LoadLabwareRunTimeCommand =>
-          command.commandType === 'loadLabware'
-      )
-      .reduce((acc, command: LoadLabwareRunTimeCommand) => {
-        const labwareDef: LabwareDefinition2 = command.result?.definition
-        const labwareId = command.result?.labwareId ?? ''
-        const definitionUri =
-          protocolAnalysis.labware.find(labware => labware.id === labwareId)
-            ?.definitionUri ?? ''
-
-        return {
-          ...acc,
-          [definitionUri]: labwareDef,
-        }
-      }, {})
+    const labwareDefinitions = getLoadedLabwareDefinitionsByUri(
+      protocolAnalysis.commands
+    )
 
     const modules: {
       [moduleId: string]: { model: ModuleModel }

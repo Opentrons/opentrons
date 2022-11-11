@@ -62,6 +62,21 @@ def test_add_labware_definition(
     assert result == expected_labware_uri
 
 
+def test_reset_tips(
+    decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
+) -> None:
+    """It should reset the tip tracking state of a labware."""
+    subject.reset_tips(labware_id="cool-labware")
+
+    decoy.verify(
+        transport.call_method(
+            "reset_tips",
+            labware_id="cool-labware",
+        ),
+        times=1,
+    )
+
+
 def test_load_labware(
     decoy: Decoy,
     transport: AbstractSyncTransport,
@@ -335,6 +350,7 @@ def test_dispense(
             origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1)
         ),
         volume=10,
+        flow_rate=2.0,
     )
 
     assert result == response
@@ -405,6 +421,31 @@ def test_wait_for_resume(
     decoy.when(transport.execute_command(request=request)).then_return(response)
 
     result = subject.wait_for_resume(message="hello world")
+
+    assert result == response
+
+
+def test_comment(
+    decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
+) -> None:
+    """It should execute a comment command."""
+    # TODO(mm, 2022-11-09): Use a proper Protocol Engine Comment command instead of
+    # a Custom command, once one exists.
+    class LegacyCommentCustomParams(commands.CustomParams):
+        legacyCommandType: str
+        legacyCommandText: str
+
+    request = commands.CustomCreate(
+        params=LegacyCommentCustomParams(
+            legacyCommandType="command.COMMENT",
+            legacyCommandText="Hello, world!",
+        )
+    )
+    response = commands.CustomResult()
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.comment(message="Hello, world!")
 
     assert result == response
 
@@ -641,7 +682,7 @@ def test_blow_out(
             labwareId="456",
             wellName="A2",
             wellLocation=WellLocation(),
-            flowRate=2.0,
+            flowRate=7.8,
         )
     )
 
@@ -654,6 +695,7 @@ def test_blow_out(
         labware_id="456",
         well_name="A2",
         well_location=WellLocation(),
+        flow_rate=7.8,
     )
 
     assert result == response

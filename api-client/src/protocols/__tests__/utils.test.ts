@@ -7,7 +7,6 @@ import {
   parseInitialLoadedLabwareEntity,
   parseInitialLoadedLabwareBySlot,
   parseInitialLoadedLabwareByModuleId,
-  parseInitialLoadedLabwareDefinitionsById,
   parseInitialLoadedModulesBySlot,
   parseLiquidsInLoadOrder,
   parseLabwareInfoByLiquidId,
@@ -236,27 +235,6 @@ describe('parseInitialLoadedLabwareById', () => {
     expect(parseInitialLoadedLabwareEntity(mockRunTimeCommands)).toEqual(
       expected
     )
-  })
-})
-describe('parseInitialLoadedLabwareDefinitionsById', () => {
-  it('returns labware definitions loaded by id', () => {
-    const expected = {
-      'opentrons/opentrons_96_tiprack_300ul/1': mockRunTimeCommands.find(
-        c =>
-          c.commandType === 'loadLabware' && c.result.labwareId === 'labware-1'
-      )?.result.definition,
-      'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1': mockRunTimeCommands.find(
-        c =>
-          c.commandType === 'loadLabware' && c.result.labwareId === 'labware-2'
-      )?.result.definition,
-      'opentrons/opentrons_24_aluminumblock_generic_2ml_screwcap/1': mockRunTimeCommands.find(
-        c =>
-          c.commandType === 'loadLabware' && c.result.labwareId === 'labware-3'
-      )?.result.definition,
-    }
-    expect(
-      parseInitialLoadedLabwareDefinitionsById(mockRunTimeCommands)
-    ).toEqual(expected)
   })
 })
 describe('parseInitialLoadedModulesBySlot', () => {

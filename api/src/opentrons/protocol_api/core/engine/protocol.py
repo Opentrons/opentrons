@@ -242,6 +242,8 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             engine_client=self._engine_client,
             sync_hardware_api=self._sync_hardware,
             protocol_core=self,
+            # TODO(mm, 2022-11-10): Deduplicate "400" with legacy core.
+            default_movement_speed=400,
         )
 
     def get_loaded_instruments(self) -> Dict[Mount, Optional[InstrumentCore]]:
@@ -260,7 +262,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def comment(self, msg: str) -> None:
         """Create a comment in the protocol to be shown in the log."""
-        raise NotImplementedError("ProtocolCore.comment not implemented")
+        self._engine_client.comment(message=msg)
 
     def delay(self, seconds: float, msg: Optional[str]) -> None:
         """Wait for a period of time before proceeding."""

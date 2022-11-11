@@ -8,7 +8,6 @@ import { renderHook } from '@testing-library/react-hooks'
 import {
   parseAllRequiredModuleModelsById,
   parseInitialLoadedLabwareEntity,
-  parseInitialLoadedLabwareDefinitionsById,
   parsePipetteEntity,
 } from '@opentrons/api-client'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
@@ -28,7 +27,9 @@ import {
 } from '../__fixtures__/storedProtocolAnalysis'
 
 import type { Protocol, Run } from '@opentrons/api-client'
+import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
 
+jest.mock('@opentrons/shared-data')
 jest.mock('@opentrons/api-client')
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../redux/protocol-storage/selectors')
@@ -46,11 +47,11 @@ const mockParseAllRequiredModuleModelsById = parseAllRequiredModuleModelsById as
 const mockParseInitialLoadedLabwareEntity = parseInitialLoadedLabwareEntity as jest.MockedFunction<
   typeof parseInitialLoadedLabwareEntity
 >
-const mockParseInitialLoadedLabwareDefinitionsById = parseInitialLoadedLabwareDefinitionsById as jest.MockedFunction<
-  typeof parseInitialLoadedLabwareDefinitionsById
->
 const mockParsePipetteEntity = parsePipetteEntity as jest.MockedFunction<
   typeof parsePipetteEntity
+>
+const mockGetLoadedLabwareDefinitionsByUri = getLoadedLabwareDefinitionsByUri as jest.MockedFunction<
+  typeof getLoadedLabwareDefinitionsByUri
 >
 const store: Store<any> = createStore(jest.fn(), {})
 
@@ -88,13 +89,15 @@ describe('useStoredProtocolAnalysis hook', () => {
     when(mockGetStoredProtocol)
       .calledWith(undefined as any)
       .mockReturnValue(null)
+    when(mockGetLoadedLabwareDefinitionsByUri)
+      .calledWith(
+        modifiedStoredProtocolData?.mostRecentAnalysis?.commands ?? []
+      )
+      .mockReturnValue(LABWARE_DEFINITIONS)
     when(mockParseAllRequiredModuleModelsById).mockReturnValue(
       MODULE_MODELS_BY_ID
     )
     when(mockParseInitialLoadedLabwareEntity).mockReturnValue([LABWARE_ENTITY])
-    when(mockParseInitialLoadedLabwareDefinitionsById).mockReturnValue(
-      LABWARE_DEFINITIONS
-    )
     when(mockParsePipetteEntity).mockReturnValue([PIPETTE_NAME_BY_ID])
   })
   afterEach(() => {

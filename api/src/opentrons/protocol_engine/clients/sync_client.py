@@ -5,6 +5,7 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
+from opentrons.commands.protocol_commands import comment as make_legacy_comment_command
 from opentrons.types import MountType
 from opentrons.hardware_control.modules.types import ThermocyclerStep
 
@@ -38,6 +39,26 @@ class SyncClient:
         return self._transport.call_method(
             "add_labware_definition",
             definition=definition,
+        )
+
+    def reset_tips(self, labware_id: str) -> None:
+        """Reset a labware's tip tracking state.."""
+        self._transport.call_method(
+            "reset_tips",
+            labware_id=labware_id,
+        )
+
+    def set_pipette_movement_speed(
+        self, pipette_id: str, speed: Optional[float]
+    ) -> None:
+        """Set the speed of a pipette's X/Y/Z movements. Does not affect plunger speed.
+
+        None will use the hardware API's default.
+        """
+        self._transport.call_method(
+            "set_pipette_movement_speed",
+            pipette_id=pipette_id,
+            speed=speed,
         )
 
     def load_labware(
@@ -217,6 +238,7 @@ class SyncClient:
         well_name: str,
         well_location: WellLocation,
         volume: float,
+        flow_rate: float,
     ) -> commands.DispenseResult:
         """Execute a ``Dispense`` command and return the result."""
         request = commands.DispenseCreate(
@@ -226,9 +248,7 @@ class SyncClient:
                 wellName=well_name,
                 wellLocation=well_location,
                 volume=volume,
-                # TODO(jbl 2022-06-17) replace default with parameter from pipette_context
-                # https://github.com/Opentrons/opentrons/issues/10810
-                flowRate=2.0,
+                flowRate=flow_rate,
             )
         )
         result = self._transport.execute_command(request=request)
@@ -240,6 +260,7 @@ class SyncClient:
         labware_id: str,
         well_name: str,
         well_location: WellLocation,
+        flow_rate: float,
     ) -> commands.BlowOutResult:
         """Execute a ``BlowOut`` command and return the result."""
         request = commands.BlowOutCreate(
@@ -248,9 +269,7 @@ class SyncClient:
                 labwareId=labware_id,
                 wellName=well_name,
                 wellLocation=well_location,
-                # TODO(jbl 2022-06-17) replace default with parameter from pipette_context
-                # https://github.com/Opentrons/opentrons/issues/10810
-                flowRate=2.0,
+                flowRate=flow_rate,
             )
         )
         result = self._transport.execute_command(request=request)
@@ -292,6 +311,31 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
         return cast(commands.WaitForResumeResult, result)
+
+    def comment(self, message: str) -> commands.CustomResult:
+        """Execute a comment command and return the result."""
+        # TODO(mm, 2022-11-09): Protocol Engine doesn't yet have a proper comment
+        # command. So, we use a legacy-style command wrapped inside a Protocol Engine
+        # CustomCommand. The Opentrons App knows how to render this in its run log
+        # because this is what we used to do for PAPIv2 commands in general.
+        #
+        # When Protocol Engine has a proper comment command, we should use it here.
+        legacy_comment_command = make_legacy_comment_command(msg=message)
+
+        class LegacyCommentCustomParams(commands.CustomParams):
+            legacyCommandType: str
+            legacyCommandText: str
+
+        request = commands.CustomCreate(
+            params=LegacyCommentCustomParams(
+                # This matches how LegacyCommandWrapper handles comments coming from
+                # protocols running under the older non-ProtocolEngine core.
+                legacyCommandType=legacy_comment_command["name"],
+                legacyCommandText=legacy_comment_command["payload"]["text"],
+            )
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.CustomResult, result)
 
     def set_rail_lights(self, on: bool) -> commands.SetRailLightsResult:
         """Execute a ``setRailLights`` command and return the result."""
