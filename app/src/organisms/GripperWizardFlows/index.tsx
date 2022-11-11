@@ -125,13 +125,14 @@ export const GripperWizardFlows = (
     }
   }, [isCommandMutationLoading, isStopLoading, isBetweenCommands, isExiting])
 
-  const calibrateBaseProps = {
-    chainRunCommands,
-    isRobotMoving,
-    proceed,
+  const sharedProps = {
+    flowType,
     runId,
-    goBack,
     attachedGripper,
+    proceed,
+    goBack,
+    isRobotMoving,
+    chainRunCommands,
     setIsBetweenCommands,
     isBetweenCommands,
   }
@@ -147,7 +148,7 @@ export const GripperWizardFlows = (
     modalContent = (
       <BeforeBeginning
         {...currentStep}
-        {...calibrateBaseProps}
+        {...sharedProps}
         createRun={createRun}
         isCreateLoading={isCreateLoading}
       />
@@ -157,7 +158,7 @@ export const GripperWizardFlows = (
     modalContent = modalContent = (
       <InsertPin
         {...currentStep}
-        {...calibrateBaseProps}
+        {...sharedProps}
         isExiting={isExiting}
       />
     )
@@ -166,7 +167,7 @@ export const GripperWizardFlows = (
     modalContent = modalContent = (
       <RemovePin
         {...currentStep}
-        {...calibrateBaseProps}
+        {...sharedProps}
         handleCleanUp={handleCleanUpAndClose}
       />
     )
@@ -175,7 +176,7 @@ export const GripperWizardFlows = (
     modalContent = modalContent = (
       <MountGripper
         {...currentStep}
-        {...calibrateBaseProps}
+        {...sharedProps}
       />
     )
   } else if (currentStep.section === SECTIONS.UNMOUNT_GRIPPER) {
@@ -183,13 +184,33 @@ export const GripperWizardFlows = (
     modalContent = modalContent = (
       <UnmountGripper
         {...currentStep}
-        {...calibrateBaseProps}
+        {...sharedProps}
       />
+    )
+  } else if (currentStep.section === SECTIONS.SUCCESSFULLY_ATTACHED) {
+    onExit = confirmExit
+    modalContent = modalContent = (
+      <Results {...currentStep} {...sharedProps} proceed={closeFlow} />
+    )
+  } else if (currentStep.section === SECTIONS.SUCCESSFULLY_DETACHED) {
+    onExit = confirmExit
+    modalContent = modalContent = (
+      <Results {...currentStep} {...sharedProps} proceed={closeFlow} />
+    )
+  } else if (currentStep.section === SECTIONS.SUCCESSFULLY_ATTACHED_AND_CALIBRATED) {
+    onExit = confirmExit
+    modalContent = modalContent = (
+      <Results {...currentStep} {...sharedProps} proceed={closeFlow} />
+    )
+  }  else if (currentStep.section === SECTIONS.SUCCESSFULLY_RECALIBRATED) {
+    onExit = confirmExit
+    modalContent = modalContent = (
+      <Results {...currentStep} {...sharedProps} proceed={closeFlow} />
     )
   } else if (currentStep.section === SECTIONS.RESULTS) {
     onExit = confirmExit
     modalContent = modalContent = (
-      <Results {...currentStep} {...calibrateBaseProps} proceed={closeFlow} />
+      <Results {...currentStep} {...sharedProps} proceed={closeFlow} />
     )
   }
 

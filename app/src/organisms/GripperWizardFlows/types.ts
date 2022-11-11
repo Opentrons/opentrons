@@ -9,6 +9,10 @@ export type GripperWizardStep =
   | ResultsStep
   | MountGripperStep
   | UnmountGripperStep
+  | SuccessfullyAttachedStep
+  | SuccessfullyDetachedStep
+  | SuccessfullyRecalibratedStep
+  | SuccessfullyAttachedAndCalibratedStep
 
 export type GripperWizardFlowType =
   | typeof GRIPPER_FLOW_TYPES.ATTACH
@@ -35,6 +39,18 @@ export interface MountGripperStep extends BaseStep {
 }
 export interface UnmountGripperStep extends BaseStep {
   section: typeof SECTIONS.UNMOUNT_GRIPPER
+}
+export interface SuccessfullyAttachedStep extends BaseStep {
+  section: typeof SECTIONS.SUCCESSFULLY_ATTACHED
+}
+export interface SuccessfullyAttachedAndCalibratedStep extends BaseStep {
+  section: typeof SECTIONS.SUCCESSFULLY_ATTACHED_AND_CALIBRATED
+}
+export interface SuccessfullyRecalibratedStep extends BaseStep {
+  section: typeof SECTIONS.SUCCESSFULLY_RECALIBRATED
+}
+export interface SuccessfullyDetachedStep extends BaseStep {
+  section: typeof SECTIONS.SUCCESSFULLY_DETACHED
 }
 
 type CreateCommandMutate = ReturnType<

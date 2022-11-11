@@ -33,10 +33,10 @@ export const UnmountGripper = (props: GripperWizardStepProps): JSX.Element | nul
     )
   return (
     <GenericWizardTile
-      header={t('unmount_gripper')}
+      header={t('loosen_screws_and_detach')}
       rightHandBody={<StyledText>TODO image of gripper being unmounted</StyledText>}
-      bodyText={<StyledText as="p">{t('loosen_screws_and_unmount_gripper')}</StyledText>}
-      proceedButtonText={t('confirm_detached')}
+      bodyText={<StyledText as="p">{t('hold_gripper_and_loosen')}</StyledText>}
+      proceedButtonText={t('shared:continue')}
       proceed={handleOnClick}
       back={goBack}
     />

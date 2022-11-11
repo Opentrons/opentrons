@@ -18,6 +18,11 @@ import { StyledText } from '../../atoms/text'
 import { PrimaryButton } from '../../atoms/buttons'
 import { NeedHelpLink } from '../../organisms/CalibrationPanels'
 
+const CAPITALIZE_FIRST_LETTER_STYLE = css`
+  &:first-letter {
+    text-transform: uppercase;
+  }
+`
 export interface GenericWizardTileProps {
   rightHandBody: React.ReactNode
   bodyText: React.ReactNode
@@ -61,7 +66,11 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
   }
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} height="24.625rem" padding={SPACING.spacing6}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      height="24.625rem"
+      padding={SPACING.spacing6}>
       <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacingXXL}>
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -76,7 +85,6 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
       <Flex
         justifyContent={buttonPositioning}
         alignItems={ALIGN_FLEX_END}
-        flex="1"
       >
         {back != null ? (
           <Btn onClick={back}>
@@ -84,7 +92,7 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
           </Btn>
         ) : null}
         {getHelp != null ? <NeedHelpLink href={getHelp} /> : null}
-        <PrimaryButton disabled={proceedIsDisabled} onClick={proceed}>
+        <PrimaryButton disabled={proceedIsDisabled} css={CAPITALIZE_FIRST_LETTER_STYLE} onClick={proceed}>
           {proceedButtonText}
         </PrimaryButton>
       </Flex>
