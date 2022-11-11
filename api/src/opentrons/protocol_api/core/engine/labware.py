@@ -39,6 +39,10 @@ class LabwareCore(AbstractLabware[WellCore]):
             for well_name in column
         }
 
+        # TODO(mc, 2022-11-11): redo this implementation
+        # https://opentrons.atlassian.net/browse/RCORE-380
+        self._well_grid = WellGrid(wells=self.get_wells())
+
     @property
     def labware_id(self) -> str:
         """The labware's unique ProtocolEngine ID."""
@@ -89,7 +93,9 @@ class LabwareCore(AbstractLabware[WellCore]):
         return cast(LabwareDefinitionDict, self._definition.dict(exclude_none=True))
 
     def get_parameters(self) -> LabwareParameters:
-        raise NotImplementedError("LabwareCore.get_parameters not implemented")
+        return cast(
+            LabwareParameters, self._definition.parameters.dict(exclude_none=True)
+        )
 
     def get_quirks(self) -> List[str]:
         raise NotImplementedError("LabwareCore.get_quirks not implemented")
@@ -140,7 +146,7 @@ class LabwareCore(AbstractLabware[WellCore]):
         raise NotImplementedError("LabwareCore.get_tip_tracker not implemented")
 
     def get_well_grid(self) -> WellGrid:
-        raise NotImplementedError("LabwareCore.get_well_grid not implemented")
+        return self._well_grid
 
     def get_wells(self) -> List[WellCore]:
         return list(self._wells_by_name.values())
