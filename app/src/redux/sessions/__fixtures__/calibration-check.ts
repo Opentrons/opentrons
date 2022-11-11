@@ -75,7 +75,7 @@ export const mockSecondPipetteHealthCheckCalibration: CalibrationCheckComparison
   tipLength: badTipLengthCalibration,
   pipetteOffset: badPipetteOffsetCalibration,
 }
-export const mockFirstPipettteHealthCheckPerCalibration: CalibrationCheckComparisonsPerCalibration = {
+export const mockFirstPipetteHealthCheckPerCalibration: CalibrationCheckComparisonsPerCalibration = {
   tipLength: goodTipLengthCalibration,
   pipetteOffset: goodPipetteOffsetCalibration,
   deck: goodDeckCalibration,
@@ -110,7 +110,7 @@ export const mockRobotCalibrationCheckSessionDetails: CheckCalibrationSessionDet
   ],
   currentStep: 'sessionStarted',
   comparisonsByPipette: {
-    first: mockFirstPipettteHealthCheckPerCalibration,
+    first: mockFirstPipetteHealthCheckPerCalibration,
     second: mockSecondPipetteHealthCheckCalibration,
   },
   labware: [mockCalibrationCheckLabware],
