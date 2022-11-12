@@ -84,9 +84,9 @@ def load_pipette_offset(
         if pip_offset_data:
             return PipetteOffsetByPipetteMount(
                 offset=pip_offset_data.offset,
-                tiprack=pip_offset_data.tiprack,
-                last_modified=pip_offset_data.last_modified,
-                uri=pip_offset_data.uri,
+                tiprack=getattr(pip_offset_data, "tiprack", None),
+                last_modified=getattr(pip_offset_data, "last_modified", None),
+                uri=getattr(pip_offset_data, "uri", None),
                 source=pip_offset_data.source,
                 status=types.CalibrationStatus(
                     markedAt=pip_offset_data.status.markedAt,
