@@ -39,7 +39,7 @@ async def _jog_axis(api: OT3API, mount: OT3Mount, axis: OT3Axis, dir: float) -> 
                     pass
 
 
-async def main(simulate: bool, slot: int, mount: OT3Mount) -> None:
+async def main(simulate: bool, slot: int, mount: OT3Mount, test: bool) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=simulate, use_defaults=True
     )
@@ -56,11 +56,22 @@ async def main(simulate: bool, slot: int, mount: OT3Mount) -> None:
 
     # Home gantry
     await api.home()
-    helpers_ot3.set_pipette_offset_ot3(api, mount, Point(x=0, y=0, z=0))
     await api.add_tip(mount, helpers_ot3.CALIBRATION_PROBE_EVT.length)
+    home_position = await api.gantry_position(mount)
+
+    # Check to see what the current calibration looks like
+    if test:
+        current_pos = await api.gantry_position(mount)
+        await api.move_to(mount, calibration_square_pos._replace(z=current_pos.z))
+        input("ENTER to test previous calibration")
+        await api.move_to(mount, calibration_square_pos)
+        input("ENTER to re-home")
+        await api.home()
+
+    # Reset the current calibration, so no offset is applied during procedure
+    helpers_ot3.set_pipette_offset_ot3(api, mount, Point(x=0, y=0, z=0))
 
     # Move above slot Z center
-    home_position = await api.gantry_position(mount)
     above_point = z_probe_pos._replace(z=home_position.z)
     await api.move_to(mount, above_point)
     input("\nRemove all items from deck and press ENTER\n")
@@ -121,6 +132,7 @@ if __name__ == "__main__":
         "--mount", choices=["left", "right", "gripper"], required=True
     )
     arg_parser.add_argument("--slot", type=int, default=5)
+    arg_parser.add_argument("--test", action="store_true")
     arg_parser.add_argument("--simulate", action="store_true")
     args = arg_parser.parse_args()
     ot3_mounts = {
@@ -129,4 +141,4 @@ if __name__ == "__main__":
         "gripper": OT3Mount.GRIPPER,
     }
     _mount = ot3_mounts[args.mount]
-    asyncio.run(main(args.simulate, args.slot, _mount))
+    asyncio.run(main(args.simulate, args.slot, _mount, args.test))
