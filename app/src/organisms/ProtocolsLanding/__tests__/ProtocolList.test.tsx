@@ -68,6 +68,7 @@ describe('ProtocolList', () => {
     getByText('mock empty state links')
     const cards = getAllByText('mock protocol card')
     expect(cards.length).toBe(2)
+    // expect(mockLocalStorageFunc.getItem).toHaveBeenCalled()
   })
 
   it('renders and clicks on import button and opens slideout', () => {

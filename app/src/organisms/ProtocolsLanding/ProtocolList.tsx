@@ -18,7 +18,7 @@ import {
   Overlay,
 } from '@opentrons/components'
 
-import { useSortedProtocols } from './hooks'
+import { useSortedProtocols, useLocalStorage } from './hooks'
 import { StyledText } from '../../atoms/text'
 import { SecondaryButton } from '../../atoms/buttons'
 import { Slideout } from '../../atoms/Slideout'
@@ -50,10 +50,10 @@ interface ProtocolListProps {
 }
 export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
   const [showSlideout, setShowSlideout] = React.useState<boolean>(false)
-  const [sortBy, setSortBy] = React.useState<ProtocolSort>(() => {
-    const savedSortKey = localStorage.getItem(LOCAL_STORAGE_KEY)
-    return savedSortKey != null ? JSON.parse(savedSortKey) : 'alphabetical'
-  })
+  const [sortBy, setSortBy] = useLocalStorage<ProtocolSort>(
+    LOCAL_STORAGE_KEY,
+    'alphabetical'
+  )
   const [showSortByMenu, setShowSortByMenu] = React.useState<boolean>(false)
   const toggleSetShowSortByMenu = (): void => setShowSortByMenu(!showSortByMenu)
   const { t } = useTranslation('protocol_info')
@@ -93,10 +93,6 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
     setSortBy(sortKey)
     setShowSortByMenu(false)
   }
-
-  React.useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(sortBy))
-  }, [sortBy])
 
   return (
     <Box padding={SPACING.spacing4}>

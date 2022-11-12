@@ -3,7 +3,7 @@ import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 import { renderHook } from '@testing-library/react-hooks'
 
-import { useSortedProtocols } from '../hooks'
+import { useSortedProtocols, useLocalStorage } from '../hooks'
 import { StoredProtocolData } from '../../../redux/protocol-storage'
 
 import type { Store } from 'redux'
@@ -273,6 +273,8 @@ const mockStoredProtocolData = [
   },
 ] as StoredProtocolData[]
 
+const LOCAL_STORAGE_KEY = 'protocolListSortKey'
+
 describe('useSortedProtocols', () => {
   const store: Store<State> = createStore(jest.fn(), {})
   beforeEach(() => {
@@ -376,5 +378,16 @@ describe('useSortedProtocols', () => {
     expect(thirdProtocol.protocolKey).toBe(
       '3dc99ffa-f85e-4c01-ab0a-edecff432dac'
     )
+  })
+})
+
+describe('useLocalStorage', () => {
+  it('should return sortKey and function', () => {
+    const mockSortKey = 'alphabetical'
+    const { result } = renderHook(() =>
+      useLocalStorage(LOCAL_STORAGE_KEY, mockSortKey)
+    )
+    expect(result.current[0]).toBe('alphabetical')
+    expect(typeof result.current[1] === 'function').toBe(true)
   })
 })
