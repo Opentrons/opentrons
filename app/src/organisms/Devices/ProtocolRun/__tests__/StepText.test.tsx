@@ -1,44 +1,29 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { resetAllWhenMocks } from 'jest-when'
+import { useRunQuery } from '@opentrons/react-api-client'
+import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 
 import { RunCommandSummary } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
-import { getLabwareDisplayName } from '@opentrons/shared-data'
-import { getSlotLabwareName } from '../utils/getSlotLabwareName'
 import { i18n } from '../../../../i18n'
-import { getLabwareLocation } from '../../ProtocolRun/utils/getLabwareLocation'
-import {
-  useLabwareRenderInfoForRunById,
-  useProtocolDetailsForRun,
-} from '../../hooks'
+import { useProtocolDetailsForRun } from '../../hooks'
 import { RunLogProtocolSetupInfo } from '../RunLogProtocolSetupInfo'
 import { StepText } from '../StepText'
 
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command'
 
-jest.mock('@opentrons/shared-data/js/helpers')
-jest.mock('../../ProtocolRun/utils/getLabwareLocation')
+jest.mock('@opentrons/react-api-client')
 jest.mock('../../hooks')
 jest.mock('./../RunLogProtocolSetupInfo')
-jest.mock('../utils/getSlotLabwareName')
 
+const mockLabwareDef = fixture_tiprack_300_ul as LabwareDefinition2
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
 >
-const mockUseLabwareRenderInfoForRunById = useLabwareRenderInfoForRunById as jest.MockedFunction<
-  typeof useLabwareRenderInfoForRunById
->
-const mockGetLabwareDisplayName = getLabwareDisplayName as jest.MockedFunction<
-  typeof getLabwareDisplayName
->
-const mockGetLabwareLocation = getLabwareLocation as jest.MockedFunction<
-  typeof getLabwareLocation
->
+const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
 const mockRunLogProtocolSetupInfo = RunLogProtocolSetupInfo as jest.MockedFunction<
   typeof RunLogProtocolSetupInfo
->
-const mockGetSlotLabwareName = getSlotLabwareName as jest.MockedFunction<
-  typeof getSlotLabwareName
 >
 
 const render = (props: React.ComponentProps<typeof StepText>) => {
@@ -80,16 +65,27 @@ const MOCK_LOAD_COMMAND = {
 describe('StepText', () => {
   beforeEach(() => {
     mockUseProtocolDetailsForRun.mockReturnValue({
-      protocolData: { commands: [] },
+      protocolData: {
+        commands: [
+          {
+            commandType: 'loadLabware',
+            params: { labwareId: 'labwareId' },
+            result: { labwareId: 'labwareId', definition: mockLabwareDef },
+          },
+        ],
+        labware: [{ id: 'labwareId', definitionUri: 'fake_def_uri' }],
+      },
     } as any)
-    mockUseLabwareRenderInfoForRunById.mockReturnValue({} as any)
     mockRunLogProtocolSetupInfo.mockReturnValue(
       <div>Mock Protocol Setup Step</div>
     )
-    mockGetSlotLabwareName.mockReturnValue({
-      slotName: 'fake_labware_location',
-      labwareName: 'fake_display_name',
-    })
+    mockUseRunQuery.mockReturnValue({
+      data: {
+        data: {
+          labware: [{ id: 'labwareId', definitionUri: 'fake_def_uri' }],
+        },
+      },
+    } as any)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -168,17 +164,6 @@ describe('StepText', () => {
   it('renders correct command text for pick up tip', () => {
     const labwareId = 'labwareId'
     const wellName = 'wellName'
-    when(mockGetLabwareDisplayName)
-      .calledWith('fake_def' as any)
-      .mockReturnValue('fake_display_name')
-    when(mockGetLabwareLocation)
-      .calledWith(labwareId, [])
-      .mockReturnValue({ slotName: 'fake_labware_location' })
-    mockUseLabwareRenderInfoForRunById.mockReturnValue({
-      labwareId: {
-        labwareDef: 'fake_def',
-      },
-    } as any)
     const { getByText } = render({
       robotName: ROBOT_NAME,
       runId: RUN_ID,
@@ -192,9 +177,7 @@ describe('StepText', () => {
         },
       },
     })
-    getByText(
-      'Picking up tip from wellName of fake_display_name in fake_labware_location'
-    )
+    getByText('Picking up tip from wellName of fake_def_uri')
   })
 
   it('renders correct command text for for legacy command with non-string text', () => {
@@ -622,18 +605,6 @@ describe('StepText', () => {
   })
 
   it('renders correct command text for aspirate', () => {
-    const labwareId = 'labwareId'
-    when(mockGetLabwareDisplayName)
-      .calledWith('fake_def' as any)
-      .mockReturnValue('fake_display_name')
-    when(mockGetLabwareLocation)
-      .calledWith(labwareId, [])
-      .mockReturnValue({ slotName: 'fake_labware_location' })
-    mockUseLabwareRenderInfoForRunById.mockReturnValue({
-      labwareId: {
-        labwareDef: 'fake_def',
-      },
-    } as any)
     const { getByText } = render({
       robotName: ROBOT_NAME,
       runId: RUN_ID,
@@ -650,22 +621,10 @@ describe('StepText', () => {
       },
     })
     getByText(
-      'Aspirating 100 uL from wellName of fake_display_name in fake_labware_location at 130 uL/sec'
+      'Aspirating 100 uL from wellName of fake_def_uri in a slot at 130 uL/sec'
     )
   })
   it('renders correct command text for dispense', () => {
-    const labwareId = 'labwareId'
-    when(mockGetLabwareDisplayName)
-      .calledWith('fake_def' as any)
-      .mockReturnValue('fake_display_name')
-    when(mockGetLabwareLocation)
-      .calledWith(labwareId, [])
-      .mockReturnValue({ slotName: 'fake_labware_location' })
-    mockUseLabwareRenderInfoForRunById.mockReturnValue({
-      labwareId: {
-        labwareDef: 'fake_def',
-      },
-    } as any)
     const { getByText } = render({
       robotName: ROBOT_NAME,
       runId: RUN_ID,
@@ -682,22 +641,10 @@ describe('StepText', () => {
       },
     })
     getByText(
-      'Dispensing 100 uL into wellName of fake_display_name in fake_labware_location at 130 uL/sec'
+      'Dispensing 100 uL into wellName of fake_def_uri in a slot at 130 uL/sec'
     )
   })
   it('renders correct command text for blowout', () => {
-    const labwareId = 'labwareId'
-    when(mockGetLabwareDisplayName)
-      .calledWith('fake_def' as any)
-      .mockReturnValue('fake_display_name')
-    when(mockGetLabwareLocation)
-      .calledWith(labwareId, [])
-      .mockReturnValue({ slotName: 'fake_labware_location' })
-    mockUseLabwareRenderInfoForRunById.mockReturnValue({
-      labwareId: {
-        labwareDef: 'fake_def',
-      },
-    } as any)
     const { getByText } = render({
       robotName: ROBOT_NAME,
       runId: RUN_ID,
@@ -712,9 +659,7 @@ describe('StepText', () => {
         },
       },
     })
-    getByText(
-      'Blowing out at wellName of fake_display_name in fake_labware_location at 130 uL/sec'
-    )
+    getByText('Blowing out at wellName of fake_def_uri in a slot at 130 uL/sec')
   })
   it('renders correct command text for touchTip', () => {
     const { getByText } = render({
@@ -742,18 +687,6 @@ describe('StepText', () => {
     getByText('Moving to slot 5')
   })
   it('renders correct command text for moveToWell', () => {
-    const labwareId = 'labwareId'
-    when(mockGetLabwareDisplayName)
-      .calledWith('fake_def' as any)
-      .mockReturnValue('fake_display_name')
-    when(mockGetLabwareLocation)
-      .calledWith(labwareId, [])
-      .mockReturnValue({ slotName: 'fake_labware_location' })
-    mockUseLabwareRenderInfoForRunById.mockReturnValue({
-      labwareId: {
-        labwareDef: 'fake_def',
-      },
-    } as any)
     const { getByText } = render({
       robotName: ROBOT_NAME,
       runId: RUN_ID,
@@ -767,9 +700,7 @@ describe('StepText', () => {
         },
       },
     })
-    getByText(
-      'Moving to wellName of fake_display_name in fake_labware_location'
-    )
+    getByText('Moving to wellName of fake_def_uri in a slot')
   })
   it('renders correct command text for moveRelative', () => {
     const { getByText } = render({

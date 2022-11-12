@@ -44,7 +44,7 @@ if TYPE_CHECKING:
     from .core.common import LabwareCore, WellCore
 
 
-MODULE_LOG = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
 
 
 class TipSelectionError(Exception):
@@ -196,7 +196,7 @@ class Well:
         Private version of from_center_cartesian. Present only for backward
         compatibility.
         """
-        MODULE_LOG.warning(
+        _log.warning(
             "This method is deprecated. Please use 'from_center_cartesian' instead."
         )
         return self.from_center_cartesian(x, y, z)
@@ -427,7 +427,7 @@ class Labware(DeckItem):
         .. deprecated:: 2.0
             Use :py:meth:`wells_by_name` or dict access instead.
         """
-        MODULE_LOG.warning(
+        _log.warning(
             "wells_by_index is deprecated. Use wells_by_name or dict access instead."
         )
         return self.wells_by_name()
@@ -480,7 +480,7 @@ class Labware(DeckItem):
         .. deprecated:: 2.0
             Use :py:meth:`rows_by_name` instead.
         """
-        MODULE_LOG.warning("rows_by_index is deprecated. Use rows_by_name instead.")
+        _log.warning("rows_by_index is deprecated. Use rows_by_name instead.")
         return self.rows_by_name()
 
     @requires_version(2, 0)
@@ -533,9 +533,7 @@ class Labware(DeckItem):
         .. deprecated:: 2.0
             Use :py:meth:`columns_by_name` instead.
         """
-        MODULE_LOG.warning(
-            "columns_by_index is deprecated. Use columns_by_name instead."
-        )
+        _log.warning("columns_by_index is deprecated. Use columns_by_name instead.")
         return self.columns_by_name()
 
     @property  # type: ignore
@@ -568,6 +566,7 @@ class Labware(DeckItem):
     def tip_length(self, length: float) -> None:
         self._implementation.set_tip_length(length)
 
+    # TODO(mc, 2022-11-09): implementation detail; deprecate public method
     def next_tip(
         self, num_tips: int = 1, starting_tip: Optional[Well] = None
     ) -> Optional[Well]:
@@ -585,13 +584,16 @@ class Labware(DeckItem):
         :type starting_tip: :py:class:`.Well`
         :return: the :py:class:`.Well` meeting the target criteria, or None
         """
-        assert num_tips > 0, "Bad call to next_tip: num_tips <= 0"
+        assert num_tips > 0, f"num_tips must be positive integer, but got {num_tips}"
 
-        well = self._implementation.get_tip_tracker().next_tip(
-            num_tips=num_tips, starting_tip=starting_tip._impl if starting_tip else None
+        well_core = self._implementation.get_next_tip(
+            num_tips=num_tips,
+            starting_tip=starting_tip._impl if starting_tip else None,
         )
-        return self._well_from_impl(well) if well else None
 
+        return self._well_from_impl(well_core) if well_core else None
+
+    # TODO(mc, 2022-11-09): implementation detail; deprecate public method
     def use_tips(self, start_well: Well, num_channels: int = 1) -> None:
         """
         Removes tips from the tip tracker.
@@ -633,6 +635,7 @@ class Labware(DeckItem):
     def __hash__(self) -> int:
         return hash((self._implementation, self._api_version))
 
+    # TODO(mc, 2022-11-09): implementation detail; deprecate public method
     def previous_tip(self, num_tips: int = 1) -> Optional[Well]:
         """
         Find the best well to drop a tip in.
@@ -647,10 +650,10 @@ class Labware(DeckItem):
         """
         # This logic is the inverse of :py:meth:`next_tip`
         assert num_tips > 0, "Bad call to previous_tip: num_tips <= 0"
-
         well = self._implementation.get_tip_tracker().previous_tip(num_tips=num_tips)
         return self._well_from_impl(well) if well else None
 
+    # TODO(mc, 2022-11-09): implementation detail; deprecate public method
     def return_tips(self, start_well: Well, num_channels: int = 1) -> None:
         """
         Re-adds tips to the tip tracker
@@ -674,16 +677,14 @@ class Labware(DeckItem):
         """
         # This logic is the inverse of :py:meth:`use_tips`
         assert num_channels > 0, "Bad call to return_tips: num_channels <= 0"
-
         self._implementation.get_tip_tracker().return_tips(
             start_well=start_well._impl, num_channels=num_channels
         )
 
     @requires_version(2, 0)
     def reset(self) -> None:
-        """Reset all tips in a tiprack"""
-        if self._is_tiprack:
-            self._implementation.reset_tips()
+        """Reset all tips in a tiprack."""
+        self._implementation.reset_tips()
 
     def _well_from_impl(self, well: WellCore) -> Well:
         return Well(
@@ -693,6 +694,7 @@ class Labware(DeckItem):
         )
 
 
+# TODO(mc, 2022-11-09): implementation detail, move to core
 def split_tipracks(tip_racks: List[Labware]) -> Tuple[Labware, List[Labware]]:
     try:
         rest = tip_racks[1:]
@@ -701,6 +703,7 @@ def split_tipracks(tip_racks: List[Labware]) -> Tuple[Labware, List[Labware]]:
     return tip_racks[0], rest
 
 
+# TODO(mc, 2022-11-09): implementation detail, move to core
 def select_tiprack_from_list(
     tip_racks: List[Labware], num_channels: int, starting_point: Optional[Well] = None
 ) -> Tuple[Labware, Well]:
@@ -726,12 +729,14 @@ def select_tiprack_from_list(
         return select_tiprack_from_list(rest, num_channels)
 
 
+# TODO(mc, 2022-11-09): implementation detail, move to core
 def filter_tipracks_to_start(
     starting_point: Well, tipracks: List[Labware]
 ) -> List[Labware]:
     return list(dropwhile(lambda tr: starting_point.parent != tr, tipracks))
 
 
+# TODO(mc, 2022-11-09): implementation detail, move to core
 def next_available_tip(
     starting_tip: Optional[Well], tip_racks: List[Labware], channels: int
 ) -> Tuple[Labware, Well]:
@@ -744,6 +749,8 @@ def next_available_tip(
         )
 
 
+# TODO(mc, 2022-11-09): implementation detail, move somewhere else
+# only used in old calibration flows by robot-server
 def load_from_definition(
     definition: "LabwareDefinition",
     parent: Location,
@@ -779,6 +786,8 @@ def load_from_definition(
     )
 
 
+# TODO(mc, 2022-11-09): implementation detail, move somewhere else
+# only used in old calibration flows by robot-server
 def load(
     load_name: str,
     parent: Location,

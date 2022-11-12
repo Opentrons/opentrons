@@ -1,56 +1,60 @@
 import { useSelector } from 'react-redux'
 import {
   parseAllRequiredModuleModelsById,
-  parseInitialLoadedLabwareById,
-  parseInitialLoadedLabwareDefinitionsById,
-  parseInitialPipetteNamesById,
+  parseInitialLoadedLabwareEntity,
+  parsePipetteEntity,
 } from '@opentrons/api-client'
+import {
+  schemaV6Adapter,
+  getLoadedLabwareDefinitionsByUri,
+} from '@opentrons/shared-data'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 
 import { getStoredProtocol } from '../../../redux/protocol-storage'
 
 import type {
-  LoadedLabwareById,
-  LoadedLabwareDefinitionsById,
+  LoadedLabwareEntity,
   ModuleModelsById,
   PipetteNamesById,
 } from '@opentrons/api-client'
-import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import type {
+  ProtocolAnalysisOutput,
+  LabwareDefinition2,
+} from '@opentrons/shared-data'
 import type { State } from '../../../redux/types'
 
 // TODO(bc, 2022-09-26): StoredProtocolAnalysis can be wholesale replaced by ProtocolAnalysisOutput,
 // instead of just extending it, as soon as we remove the need for the schemaV6adapter
 export interface StoredProtocolAnalysis
   extends Omit<ProtocolAnalysisOutput, 'pipettes' | 'modules' | 'labware'> {
-  pipettes: PipetteNamesById
+  pipettes: PipetteNamesById[]
   modules: ModuleModelsById
-  labware: LoadedLabwareById
-  labwareDefinitions: LoadedLabwareDefinitionsById
+  labware: LoadedLabwareEntity[]
+  labwareDefinitions: { [defUri: string]: LabwareDefinition2 }
 }
 
 export const parseProtocolAnalysisOutput = (
   storedProtocolAnalysis: ProtocolAnalysisOutput | null
 ): StoredProtocolAnalysis | null => {
-  const pipettesNamesById = parseInitialPipetteNamesById(
+  const pipettesNamesById = parsePipetteEntity(
     storedProtocolAnalysis?.commands ?? []
   )
   const moduleModelsById = parseAllRequiredModuleModelsById(
     storedProtocolAnalysis?.commands ?? []
   )
-  const labwareById = parseInitialLoadedLabwareById(
+  const labwareById = parseInitialLoadedLabwareEntity(
     storedProtocolAnalysis?.commands ?? []
   )
-  const labwareDefinitionsById = parseInitialLoadedLabwareDefinitionsById(
+  const labwareDefinitionsByUri = getLoadedLabwareDefinitionsByUri(
     storedProtocolAnalysis?.commands ?? []
   )
-
   return storedProtocolAnalysis != null
     ? {
         ...storedProtocolAnalysis,
         pipettes: pipettesNamesById,
         modules: moduleModelsById,
         labware: labwareById,
-        labwareDefinitions: labwareDefinitionsById,
+        labwareDefinitions: labwareDefinitionsByUri,
       }
     : null
 }
@@ -71,5 +75,7 @@ export function useStoredProtocolAnalysis(
     useSelector((state: State) => getStoredProtocol(state, protocolKey))
       ?.mostRecentAnalysis ?? null
 
-  return parseProtocolAnalysisOutput(storedProtocolAnalysis)
+  return storedProtocolAnalysis != null && 'modules' in storedProtocolAnalysis
+    ? schemaV6Adapter(storedProtocolAnalysis)
+    : parseProtocolAnalysisOutput(storedProtocolAnalysis)
 }

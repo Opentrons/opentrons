@@ -9,14 +9,13 @@ import {
   useProtocolQuery,
   useRunQuery,
 } from '@opentrons/react-api-client'
-import { useFeatureFlag } from '../../../../redux/config'
 
 import { useProtocolDetailsForRun } from '..'
 
 import { RUN_ID_2 } from '../../../../organisms/RunTimeControl/__fixtures__'
 
 import type { Protocol, Run, ProtocolAnalyses } from '@opentrons/api-client'
-import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
+import type { LegacySchemaAdapterOutput } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/shared-data', () => {
   const actualSharedData = jest.requireActual('@opentrons/shared-data')
@@ -30,7 +29,6 @@ const mockSchemaV6Adapter = schemaV6Adapter as jest.MockedFunction<
   typeof schemaV6Adapter
 >
 jest.mock('@opentrons/react-api-client')
-jest.mock('../../../../redux/config')
 
 const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
   typeof useProtocolQuery
@@ -39,10 +37,6 @@ const mockUseProtocolAnalysesQuery = useProtocolAnalysesQuery as jest.MockedFunc
   typeof useProtocolAnalysesQuery
 >
 const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
-
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
->
 
 const PROTOCOL_RESPONSE = {
   data: {
@@ -55,7 +49,7 @@ const PROTOCOL_RESPONSE = {
   },
 } as Protocol
 
-const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnalysisFile<{}>
+const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as LegacySchemaAdapterOutput
 
 describe('useProtocolDetailsForRun hook', () => {
   beforeEach(() => {
@@ -70,7 +64,6 @@ describe('useProtocolDetailsForRun hook', () => {
       .mockReturnValue({
         data: { data: [] } as any,
       } as UseQueryResult<ProtocolAnalyses>)
-    mockUseFeatureFlag.mockReturnValue(false)
   })
 
   afterEach(() => {

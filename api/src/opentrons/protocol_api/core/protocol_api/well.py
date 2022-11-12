@@ -56,11 +56,11 @@ class WellImplementation(AbstractWellCore):
         return self._name
 
     def get_column_name(self) -> str:
-        """Get the column portion of the well name (e.g. "A")."""
+        """Get the column portion of the well name (e.g. "1")."""
         return self._column_name
 
     def get_row_name(self) -> str:
-        """Get the row portion of the well name (e.g. "1")."""
+        """Get the row portion of the well name (e.g. "A")."""
         return self._row_name
 
     def get_max_volume(self) -> float:

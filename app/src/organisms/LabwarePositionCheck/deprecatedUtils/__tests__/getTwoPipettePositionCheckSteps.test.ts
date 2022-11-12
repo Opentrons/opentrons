@@ -13,7 +13,34 @@ describe('getTwoPipettePositionCheckSteps', () => {
   it('should move to all tipracks that the secondary pipette uses, move to all tipracks with that the primary pipette uses, pick up a tip at the final tiprack that the primary pipette uses, move to all remaining labware, and drop the tip back in the tiprack that the primary pipette uses', () => {
     const primaryPipetteId = '50d23e00-0042-11ec-8258-f7ffdf5ad45a' // this is just taken from the protocol fixture
     const secondaryPipetteId = 'c235a5a0-0042-11ec-8258-f7ffdf5ad45a'
-    const labware = protocolMultipleTipracks.labware
+    const labware = [
+      {
+        id: 'fixedTrash',
+        displayName: 'Trash',
+        definitionUri: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
+        loadName: 'opentrons_1_trash_1100ml_fixed',
+      },
+      {
+        id:
+          '50d3ebb0-0042-11ec-8258-f7ffdf5ad45a:opentrons/opentrons_96_tiprack_300ul/1',
+        displayName: 'Opentrons 96 Tip Rack 300 µL',
+        definitionUri: 'opentrons/opentrons_96_tiprack_300ul/1',
+        loadName: 'opentrons_96_tiprack_300ul',
+      },
+      {
+        id:
+          '9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1',
+        displayName: 'NEST 12 Well Reservoir 15 mL',
+        definitionUri: 'opentrons/nest_12_reservoir_15ml/1',
+        loadName: 'nest_12_reservoir_15ml',
+      },
+      {
+        id: 'e24818a0-0042-11ec-8258-f7ffdf5ad45a',
+        displayName: 'Opentrons 96 Tip Rack 300 µL (1)',
+        definitionUri: 'opentrons/opentrons_96_tiprack_300ul/1',
+        loadName: 'opentrons_96_tiprack_300ul',
+      },
+    ]
     const labwareDefinitions = protocolMultipleTipracks.labwareDefinitions
     const modules = protocolMultipleTipracks.modules
     const commands = protocolMultipleTipracks.commands
@@ -111,6 +138,7 @@ describe('getTwoPipettePositionCheckSteps', () => {
       getTwoPipettePositionCheckSteps({
         primaryPipetteId,
         secondaryPipetteId,
+        //  @ts-expect-error
         labware,
         labwareDefinitions,
         modules,
@@ -121,7 +149,41 @@ describe('getTwoPipettePositionCheckSteps', () => {
   it('should move to all tipracks that the secondary pipette uses, move to all tipracks with the primary pipette uses, pick up a tip at the final tiprack that the primary pipette uses, move to all remaining labware (and open TC lid), and drop the tip back in the tiprack that the primary pipette uses', () => {
     const primaryPipetteId = '50d23e00-0042-11ec-8258-f7ffdf5ad45a' // this is just taken from the protocol fixture
     const secondaryPipetteId = 'c235a5a0-0042-11ec-8258-f7ffdf5ad45a'
-    const labware = protocolWithTC.labware
+    const labware = [
+      {
+        id: 'fixedTrash',
+        displayName: 'Trash',
+        definitionUri: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
+        loadName: 'opentrons_1_trash_1100ml_fixed',
+      },
+      {
+        id:
+          '50d3ebb0-0042-11ec-8258-f7ffdf5ad45a:opentrons/opentrons_96_tiprack_300ul/1',
+        displayName: 'Opentrons 96 Tip Rack 300 µL',
+        definitionUri: 'opentrons/opentrons_96_tiprack_300ul/1',
+        loadName: 'opentrons_96_tiprack_300ul',
+      },
+      {
+        id:
+          '9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1',
+        displayName: 'NEST 12 Well Reservoir 15 mL',
+        definitionUri: 'opentrons/nest_12_reservoir_15ml/1',
+        loadName: 'nest_12_reservoir_15ml',
+      },
+      {
+        id: 'e24818a0-0042-11ec-8258-f7ffdf5ad45a',
+        displayName: 'Opentrons 96 Tip Rack 300 µL (1)',
+        definitionUri: 'opentrons/opentrons_96_tiprack_300ul/1',
+        loadName: 'opentrons_96_tiprack_300ul',
+      },
+      {
+        id:
+          '1dc0c050-0122-11ec-88a3-f1745cf9b36c:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1',
+        displayName: 'NEST 96 Well Plate 100 µL PCR Full Skirt',
+        definitionUri: 'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1',
+        loadName: 'nest_96_wellplate_100ul_pcr_full_skirt',
+      },
+    ]
     const labwareDefinitions = protocolWithTC.labwareDefinitions
     const modules = protocolWithTC.modules
     const commands = protocolWithTC.commands
@@ -247,6 +309,7 @@ describe('getTwoPipettePositionCheckSteps', () => {
       getTwoPipettePositionCheckSteps({
         primaryPipetteId,
         secondaryPipetteId,
+        //  @ts-expect-error
         labware,
         labwareDefinitions,
         modules,
