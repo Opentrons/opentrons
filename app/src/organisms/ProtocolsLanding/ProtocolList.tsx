@@ -43,12 +43,17 @@ const SORT_BY_BUTTON_STYLE = css`
   }
 `
 
+const LOCAL_STORAGE_KEY = 'protocolListSortKey'
+
 interface ProtocolListProps {
   storedProtocols: StoredProtocolData[]
 }
 export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
   const [showSlideout, setShowSlideout] = React.useState<boolean>(false)
-  const [sortBy, setSortBy] = React.useState<ProtocolSort>('alphabetical')
+  const [sortBy, setSortBy] = React.useState<ProtocolSort>(() => {
+    const savedSortKey = localStorage.getItem(LOCAL_STORAGE_KEY)
+    return savedSortKey != null ? JSON.parse(savedSortKey) : 'alphabetical'
+  })
   const [showSortByMenu, setShowSortByMenu] = React.useState<boolean>(false)
   const toggleSetShowSortByMenu = (): void => setShowSortByMenu(!showSortByMenu)
   const { t } = useTranslation('protocol_info')
@@ -83,6 +88,15 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
       label: t('oldest_updates'),
     },
   }
+
+  const handleSort = (sortKey: ProtocolSort): void => {
+    setSortBy(sortKey)
+    setShowSortByMenu(false)
+  }
+
+  React.useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(sortBy))
+  }, [sortBy])
 
   return (
     <Box padding={SPACING.spacing4}>
@@ -149,36 +163,16 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
               right="7rem"
               flexDirection={DIRECTION_COLUMN}
             >
-              <MenuItem
-                onClick={() => {
-                  setSortBy('alphabetical')
-                  setShowSortByMenu(false)
-                }}
-              >
+              <MenuItem onClick={() => handleSort('alphabetical')}>
                 {t('labware_landing:alphabetical')}
               </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  setSortBy('recent')
-                  setShowSortByMenu(false)
-                }}
-              >
+              <MenuItem onClick={() => handleSort('recent')}>
                 {t('most_recent_updates')}
               </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  setSortBy('reverse')
-                  setShowSortByMenu(false)
-                }}
-              >
+              <MenuItem onClick={() => handleSort('reverse')}>
                 {t('labware_landing:reverse')}
               </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  setSortBy('oldest')
-                  setShowSortByMenu(false)
-                }}
-              >
+              <MenuItem onClick={() => handleSort('oldest')}>
                 {t('oldest_updates')}
               </MenuItem>
             </Flex>
