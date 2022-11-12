@@ -1,122 +1,132 @@
 """OT-3 Manual Calibration."""
 import asyncio
 import argparse
-import time
 
 from opentrons.hardware_control.ot3api import OT3API
-from hardware_testing import data
+
 from hardware_testing.opentrons_api.types import OT3Mount, OT3Axis, Point
-from hardware_testing.opentrons_api.helpers_ot3 import (
-    home_ot3,
-    build_async_ot3_hardware_api,
-    jog_mount_ot3,
+from hardware_testing.opentrons_api import helpers_ot3
+from opentrons.calibration_storage.ot3.pipette_offset import (
+    save_pipette_calibration as save_offset_ot3,
 )
-from opentrons_shared_data.deck import load
-from opentrons.calibration_storage.ot3.pipette_offset import save_pipette_calibration
 
-# List of gantry axes
-list_axes = [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R]
+SAFE_Z = 10
+XY_STEP_SIZE = 0.1
 
-# Load deck definition
-deck_definition = load("ot3_standard", version=3)
 
-# Capacitive probe length
-PROBE_LENGTH = 34.5
+def _get_z_probe_pos(square_pos: Point) -> Point:
+    square = helpers_ot3.CALIBRATION_SQUARE_EVT
+    probe = helpers_ot3.CALIBRATION_PROBE_EVT
+    safe_z_probe_offset = (square.width / 2) + (probe.diameter / 2)
+    z_probe_pos = square_pos + Point(x=safe_z_probe_offset, y=safe_z_probe_offset)
+    return z_probe_pos
 
-def build_arg_parser():
-    arg_parser = argparse.ArgumentParser(description='OT-3 Manual Calibration')
-    arg_parser.add_argument('-m', '--mount', choices=['l','r'], required=False, help='The pipette mount to be calibrated', default='l')
-    arg_parser.add_argument('-o', '--slot', type=int, required=False, help='Deck slot number', default=5)
-    arg_parser.add_argument('-s', '--simulate', action="store_true", required=False, help='Simulate this script')
-    return arg_parser
 
-async def _run_manual_calibration(api: OT3API, mount: OT3Mount, slot: int) -> None:
+async def _jog_axis(api: OT3API, mount: OT3Mount, axis: OT3Axis, dir: float) -> None:
+    step = XY_STEP_SIZE
+    while True:
+        inp = input(f'<ENTER> key to jog {step} mm, or type "yes" to save position: ')
+        if not inp:
+            ax = axis.name.lower()[0]
+            await api.move_rel(mount, Point(**{ax: step * dir}))
+        if inp:
+            if inp.lower()[0] == "y":
+                return
+            else:
+                try:
+                    step = float(f"0.{inp}")
+                except ValueError:
+                    pass
+
+
+async def main(simulate: bool, slot: int, mount: OT3Mount) -> None:
+    api = await helpers_ot3.build_async_ot3_hardware_api(
+        is_simulating=simulate, use_defaults=True
+    )
     # Get pipette id
-    pipette_id = api._pipette_handler.get_pipette(mount)._pipette_id
-    print(f"\nStarting Manual Calibration on Deck Slot #{slot} and Pipette {pipette_id}:\n")
+    pipette = api.hardware_pipettes[mount.to_mount()]
+    assert pipette, f"No pipette found on mount: {mount}"
+    print(
+        f"\nStarting Manual Calibration on Deck Slot #{slot} and Pipette {pipette.pipette_id}:\n"
+    )
 
     # Initialize deck slot position
-    CORNER = Point(*deck_definition["locations"]["orderedSlots"][slot - 1]["position"])
-    CENTER_XY = Point(CORNER.x + 124.0 / 2, CORNER.y + 82.0 / 2, 50)
-    CENTER_Z = Point(CORNER.x + 76, CORNER.y + 54, 100)
+    calibration_square_pos = helpers_ot3.get_slot_calibration_square_position_ot3(slot)
+    z_probe_pos = _get_z_probe_pos(calibration_square_pos)
 
-    # Home grantry
-    await home_ot3(api, list_axes)
+    # Home gantry
+    await api.home()
+    helpers_ot3.set_pipette_offset_ot3(api, mount, Point(x=0, y=0, z=0))
+    await api.add_tip(mount, helpers_ot3.CALIBRATION_PROBE_EVT.length)
 
     # Move above slot Z center
     home_position = await api.gantry_position(mount)
-    above_point = CENTER_Z._replace(z=home_position.z)
+    above_point = z_probe_pos._replace(z=home_position.z)
     await api.move_to(mount, above_point)
-
-    input("\n--> Calibrate Deck Height? (Remove all items from deck and press ENTER)\n")
-
-    # Move to Z-axis center position
-    await api.move_to(mount, CENTER_Z)
+    input("\nRemove all items from deck and press ENTER\n")
+    await api.move_to(mount, z_probe_pos + Point(z=SAFE_Z))
 
     # Jog gantry to find deck height
-    print("\n--- Jog Z-Axis to find deck height! ---")
-    deck_position = await jog_mount_ot3(api, mount)
-    deck_height = round(deck_position[OT3Axis.by_mount(mount)], 3)
-    print(f"Deck Height = {deck_height}mm")
-
-    # Home Z-axis
+    print("\n--> Jog to find Z position")
+    await _jog_axis(api, mount, OT3Axis.by_mount(mount), -1)
     current_position = await api.gantry_position(mount)
-    home_z = current_position._replace(z=home_position.z)
-    await api.move_to(mount, home_z)
-
-    input("\n--> Calibrate Slot Center? (Remove all items from deck and press ENTER)\n")
+    await api.move_rel(mount, Point(z=SAFE_Z))
+    deck_height = float(current_position.z)
+    print(f"Found Z = {deck_height}mm")
 
     # Move to slot center
-    await api.move_to(mount, CENTER_XY)
+    current_position = await api.gantry_position(mount)
+    await api.move_to(mount, calibration_square_pos._replace(z=current_position.z))
+    input("\nPress ENTER to calibrate XY axes")
+    xy_start_pos = calibration_square_pos._replace(z=deck_height - 1)
+    await api.move_to(mount, xy_start_pos)
 
-    # Jog gantry to find slot center
-    print("\n--- Jog X-axis and Y-axis to find slot center! ---")
-    deck_position = await jog_mount_ot3(api, mount)
-    x_center = round(deck_position[OT3Axis.X], 3)
-    y_center = round(deck_position[OT3Axis.Y], 3)
-    print(f"X Center = {x_center}mm")
-    print(f"Y Center = {y_center}mm")
+    probe_radius = helpers_ot3.CALIBRATION_PROBE_EVT.diameter / 2
+
+    # move to the RIGHT until we hit the square edge
+    await _jog_axis(api, mount, OT3Axis.X, 1)
+    current_position = await api.gantry_position(mount)
+    left_square = current_position.x + probe_radius
+    x_center = left_square - (helpers_ot3.CALIBRATION_SQUARE_EVT.width / 2)
+    print(f"Found X = {x_center}mm")
+
+    # move back to center of square
+    await api.move_to(mount, xy_start_pos)
+
+    # move to the FRONT until we hit the square edge
+    await _jog_axis(api, mount, OT3Axis.Y, -1)
+    current_position = await api.gantry_position(mount)
+    bottom_square = current_position.y - probe_radius
+    y_center = bottom_square + (helpers_ot3.CALIBRATION_SQUARE_EVT.height / 2)
+    print(f"Found Y = {y_center}mm")
 
     # Show final calibration results
-    slot_center = Point(x=x_center,y=y_center,z=deck_height)
-    print(f"\nSlot #{slot} Center Position = {slot_center}")
+    found_square_pos = Point(x=x_center, y=y_center, z=deck_height)
+    print(f"\nSlot #{slot} Center Position = {found_square_pos}")
 
     # Save pipette offsets
-    save_offset = input("\n--> Save Pipette Offset? (y/N): " or "n")
-    if save_offset == "y" or save_offset == "Y":
-        offset_position = Point(x=x_center - CENTER_XY.x, y=y_center - CENTER_XY.y, z=deck_height)
-        save_pipette_calibration(offset_position, pipette_id, mount)
-        print("Pipette Offset Saved!")
+    offset_position = calibration_square_pos - found_square_pos
+    helpers_ot3.set_pipette_offset_ot3(api, mount, offset_position)
+    # move back to center of square
+    await api.move_to(mount, calibration_square_pos)
+    if "y" in input("\n--> Save Pipette Offset? (y/n): ").lower():
+        save_offset_ot3(offset_position, pipette.pipette_id, mount.to_mount())
+        print("pipette offset saved")
 
-    # Home Z-axis
-    current_position = await api.gantry_position(mount)
-    home_z = current_position._replace(z=home_position.z)
-    await api.move_to(mount, home_z)
 
-    # Move next to home
-    await api.move_to(mount, home_position + Point(x=-5, y=-5, z=0))
-
-async def exit(api: OT3API) -> None:
-    await api.disengage_axes(list_axes)
-
-async def main(simulate: bool, slot: int) -> None:
-    api = await build_async_ot3_hardware_api(is_simulating=simulate, use_defaults=True)
-    mount = OT3Mount.LEFT if args.mount == "l" else OT3Mount.RIGHT
-    await api.add_tip(mount, PROBE_LENGTH)
-    try:
-        await _run_manual_calibration(api, mount, slot)
-    except Exception as e:
-        await exit(api)
-        raise e
-    except KeyboardInterrupt:
-        await exit(api)
-        print("Calibration Cancelled!")
-    finally:
-        await exit(api)
-        print("Calibration Completed!")
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     print("\nOT-3 Manual Calibration\n")
-    arg_parser = build_arg_parser()
+    arg_parser = argparse.ArgumentParser(description="OT-3 Manual Calibration")
+    arg_parser.add_argument(
+        "--mount", choices=["left", "right", "gripper"], required=True
+    )
+    arg_parser.add_argument("--slot", type=int, default=5)
+    arg_parser.add_argument("--simulate", action="store_true")
     args = arg_parser.parse_args()
-    asyncio.run(main(args.simulate, args.slot))
+    ot3_mounts = {
+        "left": OT3Mount.LEFT,
+        "right": OT3Mount.RIGHT,
+        "gripper": OT3Mount.GRIPPER,
+    }
+    _mount = ot3_mounts[args.mount]
+    asyncio.run(main(args.simulate, args.slot, _mount))

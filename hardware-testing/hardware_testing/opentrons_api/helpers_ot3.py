@@ -8,6 +8,8 @@ from typing import List, Optional, Dict, Tuple
 from opentrons_hardware.firmware_bindings.constants import SensorId
 from opentrons_hardware.sensors import sensor_driver, sensor_types
 
+from opentrons_shared_data.deck import load as load_deck
+
 from opentrons.config.robot_configs import build_config_ot3, load_ot3 as load_ot3_config
 from opentrons.hardware_control.backends.ot3utils import sensor_node_for_mount
 
@@ -25,6 +27,28 @@ from .types import (
     Point,
     CriticalPoint,
 )
+
+
+@dataclass
+class CalibrationSquare:
+    top_left_offset: Point
+    width: float
+    height: float
+    depth: float
+
+
+@dataclass
+class CalibrationProbe:
+    length: float
+    diameter: float
+
+
+# values are from "Robot Extents" sheet
+CALIBRATION_SQUARE_OFFSET_EVT = Point(x=64, y=-43, z=-0.25)
+CALIBRATION_SQUARE_EVT = CalibrationSquare(
+    top_left_offset=CALIBRATION_SQUARE_OFFSET_EVT, width=20, height=20, depth=3
+)
+CALIBRATION_PROBE_EVT = CalibrationProbe(length=34.5, diameter=4.0)
 
 
 def stop_server_ot3() -> None:
@@ -549,3 +573,29 @@ async def wait_for_stable_capacitance_ot3(
         await wait_for_stable_capacitance_ot3(
             api, mount, threshold_pf, duration, retries - 1
         )
+
+
+def set_pipette_offset_ot3(api: OT3API, mount: OT3Mount, offset: Point) -> None:
+    """Set pipette offset OT3."""
+    pipette = api.hardware_pipettes[mount.to_mount()]
+    assert pipette, f"No pipette found on mount: {mount}"
+    pipette._pipette_offset.offset = offset
+
+
+def get_slot_top_left_position_ot3(slot: int) -> Point:
+    """Get slot top-left position."""
+    deck = load_deck("ot3_standard", version=3)
+    slots = deck["locations"]["orderedSlots"]
+    s = slots[slot - 1]
+    assert s["id"] == str(slot)
+    bottom_left = Point(*s["position"])
+    s_height = s["boundingBox"]["yDimension"]
+    top_left = bottom_left + Point(y=float(s_height))
+    return top_left
+
+
+def get_slot_calibration_square_position_ot3(slot: int) -> Point:
+    """Get slot calibration block position."""
+    slot_top_left = get_slot_top_left_position_ot3(slot)
+    calib_sq_offset = CALIBRATION_SQUARE_EVT.top_left_offset
+    return slot_top_left + calib_sq_offset
