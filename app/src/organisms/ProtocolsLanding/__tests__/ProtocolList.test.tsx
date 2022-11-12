@@ -9,7 +9,7 @@ import {
   storedProtocolDataTwo,
 } from '../../../redux/protocol-storage/__fixtures__'
 import { ProtocolList } from '../ProtocolList'
-import { useSortedProtocols } from '../hooks'
+import { useSortedProtocols, useLocalStorage } from '../hooks'
 import { EmptyStateLinks } from '../EmptyStateLinks'
 import { ProtocolCard } from '../ProtocolCard'
 
@@ -28,6 +28,11 @@ const mockEmptyStateLinks = EmptyStateLinks as jest.MockedFunction<
 const mockProtocolCard = ProtocolCard as jest.MockedFunction<
   typeof ProtocolCard
 >
+const mockUseLocalStorage = useLocalStorage as jest.MockedFunction<
+  typeof useLocalStorage
+>
+
+const LOCAL_STORAGE_KEY = 'protocolListSortKey'
 
 const render = (props: React.ComponentProps<typeof ProtocolList>) => {
   return renderWithProviders(
@@ -52,6 +57,9 @@ describe('ProtocolList', () => {
     when(mockUseSortedProtocols)
       .calledWith('alphabetical', [storedProtocolData, storedProtocolDataTwo])
       .mockReturnValue([storedProtocolData, storedProtocolDataTwo])
+    when(mockUseLocalStorage)
+      .calledWith(LOCAL_STORAGE_KEY, 'alphabetical')
+      .mockReturnValue(['alphabetical', jest.fn()])
   })
 
   afterEach(() => {
@@ -96,6 +104,9 @@ describe('ProtocolList', () => {
     when(mockUseSortedProtocols)
       .calledWith('reverse', [storedProtocolData, storedProtocolDataTwo])
       .mockReturnValue([storedProtocolDataTwo, storedProtocolData])
+    when(mockUseLocalStorage)
+      .calledWith(LOCAL_STORAGE_KEY, 'alphabetical')
+      .mockReturnValue(['reverse', jest.fn()])
     const { getByRole, getByText, getByTestId } = render(props)
     fireEvent.click(getByTestId('ProtocolList_SortByMenu'))
     getByRole('button', { name: 'Alphabetical' })
@@ -110,6 +121,9 @@ describe('ProtocolList', () => {
     when(mockUseSortedProtocols)
       .calledWith('recent', [storedProtocolData, storedProtocolDataTwo])
       .mockReturnValue([storedProtocolData, storedProtocolDataTwo])
+    when(mockUseLocalStorage)
+      .calledWith(LOCAL_STORAGE_KEY, 'alphabetical')
+      .mockReturnValue(['recent', jest.fn()])
 
     const { getByRole, getByText, getByTestId } = render(props)
     fireEvent.click(getByTestId('ProtocolList_SortByMenu'))
@@ -125,6 +139,9 @@ describe('ProtocolList', () => {
     when(mockUseSortedProtocols)
       .calledWith('oldest', [storedProtocolData, storedProtocolDataTwo])
       .mockReturnValue([storedProtocolDataTwo, storedProtocolData])
+    when(mockUseLocalStorage)
+      .calledWith(LOCAL_STORAGE_KEY, 'alphabetical')
+      .mockReturnValue(['oldest', jest.fn()])
 
     const { getByRole, getByText, getByTestId } = render(props)
     fireEvent.click(getByTestId('ProtocolList_SortByMenu'))

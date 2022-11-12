@@ -70,6 +70,11 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
     setShowSortByMenu(false)
   }
 
+  const handleSort = (sortKey: ProtocolSort): void => {
+    setSortBy(sortKey)
+    setShowSortByMenu(false)
+  }
+
   const sortByLabelType: {
     [key in ProtocolSort]: {
       label: string
@@ -87,11 +92,6 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
     oldest: {
       label: t('oldest_updates'),
     },
-  }
-
-  const handleSort = (sortKey: ProtocolSort): void => {
-    setSortBy(sortKey)
-    setShowSortByMenu(false)
   }
 
   return (
