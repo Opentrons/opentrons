@@ -18,6 +18,7 @@ if TYPE_CHECKING:
 LOG = getLogger(__name__)
 
 CAL_TRANSIT_HEIGHT: Final[float] = 10
+GRIPPER_GRIP_FORCE: Final[float] = 20
 
 
 class CalibrationMethod(Enum):
@@ -455,7 +456,7 @@ def gripper_pin_offsets_mean(front: Point, rear: Point) -> Point:
 async def calibrate_gripper(hcapi: OT3API, probe: GripperProbe) -> Point:
     hcapi.add_gripper_probe(probe)
     try:
-        await hcapi.grip(20)
+        await hcapi.grip(GRIPPER_GRIP_FORCE)
         result = await calibrate_mount(hcapi, OT3Mount.GRIPPER)
     finally:
         hcapi.remove_gripper_probe()
