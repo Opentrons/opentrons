@@ -12,6 +12,7 @@ from opentrons.calibration_storage.ot3.pipette_offset import (
 
 SAFE_Z = 10
 XY_STEP_SIZE = 0.1
+Z_OFFSET_FROM_WASHERS = 3.0
 
 
 def _get_z_probe_pos(square_pos: Point) -> Point:
@@ -24,17 +25,22 @@ def _get_z_probe_pos(square_pos: Point) -> Point:
 
 async def _jog_axis(api: OT3API, mount: OT3Mount, axis: OT3Axis, dir: float) -> None:
     step = XY_STEP_SIZE
+    ax = axis.name.lower()[0]
     while True:
         inp = input(f'<ENTER> key to jog {step} mm, or type "yes" to save position: ')
         if not inp:
-            ax = axis.name.lower()[0]
             await api.move_rel(mount, Point(**{ax: step * dir}))
         if inp:
             if inp.lower()[0] == "y":
                 return
             else:
                 try:
-                    step = float(f"0.{inp}")
+                    tmp_step = float(inp.strip())
+                    if tmp_step < 0.0 or tmp_step > 1.0:
+                        print("Cannot jog greater than 1.0 mm")
+                        continue
+                    else:
+                        step = tmp_step
                 except ValueError:
                     pass
 
@@ -52,6 +58,8 @@ async def main(simulate: bool, slot: int, mount: OT3Mount, test: bool) -> None:
 
     # Initialize deck slot position
     calibration_square_pos = helpers_ot3.get_slot_calibration_square_position_ot3(slot)
+    # TODO: remove this added Z-height once longer probe is ready
+    calibration_square_pos += Point(z=Z_OFFSET_FROM_WASHERS)
     z_probe_pos = _get_z_probe_pos(calibration_square_pos)
 
     # Home gantry
@@ -123,6 +131,9 @@ async def main(simulate: bool, slot: int, mount: OT3Mount, test: bool) -> None:
     if "y" in input("\n--> Save Pipette Offset? (y/n): ").lower():
         save_offset_ot3(offset_position, pipette.pipette_id, mount.to_mount())
         print("pipette offset saved")
+
+    # get out of the way
+    await api.home()
 
 
 if __name__ == "__main__":
