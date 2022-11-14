@@ -129,7 +129,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
 
           cy.get('div')
             .contains(
-              'This protocol can only run on app and robot server version 6.1 or higher'
+              'This protocol can only run on app and robot server version 6.2 or higher'
             )
             .should('exist')
           cy.get('button').contains('continue', { matchCase: false }).click()
@@ -145,7 +145,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
               assert.match(
                 savedFile.designerApplication.version,
                 /^6\.1\.\d+$/,
-                'designerApplication.version is 6.1.x'
+                'designerApplication.version is 6.2.x'
               )
               ;[savedFile, expectedFile].forEach(f => {
                 // Homogenize fields we don't want to compare
