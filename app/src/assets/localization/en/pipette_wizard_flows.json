@@ -30,5 +30,7 @@
   "name_and_volume_detected": "{{name}} Pipette Detected",
   "error_encountered": "Error encountered",
   "loose_detach": "Loosen Screws and Detach",
-  "hold_and_loosen": "Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette"
+  "hold_and_loosen": "Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette",
+  "attach_pipette": "Attach a pipette",
+  "detach_pipette": "Detach a pipette"
 }

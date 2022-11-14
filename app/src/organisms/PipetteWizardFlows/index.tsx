@@ -154,7 +154,7 @@ export const PipetteWizardFlows = (
     )
   } else if (currentStep.section === SECTIONS.ATTACH_PROBE) {
     onExit = confirmExit
-    modalContent = modalContent = showConfirmExit ? (
+    modalContent = showConfirmExit ? (
       exitModal
     ) : (
       <AttachProbe
@@ -165,7 +165,7 @@ export const PipetteWizardFlows = (
     )
   } else if (currentStep.section === SECTIONS.DETACH_PROBE) {
     onExit = confirmExit
-    modalContent = modalContent = showConfirmExit ? (
+    modalContent = showConfirmExit ? (
       exitModal
     ) : (
       <DetachProbe
@@ -176,11 +176,17 @@ export const PipetteWizardFlows = (
     )
   } else if (currentStep.section === SECTIONS.RESULTS) {
     onExit = confirmExit
-    modalContent = modalContent = showConfirmExit ? (
+    modalContent = showConfirmExit ? (
       exitModal
     ) : (
       <Results {...currentStep} {...calibrateBaseProps} proceed={closeFlow} />
     )
+  } else if (currentStep.section === SECTIONS.MOUNT_PIPETTE) {
+    onExit = confirmExit
+    modalContent = showConfirmExit ? exitModal : <div>MountPipette</div>
+  } else if (currentStep.section === SECTIONS.DETACH_PIPETTE) {
+    onExit = confirmExit
+    modalContent = showConfirmExit ? exitModal : <div>DetachPipette</div>
   }
 
   let wizardTitle: string = 'unknown page'
@@ -189,7 +195,16 @@ export const PipetteWizardFlows = (
       wizardTitle = t('calibrate_pipette')
       break
     }
+    case FLOWS.ATTACH: {
+      wizardTitle = t('attach_pipette')
+      break
+    }
+    case FLOWS.DETACH: {
+      wizardTitle = t('detach_pipette')
+      break
+    }
   }
+
   let exitWizardButton = onExit
   if (isRobotMoving) {
     exitWizardButton = undefined
