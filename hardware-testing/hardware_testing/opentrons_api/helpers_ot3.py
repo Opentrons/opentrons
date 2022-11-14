@@ -586,6 +586,12 @@ def set_pipette_offset_ot3(api: OT3API, mount: OT3Mount, offset: Point) -> None:
     pipette._pipette_offset.offset = offset
 
 
+def set_gripper_offset_ot3(api: OT3API, offset: Point) -> None:
+    """Set gripper offset OT3."""
+    assert api.has_gripper, "No gripper found"
+    api._gripper_handler._gripper._calibration_offset.offset = offset
+
+
 def get_slot_top_left_position_ot3(slot: int) -> Point:
     """Get slot top-left position."""
     deck = load_deck("ot3_standard", version=3)
