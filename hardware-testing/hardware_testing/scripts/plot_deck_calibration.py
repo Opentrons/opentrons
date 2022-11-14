@@ -203,7 +203,7 @@ class Plot:
         self.plot_param["x_title"] = "Time (min)"
         self.plot_param["y_title"] = "Z Gauge Displacement (mm)"
         self.plot_param["x_range"] = [0, x_last]
-        self.plot_param["y_range"] = [1.6, 1.8]
+        self.plot_param["y_range"] = [1.64, 1.74]
         self.plot_param["legend"] = "Data"
         self.plot_param["annotation"] = [annotation_zmin, annotation_zmax]
         self.write_plot(self.plot_param)
@@ -216,6 +216,7 @@ class Plot:
         x_last = df[x_axis].max()
         y_first = df[y_axis].min()
         y_last = df[y_axis].max()
+        y_avg = round(df[y_axis].mean(), 3)
 
         z_min = df[y_axis].min()
         z_min_id = df[y_axis].idxmin()
@@ -227,11 +228,20 @@ class Plot:
         z_max_xpos = df.loc[z_max_id][x_axis].item()
         z_max_text = f"Z Max = {z_max}mm"
 
+        z_avg = y_avg
+        z_avg_xpos = 0
+        z_avg_text = f"Z Avg = {z_avg}mm"
+
         annotation_zmin = self.set_annotation(z_min_xpos, z_min, z_min_text, ax_pos=-100, ay_pos=100)
         annotation_zmax = self.set_annotation(z_max_xpos, z_max, z_max_text, ax_pos=100, ay_pos=-100)
-        fig = px.line(df, x=x_axis, y=[y_axis], markers=True, color_discrete_sequence=self.list_colors[1:])
-        self.set_legend(fig, ["Z Gauge"])
-        self.plot_param["figure"] = fig
+        annotation_zavg = self.set_annotation(z_avg_xpos, z_avg, z_avg_text, ax_pos=100, ay_pos=-100)
+        fig1 = px.line(df, x=x_axis, y=[y_axis], markers=True, color_discrete_sequence=self.list_colors[1:])
+        fig2 = px.line(x=[0, x_last], y=[[y_avg, y_avg]], line_dash_sequence=["dash"], color_discrete_sequence=["black"])
+        self.set_legend(fig1, ["Z Gauge"])
+        self.set_legend(fig2, ["Average"])
+        subfig = make_subplots()
+        subfig.add_traces(fig1.data + fig2.data)
+        self.plot_param["figure"] = subfig
         self.plot_param["filename"] = "plot_zero"
         self.plot_param["title"] = "[Zeroed] Z Gauge Data"
         self.plot_param["x_title"] = "Time (min)"
@@ -239,7 +249,7 @@ class Plot:
         self.plot_param["x_range"] = [0, x_last]
         self.plot_param["y_range"] = [0, 0.1]
         self.plot_param["legend"] = "Data"
-        self.plot_param["annotation"] = [annotation_zmin, annotation_zmax]
+        self.plot_param["annotation"] = [annotation_zmin, annotation_zmax, annotation_zavg]
         self.write_plot(self.plot_param)
 
 if __name__ == '__main__':
