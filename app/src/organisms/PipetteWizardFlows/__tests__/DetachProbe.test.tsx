@@ -39,7 +39,8 @@ describe('DetachProbe', () => {
       attachedPipette: { left: mockPipette, right: null },
       flowType: FLOWS.CALIBRATE,
       handleCleanUp: jest.fn(),
-      setIsBetweenCommands: jest.fn(),
+      errorMessage: null,
+      setShowErrorMessage: jest.fn(),
       isRobotMoving: false,
     }
     mockInProgressModal.mockReturnValue(<div>mock in progress</div>)

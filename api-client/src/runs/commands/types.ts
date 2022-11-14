@@ -16,6 +16,7 @@ export interface RunCommandSummary {
   result?: RunTimeCommand['result']
   startedAt?: string
   completedAt?: string
+  error?: RunCommandError
 }
 
 export interface CommandDetail {
@@ -45,4 +46,11 @@ export interface CommandsData {
 export interface CreateCommandParams {
   waitUntilComplete?: boolean
   timeout?: number
+}
+
+export interface RunCommandError {
+  id: string
+  errorType: string
+  createdAt: string
+  detail: string
 }
