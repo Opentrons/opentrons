@@ -4,11 +4,11 @@
   "model": "eightChannel",
   "displayCategory": "GEN3",
   "pickUpTipConfigurations": {
-    "current": 0.4,
+    "current": 0.5,
     "presses": 1,
     "speed": 10,
-    "increment": 0.5,
-    "distance": 1.0
+    "increment": 0.0,
+    "distance": 13.0
   },
   "dropTipConfigurations": {
     "current": 1.0,
@@ -22,7 +22,7 @@
     "top": 0.5,
     "bottom": 71.5,
     "blowout": 76.5,
-    "drop": 90.5
+    "drop": 92.5
   },
   "availableSensors": {
     "pressure": 2,

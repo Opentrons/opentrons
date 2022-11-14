@@ -19,10 +19,10 @@
     "run": 1.0
   },
   "plungerPositionsConfigurations": {
-    "top": 1,
-    "bottom": 1,
-    "blowout": 1,
-    "drop": 1
+    "top": 0,
+    "bottom": 66,
+    "blowout": 71,
+    "drop": 80
   },
   "availableSensors": {
     "pressure": 2,

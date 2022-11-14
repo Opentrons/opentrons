@@ -1,9 +1,9 @@
 {
   "$otSharedSchema": "#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json",
   "T50": {
-    "defaultAspirateFlowRate": 20,
-    "defaultDispenseFlowRate": 20,
-    "defaultBlowOutFlowRate": 20,
+    "defaultAspirateFlowRate": 6,
+    "defaultDispenseFlowRate": 6,
+    "defaultBlowOutFlowRate": 80,
     "aspirate": {
       "default": [
         [0.4148, -1705.1015, 20.5455],
@@ -98,9 +98,9 @@
     }
   },
   "T200": {
-    "defaultAspirateFlowRate": 20,
-    "defaultDispenseFlowRate": 20,
-    "defaultBlowOutFlowRate": 20,
+    "defaultAspirateFlowRate": 80,
+    "defaultDispenseFlowRate": 80,
+    "defaultBlowOutFlowRate": 80,
     "aspirate": {
       "default": [
         [0.8314, -2.9322, 24.0741],
@@ -193,9 +193,9 @@
     }
   },
   "T1000": {
-    "defaultAspirateFlowRate": 20,
-    "defaultDispenseFlowRate": 20,
-    "defaultBlowOutFlowRate": 20,
+    "defaultAspirateFlowRate": 160,
+    "defaultDispenseFlowRate": 160,
+    "defaultBlowOutFlowRate": 80,
     "aspirate": {
       "default": [
         [0.7511, 3.9556, 6.455],
@@ -290,10 +290,8 @@
   "maxVolume": 1,
   "minVolume": 1000,
   "defaultTipracks": [
-    "opentrons/opentrons_96_tiprack_20ul/1",
-    "opentrons/opentrons_96_filtertiprack_10ul/1",
-    "opentrons/opentrons_96_tiprack_300ul/1",
-    "opentrons/opentrons_96_filtertiprack_200ul/1",
-    "opentrons/opentrons_96_tiprack_1000ul/1"
+    "opentrons/opentrons_ot3_96_tiprack_1000ul/1",
+    "opentrons/opentrons_ot3_96_tiprack_200ul/1",
+    "opentrons/opentrons_ot3_96_tiprack_50ul/1"
   ]
 }
