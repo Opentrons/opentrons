@@ -14,7 +14,6 @@ const SPLASH_DURATION = 4000
 
 export function InitialSplash(): JSX.Element {
   const history = useHistory()
-  console.log('InitialSplash')
 
   React.useEffect(() => {
     const splashTimer = setTimeout(() => {

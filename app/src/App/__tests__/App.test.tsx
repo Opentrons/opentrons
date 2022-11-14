@@ -23,7 +23,7 @@ import { getLocalRobot } from '../../redux/discovery'
 import { Alerts } from '../../organisms/Alerts'
 import { App } from '../'
 
-import { State } from '../../redux/types'
+import type { State } from '../../redux/types'
 
 jest.mock('../../organisms/Breadcrumbs')
 jest.mock('../../organisms/Devices/hooks')
@@ -33,10 +33,10 @@ jest.mock('../../pages/Devices/DevicesLanding')
 jest.mock('../../pages/Protocols/ProtocolsLanding')
 jest.mock('../../pages/Devices/ProtocolRunDetails')
 jest.mock('../../pages/Devices/RobotSettings')
-jest.mock('../../pages/Devices/Setup/InitialSplash')
-jest.mock('../../organisms/SetupNetwork/SelectNetwork')
-jest.mock('../../organisms/SetupNetwork/SetWifiCred')
-jest.mock('../../organisms/SetupNetwork/ConnectedNetworkInfo')
+jest.mock('../../pages/OnDeviceDisplay/InitialSplash')
+jest.mock('../../pages/OnDeviceDisplay/SelectNetwork')
+jest.mock('../../pages/OnDeviceDisplay/SetWifiCred')
+jest.mock('../../pages/OnDeviceDisplay/ConnectedNetworkInfo')
 jest.mock('../../organisms/Alerts')
 jest.mock('../../pages/Labware/helpers/getAllDefs')
 jest.mock('../../pages/AppSettings/GeneralSettings')

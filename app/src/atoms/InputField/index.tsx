@@ -143,7 +143,7 @@ function Input(props: InputFieldProps): JSX.Element {
           value={value}
           placeholder={placeHolder}
         />
-        {Boolean(props.units) && (
+        {props.units != null && (
           <Flex
             display={DISPLAY_INLINE_BLOCK}
             textAlign={TEXT_ALIGN_RIGHT}
