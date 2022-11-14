@@ -26,12 +26,12 @@ import { TertiaryButton } from '../../atoms/buttons'
 import * as RobotApi from '../../redux/robot-api'
 import * as Networking from '../../redux/networking'
 import { getLocalRobot } from '../../redux/discovery'
-import { ConnectingNetwork } from './ConnectingNetwork'
-import { ConnectedResult } from './ConnectedResult'
+import { ConnectingNetwork } from '../../organisms/SetupNetwork/ConnectingNetwork'
+import { ConnectedResult } from '../../organisms/SetupNetwork/ConnectedResult'
 
 import type { State, Dispatch } from '../../redux/types'
 import type { NavRouteParams } from '../../App/types'
-import type { WifiConfigureRequest } from '../Devices/RobotSettings/ConnectNetwork/types'
+import type { WifiConfigureRequest } from '../../organisms/Devices/RobotSettings/ConnectNetwork/types'
 
 const STATUS_REFRESH_MS = 5000
 const LIST_REFRESH_MS = 10000
@@ -99,7 +99,7 @@ export function SetWifiCred(): JSX.Element {
             alignItems={ALIGN_CENTER}
             marginBottom="3.0625rem"
           >
-            <Btn onClick={() => history.push(`/selectNetwork`)}>
+            <Btn onClick={() => history.push(`/select-network`)}>
               <Flex flexDirection={DIRECTION_ROW}>
                 <Icon
                   name="arrow-back"

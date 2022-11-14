@@ -1,4 +1,6 @@
 import * as React from 'react'
+import { css } from 'styled-components'
+
 import {
   Flex,
   ALIGN_CENTER,
@@ -11,13 +13,14 @@ import {
   TYPOGRAPHY,
   COLOR_WARNING_DARK,
 } from '@opentrons/components'
-import { css } from 'styled-components'
+
+import type { StyleProps } from '@opentrons/components'
 
 export const INPUT_TYPE_NUMBER = 'number' as const
 export const INPUT_TYPE_TEXT = 'text' as const
 export const INPUT_TYPE_PASSWORD = 'password' as const
 
-export interface InputFieldProps {
+export interface InputFieldProps extends StyleProps {
   /** field is disabled if value is true */
   disabled?: boolean
   /** change handler */
@@ -60,8 +63,6 @@ export interface InputFieldProps {
   /** if input type is number, these are the min and max values */
   max?: number
   min?: number
-  /** input height for odd */
-  height?: string
 }
 
 export function InputField(props: InputFieldProps): JSX.Element {
@@ -71,8 +72,8 @@ export function InputField(props: InputFieldProps): JSX.Element {
       lineHeight={1}
       fontSize={TYPOGRAPHY.fontSizeP}
       fontWeight={TYPOGRAPHY.fontWeightRegular}
-      color={props.error ? COLOR_WARNING_DARK : COLORS.darkBlackEnabled}
-      opacity={props.disabled ? 0.5 : ''}
+      color={props.error != null ? COLOR_WARNING_DARK : COLORS.darkBlackEnabled}
+      opacity={props.disabled ?? false ? 0.5 : ''}
     >
       <Input {...props} />
     </Flex>
@@ -81,8 +82,8 @@ export function InputField(props: InputFieldProps): JSX.Element {
 
 function Input(props: InputFieldProps): JSX.Element {
   const error = props.error != null
-  const value = props.isIndeterminate ? '' : props.value ?? ''
-  const placeHolder = props.isIndeterminate ? '-' : props.placeholder
+  const value = props.isIndeterminate ?? false ? '' : props.value ?? ''
+  const placeHolder = props.isIndeterminate ?? false ? '-' : props.placeholder
 
   const INPUT_FIELD = css`
     display: flex;
@@ -130,14 +131,14 @@ function Input(props: InputFieldProps): JSX.Element {
 
   return (
     <Flex width="100%" flexDirection={DIRECTION_COLUMN}>
-      <Flex css={INPUT_FIELD} height={props.height && props.height}>
+      <Flex css={INPUT_FIELD}>
         <input
           {...props}
           data-testid={props.id}
           value={value}
           placeholder={placeHolder}
         />
-        {props.units && (
+        {Boolean(props.units) && (
           <Flex
             display={DISPLAY_INLINE_BLOCK}
             textAlign={TEXT_ALIGN_RIGHT}
@@ -156,7 +157,7 @@ function Input(props: InputFieldProps): JSX.Element {
         flexDirection={DIRECTION_COLUMN}
       >
         <Flex paddingBottom={SPACING.spacing2}>{props.caption}</Flex>
-        {props.secondaryCaption ? (
+        {props.secondaryCaption != null ? (
           <Flex paddingBottom={SPACING.spacing2}>{props.secondaryCaption}</Flex>
         ) : null}
         <Flex color={COLORS.errorEnabled}>{props.error}</Flex>

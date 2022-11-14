@@ -14,10 +14,10 @@ import { ProtocolsLanding } from '../../pages/Protocols/ProtocolsLanding'
 import { ProtocolRunDetails } from '../../pages/Devices/ProtocolRunDetails'
 import { RobotSettings } from '../../pages/Devices/RobotSettings'
 import { GeneralSettings } from '../../pages/AppSettings/GeneralSettings'
-import { InitialSplash } from '../../pages/Devices/Setup/InitialSplash'
-import { SelectNetwork } from '../../organisms/SetupNetwork/SelectNetwork'
-import { SetWifiCred } from '../../organisms/SetupNetwork/SetWifiCred'
-import { ConnectedNetworkInfo } from '../../organisms/SetupNetwork/ConnectedNetworkInfo'
+import { InitialSplash } from '../../pages/OnDeviceDisplay/InitialSplash'
+import { SelectNetwork } from '../../pages/OnDeviceDisplay/SelectNetwork'
+import { SetWifiCred } from '../../pages/OnDeviceDisplay/SetWifiCred'
+import { ConnectedNetworkInfo } from '../../pages/OnDeviceDisplay/ConnectedNetworkInfo'
 import { getIsOnDevice } from '../../redux/config'
 import { getLocalRobot } from '../../redux/discovery'
 import { Alerts } from '../../organisms/Alerts'
@@ -184,27 +184,27 @@ describe('App', () => {
     getByText('Mock Alerts')
   })
 
-  it('renders a InitialSplash component component from /deviceSetup', () => {
+  it('renders a InitialSplash component component from /device-setup', () => {
     when(mockGetIsOnDevice).calledWith(MOCK_STATE).mockReturnValue(true)
-    const [{ getByText }] = render('/deviceSetup')
+    const [{ getByText }] = render('/device-setup')
     getByText('Mock InitialSplash')
   })
 
-  it('renders a SelectNetwork component from /selectNetwork', () => {
+  it('renders a SelectNetwork component from /select-network', () => {
     when(mockGetIsOnDevice).calledWith(MOCK_STATE).mockReturnValue(true)
-    const [{ getByText }] = render('/selectNetwork')
+    const [{ getByText }] = render('/select-network')
     getByText('Mock SelectNetwork')
   })
 
-  it('renders a SetWifiCred component from /setWifiCred/:ssid', () => {
+  it('renders a SetWifiCred component from /set-wifi-cred/:ssid', () => {
     when(mockGetIsOnDevice).calledWith(MOCK_STATE).mockReturnValue(true)
-    const [{ getByText }] = render('/setWifiCred/mockWifi')
+    const [{ getByText }] = render('/set-wifi-cred/mockWifi')
     getByText('Mock SetWifiCred')
   })
 
-  it('renders a ConnectedNetworkInfo component from /connectedNetworkInfo/:ssid', () => {
+  it('renders a ConnectedNetworkInfo component from /connected-network-info/:ssid', () => {
     when(mockGetIsOnDevice).calledWith(MOCK_STATE).mockReturnValue(true)
-    const [{ getByText }] = render('/connectedNetworkInfo/mockWifi')
+    const [{ getByText }] = render('/connected-network-info/mockWifi')
     getByText('Mock ConnectedNetworkInfo')
   })
 })

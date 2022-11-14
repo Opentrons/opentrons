@@ -25,10 +25,10 @@ import { ProtocolsLanding } from '../pages/Protocols/ProtocolsLanding'
 import { ProtocolDetails } from '../pages/Protocols/ProtocolDetails'
 import { AppSettings } from '../pages/AppSettings'
 import { Labware } from '../pages/Labware'
-import { InitialSplash } from '../pages/Devices/Setup/InitialSplash'
-import { ConnectedNetworkInfo } from '../organisms/SetupNetwork/ConnectedNetworkInfo'
-import { SelectNetwork } from '../organisms/SetupNetwork/SelectNetwork'
-import { SetWifiCred } from '../organisms/SetupNetwork/SetWifiCred'
+import { InitialSplash } from '../pages/OnDeviceDisplay/InitialSplash'
+import { ConnectedNetworkInfo } from '../pages/OnDeviceDisplay/ConnectedNetworkInfo'
+import { SelectNetwork } from '../pages/OnDeviceDisplay/SelectNetwork'
+import { SetWifiCred } from '../pages/OnDeviceDisplay/SetWifiCred'
 import { getIsOnDevice } from '../redux/config'
 import { getLocalRobot } from '../redux/discovery'
 import { useSoftwareUpdatePoll } from './hooks'
@@ -41,7 +41,6 @@ const stopEvent = (event: React.MouseEvent): void => event.preventDefault()
 
 export const AppComponent = (): JSX.Element => {
   useSoftwareUpdatePoll()
-
   const isOnDevice = useSelector(getIsOnDevice)
   const localRobot = useSelector(getLocalRobot)
 
@@ -105,35 +104,36 @@ export const AppComponent = (): JSX.Element => {
       name: 'App Settings',
       path: '/app-settings/:appSettingsTab?',
     },
+  ]
+
+  const onDeviceDisplayRoutes: RouteProps[] = [
     {
       Component: InitialSplash,
       exact: true,
       name: 'Start Device Setup',
-      path: '/deviceSetup',
+      path: '/device-setup',
     },
     {
       Component: SelectNetwork,
       exact: true,
       name: 'Select Network',
-      path: '/selectNetwork',
+      path: '/select-network',
     },
     {
       Component: SetWifiCred,
       exact: true,
       name: 'Set Wifi Cred',
-      path: '/setWifiCred/:ssid',
+      path: '/set-wifi-cred/:ssid',
     },
     {
       Component: ConnectedNetworkInfo,
       exact: true,
       name: 'Connected Network Info',
-      path: '/connectedNetworkInfo/:ssid',
+      path: '/connected-network-info/:ssid',
     },
   ]
 
-  const isOnDeviceRoutes = allRoutes.filter(route => route.path !== '/devices')
-
-  const routes = isOnDevice ? isOnDeviceRoutes : allRoutes
+  const routes = isOnDevice ? onDeviceDisplayRoutes : allRoutes
 
   return (
     <>
@@ -167,7 +167,7 @@ export const AppComponent = (): JSX.Element => {
                     </Route>
                   )
                 })}
-                <Redirect exact from="/" to="/deviceSetup" />
+                <Redirect to="/device-setup" />
               </Switch>
               <Alerts />
             </Box>
@@ -195,7 +195,7 @@ export const AppComponent = (): JSX.Element => {
                     </Route>
                   )
                 })}
-                <Redirect exact from="/" to="/protocols" />
+                <Redirect exact from="/" to="/devices" />
               </Switch>
               <Alerts />
             </Box>

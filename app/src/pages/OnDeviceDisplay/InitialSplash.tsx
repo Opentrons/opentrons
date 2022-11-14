@@ -8,16 +8,17 @@ import {
   JUSTIFY_CENTER,
 } from '@opentrons/components'
 
-import logo from '../../../assets/images/odd/opentrons_logo.png'
+import logo from '../../assets/images/odd/opentrons_logo.png'
 
 const SPLASH_DURATION = 4000
 
 export function InitialSplash(): JSX.Element {
   const history = useHistory()
+  console.log('InitialSplash')
 
   React.useEffect(() => {
     const splashTimer = setTimeout(() => {
-      history.push(`/selectNetwork`)
+      history.push(`/select-network`)
     }, SPLASH_DURATION)
     return () => {
       clearTimeout(splashTimer)

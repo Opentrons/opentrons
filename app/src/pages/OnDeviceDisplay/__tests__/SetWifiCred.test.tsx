@@ -50,7 +50,7 @@ const mockPostWifiConfigure = Networking.postWifiConfigure as jest.MockedFunctio
 const render = (path = '/') => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
-      <Route path="/setWifiCred/:ssid">
+      <Route path="/set-wifi-cred/:ssid">
         <SetWifiCred />
       </Route>
     </MemoryRouter>,
@@ -78,7 +78,7 @@ describe('SetWifiCred', () => {
 
   it('should render text, button and software keyboard', () => {
     const [{ getByText, getByRole, getAllByRole, getByLabelText }] = render(
-      '/setWifiCred/mockWifi'
+      '/set-wifi-cred/mockWifi'
     )
     getByText('mockWifi')
     getByText('Back')
@@ -94,7 +94,7 @@ describe('SetWifiCred', () => {
   })
 
   it('should display a dot when typing a char', () => {
-    const [{ getByRole, getByLabelText }] = render('/setWifiCred/mockWifi')
+    const [{ getByRole, getByLabelText }] = render('/set-wifi-cred/mockWifi')
     const inputBox = getByLabelText('wifi_password')
     const aKey = getByRole('button', { name: 'a' })
     const bKey = getByRole('button', { name: 'b' })
@@ -106,7 +106,7 @@ describe('SetWifiCred', () => {
   })
 
   it('should switch the input type and button text when tapping the icon next to the input', () => {
-    const [{ getByRole, getByLabelText }] = render('/setWifiCred/mockWifi')
+    const [{ getByRole, getByLabelText }] = render('/set-wifi-cred/mockWifi')
     const button = getByRole('button', { name: 'Show' })
     // ToDo: 11/08/2022 kj switch to getByRole once understand the issue on this input
     const inputBox = getByLabelText('wifi_password')
@@ -117,14 +117,14 @@ describe('SetWifiCred', () => {
   })
 
   it('should call mock function when tapping back', () => {
-    const [{ getByText }] = render('/setWifiCred/mockWifi')
+    const [{ getByText }] = render('/set-wifi-cred/mockWifi')
     const button = getByText('Back')
     fireEvent.click(button)
-    expect(mockPush).toHaveBeenCalledWith('/selectNetwork')
+    expect(mockPush).toHaveBeenCalledWith('/select-network')
   })
 
   it('should call mock function when tapping connect', () => {
-    const [{ getByRole }] = render('/setWifiCred/mockWifi')
+    const [{ getByRole }] = render('/set-wifi-cred/mockWifi')
     const button = getByRole('button', { name: 'Connect' })
     fireEvent.click(button)
     expect(dispatchApiRequest).toBeCalledWith(

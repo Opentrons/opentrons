@@ -20,7 +20,7 @@ import { StyledText } from '../../atoms/text'
 import { TertiaryButton } from '../../atoms/buttons'
 import * as Networking from '../../redux/networking'
 import { getLocalRobot } from '../../redux/discovery'
-import { SearchNetwork } from './SearchNetwork'
+import { SearchNetwork } from '../../organisms/SetupNetwork/SearchNetwork'
 
 import type { State, Dispatch } from '../../redux/types'
 
@@ -70,7 +70,7 @@ export function SelectNetwork(): JSX.Element {
               alignItems={ALIGN_CENTER}
               marginBottom={SPACING.spacing3}
               borderRadius="0.75rem"
-              onClick={() => history.push(`/setWifiCred/${nw.ssid}`)}
+              onClick={() => history.push(`/set-wifi-cred/${nw.ssid}`)}
             >
               <Icon name="wifi" size="2.25rem" />
               <StyledText marginLeft={SPACING.spacing4} color="#000">

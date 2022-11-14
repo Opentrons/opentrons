@@ -60,7 +60,7 @@ describe('SelectNetwork', () => {
     const [{ getByText }] = render()
     const ssid = getByText('foo')
     fireEvent.click(ssid)
-    expect(mockPush).toHaveBeenCalledWith('/setWifiCred/foo')
+    expect(mockPush).toHaveBeenCalledWith('/set-wifi-cred/foo')
   })
 
   it('should call mock function when tapping search again', () => {

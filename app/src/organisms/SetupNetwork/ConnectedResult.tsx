@@ -82,13 +82,13 @@ export function ConnectedResult({
           <>
             <SecondaryButton
               flex="1"
-              onClick={() => history.push(`/selectNetwork`)}
+              onClick={() => history.push(`/select-network`)}
             >
               {t('change_network')}
             </SecondaryButton>
             <PrimaryButton
               flex="1"
-              onClick={() => history.push(`/connectedNetworkInfo/${ssid}`)}
+              onClick={() => history.push(`/connected-network-info/${ssid}`)}
             >
               {t('done')}
             </PrimaryButton>
@@ -100,7 +100,7 @@ export function ConnectedResult({
             </SecondaryButton>
             <PrimaryButton
               flex="1"
-              onClick={() => history.push(`/selectNetwork`)}
+              onClick={() => history.push(`/select-network`)}
             >
               {t('change_network')}
             </PrimaryButton>

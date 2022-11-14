@@ -38,6 +38,6 @@ describe('InitialSplash', () => {
     jest.advanceTimersByTime(100)
     expect(mockPush).not.toHaveBeenCalled()
     jest.advanceTimersByTime(5000)
-    expect(mockPush).toHaveBeenCalledWith('/selectNetwork')
+    expect(mockPush).toHaveBeenCalledWith('/select-network')
   })
 })
