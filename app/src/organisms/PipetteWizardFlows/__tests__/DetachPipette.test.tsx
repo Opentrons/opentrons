@@ -38,7 +38,8 @@ describe('DetachPipette', () => {
       runId: RUN_ID_1,
       attachedPipette: { left: mockPipette, right: null },
       flowType: FLOWS.CALIBRATE,
-      setIsBetweenCommands: jest.fn(),
+      errorMessage: null,
+      setShowErrorMessage: jest.fn(),
       isRobotMoving: false,
     }
     mockInProgressModal.mockReturnValue(<div>mock in progress</div>)
