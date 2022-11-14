@@ -4,14 +4,8 @@ import uniq from 'lodash/uniq'
 import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
 import standardDeckDefOt2 from '../../deck/definitions/3/ot2_standard.json'
 import standardDeckDefOt3 from '../../deck/definitions/3/ot3_standard.json'
-import type { LoadLabwareRunTimeCommand } from '../../protocol/types/schemaV6/command/setup'
 import type { DeckDefinition, LabwareDefinition2 } from '../types'
-import type {
-  LoadedLabware,
-  RobotType,
-  RunTimeCommand,
-  ThermalAdapterName,
-} from '..'
+import type { LoadedLabware, RobotType, ThermalAdapterName } from '..'
 
 export { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 export { getWellTotalVolume } from './getWellTotalVolume'
