@@ -51,6 +51,8 @@ class Deck_Calibration_Repeatability_Test:
         self.test_data ={
             "Time":None,
             "Cycle":None,
+            "Slot":None,
+            "Pipette":None,
             "Z Height":None,
             "Z Position":None,
             "Z Gauge":None,
@@ -68,8 +70,11 @@ class Deck_Calibration_Repeatability_Test:
         self.gauge_setup()
         self.api = await build_async_ot3_hardware_api(is_simulating=self.simulate, use_defaults=True)
         self.mount = OT3Mount.LEFT if args.mount == "l" else OT3Mount.RIGHT
+        self.pipette_id = self.api._pipette_handler.get_pipette(self.mount)._pipette_id
         self.deck_definition = load("ot3_standard", version=3)
         await self.api.add_tip(self.mount, self.PROBE_LENGTH)
+        self.test_data["Slot"] = str(self.slot)
+        self.test_data["Pipette"] = str(self.pipette_id)
         self.start_time = time.time()
         print(f"\nStarting Test on Deck Slot #{self.slot}:\n")
 
