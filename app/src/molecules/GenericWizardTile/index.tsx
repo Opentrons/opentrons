@@ -13,6 +13,7 @@ import {
   ALIGN_FLEX_END,
   JUSTIFY_FLEX_END,
   JUSTIFY_START,
+  JUSTIFY_CENTER,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { PrimaryButton } from '../../atoms/buttons'
@@ -77,7 +78,9 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
           <StyledText as="h1">{header}</StyledText>
           {bodyText}
         </Flex>
-        <Flex flex="1">{rightHandBody}</Flex>
+        <Flex flex="1" justifyContent={JUSTIFY_CENTER}>
+          {rightHandBody}
+        </Flex>
       </Flex>
       <Flex
         justifyContent={buttonPositioning}
@@ -92,9 +95,11 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
           </Btn>
         ) : null}
         {getHelp != null ? <NeedHelpLink href={getHelp} /> : null}
-        <PrimaryButton disabled={proceedIsDisabled} onClick={proceed}>
-          {proceedButtonText}
-        </PrimaryButton>
+        {proceed != null ? (
+          <PrimaryButton disabled={proceedIsDisabled} onClick={proceed}>
+            {proceedButtonText}
+          </PrimaryButton>
+        ) : null}
       </Flex>
     </Flex>
   )

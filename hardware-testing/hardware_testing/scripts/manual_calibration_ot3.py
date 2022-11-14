@@ -136,7 +136,7 @@ async def _main(simulate: bool, slot: int, mount: OT3Mount, test: bool) -> None:
     else:
         gripper = api.attached_gripper
         assert gripper, "No gripper found"
-        instr_id = gripper["gripper_id"]
+        instr_id = str(gripper["gripper_id"])
     print(
         f"\nStarting Manual Calibration on Deck Slot #{slot} and Instrument {instr_id}:\n"
     )
@@ -199,7 +199,7 @@ async def _main(simulate: bool, slot: int, mount: OT3Mount, test: bool) -> None:
     await _test_current_calibration(api, mount, calibration_square_pos)
     if "y" in input(f"{offset_position}\n--> Save Offset? (y/n): ").lower():
         if mount == OT3Mount.GRIPPER:
-            save_gripper_calibration(offset_position, instr_id)
+            save_gripper_calibration(offset_position, str(instr_id))
         else:
             save_pipette_calibration(offset_position, instr_id, mount.to_mount())
         print("offset saved")
