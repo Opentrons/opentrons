@@ -389,7 +389,7 @@ class Labware(DeckItem):
             return self.wells_by_name()[idx]
         else:
             raise TypeError(
-                f"`Labware.well` must be called with an `int` or `str` ,but got {idx}"
+                f"`Labware.well` must be called with an `int` or `str`, but got {idx}"
             )
 
     @requires_version(2, 0)
