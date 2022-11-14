@@ -157,7 +157,8 @@ export const announcements: Announcement[] = [
     message: (
       <>
         <p>
-          The Opentrons Protocol Designer now supports our Thermocycler GEN2!
+          The Opentrons Protocol Designer now supports our Thermocycler Module
+          GEN2!
         </p>
         <p>
           All protocols now require Opentrons App version
