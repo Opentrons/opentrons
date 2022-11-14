@@ -14,11 +14,9 @@ _WELL_NAME_RE = re.compile(WELL_NAME_PATTERN)
 class WellGrid:
     """Well grid information.
 
-    Props:
-        columns: A matrix of well names, organized by columns.
-        rows: A matrix of well names, organized by rows.
-        column_names: The name of each column in `columns`, by index.
-        row_names: The name of each row in `rows`, by index.
+    Attributes:
+        columns_by_name: An ordered mapping of well names, keyed by column names.
+        rows_by_name: An ordered mapping of well names, keyed by row names.
     """
 
     rows_by_name: Dict[str, List[str]]
