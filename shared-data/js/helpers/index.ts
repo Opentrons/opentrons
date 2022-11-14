@@ -327,25 +327,3 @@ export const getDeckDefFromRobotType = (
   // @ts-expect-error imported JSON not playing nice with TS. see https://github.com/microsoft/TypeScript/issues/32063
   return robotType === 'OT-3 Standard' ? standardDeckDefOt3 : standardDeckDefOt2
 }
-
-/**
- * @deprecated This should be deleted as soon as schema v6 adapter work is merged.
- * The only reason this util exists is because we need data to be shaped as ProtocolAnalysisOutput
- * rather than ProtocolAnalysisFile (which is a result of the schema v6 adapter)
- */
-export const getLoadedLabwareFromCommands = (
-  commands: RunTimeCommand[]
-): LoadedLabware[] => {
-  return commands
-    .filter(
-      (command): command is LoadLabwareRunTimeCommand =>
-        command.commandType === 'loadLabware'
-    )
-    .map((loadLabwareCommand: LoadLabwareRunTimeCommand) => ({
-      id: loadLabwareCommand.id,
-      loadName: loadLabwareCommand.result.definition.parameters.loadName,
-      definitionUri: getLabwareDefURI(loadLabwareCommand.result.definition),
-      location: loadLabwareCommand.params.location,
-      displayName: loadLabwareCommand.result.definition.metadata.displayName,
-    }))
-}
