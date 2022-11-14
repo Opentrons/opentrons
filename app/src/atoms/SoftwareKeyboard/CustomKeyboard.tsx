@@ -24,7 +24,6 @@ const customLayout = {
 
 const customDisplay = {
   '{numbers}': '123',
-  '{ent}': '< enter',
   '{escape}': 'esc ⎋',
   '{tab}': 'tab ⇥',
   '{backspace}': '⌫',
