@@ -14,13 +14,11 @@ import {
   COLOR_WARNING_DARK,
 } from '@opentrons/components'
 
-import type { StyleProps } from '@opentrons/components'
-
 export const INPUT_TYPE_NUMBER = 'number' as const
 export const INPUT_TYPE_TEXT = 'text' as const
 export const INPUT_TYPE_PASSWORD = 'password' as const
 
-export interface InputFieldProps extends StyleProps {
+export interface InputFieldProps {
   /** field is disabled if value is true */
   disabled?: boolean
   /** change handler */
@@ -106,6 +104,11 @@ function Input(props: InputFieldProps): JSX.Element {
       flex: 1 1 auto;
       width: 100%;
       height: ${SPACING.spacing4};
+
+      // For the ODD app
+      @media (hover: none) and (pointer: coarse) {
+        height: '3.875rem';
+      }
     }
     & input:focus {
       outline: none;

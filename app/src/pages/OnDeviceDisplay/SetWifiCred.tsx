@@ -143,7 +143,6 @@ export function SetWifiCred(): JSX.Element {
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   type={showPassword ? 'text' : 'password'}
-                  height="3.875rem"
                   css={css`
                     font-size: 1.25rem;
                     line-height: 1.25rem;
