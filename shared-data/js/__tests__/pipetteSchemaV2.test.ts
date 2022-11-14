@@ -36,7 +36,6 @@ describe('test schema against all liquid specs definitions', () => {
   })
 
   liquidPaths.forEach(liquidPath => {
-    const filename = path.parse(liquidPath).base
     const liquidDef = require(liquidPath)
 
     it(`${liquidPath} validates against schema`, () => {
@@ -63,11 +62,10 @@ describe('test schema against all geometry specs definitions', () => {
   })
 
   geometryPaths.forEach(geometryPath => {
-    const filename = path.parse(geometryPath).base
     const geometryDef = require(geometryPath)
     const geometryParentDir = path.dirname(geometryPath)
 
-    it(`${filename} validates against schema`, () => {
+    it(`${geometryPath} validates against schema`, () => {
       const valid = validateGeometrySpecs(geometryDef)
       const validationErrors = validateGeometrySpecs.errors
       expect(validationErrors).toBe(null)
@@ -97,10 +95,9 @@ describe('test schema against all general specs definitions', () => {
   })
 
   generalPaths.forEach(generalPath => {
-    const filename = path.parse(generalPath).base
     const generalDef = require(generalPath)
 
-    it(`${filename} validates against schema`, () => {
+    it(`${generalPath} validates against schema`, () => {
       const valid = validateGeneralSpecs(generalDef)
       const validationErrors = validateGeneralSpecs.errors
       expect(validationErrors).toBe(null)
