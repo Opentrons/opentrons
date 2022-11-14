@@ -31,6 +31,8 @@ from .types import (
 
 @dataclass
 class CalibrationSquare:
+    """Calibration Square."""
+
     top_left_offset: Point
     width: float
     height: float
@@ -39,6 +41,8 @@ class CalibrationSquare:
 
 @dataclass
 class CalibrationProbe:
+    """Calibration Probe."""
+
     length: float
     diameter: float
 

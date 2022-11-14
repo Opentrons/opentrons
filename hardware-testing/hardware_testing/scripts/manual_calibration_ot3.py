@@ -45,7 +45,7 @@ async def _jog_axis(api: OT3API, mount: OT3Mount, axis: OT3Axis, dir: float) -> 
                     pass
 
 
-async def main(simulate: bool, slot: int, mount: OT3Mount, test: bool) -> None:
+async def _main(simulate: bool, slot: int, mount: OT3Mount, test: bool) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=simulate, use_defaults=True
     )
@@ -152,4 +152,4 @@ if __name__ == "__main__":
         "gripper": OT3Mount.GRIPPER,
     }
     _mount = ot3_mounts[args.mount]
-    asyncio.run(main(args.simulate, args.slot, _mount, args.test))
+    asyncio.run(_main(args.simulate, args.slot, _mount, args.test))
