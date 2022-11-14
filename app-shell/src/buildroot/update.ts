@@ -20,7 +20,7 @@ const PREMIGRATION_SERVER_WHL = path.join(
   PREMIGRATION_WHL_DIR,
   'otupdate-3.10.3-py2.py3-none-any.whl'
 )
-const SYSTEM_FILENAME = 'ot2-system.zip'
+const SYSTEM_FILENAME = 'system-update.zip'
 
 export function startPremigration(robot: RobotHost): Promise<unknown> {
   const apiUrl = `http://${robot.ip}:${robot.port}/server/update`

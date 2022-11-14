@@ -134,7 +134,7 @@ export const startUpdateEpic: Epic = (action$, state$) =>
       // otherwise robot is ready for migration or update, so get token
       // capabilities response has the correct request path to use
       const sessionPath =
-        capabilities.buildrootUpdate || capabilities.buildrootMigration
+        capabilities.buildrootUpdate || capabilities.buildrootMigration || capabilities.systemUpdate
 
       if (sessionPath == null) {
         return unexpectedBuildrootError(
