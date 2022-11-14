@@ -41,6 +41,11 @@ class WellCore(AbstractWellCore):
         """Get the ID of the well's parent labware."""
         return self._labware_id
 
+    @property
+    def geometry(self) -> WellGeometry:
+        """Get the well's geometry information interface."""
+        raise NotImplementedError("WellCore.geometry not implemented")
+
     def has_tip(self) -> bool:
         """Whether the well contains a tip."""
         raise NotImplementedError("WellCore.has_tip not implemented")
@@ -99,7 +104,3 @@ class WellCore(AbstractWellCore):
             labware_id=self.labware_id, well_name=self._name
         )
         return self.get_bottom(z_offset=well_height / 2)
-
-    def get_geometry(self) -> WellGeometry:
-        """Get the well's geometry information interface."""
-        raise NotImplementedError("WellCore.get_geometry not implemented")

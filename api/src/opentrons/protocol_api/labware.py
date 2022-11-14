@@ -12,7 +12,7 @@ from __future__ import annotations
 import logging
 
 from itertools import dropwhile
-from typing import Any, List, Dict, Optional, Union, Tuple, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, List, Dict, Optional, Union, Tuple, cast
 
 from opentrons.types import Location, Point, LocationLabware
 from opentrons.protocols.api_support.types import APIVersion
@@ -30,6 +30,7 @@ from opentrons.protocols.labware import (  # noqa: F401
     save_definition as save_definition,
 )
 
+from .core import well_grid
 from .core.labware import AbstractLabware
 from .core.protocol_api.labware import LabwareImplementation
 
@@ -95,7 +96,7 @@ class Well:
 
     @property
     def geometry(self) -> WellGeometry:
-        return self._impl.get_geometry()
+        return self._impl.geometry
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -265,6 +266,18 @@ class Labware(DeckItem):
         self._api_version = api_version
         self._implementation: LabwareCore = implementation
 
+        well_columns = implementation.get_well_columns()
+        self._well_grid = well_grid.create(columns=well_columns)
+        self._wells_by_name = {
+            well_name: Well(
+                parent=self,
+                well_implementation=implementation.get_well_core(well_name),
+                api_version=api_version,
+            )
+            for column in well_columns
+            for well_name in column
+        }
+
     @property
     def separate_calibration(self) -> bool:
         return self._implementation.separate_calibration
@@ -371,12 +384,13 @@ class Labware(DeckItem):
     def well(self, idx: Union[int, str]) -> Well:
         """Deprecated---use result of `wells` or `wells_by_name`"""
         if isinstance(idx, int):
-            res = self._implementation.get_wells()[idx]
+            return self.wells()[idx]
         elif isinstance(idx, str):
-            res = self._implementation.get_wells_by_name()[idx]
+            return self.wells_by_name()[idx]
         else:
-            res = NotImplemented
-        return self._well_from_impl(res)
+            raise TypeError(
+                f"`Labware.well` must be called with an `int` or `str` ,but got {idx}"
+            )
 
     @requires_version(2, 0)
     def wells(self, *args: Union[str, int]) -> List[Well]:
@@ -397,15 +411,21 @@ class Labware(DeckItem):
         :return: Ordered list of all wells in a labware
         """
         if not args:
-            res = self._implementation.get_wells()
-        elif isinstance(args[0], int):
-            res = [self._implementation.get_wells()[idx] for idx in args]  # type: ignore[index]
-        elif isinstance(args[0], str):
-            by_name = self._implementation.get_wells_by_name()
-            res = [by_name[idx] for idx in args]  # type: ignore[index]
+            return list(self._wells_by_name.values())
+
+        elif all(isinstance(a, int) for a in args):
+            wells = self.wells()
+            return [wells[idx] for idx in cast(Tuple[int, ...], args)]
+
+        elif all(isinstance(a, str) for a in args):
+            wells_by_name = self.wells_by_name()
+            return [wells_by_name[idx] for idx in cast(Tuple[str, ...], args)]
+
         else:
-            raise TypeError
-        return [self._well_from_impl(w) for w in res]
+            raise TypeError(
+                "`Labware.wells` must be called with all `int`'s or all `str`'s,"
+                f" but was called with {args}"
+            )
 
     @requires_version(2, 0)
     def wells_by_name(self) -> Dict[str, Well]:
@@ -418,8 +438,7 @@ class Labware(DeckItem):
 
         :return: Dictionary of well objects keyed by well name
         """
-        wells = self._implementation.get_wells_by_name()
-        return {k: self._well_from_impl(v) for k, v in wells.items()}
+        return dict(self._wells_by_name)
 
     @requires_version(2, 0)
     def wells_by_index(self) -> Dict[str, Well]:
@@ -449,16 +468,25 @@ class Labware(DeckItem):
 
         :return: A list of row lists
         """
-        grid = self._implementation.get_well_grid()
         if not args:
-            res = grid.get_rows()
-        elif isinstance(args[0], int):
-            res = [grid.get_rows()[idx] for idx in args]  # type: ignore[index]
-        elif isinstance(args[0], str):
-            res = [grid.get_row(idx) for idx in args]  # type: ignore[arg-type]
+            return [
+                [self._wells_by_name[well_name] for well_name in row]
+                for row in self._well_grid.rows_by_name.values()
+            ]
+
+        elif all(isinstance(a, int) for a in args):
+            rows = self.rows()
+            return [rows[idx] for idx in cast(Tuple[int, ...], args)]
+
+        elif all(isinstance(a, str) for a in args):
+            rows_by_name = self.rows_by_name()
+            return [rows_by_name[idx] for idx in cast(Tuple[str, ...], args)]
+
         else:
-            raise TypeError
-        return [[self._well_from_impl(w) for w in row] for row in res]
+            raise TypeError(
+                "`Labware.rows` must be called with all `int`'s or all `str`'s,"
+                f" but was called with {args}"
+            )
 
     @requires_version(2, 0)
     def rows_by_name(self) -> Dict[str, List[Well]]:
@@ -471,8 +499,10 @@ class Labware(DeckItem):
 
         :return: Dictionary of Well lists keyed by row name
         """
-        row_dict = self._implementation.get_well_grid().get_row_dict()
-        return {k: [self._well_from_impl(w) for w in v] for k, v in row_dict.items()}
+        return {
+            row_name: [self._wells_by_name[well_name] for well_name in row]
+            for row_name, row in self._well_grid.rows_by_name.items()
+        }
 
     @requires_version(2, 0)
     def rows_by_index(self) -> Dict[str, List[Well]]:
@@ -501,16 +531,25 @@ class Labware(DeckItem):
 
         :return: A list of column lists
         """
-        grid = self._implementation.get_well_grid()
         if not args:
-            res = grid.get_columns()
-        elif isinstance(args[0], int):
-            res = [grid.get_columns()[idx] for idx in args]  # type: ignore[index]
-        elif isinstance(args[0], str):
-            res = [grid.get_column(idx) for idx in args]  # type: ignore[arg-type]
+            return [
+                [self._wells_by_name[well_name] for well_name in column]
+                for column in self._well_grid.columns_by_name.values()
+            ]
+
+        elif all(isinstance(a, int) for a in args):
+            columns = self.columns()
+            return [columns[idx] for idx in cast(Tuple[int, ...], args)]
+
+        elif all(isinstance(a, str) for a in args):
+            columns_by_name = self.columns_by_name()
+            return [columns_by_name[idx] for idx in cast(Tuple[str, ...], args)]
+
         else:
-            raise TypeError
-        return [[self._well_from_impl(w) for w in col] for col in res]
+            raise TypeError(
+                "`Labware.columns` must be called with all `int`'s or all `str`'s,"
+                f" but was called with {args}"
+            )
 
     @requires_version(2, 0)
     def columns_by_name(self) -> Dict[str, List[Well]]:
@@ -524,8 +563,10 @@ class Labware(DeckItem):
 
         :return: Dictionary of Well lists keyed by column name
         """
-        column_dict = self._implementation.get_well_grid().get_column_dict()
-        return {k: [self._well_from_impl(w) for w in v] for k, v in column_dict.items()}
+        return {
+            column_name: [self._wells_by_name[well_name] for well_name in column]
+            for column_name, column in self._well_grid.columns_by_name.items()
+        }
 
     @requires_version(2, 0)
     def columns_by_index(self) -> Dict[str, List[Well]]:
@@ -586,12 +627,12 @@ class Labware(DeckItem):
         """
         assert num_tips > 0, f"num_tips must be positive integer, but got {num_tips}"
 
-        well_core = self._implementation.get_next_tip(
+        well_name = self._implementation.get_next_tip(
             num_tips=num_tips,
             starting_tip=starting_tip._impl if starting_tip else None,
         )
 
-        return self._well_from_impl(well_core) if well_core else None
+        return self._wells_by_name[well_name] if well_name is not None else None
 
     # TODO(mc, 2022-11-09): implementation detail; deprecate public method
     def use_tips(self, start_well: Well, num_channels: int = 1) -> None:
@@ -650,8 +691,10 @@ class Labware(DeckItem):
         """
         # This logic is the inverse of :py:meth:`next_tip`
         assert num_tips > 0, "Bad call to previous_tip: num_tips <= 0"
-        well = self._implementation.get_tip_tracker().previous_tip(num_tips=num_tips)
-        return self._well_from_impl(well) if well else None
+        well_core = self._implementation.get_tip_tracker().previous_tip(
+            num_tips=num_tips
+        )
+        return self._wells_by_name[well_core.get_name()] if well_core else None
 
     # TODO(mc, 2022-11-09): implementation detail; deprecate public method
     def return_tips(self, start_well: Well, num_channels: int = 1) -> None:
@@ -685,13 +728,6 @@ class Labware(DeckItem):
     def reset(self) -> None:
         """Reset all tips in a tiprack."""
         self._implementation.reset_tips()
-
-    def _well_from_impl(self, well: WellCore) -> Well:
-        return Well(
-            parent=self,
-            well_implementation=well,
-            api_version=self._api_version,
-        )
 
 
 # TODO(mc, 2022-11-09): implementation detail, move to core

@@ -39,6 +39,16 @@ class WellImplementation(AbstractWellCore):
         self._column_name = match.group(2)
         self._geometry = well_geometry
 
+    @property
+    def geometry(self) -> WellGeometry:
+        """Get the well's geometry information interface."""
+        return self._geometry
+
+    @geometry.setter
+    def geometry(self, well_geometry: WellGeometry) -> None:
+        """Upate the well's geometry interface."""
+        self._geometry = well_geometry
+
     def has_tip(self) -> bool:
         """Whether the well contains a tip."""
         return self._has_tip
@@ -78,10 +88,6 @@ class WellImplementation(AbstractWellCore):
     def get_center(self) -> Point:
         """Get the coordinate of the well's center."""
         return self._geometry.center()
-
-    def get_geometry(self) -> WellGeometry:
-        """Get the well's geometry information interface."""
-        return self._geometry
 
     # TODO(mc, 2022-10-28): is this used and/or necessary?
     def __repr__(self) -> str:

@@ -176,6 +176,7 @@ def test_load_labware(
     ).then_return(mock_labware_core)
 
     decoy.when(mock_labware_core.get_name()).then_return("Full Name")
+    decoy.when(mock_labware_core.get_well_columns()).then_return([])
 
     result = subject.load_labware(
         load_name="UPPERCASE_LABWARE",
@@ -207,6 +208,7 @@ def test_load_labware_from_definition(
     )
 
     decoy.when(mock_labware_core.get_name()).then_return("Full Name")
+    decoy.when(mock_labware_core.get_well_columns()).then_return([])
 
     decoy.when(
         mock_core.load_labware(
@@ -235,13 +237,17 @@ def test_move_labware_to_slot(
 ) -> None:
     """It should move labware to new slot location."""
     mock_labware_core = decoy.mock(cls=LabwareCore)
-    movable_labware = Labware(implementation=mock_labware_core)
+
     decoy.when(mock_validation.ensure_deck_slot(42)).then_return(DeckSlotName.SLOT_1)
+    decoy.when(mock_labware_core.get_well_columns()).then_return([])
+
+    movable_labware = Labware(implementation=mock_labware_core)
 
     subject.move_labware(
         labware=movable_labware,
         new_location=42,
     )
+
     decoy.verify(
         mock_core.move_labware(
             labware_core=mock_labware_core,
@@ -260,6 +266,9 @@ def test_move_labware_to_module(
     mock_labware_core = decoy.mock(cls=LabwareCore)
     mock_module_core = decoy.mock(cls=TemperatureModuleCore)
     mock_broker = decoy.mock(cls=Broker)
+
+    decoy.when(mock_labware_core.get_well_columns()).then_return([])
+
     movable_labware = Labware(implementation=mock_labware_core)
     module_location = TemperatureModuleContext(
         core=mock_module_core,

@@ -4,14 +4,12 @@ from decoy import Decoy
 
 from opentrons.hardware_control import SynchronousAdapter
 from opentrons.hardware_control.modules import AbstractModule
+from opentrons.protocol_engine import DeckSlotLocation
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons.protocol_api.core.engine.module_core import ModuleCore
-from opentrons.protocol_api.core.engine.labware import LabwareCore
-from opentrons.protocol_engine.types import (
-    DeckSlotLocation,
-)
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocol_api.core.engine.module_core import ModuleCore
+from opentrons.protocol_api.core.engine.labware import LabwareCore
 from opentrons.types import DeckSlotName
 
 
@@ -73,6 +71,9 @@ def test_add_labware_core(
 ) -> None:
     """Should return a Labware object."""
     labware_core = decoy.mock(cls=LabwareCore)
+
+    decoy.when(labware_core.get_well_columns()).then_return([])
+
     result = subject.add_labware_core(labware_core=labware_core)
 
     assert result.api_version == api_version
