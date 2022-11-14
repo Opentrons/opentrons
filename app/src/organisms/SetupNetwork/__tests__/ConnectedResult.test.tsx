@@ -71,7 +71,7 @@ describe('ConnectedResult', () => {
     expect(mockPush).toHaveBeenCalledWith('/select-network')
     const doneButton = getByRole('button', { name: 'Done' })
     fireEvent.click(doneButton)
-    expect(mockPush).toHaveBeenCalledWith('/connectedNetworkInfo/mockWifi')
+    expect(mockPush).toHaveBeenCalledWith('/connected-network-info/mockWifi')
   })
 
   it('should render a failure screen when the status is failed', () => {

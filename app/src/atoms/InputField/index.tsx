@@ -107,7 +107,9 @@ function Input(props: InputFieldProps): JSX.Element {
 
       // For the ODD app
       @media (hover: none) and (pointer: coarse) {
+        /* @media (hover: none) { */
         height: '3.875rem';
+        color: #ff0000;
       }
     }
     & input:focus {
