@@ -61,7 +61,7 @@ export function SimpleWizardBody(props: Props): JSX.Element {
         paddingBottom={SPACING.spacing6}
         justifyContent={JUSTIFY_FLEX_END}
       >
-        {children ?? null}
+        {children}
       </Flex>
     </Flex>
   )

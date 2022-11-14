@@ -13,7 +13,6 @@ export const chainRunCommands = (
     waitUntilComplete: true,
   })
     .then(response => {
-      console.log(response)
       if (!continuePastCommandFailure && response.data.status === 'failed') {
         return Promise.reject(
           new Error(response.data.error?.detail ?? 'command failed')
