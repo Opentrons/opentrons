@@ -60,12 +60,12 @@ class GripperHandler:
     def gripper(self, gripper: Optional[Gripper] = None) -> None:
         self._gripper = gripper
 
-    def reset_instrument_offset(self) -> None:
+    def reset_instrument_offset(self, to_default: bool) -> None:
         """
         Tempoarily reset the gripper offsets to default values.
         """
         gripper = self.get_gripper()
-        gripper.reset_offset()
+        gripper.reset_offset(to_default)
 
     def save_instrument_offset(self, delta: Point) -> None:
         """

@@ -128,13 +128,13 @@ class PipetteHandlerProvider(Generic[MountType]):
         else:
             _reset(mount)
 
-    def reset_instrument_offset(self, mount: MountType) -> None:
+    def reset_instrument_offset(self, mount: MountType, to_default: bool) -> None:
         """
-        Tempoarily rest the pipette offset to default values.
+        Temporarily reset the pipette offset to default values.
         :param mount: Modify the given mount.
         """
         pipette = self.get_pipette(mount)
-        pipette.reset_pipette_offset(mount)
+        pipette.reset_pipette_offset(mount, to_default)
 
     def save_instrument_offset(self, mount: MountType, delta: top_types.Point) -> None:
         """

@@ -98,9 +98,14 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
     def gripper_id(self) -> str:
         return self._gripper_id
 
-    def reset_offset(self) -> None:
+    def reset_offset(self, to_default: bool) -> None:
         """Tempoarily reset the gripper offsets to default values."""
-        self._calibration_offset = load_gripper_calibration_offset(gripper_id=None)
+        if to_default:
+            self._calibration_offset = load_gripper_calibration_offset(gripper_id=None)
+        else:
+            self._calibration_offset = load_gripper_calibration_offset(
+                gripper_id=self._gripper_id
+            )
 
     def save_offset(self, delta: Point) -> None:
         """Tempoarily reset the gripper offsets to default values."""

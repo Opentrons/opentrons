@@ -143,9 +143,12 @@ class Pipette(AbstractInstrument[pipette_config.PipetteConfig]):
         # Update the cached dict representation
         self._config_as_dict = asdict(self._config)
 
-    def reset_pipette_offset(self, mount: MountType) -> None:
+    def reset_pipette_offset(self, mount: MountType, to_default: bool) -> None:
         """Reset the pipette offset to system defaults."""
-        self._pipette_offset = load_pipette_offset(pip_id=None, mount=mount)
+        if to_default:
+            self._pipette_offset = load_pipette_offset(pip_id=None, mount=mount)
+        else:
+            self._pipette_offset = load_pipette_offset(self._pipette_id, mount)
 
     def save_pipette_offset(self, mount: MountType, offset: Point) -> None:
         """Update the pipette offset to a new value."""
