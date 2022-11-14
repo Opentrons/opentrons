@@ -33,7 +33,8 @@ describe('ChoosePipette', () => {
       isRobotMoving: false,
       runId: RUN_ID_1,
       attachedPipette: { left: mockPipette, right: null },
-      setIsBetweenCommands: jest.fn(),
+      errorMessage: null,
+      setShowErrorMessage: jest.fn(),
     }
   })
   it('returns the correct information, buttons work as expected', () => {
