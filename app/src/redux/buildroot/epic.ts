@@ -12,7 +12,11 @@ import {
 } from 'rxjs/operators'
 
 // imported directly to avoid circular dependencies between discovery and shell
-import { getAllRobots, getRobotApiVersion } from '../discovery'
+import {
+  getAllRobots,
+  getRobotApiVersion,
+  getRobotModelByName,
+} from '../discovery'
 import {
   startDiscovery,
   finishDiscovery,
@@ -281,7 +285,6 @@ export const uploadFileEpic: Epic = (_, state$) => {
       const systemFile = session?.userFileInfo?.systemFile || null
 
       return uploadBuildrootFile(
-        // @ts-expect-error TODO: host is actually of type Robot|ReachableRobot but this action expects a RobotHost
         host,
         `${pathPrefix}/${token}/file`,
         systemFile

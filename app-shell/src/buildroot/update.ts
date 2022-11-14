@@ -5,6 +5,10 @@ import path from 'path'
 
 import { fetch, postFile } from '../http'
 import type { RobotHost } from '@opentrons/app/src/redux/robot-api/types'
+import type {
+  RobotModel,
+  ViewableRobot,
+} from '@opentrons/app/src/redux/discovery/types'
 
 const PREMIGRATION_WHL_DIR = path.join(
   // NOTE: __dirname refers to output directory
@@ -20,7 +24,16 @@ const PREMIGRATION_SERVER_WHL = path.join(
   PREMIGRATION_WHL_DIR,
   'otupdate-3.10.3-py2.py3-none-any.whl'
 )
+
+const OT2_FILENAME = 'ot2-system.zip'
 const SYSTEM_FILENAME = 'system-update.zip'
+
+const getSystemFileName = (robotModel: RobotModel): string => {
+  if (robotModel === 'OT-2 Standard') {
+    return OT2_FILENAME
+  }
+  return SYSTEM_FILENAME
+}
 
 export function startPremigration(robot: RobotHost): Promise<unknown> {
   const apiUrl = `http://${robot.ip}:${robot.port}/server/update`
@@ -33,11 +46,11 @@ export function startPremigration(robot: RobotHost): Promise<unknown> {
 }
 
 export function uploadSystemFile(
-  robot: RobotHost,
+  robot: ViewableRobot,
   urlPath: string,
   file: string
 ): Promise<unknown> {
   const url = `http://${robot.ip}:${robot.port}${urlPath}`
 
-  return postFile(url, SYSTEM_FILENAME, file)
+  return postFile(url, getSystemFileName(robot.robotModel), file)
 }
