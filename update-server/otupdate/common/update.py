@@ -104,9 +104,9 @@ async def _save_file(part: BodyPartReader, path: str) -> None:
             write.write(decoded)
     try:
         for file in os.listdir(path):
-            LOG.info(f"Downloaded {file} to {path}")
+            LOG.info(f"file written, {file} to path, {path}")
     except Exception:
-        LOG.exception("File not Downloaded")
+        LOG.exception("File not written")
 
 
 def _begin_write(
@@ -176,7 +176,7 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
     """Serves /update/:session/file
 
     Requires multipart (encoding doesn't matter) with a file field in the
-    body called 'system-update.zip' or 'ot2-system.zip'.
+    body called 'system-update.zip'. NOTE: OT2 will also support 'ot2-system.zip'
     """
     if session.stage != Stages.AWAITING_FILE:
         return web.json_response(
@@ -192,7 +192,7 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
             LOG.info(f"Unknown field name {part.name} in file_upload, ignoring")
             await part.release()
         else:
-            LOG.info(f"Downloading {part.name}")
+            LOG.info(f"Writing {part.name}")
             await _save_file(part, session.download_path)
 
     maybe_actions = update_actions.UpdateActionsInterface.from_request(request)

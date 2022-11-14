@@ -198,7 +198,6 @@ async def test_update_happypath(
         resp = await test_cli[0].get(session_endpoint(update_session, "status"))
         assert resp.status == 200
         body = await resp.json()
-        print("YOO", body)
 
         last_progress = body["progress"]
         assert loop.time() - then <= 300
