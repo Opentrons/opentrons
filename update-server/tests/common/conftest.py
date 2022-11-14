@@ -58,11 +58,12 @@ def downloaded_update_file_consolidated(request, extracted_update_file_consolida
     zip_path_arr = []
     list_of_update_files = [
         (
-            "rootfs.xz",
-            "rootfs.xz.sha256",
-            "rootfs.xz.hash.sig",
+            "systemfs.xz",
+            "systemfs.xz.sha256",
+            "systemfs.xz.hash.sig",
             "tmp_uncomp_xz_hash_path",
-            "ot3-system.zip",
+            "system-update.zip",
+            "VERSION.json",
         ),
         (
             "rootfs.ext4",
@@ -70,9 +71,12 @@ def downloaded_update_file_consolidated(request, extracted_update_file_consolida
             "rootfs.ext4.hash.sig",
             "tmp_uncomp_xz_hash_path",
             "ot2-system.zip",
+            "VERSION.json",
         ),
     ]
-    for index, (rootfs, sha256, sig, xz_hash, pkg) in enumerate(list_of_update_files):
+    for index, (rootfs, sha256, sig, xz_hash, pkg, version) in enumerate(
+        list_of_update_files
+    ):
         rootfs_path = os.path.join(extracted_update_file_consolidated[index], rootfs)
         hash_path = os.path.join(extracted_update_file_consolidated[index], sha256)
         sig_path = os.path.join(extracted_update_file_consolidated[index], sig)
@@ -139,9 +143,9 @@ def extracted_update_file_consolidated(request, tmpdir):
     extracted_files_dir_path_arr = []
     list_of_extracted_files = [
         (
-            "rootfs.xz",
-            "rootfs.xz.sha256",
-            "rootfs.xz.hash.sig",
+            "systemfs.xz",
+            "systemfs.xz.sha256",
+            "systemfs.xz.hash.sig",
         ),
         (
             "rootfs.ext4",
@@ -202,7 +206,7 @@ def extracted_update_file_consolidated(request, tmpdir):
 def testing_partition(monkeypatch, tmpdir):
     partfile = os.path.join(tmpdir, "fake-partition")
     find_unused = mock.Mock()
-    monkeypatch.setattr(buildroot.update_actions, "_find_unused_partition", find_unused)
+    monkeypatch.setattr(common.update_actions, "_find_unused_partition", find_unused)
 
     find_unused.return_value = FakeRootPartElem(
         "TWO", common.update_actions.Partition(2, partfile)
