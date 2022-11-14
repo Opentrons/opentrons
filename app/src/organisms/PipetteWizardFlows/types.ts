@@ -70,3 +70,5 @@ export interface PipetteWizardStepProps {
   attachedPipette: AttachedPipettesByMount
   setIsBetweenCommands: React.Dispatch<React.SetStateAction<boolean>>
 }
+
+export type SelectablePipettes = '96-Channel' | 'Single-Channel_and_8-Channel'
