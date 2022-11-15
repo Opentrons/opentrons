@@ -138,13 +138,13 @@ describe('Desktop Navigation', () => {
         cy.contains('Your protocol has no steps').should('not.exist')
       })
 
-      it('displays a warning modal saying the protocol needs to be run on robot stack version 6.1 or higher', () => {
+      it('displays a warning modal saying the protocol needs to be run on robot stack version 6.2 or higher', () => {
         cy.get('button').contains('Export').click()
         // skip the first modal we checked for (your protocol has no steps)
         cy.get('button').contains('CONTINUE WITH EXPORT').click()
         // check that the robot stack version modal starts
         cy.contains(
-          'This protocol can only run on app and robot server version 6.1 or higher'
+          'This protocol can only run on app and robot server version 6.2 or higher'
         ).should('exist')
       })
 
