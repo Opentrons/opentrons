@@ -410,18 +410,38 @@ async def calibrate_mount(
     """
     # First, find the deck. This will become our z offset value, and will
     # also be used to baseline the edge detection points.
-    z_pos = await find_deck_position(hcapi, mount)
-    LOG.info(f"Found deck at {z_pos}mm")
+    # reset instrument offset
+    await hcapi.reset_instrument_offset(mount)
+    await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
+    center = Point(*hcapi.config.calibration.edge_sense.nominal_center)
+    try:
+        z_pos = await find_deck_position(hcapi, mount)
+        LOG.info(f"Found deck at {z_pos}mm")
 
-    if method == CalibrationMethod.BINARY_SEARCH:
-        x_center, y_center = await find_slot_center_binary(hcapi, mount, z_pos)
-    elif method == CalibrationMethod.NONCONTACT_PASS:
-        x_center, y_center = await find_slot_center_noncontact(hcapi, mount, z_pos)
+        if method == CalibrationMethod.BINARY_SEARCH:
+            x_center, y_center = await find_slot_center_binary(hcapi, mount, z_pos)
+        elif method == CalibrationMethod.NONCONTACT_PASS:
+            x_center, y_center = await find_slot_center_noncontact(hcapi, mount, z_pos)
+        else:
+            raise RuntimeError("Unknown calibration method")
+    except (InaccurateNonContactSweepError, EarlyCapacitiveSenseTrigger):
+        LOG.info(
+            "Error occurred during calibration. Resetting to current saved calibration value."
+        )
+        await hcapi.reset_instrument_offset(mount, to_default=False)
+        pass
     else:
-        raise RuntimeError("Unknown calibration method")
-
-    # The center of the calibration slot is the xy-center in-plane, and
-    # the absolute sense value out-of-plane
-    center = Point(x_center, y_center, z_pos)
-    LOG.info(f"Found calibration value {center} for mount {mount.name}")
-    return center
+        center = Point(x_center, y_center, z_pos)
+        LOG.info(f"Found calibration value {center} for mount {mount.name}")
+        instrument_offset = center - Point(
+            *hcapi.config.calibration.edge_sense.nominal_center
+        )
+        # save new offset
+        # reload
+        await hcapi.save_instrument_offset(mount, instrument_offset)
+    finally:
+        # remove tip
+        await hcapi.remove_tip(mount)
+        # The center of the calibration slot is the xy-center in-plane, and
+        # the absolute sense value out-of-plane
+        return center
