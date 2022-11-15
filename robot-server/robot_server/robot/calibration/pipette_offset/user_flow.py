@@ -139,7 +139,7 @@ class PipetteOffsetCalibrationUserFlow:
             CalibrationCommand.invalidate_last_action: self.invalidate_last_action,
         }
 
-        self._hw_pipette.reset_pipette_offset(self._mount)
+        self._hw_pipette.reset_pipette_offset(self._mount, to_default=True)
         self._default_tipracks = util.get_default_tipracks(
             self.hw_pipette.config.default_tipracks
         )

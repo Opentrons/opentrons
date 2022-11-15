@@ -114,7 +114,7 @@ class DeckCalibrationUserFlow:
         self.hardware.set_robot_calibration(
             robot_cal.build_temporary_identity_calibration()
         )
-        self._hw_pipette.reset_pipette_offset(self._mount)
+        self._hw_pipette.reset_pipette_offset(self._mount, to_default=True)
         self._supported_commands = SupportedCommands(namespace="calibration")
         self._supported_commands.loadLabware = True
 
