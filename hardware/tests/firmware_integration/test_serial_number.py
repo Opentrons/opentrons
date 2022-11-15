@@ -45,29 +45,25 @@ def filter_func(arb: ArbitrationId) -> bool:
 )
 
 # TODO: (2022-11-15 AA) Enable this test when the gripper EEPROM rework is complete
-"""
-@pytest.mark.requires_emulator
-@pytest.mark.can_filter_func.with_args(filter_func)
-async def test_set_serial_gripper(
-    can_messenger: CanMessenger,
-    can_messenger_queue: WaitableCallback,
-    model: int,
-    datecode: bytes,
-) -> None:
-    """It should write a serial number and read it back."""
-    node_id = NodeId.gripper
-    gripper_serial = gripper_serial_val_from_parts(model, datecode)
-    s = SerialNumberPayload(serial=SerialField(gripper_serial))
-
-    await can_messenger.send(node_id=node_id, message=SetSerialNumber(payload=s))
-    await can_messenger.send(node_id=node_id, message=InstrumentInfoRequest())
-    response, arbitration_id = await asyncio.wait_for(can_messenger_queue.read(), 1)
-
-    assert arbitration_id.parts.originating_node_id == node_id
-    assert isinstance(response, GripperInfoResponse)
-    assert response.payload.model.value == model
-    assert response.payload.serial.value[: len(datecode)] == datecode
-"""
+# @pytest.mark.requires_emulator
+# @pytest.mark.can_filter_func.with_args(filter_func)
+# async def test_set_serial_gripper(
+#     can_messenger: CanMessenger,
+#     can_messenger_queue: WaitableCallback,
+#     model: int,
+#     datecode: bytes,
+# ) -> None:
+#     """It should write a serial number and read it back."""
+#     node_id = NodeId.gripper
+#     gripper_serial = gripper_serial_val_from_parts(model, datecode)
+#     s = SerialNumberPayload(serial=SerialField(gripper_serial))
+#     await can_messenger.send(node_id=node_id, message=SetSerialNumber(payload=s))
+#     await can_messenger.send(node_id=node_id, message=InstrumentInfoRequest())
+#     response, arbitration_id = await asyncio.wait_for(can_messenger_queue.read(), 1)
+#     assert arbitration_id.parts.originating_node_id == node_id
+#     assert isinstance(response, GripperInfoResponse)
+#     assert response.payload.model.value == model
+#     assert response.payload.serial.value[: len(datecode)] == datecode
 
 
 # TODO: (2022-11-15 AA) This tests the temporary serial number for the gripper
