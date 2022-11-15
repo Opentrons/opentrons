@@ -27,8 +27,8 @@ stages:
             - id: !anystr
               status: pending
   - name: Retry until analyses status is completed.
-    max_retries: 20
-    delay_after: 2
+    max_retries: 10
+    delay_after: 0.1
     request:
       url: '{host:s}:{port:d}/protocols'
       method: GET
@@ -553,8 +553,8 @@ stages:
             - id: !anystr
               status: pending
   - name: Retry until analyses status is completed.
-    max_retries: 20
-    delay_after: 2
+    max_retries: 10
+    delay_after: 0.1
     request:
       url: '{host:s}:{port:d}/protocols'
       method: GET
