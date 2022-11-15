@@ -20,7 +20,6 @@ from opentrons.calibration_storage import (
 )
 from opentrons.hardware_control import robot_calibration as robot_cal
 from opentrons.hardware_control import HardwareControlAPI, CriticalPoint, Pipette
-from opentrons.hardware_control.instruments.ot2 import instrument_calibration
 from opentrons.protocol_api import labware
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.types import Mount, Point, Location
@@ -115,9 +114,7 @@ class DeckCalibrationUserFlow:
         self.hardware.set_robot_calibration(
             robot_cal.build_temporary_identity_calibration()
         )
-        self._hw_pipette.update_pipette_offset(
-            instrument_calibration.load_pipette_offset(pip_id=None, mount=self._mount)
-        )
+        self._hw_pipette.reset_pipette_offset(self._mount, to_default=True)
         self._supported_commands = SupportedCommands(namespace="calibration")
         self._supported_commands.loadLabware = True
 
