@@ -44,7 +44,7 @@
       "description": "The path to a valid Opentrons shared schema relative to the shared-data directory, without its extension. For instance, #/pipette/schemas/2/pipetteLiquidPropertiesSchema.json is a reference to this schema."
     },
     "patternProperties": {
-      "description": "Tip specific liquid handling properties for a given pipette",
+      "description": "Tip specific liquid handling properties for a given pipette. Using the active tip on a pipette, we will look up the pipetting configurations associated with that tip+pipette combo.",
       "type": "object",
       "$comment": "Example key: 'T50'",
       "^T[0-9]{2,4}": {
