@@ -1,13 +1,9 @@
 export const SECTIONS = {
   BEFORE_BEGINNING: 'BEFORE_BEGINNING',
-  INSERT_PIN: 'INSERT_PIN',
   MOUNT_GRIPPER: 'MOUNT_GRIPPER',
-  REMOVE_PIN: 'REMOVE_PIN',
+  MOVE_PIN: 'MOVE_PIN',
   RESULTS: 'RESULTS',
-  SUCCESSFULLY_ATTACHED: 'SUCCESSFULLY_ATTACHED',
-  SUCCESSFULLY_ATTACHED_AND_CALIBRATED: 'SUCCESSFULLY_ATTACHED_AND_CALIBRATED',
-  SUCCESSFULLY_RECALIBRATED: 'SUCCESSFULLY_RECALIBRATED',
-  SUCCESSFULLY_DETACHED: 'SUCCESSFULLY_DETACHED',
+  SUCCESS: 'SUCCESS',
   UNMOUNT_GRIPPER: 'UNMOUNT_GRIPPER',
 } as const
 
@@ -17,14 +13,18 @@ export const GRIPPER_FLOW_TYPES = {
   RECALIBRATE: 'RECALIBRATE',
 }
 
-export const FRONT_JAW = 'front_jaw'
-export const REAR_JAW = 'rear_jaw'
-
 // pin movements
 
 export const MOVE_PIN_TO_FRONT_JAW = 'movePinToFrontJaw'
 export const MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW = 'movePinFromFrontJawToRearJaw'
 export const REMOVE_PIN_FROM_REAR_JAW = 'removePinFromRearJaw'
+
+// successful actions 
+
+export const SUCCESSFULLY_ATTACHED = 'successfullyAttached'
+export const SUCCESSFULLY_ATTACHED_AND_CALIBRATED = 'successfullyAttachedAndCalibrated'
+export const SUCCESSFULLY_DETACHED = 'successfullyDetached'
+export const SUCCESSFULLY_CALIBRATED = 'successfullyCalibrated'
 
 //  required equipment list
 export const CAL_PIN_LOADNAME = 'calibration_pin'
