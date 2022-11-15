@@ -16,7 +16,6 @@ from opentrons_shared_data.protocol.models.protocol_schema_v6 import ProtocolSch
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons.protocol_api_experimental import ProtocolContext
 from opentrons.protocol_engine import ProtocolEngine, Liquid, commands as pe_commands
-from opentrons.protocol_engine.errors.exceptions import CommandDoesNotExistError
 from opentrons.protocol_reader import (
     ProtocolSource,
     JsonProtocolConfig,
@@ -292,7 +291,7 @@ def test_load_json_liquids_ff_on(
     protocol_engine: ProtocolEngine,
     task_queue: TaskQueue,
     subject: ProtocolRunner,
-    enable_load_liquid: None
+    enable_load_liquid: None,
 ) -> None:
     """It should load a JSON protocol file."""
     json_protocol_source = ProtocolSource(
