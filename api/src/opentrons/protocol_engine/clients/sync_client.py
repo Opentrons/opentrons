@@ -48,6 +48,19 @@ class SyncClient:
             labware_id=labware_id,
         )
 
+    def set_pipette_movement_speed(
+        self, pipette_id: str, speed: Optional[float]
+    ) -> None:
+        """Set the speed of a pipette's X/Y/Z movements. Does not affect plunger speed.
+
+        None will use the hardware API's default.
+        """
+        self._transport.call_method(
+            "set_pipette_movement_speed",
+            pipette_id=pipette_id,
+            speed=speed,
+        )
+
     def load_labware(
         self,
         location: LabwareLocation,

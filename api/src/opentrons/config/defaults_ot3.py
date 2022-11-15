@@ -20,7 +20,7 @@ DEFAULT_PIPETTE_OFFSET = [0.0, 0.0, 0.0]
 
 DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSettings(
     z_offset=ZSenseSettings(
-        point=(209, 170, 0),
+        point=(239, 160, 1),
         pass_settings=CapacitivePassSettings(
             prep_distance_mm=3,
             max_overrun_distance_mm=3,
@@ -29,10 +29,10 @@ DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSett
         ),
     ),
     edge_sense=EdgeSenseSettings(
-        plus_x_pos=(219, 150, 0),
-        minus_x_pos=(199, 150, 0),
-        plus_y_pos=(209, 160, 0),
-        minus_y_pos=(209, 140, 0),
+        plus_x_pos=(239, 150, 0),
+        minus_x_pos=(217, 150, 0),
+        plus_y_pos=(228, 161, 0),
+        minus_y_pos=(228, 139, 0),
         overrun_tolerance_mm=0.5,
         early_sense_tolerance_mm=0.2,
         pass_settings=CapacitivePassSettings(
@@ -43,7 +43,9 @@ DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSett
         ),
         search_initial_tolerance_mm=5.0,
         search_iteration_limit=10,
+        nominal_center=(228, 150, 0),
     ),
+    probe_length=34.5,
 )
 
 ROBOT_CONFIG_VERSION: Final = 1
@@ -54,8 +56,8 @@ DEFAULT_DECK_TRANSFORM: Final[OT3Transform] = [
     [0.0, 0.0, -1.0],
 ]
 DEFAULT_CARRIAGE_OFFSET: Final[Offset] = (477.20, 493.8, 253.475)
-DEFAULT_LEFT_MOUNT_OFFSET: Final[Offset] = (-21.0, -63.05, 256.175)
-DEFAULT_RIGHT_MOUNT_OFFSET: Final[Offset] = (33, -63.05, 256.175)
+DEFAULT_LEFT_MOUNT_OFFSET: Final[Offset] = (-13.5, -60.5, 255.675)
+DEFAULT_RIGHT_MOUNT_OFFSET: Final[Offset] = (40.5, -60.5, 255.675)
 DEFAULT_GRIPPER_MOUNT_OFFSET: Final[Offset] = (84.55, -12.75, 93.85)
 DEFAULT_Z_RETRACT_DISTANCE: Final = 2
 
@@ -355,6 +357,7 @@ def _build_default_edge_sense(
         search_iteration_limit=from_conf.get(
             "search_iteration_limit", default.search_iteration_limit
         ),
+        nominal_center=from_conf.get("nominal_center", default.nominal_center),
     )
 
 
@@ -366,6 +369,7 @@ def _build_default_calibration(
         edge_sense=_build_default_edge_sense(
             from_conf.get("edge_sense", {}), default.edge_sense
         ),
+        probe_length=from_conf.get("probe_length", default.probe_length),
     )
 
 

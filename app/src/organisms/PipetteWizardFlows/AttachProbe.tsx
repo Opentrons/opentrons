@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Flex, TEXT_ALIGN_CENTER } from '@opentrons/components'
+import { Flex, TEXT_ALIGN_CENTER, COLORS } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
+import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import attachProbe from '../../assets/images/change-pip/attach-stem.png'
@@ -20,8 +21,9 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     mount,
     isRobotMoving,
     goBack,
-    setIsBetweenCommands,
     isExiting,
+    errorMessage,
+    setShowErrorMessage,
   } = props
   const { t } = useTranslation('pipette_wizard_flows')
   const motorAxis = mount === 'left' ? 'leftZ' : 'rightZ'
@@ -31,33 +33,38 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const calSlotNum = '5'
   if (pipetteId == null) return null
   const handleOnClick = (): void => {
-    setIsBetweenCommands(true)
-    chainRunCommands([
-      {
-        // @ts-expect-error calibration type not yet supported
-        commandType: 'calibration/calibratePipette' as const,
-        params: {
-          mount: mount,
+    chainRunCommands(
+      [
+        {
+          // @ts-expect-error calibration type not yet supported
+          commandType: 'calibration/calibratePipette' as const,
+          params: {
+            mount: mount,
+          },
         },
-      },
-      {
-        commandType: 'home' as const,
-        params: {
-          axes: [motorAxis],
+        {
+          commandType: 'home' as const,
+          params: {
+            axes: [motorAxis],
+          },
         },
-      },
-      {
-        // @ts-expect-error calibration type not yet supported
-        commandType: 'calibration/moveToLocation' as const,
-        params: {
-          pipetteId: pipetteId,
-          location: 'attachOrDetach',
+        {
+          // @ts-expect-error calibration type not yet supported
+          commandType: 'calibration/moveToLocation' as const,
+          params: {
+            pipetteId: pipetteId,
+            location: 'attachOrDetach',
+          },
         },
-      },
-    ]).then(() => {
-      setIsBetweenCommands(false)
-      proceed()
-    })
+      ],
+      false
+    )
+      .then(() => {
+        proceed()
+      })
+      .catch(error => {
+        setShowErrorMessage(error.message)
+      })
   }
 
   const pipetteCalibratingImage = (
@@ -81,7 +88,14 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         )}
       </InProgressModal>
     )
-  return (
+  return errorMessage != null ? (
+    <SimpleWizardBody
+      isSuccess={false}
+      iconColor={COLORS.errorEnabled}
+      header={t('error_encountered')}
+      subHeader={errorMessage}
+    />
+  ) : (
     <GenericWizardTile
       header={t('attach_probe')}
       //  TODO(Jr, 10/26/22): replace image with correct one!

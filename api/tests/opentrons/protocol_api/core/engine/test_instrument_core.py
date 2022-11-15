@@ -68,6 +68,8 @@ def subject(
         engine_client=mock_engine_client,
         sync_hardware_api=mock_sync_hardware,
         protocol_core=mock_protocol_core,
+        # When this baby hits 88 mph, you're going to see some serious shit.
+        default_movement_speed=39339.5,
     )
 
 
@@ -371,3 +373,44 @@ def test_dispense_to_well(
         ),
         mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )
+
+
+def test_initialization_sets_default_movement_speed(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should set a default movement speed as soon as it's initialized."""
+    decoy.verify(
+        mock_engine_client.set_pipette_movement_speed(
+            pipette_id="abc123", speed=39339.5
+        )
+    )
+
+
+def test_set_default_speed(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should delegate to the engine client to set the pipette's movement speed."""
+    subject.set_default_speed(speed=9000.1)
+    decoy.verify(
+        mock_engine_client.set_pipette_movement_speed(
+            pipette_id=subject.pipette_id, speed=9000.1
+        )
+    )
+
+
+def test_get_default_speed(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should delegate to the engine client to set the pipette's movement speed."""
+    decoy.when(
+        mock_engine_client.state.pipettes.get_movement_speed(
+            pipette_id=subject.pipette_id
+        )
+    ).then_return(9000.1)
+    assert subject.get_default_speed() == 9000.1

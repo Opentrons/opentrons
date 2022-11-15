@@ -290,7 +290,7 @@ class ProtocolContextImplementation(
             protocol_interface=self,
             mount=mount,
             instrument_name=instrument_name.value,
-            default_speed=400.0,
+            default_speed=400.0,  # TODO(mm, 2022-11-10): Deduplicate with engine core.
         )
         self._instruments[mount] = new_instr
         logger.info("Instrument {} loaded".format(new_instr))
