@@ -643,7 +643,7 @@ class OT3API(
         position_axes = [OT3Axis.X, OT3Axis.Y, z_ax, plunger_ax]
 
         if fail_on_not_homed and (
-            not self._backend.is_homed(position_axes) or not self._current_position
+            not self._backend.has_homed(position_axes) or not self._current_position
         ):
             raise MustHomeError(
                 f"Current position of {str(mount)} pipette is unknown, please home."
@@ -692,7 +692,7 @@ class OT3API(
         position_axes = [OT3Axis.X, OT3Axis.Y, z_ax, plunger_ax]
 
         if fail_on_not_homed and (
-            not self._backend.is_homed(position_axes)
+            not self._backend.has_homed(position_axes)
             or not self._encoder_current_position
         ):
             raise MustHomeError(
@@ -769,10 +769,12 @@ class OT3API(
     ) -> None:
         """Move the critical point of the specified mount to a location
         relative to the deck, at the specified speed."""
-        if not self._current_position:
-            await self.home()
-
         realmount = OT3Mount.from_mount(mount)
+
+        axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
+        if not self._backend.has_homed(axes_moving):
+            await self.home(axes_moving)
+
         target_position = target_position_from_absolute(
             realmount,
             abs_position,
@@ -810,18 +812,19 @@ class OT3API(
         mhe = MustHomeError(
             "Cannot make a relative move because absolute position is unknown"
         )
-        if not self._current_position:
+
+        realmount = OT3Mount.from_mount(mount)
+        axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
+        if not self._backend.has_homed([axis for axis in axes_moving]):
             if fail_on_not_homed:
                 raise mhe
             else:
-                await self.home()
+                await self.home(axes_moving)
 
-        realmount = OT3Mount.from_mount(mount)
         target_position = target_position_from_relative(
             realmount, delta, self._current_position
         )
-        axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
-        if fail_on_not_homed and not self._backend.is_homed(
+        if fail_on_not_homed and not self._backend.has_homed(
             [axis for axis in axes_moving if axis is not None]
         ):
             raise mhe
