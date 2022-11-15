@@ -23,7 +23,7 @@ def subject(mock_state_view: StateView) -> LoadLiquidImplementation:
 
 
 async def test_load_liquid_implementation(
-    decoy: Decoy, subject: LoadLiquidImplementation, mock_state_view: StateView
+    decoy: Decoy, subject: LoadLiquidImplementation, mock_state_view: StateView, enable_load_liquid: None
 ) -> None:
     """Test LoadLiquid command execution."""
     data = LoadLiquidParams(

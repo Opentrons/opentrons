@@ -20,7 +20,6 @@ def _list_fixtures(version: int) -> Iterator[Path]:
 def test_analyze(
     fixture_path: Path,
     tmp_path: Path,
-    enable_load_liquid: None,
 ) -> None:
     """Should return with no errors and a non-empty output."""
     analysis_output_path = tmp_path / "analysis_output.json"
