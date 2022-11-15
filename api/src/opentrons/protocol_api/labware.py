@@ -15,9 +15,6 @@ from itertools import dropwhile
 from typing import Any, List, Dict, Optional, Union, Tuple, TYPE_CHECKING
 
 from opentrons.types import Location, Point, LocationLabware
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import requires_version
-from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 
@@ -32,6 +29,12 @@ from opentrons.protocols.labware import (  # noqa: F401
 
 from .core.labware import AbstractLabware
 from .core.protocol_api.labware import LabwareImplementation
+from .versioning import (
+    MAX_SUPPORTED_VERSION,
+    APIVersion,
+    HasAPIVersion,
+    requires_version,
+)
 
 if TYPE_CHECKING:
     from opentrons.protocols.geometry.module_geometry import (  # noqa: F401
@@ -55,7 +58,7 @@ class OutOfTipsError(Exception):
     pass
 
 
-class Well:
+class Well(HasAPIVersion):
     """
     The Well class represents a  single well in a :py:class:`Labware`
 
@@ -217,7 +220,7 @@ class Well:
         return hash(self.top().point)
 
 
-class Labware(DeckItem):
+class Labware(DeckItem, HasAPIVersion):
     """
     This class represents a labware, such as a PCR plate, a tube rack,
     reservoir, tip rack, etc. It defines the physical geometry of the labware,

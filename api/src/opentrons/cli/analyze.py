@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from typing import Any, Dict, List, Optional, Sequence, Union
 from typing_extensions import Literal
 
-from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocol_api import APIVersion
 from opentrons.protocol_reader import (
     ProtocolReader,
     ProtocolFileRole,

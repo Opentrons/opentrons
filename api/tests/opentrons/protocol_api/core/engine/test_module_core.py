@@ -10,8 +10,7 @@ from opentrons.protocol_api.core.engine.labware import LabwareCore
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
 )
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION
-from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION, APIVersion
 from opentrons.types import DeckSlotName
 
 

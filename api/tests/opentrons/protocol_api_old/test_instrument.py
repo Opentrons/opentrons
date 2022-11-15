@@ -4,7 +4,6 @@ from unittest import mock
 
 from opentrons.types import Mount
 from opentrons.protocols.advanced_control import transfers
-from opentrons.protocols.api_support.types import APIVersion
 
 import opentrons.protocol_api as papi
 
@@ -31,7 +30,7 @@ def test_blowout_location_unsupported_version(
     make_context_and_labware, liquid_handling_command
 ):
     # not supported in versions below 2.8
-    context_and_labware = make_context_and_labware(APIVersion(2, 7))
+    context_and_labware = make_context_and_labware(papi.APIVersion(2, 7))
     context_and_labware["ctx"].home()
     lw1 = context_and_labware["lw1"]
     instr = context_and_labware["instr"]
@@ -67,7 +66,7 @@ def test_blowout_location_invalid(
     blowout_location,
     expected_error_match,
 ):
-    context_and_labware = make_context_and_labware(APIVersion(2, 8))
+    context_and_labware = make_context_and_labware(papi.APIVersion(2, 8))
     context_and_labware["ctx"].home()
     lw1 = context_and_labware["lw1"]
     instr = context_and_labware["instr"]
@@ -93,7 +92,7 @@ def test_blowout_location_invalid(
 def test_valid_blowout_location(
     make_context_and_labware, liquid_handling_command, blowout_location, expected_strat
 ):
-    context_and_labware = make_context_and_labware(APIVersion(2, 8))
+    context_and_labware = make_context_and_labware(papi.APIVersion(2, 8))
     context_and_labware["ctx"].home()
     lw1 = context_and_labware["lw1"]
     instr = context_and_labware["instr"]

@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Union
 from typing_extensions import Literal
 
-from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocols.parse import (
     extract_static_python_info,
     version_from_static_python_info,
