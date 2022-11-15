@@ -222,7 +222,8 @@ class PipetteTipActionType(int, Enum):
     pick_up = 0x0
     drop = 0x01
 
-@unique 
+
+@unique
 class MotorPositionFlags(Enum):
     """Flags for motor position validity."""
 

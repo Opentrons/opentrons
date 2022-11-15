@@ -222,12 +222,12 @@ class PipetteTipActionTypeField(utils.UInt8Field):
             action_type = str(self.value)
         return f"{self.__class__.__name__}(value={action_type})"
 
+
 class MotorPositionFlagsField(utils.UInt8Field):
     """Bitflags to indicate the validity of a motor position."""
 
     def __repr__(self) -> str:
-        """Print the MotorPositionFlags"""
-        
+        """Print the MotorPositionFlags."""
         flags_list = [
             flag.name for flag in MotorPositionFlags if bool(self.value & flag.value)
         ]
