@@ -99,12 +99,12 @@ describe('PipetteWizardFlows', () => {
         flowType: FLOWS.CALIBRATE,
       },
       {
-        section: SECTIONS.ATTACH_STEM,
+        section: SECTIONS.ATTACH_PROBE,
         mount: LEFT,
         flowType: FLOWS.CALIBRATE,
       },
       {
-        section: SECTIONS.DETACH_STEM,
+        section: SECTIONS.DETACH_PROBE,
         mount: LEFT,
         flowType: FLOWS.CALIBRATE,
       },
@@ -129,63 +129,74 @@ describe('PipetteWizardFlows', () => {
     const getStarted = getByRole('button', { name: 'Get started' })
     fireEvent.click(getStarted)
     await waitFor(() => {
-      expect(mockChainRunCommands).toHaveBeenCalledWith([
-        {
-          commandType: 'home',
-          params: {},
-        },
-        {
-          commandType: 'loadPipette',
-          params: {
-            mount: LEFT,
-            pipetteId: 'abc',
-            pipetteName: 'p1000_single_gen3',
+      expect(mockChainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'home',
+            params: {},
           },
-        },
-        {
-          commandType: 'calibration/moveToLocation',
-          params: { pipetteId: 'abc', location: 'attachOrDetach' },
-        },
-      ])
+          {
+            commandType: 'loadPipette',
+            params: {
+              mount: LEFT,
+              pipetteId: 'abc',
+              pipetteName: 'p1000_single_gen3',
+            },
+          },
+          {
+            commandType: 'calibration/moveToLocation',
+            params: { pipetteId: 'abc', location: 'attachOrDetach' },
+          },
+        ],
+        false
+      )
       expect(mockCreateRun).toHaveBeenCalled()
     })
     // second page
     getByText('Step 1 / 3')
-    getByText('Attach Calibration Stem')
-    getByText('Grab your calibration probe, install')
+    getByText('Attach Calibration Probe')
+    getByText(
+      'Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
+    )
     const initiate = getByRole('button', { name: 'Initiate calibration' })
     fireEvent.click(initiate)
     await waitFor(() => {
-      expect(mockChainRunCommands).toHaveBeenCalledWith([
-        {
-          commandType: 'calibration/calibratePipette',
-          params: { mount: 'left' },
-        },
-        {
-          commandType: 'home',
-          params: { axes: ['leftZ'] },
-        },
-        {
-          commandType: 'calibration/moveToLocation',
-          params: { pipetteId: 'abc', location: 'attachOrDetach' },
-        },
-      ])
+      expect(mockChainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'calibration/calibratePipette',
+            params: { mount: 'left' },
+          },
+          {
+            commandType: 'home',
+            params: { axes: ['leftZ'] },
+          },
+          {
+            commandType: 'calibration/moveToLocation',
+            params: { pipetteId: 'abc', location: 'attachOrDetach' },
+          },
+        ],
+        false
+      )
     })
     //  third page
     getByText('Step 2 / 3')
-    getByText('Remove Calibration Stem')
+    getByText('Remove Calibration Probe')
     getByText(
-      'Now you’ll be guided through removing your calibration stem. Undo the latch to remove the stem'
+      'Unlatch the calibration probe, remove it from the pipette nozzle, and return it to its storage location.'
     )
     const complete = getByRole('button', { name: 'Complete calibration' })
     fireEvent.click(complete)
     await waitFor(() => {
-      expect(mockChainRunCommands).toHaveBeenCalledWith([
-        {
-          commandType: 'home',
-          params: {},
-        },
-      ])
+      expect(mockChainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'home',
+            params: {},
+          },
+        ],
+        false
+      )
       //  TODO(jr, 11/2/22): wire this up when stop run logic is figured out
       // expect(mockStopRun).toHaveBeenCalled()
     })

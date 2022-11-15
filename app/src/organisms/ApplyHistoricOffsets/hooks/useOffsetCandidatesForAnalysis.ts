@@ -1,8 +1,8 @@
 import isEqual from 'lodash/isEqual'
 import { getLabwareDisplayName, IDENTITY_VECTOR } from '@opentrons/shared-data'
+import { getLoadedLabwareDefinitionsByUri } from '../../../resources/protocols/utils'
 import { useAllHistoricOffsets } from './useAllHistoricOffsets'
 import { getLabwareLocationCombos } from './getLabwareLocationCombos'
-import { getDefsByURI } from './getDefsByURI'
 
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { LabwareOffset } from '@opentrons/api-client'
@@ -24,7 +24,7 @@ export function useOffsetCandidatesForAnalysis(
     labware,
     modules
   )
-  const defsByUri = getDefsByURI(commands)
+  const defsByUri = getLoadedLabwareDefinitionsByUri(commands)
 
   return labwareLocationCombos.reduce<OffsetCandidate[]>(
     (acc, { location, definitionUri }) => {

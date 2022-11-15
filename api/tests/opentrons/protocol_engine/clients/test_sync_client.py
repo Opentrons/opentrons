@@ -8,6 +8,8 @@ the subject's methods in a synchronous context in a child thread to ensure:
 - In the main thread, the Protocol Engine does its work in the main event
     loop, without blocking.
 """
+from typing import Optional
+
 import pytest
 from decoy import Decoy
 
@@ -58,6 +60,21 @@ def test_add_labware_definition(
     result = subject.add_labware_definition(labware_definition)
 
     assert result == expected_labware_uri
+
+
+def test_reset_tips(
+    decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
+) -> None:
+    """It should reset the tip tracking state of a labware."""
+    subject.reset_tips(labware_id="cool-labware")
+
+    decoy.verify(
+        transport.call_method(
+            "reset_tips",
+            labware_id="cool-labware",
+        ),
+        times=1,
+    )
 
 
 def test_load_labware(
@@ -245,13 +262,17 @@ def test_drop_tip(
 ) -> None:
     """It should execute a drop up tip command."""
     request = commands.DropTipCreate(
-        params=commands.DropTipParams(pipetteId="123", labwareId="456", wellName="A2")
+        params=commands.DropTipParams(
+            pipetteId="123", labwareId="456", wellName="A2", wellLocation=WellLocation()
+        )
     )
     response = commands.DropTipResult()
 
     decoy.when(transport.execute_command(request=request)).then_return(response)
 
-    result = subject.drop_tip(pipette_id="123", labware_id="456", well_name="A2")
+    result = subject.drop_tip(
+        pipette_id="123", labware_id="456", well_name="A2", well_location=WellLocation()
+    )
 
     assert result == response
 
@@ -272,7 +293,7 @@ def test_aspirate(
                 offset=WellOffset(x=0, y=0, z=1),
             ),
             volume=123.45,
-            flowRate=2.0,
+            flowRate=6.7,
         )
     )
 
@@ -291,6 +312,7 @@ def test_aspirate(
             offset=WellOffset(x=0, y=0, z=1),
         ),
         volume=123.45,
+        flow_rate=6.7,
     )
 
     assert result == result_from_transport
@@ -328,6 +350,7 @@ def test_dispense(
             origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1)
         ),
         volume=10,
+        flow_rate=2.0,
     )
 
     assert result == response
@@ -362,6 +385,28 @@ def test_touch_tip(
     assert result == response
 
 
+@pytest.mark.parametrize("seconds", [-1.23, 0.0, 1.23])
+@pytest.mark.parametrize("message", [None, "Hello, world!", ""])
+def test_wait_for_duration(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+    seconds: float,
+    message: Optional[str],
+) -> None:
+    """It should execute a wait for resume command."""
+    request = commands.WaitForDurationCreate(
+        params=commands.WaitForDurationParams(seconds=seconds, message=message)
+    )
+    response = commands.WaitForDurationResult()
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.wait_for_duration(seconds=seconds, message=message)
+
+    assert result == response
+
+
 def test_wait_for_resume(
     decoy: Decoy,
     transport: AbstractSyncTransport,
@@ -376,6 +421,31 @@ def test_wait_for_resume(
     decoy.when(transport.execute_command(request=request)).then_return(response)
 
     result = subject.wait_for_resume(message="hello world")
+
+    assert result == response
+
+
+def test_comment(
+    decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
+) -> None:
+    """It should execute a comment command."""
+    # TODO(mm, 2022-11-09): Use a proper Protocol Engine Comment command instead of
+    # a Custom command, once one exists.
+    class LegacyCommentCustomParams(commands.CustomParams):
+        legacyCommandType: str
+        legacyCommandText: str
+
+    request = commands.CustomCreate(
+        params=LegacyCommentCustomParams(
+            legacyCommandType="command.COMMENT",
+            legacyCommandText="Hello, world!",
+        )
+    )
+    response = commands.CustomResult()
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.comment(message="Hello, world!")
 
     assert result == response
 
@@ -612,7 +682,7 @@ def test_blow_out(
             labwareId="456",
             wellName="A2",
             wellLocation=WellLocation(),
-            flowRate=2.0,
+            flowRate=7.8,
         )
     )
 
@@ -625,6 +695,7 @@ def test_blow_out(
         labware_id="456",
         well_name="A2",
         well_location=WellLocation(),
+        flow_rate=7.8,
     )
 
     assert result == response

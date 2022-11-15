@@ -14,11 +14,12 @@ import {
   useOnClickOutside,
   useConditionalConfirm,
 } from '@opentrons/components'
+import { isOT3Pipette } from '@opentrons/shared-data'
 
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
-import { AskForCalibrationBlockModal } from '../../CalibrateTipLength/AskForCalibrationBlockModal'
 import { Portal } from '../../../App/portal'
+import { useMenuHandleClickOutside } from '../../../atoms/MenuList/hooks'
 import {
   INTENT_RECALIBRATE_PIPETTE_OFFSET,
   INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
@@ -32,9 +33,13 @@ import {
   useRunStatuses,
   useTipLengthCalibrations,
 } from '../../../organisms/Devices/hooks'
+import { AskForCalibrationBlockModal } from '../../CalibrateTipLength/AskForCalibrationBlockModal'
+import { PipetteWizardFlows } from '../../PipetteWizardFlows'
+import { FLOWS } from '../../PipetteWizardFlows/constants'
 import { useCalibratePipetteOffset } from '../../CalibratePipetteOffset/useCalibratePipetteOffset'
 import { DeckCalibrationConfirmModal } from '../DeckCalibrationConfirmModal'
-import { useMenuHandleClickOutside } from '../../../atoms/MenuList/hooks'
+
+import type { PipetteName } from '@opentrons/shared-data'
 
 const CAL_BLOCK_MODAL_CLOSED: 'cal_block_modal_closed' =
   'cal_block_modal_closed'
@@ -54,6 +59,7 @@ interface OverflowMenuProps {
   mount: Mount
   serialNumber: string | null
   updateRobotStatus: (isRobotBusy: boolean) => void
+  pipetteName?: string | null
 }
 
 export function OverflowMenu({
@@ -62,6 +68,7 @@ export function OverflowMenu({
   mount,
   serialNumber,
   updateRobotStatus,
+  pipetteName,
 }: OverflowMenuProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const doTrackEvent = useTrackEvent()
@@ -89,7 +96,11 @@ export function OverflowMenu({
     setCalBlockModalState,
   ] = React.useState<CalBlockModalState>(CAL_BLOCK_MODAL_CLOSED)
   const { isRunRunning: isRunning } = useRunStatuses()
-
+  const [
+    showPipetteWizardFlows,
+    setShowPipetteWizardFlows,
+  ] = React.useState<boolean>(false)
+  const isGen3Pipette = isOT3Pipette(pipetteName as PipetteName)
   interface StartWizardOptions {
     keepTipLength: boolean
     hasBlockModalResponse?: boolean | null
@@ -137,15 +148,19 @@ export function OverflowMenu({
   ): void => {
     e.preventDefault()
     if (!isRunning) {
-      if (calType === 'pipetteOffset') {
-        if (applicablePipetteOffsetCal != null) {
-          // recalibrate pipette offset
-          startPipetteOffsetCalibration({
-            withIntent: INTENT_RECALIBRATE_PIPETTE_OFFSET,
-          })
+      if (calType === 'pipetteOffset' && pipetteName != null) {
+        if (Boolean(isGen3Pipette)) {
+          setShowPipetteWizardFlows(true)
         } else {
-          // calibrate pipette offset with a wizard since not calibrated yet
-          confirmStart()
+          if (applicablePipetteOffsetCal != null) {
+            // recalibrate pipette offset
+            startPipetteOffsetCalibration({
+              withIntent: INTENT_RECALIBRATE_PIPETTE_OFFSET,
+            })
+          } else {
+            // calibrate pipette offset with a wizard since not calibrated yet
+            confirmStart()
+          }
         }
       } else {
         startPipetteOffsetPossibleTLC({
@@ -219,7 +234,14 @@ export function OverflowMenu({
           />
         </Portal>
       )}
-
+      {showPipetteWizardFlows ? (
+        <PipetteWizardFlows
+          flowType={FLOWS.CALIBRATE}
+          mount={mount}
+          closeFlow={() => setShowPipetteWizardFlows(false)}
+          robotName={robotName}
+        />
+      ) : null}
       {showOverflowMenu ? (
         <Flex
           ref={calsOverflowWrapperRef}
@@ -245,9 +267,11 @@ export function OverflowMenu({
                 : t('recalibrate_tip_and_pipette')}
             </MenuItem>
           )}
-          <MenuItem onClick={e => handleDownload(calType, e)}>
-            {t('download_calibration_data')}
-          </MenuItem>
+          {!Boolean(isGen3Pipette) ? (
+            <MenuItem onClick={e => handleDownload(calType, e)}>
+              {t('download_calibration_data')}
+            </MenuItem>
+          ) : null}
           {/* TODO 5/6/2021 kj: This is scoped out from 6.0 */}
           {/* <Divider /> */}
           {/* <MenuItem onClick={() => handleDeleteCalibrationData(calType)}>

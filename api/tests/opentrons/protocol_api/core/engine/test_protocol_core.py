@@ -1,5 +1,5 @@
 """Test for the ProtocolEngine-based protocol API core."""
-from typing import Type
+from typing import Optional, Type, cast
 
 import pytest
 from decoy import Decoy
@@ -13,6 +13,7 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from opentrons.types import Mount, MountType, DeckSlotName
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
+from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.modules import AbstractModule
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
@@ -27,6 +28,7 @@ from opentrons.protocol_engine import (
     ModuleLocation,
     ModuleDefinition,
     LabwareMovementStrategy,
+    LoadedPipette,
     commands,
 )
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
@@ -118,6 +120,7 @@ def test_get_fixed_trash(subject: ProtocolCore) -> None:
 
 def test_load_instrument(
     decoy: Decoy,
+    mock_sync_hardware_api: SyncHardwareAPI,
     mock_engine_client: EngineClient,
     subject: ProtocolCore,
 ) -> None:
@@ -127,6 +130,21 @@ def test_load_instrument(
             pipette_name=PipetteNameType.P300_SINGLE, mount=MountType.LEFT
         )
     ).then_return(commands.LoadPipetteResult(pipetteId="cool-pipette"))
+
+    decoy.when(mock_engine_client.state.pipettes.get("cool-pipette")).then_return(
+        LoadedPipette.construct(mount=MountType.LEFT)  # type: ignore[call-arg]
+    )
+    pipette_dict = cast(
+        PipetteDict,
+        {
+            "default_aspirate_flow_rates": {"1.1": 22},
+            "default_dispense_flow_rates": {"3.3": 44},
+            "default_blow_out_flow_rates": {"5.5": 66},
+        },
+    )
+    decoy.when(mock_sync_hardware_api.get_attached_instrument(Mount.LEFT)).then_return(
+        pipette_dict
+    )
 
     result = subject.load_instrument(
         instrument_name=PipetteNameType.P300_SINGLE, mount=Mount.LEFT
@@ -429,3 +447,39 @@ def test_load_module_no_location(
     """Should raise an InvalidModuleLocationError exception."""
     with pytest.raises(InvalidModuleLocationError):
         subject.load_module(model=requested_model, deck_slot=None, configuration="")
+
+
+@pytest.mark.parametrize("message", [None, "Hello, world!", ""])
+def test_pause(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: ProtocolCore,
+    message: Optional[str],
+) -> None:
+    """It should issue a waitForResume command."""
+    subject.pause(msg=message)
+    decoy.verify(mock_engine_client.wait_for_resume(message=message))
+
+
+@pytest.mark.parametrize("seconds", [0.0, -1.23, 1.23])
+@pytest.mark.parametrize("message", [None, "Hello, world!", ""])
+def test_delay(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: ProtocolCore,
+    seconds: float,
+    message: Optional[str],
+) -> None:
+    """It should issue a waitForDuration command."""
+    subject.delay(seconds=seconds, msg=message)
+    decoy.verify(mock_engine_client.wait_for_duration(seconds=seconds, message=message))
+
+
+def test_comment(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: ProtocolCore,
+) -> None:
+    """It should issue a comment command."""
+    subject.comment("Hello, world!")
+    decoy.verify(mock_engine_client.comment("Hello, world!"))
