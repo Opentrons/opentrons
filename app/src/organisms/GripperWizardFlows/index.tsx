@@ -13,11 +13,10 @@ import { useChainRunCommands } from '../../resources/runs/hooks'
 import { getGripperWizardSteps } from './getGripperWizardSteps'
 import { GRIPPER_FLOW_TYPES, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
-import { InsertPin } from './InsertPin'
-import { RemovePin } from './RemovePin'
+import { MovePin } from './MovePin'
 import { MountGripper } from './MountGripper'
 import { UnmountGripper } from './UnmountGripper'
-import { Results } from './Results'
+import { Results } from './Success'
 import { ExitConfirmation } from './ExitConfirmation'
 
 import type { GripperWizardFlowType } from './types'
@@ -153,22 +152,13 @@ export const GripperWizardFlows = (
         isCreateLoading={isCreateLoading}
       />
     )
-  } else if (currentStep.section === SECTIONS.INSERT_PIN) {
+  } else if (currentStep.section === SECTIONS.MOVE_PIN) {
     onExit = confirmExit
     modalContent = modalContent = (
-      <InsertPin
+      <MovePin
         {...currentStep}
         {...sharedProps}
         isExiting={isExiting}
-      />
-    )
-  } else if (currentStep.section === SECTIONS.REMOVE_PIN) {
-    onExit = confirmExit
-    modalContent = modalContent = (
-      <RemovePin
-        {...currentStep}
-        {...sharedProps}
-        handleCleanUp={handleCleanUpAndClose}
       />
     )
   } else if (currentStep.section === SECTIONS.MOUNT_GRIPPER) {
@@ -187,27 +177,7 @@ export const GripperWizardFlows = (
         {...sharedProps}
       />
     )
-  } else if (currentStep.section === SECTIONS.SUCCESSFULLY_ATTACHED) {
-    onExit = confirmExit
-    modalContent = modalContent = (
-      <Results {...currentStep} {...sharedProps} proceed={closeFlow} />
-    )
-  } else if (currentStep.section === SECTIONS.SUCCESSFULLY_DETACHED) {
-    onExit = confirmExit
-    modalContent = modalContent = (
-      <Results {...currentStep} {...sharedProps} proceed={closeFlow} />
-    )
-  } else if (currentStep.section === SECTIONS.SUCCESSFULLY_ATTACHED_AND_CALIBRATED) {
-    onExit = confirmExit
-    modalContent = modalContent = (
-      <Results {...currentStep} {...sharedProps} proceed={closeFlow} />
-    )
-  }  else if (currentStep.section === SECTIONS.SUCCESSFULLY_RECALIBRATED) {
-    onExit = confirmExit
-    modalContent = modalContent = (
-      <Results {...currentStep} {...sharedProps} proceed={closeFlow} />
-    )
-  } else if (currentStep.section === SECTIONS.RESULTS) {
+  } else if (currentStep.section === SECTIONS.SUCCESS) {
     onExit = confirmExit
     modalContent = modalContent = (
       <Results {...currentStep} {...sharedProps} proceed={closeFlow} />

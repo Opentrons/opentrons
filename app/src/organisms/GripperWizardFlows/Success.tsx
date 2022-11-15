@@ -4,9 +4,9 @@ import { COLORS, TEXT_TRANSFORM_CAPITALIZE } from '@opentrons/components'
 import { PrimaryButton } from '../../atoms/buttons'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { GRIPPER_FLOW_TYPES } from './constants'
-import type { GripperWizardFlowType, GripperWizardStepProps } from './types'
+import type { GripperWizardFlowType, GripperWizardStepProps, SuccessStep } from './types'
 
-export const Results = (props: GripperWizardStepProps): JSX.Element => {
+export const Success = (props: GripperWizardStepProps & SuccessStep): JSX.Element => {
   const { proceed, flowType } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
 
@@ -25,7 +25,6 @@ export const Results = (props: GripperWizardStepProps): JSX.Element => {
       <PrimaryButton
         textTransform={TEXT_TRANSFORM_CAPITALIZE}
         onClick={proceed}
-        aria-label="Results_exit"
       >
         {t('shared:exit')}
       </PrimaryButton>

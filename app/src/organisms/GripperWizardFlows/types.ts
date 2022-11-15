@@ -15,7 +15,6 @@ import type { CreateCommand } from '@opentrons/shared-data'
 export type GripperWizardStep =
   | BeforeBeginningStep
   | MovePinStep
-  | ResultsStep
   | MountGripperStep
   | UnmountGripperStep
   | SuccessStep
