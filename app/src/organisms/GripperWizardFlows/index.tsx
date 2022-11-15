@@ -16,7 +16,7 @@ import { BeforeBeginning } from './BeforeBeginning'
 import { MovePin } from './MovePin'
 import { MountGripper } from './MountGripper'
 import { UnmountGripper } from './UnmountGripper'
-import { Results } from './Success'
+import { Success } from './Success'
 import { ExitConfirmation } from './ExitConfirmation'
 
 import type { GripperWizardFlowType } from './types'
@@ -39,13 +39,10 @@ export const GripperWizardFlows = (
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const totalStepCount = gripperWizardSteps.length - 1
   const currentStep = gripperWizardSteps?.[currentStepIndex]
+  const isFinalStep = currentStepIndex === gripperWizardSteps.length - 1
 
   const goBack = (): void => {
-    setCurrentStepIndex(
-      currentStepIndex !== gripperWizardSteps.length - 1
-        ? currentStepIndex - 1
-        : currentStepIndex
-    )
+    setCurrentStepIndex(isFinalStep ? currentStepIndex : currentStepIndex - 1)
   }
   const { chainRunCommands, isCommandMutationLoading } = useChainRunCommands(
     runId
@@ -61,7 +58,7 @@ export const GripperWizardFlows = (
   )
   const { stopRun, isLoading: isStopLoading } = useStopRunMutation({
     onSuccess: () => {
-      if (currentStep.section === SECTIONS.REMOVE_PIN) {
+      if (currentStep.section === SECTIONS.MOVE_PIN) {
         proceed()
       } else {
         closeFlow()
@@ -91,16 +88,17 @@ export const GripperWizardFlows = (
     }
   }
   const handleCleanUpAndClose = (): void => {
-    setIsExiting(true)
-    chainRunCommands([
-      {
-        commandType: 'home' as const,
-        params: {},
-      },
-    ]).then(() => {
-      setIsExiting(false)
-      if (runId !== '') stopRun(runId)
-    })
+    // setIsExiting(true)
+    // chainRunCommands([
+    //   {
+    //     commandType: 'home' as const,
+    //     params: {},
+    //   },
+    // ]).then(() => {
+    //   setIsExiting(false)
+    //   if (runId !== '') stopRun(runId)
+    // })
+    if (runId !== '') stopRun(runId)
   }
   const {
     confirm: confirmExit,
@@ -180,7 +178,7 @@ export const GripperWizardFlows = (
   } else if (currentStep.section === SECTIONS.SUCCESS) {
     onExit = confirmExit
     modalContent = modalContent = (
-      <Results {...currentStep} {...sharedProps} proceed={closeFlow} />
+      <Success {...currentStep} {...sharedProps} proceed={isFinalStep ? closeFlow : proceed} />
     )
   }
 

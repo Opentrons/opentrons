@@ -56,16 +56,17 @@ export const BeforeBeginning = (
 
   if (attachedGripper == null) return null
   const handleOnClick = (): void => {
-    setIsBetweenCommands(true)
-    chainRunCommands([
-      {
-        commandType: 'home' as const,
-        params: {},
-      },
-    ]).then(() => {
-      setIsBetweenCommands(false)
-      proceed()
-    })
+    // setIsBetweenCommands(true)
+    // chainRunCommands([
+    //   {
+    //     commandType: 'home' as const,
+    //     params: {},
+    //   },
+    // ]).then(() => {
+    //   setIsBetweenCommands(false)
+    //   proceed()
+    // })
+    proceed()
   }
 
   const equipmentInfoByLoadName: { [loadName: string]: { displayName: string, subtitle?: string } } = {

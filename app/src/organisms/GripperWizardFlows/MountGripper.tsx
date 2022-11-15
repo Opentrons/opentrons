@@ -17,7 +17,7 @@ export const MountGripper = (props: GripperWizardStepProps): JSX.Element | null 
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
   if (attachedGripper == null) return null
   const handleOnClick = (): void => {
-    setIsBetweenCommands(true)
+    // setIsBetweenCommands(true)
     // chainRunCommands([
     //  // TODO: move gantry to mount/unmount location here 
     // ]).then(() => {
