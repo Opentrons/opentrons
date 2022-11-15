@@ -1,6 +1,6 @@
 {
   "$otSharedSchema": "#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json",
-  "T50": {
+  "t50": {
     "defaultAspirateFlowRate": 8,
     "defaultDispenseFlowRate": 8,
     "defaultBlowOutFlowRate": 4,

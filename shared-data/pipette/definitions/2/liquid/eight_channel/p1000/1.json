@@ -1,6 +1,6 @@
 {
   "$otSharedSchema": "#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json",
-  "T50": {
+  "t50": {
     "defaultAspirateFlowRate": 6,
     "defaultDispenseFlowRate": 6,
     "defaultBlowOutFlowRate": 80,
@@ -97,7 +97,7 @@
       ]
     }
   },
-  "T200": {
+  "t200": {
     "defaultAspirateFlowRate": 80,
     "defaultDispenseFlowRate": 80,
     "defaultBlowOutFlowRate": 80,
@@ -192,7 +192,7 @@
       ]
     }
   },
-  "T1000": {
+  "t1000": {
     "defaultAspirateFlowRate": 160,
     "defaultDispenseFlowRate": 160,
     "defaultBlowOutFlowRate": 80,
