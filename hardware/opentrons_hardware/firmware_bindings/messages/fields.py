@@ -15,6 +15,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     SensorOutputBinding,
     SensorThresholdMode,
     PipetteTipActionType,
+    MotorPositionFlags,
 )
 
 
@@ -220,3 +221,14 @@ class PipetteTipActionTypeField(utils.UInt8Field):
         except ValueError:
             action_type = str(self.value)
         return f"{self.__class__.__name__}(value={action_type})"
+
+class MotorPositionFlagsField(utils.UInt8Field):
+    """Bitflags to indicate the validity of a motor position."""
+
+    def __repr__(self) -> str:
+        """Print the MotorPositionFlags"""
+        
+        flags_list = [
+            flag.name for flag in MotorPositionFlags if bool(self.value & flag.value)
+        ]
+        return f"{self.__class__.__name__}(value={','.join(flags_list)})"

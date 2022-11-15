@@ -20,6 +20,7 @@ from .fields import (
     SerialDataCodeField,
     SensorThresholdModeField,
     PipetteTipActionTypeField,
+    MotorPositionFlagsField,
 )
 from .. import utils
 
@@ -149,6 +150,7 @@ class MoveCompletedPayload(MoveGroupResponsePayload):
     seq_id: utils.UInt8Field
     current_position_um: utils.UInt32Field
     encoder_position_um: utils.Int32Field
+    position_flags: MotorPositionFlagsField
     ack_id: utils.UInt8Field
 
 
