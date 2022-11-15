@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import {
   getLabwareDisplayName,
+  getLoadedLabwareDefinitionsByUri,
   getModuleDisplayName,
   RunTimeCommand,
 } from '@opentrons/shared-data'
@@ -21,8 +22,6 @@ import {
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../redux/config'
 import { ModalHeader, ModalShell } from '../../../../molecules/Modal'
 import { OffsetVector } from '../../../../molecules/OffsetVector'
-import { getLoadedLabwareDefinitionsByUri } from '../../../../resources/protocols/utils'
-
 import type { LabwareOffset } from '@opentrons/api-client'
 import { PrimaryButton } from '../../../../atoms/buttons'
 
@@ -102,22 +101,28 @@ export function CurrentOffsetsModal(
             </tr>
           </thead>
           <tbody>
-            {currentOffsets.map(offset => (
-              <OffsetTableRow key={offset.id}>
-                <OffsetTableDatum>
-                  {t('slot', { slotName: offset.location.slotName })}
-                  {offset.location.moduleModel != null
-                    ? ` - ${getModuleDisplayName(offset.location.moduleModel)}`
-                    : null}
-                </OffsetTableDatum>
-                <OffsetTableDatum>
-                  {getLabwareDisplayName(defsByURI[offset.definitionUri])}
-                </OffsetTableDatum>
-                <OffsetTableDatum>
-                  <OffsetVector {...offset.vector} />
-                </OffsetTableDatum>
-              </OffsetTableRow>
-            ))}
+            {currentOffsets.map(offset => {
+              const labwareDisplayName =
+                offset.definitionUri in defsByURI
+                  ? getLabwareDisplayName(defsByURI[offset.definitionUri])
+                  : offset.definitionUri
+              return (
+                <OffsetTableRow key={offset.id}>
+                  <OffsetTableDatum>
+                    {t('slot', { slotName: offset.location.slotName })}
+                    {offset.location.moduleModel != null
+                      ? ` - ${getModuleDisplayName(
+                          offset.location.moduleModel
+                        )}`
+                      : null}
+                  </OffsetTableDatum>
+                  <OffsetTableDatum>{labwareDisplayName}</OffsetTableDatum>
+                  <OffsetTableDatum>
+                    <OffsetVector {...offset.vector} />
+                  </OffsetTableDatum>
+                </OffsetTableRow>
+              )
+            })}
           </tbody>
         </OffsetTable>
         <Flex

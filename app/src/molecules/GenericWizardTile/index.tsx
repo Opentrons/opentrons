@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { css } from 'styled-components'
+import capitalize from 'lodash/capitalize'
 import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
@@ -97,7 +98,7 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
         {getHelp != null ? <NeedHelpLink href={getHelp} /> : null}
         {proceed != null ? (
           <PrimaryButton disabled={proceedIsDisabled} onClick={proceed}>
-            {proceedButtonText}
+            {capitalize(proceedButtonText)}
           </PrimaryButton>
         ) : null}
       </Flex>

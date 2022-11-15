@@ -437,13 +437,13 @@ class OT3API(
         """Set up pipette based on scanned information."""
         config = instrument_data.get("config")
         pip_id = instrument_data.get("id")
-        pip_offset_cal = load_pipette_offset(pip_id, mount.to_mount())  # type: ignore[arg-type]
+        pip_offset_cal = load_pipette_offset(pip_id, mount)
         p, may_skip = load_from_config_and_check_skip(
             config,
             self._pipette_handler.hardware_instruments[mount],
             req_instr,
             pip_id,
-            pip_offset_cal,  # type: ignore[arg-type]
+            pip_offset_cal,
         )
         self._pipette_handler.hardware_instruments[mount] = p
         if req_instr and p:
@@ -1381,6 +1381,26 @@ class OT3API(
             self._gripper_handler.reset_gripper()
         else:
             self._pipette_handler.reset_instrument(checked_mount)
+
+    async def reset_instrument_offset(
+        self, mount: Union[top_types.Mount, OT3Mount], to_default: bool = True
+    ) -> None:
+        """Reset the given instrument to system offsets."""
+        checked_mount = OT3Mount.from_mount(mount)
+        if checked_mount == OT3Mount.GRIPPER:
+            self._gripper_handler.reset_instrument_offset(to_default)
+        else:
+            self._pipette_handler.reset_instrument_offset(checked_mount, to_default)
+
+    async def save_instrument_offset(
+        self, mount: Union[top_types.Mount, OT3Mount], delta: top_types.Point
+    ) -> None:
+        """Save a new offset for a given instrument."""
+        checked_mount = OT3Mount.from_mount(mount)
+        if checked_mount == OT3Mount.GRIPPER:
+            self._gripper_handler.save_instrument_offset(delta)
+        else:
+            self._pipette_handler.save_instrument_offset(checked_mount, delta)
 
     def get_attached_pipette(
         self, mount: Union[top_types.Mount, OT3Mount]

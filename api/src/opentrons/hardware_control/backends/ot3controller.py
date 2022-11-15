@@ -292,10 +292,16 @@ class OT3Controller:
             )
             move_group_gantry_z.append(z_move)
         if distances_gantry and velocities_gantry:
-            gantry_move = self._filter_move_group(
-                create_home_group(distances_gantry, velocities_gantry)
-            )
-            move_group_gantry_z.append(gantry_move)
+            # home X axis before Y axis, to avoid collision with thermo-cycler lid
+            # that could be in the back-left corner
+            for ax in [OT3Axis.X, OT3Axis.Y]:
+                if ax in axes:
+                    gantry_move = self._filter_move_group(
+                        create_home_group(
+                            {ax: distances_gantry[ax]}, {ax: velocities_gantry[ax]}
+                        )
+                    )
+                    move_group_gantry_z.append(gantry_move)
         if move_group_gantry_z:
             return MoveGroupRunner(move_groups=move_group_gantry_z)
         return None
