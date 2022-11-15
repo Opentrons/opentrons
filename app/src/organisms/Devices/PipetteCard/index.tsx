@@ -50,12 +50,18 @@ import { AboutPipetteSlideout } from './AboutPipetteSlideout'
 import type { AttachedPipette, Mount } from '../../../redux/pipettes/types'
 import {
   isOT3Pipette,
+  NINETY_SIX_CHANNEL,
   PipetteModelSpecs,
   PipetteMount,
   PipetteName,
+  SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 import type { Dispatch, State } from '../../../redux/types'
-import type { PipetteWizardFlow } from '../../PipetteWizardFlows/types'
+import type {
+  PipetteWizardFlow,
+  SelectablePipettes,
+} from '../../PipetteWizardFlows/types'
+import { ChoosePipette } from '../../PipetteWizardFlows/ChoosePipette'
 
 interface PipetteCardProps {
   pipetteInfo: PipetteModelSpecs | null
@@ -91,6 +97,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     pipetteWizardFlow,
     setPipetteWizardFlow,
   ] = React.useState<PipetteWizardFlow | null>(null)
+  const [showAttachPipette, setShowAttachPipette] = React.useState(false)
   const [showAboutSlideout, setShowAboutSlideout] = React.useState(false)
   const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
   const configHasCalibrationBlock = useSelector(getHasCalibrationBlock)
@@ -152,7 +159,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     if (isOT3PipetteAttached && isOt3) {
       setPipetteWizardFlow(FLOWS.DETACH)
     } else if (!isOT3PipetteAttached && isOt3) {
-      setPipetteWizardFlow(FLOWS.ATTACH)
+      setShowAttachPipette(true)
     } else {
       setChangePipette(true)
     }
@@ -169,6 +176,14 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     setShowSlideout(true)
   }
 
+  const handleAttachPipette = (selectedPipette: SelectablePipettes): void => {
+    if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
+      setShowAttachPipette(false)
+      setPipetteWizardFlow(FLOWS.ATTACH)
+    } else if (selectedPipette === NINETY_SIX_CHANNEL) {
+      console.log('we still have to wire up the 96 channel attach flow!')
+    }
+  }
   return (
     <Flex
       backgroundColor={COLORS.fundamentalsBackground}
@@ -176,6 +191,12 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       width="100%"
       data-testid={`PipetteCard_${pipetteDisplayName}`}
     >
+      {showAttachPipette ? (
+        <ChoosePipette
+          proceed={handleAttachPipette}
+          exit={() => setShowAttachPipette(false)}
+        />
+      ) : null}
       {pipetteWizardFlow != null ? (
         <PipetteWizardFlows
           flowType={pipetteWizardFlow}
