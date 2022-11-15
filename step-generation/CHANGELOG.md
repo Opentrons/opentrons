@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.2.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.3...v6.2.0-alpha.4) (2022-11-15)
+
+
+### Bug Fixes
+
+* **protocol-designer:** aspirate after dispense in transfer now counts as air gap ([#11742](https://github.com/Opentrons/opentrons/issues/11742)) ([d5854e1](https://github.com/Opentrons/opentrons/commit/d5854e14f458be04007682da9b49ba16a4360e30))
+
+
+
+
+
 # [6.2.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.2...v6.2.0-alpha.3) (2022-11-10)
 
 **Note:** Version bump only for package @opentrons/step-generation

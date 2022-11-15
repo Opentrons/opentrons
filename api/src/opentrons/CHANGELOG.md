@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.2.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.3...v6.2.0-alpha.4) (2022-11-15)
+
+
+### Bug Fixes
+
+* **api:** allow loadLiquid command to no-op when liquid FF is off ([#11741](https://github.com/Opentrons/opentrons/issues/11741)) ([7d440e9](https://github.com/Opentrons/opentrons/commit/7d440e9192eb5bde1922b36a26ca9ed00aac6737))
+
+
+
+
+
 # [6.2.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.2...v6.2.0-alpha.3) (2022-11-10)
 
 

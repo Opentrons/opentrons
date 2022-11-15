@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.2.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.3...v6.2.0-alpha.4) (2022-11-15)
+
+
+### Features
+
+* **protocol-designer:** add Thermocycler GEN2 to announcement modal ([#11731](https://github.com/Opentrons/opentrons/issues/11731)) ([f696e81](https://github.com/Opentrons/opentrons/commit/f696e81248c84bd6a9447658514a0a0cb2b411b0))
+
+
+
+
+
 # [6.2.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.2...v6.2.0-alpha.3) (2022-11-10)
 
 
