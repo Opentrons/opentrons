@@ -57,6 +57,12 @@ class Capacitance_Threshold_Test:
             speed_mm_per_s=1,
             sensor_threshold_pf=1.0,
         )
+        self.PROBE_SETTINGS_XY_AXIS = CapacitivePassSettings(
+            prep_distance_mm=self.CUTOUT_HALF,
+            max_overrun_distance_mm=5,
+            speed_mm_per_s=1,
+            sensor_threshold_pf=1.0,
+        )
         self.test_data ={
             "Time":None,
             "Cycle":None,
@@ -129,8 +135,12 @@ class Capacitance_Threshold_Test:
     async def _probe_axis(
         self, axis: OT3Axis, target: float
     ) -> float:
+        if axis == OT3Axis.by_mount(self.mount):
+            settings = self.PROBE_SETTINGS_Z_AXIS
+        else:
+            settings = self.PROBE_SETTINGS_XY_AXIS
         point = await self.api.capacitive_probe(
-            self.mount, axis, target, self.PROBE_SETTINGS_Z_AXIS
+            self.mount, axis, target, settings
         )
         return point
 
