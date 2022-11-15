@@ -15,9 +15,6 @@ def run(ctx: ProtocolContext) -> None:
     reservoir = ctx.load_labware("nest_12_reservoir_15ml", "8")
     pipette = ctx.load_instrument("p1000_multi_gen3", "left", tip_racks=[tiprack_1000])
 
-    pipette.flow_rate.aspirate = 80
-    pipette.flow_rate.dispense = 80
-
     dispense_volume = TEST_VOLUME / TEST_VOLUME_DIVIDER
     assert 200 <= dispense_volume <= 250, f"dispense volume ({dispense_volume}) must be between 200-250 uL"
 

@@ -15,9 +15,6 @@ def run(ctx: ProtocolContext) -> None:
     reservoir = ctx.load_labware("nest_12_reservoir_15ml", "8")
     pipette = ctx.load_instrument("p1000_single_gen3", "left", tip_racks=[tiprack_200])
 
-    pipette.flow_rate.aspirate = 80
-    pipette.flow_rate.dispense = 80
-
     wells = [plate[f"{row}{COLUMN}"] for row in "ABCDEFGH"]
     for well in wells:
         pipette.pick_up_tip()

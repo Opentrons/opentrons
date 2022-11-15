@@ -18,9 +18,6 @@ def run(ctx: ProtocolContext) -> None:
     pipette = ctx.load_instrument("p50_single_gen3", "right", tip_racks=[tiprack_50])
     multi = ctx.load_instrument("p1000_multi_gen3", "left", tip_racks=[tiprack_200])
 
-    pipette.flow_rate.aspirate = 80
-    pipette.flow_rate.dispense = 80
-
     # DILUENT
     multi.pick_up_tip()
     multi.aspirate(200 - TEST_VOLUME, reservoir[RESERVOIR_DILUENT_WELL].bottom(2))
