@@ -43,6 +43,9 @@ def filter_func(arb: ArbitrationId) -> bool:
         (0xFFFF, b"\xff" * 16),
     ],
 )
+
+# TODO: (2022-11-15 AA) Enable this test when the gripper EEPROM rework is complete
+"""
 @pytest.mark.requires_emulator
 @pytest.mark.can_filter_func.with_args(filter_func)
 async def test_set_serial_gripper(
@@ -64,6 +67,26 @@ async def test_set_serial_gripper(
     assert isinstance(response, GripperInfoResponse)
     assert response.payload.model.value == model
     assert response.payload.serial.value[: len(datecode)] == datecode
+"""
+
+
+# TODO: (2022-11-15 AA) This tests the temporary serial number for the gripper
+async def test_temp_serial_gripper(
+    can_messenger: CanMessenger,
+    can_messenger_queue: WaitableCallback,
+) -> None:
+    """It should write a serial number and read it back."""
+    node_id = NodeId.gripper
+    temp_model = 1
+    temp_serial = b"20221115A01"
+
+    await can_messenger.send(node_id=node_id, message=InstrumentInfoRequest())
+    response, arbitration_id = await asyncio.wait_for(can_messenger_queue.read(), 1)
+
+    assert arbitration_id.parts.originating_node_id == node_id
+    assert isinstance(response, GripperInfoResponse)
+    assert response.payload.model.value == temp_model
+    assert response.payload.serial.value[: len(temp_serial)] == temp_serial
 
 
 @pytest.mark.parametrize(
