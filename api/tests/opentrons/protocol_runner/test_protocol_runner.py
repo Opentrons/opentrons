@@ -219,7 +219,7 @@ async def test_run(
     )
 
 
-def test_load_json_liquids_ff_off(
+def test_load_json(
     decoy: Decoy,
     json_file_reader: JsonFileReader,
     json_translator: JsonTranslator,
