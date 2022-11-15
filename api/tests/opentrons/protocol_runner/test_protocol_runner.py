@@ -16,7 +16,6 @@ from opentrons_shared_data.protocol.models.protocol_schema_v6 import ProtocolSch
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons.protocol_api_experimental import ProtocolContext
 from opentrons.protocol_engine import ProtocolEngine, Liquid, commands as pe_commands
-from opentrons.protocol_engine.errors.exceptions import CommandDoesNotExistError
 from opentrons.protocol_reader import (
     ProtocolSource,
     JsonProtocolConfig,
@@ -226,7 +225,6 @@ def test_load_json(
     protocol_engine: ProtocolEngine,
     task_queue: TaskQueue,
     subject: ProtocolRunner,
-    enable_load_liquid: None,
 ) -> None:
     """It should load a JSON protocol file."""
     json_protocol_source = ProtocolSource(
@@ -265,9 +263,6 @@ def test_load_json(
     subject.load(json_protocol_source)
 
     decoy.verify(
-        protocol_engine.add_liquid(
-            liquid=Liquid(id="water-id", displayName="water", description=" water desc")
-        ),
         protocol_engine.add_command(
             request=pe_commands.WaitForResumeCreate(
                 params=pe_commands.WaitForResumeParams(message="hello")
@@ -289,16 +284,16 @@ def test_load_json(
     )
 
 
-# TODO (tz, 10-12-22): remove this test when liquids ff is removed
-def test_load_json_raises_error_when_ff_disabled(
+def test_load_json_liquids_ff_on(
     decoy: Decoy,
     json_file_reader: JsonFileReader,
     json_translator: JsonTranslator,
     protocol_engine: ProtocolEngine,
     task_queue: TaskQueue,
     subject: ProtocolRunner,
+    enable_load_liquid: None,
 ) -> None:
-    """It should raise an error when loading a JSON protocol file with loadLiquid command and liquids ff is off."""
+    """It should load a JSON protocol file."""
     json_protocol_source = ProtocolSource(
         directory=Path("/dev/null"),
         main_file=Path("/dev/null/abc.json"),
@@ -311,12 +306,6 @@ def test_load_json_raises_error_when_ff_disabled(
     json_protocol = ProtocolSchemaV6.construct()  # type: ignore[call-arg]
 
     commands: List[pe_commands.CommandCreate] = [
-        pe_commands.WaitForResumeCreate(
-            params=pe_commands.WaitForResumeParams(message="hello")
-        ),
-        pe_commands.WaitForResumeCreate(
-            params=pe_commands.WaitForResumeParams(message="goodbye")
-        ),
         pe_commands.LoadLiquidCreate(
             params=pe_commands.LoadLiquidParams(
                 liquidId="water-id", labwareId="labware-id", volumeByWell={"A1": 30}
@@ -332,8 +321,21 @@ def test_load_json_raises_error_when_ff_disabled(
     decoy.when(json_translator.translate_commands(json_protocol)).then_return(commands)
     decoy.when(json_translator.translate_liquids(json_protocol)).then_return(liquids)
 
-    with pytest.raises(CommandDoesNotExistError):
-        subject.load(json_protocol_source)
+    subject.load(json_protocol_source)
+
+    decoy.verify(
+        protocol_engine.add_liquid(
+            liquid=Liquid(id="water-id", displayName="water", description=" water desc")
+        ),
+        protocol_engine.add_command(
+            request=pe_commands.LoadLiquidCreate(
+                params=pe_commands.LoadLiquidParams(
+                    liquidId="water-id", labwareId="labware-id", volumeByWell={"A1": 30}
+                )
+            ),
+        ),
+        task_queue.set_run_func(func=protocol_engine.wait_until_complete),
+    )
 
 
 def test_load_python(

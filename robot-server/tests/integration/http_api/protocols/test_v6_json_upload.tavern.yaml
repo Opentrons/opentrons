@@ -1,9 +1,9 @@
-test_name: Upload, analyze, delete basic_transfer_standalone protocol.
+test_name: Upload and analyze a JSONv6 protocol
 
 marks:
   - usefixtures:
       - run_server
-      - set_enable_load_liquid
+
 stages:
   - name: Upload simple v6 protocol
     request:
@@ -27,8 +27,8 @@ stages:
             - id: !anystr
               status: pending
   - name: Retry until analyses status is completed.
-    max_retries: 20
-    delay_after: 2
+    max_retries: 10
+    delay_after: 0.1
     request:
       url: '{host:s}:{port:d}/protocols'
       method: GET
@@ -519,6 +519,68 @@ stages:
                     z: !anyfloat
                 startedAt: !anystr
                 completedAt: !anystr
+            errors: []
+            liquids: []
+
+---
+test_name: Upload and analyze a JSONv6 protocol, with liquids
+
+marks:
+  - usefixtures:
+      - run_server
+      - set_enable_load_liquid
+
+stages:
+  - name: Upload simple v6 protocol
+    request:
+      url: '{host:s}:{port:d}/protocols'
+      method: POST
+      files:
+        files: '../shared-data/protocol/fixtures/6/simpleV6.json'
+    response:
+      strict:
+        - json:off
+      save:
+        json:
+          protocol_id: data.id
+          analysis_id: data.analysisSummaries[0].id
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          protocolType: json
+          analysisSummaries:
+            - id: !anystr
+              status: pending
+  - name: Retry until analyses status is completed.
+    max_retries: 10
+    delay_after: 0.1
+    request:
+      url: '{host:s}:{port:d}/protocols'
+      method: GET
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          - id: '{protocol_id}'
+            analysisSummaries:
+              - id: '{analysis_id}'
+                status: completed
+  - name: Get protocol analysis by ID
+    request:
+      url: '{host:s}:{port:d}/protocols/{protocol_id}/analyses'
+      method: GET
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          - id: '{analysis_id}'
+            status: completed
+            result: ok
             errors: []
             liquids:
               - id: waterId
