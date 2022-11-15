@@ -10,7 +10,7 @@ import {
 import { InProgressModal } from '../../../molecules/InProgressModal/InProgressModal'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { FLOWS } from '../constants'
-import { DetachProbe } from '../DetachProbe'
+import { DetachPipette } from '../DetachPipette'
 import type { AttachedPipette } from '../../../redux/pipettes/types'
 
 jest.mock('../../../molecules/InProgressModal/InProgressModal')
@@ -18,8 +18,8 @@ jest.mock('../../../molecules/InProgressModal/InProgressModal')
 const mockInProgressModal = InProgressModal as jest.MockedFunction<
   typeof InProgressModal
 >
-const render = (props: React.ComponentProps<typeof DetachProbe>) => {
-  return renderWithProviders(<DetachProbe {...props} />, {
+const render = (props: React.ComponentProps<typeof DetachPipette>) => {
+  return renderWithProviders(<DetachPipette {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
@@ -27,8 +27,8 @@ const mockPipette: AttachedPipette = {
   ...mockAttachedPipette,
   modelSpecs: mockGen3P1000PipetteSpecs,
 }
-describe('DetachProbe', () => {
-  let props: React.ComponentProps<typeof DetachProbe>
+describe('DetachPipette', () => {
+  let props: React.ComponentProps<typeof DetachPipette>
   beforeEach(() => {
     props = {
       mount: LEFT,
@@ -38,7 +38,6 @@ describe('DetachProbe', () => {
       runId: RUN_ID_1,
       attachedPipette: { left: mockPipette, right: null },
       flowType: FLOWS.CALIBRATE,
-      handleCleanUp: jest.fn(),
       errorMessage: null,
       setShowErrorMessage: jest.fn(),
       isRobotMoving: false,
@@ -47,14 +46,14 @@ describe('DetachProbe', () => {
   })
   it('returns the correct information, buttons work as expected', () => {
     const { getByText, getByAltText, getByRole } = render(props)
-    getByText('Remove Calibration Probe')
+    getByText('Loosen Screws and Detach')
     getByText(
-      'Unlatch the calibration probe, remove it from the pipette nozzle, and return it to its storage location.'
+      'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette'
     )
-    getByAltText('Remove probe')
-    const proceedBtn = getByRole('button', { name: 'Complete calibration' })
+    getByAltText('Detach pipette')
+    const proceedBtn = getByRole('button', { name: 'Continue' })
     fireEvent.click(proceedBtn)
-    expect(props.handleCleanUp).toHaveBeenCalled()
+    expect(props.proceed).toHaveBeenCalled()
     const backBtn = getByRole('button', { name: 'Go back' })
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()

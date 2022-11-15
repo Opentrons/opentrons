@@ -49,7 +49,8 @@ describe('BeforeBeginning', () => {
       attachedPipette: { left: mockPipette, right: null },
       flowType: FLOWS.CALIBRATE,
       createRun: jest.fn(),
-      setIsBetweenCommands: jest.fn(),
+      errorMessage: null,
+      setShowErrorMessage: jest.fn(),
       isCreateLoading: false,
       isRobotMoving: false,
     }
@@ -70,27 +71,28 @@ describe('BeforeBeginning', () => {
     getByAltText('Calibration Probe')
     const proceedBtn = getByRole('button', { name: 'Get started' })
     fireEvent.click(proceedBtn)
-    expect(props.setIsBetweenCommands).toHaveBeenCalled()
-    expect(props.chainRunCommands).toHaveBeenCalledWith([
-      {
-        commandType: 'home',
-        params: {},
-      },
-      {
-        commandType: 'loadPipette',
-        params: {
-          mount: LEFT,
-          pipetteId: 'abc',
-          pipetteName: 'p1000_single_gen3',
+    expect(props.chainRunCommands).toHaveBeenCalledWith(
+      [
+        {
+          commandType: 'home',
+          params: {},
         },
-      },
-      {
-        commandType: 'calibration/moveToLocation',
-        params: { pipetteId: 'abc', location: 'attachOrDetach' },
-      },
-    ])
+        {
+          commandType: 'loadPipette',
+          params: {
+            mount: LEFT,
+            pipetteId: 'abc',
+            pipetteName: 'p1000_single_gen3',
+          },
+        },
+        {
+          commandType: 'calibration/moveToLocation',
+          params: { pipetteId: 'abc', location: 'attachOrDetach' },
+        },
+      ],
+      false
+    )
     await waitFor(() => {
-      expect(props.setIsBetweenCommands).toHaveBeenCalled()
       expect(props.proceed).toHaveBeenCalled()
     })
   })
@@ -111,5 +113,15 @@ describe('BeforeBeginning', () => {
     const { getByRole } = render(props)
     const proceedBtn = getByRole('button', { name: 'Get started' })
     expect(proceedBtn).toBeDisabled()
+  })
+
+  it('renders the error modal screen when errorMessage is true', () => {
+    props = {
+      ...props,
+      errorMessage: 'error shmerror',
+    }
+    const { getByText } = render(props)
+    getByText('Error encountered')
+    getByText('error shmerror')
   })
 })
