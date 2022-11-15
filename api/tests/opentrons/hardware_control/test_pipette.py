@@ -179,7 +179,7 @@ def test_reset_instrument_offset():
         pipette_config.load("p10_single_v1"), temporary_calibration, "testID"
     )
     assert pip.pipette_offset.offset == Point(1, 1, 1)
-    pip.reset_pipette_offset(Mount.LEFT)
+    pip.reset_pipette_offset(Mount.LEFT, to_default=True)
     assert pip.pipette_offset.offset == Point(0, 0, 0)
 
 

@@ -443,7 +443,7 @@ class OT3API(
             self._pipette_handler.hardware_instruments[mount],
             req_instr,
             pip_id,
-            pip_offset_cal,  # type: ignore[arg-type]
+            pip_offset_cal,
         )
         self._pipette_handler.hardware_instruments[mount] = p
         if req_instr and p:
