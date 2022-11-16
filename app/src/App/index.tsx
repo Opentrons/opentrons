@@ -146,9 +146,9 @@ export const AppComponent = (): JSX.Element => {
         onDragOver={stopEvent}
         onDrop={stopEvent}
       >
+        <TopPortalRoot />
         {isOnDevice ? (
           <>
-            <TopPortalRoot />
             <Box width="100%">
               <Switch>
                 {routes.map(({ Component, exact, path }: RouteProps) => {
@@ -174,7 +174,6 @@ export const AppComponent = (): JSX.Element => {
           </>
         ) : (
           <>
-            <TopPortalRoot />
             <Navbar routes={routes} />
             <Box width="100%">
               <Switch>
