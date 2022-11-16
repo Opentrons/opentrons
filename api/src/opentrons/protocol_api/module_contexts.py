@@ -10,6 +10,8 @@ from opentrons.hardware_control import SynchronousAdapter, modules
 from opentrons.hardware_control.modules import ModuleModel
 from opentrons.commands import module_commands as cmds
 from opentrons.commands.publisher import CommandPublisher, publish
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import requires_version
 
 from opentrons.protocols.geometry.module_geometry import (
     ModuleGeometry,
@@ -26,13 +28,12 @@ from .core.common import (
     HeaterShakerCore,
 )
 
-from . import validation
 from .module_validation_and_errors import (
     validate_heater_shaker_temperature,
     validate_heater_shaker_speed,
 )
 from .labware import Labware
-from .versioning import APIVersion, HasAPIVersion, requires_version
+from . import validation
 
 
 ENGAGE_HEIGHT_UNIT_CNV = 2
@@ -43,7 +44,7 @@ _log = logging.getLogger(__name__)
 GeometryType = TypeVar("GeometryType", bound=ModuleGeometry)
 
 
-class ModuleContext(CommandPublisher, HasAPIVersion, Generic[GeometryType]):
+class ModuleContext(CommandPublisher, Generic[GeometryType]):
     """A connected module in the protocol.
 
     .. versionadded:: 2.0

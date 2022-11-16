@@ -32,7 +32,7 @@ from opentrons.hardware_control import (
 from opentrons.hardware_control.types import MachineType
 
 from opentrons.hardware_control.simulator_setup import load_simulator
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION, APIVersion
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocols.duration import DurationEstimator
 from opentrons.protocols.execution import execute
 import opentrons.broker
@@ -42,6 +42,7 @@ from opentrons.commands import types as command_types
 
 from opentrons.protocols import parse, bundle
 from opentrons.protocols.types import PythonProtocol, BundleContents
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from .util.entrypoint_util import labware_from_paths, datafiles_from_paths

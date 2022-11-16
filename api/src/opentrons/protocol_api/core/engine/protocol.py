@@ -14,6 +14,7 @@ from opentrons.hardware_control.modules.types import (
 )
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
 
@@ -25,7 +26,6 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 
-from ...versioning import APIVersion
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 from .labware import LabwareCore

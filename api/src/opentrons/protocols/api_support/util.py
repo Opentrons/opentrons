@@ -1,14 +1,26 @@
 """ Utility functions and classes for the protocol api """
 from __future__ import annotations
 
-import logging
 from collections import UserDict
+import functools
+import logging
 from dataclasses import dataclass, field, astuple
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    List,
+    Optional,
+    TypeVar,
+    Union,
+    cast,
+)
 
 from opentrons import types as top_types
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control.types import Axis
-from opentrons.protocol_api.versioning import APIVersion
+
 
 if TYPE_CHECKING:
     from opentrons.protocol_api.core.instrument import AbstractInstrument
@@ -16,6 +28,18 @@ if TYPE_CHECKING:
     from opentrons.protocols.geometry.deck import Deck
 
 MODULE_LOG = logging.getLogger(__name__)
+
+
+class APIVersionError(Exception):
+    """
+    Error raised when a protocol attempts to access behavior not implemented
+    """
+
+    pass
+
+
+class UnsupportedAPIError(Exception):
+    """Error raised when a protocol attempts to use unsupported API."""
 
 
 def _assert_gzero(val: Any, message: str) -> float:
@@ -77,8 +101,8 @@ def build_edges(
     offset: float,
     mount: top_types.Mount,
     deck: "Deck",
-    radius: float,
-    version: APIVersion,
+    radius: float = 1.0,
+    version: APIVersion = APIVersion(2, 7),
 ) -> List[top_types.Point]:
     # Determine the touch_tip edges/points
     offset_pt = top_types.Point(0, 0, offset)
@@ -302,6 +326,50 @@ def clamp_value(
         MODULE_LOG.info(f"{log_tag} clamped input {input_value} to {min_value}")
         return min_value
     return input_value
+
+
+FuncT = TypeVar("FuncT", bound=Callable[..., Any])
+
+
+def requires_version(major: int, minor: int) -> Callable[[FuncT], FuncT]:
+    """Decorator. Apply to Protocol API methods or attributes to indicate
+    the first version in which the method or attribute was present.
+    """
+
+    def _set_version(decorated_obj: FuncT) -> FuncT:
+        added_version = APIVersion(major, minor)
+        setattr(decorated_obj, "__opentrons_version_added", added_version)
+        if hasattr(decorated_obj, "__doc__"):
+            # Add the versionadded stanza to everything decorated if we can
+            docstr = decorated_obj.__doc__ or ""
+            # this newline and initial space has to be there for sphinx to
+            # parse this correctly and not add it into for instance a
+            # previous code-block
+            docstr += f"\n\n        .. versionadded:: {added_version}\n\n"
+            decorated_obj.__doc__ = docstr
+
+        @functools.wraps(decorated_obj)
+        def _check_version_wrapper(*args: Any, **kwargs: Any) -> Any:
+            slf = args[0]
+            added_in = decorated_obj.__opentrons_version_added  # type: ignore
+            current_version = slf._api_version
+
+            if APIVersion(2, 0) <= current_version < added_in:
+                # __qualname__ is *probably* set on every kind of object we care
+                # about, but the docs leave it ambiguous, so fall back to str().
+                name = getattr(decorated_obj, "__qualname__", str(decorated_obj))
+
+                raise APIVersionError(
+                    f"{name} was added in {added_in}, but your "
+                    f"protocol requested version {current_version}. You "
+                    f"must increase your API version to {added_in} to "
+                    "use this functionality."
+                )
+            return decorated_obj(*args, **kwargs)
+
+        return cast(FuncT, _check_version_wrapper)
+
+    return _set_version
 
 
 class ModifiedList(list):

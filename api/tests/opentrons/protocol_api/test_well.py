@@ -2,8 +2,8 @@
 import pytest
 from decoy import Decoy
 
-from opentrons.protocol_api import Labware, Well
-from opentrons.protocol_api.versioning import MAX_SUPPORTED_VERSION, APIVersion
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION, Labware, Well
 from opentrons.protocol_api.core.common import WellCore
 from opentrons.types import Point, Location
 

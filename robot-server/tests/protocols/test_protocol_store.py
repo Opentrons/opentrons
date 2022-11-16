@@ -3,7 +3,7 @@ import pytest
 from datetime import datetime, timezone
 from pathlib import Path
 
-from opentrons.protocol_api import APIVersion
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_reader import (
     ProtocolSource,
     ProtocolSourceFile,

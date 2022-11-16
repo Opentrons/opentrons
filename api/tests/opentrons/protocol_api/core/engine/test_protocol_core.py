@@ -47,7 +47,8 @@ from opentrons.protocol_api.core.engine.module_core import (
     ThermocyclerModuleCore,
     HeaterShakerModuleCore,
 )
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION, APIVersion
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocols.api_support.types import APIVersion
 
 
 @pytest.fixture
