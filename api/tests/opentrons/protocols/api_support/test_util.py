@@ -67,7 +67,14 @@ def test_build_edges():
         test_lw["A1"].from_center_cartesian(x=0, y=1.0, z=1) + off,
         test_lw["A1"].from_center_cartesian(x=0, y=-1.0, z=1) + off,
     ]
-    res = build_edges(test_lw["A1"], 1.0, Mount.RIGHT, deck, version=APIVersion(2, 2))
+    res = build_edges(
+        where=test_lw["A1"],
+        offset=1.0,
+        mount=Mount.RIGHT,
+        deck=deck,
+        radius=1.0,
+        version=APIVersion(2, 2),
+    )
     assert res == old_correct_edges
 
     new_correct_edges = [
@@ -77,7 +84,14 @@ def test_build_edges():
         test_lw["A1"].from_center_cartesian(x=0, y=1.0, z=1) + off,
         test_lw["A1"].from_center_cartesian(x=0, y=-1.0, z=1) + off,
     ]
-    res2 = build_edges(test_lw["A1"], 1.0, Mount.RIGHT, deck, version=APIVersion(2, 4))
+    res2 = build_edges(
+        where=test_lw["A1"],
+        offset=1.0,
+        mount=Mount.RIGHT,
+        deck=deck,
+        radius=1.0,
+        version=APIVersion(2, 4),
+    )
     assert res2 == new_correct_edges
 
 
@@ -95,10 +109,11 @@ def test_build_edges_left_pipette(ctx):
     ]
     # Test that module in slot 3 results in modified edge list
     res = build_edges(
-        test_lw["A12"],
-        1.0,
-        Mount.LEFT,
-        ctx._implementation.get_deck(),
+        where=test_lw["A12"],
+        offset=1.0,
+        mount=Mount.LEFT,
+        deck=ctx._implementation.get_deck(),
+        radius=1.0,
         version=APIVersion(2, 4),
     )
     assert res == left_pip_edges
@@ -111,10 +126,11 @@ def test_build_edges_left_pipette(ctx):
     ]
     # Test that labware in slot 6 results in modified edge list
     res2 = build_edges(
-        test_lw2["A12"],
-        1.0,
-        Mount.LEFT,
-        ctx._implementation.get_deck(),
+        where=test_lw2["A12"],
+        offset=1.0,
+        mount=Mount.LEFT,
+        deck=ctx._implementation.get_deck(),
+        radius=1.0,
         version=APIVersion(2, 4),
     )
     assert res2 == left_pip_edges
@@ -134,10 +150,11 @@ def test_build_edges_right_pipette(ctx):
     ]
     # Test that module in slot 1 results in modified edge list
     res = build_edges(
-        test_lw["A1"],
-        1.0,
-        Mount.RIGHT,
-        ctx._implementation._deck_layout,
+        where=test_lw["A1"],
+        offset=1.0,
+        mount=Mount.RIGHT,
+        deck=ctx._implementation._deck_layout,
+        radius=1.0,
         version=APIVersion(2, 4),
     )
     assert res == right_pip_edges
@@ -151,10 +168,11 @@ def test_build_edges_right_pipette(ctx):
     ]
     # Test that labware in slot 6 results in unmodified edge list
     res2 = build_edges(
-        test_lw2["A12"],
-        1.0,
-        Mount.RIGHT,
-        ctx._implementation.get_deck(),
+        where=test_lw2["A12"],
+        offset=1.0,
+        mount=Mount.RIGHT,
+        deck=ctx._implementation.get_deck(),
+        radius=1.0,
         version=APIVersion(2, 4),
     )
     assert res2 == right_pip_edges

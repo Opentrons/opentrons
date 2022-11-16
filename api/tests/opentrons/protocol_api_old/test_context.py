@@ -1113,13 +1113,6 @@ def test_api_version_checking(hardware):
 
 def test_api_per_call_checking(monkeypatch, hardware):
     ctx = papi.create_protocol_context(
-        api_version=papi.APIVersion(1, 9),
-        hardware_api=hardware,
-    )
-
-    assert ctx.deck  # 1.9 < 2.0, but api version 1 is excepted from checking
-
-    ctx = papi.create_protocol_context(
         api_version=papi.APIVersion(2, 1),
         hardware_api=hardware,
     )
