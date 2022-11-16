@@ -834,6 +834,9 @@ class OT3API(
         """
         if mount != self._last_moved_mount and self._last_moved_mount:
             await self.retract(self._last_moved_mount, 10)
+        if mount != OT3Mount.GRIPPER:
+            # TODO: check if we can avoid gripping during every retract
+            await self.grip(force_newtons=20)   # allows for safer gantry movement
         self._last_moved_mount = mount
 
     @ExecutionManagerProvider.wait_for_running
