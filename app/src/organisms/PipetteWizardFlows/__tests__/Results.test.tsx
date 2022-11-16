@@ -32,7 +32,8 @@ describe('Results', () => {
       isRobotMoving: false,
       runId: RUN_ID_1,
       attachedPipette: { left: mockPipette, right: null },
-      setIsBetweenCommands: jest.fn(),
+      errorMessage: null,
+      setShowErrorMessage: jest.fn(),
       flowType: FLOWS.CALIBRATE,
     }
   })

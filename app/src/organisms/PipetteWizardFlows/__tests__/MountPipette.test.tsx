@@ -33,7 +33,8 @@ describe('MountPipette', () => {
       runId: RUN_ID_1,
       attachedPipette: { left: mockPipette, right: null },
       flowType: FLOWS.ATTACH,
-      setIsBetweenCommands: jest.fn(),
+      errorMessage: null,
+      setShowErrorMessage: jest.fn(),
       isRobotMoving: false,
     }
   })
