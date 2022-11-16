@@ -13,7 +13,7 @@ from opentrons.hardware_control.dev_types import PipetteSpec
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.pipette.dev_types import PipetteModel
 
-defs = json.loads(load_shared_data("pipette/definitions/pipetteModelSpecs.json"))
+defs = json.loads(load_shared_data("pipette/definitions/1/pipetteModelSpecs.json"))
 
 
 def check_sequences_close(
