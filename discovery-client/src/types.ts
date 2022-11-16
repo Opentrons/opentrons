@@ -25,6 +25,7 @@ export type Capability =
   | 'balenaUpdate'
   | 'buildrootMigration'
   | 'buildrootUpdate'
+  | 'systemUpdate'
   | 'restart'
 
 export type CapabilityMap = {

@@ -34,7 +34,8 @@ describe('AttachProbe', () => {
       runId: RUN_ID_1,
       attachedPipette: { left: mockPipette, right: null },
       flowType: FLOWS.CALIBRATE,
-      setIsBetweenCommands: jest.fn(),
+      errorMessage: null,
+      setShowErrorMessage: jest.fn(),
       isRobotMoving: false,
       isExiting: false,
     }
@@ -48,23 +49,24 @@ describe('AttachProbe', () => {
     getByAltText('Attach probe')
     const proceedBtn = getByRole('button', { name: 'Initiate calibration' })
     fireEvent.click(proceedBtn)
-    expect(props.setIsBetweenCommands).toHaveBeenCalled()
-    expect(props.chainRunCommands).toHaveBeenCalledWith([
-      {
-        commandType: 'calibration/calibratePipette',
-        params: { mount: 'left' },
-      },
-      {
-        commandType: 'home',
-        params: { axes: ['leftZ'] },
-      },
-      {
-        commandType: 'calibration/moveToLocation',
-        params: { pipetteId: 'abc', location: 'attachOrDetach' },
-      },
-    ])
+    expect(props.chainRunCommands).toHaveBeenCalledWith(
+      [
+        {
+          commandType: 'calibration/calibratePipette',
+          params: { mount: 'left' },
+        },
+        {
+          commandType: 'home',
+          params: { axes: ['leftZ'] },
+        },
+        {
+          commandType: 'calibration/moveToLocation',
+          params: { pipetteId: 'abc', location: 'attachOrDetach' },
+        },
+      ],
+      false
+    )
     await waitFor(() => {
-      expect(props.setIsBetweenCommands).toHaveBeenCalled()
       expect(props.proceed).toHaveBeenCalled()
     })
 
@@ -84,5 +86,15 @@ describe('AttachProbe', () => {
       'The calibration probe will touch the sides of the calibration divot in slot 5 to determine its exact position'
     )
     getByAltText('Pipette is calibrating')
+  })
+
+  it('renders the error modal screen when errorMessage is true', () => {
+    props = {
+      ...props,
+      errorMessage: 'error shmerror',
+    }
+    const { getByText } = render(props)
+    getByText('Error encountered')
+    getByText('error shmerror')
   })
 })

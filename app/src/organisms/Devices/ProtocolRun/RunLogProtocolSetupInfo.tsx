@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
@@ -28,7 +29,14 @@ export const RunLogProtocolSetupInfo = ({
   const { t } = useTranslation('run_details')
   const { protocolData } = useProtocolDetailsForRun(runId)
   const protocolPipetteData = useRunPipetteInfoByMount(robotName, runId)
-
+  /**
+   * TODO(BC, 2022-11-11): we do not currently have the information that we need from the run commands
+   * in order to predictably create interpolated strings that describe equipment locations
+   * until there is a more reliable way to retrieve timeline specific loaded entity details
+   * we will render nothing in this component.
+   */
+  return null
+  /* eslint-disable */
   if (protocolData == null) return null
   if (setupCommand === undefined) return null
   if (
