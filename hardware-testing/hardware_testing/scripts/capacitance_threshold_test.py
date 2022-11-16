@@ -61,7 +61,7 @@ class Capacitance_Threshold_Test:
             prep_distance_mm=self.CUTOUT_HALF,
             max_overrun_distance_mm=5,
             speed_mm_per_s=1,
-            sensor_threshold_pf=1.0,
+            sensor_threshold_pf=0.5,
         )
         self.test_data ={
             "Time":None,
@@ -206,15 +206,14 @@ class Capacitance_Threshold_Test:
         self, api: OT3API, mount: OT3Mount
     ) -> None:
         # Define start and end positions
-        offset = 1.0
-        start_position = self.SQUARE_HALF - self.PROBE_TIP_RAD + offset
-        end_position = (self.SQUARE_HALF / 2) + (self.PROBE_TIP_RAD / 2)
-        self.center_z_start = self.center_xy._replace(x=self.center_xy.x + start_position)
-        self.center_z_end = self.center_xy._replace(x=self.center_xy.x + end_position)
+        start_position = self.SQUARE_HALF / 2
+        end_position = self.SQUARE_HALF - self.PROBE_TIP_RAD
+        self.center_z_start = self.slot_center._replace(x=self.center_xy.x + start_position)
+        self.center_z_end = self.slot_center._replace(x=self.center_xy.x + end_position)
 
         # Move above deck Z-Axis start position
-        above_point = self.center_z_start._replace(z=self.home.z)
-        await api.move_to(mount, above_point)
+        above_point = self.center_z_start._replace(z=self.deck_z + 10)
+        await api.move_to(mount, above_point, speed=20)
 
         # Probe deck Z-Axis start position
         self.z_start = await self._probe_axis(OT3Axis.by_mount(mount), self.center_z_start.z)
@@ -223,7 +222,7 @@ class Capacitance_Threshold_Test:
 
         # Move above deck Z-Axis end position
         above_point = self.center_z_end._replace(z=self.z_start + 10)
-        await api.move_to(mount, above_point)
+        await api.move_to(mount, above_point, speed=20)
 
         # Probe deck Z-Axis end position
         self.z_end = await self._probe_axis(OT3Axis.by_mount(mount), self.center_z_end.z)
@@ -236,7 +235,7 @@ class Capacitance_Threshold_Test:
         self.test_data["Height Average"] = str(self.z_avg)
 
         # Calculate total distance
-        self.total_distance = self.center_z_start.x - self.center_z_end.x
+        self.total_distance = self.center_z_end.x - self.center_z_start.x
         print(f"Total Distance = {self.total_distance} mm")
 
         # Calculate number of steps
@@ -287,12 +286,15 @@ class Capacitance_Threshold_Test:
         print(f"Y-Axis front edge = {y_front} mm")
         self.test_data["Y Front"] = str(round(y_front, 3))
 
-        # Calculate Slot center
+        # Calculate slot center
         x_center = x_left + (x_right - x_left)/2
         y_center = y_front + (y_back - y_front)/2
         self.test_data["X Center"] = str(round(x_center, 3))
         self.test_data["Y Center"] = str(round(y_center, 3))
         self.slot_center = Point(x=x_center, y=y_center, z=self.deck_z)
+
+        # Move to slot center
+        await api.move_to(mount, self.slot_center, speed=20)
 
     async def _home(
         self, api: OT3API, mount: OT3Mount
@@ -330,9 +332,9 @@ class Capacitance_Threshold_Test:
                     x_step = j + 1
                     print(f"\n-->> Measuring X Step {x_step}/{self.x_steps}")
                     if x_step < self.x_steps:
-                        position = self.center_z_start._replace(x=self.center_z_start.x - self.x_increment*(x_step - 1))
+                        position = self.center_z_start._replace(x=self.center_z_start.x + self.x_increment*(x_step - 1))
                     else:
-                        position = self.center_xy._replace(z=self.z_avg)
+                        position = self.slot_center._replace(z=self.z_avg)
                     await self._update_position(self.api, self.mount, position)
                     for k in range(self.z_steps):
                         z_step = k + 1
