@@ -5,7 +5,7 @@ from decoy import Decoy, matchers
 from fastapi import UploadFile
 from pathlib import Path
 
-from opentrons.protocol_api import APIVersion
+from opentrons.protocols.api_support.types import APIVersion
 
 from opentrons.protocol_reader import (
     ProtocolReader,

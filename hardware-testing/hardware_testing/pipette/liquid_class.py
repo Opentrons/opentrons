@@ -2,8 +2,9 @@
 from dataclasses import dataclass
 from typing import Optional, Callable, List
 
-from opentrons.protocol_api import ProtocolContext, InstrumentContext, APIVersion
+from opentrons.protocol_api import ProtocolContext, InstrumentContext
 from opentrons.protocol_api.labware import Well, Labware
+from opentrons.protocols.api_support.types import APIVersion
 
 from hardware_testing.data import (
     create_file_name,

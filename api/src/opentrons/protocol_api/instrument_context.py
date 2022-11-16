@@ -12,6 +12,7 @@ from opentrons.commands import publisher
 from opentrons.protocols.advanced_control.mix import mix_from_kwargs
 from opentrons.protocols.advanced_control import transfers
 
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support import instrument
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.api_support.util import (
@@ -19,10 +20,11 @@ from opentrons.protocols.api_support.util import (
     PlungerSpeeds,
     Clearances,
     clamp_value,
+    requires_version,
+    APIVersionError,
 )
 
 from .core.common import InstrumentCore
-from .versioning import APIVersion, APIVersionError, HasAPIVersion, requires_version
 from . import labware
 
 if TYPE_CHECKING:
@@ -41,7 +43,7 @@ _PREP_AFTER_ADDED_IN = APIVersion(2, 13)
 """The version after which the pick-up tip procedure should also prepare the plunger."""
 
 
-class InstrumentContext(publisher.CommandPublisher, HasAPIVersion):
+class InstrumentContext(publisher.CommandPublisher):
     """A context for a specific pipette or instrument.
 
     This can be used to call methods related to pipettes - moves or
