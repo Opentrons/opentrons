@@ -179,9 +179,7 @@ class MotorPositionRequest(EmptyPayloadMessage):  # noqa: D101
 @dataclass
 class MotorPositionResponse:  # noqa: D101
     payload: payloads.MotorPositionResponse
-    payload_type: Type[
-        payloads.MotorPositionResponse
-    ] = payloads.MotorPositionResponse
+    payload_type: Type[payloads.MotorPositionResponse] = payloads.MotorPositionResponse
     message_id: Literal[
         MessageId.motor_position_response
     ] = MessageId.motor_position_response
