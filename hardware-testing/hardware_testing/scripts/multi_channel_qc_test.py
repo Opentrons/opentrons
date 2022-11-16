@@ -12,10 +12,6 @@ from opentrons.calibration_storage.ot3.pipette_offset import (
     save_pipette_calibration as save_offset_ot3,
 )
 
-SAFE_Z = 10
-XY_STEP_SIZE = 0.1
-Z_OFFSET_FROM_WASHERS = 100
-
 def getch():
     def _getch():
         fd = sys.stdin.fileno()
@@ -43,7 +39,7 @@ async def _jog_axis(api: OT3API, mount: OT3Mount, axis: OT3Axis) -> None:
                                         pos[OT3Axis.Y],
                                         pos[OT3Axis.by_mount(mount)]),
                                         )
-        elif input == 's':
+        elif input == 'd':
             sys.stdout.flush()
             pos = await api.current_position_ot3(mount)
             await api.move_to(mount,
@@ -58,7 +54,7 @@ async def _jog_axis(api: OT3API, mount: OT3Mount, axis: OT3Axis) -> None:
                                         pos[OT3Axis.Y]+step,
                                         pos[OT3Axis.by_mount(mount)]))
                                         # speed = 40)
-        elif input == 'z':
+        elif input == 's':
             sys.stdout.flush()
             pos = await api.current_position_ot3(mount)
             await api.move_to(mount,
@@ -110,7 +106,7 @@ async def _jog_axis(api: OT3API, mount: OT3Mount, axis: OT3Axis) -> None:
                             end='')
         print('\r', end='')
 
-async def _main(simulate: bool, mount: OT3Mount, test: bool) -> None:
+async def _main(simulate: bool, mount: OT3Mount, columns: int) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=simulate, use_defaults=True
     )
@@ -119,38 +115,95 @@ async def _main(simulate: bool, mount: OT3Mount, test: bool) -> None:
     assert pipette, f"No pipette found on mount: {mount}"
     # Home gantry
     await api.home()
-    # await api.add_tip(mount, helpers_ot3.CALIBRATION_PROBE_EVT.length)
-    home_position = await api.gantry_position(mount)
+    home_pos = await api.current_position_ot3(mount)
     pos = await api.current_position_ot3(mount)
-    print(pos)
-    await api.move_to(mount, Point(160 ,150, pos[OT3Axis.by_mount(mount)]))
+    # Move to slot 1-tiprack location to the first column
+    await api.move_to(mount, Point(175.6,
+                                    189.4,
+                                    pos[OT3Axis.by_mount(mount)]))
+    print("Jog to the TipRack")
     tiprack_loc = await _jog_axis(api, mount, OT3Axis.by_mount(mount))
-    await api.pick_up_tip(mount, tip_length = 57.3)
-    await api.home_z(mount)
-    await api.move_to(mount, Point(300, 150, pos[OT3Axis.by_mount(mount)]))
-    await api.prepare_for_aspirate(mount)
-    trough_pos = await _jog_axis(api, mount, OT3Axis.by_mount(mount))
-    await api.aspirate(mount)
-    await api.home_z(mount)
+    tip_column = 0
+    for col in range(1, columns+1):
+        await api.move_to(mount, Point(tiprack_loc[OT3Axis.X]+tip_column,
+                                        tiprack_loc[OT3Axis.Y],
+                                        tiprack_loc[OT3Axis.by_mount(mount)]))
+        await api.pick_up_tip(mount, tip_length = 57.3)
+        await api.home_z(mount)
+        tip_attached_home_z_pos = await api.current_position_ot3(mount)
+        await api.move_to(mount, Point(tiprack_loc[OT3Axis.X]+tip_column,
+                                        tiprack_loc[OT3Axis.Y],
+                                        tip_attached_home_z_pos[OT3Axis.by_mount(mount)]))
+        pos = await api.current_position_ot3(mount)
+        # move to trough
+        await api.move_to(mount, Point(340,
+                                    189.4,
+                                    tip_attached_home_z_pos[OT3Axis.by_mount(mount)]))
+        await api.prepare_for_aspirate(mount)
+        pos = await api.current_position_ot3(mount)
+        if col <= 1:
+            print("Jog to the Trough Liquid Height, 2mm below the liquid")
+            trough_pos = await _jog_axis(api, mount, OT3Axis.by_mount(mount))
+        # Move to Trough aspiration position
+        else:
+            await api.move_to(mount, Point(trough_pos[OT3Axis.X],
+                                            trough_pos[OT3Axis.Y],
+                                            tip_attached_home_z_pos[OT3Axis.by_mount(mount)]))
+        await api.move_to(mount, Point(trough_pos[OT3Axis.X],
+                                        trough_pos[OT3Axis.Y],
+                                        trough_pos[OT3Axis.by_mount(mount)]))
+        await api.aspirate(mount)
+        await api.move_to(mount, Point(trough_pos[OT3Axis.X],
+                                        trough_pos[OT3Axis.Y],
+                                        tip_attached_home_z_pos[OT3Axis.by_mount(mount)]))
+        # await api.home_z(mount)
+        await api.move_to(mount, Point(trough_pos[OT3Axis.X],
+                                        trough_pos[OT3Axis.Y] -75,
+                                        tip_attached_home_z_pos[OT3Axis.by_mount(mount)])
+                                        )
+        # Move to the front of the robot to inspect
+        await api.move_to(mount, Point(trough_pos[OT3Axis.X],
+                                        trough_pos[OT3Axis.Y] -75,
+                                        tiprack_loc[OT3Axis.by_mount(mount)])
+                                        )
+        input("Press Enter to Continue")
+        await api.move_to(mount, Point(trough_pos[OT3Axis.X],
+                                        trough_pos[OT3Axis.Y] -75,
+                                        tip_attached_home_z_pos[OT3Axis.by_mount(mount)])
+                                        )
 
-    await api.move_to(mount, Point(trough_pos[OT3Axis.X],
-                                    trough_pos[OT3Axis.Y] -75,
-                                    tiprack_loc[OT3Axis.by_mount(mount)])
-                                    )
-    input("Press Enter to Continue")
-    await api.home_z(mount)
-    pos = await api.current_position_ot3(mount)
-    print(pos)
-    await api.move_to(mount, Point(trough_pos[OT3Axis.X],
-                                    trough_pos[OT3Axis.Y],
-                                    pos[OT3Axis.by_mount(mount)]
-                            ))
-    await api.move_to(mount, Point(trough_pos[OT3Axis.X],
-                                    trough_pos[OT3Axis.Y],
-                                    trough_pos[OT3Axis.by_mount(mount)]
-                                    ))
-    await api.dispense(mount)
-    await api.home_z(mount)
+        pos = await api.current_position_ot3(mount)
+        await api.move_to(mount, Point(trough_pos[OT3Axis.X],
+                                        trough_pos[OT3Axis.Y],
+                                        pos[OT3Axis.by_mount(mount)]
+                                ))
+        await api.move_to(mount, Point(trough_pos[OT3Axis.X],
+                                        trough_pos[OT3Axis.Y],
+                                        trough_pos[OT3Axis.by_mount(mount)]
+                                        ))
+        await api.dispense(mount)
+        await api.blow_out(mount)
+        await api.move_to(mount, Point(trough_pos[OT3Axis.X],
+                                        trough_pos[OT3Axis.Y],
+                                        tip_attached_home_z_pos[OT3Axis.by_mount(mount)])
+                                        )
+        # await api.home_z(mount)
+        # Trash
+        pos = await api.current_position_ot3(mount)
+        await api.move_to(mount, Point(434.8 ,
+                                        399.6 ,
+                                        tip_attached_home_z_pos[OT3Axis.by_mount(mount)]))
+        await api.move_to(mount, Point(434.8 ,399.6 ,53.4))
+        await api.drop_tip(mount, home_after = False)
+        # await api.home_z(mount)
+        tip_column += 9
+        pos = await api.current_position_ot3(mount)
+        await api.move_to(mount, Point(pos[OT3Axis.X],
+                                        pos[OT3Axis.Y],
+                                        home_pos[OT3Axis.by_mount(mount)]))
+        await api.move_to(mount, Point(tiprack_loc[OT3Axis.X]+tip_column,
+                                        tiprack_loc[OT3Axis.Y],
+                                        home_pos[OT3Axis.by_mount(mount)]))
 
 
 if __name__ == "__main__":
@@ -158,7 +211,7 @@ if __name__ == "__main__":
     arg_parser.add_argument(
         "--mount", choices=["left", "right", "gripper"], required=True
     )
-    arg_parser.add_argument("--test", action="store_true")
+    arg_parser.add_argument("--columns", type = int, default = 5)
     arg_parser.add_argument("--simulate", action="store_true")
     args = arg_parser.parse_args()
     ot3_mounts = {
@@ -167,4 +220,4 @@ if __name__ == "__main__":
         "gripper": OT3Mount.GRIPPER,
     }
     _mount = ot3_mounts[args.mount]
-    asyncio.run(_main(args.simulate, _mount, args.test))
+    asyncio.run(_main(args.simulate, _mount, args.columns))
