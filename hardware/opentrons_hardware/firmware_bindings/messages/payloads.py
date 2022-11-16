@@ -155,9 +155,10 @@ class MoveCompletedPayload(MoveGroupResponsePayload):
 
 
 @dataclass
-class EncoderPositionResponse(utils.BinarySerializable):
+class MotorPositionResponse(utils.BinarySerializable):
     """Read Encoder Position."""
 
+    current_position: utils.UInt32Field
     encoder_position: utils.Int32Field
     position_flags: MotorPositionFlagsField
 
