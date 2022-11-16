@@ -110,6 +110,11 @@ class LabwareMovementHandler:
             if new_offset_id
             else None
         )
+
+        # TODO: This is a bandaid for saving the gripper after a collision.
+        #       Remove once collisions & recovery are fixed.
+        await ot3api.home(axes=[OT3Axis.Z_G])
+
         waypoints_to_new_location = self._get_gripper_movement_waypoints(
             labware_id=labware_id,
             location=new_location,
@@ -117,18 +122,26 @@ class LabwareMovementHandler:
             gripper_home_z=gripper_homed_position.z,
             labware_offset_vector=new_labware_offset,
         )
+
         for waypoint in waypoints_to_new_location:
             await ot3api.move_to(mount=gripper_mount, abs_position=waypoint)
 
         await ot3api.ungrip()
-        await ot3api.move_to(
-            mount=OT3Mount.GRIPPER,
-            abs_position=Point(
-                waypoints_to_new_location[-1].x,
-                waypoints_to_new_location[-1].y,
-                gripper_homed_position.z,
-            ),
-        )
+        # await ot3api.move_to(
+        #     mount=OT3Mount.GRIPPER,
+        #     abs_position=Point(
+        #         waypoints_to_new_location[-1].x,
+        #         waypoints_to_new_location[-1].y,
+        #         gripper_homed_position.z,
+        #     ),
+        # )
+        # TODO: This is a bandaid for saving the gripper after a collision.
+        #       Remove once collisions & recovery are fixed.
+        await ot3api.home(axes=[OT3Axis.Z_G])
+
+        # Keep the gripper in gripped position so it avoids colliding with
+        # things like the thermocycler latches
+        await ot3api.grip(force_newtons=GRIP_FORCE)
 
     # TODO (spp, 2022-10-19): Move this to motion planning and
     #  test waypoints generation in isolation.
