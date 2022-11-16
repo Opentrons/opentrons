@@ -4,16 +4,13 @@ import { createStore, Store } from 'redux'
 import { Provider } from 'react-redux'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { simpleAnalysisFileFixture } from '@opentrons/api-client'
-import {
-  CompletedProtocolAnalysis,
-  schemaV6Adapter,
-  TEMPERATURE_MODULE_V2,
-} from '@opentrons/shared-data'
+import { schemaV6Adapter, TEMPERATURE_MODULE_V2 } from '@opentrons/shared-data'
 import { renderHook } from '@testing-library/react-hooks'
 import { useRunQuery } from '@opentrons/react-api-client'
 import { useProtocolDetailsForRun } from '../../../Devices/hooks'
 import { useLabwareOffsetForLabware } from '../useLabwareOffsetForLabware'
 import type { LabwareOffset } from '@opentrons/api-client'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../Devices/hooks')
@@ -22,7 +19,6 @@ const mockAnalysis: CompletedProtocolAnalysis = {
   status: 'completed',
 } as any
 const mockProtocolDetails = schemaV6Adapter(mockAnalysis)
-
 const queryClient = new QueryClient()
 const store: Store<any> = createStore(jest.fn(), {})
 const wrapper: React.FunctionComponent<{}> = ({ children }) => (
@@ -69,6 +65,7 @@ describe('useLabwareOffsetForLabware', () => {
     resetAllWhenMocks()
     jest.restoreAllMocks()
   })
+
   it('should return current offsets associated with given labwareId in protocol', async () => {
     const { result } = renderHook(
       () => useLabwareOffsetForLabware(MOCK_RUN_ID, 'labware-1'),

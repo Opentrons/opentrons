@@ -9,11 +9,11 @@ import {
 } from '../../../redux/pipettes/__fixtures__'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { FLOWS } from '../constants'
-import { AttachStem } from '../AttachStem'
+import { AttachProbe } from '../AttachProbe'
 import type { AttachedPipette } from '../../../redux/pipettes/types'
 
-const render = (props: React.ComponentProps<typeof AttachStem>) => {
-  return renderWithProviders(<AttachStem {...props} />, {
+const render = (props: React.ComponentProps<typeof AttachProbe>) => {
+  return renderWithProviders(<AttachProbe {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
@@ -21,8 +21,8 @@ const mockPipette: AttachedPipette = {
   ...mockAttachedPipette,
   modelSpecs: mockP300PipetteSpecs,
 }
-describe('AttachStem', () => {
-  let props: React.ComponentProps<typeof AttachStem>
+describe('AttachProbe', () => {
+  let props: React.ComponentProps<typeof AttachProbe>
   beforeEach(() => {
     props = {
       mount: LEFT,
@@ -34,35 +34,39 @@ describe('AttachStem', () => {
       runId: RUN_ID_1,
       attachedPipette: { left: mockPipette, right: null },
       flowType: FLOWS.CALIBRATE,
-      setIsBetweenCommands: jest.fn(),
+      errorMessage: null,
+      setShowErrorMessage: jest.fn(),
       isRobotMoving: false,
       isExiting: false,
     }
   })
   it('returns the correct information, buttons work as expected', async () => {
     const { getByText, getByAltText, getByRole } = render(props)
-    getByText('Attach Calibration Stem')
-    getByText('Grab your calibration probe, install')
-    getByAltText('Attach stem')
+    getByText('Attach Calibration Probe')
+    getByText(
+      'Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
+    )
+    getByAltText('Attach probe')
     const proceedBtn = getByRole('button', { name: 'Initiate calibration' })
     fireEvent.click(proceedBtn)
-    expect(props.setIsBetweenCommands).toHaveBeenCalled()
-    expect(props.chainRunCommands).toHaveBeenCalledWith([
-      {
-        commandType: 'calibration/calibratePipette',
-        params: { mount: 'left' },
-      },
-      {
-        commandType: 'home',
-        params: { axes: ['leftZ'] },
-      },
-      {
-        commandType: 'calibration/moveToLocation',
-        params: { pipetteId: 'abc', location: 'attachOrDetach' },
-      },
-    ])
+    expect(props.chainRunCommands).toHaveBeenCalledWith(
+      [
+        {
+          commandType: 'calibration/calibratePipette',
+          params: { mount: 'left' },
+        },
+        {
+          commandType: 'home',
+          params: { axes: ['leftZ'] },
+        },
+        {
+          commandType: 'calibration/moveToLocation',
+          params: { pipetteId: 'abc', location: 'attachOrDetach' },
+        },
+      ],
+      false
+    )
     await waitFor(() => {
-      expect(props.setIsBetweenCommands).toHaveBeenCalled()
       expect(props.proceed).toHaveBeenCalled()
     })
 
@@ -78,6 +82,19 @@ describe('AttachStem', () => {
     }
     const { getByText, getByAltText } = render(props)
     getByText('Stand Back, Pipette is Calibrating')
+    getByText(
+      'The calibration probe will touch the sides of the calibration divot in slot 5 to determine its exact position'
+    )
     getByAltText('Pipette is calibrating')
+  })
+
+  it('renders the error modal screen when errorMessage is true', () => {
+    props = {
+      ...props,
+      errorMessage: 'error shmerror',
+    }
+    const { getByText } = render(props)
+    getByText('Error encountered')
+    getByText('error shmerror')
   })
 })

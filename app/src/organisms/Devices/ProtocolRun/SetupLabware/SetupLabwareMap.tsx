@@ -13,6 +13,7 @@ import {
 import {
   getDeckDefFromRobotType,
   inferModuleOrientationFromXCoordinate,
+  RunTimeCommand,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { useFeatureFlag } from '../../../../redux/config'
@@ -24,19 +25,23 @@ import {
   useProtocolDetailsForRun,
   useRunHasStarted,
 } from '../../hooks'
-import type { ModuleTypesThatRequiresExtraAttention } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
+import type { ModuleTypesThatRequireExtraAttention } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
+import { getLabwareSetupItemGroups } from './utils'
+import { OffDeckLabwareList } from './OffDeckLabwareList'
 import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
 
 interface SetupLabwareMapProps {
   robotName: string
   runId: string
-  extraAttentionModules: ModuleTypesThatRequiresExtraAttention[]
+  commands: RunTimeCommand[]
+  extraAttentionModules: ModuleTypesThatRequireExtraAttention[]
 }
 
 export function SetupLabwareMap({
   robotName,
   runId,
   extraAttentionModules,
+  commands,
 }: SetupLabwareMapProps): JSX.Element {
   const moduleRenderInfoById = useModuleRenderInfoForProtocolById(
     robotName,
@@ -49,6 +54,7 @@ export function SetupLabwareMap({
 
   const deckDef = getDeckDefFromRobotType(robotType)
 
+  const { offDeckItems } = getLabwareSetupItemGroups(commands)
   return (
     <Flex flex="1" maxHeight="180vh" flexDirection={DIRECTION_COLUMN}>
       <Flex flexDirection={DIRECTION_COLUMN} marginY={SPACING.spacing4}>
@@ -131,6 +137,7 @@ export function SetupLabwareMap({
             )}
           </RobotWorkSpace>
         </Box>
+        <OffDeckLabwareList labwareItems={offDeckItems} />
       </Flex>
     </Flex>
   )

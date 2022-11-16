@@ -1,10 +1,10 @@
 """ Tests for behaviors specific to the OT3 hardware controller.
 """
-from typing import cast, Iterator, Union, Dict, Optional
+from typing import cast, Iterator, Union, Dict, Optional, Tuple
 from typing_extensions import Literal
 from math import copysign
 import pytest
-from mock import AsyncMock, patch
+from mock import AsyncMock, patch, Mock
 from opentrons.config.types import GantryLoad, CapacitivePassSettings
 from opentrons.hardware_control.dev_types import (
     InstrumentDict,
@@ -12,7 +12,9 @@ from opentrons.hardware_control.dev_types import (
 )
 from opentrons.hardware_control.instruments.ot3.gripper_handler import (
     GripError,
+    GripperHandler,
 )
+from opentrons.hardware_control.instruments.ot2.pipette_handler import OT3PipetteHandler
 from opentrons.hardware_control.types import (
     OT3Mount,
     OT3Axis,
@@ -23,11 +25,10 @@ from opentrons.hardware_control.types import (
 )
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control import ThreadManager
-from opentrons.hardware_control.backends.ot3utils import (
-    axis_to_node,
-)
+from opentrons.hardware_control.backends.ot3utils import axis_to_node
 from opentrons_hardware.firmware_bindings.constants import SensorId
-from opentrons.types import Point
+from opentrons.types import Point, Mount
+
 
 from opentrons.config import gripper_config as gc
 from opentrons_shared_data.gripper.dev_types import GripperModel
@@ -116,6 +117,20 @@ async def mock_backend_move(ot3_hardware: ThreadManager[OT3API]) -> Iterator[Asy
         AsyncMock(spec=ot3_hardware.managed_obj._backend.move),
     ) as mock_move:
         yield mock_move
+
+
+@pytest.fixture
+async def mock_instrument_handlers(
+    ot3_hardware: ThreadManager[OT3API],
+) -> Iterator[Tuple[Mock]]:
+    with patch.object(
+        ot3_hardware.managed_obj,
+        "_gripper_handler",
+        Mock(spec=GripperHandler),
+    ) as mock_gripper_handler, patch.object(
+        ot3_hardware.managed_obj, "_pipette_handler", Mock(spec=OT3PipetteHandler)
+    ) as mock_pipette_handler:
+        yield mock_gripper_handler, mock_pipette_handler
 
 
 @pytest.mark.parametrize(
@@ -564,3 +579,55 @@ async def test_gripper_move_to(
             OT3Axis.Y,
             OT3Axis.Z_G,
         ]
+
+
+@pytest.mark.parametrize(
+    "mount",
+    (
+        OT3Mount.RIGHT,
+        OT3Mount.LEFT,
+        OT3Mount.GRIPPER,
+        Mount.RIGHT,
+        Mount.LEFT,
+    ),
+)
+async def test_reset_instrument_offset(
+    ot3_hardware: ThreadManager[OT3API],
+    mount: Union[OT3Mount, Mount],
+    mock_instrument_handlers: Tuple[Mock],
+) -> None:
+    gripper_handler, pipette_handler = mock_instrument_handlers
+    await ot3_hardware.reset_instrument_offset(mount)
+    if mount == OT3Mount.GRIPPER:
+        gripper_handler.reset_instrument_offset.assert_called_once_with(True)
+    else:
+        converted_mount = OT3Mount.from_mount(mount)
+        pipette_handler.reset_instrument_offset.assert_called_once_with(
+            converted_mount, True
+        )
+
+
+@pytest.mark.parametrize(
+    "mount",
+    (
+        OT3Mount.RIGHT,
+        OT3Mount.LEFT,
+        OT3Mount.GRIPPER,
+        Mount.RIGHT,
+        Mount.LEFT,
+    ),
+)
+async def test_save_instrument_offset(
+    ot3_hardware: ThreadManager[OT3API],
+    mount: Union[OT3Mount, Mount],
+    mock_instrument_handlers: Tuple[Mock],
+) -> None:
+    gripper_handler, pipette_handler = mock_instrument_handlers
+    await ot3_hardware.save_instrument_offset(mount, Point(1, 1, 1))
+    if mount == OT3Mount.GRIPPER:
+        gripper_handler.save_instrument_offset.assert_called_once_with(Point(1, 1, 1))
+    else:
+        converted_mount = OT3Mount.from_mount(mount)
+        pipette_handler.save_instrument_offset.assert_called_once_with(
+            converted_mount, Point(1, 1, 1)
+        )

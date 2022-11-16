@@ -14,7 +14,11 @@ from opentrons.hardware_control.types import (
     GripperJawState,
     InvalidMoveError,
 )
-from .instrument_calibration import GripperCalibrationOffset
+from .instrument_calibration import (
+    GripperCalibrationOffset,
+    load_gripper_calibration_offset,
+    save_gripper_calibration_offset,
+)
 from ..instrument_abc import AbstractInstrument
 from opentrons.hardware_control.dev_types import AttachedGripper, GripperDict
 
@@ -127,10 +131,19 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
     def gripper_id(self) -> str:
         return self._gripper_id
 
-    def update_calibration_offset(self, cal_offset: GripperCalibrationOffset) -> None:
-        """Update gripper calibration offset."""
-        self._log.info(f"update gripper offset to: {cal_offset}")
-        self._calibration_offset = cal_offset
+    def reset_offset(self, to_default: bool) -> None:
+        """Tempoarily reset the gripper offsets to default values."""
+        if to_default:
+            self._calibration_offset = load_gripper_calibration_offset(gripper_id=None)
+        else:
+            self._calibration_offset = load_gripper_calibration_offset(
+                gripper_id=self._gripper_id
+            )
+
+    def save_offset(self, delta: Point) -> None:
+        """Tempoarily reset the gripper offsets to default values."""
+        save_gripper_calibration_offset(self._gripper_id, delta)
+        self._calibration_offset = load_gripper_calibration_offset(self._gripper_id)
 
     def critical_point(self, cp_override: Optional[CriticalPoint] = None) -> Point:
         """

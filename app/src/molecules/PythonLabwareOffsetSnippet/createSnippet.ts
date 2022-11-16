@@ -1,6 +1,6 @@
 import isEqual from 'lodash/isEqual'
 import { getLabwareDefinitionUri } from '../../organisms/Devices/ProtocolRun/utils/getLabwareDefinitionUri'
-import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
+import type { LegacySchemaAdapterOutput } from '@opentrons/shared-data'
 import type { LabwareOffset } from '@opentrons/api-client'
 import { getLabwareOffsetLocation } from '../../organisms/Devices/ProtocolRun/utils/getLabwareOffsetLocation'
 
@@ -11,7 +11,7 @@ const CLI_PREFIX = `from opentrons import protocol_api\n\nmetadata = {\n${PYTHON
 
 export function createSnippet(
   mode: 'jupyter' | 'cli',
-  protocol: ProtocolAnalysisFile,
+  protocol: LegacySchemaAdapterOutput,
   labwareOffsets?: LabwareOffset[]
 ): string | null {
   let moduleVariableById: { [moduleId: string]: string } = {}
@@ -22,10 +22,12 @@ export function createSnippet(
       let addendum = null
       if (command.commandType === 'loadLabware') {
         labwareCount = labwareCount + 1
-        const loadedLabware = protocol.labware[command.result.labwareId]
+        const loadedLabware = protocol.labware.find(
+          item => item.id === command.result.labwareId
+        )
         if (loadedLabware == null) return acc
         const { loadName } = protocol.labwareDefinitions[
-          loadedLabware.definitionId
+          loadedLabware.definitionUri
         ].parameters
         if (command.params.location === 'offDeck') {
           loadStatement = `labware_${labwareCount} = protocol.load_labware("${loadName}", location="offDeck")`
@@ -44,6 +46,7 @@ export function createSnippet(
           protocol.labware,
           protocol.labwareDefinitions
         )
+
         const offsetLocation = getLabwareOffsetLocation(
           command.result.labwareId,
           protocol.commands,
