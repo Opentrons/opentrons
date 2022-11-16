@@ -13,7 +13,7 @@ You will need the following tools installed to develop on the Opentrons platform
 - curl
 - ssh
 - Node.js v16
-- pyenv (see below) with a recent interpreter of your choice, like 3.10
+- [pyenv][] with a recent interpreter of your choice, like 3.10
   - Python v3.7, v3.8, v3.10
 
 ### pyenv
@@ -32,7 +32,7 @@ On macOS, we rely on:
 
 - [Homebrew][brew] to install general dependencies, like `git`
 - [Node Version Switcher][nvs] to install and manage Node.js
-- [pyenv][pyenv] to install and manage Python
+- [pyenv][] to install and manage Python
 
 The setup below is compatible with both Intel and ARM (e.g. M1) machines. It assumes you are using the system default shell of `zsh`.
 
@@ -180,7 +180,7 @@ make install-pipenv OT_PYTHON=python3.10
 
 Python 3.7, 3.8, and 3.10 are available with this pyenv global configuration. Because 3.10.8 is first when you set the configuration, `python` will use that version. Pyenv provides `python3.7`, `python3.8`, and `python3.10` to call minor versions.
 
-With the versions of Python available through pyenv on your system, [pipenv][] will point to the right version given a projects Pipfile. This is **NOT** true of `environments/app` see the [README.md](./environments/app/README.md).
+With the versions of Python available through pyenv on your system, [pipenv][] will point to the right version given a project's Pipfile. This is **NOT** true of `environments/app` see the [README.md](./environments/app/README.md).
 
 ### Windows
 
@@ -197,7 +197,7 @@ On Windows, we rely on:
       - [VS Code provides great tools!](https://code.visualstudio.com/docs/remote/wsl)
         - Follow the linked instructions and then see the [Linux section](#linux)
 
-##### 0. Install `scoop` and general dependencies
+##### 0. Install [scoop][] and general dependencies
 
 ```shell
 scoop install git gh make nvs
@@ -212,12 +212,10 @@ nvs add 16
 Select your version in a shell
 
 ```shell
-nvs
+nvs auto
 ```
 
-##### 2. Install `pyenv-win` and python 3.10
-
-Follow instructions [pyenv-win][]
+##### 2. Install [pyenv-win][] and python 3.10
 
 ##### 3. Install Visual Studio Community with C++ support
 
@@ -228,8 +226,8 @@ Follow instructions [pyenv-win][]
 
 ##### 4. Make Commands that should work after [Repository Setup](#repository-setup) on Windows
 
+- `make install-globals`
 - `make setup-js`
-- `make install-pipenv`
 - `make -C environments/app setup`
 - `make -C api test-app`
 - `make -C api test-app-cov`
@@ -276,7 +274,7 @@ Also add the above to whatever combination of `~/.profile`, `~/.bash_profile`, e
 
 ## Repository Setup
 
-### Clone
+### Clone the repository
 
 Once your system is set up, you're ready to clone the repository and get the development environment set up.
 
@@ -287,7 +285,7 @@ cd ./opentrons
 
 ### Once you are inside the repository
 
-#### Confirm Node.js and python version
+#### Confirm Node.js and python versions
 
 1. Confirm that `nvs` selected the proper version of Node.js to use
 

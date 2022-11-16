@@ -23,8 +23,7 @@ runs:
       with:
         node-version: '16'
     - shell: bash
-      run: |
-        make js-globals
+      run: make js-globals
     - uses: 'actions/setup-python@v4'
       with:
         python-version: ${{ inputs.python-version }}
