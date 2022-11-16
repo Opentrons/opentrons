@@ -167,7 +167,7 @@ export const AppComponent = (): JSX.Element => {
                     </Route>
                   )
                 })}
-                <Redirect to="/set-wifi-cred/test" />
+                <Redirect to="/device-setup" />
               </Switch>
               <Alerts />
             </Box>
