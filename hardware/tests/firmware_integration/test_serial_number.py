@@ -7,7 +7,7 @@ from opentrons_hardware.firmware_bindings.messages.fields import SerialField
 from opentrons_hardware.instruments.pipettes.serials import (
     serial_val_from_parts,
 )
-from opentrons_hardware.instruments.gripper.serials import (
+from opentrons_hardware.instruments.gripper.serials import (  # noqa: F401
     gripper_serial_val_from_parts,
 )
 
@@ -34,17 +34,16 @@ def filter_func(arb: ArbitrationId) -> bool:
     )
 
 
-@pytest.mark.parametrize(
-    "model,datecode",
-    [
-        (31, b"2020190802A02"),
-        (500, b""),
-        (0, b"asdasdasdasdasda"),
-        (0xFFFF, b"\xff" * 16),
-    ],
-)
-
 # TODO: (2022-11-15 AA) Enable this test when the gripper EEPROM rework is complete
+# @pytest.mark.parametrize(
+#     "model,datecode",
+#     [
+#         (31, b"2020190802A02"),
+#         (500, b""),
+#         (0, b"asdasdasdasdasda"),
+#         (0xFFFF, b"\xff" * 16),
+#     ],
+# )
 # @pytest.mark.requires_emulator
 # @pytest.mark.can_filter_func.with_args(filter_func)
 # async def test_set_serial_gripper(
@@ -67,6 +66,8 @@ def filter_func(arb: ArbitrationId) -> bool:
 
 
 # TODO: (2022-11-15 AA) This tests the temporary serial number for the gripper
+@pytest.mark.requires_emulator
+@pytest.mark.can_filter_func.with_args(filter_func)
 async def test_temp_serial_gripper(
     can_messenger: CanMessenger,
     can_messenger_queue: WaitableCallback,
