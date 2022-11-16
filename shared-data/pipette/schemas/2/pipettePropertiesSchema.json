@@ -111,11 +111,23 @@
     "availableSensors": {
       "type": "object",
       "description": "object with keyed by sensor and number available",
-      "required": ["pressure", "capacitive", "environment"],
+      "required": ["sensors"],
       "properties": {
-        "pressure": { "enum": [1, 2] },
-        "capacitive": { "enum": [1, 2] },
-        "environment": { "enum": [1] }
+        "sensors": {
+          "type": "array",
+          "description": "Array of available sensor types",
+          "items": {
+            "type": "string"
+          }
+        },
+        "patternProperties": {
+          "description": "The count of each sensor type available on a given pipette model.",
+          "type": "object",
+          ".*": {
+            "required": ["count"],
+            "count": { "type": "integer" }
+          }
+        }
       }
     },
     "plungerPositionsConfigurations": {

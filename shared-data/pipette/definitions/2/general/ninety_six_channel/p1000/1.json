@@ -25,9 +25,10 @@
     "drop": 80
   },
   "availableSensors": {
-    "pressure": 2,
-    "capacitive": 2,
-    "environment": 1
+    "sensors": ["pressure", "capacitive", "environment"],
+    "pressure": { "count": 2 },
+    "capacitive": { "count": 2 },
+    "environment": { "count": 1 }
   },
   "partialTipConfigurations": {
     "partialTipSupported": true,
