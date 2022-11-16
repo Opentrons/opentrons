@@ -41,7 +41,8 @@ async def _jog_axis(api: OT3API, mount: OT3Mount, axis: OT3Axis) -> None:
             await api.move_to(mount,
                                 Point(pos[OT3Axis.X]-step,
                                         pos[OT3Axis.Y],
-                                        pos[OT3Axis.by_mount(mount)]))
+                                        pos[OT3Axis.by_mount(mount)]),
+                                        )
         elif input == 's':
             sys.stdout.flush()
             pos = await api.current_position_ot3(mount)
@@ -69,9 +70,9 @@ async def _jog_axis(api: OT3API, mount: OT3Mount, axis: OT3Axis) -> None:
             sys.stdout.flush()
             pos = await api.current_position_ot3(mount)
             await api.move_to(mount,
-                                Point(pos[OT3Axis.X]+step,
+                                Point(pos[OT3Axis.X],
                                         pos[OT3Axis.Y],
-                                        pos[OT3Axis.by_mount(mount)]-step))
+                                        pos[OT3Axis.by_mount(mount)]+step))
         elif input == 'k':
             sys.stdout.flush()
             pos = await api.current_position_ot3(mount)
@@ -109,17 +110,13 @@ async def _jog_axis(api: OT3API, mount: OT3Mount, axis: OT3Axis) -> None:
                             end='')
         print('\r', end='')
 
-async def _main(simulate: bool, slot: int, mount: OT3Mount, test: bool) -> None:
+async def _main(simulate: bool, mount: OT3Mount, test: bool) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=simulate, use_defaults=True
     )
     # Get pipette id
     pipette = api.hardware_pipettes[mount.to_mount()]
     assert pipette, f"No pipette found on mount: {mount}"
-    print(
-        f"\nStarting Calibration on Deck Slot #{slot} and Pipette {pipette.pipette_id}:\n"
-    )
-
     # Home gantry
     await api.home()
     # await api.add_tip(mount, helpers_ot3.CALIBRATION_PROBE_EVT.length)
@@ -127,14 +124,37 @@ async def _main(simulate: bool, slot: int, mount: OT3Mount, test: bool) -> None:
     pos = await api.current_position_ot3(mount)
     print(pos)
     await api.move_to(mount, Point(160 ,150, pos[OT3Axis.by_mount(mount)]))
-    await _jog_axis(api, mount, OT3Axis.by_mount(mount))
+    tiprack_loc = await _jog_axis(api, mount, OT3Axis.by_mount(mount))
     await api.pick_up_tip(mount, tip_length = 57.3)
-    await home_z(mount)
-    await move_to(mount, Point(300, 150, pos[OT3Axis.by_mount(mount)]))
-    await _jog_axis(api, mount, OT3Axis.by_mount(mount))
+    await api.home_z(mount)
+    await api.move_to(mount, Point(300, 150, pos[OT3Axis.by_mount(mount)]))
+    await api.prepare_for_aspirate(mount)
+    trough_pos = await _jog_axis(api, mount, OT3Axis.by_mount(mount))
+    await api.aspirate(mount)
+    await api.home_z(mount)
+
+    await api.move_to(mount, Point(trough_pos[OT3Axis.X],
+                                    trough_pos[OT3Axis.Y] -75,
+                                    tiprack_loc[OT3Axis.by_mount(mount)])
+                                    )
+    input("Press Enter to Continue")
+    await api.home_z(mount)
+    pos = await api.current_position_ot3(mount)
+    print(pos)
+    await api.move_to(mount, Point(trough_pos[OT3Axis.X],
+                                    trough_pos[OT3Axis.Y],
+                                    pos[OT3Axis.by_mount(mount)]
+                            ))
+    await api.move_to(mount, Point(trough_pos[OT3Axis.X],
+                                    trough_pos[OT3Axis.Y],
+                                    trough_pos[OT3Axis.by_mount(mount)]
+                                    ))
+    await api.dispense(mount)
+    await api.home_z(mount)
+
 
 if __name__ == "__main__":
-    arg_parser = argparse.rser(description="OT-3 Manual Calibration")
+    arg_parser = argparse.ArgumentParser(description="OT-3 Manual Calibration")
     arg_parser.add_argument(
         "--mount", choices=["left", "right", "gripper"], required=True
     )
@@ -147,4 +167,4 @@ if __name__ == "__main__":
         "gripper": OT3Mount.GRIPPER,
     }
     _mount = ot3_mounts[args.mount]
-    asyncio.run(_main(args.simulate, args.slot, _mount, args.test))
+    asyncio.run(_main(args.simulate, _mount, args.test))
