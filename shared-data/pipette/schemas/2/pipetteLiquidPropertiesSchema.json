@@ -36,42 +36,54 @@
     }
   },
   "type": "object",
-  "required": ["$otSharedSchema", "maxVolume", "minVolume", "defaultTipracks"],
+  "required": [
+    "$otSharedSchema",
+    "maxVolume",
+    "minVolume",
+    "defaultTipracks",
+    "supportedTips"
+  ],
   "additionalProperties": false,
   "properties": {
     "$otSharedSchema": {
       "type": "string",
       "description": "The path to a valid Opentrons shared schema relative to the shared-data directory, without its extension. For instance, #/pipette/schemas/2/pipetteLiquidPropertiesSchema.json is a reference to this schema."
     },
-    "patternProperties": {
-      "description": "Tip specific liquid handling properties for a given pipette. Using the active tip on a pipette, we will look up the pipetting configurations associated with that tip+pipette combo.",
+    "supportedTips": {
       "type": "object",
-      "$comment": "Example key: 't50'",
-      "^t[0-9]{2,4}": {
-        "required": [
-          "defaultAspirateFlowRate",
-          "defaultDispenseFlowRate",
-          "defaultBlowOutFlowRate",
-          "aspirate",
-          "dispense"
-        ],
-        "properties": {
-          "defaultAspirateFlowRate": {
-            "$ref": "#/definitions/flowRate"
-          },
-          "defaultDispenseFlowRate": {
-            "$ref": "#/definitions/flowRate"
-          },
-          "defaultBlowOutFlowRate": {
-            "$ref": "#/definitions/flowRate"
-          },
-          "aspirate": {
-            "type": "array",
-            "items": { "$ref": "#/definitions/liquidHandlingSpecs" }
-          },
-          "dispense": {
-            "type": "array",
-            "items": { "$ref": "#/definitions/liquidHandlingSpecs" }
+      "description": "A container of supported tip types",
+      "properties": {
+        "patternProperties": {
+          "description": "Tip specific liquid handling properties for a given pipette. Using the active tip on a pipette, we will look up the pipetting configurations associated with that tip+pipette combo.",
+          "type": "object",
+          "$comment": "Example key: 't50'",
+          "^t[0-9]{2,4}": {
+            "required": [
+              "defaultAspirateFlowRate",
+              "defaultDispenseFlowRate",
+              "defaultBlowOutFlowRate",
+              "aspirate",
+              "dispense"
+            ],
+            "properties": {
+              "defaultAspirateFlowRate": {
+                "$ref": "#/definitions/flowRate"
+              },
+              "defaultDispenseFlowRate": {
+                "$ref": "#/definitions/flowRate"
+              },
+              "defaultBlowOutFlowRate": {
+                "$ref": "#/definitions/flowRate"
+              },
+              "aspirate": {
+                "type": "array",
+                "items": { "$ref": "#/definitions/liquidHandlingSpecs" }
+              },
+              "dispense": {
+                "type": "array",
+                "items": { "$ref": "#/definitions/liquidHandlingSpecs" }
+              }
+            }
           }
         }
       }
