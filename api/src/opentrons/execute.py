@@ -14,13 +14,12 @@ from typing import TYPE_CHECKING, Callable, Dict, List, Optional, TextIO, Union,
 
 from opentrons import protocol_api, __version__, should_use_ot3
 from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION, APIVersion
 from opentrons.protocols.execution import execute as execute_apiv2
 
 from opentrons.commands import types as command_types
 from opentrons.protocols.parse import parse, version_from_string
 from opentrons.protocols.types import ApiDeprecationError
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control import API as OT2API, ThreadManager, HardwareControlAPI
 from opentrons.hardware_control.types import MachineType
 

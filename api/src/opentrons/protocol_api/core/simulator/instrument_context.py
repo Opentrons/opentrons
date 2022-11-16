@@ -9,11 +9,10 @@ from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.types import HardwareAction
 from opentrons.protocols.api_support import instrument as instrument_support
 from opentrons.protocols.api_support.labware_like import LabwareLike
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.util import FlowRates, PlungerSpeeds, Clearances
 from opentrons.protocols.geometry import planning
 
+from ...versioning import MAX_SUPPORTED_VERSION, APIVersion
 from ..instrument import AbstractInstrument
 from ..protocol_api.well import WellImplementation
 

@@ -18,7 +18,7 @@ from _pytest.mark.structures import Mark
 from g_code_parsing.g_code_engine import GCodeEngine
 from g_code_parsing.g_code_program.supported_text_modes import SupportedTextModes
 from opentrons.hardware_control.emulation.settings import Settings, SmoothieSettings
-from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocol_api import APIVersion
 
 from pydantic import (
     BaseModel,
@@ -28,21 +28,24 @@ from pydantic import (
 )
 
 BUCKET_NAME = "g-code-comparison"
-COMPARISON_FILES_FOLDER_PATH = os.path.join(os.path.dirname(__file__), 'comparison_files')
+COMPARISON_FILES_FOLDER_PATH = os.path.join(
+    os.path.dirname(__file__), "comparison_files"
+)
 
 
 class SharedFunctionsMixin:
     """Functions that GCodeConfirmConfig classes share."""
+
     def add_mark(self, user_mark: Mark) -> None:
         self.marks.append(user_mark)
 
 
 class ProtocolGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
     path: str
-    name: Optional[constr(regex=r'^[a-z0-9_]*$')]
+    name: Optional[constr(regex=r"^[a-z0-9_]*$")]
     settings: Settings
     results_dir: ClassVar[str] = "protocols"
-    driver: str = 'protocol'
+    driver: str = "protocol"
     marks: List[Mark] = [pytest.mark.g_code_confirm]
     versions: Set[APIVersion] = Field(..., min_items=1)
 
@@ -56,9 +59,8 @@ class ProtocolGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
 
     def _get_full_path(self, version: APIVersion):
         return os.path.join(
-            COMPARISON_FILES_FOLDER_PATH,
-            self.get_comparison_file_path(version)
-            )
+            COMPARISON_FILES_FOLDER_PATH, self.get_comparison_file_path(version)
+        )
 
     def get_configuration_paths(self, version: APIVersion) -> str:
         """Get the configuration file path."""
@@ -72,12 +74,14 @@ class ProtocolGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
         """Pull comparison file and print it's content."""
         file_path = self._get_full_path(version)
         file = open(file_path, "r")
-        return ''.join(file.readlines()).strip()
+        return "".join(file.readlines()).strip()
 
     def update_comparison(self, version: APIVersion) -> str:
         """Run config and override the comparison file with output."""
-        Path(os.path.dirname(self._get_full_path(version))).mkdir(parents=True, exist_ok=True)
-        with open(self._get_full_path(version), 'w') as file:
+        Path(os.path.dirname(self._get_full_path(version))).mkdir(
+            parents=True, exist_ok=True
+        )
+        with open(self._get_full_path(version), "w") as file:
             file.write(self.execute(version))
         return "File uploaded successfully"
 
@@ -90,18 +94,20 @@ class ProtocolGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
 
 
 class HTTPGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
-    name: constr(regex=r'^[a-z0-9_]*$')
+    name: constr(regex=r"^[a-z0-9_]*$")
     executable: Callable
     settings: Settings
     results_dir: ClassVar[str] = "http"
-    driver: str = 'http'
+    driver: str = "http"
     marks: List[Mark] = [pytest.mark.g_code_confirm]
 
     class Config:
         arbitrary_types_allowed = True
 
     def _get_full_path(self) -> str:
-        return os.path.join(COMPARISON_FILES_FOLDER_PATH, self.get_comparison_file_path())
+        return os.path.join(
+            COMPARISON_FILES_FOLDER_PATH, self.get_comparison_file_path()
+        )
 
     def comparison_file_exists(self) -> bool:
         return os.path.exists(self._get_full_path())
@@ -117,11 +123,11 @@ class HTTPGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
     def get_comparison_file(self) -> str:
         """Pull comparison file and print it's content."""
         file = open(self._get_full_path(), "r")
-        return ''.join(file.readlines()).strip()
+        return "".join(file.readlines()).strip()
 
     def update_comparison(self) -> str:
         """Run config and override the comparison file with output."""
-        with open(self._get_full_path(), 'w') as file:
+        with open(self._get_full_path(), "w") as file:
             file.write(self.execute())
         return "File uploaded successfully"
 

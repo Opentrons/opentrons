@@ -19,11 +19,11 @@ from opentrons.hardware_control.modules.types import (
     ThermocyclerModuleModel as LegacyThermocyclerModuleModel,
     HeaterShakerModuleModel as LegacyHeaterShakerModuleModel,
 )
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_engine import ProtocolEngine
 from opentrons.protocol_reader import ProtocolSource
 
 from opentrons.protocol_api import (
+    APIVersion,
     ProtocolContext as LegacyProtocolContext,
     InstrumentContext as LegacyPipetteContext,
     ModuleContext as LegacyModuleContext,
