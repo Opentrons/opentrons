@@ -6,8 +6,7 @@ from decoy import Decoy
 
 from opentrons.types import Mount
 from opentrons.hardware_control import SyncHardwareAPI
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION, APIVersion
 from opentrons.protocol_api.core.protocol_api.protocol_context import (
     ProtocolContextImplementation,
 )

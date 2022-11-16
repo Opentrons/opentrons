@@ -1,7 +1,9 @@
-from .types import APIVersion
+"""Deprecated module; do not use.
 
-MAX_SUPPORTED_VERSION = APIVersion(2, 13)
-"""The maximum supported protocol API version in this release."""
-
-MIN_SUPPORTED_VERSION = APIVersion(2, 0)
-"""The minimum supported protocol API version in this release."""
+This file left in place to prevent import exceptions
+in any user protocols that may have imported from this location.
+"""
+from opentrons.protocol_api.versioning import (  # noqa: F401
+    MAX_SUPPORTED_VERSION,
+    MIN_SUPPORTED_VERSION,
+)

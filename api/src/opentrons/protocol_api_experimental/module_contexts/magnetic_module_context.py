@@ -6,7 +6,7 @@ from typing import Optional, overload
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
-from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocol_api.versioning import APIVersion
 
 from ..constants import DEFAULT_LABWARE_NAMESPACE
 from ..labware import Labware

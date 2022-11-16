@@ -1,7 +1,8 @@
 from typing import Any, Dict, NamedTuple, Optional, Union, TYPE_CHECKING
 from dataclasses import dataclass
-from .api_support.definitions import MIN_SUPPORTED_VERSION
-from .api_support.types import APIVersion
+
+from opentrons.protocol_api.versioning import MIN_SUPPORTED_VERSION, APIVersion
+
 
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
