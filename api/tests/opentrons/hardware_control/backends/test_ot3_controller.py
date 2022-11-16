@@ -5,6 +5,7 @@ from mock import AsyncMock, patch
 from opentrons.hardware_control.backends.ot3controller import OT3Controller
 from opentrons.hardware_control.backends.ot3utils import (
     node_to_axis,
+    axis_to_node,
 )
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons.config.types import OT3Config
@@ -27,6 +28,7 @@ from opentrons_hardware.hardware_control.motion import (
     MoveType,
     MoveStopCondition,
 )
+from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
 from opentrons_hardware.hardware_control.tools.detector import OneshotToolDetector
 from opentrons_hardware.hardware_control.tools.types import (
     ToolSummary,
@@ -74,6 +76,16 @@ def mock_move_group_run():
 
 
 @pytest.fixture
+def mock_move_group_runner():
+    with patch(
+        "opentrons.hardware_control.backends.ot3controller.MoveGroupRunner",
+        autospec=True,
+    ) as mock_runner:
+        mock_runner.return_value.run.return_value = {}
+        yield mock_runner
+
+
+@pytest.fixture
 def mock_present_nodes(controller: OT3Controller):
     old_pn = controller._present_nodes
     controller._present_nodes = set(
@@ -106,6 +118,19 @@ def mock_tool_detector(controller: OT3Controller):
         )
 
         yield md
+
+
+def home_runner_return_value(home_axes, present_nodes):
+    gantry_homes = {}
+    for axis in OT3Axis.gantry_axes():
+        if axis in home_axes and axis_to_node(axis) in present_nodes:
+            gantry_homes[axis_to_node(axis)] = (0.0, 0.0)
+    yield gantry_homes
+    pipette_homes = {}
+    for axis in OT3Axis.pipette_axes():
+        if axis in home_axes and axis_to_node(axis) in present_nodes:
+            pipette_homes[axis_to_node(axis)] = (0.0, 0.0)
+    yield pipette_homes
 
 
 home_test_params = [
@@ -184,20 +209,28 @@ async def test_home_build_runners(
 async def test_home_only_present_nodes(
     controller: OT3Controller, mock_move_group_run, axes
 ):
-    controller._present_nodes = set(
+    present_nodes = set(
         (NodeId.gantry_x, NodeId.gantry_y, NodeId.head_l, NodeId.head_r)
     )
-    controller._position = {
-        NodeId.head_l: 20,
-        NodeId.head_r: 85,
-        NodeId.gantry_x: 68,
-        NodeId.gantry_y: 54,
-        NodeId.pipette_left: 30,
-        NodeId.pipette_right: 110,
-    }
-    start_pos = controller._position
+
+    controller._present_nodes = present_nodes
+    controller._position.update(
+        {
+            NodeId.head_l: 20,
+            NodeId.head_r: 85,
+            NodeId.gantry_x: 68,
+            NodeId.gantry_y: 54,
+            NodeId.pipette_left: 30,
+            NodeId.pipette_right: 110,
+        }
+    )
+    starting_position = controller._position
+    new_position = {}
+
+    mock_move_group_run.side_effect = home_runner_return_value(axes, present_nodes)
 
     await controller.home(axes)
+
     for call in mock_move_group_run.call_args_list:
         # pull the bound-self argument that is the runner instance out of
         # the args list - we can do this because the mock here is the
@@ -210,12 +243,12 @@ async def test_home_only_present_nodes(
                 for node, step in move_group_step.items():
                     assert node in controller._present_nodes
                     assert step  # don't pass in empty steps
+                    new_position[node] = 0.0  # track homed position for node
 
-    for node in controller._position:
-        if node_to_axis(node) in (axes and controller._present_nodes):
-            assert controller._position[node] == 0
-        else:
-            assert controller._position[node] == start_pos[node]
+    # check that the current position is updated
+    expected_position = {**starting_position, **new_position}
+    for node, pos in controller._position.items():
+        assert pos == expected_position[node]
 
 
 async def test_probing(

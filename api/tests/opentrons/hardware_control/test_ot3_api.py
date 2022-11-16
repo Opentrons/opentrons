@@ -215,6 +215,11 @@ def mock_backend_capacitive_pass(
         yield mock_pass
 
 
+def test_home_z_only(ot3_hardware: ThreadManager[OT3API]):
+    assert ot3_hardware._current_position == {}
+    
+
+
 @pytest.mark.parametrize(
     "mount,moving",
     [

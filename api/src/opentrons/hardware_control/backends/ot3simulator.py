@@ -218,7 +218,10 @@ class OT3Simulator:
         Returns:
             Homed position.
         """
-        homed = [axis_to_node(a) for a in axes] if axes else self._position.keys()
+        if axes:
+            homed = [axis_to_node(a) for a in axes]
+        else:
+            homed = self._position.keys()
         for h in homed:
             self._homed_nodes.add(h)
         return axis_convert(self._position, 0.0)
