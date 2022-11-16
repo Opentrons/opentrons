@@ -1,5 +1,5 @@
-import pipetteNameSpecs from '../pipette/definitions/pipetteNameSpecs.json'
-import pipetteModelSpecs from '../pipette/definitions/pipetteModelSpecs.json'
+import pipetteNameSpecs from '../pipette/definitions/1/pipetteNameSpecs.json'
+import pipetteModelSpecs from '../pipette/definitions/1/pipetteModelSpecs.json'
 import { OT3_PIPETTES } from './constants'
 
 import type { PipetteNameSpecs, PipetteModelSpecs } from './types'

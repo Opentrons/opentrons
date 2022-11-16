@@ -28,7 +28,7 @@ def model_config() -> PipetteModelSpecs:
 @lru_cache(maxsize=None)
 def _model_config() -> PipetteModelSpecs:
     return json.loads(
-        load_shared_data("pipette/definitions/pipetteModelSpecs.json") or "{}"
+        load_shared_data("pipette/definitions/1/pipetteModelSpecs.json") or "{}"
     )
 
 
@@ -40,7 +40,7 @@ def name_config() -> PipetteNameSpecs:
 @lru_cache(maxsize=None)
 def _name_config() -> PipetteNameSpecs:
     return json.loads(
-        load_shared_data("pipette/definitions/pipetteNameSpecs.json") or "{}"
+        load_shared_data("pipette/definitions/1/pipetteNameSpecs.json") or "{}"
     )
 
 

@@ -1,0 +1,38 @@
+{
+  "$otSharedSchema": "#/pipette/schemas/2/pipettePropertiesSchema.json",
+  "displayName": "P1000 96 Channel GEN3",
+  "model": "ninetySixChannel",
+  "displayCategory": "GEN3",
+  "pickUpTipConfigurations": {
+    "current": 0.4,
+    "presses": 1,
+    "speed": 10,
+    "increment": 0.5,
+    "distance": 1.0
+  },
+  "dropTipConfigurations": {
+    "current": 1.0,
+    "speed": 10
+  },
+  "plungerMotorConfigurations": {
+    "idle": 0.3,
+    "run": 1.0
+  },
+  "plungerPositionsConfigurations": {
+    "top": 0,
+    "bottom": 66,
+    "blowout": 71,
+    "drop": 80
+  },
+  "availableSensors": {
+    "sensors": ["pressure", "capacitive", "environment"],
+    "pressure": { "count": 2 },
+    "capacitive": { "count": 2 },
+    "environment": { "count": 1 }
+  },
+  "partialTipConfigurations": {
+    "partialTipSupported": true,
+    "availableConfigurations": [1, 8, 12, 96]
+  },
+  "channels": 96
+}
