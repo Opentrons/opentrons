@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import '@testing-library/jest-dom'
+import { when, resetAllWhenMocks } from 'jest-when'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -13,10 +14,16 @@ import { ProtocolsLanding } from '../../pages/Protocols/ProtocolsLanding'
 import { ProtocolRunDetails } from '../../pages/Devices/ProtocolRunDetails'
 import { RobotSettings } from '../../pages/Devices/RobotSettings'
 import { GeneralSettings } from '../../pages/AppSettings/GeneralSettings'
+import { InitialSplash } from '../../pages/OnDeviceDisplay/InitialSplash'
+import { SelectNetwork } from '../../pages/OnDeviceDisplay/SelectNetwork'
+import { SetWifiCred } from '../../pages/OnDeviceDisplay/SetWifiCred'
+import { ConnectedNetworkInfo } from '../../pages/OnDeviceDisplay/ConnectedNetworkInfo'
 import { getIsOnDevice } from '../../redux/config'
 import { getLocalRobot } from '../../redux/discovery'
 import { Alerts } from '../../organisms/Alerts'
 import { App } from '../'
+
+import type { State } from '../../redux/types'
 
 jest.mock('../../organisms/Breadcrumbs')
 jest.mock('../../organisms/Devices/hooks')
@@ -26,12 +33,22 @@ jest.mock('../../pages/Devices/DevicesLanding')
 jest.mock('../../pages/Protocols/ProtocolsLanding')
 jest.mock('../../pages/Devices/ProtocolRunDetails')
 jest.mock('../../pages/Devices/RobotSettings')
+jest.mock('../../pages/OnDeviceDisplay/InitialSplash')
+jest.mock('../../pages/OnDeviceDisplay/SelectNetwork')
+jest.mock('../../pages/OnDeviceDisplay/SetWifiCred')
+jest.mock('../../pages/OnDeviceDisplay/ConnectedNetworkInfo')
 jest.mock('../../organisms/Alerts')
 jest.mock('../../pages/Labware/helpers/getAllDefs')
 jest.mock('../../pages/AppSettings/GeneralSettings')
 jest.mock('../../redux/config')
 jest.mock('../../redux/discovery')
 jest.mock('../hooks')
+
+const MOCK_STATE: State = {
+  config: {
+    isOnDevice: true,
+  },
+} as any
 
 const mockCalibrationDashboard = CalibrationDashboard as jest.MockedFunction<
   typeof CalibrationDashboard
@@ -63,12 +80,26 @@ const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
   typeof getLocalRobot
 >
 
+const mockInitialSplash = InitialSplash as jest.MockedFunction<
+  typeof InitialSplash
+>
+
+const mockSelectNetwork = SelectNetwork as jest.MockedFunction<
+  typeof SelectNetwork
+>
+
+const mockSetWifiCred = SetWifiCred as jest.MockedFunction<typeof SetWifiCred>
+
+const mockConnectedNetworkInfo = ConnectedNetworkInfo as jest.MockedFunction<
+  typeof ConnectedNetworkInfo
+>
+
 const render = (path = '/') => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
       <App />
     </MemoryRouter>,
-    { i18nInstance: i18n }
+    { i18nInstance: i18n, initialState: MOCK_STATE }
   )
 }
 
@@ -87,9 +118,16 @@ describe('App', () => {
     mockBreadcrumbs.mockReturnValue(<div>Mock Breadcrumbs</div>)
     mockGetIsOnDevice.mockReturnValue(false)
     mockGetLocalRobot.mockReturnValue(null)
+    mockInitialSplash.mockReturnValue(<div>Mock InitialSplash</div>)
+    mockSelectNetwork.mockReturnValue(<div>Mock SelectNetwork</div>)
+    mockSetWifiCred.mockReturnValue(<div>Mock SetWifiCred</div>)
+    mockConnectedNetworkInfo.mockReturnValue(
+      <div>Mock ConnectedNetworkInfo</div>
+    )
   })
   afterEach(() => {
     jest.resetAllMocks()
+    resetAllWhenMocks()
   })
   it('renders a Breadcrumbs component', () => {
     const [{ getByText }] = render('/devices')
@@ -107,7 +145,7 @@ describe('App', () => {
   })
 
   it('does not render a DevicesLanding component from /devices in single device mode', () => {
-    mockGetIsOnDevice.mockReturnValue(true)
+    when(mockGetIsOnDevice).calledWith(MOCK_STATE).mockReturnValue(true)
     const [{ queryByText }] = render('/devices')
     expect(queryByText('Mock DevicesLanding')).toBeNull()
   })
@@ -144,5 +182,29 @@ describe('App', () => {
   it('should render app-wide Alerts', () => {
     const [{ getByText }] = render()
     getByText('Mock Alerts')
+  })
+
+  it('renders a InitialSplash component component from /device-setup', () => {
+    when(mockGetIsOnDevice).calledWith(MOCK_STATE).mockReturnValue(true)
+    const [{ getByText }] = render('/device-setup')
+    getByText('Mock InitialSplash')
+  })
+
+  it('renders a SelectNetwork component from /select-network', () => {
+    when(mockGetIsOnDevice).calledWith(MOCK_STATE).mockReturnValue(true)
+    const [{ getByText }] = render('/select-network')
+    getByText('Mock SelectNetwork')
+  })
+
+  it('renders a SetWifiCred component from /set-wifi-cred/:ssid', () => {
+    when(mockGetIsOnDevice).calledWith(MOCK_STATE).mockReturnValue(true)
+    const [{ getByText }] = render('/set-wifi-cred/mockWifi')
+    getByText('Mock SetWifiCred')
+  })
+
+  it('renders a ConnectedNetworkInfo component from /connected-network-info/:ssid', () => {
+    when(mockGetIsOnDevice).calledWith(MOCK_STATE).mockReturnValue(true)
+    const [{ getByText }] = render('/connected-network-info/mockWifi')
+    getByText('Mock ConnectedNetworkInfo')
   })
 })
