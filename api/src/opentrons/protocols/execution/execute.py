@@ -1,6 +1,6 @@
 import logging
 
-from opentrons.protocol_api import ProtocolContext
+from opentrons.protocol_api import ProtocolContext, APIVersion
 from opentrons.protocols.execution.execute_python import run_python
 from opentrons.protocols.execution.json_dispatchers import (
     pipette_command_map,
@@ -11,7 +11,6 @@ from opentrons.protocols.execution.json_dispatchers import (
 from opentrons.protocols.execution import execute_json_v4, execute_json_v3
 
 from opentrons.protocols.types import PythonProtocol, Protocol
-from opentrons.protocols.api_support.types import APIVersion
 
 MODULE_LOG = logging.getLogger(__name__)
 

@@ -9,8 +9,8 @@ from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support.util import Clearances, PlungerSpeeds, FlowRates
 from opentrons.protocol_engine import DeckPoint, WellLocation
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
+from ...versioning import MAX_SUPPORTED_VERSION
 from ..instrument import AbstractInstrument
 from .well import WellCore
 

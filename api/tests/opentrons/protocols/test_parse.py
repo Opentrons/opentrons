@@ -21,7 +21,7 @@ from opentrons.protocols.types import (
     MalformedProtocolError,
     ApiDeprecationError,
 )
-from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocol_api import APIVersion
 
 
 @pytest.mark.parametrize(

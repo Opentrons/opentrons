@@ -8,11 +8,11 @@ from .labware import Labware
 from .well import Well
 
 from opentrons import types
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control.dev_types import PipetteDict
 
 # todo(mm, 2021-04-09): Duplicate these classes in this package to
 # decouple from the v2 opentrons.protocol_api?
+from opentrons.protocol_api.versioning import APIVersion
 from opentrons.protocol_api.instrument_context import AdvancedLiquidHandling
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient

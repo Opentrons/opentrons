@@ -5,6 +5,7 @@ handling hash and sig checking
 
 import binascii
 import hashlib
+import json
 import logging
 import os
 import subprocess
@@ -43,6 +44,30 @@ class HashMismatch(ValueError):
     def __init__(self, message: str) -> None:
         self.message = message
         self.short = "Hash Mismatch"
+
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__}: {self.message}>"
+
+    def __str__(self) -> str:
+        return self.message
+
+
+class InvalidPKGName(ValueError):
+    def __init__(self, message: str) -> None:
+        self.message = message
+        self.short = "Invalid PKG Name"
+
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__}: {self.message}>"
+
+    def __str__(self) -> str:
+        return self.message
+
+
+class InvalidRobotType(ValueError):
+    def __init__(self, message: str) -> None:
+        self.message = message
+        self.short = "Invalid Robot Type"
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}: {self.message}>"
@@ -220,3 +245,14 @@ def verify_signature(message_path: str, sigfile_path: str, cert_path: str) -> No
     else:
         LOG.error(f"Verification failed with cert {cert_path}: {verification!r}")
         raise SignatureMismatch("Signature check failed")
+
+
+def load_version_file(version_file: str) -> Mapping[str, str]:
+    version = {}
+    LOG.debug(f"Loading version file {version_file}")
+    try:
+        with open(version_file, "r") as fh:
+            version = json.load(fh)
+    except Exception:
+        LOG.exception(f"Could not load version file - {version_file}")
+    return version

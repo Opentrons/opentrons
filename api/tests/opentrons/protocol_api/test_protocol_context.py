@@ -12,9 +12,9 @@ from opentrons.types import Mount, DeckSlotName
 from opentrons.broker import Broker
 from opentrons.hardware_control.modules.types import ModuleType, TemperatureModuleModel
 from opentrons.protocols.api_support import instrument as mock_instrument_support
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
+    APIVersion,
     ProtocolContext,
     InstrumentContext,
     ModuleContext,

@@ -23,7 +23,7 @@ from opentrons.config import (
 )
 from opentrons.util import logging_config
 from opentrons.protocols.types import ApiDeprecationError
-from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocol_api import APIVersion
 
 version = sys.version_info[0:2]
 if version < (3, 7):

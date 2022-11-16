@@ -16,7 +16,7 @@ from otupdate.buildroot import update, config, update_actions
 from otupdate.common import file_actions
 from otupdate.common.session import UpdateSession, Stages
 from otupdate.common.update_actions import UpdateActionsInterface
-from otupdate.openembedded import Updater, RootFSInterface
+from otupdate.openembedded import OT3UpdateActions, RootFSInterface
 from tests.openembedded.conftest import (
     mock_partition_manager_valid_switch_,
 )
@@ -74,7 +74,9 @@ async def test_commit_fails_wrong_state(test_cli, update_session):
     params=[
         (
             0,
-            lambda: Updater(RootFSInterface(), mock_partition_manager_valid_switch_()),
+            lambda: OT3UpdateActions(
+                RootFSInterface(), mock_partition_manager_valid_switch_()
+            ),
         ),
         (1, lambda: update_actions.OT2UpdateActions()),
     ]
@@ -152,7 +154,7 @@ async def test_update_happypath(
 ):
 
     updaters = [
-        Updater(
+        OT3UpdateActions(
             root_FS_intf=RootFSInterface(),
             part_mngr=mock_partition_manager_valid_switch,
         ),
@@ -184,7 +186,6 @@ async def test_update_happypath(
                 )
             },
         )
-
     assert resp.status == 201
     body = await resp.json()
     assert body["stage"] == "validating"

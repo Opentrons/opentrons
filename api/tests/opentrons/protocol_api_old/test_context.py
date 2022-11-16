@@ -8,13 +8,8 @@ from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 
 import opentrons.protocol_api as papi
-import opentrons.protocols.api_support as papi_support
 import opentrons.protocols.geometry as papi_geometry
 
-from opentrons.protocol_api.module_contexts import (
-    ThermocyclerContext,
-    HeaterShakerContext,
-)
 from opentrons.types import Mount, Point, Location, TransferTipPolicy
 from opentrons.hardware_control import API, NoTipAttachedError, ThreadManagedHardware
 from opentrons.hardware_control.instruments import Pipette
@@ -22,33 +17,10 @@ from opentrons.hardware_control.types import Axis
 from opentrons.protocols.advanced_control import transfers as tf
 from opentrons.config.pipette_config import config_names
 from opentrons.protocols.api_support import instrument as instrument_support
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons.calibration_storage import types as cs_types
 from opentrons.util.helpers import utc_now
 
 import pytest
-
-
-def set_version_added(attr, mp, version):
-    """helper to mock versionadded for an attr
-
-    attr is the attr
-    mp is a monkeypatch fixture
-    version is an APIVersion
-    """
-
-    def get_wrapped(attr):
-        if hasattr(attr, "__wrapped__"):
-            return get_wrapped(attr.__wrapped__)
-        return attr
-
-    if hasattr(attr, "fget"):
-        # this is a property probably
-        orig = get_wrapped(attr.fget)
-    else:
-        orig = get_wrapped(attr)
-    mp.setattr(orig, "__opentrons_version_added", version)
-    return attr
 
 
 @pytest.fixture
@@ -189,8 +161,8 @@ def test_location_cache_two_pipettes_fails_pre_2_10(ctx, get_labware_def, hardwa
     ctx.home()
     left = ctx.load_instrument("p10_single", Mount.LEFT)
     right = ctx.load_instrument("p10_single", Mount.RIGHT)
-    left._implementation._api_version = APIVersion(2, 9)
-    right._implementation._api_version = APIVersion(2, 9)
+    left._implementation._api_version = papi.APIVersion(2, 9)
+    right._implementation._api_version = papi.APIVersion(2, 9)
 
     left_loc = Location(point=Point(1, 2, 3), labware="1")
     right_loc = Location(point=Point(3, 4, 5), labware="2")
@@ -284,7 +256,7 @@ def test_pick_up_without_prep_after(ctx, get_labware_def):
 
 def test_pick_up_tip_old_version(hardware, get_labware_def):
     # API version 2.12, a pick-up tip would not prepare-for-aspirate
-    api_version = APIVersion(2, 12)
+    api_version = papi.APIVersion(2, 12)
     ctx = papi.create_protocol_context(api_version=api_version, hardware_api=hardware)
 
     ctx.home()
@@ -306,16 +278,16 @@ def test_pick_up_tip_old_version(hardware, get_labware_def):
 
     # cannot run pick_up_tip() with a prep_after= arg
     assert not pipette.has_tip
-    with pytest.raises(papi_support.util.APIVersionError):
+    with pytest.raises(papi.APIVersionError):
         instr.pick_up_tip(tiprack["A2"].top(), prep_after=False)
-    with pytest.raises(papi_support.util.APIVersionError):
+    with pytest.raises(papi.APIVersionError):
         instr.pick_up_tip(tiprack["A2"].top(), prep_after=True)
 
 
 def test_return_tip_old_version(hardware, get_labware_def):
     # API version 2.2, a returned tip would be picked up by the
     # next pick up tip call
-    api_version = APIVersion(2, 1)
+    api_version = papi.APIVersion(2, 1)
     ctx = papi.create_protocol_context(api_version=api_version, hardware_api=hardware)
     ctx.home()
     tiprack = ctx.load_labware("opentrons_96_tiprack_300ul", 1)
@@ -669,7 +641,7 @@ def test_mix(ctx, monkeypatch):
 
 
 def test_touch_tip_default_args(monkeypatch, hardware):
-    api_version = APIVersion(2, 3)
+    api_version = papi.APIVersion(2, 3)
     ctx = papi.create_protocol_context(api_version=api_version, hardware_api=hardware)
     ctx.home()
     lw = ctx.load_labware("opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap", 1)
@@ -1124,14 +1096,14 @@ def test_extra_labware(get_labware_fixture, hardware):
 
 
 def test_api_version_checking(hardware):
-    minor_over = APIVersion(
+    minor_over = papi.APIVersion(
         papi.MAX_SUPPORTED_VERSION.major,
         papi.MAX_SUPPORTED_VERSION.minor + 1,
     )
     with pytest.raises(RuntimeError):
         papi.create_protocol_context(api_version=minor_over, hardware_api=hardware)
 
-    major_over = APIVersion(
+    major_over = papi.APIVersion(
         papi.MAX_SUPPORTED_VERSION.major + 1,
         papi.MAX_SUPPORTED_VERSION.minor,
     )
@@ -1141,26 +1113,19 @@ def test_api_version_checking(hardware):
 
 def test_api_per_call_checking(monkeypatch, hardware):
     ctx = papi.create_protocol_context(
-        api_version=APIVersion(1, 9),
-        hardware_api=hardware,
-    )
-
-    assert ctx.deck  # 1.9 < 2.0, but api version 1 is excepted from checking
-
-    ctx = papi.create_protocol_context(
-        api_version=APIVersion(2, 1),
+        api_version=papi.APIVersion(2, 1),
         hardware_api=hardware,
     )
     # versions > 2.0 are ok
     assert ctx.deck
     # set_rail_lights() was added in 2.5
-    with pytest.raises(papi_support.util.APIVersionError):
+    with pytest.raises(papi.APIVersionError):
         ctx.set_rail_lights(on=True)
 
 
 def test_home_plunger(monkeypatch, hardware):
     ctx = papi.create_protocol_context(
-        api_version=APIVersion(2, 0),
+        api_version=papi.APIVersion(2, 0),
         hardware_api=hardware,
     )
     ctx.home()
@@ -1178,7 +1143,7 @@ def test_move_to_with_thermocycler(
 
     mod = ctx.load_module("thermocycler")
 
-    assert isinstance(mod, ThermocyclerContext)
+    assert isinstance(mod, papi.ThermocyclerContext)
     mod._core.flag_unsafe_move = mock.MagicMock(side_effect=raiser)  # type: ignore[attr-defined, assignment]
     instr = ctx.load_instrument("p1000_single", "left")
     with pytest.raises(RuntimeError, match="Cannot"):
@@ -1199,7 +1164,7 @@ def test_move_to_with_heater_shaker(
 
     mod = ctx.load_module("heaterShakerModuleV1", 1)
 
-    assert isinstance(mod, HeaterShakerContext)
+    assert isinstance(mod, papi.HeaterShakerContext)
     mod._core.flag_unsafe_move = mock.MagicMock(side_effect=raiser)  # type: ignore[attr-defined]
 
     instr = ctx.load_instrument("p300_multi", "left")
