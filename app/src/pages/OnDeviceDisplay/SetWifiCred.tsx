@@ -143,13 +143,8 @@ export function SetWifiCred(): JSX.Element {
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   type={showPassword ? 'text' : 'password'}
-                  css={css`
-                    font-size: 1.25rem;
-                    line-height: 1.25rem;
-                  `}
                 />
               </Box>
-
               <Btn
                 marginLeft="1.5rem"
                 onClick={() => setShowPassword(currentState => !currentState)}

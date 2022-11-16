@@ -134,7 +134,6 @@ export const AppComponent = (): JSX.Element => {
   ]
 
   const routes = isOnDevice ? onDeviceDisplayRoutes : allRoutes
-  // const redirectPath = isOnDevice ? '/device-setup' : '/protocols'
 
   return (
     <>
@@ -168,7 +167,7 @@ export const AppComponent = (): JSX.Element => {
                     </Route>
                   )
                 })}
-                <Redirect to="/device-setup" />
+                <Redirect to="/set-wifi-cred/test" />
               </Switch>
               <Alerts />
             </Box>
@@ -203,32 +202,6 @@ export const AppComponent = (): JSX.Element => {
           </>
         )}
       </Flex>
-      {/* <TopPortalRoot />
-        {!isOnDevice ? <Navbar routes={routes} /> : null}
-        <Box width="100%">
-          <Switch>
-            {routes.map(({ Component, exact, path }: RouteProps) => {
-              return (
-                <Route key={path} exact={exact} path={path}>
-                  <Breadcrumbs />
-                  <Box
-                    position={POSITION_RELATIVE}
-                    width="100%"
-                    height="100%"
-                    backgroundColor={COLORS.fundamentalsBackground}
-                    overflow={OVERFLOW_SCROLL}
-                  >
-                    <ModalPortalRoot />
-                    <Component />
-                  </Box>
-                </Route>
-              )
-            })}
-            <Redirect exact from="/" to={redirectPath} />
-          </Switch>
-          <Alerts />
-        </Box>
-      </Flex> */}
     </>
   )
 }

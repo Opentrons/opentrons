@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled, { css } from 'styled-components'
+import { css } from 'styled-components'
 
 import {
   Flex,
@@ -12,23 +12,12 @@ import {
   BORDERS,
   TYPOGRAPHY,
   COLOR_WARNING_DARK,
-  styleProps,
-  isntStyleProp,
 } from '@opentrons/components'
-
-import type { PrimitiveComponent } from '@opentrons/components'
 
 export const INPUT_TYPE_NUMBER = 'number' as const
 export const INPUT_TYPE_TEXT = 'text' as const
 export const INPUT_TYPE_PASSWORD = 'password' as const
 
-export const ExtendedInput: PrimitiveComponent<'input'> = styled.input.withConfig(
-  {
-    shouldForwardProp: isntStyleProp,
-  }
-)`
-  ${styleProps}
-`
 export interface InputFieldProps {
   /** field is disabled if value is true */
   disabled?: boolean
@@ -115,12 +104,6 @@ function Input(props: InputFieldProps): JSX.Element {
       flex: 1 1 auto;
       width: 100%;
       height: ${SPACING.spacing4};
-      // For the ODD app
-      @media (hover: none) and (pointer: coarse) {
-        /* @media (hover: none) { */
-        height: '3.875rem';
-        color: #ff0000;
-      }
     }
     & input:focus {
       outline: none;
