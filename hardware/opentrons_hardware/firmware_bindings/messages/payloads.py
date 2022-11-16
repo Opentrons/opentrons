@@ -159,6 +159,7 @@ class EncoderPositionResponse(utils.BinarySerializable):
     """Read Encoder Position."""
 
     encoder_position: utils.Int32Field
+    position_flags: MotorPositionFlagsField
 
 
 @dataclass
