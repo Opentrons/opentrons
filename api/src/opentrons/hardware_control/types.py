@@ -493,9 +493,21 @@ class GripperJawState(enum.Enum):
         return self in [GripperJawState.HOMED_READY, GripperJawState.HOLDING_OPENED]
 
 
+class InstrumentProbeType(enum.Enum):
+    PRIMARY = enum.auto()
+    SECONDARY = enum.auto()
+
+
 class GripperProbe(enum.Enum):
     FRONT = enum.auto()
     REAR = enum.auto()
+
+    @classmethod
+    def to_type(cls, gp: "GripperProbe") -> InstrumentProbeType:
+        if gp == cls.FRONT:
+            return InstrumentProbeType.PRIMARY
+        else:
+            return InstrumentProbeType.SECONDARY
 
 
 class InvalidMoveError(ValueError):

@@ -31,7 +31,7 @@ from .ot3utils import (
     create_gripper_jaw_home_group,
 )
 
-from opentrons_hardware.firmware_bindings.constants import NodeId, SensorId
+from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.hardware_control.motion_planning import (
     Move,
     Coordinates,
@@ -46,6 +46,7 @@ from opentrons.hardware_control.types import (
     OT3AxisMap,
     CurrentConfig,
     OT3SubSystem,
+    InstrumentProbeType,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 
@@ -481,7 +482,7 @@ class OT3Simulator:
         distance_mm: float,
         speed_mm_per_s: float,
         sensor_threshold_pf: float,
-        sensor_id: Optional[SensorId] = SensorId.S0,
+        probe: InstrumentProbeType,
     ) -> None:
         self._position[axis_to_node(moving)] += distance_mm
 
@@ -491,7 +492,7 @@ class OT3Simulator:
         moving: OT3Axis,
         distance_mm: float,
         speed_mm_per_s: float,
-        sensor_id: Optional[SensorId] = SensorId.S0,
+        probe: InstrumentProbeType,
     ) -> List[float]:
         self._position[axis_to_node(moving)] += distance_mm
         return []

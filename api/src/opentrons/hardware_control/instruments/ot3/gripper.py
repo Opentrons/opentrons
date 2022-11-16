@@ -158,10 +158,10 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
         if not self._attached_probe:
             cp = cp_override or CriticalPoint.GRIPPER_JAW_CENTER
         else:
-            if self._attached_probe is GripperProbe.FRONT:
-                cp = cp_override or CriticalPoint.GRIPPER_FRONT_CALIBRATION_PIN
-            else:
+            if self._attached_probe is GripperProbe.REAR:
                 cp = cp_override or CriticalPoint.GRIPPER_REAR_CALIBRATION_PIN
+            else:
+                cp = cp_override or CriticalPoint.GRIPPER_FRONT_CALIBRATION_PIN
 
         if cp in [CriticalPoint.GRIPPER_JAW_CENTER, CriticalPoint.XY_CENTER]:
             return self._jaw_center_offset + Point(*self._calibration_offset.offset)

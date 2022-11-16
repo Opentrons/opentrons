@@ -8,7 +8,7 @@ from opentrons.hardware_control.types import (
     CurrentConfig,
     OT3SubSystem,
     OT3Mount,
-    GripperProbe,
+    InstrumentProbeType,
 )
 import numpy as np
 
@@ -300,11 +300,11 @@ def sensor_node_for_mount(mount: OT3Mount) -> ProbeTarget:
     return _sensor_node_lookup[mount]
 
 
-_gripper_sensor_id_lookup: Dict[GripperProbe, SensorId] = {
-    GripperProbe.FRONT: SensorId.S0,
-    GripperProbe.REAR: SensorId.S1,
+_instr_sensor_id_lookup: Dict[InstrumentProbeType, SensorId] = {
+    InstrumentProbeType.PRIMARY: SensorId.S0,
+    InstrumentProbeType.SECONDARY: SensorId.S1,
 }
 
 
-def sensor_id_for_gripper(probe: GripperProbe) -> SensorId:
-    return _gripper_sensor_id_lookup[probe]
+def sensor_id_for_instrument(probe: InstrumentProbeType) -> SensorId:
+    return _instr_sensor_id_lookup[probe]

@@ -46,7 +46,7 @@ from .instruments.ot2.pipette import (
 from .instruments.ot3.gripper import compare_gripper_config_and_check_skip
 from .backends.ot3controller import OT3Controller
 from .backends.ot3simulator import OT3Simulator
-from .backends.ot3utils import get_system_constraints, sensor_id_for_gripper
+from .backends.ot3utils import get_system_constraints
 from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
@@ -67,6 +67,7 @@ from .types import (
     OT3AxisMap,
     OT3SubSystem,
     GripperJawState,
+    InstrumentProbeType,
     GripperProbe,
     GripperNotAttachedError,
 )
@@ -1582,14 +1583,13 @@ class OT3API(
         if mount == OT3Mount.GRIPPER:
             probe = self._gripper_handler.get_attached_probe()
             assert probe
-            sensor_id = sensor_id = sensor_id_for_gripper(probe)
             await self._backend.capacitive_probe(
                 mount,
                 moving_axis,
                 machine_pass_distance,
                 pass_settings.speed_mm_per_s,
                 pass_settings.sensor_threshold_pf,
-                sensor_id,
+                GripperProbe.to_type(probe),
             )
         else:
             await self._backend.capacitive_probe(
@@ -1598,6 +1598,7 @@ class OT3API(
                 machine_pass_distance,
                 pass_settings.speed_mm_per_s,
                 pass_settings.sensor_threshold_pf,
+                probe=InstrumentProbeType.PRIMARY,
             )
         end_pos = await self.gantry_position(mount, refresh=True)
         await self.move_to(mount, pass_start_pos)
@@ -1629,13 +1630,20 @@ class OT3API(
         if mount == OT3Mount.GRIPPER:
             probe = self._gripper_handler.get_attached_probe()
             assert probe
-            sensor_id = sensor_id_for_gripper(probe)
             values = await self._backend.capacitive_pass(
-                mount, moving_axis, sweep_distance, speed_mm_s, sensor_id
+                mount,
+                moving_axis,
+                sweep_distance,
+                speed_mm_s,
+                GripperProbe.to_type(probe),
             )
         else:
             values = await self._backend.capacitive_pass(
-                mount, moving_axis, sweep_distance, speed_mm_s
+                mount,
+                moving_axis,
+                sweep_distance,
+                speed_mm_s,
+                probe=InstrumentProbeType.PRIMARY,
             )
         await self.move_to(mount, begin)
         return values

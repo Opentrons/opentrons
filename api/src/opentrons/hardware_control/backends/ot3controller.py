@@ -29,6 +29,7 @@ from .ot3utils import (
     node_to_axis,
     sub_system_to_node_id,
     sensor_node_for_mount,
+    sensor_id_for_instrument,
     create_gripper_jaw_grip_group,
     create_gripper_jaw_home_group,
     create_gripper_jaw_hold_group,
@@ -61,7 +62,6 @@ from opentrons_hardware.hardware_control.current_settings import (
 )
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
-    SensorId,
     PipetteName as FirmwarePipetteName,
 )
 from opentrons_hardware import firmware_update
@@ -77,6 +77,7 @@ from opentrons.hardware_control.types import (
     OT3SubSystem,
     InvalidPipetteName,
     InvalidPipetteModel,
+    InstrumentProbeType,
 )
 from opentrons_hardware.hardware_control.motion import (
     MoveStopCondition,
@@ -779,7 +780,7 @@ class OT3Controller:
         distance_mm: float,
         speed_mm_per_s: float,
         sensor_threshold_pf: float,
-        sensor_id: SensorId = SensorId.S0,
+        probe: InstrumentProbeType,
     ) -> None:
         pos, _ = await capacitive_probe(
             self._messenger,
@@ -787,7 +788,7 @@ class OT3Controller:
             axis_to_node(moving),
             distance_mm,
             speed_mm_per_s,
-            sensor_id,
+            sensor_id_for_instrument(probe),
             relative_threshold_pf=sensor_threshold_pf,
             log_sensor_values=True,
         )
@@ -800,7 +801,7 @@ class OT3Controller:
         moving: OT3Axis,
         distance_mm: float,
         speed_mm_per_s: float,
-        sensor_id: SensorId = SensorId.S0,
+        probe: InstrumentProbeType,
     ) -> List[float]:
         data = await capacitive_pass(
             self._messenger,
@@ -808,7 +809,7 @@ class OT3Controller:
             axis_to_node(moving),
             distance_mm,
             speed_mm_per_s,
-            sensor_id,
+            sensor_id_for_instrument(probe),
         )
         self._position[axis_to_node(moving)] += distance_mm
         return data

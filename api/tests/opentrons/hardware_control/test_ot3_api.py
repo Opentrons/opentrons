@@ -1,6 +1,6 @@
 """ Tests for behaviors specific to the OT3 hardware controller.
 """
-from typing import cast, Iterator, Union, Dict, Optional, Tuple
+from typing import cast, Iterator, Union, Dict, Tuple
 from typing_extensions import Literal
 from math import copysign
 import pytest
@@ -22,11 +22,11 @@ from opentrons.hardware_control.types import (
     InvalidMoveError,
     CriticalPoint,
     GripperProbe,
+    InstrumentProbeType,
 )
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control import ThreadManager
 from opentrons.hardware_control.backends.ot3utils import axis_to_node
-from opentrons_hardware.firmware_bindings.constants import SensorId
 from opentrons.types import Point, Mount
 
 
@@ -183,7 +183,7 @@ def mock_backend_capacitive_probe(
             distance_mm: float,
             speed_mm_per_s: float,
             threshold_pf: float,
-            sensor_id: Optional[SensorId] = None,
+            probe: InstrumentProbeType,
         ) -> None:
             ot3_hardware._backend._position[axis_to_node(moving)] += distance_mm / 2
 
@@ -206,7 +206,7 @@ def mock_backend_capacitive_pass(
             moving: OT3Axis,
             distance_mm: float,
             speed_mm_per_s: float,
-            sensor_id: Optional[SensorId] = None,
+            probe: InstrumentProbeType,
         ) -> None:
             ot3_hardware._backend._position[axis_to_node(moving)] += distance_mm / 2
             return [1, 2, 3, 4, 5, 6, 8]
@@ -247,7 +247,7 @@ async def test_capacitive_probe(
     # This is a negative probe because the current position is the home position
     # which is very large.
     mock_backend_capacitive_probe.assert_called_once_with(
-        mount, moving, 3, 4, 1.0, None
+        mount, moving, 3, 4, 1.0, InstrumentProbeType.PRIMARY
     )
 
     original = moving.set_in_point(here, 0)
@@ -361,13 +361,16 @@ async def test_pipette_capacitive_sweep(
     data = await ot3_hardware.capacitive_sweep(OT3Mount.RIGHT, axis, begin, end, 3)
     assert data == [1, 2, 3, 4, 5, 6, 8]
     mock_backend_capacitive_pass.assert_called_once_with(
-        OT3Mount.RIGHT, axis, distance, 3, None
+        OT3Mount.RIGHT, axis, distance, 3, InstrumentProbeType.PRIMARY
     )
 
 
 @pytest.mark.parametrize(
-    "probe,sensor_id",
-    [(GripperProbe.FRONT, SensorId.S0), (GripperProbe.REAR, SensorId.S1)],
+    "probe,intr_probe",
+    [
+        (GripperProbe.FRONT, InstrumentProbeType.PRIMARY),
+        (GripperProbe.REAR, InstrumentProbeType.SECONDARY),
+    ],
 )
 @pytest.mark.parametrize(
     "axis,begin,end,distance",
@@ -380,7 +383,7 @@ async def test_pipette_capacitive_sweep(
 )
 async def test_gripper_capacitive_sweep(
     probe: GripperProbe,
-    sensor_id: SensorId,
+    intr_probe: InstrumentProbeType,
     axis: OT3Axis,
     begin: Point,
     end: Point,
@@ -396,7 +399,7 @@ async def test_gripper_capacitive_sweep(
     data = await ot3_hardware.capacitive_sweep(OT3Mount.GRIPPER, axis, begin, end, 3)
     assert data == [1, 2, 3, 4, 5, 6, 8]
     mock_backend_capacitive_pass.assert_called_once_with(
-        OT3Mount.GRIPPER, axis, distance, 3, sensor_id
+        OT3Mount.GRIPPER, axis, distance, 3, intr_probe
     )
 
 
