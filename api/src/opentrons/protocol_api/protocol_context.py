@@ -22,9 +22,15 @@ from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
 from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support import instrument as instrument_support
-from opentrons.protocols.api_support.util import AxisMaxSpeeds
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import (
+    AxisMaxSpeeds,
+    requires_version,
+    APIVersionError,
+)
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.protocols.geometry.deck import Deck
+from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
 from .core.common import ModuleCore, ProtocolCore
 from .core.labware import AbstractLabware
@@ -36,13 +42,6 @@ from .core.module import (
 )
 
 from . import validation
-from .versioning import (
-    MAX_SUPPORTED_VERSION,
-    APIVersion,
-    APIVersionError,
-    HasAPIVersion,
-    requires_version,
-)
 from .instrument_context import InstrumentContext
 from .labware import Labware
 from .module_contexts import (
@@ -74,7 +73,7 @@ class HardwareManager(NamedTuple):
     hardware: SyncHardwareAPI
 
 
-class ProtocolContext(CommandPublisher, HasAPIVersion):
+class ProtocolContext(CommandPublisher):
     """The Context class is a container for the state of a protocol.
 
     It encapsulates many of the methods formerly found in the Robot class,

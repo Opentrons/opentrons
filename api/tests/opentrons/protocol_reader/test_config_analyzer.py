@@ -4,7 +4,7 @@ import textwrap
 from typing import List, NamedTuple
 
 from opentrons_shared_data import load_shared_data
-from opentrons.protocol_api import APIVersion
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.models import JsonProtocol
 
 from opentrons.protocol_reader import (

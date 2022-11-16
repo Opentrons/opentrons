@@ -4,18 +4,16 @@ from decoy import Decoy, matchers
 from pathlib import Path
 from typing import List, cast
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons_shared_data.protocol.models.protocol_schema_v6 import ProtocolSchemaV6
 from opentrons_shared_data.protocol.dev_types import (
     JsonProtocol as LegacyJsonProtocolDict,
 )
-
 from opentrons.broker import Broker
 from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.config import feature_flags
-from opentrons.protocol_api import APIVersion
-
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons_shared_data.protocol.models.protocol_schema_v6 import ProtocolSchemaV6
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons.protocol_api_experimental import ProtocolContext
 from opentrons.protocol_engine import ProtocolEngine, Liquid, commands as pe_commands
 from opentrons.protocol_engine.errors.exceptions import CommandDoesNotExistError

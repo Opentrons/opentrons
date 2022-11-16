@@ -13,10 +13,9 @@ from typing import (
     TYPE_CHECKING,
     TypeVar,
 )
-
-from opentrons import types
 from opentrons.protocol_api.labware import Well
-from opentrons.protocol_api.versioning import APIVersion
+from opentrons import types
+from opentrons.protocols.api_support.types import APIVersion
 
 if TYPE_CHECKING:
     from opentrons.protocol_api import InstrumentContext

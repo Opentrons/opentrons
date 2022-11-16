@@ -14,6 +14,7 @@ from opentrons.hardware_control import (
 )
 from opentrons.protocol_engine import ProtocolEngine
 from opentrons.protocol_engine.clients import SyncClient, ChildThreadTransport
+from opentrons.protocols.api_support.types import APIVersion
 
 from .protocol_context import ProtocolContext
 
@@ -27,7 +28,6 @@ from .core.protocol_api.labware_offset_provider import (
 )
 from .core.simulator.protocol_context import ProtocolContextSimulation
 from .core.engine import ProtocolCore
-from .versioning import APIVersion
 
 
 def create_protocol_context(

@@ -4,12 +4,8 @@ from decoy import Decoy, matchers
 
 from opentrons.broker import Broker
 from opentrons.hardware_control.modules import MagneticStatus
-
-from opentrons.protocol_api import (
-    MAX_SUPPORTED_VERSION,
-    APIVersion,
-    MagneticModuleContext,
-)
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION, MagneticModuleContext
 from opentrons.protocol_api.core.common import ProtocolCore, MagneticModuleCore
 
 
