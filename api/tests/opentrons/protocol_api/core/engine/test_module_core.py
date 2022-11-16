@@ -65,7 +65,6 @@ def test_get_deck_slot(
     assert subject.get_deck_slot() == DeckSlotName.SLOT_1
 
 
-@pytest.mark.parametrize("api_version", [APIVersion(2, 3)])
 def test_add_labware_core(
     decoy: Decoy, subject: ModuleCore, api_version: APIVersion
 ) -> None:

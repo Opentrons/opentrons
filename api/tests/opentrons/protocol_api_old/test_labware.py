@@ -220,7 +220,8 @@ def corning_96_wellplate_360ul_flat(corning_96_wellplate_360ul_flat_def):
         implementation=LabwareImplementation(
             definition=corning_96_wellplate_360ul_flat_def,
             parent=Location(Point(0, 0, 0), "Test Slot"),
-        )
+        ),
+        api_version=MAX_SUPPORTED_VERSION,
     )
 
 
@@ -236,7 +237,8 @@ def opentrons_96_tiprack_300ul(opentrons_96_tiprack_300ul_def):
         implementation=LabwareImplementation(
             definition=opentrons_96_tiprack_300ul_def,
             parent=Location(Point(0, 0, 0), "Test Slot"),
-        )
+        ),
+        api_version=MAX_SUPPORTED_VERSION,
     )
 
 
@@ -540,12 +542,14 @@ def test_tiprack_list():
     tiprack = labware.Labware(
         implementation=LabwareImplementation(
             labware_def, Location(Point(0, 0, 0), "Test Slot")
-        )
+        ),
+        api_version=MAX_SUPPORTED_VERSION,
     )
     tiprack_2 = labware.Labware(
         implementation=LabwareImplementation(
             labware_def, Location(Point(0, 0, 0), "Test Slot")
-        )
+        ),
+        api_version=MAX_SUPPORTED_VERSION,
     )
 
     assert labware.select_tiprack_from_list([tiprack], 1) == (tiprack, tiprack["A1"])
@@ -582,7 +586,8 @@ def test_uris():
     lw = labware.Labware(
         implementation=LabwareImplementation(
             defn, Location(Point(0, 0, 0), "Test Slot")
-        )
+        ),
+        api_version=MAX_SUPPORTED_VERSION,
     )
     assert lw.uri == uri
 
@@ -637,7 +642,9 @@ def test_set_offset(decoy: Decoy) -> None:
     """It should set the labware's offset using the implementation."""
     labware_impl = decoy.mock(cls=AbstractLabware)
     decoy.when(labware_impl.get_well_columns()).then_return([])
-    subject = labware.Labware(implementation=labware_impl)
+    subject = labware.Labware(
+        implementation=labware_impl, api_version=APIVersion(2, 12)
+    )
 
     subject.set_offset(x=1.1, y=2.2, z=3.3)
     decoy.verify(labware_impl.set_calibration(Point(1.1, 2.2, 3.3)))

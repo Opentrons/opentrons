@@ -153,12 +153,13 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
         from opentrons.protocol_api.labware import Labware, Well
 
         edges = build_edges(
-            # TODO(mc, 2022-10-26): respect api_version
-            # https://opentrons.atlassian.net/browse/RSS-97
             where=Well(
-                parent=Labware(implementation=location.geometry.parent),
+                parent=Labware(
+                    implementation=location.geometry.parent,
+                    api_version=self._api_version,
+                ),
                 well_implementation=location,
-                api_version=MAX_SUPPORTED_VERSION,
+                api_version=self._api_version,
             ),
             offset=v_offset,
             mount=self._mount,

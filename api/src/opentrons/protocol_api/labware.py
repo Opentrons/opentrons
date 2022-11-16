@@ -48,6 +48,14 @@ if TYPE_CHECKING:
 _log = logging.getLogger(__name__)
 
 
+_IGNORE_API_VERSION_BREAKPOINT = APIVersion(2, 13)
+"""API version after which to respect... the API version setting.
+
+At this API version and below, `Labware` objects were always
+erroneously constructed set to MAX_SUPPORTED_VERSION.
+."""
+
+
 class TipSelectionError(Exception):
     pass
 
@@ -67,6 +75,9 @@ class Well:
     def __init__(
         self, parent: Labware, well_implementation: WellCore, api_version: APIVersion
     ):
+        if api_version <= _IGNORE_API_VERSION_BREAKPOINT:
+            api_version = _IGNORE_API_VERSION_BREAKPOINT
+
         self._parent = parent
         self._impl = well_implementation
         self._api_version = api_version
@@ -249,7 +260,7 @@ class Labware(DeckItem):
     def __init__(
         self,
         implementation: AbstractLabware[Any],
-        api_version: Optional[APIVersion] = None,
+        api_version: APIVersion,
     ) -> None:
         """
         :param implementation: The class that implements the public interface
@@ -260,8 +271,8 @@ class Labware(DeckItem):
                                      defaults to
                                      :py:attr:`.MAX_SUPPORTED_VERSION`.
         """
-        if not api_version:
-            api_version = MAX_SUPPORTED_VERSION
+        if api_version <= _IGNORE_API_VERSION_BREAKPOINT:
+            api_version = _IGNORE_API_VERSION_BREAKPOINT
 
         self._api_version = api_version
         self._implementation: LabwareCore = implementation
@@ -336,8 +347,6 @@ class Labware(DeckItem):
         return self._implementation.get_quirks()
 
     # TODO(mc, 2022-09-23): use `self._implementation.get_default_magnet_engage_height`
-    # blocked until Labware actually respects API version
-    # https://opentrons.atlassian.net/browse/RSS-97
     @property  # type: ignore
     @requires_version(2, 0)
     def magdeck_engage_height(self) -> Optional[float]:
@@ -818,7 +827,7 @@ def load_from_definition(
             parent=parent,
             label=label,
         ),
-        api_version=api_level,
+        api_version=api_level or MAX_SUPPORTED_VERSION,
     )
 
 

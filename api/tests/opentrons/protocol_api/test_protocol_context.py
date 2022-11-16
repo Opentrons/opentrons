@@ -12,7 +12,6 @@ from opentrons.types import Mount, DeckSlotName
 from opentrons.broker import Broker
 from opentrons.hardware_control.modules.types import ModuleType, TemperatureModuleModel
 from opentrons.protocols.api_support import instrument as mock_instrument_support
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
     ProtocolContext,
@@ -241,7 +240,10 @@ def test_move_labware_to_slot(
     decoy.when(mock_validation.ensure_deck_slot(42)).then_return(DeckSlotName.SLOT_1)
     decoy.when(mock_labware_core.get_well_columns()).then_return([])
 
-    movable_labware = Labware(implementation=mock_labware_core)
+    movable_labware = Labware(
+        implementation=mock_labware_core,
+        api_version=MAX_SUPPORTED_VERSION,
+    )
 
     subject.move_labware(
         labware=movable_labware,
@@ -269,11 +271,14 @@ def test_move_labware_to_module(
 
     decoy.when(mock_labware_core.get_well_columns()).then_return([])
 
-    movable_labware = Labware(implementation=mock_labware_core)
+    movable_labware = Labware(
+        implementation=mock_labware_core,
+        api_version=MAX_SUPPORTED_VERSION,
+    )
     module_location = TemperatureModuleContext(
         core=mock_module_core,
         protocol_core=mock_core,
-        api_version=APIVersion(2, 13),
+        api_version=MAX_SUPPORTED_VERSION,
         broker=mock_broker,
     )
 

@@ -308,9 +308,7 @@ class ProtocolContext(CommandPublisher):
             version=version,
         )
 
-        # TODO(mc, 2022-09-02): add API version
-        # https://opentrons.atlassian.net/browse/RSS-97
-        return Labware(implementation=labware_core)
+        return Labware(implementation=labware_core, api_version=self._api_version)
 
     @requires_version(2, 0)
     def load_labware_by_name(
@@ -352,7 +350,9 @@ class ProtocolContext(CommandPublisher):
         def _only_labwares() -> Iterator[Tuple[int, Labware]]:
             for slotnum, slotitem in self._implementation.get_deck().items():
                 if isinstance(slotitem, AbstractLabware):
-                    yield slotnum, Labware(implementation=slotitem)
+                    yield slotnum, Labware(
+                        implementation=slotitem, api_version=self._api_version
+                    )
                 elif isinstance(slotitem, Labware):
                     yield slotnum, slotitem
                 elif isinstance(slotitem, ModuleGeometry):
@@ -702,7 +702,8 @@ class ProtocolContext(CommandPublisher):
         # TODO AL 20201113 - remove this when DeckLayout only holds
         #  LabwareInterface instances.
         if isinstance(trash, AbstractLabware):
-            return Labware(implementation=trash)
+            return Labware(implementation=trash, api_version=self._api_version)
+
         return cast("Labware", trash)
 
     @requires_version(2, 5)
