@@ -8,10 +8,11 @@ from opentrons.hardware_control.types import (
     CurrentConfig,
     OT3SubSystem,
     OT3Mount,
+    InstrumentProbeType,
 )
 import numpy as np
 
-from opentrons_hardware.firmware_bindings.constants import NodeId
+from opentrons_hardware.firmware_bindings.constants import NodeId, SensorId
 from opentrons_hardware.hardware_control.motion_planning import (
     AxisConstraints,
     SystemConstraints,
@@ -297,3 +298,13 @@ _sensor_node_lookup: Dict[OT3Mount, ProbeTarget] = {
 
 def sensor_node_for_mount(mount: OT3Mount) -> ProbeTarget:
     return _sensor_node_lookup[mount]
+
+
+_instr_sensor_id_lookup: Dict[InstrumentProbeType, SensorId] = {
+    InstrumentProbeType.PRIMARY: SensorId.S0,
+    InstrumentProbeType.SECONDARY: SensorId.S1,
+}
+
+
+def sensor_id_for_instrument(probe: InstrumentProbeType) -> SensorId:
+    return _instr_sensor_id_lookup[probe]

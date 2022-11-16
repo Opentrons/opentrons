@@ -67,6 +67,8 @@ from .types import (
     OT3AxisMap,
     OT3SubSystem,
     GripperJawState,
+    InstrumentProbeType,
+    GripperProbe,
     GripperNotAttachedError,
 )
 from . import modules
@@ -935,6 +937,7 @@ class OT3API(
                     try:
                         gripper = self._gripper_handler.get_gripper()
                         gripper.state = GripperJawState.HOMED_READY
+                        gripper.current_jaw_displacement = encoder_position[OT3Axis.G]
                     except GripperNotAttachedError:
                         pass
 
@@ -1026,7 +1029,14 @@ class OT3API(
         try:
             await self._backend.gripper_grip_jaw(duty_cycle=duty_cycle)
             encoder_pos = await self._backend.update_encoder_position()
-            self._encoder_current_position.update(encoder_pos)
+            self._encoder_current_position = deck_from_machine(
+                encoder_pos,
+                self._transforms.deck_calibration.attitude,
+                self._transforms.carriage_offset,
+            )
+            self._gripper_handler.set_jaw_displacement(
+                self._encoder_current_position[OT3Axis.G]
+            )
         except Exception:
             self._log.exception("Gripper grip failed")
             raise
@@ -1037,7 +1047,14 @@ class OT3API(
         try:
             await self._backend.gripper_home_jaw()
             encoder_pos = await self._backend.update_encoder_position()
-            self._encoder_current_position.update(encoder_pos)
+            self._encoder_current_position = deck_from_machine(
+                encoder_pos,
+                self._transforms.deck_calibration.attitude,
+                self._transforms.carriage_offset,
+            )
+            self._gripper_handler.set_jaw_displacement(
+                self._encoder_current_position[OT3Axis.G]
+            )
         except Exception:
             self._log.exception("Gripper home failed")
             raise
@@ -1064,7 +1081,14 @@ class OT3API(
                 )
             )
             encoder_pos = await self._backend.update_encoder_position()
-            self._encoder_current_position.update(encoder_pos)
+            self._encoder_current_position = deck_from_machine(
+                encoder_pos,
+                self._transforms.deck_calibration.attitude,
+                self._transforms.carriage_offset,
+            )
+            self._gripper_handler.set_jaw_displacement(
+                self._encoder_current_position[OT3Axis.G]
+            )
         except Exception:
             self._log.exception("Gripper set width failed")
             raise
@@ -1491,6 +1515,12 @@ class OT3API(
     async def remove_tip(self, mount: Union[top_types.Mount, OT3Mount]) -> None:
         await self._pipette_handler.remove_tip(OT3Mount.from_mount(mount))
 
+    def add_gripper_probe(self, probe: GripperProbe) -> None:
+        self._gripper_handler.add_probe(probe)
+
+    def remove_gripper_probe(self) -> None:
+        self._gripper_handler.remove_probe()
+
     async def capacitive_probe(
         self,
         mount: OT3Mount,
@@ -1550,13 +1580,26 @@ class OT3API(
         )
         pass_start_pos = moving_axis.set_in_point(here, pass_start)
         await self.move_to(mount, pass_start_pos)
-        await self._backend.capacitive_probe(
-            mount,
-            moving_axis,
-            machine_pass_distance,
-            pass_settings.speed_mm_per_s,
-            pass_settings.sensor_threshold_pf,
-        )
+        if mount == OT3Mount.GRIPPER:
+            probe = self._gripper_handler.get_attached_probe()
+            assert probe
+            await self._backend.capacitive_probe(
+                mount,
+                moving_axis,
+                machine_pass_distance,
+                pass_settings.speed_mm_per_s,
+                pass_settings.sensor_threshold_pf,
+                GripperProbe.to_type(probe),
+            )
+        else:
+            await self._backend.capacitive_probe(
+                mount,
+                moving_axis,
+                machine_pass_distance,
+                pass_settings.speed_mm_per_s,
+                pass_settings.sensor_threshold_pf,
+                probe=InstrumentProbeType.PRIMARY,
+            )
         end_pos = await self.gantry_position(mount, refresh=True)
         await self.move_to(mount, pass_start_pos)
         return moving_axis.of_point(end_pos)
@@ -1584,9 +1627,24 @@ class OT3API(
         )
 
         await self.move_to(mount, begin)
-        values = await self._backend.capacitive_pass(
-            mount, moving_axis, sweep_distance, speed_mm_s
-        )
+        if mount == OT3Mount.GRIPPER:
+            probe = self._gripper_handler.get_attached_probe()
+            assert probe
+            values = await self._backend.capacitive_pass(
+                mount,
+                moving_axis,
+                sweep_distance,
+                speed_mm_s,
+                GripperProbe.to_type(probe),
+            )
+        else:
+            values = await self._backend.capacitive_pass(
+                mount,
+                moving_axis,
+                sweep_distance,
+                speed_mm_s,
+                probe=InstrumentProbeType.PRIMARY,
+            )
         await self.move_to(mount, begin)
         return values
 
