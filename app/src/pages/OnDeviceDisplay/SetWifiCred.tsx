@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import { useParams, useHistory } from 'react-router-dom'
 import last from 'lodash/last'
-import { css } from 'styled-components'
 
 import {
   Box,
