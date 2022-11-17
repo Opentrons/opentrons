@@ -62,12 +62,17 @@ async def _test_current_calibration(api: OT3API, mount: OT3Mount, pos: Point) ->
         await api.move_to(mount, pos, critical_point=cp)
         jaw_width = 90
         while True:
-            res = input('press ENTER to close jaws 1mm more; type "yes" to stop')
+            res = input('ENTER closes 1mm more; type "s" to stop; type "g" to grip: ')
             if not res:
                 jaw_width -= 1
                 await api.hold_jaw_width(jaw_width)
-            elif res.strip().lower()[0] == "y":
+            elif res.strip().lower()[0] == "s":
                 break
+            elif res.strip().lower()[0] == "g":
+                await api.grip(20)
+                input("ENTER to ungrip jaws")
+                await api.home_gripper_jaw()
+                jaw_width = 90
         await api.home_gripper_jaw()
     else:
         await api.move_to(mount, pos, critical_point=cp)
@@ -158,6 +163,9 @@ async def _find_square_center(
 
 
 async def _find_square_center_of_gripper_jaw(api: OT3API, expected_pos: Point) -> Point:
+    # first, we grip the jaw, so that the jaws are fully pressing inwards
+    # this removes wiggle/backlash from jaws during probing
+    await api.grip(20)
     input("add probe to Gripper FRONT, then press ENTER: ")
     grip_cp = CriticalPoint.GRIPPER_FRONT_CALIBRATION_PIN
     found_square_front = await _find_square_center(
@@ -207,6 +215,8 @@ async def _find_square_center_of_gripper_jaw(api: OT3API, expected_pos: Point) -
         critical_point=grip_cp,
     )
     input("Remove probe from Gripper, then press ENTER: ")
+    # ungrip the jaws
+    await api.home_gripper_jaw()
     # average the two probes together
     found_square_pos = 0.5 * (found_square_front + found_square_back)
     return found_square_pos
@@ -255,12 +265,12 @@ async def _main(simulate: bool, slot: int, mount: OT3Mount, test: bool) -> None:
 
     # run the calibration procedure
     if mount != OT3Mount.GRIPPER:
-        input("add probe to Pipette, then press ENTER: ")
-        found_square_pos = await _find_square_center(api, mount, calibration_square_pos)
-    else:
         found_square_pos = await _find_square_center_of_gripper_jaw(
             api, calibration_square_pos
         )
+    else:
+        input("add probe to Pipette, then press ENTER: ")
+        found_square_pos = await _find_square_center(api, mount, calibration_square_pos)
 
     # Save pipette offsets
     offset_position = calibration_square_pos - found_square_pos
