@@ -57,71 +57,111 @@ describe('BeforeBeginning', () => {
     // mockNeedHelpLink.mockReturnValue(<div>mock need help link</div>)
     mockInProgressModal.mockReturnValue(<div>mock in progress</div>)
   })
-  it('returns the correct information for calibrate flow', async () => {
-    const { getByText, getByAltText, getByRole } = render(props)
-    getByText('Before you begin')
-    getByText(
-      'To get started, remove labware from the rest of the deck and clean up the work area to make attachment and calibration easier. Also gather the needed equipment shown on the right hand side'
-    )
-    getByText(
-      'The calibration probe is included with the robot and should be stored on the right hand side of the door opening.'
-    )
-    getByText('You will need:')
-    // getByText('mock need help link')
-    getByAltText('Calibration Probe')
-    const proceedBtn = getByRole('button', { name: 'Get started' })
-    fireEvent.click(proceedBtn)
-    expect(props.chainRunCommands).toHaveBeenCalledWith(
-      [
-        {
-          commandType: 'home',
-          params: {},
-        },
-        {
-          commandType: 'loadPipette',
-          params: {
-            mount: LEFT,
-            pipetteId: 'abc',
-            pipetteName: 'p1000_single_gen3',
+  describe('calibrate flow', () => {
+    it('returns the correct information for calibrate flow', async () => {
+      const { getByText, getByAltText, getByRole } = render(props)
+      getByText('Before you begin')
+      getByText(
+        'To get started, remove labware from the rest of the deck and clean up the work area to make attachment and calibration easier. Also gather the needed equipment shown on the right hand side'
+      )
+      getByText(
+        'The calibration probe is included with the robot and should be stored on the right hand side of the door opening.'
+      )
+      getByText('You will need:')
+      // getByText('mock need help link')
+      getByAltText('Calibration Probe')
+      const proceedBtn = getByRole('button', { name: 'Get started' })
+      fireEvent.click(proceedBtn)
+      expect(props.chainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'home',
+            params: {},
           },
-        },
-        {
-          commandType: 'calibration/moveToLocation',
-          params: { pipetteId: 'abc', location: 'attachOrDetach' },
-        },
-      ],
-      false
-    )
-    await waitFor(() => {
-      expect(props.proceed).toHaveBeenCalled()
+          {
+            commandType: 'loadPipette',
+            params: {
+              mount: LEFT,
+              pipetteId: 'abc',
+              pipetteName: 'p1000_single_gen3',
+            },
+          },
+          {
+            commandType: 'calibration/moveToLocation',
+            params: { pipetteId: 'abc', location: 'attachOrDetach' },
+          },
+        ],
+        false
+      )
+      await waitFor(() => {
+        expect(props.proceed).toHaveBeenCalled()
+      })
+    })
+    it('returns the correct information for in progress modal when robot is moving', () => {
+      props = {
+        ...props,
+        isRobotMoving: true,
+      }
+      const { getByText } = render(props)
+      getByText('mock in progress')
+    })
+
+    it('continue button is disabled when isCreateLoading is true', () => {
+      props = {
+        ...props,
+        isCreateLoading: true,
+      }
+      const { getByRole } = render(props)
+      const proceedBtn = getByRole('button', { name: 'Get started' })
+      expect(proceedBtn).toBeDisabled()
+    })
+
+    it('renders the error modal screen when errorMessage is true', () => {
+      props = {
+        ...props,
+        errorMessage: 'error shmerror',
+      }
+      const { getByText } = render(props)
+      getByText('Error encountered')
+      getByText('error shmerror')
     })
   })
-  it('returns the correct information for in progress modal when robot is moving', () => {
-    props = {
-      ...props,
-      isRobotMoving: true,
-    }
-    const { getByText } = render(props)
-    getByText('mock in progress')
-  })
-
-  it('continue button is disabled when isCreateLoading is true', () => {
-    props = {
-      ...props,
-      isCreateLoading: true,
-    }
-    const { getByRole } = render(props)
-    const proceedBtn = getByRole('button', { name: 'Get started' })
-    expect(proceedBtn).toBeDisabled()
-  })
-
-  it('renders the error modal screen when errorMessage is true', () => {
-    props = {
-      ...props,
-      errorMessage: 'error shmerror',
-    }
-    const { getByText } = render(props)
-    getByText('Error encountered')
-    getByText('error shmerror')
+  describe('attach flow', () => {
+    it('renders the modal with all correct text. clicking on proceed button sends commands', async () => {
+      props = {
+        ...props,
+        attachedPipette: { left: null, right: null },
+        flowType: FLOWS.ATTACH,
+      }
+      const { getByText, getByAltText, getByRole } = render(props)
+      getByText('Before you begin')
+      getByText(
+        'To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
+      )
+      getByText(
+        'The calibration probe is included with the robot and should be stored on the right-hand side of the door opening.'
+      )
+      getByAltText('GEN3 Pipette')
+      getByText('You will need:')
+      getByAltText('Calibration Probe')
+      getByAltText('2.5 mm Hex Screwdriver')
+      getByText(
+        'Provided with robot. Using another size can strip the instruments’s screws.'
+      )
+      const proceedBtn = getByRole('button', { name: 'Move gantry to front' })
+      fireEvent.click(proceedBtn)
+      expect(props.chainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'home',
+            params: {},
+          },
+        ],
+        false
+      )
+      await waitFor(() => {
+        expect(props.proceed).toHaveBeenCalled()
+      })
+    })
   })
 })
