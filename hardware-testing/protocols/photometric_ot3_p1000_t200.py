@@ -5,7 +5,6 @@ metadata = {"apiLevel": "2.13"}
 
 RESERVOIR_DYE_WELL = "A1"
 COLUMN = 1  # which column to dispense dye
-TEST_VOLUME = 200
 
 
 def run(ctx: ProtocolContext) -> None:
@@ -18,6 +17,7 @@ def run(ctx: ProtocolContext) -> None:
     wells = [plate[f"{row}{COLUMN}"] for row in "ABCDEFGH"]
     for well in wells:
         pipette.pick_up_tip()
-        pipette.aspirate(TEST_VOLUME, reservoir[RESERVOIR_DYE_WELL])
-        pipette.dispense(TEST_VOLUME, well)
+        pipette.aspirate(200, reservoir[RESERVOIR_DYE_WELL].bottom(3))
+        pipette.dispense(200, well.bottom(5))
+        pipette.blow_out(well.top())
         pipette.drop_tip()
