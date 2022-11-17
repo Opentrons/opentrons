@@ -210,4 +210,57 @@ describe('PipetteWizardFlows', () => {
     //   expect(props.closeFlow).toHaveBeenCalled()
     // })
   })
+  it('renders the correct information, calling the correct commands for the detach flow', () => {
+    props = {
+      ...props,
+      flowType: FLOWS.DETACH,
+    }
+    mockGetPipetteWizardSteps.mockReturnValue([
+      {
+        section: SECTIONS.BEFORE_BEGINNING,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.DETACH_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+    ])
+    const { getByText } = render(props)
+    getByText('Detach a pipette')
+    //  TODO(jr 11/11/22): finish the rest of the test
+  })
+
+  it('renders the correct information, calling the correct commands for the attach flow', () => {
+    props = {
+      ...props,
+      flowType: FLOWS.ATTACH,
+    }
+    mockGetPipetteWizardSteps.mockReturnValue([
+      {
+        section: SECTIONS.BEFORE_BEGINNING,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.MOUNT_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+    ])
+    const { getByText } = render(props)
+    getByText('Attach a pipette')
+    //  TODO(jr 11/11/22): finish the rest of the test
+  })
 })
