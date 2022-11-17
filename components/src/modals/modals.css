@@ -15,7 +15,13 @@
 
 .modal {
   @apply --modal;
+  z-index: 1;
+  padding: 4rem;
+}
 
+.modal_pd {
+  @apply --modal;
+  position: fixed;
   z-index: 1;
   padding: 4rem;
 }
