@@ -38,7 +38,7 @@ export const BeforeBeginning = (
   }, [])
 
   const pipetteId = attachedPipette[mount]?.id
-  if (pipetteId == null) return null
+  if (pipetteId == null && flowType === FLOWS.CALIBRATE) return null
   const handleOnClick = (): void => {
     chainRunCommands(
       [
