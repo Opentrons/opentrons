@@ -76,16 +76,6 @@ def mock_move_group_run():
 
 
 @pytest.fixture
-def mock_move_group_runner():
-    with patch(
-        "opentrons.hardware_control.backends.ot3controller.MoveGroupRunner",
-        autospec=True,
-    ) as mock_runner:
-        mock_runner.return_value.run.return_value = {}
-        yield mock_runner
-
-
-@pytest.fixture
 def mock_present_nodes(controller: OT3Controller):
     old_pn = controller._present_nodes
     controller._present_nodes = set(
@@ -120,19 +110,6 @@ def mock_tool_detector(controller: OT3Controller):
         yield md
 
 
-def home_runner_return_value(home_axes, present_nodes):
-    gantry_homes = {}
-    for axis in OT3Axis.gantry_axes():
-        if axis in home_axes and axis_to_node(axis) in present_nodes:
-            gantry_homes[axis_to_node(axis)] = (0.0, 0.0)
-    yield gantry_homes
-    pipette_homes = {}
-    for axis in OT3Axis.pipette_axes():
-        if axis in home_axes and axis_to_node(axis) in present_nodes:
-            pipette_homes[axis_to_node(axis)] = (0.0, 0.0)
-    yield pipette_homes
-
-
 home_test_params = [
     [OT3Axis.X],
     [OT3Axis.Y],
@@ -147,10 +124,32 @@ home_test_params = [
 ]
 
 
+def move_group_run_side_effect(controller, axes_to_home):
+    """Return homed position for axis that is present and was commanded to home."""
+    gantry_homes = {
+        axis_to_node(ax): (0.0, 0.0)
+        for ax in OT3Axis.gantry_axes()
+        if ax in axes_to_home and axis_to_node(ax) in controller._present_nodes
+    }
+    if gantry_homes:
+        yield gantry_homes
+
+    pipette_homes = {
+        axis_to_node(ax): (0.0, 0.0)
+        for ax in OT3Axis.pipette_axes()
+        if ax in axes_to_home and axis_to_node(ax) in controller._present_nodes
+    }
+    yield pipette_homes
+
+
 @pytest.mark.parametrize("axes", home_test_params)
 async def test_home_execute(
     controller: OT3Controller, mock_move_group_run, axes, mock_present_nodes
 ):
+    mock_move_group_run.side_effect = move_group_run_side_effect(controller, axes)
+    # nothing has been homed
+    assert len(controller._homed_nodes) == 0
+
     commanded_homes = set(axes)
     await controller.home(axes)
     all_calls = list(chain([args[0][0] for args in mock_move_group_run.call_args_list]))
@@ -163,11 +162,19 @@ async def test_home_execute(
                 assert step.stop_condition == MoveStopCondition.limit_switch
     assert not commanded_homes
 
+    # all commanded axes have been homed
+    assert controller._homed_nodes == set(axis_to_node(ax) for ax in axes)
+    assert controller.has_homed(axes)
+
 
 @pytest.mark.parametrize("axes", home_test_params)
 async def test_home_prioritize_mount(
     controller: OT3Controller, mock_move_group_run, axes, mock_present_nodes
 ):
+    mock_move_group_run.side_effect = move_group_run_side_effect(controller, axes)
+    # nothing has been homed
+    assert not len(controller._homed_nodes)
+
     await controller.home(axes)
     has_xy = len({OT3Axis.X, OT3Axis.Y} & set(axes)) > 0
     has_mount = len(set(OT3Axis.mount_axes()) & set(axes)) > 0
@@ -181,11 +188,18 @@ async def test_home_prioritize_mount(
     else:
         assert len(run) == 1
 
+    # all commanded axes have been homed
+    assert controller._homed_nodes == set(axis_to_node(ax) for ax in axes)
+    assert controller.has_homed(axes)
+
 
 @pytest.mark.parametrize("axes", home_test_params)
 async def test_home_build_runners(
     controller: OT3Controller, mock_move_group_run, axes, mock_present_nodes
 ):
+    mock_move_group_run.side_effect = move_group_run_side_effect(controller, axes)
+    assert not len(controller._homed_nodes)
+
     await controller.home(axes)
     has_pipette = len(set(OT3Axis.pipette_axes()) & set(axes)) > 0
     has_gantry = len(set(OT3Axis.gantry_axes()) & set(axes)) > 0
@@ -204,30 +218,34 @@ async def test_home_build_runners(
         assert len(mock_move_group_run.call_args_list) == 1
         mock_move_group_run.assert_awaited_once()
 
+    # all commanded axes have been homed
+    assert controller._homed_nodes == set(axis_to_node(ax) for ax in axes)
+    assert controller.has_homed(axes)
+
 
 @pytest.mark.parametrize("axes", home_test_params)
 async def test_home_only_present_nodes(
     controller: OT3Controller, mock_move_group_run, axes
 ):
-    present_nodes = set(
+    starting_position = {
+        NodeId.head_l: 20,
+        NodeId.head_r: 85,
+        NodeId.gantry_x: 68,
+        NodeId.gantry_y: 54,
+        NodeId.pipette_left: 30,
+        NodeId.pipette_right: 110,
+    }
+    homed_position = {}
+
+    controller._present_nodes = set(
         (NodeId.gantry_x, NodeId.gantry_y, NodeId.head_l, NodeId.head_r)
     )
+    controller._position = starting_position
 
-    controller._present_nodes = present_nodes
-    controller._position.update(
-        {
-            NodeId.head_l: 20,
-            NodeId.head_r: 85,
-            NodeId.gantry_x: 68,
-            NodeId.gantry_y: 54,
-            NodeId.pipette_left: 30,
-            NodeId.pipette_right: 110,
-        }
-    )
-    starting_position = controller._position
-    new_position = {}
+    mock_move_group_run.side_effect = move_group_run_side_effect(controller, axes)
 
-    mock_move_group_run.side_effect = home_runner_return_value(axes, present_nodes)
+    # nothing has been homed
+    assert not len(controller._homed_nodes)
 
     await controller.home(axes)
 
@@ -243,12 +261,15 @@ async def test_home_only_present_nodes(
                 for node, step in move_group_step.items():
                     assert node in controller._present_nodes
                     assert step  # don't pass in empty steps
-                    new_position[node] = 0.0  # track homed position for node
+                    homed_position[node] = 0.0  # track homed position for node
 
     # check that the current position is updated
-    expected_position = {**starting_position, **new_position}
+    expected_position = {**starting_position, **homed_position}
     for node, pos in controller._position.items():
         assert pos == expected_position[node]
+    # check that the homed axis is tracked by _homed_nodes
+    assert len(controller._homed_nodes) == len(homed_position.keys())
+    assert controller._homed_nodes == homed_position.keys()
 
 
 async def test_probing(
