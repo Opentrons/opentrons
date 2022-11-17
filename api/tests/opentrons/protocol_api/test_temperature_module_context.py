@@ -4,13 +4,9 @@ from decoy import Decoy, matchers
 
 from opentrons.broker import Broker
 from opentrons.hardware_control.modules import TemperatureStatus
-
-from opentrons.protocol_api import (
-    MAX_SUPPORTED_VERSION,
-    APIVersion,
-    TemperatureModuleContext,
-)
-from opentrons.protocol_api.versioning import APIVersionError
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import APIVersionError
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION, TemperatureModuleContext
 from opentrons.protocol_api.core.common import ProtocolCore, TemperatureModuleCore
 
 

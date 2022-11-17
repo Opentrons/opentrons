@@ -21,11 +21,14 @@ from opentrons.hardware_control.types import (
     GripperNotAttachedError,
     InvalidMoveError,
     CriticalPoint,
+    GripperProbe,
+    InstrumentProbeType,
 )
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control import ThreadManager
 from opentrons.hardware_control.backends.ot3utils import axis_to_node
 from opentrons.types import Point, Mount
+
 
 from opentrons.config import gripper_config as gc
 from opentrons_shared_data.gripper.dev_types import GripperModel
@@ -180,6 +183,7 @@ def mock_backend_capacitive_probe(
             distance_mm: float,
             speed_mm_per_s: float,
             threshold_pf: float,
+            probe: InstrumentProbeType,
         ) -> None:
             ot3_hardware._backend._position[axis_to_node(moving)] += distance_mm / 2
 
@@ -198,7 +202,11 @@ def mock_backend_capacitive_pass(
     ) as mock_pass:
 
         async def _update_position(
-            mount: OT3Mount, moving: OT3Axis, distance_mm: float, speed_mm_per_s: float
+            mount: OT3Mount,
+            moving: OT3Axis,
+            distance_mm: float,
+            speed_mm_per_s: float,
+            probe: InstrumentProbeType,
         ) -> None:
             ot3_hardware._backend._position[axis_to_node(moving)] += distance_mm / 2
             return [1, 2, 3, 4, 5, 6, 8]
@@ -238,7 +246,9 @@ async def test_capacitive_probe(
 
     # This is a negative probe because the current position is the home position
     # which is very large.
-    mock_backend_capacitive_probe.assert_called_once_with(mount, moving, 3.0, 4, 1.0)
+    mock_backend_capacitive_probe.assert_called_once_with(
+        mount, moving, 3, 4, 1.0, InstrumentProbeType.PRIMARY
+    )
 
     original = moving.set_in_point(here, 0)
     for call in mock_move_to.call_args_list:
@@ -339,7 +349,7 @@ async def test_capacitive_probe_invalid_axes(
         (OT3Axis.Y, Point(0, 0, 0), Point(0, -1, 0), 1),
     ],
 )
-async def test_capacitive_sweep(
+async def test_pipette_capacitive_sweep(
     axis: OT3Axis,
     begin: Point,
     end: Point,
@@ -351,7 +361,45 @@ async def test_capacitive_sweep(
     data = await ot3_hardware.capacitive_sweep(OT3Mount.RIGHT, axis, begin, end, 3)
     assert data == [1, 2, 3, 4, 5, 6, 8]
     mock_backend_capacitive_pass.assert_called_once_with(
-        OT3Mount.RIGHT, axis, distance, 3
+        OT3Mount.RIGHT, axis, distance, 3, InstrumentProbeType.PRIMARY
+    )
+
+
+@pytest.mark.parametrize(
+    "probe,intr_probe",
+    [
+        (GripperProbe.FRONT, InstrumentProbeType.PRIMARY),
+        (GripperProbe.REAR, InstrumentProbeType.SECONDARY),
+    ],
+)
+@pytest.mark.parametrize(
+    "axis,begin,end,distance",
+    [
+        # Points must be passed through the attitude transform and therefore
+        # flipped
+        (OT3Axis.X, Point(0, 0, 0), Point(1, 0, 0), -1),
+        (OT3Axis.Y, Point(0, 0, 0), Point(0, -1, 0), 1),
+    ],
+)
+async def test_gripper_capacitive_sweep(
+    probe: GripperProbe,
+    intr_probe: InstrumentProbeType,
+    axis: OT3Axis,
+    begin: Point,
+    end: Point,
+    distance: float,
+    ot3_hardware: ThreadManager[OT3API],
+    mock_move_to: AsyncMock,
+    mock_backend_capacitive_pass: AsyncMock,
+) -> None:
+    gripper_config = gc.load(GripperModel.V1, "g12345")
+    instr_data = AttachedGripper(config=gripper_config, id="g12345")
+    await ot3_hardware.cache_gripper(instr_data)
+    ot3_hardware._gripper_handler.add_probe(probe)
+    data = await ot3_hardware.capacitive_sweep(OT3Mount.GRIPPER, axis, begin, end, 3)
+    assert data == [1, 2, 3, 4, 5, 6, 8]
+    mock_backend_capacitive_pass.assert_called_once_with(
+        OT3Mount.GRIPPER, axis, distance, 3, intr_probe
     )
 
 
@@ -476,7 +524,6 @@ async def test_gripper_mount_not_movable(
     [
         CriticalPoint.NOZZLE,
         CriticalPoint.TIP,
-        CriticalPoint.XY_CENTER,
         CriticalPoint.FRONT_NOZZLE,
     ],
 )

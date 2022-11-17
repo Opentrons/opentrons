@@ -9,13 +9,13 @@ from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules import AbstractModule, ModuleModel, ModuleType
 from opentrons.hardware_control.types import DoorState, PauseType
-from opentrons.protocols.api_support.util import AxisMaxSpeeds
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import AxisMaxSpeeds, UnsupportedAPIError
 from opentrons.protocols.geometry import module_geometry
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocols import labware as labware_definition
 
-from ...versioning import APIVersion, APIVersionError
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 
@@ -207,7 +207,9 @@ class ProtocolContextImplementation(
         use_gripper: bool,
     ) -> None:
         """Move labware to new location."""
-        raise APIVersionError("Labware movement is not supported in this API version")
+        raise UnsupportedAPIError(
+            "Labware movement is not supported in this API version"
+        )
 
     def load_module(
         self,

@@ -15,7 +15,7 @@ from opentrons.hardware_control.instruments.ot2 import (
     instrument_calibration as instr_cal,
 )
 from opentrons.protocol_api.labware import Labware
-from opentrons.protocol_api.versioning import APIVersion
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons_shared_data.protocol.dev_types import (
     LiquidHandlingCommand,
     BlowoutLocation,

@@ -6,7 +6,7 @@ from decoy import Decoy, matchers
 from pathlib import Path
 from typing import IO, Optional
 
-from opentrons.protocol_api import APIVersion
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.models import LabwareDefinition
 
 from opentrons.protocol_reader import (

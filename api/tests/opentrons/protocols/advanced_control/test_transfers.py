@@ -3,6 +3,7 @@ import pytest
 
 from opentrons.types import Mount, TransferTipPolicy
 from opentrons.protocols.advanced_control import transfers as tx
+from opentrons.protocols.api_support.types import APIVersion
 
 import opentrons.protocol_api as papi
 
@@ -29,10 +30,10 @@ def _instr_labware(ctx):
 # +++++++ Test Helper Functions ++++++++++
 def test_check_if_zero():
     tclass = tx.TransferPlan
-    assert tclass._check_volume_not_zero(papi.APIVersion(2, 6), 0)
-    assert tclass._check_volume_not_zero(papi.APIVersion(2, 6), 15)
-    assert not tclass._check_volume_not_zero(papi.APIVersion(2, 8), 0)
-    assert tclass._check_volume_not_zero(papi.APIVersion(2, 8), 15)
+    assert tclass._check_volume_not_zero(APIVersion(2, 6), 0)
+    assert tclass._check_volume_not_zero(APIVersion(2, 6), 15)
+    assert not tclass._check_volume_not_zero(APIVersion(2, 8), 0)
+    assert tclass._check_volume_not_zero(APIVersion(2, 8), 15)
 
 
 # +++++++ Test transfer types ++++++++++++
@@ -1047,7 +1048,7 @@ def test_multichannel_transfer_old_version(hardware):
     # for API version below 2.2, multichannel pipette can only
     # reach row A of 384-well plates
     ctx = papi.create_protocol_context(
-        api_version=papi.APIVersion(2, 1),
+        api_version=APIVersion(2, 1),
         hardware_api=hardware,
     )
 
@@ -1107,7 +1108,7 @@ def test_multichannel_transfer_old_version(hardware):
 
 def test_multichannel_transfer_locs(hardware):
     ctx = papi.create_protocol_context(
-        api_version=papi.APIVersion(2, 2),
+        api_version=APIVersion(2, 2),
         hardware_api=hardware,
     )
 
@@ -1297,7 +1298,7 @@ def test_zero_volume_causes_transfer_of_disposal_vol(_instr_labware):
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]
     lw2 = _instr_labware["lw2"]
-    API_VERSION = papi.APIVersion(2, 6)
+    API_VERSION = APIVersion(2, 6)
     blow_out = _instr_labware["instr"].trash_container.wells()[0]
 
     options = tx.TransferOptions()
@@ -1411,7 +1412,7 @@ def test_blowout_to_source(_instr_labware):
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]
     lw2 = _instr_labware["lw2"]
-    API_VERSION = papi.APIVersion(2, 6)
+    API_VERSION = APIVersion(2, 6)
 
     # ========== Transfer ===========
     options = tx.TransferOptions()
@@ -1482,7 +1483,7 @@ def test_blowout_to_dest(_instr_labware):
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]
     lw2 = _instr_labware["lw2"]
-    API_VERSION = papi.APIVersion(2, 6)
+    API_VERSION = APIVersion(2, 6)
 
     # ========== Transfer ===========
     options = tx.TransferOptions()

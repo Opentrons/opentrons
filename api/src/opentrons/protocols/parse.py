@@ -20,7 +20,7 @@ from opentrons_shared_data.protocol import (
     load_schema as load_protocol_schema,
 )
 
-from opentrons.protocol_api import APIVersion
+from .api_support.types import APIVersion
 from .types import (
     Protocol,
     PythonProtocol,

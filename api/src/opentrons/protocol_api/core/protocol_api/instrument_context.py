@@ -7,7 +7,9 @@ from opentrons import types
 from opentrons.hardware_control import CriticalPoint
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support import instrument as instrument_support
+from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.labware_like import LabwareLike
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
     Clearances,
     build_edges,
@@ -16,7 +18,6 @@ from opentrons.protocols.api_support.util import (
 )
 from opentrons.protocols.geometry import planning
 
-from ...versioning import MAX_SUPPORTED_VERSION, APIVersion
 from ..instrument import AbstractInstrument
 from .well import WellImplementation
 from .legacy_module_core import LegacyThermocyclerCore, LegacyHeaterShakerCore
