@@ -121,6 +121,9 @@ class SyncClient:
         labware_id: str,
         well_name: str,
         well_location: WellLocation,
+        minimum_z_height: Optional[float],
+        force_direct: bool,
+        speed: Optional[float],
     ) -> commands.MoveToWellResult:
         """Execute a MoveToWell command and return the result."""
         request = commands.MoveToWellCreate(
@@ -129,6 +132,9 @@ class SyncClient:
                 labwareId=labware_id,
                 wellName=well_name,
                 wellLocation=well_location,
+                forceDirect=force_direct,
+                minimumZHeight=minimum_z_height,
+                speed=speed,
             )
         )
         result = self._transport.execute_command(request=request)

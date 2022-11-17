@@ -78,6 +78,8 @@ class MotionView:
         origin_cp: Optional[CriticalPoint],
         max_travel_z: float,
         current_well: Optional[CurrentWell] = None,
+        force_direct: bool = False,
+        minimum_z_height: Optional[float] = None,
     ) -> List[motion_planning.Waypoint]:
         """Calculate waypoints to a destination that's specified as a well."""
         location = current_well or self._pipettes.get_current_well()
@@ -122,6 +124,10 @@ class MotionView:
             # TODO (spp, 11-29-2021): Should log some kind of warning that pipettes
             #  could crash onto the thermocycler if current well is not known.
 
+        if minimum_z_height:
+            min_travel_z = max(min_travel_z, minimum_z_height)
+        if force_direct:
+            move_type = motion_planning.MoveType.DIRECT
         try:
             return motion_planning.get_waypoints(
                 move_type=move_type,

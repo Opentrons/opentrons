@@ -150,9 +150,9 @@ def test_move_to_well(
     subject.move_to(
         location=location,
         well_core=well_core,
-        force_direct=False,
-        minimum_z_height=None,
-        speed=None,
+        force_direct=True,
+        minimum_z_height=9.87,
+        speed=6.54,
     )
 
     decoy.verify(
@@ -163,6 +163,9 @@ def test_move_to_well(
             well_location=WellLocation(
                 origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
             ),
+            force_direct=True,
+            minimum_z_height=9.87,
+            speed=6.54,
         ),
         mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )

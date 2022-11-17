@@ -187,6 +187,9 @@ def test_move_to_well(
             wellLocation=WellLocation(
                 origin=WellOrigin.BOTTOM, offset=WellOffset(x=1, y=2, z=3)
             ),
+            forceDirect=True,
+            minimumZHeight=4.56,
+            speed=7.89,
         )
     )
     response = commands.MoveToWellResult()
@@ -200,6 +203,9 @@ def test_move_to_well(
         well_location=WellLocation(
             origin=WellOrigin.BOTTOM, offset=WellOffset(x=1, y=2, z=3)
         ),
+        force_direct=True,
+        minimum_z_height=4.56,
+        speed=7.89,
     )
 
     assert result == response
