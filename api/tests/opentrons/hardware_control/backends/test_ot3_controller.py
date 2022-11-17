@@ -28,7 +28,6 @@ from opentrons_hardware.hardware_control.motion import (
     MoveType,
     MoveStopCondition,
 )
-from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
 from opentrons_hardware.hardware_control.tools.detector import OneshotToolDetector
 from opentrons_hardware.hardware_control.tools.types import (
     ToolSummary,

@@ -221,7 +221,7 @@ class OT3Simulator:
         if axes:
             homed = [axis_to_node(a) for a in axes]
         else:
-            homed = self._position.keys()
+            homed = list(self._position.keys())
         for h in homed:
             self._homed_nodes.add(h)
         return axis_convert(self._position, 0.0)
