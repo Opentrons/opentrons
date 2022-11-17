@@ -146,5 +146,12 @@
   "wireless_mac_address": "Wireless MAC Address",
   "wireless_subnet_mask": "Wireless Subnet Mask",
   "yes_clear_data_and_restart_robot": "Yes, clear data and restart robot",
-  "protocol_run_history_description": "Resetting run history will also clear Labware Offset data."
+  "protocol_run_history_description": "Resetting run history will also clear Labware Offset data.",
+  "name_your_robot": "Name your robot",
+  "name_your_robot_description": "Don’t worry, you can always change this in your settings.",
+  "name_rule_description": "Up to 35 characters using letters and numbers only.",
+  "name_rule_error": "Oops! Too short. Robot name must be at least 1 character.",
+  "name_love_it": "{{name}}, love it!",
+  "your_robot_is_ready_to_go": "Your robot is ready to go!",
+  "finish_setup": "Finish setup"
 }

@@ -11,6 +11,7 @@ export const fontSizeP = '0.8125rem' // 13px
 export const fontSizeLabel = '0.6875rem' // 11px
 // this is redundant but we need this for captions and it makes more sense to call it caption rather than re-using fsh6
 export const fontSizeCaption = '0.625rem' // 10px
+export const titleSize = '2rem' // 32px
 
 // Font Weights
 export const fontWeightBold = 800
@@ -138,4 +139,11 @@ export const darkLinkLabelSemiBold = css`
   &:hover {
     color: ${COLORS.darkBlackEnabled};
   }
+`
+
+export const oddHeaderDefault = css`
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 2.75rem;
+  color: #000000;
 `
