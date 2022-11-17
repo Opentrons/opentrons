@@ -52,7 +52,7 @@ jobs:
           owner: opentrons
           repo: oe-core
           workflow-id: build-ot3-actions.yml
-          ref: side-by-side-monorepo
+          ref: heads/side-by-side-monorepo
           inputs: |
             {
               "oe-core-ref": "-",
