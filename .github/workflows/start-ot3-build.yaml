@@ -47,19 +47,3 @@ jobs:
         run: |
            echo "${{ github.event.pull_request.head.repo.full_name }}"
            echo "${{ toJSON(github.event.pull_request.labels }}"
-      - name: 'start build'
-        uses: octokit/request-action@v2.x
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          route: POST /repos/{owner}/{repo}/actions/workflows/{workflow-id}/dispatches
-          owner: opentrons
-          repo: oe-core
-          workflow-id: build-ot3-actions.yml
-          ref: side-by-side-monorepo
-          inputs: |
-            {
-              "oe-core-ref": "-",
-              "monorepo-ref": "${{github.head_ref}}",
-              "infra-stage": "stage-prod"
-            }
