@@ -87,7 +87,6 @@ class LabwareMovementHandler:
 
         # Retract all mounts
         await ot3api.home(axes=[OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.Z_G])
-        # TODO: reset well location cache upon completion of command execution
         await ot3api.home_gripper_jaw()
 
         gripper_homed_position = await ot3api.gantry_position(mount=gripper_mount)
@@ -111,8 +110,8 @@ class LabwareMovementHandler:
             else None
         )
 
-        # TODO: This is a bandaid for saving the gripper after a collision.
-        #       Remove once collisions & recovery are fixed.
+        # TODO: homing is temporary fix to save a gripper after collision.
+        #       Remove this call to home when RLAB-211 is addressed
         await ot3api.home(axes=[OT3Axis.Z_G])
 
         waypoints_to_new_location = self._get_gripper_movement_waypoints(
@@ -127,6 +126,10 @@ class LabwareMovementHandler:
             await ot3api.move_to(mount=gripper_mount, abs_position=waypoint)
 
         await ot3api.ungrip()
+        # TODO: homing is temporary fix to save a gripper after collision.
+        #       Remove this call to home and uncomment `move_to` when
+        #       RLAB-211 is addressed
+        await ot3api.home(axes=[OT3Axis.Z_G])
         # await ot3api.move_to(
         #     mount=OT3Mount.GRIPPER,
         #     abs_position=Point(
@@ -135,9 +138,6 @@ class LabwareMovementHandler:
         #         gripper_homed_position.z,
         #     ),
         # )
-        # TODO: This is a bandaid for saving the gripper after a collision.
-        #       Remove once collisions & recovery are fixed.
-        await ot3api.home(axes=[OT3Axis.Z_G])
 
         # Keep the gripper in gripped position so it avoids colliding with
         # things like the thermocycler latches
