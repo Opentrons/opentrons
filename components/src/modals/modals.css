@@ -9,18 +9,12 @@
     margin: 0 auto;
     padding: 1rem;
     border-radius: 0.5rem;
-    position: relative;
   }
 }
 
 .modal {
   @apply --modal;
-  z-index: 1;
-  padding: 4rem;
-}
-
-.modal_pd {
-  @apply --modal;
+  align-items: flex-start;
   position: fixed;
   z-index: 1;
   padding: 4rem;

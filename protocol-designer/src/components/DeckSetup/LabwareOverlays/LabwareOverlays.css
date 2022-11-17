@@ -18,7 +18,7 @@
 
   z-index: 1;
   padding: 0.5rem;
-  background-color: color-mod(var(--c-error-dark) alpha(0.75));
+  background-color: color-mod(var(--c-black) alpha(0.75));
   display: flex;
   flex-direction: column;
   justify-content: space-around;

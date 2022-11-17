@@ -19,9 +19,8 @@
 }
 
 .main_page_content {
-  position: absolute;
   top: 3rem;
   bottom: 0;
-  width: calc(100% - 22.8125rem);
+  width: 100%;
   overflow-y: scroll;
 }

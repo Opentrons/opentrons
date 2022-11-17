@@ -28,6 +28,16 @@
   display: block;
   margin: 0 0.5rem;
   width: 8rem;
+
+  &:focus {
+    background-color: transparent;
+  }
+}
+
+.edit_button {
+  display: block;
+  margin: 0 0.5rem;
+  width: 8rem;
 }
 
 .update_button {

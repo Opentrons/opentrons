@@ -259,7 +259,7 @@ const EditModulesModalComponent = (
         )}
         <Form>
           <div className={styles.form_row}>
-            <FormGroup label="Model*" className={styles.option_model}>
+            <FormGroup label="Model" className={styles.option_model}>
               <ModelDropdown
                 fieldName={'selectedModel'}
                 tabIndex={0}

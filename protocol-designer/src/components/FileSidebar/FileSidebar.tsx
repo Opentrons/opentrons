@@ -227,7 +227,7 @@ export function FileSidebar(props: Props): JSX.Element {
         <Portal>
           <AlertModal
             alertOverlay
-            className={modalStyles.modal_pd}
+            className={modalStyles.modal}
             heading={warning && warning.heading}
             onCloseClick={cancelModal}
             buttons={[
