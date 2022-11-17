@@ -20,6 +20,14 @@
   padding: 4rem;
 }
 
+.modal_pd {
+  @apply --modal;
+
+  z-index: 1;
+  padding: 4rem;
+  position: fixed;
+}
+
 .modal_page {
   @apply --absolute-fill;
   @apply --flex-start;
