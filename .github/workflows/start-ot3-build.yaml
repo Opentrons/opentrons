@@ -23,7 +23,7 @@ jobs:
       - name: 'start build'
         uses: octokit/request-action@v2.x
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ secrets.OT3_BUILD_CROSSREPO_ACCESS }}
         with:
           route: POST /repos/{owner}/{repo}/actions/workflows/{workflow-id}/dispatches
           owner: opentrons
@@ -46,7 +46,7 @@ jobs:
       - name: 'start build'
         uses: octokit/request-action@v2.x
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ secrets.OT3_BUILD_CROSSREPO_ACCESS }}
         with:
           route: POST /repos/{owner}/{repo}/actions/workflows/{workflow-id}/dispatches
           owner: opentrons
