@@ -146,6 +146,8 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
         self._calibration_offset = load_gripper_calibration_offset(self._gripper_id)
 
     def _check_calibration_pin_location_is_accurate(self) -> None:
+        if not self.attached_probe:
+            raise RuntimeError("gripper is not currently holding a probe, use Gripper.add_probe()")
         if self.state != GripperJawState.GRIPPING:
             raise RuntimeError("gripper probe pin locations are not accurate if jaw is not gripping")
         # NOTE: (AS) the gripper jaws have a larger positional tolerance stackup when they are open

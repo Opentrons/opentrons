@@ -4,6 +4,7 @@ import argparse
 from typing import Optional
 
 from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control.types import GripperProbe
 
 from hardware_testing.opentrons_api.types import OT3Mount, OT3Axis, Point, CriticalPoint
 from hardware_testing.opentrons_api import helpers_ot3
@@ -167,54 +168,47 @@ async def _find_square_center_of_gripper_jaw(api: OT3API, expected_pos: Point) -
     # this removes wiggle/backlash from jaws during probing
     await api.grip(20)
     input("add probe to Gripper FRONT, then press ENTER: ")
-    grip_cp = CriticalPoint.GRIPPER_FRONT_CALIBRATION_PIN
+    api.add_gripper_probe(GripperProbe.FRONT)
     found_square_front = await _find_square_center(
         api,
         OT3Mount.GRIPPER,
         expected_pos,
-        critical_point=grip_cp,
     )
     input("Press ENTER to move to found center:")
     await api.move_to(
         OT3Mount.GRIPPER,
         found_square_front,
-        critical_point=grip_cp,
     )
     input("Check by EYE, then press ENTER to continue")
     current_position = await api.gantry_position(
         OT3Mount.GRIPPER,
-        critical_point=grip_cp,
     )
     await api.move_to(
         OT3Mount.GRIPPER,
         current_position + Point(z=PROBE_CHANGE_Z),
-        critical_point=grip_cp,
     )
     input("add probe to Gripper BACK, then press ENTER: ")
-    grip_cp = CriticalPoint.GRIPPER_BACK_CALIBRATION_PIN
+    api.add_gripper_probe(GripperProbe.BACK)
     found_square_back = await _find_square_center(
         api,
         OT3Mount.GRIPPER,
         expected_pos,
-        critical_point=grip_cp,
     )
     input("Press ENTER to move to found center:")
     await api.move_to(
         OT3Mount.GRIPPER,
         found_square_back,
-        critical_point=grip_cp,
     )
     input("Check by EYE, then press ENTER to continue")
     current_position = await api.gantry_position(
         OT3Mount.GRIPPER,
-        critical_point=grip_cp,
     )
     await api.move_to(
         OT3Mount.GRIPPER,
         current_position + Point(z=PROBE_CHANGE_Z),
-        critical_point=grip_cp,
     )
     input("Remove probe from Gripper, then press ENTER: ")
+    api.remove_gripper_probe()
     # ungrip the jaws
     await api.home_gripper_jaw()
     # average the two probes together
