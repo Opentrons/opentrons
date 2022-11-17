@@ -31,6 +31,19 @@ def _get_z_probe_pos(square_pos: Point) -> Point:
     return z_probe_pos
 
 
+def _get_instrument_id(api: OT3API, mount: OT3Mount) -> str:
+    if mount == OT3Mount.LEFT or mount == OT3Mount.RIGHT:
+        pipette = api.hardware_pipettes[mount.to_mount()]
+        assert pipette, f"No pipette found on mount: {mount}"
+        instr_id = pipette.pipette_id
+    else:
+        gripper = api.attached_gripper
+        assert gripper, "No gripper found"
+        instr_id = str(gripper["gripper_id"])
+    assert instr_id, f"no instrument ID found on mount: {mount}"
+    return instr_id
+
+
 async def _test_current_calibration(api: OT3API, mount: OT3Mount, pos: Point) -> None:
     cp: Optional[CriticalPoint] = None
     if mount == OT3Mount.GRIPPER:
@@ -47,13 +60,15 @@ async def _test_current_calibration(api: OT3API, mount: OT3Mount, pos: Point) ->
     if mount == OT3Mount.GRIPPER:
         await api.home_gripper_jaw()
         await api.move_to(mount, pos, critical_point=cp)
-        await api.disengage_axes([OT3Axis.G])
-        print(
-            "The gripper's jaw motor is disengaged."
-            " Place a labware in the slot"
-            " and close the jaws by hand"
-            " to make sure they touch the labware at the same time."
-        )
+        jaw_width = 90
+        while True:
+            res = input('press ENTER to close jaws 1mm more; type "yes" to stop')
+            if not res:
+                jaw_width -= 1
+                await api.hold_jaw_width(jaw_width)
+            elif res.strip().lower()[0] == "y":
+                break
+        await api.home_gripper_jaw()
     else:
         await api.move_to(mount, pos, critical_point=cp)
 
@@ -142,19 +157,66 @@ async def _find_square_center(
     return found_square_pos
 
 
+async def _find_square_center_of_gripper_jaw(api: OT3API, expected_pos: Point) -> Point:
+    input("add probe to Gripper FRONT, then press ENTER: ")
+    grip_cp = CriticalPoint.GRIPPER_FRONT_CALIBRATION_PIN
+    found_square_front = await _find_square_center(
+        api,
+        OT3Mount.GRIPPER,
+        expected_pos,
+        critical_point=grip_cp,
+    )
+    input("Press ENTER to move to found center:")
+    await api.move_to(
+        OT3Mount.GRIPPER,
+        found_square_front,
+        critical_point=grip_cp,
+    )
+    input("Check by EYE, then press ENTER to continue")
+    current_position = await api.gantry_position(
+        OT3Mount.GRIPPER,
+        critical_point=grip_cp,
+    )
+    await api.move_to(
+        OT3Mount.GRIPPER,
+        current_position + Point(z=PROBE_CHANGE_Z),
+        critical_point=grip_cp,
+    )
+    input("add probe to Gripper BACK, then press ENTER: ")
+    grip_cp = CriticalPoint.GRIPPER_BACK_CALIBRATION_PIN
+    found_square_back = await _find_square_center(
+        api,
+        OT3Mount.GRIPPER,
+        expected_pos,
+        critical_point=grip_cp,
+    )
+    input("Press ENTER to move to found center:")
+    await api.move_to(
+        OT3Mount.GRIPPER,
+        found_square_back,
+        critical_point=grip_cp,
+    )
+    input("Check by EYE, then press ENTER to continue")
+    current_position = await api.gantry_position(
+        OT3Mount.GRIPPER,
+        critical_point=grip_cp,
+    )
+    await api.move_to(
+        OT3Mount.GRIPPER,
+        current_position + Point(z=PROBE_CHANGE_Z),
+        critical_point=grip_cp,
+    )
+    input("Remove probe from Gripper, then press ENTER: ")
+    # average the two probes together
+    found_square_pos = 0.5 * (found_square_front + found_square_back)
+    return found_square_pos
+
+
 async def _main(simulate: bool, slot: int, mount: OT3Mount, test: bool) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=simulate, use_defaults=True
     )
-    # Get instrument id
-    if mount == OT3Mount.LEFT or mount == OT3Mount.RIGHT:
-        pipette = api.hardware_pipettes[mount.to_mount()]
-        assert pipette, f"No pipette found on mount: {mount}"
-        instr_id = pipette.pipette_id
-    else:
-        gripper = api.attached_gripper
-        assert gripper, "No gripper found"
-        instr_id = str(gripper["gripper_id"])
+    instr_id = _get_instrument_id(api, mount)
     print(
         f"\nStarting Manual Calibration on Deck Slot #{slot} and Instrument {instr_id}:\n"
     )
@@ -173,10 +235,12 @@ async def _main(simulate: bool, slot: int, mount: OT3Mount, test: bool) -> None:
     # Check to see what the current calibration looks like
     if mount == OT3Mount.GRIPPER:
         slot_loc_top_left = helpers_ot3.get_slot_top_left_position_ot3(slot)
+        # use the aluminum block, to more precisely check location
         test_pos = slot_loc_top_left + (GRIPPER_TEST_BLOCK_SIZE * 0.5)
     else:
-        # pipette, so just move to the center of the square
         test_pos = calibration_square_pos
+
+    # test position, then quit the script
     if test:
         await _test_current_calibration(api, mount, test_pos)
         input("ENTER to re-home")
@@ -189,61 +253,14 @@ async def _main(simulate: bool, slot: int, mount: OT3Mount, test: bool) -> None:
     else:
         helpers_ot3.set_gripper_offset_ot3(api, Point(x=0, y=0, z=0))
 
+    # run the calibration procedure
     if mount != OT3Mount.GRIPPER:
         input("add probe to Pipette, then press ENTER: ")
         found_square_pos = await _find_square_center(api, mount, calibration_square_pos)
     else:
-        input("add probe to Gripper FRONT, then press ENTER: ")
-        grip_cp = CriticalPoint.GRIPPER_FRONT_CALIBRATION_PIN
-        found_square_front = await _find_square_center(
-            api,
-            mount,
-            calibration_square_pos,
-            critical_point=grip_cp,
+        found_square_pos = await _find_square_center_of_gripper_jaw(
+            api, calibration_square_pos
         )
-        input("Press ENTER to move to found center:")
-        await api.move_to(
-            mount,
-            found_square_front,
-            critical_point=grip_cp,
-        )
-        input("Check by EYE, then press ENTER to continue")
-        current_position = await api.gantry_position(
-            mount,
-            critical_point=grip_cp,
-        )
-        await api.move_to(
-            mount,
-            current_position + Point(z=PROBE_CHANGE_Z),
-            critical_point=grip_cp,
-        )
-        input("add probe to Gripper BACK, then press ENTER: ")
-        grip_cp = CriticalPoint.GRIPPER_BACK_CALIBRATION_PIN
-        found_square_back = await _find_square_center(
-            api,
-            mount,
-            calibration_square_pos,
-            critical_point=grip_cp,
-        )
-        input("Press ENTER to move to found center:")
-        await api.move_to(
-            mount,
-            found_square_back,
-            critical_point=grip_cp,
-        )
-        input("Check by EYE, then press ENTER to continue")
-        current_position = await api.gantry_position(
-            mount,
-            critical_point=grip_cp,
-        )
-        await api.move_to(
-            mount,
-            current_position + Point(z=PROBE_CHANGE_Z),
-            critical_point=grip_cp,
-        )
-        input("Remove probe from Gripper, then press ENTER: ")
-        # average the two probes together
-        found_square_pos = 0.5 * (found_square_front + found_square_back)
 
     # Save pipette offsets
     offset_position = calibration_square_pos - found_square_pos
