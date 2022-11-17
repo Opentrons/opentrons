@@ -153,5 +153,20 @@
   "name_rule_error": "Oops! Too short. Robot name must be at least 1 character.",
   "name_love_it": "{{name}}, love it!",
   "your_robot_is_ready_to_go": "Your robot is ready to go!",
-  "finish_setup": "Finish setup"
+  "finish_setup": "Finish setup",
+  "connect_to_a_network": "Connect to a network",
+  "hide": "Hide",
+  "show": "Show",
+  "search_again": "Search again",
+  "searching": "Searching",
+  "searching_for_network": "Searching for network...",
+  "connect": "Connect",
+  "done": "Done",
+  "try_again": "Try again",
+  "connected_to_ssid": "Connected to {{ssid}}",
+  "failed_to_connect_to_ssid": "Failed to connect to {{ssid}}",
+  "ip_address": "IP Address",
+  "subnet_mask": "Subnet Mask",
+  "mac_address": "Mac Address",
+  "connecting": "Connecting..."
 }
