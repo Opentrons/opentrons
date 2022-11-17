@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.2.0-alpha.5](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.4...v6.2.0-alpha.5) (2022-11-17)
+
+
+### Bug Fixes
+
+* **app:** pD protocol thermocycler profile steps readability ([#11753](https://github.com/Opentrons/opentrons/issues/11753)) ([0589d34](https://github.com/Opentrons/opentrons/commit/0589d346fce4633a1d82bc728e24f31bf360154e))
+
+
+
+
+
 # [6.2.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.3...v6.2.0-alpha.4) (2022-11-15)
 
 
