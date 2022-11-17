@@ -46,4 +46,4 @@ jobs:
       - name: 'echo stuff'
         run: |
            echo "${{ github.event.pull_request.head.repo.full_name }}"
-           echo "${{ toJSON(github.event.pull_request.labels }}"
+           echo "${{ toJSON(github.event.pull_request.labels) }}"
