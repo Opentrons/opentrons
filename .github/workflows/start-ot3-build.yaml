@@ -40,12 +40,9 @@ jobs:
 
   handle-pr:
     runs-on: 'ubuntu-latest'
-    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'Opentrons/opentrons'
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'Opentrons/opentrons' && contains(github.event.pull_request.labels.*.name, 'ot3-build')
     name: "Start an OT-3 build for a requested PR"
     steps:
-      - name: 'whatever'
-        run: |
-          cat not-exists
       - name: 'start build'
         uses: octokit/request-action@v2.x
         env:
