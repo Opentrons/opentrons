@@ -193,7 +193,7 @@ class Pipette(AbstractInstrument[pipette_config.PipetteConfig]):
         if cp_override in [
             CriticalPoint.GRIPPER_JAW_CENTER,
             CriticalPoint.GRIPPER_FRONT_CALIBRATION_PIN,
-            CriticalPoint.GRIPPER_BACK_CALIBRATION_PIN,
+            CriticalPoint.GRIPPER_REAR_CALIBRATION_PIN,
         ]:
             raise InvalidMoveError(
                 f"Critical point {cp_override.name} is not valid for a pipette"
