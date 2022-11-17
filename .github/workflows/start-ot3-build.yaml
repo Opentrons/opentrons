@@ -33,7 +33,7 @@ jobs:
           inputs: |
             {
               "oe-core-ref": "-",
-              "monorepo-ref": "${{github.ref}}",
+              "monorepo-ref": "${{ github.ref }}",
               "infra-stage": "stage-prod"
             }
 
@@ -56,6 +56,6 @@ jobs:
           inputs: |
             {
               "oe-core-ref": "-",
-              "monorepo-ref": "${{github.head_ref}}",
+              "monorepo-ref": "${{ github.head_ref }}",
               "infra-stage": "stage-prod"
             }
