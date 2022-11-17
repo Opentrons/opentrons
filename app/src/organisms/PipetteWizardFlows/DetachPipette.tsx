@@ -1,4 +1,5 @@
 import * as React from 'react'
+import capitalize from 'lodash/capitalize'
 import { useTranslation } from 'react-i18next'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
@@ -19,7 +20,7 @@ export const DetachPipette = (props: PipetteWizardStepProps): JSX.Element => {
         <img src={detachPipette} width="100%" alt="Detach pipette" />
       }
       bodyText={<StyledText as="p">{t('hold_and_loosen')}</StyledText>}
-      proceedButtonText={t('shared:continue')}
+      proceedButtonText={capitalize(t('shared:continue'))}
       proceed={proceed}
       back={goBack}
     />

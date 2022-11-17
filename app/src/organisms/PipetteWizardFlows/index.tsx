@@ -133,6 +133,7 @@ export const PipetteWizardFlows = (
     attachedPipette,
     setShowErrorMessage,
     errorMessage,
+    robotName,
   }
   const exitModal = (
     <ExitModal goBack={cancelExit} proceed={confirmExit} flowType={flowType} />

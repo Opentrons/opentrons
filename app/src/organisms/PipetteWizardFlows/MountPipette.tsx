@@ -1,60 +1,55 @@
 import * as React from 'react'
+import capitalize from 'lodash/capitalize'
 import { Trans, useTranslation } from 'react-i18next'
-import {
-  Flex,
-  TYPOGRAPHY,
-  DIRECTION_COLUMN,
-  JUSTIFY_CENTER,
-  Btn,
-  TEXT_ALIGN_LEFT,
-} from '@opentrons/components'
+import { useSelector } from 'react-redux'
+import { Flex, Icon, JUSTIFY_CENTER } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import screwPattern from '../../assets/images/change-pip/screw-pattern.png'
-import screwPatternPt2 from '../../assets/images/change-pip/screw-pattern-pt2.png'
-
+import { fetchPipettes, FETCH_PIPETTES } from '../../redux/pipettes'
+import {
+  getRequestById,
+  PENDING,
+  SUCCESS,
+  useDispatchApiRequests,
+} from '../../redux/robot-api'
+import type { RequestState } from '../../redux/robot-api/types'
+import type { State } from '../../redux/types'
 import type { PipetteWizardStepProps } from './types'
 
 export const MountPipette = (props: PipetteWizardStepProps): JSX.Element => {
-  const { proceed, goBack, attachedPipette, mount } = props
+  const { proceed, goBack, robotName } = props
   const { t } = useTranslation('pipette_wizard_flows')
-  const proceedButtonText: string = t('continue')
-  const [showPipetteDetected, setShowPipetteDetected] = React.useState<boolean>(
-    false
-  )
+  const fetchPipettesRequestId = React.useRef<string | null>(null)
+  const [dispatch] = useDispatchApiRequests(dispatchedAction => {
+    if (
+      dispatchedAction.type === FETCH_PIPETTES &&
+      // @ts-expect-error(sa, 2021-05-27): avoiding src code change, need to type narrow
+      dispatchedAction.meta.requestId
+    ) {
+      // @ts-expect-error(sa, 2021-05-27): avoiding src code change, need to type narrow
+      fetchPipettesRequestId.current = dispatchedAction.meta.requestId
+    }
+  })
+  const handleClick = (): void => dispatch(fetchPipettes(robotName, true))
+  const requestStatus = useSelector<State, RequestState | null>(state =>
+    fetchPipettesRequestId.current
+      ? getRequestById(state, fetchPipettesRequestId.current)
+      : null
+  )?.status
+  const isPending = requestStatus === PENDING
+
   React.useEffect(() => {
-    setTimeout(() => setShowPipetteDetected(true), 10000)
-  }, [])
+    if (requestStatus === SUCCESS) proceed()
+  }, [proceed, requestStatus])
 
-  const pipetteName = attachedPipette[mount]?.modelSpecs.displayName
-
-  return showPipetteDetected ? (
+  return (
     <GenericWizardTile
-      header={t('name_and_volume_detected', {
-        name: pipetteName,
-      })}
-      rightHandBody={
-        <Flex justifyContent={JUSTIFY_CENTER}>
-          {/* TODO(jr, 11/2/22): replace this image with correct graphic with screwdriver */}
-          <img
-            src={screwPatternPt2}
-            width="321px"
-            height="226px"
-            alt="Screw pattern pt 2"
-          />
-        </Flex>
-      }
-      bodyText={<StyledText as="p"> {t('grab_screwdriver')}</StyledText>}
-      proceedButtonText={proceedButtonText}
-      proceed={proceed}
-      back={goBack}
-    />
-  ) : (
-    <GenericWizardTile
-      header={t('mount_pipette')}
+      header={t('connect_and_screw_in_pipette')}
       rightHandBody={
         <Flex justifyContent={JUSTIFY_CENTER}>
           <img
+            //  TODO(jr, 11/18/22): attach real image
             src={screwPattern}
             width="171px"
             height="248px"
@@ -63,27 +58,27 @@ export const MountPipette = (props: PipetteWizardStepProps): JSX.Element => {
         </Flex>
       }
       bodyText={
-        <Flex flexDirection={DIRECTION_COLUMN}>
-          <Trans
-            t={t}
-            i18nKey="hold_onto_pipette"
-            components={{
-              block: <StyledText as="p" marginBottom="1rem" />,
-            }}
-          />
-          {/* TODO(Jr, 11/2/22): wire up this button to correct modal */}
-          <Btn onClick={() => console.log('check connection')}>
-            <StyledText
-              textAlign={TEXT_ALIGN_LEFT}
-              css={TYPOGRAPHY.linkPSemiBold}
-            >
-              {t('detach_and_reattach')}
-            </StyledText>
-          </Btn>
-        </Flex>
+        <Trans
+          t={t}
+          i18nKey="hold_onto_pipette"
+          components={{
+            block: <StyledText as="p" marginBottom="1rem" />,
+          }}
+        />
       }
-      proceedButtonText={proceedButtonText}
+      proceedButtonText={
+        isPending ? (
+          //  temporary spinner until we implement the simmer state
+          <Flex width="5rem" justifyContent={JUSTIFY_CENTER}>
+            <Icon name="ot-spinner" height="1rem" spin />
+          </Flex>
+        ) : (
+          capitalize(t('continue'))
+        )
+      }
       back={goBack}
+      proceed={handleClick}
+      proceedIsDisabled={isPending}
     />
   )
 }

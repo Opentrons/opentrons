@@ -25,6 +25,7 @@ describe('Results', () => {
   let props: React.ComponentProps<typeof Results>
   beforeEach(() => {
     props = {
+      robotName: 'otie',
       mount: LEFT,
       goBack: jest.fn(),
       proceed: jest.fn(),
@@ -40,6 +41,18 @@ describe('Results', () => {
   it('renders the correct information when pipette cal is a success for calibrate flow', () => {
     const { getByText, getByRole } = render(props)
     getByText('Pipette Successfully Calibrated')
+    const exit = getByRole('button', { name: 'Results_exit' })
+    fireEvent.click(exit)
+    expect(props.proceed).toHaveBeenCalled()
+  })
+
+  it('renders the correct information when pipette cal is a success for attach flow', () => {
+    props = {
+      ...props,
+      flowType: FLOWS.ATTACH,
+    }
+    const { getByText, getByRole } = render(props)
+    getByText('P1000 Single-Channel GEN3 Successfully Attached')
     const exit = getByRole('button', { name: 'Results_exit' })
     fireEvent.click(exit)
     expect(props.proceed).toHaveBeenCalled()

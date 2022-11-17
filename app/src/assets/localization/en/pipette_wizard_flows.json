@@ -22,8 +22,8 @@
   "attach_this_pipette": "Attach this pipette",
   "single_or_8_channel": "{{single}} or {{eight}} pipette",
   "ninety_six_channel": "{{ninetySix}} pipette",
-  "mount_pipette": "Mount Pipette",
-  "hold_onto_pipette": "<block>Hold onto the pipette so it does not fall. Attach the pipette to the robot by alinging the pins and ensuring a secure connection with the pins.</block><block>If you are stuck on this screen after you have connected a pipette, there is more than likely a problem with the pipette.</block>",
+  "connect_and_screw_in_pipette": "Connect and screw in pipette",
+  "hold_onto_pipette": "<block>Hold onto the pipette so it does not fall. Attach the pipette to the robot by alinging the pins and ensuring a secure connection with the pins.</block><block>Hold the pipette in place and use the hex screwdriver to tighten the pipette screws. Then test that the pipette is securely attached by gently pulling it side to side.</block>",
   "continue": "Continue",
   "detach_and_reattach": "Detach and reattach pipette",
   "grab_screwdriver": "While continuing to hold in place, grab your 2.5mm driver and tighten screws as shown in the animation. Test the pipette attachment by giving it a wiggle before pressing continue",
@@ -34,5 +34,6 @@
   "attach_pipette": "Attach a pipette",
   "detach_pipette": "Detach a pipette",
   "remove_labware": "<block>To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.</block><block>The calibration probe is included with the robot and should be stored on the right-hand side of the door opening.</block>",
-  "move_gantry_to_front": "Move gantry to front"
+  "move_gantry_to_front": "Move gantry to front",
+  "pipette_attached": "{{pipetteName}} Successfully Attached"
 }

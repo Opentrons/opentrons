@@ -18,7 +18,7 @@ describe('GenericWizardTile', () => {
       rightHandBody: <div>right hand body</div>,
       bodyText: 'body',
       proceed: jest.fn(),
-      proceedButtonText: 'Continue',
+      proceedButtonText: <div>Continue</div>,
       header: 'header',
       getHelp: 'getHelpUrl',
     }

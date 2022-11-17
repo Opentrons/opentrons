@@ -39,6 +39,7 @@ describe('BeforeBeginning', () => {
   let props: React.ComponentProps<typeof BeforeBeginning>
   beforeEach(() => {
     props = {
+      robotName: 'otie',
       mount: LEFT,
       goBack: jest.fn(),
       proceed: jest.fn(),
