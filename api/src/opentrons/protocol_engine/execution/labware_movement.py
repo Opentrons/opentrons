@@ -87,7 +87,6 @@ class LabwareMovementHandler:
 
         # Retract all mounts
         await ot3api.home(axes=[OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.Z_G])
-        await ot3api.home_gripper_jaw()
 
         gripper_homed_position = await ot3api.gantry_position(mount=gripper_mount)
         waypoints_to_labware = self._get_gripper_movement_waypoints(
@@ -99,8 +98,15 @@ class LabwareMovementHandler:
                 labware_id
             ),
         )
-        for waypoint in waypoints_to_labware:
-            await ot3api.move_to(mount=gripper_mount, abs_position=waypoint)
+
+        # TODO: We do this to have the gripper move to location with closed grip and
+        #       open right before picking up the labware to avoid collisions as much as
+        #       possible. Re-evaluate whether we need this once collision avoidance is
+        #       in place.
+        await ot3api.move_to(mount=gripper_mount, abs_position=waypoints_to_labware[0])
+        await ot3api.move_to(mount=gripper_mount, abs_position=waypoints_to_labware[1])
+        await ot3api.home_gripper_jaw()
+        await ot3api.move_to(mount=gripper_mount, abs_position=waypoints_to_labware[2])
 
         await ot3api.grip(force_newtons=GRIP_FORCE)
 
