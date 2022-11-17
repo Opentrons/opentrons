@@ -836,6 +836,8 @@ class OT3API(
             await self.retract(self._last_moved_mount, 10)
         if mount != OT3Mount.GRIPPER:
             # TODO: check if we can avoid gripping during every retract
+            if self._gripper_handler.gripper.state == GripperJawState.UNHOMED:
+                await self.home_gripper_jaw()
             await self.grip(force_newtons=20)  # allows for safer gantry movement
         self._last_moved_mount = mount
 
