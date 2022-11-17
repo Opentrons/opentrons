@@ -54,6 +54,10 @@
   display: inline-block;
   width: 6.75rem;
   margin-left: 1rem;
+
+  &:focus {
+    background-color: transparent;
+  }
 }
 
 .crash_info_container {
