@@ -57,8 +57,6 @@ describe('CustomKeyboard', () => {
 
     // fourth row
     getByRole('button', { name: '123' }) // numbers
-    getByRole('button', { name: '' }) // space keyboard
-    getByRole('button', { name: '< enter' })
   })
   it('should render the custom keyboards upper case, when clicking shift key', () => {
     const { getByRole } = render(props)
@@ -98,8 +96,6 @@ describe('CustomKeyboard', () => {
     getByRole('button', { name: 'M' })
     // fourth row
     getByRole('button', { name: '123' }) // numbers
-    getByRole('button', { name: '' }) // space keyboard
-    getByRole('button', { name: '< enter' })
   })
 
   it('should render the custom keyboards numbers, when clicking number key', () => {
