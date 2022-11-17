@@ -16,6 +16,7 @@ export const MountGripper = (props: GripperWizardStepProps): JSX.Element | null 
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
   if (attachedGripper == null) return null
+  // TODO: if clicked and attachedGripper not detected, show "Unable to Detect Gripper" tile
   const handleOnClick = (): void => {
     // setIsBetweenCommands(true)
     // chainRunCommands([
@@ -33,9 +34,9 @@ export const MountGripper = (props: GripperWizardStepProps): JSX.Element | null 
     )
   return (
     <GenericWizardTile
-      header={t('mount_gripper')}
+      header={t('connect_and_screw_in_gripper')}
       rightHandBody={<StyledText>TODO image of gripper being mounted</StyledText>}
-      bodyText={<StyledText as="p">{t('hold_onto_gripper_and_attach')}</StyledText>}
+      bodyText={<StyledText as="p">{t('attached_gripper_and_screw_in')}</StyledText>}
       proceedButtonText={t('shared:continue')}
       proceed={handleOnClick}
       back={goBack}

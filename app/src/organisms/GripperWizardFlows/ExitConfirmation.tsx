@@ -20,17 +20,12 @@ export function ExitConfirmation(props: ExitConfirmationProps): JSX.Element {
   const { goBack, proceed, flowType } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
 
-  let flowTitle: string = t('gripper_calibration')
-  switch (flowType) {
-    case GRIPPER_FLOW_TYPES.ATTACH: {
-      flowTitle = t('attach')
-      break
-    }
-    case GRIPPER_FLOW_TYPES.DETACH: {
-      flowTitle = t('detach')
-      break
-    }
+  const titleFlowType = { [flowType in GripperWizardFlowType]: string } = {
+    [GRIPPER_FLOW_TYPES.ATTACH]: t('attach'),
+    [GRIPPER_FLOW_TYPES.DETACH]: t('detach'),
+    [GRIPPER_FLOW_TYPES.RECALIBRATE]: t('gripper_recalibration'),
   }
+  const flowTitle: string = titleFlowType[flowType]
 
   return (
     <SimpleWizardBody

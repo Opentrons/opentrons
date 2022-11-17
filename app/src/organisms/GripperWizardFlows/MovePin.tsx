@@ -68,7 +68,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
           components={{ block: <StyledText as="p" marginBottom={SPACING.spacing3} /> }}
         />
       ),
-      buttonText: t('initiate_calibration'),
+      buttonText: t('begin_calibration'),
       image: <StyledText>TODO image of moving pin from storage to front jaw</StyledText>
     },
     [MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW]: {

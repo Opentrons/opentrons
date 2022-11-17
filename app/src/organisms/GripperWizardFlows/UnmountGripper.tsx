@@ -17,7 +17,7 @@ export const UnmountGripper = (props: GripperWizardStepProps): JSX.Element | nul
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
   if (attachedGripper == null) return null
   const handleOnClick = (): void => {
-    setIsBetweenCommands(true)
+    // setIsBetweenCommands(true)
     // chainRunCommands([
     //  // TODO: move gantry to mount/unmount location here 
     // ]).then(() => {
@@ -35,7 +35,7 @@ export const UnmountGripper = (props: GripperWizardStepProps): JSX.Element | nul
     <GenericWizardTile
       header={t('loosen_screws_and_detach')}
       rightHandBody={<StyledText>TODO image of gripper being unmounted</StyledText>}
-      bodyText={<StyledText as="p">{t('hold_gripper_and_loosen')}</StyledText>}
+      bodyText={<StyledText as="p">{t('hold_gripper_and_loosen_screws')}</StyledText>}
       proceedButtonText={t('shared:continue')}
       proceed={handleOnClick}
       back={goBack}

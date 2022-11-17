@@ -23,18 +23,16 @@ import type { GripperWizardFlowType } from './types'
 
 interface GripperWizardFlowsProps {
   flowType: GripperWizardFlowType
-  robotName: string
   closeFlow: () => void
 }
 
 export const GripperWizardFlows = (
   props: GripperWizardFlowsProps
 ): JSX.Element | null => {
-  const { flowType, closeFlow, robotName } = props
+  const { flowType, closeFlow } = props
   const { t } = useTranslation('gripper_wizard_flows')
   const attachedGripper = {}
   const gripperWizardSteps = getGripperWizardSteps(flowType)
-  const host = useHost()
   const [runId, setRunId] = React.useState<string>('')
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const totalStepCount = gripperWizardSteps.length - 1
@@ -44,27 +42,12 @@ export const GripperWizardFlows = (
   const goBack = (): void => {
     setCurrentStepIndex(isFinalStep ? currentStepIndex : currentStepIndex - 1)
   }
-  const { chainRunCommands, isCommandMutationLoading } = useChainRunCommands(
-    runId
-  )
+  const { chainRunCommands, isCommandMutationLoading } = useChainRunCommands(runId)
 
   const { createRun, isLoading: isCreateLoading } = useCreateRunMutation(
-    {
-      onSuccess: response => {
-        setRunId(response.data.id)
-      },
-    },
-    host
+    { onSuccess: response => { setRunId(response.data.id) } },
   )
-  const { stopRun, isLoading: isStopLoading } = useStopRunMutation({
-    onSuccess: () => {
-      if (currentStep.section === SECTIONS.MOVE_PIN) {
-        proceed()
-      } else {
-        closeFlow()
-      }
-    },
-  })
+  const { stopRun, isLoading: isStopLoading } = useStopRunMutation({ onSuccess: closeFlow })
 
   const [isBetweenCommands, setIsBetweenCommands] = React.useState<boolean>(
     false
@@ -146,7 +129,8 @@ export const GripperWizardFlows = (
       <BeforeBeginning
         {...currentStep}
         {...sharedProps}
-        createRun={createRun}
+        // createRun={createRun}
+        createRun={() => { console.log('TODO: create run') }}
         isCreateLoading={isCreateLoading}
       />
     )
@@ -178,16 +162,18 @@ export const GripperWizardFlows = (
   } else if (currentStep.section === SECTIONS.SUCCESS) {
     onExit = confirmExit
     modalContent = modalContent = (
-      <Success {...currentStep} {...sharedProps} proceed={isFinalStep ? closeFlow : proceed} />
+      <Success
+        {...currentStep}
+        proceed={isFinalStep ? closeFlow : proceed} />
     )
   }
 
-  const titleByFlowType: {[flowType in GripperWizardFlowType]: string} = {
-    [GRIPPER_FLOW_TYPES.RECALIBRATE]: t('calibrate_a_gripper'),
-    [GRIPPER_FLOW_TYPES.ATTACH]: t('attach_a_gripper'),
-    [GRIPPER_FLOW_TYPES.DETACH]: t('detach_a_gripper')
+  const titleByFlowType: { [flowType in GripperWizardFlowType]: string } = {
+    [GRIPPER_FLOW_TYPES.RECALIBRATE]: t('calibrate_gripper'),
+    [GRIPPER_FLOW_TYPES.ATTACH]: t('attach_gripper'),
+    [GRIPPER_FLOW_TYPES.DETACH]: t('detach_gripper')
   }
-  const wizardTitle = titleByFlowType[flowType] ?? 'unknown page'
+  const wizardTitle = titleByFlowType[flowType]
   let handleExit = onExit
   if (isRobotMoving) {
     handleExit = undefined

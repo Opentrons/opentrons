@@ -3,30 +3,44 @@ import { useTranslation } from 'react-i18next'
 import { COLORS, TEXT_TRANSFORM_CAPITALIZE } from '@opentrons/components'
 import { PrimaryButton } from '../../atoms/buttons'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { GRIPPER_FLOW_TYPES } from './constants'
-import type { GripperWizardFlowType, GripperWizardStepProps, SuccessStep } from './types'
+import { SUCCESSFULLY_ATTACHED, SUCCESSFULLY_ATTACHED_AND_CALIBRATED, SUCCESSFULLY_CALIBRATED, SUCCESSFULLY_DETACHED} from './constants'
+import type { GripperWizardStepProps, SuccessStep } from './types'
 
-export const Success = (props: GripperWizardStepProps & SuccessStep): JSX.Element => {
-  const { proceed, flowType } = props
-  const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
+export const Success = (props: Pick<GripperWizardStepProps, 'proceed'> & SuccessStep): JSX.Element => {
+  const { proceed, successfulAction } = props
+  const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
 
-  const headerByFlowType: {[flowType in GripperWizardFlowType]: string} = {
-    [GRIPPER_FLOW_TYPES.RECALIBRATE]: t('gripper_successfully_calibrated'),
-    [GRIPPER_FLOW_TYPES.ATTACH]: t('gripper_successfully_attached'),
-    [GRIPPER_FLOW_TYPES.DETACH]: t('gripper_successfully_detached')
+  const infoByAction: {[action in SuccessStep['successfulAction']]: {header: string, buttonText: string}} = {
+    [SUCCESSFULLY_ATTACHED_AND_CALIBRATED]: {
+      header: t('gripper_successfully_attached_and_calibrated'),
+      buttonText: t('shared:exit')
+    },
+    [SUCCESSFULLY_CALIBRATED]: {
+      header: t('gripper_successfully_calibrated'),
+      buttonText: t('shared:exit')
+    },
+    [SUCCESSFULLY_ATTACHED]: {
+      header: t('gripper_successfully_attached'),
+      buttonText: t('calibrate_gripper')
+    },
+    [SUCCESSFULLY_DETACHED]: {
+      header: t('gripper_successfully_detached'),
+      buttonText: t('shared:exit')
+    }
   }
+  const {header, buttonText} = infoByAction[successfulAction]
 
   return (
     <SimpleWizardBody
       iconColor={COLORS.successEnabled}
-      header={headerByFlowType[flowType] ?? 'unknown flow'}
+      header={header}
       isSuccess
     >
       <PrimaryButton
         textTransform={TEXT_TRANSFORM_CAPITALIZE}
         onClick={proceed}
       >
-        {t('shared:exit')}
+        {buttonText}
       </PrimaryButton>
     </SimpleWizardBody>
   )
