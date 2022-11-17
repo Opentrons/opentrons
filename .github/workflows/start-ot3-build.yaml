@@ -44,7 +44,7 @@ jobs:
     name: "Start an OT-3 build for a requested PR"
     steps:
       - name: 'whatever'
-        runs: |
+        run: |
           cat not-exists
       - name: 'start build'
         uses: octokit/request-action@v2.x
