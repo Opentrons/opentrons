@@ -1,0 +1,59 @@
+name: 'Start OT-3 build'
+on:
+  push:
+    branches:
+      - edge
+      - chore_bump-*
+      - chore_release-*
+      - release*
+    tags:
+      - v*
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - labeled
+
+jobs:
+  handle-push:
+    if: ${{ github.event_name == "push" }}
+    name: "Start an OT-3 build for a branch push"
+    steps:
+      - name: 'start build'
+        uses: octokit/request-action@v2.x
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          route: POST /repos/{owner}/{repo}/actions/workflows/{workflow-id}/dispatches
+          owner: opentrons
+          repo: oe-core
+          workflow-id: build-ot3-actions.yml
+          ref: side-by-side-monorepo
+          inputs: |
+            {
+              "oe-core-ref": "-",
+              "monorepo-ref": "${{github.ref}}",
+              "infra-stage": "stage-prod"
+            }
+
+
+  handle-pr:
+    if: github.event_name == "pull_request" && github.event.pull_request.head.repo.full_name == "Opentrons/opentrons" && contains('ot3-build', toJSON(github.event.pull_request.labels))
+    name: "Start an OT-3 build for a requested PR"
+    steps:
+      - name: 'start build'
+        uses: octokit/request-action@v2.x
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          route: POST /repos/{owner}/{repo}/actions/workflows/{workflow-id}/dispatches
+          owner: opentrons
+          repo: oe-core
+          workflow-id: build-ot3-actions.yml
+          ref: side-by-side-monorepo
+          inputs: |
+            {
+              "oe-core-ref": "-",
+              "monorepo-ref": "${{github.head_ref}}",
+              "infra-stage": "stage-prod"
+            }
