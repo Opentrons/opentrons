@@ -264,7 +264,7 @@ async def _main(simulate: bool, slot: int, mount: OT3Mount, test: bool) -> None:
         helpers_ot3.set_gripper_offset_ot3(api, Point(x=0, y=0, z=0))
 
     # run the calibration procedure
-    if mount != OT3Mount.GRIPPER:
+    if mount == OT3Mount.GRIPPER:
         found_square_pos = await _find_square_center_of_gripper_jaw(
             api, calibration_square_pos
         )
