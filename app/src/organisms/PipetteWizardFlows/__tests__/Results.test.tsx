@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { LEFT } from '@opentrons/shared-data'
-import { renderWithProviders } from '@opentrons/components'
+import { COLORS, renderWithProviders } from '@opentrons/components'
 import {
   mockAttachedPipette,
   mockGen3P1000PipetteSpecs,
@@ -39,8 +39,11 @@ describe('Results', () => {
     }
   })
   it('renders the correct information when pipette cal is a success for calibrate flow', () => {
-    const { getByText, getByRole } = render(props)
+    const { getByText, getByRole, getByLabelText } = render(props)
     getByText('Pipette Successfully Calibrated')
+    expect(getByLabelText('ot-check')).toHaveStyle(
+      `color: ${COLORS.successEnabled}`
+    )
     const exit = getByRole('button', { name: 'Results_exit' })
     fireEvent.click(exit)
     expect(props.proceed).toHaveBeenCalled()
@@ -51,8 +54,26 @@ describe('Results', () => {
       ...props,
       flowType: FLOWS.ATTACH,
     }
-    const { getByText, getByRole } = render(props)
+    const { getByText, getByRole, getByLabelText } = render(props)
     getByText('P1000 Single-Channel GEN3 Successfully Attached')
+    expect(getByLabelText('ot-check')).toHaveStyle(
+      `color: ${COLORS.successEnabled}`
+    )
+    const exit = getByRole('button', { name: 'Results_exit' })
+    fireEvent.click(exit)
+    expect(props.proceed).toHaveBeenCalled()
+  })
+  it('renders the correct information when pipette cal is a fail for attach flow', () => {
+    props = {
+      ...props,
+      attachedPipette: { left: null, right: null },
+      flowType: FLOWS.ATTACH,
+    }
+    const { getByText, getByRole, getByLabelText } = render(props)
+    getByText('Pipette failed to attach')
+    expect(getByLabelText('ot-alert')).toHaveStyle(
+      `color: ${COLORS.errorEnabled}`
+    )
     const exit = getByRole('button', { name: 'Results_exit' })
     fireEvent.click(exit)
     expect(props.proceed).toHaveBeenCalled()

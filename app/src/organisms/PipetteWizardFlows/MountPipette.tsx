@@ -8,6 +8,7 @@ import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import screwPattern from '../../assets/images/change-pip/screw-pattern.png'
 import { fetchPipettes, FETCH_PIPETTES } from '../../redux/pipettes'
 import {
+  FAILURE,
   getRequestById,
   PENDING,
   SUCCESS,
@@ -40,7 +41,8 @@ export const MountPipette = (props: PipetteWizardStepProps): JSX.Element => {
   const isPending = requestStatus === PENDING
 
   React.useEffect(() => {
-    if (requestStatus === SUCCESS) proceed()
+    //  if requestStatus is FAILURE then the error modal will be in the results page
+    if (requestStatus === SUCCESS || requestStatus === FAILURE) proceed()
   }, [proceed, requestStatus])
 
   return (
@@ -68,7 +70,7 @@ export const MountPipette = (props: PipetteWizardStepProps): JSX.Element => {
       }
       proceedButtonText={
         isPending ? (
-          //  temporary spinner until we implement the simmer state
+          //  TODO(jr 11/17/22): temporary spinner until we implement the simmer state
           <Flex width="5rem" justifyContent={JUSTIFY_CENTER}>
             <Icon name="ot-spinner" height="1rem" spin />
           </Flex>

@@ -10,27 +10,33 @@ export const Results = (props: PipetteWizardStepProps): JSX.Element => {
   const { proceed, flowType, attachedPipette, mount } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
 
-  // TODO(jr 11/17/22): add error states
-  const pipetteName = attachedPipette[mount]?.modelSpecs.displayName ?? ''
-
   let header: string = 'unknown results screen'
+  let iconColor: string = COLORS.successEnabled
+  let isSuccess: boolean = true
+
   switch (flowType) {
     case FLOWS.CALIBRATE: {
       header = t('pip_cal_success')
       break
     }
     case FLOWS.ATTACH: {
-      header = t('pipette_attached', { pipetteName: pipetteName })
+      if (attachedPipette[mount] != null) {
+        const pipetteName = attachedPipette[mount]?.modelSpecs.displayName
+        header = t('pipette_attached', { pipetteName: pipetteName })
+      } else {
+        header = t('pipette_failed_to_attach')
+        iconColor = COLORS.errorEnabled
+        isSuccess = false
+      }
     }
     //  TODO(jr, 10/26/22): wire up the other flows
   }
 
   return (
     <SimpleWizardBody
-      iconColor={COLORS.successEnabled}
+      iconColor={iconColor}
       header={header}
-      //  TODO(jr, 10/26/22): wire up isSuccess when we add error states
-      isSuccess={true}
+      isSuccess={isSuccess}
     >
       <PrimaryButton
         textTransform={TEXT_TRANSFORM_CAPITALIZE}
