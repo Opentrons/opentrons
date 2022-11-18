@@ -68,7 +68,7 @@ async def run_plunger_motor(args: argparse.Namespace) -> None:
         move_groups=[
             [
                 create_home_step(
-                    {pipette_node: float64(100.0)}, {pipette_node: float64(-25.0)}
+                    {pipette_node: float64(100.0)}, {pipette_node: float64(-10.5)}
                 )
             ]
         ]
