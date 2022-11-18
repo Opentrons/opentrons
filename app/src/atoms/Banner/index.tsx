@@ -78,6 +78,8 @@ export function Banner(props: BannerProps): JSX.Element {
     isCloseActionLoading,
     padding,
     closeButton,
+    marginRight,
+    marginLeft,
     ...styleProps
   } = props
   const bannerProps = BANNER_PROPS_BY_TYPE[type]
@@ -85,7 +87,8 @@ export function Banner(props: BannerProps): JSX.Element {
   const iconProps = {
     ...(icon ?? bannerProps.icon),
     size: SPACING.spacing4,
-    marginRight: SPACING.spacing3,
+    marginRight: marginRight ?? SPACING.spacing3,
+    marginLeft: marginLeft ?? '0rem',
     color: BANNER_PROPS_BY_TYPE[type].color,
   }
   return (

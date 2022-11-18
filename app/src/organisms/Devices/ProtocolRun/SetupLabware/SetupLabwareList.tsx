@@ -11,10 +11,10 @@ import { RunTimeCommand } from '@opentrons/shared-data'
 import { StyledText } from '../../../../atoms/text'
 import { getLabwareSetupItemGroups } from './utils'
 import { LabwareListItem } from './LabwareListItem'
+import { OffDeckLabwareList } from './OffDeckLabwareList'
 
 import type { ModuleTypesThatRequireExtraAttention } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
 import type { ModuleRenderInfoForProtocol } from '../../hooks'
-import { OffDeckLabwareList } from './OffDeckLabwareList'
 
 const HeaderRow = styled.div`
   display: grid;

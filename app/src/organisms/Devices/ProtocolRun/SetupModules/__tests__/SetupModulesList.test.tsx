@@ -12,13 +12,13 @@ import {
   mockThermocycler,
 } from '../../../../../redux/modules/__fixtures__'
 import { MultipleModulesModal } from '../../../../ProtocolSetup/RunSetupCard/ModuleSetup/MultipleModulesModal'
-import { HeaterShakerBanner } from '../../../../ProtocolSetup/RunSetupCard/ModuleSetup/HeaterShakerSetupWizard/HeaterShakerBanner'
 import { UnMatchedModuleWarning } from '../../../../ProtocolSetup/RunSetupCard/ModuleSetup/UnMatchedModuleWarning'
 import {
   useModuleRenderInfoForProtocolById,
   useRunHasStarted,
   useUnmatchedModulesForProtocol,
 } from '../../../hooks'
+import { HeaterShakerWizard } from '../../../HeaterShakerWizard'
 import { SetupModulesList } from '../SetupModulesList'
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
@@ -27,9 +27,7 @@ jest.mock('../../../hooks')
 jest.mock(
   '../../../../ProtocolSetup/RunSetupCard/ModuleSetup/UnMatchedModuleWarning'
 )
-jest.mock(
-  '../../../../ProtocolSetup/RunSetupCard/ModuleSetup/HeaterShakerSetupWizard/HeaterShakerBanner'
-)
+jest.mock('../../../HeaterShakerWizard')
 jest.mock(
   '../../../../ProtocolSetup/RunSetupCard/ModuleSetup/MultipleModulesModal'
 )
@@ -39,8 +37,8 @@ const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolByI
 const mockUnMatchedModuleWarning = UnMatchedModuleWarning as jest.MockedFunction<
   typeof UnMatchedModuleWarning
 >
-const mockHeaterShakerBanner = HeaterShakerBanner as jest.MockedFunction<
-  typeof HeaterShakerBanner
+const mockHeaterShakerWizard = HeaterShakerWizard as jest.MockedFunction<
+  typeof HeaterShakerWizard
 >
 const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jest.MockedFunction<
   typeof useUnmatchedModulesForProtocol
@@ -91,8 +89,8 @@ describe('SetupModulesList', () => {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
     }
-    when(mockHeaterShakerBanner).mockReturnValue(
-      <div>mock Heater Shaker Banner</div>
+    when(mockHeaterShakerWizard).mockReturnValue(
+      <div>mockHeaterShakerWizard</div>
     )
     when(mockUnMatchedModuleWarning).mockReturnValue(
       <div>mock unmatched module Banner</div>
@@ -297,6 +295,8 @@ describe('SetupModulesList', () => {
       },
     } as any)
     const { getByText } = render(props)
-    getByText('mock Heater Shaker Banner')
+    const moduleSetup = getByText('View module setup instructions')
+    fireEvent.click(moduleSetup)
+    getByText('mockHeaterShakerWizard')
   })
 })

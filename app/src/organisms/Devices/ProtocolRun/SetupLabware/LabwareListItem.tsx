@@ -115,7 +115,6 @@ export function LabwareListItem(
         extraAttentionText = (
           <Btn
             color={COLORS.darkGreyEnabled}
-            marginTop={SPACING.spacing3}
             onClick={() => setSecureLabwareModalType(moduleType)}
           >
             <Flex flexDirection={DIRECTION_ROW}>
@@ -124,7 +123,11 @@ export function LabwareListItem(
                 size="0.75rem"
                 marginTop={SPACING.spacingXS}
               />
-              <StyledText marginLeft={SPACING.spacing2} as="p">
+              <StyledText
+                marginLeft={SPACING.spacing2}
+                as="p"
+                textDecoration={TYPOGRAPHY.textDecorationUnderline}
+              >
                 {t('secure_labware_instructions')}
               </StyledText>
             </Flex>
@@ -134,7 +137,11 @@ export function LabwareListItem(
       case HEATERSHAKER_MODULE_TYPE:
         isHeaterShakerInProtocol = true
         extraAttentionText = (
-          <StyledText as="p" color={COLORS.darkGreyEnabled}>
+          <StyledText
+            as="p"
+            color={COLORS.darkGreyEnabled}
+            textDecoration={TYPOGRAPHY.textDecorationUnderline}
+          >
             {t('heater_shaker_labware_list_view')}
           </StyledText>
         )
@@ -180,6 +187,7 @@ export function LabwareListItem(
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_CENTER}
           marginLeft={SPACING.spacing4}
+          marginRight={SPACING.spacing3}
         >
           <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {labwareDisplayName}
