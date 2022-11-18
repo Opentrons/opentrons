@@ -177,11 +177,23 @@ export const PipetteWizardFlows = (
       />
     )
   } else if (currentStep.section === SECTIONS.RESULTS) {
+    const handleProceed = (): void => {
+      if (flowType === FLOWS.ATTACH && currentStepIndex === 2) {
+        proceed()
+      } else {
+        closeFlow()
+      }
+    }
+
     onExit = confirmExit
     modalContent = showConfirmExit ? (
       exitModal
     ) : (
-      <Results {...currentStep} {...calibrateBaseProps} proceed={closeFlow} />
+      <Results
+        {...currentStep}
+        {...calibrateBaseProps}
+        proceed={handleProceed}
+      />
     )
   } else if (currentStep.section === SECTIONS.MOUNT_PIPETTE) {
     onExit = confirmExit

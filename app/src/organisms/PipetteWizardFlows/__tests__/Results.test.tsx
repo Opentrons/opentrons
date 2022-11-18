@@ -10,6 +10,7 @@ import { i18n } from '../../../i18n'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { Results } from '../Results'
 import { FLOWS } from '../constants'
+
 import type { AttachedPipette } from '../../../redux/pipettes/types'
 
 const render = (props: React.ComponentProps<typeof Results>) => {
@@ -59,6 +60,7 @@ describe('Results', () => {
     expect(getByLabelText('ot-check')).toHaveStyle(
       `color: ${COLORS.successEnabled}`
     )
+    getByText('Calibrate pipette')
     const exit = getByRole('button', { name: 'Results_exit' })
     fireEvent.click(exit)
     expect(props.proceed).toHaveBeenCalled()

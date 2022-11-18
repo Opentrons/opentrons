@@ -13,7 +13,7 @@ export const Results = (props: PipetteWizardStepProps): JSX.Element => {
   let header: string = 'unknown results screen'
   let iconColor: string = COLORS.successEnabled
   let isSuccess: boolean = true
-
+  let buttonText: string = t('shared:exit')
   switch (flowType) {
     case FLOWS.CALIBRATE: {
       header = t('pip_cal_success')
@@ -23,6 +23,7 @@ export const Results = (props: PipetteWizardStepProps): JSX.Element => {
       if (attachedPipette[mount] != null) {
         const pipetteName = attachedPipette[mount]?.modelSpecs.displayName
         header = t('pipette_attached', { pipetteName: pipetteName })
+        buttonText = t('cal_pipette')
       } else {
         header = t('pipette_failed_to_attach')
         iconColor = COLORS.errorEnabled
@@ -43,7 +44,7 @@ export const Results = (props: PipetteWizardStepProps): JSX.Element => {
         onClick={proceed}
         aria-label="Results_exit"
       >
-        {t('shared:exit')}
+        {buttonText}
       </PrimaryButton>
     </SimpleWizardBody>
   )

@@ -8,12 +8,13 @@ import {
   useStopRunMutation,
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
-import { getAttachedPipettes } from '../../../redux/pipettes'
+import { getAttachedPipettes, fetchPipettes } from '../../../redux/pipettes'
 import { useChainRunCommands } from '../../../resources/runs/hooks'
 import {
   mockAttachedGen3Pipette,
   mockGen3P1000PipetteSpecs,
 } from '../../../redux/pipettes/__fixtures__'
+import * as RobotApi from '../../../redux/robot-api'
 import { useCloseCurrentRun } from '../../ProtocolUpload/hooks'
 import { getPipetteWizardSteps } from '../getPipetteWizardSteps'
 import { ExitModal } from '../ExitModal'
@@ -21,6 +22,7 @@ import { FLOWS, SECTIONS } from '../constants'
 import { PipetteWizardFlows } from '..'
 
 import type { AttachedPipette } from '../../../redux/pipettes/types'
+import type { DispatchApiRequestType } from '../../../redux/robot-api'
 
 jest.mock('../../../redux/pipettes')
 jest.mock('../getPipetteWizardSteps')
@@ -28,7 +30,18 @@ jest.mock('../../../resources/runs/hooks')
 jest.mock('@opentrons/react-api-client')
 jest.mock('../ExitModal')
 jest.mock('../../ProtocolUpload/hooks')
+jest.mock('../../../redux/robot-api')
+jest.mock('../../../redux/pipettes')
 
+const mockFetchPipettes = fetchPipettes as jest.MockedFunction<
+  typeof fetchPipettes
+>
+const mockUseDispatchApiRequests = RobotApi.useDispatchApiRequests as jest.MockedFunction<
+  typeof RobotApi.useDispatchApiRequests
+>
+const mockGetRequestById = RobotApi.getRequestById as jest.MockedFunction<
+  typeof RobotApi.getRequestById
+>
 const mockGetAttachedPipettes = getAttachedPipettes as jest.MockedFunction<
   typeof getAttachedPipettes
 >
@@ -62,6 +75,7 @@ const mockPipette: AttachedPipette = {
 }
 describe('PipetteWizardFlows', () => {
   let props: React.ComponentProps<typeof PipetteWizardFlows>
+  let dispatchApiRequest: DispatchApiRequestType
   const mockCreateRun = jest.fn()
   // const mockDeleteRun = jest.fn()
   const mockStopRun = jest.fn()
@@ -114,6 +128,9 @@ describe('PipetteWizardFlows', () => {
         flowType: FLOWS.CALIBRATE,
       },
     ])
+    dispatchApiRequest = jest.fn()
+    mockGetRequestById.mockReturnValue(null)
+    mockUseDispatchApiRequests.mockReturnValue([dispatchApiRequest, ['id']])
   })
   it('renders the correct information, calling the correct commands for the calibration flow', async () => {
     const { getByText, getByRole } = render(props)
@@ -237,7 +254,7 @@ describe('PipetteWizardFlows', () => {
     //  TODO(jr 11/11/22): finish the rest of the test
   })
 
-  it('renders the correct information, calling the correct commands for the attach flow', () => {
+  it('renders the correct information, calling the correct commands for the attach flow', async () => {
     props = {
       ...props,
       flowType: FLOWS.ATTACH,
@@ -258,9 +275,46 @@ describe('PipetteWizardFlows', () => {
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },
+      {
+        section: SECTIONS.ATTACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.DETACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
     ])
-    const { getByText } = render(props)
+    const { getByText, getByRole } = render(props)
     getByText('Attach a pipette')
-    //  TODO(jr 11/11/22): finish the rest of the test
+    getByText('Before you begin')
+    // page 1
+    const getStarted = getByRole('button', { name: 'Move gantry to front' })
+    fireEvent.click(getStarted)
+    await waitFor(() => {
+      expect(mockChainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'home',
+            params: {},
+          },
+        ],
+        false
+      )
+      expect(mockCreateRun).toHaveBeenCalled()
+    })
+    // page 2
+    getByText('Connect and screw in pipette')
+    const continueBtn = getByRole('button', { name: 'Continue' })
+    fireEvent.click(continueBtn)
+    await waitFor(() => {
+      expect(dispatchApiRequest).toBeCalledWith(mockFetchPipettes('otie'))
+    })
   })
 })

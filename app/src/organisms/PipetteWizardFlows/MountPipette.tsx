@@ -25,10 +25,9 @@ export const MountPipette = (props: PipetteWizardStepProps): JSX.Element => {
   const [dispatch] = useDispatchApiRequests(dispatchedAction => {
     if (
       dispatchedAction.type === FETCH_PIPETTES &&
-      // @ts-expect-error(sa, 2021-05-27): avoiding src code change, need to type narrow
+      'requestId' in dispatchedAction.meta &&
       dispatchedAction.meta.requestId
     ) {
-      // @ts-expect-error(sa, 2021-05-27): avoiding src code change, need to type narrow
       fetchPipettesRequestId.current = dispatchedAction.meta.requestId
     }
   })

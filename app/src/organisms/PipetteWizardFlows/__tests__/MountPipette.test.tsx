@@ -39,7 +39,6 @@ const mockPipette: AttachedPipette = {
 describe('MountPipette', () => {
   let props: React.ComponentProps<typeof MountPipette>
   let dispatchApiRequest: DispatchApiRequestType
-  jest.useFakeTimers()
   beforeEach(() => {
     props = {
       robotName: 'otie',

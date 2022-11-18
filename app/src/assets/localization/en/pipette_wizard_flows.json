@@ -36,5 +36,6 @@
   "remove_labware": "<block>To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.</block><block>The calibration probe is included with the robot and should be stored on the right-hand side of the door opening.</block>",
   "move_gantry_to_front": "Move gantry to front",
   "pipette_attached": "{{pipetteName}} Successfully Attached",
-  "pipette_failed_to_attach": "Pipette failed to attach"
+  "pipette_failed_to_attach": "Pipette failed to attach",
+  "cal_pipette": "Calibrate pipette"
 }

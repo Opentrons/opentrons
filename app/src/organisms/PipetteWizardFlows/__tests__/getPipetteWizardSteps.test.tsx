@@ -49,6 +49,21 @@ describe('getPipetteWizardSteps', () => {
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },
+      {
+        section: SECTIONS.ATTACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.DETACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
     ] as PipetteWizardStep[]
 
     expect(getPipetteWizardSteps(FLOWS.ATTACH, LEFT)).toStrictEqual(
