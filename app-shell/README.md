@@ -266,6 +266,7 @@ Email of app user to populate "Email" in support conversations.
 - Default: `[]`
 
 `Array<string>` of extra IP address(es)/hosts for the discovery client to track. For example, to get the discovery client to find an instance of the API server running on your own computer.
+Currently this config only allows one hostname/IP address as the value.
 
 ##### labware.directory
 
