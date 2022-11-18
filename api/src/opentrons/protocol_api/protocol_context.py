@@ -529,16 +529,23 @@ class ProtocolContext(CommandPublisher):
         checked_instrument_name = validation.ensure_pipette_name(instrument_name)
         is_96_channel = validation.ensure_96_channel_pipette(instrument_name)
         tip_racks = tip_racks or []
+        loaded_pipettes = self._instruments.values()
 
         if is_96_channel and checked_mount == Mount.RIGHT:
             raise RuntimeError("96 channel pipette is only allowed on the left mount.")
 
-        elif is_96_channel and any(self._instruments.values()) and not replace:
+        elif is_96_channel and loaded_pipettes and not replace:
             raise RuntimeError(
                 "96 channel pipette cannot be loaded with another pipette."
             )
 
-        elif not is_96_channel and any(validation.ensure_96_channel_pipette(instrument._implementation.get_pipette_name()) for instrument in self._instruments.values()):
+        elif not is_96_channel and any(
+            instrument is not None
+            and validation.ensure_96_channel_pipette(
+                instrument._implementation.get_pipette_name()
+            )
+            for instrument in loaded_pipettes
+        ):
             raise RuntimeError(
                 "96 channel pipette cannot be loaded with another pipette."
             )
