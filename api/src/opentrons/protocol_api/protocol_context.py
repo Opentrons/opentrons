@@ -527,8 +527,16 @@ class ProtocolContext(CommandPublisher):
         instrument_name = validation.ensure_lowercase_name(instrument_name)
         checked_mount = validation.ensure_mount(mount)
         checked_instrument_name = validation.ensure_pipette_name(instrument_name)
+        is_96_channel = validation.ensure_96_channel_pipette(checked_instrument_name)
         tip_racks = tip_racks or []
         existing_instrument = self._instruments[checked_mount]
+
+        if is_96_channel and any(self._instruments.items()) and not replace:
+            raise RuntimeError(
+                f"Instrument already present on {checked_mount.name.lower()}:"
+                f" {existing_instrument.name}. "
+                f"when loading a 96 channel pipette there is no option for additional pipettes."
+            )
 
         if existing_instrument is not None and not replace:
             # TODO(mc, 2022-08-25): create specific exception type

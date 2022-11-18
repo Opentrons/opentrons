@@ -47,6 +47,13 @@ def ensure_pipette_name(pipette_name: str) -> PipetteNameType:
         ) from e
 
 
+def ensure_96_channel_pipette(pipette_name: PipetteNameType) -> bool:
+    """Ensure that a given pipette is of type 96 channels."""
+    if pipette_name == PipetteNameType.P1000_96:
+        return True
+    return False
+
+
 def ensure_deck_slot(deck_slot: Union[int, str]) -> DeckSlotName:
     """Ensure that a primitive value matches a named deck slot."""
     if not isinstance(deck_slot, (int, str)):
