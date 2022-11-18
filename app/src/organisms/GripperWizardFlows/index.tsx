@@ -173,7 +173,6 @@ export const GripperWizardFlows = (
     [GRIPPER_FLOW_TYPES.ATTACH]: t('attach_gripper'),
     [GRIPPER_FLOW_TYPES.DETACH]: t('detach_gripper')
   }
-  const wizardTitle = titleByFlowType[flowType]
   let handleExit = onExit
   if (isRobotMoving) {
     handleExit = undefined
@@ -187,7 +186,7 @@ export const GripperWizardFlows = (
         width="48rem"
         header={
           <WizardHeader
-            title={wizardTitle}
+            title={titleByFlowType[flowType]}
             currentStep={currentStepIndex}
             totalSteps={totalStepCount}
             onExit={handleExit}
