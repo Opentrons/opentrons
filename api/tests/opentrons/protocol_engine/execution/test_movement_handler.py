@@ -603,6 +603,7 @@ async def test_move_to_coordinates(
         deck_coordinates=destination_deck,
         direct=True,
         additional_min_travel_z=1234,
+        speed=None,
     )
 
     decoy.verify(

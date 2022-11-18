@@ -223,6 +223,7 @@ def test_move_to_coordinates(
             coordinates=DeckPoint(x=1, y=2, z=3),
             forceDirect=True,
             minimumZHeight=42.0,
+            speed=45.6,
         )
     )
     response = commands.MoveToCoordinatesResult()
@@ -234,6 +235,7 @@ def test_move_to_coordinates(
         coordinates=DeckPoint(x=1, y=2, z=3),
         force_direct=True,
         minimum_z_height=42.0,
+        speed=45.6,
     )
 
     assert result == response

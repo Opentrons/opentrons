@@ -185,7 +185,7 @@ def test_move_to_coordinates(
         well_core=None,
         force_direct=True,
         minimum_z_height=42.0,
-        speed=None,
+        speed=4.56,
     )
 
     decoy.verify(
@@ -194,6 +194,7 @@ def test_move_to_coordinates(
             coordinates=DeckPoint(x=1, y=2, z=3),
             minimum_z_height=42.0,
             force_direct=True,
+            speed=4.56,
         ),
         mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )

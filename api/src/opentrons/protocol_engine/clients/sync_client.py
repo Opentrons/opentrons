@@ -147,6 +147,7 @@ class SyncClient:
         coordinates: DeckPoint,
         minimum_z_height: Optional[float],
         force_direct: bool,
+        speed: Optional[float],
     ) -> commands.MoveToCoordinatesResult:
         """Execute a MoveToCoordinates command and return the result."""
         request = commands.MoveToCoordinatesCreate(
@@ -155,6 +156,7 @@ class SyncClient:
                 coordinates=coordinates,
                 minimumZHeight=minimum_z_height,
                 forceDirect=force_direct,
+                speed=speed,
             )
         )
         result = self._transport.execute_command(request=request)

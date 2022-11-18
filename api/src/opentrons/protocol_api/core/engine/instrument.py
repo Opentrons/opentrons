@@ -307,6 +307,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 ),
                 minimum_z_height=minimum_z_height,
                 force_direct=force_direct,
+                speed=speed,
             )
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
