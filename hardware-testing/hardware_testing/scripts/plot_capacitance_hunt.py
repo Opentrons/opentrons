@@ -255,7 +255,7 @@ class Plot:
         )
         self.plot_param["figure"] = fig
         self.plot_param["filename"] = "plot_relative_all"
-        self.plot_param["title"] = "Absolute Capacitance vs. Deck Height"
+        self.plot_param["title"] = "Relative Capacitance vs. Deck Height"
         self.plot_param["x_title"] = "Distance from Deck (mm)"
         self.plot_param["y_title"] = "∆C/C<sub>O</sub>"
         self.plot_param["x_range"] = [x_first, x_last]
@@ -265,13 +265,13 @@ class Plot:
         zoom_param = self.plot_param.copy()
         self.write_plot(self.plot_param)
         self.add_probe_inset(fig, step_size=1,
-            probe_width=0.16, probe_height=0.2,
-            x_center=1.6, y_zero=1.76, y_offset=0.24,
-            text_x_center=1.2, text_y_center=1.86,
-            title_height=2.1
+            probe_width=0.08, probe_height=0.018,
+            x_center=0.8, y_zero=0.152, y_offset=0.022,
+            text_x_center=0.6, text_y_center=0.161,
+            title_height=0.18
         )
         zoom_param["filename"] = "plot_relative_all_zoom"
-        zoom_param["title"] = "Absolute Capacitance vs. Deck Height Zoomed"
+        zoom_param["title"] = "Relative Capacitance vs. Deck Height Zoomed"
         zoom_param["x_range"] = [x_first, 1]
         zoom_param["y_range"] = [0, 0.2]
         self.write_plot(zoom_param)
