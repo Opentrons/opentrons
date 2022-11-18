@@ -7,6 +7,9 @@ from numpy import float64
 from typing import Callable
 from logging.config import dictConfig
 
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    DisableMotorRequest,
+)
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.constants import NodeId, PipetteTipActionType
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
@@ -14,9 +17,10 @@ from opentrons_hardware.hardware_control.motion import (
     MoveGroupTipActionStep,
     MoveGroupSingleAxisStep,
     MoveStopCondition,
+    create_home_step,
 )
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
-
+from opentrons_hardware.hardware_control.current_settings import set_currents
 from opentrons_hardware.drivers.can_bus.build import build_driver
 
 
@@ -53,9 +57,57 @@ def output_details(i: int, total_i: int) -> None:
     print(f"\n\033[95mRound {i}/{total_i}:\033[0m")
 
 
-async def run(args: argparse.Namespace) -> None:
-    """Entry point for script."""
-    print("Test tip pick up for the 96 channel\n")
+async def run_plunger_motor(args: argparse.Namespace) -> None:
+    """Entry point for plunger motor scripts."""
+    print("Test plunger motor for the 96 channel\n")
+    pipette_node = NodeId.pipette_left
+    driver = await build_driver(build_settings(args))
+    messenger = CanMessenger(driver=driver)
+    messenger.start()
+    home_plunger_runner = MoveGroupRunner(
+        move_groups=[
+            [
+                create_home_step(
+                    {pipette_node: float64(100.0)}, {pipette_node: float64(-10.5)}
+                )
+            ]
+        ]
+    )
+    move_plunger_runner = MoveGroupRunner(
+        # Group 0
+        move_groups=[
+            [
+                {
+                    pipette_node: MoveGroupSingleAxisStep(
+                        distance_mm=float64(0),
+                        velocity_mm_sec=float64(-10.5),
+                        duration_sec=float64(2.86),
+                    )
+                }
+            ]
+        ],
+    )
+    try:
+        currents = {pipette_node: (float(args.hold_current), float(args.run_current))}
+        await set_currents(messenger, currents)
+        input("Hit enter to continue to home the plunger motor")
+        await home_plunger_runner.run(can_messenger=messenger)
+        input("Hit enter to continue to move the motor down 30 mm")
+        await move_plunger_runner.run(can_messenger=messenger)
+    except asyncio.CancelledError:
+        pass
+    finally:
+        print("\nTesting finishes...\n")
+        await messenger.send(node_id=pipette_node, message=DisableMotorRequest())
+        await messenger.stop()
+        driver.shutdown()
+
+    return None
+
+
+async def run_gear_motors(args: argparse.Namespace) -> None:
+    """Entry point for gear motor scripts."""
+    print("Test tip pick up motors for the 96 channel\n")
     reps = prompt_int_input("Number of repetitions for pick up and drop tip")
     delay = prompt_int_input("Delay in seconds between pick up and drop tip")
     # 96 channel can only be mounted to the left
@@ -95,30 +147,6 @@ async def run(args: argparse.Namespace) -> None:
         ]
     )
 
-    move_tip_runner = MoveGroupRunner(
-        move_groups=[
-            # Group 0
-            [
-                {
-                    NodeId.head_l: MoveGroupSingleAxisStep(
-                        distance_mm=float64(0),
-                        velocity_mm_sec=float64(-10.5),
-                        duration_sec=float64(6),
-                    )
-                }
-            ],
-            # Group 1
-            [
-                {
-                    NodeId.head_l: MoveGroupSingleAxisStep(
-                        distance_mm=float64(0),
-                        velocity_mm_sec=float64(10.5),
-                        duration_sec=float64(6),
-                    )
-                }
-            ],
-        ]
-    )
     home_z = MoveGroupRunner(
         move_groups=[
             [
@@ -134,35 +162,18 @@ async def run(args: argparse.Namespace) -> None:
         ]
     )
 
-    initial_z = MoveGroupRunner(
-        move_groups=[
-            [
-                {
-                    NodeId.head_l: MoveGroupSingleAxisStep(
-                        distance_mm=float64(0),
-                        velocity_mm_sec=float64(10.5),
-                        duration_sec=float64(10.86),
-                    )
-                }
-            ]
-        ]
-    )
     try:
         # Home the gear motors and Z before performing the test
-        await drop_tip_runner.run(can_messenger=messenger)
         await home_z.run(can_messenger=messenger)
-        await asyncio.sleep(1)
-        # Move to the tiprack
-        await initial_z.run(can_messenger=messenger)
+        await asyncio.sleep(0.1)
+        # # Move to the tiprack
         for i in range(reps):
             output_details(i, reps)
             log.info(f"*********** Now executing round {i} / {reps}")
             # Pick up tips
             await pick_up_tip_runner.run(can_messenger=messenger)
             await asyncio.sleep(delay)
-            # Move the tips up and down to test seal
-            await move_tip_runner.run(can_messenger=messenger)
-            await asyncio.sleep(delay)
+
             # Drop the tips
             await drop_tip_runner.run(can_messenger=messenger)
             await asyncio.sleep(delay)
@@ -170,6 +181,7 @@ async def run(args: argparse.Namespace) -> None:
         pass
     finally:
         print("\nTesting finishes...\n")
+        await messenger.send(node_id=pipette_node, message=DisableMotorRequest())
         await messenger.stop()
         driver.shutdown()
 
@@ -186,7 +198,7 @@ LOG_CONFIG = {
         "file_handler": {
             "class": "logging.handlers.RotatingFileHandler",
             "formatter": "basic",
-            "filename": "HT_tip_handling.log",
+            "filename": "HT_diagnostics.log",
             "maxBytes": 5000000,
             "level": logging.INFO,
             "backupCount": 3,
@@ -209,10 +221,31 @@ def main() -> None:
         description="96 channel tip handling testing script."
     )
     add_can_args(parser)
+    parser.add_argument(
+        "--use_plunger",
+        type=bool,
+        help="If true, move the plunger motors otherwise move the gear motors",
+        default=False,
+    )
+    parser.add_argument(
+        "--run_current",
+        type=float,
+        help="Active current of the plunger",
+        default=1.5,
+    )
+    parser.add_argument(
+        "--hold_current",
+        type=float,
+        help="Dwell current of the plunger",
+        default=0.8,
+    )
 
     args = parser.parse_args()
 
-    asyncio.run(run(args))
+    if args.use_plunger:
+        asyncio.run(run_plunger_motor(args))
+    else:
+        asyncio.run(run_gear_motors(args))
 
 
 if __name__ == "__main__":
