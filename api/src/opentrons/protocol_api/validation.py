@@ -47,7 +47,7 @@ def ensure_pipette_name(pipette_name: str) -> PipetteNameType:
         ) from e
 
 
-def ensure_96_channel_pipette(pipette_name: PipetteNameType) -> bool:
+def ensure_96_channel_pipette(pipette_name: str) -> bool:
     """Ensure that a given pipette is of type 96 channels."""
     if pipette_name == PipetteNameType.P1000_96:
         return True

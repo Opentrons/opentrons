@@ -527,7 +527,7 @@ class ProtocolContext(CommandPublisher):
         instrument_name = validation.ensure_lowercase_name(instrument_name)
         checked_mount = validation.ensure_mount(mount)
         checked_instrument_name = validation.ensure_pipette_name(instrument_name)
-        is_96_channel = validation.ensure_96_channel_pipette(checked_instrument_name)
+        is_96_channel = validation.ensure_96_channel_pipette(instrument_name)
         tip_racks = tip_racks or []
 
         if is_96_channel and checked_mount == Mount.RIGHT:
@@ -535,7 +535,12 @@ class ProtocolContext(CommandPublisher):
 
         elif is_96_channel and any(self._instruments.values()) and not replace:
             raise RuntimeError(
-                "When loading a 96 channel pipette there is no option for additional pipettes."
+                "96 channel pipette cannot be loaded with another pipette."
+            )
+
+        elif not is_96_channel and any(validation.ensure_96_channel_pipette(instrument._implementation.get_pipette_name()) for instrument in self._instruments.values()):
+            raise RuntimeError(
+                "96 channel pipette cannot be loaded with another pipette."
             )
 
         existing_instrument = self._instruments[checked_mount]
@@ -574,7 +579,7 @@ class ProtocolContext(CommandPublisher):
 
         if is_96_channel:
             self._instruments[Mount.LEFT] = instrument
-            self._instruments[Mount.RIGHT] = None
+            self._instruments[Mount.RIGHT] = instrument
         else:
             self._instruments[checked_mount] = instrument
 
