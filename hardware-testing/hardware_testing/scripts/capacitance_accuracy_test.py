@@ -63,6 +63,7 @@ class Capacitance_Accuracy_Test:
         self.test_data ={
             "Time":"None",
             "Cycle":"None",
+            "Step":"None",
             "Slot":"None",
             "Pipette":"None",
             "X Right":"None",
