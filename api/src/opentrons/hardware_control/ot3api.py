@@ -19,6 +19,11 @@ from typing import (
 )
 
 from opentrons_shared_data.pipette import name_config
+from opentrons_shared_data.pipette.dev_types import (
+    PipetteName,
+)
+from opentrons_shared_data.gripper.constants import IDLE_STATE_GRIP_FORCE
+
 from opentrons import types as top_types
 from opentrons.config import robot_configs
 from opentrons.config.types import (
@@ -97,10 +102,6 @@ from .motion_utilities import (
     deck_from_machine,
     machine_from_deck,
     machine_vector_from_deck_vector,
-)
-
-from opentrons_shared_data.pipette.dev_types import (
-    PipetteName,
 )
 
 from .dev_types import (
@@ -839,7 +840,8 @@ class OT3API(
             and mount != OT3Mount.GRIPPER
             and self._gripper_handler.gripper.state != GripperJawState.GRIPPING
         ):
-            await self.grip(force_newtons=20)  # allows for safer gantry movement
+            # allows for safer gantry movement at minimum force
+            await self.grip(force_newtons=IDLE_STATE_GRIP_FORCE)
         self._last_moved_mount = mount
 
     @ExecutionManagerProvider.wait_for_running

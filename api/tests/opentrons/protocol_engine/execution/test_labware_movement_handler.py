@@ -7,6 +7,10 @@ import pytest
 from decoy import Decoy, matchers
 from typing import TYPE_CHECKING, Union
 
+from opentrons_shared_data.gripper.constants import (
+    LABWARE_GRIP_FORCE,
+    IDLE_STATE_GRIP_FORCE,
+)
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.types import DeckSlotName, Point
@@ -179,7 +183,7 @@ async def test_move_labware_with_gripper(
             mount=gripper, abs_position=expected_waypoints[2]
         ),
         await ot3_hardware_api.grip(
-            force_newtons=20
+            force_newtons=LABWARE_GRIP_FORCE
         ),  # TODO: replace this once we have this spec in hardware control
         # TODO: homing is temporary fix for evt. Remove when RLAB-211 is addressed
         await ot3_hardware_api.home(axes=[OT3Axis.Z_G]),
@@ -200,7 +204,7 @@ async def test_move_labware_with_gripper(
         #     mount=gripper, abs_position=expected_waypoints[6]
         # ),
         await ot3_hardware_api.grip(
-            force_newtons=20
+            force_newtons=IDLE_STATE_GRIP_FORCE
         ),  # TODO: replace this once we have this spec in hardware control
     )
 

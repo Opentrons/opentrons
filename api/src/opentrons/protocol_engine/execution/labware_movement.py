@@ -1,6 +1,11 @@
 """Labware movement command handling."""
 from typing import Optional, Union, List
 
+from opentrons_shared_data.gripper.constants import (
+    LABWARE_GRIP_FORCE,
+    IDLE_STATE_GRIP_FORCE,
+)
+
 from opentrons.types import Point
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import OT3Mount, OT3Axis
@@ -24,8 +29,6 @@ from ..types import (
     LabwareLocation,
     LabwareOffsetVector,
 )
-
-GRIP_FORCE = 20  # Newtons
 
 
 # TODO (spp, 2022-10-20): name this GripperMovementHandler if it doesn't handle
@@ -99,16 +102,16 @@ class LabwareMovementHandler:
             ),
         )
 
-        # TODO: We do this to have the gripper move to location with closed grip and
-        #       open right before picking up the labware to avoid collisions as much as
-        #       possible. Re-evaluate whether we need this once collision avoidance is
-        #       in place.
-        await ot3api.move_to(mount=gripper_mount, abs_position=waypoints_to_labware[0])
-        await ot3api.move_to(mount=gripper_mount, abs_position=waypoints_to_labware[1])
-        await ot3api.home_gripper_jaw()
-        await ot3api.move_to(mount=gripper_mount, abs_position=waypoints_to_labware[2])
+        for waypoint in waypoints_to_labware:
+            if waypoint == waypoints_to_labware[-1]:
+                # TODO: We do this to have the gripper move to location with
+                #  closed grip and open right before picking up the labware to
+                #  avoid collisions as much as possible. Re-evaluate whether we need it
+                #  once collision avoidance is in place.
+                await ot3api.home_gripper_jaw()
+            await ot3api.move_to(mount=gripper_mount, abs_position=waypoint)
 
-        await ot3api.grip(force_newtons=GRIP_FORCE)
+        await ot3api.grip(force_newtons=LABWARE_GRIP_FORCE)
 
         new_labware_offset = (
             self._state_store.labware.get_labware_offset(new_offset_id).vector
@@ -133,21 +136,13 @@ class LabwareMovementHandler:
 
         await ot3api.ungrip()
         # TODO: homing is temporary fix to save a gripper after collision.
-        #       Remove this call to home and uncomment `move_to` when
+        #       Replace the call to home with a gripper retract using `move_to` when
         #       RLAB-211 is addressed
         await ot3api.home(axes=[OT3Axis.Z_G])
-        # await ot3api.move_to(
-        #     mount=OT3Mount.GRIPPER,
-        #     abs_position=Point(
-        #         waypoints_to_new_location[-1].x,
-        #         waypoints_to_new_location[-1].y,
-        #         gripper_homed_position.z,
-        #     ),
-        # )
 
         # Keep the gripper in gripped position so it avoids colliding with
         # things like the thermocycler latches
-        await ot3api.grip(force_newtons=GRIP_FORCE)
+        await ot3api.grip(force_newtons=IDLE_STATE_GRIP_FORCE)
 
     # TODO (spp, 2022-10-19): Move this to motion planning and
     #  test waypoints generation in isolation.
