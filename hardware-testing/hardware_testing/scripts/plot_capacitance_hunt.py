@@ -30,6 +30,10 @@ class Plot:
         }
         self.create_folder()
         self.df_data = self.import_file(self.data)
+        self.x_increment = self.get_increment(self.df_data, "x")
+        self.z_increment = self.get_increment(self.df_data, "z")
+        print(f"X-Axis Increment = {self.x_increment}")
+        print(f"Z-Axis Increment = {self.z_increment}")
 
     def import_file(self, file):
         df = pd.read_csv(file)
@@ -58,6 +62,14 @@ class Plot:
         print("Plotting Relative Capacitance...")
         self.relative_all_plot()
         print("Plots Saved!")
+
+    def get_increment(self, df, axis):
+        axis = axis.lower()
+        if axis == "x":
+            increment = round(abs(df["X Position"].iloc[-1] - df["X Position"].iloc[0]) / (df["X Step"].max() - 1), 3)
+        elif axis == "z":
+            increment = round(abs(df["Z Position"].iloc[-1] - df["Z Position"].iloc[0]) / (df["Z Step"].max() - 1), 3)
+        return increment
 
     def set_legend(self, figure, legend):
         for idx, name in enumerate(legend):
@@ -197,12 +209,10 @@ class Plot:
         fig = px.line(df, x=x_axis, y=[y_axis], color="X Step", markers=True)
         legend = []
         for i in range(df["X Step"].max()):
-            increment = 0.5
-            distance = i * increment
-            percentage = i * (increment*100/4)
+            distance = round(i * self.x_increment, 3)
+            percentage = i * (self.x_increment*100/4)
             legend.append(f"{distance} mm [{percentage} %]")
         self.set_legend(fig, legend)
-
         self.add_probe_inset(fig, step_size=1,
             probe_width=0.16, probe_height=0.8,
             x_center=1.6, y_zero=10.1, y_offset=1,
@@ -243,8 +253,8 @@ class Plot:
         fig = px.line(df, x=x_axis, y=[y_axis], color="X Step", markers=True)
         legend = []
         for i in range(df["X Step"].max()):
-            distance = i * 0.5
-            percentage = i * (0.5*100/4)
+            distance = round(i * self.x_increment, 3)
+            percentage = i * (self.x_increment*100/4)
             legend.append(f"{distance} mm [{percentage} %]")
         self.set_legend(fig, legend)
         self.add_probe_inset(fig, step_size=1,
