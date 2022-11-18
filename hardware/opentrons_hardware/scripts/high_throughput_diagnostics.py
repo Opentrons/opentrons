@@ -20,7 +20,7 @@ from opentrons_hardware.hardware_control.motion import (
     create_home_step,
 )
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
-
+from opentrons_hardware.hardware_control.current_settings import set_currents
 from opentrons_hardware.drivers.can_bus.build import build_driver
 
 
@@ -88,6 +88,8 @@ async def run_plunger_motor(args: argparse.Namespace) -> None:
         ],
     )
     try:
+        currents = {pipette_node: (float(args.hold_current), float(args.run_current))}
+        await set_currents(messenger, currents)
         input("Hit enter to continue to home the plunger motor")
         await home_plunger_runner.run(can_messenger=messenger)
         input("Hit enter to continue to move the motor down 30 mm")
@@ -222,8 +224,20 @@ def main() -> None:
     parser.add_argument(
         "--use_plunger",
         type=bool,
-        help="Move the plunger motor or gear motors",
+        help="If true, move the plunger motors otherwise move the gear motors",
         default=False,
+    )
+    parser.add_argument(
+        "--run_current",
+        type=float,
+        help="Active current of the plunger",
+        default=1.5,
+    )
+    parser.add_argument(
+        "--hold_current",
+        type=float,
+        help="Dwell current of the plunger",
+        default=0.8,
     )
 
     args = parser.parse_args()
