@@ -236,7 +236,7 @@ def test_load_instrument_96_channel_right_mount_error(
         "p1000_96"
     )
     decoy.when(mock_validation.ensure_mount(matchers.IsA(Mount))).then_return(
-        Mount.LEFT
+        Mount.RIGHT
     )
     decoy.when(mock_validation.ensure_pipette_name("p1000_96")).then_return(
         PipetteNameType.P1000_96
