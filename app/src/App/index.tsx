@@ -27,8 +27,9 @@ import { AppSettings } from '../pages/AppSettings'
 import { Labware } from '../pages/Labware'
 import { InitialSplash } from '../pages/OnDeviceDisplay/InitialSplash'
 import { ConnectedNetworkInfo } from '../pages/OnDeviceDisplay/ConnectedNetworkInfo'
-import { SelectNetwork } from '../pages/OnDeviceDisplay/SelectNetwork'
+import { SelectWifiNetwork } from '../pages/OnDeviceDisplay/SelectWifiNetwork'
 import { SetWifiCred } from '../pages/OnDeviceDisplay/SetWifiCred'
+import { NetworkSetupMenu } from '../pages/OnDeviceDisplay/NetworkSetupMenu'
 import { getIsOnDevice } from '../redux/config'
 import { getLocalRobot } from '../redux/discovery'
 import { useSoftwareUpdatePoll } from './hooks'
@@ -114,10 +115,10 @@ export const AppComponent = (): JSX.Element => {
       path: '/device-setup',
     },
     {
-      Component: SelectNetwork,
+      Component: SelectWifiNetwork,
       exact: true,
       name: 'Select Network',
-      path: '/select-network',
+      path: '/select-wifi-network',
     },
     {
       Component: SetWifiCred,
@@ -130,6 +131,12 @@ export const AppComponent = (): JSX.Element => {
       exact: true,
       name: 'Connected Network Info',
       path: '/connected-network-info/:ssid',
+    },
+    {
+      Component: NetworkSetupMenu,
+      exact: true,
+      name: 'Network setup menu',
+      path: '/network-setup-menu',
     },
   ]
 
@@ -167,7 +174,7 @@ export const AppComponent = (): JSX.Element => {
                     </Route>
                   )
                 })}
-                <Redirect to="/device-setup" />
+                <Redirect to="/network-setup-menu" />
               </Switch>
               <Alerts />
             </Box>
