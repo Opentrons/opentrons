@@ -145,31 +145,14 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
         save_gripper_calibration_offset(self._gripper_id, delta)
         self._calibration_offset = load_gripper_calibration_offset(self._gripper_id)
 
-    def _check_calibration_pin_location_is_accurate(self) -> None:
+    def check_calibration_pin_location_is_accurate(self) -> None:
         if not self.attached_probe:
             raise RuntimeError(
-                "gripper is not currently holding a probe, use Gripper.add_probe()"
+                "must attach a probe before starting calibration"
             )
         if self.state != GripperJawState.GRIPPING:
             raise RuntimeError(
-                "gripper probe pin locations are not accurate if jaw is not gripping"
-            )
-        # NOTE: (AS) the gripper jaws have a larger positional tolerance stackup when they are open
-        # but we initialize our encoder position when the jaw it open. So when we close the jaw, the
-        # two jaws are physically more precisely located, but the encoders will still have some error
-        # in their value. So, here we add a 2mm tolerance to check that the encoder is reading a position
-        # close to what we expect
-        jaw_sizes = self.config.jaw_sizes_mm
-        expected_displacement = (jaw_sizes["max"] - jaw_sizes["min"]) * 0.5
-        displacement_error_tolerance_mm = 1.5
-        min_disp = expected_displacement - displacement_error_tolerance_mm
-        max_disp = expected_displacement + displacement_error_tolerance_mm
-        if (
-            self.current_jaw_displacement < min_disp
-            or self.current_jaw_displacement > max_disp
-        ):
-            raise RuntimeError(
-                f"gripper is gripping at an unexpected displacement: {self.current_jaw_displacement}"
+                "must fully grip the jaws before starting calibration"
             )
 
     def critical_point(self, cp_override: Optional[CriticalPoint] = None) -> Point:
@@ -193,12 +176,12 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
         if cp in [CriticalPoint.GRIPPER_JAW_CENTER, CriticalPoint.XY_CENTER]:
             return self._jaw_center_offset + Point(*self._calibration_offset.offset)
         elif cp == CriticalPoint.GRIPPER_FRONT_CALIBRATION_PIN:
-            self._check_calibration_pin_location_is_accurate()
+            self.check_calibration_pin_location_is_accurate()
             return self._front_calibration_pin_offset + Point(
                 *self._calibration_offset.offset
             )
         elif cp == CriticalPoint.GRIPPER_REAR_CALIBRATION_PIN:
-            self._check_calibration_pin_location_is_accurate()
+            self.check_calibration_pin_location_is_accurate()
             return self._rear_calibration_pin_offset + Point(
                 *self._calibration_offset.offset
             )

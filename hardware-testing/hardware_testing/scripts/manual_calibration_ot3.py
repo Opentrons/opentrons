@@ -163,12 +163,27 @@ async def _find_square_center(
     return found_square_pos
 
 
+async def _test_square_pos(api: OT3API, expected_pos: Point) -> None:
+    await api.grip(20)
+    while True:
+        for probe in GripperProbe:
+            input(f"add probe to {probe}, then press ENTER: ")
+            api.add_gripper_probe(probe)
+            current_pos = await api.gantry_position(OT3Mount.GRIPPER)
+            await api.move_to(OT3Mount.GRIPPER, expected_pos._replace(z=current_pos.z))
+            await api.move_to(OT3Mount.GRIPPER, expected_pos)
+            input("Check by EYE, then press ENTER to swap probes")
+            await api.move_rel(OT3Mount.GRIPPER, Point(z=100))
+            api.remove_gripper_probe()
+
+
 async def _find_square_center_of_gripper_jaw(api: OT3API, expected_pos: Point) -> Point:
     # first, we grip the jaw, so that the jaws are fully pressing inwards
     # this removes wiggle/backlash from jaws during probing
     await api.grip(20)
     input("add probe to Gripper FRONT, then press ENTER: ")
     api.add_gripper_probe(GripperProbe.FRONT)
+    api._gripper_handler.check_ready_for_calibration()
     found_square_front = await _find_square_center(
         api,
         OT3Mount.GRIPPER,
@@ -187,8 +202,9 @@ async def _find_square_center_of_gripper_jaw(api: OT3API, expected_pos: Point) -
         OT3Mount.GRIPPER,
         current_position + Point(z=PROBE_CHANGE_Z),
     )
-    input("add probe to Gripper BACK, then press ENTER: ")
-    api.add_gripper_probe(GripperProbe.BACK)
+    api.remove_gripper_probe()
+    input("add probe to Gripper REAR, then press ENTER: ")
+    api.add_gripper_probe(GripperProbe.REAR)
     found_square_back = await _find_square_center(
         api,
         OT3Mount.GRIPPER,
@@ -259,6 +275,7 @@ async def _main(simulate: bool, slot: int, mount: OT3Mount, test: bool) -> None:
 
     # run the calibration procedure
     if mount == OT3Mount.GRIPPER:
+        await _test_square_pos(api, calibration_square_pos)
         found_square_pos = await _find_square_center_of_gripper_jaw(
             api, calibration_square_pos
         )
