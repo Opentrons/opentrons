@@ -73,7 +73,7 @@ async def _get_encoder_position(messenger: CanMessenger):
         listener = _create_listener(nodes, event, responses)
         messenger.add_listener(listener)
 
-        await messenger.send(node_id = NodeId.broadcast, message=EncoderPositionRequest())
+        # await messenger.send(node_id = NodeId.broadcast, message=EncoderPositionRequest())
         for node in nodes:
             await messenger.send(
                 node_id=node,
