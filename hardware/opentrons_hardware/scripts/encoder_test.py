@@ -50,9 +50,9 @@ def _create_listener(
                 f"0x{arbitration_id.parts.originating_node_id:x}"
             )
             return
-        # if message.message_id != MessageId.limit_sw_response:
-        #     log.warning(f"unexpected message id: 0x{message.message_id:x}")
-        #     return
+        if message.message_id != MessageId.encoder_position_response:
+            log.warning(f"unexpected message id: 0x{message.message_id:x}")
+            return
         responses[originator] = message.payload.encoder_position
         if len(responses) == len(nodes):
             event.set()
