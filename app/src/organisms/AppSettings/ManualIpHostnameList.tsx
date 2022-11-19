@@ -20,11 +20,7 @@ export function ManualIpHostnameList({
 }: IpHostnameListProps): JSX.Element {
   const candidates = useSelector((state: State) => {
     const results = getConfig(state)?.discovery.candidates
-    return typeof results === 'string'
-      ? [results]
-      : results != null
-      ? results
-      : []
+    return typeof results === 'string' ? [].concat(results) : results
   })
 
   const robots = useSelector((state: State) => getViewableRobots(state))
@@ -32,7 +28,7 @@ export function ManualIpHostnameList({
 
   return (
     <>
-      {candidates.length > 0
+      {candidates != null && candidates.length > 0
         ? candidates
             .map<[string, boolean]>(candidate => {
               const discovered = robots.some(robot => robot.ip === candidate)
