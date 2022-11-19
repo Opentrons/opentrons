@@ -11,9 +11,12 @@ from hardware_testing.opentrons_api import helpers_ot3
 from opentrons.calibration_storage.ot3.pipette_offset import save_pipette_calibration
 from opentrons.calibration_storage.ot3.gripper_offset import save_gripper_calibration
 
-SAFE_Z = 10
-XY_STEP_SIZE = 0.1
+SAFE_Z = 6
+DEFAULT_STEP_SIZE = 0.1
 Z_OFFSET_FROM_WASHERS = 3.0
+
+GRIP_FORCE_CALIBRATION = 20
+GRIP_FORCE_VALIDATION = 2
 
 # Height of the bottom of a probe above the deck.
 # Must be high enough for the user to reach under to change probes,
@@ -45,6 +48,28 @@ def _get_instrument_id(api: OT3API, mount: OT3Mount) -> str:
     return instr_id
 
 
+async def _test_gripper_calibration_with_block(api: OT3API, pos: Point) -> None:
+    input("add the calibration block to the slot, then press ENTER")
+    await api.home_gripper_jaw()
+    await api.move_to(OT3Mount.GRIPPER, pos, critical_point=CriticalPoint.GRIPPER_JAW_CENTER)
+    await api.grip(GRIP_FORCE_CALIBRATION / 2)
+    await api.home_gripper_jaw()
+    jaw_width = 90
+    while True:
+        res = input('ENTER closes 1mm more; type "s" to stop; type "g" to grip: ')
+        if not res:
+            jaw_width -= 1
+            await api.hold_jaw_width(jaw_width)
+        elif res.strip().lower()[0] == "s":
+            break
+        elif res.strip().lower()[0] == "g":
+            await api.grip(GRIP_FORCE_VALIDATION)
+            input("ENTER to ungrip jaws")
+            await api.home_gripper_jaw()
+            jaw_width = 90
+    await api.home_gripper_jaw()
+
+
 async def _test_current_calibration(api: OT3API, mount: OT3Mount, pos: Point) -> None:
     cp: Optional[CriticalPoint] = None
     if mount == OT3Mount.GRIPPER:
@@ -54,35 +79,16 @@ async def _test_current_calibration(api: OT3API, mount: OT3Mount, pos: Point) ->
     await api.move_to(mount, pos._replace(z=current_pos.z), critical_point=cp)
 
     if mount == OT3Mount.GRIPPER:
-        input("add the calibration block to the slot, then press ENTER")
+        await _test_gripper_calibration_with_block(api, pos)
     else:
         input("ENTER to move to center of slot to test Pipette calibration")
-
-    if mount == OT3Mount.GRIPPER:
-        await api.home_gripper_jaw()
-        await api.move_to(mount, pos, critical_point=cp)
-        jaw_width = 90
-        while True:
-            res = input('ENTER closes 1mm more; type "s" to stop; type "g" to grip: ')
-            if not res:
-                jaw_width -= 1
-                await api.hold_jaw_width(jaw_width)
-            elif res.strip().lower()[0] == "s":
-                break
-            elif res.strip().lower()[0] == "g":
-                await api.grip(20)
-                input("ENTER to ungrip jaws")
-                await api.home_gripper_jaw()
-                jaw_width = 90
-        await api.home_gripper_jaw()
-    else:
         await api.move_to(mount, pos, critical_point=cp)
 
 
 async def _jog_axis(
     api: OT3API, mount: OT3Mount, axis: OT3Axis, direction: float
 ) -> None:
-    step = XY_STEP_SIZE
+    step = DEFAULT_STEP_SIZE
     ax = axis.name.lower()[0]
     while True:
         inp = input(f'<ENTER> key to jog {step} mm, or type "yes" to save position: ')
@@ -163,8 +169,8 @@ async def _find_square_center(
     return found_square_pos
 
 
-async def _test_square_pos(api: OT3API, expected_pos: Point) -> None:
-    await api.grip(20)
+async def _test_probe_pin_physical_location(api: OT3API, expected_pos: Point) -> None:
+    await api.grip(GRIP_FORCE_CALIBRATION)
     while True:
         for probe in GripperProbe:
             input(f"add probe to {probe}, then press ENTER: ")
@@ -180,7 +186,7 @@ async def _test_square_pos(api: OT3API, expected_pos: Point) -> None:
 async def _find_square_center_of_gripper_jaw(api: OT3API, expected_pos: Point) -> Point:
     # first, we grip the jaw, so that the jaws are fully pressing inwards
     # this removes wiggle/backlash from jaws during probing
-    await api.grip(20)
+    await api.grip(GRIP_FORCE_CALIBRATION)
     input("add probe to Gripper FRONT, then press ENTER: ")
     api.add_gripper_probe(GripperProbe.FRONT)
     api._gripper_handler.check_ready_for_calibration()
@@ -257,6 +263,7 @@ async def _main(simulate: bool, slot: int, mount: OT3Mount, test: bool) -> None:
         slot_loc_top_left = helpers_ot3.get_slot_top_left_position_ot3(slot)
         # use the aluminum block, to more precisely check location
         test_pos = slot_loc_top_left + (GRIPPER_TEST_BLOCK_SIZE * 0.5)
+        test_pos = test_pos._replace(z=22 + 1)  # make the Z the length of the probes, plus 1mm
     else:
         test_pos = calibration_square_pos
 
@@ -275,7 +282,7 @@ async def _main(simulate: bool, slot: int, mount: OT3Mount, test: bool) -> None:
 
     # run the calibration procedure
     if mount == OT3Mount.GRIPPER:
-        await _test_square_pos(api, calibration_square_pos)
+        # await _test_probe_pin_physical_location(api, calibration_square_pos)
         found_square_pos = await _find_square_center_of_gripper_jaw(
             api, calibration_square_pos
         )
