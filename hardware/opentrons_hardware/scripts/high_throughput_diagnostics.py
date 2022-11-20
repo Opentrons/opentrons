@@ -165,6 +165,7 @@ async def run_gear_motors(args: argparse.Namespace) -> None:
     try:
         # Home the gear motors and Z before performing the test
         await home_z.run(can_messenger=messenger)
+        await drop_tip_runner.run(can_messenger=messenger)
         await asyncio.sleep(0.1)
         # # Move to the tiprack
         for i in range(reps):
