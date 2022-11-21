@@ -10,7 +10,7 @@ from .. import utils
 
 
 class SingletonMessageIndexGenerator(object):
-    """Singlton class that generates uinque index values."""
+    """Singleton class that generates uinque index values."""
 
     def __new__(cls) -> Any:
         """Either generate or return the singleton instance."""
