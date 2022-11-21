@@ -242,7 +242,7 @@ export const ModulesListItem = ({
                   color: ${COLORS.darkGreyEnabled};
 
                   &:hover {
-                    color: ${COLORS.darkGreyHover};
+                    color: ${COLORS.darkBlackEnabled};
                   }
                 `}
                 marginTop={'4px'}

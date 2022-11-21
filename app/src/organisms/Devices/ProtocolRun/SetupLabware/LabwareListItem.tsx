@@ -117,7 +117,7 @@ export function LabwareListItem(
               color: ${COLORS.darkGreyEnabled};
 
               &:hover {
-                color: ${COLORS.darkGreyHover};
+                color: ${COLORS.darkBlackEnabled};
               }
             `}
             onClick={() => setSecureLabwareModalType(moduleType)}
