@@ -33,7 +33,7 @@ endef
 # argument 7 is an additional subdir if necessary in the sdist
 # argument 8 is either egg or dist (default egg)
 define push-python-sdist
-$(if $(is-ot3), ,echo "This is an OT2 use 'make push' instead." && exit 1)
+$(if $(is-ot3), ,echo "This is an OT-2. Use 'make push' instead." && exit 1)
 scp $(if $(2),"-i $(2)") $(3) $(4) root@$(1):/var/$(notdir $(4))
 ssh $(if $(2),"-i $(2)") $(3) root@$(1) \
 "function cleanup () { rm -f /var/$(notdir $(4)) ; rm -rf /var/$(notdir $(4))-unzip; } ; \
