@@ -36,7 +36,10 @@ def _add_fake_comment_pause(
 
 
 def get_api_context(
-    api_level: str, is_simulating: bool = False, connect_to_hardware: bool = True, machine: Optional[str] = None
+    api_level: str,
+    is_simulating: bool = False,
+    connect_to_hardware: bool = True,
+    machine: Optional[str] = None,
 ) -> protocol_api.ProtocolContext:
     """Create an Opentrons API ProtocolContext instance."""
     checked_machine = cast(MachineType, machine if machine else "ot3")
