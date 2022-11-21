@@ -19,26 +19,26 @@ const NetworkSetupOptions = [
   {
     cardWidth: '19rem',
     cardHeight: '21.875rem',
-    title: 'wifi',
+    title: 'Wi-Fi',
     iconName: 'wifi' as IconName,
     description: 'connection_description',
-    distPath: 'connect-via-wifi',
+    destinationPath: 'connect-via-wifi',
   },
   {
     cardWidth: '19rem',
     cardHeight: '21.875rem',
-    title: 'ethernet',
+    title: 'Ethernet',
     iconName: 'ethernet' as IconName,
     description: 'connection_description',
-    distPath: 'connect-via-ethernet',
+    destinationPath: 'connect-via-ethernet',
   },
   {
     cardWidth: '19rem',
     cardHeight: '21.875rem',
-    title: 'usb',
+    title: 'USB',
     iconName: 'usb' as IconName,
     description: 'connection_description',
-    distPath: 'connect-via-usb',
+    destinationPath: 'connect-via-usb',
   },
 ]
 
