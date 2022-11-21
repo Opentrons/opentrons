@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import {
   Flex,
   SPACING,
@@ -38,12 +38,11 @@ import type {
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 import type { ModuleTypesThatRequireExtraAttention } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
 import type { ModuleRenderInfoForProtocol } from '../../hooks'
-import { LabwareSetupItem } from './types'
+import type { LabwareSetupItem } from './types'
 
 const LabwareRow = styled.div`
   display: grid;
   grid-template-columns: 6fr 5fr;
-  grip-gap: ${SPACING.spacing3};
   border-style: ${BORDERS.styleSolid};
   border-width: ${SPACING.spacingXXS};
   border-color: ${COLORS.medGreyEnabled};
@@ -114,7 +113,13 @@ export function LabwareListItem(
       case THERMOCYCLER_MODULE_TYPE:
         extraAttentionText = (
           <Btn
-            color={COLORS.darkGreyEnabled}
+            css={css`
+              color: ${COLORS.darkGreyEnabled};
+
+              &:hover {
+                color: ${COLORS.darkGreyHover};
+              }
+            `}
             onClick={() => setSecureLabwareModalType(moduleType)}
           >
             <Flex flexDirection={DIRECTION_ROW}>
@@ -137,11 +142,7 @@ export function LabwareListItem(
       case HEATERSHAKER_MODULE_TYPE:
         isHeaterShakerInProtocol = true
         extraAttentionText = (
-          <StyledText
-            as="p"
-            color={COLORS.darkGreyEnabled}
-            textDecoration={TYPOGRAPHY.textDecorationUnderline}
-          >
+          <StyledText as="p" color={COLORS.darkGreyEnabled}>
             {t('heater_shaker_labware_list_view')}
           </StyledText>
         )
@@ -215,11 +216,13 @@ export function LabwareListItem(
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
+              marginTop="3px"
             >
               <ToggleButton
                 label={`heater_shaker_${
                   moduleLocation?.slotName ?? ''
                 }_latch_toggle`}
+                size="auto"
                 disabled={!isCorrectHeaterShakerAttached}
                 toggledOn={isLatchClosed}
                 onClick={toggleLatch}

@@ -1,5 +1,6 @@
 import * as React from 'react'
 import map from 'lodash/map'
+import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
   BORDERS,
@@ -111,6 +112,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         marginTop={SPACING.spacing4}
         marginLeft={SPACING.spacingM}
+        marginBottom={SPACING.spacing2}
       >
         <StyledText
           css={TYPOGRAPHY.labelSemiBold}
@@ -234,7 +236,13 @@ export const ModulesListItem = ({
             {moduleModel === HEATERSHAKER_MODULE_V1 ? (
               <Btn
                 marginLeft={SPACING.spacingM}
-                color={COLORS.darkGreyEnabled}
+                css={css`
+                  color: ${COLORS.darkGreyEnabled};
+
+                  &:hover {
+                    color: ${COLORS.darkGreyHover};
+                  }
+                `}
                 marginTop={'4px'}
                 onClick={() => setShowHeaterShakerFlow(true)}
               >

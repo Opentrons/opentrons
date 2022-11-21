@@ -20,7 +20,7 @@ const HeaderRow = styled.div`
   display: grid;
   grid-template-columns: 6fr 5fr;
   grip-gap: ${SPACING.spacing3};
-  padding: ${SPACING.spacing4};
+  padding: ${SPACING.spacing3};
 `
 interface SetupLabwareListProps {
   attachedModuleInfo: { [moduleId: string]: ModuleRenderInfoForProtocol }
