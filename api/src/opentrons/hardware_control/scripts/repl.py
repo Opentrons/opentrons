@@ -30,13 +30,19 @@ import logging  # noqa: E402
 from opentrons.types import Mount, Point  # noqa: E402
 from opentrons.hardware_control.types import Axis, CriticalPoint  # noqa: E402
 from opentrons.config import feature_flags as ff  # noqa: E402
-from opentrons.hardware_control.types import OT3Axis, OT3Mount  # noqa: E402
+from opentrons.hardware_control.types import (  # noqa: E402
+    OT3Axis,
+    OT3Mount,
+    GripperProbe,
+)
 from opentrons.hardware_control.ot3_calibration import (  # noqa: E402
     calibrate_mount,
+    calibrate_gripper,
     find_edge,
     find_deck_position,
     CalibrationMethod,
     find_axis_center,
+    gripper_pin_offsets_mean,
 )
 from opentrons.hardware_control.protocols import HardwareControlAPI  # noqa: E402
 from opentrons.hardware_control.thread_manager import ThreadManager  # noqa: E402
@@ -46,7 +52,7 @@ if ff.enable_ot3_hardware_controller():
 
     HCApi: Union[Type[OT3API], Type["API"]] = OT3API
 
-    def do_calibration(
+    def calibrate_pipette(
         api: ThreadManager[OT3API], mount: OT3Mount, tip_length: float
     ) -> Point:
         api.sync.add_tip(mount, tip_length)
@@ -99,10 +105,13 @@ def do_interact(api: ThreadManager[HardwareControlAPI]) -> None:
             "Axis": Axis,
             "OT3Axis": OT3Axis,
             "OT3Mount": OT3Mount,
+            "GripperProbe": GripperProbe,
             "calibrate_mount": wrap_async_util_fn(calibrate_mount, api),
             "find_edge": wrap_async_util_fn(find_edge, api),
             "find_deck_position": wrap_async_util_fn(find_deck_position, api),
-            "do_calibration": partial(do_calibration, api),
+            "calibrate_pipette": partial(calibrate_pipette, api),
+            "calibrate_gripper": wrap_async_util_fn(calibrate_gripper, api),
+            "gripper_pin_offsets_mean": gripper_pin_offsets_mean,
             "CalibrationMethod": CalibrationMethod,
             "find_axis_center": wrap_async_util_fn(find_axis_center, api),
             "CriticalPoint": CriticalPoint,

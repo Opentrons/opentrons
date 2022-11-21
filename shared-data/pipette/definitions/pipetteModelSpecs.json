@@ -7750,7 +7750,7 @@
         "type": "float"
       },
       "pickUpCurrent": {
-        "value": 1.0,
+        "value": 0.5,
         "min": 0.05,
         "max": 2.0,
         "units": "amps",

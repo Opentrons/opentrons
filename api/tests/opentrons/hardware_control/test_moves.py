@@ -181,7 +181,7 @@ async def test_mount_offset_applied(hardware_api, is_robot):
     [
         CriticalPoint.GRIPPER_JAW_CENTER,
         CriticalPoint.GRIPPER_FRONT_CALIBRATION_PIN,
-        CriticalPoint.GRIPPER_BACK_CALIBRATION_PIN,
+        CriticalPoint.GRIPPER_REAR_CALIBRATION_PIN,
     ],
 )
 async def test_gripper_critical_points_fail_on_pipettes(
