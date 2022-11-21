@@ -68,11 +68,14 @@ async def run_plunger_motor(args: argparse.Namespace) -> None:
         move_groups=[
             [
                 create_home_step(
-                    {pipette_node: float64(100.0)}, {pipette_node: float64(-10.5)}
+                    {pipette_node: float64(100.0)}, {pipette_node: float64(-args.speed)}
                 )
             ]
         ]
     )
+    # move 30 mm
+    distance = 30
+    duration = round(abs(distance / args.speed), 4)
     move_plunger_runner = MoveGroupRunner(
         # Group 0
         move_groups=[
@@ -80,8 +83,8 @@ async def run_plunger_motor(args: argparse.Namespace) -> None:
                 {
                     pipette_node: MoveGroupSingleAxisStep(
                         distance_mm=float64(0),
-                        velocity_mm_sec=float64(-10.5),
-                        duration_sec=float64(2.86),
+                        velocity_mm_sec=float64(args.speed),
+                        duration_sec=float64(duration),
                     )
                 }
             ]
@@ -239,6 +242,12 @@ def main() -> None:
         type=float,
         help="Dwell current of the plunger",
         default=0.8,
+    )
+    parser.add_argument(
+        "--speed",
+        type=float,
+        help="The speed with which to move the plunger",
+        default=10.5,
     )
 
     args = parser.parse_args()
