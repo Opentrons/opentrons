@@ -230,6 +230,7 @@ def test_load_instrument_96_channel_loaded_error(
     decoy: Decoy, mock_core: ProtocolCore, subject: ProtocolContext
 ) -> None:
     """It should disallow a load pipette with additional 96 channel pipette."""
+    subject._instruments[Mount.LEFT] = decoy.mock(cls=InstrumentContext)
     mock_instrument_core = decoy.mock(cls=InstrumentCore)
 
     decoy.when(mock_validation.ensure_lowercase_name("p300_single")).then_return(
@@ -244,9 +245,6 @@ def test_load_instrument_96_channel_loaded_error(
     decoy.when(mock_validation.ensure_96_channel_pipette("p300_single")).then_return(
         False
     )
-    decoy.when(mock_validation.ensure_96_channel_pipette("p300_single")).then_return(
-        False
-    )
     decoy.when(
         mock_core.load_instrument(
             instrument_name=matchers.IsA(PipetteNameType),
@@ -254,9 +252,7 @@ def test_load_instrument_96_channel_loaded_error(
         )
     ).then_return(mock_instrument_core)
     decoy.when(mock_instrument_core.get_pipette_name()).then_return("p1000_96")
-    decoy.when(mock_validation.ensure_96_channel_pipette("p1000_96")).then_return(
-        True
-    )
+    decoy.when(mock_validation.ensure_96_channel_pipette("p1000_96")).then_return(True)
 
     with pytest.raises(
         RuntimeError,
