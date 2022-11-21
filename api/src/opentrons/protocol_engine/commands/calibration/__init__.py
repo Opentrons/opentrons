@@ -28,6 +28,7 @@ __all__ = [
     "CalibrateGripper",
     "CalibrateGripperCreate",
     "CalibrateGripperParams",
+    "CalibrateGripperParamsProbe",
     "CalibrateGripperResult",
     "CalibrateGripperCommandType",
     # calibration/calibratePipette
