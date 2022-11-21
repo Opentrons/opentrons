@@ -70,7 +70,7 @@ class WellOrigin(str, Enum):
     BOTTOM = "bottom"
 
 
-# Deliberately separate from Vec3f to let components default to 0.
+# This is deliberately a separate type from Vec3f to let components default to 0.
 class WellOffset(BaseModel):
     """An offset vector in (x, y, z)."""
 
