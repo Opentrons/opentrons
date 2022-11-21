@@ -62,17 +62,18 @@ def _create_listener(
 async def _get_encoder_position(messenger: CanMessenger):
     """This function allows us to obtain encoder position from all axes"""
     try:
+
         nodes = [
             NodeId.gantry_x,
             NodeId.gantry_y,
             NodeId.head_l,
             NodeId.head_r
         ]
+        encoder_positions = {}
         event = asyncio.Event()
         responses: Dict[NodeId, int] = dict()
         listener = _create_listener(nodes, event, responses)
         messenger.add_listener(listener)
-
         # await messenger.send(node_id = NodeId.broadcast, message=EncoderPositionRequest())
         for node in nodes:
             await messenger.send(
@@ -80,9 +81,10 @@ async def _get_encoder_position(messenger: CanMessenger):
                 message=EncoderPositionRequest(),
             )
         await asyncio.wait_for(event.wait(), 1.0)
-        print(responses)
-        for n, r in responses.items():
-            print(f"{n}: {r.value/1000}")
+        # print(responses)
+        for ax in responses.keys():
+            encoder_positions[ax] = responses[ax].value/1000
+        print(encoder_positions)
         messenger.remove_listener(listener)
     except asyncio.CancelledError:
         pass
@@ -93,7 +95,10 @@ async def get_encoder(args: argparse.Namespace) -> None:
         # build a GPIO handler, which will automatically release estop
         # gpio = OT3GPIO(__name__)
         # gpio.deactivate_estop()
-        await _get_encoder_position(messenger)
+        while True:
+            await _get_encoder_position(messenger)
+            await asyncio.sleep(1)
+
 
 
 def main() -> None:
