@@ -56,6 +56,7 @@ stages:
             - name: simpleV6.json
               role: main
           protocolType: json
+          robotType: OT-2 Standard
           metadata:
             tags:
               - unitTest
@@ -536,4 +537,3 @@ stages:
                 displayName: Water
                 description: Liquid H2O
                 displayColor: '#7332a8'
-            robotType: "OT-2 Standard"

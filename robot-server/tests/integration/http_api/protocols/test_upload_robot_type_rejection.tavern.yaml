@@ -1,0 +1,19 @@
+test_name: Upload, analyze, delete basic_transfer_standalone protocol.
+
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Make sure an OT-2 server rejects OT-3 protocols.
+    request:
+      url: '{host:s}:{port:d}/protocols'
+      method: POST
+      files:
+        files: 'tests/integration/protocols/empty_ot3.py'
+    response:
+      status_code: 422
+      json:
+        errors:
+          - id: ProtocolForDifferentRobotType
+            title: Protocol For Different Robot Type
+            detail: "This protocol is for OT-3 Standard robots. It can't be analyzed or run on this robot, which is an OT-2 Standard."
