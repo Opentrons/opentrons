@@ -73,9 +73,16 @@ class CalibrateGripperImplementation(
         3. Return the gripper's offset from its ideal position.
         """
         ot3_hardware_api = ensure_ot3_hardware(self._hardware_api)
+
+        # TODO(mm, 2022-11-21): This will error if the gripper jaws haven't been homed.
+        # Does it make sense to home the jaws automatically?
         result = await ot3_calibration.calibrate_gripper(
             ot3_hardware_api, self._convert_to_hw_api_probe(params.probe)
         )
+
+        # TODO(mm, 2022-11-21): Clarify what calibrate_gripper() returns--absolute
+        # coordinates, or an difference from the ideal? Is it correct to return its raw
+        # result here?
         return CalibrateGripperResult.construct(
             probeOffset=Vec3f.construct(x=result.x, y=result.y, z=result.z)
         )
