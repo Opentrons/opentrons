@@ -1,5 +1,6 @@
 """ProtocolEngine-based Protocol API core implementation."""
 from typing import Dict, Optional, Type, Union
+from typing_extensions import Literal
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
@@ -223,7 +224,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         )
 
     def load_instrument(
-        self, instrument_name: PipetteNameType, mount: Mount
+        self, instrument_name: Union[PipetteNameType, Literal["p1000_96"]], mount: Mount
     ) -> InstrumentCore:
         """Load an instrument into the protocol.
 

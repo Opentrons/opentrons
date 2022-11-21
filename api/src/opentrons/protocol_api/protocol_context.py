@@ -526,8 +526,9 @@ class ProtocolContext(CommandPublisher):
         """
         instrument_name = validation.ensure_lowercase_name(instrument_name)
         checked_mount = validation.ensure_mount(mount)
-        checked_instrument_name = validation.ensure_pipette_name(instrument_name)
-        is_96_channel = validation.ensure_96_channel_pipette(instrument_name)
+        is_96_channel = instrument_name == "p1000_96"
+        if not is_96_channel:
+            checked_instrument_name = validation.ensure_pipette_name(instrument_name)
         tip_racks = tip_racks or []
         loaded_pipettes = [
             instrument for instrument in self._instruments.values() if instrument
@@ -545,9 +546,7 @@ class ProtocolContext(CommandPublisher):
             not is_96_channel
             and loaded_pipettes
             and any(
-                validation.ensure_96_channel_pipette(
-                    i._implementation.get_pipette_name()
-                )
+                (i._implementation.get_pipette_name() == "p1000_96")
                 for i in loaded_pipettes
             )
         ):

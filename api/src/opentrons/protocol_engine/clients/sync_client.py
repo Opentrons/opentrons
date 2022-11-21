@@ -1,5 +1,6 @@
 """Synchronous ProtocolEngine client module."""
-from typing import cast, List, Optional
+from typing import cast, List, Optional, Union
+from typing_extensions import Literal
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareUri
@@ -101,16 +102,17 @@ class SyncClient:
 
     def load_pipette(
         self,
-        pipette_name: PipetteNameType,
+        pipette_name: Union[PipetteNameType, Literal["p1000_96"]],
         mount: MountType,
     ) -> commands.LoadPipetteResult:
         """Execute a LoadPipette command and return the result."""
         request = commands.LoadPipetteCreate(
-            params=commands.LoadPipetteParams(
-                pipetteName=pipette_name,
+            params=commands.LoadPipetteParams.construct(  # type: ignore[call-arg]
                 mount=mount,
             )
         )
+        if isinstance(pipette_name, PipetteNameType):
+            request.params.pipetteName = pipette_name
         result = self._transport.execute_command(request=request)
 
         return cast(commands.LoadPipetteResult, result)
