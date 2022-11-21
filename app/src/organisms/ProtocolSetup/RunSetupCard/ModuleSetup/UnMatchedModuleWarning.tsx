@@ -18,8 +18,8 @@ export const UnMatchedModuleWarning = (): JSX.Element | null => {
   return (
     <Box marginTop={SPACING.spacing3}>
       <Banner
-        marginRight={SPACING.spacing4}
-        marginLeft={SPACING.spacing3}
+        iconMarginRight={SPACING.spacing4}
+        iconMarginLeft={SPACING.spacing3}
         type="warning"
         size={SPACING.spacingM}
         onCloseClick={() => setShowBanner(false)}

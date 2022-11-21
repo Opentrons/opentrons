@@ -78,8 +78,8 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
       {hasADuplicateModule ? (
         <Box marginTop={SPACING.spacing3}>
           <Banner
-            marginRight={SPACING.spacing4}
-            marginLeft={SPACING.spacing3}
+            iconMarginRight={SPACING.spacing4}
+            iconMarginLeft={SPACING.spacing3}
             size={SPACING.spacingM}
             type="informing"
             onCloseClick={() => setShowMultipleModulesModal(true)}
@@ -121,7 +121,6 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
         >
           {t('module_name')}
         </StyledText>
-
         <StyledText
           css={TYPOGRAPHY.labelSemiBold}
           data-testid="SetupModulesList_location"
@@ -243,7 +242,7 @@ export const ModulesListItem = ({
                     color: ${COLORS.darkBlackEnabled};
                   }
                 `}
-                marginTop={'4px'}
+                marginTop={SPACING.spacing2}
                 onClick={() => setShowHeaterShakerFlow(true)}
               >
                 <Flex flexDirection={DIRECTION_ROW}>

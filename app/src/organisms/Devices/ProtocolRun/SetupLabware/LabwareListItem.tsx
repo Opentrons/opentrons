@@ -16,6 +16,7 @@ import {
   Btn,
   BORDERS,
   WELL_LABEL_OPTIONS,
+  SIZE_AUTO,
 } from '@opentrons/components'
 import {
   getLabwareDisplayName,
@@ -222,7 +223,7 @@ export function LabwareListItem(
                 label={`heater_shaker_${
                   moduleLocation?.slotName ?? ''
                 }_latch_toggle`}
-                size="auto"
+                size={SIZE_AUTO}
                 disabled={!isCorrectHeaterShakerAttached}
                 toggledOn={isLatchClosed}
                 onClick={toggleLatch}
