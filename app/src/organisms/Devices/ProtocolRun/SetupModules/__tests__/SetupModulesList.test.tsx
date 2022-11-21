@@ -259,7 +259,7 @@ describe('SetupModulesList', () => {
     const { getByText } = render(props)
     getByText('mock unmatched module Banner')
   })
-  it('should render the heater shaker banner when hs is attached', () => {
+  it('should render the heater shaker text when hs is attached', () => {
     mockUseModuleRenderInfoForProtocolById.mockReturnValue({
       [mockHeaterShaker.id]: {
         moduleId: mockHeaterShaker.id,

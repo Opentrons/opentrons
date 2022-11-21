@@ -61,9 +61,6 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
     setShowMultipleModulesModal,
   ] = React.useState<boolean>(false)
 
-  const heaterShakerModules = Object.values(
-    moduleRenderInfoForProtocolById
-  ).filter(module => module.moduleDef.model === 'heaterShakerModuleV1')
   const moduleModels = map(
     moduleRenderInfoForProtocolById,
     ({ moduleDef }) => moduleDef.model
@@ -152,7 +149,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
       >
         {map(
           moduleRenderInfoForProtocolById,
-          ({ moduleDef, attachedModuleMatch, slotName }) => {
+          ({ moduleDef, attachedModuleMatch, slotName, moduleId }) => {
             return (
               <ModulesListItem
                 key={`SetupModulesList_${moduleDef.model}_slot_${slotName}`}
@@ -160,7 +157,12 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
                 displayName={moduleDef.displayName}
                 location={slotName}
                 attachedModuleMatch={attachedModuleMatch}
-                heaterShakerModules={heaterShakerModules}
+                heaterShakerModuleFromProtocol={
+                  moduleRenderInfoForProtocolById[moduleId].moduleDef
+                    .moduleType === HEATERSHAKER_MODULE_TYPE
+                    ? moduleRenderInfoForProtocolById[moduleId]
+                    : null
+                }
               />
             )
           }
@@ -175,7 +177,7 @@ interface ModulesListItemProps {
   displayName: string
   location: string
   attachedModuleMatch: AttachedModule | null
-  heaterShakerModules: ModuleRenderInfoForProtocol[]
+  heaterShakerModuleFromProtocol: ModuleRenderInfoForProtocol | null
 }
 
 export const ModulesListItem = ({
@@ -183,7 +185,7 @@ export const ModulesListItem = ({
   displayName,
   location,
   attachedModuleMatch,
-  heaterShakerModules,
+  heaterShakerModuleFromProtocol,
 }: ModulesListItemProps): JSX.Element => {
   const { t } = useTranslation('protocol_setup')
   const moduleConnectionStatus =
@@ -194,15 +196,11 @@ export const ModulesListItem = ({
     showHeaterShakerFlow,
     setShowHeaterShakerFlow,
   ] = React.useState<Boolean>(false)
-
   const heaterShakerAttachedModule =
     attachedModuleMatch != null &&
     attachedModuleMatch.moduleType === HEATERSHAKER_MODULE_TYPE
       ? attachedModuleMatch
       : null
-  const heaterShakerModuleFromProtocol = heaterShakerModules.find(
-    module => module.attachedModuleMatch?.id === attachedModuleMatch?.id
-  )
 
   return (
     <Box
@@ -214,7 +212,7 @@ export const ModulesListItem = ({
       backgroundColor={COLORS.white}
       data-testid="ModulesListItem_Row"
     >
-      {showHeaterShakerFlow ? (
+      {showHeaterShakerFlow && heaterShakerModuleFromProtocol != null ? (
         <HeaterShakerWizard
           onCloseClick={() => setShowHeaterShakerFlow(false)}
           moduleFromProtocol={heaterShakerModuleFromProtocol}
