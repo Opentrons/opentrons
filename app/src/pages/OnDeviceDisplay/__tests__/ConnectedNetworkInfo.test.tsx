@@ -87,6 +87,6 @@ describe('ConnectedNetworkInfo', () => {
     const [{ getByRole }] = render('/connected-network-info/mockWifi')
     const button = getByRole('button', { name: 'Change network' })
     fireEvent.click(button)
-    expect(mockPush).toHaveBeenCalledWith('/select-wifi-network')
+    expect(mockPush).toHaveBeenCalledWith('/connect-via-wifi')
   })
 })

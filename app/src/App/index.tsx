@@ -118,7 +118,7 @@ export const AppComponent = (): JSX.Element => {
       Component: SelectWifiNetwork,
       exact: true,
       name: 'Select Network',
-      path: '/select-wifi-network',
+      path: '/connect-via-wifi',
     },
     {
       Component: SetWifiCred,

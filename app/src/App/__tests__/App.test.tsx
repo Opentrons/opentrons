@@ -190,9 +190,9 @@ describe('App', () => {
     getByText('Mock InitialSplash')
   })
 
-  it('renders a SelectNetwork component from /select-wifi-network', () => {
+  it('renders a SelectNetwork component from /connect-via-wifi', () => {
     when(mockGetIsOnDevice).calledWith(MOCK_STATE).mockReturnValue(true)
-    const [{ getByText }] = render('/select-wifi-network')
+    const [{ getByText }] = render('/connect-via-wifi')
     getByText('Mock SelectWifiNetwork')
   })
 

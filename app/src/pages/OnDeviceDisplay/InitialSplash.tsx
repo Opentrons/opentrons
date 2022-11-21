@@ -17,7 +17,7 @@ export function InitialSplash(): JSX.Element {
 
   React.useEffect(() => {
     const splashTimer = setTimeout(() => {
-      history.push(`/select-wifi-network`)
+      history.push('/connect-via-wifi')
     }, SPLASH_DURATION)
     return () => {
       clearTimeout(splashTimer)

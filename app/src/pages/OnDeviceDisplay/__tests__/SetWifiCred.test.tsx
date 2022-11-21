@@ -120,7 +120,7 @@ describe('SetWifiCred', () => {
     const [{ getByText }] = render('/set-wifi-cred/mockWifi')
     const button = getByText('Back')
     fireEvent.click(button)
-    expect(mockPush).toHaveBeenCalledWith('/select-wifi-network')
+    expect(mockPush).toHaveBeenCalledWith('/connect-via-wifi')
   })
 
   it('should call mock function when tapping connect', () => {

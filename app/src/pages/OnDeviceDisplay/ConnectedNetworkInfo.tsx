@@ -97,7 +97,7 @@ export function ConnectedNetworkInfo(): JSX.Element {
         </Flex>
       </Flex>
       <Flex justifyContent={JUSTIFY_FLEX_END}>
-        <SecondaryButton onClick={() => history.push(`/select-wifi-network`)}>
+        <SecondaryButton onClick={() => history.push('/connect-via-wifi')}>
           {t('change_network')}
         </SecondaryButton>
       </Flex>
