@@ -10,6 +10,7 @@ import {
   COLORS,
   TYPOGRAPHY,
   Icon,
+  Btn,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 
@@ -23,7 +24,7 @@ interface CardButtonProps {
   title: string
   iconName: IconName
   description: string
-  distPath: string
+  destinationPath: string
 }
 
 export function CardButton(props: CardButtonProps): JSX.Element {
@@ -33,26 +34,26 @@ export function CardButton(props: CardButtonProps): JSX.Element {
     title,
     iconName,
     description,
-    distPath,
+    destinationPath,
   } = props
   const { t } = useTranslation('device_settings')
   const history = useHistory()
 
   return (
-    <Flex
-      padding="1.5rem"
+    <Btn
+      display="flex"
+      padding={SPACING.spacing5}
       flexDirection={DIRECTION_COLUMN}
-      role="button"
-      onClick={() => history.push(`/${distPath}`)}
+      gridGap={SPACING.spacing5}
+      justifyContent={JUSTIFY_CENTER}
+      alignItems={ALIGN_CENTER}
+      onClick={() => history.push(`/${destinationPath}`)}
       width={cardWidth}
       height={cardHeight}
       backgroundColor={COLORS.medBlue}
+      borderRadius="16px"
     >
-      <Flex
-        justifyContent={JUSTIFY_CENTER}
-        alignItems={ALIGN_CENTER}
-        marginTop="2.5rem"
-      >
+      <Flex marginTop="2.5rem">
         <Icon
           name={iconName}
           size="5rem"
@@ -60,11 +61,7 @@ export function CardButton(props: CardButtonProps): JSX.Element {
           data-testid={`cardButton_icon_${String(iconName)}`}
         />
       </Flex>
-      <Flex
-        justifyContent={JUSTIFY_CENTER}
-        alignItems={ALIGN_CENTER}
-        marginTop={SPACING.spacing5}
-      >
+      <Flex>
         <StyledText
           fontSize="2rem"
           lineHeight="2.75rem"
@@ -72,14 +69,10 @@ export function CardButton(props: CardButtonProps): JSX.Element {
           color={COLORS.darkBlackEnabled}
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
-          {t(title)}
+          {title}
         </StyledText>
       </Flex>
-      <Flex
-        justifyContent={JUSTIFY_CENTER}
-        alignItems={ALIGN_CENTER}
-        marginTop="0.75rem"
-      >
+      <Flex marginTop="0.75rem">
         <StyledText
           fontSize="1.375rem"
           lineHeight="1.875rem"
@@ -90,6 +83,6 @@ export function CardButton(props: CardButtonProps): JSX.Element {
           {t(description)}
         </StyledText>
       </Flex>
-    </Flex>
+    </Btn>
   )
 }
