@@ -541,9 +541,15 @@ class ProtocolContext(CommandPublisher):
                 "96 channel pipette cannot be loaded with another pipette."
             )
 
-        elif not is_96_channel and loaded_pipettes and any(
-            validation.ensure_96_channel_pipette(i._implementation.get_pipette_name())
-            for i in loaded_pipettes
+        elif (
+            not is_96_channel
+            and loaded_pipettes
+            and any(
+                validation.ensure_96_channel_pipette(
+                    i._implementation.get_pipette_name()
+                )
+                for i in loaded_pipettes
+            )
         ):
             raise RuntimeError(
                 "96 channel pipette cannot be loaded with another pipette."
