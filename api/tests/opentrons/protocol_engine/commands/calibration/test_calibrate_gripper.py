@@ -53,11 +53,12 @@ async def test_calibrate_gripper(
             probe=expected_hc_probe,
         )
     ).then_return(Point(1.1, 2.2, 3.3))
+
     result = await subject.execute(params)
     assert result == CalibrateGripperResult(probeOffset=Vec3f(x=1.1, y=2.2, z=3.3))
 
 
-async def test_calibrate_gripper_errors_on_ot2(
+async def test_calibrate_gripper_raises_on_ot2(
     decoy: Decoy,
     ot2_hardware_api: OT2API,
 ) -> None:
@@ -68,6 +69,3 @@ async def test_calibrate_gripper_errors_on_ot2(
 
     with pytest.raises(HardwareNotSupportedError):
         await subject.execute(params)
-
-
-# TODO: It should raise a descriptive error if OT-3, but no gripper attached

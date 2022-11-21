@@ -74,21 +74,20 @@ class CalibrateGripperImplementation(
         """
         ot3_hardware_api = ensure_ot3_hardware(self._hardware_api)
         result = await ot3_calibration.calibrate_gripper(
-            ot3_hardware_api, self._params_probe_to_hw_api_probe(params.probe)
+            ot3_hardware_api, self._convert_to_hw_api_probe(params.probe)
         )
         return CalibrateGripperResult.construct(
             probeOffset=Vec3f.construct(x=result.x, y=result.y, z=result.z)
         )
 
     @staticmethod
-    def _params_probe_to_hw_api_probe(
-        from_params: CalibrateGripperParamsProbe,
+    def _convert_to_hw_api_probe(
+        probe_from_params: CalibrateGripperParamsProbe,
     ) -> HWAPIGripperProbe:
-        if from_params is CalibrateGripperParamsProbe.FRONT:
+        if probe_from_params is CalibrateGripperParamsProbe.FRONT:
             return HWAPIGripperProbe.FRONT
-        elif from_params is CalibrateGripperParamsProbe.REAR:
+        elif probe_from_params is CalibrateGripperParamsProbe.REAR:
             return HWAPIGripperProbe.REAR
-        # No `else`, so mypy will check for exhaustiveness.
 
 
 class CalibrateGripper(BaseCommand[CalibrateGripperParams, CalibrateGripperResult]):
