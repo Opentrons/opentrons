@@ -37,6 +37,8 @@ class DeckDataProvider:
     @staticmethod
     async def get_deck_definition() -> DeckDefinitionV3:
         """Get a labware definition given the labware's identification."""
+        # FIX BEFORE MERGE: This needs to change according to what kind of robot
+        # a protocol is running on.
         return load_deck(deck_type(), 3)
 
     async def get_deck_fixed_labware(
