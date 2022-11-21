@@ -532,7 +532,7 @@ class ProtocolContext(CommandPublisher):
         loaded_pipettes = [
             instrument for instrument in self._instruments.values() if instrument
         ]
-        print(loaded_pipettes)
+
         if is_96_channel and checked_mount == Mount.RIGHT:
             raise RuntimeError("96 channel pipette is only allowed on the left mount.")
 
