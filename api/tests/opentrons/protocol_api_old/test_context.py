@@ -70,17 +70,6 @@ def get_labware_def(monkeypatch):
     monkeypatch.setattr(papi.labware, "get_labware_definition", dummy_load)
 
 
-@pytest.mark.parametrize("name", config_names)
-def test_load_instrument(name, ctx):
-    assert ctx.loaded_instruments == {}
-    loaded = ctx.load_instrument(name, Mount.LEFT, replace=True)
-    assert ctx.loaded_instruments[Mount.LEFT.name.lower()] == loaded
-    assert loaded.name == name
-    loaded = ctx.load_instrument(name, Mount.RIGHT, replace=True)
-    assert ctx.loaded_instruments[Mount.RIGHT.name.lower()] == loaded
-    assert loaded.name == name
-
-
 async def test_motion(ctx, hardware):
     ctx.home()
     instr = ctx.load_instrument("p10_single", Mount.RIGHT)
