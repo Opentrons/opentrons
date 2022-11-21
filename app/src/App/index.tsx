@@ -174,7 +174,7 @@ export const AppComponent = (): JSX.Element => {
                     </Route>
                   )
                 })}
-                <Redirect to="/network-setup-menu" />
+                <Redirect to="/device-setup" />
               </Switch>
               <Alerts />
             </Box>
