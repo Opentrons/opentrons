@@ -250,14 +250,14 @@ async def test_move_to_without_homing_first(
         await ot3_hardware.cache_gripper(instr_data)
 
     ot3_hardware._backend._homed_nodes = set()
-    assert not ot3_hardware._backend.has_homed(homed_axis)
+    assert not ot3_hardware._backend.check_ready_for_movement(homed_axis)
 
     await ot3_hardware.move_to(
         mount,
         Point(0.001, 0.001, 0.001),
     )
     mock_home.assert_called_once_with(homed_axis)
-    assert ot3_hardware._backend.has_homed(homed_axis)
+    assert ot3_hardware._backend.check_ready_for_movement(homed_axis)
 
 
 @pytest.mark.parametrize(

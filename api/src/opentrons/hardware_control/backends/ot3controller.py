@@ -197,7 +197,7 @@ class OT3Controller:
         """Set the module controls"""
         self._module_controls = module_controls
 
-    def has_homed(self, axes: Sequence[OT3Axis]) -> bool:
+    def check_ready_for_movement(self, axes: Sequence[OT3Axis]) -> bool:
         for a in axes:
             if axis_to_node(a) not in self._homed_nodes:
                 return False

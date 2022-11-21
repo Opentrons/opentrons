@@ -163,7 +163,7 @@ async def test_home_execute(
 
     # all commanded axes have been homed
     assert controller._homed_nodes == set(axis_to_node(ax) for ax in axes)
-    assert controller.has_homed(axes)
+    assert controller.check_ready_for_movement(axes)
 
 
 @pytest.mark.parametrize("axes", home_test_params)
@@ -189,7 +189,7 @@ async def test_home_prioritize_mount(
 
     # all commanded axes have been homed
     assert controller._homed_nodes == set(axis_to_node(ax) for ax in axes)
-    assert controller.has_homed(axes)
+    assert controller.check_ready_for_movement(axes)
 
 
 @pytest.mark.parametrize("axes", home_test_params)
@@ -219,7 +219,7 @@ async def test_home_build_runners(
 
     # all commanded axes have been homed
     assert controller._homed_nodes == set(axis_to_node(ax) for ax in axes)
-    assert controller.has_homed(axes)
+    assert controller.check_ready_for_movement(axes)
 
 
 @pytest.mark.parametrize("axes", home_test_params)

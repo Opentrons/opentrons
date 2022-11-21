@@ -174,7 +174,7 @@ class OT3Simulator:
             self._configuration.current_settings, gantry_load
         )
 
-    def has_homed(self, axes: Sequence[OT3Axis]) -> bool:
+    def check_ready_for_movement(self, axes: Sequence[OT3Axis]) -> bool:
         for a in axes:
             if axis_to_node(a) not in self._homed_nodes:
                 return False
