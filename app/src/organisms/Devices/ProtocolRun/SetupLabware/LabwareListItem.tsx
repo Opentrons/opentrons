@@ -188,7 +188,7 @@ export function LabwareListItem(
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_CENTER}
           marginLeft={SPACING.spacing4}
-          marginRight={SPACING.spacing3}
+          marginRight={SPACING.spacing5}
         >
           <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {labwareDisplayName}
@@ -216,7 +216,7 @@ export function LabwareListItem(
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
-              marginTop="3px"
+              marginTop={SPACING.spacingS}
             >
               <ToggleButton
                 label={`heater_shaker_${
@@ -229,9 +229,7 @@ export function LabwareListItem(
                 display="flex"
                 alignItems={ALIGN_CENTER}
               />
-              {isLatchClosed ? (
-                <StyledText as="p">{t('secure')}</StyledText>
-              ) : null}
+              <StyledText as="p">{t('secure')}</StyledText>
             </Flex>
           </Flex>
         ) : null}
