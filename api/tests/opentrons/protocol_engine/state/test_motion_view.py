@@ -286,7 +286,16 @@ class WaypointSpec:
             should_dodge_thermocycler=True,
             expected_move_type=motion_planning.MoveType.GENERAL_ARC,
             extra_waypoints=[(123, 456)],
-        )
+        ),
+        # WaypointSpec(
+        #     name="Direct movement with force direct set to True",
+        #     location=CurrentWell(
+        #         pipette_id="pipette-id",
+        #         labware_id="other-labware-id",
+        #         well_name="A1",
+        #     ),
+        #     expected_move_type=motion_planning.MoveType.DIRECT,
+        # )
         # TODO(mc, 2021-01-08): add test for override current location (current_well)
     ],
 )
@@ -304,7 +313,7 @@ def test_get_movement_waypoints_to_well(
     The arguments to get_waypoints() should be as follows:
 
     * move_type:
-        * DIRECT if moving within a single well.
+        * DIRECT if moving within a single well, or `force_direct` is True
         * IN_LABWARE_ARC if going well-to-well in a single labware.
         * GENERAL_ARC otherwise.
     * origin:
@@ -315,8 +324,9 @@ def test_get_movement_waypoints_to_well(
         Always passed through as-is from subject's arguments.
     * min_travel_z:
         * Labware's highest Z if going well-to-well in a single labware.
-        * Doesn't matter if moving within a single well (because it'll be DIRECT).
+        * Doesn't matter if moving within a single well (because it'll be DIRECT), or force_direct = True
         * get_all_labware_highest_z() deck-wide safe height otherwise.
+        * If minimum_z_height is provided and larger than calculated min_travel_z
     * dest:
         Point calculated from subject's labware_id, well_name, and well_location
         arguments.
@@ -412,6 +422,114 @@ def test_get_movement_waypoints_to_well(
         origin=spec.origin,
         origin_cp=spec.origin_cp,
         max_travel_z=spec.max_travel_z,
+    )
+
+    assert result == waypoints
+
+
+@pytest.mark.parametrize(
+    ["location", "force_direct", "expected_move_type"],
+    [
+        (None, False, motion_planning.MoveType.GENERAL_ARC),
+        (None, True, motion_planning.MoveType.DIRECT),
+        (
+            CurrentWell(
+                pipette_id="pipette-id",
+                labware_id="other-labware-id",
+                well_name="well-name",
+            ),
+            False,
+            motion_planning.MoveType.GENERAL_ARC,
+        ),
+        (
+            CurrentWell(
+                pipette_id="other-pipette-id",
+                labware_id="labware-id",
+                well_name="well-name",
+            ),
+            False,
+            motion_planning.MoveType.GENERAL_ARC,
+        ),
+        (
+            CurrentWell(
+                pipette_id="other-pipette-id",
+                labware_id="other-labware-id",
+                well_name="well-name",
+            ),
+            False,
+            motion_planning.MoveType.GENERAL_ARC,
+        ),
+        (
+            CurrentWell(
+                pipette_id="pipette-id",
+                labware_id="labware-id",
+                well_name="other-well-name",
+            ),
+            False,
+            motion_planning.MoveType.IN_LABWARE_ARC,
+        ),
+        (
+            CurrentWell(
+                pipette_id="pipette-id", labware_id="labware-id", well_name="well-name"
+            ),
+            False,
+            motion_planning.MoveType.DIRECT,
+        ),
+    ],
+)
+def test_get_movement_waypoints_to_well_move_type(
+    decoy: Decoy,
+    geometry_view: GeometryView,
+    pipette_view: PipetteView,
+    subject: MotionView,
+    location: Optional[CurrentWell],
+    force_direct: bool,
+    expected_move_type: motion_planning.MoveType,
+):
+    decoy.when(geometry_view.get_labware_highest_z("labware-id")).then_return(123)
+    decoy.when(geometry_view.get_all_labware_highest_z()).then_return(123)
+
+    decoy.when(
+        geometry_view.get_well_position(
+            "labware-id",
+            "well-name",
+            None,
+        )
+    ).then_return(Point(4, 5, 6))
+
+    decoy.when(pipette_view.get_current_well()).then_return(location)
+
+    waypoints = [
+        motion_planning.Waypoint(
+            position=Point(1, 2, 3), critical_point=CriticalPoint.XY_CENTER
+        ),
+        motion_planning.Waypoint(
+            position=Point(4, 5, 6), critical_point=CriticalPoint.MOUNT
+        ),
+    ]
+
+    decoy.when(
+        motion_planning.get_waypoints(
+            move_type=expected_move_type,
+            origin=Point(1, 2, 3),
+            origin_cp=None,
+            max_travel_z=42.0,
+            min_travel_z=123,
+            dest=Point(4, 5, 6),
+            dest_cp=None,
+            xy_waypoints=[],
+        )
+    ).then_return(waypoints)
+
+    result = subject.get_movement_waypoints_to_well(
+        pipette_id="pipette-id",
+        labware_id="labware-id",
+        well_name="well-name",
+        well_location=None,
+        origin=Point(1, 2, 3),
+        origin_cp=None,
+        max_travel_z=42,
+        force_direct=force_direct,
     )
 
     assert result == waypoints

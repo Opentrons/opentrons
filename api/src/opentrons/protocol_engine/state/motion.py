@@ -83,17 +83,17 @@ class MotionView:
     ) -> List[motion_planning.Waypoint]:
         """Calculate waypoints to a destination that's specified as a well."""
         location = current_well or self._pipettes.get_current_well()
-        center_dest = self._labware.get_has_quirk(
+        center_destination = self._labware.get_has_quirk(
             labware_id,
             "centerMultichannelOnWells",
         )
 
-        dest = self._geometry.get_well_position(
+        destination = self._geometry.get_well_position(
             labware_id,
             well_name,
             well_location,
         )
-        dest_cp = CriticalPoint.XY_CENTER if center_dest else None
+        destination_cp = CriticalPoint.XY_CENTER if center_destination else None
         extra_waypoints = []
 
         if (
@@ -133,8 +133,8 @@ class MotionView:
                 move_type=move_type,
                 origin=origin,
                 origin_cp=origin_cp,
-                dest=dest,
-                dest_cp=dest_cp,
+                dest=destination,
+                dest_cp=destination_cp,
                 min_travel_z=min_travel_z,
                 max_travel_z=max_travel_z,
                 xy_waypoints=extra_waypoints,
