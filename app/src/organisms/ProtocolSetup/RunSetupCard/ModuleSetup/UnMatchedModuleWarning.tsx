@@ -21,6 +21,7 @@ export const UnMatchedModuleWarning = (): JSX.Element | null => {
         marginRight={SPACING.spacing4}
         marginLeft={SPACING.spacing3}
         type="warning"
+        size={SPACING.spacingM}
         onCloseClick={() => setShowBanner(false)}
       >
         <Flex flexDirection={DIRECTION_COLUMN}>

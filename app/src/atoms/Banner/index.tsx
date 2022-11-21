@@ -80,13 +80,14 @@ export function Banner(props: BannerProps): JSX.Element {
     closeButton,
     marginRight,
     marginLeft,
+    size,
     ...styleProps
   } = props
   const bannerProps = BANNER_PROPS_BY_TYPE[type]
 
   const iconProps = {
     ...(icon ?? bannerProps.icon),
-    size: SPACING.spacing4,
+    size: size ?? SPACING.spacing4,
     marginRight: marginRight ?? SPACING.spacing3,
     marginLeft: marginLeft ?? '0rem',
     color: BANNER_PROPS_BY_TYPE[type].color,
@@ -120,6 +121,7 @@ export function Banner(props: BannerProps): JSX.Element {
             <Icon
               width={SPACING.spacing5}
               height={SPACING.spacing5}
+              marginTop="0.375rem"
               name="close"
               aria-label="close_icon"
             />

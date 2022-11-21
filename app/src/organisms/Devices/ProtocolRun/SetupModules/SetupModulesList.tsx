@@ -83,12 +83,14 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
           <Banner
             marginRight={SPACING.spacing4}
             marginLeft={SPACING.spacing3}
+            size={SPACING.spacingM}
             type="informing"
             onCloseClick={() => setShowMultipleModulesModal(true)}
             closeButton={
               <StyledText
                 as="p"
                 textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                marginRight={SPACING.spacing3}
               >
                 {t('learn_more')}
               </StyledText>
