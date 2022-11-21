@@ -106,8 +106,8 @@ class LabwareMovementHandler:
             if waypoint == waypoints_to_labware[-1]:
                 # TODO: We do this to have the gripper move to location with
                 #  closed grip and open right before picking up the labware to
-                #  avoid collisions as much as possible. Re-evaluate whether we need it
-                #  once collision avoidance is in place.
+                #  avoid collisions as much as possible.
+                #  See https://opentrons.atlassian.net/browse/RLAB-214
                 await ot3api.home_gripper_jaw()
             await ot3api.move_to(mount=gripper_mount, abs_position=waypoint)
 
@@ -119,8 +119,7 @@ class LabwareMovementHandler:
             else None
         )
 
-        # TODO: homing is temporary fix to save a gripper after collision.
-        #       Remove this call to home when RLAB-211 is addressed
+        # TODO: see https://opentrons.atlassian.net/browse/RLAB-215
         await ot3api.home(axes=[OT3Axis.Z_G])
 
         waypoints_to_new_location = self._get_gripper_movement_waypoints(
@@ -135,9 +134,7 @@ class LabwareMovementHandler:
             await ot3api.move_to(mount=gripper_mount, abs_position=waypoint)
 
         await ot3api.ungrip()
-        # TODO: homing is temporary fix to save a gripper after collision.
-        #       Replace the call to home with a gripper retract using `move_to` when
-        #       RLAB-211 is addressed
+        # TODO: see https://opentrons.atlassian.net/browse/RLAB-215
         await ot3api.home(axes=[OT3Axis.Z_G])
 
         # Keep the gripper in gripped position so it avoids colliding with

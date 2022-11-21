@@ -182,10 +182,9 @@ async def test_move_labware_with_gripper(
         await ot3_hardware_api.move_to(
             mount=gripper, abs_position=expected_waypoints[2]
         ),
-        await ot3_hardware_api.grip(
-            force_newtons=LABWARE_GRIP_FORCE
-        ),  # TODO: replace this once we have this spec in hardware control
-        # TODO: homing is temporary fix for evt. Remove when RLAB-211 is addressed
+        # TODO: see https://opentrons.atlassian.net/browse/RLAB-214
+        await ot3_hardware_api.grip(force_newtons=LABWARE_GRIP_FORCE),
+        # TODO: see https://opentrons.atlassian.net/browse/RLAB-215
         await ot3_hardware_api.home(axes=[OT3Axis.Z_G]),
         await ot3_hardware_api.move_to(
             mount=gripper, abs_position=expected_waypoints[3]
@@ -197,15 +196,10 @@ async def test_move_labware_with_gripper(
             mount=gripper, abs_position=expected_waypoints[5]
         ),
         await ot3_hardware_api.ungrip(),
-        # TODO: homing is temporary fix for EVT. Remove verification for home and
-        #  uncomment `move_to` verification when RLAB-211 is addressed
+        # TODO: see https://opentrons.atlassian.net/browse/RLAB-215
         await ot3_hardware_api.home(axes=[OT3Axis.Z_G]),
-        # await ot3_hardware_api.move_to(
-        #     mount=gripper, abs_position=expected_waypoints[6]
-        # ),
-        await ot3_hardware_api.grip(
-            force_newtons=IDLE_STATE_GRIP_FORCE
-        ),  # TODO: replace this once we have this spec in hardware control
+        # TODO: see https://opentrons.atlassian.net/browse/RLAB-214
+        await ot3_hardware_api.grip(force_newtons=IDLE_STATE_GRIP_FORCE),
     )
 
 
