@@ -152,6 +152,11 @@ class OT3Simulator:
         self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
         self._homed_nodes: Set[NodeId] = set()
 
+    def clear_positions(self) -> None:
+        self._position = self._get_home_position()
+        self._encoder_position = self._get_home_position()
+        self._homed_nodes = set()
+
     @property
     def board_revision(self) -> BoardRevision:
         """Get the board revision"""

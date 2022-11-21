@@ -159,6 +159,11 @@ class OT3Controller:
         )
         await self.set_default_currents()
 
+    def clear_positions(self) -> None:
+        self._position = self._get_home_position()
+        self._encoder_position = self._get_home_position()
+        self._homed_nodes = set()
+
     @property
     def motor_run_currents(self) -> OT3AxisMap[float]:
         assert self._current_settings
