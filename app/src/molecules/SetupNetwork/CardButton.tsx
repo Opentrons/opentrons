@@ -24,7 +24,7 @@ interface CardButtonProps {
   title: string
   iconName: IconName
   description: string
-  distPath: string
+  destinationPath: string
 }
 
 export function CardButton(props: CardButtonProps): JSX.Element {
@@ -34,7 +34,7 @@ export function CardButton(props: CardButtonProps): JSX.Element {
     title,
     iconName,
     description,
-    distPath,
+    destinationPath,
   } = props
   const { t } = useTranslation('device_settings')
   const history = useHistory()
@@ -47,7 +47,7 @@ export function CardButton(props: CardButtonProps): JSX.Element {
       gridGap={SPACING.spacing5}
       justifyContent={JUSTIFY_CENTER}
       alignItems={ALIGN_CENTER}
-      onClick={() => history.push(`/${distPath}`)}
+      onClick={() => history.push(`/${destinationPath}`)}
       width={cardWidth}
       height={cardHeight}
       backgroundColor={COLORS.medBlue}
