@@ -14,7 +14,7 @@ is-ot3 = $(shell ssh $(if $(2),"-i $(2)") $(3) root@$(1) systemctl status opentr
 # argument 4 is the path to the wheel file
 
 define push-python-package
-$(if $(is-ot3), echo "This is an OT3 use 'make push-ot3' instead." && exit 1)
+$(if $(is-ot3), echo "This is an OT-3. Use 'make push-ot3' instead." && exit 1)
 scp -i $(2) $(3) "$(4)" root@$(1):/data/$(notdir $(4))
 ssh -i $(2) $(3) root@$(1) \
 "function cleanup () { rm -f /data/$(notdir $(4)) && mount -o remount,ro / ; } ;\
