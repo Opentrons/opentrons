@@ -227,5 +227,9 @@ class PipetteTipActionType(int, Enum):
 class MotorPositionFlags(Enum):
     """Flags for motor position validity."""
 
+    # Referring to the position in microsteps reported by firmware, which is
+    # an open-loop accumulation of all moves since the last homing event.
     stepper_position_ok = 0x1
+    # Referring to the closed-loop encoder on the relevant axis.
+    # Generally only unset if the motor board has not homed since power-on.
     encoder_position_ok = 0x2
