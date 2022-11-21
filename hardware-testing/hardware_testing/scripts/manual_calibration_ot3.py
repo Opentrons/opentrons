@@ -16,7 +16,7 @@ DEFAULT_STEP_SIZE = 0.1
 Z_OFFSET_FROM_WASHERS = 3.0
 
 GRIP_FORCE_CALIBRATION = 20
-GRIP_FORCE_VALIDATION = 2
+GRIP_FORCE_VALIDATION = 3
 
 # Height of the bottom of a probe above the deck.
 # Must be high enough for the user to reach under to change probes,
@@ -263,7 +263,10 @@ async def _main(simulate: bool, slot: int, mount: OT3Mount, test: bool) -> None:
         slot_loc_top_left = helpers_ot3.get_slot_top_left_position_ot3(slot)
         # use the aluminum block, to more precisely check location
         test_pos = slot_loc_top_left + (GRIPPER_TEST_BLOCK_SIZE * 0.5)
-        test_pos = test_pos._replace(z=22 + 1)  # make the Z the length of the probes, plus 1mm
+        # if we're testing w/ the probes attached, make sure we don't hit the deck
+        gripper_probe_length = 22
+        test_z = gripper_probe_length + 2
+        test_pos = test_pos._replace(z=test_z)
     else:
         test_pos = calibration_square_pos
 
