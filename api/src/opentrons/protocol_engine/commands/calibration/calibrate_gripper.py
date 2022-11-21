@@ -66,6 +66,12 @@ class CalibrateGripperImplementation(
         self._hardware_api = hardware_api
 
     async def execute(self, params: CalibrateGripperParams) -> CalibrateGripperResult:
+        """Execute a `calibrateGripper` command.
+
+        1. Move from the current location to the calibration area on the deck.
+        2. Using the given probe, sense the gripper's offset from its ideal position.
+        3. Return the gripper's offset from its ideal position.
+        """
         ot3_hardware_api = ensure_ot3_hardware(self._hardware_api)
         result = await ot3_calibration.calibrate_gripper(
             ot3_hardware_api, self._params_probe_to_hw_api_probe(params.probe)

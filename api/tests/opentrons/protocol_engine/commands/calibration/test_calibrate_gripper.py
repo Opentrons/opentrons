@@ -1,3 +1,6 @@
+"""Unit tests for the calibrateGripper implementation."""
+
+
 from decoy import Decoy
 import pytest
 
@@ -40,6 +43,7 @@ async def test_calibrate_gripper(
     params_probe: CalibrateGripperParamsProbe,
     expected_hc_probe: GripperProbe,
 ) -> None:
+    """It should delegate to the hardware API to calibrate the gripper."""
     subject = CalibrateGripperImplementation(hardware_api=ot3_hardware_api)
 
     params = CalibrateGripperParams(probe=params_probe)
@@ -57,6 +61,7 @@ async def test_calibrate_gripper_errors_on_ot2(
     decoy: Decoy,
     ot2_hardware_api: OT2API,
 ) -> None:
+    """It should raise with a descriptive error if run on an OT-2, instead of OT-3."""
     subject = CalibrateGripperImplementation(hardware_api=ot2_hardware_api)
 
     params = CalibrateGripperParams(probe=CalibrateGripperParamsProbe.REAR)

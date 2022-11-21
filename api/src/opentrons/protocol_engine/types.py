@@ -206,6 +206,8 @@ class ModuleDimensions(BaseModel):
 
 
 class Vec3f(BaseModel):
+    """A 3D vector of floats."""
+
     x: float
     y: float
     z: float
