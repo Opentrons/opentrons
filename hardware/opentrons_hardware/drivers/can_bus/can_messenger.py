@@ -57,7 +57,6 @@ class CanMessenger:
 
     async def send(self, node_id: NodeId, message: MessageDefinition) -> None:
         """Send a message."""
-        # TODO (amit, 2021-11-05): Use function code when it is better defined.
         func = (
             FunctionCode.error
             if message.message_id == MessageId.error_message
