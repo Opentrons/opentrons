@@ -559,7 +559,6 @@ class OT3API(
         await self.reset()
 
         if home_after:
-            self._backend.clear_positions()
             await self.home()
 
     async def reset(self) -> None:
