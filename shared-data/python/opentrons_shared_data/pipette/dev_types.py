@@ -31,7 +31,8 @@ PipetteName = Literal[
     "p1000_single_gen2",
     "p1000_single_gen3",
     "p1000_multi_gen3",
-    "p1000_96"
+    # TODO (tz, 11-18-22): remove after refactoring load_instrument for 96 pipettes.
+    "p1000_96",
 ]
 
 
