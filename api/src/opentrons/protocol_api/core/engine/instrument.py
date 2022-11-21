@@ -31,6 +31,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         engine_client: EngineClient,
         sync_hardware_api: SyncHardwareAPI,
         protocol_core: ProtocolCore,
+        default_movement_speed: float,
     ) -> None:
         self._pipette_id = pipette_id
         self._engine_client = engine_client
@@ -46,16 +47,24 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         self._flow_rates = FlowRates(self)
         self._flow_rates.set_defaults(MAX_SUPPORTED_VERSION)
 
+        self.set_default_speed(speed=default_movement_speed)
+
     @property
     def pipette_id(self) -> str:
         """The instrument's unique ProtocolEngine ID."""
         return self._pipette_id
 
     def get_default_speed(self) -> float:
-        raise NotImplementedError("InstrumentCore.get_default_speed not implemented")
+        speed = self._engine_client.state.pipettes.get_movement_speed(
+            pipette_id=self._pipette_id
+        )
+        assert speed is not None, "Pipette loading should have set a default speed."
+        return speed
 
     def set_default_speed(self, speed: float) -> None:
-        raise NotImplementedError("InstrumentCore.set_default_speed not implemented")
+        self._engine_client.set_pipette_movement_speed(
+            pipette_id=self._pipette_id, speed=speed
+        )
 
     def aspirate(
         self,
@@ -96,6 +105,8 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             flow_rate=flow_rate,
         )
 
+        self._protocol_core.set_last_location(location=location, mount=self.get_mount())
+
     def dispense(
         self,
         location: Location,
@@ -133,6 +144,8 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             flow_rate=flow_rate,
         )
 
+        self._protocol_core.set_last_location(location=location, mount=self.get_mount())
+
     def blow_out(
         self, location: Location, well_core: Optional[WellCore], move_to_well: bool
     ) -> None:
@@ -164,6 +177,8 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             #   this also needs to be refactored along with other flow rate related issues
             flow_rate=self.get_absolute_blow_out_flow_rate(1.0),
         )
+
+        self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
     def touch_tip(
         self,
@@ -213,6 +228,8 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             well_location=well_location,
         )
 
+        self._protocol_core.set_last_location(location=location, mount=self.get_mount())
+
     def drop_tip(
         self, location: Optional[Location], well_core: WellCore, home_after: bool
     ) -> None:
@@ -244,6 +261,8 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             well_name=well_name,
             well_location=well_location,
         )
+
+        self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
     def home(self) -> None:
         raise NotImplementedError("InstrumentCore.home not implemented")
@@ -321,19 +340,24 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         ).pipetteName.value
 
     def get_model(self) -> str:
-        raise NotImplementedError("InstrumentCore.get_model not implemented")
+        # TODO(mc, 2022-11-11): https://opentrons.atlassian.net/browse/RCORE-382
+        return self.get_hardware_state()["model"]
 
     def get_min_volume(self) -> float:
-        raise NotImplementedError("InstrumentCore.get_min_volume not implemented")
+        # TODO(mc, 2022-11-11): https://opentrons.atlassian.net/browse/RCORE-382
+        return self.get_hardware_state()["min_volume"]
 
     def get_max_volume(self) -> float:
-        raise NotImplementedError("InstrumentCore.get_max_volume not implemented")
+        # TODO(mc, 2022-11-11): https://opentrons.atlassian.net/browse/RCORE-382
+        return self.get_hardware_state()["max_volume"]
 
     def get_current_volume(self) -> float:
-        raise NotImplementedError("InstrumentCore.get_current_volume not implemented")
+        # TODO(mc, 2022-11-11): https://opentrons.atlassian.net/browse/RCORE-381
+        return self.get_hardware_state()["current_volume"]
 
     def get_available_volume(self) -> float:
-        raise NotImplementedError("InstrumentCore.get_available_volume not implemented")
+        # TODO(mc, 2022-11-11): https://opentrons.atlassian.net/browse/RCORE-381
+        return self.get_hardware_state()["available_volume"]
 
     def get_hardware_state(self) -> PipetteDict:
         """Get the current state of the pipette hardware as a dictionary."""
@@ -341,6 +365,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
     # TODO(mc, 2022-11-09): read pipette config into engine state at load
     def get_channels(self) -> int:
+        # TODO(mc, 2022-11-11): https://opentrons.atlassian.net/browse/RCORE-382
         return self.get_hardware_state()["channels"]
 
     def has_tip(self) -> bool:

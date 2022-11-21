@@ -159,6 +159,17 @@ class ResetTipsAction:
     labware_id: str
 
 
+@dataclass(frozen=True)
+class SetPipetteMovementSpeedAction:
+    """Set the speed of a pipette's X/Y/Z movements. Does not affect plunger speed.
+
+    None will use the hardware API's default.
+    """
+
+    pipette_id: str
+    speed: Optional[float]
+
+
 Action = Union[
     PlayAction,
     PauseAction,
@@ -174,4 +185,5 @@ Action = Union[
     AddModuleAction,
     AddLiquidAction,
     ResetTipsAction,
+    SetPipetteMovementSpeedAction,
 ]

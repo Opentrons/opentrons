@@ -21,7 +21,6 @@ from opentrons.calibration_storage.types import (
     TipLengthCalNotFound,
 )
 from opentrons.hardware_control import HardwareControlAPI, CriticalPoint, Pipette
-from opentrons.hardware_control.instruments.ot2 import instrument_calibration
 from opentrons.protocol_api import labware
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.types import Mount, Point, Location
@@ -140,9 +139,7 @@ class PipetteOffsetCalibrationUserFlow:
             CalibrationCommand.invalidate_last_action: self.invalidate_last_action,
         }
 
-        self._hw_pipette.update_pipette_offset(
-            instrument_calibration.load_pipette_offset(pip_id=None, mount=self._mount)
-        )
+        self._hw_pipette.reset_pipette_offset(self._mount, to_default=True)
         self._default_tipracks = util.get_default_tipracks(
             self.hw_pipette.config.default_tipracks
         )

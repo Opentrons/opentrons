@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useHistory } from 'react-router-dom'
 
+import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   Btn,
@@ -21,7 +22,6 @@ import { StyledText } from '../../atoms/text'
 import { Tooltip } from '../../atoms/Tooltip'
 import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../organisms/RunTimeControl/hooks'
-import { useProtocolDetailsForRun } from './hooks'
 
 import type { StyleProps } from '@opentrons/components'
 import type { DiscoveredRobot } from '../../redux/discovery/types'
@@ -43,7 +43,14 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
 
   const currentRunId = useCurrentRunId()
   const currentRunStatus = useCurrentRunStatus()
-  const { displayName } = useProtocolDetailsForRun(currentRunId)
+  const { data: runRecord } = useRunQuery(currentRunId, { staleTime: Infinity })
+  const protocolId = runRecord?.data?.protocolId ?? null
+  const { data: protocolRecord } = useProtocolQuery(protocolId, {
+    staleTime: Infinity,
+  })
+  const displayName =
+    protocolRecord?.data.metadata.protocolName ??
+    protocolRecord?.data.files[0].name
 
   const runningProtocolBanner: JSX.Element | null =
     currentRunId != null && currentRunStatus != null && displayName != null ? (

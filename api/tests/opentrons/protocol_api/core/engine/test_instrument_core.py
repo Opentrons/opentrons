@@ -68,6 +68,8 @@ def subject(
         engine_client=mock_engine_client,
         sync_hardware_api=mock_sync_hardware,
         protocol_core=mock_protocol_core,
+        # When this baby hits 88 mph, you're going to see some serious shit.
+        default_movement_speed=39339.5,
     )
 
 
@@ -123,7 +125,10 @@ def test_get_hardware_state(
 
 
 def test_move_to_well(
-    decoy: Decoy, mock_engine_client: EngineClient, subject: InstrumentCore
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
 ) -> None:
     """It should move the pipette to a location."""
     location = Location(point=Point(1, 2, 3), labware=None)
@@ -159,12 +164,15 @@ def test_move_to_well(
                 origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
             ),
         ),
-        times=1,
+        mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )
 
 
 def test_move_to_coordinates(
-    decoy: Decoy, mock_engine_client: EngineClient, subject: InstrumentCore
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
 ) -> None:
     """It should move the pipette to a location."""
     location = Location(point=Point(1, 2, 3), labware=None)
@@ -184,12 +192,15 @@ def test_move_to_coordinates(
             minimum_z_height=42.0,
             force_direct=True,
         ),
-        times=1,
+        mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )
 
 
 def test_pick_up_tip(
-    decoy: Decoy, mock_engine_client: EngineClient, subject: InstrumentCore
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
 ) -> None:
     """It should pick up a tip from a well."""
     location = Location(point=Point(1, 2, 3), labware=None)
@@ -224,7 +235,7 @@ def test_pick_up_tip(
                 origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
             ),
         ),
-        times=1,
+        mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )
 
 
@@ -256,6 +267,7 @@ def test_drop_tip_no_location(
 def test_aspirate_from_well(
     decoy: Decoy,
     mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
     subject: InstrumentCore,
 ) -> None:
     """It should aspirate from a well."""
@@ -286,13 +298,14 @@ def test_aspirate_from_well(
             volume=12.34,
             flow_rate=7.8,
         ),
-        times=1,
+        mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )
 
 
 def test_blow_out_to_well(
     decoy: Decoy,
     mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
     subject: InstrumentCore,
 ) -> None:
     """It should aspirate from a well."""
@@ -320,13 +333,14 @@ def test_blow_out_to_well(
             ),
             flow_rate=1.23,
         ),
-        times=1,
+        mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )
 
 
 def test_dispense_to_well(
     decoy: Decoy,
     mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
     subject: InstrumentCore,
 ) -> None:
     """It should dispense to a well."""
@@ -357,5 +371,46 @@ def test_dispense_to_well(
             volume=12.34,
             flow_rate=6.0,
         ),
-        times=1,
+        mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )
+
+
+def test_initialization_sets_default_movement_speed(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should set a default movement speed as soon as it's initialized."""
+    decoy.verify(
+        mock_engine_client.set_pipette_movement_speed(
+            pipette_id="abc123", speed=39339.5
+        )
+    )
+
+
+def test_set_default_speed(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should delegate to the engine client to set the pipette's movement speed."""
+    subject.set_default_speed(speed=9000.1)
+    decoy.verify(
+        mock_engine_client.set_pipette_movement_speed(
+            pipette_id=subject.pipette_id, speed=9000.1
+        )
+    )
+
+
+def test_get_default_speed(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should delegate to the engine client to set the pipette's movement speed."""
+    decoy.when(
+        mock_engine_client.state.pipettes.get_movement_speed(
+            pipette_id=subject.pipette_id
+        )
+    ).then_return(9000.1)
+    assert subject.get_default_speed() == 9000.1

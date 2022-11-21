@@ -7,9 +7,6 @@ from numpy import float64
 from typing import Callable
 from logging.config import dictConfig
 
-from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    EnableMotorRequest,
-)
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.constants import NodeId, PipetteTipActionType
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
@@ -68,7 +65,6 @@ async def run(args: argparse.Namespace) -> None:
 
     messenger = CanMessenger(driver=driver)
     messenger.start()
-    await messenger.send(node_id=NodeId.broadcast, message=EnableMotorRequest())
 
     pick_up_tip_runner = MoveGroupRunner(
         move_groups=[
