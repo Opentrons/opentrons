@@ -5,10 +5,11 @@ import logging
 
 from fastapi import Depends
 from sqlalchemy.engine import Engine as SQLEngine
-from typing_extensions import Final
+from typing_extensions import Final, Literal
 from pathlib import Path
 from anyio import Path as AsyncPath
 
+from opentrons.config import feature_flags
 from opentrons.protocol_reader import ProtocolReader
 from opentrons.protocol_runner import create_simulating_runner
 
@@ -87,11 +88,19 @@ def get_analysis_store(
     return analysis_store
 
 
+async def get_analysis_robot_type() -> Literal["OT-2 Standard", "OT-3 Standard"]:
+    if feature_flags.enable_ot3_hardware_controller():
+        return "OT-3 Standard"
+    else:
+        return "OT-2 Standard"
+
+
 async def get_protocol_analyzer(
     analysis_store: AnalysisStore = Depends(get_analysis_store),
+    analysis_robot_type: Literal["OT-2 Standard", "OT-3 Standard"] = Depends(get_analysis_robot_type),
 ) -> ProtocolAnalyzer:
     """Construct a ProtocolAnalyzer for a single request."""
-    protocol_runner = await create_simulating_runner()
+    protocol_runner = await create_simulating_runner(robot_type=analysis_robot_type)
 
     return ProtocolAnalyzer(
         protocol_runner=protocol_runner,

@@ -1,5 +1,6 @@
 """Protocol analysis module."""
 import logging
+from typing_extensions import Literal
 
 from opentrons.protocol_runner import ProtocolRunner
 
@@ -40,5 +41,4 @@ class ProtocolAnalyzer:
             pipettes=result.state_summary.pipettes,
             errors=result.state_summary.errors,
             liquids=result.state_summary.liquids,
-            robot_type=protocol_resource.source.robot_type,
         )

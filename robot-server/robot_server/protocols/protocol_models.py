@@ -2,6 +2,7 @@
 from datetime import datetime
 from pydantic import BaseModel, Extra, Field
 from typing import Any, List, Optional
+from typing_extensions import Literal
 
 from opentrons.protocol_reader import (
     ProtocolType as ProtocolType,
@@ -66,6 +67,17 @@ class Protocol(ResourceModel):
     protocolType: ProtocolType = Field(
         ...,
         description="The type of protocol file (JSON or Python).",
+    )
+
+    # robotType is provided for symmetry with the output of app-side analysis.
+    # Here in robot-side analysis, the returned robot_type will always match
+    # the robot that we're running on, because otherwise we would have rejected
+    # the upload.
+    #
+    # TODO(mm, 2022-10-21): Make this an enum when we figure out where it should live.
+    robotType: Literal["OT-2 Standard", "OT-3 Standard"] = Field(
+        ...,
+        description="The type of robot that this protocol can run on."
     )
 
     # todo(mm, 2021-09-16): Investigate whether something like `dict[str, Any]` would

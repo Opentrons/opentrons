@@ -69,11 +69,12 @@ async def create_simulating_runner(robot_type: _RobotType) -> ProtocolRunner:
 
 
 async def _build_hardware_simulator_for_robot_type(
-    robot_type: _RobotType
+    robot_type: _RobotType,
 ) -> HardwareControlAPI:
     if robot_type == "OT-2 Standard":
         return await OT2API.build_hardware_simulator()
-    elif robot_type== "OT-3 Standard":
+    elif robot_type == "OT-3 Standard":
         # Inline import because OT3API is not present to import on an OT-2 system.
         from opentrons.hardware_control.ot3api import OT3API
+
         return await OT3API.build_hardware_simulator()

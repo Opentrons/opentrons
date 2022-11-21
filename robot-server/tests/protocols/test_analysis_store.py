@@ -68,8 +68,8 @@ def make_dummy_protocol_resource(protocol_id: str) -> ProtocolResource:
             main_file=Path("/dev/null"),
             config=JsonProtocolConfig(schema_version=123),
             files=[],
-            metadata={},
             robot_type="OT-2 Standard",
+            metadata={},
             labware_definitions=[],
         ),
         protocol_key=None,
@@ -126,7 +126,6 @@ async def test_returned_in_order_added(
             commands=[],
             errors=[],
             liquids=[],
-            robot_type="OT-2 Standard",
         )
 
     subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id-4")
@@ -176,7 +175,6 @@ async def test_update_adds_details_and_completes_analysis(
         commands=[],
         errors=[],
         liquids=[],
-        robot_type="OT-3 Standard",
     )
 
     result = await subject.get("analysis-id")
@@ -190,7 +188,6 @@ async def test_update_adds_details_and_completes_analysis(
         commands=[],
         errors=[],
         liquids=[],
-        robotType="OT-3 Standard",
     )
     assert await subject.get_by_protocol("protocol-id") == [result]
 
@@ -252,7 +249,6 @@ async def test_update_infers_status_from_errors(
         modules=[],
         pipettes=[],
         liquids=[],
-        robot_type="OT-2 Standard",
     )
     analysis = (await subject.get_by_protocol("protocol-id"))[0]
     assert isinstance(analysis, CompletedAnalysis)

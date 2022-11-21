@@ -39,6 +39,7 @@ from .dependencies import (
     get_analysis_store,
     get_protocol_analyzer,
     get_protocol_directory,
+    get_analysis_robot_type,
 )
 
 
@@ -64,6 +65,16 @@ class ProtocolFilesInvalid(ErrorDetails):
 
     id: Literal["ProtocolFilesInvalid"] = "ProtocolFilesInvalid"
     title: str = "Protocol File(s) Invalid"
+
+
+class ProtocolForDifferentRobotType(ErrorDetails):
+    """An error returned when an uploaded protocol is for a different type of robot.
+
+    For example, if the protocol is for an OT-3, but this server is running on an OT-2.
+    """
+
+    id: Literal["ProtocolForDifferentRobotType"] = "ProtocolForDifferentRobotType"
+    title: str = "Protocol For Different Robot Type"
 
 
 class ProtocolUsedByRun(ErrorDetails):
@@ -112,6 +123,7 @@ async def create_protocol(
     protocol_analyzer: ProtocolAnalyzer = Depends(get_protocol_analyzer),
     task_runner: TaskRunner = Depends(get_task_runner),
     protocol_auto_deleter: ProtocolAutoDeleter = Depends(get_protocol_auto_deleter),
+    analysis_robot_type: Literal["OT-2 Standard", "OT-3 Standard"] = Depends(get_analysis_robot_type),
     protocol_id: str = Depends(get_unique_id, use_cache=False),
     analysis_id: str = Depends(get_unique_id, use_cache=False),
     created_at: datetime = Depends(get_current_time),
@@ -141,7 +153,16 @@ async def create_protocol(
     except ProtocolFilesInvalidError as e:
         raise ProtocolFilesInvalid(detail=str(e)).as_error(
             status.HTTP_422_UNPROCESSABLE_ENTITY
-        )
+        ) from e
+
+    if source.robot_type != analysis_robot_type:
+        raise ProtocolForDifferentRobotType(
+            detail=(
+                f"This protocol is for {source.robot_type} robots."
+                f" It can't be analyzed or run on this robot,"
+                f" which is an {analysis_robot_type}."
+            )
+        ).as_error(status.HTTP_422_UNPROCESSABLE_ENTITY)
 
     protocol_resource = ProtocolResource(
         protocol_id=protocol_id,
@@ -167,6 +188,7 @@ async def create_protocol(
         id=protocol_id,
         createdAt=created_at,
         protocolType=source.config.protocol_type,
+        robotType=source.robot_type,
         metadata=Metadata.parse_obj(source.metadata),
         analysisSummaries=[pending_analysis],
         key=key,
@@ -198,10 +220,11 @@ async def get_protocols(
     """
     protocol_resources = protocol_store.get_all()
     data = [
-        Protocol(
+        Protocol.construct(
             id=r.protocol_id,
             createdAt=r.created_at,
             protocolType=r.source.config.protocol_type,
+            robotType=r.source.robot_type,
             metadata=Metadata.parse_obj(r.source.metadata),
             analysisSummaries=analysis_store.get_summaries_by_protocol(r.protocol_id),
             key=r.protocol_key,
@@ -248,6 +271,7 @@ async def get_protocol_by_id(
         id=protocolId,
         createdAt=resource.created_at,
         protocolType=resource.source.config.protocol_type,
+        robotType=resource.source.robot_type,
         metadata=Metadata.parse_obj(resource.source.metadata),
         analysisSummaries=analyses,
         key=resource.protocol_key,
