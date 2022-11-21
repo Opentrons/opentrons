@@ -33,7 +33,7 @@ describe('CardButton', () => {
     props = {
       cardWidth: '19rem',
       cardHeight: '21rem',
-      title: 'wifi',
+      title: 'Wi-Fi',
       iconName: 'wifi',
       description: 'connection_description',
       destinationPath: 'mockPath',
