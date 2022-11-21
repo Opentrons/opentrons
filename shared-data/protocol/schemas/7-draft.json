@@ -523,7 +523,7 @@
               "params": {
                 "required": ["probe"],
                 "probe": {
-                  "enum": ["front", "rear"],
+                  "enum": ["front", "rear"]
                 }
               }
             }
