@@ -59,9 +59,6 @@ class MovementMixin(BaseModel):
             "Optional minimal Z margin in mm."
             " If this is larger than the API's default safe Z margin,"
             " it will make the arc higher. If it's smaller, it will have no effect."
-            " Specifying this for movements that would not arc"
-            " (moving within the same well in the same labware)"
-            " will cause an arc movement instead."
         ),
     )
 
