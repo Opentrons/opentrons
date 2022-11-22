@@ -1,5 +1,6 @@
 import logging
 from typing import Dict, List, Optional, Set, Union
+from typing_extensions import Literal
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -274,9 +275,12 @@ class ProtocolContextImplementation(
         return module_core
 
     def load_instrument(
-        self, instrument_name: PipetteNameType, mount: Mount
+        self, instrument_name: Union[PipetteNameType, Literal["p1000_96"]], mount: Mount
     ) -> InstrumentContextImplementation:
         """Load an instrument."""
+        if isinstance(instrument_name, str):
+            raise ValueError("96 channel pipette is not supported on a OT-2.")
+
         attached = {
             att_mount: instr.get("name", None)
             for att_mount, instr in self._sync_hardware.attached_instruments.items()

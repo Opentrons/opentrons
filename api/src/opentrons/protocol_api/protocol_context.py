@@ -569,7 +569,7 @@ class ProtocolContext(CommandPublisher):
         )
 
         instrument_core = self._implementation.load_instrument(
-            instrument_name=checked_instrument_name,
+            instrument_name=checked_instrument_name,  # ignore: type[arg-type]
             mount=checked_mount,
         )
 
