@@ -19,7 +19,7 @@ PIP_PATH = Path(__file__).parent / "example_data" / PIP_FILE_NAME
 
 
 def test_analyze_recording_and_timestamps():
-    ctx = get_api_context("2.12", is_simulating=False, connect_to_smoothie=False)
+    ctx = get_api_context("2.12", is_simulating=False, connect_to_hardware=False)
     recording = GravimetricRecording.load(str(GRAV_PATH.resolve()))
     timestamps = load_pipette_timestamps(str(PIP_PATH.resolve()))
     _analyze_recording_and_timestamps(ctx, recording, timestamps)
