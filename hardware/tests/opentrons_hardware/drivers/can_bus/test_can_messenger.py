@@ -27,6 +27,7 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     MoveCompleted,
     GetMoveGroupRequest,
 )
+from opentrons_hardware.firmware_bindings.messages.fields import MotorPositionFlagsField
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     MoveCompletedPayload,
     MoveGroupRequestPayload,
@@ -79,6 +80,7 @@ async def test_context(mock_driver: AsyncMock) -> None:
                     seq_id=UInt8Field(2),
                     current_position_um=UInt32Field(3),
                     encoder_position_um=Int32Field(3),
+                    position_flags=MotorPositionFlagsField(0),
                     ack_id=UInt8Field(4),
                 )
             ),

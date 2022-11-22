@@ -83,8 +83,8 @@ class MessageId(int, Enum):
     home_request = 0x20
     move_completed = 0x13
 
-    encoder_position_request = 0x12
-    encoder_position_response = 0x14
+    motor_position_request = 0x12
+    motor_position_response = 0x14
 
     set_motion_constraints = 0x101
     get_motion_constraints_request = 0x102
@@ -223,3 +223,15 @@ class PipetteTipActionType(int, Enum):
 
     pick_up = 0x0
     drop = 0x01
+
+
+@unique
+class MotorPositionFlags(Enum):
+    """Flags for motor position validity."""
+
+    # Referring to the position in microsteps reported by firmware, which is
+    # an open-loop accumulation of all moves since the last homing event.
+    stepper_position_ok = 0x1
+    # Referring to the closed-loop encoder on the relevant axis.
+    # Generally only unset if the motor board has not homed since power-on.
+    encoder_position_ok = 0x2

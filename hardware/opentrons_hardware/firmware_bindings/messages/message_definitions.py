@@ -170,21 +170,19 @@ class MoveCompleted:  # noqa: D101
 
 
 @dataclass
-class EncoderPositionRequest(EmptyPayloadMessage):  # noqa: D101
+class MotorPositionRequest(EmptyPayloadMessage):  # noqa: D101
     message_id: Literal[
-        MessageId.encoder_position_request
-    ] = MessageId.encoder_position_request
+        MessageId.motor_position_request
+    ] = MessageId.motor_position_request
 
 
 @dataclass
-class EncoderPositionResponse:  # noqa: D101
-    payload: payloads.EncoderPositionResponse
-    payload_type: Type[
-        payloads.EncoderPositionResponse
-    ] = payloads.EncoderPositionResponse
+class MotorPositionResponse:  # noqa: D101
+    payload: payloads.MotorPositionResponse
+    payload_type: Type[payloads.MotorPositionResponse] = payloads.MotorPositionResponse
     message_id: Literal[
-        MessageId.encoder_position_response
-    ] = MessageId.encoder_position_response
+        MessageId.motor_position_response
+    ] = MessageId.motor_position_response
 
 
 @dataclass

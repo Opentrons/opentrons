@@ -20,6 +20,7 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
     ExecuteMoveGroupRequestPayload,
     HomeRequestPayload,
 )
+from opentrons_hardware.firmware_bindings.messages.fields import MotorPositionFlagsField
 from opentrons_hardware.hardware_control.constants import (
     interrupts_per_sec,
 )
@@ -418,6 +419,7 @@ class MockSendMoveCompleter:
                         seq_id=UInt8Field(seq_id),
                         current_position_um=UInt32Field(int(move.distance_mm * 1000)),
                         encoder_position_um=Int32Field(int(move.distance_mm * 4000)),
+                        position_flags=MotorPositionFlagsField(0),
                         ack_id=UInt8Field(1),
                     )
                     arbitration_id = ArbitrationId(
@@ -464,6 +466,7 @@ class MockGripperSendMoveCompleter:
                         seq_id=UInt8Field(seq_id),
                         current_position_um=UInt32Field(int(0)),
                         encoder_position_um=Int32Field(int(0)),
+                        position_flags=MotorPositionFlagsField(0),
                         ack_id=UInt8Field(1),
                     )
                     arbitration_id = ArbitrationId(
@@ -615,6 +618,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                             seq_id=UInt8Field(2),
                             current_position_um=UInt32Field(10000),
                             encoder_position_um=Int32Field(10000 * 4),
+                            position_flags=MotorPositionFlagsField(0),
                         )
                     ),
                 ),
@@ -627,6 +631,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                             seq_id=UInt8Field(1),
                             current_position_um=UInt32Field(20000),
                             encoder_position_um=Int32Field(10000 * 4),
+                            position_flags=MotorPositionFlagsField(0),
                         )
                     ),
                 ),
@@ -639,6 +644,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                             seq_id=UInt8Field(2),
                             current_position_um=UInt32Field(30000),
                             encoder_position_um=Int32Field(10000 * 4),
+                            position_flags=MotorPositionFlagsField(0),
                         )
                     ),
                 ),
@@ -657,6 +663,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                             seq_id=UInt8Field(2),
                             current_position_um=UInt32Field(10000),
                             encoder_position_um=Int32Field(10000 * 4),
+                            position_flags=MotorPositionFlagsField(0),
                         )
                     ),
                 ),
@@ -669,6 +676,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                             seq_id=UInt8Field(1),
                             current_position_um=UInt32Field(20000),
                             encoder_position_um=Int32Field(10000 * 4),
+                            position_flags=MotorPositionFlagsField(0),
                         )
                     ),
                 ),
@@ -681,6 +689,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                             seq_id=UInt8Field(2),
                             current_position_um=UInt32Field(30000),
                             encoder_position_um=Int32Field(10000 * 4),
+                            position_flags=MotorPositionFlagsField(0),
                         )
                     ),
                 ),
@@ -724,6 +733,7 @@ class MockSendMoveCompleterWithUnknown(MockSendMoveCompleter):
                 seq_id=UInt8Field(0),
                 current_position_um=UInt32Field(0),
                 encoder_position_um=Int32Field(0),
+                position_flags=MotorPositionFlagsField(0),
                 ack_id=UInt8Field(1),
             )
             sender = next(iter(groups[0][0].keys()))
