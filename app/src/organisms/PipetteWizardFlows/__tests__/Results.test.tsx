@@ -50,7 +50,7 @@ describe('Results', () => {
     expect(props.proceed).toHaveBeenCalled()
   })
 
-  it('renders the correct information when pipette cal is a success for attach flow', () => {
+  it('renders the correct information when pipette wizard is a success for attach flow', () => {
     props = {
       ...props,
       flowType: FLOWS.ATTACH,
@@ -65,7 +65,7 @@ describe('Results', () => {
     fireEvent.click(exit)
     expect(props.proceed).toHaveBeenCalled()
   })
-  it('renders the correct information when pipette cal is a fail for attach flow', () => {
+  it('renders the correct information when pipette wizard is a fail for attach flow', () => {
     props = {
       ...props,
       attachedPipette: { left: null, right: null },
@@ -73,6 +73,35 @@ describe('Results', () => {
     }
     const { getByText, getByRole, getByLabelText } = render(props)
     getByText('Pipette failed to attach')
+    expect(getByLabelText('ot-alert')).toHaveStyle(
+      `color: ${COLORS.errorEnabled}`
+    )
+    const exit = getByRole('button', { name: 'Results_exit' })
+    fireEvent.click(exit)
+    expect(props.proceed).toHaveBeenCalled()
+  })
+  it('renders the correct information when pipette wizard is a success for detach flow', () => {
+    props = {
+      ...props,
+      attachedPipette: { left: null, right: null },
+      flowType: FLOWS.DETACH,
+    }
+    const { getByText, getByRole, getByLabelText } = render(props)
+    getByText('Pipette Successfully Detached')
+    expect(getByLabelText('ot-check')).toHaveStyle(
+      `color: ${COLORS.successEnabled}`
+    )
+    const exit = getByRole('button', { name: 'Results_exit' })
+    fireEvent.click(exit)
+    expect(props.proceed).toHaveBeenCalled()
+  })
+  it('renders the correct information when pipette wizard is a fail for detach flow', () => {
+    props = {
+      ...props,
+      flowType: FLOWS.DETACH,
+    }
+    const { getByText, getByRole, getByLabelText } = render(props)
+    getByText('Pipette failed to detach')
     expect(getByLabelText('ot-alert')).toHaveStyle(
       `color: ${COLORS.errorEnabled}`
     )

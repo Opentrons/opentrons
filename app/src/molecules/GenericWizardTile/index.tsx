@@ -28,6 +28,7 @@ export interface GenericWizardTileProps {
   proceed?: () => void
   proceedButtonText?: React.ReactNode
   proceedIsDisabled?: boolean
+  proceedButton?: JSX.Element
 }
 
 const GO_BACK_BUTTON_STYLE = css`
@@ -49,6 +50,7 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
     proceed,
     proceedButtonText,
     proceedIsDisabled,
+    proceedButton,
   } = props
   const { t } = useTranslation('shared')
 
@@ -95,11 +97,12 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
           </Btn>
         ) : null}
         {getHelp != null ? <NeedHelpLink href={getHelp} /> : null}
-        {proceed != null ? (
+        {proceed != null && proceedButton == null ? (
           <PrimaryButton disabled={proceedIsDisabled} onClick={proceed}>
             {proceedButtonText}
           </PrimaryButton>
         ) : null}
+        {proceed == null && proceedButton != null ? proceedButton : null}
       </Flex>
     </Flex>
   )

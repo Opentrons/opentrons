@@ -47,19 +47,24 @@ export const BeforeBeginning = (
 
   let equipmentList = [CALIBRATION_PROBE]
   let proceedButtonText: string = t('get_started')
-  let bodyText: string = t('remove_labware_to_get_started')
+  let bodyText: string = ''
 
   switch (flowType) {
     case FLOWS.CALIBRATE: {
-      equipmentList = [CALIBRATION_PROBE]
+      bodyText = t('remove_labware_to_get_started')
       break
     }
     case FLOWS.ATTACH: {
       equipmentList = [PIPETTE, CALIBRATION_PROBE, HEX_SCREWDRIVER]
       proceedButtonText = t('move_gantry_to_front')
       bodyText = t('remove_labware')
+      break
     }
-    //  TODO(jr, 11/17/22): wire up detach flow
+    case FLOWS.DETACH: {
+      equipmentList = [HEX_SCREWDRIVER]
+      bodyText = t('get_started_detach')
+      break
+    }
   }
   const rightHandBody = (
     <WizardRequiredEquipmentList width="100%" equipmentList={equipmentList} />

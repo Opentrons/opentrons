@@ -29,8 +29,18 @@ export const Results = (props: PipetteWizardStepProps): JSX.Element => {
         iconColor = COLORS.errorEnabled
         isSuccess = false
       }
+      break
     }
-    //  TODO(jr, 10/26/22): wire up the other flows
+    case FLOWS.DETACH: {
+      if (attachedPipette[mount] != null) {
+        header = t('pipette_failed_to_detach')
+        iconColor = COLORS.errorEnabled
+        isSuccess = false
+      } else {
+        header = t('pipette_detached')
+      }
+      break
+    }
   }
 
   return (
