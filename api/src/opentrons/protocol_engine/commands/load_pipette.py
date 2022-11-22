@@ -54,9 +54,7 @@ class LoadPipetteImplementation(
     async def execute(self, params: LoadPipetteParams) -> LoadPipetteResult:
         """Check that requested pipette is attached and assign its identifier."""
         loaded_pipette = await self._equipment.load_pipette(
-            pipette_name=params.pipetteName
-            if isinstance(params.pipetteName, PipetteNameType)
-            else "p1000_96",
+            pipette_name=params.pipetteName,
             mount=params.mount,
             pipette_id=params.pipetteId,
         )

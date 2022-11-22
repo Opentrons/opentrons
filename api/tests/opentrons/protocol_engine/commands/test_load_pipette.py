@@ -46,7 +46,8 @@ async def test_load_pipette_implementation_96_channel(
     """A LoadPipette command should have an execution implementation."""
     subject = LoadPipetteImplementation(equipment=equipment)
 
-    data = LoadPipetteParams.construct(  # type: ignore[call-arg]
+    data = LoadPipetteParams(
+        pipetteName="p1000_96",
         mount=MountType.LEFT,
         pipetteId="some id",
     )

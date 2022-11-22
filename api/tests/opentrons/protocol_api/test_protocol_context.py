@@ -119,52 +119,6 @@ def test_load_instrument(
     )
 
 
-def test_load_instrument_96_channel(
-    decoy: Decoy,
-    mock_core: ProtocolCore,
-    subject: ProtocolContext,
-) -> None:
-    """It should create a instrument for a 96 channel using its execution core."""
-    mock_instrument_core = decoy.mock(cls=InstrumentCore)
-    mock_tip_racks = [decoy.mock(cls=Labware), decoy.mock(cls=Labware)]
-
-    decoy.when(mock_validation.ensure_mount("left")).then_return(Mount.LEFT)
-    decoy.when(mock_validation.ensure_lowercase_name("P1000_96")).then_return(
-        "p1000_96"
-    )
-
-    decoy.when(
-        mock_core.load_instrument(
-            instrument_name="p1000_96",  # type: ignore[arg-type]
-            mount=Mount.LEFT,
-        )
-    ).then_return(mock_instrument_core)
-
-    decoy.when(mock_instrument_core.get_pipette_name()).then_return("p1000_96")
-
-    result = subject.load_instrument(
-        instrument_name="P1000_96", mount="left", tip_racks=mock_tip_racks
-    )
-
-    assert isinstance(result, InstrumentContext)
-    assert result.name == "p1000_96"
-    assert result.requested_as == "p1000_96"
-    assert subject.loaded_instruments["left"] is result
-
-    decoy.verify(
-        mock_instrument_support.validate_tiprack(
-            instrument_name="p1000_96",
-            tip_rack=mock_tip_racks[0],
-            log=matchers.Anything(),
-        ),
-        mock_instrument_support.validate_tiprack(
-            instrument_name="p1000_96",
-            tip_rack=mock_tip_racks[1],
-            log=matchers.Anything(),
-        ),
-    )
-
-
 def test_load_instrument_replace(
     decoy: Decoy, mock_core: ProtocolCore, subject: ProtocolContext
 ) -> None:
