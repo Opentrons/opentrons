@@ -197,6 +197,7 @@ async def _test_probe_pin_physical_location(api: OT3API, expected_pos: Point) ->
 async def _find_square_center_of_gripper_jaw(api: OT3API, expected_pos: Point) -> Point:
     # first, we grip the jaw, so that the jaws are fully pressing inwards
     # this removes wiggle/backlash from jaws during probing
+    input("ENTER to GRIP:")
     await api.grip(GRIP_FORCE_CALIBRATION)
     input("add probe to Gripper FRONT, then press ENTER: ")
     api.add_gripper_probe(GripperProbe.FRONT)
