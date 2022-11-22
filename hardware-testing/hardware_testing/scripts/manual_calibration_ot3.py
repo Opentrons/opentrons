@@ -52,21 +52,32 @@ async def _test_gripper_calibration_with_block(api: OT3API, pos: Point) -> None:
     input("add the calibration block to the slot, then press ENTER")
     await api.home_gripper_jaw()
     await api.move_to(OT3Mount.GRIPPER, pos, critical_point=CriticalPoint.GRIPPER_JAW_CENTER)
-    await api.grip(GRIP_FORCE_CALIBRATION / 2)
-    await api.home_gripper_jaw()
-    jaw_width = 90
     while True:
-        res = input('ENTER closes 1mm more; type "s" to stop; type "g" to grip: ')
-        if not res:
-            jaw_width -= 1
-            await api.hold_jaw_width(jaw_width)
-        elif res.strip().lower()[0] == "s":
-            break
-        elif res.strip().lower()[0] == "g":
-            await api.grip(GRIP_FORCE_VALIDATION)
-            input("ENTER to ungrip jaws")
+        res = input('"w"=GRIP-WIDTH; "g"=GRIP-FORCE; "u"=UNGRIP; "z"=JOG-Z; "s"=STOP ')
+        res = res.strip().lower()
+        try:
+            key = res[0]
+        except IndexError:
+            continue
+        try:
+            value = float(res[1:])
+        except (ValueError, IndexError):
+            value = 0.0
+        if key == "w" and value:
+            print(f"Jaw width: {value}")
+            await api.hold_jaw_width(int(value))
+        elif key == "g" and value:
+            print(f"Jaw force: {value}")
+            await api.grip(value)
+        elif key == "u":
+            print("Jaw homing")
             await api.home_gripper_jaw()
-            jaw_width = 90
+        elif key == "z" and value:
+            await api.move_rel(OT3Mount.GRIPPER, Point(z=value))
+            current_pos = await api.gantry_position(mount=OT3Mount.GRIPPER)
+            print(f"Gripper Z: {round(current_pos.z, 1)}")
+        elif key == "s":
+            break
     await api.home_gripper_jaw()
 
 
