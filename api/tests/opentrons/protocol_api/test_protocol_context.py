@@ -119,6 +119,52 @@ def test_load_instrument(
     )
 
 
+def test_load_instrument_96_channel(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    subject: ProtocolContext,
+) -> None:
+    """It should create a instrument for a 96 channel using its execution core."""
+    mock_instrument_core = decoy.mock(cls=InstrumentCore)
+    mock_tip_racks = [decoy.mock(cls=Labware), decoy.mock(cls=Labware)]
+
+    decoy.when(mock_validation.ensure_mount("left")).then_return(Mount.LEFT)
+    decoy.when(mock_validation.ensure_lowercase_name("P1000_96")).then_return(
+        "p1000_96"
+    )
+
+    decoy.when(
+        mock_core.load_instrument(
+            instrument_name="p1000_96",  # type: ignore[arg-type]
+            mount=Mount.LEFT,
+        )
+    ).then_return(mock_instrument_core)
+
+    decoy.when(mock_instrument_core.get_pipette_name()).then_return("p1000_96")
+
+    result = subject.load_instrument(
+        instrument_name="P1000_96", mount="left", tip_racks=mock_tip_racks
+    )
+
+    assert isinstance(result, InstrumentContext)
+    assert result.name == "p1000_96"
+    assert result.requested_as == "p1000_96"
+    assert subject.loaded_instruments["left"] is result
+
+    decoy.verify(
+        mock_instrument_support.validate_tiprack(
+            instrument_name="p1000_96",
+            tip_rack=mock_tip_racks[0],
+            log=matchers.Anything(),
+        ),
+        mock_instrument_support.validate_tiprack(
+            instrument_name="p1000_96",
+            tip_rack=mock_tip_racks[1],
+            log=matchers.Anything(),
+        ),
+    )
+
+
 def test_load_instrument_replace(
     decoy: Decoy, mock_core: ProtocolCore, subject: ProtocolContext
 ) -> None:
@@ -150,151 +196,6 @@ def test_load_instrument_replace(
 
     with pytest.raises(RuntimeError, match="Instrument already present"):
         subject.load_instrument(instrument_name="ada", mount=Mount.RIGHT)
-
-
-# def test_load_instrument_replace_96_channel(
-#     decoy: Decoy, mock_core: ProtocolCore, subject: ProtocolContext
-# ) -> None:
-#     """It should allow 96 channel pipette replacement."""
-#     subject._instruments[Mount.LEFT] = decoy.mock(cls=InstrumentContext)
-#     subject._instruments[Mount.RIGHT] = decoy.mock(cls=InstrumentContext)
-#
-#     mock_instrument_core = decoy.mock(cls=InstrumentCore)
-#
-#     decoy.when(mock_validation.ensure_lowercase_name("p1000_96")).then_return(
-#         "p1000_96"
-#     )
-#     decoy.when(mock_validation.ensure_mount(matchers.IsA(Mount))).then_return(
-#         Mount.LEFT
-#     )
-#     decoy.when(mock_validation.ensure_pipette_name("p1000_96")).then_return(
-#         PipetteNameType.P1000_96
-#     )
-#     decoy.when(
-#         mock_validation.ensure_96_channel_pipette(PipetteNameType.P1000_96)
-#     ).then_return(True)
-#     decoy.when(
-#         mock_core.load_instrument(
-#             instrument_name=matchers.IsA(PipetteNameType),
-#             mount=matchers.IsA(Mount),
-#         )
-#     ).then_return(mock_instrument_core)
-#     decoy.when(mock_instrument_core.get_pipette_name()).then_return("p1000_96")
-#     decoy.when(mock_instrument_core.get_mount()).then_return(Mount.LEFT)
-#
-#     loaded_pipette = subject.load_instrument(
-#         instrument_name="p1000_96", mount=Mount.LEFT, replace=True
-#     )
-#
-#     assert subject.loaded_instruments["left"] is loaded_pipette
-#
-#     assert subject.loaded_instruments["right"] is loaded_pipette
-#
-#
-# def test_load_instrument_no_replace_96_channel_error(
-#     decoy: Decoy, mock_core: ProtocolCore, subject: ProtocolContext
-# ) -> None:
-#     """It should disallow 96 channel pipette with no replacement."""
-#     subject._instruments[Mount.LEFT] = decoy.mock(cls=InstrumentContext)
-#
-#     mock_instrument_core = decoy.mock(cls=InstrumentCore)
-#
-#     decoy.when(mock_validation.ensure_lowercase_name("p1000_96")).then_return(
-#         "p1000_96"
-#     )
-#     decoy.when(mock_validation.ensure_mount(matchers.IsA(Mount))).then_return(
-#         Mount.LEFT
-#     )
-#     decoy.when(mock_validation.ensure_pipette_name("p1000_96")).then_return(
-#         PipetteNameType.P1000_96
-#     )
-#     decoy.when(
-#         mock_validation.ensure_96_channel_pipette(PipetteNameType.P1000_96)
-#     ).then_return(True)
-#     decoy.when(
-#         mock_core.load_instrument(
-#             instrument_name=matchers.IsA(PipetteNameType),
-#             mount=matchers.IsA(Mount),
-#         )
-#     ).then_return(mock_instrument_core)
-#     decoy.when(mock_instrument_core.get_pipette_name()).then_return("Ada Lovelace")
-#
-#     with pytest.raises(
-#         RuntimeError,
-#         match="96 channel pipette cannot be loaded with another pipette.",
-#     ):
-#         subject.load_instrument(instrument_name="p1000_96", mount=Mount.LEFT)
-#
-#
-# def test_load_instrument_96_channel_loaded_error(
-#     decoy: Decoy, mock_core: ProtocolCore, subject: ProtocolContext
-# ) -> None:
-#     """It should disallow a load pipette with additional 96 channel pipette."""
-#     mock_instrument = decoy.mock(cls=InstrumentContext)
-#     subject._instruments[Mount.LEFT] = mock_instrument
-#     mock_instrument_core = decoy.mock(cls=InstrumentCore)
-#
-#     decoy.when(mock_validation.ensure_lowercase_name("p300_single")).then_return(
-#         "p300_single"
-#     )
-#     decoy.when(mock_validation.ensure_mount(matchers.IsA(Mount))).then_return(
-#         Mount.LEFT
-#     )
-#     decoy.when(mock_validation.ensure_pipette_name("p300_single")).then_return(
-#         PipetteNameType.P300_SINGLE
-#     )
-#     decoy.when(mock_validation.ensure_96_channel_pipette("p300_single")).then_return(
-#         False
-#     )
-#     decoy.when(
-#         mock_core.load_instrument(
-#             instrument_name=matchers.IsA(PipetteNameType),
-#             mount=matchers.IsA(Mount),
-#         )
-#     ).then_return(mock_instrument_core)
-#     decoy.when(mock_instrument._implementation.get_pipette_name()).then_return(
-#         "p1000_96"
-#     )
-#     decoy.when(mock_validation.ensure_96_channel_pipette("p1000_96")).then_return(True)
-#
-#     with pytest.raises(
-#         RuntimeError,
-#         match="96 channel pipette cannot be loaded with another pipette.",
-#     ):
-#         subject.load_instrument(instrument_name="p300_single", mount=Mount.LEFT)
-#
-#
-# def test_load_instrument_96_channel_right_mount_error(
-#     decoy: Decoy, mock_core: ProtocolCore, subject: ProtocolContext
-# ) -> None:
-#     """It should disallow 96 channel pipette on the right side."""
-#     mock_instrument_core = decoy.mock(cls=InstrumentCore)
-#
-#     decoy.when(mock_validation.ensure_lowercase_name("p1000_96")).then_return(
-#         "p1000_96"
-#     )
-#     decoy.when(mock_validation.ensure_mount(matchers.IsA(Mount))).then_return(
-#         Mount.RIGHT
-#     )
-#     decoy.when(mock_validation.ensure_pipette_name("p1000_96")).then_return(
-#         PipetteNameType.P1000_96
-#     )
-#     decoy.when(
-#         mock_validation.ensure_96_channel_pipette(PipetteNameType.P1000_96)
-#     ).then_return(True)
-#     decoy.when(
-#         mock_core.load_instrument(
-#             instrument_name=matchers.IsA(PipetteNameType),
-#             mount=matchers.IsA(Mount),
-#         )
-#     ).then_return(mock_instrument_core)
-#     decoy.when(mock_instrument_core.get_pipette_name()).then_return("Ada Lovelace")
-#
-#     with pytest.raises(
-#         RuntimeError, match="96 channel pipette is only allowed on the left mount."
-#     ):
-#         subject.load_instrument(instrument_name="p1000_96", mount=Mount.RIGHT)
-#
 
 
 def test_load_labware(

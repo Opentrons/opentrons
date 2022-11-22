@@ -529,32 +529,10 @@ class ProtocolContext(CommandPublisher):
         is_96_channel = instrument_name == "p1000_96"
         if is_96_channel:
             checked_instrument_name = instrument_name
+            checked_mount = Mount.LEFT
         else:
             checked_instrument_name = validation.ensure_pipette_name(instrument_name)
         tip_racks = tip_racks or []
-        loaded_pipettes = [
-            instrument for instrument in self._instruments.values() if instrument
-        ]
-
-        if is_96_channel and checked_mount == Mount.RIGHT:
-            raise RuntimeError("96 channel pipette is only allowed on the left mount.")
-
-        elif is_96_channel and loaded_pipettes and not replace:
-            raise RuntimeError(
-                "96 channel pipette cannot be loaded with another pipette."
-            )
-
-        elif (
-            not is_96_channel
-            and loaded_pipettes
-            and any(
-                (i._implementation.get_pipette_name() == "p1000_96")
-                for i in loaded_pipettes
-            )
-        ):
-            raise RuntimeError(
-                "96 channel pipette cannot be loaded with another pipette."
-            )
 
         existing_instrument = self._instruments[checked_mount]
         if existing_instrument is not None and not replace:
@@ -568,8 +546,10 @@ class ProtocolContext(CommandPublisher):
             f"Loading {checked_instrument_name} on {checked_mount.name.lower()} mount"
         )
 
+        # TODO (tz, 11-22-22): was added to support 96 channel pipette.
+        #  Should remove when working on https://opentrons.atlassian.net/browse/RLIQ-255
         instrument_core = self._implementation.load_instrument(
-            instrument_name=checked_instrument_name,  # ignore: type[arg-type]
+            instrument_name=checked_instrument_name,  # type: ignore[arg-type]
             mount=checked_mount,
         )
 
