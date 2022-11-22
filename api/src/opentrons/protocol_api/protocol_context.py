@@ -40,7 +40,7 @@ from .core.module import (
     AbstractThermocyclerCore,
     AbstractHeaterShakerCore,
 )
-from .core.engine.protocol import ProtocolCore as EngineCore
+from .core.engine.protocol import ProtocolCore as ProtocolEngineCore
 
 from . import validation
 from .instrument_context import InstrumentContext
