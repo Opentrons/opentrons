@@ -228,7 +228,7 @@ Once `make setup` completes, you're ready to start developing! Check out our gen
 [xcode command line tools]: https://developer.apple.com/xcode/resources/
 [scoop]: https://scoop.sh/
 [nvs]: https://github.com/jasongin/nvs
-[visual studio]: https://visualstudio.microsoft.com/
+[visual studio]: https://visualstudio.microsoft.com/downloads/
 [pyenv]: https://github.com/pyenv/pyenv
 [yarn]: https://classic.yarnpkg.com/
 [pipenv]: https://github.com/pypa/pipenv
