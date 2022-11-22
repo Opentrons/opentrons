@@ -55,9 +55,16 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
   const { t } = useTranslation('shared')
 
   let buttonPositioning: string = ''
-  if ((back != null || getHelp != null) && proceed != null) {
+  if (
+    (back != null || getHelp != null) &&
+    (proceedButton != null || proceed != null)
+  ) {
     buttonPositioning = JUSTIFY_SPACE_BETWEEN
-  } else if (back == null && getHelp == null && proceed != null) {
+  } else if (
+    back == null &&
+    getHelp == null &&
+    (proceedButton != null || proceed != null)
+  ) {
     buttonPositioning = JUSTIFY_FLEX_END
   } else if ((back != null || getHelp != null) && proceed == null) {
     buttonPositioning = JUSTIFY_START
