@@ -171,7 +171,7 @@ class EquipmentHandler:
             cache_request[other_mount.to_hw_mount()] = (
                 other_pipette.pipetteName.value
                 if isinstance(other_pipette.pipetteName, PipetteNameType)
-                else pipette_name
+                else "p1000_96"
             )
 
         # TODO(mc, 2020-10-18): calling `cache_instruments` mirrors the
