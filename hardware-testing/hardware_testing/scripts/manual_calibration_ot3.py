@@ -15,8 +15,7 @@ SAFE_Z = 6
 DEFAULT_STEP_SIZE = 0.1
 Z_OFFSET_FROM_WASHERS = 3.0
 
-GRIP_FORCE_CALIBRATION = 20
-GRIP_FORCE_VALIDATION = 3
+GRIP_FORCE_CALIBRATION = 5
 
 # Height of the bottom of a probe above the deck.
 # Must be high enough for the user to reach under to change probes,
