@@ -211,7 +211,16 @@ class SensorScheduler:
     ) -> Optional[SensorDataType]:
         """Send threshold message."""
         sensor_info = sensor.sensor
-        with MultipleMessagesWaitableCallback(can_messenger) as reader:
+
+        def _filter(arbitration_id: ArbitrationId) -> bool:
+            return (
+                NodeId(arbitration_id.parts.originating_node_id) == sensor_info.node_id
+            ) and (
+                MessageId(arbitration_id.parts.message_id)
+                == MessageId.set_sensor_threshold_response
+            )
+
+        with MultipleMessagesWaitableCallback(can_messenger, _filter) as reader:
             data: Optional[SensorDataType] = None
             await can_messenger.send(
                 node_id=sensor_info.node_id,
