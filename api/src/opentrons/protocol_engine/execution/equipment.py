@@ -1,6 +1,7 @@
 """Equipment command side-effect logic."""
 from dataclasses import dataclass
-from typing import Optional, overload
+from typing import Optional, overload, Union
+from typing_extensions import Literal
 
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
@@ -143,7 +144,7 @@ class EquipmentHandler:
 
     async def load_pipette(
         self,
-        pipette_name: PipetteNameType,
+        pipette_name: Union[PipetteNameType, Literal["p1000_96"]],
         mount: MountType,
         pipette_id: Optional[str],
     ) -> LoadedPipetteData:
@@ -161,7 +162,11 @@ class EquipmentHandler:
         other_mount = mount.other_mount()
         other_pipette = self._state_store.pipettes.get_by_mount(other_mount)
 
-        cache_request = {mount.to_hw_mount(): pipette_name.value}
+        cache_request = {
+            mount.to_hw_mount(): pipette_name.value
+            if isinstance(pipette_name, PipetteNameType)
+            else pipette_name
+        }
         if other_pipette is not None:
             cache_request[other_mount.to_hw_mount()] = other_pipette.pipetteName.value
 
