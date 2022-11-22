@@ -68,11 +68,13 @@ async def run_plunger_motor(args: argparse.Namespace) -> None:
         move_groups=[
             [
                 create_home_step(
-                    {pipette_node: float64(100.0)}, {pipette_node: float64(-10.5)}
+                    {pipette_node: float64(100.0)}, {pipette_node: float64(-args.speed)}
                 )
             ]
         ]
     )
+    # move specified distance in mm (default 30mm)
+    duration = round(abs(args.distance / args.speed), 4)
     move_plunger_runner = MoveGroupRunner(
         # Group 0
         move_groups=[
@@ -80,8 +82,8 @@ async def run_plunger_motor(args: argparse.Namespace) -> None:
                 {
                     pipette_node: MoveGroupSingleAxisStep(
                         distance_mm=float64(0),
-                        velocity_mm_sec=float64(-10.5),
-                        duration_sec=float64(2.86),
+                        velocity_mm_sec=float64(args.speed),
+                        duration_sec=float64(duration),
                     )
                 }
             ]
@@ -165,6 +167,7 @@ async def run_gear_motors(args: argparse.Namespace) -> None:
     try:
         # Home the gear motors and Z before performing the test
         await home_z.run(can_messenger=messenger)
+        await drop_tip_runner.run(can_messenger=messenger)
         await asyncio.sleep(0.1)
         # # Move to the tiprack
         for i in range(reps):
@@ -238,6 +241,18 @@ def main() -> None:
         type=float,
         help="Dwell current of the plunger",
         default=0.8,
+    )
+    parser.add_argument(
+        "--speed",
+        type=float,
+        help="The speed with which to move the plunger",
+        default=10.5,
+    )
+    parser.add_argument(
+        "--distance",
+        type=float,
+        help="The distance in mm to move the plunger",
+        default=30,
     )
 
     args = parser.parse_args()

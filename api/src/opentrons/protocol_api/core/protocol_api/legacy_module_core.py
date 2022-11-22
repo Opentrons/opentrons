@@ -98,7 +98,12 @@ class LegacyModuleCore(AbstractModuleCore[LabwareImplementation]):
     def add_labware_core(self, labware_core: LabwareImplementation) -> Labware:
         """Add a labware to the module."""
         # TODO (mc, 2022-10-25): RSS-105 and RSS-106. Refactor so we do not return Labware from the method.
-        labware = self.geometry.add_labware(Labware(implementation=labware_core))
+        labware = self.geometry.add_labware(
+            Labware(
+                implementation=labware_core,
+                api_version=self._protocol_core.api_version,
+            )
+        )
         self._protocol_core.get_deck().recalculate_high_z()
         return labware
 
@@ -371,7 +376,10 @@ class LegacyThermocyclerCore(
         trash = self._protocol_core.get_fixed_trash()
 
         if isinstance(trash, LabwareImplementation):
-            trash = Labware(implementation=trash)
+            trash = Labware(
+                implementation=trash,
+                api_version=self._protocol_core.api_version,
+            )
 
         return cast(Labware, trash)
 
