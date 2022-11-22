@@ -40,6 +40,7 @@ from .core.module import (
     AbstractThermocyclerCore,
     AbstractHeaterShakerCore,
 )
+from .core.engine.protocol import ProtocolCore as EngineCore
 
 from . import validation
 from .instrument_context import InstrumentContext
@@ -527,7 +528,7 @@ class ProtocolContext(CommandPublisher):
         instrument_name = validation.ensure_lowercase_name(instrument_name)
         checked_mount = validation.ensure_mount(mount)
         is_96_channel = instrument_name == "p1000_96"
-        if is_96_channel:
+        if is_96_channel and isinstance(self._implementation, EngineCore):
             checked_instrument_name = instrument_name
             checked_mount = Mount.LEFT
         else:
