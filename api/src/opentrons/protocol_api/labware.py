@@ -53,7 +53,7 @@ _IGNORE_API_VERSION_BREAKPOINT = APIVersion(2, 13)
 
 At this API version and below, `Labware` objects were always
 erroneously constructed set to MAX_SUPPORTED_VERSION.
-."""
+"""
 
 
 class TipSelectionError(Exception):
