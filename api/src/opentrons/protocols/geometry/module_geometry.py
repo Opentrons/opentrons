@@ -32,6 +32,7 @@ from opentrons.hardware_control.modules.types import (
     HeaterShakerModuleModel,
 )
 from opentrons.protocols.geometry.deck_item import DeckItem
+from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
 from .types import ThermocyclerConfiguration
 
@@ -257,7 +258,9 @@ class ThermocyclerGeometry(ModuleGeometry):
         else:
             return {7, 8, 10, 11}
 
-    # NOTE: this func is unused until "semi" configuration
+    # TODO(mc, 2022-11-16): this method causes bugs and should not be used;
+    # Thermocycler `configuration="semi"` does not work properly and should be removed
+    # https://opentrons.atlassian.net/browse/RSS-106
     def labware_accessor(self, labware: Labware) -> Labware:
         from opentrons.protocol_api.labware import Labware
         from opentrons.protocol_api.core.protocol_api.labware import (
@@ -269,6 +272,7 @@ class ThermocyclerGeometry(ModuleGeometry):
         definition["ordering"] = definition["ordering"][2::]
         return Labware(
             implementation=LabwareImplementation(definition, super().location),
+            api_version=MAX_SUPPORTED_VERSION,
         )
 
     def add_labware(self, labware: Labware) -> Labware:

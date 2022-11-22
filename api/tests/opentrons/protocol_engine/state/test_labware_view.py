@@ -255,18 +255,6 @@ def test_get_well_definition_get_first(well_plate_def: LabwareDefinition) -> Non
     assert result == expected_well_def
 
 
-def test_get_wells(falcon_tuberack_def: LabwareDefinition) -> None:
-    """It should return a list of wells from definition."""
-    subject = get_labware_view(
-        labware_by_id={"tube-rack-id": tube_rack},
-        definitions_by_uri={"some-tube-rack-uri": falcon_tuberack_def},
-    )
-
-    expected_wells = ["A1", "B1", "A2", "B2", "A3", "B3"]
-    result = subject.get_wells(labware_id="tube-rack-id")
-    assert result == expected_wells
-
-
 def test_labware_has_well(falcon_tuberack_def: LabwareDefinition) -> None:
     """It should return a list of wells from definition."""
     subject = get_labware_view(
@@ -286,30 +274,6 @@ def test_labware_has_well(falcon_tuberack_def: LabwareDefinition) -> None:
 
     with pytest.raises(errors.LabwareNotLoadedError):
         subject.validate_liquid_allowed_in_labware(labware_id="no-id", wells={"A1": 30})
-
-
-def test_get_well_columns(falcon_tuberack_def: LabwareDefinition) -> None:
-    """It should return wells as dict of list of columns."""
-    subject = get_labware_view(
-        labware_by_id={"tube-rack-id": tube_rack},
-        definitions_by_uri={"some-tube-rack-uri": falcon_tuberack_def},
-    )
-
-    expected_columns = {"1": ["A1", "B1"], "2": ["A2", "B2"], "3": ["A3", "B3"]}
-    result = subject.get_well_columns(labware_id="tube-rack-id")
-    assert result == expected_columns
-
-
-def test_get_well_rows(falcon_tuberack_def: LabwareDefinition) -> None:
-    """It should return wells as dict of list of rows."""
-    subject = get_labware_view(
-        labware_by_id={"tube-rack-id": tube_rack},
-        definitions_by_uri={"some-tube-rack-uri": falcon_tuberack_def},
-    )
-
-    expected_rows = {"A": ["A1", "A2", "A3"], "B": ["B1", "B2", "B3"]}
-    result = subject.get_well_rows(labware_id="tube-rack-id")
-    assert result == expected_rows
 
 
 def test_get_tip_length_raises_with_non_tip_rack(

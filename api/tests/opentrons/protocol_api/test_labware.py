@@ -1,10 +1,20 @@
 """Tests for the InstrumentContext public interface."""
+import inspect
+
 import pytest
 from decoy import Decoy
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, Labware, Well
+from opentrons.protocol_api.core import well_grid
 from opentrons.protocol_api.core.common import LabwareCore, WellCore
+
+
+@pytest.fixture(autouse=True)
+def _mock_well_grid_module(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Mock out the well grid module."""
+    for name, func in inspect.getmembers(well_grid, inspect.isfunction):
+        monkeypatch.setattr(well_grid, name, decoy.mock(func=func))
 
 
 @pytest.fixture
@@ -20,15 +30,27 @@ def api_version() -> APIVersion:
 
 
 @pytest.fixture
-def subject(mock_labware_core: LabwareCore, api_version: APIVersion) -> Labware:
+def subject(
+    decoy: Decoy, mock_labware_core: LabwareCore, api_version: APIVersion
+) -> Labware:
     """Get a Labware test subject with its dependencies mocked out."""
+    decoy.when(mock_labware_core.get_well_columns()).then_return([])
+    decoy.when(well_grid.create([])).then_return(
+        well_grid.WellGrid(columns_by_name={}, rows_by_name={})
+    )
     return Labware(implementation=mock_labware_core, api_version=api_version)
 
 
-@pytest.mark.parametrize("api_version", [APIVersion(2, 0), APIVersion(2, 1)])
+@pytest.mark.parametrize("api_version", [APIVersion(2, 13)])
 def test_api_version(api_version: APIVersion, subject: Labware) -> None:
     """It should have an api_version property."""
     assert subject.api_version == api_version
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 12)])
+def test_api_version_clamped(subject: Labware) -> None:
+    """It should not allow the API version to go any lower than 2.13."""
+    assert subject.api_version == APIVersion(2, 13)
 
 
 def test_is_tiprack(
@@ -42,26 +64,47 @@ def test_is_tiprack(
     assert subject.is_tiprack is False
 
 
-def test_wells(decoy: Decoy, mock_labware_core: LabwareCore, subject: Labware) -> None:
+def test_wells(
+    decoy: Decoy,
+    api_version: APIVersion,
+    mock_labware_core: LabwareCore,
+    subject: Labware,
+) -> None:
     """It should return a list of wells."""
     mock_well_core_1 = decoy.mock(cls=WellCore)
     mock_well_core_2 = decoy.mock(cls=WellCore)
-
-    decoy.when(mock_labware_core.get_wells()).then_return(
-        [mock_well_core_1, mock_well_core_2]
+    grid = well_grid.WellGrid(
+        columns_by_name={"1": ["A1", "B1"]},
+        rows_by_name={"A": ["A1"], "B": ["B1"]},
     )
-    decoy.when(mock_well_core_1.get_name()).then_return("Z42")
+
+    decoy.when(mock_well_core_1.get_name()).then_return("A1")
     decoy.when(mock_well_core_1.get_max_volume()).then_return(100)
-    decoy.when(mock_well_core_2.get_name()).then_return("X1")
+    decoy.when(mock_well_core_2.get_name()).then_return("B1")
     decoy.when(mock_well_core_1.get_max_volume()).then_return(1000)
 
+    decoy.when(mock_labware_core.get_well_columns()).then_return([["A1", "B1"]])
+    decoy.when(mock_labware_core.get_well_core("A1")).then_return(mock_well_core_1)
+    decoy.when(mock_labware_core.get_well_core("B1")).then_return(mock_well_core_2)
+    decoy.when(well_grid.create([["A1", "B1"]])).then_return(grid)
+
+    subject = Labware(implementation=mock_labware_core, api_version=api_version)
     result = subject.wells()
+    result_a1 = result[0]
+    result_b1 = result[1]
 
     assert len(result) == 2
-    assert isinstance(result[0], Well)
-    assert result[0].well_name == "Z42"
-    assert isinstance(result[1], Well)
-    assert result[1].well_name == "X1"
+    assert isinstance(result_a1, Well)
+    assert result_a1.well_name == "A1"
+    assert isinstance(result_b1, Well)
+    assert result_b1.well_name == "B1"
+
+    assert subject.wells_by_name() == {"A1": result_a1, "B1": result_b1}
+
+    assert subject.rows() == [[result_a1], [result_b1]]
+    assert subject.rows_by_name() == {"A": [result_a1], "B": [result_b1]}
+    assert subject.columns() == [[result_a1, result_b1]]
+    assert subject.columns_by_name() == {"1": [result_a1, result_b1]}
 
 
 def test_reset_tips(
