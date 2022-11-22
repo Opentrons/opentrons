@@ -48,7 +48,12 @@ export function NetworkSetupMenu(): JSX.Element {
   return (
     <>
       <StepMeter totalSteps={4} currentStep={1} OnDevice />
-      <Flex padding={SPACING.spacingXXL} flexDirection={DIRECTION_COLUMN}>
+      <Flex
+        padding={`${String(SPACING.spacing6)} ${String(
+          SPACING.spacingXXL
+        )} ${String(SPACING.spacingXXL)}`}
+        flexDirection={DIRECTION_COLUMN}
+      >
         <Flex
           justifyContent={JUSTIFY_CENTER}
           alignItems={ALIGN_CENTER}
