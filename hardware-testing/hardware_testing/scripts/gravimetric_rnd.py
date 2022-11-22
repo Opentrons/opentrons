@@ -52,6 +52,6 @@ if __name__ == "__main__":
     ctx = get_api_context(
         api_level=metadata["apiLevel"],
         is_simulating=args.simulate,
-        connect_to_smoothie=False,
+        connect_to_hardware=False,
     )
     _run(ctx)
