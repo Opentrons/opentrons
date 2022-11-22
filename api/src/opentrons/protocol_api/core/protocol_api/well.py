@@ -1,7 +1,4 @@
 """Legacy Well core implementation."""
-
-import re
-
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
 from opentrons.protocols.geometry.well_geometry import WellGeometry
@@ -21,8 +18,6 @@ class WellImplementation(AbstractWellCore):
             Must match pattern /^([A-Z]+)([0-9]+)$/.
     """
 
-    pattern = re.compile(WELL_NAME_PATTERN, re.X)
-
     def __init__(
         self, well_geometry: WellGeometry, display_name: str, has_tip: bool, name: str
     ) -> None:
@@ -30,11 +25,8 @@ class WellImplementation(AbstractWellCore):
         self._has_tip = has_tip
         self._name = name
 
-        match = WellImplementation.pattern.match(name)
-        assert match, (
-            f"could not match '{name}' using "
-            f"pattern '{WellImplementation.pattern.pattern}'"
-        )
+        match = WELL_NAME_PATTERN.match(name)
+        assert match, f"could not match '{name}' using pattern '{WELL_NAME_PATTERN}'"
         self._row_name = match.group(1)
         self._column_name = match.group(2)
         self._geometry = well_geometry

@@ -21,7 +21,6 @@ from opentrons.protocol_api.core.protocol_api.well import WellImplementation
 from opentrons.calibration_storage import helpers
 from opentrons.types import Point, Location
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.protocol_api.core.labware import AbstractLabware
 
 test_data: Dict[str, WellDefinition] = {
@@ -417,18 +416,6 @@ def test_select_next_tip(
     tiprack.use_tips(well_list[0])
     tiprack.use_tips(well_list[0])
 
-    # you can't on api level 2.1 or previous
-    early_tr = labware.Labware(
-        implementation=LabwareImplementation(
-            definition=opentrons_96_tiprack_300ul_def,
-            parent=Location(Point(0, 0, 0), "Test Slot"),
-        ),
-        api_version=APIVersion(2, 1),
-    )
-    early_tr.use_tips(well_list[0])
-    with pytest.raises(AssertionError):
-        early_tr.use_tips(well_list[0])
-
 
 def test_previous_tip(opentrons_96_tiprack_300ul) -> None:
     tiprack = opentrons_96_tiprack_300ul
@@ -614,8 +601,8 @@ def test_labware_hash_func_same_implementation_different_version(
         minimal_labware_def, Location(Point(0, 0, 0), "Test Slot")
     )
 
-    l1 = labware.Labware(implementation=impl, api_version=APIVersion(2, 3))
-    l2 = labware.Labware(implementation=impl, api_version=APIVersion(2, 4))
+    l1 = labware.Labware(implementation=impl, api_version=APIVersion(2, 13))
+    l2 = labware.Labware(implementation=impl, api_version=APIVersion(2, 14))
 
     assert len({l1, l2}) == 2
 
@@ -648,9 +635,3 @@ def test_set_offset(decoy: Decoy) -> None:
 
     subject.set_offset(x=1.1, y=2.2, z=3.3)
     decoy.verify(labware_impl.set_calibration(Point(1.1, 2.2, 3.3)))
-
-    subject = labware.Labware(
-        implementation=labware_impl, api_version=APIVersion(2, 11)
-    )
-    with pytest.raises(APIVersionError):
-        subject.set_offset(x=4.4, y=5.5, z=6.6)

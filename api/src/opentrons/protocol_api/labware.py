@@ -12,7 +12,7 @@ from __future__ import annotations
 import logging
 
 from itertools import dropwhile
-from typing import TYPE_CHECKING, Any, List, Dict, Optional, Union, Tuple, cast
+from typing import TYPE_CHECKING, Any, List, Dict, Optional, Union, Tuple
 
 from opentrons.types import Location, Point, LocationLabware
 from opentrons.protocols.api_support.types import APIVersion
@@ -30,6 +30,7 @@ from opentrons.protocols.labware import (  # noqa: F401
     save_definition as save_definition,
 )
 
+from . import validation
 from .core import well_grid
 from .core.labware import AbstractLabware
 from .core.protocol_api.labware import LabwareImplementation
@@ -422,13 +423,13 @@ class Labware(DeckItem):
         if not args:
             return list(self._wells_by_name.values())
 
-        elif all(isinstance(a, int) for a in args):
+        elif validation.is_all_integers(args):
             wells = self.wells()
-            return [wells[idx] for idx in cast(Tuple[int, ...], args)]
+            return [wells[idx] for idx in args]
 
-        elif all(isinstance(a, str) for a in args):
+        elif validation.is_all_strings(args):
             wells_by_name = self.wells_by_name()
-            return [wells_by_name[idx] for idx in cast(Tuple[str, ...], args)]
+            return [wells_by_name[idx] for idx in args]
 
         else:
             raise TypeError(
@@ -483,13 +484,13 @@ class Labware(DeckItem):
                 for row in self._well_grid.rows_by_name.values()
             ]
 
-        elif all(isinstance(a, int) for a in args):
+        elif validation.is_all_integers(args):
             rows = self.rows()
-            return [rows[idx] for idx in cast(Tuple[int, ...], args)]
+            return [rows[idx] for idx in args]
 
-        elif all(isinstance(a, str) for a in args):
+        elif validation.is_all_strings(args):
             rows_by_name = self.rows_by_name()
-            return [rows_by_name[idx] for idx in cast(Tuple[str, ...], args)]
+            return [rows_by_name[idx] for idx in args]
 
         else:
             raise TypeError(
@@ -546,13 +547,13 @@ class Labware(DeckItem):
                 for column in self._well_grid.columns_by_name.values()
             ]
 
-        elif all(isinstance(a, int) for a in args):
+        elif validation.is_all_integers(args):
             columns = self.columns()
-            return [columns[idx] for idx in cast(Tuple[int, ...], args)]
+            return [columns[idx] for idx in args]
 
-        elif all(isinstance(a, str) for a in args):
+        elif validation.is_all_strings(args):
             columns_by_name = self.columns_by_name()
-            return [columns_by_name[idx] for idx in cast(Tuple[str, ...], args)]
+            return [columns_by_name[idx] for idx in args]
 
         else:
             raise TypeError(

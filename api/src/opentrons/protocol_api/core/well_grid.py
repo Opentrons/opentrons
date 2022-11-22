@@ -1,13 +1,9 @@
 """Well grid information."""
 import collections
-import re
 from dataclasses import dataclass
 from typing import Dict, List
 
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
-
-
-_WELL_NAME_RE = re.compile(WELL_NAME_PATTERN)
 
 
 @dataclass(frozen=True)
@@ -33,7 +29,7 @@ def create(columns: List[List[str]]) -> WellGrid:
 
     for column in columns:
         for well_name in column:
-            well_name_match = _WELL_NAME_RE.match(well_name)
+            well_name_match = WELL_NAME_PATTERN.match(well_name)
 
             assert (
                 well_name_match is not None
