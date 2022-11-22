@@ -73,9 +73,8 @@ async def run_plunger_motor(args: argparse.Namespace) -> None:
             ]
         ]
     )
-    # move 30 mm
-    distance = 30
-    duration = round(abs(distance / args.speed), 4)
+    # move specified distance in mm (default 30mm)
+    duration = round(abs(args.distance / args.speed), 4)
     move_plunger_runner = MoveGroupRunner(
         # Group 0
         move_groups=[
@@ -248,6 +247,12 @@ def main() -> None:
         type=float,
         help="The speed with which to move the plunger",
         default=10.5,
+    )
+    parser.add_argument(
+        "--distance",
+        type=float,
+        help="The distance in mm to move the plunger",
+        default=30,
     )
 
     args = parser.parse_args()
