@@ -17,6 +17,9 @@ interface HeaterShakerBannerProps {
   modules: ModuleRenderInfoForProtocol[]
 }
 
+/**
+ * @deprecated when we remove the liquid setup FF this banner will no longer be used
+ */
 export function HeaterShakerBanner(
   props: HeaterShakerBannerProps
 ): JSX.Element | null {
