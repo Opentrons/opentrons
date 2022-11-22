@@ -388,7 +388,7 @@ class CriticalPoint(enum.Enum):
     the critical point under consideration is the XY center of the pipette.
     This changes nothing for single pipettes, but makes multipipettes
     move their centers - so between channels 4 and 5 - to the specified
-    point.
+    point. This is the same as the GRIPPER_JAW_CENTER for grippers.
     """
 
     FRONT_NOZZLE = enum.auto()
@@ -410,7 +410,7 @@ class CriticalPoint(enum.Enum):
     front calibration pin slot.
     """
 
-    GRIPPER_BACK_CALIBRATION_PIN = enum.auto()
+    GRIPPER_REAR_CALIBRATION_PIN = enum.auto()
     """
     The center of the bottom face of a calibration pin inserted in the gripper's
     back calibration pin slot.
@@ -491,6 +491,23 @@ class GripperJawState(enum.Enum):
     @property
     def ready_for_grip(self) -> bool:
         return self in [GripperJawState.HOMED_READY, GripperJawState.HOLDING_OPENED]
+
+
+class InstrumentProbeType(enum.Enum):
+    PRIMARY = enum.auto()
+    SECONDARY = enum.auto()
+
+
+class GripperProbe(enum.Enum):
+    FRONT = enum.auto()
+    REAR = enum.auto()
+
+    @classmethod
+    def to_type(cls, gp: "GripperProbe") -> InstrumentProbeType:
+        if gp == cls.FRONT:
+            return InstrumentProbeType.PRIMARY
+        else:
+            return InstrumentProbeType.SECONDARY
 
 
 class InvalidMoveError(ValueError):

@@ -129,24 +129,27 @@ describe('PipetteWizardFlows', () => {
     const getStarted = getByRole('button', { name: 'Get started' })
     fireEvent.click(getStarted)
     await waitFor(() => {
-      expect(mockChainRunCommands).toHaveBeenCalledWith([
-        {
-          commandType: 'home',
-          params: {},
-        },
-        {
-          commandType: 'loadPipette',
-          params: {
-            mount: LEFT,
-            pipetteId: 'abc',
-            pipetteName: 'p1000_single_gen3',
+      expect(mockChainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'home',
+            params: {},
           },
-        },
-        {
-          commandType: 'calibration/moveToLocation',
-          params: { pipetteId: 'abc', location: 'attachOrDetach' },
-        },
-      ])
+          {
+            commandType: 'loadPipette',
+            params: {
+              mount: LEFT,
+              pipetteId: 'abc',
+              pipetteName: 'p1000_single_gen3',
+            },
+          },
+          {
+            commandType: 'calibration/moveToLocation',
+            params: { pipetteId: 'abc', location: 'attachOrDetach' },
+          },
+        ],
+        false
+      )
       expect(mockCreateRun).toHaveBeenCalled()
     })
     // second page
@@ -158,20 +161,23 @@ describe('PipetteWizardFlows', () => {
     const initiate = getByRole('button', { name: 'Initiate calibration' })
     fireEvent.click(initiate)
     await waitFor(() => {
-      expect(mockChainRunCommands).toHaveBeenCalledWith([
-        {
-          commandType: 'calibration/calibratePipette',
-          params: { mount: 'left' },
-        },
-        {
-          commandType: 'home',
-          params: { axes: ['leftZ'] },
-        },
-        {
-          commandType: 'calibration/moveToLocation',
-          params: { pipetteId: 'abc', location: 'attachOrDetach' },
-        },
-      ])
+      expect(mockChainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'calibration/calibratePipette',
+            params: { mount: 'left' },
+          },
+          {
+            commandType: 'home',
+            params: { axes: ['leftZ'] },
+          },
+          {
+            commandType: 'calibration/moveToLocation',
+            params: { pipetteId: 'abc', location: 'attachOrDetach' },
+          },
+        ],
+        false
+      )
     })
     //  third page
     getByText('Step 2 / 3')
@@ -182,12 +188,15 @@ describe('PipetteWizardFlows', () => {
     const complete = getByRole('button', { name: 'Complete calibration' })
     fireEvent.click(complete)
     await waitFor(() => {
-      expect(mockChainRunCommands).toHaveBeenCalledWith([
-        {
-          commandType: 'home',
-          params: {},
-        },
-      ])
+      expect(mockChainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'home',
+            params: {},
+          },
+        ],
+        false
+      )
       //  TODO(jr, 11/2/22): wire this up when stop run logic is figured out
       // expect(mockStopRun).toHaveBeenCalled()
     })
@@ -200,5 +209,58 @@ describe('PipetteWizardFlows', () => {
     // await waitFor(() => {
     //   expect(props.closeFlow).toHaveBeenCalled()
     // })
+  })
+  it('renders the correct information, calling the correct commands for the detach flow', () => {
+    props = {
+      ...props,
+      flowType: FLOWS.DETACH,
+    }
+    mockGetPipetteWizardSteps.mockReturnValue([
+      {
+        section: SECTIONS.BEFORE_BEGINNING,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.DETACH_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+    ])
+    const { getByText } = render(props)
+    getByText('Detach a pipette')
+    //  TODO(jr 11/11/22): finish the rest of the test
+  })
+
+  it('renders the correct information, calling the correct commands for the attach flow', () => {
+    props = {
+      ...props,
+      flowType: FLOWS.ATTACH,
+    }
+    mockGetPipetteWizardSteps.mockReturnValue([
+      {
+        section: SECTIONS.BEFORE_BEGINNING,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.MOUNT_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+    ])
+    const { getByText } = render(props)
+    getByText('Attach a pipette')
+    //  TODO(jr 11/11/22): finish the rest of the test
   })
 })

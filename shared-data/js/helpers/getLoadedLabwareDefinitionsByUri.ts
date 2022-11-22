@@ -8,7 +8,7 @@ export function getLoadedLabwareDefinitionsByUri(
     if (command.commandType === 'loadLabware') {
       const labwareDef: LabwareDefinition2 = command.result?.definition
       if (labwareDef == null) {
-        console.error(
+        console.warn(
           `could not find a labware definition in the results of load labware command: ${JSON.stringify(
             command
           )}`

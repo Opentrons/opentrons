@@ -11,11 +11,20 @@ from typing import Any, Dict, Optional, Set, Tuple, Union
 from opentrons_shared_data.pipette import name_config as pipette_name_config
 
 from opentrons.types import Point
-from opentrons.config import pipette_config, robot_configs
+from opentrons.config import pipette_config, robot_configs, feature_flags
 from opentrons.config.types import RobotConfig, OT3Config
 from opentrons.drivers.types import MoveSplit
-from ..instrument_abc import AbstractInstrument
-from .instrument_calibration import PipetteOffsetByPipetteMount
+from opentrons.hardware_control.types import OT3Mount
+from ..instrument_abc import AbstractInstrument, MountType
+from ..ot3.instrument_calibration import (
+    save_pipette_offset_calibration,
+    load_pipette_offset as ot3_pipette_offset,
+    PipetteOffsetByPipetteMount as OT3PipetteOffsetByPipetteMount,
+)
+from .instrument_calibration import (
+    PipetteOffsetByPipetteMount,
+    load_pipette_offset,
+)
 from opentrons.hardware_control.types import (
     CriticalPoint,
     BoardRevision,
@@ -40,6 +49,13 @@ mod_log = logging.getLogger(__name__)
 
 INTERNOZZLE_SPACING_MM: Final[float] = 9
 
+# TODO (lc 11-1-2022) We need to separate out the pipette object
+# into a separate category for OT2 vs OT3 pipettes. At which point
+# this union will be unneccessary
+OffsetCalibrationType = Union[
+    PipetteOffsetByPipetteMount, OT3PipetteOffsetByPipetteMount
+]
+
 
 class Pipette(AbstractInstrument[pipette_config.PipetteConfig]):
     """A class to gather and track pipette state and configs.
@@ -54,7 +70,7 @@ class Pipette(AbstractInstrument[pipette_config.PipetteConfig]):
     def __init__(
         self,
         config: pipette_config.PipetteConfig,
-        pipette_offset_cal: PipetteOffsetByPipetteMount,
+        pipette_offset_cal: OffsetCalibrationType,
         pipette_id: Optional[str] = None,
     ) -> None:
         self._config = config
@@ -109,10 +125,6 @@ class Pipette(AbstractInstrument[pipette_config.PipetteConfig]):
     def acting_as(self) -> PipetteName:
         return self._acting_as
 
-    def update_pipette_offset(self, offset_cal: PipetteOffsetByPipetteMount) -> None:
-        self._log.info("updating pipette offset to {}".format(offset_cal.offset))
-        self._pipette_offset = offset_cal
-
     @property
     def config(self) -> pipette_config.PipetteConfig:
         return self._config
@@ -121,11 +133,36 @@ class Pipette(AbstractInstrument[pipette_config.PipetteConfig]):
     def nozzle_offset(self) -> Tuple[float, float, float]:
         return self._nozzle_offset
 
+    @property
+    def pipette_offset(self) -> OffsetCalibrationType:
+        return self._pipette_offset
+
     def update_config_item(self, elem_name: str, elem_val: Any) -> None:
         self._log.info("updated config: {}={}".format(elem_name, elem_val))
         self._config = replace(self._config, **{elem_name: elem_val})
         # Update the cached dict representation
         self._config_as_dict = asdict(self._config)
+
+    def reset_pipette_offset(self, mount: MountType, to_default: bool) -> None:
+        """Reset the pipette offset to system defaults."""
+        if to_default:
+            self._pipette_offset = load_pipette_offset(pip_id=None, mount=mount)
+        else:
+            self._pipette_offset = load_pipette_offset(self._pipette_id, mount)
+
+    def save_pipette_offset(self, mount: MountType, offset: Point) -> None:
+        """Update the pipette offset to a new value."""
+        # TODO (lc 10-31-2022) We should have this command be supported properly by
+        # ot-3 and ot-2 when we split out the pipette class
+        if feature_flags.enable_ot3_hardware_controller():
+            save_pipette_offset_calibration(
+                self._pipette_id, OT3Mount.from_mount(mount), offset
+            )
+            self._pipette_offset = ot3_pipette_offset(
+                self._pipette_id, OT3Mount.from_mount(mount)
+            )
+        else:
+            self._pipette_offset = load_pipette_offset(self._pipette_id, mount)
 
     @property
     def name(self) -> PipetteName:
@@ -156,7 +193,7 @@ class Pipette(AbstractInstrument[pipette_config.PipetteConfig]):
         if cp_override in [
             CriticalPoint.GRIPPER_JAW_CENTER,
             CriticalPoint.GRIPPER_FRONT_CALIBRATION_PIN,
-            CriticalPoint.GRIPPER_BACK_CALIBRATION_PIN,
+            CriticalPoint.GRIPPER_REAR_CALIBRATION_PIN,
         ]:
             raise InvalidMoveError(
                 f"Critical point {cp_override.name} is not valid for a pipette"
@@ -355,7 +392,7 @@ class Pipette(AbstractInstrument[pipette_config.PipetteConfig]):
 def _reload_and_check_skip(
     new_config: pipette_config.PipetteConfig,
     attached_instr: Pipette,
-    pipette_offset: PipetteOffsetByPipetteMount,
+    pipette_offset: OffsetCalibrationType,
 ) -> Tuple[Pipette, bool]:
     # Once we have determined that the new and attached pipettes
     # are similar enough that we might skip, see if the configs
@@ -388,7 +425,7 @@ def load_from_config_and_check_skip(
     attached: Optional[Pipette],
     requested: Optional[PipetteName],
     serial: Optional[str],
-    pipette_offset: PipetteOffsetByPipetteMount,
+    pipette_offset: OffsetCalibrationType,
 ) -> Tuple[Optional[Pipette], bool]:
     """
     Given the pipette config for an attached pipette (if any) freshly read

@@ -30,6 +30,7 @@ type LPCPrepCommand =
 export function getPrepCommands(
   protocolData: CompletedProtocolAnalysis
 ): LPCPrepCommand[] {
+  let dropTipCommands: DropTipCreateCommand[] = []
   // load commands come from the protocol resource
   const loadCommands: LPCPrepCommand[] =
     protocolData.commands
@@ -52,7 +53,8 @@ export function getPrepCommands(
               wellName: 'A1',
             },
           }
-          return [...acc, loadWithPipetteId, dropTipToBeSafe]
+          dropTipCommands = [...dropTipCommands, dropTipToBeSafe]
+          return [...acc, loadWithPipetteId]
         } else if (command.commandType === 'loadLabware') {
           // load all labware off-deck so that LPC can move them on individually later
           return [
@@ -120,7 +122,13 @@ export function getPrepCommands(
     params: {},
   }
   // prepCommands will be run when a user starts LPC
-  return [...loadCommands, ...TCCommands, ...HSCommands, homeCommand]
+  return [
+    ...loadCommands,
+    ...TCCommands,
+    ...HSCommands,
+    homeCommand,
+    ...dropTipCommands,
+  ]
 }
 
 function isLoadCommand(
