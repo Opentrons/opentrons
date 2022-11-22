@@ -1,7 +1,7 @@
 """Load pipette command request, result, and implementation models."""
 from __future__ import annotations
 from pydantic import BaseModel, Field
-from typing import TYPE_CHECKING, Optional, Type
+from typing import TYPE_CHECKING, Optional, Type, Union
 from typing_extensions import Literal
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -19,7 +19,7 @@ LoadPipetteCommandType = Literal["loadPipette"]
 class LoadPipetteParams(BaseModel):
     """Payload needed to load a pipette on to a mount."""
 
-    pipetteName: PipetteNameType = Field(
+    pipetteName: Union[PipetteNameType, Literal["p1000_96"]] = Field(
         ...,
         description="The load name of the pipette to be required.",
     )
@@ -55,7 +55,7 @@ class LoadPipetteImplementation(
         """Check that requested pipette is attached and assign its identifier."""
         loaded_pipette = await self._equipment.load_pipette(
             pipette_name=params.pipetteName
-            if hasattr(params, "pipetteName")
+            if isinstance(params.pipetteName, PipetteNameType)
             else "p1000_96",
             mount=params.mount,
             pipette_id=params.pipetteId,

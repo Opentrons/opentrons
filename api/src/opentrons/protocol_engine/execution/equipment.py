@@ -168,7 +168,11 @@ class EquipmentHandler:
             else pipette_name
         }
         if other_pipette is not None:
-            cache_request[other_mount.to_hw_mount()] = other_pipette.pipetteName.value
+            cache_request[other_mount.to_hw_mount()] = (
+                other_pipette.pipetteName.value
+                if isinstance(other_pipette.pipetteName, PipetteNameType)
+                else "p1000_96"
+            )
 
         # TODO(mc, 2020-10-18): calling `cache_instruments` mirrors the
         # behavior of protocol_context.load_instrument, and is used here as a

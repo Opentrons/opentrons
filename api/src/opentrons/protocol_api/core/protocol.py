@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from abc import abstractmethod, ABC
 from typing import Dict, Generic, Optional, Union
+from typing_extensions import Literal
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import Mount, Location, DeckSlotName
@@ -87,7 +88,7 @@ class AbstractProtocol(
 
     @abstractmethod
     def load_instrument(
-        self, instrument_name: PipetteNameType, mount: Mount
+        self, instrument_name: Union[PipetteNameType, Literal["p1000_96"]], mount: Mount
     ) -> InstrumentCoreType:
         ...
 

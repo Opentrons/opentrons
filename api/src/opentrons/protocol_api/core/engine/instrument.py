@@ -11,6 +11,8 @@ from opentrons.protocol_engine import DeckPoint, WellLocation
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
+
 from ..instrument import AbstractInstrument
 from .well import WellCore
 
@@ -335,9 +337,12 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         Will match the load name of the actually loaded pipette,
         which may differ from the requested load name.
         """
-        return self._engine_client.state.pipettes.get(
-            self._pipette_id
-        ).pipetteName.value
+        pipette = self._engine_client.state.pipettes.get(self._pipette_id)
+        return (
+            pipette.pipetteName.value
+            if isinstance(pipette.pipetteName, PipetteNameType)
+            else pipette.pipetteName
+        )
 
     def get_model(self) -> str:
         # TODO(mc, 2022-11-11): https://opentrons.atlassian.net/browse/RCORE-382

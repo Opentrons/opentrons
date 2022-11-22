@@ -106,7 +106,7 @@ class LoadedPipette(BaseModel):
     """A pipette that has been loaded."""
 
     id: str
-    pipetteName: PipetteNameType
+    pipetteName: Union[PipetteNameType, Literal["p1000_96"]]
     mount: MountType
 
 

@@ -109,10 +109,9 @@ class SyncClient:
         request = commands.LoadPipetteCreate(
             params=commands.LoadPipetteParams.construct(  # type: ignore[call-arg]
                 mount=mount,
+                pipetteName=pipette_name
             )
         )
-        if isinstance(pipette_name, PipetteNameType):
-            request.params.pipetteName = pipette_name
         result = self._transport.execute_command(request=request)
 
         return cast(commands.LoadPipetteResult, result)

@@ -463,6 +463,7 @@ async def test_load_pipette(
         )
     )
 
+
 async def test_load_pipette_96_channels(
     decoy: Decoy,
     model_utils: ModelUtils,
@@ -479,11 +480,7 @@ async def test_load_pipette_96_channels(
     )
 
     assert result == LoadedPipetteData(pipette_id="unique-id")
-    decoy.verify(
-        await hardware_api.cache_instruments(
-            {HwMount.LEFT: "p1000_96"}
-        )
-    )
+    decoy.verify(await hardware_api.cache_instruments({HwMount.LEFT: "p1000_96"}))
 
 
 async def test_load_pipette_uses_provided_id(subject: EquipmentHandler) -> None:

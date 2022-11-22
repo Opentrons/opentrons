@@ -527,7 +527,9 @@ class ProtocolContext(CommandPublisher):
         instrument_name = validation.ensure_lowercase_name(instrument_name)
         checked_mount = validation.ensure_mount(mount)
         is_96_channel = instrument_name == "p1000_96"
-        if not is_96_channel:
+        if is_96_channel:
+            checked_instrument_name = instrument_name
+        else:
             checked_instrument_name = validation.ensure_pipette_name(instrument_name)
         tip_racks = tip_racks or []
         loaded_pipettes = [
