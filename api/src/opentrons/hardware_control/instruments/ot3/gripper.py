@@ -94,7 +94,7 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
     @current_jaw_displacement.setter
     def current_jaw_displacement(self, mm: float) -> None:
         assert mm >= 0.0, "jaw displacement from home should always be positive"
-        mm <= (self._max_jaw_displacement() + 0.5), (
+        assert mm <= (self._max_jaw_displacement() + 0.5), (
             "jaw displacement exceeds max expected value: "
             f"{self._max_jaw_displacement() + 0.5} mm"
         )
@@ -147,12 +147,12 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
 
     def check_calibration_pin_location_is_accurate(self) -> None:
         if not self.attached_probe:
-            raise RuntimeError(
-                "must attach a probe before starting calibration"
-            )
+            raise RuntimeError("must attach a probe before starting calibration")
         if self.state != GripperJawState.GRIPPING:
+            raise RuntimeError("must grip the jaws before starting calibration")
+        if self.current_jaw_displacement > self._max_jaw_displacement() - 1:
             raise RuntimeError(
-                "must fully grip the jaws before starting calibration"
+                "must hold something between gripper jaws during calibration"
             )
 
     def critical_point(self, cp_override: Optional[CriticalPoint] = None) -> Point:
@@ -177,13 +177,17 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
             return self._jaw_center_offset + Point(*self._calibration_offset.offset)
         elif cp == CriticalPoint.GRIPPER_FRONT_CALIBRATION_PIN:
             self.check_calibration_pin_location_is_accurate()
-            return self._front_calibration_pin_offset + Point(
-                *self._calibration_offset.offset
+            return (
+                self._front_calibration_pin_offset
+                + Point(*self._calibration_offset.offset)
+                - Point(y=self.current_jaw_displacement)
             )
         elif cp == CriticalPoint.GRIPPER_REAR_CALIBRATION_PIN:
             self.check_calibration_pin_location_is_accurate()
-            return self._rear_calibration_pin_offset + Point(
-                *self._calibration_offset.offset
+            return (
+                self._rear_calibration_pin_offset
+                + Point(*self._calibration_offset.offset)
+                + Point(y=self.current_jaw_displacement)
             )
         else:
             raise InvalidMoveError(f"Critical point {cp_override} is not valid")
