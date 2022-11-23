@@ -1,4 +1,5 @@
 """Labware movement command handling."""
+from dataclasses import dataclass
 from typing import Optional, Union, List
 
 from opentrons_shared_data.gripper.constants import (
@@ -29,6 +30,15 @@ from ..types import (
     LabwareLocation,
     LabwareOffsetVector,
 )
+
+
+@dataclass(frozen=True)
+class ExperimentalOffsetData:
+    """The result of a load module procedure."""
+    usePickUpLocationLpcOffset: bool
+    useDropLocationLpcOffset: bool
+    pickUpOffset: Optional[LabwareOffsetVector]
+    dropOffset: Optional[LabwareOffsetVector]
 
 
 # TODO (spp, 2022-10-20): name this GripperMovementHandler if it doesn't handle
@@ -70,6 +80,7 @@ class LabwareMovementHandler:
         labware_id: str,
         current_location: Union[DeckSlotLocation, ModuleLocation],
         new_location: Union[DeckSlotLocation, ModuleLocation],
+        experimental_offset_data: ExperimentalOffsetData,
         new_offset_id: Optional[str],
     ) -> None:
         """Move a loaded labware from one location to another."""
@@ -92,14 +103,19 @@ class LabwareMovementHandler:
         await ot3api.home(axes=[OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.Z_G])
 
         gripper_homed_position = await ot3api.gantry_position(mount=gripper_mount)
+        labware_pickup_offset = self._state_store.labware.get_experimental_labware_movement_offset_vector(
+            use_current_offset=experimental_offset_data.usePickUpLocationLpcOffset,
+            current_offset_vector=self._state_store.labware.get_labware_offset_vector(
+                labware_id
+            ),
+            additional_offset_vector=experimental_offset_data.pickUpOffset,
+        )
         waypoints_to_labware = self._get_gripper_movement_waypoints(
             labware_id=labware_id,
             location=current_location,
             current_position=await ot3api.gantry_position(mount=gripper_mount),
             gripper_home_z=gripper_homed_position.z,
-            labware_offset_vector=self._state_store.labware.get_labware_offset_vector(
-                labware_id
-            ),
+            labware_offset_vector=labware_pickup_offset,
         )
 
         for waypoint in waypoints_to_labware:
@@ -118,6 +134,11 @@ class LabwareMovementHandler:
             if new_offset_id
             else None
         )
+        labware_drop_offset = self._state_store.labware.get_experimental_labware_movement_offset_vector(
+            use_current_offset=experimental_offset_data.useDropLocationLpcOffset,
+            current_offset_vector=new_labware_offset,
+            additional_offset_vector=experimental_offset_data.dropOffset,
+        )
 
         # TODO: see https://opentrons.atlassian.net/browse/RLAB-215
         await ot3api.home(axes=[OT3Axis.Z_G])
@@ -127,7 +148,7 @@ class LabwareMovementHandler:
             location=new_location,
             current_position=waypoints_to_labware[-1],
             gripper_home_z=gripper_homed_position.z,
-            labware_offset_vector=new_labware_offset,
+            labware_offset_vector=labware_drop_offset,
         )
 
         for waypoint in waypoints_to_new_location:
@@ -149,14 +170,11 @@ class LabwareMovementHandler:
         location: Union[DeckSlotLocation, ModuleLocation],
         current_position: Point,
         gripper_home_z: float,
-        labware_offset_vector: Optional[LabwareOffsetVector],
+        labware_offset_vector: LabwareOffsetVector,
     ) -> List[Point]:
         """Get waypoints for gripper to move to a specified location."""
         labware_center = self._state_store.geometry.get_labware_center(
             labware_id=labware_id, location=location
-        )
-        labware_offset_vector = labware_offset_vector or LabwareOffsetVector(
-            x=0, y=0, z=0
         )
         waypoints: List[Point] = [
             Point(current_position.x, current_position.y, gripper_home_z),

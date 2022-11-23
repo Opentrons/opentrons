@@ -511,3 +511,26 @@ class LabwareView(HasState[LabwareState]):
         """Check whether the labware uri needs to be calculated in half a millimeter."""
         uri = self.get_uri_from_definition(self.get_definition(labware_id))
         return uri in _MAGDECK_HALF_MM_LABWARE
+
+    @staticmethod
+    def get_experimental_labware_movement_offset_vector(
+            use_current_offset: bool,
+            current_offset_vector: Optional[LabwareOffsetVector],
+            additional_offset_vector: Optional[LabwareOffsetVector],
+    ) -> LabwareOffsetVector:
+        """Calculate the final labware offset vector to use in labware movement."""
+        _current_offset_vector = current_offset_vector or LabwareOffsetVector(
+            x=0, y=0, z=0
+        )
+        _additional_offset_vector = additional_offset_vector or LabwareOffsetVector(
+            x=0, y=0, z=0
+        )
+        if not use_current_offset:
+            return _additional_offset_vector
+        else:
+            return LabwareOffsetVector(
+                x=_current_offset_vector.x + _additional_offset_vector.x,
+                y=_current_offset_vector.y + _additional_offset_vector.y,
+                z=_current_offset_vector.z + _additional_offset_vector.z,
+            )
+
