@@ -1,5 +1,4 @@
 """Labware movement command handling."""
-from dataclasses import dataclass
 from typing import Optional, Union, List
 
 from opentrons_shared_data.gripper.constants import (
@@ -95,7 +94,7 @@ class LabwareMovementHandler:
         await ot3api.home(axes=[OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.Z_G])
 
         gripper_homed_position = await ot3api.gantry_position(mount=gripper_mount)
-        labware_pickup_offset = self._state_store.labware.get_experimental_labware_movement_offset_vector(
+        labware_pickup_offset = self.get_experimental_labware_movement_offset_vector(
             use_current_offset=experimental_offset_data.usePickUpLocationLpcOffset,
             current_offset_vector=self._state_store.labware.get_labware_offset_vector(
                 labware_id
@@ -126,7 +125,7 @@ class LabwareMovementHandler:
             if new_offset_id
             else None
         )
-        labware_drop_offset = self._state_store.labware.get_experimental_labware_movement_offset_vector(
+        labware_drop_offset = self.get_experimental_labware_movement_offset_vector(
             use_current_offset=experimental_offset_data.useDropLocationLpcOffset,
             current_offset_vector=new_labware_offset,
             additional_offset_vector=experimental_offset_data.dropOffset,
@@ -182,6 +181,28 @@ class LabwareMovementHandler:
             ),
         ]
         return waypoints
+
+    @staticmethod
+    def get_experimental_labware_movement_offset_vector(
+        use_current_offset: bool,
+        current_offset_vector: Optional[LabwareOffsetVector],
+        additional_offset_vector: Optional[LabwareOffsetVector],
+    ) -> LabwareOffsetVector:
+        """Calculate the final labware offset vector to use in labware movement."""
+        _current_offset_vector = current_offset_vector or LabwareOffsetVector(
+            x=0, y=0, z=0
+        )
+        _additional_offset_vector = additional_offset_vector or LabwareOffsetVector(
+            x=0, y=0, z=0
+        )
+        if not use_current_offset:
+            return _additional_offset_vector
+        else:
+            return LabwareOffsetVector(
+                x=_current_offset_vector.x + _additional_offset_vector.x,
+                y=_current_offset_vector.y + _additional_offset_vector.y,
+                z=_current_offset_vector.z + _additional_offset_vector.z,
+            )
 
     # TODO (spp, 2022-10-20): move to labware view
     @staticmethod

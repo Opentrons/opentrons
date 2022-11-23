@@ -34,21 +34,22 @@ class MoveLabwareParams(BaseModel):
     usePickUpLocationLpcOffset: bool = Field(
         False,
         description="Whether to use LPC offset of the labware associated with its "
-                    "pick up location. Experimental param, subject to change."
+        "pick up location. Experimental param, subject to change.",
     )
     useDropLocationLpcOffset: bool = Field(
         False,
         description="Whether to use LPC offset of the labware associated with its "
-                    "drop off location. Experimental param, subject to change."
+        "drop off location. Experimental param, subject to change.",
     )
     pickUpOffset: Optional[LabwareOffsetVector] = Field(
         None,
         description="Offset to use when picking up labware. "
-                    "Experimental param, subject to change")
+        "Experimental param, subject to change",
+    )
     dropOffset: Optional[LabwareOffsetVector] = Field(
         None,
         description="Offset to use when dropping off labware. "
-                    "Experimental param, subject to change"
+        "Experimental param, subject to change",
     )
 
 

@@ -66,6 +66,7 @@ class LabwareMovementStrategy(str, Enum):
 @dataclass(frozen=True)
 class ExperimentalOffsetData:
     """The result of a load module procedure."""
+
     usePickUpLocationLpcOffset: bool
     useDropLocationLpcOffset: bool
     pickUpOffset: Optional[LabwareOffsetVector]
