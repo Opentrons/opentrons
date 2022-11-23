@@ -19,6 +19,8 @@ LoadPipetteCommandType = Literal["loadPipette"]
 class LoadPipetteParams(BaseModel):
     """Payload needed to load a pipette on to a mount."""
 
+    # TODO (tz, 11-23-22): remove Union when refactoring load_pipette for 96 channels.
+    # https://opentrons.atlassian.net/browse/RLIQ-255
     pipetteName: Union[PipetteNameType, Literal["p1000_96"]] = Field(
         ...,
         description="The load name of the pipette to be required.",

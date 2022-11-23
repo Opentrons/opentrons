@@ -526,13 +526,14 @@ class ProtocolContext(CommandPublisher):
                              replaced by `instrument_name`.
         """
         instrument_name = validation.ensure_lowercase_name(instrument_name)
-        checked_mount = validation.ensure_mount(mount)
         is_96_channel = instrument_name == "p1000_96"
         if is_96_channel and isinstance(self._implementation, ProtocolEngineCore):
             checked_instrument_name = instrument_name
             checked_mount = Mount.LEFT
         else:
             checked_instrument_name = validation.ensure_pipette_name(instrument_name)
+            checked_mount = validation.ensure_mount(mount)
+
         tip_racks = tip_racks or []
 
         existing_instrument = self._instruments[checked_mount]
@@ -571,11 +572,7 @@ class ProtocolContext(CommandPublisher):
             requested_as=instrument_name,
         )
 
-        if is_96_channel:
-            self._instruments[Mount.LEFT] = instrument
-            self._instruments[Mount.RIGHT] = instrument
-        else:
-            self._instruments[checked_mount] = instrument
+        self._instruments[checked_mount] = instrument
 
         return instrument
 
