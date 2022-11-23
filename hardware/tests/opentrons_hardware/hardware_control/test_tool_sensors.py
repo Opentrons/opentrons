@@ -23,6 +23,7 @@ from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.messages.fields import (
     SensorIdField,
     SensorTypeField,
+    MotorPositionFlagsField,
 )
 
 
@@ -122,6 +123,7 @@ async def test_capacitive_probe(
                             seq_id=UInt8Field(0),
                             current_position_um=UInt32Field(10000),
                             encoder_position_um=Int32Field(10000),
+                            position_flags=MotorPositionFlagsField(0),
                             ack_id=UInt8Field(0),
                         )
                     ),
@@ -203,6 +205,7 @@ async def test_capacitive_sweep(
                             seq_id=UInt8Field(0),
                             current_position_um=UInt32Field(10000),
                             encoder_position_um=Int32Field(10000),
+                            position_flags=MotorPositionFlagsField(0),
                             ack_id=UInt8Field(0),
                         )
                     ),

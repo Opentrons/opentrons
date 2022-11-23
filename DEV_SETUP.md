@@ -162,12 +162,15 @@ On Windows, we rely on:
 
 - [scoop][] to install general dependencies and Python
 - [Node Version Switcher][nvs] to install and manage Node.js
+- [Visual Studio][visual studio] to run electron-rebuild
 
 #### 0. Install `scoop` and general dependencies
 
 #### 1. Install `nvs` and Node.js
 
 #### 2. Install Python
+
+#### 3. Install build tools via Visual Studio Installer
 
 ### Linux
 
@@ -225,6 +228,7 @@ Once `make setup` completes, you're ready to start developing! Check out our gen
 [xcode command line tools]: https://developer.apple.com/xcode/resources/
 [scoop]: https://scoop.sh/
 [nvs]: https://github.com/jasongin/nvs
+[visual studio]: https://visualstudio.microsoft.com/downloads/
 [pyenv]: https://github.com/pyenv/pyenv
 [yarn]: https://classic.yarnpkg.com/
 [pipenv]: https://github.com/pypa/pipenv
