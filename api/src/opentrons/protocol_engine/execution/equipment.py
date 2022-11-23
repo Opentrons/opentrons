@@ -168,6 +168,8 @@ class EquipmentHandler:
             else pipette_name
         }
         if other_pipette is not None:
+            # TODO (tz, 11-23-22): remove this assigment change when refactoring load_pipette for 96 channels.
+            # https://opentrons.atlassian.net/browse/RLIQ-255
             cache_request[other_mount.to_hw_mount()] = (
                 other_pipette.pipetteName.value
                 if isinstance(other_pipette.pipetteName, PipetteNameType)

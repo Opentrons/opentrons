@@ -109,9 +109,7 @@ class SyncClient:
     ) -> commands.LoadPipetteResult:
         """Execute a LoadPipette command and return the result."""
         request = commands.LoadPipetteCreate(
-            params=commands.LoadPipetteParams(
-                mount=mount, pipetteName=pipette_name
-            )
+            params=commands.LoadPipetteParams(mount=mount, pipetteName=pipette_name)
         )
         result = self._transport.execute_command(request=request)
 

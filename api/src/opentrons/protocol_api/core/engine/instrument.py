@@ -337,6 +337,8 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         Will match the load name of the actually loaded pipette,
         which may differ from the requested load name.
         """
+        # TODO (tz, 11-23-22): revert this change when merging
+        # https://opentrons.atlassian.net/browse/RLIQ-251
         pipette = self._engine_client.state.pipettes.get(self._pipette_id)
         return (
             pipette.pipetteName.value
