@@ -19,6 +19,11 @@ from typing import (
 )
 
 from opentrons_shared_data.pipette import name_config
+from opentrons_shared_data.pipette.dev_types import (
+    PipetteName,
+)
+from opentrons_shared_data.gripper.constants import IDLE_STATE_GRIP_FORCE
+
 from opentrons import types as top_types
 from opentrons.config import robot_configs
 from opentrons.config.types import (
@@ -97,10 +102,6 @@ from .motion_utilities import (
     deck_from_machine,
     machine_from_deck,
     machine_vector_from_deck_vector,
-)
-
-from opentrons_shared_data.pipette.dev_types import (
-    PipetteName,
 )
 
 from .dev_types import (
@@ -775,6 +776,7 @@ class OT3API(
             checked_max = None
 
         await self._cache_and_maybe_retract_mount(realmount)
+        await self._move_gripper_to_idle_position(realmount)
         await self._move(target_position, speed=speed, max_speeds=checked_max)
 
     async def move_rel(
@@ -817,6 +819,7 @@ class OT3API(
         else:
             checked_max = None
         await self._cache_and_maybe_retract_mount(realmount)
+        await self._move_gripper_to_idle_position(realmount)
         await self._move(
             target_position,
             speed=speed,
@@ -835,6 +838,22 @@ class OT3API(
         if mount != self._last_moved_mount and self._last_moved_mount:
             await self.retract(self._last_moved_mount, 10)
         self._last_moved_mount = mount
+
+    async def _move_gripper_to_idle_position(self, mount_in_use: OT3Mount) -> None:
+        """Move gripper to its idle, gripped position.
+
+        If the gripper is not currently in use, puts its jaws in a low-current,
+        gripped position. Experimental behavior in order to prevent gripper jaws
+        from colliding into thermocycler lid & lid latch clips.
+        """
+        # TODO: see https://opentrons.atlassian.net/browse/RLAB-214
+        if (
+            self._gripper_handler.gripper
+            and mount_in_use != OT3Mount.GRIPPER
+            and self._gripper_handler.gripper.state != GripperJawState.GRIPPING
+        ):
+            # allows for safer gantry movement at minimum force
+            await self.grip(force_newtons=IDLE_STATE_GRIP_FORCE)
 
     @ExecutionManagerProvider.wait_for_running
     async def _move(

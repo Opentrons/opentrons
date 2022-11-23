@@ -11,7 +11,11 @@ from opentrons_hardware.firmware_bindings.arbitration_id import (
     ArbitrationIdParts,
 )
 from opentrons_hardware.firmware_bindings.message import CanMessage
-from opentrons_hardware.firmware_bindings.constants import NodeId, MessageId
+from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
+    MessageId,
+    FunctionCode,
+)
 
 from opentrons_hardware.firmware_bindings.messages.messages import (
     MessageDefinition,
@@ -53,12 +57,17 @@ class CanMessenger:
 
     async def send(self, node_id: NodeId, message: MessageDefinition) -> None:
         """Send a message."""
-        # TODO (amit, 2021-11-05): Use function code when it is better defined.
+        func = (
+            FunctionCode.error
+            if message.message_id == MessageId.error_message
+            else FunctionCode.network_management
+        )
+
         arbitration_id = ArbitrationId(
             parts=ArbitrationIdParts(
                 message_id=message.message_id,
                 node_id=node_id,
-                function_code=0,
+                function_code=func,
                 originating_node_id=NodeId.host,
             )
         )

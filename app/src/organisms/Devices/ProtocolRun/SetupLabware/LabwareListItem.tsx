@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import {
   Flex,
   SPACING,
@@ -16,6 +16,7 @@ import {
   Btn,
   BORDERS,
   WELL_LABEL_OPTIONS,
+  SIZE_AUTO,
 } from '@opentrons/components'
 import {
   getLabwareDisplayName,
@@ -38,12 +39,11 @@ import type {
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 import type { ModuleTypesThatRequireExtraAttention } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
 import type { ModuleRenderInfoForProtocol } from '../../hooks'
-import { LabwareSetupItem } from './types'
+import type { LabwareSetupItem } from './types'
 
 const LabwareRow = styled.div`
   display: grid;
   grid-template-columns: 6fr 5fr;
-  grip-gap: ${SPACING.spacing3};
   border-style: ${BORDERS.styleSolid};
   border-width: ${SPACING.spacingXXS};
   border-color: ${COLORS.medGreyEnabled};
@@ -114,8 +114,13 @@ export function LabwareListItem(
       case THERMOCYCLER_MODULE_TYPE:
         extraAttentionText = (
           <Btn
-            color={COLORS.darkGreyEnabled}
-            marginTop={SPACING.spacing3}
+            css={css`
+              color: ${COLORS.darkGreyEnabled};
+
+              &:hover {
+                color: ${COLORS.darkBlackEnabled};
+              }
+            `}
             onClick={() => setSecureLabwareModalType(moduleType)}
           >
             <Flex flexDirection={DIRECTION_ROW}>
@@ -124,7 +129,11 @@ export function LabwareListItem(
                 size="0.75rem"
                 marginTop={SPACING.spacingXS}
               />
-              <StyledText marginLeft={SPACING.spacing2} as="p">
+              <StyledText
+                marginLeft={SPACING.spacing2}
+                as="p"
+                textDecoration={TYPOGRAPHY.textDecorationUnderline}
+              >
                 {t('secure_labware_instructions')}
               </StyledText>
             </Flex>
@@ -180,6 +189,7 @@ export function LabwareListItem(
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_CENTER}
           marginLeft={SPACING.spacing4}
+          marginRight={SPACING.spacing5}
         >
           <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {labwareDisplayName}
@@ -207,20 +217,20 @@ export function LabwareListItem(
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
+              marginTop={SPACING.spacingS}
             >
               <ToggleButton
                 label={`heater_shaker_${
                   moduleLocation?.slotName ?? ''
                 }_latch_toggle`}
+                size={SIZE_AUTO}
                 disabled={!isCorrectHeaterShakerAttached}
                 toggledOn={isLatchClosed}
                 onClick={toggleLatch}
                 display="flex"
                 alignItems={ALIGN_CENTER}
               />
-              {isLatchClosed ? (
-                <StyledText as="p">{t('secure')}</StyledText>
-              ) : null}
+              <StyledText as="p">{t('secure')}</StyledText>
             </Flex>
           </Flex>
         ) : null}

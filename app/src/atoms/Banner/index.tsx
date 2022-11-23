@@ -36,6 +36,10 @@ export interface BannerProps extends StyleProps {
   isCloseActionLoading?: boolean
   /** Override the Exit icon */
   closeButton?: React.ReactNode
+  /** Icon margin right for large banners */
+  iconMarginRight?: string
+  /** Icon margin left for large banners */
+  iconMarginLeft?: string
 }
 
 const BANNER_PROPS_BY_TYPE: Record<
@@ -78,14 +82,18 @@ export function Banner(props: BannerProps): JSX.Element {
     isCloseActionLoading,
     padding,
     closeButton,
+    iconMarginLeft,
+    iconMarginRight,
+    size,
     ...styleProps
   } = props
   const bannerProps = BANNER_PROPS_BY_TYPE[type]
 
   const iconProps = {
     ...(icon ?? bannerProps.icon),
-    size: SPACING.spacing4,
-    marginRight: SPACING.spacing3,
+    size: size ?? SIZE_1,
+    marginRight: iconMarginRight ?? SPACING.spacing3,
+    marginLeft: iconMarginLeft ?? '0rem',
     color: BANNER_PROPS_BY_TYPE[type].color,
   }
   return (
@@ -111,12 +119,13 @@ export function Banner(props: BannerProps): JSX.Element {
       <Flex flex="1" alignItems={ALIGN_CENTER}>
         {props.children}
       </Flex>
-      {onCloseClick && !isCloseActionLoading ? (
+      {onCloseClick && !(isCloseActionLoading ?? false) ? (
         <Btn data-testid="Banner_close-button" onClick={props.onCloseClick}>
           {closeButton ?? (
             <Icon
               width={SPACING.spacing5}
               height={SPACING.spacing5}
+              marginTop="0.375rem"
               name="close"
               aria-label="close_icon"
             />

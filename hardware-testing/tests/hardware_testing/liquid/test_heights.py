@@ -15,7 +15,7 @@ CUSTOM_LABWARE_DEFINITION_DIR = (
 
 def _create_context() -> ProtocolContext:
     return get_api_context(
-        api_level="2.13", is_simulating=False, connect_to_smoothie=False
+        api_level="2.13", is_simulating=False, connect_to_hardware=False
     )
 
 
