@@ -29,16 +29,8 @@ from ..types import (
     ModuleLocation,
     LabwareLocation,
     LabwareOffsetVector,
+    ExperimentalOffsetData,
 )
-
-
-@dataclass(frozen=True)
-class ExperimentalOffsetData:
-    """The result of a load module procedure."""
-    usePickUpLocationLpcOffset: bool
-    useDropLocationLpcOffset: bool
-    pickUpOffset: Optional[LabwareOffsetVector]
-    dropOffset: Optional[LabwareOffsetVector]
 
 
 # TODO (spp, 2022-10-20): name this GripperMovementHandler if it doesn't handle

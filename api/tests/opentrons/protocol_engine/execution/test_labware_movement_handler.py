@@ -24,6 +24,7 @@ from opentrons.protocol_engine.types import (
     LabwareOffsetLocation,
     LabwareOffsetVector,
     LabwareLocation,
+    ExperimentalOffsetData,
 )
 
 from opentrons.protocol_engine.execution.thermocycler_movement_flagger import (
@@ -35,7 +36,6 @@ from opentrons.protocol_engine.execution.heater_shaker_movement_flagger import (
 
 from opentrons.protocol_engine.execution.labware_movement import (
     LabwareMovementHandler,
-    ExperimentalOffsetData,
 )
 from opentrons.protocol_engine.errors import (
     HardwareNotSupportedError,
@@ -232,7 +232,7 @@ async def test_labware_movement_raises_on_ot2(
             current_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
             new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             new_offset_id=None,
-            experimental_offset_data=
+            experimental_offset_data=default_experimental_movement_data(),
         )
 
 

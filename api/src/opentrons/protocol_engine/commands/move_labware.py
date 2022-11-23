@@ -5,9 +5,13 @@ from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from ..types import LabwareLocation, LabwareMovementStrategy, LabwareOffsetVector
+from ..types import (
+    LabwareLocation,
+    LabwareMovementStrategy,
+    LabwareOffsetVector,
+    ExperimentalOffsetData,
+)
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
-from ..execution.labware_movement import ExperimentalOffsetData
 
 if TYPE_CHECKING:
     from ..execution import EquipmentHandler, RunControlHandler, LabwareMovementHandler
