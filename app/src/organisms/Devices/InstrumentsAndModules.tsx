@@ -20,7 +20,12 @@ import { Banner } from '../../atoms/Banner'
 import { InstrumentCard } from '../../molecules/InstrumentCard'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ModuleCard } from '../ModuleCard'
-import { useIsOT3, useIsRobotViewable, useRunStatuses } from './hooks'
+import {
+  useIsOT3,
+  useIsRobotViewable,
+  useRunStatuses,
+  useIs96ChannelPipetteAttached,
+} from './hooks'
 import { PipetteCard } from './PipetteCard'
 
 const EQUIPMENT_POLL_MS = 5000
@@ -40,7 +45,9 @@ export function InstrumentsAndModules({
   const currentRunId = useCurrentRunId()
   const { isRunTerminal } = useRunStatuses()
   const isOT3 = useIsOT3(robotName)
-
+  const is96ChannelAttached = useIs96ChannelPipetteAttached(
+    attachedPipettes?.left ?? null
+  )
   const attachedModules =
     useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
   // split modules in half and map into each column separately to avoid
@@ -57,6 +64,19 @@ export function InstrumentsAndModules({
   // const gripper = { model: null }
   const gripper = { model: 'Opentrons Gripper GEN1' }
 
+  const leftPipetteMountCard = (
+    <PipetteCard
+      pipetteId={attachedPipettes.left?.id}
+      pipetteInfo={
+        attachedPipettes.left?.model != null
+          ? getPipetteModelSpecs(attachedPipettes.left?.model) ?? null
+          : null
+      }
+      mount={LEFT}
+      robotName={robotName}
+      is96ChannelAttached={is96ChannelAttached}
+    />
+  )
   return (
     <Flex
       alignItems={ALIGN_FLEX_START}
@@ -90,80 +110,81 @@ export function InstrumentsAndModules({
           </Flex>
         )}
         {isRobotViewable ? (
-          <Flex gridGap={SPACING.spacing3} width="100%">
-            <Flex
-              flex="50%"
-              flexDirection={DIRECTION_COLUMN}
-              gridGap={SPACING.spacing3}
-            >
-              <PipetteCard
-                pipetteId={attachedPipettes.left?.id}
-                pipetteInfo={
-                  attachedPipettes.left?.model != null
-                    ? getPipetteModelSpecs(attachedPipettes.left?.model) ?? null
-                    : null
-                }
-                mount={LEFT}
-                robotName={robotName}
-              />
-              {/* extension mount here */}
-              {isOT3 ? (
-                <InstrumentCard
-                  description={
-                    gripper.model != null ? gripper.model : t('shared:empty')
-                  }
-                  isGripperAttached={gripper.model != null}
-                  label={t('shared:extension_mount')}
-                  // TODO(bh, 2022-10-27): insert gripper recalibrate and detach functions, empty mount menu items
-                  menuOverlayItems={[
-                    {
-                      label: 'Recalibrate gripper',
-                      disabled: gripper.model == null,
-                      onClick: () => console.log('Recalibrate gripper'),
-                    },
-                    {
-                      label: 'Detach gripper',
-                      disabled: gripper.model == null,
-                      onClick: () => console.log('Detach gripper'),
-                    },
-                  ]}
-                />
-              ) : null}
-              {leftColumnModules.map((module, index) => (
-                <ModuleCard
-                  key={`moduleCard_${module.moduleType}_${index}`}
-                  robotName={robotName}
-                  module={module}
-                  isLoadedInRun={false}
-                />
-              ))}
+          <>
+            {is96ChannelAttached ? (
+              <Flex marginBottom={SPACING.spacing3} width="100%">
+                {leftPipetteMountCard}
+              </Flex>
+            ) : null}
+            <Flex gridGap={SPACING.spacing3} width="100%">
+              <Flex
+                flex="50%"
+                flexDirection={DIRECTION_COLUMN}
+                gridGap={SPACING.spacing3}
+              >
+                {!is96ChannelAttached ? leftPipetteMountCard : null}
+                {/* extension mount here */}
+                {isOT3 ? (
+                  <InstrumentCard
+                    description={
+                      gripper.model != null ? gripper.model : t('shared:empty')
+                    }
+                    isGripperAttached={gripper.model != null}
+                    label={t('shared:extension_mount')}
+                    // TODO(bh, 2022-10-27): insert gripper recalibrate and detach functions, empty mount menu items
+                    menuOverlayItems={[
+                      {
+                        label: 'Recalibrate gripper',
+                        disabled: gripper.model == null,
+                        onClick: () => console.log('Recalibrate gripper'),
+                      },
+                      {
+                        label: 'Detach gripper',
+                        disabled: gripper.model == null,
+                        onClick: () => console.log('Detach gripper'),
+                      },
+                    ]}
+                  />
+                ) : null}
+                {leftColumnModules.map((module, index) => (
+                  <ModuleCard
+                    key={`moduleCard_${module.moduleType}_${index}`}
+                    robotName={robotName}
+                    module={module}
+                    isLoadedInRun={false}
+                  />
+                ))}
+              </Flex>
+              <Flex
+                flex="50%"
+                flexDirection={DIRECTION_COLUMN}
+                gridGap={SPACING.spacing3}
+              >
+                {!is96ChannelAttached ? (
+                  <PipetteCard
+                    pipetteId={attachedPipettes.right?.id}
+                    pipetteInfo={
+                      attachedPipettes.right?.model != null
+                        ? getPipetteModelSpecs(attachedPipettes.right?.model) ??
+                          null
+                        : null
+                    }
+                    mount={RIGHT}
+                    robotName={robotName}
+                    is96ChannelAttached={false}
+                  />
+                ) : null}
+                {rightColumnModules.map((module, index) => (
+                  <ModuleCard
+                    key={`moduleCard_${module.moduleType}_${index}`}
+                    robotName={robotName}
+                    module={module}
+                    isLoadedInRun={false}
+                  />
+                ))}
+              </Flex>
             </Flex>
-            <Flex
-              flex="50%"
-              flexDirection={DIRECTION_COLUMN}
-              gridGap={SPACING.spacing3}
-            >
-              <PipetteCard
-                pipetteId={attachedPipettes.right?.id}
-                pipetteInfo={
-                  attachedPipettes.right?.model != null
-                    ? getPipetteModelSpecs(attachedPipettes.right?.model) ??
-                      null
-                    : null
-                }
-                mount={RIGHT}
-                robotName={robotName}
-              />
-              {rightColumnModules.map((module, index) => (
-                <ModuleCard
-                  key={`moduleCard_${module.moduleType}_${index}`}
-                  robotName={robotName}
-                  module={module}
-                  isLoadedInRun={false}
-                />
-              ))}
-            </Flex>
-          </Flex>
+          </>
         ) : (
           <Flex
             alignItems={ALIGN_CENTER}

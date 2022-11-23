@@ -5,7 +5,11 @@ import { i18n } from '../../../i18n'
 import { Banner } from '../../../atoms/Banner'
 import { mockMagneticModule } from '../../../redux/modules/__fixtures__'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
-import { useIsRobotViewable, useRunStatuses } from '../hooks'
+import {
+  useIs96ChannelPipetteAttached,
+  useIsRobotViewable,
+  useRunStatuses,
+} from '../hooks'
 import { ModuleCard } from '../../ModuleCard'
 import { InstrumentsAndModules } from '../InstrumentsAndModules'
 import { PipetteCard } from '../PipetteCard'
@@ -36,6 +40,9 @@ const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
 const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
   typeof useRunStatuses
 >
+const mockUseIs96ChannelPipetteAttached = useIs96ChannelPipetteAttached as jest.MockedFunction<
+  typeof useIs96ChannelPipetteAttached
+>
 
 const render = () => {
   return renderWithProviders(<InstrumentsAndModules robotName="otie" />, {
@@ -52,6 +59,7 @@ describe('InstrumentsAndModules', () => {
       isRunStill: true,
       isRunTerminal: false,
     })
+    mockUseIs96ChannelPipetteAttached.mockReturnValue(false)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -83,7 +91,7 @@ describe('InstrumentsAndModules', () => {
 
     getByText('Mock ModuleCard')
   })
-  it('renders a pipette card when a robot is viewable', () => {
+  it('renders pipette cards when a robot is viewable', () => {
     mockUseIsRobotViewable.mockReturnValue(true)
     mockUseModulesQuery.mockReturnValue({
       data: { data: [mockMagneticModule] },
@@ -105,5 +113,12 @@ describe('InstrumentsAndModules', () => {
     const [{ getByText }] = render()
 
     getByText('mock Banner')
+  })
+  it('renders 1 pipette card when a 96 channel is attached', () => {
+    mockPipetteCard.mockReturnValue(<div>Mock PipetteCard</div>)
+    mockUseIs96ChannelPipetteAttached.mockReturnValue(true)
+    mockUseIsRobotViewable.mockReturnValue(true)
+    const [{ getByText }] = render()
+    getByText('Mock PipetteCard')
   })
 })
