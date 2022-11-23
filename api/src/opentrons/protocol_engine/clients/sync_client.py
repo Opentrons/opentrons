@@ -18,6 +18,7 @@ from ..types import (
     LabwareMovementStrategy,
     ModuleModel,
     WellLocation,
+    LabwareOffsetVector,
 )
 from .transports import AbstractSyncTransport
 
@@ -88,11 +89,21 @@ class SyncClient:
         labware_id: str,
         new_location: LabwareLocation,
         strategy: LabwareMovementStrategy,
+        use_pick_up_location_lpc_offset: bool,
+        use_drop_location_lpc_offset: bool,
+        pick_up_offset: Optional[LabwareOffsetVector],
+        drop_offset: Optional[LabwareOffsetVector],
     ) -> commands.MoveLabwareResult:
         """Execute a MoveLabware command and return the result."""
         request = commands.MoveLabwareCreate(
             params=commands.MoveLabwareParams(
-                labwareId=labware_id, newLocation=new_location, strategy=strategy
+                labwareId=labware_id,
+                newLocation=new_location,
+                strategy=strategy,
+                usePickUpLocationLpcOffset=use_pick_up_location_lpc_offset,
+                useDropLocationLpcOffset=use_drop_location_lpc_offset,
+                pickUpOffset=pick_up_offset,
+                dropOffset=drop_offset,
             )
         )
         result = self._transport.execute_command(request=request)

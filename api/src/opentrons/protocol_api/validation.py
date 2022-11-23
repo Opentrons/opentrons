@@ -150,3 +150,16 @@ def ensure_thermocycler_profile_steps(
             )
         )
     return validated_steps
+
+
+def ensure_valid_labware_offset_vector(offset: Dict[str, float]) -> Dict[str, float]:
+    if isinstance(offset, dict):
+        if all([offset.get(axis) for axis in ["x", "y", "z"]]) and all(
+            [isinstance(val, (float, int)) for val in offset.values()]
+        ):
+            return offset
+    raise ValueError(
+        "Labware offset vector is expected to be a dictionary with"
+        " with floating point offset values for all 3 axes."
+        " For example: {'x': 1.1, 'y': 2.2, 'z': 3.3}"
+    )

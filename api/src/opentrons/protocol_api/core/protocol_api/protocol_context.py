@@ -205,6 +205,10 @@ class ProtocolContextImplementation(
         labware_core: LabwareImplementation,
         new_location: Union[DeckSlotName, legacy_module_core.LegacyModuleCore],
         use_gripper: bool,
+        use_pick_up_location_lpc_offset: bool,
+        use_drop_location_lpc_offset: bool,
+        pick_up_offset: Optional[Dict[str, float]],
+        drop_offset: Optional[Dict[str, float]],
     ) -> None:
         """Move labware to new location."""
         raise UnsupportedAPIError(
