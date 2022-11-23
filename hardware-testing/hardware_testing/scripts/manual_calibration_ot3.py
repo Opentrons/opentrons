@@ -24,6 +24,8 @@ PROBE_CHANGE_Z = 100
 # size of the aluminum block used to visually check gripper calibration
 GRIPPER_TEST_BLOCK_SIZE = Point(x=127.7, y=-85.5, z=64)
 
+GRIPPER_EVT_Y_OFFSET = Point(y=0.36)
+
 
 def _get_z_probe_pos(square_pos: Point) -> Point:
     square = helpers_ot3.CALIBRATION_SQUARE_EVT
@@ -280,6 +282,8 @@ async def _main(simulate: bool, slot: int, mount: OT3Mount, test: bool) -> None:
         found_square_pos = await _find_square_center_of_gripper_jaw(
             api, calibration_square_pos
         )
+        # FIXME: remove this once the HW issue is fixed for EVT grippers
+        found_square_pos += GRIPPER_EVT_Y_OFFSET
     else:
         input("add probe to Pipette, then press ENTER: ")
         found_square_pos = await _find_square_center(api, mount, calibration_square_pos)
