@@ -1,5 +1,5 @@
 """Test for the ProtocolEngine-based protocol API core."""
-from typing import Optional, Type, cast
+from typing import Optional, Type, cast, Dict
 
 import pytest
 from decoy import Decoy
@@ -30,6 +30,7 @@ from opentrons.protocol_engine import (
     LabwareMovementStrategy,
     LoadedPipette,
     commands,
+    LabwareOffsetVector,
 )
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 
@@ -199,6 +200,20 @@ def test_load_labware(
         (False, LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE),
     ],
 )
+@pytest.mark.parametrize(
+    argnames=[
+        "use_pick_up_location_lpc_offset",
+        "use_drop_location_lpc_offset",
+        "pick_up_offset",
+        "drop_offset",
+    ],
+    argvalues=[
+        (False, False, None, None),
+        (True, False, None, None),
+        (False, True, None, {"x": 4, "y": 5, "z": 6}),
+        (True, True, {"x": 4, "y": 5, "z": 6}, {"x": 4, "y": 5, "z": 6}),
+    ],
+)
 def test_move_labware(
     decoy: Decoy,
     subject: ProtocolCore,
@@ -206,6 +221,10 @@ def test_move_labware(
     api_version: APIVersion,
     expected_strategy: LabwareMovementStrategy,
     use_gripper: bool,
+    use_pick_up_location_lpc_offset: bool,
+    use_drop_location_lpc_offset: bool,
+    pick_up_offset: Optional[Dict[str, float]],
+    drop_offset: Optional[Dict[str, float]],
 ) -> None:
     """It should issue a move labware command to the engine."""
     decoy.when(
@@ -215,13 +234,25 @@ def test_move_labware(
     )
     labware = LabwareCore(labware_id="labware-id", engine_client=mock_engine_client)
     subject.move_labware(
-        labware_core=labware, new_location=DeckSlotName.SLOT_5, use_gripper=use_gripper
+        labware_core=labware,
+        new_location=DeckSlotName.SLOT_5,
+        use_gripper=use_gripper,
+        use_pick_up_location_lpc_offset=use_pick_up_location_lpc_offset,
+        use_drop_location_lpc_offset=use_drop_location_lpc_offset,
+        pick_up_offset=pick_up_offset,
+        drop_offset=drop_offset,
     )
     decoy.verify(
         mock_engine_client.move_labware(
             labware_id="labware-id",
             new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
             strategy=expected_strategy,
+            use_pick_up_location_lpc_offset=use_pick_up_location_lpc_offset,
+            use_drop_location_lpc_offset=use_drop_location_lpc_offset,
+            pick_up_offset=LabwareOffsetVector(x=4, y=5, z=6)
+            if pick_up_offset
+            else None,
+            drop_offset=LabwareOffsetVector(x=4, y=5, z=6) if drop_offset else None,
         )
     )
 

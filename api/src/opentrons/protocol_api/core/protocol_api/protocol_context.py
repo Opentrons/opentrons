@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, List, Optional, Set, Union
+from typing import Dict, List, Optional, Set, Union, Mapping
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -210,6 +210,10 @@ class ProtocolContextImplementation(
         labware_core: LabwareImplementation,
         new_location: Union[DeckSlotName, legacy_module_core.LegacyModuleCore],
         use_gripper: bool,
+        use_pick_up_location_lpc_offset: bool,
+        use_drop_location_lpc_offset: bool,
+        pick_up_offset: Optional[Mapping[str, float]],
+        drop_offset: Optional[Mapping[str, float]],
     ) -> None:
         """Move labware to new location."""
         raise UnsupportedAPIError(

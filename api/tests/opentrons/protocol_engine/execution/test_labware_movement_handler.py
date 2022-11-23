@@ -24,6 +24,7 @@ from opentrons.protocol_engine.types import (
     LabwareOffsetLocation,
     LabwareOffsetVector,
     LabwareLocation,
+    ExperimentalOffsetData,
 )
 
 from opentrons.protocol_engine.execution.thermocycler_movement_flagger import (
@@ -35,7 +36,6 @@ from opentrons.protocol_engine.execution.heater_shaker_movement_flagger import (
 
 from opentrons.protocol_engine.execution.labware_movement import (
     LabwareMovementHandler,
-    ExperimentalOffsetData,
 )
 from opentrons.protocol_engine.errors import (
     HardwareNotSupportedError,
@@ -73,6 +73,7 @@ def heater_shaker_movement_flagger(decoy: Decoy) -> HeaterShakerMovementFlagger:
     """Get a mocked out HeaterShakerMovementFlagger instance."""
     return decoy.mock(cls=HeaterShakerMovementFlagger)
 
+
 def default_experimental_movement_data() -> ExperimentalOffsetData:
     """Experimental movement data with default values."""
     return ExperimentalOffsetData(
@@ -81,6 +82,7 @@ def default_experimental_movement_data() -> ExperimentalOffsetData:
         pickUpOffset=None,
         dropOffset=None,
     )
+
 
 @pytest.mark.ot3_only
 @pytest.fixture
@@ -161,13 +163,20 @@ async def test_move_labware_with_gripper(
             vector=LabwareOffsetVector(x=0.5, y=0.6, z=0.7),
         )
     )
+    experimental_offset_data = ExperimentalOffsetData(
+        usePickUpLocationLpcOffset=True,
+        useDropLocationLpcOffset=False,
+        pickUpOffset=LabwareOffsetVector(x=-1, y=-2, z=-3),
+        dropOffset=LabwareOffsetVector(x=1, y=2, z=3),
+    )
+
     expected_waypoints = [
         Point(777, 888, 999),  # gripper retract at current location
-        Point(101.1, 102.2, 999),  # move to above slot 1
-        Point(101.1, 102.2, 119.8),  # move to labware on slot 1
-        Point(101.1, 102.2, 999),  # gripper retract at current location
-        Point(201.5, 202.6, 999),  # move to above slot 3
-        Point(201.5, 202.6, 220.2),  # move down to labware drop height on slot 3
+        Point(100.1, 100.2, 999),  # move to above slot 1
+        Point(100.1, 100.2, 116.8),  # move to labware on slot 1
+        Point(100.1, 100.2, 999),  # gripper retract at current location
+        Point(202.0, 204.0, 999),  # move to above slot 3
+        Point(202.0, 204.0, 222.5),  # move down to labware drop height on slot 3
         Point(201.5, 202.6, 999),  # retract in place
     ]
 
@@ -176,6 +185,7 @@ async def test_move_labware_with_gripper(
         current_location=from_location,
         new_location=to_location,
         new_offset_id="new-offset-id",
+        experimental_offset_data=experimental_offset_data,
     )
 
     gripper = OT3Mount.GRIPPER
@@ -232,7 +242,7 @@ async def test_labware_movement_raises_on_ot2(
             current_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
             new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             new_offset_id=None,
-            experimental_offset_data=
+            experimental_offset_data=default_experimental_movement_data(),
         )
 
 
@@ -277,6 +287,7 @@ async def test_labware_movement_raises_without_gripper(
             labware_id="labware-id",
             current_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
             new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            experimental_offset_data=default_experimental_movement_data(),
             new_offset_id=None,
         )
 

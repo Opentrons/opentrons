@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 from typing import Any, Dict, List, Optional, Sequence, Union
 from typing_extensions import TypeGuard
+=======
+from typing import List, Dict, Union, Optional, Mapping
+>>>>>>> c85eba2b31 (added experimental offset args to papi, resolved circular dependancy)
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
@@ -161,3 +165,18 @@ def is_all_integers(items: Sequence[Any]) -> TypeGuard[Sequence[int]]:
 def is_all_strings(items: Sequence[Any]) -> TypeGuard[Sequence[str]]:
     """Check that every item in a list is a string."""
     return all(isinstance(i, str) for i in items)
+
+
+def ensure_valid_labware_offset_vector(
+    offset: Mapping[str, float]
+) -> Mapping[str, float]:
+    if isinstance(offset, dict):
+        if all([offset.get(axis) for axis in ["x", "y", "z"]]) and all(
+            [isinstance(val, (float, int)) for val in offset.values()]
+        ):
+            return offset
+    raise ValueError(
+        "Labware offset vector is expected to be a dictionary with"
+        " with floating point offset values for all 3 axes."
+        " For example: {'x': 1.1, 'y': 2.2, 'z': 3.3}"
+    )

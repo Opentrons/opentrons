@@ -63,6 +63,16 @@ class LabwareMovementStrategy(str, Enum):
     MANUAL_MOVE_WITHOUT_PAUSE = "manualMoveWithoutPause"
 
 
+@dataclass(frozen=True)
+class ExperimentalOffsetData:
+    """The result of a load module procedure."""
+
+    usePickUpLocationLpcOffset: bool
+    useDropLocationLpcOffset: bool
+    pickUpOffset: Optional[LabwareOffsetVector]
+    dropOffset: Optional[LabwareOffsetVector]
+
+
 class WellOrigin(str, Enum):
     """Origin of WellLocation offset."""
 

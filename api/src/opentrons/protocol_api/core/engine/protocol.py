@@ -1,6 +1,6 @@
 """ProtocolEngine-based Protocol API core implementation."""
-from typing import Dict, Optional, Type, Union
 from typing_extensions import Literal
+from typing import Dict, Optional, Type, Union, Mapping
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
@@ -24,6 +24,7 @@ from opentrons.protocol_engine import (
     ModuleLocation,
     ModuleModel as EngineModuleModel,
     LabwareMovementStrategy,
+    LabwareOffsetVector,
 )
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 
@@ -149,6 +150,10 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         labware_core: LabwareCore,
         new_location: Union[DeckSlotName, ModuleCore],
         use_gripper: bool,
+        use_pick_up_location_lpc_offset: bool,
+        use_drop_location_lpc_offset: bool,
+        pick_up_offset: Optional[Mapping[str, float]],
+        drop_offset: Optional[Mapping[str, float]],
     ) -> None:
         """Move the given labware to a new location."""
         to_location: Union[ModuleLocation, DeckSlotLocation]
@@ -162,11 +167,28 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             if use_gripper
             else LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE
         )
-
+        _pick_up_offset = (
+            LabwareOffsetVector(
+                x=pick_up_offset["x"], y=pick_up_offset["y"], z=pick_up_offset["z"]
+            )
+            if pick_up_offset
+            else None
+        )
+        _drop_offset = (
+            LabwareOffsetVector(
+                x=drop_offset["x"], y=drop_offset["y"], z=drop_offset["z"]
+            )
+            if drop_offset
+            else None
+        )
         self._engine_client.move_labware(
             labware_id=labware_core.labware_id,
             new_location=to_location,
             strategy=strategy,
+            use_pick_up_location_lpc_offset=use_pick_up_location_lpc_offset,
+            use_drop_location_lpc_offset=use_drop_location_lpc_offset,
+            pick_up_offset=_pick_up_offset,
+            drop_offset=_drop_offset,
         )
 
     def _resolve_module_hardware(

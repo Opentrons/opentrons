@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod, ABC
-from typing import Dict, Generic, Optional, Union
+from typing import Dict, Generic, Optional, Union, Mapping
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import Mount, Location, DeckSlotName
@@ -73,6 +73,10 @@ class AbstractProtocol(
         labware_core: LabwareCoreType,
         new_location: Union[DeckSlotName, ModuleCoreType],
         use_gripper: bool,
+        use_pick_up_location_lpc_offset: bool,
+        use_drop_location_lpc_offset: bool,
+        pick_up_offset: Optional[Mapping[str, float]],
+        drop_offset: Optional[Mapping[str, float]],
     ) -> None:
         ...
 
