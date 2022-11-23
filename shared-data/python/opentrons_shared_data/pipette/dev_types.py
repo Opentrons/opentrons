@@ -31,7 +31,7 @@ PipetteName = Literal[
     "p1000_single_gen2",
     "p1000_single_gen3",
     "p1000_multi_gen3",
-    "p1000_96"
+    "p1000_96",
 ]
 
 
