@@ -9,7 +9,7 @@ describe('useIs96ChannelPipetteAttached hook', () => {
 
   it('returns true when there is a 96 channel pipette attached on the left mount', () => {
     const mockLeftMountAttachedPipette = {
-      name: 'p20_96_channel',
+      name: 'p1000_96',
     } as FetchPipettesResponsePipette
 
     const result = useIs96ChannelPipetteAttached(mockLeftMountAttachedPipette)
