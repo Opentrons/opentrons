@@ -2,12 +2,24 @@ import { createGlobalStyle } from 'styled-components'
 import { COLORS } from '@opentrons/components'
 import 'typeface-open-sans'
 
-export const GlobalStyle = createGlobalStyle`
+interface GlobalStyleProps {
+  isOnDevice?: boolean
+}
+
+export const GlobalStyle = createGlobalStyle<GlobalStyleProps>`
   * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Open Sans', sans-serif;
+    /* font-family: 'Open Sans', sans-serif; */
+    @font-face {
+      font-family: 'Public Sans';
+      src: url("../../assets/font/PublicSans-Regular.ttf");
+    }
+    /* font-family:${props =>
+      props.isOnDevice ?? false ? 'Open Sans' : 'Open Sans'}, sans-serif; */
+
+    font-family:sans-serif;
   }
 
   html,
