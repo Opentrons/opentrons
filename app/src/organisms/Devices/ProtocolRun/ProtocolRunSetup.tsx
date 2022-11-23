@@ -11,7 +11,6 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { useFeatureFlag } from '../../../redux/config'
 import { Line } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
 import { InfoMessage } from '../../../molecules/InfoMessage'
@@ -64,7 +63,6 @@ export function ProtocolRunSetup({
   const isOT3 = useIsOT3(robotName)
   const runHasStarted = useRunHasStarted(runId)
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
-  const liquidSetupEnabled = useFeatureFlag('enableLiquidSetup')
   const [expandedStepKey, setExpandedStepKey] = React.useState<StepKey | null>(
     null
   )
@@ -77,7 +75,6 @@ export function ProtocolRunSetup({
     let nextStepKeysInOrder = stepsKeysInOrder
     const showModuleSetup = protocolData != null && modules.length > 0
     const showLiquidSetup =
-      liquidSetupEnabled &&
       protocolData != null &&
       'liquids' in protocolData &&
       size(protocolData.liquids) > 0

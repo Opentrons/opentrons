@@ -12,7 +12,6 @@ import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/test
 
 import { i18n } from '../../../../i18n'
 import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
-import { useFeatureFlag } from '../../../../redux/config'
 import {
   useIsOT3,
   useProtocolDetailsForRun,
@@ -40,7 +39,6 @@ jest.mock('../SetupLabware')
 jest.mock('../SetupRobotCalibration')
 jest.mock('../SetupModules')
 jest.mock('../SetupLiquids')
-jest.mock('../../../../redux/config')
 jest.mock('@opentrons/shared-data/js/helpers/parseProtocolData')
 
 const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
@@ -74,9 +72,6 @@ const mockSetupModules = SetupModules as jest.MockedFunction<
 >
 const mockSetupLiquids = SetupLiquids as jest.MockedFunction<
   typeof SetupLiquids
->
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
 >
 const mockProtocolHasLiquids = protocolHasLiquids as jest.MockedFunction<
   typeof protocolHasLiquids
@@ -237,10 +232,7 @@ describe('ProtocolRunSetup', () => {
   })
 
   describe('when liquids are in the protocol', () => {
-    it('renders correct text for liquids when FF is on', () => {
-      when(mockUseFeatureFlag)
-        .calledWith('enableLiquidSetup')
-        .mockReturnValue(true)
+    it('renders correct text for liquids', () => {
       when(mockUseProtocolDetailsForRun)
         .calledWith(RUN_ID)
         .mockReturnValue({

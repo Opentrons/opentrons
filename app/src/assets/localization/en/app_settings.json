@@ -82,7 +82,6 @@
   "enable_dev_tools_description": "Enabling this setting opens Developer Tools on app launch, enables additional logging and gives access to feature flags.",
   "__dev_internal__allPipetteConfig": "All Pipette Config",
   "__dev_internal__enableBundleUpload": "Enable Bundle Upload",
-  "__dev_internal__enableLiquidSetup": "Enable Liquid Setup",
   "__dev_internal__enableChangePipetteWizard": "Enable Change Pipette Wizard",
   "__dev_internal__enableCalibrationWizards": "Enable Re-skinned Calibration Wizards",
   "__dev_internal__enableManualDeckStateModification": "Enable Manual Deck State Modification",

@@ -38,7 +38,6 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
   const { commands, liquids, labware = [] } = props
   const robotType = getRobotTypeFromLoadedLabware(labware)
   const deckDef = getDeckDefFromRobotType(robotType)
-  const liquidSetupEnabled = useFeatureFlag('enableLiquidSetup')
   const initialLoadedLabwareBySlot = parseInitialLoadedLabwareBySlot(commands)
   const initialLoadedModulesBySlot = parseInitialLoadedModulesBySlot(commands)
   const initialLoadedLabwareByModuleId = parseInitialLoadedLabwareByModuleId(
@@ -81,7 +80,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
             ? labwareInModule.result.labwareId
             : labwareId
           const wellFill =
-            labwareId && liquids != null && liquidSetupEnabled
+            labwareId && liquids != null
               ? getWellFillFromLabwareId(
                   labwareId,
                   liquidsInLoadOrder,

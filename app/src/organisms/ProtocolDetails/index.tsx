@@ -45,7 +45,6 @@ import { StyledText } from '../../atoms/text'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { Modal } from '../../molecules/Modal'
 import { useTrackEvent } from '../../redux/analytics'
-import { useFeatureFlag } from '../../redux/config'
 import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
 import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
@@ -253,7 +252,6 @@ export function ProtocolDetails(
     getIsProtocolAnalysisInProgress(state, protocolKey)
   )
   const analysisStatus = getAnalysisStatus(isAnalyzing, mostRecentAnalysis)
-  const liquidSetupEnabled = useFeatureFlag('enableLiquidSetup')
   if (analysisStatus === 'missing') return null
 
   const { left: leftMountPipetteName, right: rightMountPipetteName } =
@@ -596,8 +594,7 @@ export function ProtocolDetails(
                   {t('labware')}
                 </StyledText>
               </RoundTab>
-              {liquidSetupEnabled &&
-                mostRecentAnalysis != null &&
+              {mostRecentAnalysis != null &&
                 protocolHasLiquids(mostRecentAnalysis) && (
                   <RoundTab
                     data-testid="ProtocolDetails_liquids"
