@@ -3,7 +3,7 @@ import pytest
 from typing import Optional
 
 from opentrons.motion_planning.types import MoveType
-from opentrons.protocol_engine.state import motion_utils as subject
+from opentrons.protocol_engine.state import move_types as subject
 from opentrons.protocol_engine.state.pipettes import CurrentWell
 
 

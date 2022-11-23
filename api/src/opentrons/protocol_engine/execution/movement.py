@@ -135,8 +135,9 @@ class MovementHandler:
             minimum_z_height=minimum_z_height,
         )
 
-        if not speed:
-            speed = self._state_store.pipettes.get_movement_speed(pipette_id=pipette_id)
+        speed = self._state_store.pipettes.get_movement_speed(
+            pipette_id=pipette_id, requested_speed=speed
+        )
 
         # move through the waypoints
         for waypoint in waypoints:
@@ -275,8 +276,9 @@ class MovementHandler:
             additional_min_travel_z=additional_min_travel_z,
         )
 
-        if not speed:
-            speed = self._state_store.pipettes.get_movement_speed(pipette_id=pipette_id)
+        speed = self._state_store.pipettes.get_movement_speed(
+            pipette_id=pipette_id, requested_speed=speed
+        )
 
         # move through the waypoints
         for waypoint in waypoints:

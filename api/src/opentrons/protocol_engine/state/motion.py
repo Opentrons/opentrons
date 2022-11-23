@@ -10,7 +10,7 @@ from opentrons.motion_planning.adjacent_slots_getters import (
 )
 from opentrons import motion_planning
 
-from . import motion_utils
+from . import move_types
 from .. import errors
 from ..types import WellLocation
 from .labware import LabwareView
@@ -96,7 +96,7 @@ class MotionView:
         )
         destination_cp = CriticalPoint.XY_CENTER if center_destination else None
 
-        move_type = motion_utils.get_move_type_to_well(
+        move_type = move_types.get_move_type_to_well(
             pipette_id, labware_id, well_name, location, force_direct
         )
         min_travel_z = self._geometry.get_min_travel_z(

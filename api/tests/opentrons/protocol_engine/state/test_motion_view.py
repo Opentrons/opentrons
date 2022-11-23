@@ -1,4 +1,6 @@
 """Test state getters for retrieving motion planning views of state."""
+import inspect
+
 import pytest
 from decoy import Decoy
 
@@ -13,7 +15,7 @@ from opentrons.protocol_engine.types import (
     LoadedPipette,
     DeckSlotLocation,
 )
-from opentrons.protocol_engine.state import PipetteLocationData, motion_utils
+from opentrons.protocol_engine.state import PipetteLocationData, move_types
 from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.pipettes import PipetteView, CurrentWell
 from opentrons.protocol_engine.state.geometry import GeometryView
@@ -36,10 +38,10 @@ def patch_mock_get_waypoints(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> N
 
 
 @pytest.fixture(autouse=True)
-def patch_mock_get_move_type(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Replace motion_utils.get_waypoints() with a mock."""
-    mock_get_move_type = decoy.mock(func=motion_utils.get_move_type_to_well)
-    monkeypatch.setattr(motion_utils, "get_move_type_to_well", mock_get_move_type)
+def patch_mock_move_types(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Mock out move_types.py functions."""
+    for name, func in inspect.getmembers(move_types, inspect.isfunction):
+        monkeypatch.setattr(move_types, name, decoy.mock(func=func))
 
 
 @pytest.fixture
@@ -211,7 +213,7 @@ def test_get_movement_waypoints_to_well(
     ).then_return(Point(x=4, y=5, z=6))
 
     decoy.when(
-        motion_utils.get_move_type_to_well(
+        move_types.get_move_type_to_well(
             "pipette-id", "labware-id", "well-name", location, True
         )
     ).then_return(motion_planning.MoveType.GENERAL_ARC)
