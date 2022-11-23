@@ -35,6 +35,7 @@ from opentrons.protocol_engine.execution.heater_shaker_movement_flagger import (
 
 from opentrons.protocol_engine.execution.labware_movement import (
     LabwareMovementHandler,
+    ExperimentalOffsetData,
 )
 from opentrons.protocol_engine.errors import (
     HardwareNotSupportedError,
@@ -72,6 +73,14 @@ def heater_shaker_movement_flagger(decoy: Decoy) -> HeaterShakerMovementFlagger:
     """Get a mocked out HeaterShakerMovementFlagger instance."""
     return decoy.mock(cls=HeaterShakerMovementFlagger)
 
+def default_experimental_movement_data() -> ExperimentalOffsetData:
+    """Experimental movement data with default values."""
+    return ExperimentalOffsetData(
+        usePickUpLocationLpcOffset=False,
+        useDropLocationLpcOffset=False,
+        pickUpOffset=None,
+        dropOffset=None,
+    )
 
 @pytest.mark.ot3_only
 @pytest.fixture
@@ -223,6 +232,7 @@ async def test_labware_movement_raises_on_ot2(
             current_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
             new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             new_offset_id=None,
+            experimental_offset_data=
         )
 
 
@@ -240,6 +250,7 @@ async def test_labware_movement_skips_for_virtual_gripper(
         labware_id="labware-id",
         current_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
         new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        experimental_offset_data=default_experimental_movement_data(),
         new_offset_id=None,
     )
     decoy.verify(
