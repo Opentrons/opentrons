@@ -99,7 +99,6 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
             f"jaw displacement {round(mm, 1)} mm exceeds max expected value: "
             f"{max_mm} mm"
         )
-        self._log.warning(f"jaw displacement = {mm}")
         self._current_jaw_displacement = mm
 
     def _max_jaw_displacement(self) -> float:
@@ -152,9 +151,11 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
             raise RuntimeError("must attach a probe before starting calibration")
         if self.state != GripperJawState.GRIPPING:
             raise RuntimeError("must grip the jaws before starting calibration")
+        if self.current_jaw_displacement == 0.0:
+            raise RuntimeError(f"must grip the jaws before starting calibration (jaw displacement is {self.current_jaw_displacement})")
         if self.current_jaw_displacement > self._max_jaw_displacement() - 1:
             raise RuntimeError(
-                "must hold something between gripper jaws during calibration"
+                f"must hold something between gripper jaws during calibration (jaw displacement is {self.current_jaw_displacement})"
             )
 
     def critical_point(self, cp_override: Optional[CriticalPoint] = None) -> Point:
@@ -182,14 +183,14 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
             return (
                 self._front_calibration_pin_offset
                 + Point(*self._calibration_offset.offset)
-                - Point(y=self.current_jaw_displacement)
+                + Point(y=self.current_jaw_displacement)
             )
         elif cp == CriticalPoint.GRIPPER_REAR_CALIBRATION_PIN:
             self.check_calibration_pin_location_is_accurate()
             return (
                 self._rear_calibration_pin_offset
                 + Point(*self._calibration_offset.offset)
-                + Point(y=self.current_jaw_displacement)
+                - Point(y=self.current_jaw_displacement)
             )
         else:
             raise InvalidMoveError(f"Critical point {cp_override} is not valid")

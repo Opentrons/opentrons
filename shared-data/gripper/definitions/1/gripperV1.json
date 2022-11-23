@@ -49,12 +49,12 @@
   },
   "pinOneOffsetFromBase": {
     "x": 4,
-    "y": -41,
+    "y": -57,
     "z": -100.475
   },
   "pinTwoOffsetFromBase": {
     "x": 4,
-    "y": 41,
+    "y": 57,
     "z": -100.475
   },
   "quirks": [],

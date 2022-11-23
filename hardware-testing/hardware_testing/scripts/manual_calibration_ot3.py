@@ -50,7 +50,7 @@ def _get_instrument_id(api: OT3API, mount: OT3Mount) -> str:
 async def _test_gripper_calibration_with_block(api: OT3API, pos: Point) -> None:
     input("add the calibration block to the slot, then press ENTER")
     await api.home_gripper_jaw()
-    await api.move_to(OT3Mount.GRIPPER, pos, critical_point=CriticalPoint.GRIPPER_JAW_CENTER)
+    await api.move_to(OT3Mount.GRIPPER, pos)
     while True:
         res = input('"w"=GRIP-WIDTH; "g"=GRIP-FORCE; "u"=UNGRIP; "z"=JOG-Z; "s"=STOP ')
         res = res.strip().lower()
@@ -81,18 +81,13 @@ async def _test_gripper_calibration_with_block(api: OT3API, pos: Point) -> None:
 
 
 async def _test_current_calibration(api: OT3API, mount: OT3Mount, pos: Point) -> None:
-    cp: Optional[CriticalPoint] = None
-    if mount == OT3Mount.GRIPPER:
-        cp = CriticalPoint.GRIPPER_JAW_CENTER
-
-    current_pos = await api.gantry_position(mount, critical_point=cp)
-    await api.move_to(mount, pos._replace(z=current_pos.z), critical_point=cp)
-
+    current_pos = await api.gantry_position(mount)
+    await api.move_to(mount, pos._replace(z=current_pos.z))
     if mount == OT3Mount.GRIPPER:
         await _test_gripper_calibration_with_block(api, pos)
     else:
         input("ENTER to move to center of slot to test Pipette calibration")
-        await api.move_to(mount, pos, critical_point=cp)
+        await api.move_to(mount, pos)
 
 
 async def _jog_axis(
@@ -123,52 +118,50 @@ async def _find_square_center(
     api: OT3API,
     mount: OT3Mount,
     expected_pos: Point,
-    critical_point: Optional[CriticalPoint] = None,
 ) -> Point:
     # Move above slot Z center
     z_probe_pos = _get_z_probe_pos(expected_pos)
-    current_position = await api.gantry_position(mount, critical_point=critical_point)
+    current_position = await api.gantry_position(mount)
     above_point = z_probe_pos._replace(z=current_position.z)
-    await api.move_to(mount, above_point, critical_point=critical_point)
+    await api.move_to(mount, above_point)
     input("\nRemove all items from deck and press ENTER\n")
     await api.move_to(
-        mount, z_probe_pos + Point(z=SAFE_Z), critical_point=critical_point
+        mount, z_probe_pos + Point(z=SAFE_Z)
     )
 
     # Jog gantry to find deck height
     print("\n--> Jog to find Z position")
     await _jog_axis(api, mount, OT3Axis.by_mount(mount), -1)
-    current_position = await api.gantry_position(mount, critical_point=critical_point)
+    current_position = await api.gantry_position(mount)
     await api.move_rel(mount, Point(z=SAFE_Z))
     deck_height = float(current_position.z)
     print(f"Found Z = {deck_height}mm")
 
     # Move to slot center
-    current_position = await api.gantry_position(mount, critical_point=critical_point)
+    current_position = await api.gantry_position(mount)
     await api.move_to(
         mount,
         expected_pos._replace(z=current_position.z),
-        critical_point=critical_point,
     )
     input("\nPress ENTER to calibrate XY axes")
     xy_start_pos = expected_pos._replace(z=deck_height - 1)
-    await api.move_to(mount, xy_start_pos, critical_point=critical_point)
+    await api.move_to(mount, xy_start_pos)
 
     probe_radius = helpers_ot3.CALIBRATION_PROBE_EVT.diameter / 2
 
     # move to the RIGHT until we hit the square edge
     await _jog_axis(api, mount, OT3Axis.X, 1)
-    current_position = await api.gantry_position(mount, critical_point=critical_point)
+    current_position = await api.gantry_position(mount)
     right_square = current_position.x + probe_radius
     x_center = right_square - (helpers_ot3.CALIBRATION_SQUARE_EVT.width / 2)
     print(f"Found X = {x_center}mm")
 
     # move back to center of square
-    await api.move_to(mount, xy_start_pos, critical_point=critical_point)
+    await api.move_to(mount, xy_start_pos)
 
     # move to the FRONT until we hit the square edge
     await _jog_axis(api, mount, OT3Axis.Y, -1)
-    current_position = await api.gantry_position(mount, critical_point=critical_point)
+    current_position = await api.gantry_position(mount)
     bottom_square = current_position.y - probe_radius
     y_center = bottom_square + (helpers_ot3.CALIBRATION_SQUARE_EVT.height / 2)
     print(f"Found Y = {y_center}mm")
@@ -190,7 +183,6 @@ async def _find_square_center_of_gripper_jaw(api: OT3API, expected_pos: Point) -
     #        position is never read back. This is bad for calibration.
     await api.grip(GRIP_FORCE_CALIBRATION)
     api.add_gripper_probe(GripperProbe.FRONT)
-    api._gripper_handler.check_ready_for_calibration()
     found_square_front = await _find_square_center(
         api,
         OT3Mount.GRIPPER,
