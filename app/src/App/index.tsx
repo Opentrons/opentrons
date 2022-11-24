@@ -137,7 +137,7 @@ export const AppComponent = (): JSX.Element => {
 
   return (
     <>
-      <GlobalStyle isOnDevice />
+      <GlobalStyle isOnDevice={isOnDevice} />
       <Flex
         position={POSITION_FIXED}
         flexDirection={DIRECTION_ROW}
