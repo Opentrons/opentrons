@@ -93,6 +93,7 @@ class CanLoopback:
         self._mock_notifier = mock_notifier
         self._responders: List[CanLoopback.LoopbackResponder] = []
         self._mock_messenger.send.side_effect = self._listener
+        self._mock_messenger.ensure_send.side_effect = self._ensure_listener
 
     def _listener(self, node_id: NodeId, message: MessageDefinition) -> None:
         for responder in self._responders:
@@ -108,6 +109,15 @@ class CanLoopback:
                         )
                     ),
                 )
+
+    def _ensure_listener(
+        self,
+        node_id: NodeId,
+        message: MessageDefinition,
+        timeout: float = 3,
+        expected_nodes: List[NodeId] = [],
+    ) -> None:
+        self._listener(node_id, message)
 
     def add_responder(self, responder: "CanLoopback.LoopbackResponder") -> None:
         """Add a responder."""

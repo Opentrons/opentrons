@@ -2,7 +2,8 @@
 from __future__ import annotations
 import asyncio
 from inspect import Traceback
-from typing import Optional, Callable, Tuple, Dict
+from typing import Optional, Callable, Tuple, Dict, Union, List
+
 import logging
 
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
@@ -11,16 +12,30 @@ from opentrons_hardware.firmware_bindings.arbitration_id import (
     ArbitrationIdParts,
 )
 from opentrons_hardware.firmware_bindings.message import CanMessage
+from opentrons_hardware.firmware_bindings.utils.binary_serializable import (
+    BinarySerializable,
+)
+
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     MessageId,
     FunctionCode,
+    ErrorSeverity,
+    ErrorCode,
+)
+
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    Acknowledgement,
+    ErrorMessage,
 )
 
 from opentrons_hardware.firmware_bindings.messages.messages import (
     MessageDefinition,
     get_definition,
 )
+
+from opentrons_hardware.firmware_bindings.messages.payloads import ErrorMessagePayload
+
 from opentrons_hardware.firmware_bindings.utils import BinarySerializableException
 
 log = logging.getLogger(__name__)
@@ -32,6 +47,111 @@ MessageListenerCallback = Callable[[MessageDefinition, ArbitrationId], None]
 
 MessageListenerCallbackFilter = Callable[[ArbitrationId], bool]
 """A function used to filter incoming messages. Returns true to accept message."""
+
+
+_AckResponses = Union[ErrorMessage, Acknowledgement]
+_AckPacket = Tuple[ArbitrationId, _AckResponses]
+_Acks = List[_AckPacket]
+_AckIdFilter = [MessageId.acknowledgement, MessageId.error_message]
+
+_Basic_Nodes: List[NodeId] = [NodeId.gantry_x, NodeId.gantry_y, NodeId.head]
+_Gripper_SubNodes: List[NodeId] = [NodeId.gripper_g, NodeId.gripper_z]
+_Head_SubNodes: List[NodeId] = [NodeId.head_l, NodeId.head_r]
+
+
+class AcknowledgeListener:
+    """Helper clas for CanMessenger to listen for Acks back from commands."""
+
+    def __init__(
+        self,
+        can_messenger: CanMessenger,
+        node_id: NodeId,
+        message: MessageDefinition,
+        timeout: float,
+        expected_nodes: List[NodeId],
+    ) -> None:
+        """Build this listener class and ready the queue."""
+        self._can_messenger = can_messenger
+        self._node_id = node_id
+        self._message = message
+        self._timeout = timeout
+        self._event = asyncio.Event()
+        # todo add ability to know how many nodes will ack to a broadcast
+        # we can assume at least 3 for the gantry and head boards
+        self._expected_nodes = expected_nodes
+        self._expected_gripper_subnodes = (
+            _Gripper_SubNodes.copy() if NodeId.gripper in expected_nodes else []
+        )
+        self._expected_head_subnodes = (
+            _Head_SubNodes.copy() if NodeId.head in expected_nodes else []
+        )
+        self._ack_queue: asyncio.Queue[_AckPacket] = asyncio.Queue()
+
+    def __call__(
+        self, message: MessageDefinition, arbitration_id: ArbitrationId
+    ) -> None:
+        """Called by can messenger when a message arrives."""
+        if isinstance(message, Acknowledgement) or isinstance(message, ErrorMessage):
+            self.handle_ack(message, arbitration_id)
+
+    def handle_ack(self, message: _AckResponses, arbitration_id: ArbitrationId) -> None:
+        """Add the ack to the queue if it matches the message_index of the sent message."""
+        if message.payload.message_index == self._message.payload.message_index:
+            if arbitration_id.parts.originating_node_id in self._expected_nodes:
+                self._expected_nodes.remove(arbitration_id.parts.originating_node_id)
+            # this is a bit of a hack, some nodes don't responde with the same originating nodes
+            # and respond with their subnodes instead, this should take care of that
+            # by removing the higher order node when all the subnodes respond
+            elif (
+                arbitration_id.parts.originating_node_id
+                in self._expected_gripper_subnodes
+            ):
+                self._expected_gripper_subnodes.remove(
+                    arbitration_id.parts.originating_node_id
+                )
+                if len(self._expected_gripper_subnodes) == 0:
+                    self._expected_nodes.remove(NodeId.gripper)
+            elif (
+                arbitration_id.parts.originating_node_id in self._expected_head_subnodes
+            ):
+                self._expected_head_subnodes.remove(
+                    arbitration_id.parts.originating_node_id
+                )
+                if len(self._expected_head_subnodes) == 0:
+                    self._expected_nodes.remove(NodeId.head)
+            self._ack_queue.put_nowait((arbitration_id, message))
+        # If we've recieved all responses exit the listener
+        if len(self._expected_nodes) == 0:
+            self._event.set()
+
+    async def send_and_verify_recieved(self) -> ErrorCode:
+        """Send the message and wait for an Ack."""
+        try:
+            self._can_messenger.add_listener(
+                self,
+                lambda arbitration_id: bool(
+                    arbitration_id.parts.message_id in _AckIdFilter
+                ),
+            )
+            self._event.clear()
+            await self._can_messenger.send(self._node_id, self._message)
+            await asyncio.wait_for(
+                self._event.wait(),
+                max(1.0, self._timeout),
+            )
+        except asyncio.TimeoutError:
+            log.error(
+                f"Message did not receive ack for message index {self._message.payload.message_index}"
+            )
+            return ErrorCode.timeout
+        finally:
+            self._can_messenger.remove_listener(self)
+
+        while not self._ack_queue.empty():
+            ack = self._ack_queue.get_nowait()
+            if isinstance(ack, ErrorMessage):
+                return ack.payload.error_code.value
+        return ErrorCode.ok
 
 
 class CanMessenger:
@@ -79,6 +199,30 @@ class CanMessenger:
         await self._drive.send(
             message=CanMessage(arbitration_id=arbitration_id, data=data)
         )
+
+    async def ensure_send(
+        self,
+        node_id: NodeId,
+        message: MessageDefinition,
+        timeout: float = 3,
+        expected_nodes: List[NodeId] = [],
+    ) -> ErrorCode:
+        """Send a message and wait for the ack."""
+        if len(expected_nodes) == 0:
+            log.warning("Expected Nodes should have been specified")
+            if node_id == NodeId.broadcast:
+                expected_nodes = _Basic_Nodes.copy()
+            else:
+                expected_nodes = [node_id]
+
+        listener = AcknowledgeListener(
+            can_messenger=self,
+            node_id=node_id,
+            message=message,
+            timeout=timeout,
+            expected_nodes=expected_nodes,
+        )
+        return await listener.send_and_verify_recieved()
 
     async def __aenter__(self) -> CanMessenger:
         """Start messenger."""
@@ -146,12 +290,36 @@ class CanMessenger:
                     )
                     for listener, filter in self._listeners.values():
                         if filter and not filter(message.arbitration_id):
+                            log.debug("message ignored by filter")
                             continue
                         listener(message_definition(payload=build), message.arbitration_id)  # type: ignore[arg-type]
+                    if message.arbitration_id == MessageId.error_message:
+                        self._handle_error(build)
                 except BinarySerializableException:
                     log.exception(f"Failed to build from {message}")
             else:
                 log.error(f"Message {message} is not recognized.")
+
+    def _handle_error(self, build: BinarySerializable) -> None:
+        err_msg = ErrorMessage(payload=build)  # type: ignore[arg-type]
+        error_payload: ErrorMessagePayload = err_msg.payload
+        error_name = ""
+        if error_payload.error_code.value in [err.value for err in ErrorCode]:
+            error_name = str(ErrorCode(error_payload.error_code.value).name)
+        else:
+            error_name = "UNKNOWN ERROR"
+        if error_payload.severity == ErrorSeverity.WARNING:
+            log.warning(f"recived a firmware warning {error_name}")
+        elif error_payload.severity == ErrorSeverity.RECOVERABLE:
+            log.error(f"recived a firmware recoverable error {error_name}")
+        elif error_payload.severity == ErrorSeverity.UNRECOVERABLE:
+            log.critical(f"recived a firmware critical error {error_name}")
+
+        if error_payload.message_index == 0:
+            log.error(
+                f"error {str(err_msg)} recieved is asyncronous, raising exception"
+            )
+            raise RuntimeError("Async firmware error", str(err_msg))
 
 
 class WaitableCallback:
