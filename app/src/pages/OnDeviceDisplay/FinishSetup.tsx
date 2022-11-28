@@ -9,6 +9,7 @@ import {
   ALIGN_CENTER,
   SPACING,
   TYPOGRAPHY,
+  COLORS,
 } from '@opentrons/components'
 
 import { getLocalRobot } from '../../redux/discovery'
@@ -25,7 +26,12 @@ export function FinishSetup(): JSX.Element {
   return (
     <Flex padding={SPACING.spacingXXL} flexDirection={DIRECTION_COLUMN}>
       <Flex justifyContent={JUSTIFY_CENTER} marginBottom="3.041875rem">
-        <StyledText css={TYPOGRAPHY.oddHeaderDefault}>
+        <StyledText
+          fontSize="2rem"
+          fontWeight="700"
+          lineHeight="2.75rem"
+          color={COLORS.black}
+        >
           {t('name_love_it', { name: robotName })}
         </StyledText>
       </Flex>
