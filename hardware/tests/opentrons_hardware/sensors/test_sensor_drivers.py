@@ -251,8 +251,10 @@ async def test_write(
     )
     messenger = mock.AsyncMock(spec=CanMessenger)
     await sensor_driver.write(messenger, sensor_type, data)
-    messenger.send.assert_called_once_with(
-        node_id=sensor_type.sensor.node_id, message=message
+    messenger.ensure_send.assert_called_once_with(
+        node_id=sensor_type.sensor.node_id,
+        message=message,
+        expected_nodes=[sensor_type.sensor.node_id],
     )
 
 
