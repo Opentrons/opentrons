@@ -152,7 +152,9 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
         if self.state != GripperJawState.GRIPPING:
             raise RuntimeError("must grip the jaws before starting calibration")
         if self.current_jaw_displacement == 0.0:
-            raise RuntimeError(f"must grip the jaws before starting calibration (jaw displacement is {self.current_jaw_displacement})")
+            raise RuntimeError(
+                f"must grip the jaws before starting calibration (jaw displacement is {self.current_jaw_displacement})"
+            )
         if self.current_jaw_displacement > self._max_jaw_displacement() - 1:
             raise RuntimeError(
                 f"must hold something between gripper jaws during calibration (jaw displacement is {self.current_jaw_displacement})"

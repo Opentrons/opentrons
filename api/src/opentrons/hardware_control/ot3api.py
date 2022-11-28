@@ -670,9 +670,22 @@ class OT3API(
         fail_on_not_homed: bool = False,
     ) -> Dict[Axis, float]:
         """
-        Return the encoder position in relative coords specified mount.
-        TODO: CF Might want to make these coordinates to absolute in deck
-        coordinates
+        Return the encoder position in absolute deck coords specified mount.
+        """
+        ot3pos = await self.encoder_current_position_ot3(
+            mount, critical_point, refresh, fail_on_not_homed
+        )
+        return {ot3ax.to_axis(): value for ot3ax, value in ot3pos.items()}
+
+    async def encoder_current_position_ot3(
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        critical_point: Optional[CriticalPoint] = None,
+        refresh: bool = False,
+        fail_on_not_homed: bool = False,
+    ) -> Dict[OT3Axis, float]:
+        """
+        Return the encoder position in absolute deck coords specified mount.
         """
         z_ax = OT3Axis.by_mount(mount)
         plunger_ax = OT3Axis.of_main_tool_actuator(mount)
@@ -698,7 +711,7 @@ class OT3API(
                 self._encoder_current_position,
                 critical_point,
             )
-            return {ot3ax.to_axis(): value for ot3ax, value in ot3pos.items()}
+            return ot3pos
 
     def _effector_pos_from_carriage_pos(
         self,
