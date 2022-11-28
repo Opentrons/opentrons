@@ -184,7 +184,7 @@ describe('RobotSettings RenameRobotSlideout', () => {
       expect(error).toBeInTheDocument()
     })
   })
-  // TODO: kj   The following test case will be tested in the future
+  // TODO: kj The following test case will be tested in the future
   // it('should close the slideout when a user change the name successfully', () => {
   //   const [{ getByRole }, store] = render()
   //   expect(store.dispatch).toHaveBeenCalledWith(removeRobot('otie'))

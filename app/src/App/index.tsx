@@ -12,6 +12,7 @@ import {
   COLORS,
   OVERFLOW_SCROLL,
 } from '@opentrons/components'
+import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { GlobalStyle } from '../atoms/GlobalStyle'
 import { Alerts } from '../organisms/Alerts'
@@ -29,6 +30,8 @@ import { InitialSplash } from '../pages/OnDeviceDisplay/InitialSplash'
 import { ConnectedNetworkInfo } from '../pages/OnDeviceDisplay/ConnectedNetworkInfo'
 import { SelectNetwork } from '../pages/OnDeviceDisplay/SelectNetwork'
 import { SetWifiCred } from '../pages/OnDeviceDisplay/SetWifiCred'
+import { NameRobot } from '../pages/OnDeviceDisplay/NameRobot'
+import { FinishSetup } from '../pages/OnDeviceDisplay/FinishSetup'
 import { getIsOnDevice } from '../redux/config'
 import { getLocalRobot } from '../redux/discovery'
 import { useSoftwareUpdatePoll } from './hooks'
@@ -131,6 +134,18 @@ export const AppComponent = (): JSX.Element => {
       name: 'Connected Network Info',
       path: '/connected-network-info/:ssid',
     },
+    {
+      Component: NameRobot,
+      exact: true,
+      name: 'Name robot',
+      path: '/name-robot',
+    },
+    {
+      Component: FinishSetup,
+      exact: true,
+      name: 'Finish setup',
+      path: '/finish-setup',
+    },
   ]
 
   const routes = isOnDevice ? onDeviceDisplayRoutes : allRoutes
@@ -150,26 +165,31 @@ export const AppComponent = (): JSX.Element => {
         {isOnDevice ? (
           <>
             <Box width="100%">
-              <Switch>
-                {routes.map(({ Component, exact, path }: RouteProps) => {
-                  return (
-                    <Route key={path} exact={exact} path={path}>
-                      <Box
-                        position={POSITION_RELATIVE}
-                        width="100%"
-                        height="100%"
-                        backgroundColor={COLORS.fundamentalsBackground}
-                        overflow={OVERFLOW_SCROLL}
-                      >
-                        <ModalPortalRoot />
-                        <Component />
-                      </Box>
-                    </Route>
-                  )
-                })}
-                <Redirect to="/device-setup" />
-              </Switch>
-              <Alerts />
+              <ApiHostProvider
+                hostname={localRobot?.ip ?? null}
+                port={localRobot?.port ?? null}
+              >
+                <Switch>
+                  {routes.map(({ Component, exact, path }: RouteProps) => {
+                    return (
+                      <Route key={path} exact={exact} path={path}>
+                        <Box
+                          position={POSITION_RELATIVE}
+                          width="100%"
+                          height="100%"
+                          backgroundColor={COLORS.fundamentalsBackground}
+                          overflow={OVERFLOW_SCROLL}
+                        >
+                          <ModalPortalRoot />
+                          <Component />
+                        </Box>
+                      </Route>
+                    )
+                  })}
+                  <Redirect to="/name-robot" />
+                </Switch>
+                <Alerts />
+              </ApiHostProvider>
             </Box>
           </>
         ) : (

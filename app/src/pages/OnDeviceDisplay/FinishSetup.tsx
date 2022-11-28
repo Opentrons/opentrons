@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useParams } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 import {
   Flex,
@@ -11,17 +11,17 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import { getLocalRobot } from '../../redux/discovery'
 import { StyledText } from '../../atoms/text'
 import { PrimaryButton } from '../../atoms/buttons'
 import screenImage from '../../assets/images/odd/odd_abstract@x2.png'
-
-import type { NavRouteParams } from '../../App/types'
 
 const IMAGE_ALT = 'finish setting up a robot'
 
 export function FinishSetup(): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const { robotName } = useParams<NavRouteParams>()
+  const localRobot = useSelector(getLocalRobot)
+  const robotName = localRobot?.name
   return (
     <Flex padding={SPACING.spacingXXL} flexDirection={DIRECTION_COLUMN}>
       <Flex justifyContent={JUSTIFY_CENTER} marginBottom="3.041875rem">
@@ -46,7 +46,7 @@ export function FinishSetup(): JSX.Element {
           </StyledText>
           <PrimaryButton
             marginTop={SPACING.spacingXXL}
-            onClick={() => console.log('move to a screen')}
+            onClick={() => console.log('not designed yet')}
             width="100%"
             height="4.375rem"
             fontSize="1.5rem"
