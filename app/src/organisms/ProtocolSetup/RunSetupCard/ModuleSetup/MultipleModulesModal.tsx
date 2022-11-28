@@ -68,6 +68,8 @@ export const MultipleModulesModal = (
               <StyledText as="p">{t('multiple_modules_example')}</StyledText>
             </Flex>
             <img
+              height="326px"
+              width="288px"
               src={multipleModuleHelp}
               style={{ marginBottom: SPACING.spacing4 }}
             />

@@ -63,11 +63,10 @@ export const SecureLabwareModal = (
                 />
               </Flex>
               <img
+                width="288px"
+                height="326px"
                 src={secureMagModBracketImage}
-                style={{
-                  marginBottom: SPACING.spacing6,
-                  marginRight: SPACING.spacing4,
-                }}
+                style={{ marginTop: '-2rem' }}
               />
             </Flex>
           )}
@@ -79,7 +78,12 @@ export const SecureLabwareModal = (
               <StyledText as="p" marginRight="3.625rem">
                 {t(`secure_labware_explanation_${snakeCase(moduleName)}`)}
               </StyledText>
-              <img src={secureTCLatchImage} />
+              <img
+                src={secureTCLatchImage}
+                width="288px"
+                height="326px"
+                style={{ marginTop: '-2rem' }}
+              />
             </Flex>
           )}
           <PrimaryButton
