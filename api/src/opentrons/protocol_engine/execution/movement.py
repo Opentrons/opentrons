@@ -77,6 +77,9 @@ class MovementHandler:
         well_name: str,
         well_location: Optional[WellLocation] = None,
         current_well: Optional[CurrentWell] = None,
+        force_direct: bool = False,
+        minimum_z_height: Optional[float] = None,
+        speed: Optional[float] = None,
     ) -> None:
         """Move to a specific well."""
         await self._tc_movement_flagger.raise_if_labware_in_non_open_thermocycler(
@@ -128,9 +131,13 @@ class MovementHandler:
             origin_cp=origin_cp,
             max_travel_z=max_travel_z,
             current_well=current_well,
+            force_direct=force_direct,
+            minimum_z_height=minimum_z_height,
         )
 
-        speed = self._state_store.pipettes.get_movement_speed(pipette_id=pipette_id)
+        speed = self._state_store.pipettes.get_movement_speed(
+            pipette_id=pipette_id, requested_speed=speed
+        )
 
         # move through the waypoints
         for waypoint in waypoints:
@@ -236,6 +243,7 @@ class MovementHandler:
         deck_coordinates: DeckPoint,
         direct: bool,
         additional_min_travel_z: Optional[float],
+        speed: Optional[float] = None,
     ) -> None:
         """Move pipette to a given deck coordinate."""
         pipette_location = self._state_store.motion.get_pipette_location(
@@ -268,7 +276,9 @@ class MovementHandler:
             additional_min_travel_z=additional_min_travel_z,
         )
 
-        speed = self._state_store.pipettes.get_movement_speed(pipette_id=pipette_id)
+        speed = self._state_store.pipettes.get_movement_speed(
+            pipette_id=pipette_id, requested_speed=speed
+        )
 
         # move through the waypoints
         for waypoint in waypoints:

@@ -280,24 +280,8 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         minimum_z_height: Optional[float],
         speed: Optional[float],
     ) -> None:
-        if speed is not None:
-            raise NotImplementedError(
-                "InstrumentCore.move_to with explicit speed not implemented"
-            )
-
-        if well_core is not None and (
-            force_direct is True or minimum_z_height is not None
-        ):
-            raise NotImplementedError(
-                "InstrumentCore.move_to with well and extra move parameters not implemented"
-            )
 
         if well_core is not None:
-            if force_direct is True or minimum_z_height is not None:
-                raise NotImplementedError(
-                    "InstrumentCore.move_to with well and extra move parameters not implemented"
-                )
-
             labware_id = well_core.labware_id
             well_name = well_core.get_name()
             well_location = (
@@ -313,6 +297,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 labware_id=labware_id,
                 well_name=well_name,
                 well_location=well_location,
+                minimum_z_height=minimum_z_height,
+                force_direct=force_direct,
+                speed=speed,
             )
         else:
             self._engine_client.move_to_coordinates(
@@ -322,6 +309,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 ),
                 minimum_z_height=minimum_z_height,
                 force_direct=force_direct,
+                speed=speed,
             )
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
