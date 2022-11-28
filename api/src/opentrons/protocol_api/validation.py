@@ -1,4 +1,4 @@
-from typing import List, Dict, Union, Optional
+from typing import List, Dict, Union, Optional, Mapping
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
@@ -152,7 +152,9 @@ def ensure_thermocycler_profile_steps(
     return validated_steps
 
 
-def ensure_valid_labware_offset_vector(offset: Dict[str, float]) -> Dict[str, float]:
+def ensure_valid_labware_offset_vector(
+    offset: Mapping[str, float]
+) -> Mapping[str, float]:
     if isinstance(offset, dict):
         if all([offset.get(axis) for axis in ["x", "y", "z"]]) and all(
             [isinstance(val, (float, int)) for val in offset.values()]

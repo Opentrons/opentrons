@@ -234,15 +234,18 @@ def test_move_labware_to_slot(
     subject: ProtocolContext,
 ) -> None:
     """It should move labware to new slot location."""
+    drop_offset = {"x": 4, "y": 5, "z": 6}
     mock_labware_core = decoy.mock(cls=LabwareCore)
     movable_labware = Labware(implementation=mock_labware_core)
     decoy.when(mock_validation.ensure_deck_slot(42)).then_return(DeckSlotName.SLOT_1)
-
+    decoy.when(
+        mock_validation.ensure_valid_labware_offset_vector(drop_offset)
+    ).then_return({"x": 1, "y": 2, "z": 3})
     subject.move_labware(
         labware=movable_labware,
         new_location=42,
         use_pick_up_location_lpc_offset=True,
-        drop_offset={"x": 1, "y": 2, "z": 3},
+        drop_offset=drop_offset,
     )
     decoy.verify(
         mock_core.move_labware(

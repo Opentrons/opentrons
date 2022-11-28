@@ -12,6 +12,7 @@ from typing import (
     Type,
     Union,
     cast,
+    Mapping,
 )
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
@@ -369,8 +370,8 @@ class ProtocolContext(CommandPublisher):
         use_gripper: bool = False,
         use_pick_up_location_lpc_offset: bool = False,
         use_drop_location_lpc_offset: bool = False,
-        pick_up_offset: Optional[Dict[str, float]] = None,
-        drop_offset: Optional[Dict[str, float]] = None,
+        pick_up_offset: Optional[Mapping[str, float]] = None,
+        drop_offset: Optional[Mapping[str, float]] = None,
     ) -> None:
         """Move a loaded labware to a new location.
 
@@ -413,14 +414,24 @@ class ProtocolContext(CommandPublisher):
             else validation.ensure_deck_slot(new_location)
         )
 
+        _pick_up_offset = (
+            validation.ensure_valid_labware_offset_vector(pick_up_offset)
+            if pick_up_offset
+            else None
+        )
+        _drop_offset = (
+            validation.ensure_valid_labware_offset_vector(drop_offset)
+            if drop_offset
+            else None
+        )
         self._implementation.move_labware(
             labware_core=labware._implementation,
             new_location=location,
             use_gripper=use_gripper,
             use_pick_up_location_lpc_offset=use_pick_up_location_lpc_offset,
             use_drop_location_lpc_offset=use_drop_location_lpc_offset,
-            pick_up_offset=pick_up_offset,
-            drop_offset=drop_offset,
+            pick_up_offset=_pick_up_offset,
+            drop_offset=_drop_offset,
         )
 
     @requires_version(2, 0)
