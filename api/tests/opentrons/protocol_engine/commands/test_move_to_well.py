@@ -23,6 +23,9 @@ async def test_move_to_well_implementation(
         labwareId="123",
         wellName="A3",
         wellLocation=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
+        forceDirect=True,
+        minimumZHeight=4.56,
+        speed=7.89,
     )
 
     result = await subject.execute(data)
@@ -34,5 +37,8 @@ async def test_move_to_well_implementation(
             labware_id="123",
             well_name="A3",
             well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
+            force_direct=True,
+            minimum_z_height=4.56,
+            speed=7.89,
         )
     )

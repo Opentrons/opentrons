@@ -20,7 +20,6 @@ from opentrons.hardware_control import API, NoTipAttachedError, ThreadManagedHar
 from opentrons.hardware_control.instruments import Pipette
 from opentrons.hardware_control.types import Axis
 from opentrons.protocols.advanced_control import transfers as tf
-from opentrons.config.pipette_config import config_names
 from opentrons.protocols.api_support import instrument as instrument_support
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.calibration_storage import types as cs_types
@@ -68,17 +67,6 @@ def get_labware_def(monkeypatch):
         return labware_def
 
     monkeypatch.setattr(papi.labware, "get_labware_definition", dummy_load)
-
-
-@pytest.mark.parametrize("name", config_names)
-def test_load_instrument(name, ctx):
-    assert ctx.loaded_instruments == {}
-    loaded = ctx.load_instrument(name, Mount.LEFT, replace=True)
-    assert ctx.loaded_instruments[Mount.LEFT.name.lower()] == loaded
-    assert loaded.name == name
-    loaded = ctx.load_instrument(name, Mount.RIGHT, replace=True)
-    assert ctx.loaded_instruments[Mount.RIGHT.name.lower()] == loaded
-    assert loaded.name == name
 
 
 async def test_motion(ctx, hardware):
