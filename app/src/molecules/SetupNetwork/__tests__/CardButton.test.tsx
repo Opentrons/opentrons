@@ -35,7 +35,7 @@ describe('CardButton', () => {
       cardHeight: '21rem',
       title: 'Wi-Fi',
       iconName: 'wifi',
-      description: 'connection_description',
+      description: 'Find a network in your lab or enter your own.',
       destinationPath: 'mockPath',
     }
   })

@@ -273,6 +273,8 @@ class PipetteView(HasState[PipetteState]):
         """Get the tiprack ids of attached tip by pipette ids."""
         return self._state.attached_tip_labware_by_id
 
-    def get_movement_speed(self, pipette_id: str) -> Optional[float]:
-        """Return the given pipette's current movement speed."""
-        return self._state.movement_speed_by_id[pipette_id]
+    def get_movement_speed(
+        self, pipette_id: str, requested_speed: Optional[float] = None
+    ) -> Optional[float]:
+        """Return the given pipette's requested or current movement speed."""
+        return requested_speed or self._state.movement_speed_by_id[pipette_id]

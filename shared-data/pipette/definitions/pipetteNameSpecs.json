@@ -621,5 +621,45 @@
       "opentrons/opentrons_96_tiprack_300ul/1",
       "opentrons/opentrons_96_filtertiprack_200ul/1"
     ]
+  },
+  "p1000_96": {
+    "displayName": "P1000 96-Channel GEN1",
+    "displayCategory": "GEN1",
+    "defaultAspirateFlowRate": {
+      "value": 7.85,
+      "min": 3,
+      "max": 812,
+      "valuesByApiLevel": {
+        "2.0": 7.85
+      }
+    },
+    "defaultDispenseFlowRate": {
+      "value": 7.85,
+      "min": 3,
+      "max": 812,
+      "valuesByApiLevel": {
+        "2.0": 7.85
+      }
+    },
+    "defaultBlowOutFlowRate": {
+      "value": 7.85,
+      "min": 3,
+      "max": 812,
+      "valuesByApiLevel": {
+        "2.0": 7.85
+      }
+    },
+    "channels": 8,
+    "minVolume": 1,
+    "maxVolume": 50,
+    "smoothieConfigs": {
+      "stepsPerMM": 2133.33,
+      "homePosition": 230.15,
+      "travelDistance": 80
+    },
+    "defaultTipracks": [
+      "opentrons/opentrons_96_tiprack_300ul/1",
+      "opentrons/opentrons_96_filtertiprack_200ul/1"
+    ]
   }
 }

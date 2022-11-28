@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 import {
   Flex,
@@ -36,7 +35,6 @@ export function CardButton(props: CardButtonProps): JSX.Element {
     description,
     destinationPath,
   } = props
-  const { t } = useTranslation('device_settings')
   const history = useHistory()
 
   return (
@@ -53,14 +51,12 @@ export function CardButton(props: CardButtonProps): JSX.Element {
       backgroundColor={COLORS.medBlue}
       borderRadius="16px"
     >
-      <Flex marginTop="2.5rem">
-        <Icon
-          name={iconName}
-          size="5rem"
-          color={COLORS.blueEnabled}
-          data-testid={`cardButton_icon_${String(iconName)}`}
-        />
-      </Flex>
+      <Icon
+        name={iconName}
+        size="5rem"
+        color={COLORS.blueEnabled}
+        data-testid={`cardButton_icon_${String(iconName)}`}
+      />
       <Flex>
         <StyledText
           fontSize="2rem"
@@ -80,7 +76,7 @@ export function CardButton(props: CardButtonProps): JSX.Element {
           color={COLORS.darkBlackEnabled}
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
-          {t(description)}
+          {description}
         </StyledText>
       </Flex>
     </Btn>
