@@ -7,6 +7,10 @@ import pytest
 from decoy import Decoy, matchers
 from typing import TYPE_CHECKING, Union
 
+from opentrons_shared_data.gripper.constants import (
+    LABWARE_GRIP_FORCE,
+    IDLE_STATE_GRIP_FORCE,
+)
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.types import DeckSlotName, Point
@@ -168,19 +172,20 @@ async def test_move_labware_with_gripper(
     gripper = OT3Mount.GRIPPER
     decoy.verify(
         await ot3_hardware_api.home(axes=[OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.Z_G]),
-        await ot3_hardware_api.home_gripper_jaw(),
         await ot3_hardware_api.move_to(
             mount=gripper, abs_position=expected_waypoints[0]
         ),
         await ot3_hardware_api.move_to(
             mount=gripper, abs_position=expected_waypoints[1]
         ),
+        await ot3_hardware_api.home_gripper_jaw(),
         await ot3_hardware_api.move_to(
             mount=gripper, abs_position=expected_waypoints[2]
         ),
-        await ot3_hardware_api.grip(
-            force_newtons=20
-        ),  # TODO: replace this once we have this spec in hardware control
+        # TODO: see https://opentrons.atlassian.net/browse/RLAB-214
+        await ot3_hardware_api.grip(force_newtons=LABWARE_GRIP_FORCE),
+        # TODO: see https://opentrons.atlassian.net/browse/RLAB-215
+        await ot3_hardware_api.home(axes=[OT3Axis.Z_G]),
         await ot3_hardware_api.move_to(
             mount=gripper, abs_position=expected_waypoints[3]
         ),
@@ -191,9 +196,10 @@ async def test_move_labware_with_gripper(
             mount=gripper, abs_position=expected_waypoints[5]
         ),
         await ot3_hardware_api.ungrip(),
-        await ot3_hardware_api.move_to(
-            mount=gripper, abs_position=expected_waypoints[6]
-        ),
+        # TODO: see https://opentrons.atlassian.net/browse/RLAB-215
+        await ot3_hardware_api.home(axes=[OT3Axis.Z_G]),
+        # TODO: see https://opentrons.atlassian.net/browse/RLAB-214
+        await ot3_hardware_api.grip(force_newtons=IDLE_STATE_GRIP_FORCE),
     )
 
 

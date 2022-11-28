@@ -153,12 +153,13 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
         from opentrons.protocol_api.labware import Labware, Well
 
         edges = build_edges(
-            # TODO(mc, 2022-10-26): respect api_version
-            # https://opentrons.atlassian.net/browse/RSS-97
             where=Well(
-                parent=Labware(implementation=location.get_geometry().parent),
+                parent=Labware(
+                    implementation=location.geometry.parent,
+                    api_version=self._api_version,
+                ),
                 well_implementation=location,
-                api_version=MAX_SUPPORTED_VERSION,
+                api_version=self._api_version,
             ),
             offset=v_offset,
             mount=self._mount,
@@ -179,7 +180,7 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
     ) -> None:
         """Pick up a tip for the pipette to run liquid-handling commands."""
         hw = self._protocol_interface.get_hardware()
-        geometry = well_core.get_geometry()
+        geometry = well_core.geometry
         tip_rack_core = geometry.parent
         tip_length = instrument_support.tip_length_for(
             pipette=self.get_hardware_state(),
@@ -210,7 +211,7 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
             well_core: The well we're dropping into
             home_after: Whether to home the pipette after the tip is dropped.
         """
-        labware_core = well_core.get_geometry().parent
+        labware_core = well_core.geometry.parent
 
         if location is None:
             from opentrons.protocol_api.labware import Labware, Well

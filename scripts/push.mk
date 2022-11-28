@@ -3,6 +3,7 @@
 find_robot=$(shell yarn run -s discovery find -i 169.254)
 default_ssh_key := ~/.ssh/robot_key
 default_ssh_opts := -o stricthostkeychecking=no -o userknownhostsfile=/dev/null
+is-ot3 = $(shell ssh $(if $(2),"-i $(2)") $(3) root@$(1) systemctl status opentrons-robot-app)
 
 # push-python-package: execute a push to the robot of a particular python
 # package.
@@ -13,6 +14,7 @@ default_ssh_opts := -o stricthostkeychecking=no -o userknownhostsfile=/dev/null
 # argument 4 is the path to the wheel file
 
 define push-python-package
+$(if $(is-ot3), echo "This is an OT-3. Use 'make push-ot3' instead." && exit 1)
 scp -i $(2) $(3) "$(4)" root@$(1):/data/$(notdir $(4))
 ssh -i $(2) $(3) root@$(1) \
 "function cleanup () { rm -f /data/$(notdir $(4)) && mount -o remount,ro / ; } ;\
@@ -31,6 +33,7 @@ endef
 # argument 7 is an additional subdir if necessary in the sdist
 # argument 8 is either egg or dist (default egg)
 define push-python-sdist
+$(if $(is-ot3), ,echo "This is an OT-2. Use 'make push' instead." && exit 1)
 scp $(if $(2),"-i $(2)") $(3) $(4) root@$(1):/var/$(notdir $(4))
 ssh $(if $(2),"-i $(2)") $(3) root@$(1) \
 "function cleanup () { rm -f /var/$(notdir $(4)) ; rm -rf /var/$(notdir $(4))-unzip; } ; \

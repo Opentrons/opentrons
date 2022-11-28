@@ -190,6 +190,7 @@ On Windows, we rely on:
 
 - [scoop][] to install general dependencies
 - [Node Version Switcher][nvs] to install and manage Node.js
+- [Visual Studio][visual studio] to run electron-rebuild
 - [pyenv-win][]
   - For the Python side, native Windows development is not supported for most environments.
     - [environments/app](/environments/app) is supported for Windows opentrons and shared-data package testing
@@ -232,6 +233,8 @@ nvs auto
 - `make -C api test-app`
 - `make -C api test-app-cov`
 - `make -C shared-data/python test-app`
+
+#### 3. Install build tools via Visual Studio Installer
 
 ### Linux
 
@@ -316,6 +319,7 @@ Once `make setup` completes, you're ready to start developing! Check out our gen
 [xcode command line tools]: https://developer.apple.com/xcode/resources/
 [scoop]: https://scoop.sh/
 [nvs]: https://github.com/jasongin/nvs
+[visual studio]: https://visualstudio.microsoft.com/downloads/
 [pyenv]: https://github.com/pyenv/pyenv
 [pyenv-win]: https://github.com/pyenv-win/pyenv-win
 [yarn]: https://classic.yarnpkg.com/

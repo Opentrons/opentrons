@@ -78,7 +78,6 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
         flexDirection={DIRECTION_COLUMN}
         justifyContent={JUSTIFY_CENTER}
         marginTop={SPACING.spacing6}
-        gridGap={SPACING.spacing4}
       >
         {enableLiquidSetup ? (
           <>

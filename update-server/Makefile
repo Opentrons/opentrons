@@ -96,5 +96,4 @@ push: wheel
 .PHONY: push-ot3
 push-ot3: sdist
 	$(call push-python-sdist,$(host),,$(br_ssh_opts),dist/$(sdist_file),/opt/opentrons-update-server,otupdate)
-	# todo (seth): enable when this service actually exists
-	#$(call restart-service,$(host),,$(br_ssh_opts),opentrons-update-server)
+	$(call restart-service,$(host),,$(br_ssh_opts),opentrons-update-server)

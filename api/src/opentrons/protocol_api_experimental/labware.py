@@ -181,47 +181,19 @@ class Labware:  # noqa: D101
         return list(self.wells_by_name().values())
 
     def wells_by_name(self) -> Dict[str, Well]:  # noqa: D102
-        if self._wells_by_name is None:
-            wells = self._engine_client.state.labware.get_wells(
-                labware_id=self.labware_id
-            )
-            self._wells_by_name = {
-                well_name: Well(
-                    well_name=well_name,
-                    engine_client=self._engine_client,
-                    labware=self,
-                )
-                for well_name in wells
-            }
-        return self._wells_by_name
+        raise NotImplementedError("opentrons.protocol_api_experimental to be removed")
 
     def rows(self) -> List[List[Well]]:  # noqa: D102
         return list(self.rows_by_name().values())
 
     def rows_by_name(self) -> Dict[str, List[Well]]:  # noqa: D102
-        if self._rows_by_name is None:
-            rows_dict = self._engine_client.state.labware.get_well_rows(
-                labware_id=self.labware_id
-            )
-            self._rows_by_name = {
-                row: [self.wells_by_name()[well_name] for well_name in row_wells]
-                for row, row_wells in rows_dict.items()
-            }
-        return self._rows_by_name
+        raise NotImplementedError("opentrons.protocol_api_experimental to be removed")
 
     def columns(self) -> List[List[Well]]:  # noqa: D102
         return list(self.columns_by_name().values())
 
     def columns_by_name(self) -> Dict[str, List[Well]]:  # noqa: D102
-        if self._columns_by_name is None:
-            cols_dict = self._engine_client.state.labware.get_well_columns(
-                labware_id=self.labware_id
-            )
-            self._columns_by_name = {
-                col: [self.wells_by_name()[well_name] for well_name in col_wells]
-                for col, col_wells in cols_dict.items()
-            }
-        return self._columns_by_name
+        raise NotImplementedError("opentrons.protocol_api_experimental to be removed")
 
     def _definition(self) -> LabwareDefinition:
         if self._lw_definition is None:
