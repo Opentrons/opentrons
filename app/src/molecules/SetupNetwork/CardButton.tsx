@@ -16,7 +16,6 @@ import { StyledText } from '../../atoms/text'
 import type { IconName } from '@opentrons/components'
 
 // ToDo kj 11/18/2022 props will be updated when the hi-fi is done
-// backgroundColor and iconColor might be added to props
 interface CardButtonProps {
   cardWidth: string
   cardHeight: string
