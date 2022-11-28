@@ -29,12 +29,6 @@ const customDisplay = {
   '{backspace}': 'del',
   '{capslock}': 'caps lock ⇪',
   '{shift}': '⇧',
-  '{controlleft}': 'ctrl ⌃',
-  '{controlright}': 'ctrl ⌃',
-  '{altleft}': 'alt ⌥',
-  '{altright}': 'alt ⌥',
-  '{metaleft}': 'cmd ⌘',
-  '{metaright}': 'cmd ⌘',
   '{abc}': 'ABC',
 }
 

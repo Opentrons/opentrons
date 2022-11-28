@@ -106,7 +106,9 @@ class LoadedPipette(BaseModel):
     """A pipette that has been loaded."""
 
     id: str
-    pipetteName: PipetteNameType
+    # TODO (tz, 11-23-22): remove Union when refactoring load_pipette for 96 channels.
+    # https://opentrons.atlassian.net/browse/RLIQ-255
+    pipetteName: Union[PipetteNameType, Literal["p1000_96"]]
     mount: MountType
 
 

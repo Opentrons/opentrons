@@ -1,6 +1,7 @@
 """A script for monitoring CAN bus."""
 import asyncio
 import dataclasses
+from dataclasses import fields
 import logging
 import argparse
 import atexit
@@ -102,7 +103,12 @@ async def task(
                     StyledOutput(style=data_style, content=arb_id_str + "\n"),
                 ]
             )
-            for name, value in dataclasses.asdict(message.payload).items():
+            for name, value in (
+                dict(
+                    (field.name, getattr(message.payload, field.name))
+                    for field in fields(message.payload)
+                )
+            ).items():
                 writer.write(
                     [
                         StyledOutput(style=label_style, content=f"\t{name}:"),

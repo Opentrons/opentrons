@@ -31,6 +31,9 @@ PipetteName = Literal[
     "p1000_single_gen2",
     "p1000_single_gen3",
     "p1000_multi_gen3",
+    # TODO (tz, 11-23-22): remove when refactoring load_pipette for 96 channels.
+    # https://opentrons.atlassian.net/browse/RLIQ-255
+    "p1000_96",
 ]
 
 

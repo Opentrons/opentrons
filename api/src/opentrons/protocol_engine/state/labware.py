@@ -1,13 +1,10 @@
 """Basic labware data state and store."""
 from __future__ import annotations
 
-import re
-from collections import defaultdict
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Any, Mapping, Union
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
-from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 
 from opentrons.types import DeckSlotName, Point
@@ -304,15 +301,6 @@ class LabwareView(HasState[LabwareState]):
                 f"{well_name} does not exist in {labware_id}."
             ) from e
 
-    def get_wells(self, labware_id: str) -> List[str]:
-        """Get labware wells as a list of well names."""
-        definition = self.get_definition(labware_id=labware_id)
-        wells = list()
-        for col in definition.ordering:
-            for well_name in col:
-                wells.append(well_name)
-        return wells
-
     def validate_liquid_allowed_in_labware(
         self, labware_id: str, wells: Mapping[str, Any]
     ) -> List[str]:
@@ -329,26 +317,6 @@ class LabwareView(HasState[LabwareState]):
                 f"Some of the supplied wells do not match the labwareId: {labware_id}."
             )
         return list(wells)
-
-    def get_well_columns(self, labware_id: str) -> Dict[str, List[str]]:
-        """Get well columns."""
-        definition = self.get_definition(labware_id=labware_id)
-        wells_by_cols = defaultdict(list)
-        for i, col in enumerate(definition.ordering):
-            wells_by_cols[f"{i+1}"] = col
-        return wells_by_cols
-
-    def get_well_rows(self, labware_id: str) -> Dict[str, List[str]]:
-        """Get well rows."""
-        definition = self.get_definition(labware_id=labware_id)
-        wells_by_rows = defaultdict(list)
-        pattern = re.compile(WELL_NAME_PATTERN, re.X)
-        for col in definition.ordering:
-            for well_name in col:
-                match = pattern.match(well_name)
-                assert match, f"Well name did not match pattern {pattern}"
-                wells_by_rows[match.group(1)].append(well_name)
-        return wells_by_rows
 
     def get_tip_length(self, labware_id: str) -> float:
         """Get the tip length of a tip rack."""
