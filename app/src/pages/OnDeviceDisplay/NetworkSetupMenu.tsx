@@ -83,7 +83,11 @@ export function NetworkSetupMenu(): JSX.Element {
         </Flex>
         <Flex flexDirection={DIRECTION_ROW} columnGap={SPACING.spacing4}>
           {NetworkSetupOptions.map(networkOption => (
-            <CardButton key={networkOption.title} {...networkOption} />
+            <CardButton
+              key={networkOption.title}
+              {...networkOption}
+              description={t(networkOption.description)}
+            />
           ))}
         </Flex>
       </Flex>
