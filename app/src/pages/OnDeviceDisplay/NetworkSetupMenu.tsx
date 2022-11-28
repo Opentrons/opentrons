@@ -47,7 +47,7 @@ export function NetworkSetupMenu(): JSX.Element {
 
   return (
     <>
-      <StepMeter totalSteps={4} currentStep={1} OnDevice />
+      <StepMeter totalSteps={5} currentStep={1} OnDevice />
       <Flex
         padding={`${String(SPACING.spacing6)} ${String(
           SPACING.spacingXXL
