@@ -414,45 +414,35 @@ async def calibrate_mount(
     the plane of the deck. This value is suitable for vector-subtracting
     from the current instrument offset to set a new instrument offset.
     """
-    if mount == OT3Mount.GRIPPER:
-        hcapi._gripper_handler.check_ready_for_calibration()
-    # First, find the deck. This will become our z offset value, and will
-    # also be used to baseline the edge detection points.
     # reset instrument offset
     await hcapi.reset_instrument_offset(mount)
-    await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
-    center = Point(*hcapi.config.calibration.edge_sense.nominal_center)
     try:
+        # First, find the deck. This will become our z offset value, and will
+        # also be used to baseline the edge detection points.
         z_pos = await find_deck_position(hcapi, mount)
         LOG.info(f"Found deck at {z_pos}mm")
 
+        # Perform xy offset search
         if method == CalibrationMethod.BINARY_SEARCH:
             x_center, y_center = await find_slot_center_binary(hcapi, mount, z_pos)
         elif method == CalibrationMethod.NONCONTACT_PASS:
             x_center, y_center = await find_slot_center_noncontact(hcapi, mount, z_pos)
         else:
             raise RuntimeError("Unknown calibration method")
+
+        # update center with values obtained during calibration
+        center = Point(x_center, y_center, z_pos)
+        LOG.info(f"Found calibration value {center} for mount {mount.name}")
+
+        return center - Point(*hcapi.config.calibration.edge_sense.nominal_center)
+
     except (InaccurateNonContactSweepError, EarlyCapacitiveSenseTrigger):
         LOG.info(
             "Error occurred during calibration. Resetting to current saved calibration value."
         )
         await hcapi.reset_instrument_offset(mount, to_default=False)
-        pass
-    else:
-        center = Point(x_center, y_center, z_pos)
-        LOG.info(f"Found calibration value {center} for mount {mount.name}")
-        instrument_offset = center - Point(
-            *hcapi.config.calibration.edge_sense.nominal_center
-        )
-        # save new offset
-        # reload
-        await hcapi.save_instrument_offset(mount, instrument_offset)
-    finally:
-        # remove tip
-        await hcapi.remove_tip(mount)
-        # The center of the calibration slot is the xy-center in-plane, and
-        # the absolute sense value out-of-plane
-        return center
+        # re-raise exception after resetting instrument offset
+        raise
 
 
 def gripper_pin_offsets_mean(front: Point, rear: Point) -> Point:
@@ -477,8 +467,23 @@ async def calibrate_gripper(hcapi: OT3API, probe: GripperProbe) -> Point:
     hcapi.add_gripper_probe(probe)
     try:
         await hcapi.grip(GRIPPER_GRIP_FORCE)
-        result = await calibrate_mount(hcapi, OT3Mount.GRIPPER)
+        offset = await calibrate_mount(hcapi, OT3Mount.GRIPPER)
+        return offset
     finally:
         hcapi.remove_gripper_probe()
         await hcapi.ungrip()
-    return result
+
+
+async def calibrate_pipette(
+    hcapi: OT3API,
+    mount: Literal[OT3Mount.LEFT, OT3Mount.RIGHT],
+    method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
+) -> Point:
+    try:
+        await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
+        offset = await calibrate_mount(hcapi, mount, method)
+        # save instrument offset for pipette
+        await hcapi.save_instrument_offset(mount, offset)
+        return offset
+    finally:
+        await hcapi.remove_tip(mount)
