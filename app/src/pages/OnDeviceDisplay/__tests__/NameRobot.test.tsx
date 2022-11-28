@@ -88,7 +88,8 @@ describe('NameRobot', () => {
     fireEvent.change(input, {
       target: { value: 'connectableOtie' },
     })
-    const renameButton = getByRole('button', { name: 'Confirm' })
+    const nameButton = getByRole('button', { name: 'Confirm' })
+    fireEvent.click(nameButton)
     const error = await findByText(
       'Oops! Name is already in use. Choose a different name.'
     )
@@ -97,13 +98,14 @@ describe('NameRobot', () => {
     })
   })
 
-  it('should show an error message when typing an existing name - connectable robot', async () => {
+  it('should show an error message when typing an existing name - reachable robot', async () => {
     const [{ getByRole, findByText }] = render()
     const input = getByRole('textbox')
     fireEvent.change(input, {
       target: { value: 'reachableOtie' },
     })
-    const renameButton = getByRole('button', { name: 'Confirm' })
+    const nameButton = getByRole('button', { name: 'Confirm' })
+    fireEvent.click(nameButton)
     const error = await findByText(
       'Oops! Name is already in use. Choose a different name.'
     )
@@ -114,7 +116,6 @@ describe('NameRobot', () => {
 
   it('should call a mock function when tapping the confirm button', () => {
     const [{ getByRole }] = render()
-    const input = getByRole('textbox')
     fireEvent.click(getByRole('button', { name: 'a' }))
     fireEvent.click(getByRole('button', { name: 'b' }))
     fireEvent.click(getByRole('button', { name: 'c' }))
