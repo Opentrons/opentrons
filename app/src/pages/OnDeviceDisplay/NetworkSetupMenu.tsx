@@ -19,7 +19,7 @@ const NetworkSetupOptions = [
   {
     cardWidth: '19rem',
     cardHeight: '21.875rem',
-    title: 'Wi-Fi',
+    title: 'wifi',
     iconName: 'wifi' as IconName,
     description: 'connection_description',
     destinationPath: 'connect-via-wifi',
@@ -27,7 +27,7 @@ const NetworkSetupOptions = [
   {
     cardWidth: '19rem',
     cardHeight: '21.875rem',
-    title: 'Ethernet',
+    title: 'ethernet',
     iconName: 'ethernet' as IconName,
     description: 'connection_description',
     destinationPath: 'connect-via-ethernet',
@@ -35,7 +35,7 @@ const NetworkSetupOptions = [
   {
     cardWidth: '19rem',
     cardHeight: '21.875rem',
-    title: 'USB',
+    title: 'usb',
     iconName: 'usb' as IconName,
     description: 'connection_description',
     destinationPath: 'connect-via-usb',
@@ -86,6 +86,7 @@ export function NetworkSetupMenu(): JSX.Element {
             <CardButton
               key={networkOption.title}
               {...networkOption}
+              title={t(networkOption.title)}
               description={t(networkOption.description)}
             />
           ))}
