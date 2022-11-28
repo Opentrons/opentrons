@@ -18,7 +18,7 @@ describe('SecureLabwareModal', () => {
     props = { type: mockTypeMagDeck, onCloseClick: jest.fn() }
   })
   it('should render the correct modal for magnetic module type', () => {
-    const { getByText, getByRole } = render(props)
+    const { getByText } = render(props)
     getByText('How To Secure Labware to the Magnetic Module')
     getByText(
       'Opentrons recommends ensuring your labware locks to the Magnetic Module by adjusting the black plate bracket on top of the module.'
@@ -26,9 +26,6 @@ describe('SecureLabwareModal', () => {
     getByText(
       'Please note there are two sizes of plate brackets supplied with your module: standard and deep well. These brackets can be removed and swapped by unscrewing the modules thumb screw (the silver knob on the front).'
     )
-    getByText('Magnetic Module with 0.2 mL 96 well PCR Plate')
-    getByText('Magnetic Module with 2 mL Deep Well Plate')
-    getByRole('button', { name: 'close' })
   })
   it('should render magnetic module type modal and call onCloseClick when button is pressed', () => {
     const { getByRole } = render(props)
@@ -39,12 +36,11 @@ describe('SecureLabwareModal', () => {
   })
   it('should render the correct modal for thermocycler module type', () => {
     props = { type: mockTypeTC, onCloseClick: jest.fn() }
-    const { getByText, getByRole } = render(props)
+    const { getByText } = render(props)
     getByText('How To Secure Labware to the Thermocycler')
     getByText(
-      'Opentrons recommends ensuring your labware locks to the Thermocycler module by securing the Thermocycler Latch Mechanism. This latch secures the plate on the module to ensure level and accurate plate placement for optimal results.'
+      'Opentrons recommends securing your labware to the Thermocycler module by closing its latch. Doing so ensures level and accurate plate placement for optimal results.'
     )
-    getByRole('button', { name: 'close' })
   })
   it('should render tc module type modal and call onCloseClick when button is pressed', () => {
     props = { type: mockTypeTC, onCloseClick: jest.fn() }

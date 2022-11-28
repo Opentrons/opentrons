@@ -2,30 +2,22 @@ import * as React from 'react'
 import snakeCase from 'lodash/snakeCase'
 import { Trans, useTranslation } from 'react-i18next'
 import {
-  Btn,
-  Box,
-  Icon,
   Flex,
-  Modal,
-  NewPrimaryBtn,
-  Text,
-  C_MED_DARK_GRAY,
-  FONT_WEIGHT_REGULAR,
   JUSTIFY_SPACE_BETWEEN,
-  JUSTIFY_CENTER,
-  SIZE_2,
-  SIZE_4,
-  SPACING_3,
-  SPACING_4,
-  SPACING_5,
   TYPOGRAPHY,
+  DIRECTION_ROW,
+  SPACING,
+  ALIGN_FLEX_END,
+  DIRECTION_COLUMN,
 } from '@opentrons/components'
 import { Portal } from '../../../../App/portal'
+import { StyledText } from '../../../../atoms/text'
+import { PrimaryButton } from '../../../../atoms/buttons'
+import { Modal } from '../../../../molecules/Modal'
 import secureMagModBracketImage from '../../../../assets/images/secure_mag_mod_bracket.png'
 import secureTCLatchImage from '../../../../assets/images/secure_tc_latch.png'
 import { getModuleName } from './utils/getModuleName'
 
-import styles from '../../styles.css'
 import type { ModuleTypesThatRequireExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
 
 interface SecureLabwareModalProps {
@@ -40,71 +32,65 @@ export const SecureLabwareModal = (
   const moduleName = getModuleName(props.type)
   return (
     <Portal level="top">
-      <Modal className={styles.modal} contentsClassName={styles.modal_contents}>
-        <Box>
-          <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-            <Text as="h3" marginBottom={SPACING_3}>
-              {t(`secure_labware_modal_title`, {
-                name: moduleName,
-              })}
-            </Text>
-            <Btn size={SIZE_2} onClick={props.onCloseClick}>
-              <Icon name="close" color={C_MED_DARK_GRAY}></Icon>
-            </Btn>
-          </Flex>
-
+      <Modal
+        title={t(`secure_labware_modal_title`, {
+          name: moduleName,
+        })}
+        onClose={props.onCloseClick}
+        modalwidth="44.75rem"
+      >
+        <Flex flexDirection={DIRECTION_COLUMN}>
           {props.type === 'magneticModuleType' && (
-            <Box>
-              <Trans
-                t={t}
-                i18nKey={`secure_labware_explanation_${snakeCase(moduleName)}`}
-                components={{
-                  block: (
-                    <Text
-                      fontSize={TYPOGRAPHY.fontSizeH3}
-                      fontWeight={FONT_WEIGHT_REGULAR}
-                      marginBottom={SPACING_3}
-                    />
-                  ),
+            <Flex
+              flexDirection={DIRECTION_ROW}
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
+            >
+              <Flex flexDirection={DIRECTION_COLUMN}>
+                <Trans
+                  t={t}
+                  i18nKey={`secure_labware_explanation_${snakeCase(
+                    moduleName
+                  )}`}
+                  components={{
+                    block: (
+                      <StyledText
+                        as="p"
+                        marginBottom={SPACING.spacing2}
+                        marginRight="3.625rem"
+                      />
+                    ),
+                  }}
+                />
+              </Flex>
+              <img
+                src={secureMagModBracketImage}
+                style={{
+                  marginBottom: SPACING.spacing6,
+                  marginRight: SPACING.spacing4,
                 }}
               />
-              <Flex justifyContent={JUSTIFY_CENTER} marginY={SPACING_3}>
-                <img src={secureMagModBracketImage} />
-              </Flex>
-              <Flex justifyContent={JUSTIFY_CENTER}>
-                <Text fontSize={TYPOGRAPHY.fontSizeH3} marginX={SPACING_4}>
-                  {t('magnetic_module_standard_plate_text')}
-                </Text>
-                <Text fontSize={TYPOGRAPHY.fontSizeH3} marginX={SPACING_4}>
-                  {t('magnetic_module_deep_well_plate_text')}
-                </Text>
-              </Flex>
-            </Box>
+            </Flex>
           )}
           {props.type === 'thermocyclerModuleType' && (
-            <Box>
-              <Text
-                fontSize={TYPOGRAPHY.fontSizeH3}
-                fontWeight={FONT_WEIGHT_REGULAR}
-                marginBottom={SPACING_3}
-              >
+            <Flex
+              flexDirection={DIRECTION_ROW}
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
+            >
+              <StyledText as="p" marginRight="3.625rem">
                 {t(`secure_labware_explanation_${snakeCase(moduleName)}`)}
-              </Text>
-              <Flex justifyContent={JUSTIFY_CENTER} marginY={SPACING_3}>
-                <img src={secureTCLatchImage} style={{ maxWidth: '24rem' }} />
-              </Flex>
-            </Box>
+              </StyledText>
+              <img src={secureTCLatchImage} />
+            </Flex>
           )}
-          <Flex
-            justifyContent={JUSTIFY_CENTER}
-            marginTop={SPACING_5}
-            marginBottom={SPACING_3}
+          <PrimaryButton
+            onClick={props.onCloseClick}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
+            marginRight={SPACING.spacing5}
+            alignSelf={ALIGN_FLEX_END}
           >
-            <NewPrimaryBtn onClick={props.onCloseClick} width={SIZE_4}>
-              {t('shared:close')}
-            </NewPrimaryBtn>
-          </Flex>
-        </Box>
+            {t('shared:close')}
+          </PrimaryButton>
+        </Flex>
       </Modal>
     </Portal>
   )
