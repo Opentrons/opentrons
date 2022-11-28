@@ -23,9 +23,10 @@ async def test_set_enable_current(mock_can_messenger: AsyncMock) -> None:
     nodes_to_enable = {NodeId.gantry_x, NodeId.gantry_y}
     await set_enable_motor(mock_can_messenger, nodes_to_enable)
     for node_id in nodes_to_enable:
-        mock_can_messenger.send.assert_any_call(
+        mock_can_messenger.ensure_send.assert_any_call(
             node_id=node_id,
             message=md.EnableMotorRequest(),
+            expected_nodes=[node_id],
         )
 
 
@@ -34,7 +35,8 @@ async def test_set_disable_current(mock_can_messenger: AsyncMock) -> None:
     nodes_to_enable = {NodeId.gantry_x, NodeId.gantry_y}
     await set_disable_motor(mock_can_messenger, nodes_to_enable)
     for node_id in nodes_to_enable:
-        mock_can_messenger.send.assert_any_call(
+        mock_can_messenger.ensure_send.assert_any_call(
             node_id=node_id,
             message=md.DisableMotorRequest(),
+            expected_nodes=[node_id],
         )
