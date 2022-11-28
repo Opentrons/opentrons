@@ -5,14 +5,11 @@ import { i18n } from '../../../i18n'
 import { Banner } from '../../../atoms/Banner'
 import { mockMagneticModule } from '../../../redux/modules/__fixtures__'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
-import {
-  useIs96ChannelPipetteAttached,
-  useIsRobotViewable,
-  useRunStatuses,
-} from '../hooks'
+import { useIsRobotViewable, useRunStatuses } from '../hooks'
 import { ModuleCard } from '../../ModuleCard'
 import { InstrumentsAndModules } from '../InstrumentsAndModules'
 import { PipetteCard } from '../PipetteCard'
+import { getIs96ChannelPipetteAttached } from '../utils'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../hooks')
@@ -20,6 +17,7 @@ jest.mock('../../ModuleCard')
 jest.mock('../PipetteCard')
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../../../atoms/Banner')
+jest.mock('../utils')
 jest.mock('../../RunTimeControl/hooks')
 
 const mockUseModulesQuery = useModulesQuery as jest.MockedFunction<
@@ -40,8 +38,8 @@ const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
 const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
   typeof useRunStatuses
 >
-const mockUseIs96ChannelPipetteAttached = useIs96ChannelPipetteAttached as jest.MockedFunction<
-  typeof useIs96ChannelPipetteAttached
+const mockGetIs96ChannelPipetteAttached = getIs96ChannelPipetteAttached as jest.MockedFunction<
+  typeof getIs96ChannelPipetteAttached
 >
 
 const render = () => {
@@ -59,7 +57,7 @@ describe('InstrumentsAndModules', () => {
       isRunStill: true,
       isRunTerminal: false,
     })
-    mockUseIs96ChannelPipetteAttached.mockReturnValue(false)
+    mockGetIs96ChannelPipetteAttached.mockReturnValue(false)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -116,7 +114,7 @@ describe('InstrumentsAndModules', () => {
   })
   it('renders 1 pipette card when a 96 channel is attached', () => {
     mockPipetteCard.mockReturnValue(<div>Mock PipetteCard</div>)
-    mockUseIs96ChannelPipetteAttached.mockReturnValue(true)
+    mockGetIs96ChannelPipetteAttached.mockReturnValue(true)
     mockUseIsRobotViewable.mockReturnValue(true)
     const [{ getByText }] = render()
     getByText('Mock PipetteCard')
