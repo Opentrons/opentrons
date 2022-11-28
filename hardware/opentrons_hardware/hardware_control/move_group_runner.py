@@ -6,7 +6,11 @@ from typing import List, Set, Tuple, Iterator, Union
 import numpy as np
 
 from opentrons_hardware.firmware_bindings import ArbitrationId
-from opentrons_hardware.firmware_bindings.constants import NodeId
+from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
+    ErrorSeverity,
+    ErrorCode,
+)
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
@@ -20,6 +24,8 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     AddBrushedLinearMoveRequest,
     TipActionRequest,
     TipActionResponse,
+    Acknowledgement,
+    ErrorMessage,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     AddLinearMoveRequestPayload,
@@ -108,7 +114,11 @@ class MoveGroupRunner:
             return {}
         if not self._is_prepped:
             raise RuntimeError("A group must be prepped before it can be executed.")
-        move_completion_data = await self._move(can_messenger, self._start_at_index)
+        try:
+            move_completion_data = await self._move(can_messenger, self._start_at_index)
+        except RuntimeError:
+            log.error("raising error from Move group runner")
+            raise
         return self._accumulate_move_completions(move_completion_data)
 
     async def run(self, can_messenger: CanMessenger) -> NodeDict[Tuple[float, float]]:
@@ -290,6 +300,8 @@ class MoveScheduler:
         self._durations: List[float] = []
         self._stop_condition: List[MoveStopCondition] = []
         self._start_at_index = start_at_index
+        self._recieved_error = None
+
         for move_group in move_groups:
             move_set = set()
             duration = 0.0
@@ -332,6 +344,19 @@ class MoveScheduler:
         if not self._moves[group_id]:
             log.info(f"Move group {group_id+self._start_at_index} has completed.")
             self._event.set()
+
+    def _handle_acknowledge(self, message: Acknowledgement) -> None:
+        log.debug("recieved ack")
+
+    def _handle_error(self, message: ErrorMessage) -> None:
+        self._recieved_error = message
+        if message.payload.severity.value == ErrorSeverity.WARNING:
+            log.warning(f"Recieved {ErrorCode(message.payload.error_code.value).name}")
+        if message.payload.severity.value == ErrorSeverity.RECOVERABLE:
+            log.error(f"Recieved {ErrorCode(message.payload.error_code.value).name}")
+        if message.payload.severity.value == ErrorSeverity.UNRECOVERABLE:
+            log.critical(f"Recieved {ErrorCode(message.payload.error_code.value).name}")
+        raise RuntimeError("Firmware Error Revieved", message)
 
     def _handle_move_completed(self, message: MoveCompleted) -> None:
         group_id = message.payload.group_id.value - self._start_at_index
@@ -379,6 +404,16 @@ class MoveScheduler:
         elif isinstance(message, TipActionResponse):
             self._remove_move_group(message, arbitration_id)
             self._handle_tip_action(message)
+        elif isinstance(message, ErrorMessage):
+            self._handle_error(message)
+        elif isinstance(message, Acknowledgement):
+            self._handle_acknowledge(message)
+
+    def _get_nodes_in_move_group(self, group_id: int) -> List[NodeId]:
+        nodes = []
+        for (node_id, seq_id) in self._moves[group_id - self._start_at_index]:
+            nodes.append(NodeId(node_id))
+        return nodes
 
     async def run(self, can_messenger: CanMessenger) -> _Completions:
         """Start each move group after the prior has completed."""
@@ -388,7 +423,7 @@ class MoveScheduler:
             self._event.clear()
 
             log.info(f"Executing move group {group_id}.")
-            await can_messenger.send(
+            error = await can_messenger.ensure_send(
                 node_id=NodeId.broadcast,
                 message=ExecuteMoveGroupRequest(
                     payload=ExecuteMoveGroupRequestPayload(
@@ -399,7 +434,10 @@ class MoveScheduler:
                         cancel_trigger=UInt8Field(0),
                     )
                 ),
+                expected_nodes=self._get_nodes_in_move_group(group_id),
             )
+            if error != ErrorCode.ok:
+                log.error(f"recieved error trying to execute move group {str(error)}")
 
             try:
                 # TODO: The max here can be removed once can_driver.send() no longer
@@ -413,6 +451,9 @@ class MoveScheduler:
                 )
             except asyncio.TimeoutError:
                 log.warning("Move set timed out")
+            except RuntimeError:
+                log.error("canceling move group scheduler")
+                raise
 
         def _reify_queue_iter() -> Iterator[_CompletionPacket]:
             while not self._completion_queue.empty():
