@@ -434,8 +434,7 @@ async def _jog_print_current_position(
         round(motors_pos[ax], 2) for ax in [OT3Axis.X, OT3Axis.Y, z_axis, instr_axis]
     ]
     ex, ey, ez, ep = [
-        round(enc_pos[ax], 2)
-        for ax in [OT3Axis.X, OT3Axis.Y, z_axis, instr_axis]
+        round(enc_pos[ax], 2) for ax in [OT3Axis.X, OT3Axis.Y, z_axis, instr_axis]
     ]
     print(f"Deck Coordinate: X={mx}, Y={my}, Z={mz}, Instr={mp}")
     print(f"Enc. Coordinate: X={ex}, Y={ey}, Z={ez}, Instr={ep}")
@@ -579,11 +578,24 @@ async def wait_for_stable_capacitance_ot3(
         )
 
 
+def get_pipette_offset_ot3(api: OT3API, mount: OT3Mount) -> Point:
+    """Get pipette offset OT3."""
+    pipette = api.hardware_pipettes[mount.to_mount()]
+    assert pipette, f"No pipette found on mount: {mount}"
+    return pipette._pipette_offset.offset + Point()
+
+
 def set_pipette_offset_ot3(api: OT3API, mount: OT3Mount, offset: Point) -> None:
     """Set pipette offset OT3."""
     pipette = api.hardware_pipettes[mount.to_mount()]
     assert pipette, f"No pipette found on mount: {mount}"
     pipette._pipette_offset.offset = offset
+
+
+def get_gripper_offset_ot3(api: OT3API) -> Point:
+    """Get gripper offset OT3."""
+    assert api.has_gripper, "No gripper found"
+    return api._gripper_handler._gripper._calibration_offset.offset
 
 
 def set_gripper_offset_ot3(api: OT3API, offset: Point) -> None:
