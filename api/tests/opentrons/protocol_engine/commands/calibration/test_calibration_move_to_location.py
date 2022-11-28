@@ -7,10 +7,22 @@ from opentrons.protocol_engine.commands.calibration.move_to_location import (
     MoveToLocationImplementation,
     CalibrationPosition,
 )
-from opentrons.protocol_engine.execution import MovementHandler, SavedPositionData
+from opentrons.protocol_engine.execution import SavedPositionData
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.state import StateView
-from opentrons.types import DeckSlotName, Point
+from opentrons.protocol_engine.execution import MovementHandler
+from opentrons.types import Point, MountType
+from opentrons.hardware_control.types import CriticalPoint
 from opentrons.protocol_engine.types import DeckPoint
+
+
+@pytest.fixture
+def subject(
+    state_view: StateView, hardware_api: HardwareControlAPI
+) -> MoveToLocationImplementation:
+    return MoveToLocationImplementation(
+        state_view=state_view, hardware_api=hardware_api
+    )
 
 
 @pytest.mark.parametrize(
@@ -22,9 +34,10 @@ from opentrons.protocol_engine.types import DeckPoint
 )
 async def test_calibration_set_up_position_implementation(
     decoy: Decoy,
-    state_view: StateView,
-    movement: MovementHandler,
     slot_name: CalibrationPosition,
+    subject: MoveToLocationImplementation,
+    state_view: StateView,
+    hardware_api: HardwareControlAPI,
 ) -> None:
     """Command should get a Point value for a given deck slot center and \
         call Movement.move_to_coordinates with the correct input."""
@@ -36,7 +49,7 @@ async def test_calibration_set_up_position_implementation(
             return attach_or_detach
 
     params = MoveToLocationParams(
-        pipetteId="pipette-id",
+        mount="left",
         location=slot_name,
     )
 
@@ -54,35 +67,26 @@ async def test_calibration_set_up_position_implementation(
         position=DeckPoint(x=1, y=2, z=10),
         positionId="",
     )
-    decoy.when(
-        await movement.save_position(pipette_id="pipette-id", position_id=None)
-    ).then_return(
-        probe_position
-        if slot_name == CalibrationPosition.PROBE_POSITION
-        else attach_or_detach
-    )
 
     decoy.when(
-        state_view.labware.get_slot_center_position(DeckSlotName.SLOT_2)
-    ).then_return(Point(x=1, y=2, z=10))
-    decoy.when(
-        state_view.labware.get_slot_center_position(DeckSlotName.SLOT_5)
-    ).then_return(Point(x=4, y=5, z=6))
+        state_view.labware.get_calibration_coordinate(
+            CalibrationPosition.PROBE_POSITION
+        )
+    ).then_return((Point(x=1, y=2, z=3), CriticalPoint.MOUNT))
 
-    subject = MoveToLocationImplementation(state_view=state_view, movement=movement)
+    decoy.when(
+        hardware_api.gantry_position(
+            mount=MountType.LEFT, critical_point=CriticalPoint.MOUNT
+        )
+    ).then_return(Point(x=1, y=1, z=1))
+
     result = await subject.execute(params=params)
-    assert result
-    movement_result = DeckPoint(
-        x=movement_coordinate(slot_name).position.x + offset(slot_name).x,
-        y=movement_coordinate(slot_name).position.y + offset(slot_name).y,
-        z=movement_coordinate(slot_name).position.z,
-    )
+    assert result == Point(x=1, y=1, z=1)
 
     decoy.verify(
-        await movement.move_to_coordinates(
-            pipette_id="pipette-id",
-            deck_coordinates=movement_result,
-            direct=True,
-            additional_min_travel_z=None,
+        await hardware_api.move_to(
+            mount=MountType.LEFT,
+            abs_position=Point(x=1, y=2, z=3),
+            critical_point=CriticalPoint.MOUNT,
         )
     )
