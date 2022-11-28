@@ -9,6 +9,7 @@ from mock import AsyncMock, Mock
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     MessageId,
+    ErrorCode,
 )
 
 from opentrons_hardware.firmware_bindings.message import CanMessage
@@ -26,11 +27,13 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     HeartbeatRequest,
     MoveCompleted,
     GetMoveGroupRequest,
+    SetBrushedMotorPwmRequest,
 )
 from opentrons_hardware.firmware_bindings.messages.fields import MotorPositionFlagsField
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     MoveCompletedPayload,
     MoveGroupRequestPayload,
+    BrushedMotorPwmPayload,
 )
 from opentrons_hardware.firmware_bindings.utils import (
     UInt8Field,
@@ -95,6 +98,102 @@ async def test_send(
 ) -> None:
     """It should create a can message and use the driver to send the message."""
     await subject.send(node_id, message)
+    mock_driver.send.assert_called_once_with(
+        message=CanMessage(
+            arbitration_id=ArbitrationId(
+                parts=ArbitrationIdParts(
+                    message_id=message.message_id,
+                    node_id=node_id,
+                    function_code=0,
+                    originating_node_id=NodeId.host,
+                )
+            ),
+            data=message.payload.serialize(),
+        )
+    )
+
+
+@pytest.mark.parametrize(
+    "node_id,message",
+    [
+        [
+            NodeId.gripper_g,
+            SetBrushedMotorPwmRequest(
+                payload=BrushedMotorPwmPayload(
+                    duty_cycle=UInt32Field(50),
+                )
+            ),
+        ],
+    ],
+)
+async def test_ensure_send(
+    subject: CanMessenger,
+    mock_driver: AsyncMock,
+    node_id: NodeId,
+    message: MessageDefinition,
+    incoming_messages: Queue[CanMessage],
+) -> None:
+    """It should create a can message and use the driver to send the message."""
+    incoming_messages.put_nowait(
+        CanMessage(
+            arbitration_id=ArbitrationId(
+                parts=ArbitrationIdParts(
+                    message_id=MessageId.acknowledgement,
+                    node_id=NodeId.host,
+                    function_code=0,
+                    originating_node_id=NodeId.gripper_g,
+                )
+            ),
+            data=message.payload.message_index.value.to_bytes(4, "big"),
+        )
+    )
+    print(message.payload.message_index.value.to_bytes(4, "big"))
+    """It should create a can message and use the driver to send the message and raise no exception."""
+    error, ignore = await asyncio.gather(
+        subject.ensure_send(node_id, message, expected_nodes=[node_id]),
+        subject.__aenter__(),
+    )
+    assert error == ErrorCode.ok
+    mock_driver.send.assert_called_once_with(
+        message=CanMessage(
+            arbitration_id=ArbitrationId(
+                parts=ArbitrationIdParts(
+                    message_id=message.message_id,
+                    node_id=node_id,
+                    function_code=0,
+                    originating_node_id=NodeId.host,
+                )
+            ),
+            data=message.payload.serialize(),
+        )
+    )
+
+
+@pytest.mark.parametrize(
+    "node_id,message",
+    [
+        [
+            NodeId.gripper_g,
+            SetBrushedMotorPwmRequest(
+                payload=BrushedMotorPwmPayload(
+                    duty_cycle=UInt32Field(50),
+                )
+            ),
+        ],
+    ],
+)
+async def test_ensure_send_timeout(
+    subject: CanMessenger,
+    mock_driver: AsyncMock,
+    node_id: NodeId,
+    message: MessageDefinition,
+) -> None:
+    """It should create a can message and use the driver to send the message but raise an TimeoutError."""
+    error, ignore = await asyncio.gather(
+        subject.ensure_send(node_id, message, timeout=0.1, expected_nodes=[node_id]),
+        subject.__aenter__(),
+    )
+    assert error == ErrorCode.timeout
     mock_driver.send.assert_called_once_with(
         message=CanMessage(
             arbitration_id=ArbitrationId(
