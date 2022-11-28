@@ -1,7 +1,7 @@
 """Definition of CAN messages."""
 from dataclasses import dataclass
 from typing import Type, Any
-
+import threading
 from typing_extensions import Literal
 
 from ..constants import MessageId
@@ -18,10 +18,16 @@ class SingletonMessageIndexGenerator(object):
             cls.instance = super(SingletonMessageIndexGenerator, cls).__new__(cls)
         return cls.instance
 
+    def __init__(self) -> None:
+        """Initalize the lock."""
+        self._lock = threading.Lock()
+
     def get_next_index(self) -> int:
         """Return the next index."""
         # increment before returning so we never return 0 as a value
+        self._lock.acquire(timeout=1)
         self.__current_index += 1
+        self._lock.release()
         return self.__current_index
 
     __current_index = 0
