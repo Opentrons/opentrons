@@ -8,6 +8,7 @@ from . import message_definitions as defs
 from ..constants import MessageId
 
 MessageDefinition = Union[
+    defs.Acknowledgement,
     defs.HeartbeatRequest,
     defs.HeartbeatResponse,
     defs.DeviceInfoRequest,
@@ -29,8 +30,8 @@ MessageDefinition = Union[
     defs.ExecuteMoveGroupRequest,
     defs.ClearAllMoveGroupsRequest,
     defs.MoveCompleted,
-    defs.EncoderPositionRequest,
-    defs.EncoderPositionResponse,
+    defs.MotorPositionRequest,
+    defs.MotorPositionResponse,
     defs.SetMotionConstraints,
     defs.GetMotionConstraintsRequest,
     defs.GetMotionConstraintsResponse,
