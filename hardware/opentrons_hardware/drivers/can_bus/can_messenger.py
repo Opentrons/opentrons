@@ -96,32 +96,32 @@ class AcknowledgeListener:
         if isinstance(message, Acknowledgement) or isinstance(message, ErrorMessage):
             self.handle_ack(message, arbitration_id)
 
+    def _remove_response_subnodes(self, node: NodeId) -> None:
+        if node in self._expected_gripper_subnodes:
+            self._expected_gripper_subnodes.remove(node)
+            # delete gripper node if all subnodes responded
+            if len(self._expected_gripper_subnodes) == 0:
+                self._expected_nodes.remove(NodeId.gripper)
+
+        elif node in self._expected_head_subnodes:
+            self._expected_head_subnodes.remove(node)
+            # delete head node if all subnodes responded
+            if len(self._expected_head_subnodes) == 0:
+                self._expected_nodes.remove(NodeId.head)
+
+    def _remove_response_node(self, node: NodeId) -> None:
+        # this is a bit of a hack, some nodes don't responde with the same originating nodes
+        # and respond with their subnodes instead
+        if node in self._expected_nodes:
+            self._expected_nodes.remove(node)
+        else:
+            self._remove_response_subnodes(node)
+
     def handle_ack(self, message: _AckResponses, arbitration_id: ArbitrationId) -> None:
         """Add the ack to the queue if it matches the message_index of the sent message."""
         if message.payload.message_index == self._message.payload.message_index:
-            if arbitration_id.parts.originating_node_id in self._expected_nodes:
-                self._expected_nodes.remove(arbitration_id.parts.originating_node_id)
-            # this is a bit of a hack, some nodes don't responde with the same originating nodes
-            # and respond with their subnodes instead, this should take care of that
-            # by removing the higher order node when all the subnodes respond
-            elif (
-                arbitration_id.parts.originating_node_id
-                in self._expected_gripper_subnodes
-            ):
-                self._expected_gripper_subnodes.remove(
-                    arbitration_id.parts.originating_node_id
-                )
-                if len(self._expected_gripper_subnodes) == 0:
-                    self._expected_nodes.remove(NodeId.gripper)
-            elif (
-                arbitration_id.parts.originating_node_id in self._expected_head_subnodes
-            ):
-                self._expected_head_subnodes.remove(
-                    arbitration_id.parts.originating_node_id
-                )
-                if len(self._expected_head_subnodes) == 0:
-                    self._expected_nodes.remove(NodeId.head)
-            self._ack_queue.put_nowait((arbitration_id, message))
+            self._remove_response_node(arbitration_id.parts.originating_node_id)
+        self._ack_queue.put_nowait((arbitration_id, message))
         # If we've recieved all responses exit the listener
         if len(self._expected_nodes) == 0:
             self._event.set()
