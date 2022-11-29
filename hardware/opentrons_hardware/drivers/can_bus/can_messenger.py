@@ -62,7 +62,7 @@ _Head_SubNodes: List[NodeId] = [NodeId.head_l, NodeId.head_r]
 
 
 class AcknowledgeListener:
-    """Helper clas for CanMessenger to listen for Acks back from commands."""
+    """Helper class for CanMessenger to listen for Acks back from commands."""
 
     def __init__(
         self,

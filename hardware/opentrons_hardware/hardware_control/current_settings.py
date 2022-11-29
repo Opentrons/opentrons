@@ -35,7 +35,7 @@ async def set_currents(
         )
         if error != ErrorCode.ok:
             log.error(
-                f"recieved error {str(error)} trying to set currents for {str(node)}"
+                f"received error {str(error)} trying to set currents for {str(node)}"
             )
 
 
