@@ -308,11 +308,11 @@ class CanMessenger:
             error_name = str(ErrorCode(error_payload.error_code.value).name)
         else:
             error_name = "UNKNOWN ERROR"
-        if error_payload.severity == ErrorSeverity.WARNING:
+        if error_payload.severity == ErrorSeverity.warning:
             log.warning(f"recived a firmware warning {error_name}")
-        elif error_payload.severity == ErrorSeverity.RECOVERABLE:
+        elif error_payload.severity == ErrorSeverity.recoverable:
             log.error(f"recived a firmware recoverable error {error_name}")
-        elif error_payload.severity == ErrorSeverity.UNRECOVERABLE:
+        elif error_payload.severity == ErrorSeverity.unrecoverable:
             log.critical(f"recived a firmware critical error {error_name}")
 
         if error_payload.message_index == 0:

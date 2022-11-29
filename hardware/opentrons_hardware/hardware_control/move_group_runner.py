@@ -300,7 +300,6 @@ class MoveScheduler:
         self._durations: List[float] = []
         self._stop_condition: List[MoveStopCondition] = []
         self._start_at_index = start_at_index
-        self._recieved_error = None
 
         for move_group in move_groups:
             move_set = set()
@@ -350,11 +349,11 @@ class MoveScheduler:
 
     def _handle_error(self, message: ErrorMessage) -> None:
         self._recieved_error = message
-        if message.payload.severity.value == ErrorSeverity.WARNING:
+        if message.payload.severity.value == ErrorSeverity.warning:
             log.warning(f"Recieved {ErrorCode(message.payload.error_code.value).name}")
-        if message.payload.severity.value == ErrorSeverity.RECOVERABLE:
+        if message.payload.severity.value == ErrorSeverity.recoverable:
             log.error(f"Recieved {ErrorCode(message.payload.error_code.value).name}")
-        if message.payload.severity.value == ErrorSeverity.UNRECOVERABLE:
+        if message.payload.severity.value == ErrorSeverity.unrecoverable:
             log.critical(f"Recieved {ErrorCode(message.payload.error_code.value).name}")
         raise RuntimeError("Firmware Error Revieved", message)
 
