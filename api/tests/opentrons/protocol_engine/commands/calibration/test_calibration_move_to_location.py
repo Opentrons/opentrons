@@ -33,7 +33,7 @@ def subject(
         (CalibrationPosition.ATTACH_OR_DETACH, CriticalPoint.MOUNT),
     ],
 )
-async def test_calibration_set_up_position_implementation(
+async def test_calibration_move_to_location_implementation(
     decoy: Decoy,
     input_position: CalibrationPosition,
     critical_point_result: Optional[CriticalPoint],
