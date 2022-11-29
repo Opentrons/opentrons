@@ -16,6 +16,7 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import { Divider } from '../../../../atoms/structure'
 import { StyledText } from '../../../../atoms/text'
+import { useTrackEvent } from '../../../../redux/analytics'
 import { getWellRangeForLiquidLabwarePair } from './utils'
 
 interface LiquidDetailCardProps {
@@ -40,6 +41,8 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
     selectedValue,
     labwareWellOrdering,
   } = props
+  const trackEvent = useTrackEvent()
+
   const LIQUID_CARD_STYLE = css`
     ${BORDERS.cardOutlineBorder}
 
@@ -56,13 +59,18 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
     volumeByWell,
     labwareWellOrdering
   )
+
+  const handleSelectedValue = (): void => {
+    setSelectedValue(liquidId)
+    trackEvent({ name: 'highLiquidInDetailModal', properties: {} })
+  }
   return (
     <Box
       css={selectedValue === liquidId ? ACTIVE_STYLE : LIQUID_CARD_STYLE}
       borderRadius={BORDERS.radiusSoftCorners}
       padding={SPACING.spacing4}
       backgroundColor={COLORS.white}
-      onClick={() => setSelectedValue(liquidId)}
+      onClick={handleSelectedValue}
       width="10.3rem"
       minHeight="max-content"
     >

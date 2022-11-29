@@ -110,12 +110,15 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
       ${BORDERS.cardOutlineBorder}
     }
   `
-
+  const handleSetOpenItem = (): void => {
+    setOpenItem(!openItem)
+    trackEvent({ name: 'expandLiquidSetupRow', properties: {} })
+  }
   return (
     <Box
       css={LIQUID_CARD_STYLE}
       padding={SPACING.spacing4}
-      onClick={() => setOpenItem(!openItem)}
+      onClick={handleSetOpenItem}
       backgroundColor={openItem ? COLORS.fundamentalsBackground : COLORS.white}
       data-testid="LiquidsListItem_Row"
     >

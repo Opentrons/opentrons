@@ -192,7 +192,6 @@ export function ProtocolRunSetup({
             </StyledText>
           ) : (
             stepsKeysInOrder.map((stepKey, index) => (
-              
               <Flex flexDirection={DIRECTION_COLUMN} key={stepKey}>
                 <SetupStep
                   expanded={stepKey === expandedStepKey}
