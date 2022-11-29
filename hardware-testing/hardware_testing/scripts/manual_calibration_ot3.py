@@ -182,6 +182,7 @@ async def _find_square_center_of_gripper_jaw(api: OT3API, expected_pos: Point) -
     #        position is never read back. This is bad for calibration.
     await api.grip(GRIP_FORCE_CALIBRATION)
     api.add_gripper_probe(GripperProbe.FRONT)
+    await api.home_z(OT3Mount.GRIPPER)  # home after attaching probe, if motor skips
     found_square_front = await _find_square_center(
         api,
         OT3Mount.GRIPPER,
@@ -203,6 +204,7 @@ async def _find_square_center_of_gripper_jaw(api: OT3API, expected_pos: Point) -
     api.remove_gripper_probe()
     input("add probe to Gripper REAR, then press ENTER: ")
     api.add_gripper_probe(GripperProbe.REAR)
+    await api.home_z(OT3Mount.GRIPPER)  # home after attaching probe, if motor skips
     found_square_back = await _find_square_center(
         api,
         OT3Mount.GRIPPER,
