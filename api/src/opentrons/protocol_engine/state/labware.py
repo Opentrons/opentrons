@@ -51,7 +51,11 @@ _MAGDECK_HALF_MM_LABWARE = {
     "opentrons/usascientific_96_wellplate_2.4ml_deep/1",
 }
 
-_PROBE_DECK_SLOT_OFFSET = DeckSlotOffsetVector(x=10, y=0, z=3)
+_PIPETTE_PROBE_ATTACH_SLOT = DeckSlotName.SLOT_5
+_PIPETTE_PROBE_ATTACH_X_OFFSET_FROM_SLOT = 10.0
+_PIPETTE_PROBE_ATTACH_Z_OFFSET_FROM_SLOT = 3.0
+
+_PIPETTE_ATTACH_SLOT = DeckSlotName.SLOT_2
 
 
 @dataclass
