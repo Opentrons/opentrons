@@ -9,7 +9,7 @@ from typing import Optional, Union, List, Dict, Any, NamedTuple
 from typing_extensions import Literal, TypeGuard
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons.types import MountType, DeckSlotName
+from opentrons.types import MountType, DeckSlotName, Point
 from opentrons.hardware_control.modules import ModuleType as ModuleType
 from opentrons.hardware_control.types import CriticalPoint
 
@@ -404,12 +404,12 @@ class HeaterShakerMovementRestrictors:
 class CalibrationPosition(str, Enum):
     """Deck slot to move to."""
 
-    PIPETTE_PROBE_ATTACH = "pipetteProbeAttach"
-    ATTACH_OR_DETACH = "attachOrDetach"
+    INSTRUMENT_PROBE_ATTACH = "instrumentProbeAttach"
+    INSTRUMENT_ATTACH = "instrumentAttach"
 
 
 class CalibrationCoordinates(NamedTuple):
     """Calibration coordinates and critical point."""
 
-    coordinates: DeckPoint
+    coordinates: Point
     critical_point: Optional[CriticalPoint]

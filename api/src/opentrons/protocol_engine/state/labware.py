@@ -30,7 +30,6 @@ from ..types import (
     ModuleLocation,
     CalibrationPosition,
     CalibrationCoordinates,
-    DeckPoint,
 )
 from ..actions import (
     Action,
@@ -51,11 +50,11 @@ _MAGDECK_HALF_MM_LABWARE = {
     "opentrons/usascientific_96_wellplate_2.4ml_deep/1",
 }
 
-_PIPETTE_PROBE_ATTACH_SLOT = DeckSlotName.SLOT_5
+_INSTRUMENT_PROBE_ATTACH_SLOT = DeckSlotName.SLOT_5
 _PIPETTE_PROBE_ATTACH_X_OFFSET_FROM_SLOT = 10.0
 _PIPETTE_PROBE_ATTACH_Z_OFFSET_FROM_SLOT = 3.0
 
-_PIPETTE_ATTACH_SLOT = DeckSlotName.SLOT_2
+_INSTRUMENT_ATTACH_SLOT = DeckSlotName.SLOT_2
 
 
 @dataclass
@@ -489,10 +488,10 @@ class LabwareView(HasState[LabwareState]):
         self, location: CalibrationPosition
     ) -> CalibrationCoordinates:
         """Get calibration critical point and target position."""
-        if location == CalibrationPosition.PIPETTE_PROBE_ATTACH:
-            target_center = self.get_slot_center_position(_PIPETTE_PROBE_ATTACH_SLOT)
+        if location == CalibrationPosition.INSTRUMENT_PROBE_ATTACH:
+            target_center = self.get_slot_center_position(_INSTRUMENT_PROBE_ATTACH_SLOT)
             result = CalibrationCoordinates(
-                coordinates=DeckPoint(
+                coordinates=Point(
                     x=target_center.x + _PIPETTE_PROBE_ATTACH_X_OFFSET_FROM_SLOT,
                     y=target_center.y,
                     z=target_center.z + _PIPETTE_PROBE_ATTACH_Z_OFFSET_FROM_SLOT,
@@ -500,7 +499,7 @@ class LabwareView(HasState[LabwareState]):
                 critical_point=None,
             )
         else:
-            target_center = self.get_slot_center_position(_PIPETTE_ATTACH_SLOT)
+            target_center = self.get_slot_center_position(_INSTRUMENT_ATTACH_SLOT)
             result = CalibrationCoordinates(
                 coordinates=target_center, critical_point=CriticalPoint.MOUNT
             )

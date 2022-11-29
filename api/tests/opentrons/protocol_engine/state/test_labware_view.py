@@ -719,12 +719,12 @@ def test_raise_if_labware_in_location(
     "input_location, critical_point_result, coordinates_result",
     [
         (
-            CalibrationPosition.PIPETTE_PROBE_ATTACH,
+            CalibrationPosition.INSTRUMENT_PROBE_ATTACH,
             None,
             Point(x=20.0, y=12.5, z=3.0),
         ),
         (
-            CalibrationPosition.ATTACH_OR_DETACH,
+            CalibrationPosition.INSTRUMENT_ATTACH,
             CriticalPoint.MOUNT,
             Point(x=4.0, y=5.0, z=0.0),
         ),

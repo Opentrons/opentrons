@@ -2,8 +2,6 @@
 import pytest
 from decoy import Decoy
 
-from typing import Optional
-
 from opentrons.protocol_engine.commands.calibration.move_to_location import (
     MoveToLocationParams,
     MoveToLocationImplementation,
@@ -36,12 +34,12 @@ async def test_calibration_move_to_location_implementation(
         call Movement.move_to_coordinates with the correct input."""
     params = MoveToLocationParams(
         mount=MountType.LEFT,
-        location=CalibrationPosition.ATTACH_OR_DETACH,
+        location=CalibrationPosition.INSTRUMENT_ATTACH,
     )
 
     decoy.when(
         state_view.labware.get_calibration_coordinates(
-            location=CalibrationPosition.ATTACH_OR_DETACH
+            location=CalibrationPosition.INSTRUMENT_ATTACH
         )
     ).then_return(
         CalibrationCoordinates(
