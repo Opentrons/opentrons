@@ -19,8 +19,10 @@ import {
   Overlay,
 } from '@opentrons/components'
 
-import { getProtocolsStoredSortKey } from '../../redux/config'
-import { storeProtocolsSortKey } from '../../redux/protocol-storage'
+import {
+  getProtocolsStoredSortKey,
+  updateConfigValue,
+} from '../../redux/config'
 import { useSortedProtocols } from './hooks'
 import { StyledText } from '../../atoms/text'
 import { SecondaryButton } from '../../atoms/buttons'
@@ -31,7 +33,8 @@ import { ProtocolCard } from './ProtocolCard'
 import { EmptyStateLinks } from './EmptyStateLinks'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 
-import type { StoredProtocolData, ProtocolSort } from '../../redux/protocol-storage'
+import type { StoredProtocolData } from '../../redux/protocol-storage'
+import type { ProtocolSort } from './hooks'
 import type { Dispatch } from '../../redux/types'
 
 const SORT_BY_BUTTON_STYLE = css`
@@ -52,7 +55,9 @@ interface ProtocolListProps {
 export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
   const protocolsStoredSortKey = useSelector(getProtocolsStoredSortKey)
   const [showSlideout, setShowSlideout] = React.useState<boolean>(false)
-  const [sortBy, setSortBy] = React.useState<ProtocolSort>(protocolsStoredSortKey ?? 'alphabetical')
+  const [sortBy, setSortBy] = React.useState<ProtocolSort>(
+    protocolsStoredSortKey ?? 'alphabetical'
+  )
   const [showSortByMenu, setShowSortByMenu] = React.useState<boolean>(false)
   const toggleSetShowSortByMenu = (): void => setShowSortByMenu(!showSortByMenu)
   const { t } = useTranslation('protocol_info')
@@ -71,9 +76,11 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
     setShowSortByMenu(false)
   }
 
-  const handleSortProtocols = ( sortKey: ProtocolSort): void => {
+  const handleSortProtocols = (sortKey: ProtocolSort): void => {
     setSortBy(sortKey)
-    dispatch(storeProtocolsSortKey(sortBy))
+    dispatch(
+      updateConfigValue('protocolsSortKey.protocolsStoredSortKey', sortKey)
+    )
     setShowSortByMenu(false)
   }
 
@@ -161,37 +168,16 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
               right="7rem"
               flexDirection={DIRECTION_COLUMN}
             >
-              <MenuItem
-                onClick={() => {
-                  setSortBy('alphabetical')
-                  setShowSortByMenu(false)
-                }}
-              >
+              <MenuItem onClick={() => handleSortProtocols('alphabetical')}>
                 {t('labware_landing:alphabetical')}
               </MenuItem>
-              <MenuItem
-                // onClick={() => {
-                //   setSortBy('recent')
-                //   setShowSortByMenu(false)
-                // }}
-                onClick={handleSortProtocols('recent')}
-              >
+              <MenuItem onClick={() => handleSortProtocols('recent')}>
                 {t('most_recent_updates')}
               </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  setSortBy('reverse')
-                  setShowSortByMenu(false)
-                }}
-              >
+              <MenuItem onClick={() => handleSortProtocols('reverse')}>
                 {t('labware_landing:reverse')}
               </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  setSortBy('oldest')
-                  setShowSortByMenu(false)
-                }}
-              >
+              <MenuItem onClick={() => handleSortProtocols('oldest')}>
                 {t('oldest_updates')}
               </MenuItem>
             </Flex>
