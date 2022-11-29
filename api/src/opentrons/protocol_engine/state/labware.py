@@ -500,7 +500,7 @@ class LabwareView(HasState[LabwareState]):
                 critical_point=None,
             )
         else:
-            target_center = self.get_slot_center_position(DeckSlotName.SLOT_2)
+            target_center = self.get_slot_center_position(_PIPETTE_ATTACH_SLOT)
             result = CalibrationCoordinates(
                 coordinates=target_center, critical_point=CriticalPoint.MOUNT
             )
