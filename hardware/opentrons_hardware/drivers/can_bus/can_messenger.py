@@ -38,6 +38,8 @@ from opentrons_hardware.firmware_bindings.messages.payloads import ErrorMessageP
 
 from opentrons_hardware.firmware_bindings.utils import BinarySerializableException
 
+from .errors import AsyncHardwareError
+
 log = logging.getLogger(__name__)
 
 
@@ -319,7 +321,11 @@ class CanMessenger:
             log.error(
                 f"error {str(err_msg)} recieved is asyncronous, raising exception"
             )
-            raise RuntimeError("Async firmware error", str(err_msg))
+            raise AsyncHardwareError(
+                "Async firmware error: " + str(err_msg),
+                ErrorCode(error_payload.error_code.value),
+                ErrorSeverity(error_payload.severity.value),
+            )
 
 
 class WaitableCallback:
