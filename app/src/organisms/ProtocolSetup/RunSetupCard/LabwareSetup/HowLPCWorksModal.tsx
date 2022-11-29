@@ -29,7 +29,8 @@ export const HowLPCWorksModal = (props: HowLPCWorksModalProps): JSX.Element => {
       <Modal
         title={t('how_offset_data_works')}
         onClose={props.onCloseClick}
-        modalwidth="31.25rem"
+        modalWidth="31.25rem"
+        closeOnOutsideClick
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
           <StyledText as="p" marginBottom={SPACING.spacing4}>
