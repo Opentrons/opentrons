@@ -1,9 +1,5 @@
-<<<<<<< HEAD
-from typing import Any, Dict, List, Optional, Sequence, Union
+from typing import Any, Dict, List, Optional, Sequence, Union, Mapping
 from typing_extensions import TypeGuard
-=======
-from typing import List, Dict, Union, Optional, Mapping
->>>>>>> c85eba2b31 (added experimental offset args to papi, resolved circular dependancy)
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
