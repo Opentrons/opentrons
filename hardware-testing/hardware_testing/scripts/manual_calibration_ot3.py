@@ -23,6 +23,7 @@ GRIP_FORCE_CALIBRATION = 5
 PROBE_CHANGE_Z = 100
 
 # size of the aluminum block used to visually check gripper calibration
+SLOT_SIZE = Point(x=128, y=-86, z=0)
 GRIPPER_TEST_BLOCK_SIZE = Point(x=127.7, y=-85.5, z=64)
 
 
@@ -314,7 +315,7 @@ async def _main(
     if mount == OT3Mount.GRIPPER:
         slot_loc_top_left = helpers_ot3.get_slot_top_left_position_ot3(slot)
         # use the aluminum block, to more precisely check location
-        test_pos = slot_loc_top_left + (GRIPPER_TEST_BLOCK_SIZE * 0.5)
+        test_pos = slot_loc_top_left + (SLOT_SIZE * 0.5)
         # just in case we're testing w/ the probes attached, don't hit the deck
         gripper_probe_length = 22
         test_z = gripper_probe_length + 2
