@@ -56,12 +56,7 @@ async def test_calibration_move_to_location_implementation(
         await hardware_api.move_to(
             mount=Mount.LEFT,
             abs_position=Point(x=1, y=2, z=3),
-<<<<<<< HEAD
-            critical_point=critical_point_result,
-        ),
-        times=1
-=======
             critical_point=CriticalPoint.MOUNT,
-        )
->>>>>>> 11691c028 (pr fixes)
+        ),
+        times=1,
     )
