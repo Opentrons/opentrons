@@ -30,7 +30,7 @@ export const MultipleModulesModal = (
   return (
     <Portal level="top">
       <Modal
-        title={t('multiple_modules_modal_title')}
+        title={t('multiple_modules_modal')}
         onClose={props.onCloseClick}
         modalwidth="44.75rem"
       >
@@ -48,15 +48,12 @@ export const MultipleModulesModal = (
                 rel="noopener noreferrer"
                 marginBottom={SPACING.spacing4}
               >
-                <Flex flexDirection={DIRECTION_ROW}>
-                  {t('multiple_modules_link')}
-                  <Icon
-                    name="open-in-new"
-                    marginLeft={SPACING.spacing2}
-                    size="0.625rem"
-                    marginTop={SPACING.spacing4}
-                  />
-                </Flex>
+                {t('multiple_modules_link')}
+                <Icon
+                  name="open-in-new"
+                  marginLeft={SPACING.spacing2}
+                  size="0.625rem"
+                />
               </Link>
               <StyledText
                 css={TYPOGRAPHY.pSemiBold}
@@ -68,7 +65,7 @@ export const MultipleModulesModal = (
               <StyledText as="p">{t('multiple_modules_example')}</StyledText>
             </Flex>
             <img
-              height="326px"
+              height="100%"
               width="288px"
               src={multipleModuleHelp}
               style={{ marginBottom: SPACING.spacing4 }}
@@ -77,7 +74,6 @@ export const MultipleModulesModal = (
           <PrimaryButton
             onClick={props.onCloseClick}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
-            marginRight={SPACING.spacing5}
             alignSelf={ALIGN_FLEX_END}
           >
             {t('shared:close')}

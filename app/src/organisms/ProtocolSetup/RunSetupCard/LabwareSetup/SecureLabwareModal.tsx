@@ -1,6 +1,7 @@
 import * as React from 'react'
 import snakeCase from 'lodash/snakeCase'
 import { Trans, useTranslation } from 'react-i18next'
+import lowerCase from 'lodash/lowerCase'
 import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
@@ -33,8 +34,8 @@ export const SecureLabwareModal = (
   return (
     <Portal level="top">
       <Modal
-        title={t(`secure_labware_modal_title`, {
-          name: moduleName,
+        title={t(`secure_labware_modal`, {
+          name: lowerCase(moduleName),
         })}
         onClose={props.onCloseClick}
         modalwidth="44.75rem"
@@ -62,12 +63,7 @@ export const SecureLabwareModal = (
                   }}
                 />
               </Flex>
-              <img
-                width="288px"
-                height="326px"
-                src={secureMagModBracketImage}
-                style={{ marginTop: '-2rem' }}
-              />
+              <img width="288px" height="100%" src={secureMagModBracketImage} />
             </Flex>
           )}
           {props.type === 'thermocyclerModuleType' && (
@@ -78,18 +74,12 @@ export const SecureLabwareModal = (
               <StyledText as="p" marginRight="3.625rem">
                 {t(`secure_labware_explanation_${snakeCase(moduleName)}`)}
               </StyledText>
-              <img
-                src={secureTCLatchImage}
-                width="288px"
-                height="326px"
-                style={{ marginTop: '-2rem' }}
-              />
+              <img src={secureTCLatchImage} width="288px" height="100%" />
             </Flex>
           )}
           <PrimaryButton
             onClick={props.onCloseClick}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
-            marginRight={SPACING.spacing5}
             alignSelf={ALIGN_FLEX_END}
           >
             {t('shared:close')}

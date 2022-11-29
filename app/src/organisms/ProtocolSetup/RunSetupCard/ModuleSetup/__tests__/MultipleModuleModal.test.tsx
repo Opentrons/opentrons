@@ -18,7 +18,7 @@ describe('MultipleModulesModal', () => {
 
   it('should render the correct header', () => {
     const { getByRole } = render(props)
-    getByRole('heading', { name: 'Setting Up Modules of the Same Type' })
+    getByRole('heading', { name: 'Setting up modules of the same type' })
   })
   it('should render the correct body', () => {
     const { getByText } = render(props)
@@ -27,7 +27,7 @@ describe('MultipleModulesModal', () => {
     )
     getByText('Example')
     getByText(
-      'Your protocol has 2 Temperature Modules. The Temperature Module attached to the first port starting from the left will be related to the first Temperature Module in your protocol while the second Temperature Module loaded would be related to the Temperature Module connected to the next port to the right. If using a hub, follow the same logic with the port ordered.'
+      'Your protocol has two Temperature Modules. The Temperature Module attached to the first port starting from the left will be related to the first Temperature Module in your protocol while the second Temperature Module loaded would be related to the Temperature Module connected to the next port to the right. If using a hub, follow the same logic with the port ordering.'
     )
   })
   it('should render a link to the learn more page', () => {
