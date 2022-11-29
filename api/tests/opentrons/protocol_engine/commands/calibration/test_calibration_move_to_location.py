@@ -26,17 +26,8 @@ def subject(
     )
 
 
-@pytest.mark.parametrize(
-    argnames=["input_position", "critical_point_result"],
-    argvalues=[
-        (CalibrationPosition.PROBE_POSITION, None),
-        (CalibrationPosition.ATTACH_OR_DETACH, CriticalPoint.MOUNT),
-    ],
-)
 async def test_calibration_move_to_location_implementation(
     decoy: Decoy,
-    input_position: CalibrationPosition,
-    critical_point_result: Optional[CriticalPoint],
     subject: MoveToLocationImplementation,
     state_view: StateView,
     hardware_api: HardwareControlAPI,
@@ -45,14 +36,16 @@ async def test_calibration_move_to_location_implementation(
         call Movement.move_to_coordinates with the correct input."""
     params = MoveToLocationParams(
         mount=MountType.LEFT,
-        location=input_position,
+        location=CalibrationPosition.ATTACH_OR_DETACH,
     )
 
     decoy.when(
-        state_view.labware.get_calibration_coordinates(location=input_position)
+        state_view.labware.get_calibration_coordinates(
+            location=CalibrationPosition.ATTACH_OR_DETACH
+        )
     ).then_return(
         CalibrationCoordinates(
-            coordinates=Point(x=1, y=2, z=3), critical_point=critical_point_result
+            coordinates=Point(x=1, y=2, z=3), critical_point=CriticalPoint.MOUNT
         )
     )
 
@@ -63,7 +56,12 @@ async def test_calibration_move_to_location_implementation(
         await hardware_api.move_to(
             mount=Mount.LEFT,
             abs_position=Point(x=1, y=2, z=3),
+<<<<<<< HEAD
             critical_point=critical_point_result,
         ),
         times=1
+=======
+            critical_point=CriticalPoint.MOUNT,
+        )
+>>>>>>> 11691c028 (pr fixes)
     )

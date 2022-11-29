@@ -30,7 +30,7 @@ from ..types import (
     ModuleLocation,
     CalibrationPosition,
     CalibrationCoordinates,
-    DeckSlotOffsetVector,
+    DeckPoint,
 )
 from ..actions import (
     Action,
@@ -489,10 +489,10 @@ class LabwareView(HasState[LabwareState]):
         self, location: CalibrationPosition
     ) -> CalibrationCoordinates:
         """Get calibration critical point and target position."""
-        if location == CalibrationPosition.PROBE_POSITION:
+        if location == CalibrationPosition.PIPETTE_PROBE_ATTACH:
             target_center = self.get_slot_center_position(_PIPETTE_PROBE_ATTACH_SLOT)
             result = CalibrationCoordinates(
-                coordinates=Point(
+                coordinates=DeckPoint(
                     x=target_center.x + _PIPETTE_PROBE_ATTACH_X_OFFSET_FROM_SLOT,
                     y=target_center.y,
                     z=target_center.z + _PIPETTE_PROBE_ATTACH_Z_OFFSET_FROM_SLOT,

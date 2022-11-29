@@ -230,14 +230,6 @@ class InstrumentOffsetVector(BaseModel):
     z: float
 
 
-class DeckSlotOffsetVector(BaseModel):
-    """Deck slot Offset from home position to robot deck."""
-
-    x: float
-    y: float
-    z: float
-
-
 class ModuleDefinition(BaseModel):
     """Module definition class."""
 
@@ -412,7 +404,7 @@ class HeaterShakerMovementRestrictors:
 class CalibrationPosition(str, Enum):
     """Deck slot to move to."""
 
-    PROBE_POSITION = "probePosition"
+    PIPETTE_PROBE_ATTACH = "pipetteProbeAttach"
     ATTACH_OR_DETACH = "attachOrDetach"
 
 

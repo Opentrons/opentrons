@@ -718,7 +718,11 @@ def test_raise_if_labware_in_location(
 @pytest.mark.parametrize(
     "input_location, critical_point_result, coordinates_result",
     [
-        (CalibrationPosition.PROBE_POSITION, None, Point(x=206.5, y=133.5, z=3.0)),
+        (
+            CalibrationPosition.PIPETTE_PROBE_ATTACH,
+            None,
+            Point(x=206.5, y=133.5, z=3.0),
+        ),
         (
             CalibrationPosition.ATTACH_OR_DETACH,
             CriticalPoint.MOUNT,
