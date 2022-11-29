@@ -721,12 +721,12 @@ def test_raise_if_labware_in_location(
         (
             CalibrationPosition.PIPETTE_PROBE_ATTACH,
             None,
-            Point(x=206.5, y=133.5, z=3.0),
+            Point(x=20.0, y=12.5, z=3.0),
         ),
         (
             CalibrationPosition.ATTACH_OR_DETACH,
             CriticalPoint.MOUNT,
-            Point(x=196.5, y=43.0, z=0.0),
+            Point(x=4.0, y=5.0, z=0.0),
         ),
     ],
 )
@@ -734,10 +734,35 @@ def test_get_calibration_coordinates(
     input_location: CalibrationPosition,
     critical_point_result: Optional[CriticalPoint],
     coordinates_result: Point,
-    standard_deck_def: DeckDefinitionV3,
 ) -> None:
     """Should return critical point and coordinates."""
-    subject = get_labware_view(deck_definition=standard_deck_def)
+    slot_definitions = {
+        "locations": {
+            "orderedSlots": [
+                {
+                    "id": "2",
+                    "position": [2, 2, 0.0],
+                    "boundingBox": {
+                        "xDimension": 4.0,
+                        "yDimension": 6.0,
+                        "zDimension": 0,
+                    },
+                    "displayName": "Slot 2",
+                },
+                {
+                    "id": "5",
+                    "position": [5, 5, 0.0],
+                    "boundingBox": {
+                        "xDimension": 10.0,
+                        "yDimension": 15.0,
+                        "zDimension": 0,
+                    },
+                    "displayName": "Slot 5",
+                },
+            ]
+        }
+    }
+    subject = get_labware_view(deck_definition=cast(DeckDefinitionV3, slot_definitions))
 
     result = subject.get_calibration_coordinates(location=input_location)
 
