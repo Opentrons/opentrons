@@ -762,7 +762,9 @@ def test_get_calibration_coordinates(
             ]
         }
     }
+
     subject = get_labware_view(deck_definition=cast(DeckDefinitionV3, slot_definitions))
+    
 
     result = subject.get_calibration_coordinates(location=input_location)
 
