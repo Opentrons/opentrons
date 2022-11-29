@@ -8,7 +8,6 @@ import numpy as np
 from opentrons_hardware.firmware_bindings import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
-    ErrorSeverity,
     ErrorCode,
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
