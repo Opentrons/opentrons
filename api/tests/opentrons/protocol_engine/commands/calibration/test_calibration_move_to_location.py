@@ -49,7 +49,7 @@ async def test_calibration_set_up_position_implementation(
     )
 
     decoy.when(
-        state_view.labware.get_calibration_coordinates(location=slot_name)
+        state_view.labware.get_calibration_coordinates(location=input_position)
     ).then_return(
         CalibrationCoordinates(
             coordinates=Point(x=1, y=2, z=3), critical_point=critical_point_result
