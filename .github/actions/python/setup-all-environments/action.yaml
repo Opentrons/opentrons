@@ -56,5 +56,5 @@ runs:
       name: install pipenv on 3.10
       run: make python-globals OT_PYTHON=$(which python)
     - shell: bash
-      name: setup the dev environment
-      run: make -C environments/dev setup
+      name: setup the dev and app environment
+      run: make setup-py PYTHON_SETUP_DIRS="environments/dev environments/app" -j
