@@ -35,7 +35,7 @@ def subject(
 )
 async def test_calibration_set_up_position_implementation(
     decoy: Decoy,
-    slot_name: CalibrationPosition,
+    input_position: CalibrationPosition,
     critical_point_result: Optional[CriticalPoint],
     subject: MoveToLocationImplementation,
     state_view: StateView,
