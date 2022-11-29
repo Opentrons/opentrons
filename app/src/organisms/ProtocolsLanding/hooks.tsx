@@ -1,7 +1,7 @@
 import { StoredProtocolData } from '../../redux/protocol-storage'
 import { getProtocolDisplayName } from './utils'
 
-export type ProtocolSort = 'alphabetical' | 'reverse' | 'recent' | 'oldest'
+import type { ProtocolSort } from '../../redux/protocol-storage'
 
 export function useSortedProtocols(
   sortBy: ProtocolSort,

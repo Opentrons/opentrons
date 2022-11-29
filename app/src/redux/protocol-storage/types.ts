@@ -38,6 +38,8 @@ export type ProtocolListActionSource =
   | 'protocolAddition'
   | 'overwriteProtocol'
 
+  export type ProtocolSort = 'alphabetical' | 'reverse' | 'recent' | 'oldest'
+
 export interface FetchProtocolsAction {
   type: 'protocolStorage:FETCH_PROTOCOLS'
   meta: { shell: true }
@@ -105,6 +107,12 @@ export interface ViewProtocolSourceFolder {
   meta: { shell: true }
 }
 
+export interface StoreProtocolsSortKey {
+  type: 'protocolStorage:STORE_PROTOCOLS_SORT_KEY'
+  payload: { protocolsSortKey: ProtocolSort}
+  meta: { shell: true}
+}
+
 export type ProtocolStorageAction =
   | FetchProtocolsAction
   | UpdateProtocolListAction
@@ -118,3 +126,4 @@ export type ProtocolStorageAction =
   | AnalyzeProtocolSuccessAction
   | AnalyzeProtocolFailureAction
   | ViewProtocolSourceFolder
+  | StoreProtocolsSortKey
