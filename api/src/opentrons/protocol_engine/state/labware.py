@@ -475,6 +475,9 @@ class LabwareView(HasState[LabwareState]):
                     f"Labware {labware.loadName} is already present at {location}."
                 )
 
+    def get_calibration_coordinates(self):
+        pass
+
     def _is_magnetic_module_uri_in_half_millimeter(self, labware_id: str) -> bool:
         """Check whether the labware uri needs to be calculated in half a millimeter."""
         uri = self.get_uri_from_definition(self.get_definition(labware_id))

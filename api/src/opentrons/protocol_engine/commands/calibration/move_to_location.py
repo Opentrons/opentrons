@@ -3,12 +3,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Type, Optional
 from typing_extensions import Literal
-from enum import Enum
 
 from pydantic import BaseModel, Field
 
-from opentrons.protocol_engine.types import DeckPoint
-from opentrons.types import DeckSlotName, MountType
+from opentrons.protocol_engine.types import DeckPoint, CalibrationPosition
+from opentrons.types import MountType
 from opentrons.protocol_engine.commands.command import (
     AbstractCommandImpl,
     BaseCommand,
@@ -21,13 +20,6 @@ if TYPE_CHECKING:
 
 
 MoveToLocationCommandType = Literal["calibration/moveToLocation"]
-
-
-class CalibrationPosition(str, Enum):
-    """Deck slot to move to."""
-
-    PROBE_POSITION = "probePosition"
-    ATTACH_OR_DETACH = "attachOrDetach"
 
 
 class MoveToLocationParams(BaseModel):

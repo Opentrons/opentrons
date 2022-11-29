@@ -398,3 +398,10 @@ class HeaterShakerMovementRestrictors:
     plate_shaking: bool
     latch_closed: bool
     deck_slot: int
+
+
+class CalibrationPosition(str, Enum):
+    """Deck slot to move to."""
+
+    PROBE_POSITION = "probePosition"
+    ATTACH_OR_DETACH = "attachOrDetach"

@@ -711,3 +711,11 @@ def test_raise_if_labware_in_location(
     )
     with expected_raise:
         subject.raise_if_labware_in_location(location=location)
+
+
+def test_get_calibration_coordinates() -> None:
+    """Should return critical point and coordinates."""
+    subject = get_labware_view()
+
+    coordinates, critical_point = subject.get_calibration_coordinates()
+
