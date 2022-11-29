@@ -419,5 +419,5 @@ class CalibrationPosition(str, Enum):
 class CalibrationCoordinates(NamedTuple):
     """Calibration coordinates and critical point."""
 
-    coordinates: Point
+    coordinates: DeckPoint
     critical_point: Optional[CriticalPoint]
