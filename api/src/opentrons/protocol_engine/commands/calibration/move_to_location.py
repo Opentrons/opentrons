@@ -36,7 +36,7 @@ class MoveToLocationParams(BaseModel):
 
 
 class MoveToLocationResult(BaseModel):
-    """Result data from the execution of a CalibrationSetUpPosition command."""
+    """Result data from the execution of a MoveToLocation command."""
 
 
 class MoveToLocationImplementation(
