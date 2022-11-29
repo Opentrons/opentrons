@@ -37,6 +37,8 @@ LABWARE_GRIP_HEIGHT = {
 
 LABWARE_GRIP_FORCE = {"plate": 5, "tiprack": 10}
 
+DEFAULT_PRESS_DOWN_Z = 2
+
 LABWARE_WARP = types.Point()
 
 # TODO: changes for DVT
@@ -75,6 +77,8 @@ def _get_gripper_offset_within_slot(
         x = slot_center.x
     y = slot_center.y
     z = grip_height
+    if not is_grip:
+        z -= DEFAULT_PRESS_DOWN_Z
     return types.Point(x=x, y=y, z=z)
 
 
