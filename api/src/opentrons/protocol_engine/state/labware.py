@@ -490,12 +490,12 @@ class LabwareView(HasState[LabwareState]):
     ) -> CalibrationCoordinates:
         """Get calibration critical point and target position."""
         if location == CalibrationPosition.PROBE_POSITION:
-            target_center = self.get_slot_center_position(DeckSlotName.SLOT_5)
+            target_center = self.get_slot_center_position(_PIPETTE_PROBE_ATTACH_SLOT)
             result = CalibrationCoordinates(
                 coordinates=Point(
-                    x=target_center.x + _PROBE_DECK_SLOT_OFFSET.x,
-                    y=target_center.y + _PROBE_DECK_SLOT_OFFSET.y,
-                    z=_PROBE_DECK_SLOT_OFFSET.z,
+                    x=target_center.x + _PIPETTE_PROBE_ATTACH_X_OFFSET_FROM_SLOT,
+                    y=target_center.y,
+                    z=target_center.z + _PIPETTE_PROBE_ATTACH_Z_OFFSET_FROM_SLOT,
                 ),
                 critical_point=None,
             )
