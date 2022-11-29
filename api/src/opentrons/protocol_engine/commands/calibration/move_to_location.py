@@ -31,7 +31,7 @@ class MoveToLocationParams(BaseModel):
     )
     mount: MountType = Field(
         ...,
-        description="Gantry mount to move.",
+        description="Gantry mount to move to location.",
     )
 
 
