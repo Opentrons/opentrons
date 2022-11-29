@@ -305,17 +305,7 @@ class CanMessenger:
     def _handle_error(self, build: BinarySerializable) -> None:
         err_msg = ErrorMessage(payload=build)  # type: ignore[arg-type]
         error_payload: ErrorMessagePayload = err_msg.payload
-        error_name = ""
-        if error_payload.error_code.value in [err.value for err in ErrorCode]:
-            error_name = str(ErrorCode(error_payload.error_code.value).name)
-        else:
-            error_name = "UNKNOWN ERROR"
-        if error_payload.severity == ErrorSeverity.warning:
-            log.warning(f"recived a firmware warning {error_name}")
-        elif error_payload.severity == ErrorSeverity.recoverable:
-            log.error(f"recived a firmware recoverable error {error_name}")
-        elif error_payload.severity == ErrorSeverity.unrecoverable:
-            log.critical(f"recived a firmware critical error {error_name}")
+        err_msg.log_error(log)
 
         if error_payload.message_index == 0:
             log.error(

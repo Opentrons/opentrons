@@ -4,9 +4,10 @@ from typing import Type, Any
 import threading
 from typing_extensions import Literal
 
-from ..constants import MessageId
+from ..constants import MessageId, ErrorCode, ErrorSeverity
 from . import payloads
 from .. import utils
+from logging import Logger
 
 
 class SingletonMessageIndexGenerator(object):
@@ -69,6 +70,21 @@ class ErrorMessage(BaseMessage):  # noqa: D101
     payload: payloads.ErrorMessagePayload
     payload_type: Type[payloads.ErrorMessagePayload] = payloads.ErrorMessagePayload
     message_id: Literal[MessageId.error_message] = MessageId.error_message
+
+    def log_error(self, log: Logger) -> None:
+        """Log an error message with the correct log level."""
+        error_name = ""
+        if self.payload.error_code.value in [err.value for err in ErrorCode]:
+            error_name = str(ErrorCode(self.payload.error_code.value).name)
+        else:
+            error_name = "UNKNOWN ERROR"
+
+        if self.payload.severity == ErrorSeverity.warning:
+            log.warning(f"recived a firmware warning {error_name}")
+        elif self.payload.severity == ErrorSeverity.recoverable:
+            log.error(f"recived a firmware recoverable error {error_name}")
+        elif self.payload.severity == ErrorSeverity.unrecoverable:
+            log.critical(f"recived a firmware critical error {error_name}")
 
 
 @dataclass

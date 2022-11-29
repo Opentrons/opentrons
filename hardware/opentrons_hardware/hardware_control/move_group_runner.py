@@ -348,13 +348,6 @@ class MoveScheduler:
         log.debug("recieved ack")
 
     def _handle_error(self, message: ErrorMessage) -> None:
-        self._recieved_error = message
-        if message.payload.severity.value == ErrorSeverity.warning:
-            log.warning(f"Recieved {ErrorCode(message.payload.error_code.value).name}")
-        if message.payload.severity.value == ErrorSeverity.recoverable:
-            log.error(f"Recieved {ErrorCode(message.payload.error_code.value).name}")
-        if message.payload.severity.value == ErrorSeverity.unrecoverable:
-            log.critical(f"Recieved {ErrorCode(message.payload.error_code.value).name}")
         raise RuntimeError("Firmware Error Revieved", message)
 
     def _handle_move_completed(self, message: MoveCompleted) -> None:
