@@ -46,7 +46,7 @@ jobs:
       - name: Lint
         run: make -C update-server lint
       - name: Test
-        run: make -C update-server test -j
+        run: make -C update-server test
       - uses: 'codecov/codecov-action@v3'
         with:
           files: ./update-server/coverage.xml
