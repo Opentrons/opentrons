@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Sequence, Any, Mapping, Union, Tuple
+from typing import Dict, List, Optional, Sequence, Any, Mapping, Union
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
 from opentrons_shared_data.pipette.dev_types import LabwareUri
@@ -10,7 +10,6 @@ from opentrons_shared_data.pipette.dev_types import LabwareUri
 from opentrons.types import DeckSlotName, Point
 from opentrons.protocols.models import LabwareDefinition, WellDefinition
 from opentrons.calibration_storage.helpers import uri_from_details
-from opentrons.hardware_control.types import CriticalPoint
 
 from .. import errors
 from ..resources import DeckFixedLabware
@@ -29,6 +28,7 @@ from ..types import (
     LoadedLabware,
     ModuleLocation,
     CalibrationPosition,
+    CalibrationCoordinates
 )
 from ..actions import (
     Action,
@@ -479,7 +479,7 @@ class LabwareView(HasState[LabwareState]):
 
     def get_calibration_coordinates(
         self, location: CalibrationPosition
-    ) -> Tuple[Point, Optional[CriticalPoint]]:
+    ) -> CalibrationCoordinates:
         """Get calibration critical point and target position."""
         pass
 

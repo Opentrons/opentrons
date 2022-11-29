@@ -83,17 +83,14 @@ class MoveToLocationImplementation(
         #     additional_min_travel_z=None,
         # )
 
-        (
-            coordinates,
-            critical_point,
-        ) = self._state_view.labware.get_calibration_coordinates(
+        result = self._state_view.labware.get_calibration_coordinates(
             location=params.location
         )
 
         await self._hardware_api.move_to(
             mount=hardware_mount,
-            abs_position=coordinates,
-            critical_point=critical_point,
+            abs_position=result.coordinates,
+            critical_point=result.critical_point,
         )
 
         return MoveToLocationResult()
