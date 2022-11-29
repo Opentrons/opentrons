@@ -55,7 +55,7 @@ class MoveToLocationImplementation(
 
     async def execute(self, params: MoveToLocationParams) -> MoveToLocationResult:
         """Move the requested pipette to a given deck slot."""
-        hardware_mount = MountType.to_hw_mount(params.mount)
+        hardware_mount = params.mount.to_hw_mount()
 
         result = self._state_view.labware.get_calibration_coordinates(
             location=params.location
