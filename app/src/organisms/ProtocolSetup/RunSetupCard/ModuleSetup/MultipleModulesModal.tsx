@@ -48,7 +48,7 @@ export const MultipleModulesModal = (
                 rel="noopener noreferrer"
                 marginBottom={SPACING.spacing4}
               >
-                {t('multiple_modules_link')}
+                {t('multiple_modules_learn_more')}
                 <Icon
                   name="open-in-new"
                   marginLeft={SPACING.spacing2}
