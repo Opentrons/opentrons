@@ -13,6 +13,7 @@ import {
 
 import { useFeatureFlag } from '../../../redux/config'
 import { Line } from '../../../atoms/structure'
+import { useTrackEvent } from '../../../redux/analytics'
 import { StyledText } from '../../../atoms/text'
 import { InfoMessage } from '../../../molecules/InfoMessage'
 import {
@@ -56,6 +57,7 @@ export function ProtocolRunSetup({
   const { protocolData: robotProtocolAnalysis } = useProtocolDetailsForRun(
     runId
   )
+  const trackEvent = useTrackEvent()
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
   const modules = parseAllRequiredModuleModels(protocolData?.commands ?? [])
@@ -190,6 +192,7 @@ export function ProtocolRunSetup({
             </StyledText>
           ) : (
             stepsKeysInOrder.map((stepKey, index) => (
+              
               <Flex flexDirection={DIRECTION_COLUMN} key={stepKey}>
                 <SetupStep
                   expanded={stepKey === expandedStepKey}
