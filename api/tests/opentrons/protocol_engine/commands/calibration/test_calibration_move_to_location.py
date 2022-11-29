@@ -7,7 +7,7 @@ from typing import Optional
 from opentrons.protocol_engine.commands.calibration.move_to_location import (
     MoveToLocationParams,
     MoveToLocationImplementation,
-    MoveToLocationResult
+    MoveToLocationResult,
 )
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.state import StateView
@@ -43,7 +43,6 @@ async def test_calibration_set_up_position_implementation(
 ) -> None:
     """Command should get a Point value for a given deck slot center and \
         call Movement.move_to_coordinates with the correct input."""
-
     params = MoveToLocationParams(
         mount=MountType.LEFT,
         location=slot_name,
@@ -51,7 +50,11 @@ async def test_calibration_set_up_position_implementation(
 
     decoy.when(
         state_view.labware.get_calibration_coordinates(location=slot_name)
-    ).then_return(CalibrationCoordinates(coordinates=Point(x=1, y=2, z=3), critical_point=critical_point_result))
+    ).then_return(
+        CalibrationCoordinates(
+            coordinates=Point(x=1, y=2, z=3), critical_point=critical_point_result
+        )
+    )
 
     result = await subject.execute(params=params)
     assert result == MoveToLocationResult()

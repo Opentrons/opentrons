@@ -56,32 +56,6 @@ class MoveToLocationImplementation(
     async def execute(self, params: MoveToLocationParams) -> MoveToLocationResult:
         """Move the requested pipette to a given deck slot."""
         hardware_mount = MountType.to_hw_mount(params.mount)
-        # if params.location == CalibrationPosition.PROBE_POSITION:
-        #     offset = DeckPoint(x=10, y=0, z=3)
-        #     deck_center = self._state_view.labware.get_slot_center_position(
-        #         DeckSlotName.SLOT_5
-        #     )
-        #     z_position = offset.z
-        # else:
-        #     # get current z coordinate and pass it into movement destination
-        #     offset = DeckPoint(x=0, y=0, z=0)
-        #     deck_center = self._state_view.labware.get_slot_center_position(
-        #         DeckSlotName.SLOT_2
-        #     )
-        #     current_position = await self._movement.save_mount_position(
-        #         mount=pipette_mount, position_id=None
-        #     )
-        #     z_position = current_position.position.z
-        # destination = DeckPoint(
-        #     x=deck_center.x + offset.x, y=deck_center.y + offset.y, z=z_position
-        # )
-        #
-        # await self._movement.move_mount_to_coordinates(
-        #     mount=params.mount,
-        #     deck_coordinates=destination,
-        #     direct=True,
-        #     additional_min_travel_z=None,
-        # )
 
         result = self._state_view.labware.get_calibration_coordinates(
             location=params.location

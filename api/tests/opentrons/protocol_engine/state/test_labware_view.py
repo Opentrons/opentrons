@@ -8,6 +8,7 @@ from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName, Point
+from opentrons.hardware_control.types import CriticalPoint
 
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
@@ -714,10 +715,28 @@ def test_raise_if_labware_in_location(
         subject.raise_if_labware_in_location(location=location)
 
 
-def test_get_calibration_coordinates() -> None:
+@pytest.mark.parametrize(
+    "input_location, critical_point_result, coordinates_result",
+    [
+        (CalibrationPosition.PROBE_POSITION, None, Point(x=206.5, y=133.5, z=3.0)),
+        (
+            CalibrationPosition.ATTACH_OR_DETACH,
+            CriticalPoint.MOUNT,
+            Point(x=196.5, y=43.0, z=0.0),
+        ),
+    ],
+)
+def test_get_calibration_coordinates(
+    input_location: CalibrationPosition,
+    critical_point_result: Optional[CriticalPoint],
+    coordinates_result: Point,
+    standard_deck_def: DeckDefinitionV3,
+) -> None:
     """Should return critical point and coordinates."""
-    subject = get_labware_view()
+    subject = get_labware_view(deck_definition=standard_deck_def)
 
-    coordinates, critical_point = subject.get_calibration_coordinates(
-        location=CalibrationPosition.PROBE_POSITION
-    )
+    result = subject.get_calibration_coordinates(location=input_location)
+
+    assert result.critical_point == critical_point_result
+
+    assert result.coordinates == coordinates_result

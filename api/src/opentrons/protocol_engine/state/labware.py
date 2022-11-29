@@ -10,6 +10,7 @@ from opentrons_shared_data.pipette.dev_types import LabwareUri
 from opentrons.types import DeckSlotName, Point
 from opentrons.protocols.models import LabwareDefinition, WellDefinition
 from opentrons.calibration_storage.helpers import uri_from_details
+from opentrons.hardware_control.types import CriticalPoint
 
 from .. import errors
 from ..resources import DeckFixedLabware
@@ -28,7 +29,8 @@ from ..types import (
     LoadedLabware,
     ModuleLocation,
     CalibrationPosition,
-    CalibrationCoordinates
+    CalibrationCoordinates,
+    DeckSlotOffsetVector,
 )
 from ..actions import (
     Action,
@@ -48,6 +50,8 @@ _MAGDECK_HALF_MM_LABWARE = {
     "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",
     "opentrons/usascientific_96_wellplate_2.4ml_deep/1",
 }
+
+_PROBE_DECK_SLOT_OFFSET = DeckSlotOffsetVector(x=10, y=0, z=3)
 
 
 @dataclass
@@ -481,7 +485,23 @@ class LabwareView(HasState[LabwareState]):
         self, location: CalibrationPosition
     ) -> CalibrationCoordinates:
         """Get calibration critical point and target position."""
-        pass
+        if location == CalibrationPosition.PROBE_POSITION:
+            target_center = self.get_slot_center_position(DeckSlotName.SLOT_5)
+            result = CalibrationCoordinates(
+                coordinates=Point(
+                    x=target_center.x + _PROBE_DECK_SLOT_OFFSET.x,
+                    y=target_center.y + _PROBE_DECK_SLOT_OFFSET.y,
+                    z=_PROBE_DECK_SLOT_OFFSET.z,
+                ),
+                critical_point=None,
+            )
+        else:
+            target_center = self.get_slot_center_position(DeckSlotName.SLOT_2)
+            result = CalibrationCoordinates(
+                coordinates=target_center, critical_point=CriticalPoint.MOUNT
+            )
+
+        return result
 
     def _is_magnetic_module_uri_in_half_millimeter(self, labware_id: str) -> bool:
         """Check whether the labware uri needs to be calculated in half a millimeter."""

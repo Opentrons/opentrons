@@ -230,6 +230,14 @@ class InstrumentOffsetVector(BaseModel):
     z: float
 
 
+class DeckSlotOffsetVector(BaseModel):
+    """Deck slot Offset from home position to robot deck."""
+
+    x: float
+    y: float
+    z: float
+
+
 class ModuleDefinition(BaseModel):
     """Module definition class."""
 
