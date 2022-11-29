@@ -86,13 +86,21 @@ def _create_fake_pipette_id(mount: OT3Mount, model: Optional[str]) -> Optional[s
 
 
 def _create_attached_instruments_dict(
-    pipette_left: Optional[str] = None, pipette_right: Optional[str] = None
+    pipette_left: Optional[str] = None,
+    pipette_right: Optional[str] = None,
+    gripper: Optional[str] = None,
 ) -> Dict[OT3Mount, Dict[str, Optional[str]]]:
     fake_id_left = _create_fake_pipette_id(OT3Mount.LEFT, pipette_left)
     fake_id_right = _create_fake_pipette_id(OT3Mount.RIGHT, pipette_right)
+    fake_id_gripper = "GRPV1020221101A02" if gripper else None
     sim_pip_left = {"model": pipette_left, "id": fake_id_left}
     sim_pip_right = {"model": pipette_right, "id": fake_id_right}
-    return {OT3Mount.LEFT: sim_pip_left, OT3Mount.RIGHT: sim_pip_right}
+    sim_gripper = {"model": gripper, "id": fake_id_gripper}
+    return {
+        OT3Mount.LEFT: sim_pip_left,
+        OT3Mount.RIGHT: sim_pip_right,
+        OT3Mount.GRIPPER: sim_gripper,
+    }
 
 
 async def build_async_ot3_hardware_api(
@@ -100,6 +108,7 @@ async def build_async_ot3_hardware_api(
     use_defaults: Optional[bool] = True,
     pipette_left: Optional[str] = None,
     pipette_right: Optional[str] = None,
+    gripper: Optional[str] = None,
 ) -> OT3API:
     """Built an OT3 Hardware API instance."""
     config = build_config_ot3({}) if use_defaults else load_ot3_config()
@@ -110,7 +119,9 @@ async def build_async_ot3_hardware_api(
         #                - gripper
         #                - 96-channel
         #                - modules
-        sim_pips = _create_attached_instruments_dict(pipette_left, pipette_right)
+        sim_pips = _create_attached_instruments_dict(
+            pipette_left, pipette_right, gripper
+        )
         kwargs["attached_instruments"] = sim_pips  # type: ignore[assignment]
     else:
         builder = OT3API.build_hardware_controller
