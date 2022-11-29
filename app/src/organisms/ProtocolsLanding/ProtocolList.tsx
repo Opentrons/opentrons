@@ -76,7 +76,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
     setShowSortByMenu(false)
   }
 
-  const handleSortProtocols = (sortKey: ProtocolSort): void => {
+  const handleProtocolsSortKey = (sortKey: ProtocolSort): void => {
     setSortBy(sortKey)
     dispatch(
       updateConfigValue('protocolsSortKey.protocolsStoredSortKey', sortKey)
@@ -168,16 +168,16 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
               right="7rem"
               flexDirection={DIRECTION_COLUMN}
             >
-              <MenuItem onClick={() => handleSortProtocols('alphabetical')}>
+              <MenuItem onClick={() => handleProtocolsSortKey('alphabetical')}>
                 {t('labware_landing:alphabetical')}
               </MenuItem>
-              <MenuItem onClick={() => handleSortProtocols('recent')}>
+              <MenuItem onClick={() => handleProtocolsSortKey('recent')}>
                 {t('most_recent_updates')}
               </MenuItem>
-              <MenuItem onClick={() => handleSortProtocols('reverse')}>
+              <MenuItem onClick={() => handleProtocolsSortKey('reverse')}>
                 {t('labware_landing:reverse')}
               </MenuItem>
-              <MenuItem onClick={() => handleSortProtocols('oldest')}>
+              <MenuItem onClick={() => handleProtocolsSortKey('oldest')}>
                 {t('oldest_updates')}
               </MenuItem>
             </Flex>
