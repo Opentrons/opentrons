@@ -147,7 +147,7 @@ async def test_ensure_send(
             data=message.payload.message_index.value.to_bytes(4, "big"),
         )
     )
-    print(message.payload.message_index.value.to_bytes(4, "big"))
+
     """It should create a can message and use the driver to send the message and raise no exception."""
     error, ignore = await asyncio.gather(
         subject.ensure_send(node_id, message, expected_nodes=[node_id]),
