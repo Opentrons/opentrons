@@ -5,21 +5,20 @@ import pytest
 from opentrons.protocol_engine.commands.calibration.move_to_location import (
     MoveToLocationParams,
     MoveToLocationImplementation,
-    CalibrationPosition,
 )
 from opentrons.protocol_engine.execution import SavedPositionData
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.state import StateView
-from opentrons.protocol_engine.execution import MovementHandler
-from opentrons.types import Point, MountType
+from opentrons.types import Point, MountType, Mount
 from opentrons.hardware_control.types import CriticalPoint
-from opentrons.protocol_engine.types import DeckPoint
+from opentrons.protocol_engine.types import DeckPoint, CalibrationPosition
 
 
 @pytest.fixture
 def subject(
     state_view: StateView, hardware_api: HardwareControlAPI
 ) -> MoveToLocationImplementation:
+    """Get command subject to test."""
     return MoveToLocationImplementation(
         state_view=state_view, hardware_api=hardware_api
     )
@@ -49,7 +48,7 @@ async def test_calibration_set_up_position_implementation(
             return attach_or_detach
 
     params = MoveToLocationParams(
-        mount="left",
+        mount=MountType.LEFT,
         location=slot_name,
     )
 
@@ -69,23 +68,17 @@ async def test_calibration_set_up_position_implementation(
     )
 
     decoy.when(
-        state_view.labware.get_calibration_coordinate(
+        state_view.labware.get_calibration_coordinates(
             CalibrationPosition.PROBE_POSITION
         )
     ).then_return((Point(x=1, y=2, z=3), CriticalPoint.MOUNT))
-
-    decoy.when(
-        hardware_api.gantry_position(
-            mount=MountType.LEFT, critical_point=CriticalPoint.MOUNT
-        )
-    ).then_return(Point(x=1, y=1, z=1))
 
     result = await subject.execute(params=params)
     assert result == Point(x=1, y=1, z=1)
 
     decoy.verify(
         await hardware_api.move_to(
-            mount=MountType.LEFT,
+            mount=Mount.LEFT,
             abs_position=Point(x=1, y=2, z=3),
             critical_point=CriticalPoint.MOUNT,
         )

@@ -19,6 +19,7 @@ from opentrons.protocol_engine.types import (
     LoadedLabware,
     ModuleModel,
     ModuleLocation,
+    CalibrationPosition,
 )
 
 from opentrons.protocol_engine.state.labware import LabwareState, LabwareView
@@ -717,5 +718,6 @@ def test_get_calibration_coordinates() -> None:
     """Should return critical point and coordinates."""
     subject = get_labware_view()
 
-    coordinates, critical_point = subject.get_calibration_coordinates()
-
+    coordinates, critical_point = subject.get_calibration_coordinates(
+        location=CalibrationPosition.PROBE_POSITION
+    )

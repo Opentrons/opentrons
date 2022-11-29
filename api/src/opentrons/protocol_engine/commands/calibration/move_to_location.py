@@ -6,7 +6,7 @@ from typing_extensions import Literal
 
 from pydantic import BaseModel, Field
 
-from opentrons.protocol_engine.types import DeckPoint, CalibrationPosition
+from opentrons.protocol_engine.types import CalibrationPosition
 from opentrons.types import MountType
 from opentrons.protocol_engine.commands.command import (
     AbstractCommandImpl,
@@ -38,11 +38,6 @@ class MoveToLocationParams(BaseModel):
 class MoveToLocationResult(BaseModel):
     """Result data from the execution of a CalibrationSetUpPosition command."""
 
-    position: DeckPoint = Field(
-        ...,
-        description="Position in deck coordinates after this movement has been executed",
-    )
-
 
 class MoveToLocationImplementation(
     AbstractCommandImpl[MoveToLocationParams, MoveToLocationResult]
@@ -60,7 +55,7 @@ class MoveToLocationImplementation(
 
     async def execute(self, params: MoveToLocationParams) -> MoveToLocationResult:
         """Move the requested pipette to a given deck slot."""
-        pipette_mount = MountType(params.mount)
+        hardware_mount = MountType.to_hw_mount(params.mount)
         # if params.location == CalibrationPosition.PROBE_POSITION:
         #     offset = DeckPoint(x=10, y=0, z=3)
         #     deck_center = self._state_view.labware.get_slot_center_position(
@@ -95,13 +90,13 @@ class MoveToLocationImplementation(
             location=params.location
         )
 
-        await self._hardware_api.move_to(mount=pipette_mount)
-
-        new_position = await self._hardware_api.gantry_position(
-            mount=pipette_mount, critical_point=critical_point
+        await self._hardware_api.move_to(
+            mount=hardware_mount,
+            abs_position=coordinates,
+            critical_point=critical_point,
         )
 
-        return MoveToLocationResult(position=new_position.position)
+        return MoveToLocationResult()
 
 
 class MoveToLocation(BaseCommand[MoveToLocationParams, MoveToLocationResult]):

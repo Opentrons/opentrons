@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Sequence, Any, Mapping, Union
+from typing import Dict, List, Optional, Sequence, Any, Mapping, Union, Tuple
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
 from opentrons_shared_data.pipette.dev_types import LabwareUri
@@ -10,6 +10,7 @@ from opentrons_shared_data.pipette.dev_types import LabwareUri
 from opentrons.types import DeckSlotName, Point
 from opentrons.protocols.models import LabwareDefinition, WellDefinition
 from opentrons.calibration_storage.helpers import uri_from_details
+from opentrons.hardware_control.types import CriticalPoint
 
 from .. import errors
 from ..resources import DeckFixedLabware
@@ -27,6 +28,7 @@ from ..types import (
     LabwareLocation,
     LoadedLabware,
     ModuleLocation,
+    CalibrationPosition,
 )
 from ..actions import (
     Action,
@@ -475,7 +477,10 @@ class LabwareView(HasState[LabwareState]):
                     f"Labware {labware.loadName} is already present at {location}."
                 )
 
-    def get_calibration_coordinates(self):
+    def get_calibration_coordinates(
+        self, location: CalibrationPosition
+    ) -> Tuple[Point, Optional[CriticalPoint]]:
+        """Get calibration critical point and target position."""
         pass
 
     def _is_magnetic_module_uri_in_half_millimeter(self, labware_id: str) -> bool:
