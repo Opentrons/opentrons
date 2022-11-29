@@ -1,0 +1,65 @@
+{
+  "$otSharedSchema": "gripper/schemas/1",
+  "model": "gripperV1",
+  "displayName": "Gripper GEN1",
+  "idleZCurrent": {
+    "defaultValue": 0.2,
+    "min": 0.02,
+    "max": 0.67,
+    "units": "amps",
+    "type": "float"
+  },
+  "activeZCurrent": {
+    "defaultValue": 0.67,
+    "min": 0.02,
+    "max": 0.67,
+    "units": "amps",
+    "type": "float"
+  },
+  "jawReferenceVoltage": {
+    "defaultValue": 2.6,
+    "min": 0.5,
+    "max": 3.3,
+    "units": "volts",
+    "type": "float"
+  },
+  "jawForcePerDutyCycle": [
+    [0.92, 4],
+    [1.48, 5],
+    [2.86, 7],
+    [3.72, 9],
+    [5.64, 12],
+    [7.66, 17],
+    [8.76, 20],
+    [10.06, 23],
+    [12.42, 34],
+    [16.2, 54],
+    [23, 80],
+    [25.7, 90]
+  ],
+  "baseOffsetFromMount": {
+    "x": 19.5,
+    "y": -74.325,
+    "z": -94.825
+  },
+  "jawCenterOffsetFromBase": {
+    "x": 0,
+    "y": 0,
+    "z": -76.475
+  },
+  "pinOneOffsetFromBase": {
+    "x": 4,
+    "y": -57,
+    "z": -100.475
+  },
+  "pinTwoOffsetFromBase": {
+    "x": 4,
+    "y": 57,
+    "z": -100.475
+  },
+  "quirks": [],
+  "jawSizes_mm": {
+    "max": 90.0,
+    "min": 58.0
+  }
+}
