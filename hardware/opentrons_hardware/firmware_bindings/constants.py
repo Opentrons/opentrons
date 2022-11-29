@@ -166,6 +166,7 @@ class ErrorCode(int, Enum):
     timeout = 0x06
     estop_detected = 0x07
     collision_detected = 0x08
+    labware_dropped = 0x09
 
 
 @unique
