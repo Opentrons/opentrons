@@ -27,7 +27,7 @@ def subject(
 
 
 @pytest.mark.parametrize(
-    argnames=["slot_name", "critical_point_result"],
+    argnames=["input_position", "critical_point_result"],
     argvalues=[
         (CalibrationPosition.PROBE_POSITION, None),
         (CalibrationPosition.ATTACH_OR_DETACH, CriticalPoint.MOUNT),
