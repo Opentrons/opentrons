@@ -232,7 +232,14 @@ async def _find_square_center_of_gripper_jaw(api: OT3API, expected_pos: Point) -
     return found_square_pos
 
 
-async def _main(simulate: bool, slot: int, mount: OT3Mount, test: bool, relative_offset: Optional[Point] = None, no_washers: bool = False) -> None:
+async def _main(
+    simulate: bool,
+    slot: int,
+    mount: OT3Mount,
+    test: bool,
+    relative_offset: Optional[Point] = None,
+    no_washers: bool = False,
+) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=simulate, use_defaults=True
     )
@@ -245,7 +252,9 @@ async def _main(simulate: bool, slot: int, mount: OT3Mount, test: bool, relative
         if not relative_offset:
             print("No relative offset to apply")
             return _offset
-        res = input(f"Add relative offset {relative_offset} to instrument's current offset? (y/n): ")
+        res = input(
+            f"Add relative offset {relative_offset} to instrument's current offset? (y/n): "
+        )
         if res and res[0].lower() == "y":
             print("applying relative offset")
             _offset += relative_offset
@@ -254,10 +263,14 @@ async def _main(simulate: bool, slot: int, mount: OT3Mount, test: bool, relative
         return _offset
 
     if mount == OT3Mount.GRIPPER:
-        instrument_offset = _apply_relative_offset(helpers_ot3.get_gripper_offset_ot3(api))
+        instrument_offset = _apply_relative_offset(
+            helpers_ot3.get_gripper_offset_ot3(api)
+        )
         helpers_ot3.set_gripper_offset_ot3(api, instrument_offset)
     else:
-        instrument_offset = _apply_relative_offset(helpers_ot3.get_pipette_offset_ot3(api, mount))
+        instrument_offset = _apply_relative_offset(
+            helpers_ot3.get_pipette_offset_ot3(api, mount)
+        )
         helpers_ot3.set_pipette_offset_ot3(api, mount, instrument_offset)
 
     # Initialize deck slot position
@@ -283,9 +296,13 @@ async def _main(simulate: bool, slot: int, mount: OT3Mount, test: bool, relative
         else:
             helpers_ot3.set_pipette_offset_ot3(api, mount, Point(x=0, y=0, z=0))
             input("add probe to Pipette, then press ENTER: ")
-            found_square_pos = await _find_square_center(api, mount, calibration_square_pos)
+            found_square_pos = await _find_square_center(
+                api, mount, calibration_square_pos
+            )
         # Save pipette offsets
-        instrument_offset = _apply_relative_offset(calibration_square_pos - found_square_pos)
+        instrument_offset = _apply_relative_offset(
+            calibration_square_pos - found_square_pos
+        )
         if mount == OT3Mount.GRIPPER:
             helpers_ot3.set_gripper_offset_ot3(api, instrument_offset)
         else:
@@ -341,4 +358,6 @@ if __name__ == "__main__":
         rel_offset = Point(*[float(v) for v in args.rel_offset])
     else:
         rel_offset = None
-    asyncio.run(_main(args.simulate, args.slot, _mount, args.test, rel_offset, args.no_washers))
+    asyncio.run(
+        _main(args.simulate, args.slot, _mount, args.test, rel_offset, args.no_washers)
+    )

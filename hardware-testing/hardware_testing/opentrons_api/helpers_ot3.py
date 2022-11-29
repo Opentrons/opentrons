@@ -373,6 +373,12 @@ def get_endstop_position_ot3(api: OT3API, mount: OT3Mount) -> Dict[OT3Axis, floa
     return {ax: val for ax, val in mount_pos_per_axis.items()}
 
 
+def get_gantry_homed_position_ot3(api: OT3API, mount: OT3Mount) -> Point:
+    """Get the homed coordinate by mount."""
+    axes_pos = get_endstop_position_ot3(api, mount)
+    return Point(x=axes_pos[OT3Axis.X], y=axes_pos[OT3Axis.Y], z=axes_pos[OT3Axis.by_mount(mount)])
+
+
 class OT3JogTermination(Exception):
     """Jogging terminated."""
 
