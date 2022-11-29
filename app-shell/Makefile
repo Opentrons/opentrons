@@ -52,8 +52,7 @@ electron := yarn electron . \
 	--disable_ui.webPreferences.webSecurity \
 	--ui.url.protocol="http:" \
 	--ui.url.path="localhost:$(PORT)" \
-	--python.pathToPythonOverride=$(shell cd ../api && pipenv --venv) \
-	--protocolsSortKey.protocolsStoredSortKey="alphabetical"
+	--python.pathToPythonOverride=$(shell cd ../api && pipenv --venv)
 
 # standard targets
 #####################################################################
