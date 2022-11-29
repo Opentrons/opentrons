@@ -45,7 +45,7 @@ async def test_calibration_set_up_position_implementation(
         call Movement.move_to_coordinates with the correct input."""
     params = MoveToLocationParams(
         mount=MountType.LEFT,
-        location=slot_name,
+        location=input_position,
     )
 
     decoy.when(
