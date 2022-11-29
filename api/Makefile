@@ -125,11 +125,11 @@ test-ot3:
 
 .PHONY: test-app
 test-app:
-	$(call pytest,app) $(tests) -m 'not ot3_only' $(test_opts) --ot2-only --ignore-glob="**/*ot3*"
+	$(call pytest,app) $(tests) $(test_opts)
 
 .PHONY: test-cov-app
 test-cov-app:
-	$(call pytest,app) $(tests) -m 'not ot3_only' $(test_opts) --ot2-only --ignore-glob="**/*ot3*" $(cov_opts)
+	$(call pytest,app) $(tests) $(test_opts) $(cov_opts)
 
 .PHONY: black-check
 black-check:

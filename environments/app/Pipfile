@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 opentrons-shared-data = { editable = true, path = "../../shared-data/python" }
+opentrons-hardware = { editable = true, path = "../../hardware" }
 opentrons = { editable = true, path = "../../api" }
 pytest = ">=7.0.1,<8"
 coverage = ">=5.1,<7"
