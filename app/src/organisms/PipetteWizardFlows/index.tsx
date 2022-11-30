@@ -117,8 +117,7 @@ export const PipetteWizardFlows = (
 
   React.useEffect(() => {
     if (isCommandMutationLoading || isStopLoading || isExiting) {
-      const timer = setTimeout(() => setIsRobotMoving(true), 700)
-      return () => clearTimeout(timer)
+      setIsRobotMoving(true)
     } else {
       setIsRobotMoving(false)
     }
@@ -185,6 +184,9 @@ export const PipetteWizardFlows = (
         attachedPipette[mount] != null
       ) {
         proceed()
+        //  if you completed detaching the pipette, robot will home and delete run
+      } else if (flowType === FLOWS.DETACH) {
+        handleCleanUpAndClose()
       } else {
         closeFlow()
       }
