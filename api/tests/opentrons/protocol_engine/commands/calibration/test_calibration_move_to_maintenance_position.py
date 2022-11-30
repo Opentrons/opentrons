@@ -31,8 +31,7 @@ async def test_calibration_move_to_location_implementation(
     state_view: StateView,
     hardware_api: HardwareControlAPI,
 ) -> None:
-    """Command should get a Point value for a given deck slot center and \
-        call Movement.move_to_coordinates with the correct input."""
+    """Command should get a move to target location and critical point and should verify move_to call."""
     params = MoveToMaintenancePositionParams(mount=MountType.LEFT)
 
     decoy.when(await hardware_api.gantry_position(mount=Mount.LEFT)).then_return(
