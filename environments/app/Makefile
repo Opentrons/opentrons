@@ -3,7 +3,7 @@ include ../../scripts/python.mk
 .PHONY: setup, teardown
 .DEFAULT_TARGET: setup
 
-setup: teardown
+setup:
 	$(call pipenv,app) install --dev --skip-lock --python $(OT_PYTHON)
 	$(call pipenv,app) run pip freeze
 
