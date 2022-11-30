@@ -5,7 +5,7 @@ and expose it to a python commandline.
 """
 
 import os
-from functools import partial, wraps
+from functools import wraps
 import asyncio
 
 has_robot_server = True
