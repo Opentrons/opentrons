@@ -35,6 +35,7 @@ from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
 from opentrons_shared_data.deck.dev_types import RobotModel, DeckDefinitionV3
 from opentrons_shared_data.deck import (
     load as load_deck,
+    DefinitionName as DeckDefinitionName,
     DEFAULT_DECK_DEFINITION_VERSION,
 )
 
@@ -240,9 +241,14 @@ async def robot_model(
 @pytest.fixture
 def deck_definition(robot_model: RobotModel) -> DeckDefinitionV3:
     if robot_model == "OT-3 Standard":
-        return load_deck("ot3_standard", DEFAULT_DECK_DEFINITION_VERSION)
+        return load_deck(
+            DeckDefinitionName.OT3_STANDARD,
+            DEFAULT_DECK_DEFINITION_VERSION,
+        )
     else:
-        return load_deck("ot2_standard", DEFAULT_DECK_DEFINITION_VERSION)
+        return load_deck(
+            DeckDefinitionName.OT2_STANDARD, DEFAULT_DECK_DEFINITION_VERSION
+        )
 
 
 @pytest.fixture()

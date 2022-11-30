@@ -6,14 +6,13 @@ from typing import TYPE_CHECKING
 from decoy import Decoy
 
 from opentrons_shared_data import load_shared_data
-from opentrons_shared_data.deck import load as load_deck
+from opentrons_shared_data.deck import (
+    DefinitionName as DeckDefinitionName,
+    load as load_deck,
+)
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.labware import load_definition
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.protocols.api_support.constants import (
-    STANDARD_OT2_DECK,
-    SHORT_TRASH_DECK,
-)
 from opentrons.protocol_engine.types import ModuleDefinition
 
 if TYPE_CHECKING:
@@ -36,13 +35,13 @@ def ot3_hardware_api(decoy: Decoy) -> OT3API:
 @pytest.fixture(scope="session")
 def standard_deck_def() -> DeckDefinitionV3:
     """Get the OT-2 standard deck definition."""
-    return load_deck(STANDARD_OT2_DECK, 3)
+    return load_deck(DeckDefinitionName.OT2_STANDARD, 3)
 
 
 @pytest.fixture(scope="session")
 def short_trash_deck_def() -> DeckDefinitionV3:
     """Get the OT-2 short-trash deck definition."""
-    return load_deck(SHORT_TRASH_DECK, 3)
+    return load_deck(DeckDefinitionName.OT2_SHORT_TRASH, 3)
 
 
 @pytest.fixture(scope="session")

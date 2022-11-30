@@ -13,7 +13,9 @@ from opentrons_shared_data.deck.dev_types import SlotDefV3
 from opentrons import types
 from opentrons.hardware_control.modules.types import ModuleType
 from opentrons.protocol_api.labware import load as load_lw, Labware
-from opentrons.protocols.api_support.constants import deck_type
+from opentrons.protocols.api_support.default_deck_type import (
+    infer_from_global_config as infer_deck_type_from_global_config,
+)
 from opentrons.protocols.api_support.labware_like import LabwareLike
 
 from . import deck_conflict
@@ -47,7 +49,9 @@ class Deck(UserDict):
         # TODO(mc, 2022-06-17): move deck type selection
         # (and maybe deck definition loading) out of this constructor
         # to decouple from config (and environment) reading / loading
-        self._definition = load_deck(deck_type(), DEFAULT_DECK_DEFINITION_VERSION)
+        self._definition = load_deck(
+            infer_deck_type_from_global_config(), DEFAULT_DECK_DEFINITION_VERSION
+        )
         self._positions = {}
         for slot in self._definition["locations"]["orderedSlots"]:
             self.data[int(slot["id"])] = None
