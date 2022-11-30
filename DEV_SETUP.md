@@ -82,7 +82,7 @@ Close and re-open your terminal to confirm `nvs` is installed.
 nvs --version
 ```
 
-Now we can use nvs to install Node.js v14 and switch on `auto` mode, which will make sure Node.js v14 is used any time we're in the `opentrons` project directory.
+Now we can use nvs to install Node.js v16 and switch on `auto` mode, which will make sure Node.js v16 is used any time we're in the `opentrons` project directory.
 
 ```shell
 nvs add 16
@@ -162,12 +162,15 @@ On Windows, we rely on:
 
 - [scoop][] to install general dependencies and Python
 - [Node Version Switcher][nvs] to install and manage Node.js
+- [Visual Studio][visual studio] to run electron-rebuild
 
 #### 0. Install `scoop` and general dependencies
 
 #### 1. Install `nvs` and Node.js
 
 #### 2. Install Python
+
+#### 3. Install build tools via Visual Studio Installer
 
 ### Linux
 
@@ -196,7 +199,7 @@ Once you are inside the repository for the first time, you should do two things:
 2. Tell `pyenv` to use Python 3.7
 
 ```shell
-# confirm Node v14
+# confirm Node v16
 node --version
 
 # set Python version, and confirm
@@ -225,6 +228,7 @@ Once `make setup` completes, you're ready to start developing! Check out our gen
 [xcode command line tools]: https://developer.apple.com/xcode/resources/
 [scoop]: https://scoop.sh/
 [nvs]: https://github.com/jasongin/nvs
+[visual studio]: https://visualstudio.microsoft.com/downloads/
 [pyenv]: https://github.com/pyenv/pyenv
 [yarn]: https://classic.yarnpkg.com/
 [pipenv]: https://github.com/pypa/pipenv

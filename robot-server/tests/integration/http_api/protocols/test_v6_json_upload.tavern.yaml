@@ -387,6 +387,7 @@ stages:
                       x: 0
                       y: 0
                       z: 0
+                  forceDirect: false
                 result: {}
                 startedAt: !anystr
                 completedAt: !anystr
@@ -405,6 +406,9 @@ stages:
                       x: 2
                       y: 3
                       z: 10
+                  minimumZHeight: 35
+                  forceDirect: true
+                  speed: 12.3
                 result: {}
                 startedAt: !anystr
                 completedAt: !anystr
@@ -449,6 +453,7 @@ stages:
                     z: 0
                   minimumZHeight: 35
                   forceDirect: true
+                  speed: 12.3
                 result: {}
                 startedAt: !anystr
                 completedAt: !anystr

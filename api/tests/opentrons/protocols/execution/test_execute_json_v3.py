@@ -54,7 +54,8 @@ def test_get_well(minimal_labware_def2):
     deck = Location(Point(0, 0, 0), "deck")
     well_name = "A2"
     some_labware = labware.Labware(
-        implementation=LabwareImplementation(minimal_labware_def2, deck)
+        implementation=LabwareImplementation(minimal_labware_def2, deck),
+        api_version=MAX_SUPPORTED_VERSION,
     )
     loaded_labware = {"someLabwareId": some_labware}
     params = {"labware": "someLabwareId", "well": well_name}
@@ -113,7 +114,8 @@ def test_get_location_with_offset_fixed_trash(minimal_labware_def2):
     trash_labware_def = deepcopy(minimal_labware_def2)
     trash_labware_def["parameters"]["quirks"] = ["fixedTrash"]
     trash_labware = labware.Labware(
-        implementation=LabwareImplementation(trash_labware_def, deck)
+        implementation=LabwareImplementation(trash_labware_def, deck),
+        api_version=MAX_SUPPORTED_VERSION,
     )
 
     loaded_labware = {"someLabwareId": trash_labware}
@@ -202,7 +204,8 @@ def test_air_gap(minimal_labware_def2):
     deck = Location(Point(0, 0, 0), "deck")
     well_name = "A2"
     some_labware = labware.Labware(
-        implementation=LabwareImplementation(minimal_labware_def2, deck)
+        implementation=LabwareImplementation(minimal_labware_def2, deck),
+        api_version=MAX_SUPPORTED_VERSION,
     )
     loaded_labware = {"someLabwareId": some_labware}
     params = {"labware": "someLabwareId", "well": well_name}

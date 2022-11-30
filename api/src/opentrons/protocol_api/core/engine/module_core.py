@@ -1,5 +1,8 @@
 """Protocol API module implementation logic."""
+from __future__ import annotations
+
 from typing import Optional, List
+from typing_extensions import TYPE_CHECKING
 
 from opentrons.hardware_control import SynchronousAdapter, modules as hw_modules
 from opentrons.hardware_control.modules.types import (
@@ -22,7 +25,6 @@ from opentrons.protocol_engine.errors.exceptions import (
     NoMagnetEngageHeightError,
 )
 
-from opentrons.protocol_api import Labware
 from opentrons.protocols.api_support.types import APIVersion
 
 from ..module import (
@@ -34,6 +36,9 @@ from ..module import (
 )
 from .labware import LabwareCore
 from .exceptions import InvalidMagnetEngageHeightError
+
+if TYPE_CHECKING:
+    from opentrons.protocol_api import Labware
 
 
 class ModuleCore(AbstractModuleCore[LabwareCore]):
@@ -95,6 +100,8 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
 
     def add_labware_core(self, labware_core: LabwareCore) -> Labware:
         """Add a labware to the module."""
+        from opentrons.protocol_api import Labware
+
         return Labware(implementation=labware_core, api_version=self._api_version)
 
 
