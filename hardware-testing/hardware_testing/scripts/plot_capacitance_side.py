@@ -137,7 +137,13 @@ class Plot:
         x_last = df[x_axis].max()
         y_first = df[y_axis].min()
         y_last = df[y_axis].max()
-        fig = px.line(df, x=x_axis, y=[y_axis], color="Cycle", markers=True)
+        fig = px.line(df, x=x_axis, y=[y_axis], markers=True)
+        fig.update_traces(
+            marker={
+                "size":10,
+                "line":{"width":2, "color":"black"}
+            }
+        )
         self.plot_param["figure"] = fig
         self.plot_param["filename"] = "plot_absolute"
         self.plot_param["title"] = "Absolute Capacitance Data"
@@ -145,7 +151,7 @@ class Plot:
         self.plot_param["y_title"] = "Capacitance (pF)"
         self.plot_param["x_range"] = [x_first, x_last]
         self.plot_param["y_range"] = [0, 14]
-        self.plot_param["legend"] = "Cycles"
+        self.plot_param["legend"] = "Data"
         self.plot_param["annotation"] = None
         zoom_param = self.plot_param.copy()
         self.write_plot(self.plot_param)
@@ -162,7 +168,13 @@ class Plot:
         x_last = df[x_axis].max()
         y_first = df[y_axis].min()
         y_last = df[y_axis].max()
-        fig = px.line(df, x=x_axis, y=[y_axis], color="Cycle", markers=True)
+        fig = px.line(df, x=x_axis, y=[y_axis], markers=True)
+        fig.update_traces(
+            marker={
+                "size":10,
+                "line":{"width":2, "color":"black"}
+            }
+        )
         self.plot_param["figure"] = fig
         self.plot_param["filename"] = "plot_distance"
         self.plot_param["title"] = "Capacitance vs. Distance Data"
@@ -170,7 +182,7 @@ class Plot:
         self.plot_param["y_title"] = "Capacitance (pF)"
         self.plot_param["x_range"] = [x_first, x_last]
         self.plot_param["y_range"] = [0, 14]
-        self.plot_param["legend"] = "Cycles"
+        self.plot_param["legend"] = "Data"
         self.plot_param["annotation"] = None
         zoom_param = self.plot_param.copy()
         self.write_plot(self.plot_param)
