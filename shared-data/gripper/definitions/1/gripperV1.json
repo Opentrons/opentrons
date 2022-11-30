@@ -17,7 +17,7 @@
     "type": "float"
   },
   "jawReferenceVoltage": {
-    "defaultValue": 1.0,
+    "defaultValue": 2.6,
     "min": 0.5,
     "max": 3.3,
     "units": "volts",

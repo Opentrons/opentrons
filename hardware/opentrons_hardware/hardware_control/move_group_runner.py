@@ -409,11 +409,10 @@ class MoveScheduler:
                 # the execute even gets sent.
                 await asyncio.wait_for(
                     self._event.wait(),
-                    max(0.1, self._durations[group_id - self._start_at_index] + 0.1),
+                    max(1.0, self._durations[group_id - self._start_at_index] * 1.1),
                 )
             except asyncio.TimeoutError:
-                # log.warning("Move set timed out")
-                pass
+                log.warning("Move set timed out")
 
         def _reify_queue_iter() -> Iterator[_CompletionPacket]:
             while not self._completion_queue.empty():
