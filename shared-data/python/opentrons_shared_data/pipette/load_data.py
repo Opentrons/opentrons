@@ -19,9 +19,9 @@ LoadedConfiguration = Dict[types.PipetteChannelType, Dict[types.PipetteModelType
 
 
 def _build_configuration_dictionary(
-    rel_path, version: types.PipetteVersionType
+    rel_path: str, version: types.PipetteVersionType
 ) -> LoadedConfiguration:
-    _dict = {}
+    _dict: LoadedConfiguration = {}
     for pipette_type in types.PipetteChannelType:
         pipette_type_path = get_shared_data_root() / rel_path / pipette_type.value
         _dict[pipette_type] = {}

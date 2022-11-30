@@ -14,10 +14,10 @@ class SupportedTipsDefinition(BaseModel):
     defaultBlowOutFlowRate: float = Field(
         ..., description="The flowrate used in blowouts by default."
     )
-    aspirate: Dict[str, List] = Field(
+    aspirate: Dict[str, List[float]] = Field(
         ..., description="The default pipetting functions list for aspirate."
     )
-    dispense: Dict[str, List] = Field(
+    dispense: Dict[str, List[float]] = Field(
         ..., description="The default pipetting functions list for dispensing."
     )
 
