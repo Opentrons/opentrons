@@ -100,7 +100,7 @@ export const useToggleGroup = (
         css={selectedValue === left ? ACTIVE_STYLE : DEFAULT_STYLE}
         key={left}
         onClick={handleLeftClick}
-        data-testid='useToggleGroup_leftButton'
+        data-testid="useToggleGroup_leftButton"
       >
         {left}
       </PrimaryButton>
@@ -108,8 +108,7 @@ export const useToggleGroup = (
         css={selectedValue === right ? ACTIVE_STYLE : DEFAULT_STYLE}
         key={right}
         onClick={handleRightClick}
-        data-testid='useToggleGroup_rightButton'
-
+        data-testid="useToggleGroup_rightButton"
       >
         {right}
       </PrimaryButton>
