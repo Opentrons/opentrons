@@ -1,4 +1,4 @@
-"""Calibration Move To Location command payload, result, and implementation models."""
+"""Calibration Move To Maintenance Location command payload, result, and implementation models."""
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Type, Optional
