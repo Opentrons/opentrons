@@ -57,7 +57,7 @@ jobs:
 
   python-test:
     name: 'shared-data package on ${{ matrix.os }}'
-    timeout-minutes: 35
+    timeout-minutes: 45 # macos takes a very long time when the cache is busted
     needs: [python-lint]
     strategy:
       matrix:
