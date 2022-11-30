@@ -53,7 +53,7 @@ class MoveToMaintenancePositionImplementation(
     async def execute(
         self, params: MoveToMaintenancePositionParams
     ) -> MoveToMaintenancePositionResult:
-        """Move the requested pipette to a given deck slot."""
+        """Move the requested mount to a maintenance deck slot."""
         hardware_mount = params.mount.to_hw_mount()
 
         await self._hardware_api.home_z(hardware_mount)
