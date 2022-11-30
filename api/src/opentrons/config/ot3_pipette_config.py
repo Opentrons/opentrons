@@ -1,4 +1,4 @@
-from typing import List, Tuple, Dict
+from typing import List, Dict
 from dataclasses import dataclass, field
 from opentrons_shared_data.pipette import load_data, pipette_definition
 from opentrons_shared_data.pipette.types import (
@@ -95,8 +95,8 @@ class TipSpecificConfigurations:
     default_aspirate_flowrate: float
     default_dispense_flowrate: float
     default_blowout_flowrate: float
-    aspirate: Dict[str, List[Tuple[float, float, float]]]
-    dispense: Dict[str, List[Tuple[float, float, float]]]
+    aspirate: Dict[str, List[float]]
+    dispense: Dict[str, List[float]]
 
     @classmethod
     def from_pydantic(

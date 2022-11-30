@@ -35,11 +35,11 @@ class PipetteChannelType(Enum):
 
     @property
     def as_int(self) -> int:
-        if self.value == self.NINETY_SIX_CHANNEL:
+        if self.value == "ninety_six_channel":
             return 96
-        elif self.value == self.EIGHT_CHANNEL:
+        elif self.value == "eight_channel":
             return 8
-        elif self.value == self.SINGLE_CHANNEL:
+        elif self.value == "single_channel":
             return 1
         return 0
 
