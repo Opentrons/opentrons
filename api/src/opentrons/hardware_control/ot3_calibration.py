@@ -385,7 +385,7 @@ async def find_slot_center_noncontact(
     return x_center, y_center
 
 
-async def calibrate_mount(
+async def _calibrate_mount(
     hcapi: OT3API,
     mount: OT3Mount,
     method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
@@ -467,7 +467,7 @@ async def calibrate_gripper(hcapi: OT3API, probe: GripperProbe) -> Point:
     hcapi.add_gripper_probe(probe)
     try:
         await hcapi.grip(GRIPPER_GRIP_FORCE)
-        offset = await calibrate_mount(hcapi, OT3Mount.GRIPPER)
+        offset = await _calibrate_mount(hcapi, OT3Mount.GRIPPER)
         return offset
     finally:
         hcapi.remove_gripper_probe()
@@ -481,7 +481,7 @@ async def calibrate_pipette(
 ) -> Point:
     try:
         await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
-        offset = await calibrate_mount(hcapi, mount, method)
+        offset = await _calibrate_mount(hcapi, mount, method)
         # save instrument offset for pipette
         await hcapi.save_instrument_offset(mount, offset)
         return offset
