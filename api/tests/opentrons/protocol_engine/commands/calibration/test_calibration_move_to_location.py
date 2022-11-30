@@ -51,6 +51,13 @@ async def test_calibration_move_to_location_implementation(
     assert result == MoveToLocationResult()
 
     decoy.verify(
+        await hardware_api.home_z(
+            mount=Mount.LEFT,
+        ),
+        times=1,
+    )
+
+    decoy.verify(
         await hardware_api.move_to(
             mount=Mount.LEFT,
             abs_position=Point(x=1, y=2, z=3),
