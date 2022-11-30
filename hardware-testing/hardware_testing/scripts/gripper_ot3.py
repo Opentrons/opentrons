@@ -32,7 +32,7 @@ ARMADILLO_GRIP_POINT += types.Point(z=LABWARE_SIZE_ARMADILLO.z * 0.5)
 LABWARE_SIZE = {"plate": LABWARE_SIZE_ARMADILLO, "tiprack": LABWARE_SIZE_EVT_TIPRACK}
 LABWARE_GRIP_HEIGHT = {
     "plate": LABWARE_SIZE_ARMADILLO.z,
-    "tiprack": LABWARE_SIZE_EVT_TIPRACK * 0.5,
+    "tiprack": LABWARE_SIZE_EVT_TIPRACK.z * 0.5,
 }
 
 LABWARE_GRIP_FORCE = {"plate": 5, "tiprack": 10}
@@ -194,13 +194,18 @@ async def _main(
         for i, s in enumerate(slots[:-1]):
             src = slots[i]
             dst = slots[i + 1]
-            args = [api, labware_key, force, src, dst]
             if not offsets:
-                await _slot_to_slot(*args, inspect=inspect, warp=warp)
+                await _slot_to_slot(
+                    api, labware_key, force, src, dst, inspect=inspect, warp=warp
+                )
             else:
                 for _s_offset, _d_offset in offsets:
                     await _slot_to_slot(
-                        *args,
+                        api,
+                        labware_key,
+                        force,
+                        src,
+                        dst,
                         src_offset=_s_offset,
                         dst_offset=_d_offset,
                         inspect=inspect,

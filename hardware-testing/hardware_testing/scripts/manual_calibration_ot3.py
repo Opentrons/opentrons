@@ -1,12 +1,12 @@
 """OT-3 Manual Calibration."""
 import asyncio
 import argparse
-from typing import Optional
+from typing import Tuple
 
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.types import GripperProbe
 
-from hardware_testing.opentrons_api.types import OT3Mount, OT3Axis, Point, CriticalPoint
+from hardware_testing.opentrons_api.types import OT3Mount, OT3Axis, Point
 from hardware_testing.opentrons_api import helpers_ot3
 from opentrons.calibration_storage.ot3.pipette_offset import save_pipette_calibration
 from opentrons.calibration_storage.ot3.gripper_offset import save_gripper_calibration
@@ -16,6 +16,8 @@ DEFAULT_STEP_SIZE = 0.1
 Z_OFFSET_FROM_WASHERS = 3.0
 
 GRIP_FORCE_CALIBRATION = 5
+
+GRIPPER_PROBE_LENGTH = 22
 
 # Height of the bottom of a probe above the deck.
 # Must be high enough for the user to reach under to change probes,
@@ -48,21 +50,28 @@ def _get_instrument_id(api: OT3API, mount: OT3Mount) -> str:
     return instr_id
 
 
-async def _test_gripper_calibration_with_block(api: OT3API, pos: Point) -> None:
+def _get_user_input_during_gripper_test() -> Tuple[str, float]:
+    res = input(
+        '"w"=GRIP-WIDTH; "g"=GRIP-FORCE; "u"=UNGRIP; "z"=JOG-Z; "y"=JOG-Y; "s"=STOP '
+    )
+    res = res.strip().lower()
+    try:
+        key = res[0]
+    except IndexError:
+        return _get_user_input_during_gripper_test()
+    try:
+        value = float(res[1:])
+    except (ValueError, IndexError):
+        value = 0.0
+    return key, value
+
+
+async def _test_gripper_calibration_with_block(api: OT3API, pos: Point) -> Point:
     input("add the calibration block to the slot, then press ENTER")
     await api.home_gripper_jaw()
     await api.move_to(OT3Mount.GRIPPER, pos)
     while True:
-        res = input('"w"=GRIP-WIDTH; "g"=GRIP-FORCE; "u"=UNGRIP; "z"=JOG-Z; "s"=STOP ')
-        res = res.strip().lower()
-        try:
-            key = res[0]
-        except IndexError:
-            continue
-        try:
-            value = float(res[1:])
-        except (ValueError, IndexError):
-            value = 0.0
+        key, value = _get_user_input_during_gripper_test()
         if key == "w" and value:
             print(f"Jaw width: {value}")
             await api.hold_jaw_width(int(value))
@@ -76,19 +85,31 @@ async def _test_gripper_calibration_with_block(api: OT3API, pos: Point) -> None:
             await api.move_rel(OT3Mount.GRIPPER, Point(z=value))
             current_pos = await api.gantry_position(mount=OT3Mount.GRIPPER)
             print(f"Gripper Z: {round(current_pos.z, 1)}")
+        elif key == "y" and value:
+            if abs(value) > 1.0:
+                print("must jog Y axis in increments less than 1mm")
+            else:
+                await api.move_rel(OT3Mount.GRIPPER, Point(y=value))
+                current_pos = await api.gantry_position(mount=OT3Mount.GRIPPER)
+                print(f"Additional Y Offset: {round(pos.y - current_pos.y, 2)}")
         elif key == "s":
             break
     await api.home_gripper_jaw()
+    # get any additional Y-axis offset
+    new_pos = await api.gantry_position(mount=OT3Mount.GRIPPER)
+    y_offset_from_calibrated_position = pos.y - new_pos.y
+    return Point(y=y_offset_from_calibrated_position)
 
 
-async def _test_current_calibration(api: OT3API, mount: OT3Mount, pos: Point) -> None:
+async def _test_current_calibration(api: OT3API, mount: OT3Mount, pos: Point) -> Point:
     current_pos = await api.gantry_position(mount)
     await api.move_to(mount, pos._replace(z=current_pos.z))
     if mount == OT3Mount.GRIPPER:
-        await _test_gripper_calibration_with_block(api, pos)
+        return await _test_gripper_calibration_with_block(api, pos)
     else:
         input("ENTER to move to center of slot to test Pipette calibration")
         await api.move_to(mount, pos)
+        return Point()
 
 
 async def _jog_axis(
@@ -235,12 +256,62 @@ async def _find_square_center_of_gripper_jaw(api: OT3API, expected_pos: Point) -
     return found_square_pos
 
 
+def _apply_relative_offset(_offset: Point, _relative: Point) -> Point:
+    if not _relative or _relative == Point():
+        print("No relative offset to apply")
+        return _offset
+    res = input(
+        f"Add relative offset {_relative} to instrument's current offset? (y/n): "
+    )
+    if res and res[0].lower() == "y":
+        print("applying relative offset")
+        _offset += _relative
+    else:
+        print("skipping relative offset")
+    return _offset
+
+
+async def _find_the_square(api: OT3API, mount: OT3Mount, expected_pos: Point) -> Point:
+    if mount == OT3Mount.GRIPPER:
+        helpers_ot3.set_gripper_offset_ot3(api, Point(x=0, y=0, z=0))
+        found_pos = await _find_square_center_of_gripper_jaw(api, expected_pos)
+    else:
+        helpers_ot3.set_pipette_offset_ot3(api, mount, Point(x=0, y=0, z=0))
+        input("add probe to Pipette, then press ENTER: ")
+        found_pos = await _find_square_center(api, mount, expected_pos)
+    return found_pos
+
+
+def _apply_offset(
+    api: OT3API, mount: OT3Mount, offset: Point, relative_offset: Point
+) -> Point:
+    calibration_with_offset = _apply_relative_offset(offset, relative_offset)
+    if mount == OT3Mount.GRIPPER:
+        helpers_ot3.set_gripper_offset_ot3(api, calibration_with_offset)
+    else:
+        helpers_ot3.set_pipette_offset_ot3(api, mount, calibration_with_offset)
+    return calibration_with_offset
+
+
+async def _init_deck_and_pipette_coordinates(
+    api: OT3API, mount: OT3Mount, slot: int, no_washers: bool
+) -> Point:
+    calibration_square_pos = helpers_ot3.get_slot_calibration_square_position_ot3(slot)
+    if not no_washers:
+        # FIXME: remove this extra height, once longer probe is ready
+        calibration_square_pos += Point(z=Z_OFFSET_FROM_WASHERS)
+    if mount != OT3Mount.GRIPPER:
+        # do this early on, so that all coordinates are using the probe's length
+        await api.add_tip(mount, helpers_ot3.CALIBRATION_PROBE_EVT.length)
+    return calibration_square_pos
+
+
 async def _main(
     simulate: bool,
     slot: int,
     mount: OT3Mount,
     test: bool,
-    relative_offset: Optional[Point] = None,
+    relative_offset: Point,
     no_washers: bool = False,
 ) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(
@@ -251,82 +322,59 @@ async def _main(
         f"\nStarting Manual Calibration on Deck Slot #{slot} and Instrument {instr_id}:\n"
     )
 
-    def _apply_relative_offset(_offset: Point) -> Point:
-        if not relative_offset:
-            print("No relative offset to apply")
-            return _offset
-        res = input(
-            f"Add relative offset {relative_offset} to instrument's current offset? (y/n): "
-        )
-        if res and res[0].lower() == "y":
-            print("applying relative offset")
-            _offset += relative_offset
-        else:
-            print("skipping relative offset")
-        return _offset
-
+    # apply the (optional) relative offset passed in
     if mount == OT3Mount.GRIPPER:
-        instrument_offset = _apply_relative_offset(
-            helpers_ot3.get_gripper_offset_ot3(api)
-        )
-        helpers_ot3.set_gripper_offset_ot3(api, instrument_offset)
+        loaded_offset = helpers_ot3.get_gripper_offset_ot3(api)
     else:
-        instrument_offset = _apply_relative_offset(
-            helpers_ot3.get_pipette_offset_ot3(api, mount)
-        )
-        helpers_ot3.set_pipette_offset_ot3(api, mount, instrument_offset)
+        loaded_offset = helpers_ot3.get_pipette_offset_ot3(api, mount)
+    print(f"loaded instrument offset: {loaded_offset}")
+    instrument_offset = _apply_offset(api, mount, loaded_offset, relative_offset)
 
     # Initialize deck slot position
-    calibration_square_pos = helpers_ot3.get_slot_calibration_square_position_ot3(slot)
-    if not no_washers:
-        # FIXME: remove this extra height, once longer probe is ready
-        calibration_square_pos += Point(z=Z_OFFSET_FROM_WASHERS)
-    if mount != OT3Mount.GRIPPER:
-        # do this early on, so that all coordinates are using the probe's length
-        await api.add_tip(mount, helpers_ot3.CALIBRATION_PROBE_EVT.length)
+    calibration_square_pos = await _init_deck_and_pipette_coordinates(
+        api, mount, slot, no_washers
+    )
 
-    # home
     await api.home()
 
     # find
     if not test:
-        # run the calibration procedure
-        if mount == OT3Mount.GRIPPER:
-            helpers_ot3.set_gripper_offset_ot3(api, Point(x=0, y=0, z=0))
-            found_square_pos = await _find_square_center_of_gripper_jaw(
-                api, calibration_square_pos
-            )
-        else:
-            helpers_ot3.set_pipette_offset_ot3(api, mount, Point(x=0, y=0, z=0))
-            input("add probe to Pipette, then press ENTER: ")
-            found_square_pos = await _find_square_center(
-                api, mount, calibration_square_pos
-            )
-        # Save pipette offsets
-        instrument_offset = _apply_relative_offset(
-            calibration_square_pos - found_square_pos
-        )
-        if mount == OT3Mount.GRIPPER:
-            helpers_ot3.set_gripper_offset_ot3(api, instrument_offset)
-        else:
-            helpers_ot3.set_pipette_offset_ot3(api, mount, instrument_offset)
+        found_square_pos = await _find_the_square(api, mount, calibration_square_pos)
+        found_offset = calibration_square_pos - found_square_pos
+        instrument_offset = _apply_offset(api, mount, found_offset, relative_offset)
 
     # test
     if mount == OT3Mount.GRIPPER:
-        slot_loc_top_left = helpers_ot3.get_slot_top_left_position_ot3(slot)
-        # use the aluminum block, to more precisely check location
-        test_pos = slot_loc_top_left + (SLOT_SIZE * 0.5)
-        # just in case we're testing w/ the probes attached, don't hit the deck
-        gripper_probe_length = 22
-        test_z = gripper_probe_length + 2
-        test_pos = test_pos._replace(z=test_z)
+        # make sure we use the un-altered slot position
+        slot_center = helpers_ot3.get_slot_calibration_square_position_ot3(slot)
+        # default assume the probes are accidentally attached
+        # we can jog the Z up/down after it's positioned
+        test_z = GRIPPER_PROBE_LENGTH + 2
+        test_pos = slot_center._replace(z=test_z)
     else:
+        # use whatever point we used during calibration
         test_pos = calibration_square_pos
-    await _test_current_calibration(api, mount, test_pos)
+    additional_offset = await _test_current_calibration(api, mount, test_pos)
+
+    # adjust
+    if mount == OT3Mount.GRIPPER and additional_offset != Point():
+        res = input(
+            f"additional offset {additional_offset}, apply to current calibrated offset? (y/n): "
+        )
+        if res and res[0].lower() == "y":
+            relative_offset += additional_offset
+            instrument_offset = _apply_offset(
+                api, mount, instrument_offset, relative_offset
+            )
 
     # save
-    if not test or relative_offset:
-        if "y" in input(f"{instrument_offset}\n--> Save Offset? (y/n): ").lower():
+    if not test or relative_offset != Point():
+        if (
+            "y"
+            in input(
+                f"New Offset: {instrument_offset}\n--> Save to Disk? (y/n): "
+            ).lower()
+        ):
             if mount == OT3Mount.GRIPPER:
                 save_gripper_calibration(instrument_offset, str(instr_id))
             else:
@@ -360,7 +408,7 @@ if __name__ == "__main__":
     if args.rel_offset:
         rel_offset = Point(*[float(v) for v in args.rel_offset])
     else:
-        rel_offset = None
+        rel_offset = Point()
     asyncio.run(
         _main(args.simulate, args.slot, _mount, args.test, rel_offset, args.no_washers)
     )
