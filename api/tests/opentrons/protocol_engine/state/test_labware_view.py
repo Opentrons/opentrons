@@ -726,7 +726,7 @@ def test_raise_if_labware_in_location(
         (
             CalibrationPosition.INSTRUMENT_ATTACH,
             CriticalPoint.MOUNT,
-            Point(x=4.0, y=5.0, z=0.0),
+            Point(x=4.0, y=5.0, z=250.0),
         ),
     ],
 )

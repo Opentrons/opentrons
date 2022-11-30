@@ -11,6 +11,7 @@ from opentrons.types import DeckSlotName, Point
 from opentrons.protocols.models import LabwareDefinition, WellDefinition
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.hardware_control.types import CriticalPoint
+from opentrons import should_use_ot3
 
 from .. import errors
 from ..resources import DeckFixedLabware
@@ -53,6 +54,8 @@ _MAGDECK_HALF_MM_LABWARE = {
 _INSTRUMENT_PROBE_ATTACH_SLOT = DeckSlotName.SLOT_5
 _PIPETTE_PROBE_ATTACH_X_OFFSET_FROM_SLOT = 10.0
 _PIPETTE_PROBE_ATTACH_Z_OFFSET_FROM_SLOT = 3.0
+_OT_2_PIPETTE_ATTACH_Z_OFFSET_FROM_SLOT = 30.0
+_OT_3_PIPETTE_ATTACH_Z_OFFSET_FROM_SLOT = 250.0
 
 _INSTRUMENT_ATTACH_SLOT = DeckSlotName.SLOT_2
 
@@ -500,8 +503,18 @@ class LabwareView(HasState[LabwareState]):
             )
         else:
             target_center = self.get_slot_center_position(_INSTRUMENT_ATTACH_SLOT)
+            z_offset = (
+                _OT_3_PIPETTE_ATTACH_Z_OFFSET_FROM_SLOT
+                if should_use_ot3
+                else _OT_2_PIPETTE_ATTACH_Z_OFFSET_FROM_SLOT
+            )
             result = CalibrationCoordinates(
-                coordinates=target_center, critical_point=CriticalPoint.MOUNT
+                coordinates=Point(
+                    x=target_center.x,
+                    y=target_center.y,
+                    z=target_center.z + z_offset,
+                ),
+                critical_point=CriticalPoint.MOUNT,
             )
 
         return result
