@@ -56,7 +56,7 @@ class MoveToMaintenancePositionImplementation(
         """Move the requested mount to a maintenance deck slot."""
         hardware_mount = params.mount.to_hw_mount()
 
-        await self._hardware_api.home_z(hardware_mount)
+        await self._hardware_api.home()
 
         mount_current_position = await self._hardware_api.gantry_position(
             hardware_mount
