@@ -401,13 +401,6 @@ class HeaterShakerMovementRestrictors:
     deck_slot: int
 
 
-class CalibrationPosition(str, Enum):
-    """Deck slot to move to."""
-
-    INSTRUMENT_PROBE_ATTACH = "instrumentProbeAttach"
-    INSTRUMENT_ATTACH = "instrumentAttach"
-
-
 class CalibrationCoordinates(NamedTuple):
     """Calibration coordinates and critical point."""
 

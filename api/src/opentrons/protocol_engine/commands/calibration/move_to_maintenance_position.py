@@ -6,7 +6,6 @@ from typing_extensions import Literal
 
 from pydantic import BaseModel, Field
 
-from opentrons.protocol_engine.types import CalibrationPosition
 from opentrons.types import MountType
 from opentrons.protocol_engine.commands.command import (
     AbstractCommandImpl,
@@ -19,28 +18,26 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.state.state import StateView
 
 
-MoveToLocationCommandType = Literal["calibration/moveToLocation"]
+MoveToMaintenancePositionCommandType = Literal["calibration/moveToMaintenancePosition"]
 
 
-class MoveToLocationParams(BaseModel):
+class MoveToMaintenancePositionParams(BaseModel):
     """Calibration set up position command parameters."""
 
-    location: CalibrationPosition = Field(
-        ...,
-        description="Slot location to move to before starting calibration.",
-    )
     mount: MountType = Field(
         ...,
-        description="Gantry mount to move to location.",
+        description="Gantry mount to move maintenance position.",
     )
 
 
-class MoveToLocationResult(BaseModel):
+class MoveToMaintenancePositionResult(BaseModel):
     """Result data from the execution of a MoveToLocation command."""
 
 
-class MoveToLocationImplementation(
-    AbstractCommandImpl[MoveToLocationParams, MoveToLocationResult]
+class MoveToMaintenancePositionImplementation(
+    AbstractCommandImpl[
+        MoveToMaintenancePositionParams, MoveToMaintenancePositionResult
+    ]
 ):
     """Calibration set up position command implementation."""
 
@@ -53,14 +50,20 @@ class MoveToLocationImplementation(
         self._state_view = state_view
         self._hardware_api = hardware_api
 
-    async def execute(self, params: MoveToLocationParams) -> MoveToLocationResult:
+    async def execute(
+        self, params: MoveToMaintenancePositionParams
+    ) -> MoveToMaintenancePositionResult:
         """Move the requested pipette to a given deck slot."""
         hardware_mount = params.mount.to_hw_mount()
 
         await self._hardware_api.home_z(hardware_mount)
 
+        mount_current_position = await self._hardware_api.gantry_position(
+            hardware_mount
+        )
+
         result = self._state_view.labware.get_calibration_coordinates(
-            location=params.location
+            current_z_position=mount_current_position.z
         )
 
         await self._hardware_api.move_to(
@@ -69,25 +72,33 @@ class MoveToLocationImplementation(
             critical_point=result.critical_point,
         )
 
-        return MoveToLocationResult()
+        return MoveToMaintenancePositionResult()
 
 
-class MoveToLocation(BaseCommand[MoveToLocationParams, MoveToLocationResult]):
+class MoveToMaintenancePosition(
+    BaseCommand[MoveToMaintenancePositionParams, MoveToMaintenancePositionResult]
+):
     """Calibration set up position command model."""
 
-    commandType: MoveToLocationCommandType = "calibration/moveToLocation"
-    params: MoveToLocationParams
-    result: Optional[MoveToLocationResult]
+    commandType: MoveToMaintenancePositionCommandType = (
+        "calibration/moveToMaintenancePosition"
+    )
+    params: MoveToMaintenancePositionParams
+    result: Optional[MoveToMaintenancePositionResult]
 
     _ImplementationCls: Type[
-        MoveToLocationImplementation
-    ] = MoveToLocationImplementation
+        MoveToMaintenancePositionImplementation
+    ] = MoveToMaintenancePositionImplementation
 
 
-class MoveToLocationCreate(BaseCommandCreate[MoveToLocationParams]):
+class MoveToMaintenancePositionCreate(
+    BaseCommandCreate[MoveToMaintenancePositionParams]
+):
     """Calibration set up position command creation request model."""
 
-    commandType: MoveToLocationCommandType = "calibration/moveToLocation"
-    params: MoveToLocationParams
+    commandType: MoveToMaintenancePositionCommandType = (
+        "calibration/moveToMaintenancePosition"
+    )
+    params: MoveToMaintenancePositionParams
 
-    _CommandCls: Type[MoveToLocation] = MoveToLocation
+    _CommandCls: Type[MoveToMaintenancePosition] = MoveToMaintenancePosition

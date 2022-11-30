@@ -20,7 +20,6 @@ from opentrons.protocol_engine.types import (
     LoadedLabware,
     ModuleModel,
     ModuleLocation,
-    CalibrationPosition,
 )
 
 from opentrons.protocol_engine.state.labware import LabwareState, LabwareView
@@ -715,26 +714,7 @@ def test_raise_if_labware_in_location(
         subject.raise_if_labware_in_location(location=location)
 
 
-@pytest.mark.parametrize(
-    "input_location, critical_point_result, coordinates_result",
-    [
-        (
-            CalibrationPosition.INSTRUMENT_PROBE_ATTACH,
-            None,
-            Point(x=20.0, y=12.5, z=3.0),
-        ),
-        (
-            CalibrationPosition.INSTRUMENT_ATTACH,
-            CriticalPoint.MOUNT,
-            Point(x=4.0, y=5.0, z=250.0),
-        ),
-    ],
-)
-def test_get_calibration_coordinates(
-    input_location: CalibrationPosition,
-    critical_point_result: Optional[CriticalPoint],
-    coordinates_result: Point,
-) -> None:
+def test_get_calibration_coordinates() -> None:
     """Should return critical point and coordinates."""
     slot_definitions = {
         "locations": {
@@ -749,25 +729,24 @@ def test_get_calibration_coordinates(
                     },
                     "displayName": "Slot 2",
                 },
-                {
-                    "id": "5",
-                    "position": [5, 5, 0.0],
-                    "boundingBox": {
-                        "xDimension": 10.0,
-                        "yDimension": 15.0,
-                        "zDimension": 0,
-                    },
-                    "displayName": "Slot 5",
-                },
+                # {
+                #     "id": "5",
+                #     "position": [5, 5, 0.0],
+                #     "boundingBox": {
+                #         "xDimension": 10.0,
+                #         "yDimension": 15.0,
+                #         "zDimension": 0,
+                #     },
+                #     "displayName": "Slot 5",
+                # },
             ]
         }
     }
 
     subject = get_labware_view(deck_definition=cast(DeckDefinitionV3, slot_definitions))
-    
 
-    result = subject.get_calibration_coordinates(location=input_location)
+    result = subject.get_calibration_coordinates(current_z_position=3.0)
 
-    assert result.critical_point == critical_point_result
+    assert result.critical_point == CriticalPoint.MOUNT
 
-    assert result.coordinates == coordinates_result
+    assert result.coordinates == Point(x=2, y=5, z=0)

@@ -29,7 +29,6 @@ from ..types import (
     LabwareLocation,
     LoadedLabware,
     ModuleLocation,
-    CalibrationPosition,
     CalibrationCoordinates,
 )
 from ..actions import (
@@ -488,34 +487,23 @@ class LabwareView(HasState[LabwareState]):
                 )
 
     def get_calibration_coordinates(
-        self, location: CalibrationPosition
+        self, current_z_position: float
     ) -> CalibrationCoordinates:
         """Get calibration critical point and target position."""
-        if location == CalibrationPosition.INSTRUMENT_PROBE_ATTACH:
-            target_center = self.get_slot_center_position(_INSTRUMENT_PROBE_ATTACH_SLOT)
-            result = CalibrationCoordinates(
-                coordinates=Point(
-                    x=target_center.x + _PIPETTE_PROBE_ATTACH_X_OFFSET_FROM_SLOT,
-                    y=target_center.y,
-                    z=target_center.z + _PIPETTE_PROBE_ATTACH_Z_OFFSET_FROM_SLOT,
-                ),
-                critical_point=None,
-            )
-        else:
-            target_center = self.get_slot_center_position(_INSTRUMENT_ATTACH_SLOT)
-            z_offset = (
-                _OT_3_PIPETTE_ATTACH_Z_OFFSET_FROM_SLOT
-                if should_use_ot3
-                else _OT_2_PIPETTE_ATTACH_Z_OFFSET_FROM_SLOT
-            )
-            result = CalibrationCoordinates(
-                coordinates=Point(
-                    x=target_center.x,
-                    y=target_center.y,
-                    z=target_center.z + z_offset,
-                ),
-                critical_point=CriticalPoint.MOUNT,
-            )
+        target_center = self.get_slot_center_position(_INSTRUMENT_ATTACH_SLOT)
+        z_offset = (
+            _OT_3_PIPETTE_ATTACH_Z_OFFSET_FROM_SLOT
+            if should_use_ot3
+            else _OT_2_PIPETTE_ATTACH_Z_OFFSET_FROM_SLOT
+        )
+        result = CalibrationCoordinates(
+            coordinates=Point(
+                x=target_center.x,
+                y=target_center.y,
+                z=current_z_position + z_offset,
+            ),
+            critical_point=CriticalPoint.MOUNT,
+        )
 
         return result
 
