@@ -146,12 +146,14 @@ class EdgeSenseSettings:
     pass_settings: CapacitivePassSettings
     search_initial_tolerance_mm: float
     search_iteration_limit: int
+    nominal_center: Offset
 
 
 @dataclass(frozen=True)
 class OT3CalibrationSettings:
     z_offset: ZSenseSettings
     edge_sense: EdgeSenseSettings
+    probe_length: float
 
 
 @dataclass

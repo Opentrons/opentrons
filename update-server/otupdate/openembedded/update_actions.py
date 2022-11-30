@@ -1,26 +1,32 @@
 """OE Updater and dependency injection classes."""
+import os
 import contextlib
 import lzma
 import tempfile
 
+from otupdate.common.constants import MODEL_OT3
 from otupdate.common.file_actions import (
+    InvalidRobotType,
     unzip_update,
     hash_file,
     HashMismatch,
+    InvalidPKGName,
     verify_signature,
+    load_version_file,
 )
 from otupdate.common.update_actions import UpdateActionsInterface, Partition
-from typing import Callable, Optional
+from typing import Any, Callable, Generator, Optional
 import enum
 import subprocess
 
 import logging
 
-UPDATE_PKG = "ot3-system.zip"
-ROOTFS_SIG_NAME = "rootfs.xz.hash.sig"
-ROOTFS_HASH_NAME = "rootfs.xz.sha256"
-ROOTFS_NAME = "rootfs.xz"
-UPDATE_FILES = [ROOTFS_NAME, ROOTFS_SIG_NAME, ROOTFS_HASH_NAME]
+UPDATE_PKG_OE = ["system-update.zip"]
+UPDATE_PKG_VERSION_FILE = "VERSION.json"
+ROOTFS_SIG_NAME = "systemfs.xz.hash.sig"
+ROOTFS_HASH_NAME = "systemfs.xz.sha256"
+ROOTFS_NAME = "systemfs.xz"
+UPDATE_FILES = [ROOTFS_NAME, ROOTFS_SIG_NAME, ROOTFS_HASH_NAME, UPDATE_PKG_VERSION_FILE]
 
 LOG = logging.getLogger(__name__)
 
@@ -81,7 +87,7 @@ class PartitionManager:
         else:
             return False
 
-    def mountpoint_root(self):
+    def mountpoint_root(self) -> str:
         """provides mountpoint location for :py:meth:`mount_update`.
 
         exists only for ease of mocking
@@ -125,7 +131,7 @@ class RootFSInterface:
             LOG.exception("RootFSInterface::write_update exception reading")
 
 
-class Updater(UpdateActionsInterface):
+class OT3UpdateActions(UpdateActionsInterface):
     """OE updater class."""
 
     def __init__(self, root_FS_intf: RootFSInterface, part_mngr: PartitionManager):
@@ -155,7 +161,14 @@ class Updater(UpdateActionsInterface):
         Will also raise an exception if validation fails
         """
 
-        def zip_callback(progress):
+        # make sure we have the correct file
+        filename = os.path.basename(filepath)
+        if filename not in UPDATE_PKG_OE:
+            msg = f"invalid filename {filepath} {filename}"
+            LOG.error(msg)
+            raise InvalidPKGName(msg)
+
+        def zip_callback(progress: Any) -> None:
             progress_callback(progress / 2.0)
 
         required = [ROOTFS_NAME, ROOTFS_HASH_NAME]
@@ -163,15 +176,25 @@ class Updater(UpdateActionsInterface):
             required.append(ROOTFS_SIG_NAME)
         files, sizes = unzip_update(filepath, zip_callback, UPDATE_FILES, required)
 
-        def hash_callback(progress):
+        def hash_callback(progress: Any) -> None:
             progress_callback(progress / 2.0 + 0.5)
+
+        version_file = str(files.get("VERSION.json"))
+        version_dict = load_version_file(version_file)
+        robot_type = version_dict.get("robot_type")
+        if robot_type != MODEL_OT3:
+            msg = f"Invalid robot_type: expected {MODEL_OT3} != packaged {robot_type}"
+            LOG.error(msg)
+            raise InvalidRobotType(msg)
 
         rootfs = files.get(ROOTFS_NAME)
         assert rootfs
         rootfs_hash = hash_file(rootfs, hash_callback, file_size=sizes[ROOTFS_NAME])
         hashfile = files.get(ROOTFS_HASH_NAME)
         assert hashfile
-        packaged_hash = open(hashfile, "rb").read().strip()
+        packaged_hash = b""
+        with open(hashfile, "rb") as fh:
+            packaged_hash = fh.readline().strip()
         if packaged_hash != rootfs_hash:
             msg = (
                 f"Hash mismatch: calculated {rootfs_hash!r} != "
@@ -202,7 +225,7 @@ class Updater(UpdateActionsInterface):
             LOG.info(f"commit_update: committed to booting {new}")
 
     @contextlib.contextmanager
-    def mount_update(self):
+    def mount_update(self) -> Generator[str, None, None]:
         """Mount the freshly-written partition r/w (to update machine-id).
 
         Should be used as a context manager, and the yielded value is the path

@@ -15,6 +15,8 @@ from opentrons_hardware.firmware_bindings.constants import (
     SensorOutputBinding,
     SensorThresholdMode,
     PipetteTipActionType,
+    MotorPositionFlags,
+    ErrorSeverity,
 )
 
 
@@ -72,8 +74,21 @@ class ToolField(utils.UInt8Field):
 class FirmwareUpdateDataField(utils.BinaryFieldBase[bytes]):
     """The data field of FirmwareUpdateData."""
 
-    NUM_BYTES = 56
+    # this needs to be a multiple of 8
+    NUM_BYTES = 48
     FORMAT = f"{NUM_BYTES}s"
+
+
+class ErrorSeverityField(utils.UInt16Field):
+    """A field for error severity."""
+
+    def __repr__(self) -> str:
+        """Print error severity."""
+        try:
+            severity = ErrorSeverity(self.value).name
+        except ValueError:
+            severity = str(self.value)
+        return f"{self.__class__.__name__}(value={severity})"
 
 
 class ErrorCodeField(utils.UInt16Field):
@@ -220,3 +235,14 @@ class PipetteTipActionTypeField(utils.UInt8Field):
         except ValueError:
             action_type = str(self.value)
         return f"{self.__class__.__name__}(value={action_type})"
+
+
+class MotorPositionFlagsField(utils.UInt8Field):
+    """Bitflags to indicate the validity of a motor position."""
+
+    def __repr__(self) -> str:
+        """Print the MotorPositionFlags."""
+        flags_list = [
+            flag.name for flag in MotorPositionFlags if bool(self.value & flag.value)
+        ]
+        return f"{self.__class__.__name__}(value={','.join(flags_list)})"

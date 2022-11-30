@@ -29,6 +29,7 @@ from .ot3utils import (
     node_to_axis,
     sub_system_to_node_id,
     sensor_node_for_mount,
+    sensor_id_for_instrument,
     create_gripper_jaw_grip_group,
     create_gripper_jaw_home_group,
     create_gripper_jaw_hold_group,
@@ -76,6 +77,7 @@ from opentrons.hardware_control.types import (
     OT3SubSystem,
     InvalidPipetteName,
     InvalidPipetteModel,
+    InstrumentProbeType,
 )
 from opentrons_hardware.hardware_control.motion import (
     MoveStopCondition,
@@ -293,10 +295,16 @@ class OT3Controller:
             )
             move_group_gantry_z.append(z_move)
         if distances_gantry and velocities_gantry:
-            gantry_move = self._filter_move_group(
-                create_home_group(distances_gantry, velocities_gantry)
-            )
-            move_group_gantry_z.append(gantry_move)
+            # home X axis before Y axis, to avoid collision with thermo-cycler lid
+            # that could be in the back-left corner
+            for ax in [OT3Axis.X, OT3Axis.Y]:
+                if ax in axes:
+                    gantry_move = self._filter_move_group(
+                        create_home_group(
+                            {ax: distances_gantry[ax]}, {ax: velocities_gantry[ax]}
+                        )
+                    )
+                    move_group_gantry_z.append(gantry_move)
         if move_group_gantry_z:
             return MoveGroupRunner(move_groups=move_group_gantry_z)
         return None
@@ -773,6 +781,7 @@ class OT3Controller:
         distance_mm: float,
         speed_mm_per_s: float,
         sensor_threshold_pf: float,
+        probe: InstrumentProbeType,
     ) -> None:
         pos, _ = await capacitive_probe(
             self._messenger,
@@ -780,6 +789,7 @@ class OT3Controller:
             axis_to_node(moving),
             distance_mm,
             speed_mm_per_s,
+            sensor_id_for_instrument(probe),
             relative_threshold_pf=sensor_threshold_pf,
             log_sensor_values=True,
         )
@@ -792,6 +802,7 @@ class OT3Controller:
         moving: OT3Axis,
         distance_mm: float,
         speed_mm_per_s: float,
+        probe: InstrumentProbeType,
     ) -> List[float]:
         data = await capacitive_pass(
             self._messenger,
@@ -799,6 +810,7 @@ class OT3Controller:
             axis_to_node(moving),
             distance_mm,
             speed_mm_per_s,
+            sensor_id_for_instrument(probe),
         )
         self._position[axis_to_node(moving)] += distance_mm
         return data
