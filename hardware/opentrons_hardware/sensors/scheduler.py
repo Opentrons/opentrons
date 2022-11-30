@@ -68,6 +68,31 @@ ResponseType = TypeVar("ResponseType", bound=MessageDefinition)
 class SensorScheduler:
     """Sensor message scheduler."""
 
+    @staticmethod
+    def _create_filter(
+        node_id: Optional[NodeId] = None, message_id: Optional[MessageId] = None
+    ) -> Optional[Callable[[ArbitrationId], bool]]:
+        """Create listener filter by NodeId and MessageId."""
+        if not node_id and not message_id:
+            return None
+
+        def _filter(arbitration_id: ArbitrationId) -> bool:
+            return (
+                NodeId(arbitration_id.parts.originating_node_id) == node_id
+                if node_id
+                else True
+            ) and (
+                MessageId(arbitration_id.parts.message_id) == message_id
+                if message_id
+                else True
+            )
+
+        return _filter
+
+    @staticmethod
+    def _format_sensor_response(message: ReadFromSensorResponse) -> SensorDataType:
+        return SensorDataType.build(message.payload.sensor_data, message.payload.sensor)
+
     async def run_poll(
         self,
         sensor: PollSensorInformation,
@@ -79,7 +104,7 @@ class SensorScheduler:
         sensor_info = sensor.sensor
         with MultipleMessagesWaitableCallback(
             can_messenger,
-            self._create_filter(sensor_info.node_id, MessageId.read_sensor_response),
+            self._create_filter(sensor_info.node_id, ReadFromSensorResponse.message_id),
             number_of_messages=expected_num_messages,
         ) as reader:
             data_list: List[SensorDataType] = []
@@ -94,16 +119,8 @@ class SensorScheduler:
                 ),
             )
             try:
-
-                def _format(message: ReadFromSensorResponse) -> SensorDataType:
-                    return SensorDataType.build(
-                        message.payload.sensor_data, message.payload.sensor
-                    )
-
                 data_list = await asyncio.wait_for(
-                    self._multi_wait_for_response(
-                        reader, ReadFromSensorResponse, _format
-                    ),
+                    self._multi_wait_for_response(reader, self._format_sensor_response),
                     timeout,
                 )
             except asyncio.TimeoutError:
@@ -138,6 +155,7 @@ class SensorScheduler:
     ) -> List[SensorDataType]:
         """Send read message."""
         sensor_info = sensor.sensor
+
         with MultipleMessagesWaitableCallback(
             can_messenger,
             self._create_filter(sensor_info.node_id, MessageId.read_sensor_response),
@@ -162,9 +180,7 @@ class SensorScheduler:
                     )
 
                 data_list = await asyncio.wait_for(
-                    self._multi_wait_for_response(
-                        reader, ReadFromSensorResponse, _format
-                    ),
+                    self._multi_wait_for_response(reader, self._format_sensor_response),
                     timeout,
                 )
             except asyncio.TimeoutError:
@@ -198,9 +214,7 @@ class SensorScheduler:
         ) as reader:
             try:
                 data_list = await asyncio.wait_for(
-                    self._multi_wait_for_response(
-                        reader, ReadFromSensorResponse, _format
-                    ),
+                    self._multi_wait_for_response(reader, _format),
                     timeout,
                 )
             except asyncio.TimeoutError:
@@ -213,20 +227,15 @@ class SensorScheduler:
         sensor: SensorThresholdInformation,
         can_messenger: CanMessenger,
         timeout: float = 1.0,
-    ) -> Optional[SensorDataType]:
+    ) -> SensorDataType:
         """Send threshold message."""
+        response_type = SensorThresholdResponse
         sensor_info = sensor.sensor
 
-        def _filter(arbitration_id: ArbitrationId) -> bool:
-            return (
-                NodeId(arbitration_id.parts.originating_node_id) == sensor_info.node_id
-            ) and (
-                MessageId(arbitration_id.parts.message_id)
-                == MessageId.set_sensor_threshold_response
-            )
-
-        with MultipleMessagesWaitableCallback(can_messenger, _filter) as reader:
-            data: Optional[SensorDataType] = None
+        with WaitableCallback(
+            can_messenger,
+            self._create_filter(sensor_info.node_id, response_type.message_id),
+        ) as reader:
             await can_messenger.send(
                 node_id=sensor_info.node_id,
                 message=SetSensorThresholdRequest(
@@ -240,26 +249,22 @@ class SensorScheduler:
             )
             try:
 
-                def _format(response: SensorThresholdResponse) -> SensorDataType:
+                def _format(response: response_type) -> SensorDataType:
                     return SensorDataType.build(
                         response.payload.threshold, response.payload.sensor
                     )
 
-                data = await asyncio.wait_for(
-                    self._wait_for_response(
-                        sensor_info.node_id, reader, SensorThresholdResponse, _format
-                    ),
+                return await asyncio.wait_for(
+                    self._wait_for_response(reader, _format),
                     timeout,
                 )
             except asyncio.TimeoutError:
-                log.warning("Sensor Read timed out")
-            finally:
-                return data
+                log.error(f"Sensor Threshold Read from {sensor_info.node_id} timed out")
+                raise
 
     @staticmethod
     async def _multi_wait_for_response(
         reader: WaitableCallback,
-        response_def: Type[ResponseType],
         response_handler: Callable[[ResponseType], SensorDataType],
     ) -> List[SensorDataType]:
         """Listener for receiving messages back."""
@@ -268,57 +273,26 @@ class SensorScheduler:
         # for. Otherwise, the code will timeout unless you return directly
         # from an async for loop.
         data: List[SensorDataType] = []
-        async for response, arbitration_id in reader:
-            if isinstance(response, response_def):
-                data.append(response_handler(response))
+        async for response, _ in reader:
+            data.append(response_handler(response))
         return data
 
     @staticmethod
-    def _create_filter(
-        node_id: Optional[NodeId] = None, message_id: Optional[MessageId] = None
-    ) -> Optional[Callable[[ArbitrationId], bool]]:
-        """Create listener filter by NodeId and MessageId."""
-        if not node_id and not message_id:
-            return None
-
-        def _filter(arbitration_id: ArbitrationId) -> bool:
-            return (
-                NodeId(arbitration_id.parts.originating_node_id) == node_id
-                if node_id
-                else True
-            ) and (
-                MessageId(arbitration_id.parts.message_id) == message_id
-                if message_id
-                else True
-            )
-
-        return _filter
-
-    @staticmethod
     async def _wait_for_response(
-        node_id: NodeId,
         reader: WaitableCallback,
-        response_def: Type[ResponseType],
         response_handler: Callable[[ResponseType], Optional[SensorDataType]],
-    ) -> Optional[SensorDataType]:
+    ) -> SensorDataType:
         """Listener for receiving messages back."""
-        async for response, arbitration_id in reader:
-            if arbitration_id.parts.originating_node_id == node_id:
-                if isinstance(response, response_def):
-                    return response_handler(response)
-        return None
+        async for response, _ in reader:
+            return response_handler(response)
 
     @staticmethod
     async def _read_peripheral_response(
-        node_id: NodeId,
         reader: WaitableCallback,
     ) -> bool:
         """Waits for and sends back PeripheralStatusResponse."""
-        async for response, arbitration_id in reader:
-            if arbitration_id.parts.originating_node_id == node_id:
-                if isinstance(response, PeripheralStatusResponse):
-                    return bool(response.payload.status)
-        return False
+        async for response, _ in reader:
+            return bool(response.payload.status)
 
     async def request_peripheral_status(
         self,
@@ -329,8 +303,10 @@ class SensorScheduler:
         timeout: int,
     ) -> bool:
         """Send threshold message."""
-        with MultipleMessagesWaitableCallback(can_messenger) as reader:
-            status = False
+        with MultipleMessagesWaitableCallback(
+            can_messenger,
+            self._create_filter(node_id, PeripheralStatusResponse.message_id),
+        ) as reader:
             await can_messenger.send(
                 node_id=node_id,
                 message=PeripheralStatusRequest(
@@ -342,14 +318,12 @@ class SensorScheduler:
             )
 
             try:
-                response = asyncio.wait_for(
-                    self._read_peripheral_response(node_id, reader), timeout
+                return await asyncio.wait_for(
+                    self._read_peripheral_response(reader), timeout
                 )
-                status = await response
             except asyncio.TimeoutError:
-                log.warning("Sensor Read timed out")
-            finally:
-                return status
+                log.warning(f"No PeripheralStatusResponse from node {node_id}")
+                return False
 
     @staticmethod
     def _log_sensor_output(message: MessageDefinition, arb: ArbitrationId) -> None:
@@ -383,7 +357,9 @@ class SensorScheduler:
         )
         try:
             if log:
-                can_messenger.add_listener(self._log_sensor_output)
+                can_messenger.add_listener(
+                    self._log_sensor_output,
+                )
             yield
         finally:
             if log:
