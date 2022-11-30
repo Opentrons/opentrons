@@ -51,6 +51,7 @@ class Params(BaseModel):
     seconds: Optional[float]
     minimumZHeight: Optional[float]
     forceDirect: Optional[bool]
+    speed: Optional[float]
     message: Optional[str]
     coordinates: Optional[OffsetVector]
     axis: Optional[str]
