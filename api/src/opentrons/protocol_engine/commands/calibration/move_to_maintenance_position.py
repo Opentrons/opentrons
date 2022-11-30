@@ -15,7 +15,7 @@ from opentrons.protocol_engine.commands.command import (
 
 if TYPE_CHECKING:
     from opentrons.hardware_control import HardwareControlAPI
-    from ..state import StateView
+    from ...state import StateView
 
 
 MoveToMaintenancePositionCommandType = Literal["calibration/moveToMaintenancePosition"]
