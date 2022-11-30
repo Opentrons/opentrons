@@ -63,7 +63,7 @@ jobs:
           project: api
   test:
     name: 'opentrons package tests on ${{ matrix.os }}'
-    timeout-minutes: 45 # macos takes a very long time when cache is busted
+    timeout-minutes: 55 # macos takes a very long time when cache is busted
     needs: [lint]
     strategy:
       matrix:
