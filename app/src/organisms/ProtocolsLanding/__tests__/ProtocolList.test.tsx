@@ -4,6 +4,8 @@ import { when } from 'jest-when'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
+
+import { getProtocolsStoredSortKey } from '../../../redux/config'
 import {
   storedProtocolData,
   storedProtocolDataTwo,
@@ -28,6 +30,7 @@ const mockEmptyStateLinks = EmptyStateLinks as jest.MockedFunction<
 const mockProtocolCard = ProtocolCard as jest.MockedFunction<
   typeof ProtocolCard
 >
+const mockGetProtocolsStoredSortKey = getProtocolsStoredSortKey as jest.MockedFunction<typeof getProtocolsStoredSortKey>
 
 const render = (props: React.ComponentProps<typeof ProtocolList>) => {
   return renderWithProviders(
@@ -52,6 +55,7 @@ describe('ProtocolList', () => {
     when(mockUseSortedProtocols)
       .calledWith('alphabetical', [storedProtocolData, storedProtocolDataTwo])
       .mockReturnValue([storedProtocolData, storedProtocolDataTwo])
+    when(mockGetProtocolsStoredSortKey).mockReturnValue('alphabetical')
   })
 
   afterEach(() => {
@@ -134,4 +138,16 @@ describe('ProtocolList', () => {
     fireEvent.click(oldest)
     getByText('Oldest updates')
   })
+
+  it('renders Alphabetical as the sort key when alphabetical was selected last time', () => {
+    const { getByText } = render(props)
+    getByText('Alphabetical')
+  })
+
+  it('renders Oldest updates as the sort key when oldest was selected last time', () => {
+    when(mockGetProtocolsStoredSortKey).mockReturnValue('oldest')
+    const { getByText } = render(props)
+    getByText('Oldest updates')
+  })
+
 })
