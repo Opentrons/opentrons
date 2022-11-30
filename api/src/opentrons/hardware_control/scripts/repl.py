@@ -96,7 +96,7 @@ def do_interact(api: ThreadManager[HardwareControlAPI]) -> None:
             "GripperProbe": GripperProbe,
             "find_edge": wrap_async_util_fn(find_edge, api),
             "find_deck_position": wrap_async_util_fn(find_deck_position, api),
-            "calibrate_pipette": partial(calibrate_pipette, api),
+            "calibrate_pipette": wrap_async_util_fn(calibrate_pipette, api),
             "calibrate_gripper": wrap_async_util_fn(calibrate_gripper, api),
             "gripper_pin_offsets_mean": gripper_pin_offsets_mean,
             "CalibrationMethod": CalibrationMethod,
