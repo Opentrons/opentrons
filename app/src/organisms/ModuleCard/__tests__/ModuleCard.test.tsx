@@ -8,7 +8,7 @@ import {
   DispatchApiRequestType,
   useDispatchApiRequest,
 } from '../../../redux/robot-api'
-import { Toast } from '../../../atoms/Toast'
+import { useToast } from '../../../atoms/Toast'
 import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
 import * as RobotApi from '../../../redux/robot-api'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
@@ -94,7 +94,7 @@ const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
 >
 const mockErrorInfo = ErrorInfo as jest.MockedFunction<typeof ErrorInfo>
-const mockToast = Toast as jest.MockedFunction<typeof Toast>
+const mockUseToast = useToast as jest.MockedFunction<typeof useToast>
 const mockMagneticModuleHub = {
   id: 'magdeck_id',
   moduleModel: 'magneticModuleV1',
@@ -185,6 +185,9 @@ const mockHotThermo = {
   usbPort: { path: '/dev/ot_module_thermocycler', hub: null, port: 1 },
 } as ThermocyclerModule
 
+const mockMakeToast = jest.fn()
+const mockEatToast = jest.fn()
+
 const render = (props: React.ComponentProps<typeof ModuleCard>) => {
   return renderWithProviders(<ModuleCard {...props} />, {
     i18nInstance: i18n,
@@ -210,7 +213,10 @@ describe('ModuleCard', () => {
     mockFirmwareUpdateFailedModal.mockReturnValue(
       <div>mock firmware update failed modal</div>
     )
-    mockToast.mockReturnValue(<div>mock toast</div>)
+    mockUseToast.mockReturnValue({
+      makeToast: mockMakeToast,
+      eatToast: mockEatToast,
+    })
     mockGetRequestById.mockReturnValue(null)
     when(mockUseCurrentRunStatus)
       .calledWith(expect.any(Object))
@@ -218,8 +224,6 @@ describe('ModuleCard', () => {
   })
   afterEach(() => {
     jest.resetAllMocks()
-  })
-  afterEach(() => {
     resetAllWhenMocks()
   })
 
@@ -356,12 +360,12 @@ describe('ModuleCard', () => {
         status: 200,
       },
     })
-    const { getByText } = render({
+    render({
       module: mockHotHeaterShaker,
       robotName: mockRobot.name,
       isLoadedInRun: false,
     })
-    getByText('mock toast')
+    expect(mockMakeToast).toBeCalled()
   })
   it('renders information for a magnetic module when an update is available so update banner renders', () => {
     mockUseModuleIdFromRun.mockReturnValue({ moduleIdFromRun: 'magdeck_id' })

@@ -23,7 +23,7 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { SecondaryButton } from '../../atoms/buttons'
-import { Toast } from '../../atoms/Toast'
+import { ERROR_TOAST, SUCCESS_TOAST, useToast } from '../../atoms/Toast'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { useTrackEvent } from '../../redux/analytics'
 import { DropdownMenu } from '../../atoms/MenuList/DropdownMenu'
@@ -77,6 +77,7 @@ export function Labware(): JSX.Element {
   const toggleSetShowSortByMenu = (): void => setShowSortByMenu(!showSortByMenu)
   const trackEvent = useTrackEvent()
   const [filterBy, setFilterBy] = React.useState<LabwareFilter>('all')
+  const { makeToast } = useToast()
 
   const labware = useAllLabware(sortBy, filterBy)
   const { labwareFailureMessage, clearLabwareFailure } = useLabwareFailure()
@@ -84,8 +85,6 @@ export function Labware(): JSX.Element {
   const [showAddLabwareSlideout, setShowAddLabwareSlideout] = React.useState(
     false
   )
-  const [showSuccessToast, setShowSuccessToast] = React.useState(false)
-  const [showFailureToast, setShowFailureToast] = React.useState(false)
   const [
     currentLabwareDef,
     setCurrentLabwareDef,
@@ -97,11 +96,18 @@ export function Labware(): JSX.Element {
   React.useEffect(() => {
     if (labwareFailureMessage != null) {
       setShowAddLabwareSlideout(false)
-      setShowFailureToast(true)
+      makeToast(labwareFailureMessage, ERROR_TOAST, {
+        closeButton: true,
+        onClose: clearLabwareFailure,
+      })
     } else if (newLabwareName != null) {
       setShowAddLabwareSlideout(false)
-      setShowSuccessToast(true)
+      makeToast(t('imported', { filename: newLabwareName }), SUCCESS_TOAST, {
+        closeButton: true,
+        onClose: clearLabwareName,
+      })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [labwareFailureMessage, newLabwareName])
 
   return (
@@ -253,32 +259,6 @@ export function Labware(): JSX.Element {
         <AddCustomLabwareSlideout
           isExpanded={showAddLabwareSlideout}
           onCloseClick={() => setShowAddLabwareSlideout(false)}
-          onSuccess={() => setShowSuccessToast(true)}
-          onFailure={() => setShowFailureToast(true)}
-        />
-      )}
-      {showSuccessToast && newLabwareName != null && (
-        <Toast
-          message={t('imported', { filename: newLabwareName })}
-          type="success"
-          data-testid="LabwareIndex_successToast"
-          closeButton
-          onClose={() => {
-            setShowSuccessToast(false)
-            clearLabwareName()
-          }}
-        />
-      )}
-      {showFailureToast && labwareFailureMessage != null && (
-        <Toast
-          message={labwareFailureMessage}
-          type="error"
-          data-testid="LabwareIndex_errorToast"
-          closeButton
-          onClose={() => {
-            setShowFailureToast(false)
-            clearLabwareFailure()
-          }}
         />
       )}
       {currentLabwareDef != null && (

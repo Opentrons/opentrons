@@ -38,8 +38,7 @@ import {
   useRunTimestamps,
 } from '../../../organisms/RunTimeControl/hooks'
 import { RUN_LOG_WINDOW_SIZE } from '../constants'
-import { useProtocolDetailsForRun } from '../hooks'
-import { DownloadRunLogToast } from '../DownloadRunLogToast'
+import { useDownloadRunLog, useProtocolDetailsForRun } from '../hooks'
 import { RunLogProtocolSetupInfo } from './RunLogProtocolSetupInfo'
 import { StepItem } from './StepItem'
 
@@ -79,10 +78,6 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
   const lastKnownPrePlayRunCommandIndex = React.useRef<number>(-1)
   const [isDeterministic, setIsDeterministic] = React.useState<boolean>(true)
   const [windowIndex, setWindowIndex] = React.useState<number>(0)
-  const [
-    showDownloadRunLogToast,
-    setShowDownloadRunLogToast,
-  ] = React.useState<boolean>(false)
 
   const windowFirstCommandIndex =
     (RUN_LOG_WINDOW_SIZE - WINDOW_OVERLAP) * windowIndex
@@ -109,7 +104,13 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
   const currentCommandKey = commandsData?.links?.current?.meta?.key ?? null
   const currentCommandCreatedAt =
     commandsData?.links?.current?.meta?.createdAt ?? null
-  const runTotalCommandCount = commandsData?.meta?.totalLength
+  const runTotalCommandCount = commandsData?.meta?.totalLength ?? 0
+
+  const { downloadRunLog } = useDownloadRunLog(
+    robotName,
+    runId,
+    runTotalCommandCount
+  )
 
   const [isJumpingToCurrent, setIsJumpingToCurrent] = React.useState<boolean>(
     false
@@ -219,7 +220,7 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
   const currentCommandIndex = currentCommandList.findIndex(
     command => command?.analysisCommand?.key === currentCommandKey
   )
-  if (currentCommandIndex >= 0 && runTotalCommandCount != null) {
+  if (currentCommandIndex >= 0 && runTotalCommandCount > 0) {
     firstPostInitialPlayRunCommandIndex.current =
       runTotalCommandCount - 1 - currentCommandIndex
   }
@@ -359,10 +360,6 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
     }
   }
 
-  const onClickDownloadRunLog = (): void => {
-    setShowDownloadRunLogToast(true)
-  }
-
   const isCurrentStepBelow =
     (currentItemRef.current?.getBoundingClientRect().top != null &&
       listInnerRef.current?.getBoundingClientRect().bottom != null &&
@@ -406,14 +403,6 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
       width="100%"
       overflowY="hidden"
     >
-      {runTotalCommandCount != null && showDownloadRunLogToast ? (
-        <DownloadRunLogToast
-          robotName={robotName}
-          runId={runId}
-          pageLength={runTotalCommandCount}
-          onClose={() => setShowDownloadRunLogToast(false)}
-        />
-      ) : null}
       {jumpToCurrentStepButton}
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -442,7 +431,8 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
         <Btn
           color={COLORS.darkGreyEnabled}
           css={TYPOGRAPHY.labelSemiBold}
-          onClick={onClickDownloadRunLog}
+          disabled={runTotalCommandCount === 0}
+          onClick={downloadRunLog}
           id="RunLog_downloadRunLog"
         >
           {t('download_run_log')}

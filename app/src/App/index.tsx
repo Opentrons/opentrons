@@ -14,6 +14,7 @@ import {
 } from '@opentrons/components'
 
 import { GlobalStyle } from '../atoms/GlobalStyle'
+import { ToasterOven } from '../atoms/Toast'
 import { Alerts } from '../organisms/Alerts'
 import { Breadcrumbs } from '../organisms/Breadcrumbs'
 import { CalibrationDashboard } from '../pages/Devices/CalibrationDashboard'
@@ -39,6 +40,7 @@ export const AppComponent = (): JSX.Element => {
   useSoftwareUpdatePoll()
 
   const isOnDevice = useSelector(getIsOnDevice)
+  // TODO(bh, 2022-11-30): remove when routes reorganized for ODD, causing app rerenders
   const localRobot = useSelector(getLocalRobot)
 
   const allRoutes: RouteProps[] = [
@@ -120,29 +122,31 @@ export const AppComponent = (): JSX.Element => {
       >
         <TopPortalRoot />
         <Navbar routes={routes} />
-        <Box width="100%">
-          <Switch>
-            {routes.map(({ Component, exact, path }: RouteProps) => {
-              return (
-                <Route key={path} exact={exact} path={path}>
-                  <Breadcrumbs />
-                  <Box
-                    position={POSITION_RELATIVE}
-                    width="100%"
-                    height="100%"
-                    backgroundColor={COLORS.fundamentalsBackground}
-                    overflow={OVERFLOW_SCROLL}
-                  >
-                    <ModalPortalRoot />
-                    <Component />
-                  </Box>
-                </Route>
-              )
-            })}
-            <Redirect exact from="/" to="/protocols" />
-          </Switch>
-          <Alerts />
-        </Box>
+        <ToasterOven>
+          <Box width="100%">
+            <Switch>
+              {routes.map(({ Component, exact, path }: RouteProps) => {
+                return (
+                  <Route key={path} exact={exact} path={path}>
+                    <Breadcrumbs />
+                    <Box
+                      position={POSITION_RELATIVE}
+                      width="100%"
+                      height="100%"
+                      backgroundColor={COLORS.fundamentalsBackground}
+                      overflow={OVERFLOW_SCROLL}
+                    >
+                      <ModalPortalRoot />
+                      <Component />
+                    </Box>
+                  </Route>
+                )
+              })}
+              <Redirect exact from="/" to="/protocols" />
+            </Switch>
+            <Alerts />
+          </Box>
+        </ToasterOven>
       </Flex>
     </>
   )

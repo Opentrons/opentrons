@@ -4,24 +4,18 @@ import { useTranslation } from 'react-i18next'
 import { IconProps } from '@opentrons/components'
 import { useAllCommandsQuery, useRunQuery } from '@opentrons/react-api-client'
 
-import { Toast } from '../../atoms/Toast'
-import { useProtocolDetailsForRun } from './hooks'
-import { downloadFile } from './utils'
+import { ERROR_TOAST, INFO_TOAST, useToast } from '../../../atoms/Toast'
+import { useProtocolDetailsForRun } from './useProtocolDetailsForRun'
+import { downloadFile } from '../utils'
 
-interface DownloadRunLogToastProps {
-  robotName: string
-  runId: string
-  onClose: () => void
+export function useDownloadRunLog(
+  robotName: string,
+  runId: string,
   pageLength: number
-}
-
-export function DownloadRunLogToast({
-  robotName,
-  runId,
-  pageLength,
-  onClose,
-}: DownloadRunLogToastProps): JSX.Element {
+): { downloadRunLog: () => void } {
   const { t } = useTranslation('run_details')
+
+  const { makeToast, eatToast } = useToast()
 
   const {
     data: allCommandsQueryData,
@@ -55,7 +49,16 @@ export function DownloadRunLogToast({
   const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
 
   React.useEffect(() => {
+    if (commands != null && run != null && isError) {
+      makeToast(errorMessage, ERROR_TOAST)
+    }
+  }, [commands, errorMessage, isError, makeToast, run])
+
+  const downloadRunLog = (): void => {
     if (commands != null && run != null) {
+      const toastId = makeToast(t('downloading_run_log'), INFO_TOAST, {
+        icon: toastIcon,
+      })
       const runDetails = {
         ...run,
         commands,
@@ -63,18 +66,9 @@ export function DownloadRunLogToast({
       const createdAt = new Date(run.createdAt).toISOString()
       const fileName = `${robotName}_${protocolName}_${createdAt}.json`
       downloadFile(runDetails, fileName)
-      onClose()
+      eatToast(toastId)
     }
-  }, [commands, protocolName, robotName, run, onClose])
+  }
 
-  return (
-    <Toast
-      message={isError ? errorMessage : t('downloading_run_log')}
-      type={isError ? 'error' : 'info'}
-      icon={isError ? undefined : toastIcon}
-      closeButton={isError}
-      onClose={onClose}
-      disableTimeout={true}
-    />
-  )
+  return { downloadRunLog }
 }

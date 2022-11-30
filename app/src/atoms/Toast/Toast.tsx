@@ -1,47 +1,58 @@
 import * as React from 'react'
 import { css } from 'styled-components'
+
 import {
   Flex,
-  Link,
   Icon,
+  Link,
+  ALIGN_CENTER,
+  BORDER_STYLE_SOLID,
   BORDERS,
   COLORS,
-  SPACING,
-  IconName,
-  JUSTIFY_SPACE_BETWEEN,
-  BORDER_STYLE_SOLID,
-  ALIGN_CENTER,
   DIRECTION_ROW,
-  POSITION_FIXED,
+  JUSTIFY_SPACE_BETWEEN,
+  SPACING,
 } from '@opentrons/components'
+
 import { StyledText } from '../text'
-import type { IconProps } from '@opentrons/components'
 
-type ToastType = 'success' | 'warning' | 'error' | 'info'
+import type { IconName, IconProps, StyleProps } from '@opentrons/components'
 
-export interface ToastProps {
+export const SUCCESS_TOAST: 'success' = 'success'
+export const WARNING_TOAST: 'warning' = 'warning'
+export const ERROR_TOAST: 'error' = 'error'
+export const INFO_TOAST: 'info' = 'info'
+
+export type ToastType =
+  | typeof SUCCESS_TOAST
+  | typeof WARNING_TOAST
+  | typeof ERROR_TOAST
+  | typeof INFO_TOAST
+
+export interface ToastProps extends StyleProps {
+  id: string
   message: string | JSX.Element
   type: ToastType
   icon?: IconProps
   closeButton?: boolean
-  onClose: () => void
+  onClose?: () => void
   disableTimeout?: boolean
   duration?: number
 }
 
+const TOAST_ANIMATION_DURATION = 500
+
 const EXPANDED_STYLE = css`
-  animation-duration: 300ms;
-  animation-name: slideup;
+  animation-duration: ${TOAST_ANIMATION_DURATION}ms;
+  animation-name: slidein;
   overflow: hidden;
 
-  @keyframes slideup {
+  @keyframes slidein {
     from {
-      opacity: 0;
-      transform: translateY(30%);
+      transform: translateX(100%);
     }
     to {
-      opacity: 1;
-      transform: translateY(0%);
+      transform: translateX(0%);
     }
   }
 `
@@ -53,22 +64,22 @@ const toastStyleByType: {
     backgroundColor: string
   }
 } = {
-  error: {
+  [ERROR_TOAST]: {
     iconName: 'alert-circle',
     color: COLORS.errorEnabled,
     backgroundColor: COLORS.errorBackgroundLight,
   },
-  warning: {
+  [WARNING_TOAST]: {
     iconName: 'alert-circle',
     color: COLORS.warningEnabled,
     backgroundColor: COLORS.warningBackgroundLight,
   },
-  success: {
+  [SUCCESS_TOAST]: {
     iconName: 'check-circle',
     color: COLORS.successEnabled,
     backgroundColor: COLORS.successBackgroundLight,
   },
-  info: {
+  [INFO_TOAST]: {
     iconName: 'information',
     color: COLORS.darkGreyEnabled,
     backgroundColor: COLORS.darkGreyDisabled,
@@ -83,14 +94,18 @@ export function Toast(props: ToastProps): JSX.Element {
     closeButton,
     onClose,
     disableTimeout = false,
-    duration = 5000,
+    duration = 8000,
+    ...styleProps
   } = props
 
-  if (!disableTimeout) {
-    setTimeout(() => {
-      onClose()
-    }, duration)
-  }
+  React.useEffect(() => {
+    if (!disableTimeout) {
+      setTimeout(() => {
+        onClose?.()
+      }, duration)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [disableTimeout, duration])
 
   return (
     // maxWidth is based on default app size ratio
@@ -103,13 +118,11 @@ export function Toast(props: ToastProps): JSX.Element {
       borderWidth={SPACING.spacingXXS}
       border={BORDER_STYLE_SOLID}
       backgroundColor={toastStyleByType[type].backgroundColor}
-      paddingX={SPACING.spacing3}
-      paddingY={SPACING.spacing2}
-      right={SPACING.spacing6}
-      bottom={SPACING.spacing4}
-      position={POSITION_FIXED}
-      data-testid={`Toast_${type as string}`}
+      padding={`${SPACING.spacing3} ${SPACING.spacing3} ${SPACING.spacing3} 0.75rem`}
+      data-testid={`Toast_${type}`}
       maxWidth="88%"
+      minWidth="fit-content"
+      {...styleProps}
     >
       <Flex flexDirection={DIRECTION_ROW}>
         <Icon
@@ -118,7 +131,7 @@ export function Toast(props: ToastProps): JSX.Element {
           width={SPACING.spacing4}
           marginRight={SPACING.spacing3}
           spin={icon?.spin != null ? icon.spin : false}
-          aria-label={`icon_${type as string}`}
+          aria-label={`icon_${type}`}
         />
         <StyledText as="p">{message}</StyledText>
       </Flex>

@@ -35,7 +35,7 @@ import { Modal } from '../../molecules/Modal'
 import { Portal } from '../../App/portal'
 import { SelectOption } from '../../atoms/SelectField/Select'
 import { SelectField } from '../../atoms/SelectField'
-import { Toast } from '../../atoms/Toast'
+import { ERROR_TOAST, SUCCESS_TOAST, useToast } from '../../atoms/Toast'
 import { useTrackEvent } from '../../redux/analytics'
 import {
   getU2EAdapterDevice,
@@ -86,8 +86,7 @@ export function AdvancedSettings(): JSX.Element {
   const enableExtendedHardware = Config.useFeatureFlag('enableExtendedHardware')
 
   const dispatch = useDispatch<Dispatch>()
-  const [showSuccessToast, setShowSuccessToast] = React.useState(false)
-  const [showErrorToast, setShowErrorToast] = React.useState(false)
+  const { makeToast } = useToast()
   const reachableRobots = useSelector((state: State) =>
     getReachableRobots(state)
   )
@@ -102,10 +101,10 @@ export function AdvancedSettings(): JSX.Element {
 
   const handleDeleteUnavailRobots = (): void => {
     if (isUnavailableRobots) {
-      setShowSuccessToast(true)
       dispatch(clearDiscoveryCache())
+      makeToast(t('successfully_deleted_unavail_robots'), SUCCESS_TOAST)
     } else {
-      setShowErrorToast(true)
+      makeToast(t('no_unavail_robots_to_clear'), ERROR_TOAST)
     }
   }
 
@@ -201,20 +200,6 @@ export function AdvancedSettings(): JSX.Element {
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           gridGap={SPACING.spacingXXL}
         >
-          {showSuccessToast && (
-            <Toast
-              message={t('successfully_deleted_unavail_robots')}
-              type="success"
-              onClose={() => setShowSuccessToast(false)}
-            />
-          )}
-          {showErrorToast && (
-            <Toast
-              message={t('no_unavail_robots_to_clear')}
-              type="error"
-              onClose={() => setShowErrorToast(false)}
-            />
-          )}
           {showConfirmDeleteUnavailRobots ? (
             <Portal level="top">
               <Modal
