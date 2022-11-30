@@ -11,7 +11,6 @@ from opentrons.types import DeckSlotName, Point
 from opentrons.protocols.models import LabwareDefinition, WellDefinition
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.hardware_control.types import CriticalPoint
-from opentrons import should_use_ot3
 
 from .. import errors
 from ..resources import DeckFixedLabware
@@ -49,12 +48,6 @@ _MAGDECK_HALF_MM_LABWARE = {
     "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",
     "opentrons/usascientific_96_wellplate_2.4ml_deep/1",
 }
-
-_INSTRUMENT_PROBE_ATTACH_SLOT = DeckSlotName.SLOT_5
-_PIPETTE_PROBE_ATTACH_X_OFFSET_FROM_SLOT = 10.0
-_PIPETTE_PROBE_ATTACH_Z_OFFSET_FROM_SLOT = 3.0
-_OT_2_PIPETTE_ATTACH_Z_OFFSET_FROM_SLOT = 30.0
-_OT_3_PIPETTE_ATTACH_Z_OFFSET_FROM_SLOT = 250.0
 
 _INSTRUMENT_ATTACH_SLOT = DeckSlotName.SLOT_2
 
@@ -491,16 +484,13 @@ class LabwareView(HasState[LabwareState]):
     ) -> CalibrationCoordinates:
         """Get calibration critical point and target position."""
         target_center = self.get_slot_center_position(_INSTRUMENT_ATTACH_SLOT)
-        z_offset = (
-            _OT_3_PIPETTE_ATTACH_Z_OFFSET_FROM_SLOT
-            if should_use_ot3
-            else _OT_2_PIPETTE_ATTACH_Z_OFFSET_FROM_SLOT
-        )
+        # TODO (tz, 11-30-22): These coordinates wont work for OT-2. We will need to apply offsets after
+        # https://opentrons.atlassian.net/browse/RCORE-382
         result = CalibrationCoordinates(
             coordinates=Point(
                 x=target_center.x,
                 y=target_center.y,
-                z=current_z_position + z_offset,
+                z=current_z_position,
             ),
             critical_point=CriticalPoint.MOUNT,
         )

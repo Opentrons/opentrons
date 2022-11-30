@@ -728,17 +728,7 @@ def test_get_calibration_coordinates() -> None:
                         "zDimension": 0,
                     },
                     "displayName": "Slot 2",
-                },
-                # {
-                #     "id": "5",
-                #     "position": [5, 5, 0.0],
-                #     "boundingBox": {
-                #         "xDimension": 10.0,
-                #         "yDimension": 15.0,
-                #         "zDimension": 0,
-                #     },
-                #     "displayName": "Slot 5",
-                # },
+                }
             ]
         }
     }
@@ -749,4 +739,4 @@ def test_get_calibration_coordinates() -> None:
 
     assert result.critical_point == CriticalPoint.MOUNT
 
-    assert result.coordinates == Point(x=2, y=5, z=0)
+    assert result.coordinates == Point(x=4, y=5, z=3)

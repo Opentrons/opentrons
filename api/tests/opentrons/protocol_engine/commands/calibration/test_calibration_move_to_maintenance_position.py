@@ -35,9 +35,7 @@ async def test_calibration_move_to_location_implementation(
         call Movement.move_to_coordinates with the correct input."""
     params = MoveToMaintenancePositionParams(mount=MountType.LEFT)
 
-    decoy.when(
-        await hardware_api.gantry_position(mount=Mount.LEFT)
-    ).then_return(
+    decoy.when(await hardware_api.gantry_position(mount=Mount.LEFT)).then_return(
         Point(x=1, y=2, z=3)
     )
 
