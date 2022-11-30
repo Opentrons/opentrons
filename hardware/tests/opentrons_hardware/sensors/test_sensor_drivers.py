@@ -674,7 +674,7 @@ async def test_peripheral_status(
                 ),
                 ArbitrationId(
                     parts=ArbitrationIdParts(
-                        message_id=ReadFromSensorResponse.message_id,
+                        message_id=PeripheralStatusResponse.message_id,
                         node_id=node_id,
                         function_code=0,
                         originating_node_id=node_id,

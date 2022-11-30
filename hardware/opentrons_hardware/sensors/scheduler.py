@@ -3,7 +3,7 @@ import asyncio
 import logging
 from contextlib import asynccontextmanager
 
-from typing import Optional, Type, TypeVar, Callable, AsyncIterator, cast, List
+from typing import Optional, TypeVar, Callable, AsyncIterator, cast, List
 
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
@@ -65,6 +65,11 @@ log = logging.getLogger(__name__)
 ResponseType = TypeVar("ResponseType", bound=MessageDefinition)
 
 
+def _format_sensor_response(response: MessageDefinition) -> SensorDataType:
+    assert isinstance(response, ReadFromSensorResponse)
+    return SensorDataType.build(response.payload.sensor_data, response.payload.sensor)
+
+
 class SensorScheduler:
     """Sensor message scheduler."""
 
@@ -88,10 +93,6 @@ class SensorScheduler:
             )
 
         return _filter
-
-    @staticmethod
-    def _format_sensor_response(message: ReadFromSensorResponse) -> SensorDataType:
-        return SensorDataType.build(message.payload.sensor_data, message.payload.sensor)
 
     async def run_poll(
         self,
@@ -119,8 +120,9 @@ class SensorScheduler:
                 ),
             )
             try:
+
                 data_list = await asyncio.wait_for(
-                    self._multi_wait_for_response(reader, self._format_sensor_response),
+                    self._multi_wait_for_response(reader, _format_sensor_response),
                     timeout,
                 )
             except asyncio.TimeoutError:
@@ -174,13 +176,8 @@ class SensorScheduler:
             )
             try:
 
-                def _format(response: ReadFromSensorResponse) -> SensorDataType:
-                    return SensorDataType.build(
-                        response.payload.sensor_data, response.payload.sensor
-                    )
-
                 data_list = await asyncio.wait_for(
-                    self._multi_wait_for_response(reader, self._format_sensor_response),
+                    self._multi_wait_for_response(reader, _format_sensor_response),
                     timeout,
                 )
             except asyncio.TimeoutError:
@@ -202,19 +199,15 @@ class SensorScheduler:
         """
         data_list: List[SensorDataType] = []
 
-        def _format(response: ReadFromSensorResponse) -> SensorDataType:
-            return SensorDataType.build(
-                response.payload.sensor_data, response.payload.sensor
-            )
-
         with MultipleMessagesWaitableCallback(
             can_messenger,
             self._create_filter(node_id, MessageId.read_sensor_response),
             number_of_messages=expected_num_messages,
         ) as reader:
             try:
+
                 data_list = await asyncio.wait_for(
-                    self._multi_wait_for_response(reader, _format),
+                    self._multi_wait_for_response(reader, _format_sensor_response),
                     timeout,
                 )
             except asyncio.TimeoutError:
@@ -229,12 +222,13 @@ class SensorScheduler:
         timeout: float = 1.0,
     ) -> SensorDataType:
         """Send threshold message."""
-        response_type = SensorThresholdResponse
         sensor_info = sensor.sensor
 
         with WaitableCallback(
             can_messenger,
-            self._create_filter(sensor_info.node_id, response_type.message_id),
+            self._create_filter(
+                sensor_info.node_id, SensorThresholdResponse.message_id
+            ),
         ) as reader:
             await can_messenger.send(
                 node_id=sensor_info.node_id,
@@ -249,7 +243,8 @@ class SensorScheduler:
             )
             try:
 
-                def _format(response: response_type) -> SensorDataType:
+                def _format(response: MessageDefinition) -> SensorDataType:
+                    assert isinstance(response, SensorThresholdResponse)
                     return SensorDataType.build(
                         response.payload.threshold, response.payload.sensor
                     )
@@ -265,7 +260,7 @@ class SensorScheduler:
     @staticmethod
     async def _multi_wait_for_response(
         reader: WaitableCallback,
-        response_handler: Callable[[ResponseType], SensorDataType],
+        response_handler: Callable[[MessageDefinition], SensorDataType],
     ) -> List[SensorDataType]:
         """Listener for receiving messages back."""
         # TODO we should refactor the rest of the code that relies on
@@ -280,11 +275,12 @@ class SensorScheduler:
     @staticmethod
     async def _wait_for_response(
         reader: WaitableCallback,
-        response_handler: Callable[[ResponseType], Optional[SensorDataType]],
+        response_handler: Callable[[MessageDefinition], SensorDataType],
     ) -> SensorDataType:
         """Listener for receiving messages back."""
         async for response, _ in reader:
             return response_handler(response)
+        raise StopAsyncIteration
 
     @staticmethod
     async def _read_peripheral_response(
@@ -292,7 +288,9 @@ class SensorScheduler:
     ) -> bool:
         """Waits for and sends back PeripheralStatusResponse."""
         async for response, _ in reader:
+            assert isinstance(response, PeripheralStatusResponse)
             return bool(response.payload.status)
+        raise StopAsyncIteration
 
     async def request_peripheral_status(
         self,
