@@ -78,7 +78,9 @@ class SensorScheduler:
         """Send poll message."""
         sensor_info = sensor.sensor
         with MultipleMessagesWaitableCallback(
-            can_messenger, number_of_messages=expected_num_messages
+            can_messenger,
+            self._create_filter(sensor_info.node_id, MessageId.read_sensor_response),
+            number_of_messages=expected_num_messages,
         ) as reader:
             data_list: List[SensorDataType] = []
             await can_messenger.send(
@@ -100,7 +102,7 @@ class SensorScheduler:
 
                 data_list = await asyncio.wait_for(
                     self._multi_wait_for_response(
-                        sensor_info.node_id, reader, ReadFromSensorResponse, _format
+                        reader, ReadFromSensorResponse, _format
                     ),
                     timeout,
                 )
@@ -137,7 +139,9 @@ class SensorScheduler:
         """Send read message."""
         sensor_info = sensor.sensor
         with MultipleMessagesWaitableCallback(
-            can_messenger, number_of_messages=expected_num_messages
+            can_messenger,
+            self._create_filter(sensor_info.node_id, MessageId.read_sensor_response),
+            number_of_messages=expected_num_messages,
         ) as reader:
             data_list: List[SensorDataType] = []
             await can_messenger.send(
@@ -159,7 +163,7 @@ class SensorScheduler:
 
                 data_list = await asyncio.wait_for(
                     self._multi_wait_for_response(
-                        sensor_info.node_id, reader, ReadFromSensorResponse, _format
+                        reader, ReadFromSensorResponse, _format
                     ),
                     timeout,
                 )
@@ -189,12 +193,13 @@ class SensorScheduler:
 
         with MultipleMessagesWaitableCallback(
             can_messenger,
+            self._create_filter(node_id, MessageId.read_sensor_response),
             number_of_messages=expected_num_messages,
         ) as reader:
             try:
                 data_list = await asyncio.wait_for(
                     self._multi_wait_for_response(
-                        node_id, reader, ReadFromSensorResponse, _format
+                        reader, ReadFromSensorResponse, _format
                     ),
                     timeout,
                 )
@@ -253,7 +258,6 @@ class SensorScheduler:
 
     @staticmethod
     async def _multi_wait_for_response(
-        node_id: NodeId,
         reader: WaitableCallback,
         response_def: Type[ResponseType],
         response_handler: Callable[[ResponseType], SensorDataType],
@@ -265,10 +269,30 @@ class SensorScheduler:
         # from an async for loop.
         data: List[SensorDataType] = []
         async for response, arbitration_id in reader:
-            if arbitration_id.parts.originating_node_id == node_id:
-                if isinstance(response, response_def):
-                    data.append(response_handler(response))
+            if isinstance(response, response_def):
+                data.append(response_handler(response))
         return data
+
+    @staticmethod
+    def _create_filter(
+        node_id: Optional[NodeId] = None, message_id: Optional[MessageId] = None
+    ) -> Optional[Callable[[ArbitrationId], bool]]:
+        """Create listener filter by NodeId and MessageId."""
+        if not node_id and not message_id:
+            return None
+
+        def _filter(arbitration_id: ArbitrationId) -> bool:
+            return (
+                NodeId(arbitration_id.parts.originating_node_id) == node_id
+                if node_id
+                else True
+            ) and (
+                MessageId(arbitration_id.parts.message_id) == message_id
+                if message_id
+                else True
+            )
+
+        return _filter
 
     @staticmethod
     async def _wait_for_response(
