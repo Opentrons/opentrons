@@ -439,7 +439,7 @@ class HeaterShakerGeometry(ModuleGeometry):
         ) in get_east_west_slots(int(heater_shaker_slot))
 
 
-def create_geometry(
+def create_geometry_for_ot2_deck(
     definition: ModuleDefinitionV3,
     parent: Location,
     configuration: Optional[str],
@@ -461,8 +461,8 @@ def create_geometry(
     else:
         par = str(parent.labware.object)
 
-    # this needs to change to look up the current deck type if/when we add
-    # that notion
+    # Assume this is for an OT-2, so we can hard-code "ot2_standard".
+    # Also assume that "ot2_short_trash" has the same transforms as "ot2_standard."
     xforms_ser = (
         definition["slotTransforms"]
         .get("ot2_standard", {})

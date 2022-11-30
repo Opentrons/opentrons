@@ -283,7 +283,7 @@ def test_direct_cp():
 
 def test_gen2_module_transforms():
     deck = Deck()
-    tmod = module_geometry.create_geometry(
+    tmod = module_geometry.create_geometry_for_ot2_deck(
         definition=module_geometry.load_definition(
             TemperatureModuleModel.TEMPERATURE_V2
         ),
@@ -291,7 +291,7 @@ def test_gen2_module_transforms():
         configuration=None,
     )
     assert tmod.labware_offset == Point(-1.45, -0.15, 80.09)
-    tmod2 = module_geometry.create_geometry(
+    tmod2 = module_geometry.create_geometry_for_ot2_deck(
         definition=module_geometry.load_definition(
             TemperatureModuleModel.TEMPERATURE_V2
         ),
@@ -300,13 +300,13 @@ def test_gen2_module_transforms():
     )
     assert tmod2.labware_offset == Point(1.15, -0.15, 80.09)
 
-    mmod = module_geometry.create_geometry(
+    mmod = module_geometry.create_geometry_for_ot2_deck(
         definition=module_geometry.load_definition(MagneticModuleModel.MAGNETIC_V2),
         parent=deck.position_for("1"),
         configuration=None,
     )
     assert mmod.labware_offset == Point(-1.175, -0.125, 82.25)
-    mmod2 = module_geometry.create_geometry(
+    mmod2 = module_geometry.create_geometry_for_ot2_deck(
         definition=module_geometry.load_definition(MagneticModuleModel.MAGNETIC_V2),
         parent=deck.position_for("3"),
         configuration=None,

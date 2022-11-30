@@ -9,7 +9,7 @@ from opentrons.types import Location, Point
 from opentrons.hardware_control.modules.types import ModuleType, HeaterShakerModuleModel
 
 from opentrons.protocols.geometry.module_geometry import (
-    create_geometry,
+    create_geometry_for_ot2_deck,
     ModuleGeometry,
     HeaterShakerGeometry,
     PipetteMovementRestrictedByHeaterShakerError,
@@ -128,7 +128,7 @@ def test_create_geometry(
     expected_repr: str,
 ) -> None:
     """It should load an API-version-specific module from its definition."""
-    load_result = create_geometry(
+    load_result = create_geometry_for_ot2_deck(
         definition=module_definition,
         parent=Location(point=Point(0, 0, 0), labware=None),
         configuration=None,
@@ -147,7 +147,7 @@ def test_create_geometry_raises(v1_mag_module_schema_v3_definition) -> None:
     v1_mag_module_schema_v3_definition.update({"moduleType": "blahblahModuleType"})
 
     with pytest.raises(ValueError):
-        create_geometry(
+        create_geometry_for_ot2_deck(
             definition=v1_mag_module_schema_v3_definition,
             parent=Location(point=Point(0, 0, 0), labware=None),
             configuration=None,

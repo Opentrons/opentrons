@@ -250,7 +250,7 @@ class ProtocolContextImplementation(
             raise RuntimeError(f"Could not find specified module: {model.value}")
 
         # Load geometry to match the hardware module that we found connected.
-        geometry = module_geometry.create_geometry(
+        geometry = module_geometry.create_geometry_for_ot2_deck(
             definition=selected_definition,
             parent=self._deck_layout.position_for(resolved_location),
             configuration=configuration,
