@@ -4,28 +4,17 @@ import {
   Flex,
   Link,
   Icon,
-  Btn,
-  Modal,
-  NewPrimaryBtn,
-  Text,
-  C_BLUE,
-  C_MED_DARK_GRAY,
-  FONT_SIZE_BODY_1,
-  JUSTIFY_SPACE_BETWEEN,
-  FONT_WEIGHT_REGULAR,
-  FONT_WEIGHT_SEMIBOLD,
-  JUSTIFY_CENTER,
-  SIZE_4,
-  SIZE_2,
-  SPACING_3,
   DIRECTION_COLUMN,
-  SPACING_1,
-  SPACING_4,
-  SPACING_2,
+  TYPOGRAPHY,
+  SPACING,
+  ALIGN_FLEX_END,
+  DIRECTION_ROW,
 } from '@opentrons/components'
 import { Portal } from '../../../../App/portal'
-import multipleModuleHelp from '../../../../assets/images/MoaM_modal_Image.svg'
-import styles from '../../styles.css'
+import { Modal } from '../../../../molecules/Modal'
+import multipleModuleHelp from '../../../../assets/images/Moam_modal_image.png'
+import { PrimaryButton } from '../../../../atoms/buttons'
+import { StyledText } from '../../../../atoms/text'
 
 const HOW_TO_MULTIPLE_MODULES_HREF =
   'https://support.opentrons.com/s/article/Using-modules-of-the-same-type-on-the-OT-2'
@@ -40,63 +29,55 @@ export const MultipleModulesModal = (
   const { t } = useTranslation(['protocol_setup', 'shared'])
   return (
     <Portal level="top">
-      <Modal className={styles.modal} contentsClassName={styles.modal_contents}>
-        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Text as="h3" marginBottom={SPACING_3}>
-            {t('multiple_modules_modal_title')}
-          </Text>
-          <Btn size={SIZE_2} onClick={props.onCloseClick}>
-            <Icon name="close" color={C_MED_DARK_GRAY}></Icon>
-          </Btn>
-        </Flex>
-        <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING_3}>
-          <Flex flexDirection={DIRECTION_COLUMN}>
-            <Text
-              fontSize={FONT_SIZE_BODY_1}
-              fontWeight={FONT_WEIGHT_REGULAR}
-              marginBottom={SPACING_1}
-            >
-              {t('multiple_modules_explanation')}
-            </Text>
-            <Link
-              external
-              fontSize={FONT_SIZE_BODY_1}
-              color={C_BLUE}
-              href={HOW_TO_MULTIPLE_MODULES_HREF}
-              target="_blank"
-              rel="noopener noreferrer"
-              marginBottom={SPACING_3}
-            >
-              {t('multiple_modules_link')}
-              <Icon name="open-in-new" marginLeft={SPACING_1} size="10px" />
-            </Link>
-            <Text
-              as="h4"
-              fontWeight={FONT_WEIGHT_SEMIBOLD}
-              marginBottom={SPACING_2}
-            >
-              {t('example')}
-            </Text>
+      <Modal
+        title={t('multiple_modules_modal')}
+        onClose={props.onCloseClick}
+        modalWidth="44.75rem"
+      >
+        <Flex flexDirection={DIRECTION_COLUMN}>
+          <Flex flexDirection={DIRECTION_ROW}>
+            <Flex flexDirection={DIRECTION_COLUMN} marginRight="3.625rem">
+              <StyledText as="p" marginBottom={SPACING.spacing4}>
+                {t('multiple_modules_explanation')}
+              </StyledText>
+              <Link
+                external
+                css={TYPOGRAPHY.linkPSemiBold}
+                href={HOW_TO_MULTIPLE_MODULES_HREF}
+                target="_blank"
+                rel="noopener noreferrer"
+                marginBottom={SPACING.spacing4}
+              >
+                {t('multiple_modules_learn_more')}
+                <Icon
+                  name="open-in-new"
+                  marginLeft={SPACING.spacing2}
+                  size="0.625rem"
+                />
+              </Link>
+              <StyledText
+                css={TYPOGRAPHY.pSemiBold}
+                marginBottom={SPACING.spacing2}
+              >
+                {t('example')}
+              </StyledText>
 
-            <Text
-              fontSize={FONT_SIZE_BODY_1}
-              fontWeight={FONT_WEIGHT_REGULAR}
-              title={t('multiple_modules_example')}
-              marginBottom={SPACING_4}
-            >
-              {t('multiple_modules_example')}
-            </Text>
+              <StyledText as="p">{t('multiple_modules_example')}</StyledText>
+            </Flex>
+            <img
+              height="100%"
+              width="288px"
+              src={multipleModuleHelp}
+              style={{ marginBottom: SPACING.spacing4 }}
+            />
           </Flex>
-          <img src={multipleModuleHelp} />
-        </Flex>
-        <Flex justifyContent={JUSTIFY_CENTER}>
-          <NewPrimaryBtn
+          <PrimaryButton
             onClick={props.onCloseClick}
-            width={SIZE_4}
-            marginTop={SPACING_3}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
+            alignSelf={ALIGN_FLEX_END}
           >
             {t('shared:close')}
-          </NewPrimaryBtn>
+          </PrimaryButton>
         </Flex>
       </Modal>
     </Portal>

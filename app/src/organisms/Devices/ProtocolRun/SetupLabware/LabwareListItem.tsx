@@ -28,6 +28,7 @@ import {
   ModuleType,
   TC_MODULE_LOCATION,
   THERMOCYCLER_MODULE_TYPE,
+  THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { ToggleButton } from '../../../../atoms/buttons'
@@ -112,33 +113,35 @@ export function LabwareListItem(
     switch (moduleTypeNeedsAttention) {
       case MAGNETIC_MODULE_TYPE:
       case THERMOCYCLER_MODULE_TYPE:
-        extraAttentionText = (
-          <Btn
-            css={css`
-              color: ${COLORS.darkGreyEnabled};
+        if (moduleModel !== THERMOCYCLER_MODULE_V2) {
+          extraAttentionText = (
+            <Btn
+              css={css`
+                color: ${COLORS.darkGreyEnabled};
 
-              &:hover {
-                color: ${COLORS.darkBlackEnabled};
-              }
-            `}
-            onClick={() => setSecureLabwareModalType(moduleType)}
-          >
-            <Flex flexDirection={DIRECTION_ROW}>
-              <Icon
-                name="information"
-                size="0.75rem"
-                marginTop={SPACING.spacingXS}
-              />
-              <StyledText
-                marginLeft={SPACING.spacing2}
-                as="p"
-                textDecoration={TYPOGRAPHY.textDecorationUnderline}
-              >
-                {t('secure_labware_instructions')}
-              </StyledText>
-            </Flex>
-          </Btn>
-        )
+                &:hover {
+                  color: ${COLORS.darkBlackEnabled};
+                }
+              `}
+              onClick={() => setSecureLabwareModalType(moduleType)}
+            >
+              <Flex flexDirection={DIRECTION_ROW}>
+                <Icon
+                  name="information"
+                  size="0.75rem"
+                  marginTop={SPACING.spacingXS}
+                />
+                <StyledText
+                  marginLeft={SPACING.spacing2}
+                  as="p"
+                  textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                >
+                  {t('secure_labware_instructions')}
+                </StyledText>
+              </Flex>
+            </Btn>
+          )
+        }
         break
       case HEATERSHAKER_MODULE_TYPE:
         isHeaterShakerInProtocol = true
