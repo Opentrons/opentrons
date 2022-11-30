@@ -1,3 +1,4 @@
+from typing import cast
 from enum import Enum
 from dataclasses import dataclass
 
@@ -34,11 +35,11 @@ class PipetteChannelType(Enum):
 
     @property
     def as_int(self) -> int:
-        if self.value == self.NINETY_SIX_CHANNEL.value:
+        if self.value == self.NINETY_SIX_CHANNEL:
             return 96
-        elif self.value == self.EIGHT_CHANNEL.value:
+        elif self.value == self.EIGHT_CHANNEL:
             return 8
-        elif self.value == self.SINGLE_CHANNEL.value:
+        elif self.value == self.SINGLE_CHANNEL:
             return 1
         return 0
 
@@ -59,6 +60,8 @@ class PipetteVersionType:
 
     @classmethod
     def convert_from_float(cls, version: float) -> "PipetteVersionType":
-        cls.major = int(version // 1)
-        cls.minor = int(round((version % 1), 2) * 10)
-        return cls
+        major = cast(constants.PipetteModelMajorVersion, int(version // 1))
+        minor = cast(
+            constants.PipetteModelMinorVersion, int(round((version % 1), 2) * 10)
+        )
+        return cls(major=major, minor=minor)
