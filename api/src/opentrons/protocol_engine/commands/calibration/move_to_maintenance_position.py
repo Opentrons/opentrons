@@ -31,7 +31,7 @@ class MoveToMaintenancePositionParams(BaseModel):
 
 
 class MoveToMaintenancePositionResult(BaseModel):
-    """Result data from the execution of a MoveToLocation command."""
+    """Result data from the execution of a MoveToMaintenancePosition command."""
 
 
 class MoveToMaintenancePositionImplementation(
