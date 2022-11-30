@@ -81,7 +81,7 @@ function RequiredEquipmentCard(props: RequiredEquipmentCardProps): JSX.Element {
         width="100%"
       >
         <Flex
-          height="6rem"
+          height={loadName in equipmentImages ? '3.5rem' : '6rem'}
           flex="0 1 30%"
           justifyContent={JUSTIFY_CENTER}
           alignItems={ALIGN_CENTER}
