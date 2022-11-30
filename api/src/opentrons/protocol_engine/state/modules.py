@@ -533,6 +533,7 @@ class ModuleView(HasState[ModuleState]):
         pre_transform = array(
             (definition.labwareOffset.x, definition.labwareOffset.y, 1)
         )
+        # FIXME(mm, 2022-11-30): Extend this for OT-3 and short-trash OT-2 decks.
         xforms_ser = definition.slotTransforms.get("ot2_standard", {}).get(
             slot, {"labwareOffset": [[1, 0, 0], [0, 1, 0], [0, 0, 1]]}
         )
