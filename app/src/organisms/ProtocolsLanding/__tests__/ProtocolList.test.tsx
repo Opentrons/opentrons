@@ -30,7 +30,9 @@ const mockEmptyStateLinks = EmptyStateLinks as jest.MockedFunction<
 const mockProtocolCard = ProtocolCard as jest.MockedFunction<
   typeof ProtocolCard
 >
-const mockGetProtocolsStoredSortKey = getProtocolsStoredSortKey as jest.MockedFunction<typeof getProtocolsStoredSortKey>
+const mockGetProtocolsStoredSortKey = getProtocolsStoredSortKey as jest.MockedFunction<
+  typeof getProtocolsStoredSortKey
+>
 
 const render = (props: React.ComponentProps<typeof ProtocolList>) => {
   return renderWithProviders(
@@ -149,5 +151,4 @@ describe('ProtocolList', () => {
     const { getByText } = render(props)
     getByText('Oldest updates')
   })
-
 })
