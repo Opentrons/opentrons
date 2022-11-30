@@ -2,7 +2,7 @@
 from __future__ import annotations
 import asyncio
 from inspect import Traceback
-from typing import Optional, Callable, Tuple, Dict, Union, List
+from typing import Optional, Callable, Tuple, Dict, Union, List, cast
 
 import logging
 
@@ -150,9 +150,10 @@ class AcknowledgeListener:
             self._can_messenger.remove_listener(self)
 
         while not self._ack_queue.empty():
-            ack = self._ack_queue.get_nowait()
-            if isinstance(ack, ErrorMessage):
-                return ack.payload.error_code.value
+            arb_id, message = self._ack_queue.get_nowait()
+            if arb_id.parts.message_id == MessageId.error_message:
+                err_msg = cast(ErrorMessage, message)
+                return ErrorCode(err_msg.payload.error_code.value)
         return ErrorCode.ok
 
 
