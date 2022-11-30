@@ -7,7 +7,7 @@ import serial  # type: ignore[import]
 class Mitutoyo_Digimatic_Indicator:
     """Driver class to use dial indicator."""
 
-    def __init__(self, port: str = "/dev/ttyUSB0", baudrate: int = 9600) -> None:
+    def __init__(self, port: str = "COM11", baudrate: int = 9600) -> None:
         """Initialize class."""
         self.PORT = port
         self.BAUDRATE = baudrate
@@ -77,7 +77,7 @@ class Mitutoyo_Digimatic_Indicator:
 
 if __name__ == "__main__":
     print("Mitutoyo ABSOLUTE Digimatic Indicator")
-    gauge = Mitutoyo_Digimatic_Indicator(port="/dev/ttyUSB0")
+    gauge = Mitutoyo_Digimatic_Indicator(port="COM11")
     gauge.connect()
     start_time = time.time()
     while True:

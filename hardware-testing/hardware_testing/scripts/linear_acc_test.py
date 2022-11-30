@@ -68,23 +68,23 @@ async def _main(is_simulating: bool) -> None:
     test_name = "linear-acc"
     file_name = data.create_file_name(test_name=test_name, run_id=data.create_run_id(), tag=test_tag)
 
-    await home_ot3(api, [OT3Axis.X])
+    await home_ot3(api) # , [OT3Axis.Y])
     # await api.move_rel(mount=MOUNT, delta=Point(y=-60), speed=200)
-    await api.disengage_axes([OT3Axis.Y])
+    # await api.disengage_axes([OT3Axis.Y])
 
-    input("Set Y-Axis\n\n\t>> Continue...")
-    await api.engage_axes([OT3Axis.Y])
+    # input("Set Y-Axis\n\n\t>> Continue...")
+    # await api.engage_axes([OT3Axis.Y])
 
-    print(f"Set digital scale parallel to X-Axis")
-    input("\n\t>> Continue...")
+    # print(f"Set digital scale parallel to X-Axis")
+    # input("\n\t>> Continue...")
 
     # await api.engage_axes([OT3Axis.Y])
     starting_read_pos = gauge.read()
 
-    print(f"Attach and set digital scale to 0\n\t>> Current position: {starting_read_pos}")
-    await api.disengage_axes([OT3Axis.Y])
+    print(f"Set digital scale to 0\n\t>> Current position: {starting_read_pos}")
+    # await api.disengage_axes([OT3Axis.Y])
     input("\n\t>> Continue...")
-    await api.engage_axes([OT3Axis.Y])
+    # await api.engage_axes([OT3Axis.Y])
 
     init_reading = gauge.read()
     print(f"Initial gauge read {test_tag}: {init_reading} mm\n")
@@ -92,12 +92,13 @@ async def _main(is_simulating: bool) -> None:
     test_axis = test_tag
 
     init_encoder_pos = await api.encoder_current_position(MOUNT)
+    # print(f"Init Encoder position: {init_encoder_pos[Axis.X]}, {init_encoder_pos[Axis.Y]}")
     # for key in init_encoder_pos:
     #     print(key)
     #     print(init_encoder_pos[key])
     # keys = init_encoder_pos.keys()
     # print(keys)
-    init_encoder_pos = init_encoder_pos[Axis.X]
+    init_encoder_pos = init_encoder_pos[Axis.Y]
     # init_encoder_pos = init_encoder_pos["<Axis.X>"]
 
     if test_axis == "Z":
@@ -117,8 +118,10 @@ async def _main(is_simulating: bool) -> None:
 
     # distances = [440*0.25, 440*0.5, 440*0.75, 440]
     cur_pos = await api.current_position(MOUNT)
+    print(f"Max Y Travel: {cur_pos[Axis.Y]}")
     # print(cur_pos.keys())
-    distances = [cur_pos[Axis.X]*0.25, cur_pos[Axis.X]*0.25, cur_pos[Axis.X]*0.25, cur_pos[Axis.X]*0.25]
+    distances = [(cur_pos[Axis.Y]-22.56)*0.25, (cur_pos[Axis.Y]-22.56)*0.25, (cur_pos[Axis.Y]-22.56)*0.25, (cur_pos[Axis.Y]-22.56)*0.25]
+    print(f"Distance increments: {(cur_pos[Axis.Y]-22.56)*0.25}")
     count = 0
     for cycle in range(CYCLES):
         print(f"Cycle: {cycle+1} out of {CYCLES}")
@@ -131,12 +134,14 @@ async def _main(is_simulating: bool) -> None:
             # if count == 1:
             #     time.sleep(2)
             #     start_pos = gauge.read()
-            await api.move_rel(mount=MOUNT, delta=Point(x=-distance), speed=400)
+            print(f"\tMove to: {distance*count} mm")
+            await api.move_rel(mount=MOUNT, delta=Point(y=-distance), speed=400)
             time.sleep(2)
             pos_reading = gauge.read() - start_pos
             print(f"\tCurrent position reading:\n\t {pos_reading} mm")
             encoder_pos = await api.encoder_current_position(MOUNT)
-            encoder_pos = init_encoder_pos - encoder_pos[Axis.X]
+            # print(f"Encoder position: {encoder_pos[Axis.X]}, {encoder_pos[Axis.Y]}")
+            encoder_pos = init_encoder_pos - encoder_pos[Axis.Y]
             print(f"\tCurrent encoder position reading:\n\t {encoder_pos} mm")
             # await home_ot3(api, [OT3Axis.X])
             time.sleep(2)
@@ -145,7 +150,7 @@ async def _main(is_simulating: bool) -> None:
             cycle_data = [cycle+1, '', start_pos, pos_reading, distance*count, encoder_pos, test_speed]
             cycle_data_str = data.convert_list_to_csv_line(cycle_data)
             data.append_data_to_file(test_name=test_name, file_name=file_name, data=cycle_data_str)
-        await home_ot3(api, [OT3Axis.X])
+        await home_ot3(api) #, [OT3Axis.X])
         count = 0
 
     await api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
