@@ -11,11 +11,12 @@ import {
 interface StepMeterProps {
   totalSteps: number
   currentStep: number | null
+  OnDevice?: boolean
 }
 
 export const StepMeter = (props: StepMeterProps): JSX.Element => {
-  const { totalSteps, currentStep } = props
-  const progress = currentStep || 0
+  const { totalSteps, currentStep, OnDevice: isOnDevice = false } = props
+  const progress = currentStep != null ? currentStep : 0
   const percentComplete = `${
     //    this logic puts a cap at 100% percentComplete which we should never run into
     currentStep != null && currentStep > totalSteps
@@ -25,7 +26,7 @@ export const StepMeter = (props: StepMeterProps): JSX.Element => {
 
   const StepMeterContainer = css`
     position: ${POSITION_RELATIVE};
-    height: ${SPACING.spacing2};
+    height: ${isOnDevice ? '0.75rem' : SPACING.spacing2};
     background-color: ${COLORS.medGreyEnabled};
   `
   const StepMeterBar = css`
