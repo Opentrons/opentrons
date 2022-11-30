@@ -10,7 +10,8 @@
       "gitTagVersion": false,
       "push": false,
       "preid": "alpha",
-      "forcePublish": "*"
+      "forcePublish": "*",
+      "noChangelog": true
     }
   },
   "npmClient": "yarn",
