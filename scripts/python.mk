@@ -29,7 +29,7 @@ endif
 # when using newer versions of setuptools
 export SETUPTOOLS_ENABLE_FEATURES := legacy-editable
 
-pipenv_envvars := $(and $(CI),PIPENV_IGNORE_VIRTUALENVS=1)
+pipenv_envvars := ""
 pipenv_call := $(pipenv_envvars) $(OT_PYTHON) -m pipenv
 pipenv = PIPENV_PIPFILE=$(monorepo_root)/environments/$(1)/Pipfile $(pipenv_call)
 python = $(call pipenv,$(1)) run python
