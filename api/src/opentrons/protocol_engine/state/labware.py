@@ -51,6 +51,7 @@ _MAGDECK_HALF_MM_LABWARE = {
 
 _INSTRUMENT_ATTACH_SLOT = DeckSlotName.SLOT_2
 
+
 @dataclass
 class LabwareState:
     """State of all loaded labware resources."""
