@@ -23,7 +23,7 @@ __all__ = [
     "CalibratePipetteParams",
     "CalibratePipetteResult",
     "CalibratePipetteCommandType",
-    # calibration/moveToLocation
+    # calibration/moveToMaintenancePosition
     "MoveToMaintenancePosition",
     "MoveToMaintenancePositionCreate",
     "MoveToMaintenancePositionParams",
