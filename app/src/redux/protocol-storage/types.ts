@@ -38,8 +38,6 @@ export type ProtocolListActionSource =
   | 'protocolAddition'
   | 'overwriteProtocol'
 
-export type ProtocolSort = 'alphabetical' | 'reverse' | 'recent' | 'oldest'
-
 export interface FetchProtocolsAction {
   type: 'protocolStorage:FETCH_PROTOCOLS'
   meta: { shell: true }
