@@ -46,7 +46,7 @@ describe('LiquidDetailCard', () => {
     const [{ getByTestId }] = render(props)
     fireEvent.click(getByTestId('LiquidDetailCard_box'))
     expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: 'highLiquidInDetailModal',
+      name: 'highlightLiquidInDetailModal',
       properties: {},
     })
   })

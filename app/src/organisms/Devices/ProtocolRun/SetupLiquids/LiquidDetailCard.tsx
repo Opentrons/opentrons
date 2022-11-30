@@ -62,7 +62,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
 
   const handleSelectedValue = (): void => {
     setSelectedValue(liquidId)
-    trackEvent({ name: 'highLiquidInDetailModal', properties: {} })
+    trackEvent({ name: 'highlightLiquidInDetailModal', properties: {} })
   }
   return (
     <Box

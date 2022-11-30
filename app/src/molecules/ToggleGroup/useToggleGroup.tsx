@@ -72,9 +72,7 @@ export const useToggleGroup = (
   right: string,
   trackEventName?: string
 ): [string, React.ReactNode] => {
-  const [selectedValue, setSelectedValue] = React.useState<
-    typeof left | typeof right
-  >(left)
+  const [selectedValue, setSelectedValue] = React.useState<string>(left)
   const trackEvent = useTrackEvent()
   const handleLeftClick = (): void => {
     setSelectedValue(left)
@@ -94,6 +92,7 @@ export const useToggleGroup = (
       })
     }
   }
+
   return [
     selectedValue,
     <Flex css={BUTTON_GROUP_STYLES} key="toggleGroup">
@@ -101,6 +100,7 @@ export const useToggleGroup = (
         css={selectedValue === left ? ACTIVE_STYLE : DEFAULT_STYLE}
         key={left}
         onClick={handleLeftClick}
+        data-testid='useToggleGroup_leftButton'
       >
         {left}
       </PrimaryButton>
@@ -108,6 +108,8 @@ export const useToggleGroup = (
         css={selectedValue === right ? ACTIVE_STYLE : DEFAULT_STYLE}
         key={right}
         onClick={handleRightClick}
+        data-testid='useToggleGroup_rightButton'
+
       >
         {right}
       </PrimaryButton>

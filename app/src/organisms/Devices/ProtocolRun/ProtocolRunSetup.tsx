@@ -13,7 +13,6 @@ import {
 
 import { useFeatureFlag } from '../../../redux/config'
 import { Line } from '../../../atoms/structure'
-import { useTrackEvent } from '../../../redux/analytics'
 import { StyledText } from '../../../atoms/text'
 import { InfoMessage } from '../../../molecules/InfoMessage'
 import {
@@ -57,7 +56,6 @@ export function ProtocolRunSetup({
   const { protocolData: robotProtocolAnalysis } = useProtocolDetailsForRun(
     runId
   )
-  const trackEvent = useTrackEvent()
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
   const modules = parseAllRequiredModuleModels(protocolData?.commands ?? [])
@@ -191,39 +189,31 @@ export function ProtocolRunSetup({
               {t('protocol_analysis_failed')}
             </StyledText>
           ) : (
-            stepsKeysInOrder.map((stepKey, index) => {
-              const handleToggleExpanded = (): void => {
-                setExpandedStepKey(stepKey)
-                if (stepKey === 'liquid_setup_step') {
-                  trackEvent({ name: 'expandLiquidSetup', properties: {} })
-                }
-              }
-              return (
-                <Flex flexDirection={DIRECTION_COLUMN} key={stepKey}>
-                  <SetupStep
-                    expanded={stepKey === expandedStepKey}
-                    label={t('step', { index: index + 1 })}
-                    title={t(`${stepKey}_title`)}
-                    description={StepDetailMap[stepKey].description}
-                    toggleExpanded={
-                      stepKey === expandedStepKey
-                        ? () => setExpandedStepKey(null)
-                        : handleToggleExpanded
-                    }
-                    calibrationStatusComplete={
-                      stepKey === ROBOT_CALIBRATION_STEP_KEY && !runHasStarted
-                        ? calibrationStatus.complete
-                        : null
-                    }
-                  >
-                    {StepDetailMap[stepKey].stepInternals}
-                  </SetupStep>
-                  {index !== stepsKeysInOrder.length - 1 ? (
-                    <Line marginTop={SPACING.spacing5} />
-                  ) : null}
-                </Flex>
-              )
-            })
+            stepsKeysInOrder.map((stepKey, index) => (
+              <Flex flexDirection={DIRECTION_COLUMN} key={stepKey}>
+                <SetupStep
+                  expanded={stepKey === expandedStepKey}
+                  label={t('step', { index: index + 1 })}
+                  title={t(`${stepKey}_title`)}
+                  description={StepDetailMap[stepKey].description}
+                  toggleExpanded={() =>
+                    stepKey === expandedStepKey
+                      ? setExpandedStepKey(null)
+                      : setExpandedStepKey(stepKey)
+                  }
+                  calibrationStatusComplete={
+                    stepKey === ROBOT_CALIBRATION_STEP_KEY && !runHasStarted
+                      ? calibrationStatus.complete
+                      : null
+                  }
+                >
+                  {StepDetailMap[stepKey].stepInternals}
+                </SetupStep>
+                {index !== stepsKeysInOrder.length - 1 ? (
+                  <Line marginTop={SPACING.spacing5} />
+                ) : null}
+              </Flex>
+            ))
           )}
         </>
       ) : (

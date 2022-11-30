@@ -13,7 +13,6 @@ import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/test
 import { i18n } from '../../../../i18n'
 import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
 import { useFeatureFlag } from '../../../../redux/config'
-import { useTrackEvent } from '../../../../redux/analytics'
 import {
   useIsOT3,
   useProtocolDetailsForRun,
@@ -43,7 +42,6 @@ jest.mock('../SetupModules')
 jest.mock('../SetupLiquids')
 jest.mock('../../../../redux/config')
 jest.mock('@opentrons/shared-data/js/helpers/parseProtocolData')
-jest.mock('../../../../redux/analytics')
 
 const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
@@ -83,12 +81,9 @@ const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
 const mockProtocolHasLiquids = protocolHasLiquids as jest.MockedFunction<
   typeof protocolHasLiquids
 >
-const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
-  typeof useTrackEvent
->
+
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
-let mockTrackEvent: jest.Mock
 
 const render = () => {
   return renderWithProviders(
@@ -147,8 +142,6 @@ describe('ProtocolRunSetup', () => {
       .mockReturnValue(<span>Mock SetupLabware</span>)
     when(mockSetupModules).mockReturnValue(<div>Mock SetupModules</div>)
     when(mockSetupLiquids).mockReturnValue(<div>Mock SetupLiquids</div>)
-    mockTrackEvent = jest.fn()
-    when(mockUseTrackEvent).mockReturnValue(mockTrackEvent)
   })
   afterEach(() => {
     resetAllWhenMocks()
