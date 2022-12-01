@@ -20,7 +20,7 @@ DEFAULT_DECK_DEFINITION_VERSION = 3
 
 
 class DefinitionName(Enum):
-    OT2_STANDARD = "ot3_standard"
+    OT2_STANDARD = "ot2_standard"
     OT2_SHORT_TRASH = "ot2_short_trash"
     OT3_STANDARD = "ot3_standard"
 
