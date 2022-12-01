@@ -485,10 +485,8 @@ def test_comment(
     decoy.verify(mock_engine_client.comment("Hello, world!"))
 
 
-def test_set_rail_lights(
-        decoy: Decoy,
-        mock_engine_client: EngineClient,
-        subject: ProtocolCore
+def test_set_get_rail_lights(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: ProtocolCore
 ) -> None:
     """It should verify a call to sync client."""
     subject.set_rail_lights(on=True)
@@ -497,3 +495,12 @@ def test_set_rail_lights(
     subject.set_rail_lights(on=False)
     decoy.verify(mock_engine_client.set_rail_lights(on=False))
 
+
+def test_get_rail_lights(
+    decoy: Decoy, mock_sync_hardware_api: SyncHardwareAPI, subject: ProtocolCore
+) -> None:
+    """It should verify a call to sync client."""
+    decoy.when(mock_sync_hardware_api.get_lights()).then_return({"rails": True})
+
+    result = subject.get_rail_lights_on()
+    assert result is True

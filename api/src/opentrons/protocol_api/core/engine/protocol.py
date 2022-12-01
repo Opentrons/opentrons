@@ -289,7 +289,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def get_rail_lights_on(self) -> bool:
         """Get whether the device's rail lights are on."""
-        raise NotImplementedError("ProtocolCore.get_rail_lights_on not implemented")
+        return self._sync_hardware.get_lights()["rails"]  # type: ignore[no-any-return]
 
     def door_closed(self) -> bool:
         """Get whether the device's front door is closed."""
