@@ -26,6 +26,7 @@ from opentrons.protocol_engine.types import (
     WellOrigin,
     WellOffset,
     WellLocation,
+    StaticPipetteConfig,
 )
 
 

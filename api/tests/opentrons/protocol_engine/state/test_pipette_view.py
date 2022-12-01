@@ -7,7 +7,7 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType, Mount as HwMount
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocol_engine import errors
-from opentrons.protocol_engine.types import LoadedPipette
+from opentrons.protocol_engine.types import LoadedPipette, StaticPipetteConfig
 from opentrons.protocol_engine.state.pipettes import (
     PipetteState,
     PipetteView,
@@ -22,6 +22,7 @@ def get_pipette_view(
     current_well: Optional[CurrentWell] = None,
     attached_tip_labware_by_id: Optional[Dict[str, str]] = None,
     movement_speed_by_id: Optional[Dict[str, Optional[float]]] = None,
+    static_config_by_id: Optional[Dict[str, StaticPipetteConfig]] = None,
 ) -> PipetteView:
     """Get a pipette view test subject with the specified state."""
     state = PipetteState(
@@ -30,6 +31,7 @@ def get_pipette_view(
         current_well=current_well,
         attached_tip_labware_by_id=attached_tip_labware_by_id or {},
         movement_speed_by_id=movement_speed_by_id or {},
+        static_config_by_id=static_config_by_id or {},
     )
 
     return PipetteView(state=state)

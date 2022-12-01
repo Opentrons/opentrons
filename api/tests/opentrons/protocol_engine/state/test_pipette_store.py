@@ -13,6 +13,7 @@ from opentrons.protocol_engine.types import (
     LoadedPipette,
     OFF_DECK_LOCATION,
     LabwareMovementStrategy,
+    StaticPipetteConfig,
 )
 from opentrons.protocol_engine.actions import (
     SetPipetteMovementSpeedAction,
@@ -53,6 +54,7 @@ def test_sets_initial_state(subject: PipetteStore) -> None:
         current_well=None,
         attached_tip_labware_by_id={},
         movement_speed_by_id={},
+        static_config_by_id={},
     )
 
 
