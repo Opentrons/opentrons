@@ -11,7 +11,6 @@ from opentrons.protocol_engine.commands.calibration.move_to_maintenance_position
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.state import StateView
 from opentrons.types import Point, MountType, Mount
-from opentrons.hardware_control.types import CriticalPoint
 
 
 @pytest.fixture
@@ -50,8 +49,6 @@ async def test_calibration_move_to_location_implementation(
     )
 
     decoy.verify(
-        await hardware_api.move_to(
-            mount=Mount.LEFT,
-            abs_position=Point(x=1, y=2, z=3)        ),
+        await hardware_api.move_to(mount=Mount.LEFT, abs_position=Point(x=1, y=2, z=3)),
         times=1,
     )
