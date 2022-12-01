@@ -865,8 +865,13 @@ class OT3API(
             and mount_in_use != OT3Mount.GRIPPER
             and self._gripper_handler.gripper.state != GripperJawState.GRIPPING
         ):
-            # allows for safer gantry movement at minimum force
-            await self.grip(force_newtons=IDLE_STATE_GRIP_FORCE)
+            if self._gripper_handler.gripper.state == GripperJawState.UNHOMED:
+                self._log.warning(
+                    "Gripper jaw is not homed. " "Can't be moved to idle position"
+                )
+            else:
+                # allows for safer gantry movement at minimum force
+                await self.grip(force_newtons=IDLE_STATE_GRIP_FORCE)
 
     @ExecutionManagerProvider.wait_for_running
     async def _move(
