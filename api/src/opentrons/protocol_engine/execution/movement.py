@@ -91,6 +91,10 @@ class MovementHandler:
         hs_movement_restrictors = (
             self._state_store.modules.get_heater_shaker_movement_restrictors()
         )
+        print("######## H/S movement restrictors #######")
+        print(f"{hs_movement_restrictors}")
+        print("##########################################")
+
         dest_slot_int = int(
             self._state_store.geometry.get_ancestor_slot_name(labware_id)
         )

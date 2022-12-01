@@ -241,5 +241,5 @@ class LabwareMovementHandler:
             except HeaterShakerLabwareLatchNotOpenError:
                 raise LabwareMovementNotAllowedError(
                     "Cannot move labware from/to a heater-shaker"
-                    " with its labware latch open."
+                    " with its labware latch closed."
                 )
