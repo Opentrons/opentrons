@@ -98,14 +98,11 @@ export function Toast(props: ToastProps): JSX.Element {
     ...styleProps
   } = props
 
-  React.useEffect(() => {
-    if (!disableTimeout) {
-      setTimeout(() => {
-        onClose?.()
-      }, duration)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [disableTimeout, duration])
+  if (!disableTimeout) {
+    setTimeout(() => {
+      onClose?.()
+    }, duration)
+  }
 
   return (
     // maxWidth is based on default app size ratio
