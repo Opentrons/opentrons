@@ -8,7 +8,6 @@ from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName, Point
-from opentrons.hardware_control.types import CriticalPoint
 
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
@@ -737,6 +736,4 @@ def test_get_calibration_coordinates() -> None:
 
     result = subject.get_calibration_coordinates(current_z_position=3.0)
 
-    assert result.critical_point == None
-
-    assert result.coordinates == Point(x=4, y=5, z=3)
+    assert result == Point(x=4, y=5, z=3)

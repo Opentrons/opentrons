@@ -7,7 +7,6 @@ from opentrons.protocol_engine.commands.calibration.move_to_maintenance_position
     MoveToMaintenancePositionImplementation,
     MoveToMaintenancePositionResult,
 )
-from opentrons.protocol_engine.types import CalibrationCoordinates
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.state import StateView
@@ -40,11 +39,7 @@ async def test_calibration_move_to_location_implementation(
 
     decoy.when(
         state_view.labware.get_calibration_coordinates(current_z_position=3.0)
-    ).then_return(
-        CalibrationCoordinates(
-            coordinates=Point(x=1, y=2, z=3), critical_point=CriticalPoint.MOUNT
-        )
-    )
+    ).then_return(Point(x=1, y=2, z=3))
 
     result = await subject.execute(params=params)
     assert result == MoveToMaintenancePositionResult()
@@ -57,8 +52,6 @@ async def test_calibration_move_to_location_implementation(
     decoy.verify(
         await hardware_api.move_to(
             mount=Mount.LEFT,
-            abs_position=Point(x=1, y=2, z=3),
-            critical_point=CriticalPoint.MOUNT,
-        ),
+            abs_position=Point(x=1, y=2, z=3)        ),
         times=1,
     )

@@ -27,7 +27,6 @@ from ..types import (
     LabwareLocation,
     LoadedLabware,
     ModuleLocation,
-    CalibrationCoordinates,
 )
 from ..actions import (
     Action,
@@ -478,23 +477,17 @@ class LabwareView(HasState[LabwareState]):
                     f"Labware {labware.loadName} is already present at {location}."
                 )
 
-    def get_calibration_coordinates(
-        self, current_z_position: float
-    ) -> CalibrationCoordinates:
+    def get_calibration_coordinates(self, current_z_position: float) -> Point:
         """Get calibration critical point and target position."""
         target_center = self.get_slot_center_position(_INSTRUMENT_ATTACH_SLOT)
         # TODO (tz, 11-30-22): These coordinates wont work for OT-2. We will need to apply offsets after
         # https://opentrons.atlassian.net/browse/RCORE-382
-        result = CalibrationCoordinates(
-            coordinates=Point(
-                x=target_center.x,
-                y=target_center.y,
-                z=current_z_position,
-            ),
-            critical_point=None,
-        )
 
-        return result
+        return Point(
+            x=target_center.x,
+            y=target_center.y,
+            z=current_z_position,
+        )
 
     def _is_magnetic_module_uri_in_half_millimeter(self, labware_id: str) -> bool:
         """Check whether the labware uri needs to be calculated in half a millimeter."""

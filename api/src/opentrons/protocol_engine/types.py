@@ -9,10 +9,8 @@ from typing import Optional, Union, List, Dict, Any, NamedTuple
 from typing_extensions import Literal, TypeGuard
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons.types import MountType, DeckSlotName, Point
+from opentrons.types import MountType, DeckSlotName
 from opentrons.hardware_control.modules import ModuleType as ModuleType
-from opentrons.hardware_control.types import CriticalPoint
-
 
 from opentrons_shared_data.pipette.dev_types import (  # noqa: F401
     # convenience re-export of LabwareUri type
@@ -399,10 +397,3 @@ class HeaterShakerMovementRestrictors:
     plate_shaking: bool
     latch_closed: bool
     deck_slot: int
-
-
-class CalibrationCoordinates(NamedTuple):
-    """Calibration coordinates and critical point."""
-
-    coordinates: Point
-    critical_point: Optional[CriticalPoint]
