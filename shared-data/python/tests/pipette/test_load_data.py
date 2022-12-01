@@ -15,13 +15,17 @@ def test_load_pipette_definition() -> None:
         types.PipetteChannelType.SINGLE_CHANNEL,
         types.PipetteVersionType(major=1, minor=0),
     )
-
-    assert pipette_config.liquid.dict() == json.loads(
+    combined_dict = json.loads(
         load_shared_data("pipette/definitions/2/liquid/single_channel/p50/1.json")
-    ).pop("$otSharedSchema")
-    assert pipette_config.geometry.dict() == json.loads(
-        load_shared_data("pipette/definitions/2/geometry/single_channel/p50/1.json")
     )
-    assert pipette_config.physical.dict() == json.loads(
-        load_shared_data("pipette/definitions/2/general/single_channel/p50/1.json")
+    combined_dict.update(
+        json.loads(
+            load_shared_data("pipette/definitions/2/geometry/single_channel/p50/1.json")
+        )
     )
+    combined_dict.update(
+        json.loads(
+            load_shared_data("pipette/definitions/2/general/single_channel/p50/1.json")
+        )
+    )
+    assert pipette_config.dict() == combined_dict

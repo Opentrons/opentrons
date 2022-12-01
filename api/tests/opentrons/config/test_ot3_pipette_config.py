@@ -1,20 +1,16 @@
 import pytest
 
 from opentrons_shared_data.pipette.types import PipetteTipType
-from opentrons.config.ot3_pipette_config import (
-    load_ot3_pipette,
-    TipSpecificConfigurations,
-)
+from opentrons_shared_data.pipette.pipette_definition import SupportedTipsDefinition
+from opentrons.config.ot3_pipette_config import load_ot3_pipette
 
 
 def test_multiple_tip_configurations() -> None:
     loaded_configuration = load_ot3_pipette("p1000", 8, 1.0)
-    assert list(loaded_configuration.tip_handling_configurations.keys()) == list(
-        PipetteTipType
-    )
+    assert list(loaded_configuration.supported_tips.keys()) == list(PipetteTipType)
     assert isinstance(
-        loaded_configuration.tip_handling_configurations[PipetteTipType.t50],
-        TipSpecificConfigurations,
+        loaded_configuration.supported_tips[PipetteTipType.t50],
+        SupportedTipsDefinition,
     )
 
 
@@ -26,6 +22,5 @@ def test_load_full_pipette_configurations(
     model: str, channels: int, version: float
 ) -> None:
     loaded_configuration = load_ot3_pipette(model, channels, version)
-    assert loaded_configuration.pipette_version.major == int(version)
     assert loaded_configuration.pipette_type.value == model
     assert loaded_configuration.channels.as_int == channels

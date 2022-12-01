@@ -7,12 +7,7 @@ from functools import lru_cache
 from .. import load_shared_data, get_shared_data_root
 
 from . import types
-from .pipette_definition import (
-    PipetteConfigurations,
-    PipetteLiquidPropertiesDefinition,
-    PipetteGeometryDefinition,
-    PipettePhysicalPropertiesDefinition,
-)
+from .pipette_definition import PipetteConfigurations
 
 
 LoadedConfiguration = Dict[types.PipetteChannelType, Dict[types.PipetteModelType, Any]]
@@ -55,14 +50,10 @@ def load_definition(
     channels: types.PipetteChannelType,
     version: types.PipetteVersionType,
 ) -> PipetteConfigurations:
-    return PipetteConfigurations(
-        liquid=PipetteLiquidPropertiesDefinition.parse_obj(
-            _liquid(version)[channels][max_volume]
-        ),
-        physical=PipettePhysicalPropertiesDefinition.parse_obj(
-            _physical(version)[channels][max_volume]
-        ),
-        geometry=PipetteGeometryDefinition.parse_obj(
-            _geometry(version)[channels][max_volume]
-        ),
+    geometry_dict = _geometry(version)[channels][max_volume]
+    physical_dict = _physical(version)[channels][max_volume]
+    liquid_dict = _liquid(version)[channels][max_volume]
+
+    return PipetteConfigurations.parse_obj(
+        {**geometry_dict, **physical_dict, **liquid_dict}
     )

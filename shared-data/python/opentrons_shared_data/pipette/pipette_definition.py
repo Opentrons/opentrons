@@ -1,23 +1,30 @@
-from typing import List, Dict
-from pydantic import BaseModel, Field
+from typing import List, Dict, Tuple
+from pydantic import BaseModel, Field, validator
+from .types import PipetteModelType, PipetteTipType, PipetteChannelType
 
 
 class SupportedTipsDefinition(BaseModel):
     """Tip parameters available for every tip size."""
 
-    defaultAspirateFlowRate: float = Field(
-        ..., description="The flowrate used in aspirations by default."
+    default_aspirate_flowrate: float = Field(
+        ...,
+        description="The flowrate used in aspirations by default.",
+        alias="defaultAspirateFlowRate",
     )
-    defaultDispenseFlowRate: float = Field(
-        ..., description="The flowrate used in dispenses by default."
+    default_dispense_flowrate: float = Field(
+        ...,
+        description="The flowrate used in dispenses by default.",
+        alias="defaultDispenseFlowRate",
     )
-    defaultBlowOutFlowRate: float = Field(
-        ..., description="The flowrate used in blowouts by default."
+    default_blowout_flowrate: float = Field(
+        ...,
+        description="The flowrate used in blowouts by default.",
+        alias="defaultBlowOutFlowRate",
     )
-    aspirate: Dict[str, List[float]] = Field(
+    aspirate: Dict[str, List[Tuple[float, float, float]]] = Field(
         ..., description="The default pipetting functions list for aspirate."
     )
-    dispense: Dict[str, List[float]] = Field(
+    dispense: Dict[str, List[Tuple[float, float, float]]] = Field(
         ..., description="The default pipetting functions list for dispensing."
     )
 
@@ -77,66 +84,112 @@ class AvailableSensorDefinition(BaseModel):
 
 
 class PartialTipDefinition(BaseModel):
-    partialTipSupported: bool = Field(
-        ..., description="Whether partial tip pick up is supported."
+    partial_tip_supported: bool = Field(
+        ...,
+        description="Whether partial tip pick up is supported.",
+        alias="partialTipSupported",
     )
-    availableConfigurations: List[int] = Field(
+    available_configurations: List[int] = Field(
         default=None,
         description="A list of the types of partial tip configurations supported, listed by channel ints",
+        alias="availableConfigurations",
     )
 
 
 class PipettePhysicalPropertiesDefinition(BaseModel):
     """The physical properties definition of a pipette."""
 
-    displayName: str = Field(
-        ..., description="The display or full product name of the pipette."
+    display_name: str = Field(
+        ...,
+        description="The display or full product name of the pipette.",
+        alias="displayName",
     )
-    model: str = Field(
-        ..., description="The pipette model type (related to number of channels)"
+    pipette_type: PipetteModelType = Field(
+        ...,
+        description="The pipette model type (related to number of channels).",
+        alias="model",
     )
-    displayCategory: str = Field(..., description="The product model of the pipette.")
-    pickUpTipConfigurations: PickUpTipConfigurations
-    dropTipConfigurations: TipHandlingConfigurations
-    plungerMotorConfigurations: MotorConfigurations
-    plungerPositionsConfigurations: PlungerPositions
-    availableSensors: AvailableSensorDefinition
-    partialTipConfigurations: PartialTipDefinition
-    channels: int = Field(
+    display_category: str = Field(
+        ..., description="The product model of the pipette.", alias="displayCategory"
+    )
+    pick_up_tip_configurations: PickUpTipConfigurations = Field(
+        ..., alias="pickUpTipConfigurations"
+    )
+    drop_tip_configurations: TipHandlingConfigurations = Field(
+        ..., alias="dropTipConfigurations"
+    )
+    plunger_motor_configurations: MotorConfigurations = Field(
+        ..., alias="plungerMotorConfigurations"
+    )
+    plunger_positions_configurations: PlungerPositions = Field(
+        ..., alias="plungerPositionsConfigurations"
+    )
+    available_sensors: AvailableSensorDefinition = Field(..., alias="availableSensors")
+    partial_tip_configurations: PartialTipDefinition = Field(
+        ..., alias="partialTipConfigurations"
+    )
+    channels: PipetteChannelType = Field(
         ..., description="The maximum number of channels on the pipette."
     )
+
+    @validator("pipette_type", pre=True)
+    def convert_pipette_model_string(cls, v: str) -> PipetteModelType:
+        return PipetteModelType.convert_from_model(v)
+
+    @validator("channels", pre=True)
+    def convert_channels(cls, v: int) -> PipetteChannelType:
+        return PipetteChannelType.convert_from_channels(v)
 
 
 class PipetteGeometryDefinition(BaseModel):
     """The geometry properties definition of a pipette."""
 
-    nozzleOffset: List[float]
-    pathTo3D: str = Field(
+    nozzle_offset: List[float] = Field(..., alias="nozzleOffset")
+    path_to_3D: str = Field(
         ...,
         description="The shared data relative path to the 3D representation of the pipette model.",
+        alias="pathTo3D",
     )
 
 
 class PipetteLiquidPropertiesDefinition(BaseModel):
     """The liquid properties definition of a pipette."""
 
-    supportedTips: Dict[str, SupportedTipsDefinition]
-    maxVolume: float = Field(
-        ..., description="The maximum supported volume of the pipette."
+    supported_tips: Dict[PipetteTipType, SupportedTipsDefinition] = Field(
+        ..., alias="supportedTips"
     )
-    minVolume: float = Field(
-        ..., description="The minimum supported volume of the pipette."
+    max_volume: float = Field(
+        ...,
+        description="The maximum supported volume of the pipette.",
+        alias="maxVolume",
     )
-    defaultTipracks: List[str] = Field(
+    min_volume: float = Field(
+        ...,
+        description="The minimum supported volume of the pipette.",
+        alias="minVolume",
+    )
+    default_tipracks: List[str] = Field(
         ...,
         description="A list of default tiprack paths.",
         regex="opentrons/[a-z0-9._]+/[0-9]",
+        alias="defaultTipracks",
     )
 
+    @validator("supported_tips", pre=True)
+    def convert_aspirate_key_to_channel_type(
+        cls, v: Dict[str, SupportedTipsDefinition]
+    ) -> Dict[PipetteTipType, SupportedTipsDefinition]:
+        return {PipetteTipType[key]: value for key, value in v.items()}
 
-class PipetteConfigurations(BaseModel):
+
+class PipetteConfigurations(
+    PipetteGeometryDefinition,
+    PipettePhysicalPropertiesDefinition,
+    PipetteLiquidPropertiesDefinition,
+):
     """The full pipette configurations of a given model and version."""
 
-    geometry: PipetteGeometryDefinition
-    physical: PipettePhysicalPropertiesDefinition
-    liquid: PipetteLiquidPropertiesDefinition
+    pass
+    # geometry: PipetteGeometryDefinition
+    # physical: PipettePhysicalPropertiesDefinition
+    # liquid: PipetteLiquidPropertiesDefinition
