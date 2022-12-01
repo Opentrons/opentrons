@@ -57,6 +57,10 @@ const EXPANDED_STYLE = css`
   }
 `
 
+// TODO(bh: 2022-12-1): implement css for toast removal -
+// a bit complicated because removal removes the element from the DOM immediately
+// a library like react-transition-group is a possible solution
+
 const toastStyleByType: {
   [k in ToastType]: {
     iconName: IconName
