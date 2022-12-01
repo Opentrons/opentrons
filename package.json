@@ -39,6 +39,7 @@
     "@babel/preset-typescript": "^7.12.7",
     "@babel/register": "^7.12.10",
     "@cypress/webpack-preprocessor": "^5.1.2",
+    "@octokit/rest": "^19.0.5",
     "@rollup/plugin-alias": "^3.1.2",
     "@rollup/plugin-babel": "^5.3.0",
     "@rollup/plugin-commonjs": "^18.0.0",
