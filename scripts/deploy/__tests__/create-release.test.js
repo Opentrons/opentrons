@@ -16,11 +16,16 @@ const HISTORICAL_VERSIONS = [
   '1.2.0',
   '1.1.9-alpha.2',
   '1.1.9-candidate-d',
+  '1.1.9-beta.0',
+  '1.1.9-alpha.0',
 ]
 
 describe('create-release script', () => {
   it(`should pull the last production version for a production version`, () => {
     return expect(versionPrevious('1.2.2', HISTORICAL_VERSIONS)).toBe('1.2.1')
+  })
+  it(`should return null if it cannot find a recent production version for a production`, () => {
+    return expect(versionPrevious('1.2.0', HISTORICAL_VERSIONS)).toBeNull()
   })
   it(`should generate changes since a recent production version for a candidate`, () => {
     return expect(
@@ -32,12 +37,17 @@ describe('create-release script', () => {
       versionPrevious('1.2.1-candidate-b', HISTORICAL_VERSIONS)
     ).toBe('1.2.1-candidate-a')
   })
+  it(`should return null if it cannot find a recent version for a candidate`, () => {
+    return expect(
+      versionPrevious('1.1.9-candidate-d', HISTORICAL_VERSIONS)
+    ).toBeNull()
+  })
   it(`should generate changes since a recent production version for a beta`, () => {
     return expect(versionPrevious('1.2.2-beta.1', HISTORICAL_VERSIONS)).toBe(
       '1.2.1'
     )
   })
-  it(`should generate changes since a recent candidate version for a beta`, () => {
+  it(`should generate changes since a recent version for a beta`, () => {
     return expect(versionPrevious('1.2.1-beta.3', HISTORICAL_VERSIONS)).toBe(
       '1.2.1-candidate-b'
     )
@@ -46,6 +56,11 @@ describe('create-release script', () => {
     return expect(versionPrevious('1.2.1-beta.2', HISTORICAL_VERSIONS)).toBe(
       '1.2.1-beta.1'
     )
+  })
+  it(`should return null if it cannot find a recent version for a beta`, () => {
+    return expect(
+      versionPrevious('1.1.9-beta.0', HISTORICAL_VERSIONS)
+    ).toBeNull()
   })
   it(`should generate changes since a recent production version for an alpha`, () => {
     return expect(versionPrevious('1.2.3-alpha.0', HISTORICAL_VERSIONS)).toBe(
@@ -66,5 +81,10 @@ describe('create-release script', () => {
     return expect(versionPrevious('1.2.1-alpha.3', HISTORICAL_VERSIONS)).toBe(
       '1.2.1-alpha.2'
     )
+  })
+  it(`should return null if it cannot find a recent version for an alpha`, () => {
+    return expect(
+      versionPrevious('1.1.9-alpha.0', HISTORICAL_VERSIONS)
+    ).toBeNull()
   })
 })

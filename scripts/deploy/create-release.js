@@ -66,8 +66,10 @@ const releaseKind = version =>
 const releasePriorityGreaterThanOrEqual = (kindA, kindB) =>
   ALLOWED_VERSION_TYPES.indexOf(kindA) >= ALLOWED_VERSION_TYPES.indexOf(kindB)
 
+const titleForProject = project => project.replaceAll('-', ' ')
+
 const titleForRelease = (project, version) =>
-  `${project.replaceAll('-', ' ')} version ${version}`
+  `${titleForProject(project)} version ${version}`
 
 // Return the version to build a changelog from, which is the most recent version whose prerelease
 // level is equal to or greater than the current tag. So
@@ -91,6 +93,77 @@ function versionPrevious(currentVersion, previousVersions) {
     releasePriorityGreaterThanOrEqual(releaseKind(version), currentReleaseKind)
   )
   return releasesOfGEQKind.length === 0 ? null : releasesOfGEQKind[0]
+}
+
+async function versionDetailsFromGit(tag, allowOld) {
+  if (!allowOld) {
+    const last100 = await git().log({ from: 'HEAD~100', to: 'HEAD' })
+    if (!last100.all.some(commit => commit.refs.includes('tag: ' + tag))) {
+      throw new Error(
+        `Cannot find tag ${tag} in last 100 commits. You must run this script from a ref with ` +
+          `the tag in its history to correctly generate a changelog. If your tag is very old but ` +
+          `is definitely in whatever branch is checked out, use --allow-old.`
+      )
+    }
+  }
+
+  const [project, currentVersion] = detailsFromTag(tag)
+
+  const allTags = (await git().tags([prefixForProject(project) + '*'])).all
+  if (!allTags.includes(tag)) {
+    throw new Error(
+      `Tag ${tag} does not exist - create it before running this script`
+    )
+  }
+  const sortedVersions = allTags
+    .map(tag => detailsFromTag(tag)[1])
+    .sort(semver.compare)
+    .reverse()
+
+  const previousVersion = versionPrevious(currentVersion, sortedVersions)
+  return [project, currentVersion, previousVersion]
+}
+
+async function buildChangelog(project, currentVersion, previousVersion) {
+  if (previousVersion === null) {
+    console.warn(
+      `Cannot find an appropriate previous version of ${project} for ` +
+        `version ${currentVersion}. ` +
+        `On the first run for a given project this script will emit an ` +
+        `empty changelog.`
+    )
+    return (
+      `## ${currentVersion}` + `\nFirst release for ${titleForProject(project)}`
+    )
+  }
+  const previousTag = tagFromDetails(project, previousVersion)
+
+  const changelogStream = conventionalChangelog(
+    { preset: 'angular', tagPrefix: prefixForProject(project) },
+    {
+      version: currentVersion,
+      currentTag: tagFromDetails(project, currentVersion),
+      previousTag: previousTag,
+      host: 'https://github.com',
+      owner: REPO_DETAILS.owner,
+      repository: REPO_DETAILS.repo,
+      linkReferences: true,
+    },
+    { from: previousTag }
+  )
+  const chunks = []
+  for await (const chunk of changelogStream) {
+    chunks.push(chunk.toString())
+  }
+  // For some reason, later chunks include the contents of earlier chunks so we need to
+  // accumulate chunks in reverse and drop earlier chunks that are included in later ones
+  const changelog = chunks
+    .reverse()
+    .reduce(
+      (accum, chunk) => (accum.includes(chunk.trim()) ? accum : chunk + accum),
+      ''
+    )
+  return changelog
 }
 
 async function createRelease(token, tag, project, version, changelog, deploy) {
@@ -127,62 +200,16 @@ async function main() {
 
   const deploy = flags.includes('--deploy')
   const allowOld = flags.includes('--allow-old')
-
-  if (!allowOld) {
-    const last100 = await git().log({ from: 'HEAD~100', to: 'HEAD' })
-    if (!last100.all.some(commit => commit.refs.includes('tag: ' + tag))) {
-      throw new Error(
-        `Cannot find tag ${tag} in last 100 commits. You must run this script from a ref with ` +
-          `the tag in its history to correctly generate a changelog. If your tag is very old but ` +
-          `is definitely in whatever branch is checked out, use --allow-old.`
-      )
-    }
-  }
-
-  const [project, currentVersion] = detailsFromTag(tag)
-
-  console.log(`Tag ${tag} represents version ${currentVersion} of ${project}`)
-
-  const allTags = (await git().tags([prefixForProject(project) + '*'])).all
-  if (!allTags.includes(tag)) {
-    throw new Error(
-      `Tag ${tag} does not exist - create it before running this script`
-    )
-  }
-  const sortedVersions = allTags
-    .map(tag => detailsFromTag(tag)[1])
-    .sort(semver.compare)
-    .reverse()
-
-  const previousVersion = versionPrevious(currentVersion, sortedVersions)
-  const previousTag = tagFromDetails(project, previousVersion)
-
-  const changelogStream = conventionalChangelog(
-    { preset: 'angular', tagPrefix: prefixForProject(project) },
-    {
-      gitSemverTags: allTags,
-      version: currentVersion,
-      currentTag: tag,
-      previousTag: previousTag,
-      host: 'https://github.com',
-      owner: REPO_DETAILS.owner,
-      repository: REPO_DETAILS.repo,
-      linkReferences: true,
-    },
-    { from: previousTag }
+  const [
+    project,
+    currentVersion,
+    previousVersion,
+  ] = await versionDetailsFromGit(tag, allowOld)
+  const changelog = await buildChangelog(
+    project,
+    currentVersion,
+    previousVersion
   )
-  const chunks = []
-  for await (const chunk of changelogStream) {
-    chunks.push(chunk.toString())
-  }
-  // For some reason, later chunks include the contents of earlier chunks so we need to
-  // accumulate chunks in reverse and drop earlier chunks that are included in later ones
-  const changelog = chunks
-    .reverse()
-    .reduce(
-      (accum, chunk) => (accum.includes(chunk.trim()) ? accum : chunk + accum),
-      ''
-    )
   return await createRelease(
     token,
     tag,
