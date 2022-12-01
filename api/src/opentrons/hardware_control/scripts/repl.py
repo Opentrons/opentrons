@@ -5,7 +5,7 @@ and expose it to a python commandline.
 """
 
 import os
-from functools import partial, wraps
+from functools import wraps
 import asyncio
 
 has_robot_server = True
@@ -24,7 +24,7 @@ else:
 
 from code import interact  # noqa: E402
 from subprocess import run  # noqa: E402
-from typing import Union, Type, Any, cast  # noqa: E402
+from typing import Union, Type, Any  # noqa: E402
 import logging  # noqa: E402
 
 from opentrons.types import Mount, Point  # noqa: E402
@@ -36,7 +36,7 @@ from opentrons.hardware_control.types import (  # noqa: E402
     GripperProbe,
 )
 from opentrons.hardware_control.ot3_calibration import (  # noqa: E402
-    calibrate_mount,
+    calibrate_pipette,
     calibrate_gripper,
     find_edge,
     find_deck_position,
@@ -51,18 +51,6 @@ if ff.enable_ot3_hardware_controller():
     from opentrons.hardware_control.ot3api import OT3API
 
     HCApi: Union[Type[OT3API], Type["API"]] = OT3API
-
-    def calibrate_pipette(
-        api: ThreadManager[OT3API], mount: OT3Mount, tip_length: float
-    ) -> Point:
-        api.sync.add_tip(mount, tip_length)
-        try:
-            result = asyncio.get_event_loop().run_until_complete(
-                calibrate_mount(cast(OT3API, api), mount)
-            )
-        finally:
-            api.sync.remove_tip(mount)
-        return result
 
     def wrap_async_util_fn(fn: Any, *bind_args: Any, **bind_kwargs: Any) -> Any:
         @wraps(fn)
@@ -106,10 +94,9 @@ def do_interact(api: ThreadManager[HardwareControlAPI]) -> None:
             "OT3Axis": OT3Axis,
             "OT3Mount": OT3Mount,
             "GripperProbe": GripperProbe,
-            "calibrate_mount": wrap_async_util_fn(calibrate_mount, api),
             "find_edge": wrap_async_util_fn(find_edge, api),
             "find_deck_position": wrap_async_util_fn(find_deck_position, api),
-            "calibrate_pipette": partial(calibrate_pipette, api),
+            "calibrate_pipette": wrap_async_util_fn(calibrate_pipette, api),
             "calibrate_gripper": wrap_async_util_fn(calibrate_gripper, api),
             "gripper_pin_offsets_mean": gripper_pin_offsets_mean,
             "CalibrationMethod": CalibrationMethod,
