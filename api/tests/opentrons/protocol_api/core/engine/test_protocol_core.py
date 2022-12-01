@@ -485,7 +485,7 @@ def test_comment(
     decoy.verify(mock_engine_client.comment("Hello, world!"))
 
 
-def test_set_get_rail_lights(
+def test_set_rail_lights(
     decoy: Decoy, mock_engine_client: EngineClient, subject: ProtocolCore
 ) -> None:
     """It should verify a call to sync client."""
