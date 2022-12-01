@@ -1,0 +1,34 @@
+# A workflow to create github releases with changelogs from tags
+
+name: 'Create github release for tag'
+
+on:
+  push:
+    tags:
+      - '*'
+workflow_dispatch:
+
+jobs:
+  create-release:
+    runs-on: 'ubuntu-22.04'
+    name: 'Create changelogs and release'
+    steps:
+      - uses: 'actions/checkout@v3'
+      - uses: 'actions/setup-node@v3'
+        with:
+          node-version: '16'
+      - name: 'cache yarn cache'
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/.npm-cache/_prebuild
+            ${{ github.workspace }}/.yarn-cache
+          key: js-${{ hashFiles('yarn.lock') }}
+      - name: 'setup-js'
+        run: |
+          npm config set cache ${{ github.workspace }}/.npm-cache
+          yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
+          make setup-js
+      - name: 'create release'
+        run: |
+          node ./scripts/create-release ${{ github.token }} ${{ github.ref_name }}
