@@ -285,7 +285,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def set_rail_lights(self, on: bool) -> None:
         """Set the device's rail lights."""
-        raise NotImplementedError("ProtocolCore.set_rail_lights not implemented")
+        self._engine_client.set_rail_lights(on=on)
 
     def get_rail_lights_on(self) -> bool:
         """Get whether the device's rail lights are on."""

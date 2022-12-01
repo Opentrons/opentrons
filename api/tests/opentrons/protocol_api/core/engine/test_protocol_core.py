@@ -483,3 +483,17 @@ def test_comment(
     """It should issue a comment command."""
     subject.comment("Hello, world!")
     decoy.verify(mock_engine_client.comment("Hello, world!"))
+
+
+def test_set_rail_lights(
+        decoy: Decoy,
+        mock_engine_client: EngineClient,
+        subject: ProtocolCore
+) -> None:
+    """It should verify a call to sync client."""
+    subject.set_rail_lights(on=True)
+    decoy.verify(mock_engine_client.set_rail_lights(on=True))
+
+    subject.set_rail_lights(on=False)
+    decoy.verify(mock_engine_client.set_rail_lights(on=False))
+
