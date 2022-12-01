@@ -10,11 +10,12 @@ import opentrons.protocol_api as papi
 
 
 @pytest.fixture
-def make_context_and_labware(hardware):
+def make_context_and_labware(hardware, deck_definition_name):
     def _make_context_and_labware(api_version):
         ctx = papi.create_protocol_context(
             api_version=api_version,
             hardware_api=hardware,
+            deck_type=deck_definition_name,
         )
         lw1 = ctx.load_labware("biorad_96_wellplate_200ul_pcr", 1)
         instr = ctx.load_instrument("p300_single", Mount.RIGHT)
