@@ -24,14 +24,16 @@ const git = require('simple-git')
 const semver = require('semver')
 const { Octokit } = require('@octokit/rest')
 const ALLOWED_VERSION_TYPES = ['alpha', 'beta', 'candidate', 'production']
-const USAGE = '\nUsage:\n node ./scripts/deploy/create-release <token> <tag> [--deploy] [--allow-old]'
+const USAGE =
+  '\nUsage:\n node ./scripts/deploy/create-release <token> <tag> [--deploy] [--allow-old]'
 
 const REPO_DETAILS = {
   owner: 'Opentrons',
-  repo: 'opentrons'
+  repo: 'opentrons',
 }
 
-const detailsFromTag = (tag) => tag.includes('@') ? tag.split('@') : ['robot-stack', tag.substring(1)]
+const detailsFromTag = tag =>
+  tag.includes('@') ? tag.split('@') : ['robot-stack', tag.substring(1)]
 function tagFromDetails(project, version) {
   if (project === 'robot-stack') {
     return 'v' + version
@@ -47,8 +49,10 @@ function prefixForProject(project) {
   }
 }
 
-const releaseKind = version => (semver.prerelease(version)?.at(0) ?? 'production').split('-')[0]
-const releasePriorityGEQ = (kindA, kindB) => ALLOWED_VERSION_TYPES.indexOf(kindA) >= ALLOWED_VERSION_TYPES.indexOf(kindB)
+const releaseKind = version =>
+  (semver.prerelease(version)?.at(0) ?? 'production').split('-')[0]
+const releasePriorityGEQ = (kindA, kindB) =>
+  ALLOWED_VERSION_TYPES.indexOf(kindA) >= ALLOWED_VERSION_TYPES.indexOf(kindB)
 
 // Return the version to build a changelog from, which is the most recent version whose prerelease
 // level is equal to or greater than the current tag. So
@@ -60,17 +64,22 @@ const releasePriorityGEQ = (kindA, kindB) => ALLOWED_VERSION_TYPES.indexOf(kindA
 function versionPrevious(currentVersion, previousVersions) {
   const currentReleaseKind = releaseKind(currentVersion)
   if (!ALLOWED_VERSION_TYPES.includes(currentReleaseKind)) {
-    throw new Error(`Error: Prerelease tag ${currentReleaseKind} is not one of ${ALLOWED_VERSION_TYPES.join(', ')}`)
+    throw new Error(
+      `Error: Prerelease tag ${currentReleaseKind} is not one of ${ALLOWED_VERSION_TYPES.join(
+        ', '
+      )}`
+    )
   }
   const from = previousVersions.indexOf(currentVersion)
-  const notIncluding = previousVersions.slice(from+1)
-  const releasesOfGEQKind = notIncluding.filter(
-    version => releasePriorityGEQ(releaseKind(version), currentReleaseKind)
+  const notIncluding = previousVersions.slice(from + 1)
+  const releasesOfGEQKind = notIncluding.filter(version =>
+    releasePriorityGEQ(releaseKind(version), currentReleaseKind)
   )
   return releasesOfGEQKind.length === 0 ? null : releasesOfGEQKind[0]
 }
 
-const titleForRelease = (project, version) => `${project.replaceAll('-', ' ')} version ${version}`
+const titleForRelease = (project, version) =>
+  `${project.replaceAll('-', ' ')} version ${version}`
 
 async function createRelease(token, tag, project, version, changelog, deploy) {
   const title = titleForRelease(project, version)
@@ -78,7 +87,7 @@ async function createRelease(token, tag, project, version, changelog, deploy) {
   if (deploy) {
     const octokit = new Octokit({
       auth: token,
-      userAgent: 'Opentrons Release Creator'
+      userAgent: 'Opentrons Release Creator',
     })
     await octokit.reset.createRelease({
       owner: REPO_DETAILS.owner,
@@ -87,7 +96,7 @@ async function createRelease(token, tag, project, version, changelog, deploy) {
       name: title,
       body: changelog,
       draft: true,
-      prerelease: isPre
+      prerelease: isPre,
     })
   } else {
     console.log(`${tag} ${title}\n${changelog}\n${isPre ? '\nprerelease' : ''}`)
@@ -106,12 +115,13 @@ async function main() {
   const allowOld = flags.includes('--allow-old')
 
   if (!allowOld) {
-    const last100 = await git().log({from: 'HEAD~100', to: 'HEAD'})
+    const last100 = await git().log({ from: 'HEAD~100', to: 'HEAD' })
     if (!last100.all.some(commit => commit.refs.includes('tag: ' + tag))) {
       throw new Error(
         `Cannot find tag ${tag} in last 100 commits. You must run this script from a ref with ` +
-        `the tag in its history to correctly generate a changelog. If your tag is very old but ` +
-        `is definitely in whatever branch is checked out, use --allow-old.`)
+          `the tag in its history to correctly generate a changelog. If your tag is very old but ` +
+          `is definitely in whatever branch is checked out, use --allow-old.`
+      )
     }
   }
 
@@ -121,25 +131,31 @@ async function main() {
 
   const allTags = (await git().tags([prefixForProject(project) + '*'])).all
   if (!allTags.includes(tag)) {
-    throw new Error(`Tag ${tag} does not exist - create it before running this script`)
+    throw new Error(
+      `Tag ${tag} does not exist - create it before running this script`
+    )
   }
-  const sortedVersions = allTags.map(tag => detailsFromTag(tag)[1]).sort(semver.compare).reverse()
+  const sortedVersions = allTags
+    .map(tag => detailsFromTag(tag)[1])
+    .sort(semver.compare)
+    .reverse()
 
   const previousVersion = versionPrevious(currentVersion, sortedVersions)
   const previousTag = tagFromDetails(project, previousVersion)
 
   const changelogStream = conventionalChangelog(
-    {preset: 'angular', tagPrefix: prefixForProject(project)},
-    {gitSemverTags: allTags,
-     version: currentVersion,
-     currentTag: tag,
-     previousTag: previousTag,
-     host: 'https://github.com',
-     owner: REPO_DETAILS.owner,
-     repository: REPO_DETAILS.repo,
-     linkReferences: true
+    { preset: 'angular', tagPrefix: prefixForProject(project) },
+    {
+      gitSemverTags: allTags,
+      version: currentVersion,
+      currentTag: tag,
+      previousTag: previousTag,
+      host: 'https://github.com',
+      owner: REPO_DETAILS.owner,
+      repository: REPO_DETAILS.repo,
+      linkReferences: true,
     },
-    {from: previousTag}
+    { from: previousTag }
   )
   const chunks = []
   for await (const chunk of changelogStream) {
@@ -147,12 +163,16 @@ async function main() {
   }
   // For some reason, later chunks include the contents of earlier chunks so we need to
   // accumulate chunks in reverse and drop earlier chunks that are included in later ones
-  const changelog = chunks.reverse().reduce(
-    (accum, chunk) => accum.includes(chunk.trim()) ? accum : chunk + accum, '')
+  const changelog = chunks
+    .reverse()
+    .reduce(
+      (accum, chunk) => (accum.includes(chunk.trim()) ? accum : chunk + accum),
+      ''
+    )
   await createRelease(token, tag, project, currentVersion, changelog, deploy)
 }
 
-(async () => {
+;(async () => {
   try {
     await main()
   } catch (err) {
