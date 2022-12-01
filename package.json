@@ -77,7 +77,6 @@
     "babel-plugin-unassert": "^3.0.1",
     "concurrently": "^4.1.2",
     "conventional-changelog": "^3.1.25",
-    "conventional-github-releaser": "^3.1.5",
     "core-js": "^3.6.4",
     "css-loader": "^3.2.0",
     "cypress": "^6.6.0",
@@ -163,5 +162,6 @@
     "webpack-merge": "^4.2.2",
     "webpack-node-externals": "^1.7.2",
     "worker-plugin": "^5.0.0"
-  }
+  },
+  "dependencies": {}
 }
