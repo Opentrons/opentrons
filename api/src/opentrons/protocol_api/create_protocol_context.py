@@ -2,6 +2,7 @@
 import asyncio
 from typing import Any, Dict, Optional, Union
 
+from opentrons_shared_data.deck import DefinitionName as DeckDefinitionName
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from opentrons.broker import Broker
@@ -15,6 +16,7 @@ from opentrons.hardware_control import (
 from opentrons.protocol_engine import ProtocolEngine
 from opentrons.protocol_engine.clients import SyncClient, ChildThreadTransport
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.geometry.deck import Deck
 
 from .protocol_context import ProtocolContext
 
@@ -34,6 +36,7 @@ def create_protocol_context(
     api_version: APIVersion,
     *,
     hardware_api: Union[HardwareControlAPI, ThreadManager[HardwareControlAPI]],
+    deck_type: DeckDefinitionName,
     protocol_engine: Optional[ProtocolEngine] = None,
     protocol_engine_loop: Optional[asyncio.AbstractEventLoop] = None,
     broker: Optional[Broker] = None,
@@ -48,6 +51,7 @@ def create_protocol_context(
     Args:
         api_version: The API version to target.
         hardware_api: Control interface to the device's hardware.
+        deck_type: What kind of deck the device has.
         protocol_engine: A ProtocolEngine to use for labware offsets
             and core protocol logic. If omitted, labware offsets will
             all be (0, 0, 0) and ProtocolEngine-based core will not work.
@@ -77,6 +81,8 @@ def create_protocol_context(
     else:
         sync_hardware = SynchronousAdapter(hardware_api)
 
+    deck = Deck(deck_type=deck_type)
+
     if protocol_engine is not None:
         labware_offset_provider = LabwareOffsetProvider(engine=protocol_engine)
     else:
@@ -104,6 +110,7 @@ def create_protocol_context(
         core = ProtocolContextSimulation(
             sync_hardware=sync_hardware,
             labware_offset_provider=labware_offset_provider,
+            deck_layout=deck,
             equipment_broker=equipment_broker,
             api_version=api_version,
             bundled_labware=bundled_labware,
@@ -115,6 +122,7 @@ def create_protocol_context(
         core = ProtocolContextImplementation(
             sync_hardware=sync_hardware,
             labware_offset_provider=labware_offset_provider,
+            deck_layout=deck,
             equipment_broker=equipment_broker,
             api_version=api_version,
             bundled_labware=bundled_labware,

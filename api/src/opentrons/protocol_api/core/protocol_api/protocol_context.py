@@ -40,8 +40,8 @@ class ProtocolContextImplementation(
         sync_hardware: SyncHardwareAPI,
         api_version: APIVersion,
         labware_offset_provider: AbstractLabwareOffsetProvider,
+        deck_layout: Deck,
         equipment_broker: Optional[EquipmentBroker[LoadInfo]] = None,
-        deck_layout: Optional[Deck] = None,
         bundled_labware: Optional[Dict[str, LabwareDefinition]] = None,
         bundled_data: Optional[Dict[str, bytes]] = None,
         extra_labware: Optional[Dict[str, LabwareDefinition]] = None,
@@ -70,8 +70,8 @@ class ProtocolContextImplementation(
         self._sync_hardware = sync_hardware
         self._api_version = api_version
         self._labware_offset_provider = labware_offset_provider
+        self._deck_layout = deck_layout
         self._equipment_broker = equipment_broker or EquipmentBroker()
-        self._deck_layout = Deck() if deck_layout is None else deck_layout
 
         self._instruments: Dict[Mount, Optional[InstrumentContextImplementation]] = {
             mount: None for mount in Mount
