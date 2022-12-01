@@ -99,12 +99,14 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: 'actions/checkout@v3'
-      - uses: './.github/actions/python/setup-single-environment'
+      - uses: 'actions/setup-node@v3'
+        with:
+          node-version: '16'
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-          environment: 'environments/app'
       - name: 'downgrade npm version'
-        run: make js-globals
+        run: npm install -g npm@6
       - name: 'install libudev'
         if: startsWith(matrix.os, 'ubuntu')
         run: sudo apt-get update && sudo apt-get upgrade && sudo apt-get install libudev-dev
