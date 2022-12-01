@@ -74,9 +74,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
   }
 
   const handleProtocolsSortKey = (sortKey: ProtocolSort): void => {
-    dispatch(
-      updateConfigValue('protocolsSortKey.protocolsStoredSortKey', sortKey)
-    )
+    dispatch(updateConfigValue('protocols.protocolsStoredSortKey', sortKey))
     setShowSortByMenu(false)
   }
 

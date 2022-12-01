@@ -74,5 +74,5 @@ export const getProtocolsStoredSortKey: (
   state: State
 ) => ProtocolSort | null = createSelector(
   getConfig,
-  config => config?.protocolsSortKey.protocolsStoredSortKey ?? null
+  config => config?.protocols.protocolsStoredSortKey ?? null
 )

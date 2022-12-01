@@ -144,7 +144,7 @@ describe('shell selectors', () => {
     it('should return ProtocolSort if sortKey is selected', () => {
       const state: State = {
         config: {
-          protocolsSortKey: { protocolsStoredSortKey: 'alphabetical' },
+          protocols: { protocolsStoredSortKey: 'alphabetical' },
         },
       } as any
       expect(Selectors.getProtocolsStoredSortKey(state)).toEqual('alphabetical')
@@ -152,7 +152,7 @@ describe('shell selectors', () => {
 
     it('should return null if saved value in config is null', () => {
       const state: State = {
-        config: { protocolsSortKey: { protocolsStoredSortKey: null } },
+        config: { protocols: { protocolsStoredSortKey: null } },
       } as any
       expect(Selectors.getProtocolsStoredSortKey(state)).toEqual(null)
     })

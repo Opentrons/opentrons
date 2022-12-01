@@ -157,7 +157,9 @@ export interface ConfigV10 extends Omit<ConfigV9, 'version'> {
 
 export interface ConfigV11 extends Omit<ConfigV10, 'version'> {
   version: 11
-  protocolsSortKey: { protocolsStoredSortKey: ProtocolSort | null }
+  protocols: ConfigV10['protocols'] & {
+    protocolsStoredSortKey: ProtocolSort | null
+  }
 }
 
 export type Config = ConfigV11
