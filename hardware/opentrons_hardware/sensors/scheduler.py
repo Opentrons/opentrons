@@ -3,7 +3,7 @@ import asyncio
 import logging
 from contextlib import asynccontextmanager
 
-from typing import Optional, Type, TypeVar, Callable, AsyncIterator, List, cast
+from typing import Optional, TypeVar, Callable, AsyncIterator, List
 
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
@@ -350,7 +350,7 @@ class SensorScheduler:
     ) -> AsyncIterator[None]:
         """While acquired, bind the specified sensor to control sync."""
         flags = [SensorOutputBinding.sync]
-        if log:
+        if do_log:
             flags.append(SensorOutputBinding.report)
         error = await can_messenger.ensure_send(
             node_id=target_sensor.node_id,
