@@ -54,10 +54,7 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
    * @param {string} toastId the id of the toast to remove
    */
   function eatToast(toastId: string): void {
-    // find index of toast to remove
-    const toastIndex = toasts.findIndex(toast => toast.id === toastId)
-    // remove toast from the array
-    setToasts(t => t.slice(0, toastIndex).concat(t.slice(toastIndex + 1)))
+    setToasts(t => t.filter(toast => toast.id !== toastId))
   }
 
   return (
@@ -72,7 +69,7 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
           bottom={SPACING.spacing4}
           zIndex={1000}
         >
-          {toasts.map((toast, i) => (
+          {toasts.map(toast => (
             <Toast
               {...toast}
               key={toast.id}
