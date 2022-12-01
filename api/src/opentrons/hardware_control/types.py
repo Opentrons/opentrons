@@ -488,10 +488,6 @@ class GripperJawState(enum.Enum):
     HOLDING_OPENED = enum.auto()
     #: the gripper is holding itself open but not quite at its homed position
 
-    @property
-    def ready_for_grip(self) -> bool:
-        return self in [GripperJawState.HOMED_READY, GripperJawState.HOLDING_OPENED]
-
 
 class InstrumentProbeType(enum.Enum):
     PRIMARY = enum.auto()
