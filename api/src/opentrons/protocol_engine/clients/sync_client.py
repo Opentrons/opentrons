@@ -1,5 +1,5 @@
 """Synchronous ProtocolEngine client module."""
-from typing import cast, List, Optional, Union
+from typing import cast, List, Optional, Union, Sequence
 from typing_extensions import Literal
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -20,6 +20,7 @@ from ..types import (
     ModuleModel,
     WellLocation,
     LabwareOffsetVector,
+    MotorAxis,
 )
 from .transports import AbstractSyncTransport
 
@@ -173,6 +174,20 @@ class SyncClient:
         result = self._transport.execute_command(request=request)
 
         return cast(commands.MoveToCoordinatesResult, result)
+
+    def home(
+        self,
+        axes: Optional[Sequence[MotorAxis]] = None,
+    ) -> commands.HomeResult:
+        """Execute a Home command and return the result."""
+        request = commands.HomeCreate(
+            params=commands.HomeParams(
+                axes=axes
+            )
+        )
+        result = self._transport.execute_command(request=request)
+
+        return cast(commands.HomeResult, result)
 
     def load_module(
         self,
