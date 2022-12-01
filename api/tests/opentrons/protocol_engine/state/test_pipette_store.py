@@ -18,6 +18,7 @@ from opentrons.protocol_engine.types import (
 from opentrons.protocol_engine.actions import (
     SetPipetteMovementSpeedAction,
     UpdateCommandAction,
+    AddPipetteConfigAction,
 )
 from opentrons.protocol_engine.state.pipettes import (
     PipetteStore,
@@ -545,3 +546,19 @@ def test_set_movement_speed(subject: PipetteStore) -> None:
         SetPipetteMovementSpeedAction(pipette_id=pipette_id, speed=123.456)
     )
     assert subject.state.movement_speed_by_id[pipette_id] == 123.456
+
+
+def test_add_pipette_config(subject: PipetteStore) -> None:
+    """It should issue an action to add a pipette config."""
+    subject.handle_action(
+        AddPipetteConfigAction(
+            pipette_id="pipette-id",
+            static_config=StaticPipetteConfig(
+                model="pipette-model", min_volume=1.23, max_volume=4.56, channels=7
+            ),
+        )
+    )
+
+    assert subject.state.static_config_by_id["pipette-id"] == StaticPipetteConfig(
+        model="pipette-model", min_volume=1.23, max_volume=4.56, channels=7
+    )

@@ -418,3 +418,59 @@ def test_get_default_speed(
         )
     ).then_return(9000.1)
     assert subject.get_default_speed() == 9000.1
+
+
+def test_get_model(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should get the pipette's model name."""
+    decoy.when(
+        mock_engine_client.state.pipettes.get_model_name(
+            pipette_id=subject.pipette_id
+        )
+    ).then_return("pipette-model")
+    assert subject.get_model() == "pipette-model"
+
+
+def test_get_min_volume(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should get the pipette's min volume."""
+    decoy.when(
+        mock_engine_client.state.pipettes.get_minimum_volume(
+            pipette_id=subject.pipette_id
+        )
+    ).then_return(1.23)
+    assert subject.get_min_volume() == 1.23
+
+
+def test_get_max_volume(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should get the pipette's max volume."""
+    decoy.when(
+        mock_engine_client.state.pipettes.get_maximum_volume(
+            pipette_id=subject.pipette_id
+        )
+    ).then_return(4.56)
+    assert subject.get_max_volume() == 4.56
+
+
+def test_get_channels(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should get the pipette's number of channels."""
+    decoy.when(
+        mock_engine_client.state.pipettes.get_channels(
+            pipette_id=subject.pipette_id
+        )
+    ).then_return(42)
+    assert subject.get_channels() == 42

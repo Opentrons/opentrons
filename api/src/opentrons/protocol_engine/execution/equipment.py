@@ -200,7 +200,7 @@ class EquipmentHandler:
                     min_volume=pipette_dict["min_volume"],
                     max_volume=pipette_dict["max_volume"],
                     channels=pipette_dict["channels"],
-                )
+                ),
             )
         )
 

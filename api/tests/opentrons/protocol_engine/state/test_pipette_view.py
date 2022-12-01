@@ -283,3 +283,17 @@ def test_get_movement_speed() -> None:
     assert (
         subject.get_movement_speed(pipette_id="pipette-without-movement-speed") is None
     )
+
+
+def test_get_static_config() -> None:
+    """It should return the static pipette configuration that was set for the given pipette."""
+    subject = get_pipette_view(
+        static_config_by_id={
+            "pipette-id": StaticPipetteConfig(model="pipette-model", min_volume=1.23, max_volume=4.56, channels=7)
+        }
+    )
+
+    assert subject.get_model_name("pipette-id") == "pipette-model"
+    assert subject.get_minimum_volume("pipette-id") == 1.23
+    assert subject.get_maximum_volume("pipette-id") == 4.56
+    assert subject.get_channels("pipette-id") == 7

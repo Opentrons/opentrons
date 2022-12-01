@@ -335,16 +335,13 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         )
 
     def get_model(self) -> str:
-        # TODO(mc, 2022-11-11): https://opentrons.atlassian.net/browse/RCORE-382
-        return self.get_hardware_state()["model"]
+        return self._engine_client.state.pipettes.get_model_name(self._pipette_id)
 
     def get_min_volume(self) -> float:
-        # TODO(mc, 2022-11-11): https://opentrons.atlassian.net/browse/RCORE-382
-        return self.get_hardware_state()["min_volume"]
+        return self._engine_client.state.pipettes.get_minimum_volume(self._pipette_id)
 
     def get_max_volume(self) -> float:
-        # TODO(mc, 2022-11-11): https://opentrons.atlassian.net/browse/RCORE-382
-        return self.get_hardware_state()["max_volume"]
+        return self._engine_client.state.pipettes.get_maximum_volume(self._pipette_id)
 
     def get_current_volume(self) -> float:
         # TODO(mc, 2022-11-11): https://opentrons.atlassian.net/browse/RCORE-381
@@ -358,10 +355,8 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         """Get the current state of the pipette hardware as a dictionary."""
         return self._sync_hardware_api.get_attached_instrument(self.get_mount())  # type: ignore[no-any-return]
 
-    # TODO(mc, 2022-11-09): read pipette config into engine state at load
     def get_channels(self) -> int:
-        # TODO(mc, 2022-11-11): https://opentrons.atlassian.net/browse/RCORE-382
-        return self.get_hardware_state()["channels"]
+        return self._engine_client.state.pipettes.get_channels(self._pipette_id)
 
     def has_tip(self) -> bool:
         return self.get_hardware_state()["has_tip"]

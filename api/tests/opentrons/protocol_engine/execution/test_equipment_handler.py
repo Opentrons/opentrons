@@ -494,7 +494,7 @@ async def test_load_pipette(
                 pipette_id="unique-id",
                 static_config=StaticPipetteConfig(
                     model="pipette-model", min_volume=1.23, max_volume=4.56, channels=7
-                )
+                ),
             )
         )
     )
@@ -542,7 +542,7 @@ async def test_load_pipette_96_channels(
                 pipette_id="unique-id",
                 static_config=StaticPipetteConfig(
                     model="pipette-model", min_volume=1.23, max_volume=4.56, channels=7
-                )
+                ),
             )
         )
     )
@@ -587,7 +587,7 @@ async def test_load_pipette_uses_provided_id(
                 pipette_id="my-pipette-id",
                 static_config=StaticPipetteConfig(
                     model="pipette-model", min_volume=1.23, max_volume=4.56, channels=7
-                )
+                ),
             )
         )
     )
@@ -644,7 +644,7 @@ async def test_load_pipette_checks_existence_with_already_loaded(
                 pipette_id="unique-id",
                 static_config=StaticPipetteConfig(
                     model="pipette-model", min_volume=1.23, max_volume=4.56, channels=7
-                )
+                ),
             )
         )
     )
