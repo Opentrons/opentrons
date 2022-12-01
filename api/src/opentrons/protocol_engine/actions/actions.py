@@ -14,7 +14,7 @@ from opentrons.hardware_control.modules import LiveData
 
 from ..commands import Command, CommandCreate
 from ..errors import ProtocolEngineError
-from ..types import LabwareOffsetCreate, ModuleDefinition, Liquid
+from ..types import LabwareOffsetCreate, ModuleDefinition, Liquid, StaticPipetteConfig
 
 
 @dataclass(frozen=True)
@@ -170,6 +170,14 @@ class SetPipetteMovementSpeedAction:
     speed: Optional[float]
 
 
+@dataclass(frozen=True)
+class AddPipetteConfigAction:
+    """"""
+
+    pipette_id: str
+    static_config: StaticPipetteConfig
+
+
 Action = Union[
     PlayAction,
     PauseAction,
@@ -186,4 +194,5 @@ Action = Union[
     AddLiquidAction,
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
+    AddPipetteConfigAction,
 ]

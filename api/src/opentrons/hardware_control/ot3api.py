@@ -508,6 +508,21 @@ class OT3API(
             self._gantry_load_from_instruments(self.get_all_attached_instr())
         )
 
+    async def cache_and_get_instrument(
+        self,
+        mount: top_types.MountType,
+        pipette_name: PipetteName,
+        other_mount_dict: Optional[Dict[top_types.Mount, PipetteName]] = None,
+    ) -> PipetteDict:
+        # Check if instrument is cached, if not this will raise an error
+        require = {mount.to_hw_mount(): pipette_name}
+        if other_mount_dict:
+            require.update(other_mount_dict)
+
+        await self.cache_instruments(require)
+
+        return self._pipette_handler.get_attached_instrument(OT3Mount.from_mount(mount))
+
     # Global actions API
     def pause(self, pause_type: PauseType) -> None:
         """

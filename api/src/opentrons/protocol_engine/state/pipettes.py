@@ -7,7 +7,7 @@ from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.types import MountType, Mount as HwMount
 
 from .. import errors
-from ..types import LoadedPipette
+from ..types import LoadedPipette, StaticPipetteConfig
 
 from ..commands import (
     Command,
@@ -26,7 +26,7 @@ from ..commands import (
     thermocycler,
     heater_shaker,
 )
-from ..actions import Action, SetPipetteMovementSpeedAction, UpdateCommandAction
+from ..actions import Action, SetPipetteMovementSpeedAction, UpdateCommandAction, AddPipetteConfigAction
 from .abstract_store import HasState, HandlesActions
 
 
@@ -56,6 +56,7 @@ class PipetteState:
     current_well: Optional[CurrentWell]
     attached_tip_labware_by_id: Dict[str, str]
     movement_speed_by_id: Dict[str, Optional[float]]
+    static_config_by_id: Dict[str, StaticPipetteConfig]
 
 
 class PipetteStore(HasState[PipetteState], HandlesActions):
@@ -71,6 +72,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             current_well=None,
             attached_tip_labware_by_id={},
             movement_speed_by_id={},
+            static_config_by_id={},
         )
 
     def handle_action(self, action: Action) -> None:
@@ -79,6 +81,8 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._handle_command(action.command)
         elif isinstance(action, SetPipetteMovementSpeedAction):
             self._state.movement_speed_by_id[action.pipette_id] = action.speed
+        elif isinstance(action, AddPipetteConfigAction):
+            self._state.static_config_by_id[action.pipette_id] = action.static_config
 
     def _handle_command(self, command: Command) -> None:
         self._update_current_well(command)
@@ -278,3 +282,21 @@ class PipetteView(HasState[PipetteState]):
     ) -> Optional[float]:
         """Return the given pipette's requested or current movement speed."""
         return requested_speed or self._state.movement_speed_by_id[pipette_id]
+
+    def _get_static_config(self, pipette_id: str) -> StaticPipetteConfig:
+        try:
+            return self._state.static_config_by_id[pipette_id]
+        except KeyError:
+            raise errors.PipetteNotLoadedError()
+
+    def get_model_name(self, pipette_id: str) -> str:
+        return self._get_static_config(pipette_id).model
+
+    def get_minimum_volume(self, pipette_id: str) -> float:
+        return self._get_static_config(pipette_id).min_volume
+
+    def get_maximum_volume(self, pipette_id: str) -> float:
+        return self._get_static_config(pipette_id).max_volume
+
+    def get_channels(self, pipette_id: str) -> int:
+        return self._get_static_config(pipette_id).channels

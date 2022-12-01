@@ -2,7 +2,7 @@ from typing import Dict, Optional
 from typing_extensions import Protocol
 
 from opentrons_shared_data.pipette.dev_types import PipetteName
-from opentrons.types import Mount
+from opentrons.types import Mount, MountType
 
 from opentrons.hardware_control.instruments import Pipette
 from ..dev_types import PipetteDict
@@ -68,6 +68,20 @@ class InstrumentConfigurer(Protocol):
         """Get the status dict of a single cached instrument.
 
         Return values and caveats are as get_attached_instruments.
+        """
+        ...
+
+    async def cache_and_get_instrument(
+        self,
+        mount: MountType,
+        pipette_name: PipetteName,
+        other_mount_dict: Optional[Dict[Mount, PipetteName]],
+    ) -> PipetteDict:
+        """Caches the specified instrument and returns the status dict.
+
+        If an instrument is on the other mount, that it cached as well.
+        This will raise an error from `cache_instruments` if one of the
+        expected instruments is not currently present.
         """
         ...
 

@@ -34,6 +34,7 @@ from .backends import Controller, Simulator
 from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
+from .dev_types import PipetteDict
 from .types import (
     Axis,
     CriticalPoint,
@@ -421,6 +422,21 @@ class API(
             )
             await self._backend.configure_mount(mount, hw_config)
         self._log.info("Instruments found: {}".format(self._attached_instruments))
+
+    async def cache_and_get_instrument(
+        self,
+        mount: top_types.MountType,
+        pipette_name: PipetteName,
+        other_mount_dict: Optional[Dict[top_types.Mount, PipetteName]] = None,
+    ) -> PipetteDict:
+        # Check if instrument is cached, if not this will raise an error
+        require = {mount.to_hw_mount(): pipette_name}
+        if other_mount_dict:
+            require.update(other_mount_dict)
+
+        await self.cache_instruments(require)
+
+        return PipetteHandlerProvider.get_attached_instrument(self, mount.to_hw_mount())
 
     # Global actions API
     def pause(self, pause_type: PauseType) -> None:
