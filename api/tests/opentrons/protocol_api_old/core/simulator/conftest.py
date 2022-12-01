@@ -2,6 +2,7 @@ import pytest
 
 from opentrons import types
 from opentrons.hardware_control import ThreadManagedHardware
+from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
 from opentrons.protocol_api.core.protocol_api.protocol_context import (
@@ -20,15 +21,19 @@ from opentrons.protocol_api.core.simulator.protocol_context import (
     ProtocolContextSimulation,
 )
 
+from opentrons_shared_data.deck import DefinitionName as DeckDefinitionName
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 
 @pytest.fixture
-def protocol_context(hardware: ThreadManagedHardware) -> ProtocolContextImplementation:
+def protocol_context(
+    hardware: ThreadManagedHardware, deck_definition_name: DeckDefinitionName
+) -> ProtocolContextImplementation:
     """Protocol context implementation fixture."""
     return ProtocolContextImplementation(
         sync_hardware=hardware.sync,
+        deck_layout=Deck(deck_type=deck_definition_name),
         api_version=MAX_SUPPORTED_VERSION,
         labware_offset_provider=NullLabwareOffsetProvider(),
     )
@@ -37,10 +42,12 @@ def protocol_context(hardware: ThreadManagedHardware) -> ProtocolContextImplemen
 @pytest.fixture
 def simulating_protocol_context(
     hardware: ThreadManagedHardware,
+    deck_definition_name: DeckDefinitionName,
 ) -> ProtocolContextSimulation:
     """Protocol context simulation fixture."""
     return ProtocolContextSimulation(
         sync_hardware=hardware.sync,
+        deck_layout=Deck(deck_type=deck_definition_name),
         api_version=MAX_SUPPORTED_VERSION,
         labware_offset_provider=NullLabwareOffsetProvider(),
     )
