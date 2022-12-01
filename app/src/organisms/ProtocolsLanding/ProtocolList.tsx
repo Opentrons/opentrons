@@ -84,13 +84,13 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
     }
   } = {
     alphabetical: {
-      label: t('labware_landing:alphabetical'),
+      label: t('shared:alphabetical'),
     },
     recent: {
       label: t('most_recent_updates'),
     },
     reverse: {
-      label: t('labware_landing:reverse'),
+      label: t('shared:reverse'),
     },
     oldest: {
       label: t('oldest_updates'),
@@ -123,7 +123,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               color={COLORS.darkGreyEnabled}
             >
-              {t('labware_landing:sort_by')}
+              {t('shared:sort_by')}
             </StyledText>
             <Flex
               flexDirection={DIRECTION_ROW}
@@ -163,13 +163,13 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
               flexDirection={DIRECTION_COLUMN}
             >
               <MenuItem onClick={() => handleProtocolsSortKey('alphabetical')}>
-                {t('labware_landing:alphabetical')}
+                {t('shared:alphabetical')}
               </MenuItem>
               <MenuItem onClick={() => handleProtocolsSortKey('recent')}>
                 {t('most_recent_updates')}
               </MenuItem>
               <MenuItem onClick={() => handleProtocolsSortKey('reverse')}>
-                {t('labware_landing:reverse')}
+                {t('shared:reverse')}
               </MenuItem>
               <MenuItem onClick={() => handleProtocolsSortKey('oldest')}>
                 {t('oldest_updates')}
