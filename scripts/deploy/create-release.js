@@ -23,10 +23,15 @@ const conventionalChangelog = require('conventional-changelog')
 const git = require('simple-git')
 const semver = require('semver')
 const { Octokit } = require('@octokit/rest')
-const ALLOWED_VERSION_TYPES = ['alpha', 'beta', 'candidate', 'production']
+
 const USAGE =
   '\nUsage:\n node ./scripts/deploy/create-release <token> <tag> [--deploy] [--allow-old]'
 
+// The allowed types of release. The order matters here - order in this array determines the
+// "release kind greater than or equal to" logic for generating changelogs. A version matching
+// one of the entries in this array will have its changelogs generated from the closest version
+// matching the same type or a type to its right.
+const ALLOWED_VERSION_TYPES = ['alpha', 'beta', 'candidate', 'production']
 const REPO_DETAILS = {
   owner: 'Opentrons',
   repo: 'opentrons',
@@ -34,6 +39,7 @@ const REPO_DETAILS = {
 
 const detailsFromTag = tag =>
   tag.includes('@') ? tag.split('@') : ['robot-stack', tag.substring(1)]
+
 function tagFromDetails(project, version) {
   if (project === 'robot-stack') {
     return 'v' + version
@@ -41,6 +47,7 @@ function tagFromDetails(project, version) {
     return [project, version].join('@')
   }
 }
+
 function prefixForProject(project) {
   if (project === 'robot-stack') {
     return 'v'
@@ -49,10 +56,18 @@ function prefixForProject(project) {
   }
 }
 
+// The release kind is normally just the semver preproduction stage, but we need to account
+// for PD using candidate-a, candidate-b etc - semver preproduction stage is separated from
+// sequence by a . normally (i.e. alpha.0, beta.32), so semver.prerelease('candidate-a') gives
+// you 'candidate-a' and we want 'candidate'
 const releaseKind = version =>
   (semver.prerelease(version)?.at(0) ?? 'production').split('-')[0]
-const releasePriorityGEQ = (kindA, kindB) =>
+
+const releasePriorityGreaterThanOrEqual = (kindA, kindB) =>
   ALLOWED_VERSION_TYPES.indexOf(kindA) >= ALLOWED_VERSION_TYPES.indexOf(kindB)
+
+const titleForRelease = (project, version) =>
+  `${project.replaceAll('-', ' ')} version ${version}`
 
 // Return the version to build a changelog from, which is the most recent version whose prerelease
 // level is equal to or greater than the current tag. So
@@ -65,7 +80,7 @@ function versionPrevious(currentVersion, previousVersions) {
   const currentReleaseKind = releaseKind(currentVersion)
   if (!ALLOWED_VERSION_TYPES.includes(currentReleaseKind)) {
     throw new Error(
-      `Error: Prerelease tag ${currentReleaseKind} is not one of ${ALLOWED_VERSION_TYPES.join(
+      `Prerelease tag ${currentReleaseKind} is not one of ${ALLOWED_VERSION_TYPES.join(
         ', '
       )}`
     )
@@ -73,13 +88,10 @@ function versionPrevious(currentVersion, previousVersions) {
   const from = previousVersions.indexOf(currentVersion)
   const notIncluding = previousVersions.slice(from + 1)
   const releasesOfGEQKind = notIncluding.filter(version =>
-    releasePriorityGEQ(releaseKind(version), currentReleaseKind)
+    releasePriorityGreaterThanOrEqual(releaseKind(version), currentReleaseKind)
   )
   return releasesOfGEQKind.length === 0 ? null : releasesOfGEQKind[0]
 }
-
-const titleForRelease = (project, version) =>
-  `${project.replaceAll('-', ' ')} version ${version}`
 
 async function createRelease(token, tag, project, version, changelog, deploy) {
   const title = titleForRelease(project, version)
@@ -89,7 +101,7 @@ async function createRelease(token, tag, project, version, changelog, deploy) {
       auth: token,
       userAgent: 'Opentrons Release Creator',
     })
-    await octokit.reset.createRelease({
+    const { data } = await octokit.reset.createRelease({
       owner: REPO_DETAILS.owner,
       repo: REPO_DETAILS.repo,
       tag_name: tag,
@@ -98,8 +110,10 @@ async function createRelease(token, tag, project, version, changelog, deploy) {
       draft: true,
       prerelease: isPre,
     })
+    return data.html_url
   } else {
     console.log(`${tag} ${title}\n${changelog}\n${isPre ? '\nprerelease' : ''}`)
+    return `http://github.com/${REPO_DETAILS.owner}/${REPO_DETAILS.repo}/releases/${tag}`
   }
 }
 
@@ -169,14 +183,21 @@ async function main() {
       (accum, chunk) => (accum.includes(chunk.trim()) ? accum : chunk + accum),
       ''
     )
-  await createRelease(token, tag, project, currentVersion, changelog, deploy)
+  return await createRelease(
+    token,
+    tag,
+    project,
+    currentVersion,
+    changelog,
+    deploy
+  )
 }
 
-;(async () => {
-  try {
-    await main()
-  } catch (err) {
-    console.error('Release failed: ', err)
-    process.exit(-1)
-  }
-})()
+main()
+  .then(url => {
+    console.log('Release created:', url)
+  })
+  .catch(error => {
+    console.error('Release failed:', error)
+    process.exitCode = -1
+  })
