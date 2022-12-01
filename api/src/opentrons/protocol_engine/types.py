@@ -12,7 +12,6 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType, DeckSlotName
 from opentrons.hardware_control.modules import ModuleType as ModuleType
 
-
 from opentrons_shared_data.pipette.dev_types import (  # noqa: F401
     # convenience re-export of LabwareUri type
     LabwareUri as LabwareUri,
