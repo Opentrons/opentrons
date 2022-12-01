@@ -5,6 +5,7 @@ import mock
 from typing import Any, Dict
 
 from opentrons_shared_data import load_shared_data
+from opentrons_shared_data.deck import DefinitionName as DeckDefinitionName
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 
 import opentrons.protocol_api as papi
@@ -270,10 +271,12 @@ def test_pick_up_without_prep_after(ctx, get_labware_def):
     instr.drop_tip(tiprack["A2"].top())
 
 
-def test_pick_up_tip_old_version(hardware, get_labware_def):
+def test_pick_up_tip_old_version(hardware, deck_definition_name, get_labware_def):
     # API version 2.12, a pick-up tip would not prepare-for-aspirate
     api_version = APIVersion(2, 12)
-    ctx = papi.create_protocol_context(api_version=api_version, hardware_api=hardware)
+    ctx = papi.create_protocol_context(
+        api_version=api_version, hardware_api=hardware, deck_type=deck_definition_name
+    )
 
     ctx.home()
     tiprack = ctx.load_labware("opentrons_96_tiprack_300ul", 1)
@@ -300,11 +303,13 @@ def test_pick_up_tip_old_version(hardware, get_labware_def):
         instr.pick_up_tip(tiprack["A2"].top(), prep_after=True)
 
 
-def test_return_tip_old_version(hardware, get_labware_def):
+def test_return_tip_old_version(hardware, deck_definition_name, get_labware_def):
     # API version 2.2, a returned tip would be picked up by the
     # next pick up tip call
     api_version = APIVersion(2, 1)
-    ctx = papi.create_protocol_context(api_version=api_version, hardware_api=hardware)
+    ctx = papi.create_protocol_context(
+        api_version=api_version, hardware_api=hardware, deck_type=deck_definition_name
+    )
     ctx.home()
     tiprack = ctx.load_labware("opentrons_96_tiprack_300ul", 1)
     mount = Mount.LEFT
@@ -656,9 +661,11 @@ def test_mix(ctx, monkeypatch):
     assert mix_steps == expected_mix_steps
 
 
-def test_touch_tip_default_args(monkeypatch, hardware):
+def test_touch_tip_default_args(monkeypatch, hardware, deck_definition_name):
     api_version = APIVersion(2, 3)
-    ctx = papi.create_protocol_context(api_version=api_version, hardware_api=hardware)
+    ctx = papi.create_protocol_context(
+        api_version=api_version, hardware_api=hardware, deck_type=deck_definition_name
+    )
     ctx.home()
     lw = ctx.load_labware("opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap", 1)
     tiprack = ctx.load_labware("opentrons_96_tiprack_300ul", 3)
@@ -966,6 +973,7 @@ def test_order_of_module_load():
     ctx1 = protocol_api.create_protocol_context(
         api_version=papi.MAX_SUPPORTED_VERSION,
         hardware_api=fake_hardware,
+        deck_type=DeckDefinitionName.OT2_STANDARD,
     )
 
     temp1 = ctx1.load_module("tempdeck", 4)
@@ -983,6 +991,7 @@ def test_order_of_module_load():
     ctx2 = protocol_api.create_protocol_context(
         api_version=papi.MAX_SUPPORTED_VERSION,
         hardware_api=fake_hardware,
+        deck_type=DeckDefinitionName.OT2_STANDARD,
     )
 
     ctx2.load_module("thermocycler")
@@ -1052,6 +1061,7 @@ def test_bundled_labware(get_labware_fixture, hardware):
     ctx = papi.create_protocol_context(
         api_version=papi.MAX_SUPPORTED_VERSION,
         hardware_api=hardware,
+        deck_type=DeckDefinitionName.OT2_STANDARD,
         bundled_labware=bundled_labware,
     )
 
@@ -1068,6 +1078,7 @@ def test_bundled_labware_missing(get_labware_fixture, hardware):
         ctx = papi.create_protocol_context(
             api_version=papi.MAX_SUPPORTED_VERSION,
             hardware_api=hardware,
+            deck_type=DeckDefinitionName.OT2_STANDARD,
             bundled_labware=bundled_labware,
         )
         ctx.load_labware("fixture_96_plate", 3, namespace="fixture")
@@ -1080,29 +1091,32 @@ def test_bundled_labware_missing(get_labware_fixture, hardware):
         ctx = papi.create_protocol_context(
             api_version=papi.MAX_SUPPORTED_VERSION,
             hardware_api=hardware,
+            deck_type=DeckDefinitionName.OT2_STANDARD,
             bundled_labware={},
             extra_labware=bundled_labware,
         )
         ctx.load_labware("fixture_96_plate", 3, namespace="fixture")
 
 
-def test_bundled_data(hardware):
+def test_bundled_data(hardware, deck_definition_name):
     bundled_data = {"foo": b"1,2,3"}
     ctx = papi.create_protocol_context(
         api_version=papi.MAX_SUPPORTED_VERSION,
         hardware_api=hardware,
+        deck_type=deck_definition_name,
         bundled_data=bundled_data,
     )
 
     assert ctx.bundled_data == bundled_data
 
 
-def test_extra_labware(get_labware_fixture, hardware):
+def test_extra_labware(get_labware_fixture, hardware, deck_definition_name):
     fixture_96_plate = get_labware_fixture("fixture_96_plate")
     bundled_labware = {"fixture/fixture_96_plate/1": fixture_96_plate}
     ctx = papi.create_protocol_context(
         api_version=papi.MAX_SUPPORTED_VERSION,
         hardware_api=hardware,
+        deck_type=deck_definition_name,
         extra_labware=bundled_labware,
     )
 
@@ -1111,26 +1125,35 @@ def test_extra_labware(get_labware_fixture, hardware):
     assert ctx.loaded_labwares[3]._implementation.get_definition() == fixture_96_plate
 
 
-def test_api_version_checking(hardware):
+def test_api_version_checking(hardware, deck_definition_name):
     minor_over = APIVersion(
         papi.MAX_SUPPORTED_VERSION.major,
         papi.MAX_SUPPORTED_VERSION.minor + 1,
     )
     with pytest.raises(RuntimeError):
-        papi.create_protocol_context(api_version=minor_over, hardware_api=hardware)
+        papi.create_protocol_context(
+            api_version=minor_over,
+            hardware_api=hardware,
+            deck_type=deck_definition_name,
+        )
 
     major_over = APIVersion(
         papi.MAX_SUPPORTED_VERSION.major + 1,
         papi.MAX_SUPPORTED_VERSION.minor,
     )
     with pytest.raises(RuntimeError):
-        papi.create_protocol_context(api_version=major_over, hardware_api=hardware)
+        papi.create_protocol_context(
+            api_version=major_over,
+            hardware_api=hardware,
+            deck_type=deck_definition_name,
+        )
 
 
-def test_api_per_call_checking(monkeypatch, hardware):
+def test_api_per_call_checking(monkeypatch, hardware, deck_definition_name):
     ctx = papi.create_protocol_context(
         api_version=APIVersion(1, 9),
         hardware_api=hardware,
+        deck_type=deck_definition_name,
     )
 
     assert ctx.deck  # 1.9 < 2.0, but api version 1 is excepted from checking
@@ -1138,6 +1161,7 @@ def test_api_per_call_checking(monkeypatch, hardware):
     ctx = papi.create_protocol_context(
         api_version=APIVersion(2, 1),
         hardware_api=hardware,
+        deck_type=deck_definition_name,
     )
     # versions > 2.0 are ok
     assert ctx.deck
@@ -1146,10 +1170,11 @@ def test_api_per_call_checking(monkeypatch, hardware):
         ctx.set_rail_lights(on=True)
 
 
-def test_home_plunger(monkeypatch, hardware):
+def test_home_plunger(monkeypatch, hardware, deck_definition_name):
     ctx = papi.create_protocol_context(
         api_version=APIVersion(2, 0),
         hardware_api=hardware,
+        deck_type=deck_definition_name,
     )
     ctx.home()
     instr = ctx.load_instrument("p1000_single", "left")
