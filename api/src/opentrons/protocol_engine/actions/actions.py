@@ -172,7 +172,7 @@ class SetPipetteMovementSpeedAction:
 
 @dataclass(frozen=True)
 class AddPipetteConfigAction:
-    """"""
+    """Adds a pipette's static config to the state store."""
 
     pipette_id: str
     static_config: StaticPipetteConfig

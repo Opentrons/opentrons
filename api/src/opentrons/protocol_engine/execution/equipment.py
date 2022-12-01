@@ -163,12 +163,6 @@ class EquipmentHandler:
         Returns:
             A LoadedPipetteData object.
         """
-        pipette_name = (
-            pipette_name.value
-            if isinstance(pipette_name, PipetteNameType)
-            else pipette_name
-        )
-
         other_mount_dict = {}
         other_pipette = self._state_store.pipettes.get_by_mount(mount.other_mount())
         if other_pipette is not None:
@@ -185,7 +179,11 @@ class EquipmentHandler:
         # pipette existence check
         try:
             pipette_dict = await self._hardware_api.cache_and_get_instrument(
-                mount, pipette_name, other_mount_dict
+                mount=mount,
+                pipette_name=pipette_name.value
+                if isinstance(pipette_name, PipetteNameType)
+                else pipette_name,
+                other_mount_dict=other_mount_dict,
             )
         except RuntimeError as e:
             raise FailedToLoadPipetteError(str(e)) from e

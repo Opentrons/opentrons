@@ -289,7 +289,9 @@ def test_get_static_config() -> None:
     """It should return the static pipette configuration that was set for the given pipette."""
     subject = get_pipette_view(
         static_config_by_id={
-            "pipette-id": StaticPipetteConfig(model="pipette-model", min_volume=1.23, max_volume=4.56, channels=7)
+            "pipette-id": StaticPipetteConfig(
+                model="pipette-model", min_volume=1.23, max_volume=4.56, channels=7
+            )
         }
     )
 

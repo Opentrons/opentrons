@@ -427,9 +427,7 @@ def test_get_model(
 ) -> None:
     """It should get the pipette's model name."""
     decoy.when(
-        mock_engine_client.state.pipettes.get_model_name(
-            pipette_id=subject.pipette_id
-        )
+        mock_engine_client.state.pipettes.get_model_name(pipette_id=subject.pipette_id)
     ).then_return("pipette-model")
     assert subject.get_model() == "pipette-model"
 
@@ -469,8 +467,6 @@ def test_get_channels(
 ) -> None:
     """It should get the pipette's number of channels."""
     decoy.when(
-        mock_engine_client.state.pipettes.get_channels(
-            pipette_id=subject.pipette_id
-        )
+        mock_engine_client.state.pipettes.get_channels(pipette_id=subject.pipette_id)
     ).then_return(42)
     assert subject.get_channels() == 42

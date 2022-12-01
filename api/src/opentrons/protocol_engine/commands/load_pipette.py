@@ -8,7 +8,6 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
-from ..types import StaticPipetteConfig
 
 if TYPE_CHECKING:
     from ..execution import EquipmentHandler
