@@ -1,8 +1,12 @@
 """Test hardware stopping execution and side effects."""
+from __future__ import annotations
+
 import pytest
 from decoy import Decoy
+from typing import TYPE_CHECKING
 
 from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control.types import OT3Mount
 from opentrons.protocol_engine import WellLocation, errors
 from opentrons.protocol_engine.state import StateStore
 from opentrons.protocol_engine.execution import (
@@ -11,6 +15,9 @@ from opentrons.protocol_engine.execution import (
     HardwareStopper,
 )
 from opentrons.protocol_engine.types import MotorAxis
+
+if TYPE_CHECKING:
+    from opentrons.hardware_control.ot3api import OT3API
 
 
 @pytest.fixture
@@ -155,4 +162,45 @@ async def test_hardware_stopping_sequence_no_pipette(
 
     decoy.verify(
         await hardware_api.stop(home_after=True),
+    )
+
+
+@pytest.mark.ot3_only
+async def test_hardware_stopping_sequence_with_gripper(
+    decoy: Decoy,
+    state_store: StateStore,
+    ot3_hardware_api: OT3API,
+    movement: MovementHandler,
+    pipetting: PipettingHandler,
+) -> None:
+    """It should stop the hardware, home the robot and perform drop tip if required."""
+    subject = HardwareStopper(
+        hardware_api=ot3_hardware_api,
+        state_store=state_store,
+        movement=movement,
+        pipetting=pipetting,
+    )
+    decoy.when(state_store.pipettes.get_attached_tip_labware_by_id()).then_return(
+        {"pipette-id": "tiprack-id"}
+    )
+    decoy.when(ot3_hardware_api.has_gripper()).then_return(True)
+    await subject.do_stop_and_recover(drop_tips_and_home=True)
+
+    decoy.verify(
+        await ot3_hardware_api.stop(home_after=False),
+        await ot3_hardware_api.home_z(mount=OT3Mount.GRIPPER),
+        await movement.home(
+            axes=[MotorAxis.X, MotorAxis.Y, MotorAxis.LEFT_Z, MotorAxis.RIGHT_Z]
+        ),
+        await pipetting.add_tip(
+            pipette_id="pipette-id",
+            labware_id="tiprack-id",
+        ),
+        await pipetting.drop_tip(
+            pipette_id="pipette-id",
+            labware_id="fixedTrash",
+            well_name="A1",
+            well_location=WellLocation(),
+        ),
+        await ot3_hardware_api.stop(home_after=True),
     )
