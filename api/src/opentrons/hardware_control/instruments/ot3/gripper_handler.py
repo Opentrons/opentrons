@@ -126,17 +126,7 @@ class GripperHandler:
     def check_ready_for_calibration(self) -> None:
         """Raise an exception if a probe is not attached before calibration."""
         gripper = self.get_gripper()
-        if not gripper._attached_probe:
-            raise CalibrationError("Must attach a probe before starting calibration.")
-
-    def check_ready_for_grip(self) -> None:
-        """Raise an exception if it is not currently valid to grip."""
-        gripper = self.get_gripper()
-        self.check_ready_for_jaw_move()
-        if gripper.state == GripperJawState.GRIPPING:
-            raise GripError("Gripper is already gripping")
-        elif not gripper.state.ready_for_grip:
-            raise GripError("Gripper cannot currently grip")
+        gripper.check_calibration_pin_location_is_accurate()
 
     def check_ready_for_jaw_move(self) -> None:
         """Raise an exception if it is not currently valid to move the jaw."""
