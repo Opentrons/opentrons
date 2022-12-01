@@ -14,9 +14,9 @@ import styles from '../../styles.css'
 import { determineMultiChannelSupport } from '../../utils/determineMultiChannelSupport'
 
 const LABWARE_PDF_URL =
-  'https://opentrons-publications.s3.us-east-2.amazonaws.com/labwareDefinition_testGuide.pdf'
+  'https://insights.opentrons.com/hubfs/Products/Consumables%20and%20Reagents/labwareDefinition_testGuide.pdf'
 const TIPRACK_PDF_URL =
-  'https://opentrons-publications.s3.us-east-2.amazonaws.com/labwareDefinition_tipRack_testGuide.pdf'
+  'https://insights.opentrons.com/hubfs/Products/Consumables%20and%20Reagents/labwareDefinition_tipRack_testGuide.pdf'
 
 interface ExportProps {
   onExportClick: (e: React.MouseEvent) => unknown
