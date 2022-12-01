@@ -1,7 +1,7 @@
 {
   "$otSharedSchema": "#/pipette/schemas/2/pipettePropertiesSchema.json",
   "displayName": "P1000 96 Channel GEN3",
-  "model": "ninetySixChannel",
+  "model": "p1000",
   "displayCategory": "GEN3",
   "pickUpTipConfigurations": {
     "current": 0.4,

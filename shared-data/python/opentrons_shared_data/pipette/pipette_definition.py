@@ -190,6 +190,3 @@ class PipetteConfigurations(
     """The full pipette configurations of a given model and version."""
 
     pass
-    # geometry: PipetteGeometryDefinition
-    # physical: PipettePhysicalPropertiesDefinition
-    # liquid: PipetteLiquidPropertiesDefinition
