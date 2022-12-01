@@ -6,7 +6,7 @@ on:
   push:
     tags:
       - '*'
-workflow_dispatch:
+  workflow_dispatch:
 
 jobs:
   create-release:
