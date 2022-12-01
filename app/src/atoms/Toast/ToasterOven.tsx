@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { v4 as uuidv4 } from 'uuid'
 
 import {
   Flex,
@@ -40,7 +41,7 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
     type: ToastType,
     options?: MakeToastOptions
   ): string {
-    const id = JSON.stringify(Date.now())
+    const id = uuidv4()
 
     setToasts(t =>
       [{ id, message, type, ...options }, ...t].slice(0, TOASTER_OVEN_SIZE)
