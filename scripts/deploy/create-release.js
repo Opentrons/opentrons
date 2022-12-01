@@ -16,11 +16,9 @@
 
 const assert = require('assert')
 const parseArgs = require('./lib/parseArgs')
-const conventionalGithubReleaser = require('conventional-github-releaser')
 const conventionalChangelog = require('conventional-changelog')
 const git = require('simple-git')
 const semver = require('semver')
-
 const ALLOWED_VERSION_TYPES = ['alpha', 'beta', 'candidate', 'production']
 const USAGE = '\nUsage:\n node ./scripts/deploy/create-release <token> <tag> [--deploy]'
 
@@ -47,6 +45,10 @@ const CONTEXTS_FOR_PROJECT = {
   'robot-stack': {
     title: 'Opentrons App and Robot Software',
     ...COMMON_CONTEXTS
+  },
+  'test': {
+    title: 'A test project for release flows',
+    ...COMMON_CONTEXTS
   }
 }
 
@@ -60,9 +62,9 @@ function tagFromDetails(project, version) {
 }
 function prefixForProject(project) {
   if (project === 'robot-stack') {
-    return 'v*'
+    return 'v'
   } else {
-    return project + '@*'
+    return project + '@'
   }
 }
 const tagIsForProject = (tag, project) => detailsFromTag(tag)[0] === project
@@ -103,27 +105,26 @@ async function main() {
 
   console.log(`Tag ${tag} represents version ${currentVersion} of ${project}`)
 
-  const allTags = (await git().tags([prefixForProject(project)])).all
+  const allTags = (await git().tags([prefixForProject(project) + '*'])).all
   if (!allTags.includes(tag)) {
     throw new Error(`Tag ${tag} does not exist - create it before running this script`)
   }
-
+  console.log(allTags.join(', '))
   const sortedVersions = allTags.map(tag => detailsFromTag(tag)[1]).sort(semver.compare).reverse()
 
   const previousVersion = versionPrevious(currentVersion, sortedVersions)
   const previousTag = tagFromDetails(project, previousVersion)
 
-  console.log(`Changelogs will be generated from tag ${previousTag} which is version ${previousVersion}`)
+  console.log(`Changelogs will be generated  from tag ${previousTag} which is version ${previousVersion} to tag ${tag} which is version ${currentVersion}`)
 
   const changelogStream = conventionalChangelog(
-    {preset: 'angular'},
-    {version: currentVersion, currentTag: tag, previousTag: tag, ...CONTEXTS_FOR_PROJECT[project]}
+    {preset: 'angular', tagPrefix: prefixForProject(project), debug: console.log},
+    {gitSemverTags: allTags, version: currentVersion, currentTag: tag, previousTag: previousTag, ...CONTEXTS_FOR_PROJECT[project]},
+    {from: previousTag}
   )
   for await (const chunk of changelogStream) {
-    console.count('chunk')
-    console.log(chunk)
+    console.log(chunk.toString())
   }
-
 }
 
 // i will do anything to use await instead of promise chaining, except apparently set up babel
@@ -131,7 +132,7 @@ async function main() {
   try {
     await main()
   } catch (err) {
-    console.error(err.message)
+    console.error('Release failed: ', err)
     process.exit(-1)
   }
 })()
