@@ -412,8 +412,12 @@ class MoveScheduler:
                     max(0.1, self._durations[group_id - self._start_at_index] + 0.1),
                 )
             except asyncio.TimeoutError:
-                unresponsive_ids = set([hex(node_id) for node_id, _ in self._moves[group_id]])
-                log.warning(f"Move set timed out (unresponsive nodes: {unresponsive_ids})")
+                unresponsive_ids = set(
+                    [hex(node_id) for node_id, _ in self._moves[group_id]]
+                )
+                log.warning(
+                    f"Move set timed out (unresponsive nodes: {unresponsive_ids})"
+                )
 
         def _reify_queue_iter() -> Iterator[_CompletionPacket]:
             while not self._completion_queue.empty():
