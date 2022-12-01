@@ -18,7 +18,7 @@ from opentrons.hardware_control.ot3_calibration import (
     find_deck_position,
     find_slot_center_binary,
     find_slot_center_noncontact,
-    calibrate_mount,
+    calibrate_pipette,
     CalibrationMethod,
     _edges_from_data,
     InaccurateNonContactSweepError,
@@ -90,6 +90,7 @@ plus_x_point = (0, 10, 0)
 plus_y_point = (10, 0, 0)
 minus_x_point = (0, -10, 0)
 minus_y_point = (-10, 0, 0)
+nominal_centr = (0, 0, 0)
 
 
 @pytest.fixture
@@ -106,6 +107,7 @@ async def override_cal_config(ot3_hardware: ThreadManager[OT3API]) -> Iterator[N
             plus_y_pos=plus_y_point,
             minus_x_pos=minus_x_point,
             minus_y_pos=minus_y_point,
+            nominal_center=nominal_centr,
         )
     )
     try:
@@ -210,7 +212,10 @@ async def test_find_deck_checks_z_only(
     assert isclose(second_move_point.y, config_point.y)
 
 
-async def test_method_enum(ot3_hardware: ThreadManager[OT3API]) -> None:
+async def test_method_enum(
+    ot3_hardware: ThreadManager[OT3API],
+    override_cal_config: None,
+) -> None:
     with patch(
         "opentrons.hardware_control.ot3_calibration.find_slot_center_binary",
         AsyncMock(spec=find_slot_center_binary),
@@ -228,7 +233,7 @@ async def test_method_enum(ot3_hardware: ThreadManager[OT3API]) -> None:
         find_deck.return_value = 10
         binary.return_value = (1.0, 2.0)
         noncontact.return_value = (3.0, 4.0)
-        binval = await calibrate_mount(
+        binval = await calibrate_pipette(
             ot3_hardware, OT3Mount.RIGHT, CalibrationMethod.BINARY_SEARCH
         )
         reset_instrument_offset.assert_called_once()
@@ -244,7 +249,7 @@ async def test_method_enum(ot3_hardware: ThreadManager[OT3API]) -> None:
         noncontact.reset_mock()
         save_instrument_offset.reset_mock()
 
-        ncval = await calibrate_mount(
+        ncval = await calibrate_pipette(
             ot3_hardware, OT3Mount.LEFT, CalibrationMethod.NONCONTACT_PASS
         )
         reset_instrument_offset.assert_called_once()
@@ -264,14 +269,19 @@ async def test_calibrate_mount_errors(
         ot3_hardware.managed_obj, "save_instrument_offset", AsyncMock()
     ) as save_instrument_offset:
         mock_data_analysis.return_value = (-1000, 1000)
-        await calibrate_mount(
-            ot3_hardware, OT3Mount.RIGHT, CalibrationMethod.NONCONTACT_PASS
-        )
+
+        # calibrate pipette should re-raise exception
+        with pytest.raises(InaccurateNonContactSweepError):
+            await calibrate_pipette(
+                ot3_hardware, OT3Mount.RIGHT, CalibrationMethod.NONCONTACT_PASS
+            )
+
         reset_calls = [
             mock_call(OT3Mount.RIGHT),
             mock_call(OT3Mount.RIGHT, to_default=False),
         ]
         reset_instrument_offset.assert_has_calls(reset_calls)
+        # instrument offset should not be saved
         save_instrument_offset.assert_not_called()
 
         reset_instrument_offset.reset_mock()
