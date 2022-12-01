@@ -499,7 +499,7 @@ def test_set_get_rail_lights(
 def test_get_rail_lights(
     decoy: Decoy, mock_sync_hardware_api: SyncHardwareAPI, subject: ProtocolCore
 ) -> None:
-    """It should verify a call to sync client."""
+    """It should get rails light state."""
     decoy.when(mock_sync_hardware_api.get_lights()).then_return({"rails": True})
 
     result = subject.get_rail_lights_on()
