@@ -1,32 +1,31 @@
 import pytest
-from opentrons_shared_data.pipette.types import (
+from opentrons_shared_data.pipette.pipette_definition import (
     PipetteChannelType,
     PipetteModelType,
     PipetteVersionType,
-    UnsupportedNumberOfChannels,
 )
 
 
 @pytest.mark.parametrize(
     argnames=["model", "expected_enum"],
-    argvalues=[["p50", PipetteModelType.P50], ["p1000", PipetteModelType.P1000]],
+    argvalues=[["p50", PipetteModelType.p50], ["p1000", PipetteModelType.p1000]],
 )
 def test_model_enum(model: str, expected_enum: PipetteModelType) -> None:
-    assert expected_enum == PipetteModelType.convert_from_model(model)
+    assert expected_enum == PipetteModelType(model)
 
 
 @pytest.mark.parametrize(argnames="channels", argvalues=[1, 8, 96])
 def test_channel_enum(channels: int) -> None:
-    channel_type = PipetteChannelType.convert_from_channels(channels)
+    channel_type = PipetteChannelType(channels)
     assert channels == channel_type.as_int
 
 
 def test_incorrect_values() -> None:
-    with pytest.raises(KeyError):
-        PipetteModelType.convert_from_model("p100")
+    with pytest.raises(ValueError):
+        PipetteModelType("p100")
 
-    with pytest.raises(UnsupportedNumberOfChannels):
-        PipetteChannelType.convert_from_channels(99)
+    with pytest.raises(ValueError):
+        PipetteChannelType(99)
 
 
 @pytest.mark.parametrize(
@@ -35,7 +34,5 @@ def test_incorrect_values() -> None:
 )
 def test_version_enum(version: float, major: int, minor: int) -> None:
     version_type = PipetteVersionType.convert_from_float(version)
-    conversion_test = round(version % 1, 2)
-    print(conversion_test)
     assert version_type.major == major
     assert version_type.minor == minor

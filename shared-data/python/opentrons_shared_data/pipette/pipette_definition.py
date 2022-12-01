@@ -1,6 +1,50 @@
-from typing import List, Dict, Tuple
+from typing_extensions import Literal
+from typing import List, Dict, Tuple, cast
 from pydantic import BaseModel, Field, validator
-from .types import PipetteModelType, PipetteTipType, PipetteChannelType
+from enum import Enum
+from dataclasses import dataclass
+
+PLUNGER_CURRENT_MINIMUM = 0.1
+PLUNGER_CURRENT_MAXIMUM = 1.5
+
+
+PipetteModelMajorVersion = Literal[1]
+PipetteModelMinorVersion = Literal[0, 1, 2, 3]
+
+
+class PipetteTipType(Enum):
+    t50 = "t50"
+    t200 = "t200"
+    t1000 = "t1000"
+
+
+class PipetteChannelType(Enum):
+    SINGLE_CHANNEL = 1
+    EIGHT_CHANNEL = 8
+    NINETY_SIX_CHANNEL = 96
+
+    @property
+    def as_int(self) -> int:
+        return self.value
+
+
+class PipetteModelType(Enum):
+    p50 = "p50"
+    p1000 = "p1000"
+
+
+@dataclass(frozen=True)
+class PipetteVersionType:
+    major: PipetteModelMajorVersion
+    minor: PipetteModelMinorVersion
+
+    @classmethod
+    def convert_from_float(cls, version: float) -> "PipetteVersionType":
+        major = cast(PipetteModelMajorVersion, int(version // 1))
+        minor = cast(
+            PipetteModelMinorVersion, int(round((version % 1), 2) * 10)
+        )
+        return cls(major=major, minor=minor)
 
 
 class SupportedTipsDefinition(BaseModel):
@@ -134,11 +178,11 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
 
     @validator("pipette_type", pre=True)
     def convert_pipette_model_string(cls, v: str) -> PipetteModelType:
-        return PipetteModelType.convert_from_model(v)
+        return PipetteModelType(v)
 
     @validator("channels", pre=True)
     def convert_channels(cls, v: int) -> PipetteChannelType:
-        return PipetteChannelType.convert_from_channels(v)
+        return PipetteChannelType(v)
 
 
 class PipetteGeometryDefinition(BaseModel):

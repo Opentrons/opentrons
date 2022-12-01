@@ -1,7 +1,9 @@
 import pytest
 
-from opentrons_shared_data.pipette.types import PipetteTipType
-from opentrons_shared_data.pipette.pipette_definition import SupportedTipsDefinition
+from opentrons_shared_data.pipette.pipette_definition import (
+    SupportedTipsDefinition,
+    PipetteTipType,
+)
 from opentrons.config.ot3_pipette_config import load_ot3_pipette
 
 

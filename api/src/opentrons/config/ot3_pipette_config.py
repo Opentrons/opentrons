@@ -1,8 +1,9 @@
-from opentrons_shared_data.pipette import load_data, pipette_definition
-from opentrons_shared_data.pipette.types import (
+from opentrons_shared_data.pipette import load_data
+from opentrons_shared_data.pipette.pipette_definition import (
     PipetteChannelType,
     PipetteModelType,
     PipetteVersionType,
+    PipetteConfigurations,
 )
 
 DEFAULT_CALIBRATION_OFFSET = [0.0, 0.0, 0.0]
@@ -10,9 +11,9 @@ DEFAULT_CALIBRATION_OFFSET = [0.0, 0.0, 0.0]
 
 def load_ot3_pipette(
     pipette_model: str, number_of_channels: int, version: float
-) -> pipette_definition.PipetteConfigurations:
-    requested_model = PipetteModelType.convert_from_model(pipette_model)
-    requested_channels = PipetteChannelType.convert_from_channels(number_of_channels)
+) -> PipetteConfigurations:
+    requested_model = PipetteModelType(pipette_model)
+    requested_channels = PipetteChannelType(number_of_channels)
     requested_version = PipetteVersionType.convert_from_float(version)
 
     return load_data.load_definition(

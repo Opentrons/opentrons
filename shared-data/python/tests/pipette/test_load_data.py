@@ -1,14 +1,20 @@
 import json
-from opentrons_shared_data.pipette import load_data, types
+from opentrons_shared_data.pipette import load_data
+from opentrons_shared_data.pipette.pipette_definition import (
+    PipetteChannelType,
+    PipetteModelType,
+    PipetteVersionType,
+    PipetteTipType,
+)
 
 from opentrons_shared_data import load_shared_data
 
 
 def test_load_pipette_definition() -> None:
     pipette_config = load_data.load_definition(
-        types.PipetteModelType.P50,
-        types.PipetteChannelType.SINGLE_CHANNEL,
-        types.PipetteVersionType(major=1, minor=0),
+        PipetteModelType.p50,
+        PipetteChannelType.SINGLE_CHANNEL,
+        PipetteVersionType(major=1, minor=0),
     )
     liquid = json.loads(
         load_shared_data("pipette/definitions/2/liquid/single_channel/p50/1_0.json")
@@ -25,8 +31,6 @@ def test_load_pipette_definition() -> None:
     assert pipette_config.nozzle_offset == geometry["nozzleOffset"]
 
     assert (
-        pipette_config.supported_tips[
-            types.PipetteTipType.t50
-        ].default_aspirate_flowrate
+        pipette_config.supported_tips[PipetteTipType.t50].default_aspirate_flowrate
         == liquid["supportedTips"]["t50"]["defaultAspirateFlowRate"]
     )

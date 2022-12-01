@@ -1,58 +1,76 @@
 import json
-import os
 
 from typing import Dict, Any
+from typing_extensions import Literal
 from functools import lru_cache
 
 from .. import load_shared_data, get_shared_data_root
 
-from . import types
-from .pipette_definition import PipetteConfigurations
+from .pipette_definition import (
+    PipetteConfigurations,
+    PipetteChannelType,
+    PipetteVersionType,
+    PipetteModelType,
+)
 
 
-LoadedConfiguration = Dict[types.PipetteChannelType, Dict[types.PipetteModelType, Any]]
+LoadedConfiguration = Dict[PipetteChannelType, Dict[PipetteModelType, Any]]
 
 
-def _build_configuration_dictionary(
-    rel_path: str, version: types.PipetteVersionType
+def _get_configuration_dictionary(
+    config_type: Literal["general", "geometry", "liquid"],
+    channels: PipetteChannelType,
+    max_volume: PipetteModelType,
+    version: PipetteVersionType,
 ) -> LoadedConfiguration:
-    _dict: LoadedConfiguration = {}
-    for pipette_type in types.PipetteChannelType:
-        pipette_type_path = get_shared_data_root() / rel_path / pipette_type.value
-        _dict[pipette_type] = {}
-        for dir_name in os.scandir(pipette_type_path):
-            model_key = types.PipetteModelType.convert_from_model(dir_name.name)
-            _dict[pipette_type][model_key] = json.loads(
-                load_shared_data(
-                    f"{pipette_type_path}/{dir_name.name}/{version.major}_{version.minor}.json"
-                )
-            )
-    return _dict
+    config_path = (
+        get_shared_data_root()
+        / "pipette"
+        / "definitions"
+        / "2"
+        / config_type
+        / channels.name.lower()
+        / max_volume.value
+        / f"{version.major}_{version.minor}.json"
+    )
+    return json.loads(load_shared_data(config_path))
 
 
 @lru_cache(maxsize=None)
-def _geometry(version: types.PipetteVersionType) -> LoadedConfiguration:
-    return _build_configuration_dictionary("pipette/definitions/2/geometry", version)
+def _geometry(
+    channels: PipetteChannelType,
+    max_volume: PipetteModelType,
+    version: PipetteVersionType,
+) -> LoadedConfiguration:
+    return _get_configuration_dictionary("geometry", channels, max_volume, version)
 
 
 @lru_cache(maxsize=None)
-def _liquid(version: types.PipetteVersionType) -> LoadedConfiguration:
-    return _build_configuration_dictionary("pipette/definitions/2/liquid", version)
+def _liquid(
+    channels: PipetteChannelType,
+    max_volume: PipetteModelType,
+    version: PipetteVersionType,
+) -> LoadedConfiguration:
+    return _get_configuration_dictionary("liquid", channels, max_volume, version)
 
 
 @lru_cache(maxsize=None)
-def _physical(version: types.PipetteVersionType) -> LoadedConfiguration:
-    return _build_configuration_dictionary("pipette/definitions/2/general", version)
+def _physical(
+    channels: PipetteChannelType,
+    max_volume: PipetteModelType,
+    version: PipetteVersionType,
+) -> LoadedConfiguration:
+    return _get_configuration_dictionary("general", channels, max_volume, version)
 
 
 def load_definition(
-    max_volume: types.PipetteModelType,
-    channels: types.PipetteChannelType,
-    version: types.PipetteVersionType,
+    max_volume: PipetteModelType,
+    channels: PipetteChannelType,
+    version: PipetteVersionType,
 ) -> PipetteConfigurations:
-    geometry_dict = _geometry(version)[channels][max_volume]
-    physical_dict = _physical(version)[channels][max_volume]
-    liquid_dict = _liquid(version)[channels][max_volume]
+    geometry_dict = _geometry(channels, max_volume, version)
+    physical_dict = _physical(channels, max_volume, version)
+    liquid_dict = _liquid(channels, max_volume, version)
 
     return PipetteConfigurations.parse_obj(
         {**geometry_dict, **physical_dict, **liquid_dict}
