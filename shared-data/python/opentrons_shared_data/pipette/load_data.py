@@ -24,7 +24,7 @@ def _build_configuration_dictionary(
             model_key = types.PipetteModelType.convert_from_model(dir_name.name)
             _dict[pipette_type][model_key] = json.loads(
                 load_shared_data(
-                    f"{pipette_type_path}/{dir_name.name}/{version.major}.json"
+                    f"{pipette_type_path}/{dir_name.name}/{version.major}_{version.minor}.json"
                 )
             )
     return _dict
