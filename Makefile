@@ -85,11 +85,9 @@ setup-py:
 	$(MAKE) $(PYTHON_SETUP_TARGETS)
 
 # uninstall all project dependencies
-# tear down JS after Python, because Python cleanup depends on JS dep shx
+# does not remove the python or js globals
 .PHONY: teardown
-teardown:
-	$(MAKE) teardown-py
-	$(MAKE) teardown-js
+teardown: teardown-py teardown-js
 
 .PHONY: teardown-js
 teardown-js: clean-js
