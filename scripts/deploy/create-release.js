@@ -8,49 +8,22 @@
 // tag should be the tag for which the release should be created
 // --deploy should be specified to actually create the release; if not specified, the script
 //          will print what it would do but not do it
-//
+// --allow-old allows the use of a tag that does not point to one of the last 100 commits. We
+//             only check the last 100 commits for the recent tag to not bog everything down,
+//             so normally if you try to make a release for a really old commit the check that
+//             prevents you from getting a conventional-changelog for the wrong thing will
+//             false-positive. Set this flag to not do that check.
 // The release will be created as a prerelease if this is a prerelease tag.
 // It will always be created as a draft so that humans can review it before it goes live.
 //
 // The changelog content will be in the body of the release.
 
-const assert = require('assert')
 const parseArgs = require('./lib/parseArgs')
 const conventionalChangelog = require('conventional-changelog')
 const git = require('simple-git')
 const semver = require('semver')
 const ALLOWED_VERSION_TYPES = ['alpha', 'beta', 'candidate', 'production']
-const USAGE = '\nUsage:\n node ./scripts/deploy/create-release <token> <tag> [--deploy]'
-
-const COMMON_CONTEXTS = {
-  host: 'https://github.com',
-  owner: 'Opentrons',
-  repository: 'opentrons',
-  linkReferences: true
-}
-
-const CONTEXTS_FOR_PROJECT = {
-  'protocol-designer': {
-    title: 'Opentrons Protocol Designer',
-    ...COMMON_CONTEXTS
-  },
-  'labware-library': {
-    title: 'Opentrons Labware Library',
-    ...COMMON_CONTEXTS
-  },
-  'docs': {
-    title: 'Opentrons Python Protocol API Documentation',
-    ...COMMON_CONTEXTS
-  },
-  'robot-stack': {
-    title: 'Opentrons App and Robot Software',
-    ...COMMON_CONTEXTS
-  },
-  'test': {
-    title: 'A test project for release flows',
-    ...COMMON_CONTEXTS
-  }
-}
+const USAGE = '\nUsage:\n node ./scripts/deploy/create-release <token> <tag> [--deploy] [--allow-old]'
 
 const detailsFromTag = (tag) => tag.includes('@') ? tag.split('@') : ['robot-stack', tag.substring(1)]
 function tagFromDetails(project, version) {
@@ -67,7 +40,7 @@ function prefixForProject(project) {
     return project + '@'
   }
 }
-const tagIsForProject = (tag, project) => detailsFromTag(tag)[0] === project
+
 const releaseKind = version => (semver.prerelease(version)?.at(0) ?? 'production').split('-')[0]
 const releasePriorityGEQ = (kindA, kindB) => ALLOWED_VERSION_TYPES.indexOf(kindA) >= ALLOWED_VERSION_TYPES.indexOf(kindB)
 
@@ -100,6 +73,17 @@ async function main() {
   }
 
   const dryrun = !flags.includes('--deploy')
+  const allowOld = flags.includes('--allow-old')
+
+  if (!allowOld) {
+    const last100 = await git().log({from: 'HEAD~100', to: 'HEAD'})
+    if (!last100.all.some(commit => commit.refs.includes('tag: ' + tag))) {
+      throw new Error(
+        `Cannot find tag ${tag} in last 100 commits. You must run this script from a ref with ` +
+        `the tag in its history to correctly generate a changelog. If your tag is very old but ` +
+        `is definitely in whatever branch is checked out, use --allow-old.`)
+    }
+  }
 
   const [project, currentVersion] = detailsFromTag(tag)
 
@@ -114,18 +98,30 @@ async function main() {
   const previousVersion = versionPrevious(currentVersion, sortedVersions)
   const previousTag = tagFromDetails(project, previousVersion)
 
-
   const changelogStream = conventionalChangelog(
     {preset: 'angular', tagPrefix: prefixForProject(project)},
-    {gitSemverTags: allTags, version: currentVersion, currentTag: tag, previousTag: previousTag, ...CONTEXTS_FOR_PROJECT[project]},
+    {gitSemverTags: allTags,
+     version: currentVersion,
+     currentTag: tag,
+     previousTag: previousTag,
+     host: 'https://github.com',
+     owner: 'Opentrons',
+     repository: 'opentrons',
+     linkReferences: true
+    },
     {from: previousTag}
   )
+  const chunks = []
   for await (const chunk of changelogStream) {
-    console.log('chunk', chunk.toString())
+    chunks.push(chunk.toString())
   }
+  // For some reason, later chunks include the contents of earlier chunks so we need to
+  // accumulate chunks in reverse and drop earlier chunks that are included in later ones
+  const changelog = chunks.reverse().reduce(
+    (accum, chunk) => accum.includes(chunk.trim()) ? accum : chunk + accum, '')
+  console.log(changelog)
 }
 
-// i will do anything to use await instead of promise chaining, except apparently set up babel
 (async () => {
   try {
     await main()
