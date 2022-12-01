@@ -241,16 +241,19 @@ async def robot_model(
 
 
 @pytest.fixture
-def deck_definition(robot_model: RobotModel) -> DeckDefinitionV3:
+def deck_definition_name(robot_model: RobotModel) -> DeckDefinitionName:
     if robot_model == "OT-3 Standard":
-        return load_deck(
-            DeckDefinitionName.OT3_STANDARD,
-            DEFAULT_DECK_DEFINITION_VERSION,
-        )
-    else:
-        return load_deck(
-            DeckDefinitionName.OT2_STANDARD, DEFAULT_DECK_DEFINITION_VERSION
-        )
+        return DeckDefinitionName.OT3_STANDARD
+    elif robot_model == "OT-2 Standard":
+        # There are two OT-2 deck definitions (standard and short-trash),
+        # but RobotModel does not draw such a distinction. We assume here that it's
+        # sufficient to run OT-2 tests with the standard deck definition only.
+        return DeckDefinitionName.OT2_STANDARD
+
+
+@pytest.fixture
+def deck_definition(deck_definition_name: DeckDefinitionName) -> DeckDefinitionV3:
+    return load_deck(deck_definition_name, DEFAULT_DECK_DEFINITION_VERSION)
 
 
 @pytest.fixture()
@@ -274,14 +277,13 @@ async def hardware(
 
 
 @pytest.fixture()
-def ctx(hardware: ThreadManagedHardware) -> Generator[ProtocolContext, None, None]:
+def ctx(
+    hardware: ThreadManagedHardware, deck_definition_name: DeckDefinitionName
+) -> Generator[ProtocolContext, None, None]:
     c = create_protocol_context(
         api_version=MAX_SUPPORTED_VERSION,
         hardware_api=hardware,
-        # TODO(mm, 2022-12-01): Parametrizing `hardware_api` but getting the deck type
-        # from global config seems wrong. Do they need to be kept in sync so the
-        # robot type matches?
-        deck_type=guess_deck_type_from_global_config(),
+        deck_type=deck_definition_name,
     )
     yield c
     # Manually clean up all the modules.
