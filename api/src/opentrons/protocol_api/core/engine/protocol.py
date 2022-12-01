@@ -273,7 +273,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def home(self) -> None:
         """Move all axes to their home positions."""
-        raise NotImplementedError("ProtocolCore.home not implemented")
+        self._engine_client.home(axes=None)
 
     def get_deck(self) -> Deck:
         """Get an interface to get and modify the deck layout."""

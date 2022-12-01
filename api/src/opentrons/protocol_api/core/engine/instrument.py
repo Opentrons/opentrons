@@ -267,10 +267,13 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
     def home(self) -> None:
-        raise NotImplementedError("InstrumentCore.home not implemented")
+        z_axis = self._engine_client.state.pipettes.get_z_axis("abc123")
+        plunger_axis = self._engine_client.state.pipettes.get_plunger_axis("abc123")
+        self._engine_client.home([z_axis, plunger_axis])
 
     def home_plunger(self) -> None:
-        raise NotImplementedError("InstrumentCore.home_plunger not implemented")
+        plunger_axis = self._engine_client.state.pipettes.get_plunger_axis("abc123")
+        self._engine_client.home([plunger_axis])
 
     def move_to(
         self,

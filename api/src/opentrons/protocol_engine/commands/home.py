@@ -1,7 +1,7 @@
 """Home command payload, result, and implementation models."""
 from __future__ import annotations
 from pydantic import BaseModel, Field
-from typing import TYPE_CHECKING, Optional, Sequence, Type
+from typing import TYPE_CHECKING, Optional, List, Type
 from typing_extensions import Literal
 
 from ..types import MotorAxis
@@ -17,7 +17,7 @@ HomeCommandType = Literal["home"]
 class HomeParams(BaseModel):
     """Payload required for a Home command."""
 
-    axes: Optional[Sequence[MotorAxis]] = Field(
+    axes: Optional[List[MotorAxis]] = Field(
         None,
         description=(
             "Axes to return to their home positions. If omitted,"
