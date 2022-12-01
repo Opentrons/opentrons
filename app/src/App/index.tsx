@@ -30,6 +30,7 @@ import { ConnectedNetworkInfo } from '../pages/OnDeviceDisplay/ConnectedNetworkI
 import { SelectWifiNetwork } from '../pages/OnDeviceDisplay/SelectWifiNetwork'
 import { SetWifiCred } from '../pages/OnDeviceDisplay/SetWifiCred'
 import { NetworkSetupMenu } from '../pages/OnDeviceDisplay/NetworkSetupMenu'
+import { ConnectViaEthernet } from '../pages/OnDeviceDisplay/ConnectViaEthernet'
 import { getIsOnDevice } from '../redux/config'
 import { getLocalRobot } from '../redux/discovery'
 import { useSoftwareUpdatePoll } from './hooks'
@@ -137,6 +138,12 @@ export const AppComponent = (): JSX.Element => {
       exact: true,
       name: 'Network setup menu',
       path: '/network-setup-menu',
+    },
+    {
+      Component: ConnectViaEthernet,
+      exact: true,
+      name: 'Connect via Ethernet',
+      path: '/connect-via-ethernet',
     },
   ]
 

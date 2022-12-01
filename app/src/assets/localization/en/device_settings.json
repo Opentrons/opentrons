@@ -160,12 +160,17 @@
   "failed_to_connect_to_ssid": "Failed to connect to {{ssid}}",
   "ip_address": "IP Address",
   "subnet_mask": "Subnet Mask",
-  "mac_address": "Mac Address",
+  "mac_address": "MAC Address",
   "connecting": "Connecting...",
   "lets_connect_to_a_network": "Let’s connect to a network",
   "choose_your_connection_type": "Choose your connection type from the options below.",
   "connection_description": "Find a network in your lab or enter your own.",
   "connect_via": "Connect via {{type}}",
   "ethernet": "Ethernet",
-  "usb": "USB"
+  "usb": "USB",
+  "connection_status": "Connection status:",
+  "connected": "connected",
+  "no_network_found": "No network found",
+  "no_network_found_description": "Connect an Ethernet cable to the back of the robot to display network connection.",
+  "next_step": "Next step"
 }
