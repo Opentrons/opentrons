@@ -233,7 +233,8 @@ const toVersion11 = (prevConfig: ConfigV10): ConfigV11 => {
   const nextConfig = {
     ...prevConfig,
     version: 11 as const,
-    protocolsSortKey: {
+    protocols: {
+      ...prevConfig.protocols,
       protocolsStoredSortKey: null,
     },
   }

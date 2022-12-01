@@ -160,5 +160,8 @@ export const MOCK_CONFIG_V10: ConfigV10 = {
 export const MOCK_CONFIG_V11: ConfigV11 = {
   ...MOCK_CONFIG_V10,
   version: 11,
-  protocolsSortKey: { protocolsStoredSortKey: null },
+  protocols: {
+    ...MOCK_CONFIG_V10.protocols,
+    protocolsStoredSortKey: null,
+  },
 }

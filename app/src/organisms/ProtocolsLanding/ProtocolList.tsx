@@ -53,11 +53,8 @@ interface ProtocolListProps {
   storedProtocols: StoredProtocolData[]
 }
 export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
-  const protocolsStoredSortKey = useSelector(getProtocolsStoredSortKey)
   const [showSlideout, setShowSlideout] = React.useState<boolean>(false)
-  const [sortBy, setSortBy] = React.useState<ProtocolSort>(
-    protocolsStoredSortKey ?? 'alphabetical'
-  )
+  const sortBy = useSelector(getProtocolsStoredSortKey) ?? 'alphabetical'
   const [showSortByMenu, setShowSortByMenu] = React.useState<boolean>(false)
   const toggleSetShowSortByMenu = (): void => setShowSortByMenu(!showSortByMenu)
   const { t } = useTranslation('protocol_info')
@@ -77,7 +74,6 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
   }
 
   const handleProtocolsSortKey = (sortKey: ProtocolSort): void => {
-    setSortBy(sortKey)
     dispatch(
       updateConfigValue('protocolsSortKey.protocolsStoredSortKey', sortKey)
     )
