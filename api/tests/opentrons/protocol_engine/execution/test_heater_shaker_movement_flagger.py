@@ -1,18 +1,60 @@
 """Tests for heater_shaker_movement_flagger."""
 
-
-from contextlib import nullcontext as does_not_raise
-from typing import ContextManager, Any
-
 import pytest
+from contextlib import nullcontext as does_not_raise
+from typing import ContextManager, Any, NamedTuple
+from decoy import Decoy
 
-from opentrons.protocol_engine.types import HeaterShakerMovementRestrictors
+from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
+from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control.modules.heater_shaker import (
+    HeaterShaker as HardwareHeaterShaker,
+)
+
+from opentrons.protocol_engine.types import (
+    HeaterShakerMovementRestrictors,
+    ModuleLocation,
+    DeckSlotLocation,
+)
 from opentrons.protocol_engine.errors import (
     PipetteMovementRestrictedByHeaterShakerError,
+    HeaterShakerLabwareLatchNotOpenError,
+    WrongModuleTypeError,
 )
 from opentrons.protocol_engine.execution.heater_shaker_movement_flagger import (
     raise_if_movement_restricted,
+    HeaterShakerMovementFlagger,
 )
+from opentrons.protocol_engine.state import StateStore
+from opentrons.protocol_engine.state.module_substates.heater_shaker_module_substate import (
+    HeaterShakerModuleId,
+    HeaterShakerModuleSubState,
+)
+from opentrons.types import DeckSlotName
+
+
+@pytest.fixture
+def hardware_api(decoy: Decoy) -> HardwareAPI:
+    """Get a mock in the shape of a HardwareAPI."""
+    return decoy.mock(cls=HardwareAPI)
+
+
+@pytest.fixture
+def state_store(decoy: Decoy) -> StateStore:
+    """Get a mock in the shape of a StateStore."""
+    return decoy.mock(cls=StateStore)
+
+
+@pytest.fixture
+def subject(
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+) -> HeaterShakerMovementFlagger:
+    """Return a h/s movement flagger initialized with mocked-out dependencies."""
+    return HeaterShakerMovementFlagger(
+        state_store=state_store,
+        hardware_api=hardware_api,
+    )
 
 
 @pytest.mark.parametrize(
@@ -199,3 +241,181 @@ async def test_does_not_raise_when_idle_and_latch_closed(
             is_multi_channel=False,
             destination_is_tip_rack=False,
         )
+
+
+async def test_raises_depending_on_heater_shaker_substate_latch_status(
+    subject: HeaterShakerMovementFlagger,
+    state_store: StateStore,
+    decoy: Decoy,
+) -> None:
+    """It should flag movement depending on engine's h/s state."""
+    decoy.when(
+        state_store.modules.get_heater_shaker_module_substate(module_id="module-id")
+    ).then_return(
+        HeaterShakerModuleSubState(
+            module_id=HeaterShakerModuleId("module-id"),
+            is_labware_latch_closed=True,
+            is_plate_shaking=False,
+            plate_target_temperature=None,
+        )
+    )
+
+    with pytest.raises(HeaterShakerLabwareLatchNotOpenError):
+        await subject.raise_if_labware_latched_on_heater_shaker(
+            labware_parent=ModuleLocation(moduleId="module-id")
+        )
+
+
+class LatchStatusAndRaiseSpec(NamedTuple):
+    """Test parametrization data.
+
+    A H/S labware latch status, and what we expect the subject to raise when a h/s
+    has that latch status.
+    """
+
+    latch_status: HeaterShakerLabwareLatchStatus
+    expected_raise_cm: ContextManager[Any]
+
+
+@pytest.mark.parametrize(
+    LatchStatusAndRaiseSpec._fields,
+    [
+        LatchStatusAndRaiseSpec(
+            latch_status=HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN,
+            expected_raise_cm=pytest.raises(HeaterShakerLabwareLatchNotOpenError),
+        ),
+        LatchStatusAndRaiseSpec(
+            latch_status=HeaterShakerLabwareLatchStatus.IDLE_CLOSED,
+            expected_raise_cm=pytest.raises(HeaterShakerLabwareLatchNotOpenError),
+        ),
+        LatchStatusAndRaiseSpec(
+            latch_status=HeaterShakerLabwareLatchStatus.CLOSING,
+            expected_raise_cm=pytest.raises(HeaterShakerLabwareLatchNotOpenError),
+        ),
+        LatchStatusAndRaiseSpec(
+            latch_status=HeaterShakerLabwareLatchStatus.OPENING,
+            expected_raise_cm=pytest.raises(HeaterShakerLabwareLatchNotOpenError),
+        ),
+        LatchStatusAndRaiseSpec(
+            latch_status=HeaterShakerLabwareLatchStatus.UNKNOWN,
+            expected_raise_cm=pytest.raises(HeaterShakerLabwareLatchNotOpenError),
+        ),
+        LatchStatusAndRaiseSpec(
+            latch_status=HeaterShakerLabwareLatchStatus.IDLE_OPEN,
+            expected_raise_cm=does_not_raise(),
+        ),
+    ],
+)
+async def test_raises_depending_on_heater_shaker_latch_status(
+    decoy: Decoy,
+    latch_status: HeaterShakerLabwareLatchStatus,
+    expected_raise_cm: ContextManager[Any],
+    subject: HeaterShakerMovementFlagger,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+) -> None:
+    """When on a H/S, it should raise if the latch isn't open."""
+    decoy.when(
+        state_store.modules.get_heater_shaker_module_substate(module_id="module-id")
+    ).then_return(
+        HeaterShakerModuleSubState(
+            module_id=HeaterShakerModuleId("module-id"),
+            is_labware_latch_closed=False,
+            is_plate_shaking=False,
+            plate_target_temperature=None,
+        )
+    )
+
+    decoy.when(state_store.config.use_virtual_modules).then_return(False)
+    decoy.when(
+        state_store.modules.get_serial_number(module_id="module-id")
+    ).then_return("module-serial")
+
+    heater_shaker = decoy.mock(cls=HardwareHeaterShaker)
+    decoy.when(hardware_api.attached_modules).then_return([heater_shaker])
+    decoy.when(heater_shaker.device_info).then_return({"serial": "module-serial"})
+    decoy.when(heater_shaker.labware_latch_status).then_return(latch_status)
+
+    with expected_raise_cm:
+        await subject.raise_if_labware_latched_on_heater_shaker(
+            labware_parent=ModuleLocation(moduleId="module-id"),
+        )
+
+
+async def test_raises_if_hardware_module_has_gone_missing(
+    subject: HeaterShakerMovementFlagger,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    decoy: Decoy,
+) -> None:
+    """It should raise if the hardware module can't be found by its serial no."""
+    decoy.when(
+        state_store.modules.get_heater_shaker_module_substate(module_id="module-id")
+    ).then_return(
+        HeaterShakerModuleSubState(
+            module_id=HeaterShakerModuleId("module-id"),
+            is_labware_latch_closed=False,
+            is_plate_shaking=False,
+            plate_target_temperature=None,
+        ),
+    )
+
+    decoy.when(state_store.config.use_virtual_modules).then_return(False)
+    decoy.when(
+        state_store.modules.get_serial_number(module_id="module-id")
+    ).then_return("module-serial")
+    decoy.when(hardware_api.attached_modules).then_return([])
+
+    with pytest.raises(HeaterShakerLabwareLatchNotOpenError):
+        await subject.raise_if_labware_latched_on_heater_shaker(
+            labware_parent=ModuleLocation(moduleId="module-id"),
+        )
+
+
+async def test_passes_if_virtual_module_latch_open(
+    subject: HeaterShakerMovementFlagger,
+    state_store: StateStore,
+    decoy: Decoy,
+) -> None:
+    """It shouldn't raise if a virtual module in analysis has latch open."""
+    decoy.when(
+        state_store.modules.get_heater_shaker_module_substate(module_id="module-id")
+    ).then_return(
+        HeaterShakerModuleSubState(
+            module_id=HeaterShakerModuleId("module-id"),
+            is_labware_latch_closed=False,
+            is_plate_shaking=False,
+            plate_target_temperature=None,
+        ),
+    )
+    decoy.when(state_store.config.use_virtual_modules).then_return(True)
+    await subject.raise_if_labware_latched_on_heater_shaker(
+        labware_parent=ModuleLocation(moduleId="module-id")
+    )
+
+
+async def test_passes_if_labware_on_non_heater_shaker_module(
+    subject: HeaterShakerMovementFlagger,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    decoy: Decoy,
+) -> None:
+    """It shouldn't raise if the labware is on a module other than a Heater-Shaker."""
+    decoy.when(
+        state_store.modules.get_heater_shaker_module_substate(module_id="module-id")
+    ).then_raise(WrongModuleTypeError("Woops"))
+    await subject.raise_if_labware_latched_on_heater_shaker(
+        ModuleLocation(moduleId="module-id")
+    )
+
+
+async def test_passes_if_labware_not_on_any_module(
+    subject: HeaterShakerMovementFlagger,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    decoy: Decoy,
+) -> None:
+    """It shouldn't raise if the labware isn't on a module."""
+    await subject.raise_if_labware_latched_on_heater_shaker(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+    )

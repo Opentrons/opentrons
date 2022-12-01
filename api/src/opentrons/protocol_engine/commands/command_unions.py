@@ -28,6 +28,7 @@ from .aspirate import (
 from .custom import (
     Custom,
     CustomParams,
+    CustomCreate,
     CustomResult,
     CustomCommandType,
 )
@@ -320,6 +321,7 @@ CommandType = Union[
 
 CommandCreate = Union[
     AspirateCreate,
+    CustomCreate,
     DispenseCreate,
     DispenseInPlaceCreate,
     BlowOutCreate,

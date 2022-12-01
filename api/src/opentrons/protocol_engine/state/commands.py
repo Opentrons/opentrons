@@ -147,6 +147,12 @@ class CommandState:
     are stored on the individual commands themselves.
     """
 
+    latest_command_hash: Optional[str]
+    """The latest hash value received in a QueueCommandAction.
+
+    This value can be used to generate future hashes.
+    """
+
 
 class CommandStore(HasState[CommandState], HandlesActions):
     """Command state container."""
@@ -173,6 +179,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             errors_by_id={},
             run_completed_at=None,
             run_started_at=None,
+            latest_command_hash=None,
         )
 
     def handle_action(self, action: Action) -> None:  # noqa: C901
@@ -191,9 +198,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 key=(
                     action.request.key
                     if action.request.key is not None
-                    # TODO(mc, 2021-12-13): generate a command key from params and state
-                    # https://github.com/Opentrons/opentrons/issues/8986
-                    else action.command_id
+                    else (action.request_hash or action.command_id)
                 ),
                 createdAt=action.created_at,
                 params=action.request.params,  # type: ignore[arg-type]
@@ -212,6 +217,9 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 self._state.queued_setup_command_ids.add(queued_command.id)
             else:
                 self._state.queued_command_ids.add(queued_command.id)
+
+            if action.request_hash is not None:
+                self._state.latest_command_hash = action.request_hash
 
         # TODO(mc, 2021-12-28): replace "UpdateCommandAction" with explicit
         # state change actions (e.g. RunCommandAction, SucceedCommandAction)
@@ -606,3 +614,7 @@ class CommandView(HasState[CommandState]):
                 return EngineStatus.PAUSED
 
         return EngineStatus.IDLE
+
+    def get_latest_command_hash(self) -> Optional[str]:
+        """Get the command hash of the last queued command, if any."""
+        return self._state.latest_command_hash

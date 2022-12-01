@@ -12,10 +12,10 @@ import { StyledText } from '../../atoms/text'
 
 interface Props {
   iconColor: string
-  children: React.ReactNode
   header: string
-  subHeader?: string
   isSuccess: boolean
+  children?: React.ReactNode
+  subHeader?: string
 }
 
 export function SimpleWizardBody(props: Props): JSX.Element {
@@ -52,7 +52,9 @@ export function SimpleWizardBody(props: Props): JSX.Element {
           >
             {subHeader}
           </StyledText>
-        ) : null}
+        ) : (
+          <Flex height="1.75rem" />
+        )}
       </Flex>
       <Flex
         paddingX={SPACING.spacing6}

@@ -426,6 +426,11 @@
                     "description": "If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the `minimumZHeight` param to be ignored. A 'direct' movement is in X/Y/Z simultaneously.",
                     "type": "boolean",
                     "default": false
+                  },
+                  "speed": {
+                    "description": "Override the travel speed in mm/s. This controls the straight linear speed of motion.",
+                    "type": "number",
+                    "minimum": 0
                   }
                 }
               }
@@ -1023,6 +1028,11 @@
                     "description": "If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the `minimumZHeight` param to be ignored. A 'direct' movement is in X/Y/Z simultaneously.",
                     "type": "boolean",
                     "default": false
+                  },
+                  "speed": {
+                    "description": "Override the travel speed in mm/s. This controls the straight linear speed of motion.",
+                    "type": "number",
+                    "minimum": 0
                   }
                 }
               }

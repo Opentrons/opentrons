@@ -38,6 +38,7 @@ def test_id_get_added_to_dict(fake_offset):
     assert gripr.as_dict()["gripper_id"] == "fakeid123"
 
 
+@pytest.mark.xfail
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "override,result_accessor",
@@ -49,8 +50,8 @@ def test_id_get_added_to_dict(fake_offset):
             lambda g: g._front_calibration_pin_offset,
         ),
         (
-            CriticalPoint.GRIPPER_BACK_CALIBRATION_PIN,
-            lambda g: g._back_calibration_pin_offset,
+            CriticalPoint.GRIPPER_REAR_CALIBRATION_PIN,
+            lambda g: g._rear_calibration_pin_offset,
         ),
     ],
 )

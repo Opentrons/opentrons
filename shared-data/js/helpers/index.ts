@@ -5,12 +5,12 @@ import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
 import standardDeckDefOt2 from '../../deck/definitions/3/ot2_standard.json'
 import standardDeckDefOt3 from '../../deck/definitions/3/ot3_standard.json'
 import type { DeckDefinition, LabwareDefinition2 } from '../types'
-import type { LoadedLabware, RobotName, ThermalAdapterName } from '..'
+import type { LoadedLabware, RobotType, ThermalAdapterName } from '..'
 
 export { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 export { getWellTotalVolume } from './getWellTotalVolume'
 export { wellIsRect } from './wellIsRect'
-export { schemaV6Adapter } from './schemaV6Adapter'
+export { schemaV6Adapter, LegacySchemaAdapterOutput } from './schemaV6Adapter'
 
 export * from './parseProtocolData'
 export * from './volume'
@@ -18,6 +18,7 @@ export * from './wellSets'
 export * from './getModuleVizDims'
 export * from './getVectorDifference'
 export * from './getVectorSum'
+export * from './getLoadedLabwareDefinitionsByUri'
 
 export const getLabwareDefIsStandard = (def: LabwareDefinition2): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE
@@ -305,18 +306,18 @@ export const getAdapterName = (labwareLoadname: string): ThermalAdapterName => {
   return adapterName
 }
 
-export const getRobotNameFromLoadedLabware = (
+export const getRobotTypeFromLoadedLabware = (
   labware: LoadedLabware[]
-): RobotName => {
+): RobotType => {
   const isProtocolForOT3 = labware.some(
     l => l.loadName === 'opentrons_1_trash_3200ml_fixed'
   )
   return isProtocolForOT3 ? 'OT-3 Standard' : 'OT-2 Standard'
 }
 
-export const getDeckDefFromRobotName = (
-  robotName: RobotName
+export const getDeckDefFromRobotType = (
+  robotType: RobotType
 ): DeckDefinition => {
   // @ts-expect-error imported JSON not playing nice with TS. see https://github.com/microsoft/TypeScript/issues/32063
-  return robotName === 'OT-3 Standard' ? standardDeckDefOt3 : standardDeckDefOt2
+  return robotType === 'OT-3 Standard' ? standardDeckDefOt3 : standardDeckDefOt2
 }

@@ -8,6 +8,8 @@ from typing import List, Optional, Dict, Tuple
 from opentrons_hardware.firmware_bindings.constants import SensorId
 from opentrons_hardware.sensors import sensor_driver, sensor_types
 
+from opentrons_shared_data.deck import load as load_deck
+
 from opentrons.config.robot_configs import build_config_ot3, load_ot3 as load_ot3_config
 from opentrons.hardware_control.backends.ot3utils import sensor_node_for_mount
 
@@ -16,7 +18,6 @@ from opentrons.hardware_control.backends.ot3utils import sensor_node_for_mount
 from opentrons.hardware_control.instruments.ot2.pipette import Pipette
 from opentrons.hardware_control.motion_utilities import deck_from_machine
 from opentrons.hardware_control.ot3api import OT3API
-from opentrons.types import PipetteNotAttachedError
 
 from .types import (
     GantryLoad,
@@ -26,6 +27,32 @@ from .types import (
     Point,
     CriticalPoint,
 )
+
+
+@dataclass
+class CalibrationSquare:
+    """Calibration Square."""
+
+    top_left_offset: Point
+    width: float
+    height: float
+    depth: float
+
+
+@dataclass
+class CalibrationProbe:
+    """Calibration Probe."""
+
+    length: float
+    diameter: float
+
+
+# values are from "Robot Extents" sheet
+CALIBRATION_SQUARE_OFFSET_EVT = Point(x=64, y=-43, z=-0.25)
+CALIBRATION_SQUARE_EVT = CalibrationSquare(
+    top_left_offset=CALIBRATION_SQUARE_OFFSET_EVT, width=20, height=20, depth=3
+)
+CALIBRATION_PROBE_EVT = CalibrationProbe(length=34.5, diameter=4.0)
 
 
 def stop_server_ot3() -> None:
@@ -291,7 +318,7 @@ async def move_plunger_absolute_ot3(
 ) -> None:
     """Move OT3 plunger position to an absolute position."""
     if not api.hardware_pipettes[mount.to_mount()]:
-        raise PipetteNotAttachedError(f"No pipette found on mount: {mount}")
+        raise RuntimeError(f"No pipette found on mount: {mount}")
     plunger_axis = OT3Axis.of_main_tool_actuator(mount)
     _move_coro = api._move(
         target_position={plunger_axis: position},  # type: ignore[arg-type]
@@ -323,6 +350,14 @@ async def move_plunger_relative_ot3(
     )
 
 
+async def move_gripper_jaw_relative_ot3(api: OT3API, delta: float) -> None:
+    """Move the gripper jaw by a relative distance."""
+    # FIXME: this should be in relative distances
+    #        but the api isn't setup for reporting current position yet
+    print("FIXME: Not using relative distances for gripper, using absolute...")
+    await api.hold_jaw_width(int(delta))
+
+
 def get_endstop_position_ot3(api: OT3API, mount: OT3Mount) -> Dict[OT3Axis, float]:
     """Get the endstop's position per mount."""
     transforms = api._transforms
@@ -338,6 +373,16 @@ def get_endstop_position_ot3(api: OT3API, mount: OT3Mount) -> Dict[OT3Axis, floa
     return {ax: val for ax, val in mount_pos_per_axis.items()}
 
 
+def get_gantry_homed_position_ot3(api: OT3API, mount: OT3Mount) -> Point:
+    """Get the homed coordinate by mount."""
+    axes_pos = get_endstop_position_ot3(api, mount)
+    return Point(
+        x=axes_pos[OT3Axis.X],
+        y=axes_pos[OT3Axis.Y],
+        z=axes_pos[OT3Axis.by_mount(mount)],
+    )
+
+
 class OT3JogTermination(Exception):
     """Jogging terminated."""
 
@@ -350,20 +395,24 @@ class OT3JogNoInput(Exception):
     pass
 
 
-def _jog_read_user_input(terminator: str) -> Tuple[str, float]:
+def _jog_read_user_input(terminator: str, home_key: str) -> Tuple[str, float, bool]:
     user_input = input(f'Jog eg: x-10.5 ("{terminator}" to stop): ')
     user_input = user_input.strip().replace(" ", "")
     if user_input == terminator:
         raise OT3JogTermination()
     if not user_input:
         raise OT3JogNoInput()
-    if len(user_input) < 2:
-        raise ValueError(f"Unexpected jog input: {user_input}")
+    if home_key in user_input:
+        user_input = user_input.replace(home_key, "")
+        do_home = True
+        distance = 0.0
+    else:
+        do_home = False
+        distance = float(user_input[1:])
     axis = user_input[0].upper()
     if axis not in "XYZPG":
         raise ValueError(f'Unexpected axis: "{axis}"')
-    distance = float(user_input[1:])
-    return axis, distance
+    return axis, distance, do_home
 
 
 async def _jog_axis_some_distance(
@@ -372,7 +421,7 @@ async def _jog_axis_some_distance(
     if not axis or distance == 0.0:
         return
     elif axis == "G":
-        raise RuntimeError("Gripper jogging not yet supported")
+        await move_gripper_jaw_relative_ot3(api, distance)
     elif axis == "P":
         await move_plunger_relative_ot3(api, mount, distance)
     else:
@@ -384,46 +433,73 @@ async def _jog_print_current_position(
     api: OT3API, mount: OT3Mount, critical_point: Optional[CriticalPoint] = None
 ) -> None:
     z_axis = OT3Axis.by_mount(mount)
-    plunger_axis = OT3Axis.of_main_tool_actuator(mount)
-    current_pos = await api.current_position_ot3(
+    instr_axis = OT3Axis.of_main_tool_actuator(mount)
+    motors_pos = await api.current_position_ot3(
         mount=mount, critical_point=critical_point
     )
-    x, y, z, p = [
-        current_pos.get(ax) for ax in [OT3Axis.X, OT3Axis.Y, z_axis, plunger_axis]
+    enc_pos = await api.encoder_current_position_ot3(
+        mount=mount, critical_point=critical_point
+    )
+    mx, my, mz, mp = [
+        round(motors_pos[ax], 2) for ax in [OT3Axis.X, OT3Axis.Y, z_axis, instr_axis]
     ]
-    print(f"Deck Coordinate: X={x}, Y={y}, Z={z}, P={p}")
+    ex, ey, ez, ep = [
+        round(enc_pos[ax], 2) for ax in [OT3Axis.X, OT3Axis.Y, z_axis, instr_axis]
+    ]
+    print(f"Deck Coordinate: X={mx}, Y={my}, Z={mz}, Instr={mp}")
+    print(f"Enc. Coordinate: X={ex}, Y={ey}, Z={ez}, Instr={ep}")
+
+
+async def _jog_do_print_then_input_then_move(
+    api: OT3API,
+    mount: OT3Mount,
+    critical_point: Optional[CriticalPoint],
+    axis: str,
+    distance: float,
+    do_home: bool,
+) -> Tuple[str, float, bool]:
+    try:
+        await _jog_print_current_position(api, mount, critical_point)
+        axis, distance, do_home = _jog_read_user_input(
+            terminator="stop", home_key="home"
+        )
+    except OT3JogNoInput:
+        print("No input, repeating previous jog")
+    if do_home:
+        str_to_axes = {
+            "X": OT3Axis.X,
+            "Y": OT3Axis.Y,
+            "Z": OT3Axis.by_mount(mount),
+            "P": OT3Axis.of_main_tool_actuator(mount),
+            "G": OT3Axis.G,
+            "Q": OT3Axis.Q,
+        }
+        await api.home([str_to_axes[axis]])
+    else:
+        await _jog_axis_some_distance(api, mount, axis, distance)
+    return axis, distance, do_home
 
 
 async def jog_mount_ot3(
     api: OT3API, mount: OT3Mount, critical_point: Optional[CriticalPoint] = None
 ) -> Dict[OT3Axis, float]:
     """Jog an OT3 mount's gantry XYZ and pipettes axes."""
-    axis = ""
-    distance = 0.0
+    axis: str = ""
+    distance: float = 0.0
+    do_home: bool = False
     while True:
-        current_pos = await api.current_position_ot3(
-            mount=mount, critical_point=critical_point
-        )
-        await _jog_print_current_position(api, mount, critical_point)
         try:
-            axis, distance = _jog_read_user_input("stop")
+            axis, distance, do_home = await _jog_do_print_then_input_then_move(
+                api, mount, critical_point, axis, distance, do_home
+            )
         except ValueError as e:
             print(e)
             continue
         except OT3JogTermination:
             print("Done jogging")
-            break
-        except OT3JogNoInput:
-            if axis and distance:
-                print(
-                    f"No input, repeating previous jog (axis={axis}, distance={distance})"
-                )
-            pass
-        try:
-            await _jog_axis_some_distance(api, mount, axis, distance)
-        except PipetteNotAttachedError as e:
-            print(e)
-    return current_pos
+            return await api.current_position_ot3(
+                mount=mount, critical_point=critical_point
+            )
 
 
 async def move_to_arched_ot3(
@@ -510,3 +586,48 @@ async def wait_for_stable_capacitance_ot3(
         await wait_for_stable_capacitance_ot3(
             api, mount, threshold_pf, duration, retries - 1
         )
+
+
+def get_pipette_offset_ot3(api: OT3API, mount: OT3Mount) -> Point:
+    """Get pipette offset OT3."""
+    pipette = api.hardware_pipettes[mount.to_mount()]
+    assert pipette, f"No pipette found on mount: {mount}"
+    return pipette._pipette_offset.offset + Point()
+
+
+def set_pipette_offset_ot3(api: OT3API, mount: OT3Mount, offset: Point) -> None:
+    """Set pipette offset OT3."""
+    pipette = api.hardware_pipettes[mount.to_mount()]
+    assert pipette, f"No pipette found on mount: {mount}"
+    pipette._pipette_offset.offset = offset
+
+
+def get_gripper_offset_ot3(api: OT3API) -> Point:
+    """Get gripper offset OT3."""
+    assert api.has_gripper, "No gripper found"
+    return api._gripper_handler._gripper._calibration_offset.offset  # type: ignore[union-attr]
+
+
+def set_gripper_offset_ot3(api: OT3API, offset: Point) -> None:
+    """Set gripper offset OT3."""
+    assert api.has_gripper, "No gripper found"
+    api._gripper_handler._gripper._calibration_offset.offset = offset  # type: ignore[union-attr]
+
+
+def get_slot_top_left_position_ot3(slot: int) -> Point:
+    """Get slot top-left position."""
+    deck = load_deck("ot3_standard", version=3)
+    slots = deck["locations"]["orderedSlots"]
+    s = slots[slot - 1]
+    assert s["id"] == str(slot)
+    bottom_left = Point(*s["position"])
+    s_height = s["boundingBox"]["yDimension"]
+    top_left = bottom_left + Point(y=float(s_height))
+    return top_left
+
+
+def get_slot_calibration_square_position_ot3(slot: int) -> Point:
+    """Get slot calibration block position."""
+    slot_top_left = get_slot_top_left_position_ot3(slot)
+    calib_sq_offset = CALIBRATION_SQUARE_EVT.top_left_offset
+    return slot_top_left + calib_sq_offset

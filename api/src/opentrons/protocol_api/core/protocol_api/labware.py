@@ -1,11 +1,10 @@
-from typing import List, Dict, Optional
+from typing import List, Optional
 
 from opentrons.calibration_storage import helpers
 from opentrons.protocols.geometry.labware_geometry import LabwareGeometry
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocols.api_support.tip_tracker import TipTracker
 
-from opentrons.protocols.api_support.well_grid import WellGrid
 from opentrons.types import Point, Location
 from opentrons_shared_data.labware.dev_types import LabwareParameters, LabwareDefinition
 
@@ -54,15 +53,34 @@ class LabwareImplementation(AbstractLabware[WellImplementation]):
         self._definition = definition
 
         self._geometry = LabwareGeometry(definition, parent)
-        # flatten list of list of well names.
-        self._ordering = [well for col in definition["ordering"] for well in col]
-        self._wells: List[WellImplementation] = []
-        self._well_name_grid = WellGrid(wells=self._wells)
-        self._tip_tracker = TipTracker(columns=self._well_name_grid.get_columns())
+        self._calibrated_offset = Point(
+            x=self._geometry.offset.x,
+            y=self._geometry.offset.y,
+            z=self._geometry.offset.z,
+        )
 
-        self._calibrated_offset = Point(0, 0, 0)
-        # Will cause building of the wells
-        self.set_calibration(self._calibrated_offset)
+        # flatten list of list of well names.
+        self._wells_by_name = {
+            well_name: WellImplementation(
+                well_geometry=WellGeometry(
+                    well_props=self._well_definition[well_name],
+                    parent_point=self._calibrated_offset,
+                    parent_object=self,
+                ),
+                display_name=f"{well_name} of {self._display_name}",
+                has_tip=self.is_tip_rack(),
+                name=well_name,
+            )
+            for column in self.get_well_columns()
+            for well_name in column
+        }
+
+        self._tip_tracker = TipTracker(
+            columns=[
+                [self._wells_by_name[well_name] for well_name in column]
+                for column in self.get_well_columns()
+            ]
+        )
 
     def get_uri(self) -> str:
         return helpers.uri_from_definition(self._definition)
@@ -101,16 +119,24 @@ class LabwareImplementation(AbstractLabware[WellImplementation]):
             y=self._geometry.offset.y + delta.y,
             z=self._geometry.offset.z + delta.z,
         )
-        # The wells must be rebuilt
-        self._wells = self._build_wells()
-        self._well_name_grid = WellGrid(wells=self._wells)
-        self._tip_tracker = TipTracker(columns=self._well_name_grid.get_columns())
+
+        # Rebuild well geometry with new offset
+        for well_name, well_core in self._wells_by_name.items():
+            well_core.geometry = WellGeometry(
+                well_props=self._well_definition[well_name],
+                parent_point=self._calibrated_offset,
+                parent_object=self,
+            )
 
     def get_calibrated_offset(self) -> Point:
         return self._calibrated_offset
 
     def is_tip_rack(self) -> bool:
         return self._parameters["isTiprack"]
+
+    def is_fixed_trash(self) -> bool:
+        """Whether the labware is fixed trash."""
+        return "fixedTrash" in self.get_quirks()
 
     def get_tip_length(self) -> float:
         return self._parameters["tipLength"]
@@ -120,20 +146,21 @@ class LabwareImplementation(AbstractLabware[WellImplementation]):
 
     def reset_tips(self) -> None:
         if self.is_tip_rack():
-            for well in self._wells:
+            for well in self._wells_by_name.values():
                 well.set_has_tip(True)
+
+    def get_next_tip(
+        self, num_tips: int, starting_tip: Optional[WellImplementation]
+    ) -> Optional[str]:
+        next_well = self._tip_tracker.next_tip(num_tips, starting_tip)
+        return next_well.get_name() if next_well else None
 
     def get_tip_tracker(self) -> TipTracker:
         return self._tip_tracker
 
-    def get_well_grid(self) -> WellGrid:
-        return self._well_name_grid
-
-    def get_wells(self) -> List[WellImplementation]:
-        return self._wells
-
-    def get_wells_by_name(self) -> Dict[str, WellImplementation]:
-        return {well.get_name(): well for well in self._wells}
+    def get_well_columns(self) -> List[List[str]]:
+        """Get the all well names, organized by column, from the labware's definition."""
+        return self._definition["ordering"]
 
     def get_geometry(self) -> LabwareGeometry:
         return self._geometry
@@ -174,17 +201,5 @@ class LabwareImplementation(AbstractLabware[WellImplementation]):
 
         return default_engage_height
 
-    def _build_wells(self) -> List[WellImplementation]:
-        return [
-            WellImplementation(
-                well_geometry=WellGeometry(
-                    well_props=self._well_definition[well],
-                    parent_point=self._calibrated_offset,
-                    parent_object=self,
-                ),
-                display_name="{} of {}".format(well, self._display_name),
-                has_tip=self.is_tip_rack(),
-                name=well,
-            )
-            for well in self._ordering
-        ]
+    def get_well_core(self, well_name: str) -> WellImplementation:
+        return self._wells_by_name[well_name]

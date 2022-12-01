@@ -7,8 +7,8 @@ import { useFeatureFlag } from '../../redux/config'
 import {
   inferModuleOrientationFromXCoordinate,
   getModuleDef2,
-  getDeckDefFromRobotName,
-  getRobotNameFromLoadedLabware,
+  getDeckDefFromRobotType,
+  getRobotTypeFromLoadedLabware,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import {
@@ -19,12 +19,13 @@ import {
   parseLabwareInfoByLiquidId,
 } from '@opentrons/api-client'
 import { getWellFillFromLabwareId } from '../../organisms/Devices/ProtocolRun/SetupLiquids/utils'
+import { getStandardDeckViewLayerBlockList } from './utils/getStandardDeckViewLayerBlockList'
+import { getStandardDeckViewBox } from './utils/getStandardViewBox'
 import type {
   DeckSlot,
   Liquid,
   LoadedLabware,
   RunTimeCommand,
-  RobotName,
 } from '@opentrons/shared-data'
 
 interface DeckThumbnailProps {
@@ -32,36 +33,11 @@ interface DeckThumbnailProps {
   labware: LoadedLabware[]
   liquids?: Liquid[]
 }
-const deckSetupLayerBlocklist = [
-  'calibrationMarkings',
-  'fixedBase',
-  'doorStops',
-  'metalFrame',
-  'removalHandle',
-  'removableDeckOutline',
-  'screwHoles',
-  'DECK_BASE',
-  'BARCODE_COVERS',
-]
-
-const OT2_VIEWBOX = '-75 -20 586 480'
-const OT3_VIEWBOX = '-144.31 -76.59 750 681.74'
-
-const getViewBox = (robotType: RobotName): string | null => {
-  switch (robotType) {
-    case 'OT-2 Standard':
-      return OT2_VIEWBOX
-    case 'OT-3 Standard':
-      return OT3_VIEWBOX
-    default:
-      return null
-  }
-}
 
 export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
   const { commands, liquids, labware = [] } = props
-  const robotName = getRobotNameFromLoadedLabware(labware)
-  const deckDef = getDeckDefFromRobotName(robotName)
+  const robotType = getRobotTypeFromLoadedLabware(labware)
+  const deckDef = getDeckDefFromRobotType(robotType)
   const liquidSetupEnabled = useFeatureFlag('enableLiquidSetup')
   const enableThermocyclerGen2 = useFeatureFlag('enableThermocyclerGen2')
 
@@ -71,7 +47,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
     commands
   )
   const liquidsInLoadOrder = parseLiquidsInLoadOrder(
-    liquids != null ? liquids : {},
+    liquids != null ? liquids : [],
     commands
   )
   const labwareByLiquidId = parseLabwareInfoByLiquidId(commands)
@@ -81,9 +57,9 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
     // revert the height
     // Note add offset 18px to right and left
     <RobotWorkSpace
-      deckLayerBlocklist={deckSetupLayerBlocklist}
+      deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
       deckDef={deckDef}
-      viewBox={getViewBox(robotName)}
+      viewBox={getStandardDeckViewBox(robotType)}
     >
       {({ deckSlotsById }) =>
         map<DeckSlot>(deckSlotsById, (slot: DeckSlot, slotId: string) => {

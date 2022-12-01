@@ -1,9 +1,8 @@
 """Legacy Well core implementation."""
-
-import re
+from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
 from opentrons.protocols.geometry.well_geometry import WellGeometry
-from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
+from opentrons.types import Point
 
 from ..well import AbstractWellCore
 
@@ -19,8 +18,6 @@ class WellImplementation(AbstractWellCore):
             Must match pattern /^([A-Z]+)([0-9]+)$/.
     """
 
-    pattern = re.compile(WELL_NAME_PATTERN, re.X)
-
     def __init__(
         self, well_geometry: WellGeometry, display_name: str, has_tip: bool, name: str
     ) -> None:
@@ -28,13 +25,20 @@ class WellImplementation(AbstractWellCore):
         self._has_tip = has_tip
         self._name = name
 
-        match = WellImplementation.pattern.match(name)
-        assert match, (
-            f"could not match '{name}' using "
-            f"pattern '{WellImplementation.pattern.pattern}'"
-        )
+        match = WELL_NAME_PATTERN.match(name)
+        assert match, f"could not match '{name}' using pattern '{WELL_NAME_PATTERN}'"
         self._row_name = match.group(1)
         self._column_name = match.group(2)
+        self._geometry = well_geometry
+
+    @property
+    def geometry(self) -> WellGeometry:
+        """Get the well's geometry information interface."""
+        return self._geometry
+
+    @geometry.setter
+    def geometry(self, well_geometry: WellGeometry) -> None:
+        """Upate the well's geometry interface."""
         self._geometry = well_geometry
 
     def has_tip(self) -> bool:
@@ -54,21 +58,30 @@ class WellImplementation(AbstractWellCore):
         return self._name
 
     def get_column_name(self) -> str:
-        """Get the column portion of the well name (e.g. "A")."""
+        """Get the column portion of the well name (e.g. "1")."""
         return self._column_name
 
     def get_row_name(self) -> str:
-        """Get the row portion of the well name (e.g. "1")."""
+        """Get the row portion of the well name (e.g. "A")."""
         return self._row_name
 
     def get_max_volume(self) -> float:
         """Get the well's maximum liquid volume."""
         return self._geometry.max_volume
 
-    def get_geometry(self) -> WellGeometry:
-        """Get the well's geometry information interface."""
-        return self._geometry
+    def get_top(self, z_offset: float) -> Point:
+        """Get the coordinate of the well's top, with an z-offset."""
+        return self._geometry.top(z_offset)
 
+    def get_bottom(self, z_offset: float) -> Point:
+        """Get the coordinate of the well's bottom, with an z-offset."""
+        return self._geometry.bottom(z_offset)
+
+    def get_center(self) -> Point:
+        """Get the coordinate of the well's center."""
+        return self._geometry.center()
+
+    # TODO(mc, 2022-10-28): is this used and/or necessary?
     def __repr__(self) -> str:
         """Use the well's display name as its repr."""
         return self.get_display_name()

@@ -40,6 +40,7 @@ from .core.module import (
     AbstractThermocyclerCore,
     AbstractHeaterShakerCore,
 )
+from .core.engine.protocol import ProtocolCore as ProtocolEngineCore
 
 from . import validation
 from .instrument_context import InstrumentContext
@@ -49,6 +50,7 @@ from .module_contexts import (
     TemperatureModuleContext,
     ThermocyclerContext,
     HeaterShakerContext,
+    ModuleContext,
 )
 
 
@@ -296,6 +298,7 @@ class ProtocolContext(CommandPublisher):
         :param int version: The version of the labware definition. If
             unspecified, will use version 1.
         """
+        load_name = validation.ensure_lowercase_name(load_name)
         deck_slot = validation.ensure_deck_slot(location)
 
         labware_core = self._implementation.load_labware(
@@ -306,9 +309,7 @@ class ProtocolContext(CommandPublisher):
             version=version,
         )
 
-        # TODO(mc, 2022-09-02): add API version
-        # https://opentrons.atlassian.net/browse/RSS-97
-        return Labware(implementation=labware_core)
+        return Labware(implementation=labware_core, api_version=self._api_version)
 
     @requires_version(2, 0)
     def load_labware_by_name(
@@ -350,7 +351,9 @@ class ProtocolContext(CommandPublisher):
         def _only_labwares() -> Iterator[Tuple[int, Labware]]:
             for slotnum, slotitem in self._implementation.get_deck().items():
                 if isinstance(slotitem, AbstractLabware):
-                    yield slotnum, Labware(implementation=slotitem)
+                    yield slotnum, Labware(
+                        implementation=slotitem, api_version=self._api_version
+                    )
                 elif isinstance(slotitem, Labware):
                     yield slotnum, slotitem
                 elif isinstance(slotitem, ModuleGeometry):
@@ -358,6 +361,52 @@ class ProtocolContext(CommandPublisher):
                         yield slotnum, slotitem.labware
 
         return dict(_only_labwares())
+
+    # TODO: gate move_labware behind API version
+    def move_labware(
+        self,
+        labware: Labware,
+        new_location: Union[DeckLocation, ModuleTypes],
+        use_gripper: bool = False,
+    ) -> None:
+        """Move a loaded labware to a new location.
+
+        *** This API method is currently being developed. ***
+        *** Expect changes without API level bump.        ***
+
+        :param labware: Labware to move. Should be a labware already loaded
+                        using :py:meth:`load_labware`
+
+        :param new_location: Deck slot location or a hardware module that is already
+                             loaded on the deck using :py:meth:`load_module`.
+        :param use_gripper: Whether to use gripper to perform this move.
+                            If True, will use the gripper to perform the move (OT3 only).
+                            If False, will pause protocol execution to allow the user
+                            to perform a manual move and click resume to continue
+                            protocol execution.
+        Before moving a labware from or to a hardware module, make sure that the labware
+        and its new location is reachable by the gripper. So, thermocycler lid should be
+        open and heater-shaker's labware latch should be open.
+        """
+        # TODO (spp, 2022-10-31): re-evaluate whether to allow specifying `use_gripper`
+        #  in the args or whether to have it specified in protocol requirements.
+
+        if not isinstance(labware, Labware):
+            raise ValueError(
+                f"Expected labware of type 'Labware' but got {type(labware)}."
+            )
+
+        location = (
+            new_location._core
+            if isinstance(new_location, ModuleContext)
+            else validation.ensure_deck_slot(new_location)
+        )
+
+        self._implementation.move_labware(
+            labware_core=labware._implementation,
+            new_location=location,
+            use_gripper=use_gripper,
+        )
 
     @requires_version(2, 0)
     def load_module(
@@ -437,7 +486,7 @@ class ProtocolContext(CommandPublisher):
         has only loaded the Temperature Module with :py:meth:`load_module`,
         only the Temperature Module will be present.
 
-        :returns Dict[str, ModuleContext]: Dict mapping slot name to module
+        :returns Dict[int, ModuleContext]: Dict mapping slot name to module
                                            contexts. The elements may not be
                                            ordered by slot number.
         """
@@ -476,12 +525,18 @@ class ProtocolContext(CommandPublisher):
                              `mount` (if such an instrument exists) should be
                              replaced by `instrument_name`.
         """
+        instrument_name = validation.ensure_lowercase_name(instrument_name)
+        is_96_channel = instrument_name == "p1000_96"
+        if is_96_channel and isinstance(self._implementation, ProtocolEngineCore):
+            checked_instrument_name = instrument_name
+            checked_mount = Mount.LEFT
+        else:
+            checked_instrument_name = validation.ensure_pipette_name(instrument_name)
+            checked_mount = validation.ensure_mount(mount)
 
-        checked_mount = validation.ensure_mount(mount)
-        checked_instrument_name = validation.ensure_pipette_name(instrument_name)
         tip_racks = tip_racks or []
-        existing_instrument = self._instruments[checked_mount]
 
+        existing_instrument = self._instruments[checked_mount]
         if existing_instrument is not None and not replace:
             # TODO(mc, 2022-08-25): create specific exception type
             raise RuntimeError(
@@ -493,8 +548,10 @@ class ProtocolContext(CommandPublisher):
             f"Loading {checked_instrument_name} on {checked_mount.name.lower()} mount"
         )
 
+        # TODO (tz, 11-22-22): was added to support 96 channel pipette.
+        #  Should remove when working on https://opentrons.atlassian.net/browse/RLIQ-255
         instrument_core = self._implementation.load_instrument(
-            instrument_name=checked_instrument_name,
+            instrument_name=checked_instrument_name,  # type: ignore[arg-type]
             mount=checked_mount,
         )
 
@@ -654,7 +711,8 @@ class ProtocolContext(CommandPublisher):
         # TODO AL 20201113 - remove this when DeckLayout only holds
         #  LabwareInterface instances.
         if isinstance(trash, AbstractLabware):
-            return Labware(implementation=trash)
+            return Labware(implementation=trash, api_version=self._api_version)
+
         return cast("Labware", trash)
 
     @requires_version(2, 5)

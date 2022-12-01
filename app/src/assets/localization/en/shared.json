@@ -19,6 +19,7 @@
   "ending": "ending",
   "error": "error",
   "exit": "exit",
+  "extension_mount": "extension mount",
   "flow_complete": "{{flowName}} complete!",
   "go_back": "Go back",
   "instruments": "instruments",
@@ -52,5 +53,6 @@
   "none": "None",
   "remember_my_selection_and_do_not_ask_again": "Remember my selection and don't ask again",
   "you_will_need": "You will need:",
-  "get_started": "Get started"
+  "get_started": "Get started",
+  "back": "Back"
 }

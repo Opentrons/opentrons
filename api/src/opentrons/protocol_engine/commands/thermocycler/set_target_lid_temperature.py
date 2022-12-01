@@ -83,7 +83,9 @@ class SetTargetLidTemperature(
 class SetTargetLidTemperatureCreate(BaseCommandCreate[SetTargetLidTemperatureParams]):
     """A request to create a Thermocycler's set lid temperature command."""
 
-    commandType: SetTargetLidTemperatureCommandType
+    commandType: SetTargetLidTemperatureCommandType = (
+        "thermocycler/setTargetLidTemperature"
+    )
     params: SetTargetLidTemperatureParams
 
     _CommandCls: Type[SetTargetLidTemperature] = SetTargetLidTemperature

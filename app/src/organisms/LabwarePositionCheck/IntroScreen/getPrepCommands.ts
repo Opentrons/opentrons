@@ -30,6 +30,7 @@ type LPCPrepCommand =
 export function getPrepCommands(
   protocolData: CompletedProtocolAnalysis
 ): LPCPrepCommand[] {
+  let dropTipCommands: DropTipCreateCommand[] = []
   // load commands come from the protocol resource
   const loadCommands: LPCPrepCommand[] =
     protocolData.commands
@@ -52,14 +53,34 @@ export function getPrepCommands(
               wellName: 'A1',
             },
           }
-          return [...acc, loadWithPipetteId, dropTipToBeSafe]
+          dropTipCommands = [...dropTipCommands, dropTipToBeSafe]
+          return [...acc, loadWithPipetteId]
         } else if (command.commandType === 'loadLabware') {
           // load all labware off-deck so that LPC can move them on individually later
           return [
             ...acc,
             {
               ...command,
-              params: { ...command.params, location: 'offDeck' },
+              params: {
+                ...command.params,
+                location: 'offDeck',
+                // python protocols won't have labwareId in the params, we want to
+                // use the same labwareIds that came back as the result of analysis
+                labwareId: command.result.labwareId,
+              },
+            },
+          ]
+        } else if (command.commandType === 'loadModule') {
+          return [
+            ...acc,
+            {
+              ...command,
+              params: {
+                ...command.params,
+                // python protocols won't have moduleId in the params, we want to
+                // use the same moduleIds that came back as the result of analysis
+                moduleId: command.result.moduleId,
+              },
             },
           ]
         }
@@ -101,7 +122,13 @@ export function getPrepCommands(
     params: {},
   }
   // prepCommands will be run when a user starts LPC
-  return [...loadCommands, ...TCCommands, ...HSCommands, homeCommand]
+  return [
+    ...loadCommands,
+    ...TCCommands,
+    ...HSCommands,
+    homeCommand,
+    ...dropTipCommands,
+  ]
 }
 
 function isLoadCommand(

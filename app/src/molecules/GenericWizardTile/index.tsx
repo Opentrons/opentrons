@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { css } from 'styled-components'
+import capitalize from 'lodash/capitalize'
 import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
@@ -11,6 +12,9 @@ import {
   COLORS,
   Btn,
   ALIGN_FLEX_END,
+  JUSTIFY_FLEX_END,
+  JUSTIFY_START,
+  JUSTIFY_CENTER,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { PrimaryButton } from '../../atoms/buttons'
@@ -24,6 +28,7 @@ export interface GenericWizardTileProps {
   back?: () => void
   proceed?: () => void
   proceedButtonText?: string
+  proceedIsDisabled?: boolean
 }
 
 const GO_BACK_BUTTON_STYLE = css`
@@ -44,11 +49,21 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
     back,
     proceed,
     proceedButtonText,
+    proceedIsDisabled,
   } = props
   const { t } = useTranslation('shared')
 
+  let buttonPositioning: string = ''
+  if ((back != null || getHelp != null) && proceed != null) {
+    buttonPositioning = JUSTIFY_SPACE_BETWEEN
+  } else if (back == null && getHelp == null && proceed != null) {
+    buttonPositioning = JUSTIFY_FLEX_END
+  } else if ((back != null || getHelp != null) && proceed == null) {
+    buttonPositioning = JUSTIFY_START
+  }
+
   return (
-    <>
+    <Flex flexDirection={DIRECTION_COLUMN} height="24.6rem">
       <Flex
         flexDirection={DIRECTION_ROW}
         paddingX={SPACING.spacing6}
@@ -64,13 +79,16 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
           <StyledText as="h1">{header}</StyledText>
           {bodyText}
         </Flex>
-        <Flex flex="1">{rightHandBody}</Flex>
+        <Flex flex="1" justifyContent={JUSTIFY_CENTER}>
+          {rightHandBody}
+        </Flex>
       </Flex>
       <Flex
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        justifyContent={buttonPositioning}
         marginBottom={SPACING.spacing6}
         marginX={SPACING.spacing6}
         alignItems={ALIGN_FLEX_END}
+        flex="1"
       >
         {back != null ? (
           <Btn onClick={back}>
@@ -78,8 +96,12 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
           </Btn>
         ) : null}
         {getHelp != null ? <NeedHelpLink href={getHelp} /> : null}
-        <PrimaryButton onClick={proceed}>{proceedButtonText}</PrimaryButton>
+        {proceed != null ? (
+          <PrimaryButton disabled={proceedIsDisabled} onClick={proceed}>
+            {capitalize(proceedButtonText)}
+          </PrimaryButton>
+        ) : null}
       </Flex>
-    </>
+    </Flex>
   )
 }

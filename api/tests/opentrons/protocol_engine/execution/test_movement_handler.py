@@ -21,6 +21,7 @@ from opentrons.protocol_engine.types import (
     WellLocation,
     WellOrigin,
     WellOffset,
+    DeckSlotLocation,
 )
 from opentrons.protocol_engine.state import (
     StateStore,
@@ -107,7 +108,9 @@ async def test_move_to_well(
         origin=WellOrigin.BOTTOM,
         offset=WellOffset(x=0, y=0, z=1),
     )
-
+    decoy.when(state_store.labware.get_location(labware_id="labware-id")).then_return(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+    )
     decoy.when(
         state_store.modules.get_heater_shaker_movement_restrictors()
     ).then_return([])
@@ -151,6 +154,12 @@ async def test_move_to_well(
     )
 
     decoy.when(
+        state_store.pipettes.get_movement_speed(
+            pipette_id="pipette-id", requested_speed=45.6
+        )
+    ).then_return(39339.5)
+
+    decoy.when(
         state_store.motion.get_movement_waypoints_to_well(
             origin=Point(1, 1, 1),
             origin_cp=CriticalPoint.FRONT_NOZZLE,
@@ -160,6 +169,8 @@ async def test_move_to_well(
             well_name="B2",
             well_location=well_location,
             current_well=None,
+            force_direct=True,
+            minimum_z_height=12.3,
         )
     ).then_return(
         [Waypoint(Point(1, 2, 3), CriticalPoint.XY_CENTER), Waypoint(Point(4, 5, 6))]
@@ -170,11 +181,14 @@ async def test_move_to_well(
         labware_id="labware-id",
         well_name="B2",
         well_location=well_location,
+        force_direct=True,
+        minimum_z_height=12.3,
+        speed=45.6,
     )
 
     decoy.verify(
         await thermocycler_movement_flagger.raise_if_labware_in_non_open_thermocycler(
-            labware_id="labware-id"
+            labware_parent=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
         ),
         heater_shaker_movement_flagger.raise_if_movement_restricted(
             hs_movement_restrictors=[],
@@ -186,11 +200,13 @@ async def test_move_to_well(
             mount=Mount.LEFT,
             abs_position=Point(1, 2, 3),
             critical_point=CriticalPoint.XY_CENTER,
+            speed=39339.5,
         ),
         await hardware_api.move_to(
             mount=Mount.LEFT,
             abs_position=Point(4, 5, 6),
             critical_point=None,
+            speed=39339.5,
         ),
     )
 
@@ -214,7 +230,9 @@ async def test_move_to_well_from_starting_location(
         labware_id="labware-id",
         well_name="B2",
     )
-
+    decoy.when(state_store.labware.get_location(labware_id="labware-id")).then_return(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+    )
     decoy.when(
         state_store.modules.get_heater_shaker_movement_restrictors()
     ).then_return([])
@@ -267,8 +285,16 @@ async def test_move_to_well_from_starting_location(
             labware_id="labware-id",
             well_name="B2",
             well_location=well_location,
+            force_direct=False,
+            minimum_z_height=None,
         )
     ).then_return([Waypoint(Point(1, 2, 3), CriticalPoint.XY_CENTER)])
+
+    decoy.when(
+        state_store.pipettes.get_movement_speed(
+            pipette_id="pipette-id", requested_speed=None
+        )
+    ).then_return(39339.5)
 
     await subject.move_to_well(
         pipette_id="pipette-id",
@@ -280,7 +306,7 @@ async def test_move_to_well_from_starting_location(
 
     decoy.verify(
         await thermocycler_movement_flagger.raise_if_labware_in_non_open_thermocycler(
-            labware_id="labware-id"
+            labware_parent=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
         ),
         heater_shaker_movement_flagger.raise_if_movement_restricted(
             hs_movement_restrictors=[],
@@ -292,6 +318,7 @@ async def test_move_to_well_from_starting_location(
             mount=Mount.RIGHT,
             abs_position=Point(1, 2, 3),
             critical_point=CriticalPoint.XY_CENTER,
+            speed=39339.5,
         ),
     )
 
@@ -350,6 +377,10 @@ async def test_move_relative(
         )
     ).then_return(Point(x=1, y=2, z=3))
 
+    decoy.when(
+        state_store.pipettes.get_movement_speed(pipette_id="pipette-id")
+    ).then_return(39339.5)
+
     result = await subject.move_relative(
         pipette_id="pipette-id",
         axis=axis,
@@ -363,6 +394,7 @@ async def test_move_relative(
             mount=Mount.LEFT,
             delta=expected_delta,
             fail_on_not_homed=True,
+            speed=39339.5,
         )
     )
 
@@ -384,10 +416,15 @@ async def test_move_relative_must_home(
     )
 
     decoy.when(
+        state_store.pipettes.get_movement_speed(pipette_id="pipette-id")
+    ).then_return(39339.5)
+
+    decoy.when(
         await hardware_api.move_rel(
             mount=Mount.LEFT,
             delta=Point(x=0, y=0, z=42.0),
             fail_on_not_homed=True,
+            speed=39339.5,
         )
     ).then_raise(HardwareMustHomeError("oh no"))
 
@@ -564,11 +601,18 @@ async def test_move_to_coordinates(
         )
     ).then_return([planned_waypoint_1, planned_waypoint_2])
 
+    decoy.when(
+        state_store.pipettes.get_movement_speed(
+            pipette_id="pipette-id", requested_speed=567
+        )
+    ).then_return(39339.5)
+
     await subject.move_to_coordinates(
         pipette_id="pipette-id",
         deck_coordinates=destination_deck,
         direct=True,
         additional_min_travel_z=1234,
+        speed=567,
     )
 
     decoy.verify(
@@ -576,11 +620,13 @@ async def test_move_to_coordinates(
             mount=mount,
             abs_position=planned_waypoint_1.position,
             critical_point=planned_waypoint_1.critical_point,
+            speed=39339.5,
         ),
         await hardware_api.move_to(
             mount=mount,
             abs_position=planned_waypoint_2.position,
             critical_point=planned_waypoint_2.critical_point,
+            speed=39339.5,
         ),
     )
 

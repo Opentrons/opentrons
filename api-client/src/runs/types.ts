@@ -1,4 +1,8 @@
-import type { ModuleModel } from '@opentrons/shared-data'
+import type {
+  LoadedLabware,
+  LoadedPipette,
+  ModuleModel,
+} from '@opentrons/shared-data'
 import type { ResourceLink } from '../types'
 import type { RunCommandSummary } from './commands/types'
 export * from './commands/types'
@@ -35,8 +39,8 @@ export interface RunData {
   status: RunStatus
   actions: RunAction[]
   errors: Error[]
-  pipettes: unknown[]
-  labware: unknown[]
+  pipettes: LoadedPipette[]
+  labware: LoadedLabware[]
   protocolId?: string
   labwareOffsets?: LabwareOffset[]
 }

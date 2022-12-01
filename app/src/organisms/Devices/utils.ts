@@ -1,4 +1,5 @@
 import { format, parseISO } from 'date-fns'
+import type { FetchPipettesResponsePipette } from '../../redux/pipettes/types'
 
 /**
  * formats a string if it is in ISO 8601 date format
@@ -27,4 +28,12 @@ export function downloadFile(data: object, fileName: string): void {
   })
   a.dispatchEvent(clickEvt)
   a.remove()
+}
+
+export function getIs96ChannelPipetteAttached(
+  leftMountAttachedPipette: FetchPipettesResponsePipette | null
+): boolean {
+  const pipetteName = leftMountAttachedPipette?.name
+
+  return pipetteName === 'p1000_96'
 }

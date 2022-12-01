@@ -74,7 +74,7 @@ def simulating_instrument_context(
     """A simulating instrument context."""
     return InstrumentContextSimulation(
         protocol_interface=simulating_protocol_context,
-        pipette_dict=instrument_context.get_pipette(),
+        pipette_dict=instrument_context.get_hardware_state(),
         mount=types.Mount.RIGHT,
         instrument_name="p300_single_gen2",
     )
@@ -88,7 +88,7 @@ def second_simulating_instrument_context(
     """A simulating instrument context."""
     return InstrumentContextSimulation(
         protocol_interface=simulating_protocol_context,
-        pipette_dict=second_instrument_context.get_pipette(),
+        pipette_dict=second_instrument_context.get_hardware_state(),
         mount=types.Mount.LEFT,
         instrument_name="p300_single_gen2",
     )
@@ -99,6 +99,22 @@ def labware(minimal_labware_def: LabwareDefinition) -> LabwareImplementation:
     """Labware fixture."""
     return LabwareImplementation(
         definition=minimal_labware_def,
+        parent=types.Location(types.Point(0, 0, 0), "1"),
+    )
+
+
+@pytest.fixture
+def tip_rack(minimal_labware_def: LabwareDefinition) -> LabwareImplementation:
+    tip_rack_definition = minimal_labware_def.copy()
+    tip_rack_parameters = minimal_labware_def["parameters"].copy()
+
+    tip_rack_parameters["isTiprack"] = True
+    tip_rack_parameters["tipLength"] = 123
+    tip_rack_definition["parameters"] = tip_rack_parameters
+
+    """Labware fixture."""
+    return LabwareImplementation(
+        definition=tip_rack_definition,
         parent=types.Location(types.Point(0, 0, 0), "1"),
     )
 

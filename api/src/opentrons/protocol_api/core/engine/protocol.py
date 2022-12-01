@@ -1,5 +1,6 @@
 """ProtocolEngine-based Protocol API core implementation."""
 from typing import Dict, Optional, Type, Union
+from typing_extensions import Literal
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
@@ -22,6 +23,7 @@ from opentrons.protocol_engine import (
     DeckSlotLocation,
     ModuleLocation,
     ModuleModel as EngineModuleModel,
+    LabwareMovementStrategy,
 )
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 
@@ -64,6 +66,8 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             labware_id=engine_client.state.labware.get_fixed_trash_id(),
             engine_client=engine_client,
         )
+        self._last_location: Optional[Location] = None
+        self._last_mount: Optional[Mount] = None
 
     @property
     def api_version(self) -> APIVersion:
@@ -140,6 +144,31 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             engine_client=self._engine_client,
         )
 
+    def move_labware(
+        self,
+        labware_core: LabwareCore,
+        new_location: Union[DeckSlotName, ModuleCore],
+        use_gripper: bool,
+    ) -> None:
+        """Move the given labware to a new location."""
+        to_location: Union[ModuleLocation, DeckSlotLocation]
+        if isinstance(new_location, ModuleCore):
+            to_location = ModuleLocation(moduleId=new_location.module_id)
+        else:
+            to_location = DeckSlotLocation(slotName=new_location)
+
+        strategy = (
+            LabwareMovementStrategy.USING_GRIPPER
+            if use_gripper
+            else LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE
+        )
+
+        self._engine_client.move_labware(
+            labware_id=labware_core.labware_id,
+            new_location=to_location,
+            strategy=strategy,
+        )
+
     def _resolve_module_hardware(
         self, serial_number: str, model: ModuleModel
     ) -> AbstractModule:
@@ -194,8 +223,10 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             sync_module_hardware=SynchronousAdapter(selected_hardware),
         )
 
+    # TODO (tz, 11-23-22): remove Union when refactoring load_pipette for 96 channels.
+    # https://opentrons.atlassian.net/browse/RLIQ-255
     def load_instrument(
-        self, instrument_name: PipetteNameType, mount: Mount
+        self, instrument_name: Union[PipetteNameType, Literal["p1000_96"]], mount: Mount
     ) -> InstrumentCore:
         """Load an instrument into the protocol.
 
@@ -212,6 +243,10 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         return InstrumentCore(
             pipette_id=load_result.pipetteId,
             engine_client=self._engine_client,
+            sync_hardware_api=self._sync_hardware,
+            protocol_core=self,
+            # TODO(mm, 2022-11-10): Deduplicate "400" with legacy core.
+            default_movement_speed=400,
         )
 
     def get_loaded_instruments(self) -> Dict[Mount, Optional[InstrumentCore]]:
@@ -220,19 +255,21 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def pause(self, msg: Optional[str]) -> None:
         """Pause the protocol."""
-        raise NotImplementedError("ProtocolCore.pause not implemented")
+        self._engine_client.wait_for_resume(message=msg)
 
     def resume(self) -> None:
         """Resume the protocol."""
+        # TODO(mm, 2022-11-08): This method is not usable in practice. Consider removing
+        # it from both cores. https://github.com/Opentrons/opentrons/issues/8209
         raise NotImplementedError("ProtocolCore.resume not implemented")
 
     def comment(self, msg: str) -> None:
         """Create a comment in the protocol to be shown in the log."""
-        raise NotImplementedError("ProtocolCore.comment not implemented")
+        self._engine_client.comment(message=msg)
 
     def delay(self, seconds: float, msg: Optional[str]) -> None:
         """Wait for a period of time before proceeding."""
-        raise NotImplementedError("ProtocolCore.delay not implemented")
+        self._engine_client.wait_for_duration(seconds=seconds, message=msg)
 
     def home(self) -> None:
         """Move all axes to their home positions."""
@@ -263,7 +300,10 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         mount: Optional[Mount] = None,
     ) -> Optional[Location]:
         """Get the last accessed location."""
-        raise NotImplementedError("ProtocolCore.get_last_location not implemented")
+        if mount is None or mount == self._last_mount:
+            return self._last_location
+
+        return None
 
     def set_last_location(
         self,
@@ -271,4 +311,5 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         mount: Optional[Mount] = None,
     ) -> None:
         """Set the last accessed location."""
-        raise NotImplementedError("ProtocolCore.set_last_location not implemented")
+        self._last_location = location
+        self._last_mount = mount
