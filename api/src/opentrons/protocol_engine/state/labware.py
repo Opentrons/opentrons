@@ -10,7 +10,6 @@ from opentrons_shared_data.pipette.dev_types import LabwareUri
 from opentrons.types import DeckSlotName, Point
 from opentrons.protocols.models import LabwareDefinition, WellDefinition
 from opentrons.calibration_storage.helpers import uri_from_details
-from opentrons.hardware_control.types import CriticalPoint
 
 from .. import errors
 from ..resources import DeckFixedLabware
@@ -492,7 +491,7 @@ class LabwareView(HasState[LabwareState]):
                 y=target_center.y,
                 z=current_z_position,
             ),
-            critical_point=CriticalPoint.MOUNT,
+            critical_point=None,
         )
 
         return result
