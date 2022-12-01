@@ -109,21 +109,19 @@ async function main() {
   if (!allTags.includes(tag)) {
     throw new Error(`Tag ${tag} does not exist - create it before running this script`)
   }
-  console.log(allTags.join(', '))
   const sortedVersions = allTags.map(tag => detailsFromTag(tag)[1]).sort(semver.compare).reverse()
 
   const previousVersion = versionPrevious(currentVersion, sortedVersions)
   const previousTag = tagFromDetails(project, previousVersion)
 
-  console.log(`Changelogs will be generated  from tag ${previousTag} which is version ${previousVersion} to tag ${tag} which is version ${currentVersion}`)
 
   const changelogStream = conventionalChangelog(
-    {preset: 'angular', tagPrefix: prefixForProject(project), debug: console.log},
+    {preset: 'angular', tagPrefix: prefixForProject(project)},
     {gitSemverTags: allTags, version: currentVersion, currentTag: tag, previousTag: previousTag, ...CONTEXTS_FOR_PROJECT[project]},
     {from: previousTag}
   )
   for await (const chunk of changelogStream) {
-    console.log(chunk.toString())
+    console.log('chunk', chunk.toString())
   }
 }
 
