@@ -52,7 +52,10 @@ class HardwareStopper:
             # TODO: Update this once gripper MotorAxis is available in engine.
             try:
                 ot3api = ensure_ot3_hardware(hardware_api=self._hardware_api)
-                if ot3api.has_gripper():
+                if (
+                    not self._state_store.config.use_virtual_gripper
+                    and ot3api.has_gripper()
+                ):
                     await ot3api.home_z(mount=OT3Mount.GRIPPER)
             except HardwareNotSupportedError:
                 pass

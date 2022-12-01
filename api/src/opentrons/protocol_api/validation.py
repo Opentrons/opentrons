@@ -167,7 +167,8 @@ def ensure_valid_labware_offset_vector(
     offset: Mapping[str, float]
 ) -> Mapping[str, float]:
     if isinstance(offset, dict):
-        if all([offset.get(axis) for axis in ["x", "y", "z"]]) and all(
+        # TODO: find a better way to unpack these values
+        if all([offset.get(axis) is not None for axis in ["x", "y", "z"]]) and all(
             [isinstance(val, (float, int)) for val in offset.values()]
         ):
             return offset
