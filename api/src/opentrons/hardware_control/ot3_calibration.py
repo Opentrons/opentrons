@@ -204,6 +204,14 @@ async def find_slot_center_binary(
         1,
     )
     LOG.info(f"Found -x edge at {minus_x_edge}mm")
+
+    here = await hcapi.gantry_position(mount)
+    await hcapi.move_to(
+        mount,
+        Point(*hcapi.config.calibration.edge_sense.plus_y_pos)._replace(
+            y=here.y, z=CAL_TRANSIT_HEIGHT
+        ),
+    )
     plus_y_edge = await find_edge(
         hcapi,
         mount,
@@ -511,4 +519,5 @@ async def calibrate_pipette(
         await hcapi.save_instrument_offset(mount, offset)
         return offset
     finally:
+        await hcapi.home_z(mount)
         await hcapi.remove_tip(mount)
