@@ -1,14 +1,14 @@
 {
   "$otSharedSchema": "#/pipette/schemas/2/pipettePropertiesSchema.json",
-  "displayName": "P1000 One Channel GEN3",
-  "model": "oneChannel",
+  "displayName": "P1000 96 Channel GEN3",
+  "model": "p1000",
   "displayCategory": "GEN3",
   "pickUpTipConfigurations": {
-    "current": 0.15,
+    "current": 0.4,
     "presses": 1,
     "speed": 10,
-    "increment": 0.0,
-    "distance": 13.0
+    "increment": 0.5,
+    "distance": 1.0
   },
   "dropTipConfigurations": {
     "current": 1.0,
@@ -19,19 +19,20 @@
     "run": 1.0
   },
   "plungerPositionsConfigurations": {
-    "top": 0.5,
-    "bottom": 71.5,
-    "blowout": 76.5,
-    "drop": 90.5
+    "top": 0,
+    "bottom": 66,
+    "blowout": 71,
+    "drop": 80
   },
   "availableSensors": {
     "sensors": ["pressure", "capacitive", "environment"],
-    "pressure": { "count": 1 },
-    "capacitive": { "count": 1 },
+    "pressure": { "count": 2 },
+    "capacitive": { "count": 2 },
     "environment": { "count": 1 }
   },
   "partialTipConfigurations": {
-    "partialTipSupported": false
+    "partialTipSupported": true,
+    "availableConfigurations": [1, 8, 12, 96]
   },
-  "channels": 1
+  "channels": 96
 }
