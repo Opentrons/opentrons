@@ -5,10 +5,7 @@ import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 
-import {
-  getProtocolsStoredSortKey,
-  updateConfigValue,
-} from '../../../redux/config'
+import { getProtocolsStoredSortKey } from '../../../redux/config'
 import {
   storedProtocolData,
   storedProtocolDataTwo,
@@ -17,8 +14,6 @@ import { ProtocolList } from '../ProtocolList'
 import { useSortedProtocols } from '../hooks'
 import { EmptyStateLinks } from '../EmptyStateLinks'
 import { ProtocolCard } from '../ProtocolCard'
-
-import type { ProtocolSort } from '../hooks'
 
 jest.mock('../hooks')
 jest.mock('../../../redux/protocol-storage')
@@ -37,9 +32,6 @@ const mockProtocolCard = ProtocolCard as jest.MockedFunction<
 >
 const mockGetProtocolsStoredSortKey = getProtocolsStoredSortKey as jest.MockedFunction<
   typeof getProtocolsStoredSortKey
->
-const mockUpdateConfigValue = updateConfigValue as jest.MockedFunction<
-  typeof updateConfigValue
 >
 
 const render = (props: React.ComponentProps<typeof ProtocolList>) => {
