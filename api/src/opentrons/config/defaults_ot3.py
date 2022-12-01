@@ -29,10 +29,10 @@ DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSett
         ),
     ),
     edge_sense=EdgeSenseSettings(
-        plus_x_pos=(239, 150, 0),
-        minus_x_pos=(217, 150, 0),
-        plus_y_pos=(228, 161, 0),
-        minus_y_pos=(228, 139, 0),
+        plus_x_pos=(237, 148, 0),
+        minus_x_pos=(215, 148, 0),
+        plus_y_pos=(224, 161, 0),
+        minus_y_pos=(224, 141, 0),
         overrun_tolerance_mm=0.5,
         early_sense_tolerance_mm=0.2,
         pass_settings=CapacitivePassSettings(
