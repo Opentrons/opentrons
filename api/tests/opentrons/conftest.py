@@ -48,7 +48,9 @@ from opentrons.hardware_control import (
     ThreadManager,
     ThreadManagedHardware,
 )
-from opentrons.protocols.api_support.default_deck_type import infer_from_global_config as infer_deck_type_from_global_config
+from opentrons.protocols.api_support.default_deck_type import (
+    guess_from_global_config as guess_deck_type_from_global_config,
+)
 from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
     ProtocolContext,
@@ -279,7 +281,7 @@ def ctx(hardware: ThreadManagedHardware) -> Generator[ProtocolContext, None, Non
         # TODO(mm, 2022-12-01): Parametrizing `hardware_api` but getting the deck type
         # from global config seems wrong. Do they need to be kept in sync so the
         # robot type matches?
-        deck_type=infer_deck_type_from_global_config(),
+        deck_type=guess_deck_type_from_global_config(),
     )
     yield c
     # Manually clean up all the modules.

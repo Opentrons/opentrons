@@ -8,7 +8,7 @@ from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName
 from opentrons.protocols.api_support.default_deck_type import (
-    infer_from_global_config as infer_deck_type_from_global_config,
+    guess_from_global_config as guess_deck_type_from_global_config,
 )
 
 from ..types import DeckSlotLocation
@@ -39,7 +39,7 @@ class DeckDataProvider:
     @staticmethod
     async def get_deck_definition() -> DeckDefinitionV3:
         """Get a labware definition given the labware's identification."""
-        return load_deck(infer_deck_type_from_global_config(), 3)
+        return load_deck(guess_deck_type_from_global_config(), 3)
 
     async def get_deck_fixed_labware(
         self,

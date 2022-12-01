@@ -2,7 +2,7 @@ from opentrons_shared_data.deck import DefinitionName as DeckDefinitionName
 from opentrons.config import feature_flags
 
 
-def infer_from_global_config() -> DeckDefinitionName:
+def guess_from_global_config() -> DeckDefinitionName:
     """Return a default deck type based on global environment configuration.
 
     Deprecated:

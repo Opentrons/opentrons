@@ -9,7 +9,9 @@ from dataclasses import dataclass
 
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.commands import types
-from opentrons.protocols.api_support.default_deck_type import infer_from_global_config as infer_deck_type_from_global_config
+from opentrons.protocols.api_support.default_deck_type import (
+    guess_from_global_config as guess_deck_type_from_global_config,
+)
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.duration.errors import DurationEstimatorException
 from opentrons.types import Location
@@ -63,7 +65,7 @@ class DurationEstimator:
         self._increments: List[TimerEntry] = []
 
         # TODO(mm, 2022-12-01): Allow the caller to configure the deck type.
-        self._deck = Deck(deck_type=infer_deck_type_from_global_config())
+        self._deck = Deck(deck_type=guess_deck_type_from_global_config())
 
     def get_total_duration(self) -> float:
         """Return the total duration"""
