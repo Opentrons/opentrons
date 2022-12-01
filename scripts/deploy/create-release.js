@@ -22,8 +22,14 @@ const parseArgs = require('./lib/parseArgs')
 const conventionalChangelog = require('conventional-changelog')
 const git = require('simple-git')
 const semver = require('semver')
+const { Octokit } = require('@octokit/rest')
 const ALLOWED_VERSION_TYPES = ['alpha', 'beta', 'candidate', 'production']
 const USAGE = '\nUsage:\n node ./scripts/deploy/create-release <token> <tag> [--deploy] [--allow-old]'
+
+const REPO_DETAILS = {
+  owner: 'Opentrons',
+  repo: 'opentrons'
+}
 
 const detailsFromTag = (tag) => tag.includes('@') ? tag.split('@') : ['robot-stack', tag.substring(1)]
 function tagFromDetails(project, version) {
@@ -64,6 +70,30 @@ function versionPrevious(currentVersion, previousVersions) {
   return releasesOfGEQKind.length === 0 ? null : releasesOfGEQKind[0]
 }
 
+const titleForRelease = (project, version) => `${project.replaceAll('-', ' ')} version ${version}`
+
+async function createRelease(token, tag, project, version, changelog, deploy) {
+  const title = titleForRelease(project, version)
+  const isPre = !!semver.prerelease(version)
+  if (deploy) {
+    const octokit = new Octokit({
+      auth: token,
+      userAgent: 'Opentrons Release Creator'
+    })
+    await octokit.reset.createRelease({
+      owner: REPO_DETAILS.owner,
+      repo: REPO_DETAILS.repo,
+      tag_name: tag,
+      name: title,
+      body: changelog,
+      draft: true,
+      prerelease: isPre
+    })
+  } else {
+    console.log(`${tag} ${title}\n${changelog}\n${isPre ? '\nprerelease' : ''}`)
+  }
+}
+
 async function main() {
   const { args, flags } = parseArgs(process.argv.slice(2))
 
@@ -72,7 +102,7 @@ async function main() {
     throw new Error(USAGE)
   }
 
-  const dryrun = !flags.includes('--deploy')
+  const deploy = flags.includes('--deploy')
   const allowOld = flags.includes('--allow-old')
 
   if (!allowOld) {
@@ -105,8 +135,8 @@ async function main() {
      currentTag: tag,
      previousTag: previousTag,
      host: 'https://github.com',
-     owner: 'Opentrons',
-     repository: 'opentrons',
+     owner: REPO_DETAILS.owner,
+     repository: REPO_DETAILS.repo,
      linkReferences: true
     },
     {from: previousTag}
@@ -119,7 +149,7 @@ async function main() {
   // accumulate chunks in reverse and drop earlier chunks that are included in later ones
   const changelog = chunks.reverse().reduce(
     (accum, chunk) => accum.includes(chunk.trim()) ? accum : chunk + accum, '')
-  console.log(changelog)
+  await createRelease(token, tag, project, currentVersion, changelog, deploy)
 }
 
 (async () => {
