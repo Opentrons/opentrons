@@ -193,8 +193,7 @@ async function main() {
   )
 }
 
-module.exports = {versionPrevious: versionPrevious }
-
+module.exports = { versionPrevious: versionPrevious }
 
 if (require.main === module) {
   main()
