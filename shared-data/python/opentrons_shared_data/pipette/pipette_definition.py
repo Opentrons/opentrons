@@ -41,9 +41,7 @@ class PipetteVersionType:
     @classmethod
     def convert_from_float(cls, version: float) -> "PipetteVersionType":
         major = cast(PipetteModelMajorVersion, int(version // 1))
-        minor = cast(
-            PipetteModelMinorVersion, int(round((version % 1), 2) * 10)
-        )
+        minor = cast(PipetteModelMinorVersion, int(round((version % 1), 2) * 10))
         return cls(major=major, minor=minor)
 
 
