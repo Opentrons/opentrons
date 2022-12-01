@@ -193,11 +193,16 @@ async function main() {
   )
 }
 
-main()
-  .then(url => {
-    console.log('Release created:', url)
-  })
-  .catch(error => {
-    console.error('Release failed:', error)
-    process.exitCode = -1
-  })
+module.exports = {versionPrevious: versionPrevious }
+
+
+if (require.main === module) {
+  main()
+    .then(url => {
+      console.log('Release created:', url)
+    })
+    .catch(error => {
+      console.error('Release failed:', error)
+      process.exitCode = -1
+    })
+}

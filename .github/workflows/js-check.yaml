@@ -87,3 +87,5 @@ jobs:
       - name: 'lint css'
         if: always() && steps.setup-js.outcome == 'success'
         run: make lint-css
+      - name: 'test scripts'
+        run: yarn jest scripts
