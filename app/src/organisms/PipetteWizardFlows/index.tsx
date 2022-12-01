@@ -84,7 +84,7 @@ export const PipetteWizardFlows = (
   const [isExiting, setIsExiting] = React.useState<boolean>(false)
 
   const proceed = (): void => {
-    if (!(isCommandMutationLoading || isStopLoading || isExiting)) {
+    if (!isCommandMutationLoading) {
       setCurrentStepIndex(
         currentStepIndex !== pipetteWizardSteps.length - 1
           ? currentStepIndex + 1
@@ -103,8 +103,8 @@ export const PipetteWizardFlows = (
       ],
       false
     ).then(() => {
-      setIsExiting(false)
       if (runId !== '') stopRun(runId)
+      setIsExiting(false)
     })
   }
   const {
@@ -140,7 +140,7 @@ export const PipetteWizardFlows = (
   let onExit
   if (currentStep == null) return null
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
-  if (isExiting === true) {
+  if (isExiting) {
     modalContent = <InProgressModal description={t('stand_back')} />
   }
   if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
