@@ -48,9 +48,6 @@ from opentrons.hardware_control import (
     ThreadManager,
     ThreadManagedHardware,
 )
-from opentrons.protocols.api_support.default_deck_type import (
-    guess_from_global_config as guess_deck_type_from_global_config,
-)
 from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
     ProtocolContext,
