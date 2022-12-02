@@ -20,6 +20,9 @@ from opentrons.protocols.execution import execute as execute_apiv2
 from opentrons.commands import types as command_types
 from opentrons.protocols.parse import parse, version_from_string
 from opentrons.protocols.types import ApiDeprecationError
+from opentrons.protocols.api_support.default_deck_type import (
+    guess_from_global_config as guess_deck_type_from_global_config,
+)
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control import API as OT2API, ThreadManager, HardwareControlAPI
 from opentrons.hardware_control.types import MachineType
@@ -104,6 +107,9 @@ def get_protocol_api(
     context = protocol_api.create_protocol_context(
         api_version=checked_version,
         hardware_api=_THREAD_MANAGED_HW,  # type: ignore[arg-type]
+        # FIXME(2022-12-02): Instead of guessing, match this to the robot type declared
+        # by the protocol.
+        deck_type=guess_deck_type_from_global_config(),
         bundled_labware=bundled_labware,
         bundled_data=bundled_data,
         extra_labware=extra_labware,
