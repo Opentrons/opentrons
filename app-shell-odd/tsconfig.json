@@ -1,0 +1,18 @@
+{
+  "extends": "../tsconfig-base.json",
+  "files": ["src/protocol-storage/__fixtures__/analysisResult.json"],
+  "references": [
+    {
+      "path": "../discovery-client"
+    },
+    {
+      "path": "../shared-data"
+    }
+  ],
+  "compilerOptions": {
+    "composite": true,
+    "rootDir": "src",
+    "outDir": "lib"
+  },
+  "include": ["typings", "src"]
+}

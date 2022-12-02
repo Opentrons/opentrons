@@ -5,6 +5,7 @@
     "api/src/opentrons",
     "app",
     "app-shell",
+    "app-shell-odd",
     "components",
     "discovery-client",
     "labware-designer",

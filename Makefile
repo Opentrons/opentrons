@@ -6,6 +6,7 @@ include ./scripts/python.mk
 
 API_DIR := api
 APP_SHELL_DIR := app-shell
+APP_SHELL_ODD_DIR := app-shell-odd
 COMPONENTS_DIR := components
 DISCOVERY_CLIENT_DIR := discovery-client
 G_CODE_TESTING_DIR := g-code-testing
@@ -52,6 +53,7 @@ setup-js:
 	yarn config set network-timeout 60000
 	yarn
 	$(MAKE) -C $(APP_SHELL_DIR) setup
+	$(MAKE) -C $(APP_SHELL_ODD_DIR) setup
 	$(MAKE) -C $(SHARED_DATA_DIR) setup-js
 
 PYTHON_SETUP_TARGETS := $(addsuffix -py-setup, $(PYTHON_DIRS))
