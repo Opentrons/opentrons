@@ -180,11 +180,7 @@ class SyncClient:
         axes: Optional[Sequence[MotorAxis]] = None,
     ) -> commands.HomeResult:
         """Execute a Home command and return the result."""
-        request = commands.HomeCreate(
-            params=commands.HomeParams(
-                axes=axes
-            )
-        )
+        request = commands.HomeCreate(params=commands.HomeParams(axes=axes))
         result = self._transport.execute_command(request=request)
 
         return cast(commands.HomeResult, result)

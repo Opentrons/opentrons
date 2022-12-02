@@ -514,3 +514,13 @@ def test_comment(
     """It should issue a comment command."""
     subject.comment("Hello, world!")
     decoy.verify(mock_engine_client.comment("Hello, world!"))
+
+
+def test_home(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: ProtocolCore,
+) -> None:
+    """It should issue a home command."""
+    subject.home()
+    decoy.verify(mock_engine_client.home())
