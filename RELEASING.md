@@ -8,7 +8,7 @@ neatly document any changes that may happen during QA, such as bug fixes, and se
 Our release process is still a work-in-progress. The app and API projects are currently versioned together to ensure interoperability.
 
 1. Ensure you have a buildroot release created in GitHub with all the changes you want in this release, if any. If there are no buildroot changes, you don't have to create a new release; the last tag in buildroot is used for release builds.
-1. Checkout `edge` and make a release branch, without any new changes. The branch name should match `release_*` to make `make bump` usage easier and make it clear this is a release.
+2. Checkout `edge` and make a release branch, without any new changes. The branch name should match `release_*` to make `make bump` usage easier and make it clear this is a release.
 
 ```shell
 git checkout edge
@@ -17,27 +17,27 @@ git checkout -b release_${version}
 git push --set-upstream origin release_${version}
 ```
 
-1. Open a PR into `release` for your empty release branch.
-1. Create a new branch for your initial version bump:
+3. Open a PR into `release` for your empty release branch.
+4. Create a new branch for your initial version bump:
 
 ```shell
 git checkout -b chore_bump-${version}
 ```
 
-1. In the bump branch, bump the version to the appropriate alpha (read [the section below](#make-bump-usage) carefully)
-1. Inspect version bumps
-1. Edit the user-facing changelog at `app-shell/build/release-notes.md` to add the new notes for the app
-1. Edit the user-facing changelog at `api/release-notes.md` to add the new notes for the robot software
-1. `git add --all`
-1. `git cz`
+5. In the bump branch, bump the version to the appropriate alpha (read [the section below](#make-bump-usage) carefully)
+6. Inspect version bumps
+7. Edit the user-facing changelog at `app-shell/build/release-notes.md` to add the new notes for the app
+8. Edit the user-facing changelog at `api/release-notes.md` to add the new notes for the robot software
+9. `git add --all`
+10. `git cz`
 
 - Type: `chore`
 - Scope: `release`
 - Message: `${version}`
 
-1. Gather reviews on release notes until everybody is satisfied. Check the docs at sandbox.docs.opentrons.com/release\_\${version}
-1. Once your chore bump branch is ready, squash merge the `chore_bump-${version}` into the `release_${version}` branch.
-1. Tag the release branch as the version you just bumped to; this is a release candidate that will undergo QA:
+11. Gather reviews on release notes until everybody is satisfied. Check the docs at sandbox.docs.opentrons.com/release\_\${version}
+12. Once your chore bump branch is ready, squash merge the `chore_bump-${version}` into the `release_${version}` branch.
+13. Tag the release branch as the version you just bumped to; this is a release candidate that will undergo QA:
 
 ```shell
 git tag -a v${version} -m 'chore(release): ${version}'
@@ -46,10 +46,10 @@ git push origin v${version}
 
 Changelogs for the release are automatically generated when the tag is pushed and sent to the release page in github.
 
-1. Run QA on this release. If issues are found, create PRs targeted on the release branch. To create new alpha releases, repeat steps from making a bump branch to now.
-1. Once QA is a pass, bump to the target release version (review [the section below](#make-bump-usage) again)
+14. Run QA on this release. If issues are found, create PRs targeted on the release branch. To create new alpha releases, repeat steps 4-14.
+15. Once QA is a pass, bump to the target release version (review [the section below](#make-bump-usage) again)
 
-1. Do a NORMAL MERGE into `release`. Do NOT squash or rebase. This should be done from your local command line (and will succeed as long as the release PR is reviewed and status checks have passed):
+16. Do a NORMAL MERGE into `release`. Do NOT squash or rebase. This should be done from your local command line (and will succeed as long as the release PR is reviewed and status checks have passed):
 
 ```shell
 # note: make sure you have pulled the latest changes for branch
@@ -59,7 +59,7 @@ git merge --ff-only release_${version}
 git push origin release
 ```
 
-1. Tag the release:
+17. Tag the release:
 
 ```shell
 git tag -a v${version} -m 'chore(release): ${version}'
@@ -68,7 +68,7 @@ git push origin v${version}
 
 The tag push will kick off release builds and create a release page where those builds and automatically generated in-depth changelogs will be posted.
 
-1. Open a PR of `release` into `edge`. Give the PR a name like `chore(release): Merge changes from ${version} into edge`. Once it passes, on the command line merge it into `edge`:
+18. Open a PR of `release` into `edge`. Give the PR a name like `chore(release): Merge changes from ${version} into edge`. Once it passes, on the command line merge it into `edge`:
 
 ```shell
 git checkout edge
@@ -76,13 +76,13 @@ git pull
 git merge --no-ff release
 ```
 
-1. Use the PR title for the merge commit title. You can then `git push origin edge`, which will succeed as ong as the PR is approved and status checks pass.
-1. Release the docs for this version (see below under Releasing Web Projects)
+19. Use the PR title for the merge commit title. You can then `git push origin edge`, which will succeed as ong as the PR is approved and status checks pass.
+20. Release the docs for this version (see below under Releasing Web Projects)
 
 ## Releasing Robot Software Stack Hotfixes
 
 1. Ensure you have a buildroot release created in GitHub with all the changes you want to see, if any. If there aren't any, you don't have to create a new buildroot release; by default, the last tag is used for release builds.
-1. Checkout `release` and make a release branch, without any new changes. The branch name should match `hotfix_*` to make it clear this is a hotfix, and make `make bump` usage simpler.
+2. Checkout `release` and make a release branch, without any new changes. The branch name should match `hotfix_*` to make it clear this is a hotfix, and make `make bump` usage simpler.
 
 ```shell
 git checkout release
@@ -91,36 +91,36 @@ git checkout -b hotfix_${version}
 git push --set-upstream origin hotfix_${version}
 ```
 
-1. Target the hotfix PRs on this branch.
-1. Once the fixes have been merged into the original hotfix branch, create a new branch for your initial version bump:
+3. Target the hotfix PRs on this branch.
+4. Once the fixes have been merged into the original hotfix branch, create a new branch for your initial version bump:
 
 ```shell
 git checkout -b chore_bump-${version}
 ```
 
-1. In the bump branch, bump the version to the appropriate alpha (read [the section below](#make-bump-usage) carefully)
-1. Inspect version bumps
-1. Edit the user-facing changelog at `app-shell/build/release-notes.md` to add the new notes for the app
-1. Edit the user-facing changelog at `api/release-notes.md` to add the new notes for the robot software
-1. `git add --all`
-1. `git cz`
+5. In the bump branch, bump the version to the appropriate alpha (read [the section below](#make-bump-usage) carefully)
+6. Inspect version bumps
+7. Edit the user-facing changelog at `app-shell/build/release-notes.md` to add the new notes for the app
+8. Edit the user-facing changelog at `api/release-notes.md` to add the new notes for the robot software
+9. `git add --all`
+10. `git cz`
 
 - Type: `chore`
 - Scope: `release`
 - Message: `${version}`
 
-1. Push this commit
-1. Once your chore bump branch is ready, squash merge the `chore_bump-${version}` into the `hotfix_${version}` branch.
-1. Tag the release branch as the version you just bumped to; this is a release candidate that will undergo QA:
+11. Push this commit
+12. Once your chore bump branch is ready, squash merge the `chore_bump-${version}` into the `hotfix_${version}` branch.
+13. Tag the release branch as the version you just bumped to; this is a release candidate that will undergo QA:
 
 ```bash
 git tag -a v${version} -m 'chore(release): ${version}'
 git push origin v${version}
 ```
 
-1. Run QA on this release. If issues are found, create PRs targeted on the release branch. To create new alpha releases, repeat steps 4-11.
-1. Once QA is a pass, bump to your target version (review [the section below](#make-bump-usage) again)
-1. Do a NORMAL MERGE into `release`. Do NOT squash or rebase. This should be done from your local command line (and will succeed as long as the release PR is reviewed and status checks have passed):
+14. Run QA on this release. If issues are found, create PRs targeted on the release branch. To create new alpha releases, repeat steps 4-14.
+15. Once QA is a pass, bump to your target version (review [the section below](#make-bump-usage) again)
+16. Do a NORMAL MERGE into `release`. Do NOT squash or rebase. This should be done from your local command line (and will succeed as long as the release PR is reviewed and status checks have passed):
 
 ```shell
 # note: make sure you have pulled the latest changes for branch
@@ -130,7 +130,7 @@ git merge --ff-only release_${version}
 git push origin release
 ```
 
-1. Tag the release:
+17. Tag the release:
 
 ```shell
 git tag -a v${version} -m 'chore(release): ${version}'
@@ -139,7 +139,7 @@ git push origin v${version}
 
 Pushing the tag will create release builds and a github release page with the in-depth changelogs.
 
-1. Open a PR of `release` into `edge`. Give the PR a name like `chore(release): Merge changes from ${version} into edge`. Once it passes, on the command line merge it into `edge`:
+18. Open a PR of `release` into `edge`. Give the PR a name like `chore(release): Merge changes from ${version} into edge`. Once it passes, on the command line merge it into `edge`:
 
 ```shell
 git checkout edge
@@ -147,8 +147,8 @@ git pull
 git merge --no-ff release
 ```
 
-1. Use the PR title for the merge commit title. You can then `git push origin edge`, which will succeed as long as the PR is approved and status checks pass.
-1. Release the docs for this version (see below under Releasing Web Projects)
+19. Use the PR title for the merge commit title. You can then `git push origin edge`, which will succeed as long as the PR is approved and status checks pass.
+20. Release the docs for this version (see below under Releasing Web Projects)
 
 ### tag usage
 
