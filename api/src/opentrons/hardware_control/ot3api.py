@@ -45,7 +45,6 @@ from .util import use_or_initialize_loop, check_motion_bounds
 # TODO (lc 09-23-2022) Pull in correct OT3 instrument once
 # instrument model re-working is complete.
 from .instruments.ot2.pipette import (
-    generate_hardware_configs_ot3,
     load_from_config_and_check_skip,
 )
 from .instruments.ot3.gripper import compare_gripper_config_and_check_skip
@@ -441,7 +440,7 @@ class OT3API(
         config = instrument_data.get("config")
         pip_id = instrument_data.get("id")
         pip_offset_cal = load_pipette_offset(pip_id, mount)
-        p, may_skip = load_from_config_and_check_skip(
+        p, _ = load_from_config_and_check_skip(
             config,
             self._pipette_handler.hardware_instruments[mount],
             req_instr,
@@ -451,14 +450,6 @@ class OT3API(
         self._pipette_handler.hardware_instruments[mount] = p
         if req_instr and p:
             p.act_as(req_instr)
-        if not may_skip:
-            self._log.info(f"Doing full configuration on {mount.name}")
-            hw_config = generate_hardware_configs_ot3(
-                p, self._config, self._backend.board_revision
-            )
-            await self._backend.configure_mount(mount, hw_config)
-        else:
-            self._log.info(f"Skipping configuration on {mount.name}")
 
     async def cache_gripper(self, instrument_data: AttachedGripper) -> None:
         """Set up gripper based on scanned information."""

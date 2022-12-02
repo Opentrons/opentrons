@@ -684,12 +684,6 @@ class OT3Controller:
                 self._event_watcher.close()
         return None
 
-    async def configure_mount(
-        self, mount: OT3Mount, config: InstrumentHardwareConfigs
-    ) -> None:
-        """Configure a mount."""
-        return None
-
     @staticmethod
     def _get_home_position() -> Dict[NodeId, float]:
         return {

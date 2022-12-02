@@ -22,7 +22,6 @@ from .instrument_calibration import (
 from opentrons.hardware_control.types import (
     CriticalPoint,
     BoardRevision,
-    OT3AxisKind,
     InvalidMoveError,
 )
 
@@ -487,32 +486,5 @@ def generate_hardware_configs(
             "idle_current": robot_configs.current_for_revision(
                 robot_config.low_current, revision
             )["B"],
-            "splits": None,
-        }
-
-
-def generate_hardware_configs_ot3(
-    pipette: Optional[Pipette], robot_config: OT3Config, revision: BoardRevision
-) -> InstrumentHardwareConfigs:
-    """
-    Fuse robot and pipette configuration to generate commands to send to
-    the motor driver if required
-    """
-    if pipette:
-        return {
-            "steps_per_mm": 0,
-            "home_pos": 0,
-            "max_travel": pipette.config.max_travel,
-            "idle_current": pipette.config.idle_current,
-            "splits": _build_splits(pipette),
-        }
-    else:
-        return {
-            "steps_per_mm": 0,
-            "home_pos": 0,
-            "max_travel": 0,
-            "idle_current": robot_config.current_settings.hold_current.none[
-                OT3AxisKind.P
-            ],
             "splits": None,
         }
