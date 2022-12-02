@@ -660,9 +660,54 @@ async def test_home(
         ),
         times=1,
     )
+    decoy.reset()
 
     await subject.home(axes=None)
-    decoy.verify(await hardware_api.home(axes=None), times=1)
+    decoy.verify(await hardware_api.home(), times=1)
+    decoy.reset()
 
     await subject.home(axes=[])
     decoy.verify(await hardware_api.home(axes=[]), times=1)
+
+
+# TODO(mc, 2022-12-01): this is overly complicated
+# https://opentrons.atlassian.net/browse/RET-1287
+async def test_home_z(
+    decoy: Decoy,
+    hardware_api: HardwareAPI,
+    subject: MovementHandler,
+) -> None:
+    """It should home a single Z axis and plunger."""
+    await subject.home(axes=[MotorAxis.LEFT_Z, MotorAxis.LEFT_PLUNGER])
+    decoy.verify(
+        await hardware_api.home_z(Mount.LEFT),
+        await hardware_api.home_plunger(Mount.LEFT),
+    )
+    decoy.reset()
+
+    await subject.home(axes=[MotorAxis.RIGHT_Z, MotorAxis.RIGHT_PLUNGER])
+    decoy.verify(
+        await hardware_api.home_z(Mount.RIGHT),
+        await hardware_api.home_plunger(Mount.RIGHT),
+    )
+    decoy.reset()
+
+    await subject.home(axes=[MotorAxis.LEFT_PLUNGER])
+    decoy.verify(
+        await hardware_api.home_plunger(Mount.LEFT),
+        times=1,
+    )
+    decoy.reset()
+
+    await subject.home(axes=[MotorAxis.RIGHT_PLUNGER])
+    decoy.verify(
+        await hardware_api.home_plunger(Mount.RIGHT),
+        times=1,
+    )
+    decoy.reset()
+
+    await subject.home(axes=[MotorAxis.RIGHT_Z, MotorAxis.LEFT_PLUNGER])
+    decoy.verify(
+        await hardware_api.home([HardwareAxis.A, HardwareAxis.B]),
+        times=1,
+    )

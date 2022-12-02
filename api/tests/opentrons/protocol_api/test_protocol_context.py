@@ -361,3 +361,13 @@ def test_load_module_default_location(
 
     assert isinstance(result, ModuleContext)
     assert subject.loaded_modules[3] is result
+
+
+def test_home(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    subject: ProtocolContext,
+) -> None:
+    """It should home all axes."""
+    subject.home()
+    decoy.verify(mock_core.home(), times=1)

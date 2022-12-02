@@ -1,10 +1,10 @@
 """Movement command handling."""
 from __future__ import annotations
 
-from typing import Dict, Optional, Sequence
+from typing import Dict, Optional, List
 from dataclasses import dataclass
 
-from opentrons.types import Point
+from opentrons.types import Point, Mount
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import (
     CriticalPoint,
@@ -226,16 +226,28 @@ class MovementHandler:
             position=DeckPoint(x=point.x, y=point.y, z=point.z),
         )
 
-    async def home(self, axes: Optional[Sequence[MotorAxis]]) -> None:
+    async def home(self, axes: Optional[List[MotorAxis]]) -> None:
         """Send the requested axes to their "home" positions.
 
         If axes is `None`, will home all motors.
         """
-        hardware_axes = None
-        if axes is not None:
+        # TODO(mc, 2022-12-01): this is overly complicated
+        # https://opentrons.atlassian.net/browse/RET-1287
+        if axes is None:
+            await self._hardware_api.home()
+        elif axes == [MotorAxis.LEFT_PLUNGER]:
+            await self._hardware_api.home_plunger(Mount.LEFT)
+        elif axes == [MotorAxis.RIGHT_PLUNGER]:
+            await self._hardware_api.home_plunger(Mount.RIGHT)
+        elif axes == [MotorAxis.LEFT_Z, MotorAxis.LEFT_PLUNGER]:
+            await self._hardware_api.home_z(Mount.LEFT)
+            await self._hardware_api.home_plunger(Mount.LEFT)
+        elif axes == [MotorAxis.RIGHT_Z, MotorAxis.RIGHT_PLUNGER]:
+            await self._hardware_api.home_z(Mount.RIGHT)
+            await self._hardware_api.home_plunger(Mount.RIGHT)
+        else:
             hardware_axes = [MOTOR_AXIS_TO_HARDWARE_AXIS[a] for a in axes]
-
-        await self._hardware_api.home(axes=hardware_axes)
+            await self._hardware_api.home(axes=hardware_axes)
 
     async def move_to_coordinates(
         self,

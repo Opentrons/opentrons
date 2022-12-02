@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from contextlib import nullcontext
-from typing import TYPE_CHECKING, Any, List, Optional, Sequence, Union
+from typing import Any, List, Optional, Sequence, Union
 from opentrons.broker import Broker
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons import types, hardware_control as hc
@@ -24,11 +24,9 @@ from opentrons.protocols.api_support.util import (
     APIVersionError,
 )
 
-from .core.common import InstrumentCore
+from .core.common import InstrumentCore, ProtocolCore
 from . import labware
 
-if TYPE_CHECKING:
-    from .protocol_context import ProtocolContext
 
 AdvancedLiquidHandling = Union[
     labware.Well,
@@ -64,7 +62,7 @@ class InstrumentContext(publisher.CommandPublisher):
     def __init__(
         self,
         implementation: InstrumentCore,
-        ctx: ProtocolContext,
+        protocol_core: ProtocolCore,
         broker: Broker,
         api_version: APIVersion,
         tip_racks: List[labware.Labware],
@@ -75,7 +73,7 @@ class InstrumentContext(publisher.CommandPublisher):
         super().__init__(broker)
         self._api_version = api_version
         self._implementation = implementation
-        self._ctx = ctx
+        self._protocol_core = protocol_core
         self._tip_racks = tip_racks
         self._last_tip_picked_up_from: Union[labware.Well, None] = None
         self._starting_tip: Union[labware.Well, None] = None
@@ -168,6 +166,8 @@ class InstrumentContext(publisher.CommandPublisher):
         )
 
         well: Optional[labware.Well]
+        last_location = self._protocol_core.get_last_location()
+
         if isinstance(location, labware.Well):
             move_to_location = location.bottom(z=self.well_bottom_clearance.aspirate)
             well = location
@@ -178,8 +178,8 @@ class InstrumentContext(publisher.CommandPublisher):
             raise TypeError(
                 "location should be a Well or Location, but it is {}".format(location)
             )
-        elif self._ctx.location_cache:
-            move_to_location = self._ctx.location_cache
+        elif last_location:
+            move_to_location = last_location
             _, well = move_to_location.labware.get_parent_labware_and_well()
         else:
             raise RuntimeError(
@@ -270,6 +270,8 @@ class InstrumentContext(publisher.CommandPublisher):
             )
         )
         well: Optional[labware.Well]
+        last_location = self._protocol_core.get_last_location()
+
         if isinstance(location, labware.Well):
             well = location
             if well.parent._implementation.is_fixed_trash():
@@ -285,8 +287,8 @@ class InstrumentContext(publisher.CommandPublisher):
             raise TypeError(
                 f"location should be a Well or Location, but it is {location}"
             )
-        elif self._ctx.location_cache:
-            move_to_location = self._ctx.location_cache
+        elif last_location:
+            move_to_location = last_location
             _, well = move_to_location.labware.get_parent_labware_and_well()
         else:
             raise RuntimeError(
@@ -426,6 +428,8 @@ class InstrumentContext(publisher.CommandPublisher):
         well: Optional[labware.Well]
         # TODO(jbl 2022-11-10) refactor this boolean out and make location optional when PE blow-out in place exists
         move_to_well = True
+        last_location = self._protocol_core.get_last_location()
+
         if isinstance(location, labware.Well):
             if location.parent.is_tiprack:
                 _log.warning(
@@ -441,8 +445,8 @@ class InstrumentContext(publisher.CommandPublisher):
             raise TypeError(
                 "location should be a Well or Location, but it is {}".format(location)
             )
-        elif self._ctx.location_cache:
-            checked_loc = self._ctx.location_cache
+        elif last_location:
+            checked_loc = last_location
             _, well = checked_loc.labware.get_parent_labware_and_well()
             # if no explicit location given but location cache exists,
             # pipette blows out immediately at
@@ -524,7 +528,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         # If location is a valid well, move to the well first
         if location is None:
-            last_location = self._ctx.location_cache
+            last_location = self._protocol_core.get_last_location()
             if not last_location:
                 raise RuntimeError("No valid current location cache present")
             else:
@@ -603,7 +607,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         if height is None:
             height = 5
-        loc = self._ctx.location_cache
+        loc = self._protocol_core.get_last_location()
         if not loc or not loc.labware.is_well:
             raise RuntimeError("No previous Well cached to perform air gap")
         target = loc.labware.as_well().top(height)
