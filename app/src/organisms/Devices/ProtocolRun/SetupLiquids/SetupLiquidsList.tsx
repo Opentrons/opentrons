@@ -23,6 +23,7 @@ import {
   JUSTIFY_FLEX_START,
 } from '@opentrons/components'
 import { MICRO_LITERS } from '@opentrons/shared-data'
+import { useTrackEvent } from '../../../../redux/analytics'
 import { useProtocolDetailsForRun } from '../../../Devices/hooks'
 import { StyledText } from '../../../../atoms/text'
 import { getSlotLabwareName } from '../utils/getSlotLabwareName'
@@ -92,6 +93,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
   >(null)
   const commands = useProtocolDetailsForRun(runId).protocolData?.commands
   const labwareByLiquidId = parseLabwareInfoByLiquidId(commands ?? [])
+  const trackEvent = useTrackEvent()
 
   const LIQUID_CARD_STYLE = css`
     ${BORDERS.cardOutlineBorder}
@@ -108,12 +110,15 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
       ${BORDERS.cardOutlineBorder}
     }
   `
-
+  const handleSetOpenItem = (): void => {
+    setOpenItem(!openItem)
+    trackEvent({ name: 'expandLiquidSetupRow', properties: {} })
+  }
   return (
     <Box
       css={LIQUID_CARD_STYLE}
       padding={SPACING.spacing4}
-      onClick={() => setOpenItem(!openItem)}
+      onClick={handleSetOpenItem}
       backgroundColor={openItem ? COLORS.fundamentalsBackground : COLORS.white}
       data-testid="LiquidsListItem_Row"
     >
@@ -171,6 +176,13 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
               labware.labwareId,
               commands
             )
+            const handleLiquidDetailsLabwareId = (): void => {
+              setLiquidDetailsLabwareId(labware.labwareId)
+              trackEvent({
+                name: 'openLiquidLabwareDetailModal',
+                properties: {},
+              })
+            }
             return (
               <Box
                 css={LIQUID_CARD_ITEM_STYLE}
@@ -180,7 +192,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                 padding={SPACING.spacing4}
                 backgroundColor={COLORS.white}
                 data-testid={`LiquidsListItem_slotRow_${index}`}
-                onClick={() => setLiquidDetailsLabwareId(labware.labwareId)}
+                onClick={handleLiquidDetailsLabwareId}
               >
                 <Flex
                   flexDirection={DIRECTION_ROW}

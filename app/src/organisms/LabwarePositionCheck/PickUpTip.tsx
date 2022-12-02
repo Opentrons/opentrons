@@ -13,6 +13,7 @@ import {
   getLabwareDisplayName,
   getModuleType,
   getVectorDifference,
+  HEATERSHAKER_MODULE_TYPE,
   IDENTITY_VECTOR,
 } from '@opentrons/shared-data'
 import { getLabwareDef } from './utils/labware'
@@ -86,7 +87,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
   const handleConfirmPlacement = (): void => {
     const modulePrepCommands = protocolData.modules.reduce<CreateCommand[]>(
       (acc, module) => {
-        if (getModuleType(module.model)) {
+        if (getModuleType(module.model) === HEATERSHAKER_MODULE_TYPE) {
           return [
             ...acc,
             {

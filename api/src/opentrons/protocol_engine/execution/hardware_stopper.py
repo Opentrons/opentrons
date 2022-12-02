@@ -3,12 +3,15 @@ import logging
 from typing import Optional
 
 from opentrons.hardware_control import HardwareControlAPI
+from ..resources.ot3_validation import ensure_ot3_hardware
 from ..state import StateStore
 from ..types import MotorAxis, WellLocation
-from ..errors import PipetteNotAttachedError
+from ..errors import PipetteNotAttachedError, HardwareNotSupportedError
 
 from .movement import MovementHandler
 from .pipetting import PipettingHandler
+
+from ...hardware_control.types import OT3Mount
 
 
 log = logging.getLogger(__name__)
@@ -48,6 +51,16 @@ class HardwareStopper:
 
         if attached_tip_racks:
             await self._hardware_api.stop(home_after=False)
+            # TODO: Update this once gripper MotorAxis is available in engine.
+            try:
+                ot3api = ensure_ot3_hardware(hardware_api=self._hardware_api)
+                if (
+                    self._state_store.config.use_virtual_gripper
+                    and ot3api.has_gripper()
+                ):
+                    await ot3api.home_z(mount=OT3Mount.GRIPPER)
+            except HardwareNotSupportedError:
+                pass
             await self._movement_handler.home(
                 axes=[MotorAxis.X, MotorAxis.Y, MotorAxis.LEFT_Z, MotorAxis.RIGHT_Z]
             )
