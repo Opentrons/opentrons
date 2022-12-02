@@ -488,9 +488,7 @@ However, this code would generate 60 lines in the protocol's run log, while exec
 Changes with the GEN2 Thermocycler Module
 =========================================
 
-All methods of :py:class:`.ThermocyclerContext` work with both the GEN1 and GEN2 Thermocycler. One difference is that the GEN2 module has an automatic plate lift feature. When executing :py:meth:`~.ThermocyclerContext.open_lid`,  the GEN2 module physically moves the loaded plate upward to make it easier to remove the plate from the module.
-
-.. versionchanged: 2.14
+All methods of :py:class:`.ThermocyclerContext` work with both the GEN1 and GEN2 Thermocycler. One practical difference is that the GEN2 module has a plate lift feature to make it easier to remove the plate manually or with a robotic gripper. To activate the plate lift, press the button on the Thermocycler for three seconds while the lid is open. If you need to do this in the middle of a run, call :py:meth:`~.ProtocolContext.pause`, lift and move the plate, and then resume the run from the Opentrons App.
 
 
 .. _heater-shaker-module:
