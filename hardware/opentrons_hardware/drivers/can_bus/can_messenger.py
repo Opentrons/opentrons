@@ -297,20 +297,22 @@ class CanMessenger:
                             log.debug("message ignored by filter")
                             continue
                         listener(message_definition(payload=build), message.arbitration_id)  # type: ignore[arg-type]
-                    if message.arbitration_id == MessageId.error_message:
-                        self._handle_error(build)
+                    if (
+                        message.arbitration_id.parts.message_id
+                        == MessageId.error_message
+                    ):
+                        await self._handle_error(build)
                 except BinarySerializableException:
                     log.exception(f"Failed to build from {message}")
             else:
                 log.error(f"Message {message} is not recognized.")
 
-    def _handle_error(self, build: BinarySerializable) -> None:
+    async def _handle_error(self, build: BinarySerializable) -> None:
         err_msg = ErrorMessage(payload=build)  # type: ignore[arg-type]
         error_payload: ErrorMessagePayload = err_msg.payload
         err_msg.log_error(log)
-
-        if error_payload.severity == ErrorSeverity.unrecoverable:
-            self.send(NodeId.broadcast, StopRequest())
+        if error_payload.severity.value == ErrorSeverity.unrecoverable:
+            await self.send(NodeId.broadcast, StopRequest())
 
         if error_payload.message_index == 0:
             log.error(
