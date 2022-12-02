@@ -21,6 +21,9 @@ from opentrons.calibration_storage import (
 from opentrons.hardware_control import robot_calibration as robot_cal
 from opentrons.hardware_control import HardwareControlAPI, CriticalPoint, Pipette
 from opentrons.protocol_api import labware
+from opentrons.protocols.api_support.default_deck_type import (
+    guess_from_global_config as guess_deck_type_from_global_config,
+)
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.types import Mount, Point, Location
 from opentrons.util import linal
@@ -85,7 +88,7 @@ class DeckCalibrationUserFlow:
         self._hw_pipette, self._mount = self._select_target_pipette()
         self._default_tipracks = self._get_default_tipracks()
 
-        self._deck = Deck()
+        self._deck = Deck(guess_deck_type_from_global_config())
         self._tip_rack = self._get_tip_rack_lw()
         self._deck[TIP_RACK_SLOT] = self._tip_rack
 

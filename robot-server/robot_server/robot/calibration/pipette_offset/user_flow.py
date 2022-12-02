@@ -22,6 +22,9 @@ from opentrons.calibration_storage.types import (
 )
 from opentrons.hardware_control import HardwareControlAPI, CriticalPoint, Pipette
 from opentrons.protocol_api import labware
+from opentrons.protocols.api_support.default_deck_type import (
+    guess_from_global_config as guess_deck_type_from_global_config,
+)
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.types import Mount, Point, Location
 from robot_server.service.errors import RobotServerError
@@ -88,7 +91,7 @@ class PipetteOffsetCalibrationUserFlow:
             )
         self._hw_pipette = pip
 
-        self._deck = Deck()
+        self._deck = Deck(guess_deck_type_from_global_config())
 
         self._saved_offset_this_session = False
 

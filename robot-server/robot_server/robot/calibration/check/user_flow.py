@@ -26,6 +26,9 @@ from opentrons.hardware_control import (
 )
 from opentrons.protocol_api import labware
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
+from opentrons.protocols.api_support.default_deck_type import (
+    guess_from_global_config as guess_deck_type_from_global_config,
+)
 from opentrons.protocols.geometry.deck import Deck
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
@@ -109,7 +112,7 @@ class CheckCalibrationUserFlow:
             first=ComparisonStatePerCalibration(),
             second=ComparisonStatePerCalibration(),
         )
-        self._deck = Deck()
+        self._deck = Deck(guess_deck_type_from_global_config())
         self._filtered_hw_pips = self._filter_hw_pips()
         (
             self._deck_calibration,
