@@ -19,7 +19,7 @@ from typing import (
     Iterator,
 )
 from opentrons.config.types import OT3Config, GantryLoad
-from opentrons.config import pipette_config, gripper_config
+from opentrons.config import ot3_pipette_config, gripper_config
 from .ot3utils import (
     axis_convert,
     create_move_group,
@@ -397,8 +397,38 @@ class OT3Controller:
             self._encoder_position.update({axis: point[1]})
 
     @staticmethod
-    def _synthesize_model_name(name: FirmwarePipetteName, model: str) -> "PipetteModel":
-        return cast("PipetteModel", f"{name.name}_v{model}")
+    def _convert_channels_to_int(channels: str) -> int:
+        # TODO this is a temporary function. We should
+        # actually just split the pipette type and
+        # channels when we pull out the pipette serial
+        # number.
+        if channels == '96':
+            return 96
+        elif channels == 'multi':
+            return 8
+        else:
+            return 1
+
+    @staticmethod
+    def _lookup_serial_key(pipette_name: FirmwarePipetteName) -> str:
+        lookup_name = {
+            PipetteName.p1000_single: "P1KS",
+            PipetteName.p1000_multi: "P1KM",
+            PipetteName.p50_single: "P50S",
+            PipetteName.p50_multi: "P50M",
+            PipetteName.p1000_96: "P1KH",
+            PipetteName.p50_96: "P50H"}
+        return lookup_name[pipette_name]
+    
+    @staticmethod
+    def _split_pipette_name(name: FirmwarePipetteName) -> Tuple[str, int]:
+        pipette_type, channels = name.name.split('_')
+        return pipette_type, OT3Controller._convert_channels_to_int(channels)
+
+    @staticmethod
+    def _combine_serial_number(pipette_info: ohc_tool_types.PipetteInformation) -> str:
+        serialized_name = OT3Controller._lookup_serial_key(pipette_info.name)
+        return f"{serialized_name}V{pipette_info.model}{pipette_info.serial}"
 
     @staticmethod
     def _build_attached_pip(
@@ -408,10 +438,10 @@ class OT3Controller:
             raise InvalidPipetteName(name=attached.name_int, mount=mount)
         try:
             return {
-                "config": pipette_config.load(
-                    OT3Controller._synthesize_model_name(attached.name, attached.model)
+                "config": ot3_pipette_config.load_ot3_pipette(
+                    **OT3Controller._split_pipette_name(attached.name), attached.model
                 ),
-                "id": attached.serial,
+                "id": OT3Controller._combine_serial_number(attached),
             }
         except KeyError:
             raise InvalidPipetteModel(
@@ -426,7 +456,7 @@ class OT3Controller:
         serial = attached.serial
         return {
             "config": gripper_config.load(model, serial),
-            "id": serial,
+            "id": f"GRPV{model}{serial}",
         }
 
     @staticmethod

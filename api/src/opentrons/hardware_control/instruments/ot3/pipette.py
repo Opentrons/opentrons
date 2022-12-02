@@ -1,54 +1,40 @@
-from __future__ import annotations
-
-import functools
-
-""" Classes and functions for pipette state tracking
-"""
-from dataclasses import asdict, replace
-import logging
 from typing import Any, Dict, Optional, Set, Tuple, Union
-
-from opentrons_shared_data.pipette import name_config as pipette_name_config
-
-from opentrons.types import Point
-from opentrons.config import pipette_config, robot_configs
-from opentrons.config.types import RobotConfig, OT3Config
-from opentrons.drivers.types import MoveSplit
-from ..instrument_abc import AbstractInstrument, MountType
+from opentrons.config import ot3_pipette_config
+from opentrons_shared_data.pipette.pipette_definition import PipetteConfigurations
+from ..instrument_abc import AbstractInstrument
 from .instrument_calibration import (
-    PipetteOffsetByPipetteMount,
+    save_pipette_offset_calibration,
     load_pipette_offset,
-)
-from opentrons.hardware_control.types import (
-    CriticalPoint,
-    BoardRevision,
-    OT3AxisKind,
-    InvalidMoveError,
+    PipetteOffsetByPipetteMount,
 )
 
 
-from opentrons_shared_data.pipette.dev_types import (
-    UlPerMmAction,
-    PipetteName,
-    PipetteModel,
-)
-from opentrons.hardware_control.dev_types import InstrumentHardwareConfigs
-from typing_extensions import Final
+def piecewise_volume_conversion(ul: float, sequence: List[List[float]]) -> float:
+    """
+    Takes a volume in microliters and a sequence representing a piecewise
+    function for the slope and y-intercept of a ul/mm function, where each
+    sub-list in the sequence contains:
+
+      - the max volume for the piece of the function (minimum implied from the
+        max of the previous item or 0
+      - the slope of the segment
+      - the y-intercept of the segment
+
+    :return: the ul/mm value for the specified volume
+    """
+    # pick the first item from the seq for which the target is less than
+    # the bracketing element
+    for x in sequence:
+        if ul <= x[0]:
+            # use that element to calculate the movement distance in mm
+            return x[1] * ul + x[2]
+
+    # Compatibility with previous implementation of search.
+    #  list(filter(lambda x: ul <= x[0], sequence))[0]
+    raise IndexError()
 
 
-RECONFIG_KEYS = {"quirks"}
-
-
-mod_log = logging.getLogger(__name__)
-
-INTERNOZZLE_SPACING_MM: Final[float] = 9
-
-# TODO (lc 11-1-2022) We need to separate out the pipette object
-# into a separate category for OT2 vs OT3 pipettes. At which point
-# this union will be unneccessary
-
-
-class Pipette(AbstractInstrument[pipette_config.PipetteConfig]):
+class Pipette(AbstractInstrument[PipetteConfigurations]):
     """A class to gather and track pipette state and configs.
 
     This class should not touch hardware or call back out to the hardware
@@ -60,7 +46,7 @@ class Pipette(AbstractInstrument[pipette_config.PipetteConfig]):
 
     def __init__(
         self,
-        config: pipette_config.PipetteConfig,
+        config: PipetteConfigurations,
         pipette_offset_cal: PipetteOffsetByPipetteMount,
         pipette_id: Optional[str] = None,
     ) -> None:
@@ -91,30 +77,6 @@ class Pipette(AbstractInstrument[pipette_config.PipetteConfig]):
         self._aspirate_flow_rate = self._config.default_aspirate_flow_rates["2.0"]
         self._dispense_flow_rate = self._config.default_dispense_flow_rates["2.0"]
         self._blow_out_flow_rate = self._config.default_blow_out_flow_rates["2.0"]
-        # cache a dict representation of config for improved performance of
-        # as_dict.
-        self._config_as_dict = asdict(config)
-
-    def act_as(self, name: PipetteName) -> None:
-        """Reconfigure to act as ``name``. ``name`` must be either the
-        actual name of the pipette, or a name in its back-compatibility
-        config.
-        """
-        if name == self._acting_as:
-            return
-
-        assert name in self._config.back_compat_names + [
-            self.name
-        ], f"{self._name} is not back-compatible with {name}"
-        name_conf = pipette_name_config()
-        bc_conf = name_conf[name]
-        self.working_volume = bc_conf["maxVolume"]
-        self.update_config_item("min_volume", bc_conf["minVolume"])
-        self.update_config_item("max_volume", bc_conf["maxVolume"])
-
-    @property
-    def acting_as(self) -> PipetteName:
-        return self._acting_as
 
     @property
     def config(self) -> pipette_config.PipetteConfig:
@@ -125,14 +87,9 @@ class Pipette(AbstractInstrument[pipette_config.PipetteConfig]):
         return self._nozzle_offset
 
     @property
-    def pipette_offset(self) -> PipetteOffsetByPipetteMount:
+    def pipette_offset(self) -> OffsetCalibrationType:
         return self._pipette_offset
 
-    def update_config_item(self, elem_name: str, elem_val: Any) -> None:
-        self._log.info("updated config: {}={}".format(elem_name, elem_val))
-        self._config = replace(self._config, **{elem_name: elem_val})
-        # Update the cached dict representation
-        self._config_as_dict = asdict(self._config)
 
     def reset_pipette_offset(self, mount: MountType, to_default: bool) -> None:
         """Reset the pipette offset to system defaults."""
@@ -143,8 +100,9 @@ class Pipette(AbstractInstrument[pipette_config.PipetteConfig]):
 
     def save_pipette_offset(self, mount: MountType, offset: Point) -> None:
         """Update the pipette offset to a new value."""
-        # TODO (lc 10-31-2022) We should have this command be supported properly by
-        # ot-3 and ot-2 when we split out the pipette class
+        save_pipette_offset_calibration(
+            self._pipette_id, OT3Mount.from_mount(mount), offset
+        )
         self._pipette_offset = load_pipette_offset(self._pipette_id, mount)
 
     @property
@@ -375,7 +333,7 @@ class Pipette(AbstractInstrument[pipette_config.PipetteConfig]):
 def _reload_and_check_skip(
     new_config: pipette_config.PipetteConfig,
     attached_instr: Pipette,
-    pipette_offset: PipetteOffsetByPipetteMount,
+    pipette_offset: OffsetCalibrationType,
 ) -> Tuple[Pipette, bool]:
     # Once we have determined that the new and attached pipettes
     # are similar enough that we might skip, see if the configs
@@ -408,7 +366,7 @@ def load_from_config_and_check_skip(
     attached: Optional[Pipette],
     requested: Optional[PipetteName],
     serial: Optional[str],
-    pipette_offset: PipetteOffsetByPipetteMount,
+    pipette_offset: OffsetCalibrationType,
 ) -> Tuple[Optional[Pipette], bool]:
     """
     Given the pipette config for an attached pipette (if any) freshly read
@@ -516,3 +474,4 @@ def generate_hardware_configs_ot3(
             ],
             "splits": None,
         }
+
