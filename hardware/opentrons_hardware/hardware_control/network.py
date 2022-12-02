@@ -3,7 +3,7 @@ import asyncio
 import logging
 from typing import Set, Optional
 from opentrons_hardware.firmware_bindings import ArbitrationId
-from opentrons_hardware.firmware_bindings.constants import NodeId
+from opentrons_hardware.firmware_bindings.constants import NodeId, MessageId
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
@@ -42,9 +42,14 @@ async def probe(
             )
             return
         mod_log.debug(f"got response from {arbitration_id.parts.originating_node_id}")
-        nodes.add(originator)
-        if expected and expected.issubset(nodes):
-            event.set()
+        if arbitration_id.parts.message_id == MessageId.error_message:
+            mod_log.error(
+                f"Recieved an error message {str(message)} from {str(arbitration_id.parts)}"
+            )
+        else:
+            nodes.add(originator)
+            if expected and expected.issubset(nodes):
+                event.set()
 
     can_messenger.add_listener(listener)
     await can_messenger.send(

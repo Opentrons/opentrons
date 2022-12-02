@@ -8,9 +8,11 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     ExecuteMoveGroupRequest,
     MoveCompleted,
     ReadFromSensorResponse,
+    Acknowledgement,
 )
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.messages.payloads import (
+    EmptyPayload,
     MoveCompletedPayload,
     ReadFromSensorResponsePayload,
 )
@@ -114,7 +116,14 @@ async def test_capacitive_probe(
     ) -> List[Tuple[NodeId, MessageDefinition, NodeId]]:
         message.payload.serialize()
         if isinstance(message, ExecuteMoveGroupRequest):
+            ack_payload = EmptyPayload()
+            ack_payload.message_index = message.payload.message_index
             return [
+                (
+                    NodeId.host,
+                    Acknowledgement(payload=ack_payload),
+                    motor_node,
+                ),
                 (
                     NodeId.host,
                     MoveCompleted(
@@ -128,7 +137,7 @@ async def test_capacitive_probe(
                         )
                     ),
                     motor_node,
-                )
+                ),
             ]
         else:
             return []
@@ -151,7 +160,7 @@ async def test_capacitive_probe(
         ANY,  # this is a mock of a function on a class not a method so this is self
         sensor_info,
         ANY,
-        log=ANY,
+        do_log=ANY,
     )
 
 
@@ -182,6 +191,8 @@ async def test_capacitive_sweep(
     ) -> List[Tuple[NodeId, MessageDefinition, NodeId]]:
         message.payload.serialize()
         if isinstance(message, ExecuteMoveGroupRequest):
+            ack_payload = EmptyPayload()
+            ack_payload.message_index = message.payload.message_index
             sensor_values: List[Tuple[NodeId, MessageDefinition, NodeId]] = [
                 (
                     NodeId.host,
@@ -212,7 +223,16 @@ async def test_capacitive_sweep(
                     motor_node,
                 ),
             ]
-            return sensor_values + move_ack
+            execute_ack: List[Tuple[NodeId, MessageDefinition, NodeId]] = [
+                (
+                    NodeId.host,
+                    Acknowledgement(
+                        payload=ack_payload,
+                    ),
+                    motor_node,
+                ),
+            ]
+            return execute_ack + sensor_values + move_ack
         else:
             return []
 
