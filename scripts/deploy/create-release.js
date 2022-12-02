@@ -220,7 +220,7 @@ async function main() {
   )
 }
 
-module.exports = { versionPrevious: versionPrevious }
+module.exports = { versionPrevious: versionPrevious, versionDetailsFromGit: versionDetailsFromGit }
 
 if (require.main === module) {
   main()
