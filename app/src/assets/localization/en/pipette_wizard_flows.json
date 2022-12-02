@@ -40,5 +40,16 @@
   "cal_pipette": "Calibrate pipette",
   "get_started_detach": "<block>To get started, remove labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right</block>",
   "pipette_failed_to_detach": "Pipette failed to detach",
-  "pipette_detached": "Pipette Successfully Detached"
+  "pipette_detached": "Pipette Successfully Detached",
+  "get_started_flow": "<block>To get started, remove labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right</block>",
+  "unscrew_carriage": "Unscrew Z Axis Carriage",
+  "unscrew_at_top": "<block>Reach the top of of the gantry carriage and unscrew the captive screw connecting right pippete mount to the the z axis.</block><block>The detached right mount should freely move up and down the z axis.</block>",
+  "connect_mounting_plate": "Connect and Attach Mounting Plate",
+  "attach_mounting_plate": "<block>Hold onto the pipette so it does not fall. Attach the monting plate to the robot by alinging the pins on the mounting plate to the slots on the z axis carriage.</block><block>You may need to adjust the z axis to align the left and right channels for propper fitment.</block>",
+  "reattach_carriage": "Reattach Z Axis Carriage",
+  "how_to_reattach": "<block>Take the right carriage and push it to the top of the z axis. Reach the top of of the gantry carriage and screw in the captive screw to connect right pippete mount to the the z axis.</block><block>The detached right mount should freely move up and down the z axis.</block>",
+  "single_mount_attached_error": "Single mount pipette is selected when this is the 96 channel flow",
+  "detach_mounting_plate_instructions": "Hold onto the pipette so it does not fall. Dettach the monting plate to the robot by removing the pins on the plate from the slots on the gantry carriage",
+  "unscrew_and_detach": "Unscrew and Dettach Mounting Plate",
+  "pipette_heavy": "The 96-channel pipette is <weight> so be cautious during uninstall. Having a helper near by can be really useful for this process"
 }

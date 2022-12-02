@@ -25,24 +25,30 @@ import { DetachPipette } from './DetachPipette'
 
 import type { PipetteMount } from '@opentrons/shared-data'
 import type { State } from '../../redux/types'
-import type { PipetteWizardFlow } from './types'
+import type { PipetteWizardFlow, SelectablePipettes } from './types'
 
 interface PipetteWizardFlowsProps {
   flowType: PipetteWizardFlow
   mount: PipetteMount
   robotName: string
+  selectedPipette: SelectablePipettes
   closeFlow: () => void
 }
 
 export const PipetteWizardFlows = (
   props: PipetteWizardFlowsProps
 ): JSX.Element | null => {
-  const { flowType, mount, closeFlow, robotName } = props
+  const { flowType, mount, closeFlow, robotName, selectedPipette } = props
   const { t } = useTranslation('pipette_wizard_flows')
   const attachedPipette = useSelector((state: State) =>
     getAttachedPipettes(state, robotName)
   )
-  const pipetteWizardSteps = getPipetteWizardSteps(flowType, mount)
+  const pipetteWizardSteps = getPipetteWizardSteps(
+    flowType,
+    mount,
+    selectedPipette
+  )
+  console.log(selectedPipette)
   const host = useHost()
   const [runId, setRunId] = React.useState<string>('')
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
@@ -133,6 +139,7 @@ export const PipetteWizardFlows = (
     setShowErrorMessage,
     errorMessage,
     robotName,
+    selectedPipette,
   }
   const exitModal = (
     <ExitModal goBack={cancelExit} proceed={confirmExit} flowType={flowType} />

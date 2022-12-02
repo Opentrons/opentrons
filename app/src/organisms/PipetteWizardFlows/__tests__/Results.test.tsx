@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
-import { LEFT } from '@opentrons/shared-data'
+import { LEFT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 import { COLORS, renderWithProviders } from '@opentrons/components'
 import {
   mockAttachedPipette,
@@ -26,6 +26,7 @@ describe('Results', () => {
   let props: React.ComponentProps<typeof Results>
   beforeEach(() => {
     props = {
+      selectedPipette: SINGLE_MOUNT_PIPETTES,
       robotName: 'otie',
       mount: LEFT,
       goBack: jest.fn(),
@@ -74,6 +75,35 @@ describe('Results', () => {
     }
     const { getByText, getByRole, getByLabelText } = render(props)
     getByText('Pipette failed to attach')
+    expect(getByLabelText('ot-alert')).toHaveStyle(
+      `color: ${COLORS.errorEnabled}`
+    )
+    const exit = getByRole('button', { name: 'Results_exit' })
+    fireEvent.click(exit)
+    expect(props.proceed).toHaveBeenCalled()
+  })
+  it('renders the correct information when pipette wizard is a success for detach flow', () => {
+    props = {
+      ...props,
+      attachedPipette: { left: null, right: null },
+      flowType: FLOWS.DETACH,
+    }
+    const { getByText, getByRole, getByLabelText } = render(props)
+    getByText('Pipette Successfully Detached')
+    expect(getByLabelText('ot-check')).toHaveStyle(
+      `color: ${COLORS.successEnabled}`
+    )
+    const exit = getByRole('button', { name: 'Results_exit' })
+    fireEvent.click(exit)
+    expect(props.proceed).toHaveBeenCalled()
+  })
+  it('renders the correct information when pipette wizard is a fail for detach flow', () => {
+    props = {
+      ...props,
+      flowType: FLOWS.DETACH,
+    }
+    const { getByText, getByRole, getByLabelText } = render(props)
+    getByText('Pipette failed to detach')
     expect(getByLabelText('ot-alert')).toHaveStyle(
       `color: ${COLORS.errorEnabled}`
     )

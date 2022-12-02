@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import { LEFT } from '@opentrons/shared-data'
+import { LEFT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import {
   mockAttachedPipette,
@@ -39,6 +39,7 @@ describe('AttachProbe', () => {
       setShowErrorMessage: jest.fn(),
       isRobotMoving: false,
       isExiting: false,
+      selectedPipette: SINGLE_MOUNT_PIPETTES,
     }
   })
   it('returns the correct information, buttons work as expected', async () => {

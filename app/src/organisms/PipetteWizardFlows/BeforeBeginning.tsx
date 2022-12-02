@@ -1,13 +1,25 @@
 import * as React from 'react'
 import { UseMutateFunction } from 'react-query'
 import { COLORS } from '@opentrons/components'
+import {
+  NINETY_SIX_CHANNEL,
+  SINGLE_MOUNT_PIPETTES,
+} from '@opentrons/shared-data'
 import { Trans, useTranslation } from 'react-i18next'
 import { StyledText } from '../../atoms/text'
+import { Banner } from '../../atoms/Banner'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardRequiredEquipmentList } from '../../molecules/WizardRequiredEquipmentList'
-import { CALIBRATION_PROBE, FLOWS, PIPETTE, HEX_SCREWDRIVER } from './constants'
+import {
+  CALIBRATION_PROBE,
+  FLOWS,
+  PIPETTE,
+  HEX_SCREWDRIVER,
+  NINETY_SIX_CHANNEL_MOUNTING_PLATE,
+  NINETY_SIX_CHANNEL_PIPETTE,
+} from './constants'
 import type { Run, CreateRunData } from '@opentrons/api-client'
 import type { PipetteWizardStepProps } from './types'
 import type { AxiosError } from 'axios'
@@ -31,6 +43,7 @@ export const BeforeBeginning = (
     isRobotMoving,
     errorMessage,
     setShowErrorMessage,
+    selectedPipette,
   } = props
   const { t } = useTranslation('pipette_wizard_flows')
   React.useEffect(() => {
@@ -63,6 +76,27 @@ export const BeforeBeginning = (
     case FLOWS.DETACH: {
       equipmentList = [HEX_SCREWDRIVER]
       bodyText = t('get_started_detach')
+      bodyText = t('remove_labware')
+      proceedButtonText = t('move_gantry_to_front')
+      if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
+        equipmentList = [PIPETTE, CALIBRATION_PROBE, HEX_SCREWDRIVER]
+      } else {
+        equipmentList = [
+          NINETY_SIX_CHANNEL_PIPETTE,
+          CALIBRATION_PROBE,
+          HEX_SCREWDRIVER,
+          NINETY_SIX_CHANNEL_MOUNTING_PLATE,
+        ]
+      }
+      break
+    }
+    case FLOWS.DETACH: {
+      bodyText = t('get_started_flow')
+      if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
+        equipmentList = [HEX_SCREWDRIVER]
+      } else {
+        equipmentList = [CALIBRATION_PROBE, HEX_SCREWDRIVER]
+      }
       break
     }
   }
@@ -140,11 +174,17 @@ export const BeforeBeginning = (
       // getHelp={BEFORE_YOU_BEGIN_URL}
       rightHandBody={rightHandBody}
       bodyText={
-        <Trans
-          t={t}
-          i18nKey={bodyText}
-          components={{ block: <StyledText as="p" /> }}
-        />
+        <>
+          <Trans
+            t={t}
+            i18nKey={bodyText}
+            components={{ block: <StyledText as="p" /> }}
+          />
+          {selectedPipette === NINETY_SIX_CHANNEL &&
+          (flowType === FLOWS.DETACH || flowType === FLOWS.ATTACH) ? (
+            <Banner type="warning">{t('pipette_heavy')}</Banner>
+          ) : null}
+        </>
       }
       proceedButtonText={proceedButtonText}
       proceedIsDisabled={isCreateLoading}

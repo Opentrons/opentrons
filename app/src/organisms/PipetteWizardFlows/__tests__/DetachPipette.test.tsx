@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import { LEFT } from '@opentrons/shared-data'
+import { LEFT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import {
   mockAttachedPipette,
@@ -37,6 +37,7 @@ describe('DetachPipette', () => {
   beforeEach(() => {
     props = {
       robotName: 'otie',
+      selectedPipette: SINGLE_MOUNT_PIPETTES,
       mount: LEFT,
       goBack: jest.fn(),
       proceed: jest.fn(),

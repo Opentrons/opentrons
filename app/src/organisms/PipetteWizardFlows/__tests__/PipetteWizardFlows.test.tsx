@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import { LEFT } from '@opentrons/shared-data'
+import { LEFT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 import {
   useCreateRunMutation,
   // useDeleteRunMutation,
@@ -85,6 +85,7 @@ describe('PipetteWizardFlows', () => {
     .mockImplementation(() => Promise.resolve())
   beforeEach(() => {
     props = {
+      selectedPipette: SINGLE_MOUNT_PIPETTES,
       flowType: FLOWS.CALIBRATE,
       mount: LEFT,
       robotName: 'otie',
@@ -317,4 +318,5 @@ describe('PipetteWizardFlows', () => {
       expect(dispatchApiRequest).toBeCalledWith(mockFetchPipettes('otie'))
     })
   })
+  //  TODO( jr 12/1/22): add tests for 96 channel
 })

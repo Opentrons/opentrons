@@ -101,7 +101,9 @@ export const OT3_PIPETTES = [
   'p50_single_gen3',
   'p50_multi_gen3',
   'p1000_multi_gen3',
+  'p1000_96',
 ]
+
 //  magnetic module info
 export const MM: 'mm' = 'mm'
 export const MAGNETIC_MODULES_MAX_ENGAGE_HEIGHT = 20
