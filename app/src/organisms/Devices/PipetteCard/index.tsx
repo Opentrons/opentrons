@@ -43,6 +43,7 @@ import {
 import { FLOWS } from '../../PipetteWizardFlows/constants'
 import { PipetteWizardFlows } from '../../PipetteWizardFlows'
 import { AskForCalibrationBlockModal } from '../../CalibrateTipLength'
+import { ChoosePipette } from '../../PipetteWizardFlows/ChoosePipette'
 import {
   useDeckCalibrationData,
   useIsOT3,
@@ -62,7 +63,6 @@ import type {
   PipetteWizardFlow,
   SelectablePipettes,
 } from '../../PipetteWizardFlows/types'
-import { ChoosePipette } from '../../PipetteWizardFlows/ChoosePipette'
 
 interface PipetteCardProps {
   pipetteInfo: PipetteModelSpecs | null
@@ -364,12 +364,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
         padding={SPACING.spacing2}
         data-testid={`PipetteCard_overflow_btn_${pipetteDisplayName}`}
       >
-        <OverflowBtn
-          aria-label="overflow"
-          onClick={handleOverflowClick}
-          //  disabling the overflow btn if a 96 channel pipette is attached for now
-          disabled={is96ChannelAttached}
-        />
+        <OverflowBtn aria-label="overflow" onClick={handleOverflowClick} />
       </Box>
       {showOverflowMenu && (
         <>
