@@ -31,4 +31,4 @@ jobs:
           yarn install
       - name: 'create release'
         run: |
-          node ./scripts/create-release ${{ github.token }} ${{ github.ref_name }}
+          node ./scripts/deploy/create-release.js ${{ github.token }} ${{ github.ref_name }} --deploy
