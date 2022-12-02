@@ -8,6 +8,7 @@ from opentrons.protocols.geometry import module_geometry
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.types import Location
 
+from opentrons_shared_data.deck import DefinitionName as DeckDefinitionName
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
@@ -18,14 +19,14 @@ def trough_definition() -> LabwareDefinition:
 
 @pytest.fixture(scope="session")
 def trough(trough_definition):
-    deck = Deck()
+    deck = Deck(deck_type=DeckDefinitionName.OT2_STANDARD)
     return labware.load_from_definition(trough_definition, deck.position_for(1))
 
 
 @pytest.fixture(scope="session")
 def module(trough):
-    deck = Deck()
-    mod = module_geometry.create_geometry(
+    deck = Deck(deck_type=DeckDefinitionName.OT2_STANDARD)
+    mod = module_geometry.create_geometry_for_ot2_deck(
         definition=module_geometry.load_definition(
             TemperatureModuleModel.TEMPERATURE_V2
         ),
