@@ -867,7 +867,7 @@ class OT3API(
         ):
             if self._gripper_handler.gripper.state == GripperJawState.UNHOMED:
                 self._log.warning(
-                    "Gripper jaw is not homed. " "Can't be moved to idle position"
+                    "Gripper jaw is not homed. Can't be moved to idle position"
                 )
             else:
                 # allows for safer gantry movement at minimum force

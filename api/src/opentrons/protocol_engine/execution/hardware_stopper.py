@@ -10,7 +10,13 @@ from ..errors import PipetteNotAttachedError, HardwareNotSupportedError
 
 from .movement import MovementHandler
 from .pipetting import PipettingHandler
+<<<<<<< HEAD
 from ...hardware_control.types import OT3Mount
+=======
+
+from ...hardware_control.types import OT3Mount
+
+>>>>>>> edge
 
 log = logging.getLogger(__name__)
 
