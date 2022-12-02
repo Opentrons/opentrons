@@ -13,6 +13,12 @@ jobs:
     runs-on: 'ubuntu-22.04'
     name: 'Create changelogs and release'
     steps:
+      # this could be improved by replacing this checkout with something like
+      # mkdir opentrons ; git init . ;
+      # git remote add origin  https://github.com/opentrons/opentrons
+      # git fetch origin ${{ github.ref_name }}:${{ github.ref_name }}
+      # git checkout ${{ github.ref_name }}
+      # This would pull history for only the tag in question.
       - uses: 'actions/checkout@v3'
         with:
           fetch-depth: 0
