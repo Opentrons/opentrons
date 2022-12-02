@@ -107,12 +107,12 @@ describe('getPipetteWizardSteps', () => {
         flowType: FLOWS.ATTACH,
       },
       {
-        section: SECTIONS.UNSCREW_CARRIAGE,
+        section: SECTIONS.CARRIAGE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },
       {
-        section: SECTIONS.ATTACH_MOUNTING_PLATE,
+        section: SECTIONS.MOUNTING_PLATE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },
@@ -146,12 +146,12 @@ describe('getPipetteWizardSteps', () => {
         flowType: FLOWS.DETACH,
       },
       {
-        section: SECTIONS.DETACH_MOUNTING_PLATE,
+        section: SECTIONS.MOUNTING_PLATE,
         mount: LEFT,
         flowType: FLOWS.DETACH,
       },
       {
-        section: SECTIONS.REATTACH_CARRIAGE,
+        section: SECTIONS.CARRIAGE,
         mount: LEFT,
         flowType: FLOWS.DETACH,
       },

@@ -11,10 +11,8 @@ export type PipetteWizardStep =
   | ResultsStep
   | MountPipetteStep
   | DetachPipetteStep
-  | DetachMountingPlateStep
-  | ReattachCarriageStep
-  | AttachMountingPlateStep
-  | UnscrewCarriageStep
+  | MountingPlateStep
+  | CarriageStep
 
 export type PipetteWizardFlow =
   | typeof FLOWS.ATTACH
@@ -54,18 +52,13 @@ export interface MountPipetteStep extends BaseStep {
 export interface DetachPipetteStep extends BaseStep {
   section: typeof SECTIONS.DETACH_PIPETTE
 }
-export interface DetachMountingPlateStep extends BaseStep {
-  section: typeof SECTIONS.DETACH_MOUNTING_PLATE
+export interface CarriageStep extends BaseStep {
+  section: typeof SECTIONS.CARRIAGE
 }
-export interface ReattachCarriageStep extends BaseStep {
-  section: typeof SECTIONS.REATTACH_CARRIAGE
+export interface MountingPlateStep extends BaseStep {
+  section: typeof SECTIONS.MOUNTING_PLATE
 }
-export interface AttachMountingPlateStep extends BaseStep {
-  section: typeof SECTIONS.ATTACH_MOUNTING_PLATE
-}
-export interface UnscrewCarriageStep extends BaseStep {
-  section: typeof SECTIONS.UNSCREW_CARRIAGE
-}
+
 type CreateCommandMutate = ReturnType<
   typeof useCreateCommandMutation
 >['createCommand']

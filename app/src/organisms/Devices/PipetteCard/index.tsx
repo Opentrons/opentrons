@@ -189,12 +189,8 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   }
 
   const handleAttachPipette = (): void => {
-    if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
-      setShowAttachPipette(false)
-      setPipetteWizardFlow(FLOWS.ATTACH)
-    } else if (selectedPipette === NINETY_SIX_CHANNEL) {
-      setPipetteWizardFlow(FLOWS.ATTACH)
-    }
+    setShowAttachPipette(false)
+    setPipetteWizardFlow(FLOWS.ATTACH)
   }
   return (
     <Flex

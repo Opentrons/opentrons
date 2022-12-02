@@ -73,12 +73,12 @@ export const getPipetteWizardSteps = (
             flowType: flowType,
           },
           {
-            section: SECTIONS.UNSCREW_CARRIAGE,
+            section: SECTIONS.CARRIAGE,
             mount: mount,
             flowType: flowType,
           },
           {
-            section: SECTIONS.ATTACH_MOUNTING_PLATE,
+            section: SECTIONS.MOUNTING_PLATE,
             mount: mount,
             flowType: flowType,
           },
@@ -99,12 +99,12 @@ export const getPipetteWizardSteps = (
             flowType: flowType,
           },
           {
-            section: SECTIONS.DETACH_MOUNTING_PLATE,
+            section: SECTIONS.MOUNTING_PLATE,
             mount: mount,
             flowType: flowType,
           },
           {
-            section: SECTIONS.REATTACH_CARRIAGE,
+            section: SECTIONS.CARRIAGE,
             mount: mount,
             flowType: flowType,
           },

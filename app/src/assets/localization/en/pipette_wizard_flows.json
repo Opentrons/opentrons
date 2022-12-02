@@ -51,5 +51,9 @@
   "single_mount_attached_error": "Single mount pipette is selected when this is the 96 channel flow",
   "detach_mounting_plate_instructions": "Hold onto the pipette so it does not fall. Dettach the monting plate to the robot by removing the pins on the plate from the slots on the gantry carriage",
   "unscrew_and_detach": "Unscrew and Dettach Mounting Plate",
-  "pipette_heavy": "The 96-channel pipette is <weight> so be cautious during uninstall. Having a helper near by can be really useful for this process"
+  "pipette_heavy": "The 96-channel pipette is <weight> so be cautious during uninstall. Having a helper near by can be really useful for this process",
+  "connect_96_channel": "Connect and Attach 96 Channel Pipette",
+  "hold_pipette_carefully": "Hold onto the pipette so it does not fall. Attach the 96 channel to thegantry by alinging the 2 protruding rods on the mounting plate and ensuring a secure connection by screwing in the 4 front screws with the provided screw driver.",
+  "unscrew_remove_96_channel": "Unscrew and Remove 96 Channel Pipette",
+  "secure_pipette": "<block>Place your hand onto the pipette so it does not fall. Begin by unscrewing the 4 captive screws found in the front of the 96 channel pipette. Once all the screws are lossened, proceed to slowly remove the pipette by sliding off the supporting pins.</block><block>The pipette is heavy so be cautious during uninstall. Having a helper near can be really helpful during this process.</block>"
 }

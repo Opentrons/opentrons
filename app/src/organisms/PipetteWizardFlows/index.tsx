@@ -22,10 +22,12 @@ import { Results } from './Results'
 import { ExitModal } from './ExitModal'
 import { MountPipette } from './MountPipette'
 import { DetachPipette } from './DetachPipette'
+import { Carriage } from './Carriage'
 
 import type { PipetteMount } from '@opentrons/shared-data'
 import type { State } from '../../redux/types'
 import type { PipetteWizardFlow, SelectablePipettes } from './types'
+import { MountingPlate } from './MountingPlate'
 
 interface PipetteWizardFlowsProps {
   flowType: PipetteWizardFlow
@@ -221,8 +223,21 @@ export const PipetteWizardFlows = (
     ) : (
       <DetachPipette {...currentStep} {...calibrateBaseProps} />
     )
+  } else if (currentStep.section === SECTIONS.CARRIAGE) {
+    onExit = confirmExit
+    modalContent = showConfirmExit ? (
+      exitModal
+    ) : (
+      <Carriage {...currentStep} {...calibrateBaseProps} />
+    )
+  } else if (currentStep.section === SECTIONS.MOUNTING_PLATE) {
+    onExit = confirmExit
+    modalContent = showConfirmExit ? (
+      exitModal
+    ) : (
+      <MountingPlate {...currentStep} {...calibrateBaseProps} />
+    )
   }
-
   let wizardTitle: string = 'unknown page'
   switch (flowType) {
     case FLOWS.CALIBRATE: {
