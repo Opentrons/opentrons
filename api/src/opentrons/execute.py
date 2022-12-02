@@ -385,10 +385,6 @@ def _create_hardware_controller(machine: Optional[MachineType]) -> None:
             _THREAD_MANAGED_HW = ThreadManager(OT2API.build_hardware_controller)
 
 
-# TODO(mm, 2022-12-01): This is a signal that execute.get_protocol_api() needs to return
-# a context manager or something with a cleanup method to do this hardware cleanup,
-# and that we need to teach users to use it. This automatic cleanup upon process exit
-# is insufficient because the user's process might live for a long time.
 @atexit.register
 def _clear_cached_hardware_controller() -> None:
     global _THREAD_MANAGED_HW
