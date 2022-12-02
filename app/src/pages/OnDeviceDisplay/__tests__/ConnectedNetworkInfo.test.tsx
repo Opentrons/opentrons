@@ -48,13 +48,6 @@ const initialMockWifi = {
   type: Networking.INTERFACE_WIFI,
 }
 
-const initialMockEthernet = {
-  ipAddress: '127.0.0.101',
-  subnetMask: '255.255.255.231',
-  macAddress: 'US:B0:00:00:00:00',
-  type: Networking.INTERFACE_ETHERNET,
-}
-
 const mockWifiList = [
   { ...Fixtures.mockWifiNetwork, ssid: 'foo', active: true },
   { ...Fixtures.mockWifiNetwork, ssid: 'bar', active: false },
@@ -64,7 +57,7 @@ describe('ConnectedNetworkInfo', () => {
   beforeEach(() => {
     mockGetNetworkInterfaces.mockReturnValue({
       wifi: initialMockWifi,
-      ethernet: initialMockEthernet,
+      ethernet: null,
     })
     mockGetWifiList.mockReturnValue(mockWifiList)
   })
@@ -79,7 +72,7 @@ describe('ConnectedNetworkInfo', () => {
     getByText('mockWifi')
     getByText('IP Address: 127.0.0.100')
     getByText('Subnet Mask: 255.255.255.230')
-    getByText('Mac Address: WI:FI:00:00:00:00')
+    getByText('MAC Address: WI:FI:00:00:00:00')
     getByText('Change network')
   })
 

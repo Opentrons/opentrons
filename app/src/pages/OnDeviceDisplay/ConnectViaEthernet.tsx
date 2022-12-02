@@ -99,7 +99,7 @@ export function ConnectViaEthernet(): JSX.Element {
 interface TitleHeaderProps {
   title: string
 }
-// ToDo create header component for touchscreen app
+// ToDo kj:12/01/2022 create header component for touchscreen app
 // refactor prop title and path
 const TitleHeader = ({ title }: TitleHeaderProps): JSX.Element => {
   const history = useHistory()
@@ -176,7 +176,7 @@ const DisplayConnectionStatus = ({
             lineHeight="2.1875rem"
             color={COLORS.black}
           >
-            {capitalize(t('connected'))}
+            {t('connected')}
           </StyledText>
         </Flex>
       ) : (
@@ -289,6 +289,7 @@ const DisplayEthernetInfo = ({
             color={COLORS.black}
           >
             {t('mac_address')}:{' '}
+            {/* Note: technically no data for MAC Address isn't necessary but just in case */}
             {macAddress != null ? macAddress : capitalize(t('shared:no_data'))}
           </StyledText>
         </Flex>

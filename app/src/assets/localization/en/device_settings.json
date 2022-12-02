@@ -169,7 +169,7 @@
   "ethernet": "Ethernet",
   "usb": "USB",
   "connection_status": "Connection status:",
-  "connected": "connected",
+  "connected": "Connected",
   "no_network_found": "No network found",
   "no_network_found_description": "Connect an Ethernet cable to the back of the robot to display network connection.",
   "next_step": "Next step"
