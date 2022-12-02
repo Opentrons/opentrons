@@ -1,7 +1,7 @@
 """
 opentrons_shared_data.deck: types and bindings for deck definitions
 """
-from enum import Enum, auto
+from enum import Enum
 from typing import overload, TYPE_CHECKING
 import json
 
