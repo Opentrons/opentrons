@@ -174,7 +174,7 @@ async function createRelease(token, tag, project, version, changelog, deploy) {
       auth: token,
       userAgent: 'Opentrons Release Creator',
     })
-    const { data } = await octokit.reset.createRelease({
+    const { data } = await octokit.rest.createRelease({
       owner: REPO_DETAILS.owner,
       repo: REPO_DETAILS.repo,
       tag_name: tag,
