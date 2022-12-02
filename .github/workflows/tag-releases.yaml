@@ -28,7 +28,7 @@ jobs:
         run: |
           npm config set cache ${{ github.workspace }}/.npm-cache
           yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
-          make setup-js
+          yarn install
       - name: 'create release'
         run: |
           node ./scripts/create-release ${{ github.token }} ${{ github.ref_name }}
