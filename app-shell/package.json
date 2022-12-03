@@ -42,7 +42,7 @@
     "@thi.ng/paths": "1.6.5",
     "@types/dateformat": "^3.0.1",
     "@types/fs-extra": "9.0.13",
-    "@types/lodash": "^4.14.168",
+    "@types/lodash": "^4.14.191",
     "@types/pump": "^1.1.0",
     "@types/uuid": "^3.4.7",
     "ajv": "6.10.2",

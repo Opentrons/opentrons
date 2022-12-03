@@ -23,7 +23,7 @@
     "@opentrons/shared-data": "6.1.0",
     "core-js": "3.2.1",
     "immer": "5.1.0",
-    "lodash": "4.17.15",
+    "lodash": "4.17.21",
     "uuid": "3.3.2"
   }
 }
