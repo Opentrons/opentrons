@@ -85,7 +85,6 @@ export function GripperCard({
       {openWizardFlowType != null ? (
         <GripperWizardFlows
           flowType={openWizardFlowType}
-          robotName={robotName}
           closeFlow={() => setOpenWizardFlowType(null)}
         />
       ) : null}

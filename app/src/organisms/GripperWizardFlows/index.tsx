@@ -42,9 +42,7 @@ export const GripperWizardFlows = (
   const goBack = (): void => {
     setCurrentStepIndex(isFinalStep ? currentStepIndex : currentStepIndex - 1)
   }
-  const { chainRunCommands, isCommandMutationLoading } = useChainRunCommands(
-    runId
-  )
+  const { chainRunCommands, isCommandMutationLoading } = useChainRunCommands(runId)
 
   const { createRun, isLoading: isCreateLoading } = useCreateRunMutation({
     onSuccess: response => {

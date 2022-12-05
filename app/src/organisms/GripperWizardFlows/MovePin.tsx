@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { useTranslation, Trans } from 'react-i18next'
-import { SPACING } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
@@ -19,12 +18,12 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
   const {
     proceed,
     attachedGripper,
-    chainRunCommands,
     isRobotMoving,
     goBack,
-    setIsBetweenCommands,
-    isExiting,
     movement,
+    // chainRunCommands,
+    // setIsBetweenCommands,
+    // isExiting,
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
   if (attachedGripper == null) return null

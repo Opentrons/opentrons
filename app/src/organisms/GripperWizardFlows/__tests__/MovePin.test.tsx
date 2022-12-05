@@ -8,6 +8,7 @@ import {
   MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
   MOVE_PIN_TO_FRONT_JAW,
   REMOVE_PIN_FROM_REAR_JAW,
+  SECTIONS,
 } from '../constants'
 
 describe('MovePin', () => {
@@ -26,11 +27,13 @@ describe('MovePin', () => {
       return renderWithProviders(
         <MovePin
           runId={mockRunId}
+          section={SECTIONS.MOVE_PIN}
           flowType={GRIPPER_FLOW_TYPES.ATTACH}
           proceed={mockProceed}
           attachedGripper={{}}
           chainRunCommands={mockChainRunCommands}
           isRobotMoving={false}
+          isExiting={false}
           goBack={mockGoBack}
           setIsBetweenCommands={mockSetIsBetweenCommands}
           movement={MOVE_PIN_TO_FRONT_JAW}
