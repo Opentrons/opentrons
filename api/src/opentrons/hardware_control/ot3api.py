@@ -401,25 +401,24 @@ class OT3API(
         """Update the firmware on the hardware."""
         await self._backend.update_firmware(firmware_file, target)
 
-    @staticmethod
     def _gantry_load_from_instruments(
-        instruments: Mapping[OT3Mount, Optional[InstrumentDict]]
+        self
     ) -> GantryLoad:
         """Compute the gantry load based on attached instruments."""
-        left = cast(PipetteDict, instruments.get(OT3Mount.LEFT))
-        right = cast(PipetteDict, instruments.get(OT3Mount.RIGHT))
-        gripper = cast(GripperDict, instruments.get(OT3Mount.GRIPPER))
+        left = self._pipette_handler.get_pipette(OT3Mount.LEFT)
+        right = self._pipette_handler.get_pipette(OT3Mount.RIGHT)
+        gripper = self._gripper_handler.get_gripper()
         if left and right:
             # Only low-throughputs can have the two-instrument case
             return GantryLoad.TWO_LOW_THROUGHPUT
-        if left:
-            # only a low-throughput pipette can be on the left mount
-            return GantryLoad.LOW_THROUGHPUT
         if right:
+            # only a low-throughput pipette can be on the right mount
+            return GantryLoad.LOW_THROUGHPUT
+        if left:
             # as good a measure as any to define low vs high throughput, though
             # we'll want to touch this up as we get pipette definitions for HT
             # pipettes
-            if right["channels"] <= 8:
+            if left["channels"].as_int <= 8:
                 return GantryLoad.LOW_THROUGHPUT
             else:
                 return GantryLoad.HIGH_THROUGHPUT
@@ -494,7 +493,7 @@ class OT3API(
 
         await self._backend.probe_network()
         await self.set_gantry_load(
-            self._gantry_load_from_instruments(self.get_all_attached_instr())
+            self._gantry_load_from_instruments()
         )
 
     # Global actions API
@@ -1379,6 +1378,8 @@ class OT3API(
 
     @property
     def hardware_pipettes(self) -> InstrumentsByMount[top_types.Mount]:
+        # TODO (lc 12-5-2022) We should have ONE entry point into knowing
+        # what pipettes are attached from the hardware controller.
         return {
             m.to_mount(): i
             for m, i in self._pipette_handler.hardware_instruments.items()
