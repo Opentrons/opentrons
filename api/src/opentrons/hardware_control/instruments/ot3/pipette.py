@@ -98,12 +98,9 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         )
         self._nozzle_offset = self._config.nozzle_offset
         self._current_volume = 0.0
-        self._working_volume = self._config.max_volume
+        self._working_volume = float(self._config.max_volume)
         self._current_tip_length = 0.0
         self._current_tiprack_diameter = 0.0
-        # TODO add in a tip length value
-        self._fallback_tip_length = 0.0
-        self._tip_overlap_map = 10
         self._has_tip = False
         self._pipette_id = pipette_id
         self._log = mod_log.getChild(
@@ -117,6 +114,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self.ready_to_aspirate = False
         #: True if ready to aspirate
         self._active_tip_settings = self._config.supported_tips[PipetteTipType(self._working_volume)]
+        self._fallback_tip_length = self._active_tip_settings.default_tip_length
         self._aspirate_flow_rate = self._active_tip_settings.default_aspirate_flowrate
         self._dispense_flow_rate = self._active_tip_settings.default_dispense_flowrate
         self._blow_out_flow_rate = self._active_tip_settings.default_blowout_flowrate
@@ -331,6 +329,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         """The working volume is the current tip max volume"""
         self._working_volume = min(self.config.max_volume, tip_volume)
         self._active_tip_settings = self._config.supported_tips[PipetteTipType(self._working_volume)]
+        self._fallback_tip_length = self._active_tip_settings.default_tip_length
 
     @property
     def available_volume(self) -> float:
@@ -417,6 +416,9 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
                 "aspirate_flow_rate": self.aspirate_flow_rate,
                 "dispense_flow_rate": self.dispense_flow_rate,
                 "blow_out_flow_rate": self.blow_out_flow_rate,
+                "tip_length": self.current_tip_length,
+                "return_tip_height": self.active_tip_settings.default_return_tip_height,
+                "tip_overlap": self.active_tip_settings.default_tip_overlap
             }
         )
         return self._config_as_dict

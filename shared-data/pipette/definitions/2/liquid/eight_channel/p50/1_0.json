@@ -5,6 +5,9 @@
       "defaultAspirateFlowRate": 8,
       "defaultDispenseFlowRate": 8,
       "defaultBlowOutFlowRate": 4,
+      "defaultTipLength": 57.9,
+      "defaultTipOverlap": 10.5,
+      "defaultReturnTipHeight": 0.83,
       "aspirate": {
         "default": [
           [0.6464, 0.4817, 0.0427],

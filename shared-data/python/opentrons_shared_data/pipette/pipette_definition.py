@@ -86,6 +86,21 @@ class SupportedTipsDefinition(BaseModel):
         description="The flowrate used in blowouts by default.",
         alias="defaultBlowOutFlowRate",
     )
+    default_tip_length: float = Field(
+        ...,
+        description="The default tip length associated with this tip type.",
+        alias="defaultTipLength"
+    )
+    default_tip_overlap: float = Field(
+        ...,
+        description="The default tip overlap associated with this tip type.",
+        alias="defaultTipOverlap"
+    )
+    default_return_tip_height: float = Field(
+        ...,
+        description="The height to return a tip to its tiprack.",
+        alias="defaultReturnTipHeight"
+    )
     aspirate: Dict[str, List[Tuple[float, float, float]]] = Field(
         ..., description="The default pipetting functions list for aspirate."
     )
