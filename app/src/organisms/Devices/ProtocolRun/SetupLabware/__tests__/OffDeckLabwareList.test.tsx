@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { StaticRouter } from 'react-router-dom'
-import _uncastedProtocolWithTC from '@opentrons/shared-data/protocol/fixtures/6/multipleTipracksWithTC.json'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import { mockLabwareDef } from '../../../../LabwarePositionCheck/__fixtures__/mockLabwareDef'
