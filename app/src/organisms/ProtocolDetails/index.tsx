@@ -370,7 +370,10 @@ export function ProtocolDetails(
   }
 
   const handleRunProtocolButtonClick = (): void => {
-    trackEvent({ name: 'proceedToRun', properties: { sourceLocation: 'ProtocolDetail' } })
+    trackEvent({
+      name: 'proceedToRun',
+      properties: { sourceLocation: 'ProtocolDetail' },
+    })
     setShowSlideout(true)
   }
 

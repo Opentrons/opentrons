@@ -64,7 +64,10 @@ export function ProtocolOverflowMenu(
   const handleClickRun: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
-    trackEvent({ name: 'proceedToRun', properties: { sourceLocation: 'ProtocolLanding' } })
+    trackEvent({
+      name: 'proceedToRun',
+      properties: { sourceLocation: 'ProtocolLanding' },
+    })
     handleRunProtocol()
     setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }

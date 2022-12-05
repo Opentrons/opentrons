@@ -138,7 +138,10 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     e.stopPropagation()
 
     reset()
-    trackEvent({ name: 'proceedToRun', properties: { sourceLocation: 'HistoricalProtocolRun' } })
+    trackEvent({
+      name: 'proceedToRun',
+      properties: { sourceLocation: 'HistoricalProtocolRun' },
+    })
     trackProtocolRunEvent({ name: 'runAgain' })
   }
 
