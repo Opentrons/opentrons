@@ -51,29 +51,30 @@ usb_host=$(shell yarn run -s discovery find -i 169.254)
 # install all project dependencies
 # may be run with -j
 .PHONY: setup
-setup:
-	$(MAKE) setup-globals
-	$(MAKE) setup-js setup-py
+setup: setup-js setup-py
 
 # front-end dependecies handled by yarn
 .PHONY: setup-js
-setup-js:
+setup-js: js-globals
 	yarn config set network-timeout 60000
 	yarn
 	$(MAKE) -C $(APP_SHELL_DIR) setup
 	$(MAKE) -C $(SHARED_DATA_DIR) setup-js
 
-.PHONY: setup-globals
-setup-globals: js-globals python-globals
-
+# this is the source of truth for the required pipenv version
 .PHONY: python-globals
 python-globals:
 	$(OT_PYTHON) -m pip install pipenv==2021.5.29
 
+# this is the source of truth for npm, yarn, and shx version
+# shx is used heavilily in python project makefiles
 .PHONY: js-globals
 js-globals:
 	npm i -g npm@6
 	npm i -g yarn@1 shx@0.3.3
+
+.PHONY: setup-globals
+setup-globals: js-globals python-globals
 
 PYTHON_SETUP_TARGETS := $(addsuffix -py-setup, $(PYTHON_SETUP_DIRS))
 
@@ -81,7 +82,7 @@ PYTHON_SETUP_TARGETS := $(addsuffix -py-setup, $(PYTHON_SETUP_DIRS))
 	$(MAKE) -C $* setup
 
 .PHONY: setup-py
-setup-py:
+setup-py: setup-globals
 	$(MAKE) $(PYTHON_SETUP_TARGETS)
 
 # uninstall all project dependencies

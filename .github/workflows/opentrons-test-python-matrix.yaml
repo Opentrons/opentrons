@@ -26,6 +26,8 @@ defaults:
 jobs:
   test:
     name: 'opentrons package tests on ${{ matrix.os }}, python ${{ matrix.python }}'
+    env:
+      SETUP_TIMEOUT = 15
     timeout-minutes: 45
     strategy:
       fail-fast: false
@@ -34,8 +36,12 @@ jobs:
         python: ['3.7', '3.8', '3.9'] # 3.10 tested in api tests
     runs-on: '${{ matrix.os }}'
     steps:
+      - name: mac setup timeout
+        if: startsWith(matrix.os, 'macos')
+        run: echo "SETUP_TIMEOUT=35" >> $GITHUB_ENV
       - uses: 'actions/checkout@v3'
       - uses: './.github/actions/python/setup-single-environment'
+        timeout-minutes: ${{ env.SETUP_TIMEOUT }}
         with:
           python-version: '${{ matrix.python }}'
           environment: 'environments/app'
@@ -46,6 +52,7 @@ jobs:
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
       - name: Test opentrons on app environment
+        timeout-minutes: 8
         run: make -C api test-app
       - name: python -m pip install opentrons and use CLI
         working-directory: api
