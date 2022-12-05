@@ -7,7 +7,7 @@ from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.types import MountType, Mount as HwMount
 
 from .. import errors
-from ..types import LoadedPipette, StaticPipetteConfig
+from ..types import LoadedPipette, StaticPipetteConfig, MotorAxis
 
 from ..commands import (
     Command,
@@ -312,3 +312,17 @@ class PipetteView(HasState[PipetteState]):
     def get_channels(self, pipette_id: str) -> int:
         """Return the given pipette's number of channels."""
         return self._get_static_config(pipette_id).channels
+
+    def get_z_axis(self, pipette_id: str) -> MotorAxis:
+        """Get the MotorAxis representing this pipette's Z stage."""
+        mount = self.get(pipette_id).mount
+        return MotorAxis.LEFT_Z if mount == MountType.LEFT else MotorAxis.RIGHT_Z
+
+    def get_plunger_axis(self, pipette_id: str) -> MotorAxis:
+        """Get the MotorAxis representing this pipette's plunger."""
+        mount = self.get(pipette_id).mount
+        return (
+            MotorAxis.LEFT_PLUNGER
+            if mount == MountType.LEFT
+            else MotorAxis.RIGHT_PLUNGER
+        )

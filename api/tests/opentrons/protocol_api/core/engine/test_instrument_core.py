@@ -11,6 +11,7 @@ from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocol_engine import (
     DeckPoint,
     LoadedPipette,
+    MotorAxis,
     WellLocation,
     WellOffset,
     WellOrigin,
@@ -470,3 +471,42 @@ def test_get_channels(
         mock_engine_client.state.pipettes.get_channels(pipette_id=subject.pipette_id)
     ).then_return(42)
     assert subject.get_channels() == 42
+
+
+def test_home_z(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should home its Z-stage and plunger."""
+    decoy.when(mock_engine_client.state.pipettes.get_z_axis("abc123")).then_return(
+        MotorAxis.RIGHT_Z
+    )
+    decoy.when(
+        mock_engine_client.state.pipettes.get_plunger_axis("abc123")
+    ).then_return(MotorAxis.RIGHT_PLUNGER)
+
+    subject.home()
+
+    decoy.verify(
+        mock_engine_client.home(axes=[MotorAxis.RIGHT_Z, MotorAxis.RIGHT_PLUNGER]),
+        times=1,
+    )
+
+
+def test_home_plunger(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should home its plunger."""
+    decoy.when(
+        mock_engine_client.state.pipettes.get_plunger_axis("abc123")
+    ).then_return(MotorAxis.LEFT_PLUNGER)
+
+    subject.home_plunger()
+
+    decoy.verify(
+        mock_engine_client.home(axes=[MotorAxis.LEFT_PLUNGER]),
+        times=1,
+    )

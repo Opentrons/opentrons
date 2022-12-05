@@ -74,7 +74,7 @@ async def capacitive_probe(
     async with sensor_scheduler.bind_sync(
         sensor_info,
         messenger,
-        log=log_sensor_values,
+        do_log=log_sensor_values,
     ):
         position = await runner.run(can_messenger=messenger)
         return position[mover]
