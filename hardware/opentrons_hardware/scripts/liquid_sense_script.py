@@ -19,6 +19,7 @@ import opentrons_hardware.sensors.types as sensor_types
 
 from opentrons_hardware.firmware_bindings.utils import (
     Int32Field,
+    UInt8Field,
 )
 from opentrons_hardware.firmware_bindings.messages import (
     message_definitions,
@@ -74,6 +75,7 @@ class Capturer:
     def __init__(self) -> None:
         """Build the capturer."""
         self.response_queue: asyncio.Queue[float] = asyncio.Queue()
+        self.mount = "left"
 
     def _do_get_all(self) -> Iterator[float]:
         """Worker to get messages."""
@@ -85,6 +87,9 @@ class Capturer:
     def get_all(self) -> List[float]:
         """Get all captured messages."""
         return list(self._do_get_all())
+
+    def set_mount(self, mount: str) -> None:
+        self.mount = mount
 
     def __call__(
         self,
@@ -98,18 +103,28 @@ class Capturer:
                     message.payload.sensor_data, message.payload.sensor
                 ).to_float()
             )
+        elif isinstance(message, message_definitions.MoveCompleted):
+            if message.payload.ack_id == UInt8Field(2):
+                if arbitration_id.parts.originating_node_id == \
+                NodeId["head_" + self.mount[0]]:
+                    print(f"\nmount position = {message.payload.current_position_um}")
+                    print(f"mount encoder position = {message.payload.encoder_position_um}")
+                elif arbitration_id.parts.originating_node_id == \
+                NodeId["pipette_" + self.mount]:
+                    print(f"\npipette position = {message.payload.current_position_um}")
+                    print(f"pipette encoder position = {message.payload.encoder_position_um}")
+
 
 async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
     """Run the test."""
     target_z = NodeId["head_" + args.mount[0]]
     target_pipette = NodeId["pipette_" + args.mount]
-    print(f"target pipette = {target_pipette}")
     found = await probe(messenger, {NodeId.head, target_pipette}, 10)
     if NodeId.head not in found or target_pipette not in found:
         raise RuntimeError(f"could not find targets for {args.mount} in {found}")
 
-    slot_width = 152
-    slot_length = 103
+    slot_width = 55
+    slot_length = 90
     slot_dist = {
         1: [2.5 * slot_width, 3.5 * slot_length],
         2: [1.5 * slot_width, 3.5 * slot_length],
@@ -127,7 +142,10 @@ async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
     # 164 x 107 each according to ot3_standards.json
     # using 152 x 103 from ot3repl
 
+    x_dist = float64(slot_dist[args.which_slot][0])
+    # print(f"x dist = {x_dist}, should be 75")
     sensor_cap = Capturer()
+    sensor_cap.set_mount(args.mount)
     messenger.add_listener(sensor_cap, None)
 
     prep_move_group = [
@@ -138,30 +156,32 @@ async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
                     NodeId.gantry_x: float64(-1000),
                     NodeId.gantry_y: float64(-1000),
                     target_z: float64(1000),
-                    target_pipette: float64(500)
+                    target_pipette: float64(500),
                 },
                 {
                     NodeId.gantry_x: float64(-40),
                     NodeId.gantry_y: float64(-40),
                     target_z: float64(-10),
-                    target_pipette: float64(-10)
-                }
+                    target_pipette: float64(-10),
+                },
             )
         ],
         [
             create_step(
                 distance={
-                    NodeId.gantry_x: float64(slot_dist[args.which_slot][0]),
+                    # NodeId.gantry_x: float64(slot_dist[args.which_slot][0]),
+                    NodeId.gantry_x: float64(26.5),
                     NodeId.gantry_y: float64(slot_dist[args.which_slot][1]),
                 },
                 velocity={
-                    NodeId.gantry_x: float64(args.gantry_speed),
+                    NodeId.gantry_x: float64(args.gantry_speed + 2),
                     NodeId.gantry_y: float64(args.gantry_speed),
                 },
                 acceleration={},
                 duration=float64(
-                    max(slot_dist[args.which_slot][0], slot_dist[args.which_slot][1]) \
-                    / args.gantry_speed),
+                    max(slot_dist[args.which_slot][0], slot_dist[args.which_slot][1])
+                    / args.gantry_speed
+                ),
                 present_nodes=[NodeId.gantry_x, NodeId.gantry_y],
                 stop_condition=MoveStopCondition.none,
             )
@@ -196,22 +216,37 @@ async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
                 acceleration={},
                 duration=float64(6.75),
                 present_nodes=[target_z, target_pipette],
-                stop_condition=MoveStopCondition.none, # change back to cap_sensor
+                stop_condition=MoveStopCondition.none,
+            ),
+        ],
+        [
+            create_step(
+                distance={
+                    target_z: float64(-50),
+                },
+                velocity={
+                    target_z: float64(-1 * args.mount_speed),
+                },
+                acceleration={},
+                duration=float64(6.75),
+                present_nodes=[target_z],
+                stop_condition=MoveStopCondition.none,
             ),
         ]
     ]
-    threshold_cmh20 = float(66)
+    threshold_cmh20 = float(67)
     threshold_payload = payloads.SetSensorThresholdRequestPayload(
         sensor=fields.SensorTypeField(SensorType.pressure),
         sensor_id=fields.SensorIdField(0),
-        threshold=Int32Field(int(threshold_cmh20 * sensor_types.sensor_fixed_point_conversion)),
+        threshold=Int32Field(
+            int(threshold_cmh20 * sensor_types.sensor_fixed_point_conversion)
+        ),
         mode=fields.SensorThresholdModeField(SensorThresholdMode.absolute),
     )
     threshold_message = message_definitions.SetSensorThresholdRequest(
         payload=threshold_payload
     )
     await messenger.send(target_pipette, threshold_message)
-
 
     if args.verbose_monitoring:
         binding = 3
@@ -226,19 +261,18 @@ async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
     runner = MoveGroupRunner(move_groups=prep_move_group)
 
     position = await runner.run(can_messenger=messenger)
-    print(f"finished home move")
 
     # await messenger.send(target_pipette, reset_message)
     await asyncio.get_running_loop().run_in_executor(
-        None, lambda: input("press enter to start reading")
+        None, lambda: input("\npress enter to start reading")
     )
     await messenger.send(target_pipette, stim_message)
 
     runner = MoveGroupRunner(move_groups=test_move_group)
-    await runner.run(can_messenger=messenger)
+    position = await runner.run(can_messenger=messenger)
     if args.verbose_monitoring:
         print(f"Sensor data: {sensor_cap.get_all()}")
-    print(f"Position: {position[target_z]}")
+    # print(f"Final position: {position}")
 
     reset_payload = payloads.BindSensorOutputRequestPayload(
         sensor=fields.SensorTypeField(SensorType.pressure),
@@ -248,9 +282,8 @@ async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
     reset_message = message_definitions.BindSensorOutputRequest(payload=reset_payload)
 
     await asyncio.get_running_loop().run_in_executor(
-        None, lambda: input("press enter to home")
+        None, lambda: input("\npress enter to home")
     )
-    print(f"trying to send reset message now")
     await messenger.send(target_pipette, reset_message)
     runner = MoveGroupRunner(move_groups=[prep_move_group[0]])
     await runner.run(can_messenger=messenger)
@@ -272,8 +305,8 @@ def main() -> None:
     )
     parser.add_argument("-ps", "--pipette-speed", type=float, default=10)
     parser.add_argument("-tv", "--threshold-value", type=float, default=10)
-    parser.add_argument("-pd", "--pipette-distance", type=float, default=80)
-    parser.add_argument("-mh", "--mount-start-height", type=float, default=110)
+    parser.add_argument("-pd", "--pipette-distance", type=float, default=100)
+    parser.add_argument("-mh", "--mount-start-height", type=float, default=140)
     parser.add_argument("-md", "--mount-distance", type=float, default=10)
     parser.add_argument("-ms", "--mount-speed", type=float, default=10)
     parser.add_argument("-gs", "--gantry-speed", type=float, default=60)
