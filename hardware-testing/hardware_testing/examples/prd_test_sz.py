@@ -392,7 +392,7 @@ async def _ot3life(is_simulating: bool, mount: types.OT3Mount,move_speed) -> Non
 
 async def _stage_check(api: OT3API,mount: OT3Mount,critical_point: Optional[CriticalPoint] = None) -> None:
     # Set mount run_current
-    helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(api,CUSTOM_AXIS_SETTINGS)
+    helpers_ot3.set_gantry_load_per_axis_settings_ot3(api,CUSTOM_AXIS_SETTINGS)
     pos_diff = 5
     z_axis = OT3Axis.by_mount(mount)
     await api.move_to(mount, Point(100,
