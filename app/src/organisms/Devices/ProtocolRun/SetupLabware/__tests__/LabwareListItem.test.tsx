@@ -29,11 +29,9 @@ const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFu
   typeof useCreateLiveCommandMutation
 >
 
-const mockThermocyclerModuleDefinition = {
-  moduleId: 'someThermocyclerModule',
-  model: 'thermocyclerModuleV1' as ModuleModel,
-  type: 'thermocyclerModuleType' as ModuleType,
-  labwareOffset: { x: 5, y: 5, z: 5 },
+const mockNestedLabwareDisplayName = 'nested labware display name'
+const mockLocationInfo = {
+  labwareOffset: { x: 1, y: 1, z: 1 },
   cornerOffsetFromSlot: { x: 1, y: 1, z: 1 },
   dimensions: {
     xDimension: 100,
@@ -45,8 +43,25 @@ const mockThermocyclerModuleDefinition = {
   },
   twoDimensionalRendering: { children: [] },
 }
-
-const MODULE_ID = 'moduleId'
+const mockAttachedModuleInfo = {
+  x: 1,
+  y: 1,
+  z: 1,
+  nestedLabwareDef: mockLabwareDef,
+  nestedLabwareId: '1',
+  nestedLabwareDisplayName: mockNestedLabwareDisplayName,
+  protocolLoadOrder: 0,
+  slotName: '7',
+}
+const mockModuleSlot = { slotName: '7' }
+const mockThermocyclerModuleDefinition = {
+  moduleId: 'someThermocyclerModule',
+  model: 'thermocyclerModuleV1' as ModuleModel,
+  type: 'thermocyclerModuleType' as ModuleType,
+  ...mockLocationInfo,
+}
+const mockModuleId = 'moduleId'
+const mockNickName = 'nickName'
 
 const render = (props: React.ComponentProps<typeof LabwareListItem>) => {
   return renderWithProviders(
@@ -60,9 +75,8 @@ const render = (props: React.ComponentProps<typeof LabwareListItem>) => {
 }
 
 describe('LabwareListItem', () => {
-  let mockCreateLiveCommand = jest.fn()
+  const mockCreateLiveCommand = jest.fn()
   beforeEach(() => {
-    mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
     mockSecureLabwareModal.mockReturnValue(<div>mock secure labware modal</div>)
     mockUseLiveCommandMutation.mockReturnValue({
@@ -72,26 +86,18 @@ describe('LabwareListItem', () => {
 
   it('renders the correct info for a thermocycler, clicking on secure labware instructions opens the modal', () => {
     const { getByText } = render({
-      nickName: 'nickName',
+      nickName: mockNickName,
       definition: mockLabwareDef,
-      initialLocation: { moduleId: MODULE_ID },
+      initialLocation: { moduleId: mockModuleId },
       moduleModel: 'thermocyclerModuleV1' as ModuleModel,
-      moduleLocation: { slotName: '7' },
+      moduleLocation: mockModuleSlot,
       extraAttentionModules: ['thermocyclerModuleType'],
       attachedModuleInfo: {
-        [MODULE_ID]: ({
+        [mockModuleId]: ({
           moduleId: 'thermocyclerModuleId',
-
           attachedModuleMatch: (mockThermocycler as any) as AttachedModule,
-          x: 1,
-          y: 1,
-          z: 1,
-          nestedLabwareDef: mockLabwareDef,
-          nestedLabwareId: '1',
-          nestedLabwareDisplayName: 'nested labware display name',
-          protocolLoadOrder: 0,
-          slotName: '7',
           moduleDef: mockThermocyclerModuleDefinition as any,
+          ...mockAttachedModuleInfo,
         } as any) as ModuleRenderInfoForProtocol,
       },
     })
@@ -105,41 +111,24 @@ describe('LabwareListItem', () => {
 
   it('renders the correct info for a labware on top of a magnetic module', () => {
     const { getByText } = render({
-      nickName: 'nickName',
+      nickName: mockNickName,
       definition: mockLabwareDef,
-      initialLocation: { moduleId: MODULE_ID },
+      initialLocation: { moduleId: mockModuleId },
       moduleModel: 'magneticModuleV1' as ModuleModel,
-      moduleLocation: { slotName: '7' },
+      moduleLocation: mockModuleSlot,
       extraAttentionModules: ['magneticModuleType'],
       attachedModuleInfo: {
-        [MODULE_ID]: ({
+        [mockModuleId]: ({
           moduleId: 'magneticModuleId',
 
           attachedModuleMatch: (mockMagneticModule as any) as AttachedModule,
-          x: 1,
-          y: 1,
-          z: 1,
-          nestedLabwareDef: mockLabwareDef,
-          nestedLabwareId: '1',
-          nestedLabwareDisplayName: 'nested labware display name',
-          protocolLoadOrder: 0,
-          slotName: '7',
           moduleDef: {
             moduleId: 'someMagneticModule',
             model: 'magneticModuleV2' as ModuleModel,
             type: 'magneticModuleType' as ModuleType,
-            labwareOffset: { x: 5, y: 5, z: 5 },
-            cornerOffsetFromSlot: { x: 1, y: 1, z: 1 },
-            dimensions: {
-              xDimension: 100,
-              yDimension: 100,
-              footprintXDimension: 50,
-              footprintYDimension: 50,
-              labwareInterfaceXDimension: 80,
-              labwareInterfaceYDimension: 120,
-            },
-            twoDimensionalRendering: { children: [] },
+            ...mockLocationInfo,
           } as any,
+          ...mockAttachedModuleInfo,
         } as any) as ModuleRenderInfoForProtocol,
       },
     })
@@ -153,40 +142,23 @@ describe('LabwareListItem', () => {
 
   it('renders the correct info for a labware on top of a temperature module ', () => {
     const { getByText } = render({
-      nickName: 'nickName',
+      nickName: mockNickName,
       definition: mockLabwareDef,
-      initialLocation: { moduleId: MODULE_ID },
+      initialLocation: { moduleId: mockModuleId },
       moduleModel: 'temperatureModuleV1' as ModuleModel,
-      moduleLocation: { slotName: '7' },
+      moduleLocation: mockModuleSlot,
       extraAttentionModules: [],
       attachedModuleInfo: {
-        [MODULE_ID]: ({
+        [mockModuleId]: ({
           moduleId: 'temperatureModuleId',
           attachedModuleMatch: (mockTemperatureModule as any) as AttachedModule,
-          x: 1,
-          y: 1,
-          z: 1,
-          nestedLabwareDef: mockLabwareDef,
-          nestedLabwareId: '1',
-          nestedLabwareDisplayName: 'nested labware display name',
-          protocolLoadOrder: 0,
-          slotName: '7',
           moduleDef: {
             moduleId: 'someTemperatureModule',
             model: 'temperatureModuleV2' as ModuleModel,
             type: 'temperatureModuleType' as ModuleType,
-            labwareOffset: { x: 5, y: 5, z: 5 },
-            cornerOffsetFromSlot: { x: 1, y: 1, z: 1 },
-            dimensions: {
-              xDimension: 100,
-              yDimension: 100,
-              footprintXDimension: 50,
-              footprintYDimension: 50,
-              labwareInterfaceXDimension: 80,
-              labwareInterfaceYDimension: 120,
-            },
-            twoDimensionalRendering: { children: [] },
+            ...mockLocationInfo,
           } as any,
+          ...mockAttachedModuleInfo,
         } as any) as ModuleRenderInfoForProtocol,
       },
     })
@@ -197,40 +169,23 @@ describe('LabwareListItem', () => {
 
   it('renders the correct info for a labware on top of a heater shaker', () => {
     const { getByText, getByLabelText } = render({
-      nickName: 'nickName',
+      nickName: mockNickName,
       definition: mockLabwareDef,
-      initialLocation: { moduleId: MODULE_ID },
+      initialLocation: { moduleId: mockModuleId },
       moduleModel: 'heaterShakerModuleV1' as ModuleModel,
-      moduleLocation: { slotName: '7' },
+      moduleLocation: mockModuleSlot,
       extraAttentionModules: ['heaterShakerModuleType'],
       attachedModuleInfo: {
-        [MODULE_ID]: ({
+        [mockModuleId]: ({
           moduleId: 'heaterShakerModuleId',
           attachedModuleMatch: (mockHeaterShaker as any) as AttachedModule,
-          x: 1,
-          y: 1,
-          z: 1,
-          nestedLabwareDef: mockLabwareDef,
-          nestedLabwareId: '1',
-          nestedLabwareDisplayName: 'nested labware display name',
-          protocolLoadOrder: 0,
-          slotName: '7',
           moduleDef: {
             moduleId: 'someheaterShakerModule',
             model: 'heaterShakerModuleV1' as ModuleModel,
             type: 'heaterShakerModuleType' as ModuleType,
-            labwareOffset: { x: 5, y: 5, z: 5 },
-            cornerOffsetFromSlot: { x: 1, y: 1, z: 1 },
-            dimensions: {
-              xDimension: 100,
-              yDimension: 100,
-              footprintXDimension: 50,
-              footprintYDimension: 50,
-              labwareInterfaceXDimension: 80,
-              labwareInterfaceYDimension: 120,
-            },
-            twoDimensionalRendering: { children: [] },
+            ...mockLocationInfo,
           } as any,
+          ...mockAttachedModuleInfo,
         } as any) as ModuleRenderInfoForProtocol,
       },
     })
