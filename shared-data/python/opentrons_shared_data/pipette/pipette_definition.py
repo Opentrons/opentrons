@@ -243,4 +243,4 @@ class PipetteConfigurations(
 ):
     """The full pipette configurations of a given model and version."""
 
-    pass
+    version: PipetteVersionType = Field(..., description="The version of the configuration loaded.")

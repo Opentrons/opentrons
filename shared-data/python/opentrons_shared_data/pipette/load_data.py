@@ -73,5 +73,5 @@ def load_definition(
     liquid_dict = _liquid(channels, max_volume, version)
 
     return PipetteConfigurations.parse_obj(
-        {**geometry_dict, **physical_dict, **liquid_dict}
+        {**geometry_dict, **physical_dict, **liquid_dict, "version": version}
     )

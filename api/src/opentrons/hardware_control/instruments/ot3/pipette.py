@@ -10,7 +10,7 @@ from opentrons.config import ot3_pipette_config
 from opentrons_shared_data.pipette.pipette_definition import (
     PipetteConfigurations, PipetteTipType, PlungerPositions,
     MotorConfigurations, PickUpTipConfigurations, SupportedTipsDefinition,
-    TipHandlingConfigurations)
+    TipHandlingConfigurations, PipetteModelType)
 from ..instrument_abc import AbstractInstrument
 from .instrument_calibration import (
     save_pipette_offset_calibration,
@@ -82,15 +82,18 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._drop_configurations = config.drop_tip_configurations
         self._pipette_offset = pipette_offset_cal
         self._acting_as = self._config.pipette_type
-        # TODO (lc 12-2-2022) change to pipette type
-        # think about how to make this backcompat
         self._pipette_type = self._config.pipette_type
+
+        # TODO (lc 12-05-2022) figure out how we can safely deprecate "name" and "model"
         self._name = ot3_pipette_config.PipetteNameType(
             pipette_type=config.pipette_type,
             pipette_channels=config.channels,
             pipette_generation=config.display_category)
-        # TODO (lc 12-2-2022) change to pipette version
-        self._model = self._config.model
+        self._model = ot3_pipette_config.PipetteModelVersionType(
+            pipette_type=config.pipette_type,
+            pipette_channels=config.channels,
+            pipette_version=config.version
+        )
         self._nozzle_offset = self._config.nozzle_offset
         self._current_volume = 0.0
         self._working_volume = self._config.max_volume
@@ -182,14 +185,14 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
 
     @property
     def name(self) -> PipetteName:
-        return self._name
+        return f"{self._name}"
 
     @property
     def model(self) -> PipetteModel:
-        return self._model
+        return f"{self._model}"
 
     @property
-    def pipette_type(self) -> PipetteModel:
+    def pipette_type(self) -> PipetteModelType:
         return self._pipette_type
 
     @property
