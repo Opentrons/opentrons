@@ -13,9 +13,9 @@ PipetteModelMinorVersion = Literal[0, 1, 2, 3]
 
 
 class PipetteTipType(Enum):
-    t50 = "t50"
-    t200 = "t200"
-    t1000 = "t1000"
+    t50 = 50
+    t200 = 200
+    t1000 = 1000
 
 
 class PipetteChannelType(Enum):
@@ -229,7 +229,7 @@ class PipetteLiquidPropertiesDefinition(BaseModel):
     supported_tips: Dict[PipetteTipType, SupportedTipsDefinition] = Field(
         ..., alias="supportedTips"
     )
-    max_volume: float = Field(
+    max_volume: int = Field(
         ...,
         description="The maximum supported volume of the pipette.",
         alias="maxVolume",

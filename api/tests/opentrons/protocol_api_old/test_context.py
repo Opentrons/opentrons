@@ -17,7 +17,7 @@ from opentrons.protocol_api.module_contexts import (
 )
 from opentrons.types import Mount, Point, Location, TransferTipPolicy
 from opentrons.hardware_control import API, NoTipAttachedError, ThreadManagedHardware
-from opentrons.hardware_control.instruments import Pipette
+from opentrons.hardware_control.instruments.ot2.pipette import Pipette
 from opentrons.hardware_control.types import Axis
 from opentrons.protocols.advanced_control import transfers as tf
 from opentrons.protocols.api_support import instrument as instrument_support

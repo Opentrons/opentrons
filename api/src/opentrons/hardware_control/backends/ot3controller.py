@@ -437,9 +437,10 @@ class OT3Controller:
             raise InvalidPipetteName(name=attached.name_int, mount=mount)
         try:
             pipette_type, channels = OT3Controller._split_pipette_name(attached.name)
+            # TODO (lc 12-5-2022) In follow-up we should make the model a float.
             return {
                 "config": ot3_pipette_config.load_ot3_pipette(
-                    pipette_type, channels, attached.model
+                    pipette_type, channels, float(attached.model)
                 ),
                 "id": OT3Controller._combine_serial_number(attached),
             }

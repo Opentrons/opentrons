@@ -33,7 +33,7 @@ mod_log = logging.getLogger(__name__)
 INTERNOZZLE_SPACING_MM: Final[float] = 9
 
 
-def piecewise_volume_conversion(ul: float, sequence: List[List[float]]) -> float:
+def piecewise_volume_conversion(ul: float, sequence: List[Tuple[float, float, float]]) -> float:
     """
     Takes a volume in microliters and a sequence representing a piecewise
     function for the slope and y-intercept of a ul/mm function, where each
@@ -236,14 +236,14 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         if cp_override == CriticalPoint.XY_CENTER:
             mod_offset_xy = [
                 offsets[0],
-                offsets[1] - (INTERNOZZLE_SPACING_MM * (self._config.channels - 1) / 2),
+                offsets[1] - (INTERNOZZLE_SPACING_MM * (self._config.channels.as_int - 1) / 2),
                 offsets[2],
             ]
             cp_type = CriticalPoint.XY_CENTER
         elif cp_override == CriticalPoint.FRONT_NOZZLE:
             mod_offset_xy = [
                 0,
-                (offsets[1] - INTERNOZZLE_SPACING_MM * (self._config.channels - 1)),
+                (offsets[1] - INTERNOZZLE_SPACING_MM * (self._config.channels.as_int - 1)),
                 offsets[2],
             ]
             cp_type = CriticalPoint.FRONT_NOZZLE
@@ -404,6 +404,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         )
 
     def as_dict(self) -> "Pipette.DictType":
+        # TODO (lc 12-05-2022) Kill this code ASAP
         self._config_as_dict.update(
             {
                 "current_volume": self.current_volume,

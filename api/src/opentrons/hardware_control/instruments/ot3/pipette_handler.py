@@ -96,7 +96,7 @@ class DropTipSpec:
 class PipetteHandlerProvider:
     IHP_LOG = MOD_LOG.getChild("InstrumentHandler")
 
-    def __init__(self, attached_instruments: InstrumentsByMount):
+    def __init__(self, attached_instruments: InstrumentsByMount[OT3Mount]):
         assert attached_instruments
         self._attached_instruments: InstrumentsByMount[OT3Mount] = attached_instruments
         self._ihp_log = PipetteHandlerProvider.IHP_LOG.getChild(str(id(self)))
@@ -169,18 +169,12 @@ class PipetteHandlerProvider:
     # TODO(mc, 2022-01-11): change return type to `Optional[PipetteDict]` instead
     # of potentially returning an empty dict
     def get_attached_instrument(self, mount: OT3Mount) -> PipetteDict:
-        instr = self._attached_instruments[mount.to_mount]
+        # TODO (lc 12-05-2022) Kill this code ASAP
+        instr = self._attached_instruments[mount]
         result: Dict[str, Any] = {}
         if instr:
             configs = [
-                "name",
-                "min_volume",
-                "max_volume",
-                "channels",
-                "aspirate_flow_rate",
-                "dispense_flow_rate",
-                "pipette_id",
-                "current_volume",
+
                 "display_name",
                 "tip_length",
                 "model",
@@ -192,7 +186,6 @@ class PipetteHandlerProvider:
                 "default_aspirate_flow_rates",
                 "default_blow_out_flow_rates",
                 "default_dispense_flow_rates",
-                "back_compat_names",
             ]
 
             instr_dict = instr.as_dict()

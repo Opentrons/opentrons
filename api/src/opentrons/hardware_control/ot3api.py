@@ -1379,7 +1379,6 @@ class OT3API(
 
     @property
     def hardware_pipettes(self) -> InstrumentsByMount[top_types.Mount]:
-        # override required for type matching
         return {
             m.to_mount(): i
             for m, i in self._pipette_handler.hardware_instruments.items()
@@ -1387,7 +1386,9 @@ class OT3API(
         }
 
     @property
-    def hardware_instruments(self) -> InstrumentsByMount[top_types.Mount]:
+    def hardware_instruments(self) -> InstrumentsByMount[top_types.Mount]: # type: ignore
+        # see comment in `protocols.instrument_configurer`
+        # override required for type matching
         # Warning: don't use this in new code, used `hardware_pipettes` instead
         return self.hardware_pipettes
 
