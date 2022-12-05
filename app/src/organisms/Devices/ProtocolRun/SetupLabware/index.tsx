@@ -113,6 +113,7 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
             protocolRunHeaderRef={protocolRunHeaderRef}
             robotName={robotName}
             runId={runId}
+            sourceLocation='SetupLabware'
           />
         ) : (
           <PrimaryButton onClick={() => expandStep(nextStep)}>

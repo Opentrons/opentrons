@@ -46,6 +46,7 @@ const render = () => {
         protocolRunHeaderRef={null}
         robotName={ROBOT_NAME}
         runId={RUN_ID}
+        sourceLocation='test run button'
       />
     </StaticRouter>,
     {
