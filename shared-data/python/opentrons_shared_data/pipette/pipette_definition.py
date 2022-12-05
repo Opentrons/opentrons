@@ -61,6 +61,12 @@ class PipetteVersionType:
     def __repr__(self) -> str:
         return f"{self.major}.{self.minor}"
 
+    @property
+    def as_float(self) -> float:
+        # TODO (lc 12-05-2022) Kinda gross. We should make this
+        # nicer probably.
+        return float(f"{self}")
+
 
 class SupportedTipsDefinition(BaseModel):
     """Tip parameters available for every tip size."""

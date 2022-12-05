@@ -81,14 +81,16 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._pick_up_configurations = config.pick_up_tip_configurations
         self._drop_configurations = config.drop_tip_configurations
         self._pipette_offset = pipette_offset_cal
-        self._acting_as = self._config.pipette_type
         self._pipette_type = self._config.pipette_type
+        self._pipette_version = self._config.version
+        self._max_channels = self._config.channels
 
         # TODO (lc 12-05-2022) figure out how we can safely deprecate "name" and "model"
         self._name = ot3_pipette_config.PipetteNameType(
             pipette_type=config.pipette_type,
             pipette_channels=config.channels,
             pipette_generation=config.display_category)
+        self._acting_as = self._name
         self._model = ot3_pipette_config.PipetteModelVersionType(
             pipette_type=config.pipette_type,
             pipette_channels=config.channels,
@@ -166,7 +168,10 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         return cast(PipetteName, f"{self._acting_as}")
 
     def reload_configurations(self) -> None:
-        self._config = ot3_pipette_config.load_ot3_pipette(self._pipette_type, 1, 1.0)
+        self._config = ot3_pipette_config.load_ot3_pipette(
+            self._pipette_type.name,
+            self._max_channels.as_int,
+            self._pipette_version.as_float)
         self._config_as_dict = self._config.dict()
 
     def reset_pipette_offset(self, mount: OT3Mount, to_default: bool) -> None:
@@ -325,6 +330,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     def working_volume(self, tip_volume: float) -> None:
         """The working volume is the current tip max volume"""
         self._working_volume = min(self.config.max_volume, tip_volume)
+        self._active_tip_settings = self._config.supported_tips[PipetteTipType(self._working_volume)]
 
     @property
     def available_volume(self) -> float:
@@ -378,7 +384,10 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     # want this to unbounded.
     @functools.lru_cache(maxsize=100)
     def ul_per_mm(self, ul: float, action: UlPerMmAction, specific_tip: str = "default") -> float:
-        sequence = self._active_tip_settings[action][specific_tip]
+        if action == "aspirate":
+            sequence = self._active_tip_settings.aspirate[specific_tip]
+        else:
+            sequence = self._active_tip_settings.dispense[specific_tip]
         return piecewise_volume_conversion(ul, sequence)
 
     def __str__(self) -> str:
