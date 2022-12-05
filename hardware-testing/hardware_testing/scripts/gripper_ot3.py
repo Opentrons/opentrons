@@ -24,25 +24,24 @@ ARMADILLO_OFFSET_ON_MAG_PLATE = types.Point(
 TRAVEL_HEIGHT = 30
 
 ForcedOffsets = List[Tuple[types.Point, types.Point]]
+
+# EDIT BELOW VARIABLES
 TEST_OFFSETS: ForcedOffsets = [
     (types.Point(x=0, y=0, z=0), types.Point(x=0, y=0, z=0)),
 ]
-
-ARMADILLO_GRIP_POINT = LABWARE_SIZE_ARMADILLO * 0.5
-ARMADILLO_GRIP_POINT += types.Point(z=LABWARE_SIZE_ARMADILLO.z * 0.5)
 LABWARE_SIZE = {"plate": LABWARE_SIZE_ARMADILLO, "tiprack": LABWARE_SIZE_EVT_TIPRACK}
 LABWARE_GRIP_HEIGHT = {
-    "plate": LABWARE_SIZE_ARMADILLO.z,
+    "plate": LABWARE_SIZE_ARMADILLO.z * 0.5,
     "tiprack": LABWARE_SIZE_EVT_TIPRACK.z * 0.5,
 }
-
 LABWARE_GRIP_FORCE = {"plate": 5, "tiprack": 10}
-
 LABWARE_WARP = types.Point()
 
 
 @dataclass
 class GripperSlotStates:
+    """Gripper slot states."""
+
     slots: List[int]
     temp_modules: List[int]
     heater_shakers: List[int]
@@ -201,14 +200,14 @@ def _calculate_src_and_dst_points(
         dst_loc += dst_offset
     print(f"\tSrc Final = {src_loc}")
     print(f"\t\tSlot = {src_slot_loc}")
-    print(f"\t\tOffset = {src_rel_offset}")
+    print(f"\t\tOffset = {src_labware_offset}")
     if warp:
         print(f"\t\tWarp: {warp}")
     if src_offset:
         print(f"\t\tAdditional Offset = {src_offset}")
     print(f"\tDst Final = {dst_loc}")
     print(f"\t\tSlot = {dst_slot_loc}")
-    print(f"\t\tOffset = {dst_rel_offset}")
+    print(f"\t\tOffset = {dst_labware_offset}")
     if warp:
         print(f"\t\tWarp: {warp}")
     if dst_offset:
@@ -311,7 +310,6 @@ async def _main(
 
 
 def _gather_and_test_slots(args: Any) -> GripperSlotStates:
-
     def _slot_array_from_args(a: Any) -> List[int]:
         if a:
             return [int(s) for s in a]
