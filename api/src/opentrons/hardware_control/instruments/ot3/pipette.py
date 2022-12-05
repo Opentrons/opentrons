@@ -416,6 +416,9 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
                 "aspirate_flow_rate": self.aspirate_flow_rate,
                 "dispense_flow_rate": self.dispense_flow_rate,
                 "blow_out_flow_rate": self.blow_out_flow_rate,
+                "default_aspirate_flow_rates": self.active_tip_settings.default_aspirate_flowrate,
+                "default_blow_out_flow_rates": self.active_tip_settings.default_dispense_flowrate,
+                "default_dispense_flow_rates": self.active_tip_settings.default_blowout_flowrate,
                 "tip_length": self.current_tip_length,
                 "return_tip_height": self.active_tip_settings.default_return_tip_height,
                 "tip_overlap": self.active_tip_settings.default_tip_overlap
