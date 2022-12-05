@@ -37,7 +37,7 @@ export function SimpleWizardBody(props: Props): JSX.Element {
           aria-label={isSuccess ? 'ot-check' : 'ot-alert'}
         />
         <StyledText
-          css={TYPOGRAPHY.h1Default}
+          as="h1"
           marginTop={SPACING.spacing5}
           marginBottom={SPACING.spacing3}
         >

@@ -11,18 +11,18 @@ import { GRIPPER_FLOW_TYPES } from './constants'
 import type { GripperWizardFlowType } from './types'
 
 interface ExitConfirmationProps {
-  proceed: () => void
-  goBack: () => void
+  handleExit: () => void
+  handleGoBack: () => void
   flowType: GripperWizardFlowType
 }
 
 export function ExitConfirmation(props: ExitConfirmationProps): JSX.Element {
-  const { goBack, proceed, flowType } = props
+  const { handleGoBack, handleExit, flowType } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
 
-  const titleFlowType = { [flowType in GripperWizardFlowType]: string } = {
-    [GRIPPER_FLOW_TYPES.ATTACH]: t('attach'),
-    [GRIPPER_FLOW_TYPES.DETACH]: t('detach'),
+  const titleFlowType: { [flowType in GripperWizardFlowType]: string } = {
+    [GRIPPER_FLOW_TYPES.ATTACH]: t('attach_gripper'),
+    [GRIPPER_FLOW_TYPES.DETACH]: t('detach_gripper'),
     [GRIPPER_FLOW_TYPES.RECALIBRATE]: t('gripper_recalibration'),
   }
   const flowTitle: string = titleFlowType[flowType]
@@ -34,12 +34,12 @@ export function ExitConfirmation(props: ExitConfirmationProps): JSX.Element {
       subHeader={t('are_you_sure_exit', { flow: flowTitle })}
       isSuccess={false}
     >
-      <SecondaryButton onClick={goBack} marginRight={SPACING.spacing2}>
+      <SecondaryButton onClick={handleGoBack} marginRight={SPACING.spacing2}>
         {t('shared:go_back')}
       </SecondaryButton>
       <AlertPrimaryButton
         textTransform={TEXT_TRANSFORM_CAPITALIZE}
-        onClick={proceed}
+        onClick={handleExit}
       >
         {t('shared:exit')}
       </AlertPrimaryButton>

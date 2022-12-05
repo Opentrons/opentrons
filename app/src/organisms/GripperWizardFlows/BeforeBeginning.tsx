@@ -5,31 +5,40 @@ import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardRequiredEquipmentList } from '../../molecules/WizardRequiredEquipmentList'
-import { GRIPPER_FLOW_TYPES, SCREWDRIVER_LOADNAME, GRIPPER_LOADNAME, CAL_PIN_LOADNAME } from './constants'
+import {
+  GRIPPER_FLOW_TYPES,
+  SCREWDRIVER_LOADNAME,
+  GRIPPER_LOADNAME,
+  CAL_PIN_LOADNAME,
+} from './constants'
 import type { Run, CreateRunData } from '@opentrons/api-client'
 import type { GripperWizardFlowType, GripperWizardStepProps } from './types'
 import type { AxiosError } from 'axios'
-
-
 
 interface BeforeBeginningInfo {
   bodyI18nKey: string
   equipmentLoadNames: string[]
 }
 
-const INFO_BY_FLOW_TYPE: { [flowType in GripperWizardFlowType]: BeforeBeginningInfo } = {
+const INFO_BY_FLOW_TYPE: {
+  [flowType in GripperWizardFlowType]: BeforeBeginningInfo
+} = {
   [GRIPPER_FLOW_TYPES.ATTACH]: {
-    bodyI18nKey: "remove_labware_to_get_started_attaching",
-    equipmentLoadNames: [GRIPPER_LOADNAME, SCREWDRIVER_LOADNAME, CAL_PIN_LOADNAME],
+    bodyI18nKey: 'remove_labware_to_get_started_attaching',
+    equipmentLoadNames: [
+      GRIPPER_LOADNAME,
+      SCREWDRIVER_LOADNAME,
+      CAL_PIN_LOADNAME,
+    ],
   },
   [GRIPPER_FLOW_TYPES.DETACH]: {
-    bodyI18nKey: "remove_labware_to_get_started_detaching",
+    bodyI18nKey: 'remove_labware_to_get_started_detaching',
     equipmentLoadNames: [SCREWDRIVER_LOADNAME],
   },
   [GRIPPER_FLOW_TYPES.RECALIBRATE]: {
-    bodyI18nKey: "remove_labware_to_get_started_recalibrating",
+    bodyI18nKey: 'remove_labware_to_get_started_recalibrating',
     equipmentLoadNames: [GRIPPER_LOADNAME, CAL_PIN_LOADNAME],
-  }
+  },
 }
 interface BeforeBeginningProps extends GripperWizardStepProps {
   createRun: UseMutateFunction<Run, AxiosError<any>, CreateRunData, unknown>
@@ -69,13 +78,15 @@ export const BeforeBeginning = (
     proceed()
   }
 
-  const equipmentInfoByLoadName: { [loadName: string]: { displayName: string, subtitle?: string } } = {
-    calibration_pin: { displayName: t('calibration_pin'), },
+  const equipmentInfoByLoadName: {
+    [loadName: string]: { displayName: string; subtitle?: string }
+  } = {
+    calibration_pin: { displayName: t('calibration_pin') },
     t10_torx_screwdriver: {
       displayName: t('t10_torx_screwdriver'),
-      subtitle: t('provided_with_robot_use_right_size')
+      subtitle: t('provided_with_robot_use_right_size'),
     },
-    opentrons_gripper: { displayName: t('gripper') }
+    opentrons_gripper: { displayName: t('gripper') },
   }
 
   const { bodyI18nKey, equipmentLoadNames } = INFO_BY_FLOW_TYPE[flowType]
@@ -84,7 +95,12 @@ export const BeforeBeginning = (
     return { loadName, displayName, subtitle }
   })
 
-  if (isRobotMoving) return <InProgressModal description={t('shared:stand_back_robot_is_in_motion')} />
+  if (isRobotMoving)
+    return (
+      <InProgressModal
+        description={t('shared:stand_back_robot_is_in_motion')}
+      />
+    )
   return (
     <GenericWizardTile
       header={t('before_you_begin')}

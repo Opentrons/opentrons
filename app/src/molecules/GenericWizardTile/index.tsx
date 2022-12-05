@@ -72,7 +72,8 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       height="24.625rem"
-      padding={SPACING.spacing6}>
+      padding={SPACING.spacing6}
+    >
       <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacingXXL}>
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -86,10 +87,7 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
           {rightHandBody}
         </Flex>
       </Flex>
-      <Flex
-        justifyContent={buttonPositioning}
-        alignItems={ALIGN_FLEX_END}
-      >
+      <Flex justifyContent={buttonPositioning} alignItems={ALIGN_FLEX_END}>
         {back != null ? (
           <Btn onClick={back}>
             <StyledText css={GO_BACK_BUTTON_STYLE}>{t('go_back')}</StyledText>
@@ -97,7 +95,11 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
         ) : null}
         {getHelp != null ? <NeedHelpLink href={getHelp} /> : null}
         {proceed != null ? (
-          <PrimaryButton disabled={proceedIsDisabled} css={CAPITALIZE_FIRST_LETTER_STYLE} onClick={proceed}>
+          <PrimaryButton
+            disabled={proceedIsDisabled}
+            css={CAPITALIZE_FIRST_LETTER_STYLE}
+            onClick={proceed}
+          >
             {proceedButtonText}
           </PrimaryButton>
         ) : null}

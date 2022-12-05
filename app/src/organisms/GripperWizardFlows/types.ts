@@ -30,9 +30,9 @@ export interface BeforeBeginningStep {
 export interface MovePinStep {
   section: typeof SECTIONS.MOVE_PIN
   movement:
-  | typeof MOVE_PIN_TO_FRONT_JAW
-  | typeof MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW
-  | typeof REMOVE_PIN_FROM_REAR_JAW
+    | typeof MOVE_PIN_TO_FRONT_JAW
+    | typeof MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW
+    | typeof REMOVE_PIN_FROM_REAR_JAW
 }
 export interface MountGripperStep {
   section: typeof SECTIONS.MOUNT_GRIPPER
@@ -43,10 +43,10 @@ export interface UnmountGripperStep {
 export interface SuccessStep {
   section: typeof SECTIONS.SUCCESS
   successfulAction:
-  | typeof SUCCESSFULLY_ATTACHED
-  | typeof SUCCESSFULLY_ATTACHED_AND_CALIBRATED
-  | typeof SUCCESSFULLY_DETACHED
-  | typeof SUCCESSFULLY_CALIBRATED
+    | typeof SUCCESSFULLY_ATTACHED
+    | typeof SUCCESSFULLY_ATTACHED_AND_CALIBRATED
+    | typeof SUCCESSFULLY_DETACHED
+    | typeof SUCCESSFULLY_CALIBRATED
 }
 
 type CreateCommandMutate = ReturnType<

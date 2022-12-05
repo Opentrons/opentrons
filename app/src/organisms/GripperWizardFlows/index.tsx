@@ -42,12 +42,18 @@ export const GripperWizardFlows = (
   const goBack = (): void => {
     setCurrentStepIndex(isFinalStep ? currentStepIndex : currentStepIndex - 1)
   }
-  const { chainRunCommands, isCommandMutationLoading } = useChainRunCommands(runId)
-
-  const { createRun, isLoading: isCreateLoading } = useCreateRunMutation(
-    { onSuccess: response => { setRunId(response.data.id) } },
+  const { chainRunCommands, isCommandMutationLoading } = useChainRunCommands(
+    runId
   )
-  const { stopRun, isLoading: isStopLoading } = useStopRunMutation({ onSuccess: closeFlow })
+
+  const { createRun, isLoading: isCreateLoading } = useCreateRunMutation({
+    onSuccess: response => {
+      setRunId(response.data.id)
+    },
+  })
+  const { stopRun, isLoading: isStopLoading } = useStopRunMutation({
+    onSuccess: closeFlow,
+  })
 
   const [isBetweenCommands, setIsBetweenCommands] = React.useState<boolean>(
     false
@@ -121,7 +127,11 @@ export const GripperWizardFlows = (
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
   if (showConfirmExit) {
     modalContent = (
-      <ExitConfirmation goBack={cancelExit} proceed={confirmExit} flowType={flowType} />
+      <ExitConfirmation
+        handleGoBack={cancelExit}
+        handleExit={confirmExit}
+        flowType={flowType}
+      />
     )
   } else if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
     onExit = handleCleanUpAndClose
@@ -130,48 +140,38 @@ export const GripperWizardFlows = (
         {...currentStep}
         {...sharedProps}
         // createRun={createRun}
-        createRun={() => { console.log('TODO: create run') }}
+        createRun={() => {
+          console.log('TODO: create run')
+        }}
         isCreateLoading={isCreateLoading}
       />
     )
   } else if (currentStep.section === SECTIONS.MOVE_PIN) {
     onExit = confirmExit
     modalContent = modalContent = (
-      <MovePin
-        {...currentStep}
-        {...sharedProps}
-        isExiting={isExiting}
-      />
+      <MovePin {...currentStep} {...sharedProps} isExiting={isExiting} />
     )
   } else if (currentStep.section === SECTIONS.MOUNT_GRIPPER) {
     onExit = confirmExit
     modalContent = modalContent = (
-      <MountGripper
-        {...currentStep}
-        {...sharedProps}
-      />
+      <MountGripper {...currentStep} {...sharedProps} />
     )
   } else if (currentStep.section === SECTIONS.UNMOUNT_GRIPPER) {
     onExit = confirmExit
     modalContent = modalContent = (
-      <UnmountGripper
-        {...currentStep}
-        {...sharedProps}
-      />
+      <UnmountGripper {...currentStep} {...sharedProps} />
     )
   } else if (currentStep.section === SECTIONS.SUCCESS) {
     onExit = confirmExit
     modalContent = modalContent = (
-      <Success
-        {...currentStep}
-        proceed={isFinalStep ? closeFlow : proceed} />
+      <Success {...currentStep} proceed={isFinalStep ? closeFlow : proceed} />
     )
   }
 
   const titleByFlowType: { [flowType in GripperWizardFlowType]: string } = {
     [GRIPPER_FLOW_TYPES.RECALIBRATE]: t('calibrate_gripper'),
     [GRIPPER_FLOW_TYPES.ATTACH]: t('attach_gripper'),
-    [GRIPPER_FLOW_TYPES.DETACH]: t('detach_gripper')
+    [GRIPPER_FLOW_TYPES.DETACH]: t('detach_gripper'),
   }
   let handleExit = onExit
   if (isRobotMoving) {

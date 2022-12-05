@@ -7,7 +7,7 @@ import { GripperWizardFlowType } from '../GripperWizardFlows/types'
 
 const TEMP_STUB_ATTACHED_GRIPPER = {
   model: 'temp_fake_gripper_model',
-  serialNumber: 'temp_fake_gripper_serial_number'
+  serialNumber: 'temp_fake_gripper_serial_number',
 }
 
 interface AttachedGripper {
@@ -23,9 +23,16 @@ interface GripperCardProps {
   tempSetAttachedGripper: (attachedGripper: AttachedGripper | null) => void
 }
 
-export function GripperCard({ attachedGripper, robotName, tempSetAttachedGripper }: GripperCardProps): JSX.Element {
+export function GripperCard({
+  attachedGripper,
+  robotName,
+  tempSetAttachedGripper,
+}: GripperCardProps): JSX.Element {
   const { t } = useTranslation(['device_details', 'shared'])
-  const [openWizardFlowType, setOpenWizardFlowType] = React.useState<GripperWizardFlowType | null>(null)
+  const [
+    openWizardFlowType,
+    setOpenWizardFlowType,
+  ] = React.useState<GripperWizardFlowType | null>(null)
 
   const handleAttach: React.MouseEventHandler<HTMLButtonElement> = () => {
     tempSetAttachedGripper(TEMP_STUB_ATTACHED_GRIPPER)
@@ -44,25 +51,27 @@ export function GripperCard({ attachedGripper, robotName, tempSetAttachedGripper
     console.log('TODO: handle calibrate gripper', robotName)
   }
 
-  const menuOverlayItems = attachedGripper == null ?
-    [
-      {
-        label: 'Attach gripper',
-        disabled: attachedGripper != null,
-        onClick: handleAttach,
-      }
-    ] : [
-      {
-        label: 'Recalibrate gripper',
-        disabled: attachedGripper == null,
-        onClick: handleCalibrate,
-      },
-      {
-        label: 'Detach gripper',
-        disabled: attachedGripper == null,
-        onClick: handleDetach,
-      }
-    ]
+  const menuOverlayItems =
+    attachedGripper == null
+      ? [
+          {
+            label: 'Attach gripper',
+            disabled: attachedGripper != null,
+            onClick: handleAttach,
+          },
+        ]
+      : [
+          {
+            label: 'Recalibrate gripper',
+            disabled: attachedGripper == null,
+            onClick: handleCalibrate,
+          },
+          {
+            label: 'Detach gripper',
+            disabled: attachedGripper == null,
+            onClick: handleDetach,
+          },
+        ]
   return (
     <>
       <InstrumentCard
@@ -73,14 +82,13 @@ export function GripperCard({ attachedGripper, robotName, tempSetAttachedGripper
         label={t('shared:extension_mount')}
         menuOverlayItems={menuOverlayItems}
       />
-      {
-        openWizardFlowType != null
-          ? <GripperWizardFlows
-            flowType={openWizardFlowType}
-            robotName={robotName}
-            closeFlow={() => setOpenWizardFlowType(null)} />
-          : null
-      }
+      {openWizardFlowType != null ? (
+        <GripperWizardFlows
+          flowType={openWizardFlowType}
+          robotName={robotName}
+          closeFlow={() => setOpenWizardFlowType(null)}
+        />
+      ) : null}
     </>
   )
 }

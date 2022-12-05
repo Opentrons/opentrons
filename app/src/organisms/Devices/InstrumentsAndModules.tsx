@@ -42,7 +42,10 @@ export function InstrumentsAndModules({
   const { isRunTerminal } = useRunStatuses()
   const isOT3 = useIsOT3(robotName)
 
-  const [tempAttachedGripper, tempSetAttachedGripper] = React.useState<{ model: string, serialNumber: string } | null>(null)
+  const [tempAttachedGripper, tempSetAttachedGripper] = React.useState<{
+    model: string
+    serialNumber: string
+  } | null>(null)
 
   const attachedModules =
     useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
@@ -110,13 +113,13 @@ export function InstrumentsAndModules({
                 robotName={robotName}
               />
               {/* extension mount here */}
-              {isOT3
-                ? <GripperCard
+              {isOT3 ? (
+                <GripperCard
                   robotName={robotName}
                   attachedGripper={tempAttachedGripper}
                   tempSetAttachedGripper={tempSetAttachedGripper}
                 />
-                : null}
+              ) : null}
               {leftColumnModules.map((module, index) => (
                 <ModuleCard
                   key={`moduleCard_${module.moduleType}_${index}`}
@@ -136,7 +139,7 @@ export function InstrumentsAndModules({
                 pipetteInfo={
                   attachedPipettes.right?.model != null
                     ? getPipetteModelSpecs(attachedPipettes.right?.model) ??
-                    null
+                      null
                     : null
                 }
                 mount={RIGHT}

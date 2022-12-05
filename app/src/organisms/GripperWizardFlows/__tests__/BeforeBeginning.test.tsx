@@ -45,13 +45,19 @@ describe('BeforeBeginning', () => {
   it('returns the correct information for attach flow', async () => {
     const { getByText, getByRole } = render(props)
     getByText('Before you begin')
-    getByText('To get started, remove labware from the rest of the deck and clean up the work area to make attachment and calibration easier. Also gather the needed equipment shown on the right hand side')
-    getByText('The calibration pin is included with the gripper and should be stored on the exposed panel of the gripper.')
+    getByText(
+      'To get started, remove labware from the rest of the deck and clean up the work area to make attachment and calibration easier. Also gather the needed equipment shown on the right hand side'
+    )
+    getByText(
+      'The calibration pin is included with the gripper and should be stored on the exposed panel of the gripper.'
+    )
     getByText('You will need:')
     // getByText('mock need help link')
     getByText('Calibration Pin')
     getByText('T10 Torx Screwdriver')
-    getByText("Provided with robot. Using another size can strip the instrument’s screws.")
+    getByText(
+      'Provided with robot. Using another size can strip the instrument’s screws.'
+    )
     getByText('Gripper')
 
     getByRole('button', { name: 'Move gantry to front' }).click()
@@ -81,13 +87,17 @@ describe('BeforeBeginning', () => {
     })
   })
   it('returns the correct information for detach flow', async () => {
-    props = {...props, flowType: GRIPPER_FLOW_TYPES.DETACH}
+    props = { ...props, flowType: GRIPPER_FLOW_TYPES.DETACH }
     const { getByText, getByRole } = render(props)
     getByText('Before you begin')
-    getByText('To get started, remove labware from the rest of the deck and clean up the work area to make attachment and calibration easier. Also gather the needed equipment shown on the right hand side')
+    getByText(
+      'To get started, remove labware from the rest of the deck and clean up the work area to make attachment and calibration easier. Also gather the needed equipment shown on the right hand side'
+    )
     getByText('You will need:')
     getByText('T10 Torx Screwdriver')
-    getByText("Provided with robot. Using another size can strip the instrument’s screws.")
+    getByText(
+      'Provided with robot. Using another size can strip the instrument’s screws.'
+    )
     // getByText('mock need help link')
 
     getByRole('button', { name: 'Move gantry to front' }).click()
@@ -117,11 +127,15 @@ describe('BeforeBeginning', () => {
     })
   })
   it('returns the correct information for recalibrate flow', async () => {
-    props = {...props, flowType: GRIPPER_FLOW_TYPES.RECALIBRATE}
+    props = { ...props, flowType: GRIPPER_FLOW_TYPES.RECALIBRATE }
     const { getByText, getByRole } = render(props)
     getByText('Before you begin')
-    getByText('To get started, remove labware from the rest of the deck and clean up the work area to make attachment and calibration easier. Also gather the needed equipment shown on the right hand side')
-    getByText('The calibration pin is included with the gripper and should be stored on the exposed panel of the gripper.')
+    getByText(
+      'To get started, remove labware from the rest of the deck and clean up the work area to make attachment and calibration easier. Also gather the needed equipment shown on the right hand side'
+    )
+    getByText(
+      'The calibration pin is included with the gripper and should be stored on the exposed panel of the gripper.'
+    )
     getByText('You will need:')
     getByText('Calibration Pin')
     getByText('Gripper')

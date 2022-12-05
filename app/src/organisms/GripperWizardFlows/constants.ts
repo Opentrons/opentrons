@@ -18,7 +18,7 @@ export const MOVE_PIN_TO_FRONT_JAW = 'movePinToFrontJaw' as const
 export const MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW = 'movePinFromFrontJawToRearJaw' as const
 export const REMOVE_PIN_FROM_REAR_JAW = 'removePinFromRearJaw' as const
 
-// successful actions 
+// successful actions
 
 export const SUCCESSFULLY_ATTACHED = 'successfullyAttached' as const
 export const SUCCESSFULLY_ATTACHED_AND_CALIBRATED = 'successfullyAttachedAndCalibrated' as const
@@ -29,5 +29,3 @@ export const SUCCESSFULLY_CALIBRATED = 'successfullyCalibrated' as const
 export const CAL_PIN_LOADNAME = 'calibration_pin' as const
 export const SCREWDRIVER_LOADNAME = 't10_torx_screwdriver' as const
 export const GRIPPER_LOADNAME = 'opentrons_gripper' as const
-
-
