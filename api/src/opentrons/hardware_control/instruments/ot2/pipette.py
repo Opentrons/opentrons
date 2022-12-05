@@ -10,11 +10,11 @@ from typing import Any, Dict, Optional, Set, Tuple, Union
 
 from opentrons_shared_data.pipette import name_config as pipette_name_config
 
-from opentrons.types import Point
+from opentrons.types import Point, Mount
 from opentrons.config import pipette_config, robot_configs
-from opentrons.config.types import RobotConfig, OT3Config
+from opentrons.config.types import RobotConfig
 from opentrons.drivers.types import MoveSplit
-from ..instrument_abc import AbstractInstrument, MountType
+from ..instrument_abc import AbstractInstrument
 from .instrument_calibration import (
     PipetteOffsetByPipetteMount,
     load_pipette_offset,
@@ -133,14 +133,18 @@ class Pipette(AbstractInstrument[pipette_config.PipetteConfig]):
         # Update the cached dict representation
         self._config_as_dict = asdict(self._config)
 
-    def reset_pipette_offset(self, mount: MountType, to_default: bool) -> None:
+    def reload_configurations(self) -> None:
+        self._config = pipette_config.load(self.model, self.pipette_id)
+        self._config_as_dict = asdict(self._config)
+
+    def reset_pipette_offset(self, mount: Mount, to_default: bool) -> None:
         """Reset the pipette offset to system defaults."""
         if to_default:
             self._pipette_offset = load_pipette_offset(pip_id=None, mount=mount)
         else:
             self._pipette_offset = load_pipette_offset(self._pipette_id, mount)
 
-    def save_pipette_offset(self, mount: MountType, offset: Point) -> None:
+    def save_pipette_offset(self, mount: Mount, offset: Point) -> None:
         """Update the pipette offset to a new value."""
         # TODO (lc 10-31-2022) We should have this command be supported properly by
         # ot-3 and ot-2 when we split out the pipette class

@@ -42,9 +42,7 @@ from opentrons_hardware.hardware_control.motion_planning import (
 
 from .util import use_or_initialize_loop, check_motion_bounds
 
-# TODO (lc 09-23-2022) Pull in correct OT3 instrument once
-# instrument model re-working is complete.
-from .instruments.ot2.pipette import (
+from .instruments.ot3.pipette import (
     load_from_config_and_check_skip,
 )
 from .instruments.ot3.gripper import compare_gripper_config_and_check_skip
@@ -86,7 +84,7 @@ from .protocols import HardwareControlAPI
 
 # TODO (lc 09/15/2022) We should update our pipette handler to reflect OT-3 properties
 # in a follow-up PR.
-from .instruments.ot2.pipette_handler import OT3PipetteHandler, InstrumentsByMount
+from .instruments.ot3.pipette_handler import OT3PipetteHandler, InstrumentsByMount
 from .instruments.ot3.instrument_calibration import load_pipette_offset
 from .instruments.ot3.gripper_handler import GripperHandler
 from .instruments.ot3.instrument_calibration import (
@@ -105,7 +103,7 @@ from .motion_utilities import (
 
 from .dev_types import (
     AttachedGripper,
-    AttachedPipette,
+    OT3AttachedPipette,
     PipetteDict,
     InstrumentDict,
     GripperDict,
@@ -433,7 +431,7 @@ class OT3API(
     async def cache_pipette(
         self,
         mount: OT3Mount,
-        instrument_data: AttachedPipette,
+        instrument_data: OT3AttachedPipette,
         req_instr: Optional[PipetteName],
     ) -> None:
         """Set up pipette based on scanned information."""
@@ -491,7 +489,7 @@ class OT3API(
             else:
                 req_instr_name = checked_require.get(mount, None)
                 await self.cache_pipette(
-                    mount, cast(AttachedPipette, instrument_data), req_instr_name
+                    mount, cast(OT3AttachedPipette, instrument_data), req_instr_name
                 )
 
         await self._backend.probe_network()

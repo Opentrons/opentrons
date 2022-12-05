@@ -1,11 +1,16 @@
 import logging
+import functools
+
 from typing import Any, List, Dict, Optional, Set, Tuple, Union
 from typing_extensions import Final
 
 from opentrons.types import Point
 
 from opentrons.config import ot3_pipette_config
-from opentrons_shared_data.pipette.pipette_definition import PipetteConfigurations
+from opentrons_shared_data.pipette.pipette_definition import (
+    PipetteConfigurations, PipetteTipType, PlungerPositions,
+    MotorConfigurations, PickUpTipConfigurations, SupportedTipsDefinition,
+    TipHandlingConfigurations)
 from ..instrument_abc import AbstractInstrument
 from .instrument_calibration import (
     save_pipette_offset_calibration,
@@ -22,10 +27,11 @@ from opentrons.hardware_control.types import (
     OT3Mount,
     InvalidMoveError)
 
+mod_log = logging.getLogger(__name__)
 
 # TODO (lc 12-2-2022) We should move this to the geometry configurations
 INTERNOZZLE_SPACING_MM: Final[float] = 9
-mod_log = logging.getLogger(__name__)
+
 
 def piecewise_volume_conversion(ul: float, sequence: List[List[float]]) -> float:
     """
@@ -69,17 +75,27 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         pipette_id: Optional[str] = None,
     ) -> None:
         self._config = config
+        self._config_as_dict = config.dict()
+        self._plunger_positions = config.plunger_positions_configurations
+        self._plunger_motor_current = config.plunger_motor_configurations
+        self._pick_up_configurations = config.pick_up_tip_configurations
+        self._drop_configurations = config.drop_tip_configurations
         self._pipette_offset = pipette_offset_cal
-        self._acting_as = self._config.name
-        self._name = self._config.name
+        self._acting_as = self._config.pipette_type
+        # TODO (lc 12-2-2022) change to pipette type
+        # think about how to make this backcompat
+        self._pipette_type = self._config.pipette_type
+        self._name = self._config.pipette_type
+        # TODO (lc 12-2-2022) change to pipette version
         self._model = self._config.model
         self._nozzle_offset = self._config.nozzle_offset
         self._current_volume = 0.0
         self._working_volume = self._config.max_volume
         self._current_tip_length = 0.0
         self._current_tiprack_diameter = 0.0
-        self._fallback_tip_length = self._config.tip_length
-        self._tip_overlap_map = self._config.tip_overlap
+        # TODO add in a tip length value
+        self._fallback_tip_length = 0.0
+        self._tip_overlap_map = 10
         self._has_tip = False
         self._pipette_id = pipette_id
         self._log = mod_log.getChild(
@@ -92,22 +108,60 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         )
         self.ready_to_aspirate = False
         #: True if ready to aspirate
-        self._aspirate_flow_rate = self._config.default_aspirate_flow_rates["2.0"]
-        self._dispense_flow_rate = self._config.default_dispense_flow_rates["2.0"]
-        self._blow_out_flow_rate = self._config.default_blow_out_flow_rates["2.0"]
+        self._active_tip_settings = self._config.supported_tips[PipetteTipType(self._working_volume)]
+        self._aspirate_flow_rate = self._active_tip_settings.default_aspirate_flowrate
+        self._dispense_flow_rate = self._active_tip_settings.default_dispense_flowrate
+        self._blow_out_flow_rate = self._active_tip_settings.default_blowout_flowrate
 
     @property
     def config(self) -> PipetteConfigurations:
         return self._config
 
     @property
-    def nozzle_offset(self) -> Tuple[float, float, float]:
+    def nozzle_offset(self) -> List[float]:
         return self._nozzle_offset
 
     @property
-    def pipette_offset(self) -> PipetteConfigurations:
+    def pipette_offset(self) -> PipetteOffsetByPipetteMount:
         return self._pipette_offset
 
+    @property
+    def plunger_positions(self) -> PlungerPositions:
+        return self._plunger_positions
+
+    @property
+    def plunger_motor_current(self) -> MotorConfigurations:
+        return self._plunger_motor_current
+
+    @property
+    def pick_up_configurations(self) -> PickUpTipConfigurations:
+        return self._pick_up_configurations
+
+    @property
+    def drop_configurations(self) -> TipHandlingConfigurations:
+        return self._drop_configurations
+
+    @property
+    def active_tip_settings(self) -> SupportedTipsDefinition:
+        return self._active_tip_settings
+
+    def act_as(self, name: PipetteName) -> None:
+        """Reconfigure to act as ``name``. ``name`` must be either the
+        actual name of the pipette, or a name in its back-compatibility
+        config.
+        """
+        raise NotImplementedError("Backwards compatibility is not supported at this time.")
+
+    def update_config_item(self, elem_name: str, elem_val: Any) -> None:
+        raise NotImplementedError("Update config is not supported at this time.")
+
+    @property
+    def acting_as(self) -> PipetteName:
+        return self._acting_as
+
+    def reload_configurations(self) -> None:
+        self._config = ot3_pipette_config.load_ot3_pipette(self._pipette_type, 1, 1.0)
+        self._config_as_dict = self._config.dict()
 
     def reset_pipette_offset(self, mount: OT3Mount, to_default: bool) -> None:
         """Reset the pipette offset to system defaults."""
@@ -130,6 +184,10 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     @property
     def model(self) -> PipetteModel:
         return self._model
+
+    @property
+    def pipette_type(self) -> PipetteModel:
+        return self._pipette_type
 
     @property
     def pipette_id(self) -> Optional[str]:
@@ -313,8 +371,8 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     # Cache max is chosen somewhat arbitrarily. With a float is input we don't
     # want this to unbounded.
     @functools.lru_cache(maxsize=100)
-    def ul_per_mm(self, ul: float, action: UlPerMmAction) -> float:
-        sequence = self._config.ul_per_mm[action]
+    def ul_per_mm(self, ul: float, action: UlPerMmAction, specific_tip: str = "default") -> float:
+        sequence = self._active_tip_settings[action][specific_tip]
         return piecewise_volume_conversion(ul, sequence)
 
     def __str__(self) -> str:

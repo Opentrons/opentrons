@@ -26,7 +26,7 @@ from opentrons.config.types import RobotConfig, OT3Config
 from opentrons.drivers.rpi_drivers.types import USBPort
 
 from .util import use_or_initialize_loop, check_motion_bounds
-from .instruments.ot2.pipette import (
+from .instruments.pipette import (
     generate_hardware_configs,
     load_from_config_and_check_skip,
 )

@@ -95,10 +95,9 @@ from opentrons_hardware.drivers.gpio import OT3GPIO
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
     from ..dev_types import (
-        AttachedPipette,
+        OT3AttachedPipette,
         AttachedGripper,
         OT3AttachedInstruments,
-        InstrumentHardwareConfigs,
     )
 
 log = logging.getLogger(__name__)
@@ -412,12 +411,12 @@ class OT3Controller:
     @staticmethod
     def _lookup_serial_key(pipette_name: FirmwarePipetteName) -> str:
         lookup_name = {
-            PipetteName.p1000_single: "P1KS",
-            PipetteName.p1000_multi: "P1KM",
-            PipetteName.p50_single: "P50S",
-            PipetteName.p50_multi: "P50M",
-            PipetteName.p1000_96: "P1KH",
-            PipetteName.p50_96: "P50H"}
+            FirmwarePipetteName.p1000_single: "P1KS",
+            FirmwarePipetteName.p1000_multi: "P1KM",
+            FirmwarePipetteName.p50_single: "P50S",
+            FirmwarePipetteName.p50_multi: "P50M",
+            FirmwarePipetteName.p1000_96: "P1KH",
+            FirmwarePipetteName.p50_96: "P50H"}
         return lookup_name[pipette_name]
     
     @staticmethod
@@ -433,13 +432,14 @@ class OT3Controller:
     @staticmethod
     def _build_attached_pip(
         attached: ohc_tool_types.PipetteInformation, mount: OT3Mount
-    ) -> AttachedPipette:
+    ) -> OT3AttachedPipette:
         if attached.name == FirmwarePipetteName.unknown:
             raise InvalidPipetteName(name=attached.name_int, mount=mount)
         try:
+            pipette_type, channels = OT3Controller._split_pipette_name(attached.name)
             return {
                 "config": ot3_pipette_config.load_ot3_pipette(
-                    **OT3Controller._split_pipette_name(attached.name), attached.model
+                    pipette_type, channels, attached.model
                 ),
                 "id": OT3Controller._combine_serial_number(attached),
             }
@@ -771,9 +771,9 @@ class OT3Controller:
         # when that method actually does canbus stuff
         instrs = await self.get_attached_instruments({})
         expected = {NodeId.gantry_x, NodeId.gantry_y, NodeId.head}
-        if instrs.get(OT3Mount.LEFT, cast("AttachedPipette", {})).get("config", None):
+        if instrs.get(OT3Mount.LEFT, cast("OT3AttachedPipette", {})).get("config", None):
             expected.add(NodeId.pipette_left)
-        if instrs.get(OT3Mount.RIGHT, cast("AttachedPipette", {})).get("config", None):
+        if instrs.get(OT3Mount.RIGHT, cast("OT3AttachedPipette", {})).get("config", None):
             expected.add(NodeId.pipette_right)
         if instrs.get(OT3Mount.GRIPPER, cast("AttachedGripper", {})).get(
             "config", None
