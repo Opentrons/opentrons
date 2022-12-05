@@ -998,6 +998,10 @@ class OT3API(
         res = await self._backend.get_limit_switches()
         return {ax: val for ax, val in res.items()}
 
+    async def get_encoder_position(self) -> Dict[OT3Axis, bool]:
+        res = await self._backend.get_encoder_position()
+        return {ax: val for ax, val in res.items()}
+
     async def _fast_home(
         self, axes: Sequence[OT3Axis], margin: float
     ) -> OT3AxisMap[float]:
