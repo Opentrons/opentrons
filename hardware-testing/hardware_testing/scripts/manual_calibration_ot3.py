@@ -107,8 +107,9 @@ async def _test_current_calibration(api: OT3API, mount: OT3Mount, pos: Point) ->
     if mount == OT3Mount.GRIPPER:
         return await _test_gripper_calibration_with_block(api, pos)
     else:
-        input("ENTER to move to center of slot to test Pipette calibration")
+        input("ENTER to move to center of slot to test Pipette calibration: ")
         await api.move_to(mount, pos)
+        input("Check by EYE, then press ENTER to continue: ")
         return Point()
 
 
@@ -146,7 +147,7 @@ async def _find_square_center(
     current_position = await api.gantry_position(mount)
     above_point = z_probe_pos._replace(z=current_position.z)
     await api.move_to(mount, above_point)
-    input("\nRemove all items from deck and press ENTER\n")
+    input("\nRemove all items from deck and press ENTER:\n")
     await api.move_to(mount, z_probe_pos + Point(z=SAFE_Z))
 
     # Jog gantry to find deck height
@@ -163,7 +164,7 @@ async def _find_square_center(
         mount,
         expected_pos._replace(z=current_position.z),
     )
-    input("\nPress ENTER to calibrate XY axes")
+    input("\nPress ENTER to calibrate XY axes:")
     xy_start_pos = expected_pos._replace(z=deck_height - 1)
     await api.move_to(mount, xy_start_pos)
 
@@ -215,7 +216,7 @@ async def _find_square_center_of_gripper_jaw(api: OT3API, expected_pos: Point) -
         OT3Mount.GRIPPER,
         found_square_front,
     )
-    input("Check by EYE, then press ENTER to continue")
+    input("Check by EYE, then press ENTER to continue:")
     current_position = await api.gantry_position(
         OT3Mount.GRIPPER,
     )
@@ -237,7 +238,7 @@ async def _find_square_center_of_gripper_jaw(api: OT3API, expected_pos: Point) -
         OT3Mount.GRIPPER,
         found_square_back,
     )
-    input("Check by EYE, then press ENTER to continue")
+    input("Check by EYE, then press ENTER to continue:")
     current_position = await api.gantry_position(
         OT3Mount.GRIPPER,
     )
