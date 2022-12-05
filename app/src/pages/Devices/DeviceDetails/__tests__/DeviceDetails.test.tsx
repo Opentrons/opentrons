@@ -12,7 +12,7 @@ import {
   useRobot,
   useSyncRobotClock,
 } from '../../../../organisms/Devices/hooks'
-import { PipettesAndModules } from '../../../../organisms/Devices/PipettesAndModules'
+import { InstrumentsAndModules } from '../../../../organisms/Devices/InstrumentsAndModules'
 import { RecentProtocolRuns } from '../../../../organisms/Devices/RecentProtocolRuns'
 import { RobotOverview } from '../../../../organisms/Devices/RobotOverview'
 import { getScanning } from '../../../../redux/discovery'
@@ -22,7 +22,7 @@ import { DeviceDetails } from '..'
 import type { State } from '../../../../redux/types'
 
 jest.mock('../../../../organisms/Devices/hooks')
-jest.mock('../../../../organisms/Devices/PipettesAndModules')
+jest.mock('../../../../organisms/Devices/InstrumentsAndModules')
 jest.mock('../../../../organisms/Devices/RecentProtocolRuns')
 jest.mock('../../../../organisms/Devices/RobotOverview')
 jest.mock('../../../../redux/discovery')
@@ -34,8 +34,8 @@ const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 const mockRobotOverview = RobotOverview as jest.MockedFunction<
   typeof RobotOverview
 >
-const mockPipettesAndModules = PipettesAndModules as jest.MockedFunction<
-  typeof PipettesAndModules
+const mockInstrumentsAndModules = InstrumentsAndModules as jest.MockedFunction<
+  typeof InstrumentsAndModules
 >
 const mockRecentProtocolRuns = RecentProtocolRuns as jest.MockedFunction<
   typeof RecentProtocolRuns
@@ -61,9 +61,9 @@ describe('DeviceDetails', () => {
     when(mockRobotOverview)
       .calledWith(componentPropsMatcher({ robotName: 'otie' }))
       .mockReturnValue(<div>Mock RobotOverview</div>)
-    when(mockPipettesAndModules)
+    when(mockInstrumentsAndModules)
       .calledWith(componentPropsMatcher({ robotName: 'otie' }))
-      .mockReturnValue(<div>Mock PipettesAndModules</div>)
+      .mockReturnValue(<div>Mock InstrumentsAndModules</div>)
     when(mockRecentProtocolRuns)
       .calledWith(componentPropsMatcher({ robotName: 'otie' }))
       .mockReturnValue(<div>Mock RecentProtocolRuns</div>)
@@ -98,11 +98,11 @@ describe('DeviceDetails', () => {
     expect(mockUseSyncRobotClock).toHaveBeenCalledWith('otie')
   })
 
-  it('renders PipettesAndModules when a robot is found', () => {
+  it('renders InstrumentsAndModules when a robot is found', () => {
     when(mockUseRobot).calledWith('otie').mockReturnValue(mockConnectableRobot)
     const [{ getByText }] = render('/devices/otie')
 
-    getByText('Mock PipettesAndModules')
+    getByText('Mock InstrumentsAndModules')
   })
 
   it('renders RecentProtocolRuns when a robot is found', () => {

@@ -1,6 +1,7 @@
 """Equipment command side-effect logic."""
 from dataclasses import dataclass
-from typing import Optional, overload
+from typing import Optional, overload, Union
+from typing_extensions import Literal
 
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
@@ -143,7 +144,7 @@ class EquipmentHandler:
 
     async def load_pipette(
         self,
-        pipette_name: PipetteNameType,
+        pipette_name: Union[PipetteNameType, Literal["p1000_96"]],
         mount: MountType,
         pipette_id: Optional[str],
     ) -> LoadedPipetteData:
@@ -161,9 +162,19 @@ class EquipmentHandler:
         other_mount = mount.other_mount()
         other_pipette = self._state_store.pipettes.get_by_mount(other_mount)
 
-        cache_request = {mount.to_hw_mount(): pipette_name.value}
+        cache_request = {
+            mount.to_hw_mount(): pipette_name.value
+            if isinstance(pipette_name, PipetteNameType)
+            else pipette_name
+        }
         if other_pipette is not None:
-            cache_request[other_mount.to_hw_mount()] = other_pipette.pipetteName.value
+            # TODO (tz, 11-23-22): remove 96 channel assignment when refactoring load_pipette for 96 channels.
+            # https://opentrons.atlassian.net/browse/RLIQ-255
+            cache_request[other_mount.to_hw_mount()] = (
+                other_pipette.pipetteName.value
+                if isinstance(other_pipette.pipetteName, PipetteNameType)
+                else "p1000_96"
+            )
 
         # TODO(mc, 2020-10-18): calling `cache_instruments` mirrors the
         # behavior of protocol_context.load_instrument, and is used here as a
@@ -306,7 +317,7 @@ class EquipmentHandler:
         else:
             # No offset for off-deck location.
             # Returning None instead of raising an exception allows loading a labware
-            # with 'off-deck' as valid location.
+            # with 'offDeck' as valid location.
             # Also allows using `moveLabware` with 'offDeck' location.
             return None
 

@@ -5,6 +5,8 @@ from typing_extensions import Literal, Type
 
 from pydantic import BaseModel, Field
 
+from opentrons.hardware_control.modules.types import ThermocyclerStep
+
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
@@ -65,12 +67,12 @@ class RunProfileImpl(AbstractCommandImpl[RunProfileParams, RunProfileResult]):
         )
 
         steps = [
-            {
-                "temperature": thermocycler_state.validate_target_block_temperature(
+            ThermocyclerStep(
+                temperature=thermocycler_state.validate_target_block_temperature(
                     profile_step.celsius
                 ),
-                "hold_time_seconds": profile_step.holdSeconds,
-            }
+                hold_time_seconds=profile_step.holdSeconds,
+            )
             for profile_step in params.profile
         ]
 

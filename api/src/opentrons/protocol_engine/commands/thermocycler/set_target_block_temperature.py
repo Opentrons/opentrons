@@ -106,7 +106,9 @@ class SetTargetBlockTemperatureCreate(
 ):
     """A request to create a Thermocycler's set block temperature command."""
 
-    commandType: SetTargetBlockTemperatureCommandType
+    commandType: SetTargetBlockTemperatureCommandType = (
+        "thermocycler/setTargetBlockTemperature"
+    )
     params: SetTargetBlockTemperatureParams
 
     _CommandCls: Type[SetTargetBlockTemperature] = SetTargetBlockTemperature

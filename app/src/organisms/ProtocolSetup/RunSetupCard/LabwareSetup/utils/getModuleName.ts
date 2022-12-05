@@ -1,7 +1,7 @@
-import { ModuleTypesThatRequiresExtraAttention } from './getModuleTypesThatRequireExtraAttention'
+import { ModuleTypesThatRequireExtraAttention } from './getModuleTypesThatRequireExtraAttention'
 
 export const getModuleName = (
-  type: ModuleTypesThatRequiresExtraAttention
+  type: ModuleTypesThatRequireExtraAttention
 ): 'Magnetic Module' | 'Thermocycler' | 'Heater-Shaker Module' => {
   switch (type) {
     case 'magneticModuleType':

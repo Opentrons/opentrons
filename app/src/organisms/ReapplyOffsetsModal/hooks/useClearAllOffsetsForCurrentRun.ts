@@ -12,22 +12,22 @@ export function useClearAllOffsetsForCurrentRun(): () => void {
 
   return () => {
     if (currentRunId == null || protocolData == null) return
-    Object.keys(protocolData.labware).forEach(labwareId => {
-      const offsetLocation = getLabwareOffsetLocation(
-        labwareId,
+    protocolData.labware.forEach(item => {
+      const location = getLabwareOffsetLocation(
+        item.id,
         protocolData.commands,
         protocolData.modules
       )
-      if (offsetLocation != null) {
+      if (location != null) {
         createLabwareOffset({
           runId: currentRunId,
           data: {
             definitionUri: getLabwareDefinitionUri(
-              labwareId,
+              item.id,
               protocolData.labware,
               protocolData.labwareDefinitions
             ),
-            location: offsetLocation,
+            location: location,
             vector: IDENTITY_VECTOR,
           },
         }).catch((e: Error) => {

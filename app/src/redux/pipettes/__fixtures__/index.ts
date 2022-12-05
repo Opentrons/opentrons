@@ -35,6 +35,21 @@ export const mockUnattachedPipette = {
   plunger_axis: 'b',
 }
 
+export const mockAttachedGen3Pipette = {
+  id: 'abc',
+  name: 'p1000_single_gen3',
+  model: 'p1000_single_v3.0',
+  tip_length: 42,
+  mount_axis: 'c',
+  plunger_axis: 'd',
+}
+
+export const mockGen3P1000PipetteSpecs: any = {
+  displayName: 'P1000 Single-Channel GEN3',
+  name: 'p1000_single_gen3',
+  backCompatNames: ['p1000_single'],
+}
+
 export const mockFetchPipettesSuccessMeta: RobotApiResponseMeta = {
   method: 'GET',
   path: '/pipettes',
@@ -273,16 +288,16 @@ export const mockRightSpecs: any = {
   name: 'mock_right',
 }
 
-// NOTE: protocol pipettes use "name" for the exact "model" because reasons
+// NOTE: protocol pipettes use "pipetteName" for the exact "model" because reasons
 export const mockLeftProtoPipette: any = {
   mount: 'left',
-  name: 'mock_left_model',
+  pipetteName: 'mock_left_model',
   modelSpecs: mockLeftSpecs,
 }
 
 export const mockRightProtoPipette: any = {
   mount: 'right',
-  name: 'mock_right_model',
+  pipetteName: 'mock_right_model',
   modelSpecs: mockRightSpecs,
 }
 

@@ -2,8 +2,6 @@
 import pytest
 from decoy import Decoy
 
-from typing import List
-
 from opentrons.types import Mount, Location, Point
 from opentrons.drivers.types import ThermocyclerLidStatus
 from opentrons.hardware_control import SynchronousAdapter, SyncHardwareAPI
@@ -11,7 +9,6 @@ from opentrons.hardware_control.types import Axis
 from opentrons.hardware_control.modules import Thermocycler, TemperatureStatus
 from opentrons.hardware_control.modules.types import (
     ThermocyclerModuleModel,
-    ThermocyclerStep,
 )
 from opentrons.protocols.geometry.module_geometry import ThermocyclerGeometry
 
@@ -288,6 +285,7 @@ def test_open_lid(
         mock_sync_hardware_api.retract(Mount.RIGHT),
         mock_instrument_core.move_to(
             Location(Point(x=1, y=2, z=4), None),
+            well_core=None,
             force_direct=True,
             minimum_z_height=None,
             speed=None,
@@ -329,7 +327,8 @@ def test_close_lid(
     decoy.verify(
         mock_sync_hardware_api.retract(Mount.LEFT),
         mock_instrument_core.move_to(
-            Location(Point(x=1, y=2, z=4), None),
+            location=Location(Point(x=1, y=2, z=4), None),
+            well_core=None,
             force_direct=True,
             minimum_z_height=None,
             speed=None,
@@ -394,58 +393,25 @@ def test_wait_for_lid_temperature(
     decoy.verify(mock_sync_module_hardware.wait_for_lid_target(), times=1)
 
 
-@pytest.mark.parametrize(
-    "steps",
-    [
-        [{"temperature": 42.0, "hold_time_minutes": 12.3, "hold_time_seconds": 45.6}],
-        [{"temperature": 42.0, "hold_time_seconds": 45.6}],
-        [{"temperature": 42.0, "hold_time_minutes": 12.3}],
-        [],
-    ],
-)
 def test_execute_profile(
     decoy: Decoy,
     mock_sync_module_hardware: SyncThermocyclerHardware,
-    steps: List[ThermocyclerStep],
     subject: LegacyThermocyclerCore,
 ) -> None:
     """It should execute a valid profile with the hardware."""
-    subject.execute_profile(steps=steps, repetitions=12, block_max_volume=34.5)
+    subject.execute_profile(
+        steps=[{"temperature": 42.0, "hold_time_seconds": 45.6}],
+        repetitions=12,
+        block_max_volume=34.5,
+    )
 
     decoy.verify(
         mock_sync_module_hardware.cycle_temperatures(
-            steps=steps, repetitions=12, volume=34.5
+            steps=[{"temperature": 42.0, "hold_time_seconds": 45.6}],
+            repetitions=12,
+            volume=34.5,
         )
     )
-
-
-@pytest.mark.parametrize(
-    "repetitions",
-    [0, -1, -999],
-)
-def test_execute_profile_invalid_repetitions_raises(
-    repetitions: int,
-    subject: LegacyThermocyclerCore,
-) -> None:
-    """It should raise a ValueError when given non-positive repetition value."""
-    with pytest.raises(ValueError):
-        subject.execute_profile(steps=[], repetitions=repetitions)
-
-
-@pytest.mark.parametrize(
-    "steps",
-    [
-        [{"hold_time_minutes": 12.3, "hold_time_seconds": 45.6}],
-        [{"temperature": 42.0}],
-    ],
-)
-def test_execute_profile_invalid_steps_raises(
-    steps: List[ThermocyclerStep],
-    subject: LegacyThermocyclerCore,
-) -> None:
-    """It should raise a ValueError when given invalid thermocycler profile steps."""
-    with pytest.raises(ValueError):
-        subject.execute_profile(steps=steps, repetitions=1)
 
 
 def test_deactivate_lid(

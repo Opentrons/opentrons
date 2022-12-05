@@ -14,8 +14,10 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { inferModuleOrientationFromXCoordinate } from '@opentrons/shared-data'
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
+import {
+  getDeckDefFromRobotType,
+  inferModuleOrientationFromXCoordinate,
+} from '@opentrons/shared-data'
 import { useFeatureFlag } from '../../../../redux/config'
 import { HeaterShakerBanner } from '../../../ProtocolSetup/RunSetupCard/ModuleSetup/HeaterShakerSetupWizard/HeaterShakerBanner'
 import { ModuleInfo } from '../../../ProtocolSetup/RunSetupCard/ModuleSetup/ModuleInfo'
@@ -23,19 +25,11 @@ import { UnMatchedModuleWarning } from '../../../ProtocolSetup/RunSetupCard/Modu
 import { MultipleModulesModal } from '../../../ProtocolSetup/RunSetupCard/ModuleSetup/MultipleModulesModal'
 import {
   useModuleRenderInfoForProtocolById,
+  useProtocolDetailsForRun,
   useUnmatchedModulesForProtocol,
 } from '../../hooks'
-
-const DECK_LAYER_BLOCKLIST = [
-  'calibrationMarkings',
-  'fixedBase',
-  'doorStops',
-  'metalFrame',
-  'removalHandle',
-  'removableDeckOutline',
-  'screwHoles',
-]
-const DECK_VIEW_BOX = '-80 -40 550 510'
+import { getStandardDeckViewBox } from '../utils/getStandardDeckViewBox'
+import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
 
 interface SetupModulesMapProps {
   robotName: string
@@ -52,6 +46,9 @@ export const SetupModulesMap = ({
     robotName,
     runId
   )
+  const { robotType } = useProtocolDetailsForRun(runId)
+
+  const deckDef = getDeckDefFromRobotType(robotType)
   const {
     missingModuleIds,
     remainingAttachedModules,
@@ -106,9 +103,9 @@ export const SetupModulesMap = ({
       ) : null}
       <Box margin="0 auto" maxWidth="46.25rem" width="100%">
         <RobotWorkSpace
-          deckDef={standardDeckDef as any}
-          viewBox={DECK_VIEW_BOX}
-          deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
+          deckDef={deckDef}
+          viewBox={getStandardDeckViewBox(robotType)}
+          deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
           id="ModuleSetup_deckMap"
         >
           {() => (

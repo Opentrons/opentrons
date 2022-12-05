@@ -21,7 +21,7 @@ import { useCurrentRunId } from '../../../../organisms/ProtocolUpload/hooks'
 import { ProtocolRunDetails } from '..'
 import { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
-import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
+import type { LegacySchemaAdapterOutput } from '@opentrons/shared-data'
 
 jest.mock('../../../../organisms/Devices/hooks')
 jest.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunHeader')
@@ -121,9 +121,10 @@ describe('ProtocolRunDetails', () => {
     } as any)
     mockUseCurrentRunId.mockReturnValue(RUN_ID)
     mockUseProtocolDetailsForRun.mockReturnValue({
-      protocolData: (noModulesProtocol as unknown) as ProtocolAnalysisFile,
+      protocolData: (noModulesProtocol as unknown) as LegacySchemaAdapterOutput,
       displayName: 'mock display name',
       protocolKey: 'fakeProtocolKey',
+      robotType: 'OT-2 Standard',
     })
   })
   afterEach(() => {
@@ -240,6 +241,7 @@ describe('ProtocolRunDetails', () => {
       protocolData: null,
       displayName: null,
       protocolKey: null,
+      robotType: 'OT-2 Standard',
     })
     const [{ getByText, queryByText }] = render(
       `/devices/otie/protocol-runs/${RUN_ID}`

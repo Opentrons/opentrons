@@ -93,6 +93,7 @@ class QueueCommandAction:
     command_id: str
     created_at: datetime
     request: CommandCreate
+    request_hash: Optional[str]
 
 
 @dataclass(frozen=True)
@@ -151,6 +152,24 @@ class AddModuleAction:
     module_live_data: LiveData
 
 
+@dataclass(frozen=True)
+class ResetTipsAction:
+    """Reset the tip tracking state of a given tip rack."""
+
+    labware_id: str
+
+
+@dataclass(frozen=True)
+class SetPipetteMovementSpeedAction:
+    """Set the speed of a pipette's X/Y/Z movements. Does not affect plunger speed.
+
+    None will use the hardware API's default.
+    """
+
+    pipette_id: str
+    speed: Optional[float]
+
+
 Action = Union[
     PlayAction,
     PauseAction,
@@ -165,4 +184,6 @@ Action = Union[
     AddLabwareDefinitionAction,
     AddModuleAction,
     AddLiquidAction,
+    ResetTipsAction,
+    SetPipetteMovementSpeedAction,
 ]

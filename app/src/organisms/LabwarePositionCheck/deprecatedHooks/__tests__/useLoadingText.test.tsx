@@ -36,6 +36,7 @@ describe('useTitleText', () => {
       protocolData: mockProtocolData,
       displayName: 'mock display name',
       protocolKey: 'fakeProtocolKey',
+      robotType: 'OT-2 Standard',
     })
     when(mockGetLabwareLocation)
       .calledWith(mockLabwareId, mockProtocolData.commands)

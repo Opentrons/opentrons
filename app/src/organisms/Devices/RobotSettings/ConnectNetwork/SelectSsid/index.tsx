@@ -86,7 +86,7 @@ export function SelectSsid(props: SelectSsidProps): JSX.Element {
     // options menu list or in the currently selected value. If it's being
     // rendered in the menu, we want to show a connected icon if the network
     // is active, but if the context is value, we want to hide the icon
-    return network ? (
+    return network != null ? (
       <NetworkOptionLabel
         {...network}
         showConnectedIcon={context === CONTEXT_MENU}

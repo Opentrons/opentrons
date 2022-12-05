@@ -9,6 +9,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   StyleProps,
   COLORS,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 
@@ -42,7 +43,9 @@ export function CollapsibleSection(
           cursor: 'pointer',
         }}
       >
-        <StyledText as="p">{title}</StyledText>
+        <StyledText as="p" textTransform={TYPOGRAPHY.textTransformCapitalize}>
+          {title}
+        </StyledText>
         <Btn
           onClick={() => setIsExpanded(!isExpanded)}
           data-testid={

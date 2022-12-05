@@ -2,9 +2,10 @@ import pytest
 
 from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
 from opentrons.types import Point, Location, Mount
-from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocol_api.labware import Labware, get_labware_definition
 from opentrons.protocols.geometry.deck import Deck
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
     AxisMaxSpeeds,
     build_edges,
@@ -57,7 +58,8 @@ def test_max_speeds_userdict():
 def test_build_edges():
     lw_def = get_labware_definition("corning_96_wellplate_360ul_flat")
     test_lw = Labware(
-        implementation=LabwareImplementation(lw_def, Location(Point(0, 0, 0), None))
+        implementation=LabwareImplementation(lw_def, Location(Point(0, 0, 0), None)),
+        api_version=MAX_SUPPORTED_VERSION,
     )
     off = Point(0, 0, 1.0)
     deck = Deck()

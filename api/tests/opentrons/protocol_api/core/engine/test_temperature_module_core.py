@@ -1,0 +1,124 @@
+"""Test temperature module core."""
+import pytest
+from decoy import Decoy
+
+from opentrons.hardware_control import SynchronousAdapter
+from opentrons.hardware_control.modules import TempDeck
+from opentrons.hardware_control.modules.types import TemperatureStatus
+
+from opentrons.protocol_engine.clients import SyncClient as EngineClient
+
+from opentrons.protocol_api.core.engine.module_core import TemperatureModuleCore
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+
+TempDeckHardware = SynchronousAdapter[TempDeck]
+
+
+@pytest.fixture
+def mock_engine_client(decoy: Decoy) -> EngineClient:
+    """Get a mock ProtocolEngine synchronous client."""
+    return decoy.mock(cls=EngineClient)
+
+
+@pytest.fixture
+def mock_sync_module_hardware(decoy: Decoy) -> TempDeckHardware:
+    """Get a mock synchronous module hardware."""
+    return decoy.mock(name="TempDeckHardware")  # type: ignore[no-any-return]
+
+
+@pytest.fixture
+def subject(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_sync_module_hardware: TempDeckHardware,
+) -> TemperatureModuleCore:
+    """Get a mock of TemperatureModuleCore."""
+    return TemperatureModuleCore(
+        module_id="1234",
+        engine_client=mock_engine_client,
+        api_version=MAX_SUPPORTED_VERSION,
+        sync_module_hardware=mock_sync_module_hardware,
+    )
+
+
+def test_set_target_temperature(
+    decoy: Decoy,
+    subject: TemperatureModuleCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """Should verify EngineClient call to set_target_temperature."""
+    subject.set_target_temperature(38.9)
+
+    decoy.verify(
+        mock_engine_client.temperature_module_set_target_temperature(
+            module_id="1234", celsius=38.9
+        ),
+        times=1,
+    )
+
+
+def test_wait_for_target_temperature(
+    decoy: Decoy,
+    subject: TemperatureModuleCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """Should verify EngineClient call to wait_for_target_temperature."""
+    subject.wait_for_target_temperature()
+
+    decoy.verify(
+        mock_engine_client.temperature_module_wait_for_target_temperature(
+            module_id="1234", celsius=None
+        ),
+        times=1,
+    )
+
+
+def test_deactivate(
+    decoy: Decoy,
+    subject: TemperatureModuleCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """Should verify EngineClient call to deactivate temp module."""
+    subject.deactivate()
+
+    decoy.verify(
+        mock_engine_client.temperature_module_deactivate(module_id="1234"), times=1
+    )
+
+
+def test_get_target_temperature(
+    decoy: Decoy,
+    subject: TemperatureModuleCore,
+    mock_engine_client: EngineClient,
+    mock_sync_module_hardware: TempDeckHardware,
+) -> None:
+    """Should return the target temperature."""
+    decoy.when(mock_sync_module_hardware.target).then_return(38.9)
+
+    result = subject.get_target_temperature()
+
+    assert result == 38.9
+
+
+def test_get_status(
+    decoy: Decoy,
+    subject: TemperatureModuleCore,
+    mock_engine_client: EngineClient,
+    mock_sync_module_hardware: TempDeckHardware,
+) -> None:
+    """Should get temp deck status."""
+    decoy.when(mock_sync_module_hardware.status).then_return(TemperatureStatus.HEATING)
+
+    assert subject.get_status() == TemperatureStatus.HEATING
+
+
+def test_get_current_temperature(
+    decoy: Decoy,
+    subject: TemperatureModuleCore,
+    mock_engine_client: EngineClient,
+    mock_sync_module_hardware: TempDeckHardware,
+) -> None:
+    """Should get the current module temperature."""
+    decoy.when(mock_sync_module_hardware.temperature).then_return(36.5)
+
+    assert subject.get_current_temperature() == 36.5

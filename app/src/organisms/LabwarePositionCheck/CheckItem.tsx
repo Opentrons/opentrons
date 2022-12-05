@@ -146,11 +146,12 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
     confirmPlacementCommands =
       moduleType === HEATERSHAKER_MODULE_TYPE
         ? [
+            confirmPlacementCommands[0],
             {
               commandType: 'heaterShaker/closeLabwareLatch',
               params: { moduleId },
             },
-            ...confirmPlacementCommands,
+            confirmPlacementCommands[1],
           ]
         : confirmPlacementCommands
   }
@@ -192,7 +193,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
             location,
             position,
           })
-          const confirmPositionCommands: CreateCommand[] = [
+          let confirmPositionCommands: CreateCommand[] = [
             {
               commandType: 'moveToWell' as const,
               params: {
@@ -211,6 +212,20 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
               },
             },
           ]
+          if (
+            moduleId != null &&
+            moduleType != null &&
+            moduleType === HEATERSHAKER_MODULE_TYPE
+          ) {
+            confirmPositionCommands = [
+              confirmPositionCommands[0],
+              {
+                commandType: 'heaterShaker/openLabwareLatch',
+                params: { moduleId },
+              },
+              confirmPositionCommands[1],
+            ]
+          }
           chainRunCommands(confirmPositionCommands, createRunCommand, proceed)
         },
       }

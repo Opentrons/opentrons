@@ -23,7 +23,6 @@ from .legacy_wrappers import (
     LegacyLabwareLoadInfo,
     LegacyModuleLoadInfo,
     LegacyPipetteContext,
-    LegacyWell,
     LegacyModuleModel,
     LegacyMagneticModuleModel,
     LegacyTemperatureModuleModel,
@@ -282,9 +281,7 @@ class LegacyCommandMapper:
         now: datetime,
     ) -> pe_commands.Command:
         pipette: LegacyPipetteContext = command["payload"]["instrument"]
-        location = command["payload"]["location"]
-        assert location.labware.is_well
-        well = location.labware.as_well()
+        well = command["payload"]["location"]
         mount = MountType(pipette.mount)
         #   the following type checking suppression assumes the tiprack is not loaded on top of a module
         slot = DeckSlotName.from_primitive(well.parent.parent)  # type: ignore[arg-type]
@@ -312,7 +309,6 @@ class LegacyCommandMapper:
     ) -> pe_commands.Command:
         pipette: LegacyPipetteContext = command["payload"]["instrument"]
         location = command["payload"]["location"]
-        assert isinstance(location, LegacyWell)
         well = location
         mount = MountType(pipette.mount)
         #   the following type checking suppression assumes the tiprack is not loaded on top of a module

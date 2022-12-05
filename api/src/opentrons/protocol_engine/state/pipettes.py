@@ -7,7 +7,7 @@ from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.types import MountType, Mount as HwMount
 
 from .. import errors
-from ..types import LoadedPipette
+from ..types import LoadedPipette, MotorAxis
 
 from ..commands import (
     Command,
@@ -26,7 +26,7 @@ from ..commands import (
     thermocycler,
     heater_shaker,
 )
-from ..actions import Action, UpdateCommandAction
+from ..actions import Action, SetPipetteMovementSpeedAction, UpdateCommandAction
 from .abstract_store import HasState, HandlesActions
 
 
@@ -55,6 +55,7 @@ class PipetteState:
     aspirated_volume_by_id: Dict[str, float]
     current_well: Optional[CurrentWell]
     attached_tip_labware_by_id: Dict[str, str]
+    movement_speed_by_id: Dict[str, Optional[float]]
 
 
 class PipetteStore(HasState[PipetteState], HandlesActions):
@@ -69,12 +70,15 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             aspirated_volume_by_id={},
             current_well=None,
             attached_tip_labware_by_id={},
+            movement_speed_by_id={},
         )
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
         if isinstance(action, UpdateCommandAction):
             self._handle_command(action.command)
+        elif isinstance(action, SetPipetteMovementSpeedAction):
+            self._state.movement_speed_by_id[action.pipette_id] = action.speed
 
     def _handle_command(self, command: Command) -> None:
         self._update_current_well(command)
@@ -88,6 +92,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 mount=command.params.mount,
             )
             self._state.aspirated_volume_by_id[pipette_id] = 0
+            self._state.movement_speed_by_id[pipette_id] = None
 
         elif isinstance(command.result, AspirateResult):
             pipette_id = command.params.pipetteId
@@ -267,3 +272,23 @@ class PipetteView(HasState[PipetteState]):
     def get_attached_tip_labware_by_id(self) -> Dict[str, str]:
         """Get the tiprack ids of attached tip by pipette ids."""
         return self._state.attached_tip_labware_by_id
+
+    def get_movement_speed(
+        self, pipette_id: str, requested_speed: Optional[float] = None
+    ) -> Optional[float]:
+        """Return the given pipette's requested or current movement speed."""
+        return requested_speed or self._state.movement_speed_by_id[pipette_id]
+
+    def get_z_axis(self, pipette_id: str) -> MotorAxis:
+        """Get the MotorAxis representing this pipette's Z stage."""
+        mount = self.get(pipette_id).mount
+        return MotorAxis.LEFT_Z if mount == MountType.LEFT else MotorAxis.RIGHT_Z
+
+    def get_plunger_axis(self, pipette_id: str) -> MotorAxis:
+        """Get the MotorAxis representing this pipette's plunger."""
+        mount = self.get(pipette_id).mount
+        return (
+            MotorAxis.LEFT_PLUNGER
+            if mount == MountType.LEFT
+            else MotorAxis.RIGHT_PLUNGER
+        )

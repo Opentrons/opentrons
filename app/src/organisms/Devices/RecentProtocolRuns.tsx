@@ -6,15 +6,17 @@ import {
 } from '@opentrons/react-api-client'
 import {
   Flex,
-  Box,
-  SPACING,
-  TYPOGRAPHY,
+  ALIGN_CENTER,
+  ALIGN_FLEX_START,
   BORDERS,
   COLORS,
-  ALIGN_FLEX_START,
   DIRECTION_COLUMN,
   JUSTIFY_SPACE_AROUND,
+  SIZE_4,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { StyledText } from '../../atoms/text'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { HistoricalProtocolRun } from './HistoricalProtocolRun'
@@ -40,9 +42,11 @@ export function RecentProtocolRuns({
     <Flex
       alignItems={ALIGN_FLEX_START}
       backgroundColor={COLORS.white}
-      border={`${SPACING.spacingXXS} ${BORDERS.styleSolid}  ${COLORS.medGreyEnabled}`}
+      border={BORDERS.lineBorder}
       borderRadius={BORDERS.radiusSoftCorners}
       flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing4}
+      padding={`0 0 ${SPACING.spacing3}`}
       width="100%"
       marginBottom="6rem"
     >
@@ -54,15 +58,21 @@ export function RecentProtocolRuns({
         width="100%"
         id="RecentProtocolRuns_title"
       >
-        {t('recent_protocol_runs', { robotName: robotName })}
+        {t('recent_protocol_runs')}
       </StyledText>
-      <Box padding={SPACING.spacing4} width="100%">
+      <Flex
+        alignItems={ALIGN_CENTER}
+        flexDirection={DIRECTION_COLUMN}
+        minHeight={SIZE_4}
+        padding={`0 ${SPACING.spacing4}`}
+        width="100%"
+      >
         {isRobotViewable && runs && runs.length > 0 && (
-          <Box>
+          <>
             <Flex
               justifyContent={JUSTIFY_SPACE_AROUND}
-              borderBottom={BORDERS.lineBorder}
               padding={SPACING.spacing3}
+              width="100%"
             >
               <StyledText
                 marginLeft={SPACING.spacing5}
@@ -129,14 +139,16 @@ export function RecentProtocolRuns({
                   />
                 )
               })}
-          </Box>
+          </>
         )}
         {!isRobotViewable && (
           <StyledText
             as="p"
+            alignItems={ALIGN_CENTER}
+            color={COLORS.errorDisabled}
+            display="flex"
+            flex="1 0"
             id="RecentProtocolRuns_offline"
-            textAlign={TYPOGRAPHY.textAlignCenter}
-            padding={SPACING.spacing7}
           >
             {t('offline_recent_protocol_runs')}
           </StyledText>
@@ -144,14 +156,15 @@ export function RecentProtocolRuns({
         {isRobotViewable && (runs == null || runs.length === 0) && (
           <StyledText
             as="p"
+            alignItems={ALIGN_CENTER}
+            display="flex"
+            flex="1 0"
             id="RecentProtocolRuns_no_runs"
-            textAlign={TYPOGRAPHY.textAlignCenter}
-            padding={SPACING.spacing7}
           >
             {t('no_protocol_runs')}
           </StyledText>
         )}
-      </Box>
+      </Flex>
     </Flex>
   )
 }

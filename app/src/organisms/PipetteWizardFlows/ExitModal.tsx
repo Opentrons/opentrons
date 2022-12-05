@@ -8,9 +8,15 @@ import {
 import { AlertPrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { FLOWS } from './constants'
-import type { PipetteWizardStepProps } from './types'
+import type { PipetteWizardFlow } from './types'
 
-export function ExitModal(props: PipetteWizardStepProps): JSX.Element {
+interface ExitModalProps {
+  proceed: () => void
+  goBack: () => void
+  flowType: PipetteWizardFlow
+}
+
+export function ExitModal(props: ExitModalProps): JSX.Element {
   const { goBack, proceed, flowType } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
 

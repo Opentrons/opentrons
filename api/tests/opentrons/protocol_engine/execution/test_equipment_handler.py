@@ -464,6 +464,25 @@ async def test_load_pipette(
     )
 
 
+async def test_load_pipette_96_channels(
+    decoy: Decoy,
+    model_utils: ModelUtils,
+    hardware_api: HardwareControlAPI,
+    subject: EquipmentHandler,
+) -> None:
+    """It should load pipette data, check attachment, and generate an ID."""
+    decoy.when(model_utils.generate_id()).then_return("unique-id")
+
+    result = await subject.load_pipette(
+        pipette_name="p1000_96",
+        mount=MountType.LEFT,
+        pipette_id=None,
+    )
+
+    assert result == LoadedPipetteData(pipette_id="unique-id")
+    decoy.verify(await hardware_api.cache_instruments({HwMount.LEFT: "p1000_96"}))
+
+
 async def test_load_pipette_uses_provided_id(subject: EquipmentHandler) -> None:
     """It should use the provided ID rather than generating an ID for the pipette."""
     result = await subject.load_pipette(

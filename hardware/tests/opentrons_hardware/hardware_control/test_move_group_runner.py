@@ -15,11 +15,13 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     MoveCompleted,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
+    EmptyPayload,
     AddLinearMoveRequestPayload,
     MoveCompletedPayload,
     ExecuteMoveGroupRequestPayload,
     HomeRequestPayload,
 )
+from opentrons_hardware.firmware_bindings.messages.fields import MotorPositionFlagsField
 from opentrons_hardware.hardware_control.constants import (
     interrupts_per_sec,
 )
@@ -408,6 +410,12 @@ class MockSendMoveCompleter:
         if isinstance(message, md.ExecuteMoveGroupRequest):
             # Iterate through each move in each sequence and send a move
             # completed for it.
+            payload = EmptyPayload()
+            payload.message_index = message.payload.message_index
+            arbitration_id = ArbitrationId(
+                parts=ArbitrationIdParts(originating_node_id=node_id)
+            )
+            self._listener(md.Acknowledgement(payload=payload), arbitration_id)
             for seq_id, moves in enumerate(
                 self._move_groups[message.payload.group_id.value - self._start_at_index]
             ):
@@ -418,12 +426,23 @@ class MockSendMoveCompleter:
                         seq_id=UInt8Field(seq_id),
                         current_position_um=UInt32Field(int(move.distance_mm * 1000)),
                         encoder_position_um=Int32Field(int(move.distance_mm * 4000)),
+                        position_flags=MotorPositionFlagsField(0),
                         ack_id=UInt8Field(1),
                     )
                     arbitration_id = ArbitrationId(
                         parts=ArbitrationIdParts(originating_node_id=node)
                     )
                     self._listener(md.MoveCompleted(payload=payload), arbitration_id)
+
+    async def mock_ensure_send(
+        self,
+        node_id: NodeId,
+        message: MessageDefinition,
+        timeout: float = 3,
+        expected_nodes: List[NodeId] = [],
+    ) -> None:
+        """Mock ensure_send function."""
+        await self.mock_send(node_id, message)
 
 
 class MockGripperSendMoveCompleter:
@@ -454,6 +473,12 @@ class MockGripperSendMoveCompleter:
         if isinstance(message, md.ExecuteMoveGroupRequest):
             # Iterate through each move in each sequence and send a move
             # completed for it.
+            payload = EmptyPayload()
+            payload.message_index = message.payload.message_index
+            arbitration_id = ArbitrationId(
+                parts=ArbitrationIdParts(originating_node_id=node_id)
+            )
+            self._listener(md.Acknowledgement(payload=payload), arbitration_id)
             for seq_id, moves in enumerate(
                 self._move_groups[message.payload.group_id.value - self._start_at_index]
             ):
@@ -464,12 +489,23 @@ class MockGripperSendMoveCompleter:
                         seq_id=UInt8Field(seq_id),
                         current_position_um=UInt32Field(int(0)),
                         encoder_position_um=Int32Field(int(0)),
+                        position_flags=MotorPositionFlagsField(0),
                         ack_id=UInt8Field(1),
                     )
                     arbitration_id = ArbitrationId(
                         parts=ArbitrationIdParts(originating_node_id=node)
                     )
                     self._listener(md.MoveCompleted(payload=payload), arbitration_id)
+
+    async def mock_ensure_send(
+        self,
+        node_id: NodeId,
+        message: MessageDefinition,
+        timeout: float = 3,
+        expected_nodes: List[NodeId] = [],
+    ) -> None:
+        """Mock ensure_send function."""
+        await self.mock_send(node_id, message)
 
 
 async def test_single_move(
@@ -478,10 +514,13 @@ async def test_single_move(
     """It should send a start group command."""
     subject = MoveScheduler(move_groups=move_group_single)
     mock_sender = MockSendMoveCompleter(move_group_single, subject)
+    mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
     mock_can_messenger.send.side_effect = mock_sender.mock_send
     position = await subject.run(can_messenger=mock_can_messenger)
-
-    mock_can_messenger.send.assert_has_calls(
+    expected_nodes = []
+    for mgs in move_group_single[0]:
+        expected_nodes.extend([k for k in mgs.keys()])
+    mock_can_messenger.ensure_send.assert_has_calls(
         calls=[
             call(
                 node_id=NodeId.broadcast,
@@ -492,6 +531,7 @@ async def test_single_move(
                         start_trigger=UInt8Field(0),
                     )
                 ),
+                expected_nodes=expected_nodes,
             )
         ]
     )
@@ -505,10 +545,21 @@ async def test_multi_group_move(
     """It should start next group once the prior has completed."""
     subject = MoveScheduler(move_groups=move_group_multiple)
     mock_sender = MockSendMoveCompleter(move_group_multiple, subject)
+    mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
     mock_can_messenger.send.side_effect = mock_sender.mock_send
     position = await subject.run(can_messenger=mock_can_messenger)
+    expected_nodes_list: List[List[NodeId]] = []
 
-    mock_can_messenger.send.assert_has_calls(
+    # we have to do this weird list->set->list conversion to get the same
+    # order as the one move_group_runner uses since sets hash things
+    # in a way that doesn't preserve order
+    for movegroup in move_group_multiple:
+        expected_nodes = set()
+        for seq_id, mgs in enumerate(movegroup):
+            expected_nodes.update(set((k.value, seq_id) for k in mgs.keys()))
+        expected_nodes_list.append([NodeId(n) for n, s in expected_nodes])
+
+    mock_can_messenger.ensure_send.assert_has_calls(
         calls=[
             call(
                 node_id=NodeId.broadcast,
@@ -519,6 +570,7 @@ async def test_multi_group_move(
                         start_trigger=UInt8Field(0),
                     )
                 ),
+                expected_nodes=expected_nodes_list[0],
             ),
             call(
                 node_id=NodeId.broadcast,
@@ -529,6 +581,7 @@ async def test_multi_group_move(
                         start_trigger=UInt8Field(0),
                     )
                 ),
+                expected_nodes=expected_nodes_list[1],
             ),
             call(
                 node_id=NodeId.broadcast,
@@ -539,6 +592,7 @@ async def test_multi_group_move(
                         start_trigger=UInt8Field(0),
                     )
                 ),
+                expected_nodes=expected_nodes_list[2],
             ),
         ]
     )
@@ -557,9 +611,10 @@ async def test_multi_gripper_group_move(
     subject = MoveScheduler(move_groups=move_group_gripper_multiple)
     mock_sender = MockGripperSendMoveCompleter(move_group_gripper_multiple, subject)
     mock_can_messenger.send.side_effect = mock_sender.mock_send
+    mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
     position = await subject.run(can_messenger=mock_can_messenger)
 
-    mock_can_messenger.send.assert_has_calls(
+    mock_can_messenger.ensure_send.assert_has_calls(
         calls=[
             call(
                 node_id=NodeId.broadcast,
@@ -570,6 +625,7 @@ async def test_multi_gripper_group_move(
                         start_trigger=UInt8Field(0),
                     )
                 ),
+                expected_nodes=[NodeId.gripper_g],
             ),
             call(
                 node_id=NodeId.broadcast,
@@ -580,6 +636,7 @@ async def test_multi_gripper_group_move(
                         start_trigger=UInt8Field(0),
                     )
                 ),
+                expected_nodes=[NodeId.gripper_g],
             ),
             call(
                 node_id=NodeId.broadcast,
@@ -590,6 +647,7 @@ async def test_multi_gripper_group_move(
                         start_trigger=UInt8Field(0),
                     )
                 ),
+                expected_nodes=[NodeId.gripper_g],
             ),
         ]
     )
@@ -615,6 +673,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                             seq_id=UInt8Field(2),
                             current_position_um=UInt32Field(10000),
                             encoder_position_um=Int32Field(10000 * 4),
+                            position_flags=MotorPositionFlagsField(0),
                         )
                     ),
                 ),
@@ -627,6 +686,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                             seq_id=UInt8Field(1),
                             current_position_um=UInt32Field(20000),
                             encoder_position_um=Int32Field(10000 * 4),
+                            position_flags=MotorPositionFlagsField(0),
                         )
                     ),
                 ),
@@ -639,6 +699,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                             seq_id=UInt8Field(2),
                             current_position_um=UInt32Field(30000),
                             encoder_position_um=Int32Field(10000 * 4),
+                            position_flags=MotorPositionFlagsField(0),
                         )
                     ),
                 ),
@@ -657,6 +718,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                             seq_id=UInt8Field(2),
                             current_position_um=UInt32Field(10000),
                             encoder_position_um=Int32Field(10000 * 4),
+                            position_flags=MotorPositionFlagsField(0),
                         )
                     ),
                 ),
@@ -669,6 +731,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                             seq_id=UInt8Field(1),
                             current_position_um=UInt32Field(20000),
                             encoder_position_um=Int32Field(10000 * 4),
+                            position_flags=MotorPositionFlagsField(0),
                         )
                     ),
                 ),
@@ -681,6 +744,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                             seq_id=UInt8Field(2),
                             current_position_um=UInt32Field(30000),
                             encoder_position_um=Int32Field(10000 * 4),
+                            position_flags=MotorPositionFlagsField(0),
                         )
                     ),
                 ),
@@ -717,6 +781,12 @@ class MockSendMoveCompleterWithUnknown(MockSendMoveCompleter):
     async def mock_send(self, node_id: NodeId, message: MessageDefinition) -> None:
         """Overrides the send method of the messenger."""
         if isinstance(message, md.ExecuteMoveGroupRequest):
+            payload = EmptyPayload()
+            payload.message_index = message.payload.message_index
+            arbitration_id = ArbitrationId(
+                parts=ArbitrationIdParts(originating_node_id=node_id)
+            )
+            self._listener(md.Acknowledgement(payload=payload), arbitration_id)
             groups = super().groups
             bad_id = len(groups)
             payload = MoveCompletedPayload(
@@ -724,6 +794,7 @@ class MockSendMoveCompleterWithUnknown(MockSendMoveCompleter):
                 seq_id=UInt8Field(0),
                 current_position_um=UInt32Field(0),
                 encoder_position_um=Int32Field(0),
+                position_flags=MotorPositionFlagsField(0),
                 ack_id=UInt8Field(1),
             )
             sender = next(iter(groups[0][0].keys()))
@@ -741,6 +812,7 @@ async def test_handles_unknown_group_ids(
     subject = MoveScheduler(move_group_single)
     mock_sender = MockSendMoveCompleterWithUnknown(move_group_single, subject)
     mock_can_messenger.send.side_effect = mock_sender.mock_send
+    mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
     # this should not throw
     await subject.run(can_messenger=mock_can_messenger)
 
@@ -752,9 +824,13 @@ async def test_groups_from_nonzero_index(
     subject = MoveScheduler(move_group_single, 1)
     mock_sender = MockSendMoveCompleter(move_group_single, subject, 1)
     mock_can_messenger.send.side_effect = mock_sender.mock_send
+    mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
+    expected_nodes = []
+    for mgs in move_group_single[0]:
+        expected_nodes.extend([k for k in mgs.keys()])
     # this should not throw
     await subject.run(can_messenger=mock_can_messenger)
-    mock_can_messenger.send.assert_has_calls(
+    mock_can_messenger.ensure_send.assert_has_calls(
         calls=[
             call(
                 node_id=NodeId.broadcast,
@@ -765,6 +841,7 @@ async def test_groups_from_nonzero_index(
                         start_trigger=UInt8Field(0),
                     )
                 ),
+                expected_nodes=expected_nodes,
             )
         ]
     )

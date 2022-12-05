@@ -14,6 +14,7 @@ import {
 } from '@opentrons/components'
 
 import { GlobalStyle } from '../atoms/GlobalStyle'
+import { ToasterOven } from '../atoms/Toast'
 import { Alerts } from '../organisms/Alerts'
 import { Breadcrumbs } from '../organisms/Breadcrumbs'
 import { CalibrationDashboard } from '../pages/Devices/CalibrationDashboard'
@@ -25,6 +26,11 @@ import { ProtocolsLanding } from '../pages/Protocols/ProtocolsLanding'
 import { ProtocolDetails } from '../pages/Protocols/ProtocolDetails'
 import { AppSettings } from '../pages/AppSettings'
 import { Labware } from '../pages/Labware'
+import { InitialSplash } from '../pages/OnDeviceDisplay/InitialSplash'
+import { ConnectedNetworkInfo } from '../pages/OnDeviceDisplay/ConnectedNetworkInfo'
+import { SelectWifiNetwork } from '../pages/OnDeviceDisplay/SelectWifiNetwork'
+import { SetWifiCred } from '../pages/OnDeviceDisplay/SetWifiCred'
+import { NetworkSetupMenu } from '../pages/OnDeviceDisplay/NetworkSetupMenu'
 import { getIsOnDevice } from '../redux/config'
 import { getLocalRobot } from '../redux/discovery'
 import { useSoftwareUpdatePoll } from './hooks'
@@ -37,8 +43,8 @@ const stopEvent = (event: React.MouseEvent): void => event.preventDefault()
 
 export const AppComponent = (): JSX.Element => {
   useSoftwareUpdatePoll()
-
   const isOnDevice = useSelector(getIsOnDevice)
+  // TODO(bh, 2022-11-30): remove when routes reorganized for ODD, causing app rerenders
   const localRobot = useSelector(getLocalRobot)
 
   const allRoutes: RouteProps[] = [
@@ -103,9 +109,40 @@ export const AppComponent = (): JSX.Element => {
     },
   ]
 
-  const isOnDeviceRoutes = allRoutes.filter(route => route.path !== '/devices')
+  const onDeviceDisplayRoutes: RouteProps[] = [
+    {
+      Component: InitialSplash,
+      exact: true,
+      name: 'Start Device Setup',
+      path: '/device-setup',
+    },
+    {
+      Component: SelectWifiNetwork,
+      exact: true,
+      name: 'Select Network',
+      path: '/connect-via-wifi',
+    },
+    {
+      Component: SetWifiCred,
+      exact: true,
+      name: 'Set Wifi Cred',
+      path: '/set-wifi-cred/:ssid',
+    },
+    {
+      Component: ConnectedNetworkInfo,
+      exact: true,
+      name: 'Connected Network Info',
+      path: '/connected-network-info/:ssid',
+    },
+    {
+      Component: NetworkSetupMenu,
+      exact: true,
+      name: 'Network setup menu',
+      path: '/network-setup-menu',
+    },
+  ]
 
-  const routes = isOnDevice ? isOnDeviceRoutes : allRoutes
+  const routes = isOnDevice ? onDeviceDisplayRoutes : allRoutes
 
   return (
     <>
@@ -119,30 +156,61 @@ export const AppComponent = (): JSX.Element => {
         onDrop={stopEvent}
       >
         <TopPortalRoot />
-        <Navbar routes={routes} />
-        <Box width="100%">
-          <Switch>
-            {routes.map(({ Component, exact, path }: RouteProps) => {
-              return (
-                <Route key={path} exact={exact} path={path}>
-                  <Breadcrumbs />
-                  <Box
-                    position={POSITION_RELATIVE}
-                    width="100%"
-                    height="100%"
-                    backgroundColor={COLORS.fundamentalsBackground}
-                    overflow={OVERFLOW_SCROLL}
-                  >
-                    <ModalPortalRoot />
-                    <Component />
-                  </Box>
-                </Route>
-              )
-            })}
-            <Redirect exact from="/" to="/protocols" />
-          </Switch>
-          <Alerts />
-        </Box>
+        {isOnDevice ? (
+          <>
+            <Box width="100%">
+              <Switch>
+                {routes.map(({ Component, exact, path }: RouteProps) => {
+                  return (
+                    <Route key={path} exact={exact} path={path}>
+                      <Box
+                        position={POSITION_RELATIVE}
+                        width="100%"
+                        height="100%"
+                        backgroundColor={COLORS.fundamentalsBackground}
+                        overflow={OVERFLOW_SCROLL}
+                      >
+                        <ModalPortalRoot />
+                        <Component />
+                      </Box>
+                    </Route>
+                  )
+                })}
+                <Redirect to="/device-setup" />
+              </Switch>
+              <Alerts />
+            </Box>
+          </>
+        ) : (
+          <>
+            <Navbar routes={routes} />
+            <ToasterOven>
+              <Box width="100%">
+                <Switch>
+                  {routes.map(({ Component, exact, path }: RouteProps) => {
+                    return (
+                      <Route key={path} exact={exact} path={path}>
+                        <Breadcrumbs />
+                        <Box
+                          position={POSITION_RELATIVE}
+                          width="100%"
+                          height="100%"
+                          backgroundColor={COLORS.fundamentalsBackground}
+                          overflow={OVERFLOW_SCROLL}
+                        >
+                          <ModalPortalRoot />
+                          <Component />
+                        </Box>
+                      </Route>
+                    )
+                  })}
+                  <Redirect exact from="/" to="/protocols" />
+                </Switch>
+                <Alerts />
+              </Box>
+            </ToasterOven>
+          </>
+        )}
       </Flex>
     </>
   )

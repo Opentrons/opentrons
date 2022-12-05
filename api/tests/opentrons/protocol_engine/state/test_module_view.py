@@ -3,7 +3,7 @@ import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 
 from contextlib import nullcontext as does_not_raise
-from typing import ContextManager, Dict, NamedTuple, Optional, Type, Union
+from typing import ContextManager, Dict, NamedTuple, Optional, Type, Union, Any
 
 from opentrons_shared_data import load_shared_data
 from opentrons.types import DeckSlotName
@@ -13,6 +13,7 @@ from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     ModuleDefinition,
     ModuleModel,
+    ModuleLocation,
 )
 from opentrons.protocol_engine.state.modules import (
     ModuleView,
@@ -1353,3 +1354,42 @@ def test_get_overall_height(
 
     result = subject.get_overall_height("module-id")
     assert result == expected_height
+
+
+@pytest.mark.parametrize(
+    argnames=["location", "expected_raise"],
+    argvalues=[
+        (
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            pytest.raises(errors.LocationIsOccupiedError),
+        ),
+        (DeckSlotLocation(slotName=DeckSlotName.SLOT_2), does_not_raise()),
+        (DeckSlotLocation(slotName=DeckSlotName.FIXED_TRASH), does_not_raise()),
+        (ModuleLocation(moduleId="module-id-1"), does_not_raise()),
+    ],
+)
+def test_raise_if_labware_in_location(
+    location: Union[DeckSlotLocation, ModuleLocation],
+    expected_raise: ContextManager[Any],
+    thermocycler_v1_def: ModuleDefinition,
+) -> None:
+    """It should raise if there is module in specified location."""
+    subject = make_module_view(
+        slot_by_module_id={"module-id-1": DeckSlotName.SLOT_1},
+        hardware_by_module_id={
+            "module-id-1": HardwareModule(
+                serial_number="serial-number",
+                definition=thermocycler_v1_def,
+            )
+        },
+        substate_by_module_id={
+            "module-id-1": ThermocyclerModuleSubState(
+                module_id=ThermocyclerModuleId("module-id-1"),
+                is_lid_open=False,
+                target_block_temperature=None,
+                target_lid_temperature=None,
+            )
+        },
+    )
+    with expected_raise:
+        subject.raise_if_module_in_location(location=location)

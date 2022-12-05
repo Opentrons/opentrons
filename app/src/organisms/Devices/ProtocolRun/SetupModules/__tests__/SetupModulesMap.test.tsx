@@ -25,6 +25,7 @@ import {
 } from '../../../../../redux/modules/__fixtures__/index'
 import {
   useModuleRenderInfoForProtocolById,
+  useProtocolDetailsForRun,
   useUnmatchedModulesForProtocol,
 } from '../../../hooks'
 import { SetupModulesMap } from '../SetupModulesMap'
@@ -52,6 +53,9 @@ const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolByI
 >
 const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jest.MockedFunction<
   typeof useUnmatchedModulesForProtocol
+>
+const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
+  typeof useProtocolDetailsForRun
 >
 const mockModuleInfo = ModuleInfo as jest.MockedFunction<typeof ModuleInfo>
 const mockInferModuleOrientationFromXCoordinate = inferModuleOrientationFromXCoordinate as jest.MockedFunction<
@@ -133,6 +137,9 @@ describe('SetupModulesMap', () => {
         missingModuleIds: [],
         remainingAttachedModules: [],
       })
+    when(mockUseProtocolDetailsForRun)
+      .calledWith(MOCK_RUN_ID)
+      .mockReturnValue({ protocolData: {} } as any)
     when(mockUseFeatureFlag).mockReturnValue(false)
     when(mockInferModuleOrientationFromXCoordinate)
       .calledWith(expect.anything())

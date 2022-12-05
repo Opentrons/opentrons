@@ -40,7 +40,7 @@ import {
   SUCCESS,
 } from '../../redux/robot-api'
 import { Banner } from '../../atoms/Banner'
-import { Toast } from '../../atoms/Toast'
+import { SUCCESS_TOAST, useToast } from '../../atoms/Toast'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { Tooltip } from '../../atoms/Tooltip'
 import { StyledText } from '../../atoms/text'
@@ -92,7 +92,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   })
   const [showSlideout, setShowSlideout] = React.useState(false)
   const [hasSecondary, setHasSecondary] = React.useState(false)
-  const [showSuccessToast, setShowSuccessToast] = React.useState(false)
   const [showAboutModule, setShowAboutModule] = React.useState(false)
   const [showTestShake, setShowTestShake] = React.useState(false)
   const [showBanner, setShowBanner] = React.useState<boolean>(true)
@@ -121,14 +120,15 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     robotName &&
       dispatchApiRequest(updateModule(robotName, module.serialNumber))
   }
+  const { makeToast } = useToast()
   React.useEffect(() => {
     if (
       module.hasAvailableUpdate === false &&
       latestRequest?.status === SUCCESS
     ) {
-      setShowSuccessToast(true)
+      makeToast(t('firmware_update_installation_successful'), SUCCESS_TOAST)
     }
-  }, [module.hasAvailableUpdate, latestRequest?.status])
+  }, [module.hasAvailableUpdate, latestRequest?.status, makeToast, t])
 
   const isPending = latestRequest?.status === PENDING
   const hotToTouch: IconProps = { name: 'ot-hot-to-touch' }
@@ -214,7 +214,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     <Flex
       backgroundColor={COLORS.fundamentalsBackground}
       borderRadius={SPACING.spacing2}
-      marginBottom={SPACING.spacing3}
       width="100%"
       data-testid={`ModuleCard_${module.serialNumber}`}
     >
@@ -267,13 +266,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             paddingLeft={SPACING.spacing3}
           >
             <ErrorInfo attachedModule={module} />
-            {showSuccessToast && (
-              <Toast
-                message={t('firmware_update_installation_successful')}
-                type="success"
-                onClose={() => setShowSuccessToast(false)}
-              />
-            )}
             {latestRequest != null && latestRequest.status === FAILURE && (
               <FirmwareUpdateFailedModal
                 module={module}
@@ -346,9 +338,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               <>
                 <StyledText
                   textTransform={TYPOGRAPHY.textTransformUppercase}
-                  color={COLORS.darkGrey}
-                  fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  fontSize={TYPOGRAPHY.fontSizeCaption}
+                  color={COLORS.darkGreyEnabled}
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  fontSize={TYPOGRAPHY.fontSizeH6}
                   paddingBottom={SPACING.spacing2}
                   data-testid={`module_card_usb_port_${module.serialNumber}`}
                 >
@@ -415,6 +407,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             <ModuleOverflowMenu
               handleAboutClick={handleAboutClick}
               module={module}
+              robotName={robotName}
               runId={runId}
               handleSlideoutClick={handleMenuItemClick}
               handleTestShakeClick={handleTestShakeClick}

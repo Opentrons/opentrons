@@ -79,7 +79,7 @@ class WaitForLidTemperature(
 class WaitForLidTemperatureCreate(BaseCommandCreate[WaitForLidTemperatureParams]):
     """A request to create Thermocycler's wait for lid temperature command."""
 
-    commandType: WaitForLidTemperatureCommandType
+    commandType: WaitForLidTemperatureCommandType = "thermocycler/waitForLidTemperature"
     params: WaitForLidTemperatureParams
 
     _CommandCls: Type[WaitForLidTemperature] = WaitForLidTemperature

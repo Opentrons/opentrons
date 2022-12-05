@@ -44,6 +44,7 @@ def get_command_view(
     queued_setup_command_ids: Sequence[str] = (),
     errors_by_id: Optional[Dict[str, errors.ErrorOccurrence]] = None,
     commands: Sequence[cmd.Command] = (),
+    latest_command_hash: Optional[str] = None,
 ) -> CommandView:
     """Get a command view test subject."""
     all_command_ids = [command.id for command in commands]
@@ -64,6 +65,7 @@ def get_command_view(
         all_command_ids=all_command_ids,
         commands_by_id=commands_by_id,
         run_started_at=run_started_at,
+        latest_command_hash=latest_command_hash,
     )
 
     return CommandView(state=state)
@@ -335,6 +337,7 @@ action_allowed_specs: List[ActionAllowedSpec] = [
         subject=get_command_view(queue_status=QueueStatus.SETUP),
         action=QueueCommandAction(
             request=cmd.HomeCreate(params=cmd.HomeParams()),
+            request_hash=None,
             command_id="command-id",
             created_at=datetime(year=2021, month=1, day=1),
         ),
@@ -383,6 +386,7 @@ action_allowed_specs: List[ActionAllowedSpec] = [
         subject=get_command_view(run_result=RunResult.STOPPED),
         action=QueueCommandAction(
             request=cmd.HomeCreate(params=cmd.HomeParams()),
+            request_hash=None,
             command_id="command-id",
             created_at=datetime(year=2021, month=1, day=1),
         ),
@@ -396,6 +400,7 @@ action_allowed_specs: List[ActionAllowedSpec] = [
                 params=cmd.HomeParams(),
                 intent=cmd.CommandIntent.SETUP,
             ),
+            request_hash=None,
             command_id="command-id",
             created_at=datetime(year=2021, month=1, day=1),
         ),
@@ -409,6 +414,7 @@ action_allowed_specs: List[ActionAllowedSpec] = [
                 params=cmd.HomeParams(),
                 intent=cmd.CommandIntent.SETUP,
             ),
+            request_hash=None,
             command_id="command-id",
             created_at=datetime(year=2021, month=1, day=1),
         ),
@@ -747,3 +753,9 @@ def test_get_slice_default_cursor_no_current() -> None:
         cursor=1,
         total_length=4,
     )
+
+
+def test_get_latest_command_hash() -> None:
+    """It should get the latest command hash from state, if set."""
+    subject = get_command_view(latest_command_hash="abc123")
+    assert subject.get_latest_command_hash() == "abc123"

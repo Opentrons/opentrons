@@ -1,9 +1,9 @@
 """Tests for the ProtocolEngine class."""
-import pytest
-
 from datetime import datetime
-from decoy import Decoy
 from typing import Any
+
+import pytest
+from decoy import Decoy
 
 from opentrons.types import DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI
@@ -11,7 +11,6 @@ from opentrons.hardware_control.modules import MagDeck, TempDeck
 from opentrons.hardware_control.types import PauseType as HardwarePauseType
 
 from opentrons.protocols.models import LabwareDefinition
-
 from opentrons.protocol_engine import ProtocolEngine, commands
 from opentrons.protocol_engine.types import (
     LabwareOffset,
@@ -46,6 +45,7 @@ from opentrons.protocol_engine.actions import (
     FinishErrorDetails,
     QueueCommandAction,
     HardwareStoppedAction,
+    ResetTipsAction,
 )
 
 
@@ -101,6 +101,16 @@ def door_watcher(decoy: Decoy) -> DoorWatcher:
 def module_data_provider(decoy: Decoy) -> ModuleDataProvider:
     """Get a mock ModuleDataProvider."""
     return decoy.mock(cls=ModuleDataProvider)
+
+
+@pytest.fixture(autouse=True)
+def _mock_hash_command_params_module(
+    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    hash_command_params = commands.hash_command_params
+    monkeypatch.setattr(
+        commands, "hash_command_params", decoy.mock(func=hash_command_params)
+    )
 
 
 @pytest.fixture
@@ -161,6 +171,10 @@ def test_add_command(
 
     decoy.when(model_utils.generate_id()).then_return("command-id")
     decoy.when(model_utils.get_timestamp()).then_return(created_at)
+    decoy.when(state_store.commands.get_latest_command_hash()).then_return("abc")
+    decoy.when(
+        commands.hash_command_params(create=request, last_hash="abc")
+    ).then_return("123")
 
     def _stub_queued(*_a: object, **_k: object) -> None:
         decoy.when(state_store.commands.get("command-id")).then_return(queued)
@@ -171,6 +185,7 @@ def test_add_command(
                 command_id="command-id",
                 created_at=created_at,
                 request=request,
+                request_hash="123",
             )
         )
     ).then_return(
@@ -178,6 +193,7 @@ def test_add_command(
             command_id="command-id-validated",
             created_at=created_at,
             request=request,
+            request_hash="456",
         )
     )
 
@@ -187,6 +203,7 @@ def test_add_command(
                 command_id="command-id-validated",
                 created_at=created_at,
                 request=request,
+                request_hash="456",
             )
         ),
     ).then_do(_stub_queued)
@@ -239,6 +256,7 @@ async def test_add_and_execute_command(
                 command_id="command-id",
                 created_at=created_at,
                 request=request,
+                request_hash=None,
             )
         )
     ).then_return(
@@ -246,6 +264,7 @@ async def test_add_and_execute_command(
             command_id="command-id-validated",
             created_at=created_at,
             request=request,
+            request_hash=None,
         )
     )
 
@@ -255,6 +274,7 @@ async def test_add_and_execute_command(
                 command_id="command-id-validated",
                 created_at=created_at,
                 request=request,
+                request_hash=None,
             )
         )
     ).then_do(_stub_queued)
@@ -675,4 +695,16 @@ async def test_use_attached_temp_and_mag_modules(
                 module_live_data={"status": "other-status", "data": {}},
             ),
         ),
+    )
+
+
+def test_reset_tips(
+    decoy: Decoy, action_dispatcher: ActionDispatcher, subject: ProtocolEngine
+) -> None:
+    """It should reset tip state by dispatching an action."""
+    subject.reset_tips(labware_id="cool-labware")
+
+    decoy.verify(
+        action_dispatcher.dispatch(ResetTipsAction(labware_id="cool-labware")),
+        times=1,
     )

@@ -29,7 +29,7 @@ import { ProtocolRunSetup } from '../ProtocolRunSetup'
 import { SetupModules } from '../SetupModules'
 
 import {
-  ProtocolAnalysisFile,
+  LegacySchemaAdapterOutput,
   protocolHasLiquids,
 } from '@opentrons/shared-data'
 import type { StoredProtocolAnalysis } from '../../hooks'
@@ -104,9 +104,10 @@ describe('ProtocolRunSetup', () => {
     when(mockUseProtocolDetailsForRun)
       .calledWith(RUN_ID)
       .mockReturnValue({
-        protocolData: (noModulesProtocol as unknown) as ProtocolAnalysisFile,
+        protocolData: (noModulesProtocol as unknown) as LegacySchemaAdapterOutput,
         displayName: 'mock display name',
         protocolKey: 'fakeProtocolKey',
+        robotType: 'OT-2 Standard',
       })
     when(mockUseProtocolAnalysisErrors).calledWith(RUN_ID).mockReturnValue({
       analysisErrors: null,
@@ -157,6 +158,7 @@ describe('ProtocolRunSetup', () => {
       protocolData: null,
       displayName: null,
       protocolKey: null,
+      robotType: 'OT-2 Standard',
     })
     when(mockUseStoredProtocolAnalysis).calledWith(RUN_ID).mockReturnValue(null)
     const { getByText } = render()
@@ -245,9 +247,10 @@ describe('ProtocolRunSetup', () => {
           protocolData: ({
             ...noModulesProtocol,
             liquids: [{ displayName: 'water', description: 'liquid H2O' }],
-          } as unknown) as ProtocolAnalysisFile,
+          } as unknown) as LegacySchemaAdapterOutput,
           displayName: 'mock display name',
           protocolKey: 'fakeProtocolKey',
+          robotType: 'OT-2 Standard',
         })
       mockProtocolHasLiquids.mockReturnValue(true)
 
@@ -268,9 +271,10 @@ describe('ProtocolRunSetup', () => {
       when(mockUseProtocolDetailsForRun)
         .calledWith(RUN_ID)
         .mockReturnValue({
-          protocolData: (withModulesProtocol as unknown) as ProtocolAnalysisFile,
+          protocolData: (withModulesProtocol as unknown) as LegacySchemaAdapterOutput,
           displayName: 'mock display name',
           protocolKey: 'fakeProtocolKey',
+          robotType: 'OT-2 Standard',
         })
       when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
     })
@@ -317,9 +321,10 @@ describe('ProtocolRunSetup', () => {
               withModulesProtocol.modules,
               Object.keys(withModulesProtocol.modules)[0]
             ),
-          } as unknown) as ProtocolAnalysisFile,
+          } as unknown) as LegacySchemaAdapterOutput,
           displayName: 'mock display name',
           protocolKey: 'fakeProtocolKey',
+          robotType: 'OT-2 Standard',
         })
       when(mockParseAllRequiredModuleModels).mockReturnValue([
         'magneticModuleV1',

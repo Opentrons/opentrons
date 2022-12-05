@@ -52,6 +52,7 @@ async def create_simulating_runner() -> ProtocolRunner:
         config=ProtocolEngineConfig(
             ignore_pause=True,
             use_virtual_modules=True,
+            use_virtual_gripper=True,
         ),
     )
 

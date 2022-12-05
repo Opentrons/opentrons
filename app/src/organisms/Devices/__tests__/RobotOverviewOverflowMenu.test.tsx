@@ -93,7 +93,7 @@ describe('RobotOverviewOverflowMenu', () => {
     getByText('mock update buildroot')
   })
 
-  it('should not render the menu items when robot is busy', () => {
+  it('should render disabled restart and home gantry menu items when robot is busy', () => {
     when(mockUseIsRobotBusy).calledWith().mockReturnValue(true)
     when(mockUseCurrentRunStatus)
       .calledWith()
@@ -105,8 +105,8 @@ describe('RobotOverviewOverflowMenu', () => {
     fireEvent.click(btn)
 
     expect(screen.queryByText('Update robot software')).toBeNull()
-    expect(screen.queryByText('Restart robot')).toBeNull()
-    expect(screen.queryByText('Home gantry')).toBeNull()
+    expect(getByRole('button', { name: 'Restart robot' })).toBeDisabled()
+    expect(getByRole('button', { name: 'Home gantry' })).toBeDisabled()
     getByRole('button', { name: 'Robot settings' })
   })
 
@@ -156,13 +156,16 @@ describe('RobotOverviewOverflowMenu', () => {
     getByRole('button', { name: 'Home gantry' })
     getByRole('button', { name: 'Robot settings' })
   })
-  it('should not render menu items when the robot is unreachable', () => {
+  it('should render disabled menu items when the robot is unreachable', () => {
     when(mockUseIsRobotBusy).calledWith().mockReturnValue(true)
     when(mockUseCurrentRunStatus)
       .calledWith()
       .mockReturnValue(RUN_STATUS_RUNNING)
     const { getByRole } = render({ robot: mockUnreachableRobot })
     const btn = getByRole('button')
-    expect(btn).toBeDisabled()
+    btn.click()
+    expect(getByRole('button', { name: 'Restart robot' })).toBeDisabled()
+    expect(getByRole('button', { name: 'Home gantry' })).toBeDisabled()
+    expect(getByRole('button', { name: 'Robot settings' })).toBeDisabled()
   })
 })

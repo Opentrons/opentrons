@@ -64,7 +64,7 @@ def test_initial_load_robot_available_v5dot1(
             )
             assert (
                 device_landing.get_pipettes_and_modules_header_text()
-                == "Pipettes and Modules"
+                == "Instruments and Modules"
             )
             assert (
                 device_landing.get_recent_protocol_runs_header_text()

@@ -12,7 +12,6 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType, DeckSlotName
 from opentrons.hardware_control.modules import ModuleType as ModuleType
 
-
 from opentrons_shared_data.pipette.dev_types import (  # noqa: F401
     # convenience re-export of LabwareUri type
     LabwareUri as LabwareUri,
@@ -106,7 +105,9 @@ class LoadedPipette(BaseModel):
     """A pipette that has been loaded."""
 
     id: str
-    pipetteName: PipetteNameType
+    # TODO (tz, 11-23-22): remove Union when refactoring load_pipette for 96 channels.
+    # https://opentrons.atlassian.net/browse/RLIQ-255
+    pipetteName: Union[PipetteNameType, Literal["p1000_96"]]
     mount: MountType
 
 

@@ -1,15 +1,14 @@
 """ProtocolEngine-based Labware core implementations."""
-from typing import List, Dict, Optional, cast
+from typing import List, Optional, cast
 
 from opentrons_shared_data.labware.dev_types import (
-    LabwareParameters,
+    LabwareParameters as LabwareParametersDict,
     LabwareDefinition as LabwareDefinitionDict,
 )
 
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocols.geometry.labware_geometry import LabwareGeometry
 from opentrons.protocols.api_support.tip_tracker import TipTracker
-from opentrons.protocols.api_support.well_grid import WellGrid
 from opentrons.types import Point
 
 from ..labware import AbstractLabware, LabwareLoadParams
@@ -31,11 +30,6 @@ class LabwareCore(AbstractLabware[WellCore]):
         labware_state = engine_client.state.labware
         self._definition = labware_state.get_definition(labware_id)
         self._user_display_name = labware_state.get_display_name(labware_id)
-        self._wells = [
-            WellCore(name=well_name, labware_id=labware_id, engine_client=engine_client)
-            for column in self._definition.ordering
-            for well_name in column
-        ]
 
     @property
     def labware_id(self) -> str:
@@ -52,7 +46,7 @@ class LabwareCore(AbstractLabware[WellCore]):
 
     @property
     def load_name(self) -> str:
-        raise NotImplementedError("LabwareCore.load_name not implemented")
+        return self._definition.parameters.loadName
 
     def get_uri(self) -> str:
         """Get the URI string string of the labware's definition.
@@ -70,7 +64,7 @@ class LabwareCore(AbstractLabware[WellCore]):
 
     def get_display_name(self) -> str:
         """Get a display name for the labware, falling back to the definition."""
-        raise NotImplementedError("LabwareCore.get_display_name not implemented")
+        return self._user_display_name or self._definition.metadata.displayName
 
     def get_user_display_name(self) -> Optional[str]:
         """Get the user-specified display name of the labware, if set."""
@@ -86,8 +80,11 @@ class LabwareCore(AbstractLabware[WellCore]):
         """Get the labware's definition as a plain dictionary."""
         return cast(LabwareDefinitionDict, self._definition.dict(exclude_none=True))
 
-    def get_parameters(self) -> LabwareParameters:
-        raise NotImplementedError("LabwareCore.get_parameters not implemented")
+    def get_parameters(self) -> LabwareParametersDict:
+        return cast(
+            LabwareParametersDict,
+            self._definition.parameters.dict(exclude_none=True),
+        )
 
     def get_quirks(self) -> List[str]:
         raise NotImplementedError("LabwareCore.get_quirks not implemented")
@@ -103,6 +100,12 @@ class LabwareCore(AbstractLabware[WellCore]):
         "Whether the labware is a tip rack."
         return self._definition.parameters.isTiprack
 
+    def is_fixed_trash(self) -> bool:
+        """Whether the labware is a fixed trash."""
+        return self._engine_client.state.labware.is_fixed_trash(
+            labware_id=self.labware_id
+        )
+
     def get_tip_length(self) -> float:
         raise NotImplementedError("LabwareCore.get_tip_length not implemented")
 
@@ -110,19 +113,28 @@ class LabwareCore(AbstractLabware[WellCore]):
         raise NotImplementedError("LabwareCore.set_tip_length not implemented")
 
     def reset_tips(self) -> None:
-        raise NotImplementedError("LabwareCore.reset_tips not implemented")
+        self._engine_client.reset_tips(labware_id=self.labware_id)
 
+    def get_next_tip(
+        self, num_tips: int, starting_tip: Optional[WellCore]
+    ) -> Optional[str]:
+        return self._engine_client.state.tips.get_next_tip(
+            labware_id=self._labware_id,
+            use_column=num_tips != 1,
+            starting_tip_name=(
+                starting_tip.get_name()
+                if starting_tip and starting_tip.labware_id == self._labware_id
+                else None
+            ),
+        )
+
+    # TODO(mc, 2022-11-09): remove from engine core
     def get_tip_tracker(self) -> TipTracker:
         raise NotImplementedError("LabwareCore.get_tip_tracker not implemented")
 
-    def get_well_grid(self) -> WellGrid:
-        raise NotImplementedError("LabwareCore.get_well_grid not implemented")
-
-    def get_wells(self) -> List[WellCore]:
-        return self._wells
-
-    def get_wells_by_name(self) -> Dict[str, WellCore]:
-        raise NotImplementedError("LabwareCore.get_wells_by_name not implemented")
+    def get_well_columns(self) -> List[List[str]]:
+        """Get the all well names, organized by column, from the labware's definition."""
+        return self._definition.ordering
 
     def get_geometry(self) -> LabwareGeometry:
         raise NotImplementedError("LabwareCore.get_geometry not implemented")
@@ -132,4 +144,12 @@ class LabwareCore(AbstractLabware[WellCore]):
     ) -> Optional[float]:
         raise NotImplementedError(
             "LabwareCore.get_default_magnet_engage_height not implemented"
+        )
+
+    def get_well_core(self, well_name: str) -> WellCore:
+        """Create a well core interface to a well in this labware."""
+        return WellCore(
+            name=well_name,
+            labware_id=self._labware_id,
+            engine_client=self._engine_client,
         )

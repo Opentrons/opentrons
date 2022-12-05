@@ -7,19 +7,19 @@ import json
 
 from .. import get_shared_data_root
 
-from .dev_types import RobotDefinition, RobotName
+from .dev_types import RobotDefinition, RobotType
 
 DEFAULT_ROBOT_DEFINITION_VERSION: Final = 1
 
 
 def load(
-    robot_name: RobotName, version: int = DEFAULT_ROBOT_DEFINITION_VERSION
+    robot_type: RobotType, version: int = DEFAULT_ROBOT_DEFINITION_VERSION
 ) -> RobotDefinition:
     """Load the definition for the specified robot id."""
     for fi in Path(
         get_shared_data_root() / "robot" / "definitions" / f"{version}"
     ).iterdir():
         defn = json.load(fi.open("r"))
-        if defn["robotName"] == robot_name:
+        if defn["robotType"] == robot_type:
             return cast(RobotDefinition, defn)
-    raise KeyError(robot_name)
+    raise KeyError(robot_type)

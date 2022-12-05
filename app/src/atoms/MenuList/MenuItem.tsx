@@ -14,7 +14,7 @@ type BtnComponent = PrimitiveComponent<'button'>
 export const MenuItem: BtnComponent = styled(Btn)`
   text-align: ${TEXT_ALIGN_LEFT};
   font-size: ${TYPOGRAPHY.fontSizeP};
-  background-color: transparent;
+  background-color: ${COLORS.transparent};
   color: ${COLORS.darkBlackEnabled};
   padding: ${SPACING.spacing3} 0.75rem ${SPACING.spacing3} 0.75rem;
 
@@ -24,6 +24,7 @@ export const MenuItem: BtnComponent = styled(Btn)`
 
   &:disabled,
   &.disabled {
-    color: ${COLORS.darkGreyDisabled};
+    background-color: ${COLORS.transparent};
+    color: ${COLORS.black}${COLORS.opacity50HexCode};
   }
 `

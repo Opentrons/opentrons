@@ -7,7 +7,11 @@ from aiohttp.test_utils import TestClient
 
 from otupdate import openembedded
 from otupdate.common.update_actions import Partition, UpdateActionsInterface
-from otupdate.openembedded.updater import RootFSInterface, PartitionManager, Updater
+from otupdate.openembedded.update_actions import (
+    RootFSInterface,
+    PartitionManager,
+    OT3UpdateActions,
+)
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
@@ -17,7 +21,7 @@ def mock_update_actions_interface(
     mock_root_fs_interface: MagicMock, mock_partition_manager_invalid_switch: MagicMock
 ) -> MagicMock:
     """Mock UpdateActionsInterface"""
-    updater = Updater(
+    updater = OT3UpdateActions(
         root_FS_intf=mock_root_fs_interface,
         part_mngr=mock_partition_manager_invalid_switch,
     )
@@ -107,7 +111,7 @@ def testing_partition(monkeypatch, tmpdir):
     part_file = os.path.join(tmpdir, "fake-partition")
     find_unused = mock.Mock()
     monkeypatch.setattr(
-        openembedded.updater.PartitionManager, "find_unused_partition", find_unused
+        openembedded.PartitionManager, "find_unused_partition", find_unused
     )
     find_unused.return_value = FakeRootPartElem(
         "TWO", Partition(2, part_file, "/mnt/mmblk0-p2")

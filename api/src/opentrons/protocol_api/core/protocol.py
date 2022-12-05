@@ -68,6 +68,15 @@ class AbstractProtocol(
         ...
 
     @abstractmethod
+    def move_labware(
+        self,
+        labware_core: LabwareCoreType,
+        new_location: Union[DeckSlotName, ModuleCoreType],
+        use_gripper: bool,
+    ) -> None:
+        ...
+
+    @abstractmethod
     def load_module(
         self,
         model: ModuleModel,

@@ -7,7 +7,7 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType, Mount as HwMount
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocol_engine import errors
-from opentrons.protocol_engine.types import LoadedPipette
+from opentrons.protocol_engine.types import LoadedPipette, MotorAxis
 from opentrons.protocol_engine.state.pipettes import (
     PipetteState,
     PipetteView,
@@ -21,6 +21,7 @@ def get_pipette_view(
     aspirated_volume_by_id: Optional[Dict[str, float]] = None,
     current_well: Optional[CurrentWell] = None,
     attached_tip_labware_by_id: Optional[Dict[str, str]] = None,
+    movement_speed_by_id: Optional[Dict[str, Optional[float]]] = None,
 ) -> PipetteView:
     """Get a pipette view test subject with the specified state."""
     state = PipetteState(
@@ -28,6 +29,7 @@ def get_pipette_view(
         aspirated_volume_by_id=aspirated_volume_by_id or {},
         current_well=current_well,
         attached_tip_labware_by_id=attached_tip_labware_by_id or {},
+        movement_speed_by_id=movement_speed_by_id or {},
     )
 
     return PipetteView(state=state)
@@ -262,3 +264,45 @@ def test_pipette_not_ready_to_aspirate() -> None:
     )
 
     assert result is False
+
+
+def test_get_movement_speed() -> None:
+    """It should return the movement speed that was set for the given pipette."""
+    subject = get_pipette_view(
+        movement_speed_by_id={
+            "pipette-with-movement-speed": 123.456,
+            "pipette-without-movement-speed": None,
+        }
+    )
+
+    assert (
+        subject.get_movement_speed(pipette_id="pipette-with-movement-speed") == 123.456
+    )
+    assert (
+        subject.get_movement_speed(pipette_id="pipette-without-movement-speed") is None
+    )
+
+
+@pytest.mark.parametrize(
+    ("mount", "expected_z_axis", "expected_plunger_axis"),
+    [
+        (MountType.LEFT, MotorAxis.LEFT_Z, MotorAxis.LEFT_PLUNGER),
+        (MountType.RIGHT, MotorAxis.RIGHT_Z, MotorAxis.RIGHT_PLUNGER),
+    ],
+)
+def test_get_motor_axes(
+    mount: MountType, expected_z_axis: MotorAxis, expected_plunger_axis: MotorAxis
+) -> None:
+    """It should get a pipette's motor axes."""
+    subject = get_pipette_view(
+        pipettes_by_id={
+            "pipette-id": LoadedPipette(
+                id="pipette-id",
+                mount=mount,
+                pipetteName=PipetteNameType.P300_SINGLE,
+            ),
+        },
+    )
+
+    assert subject.get_z_axis("pipette-id") == expected_z_axis
+    assert subject.get_plunger_axis("pipette-id") == expected_plunger_axis

@@ -1,5 +1,6 @@
 """Common pipetting command base models."""
 from pydantic import BaseModel, Field
+from typing import Optional
 
 from ..types import WellLocation
 
@@ -46,6 +47,38 @@ class WellLocationMixin(BaseModel):
     wellLocation: WellLocation = Field(
         default_factory=WellLocation,
         description="Relative well location at which to perform the operation",
+    )
+
+
+class MovementMixin(BaseModel):
+    """Mixin for command requests that move a pipette."""
+
+    minimumZHeight: Optional[float] = Field(
+        None,
+        description=(
+            "Optional minimal Z margin in mm."
+            " If this is larger than the API's default safe Z margin,"
+            " it will make the arc higher. If it's smaller, it will have no effect."
+        ),
+    )
+
+    forceDirect: bool = Field(
+        False,
+        description=(
+            "If true, moving from one labware/well to another"
+            " will not arc to the default safe z,"
+            " but instead will move directly to the specified location."
+            " This will also force the `minimumZHeight` param to be ignored."
+            " A 'direct' movement is in X/Y/Z simultaneously."
+        ),
+    )
+
+    speed: Optional[float] = Field(
+        None,
+        description=(
+            "Override the travel speed in mm/s."
+            " This controls the straight linear speed of motion."
+        ),
     )
 
 

@@ -47,6 +47,10 @@ class LabwareNotLoadedError(ProtocolEngineError):
     """An error raised when referencing a labware that has not been loaded."""
 
 
+class LabwareNotLoadedOnModuleError(ProtocolEngineError):
+    """An error raised when referencing a labware on a module that has not been loaded."""
+
+
 class LabwareNotOnDeckError(ProtocolEngineError):
     """An error raised when a labware can't be used because it's off-deck."""
 
@@ -145,8 +149,16 @@ class PipetteMovementRestrictedByHeaterShakerError(ProtocolEngineError):
     """An error raised when trying to move to labware that's restricted by a module."""
 
 
+class HeaterShakerLabwareLatchNotOpenError(ProtocolEngineError):
+    """An error raised when heater-shaker latch is not open when it is expected to be so."""
+
+
 class EngageHeightOutOfRangeError(ProtocolEngineError):
     """An error raised when a Magnetic Module engage height is out of bounds."""
+
+
+class NoMagnetEngageHeightError(ProtocolEngineError):
+    """Error raised if a Magnetic Module engage height is missing."""
 
 
 class NoTargetTemperatureSetError(ProtocolEngineError):
@@ -181,5 +193,9 @@ class GripperNotAttachedError(ProtocolEngineError):
     """An error raised when executing a gripper action without an attached gripper."""
 
 
-class UnsupportedLabwareMovementError(ProtocolEngineError):
+class LabwareMovementNotAllowedError(ProtocolEngineError):
     """An error raised when attempting an illegal labware movement."""
+
+
+class LocationIsOccupiedError(ProtocolEngineError):
+    """An error raised when attempting to place labware in a non-empty location."""

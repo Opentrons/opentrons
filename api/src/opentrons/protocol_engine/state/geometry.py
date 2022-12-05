@@ -1,6 +1,6 @@
 """Geometry state getters."""
 from dataclasses import dataclass
-from typing import Optional, List
+from typing import Optional, List, Tuple, Union
 
 from opentrons.types import Point, DeckSlotName
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -14,9 +14,12 @@ from ..types import (
     DeckSlotLocation,
     ModuleLocation,
     OFF_DECK_LOCATION,
+    LabwareLocation,
+    LabwareOffsetVector,
 )
 from .labware import LabwareView
 from .modules import ModuleView
+from .pipettes import CurrentWell
 
 
 DEFAULT_TIP_DROP_HEIGHT_FACTOR = 0.5
@@ -79,6 +82,26 @@ class GeometryView:
 
         return max(highest_labware_z, highest_module_z)
 
+    def get_min_travel_z(
+        self,
+        pipette_id: str,
+        labware_id: str,
+        location: Optional[CurrentWell],
+        minimum_z_height: Optional[float],
+    ) -> float:
+        """Get the minimum allowed travel height of an arc move."""
+        if (
+            location is not None
+            and pipette_id == location.pipette_id
+            and labware_id == location.labware_id
+        ):
+            min_travel_z = self.get_labware_highest_z(labware_id)
+        else:
+            min_travel_z = self.get_all_labware_highest_z()
+        if minimum_z_height:
+            min_travel_z = max(min_travel_z, minimum_z_height)
+        return min_travel_z
+
     def get_labware_parent_position(self, labware_id: str) -> Point:
         """Get the position of the labware's parent slot (deck or module)."""
         labware_data = self._labware.get(labware_id)
@@ -136,7 +159,7 @@ class GeometryView:
         well_name: str,
         well_location: Optional[WellLocation] = None,
     ) -> Point:
-        """Get the absolute position of a well in a labware."""
+        """Given relative well location in a labware, get absolute position."""
         labware_pos = self.get_labware_position(labware_id)
         well_def = self._labware.get_well_definition(labware_id, well_name)
         well_depth = well_def.depth
@@ -155,6 +178,27 @@ class GeometryView:
             y=labware_pos.y + offset.y + well_def.y,
             z=labware_pos.z + offset.z + well_def.z,
         )
+
+    def get_relative_well_location(
+        self,
+        labware_id: str,
+        well_name: str,
+        absolute_point: Point,
+    ) -> WellLocation:
+        """Given absolute position, get relative location of a well in a labware."""
+        well_absolute_point = self.get_well_position(labware_id, well_name)
+        delta = absolute_point - well_absolute_point
+
+        return WellLocation(offset=WellOffset(x=delta.x, y=delta.y, z=delta.z))
+
+    def get_well_height(
+        self,
+        labware_id: str,
+        well_name: str,
+    ) -> float:
+        """Get the height of a specified well for a labware."""
+        well_def = self._labware.get_well_definition(labware_id, well_name)
+        return well_def.depth
 
     def get_well_edges(
         self,
@@ -299,3 +343,49 @@ class GeometryView:
             )
 
         return slot_name
+
+    def ensure_location_not_occupied(
+        self, location: LabwareLocation
+    ) -> LabwareLocation:
+        """Ensure that the location does not already have equipment in it."""
+        if isinstance(location, (DeckSlotLocation, ModuleLocation)):
+            self._labware.raise_if_labware_in_location(location)
+            self._modules.raise_if_module_in_location(location)
+        return location
+
+    def get_labware_center(
+        self, labware_id: str, location: Union[DeckSlotLocation, ModuleLocation]
+    ) -> Point:
+        """Get the center point of the labware as placed on the given location.
+
+        Returns the absolute position of the labware as if it were placed on the
+        specified location. Labware offset not included.
+        """
+        labware_dimensions = self._labware.get_dimensions(labware_id)
+        module_offset = LabwareOffsetVector(x=0, y=0, z=0)
+        location_slot: DeckSlotName
+        if isinstance(location, ModuleLocation):
+            module_offset = self._modules.get_module_offset(location.moduleId)
+            location_slot = self._modules.get_location(location.moduleId).slotName
+        else:
+            location_slot = location.slotName
+        slot_center = self._labware.get_slot_center_position(location_slot)
+        return Point(
+            slot_center.x + module_offset.x,
+            slot_center.y + module_offset.y,
+            slot_center.z + module_offset.z + labware_dimensions.z / 2,
+        )
+
+    def get_extra_waypoints(
+        self, labware_id: str, location: Optional[CurrentWell]
+    ) -> List[Tuple[float, float]]:
+        """Get extra waypoints for movement if thermocycler needs to be dodged."""
+        if location is not None and self._modules.should_dodge_thermocycler(
+            from_slot=self.get_ancestor_slot_name(location.labware_id),
+            to_slot=self.get_ancestor_slot_name(labware_id),
+        ):
+            slot_5_center = self._labware.get_slot_center_position(
+                slot=DeckSlotName.SLOT_5
+            )
+            return [(slot_5_center.x, slot_5_center.y)]
+        return []

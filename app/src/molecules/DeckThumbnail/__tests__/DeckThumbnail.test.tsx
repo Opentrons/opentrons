@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import {
-  getRobotNameFromLoadedLabware,
-  getDeckDefFromRobotName,
+  getRobotTypeFromLoadedLabware,
+  getDeckDefFromRobotType,
 } from '@opentrons/shared-data'
 import ot2StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import { renderWithProviders } from '@opentrons/components'
@@ -15,8 +15,8 @@ jest.mock('@opentrons/shared-data', () => {
   const actualSharedData = jest.requireActual('@opentrons/shared-data')
   return {
     ...actualSharedData,
-    getRobotNameFromLoadedLabware: jest.fn(),
-    getDeckDefFromRobotName: jest.fn(),
+    getRobotTypeFromLoadedLabware: jest.fn(),
+    getDeckDefFromRobotType: jest.fn(),
   }
 })
 jest.mock('@opentrons/components', () => {
@@ -35,12 +35,12 @@ jest.mock('@opentrons/components', () => {
 })
 jest.mock('../../../redux/config')
 
-const mockGetRobotNameFromLoadedLabware = getRobotNameFromLoadedLabware as jest.MockedFunction<
-  typeof getRobotNameFromLoadedLabware
+const mockgetRobotTypeFromLoadedLabware = getRobotTypeFromLoadedLabware as jest.MockedFunction<
+  typeof getRobotTypeFromLoadedLabware
 >
 
-const mockGetDeckDefFromRobotName = getDeckDefFromRobotName as jest.MockedFunction<
-  typeof getDeckDefFromRobotName
+const mockgetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
+  typeof getDeckDefFromRobotType
 >
 
 const commands: RunTimeCommand[] = simpleAnalysisFileFixture.commands as any
@@ -54,10 +54,10 @@ const render = (props: React.ComponentProps<typeof DeckThumbnail>) => {
 
 describe('DeckThumbnail', () => {
   beforeEach(() => {
-    when(mockGetRobotNameFromLoadedLabware)
+    when(mockgetRobotTypeFromLoadedLabware)
       .calledWith(labware)
       .mockReturnValue('OT-2 Standard')
-    when(mockGetDeckDefFromRobotName)
+    when(mockgetDeckDefFromRobotType)
       .calledWith('OT-2 Standard')
       .mockReturnValue(ot2StandardDeckDef as any)
   })
@@ -84,17 +84,17 @@ describe('DeckThumbnail', () => {
     ).not.toBeFalsy()
   })
   it('renders an OT-2 deck view when the protocol is an OT-2 protocol', () => {
-    when(mockGetRobotNameFromLoadedLabware)
+    when(mockgetRobotTypeFromLoadedLabware)
       .calledWith(labware)
       .mockReturnValue('OT-2 Standard')
     render({ commands, labware })
-    expect(mockGetDeckDefFromRobotName).toHaveBeenCalledWith('OT-2 Standard')
+    expect(mockgetDeckDefFromRobotType).toHaveBeenCalledWith('OT-2 Standard')
   })
   it('renders an OT-3 deck view when the protocol is an OT-3 protocol', () => {
-    when(mockGetRobotNameFromLoadedLabware)
+    when(mockgetRobotTypeFromLoadedLabware)
       .calledWith(labware)
       .mockReturnValue('OT-3 Standard')
     render({ commands, labware })
-    expect(mockGetDeckDefFromRobotName).toHaveBeenCalledWith('OT-3 Standard')
+    expect(mockgetDeckDefFromRobotType).toHaveBeenCalledWith('OT-3 Standard')
   })
 })

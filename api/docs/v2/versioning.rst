@@ -248,7 +248,7 @@ Version 2.12
 ++++++++++++
 
 - :py:meth:`.ProtocolContext.resume` has been deprecated.
-- :py:meth:`.ProtocolContext.set_offset` has been added to apply labware offsets to protocols run (exclusively) outside of the Opentrons app (Jupyter Notebook and SSH).
+- :py:meth:`.Labware.set_offset` has been added to apply labware offsets to protocols run (exclusively) outside of the Opentrons app (Jupyter Notebook and SSH).
 
 
 Version 2.13
@@ -265,5 +265,6 @@ Version 2.14
 
 Upcoming, not yet released.
 
+- :py:class:`.Labware` and :py:class:`.Well` objects will adhere to the protocol's API level setting. Prior to this version, they incorrectly ignore the setting.
 - :py:meth:`.ModuleContext.load_labware_object` has been deprecated.
 - :py:meth:`.MagneticModuleContext.calibrate` has been deprecated.

@@ -15,7 +15,7 @@ export const getModuleInitialLoadInfo = (
   const moduleLoadIndex = commands.findIndex(
     (command: RunTimeCommand): command is LoadModuleRunTimeCommand =>
       command.commandType === 'loadModule' &&
-      command.params.moduleId === moduleId
+      command.result.moduleId === moduleId
   )
 
   if (moduleLoadIndex === -1) {

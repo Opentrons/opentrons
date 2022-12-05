@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import {
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -76,7 +77,7 @@ export const RobotOverviewOverflowMenu = (
   const { autoUpdateAction } = useSelector((state: State) => {
     return getBuildrootUpdateDisplayInfo(state, robot.name)
   })
-  const isRobotInUse = isRobotBusy || robot?.status !== CONNECTABLE
+  const isRobotUnavailable = isRobotBusy || robot?.status !== CONNECTABLE
 
   return (
     <Flex
@@ -96,16 +97,12 @@ export const RobotOverviewOverflowMenu = (
           />
         </Portal>
       ) : null}
-      <OverflowBtn
-        aria-label="overflow"
-        onClick={handleOverflowClick}
-        disabled={robot.status === UNREACHABLE}
-      />
+      <OverflowBtn aria-label="overflow" onClick={handleOverflowClick} />
       {showOverflowMenu ? (
         <Flex
           whiteSpace="nowrap"
           zIndex={10}
-          borderRadius="4px 4px 0px 0px"
+          borderRadius={BORDERS.radiusSoftCorners}
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
           position={POSITION_ABSOLUTE}
           backgroundColor={COLORS.white}
@@ -113,7 +110,7 @@ export const RobotOverviewOverflowMenu = (
           right={0}
           flexDirection={DIRECTION_COLUMN}
         >
-          {autoUpdateAction === 'upgrade' && !isRobotInUse ? (
+          {autoUpdateAction === 'upgrade' && !isRobotUnavailable ? (
             <MenuItem
               onClick={handleClickUpdateBuildroot}
               data-testid={`RobotOverviewOverflowMenu_updateSoftware_${robot.name}`}
@@ -121,22 +118,20 @@ export const RobotOverviewOverflowMenu = (
               {t('update_robot_software')}
             </MenuItem>
           ) : null}
-          {isRobotInUse ? null : (
-            <>
-              <MenuItem
-                onClick={handleClickRestart}
-                data-testid={`RobotOverviewOverflowMenu_restartRobot_${robot.name}`}
-              >
-                {t('robot_controls:restart_label')}
-              </MenuItem>
-              <MenuItem
-                onClick={handleClickHomeGantry}
-                data-testid={`RobotOverviewOverflowMenu_homeGantry_${robot.name}`}
-              >
-                {t('home_gantry')}
-              </MenuItem>
-            </>
-          )}
+          <MenuItem
+            disabled={isRobotUnavailable}
+            onClick={handleClickHomeGantry}
+            data-testid={`RobotOverviewOverflowMenu_homeGantry_${robot.name}`}
+          >
+            {t('home_gantry')}
+          </MenuItem>
+          <MenuItem
+            disabled={isRobotUnavailable}
+            onClick={handleClickRestart}
+            data-testid={`RobotOverviewOverflowMenu_restartRobot_${robot.name}`}
+          >
+            {t('robot_controls:restart_label')}
+          </MenuItem>
           <Divider marginY="0" />
           <MenuItem
             onClick={() =>

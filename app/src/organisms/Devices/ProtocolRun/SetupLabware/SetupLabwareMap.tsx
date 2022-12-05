@@ -11,52 +11,50 @@ import {
   SPACING,
 } from '@opentrons/components'
 import {
+  getDeckDefFromRobotType,
   inferModuleOrientationFromXCoordinate,
+  RunTimeCommand,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import { useFeatureFlag } from '../../../../redux/config'
 import { ModuleExtraAttention } from '../ModuleExtraAttention'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import {
   useLabwareRenderInfoForRunById,
   useModuleRenderInfoForProtocolById,
+  useProtocolDetailsForRun,
   useRunHasStarted,
 } from '../../hooks'
-import type { DeckDefinition } from '@opentrons/shared-data'
-import type { ModuleTypesThatRequiresExtraAttention } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
-
-const DECK_LAYER_BLOCKLIST = [
-  'calibrationMarkings',
-  'fixedBase',
-  'doorStops',
-  'metalFrame',
-  'removalHandle',
-  'removableDeckOutline',
-  'screwHoles',
-]
-
-const DECK_MAP_VIEWBOX = '-80 -40 550 500'
+import type { ModuleTypesThatRequireExtraAttention } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
+import { getLabwareSetupItemGroups } from './utils'
+import { OffDeckLabwareList } from './OffDeckLabwareList'
+import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
 
 interface SetupLabwareMapProps {
   robotName: string
   runId: string
-  extraAttentionModules: ModuleTypesThatRequiresExtraAttention[]
+  commands: RunTimeCommand[]
+  extraAttentionModules: ModuleTypesThatRequireExtraAttention[]
 }
 
 export function SetupLabwareMap({
   robotName,
   runId,
   extraAttentionModules,
+  commands,
 }: SetupLabwareMapProps): JSX.Element {
   const moduleRenderInfoById = useModuleRenderInfoForProtocolById(
     robotName,
     runId
   )
+  const { robotType } = useProtocolDetailsForRun(runId)
   const labwareRenderInfoById = useLabwareRenderInfoForRunById(runId)
   const runHasStarted = useRunHasStarted(runId)
   const enableLiquidSetup = useFeatureFlag('enableLiquidSetup')
 
+  const deckDef = getDeckDefFromRobotType(robotType)
+
+  const { offDeckItems } = getLabwareSetupItemGroups(commands)
   return (
     <Flex flex="1" maxHeight="180vh" flexDirection={DIRECTION_COLUMN}>
       <Flex flexDirection={DIRECTION_COLUMN} marginY={SPACING.spacing4}>
@@ -71,9 +69,8 @@ export function SetupLabwareMap({
         ) : null}
         <Box margin="0 auto" maxWidth="46.25rem" width="100%">
           <RobotWorkSpace
-            deckDef={(standardDeckDef as unknown) as DeckDefinition}
-            viewBox={DECK_MAP_VIEWBOX}
-            deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
+            deckDef={deckDef}
+            deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
             id="LabwareSetup_deckMap"
           >
             {() => (
@@ -140,6 +137,7 @@ export function SetupLabwareMap({
             )}
           </RobotWorkSpace>
         </Box>
+        <OffDeckLabwareList labwareItems={offDeckItems} />
       </Flex>
     </Flex>
   )

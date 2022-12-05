@@ -71,6 +71,7 @@ def test_initial_state(
         all_command_ids=[],
         commands_by_id=OrderedDict(),
         errors_by_id={},
+        latest_command_hash=None,
     )
 
 
@@ -200,6 +201,7 @@ def test_command_store_queues_commands(
     """It should add a command to the store."""
     action = QueueCommandAction(
         request=command_request,
+        request_hash=None,
         created_at=created_at,
         command_id=command_id,
     )
@@ -222,15 +224,48 @@ def test_command_store_queues_commands(
     assert subject.state.queued_command_ids == OrderedSet(["command-id"])
 
 
+def test_command_queue_with_hash() -> None:
+    """It should queue a command with a command hash and no explicit key."""
+    create = commands.WaitForResumeCreate(
+        params=commands.WaitForResumeParams(message="hello world"),
+    )
+
+    subject = CommandStore(is_door_open=False, config=Config())
+    subject.handle_action(
+        QueueCommandAction(
+            request=create,
+            request_hash="abc123",
+            created_at=datetime(year=2021, month=1, day=1),
+            command_id="command-id-1",
+        )
+    )
+
+    assert subject.state.commands_by_id["command-id-1"].command.key == "abc123"
+    assert subject.state.latest_command_hash == "abc123"
+
+    subject.handle_action(
+        QueueCommandAction(
+            request=create,
+            request_hash="def456",
+            created_at=datetime(year=2021, month=1, day=1),
+            command_id="command-id-2",
+        )
+    )
+
+    assert subject.state.latest_command_hash == "def456"
+
+
 def test_command_queue_and_unqueue() -> None:
     """It should queue on QueueCommandAction and dequeue on UpdateCommandAction."""
     queue_1 = QueueCommandAction(
         request=commands.WaitForResumeCreate(params=commands.WaitForResumeParams()),
+        request_hash=None,
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-1",
     )
     queue_2 = QueueCommandAction(
         request=commands.WaitForResumeCreate(params=commands.WaitForResumeParams()),
+        request_hash=None,
         created_at=datetime(year=2022, month=2, day=2),
         command_id="command-id-2",
     )
@@ -265,6 +300,7 @@ def test_setup_command_queue_and_unqueue() -> None:
             params=commands.WaitForResumeParams(),
             intent=commands.CommandIntent.SETUP,
         ),
+        request_hash=None,
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-1",
     )
@@ -273,6 +309,7 @@ def test_setup_command_queue_and_unqueue() -> None:
             params=commands.WaitForResumeParams(),
             intent=commands.CommandIntent.SETUP,
         ),
+        request_hash=None,
         created_at=datetime(year=2022, month=2, day=2),
         command_id="command-id-2",
     )
@@ -308,6 +345,7 @@ def test_setup_queue_action_updates_command_intent() -> None:
             intent=commands.CommandIntent.SETUP,
             key="command-key-1",
         ),
+        request_hash=None,
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-1",
     )
@@ -333,6 +371,7 @@ def test_running_command_id() -> None:
     """It should update the running command ID through a command's lifecycle."""
     queue = QueueCommandAction(
         request=commands.WaitForResumeCreate(params=commands.WaitForResumeParams()),
+        request_hash=None,
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-1",
     )
@@ -381,6 +420,7 @@ def test_command_failure_clears_queues() -> None:
         request=commands.WaitForResumeCreate(
             params=commands.WaitForResumeParams(), key="command-key-1"
         ),
+        request_hash=None,
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-1",
     )
@@ -388,6 +428,7 @@ def test_command_failure_clears_queues() -> None:
         request=commands.WaitForResumeCreate(
             params=commands.WaitForResumeParams(), key="command-key-2"
         ),
+        request_hash=None,
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-2",
     )
@@ -466,6 +507,7 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
         request=commands.WaitForResumeCreate(
             params=cmd_1_non_setup.params, key="command-key-1"
         ),
+        request_hash=None,
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-1",
     )
@@ -475,6 +517,7 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
             intent=commands.CommandIntent.SETUP,
             key="command-key-2",
         ),
+        request_hash=None,
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-2",
     )
@@ -484,6 +527,7 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
             intent=commands.CommandIntent.SETUP,
             key="command-key-3",
         ),
+        request_hash=None,
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-3",
     )
@@ -603,6 +647,7 @@ def test_command_store_handles_pause_action(pause_source: PauseSource) -> None:
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
+        latest_command_hash=None,
     )
 
 
@@ -624,6 +669,7 @@ def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
         commands_by_id=OrderedDict(),
         errors_by_id={},
         run_started_at=datetime(year=2021, month=1, day=1),
+        latest_command_hash=None,
     )
 
 
@@ -646,6 +692,7 @@ def test_command_store_handles_finish_action() -> None:
         commands_by_id=OrderedDict(),
         errors_by_id={},
         run_started_at=datetime(year=2021, month=1, day=1),
+        latest_command_hash=None,
     )
 
 
@@ -678,6 +725,7 @@ def test_command_store_handles_stop_action() -> None:
         commands_by_id=OrderedDict(),
         errors_by_id={},
         run_started_at=datetime(year=2021, month=1, day=1),
+        latest_command_hash=None,
     )
 
 
@@ -699,6 +747,7 @@ def test_command_store_cannot_restart_after_should_stop() -> None:
         commands_by_id=OrderedDict(),
         errors_by_id={},
         run_started_at=None,
+        latest_command_hash=None,
     )
 
 
@@ -764,6 +813,7 @@ def test_command_store_saves_unknown_finish_error() -> None:
             )
         },
         run_started_at=None,
+        latest_command_hash=None,
     )
 
 
@@ -787,6 +837,7 @@ def test_command_store_ignores_stop_after_graceful_finish() -> None:
         commands_by_id=OrderedDict(),
         errors_by_id={},
         run_started_at=datetime(year=2021, month=1, day=1),
+        latest_command_hash=None,
     )
 
 
@@ -810,6 +861,7 @@ def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
         commands_by_id=OrderedDict(),
         errors_by_id={},
         run_started_at=datetime(year=2021, month=1, day=1),
+        latest_command_hash=None,
     )
 
 
@@ -855,6 +907,7 @@ def test_command_store_handles_command_failed() -> None:
         },
         errors_by_id={},
         run_started_at=None,
+        latest_command_hash=None,
     )
 
 
@@ -876,6 +929,7 @@ def test_handles_hardware_stopped() -> None:
         commands_by_id=OrderedDict(),
         errors_by_id={},
         run_started_at=None,
+        latest_command_hash=None,
     )
 
 
@@ -959,6 +1013,7 @@ def test_command_store_handles_stop_action_with_queued_commands() -> None:
         request=commands.WaitForResumeCreate(
             params=commands.WaitForResumeParams(message="hello world"),
         ),
+        request_hash=None,
         created_at=datetime(year=2022, month=1, day=1),
         command_id="command_id",
     )
@@ -966,13 +1021,10 @@ def test_command_store_handles_stop_action_with_queued_commands() -> None:
     subject.handle_action(action)
 
     assert len(subject.state.queued_command_ids) > 0
-
     assert subject.state.run_result is None
 
     subject.handle_action(StopAction())
 
     assert len(subject.state.queued_command_ids) == 0
-
     assert subject.state.queue_status == QueueStatus.PAUSED
-
     assert subject.state.run_result == RunResult.STOPPED

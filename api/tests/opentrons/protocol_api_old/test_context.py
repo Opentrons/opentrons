@@ -20,7 +20,7 @@ from opentrons.hardware_control import API, NoTipAttachedError, ThreadManagedHar
 from opentrons.hardware_control.instruments import Pipette
 from opentrons.hardware_control.types import Axis
 from opentrons.protocols.advanced_control import transfers as tf
-from opentrons.config.pipette_config import config_names
+from opentrons.protocols.api_support import instrument as instrument_support
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.calibration_storage import types as cs_types
 from opentrons.util.helpers import utc_now
@@ -67,17 +67,6 @@ def get_labware_def(monkeypatch):
         return labware_def
 
     monkeypatch.setattr(papi.labware, "get_labware_definition", dummy_load)
-
-
-@pytest.mark.parametrize("name", config_names)
-def test_load_instrument(name, ctx):
-    assert ctx.loaded_instruments == {}
-    loaded = ctx.load_instrument(name, Mount.LEFT, replace=True)
-    assert ctx.loaded_instruments[Mount.LEFT.name.lower()] == loaded
-    assert loaded.name == name
-    loaded = ctx.load_instrument(name, Mount.RIGHT, replace=True)
-    assert ctx.loaded_instruments[Mount.RIGHT.name.lower()] == loaded
-    assert loaded.name == name
 
 
 async def test_motion(ctx, hardware):
@@ -767,11 +756,11 @@ def test_blow_out(ctx, monkeypatch):
     instr.pick_up_tip()
     instr.aspirate(10, lw.wells()[0])
 
-    def fake_move(loc, publish):
+    def fake_move(location):
         nonlocal move_location
-        move_location = loc
+        move_location = location
 
-    monkeypatch.setattr(instr, "move_to", fake_move)
+    monkeypatch.setattr(instr._implementation, "move_to", fake_move)
 
     instr.blow_out()
     # pipette should not move, if no location is passed
@@ -1006,15 +995,6 @@ def test_order_of_module_load():
     assert id(async_temp2) == id(hw_temp2)
 
 
-def test_tip_length_for(ctx, monkeypatch):
-    instr = ctx.load_instrument("p20_single_gen2", "left")
-    tiprack = ctx.load_labware("geb_96_tiprack_10ul", "1")
-    assert instr._tip_length_for(tiprack) == (
-        tiprack._implementation.get_definition()["parameters"]["tipLength"]
-        - instr.hw_pipette["tip_overlap"]["opentrons/geb_96_tiprack_10ul/1"]
-    )
-
-
 @pytest.mark.ot2_only
 def test_tip_length_for_caldata(ctx, decoy, monkeypatch):
     # TODO (lc 10-27-2022) We need to investigate why the pipette id is
@@ -1025,11 +1005,13 @@ def test_tip_length_for_caldata(ctx, decoy, monkeypatch):
     from opentrons.calibration_storage import types as CSTypes
 
     instr = ctx.load_instrument("p20_single_gen2", "left")
-    tiprack = ctx.load_labware("geb_96_tiprack_10ul", "1")
+    tip_rack = ctx.load_labware("geb_96_tiprack_10ul", "1")
 
     mock_load_tip_length = decoy.mock(func=instr_cal.load_tip_length_for_pipette)
+    monkeypatch.setattr(instr_cal, "load_tip_length_for_pipette", mock_load_tip_length)
+
     decoy.when(
-        mock_load_tip_length(None, tiprack._implementation.get_definition())
+        mock_load_tip_length(None, tip_rack._implementation.get_definition())
     ).then_return(
         instr_cal.TipLengthCalibration(
             tip_length=2,
@@ -1041,8 +1023,26 @@ def test_tip_length_for_caldata(ctx, decoy, monkeypatch):
             pipette=None,  # type: ignore[arg-type]
         )
     )
-    monkeypatch.setattr(instr_cal, "load_tip_length_for_pipette", mock_load_tip_length)
-    assert instr._tip_length_for(tiprack) == 2
+
+    assert (
+        instrument_support.tip_length_for(
+            pipette=instr.hw_pipette,
+            tip_rack_definition=tip_rack._implementation.get_definition(),
+        )
+        == 2
+    )
+
+    decoy.when(
+        mock_load_tip_length(None, tip_rack._implementation.get_definition())
+    ).then_raise(cs_types.TipLengthCalNotFound("oh no"))
+
+    assert instrument_support.tip_length_for(
+        pipette=instr.hw_pipette,
+        tip_rack_definition=tip_rack._implementation.get_definition(),
+    ) == (
+        tip_rack._implementation.get_definition()["parameters"]["tipLength"]
+        - instr.hw_pipette["tip_overlap"]["opentrons/geb_96_tiprack_10ul/1"]
+    )
 
 
 def test_bundled_labware(get_labware_fixture, hardware):
@@ -1167,11 +1167,11 @@ def test_move_to_with_thermocycler(
     mod = ctx.load_module("thermocycler")
 
     assert isinstance(mod, ThermocyclerContext)
-    mod.flag_unsafe_move = mock.MagicMock(side_effect=raiser)  # type: ignore[assignment]
+    mod._core.flag_unsafe_move = mock.MagicMock(side_effect=raiser)  # type: ignore[attr-defined, assignment]
     instr = ctx.load_instrument("p1000_single", "left")
     with pytest.raises(RuntimeError, match="Cannot"):
         instr.move_to(Location(Point(0, 0, 0), None))
-    mod.flag_unsafe_move.assert_called_once_with(
+    mod._core.flag_unsafe_move.assert_called_once_with(  # type: ignore[attr-defined]
         to_loc=Location(Point(0, 0, 0), None), from_loc=Location(Point(0, 0, 0), None)
     )
 
@@ -1188,12 +1188,12 @@ def test_move_to_with_heater_shaker(
     mod = ctx.load_module("heaterShakerModuleV1", 1)
 
     assert isinstance(mod, HeaterShakerContext)
-    mod.flag_unsafe_move = mock.MagicMock(side_effect=raiser)  # type: ignore[assignment]
+    mod._core.flag_unsafe_move = mock.MagicMock(side_effect=raiser)  # type: ignore[attr-defined]
 
     instr = ctx.load_instrument("p300_multi", "left")
     with pytest.raises(RuntimeError, match="Cannot"):
         instr.move_to(Location(Point(0, 0, 0), None))
-    mod.flag_unsafe_move.assert_called_once_with(
+    mod._core.flag_unsafe_move.assert_called_once_with(  # type: ignore[attr-defined]
         to_loc=Location(Point(0, 0, 0), None),
         is_multichannel=True,
     )

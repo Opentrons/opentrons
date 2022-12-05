@@ -17,7 +17,7 @@ def mock_pipette(decoy: Decoy) -> Pipette:
 
 @pytest.fixture
 def subject(decoy: Decoy, mock_pipette: Pipette) -> PipetteHandlerProvider:
-    inst_by_mount = {types.Mount.LEFT: mock_pipette}
+    inst_by_mount = {types.Mount.LEFT: mock_pipette, types.Mount.RIGHT: None}
     subject = PipetteHandlerProvider(attached_instruments=inst_by_mount)
     return subject
 
@@ -53,3 +53,8 @@ def test_plan_check_pick_up_tip_with_presses_argument(
     )
 
     assert len(spec.presses) == expected_array_length
+
+
+def test_get_pipette_fails(decoy: Decoy, subject: PipetteHandlerProvider):
+    with pytest.raises(types.PipetteNotAttachedError):
+        subject.get_pipette(types.Mount.RIGHT)

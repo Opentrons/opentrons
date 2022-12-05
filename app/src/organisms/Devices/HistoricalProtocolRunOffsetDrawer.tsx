@@ -7,7 +7,6 @@ import {
   SPACING,
   COLORS,
   TYPOGRAPHY,
-  BORDERS,
   JUSTIFY_FLEX_START,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
@@ -58,10 +57,9 @@ export function HistoricalProtocolRunOffsetDrawer(
   if (uniqueLabwareOffsets == null || uniqueLabwareOffsets.length === 0) {
     return (
       <Box
-        backgroundColor={COLORS.medGreyEnabled}
+        backgroundColor={COLORS.fundamentalsBackground}
         width="100%"
-        paddingY={SPACING.spacing4}
-        paddingX={SPACING.spacing7}
+        padding={`${SPACING.spacing4} ${SPACING.spacing3} ${SPACING.spacing4} ${SPACING.spacing7}`}
       >
         <Box
           backgroundColor={COLORS.white}
@@ -82,16 +80,12 @@ export function HistoricalProtocolRunOffsetDrawer(
 
   return (
     <Box
-      backgroundColor={COLORS.medGreyEnabled}
+      backgroundColor={COLORS.fundamentalsBackground}
       width="100%"
-      padding={SPACING.spacing3}
+      padding={`${SPACING.spacing4} ${SPACING.spacing3} ${SPACING.spacing4} ${SPACING.spacing7}`}
     >
       {isOutOfDate ? (
-        <Banner
-          type="warning"
-          marginLeft={SPACING.spacing5}
-          marginTop={SPACING.spacing3}
-        >
+        <Banner type="warning" marginTop={SPACING.spacing3}>
           <Flex flexDirection={DIRECTION_COLUMN}>
             <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {t('data_out_of_date')}
@@ -100,13 +94,8 @@ export function HistoricalProtocolRunOffsetDrawer(
           </Flex>
         </Banner>
       ) : null}
-      <Flex
-        justifyContent={JUSTIFY_FLEX_START}
-        borderBottom={BORDERS.lineBorder}
-        padding={SPACING.spacing3}
-      >
+      <Flex justifyContent={JUSTIFY_FLEX_START}>
         <StyledText
-          marginLeft={SPACING.spacing5}
           width="24%"
           as="label"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -150,16 +139,15 @@ export function HistoricalProtocolRunOffsetDrawer(
             padding={SPACING.spacing3}
             backgroundColor={COLORS.white}
             marginY={SPACING.spacing3}
-            marginLeft={SPACING.spacing5}
           >
-            <StyledText width="25%" as="label">
+            <StyledText width="23.5%" as="label">
               {t('slot', { slotName: offset.location.slotName })}
               {offset.location.moduleModel != null &&
                 ` - ${getModuleDisplayName(offset.location.moduleModel)}`}
             </StyledText>
             <StyledText
               as="label"
-              width="33%"
+              width="34%"
               overflow="hidden"
               textOverflow="ellipsis"
               title={labwareName}

@@ -18,7 +18,7 @@ describe('GenericWizardTile', () => {
       rightHandBody: <div>right hand body</div>,
       bodyText: 'body',
       proceed: jest.fn(),
-      proceedButtonText: 'continue',
+      proceedButtonText: 'Continue',
       header: 'header',
       getHelp: 'getHelpUrl',
     }
@@ -26,7 +26,7 @@ describe('GenericWizardTile', () => {
   it('renders correct generic tile information with a help link', () => {
     const { getByText } = render(props)
     getByText('body')
-    const btn = getByText('continue')
+    const btn = getByText('Continue')
     getByText('header')
     fireEvent.click(btn)
     expect(props.proceed).toHaveBeenCalled()

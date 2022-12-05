@@ -14,7 +14,12 @@ from opentrons.protocol_api.core.protocol_api.well import WellImplementation
     ],
 )
 def test_row_column(name, row, col):
-    w = WellImplementation(None, None, None, name=name)  # type: ignore[arg-type]
+    w = WellImplementation(
+        well_geometry=None,  # type: ignore[arg-type]
+        display_name=None,  # type: ignore[arg-type]
+        has_tip=None,  # type: ignore[arg-type]
+        name=name,
+    )
     assert w.get_name() == name
     assert w.get_row_name() == row
     assert w.get_column_name() == col
@@ -30,4 +35,9 @@ def test_row_column(name, row, col):
 )
 def test_row_column_fail(name):
     with pytest.raises(AssertionError, match=f"could not match '{name}'"):
-        WellImplementation(None, None, None, name=name)  # type: ignore[arg-type]
+        WellImplementation(
+            well_geometry=None,  # type: ignore[arg-type]
+            display_name=None,  # type: ignore[arg-type]
+            has_tip=None,  # type: ignore[arg-type]
+            name=name,
+        )

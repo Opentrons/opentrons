@@ -12,6 +12,7 @@ def test_move_to_well_with_optional_params():
     instruments = {"somePipetteId": pipette_mock}
 
     well = labware.Well(
+        parent=None,  # type: ignore[arg-type]
         well_implementation=WellImplementation(
             well_geometry=WellGeometry(
                 {
@@ -26,11 +27,11 @@ def test_move_to_well_with_optional_params():
                 parent_point=Point(10, 20, 30),
                 parent_object=1,
             ),
-            has_tip=False,
             display_name="some well",
+            has_tip=False,
             name="A2",
         ),
-        api_level=MAX_SUPPORTED_VERSION,
+        api_version=MAX_SUPPORTED_VERSION,
     )
 
     mock_get_well = mock.MagicMock(return_value=well, name="mock_get_well")
@@ -65,6 +66,7 @@ def test_move_to_well_without_optional_params():
     instruments = {"somePipetteId": pipette_mock}
 
     well = labware.Well(
+        parent=None,  # type: ignore[arg-type]
         well_implementation=WellImplementation(
             well_geometry=WellGeometry(
                 {
@@ -79,11 +81,11 @@ def test_move_to_well_without_optional_params():
                 parent_point=Point(10, 20, 30),
                 parent_object=1,
             ),
-            has_tip=False,
             display_name="some well",
+            has_tip=False,
             name="A2",
         ),
-        api_level=MAX_SUPPORTED_VERSION,
+        api_version=MAX_SUPPORTED_VERSION,
     )
 
     mock_get_well = mock.MagicMock(return_value=well, name="mock_get_well")

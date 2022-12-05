@@ -8,14 +8,13 @@ import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   OVERFLOW_SCROLL,
-  SIZE_6,
   SPACING,
   COLORS,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { useRobot, useSyncRobotClock } from '../../../organisms/Devices/hooks'
-import { PipettesAndModules } from '../../../organisms/Devices/PipettesAndModules'
+import { InstrumentsAndModules } from '../../../organisms/Devices/InstrumentsAndModules'
 import { RecentProtocolRuns } from '../../../organisms/Devices/RecentProtocolRuns'
 import { RobotOverview } from '../../../organisms/Devices/RobotOverview'
 import { getScanning } from '../../../redux/discovery'
@@ -34,7 +33,7 @@ export function DeviceDetails(): JSX.Element | null {
   return robot != null ? (
     <ApiHostProvider key={robot.name} hostname={robot.ip ?? null}>
       <Box
-        minWidth={SIZE_6}
+        minWidth="36rem"
         height="100%"
         overflow={OVERFLOW_SCROLL}
         paddingX={SPACING.spacing4}
@@ -53,7 +52,7 @@ export function DeviceDetails(): JSX.Element | null {
           width="100%"
         >
           <RobotOverview robotName={robotName} />
-          <PipettesAndModules robotName={robotName} />
+          <InstrumentsAndModules robotName={robotName} />
         </Flex>
         <RecentProtocolRuns robotName={robotName} />
       </Box>

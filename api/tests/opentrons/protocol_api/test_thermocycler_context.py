@@ -1,4 +1,5 @@
 """Tests for Protocol API thermocycler module contexts."""
+import inspect
 import pytest
 from decoy import Decoy, matchers
 
@@ -6,8 +7,18 @@ from opentrons.broker import Broker
 from opentrons.drivers.types import ThermocyclerLidStatus
 from opentrons.hardware_control.modules import TemperatureStatus
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION, ThermocyclerContext
+from opentrons.protocol_api import (
+    MAX_SUPPORTED_VERSION,
+    ThermocyclerContext,
+    validation as mock_validation,
+)
 from opentrons.protocol_api.core.common import ProtocolCore, ThermocyclerCore
+
+
+@pytest.fixture(autouse=True)
+def _mock_validation_module(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+    for name, func in inspect.getmembers(mock_validation, inspect.isfunction):
+        monkeypatch.setattr(mock_validation, name, decoy.mock(func=func))
 
 
 @pytest.fixture
@@ -236,6 +247,10 @@ def test_set_block_temperature(
     subject: ThermocyclerContext,
 ) -> None:
     """It should set the block temperature via the core."""
+    decoy.when(
+        mock_validation.ensure_hold_time_seconds(seconds=1.2, minutes=3.4)
+    ).then_return(5.6)
+
     subject.set_block_temperature(
         temperature=42.0,
         hold_time_seconds=1.2,
@@ -259,7 +274,7 @@ def test_set_block_temperature(
         ),
         mock_core.set_target_block_temperature(
             celsius=42.0,
-            hold_time_seconds=205.2,
+            hold_time_seconds=5.6,
             block_max_volume=7.8,
         ),
         mock_core.wait_for_block_temperature(),
@@ -312,11 +327,26 @@ def test_execute_profile(
     subject: ThermocyclerContext,
 ) -> None:
     """It should execute a thermocycler profile via the core."""
+    decoy.when(mock_validation.ensure_thermocycler_repetition_count(123)).then_return(
+        321
+    )
+    decoy.when(
+        mock_validation.ensure_thermocycler_profile_steps(
+            [
+                {
+                    "temperature": 12.3,
+                    "hold_time_minutes": 12.3,
+                    "hold_time_seconds": 45.6,
+                }
+            ]
+        )
+    ).then_return([{"temperature": 42.0, "hold_time_seconds": 123.456}])
+
     subject.execute_profile(
         steps=[
-            {"temperature": 42.0, "hold_time_minutes": 12.3, "hold_time_seconds": 45.6}
+            {"temperature": 12.3, "hold_time_minutes": 12.3, "hold_time_seconds": 45.6}
         ],
-        repetitions=12,
+        repetitions=123,
         block_max_volume=34.5,
     )
 
@@ -331,7 +361,7 @@ def test_execute_profile(
                         {
                             "steps": [
                                 {
-                                    "temperature": 42.0,
+                                    "temperature": 12.3,
                                     "hold_time_minutes": 12.3,
                                     "hold_time_seconds": 45.6,
                                 }
@@ -345,11 +375,10 @@ def test_execute_profile(
             steps=[
                 {
                     "temperature": 42.0,
-                    "hold_time_minutes": 12.3,
-                    "hold_time_seconds": 45.6,
+                    "hold_time_seconds": 123.456,
                 }
             ],
-            repetitions=12,
+            repetitions=321,
             block_max_volume=34.5,
         ),
         mock_broker.publish(
@@ -361,7 +390,7 @@ def test_execute_profile(
                         {
                             "steps": [
                                 {
-                                    "temperature": 42.0,
+                                    "temperature": 12.3,
                                     "hold_time_minutes": 12.3,
                                     "hold_time_seconds": 45.6,
                                 }

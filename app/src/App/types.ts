@@ -18,7 +18,11 @@ export interface RouteProps {
   path: string
 }
 
-export type RobotSettingsTab = 'calibration' | 'networking' | 'advanced'
+export type RobotSettingsTab =
+  | 'calibration'
+  | 'networking'
+  | 'advanced'
+  | 'feature-flags'
 
 export type AppSettingsTab =
   | 'general'
@@ -39,4 +43,5 @@ export interface NavRouteParams {
   robotSettingsTab: RobotSettingsTab
   runId: string
   protocolRunDetailsTab: ProtocolRunDetailsTab
+  ssid: string
 }

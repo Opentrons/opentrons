@@ -32,6 +32,7 @@ from ..types import (
     ModuleDimensions,
     LabwareOffsetVector,
     HeaterShakerMovementRestrictors,
+    ModuleLocation,
 )
 from .. import errors
 from ..commands import (
@@ -758,3 +759,13 @@ class ModuleView(HasState[ModuleState]):
             for substate in hs_substates
         ]
         return hs_restrictors
+
+    def raise_if_module_in_location(
+        self, location: Union[DeckSlotLocation, ModuleLocation]
+    ) -> None:
+        """Raise if the given location has a module in it."""
+        for module in self.get_all():
+            if module.location == location:
+                raise errors.LocationIsOccupiedError(
+                    f"Module {module.model} is already present at {location}."
+                )

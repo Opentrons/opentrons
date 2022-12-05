@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
@@ -28,7 +29,14 @@ export const RunLogProtocolSetupInfo = ({
   const { t } = useTranslation('run_details')
   const { protocolData } = useProtocolDetailsForRun(runId)
   const protocolPipetteData = useRunPipetteInfoByMount(robotName, runId)
-
+  /**
+   * TODO(BC, 2022-11-11): we do not currently have the information that we need from the run commands
+   * in order to predictably create interpolated strings that describe equipment locations
+   * until there is a more reliable way to retrieve timeline specific loaded entity details
+   * we will render nothing in this component.
+   */
+  return null
+  /* eslint-disable */
   if (protocolData == null) return null
   if (setupCommand === undefined) return null
   if (
@@ -58,7 +66,7 @@ export const RunLogProtocolSetupInfo = ({
     )
   } else if (setupCommand.commandType === 'loadModule') {
     // TODO(bh, 2022-03-30): parse based on module model or type, not module id
-    const moduleId = setupCommand.params.moduleId
+    const moduleId = setupCommand.result.moduleId
     const moduleModel = protocolData.modules[moduleId]
     const moduleSlotNumber = moduleId.includes('thermocycler') ? 4 : 1
     setupCommandText = (
@@ -84,7 +92,7 @@ export const RunLogProtocolSetupInfo = ({
           (command): command is LoadModuleRunTimeCommand =>
             command.commandType === 'loadModule'
         )
-        .find(command => command.params.moduleId === moduleId)
+        .find(command => command.result.moduleId === moduleId)
       const moduleSlotNumber = moduleRunTimeCommand?.params.location.slotName
       slotNumber = moduleSlotNumber
       moduleName = getModuleDisplayName(moduleModel.model)

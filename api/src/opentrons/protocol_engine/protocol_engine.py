@@ -6,8 +6,8 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
 from opentrons.hardware_control.types import PauseType as HardwarePauseType
 
+from . import commands
 from .resources import ModelUtils, ModuleDataProvider
-from .commands import Command, CommandCreate
 from .types import LabwareOffset, LabwareOffsetCreate, LabwareUri, ModuleModel, Liquid
 from .execution import (
     QueueWorker,
@@ -31,6 +31,8 @@ from .actions import (
     AddLiquidAction,
     AddModuleAction,
     HardwareStoppedAction,
+    ResetTipsAction,
+    SetPipetteMovementSpeedAction,
 )
 
 
@@ -122,7 +124,7 @@ class ProtocolEngine:
         self._action_dispatcher.dispatch(action)
         self._hardware_api.pause(HardwarePauseType.PAUSE)
 
-    def add_command(self, request: CommandCreate) -> Command:
+    def add_command(self, request: commands.CommandCreate) -> commands.Command:
         """Add a command to the `ProtocolEngine`'s queue.
 
         Arguments:
@@ -139,10 +141,15 @@ class ProtocolEngine:
                 may be added.
         """
         command_id = self._model_utils.generate_id()
+        request_hash = commands.hash_command_params(
+            create=request,
+            last_hash=self._state_store.commands.get_latest_command_hash(),
+        )
 
         action = self.state_view.commands.validate_action_allowed(
             QueueCommandAction(
                 request=request,
+                request_hash=request_hash,
                 command_id=command_id,
                 created_at=self._model_utils.get_timestamp(),
             )
@@ -157,7 +164,9 @@ class ProtocolEngine:
             command_id=command_id,
         )
 
-    async def add_and_execute_command(self, request: CommandCreate) -> Command:
+    async def add_and_execute_command(
+        self, request: commands.CommandCreate
+    ) -> commands.Command:
         """Add a command to the queue and wait for it to complete.
 
         The engine must be started by calling `play` before the command will
@@ -282,6 +291,24 @@ class ProtocolEngine:
     def add_liquid(self, liquid: Liquid) -> None:
         """Add a liquid to the state for subsequent liquid loads."""
         self._action_dispatcher.dispatch(AddLiquidAction(liquid=liquid))
+
+    def reset_tips(self, labware_id: str) -> None:
+        """Reset the tip state of a given labware."""
+        self._action_dispatcher.dispatch(ResetTipsAction(labware_id=labware_id))
+
+    # TODO(mm, 2022-11-10): This is a method on ProtocolEngine instead of a command
+    # as a quick hack to support Python protocols. We should consider making this a
+    # command, or adding speed parameters to existing commands.
+    def set_pipette_movement_speed(
+        self, pipette_id: str, speed: Optional[float]
+    ) -> None:
+        """Set the speed of a pipette's X/Y/Z movements. Does not affect plunger speed.
+
+        None will use the hardware API's default.
+        """
+        self._action_dispatcher.dispatch(
+            SetPipetteMovementSpeedAction(pipette_id=pipette_id, speed=speed)
+        )
 
     async def use_attached_modules(
         self,

@@ -46,6 +46,7 @@ from opentrons.hardware_control.types import (
     OT3AxisMap,
     CurrentConfig,
     OT3SubSystem,
+    InstrumentProbeType,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 
@@ -481,6 +482,7 @@ class OT3Simulator:
         distance_mm: float,
         speed_mm_per_s: float,
         sensor_threshold_pf: float,
+        probe: InstrumentProbeType,
     ) -> None:
         self._position[axis_to_node(moving)] += distance_mm
 
@@ -490,6 +492,7 @@ class OT3Simulator:
         moving: OT3Axis,
         distance_mm: float,
         speed_mm_per_s: float,
+        probe: InstrumentProbeType,
     ) -> List[float]:
         self._position[axis_to_node(moving)] += distance_mm
         return []

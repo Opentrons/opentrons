@@ -29,7 +29,7 @@ import _uncastedModifiedSimpleV6Protocol from '../__fixtures__/modifiedSimpleV6.
 import type {
   LabwareDefinition2,
   PipetteNameSpecs,
-  ProtocolAnalysisFile,
+  LegacySchemaAdapterOutput,
 } from '@opentrons/shared-data'
 import type { PipetteInfo, ProtocolDetails, StoredProtocolAnalysis } from '..'
 
@@ -87,12 +87,47 @@ const TIP_LENGTH_CALIBRATIONS = [
 ]
 
 const tiprack10ul = _tiprack10ul as LabwareDefinition2
-const modifiedSimpleV6Protocol = (_uncastedModifiedSimpleV6Protocol as any) as ProtocolAnalysisFile<{}>
+const modifiedSimpleV6Protocol = ({
+  ..._uncastedModifiedSimpleV6Protocol,
+  labware: [
+    {
+      id: ' trashId',
+      displayName: 'Trash',
+      definitionUri: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
+      loadName: 'opentrons_1_trash_1100ml_fixed',
+    },
+    {
+      id: 'tipRackId',
+      displayName: 'Opentrons 96 Tip Rack 10 µL',
+      definitionUri: 'opentrons/opentrons_96_tiprack_10ul/1',
+      loadName: 'opentrons_96_tiprack_10ul',
+    },
+    {
+      id: 'sourcePlateId',
+      displayName: 'Source Plate',
+      definitionUri: 'example/plate/1',
+      loadName: 'plate',
+    },
+    {
+      id: 'destPlateId',
+      displayName: 'Sample Collection Plate',
+      definitionUri: 'example/plate/1',
+      loadName: 'plate',
+    },
+  ],
+  pipettes: [
+    {
+      id: 'pipetteId',
+      pipetteName: 'p10_single',
+    },
+  ],
+} as any) as LegacySchemaAdapterOutput
 
 const PROTOCOL_DETAILS = {
   displayName: 'fake protocol',
   protocolData: modifiedSimpleV6Protocol,
   protocolKey: 'fakeProtocolKey',
+  robotType: 'OT-2 Standard' as const,
 }
 
 describe('useRunPipetteInfoByMount hook', () => {
@@ -140,7 +175,7 @@ describe('useRunPipetteInfoByMount hook', () => {
     expect(result.current).toStrictEqual({
       left: ({
         id: 'pipetteId',
-        name: 'p10_single',
+        pipetteName: 'p10_single',
         requestedPipetteMatch: 'incompatible',
         pipetteCalDate: null,
         pipetteSpecs: {

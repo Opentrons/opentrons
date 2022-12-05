@@ -13,3 +13,7 @@ class InvalidModuleLocationError(ValueError):
         )
         self.invalid_value = invalid_value
         self.module_name = module_name
+
+
+class InvalidMagnetEngageHeightError(ValueError):
+    """Error raised if a Magnetic Module engage height is invalid."""

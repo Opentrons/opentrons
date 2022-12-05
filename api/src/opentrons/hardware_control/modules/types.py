@@ -24,7 +24,15 @@ if TYPE_CHECKING:
         HeaterShakerModuleType,
     )
 
-ThermocyclerStep = Dict[str, float]
+
+class ThermocyclerStepBase(TypedDict):
+    temperature: float
+
+
+class ThermocyclerStep(ThermocyclerStepBase, total=False):
+    hold_time_seconds: float
+    hold_time_minutes: float
+
 
 UploadFunction = Callable[[str, str, Dict[str, Any]], Awaitable[Tuple[bool, str]]]
 
