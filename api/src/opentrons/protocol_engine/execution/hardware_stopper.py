@@ -55,7 +55,7 @@ class HardwareStopper:
             try:
                 ot3api = ensure_ot3_hardware(hardware_api=self._hardware_api)
                 if (
-                    self._state_store.config.use_virtual_gripper
+                    not self._state_store.config.use_virtual_gripper
                     and ot3api.has_gripper()
                 ):
                     await ot3api.home_z(mount=OT3Mount.GRIPPER)

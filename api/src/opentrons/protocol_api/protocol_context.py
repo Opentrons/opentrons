@@ -563,9 +563,9 @@ class ProtocolContext(CommandPublisher):
             )
 
         instrument = InstrumentContext(
-            ctx=self,
             broker=self._broker,
             implementation=instrument_core,
+            protocol_core=self._implementation,
             api_version=self._api_version,
             tip_racks=tip_racks,
             trash=self.fixed_trash,
@@ -663,7 +663,6 @@ class ProtocolContext(CommandPublisher):
     @requires_version(2, 0)
     def home(self) -> None:
         """Homes the robot."""
-        logger.debug("home")
         self._implementation.home()
 
     @property

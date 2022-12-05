@@ -3,7 +3,7 @@ import asyncio
 import logging
 from contextlib import asynccontextmanager
 
-from typing import Optional, TypeVar, Callable, AsyncIterator, cast, List
+from typing import Optional, TypeVar, Callable, AsyncIterator, List
 
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
@@ -11,6 +11,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     SensorId,
     SensorType,
     MessageId,
+    ErrorCode,
 )
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 
@@ -30,6 +31,7 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     ReadFromSensorResponse,
     PeripheralStatusResponse,
     BindSensorOutputRequest,
+    ErrorMessage,
 )
 from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.messages.payloads import (
@@ -135,7 +137,7 @@ class SensorScheduler:
     ) -> None:
         """Send write message."""
         sensor_info = sensor.sensor
-        await can_messenger.send(
+        error = await can_messenger.ensure_send(
             node_id=sensor_info.node_id,
             message=WriteToSensorRequest(
                 payload=WriteToSensorRequestPayload(
@@ -146,7 +148,12 @@ class SensorScheduler:
                     reg_address=UInt8Field(0x0),
                 )
             ),
+            expected_nodes=[sensor_info.node_id],
         )
+        if error != ErrorCode.ok:
+            log.error(
+                f"recieved error {str(error)} trying to write sensor info to {str(sensor_info.node_id)}"
+            )
 
     async def send_read(
         self,
@@ -330,6 +337,8 @@ class SensorScheduler:
                 f"{SensorType(message.payload.sensor.value).name}: "
                 f"{SensorDataType.build(message.payload.sensor_data, message.payload.sensor).to_float()}"
             )
+        if isinstance(message, ErrorMessage):
+            log.error(f"recieved error message {str(message)}")
 
     @asynccontextmanager
     async def bind_sync(
@@ -337,13 +346,13 @@ class SensorScheduler:
         target_sensor: SensorInformation,
         can_messenger: CanMessenger,
         timeout: float = 0.5,
-        log: bool = False,
+        do_log: bool = False,
     ) -> AsyncIterator[None]:
         """While acquired, bind the specified sensor to control sync."""
         flags = [SensorOutputBinding.sync]
-        if log:
+        if do_log:
             flags.append(SensorOutputBinding.report)
-        await can_messenger.send(
+        error = await can_messenger.ensure_send(
             node_id=target_sensor.node_id,
             message=BindSensorOutputRequest(
                 payload=BindSensorOutputRequestPayload(
@@ -352,17 +361,21 @@ class SensorScheduler:
                     binding=SensorOutputBindingField.from_flags(flags),
                 )
             ),
+            expected_nodes=[target_sensor.node_id],
         )
+        if error != ErrorCode.ok:
+            log.error(
+                f"recieved error {str(error)} trying to bind sensor output on {str(target_sensor.node_id)}"
+            )
+
         try:
-            if log:
-                can_messenger.add_listener(
-                    self._log_sensor_output,
-                )
+            if do_log:
+                can_messenger.add_listener(self._log_sensor_output)
             yield
         finally:
-            if log:
+            if do_log:
                 can_messenger.remove_listener(self._log_sensor_output)
-            await can_messenger.send(
+            error = await can_messenger.ensure_send(
                 node_id=target_sensor.node_id,
                 message=BindSensorOutputRequest(
                     payload=BindSensorOutputRequestPayload(
@@ -373,7 +386,12 @@ class SensorScheduler:
                         ),
                     )
                 ),
+                expected_nodes=[target_sensor.node_id],
             )
+            if error != ErrorCode.ok:
+                log.error(
+                    f"recieved error {str(error)} trying to write unbind sensor output on {str(target_sensor.node_id)}"
+                )
 
     @asynccontextmanager
     async def capture_output(
@@ -387,10 +405,13 @@ class SensorScheduler:
         def _logging_listener(
             message: MessageDefinition, arb_id: ArbitrationId
         ) -> None:
-            payload = cast(ReadFromSensorResponse, message).payload
-            response_queue.put_nowait(
-                SensorDataType.build(payload.sensor_data, payload.sensor).to_float()
-            )
+            if isinstance(message, ReadFromSensorResponse):
+                payload = message.payload
+                response_queue.put_nowait(
+                    SensorDataType.build(payload.sensor_data, payload.sensor).to_float()
+                )
+            if isinstance(message, ErrorMessage):
+                log.error(f"Recieved error message {str(message)}")
 
         def _filter(arbitration_id: ArbitrationId) -> bool:
             return (
@@ -399,10 +420,11 @@ class SensorScheduler:
             ) and (
                 MessageId(arbitration_id.parts.message_id)
                 == MessageId.read_sensor_response
+                or MessageId(arbitration_id.parts.message_id) == MessageId.error_message
             )
 
         can_messenger.add_listener(_logging_listener, _filter)
-        await can_messenger.send(
+        error = await can_messenger.ensure_send(
             node_id=target_sensor.node_id,
             message=BindSensorOutputRequest(
                 payload=BindSensorOutputRequestPayload(
@@ -411,12 +433,18 @@ class SensorScheduler:
                     binding=SensorOutputBindingField(SensorOutputBinding.report.value),
                 )
             ),
+            expected_nodes=[target_sensor.node_id],
         )
+        if error != ErrorCode.ok:
+            log.error(
+                f"recieved error {str(error)} trying to bind sensor output on {str(target_sensor.node_id)}"
+            )
+
         try:
             yield response_queue
         finally:
             can_messenger.remove_listener(_logging_listener)
-            await can_messenger.send(
+            error = await can_messenger.ensure_send(
                 node_id=target_sensor.node_id,
                 message=BindSensorOutputRequest(
                     payload=BindSensorOutputRequestPayload(
@@ -427,4 +455,9 @@ class SensorScheduler:
                         ),
                     )
                 ),
+                expected_nodes=[target_sensor.node_id],
             )
+            if error != ErrorCode.ok:
+                log.error(
+                    f"recieved error {str(error)} trying to write unbind sensor output on {str(target_sensor.node_id)}"
+                )
