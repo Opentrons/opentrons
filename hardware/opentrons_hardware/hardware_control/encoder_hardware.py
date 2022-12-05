@@ -62,7 +62,6 @@ async def get_encoder_position(messenger: CanMessenger, nodes: Set[NodeId]):
         )
     try:
         await asyncio.wait_for(event.wait(), 1.0)
-        # print(responses)
         for ax in responses.keys():
             encoder_positions[ax] = responses[ax].value/1000.0
         messenger.remove_listener(listener)
