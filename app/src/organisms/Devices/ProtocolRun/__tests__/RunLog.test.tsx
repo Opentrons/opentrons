@@ -91,6 +91,7 @@ describe('RunLog', () => {
     )
     when(mockUseDownloadRunLog).mockReturnValue({
       downloadRunLog: mockDownloadRunLog,
+      isRunLogLoading: false,
     })
     when(mockUseRunTimestamps)
       .calledWith(RUN_ID)
