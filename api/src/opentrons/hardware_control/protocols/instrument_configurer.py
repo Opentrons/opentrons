@@ -71,20 +71,6 @@ class InstrumentConfigurer(Protocol):
         """
         ...
 
-    async def cache_and_get_instrument(
-        self,
-        mount: MountType,
-        pipette_name: PipetteName,
-        other_mount_dict: Optional[Dict[Mount, PipetteName]],
-    ) -> PipetteDict:
-        """Caches the specified instrument and returns the status dict.
-
-        If an instrument is on the other mount, that it cached as well.
-        This will raise an error from `cache_instruments` if one of the
-        expected instruments is not currently present.
-        """
-        ...
-
     @property
     def attached_instruments(self) -> Dict[Mount, PipetteDict]:
         return self.get_attached_instruments()
