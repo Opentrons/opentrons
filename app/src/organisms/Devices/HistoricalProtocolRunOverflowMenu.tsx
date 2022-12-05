@@ -59,7 +59,7 @@ export function HistoricalProtocolRunOverflowMenu(
   )
   const runTotalCommandCount = commands?.data?.meta?.totalLength ?? 0
 
-  const { downloadRunLog } = useDownloadRunLog(
+  const { downloadRunLog, isRunLogLoading } = useDownloadRunLog(
     robotName,
     runId,
     runTotalCommandCount
@@ -82,6 +82,7 @@ export function HistoricalProtocolRunOverflowMenu(
               {...props}
               closeOverflowMenu={handleOverflowClick}
               downloadRunLog={downloadRunLog}
+              isRunLogLoading={isRunLogLoading}
             />
           </Box>
           {menuOverlay}
@@ -94,6 +95,7 @@ export function HistoricalProtocolRunOverflowMenu(
 interface MenuDropdownProps extends HistoricalProtocolRunOverflowMenuProps {
   closeOverflowMenu: React.MouseEventHandler<HTMLButtonElement>
   downloadRunLog: () => void
+  isRunLogLoading: boolean
 }
 function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   const { t } = useTranslation('device_details')
@@ -105,6 +107,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     robotIsBusy,
     closeOverflowMenu,
     downloadRunLog,
+    isRunLogLoading,
   } = props
   const isRobotOnWrongVersionOfSoftware = ['upgrade', 'downgrade'].includes(
     useSelector((state: State) => {
@@ -176,6 +179,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
       )}
       <MenuItem
         data-testid="RecentProtocolRun_OverflowMenu_downloadRunLog"
+        disabled={isRunLogLoading}
         onClick={onDownloadClick}
       >
         {t('download_run_log')}

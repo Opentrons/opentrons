@@ -82,6 +82,7 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
     })
     when(mockUseDownloadRunLog).mockReturnValue({
       downloadRunLog: mockDownloadRunLog,
+      isRunLogLoading: false,
     })
     when(
       mockUseDeleteRunMutation.mockReturnValue({
