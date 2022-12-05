@@ -98,7 +98,7 @@ export function SetWifiCred(): JSX.Element {
             alignItems={ALIGN_CENTER}
             marginBottom="3.0625rem"
           >
-            <Btn onClick={() => history.push(`/select-network`)}>
+            <Btn onClick={() => history.push('/connect-via-wifi')}>
               <Flex flexDirection={DIRECTION_ROW}>
                 <Icon
                   name="arrow-back"

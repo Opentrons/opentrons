@@ -9,6 +9,7 @@ from mock import AsyncMock, Mock
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     MessageId,
+    ErrorCode,
 )
 
 from opentrons_hardware.firmware_bindings.message import CanMessage
@@ -26,17 +27,28 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     HeartbeatRequest,
     MoveCompleted,
     GetMoveGroupRequest,
+    SetBrushedMotorPwmRequest,
+    ExecuteMoveGroupRequest,
 )
-from opentrons_hardware.firmware_bindings.messages.fields import MotorPositionFlagsField
+from opentrons_hardware.firmware_bindings.messages.fields import (
+    MotorPositionFlagsField,
+    ErrorCodeField,
+    ErrorSeverityField,
+)
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     MoveCompletedPayload,
     MoveGroupRequestPayload,
+    BrushedMotorPwmPayload,
+    ExecuteMoveGroupRequestPayload,
+    ErrorMessagePayload,
 )
 from opentrons_hardware.firmware_bindings.utils import (
     UInt8Field,
     UInt32Field,
     Int32Field,
 )
+
+from typing import List
 
 
 @pytest.fixture
@@ -106,6 +118,279 @@ async def test_send(
                 )
             ),
             data=message.payload.serialize(),
+        )
+    )
+
+
+@pytest.mark.parametrize(
+    "node_id,message",
+    [
+        [
+            NodeId.gripper_g,
+            SetBrushedMotorPwmRequest(
+                payload=BrushedMotorPwmPayload(
+                    duty_cycle=UInt32Field(50),
+                )
+            ),
+        ],
+    ],
+)
+async def test_ensure_send(
+    subject: CanMessenger,
+    mock_driver: AsyncMock,
+    node_id: NodeId,
+    message: MessageDefinition,
+    incoming_messages: Queue[CanMessage],
+) -> None:
+    """It should create a can message and use the driver to send the message."""
+    incoming_messages.put_nowait(
+        CanMessage(
+            arbitration_id=ArbitrationId(
+                parts=ArbitrationIdParts(
+                    message_id=MessageId.acknowledgement,
+                    node_id=NodeId.host,
+                    function_code=0,
+                    originating_node_id=NodeId.gripper_g,
+                )
+            ),
+            data=message.payload.message_index.value.to_bytes(4, "big"),
+        )
+    )
+
+    """It should create a can message and use the driver to send the message and raise no exception."""
+    error, ignore = await asyncio.gather(
+        subject.ensure_send(node_id, message, expected_nodes=[node_id]),
+        subject.__aenter__(),
+    )
+    assert error == ErrorCode.ok
+    mock_driver.send.assert_called_once_with(
+        message=CanMessage(
+            arbitration_id=ArbitrationId(
+                parts=ArbitrationIdParts(
+                    message_id=message.message_id,
+                    node_id=node_id,
+                    function_code=0,
+                    originating_node_id=NodeId.host,
+                )
+            ),
+            data=message.payload.serialize(),
+        )
+    )
+
+
+@pytest.mark.parametrize(
+    "node_id,message",
+    [
+        [
+            NodeId.gripper_g,
+            SetBrushedMotorPwmRequest(
+                payload=BrushedMotorPwmPayload(
+                    duty_cycle=UInt32Field(50),
+                )
+            ),
+        ],
+    ],
+)
+async def test_ensure_send_error(
+    subject: CanMessenger,
+    mock_driver: AsyncMock,
+    node_id: NodeId,
+    message: MessageDefinition,
+    incoming_messages: Queue[CanMessage],
+) -> None:
+    """It should create a can message and use the driver to send the message."""
+    error_payload = ErrorMessagePayload(
+        severity=ErrorSeverityField(1),
+        error_code=ErrorCodeField(5),
+    )
+    error_payload.message_index = message.payload.message_index
+
+    incoming_messages.put_nowait(
+        CanMessage(
+            arbitration_id=ArbitrationId(
+                parts=ArbitrationIdParts(
+                    message_id=MessageId.error_message,
+                    node_id=NodeId.host,
+                    function_code=2,
+                    originating_node_id=NodeId.gripper_g,
+                )
+            ),
+            data=error_payload.serialize(),
+        )
+    )
+
+    """It should create a can message and use the driver to send the message and raise no exception."""
+    error, ignore = await asyncio.gather(
+        subject.ensure_send(node_id, message, expected_nodes=[node_id]),
+        subject.__aenter__(),
+    )
+    assert error == 5
+    mock_driver.send.assert_called_once_with(
+        message=CanMessage(
+            arbitration_id=ArbitrationId(
+                parts=ArbitrationIdParts(
+                    message_id=message.message_id,
+                    node_id=node_id,
+                    function_code=0,
+                    originating_node_id=NodeId.host,
+                )
+            ),
+            data=message.payload.serialize(),
+        )
+    )
+
+
+@pytest.mark.parametrize(
+    "node_id,message,response_subnodes",
+    [
+        (
+            NodeId.gripper,
+            ExecuteMoveGroupRequest(
+                payload=ExecuteMoveGroupRequestPayload(
+                    group_id=UInt8Field(0),
+                    start_trigger=UInt8Field(0),
+                    cancel_trigger=UInt8Field(0),
+                )
+            ),
+            [NodeId.gripper_g, NodeId.gripper_z],
+        ),
+        (
+            NodeId.head,
+            ExecuteMoveGroupRequest(
+                payload=ExecuteMoveGroupRequestPayload(
+                    group_id=UInt8Field(0),
+                    start_trigger=UInt8Field(0),
+                    cancel_trigger=UInt8Field(0),
+                )
+            ),
+            [NodeId.head_l, NodeId.head_r],
+        ),
+    ],
+)
+async def test_ensure_send_subnodes(
+    subject: CanMessenger,
+    mock_driver: AsyncMock,
+    node_id: NodeId,
+    message: MessageDefinition,
+    response_subnodes: List[NodeId],
+    incoming_messages: Queue[CanMessage],
+) -> None:
+    """If we send messages to a supernode we should return from ensure_send when all the subnodes respond."""
+    for resp_node in response_subnodes:
+        incoming_messages.put_nowait(
+            CanMessage(
+                arbitration_id=ArbitrationId(
+                    parts=ArbitrationIdParts(
+                        message_id=MessageId.acknowledgement,
+                        node_id=NodeId.host,
+                        function_code=0,
+                        originating_node_id=resp_node,
+                    )
+                ),
+                data=message.payload.message_index.value.to_bytes(4, "big"),
+            )
+        )
+
+    """It should create a can message and use the driver to send the message and raise no exception."""
+    error, ignore = await asyncio.gather(
+        subject.ensure_send(node_id, message, expected_nodes=[node_id]),
+        subject.__aenter__(),
+    )
+    assert error == ErrorCode.ok
+    mock_driver.send.assert_called_once_with(
+        message=CanMessage(
+            arbitration_id=ArbitrationId(
+                parts=ArbitrationIdParts(
+                    message_id=message.message_id,
+                    node_id=node_id,
+                    function_code=0,
+                    originating_node_id=NodeId.host,
+                )
+            ),
+            data=message.payload.serialize(),
+        )
+    )
+
+
+@pytest.mark.parametrize(
+    "node_id,message",
+    [
+        [
+            NodeId.gripper_g,
+            SetBrushedMotorPwmRequest(
+                payload=BrushedMotorPwmPayload(
+                    duty_cycle=UInt32Field(50),
+                )
+            ),
+        ],
+    ],
+)
+async def test_ensure_send_timeout(
+    subject: CanMessenger,
+    mock_driver: AsyncMock,
+    node_id: NodeId,
+    message: MessageDefinition,
+) -> None:
+    """It should create a can message and use the driver to send the message but raise an TimeoutError."""
+    error, ignore = await asyncio.gather(
+        subject.ensure_send(node_id, message, timeout=0.1, expected_nodes=[node_id]),
+        subject.__aenter__(),
+    )
+    assert error == ErrorCode.timeout
+    mock_driver.send.assert_called_once_with(
+        message=CanMessage(
+            arbitration_id=ArbitrationId(
+                parts=ArbitrationIdParts(
+                    message_id=message.message_id,
+                    node_id=node_id,
+                    function_code=0,
+                    originating_node_id=NodeId.host,
+                )
+            ),
+            data=message.payload.serialize(),
+        )
+    )
+
+
+async def test_auto_halt(
+    subject: CanMessenger, mock_driver: AsyncMock, incoming_messages: Queue[CanMessage]
+) -> None:
+    """Test to make sure can messenger broadcasts a stop when a critical error orrcurs."""
+    error_payload = ErrorMessagePayload(
+        severity=ErrorSeverityField(3),
+        error_code=ErrorCodeField(5),
+    )
+    error_payload.message_index = UInt32Field(0)
+
+    incoming_messages.put_nowait(
+        CanMessage(
+            arbitration_id=ArbitrationId(
+                parts=ArbitrationIdParts(
+                    message_id=MessageId.error_message,
+                    node_id=NodeId.host,
+                    function_code=2,
+                    originating_node_id=NodeId.gripper_g,
+                )
+            ),
+            data=error_payload.serialize(),
+        )
+    )
+    await asyncio.gather(subject.__aenter__())
+
+    while not incoming_messages.empty():
+        await asyncio.sleep(0.01)
+
+    mock_driver.send.assert_called_once_with(
+        message=CanMessage(
+            arbitration_id=ArbitrationId(
+                parts=ArbitrationIdParts(
+                    message_id=MessageId.stop_request,
+                    node_id=NodeId.broadcast,
+                    function_code=0,
+                    originating_node_id=NodeId.host,
+                )
+            ),
+            data=(1).to_bytes(4, "big"),
         )
     )
 

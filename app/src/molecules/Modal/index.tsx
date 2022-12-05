@@ -12,10 +12,10 @@ export interface ModalProps extends StyleProps {
   onClose?: React.MouseEventHandler
   closeOnOutsideClick?: boolean
   title?: React.ReactNode
-  footer?: React.ReactNode
   fullPage?: boolean
   childrenPadding?: string | number
   children?: React.ReactNode
+  modalWidth?: string
 }
 
 export const Modal = (props: ModalProps): JSX.Element => {
@@ -26,6 +26,7 @@ export const Modal = (props: ModalProps): JSX.Element => {
     title,
     childrenPadding = `${SPACING.spacing4} ${SPACING.spacing5} ${SPACING.spacing5}`,
     children,
+    modalWidth,
   } = props
 
   const modalHeader = (
@@ -48,7 +49,7 @@ export const Modal = (props: ModalProps): JSX.Element => {
 
   return (
     <ModalShell
-      width="31.25rem"
+      width={modalWidth ?? '31.25rem'}
       header={modalHeader}
       onOutsideClick={closeOnOutsideClick ? onClose : undefined}
       // center within viewport aside from nav

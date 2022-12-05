@@ -11,6 +11,8 @@ from opentrons.protocol_engine import DeckPoint, WellLocation
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
+
 from ..instrument import AbstractInstrument
 from .well import WellCore
 
@@ -265,10 +267,17 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
     def home(self) -> None:
-        raise NotImplementedError("InstrumentCore.home not implemented")
+        z_axis = self._engine_client.state.pipettes.get_z_axis(self._pipette_id)
+        plunger_axis = self._engine_client.state.pipettes.get_plunger_axis(
+            self._pipette_id
+        )
+        self._engine_client.home([z_axis, plunger_axis])
 
     def home_plunger(self) -> None:
-        raise NotImplementedError("InstrumentCore.home_plunger not implemented")
+        plunger_axis = self._engine_client.state.pipettes.get_plunger_axis(
+            self._pipette_id
+        )
+        self._engine_client.home([plunger_axis])
 
     def move_to(
         self,
@@ -278,24 +287,8 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         minimum_z_height: Optional[float],
         speed: Optional[float],
     ) -> None:
-        if speed is not None:
-            raise NotImplementedError(
-                "InstrumentCore.move_to with explicit speed not implemented"
-            )
-
-        if well_core is not None and (
-            force_direct is True or minimum_z_height is not None
-        ):
-            raise NotImplementedError(
-                "InstrumentCore.move_to with well and extra move parameters not implemented"
-            )
 
         if well_core is not None:
-            if force_direct is True or minimum_z_height is not None:
-                raise NotImplementedError(
-                    "InstrumentCore.move_to with well and extra move parameters not implemented"
-                )
-
             labware_id = well_core.labware_id
             well_name = well_core.get_name()
             well_location = (
@@ -311,6 +304,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 labware_id=labware_id,
                 well_name=well_name,
                 well_location=well_location,
+                minimum_z_height=minimum_z_height,
+                force_direct=force_direct,
+                speed=speed,
             )
         else:
             self._engine_client.move_to_coordinates(
@@ -320,6 +316,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 ),
                 minimum_z_height=minimum_z_height,
                 force_direct=force_direct,
+                speed=speed,
             )
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
@@ -335,9 +332,14 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         Will match the load name of the actually loaded pipette,
         which may differ from the requested load name.
         """
-        return self._engine_client.state.pipettes.get(
-            self._pipette_id
-        ).pipetteName.value
+        # TODO (tz, 11-23-22): revert this change when merging
+        # https://opentrons.atlassian.net/browse/RLIQ-251
+        pipette = self._engine_client.state.pipettes.get(self._pipette_id)
+        return (
+            pipette.pipetteName.value
+            if isinstance(pipette.pipetteName, PipetteNameType)
+            else pipette.pipetteName
+        )
 
     def get_model(self) -> str:
         # TODO(mc, 2022-11-11): https://opentrons.atlassian.net/browse/RCORE-382

@@ -1,10 +1,10 @@
 """Movement command handling."""
 from __future__ import annotations
 
-from typing import Dict, Optional, Sequence
+from typing import Dict, Optional, List
 from dataclasses import dataclass
 
-from opentrons.types import Point
+from opentrons.types import Point, Mount
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import (
     CriticalPoint,
@@ -77,6 +77,9 @@ class MovementHandler:
         well_name: str,
         well_location: Optional[WellLocation] = None,
         current_well: Optional[CurrentWell] = None,
+        force_direct: bool = False,
+        minimum_z_height: Optional[float] = None,
+        speed: Optional[float] = None,
     ) -> None:
         """Move to a specific well."""
         await self._tc_movement_flagger.raise_if_labware_in_non_open_thermocycler(
@@ -128,9 +131,13 @@ class MovementHandler:
             origin_cp=origin_cp,
             max_travel_z=max_travel_z,
             current_well=current_well,
+            force_direct=force_direct,
+            minimum_z_height=minimum_z_height,
         )
 
-        speed = self._state_store.pipettes.get_movement_speed(pipette_id=pipette_id)
+        speed = self._state_store.pipettes.get_movement_speed(
+            pipette_id=pipette_id, requested_speed=speed
+        )
 
         # move through the waypoints
         for waypoint in waypoints:
@@ -219,16 +226,28 @@ class MovementHandler:
             position=DeckPoint(x=point.x, y=point.y, z=point.z),
         )
 
-    async def home(self, axes: Optional[Sequence[MotorAxis]]) -> None:
+    async def home(self, axes: Optional[List[MotorAxis]]) -> None:
         """Send the requested axes to their "home" positions.
 
         If axes is `None`, will home all motors.
         """
-        hardware_axes = None
-        if axes is not None:
+        # TODO(mc, 2022-12-01): this is overly complicated
+        # https://opentrons.atlassian.net/browse/RET-1287
+        if axes is None:
+            await self._hardware_api.home()
+        elif axes == [MotorAxis.LEFT_PLUNGER]:
+            await self._hardware_api.home_plunger(Mount.LEFT)
+        elif axes == [MotorAxis.RIGHT_PLUNGER]:
+            await self._hardware_api.home_plunger(Mount.RIGHT)
+        elif axes == [MotorAxis.LEFT_Z, MotorAxis.LEFT_PLUNGER]:
+            await self._hardware_api.home_z(Mount.LEFT)
+            await self._hardware_api.home_plunger(Mount.LEFT)
+        elif axes == [MotorAxis.RIGHT_Z, MotorAxis.RIGHT_PLUNGER]:
+            await self._hardware_api.home_z(Mount.RIGHT)
+            await self._hardware_api.home_plunger(Mount.RIGHT)
+        else:
             hardware_axes = [MOTOR_AXIS_TO_HARDWARE_AXIS[a] for a in axes]
-
-        await self._hardware_api.home(axes=hardware_axes)
+            await self._hardware_api.home(axes=hardware_axes)
 
     async def move_to_coordinates(
         self,
@@ -236,6 +255,7 @@ class MovementHandler:
         deck_coordinates: DeckPoint,
         direct: bool,
         additional_min_travel_z: Optional[float],
+        speed: Optional[float] = None,
     ) -> None:
         """Move pipette to a given deck coordinate."""
         pipette_location = self._state_store.motion.get_pipette_location(
@@ -268,7 +288,9 @@ class MovementHandler:
             additional_min_travel_z=additional_min_travel_z,
         )
 
-        speed = self._state_store.pipettes.get_movement_speed(pipette_id=pipette_id)
+        speed = self._state_store.pipettes.get_movement_speed(
+            pipette_id=pipette_id, requested_speed=speed
+        )
 
         # move through the waypoints
         for waypoint in waypoints:

@@ -1,4 +1,5 @@
 """Utilities for updating the gripper settings."""
+import logging
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.messages import payloads
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
@@ -13,8 +14,10 @@ from opentrons_hardware.firmware_bindings.utils import (
     UInt32Field,
     Int32Field,
 )
-from opentrons_hardware.firmware_bindings.constants import NodeId
+from opentrons_hardware.firmware_bindings.constants import NodeId, ErrorCode
 from .constants import brushed_motor_interrupts_per_sec
+
+log = logging.getLogger(__name__)
 
 
 async def set_reference_voltage(
@@ -22,14 +25,17 @@ async def set_reference_voltage(
     v_ref: float,
 ) -> None:
     """Set gripper brushed motor reference voltage."""
-    await can_messenger.send(
-        node_id=NodeId.gripper,
+    error = await can_messenger.ensure_send(
+        node_id=NodeId.gripper_g,
         message=SetBrushedMotorVrefRequest(
             payload=payloads.BrushedMotorVrefPayload(
                 v_ref=UInt32Field(int(v_ref * (2**16)))
             )
         ),
+        expected_nodes=[NodeId.gripper_g],
     )
+    if error != ErrorCode.ok:
+        log.error(f"recieved error trying to set gripper vref {str(error)}")
 
 
 async def set_pwm_param(
@@ -37,12 +43,15 @@ async def set_pwm_param(
     duty_cycle: int,
 ) -> None:
     """Set gripper brushed motor reference voltage."""
-    await can_messenger.send(
-        node_id=NodeId.gripper,
+    error = await can_messenger.ensure_send(
+        node_id=NodeId.gripper_g,
         message=SetBrushedMotorPwmRequest(
             payload=payloads.BrushedMotorPwmPayload(duty_cycle=UInt32Field(duty_cycle))
         ),
+        expected_nodes=[NodeId.gripper_g],
     )
+    if error != ErrorCode.ok:
+        log.error(f"recieved error trying to set gripper pwm {str(error)}")
 
 
 async def grip(

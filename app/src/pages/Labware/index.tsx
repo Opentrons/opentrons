@@ -70,7 +70,7 @@ const SORT_BY_BUTTON_STYLE = css`
 `
 
 export function Labware(): JSX.Element {
-  const { t } = useTranslation('labware_landing')
+  const { t } = useTranslation(['labware_landing', 'shared'])
 
   const [sortBy, setSortBy] = React.useState<LabwareSort>('alphabetical')
   const [showSortByMenu, setShowSortByMenu] = React.useState<boolean>(false)
@@ -146,7 +146,7 @@ export function Labware(): JSX.Element {
               css={TYPOGRAPHY.pSemiBold}
               color={COLORS.darkGreyEnabled}
             >
-              {t('sort_by')}
+              {t('shared:sort_by')}
             </StyledText>
             <Flex
               flexDirection={DIRECTION_ROW}
@@ -163,7 +163,9 @@ export function Labware(): JSX.Element {
                 paddingY={SPACING.spacing2}
                 data-testid="sortBy-label"
               >
-                {sortBy === 'alphabetical' ? t('alphabetical') : t('reverse')}
+                {sortBy === 'alphabetical'
+                  ? t('shared:alphabetical')
+                  : t('shared:reverse')}
               </StyledText>
               <Icon
                 paddingRight={SPACING.spacing3}
@@ -191,7 +193,7 @@ export function Labware(): JSX.Element {
                   setShowSortByMenu(false)
                 }}
               >
-                {t('alphabetical')}
+                {t('shared:alphabetical')}
               </MenuItem>
               <MenuItem
                 onClick={() => {
@@ -199,7 +201,7 @@ export function Labware(): JSX.Element {
                   setShowSortByMenu(false)
                 }}
               >
-                {t('reverse')}
+                {t('shared:reverse')}
               </MenuItem>
             </Flex>
           )}

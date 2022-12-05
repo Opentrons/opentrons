@@ -139,4 +139,22 @@ describe('shell selectors', () => {
       expect(Selectors.getPathToPythonOverride(state)).toEqual(null)
     })
   })
+
+  describe('getProtocolsStoredSortKey', () => {
+    it('should return ProtocolSort if sortKey is selected', () => {
+      const state: State = {
+        config: {
+          protocols: { protocolsStoredSortKey: 'alphabetical' },
+        },
+      } as any
+      expect(Selectors.getProtocolsStoredSortKey(state)).toEqual('alphabetical')
+    })
+
+    it('should return null if saved value in config is null', () => {
+      const state: State = {
+        config: { protocols: { protocolsStoredSortKey: null } },
+      } as any
+      expect(Selectors.getProtocolsStoredSortKey(state)).toEqual(null)
+    })
+  })
 })

@@ -68,13 +68,20 @@ interface PipetteCardProps {
   pipetteId?: AttachedPipette['id'] | null
   mount: Mount
   robotName: string
+  is96ChannelAttached: boolean
 }
 
 const FETCH_PIPETTE_CAL_MS = 30000
 
 export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const { t } = useTranslation(['device_details', 'protocol_setup'])
-  const { pipetteInfo, mount, robotName, pipetteId } = props
+  const {
+    pipetteInfo,
+    mount,
+    robotName,
+    pipetteId,
+    is96ChannelAttached,
+  } = props
   const {
     menuOverlay,
     handleOverflowClick,
@@ -329,9 +336,11 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               paddingBottom={SPACING.spacing2}
               data-testid={`PipetteCard_mount_${pipetteDisplayName}`}
             >
-              {t('mount', {
-                side: mount === LEFT ? t('left') : t('right'),
-              })}
+              {is96ChannelAttached
+                ? t('both_mounts')
+                : t('mount', {
+                    side: mount === LEFT ? t('left') : t('right'),
+                  })}
             </StyledText>
             <Flex
               paddingBottom={SPACING.spacing2}
@@ -349,7 +358,12 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
         padding={SPACING.spacing2}
         data-testid={`PipetteCard_overflow_btn_${pipetteDisplayName}`}
       >
-        <OverflowBtn aria-label="overflow" onClick={handleOverflowClick} />
+        <OverflowBtn
+          aria-label="overflow"
+          onClick={handleOverflowClick}
+          //  disabling the overflow btn if a 96 channel pipette is attached for now
+          disabled={is96ChannelAttached}
+        />
       </Box>
       {showOverflowMenu && (
         <>

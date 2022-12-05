@@ -148,9 +148,9 @@ class MessageId(int, Enum):
 class ErrorSeverity(int, Enum):
     """Error Severity levels."""
 
-    WARNING = 0x1
-    RECOVERABLE = 0x2
-    UNRECOVERABLE = 0x3
+    warning = 0x1
+    recoverable = 0x2
+    unrecoverable = 0x3
 
 
 @unique
@@ -163,6 +163,10 @@ class ErrorCode(int, Enum):
     invalid_byte_count = 0x03
     invalid_input = 0x04
     hardware = 0x05
+    timeout = 0x06
+    estop_detected = 0x07
+    collision_detected = 0x08
+    labware_dropped = 0x09
 
 
 @unique

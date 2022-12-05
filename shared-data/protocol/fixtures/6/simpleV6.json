@@ -1410,7 +1410,8 @@
           "offset": { "x": 2, "y": 3, "z": 10 }
         },
         "minimumZHeight": 35,
-        "forceDirect": true
+        "forceDirect": true,
+        "speed": 12.3
       }
     },
     {
@@ -1437,7 +1438,8 @@
         "pipetteId": "pipetteId",
         "coordinates": { "x": 0, "y": 0, "z": 0 },
         "minimumZHeight": 35,
-        "forceDirect": true
+        "forceDirect": true,
+        "speed": 12.3
       }
     },
     {

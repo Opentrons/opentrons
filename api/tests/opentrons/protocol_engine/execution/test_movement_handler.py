@@ -154,7 +154,9 @@ async def test_move_to_well(
     )
 
     decoy.when(
-        state_store.pipettes.get_movement_speed(pipette_id="pipette-id")
+        state_store.pipettes.get_movement_speed(
+            pipette_id="pipette-id", requested_speed=45.6
+        )
     ).then_return(39339.5)
 
     decoy.when(
@@ -167,6 +169,8 @@ async def test_move_to_well(
             well_name="B2",
             well_location=well_location,
             current_well=None,
+            force_direct=True,
+            minimum_z_height=12.3,
         )
     ).then_return(
         [Waypoint(Point(1, 2, 3), CriticalPoint.XY_CENTER), Waypoint(Point(4, 5, 6))]
@@ -177,6 +181,9 @@ async def test_move_to_well(
         labware_id="labware-id",
         well_name="B2",
         well_location=well_location,
+        force_direct=True,
+        minimum_z_height=12.3,
+        speed=45.6,
     )
 
     decoy.verify(
@@ -278,11 +285,15 @@ async def test_move_to_well_from_starting_location(
             labware_id="labware-id",
             well_name="B2",
             well_location=well_location,
+            force_direct=False,
+            minimum_z_height=None,
         )
     ).then_return([Waypoint(Point(1, 2, 3), CriticalPoint.XY_CENTER)])
 
     decoy.when(
-        state_store.pipettes.get_movement_speed(pipette_id="pipette-id")
+        state_store.pipettes.get_movement_speed(
+            pipette_id="pipette-id", requested_speed=None
+        )
     ).then_return(39339.5)
 
     await subject.move_to_well(
@@ -591,7 +602,9 @@ async def test_move_to_coordinates(
     ).then_return([planned_waypoint_1, planned_waypoint_2])
 
     decoy.when(
-        state_store.pipettes.get_movement_speed(pipette_id="pipette-id")
+        state_store.pipettes.get_movement_speed(
+            pipette_id="pipette-id", requested_speed=567
+        )
     ).then_return(39339.5)
 
     await subject.move_to_coordinates(
@@ -599,6 +612,7 @@ async def test_move_to_coordinates(
         deck_coordinates=destination_deck,
         direct=True,
         additional_min_travel_z=1234,
+        speed=567,
     )
 
     decoy.verify(
@@ -646,9 +660,54 @@ async def test_home(
         ),
         times=1,
     )
+    decoy.reset()
 
     await subject.home(axes=None)
-    decoy.verify(await hardware_api.home(axes=None), times=1)
+    decoy.verify(await hardware_api.home(), times=1)
+    decoy.reset()
 
     await subject.home(axes=[])
     decoy.verify(await hardware_api.home(axes=[]), times=1)
+
+
+# TODO(mc, 2022-12-01): this is overly complicated
+# https://opentrons.atlassian.net/browse/RET-1287
+async def test_home_z(
+    decoy: Decoy,
+    hardware_api: HardwareAPI,
+    subject: MovementHandler,
+) -> None:
+    """It should home a single Z axis and plunger."""
+    await subject.home(axes=[MotorAxis.LEFT_Z, MotorAxis.LEFT_PLUNGER])
+    decoy.verify(
+        await hardware_api.home_z(Mount.LEFT),
+        await hardware_api.home_plunger(Mount.LEFT),
+    )
+    decoy.reset()
+
+    await subject.home(axes=[MotorAxis.RIGHT_Z, MotorAxis.RIGHT_PLUNGER])
+    decoy.verify(
+        await hardware_api.home_z(Mount.RIGHT),
+        await hardware_api.home_plunger(Mount.RIGHT),
+    )
+    decoy.reset()
+
+    await subject.home(axes=[MotorAxis.LEFT_PLUNGER])
+    decoy.verify(
+        await hardware_api.home_plunger(Mount.LEFT),
+        times=1,
+    )
+    decoy.reset()
+
+    await subject.home(axes=[MotorAxis.RIGHT_PLUNGER])
+    decoy.verify(
+        await hardware_api.home_plunger(Mount.RIGHT),
+        times=1,
+    )
+    decoy.reset()
+
+    await subject.home(axes=[MotorAxis.RIGHT_Z, MotorAxis.LEFT_PLUNGER])
+    decoy.verify(
+        await hardware_api.home([HardwareAxis.A, HardwareAxis.B]),
+        times=1,
+    )

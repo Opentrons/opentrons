@@ -40,6 +40,7 @@ from .core.module import (
     AbstractThermocyclerCore,
     AbstractHeaterShakerCore,
 )
+from .core.engine.protocol import ProtocolCore as ProtocolEngineCore
 
 from . import validation
 from .instrument_context import InstrumentContext
@@ -525,11 +526,17 @@ class ProtocolContext(CommandPublisher):
                              replaced by `instrument_name`.
         """
         instrument_name = validation.ensure_lowercase_name(instrument_name)
-        checked_mount = validation.ensure_mount(mount)
-        checked_instrument_name = validation.ensure_pipette_name(instrument_name)
-        tip_racks = tip_racks or []
-        existing_instrument = self._instruments[checked_mount]
+        is_96_channel = instrument_name == "p1000_96"
+        if is_96_channel and isinstance(self._implementation, ProtocolEngineCore):
+            checked_instrument_name = instrument_name
+            checked_mount = Mount.LEFT
+        else:
+            checked_instrument_name = validation.ensure_pipette_name(instrument_name)
+            checked_mount = validation.ensure_mount(mount)
 
+        tip_racks = tip_racks or []
+
+        existing_instrument = self._instruments[checked_mount]
         if existing_instrument is not None and not replace:
             # TODO(mc, 2022-08-25): create specific exception type
             raise RuntimeError(
@@ -541,8 +548,10 @@ class ProtocolContext(CommandPublisher):
             f"Loading {checked_instrument_name} on {checked_mount.name.lower()} mount"
         )
 
+        # TODO (tz, 11-22-22): was added to support 96 channel pipette.
+        #  Should remove when working on https://opentrons.atlassian.net/browse/RLIQ-255
         instrument_core = self._implementation.load_instrument(
-            instrument_name=checked_instrument_name,
+            instrument_name=checked_instrument_name,  # type: ignore[arg-type]
             mount=checked_mount,
         )
 
@@ -554,9 +563,9 @@ class ProtocolContext(CommandPublisher):
             )
 
         instrument = InstrumentContext(
-            ctx=self,
             broker=self._broker,
             implementation=instrument_core,
+            protocol_core=self._implementation,
             api_version=self._api_version,
             tip_racks=tip_racks,
             trash=self.fixed_trash,
@@ -654,7 +663,6 @@ class ProtocolContext(CommandPublisher):
     @requires_version(2, 0)
     def home(self) -> None:
         """Homes the robot."""
-        logger.debug("home")
         self._implementation.home()
 
     @property

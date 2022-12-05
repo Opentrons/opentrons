@@ -25,9 +25,6 @@
   "cannot-run-python-missing-labware": "Robots cannot run Python protocols with missing labware definitions.",
   "cancel": "cancel",
   "yes_delete_def": "Yes, delete definition",
-  "sort_by": "Sort by",
-  "alphabetical": "Alphabetical",
-  "reverse": "Reverse alphabetical",
   "category": "Category",
   "copied": "Copied!"
 }

@@ -7,7 +7,7 @@ from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.types import MountType, Mount as HwMount
 
 from .. import errors
-from ..types import LoadedPipette
+from ..types import LoadedPipette, MotorAxis
 
 from ..commands import (
     Command,
@@ -273,6 +273,22 @@ class PipetteView(HasState[PipetteState]):
         """Get the tiprack ids of attached tip by pipette ids."""
         return self._state.attached_tip_labware_by_id
 
-    def get_movement_speed(self, pipette_id: str) -> Optional[float]:
-        """Return the given pipette's current movement speed."""
-        return self._state.movement_speed_by_id[pipette_id]
+    def get_movement_speed(
+        self, pipette_id: str, requested_speed: Optional[float] = None
+    ) -> Optional[float]:
+        """Return the given pipette's requested or current movement speed."""
+        return requested_speed or self._state.movement_speed_by_id[pipette_id]
+
+    def get_z_axis(self, pipette_id: str) -> MotorAxis:
+        """Get the MotorAxis representing this pipette's Z stage."""
+        mount = self.get(pipette_id).mount
+        return MotorAxis.LEFT_Z if mount == MountType.LEFT else MotorAxis.RIGHT_Z
+
+    def get_plunger_axis(self, pipette_id: str) -> MotorAxis:
+        """Get the MotorAxis representing this pipette's plunger."""
+        mount = self.get(pipette_id).mount
+        return (
+            MotorAxis.LEFT_PLUNGER
+            if mount == MountType.LEFT
+            else MotorAxis.RIGHT_PLUNGER
+        )

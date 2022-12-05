@@ -26,7 +26,7 @@ import type { State, Dispatch } from '../../redux/types'
 
 const LIST_REFRESH_MS = 10000
 
-export function SelectNetwork(): JSX.Element {
+export function SelectWifiNetwork(): JSX.Element {
   const [isSearching, setIsSearching] = React.useState<boolean>(false)
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'

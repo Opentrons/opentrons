@@ -54,5 +54,8 @@
   "remember_my_selection_and_do_not_ask_again": "Remember my selection and don't ask again",
   "you_will_need": "You will need:",
   "get_started": "Get started",
-  "back": "Back"
+  "back": "Back",
+  "sort_by": "Sort by",
+  "alphabetical": "Alphabetical",
+  "reverse": "Reverse alphabetical"
 }

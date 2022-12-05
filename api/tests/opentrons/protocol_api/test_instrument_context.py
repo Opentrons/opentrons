@@ -12,13 +12,12 @@ from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import Clearances
 from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
-    ProtocolContext,
     InstrumentContext,
     Labware,
     Well,
     labware,
 )
-from opentrons.protocol_api.core.common import InstrumentCore
+from opentrons.protocol_api.core.common import InstrumentCore, ProtocolCore
 from opentrons.types import Location, Mount, Point
 
 
@@ -47,11 +46,10 @@ def mock_instrument_core(decoy: Decoy) -> InstrumentCore:
     return instrument_core
 
 
-# TODO(mc, 2022-10-25): this will be replaced by a protocol core, instead
 @pytest.fixture
-def mock_protocol_context(decoy: Decoy) -> ProtocolContext:
-    """Get a mock ProtocolContext."""
-    return decoy.mock(cls=ProtocolContext)
+def mock_protocol_core(decoy: Decoy) -> ProtocolCore:
+    """Get a mock ProtocolCore."""
+    return decoy.mock(cls=ProtocolCore)
 
 
 @pytest.fixture
@@ -75,15 +73,15 @@ def api_version() -> APIVersion:
 @pytest.fixture
 def subject(
     mock_instrument_core: InstrumentCore,
-    mock_protocol_context: ProtocolContext,
+    mock_protocol_core: ProtocolCore,
     mock_broker: Broker,
     mock_trash: Labware,
     api_version: APIVersion,
 ) -> InstrumentContext:
-    """Get a ProtocolContext test subject with its dependencies mocked out."""
+    """Get a ProtocolCore test subject with its dependencies mocked out."""
     return InstrumentContext(
         implementation=mock_instrument_core,
-        ctx=mock_protocol_context,
+        protocol_core=mock_protocol_core,
         broker=mock_broker,
         api_version=api_version,
         tip_racks=[],
@@ -272,14 +270,14 @@ def test_blow_out_to_location(
 def test_blow_out_in_place(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
-    mock_protocol_context: ProtocolContext,
+    mock_protocol_core: ProtocolCore,
     subject: InstrumentContext,
 ) -> None:
     """It should blow out in place."""
     mock_well = decoy.mock(cls=Well)
     location = Location(point=Point(1, 2, 3), labware=mock_well)
 
-    decoy.when(mock_protocol_context.location_cache).then_return(location)
+    decoy.when(mock_protocol_core.get_last_location()).then_return(location)
 
     subject.blow_out()
 
@@ -295,12 +293,11 @@ def test_blow_out_in_place(
 
 def test_blow_out_no_location_cache_raises(
     decoy: Decoy,
-    mock_instrument_core: InstrumentCore,
-    mock_protocol_context: ProtocolContext,
+    mock_protocol_core: ProtocolCore,
     subject: InstrumentContext,
 ) -> None:
     """It should raise if no location or well is provided and the location cache returns None."""
-    decoy.when(mock_protocol_context.location_cache).then_return(None)
+    decoy.when(mock_protocol_core.get_last_location()).then_return(None)
 
     with pytest.raises(RuntimeError):
         subject.blow_out()
@@ -554,10 +551,10 @@ def test_dispense_with_no_location(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
     subject: InstrumentContext,
-    mock_protocol_context: ProtocolContext,
+    mock_protocol_core: ProtocolCore,
 ) -> None:
     """It should dispense to a well."""
-    decoy.when(mock_protocol_context.location_cache).then_return(
+    decoy.when(mock_protocol_core.get_last_location()).then_return(
         Location(point=Point(1, 2, 3), labware=None)
     )
 

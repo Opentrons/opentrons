@@ -63,7 +63,10 @@ Some modules were added to the Protocol API later than others, and some modules 
    | GEN2               |                               |                     |
    +--------------------+-------------------------------+---------------------+
    | Thermocycler       | ``thermocycler module``       | 2.0                 |
-   | Module             | or ``thermocycler``           |                     |
+   | Module GEN1        | or ``thermocycler``           |                     |
+   +--------------------+-------------------------------+---------------------+
+   | Thermocycler       | ``thermocycler module gen2``  | 2.14                |
+   | Module GEN2        | or ``thermocyclerModuleV2``   |                     |
    +--------------------+-------------------------------+---------------------+
    | Heater-Shaker      | ``heaterShakerModuleV1``      | 2.13                |
    | Module             |                               |                     |
@@ -319,7 +322,7 @@ Changes with the GEN2 Magnetic Module
 The GEN2 Magnetic Module uses smaller magnets than the GEN1 version.
 This mitigates an issue where beads would be attracted even when the magnets were retracted.
 
-This means it will take longer for the GEN2 module to attract beads.
+This means it will take longer for the GEN2 module to attract beads. If you need additional strength for your application, use the available `Adapter Magnets <https://support.opentrons.com/s/article/Adapter-magnets>`_.
 
 Recommended Magnetic Module GEN2 bead attraction time:
     - Total liquid volume <= 50 uL: 5 minutes
@@ -333,266 +336,159 @@ Using a Thermocycler Module
 ***************************
 
 
-The Thermocycler Module allows users to perform complete experiments that require temperature sensitive reactions such as PCR.
+The Thermocycler Module provides on-deck, fully automated thermocycling and can heat and cool very quickly during operation. The module's block can heat and cool between 4 °C and 99 °C, and the module's lid can heat up to 110 °C.
 
-There are two heating mechanisms in the Thermocycler. One is the block in which samples are located; the other is the lid heating pad.
+The Thermocycler is represented in code by a :py:class:`.ThermocyclerContext` object, which has methods for controlling the lid, controlling the block, and setting *profiles* — timed heating and cooling routines that can be automatically repeated. 
 
-The block can control its temperature between 4 °C and 99 °C to the nearest 1 °C.
-
-The lid can control its temperature between 37 °C to 110 °C. Please see our `support article <https://support.opentrons.com/en/articles/3469797-thermocycler-module>`_ on controlling the Thermocycler in the Opentrons App.
-
-For the purposes of this section, assume we have the following already:
+The examples in this section will use a Thermocycler loaded as follows:
 
 .. code-block:: python
     :substitutions:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata = {'apiLevel': '2.14'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        tc_mod = protocol.load_module('Thermocycler Module')
+        tc_mod = protocol.load_module('thermocyclerModuleV2')
         plate = tc_mod.load_labware('nest_96_wellplate_100ul_pcr_full_skirt')
+        
+The ``location`` parameter of :py:meth:`.load_module` isn't required for the Thermocycler, since it only has one valid deck location, which covers slots 7, 8, 10, and 11. Attempting to load any other modules or labware in these four slots will raise a ``DeckConflictError``. 
 
 .. note::
 
-    When loading the Thermocycler, it is not necessary to specify a slot.
-    This is because the Thermocycler has a default position that covers Slots 7, 8, 10, and 11.
-    This is the only valid location for the Thermocycler on the OT-2 deck.
+    If you want to specify a slot for the Thermocycler (for parallelism with other ``load_module()`` calls in your protocol), you can do so: the only accepted value is ``7``.
 
 .. versionadded:: 2.0
+.. versionchanged:: 2.14
+   Added support for Thermocycler Module GEN2.
 
-Lid Motor Control
-=================
 
-The Thermocycler can control its temperature with the lid open or closed. When the lid of the Thermocycler is open, the pipettes can access the loaded labware. You can control the lid position with the methods below.
+Lid Control
+===========
 
-Open Lid
---------
+The Thermocycler can control the position and temperature of its lid. 
+
+To change the lid position, use :py:meth:`~.ThermocyclerContext.open_lid` and :py:meth:`~.ThermocyclerContext.close_lid`. When the lid is open, the pipettes can access the loaded labware. 
+
+You can also control the temperature of the lid. Acceptable target temperatures are between 37 and 110 °C. Use :py:meth:`~.ThermocyclerContext.set_lid_temperature`, which takes one parameter: the target ``temperature`` (in degrees Celsius) as an integer. For example, to set the lid to 50 °C:
 
 .. code-block:: python
 
-    tc_mod.open_lid()
+    tc_mod.set_lid_temperature(50)
 
+The protocol will only proceed once the lid temperature reaches 50 °C. This is the case whether the previous temperature was lower than 50 °C (in which case the lid will actively heat) or higher than 50 °C (in which case the lid will passively cool).
 
-.. versionadded:: 2.0
+You can turn off the lid heater at any time with :py:meth:`~.ThermocyclerContext.deactivate_lid`.
 
-Close Lid
----------
+.. note::
 
-.. code-block:: python
-
-    tc_mod.close_lid()
+    Lid temperature is not affected by Thermocycler profiles. Therefore you should set an appropriate lid temperature to hold during your profile *before* executing it. See :ref:`thermocycler-profiles` for more information on defining and executing profiles.
 
 .. versionadded:: 2.0
 
-Lid Temperature Control
-=======================
+Block Control
+=============
 
-You can control when a lid temperature is set. It is recommended that you set
-the lid temperature before executing a Thermocycler profile (see :ref:`thermocycler-profiles`). The range of the Thermocycler lid is
-37 °C to 110 °C.
-
-Set Lid Temperature
--------------------
-
-:py:meth:`.ThermocyclerContext.set_lid_temperature` takes one parameter: the ``temperature`` you wish the lid to be set to. The protocol will only proceed once the lid temperature has been reached.
-
-.. code-block:: python
-
-    tc_mod.set_lid_temperature(temperature)
-
-.. versionadded:: 2.0
-
-Block Temperature Control
-=========================
-
-To set the block temperature inside the Thermocycler, you can use the method :py:meth:`.ThermocyclerContext.set_block_temperature`. It takes five parameters:
-``temperature``, ``hold_time_seconds``, ``hold_time_minutes``, ``ramp_rate`` and ``block_max_volume``. Only ``temperature`` is required; the two ``hold_time`` parameters, ``ramp_rate``, and ``block_max_volume`` are optional.
-
+The Thermocycler can control its block temperature, including holding at a temperature and adjusting for the volume of liquid held in its loaded plate.
 
 Temperature
 -----------
 
-If you only specify a ``temperature`` in °C, the Thermocycler will hold this temperature indefinitely until powered off.
+To set the block temperature inside the Thermocycler, use :py:meth:`~.ThermocyclerContext.set_block_temperature`. At minimum you have to specify a ``temperature`` in degrees Celsius:
 
 .. code-block:: python
 
-        tc_mod.set_block_temperature(4)
+        tc_mod.set_block_temperature(temperature=4)
+        
+If you don't specify any other parameters, the Thermocycler will hold this temperature until a new temperature is set, :py:meth:`~.ThermocyclerContext.deactivate_block` is called, or the module is powered off.
 
 .. versionadded:: 2.0
 
 Hold Time
 ---------
 
-If you set a ``temperature`` and a ``hold_time``, the Thermocycler will hold the temperature for the specified amount of time. Time can be passed in as minutes or seconds.
-
-With a hold time, it is important to also include the ``block_max_volume`` parameter. This is to ensure that the sample reaches the target temperature before the hold time counts down.
-
-In the example below, the Thermocycler will hold the 50 µl samples at the specified temperature for 45 minutes and 15 seconds.
-
-If you do not specify a hold time the protocol will proceed once the temperature specified is reached.
+You can optionally instruct the Thermocycler to hold its block temperature for a specific amount of time. You can specify ``hold_time_minutes``, ``hold_time_seconds``, or both (in which case they will be added together). For example, this will set the block to 4 °C for 4 minutes and 15 seconds:
 
 .. code-block:: python
 
-        tc_mod.set_block_temperature(4, hold_time_seconds=15, hold_time_minutes=45, block_max_volume=50)
+        tc_mod.set_block_temperature(temperature=4, hold_time_minutes=4,
+                                     hold_time_seconds=15)
+
+.. note ::
+
+    Your protocol will not proceed to further commands while holding at a temperature. If you don't specify a hold time, the protocol will proceed as soon as the target temperature is reached.
 
 .. versionadded:: 2.0
 
 Block Max Volume
 ----------------
 
-The Thermocycler's block temperature controller varies its behavior based on the amount of liquid in the wells of its labware. Specifying an accurate volume allows the Thermocycler to precisely track the temperature of the samples. The ``block_max_volume`` parameter is specified in µL and is the volume of the most-full well in the labware that is loaded on the Thermocycler's block. If not specified, it defaults to 25 µL.
+The Thermocycler's block temperature controller varies its behavior based on the amount of liquid in the wells of its labware. Accurately specifying the liquid volume allows the Thermocycler to more precisely control the temperature of the samples. You should set the ``block_max_volume`` parameter to the amount of liquid in the *fullest* well, measured in µL. If not specified, the Thermocycler will assume samples of 25 µL.
+
+It is especially important to specify ``block_max_volume`` when holding at a temperature. For example, say you want to hold larger samples at a temperature for a short time:
 
 .. code-block:: python
 
-        tc_mod.set_block_temperature(4, hold_time_seconds=20, block_max_volume=80)
+        tc_mod.set_block_temperature(temperature=4, hold_time_seconds=20,
+                                     block_max_volume=80)
 
-
-.. versionadded:: 2.0
-
-Ramp Rate
----------
-
-Lastly, you can modify the ``ramp_rate`` in °C/sec for a given ``temperature``.
-
-.. code-block:: python
-
-        tc_mod.set_block_temperature(4, hold_time_seconds=60, ramp_rate=0.5)
-
-.. warning::
-
-  Do not modify the ``ramp_rate`` unless you know what you're doing.
+If the Thermocycler assumes these samples are 25 µL, it may not cool them to 4 °C before starting the 20-second timer. In fact, with such a short hold time they may not reach 4 °C at all!
 
 .. versionadded:: 2.0
+
 
 .. _thermocycler-profiles:
 
 Thermocycler Profiles
 =====================
 
-The Thermocycler can rapidly cycle through temperatures to execute heat-sensitive reactions. These cycles are defined as profiles.
+In addition to executing individual temperature commands, the Thermocycler can automatically cycle through a sequence of block temperatures to perform heat-sensitive reactions. These sequences are called *profiles*, which are defined in the Protocol API as lists of dicts. Each dict should have a ``temperature`` key, which specifies the temperature of the step, and either or both of ``hold_time_seconds`` and ``hold_time_minutes``, which specify the duration of the step. 
 
-
-Thermocycler profiles are defined for the Protocol API as lists of dicts. Each dict should have a ``temperature`` key, which specifies the temperature of a profile step, and either or both of ``hold_time_seconds`` or ``hold_time_minutes``, which specify the duration of the step. For instance, this profile commands the Thermocycler to drive its temperature to 10 °C for 30 seconds, and then 60 °C for 45 seconds:
-
+For example, this profile commands the Thermocycler to reach 10 °C and hold for 30 seconds, and then to reach 60 °C and hold for 45 seconds:
 
 .. code-block:: python
 
         profile = [
-          {'temperature': 10, 'hold_time_seconds': 30},
-          {'temperature': 60, 'hold_time_seconds': 45}]
+            {'temperature': 10, 'hold_time_seconds': 30},
+            {'temperature': 60, 'hold_time_seconds': 45}
+        ]
 
-Once you have written your profile, you command the Thermocycler to execute it using :py:meth:`.ThermocyclerContext.execute_profile`. This function executes your profile steps multiple times depending on the ``repetitions`` parameter. It also takes a ``block_max_volume`` parameter, which is the same as that of the :py:meth:`.ThermocyclerContext.set_block_temperature` function.
+Once you have written the steps of your profile, execute it with :py:meth:`~.ThermocyclerContext.execute_profile`. This function executes your profile steps multiple times depending on the ``repetitions`` parameter. It also takes a ``block_max_volume`` parameter, which is the same as that of the :py:meth:`~.ThermocyclerContext.set_block_temperature` function.
 
-For instance, you can execute the profile defined above 100 times for a 30 µL-per-well volume like this:
+For instance, a PCR prep protocol might define and execute a profile like this:
 
 .. code-block:: python
 
         profile = [
-          {'temperature': 10, 'hold_time_seconds': 30},
-          {'temperature': 60, 'hold_time_seconds': 30}]
+            {'temperature': 95, 'hold_time_seconds': 30},
+            {'temperature': 57, 'hold_time_seconds': 30},
+            {'temperature': 72, 'hold_time_seconds': 60}
+        ]
+        tc_mod.execute_profile(steps=profile, repetitions=20, block_max_volume=32)
 
-        tc_mod.execute_profile(steps=profile, repetitions=100, block_max_volume=30)
+In terms of the actions that the Thermocycler performs, this would be equivalent to nesting ``set_block_temperature`` commands in a ``for`` loop:
 
+.. code-block:: python
+
+        for i in range(20):
+            tc_mod.set_block_temperature(95, hold_time_seconds=30, block_max_volume=32)
+            tc_mod.set_block_temperature(57, hold_time_seconds=30, block_max_volume=32)
+            tc_mod.set_block_temperature(72, hold_time_seconds=60, block_max_volume=32)
+            
+However, this code would generate 60 lines in the protocol's run log, while executing a profile is summarized in a single line. Additionally, you can set a profile once and execute it multiple times (with different numbers of repetitions and maximum volumes, if needed).
 
 .. note::
 
-    Temperature profiles only control the temperature of the `block` in the Thermocycler. You should set a lid temperature before executing the profile using :py:meth:`.ThermocyclerContext.set_lid_temperature`.
+    Temperature profiles only control the temperature of the `block` in the Thermocycler. You should set a lid temperature before executing the profile using :py:meth:`~.ThermocyclerContext.set_lid_temperature`.
 
 .. versionadded:: 2.0
 
-Thermocycler Status
-===================
 
-Throughout your protocol, you may want particular information on the current status of your Thermocycler. Below are
-a few methods that allow you to do that.
+Changes with the GEN2 Thermocycler Module
+=========================================
 
-Basic Status
-------------
-
-..
-    TODO(mm, 2021-09-30): We should be able to cross-reference to ThermocyclerContext.status, but it appears to not actually exist?
-
-The ``ThermocyclerContext.status`` property is one of the strings ``‘holding at target’``, ``‘cooling’``, ``‘heating’``, or ``‘idle’``.
-
-.. code-block:: python
-
-    tc_mod.status
-
-.. versionadded:: 2.0
-
-Lid Position
-------------
-
-The current status of the lid position. It can be one of the strings ``'open'``, ``'closed'`` or ``'in_between'``.
-
-.. code-block:: python
-
-    tc_mod.lid_position
-
-.. versionadded:: 2.0
-
-Heated Lid Temperature Status
------------------------------
-
-The current status of the heated lid temperature controller. It can be one of the strings ``'holding at target'``, ``'heating'``, ``'idle'``,  or ``'error'``.
-
-.. code-block:: python
-
-    tc_mod.lid_temperature_status
-
-.. versionadded:: 2.0
-
-Block Temperature Status
-------------------------
-
-The current status of the well block temperature controller. It can be one of the strings ``'holding at target'``, ``'cooling'``, ``'heating'``, ``'idle'``, or ``'error'``.
-
-.. code-block:: python
-
-    tc_mod.block_temperature_status
-
-.. versionadded:: 2.0
-
-.. _thermocycler-deactivation:
-
-Thermocycler Deactivate
-=======================
-
-At some points in your protocol, you may want to deactivate specific temperature controllers of your Thermocycler. This can be done with three methods,
-:py:meth:`.ThermocyclerContext.deactivate`, :py:meth:`.ThermocyclerContext.deactivate_lid`, :py:meth:`.ThermocyclerContext.deactivate_block`.
-
-Deactivate
-----------
-
-This deactivates both the well block and the heated lid of the Thermocycler.
-
-.. code-block:: python
-
-  tc_mod.deactivate()
-
-Deactivate Lid
---------------
-
-This deactivates only the heated lid of the Thermocycler.
-
-.. code-block:: python
-
-  tc_mod.deactivate_lid()
-
-.. versionadded:: 2.0
-
-Deactivate Block
-----------------
-
-This deactivates only the well block of the Thermocycler.
-
-.. code-block:: python
-
-  tc_mod.deactivate_block()
-
-.. versionadded:: 2.0
+All methods of :py:class:`.ThermocyclerContext` work with both the GEN1 and GEN2 Thermocycler. One practical difference is that the GEN2 module has a plate lift feature to make it easier to remove the plate manually or with a robotic gripper. To activate the plate lift, press the button on the Thermocycler for three seconds while the lid is open. If you need to do this in the middle of a run, call :py:meth:`~.ProtocolContext.pause`, lift and move the plate, and then resume the run from the Opentrons App.
 
 
 .. _heater-shaker-module:

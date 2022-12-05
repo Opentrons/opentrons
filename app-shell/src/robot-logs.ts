@@ -24,6 +24,7 @@ export function registerRobotLogs(
             return download(mainWindow, url, {
               saveAs: true,
               openFolderWhenDone: index === logUrls.length - 1,
+              onCancel: () => dispatch({ type: 'shell:DOWNLOAD_LOGS_DONE' }),
             })
           })
         }, Promise.resolve())
