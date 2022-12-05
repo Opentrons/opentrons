@@ -7,7 +7,7 @@ from opentrons.hardware_control.util import plan_arc
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.protocol_api import labware
 from opentrons.protocols.geometry import planning
-from opentrons.protocols.geometry.deck import Deck
+from opentrons.protocol_api.core.protocol_api.deck import Deck
 from opentrons.calibration_storage import (
     helpers,
     create_tip_length_data,

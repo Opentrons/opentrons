@@ -22,7 +22,7 @@ from opentrons.calibration_storage.types import (
 )
 from opentrons.hardware_control import HardwareControlAPI, CriticalPoint, Pipette
 from opentrons.protocol_api import labware
-from opentrons.protocols.geometry.deck import Deck
+from opentrons.protocol_api.core.protocol_api.deck import Deck
 from opentrons.types import Mount, Point, Location
 from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models.command_definitions import CalibrationCommand

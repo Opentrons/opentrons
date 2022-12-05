@@ -4,7 +4,7 @@ opentrons_shared_data.deck.dev_types: types for deck defs
 This should only be imported if typing.TYPE_CHECKING is True
 """
 
-from typing import Any, Dict, List, NewType, Union
+from typing import Any, Dict, List, NewType, Tuple, Union
 from typing_extensions import Literal, TypedDict
 
 from ..module.dev_types import ModuleType
@@ -37,7 +37,7 @@ class BoundingBox(TypedDict):
 
 class SlotDefV3(TypedDict, total=False):
     id: str
-    position: List[float]
+    position: Tuple[float, float, float]
     boundingBox: BoundingBox
     displayName: str
     compatibleModuleTypes: List[ModuleType]
@@ -46,7 +46,7 @@ class SlotDefV3(TypedDict, total=False):
 
 class CalibrationPoint(TypedDict):
     id: str
-    position: List[float]
+    position: Tuple[float, float, float]
     displayName: str
 
 
@@ -70,7 +70,7 @@ class FixedLabwareByPosition(TypedDict):
     id: str
     displayName: str
     labware: str
-    position: List[float]
+    position: Tuple[float, float, float]
 
 
 class FixedVolumeBySlot(TypedDict):
@@ -84,7 +84,7 @@ class FixedVolumeByPosition(TypedDict):
     id: str
     displayName: str
     boundingBox: BoundingBox
-    position: List[float]
+    position: Tuple[float, float, float]
 
 
 Fixture = Union[
@@ -101,8 +101,8 @@ class LocationsV3(TypedDict):
 class DeckDefinitionV3(TypedDict):
     otId: str
     schemaVersion: Literal[3]
-    cornerOffsetFromOrigin: List[float]
-    dimensions: List[float]
+    cornerOffsetFromOrigin: Tuple[float, float, float]
+    dimensions: Tuple[float, float, float]
     metadata: Metadata
     robot: Robot
     locations: LocationsV3

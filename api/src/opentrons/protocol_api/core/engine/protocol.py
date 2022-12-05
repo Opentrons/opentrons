@@ -16,8 +16,6 @@ from opentrons.hardware_control.modules.types import (
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.geometry.deck import Deck
-from opentrons.protocols.geometry.deck_item import DeckItem
 
 from opentrons.protocol_engine import (
     DeckSlotLocation,
@@ -275,11 +273,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         """Move all axes to their home positions."""
         self._engine_client.home(axes=None)
 
-    def get_deck(self) -> Deck:
-        """Get an interface to get and modify the deck layout."""
-        raise NotImplementedError("ProtocolCore.get_deck not implemented")
-
-    def get_fixed_trash(self) -> DeckItem:
+    def get_fixed_trash(self) -> LabwareCore:
         """Get the fixed trash labware."""
         return self._fixed_trash_core
 
