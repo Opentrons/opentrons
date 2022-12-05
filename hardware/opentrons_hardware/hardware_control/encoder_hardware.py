@@ -65,7 +65,6 @@ async def get_encoder_position(messenger: CanMessenger, nodes: Set[NodeId]):
         # print(responses)
         for ax in responses.keys():
             encoder_positions[ax] = responses[ax].value/1000.0
-            print(f"{encoder_positions}")
         messenger.remove_listener(listener)
     except asyncio.TimeoutError:
         log.error("encoder request timed out before expected nodes responded")
