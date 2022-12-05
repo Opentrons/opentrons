@@ -85,7 +85,10 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         # TODO (lc 12-2-2022) change to pipette type
         # think about how to make this backcompat
         self._pipette_type = self._config.pipette_type
-        self._name = self._config.pipette_type
+        self._name = ot3_pipette_config.PipetteNameType(
+            pipette_type=config.pipette_type,
+            pipette_channels=config.channels,
+            pipette_generation=config.display_category)
         # TODO (lc 12-2-2022) change to pipette version
         self._model = self._config.model
         self._nozzle_offset = self._config.nozzle_offset

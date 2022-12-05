@@ -33,6 +33,12 @@ class PipetteModelType(Enum):
     p1000 = "p1000"
 
 
+class PipetteGenerationType(Enum):
+    GEN1 = "GEN1"
+    GEN2 = "GEN2"
+    GEN3 = "GEN3"
+
+
 @dataclass(frozen=True)
 class PipetteVersionType:
     major: PipetteModelMajorVersion
@@ -89,10 +95,10 @@ class PlungerPositions(BaseModel):
         ...,
         description="The plunger position that describes min available volume of a pipette in mm.",
     )
-    blowout: float = Field(
+    blow_out: float = Field(
         ..., description="The plunger position past 0 volume to blow out liquid."
     )
-    drop: float = Field(..., description="The plunger position used to drop tips.")
+    drop_tip: float = Field(..., description="The plunger position used to drop tips.")
 
 
 class TipHandlingConfigurations(BaseModel):
@@ -181,6 +187,12 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
     @validator("channels", pre=True)
     def convert_channels(cls, v: int) -> PipetteChannelType:
         return PipetteChannelType(v)
+
+    @validator("display_category", pre=True)
+    def convert_display_category(cls, v: str) -> PipetteGenerationType:
+        if not v:
+            return PipetteGenerationType.GEN1
+        return PipetteGenerationType(v)
 
 
 class PipetteGeometryDefinition(BaseModel):
