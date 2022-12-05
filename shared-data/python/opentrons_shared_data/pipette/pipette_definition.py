@@ -27,10 +27,10 @@ class PipetteChannelType(Enum):
     def as_int(self) -> int:
         return self.value
 
-    def __repr__(self) -> str:
-        if self == self.NINETY_SIX_CHANNEL.value:
+    def __str__(self) -> str:
+        if self == self.NINETY_SIX_CHANNEL:
             return "96"
-        elif self == self.EIGHT_CHANNEL.value:
+        elif self == self.EIGHT_CHANNEL:
             return "multi"
         else:
             return "single"
@@ -58,7 +58,7 @@ class PipetteVersionType:
         minor = cast(PipetteModelMinorVersion, int(round((version % 1), 2) * 10))
         return cls(major=major, minor=minor)
 
-    def __repr__(self) -> str:
+    def __str__(self) -> str:
         return f"{self.major}.{self.minor}"
 
     @property

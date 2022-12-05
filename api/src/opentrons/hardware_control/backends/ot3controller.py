@@ -784,6 +784,8 @@ class OT3Controller:
         self._present_nodes = self._replace_gripper_node(
             self._replace_head_node(present)
         )
+        log.info(f"The present nodes are now {self._present_nodes}")
+
 
     def _axis_is_present(self, axis: OT3Axis) -> bool:
         try:

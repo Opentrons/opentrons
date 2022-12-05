@@ -20,7 +20,7 @@ class PipetteNameType:
     pipette_generation: PipetteGenerationType
 
     def __repr__(self) -> str:
-        base_name = f"{self.pipette_type}_{self.pipette_channels}"
+        base_name = f"{self.pipette_type.name}_{self.pipette_channels}"
         if self.pipette_generation == PipetteGenerationType.GEN1:
             return base_name
         elif self.pipette_channels == PipetteChannelType.NINETY_SIX_CHANNEL:
@@ -35,7 +35,7 @@ class PipetteModelVersionType:
     pipette_version: PipetteVersionType
 
     def __repr__(self) -> str:
-        base_name = f"{self.pipette_type}_{self.pipette_channels}"
+        base_name = f"{self.pipette_type.name}_{self.pipette_channels}"
 
         return f"{base_name}_v{self.pipette_version}"
 

@@ -749,6 +749,9 @@ class PipetteHandlerProvider:
             _remove_tips,
         )
 
+    def has_pipette(self, mount: OT3Mount) -> bool:
+        return bool(self._attached_instruments[mount])
+
     def get_pipette(self, mount: OT3Mount) -> Pipette:
         pip = self._attached_instruments[mount]
         if not pip:

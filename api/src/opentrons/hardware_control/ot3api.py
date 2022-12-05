@@ -405,9 +405,9 @@ class OT3API(
         self
     ) -> GantryLoad:
         """Compute the gantry load based on attached instruments."""
-        left = self._pipette_handler.get_pipette(OT3Mount.LEFT)
-        right = self._pipette_handler.get_pipette(OT3Mount.RIGHT)
-        gripper = self._gripper_handler.get_gripper()
+        left = self._pipette_handler.has_pipette(OT3Mount.LEFT)
+        right = self._pipette_handler.has_pipette(OT3Mount.RIGHT)
+        gripper = self._gripper_handler.has_gripper()
         if left and right:
             # Only low-throughputs can have the two-instrument case
             return GantryLoad.TWO_LOW_THROUGHPUT
@@ -418,7 +418,8 @@ class OT3API(
             # as good a measure as any to define low vs high throughput, though
             # we'll want to touch this up as we get pipette definitions for HT
             # pipettes
-            if left["channels"].as_int <= 8:
+            left_hw_pipette = self._pipette_handler.get_pipette(OT3Mount.LEFT)
+            if left_hw_pipette.config.channels.as_int <= 8:
                 return GantryLoad.LOW_THROUGHPUT
             else:
                 return GantryLoad.HIGH_THROUGHPUT
@@ -594,6 +595,7 @@ class OT3API(
             target_pos = target_position_from_plunger(
                 checked_mount, instr.plunger_positions.bottom, self._current_position
             )
+            self._log.info("Attempting to move the plunger to bottom.")
             await self._move(target_pos, acquire_lock=False, home_flagged_axes=False)
             await self.current_position_ot3(mount=checked_mount, refresh=True)
 
@@ -918,6 +920,7 @@ class OT3API(
             checked_axes = [OT3Axis.from_axis(ax) for ax in axes]
         else:
             checked_axes = [ax for ax in OT3Axis]
+        self._log.info(f"Homing {axes}")
         async with self._motion_lock:
             try:
                 await self._backend.home(checked_axes)
