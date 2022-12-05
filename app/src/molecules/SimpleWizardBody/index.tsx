@@ -6,7 +6,6 @@ import {
   Icon,
   JUSTIFY_FLEX_END,
   SPACING,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 

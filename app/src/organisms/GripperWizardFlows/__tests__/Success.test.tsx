@@ -10,7 +10,6 @@ import {
   SUCCESSFULLY_CALIBRATED,
   SUCCESSFULLY_DETACHED,
 } from '../constants'
-import { getByRole } from '@testing-library/react'
 
 describe('Success', () => {
   let render: (

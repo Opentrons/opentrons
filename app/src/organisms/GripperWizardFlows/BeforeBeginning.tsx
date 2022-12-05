@@ -53,10 +53,10 @@ export const BeforeBeginning = (
     createRun,
     flowType,
     attachedGripper,
-    chainRunCommands,
     isCreateLoading,
     isRobotMoving,
-    setIsBetweenCommands,
+    // chainRunCommands,
+    // setIsBetweenCommands,
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
   React.useEffect(() => {

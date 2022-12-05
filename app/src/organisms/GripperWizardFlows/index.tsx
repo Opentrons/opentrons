@@ -2,7 +2,6 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useConditionalConfirm } from '@opentrons/components'
 import {
-  useHost,
   useCreateRunMutation,
   useStopRunMutation,
 } from '@opentrons/react-api-client'
@@ -42,9 +41,11 @@ export const GripperWizardFlows = (
   const goBack = (): void => {
     setCurrentStepIndex(isFinalStep ? currentStepIndex : currentStepIndex - 1)
   }
-  const { chainRunCommands, isCommandMutationLoading } = useChainRunCommands(runId)
+  const { chainRunCommands, isCommandMutationLoading } = useChainRunCommands(
+    runId
+  )
 
-  const { createRun, isLoading: isCreateLoading } = useCreateRunMutation({
+  const { isLoading: isCreateLoading } = useCreateRunMutation({
     onSuccess: response => {
       setRunId(response.data.id)
     },
@@ -56,7 +57,7 @@ export const GripperWizardFlows = (
   const [isBetweenCommands, setIsBetweenCommands] = React.useState<boolean>(
     false
   )
-  const [isExiting, setIsExiting] = React.useState<boolean>(false)
+  const [isExiting] = React.useState<boolean>(false)
 
   const proceed = (): void => {
     if (

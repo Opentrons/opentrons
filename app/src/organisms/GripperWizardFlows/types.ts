@@ -61,7 +61,10 @@ export interface GripperWizardStepProps {
   flowType: GripperWizardFlowType
   proceed: () => void
   goBack: () => void
-  chainRunCommands: (commands: CreateCommand[], continuePastCommandFailure: boolean) => Promise<unknown>
+  chainRunCommands: (
+    commands: CreateCommand[],
+    continuePastCommandFailure: boolean
+  ) => Promise<unknown>
   isRobotMoving: boolean
   runId: string
   attachedGripper: {} | null

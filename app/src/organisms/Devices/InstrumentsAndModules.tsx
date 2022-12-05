@@ -17,7 +17,6 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
-import { InstrumentCard } from '../../molecules/InstrumentCard'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ModuleCard } from '../ModuleCard'
 import { useIsOT3, useIsRobotViewable, useRunStatuses } from './hooks'
@@ -42,6 +41,7 @@ export function InstrumentsAndModules({
   const { isRunTerminal } = useRunStatuses()
   const isOT3 = useIsOT3(robotName)
 
+  // TODO(BC, 2022-12-05): replace with attachedGripper after RLAB-88 is done
   const [tempAttachedGripper, tempSetAttachedGripper] = React.useState<{
     model: string
     serialNumber: string
@@ -58,10 +58,6 @@ export function InstrumentsAndModules({
     : Math.ceil(attachedModules?.length / 2)
   const leftColumnModules = attachedModules?.slice(0, halfAttachedModulesSize)
   const rightColumnModules = attachedModules?.slice(halfAttachedModulesSize)
-
-  // TODO(bh, 2022-10-27): get gripper data, create interface
-  // const gripper = { model: null }
-  const gripper = { model: 'Opentrons Gripper GEN1' }
 
   return (
     <Flex

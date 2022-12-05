@@ -11,10 +11,10 @@ export const UnmountGripper = (
   const {
     proceed,
     attachedGripper,
-    chainRunCommands,
     isRobotMoving,
     goBack,
-    setIsBetweenCommands,
+    // chainRunCommands,
+    // setIsBetweenCommands,
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
   if (attachedGripper == null) return null

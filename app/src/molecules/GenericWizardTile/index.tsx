@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import capitalize from 'lodash/capitalize'
 import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
