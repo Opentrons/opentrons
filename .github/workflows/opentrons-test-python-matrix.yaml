@@ -26,8 +26,7 @@ defaults:
 jobs:
   test:
     name: 'opentrons package tests on ${{ matrix.os }}, python ${{ matrix.python }}'
-    env:
-      SETUP_TIMEOUT = 15
+    env: SETUP_TIMEOUT = 15
     timeout-minutes: 45
     strategy:
       fail-fast: false
