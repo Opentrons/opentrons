@@ -164,9 +164,11 @@ class EquipmentHandler:
             A LoadedPipetteData object.
         """
         cache_request = {
-            mount.to_hw_mount(): pipette_name.value
-            if isinstance(pipette_name, PipetteNameType)
-            else pipette_name
+            mount.to_hw_mount(): (
+                pipette_name.value
+                if isinstance(pipette_name, PipetteNameType)
+                else pipette_name
+            )
         }
 
         # TODO(mc, 2020-10-18): calling `cache_instruments` mirrors the
