@@ -80,9 +80,6 @@ class CalibrateGripperImplementation(
             ot3_hardware_api, self._convert_to_hw_api_probe(params.probe)
         )
 
-        # TODO(mm, 2022-11-21): Clarify what calibrate_gripper() returns--absolute
-        # coordinates, or an difference from the ideal? Is it correct to return its raw
-        # result here?
         return CalibrateGripperResult.construct(
             probeOffset=Vec3f.construct(x=result.x, y=result.y, z=result.z)
         )
