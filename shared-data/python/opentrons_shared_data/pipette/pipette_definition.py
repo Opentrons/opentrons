@@ -96,9 +96,9 @@ class PlungerPositions(BaseModel):
         description="The plunger position that describes min available volume of a pipette in mm.",
     )
     blow_out: float = Field(
-        ..., description="The plunger position past 0 volume to blow out liquid."
+        ..., description="The plunger position past 0 volume to blow out liquid.", alias="blowout"
     )
-    drop_tip: float = Field(..., description="The plunger position used to drop tips.")
+    drop_tip: float = Field(..., description="The plunger position used to drop tips.", alias="drop")
 
 
 class TipHandlingConfigurations(BaseModel):
@@ -157,7 +157,7 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
         description="The pipette model type (related to number of channels).",
         alias="model",
     )
-    display_category: str = Field(
+    display_category: PipetteGenerationType = Field(
         ..., description="The product model of the pipette.", alias="displayCategory"
     )
     pick_up_tip_configurations: PickUpTipConfigurations = Field(
@@ -243,4 +243,6 @@ class PipetteConfigurations(
 ):
     """The full pipette configurations of a given model and version."""
 
-    version: PipetteVersionType = Field(..., description="The version of the configuration loaded.")
+    version: PipetteVersionType = Field(
+        ..., description="The version of the configuration loaded."
+    )
