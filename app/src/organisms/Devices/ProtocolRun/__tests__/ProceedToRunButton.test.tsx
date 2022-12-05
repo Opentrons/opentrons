@@ -95,7 +95,7 @@ describe('ProceedToRunButton', () => {
     button.click()
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: 'proceedToRun',
-      properties: {},
+      properties: { sourceLocation: 'test run button' },
     })
   })
 
