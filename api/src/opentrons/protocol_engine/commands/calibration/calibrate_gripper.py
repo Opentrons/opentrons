@@ -74,8 +74,6 @@ class CalibrateGripperImplementation(
         """
         ot3_hardware_api = ensure_ot3_hardware(self._hardware_api)
 
-        # TODO(mm, 2022-11-21): This will error if the gripper jaws haven't been homed.
-        # Does it make sense to home the jaws automatically?
         result = await ot3_calibration.calibrate_gripper(
             ot3_hardware_api, self._convert_to_hw_api_probe(params.probe)
         )
