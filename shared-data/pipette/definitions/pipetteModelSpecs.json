@@ -6536,7 +6536,7 @@
         "type": "float"
       },
       "pickUpCurrent": {
-        "value": 0.6,
+        "value": 0.125,
         "min": 0.05,
         "max": 2.0,
         "units": "amps",
@@ -6911,7 +6911,7 @@
         "type": "float"
       },
       "pickUpCurrent": {
-        "value": 0.6,
+        "value": 0.125,
         "min": 0.05,
         "max": 2.0,
         "units": "amps",
