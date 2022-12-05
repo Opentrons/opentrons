@@ -38,8 +38,6 @@ LABWARE_GRIP_HEIGHT = {
 
 LABWARE_GRIP_FORCE = {"plate": 5, "tiprack": 10}
 
-DEFAULT_PRESS_DOWN_Z = 2
-
 LABWARE_WARP = types.Point()
 
 
@@ -125,7 +123,7 @@ async def _finish(api: OT3API) -> None:
     exit()
 
 
-def _get_gripper_offset_within_slot(
+def _get_labware_grip_offset(
     labware_key: str, is_grip: bool, has_clips: bool, warp: Optional[float]
 ) -> types.Point:
     slot_center = SLOT_SIZE * 0.5
@@ -141,8 +139,6 @@ def _get_gripper_offset_within_slot(
         x = slot_center.x
     y = slot_center.y
     z = grip_height
-    if not is_grip:
-        z -= DEFAULT_PRESS_DOWN_Z
     return types.Point(x=x, y=y, z=z)
 
 
@@ -186,18 +182,18 @@ def _calculate_src_and_dst_points(
     src_slot_loc = helpers_ot3.get_slot_top_left_position_ot3(src_slot)
     dst_slot_loc = helpers_ot3.get_slot_top_left_position_ot3(dst_slot)
     # relative position, within a slot
-    src_rel_offset = _get_gripper_offset_within_slot(
+    src_labware_offset = _get_labware_grip_offset(
         labware_key, is_grip=True, has_clips=True, warp=warp
     )
-    dst_rel_offset = _get_gripper_offset_within_slot(
+    dst_labware_offset = _get_labware_grip_offset(
         labware_key, is_grip=False, has_clips=True, warp=warp
     )
-    # apply the grip_offset function
+    # apply module-specific offset (include module geometry + action-offset)
     src_item_offset = types.Point(**grip_offset("pick-up", src_deck_item))
     dst_item_offset = types.Point(**grip_offset("drop", dst_deck_item))
     # absolute position, on the deck
-    src_loc = src_slot_loc + src_item_offset + src_rel_offset
-    dst_loc = dst_slot_loc + dst_item_offset + dst_rel_offset
+    src_loc = src_slot_loc + src_item_offset + src_labware_offset
+    dst_loc = dst_slot_loc + dst_item_offset + dst_labware_offset
     # add additional offsets, for testing purposes
     if src_offset:
         src_loc += src_offset
