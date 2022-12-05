@@ -27,6 +27,14 @@ class PipetteChannelType(Enum):
     def as_int(self) -> int:
         return self.value
 
+    def __repr__(self) -> str:
+        if self == self.NINETY_SIX_CHANNEL.value:
+            return "96"
+        elif self == self.EIGHT_CHANNEL.value:
+            return "multi"
+        else:
+            return "single"
+
 
 class PipetteModelType(Enum):
     p50 = "p50"
@@ -49,6 +57,9 @@ class PipetteVersionType:
         major = cast(PipetteModelMajorVersion, int(version // 1))
         minor = cast(PipetteModelMinorVersion, int(round((version % 1), 2) * 10))
         return cls(major=major, minor=minor)
+
+    def __repr__(self) -> str:
+        return f"{self.major}.{self.minor}"
 
 
 class SupportedTipsDefinition(BaseModel):

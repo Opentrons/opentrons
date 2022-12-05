@@ -593,7 +593,7 @@ class OT3API(
         instr = self._pipette_handler.hardware_instruments[checked_mount]
         if instr:
             target_pos = target_position_from_plunger(
-                checked_mount, instr.config.bottom, self._current_position
+                checked_mount, instr.plunger_positions.bottom, self._current_position
             )
             await self._move(target_pos, acquire_lock=False, home_flagged_axes=False)
             await self.current_position_ot3(mount=checked_mount, refresh=True)
@@ -1134,7 +1134,7 @@ class OT3API(
             speed = self._pipette_handler.plunger_speed(
                 instrument, instrument.blow_out_flow_rate, "aspirate"
             )
-            bottom = instrument.config.bottom
+            bottom = instrument.plunger_positions.bottom
             target_pos = target_position_from_plunger(
                 OT3Mount.from_mount(mount), bottom, self._current_position
             )

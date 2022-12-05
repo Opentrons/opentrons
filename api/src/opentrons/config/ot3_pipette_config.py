@@ -19,9 +19,11 @@ class PipetteNameType:
     pipette_channels: PipetteChannelType
     pipette_generation: PipetteGenerationType
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         base_name = f"{self.pipette_type}_{self.pipette_channels}"
         if self.pipette_generation == PipetteGenerationType.GEN1:
+            return base_name
+        elif self.pipette_channels == PipetteChannelType.NINETY_SIX_CHANNEL:
             return base_name
         else:
             return f"{base_name}_{self.pipette_generation.name.lower()}"
@@ -32,12 +34,10 @@ class PipetteModelVersionType:
     pipette_channels: PipetteChannelType
     pipette_version: PipetteVersionType
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         base_name = f"{self.pipette_type}_{self.pipette_channels}"
-        if self.pipette_generation == PipetteGenerationType.GEN1:
-            return base_name
-        else:
-            return f"{base_name}_{self.pipette_generation.name.lower()}"
+
+        return f"{base_name}_v{self.pipette_version}"
 
 
 def load_ot3_pipette(

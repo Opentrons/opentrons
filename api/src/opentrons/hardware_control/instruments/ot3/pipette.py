@@ -1,7 +1,7 @@
 import logging
 import functools
 
-from typing import Any, List, Dict, Optional, Set, Tuple, Union
+from typing import Any, List, Dict, Optional, Set, Tuple, Union, cast
 from typing_extensions import Final
 
 from opentrons.types import Point
@@ -109,7 +109,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         )
         self._log.info(
             "loaded: {}, pipette offset: {}".format(
-                config.model, self._pipette_offset.offset
+                self._model, self._pipette_offset.offset
             )
         )
         self.ready_to_aspirate = False
@@ -163,7 +163,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
 
     @property
     def acting_as(self) -> PipetteName:
-        return self._acting_as
+        return cast(PipetteName, f"{self._acting_as}")
 
     def reload_configurations(self) -> None:
         self._config = ot3_pipette_config.load_ot3_pipette(self._pipette_type, 1, 1.0)
@@ -185,11 +185,11 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
 
     @property
     def name(self) -> PipetteName:
-        return f"{self._name}"
+        return cast(PipetteName, f"{self._name}")
 
     @property
     def model(self) -> PipetteModel:
-        return f"{self._model}"
+        return cast(PipetteModel, f"{self._model}")
 
     @property
     def pipette_type(self) -> PipetteModelType:
