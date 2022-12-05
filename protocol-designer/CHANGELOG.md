@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.2.0-alpha.6](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.5...v6.2.0-alpha.6) (2022-12-05)
+
+
+### Bug Fixes
+
+* **protocol-designer:** various UI changes to increase usability and center modals ([#11754](https://github.com/Opentrons/opentrons/issues/11754)) ([8427b42](https://github.com/Opentrons/opentrons/commit/8427b421d3bc62e9da32082763c37b8a4577cb80))
+
+
+
+
+
 # [6.2.0-alpha.5](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.4...v6.2.0-alpha.5) (2022-11-17)
 
 **Note:** Version bump only for package protocol-designer
