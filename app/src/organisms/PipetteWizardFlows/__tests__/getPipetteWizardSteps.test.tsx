@@ -166,4 +166,12 @@ describe('getPipetteWizardSteps', () => {
       getPipetteWizardSteps(FLOWS.DETACH, LEFT, NINETY_SIX_CHANNEL)
     ).toStrictEqual(mockDetachPipetteFlowSteps)
   })
+
+  //  TODO(jr, 12/5/22): fix this test when the calibrate steps are added
+  it('returns the corect array of info for calibrate pipette 96 channel', () => {
+    const mockDetachPipetteFlowSteps = [] as PipetteWizardStep[]
+    expect(
+      getPipetteWizardSteps(FLOWS.CALIBRATE, LEFT, NINETY_SIX_CHANNEL)
+    ).toStrictEqual(mockDetachPipetteFlowSteps)
+  })
 })
