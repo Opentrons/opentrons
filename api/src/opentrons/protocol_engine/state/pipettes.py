@@ -293,7 +293,9 @@ class PipetteView(HasState[PipetteState]):
         try:
             return self._state.static_config_by_id[pipette_id]
         except KeyError:
-            raise errors.PipetteNotLoadedError()
+            raise errors.PipetteNotLoadedError(
+                f"Pipette {pipette_id} not found; unable to get pipette configuration."
+            )
 
     def get_model_name(self, pipette_id: str) -> str:
         """Return the given pipette's model name."""

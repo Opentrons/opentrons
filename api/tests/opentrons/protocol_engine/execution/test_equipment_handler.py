@@ -462,13 +462,7 @@ async def test_load_pipette(
     """It should load pipette data, check attachment, and generate an ID."""
     decoy.when(model_utils.generate_id()).then_return("unique-id")
 
-    decoy.when(
-        await hardware_api.cache_and_get_instrument(
-            mount=MountType.LEFT,
-            pipette_name=PipetteNameType.P300_SINGLE.value,
-            other_mount_dict={},
-        )
-    ).then_return(
+    decoy.when(hardware_api.get_attached_instrument(mount=HwMount.LEFT)).then_return(
         cast(
             PipetteDict,
             {
@@ -489,6 +483,9 @@ async def test_load_pipette(
     assert result == LoadedPipetteData(pipette_id="unique-id")
 
     decoy.verify(
+        await hardware_api.cache_instruments(
+            {HwMount.LEFT: PipetteNameType.P300_SINGLE.value}
+        ),
         action_dispatcher.dispatch(
             AddPipetteConfigAction(
                 pipette_id="unique-id",
@@ -496,7 +493,7 @@ async def test_load_pipette(
                     model="pipette-model", min_volume=1.23, max_volume=4.56, channels=7
                 ),
             )
-        )
+        ),
     )
 
 
@@ -510,13 +507,7 @@ async def test_load_pipette_96_channels(
     """It should load pipette data, check attachment, and generate an ID."""
     decoy.when(model_utils.generate_id()).then_return("unique-id")
 
-    decoy.when(
-        await hardware_api.cache_and_get_instrument(
-            mount=MountType.LEFT,
-            pipette_name="p1000_96",
-            other_mount_dict={},
-        )
-    ).then_return(
+    decoy.when(hardware_api.get_attached_instrument(mount=HwMount.LEFT)).then_return(
         cast(
             PipetteDict,
             {
@@ -537,6 +528,7 @@ async def test_load_pipette_96_channels(
     assert result == LoadedPipetteData(pipette_id="unique-id")
 
     decoy.verify(
+        await hardware_api.cache_instruments({HwMount.LEFT: "p1000_96"}),
         action_dispatcher.dispatch(
             AddPipetteConfigAction(
                 pipette_id="unique-id",
@@ -544,7 +536,7 @@ async def test_load_pipette_96_channels(
                     model="pipette-model", min_volume=1.23, max_volume=4.56, channels=7
                 ),
             )
-        )
+        ),
     )
 
 
@@ -555,13 +547,7 @@ async def test_load_pipette_uses_provided_id(
     subject: EquipmentHandler,
 ) -> None:
     """It should use the provided ID rather than generating an ID for the pipette."""
-    decoy.when(
-        await hardware_api.cache_and_get_instrument(
-            mount=MountType.LEFT,
-            pipette_name=PipetteNameType.P300_SINGLE.value,
-            other_mount_dict={},
-        )
-    ).then_return(
+    decoy.when(hardware_api.get_attached_instrument(mount=HwMount.LEFT)).then_return(
         cast(
             PipetteDict,
             {
@@ -612,13 +598,7 @@ async def test_load_pipette_checks_existence_with_already_loaded(
         )
     )
 
-    decoy.when(
-        await hardware_api.cache_and_get_instrument(
-            mount=MountType.LEFT,
-            pipette_name=PipetteNameType.P300_SINGLE.value,
-            other_mount_dict={HwMount.RIGHT: PipetteNameType.P300_MULTI_GEN2.value},
-        )
-    ).then_return(
+    decoy.when(hardware_api.get_attached_instrument(mount=HwMount.LEFT)).then_return(
         cast(
             PipetteDict,
             {
@@ -639,6 +619,9 @@ async def test_load_pipette_checks_existence_with_already_loaded(
     assert result == LoadedPipetteData(pipette_id="unique-id")
 
     decoy.verify(
+        await hardware_api.cache_instruments(
+            {HwMount.LEFT: PipetteNameType.P300_SINGLE.value}
+        ),
         action_dispatcher.dispatch(
             AddPipetteConfigAction(
                 pipette_id="unique-id",
@@ -646,7 +629,7 @@ async def test_load_pipette_checks_existence_with_already_loaded(
                     model="pipette-model", min_volume=1.23, max_volume=4.56, channels=7
                 ),
             )
-        )
+        ),
     )
 
 
@@ -656,14 +639,12 @@ async def test_load_pipette_raises_if_pipette_not_attached(
     hardware_api: HardwareControlAPI,
     subject: EquipmentHandler,
 ) -> None:
-    """Loading a pipette should should raise if unable to cache instruments."""
+    """Loading a pipette should raise if unable to cache instruments."""
     decoy.when(model_utils.generate_id()).then_return("unique-id")
 
     decoy.when(
-        await hardware_api.cache_and_get_instrument(
-            mount=MountType.LEFT,
-            pipette_name=PipetteNameType.P300_SINGLE.value,
-            other_mount_dict={},
+        await hardware_api.cache_instruments(
+            {HwMount.LEFT: PipetteNameType.P300_SINGLE.value}
         )
     ).then_raise(
         RuntimeError(

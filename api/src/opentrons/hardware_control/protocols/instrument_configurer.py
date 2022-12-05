@@ -2,7 +2,7 @@ from typing import Dict, Optional
 from typing_extensions import Protocol
 
 from opentrons_shared_data.pipette.dev_types import PipetteName
-from opentrons.types import Mount, MountType
+from opentrons.types import Mount
 
 from opentrons.hardware_control.instruments import Pipette
 from ..dev_types import PipetteDict
