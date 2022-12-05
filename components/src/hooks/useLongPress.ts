@@ -8,19 +8,26 @@ import {
 import interact from 'interactjs'
 import type PointerEvent from 'interactjs'
 
+// Note kj 12/05/2022
+// ODD needs setIsLongPressed since when a user use long press, ODD app needs to show overflow menu.
+// Then if a user takes clicking outside action, the ODD app needs to reset the isLongPressed.
+// In terms of setIsTapped, if the ODD app doesn't need it, it will be removed.
 interface UseLongPressResult {
   ref: MutableRefObject<null>
   style: CSSProperties
   isEnabled: boolean
   isLongPressed: boolean
   isTapped: boolean
+  setIsLongPressed: (value: boolean) => void
+  setIsTapped: (value: boolean) => void
   enable: () => void
   disable: () => void
 }
 
 /**
  * useLongPress provide two actions (tap and long press)
- * useLongPress recognize 3sec hold as long press: holdDuration
+ * useLongPress recognize 1 sec hold as long press: hold Duration
+ * interactjs recognize "hold" when an element is held down around 600ms(default)
  * @returns {UseLongPressResult}
  */
 export const useLongPress = (): UseLongPressResult => {
@@ -33,12 +40,11 @@ export const useLongPress = (): UseLongPressResult => {
     if (interactiveRef?.current != null) {
       interact((interactiveRef.current as unknown) as HTMLElement)
         .pointerEvents({
-          holdDuration: 3000,
+          holdDuration: 1000,
         })
         .on('hold', (event: PointerEvent) => {
           setIsLongPressed(true)
         })
-        // This might be needed but it would depend on how we implement
         .on('tap', (event: PointerEvent) => {
           setIsTapped(true)
         })
@@ -68,6 +74,8 @@ export const useLongPress = (): UseLongPressResult => {
     isEnabled,
     isLongPressed,
     isTapped,
+    setIsLongPressed,
+    setIsTapped,
     enable: () => setIsEnabled(true),
     disable: () => setIsEnabled(false),
   }
