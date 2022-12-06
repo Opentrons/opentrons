@@ -25,7 +25,6 @@ TipRackStateByWellName = Dict[str, TipRackWellState]
 _96_CHANNEL_PIPETTE = 96
 _8_CHANNEL_PIPETTE = 8
 
-
 @dataclass
 class TipState:
     """State of all tips."""
