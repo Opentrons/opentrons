@@ -54,6 +54,7 @@ from opentrons_hardware.hardware_control.motor_enable_disable import (
     set_disable_motor,
 )
 from opentrons_hardware.hardware_control.limit_switches import get_limit_switches
+from opentrons_hardware.hardware_control.encoder_hardware import get_encoder_position
 from opentrons_hardware.hardware_control.network import probe
 from opentrons_hardware.hardware_control.current_settings import (
     set_run_current,
@@ -478,6 +479,14 @@ class OT3Controller:
         ), "No nodes available to read limit switch status from"
         res = await get_limit_switches(self._messenger, self._present_nodes)
         return {node_to_axis(node): bool(val) for node, val in res.items()}
+
+    async def get_encoder_position(self) -> OT3AxisMap[bool]:
+        """Get the state of the all the encoders for each axis."""
+        assert (
+            self._present_nodes
+        ), "No nodes available to read limit switch status from"
+        res = await get_encoder_position(self._messenger, self._present_nodes)
+        return {node_to_axis(node): val for node, val in res.items()}
 
     async def set_default_currents(self) -> None:
         """Set both run and hold currents from robot config to each node."""
