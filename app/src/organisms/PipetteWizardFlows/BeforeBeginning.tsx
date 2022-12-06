@@ -90,15 +90,6 @@ export const BeforeBeginning = (
       }
       break
     }
-    case FLOWS.DETACH: {
-      bodyText = t('get_started_flow')
-      if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
-        equipmentList = [HEX_SCREWDRIVER]
-      } else {
-        equipmentList = [CALIBRATION_PROBE, HEX_SCREWDRIVER]
-      }
-      break
-    }
   }
   const rightHandBody = (
     <WizardRequiredEquipmentList width="100%" equipmentList={equipmentList} />
