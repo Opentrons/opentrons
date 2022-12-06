@@ -309,10 +309,6 @@ class PipetteView(HasState[PipetteState]):
         """Return the given pipette's maximum volume."""
         return self._get_static_config(pipette_id).max_volume
 
-    def get_channels(self, pipette_id: str) -> int:
-        """Return the given pipette's number of channels."""
-        return self._get_static_config(pipette_id).channels
-
     def get_z_axis(self, pipette_id: str) -> MotorAxis:
         """Get the MotorAxis representing this pipette's Z stage."""
         mount = self.get(pipette_id).mount

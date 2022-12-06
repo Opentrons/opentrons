@@ -302,7 +302,6 @@ def test_get_static_config() -> None:
     assert subject.get_model_name("pipette-id") == "pipette-model"
     assert subject.get_minimum_volume("pipette-id") == 1.23
     assert subject.get_maximum_volume("pipette-id") == 4.56
-    assert subject.get_channels("pipette-id") == 7
 
 
 @pytest.mark.parametrize(

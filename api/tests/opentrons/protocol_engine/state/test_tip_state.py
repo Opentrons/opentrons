@@ -209,11 +209,11 @@ def test_reset_tips(
 
 
 @pytest.mark.parametrize("input_channels, next_tip_result", [(96, None), (8, "A2")])
-def test_tip_tracking_for_96_channels(
+def test_tip_tracking(
     subject: TipStore,
     load_labware_command: commands.LoadLabware,
     pick_up_tip_command: commands.PickUpTip,
-    input_channels: str,
+    input_channels: int,
     next_tip_result: Optional[str],
 ) -> None:
     """Should set tiprack as used."""

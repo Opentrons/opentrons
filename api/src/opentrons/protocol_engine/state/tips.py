@@ -1,7 +1,7 @@
 """Tip state tracking."""
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, Set, Optional, List
+from typing import Dict, Optional, List
 
 from .abstract_store import HasState, HandlesActions
 from ..actions import (
@@ -33,7 +33,7 @@ class TipState:
     tips_by_labware_id: Dict[str, TipRackStateByWellName]
     # TODO (tz, 12-6-22): should this be a set?
     column_by_labware_id: Dict[str, List[List[str]]]
-    pipette_channels_by_id: Dict[str, int]
+    pipette_channels_by_pipette_id: Dict[str, int]
 
 
 class TipStore(HasState[TipState], HandlesActions):
@@ -46,7 +46,7 @@ class TipStore(HasState[TipState], HandlesActions):
         self._state = TipState(
             tips_by_labware_id={},
             column_by_labware_id={},
-            pipette_channels_by_id={},
+            pipette_channels_by_pipette_id={},
         )
 
     def handle_action(self, action: Action) -> None:
@@ -85,14 +85,14 @@ class TipStore(HasState[TipState], HandlesActions):
                 ] = TipRackWellState.CLEAN
 
         elif isinstance(action, AddPipetteConfigAction):
-            self._state.pipette_channels_by_id[
+            self._state.pipette_channels_by_pipette_id[
                 action.pipette_id
             ] = action.static_config.channels
 
     def _update_used_tips(
         self, pipette_id: str, well_name: str, labware_id: str
     ) -> None:
-        pipette_channels = self._state.pipette_channels_by_id[pipette_id]
+        pipette_channels = self._state.pipette_channels_by_pipette_id[pipette_id]
         if pipette_channels == _96_CHANNEL_PIPETTE:
             for well_name in self._state.tips_by_labware_id[labware_id].keys():
                 self._state.tips_by_labware_id[labware_id][
@@ -146,3 +146,7 @@ class TipView(HasState[TipState]):
                 return well_name
 
         return None
+
+    def get_channels(self, pipette_id: str) -> int:
+        """Return the given pipette's number of channels."""
+        return self._state.pipette_channels_by_pipette_id[pipette_id]
