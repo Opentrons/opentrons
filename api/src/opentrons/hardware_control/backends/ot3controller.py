@@ -93,7 +93,7 @@ from opentrons_hardware.hardware_control.tool_sensors import (
 from opentrons_hardware.drivers.gpio import OT3GPIO
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
+    from opentrons_shared_data.pipette.dev_types import PipetteName
     from ..dev_types import (
         OT3AttachedPipette,
         AttachedGripper,

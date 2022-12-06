@@ -4,7 +4,6 @@ import logging
 from typing import (
     Callable,
     Dict,
-    Generic,
     Optional,
     Tuple,
     Any,
@@ -354,7 +353,6 @@ class PipetteHandlerProvider:
         """Return max achievable height of the attached instrument
         based on the current critical point
         """
-        pip = self.get_pipette(mount)
         cp = self.critical_point_for(mount, critical_point)
 
         max_height = HOME_POSITION - retract_distance + cp.z

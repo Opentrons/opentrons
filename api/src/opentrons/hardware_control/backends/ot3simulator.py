@@ -15,12 +15,10 @@ from typing import (
     Set,
     Union,
     Mapping,
-    cast,
 )
 
 from opentrons.config.types import OT3Config, GantryLoad
 from opentrons.config import ot3_pipette_config, gripper_config
-from opentrons_shared_data.pipette import dummy_model_for_name
 from .ot3utils import (
     axis_convert,
     create_move_group,

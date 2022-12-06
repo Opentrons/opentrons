@@ -37,7 +37,6 @@ from opentrons.hardware_control.constants import (
 
 from opentrons.hardware_control.dev_types import PipetteDict
 from .pipette import Pipette
-from .instrument_calibration import load_pipette_offset
 
 # TODO both pipette handlers should be combined once the pipette configurations
 # are unified AND we separate out the concept of changing pipette state versus static state

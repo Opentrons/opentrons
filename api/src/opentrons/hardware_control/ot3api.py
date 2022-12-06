@@ -5,7 +5,6 @@ from dataclasses import replace
 import logging
 from collections import OrderedDict
 from typing import (
-    Mapping,
     cast,
     Callable,
     Dict,

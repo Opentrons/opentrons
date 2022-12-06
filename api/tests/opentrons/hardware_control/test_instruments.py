@@ -540,9 +540,7 @@ async def test_aspirate_flow_rate(sim_and_instr):
         await hw_api.aspirate(types.Mount.LEFT, 2, rate=0.5)
         assert_move_called(
             mock_move,
-            get_plunger_speed(hw_api)(
-                pip, pip.aspirate_flow_rate * 0.5, "aspirate"
-            ),
+            get_plunger_speed(hw_api)(pip, pip.aspirate_flow_rate * 0.5, "aspirate"),
         )
 
     hw_api.set_flow_rate(mount, aspirate=1)
@@ -601,9 +599,7 @@ async def test_dispense_flow_rate(sim_and_instr):
         await hw_api.dispense(types.Mount.LEFT, 2, rate=0.5)
         assert_move_called(
             mock_move,
-            get_plunger_speed(hw_api)(
-                pip, pip.dispense_flow_rate * 0.5, "dispense"
-            ),
+            get_plunger_speed(hw_api)(pip, pip.dispense_flow_rate * 0.5, "dispense"),
         )
 
     hw_api.set_flow_rate(mount, dispense=3)
