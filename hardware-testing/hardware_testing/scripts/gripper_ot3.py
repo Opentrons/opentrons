@@ -55,7 +55,7 @@ class GripperSlotStates:
 #       - tall-pegs ~5mm from slot-edge
 
 
-def grip_offset(action: str, item: str) -> Dict[str, float]:
+def grip_offset(action: str, item: str, slot: Optional[int] = None) -> Dict[str, float]:
     """Grip offset."""
     from opentrons.types import Point
 
@@ -65,7 +65,8 @@ def grip_offset(action: str, item: str) -> Dict[str, float]:
     _hw_offsets = {
         "deck": Point(),
         "mag-plate": Point(z=29.5),
-        "heater-shaker": Point(x=(-3 - -0.125), y=(-1 - 1.125), z=(24 - 68.275)),
+        "heater-shaker-right": Point(x=(-3 - -0.125), y=(-1 - 1.125), z=(24 - 68.275)),
+        "heater-shaker-left": Point(x=(3 - -0.125), y=(1 - 1.125), z=(24 - 68.275)),
         "temp-module": Point(x=(0 - -1.45), y=(0 - -0.15), z=(9 - 80.09)),
         "thermo-cycler": Point(x=(-20 - 0), y=(67.5 - 68.06), z=(-0.04 - 98.26)),
     }
@@ -98,8 +99,17 @@ def grip_offset(action: str, item: str) -> Dict[str, float]:
         )
     if item not in item_options:
         raise ValueError(f'"{item}" not recognized, available options: {item_options}')
-    # add up the combined offset
-    hw_offset = _hw_offsets[item]
+    if item == "heater-shaker":
+        assert slot, "argument slot= is required when using \"heater-shaker\""
+        if slot in [1, 4, 7, 10]:
+            side = "left"
+        elif slot in [3, 6, 9, 12]:
+            side = "right"
+        else:
+            raise ValueError("heater shaker must be on either left or right side")
+        hw_offset = _hw_offsets[f"{item}-{side}"]
+    else:
+        hw_offset = _hw_offsets[item]
     if action == "pick-up":
         offset = hw_offset + _pick_up_offsets[item]
     else:
@@ -188,8 +198,18 @@ def _calculate_src_and_dst_points(
         labware_key, is_grip=False, has_clips=True, warp=warp
     )
     # apply module-specific offset (include module geometry + action-offset)
-    src_item_offset = types.Point(**grip_offset("pick-up", src_deck_item))
-    dst_item_offset = types.Point(**grip_offset("drop", dst_deck_item))
+    def _get_deck_item_side(_slot: int) -> Optional[str]:
+        if _slot in [1, 4, 7, 10]:
+            return "left"
+        elif _slot in [3, 6, 9, 12]:
+            return "right"
+        else:
+            raise ValueError(f"slot {_slot} is not on a side")
+
+    src_side = _get_deck_item_side(src_slot) if src_deck_item == "heater-shaker" else None
+    dst_side = _get_deck_item_side(dst_slot) if dst_deck_item == "heater-shaker" else None
+    src_item_offset = types.Point(**grip_offset("pick-up", src_deck_item, side=src_side))
+    dst_item_offset = types.Point(**grip_offset("drop", dst_deck_item, side=dst_side))
     # absolute position, on the deck
     src_loc = src_slot_loc + src_item_offset + src_labware_offset
     dst_loc = dst_slot_loc + dst_item_offset + dst_labware_offset
