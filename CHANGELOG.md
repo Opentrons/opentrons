@@ -3,93 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [6.2.0-alpha.6](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.5...v6.2.0-alpha.6) (2022-12-05)
+# [6.2.0](https://github.com/Opentrons/opentrons/compare/v6.1.0...v6.2.0) (2022-12-06)
 
 
 ### Bug Fixes
 
 * **app:** handle the input via OT_APP_DISCOVERY__CANDIDATES  ([#11759](https://github.com/Opentrons/opentrons/issues/11759)) ([48c4ad7](https://github.com/Opentrons/opentrons/commit/48c4ad768cefa1086038c940389640af8c15bf5b))
 * **protocol-designer:** various UI changes to increase usability and center modals ([#11754](https://github.com/Opentrons/opentrons/issues/11754)) ([8427b42](https://github.com/Opentrons/opentrons/commit/8427b421d3bc62e9da32082763c37b8a4577cb80))
-
-
-
-
-
-# [6.2.0-alpha.5](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.4...v6.2.0-alpha.5) (2022-11-17)
-
-
-### Bug Fixes
-
 * **app:** pD protocol thermocycler profile steps readability ([#11753](https://github.com/Opentrons/opentrons/issues/11753)) ([0589d34](https://github.com/Opentrons/opentrons/commit/0589d346fce4633a1d82bc728e24f31bf360154e))
-
-
-
-
-
-# [6.2.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.3...v6.2.0-alpha.4) (2022-11-15)
-
-
-### Bug Fixes
-
 * **api:** allow loadLiquid command to no-op when liquid FF is off ([#11741](https://github.com/Opentrons/opentrons/issues/11741)) ([7d440e9](https://github.com/Opentrons/opentrons/commit/7d440e9192eb5bde1922b36a26ca9ed00aac6737))
 * **protocol-designer:** aspirate after dispense in transfer now counts as air gap ([#11742](https://github.com/Opentrons/opentrons/issues/11742)) ([d5854e1](https://github.com/Opentrons/opentrons/commit/d5854e14f458be04007682da9b49ba16a4360e30))
-
-
-### Features
-
-* **protocol-designer:** add Thermocycler GEN2 to announcement modal ([#11731](https://github.com/Opentrons/opentrons/issues/11731)) ([f696e81](https://github.com/Opentrons/opentrons/commit/f696e81248c84bd6a9447658514a0a0cb2b411b0))
-
-
-
-
-
-# [6.2.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.2...v6.2.0-alpha.3) (2022-11-10)
-
-
-### Bug Fixes
-
 * **api:** ensure Thermocycler status APIs return vanilla strings ([#11694](https://github.com/Opentrons/opentrons/issues/11694)) ([10509dd](https://github.com/Opentrons/opentrons/commit/10509ddc11ccd89a1fa995b34e264873c7375e11))
 * **app:** downgrading robot software version and install btn fix ([#11707](https://github.com/Opentrons/opentrons/issues/11707)) ([c454b0c](https://github.com/Opentrons/opentrons/commit/c454b0c5ed85ab8d22059a8ef7786905005e2757))
 * **app:** include enabling log aggregation as toggle in robot settings ([#11715](https://github.com/Opentrons/opentrons/issues/11715)) ([29fd028](https://github.com/Opentrons/opentrons/commit/29fd0289d146529a46da503985120e49339349ec))
 * **app:** reintroduce deleted reanalyze menu item ([#11643](https://github.com/Opentrons/opentrons/issues/11643)) ([#11713](https://github.com/Opentrons/opentrons/issues/11713)) ([d320a77](https://github.com/Opentrons/opentrons/commit/d320a7773b1be51a0132df9f7844203d0f52fb54))
 * **robot-server:** Do not raise exception when unpickling unknown types ([#11692](https://github.com/Opentrons/opentrons/issues/11692)) ([78340da](https://github.com/Opentrons/opentrons/commit/78340dadcb973beb9ed4f133b017e1ea784c13bf))
-
-
-### Features
-
-* **app:** Thermocycler GEN1 and GEN2 lid status in_between wire up ([#11686](https://github.com/Opentrons/opentrons/issues/11686)) ([8a04fdd](https://github.com/Opentrons/opentrons/commit/8a04fdd1a4a9549bec561f655519ca2f3270f6ca))
-* **protocol-designer:** bump PD version up to 6.1.0 ([#11688](https://github.com/Opentrons/opentrons/issues/11688)) ([066d2fd](https://github.com/Opentrons/opentrons/commit/066d2fd12ab06be4a2c240c936d19867fc0710ea))
-
-
-
-
-
-# [6.2.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.1...v6.2.0-alpha.2) (2022-11-04)
-
-
-### Bug Fixes
-
 * **api:** fix ot3 calibration failing test ([#11617](https://github.com/Opentrons/opentrons/issues/11617)) ([ce49a14](https://github.com/Opentrons/opentrons/commit/ce49a1443105d1b5f368be8c5d32d4153ca2b338))
 * **api:** more cherry-pick merge conflict failures ([#11678](https://github.com/Opentrons/opentrons/issues/11678)) ([200b359](https://github.com/Opentrons/opentrons/commit/200b3597190e2402163820d3d3e65ccfe8624a7c))
 * **api:** thermocycler test merge conflict ([#11674](https://github.com/Opentrons/opentrons/issues/11674)) ([a598f4d](https://github.com/Opentrons/opentrons/commit/a598f4d73af6d7e21f37f26e5b1f06f3d7290e99))
-
-
-
-
-
-# [6.2.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.0...v6.2.0-alpha.1) (2022-11-03)
-
-**Note:** Version bump only for package opentrons
-
-
-
-
-
-# [6.2.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v6.1.0...v6.2.0-alpha.0) (2022-10-27)
-
-
-### Bug Fixes
-
 * **api:** allow relative threshold value to be set for capacitive probe ([#11601](https://github.com/Opentrons/opentrons/issues/11601)) ([8d6519b](https://github.com/Opentrons/opentrons/commit/8d6519bd679317e3ee354f96e1065e3f7f048ecf))
 * **api:** correct critical points for gen3 multis ([#11405](https://github.com/Opentrons/opentrons/issues/11405)) ([797048e](https://github.com/Opentrons/opentrons/commit/797048e749ab733c573a69c85d62da1cb692e5bc))
 * **api:** Disallow uploading a protocol with non matching references ([#11418](https://github.com/Opentrons/opentrons/issues/11418)) ([2b6f6f1](https://github.com/Opentrons/opentrons/commit/2b6f6f10ae47d891126e4670b3c113ce00457a9b))
@@ -131,6 +62,9 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
+* **protocol-designer:** add Thermocycler GEN2 to announcement modal ([#11731](https://github.com/Opentrons/opentrons/issues/11731)) ([f696e81](https://github.com/Opentrons/opentrons/commit/f696e81248c84bd6a9447658514a0a0cb2b411b0))
+* **app:** Thermocycler GEN1 and GEN2 lid status in_between wire up ([#11686](https://github.com/Opentrons/opentrons/issues/11686)) ([8a04fdd](https://github.com/Opentrons/opentrons/commit/8a04fdd1a4a9549bec561f655519ca2f3270f6ca))
+* **protocol-designer:** bump PD version up to 6.1.0 ([#11688](https://github.com/Opentrons/opentrons/issues/11688)) ([066d2fd](https://github.com/Opentrons/opentrons/commit/066d2fd12ab06be4a2c240c936d19867fc0710ea))
 * **api:** Add labware, modules, liquids, and pipettes to cli analyze result ([#11451](https://github.com/Opentrons/opentrons/issues/11451)) ([129ffa8](https://github.com/Opentrons/opentrons/commit/129ffa8a28d7fe7d793b72a352f1dd7968676e66))
 * **api:** Enable calibrate-pipette command for OT3 hardware ([#11482](https://github.com/Opentrons/opentrons/issues/11482)) ([d3d71e3](https://github.com/Opentrons/opentrons/commit/d3d71e3e263b68d07c0c9fa775adfeddd2b4e406))
 * **api:** thermocycler-gen2 firmware update ([#11305](https://github.com/Opentrons/opentrons/issues/11305)) ([011d900](https://github.com/Opentrons/opentrons/commit/011d90044cbf0889aba0453122987447aee05018))
