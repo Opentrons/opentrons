@@ -182,7 +182,6 @@ if __name__ == "__main__":
         "--racknum", type=int, default="11", help='TipRack number for pipettelife test'
     )
     args = parser.parse_args()
-    type = args.test
     mount = mount_options[args.mount]
     cycles = args.cycles
     rack_num = args.racknum

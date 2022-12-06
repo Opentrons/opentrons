@@ -129,20 +129,7 @@ async def _stage_check(api: OT3API,mount: OT3Mount,critical_point: Optional[Crit
 
 async def _zstage(is_simulating: bool) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating)
-    global DEFAULT_AXIS_SETTINGS
-    await api.home()
-    pos = await api.current_position_ot3(mount=mount)
-    await api.move_to(mount, Point(pos[OT3Axis.X],
-                                   pos[OT3Axis.Y],
-                                   320))
-    await api.home()
-    pos = await api.current_position_ot3(mount=mount)
-    await api.move_to(mount, Point(pos[OT3Axis.X],
-                                   pos[OT3Axis.Y],
-                                   320))
-    await helpers_ot3.set_gantry_load_per_axis_settings_ot3(api, DEFAULT_AXIS_SETTINGS)
-    time.sleep(0.1)
-    await api.home()
+    await api.home_z()
     currents = (0.2, 0.5, 1.0, 1.5)
     speeds = (50, 100)
     speed_force_gauge = (2, 5, 10, 20)
@@ -150,10 +137,9 @@ async def _zstage(is_simulating: bool) -> None:
     # Do left mount step check
     print('Start left mount stage check:')
     global CUSTOM_AXIS_SETTINGS
-
+    global DEFAULT_AXIS_SETTINGS
     for cu in currents:
         for sp in speeds:
-
             print('  Current: {}, Speed: {}::::'.format(cu, sp))
             input('Pause')
             userSetting = helpers_ot3.GantryLoadSettings(
@@ -168,20 +154,9 @@ async def _zstage(is_simulating: bool) -> None:
             # print(CUSTOM_AXIS_SETTINGS)
             await helpers_ot3.set_gantry_load_per_axis_settings_ot3(api, CUSTOM_AXIS_SETTINGS)
             res = await _stage_check(api, types.OT3Mount.LEFT)
-            time.sleep(1)
-            print(DEFAULT_AXIS_SETTINGS)
-
-            userSetting = helpers_ot3.GantryLoadSettings(
-                max_speed=float(60),
-                acceleration=200,
-                max_start_stop_speed=1,
-                max_change_dir_speed=1,
-                hold_current=0.1,
-                run_current=float(1.4))
-            CUSTOM_AXIS_SETTINGS.update({types.OT3Axis.Z_L: userSetting})
-            CUSTOM_AXIS_SETTINGS.update({types.OT3Axis.Z_R: userSetting})
-            await helpers_ot3.set_gantry_load_per_axis_settings_ot3(api, CUSTOM_AXIS_SETTINGS)
-            time.sleep(1)
+            time.sleep(0.2)
+            await helpers_ot3.set_gantry_load_per_axis_settings_ot3(api, DEFAULT_AXIS_SETTINGS)
+            time.sleep(0.1)
             await api.home_z()
             # print('  Current: {}, Speed: {},  Result: {}'.format(cu,sp,res))
         # # Do right mount step check
