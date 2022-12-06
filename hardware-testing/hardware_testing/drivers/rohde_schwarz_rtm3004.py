@@ -97,13 +97,11 @@ if __name__ == "__main__":
     print("Rohde & Schwarz RTM3004 Oscilloscope")
     oscilloscope = Rohde_Schwarz_RTM3004(port="/dev/ttyACM0")
     oscilloscope.connect()
+    print(f"\nInfo: {oscilloscope.get_info()}\n")
     start_time = time.time()
     while True:
+        place = 1
         elapsed_time = round(time.time() - start_time, 3)
-        info = oscilloscope.get_info()
-        print(f"Time: {elapsed_time} Info: {info}")
-        print(f"Serial Number: {oscilloscope.get_serial_number()}")
-        print(f"Firmware Version: {oscilloscope.get_firmware_version()}")
-        data = oscilloscope.get_data(1).split(',')
-        print(f"Data Size: {len(data)}")
+        measurement = oscilloscope.get_measurement(place)
+        print(f"Time: {elapsed_time} Measurement #{place}: {measurement}")
         time.sleep(1.0)
