@@ -105,7 +105,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def is_simulating(self) -> bool:
         """Get whether the protocol is being analyzed or actually run."""
-        return self._sync_hardware.is_simulator  # type: ignore[no-any-return]
+        return self._engine_client.state.config.ignore_pause
 
     def add_labware_definition(
         self,

@@ -495,6 +495,16 @@ def test_home(
     decoy.verify(mock_engine_client.home(axes=None), times=1)
 
 
+def test_is_simulating(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: ProtocolCore,
+) -> None:
+    """It should return if simulating."""
+    decoy.when(mock_engine_client.state.config.ignore_pause).then_return(True)
+    assert subject.is_simulating()
+
+
 def test_set_rail_lights(
     decoy: Decoy, mock_engine_client: EngineClient, subject: ProtocolCore
 ) -> None:
