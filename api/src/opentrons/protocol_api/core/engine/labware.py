@@ -38,7 +38,10 @@ class LabwareCore(AbstractLabware[WellCore]):
 
     @property
     def highest_z(self) -> float:
-        raise NotImplementedError("LabwareCore.highest_z not implemented")
+        """The z-coordinate of the tallest single point anywhere on the labware."""
+        return self._engine_client.state.geometry.get_labware_highest_z(
+            self._labware_id
+        )
 
     @property
     def separate_calibration(self) -> bool:
@@ -46,10 +49,11 @@ class LabwareCore(AbstractLabware[WellCore]):
 
     @property
     def load_name(self) -> str:
+        """The API load name of the labware definition."""
         return self._definition.parameters.loadName
 
     def get_uri(self) -> str:
-        """Get the URI string string of the labware's definition.
+        """Get the URI string of the labware's definition.
 
         The URI is unique for a given namespace, load name, and definition version.
         """
@@ -71,7 +75,8 @@ class LabwareCore(AbstractLabware[WellCore]):
         return self._user_display_name
 
     def get_name(self) -> str:
-        raise NotImplementedError("LabwareCore.get_name not implemented")
+        """Get the load name or the label of the labware specified by a user."""
+        return self._user_display_name or self.load_name
 
     def set_name(self, new_name: str) -> None:
         raise NotImplementedError("LabwareCore.set_name not implemented")
@@ -87,17 +92,17 @@ class LabwareCore(AbstractLabware[WellCore]):
         )
 
     def get_quirks(self) -> List[str]:
-        raise NotImplementedError("LabwareCore.get_quirks not implemented")
+        return self._definition.parameters.quirks or []
 
     def set_calibration(self, delta: Point) -> None:
         # TODO(jbl 2022-09-01): implement set calibration through the engine
         pass
 
     def get_calibrated_offset(self) -> Point:
-        raise NotImplementedError("LabwareCore.get_calibrated_offset not implemented")
+        return self._engine_client.state.geometry.get_labware_position(self._labware_id)
 
     def is_tip_rack(self) -> bool:
-        "Whether the labware is a tip rack."
+        """Whether the labware is a tip rack."""
         return self._definition.parameters.isTiprack
 
     def is_fixed_trash(self) -> bool:
@@ -107,7 +112,7 @@ class LabwareCore(AbstractLabware[WellCore]):
         )
 
     def get_tip_length(self) -> float:
-        raise NotImplementedError("LabwareCore.get_tip_length not implemented")
+        return self._engine_client.state.labware.get_tip_length(self._labware_id)
 
     def set_tip_length(self, length: float) -> None:
         raise NotImplementedError("LabwareCore.set_tip_length not implemented")
