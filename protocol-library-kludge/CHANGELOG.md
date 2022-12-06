@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [6.2.0-alpha.6](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.5...v6.2.0-alpha.6) (2022-12-05)
+# [6.2.0](https://github.com/Opentrons/opentrons/compare/v6.1.0...v6.2.0) (2022-12-06)
 
 **Note:** Version bump only for package protocol-library-kludge
 
@@ -11,55 +11,8 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-# [6.2.0-alpha.5](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.4...v6.2.0-alpha.5) (2022-11-17)
 
-**Note:** Version bump only for package protocol-library-kludge
-
-
-
-
-
-# [6.2.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.3...v6.2.0-alpha.4) (2022-11-15)
-
-**Note:** Version bump only for package protocol-library-kludge
-
-
-
-
-
-# [6.2.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.2...v6.2.0-alpha.3) (2022-11-10)
-
-**Note:** Version bump only for package protocol-library-kludge
-
-
-
-
-
-# [6.2.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.1...v6.2.0-alpha.2) (2022-11-04)
-
-**Note:** Version bump only for package protocol-library-kludge
-
-
-
-
-
-# [6.2.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.0...v6.2.0-alpha.1) (2022-11-03)
-
-**Note:** Version bump only for package protocol-library-kludge
-
-
-
-
-
-# [6.2.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v6.1.0...v6.2.0-alpha.0) (2022-10-27)
-
-**Note:** Version bump only for package protocol-library-kludge
-
-
-
-
-
-# [6.1.0](https://github.com/Opentrons/opentrons/compare/v6.0.1...v6.1.0) (2022-09-27)
+## [6.1.0](https://github.com/Opentrons/opentrons/compare/v6.0.1...v6.1.0) (2022-09-27)
 
 **Note:** Version bump only for package protocol-library-kludge
 

@@ -3,75 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [6.2.0-alpha.6](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.5...v6.2.0-alpha.6) (2022-12-05)
+# [6.2.0](https://github.com/Opentrons/opentrons/compare/v6.1.0...v6.2.0) (2022-12-06)
 
 
 ### Bug Fixes
 
 * **app:** handle the input via OT_APP_DISCOVERY__CANDIDATES  ([#11759](https://github.com/Opentrons/opentrons/issues/11759)) ([48c4ad7](https://github.com/Opentrons/opentrons/commit/48c4ad768cefa1086038c940389640af8c15bf5b))
-
-
-
-
-
-# [6.2.0-alpha.5](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.4...v6.2.0-alpha.5) (2022-11-17)
-
-
-### Bug Fixes
-
 * **app:** pD protocol thermocycler profile steps readability ([#11753](https://github.com/Opentrons/opentrons/issues/11753)) ([0589d34](https://github.com/Opentrons/opentrons/commit/0589d346fce4633a1d82bc728e24f31bf360154e))
-
-
-
-
-
-# [6.2.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.3...v6.2.0-alpha.4) (2022-11-15)
-
-**Note:** Version bump only for package @opentrons/app
-
-
-
-
-
-# [6.2.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.2...v6.2.0-alpha.3) (2022-11-10)
-
-
-### Bug Fixes
-
 * **app:** downgrading robot software version and install btn fix ([#11707](https://github.com/Opentrons/opentrons/issues/11707)) ([c454b0c](https://github.com/Opentrons/opentrons/commit/c454b0c5ed85ab8d22059a8ef7786905005e2757))
 * **app:** include enabling log aggregation as toggle in robot settings ([#11715](https://github.com/Opentrons/opentrons/issues/11715)) ([29fd028](https://github.com/Opentrons/opentrons/commit/29fd0289d146529a46da503985120e49339349ec))
 * **app:** reintroduce deleted reanalyze menu item ([#11643](https://github.com/Opentrons/opentrons/issues/11643)) ([#11713](https://github.com/Opentrons/opentrons/issues/11713)) ([d320a77](https://github.com/Opentrons/opentrons/commit/d320a7773b1be51a0132df9f7844203d0f52fb54))
-
-
-### Features
-
-* **app:** Thermocycler GEN1 and GEN2 lid status in_between wire up ([#11686](https://github.com/Opentrons/opentrons/issues/11686)) ([8a04fdd](https://github.com/Opentrons/opentrons/commit/8a04fdd1a4a9549bec561f655519ca2f3270f6ca))
-
-
-
-
-
-# [6.2.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.1...v6.2.0-alpha.2) (2022-11-04)
-
-**Note:** Version bump only for package @opentrons/app
-
-
-
-
-
-# [6.2.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.0...v6.2.0-alpha.1) (2022-11-03)
-
-**Note:** Version bump only for package @opentrons/app
-
-
-
-
-
-# [6.2.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v6.1.0...v6.2.0-alpha.0) (2022-10-27)
-
-
-### Bug Fixes
-
 * **app:** add reanalyze to overflowMenu on landing page ([#11311](https://github.com/Opentrons/opentrons/issues/11311)) ([e29a7f4](https://github.com/Opentrons/opentrons/commit/e29a7f4f9056f01be8e8d99b2226b7df2e7f52ae))
 * **app:** change isDeckCalibrated's checked condition ([#11353](https://github.com/Opentrons/opentrons/issues/11353)) ([aac525a](https://github.com/Opentrons/opentrons/commit/aac525a3d73f6c8320fb556670734137aecbffd6))
 * **app:** fix connect to a robot via ip unique key issue ([#11541](https://github.com/Opentrons/opentrons/issues/11541)) ([45c89af](https://github.com/Opentrons/opentrons/commit/45c89afa1be017fe33876a9b6182bb6361143ad1))
@@ -87,6 +28,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
+* **app:** Thermocycler GEN1 and GEN2 lid status in_between wire up ([#11686](https://github.com/Opentrons/opentrons/issues/11686)) ([8a04fdd](https://github.com/Opentrons/opentrons/commit/8a04fdd1a4a9549bec561f655519ca2f3270f6ca))
 * **app:** Add  virtual keyboard components ([#11464](https://github.com/Opentrons/opentrons/issues/11464)) ([9f20d71](https://github.com/Opentrons/opentrons/commit/9f20d71a73d7dcf69a096329e7c4161d9e7b24d2))
 * **app:** add dsm feature flag and deprecate LabwarePositionCheck components ([#11404](https://github.com/Opentrons/opentrons/issues/11404)) ([343eaa3](https://github.com/Opentrons/opentrons/commit/343eaa3b761fa454b439dfc4545cc4d2f146c3f1))
 * **app:** add dummy OT-3 image ([#11477](https://github.com/Opentrons/opentrons/issues/11477)) ([3244ebc](https://github.com/Opentrons/opentrons/commit/3244ebc1138516d1a1c00c834821c80721f2aa0c))

@@ -3,65 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [6.2.0-alpha.6](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.5...v6.2.0-alpha.6) (2022-12-05)
-
-**Note:** Version bump only for package @opentrons/api-server
-
-
-
-
-
-# [6.2.0-alpha.5](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.4...v6.2.0-alpha.5) (2022-11-17)
-
-**Note:** Version bump only for package @opentrons/api-server
-
-
-
-
-
-# [6.2.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.3...v6.2.0-alpha.4) (2022-11-15)
-
-
-### Bug Fixes
-
-* **api:** allow loadLiquid command to no-op when liquid FF is off ([#11741](https://github.com/Opentrons/opentrons/issues/11741)) ([7d440e9](https://github.com/Opentrons/opentrons/commit/7d440e9192eb5bde1922b36a26ca9ed00aac6737))
-
-
-
-
-
-# [6.2.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.2...v6.2.0-alpha.3) (2022-11-10)
+# [6.2.0](https://github.com/Opentrons/opentrons/compare/v6.1.0...v6.2.0) (2022-12-06)
 
 
 ### Bug Fixes
 
 * **api:** ensure Thermocycler status APIs return vanilla strings ([#11694](https://github.com/Opentrons/opentrons/issues/11694)) ([10509dd](https://github.com/Opentrons/opentrons/commit/10509ddc11ccd89a1fa995b34e264873c7375e11))
-
-
-
-
-
-# [6.2.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.1...v6.2.0-alpha.2) (2022-11-04)
-
-**Note:** Version bump only for package @opentrons/api-server
-
-
-
-
-
-# [6.2.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v6.2.0-alpha.0...v6.2.0-alpha.1) (2022-11-03)
-
-**Note:** Version bump only for package @opentrons/api-server
-
-
-
-
-
-# [6.2.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v6.1.0...v6.2.0-alpha.0) (2022-10-27)
-
-
-### Bug Fixes
-
 * **api:** allow relative threshold value to be set for capacitive probe ([#11601](https://github.com/Opentrons/opentrons/issues/11601)) ([8d6519b](https://github.com/Opentrons/opentrons/commit/8d6519bd679317e3ee354f96e1065e3f7f048ecf))
 * **api:** correct critical points for gen3 multis ([#11405](https://github.com/Opentrons/opentrons/issues/11405)) ([797048e](https://github.com/Opentrons/opentrons/commit/797048e749ab733c573a69c85d62da1cb692e5bc))
 * **api:** ensure first module read completes during HW API build ([#11573](https://github.com/Opentrons/opentrons/issues/11573)) ([52ae103](https://github.com/Opentrons/opentrons/commit/52ae1031c08c7cc75dc13b8b8fc4e44a459e6874))
