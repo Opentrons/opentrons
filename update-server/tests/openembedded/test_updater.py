@@ -6,8 +6,8 @@ from unittest.mock import MagicMock
 import pytest
 
 from otupdate.common.update_actions import Partition
-from otupdate.openembedded.updater import (
-    Updater,
+from otupdate.openembedded.update_actions import (
+    OT3UpdateActions,
     PartitionManager,
     RootFSInterface,
 )
@@ -23,7 +23,7 @@ def test_update_valid_part_switch(
 ):
     """Test root fs being written to unused partition."""
 
-    updater = Updater(
+    updater = OT3UpdateActions(
         root_FS_intf=mock_root_fs_interface,
         part_mngr=mock_partition_manager_valid_switch,
     )
@@ -48,7 +48,7 @@ def test_update_invalid_part_switch(
 ):
     """Test for an invalid partition switch."""
 
-    updater = Updater(
+    updater = OT3UpdateActions(
         root_FS_intf=mock_root_fs_interface,
         part_mngr=mock_partition_manager_invalid_switch,
     )
@@ -72,7 +72,7 @@ def test_update_invalid_part_switch(
 )
 def test_unused_partition(mock_root_fs_interface, test_input, expected):
     pm = PartitionManager()
-    updater = Updater(root_FS_intf=mock_root_fs_interface, part_mngr=pm)
+    updater = OT3UpdateActions(root_FS_intf=mock_root_fs_interface, part_mngr=pm)
     assert updater.part_mngr.find_unused_partition(test_input) == expected
 
 
@@ -80,7 +80,7 @@ def test_decomp_and_write(
     mock_root_fs_interface: MagicMock, mock_partition_manager_valid_switch: MagicMock
 ):
     """Test helper functions get called as expected in decomp_and_write"""
-    updater = Updater(
+    updater = OT3UpdateActions(
         root_FS_intf=mock_root_fs_interface,
         part_mngr=mock_partition_manager_valid_switch,
     )
@@ -95,7 +95,7 @@ def test_commit_update(
     mock_partition_manager_valid_switch: MagicMock,
 ):
     """Test commit_update mounts and resizes rootfs as expected!"""
-    updater = Updater(
+    updater = OT3UpdateActions(
         root_FS_intf=mock_root_fs_interface,
         part_mngr=mock_partition_manager_valid_switch,
     )

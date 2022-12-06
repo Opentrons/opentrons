@@ -135,6 +135,8 @@ export const OT3_STANDARD_DECKID: 'ot3_standard' = 'ot3_standard'
 export const SINGLE_CHANNEL: 'Single-Channel' = 'Single-Channel'
 export const EIGHT_CHANNEL: '8-Channel' = '8-Channel'
 export const NINETY_SIX_CHANNEL: '96-Channel' = '96-Channel'
+export const SINGLE_MOUNT_PIPETTES: 'Single-Channel_and_8-Channel' =
+  'Single-Channel_and_8-Channel'
 
 // Thermocycler module info
 export const TC_MODULE_LOCATION: '7+10' = '7+10'

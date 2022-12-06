@@ -1,12 +1,12 @@
 import pytest
 from opentrons.calibration_storage import types as cal_types
-from opentrons.types import Point
+from opentrons.types import Point, Mount
 from opentrons.hardware_control.instruments.ot2 import pipette, instrument_calibration
 from opentrons.hardware_control import types
 from opentrons.config import pipette_config
 
 PIP_CAL = instrument_calibration.PipetteOffsetByPipetteMount(
-    offset=[0, 0, 0],
+    offset=Point(0, 0, 0),
     source=cal_types.SourceType.user,
     status=cal_types.CalibrationStatus(),
 )
@@ -117,6 +117,8 @@ def test_smoothie_config_update(monkeypatch):
 
 @pytest.mark.parametrize("config_model", pipette_config.config_models)
 def test_tip_overlap(config_model):
+    # TODO (lc 10-31-2022) We really shouldn't need to paramaterize over all of the
+    # config models to check that the config is loaded in properly.
     loaded = pipette_config.load(config_model)
     pip = pipette.Pipette(loaded, PIP_CAL, "testId")
     assert pip.config.tip_overlap == pipette_config.configs[config_model]["tipOverlap"]
@@ -161,3 +163,35 @@ def test_xy_center(config_model):
         loaded.nozzle_offset[1] - cp_y_offset,
         loaded.nozzle_offset[2],
     )
+
+
+def test_reset_instrument_offset():
+    # TODO (lc 10-31-2022) These tests would be much cleaner/easier to mock with
+    # an InstrumentCalibrationProvider class (like robot calibration provider)
+    # which should be done in a follow-up refactor.
+    temporary_calibration = instrument_calibration.PipetteOffsetByPipetteMount(
+        offset=Point(1, 1, 1),
+        source=cal_types.SourceType.user,
+        status=cal_types.CalibrationStatus(),
+    )
+
+    pip = pipette.Pipette(
+        pipette_config.load("p10_single_v1"), temporary_calibration, "testID"
+    )
+    assert pip.pipette_offset.offset == Point(1, 1, 1)
+    pip.reset_pipette_offset(Mount.LEFT, to_default=True)
+    assert pip.pipette_offset.offset == Point(0, 0, 0)
+
+
+@pytest.mark.xfail
+def test_save_instrument_offset():
+    # TODO (lc 10-31-2022) These tests would be much cleaner/easier to mock with
+    # an InstrumentCalibrationProvider class (like robot calibration provider)
+    # which should be done in a follow-up refactor.
+    pip = pipette.Pipette(pipette_config.load("p10_single_v1"), PIP_CAL, "testID")
+
+    assert pip.pipette_offset.offset == Point(0, 0, 0)
+    pip.save_pipette_offset(Mount.LEFT, Point(1.0, 2.0, 3.0))
+    # TODO (lc 10-31-2022) This assert should be easier to handle once we
+    # have the correct exports from calibration_storage
+    assert pip.pipette_offset.offset == Point(1.0, 2.0, 3.0)

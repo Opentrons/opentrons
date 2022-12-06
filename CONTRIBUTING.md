@@ -161,7 +161,7 @@ You will need the following tools installed to develop on the Opentrons platform
 - curl
 - ssh
 - Python v3.7
-- Node.js v14
+- Node.js v16
 
 See [DEV_SETUP.md](./DEV_SETUP.md) for our recommended development setup guides for macOS, Windows, and Linux.
 

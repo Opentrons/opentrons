@@ -12,10 +12,10 @@ import { StyledText } from '../../atoms/text'
 
 interface Props {
   iconColor: string
-  children: React.ReactNode
   header: string
-  subHeader?: string
   isSuccess: boolean
+  children?: React.ReactNode
+  subHeader?: string
 }
 
 export function SimpleWizardBody(props: Props): JSX.Element {

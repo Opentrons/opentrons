@@ -10,6 +10,7 @@ from opentrons.calibration_storage import (
     helpers,
     load_tip_length_calibration,
     get_pipette_offset,
+    save_pipette_calibration,
 )
 from opentrons.hardware_control.types import OT3Mount
 
@@ -95,6 +96,25 @@ def load_pipette_offset(
                 ),
             )
     return pip_cal_obj
+
+
+def save_pipette_offset_calibration(
+    pip_id: typing.Optional[str],
+    mount: typing.Union[Mount, OT3Mount],
+    offset: Point,
+    tiprack_hash: str,
+    tiprack_uri: str,
+) -> None:
+    # TODO this can be removed once we switch to using
+    # ot3 pipette types in the ot3 hardware controller.
+    if isinstance(mount, OT3Mount):
+        checked_mount = mount.to_mount()
+    else:
+        checked_mount = mount
+    if pip_id:
+        save_pipette_calibration(
+            offset, pip_id, checked_mount, tiprack_hash, tiprack_uri
+        )
 
 
 # TODO (lc 09-26-2022) We should ensure that only LabwareDefinition models are passed

@@ -38,7 +38,11 @@ import {
 import { FLOWS } from '../../PipetteWizardFlows/constants'
 import { PipetteWizardFlows } from '../../PipetteWizardFlows'
 import { AskForCalibrationBlockModal } from '../../CalibrateTipLength'
-import { useDeckCalibrationData, usePipetteOffsetCalibration } from '../hooks'
+import {
+  useDeckCalibrationData,
+  useIsOT3,
+  usePipetteOffsetCalibration,
+} from '../hooks'
 import { PipetteOverflowMenu } from './PipetteOverflowMenu'
 import { PipetteSettingsSlideout } from './PipetteSettingsSlideout'
 import { AboutPipetteSlideout } from './AboutPipetteSlideout'
@@ -46,45 +50,61 @@ import { AboutPipetteSlideout } from './AboutPipetteSlideout'
 import type { AttachedPipette, Mount } from '../../../redux/pipettes/types'
 import {
   isOT3Pipette,
+  NINETY_SIX_CHANNEL,
   PipetteModelSpecs,
   PipetteMount,
   PipetteName,
+  SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 import type { Dispatch, State } from '../../../redux/types'
-import type { PipetteWizardFlow } from '../../PipetteWizardFlows/types'
+import type {
+  PipetteWizardFlow,
+  SelectablePipettes,
+} from '../../PipetteWizardFlows/types'
+import { ChoosePipette } from '../../PipetteWizardFlows/ChoosePipette'
 
 interface PipetteCardProps {
   pipetteInfo: PipetteModelSpecs | null
   pipetteId?: AttachedPipette['id'] | null
   mount: Mount
   robotName: string
+  is96ChannelAttached: boolean
 }
 
 const FETCH_PIPETTE_CAL_MS = 30000
 
 export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const { t } = useTranslation(['device_details', 'protocol_setup'])
-  const { pipetteInfo, mount, robotName, pipetteId } = props
+  const {
+    pipetteInfo,
+    mount,
+    robotName,
+    pipetteId,
+    is96ChannelAttached,
+  } = props
   const {
     menuOverlay,
     handleOverflowClick,
     showOverflowMenu,
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
+  const isOt3 = useIsOT3(robotName)
   const dispatch = useDispatch<Dispatch>()
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
   const pipetteName = pipetteInfo?.name
+  const isOT3PipetteAttached = isOT3Pipette(pipetteName as PipetteName)
   const pipetteDisplayName = pipetteInfo?.displayName
   const pipetteOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => setShowOverflowMenu(false),
   })
-  const isOT3PipetteAttached = isOT3Pipette(pipetteName as PipetteName)
   const [showChangePipette, setChangePipette] = React.useState(false)
   const [showBanner, setShowBanner] = React.useState(true)
   const [showSlideout, setShowSlideout] = React.useState(false)
-  const [showPipetteWizardFlows, setShowPipetteWizardFlows] = React.useState(
-    false
-  )
+  const [
+    pipetteWizardFlow,
+    setPipetteWizardFlow,
+  ] = React.useState<PipetteWizardFlow | null>(null)
+  const [showAttachPipette, setShowAttachPipette] = React.useState(false)
   const [showAboutSlideout, setShowAboutSlideout] = React.useState(false)
   const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
   const configHasCalibrationBlock = useSelector(getHasCalibrationBlock)
@@ -143,11 +163,17 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   }
 
   const handleChangePipette = (): void => {
-    setChangePipette(true)
+    if (isOT3PipetteAttached && isOt3) {
+      setPipetteWizardFlow(FLOWS.DETACH)
+    } else if (!isOT3PipetteAttached && isOt3) {
+      setShowAttachPipette(true)
+    } else {
+      setChangePipette(true)
+    }
   }
   const handleCalibrate = (): void => {
     isOT3PipetteAttached
-      ? setShowPipetteWizardFlows(true)
+      ? setPipetteWizardFlow(FLOWS.CALIBRATE)
       : startPipetteOffsetCalibrationBlockModal(null)
   }
   const handleAboutSlideout = (): void => {
@@ -157,6 +183,14 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     setShowSlideout(true)
   }
 
+  const handleAttachPipette = (selectedPipette: SelectablePipettes): void => {
+    if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
+      setShowAttachPipette(false)
+      setPipetteWizardFlow(FLOWS.ATTACH)
+    } else if (selectedPipette === NINETY_SIX_CHANNEL) {
+      console.log('we still have to wire up the 96 channel attach flow!')
+    }
+  }
   return (
     <Flex
       backgroundColor={COLORS.fundamentalsBackground}
@@ -164,11 +198,17 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       width="100%"
       data-testid={`PipetteCard_${pipetteDisplayName}`}
     >
-      {showPipetteWizardFlows ? (
+      {showAttachPipette ? (
+        <ChoosePipette
+          proceed={handleAttachPipette}
+          exit={() => setShowAttachPipette(false)}
+        />
+      ) : null}
+      {pipetteWizardFlow != null ? (
         <PipetteWizardFlows
-          flowType={FLOWS.CALIBRATE as PipetteWizardFlow}
+          flowType={pipetteWizardFlow}
           mount={mount as PipetteMount}
-          closeFlow={() => setShowPipetteWizardFlows(false)}
+          closeFlow={() => setPipetteWizardFlow(null)}
           robotName={robotName}
         />
       ) : null}
@@ -296,9 +336,11 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               paddingBottom={SPACING.spacing2}
               data-testid={`PipetteCard_mount_${pipetteDisplayName}`}
             >
-              {t('mount', {
-                side: mount === LEFT ? t('left') : t('right'),
-              })}
+              {is96ChannelAttached
+                ? t('both_mounts')
+                : t('mount', {
+                    side: mount === LEFT ? t('left') : t('right'),
+                  })}
             </StyledText>
             <Flex
               paddingBottom={SPACING.spacing2}
@@ -316,7 +358,12 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
         padding={SPACING.spacing2}
         data-testid={`PipetteCard_overflow_btn_${pipetteDisplayName}`}
       >
-        <OverflowBtn aria-label="overflow" onClick={handleOverflowClick} />
+        <OverflowBtn
+          aria-label="overflow"
+          onClick={handleOverflowClick}
+          //  disabling the overflow btn if a 96 channel pipette is attached for now
+          disabled={is96ChannelAttached}
+        />
       </Box>
       {showOverflowMenu && (
         <>

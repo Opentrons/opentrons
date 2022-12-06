@@ -4,19 +4,13 @@ import uniq from 'lodash/uniq'
 import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
 import standardDeckDefOt2 from '../../deck/definitions/3/ot2_standard.json'
 import standardDeckDefOt3 from '../../deck/definitions/3/ot3_standard.json'
-import type { LoadLabwareRunTimeCommand } from '../../protocol/types/schemaV6/command/setup'
 import type { DeckDefinition, LabwareDefinition2 } from '../types'
-import type {
-  LoadedLabware,
-  RobotType,
-  RunTimeCommand,
-  ThermalAdapterName,
-} from '..'
+import type { LoadedLabware, RobotType, ThermalAdapterName } from '..'
 
 export { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 export { getWellTotalVolume } from './getWellTotalVolume'
 export { wellIsRect } from './wellIsRect'
-export { schemaV6Adapter } from './schemaV6Adapter'
+export { schemaV6Adapter, LegacySchemaAdapterOutput } from './schemaV6Adapter'
 
 export * from './parseProtocolData'
 export * from './volume'
@@ -24,6 +18,7 @@ export * from './wellSets'
 export * from './getModuleVizDims'
 export * from './getVectorDifference'
 export * from './getVectorSum'
+export * from './getLoadedLabwareDefinitionsByUri'
 
 export const getLabwareDefIsStandard = (def: LabwareDefinition2): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE
@@ -325,26 +320,4 @@ export const getDeckDefFromRobotType = (
 ): DeckDefinition => {
   // @ts-expect-error imported JSON not playing nice with TS. see https://github.com/microsoft/TypeScript/issues/32063
   return robotType === 'OT-3 Standard' ? standardDeckDefOt3 : standardDeckDefOt2
-}
-
-/**
- * @deprecated This should be deleted as soon as schema v6 adapter work is merged.
- * The only reason this util exists is because we need data to be shaped as ProtocolAnalysisOutput
- * rather than ProtocolAnalysisFile (which is a result of the schema v6 adapter)
- */
-export const getLoadedLabwareFromCommands = (
-  commands: RunTimeCommand[]
-): LoadedLabware[] => {
-  return commands
-    .filter(
-      (command): command is LoadLabwareRunTimeCommand =>
-        command.commandType === 'loadLabware'
-    )
-    .map((loadLabwareCommand: LoadLabwareRunTimeCommand) => ({
-      id: loadLabwareCommand.id,
-      loadName: loadLabwareCommand.result.definition.parameters.loadName,
-      definitionUri: getLabwareDefURI(loadLabwareCommand.result.definition),
-      location: loadLabwareCommand.params.location,
-      displayName: loadLabwareCommand.result.definition.metadata.displayName,
-    }))
 }

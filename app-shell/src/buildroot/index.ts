@@ -71,11 +71,7 @@ export function registerBuildrootUpdate(dispatch: Dispatch): Dispatch {
       }
 
       case 'buildroot:UPLOAD_FILE': {
-        const { host, path, systemFile } = action.payload as {
-          host: RobotHost
-          path: string
-          systemFile: string | null
-        }
+        const { host, path, systemFile } = action.payload
         const file = systemFile !== null ? systemFile : updateSet?.system
 
         if (file == null) {

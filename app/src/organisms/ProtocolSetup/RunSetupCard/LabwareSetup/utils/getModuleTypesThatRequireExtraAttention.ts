@@ -6,19 +6,19 @@ const MODULE_TYPES_THAT_REQUIRE_EXTRA_ATTENTION = [
   'heaterShakerModuleType',
 ] as const
 
-export type ModuleTypesThatRequiresExtraAttention = typeof MODULE_TYPES_THAT_REQUIRE_EXTRA_ATTENTION[number]
+export type ModuleTypesThatRequireExtraAttention = typeof MODULE_TYPES_THAT_REQUIRE_EXTRA_ATTENTION[number]
 
 const doesModuleRequireExtraAttention = (
   moduleType: ModuleType
-): moduleType is ModuleTypesThatRequiresExtraAttention =>
+): moduleType is ModuleTypesThatRequireExtraAttention =>
   MODULE_TYPES_THAT_REQUIRE_EXTRA_ATTENTION.includes(
-    moduleType as ModuleTypesThatRequiresExtraAttention
+    moduleType as ModuleTypesThatRequireExtraAttention
   )
 
 export const getModuleTypesThatRequireExtraAttention = (
   moduleModels: ModuleModel[]
-): ModuleTypesThatRequiresExtraAttention[] =>
-  moduleModels.reduce<ModuleTypesThatRequiresExtraAttention[]>(
+): ModuleTypesThatRequireExtraAttention[] =>
+  moduleModels.reduce<ModuleTypesThatRequireExtraAttention[]>(
     (acc, moduleModel) => {
       const moduleType = getModuleType(moduleModel)
       return doesModuleRequireExtraAttention(moduleType) &&

@@ -468,7 +468,7 @@ class PickUpTipCommand(TypedDict):
 
 
 class DropTipCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
-    location: Location
+    location: Well
 
 
 class DropTipCommand(TypedDict):

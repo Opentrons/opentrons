@@ -17,17 +17,16 @@ import {
 import { ExternalLink } from '../../../atoms/Link/ExternalLink'
 import { StyledText } from '../../../atoms/text'
 import { Divider } from '../../../atoms/structure'
-// import { SecondaryButton } from '../../../atoms/buttons'
+
 import {
   fetchStatus,
   fetchWifiList,
   getNetworkInterfaces,
   getWifiList,
-  /* postWifiDisconnect, */
 } from '../../../redux/networking'
-// import * as RobotApi from '../../../redux/robot-api'
+
 import { useIsRobotBusy } from '../hooks'
-import { TemporarySelectNetwork } from './TemporarySelectNetwork'
+import { SelectNetwork } from './SelectNetwork'
 
 import type { State, Dispatch } from '../../../redux/types'
 interface NetworkingProps {
@@ -48,7 +47,6 @@ export function RobotSettingsNetworking({
   const list = useSelector((state: State) => getWifiList(state, robotName))
   const dispatch = useDispatch<Dispatch>()
   const isRobotBusy = useIsRobotBusy({ poll: true })
-  // const [dispatchApi] = RobotApi.useDispatchApiRequest()
 
   const { wifi, ethernet } = useSelector((state: State) =>
     getNetworkInterfaces(state, robotName)
@@ -102,7 +100,7 @@ export function RobotSettingsNetworking({
           <>
             <Flex marginBottom={SPACING.spacing5}>
               <Box width="25%" marginRight={SPACING.spacing3}>
-                <TemporarySelectNetwork
+                <SelectNetwork
                   robotName={robotName}
                   isRobotBusy={isRobotBusy}
                 />
@@ -141,10 +139,7 @@ export function RobotSettingsNetworking({
           </>
         ) : (
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <TemporarySelectNetwork
-              robotName={robotName}
-              isRobotBusy={isRobotBusy}
-            />
+            <SelectNetwork robotName={robotName} isRobotBusy={isRobotBusy} />
           </Flex>
         )}
       </Box>

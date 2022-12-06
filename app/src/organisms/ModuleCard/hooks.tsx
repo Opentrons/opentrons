@@ -7,7 +7,6 @@ import { useTranslation } from 'react-i18next'
 import { useHoverTooltip } from '@opentrons/components'
 import {
   getDeckDefFromRobotType,
-  getLoadedLabwareFromCommands,
   getRobotTypeFromLoadedLabware,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
@@ -40,8 +39,7 @@ export function useIsHeaterShakerInProtocol(): boolean {
   const currentRunId = useCurrentRunId()
   const { protocolData } = useProtocolDetailsForRun(currentRunId)
   if (protocolData == null) return false
-  const loadedLabware = getLoadedLabwareFromCommands(protocolData.commands)
-  const robotType = getRobotTypeFromLoadedLabware(loadedLabware)
+  const robotType = getRobotTypeFromLoadedLabware(protocolData.labware)
 
   const deckDef = getDeckDefFromRobotType(robotType)
   const protocolModulesInfo = getProtocolModulesInfo(protocolData, deckDef)

@@ -29,13 +29,19 @@ export function useCreateRunCommandMutation(
 export function useChainRunCommands(
   runId: string
 ): {
-  chainRunCommands: (commands: CreateCommand[]) => Promise<unknown>
+  chainRunCommands: (
+    commands: CreateCommand[],
+    continuePastCommandFailure: boolean
+  ) => Promise<unknown>
   isCommandMutationLoading: boolean
 } {
   const { createRunCommand, isLoading } = useCreateRunCommandMutation(runId)
   return {
-    chainRunCommands: (commands: CreateCommand[]) =>
-      chainRunCommands(commands, createRunCommand),
+    chainRunCommands: (
+      commands: CreateCommand[],
+      continuePastCommandFailure: boolean
+    ) =>
+      chainRunCommands(commands, createRunCommand, continuePastCommandFailure),
     isCommandMutationLoading: isLoading,
   }
 }

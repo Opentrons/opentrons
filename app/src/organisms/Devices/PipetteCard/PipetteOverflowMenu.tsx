@@ -89,15 +89,13 @@ export const PipetteOverflowMenu = (
                   : calibratePipetteText
               )}
             </MenuItem>
-            {!isOT3PipetteAttached && (
-              <MenuItem
-                key={`${pipetteDisplayName}_${mount}_detach`}
-                onClick={() => handleChangePipette()}
-                data-testid={`pipetteOverflowMenu_detach_pipette_btn_${pipetteDisplayName}_${mount}`}
-              >
-                {t('detach_pipette')}
-              </MenuItem>
-            )}
+            <MenuItem
+              key={`${pipetteDisplayName}_${mount}_detach`}
+              onClick={() => handleChangePipette()}
+              data-testid={`pipetteOverflowMenu_detach_pipette_btn_${pipetteDisplayName}_${mount}`}
+            >
+              {t('detach_pipette')}
+            </MenuItem>
             <MenuItem
               key={`${pipetteDisplayName}_${mount}_about_pipette`}
               onClick={() => handleAboutSlideout()}

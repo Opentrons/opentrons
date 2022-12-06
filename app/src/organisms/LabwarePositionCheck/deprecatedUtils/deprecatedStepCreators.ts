@@ -4,6 +4,7 @@ import {
   RunTimeCommand,
   HEATERSHAKER_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  LoadedLabware,
 } from '@opentrons/shared-data'
 import { getLabwareLocation } from '../../Devices/ProtocolRun/utils/getLabwareLocation'
 import type {
@@ -68,7 +69,7 @@ export const getMoveToTiprackSteps = (
   })
 
 export const getMoveToLabwareSteps = (
-  labware: ProtocolFile<{}>['labware'],
+  labware: LoadedLabware[],
   modules: ProtocolFile<{}>['modules'],
   labwareIds: string[],
   pipetteId: string,
@@ -101,7 +102,7 @@ export const getMoveToLabwareSteps = (
     let moveToLabwareCommands: LabwarePositionCheckCreateCommand[] = []
 
     if (isLabwareOnTopOfTC) {
-      // @ts-expect-error we know there is a moduleId key on type LabwareLocation because the labware is on top of a TC
+      // @ts-expect-error moduleId will exist from type narrowing
       const moduleId = getLabwareLocation(labwareId, commands).moduleId
       const openTCLidCommand: TCOpenLidCreateCommand = {
         commandType: 'thermocycler/openLid',
@@ -111,7 +112,7 @@ export const getMoveToLabwareSteps = (
       }
       moveToLabwareCommands = [openTCLidCommand, moveToWellCommand]
     } else if (isLabwareOnTopOfHS) {
-      // @ts-expect-error we know there is a moduleId key on type LabwareLocation because the labware is on top of a HS
+      // @ts-expect-error moduleId will exist from type narrowing
       const moduleId = getLabwareLocation(labwareId, commands).moduleId
       const closeLatchCommand: HeaterShakerCloseLatchCreateCommand = {
         commandType: 'heaterShaker/closeLabwareLatch',

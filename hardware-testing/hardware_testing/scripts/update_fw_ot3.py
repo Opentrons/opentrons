@@ -30,7 +30,8 @@ FW_PIP_SINGLE = HexPathAndTarget(
 FW_PIP_MULTI = HexPathAndTarget(
     name="pipettes-multi-rev1.hex", path=None, target="pipette-{mount}"
 )
-ALL_FW = [FW_GANTRY_X, FW_GANTRY_Y, FW_HEAD, FW_PIP_SINGLE, FW_PIP_MULTI]
+FW_GRIPPER = HexPathAndTarget(name="gripper-rev1.hex", path=None, target="gripper")
+ALL_FW = [FW_GANTRY_X, FW_GANTRY_Y, FW_HEAD, FW_PIP_SINGLE, FW_PIP_MULTI, FW_GRIPPER]
 
 
 def _gather_hex_files_from_directory(directory: Path) -> None:
@@ -103,8 +104,12 @@ async def _main(directory: Path, is_simulating: bool) -> None:
                 is_simulating=is_simulating,
             )
     # flash the gripper
-    if has_gripper:
-        raise RuntimeError("Gripper flashing is not yet implemented")
+    if has_gripper and FW_GRIPPER.path:
+        _run_update_fw_command(
+            path=FW_GRIPPER.path,
+            target=FW_GRIPPER.target,
+            is_simulating=is_simulating,
+        )
 
 
 if __name__ == "__main__":

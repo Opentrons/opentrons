@@ -1,5 +1,6 @@
 """ProtocolEngine-based Protocol API core implementation."""
 from typing import Dict, Optional, Type, Union
+from typing_extensions import Literal
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
@@ -65,6 +66,8 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             labware_id=engine_client.state.labware.get_fixed_trash_id(),
             engine_client=engine_client,
         )
+        self._last_location: Optional[Location] = None
+        self._last_mount: Optional[Mount] = None
 
     @property
     def api_version(self) -> APIVersion:
@@ -102,7 +105,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def is_simulating(self) -> bool:
         """Get whether the protocol is being analyzed or actually run."""
-        return self._sync_hardware.is_simulator  # type: ignore[no-any-return]
+        return self._engine_client.state.config.ignore_pause
 
     def add_labware_definition(
         self,
@@ -220,8 +223,10 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             sync_module_hardware=SynchronousAdapter(selected_hardware),
         )
 
+    # TODO (tz, 11-23-22): remove Union when refactoring load_pipette for 96 channels.
+    # https://opentrons.atlassian.net/browse/RLIQ-255
     def load_instrument(
-        self, instrument_name: PipetteNameType, mount: Mount
+        self, instrument_name: Union[PipetteNameType, Literal["p1000_96"]], mount: Mount
     ) -> InstrumentCore:
         """Load an instrument into the protocol.
 
@@ -239,6 +244,9 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             pipette_id=load_result.pipetteId,
             engine_client=self._engine_client,
             sync_hardware_api=self._sync_hardware,
+            protocol_core=self,
+            # TODO(mm, 2022-11-10): Deduplicate "400" with legacy core.
+            default_movement_speed=400,
         )
 
     def get_loaded_instruments(self) -> Dict[Mount, Optional[InstrumentCore]]:
@@ -247,23 +255,25 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def pause(self, msg: Optional[str]) -> None:
         """Pause the protocol."""
-        raise NotImplementedError("ProtocolCore.pause not implemented")
+        self._engine_client.wait_for_resume(message=msg)
 
     def resume(self) -> None:
         """Resume the protocol."""
+        # TODO(mm, 2022-11-08): This method is not usable in practice. Consider removing
+        # it from both cores. https://github.com/Opentrons/opentrons/issues/8209
         raise NotImplementedError("ProtocolCore.resume not implemented")
 
     def comment(self, msg: str) -> None:
         """Create a comment in the protocol to be shown in the log."""
-        raise NotImplementedError("ProtocolCore.comment not implemented")
+        self._engine_client.comment(message=msg)
 
     def delay(self, seconds: float, msg: Optional[str]) -> None:
         """Wait for a period of time before proceeding."""
-        raise NotImplementedError("ProtocolCore.delay not implemented")
+        self._engine_client.wait_for_duration(seconds=seconds, message=msg)
 
     def home(self) -> None:
         """Move all axes to their home positions."""
-        raise NotImplementedError("ProtocolCore.home not implemented")
+        self._engine_client.home(axes=None)
 
     def get_deck(self) -> Deck:
         """Get an interface to get and modify the deck layout."""
@@ -275,11 +285,11 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def set_rail_lights(self, on: bool) -> None:
         """Set the device's rail lights."""
-        raise NotImplementedError("ProtocolCore.set_rail_lights not implemented")
+        self._engine_client.set_rail_lights(on=on)
 
     def get_rail_lights_on(self) -> bool:
         """Get whether the device's rail lights are on."""
-        raise NotImplementedError("ProtocolCore.get_rail_lights_on not implemented")
+        return self._sync_hardware.get_lights()["rails"]  # type: ignore[no-any-return]
 
     def door_closed(self) -> bool:
         """Get whether the device's front door is closed."""
@@ -290,7 +300,10 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         mount: Optional[Mount] = None,
     ) -> Optional[Location]:
         """Get the last accessed location."""
-        raise NotImplementedError("ProtocolCore.get_last_location not implemented")
+        if mount is None or mount == self._last_mount:
+            return self._last_location
+
+        return None
 
     def set_last_location(
         self,
@@ -298,4 +311,5 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         mount: Optional[Mount] = None,
     ) -> None:
         """Set the last accessed location."""
-        raise NotImplementedError("ProtocolCore.set_last_location not implemented")
+        self._last_location = location
+        self._last_mount = mount

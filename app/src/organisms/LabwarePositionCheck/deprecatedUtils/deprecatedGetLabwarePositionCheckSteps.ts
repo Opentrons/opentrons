@@ -1,5 +1,3 @@
-import omitBy from 'lodash/omitBy'
-import values from 'lodash/values'
 import { deprecatedGetPrimaryPipetteId } from './deprecatedGetPrimaryPipetteId'
 import { getPipetteWorkflow } from './getPipetteWorkflow'
 import { getOnePipettePositionCheckSteps } from './getOnePipettePositionCheckSteps'
@@ -8,42 +6,43 @@ import type {
   RunTimeCommand,
   ProtocolAnalysisFile,
 } from '@opentrons/shared-data/protocol/types/schemaV6'
+import type {
+  LegacySchemaAdapterOutput,
+  LoadedPipette,
+} from '@opentrons/shared-data'
 import type { DeprecatedLabwarePositionCheckStep } from '../types'
 
 export const deprecatedGetLabwarePositionCheckSteps = (
-  protocolData: ProtocolAnalysisFile
+  protocolData: LegacySchemaAdapterOutput
 ): DeprecatedLabwarePositionCheckStep[] => {
   if (protocolData != null && 'pipettes' in protocolData) {
     // filter out any pipettes that are not being used in the protocol
-    const pipettesById: ProtocolAnalysisFile['pipettes'] = omitBy(
-      protocolData.pipettes,
-      (_pipette, id) =>
-        !protocolData.commands.some(
-          command =>
-            command.commandType === 'pickUpTip' &&
-            command.params.pipetteId === id
-        )
+    const pipettes: LoadedPipette[] = protocolData.pipettes.filter(pipette =>
+      protocolData.commands.some(
+        command =>
+          command.commandType === 'pickUpTip' &&
+          command.params.pipetteId === pipette.id
+      )
     )
-    const pipettes = values(pipettesById)
-    const pipetteNames = pipettes.map(({ name }) => name)
-    const labware = omitBy(
-      protocolData.labware,
-      (labware, id) =>
-        protocolData.labwareDefinitions[labware.definitionId]?.parameters
+    const pipetteNames = pipettes.map(({ pipetteName }) => pipetteName)
+
+    const labware = protocolData.labware.filter(
+      labware =>
+        !protocolData.labwareDefinitions[labware.definitionUri]?.parameters
+          .isTiprack ||
+        (protocolData.labwareDefinitions[labware.definitionUri]?.parameters
           .isTiprack &&
-        !protocolData.commands.some(
-          command =>
-            command.commandType === 'pickUpTip' &&
-            command.params.labwareId === id
-        )
+          protocolData.commands.some(
+            command =>
+              command.commandType === 'pickUpTip' &&
+              command.params.labwareId === labware.id
+          ))
     )
+
     const modules: ProtocolAnalysisFile['modules'] = protocolData.modules
     const labwareDefinitions = protocolData.labwareDefinitions
     const commands: RunTimeCommand[] = protocolData.commands
-    const primaryPipetteId = deprecatedGetPrimaryPipetteId(
-      pipettesById,
-      commands
-    )
+    const primaryPipetteId = deprecatedGetPrimaryPipetteId(pipettes, commands)
     const pipetteWorkflow = getPipetteWorkflow({
       pipetteNames,
       primaryPipetteId,
@@ -61,9 +60,9 @@ export const deprecatedGetLabwarePositionCheckSteps = (
         commands,
       })
     } else {
-      const secondaryPipetteId = Object.keys(pipettesById).find(
-        pipetteId => pipetteId !== primaryPipetteId
-      ) as string
+      const secondaryPipetteId = pipettes.find(
+        pipette => pipette.id !== primaryPipetteId
+      )?.id as string
 
       return getTwoPipettePositionCheckSteps({
         primaryPipetteId,

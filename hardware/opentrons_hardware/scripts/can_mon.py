@@ -1,6 +1,7 @@
 """A script for monitoring CAN bus."""
 import asyncio
 import dataclasses
+from dataclasses import fields
 import logging
 import argparse
 import atexit
@@ -84,8 +85,12 @@ async def task(
     """
     writer = Writer(write_to)
     label_style = "\033[0;37;40m"
-    header_style = "\033[0;36;40m"
-    data_style = "\033[1;36;40m"
+
+    info_header_style = "\033[0;36;40m"
+    info_data_style = "\033[1;36;40m"
+
+    err_header_style = "\033[0;31;40m"
+    err_data_style = "\033[1;31;40m"
 
     with WaitableCallback(messenger) as cb:
         async for message, arbitration_id in cb:
@@ -96,13 +101,26 @@ async def task(
                 arb_id_str = f"{msg_name} ({from_node}->{to_node})"
             except ValueError:
                 arb_id_str = f"0x{arbitration_id.id:x}"
+
+            if arbitration_id.parts.message_id == MessageId.error_message:
+                header_style = err_header_style
+                data_style = err_data_style
+            else:
+                header_style = info_header_style
+                data_style = info_data_style
+
             writer.write(
                 [
                     StyledOutput(style=header_style, content=str(datetime.now())),
                     StyledOutput(style=data_style, content=arb_id_str + "\n"),
                 ]
             )
-            for name, value in dataclasses.asdict(message.payload).items():
+            for name, value in (
+                dict(
+                    (field.name, getattr(message.payload, field.name))
+                    for field in fields(message.payload)
+                )
+            ).items():
                 writer.write(
                     [
                         StyledOutput(style=label_style, content=f"\t{name}:"),

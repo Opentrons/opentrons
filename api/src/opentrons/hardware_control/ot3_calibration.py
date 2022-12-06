@@ -8,7 +8,7 @@ from enum import Enum
 from math import copysign, floor
 from logging import getLogger
 
-from .types import OT3Mount, OT3Axis
+from .types import OT3Mount, OT3Axis, GripperProbe
 from opentrons.types import Point
 import json
 
@@ -18,6 +18,7 @@ if TYPE_CHECKING:
 LOG = getLogger(__name__)
 
 CAL_TRANSIT_HEIGHT: Final[float] = 10
+GRIPPER_GRIP_FORCE: Final[float] = 20
 
 
 class CalibrationMethod(Enum):
@@ -384,7 +385,7 @@ async def find_slot_center_noncontact(
     return x_center, y_center
 
 
-async def calibrate_mount(
+async def _calibrate_mount(
     hcapi: OT3API,
     mount: OT3Mount,
     method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
@@ -397,6 +398,11 @@ async def calibrate_mount(
     tip has been attached, or the conductive probe has been attached,
     or the probe has been lowered). The robot should be homed.
 
+    Note: To calibrate a gripper, this process must be performed on the front
+    and rear calibration pins separately. The gripper calibration offset is
+    the average of the pin offsets, which can be obtained by passing the
+    two offsets into the `gripper_pin_offsets_mean` func.
+
     Params
     ------
     hcapi: a hardware control api to run commands against
@@ -408,20 +414,101 @@ async def calibrate_mount(
     the plane of the deck. This value is suitable for vector-subtracting
     from the current instrument offset to set a new instrument offset.
     """
-    # First, find the deck. This will become our z offset value, and will
-    # also be used to baseline the edge detection points.
-    z_pos = await find_deck_position(hcapi, mount)
-    LOG.info(f"Found deck at {z_pos}mm")
+    # reset instrument offset
+    await hcapi.reset_instrument_offset(mount)
+    try:
+        # First, find the deck. This will become our z offset value, and will
+        # also be used to baseline the edge detection points.
+        z_pos = await find_deck_position(hcapi, mount)
+        LOG.info(f"Found deck at {z_pos}mm")
 
-    if method == CalibrationMethod.BINARY_SEARCH:
-        x_center, y_center = await find_slot_center_binary(hcapi, mount, z_pos)
-    elif method == CalibrationMethod.NONCONTACT_PASS:
-        x_center, y_center = await find_slot_center_noncontact(hcapi, mount, z_pos)
-    else:
-        raise RuntimeError("Unknown calibration method")
+        # Perform xy offset search
+        if method == CalibrationMethod.BINARY_SEARCH:
+            x_center, y_center = await find_slot_center_binary(hcapi, mount, z_pos)
+        elif method == CalibrationMethod.NONCONTACT_PASS:
+            x_center, y_center = await find_slot_center_noncontact(hcapi, mount, z_pos)
+        else:
+            raise RuntimeError("Unknown calibration method")
 
-    # The center of the calibration slot is the xy-center in-plane, and
-    # the absolute sense value out-of-plane
-    center = Point(x_center, y_center, z_pos)
-    LOG.info(f"Found calibration value {center} for mount {mount.name}")
-    return center
+        # update center with values obtained during calibration
+        center = Point(x_center, y_center, z_pos)
+        LOG.info(f"Found calibration value {center} for mount {mount.name}")
+
+        return center - Point(*hcapi.config.calibration.edge_sense.nominal_center)
+
+    except (InaccurateNonContactSweepError, EarlyCapacitiveSenseTrigger):
+        LOG.info(
+            "Error occurred during calibration. Resetting to current saved calibration value."
+        )
+        await hcapi.reset_instrument_offset(mount, to_default=False)
+        # re-raise exception after resetting instrument offset
+        raise
+
+
+def gripper_pin_offsets_mean(front: Point, rear: Point) -> Point:
+    """
+    Get calibration offset of a gripper from its front and rear pin offsets.
+
+    This function should be used for gripper calibration only.
+
+    Params
+    ------
+    front: gripper's front pin calibration offset
+    rear: gripper's rear pin calibration offset
+
+    Returns
+    -------
+    The gripper calibration offset.
+    """
+    return 0.5 * (front + rear)
+
+
+async def calibrate_gripper(
+    hcapi: OT3API,
+    probe: GripperProbe,
+    method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
+) -> Point:
+    """
+    Run automatic calibration for gripper.
+
+    Before running this function, make sure that the appropriate probe
+    has been attached or prepped on the tool (for instance, a capacitive
+    tip has been attached, or the conductive probe has been attached,
+    or the probe has been lowered). The robot should be homed.
+
+    This process must be performed on the front
+    and rear calibration pins separately. The gripper calibration offset is
+    the average of the pin offsets, which can be obtained by passing the
+    two offsets into the `gripper_pin_offsets_mean` func.
+    """
+    hcapi.add_gripper_probe(probe)
+    try:
+        await hcapi.grip(GRIPPER_GRIP_FORCE)
+        offset = await _calibrate_mount(hcapi, OT3Mount.GRIPPER, method)
+        return offset
+    finally:
+        hcapi.remove_gripper_probe()
+        await hcapi.ungrip()
+
+
+async def calibrate_pipette(
+    hcapi: OT3API,
+    mount: Literal[OT3Mount.LEFT, OT3Mount.RIGHT],
+    method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
+) -> Point:
+    """
+    Run automatic calibration for pipette.
+
+    Before running this function, make sure that the appropriate probe
+    has been attached or prepped on the tool (for instance, a capacitive
+    tip has been attached, or the conductive probe has been attached,
+    or the probe has been lowered). The robot should be homed.
+    """
+    try:
+        await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
+        offset = await _calibrate_mount(hcapi, mount, method)
+        # save instrument offset for pipette
+        await hcapi.save_instrument_offset(mount, offset)
+        return offset
+    finally:
+        await hcapi.remove_tip(mount)

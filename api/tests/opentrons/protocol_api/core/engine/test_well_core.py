@@ -78,7 +78,7 @@ def test_max_volume(subject: WellCore) -> None:
 def test_get_top(
     decoy: Decoy, mock_engine_client: EngineClient, subject: WellCore
 ) -> None:
-    """It should have a max volume."""
+    """It should get a well top."""
     decoy.when(
         mock_engine_client.state.geometry.get_well_position(
             labware_id="labware-id",
@@ -95,7 +95,7 @@ def test_get_top(
 def test_get_bottom(
     decoy: Decoy, mock_engine_client: EngineClient, subject: WellCore
 ) -> None:
-    """It should have a max volume."""
+    """It should get a well bottom."""
     decoy.when(
         mock_engine_client.state.geometry.get_well_position(
             labware_id="labware-id",
@@ -107,3 +107,26 @@ def test_get_bottom(
     ).then_return(Point(1, 2, 3))
 
     assert subject.get_bottom(z_offset=42.0) == Point(1, 2, 3)
+
+
+def test_get_center(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: WellCore
+) -> None:
+    """It should get a well center."""
+    decoy.when(
+        mock_engine_client.state.geometry.get_well_height(
+            labware_id="labware-id", well_name="well-name"
+        )
+    ).then_return(42.0)
+
+    decoy.when(
+        mock_engine_client.state.geometry.get_well_position(
+            labware_id="labware-id",
+            well_name="well-name",
+            well_location=WellLocation(
+                origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=21)
+            ),
+        )
+    ).then_return(Point(1, 2, 3))
+
+    assert subject.get_center() == Point(1, 2, 3)

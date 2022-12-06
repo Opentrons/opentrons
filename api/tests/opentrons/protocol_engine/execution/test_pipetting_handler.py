@@ -584,6 +584,10 @@ async def test_touch_tip(
         )
     ).then_return([Point(x=0, y=1, z=2), Point(x=3, y=4, z=5)])
 
+    decoy.when(
+        state_store.pipettes.get_movement_speed(pipette_id="pipette-id")
+    ).then_return(39339.5)
+
     await subject.touch_tip(
         pipette_id="pipette-id",
         labware_id="labware-id",
@@ -602,10 +606,12 @@ async def test_touch_tip(
             mount=Mount.LEFT,
             critical_point=CriticalPoint.XY_CENTER,
             abs_position=Point(x=0, y=1, z=2),
+            speed=39339.5,
         ),
         await hardware_api.move_to(
             mount=Mount.LEFT,
             critical_point=CriticalPoint.XY_CENTER,
             abs_position=Point(x=3, y=4, z=5),
+            speed=39339.5,
         ),
     )

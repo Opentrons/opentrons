@@ -17,6 +17,7 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     FirmwareUpdateComplete,
     FirmwareUpdateDataAcknowledge,
     FirmwareUpdateCompleteAcknowledge,
+    SingletonMessageIndexGenerator,
 )
 from opentrons_hardware.firmware_bindings.messages import payloads
 from opentrons_hardware.firmware_bindings.messages.fields import ErrorCodeField
@@ -37,7 +38,7 @@ def mock_hex_processor() -> MagicMock:
 def chunks() -> List[Chunk]:
     """Data chunks produced by hex processor."""
     return [
-        Chunk(address=0x000, data=list(range(56))),
+        Chunk(address=0x000, data=list(range(48))),
         Chunk(address=0x100, data=[5, 6, 7, 8]),
         Chunk(address=0x200, data=[100, 121]),
     ]
@@ -71,13 +72,13 @@ async def test_messaging(
     def responder(node_id: NodeId, message: MessageDefinition) -> None:
         """Message responder."""
         if isinstance(message, FirmwareUpdateData):
+            FwUpData_payload = payloads.FirmwareUpdateDataAcknowledge(
+                address=message.payload.address,
+                error_code=ErrorCodeField(ErrorCode.ok),
+            )
+            FwUpData_payload.message_index = message.payload.message_index
             can_message_notifier.notify(
-                FirmwareUpdateDataAcknowledge(
-                    payload=payloads.FirmwareUpdateDataAcknowledge(
-                        address=message.payload.address,
-                        error_code=ErrorCodeField(ErrorCode.ok),
-                    )
-                ),
+                FirmwareUpdateDataAcknowledge(payload=FwUpData_payload),
                 ArbitrationId(
                     parts=ArbitrationIdParts(
                         message_id=FirmwareUpdateDataAcknowledge.message_id,
@@ -88,12 +89,12 @@ async def test_messaging(
                 ),
             )
         elif isinstance(message, FirmwareUpdateComplete):
+            FwUpCom_payload = payloads.FirmwareUpdateAcknowledge(
+                error_code=ErrorCodeField(ErrorCode.ok)
+            )
+            FwUpCom_payload.message_index = message.payload.message_index
             can_message_notifier.notify(
-                FirmwareUpdateCompleteAcknowledge(
-                    payload=payloads.FirmwareUpdateAcknowledge(
-                        error_code=ErrorCodeField(ErrorCode.ok)
-                    )
-                ),
+                FirmwareUpdateCompleteAcknowledge(payload=FwUpCom_payload),
                 ArbitrationId(
                     parts=ArbitrationIdParts(
                         message_id=FirmwareUpdateCompleteAcknowledge.message_id,
@@ -110,17 +111,25 @@ async def test_messaging(
 
     await subject.run(NodeId.gantry_y_bootloader, mock_hex_processor, 10)
 
+    # When the downloader runs it creates unique message indecies for each
+    # message, this is a little hack to get the next index it would use
+    # so we can caluclate what indecies it gave the messages.
+    index_generator = SingletonMessageIndexGenerator()
+    msg_index = index_generator.get_next_index() - (len(chunks) + 1)
+
     mock_messenger.send.assert_has_calls(
         [
             call(
                 node_id=NodeId.gantry_y_bootloader,
                 message=FirmwareUpdateData(
                     payload=payloads.FirmwareUpdateData.create(
-                        address=chunk.address, data=bytes(chunk.data)
+                        address=chunk.address,
+                        data=bytes(chunk.data),
+                        message_index=msg_index + i,
                     )
                 ),
             )
-            for chunk in chunks
+            for i, chunk in enumerate(chunks)
         ]
         + [
             call(

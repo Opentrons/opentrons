@@ -21,6 +21,7 @@ from opentrons import types as top_types
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control.types import Axis
 
+
 if TYPE_CHECKING:
     from opentrons.protocol_api.core.instrument import AbstractInstrument
     from opentrons.protocol_api.labware import Well, Labware

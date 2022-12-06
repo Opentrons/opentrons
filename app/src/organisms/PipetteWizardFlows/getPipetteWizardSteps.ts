@@ -14,8 +14,30 @@ export const getPipetteWizardSteps = (
           mount: mount,
           flowType: flowType,
         },
-        { section: SECTIONS.ATTACH_STEM, mount: mount, flowType: flowType },
-        { section: SECTIONS.DETACH_STEM, mount: mount, flowType: flowType },
+        { section: SECTIONS.ATTACH_PROBE, mount: mount, flowType: flowType },
+        { section: SECTIONS.DETACH_PROBE, mount: mount, flowType: flowType },
+        { section: SECTIONS.RESULTS, mount: mount, flowType: flowType },
+      ]
+    }
+    case FLOWS.ATTACH: {
+      return [
+        {
+          section: SECTIONS.BEFORE_BEGINNING,
+          mount: mount,
+          flowType: flowType,
+        },
+        { section: SECTIONS.MOUNT_PIPETTE, mount: mount, flowType: flowType },
+        { section: SECTIONS.RESULTS, mount: mount, flowType: flowType },
+      ]
+    }
+    case FLOWS.DETACH: {
+      return [
+        {
+          section: SECTIONS.BEFORE_BEGINNING,
+          mount: mount,
+          flowType: flowType,
+        },
+        { section: SECTIONS.DETACH_PIPETTE, mount: mount, flowType: flowType },
         { section: SECTIONS.RESULTS, mount: mount, flowType: flowType },
       ]
     }
