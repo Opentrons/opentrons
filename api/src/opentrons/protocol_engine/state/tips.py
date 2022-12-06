@@ -92,7 +92,7 @@ class TipStore(HasState[TipState], HandlesActions):
     def _update_used_tips(
         self, pipette_id: str, well_name: str, labware_id: str
     ) -> None:
-        pipette_channels = self._state.pipette_channels_by_pipette_id[pipette_id]
+        pipette_channels = self._state.pipette_channels_by_pipette_id.get(pipette_id)
         if pipette_channels == _96_CHANNEL_PIPETTE:
             for well_name in self._state.tips_by_labware_id[labware_id].keys():
                 self._state.tips_by_labware_id[labware_id][
