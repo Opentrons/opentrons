@@ -119,7 +119,13 @@ class PipetteHandlerProvider(Generic[MountType]):
             p = self._attached_instruments[m]
             if not p:
                 return
-            p.reset_pipette_offset(m, to_default=False)
+            if isinstance(m, OT3Mount):
+                # This is to satisfy lint. Code will be cleaner once
+                # we can combine the pipette handler for OT2 and OT3
+                # pipettes again.
+                p.reset_pipette_offset(m.to_mount(), to_default=False)
+            else:
+                p.reset_pipette_offset(m, to_default=False)
             p.reload_configurations()
 
         if not mount:
@@ -133,8 +139,15 @@ class PipetteHandlerProvider(Generic[MountType]):
         Temporarily reset the pipette offset to default values.
         :param mount: Modify the given mount.
         """
-        pipette = self.get_pipette(mount)
-        pipette.reset_pipette_offset(mount, to_default)
+        if isinstance(mount, OT3Mount):
+            # This is to satisfy lint. Code will be cleaner once
+            # we can combine the pipette handler for OT2 and OT3
+            # pipettes again.
+            pipette = self.get_pipette(mount)
+            pipette.reset_pipette_offset(mount.to_mount(), to_default)
+        else:
+            pipette = self.get_pipette(mount)
+            pipette.reset_pipette_offset(mount, to_default)
 
     def save_instrument_offset(self, mount: MountType, delta: top_types.Point) -> None:
         """
@@ -142,8 +155,15 @@ class PipetteHandlerProvider(Generic[MountType]):
         :param mount: Modify the given mount.
         :param delta: The offset to set for the pipette.
         """
-        pipette = self.get_pipette(mount)
-        pipette.save_pipette_offset(mount, delta)
+        if isinstance(mount, OT3Mount):
+            # This is to satisfy lint. Code will be cleaner once
+            # we can combine the pipette handler for OT2 and OT3
+            # pipettes again.
+            pipette = self.get_pipette(mount)
+            pipette.save_pipette_offset(mount.to_mount(), delta)
+        else:
+            pipette = self.get_pipette(mount)
+            pipette.save_pipette_offset(mount, delta)
 
     # TODO(mc, 2022-01-11): change returned map value type to `Optional[PipetteDict]`
     # instead of potentially returning an empty dict

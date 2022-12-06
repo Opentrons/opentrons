@@ -56,8 +56,10 @@ class LiquidActionSpec:
     instr: Pipette
     current: float
 
+
 # TODO during refactor we should figure out if
 # we still need these dataclasses
+
 
 @dataclass(frozen=True)
 class PickUpTipPressSpec:
@@ -118,6 +120,7 @@ class PipetteHandlerProvider:
                 return
             p.reset_pipette_offset(OT3Mount.from_mount(m), to_default=False)
             p.reload_configurations()
+            p.reset_state()
 
         if not mount:
             for m in type(list(self._attached_instruments.keys())[0]):
@@ -216,13 +219,25 @@ class PipetteHandlerProvider:
             # be for.... revisit when we separate out static configs and
             # stateful configs.
             result["default_blow_out_speeds"] = {
-                "2.0": self.plunger_speed(instr, instr.active_tip_settings.default_dispense_flowrate, "dispense")
+                "2.0": self.plunger_speed(
+                    instr,
+                    instr.active_tip_settings.default_dispense_flowrate,
+                    "dispense",
+                )
             }
             result["default_dispense_speeds"] = {
-                "2.0": self.plunger_speed(instr, instr.active_tip_settings.default_dispense_flowrate, "dispense")
+                "2.0": self.plunger_speed(
+                    instr,
+                    instr.active_tip_settings.default_dispense_flowrate,
+                    "dispense",
+                )
             }
             result["default_aspirate_speeds"] = {
-                "2.0": self.plunger_speed(instr, instr._active_tip_settings.default_aspirate_flowrate, "aspirate")
+                "2.0": self.plunger_speed(
+                    instr,
+                    instr._active_tip_settings.default_aspirate_flowrate,
+                    "aspirate",
+                )
             }
         return cast(PipetteDict, result)
 
@@ -484,7 +499,6 @@ class PipetteHandlerProvider:
             current=instrument.plunger_motor_current.run,
         )
 
-
     def plan_check_dispense(
         self,
         mount: OT3Mount,
@@ -608,7 +622,8 @@ class PipetteHandlerProvider:
             for i in range(checked_presses):
                 # move nozzle down into the tip
                 press_dist = (
-                    -1.0 * instrument.pick_up_configurations.distance + -1.0 * check_incr * i
+                    -1.0 * instrument.pick_up_configurations.distance
+                    + -1.0 * check_incr * i
                 )
                 # move nozzle back up
                 backup_dist = -press_dist
@@ -617,7 +632,6 @@ class PipetteHandlerProvider:
         def add_tip_to_instr() -> None:
             instrument.add_tip(tip_length=tip_length)
             instrument.set_current_volume(0)
-
 
         return (
             PickUpTipSpec(

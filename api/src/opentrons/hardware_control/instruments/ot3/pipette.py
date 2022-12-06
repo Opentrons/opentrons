@@ -8,9 +8,15 @@ from opentrons.types import Point
 
 from opentrons.config import ot3_pipette_config
 from opentrons_shared_data.pipette.pipette_definition import (
-    PipetteConfigurations, PipetteTipType, PlungerPositions,
-    MotorConfigurations, PickUpTipConfigurations, SupportedTipsDefinition,
-    TipHandlingConfigurations, PipetteModelType)
+    PipetteConfigurations,
+    PipetteTipType,
+    PlungerPositions,
+    MotorConfigurations,
+    PickUpTipConfigurations,
+    SupportedTipsDefinition,
+    TipHandlingConfigurations,
+    PipetteModelType,
+)
 from ..instrument_abc import AbstractInstrument
 from .instrument_calibration import (
     save_pipette_offset_calibration,
@@ -22,10 +28,7 @@ from opentrons_shared_data.pipette.dev_types import (
     PipetteName,
     PipetteModel,
 )
-from opentrons.hardware_control.types import (
-    CriticalPoint,
-    OT3Mount,
-    InvalidMoveError)
+from opentrons.hardware_control.types import CriticalPoint, OT3Mount, InvalidMoveError
 
 mod_log = logging.getLogger(__name__)
 
@@ -33,7 +36,9 @@ mod_log = logging.getLogger(__name__)
 INTERNOZZLE_SPACING_MM: Final[float] = 9
 
 
-def piecewise_volume_conversion(ul: float, sequence: List[Tuple[float, float, float]]) -> float:
+def piecewise_volume_conversion(
+    ul: float, sequence: List[Tuple[float, float, float]]
+) -> float:
     """
     Takes a volume in microliters and a sequence representing a piecewise
     function for the slope and y-intercept of a ul/mm function, where each
@@ -89,12 +94,13 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._name = ot3_pipette_config.PipetteNameType(
             pipette_type=config.pipette_type,
             pipette_channels=config.channels,
-            pipette_generation=config.display_category)
+            pipette_generation=config.display_category,
+        )
         self._acting_as = self._name
         self._model = ot3_pipette_config.PipetteModelVersionType(
             pipette_type=config.pipette_type,
             pipette_channels=config.channels,
-            pipette_version=config.version
+            pipette_version=config.version,
         )
         self._nozzle_offset = self._config.nozzle_offset
         self._current_volume = 0.0
@@ -113,7 +119,9 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         )
         self.ready_to_aspirate = False
         #: True if ready to aspirate
-        self._active_tip_settings = self._config.supported_tips[PipetteTipType(self._working_volume)]
+        self._active_tip_settings = self._config.supported_tips[
+            PipetteTipType(self._working_volume)
+        ]
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
         self._aspirate_flow_rate = self._active_tip_settings.default_aspirate_flowrate
         self._dispense_flow_rate = self._active_tip_settings.default_dispense_flowrate
@@ -156,7 +164,9 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         actual name of the pipette, or a name in its back-compatibility
         config.
         """
-        raise NotImplementedError("Backwards compatibility is not supported at this time.")
+        raise NotImplementedError(
+            "Backwards compatibility is not supported at this time."
+        )
 
     def update_config_item(self, elem_name: str, elem_val: Any) -> None:
         raise NotImplementedError("Update config is not supported at this time.")
@@ -169,8 +179,25 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._config = ot3_pipette_config.load_ot3_pipette(
             self._pipette_type.name,
             self._max_channels.as_int,
-            self._pipette_version.as_float)
+            self._pipette_version.as_float,
+        )
         self._config_as_dict = self._config.dict()
+
+    def reset_state(self) -> None:
+        self._current_volume = 0.0
+        self._working_volume = float(self._config.max_volume)
+        self._current_tip_length = 0.0
+        self._current_tiprack_diameter = 0.0
+        self._has_tip = False
+        self.ready_to_aspirate = False
+        #: True if ready to aspirate
+        self._active_tip_settings = self._config.supported_tips[
+            PipetteTipType(self._working_volume)
+        ]
+        self._fallback_tip_length = self._active_tip_settings.default_tip_length
+        self._aspirate_flow_rate = self._active_tip_settings.default_aspirate_flowrate
+        self._dispense_flow_rate = self._active_tip_settings.default_dispense_flowrate
+        self._blow_out_flow_rate = self._active_tip_settings.default_blowout_flowrate
 
     def reset_pipette_offset(self, mount: OT3Mount, to_default: bool) -> None:
         """Reset the pipette offset to system defaults."""
@@ -181,9 +208,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
 
     def save_pipette_offset(self, mount: OT3Mount, offset: Point) -> None:
         """Update the pipette offset to a new value."""
-        save_pipette_offset_calibration(
-            self._pipette_id, mount, offset
-        )
+        save_pipette_offset_calibration(self._pipette_id, mount, offset)
         self._pipette_offset = load_pipette_offset(self._pipette_id, mount)
 
     @property
@@ -234,14 +259,18 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         if cp_override == CriticalPoint.XY_CENTER:
             mod_offset_xy = [
                 offsets[0],
-                offsets[1] - (INTERNOZZLE_SPACING_MM * (self._config.channels.as_int - 1) / 2),
+                offsets[1]
+                - (INTERNOZZLE_SPACING_MM * (self._config.channels.as_int - 1) / 2),
                 offsets[2],
             ]
             cp_type = CriticalPoint.XY_CENTER
         elif cp_override == CriticalPoint.FRONT_NOZZLE:
             mod_offset_xy = [
                 0,
-                (offsets[1] - INTERNOZZLE_SPACING_MM * (self._config.channels.as_int - 1)),
+                (
+                    offsets[1]
+                    - INTERNOZZLE_SPACING_MM * (self._config.channels.as_int - 1)
+                ),
                 offsets[2],
             ]
             cp_type = CriticalPoint.FRONT_NOZZLE
@@ -328,7 +357,9 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     def working_volume(self, tip_volume: float) -> None:
         """The working volume is the current tip max volume"""
         self._working_volume = min(self.config.max_volume, tip_volume)
-        self._active_tip_settings = self._config.supported_tips[PipetteTipType(self._working_volume)]
+        self._active_tip_settings = self._config.supported_tips[
+            PipetteTipType(int(self._working_volume))
+        ]
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
 
     @property
@@ -382,7 +413,9 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     # Cache max is chosen somewhat arbitrarily. With a float is input we don't
     # want this to unbounded.
     @functools.lru_cache(maxsize=100)
-    def ul_per_mm(self, ul: float, action: UlPerMmAction, specific_tip: str = "default") -> float:
+    def ul_per_mm(
+        self, ul: float, action: UlPerMmAction, specific_tip: str = "default"
+    ) -> float:
         if action == "aspirate":
             sequence = self._active_tip_settings.aspirate[specific_tip]
         else:
@@ -421,7 +454,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
                 "default_dispense_flow_rates": self.active_tip_settings.default_blowout_flowrate,
                 "tip_length": self.current_tip_length,
                 "return_tip_height": self.active_tip_settings.default_return_tip_height,
-                "tip_overlap": self.active_tip_settings.default_tip_overlap
+                "tip_overlap": self.active_tip_settings.default_tip_overlap,
             }
         )
         return self._config_as_dict

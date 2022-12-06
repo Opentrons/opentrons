@@ -137,6 +137,20 @@ class Pipette(AbstractInstrument[pipette_config.PipetteConfig]):
         self._config = pipette_config.load(self.model, self.pipette_id)
         self._config_as_dict = asdict(self._config)
 
+    def reset_state(self) -> None:
+        self._current_volume = 0.0
+        self._working_volume = self._config.max_volume
+        self._current_tip_length = 0.0
+        self._current_tiprack_diameter = 0.0
+        self._fallback_tip_length = self._config.tip_length
+        self._tip_overlap_map = self._config.tip_overlap
+        self._has_tip = False
+        self.ready_to_aspirate = False
+        #: True if ready to aspirate
+        self._aspirate_flow_rate = self._config.default_aspirate_flow_rates["2.0"]
+        self._dispense_flow_rate = self._config.default_dispense_flow_rates["2.0"]
+        self._blow_out_flow_rate = self._config.default_blow_out_flow_rates["2.0"]
+
     def reset_pipette_offset(self, mount: Mount, to_default: bool) -> None:
         """Reset the pipette offset to system defaults."""
         if to_default:
