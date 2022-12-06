@@ -17,8 +17,8 @@ import {
   FLOWS,
   PIPETTE,
   HEX_SCREWDRIVER,
-  NINETY_SIX_CHANNEL_MOUNTING_PLATE,
   NINETY_SIX_CHANNEL_PIPETTE,
+  NINETY_SIX_CHANNEL_MOUNTING_PLATE,
 } from './constants'
 import type { Run, CreateRunData } from '@opentrons/api-client'
 import type { PipetteWizardStepProps } from './types'
@@ -68,14 +68,6 @@ export const BeforeBeginning = (
       break
     }
     case FLOWS.ATTACH: {
-      equipmentList = [PIPETTE, CALIBRATION_PROBE, HEX_SCREWDRIVER]
-      proceedButtonText = t('move_gantry_to_front')
-      bodyText = t('remove_labware')
-      break
-    }
-    case FLOWS.DETACH: {
-      equipmentList = [HEX_SCREWDRIVER]
-      bodyText = t('get_started_detach')
       bodyText = t('remove_labware')
       proceedButtonText = t('move_gantry_to_front')
       if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
@@ -87,6 +79,15 @@ export const BeforeBeginning = (
           HEX_SCREWDRIVER,
           NINETY_SIX_CHANNEL_MOUNTING_PLATE,
         ]
+      }
+      break
+    }
+    case FLOWS.DETACH: {
+      bodyText = t('get_started_detach')
+      if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
+        equipmentList = [HEX_SCREWDRIVER]
+      } else {
+        equipmentList = [HEX_SCREWDRIVER, CALIBRATION_PROBE]
       }
       break
     }

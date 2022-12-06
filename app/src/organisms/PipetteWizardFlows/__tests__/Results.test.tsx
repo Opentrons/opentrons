@@ -67,28 +67,14 @@ describe('Results', () => {
     fireEvent.click(exit)
     expect(props.proceed).toHaveBeenCalled()
   })
-  it('renders the correct information when pipette wizard is a success for detach flow', () => {
+  it('renders the correct information when pipette wizard is a fail for attach flow', () => {
     props = {
       ...props,
       attachedPipette: { left: null, right: null },
-      flowType: FLOWS.DETACH,
+      flowType: FLOWS.ATTACH,
     }
     const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Pipette Successfully Detached')
-    expect(getByLabelText('ot-check')).toHaveStyle(
-      `color: ${COLORS.successEnabled}`
-    )
-    const exit = getByRole('button', { name: 'Results_exit' })
-    fireEvent.click(exit)
-    expect(props.proceed).toHaveBeenCalled()
-  })
-  it('renders the correct information when pipette wizard is a fail for detach flow', () => {
-    props = {
-      ...props,
-      flowType: FLOWS.DETACH,
-    }
-    const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Pipette failed to detach')
+    getByText('Pipette failed to attach')
     expect(getByLabelText('ot-alert')).toHaveStyle(
       `color: ${COLORS.errorEnabled}`
     )
