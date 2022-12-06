@@ -105,7 +105,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def is_simulating(self) -> bool:
         """Get whether the protocol is being analyzed or actually run."""
-        return self._sync_hardware.is_simulator  # type: ignore[no-any-return]
+        return self._engine_client.state.config.ignore_pause
 
     def add_labware_definition(
         self,
@@ -285,11 +285,11 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def set_rail_lights(self, on: bool) -> None:
         """Set the device's rail lights."""
-        raise NotImplementedError("ProtocolCore.set_rail_lights not implemented")
+        self._engine_client.set_rail_lights(on=on)
 
     def get_rail_lights_on(self) -> bool:
         """Get whether the device's rail lights are on."""
-        raise NotImplementedError("ProtocolCore.get_rail_lights_on not implemented")
+        return self._sync_hardware.get_lights()["rails"]  # type: ignore[no-any-return]
 
     def door_closed(self) -> bool:
         """Get whether the device's front door is closed."""

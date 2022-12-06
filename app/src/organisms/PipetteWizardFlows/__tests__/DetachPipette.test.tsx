@@ -11,12 +11,17 @@ import { InProgressModal } from '../../../molecules/InProgressModal/InProgressMo
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { FLOWS } from '../constants'
 import { DetachPipette } from '../DetachPipette'
+import { CheckPipetteButton } from '../CheckPipetteButton'
 import type { AttachedPipette } from '../../../redux/pipettes/types'
 
+jest.mock('../CheckPipetteButton')
 jest.mock('../../../molecules/InProgressModal/InProgressModal')
 
 const mockInProgressModal = InProgressModal as jest.MockedFunction<
   typeof InProgressModal
+>
+const mockCheckPipetteButton = CheckPipetteButton as jest.MockedFunction<
+  typeof CheckPipetteButton
 >
 const render = (props: React.ComponentProps<typeof DetachPipette>) => {
   return renderWithProviders(<DetachPipette {...props} />, {
@@ -31,6 +36,7 @@ describe('DetachPipette', () => {
   let props: React.ComponentProps<typeof DetachPipette>
   beforeEach(() => {
     props = {
+      robotName: 'otie',
       mount: LEFT,
       goBack: jest.fn(),
       proceed: jest.fn(),
@@ -43,6 +49,7 @@ describe('DetachPipette', () => {
       isRobotMoving: false,
     }
     mockInProgressModal.mockReturnValue(<div>mock in progress</div>)
+    mockCheckPipetteButton.mockReturnValue(<div>mock check pipette button</div>)
   })
   it('returns the correct information, buttons work as expected', () => {
     const { getByText, getByAltText, getByRole } = render(props)
@@ -54,6 +61,7 @@ describe('DetachPipette', () => {
     const proceedBtn = getByRole('button', { name: 'continue' })
     fireEvent.click(proceedBtn)
     expect(props.proceed).toHaveBeenCalled()
+    getByText('mock check pipette button')
     const backBtn = getByRole('button', { name: 'Go back' })
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()
