@@ -159,7 +159,7 @@ class Deck(UserDict):  # type: ignore[type-arg]
 
         return isinstance(other_labware, ModuleGeometry)
 
-    def right_of(self, slot: DeckLocation) -> Optional[DeckItem]:
+    def right_of(self, slot: str) -> Optional[DeckItem]:
         if int(slot) % ROW_LENGTH == 0:
             # We know we're at the right-most edge
             # of the given row
@@ -168,7 +168,7 @@ class Deck(UserDict):  # type: ignore[type-arg]
             idx = int(slot) + 1
             return self[str(idx)]
 
-    def left_of(self, slot: DeckLocation) -> Optional[DeckItem]:
+    def left_of(self, slot: str) -> Optional[DeckItem]:
         if int(slot) - 1 % ROW_LENGTH == 0:
             # We know we're at the left-most edge
             # of the given row
@@ -187,7 +187,7 @@ class Deck(UserDict):  # type: ignore[type-arg]
         for item in [lw for lw in self.data.values() if lw]:
             self._highest_z = max(item.highest_z, self._highest_z)
 
-    def get_slot_definition(self, slot_name: DeckLocation) -> SlotDefV3:
+    def get_slot_definition(self, slot_name: str) -> SlotDefV3:
         slots = self._definition["locations"]["orderedSlots"]
         slot_def = next((slot for slot in slots if slot["id"] == slot_name), None)
         if not slot_def:
@@ -198,7 +198,7 @@ class Deck(UserDict):  # type: ignore[type-arg]
             )
         return slot_def
 
-    def get_slot_center(self, slot_name: DeckLocation) -> Point:
+    def get_slot_center(self, slot_name: str) -> Point:
         defn = self.get_slot_definition(slot_name)
         return Point(
             defn["position"][0] + defn["boundingBox"]["xDimension"] / 2,
@@ -285,6 +285,10 @@ class Deck(UserDict):  # type: ignore[type-arg]
     def get_fixed_trash(self) -> Optional[Union[Labware, LabwareImplementation]]:
         fixtures = self._definition["locations"]["fixtures"]
         ft = next((f for f in fixtures if f["id"] == FIXED_TRASH_ID), None)
+
+        # NOTE(mc, 2022-12-06): type ignore below because this `Deck` is typed
+        # as contiaining `DeckItem` values, but the contents of slot 12
+        # will always be limited to either a `Labware` or `LabwareImplementation` object
         return self.data[self._check_name(ft.get("slot"))] if ft else None  # type: ignore[return-value]
 
     def get_non_fixture_slots(self) -> List[int]:
