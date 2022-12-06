@@ -1,4 +1,12 @@
-import { formatTimestamp, getIs96ChannelPipetteAttached } from '../utils'
+import {
+  formatTimestamp,
+  getIs96ChannelPipetteAttached,
+  getOffsetCalibrationForMount,
+} from '../utils'
+import {
+  mockPipetteOffsetCalibration1,
+  mockPipetteOffsetCalibration2,
+} from '../../../redux/calibration/pipette-offset/__fixtures__'
 import type { FetchPipettesResponsePipette } from '../../../redux/pipettes/types'
 
 describe('formatTimestamp', () => {
@@ -45,5 +53,27 @@ describe('getIs96ChannelPipetteAttached hook', () => {
 
     const result = getIs96ChannelPipetteAttached(mockLeftMountAttachedPipette)
     expect(result).toEqual(false)
+  })
+})
+
+describe('getOffsetCalibrationForMount', () => {
+  it('returns null when not given calibrations', () => {
+    const result = getOffsetCalibrationForMount(null, 'right')
+    expect(result).toEqual(null)
+  })
+
+  it("returns null when asked for calibrations that don't exist for a mount", () => {
+    const calibrations = [mockPipetteOffsetCalibration1]
+    const result = getOffsetCalibrationForMount(calibrations, 'right')
+    expect(result).toEqual(null)
+  })
+
+  it('returns the correct calibrations for a mount', () => {
+    const calibrations = [
+      mockPipetteOffsetCalibration1,
+      mockPipetteOffsetCalibration2,
+    ]
+    const result = getOffsetCalibrationForMount(calibrations, 'right')
+    expect(result).toEqual(mockPipetteOffsetCalibration2)
   })
 })

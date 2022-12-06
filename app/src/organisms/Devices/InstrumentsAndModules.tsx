@@ -13,6 +13,7 @@ import {
   SIZE_3,
   SPACING,
   TYPOGRAPHY,
+  useInterval,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
@@ -20,11 +21,24 @@ import { Banner } from '../../atoms/Banner'
 import { InstrumentCard } from '../../molecules/InstrumentCard'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ModuleCard } from '../ModuleCard'
-import { useIsOT3, useIsRobotViewable, useRunStatuses } from './hooks'
-import { getIs96ChannelPipetteAttached } from './utils'
+import {
+  useIsOT3,
+  useIsRobotViewable,
+  usePipetteOffsetCalibrations,
+  useRunStatuses,
+} from './hooks'
+import {
+  getIs96ChannelPipetteAttached,
+  getOffsetCalibrationForMount,
+} from './utils'
 import { PipetteCard } from './PipetteCard'
+import { useDispatch } from 'react-redux'
+import { fetchPipetteOffsetCalibrations } from '../../redux/calibration'
+
+import type { Dispatch } from '../../redux/types'
 
 const EQUIPMENT_POLL_MS = 5000
+const FETCH_PIPETTE_CAL_MS = 30000
 interface InstrumentsAndModulesProps {
   robotName: string
 }
@@ -41,6 +55,7 @@ export function InstrumentsAndModules({
   const currentRunId = useCurrentRunId()
   const { isRunTerminal } = useRunStatuses()
   const isOT3 = useIsOT3(robotName)
+  const dispatch = useDispatch<Dispatch>()
   const is96ChannelAttached = getIs96ChannelPipetteAttached(
     attachedPipettes?.left ?? null
   )
@@ -59,6 +74,25 @@ export function InstrumentsAndModules({
   // TODO(bh, 2022-10-27): get gripper data, create interface
   // const gripper = { model: null }
   const gripper = { model: 'Opentrons Gripper GEN1' }
+
+  // The following pipetteOffset related code has been lifted out of the PipetteCard component
+  // to eliminate duplicated useInterval calls to `calibration/pipette_offset` coming from each card.
+  // Instead we now capture all offset calibration data here, and pass the appropriate calibration
+  // data to the associated card via props
+  const pipetteOffsetCalibrations = usePipetteOffsetCalibrations(robotName)
+
+  useInterval(
+    () => {
+      dispatch(fetchPipetteOffsetCalibrations(robotName))
+    },
+    pipetteOffsetCalibrations === null ||
+      (Array.isArray(pipetteOffsetCalibrations) &&
+        pipetteOffsetCalibrations.length !==
+          Object.keys(attachedPipettes).length)
+      ? 1000
+      : FETCH_PIPETTE_CAL_MS,
+    true
+  )
 
   return (
     <Flex
@@ -106,6 +140,10 @@ export function InstrumentsAndModules({
                     ? getPipetteModelSpecs(attachedPipettes.left?.model) ?? null
                     : null
                 }
+                pipetteOffsetCalibration={getOffsetCalibrationForMount(
+                  pipetteOffsetCalibrations,
+                  LEFT
+                )}
                 mount={LEFT}
                 robotName={robotName}
                 is96ChannelAttached={is96ChannelAttached}
@@ -158,6 +196,10 @@ export function InstrumentsAndModules({
                         null
                       : null
                   }
+                  pipetteOffsetCalibration={getOffsetCalibrationForMount(
+                    pipetteOffsetCalibrations,
+                    RIGHT
+                  )}
                   mount={RIGHT}
                   robotName={robotName}
                   is96ChannelAttached={false}

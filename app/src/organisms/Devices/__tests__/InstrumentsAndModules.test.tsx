@@ -1,16 +1,32 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders, useInterval } from '@opentrons/components'
 import { useModulesQuery, usePipettesQuery } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import { Banner } from '../../../atoms/Banner'
 import { mockMagneticModule } from '../../../redux/modules/__fixtures__'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
-import { useIsRobotViewable, useRunStatuses } from '../hooks'
+import {
+  useIsRobotViewable,
+  useRunStatuses,
+  usePipetteOffsetCalibrations,
+} from '../hooks'
 import { ModuleCard } from '../../ModuleCard'
 import { InstrumentsAndModules } from '../InstrumentsAndModules'
 import { PipetteCard } from '../PipetteCard'
 import { getIs96ChannelPipetteAttached } from '../utils'
 
+import {
+  mockPipetteOffsetCalibration1,
+  mockPipetteOffsetCalibration2,
+} from '../../../redux/calibration/pipette-offset/__fixtures__'
+
+jest.mock('@opentrons/components', () => {
+  const actualComponents = jest.requireActual('@opentrons/components')
+  return {
+    ...actualComponents,
+    useInterval: jest.fn(),
+  }
+})
 jest.mock('@opentrons/react-api-client')
 jest.mock('../hooks')
 jest.mock('../../ModuleCard')
@@ -26,6 +42,10 @@ const mockUseModulesQuery = useModulesQuery as jest.MockedFunction<
 const mockUseIsRobotViewable = useIsRobotViewable as jest.MockedFunction<
   typeof useIsRobotViewable
 >
+const mockUsePipetteOffsetCalibrations = usePipetteOffsetCalibrations as jest.MockedFunction<
+  typeof usePipetteOffsetCalibrations
+>
+const mockUseInterval = useInterval as jest.MockedFunction<typeof useInterval>
 const mockModuleCard = ModuleCard as jest.MockedFunction<typeof ModuleCard>
 const mockPipetteCard = PipetteCard as jest.MockedFunction<typeof PipetteCard>
 const mockUsePipettesQuery = usePipettesQuery as jest.MockedFunction<
@@ -47,6 +67,9 @@ const render = () => {
     i18nInstance: i18n,
   })
 }
+
+const INTERVAL_FREQUENT = 1000
+const INTERVAL_LESS_FREQUENT = 30000
 
 describe('InstrumentsAndModules', () => {
   beforeEach(() => {
@@ -118,5 +141,25 @@ describe('InstrumentsAndModules', () => {
     mockUseIsRobotViewable.mockReturnValue(true)
     const [{ getByText }] = render()
     getByText('Mock PipetteCard')
+  })
+  it('fetches offset calibrations status more frequently when calibrations do not exist', () => {
+    mockUsePipetteOffsetCalibrations.mockReturnValue(null)
+    render()
+    expect(mockUseInterval.mock.calls[0][1]).toBe(INTERVAL_FREQUENT)
+  })
+  it('fetches offset calibrations status more frequently when calibrations do not exist for every pipette', () => {
+    mockUsePipetteOffsetCalibrations.mockReturnValue([
+      mockPipetteOffsetCalibration1,
+    ])
+    render()
+    expect(mockUseInterval.mock.calls[0][1]).toBe(INTERVAL_FREQUENT)
+  })
+  it('fetches offset calibrations status less frequently when calibrations exist for every pipette', () => {
+    mockUsePipetteOffsetCalibrations.mockReturnValue([
+      mockPipetteOffsetCalibration1,
+      mockPipetteOffsetCalibration2,
+    ])
+    render()
+    expect(mockUseInterval.mock.calls[0][1]).toBe(INTERVAL_LESS_FREQUENT)
   })
 })

@@ -1,5 +1,9 @@
 import { format, parseISO } from 'date-fns'
-import type { FetchPipettesResponsePipette } from '../../redux/pipettes/types'
+import { PipetteOffsetCalibration } from '../../redux/calibration/api-types'
+import type {
+  FetchPipettesResponsePipette,
+  Mount,
+} from '../../redux/pipettes/types'
 
 /**
  * formats a string if it is in ISO 8601 date format
@@ -36,4 +40,15 @@ export function getIs96ChannelPipetteAttached(
   const pipetteName = leftMountAttachedPipette?.name
 
   return pipetteName === 'p1000_96'
+}
+
+export function getOffsetCalibrationForMount(
+  pipetteOffsetCalibrations: PipetteOffsetCalibration[] | null,
+  mount: Mount
+): PipetteOffsetCalibration | null {
+  if (pipetteOffsetCalibrations === null) {
+    return null
+  } else {
+    return pipetteOffsetCalibrations.find(cal => cal.mount === mount) || null
+  }
 }
