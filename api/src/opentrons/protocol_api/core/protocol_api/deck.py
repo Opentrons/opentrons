@@ -256,7 +256,18 @@ class Deck(AbstractDeck, UserDict):  # type: ignore[type-arg]
     @property
     def calibration_positions(self) -> List[CalibrationPosition]:
         raw_positions = self._definition["locations"]["calibrationPoints"]
-        return [CalibrationPosition(**pos) for pos in raw_positions]
+        return [
+            CalibrationPosition(
+                id=raw_position["id"],
+                displayName=raw_position["displayName"],
+                position=(
+                    raw_position["position"][0],
+                    raw_position["position"][1],
+                    raw_position["position"][2],
+                ),
+            )
+            for raw_position in raw_positions
+        ]
 
     def get_calibration_position(self, id: str) -> CalibrationPosition:
         calibration_position = next(
