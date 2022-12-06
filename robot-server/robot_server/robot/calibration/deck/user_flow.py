@@ -376,6 +376,6 @@ class DeckCalibrationUserFlow:
         if self._current_state != State.preparingPipette:
             trash = self._deck.get_fixed_trash()
             assert trash, "Bad deck setup"
-            await uf.move(self, trash["A1"].top(), CriticalPoint.XY_CENTER)
+            await uf.move(self, trash["A1"].top(), CriticalPoint.XY_CENTER)  # type: ignore[index]
             await self.hardware.drop_tip(self.mount)
         await self.move_to_tip_rack()

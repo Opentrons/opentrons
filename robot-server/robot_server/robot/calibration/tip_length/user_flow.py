@@ -276,6 +276,6 @@ class TipCalibrationUserFlow:
             await self._hardware.gantry_position(self.mount, refresh=True)
             trash = self._deck.get_fixed_trash()
             assert trash, "Bad deck setup"
-            await util.move(self, trash["A1"].top(), CriticalPoint.XY_CENTER)
+            await util.move(self, trash["A1"].top(), CriticalPoint.XY_CENTER)  # type: ignore[index]
             await self.hardware.drop_tip(self.mount)
             await self.move_to_tip_rack()

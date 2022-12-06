@@ -190,7 +190,7 @@ def get_reference_location(
     else:
         trash = deck.get_fixed_trash()
         assert trash
-        trash_loc = trash.wells_by_name()[TRASH_WELL].top()
+        trash_loc = trash.wells_by_name()[TRASH_WELL].top()  # type: ignore[union-attr]
         ref_loc = trash_loc.move(
             TRASH_REF_POINT_OFFSET + MOVE_TO_REF_POINT_SAFETY_BUFFER
         )
