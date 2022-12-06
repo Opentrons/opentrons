@@ -4,6 +4,7 @@
 **/build/**
 **/venv/**
 .opentrons_config
+**/.npm_cache/**
 
 # typescript
 app-shell/lib/**
