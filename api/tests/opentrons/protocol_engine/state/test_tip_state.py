@@ -235,6 +235,3 @@ def test_tip_tracking_for_96_channels(
     )
 
     assert result == next_tip_result
-
-    print(subject.state.column_by_labware_id["cool-labware"])
-    print(subject.state.tips_by_labware_id["cool-labware"])

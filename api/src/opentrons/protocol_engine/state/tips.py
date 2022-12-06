@@ -133,7 +133,7 @@ class TipView(HasState[TipState]):
         seen_start = starting_tip_name is None
         wells = self._state.tips_by_labware_id[labware_id]
         columns = self._state.column_by_labware_id[labware_id]
-        column_heads = [[column[0] for column in x] for x in columns]
+        column_heads = [x[0] for x in columns]
 
         for well_name, tip_state in wells.items():
             seen_start = seen_start or well_name == starting_tip_name
