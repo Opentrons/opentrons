@@ -98,11 +98,11 @@ class Capturer:
     ) -> None:
         """Callback entry point for capturing messages."""
         if isinstance(message, message_definitions.ReadFromSensorResponse):
-            self.response_queue.put_nowait(
-                sensor_types.SensorDataType.build(
+            data = sensor_types.SensorDataType.build(
                     message.payload.sensor_data, message.payload.sensor
                 ).to_float()
-            )
+            self.response_queue.put_nowait(data)
+            print(f"\nsensor data = {data}")
         elif isinstance(message, message_definitions.MoveCompleted):
             if message.payload.ack_id == UInt8Field(2):
                 if arbitration_id.parts.originating_node_id == \
@@ -148,93 +148,129 @@ async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
     sensor_cap.set_mount(args.mount)
     messenger.add_listener(sensor_cap, None)
 
-    prep_move_group = [
-        # Group 0 - home
-        [
-            create_home_step(
-                {
-                    NodeId.gantry_x: float64(-1000),
-                    NodeId.gantry_y: float64(-1000),
-                    target_z: float64(1000),
-                    target_pipette: float64(500),
-                },
-                {
-                    NodeId.gantry_x: float64(-40),
-                    NodeId.gantry_y: float64(-40),
-                    target_z: float64(-10),
-                    target_pipette: float64(-10),
-                },
-            )
-        ],
-        [
-            create_step(
-                distance={
-                    # NodeId.gantry_x: float64(slot_dist[args.which_slot][0]),
-                    NodeId.gantry_x: float64(26.5),
-                    NodeId.gantry_y: float64(slot_dist[args.which_slot][1]),
-                },
-                velocity={
-                    NodeId.gantry_x: float64(args.gantry_speed + 2),
-                    NodeId.gantry_y: float64(args.gantry_speed),
-                },
-                acceleration={},
-                duration=float64(
-                    max(slot_dist[args.which_slot][0], slot_dist[args.which_slot][1])
-                    / args.gantry_speed
-                ),
-                present_nodes=[NodeId.gantry_x, NodeId.gantry_y],
-                stop_condition=MoveStopCondition.none,
-            )
-        ],
-        [
-            create_step(
-                distance={
-                    target_z: float64(args.mount_start_height),
-                },
-                velocity={
-                    target_z: float64(args.mount_speed),
-                },
-                acceleration={},
-                duration=float64(args.mount_start_height / args.mount_speed),
-                present_nodes=[target_z],
-                stop_condition=MoveStopCondition.none,
-            ),
-        ],
-    ]
-
-    test_move_group = [
-        [
-            create_step(
-                distance={
-                    target_z: float64(args.mount_distance),
-                    target_pipette: float64(70),
-                },
-                velocity={
-                    target_z: float64(args.mount_speed),
-                    target_pipette: float64(10),
-                },
-                acceleration={},
-                duration=float64(6.75),
-                present_nodes=[target_z, target_pipette],
-                stop_condition=MoveStopCondition.none,
-            ),
-        ],
-        [
-            create_step(
-                distance={
-                    target_z: float64(-50),
-                },
-                velocity={
-                    target_z: float64(-1 * args.mount_speed),
-                },
-                acceleration={},
-                duration=float64(6.75),
-                present_nodes=[target_z],
-                stop_condition=MoveStopCondition.none,
-            ),
+    if args.pipette_only:
+        prep_move_group = [
+            [
+                create_home_step(
+                    {
+                        target_z: float64(1000),
+                        target_pipette: float64(500),
+                    },
+                    {
+                        target_z: float64(-10),
+                        target_pipette: float64(-10),
+                    },
+                )
+            ]
         ]
-    ]
-    threshold_cmh20 = float(67)
+    else:
+        prep_move_group = [
+            # Group 0 - home
+            [
+                create_home_step(
+                    {
+                        NodeId.gantry_x: float64(-1000),
+                        NodeId.gantry_y: float64(-1000),
+                        target_z: float64(1000),
+                        target_pipette: float64(500),
+                    },
+                    {
+                        NodeId.gantry_x: float64(-40),
+                        NodeId.gantry_y: float64(-40),
+                        target_z: float64(-10),
+                        target_pipette: float64(-10),
+                    },
+                )
+            ],
+            [
+                create_step(
+                    distance={
+                        # NodeId.gantry_x: float64(slot_dist[args.which_slot][0]),
+                        NodeId.gantry_x: float64(26.5),
+                        NodeId.gantry_y: float64(slot_dist[args.which_slot][1]),
+                    },
+                    velocity={
+                        NodeId.gantry_x: float64(args.gantry_speed + 2),
+                        NodeId.gantry_y: float64(args.gantry_speed),
+                    },
+                    acceleration={},
+                    duration=float64(
+                        max(slot_dist[args.which_slot][0], slot_dist[args.which_slot][1])
+                        / args.gantry_speed
+                    ),
+                    present_nodes=[NodeId.gantry_x, NodeId.gantry_y],
+                    stop_condition=MoveStopCondition.none,
+                )
+            ],
+            [
+                create_step(
+                    distance={
+                        target_z: float64(args.mount_start_height),
+                    },
+                    velocity={
+                        target_z: float64(args.mount_speed),
+                    },
+                    acceleration={},
+                    duration=float64(args.mount_start_height / args.mount_speed),
+                    present_nodes=[target_z],
+                    stop_condition=MoveStopCondition.none,
+                ),
+            ],
+        ]
+
+    if args.pipette_only:
+        test_move_group = [
+            [
+                create_step(
+                    distance={
+                        target_z: float64(args.mount_distance),
+                        target_pipette: float64(70),
+                    },
+                    velocity={
+                        target_z: float64(args.mount_speed),
+                        target_pipette: float64(10),
+                    },
+                    acceleration={},
+                    duration=float64(7),
+                    present_nodes=[target_z, target_pipette],
+                    stop_condition=MoveStopCondition.cap_sensor,
+                ),
+            ]
+        ]
+    else:
+        test_move_group = [
+            [
+                create_step(
+                    distance={
+                        target_z: float64(args.mount_distance),
+                        target_pipette: float64(70),
+                    },
+                    velocity={
+                        target_z: float64(args.mount_speed),
+                        target_pipette: float64(10),
+                    },
+                    acceleration={},
+                    duration=float64(6.75),
+                    present_nodes=[target_z, target_pipette],
+                    stop_condition=MoveStopCondition.none,
+                ),
+            ],
+            [
+                create_step(
+                    distance={
+                        target_z: float64(-50),
+                    },
+                    velocity={
+                        target_z: float64(-1 * args.mount_speed),
+                    },
+                    acceleration={},
+                    duration=float64(6.75),
+                    present_nodes=[target_z],
+                    stop_condition=MoveStopCondition.cap_sensor,
+                ),
+            ]
+        ]
+    threshold_cmh20 = float(63)
     threshold_payload = payloads.SetSensorThresholdRequestPayload(
         sensor=fields.SensorTypeField(SensorType.pressure),
         sensor_id=fields.SensorIdField(0),
@@ -259,7 +295,6 @@ async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
     )
     stim_message = message_definitions.BindSensorOutputRequest(payload=stim_payload)
     runner = MoveGroupRunner(move_groups=prep_move_group)
-
     position = await runner.run(can_messenger=messenger)
 
     # await messenger.send(target_pipette, reset_message)
@@ -284,6 +319,7 @@ async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
     await asyncio.get_running_loop().run_in_executor(
         None, lambda: input("\npress enter to home")
     )
+
     await messenger.send(target_pipette, reset_message)
     runner = MoveGroupRunner(move_groups=[prep_move_group[0]])
     await runner.run(can_messenger=messenger)
@@ -311,6 +347,7 @@ def main() -> None:
     parser.add_argument("-ms", "--mount-speed", type=float, default=10)
     parser.add_argument("-gs", "--gantry-speed", type=float, default=60)
     parser.add_argument("-ws", "--which-slot", type=int, default=5)
+    parser.add_argument("-po", "--pipette-only", type=bool, default=False)
     parser.add_argument("-v", "--verbose-monitoring", action="store_true")
     parser.add_argument(
         "-l",
