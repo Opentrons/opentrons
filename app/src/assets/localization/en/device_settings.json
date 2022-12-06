@@ -161,5 +161,7 @@
   "ip_address": "IP Address",
   "subnet_mask": "Subnet Mask",
   "mac_address": "Mac Address",
-  "connecting": "Connecting..."
+  "connecting": "Connecting...",
+  "connect_via_usb": "Connect via USB",
+  "connect_ot3_via_usb": "Connect your OT-3 to a computer with the provided USB cable. Make sure to have the Opentrons app downloaded on your desktop."
 }

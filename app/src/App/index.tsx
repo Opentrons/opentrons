@@ -29,6 +29,7 @@ import { InitialSplash } from '../pages/OnDeviceDisplay/InitialSplash'
 import { ConnectedNetworkInfo } from '../pages/OnDeviceDisplay/ConnectedNetworkInfo'
 import { SelectNetwork } from '../pages/OnDeviceDisplay/SelectNetwork'
 import { SetWifiCred } from '../pages/OnDeviceDisplay/SetWifiCred'
+import { ConnectViaUsb } from '../pages/OnDeviceDisplay/ConnectViaUsb'
 import { getIsOnDevice } from '../redux/config'
 import { getLocalRobot } from '../redux/discovery'
 import { useSoftwareUpdatePoll } from './hooks'
@@ -131,6 +132,12 @@ export const AppComponent = (): JSX.Element => {
       name: 'Connected Network Info',
       path: '/connected-network-info/:ssid',
     },
+    {
+      Component: ConnectViaUsb,
+      exact: true,
+      name: 'Connect via USB',
+      path: '/connect-via-usb',
+    },
   ]
 
   const routes = isOnDevice ? onDeviceDisplayRoutes : allRoutes
@@ -167,7 +174,7 @@ export const AppComponent = (): JSX.Element => {
                     </Route>
                   )
                 })}
-                <Redirect to="/device-setup" />
+                <Redirect to="/connect-via-usb" />
               </Switch>
               <Alerts />
             </Box>
