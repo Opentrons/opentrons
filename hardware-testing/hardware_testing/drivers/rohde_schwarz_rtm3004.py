@@ -82,16 +82,16 @@ class Rohde_Schwarz_RTM3004:
                 reading = False
         return data
 
-    def get_measurement(self, place: int):
+    def get_measurement(self, place: int) -> float:
         """Get instrument measurement from specific place."""
         self.packet = self.GCODE["GET_MEASUREMENT"].format(place) + self.ACK
         self._send_packet(self.packet)
         reading = True
         while reading:
-            data = self._get_packet()
-            if data != "":
+            measurement = self._get_packet()
+            if measurement != "":
                 reading = False
-        return data
+        return float(measurement)
 
 if __name__ == "__main__":
     print("Rohde & Schwarz RTM3004 Oscilloscope")
