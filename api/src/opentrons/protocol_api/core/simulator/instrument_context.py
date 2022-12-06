@@ -143,7 +143,7 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
         increment: Optional[float],
         prep_after: bool = True,
     ) -> None:
-        geometry = well_core.get_geometry()
+        geometry = well_core.geometry
         tip_rack_core = geometry.parent
         tip_length = instrument_support.tip_length_for(
             pipette=self._pipette_dict,
@@ -174,7 +174,7 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
         well_core: WellImplementation,
         home_after: bool,
     ) -> None:
-        labware_core = well_core.get_geometry().parent
+        labware_core = well_core.geometry.parent
 
         if location is None:
             from opentrons.protocol_api.labware import Labware, Well

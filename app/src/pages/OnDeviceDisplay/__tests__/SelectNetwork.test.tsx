@@ -7,7 +7,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { getWifiList } from '../../../redux/networking'
 import * as Fixtures from '../../../redux/networking/__fixtures__'
-import { SelectNetwork } from '../SelectNetwork'
+import { SelectWifiNetwork } from '../SelectWifiNetwork'
 
 const mockPush = jest.fn()
 const mockWifiList = [
@@ -32,7 +32,7 @@ jest.mock('react-router-dom', () => {
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <SelectNetwork />
+      <SelectWifiNetwork />
     </MemoryRouter>,
     {
       i18nInstance: i18n,

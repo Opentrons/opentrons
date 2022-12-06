@@ -15,7 +15,7 @@ import { ProtocolRunDetails } from '../../pages/Devices/ProtocolRunDetails'
 import { RobotSettings } from '../../pages/Devices/RobotSettings'
 import { GeneralSettings } from '../../pages/AppSettings/GeneralSettings'
 import { InitialSplash } from '../../pages/OnDeviceDisplay/InitialSplash'
-import { SelectNetwork } from '../../pages/OnDeviceDisplay/SelectNetwork'
+import { SelectWifiNetwork } from '../../pages/OnDeviceDisplay/SelectWifiNetwork'
 import { SetWifiCred } from '../../pages/OnDeviceDisplay/SetWifiCred'
 import { ConnectedNetworkInfo } from '../../pages/OnDeviceDisplay/ConnectedNetworkInfo'
 import { getIsOnDevice } from '../../redux/config'
@@ -34,7 +34,7 @@ jest.mock('../../pages/Protocols/ProtocolsLanding')
 jest.mock('../../pages/Devices/ProtocolRunDetails')
 jest.mock('../../pages/Devices/RobotSettings')
 jest.mock('../../pages/OnDeviceDisplay/InitialSplash')
-jest.mock('../../pages/OnDeviceDisplay/SelectNetwork')
+jest.mock('../../pages/OnDeviceDisplay/SelectWifiNetwork')
 jest.mock('../../pages/OnDeviceDisplay/SetWifiCred')
 jest.mock('../../pages/OnDeviceDisplay/ConnectedNetworkInfo')
 jest.mock('../../organisms/Alerts')
@@ -84,8 +84,8 @@ const mockInitialSplash = InitialSplash as jest.MockedFunction<
   typeof InitialSplash
 >
 
-const mockSelectNetwork = SelectNetwork as jest.MockedFunction<
-  typeof SelectNetwork
+const mockSelectWifiNetwork = SelectWifiNetwork as jest.MockedFunction<
+  typeof SelectWifiNetwork
 >
 
 const mockSetWifiCred = SetWifiCred as jest.MockedFunction<typeof SetWifiCred>
@@ -119,7 +119,7 @@ describe('App', () => {
     mockGetIsOnDevice.mockReturnValue(false)
     mockGetLocalRobot.mockReturnValue(null)
     mockInitialSplash.mockReturnValue(<div>Mock InitialSplash</div>)
-    mockSelectNetwork.mockReturnValue(<div>Mock SelectNetwork</div>)
+    mockSelectWifiNetwork.mockReturnValue(<div>Mock SelectWifiNetwork</div>)
     mockSetWifiCred.mockReturnValue(<div>Mock SetWifiCred</div>)
     mockConnectedNetworkInfo.mockReturnValue(
       <div>Mock ConnectedNetworkInfo</div>
@@ -190,10 +190,10 @@ describe('App', () => {
     getByText('Mock InitialSplash')
   })
 
-  it('renders a SelectNetwork component from /select-network', () => {
+  it('renders a SelectNetwork component from /connect-via-wifi', () => {
     when(mockGetIsOnDevice).calledWith(MOCK_STATE).mockReturnValue(true)
-    const [{ getByText }] = render('/select-network')
-    getByText('Mock SelectNetwork')
+    const [{ getByText }] = render('/connect-via-wifi')
+    getByText('Mock SelectWifiNetwork')
   })
 
   it('renders a SetWifiCred component from /set-wifi-cred/:ssid', () => {

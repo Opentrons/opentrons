@@ -8,9 +8,11 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     ExecuteMoveGroupRequest,
     MoveCompleted,
     ReadFromSensorResponse,
+    Acknowledgement,
 )
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.messages.payloads import (
+    EmptyPayload,
     MoveCompletedPayload,
     ReadFromSensorResponsePayload,
 )
@@ -23,6 +25,7 @@ from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.messages.fields import (
     SensorIdField,
     SensorTypeField,
+    MotorPositionFlagsField,
 )
 
 
@@ -113,7 +116,14 @@ async def test_capacitive_probe(
     ) -> List[Tuple[NodeId, MessageDefinition, NodeId]]:
         message.payload.serialize()
         if isinstance(message, ExecuteMoveGroupRequest):
+            ack_payload = EmptyPayload()
+            ack_payload.message_index = message.payload.message_index
             return [
+                (
+                    NodeId.host,
+                    Acknowledgement(payload=ack_payload),
+                    motor_node,
+                ),
                 (
                     NodeId.host,
                     MoveCompleted(
@@ -122,11 +132,12 @@ async def test_capacitive_probe(
                             seq_id=UInt8Field(0),
                             current_position_um=UInt32Field(10000),
                             encoder_position_um=Int32Field(10000),
+                            position_flags=MotorPositionFlagsField(0),
                             ack_id=UInt8Field(0),
                         )
                     ),
                     motor_node,
-                )
+                ),
             ]
         else:
             return []
@@ -149,7 +160,7 @@ async def test_capacitive_probe(
         ANY,  # this is a mock of a function on a class not a method so this is self
         sensor_info,
         ANY,
-        log=ANY,
+        do_log=ANY,
     )
 
 
@@ -180,6 +191,8 @@ async def test_capacitive_sweep(
     ) -> List[Tuple[NodeId, MessageDefinition, NodeId]]:
         message.payload.serialize()
         if isinstance(message, ExecuteMoveGroupRequest):
+            ack_payload = EmptyPayload()
+            ack_payload.message_index = message.payload.message_index
             sensor_values: List[Tuple[NodeId, MessageDefinition, NodeId]] = [
                 (
                     NodeId.host,
@@ -203,13 +216,23 @@ async def test_capacitive_sweep(
                             seq_id=UInt8Field(0),
                             current_position_um=UInt32Field(10000),
                             encoder_position_um=Int32Field(10000),
+                            position_flags=MotorPositionFlagsField(0),
                             ack_id=UInt8Field(0),
                         )
                     ),
                     motor_node,
                 ),
             ]
-            return sensor_values + move_ack
+            execute_ack: List[Tuple[NodeId, MessageDefinition, NodeId]] = [
+                (
+                    NodeId.host,
+                    Acknowledgement(
+                        payload=ack_payload,
+                    ),
+                    motor_node,
+                ),
+            ]
+            return execute_ack + sensor_values + move_ack
         else:
             return []
 

@@ -21,9 +21,9 @@ import {
 } from '@opentrons/components'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../redux/config'
 import { ModalHeader, ModalShell } from '../../../../molecules/Modal'
+import { PrimaryButton } from '../../../../atoms/buttons'
 import { OffsetVector } from '../../../../molecules/OffsetVector'
 import type { LabwareOffset } from '@opentrons/api-client'
-import { PrimaryButton } from '../../../../atoms/buttons'
 
 const OffsetTable = styled('table')`
   ${TYPOGRAPHY.labelRegular}

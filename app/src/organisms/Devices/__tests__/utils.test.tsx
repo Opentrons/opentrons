@@ -1,4 +1,5 @@
-import { formatTimestamp } from '../utils'
+import { formatTimestamp, getIs96ChannelPipetteAttached } from '../utils'
+import type { FetchPipettesResponsePipette } from '../../../redux/pipettes/types'
 
 describe('formatTimestamp', () => {
   it('should format an ISO 8601 date string', () => {
@@ -19,5 +20,30 @@ describe('formatTimestamp', () => {
     const noDate = 'A Protocol For Otie'
 
     expect(formatTimestamp(noDate)).toEqual(noDate)
+  })
+})
+
+describe('getIs96ChannelPipetteAttached hook', () => {
+  it('returns false when there is no pipette attached on the left mount', () => {
+    const result = getIs96ChannelPipetteAttached(null)
+    expect(result).toEqual(false)
+  })
+
+  it('returns true when there is a 96 channel pipette attached on the left mount', () => {
+    const mockLeftMountAttachedPipette = {
+      name: 'p1000_96',
+    } as FetchPipettesResponsePipette
+
+    const result = getIs96ChannelPipetteAttached(mockLeftMountAttachedPipette)
+    expect(result).toEqual(true)
+  })
+
+  it('returns false when there is no 96 channel pipette attached on the left mount', () => {
+    const mockLeftMountAttachedPipette = {
+      name: 'mock single channel',
+    } as FetchPipettesResponsePipette
+
+    const result = getIs96ChannelPipetteAttached(mockLeftMountAttachedPipette)
+    expect(result).toEqual(false)
   })
 })

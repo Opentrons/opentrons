@@ -33,8 +33,6 @@ describe('AddCustomLabwareSlideout', () => {
   const props: React.ComponentProps<typeof AddCustomLabwareSlideout> = {
     isExpanded: true,
     onCloseClick: jest.fn(() => null),
-    onSuccess: jest.fn(() => null),
-    onFailure: jest.fn(() => null),
   }
   beforeEach(() => {
     mockTrackEvent = jest.fn()

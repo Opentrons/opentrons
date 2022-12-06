@@ -1,6 +1,6 @@
 """Geometry state getters."""
 from dataclasses import dataclass
-from typing import Optional, List, Union
+from typing import Optional, List, Tuple, Union
 
 from opentrons.types import Point, DeckSlotName
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -19,6 +19,7 @@ from ..types import (
 )
 from .labware import LabwareView
 from .modules import ModuleView
+from .pipettes import CurrentWell
 
 
 DEFAULT_TIP_DROP_HEIGHT_FACTOR = 0.5
@@ -80,6 +81,26 @@ class GeometryView:
         )
 
         return max(highest_labware_z, highest_module_z)
+
+    def get_min_travel_z(
+        self,
+        pipette_id: str,
+        labware_id: str,
+        location: Optional[CurrentWell],
+        minimum_z_height: Optional[float],
+    ) -> float:
+        """Get the minimum allowed travel height of an arc move."""
+        if (
+            location is not None
+            and pipette_id == location.pipette_id
+            and labware_id == location.labware_id
+        ):
+            min_travel_z = self.get_labware_highest_z(labware_id)
+        else:
+            min_travel_z = self.get_all_labware_highest_z()
+        if minimum_z_height:
+            min_travel_z = max(min_travel_z, minimum_z_height)
+        return min_travel_z
 
     def get_labware_parent_position(self, labware_id: str) -> Point:
         """Get the position of the labware's parent slot (deck or module)."""
@@ -354,3 +375,17 @@ class GeometryView:
             slot_center.y + module_offset.y,
             slot_center.z + module_offset.z + labware_dimensions.z / 2,
         )
+
+    def get_extra_waypoints(
+        self, labware_id: str, location: Optional[CurrentWell]
+    ) -> List[Tuple[float, float]]:
+        """Get extra waypoints for movement if thermocycler needs to be dodged."""
+        if location is not None and self._modules.should_dodge_thermocycler(
+            from_slot=self.get_ancestor_slot_name(location.labware_id),
+            to_slot=self.get_ancestor_slot_name(labware_id),
+        ):
+            slot_5_center = self._labware.get_slot_center_position(
+                slot=DeckSlotName.SLOT_5
+            )
+            return [(slot_5_center.x, slot_5_center.y)]
+        return []

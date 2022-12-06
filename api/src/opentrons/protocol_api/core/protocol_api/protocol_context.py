@@ -86,6 +86,11 @@ class ProtocolContextImplementation(
         self._module_cores: List[legacy_module_core.LegacyModuleCore] = []
 
     @property
+    def api_version(self) -> APIVersion:
+        """Get the API version the protocol is adhering to."""
+        return self._api_version
+
+    @property
     def equipment_broker(self) -> EquipmentBroker[LoadInfo]:
         """A message broker to to publish equipment load events.
 

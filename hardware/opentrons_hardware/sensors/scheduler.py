@@ -3,7 +3,7 @@ import asyncio
 import logging
 from contextlib import asynccontextmanager
 
-from typing import Optional, Type, TypeVar, Callable, AsyncIterator, cast, List
+from typing import Optional, TypeVar, Callable, AsyncIterator, List
 
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
@@ -11,6 +11,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     SensorId,
     SensorType,
     MessageId,
+    ErrorCode,
 )
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 
@@ -30,6 +31,7 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     ReadFromSensorResponse,
     PeripheralStatusResponse,
     BindSensorOutputRequest,
+    ErrorMessage,
 )
 from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.messages.payloads import (
@@ -65,8 +67,34 @@ log = logging.getLogger(__name__)
 ResponseType = TypeVar("ResponseType", bound=MessageDefinition)
 
 
+def _format_sensor_response(response: MessageDefinition) -> SensorDataType:
+    assert isinstance(response, ReadFromSensorResponse)
+    return SensorDataType.build(response.payload.sensor_data, response.payload.sensor)
+
+
 class SensorScheduler:
     """Sensor message scheduler."""
+
+    @staticmethod
+    def _create_filter(
+        node_id: Optional[NodeId] = None, message_id: Optional[MessageId] = None
+    ) -> Optional[Callable[[ArbitrationId], bool]]:
+        """Create listener filter by NodeId and MessageId."""
+        if not node_id and not message_id:
+            return None
+
+        def _filter(arbitration_id: ArbitrationId) -> bool:
+            return (
+                NodeId(arbitration_id.parts.originating_node_id) == node_id
+                if node_id
+                else True
+            ) and (
+                MessageId(arbitration_id.parts.message_id) == message_id
+                if message_id
+                else True
+            )
+
+        return _filter
 
     async def run_poll(
         self,
@@ -78,7 +106,9 @@ class SensorScheduler:
         """Send poll message."""
         sensor_info = sensor.sensor
         with MultipleMessagesWaitableCallback(
-            can_messenger, number_of_messages=expected_num_messages
+            can_messenger,
+            self._create_filter(sensor_info.node_id, ReadFromSensorResponse.message_id),
+            number_of_messages=expected_num_messages,
         ) as reader:
             data_list: List[SensorDataType] = []
             await can_messenger.send(
@@ -93,15 +123,8 @@ class SensorScheduler:
             )
             try:
 
-                def _format(message: ReadFromSensorResponse) -> SensorDataType:
-                    return SensorDataType.build(
-                        message.payload.sensor_data, message.payload.sensor
-                    )
-
                 data_list = await asyncio.wait_for(
-                    self._multi_wait_for_response(
-                        sensor_info.node_id, reader, ReadFromSensorResponse, _format
-                    ),
+                    self._multi_wait_for_response(reader, _format_sensor_response),
                     timeout,
                 )
             except asyncio.TimeoutError:
@@ -114,7 +137,7 @@ class SensorScheduler:
     ) -> None:
         """Send write message."""
         sensor_info = sensor.sensor
-        await can_messenger.send(
+        error = await can_messenger.ensure_send(
             node_id=sensor_info.node_id,
             message=WriteToSensorRequest(
                 payload=WriteToSensorRequestPayload(
@@ -125,7 +148,12 @@ class SensorScheduler:
                     reg_address=UInt8Field(0x0),
                 )
             ),
+            expected_nodes=[sensor_info.node_id],
         )
+        if error != ErrorCode.ok:
+            log.error(
+                f"recieved error {str(error)} trying to write sensor info to {str(sensor_info.node_id)}"
+            )
 
     async def send_read(
         self,
@@ -136,8 +164,11 @@ class SensorScheduler:
     ) -> List[SensorDataType]:
         """Send read message."""
         sensor_info = sensor.sensor
+
         with MultipleMessagesWaitableCallback(
-            can_messenger, number_of_messages=expected_num_messages
+            can_messenger,
+            self._create_filter(sensor_info.node_id, MessageId.read_sensor_response),
+            number_of_messages=expected_num_messages,
         ) as reader:
             data_list: List[SensorDataType] = []
             await can_messenger.send(
@@ -152,15 +183,8 @@ class SensorScheduler:
             )
             try:
 
-                def _format(response: ReadFromSensorResponse) -> SensorDataType:
-                    return SensorDataType.build(
-                        response.payload.sensor_data, response.payload.sensor
-                    )
-
                 data_list = await asyncio.wait_for(
-                    self._multi_wait_for_response(
-                        sensor_info.node_id, reader, ReadFromSensorResponse, _format
-                    ),
+                    self._multi_wait_for_response(reader, _format_sensor_response),
                     timeout,
                 )
             except asyncio.TimeoutError:
@@ -182,20 +206,15 @@ class SensorScheduler:
         """
         data_list: List[SensorDataType] = []
 
-        def _format(response: ReadFromSensorResponse) -> SensorDataType:
-            return SensorDataType.build(
-                response.payload.sensor_data, response.payload.sensor
-            )
-
         with MultipleMessagesWaitableCallback(
             can_messenger,
+            self._create_filter(node_id, MessageId.read_sensor_response),
             number_of_messages=expected_num_messages,
         ) as reader:
             try:
+
                 data_list = await asyncio.wait_for(
-                    self._multi_wait_for_response(
-                        node_id, reader, ReadFromSensorResponse, _format
-                    ),
+                    self._multi_wait_for_response(reader, _format_sensor_response),
                     timeout,
                 )
             except asyncio.TimeoutError:
@@ -208,11 +227,16 @@ class SensorScheduler:
         sensor: SensorThresholdInformation,
         can_messenger: CanMessenger,
         timeout: float = 1.0,
-    ) -> Optional[SensorDataType]:
+    ) -> SensorDataType:
         """Send threshold message."""
         sensor_info = sensor.sensor
-        with MultipleMessagesWaitableCallback(can_messenger) as reader:
-            data: Optional[SensorDataType] = None
+
+        with WaitableCallback(
+            can_messenger,
+            self._create_filter(
+                sensor_info.node_id, SensorThresholdResponse.message_id
+            ),
+        ) as reader:
             await can_messenger.send(
                 node_id=sensor_info.node_id,
                 message=SetSensorThresholdRequest(
@@ -226,28 +250,24 @@ class SensorScheduler:
             )
             try:
 
-                def _format(response: SensorThresholdResponse) -> SensorDataType:
+                def _format(response: MessageDefinition) -> SensorDataType:
+                    assert isinstance(response, SensorThresholdResponse)
                     return SensorDataType.build(
                         response.payload.threshold, response.payload.sensor
                     )
 
-                data = await asyncio.wait_for(
-                    self._wait_for_response(
-                        sensor_info.node_id, reader, SensorThresholdResponse, _format
-                    ),
+                return await asyncio.wait_for(
+                    self._wait_for_response(reader, _format),
                     timeout,
                 )
             except asyncio.TimeoutError:
-                log.warning("Sensor Read timed out")
-            finally:
-                return data
+                log.error(f"Sensor Threshold Read from {sensor_info.node_id} timed out")
+                raise
 
     @staticmethod
     async def _multi_wait_for_response(
-        node_id: NodeId,
         reader: WaitableCallback,
-        response_def: Type[ResponseType],
-        response_handler: Callable[[ResponseType], SensorDataType],
+        response_handler: Callable[[MessageDefinition], SensorDataType],
     ) -> List[SensorDataType]:
         """Listener for receiving messages back."""
         # TODO we should refactor the rest of the code that relies on
@@ -255,37 +275,29 @@ class SensorScheduler:
         # for. Otherwise, the code will timeout unless you return directly
         # from an async for loop.
         data: List[SensorDataType] = []
-        async for response, arbitration_id in reader:
-            if arbitration_id.parts.originating_node_id == node_id:
-                if isinstance(response, response_def):
-                    data.append(response_handler(response))
+        async for response, _ in reader:
+            data.append(response_handler(response))
         return data
 
     @staticmethod
     async def _wait_for_response(
-        node_id: NodeId,
         reader: WaitableCallback,
-        response_def: Type[ResponseType],
-        response_handler: Callable[[ResponseType], Optional[SensorDataType]],
-    ) -> Optional[SensorDataType]:
+        response_handler: Callable[[MessageDefinition], SensorDataType],
+    ) -> SensorDataType:
         """Listener for receiving messages back."""
-        async for response, arbitration_id in reader:
-            if arbitration_id.parts.originating_node_id == node_id:
-                if isinstance(response, response_def):
-                    return response_handler(response)
-        return None
+        async for response, _ in reader:
+            return response_handler(response)
+        raise StopAsyncIteration
 
     @staticmethod
     async def _read_peripheral_response(
-        node_id: NodeId,
         reader: WaitableCallback,
     ) -> bool:
         """Waits for and sends back PeripheralStatusResponse."""
-        async for response, arbitration_id in reader:
-            if arbitration_id.parts.originating_node_id == node_id:
-                if isinstance(response, PeripheralStatusResponse):
-                    return bool(response.payload.status)
-        return False
+        async for response, _ in reader:
+            assert isinstance(response, PeripheralStatusResponse)
+            return bool(response.payload.status)
+        raise StopAsyncIteration
 
     async def request_peripheral_status(
         self,
@@ -296,8 +308,10 @@ class SensorScheduler:
         timeout: int,
     ) -> bool:
         """Send threshold message."""
-        with MultipleMessagesWaitableCallback(can_messenger) as reader:
-            status = False
+        with MultipleMessagesWaitableCallback(
+            can_messenger,
+            self._create_filter(node_id, PeripheralStatusResponse.message_id),
+        ) as reader:
             await can_messenger.send(
                 node_id=node_id,
                 message=PeripheralStatusRequest(
@@ -309,14 +323,12 @@ class SensorScheduler:
             )
 
             try:
-                response = asyncio.wait_for(
-                    self._read_peripheral_response(node_id, reader), timeout
+                return await asyncio.wait_for(
+                    self._read_peripheral_response(reader), timeout
                 )
-                status = await response
             except asyncio.TimeoutError:
-                log.warning("Sensor Read timed out")
-            finally:
-                return status
+                log.warning(f"No PeripheralStatusResponse from node {node_id}")
+                return False
 
     @staticmethod
     def _log_sensor_output(message: MessageDefinition, arb: ArbitrationId) -> None:
@@ -325,6 +337,8 @@ class SensorScheduler:
                 f"{SensorType(message.payload.sensor.value).name}: "
                 f"{SensorDataType.build(message.payload.sensor_data, message.payload.sensor).to_float()}"
             )
+        if isinstance(message, ErrorMessage):
+            log.error(f"recieved error message {str(message)}")
 
     @asynccontextmanager
     async def bind_sync(
@@ -332,13 +346,13 @@ class SensorScheduler:
         target_sensor: SensorInformation,
         can_messenger: CanMessenger,
         timeout: float = 0.5,
-        log: bool = False,
+        do_log: bool = False,
     ) -> AsyncIterator[None]:
         """While acquired, bind the specified sensor to control sync."""
         flags = [SensorOutputBinding.sync]
-        if log:
+        if do_log:
             flags.append(SensorOutputBinding.report)
-        await can_messenger.send(
+        error = await can_messenger.ensure_send(
             node_id=target_sensor.node_id,
             message=BindSensorOutputRequest(
                 payload=BindSensorOutputRequestPayload(
@@ -347,15 +361,21 @@ class SensorScheduler:
                     binding=SensorOutputBindingField.from_flags(flags),
                 )
             ),
+            expected_nodes=[target_sensor.node_id],
         )
+        if error != ErrorCode.ok:
+            log.error(
+                f"recieved error {str(error)} trying to bind sensor output on {str(target_sensor.node_id)}"
+            )
+
         try:
-            if log:
+            if do_log:
                 can_messenger.add_listener(self._log_sensor_output)
             yield
         finally:
-            if log:
+            if do_log:
                 can_messenger.remove_listener(self._log_sensor_output)
-            await can_messenger.send(
+            error = await can_messenger.ensure_send(
                 node_id=target_sensor.node_id,
                 message=BindSensorOutputRequest(
                     payload=BindSensorOutputRequestPayload(
@@ -366,7 +386,12 @@ class SensorScheduler:
                         ),
                     )
                 ),
+                expected_nodes=[target_sensor.node_id],
             )
+            if error != ErrorCode.ok:
+                log.error(
+                    f"recieved error {str(error)} trying to write unbind sensor output on {str(target_sensor.node_id)}"
+                )
 
     @asynccontextmanager
     async def capture_output(
@@ -380,10 +405,13 @@ class SensorScheduler:
         def _logging_listener(
             message: MessageDefinition, arb_id: ArbitrationId
         ) -> None:
-            payload = cast(ReadFromSensorResponse, message).payload
-            response_queue.put_nowait(
-                SensorDataType.build(payload.sensor_data, payload.sensor).to_float()
-            )
+            if isinstance(message, ReadFromSensorResponse):
+                payload = message.payload
+                response_queue.put_nowait(
+                    SensorDataType.build(payload.sensor_data, payload.sensor).to_float()
+                )
+            if isinstance(message, ErrorMessage):
+                log.error(f"Recieved error message {str(message)}")
 
         def _filter(arbitration_id: ArbitrationId) -> bool:
             return (
@@ -392,10 +420,11 @@ class SensorScheduler:
             ) and (
                 MessageId(arbitration_id.parts.message_id)
                 == MessageId.read_sensor_response
+                or MessageId(arbitration_id.parts.message_id) == MessageId.error_message
             )
 
         can_messenger.add_listener(_logging_listener, _filter)
-        await can_messenger.send(
+        error = await can_messenger.ensure_send(
             node_id=target_sensor.node_id,
             message=BindSensorOutputRequest(
                 payload=BindSensorOutputRequestPayload(
@@ -404,12 +433,18 @@ class SensorScheduler:
                     binding=SensorOutputBindingField(SensorOutputBinding.report.value),
                 )
             ),
+            expected_nodes=[target_sensor.node_id],
         )
+        if error != ErrorCode.ok:
+            log.error(
+                f"recieved error {str(error)} trying to bind sensor output on {str(target_sensor.node_id)}"
+            )
+
         try:
             yield response_queue
         finally:
             can_messenger.remove_listener(_logging_listener)
-            await can_messenger.send(
+            error = await can_messenger.ensure_send(
                 node_id=target_sensor.node_id,
                 message=BindSensorOutputRequest(
                     payload=BindSensorOutputRequestPayload(
@@ -420,4 +455,9 @@ class SensorScheduler:
                         ),
                     )
                 ),
+                expected_nodes=[target_sensor.node_id],
             )
+            if error != ErrorCode.ok:
+                log.error(
+                    f"recieved error {str(error)} trying to write unbind sensor output on {str(target_sensor.node_id)}"
+                )

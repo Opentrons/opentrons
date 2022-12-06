@@ -1,13 +1,10 @@
 """Basic labware data state and store."""
 from __future__ import annotations
 
-import re
-from collections import defaultdict
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Any, Mapping, Union
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
-from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 
 from opentrons.types import DeckSlotName, Point
@@ -49,6 +46,8 @@ _MAGDECK_HALF_MM_LABWARE = {
     "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",
     "opentrons/usascientific_96_wellplate_2.4ml_deep/1",
 }
+
+_INSTRUMENT_ATTACH_SLOT = DeckSlotName.SLOT_2
 
 
 @dataclass
@@ -304,15 +303,6 @@ class LabwareView(HasState[LabwareState]):
                 f"{well_name} does not exist in {labware_id}."
             ) from e
 
-    def get_wells(self, labware_id: str) -> List[str]:
-        """Get labware wells as a list of well names."""
-        definition = self.get_definition(labware_id=labware_id)
-        wells = list()
-        for col in definition.ordering:
-            for well_name in col:
-                wells.append(well_name)
-        return wells
-
     def validate_liquid_allowed_in_labware(
         self, labware_id: str, wells: Mapping[str, Any]
     ) -> List[str]:
@@ -329,26 +319,6 @@ class LabwareView(HasState[LabwareState]):
                 f"Some of the supplied wells do not match the labwareId: {labware_id}."
             )
         return list(wells)
-
-    def get_well_columns(self, labware_id: str) -> Dict[str, List[str]]:
-        """Get well columns."""
-        definition = self.get_definition(labware_id=labware_id)
-        wells_by_cols = defaultdict(list)
-        for i, col in enumerate(definition.ordering):
-            wells_by_cols[f"{i+1}"] = col
-        return wells_by_cols
-
-    def get_well_rows(self, labware_id: str) -> Dict[str, List[str]]:
-        """Get well rows."""
-        definition = self.get_definition(labware_id=labware_id)
-        wells_by_rows = defaultdict(list)
-        pattern = re.compile(WELL_NAME_PATTERN, re.X)
-        for col in definition.ordering:
-            for well_name in col:
-                match = pattern.match(well_name)
-                assert match, f"Well name did not match pattern {pattern}"
-                wells_by_rows[match.group(1)].append(well_name)
-        return wells_by_rows
 
     def get_tip_length(self, labware_id: str) -> float:
         """Get the tip length of a tip rack."""
@@ -506,6 +476,18 @@ class LabwareView(HasState[LabwareState]):
                 raise errors.LocationIsOccupiedError(
                     f"Labware {labware.loadName} is already present at {location}."
                 )
+
+    def get_calibration_coordinates(self, current_z_position: float) -> Point:
+        """Get calibration critical point and target position."""
+        target_center = self.get_slot_center_position(_INSTRUMENT_ATTACH_SLOT)
+        # TODO (tz, 11-30-22): These coordinates wont work for OT-2. We will need to apply offsets after
+        # https://opentrons.atlassian.net/browse/RCORE-382
+
+        return Point(
+            x=target_center.x,
+            y=target_center.y,
+            z=current_z_position,
+        )
 
     def _is_magnetic_module_uri_in_half_millimeter(self, labware_id: str) -> bool:
         """Check whether the labware uri needs to be calculated in half a millimeter."""

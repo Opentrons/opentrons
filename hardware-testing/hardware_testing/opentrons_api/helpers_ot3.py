@@ -373,6 +373,16 @@ def get_endstop_position_ot3(api: OT3API, mount: OT3Mount) -> Dict[OT3Axis, floa
     return {ax: val for ax, val in mount_pos_per_axis.items()}
 
 
+def get_gantry_homed_position_ot3(api: OT3API, mount: OT3Mount) -> Point:
+    """Get the homed coordinate by mount."""
+    axes_pos = get_endstop_position_ot3(api, mount)
+    return Point(
+        x=axes_pos[OT3Axis.X],
+        y=axes_pos[OT3Axis.Y],
+        z=axes_pos[OT3Axis.by_mount(mount)],
+    )
+
+
 class OT3JogTermination(Exception):
     """Jogging terminated."""
 
@@ -427,15 +437,14 @@ async def _jog_print_current_position(
     motors_pos = await api.current_position_ot3(
         mount=mount, critical_point=critical_point
     )
-    enc_pos = await api.encoder_current_position(
+    enc_pos = await api.encoder_current_position_ot3(
         mount=mount, critical_point=critical_point
     )
     mx, my, mz, mp = [
         round(motors_pos[ax], 2) for ax in [OT3Axis.X, OT3Axis.Y, z_axis, instr_axis]
     ]
     ex, ey, ez, ep = [
-        round(enc_pos[ax.to_axis()], 2)
-        for ax in [OT3Axis.X, OT3Axis.Y, z_axis, instr_axis]
+        round(enc_pos[ax], 2) for ax in [OT3Axis.X, OT3Axis.Y, z_axis, instr_axis]
     ]
     print(f"Deck Coordinate: X={mx}, Y={my}, Z={mz}, Instr={mp}")
     print(f"Enc. Coordinate: X={ex}, Y={ey}, Z={ez}, Instr={ep}")
@@ -579,11 +588,30 @@ async def wait_for_stable_capacitance_ot3(
         )
 
 
+def get_pipette_offset_ot3(api: OT3API, mount: OT3Mount) -> Point:
+    """Get pipette offset OT3."""
+    pipette = api.hardware_pipettes[mount.to_mount()]
+    assert pipette, f"No pipette found on mount: {mount}"
+    return pipette._pipette_offset.offset + Point()
+
+
 def set_pipette_offset_ot3(api: OT3API, mount: OT3Mount, offset: Point) -> None:
     """Set pipette offset OT3."""
     pipette = api.hardware_pipettes[mount.to_mount()]
     assert pipette, f"No pipette found on mount: {mount}"
     pipette._pipette_offset.offset = offset
+
+
+def get_gripper_offset_ot3(api: OT3API) -> Point:
+    """Get gripper offset OT3."""
+    assert api.has_gripper, "No gripper found"
+    return api._gripper_handler._gripper._calibration_offset.offset  # type: ignore[union-attr]
+
+
+def set_gripper_offset_ot3(api: OT3API, offset: Point) -> None:
+    """Set gripper offset OT3."""
+    assert api.has_gripper, "No gripper found"
+    api._gripper_handler._gripper._calibration_offset.offset = offset  # type: ignore[union-attr]
 
 
 def get_slot_top_left_position_ot3(slot: int) -> Point:

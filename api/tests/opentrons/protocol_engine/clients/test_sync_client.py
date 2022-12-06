@@ -18,7 +18,7 @@ from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from opentrons.types import DeckSlotName, MountType
-from opentrons.protocol_engine import DeckSlotLocation, DeckPoint, commands
+from opentrons.protocol_engine import DeckSlotLocation, DeckPoint, MotorAxis, commands
 from opentrons.protocol_engine.clients import SyncClient, AbstractSyncTransport
 from opentrons.protocol_engine.types import (
     ModuleDefinition,
@@ -187,6 +187,9 @@ def test_move_to_well(
             wellLocation=WellLocation(
                 origin=WellOrigin.BOTTOM, offset=WellOffset(x=1, y=2, z=3)
             ),
+            forceDirect=True,
+            minimumZHeight=4.56,
+            speed=7.89,
         )
     )
     response = commands.MoveToWellResult()
@@ -200,6 +203,9 @@ def test_move_to_well(
         well_location=WellLocation(
             origin=WellOrigin.BOTTOM, offset=WellOffset(x=1, y=2, z=3)
         ),
+        force_direct=True,
+        minimum_z_height=4.56,
+        speed=7.89,
     )
 
     assert result == response
@@ -217,6 +223,7 @@ def test_move_to_coordinates(
             coordinates=DeckPoint(x=1, y=2, z=3),
             forceDirect=True,
             minimumZHeight=42.0,
+            speed=45.6,
         )
     )
     response = commands.MoveToCoordinatesResult()
@@ -228,6 +235,7 @@ def test_move_to_coordinates(
         coordinates=DeckPoint(x=1, y=2, z=3),
         force_direct=True,
         minimum_z_height=42.0,
+        speed=45.6,
     )
 
     assert result == response
@@ -879,5 +887,21 @@ def test_temperature_module_wait_for_target_temperature(
     result = subject.temperature_module_wait_for_target_temperature(
         module_id="module-id", celsius=38.7
     )
+
+    assert result == response
+
+
+def test_home(
+    decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
+) -> None:
+    """It should execute a home command."""
+    request = commands.HomeCreate(
+        params=commands.HomeParams(axes=[MotorAxis.X, MotorAxis.Y]),
+    )
+    response = commands.HomeResult()
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.home(axes=[MotorAxis.X, MotorAxis.Y])
 
     assert result == response

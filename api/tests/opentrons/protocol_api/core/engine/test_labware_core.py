@@ -143,13 +143,20 @@ def test_is_tip_rack(subject: LabwareCore) -> None:
         )
     ],
 )
-def test_get_wells(subject: LabwareCore) -> None:
-    """It should get a wells list in order, from the definition."""
-    result = subject.get_wells()
+def test_get_well_columns(subject: LabwareCore) -> None:
+    """It should get a well name columns from the definition."""
+    result = subject.get_well_columns()
 
-    assert len(result) == 4
-    assert all(isinstance(wc, WellCore) for wc in result)
-    assert list(wc.get_name() for wc in result) == ["A1", "B1", "A2", "B2"]
+    assert result == [["A1", "B1"], ["A2", "B2"]]
+
+
+def test_get_well_core(subject: LabwareCore) -> None:
+    """It should get a well name grid from the definition."""
+    result = subject.get_well_core("A1")
+
+    assert isinstance(result, WellCore)
+    assert result.get_name() == "A1"
+    assert result.labware_id == "cool-labware"
 
 
 def test_get_uri(
@@ -165,14 +172,6 @@ def test_get_uri(
     assert result == "great/uri/42"
 
 
-@pytest.mark.parametrize(
-    "labware_definition",
-    [
-        LabwareDefinition.construct(  # type: ignore[call-arg]
-            ordering=[["A1", "B1"], ["A2", "B2"]],
-        )
-    ],
-)
 def test_get_next_tip(
     decoy: Decoy, mock_engine_client: EngineClient, subject: LabwareCore
 ) -> None:
@@ -185,14 +184,12 @@ def test_get_next_tip(
         )
     ).then_return("A2")
 
-    starting_tip = subject.get_wells()[1]
+    starting_tip = WellCore(
+        name="B1", labware_id="cool-labware", engine_client=mock_engine_client
+    )
     result = subject.get_next_tip(num_tips=8, starting_tip=starting_tip)
 
-    assert isinstance(result, WellCore)
-    assert result.labware_id == "cool-labware"
-    assert result.get_name() == "A2"
-    assert result is subject.get_wells()[2]
-    assert result is subject.get_wells_by_name()["A2"]
+    assert result == "A2"
 
 
 def test_reset_tips(

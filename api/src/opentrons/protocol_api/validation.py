@@ -1,4 +1,5 @@
-from typing import List, Dict, Union, Optional
+from typing import Any, Dict, List, Optional, Sequence, Union
+from typing_extensions import TypeGuard
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
@@ -150,3 +151,13 @@ def ensure_thermocycler_profile_steps(
             )
         )
     return validated_steps
+
+
+def is_all_integers(items: Sequence[Any]) -> TypeGuard[Sequence[int]]:
+    """Check that every item in a list is an integer."""
+    return all(isinstance(i, int) for i in items)
+
+
+def is_all_strings(items: Sequence[Any]) -> TypeGuard[Sequence[str]]:
+    """Check that every item in a list is a string."""
+    return all(isinstance(i, str) for i in items)

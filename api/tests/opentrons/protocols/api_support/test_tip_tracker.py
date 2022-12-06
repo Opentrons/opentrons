@@ -3,31 +3,37 @@ from typing import List
 import pytest
 from opentrons.protocols.api_support.tip_tracker import TipTracker
 from opentrons.protocol_api.core.protocol_api.well import WellImplementation
-from opentrons.protocols.api_support.well_grid import WellGrid
-
-
-@pytest.fixture()
-def names_96_well() -> List[str]:
-    names = ((f"{c}{r}" for c in (chr(65 + i) for i in range(8))) for r in range(1, 13))
-    return [name for column in names for name in column]
-
-
-@pytest.fixture()
-def wells(names_96_well) -> List[WellImplementation]:
-    return [
-        WellImplementation(well_geometry=None, display_name=n, has_tip=True, name=n)
-        for n in names_96_well
-    ]
-
-
-@pytest.fixture()
-def well_grid(names_96_well, wells) -> WellGrid:
-    return WellGrid(wells)
 
 
 @pytest.fixture
-def tiptracker(well_grid) -> TipTracker:
-    return TipTracker(well_grid.get_columns())
+def well_ordering() -> List[List[str]]:
+    return [[f"{c}{r}" for c in (chr(65 + i) for i in range(8))] for r in range(1, 13)]
+
+
+@pytest.fixture
+def wells_by_column(well_ordering: List[List[str]]) -> List[List[WellImplementation]]:
+    return [
+        [
+            WellImplementation(
+                well_geometry=None,  # type: ignore[arg-type]
+                display_name=well_name,
+                has_tip=True,
+                name=well_name,
+            )
+            for well_name in column
+        ]
+        for column in well_ordering
+    ]
+
+
+@pytest.fixture
+def wells(wells_by_column) -> List[WellImplementation]:
+    return [well_impl for column in wells_by_column for well_impl in column]
+
+
+@pytest.fixture
+def tiptracker(wells_by_column) -> TipTracker:
+    return TipTracker(wells_by_column)
 
 
 def test_use_tips(wells, tiptracker):

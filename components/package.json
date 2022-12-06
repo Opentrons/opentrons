@@ -26,7 +26,7 @@
     "@types/lodash": "^4.14.168",
     "@types/react": "^17.0.1",
     "@types/react-router-dom": "^5.1.7",
-    "@types/styled-components": "^5.1.7",
+    "@types/styled-components": "^5.1.26",
     "@types/webpack-env": "^1.16.0",
     "classnames": "2.2.5",
     "jest-when": "^3.0.1",
@@ -34,7 +34,7 @@
     "react-popper": "1.0.0",
     "react-remove-scroll": "2.4.3",
     "react-select": "5.4.0",
-    "styled-components": "5.1.1"
+    "styled-components": "5.3.6"
   },
   "browser": {
     "jest-when": false
