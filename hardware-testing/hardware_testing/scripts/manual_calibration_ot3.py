@@ -137,19 +137,18 @@ async def _jog_axis(
                     pass
 
 
-async def _find_square_center(
-    api: OT3API,
-    mount: OT3Mount,
-    expected_pos: Point,
-) -> Point:
+async def _begin_find_sequence(api: OT3API, mount: OT3Mount, expected_pos: Point) -> None:
     # Move above slot Z center
-    z_probe_pos = _get_z_probe_pos(expected_pos)
+    z_probe_pos = _get_z_probe_pos(expected_pos) + Point(z=SAFE_Z)
     current_position = await api.gantry_position(mount)
-    above_point = z_probe_pos._replace(z=current_position.z)
-    await api.move_to(mount, above_point)
+    travel_height = max(current_position.z, z_probe_pos.z)
+    await api.move_to(mount, current_position._replace(z=travel_height))
+    await api.move_to(mount, z_probe_pos._replace(z=travel_height))
     input("\nRemove all items from deck and press ENTER:\n")
-    await api.move_to(mount, z_probe_pos + Point(z=SAFE_Z))
+    await api.move_to(mount, z_probe_pos)
 
+
+async def _find_square_z_pos(api: OT3API, mount: OT3Mount) -> float:
     # Jog gantry to find deck height
     print("\n--> Jog to find Z position")
     await _jog_axis(api, mount, OT3Axis.by_mount(mount), -1)
@@ -157,6 +156,18 @@ async def _find_square_center(
     await api.move_rel(mount, Point(z=SAFE_Z))
     deck_height = float(current_position.z)
     print(f"Found Z = {deck_height}mm")
+    return deck_height
+
+
+async def _find_square_center(
+    api: OT3API,
+    mount: OT3Mount,
+    expected_pos: Point,
+) -> Point:
+    await _begin_find_sequence(api, mount, expected_pos)
+
+    # find the Z height
+    deck_height = await _find_square_z_pos(api, mount)
 
     # Move to slot center
     current_position = await api.gantry_position(mount)
@@ -272,14 +283,37 @@ def _apply_relative_offset(_offset: Point, _relative: Point) -> Point:
     return _offset
 
 
+async def _check_multi_channel_to_deck_alignment(api: OT3API, mount: OT3Mount, expected_pos: Point, found_pos: Point) -> None:
+    current_pos = await api.gantry_position(mount)
+    await api.move_to(mount, current_pos._replace(z=100))
+    input("add probe to pipette FRONT channel (#8), then press ENTER: ")
+    await _begin_find_sequence(api, mount, expected_pos + Point(y=9 * 7))
+    front_deck_height = await _find_square_z_pos(api, mount)
+    diff = front_deck_height - found_pos.z
+    if diff != 0.0:
+        above_below_msg = "below" if diff < 0 else "above"
+        print(f"FRONT channel is {abs(diff)} mm {above_below_msg} the REAR channel")
+        print("is this acceptable?")
+        if "n" in input("if not, then home and exit this script? (y/n): "):
+            print("homing")
+            await api.home()
+            exit()
+
+
 async def _find_the_square(api: OT3API, mount: OT3Mount, expected_pos: Point) -> Point:
     if mount == OT3Mount.GRIPPER:
         helpers_ot3.set_gripper_offset_ot3(api, Point(x=0, y=0, z=0))
         found_pos = await _find_square_center_of_gripper_jaw(api, expected_pos)
     else:
         helpers_ot3.set_pipette_offset_ot3(api, mount, Point(x=0, y=0, z=0))
-        input("add probe to Pipette, then press ENTER: ")
+        is_multi = "multi" in api.hardware_pipettes[mount.to_mount()].name
+        if is_multi:
+            input("add probe to pipette REAR channel (#1), then press ENTER: ")
+        else:
+            input("add probe to Pipette, then press ENTER: ")
         found_pos = await _find_square_center(api, mount, expected_pos)
+        if is_multi and "y" in input("check if level to deck? (y/n):"):
+            await _check_multi_channel_to_deck_alignment(api, mount, expected_pos, found_pos)
     return found_pos
 
 
