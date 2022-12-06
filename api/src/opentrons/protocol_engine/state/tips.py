@@ -88,7 +88,7 @@ class TipStore(HasState[TipState], HandlesActions):
                 action.pipette_id
             ] = action.static_config.channels
 
-    def _update_used_tips(
+    def _set_used_tips(
         self, pipette_id: str, well_name: str, labware_id: str
     ) -> None:
         pipette_channels = self._state.channels_by_pipette_id.get(pipette_id)
