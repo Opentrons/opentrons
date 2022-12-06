@@ -6,8 +6,18 @@ import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { FLOWS } from './constants'
 import type { PipetteWizardStepProps } from './types'
 
-export const Results = (props: PipetteWizardStepProps): JSX.Element => {
-  const { proceed, flowType, attachedPipette, mount } = props
+interface ResultsProps extends PipetteWizardStepProps {
+  handleCleanUpAndClose: () => void
+}
+
+export const Results = (props: ResultsProps): JSX.Element => {
+  const {
+    proceed,
+    flowType,
+    attachedPipette,
+    mount,
+    handleCleanUpAndClose,
+  } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
 
   let header: string = 'unknown results screen'
@@ -43,6 +53,14 @@ export const Results = (props: PipetteWizardStepProps): JSX.Element => {
     }
   }
 
+  const handleProceed = (): void => {
+    if (flowType === FLOWS.DETACH) {
+      handleCleanUpAndClose()
+    } else {
+      proceed()
+    }
+  }
+
   return (
     <SimpleWizardBody
       iconColor={iconColor}
@@ -51,7 +69,7 @@ export const Results = (props: PipetteWizardStepProps): JSX.Element => {
     >
       <PrimaryButton
         textTransform={TEXT_TRANSFORM_CAPITALIZE}
-        onClick={proceed}
+        onClick={handleProceed}
         aria-label="Results_exit"
       >
         {buttonText}

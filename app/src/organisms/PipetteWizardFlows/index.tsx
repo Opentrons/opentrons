@@ -178,15 +178,12 @@ export const PipetteWizardFlows = (
   } else if (currentStep.section === SECTIONS.RESULTS) {
     const handleProceed = (): void => {
       if (
-        flowType === FLOWS.ATTACH &&
         currentStepIndex === 2 &&
         //  only proceeds if we know that the pipette was successfully attached
         attachedPipette[mount] != null
       ) {
         proceed()
         //  if you completed detaching the pipette, robot will home and delete run
-      } else if (flowType === FLOWS.DETACH) {
-        handleCleanUpAndClose()
       } else {
         closeFlow()
       }
@@ -200,6 +197,7 @@ export const PipetteWizardFlows = (
         {...currentStep}
         {...calibrateBaseProps}
         proceed={handleProceed}
+        handleCleanUpAndClose={handleCleanUpAndClose}
       />
     )
   } else if (currentStep.section === SECTIONS.MOUNT_PIPETTE) {

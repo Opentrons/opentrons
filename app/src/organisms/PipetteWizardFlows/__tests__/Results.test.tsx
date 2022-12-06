@@ -37,6 +37,7 @@ describe('Results', () => {
       errorMessage: null,
       setShowErrorMessage: jest.fn(),
       flowType: FLOWS.CALIBRATE,
+      handleCleanUpAndClose: jest.fn(),
     }
   })
   it('renders the correct information when pipette cal is a success for calibrate flow', () => {
@@ -93,7 +94,7 @@ describe('Results', () => {
     )
     const exit = getByRole('button', { name: 'Results_exit' })
     fireEvent.click(exit)
-    expect(props.proceed).toHaveBeenCalled()
+    expect(props.handleCleanUpAndClose).toHaveBeenCalled()
   })
   it('renders the correct information when pipette wizard is a fail for detach flow', () => {
     props = {
@@ -107,6 +108,6 @@ describe('Results', () => {
     )
     const exit = getByRole('button', { name: 'Results_exit' })
     fireEvent.click(exit)
-    expect(props.proceed).toHaveBeenCalled()
+    expect(props.handleCleanUpAndClose).toHaveBeenCalled()
   })
 })
