@@ -1,32 +1,29 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { IconProps } from '@opentrons/components'
 import { useAllCommandsQuery, useRunQuery } from '@opentrons/react-api-client'
 
-import { Toast } from '../../atoms/Toast'
-import { useProtocolDetailsForRun } from './hooks'
-import { downloadFile } from './utils'
+import { ERROR_TOAST, INFO_TOAST, useToast } from '../../../atoms/Toast'
+import { useProtocolDetailsForRun } from './useProtocolDetailsForRun'
+import { downloadFile } from '../utils'
 
-interface DownloadRunLogToastProps {
-  robotName: string
-  runId: string
-  onClose: () => void
+// TODO(bh, 2022-12-5): consider refactoring -
+// currently, this hook makes run and commands queries for each historical run on device details page load
+// this is not ideal for performance, and doesn't allow for a toast that responds to "download" status
+export function useDownloadRunLog(
+  robotName: string,
+  runId: string,
   pageLength: number
-}
-
-export function DownloadRunLogToast({
-  robotName,
-  runId,
-  pageLength,
-  onClose,
-}: DownloadRunLogToastProps): JSX.Element {
+): { downloadRunLog: () => void; isRunLogLoading: boolean } {
   const { t } = useTranslation('run_details')
+
+  const { makeToast } = useToast()
 
   const {
     data: allCommandsQueryData,
     error: allCommandsQueryError,
     isError: isAllCommandsQueryError,
+    isLoading: isCommandsQueryLoading,
   } = useAllCommandsQuery(
     runId,
     {
@@ -41,10 +38,15 @@ export function DownloadRunLogToast({
     data: runQueryData,
     error: runQueryError,
     isError: isRunQueryError,
+    isLoading: isRunQueryLoading,
   } = useRunQuery(runId, { staleTime: Infinity })
   const run = runQueryData?.data
 
   const isError = isAllCommandsQueryError || isRunQueryError
+
+  // a loading boolean to indicate when downloadRunLog is available
+  const isRunLogLoading = isCommandsQueryLoading || isRunQueryLoading
+
   // prioritize display of commands error
   const errorMessage =
     allCommandsQueryError?.message ?? runQueryError?.message ?? ''
@@ -54,8 +56,13 @@ export function DownloadRunLogToast({
 
   const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
 
-  React.useEffect(() => {
-    if (commands != null && run != null) {
+  const downloadRunLog = (): void => {
+    if (isError) {
+      makeToast(errorMessage, ERROR_TOAST)
+    } else if (commands != null && run != null) {
+      makeToast(t('downloading_run_log'), INFO_TOAST, {
+        icon: toastIcon,
+      })
       const runDetails = {
         ...run,
         commands,
@@ -63,18 +70,8 @@ export function DownloadRunLogToast({
       const createdAt = new Date(run.createdAt).toISOString()
       const fileName = `${robotName}_${protocolName}_${createdAt}.json`
       downloadFile(runDetails, fileName)
-      onClose()
     }
-  }, [commands, protocolName, robotName, run, onClose])
+  }
 
-  return (
-    <Toast
-      message={isError ? errorMessage : t('downloading_run_log')}
-      type={isError ? 'error' : 'info'}
-      icon={isError ? undefined : toastIcon}
-      closeButton={isError}
-      onClose={onClose}
-      disableTimeout={true}
-    />
-  )
+  return { downloadRunLog, isRunLogLoading }
 }

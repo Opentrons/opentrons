@@ -22,8 +22,6 @@ import type { Dispatch } from '../../redux/types'
 export interface AddCustomLabwareSlideoutProps {
   isExpanded: boolean
   onCloseClick: () => void
-  onSuccess: () => void
-  onFailure: () => void
 }
 
 export function AddCustomLabwareSlideout(

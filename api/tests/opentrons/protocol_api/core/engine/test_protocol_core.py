@@ -485,6 +485,16 @@ def test_comment(
     decoy.verify(mock_engine_client.comment("Hello, world!"))
 
 
+def test_home(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: ProtocolCore,
+) -> None:
+    """It should home all axes."""
+    subject.home()
+    decoy.verify(mock_engine_client.home(axes=None), times=1)
+
+
 def test_set_rail_lights(
     decoy: Decoy, mock_engine_client: EngineClient, subject: ProtocolCore
 ) -> None:
@@ -504,3 +514,4 @@ def test_get_rail_lights(
 
     result = subject.get_rail_lights_on()
     assert result is True
+
