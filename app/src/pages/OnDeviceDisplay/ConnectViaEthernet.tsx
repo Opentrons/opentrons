@@ -112,7 +112,7 @@ const TitleHeader = ({ title }: TitleHeaderProps): JSX.Element => {
       marginBottom="1.5625rem"
       position={POSITION_RELATIVE}
     >
-      // ToDo kj 12/05/2022 update path
+      {/* ToDo kj 12/05/2022 update path */}
       <Btn onClick={() => history.push('/network-setup-menu')}>
         <Flex
           alignItems={ALIGN_CENTER}
