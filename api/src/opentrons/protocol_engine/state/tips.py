@@ -33,7 +33,7 @@ class TipState:
     tips_by_labware_id: Dict[str, TipRackStateByWellName]
     # TODO (tz, 12-6-22): should this be a set?
     column_by_labware_id: Dict[str, List[List[str]]]
-    pipette_channels_by_pipette_id: Dict[str, int]
+    channels_by_pipette_id: Dict[str, int]
 
 
 class TipStore(HasState[TipState], HandlesActions):
@@ -46,7 +46,7 @@ class TipStore(HasState[TipState], HandlesActions):
         self._state = TipState(
             tips_by_labware_id={},
             column_by_labware_id={},
-            pipette_channels_by_pipette_id={},
+            channels_by_pipette_id={},
         )
 
     def handle_action(self, action: Action) -> None:
@@ -85,19 +85,20 @@ class TipStore(HasState[TipState], HandlesActions):
                 ] = TipRackWellState.CLEAN
 
         elif isinstance(action, AddPipetteConfigAction):
-            self._state.pipette_channels_by_pipette_id[
+            self._state.channels_by_pipette_id[
                 action.pipette_id
             ] = action.static_config.channels
 
     def _update_used_tips(
         self, pipette_id: str, well_name: str, labware_id: str
     ) -> None:
-        pipette_channels = self._state.pipette_channels_by_pipette_id.get(pipette_id)
+        pipette_channels = self._state.channels_by_pipette_id.get(pipette_id)
         if pipette_channels == _96_CHANNEL_PIPETTE:
             for well_name in self._state.tips_by_labware_id[labware_id].keys():
                 self._state.tips_by_labware_id[labware_id][
                     well_name
                 ] = TipRackWellState.USED
+
         elif pipette_channels == _8_CHANNEL_PIPETTE:
             columns = self._state.column_by_labware_id[labware_id]
             for column in columns:
@@ -107,6 +108,7 @@ class TipStore(HasState[TipState], HandlesActions):
                             well
                         ] = TipRackWellState.USED
                     break
+
         else:
             self._state.tips_by_labware_id[labware_id][
                 well_name
@@ -133,7 +135,7 @@ class TipView(HasState[TipState]):
         seen_start = starting_tip_name is None
         wells = self._state.tips_by_labware_id[labware_id]
         columns = self._state.column_by_labware_id[labware_id]
-        column_heads = [x[0] for x in columns]
+        column_heads = [column[0] for column in columns]
 
         for well_name, tip_state in wells.items():
             seen_start = seen_start or well_name == starting_tip_name
@@ -149,4 +151,4 @@ class TipView(HasState[TipState]):
 
     def get_channels(self, pipette_id: str) -> int:
         """Return the given pipette's number of channels."""
-        return self._state.pipette_channels_by_pipette_id[pipette_id]
+        return self._state.channels_by_pipette_id[pipette_id]
