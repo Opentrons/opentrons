@@ -1,7 +1,7 @@
 """Tip state tracking."""
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, Set, Optional
+from typing import Dict, Set, Optional, List
 
 from .abstract_store import HasState, HandlesActions
 from ..actions import (
@@ -22,13 +22,17 @@ class TipRackWellState(Enum):
 
 TipRackStateByWellName = Dict[str, TipRackWellState]
 
+_96_CHANNEL_PIPETTE = 96
+_8_CHANNEL_PIPETTE = 8
+
 
 @dataclass
 class TipState:
     """State of all tips."""
 
     tips_by_labware_id: Dict[str, TipRackStateByWellName]
-    column_heads_by_labware_id: Dict[str, Set[str]]
+    # TODO (tz, 12-6-22): should this be a set?
+    column_by_labware_id: Dict[str, List[List[str]]]
     pipette_channels_by_id: Dict[str, int]
 
 
@@ -41,7 +45,7 @@ class TipStore(HasState[TipState], HandlesActions):
         """Initialize a liquid store and its state."""
         self._state = TipState(
             tips_by_labware_id={},
-            column_heads_by_labware_id={},
+            column_by_labware_id={},
             pipette_channels_by_id={},
         )
 
@@ -58,8 +62,8 @@ class TipStore(HasState[TipState], HandlesActions):
                 for column in definition.ordering
                 for well_name in column
             }
-            self._state.column_heads_by_labware_id[labware_id] = set(
-                column[0] for column in definition.ordering
+            self._state.column_by_labware_id[labware_id] = list(
+                column for column in definition.ordering
             )
 
         elif isinstance(action, UpdateCommandAction) and isinstance(
@@ -68,20 +72,9 @@ class TipStore(HasState[TipState], HandlesActions):
             labware_id = action.command.params.labwareId
             well_name = action.command.params.wellName
             pipette_id = action.command.params.pipetteId
-
-            pipette_channels = self._state.pipette_channels_by_id[pipette_id]
-            if pipette_channels == 96:
-                for well_name in self._state.tips_by_labware_id[labware_id].keys():
-                    self._state.tips_by_labware_id[labware_id][
-                        well_name
-                    ] = TipRackWellState.USED
-            else:
-                # TODO(mc, 2022-11-09): take channels into account
-                # for 96 channel pipette support and
-                # non-96 well tip racks (if that's even a thing)
-                self._state.tips_by_labware_id[labware_id][
-                    well_name
-                ] = TipRackWellState.USED
+            self._update_used_tips(
+                pipette_id=pipette_id, well_name=well_name, labware_id=labware_id
+            )
 
         elif isinstance(action, ResetTipsAction):
             labware_id = action.labware_id
@@ -95,6 +88,29 @@ class TipStore(HasState[TipState], HandlesActions):
             self._state.pipette_channels_by_id[
                 action.pipette_id
             ] = action.static_config.channels
+
+    def _update_used_tips(
+        self, pipette_id: str, well_name: str, labware_id: str
+    ) -> None:
+        pipette_channels = self._state.pipette_channels_by_id[pipette_id]
+        if pipette_channels == _96_CHANNEL_PIPETTE:
+            for well_name in self._state.tips_by_labware_id[labware_id].keys():
+                self._state.tips_by_labware_id[labware_id][
+                    well_name
+                ] = TipRackWellState.USED
+        elif pipette_channels == _8_CHANNEL_PIPETTE:
+            columns = self._state.column_by_labware_id[labware_id]
+            for column in columns:
+                if well_name in column:
+                    for well in column:
+                        self._state.tips_by_labware_id[labware_id][
+                            well
+                        ] = TipRackWellState.USED
+                    break
+        else:
+            self._state.tips_by_labware_id[labware_id][
+                well_name
+            ] = TipRackWellState.USED
 
 
 class TipView(HasState[TipState]):
@@ -116,7 +132,8 @@ class TipView(HasState[TipState]):
         """Get the next available clean tip."""
         seen_start = starting_tip_name is None
         wells = self._state.tips_by_labware_id[labware_id]
-        column_heads = self._state.column_heads_by_labware_id[labware_id]
+        columns = self._state.column_by_labware_id[labware_id]
+        column_heads = [[column[0] for column in x] for x in columns]
 
         for well_name, tip_state in wells.items():
             seen_start = seen_start or well_name == starting_tip_name

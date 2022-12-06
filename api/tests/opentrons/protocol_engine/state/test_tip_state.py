@@ -2,6 +2,8 @@
 import pytest
 from decoy import Decoy
 
+from typing import Optional
+
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from opentrons.protocol_engine import actions, commands
@@ -122,7 +124,7 @@ def test_get_next_tip_skips_picked_up_tip(
         actions.AddPipetteConfigAction(
             pipette_id="pipette-id",
             static_config=StaticPipetteConfig.construct(  # type: ignore[call-arg]
-                channels=8
+                channels=1
             ),
         )
     )
@@ -148,7 +150,7 @@ def test_get_next_tip_with_column(
         actions.AddPipetteConfigAction(
             pipette_id="pipette-id",
             static_config=StaticPipetteConfig.construct(  # type: ignore[call-arg]
-                channels=8
+                channels=1
             ),
         )
     )
@@ -206,10 +208,13 @@ def test_reset_tips(
     assert result == "A1"
 
 
+@pytest.mark.parametrize("input_channels, next_tip_result", [(96, None), (8, "A2")])
 def test_tip_tracking_for_96_channels(
     subject: TipStore,
     load_labware_command: commands.LoadLabware,
     pick_up_tip_command: commands.PickUpTip,
+    input_channels: str,
+    next_tip_result: Optional[str],
 ) -> None:
     """Should set tiprack as used."""
     subject.handle_action(actions.UpdateCommandAction(command=load_labware_command))
@@ -217,8 +222,19 @@ def test_tip_tracking_for_96_channels(
         actions.AddPipetteConfigAction(
             pipette_id="pipette-id",
             static_config=StaticPipetteConfig.construct(  # type: ignore[call-arg]
-                channels=96
+                channels=input_channels
             ),
         )
     )
     subject.handle_action(actions.UpdateCommandAction(command=pick_up_tip_command))
+
+    result = TipView(subject.state).get_next_tip(
+        labware_id="cool-labware",
+        use_column=False,
+        starting_tip_name=None,
+    )
+
+    assert result == next_tip_result
+
+    print(subject.state.column_by_labware_id["cool-labware"])
+    print(subject.state.tips_by_labware_id["cool-labware"])
