@@ -183,6 +183,7 @@ async def test_hardware_stopping_sequence_with_gripper(
     decoy.when(state_store.pipettes.get_attached_tip_labware_by_id()).then_return(
         {"pipette-id": "tiprack-id"}
     )
+    decoy.when(state_store.config.use_virtual_gripper).then_return(False)
     decoy.when(ot3_hardware_api.has_gripper()).then_return(True)
     await subject.do_stop_and_recover(drop_tips_and_home=True)
 
