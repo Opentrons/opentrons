@@ -1,5 +1,4 @@
 """Deck state accessors for the Protocol API."""
-from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Iterator, List, Mapping, Optional, Tuple, Union
 
@@ -28,54 +27,7 @@ class CalibrationPosition:
     displayName: str
 
 
-class AbstractDeck(ABC, Mapping[DeckLocation, Optional[DeckItem]]):
-    """Abstract interface for :py:class:`Deck`."""
-
-    @abstractmethod
-    def __getitem__(self, key: DeckLocation) -> Optional[DeckItem]:
-        """Get the item, if any, located in a given slot."""
-
-    @abstractmethod
-    def right_of(self, slot: DeckLocation) -> Optional[DeckItem]:
-        """Get the item directly to the right of the given slot, if any."""
-
-    @abstractmethod
-    def left_of(self, slot: DeckLocation) -> Optional[DeckItem]:
-        """Get the item directly to the left of the given slot, if any."""
-
-    @abstractmethod
-    def position_for(self, key: DeckLocation) -> Location:
-        """Get the absolute location of a deck slot's front-left corner."""
-
-    @abstractmethod
-    def get_slot_definition(self, slot_name: DeckLocation) -> SlotDefV3:
-        """Get the geometric definition data of a slot."""
-
-    @abstractmethod
-    def get_slot_center(self, slot_name: DeckLocation) -> Point:
-        """Get the absolute coordinates of a slot's center."""
-
-    @property
-    @abstractmethod
-    def highest_z(self) -> float:
-        """Get the height of the tallest known point on the deck."""
-
-    @property
-    @abstractmethod
-    def slots(self) -> List[SlotDefV3]:
-        """Get a list of all slot definitions."""
-
-    @property
-    @abstractmethod
-    def calibration_positions(self) -> List[CalibrationPosition]:
-        """Get a list of all calibration positions on the deck."""
-
-    @abstractmethod
-    def get_non_fixture_slots(self) -> List[str]:
-        """Get a list of all slot names that are user-accessible."""
-
-
-class Deck(AbstractDeck):
+class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
     """A dictionary-like object to access Protocol API objects loaded on the deck.
 
     Accessible via :py:meth:`ProtocolContext.deck`.

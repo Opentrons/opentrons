@@ -44,7 +44,7 @@ from .core.protocol_api.protocol_context import (
 )
 
 from . import validation
-from .deck import AbstractDeck, Deck
+from .deck import Deck
 from .instrument_context import InstrumentContext
 from .labware import Labware
 from .module_contexts import (
@@ -125,7 +125,9 @@ class ProtocolContext(CommandPublisher):
         }
         self._modules: Dict[DeckSlotName, ModuleTypes] = {}
 
-        self._deck: AbstractDeck = (
+        # TODO(mc, 2022-12-06): replace with API version guard once
+        # new `Deck` is fully implemented
+        self._deck: Deck = (
             Deck(protocol_core=implementation)
             if not isinstance(implementation, LegacyProtocolCore)
             else implementation.get_deck()  # type: ignore[attr-defined]
@@ -686,7 +688,7 @@ class ProtocolContext(CommandPublisher):
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def deck(self) -> AbstractDeck:
+    def deck(self) -> Deck:
         """An interface to provide information about the current deck layout.
 
         This object behaves like a dictionary with keys for both numeric

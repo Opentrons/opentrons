@@ -22,7 +22,7 @@ from opentrons.protocols.geometry.module_geometry import (
     ThermocyclerGeometry,
 )
 
-from ...deck import AbstractDeck, CalibrationPosition
+from ...deck import CalibrationPosition
 from ...labware import load as load_lw, Labware
 from .labware import LabwareImplementation
 from . import deck_conflict
@@ -45,7 +45,7 @@ class DeckItem(Protocol):
         ...
 
 
-class Deck(AbstractDeck, UserDict):  # type: ignore[type-arg]
+class Deck(UserDict):  # type: ignore[type-arg]
     data: Dict[int, Optional[DeckItem]]
 
     def __init__(self) -> None:
@@ -103,7 +103,7 @@ class Deck(AbstractDeck, UserDict):  # type: ignore[type-arg]
         else:
             return key_int
 
-    def __getitem__(self, key: DeckLocation) -> Optional[DeckItem]:  # type: ignore[override]
+    def __getitem__(self, key: DeckLocation) -> Optional[DeckItem]:
         return self.data[self._check_name(key)]
 
     def __delitem__(self, key: DeckLocation) -> None:
@@ -159,7 +159,7 @@ class Deck(AbstractDeck, UserDict):  # type: ignore[type-arg]
 
         return isinstance(other_labware, ModuleGeometry)
 
-    def right_of(self, slot: DeckLocation) -> Optional[DeckItem]:  # type: ignore[override]
+    def right_of(self, slot: DeckLocation) -> Optional[DeckItem]:
         if int(slot) % ROW_LENGTH == 0:
             # We know we're at the right-most edge
             # of the given row
@@ -168,7 +168,7 @@ class Deck(AbstractDeck, UserDict):  # type: ignore[type-arg]
             idx = int(slot) + 1
             return self[str(idx)]
 
-    def left_of(self, slot: DeckLocation) -> Optional[DeckItem]:  # type: ignore[override]
+    def left_of(self, slot: DeckLocation) -> Optional[DeckItem]:
         if int(slot) - 1 % ROW_LENGTH == 0:
             # We know we're at the left-most edge
             # of the given row
@@ -287,7 +287,7 @@ class Deck(AbstractDeck, UserDict):  # type: ignore[type-arg]
         ft = next((f for f in fixtures if f["id"] == FIXED_TRASH_ID), None)
         return self.data[self._check_name(ft.get("slot"))] if ft else None  # type: ignore[return-value]
 
-    def get_non_fixture_slots(self) -> List[int]:  # type: ignore[override]
+    def get_non_fixture_slots(self) -> List[int]:
         fixtures = self._definition["locations"]["fixtures"]
         fixture_slots = {
             self._check_name(f.get("slot")) for f in fixtures if f.get("slot")
