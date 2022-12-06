@@ -1,14 +1,16 @@
 """Tests for tip state store and selectors."""
 import pytest
+from decoy import Decoy
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from opentrons.protocol_engine import actions, commands
+from opentrons.protocol_engine.types import StaticPipetteConfig
 from opentrons.protocol_engine.state.tips import TipStore, TipView
 
 
 @pytest.fixture
-def subject() -> TipStore:
+def subject(decoy: Decoy) -> TipStore:
     """Get a TipStore test subject."""
     return TipStore()
 
@@ -39,7 +41,8 @@ def load_labware_command(labware_definition: LabwareDefinition) -> commands.Load
 def pick_up_tip_command() -> commands.PickUpTip:
     """Get a load labware command value object."""
     return commands.PickUpTip.construct(  # type: ignore[call-arg]
-        params=commands.PickUpTipParams.construct(  # type: ignore[call-arg]
+        params=commands.PickUpTipParams.construct(
+            pipetteId="pipette-id",
             labwareId="cool-labware",
             wellName="A1",
         ),
@@ -115,6 +118,14 @@ def test_get_next_tip_skips_picked_up_tip(
 ) -> None:
     """It should get the next tip in the column if one has been picked up."""
     subject.handle_action(actions.UpdateCommandAction(command=load_labware_command))
+    subject.handle_action(
+        actions.AddPipetteConfigAction(
+            pipette_id="pipette-id",
+            static_config=StaticPipetteConfig.construct(  # type: ignore[call-arg]
+                channels=8
+            ),
+        )
+    )
     subject.handle_action(actions.UpdateCommandAction(command=pick_up_tip_command))
 
     result = TipView(subject.state).get_next_tip(
@@ -133,6 +144,14 @@ def test_get_next_tip_with_column(
 ) -> None:
     """It should return the first tip in a column if column is needed."""
     subject.handle_action(actions.UpdateCommandAction(command=load_labware_command))
+    subject.handle_action(
+        actions.AddPipetteConfigAction(
+            pipette_id="pipette-id",
+            static_config=StaticPipetteConfig.construct(  # type: ignore[call-arg]
+                channels=8
+            ),
+        )
+    )
     subject.handle_action(actions.UpdateCommandAction(command=pick_up_tip_command))
 
     result = TipView(subject.state).get_next_tip(
@@ -167,6 +186,14 @@ def test_reset_tips(
 ) -> None:
     """It should be able to reset tip tracking state."""
     subject.handle_action(actions.UpdateCommandAction(command=load_labware_command))
+    subject.handle_action(
+        actions.AddPipetteConfigAction(
+            pipette_id="pipette-id",
+            static_config=StaticPipetteConfig.construct(  # type: ignore[call-arg]
+                channels=8
+            ),
+        )
+    )
     subject.handle_action(actions.UpdateCommandAction(command=pick_up_tip_command))
     subject.handle_action(actions.ResetTipsAction(labware_id="cool-labware"))
 
@@ -177,3 +204,21 @@ def test_reset_tips(
     )
 
     assert result == "A1"
+
+
+def test_tip_tracking_for_96_channels(
+    subject: TipStore,
+    load_labware_command: commands.LoadLabware,
+    pick_up_tip_command: commands.PickUpTip,
+) -> None:
+    """Should set tiprack as used."""
+    subject.handle_action(actions.UpdateCommandAction(command=load_labware_command))
+    subject.handle_action(
+        actions.AddPipetteConfigAction(
+            pipette_id="pipette-id",
+            static_config=StaticPipetteConfig.construct(  # type: ignore[call-arg]
+                channels=96
+            ),
+        )
+    )
+    subject.handle_action(actions.UpdateCommandAction(command=pick_up_tip_command))

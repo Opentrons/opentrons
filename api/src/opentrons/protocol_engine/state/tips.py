@@ -4,7 +4,12 @@ from enum import Enum
 from typing import Dict, Set, Optional
 
 from .abstract_store import HasState, HandlesActions
-from ..actions import Action, UpdateCommandAction, ResetTipsAction
+from ..actions import (
+    Action,
+    UpdateCommandAction,
+    ResetTipsAction,
+    AddPipetteConfigAction,
+)
 from ..commands import LoadLabwareResult, PickUpTipResult
 
 
@@ -24,6 +29,7 @@ class TipState:
 
     tips_by_labware_id: Dict[str, TipRackStateByWellName]
     column_heads_by_labware_id: Dict[str, Set[str]]
+    pipette_channels_by_id: Dict[str, int]
 
 
 class TipStore(HasState[TipState], HandlesActions):
@@ -33,7 +39,11 @@ class TipStore(HasState[TipState], HandlesActions):
 
     def __init__(self) -> None:
         """Initialize a liquid store and its state."""
-        self._state = TipState(tips_by_labware_id={}, column_heads_by_labware_id={})
+        self._state = TipState(
+            tips_by_labware_id={},
+            column_heads_by_labware_id={},
+            pipette_channels_by_id={},
+        )
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
@@ -57,13 +67,21 @@ class TipStore(HasState[TipState], HandlesActions):
         ):
             labware_id = action.command.params.labwareId
             well_name = action.command.params.wellName
+            pipette_id = action.command.params.pipetteId
 
-            # TODO(mc, 2022-11-09): take channels into account
-            # for 96 channel pipette support and
-            # non-96 well tip racks (if that's even a thing)
-            self._state.tips_by_labware_id[labware_id][
-                well_name
-            ] = TipRackWellState.USED
+            pipette_channels = self._state.pipette_channels_by_id[pipette_id]
+            if pipette_channels == 96:
+                for well_name in self._state.tips_by_labware_id[labware_id].keys():
+                    self._state.tips_by_labware_id[labware_id][
+                        well_name
+                    ] = TipRackWellState.USED
+            else:
+                # TODO(mc, 2022-11-09): take channels into account
+                # for 96 channel pipette support and
+                # non-96 well tip racks (if that's even a thing)
+                self._state.tips_by_labware_id[labware_id][
+                    well_name
+                ] = TipRackWellState.USED
 
         elif isinstance(action, ResetTipsAction):
             labware_id = action.labware_id
@@ -72,6 +90,11 @@ class TipStore(HasState[TipState], HandlesActions):
                 self._state.tips_by_labware_id[labware_id][
                     well_name
                 ] = TipRackWellState.CLEAN
+
+        elif isinstance(action, AddPipetteConfigAction):
+            self._state.pipette_channels_by_id[
+                action.pipette_id
+            ] = action.static_config.channels
 
 
 class TipView(HasState[TipState]):
