@@ -12,7 +12,7 @@ from opentrons.protocol_engine.state.tips import TipStore, TipView
 
 
 @pytest.fixture
-def subject(decoy: Decoy) -> TipStore:
+def subject() -> TipStore:
     """Get a TipStore test subject."""
     return TipStore()
 
