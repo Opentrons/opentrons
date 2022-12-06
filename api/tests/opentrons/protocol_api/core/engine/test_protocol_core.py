@@ -514,4 +514,3 @@ def test_get_rail_lights(
 
     result = subject.get_rail_lights_on()
     assert result is True
-
