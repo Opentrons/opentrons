@@ -401,9 +401,7 @@ class OT3API(
         """Update the firmware on the hardware."""
         await self._backend.update_firmware(firmware_file, target)
 
-    def _gantry_load_from_instruments(
-        self
-    ) -> GantryLoad:
+    def _gantry_load_from_instruments(self) -> GantryLoad:
         """Compute the gantry load based on attached instruments."""
         left = self._pipette_handler.has_pipette(OT3Mount.LEFT)
         right = self._pipette_handler.has_pipette(OT3Mount.RIGHT)
@@ -493,9 +491,7 @@ class OT3API(
                 )
 
         await self._backend.probe_network()
-        await self.set_gantry_load(
-            self._gantry_load_from_instruments()
-        )
+        await self.set_gantry_load(self._gantry_load_from_instruments())
 
     # Global actions API
     def pause(self, pause_type: PauseType) -> None:
@@ -923,6 +919,10 @@ class OT3API(
         self._log.info(f"Homing {axes}")
         async with self._motion_lock:
             try:
+                # with self._backend.save_current():
+                #     self._backend.set_active_current(
+                #         {checked_axis: instr.config.plunger_current}
+                #     )
                 await self._backend.home(checked_axes)
             except MoveConditionNotMet:
                 self._log.exception("Homing failed")
@@ -1390,7 +1390,7 @@ class OT3API(
         }
 
     @property
-    def hardware_instruments(self) -> InstrumentsByMount[top_types.Mount]: # type: ignore
+    def hardware_instruments(self) -> InstrumentsByMount[top_types.Mount]:  # type: ignore
         # see comment in `protocols.instrument_configurer`
         # override required for type matching
         # Warning: don't use this in new code, used `hardware_pipettes` instead

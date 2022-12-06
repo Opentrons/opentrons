@@ -33,6 +33,13 @@ class PipetteSpec(InstrumentSpec):
     model: Union[PipetteModel, None]
 
 
+class OT3PipetteSpec(InstrumentSpec):
+    model: Union[PipetteModel, None]
+    pipette_type: str
+    channels: int
+    version: float
+
+
 class GripperSpec(InstrumentSpec):
     model: Union[GripperModel, None]
 
