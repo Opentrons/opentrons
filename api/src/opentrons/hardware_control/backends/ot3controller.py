@@ -401,9 +401,9 @@ class OT3Controller:
         # actually just split the pipette type and
         # channels when we pull out the pipette serial
         # number.
-        if channels == '96':
+        if channels == "96":
             return 96
-        elif channels == 'multi':
+        elif channels == "multi":
             return 8
         else:
             return 1
@@ -416,12 +416,13 @@ class OT3Controller:
             FirmwarePipetteName.p50_single: "P50S",
             FirmwarePipetteName.p50_multi: "P50M",
             FirmwarePipetteName.p1000_96: "P1KH",
-            FirmwarePipetteName.p50_96: "P50H"}
+            FirmwarePipetteName.p50_96: "P50H",
+        }
         return lookup_name[pipette_name]
-    
+
     @staticmethod
     def _split_pipette_name(name: FirmwarePipetteName) -> Tuple[str, int]:
-        pipette_type, channels = name.name.split('_')
+        pipette_type, channels = name.name.split("_")
         return pipette_type, OT3Controller._convert_channels_to_int(channels)
 
     @staticmethod
@@ -772,9 +773,13 @@ class OT3Controller:
         # when that method actually does canbus stuff
         instrs = await self.get_attached_instruments({})
         expected = {NodeId.gantry_x, NodeId.gantry_y, NodeId.head}
-        if instrs.get(OT3Mount.LEFT, cast("OT3AttachedPipette", {})).get("config", None):
+        if instrs.get(OT3Mount.LEFT, cast("OT3AttachedPipette", {})).get(
+            "config", None
+        ):
             expected.add(NodeId.pipette_left)
-        if instrs.get(OT3Mount.RIGHT, cast("OT3AttachedPipette", {})).get("config", None):
+        if instrs.get(OT3Mount.RIGHT, cast("OT3AttachedPipette", {})).get(
+            "config", None
+        ):
             expected.add(NodeId.pipette_right)
         if instrs.get(OT3Mount.GRIPPER, cast("AttachedGripper", {})).get(
             "config", None
@@ -785,7 +790,6 @@ class OT3Controller:
             self._replace_head_node(present)
         )
         log.info(f"The present nodes are now {self._present_nodes}")
-
 
     def _axis_is_present(self, axis: OT3Axis) -> bool:
         try:

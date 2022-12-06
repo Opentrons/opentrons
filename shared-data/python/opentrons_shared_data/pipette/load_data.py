@@ -68,9 +68,15 @@ def load_definition(
     channels: PipetteChannelType,
     version: PipetteVersionType,
 ) -> PipetteConfigurations:
-    geometry_dict = _geometry(channels, max_volume, version)
-    physical_dict = _physical(channels, max_volume, version)
-    liquid_dict = _liquid(channels, max_volume, version)
+    updated_version = version
+    if updated_version.as_float != 1.0:
+        # TODO (lc 12-5-2022) Temporary measure until we have full version support
+        # in the new configurations. Should be removed ASAP.
+        updated_version = PipetteVersionType.convert_from_float(1.0)
+    geometry_dict = _geometry(channels, max_volume, updated_version)
+    physical_dict = _physical(channels, max_volume, updated_version)
+    liquid_dict = _liquid(channels, max_volume, updated_version)
+
 
     return PipetteConfigurations.parse_obj(
         {**geometry_dict, **physical_dict, **liquid_dict, "version": version}
