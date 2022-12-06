@@ -120,13 +120,13 @@ def create_step(
     Returns:
         A Move
     """
+    ordered_nodes = sorted(present_nodes, key=lambda node: node.value)
     # Gripper G cannont process this type of move and this will
     # result in numerous move set timeouts if the gripper is attached
     # possible TODO if requested is to also add a move group step that
     # adds a MoveGroupeSingleGripperStep
-    present_nodes = iter([n for n in present_nodes if n != NodeId.gripper_g])
+    ordered_nodes = list([n for n in present_nodes if n != NodeId.gripper_g])
 
-    ordered_nodes = sorted(present_nodes, key=lambda node: node.value)
     step: MoveGroupStep = {}
     for axis_node in ordered_nodes:
         step[axis_node] = MoveGroupSingleAxisStep(
