@@ -28,11 +28,11 @@ class CalibrationPosition:
     displayName: str
 
 
-class AbstractDeck(ABC, Mapping[DeckLocation, DeckItem]):
+class AbstractDeck(ABC, Mapping[DeckLocation, Optional[DeckItem]]):
     """Abstract interface for :py:class:`Deck`."""
 
     @abstractmethod
-    def __getitem__(self, key: DeckLocation) -> DeckItem:
+    def __getitem__(self, key: DeckLocation) -> Optional[DeckItem]:
         """Get the item, if any, located in a given slot."""
 
     @abstractmethod
@@ -84,7 +84,7 @@ class Deck(AbstractDeck):
     def __init__(self, protocol_core: ProtocolCore) -> None:
         self._protocol_core = protocol_core
 
-    def __getitem__(self, key: DeckLocation) -> DeckItem:
+    def __getitem__(self, key: DeckLocation) -> Optional[DeckItem]:
         """Get the item, if any, located in a given slot."""
         raise NotImplementedError("Deck.__getitem__ not implemented")
 
