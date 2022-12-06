@@ -11,6 +11,16 @@ from hardware_testing.opentrons_api.helpers_ot3 import (
     build_async_ot3_hardware_api,
 )
 
+from opentrons_hardware.hardware_control.gripper_settings import (
+    set_pwm_param,
+    set_reference_voltage,
+)
+
+from hardware_testing.drivers import (
+    mark10,
+    rohde_schwarz_rtm3004,
+)
+
 def build_arg_parser():
     arg_parser = argparse.ArgumentParser(description='Gripper Force Test')
     arg_parser.add_argument('-c', '--cycles', type=int, required=False, help='Number of testing cycles', default=1)
@@ -41,18 +51,28 @@ class Gripper_Force_Test:
             "Force":"None",
             "Current":"None",
         }
+        self.force_gauge = None
+        self.oscilloscope = None
+        self.force_gauge_port = "/dev/ttyUSB0"
+        self.oscilloscope_port = "/dev/ttyACM0"
 
     async def test_setup(self):
         self.file_setup()
+        self.gauge_setup()
+        self.oscilloscope_setup()
         self.api = await build_async_ot3_hardware_api(is_simulating=self.simulate, use_defaults=True)
         self.mount = OT3Mount.GRIPPER
+        if self.simulate:
+            self.gripper_id = "SIMULATION"
+        else:
+            self.gripper_id = self.api._gripper_handler.get_gripper().gripper_id
+        self.test_data["Gripper"] = str(self.gripper_id)
         self.start_time = time.time()
         print(f"\nStarting Gripper Force Test:\n")
 
     def file_setup(self):
         class_name = self.__class__.__name__
         self.test_name = class_name.lower()
-        # self.test_tag = f"slot{self.slot}"
         self.test_tag = "vref"
         self.test_header = self.dict_keys_to_line(self.test_data)
         self.test_id = data.create_run_id()
@@ -62,17 +82,61 @@ class Gripper_Force_Test:
         print("FILE PATH = ", self.test_path)
         print("FILE NAME = ", self.test_file)
 
+    def gauge_setup(self):
+        self.force_gauge = mark10.Mark10.create(port=self.force_gauge_port)
+        self.force_gauge.connect()
+
+    def oscilloscope_setup(self):
+        self.oscilloscope = rohde_schwarz_rtm3004.Rohde_Schwarz_RTM3004(port=self.oscilloscope_port)
+        self.oscilloscope.connect()
+
     def dict_keys_to_line(self, dict):
         return str.join(",", list(dict.keys()))+"\n"
 
     def dict_values_to_line(self, dict):
         return str.join(",", list(dict.values()))+"\n"
 
+    def _get_stable_force(self) -> float:
+        _reading = True
+        _try = 1
+        while _reading:
+            force = []
+            for i in range(5):
+                if self.simulate:
+                    data = 0.0
+                else:
+                    data = self.force_gauge.read_force()
+                force.append(data)
+            _variance = round(abs(max(force) - min(force)), 5)
+            # print(f"Try #{_try} Variance = {_variance}")
+            _try += 1
+            if _variance < 0.1:
+                _reading = False
+        return sum(force) / len(force)
+        return force
+
+    async def _record_data(self, cycle, trial):
+        elapsed_time = (time.time() - self.start_time)/60
+        self.test_data["Time"] = str(round(elapsed_time, 3))
+        self.test_data["Cycle"] = str(cycle)
+        self.test_data["Trial"] = str(trial)
+        test_data = self.dict_values_to_line(self.test_data)
+        data.append_data_to_file(self.test_name, self.test_file, test_data)
+
     async def _measure_force(
         self, api: OT3API, mount: OT3Mount
     ) -> None:
         await api.grip(self.force)
         time.sleep(self.interval)
+        measurement = []
+        for i in range(4):
+            measurement.append(self.oscilloscope.get_measurement(i+1))
+            print(f"MEAS #{i+1}", measurement[i])
+
+        force = self._get_stable_force()
+        print(f"Grip Force: {force} N")
+        self.test_data["Force"] = str(force)
+
         await api.ungrip()
         time.sleep(self.interval)
 
@@ -105,6 +169,7 @@ class Gripper_Force_Test:
                         trial = j + 1
                         print(f"\n-->> Measuring Trial {trial}/{self.trials}")
                         await self._measure_force(self.api, self.mount)
+                        await self._record_data(cycle, trial)
         except Exception as e:
             await self.exit()
             raise e
