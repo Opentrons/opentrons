@@ -185,7 +185,7 @@ describe('ProtocolDetails', () => {
     fireEvent.click(runProtocolButton)
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: 'proceedToRun',
-      properties: { sourceLocation: 'ProtocolDetail' },
+      properties: { sourceLocation: 'ProtocolsDetail' },
     })
     expect(getByText('mock Choose Robot Slideout')).toBeVisible()
   })

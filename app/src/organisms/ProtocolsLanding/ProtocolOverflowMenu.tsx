@@ -66,7 +66,7 @@ export function ProtocolOverflowMenu(
     e.stopPropagation()
     trackEvent({
       name: 'proceedToRun',
-      properties: { sourceLocation: 'ProtocolLanding' },
+      properties: { sourceLocation: 'ProtocolsLanding' },
     })
     handleRunProtocol()
     setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)

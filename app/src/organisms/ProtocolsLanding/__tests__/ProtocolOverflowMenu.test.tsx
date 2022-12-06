@@ -76,7 +76,7 @@ describe('ProtocolOverflowMenu', () => {
     fireEvent.click(runButton)
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: 'proceedToRun',
-      properties: { sourceLocation: 'ProtocolLanding' },
+      properties: { sourceLocation: 'ProtocolsLanding' },
     })
     expect(mockHandleRunProtocol).toHaveBeenCalled()
   })
