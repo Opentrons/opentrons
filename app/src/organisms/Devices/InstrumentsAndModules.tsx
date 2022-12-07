@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 import { getPipetteModelSpecs, LEFT, RIGHT } from '@opentrons/shared-data'
 import { useModulesQuery, usePipettesQuery } from '@opentrons/react-api-client'
 
@@ -32,7 +33,6 @@ import {
   getOffsetCalibrationForMount,
 } from './utils'
 import { PipetteCard } from './PipetteCard'
-import { useDispatch } from 'react-redux'
 import { fetchPipetteOffsetCalibrations } from '../../redux/calibration'
 
 import type { Dispatch } from '../../redux/types'
