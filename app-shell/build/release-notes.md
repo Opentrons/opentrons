@@ -1,7 +1,7 @@
 For more details about this release, please see the full [technical change
 log][]. For a list of currently known issues, please see the [Opentrons issue tracker][].
 
-[technical change log]: https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md
+[technical change log]: https://github.com/Opentrons/opentrons/releases
 [opentrons issue tracker]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Abug
 
 ---
