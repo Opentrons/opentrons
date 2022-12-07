@@ -83,8 +83,8 @@ async def get_gripper_jaw_motor_param(
         """Listener for receiving messages back."""
         async for response, _ in reader:
             return DriverConfig(
-                reference_voltage=float(response.payload.v_ref / (2**16)),
-                duty_cycle=int(response.payload.duty_cycle / (2**16)),
+                reference_voltage=float(response.payload.v_ref.value / (2**16)),
+                duty_cycle=int(response.payload.duty_cycle.value / (2**16)),
             )
         raise StopAsyncIteration
 
