@@ -917,9 +917,6 @@ def test_pipette_speed(ctx, monkeypatch):
 
 
 def test_loaded_labwares(ctx):
-    print(ctx.loaded_labwares)
-    print(ctx.loaded_labwares[12] is ctx.fixed_trash)
-
     assert ctx.loaded_labwares == {12: ctx.fixed_trash}
     lw1 = ctx.load_labware("opentrons_96_tiprack_300ul", 3)
     lw2 = ctx.load_labware("opentrons_96_tiprack_300ul", 8)
