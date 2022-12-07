@@ -1,4 +1,4 @@
-import type { PipetteModel, PipetteModelSpecs } from '@opentrons/shared-data'
+import type { PipetteModel, PipetteModelSpecs, PipetteName } from '@opentrons/shared-data'
 
 // common types
 
@@ -6,7 +6,7 @@ export type Mount = 'left' | 'right'
 
 export interface AttachedPipette {
   id: string
-  name: string
+  name: PipetteName
   model: string
   tip_length: number
   mount_axis: string
@@ -25,7 +25,7 @@ export type Pipettes = FetchPipettesResponseBody
 export type FetchPipettesResponsePipette =
   | {
       id: string
-      name: string
+      name: PipetteName
       model: PipetteModel
       tip_length: number
       mount_axis: string

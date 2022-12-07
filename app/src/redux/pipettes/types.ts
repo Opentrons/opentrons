@@ -118,7 +118,7 @@ export interface ProtocolPipetteInfoByMount {
 export type FetchPipettesResponsePipette =
   | {
       id: string
-      name: string
+      name: PipetteName
       model: string
       tip_length: number
       mount_axis: string
