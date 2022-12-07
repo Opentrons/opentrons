@@ -107,9 +107,15 @@ def do_interact(api: ThreadManager[HardwareControlAPI]) -> None:
             "CalibrationMethod": CalibrationMethod,
             "find_axis_center": wrap_async_util_fn(find_axis_center, api),
             "CriticalPoint": CriticalPoint,
-            "set_gripper_reference_voltage": set_reference_voltage,
-            "set_gripper_pwm_param": set_pwm_param,
-            "get_gripper_jaw_motor_param": get_gripper_jaw_motor_param,
+            "set_gripper_reference_voltage": wrap_async_util_fn(
+                set_reference_voltage, api._backend._messenger
+            ),
+            "set_gripper_pwm_param": wrap_async_util_fn(
+                set_pwm_param, api._backend._messenger
+            ),
+            "get_gripper_jaw_motor_param": wrap_async_util_fn(
+                get_gripper_jaw_motor_param, api._backend._messenger
+            ),
         },
     )
 
