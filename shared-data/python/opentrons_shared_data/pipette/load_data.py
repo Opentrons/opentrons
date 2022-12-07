@@ -11,6 +11,8 @@ from .pipette_definition import (
     PipetteChannelType,
     PipetteVersionType,
     PipetteModelType,
+    PipetteModelMajorVersion,
+    PipetteModelMinorVersion
 )
 
 
@@ -68,6 +70,9 @@ def load_definition(
     channels: PipetteChannelType,
     version: PipetteVersionType,
 ) -> PipetteConfigurations:
+    if version.major not in PipetteModelMajorVersion or version.minor not in PipetteModelMinorVersion:
+        raise KeyError("Pipette version not found.")
+
     updated_version = version
     if updated_version.as_float != 1.0:
         # TODO (lc 12-5-2022) Temporary measure until we have full version support

@@ -8,8 +8,15 @@ PLUNGER_CURRENT_MINIMUM = 0.1
 PLUNGER_CURRENT_MAXIMUM = 1.5
 
 
-PipetteModelMajorVersion = Literal[1, 2, 3]
-PipetteModelMinorVersion = Literal[0, 1, 2, 3]
+PipetteModelMajorVersion = [1, 2, 3]
+PipetteModelMinorVersion = [0, 1, 2, 3]
+
+# TODO Literals are only good for writing down
+# exact values. Is there a better typing mechanism
+# so we don't need to keep track of versions in two
+# different places?
+PipetteModelMajorVersionType = Literal[1, 2, 3]
+PipetteModelMinorVersionType = Literal[0, 1, 2, 3]
 
 
 class PipetteTipType(Enum):
@@ -47,15 +54,19 @@ class PipetteGenerationType(Enum):
     GEN3 = "GEN3"
 
 
+PIPETTE_AVAILABLE_TYPES = [m.name for m in PipetteModelType]
+PIPETTE_CHANNELS_INTS = [c.as_int for c in PipetteChannelType]
+PIPETTE_GENERATIONS = [g.name.lower() for g in PipetteGenerationType]
+
 @dataclass(frozen=True)
 class PipetteVersionType:
-    major: PipetteModelMajorVersion
-    minor: PipetteModelMinorVersion
+    major: PipetteModelMajorVersionType
+    minor: PipetteModelMinorVersionType
 
     @classmethod
     def convert_from_float(cls, version: float) -> "PipetteVersionType":
-        major = cast(PipetteModelMajorVersion, int(version // 1))
-        minor = cast(PipetteModelMinorVersion, int(round((version % 1), 2) * 10))
+        major = cast(PipetteModelMajorVersionType, int(version // 1))
+        minor = cast(PipetteModelMinorVersionType, int(round((version % 1), 2) * 10))
         return cls(major=major, minor=minor)
 
     def __str__(self) -> str:
