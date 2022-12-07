@@ -323,6 +323,7 @@ class Labware:
         load it, or the label of the labware specified by a user."""
         return self._implementation.get_name()
 
+    # TODO(jbl, 2022-12-06): deprecate officially when there is a PAPI version for the engine core
     @name.setter
     def name(self, new_name: str) -> None:
         """Set the labware name"""
@@ -612,6 +613,7 @@ class Labware:
     def tip_length(self) -> float:
         return self._implementation.get_tip_length()
 
+    # TODO(jbl, 2022-12-06): deprecate officially when there is a PAPI version for the engine core
     @tip_length.setter
     def tip_length(self, length: float) -> None:
         self._implementation.set_tip_length(length)
