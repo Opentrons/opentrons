@@ -79,6 +79,8 @@ MessageDefinition = Union[
     defs.PeripheralStatusResponse,
     defs.SetSerialNumber,
     defs.InstrumentInfoRequest,
+    defs.BrushedMotorConfRequest,
+    defs.BrushedMotorConfResponse,
 ]
 
 

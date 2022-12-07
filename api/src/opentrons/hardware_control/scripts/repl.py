@@ -44,6 +44,11 @@ from opentrons.hardware_control.ot3_calibration import (  # noqa: E402
     find_axis_center,
     gripper_pin_offsets_mean,
 )
+from opentrons_hardware.hardware_control.gripper_settings import (
+    set_reference_voltage,
+    set_pwm_param,
+    get_gripper_jaw_motor_param,
+)
 from opentrons.hardware_control.protocols import HardwareControlAPI  # noqa: E402
 from opentrons.hardware_control.thread_manager import ThreadManager  # noqa: E402
 
@@ -102,6 +107,15 @@ def do_interact(api: ThreadManager[HardwareControlAPI]) -> None:
             "CalibrationMethod": CalibrationMethod,
             "find_axis_center": wrap_async_util_fn(find_axis_center, api),
             "CriticalPoint": CriticalPoint,
+            "set_gripper_reference_voltage": wrap_async_util_fn(
+                set_reference_voltage, api._backend._messenger
+            ),
+            "set_gripper_pwm_param": wrap_async_util_fn(
+                set_pwm_param, api._backend._messenger
+            ),
+            "get_gripper_jaw_motor_param": wrap_async_util_fn(
+                get_gripper_jaw_motor_param, api._backend._messenger
+            ),
         },
     )
 
