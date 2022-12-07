@@ -2,17 +2,19 @@
 import argparse
 import asyncio
 from dataclasses import dataclass
-from typing import Optional, List, Tuple, Dict, Any
+from typing import Optional, List, Tuple, Any
 
 from opentrons.hardware_control.ot3api import OT3API
 
 from hardware_testing.opentrons_api import types
+from hardware_testing.opentrons_api.types import Point
 from hardware_testing.opentrons_api import helpers_ot3
 
 # size of things we are using (NOTE: keep Y-Axis as negative)
 SLOT_SIZE = types.Point(x=128, y=-86, z=0)
 LABWARE_SIZE_ARMADILLO = types.Point(x=127.8, y=-85.55, z=16)
 LABWARE_SIZE_EVT_TIPRACK = types.Point(x=127.6, y=-85.8, z=93)
+LABWARE_SIZE_RESERVOIR = types.Point(x=127.8, y=-85.55, z=30)  # FIXME: get real values
 MAG_PLATE_SIZE = types.Point(x=128, y=-86.0, z=39.5)
 
 # offset created by placing labware on the magnetic plate
@@ -29,12 +31,14 @@ ForcedOffsets = List[Tuple[types.Point, types.Point]]
 TEST_OFFSETS: ForcedOffsets = [
     (types.Point(x=0, y=0, z=0), types.Point(x=0, y=0, z=0)),
 ]
-LABWARE_SIZE = {"plate": LABWARE_SIZE_ARMADILLO, "tiprack": LABWARE_SIZE_EVT_TIPRACK}
-LABWARE_GRIP_HEIGHT = {
-    "plate": LABWARE_SIZE_ARMADILLO.z * 0.5,
-    "tiprack": LABWARE_SIZE_EVT_TIPRACK.z * 0.5,
+LABWARE_SIZE = {
+    "plate": LABWARE_SIZE_ARMADILLO,
+    "tiprack": LABWARE_SIZE_EVT_TIPRACK,
+    "reservoir": LABWARE_SIZE_RESERVOIR,
 }
-LABWARE_GRIP_FORCE = {"plate": 5, "tiprack": 10}
+LABWARE_KEYS = list(LABWARE_SIZE.keys())
+LABWARE_GRIP_HEIGHT = {k: LABWARE_SIZE[k].z * 0.5 for k in LABWARE_KEYS}
+LABWARE_GRIP_FORCE = {k: 15 for k in LABWARE_KEYS}
 LABWARE_WARP = types.Point()
 
 
@@ -54,22 +58,31 @@ class GripperSlotStates:
 #       - tall-pegs on only top+left sides
 #       - tall-pegs ~5mm from slot-edge
 
+SW_OFFSETS_OT2 = {
+    "deck": Point(),
+    "mag-plate": Point(),
+    "heater-shaker-right": Point(x=0.125, y=-1.125, z=68.275),
+    "heater-shaker-left": Point(x=-0.125, y=1.125, z=68.275),
+    "temp-module": Point(x=-1.45, y=-0.15, z=80.09),
+    "thermo-cycler": Point(y=68.06, z=98.26),
+}
 
-def grip_offset(action: str, item: str, slot: Optional[int] = None) -> Dict[str, float]:
+
+def _remove_ot2_sw_offset(o: Point, d_item: str, s: int) -> Point:
+    if d_item == "heater-shaker":
+        if s in [1, 4, 7, 10]:
+            o += SW_OFFSETS_OT2[f"{d_item}-left"]
+        else:
+            o += SW_OFFSETS_OT2[f"{d_item}-right"]
+    else:
+        o += SW_OFFSETS_OT2[d_item]
+    return o
+
+
+def grip_offset(action, item, slot = None):
     """Grip offset."""
     from opentrons.types import Point
 
-    # do NOT edit these values
-    # NOTE: these values will eventually be in our software
-    #       and will not need to be inside a protocol
-    _hw_offsets = {
-        "deck": Point(),
-        "mag-plate": Point(z=29.5),
-        "heater-shaker-right": Point(x=(-3 - -0.125), y=(-1 - 1.125), z=(24 - 68.275)),
-        "heater-shaker-left": Point(x=(3 - -0.125), y=(1 - 1.125), z=(24 - 68.275)),
-        "temp-module": Point(x=(0 - -1.45), y=(0 - -0.15), z=(9 - 80.09)),
-        "thermo-cycler": Point(x=(-20 - 0), y=(67.5 - 68.06), z=(-0.04 - 98.26)),
-    }
     # EDIT these values
     # NOTE: we are still testing to determine our software's defaults
     #       but we also expect users will want to edit these
@@ -90,9 +103,31 @@ def grip_offset(action: str, item: str, slot: Optional[int] = None) -> Dict[str,
         "temp-module": Point(z=-2),
         "thermo-cycler": Point(),
     }
+    # do NOT edit these values
+    # NOTE: these values will eventually be in our software
+    #       and will not need to be inside a protocol
+    _sw_offsets_ot2 = {
+        "deck": Point(),
+        "mag-plate": Point(),
+        "heater-shaker-right": Point(x=0.125, y=-1.125, z=68.275),
+        "heater-shaker-left": Point(x=-0.125, y=1.125, z=68.275),
+        "temp-module": Point(x=-1.45, y=-0.15, z=80.09),
+        "thermo-cycler": Point(y=68.06, z=98.26),
+    }
+    _hw_offsets_ot3 = {
+        "deck": Point(),
+        "mag-plate": Point(z=29.5),
+        "heater-shaker-right": Point(x=-3, y=-1, z=24),
+        "heater-shaker-left": Point(x=3, y=1, z=24),
+        "temp-module": Point(z=9),
+        "thermo-cycler": Point(x=-20, y=67.5, z=-0.04),
+    }
     # make sure arguments are correct
     action_options = ["pick-up", "drop"]
-    item_options = list(_hw_offsets.keys())
+    item_options = list(_hw_offsets_ot3.keys())
+    item_options.remove("heater-shaker-left")
+    item_options.remove("heater-shaker-right")
+    item_options.append("heater-shaker")
     if action not in action_options:
         raise ValueError(
             f'"{action}" not recognized, available options: {action_options}'
@@ -107,9 +142,10 @@ def grip_offset(action: str, item: str, slot: Optional[int] = None) -> Dict[str,
             side = "right"
         else:
             raise ValueError("heater shaker must be on either left or right side")
-        hw_offset = _hw_offsets[f"{item}-{side}"]
+        k = f"{item}-{side}"
+        hw_offset = _hw_offsets_ot3[k] - _sw_offsets_ot2[k]
     else:
-        hw_offset = _hw_offsets[item]
+        hw_offset = _hw_offsets_ot3[item] - _sw_offsets_ot2[item]
     if action == "pick-up":
         offset = hw_offset + _pick_up_offsets[item]
     else:
@@ -197,22 +233,16 @@ def _calculate_src_and_dst_points(
     dst_labware_offset = _get_labware_grip_offset(
         labware_key, is_grip=False, has_clips=True, warp=warp
     )
-    # apply module-specific offset (include module geometry + action-offset)
-    def _get_deck_item_side(_slot: int) -> Optional[str]:
-        if _slot in [1, 4, 7, 10]:
-            return "left"
-        elif _slot in [3, 6, 9, 12]:
-            return "right"
-        else:
-            raise ValueError(f"slot {_slot} is not on a side")
-
-    src_side = _get_deck_item_side(src_slot) if src_deck_item == "heater-shaker" else None
-    dst_side = _get_deck_item_side(dst_slot) if dst_deck_item == "heater-shaker" else None
-    src_item_offset = types.Point(**grip_offset("pick-up", src_deck_item, side=src_side))
-    dst_item_offset = types.Point(**grip_offset("drop", dst_deck_item, side=dst_side))
+    # offset the module applies to an inserted labware
+    src_module_offset = types.Point(
+        **grip_offset("pick-up", src_deck_item, slot=src_slot)
+    )
+    src_module_offset = _remove_ot2_sw_offset(src_module_offset, src_deck_item, src_slot)
+    dst_module_offset = types.Point(**grip_offset("drop", dst_deck_item, slot=dst_slot))
+    dst_module_offset = _remove_ot2_sw_offset(dst_module_offset, dst_deck_item, dst_slot)
     # absolute position, on the deck
-    src_loc = src_slot_loc + src_item_offset + src_labware_offset
-    dst_loc = dst_slot_loc + dst_item_offset + dst_labware_offset
+    src_loc = src_slot_loc + src_module_offset + src_labware_offset
+    dst_loc = dst_slot_loc + dst_module_offset + dst_labware_offset
     # add additional offsets, for testing purposes
     if src_offset:
         src_loc += src_offset
@@ -388,7 +418,7 @@ if __name__ == "__main__":
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--inspect", action="store_true")
     parser.add_argument("--slots", nargs="+", required=True)
-    parser.add_argument("--labware", choices=["plate", "tiprack"], required=True)
+    parser.add_argument("--labware", choices=LABWARE_KEYS, required=True)
     parser.add_argument("--force", type=int, default=5.0)
     parser.add_argument("--warp", type=float)
     parser.add_argument("--temp-module-slots", nargs="+")
