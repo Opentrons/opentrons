@@ -174,6 +174,7 @@ export const AppComponent = (): JSX.Element => {
                         position={POSITION_RELATIVE}
                         width="100%"
                         height="100%"
+                        // backgroundColor might be updated in hi-fi design
                         backgroundColor={COLORS.white}
                         overflow={OVERFLOW_SCROLL}
                       >
@@ -183,7 +184,7 @@ export const AppComponent = (): JSX.Element => {
                     </Route>
                   )
                 })}
-                <Redirect to="/robot-dashboard" />
+                <Redirect to="/device-setup" />
               </Switch>
               <Alerts />
             </Box>
