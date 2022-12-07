@@ -35,9 +35,9 @@ class PipetteChannelType(Enum):
         return self.value
 
     def __str__(self) -> str:
-        if self == self.NINETY_SIX_CHANNEL:
+        if self.value == 96:
             return "96"
-        elif self == self.EIGHT_CHANNEL:
+        elif self.value == 8:
             return "multi"
         else:
             return "single"
@@ -57,6 +57,7 @@ class PipetteGenerationType(Enum):
 PIPETTE_AVAILABLE_TYPES = [m.name for m in PipetteModelType]
 PIPETTE_CHANNELS_INTS = [c.as_int for c in PipetteChannelType]
 PIPETTE_GENERATIONS = [g.name.lower() for g in PipetteGenerationType]
+
 
 @dataclass(frozen=True)
 class PipetteVersionType:
@@ -100,17 +101,17 @@ class SupportedTipsDefinition(BaseModel):
     default_tip_length: float = Field(
         ...,
         description="The default tip length associated with this tip type.",
-        alias="defaultTipLength"
+        alias="defaultTipLength",
     )
     default_tip_overlap: float = Field(
         ...,
         description="The default tip overlap associated with this tip type.",
-        alias="defaultTipOverlap"
+        alias="defaultTipOverlap",
     )
     default_return_tip_height: float = Field(
         ...,
         description="The height to return a tip to its tiprack.",
-        alias="defaultReturnTipHeight"
+        alias="defaultReturnTipHeight",
     )
     aspirate: Dict[str, List[Tuple[float, float, float]]] = Field(
         ..., description="The default pipetting functions list for aspirate."
@@ -139,9 +140,13 @@ class PlungerPositions(BaseModel):
         description="The plunger position that describes min available volume of a pipette in mm.",
     )
     blow_out: float = Field(
-        ..., description="The plunger position past 0 volume to blow out liquid.", alias="blowout"
+        ...,
+        description="The plunger position past 0 volume to blow out liquid.",
+        alias="blowout",
     )
-    drop_tip: float = Field(..., description="The plunger position used to drop tips.", alias="drop")
+    drop_tip: float = Field(
+        ..., description="The plunger position used to drop tips.", alias="drop"
+    )
 
 
 class TipHandlingConfigurations(BaseModel):

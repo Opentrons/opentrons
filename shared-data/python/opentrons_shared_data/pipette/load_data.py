@@ -12,7 +12,7 @@ from .pipette_definition import (
     PipetteVersionType,
     PipetteModelType,
     PipetteModelMajorVersion,
-    PipetteModelMinorVersion
+    PipetteModelMinorVersion,
 )
 
 
@@ -70,7 +70,10 @@ def load_definition(
     channels: PipetteChannelType,
     version: PipetteVersionType,
 ) -> PipetteConfigurations:
-    if version.major not in PipetteModelMajorVersion or version.minor not in PipetteModelMinorVersion:
+    if (
+        version.major not in PipetteModelMajorVersion
+        or version.minor not in PipetteModelMinorVersion
+    ):
         raise KeyError("Pipette version not found.")
 
     updated_version = version
@@ -81,7 +84,6 @@ def load_definition(
     geometry_dict = _geometry(channels, max_volume, updated_version)
     physical_dict = _physical(channels, max_volume, updated_version)
     liquid_dict = _liquid(channels, max_volume, updated_version)
-
 
     return PipetteConfigurations.parse_obj(
         {**geometry_dict, **physical_dict, **liquid_dict, "version": version}
