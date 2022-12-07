@@ -127,9 +127,20 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._dispense_flow_rate = self._active_tip_settings.default_dispense_flowrate
         self._blow_out_flow_rate = self._active_tip_settings.default_blowout_flowrate
 
+        # TODO (lc 12-6-2022) When we switch over to sending pipette state, we
+        # we should also try to make sure the python api isn't reaching into
+        # Pipette interals. For now, we want to make sure the shape of
+        # tip overlap matches the shape of OT2 pipettes. We'll also need
+        # to revisit some liquid configurations for tiprack types.
+        self._tip_overlap = {"default": self._active_tip_settings.default_tip_overlap}
+
     @property
     def config(self) -> PipetteConfigurations:
         return self._config
+
+    @property
+    def tip_overlap(self) -> Dict[str, float]:
+        return self._tip_overlap
 
     @property
     def nozzle_offset(self) -> List[float]:
@@ -198,6 +209,8 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._aspirate_flow_rate = self._active_tip_settings.default_aspirate_flowrate
         self._dispense_flow_rate = self._active_tip_settings.default_dispense_flowrate
         self._blow_out_flow_rate = self._active_tip_settings.default_blowout_flowrate
+
+        self._tip_overlap = {"default": self._active_tip_settings.default_tip_overlap}
 
     def reset_pipette_offset(self, mount: OT3Mount, to_default: bool) -> None:
         """Reset the pipette offset to system defaults."""
@@ -361,6 +374,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             PipetteTipType(int(self._working_volume))
         ]
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
+        self._tip_overlap = {"default": self._active_tip_settings.default_tip_overlap}
 
     @property
     def available_volume(self) -> float:
@@ -454,7 +468,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
                 "default_dispense_flow_rates": self.active_tip_settings.default_blowout_flowrate,
                 "tip_length": self.current_tip_length,
                 "return_tip_height": self.active_tip_settings.default_return_tip_height,
-                "tip_overlap": self.active_tip_settings.default_tip_overlap,
+                "tip_overlap": self.tip_overlap,
             }
         )
         return self._config_as_dict
