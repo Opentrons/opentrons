@@ -1,5 +1,6 @@
 // mock HTTP responses for pipettes endpoints
 import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
+import type { PipetteName } from '@opentrons/shared-data'
 import type { PipetteSettings, PipetteSettingsFieldsMap } from '../types'
 import type {
   RobotApiResponse,
@@ -14,7 +15,7 @@ export const mockRobot = { name: 'robot', ip: '127.0.0.1', port: 31950 }
 
 export const mockAttachedPipette = {
   id: 'abc',
-  name: 'p300_single_gen2',
+  name: 'p300_single_gen2' as PipetteName,
   model: 'p300_single_v2.0',
   tip_length: 42,
   mount_axis: 'c',
@@ -37,7 +38,7 @@ export const mockUnattachedPipette = {
 
 export const mockAttachedGen3Pipette = {
   id: 'abc',
-  name: 'p1000_single_gen3',
+  name: 'p1000_single_gen3' as PipetteName,
   model: 'p1000_single_v3.0',
   tip_length: 42,
   mount_axis: 'c',
