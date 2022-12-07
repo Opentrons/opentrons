@@ -11,7 +11,6 @@ from typing import (
     Tuple,
     Type,
     Union,
-    cast,
 )
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
@@ -29,7 +28,6 @@ from opentrons.protocols.api_support.util import (
     APIVersionError,
 )
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry
-from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
 from .core.common import ModuleCore, ProtocolCore
@@ -41,8 +39,12 @@ from .core.module import (
     AbstractHeaterShakerCore,
 )
 from .core.engine.protocol import ProtocolCore as ProtocolEngineCore
+from .core.protocol_api.protocol_context import (
+    ProtocolContextImplementation as LegacyProtocolCore,
+)
 
 from . import validation
+from .deck import Deck
 from .instrument_context import InstrumentContext
 from .labware import Labware
 from .module_contexts import (
@@ -122,6 +124,14 @@ class ProtocolContext(CommandPublisher):
             mount: None for mount in Mount
         }
         self._modules: Dict[DeckSlotName, ModuleTypes] = {}
+
+        # TODO(mc, 2022-12-06): replace with API version guard once
+        # new `Deck` is fully implemented
+        self._deck: Deck = (
+            Deck(protocol_core=implementation)
+            if not isinstance(implementation, LegacyProtocolCore)
+            else implementation.get_deck()  # type: ignore[attr-defined]
+        )
 
         self._commands: List[str] = []
         self._unsubscribe_commands: Optional[Callable[[], None]] = None
@@ -349,7 +359,9 @@ class ProtocolContext(CommandPublisher):
         """
 
         def _only_labwares() -> Iterator[Tuple[int, Labware]]:
-            for slotnum, slotitem in self._implementation.get_deck().items():
+            for slotnum, slotitem in self._deck.items():
+                slotnum = int(slotnum)
+
                 if isinstance(slotitem, AbstractLabware):
                     yield slotnum, Labware(
                         implementation=slotitem, api_version=self._api_version
@@ -677,26 +689,22 @@ class ProtocolContext(CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 0)
     def deck(self) -> Deck:
-        """The object holding the deck layout of the robot.
+        """An interface to provide information about the current deck layout.
 
         This object behaves like a dictionary with keys for both numeric
-        and string slot numbers (for instance, ``protocol.deck[1]`` and
-        ``protocol.deck['1']`` will both return the object in slot 1). If
-        nothing is loaded into a slot, ``None`` will be present. This object
-        is useful for determining if a slot in the deck is free. Rather than
-        filtering the objects in the deck map yourself, you can also use
-        :py:attr:`loaded_labwares` to see a dict of labwares and
-        :py:attr:`loaded_modules` to see a dict of modules. For advanced
-        control you can delete an item of labware from the deck with
-        e.g. ``del protocol.deck['1']`` to free a slot for new labware.
-        (Note that for each slot only the last labware used in a command will
-        be available for calibration in the OpenTrons UI, and that the
-        tallest labware on the deck will be calculated using only currently
-        loaded labware, meaning that the labware loaded should always
-        reflect the labware physically on the deck (or be higher than the
-        labware on the deck).
+        and string slot numbers - for instance, ``protocol.deck[1]`` and
+        ``protocol.deck['1']`` will both return the object in slot 1. If
+        nothing is loaded into a slot, ``None`` will be present.
+
+        This object is useful for determining if a slot in the deck is free.
+        Rather than filtering the objects in the deck map yourself,
+        you can also use :py:attr:`loaded_labwares` to see a dict of labwares
+        and :py:attr:`loaded_modules` to see a dict of modules.
+
+        For advanced control you can delete an item of labware from the deck
+        with e.g. ``del protocol.deck['1']`` to free a slot for new labware.
         """
-        return self._implementation.get_deck()
+        return self._deck
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -707,12 +715,13 @@ class ProtocolContext(CommandPublisher):
         e.g. ``protocol.fixed_trash['A1']``
         """
         trash = self._implementation.get_fixed_trash()
+
         # TODO AL 20201113 - remove this when DeckLayout only holds
         #  LabwareInterface instances.
-        if isinstance(trash, AbstractLabware):
+        if not isinstance(trash, Labware):
             return Labware(implementation=trash, api_version=self._api_version)
 
-        return cast("Labware", trash)
+        return trash
 
     @requires_version(2, 5)
     def set_rail_lights(self, on: bool) -> None:

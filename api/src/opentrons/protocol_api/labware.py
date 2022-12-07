@@ -18,7 +18,6 @@ from opentrons.types import Location, Point, LocationLabware
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import requires_version
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
-from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 
 # TODO(mc, 2022-09-02): re-exports provided for backwards compatibility
@@ -230,7 +229,7 @@ class Well:
         return hash(self.top().point)
 
 
-class Labware(DeckItem):
+class Labware:
     """
     This class represents a labware, such as a PCR plate, a tube rack,
     reservoir, tip rack, etc. It defines the physical geometry of the labware,
@@ -292,7 +291,7 @@ class Labware(DeckItem):
 
     @property
     def separate_calibration(self) -> bool:
-        return self._implementation.separate_calibration
+        return False
 
     @property  # type: ignore
     @requires_version(2, 0)

@@ -31,7 +31,6 @@ from opentrons.hardware_control.modules.types import (
     ThermocyclerModuleModel,
     HeaterShakerModuleModel,
 )
-from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
 from .types import ThermocyclerConfiguration
@@ -53,7 +52,7 @@ class PipetteMovementRestrictedByHeaterShakerError(Exception):
 
 
 # TODO (spp, 2022-05-09): add tests
-class ModuleGeometry(DeckItem):
+class ModuleGeometry:
     """
     This class represents an active peripheral, such as an Opentrons Magnetic
     Module, Temperature Module or Thermocycler Module. It defines the physical
