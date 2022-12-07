@@ -134,14 +134,6 @@ def test_get_name_load_name(subject: LabwareCore) -> None:
     assert result == "load-name"
 
 
-@pytest.mark.parametrize(
-    "labware_definition",
-    [
-        LabwareDefinition.construct(  # type: ignore[call-arg]
-            parameters=LabwareDefinitionParameters.construct(loadName="load-name"),  # type: ignore[call-arg]
-        ),
-    ],
-)
 def test_get_name_display_name(decoy: Decoy, mock_engine_client: EngineClient) -> None:
     """It should get the user display name when one is defined."""
     decoy.when(
