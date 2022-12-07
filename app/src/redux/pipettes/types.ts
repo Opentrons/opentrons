@@ -2,7 +2,7 @@ import type {
   LabwareDefinition2,
   PipetteChannels,
   PipetteModelSpecs,
-  PipetteName
+  PipetteName,
 } from '@opentrons/shared-data'
 import type { RobotApiRequestMeta } from '../robot-api/types'
 import type {

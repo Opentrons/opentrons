@@ -1,4 +1,8 @@
-import type { PipetteModel, PipetteModelSpecs, PipetteName } from '@opentrons/shared-data'
+import type {
+  PipetteModel,
+  PipetteModelSpecs,
+  PipetteName,
+} from '@opentrons/shared-data'
 
 // common types
 
