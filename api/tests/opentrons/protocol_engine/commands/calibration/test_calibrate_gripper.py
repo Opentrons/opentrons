@@ -24,6 +24,7 @@ if TYPE_CHECKING:
     # Support environments without OT-3 hardware control dependencies.
     from opentrons.hardware_control.ot3api import OT3API
 
+
 @pytest.fixture
 def use_mock_hc_calibrate_gripper(
     decoy: Decoy, monkeypatch: pytest.MonkeyPatch
