@@ -22,7 +22,7 @@ import * as RobotApi from '../../../redux/robot-api'
 import { useCloseCurrentRun } from '../../ProtocolUpload/hooks'
 import { getPipetteWizardSteps } from '../getPipetteWizardSteps'
 import { ExitModal } from '../ExitModal'
-import { FLOWS, NINETY_SIX_CHANNEL_PIPETTE, SECTIONS } from '../constants'
+import { FLOWS, SECTIONS } from '../constants'
 import { PipetteWizardFlows } from '..'
 
 import type { AttachedPipette } from '../../../redux/pipettes/types'
