@@ -22,9 +22,6 @@ class TipRackWellState(Enum):
 
 TipRackStateByWellName = Dict[str, TipRackWellState]
 
-_96_CHANNEL_PIPETTE = 96
-_8_CHANNEL_PIPETTE = 8
-
 
 @dataclass
 class TipState:
@@ -93,8 +90,8 @@ class TipStore(HasState[TipState], HandlesActions):
         tips_in_labware = self._state.tips_by_labware_id[labware_id]
 
         if pipette_channels == len(tips_in_labware.keys()):
-            for well_name in self._state.tips_by_labware_id[labware_id].keys():
-                self._state.tips_by_labware_id[labware_id][
+            for well_name in tips_in_labware.keys():
+                tips_in_labware[
                     well_name
                 ] = TipRackWellState.USED
 
@@ -131,15 +128,25 @@ class TipView(HasState[TipState]):
         columns = self._state.column_by_labware_id[labware_id]
         column_heads = [column[0] for column in columns]
 
-        for well_name, tip_state in wells.items():
-            seen_start = seen_start or well_name == starting_tip_name
+        if use_column:
+            for column in columns:
+                if seen_start:
+                    if not any(wells[well] == TipRackWellState.USED for well in column):
+                        return column[0]
+                else:
+                    if starting_tip_name in column and not any(wells[well] == TipRackWellState.USED for well in column):
+                        return column[0]
 
-            if (
-                seen_start
-                and tip_state == TipRackWellState.CLEAN
-                and (use_column is False or well_name in column_heads)
-            ):
-                return well_name
+        else:
+            for well_name, tip_state in wells.items():
+                seen_start = seen_start or well_name == starting_tip_name
+
+                if (
+                    seen_start
+                    and tip_state == TipRackWellState.CLEAN
+                    and (use_column is False or well_name in column_heads)
+                ):
+                    return well_name
 
         return None
 
