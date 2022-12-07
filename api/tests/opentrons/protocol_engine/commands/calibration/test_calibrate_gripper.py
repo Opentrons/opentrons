@@ -1,12 +1,13 @@
 """Unit tests for the calibrateGripper implementation."""
 
+from __future__ import annotations
 
 from decoy import Decoy
+from typing import TYPE_CHECKING
 import pytest
 
 from opentrons.hardware_control import ot3_calibration
 from opentrons.hardware_control.api import API as OT2API
-from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.types import GripperProbe
 from opentrons.types import Point
 
@@ -19,6 +20,9 @@ from opentrons.protocol_engine.commands.calibration.calibrate_gripper import (
 from opentrons.protocol_engine.errors import HardwareNotSupportedError
 from opentrons.protocol_engine.types import Vec3f
 
+if TYPE_CHECKING:
+    # Support environments without OT-3 hardware control dependencies.
+    from opentrons.hardware_control.ot3api import OT3API
 
 @pytest.fixture
 def use_mock_hc_calibrate_gripper(
@@ -29,6 +33,7 @@ def use_mock_hc_calibrate_gripper(
     monkeypatch.setattr(ot3_calibration, "calibrate_gripper", mock)
 
 
+@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "params_probe, expected_hc_probe",
     [
