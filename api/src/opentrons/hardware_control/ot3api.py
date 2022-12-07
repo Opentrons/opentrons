@@ -17,11 +17,6 @@ from typing import (
     TypeVar,
 )
 
-from opentrons_shared_data.pipette.pipette_definition import (
-    PIPETTE_AVAILABLE_TYPES,
-    PIPETTE_CHANNELS_INTS,
-)
-
 from opentrons_shared_data.pipette.dev_types import (
     PipetteName,
 )
@@ -482,11 +477,7 @@ class OT3API(
             # TODO (lc 12-5-2022) cache instruments should be receiving
             # a pipette type / channels rather than the named config.
             # We should also check version here once we're comfortable.
-            pipette_type, channels, _ = ot3_pipette_config.convert_pipette_name(name)
-            if (
-                pipette_type not in PIPETTE_AVAILABLE_TYPES
-                or channels not in PIPETTE_CHANNELS_INTS
-            ):
+            if not ot3_pipette_config.supported_pipette(name):
                 raise RuntimeError(f"{name} is not a valid pipette name")
         async with self._motion_lock:
             # we're not actually checking the required instrument except in the context

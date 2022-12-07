@@ -396,19 +396,6 @@ class OT3Controller:
             self._encoder_position.update({axis: point[1]})
 
     @staticmethod
-    def _convert_channels_to_int(channels: str) -> int:
-        # TODO this is a temporary function. We should
-        # actually just split the pipette type and
-        # channels when we pull out the pipette serial
-        # number.
-        if channels == "96":
-            return 96
-        elif channels == "multi":
-            return 8
-        else:
-            return 1
-
-    @staticmethod
     def _lookup_serial_key(pipette_name: FirmwarePipetteName) -> str:
         lookup_name = {
             FirmwarePipetteName.p1000_single: "P1KS",
@@ -421,15 +408,9 @@ class OT3Controller:
         return lookup_name[pipette_name]
 
     @staticmethod
-    def _split_pipette_name(name: FirmwarePipetteName) -> Tuple[str, int]:
-        pipette_type, channels = name.name.split("_")
-        return pipette_type, OT3Controller._convert_channels_to_int(channels)
-
-    @staticmethod
     def _combine_serial_number(pipette_info: ohc_tool_types.PipetteInformation) -> str:
         serialized_name = OT3Controller._lookup_serial_key(pipette_info.name)
-        version_removed_decimal = int(float(pipette_info.model) * 10)
-        return f"{serialized_name}V{version_removed_decimal}{pipette_info.serial}"
+        return f"{serialized_name}V{pipette_info.model}{pipette_info.serial}"
 
     @staticmethod
     def _build_attached_pip(
@@ -438,11 +419,15 @@ class OT3Controller:
         if attached.name == FirmwarePipetteName.unknown:
             raise InvalidPipetteName(name=attached.name_int, mount=mount)
         try:
-            pipette_type, channels = OT3Controller._split_pipette_name(attached.name)
-            # TODO (lc 12-5-2022) In follow-up we should make the model a float.
+            # TODO (lc 12-6-2022) We should also provide the full serial number
+            # for PipetteInformation.serial so we don't have to use
+            # helper methods to convert the serial back to what was flashed
+            # on the eeprom.
             return {
                 "config": ot3_pipette_config.load_ot3_pipette(
-                    pipette_type, channels, float(attached.model)
+                    ot3_pipette_config.convert_pipette_name(
+                        cast(PipetteName, attached.name.name), attached.model
+                    )
                 ),
                 "id": OT3Controller._combine_serial_number(attached),
             }

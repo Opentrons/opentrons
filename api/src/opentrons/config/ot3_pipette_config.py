@@ -1,4 +1,5 @@
-from typing import Tuple, Optional
+import re
+from typing import List, Optional, Union, cast
 from dataclasses import dataclass
 from opentrons_shared_data.pipette import load_data
 from opentrons_shared_data.pipette.dev_types import PipetteModel, PipetteName
@@ -8,52 +9,16 @@ from opentrons_shared_data.pipette.pipette_definition import (
     PipetteVersionType,
     PipetteGenerationType,
     PipetteConfigurations,
+    PIPETTE_AVAILABLE_TYPES,
+    PIPETTE_CHANNELS_INTS,
+    PipetteModelMajorVersionType,
+    PipetteModelMinorVersionType,
 )
 
 DEFAULT_CALIBRATION_OFFSET = [0.0, 0.0, 0.0]
-DEFAULT_MODEL = "p1000"
-DEFAULT_CHANNELS = 1
-DEFAULT_MODEL_VERSION = 1.0
-
-
-def convert_channels_to_int(channels: str) -> int:
-    if channels == "96":
-        return 96
-    elif channels == "multi":
-        return 8
-    else:
-        return 1
-
-
-def convert_version_to_float(version: str) -> float:
-    return float(version.split("v")[1])
-
-
-def convert_pipette_name(name: PipetteName) -> Tuple[str, int, float]:
-    split_pipette_name = name.split("_")
-    channels = convert_channels_to_int(split_pipette_name[1])
-    if "gen3" in split_pipette_name:
-        version = 3.0
-    elif "gen2" in split_pipette_name:
-        version = 2.0
-    else:
-        version = DEFAULT_MODEL_VERSION
-    return split_pipette_name[0], channels, version
-
-
-def convert_pipette_model(model: Optional[PipetteModel]) -> Tuple[str, int, float]:
-    # TODO (lc 12-5-2022) This helper function is needed
-    # until we stop using "name" and "model" to refer
-    # to attached pipettes.
-    # We need to figure out how to default the pipette model as well
-    # rather than returning a p1000
-    if model:
-        pipette_type, channels, version = model.split("_")
-        int_channels = convert_channels_to_int(channels)
-        float_version = convert_version_to_float(version)
-        return pipette_type, int_channels, float_version
-    else:
-        return DEFAULT_MODEL, DEFAULT_CHANNELS, DEFAULT_MODEL_VERSION
+DEFAULT_MODEL = PipetteModelType.p1000
+DEFAULT_CHANNELS = PipetteChannelType.SINGLE_CHANNEL
+DEFAULT_MODEL_VERSION = PipetteVersionType(major=1, minor=0)
 
 
 # TODO (lc 12-5-2022) Ideally we can deprecate this
@@ -86,13 +51,177 @@ class PipetteModelVersionType:
         return f"{base_name}_v{self.pipette_version}"
 
 
-def load_ot3_pipette(
-    pipette_model: str, number_of_channels: int, version: float
-) -> PipetteConfigurations:
-    requested_model = PipetteModelType(pipette_model)
-    requested_channels = PipetteChannelType(number_of_channels)
-    requested_version = PipetteVersionType.convert_from_float(version)
+def channels_from_string(channels: str) -> PipetteChannelType:
+    """Convert channels from a string.
 
+    With both `py:data:PipetteName` and `py:data:PipetteObject`, we refer to channel types
+    as `single`, `multi` or `96`.
+
+    Args:
+        channels (str): The channel string we wish to convert.
+
+    Returns:
+        PipetteChannelType: A `py:obj:PipetteChannelType`
+        representing the number of channels on a pipette.
+
+    """
+    if channels == "96":
+        return PipetteChannelType.NINETY_SIX_CHANNEL
+    elif channels == "multi":
+        return PipetteChannelType.EIGHT_CHANNEL
+    else:
+        return PipetteChannelType.SINGLE_CHANNEL
+
+
+def version_from_string(version: str) -> PipetteVersionType:
+    """Convert a version string to a py:obj:PipetteVersionType.
+
+    The version string will either be in the format of `int.int` or `vint.int`.
+
+    Args:
+        version (str): The string version we wish to convert.
+
+    Returns:
+        PipetteVersionType: A pipette version object.
+
+    """
+    version_list = [v for v in re.split("\\.|[v]", version) if v]
+    major = cast(PipetteModelMajorVersionType, int(version_list[0]))
+    minor = cast(PipetteModelMinorVersionType, int(version_list[1]))
+    return PipetteVersionType(major, minor)
+
+
+def version_from_int(version: int) -> PipetteVersionType:
+    """Convert a version int to a py:obj:PipetteVersionType.
+
+    The version int will be a 2 digit value with the 10s place
+    representing the major version and the 1s place representing
+    a minor version.
+
+    Args:
+        version (int): The int version we wish to convert.
+
+    Returns:
+        PipetteVersionType: A pipette version object.
+
+    """
+    major = cast(PipetteModelMajorVersionType, version // 10)
+    minor = cast(PipetteModelMinorVersionType, version % 10)
+    return PipetteVersionType(major, minor)
+
+
+def version_from_generation(pipette_name_list: List[str]) -> PipetteVersionType:
+    """Convert a string generation name to a py:obj:PipetteVersionType.
+
+    Pipette generations are strings in the format of "gen1" or "gen2", and
+    usually associated withe :py:data:PipetteName.
+
+    Args:
+        pipette_name_list (List[str]): A list of strings from the separated by `_`
+        py:data:PipetteName.
+
+    Returns:
+        PipetteVersionType: A pipette version object.
+
+    """
+    if "gen3" in pipette_name_list:
+        return PipetteVersionType(3, 0)
+    elif "gen2" in pipette_name_list:
+        return PipetteVersionType(2, 0)
+    else:
+        return PipetteVersionType(1, 0)
+
+
+def convert_pipette_name(
+    name: PipetteName, provided_version: Optional[Union[str, int]] = None
+) -> PipetteModelVersionType:
+    """Convert the py:data:PipetteName to a py:obj:PipetteModelVersionType.
+
+    `PipetteNames` are in the format of "p300_single" or "p300_single_gen1".
+
+    Args:
+        name (PipetteName): The pipette name we want to convert.
+
+    Returns:
+        PipetteModelVersionType: An object representing a broken out PipetteName
+        string.
+
+    """
+    split_pipette_name = name.split("_")
+    channels = channels_from_string(split_pipette_name[1])
+    if provided_version and isinstance(provided_version, str):
+        version = version_from_string(provided_version)
+    elif provided_version and isinstance(provided_version, int):
+        version = version_from_int(provided_version)
+    else:
+        version = version_from_generation(split_pipette_name)
+
+    pipette_type = PipetteModelType[split_pipette_name[0]]
+
+    return PipetteModelVersionType(pipette_type, channels, version)
+
+
+def convert_pipette_model(
+    model: Optional[PipetteModel], provided_version: Optional[str] = ""
+) -> PipetteModelVersionType:
+    """Convert the py:data:PipetteModel to a py:obj:PipetteModelVersionType.
+
+    `PipetteModel` are in the format of "p300_single_v1.0" or "p300_single_v3.3".
+
+    Sometimes, models may not have a version, in which case the `provided_version` arg
+    allows you to specify a version to search for.
+
+    Args:
+        model (PipetteModel): The pipette model we want to convert.
+        provided_version (str, Optional): The provided version we'd like to look for.
+
+    Returns:
+        PipetteModelVersionType: An object representing a broken out PipetteName
+        string.
+
+    """
+    # TODO (lc 12-5-2022) This helper function is needed
+    # until we stop using "name" and "model" to refer
+    # to attached pipettes.
+    # We need to figure out how to default the pipette model as well
+    # rather than returning a p1000
+    if model and not provided_version:
+        pipette_type, parsed_channels, parsed_version = model.split("_")
+        channels = channels_from_string(parsed_channels)
+        version = version_from_string(parsed_version)
+    elif model and provided_version:
+        pipette_type, parsed_channels = model.split("_")
+        channels = channels_from_string(parsed_channels)
+        version = version_from_string(provided_version)
+    else:
+        pipette_type = DEFAULT_MODEL.value
+        channels = DEFAULT_CHANNELS
+        version = DEFAULT_MODEL_VERSION
+    return PipetteModelVersionType(PipetteModelType[pipette_type], channels, version)
+
+
+def supported_pipette(model_or_name: Union[PipetteName, PipetteModel, None]) -> bool:
+    """Determine if a pipette type is supported.
+
+    Args:
+        model_or_name (Union[PipetteName, PipetteModel, None]): The pipette we want to check.
+
+    Returns:
+        bool: Whether or not the given pipette name or model is supported.
+    """
+    if not model_or_name:
+        return False
+    split_model_or_name = model_or_name.split("_")
+    channels_as_int = channels_from_string(split_model_or_name[1]).as_int
+    if (
+        split_model_or_name[0] in PIPETTE_AVAILABLE_TYPES
+        or channels_as_int in PIPETTE_CHANNELS_INTS
+    ):
+        return True
+    return False
+
+
+def load_ot3_pipette(model_type: PipetteModelVersionType) -> PipetteConfigurations:
     return load_data.load_definition(
-        requested_model, requested_channels, requested_version
+        model_type.pipette_type, model_type.pipette_channels, model_type.pipette_version
     )

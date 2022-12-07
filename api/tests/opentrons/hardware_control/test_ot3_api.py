@@ -1,6 +1,6 @@
 """ Tests for behaviors specific to the OT3 hardware controller.
 """
-from typing import Iterator, Union, Tuple
+from typing import Iterator, Union, Tuple, Dict
 from typing_extensions import Literal
 from math import copysign
 import pytest
@@ -29,6 +29,11 @@ from opentrons.types import Point, Mount
 
 from opentrons.config import gripper_config as gc, ot3_pipette_config
 from opentrons_shared_data.gripper.dev_types import GripperModel
+from opentrons_shared_data.pipette.pipette_definition import (
+    PipetteModelType,
+    PipetteChannelType,
+    PipetteVersionType,
+)
 
 
 @pytest.fixture
@@ -135,8 +140,8 @@ async def mock_instrument_handlers(
     (
         (
             {
-                OT3Mount.RIGHT: {"channels": 8, "version": 1.0, "model": "p50"},
-                OT3Mount.LEFT: {"channels": 1, "version": 1.0, "model": "p1000"},
+                OT3Mount.RIGHT: {"channels": 8, "version": (1, 0), "model": "p50"},
+                OT3Mount.LEFT: {"channels": 1, "version": (1, 0), "model": "p1000"},
             },
             GantryLoad.TWO_LOW_THROUGHPUT,
         ),
@@ -146,34 +151,34 @@ async def mock_instrument_handlers(
             GantryLoad.GRIPPER,
         ),
         (
-            {OT3Mount.LEFT: {"channels": 8, "version": 1.0, "model": "p1000"}},
+            {OT3Mount.LEFT: {"channels": 8, "version": (1, 0), "model": "p1000"}},
             GantryLoad.LOW_THROUGHPUT,
         ),
         (
-            {OT3Mount.RIGHT: {"channels": 8, "version": 1.0, "model": "p1000"}},
+            {OT3Mount.RIGHT: {"channels": 8, "version": (1, 0), "model": "p1000"}},
             GantryLoad.LOW_THROUGHPUT,
         ),
         (
-            {OT3Mount.LEFT: {"channels": 96, "model": "p1000", "version": 1.0}},
+            {OT3Mount.LEFT: {"channels": 96, "model": "p1000", "version": (1, 0)}},
             GantryLoad.HIGH_THROUGHPUT,
         ),
         (
             {
-                OT3Mount.LEFT: {"channels": 1, "version": 1.0, "model": "p1000"},
+                OT3Mount.LEFT: {"channels": 1, "version": (1, 0), "model": "p1000"},
                 OT3Mount.GRIPPER: {"model": GripperModel.V1, "id": "g12345"},
             },
             GantryLoad.LOW_THROUGHPUT,
         ),
         (
             {
-                OT3Mount.RIGHT: {"channels": 8, "version": 1.0, "model": "p1000"},
+                OT3Mount.RIGHT: {"channels": 8, "version": (1, 0), "model": "p1000"},
                 OT3Mount.GRIPPER: {"model": GripperModel.V1, "id": "g12345"},
             },
             GantryLoad.LOW_THROUGHPUT,
         ),
         (
             {
-                OT3Mount.LEFT: {"channels": 96, "model": "p1000", "version": 1.0},
+                OT3Mount.LEFT: {"channels": 96, "model": "p1000", "version": (1, 0)},
                 OT3Mount.GRIPPER: {"model": GripperModel.V1, "id": "g12345"},
             },
             GantryLoad.HIGH_THROUGHPUT,
@@ -181,8 +186,10 @@ async def mock_instrument_handlers(
     ),
 )
 async def test_gantry_load_transform(
-    ot3_hardware: ThreadManager[OT3API], load_configs, load
-):
+    ot3_hardware: ThreadManager[OT3API],
+    load_configs: Dict[str, Union[int, str, Tuple[int, int]]],
+    load: GantryLoad,
+) -> None:
 
     for mount, configs in load_configs.items():
         if mount == OT3Mount.GRIPPER:
@@ -191,7 +198,11 @@ async def test_gantry_load_transform(
             await ot3_hardware.cache_gripper(instr_data)
         else:
             pipette_config = ot3_pipette_config.load_ot3_pipette(
-                configs["model"], configs["channels"], configs["version"]
+                ot3_pipette_config.PipetteModelVersionType(
+                    PipetteModelType(configs["model"]),
+                    PipetteChannelType(configs["channels"]),
+                    PipetteVersionType(*configs["version"]),
+                )
             )
             instr_data = OT3AttachedPipette(config=pipette_config, id="fakepip")
             await ot3_hardware.cache_pipette(mount, instr_data, None)

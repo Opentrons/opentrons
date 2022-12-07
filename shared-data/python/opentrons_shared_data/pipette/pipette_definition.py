@@ -74,10 +74,8 @@ class PipetteVersionType:
         return f"{self.major}.{self.minor}"
 
     @property
-    def as_float(self) -> float:
-        # TODO (lc 12-05-2022) Kinda gross. We should make this
-        # nicer probably.
-        return float(f"{self}")
+    def as_tuple(self) -> Tuple[PipetteModelMajorVersionType, PipetteModelMinorVersionType]:
+        return (self.major, self.minor)
 
 
 class SupportedTipsDefinition(BaseModel):

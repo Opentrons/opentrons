@@ -91,13 +91,13 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._max_channels = self._config.channels
 
         # TODO (lc 12-05-2022) figure out how we can safely deprecate "name" and "model"
-        self._name = ot3_pipette_config.PipetteNameType(
+        self._pipette_name = ot3_pipette_config.PipetteNameType(
             pipette_type=config.pipette_type,
             pipette_channels=config.channels,
             pipette_generation=config.display_category,
         )
-        self._acting_as = self._name
-        self._model = ot3_pipette_config.PipetteModelVersionType(
+        self._acting_as = self._pipette_name
+        self._pipette_model = ot3_pipette_config.PipetteModelVersionType(
             pipette_type=config.pipette_type,
             pipette_channels=config.channels,
             pipette_version=config.version,
@@ -114,7 +114,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         )
         self._log.info(
             "loaded: {}, pipette offset: {}".format(
-                self._model, self._pipette_offset.offset
+                self._pipette_model, self._pipette_offset.offset
             )
         )
         self.ready_to_aspirate = False
@@ -191,11 +191,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         return cast(PipetteName, f"{self._acting_as}")
 
     def reload_configurations(self) -> None:
-        self._config = ot3_pipette_config.load_ot3_pipette(
-            self._pipette_type.name,
-            self._max_channels.as_int,
-            self._pipette_version.as_float,
-        )
+        self._config = ot3_pipette_config.load_ot3_pipette(self._pipette_model)
         self._config_as_dict = self._config.dict()
 
     def reset_state(self) -> None:
@@ -230,11 +226,11 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
 
     @property
     def name(self) -> PipetteName:
-        return cast(PipetteName, f"{self._name}")
+        return cast(PipetteName, f"{self._pipette_name}")
 
     @property
     def model(self) -> PipetteModel:
-        return cast(PipetteModel, f"{self._model}")
+        return cast(PipetteModel, f"{self._pipette_model}")
 
     @property
     def pipette_type(self) -> PipetteModelType:
