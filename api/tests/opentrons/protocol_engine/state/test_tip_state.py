@@ -209,6 +209,23 @@ def test_reset_tips(
     assert result == "A1"
 
 
+def test_handle_pipette_config_action(subject: TipStore) -> None:
+    """Should add pipette channel to state."""
+    subject.handle_action(
+        actions.AddPipetteConfigAction(
+            pipette_id="pipette-id",
+            channels=8,
+            max_volume=15,
+            min_volume=3,
+            model="gen a",
+        )
+    )
+
+    assert TipView(subject.state).get_channels(
+        pipette_id="pipette-id"
+    ) == 8
+
+
 @pytest.mark.parametrize("input_channels, next_tip_result", [(96, None), (8, "A2")])
 def test_tip_tracking(
     subject: TipStore,
