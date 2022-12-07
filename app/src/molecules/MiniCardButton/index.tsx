@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useHistory } from 'react-router-dom'
+
 import {
   Btn,
   SPACING,
@@ -12,7 +13,6 @@ import {
 import { StyledText } from '../../atoms/text'
 
 import type { IconName } from '@opentrons/components'
-import { push } from 'mixpanel-browser'
 
 interface MiniCardButtonProps {
   iconName: IconName
