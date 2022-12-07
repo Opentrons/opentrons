@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.2.0](https://github.com/Opentrons/opentrons/compare/v6.1.0...v6.2.0) (2022-12-06)
+
+
+### Bug Fixes
+
+* **app:** handle the input via OT_APP_DISCOVERY__CANDIDATES  ([#11759](https://github.com/Opentrons/opentrons/issues/11759)) ([48c4ad7](https://github.com/Opentrons/opentrons/commit/48c4ad768cefa1086038c940389640af8c15bf5b))
+
+
+### Features
+
+* **app, api-client:** wire up liquid setup and protocol details ([#11455](https://github.com/Opentrons/opentrons/issues/11455)) ([0c6ee3d](https://github.com/Opentrons/opentrons/commit/0c6ee3d7ced0afd1a27bb42da4f6760cb93f71a5))
+* **app,app-shell:** add config and routing for app on device ([#11191](https://github.com/Opentrons/opentrons/issues/11191)) ([615b8df](https://github.com/Opentrons/opentrons/commit/615b8df3206de31d00b8b13cec5508cdb4c5a0da))
+
+
+
+
+
 # [6.1.0](https://github.com/Opentrons/opentrons/compare/v6.0.1...v6.1.0) (2022-09-27)
 
 

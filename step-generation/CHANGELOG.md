@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.2.0](https://github.com/Opentrons/opentrons/compare/v6.1.0...v6.2.0) (2022-12-06)
+
+
+### Bug Fixes
+
+* **protocol-designer:** aspirate after dispense in transfer now counts as air gap ([#11742](https://github.com/Opentrons/opentrons/issues/11742)) ([d5854e1](https://github.com/Opentrons/opentrons/commit/d5854e14f458be04007682da9b49ba16a4360e30))
+* **step-generation, shared-data:** do not change liquid state of airGap command ([#11564](https://github.com/Opentrons/opentrons/issues/11564)) ([464f4e8](https://github.com/Opentrons/opentrons/commit/464f4e8806dffa995570d33c0b3e0a8589d19edc))
+
+
+
+
+
 # [6.1.0](https://github.com/Opentrons/opentrons/compare/v6.0.1...v6.1.0) (2022-09-27)
 
 
