@@ -31,6 +31,7 @@ import { ConnectedNetworkInfo } from '../pages/OnDeviceDisplay/ConnectedNetworkI
 import { SelectWifiNetwork } from '../pages/OnDeviceDisplay/SelectWifiNetwork'
 import { SetWifiCred } from '../pages/OnDeviceDisplay/SetWifiCred'
 import { NetworkSetupMenu } from '../pages/OnDeviceDisplay/NetworkSetupMenu'
+import { RobotDashboard } from '../pages/OnDeviceDisplay/RobotDashboard'
 import { getIsOnDevice } from '../redux/config'
 import { getLocalRobot } from '../redux/discovery'
 import { useSoftwareUpdatePoll } from './hooks'
@@ -140,6 +141,12 @@ export const AppComponent = (): JSX.Element => {
       name: 'Network setup menu',
       path: '/network-setup-menu',
     },
+    {
+      Component: RobotDashboard,
+      exact: true,
+      name: 'Robot Dashboard',
+      path: '/robot-dashboard',
+    },
   ]
 
   const routes = isOnDevice ? onDeviceDisplayRoutes : allRoutes
@@ -167,7 +174,7 @@ export const AppComponent = (): JSX.Element => {
                         position={POSITION_RELATIVE}
                         width="100%"
                         height="100%"
-                        backgroundColor={COLORS.fundamentalsBackground}
+                        backgroundColor={COLORS.white}
                         overflow={OVERFLOW_SCROLL}
                       >
                         <ModalPortalRoot />
@@ -176,7 +183,7 @@ export const AppComponent = (): JSX.Element => {
                     </Route>
                   )
                 })}
-                <Redirect to="/device-setup" />
+                <Redirect to="/robot-dashboard" />
               </Switch>
               <Alerts />
             </Box>

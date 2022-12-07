@@ -14,7 +14,7 @@ import { StyledText } from '../../atoms/text'
 
 import type { IconName } from '@opentrons/components'
 
-interface MiniCardButtonProps {
+export interface MiniCardButtonProps {
   iconName: IconName
   cardName: string
   destinationPath: string
