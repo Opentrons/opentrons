@@ -6,7 +6,7 @@ from typing import Optional, TYPE_CHECKING
 from opentrons.types import Location, Mount
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.protocols.api_support.util import Clearances, PlungerSpeeds, FlowRates
+from opentrons.protocols.api_support.util import PlungerSpeeds, FlowRates
 from opentrons.protocol_engine import DeckPoint, WellLocation
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
@@ -40,10 +40,6 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         self._sync_hardware_api = sync_hardware_api
         self._protocol_core = protocol_core
 
-        # TODO(jbl 2022-11-09) clearances should be move out of the core
-        self._well_bottom_clearances = Clearances(
-            default_aspirate=1.0, default_dispense=1.0
-        )
         # TODO(jbl 2022-11-03) flow_rates should not live in the cores, and should be moved to the protocol context
         #   along with other rate related refactors (for the hardware API)
         self._flow_rates = FlowRates(self)
@@ -342,16 +338,13 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         )
 
     def get_model(self) -> str:
-        # TODO(mc, 2022-11-11): https://opentrons.atlassian.net/browse/RCORE-382
-        return self.get_hardware_state()["model"]
+        return self._engine_client.state.pipettes.get_model_name(self._pipette_id)
 
     def get_min_volume(self) -> float:
-        # TODO(mc, 2022-11-11): https://opentrons.atlassian.net/browse/RCORE-382
-        return self.get_hardware_state()["min_volume"]
+        return self._engine_client.state.pipettes.get_minimum_volume(self._pipette_id)
 
     def get_max_volume(self) -> float:
-        # TODO(mc, 2022-11-11): https://opentrons.atlassian.net/browse/RCORE-382
-        return self.get_hardware_state()["max_volume"]
+        return self._engine_client.state.pipettes.get_maximum_volume(self._pipette_id)
 
     def get_current_volume(self) -> float:
         # TODO(mc, 2022-11-11): https://opentrons.atlassian.net/browse/RCORE-381
@@ -365,10 +358,8 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         """Get the current state of the pipette hardware as a dictionary."""
         return self._sync_hardware_api.get_attached_instrument(self.get_mount())  # type: ignore[no-any-return]
 
-    # TODO(mc, 2022-11-09): read pipette config into engine state at load
     def get_channels(self) -> int:
-        # TODO(mc, 2022-11-11): https://opentrons.atlassian.net/browse/RCORE-382
-        return self.get_hardware_state()["channels"]
+        return self._engine_client.state.pipettes.get_channels(self._pipette_id)
 
     def has_tip(self) -> bool:
         return self.get_hardware_state()["has_tip"]
@@ -381,9 +372,6 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
     def get_return_height(self) -> float:
         raise NotImplementedError("InstrumentCore.get_return_height not implemented")
-
-    def get_well_bottom_clearance(self) -> Clearances:
-        return self._well_bottom_clearances
 
     def get_speed(self) -> PlungerSpeeds:
         raise NotImplementedError("InstrumentCore.get_speed not implemented")

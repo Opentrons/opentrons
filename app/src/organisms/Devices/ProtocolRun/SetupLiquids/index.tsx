@@ -43,6 +43,7 @@ export function SetupLiquids(props: SetupLiquidsProps): JSX.Element {
           protocolRunHeaderRef={props.protocolRunHeaderRef}
           robotName={props.robotName}
           runId={props.runId}
+          sourceLocation="SetupLiquids"
         />
       </Flex>
     </Flex>

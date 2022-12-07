@@ -44,6 +44,7 @@ import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { Modal } from '../../molecules/Modal'
+import { useTrackEvent } from '../../redux/analytics'
 import { useFeatureFlag } from '../../redux/config'
 import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
 import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
@@ -240,6 +241,7 @@ interface ProtocolDetailsProps extends StoredProtocolData {}
 export function ProtocolDetails(
   props: ProtocolDetailsProps
 ): JSX.Element | null {
+  const trackEvent = useTrackEvent()
   const { protocolKey, srcFileNames, mostRecentAnalysis, modified } = props
   const { t } = useTranslation(['protocol_details', 'shared'])
   const [currentTab, setCurrentTab] = React.useState<
@@ -367,6 +369,14 @@ export function ProtocolDetails(
     ),
   }
 
+  const handleRunProtocolButtonClick = (): void => {
+    trackEvent({
+      name: 'proceedToRun',
+      properties: { sourceLocation: 'ProtocolsDetail' },
+    })
+    setShowSlideout(true)
+  }
+
   return (
     <>
       <Portal level="top">
@@ -466,7 +476,7 @@ export function ProtocolDetails(
                 `}
               >
                 <PrimaryButton
-                  onClick={() => setShowSlideout(true)}
+                  onClick={() => handleRunProtocolButtonClick()}
                   data-testid="ProtocolDetails_runProtocol"
                   disabled={analysisStatus === 'loading'}
                 >

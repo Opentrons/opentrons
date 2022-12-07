@@ -47,30 +47,30 @@ Some modules were added to the Protocol API later than others, and some modules 
 .. table::
    :widths: 4 5 2
    
-   +--------------------+-------------------------------+---------------------+
-   | Module             | Load Name                     | Minimum API Version |
-   +====================+===============================+=====================+
-   | Temperature Module | ``temperature module``        | 2.0                 |
-   | GEN1               | or ``tempdeck``               |                     |
-   +--------------------+-------------------------------+---------------------+
-   | Temperature Module | ``temperature module gen2``   | 2.3                 |
-   | GEN2               |                               |                     |
-   +--------------------+-------------------------------+---------------------+
-   | Magnetic Module    | ``magnetic module``           | 2.0                 |
-   | GEN1               | or ``magdeck``                |                     |
-   +--------------------+-------------------------------+---------------------+
-   | Magnetic Module    | ``magnetic module gen2``      | 2.3                 |
-   | GEN2               |                               |                     |
-   +--------------------+-------------------------------+---------------------+
-   | Thermocycler       | ``thermocycler module``       | 2.0                 |
-   | Module GEN1        | or ``thermocycler``           |                     |
-   +--------------------+-------------------------------+---------------------+
-   | Thermocycler       | ``thermocycler module gen2``  | 2.14                |
-   | Module GEN2        | or ``thermocyclerModuleV2``   |                     |
-   +--------------------+-------------------------------+---------------------+
-   | Heater-Shaker      | ``heaterShakerModuleV1``      | 2.13                |
-   | Module             |                               |                     |
-   +--------------------+-------------------------------+---------------------+
+   +--------------------+-------------------------------+---------------------------+
+   | Module             | Load Name                     | Introduced in API Version |
+   +====================+===============================+===========================+
+   | Temperature Module | ``temperature module``        | 2.0                       |
+   | GEN1               | or ``tempdeck``               |                           |
+   +--------------------+-------------------------------+---------------------------+
+   | Temperature Module | ``temperature module gen2``   | 2.3                       |
+   | GEN2               |                               |                           |
+   +--------------------+-------------------------------+---------------------------+
+   | Magnetic Module    | ``magnetic module``           | 2.0                       |
+   | GEN1               | or ``magdeck``                |                           |
+   +--------------------+-------------------------------+---------------------------+
+   | Magnetic Module    | ``magnetic module gen2``      | 2.3                       |
+   | GEN2               |                               |                           |
+   +--------------------+-------------------------------+---------------------------+
+   | Thermocycler       | ``thermocycler module``       | 2.0                       |
+   | Module GEN1        | or ``thermocycler``           |                           |
+   +--------------------+-------------------------------+---------------------------+
+   | Thermocycler       | ``thermocycler module gen2``  | 2.13                      |
+   | Module GEN2        | or ``thermocyclerModuleV2``   |                           |
+   +--------------------+-------------------------------+---------------------------+
+   | Heater-Shaker      | ``heaterShakerModuleV1``      | 2.13                      |
+   | Module             |                               |                           |
+   +--------------------+-------------------------------+---------------------------+
 
 Loading Labware onto Your Module
 ================================
@@ -347,7 +347,7 @@ The examples in this section will use a Thermocycler loaded as follows:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.14'}
+    metadata = {'apiLevel': '2.13'}
 
     def run(protocol: protocol_api.ProtocolContext):
         tc_mod = protocol.load_module('thermocyclerModuleV2')
@@ -360,8 +360,6 @@ The ``location`` parameter of :py:meth:`.load_module` isn't required for the The
     If you want to specify a slot for the Thermocycler (for parallelism with other ``load_module()`` calls in your protocol), you can do so: the only accepted value is ``7``.
 
 .. versionadded:: 2.0
-.. versionchanged:: 2.14
-   Added support for Thermocycler Module GEN2.
 
 
 Lid Control
@@ -375,7 +373,7 @@ You can also control the temperature of the lid. Acceptable target temperatures 
 
 .. code-block:: python
 
-    tc_mod.set_lid_temperature(50)
+    tc_mod.set_lid_temperature(temperature=50)
 
 The protocol will only proceed once the lid temperature reaches 50 °C. This is the case whether the previous temperature was lower than 50 °C (in which case the lid will actively heat) or higher than 50 °C (in which case the lid will passively cool).
 

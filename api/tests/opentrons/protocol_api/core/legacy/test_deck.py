@@ -5,10 +5,11 @@ import pytest
 from decoy import Decoy
 
 from opentrons.hardware_control.modules import ModuleType
-from opentrons.protocols.geometry import deck_conflict
-from opentrons.protocols.geometry.deck import Deck
-from opentrons.protocols.geometry.deck_item import DeckItem
+
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry
+
+from opentrons.protocol_api.core.protocol_api import deck_conflict
+from opentrons.protocol_api.core.protocol_api.deck import Deck, DeckItem
 
 
 @pytest.fixture(autouse=True)
@@ -51,6 +52,7 @@ def test_slot_names(decoy: Decoy, slot_number: int, subject: Deck) -> None:
 
 @pytest.mark.parametrize("bad_slot", [0, 13, 1.0, "0", "13", "1.0", "hello world"])
 def test_invalid_slot_names(decoy: Decoy, bad_slot: Any, subject: Deck) -> None:
+    """It should reject things that aren't slot names."""
     with pytest.raises(ValueError, match="Unknown slot"):
         subject[bad_slot]
 
@@ -59,6 +61,7 @@ def test_invalid_slot_names(decoy: Decoy, bad_slot: Any, subject: Deck) -> None:
 
 
 def test_highest_z(decoy: Decoy, subject: Deck) -> None:
+    """It should return the highest Z point of all objects on the deck."""
     item_10 = decoy.mock(cls=DeckItem)
     decoy.when(item_10.highest_z).then_return(10)
 
@@ -89,6 +92,7 @@ def test_item_collisions(
     decoy: Decoy,
     subject: Deck,
 ) -> None:
+    """It should prevent deck conflicts."""
     labware_item = decoy.mock(cls=DeckItem)
     decoy.when(labware_item.highest_z).then_return(42)
 

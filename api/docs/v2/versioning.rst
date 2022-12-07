@@ -266,5 +266,5 @@ Version 2.14
 Upcoming, not yet released.
 
 - :py:class:`.Labware` and :py:class:`.Well` objects will adhere to the protocol's API level setting. Prior to this version, they incorrectly ignore the setting.
-- :py:meth:`.ModuleContext.load_labware_object` has been deprecated.
-- :py:meth:`.MagneticModuleContext.calibrate` has been deprecated.
+- :py:meth:`.ModuleContext.load_labware_object` will be deprecated.
+- :py:meth:`.MagneticModuleContext.calibrate` will be deprecated.

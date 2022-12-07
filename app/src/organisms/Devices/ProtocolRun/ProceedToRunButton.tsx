@@ -17,12 +17,14 @@ interface ProceedToRunButtonProps {
   protocolRunHeaderRef: React.RefObject<HTMLDivElement> | null
   robotName: string
   runId: string
+  sourceLocation: string
 }
 
 export function ProceedToRunButton({
   protocolRunHeaderRef,
   robotName,
   runId,
+  sourceLocation,
 }: ProceedToRunButtonProps): JSX.Element | null {
   const { t } = useTranslation('protocol_setup')
   const [targetProps, tooltipProps] = useHoverTooltip()
@@ -58,7 +60,7 @@ export function ProceedToRunButton({
     <Link
       to={`/devices/${robotName}/protocol-runs/${runId}/run-log`}
       onClick={() => {
-        trackEvent({ name: 'proceedToRun', properties: {} })
+        trackEvent({ name: 'proceedToRun', properties: { sourceLocation } })
         protocolRunHeaderRef?.current?.scrollIntoView({
           behavior: 'smooth',
         })
