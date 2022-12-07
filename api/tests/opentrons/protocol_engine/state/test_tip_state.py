@@ -1,6 +1,5 @@
 """Tests for tip state store and selectors."""
 import pytest
-from decoy import Decoy
 
 from typing import Optional
 
