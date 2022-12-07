@@ -22,5 +22,5 @@ export const Primary = Template.bind({})
 Primary.args = {
   iconName: 'wifi',
   cardName: 'Settings',
-  distPath: '/app-molecules-minicardbutton--primary',
+  destinationPath: '/app-molecules-minicardbutton--primary',
 }
