@@ -15,7 +15,7 @@ from opentrons.hardware_control.backends.ot3utils import sensor_node_for_mount
 
 # TODO (lc 10-27-2022) This should be changed to an ot3 pipette object once we
 # have that well defined.
-from opentrons.hardware_control.instruments.ot2.pipette import Pipette
+from opentrons.hardware_control.instruments.ot3.pipette import Pipette
 from opentrons.hardware_control.motion_utilities import deck_from_machine
 from opentrons.hardware_control.ot3api import OT3API
 
@@ -290,7 +290,12 @@ def get_plunger_positions_ot3(
     """Update plunger current."""
     pipette = _get_pipette_from_mount(api, mount)
     cfg = pipette.config
-    return cfg.top, cfg.bottom, cfg.blow_out, cfg.drop_tip
+    return (
+        pipette.plunger_positions.top,
+        pipette.plunger_positions.bottom,
+        pipette.plunger_positions.blow_out,
+        pipette.plunger_positions.drop_tip,
+    )
 
 
 async def update_pick_up_current(
@@ -298,7 +303,9 @@ async def update_pick_up_current(
 ) -> None:
     """Update pick-up-tip current."""
     pipette = _get_pipette_from_mount(api, mount)
-    pipette._config = replace(pipette.config, pick_up_current=current)
+    config_model = pipette.pick_up_configurations
+    config_model.current = current
+    pipette.pick_up_configurations = config_model
 
 
 async def update_pick_up_distance(
@@ -306,7 +313,9 @@ async def update_pick_up_distance(
 ) -> None:
     """Update pick-up-tip current."""
     pipette = _get_pipette_from_mount(api, mount)
-    pipette._config = replace(pipette.config, pick_up_distance=distance)
+    config_model = pipette.pick_up_configurations
+    config_model.distance = distance
+    pipette.pick_up_configurations = config_model
 
 
 async def move_plunger_absolute_ot3(
