@@ -137,7 +137,9 @@ async def _jog_axis(
                     pass
 
 
-async def _begin_find_sequence(api: OT3API, mount: OT3Mount, expected_pos: Point) -> None:
+async def _begin_find_sequence(
+    api: OT3API, mount: OT3Mount, expected_pos: Point
+) -> None:
     # Move above slot Z center
     z_probe_pos = _get_z_probe_pos(expected_pos) + Point(z=SAFE_Z)
     current_position = await api.gantry_position(mount)
@@ -283,7 +285,9 @@ def _apply_relative_offset(_offset: Point, _relative: Point) -> Point:
     return _offset
 
 
-async def _check_multi_channel_to_deck_alignment(api: OT3API, mount: OT3Mount, expected_pos: Point, found_pos: Point) -> None:
+async def _check_multi_channel_to_deck_alignment(
+    api: OT3API, mount: OT3Mount, expected_pos: Point, found_pos: Point
+) -> None:
     current_pos = await api.gantry_position(mount)
     await api.move_to(mount, current_pos._replace(z=100))
     input("add probe to pipette FRONT channel (#8), then press ENTER: ")
@@ -298,6 +302,9 @@ async def _check_multi_channel_to_deck_alignment(api: OT3API, mount: OT3Mount, e
             print("homing")
             await api.home()
             exit()
+    current_pos = await api.gantry_position(mount)
+    await api.move_to(mount, current_pos._replace(z=100))
+    input("add probe back to pipette REAR channel (#1), then press ENTER: ")
 
 
 async def _find_the_square(api: OT3API, mount: OT3Mount, expected_pos: Point) -> Point:
@@ -313,7 +320,9 @@ async def _find_the_square(api: OT3API, mount: OT3Mount, expected_pos: Point) ->
             input("add probe to Pipette, then press ENTER: ")
         found_pos = await _find_square_center(api, mount, expected_pos)
         if is_multi and "y" in input("check if level to deck? (y/n):"):
-            await _check_multi_channel_to_deck_alignment(api, mount, expected_pos, found_pos)
+            await _check_multi_channel_to_deck_alignment(
+                api, mount, expected_pos, found_pos
+            )
     return found_pos
 
 
