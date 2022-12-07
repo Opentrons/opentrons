@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Generic, Dict, List, NamedTuple, Optional, TypeVar
+from typing import Any, Generic, List, NamedTuple, Optional, TypeVar
 
 from opentrons_shared_data.labware.dev_types import (
     LabwareUri,
@@ -13,7 +13,6 @@ from opentrons_shared_data.labware.dev_types import (
 from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocols.geometry.labware_geometry import AbstractLabwareGeometry
 from opentrons.protocols.api_support.tip_tracker import TipTracker
-from opentrons.protocols.api_support.well_grid import WellGrid
 from opentrons.types import Point
 
 from .well import WellCoreType
@@ -45,7 +44,6 @@ class AbstractLabware(DeckItem, ABC, Generic[WellCoreType]):
 
         The URI is unique for a given namespace, load name, and definition version.
         """
-        ...
 
     @abstractmethod
     def get_load_params(self) -> LabwareLoadParams:
@@ -54,12 +52,10 @@ class AbstractLabware(DeckItem, ABC, Generic[WellCoreType]):
     @abstractmethod
     def get_display_name(self) -> str:
         """Get a display name for the labware, falling back to the definition."""
-        ...
 
     @abstractmethod
     def get_user_display_name(self) -> Optional[str]:
         """Get the user-specified display name of the labware, if set."""
-        ...
 
     @abstractmethod
     def get_name(self) -> str:
@@ -72,12 +68,10 @@ class AbstractLabware(DeckItem, ABC, Generic[WellCoreType]):
     @abstractmethod
     def get_definition(self) -> LabwareDefinitionDict:
         """Get the labware's definition as a plain dictionary."""
-        ...
 
     @abstractmethod
     def get_parameters(self) -> LabwareParametersDict:
         """Get the labware's definition's `parameters` field as a plain dictionary."""
-        ...
 
     @abstractmethod
     def get_quirks(self) -> List[str]:
@@ -94,12 +88,10 @@ class AbstractLabware(DeckItem, ABC, Generic[WellCoreType]):
     @abstractmethod
     def is_tip_rack(self) -> bool:
         "Whether the labware is a tip rack."
-        ...
 
     @abstractmethod
     def is_fixed_trash(self) -> bool:
         "Whether the labware is a fixed trash."
-        ...
 
     @abstractmethod
     def get_tip_length(self) -> float:
@@ -116,9 +108,8 @@ class AbstractLabware(DeckItem, ABC, Generic[WellCoreType]):
     @abstractmethod
     def get_next_tip(
         self, num_tips: int, starting_tip: Optional[WellCoreType]
-    ) -> Optional[WellCoreType]:
-        """Get the next available tip(s) in the rack, if available."""
-        ...
+    ) -> Optional[str]:
+        """Get the name of the next available tip(s) in the rack, if available."""
 
     # TODO(mc, 2022-11-09): remove from abstract core
     @abstractmethod
@@ -126,16 +117,8 @@ class AbstractLabware(DeckItem, ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
-    def get_well_grid(self) -> WellGrid:
-        ...
-
-    @abstractmethod
-    def get_wells(self) -> List[WellCoreType]:
-        ...
-
-    @abstractmethod
-    def get_wells_by_name(self) -> Dict[str, WellCoreType]:
-        ...
+    def get_well_columns(self) -> List[List[str]]:
+        """Get the all well names, organized by column, from the labware's definition."""
 
     @abstractmethod
     def get_geometry(self) -> AbstractLabwareGeometry:
@@ -152,6 +135,10 @@ class AbstractLabware(DeckItem, ABC, Generic[WellCoreType]):
         unless `preserve_half_mm` is specified, in which case
         some definitions will return half-millimeters.
         """
+
+    @abstractmethod
+    def get_well_core(self, well_name: str) -> WellCoreType:
+        """Get a well core interface to a given well in this labware."""
 
 
 LabwareCoreType = TypeVar("LabwareCoreType", bound=AbstractLabware[Any])

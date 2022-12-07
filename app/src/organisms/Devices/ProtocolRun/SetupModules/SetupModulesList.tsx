@@ -1,30 +1,40 @@
 import * as React from 'react'
 import map from 'lodash/map'
+import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
   BORDERS,
   Box,
+  Btn,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
+  Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { getModuleType, TC_MODULE_LOCATION } from '@opentrons/shared-data'
+import {
+  getModuleType,
+  HEATERSHAKER_MODULE_TYPE,
+  HEATERSHAKER_MODULE_V1,
+  TC_MODULE_LOCATION,
+} from '@opentrons/shared-data'
 import { Banner } from '../../../../atoms/Banner'
 import { StyledText } from '../../../../atoms/text'
 import { StatusLabel } from '../../../../atoms/StatusLabel'
-import { HeaterShakerBanner } from '../../../ProtocolSetup/RunSetupCard/ModuleSetup/HeaterShakerSetupWizard/HeaterShakerBanner'
 import { UnMatchedModuleWarning } from '../../../ProtocolSetup/RunSetupCard/ModuleSetup/UnMatchedModuleWarning'
 import { MultipleModulesModal } from '../../../ProtocolSetup/RunSetupCard/ModuleSetup/MultipleModulesModal'
 import {
+  ModuleRenderInfoForProtocol,
   useModuleRenderInfoForProtocolById,
   useUnmatchedModulesForProtocol,
 } from '../../hooks'
+import { HeaterShakerWizard } from '../../HeaterShakerWizard'
 import { getModuleImage } from './utils'
+
 import type { ModuleModel } from '@opentrons/shared-data'
 import type { AttachedModule } from '../../../../redux/modules/types'
 
@@ -51,10 +61,6 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
     setShowMultipleModulesModal,
   ] = React.useState<boolean>(false)
 
-  const heaterShakerModules = Object.values(
-    moduleRenderInfoForProtocolById
-  ).filter(module => module.moduleDef.model === 'heaterShakerModuleV1')
-
   const moduleModels = map(
     moduleRenderInfoForProtocolById,
     ({ moduleDef }) => moduleDef.model
@@ -64,9 +70,6 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
 
   return (
     <>
-      {heaterShakerModules.length !== 0 ? (
-        <HeaterShakerBanner modules={heaterShakerModules} />
-      ) : null}
       {showMultipleModulesModal ? (
         <MultipleModulesModal
           onCloseClick={() => setShowMultipleModulesModal(false)}
@@ -75,12 +78,16 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
       {hasADuplicateModule ? (
         <Box marginTop={SPACING.spacing3}>
           <Banner
+            iconMarginRight={SPACING.spacing4}
+            iconMarginLeft={SPACING.spacing3}
+            size={SPACING.spacingM}
             type="informing"
             onCloseClick={() => setShowMultipleModulesModal(true)}
             closeButton={
               <StyledText
                 as="p"
                 textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                marginRight={SPACING.spacing3}
               >
                 {t('learn_more')}
               </StyledText>
@@ -104,6 +111,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         marginTop={SPACING.spacing4}
         marginLeft={SPACING.spacingM}
+        marginBottom={SPACING.spacing2}
       >
         <StyledText
           css={TYPOGRAPHY.labelSemiBold}
@@ -134,14 +142,13 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
         flexDirection={DIRECTION_COLUMN}
         width="100%"
         overflowY="auto"
-        marginTop={SPACING.spacing2}
-        marginBottom={SPACING.spacing5}
         data-testid="SetupModulesList_ListView"
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing2}
+        marginBottom={SPACING.spacing5}
       >
         {map(
           moduleRenderInfoForProtocolById,
-          ({ moduleDef, attachedModuleMatch, slotName }) => {
+          ({ moduleDef, attachedModuleMatch, slotName, moduleId }) => {
             return (
               <ModulesListItem
                 key={`SetupModulesList_${moduleDef.model}_slot_${slotName}`}
@@ -149,6 +156,12 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
                 displayName={moduleDef.displayName}
                 location={slotName}
                 attachedModuleMatch={attachedModuleMatch}
+                heaterShakerModuleFromProtocol={
+                  moduleRenderInfoForProtocolById[moduleId].moduleDef
+                    .moduleType === HEATERSHAKER_MODULE_TYPE
+                    ? moduleRenderInfoForProtocolById[moduleId]
+                    : null
+                }
               />
             )
           }
@@ -163,6 +176,7 @@ interface ModulesListItemProps {
   displayName: string
   location: string
   attachedModuleMatch: AttachedModule | null
+  heaterShakerModuleFromProtocol: ModuleRenderInfoForProtocol | null
 }
 
 export const ModulesListItem = ({
@@ -170,21 +184,40 @@ export const ModulesListItem = ({
   displayName,
   location,
   attachedModuleMatch,
+  heaterShakerModuleFromProtocol,
 }: ModulesListItemProps): JSX.Element => {
   const { t } = useTranslation('protocol_setup')
-
   const moduleConnectionStatus =
     attachedModuleMatch != null
       ? t('module_connected')
       : t('module_not_connected')
+  const [
+    showHeaterShakerFlow,
+    setShowHeaterShakerFlow,
+  ] = React.useState<Boolean>(false)
+  const heaterShakerAttachedModule =
+    attachedModuleMatch != null &&
+    attachedModuleMatch.moduleType === HEATERSHAKER_MODULE_TYPE
+      ? attachedModuleMatch
+      : null
 
   return (
     <Box
-      css={BORDERS.cardOutlineBorder}
+      border={BORDERS.styleSolid}
+      borderColor={COLORS.medGreyEnabled}
+      borderWidth={SPACING.spacingXXS}
+      borderRadius={BORDERS.radiusSoftCorners}
       padding={SPACING.spacing4}
       backgroundColor={COLORS.white}
       data-testid="ModulesListItem_Row"
     >
+      {showHeaterShakerFlow && heaterShakerModuleFromProtocol != null ? (
+        <HeaterShakerWizard
+          onCloseClick={() => setShowHeaterShakerFlow(false)}
+          moduleFromProtocol={heaterShakerModuleFromProtocol}
+          attachedModule={heaterShakerAttachedModule}
+        />
+      ) : null}
       <Flex
         flexDirection={DIRECTION_ROW}
         alignItems={JUSTIFY_CENTER}
@@ -192,9 +225,43 @@ export const ModulesListItem = ({
       >
         <Flex alignItems={JUSTIFY_CENTER} width="45%">
           <img width="60px" height="54px" src={getModuleImage(moduleModel)} />
-          <StyledText css={TYPOGRAPHY.pSemiBold} marginLeft={SPACING.spacingM}>
-            {displayName}
-          </StyledText>
+          <Flex flexDirection={DIRECTION_COLUMN}>
+            <StyledText
+              css={TYPOGRAPHY.pSemiBold}
+              marginLeft={SPACING.spacingM}
+            >
+              {displayName}
+            </StyledText>
+            {moduleModel === HEATERSHAKER_MODULE_V1 ? (
+              <Btn
+                marginLeft={SPACING.spacingM}
+                css={css`
+                  color: ${COLORS.darkGreyEnabled};
+
+                  &:hover {
+                    color: ${COLORS.darkBlackEnabled};
+                  }
+                `}
+                marginTop={SPACING.spacing2}
+                onClick={() => setShowHeaterShakerFlow(true)}
+              >
+                <Flex flexDirection={DIRECTION_ROW}>
+                  <Icon
+                    name="information"
+                    size="0.75rem"
+                    marginTop={SPACING.spacingXS}
+                  />
+                  <StyledText
+                    marginLeft={SPACING.spacing2}
+                    textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                    as="p"
+                  >
+                    {t('view_module_setup_instructions')}
+                  </StyledText>
+                </Flex>
+              </Btn>
+            ) : null}
+          </Flex>
         </Flex>
         <StyledText as="p" width="15%">
           {t('slot_location', {

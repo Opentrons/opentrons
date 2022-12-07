@@ -1,7 +1,7 @@
 """Test state getters for retrieving geometry views of state."""
 import pytest
 from decoy import Decoy
-from typing import cast, Union
+from typing import cast, List, Tuple, Union, Optional
 
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
@@ -24,6 +24,7 @@ from opentrons.protocol_engine.types import (
 from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.modules import ModuleView
 from opentrons.protocol_engine.state.geometry import GeometryView
+from opentrons.protocol_engine.state.pipettes import CurrentWell
 
 
 @pytest.fixture
@@ -327,6 +328,56 @@ def test_get_all_labware_highest_z_with_modules(
     result = subject.get_all_labware_highest_z()
 
     assert result == 1337.0
+
+
+@pytest.mark.parametrize(
+    ["location", "min_z_height", "expected_min_z"],
+    [
+        (None, None, 0),
+        (None, 1337, 1337),
+        (CurrentWell("other-pipette-id", "labware-id", "well-name"), None, 0),
+        (CurrentWell("pipette-id", "other-labware-id", "well-name"), None, 0),
+        (CurrentWell("pipette-id", "labware-id", "well-name"), None, 20.22),
+        (CurrentWell("pipette-id", "labware-id", "well-name"), 1.23, 20.22),
+        (CurrentWell("pipette-id", "labware-id", "well-name"), 1337, 1337),
+    ],
+)
+def test_get_min_travel_z(
+    decoy: Decoy,
+    well_plate_def: LabwareDefinition,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    location: Optional[CurrentWell],
+    min_z_height: Optional[float],
+    expected_min_z: float,
+    subject: GeometryView,
+) -> None:
+    """It should find the minimum travel z."""
+    labware_data = LoadedLabware(
+        id="labware-id",
+        loadName="load-name",
+        definitionUri="definition-uri",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+        offsetId="offset-id",
+    )
+
+    decoy.when(labware_view.get("labware-id")).then_return(labware_data)
+    decoy.when(labware_view.get_definition("labware-id")).then_return(well_plate_def)
+    decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
+        LabwareOffsetVector(x=0, y=0, z=3)
+    )
+    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_3)).then_return(
+        Point(0, 0, 3)
+    )
+
+    decoy.when(module_view.get_all()).then_return([])
+    decoy.when(labware_view.get_all()).then_return([])
+
+    min_travel_z = subject.get_min_travel_z(
+        "pipette-id", "labware-id", location, min_z_height
+    )
+
+    assert min_travel_z == expected_min_z
 
 
 def test_get_labware_position(
@@ -904,3 +955,52 @@ def test_get_labware_center(
     )
 
     assert labware_center == expected_center_point
+
+
+@pytest.mark.parametrize(
+    argnames=["location", "should_dodge", "expected_waypoints"],
+    argvalues=[
+        (None, True, []),
+        (CurrentWell("pipette-id", "from-labware-id", "well-name"), False, []),
+        (CurrentWell("pipette-id", "from-labware-id", "well-name"), True, [(11, 22)]),
+    ],
+)
+def test_get_extra_waypoints(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    location: Optional[CurrentWell],
+    should_dodge: bool,
+    expected_waypoints: List[Tuple[float, float]],
+    subject: GeometryView,
+) -> None:
+    """It should return extra waypoints if thermocycler should be dodged."""
+    decoy.when(labware_view.get("from-labware-id")).then_return(
+        LoadedLabware(
+            id="labware1",
+            loadName="load-name1",
+            definitionUri="1234",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        )
+    )
+    decoy.when(labware_view.get("to-labware-id")).then_return(
+        LoadedLabware(
+            id="labware2",
+            loadName="load-name2",
+            definitionUri="4567",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
+        )
+    )
+
+    decoy.when(
+        module_view.should_dodge_thermocycler(
+            from_slot=DeckSlotName.SLOT_1, to_slot=DeckSlotName.SLOT_2
+        )
+    ).then_return(should_dodge)
+    decoy.when(
+        labware_view.get_slot_center_position(slot=DeckSlotName.SLOT_5)
+    ).then_return(Point(x=11, y=22, z=33))
+
+    extra_waypoints = subject.get_extra_waypoints("to-labware-id", location)
+
+    assert extra_waypoints == expected_waypoints

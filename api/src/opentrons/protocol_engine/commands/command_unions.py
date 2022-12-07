@@ -222,7 +222,7 @@ Command = Union[
     thermocycler.RunProfile,
     calibration.CalibrateGripper,
     calibration.CalibratePipette,
-    calibration.MoveToLocation,
+    calibration.MoveToMaintenancePosition,
 ]
 
 CommandParams = Union[
@@ -271,7 +271,7 @@ CommandParams = Union[
     thermocycler.RunProfileStepParams,
     calibration.CalibrateGripperParams,
     calibration.CalibratePipetteParams,
-    calibration.MoveToLocationParams,
+    calibration.MoveToMaintenancePositionParams,
 ]
 
 CommandType = Union[
@@ -319,7 +319,7 @@ CommandType = Union[
     thermocycler.RunProfileCommandType,
     calibration.CalibrateGripperCommandType,
     calibration.CalibratePipetteCommandType,
-    calibration.MoveToLocationCommandType,
+    calibration.MoveToMaintenancePositionCommandType,
 ]
 
 CommandCreate = Union[
@@ -367,7 +367,7 @@ CommandCreate = Union[
     thermocycler.RunProfileCreate,
     calibration.CalibrateGripperCreate,
     calibration.CalibratePipetteCreate,
-    calibration.MoveToLocationCreate,
+    calibration.MoveToMaintenancePositionCreate,
 ]
 
 CommandResult = Union[
@@ -415,5 +415,5 @@ CommandResult = Union[
     thermocycler.RunProfileResult,
     calibration.CalibrateGripperResult,
     calibration.CalibratePipetteResult,
-    calibration.MoveToLocationResult,
+    calibration.MoveToMaintenancePositionResult,
 ]

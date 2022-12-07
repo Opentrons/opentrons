@@ -9,6 +9,7 @@ import { useIsRobotViewable, useRunStatuses } from '../hooks'
 import { ModuleCard } from '../../ModuleCard'
 import { InstrumentsAndModules } from '../InstrumentsAndModules'
 import { PipetteCard } from '../PipetteCard'
+import { getIs96ChannelPipetteAttached } from '../utils'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../hooks')
@@ -16,6 +17,7 @@ jest.mock('../../ModuleCard')
 jest.mock('../PipetteCard')
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../../../atoms/Banner')
+jest.mock('../utils')
 jest.mock('../../RunTimeControl/hooks')
 
 const mockUseModulesQuery = useModulesQuery as jest.MockedFunction<
@@ -36,6 +38,9 @@ const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
 const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
   typeof useRunStatuses
 >
+const mockGetIs96ChannelPipetteAttached = getIs96ChannelPipetteAttached as jest.MockedFunction<
+  typeof getIs96ChannelPipetteAttached
+>
 
 const render = () => {
   return renderWithProviders(<InstrumentsAndModules robotName="otie" />, {
@@ -52,6 +57,7 @@ describe('InstrumentsAndModules', () => {
       isRunStill: true,
       isRunTerminal: false,
     })
+    mockGetIs96ChannelPipetteAttached.mockReturnValue(false)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -83,7 +89,7 @@ describe('InstrumentsAndModules', () => {
 
     getByText('Mock ModuleCard')
   })
-  it('renders a pipette card when a robot is viewable', () => {
+  it('renders pipette cards when a robot is viewable', () => {
     mockUseIsRobotViewable.mockReturnValue(true)
     mockUseModulesQuery.mockReturnValue({
       data: { data: [mockMagneticModule] },
@@ -105,5 +111,12 @@ describe('InstrumentsAndModules', () => {
     const [{ getByText }] = render()
 
     getByText('mock Banner')
+  })
+  it('renders 1 pipette card when a 96 channel is attached', () => {
+    mockPipetteCard.mockReturnValue(<div>Mock PipetteCard</div>)
+    mockGetIs96ChannelPipetteAttached.mockReturnValue(true)
+    mockUseIsRobotViewable.mockReturnValue(true)
+    const [{ getByText }] = render()
+    getByText('Mock PipetteCard')
   })
 })

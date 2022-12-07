@@ -40,10 +40,16 @@ def subject(
     )
 
 
-@pytest.mark.parametrize("api_version", [APIVersion(2, 0), APIVersion(2, 1)])
+@pytest.mark.parametrize("api_version", [APIVersion(2, 13)])
 def test_api_version(api_version: APIVersion, subject: Well) -> None:
     """It should have an api_version property."""
     assert subject.api_version == api_version
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 12)])
+def test_api_version_clamped(subject: Well) -> None:
+    """It should not allow the API version to go any lower than 2.13."""
+    assert subject.api_version == APIVersion(2, 13)
 
 
 def test_parent(mock_parent: Labware, subject: Well) -> None:

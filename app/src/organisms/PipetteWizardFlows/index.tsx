@@ -20,6 +20,8 @@ import { AttachProbe } from './AttachProbe'
 import { DetachProbe } from './DetachProbe'
 import { Results } from './Results'
 import { ExitModal } from './ExitModal'
+import { MountPipette } from './MountPipette'
+import { DetachPipette } from './DetachPipette'
 
 import type { PipetteMount } from '@opentrons/shared-data'
 import type { State } from '../../redux/types'
@@ -138,7 +140,6 @@ export const PipetteWizardFlows = (
   let onExit
   if (currentStep == null) return null
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
-
   if (isExiting === true) {
     modalContent = <InProgressModal description={t('stand_back')} />
   }
@@ -154,7 +155,7 @@ export const PipetteWizardFlows = (
     )
   } else if (currentStep.section === SECTIONS.ATTACH_PROBE) {
     onExit = confirmExit
-    modalContent = modalContent = showConfirmExit ? (
+    modalContent = showConfirmExit ? (
       exitModal
     ) : (
       <AttachProbe
@@ -165,7 +166,7 @@ export const PipetteWizardFlows = (
     )
   } else if (currentStep.section === SECTIONS.DETACH_PROBE) {
     onExit = confirmExit
-    modalContent = modalContent = showConfirmExit ? (
+    modalContent = showConfirmExit ? (
       exitModal
     ) : (
       <DetachProbe
@@ -176,10 +177,24 @@ export const PipetteWizardFlows = (
     )
   } else if (currentStep.section === SECTIONS.RESULTS) {
     onExit = confirmExit
-    modalContent = modalContent = showConfirmExit ? (
+    modalContent = showConfirmExit ? (
       exitModal
     ) : (
       <Results {...currentStep} {...calibrateBaseProps} proceed={closeFlow} />
+    )
+  } else if (currentStep.section === SECTIONS.MOUNT_PIPETTE) {
+    onExit = confirmExit
+    modalContent = showConfirmExit ? (
+      exitModal
+    ) : (
+      <MountPipette {...currentStep} {...calibrateBaseProps} />
+    )
+  } else if (currentStep.section === SECTIONS.DETACH_PIPETTE) {
+    onExit = confirmExit
+    modalContent = showConfirmExit ? (
+      exitModal
+    ) : (
+      <DetachPipette {...currentStep} {...calibrateBaseProps} />
     )
   }
 
@@ -189,7 +204,16 @@ export const PipetteWizardFlows = (
       wizardTitle = t('calibrate_pipette')
       break
     }
+    case FLOWS.ATTACH: {
+      wizardTitle = t('attach_pipette')
+      break
+    }
+    case FLOWS.DETACH: {
+      wizardTitle = t('detach_pipette')
+      break
+    }
   }
+
   let exitWizardButton = onExit
   if (isRobotMoving) {
     exitWizardButton = undefined

@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from typing import List, Optional
 
-from opentrons.types import MountType, Point, DeckSlotName
+from opentrons.types import MountType, Point
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.motion_planning.adjacent_slots_getters import (
     get_east_west_slots,
@@ -10,6 +10,7 @@ from opentrons.motion_planning.adjacent_slots_getters import (
 )
 from opentrons import motion_planning
 
+from . import move_types
 from .. import errors
 from ..types import WellLocation
 from .labware import LabwareView
@@ -78,57 +79,40 @@ class MotionView:
         origin_cp: Optional[CriticalPoint],
         max_travel_z: float,
         current_well: Optional[CurrentWell] = None,
+        force_direct: bool = False,
+        minimum_z_height: Optional[float] = None,
     ) -> List[motion_planning.Waypoint]:
         """Calculate waypoints to a destination that's specified as a well."""
         location = current_well or self._pipettes.get_current_well()
-        center_dest = self._labware.get_has_quirk(
+        center_destination = self._labware.get_has_quirk(
             labware_id,
             "centerMultichannelOnWells",
         )
 
-        dest = self._geometry.get_well_position(
+        destination = self._geometry.get_well_position(
             labware_id,
             well_name,
             well_location,
         )
-        dest_cp = CriticalPoint.XY_CENTER if center_dest else None
-        extra_waypoints = []
+        destination_cp = CriticalPoint.XY_CENTER if center_destination else None
 
-        if (
-            location is not None
-            and pipette_id == location.pipette_id
-            and labware_id == location.labware_id
-        ):
-            move_type = (
-                motion_planning.MoveType.IN_LABWARE_ARC
-                if well_name != location.well_name
-                else motion_planning.MoveType.DIRECT
-            )
-            min_travel_z = self._geometry.get_labware_highest_z(labware_id)
-        else:
-            move_type = motion_planning.MoveType.GENERAL_ARC
-            min_travel_z = self._geometry.get_all_labware_highest_z()
-            if location is not None:
-                if self._module.should_dodge_thermocycler(
-                    from_slot=self._geometry.get_ancestor_slot_name(
-                        location.labware_id
-                    ),
-                    to_slot=self._geometry.get_ancestor_slot_name(labware_id),
-                ):
-                    slot_5_center = self._labware.get_slot_center_position(
-                        slot=DeckSlotName.SLOT_5
-                    )
-                    extra_waypoints = [(slot_5_center.x, slot_5_center.y)]
-            # TODO (spp, 11-29-2021): Should log some kind of warning that pipettes
-            #  could crash onto the thermocycler if current well is not known.
+        move_type = move_types.get_move_type_to_well(
+            pipette_id, labware_id, well_name, location, force_direct
+        )
+        min_travel_z = self._geometry.get_min_travel_z(
+            pipette_id, labware_id, location, minimum_z_height
+        )
+        # TODO (spp, 11-29-2021): Should log some kind of warning that pipettes
+        #  could crash onto the thermocycler if current well is not known.
+        extra_waypoints = self._geometry.get_extra_waypoints(labware_id, location)
 
         try:
             return motion_planning.get_waypoints(
                 move_type=move_type,
                 origin=origin,
                 origin_cp=origin_cp,
-                dest=dest,
-                dest_cp=dest_cp,
+                dest=destination,
+                dest_cp=destination_cp,
                 min_travel_z=min_travel_z,
                 max_travel_z=max_travel_z,
                 xy_waypoints=extra_waypoints,

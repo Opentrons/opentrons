@@ -14,6 +14,7 @@ import {
 } from '@opentrons/components'
 
 import { GlobalStyle } from '../atoms/GlobalStyle'
+import { ToasterOven } from '../atoms/Toast'
 import { Alerts } from '../organisms/Alerts'
 import { Breadcrumbs } from '../organisms/Breadcrumbs'
 import { CalibrationDashboard } from '../pages/Devices/CalibrationDashboard'
@@ -27,8 +28,9 @@ import { AppSettings } from '../pages/AppSettings'
 import { Labware } from '../pages/Labware'
 import { InitialSplash } from '../pages/OnDeviceDisplay/InitialSplash'
 import { ConnectedNetworkInfo } from '../pages/OnDeviceDisplay/ConnectedNetworkInfo'
-import { SelectNetwork } from '../pages/OnDeviceDisplay/SelectNetwork'
+import { SelectWifiNetwork } from '../pages/OnDeviceDisplay/SelectWifiNetwork'
 import { SetWifiCred } from '../pages/OnDeviceDisplay/SetWifiCred'
+import { NetworkSetupMenu } from '../pages/OnDeviceDisplay/NetworkSetupMenu'
 import { getIsOnDevice } from '../redux/config'
 import { getLocalRobot } from '../redux/discovery'
 import { useSoftwareUpdatePoll } from './hooks'
@@ -42,6 +44,7 @@ const stopEvent = (event: React.MouseEvent): void => event.preventDefault()
 export const AppComponent = (): JSX.Element => {
   useSoftwareUpdatePoll()
   const isOnDevice = useSelector(getIsOnDevice)
+  // TODO(bh, 2022-11-30): remove when routes reorganized for ODD, causing app rerenders
   const localRobot = useSelector(getLocalRobot)
 
   const allRoutes: RouteProps[] = [
@@ -114,10 +117,10 @@ export const AppComponent = (): JSX.Element => {
       path: '/device-setup',
     },
     {
-      Component: SelectNetwork,
+      Component: SelectWifiNetwork,
       exact: true,
       name: 'Select Network',
-      path: '/select-network',
+      path: '/connect-via-wifi',
     },
     {
       Component: SetWifiCred,
@@ -130,6 +133,12 @@ export const AppComponent = (): JSX.Element => {
       exact: true,
       name: 'Connected Network Info',
       path: '/connected-network-info/:ssid',
+    },
+    {
+      Component: NetworkSetupMenu,
+      exact: true,
+      name: 'Network setup menu',
+      path: '/network-setup-menu',
     },
   ]
 
@@ -175,29 +184,31 @@ export const AppComponent = (): JSX.Element => {
         ) : (
           <>
             <Navbar routes={routes} />
-            <Box width="100%">
-              <Switch>
-                {routes.map(({ Component, exact, path }: RouteProps) => {
-                  return (
-                    <Route key={path} exact={exact} path={path}>
-                      <Breadcrumbs />
-                      <Box
-                        position={POSITION_RELATIVE}
-                        width="100%"
-                        height="100%"
-                        backgroundColor={COLORS.fundamentalsBackground}
-                        overflow={OVERFLOW_SCROLL}
-                      >
-                        <ModalPortalRoot />
-                        <Component />
-                      </Box>
-                    </Route>
-                  )
-                })}
-                <Redirect exact from="/" to="/protocols" />
-              </Switch>
-              <Alerts />
-            </Box>
+            <ToasterOven>
+              <Box width="100%">
+                <Switch>
+                  {routes.map(({ Component, exact, path }: RouteProps) => {
+                    return (
+                      <Route key={path} exact={exact} path={path}>
+                        <Breadcrumbs />
+                        <Box
+                          position={POSITION_RELATIVE}
+                          width="100%"
+                          height="100%"
+                          backgroundColor={COLORS.fundamentalsBackground}
+                          overflow={OVERFLOW_SCROLL}
+                        >
+                          <ModalPortalRoot />
+                          <Component />
+                        </Box>
+                      </Route>
+                    )
+                  })}
+                  <Redirect exact from="/" to="/protocols" />
+                </Switch>
+                <Alerts />
+              </Box>
+            </ToasterOven>
           </>
         )}
       </Flex>

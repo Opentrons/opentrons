@@ -11,16 +11,16 @@ import { RunTimeCommand } from '@opentrons/shared-data'
 import { StyledText } from '../../../../atoms/text'
 import { getLabwareSetupItemGroups } from './utils'
 import { LabwareListItem } from './LabwareListItem'
+import { OffDeckLabwareList } from './OffDeckLabwareList'
 
 import type { ModuleTypesThatRequireExtraAttention } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
 import type { ModuleRenderInfoForProtocol } from '../../hooks'
-import { OffDeckLabwareList } from './OffDeckLabwareList'
 
 const HeaderRow = styled.div`
   display: grid;
   grid-template-columns: 6fr 5fr;
   grip-gap: ${SPACING.spacing3};
-  padding: ${SPACING.spacing4};
+  padding: ${SPACING.spacing3};
 `
 interface SetupLabwareListProps {
   attachedModuleInfo: { [moduleId: string]: ModuleRenderInfoForProtocol }
@@ -35,7 +35,11 @@ export function SetupLabwareList(
   const { offDeckItems, onDeckItems } = getLabwareSetupItemGroups(commands)
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing2}
+      marginBottom={SPACING.spacing4}
+    >
       <HeaderRow>
         <StyledText as="label" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {t('labware_name')}

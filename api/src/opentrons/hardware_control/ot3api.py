@@ -19,6 +19,11 @@ from typing import (
 )
 
 from opentrons_shared_data.pipette import name_config
+from opentrons_shared_data.pipette.dev_types import (
+    PipetteName,
+)
+from opentrons_shared_data.gripper.constants import IDLE_STATE_GRIP_FORCE
+
 from opentrons import types as top_types
 from opentrons.config import robot_configs
 from opentrons.config.types import (
@@ -97,10 +102,6 @@ from .motion_utilities import (
     deck_from_machine,
     machine_from_deck,
     machine_vector_from_deck_vector,
-)
-
-from opentrons_shared_data.pipette.dev_types import (
-    PipetteName,
 )
 
 from .dev_types import (
@@ -669,9 +670,22 @@ class OT3API(
         fail_on_not_homed: bool = False,
     ) -> Dict[Axis, float]:
         """
-        Return the encoder position in relative coords specified mount.
-        TODO: CF Might want to make these coordinates to absolute in deck
-        coordinates
+        Return the encoder position in absolute deck coords specified mount.
+        """
+        ot3pos = await self.encoder_current_position_ot3(
+            mount, critical_point, refresh, fail_on_not_homed
+        )
+        return {ot3ax.to_axis(): value for ot3ax, value in ot3pos.items()}
+
+    async def encoder_current_position_ot3(
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        critical_point: Optional[CriticalPoint] = None,
+        refresh: bool = False,
+        fail_on_not_homed: bool = False,
+    ) -> Dict[OT3Axis, float]:
+        """
+        Return the encoder position in absolute deck coords specified mount.
         """
         z_ax = OT3Axis.by_mount(mount)
         plunger_ax = OT3Axis.of_main_tool_actuator(mount)
@@ -697,7 +711,7 @@ class OT3API(
                 self._encoder_current_position,
                 critical_point,
             )
-            return {ot3ax.to_axis(): value for ot3ax, value in ot3pos.items()}
+            return ot3pos
 
     def _effector_pos_from_carriage_pos(
         self,
@@ -775,6 +789,7 @@ class OT3API(
             checked_max = None
 
         await self._cache_and_maybe_retract_mount(realmount)
+        await self._move_gripper_to_idle_position(realmount)
         await self._move(target_position, speed=speed, max_speeds=checked_max)
 
     async def move_rel(
@@ -817,6 +832,7 @@ class OT3API(
         else:
             checked_max = None
         await self._cache_and_maybe_retract_mount(realmount)
+        await self._move_gripper_to_idle_position(realmount)
         await self._move(
             target_position,
             speed=speed,
@@ -835,6 +851,27 @@ class OT3API(
         if mount != self._last_moved_mount and self._last_moved_mount:
             await self.retract(self._last_moved_mount, 10)
         self._last_moved_mount = mount
+
+    async def _move_gripper_to_idle_position(self, mount_in_use: OT3Mount) -> None:
+        """Move gripper to its idle, gripped position.
+
+        If the gripper is not currently in use, puts its jaws in a low-current,
+        gripped position. Experimental behavior in order to prevent gripper jaws
+        from colliding into thermocycler lid & lid latch clips.
+        """
+        # TODO: see https://opentrons.atlassian.net/browse/RLAB-214
+        if (
+            self._gripper_handler.gripper
+            and mount_in_use != OT3Mount.GRIPPER
+            and self._gripper_handler.gripper.state != GripperJawState.GRIPPING
+        ):
+            if self._gripper_handler.gripper.state == GripperJawState.UNHOMED:
+                self._log.warning(
+                    "Gripper jaw is not homed. Can't be moved to idle position"
+                )
+            else:
+                # allows for safer gantry movement at minimum force
+                await self.grip(force_newtons=IDLE_STATE_GRIP_FORCE)
 
     @ExecutionManagerProvider.wait_for_running
     async def _move(
@@ -1094,7 +1131,7 @@ class OT3API(
             raise
 
     async def grip(self, force_newtons: float) -> None:
-        self._gripper_handler.check_ready_for_grip()
+        self._gripper_handler.check_ready_for_jaw_move()
         dc = self._gripper_handler.get_duty_cycle_by_grip_force(force_newtons)
         await self._grip(duty_cycle=dc)
         self._gripper_handler.set_jaw_state(GripperJawState.GRIPPING)
