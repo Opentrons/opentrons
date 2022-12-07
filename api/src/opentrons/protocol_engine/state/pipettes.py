@@ -87,7 +87,11 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         elif isinstance(action, SetPipetteMovementSpeedAction):
             self._state.movement_speed_by_id[action.pipette_id] = action.speed
         elif isinstance(action, AddPipetteConfigAction):
-            self._state.static_config_by_id[action.pipette_id] = action.static_config
+            self._state.static_config_by_id[action.pipette_id] = StaticPipetteConfig(
+                model=action.model,
+                min_volume=action.min_volume,
+                max_volume=action.max_volume,
+            )
 
     def _handle_command(self, command: Command) -> None:
         self._update_current_well(command)

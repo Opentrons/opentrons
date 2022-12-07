@@ -31,7 +31,6 @@ from opentrons.protocol_engine.types import (
     ModuleModel,
     ModuleDefinition,
     OFF_DECK_LOCATION,
-    StaticPipetteConfig,
 )
 
 from opentrons.protocol_engine.state import Config, StateStore
@@ -489,9 +488,10 @@ async def test_load_pipette(
         action_dispatcher.dispatch(
             AddPipetteConfigAction(
                 pipette_id="unique-id",
-                static_config=StaticPipetteConfig(
-                    model="pipette-model", min_volume=1.23, max_volume=4.56, channels=7
-                ),
+                model="pipette-model",
+                min_volume=1.23,
+                max_volume=4.56,
+                channels=7,
             )
         ),
     )
@@ -532,9 +532,10 @@ async def test_load_pipette_96_channels(
         action_dispatcher.dispatch(
             AddPipetteConfigAction(
                 pipette_id="unique-id",
-                static_config=StaticPipetteConfig(
-                    model="pipette-model", min_volume=1.23, max_volume=4.56, channels=7
-                ),
+                model="pipette-model",
+                min_volume=1.23,
+                max_volume=4.56,
+                channels=7,
             )
         ),
     )
@@ -571,9 +572,10 @@ async def test_load_pipette_uses_provided_id(
         action_dispatcher.dispatch(
             AddPipetteConfigAction(
                 pipette_id="my-pipette-id",
-                static_config=StaticPipetteConfig(
-                    model="pipette-model", min_volume=1.23, max_volume=4.56, channels=7
-                ),
+                model="pipette-model",
+                min_volume=1.23,
+                max_volume=4.56,
+                channels=7,
             )
         )
     )
@@ -625,9 +627,10 @@ async def test_load_pipette_checks_existence_with_already_loaded(
         action_dispatcher.dispatch(
             AddPipetteConfigAction(
                 pipette_id="unique-id",
-                static_config=StaticPipetteConfig(
-                    model="pipette-model", min_volume=1.23, max_volume=4.56, channels=7
-                ),
+                model="pipette-model",
+                min_volume=1.23,
+                max_volume=4.56,
+                channels=7,
             )
         ),
     )

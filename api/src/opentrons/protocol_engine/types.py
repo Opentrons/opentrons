@@ -107,7 +107,6 @@ class StaticPipetteConfig(BaseModel):
     model: str
     min_volume: float
     max_volume: float
-    channels: int
 
 
 class LoadedPipette(BaseModel):

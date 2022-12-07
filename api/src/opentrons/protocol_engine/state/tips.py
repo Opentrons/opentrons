@@ -25,6 +25,7 @@ TipRackStateByWellName = Dict[str, TipRackWellState]
 _96_CHANNEL_PIPETTE = 96
 _8_CHANNEL_PIPETTE = 8
 
+
 @dataclass
 class TipState:
     """State of all tips."""
@@ -71,7 +72,7 @@ class TipStore(HasState[TipState], HandlesActions):
             labware_id = action.command.params.labwareId
             well_name = action.command.params.wellName
             pipette_id = action.command.params.pipetteId
-            self._update_used_tips(
+            self._set_used_tips(
                 pipette_id=pipette_id, well_name=well_name, labware_id=labware_id
             )
 
@@ -84,13 +85,9 @@ class TipStore(HasState[TipState], HandlesActions):
                 ] = TipRackWellState.CLEAN
 
         elif isinstance(action, AddPipetteConfigAction):
-            self._state.channels_by_pipette_id[
-                action.pipette_id
-            ] = action.static_config.channels
+            self._state.channels_by_pipette_id[action.pipette_id] = action.channels
 
-    def _set_used_tips(
-        self, pipette_id: str, well_name: str, labware_id: str
-    ) -> None:
+    def _set_used_tips(self, pipette_id: str, well_name: str, labware_id: str) -> None:
         pipette_channels = self._state.channels_by_pipette_id.get(pipette_id)
         if pipette_channels == _96_CHANNEL_PIPETTE:
             for well_name in self._state.tips_by_labware_id[labware_id].keys():

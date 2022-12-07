@@ -7,7 +7,6 @@ from typing import Optional
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from opentrons.protocol_engine import actions, commands
-from opentrons.protocol_engine.types import StaticPipetteConfig
 from opentrons.protocol_engine.state.tips import TipStore, TipView
 
 
@@ -123,9 +122,10 @@ def test_get_next_tip_skips_picked_up_tip(
     subject.handle_action(
         actions.AddPipetteConfigAction(
             pipette_id="pipette-id",
-            static_config=StaticPipetteConfig.construct(  # type: ignore[call-arg]
-                channels=1
-            ),
+            channels=1,
+            max_volume=15,
+            min_volume=3,
+            model="gen a",
         )
     )
     subject.handle_action(actions.UpdateCommandAction(command=pick_up_tip_command))
@@ -149,9 +149,10 @@ def test_get_next_tip_with_column(
     subject.handle_action(
         actions.AddPipetteConfigAction(
             pipette_id="pipette-id",
-            static_config=StaticPipetteConfig.construct(  # type: ignore[call-arg]
-                channels=1
-            ),
+            channels=1,
+            max_volume=15,
+            min_volume=3,
+            model="gen a",
         )
     )
     subject.handle_action(actions.UpdateCommandAction(command=pick_up_tip_command))
@@ -191,9 +192,10 @@ def test_reset_tips(
     subject.handle_action(
         actions.AddPipetteConfigAction(
             pipette_id="pipette-id",
-            static_config=StaticPipetteConfig.construct(  # type: ignore[call-arg]
-                channels=8
-            ),
+            channels=8,
+            max_volume=15,
+            min_volume=3,
+            model="gen a",
         )
     )
     subject.handle_action(actions.UpdateCommandAction(command=pick_up_tip_command))
@@ -221,9 +223,10 @@ def test_tip_tracking(
     subject.handle_action(
         actions.AddPipetteConfigAction(
             pipette_id="pipette-id",
-            static_config=StaticPipetteConfig.construct(  # type: ignore[call-arg]
-                channels=input_channels
-            ),
+            channels=input_channels,
+            max_volume=15,
+            min_volume=3,
+            model="gen a",
         )
     )
     subject.handle_action(actions.UpdateCommandAction(command=pick_up_tip_command))
