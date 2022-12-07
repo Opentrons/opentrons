@@ -110,6 +110,11 @@ async def _test_current_calibration(api: OT3API, mount: OT3Mount, pos: Point) ->
         input("ENTER to move to center of slot to test Pipette calibration: ")
         await api.move_to(mount, pos)
         input("Check by EYE, then press ENTER to continue: ")
+        is_multi = "multi" in api.hardware_pipettes[mount.to_mount()].name
+        if is_multi and "y" in input("check if level to deck? (y/n):"):
+            await _check_multi_channel_to_deck_alignment(
+                api, mount, pos, pos
+            )
         return Point()
 
 
@@ -319,10 +324,6 @@ async def _find_the_square(api: OT3API, mount: OT3Mount, expected_pos: Point) ->
         else:
             input("add probe to Pipette, then press ENTER: ")
         found_pos = await _find_square_center(api, mount, expected_pos)
-        if is_multi and "y" in input("check if level to deck? (y/n):"):
-            await _check_multi_channel_to_deck_alignment(
-                api, mount, expected_pos, found_pos
-            )
     return found_pos
 
 
