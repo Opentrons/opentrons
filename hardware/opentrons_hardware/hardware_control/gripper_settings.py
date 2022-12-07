@@ -79,18 +79,22 @@ async def get_gripper_jaw_motor_param(
     def _filter(arbitration_id: ArbitrationId) -> bool:
         return NodeId(arbitration_id.parts.originating_node_id) == NodeId.gripper_g
 
+    async def _wait_for_response(reader: WaitableCallback) -> DriverConfig:
+        """Listener for receiving messages back."""
+        async for response, _ in reader:
+            return DriverConfig(
+                reference_voltage=float(response.payload.v_ref / (2**16)),
+                duty_cycle=int(response.payload.duty_cycle / (2**16)),
+            )
+        raise StopAsyncIteration
+
     with WaitableCallback(can_messenger, _filter) as reader:
         await can_messenger.send(
             node_id=NodeId.gripper_g,
             message=BrushedMotorConfRequest(),
         )
         try:
-            response = await asyncio.wait_for(reader.read(), 1.0)
-            assert isinstance(response, BrushedMotorConfResponse)
-            return DriverConfig(
-                reference_voltage=float(response.payload.v_ref / (2**16)),
-                duty_cycle=int(response.payload.duty_cycle / (2**16)),
-            )
+            return await asyncio.wait_for(_wait_for_response(reader), 1.0)
         except asyncio.TimeoutError:
             log.warning("Read brushed motor driver config timed out")
             raise StopAsyncIteration
