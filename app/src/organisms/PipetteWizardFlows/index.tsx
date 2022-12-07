@@ -1,14 +1,15 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { getAttachedPipettes } from '../../redux/pipettes'
 import { useConditionalConfirm } from '@opentrons/components'
+import { SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 import {
   useHost,
   useCreateRunMutation,
   useStopRunMutation,
 } from '@opentrons/react-api-client'
 import { ModalShell } from '../../molecules/Modal'
+import { getAttachedPipettes } from '../../redux/pipettes'
 import { Portal } from '../../App/portal'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
@@ -23,11 +24,10 @@ import { ExitModal } from './ExitModal'
 import { MountPipette } from './MountPipette'
 import { DetachPipette } from './DetachPipette'
 import { Carriage } from './Carriage'
-
+import { MountingPlate } from './MountingPlate'
 import type { PipetteMount } from '@opentrons/shared-data'
 import type { State } from '../../redux/types'
 import type { PipetteWizardFlow, SelectablePipettes } from './types'
-import { MountingPlate } from './MountingPlate'
 
 interface PipetteWizardFlowsProps {
   flowType: PipetteWizardFlow
@@ -50,7 +50,6 @@ export const PipetteWizardFlows = (
     mount,
     selectedPipette
   )
-  console.log(selectedPipette)
   const host = useHost()
   const [runId, setRunId] = React.useState<string>('')
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
@@ -241,15 +240,27 @@ export const PipetteWizardFlows = (
   let wizardTitle: string = 'unknown page'
   switch (flowType) {
     case FLOWS.CALIBRATE: {
-      wizardTitle = t('calibrate_pipette')
+      if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
+        wizardTitle = t('calibrate_pipette')
+      } else {
+        wizardTitle = t('calibrate_96_channel')
+      }
       break
     }
     case FLOWS.ATTACH: {
-      wizardTitle = t('attach_pipette')
+      if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
+        wizardTitle = t('attach_pipette')
+      } else {
+        wizardTitle = t('attach_96_channel')
+      }
       break
     }
     case FLOWS.DETACH: {
-      wizardTitle = t('detach_pipette')
+      if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
+        wizardTitle = t('detach_pipette')
+      } else {
+        wizardTitle = t('detach_96_channel')
+      }
       break
     }
   }

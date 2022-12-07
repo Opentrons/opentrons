@@ -90,9 +90,7 @@ describe('DetachPipette', () => {
       'The pipette is heavy so be cautious during uninstall. Having a helper near can be really helpful during this process.'
     )
     getByAltText('Unscrew 96 channel pipette')
-    const proceedBtn = getByRole('button', { name: 'Continue' })
-    fireEvent.click(proceedBtn)
-    expect(props.proceed).toHaveBeenCalled()
+    getByText('mock check pipette button')
     const backBtn = getByRole('button', { name: 'Go back' })
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()
