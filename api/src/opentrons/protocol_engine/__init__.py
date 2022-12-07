@@ -41,6 +41,7 @@ from .types import (
     ModuleModel,
     ModuleDefinition,
     Liquid,
+    StaticPipetteConfig,
 )
 
 
@@ -87,6 +88,7 @@ __all__ = [
     "ModuleModel",
     "ModuleDefinition",
     "Liquid",
+    "StaticPipetteConfig",
     # plugins
     "AbstractPlugin",
 ]

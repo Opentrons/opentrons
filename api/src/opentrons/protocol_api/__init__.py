@@ -10,6 +10,7 @@ from opentrons.protocols.api_support.definitions import (
 )
 
 from .protocol_context import ProtocolContext
+from .deck import Deck
 from .instrument_context import InstrumentContext
 from .labware import Labware, Well
 from .module_contexts import (
@@ -26,6 +27,7 @@ __all__ = [
     "MAX_SUPPORTED_VERSION",
     "MIN_SUPPORTED_VERSION",
     "ProtocolContext",
+    "Deck",
     "ModuleContext",
     "InstrumentContext",
     "TemperatureModuleContext",
