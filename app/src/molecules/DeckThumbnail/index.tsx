@@ -2,8 +2,6 @@ import * as React from 'react'
 import map from 'lodash/map'
 
 import { RobotWorkSpace, Module, LabwareRender } from '@opentrons/components'
-import { useFeatureFlag } from '../../redux/config'
-
 import {
   inferModuleOrientationFromXCoordinate,
   getModuleDef2,
