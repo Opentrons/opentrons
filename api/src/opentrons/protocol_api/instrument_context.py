@@ -35,6 +35,9 @@ AdvancedLiquidHandling = Union[
     Sequence[Sequence[labware.Well]],
 ]
 
+_DEFAULT_ASPIRATE_CLEARANCE = 1.0
+_DEFAULT_DISPENSE_CLEARANCE = 1.0
+
 _log = logging.getLogger(__name__)
 
 _PREP_AFTER_ADDED_IN = APIVersion(2, 13)
@@ -78,7 +81,8 @@ class InstrumentContext(publisher.CommandPublisher):
         self._last_tip_picked_up_from: Union[labware.Well, None] = None
         self._starting_tip: Union[labware.Well, None] = None
         self._well_bottom_clearances = Clearances(
-            default_aspirate=1.0, default_dispense=1.0
+            default_aspirate=_DEFAULT_ASPIRATE_CLEARANCE,
+            default_dispense=_DEFAULT_DISPENSE_CLEARANCE,
         )
 
         self.trash_container = trash
