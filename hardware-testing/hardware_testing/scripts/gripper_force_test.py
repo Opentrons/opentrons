@@ -43,6 +43,13 @@ class Gripper_Force_Test:
         self.force = force
         self.interval = interval
         self.engage_position = Point(0, 0, -80)
+        self.measurement_data = {
+            "RMS":0,
+            "Peak Plus":0,
+            "Peak Minus":0,
+            "PWM Duty Cycle":0,
+            "PWM Frequency":0,
+        }
         self.test_data ={
             "Time":"None",
             "Cycle":"None",
@@ -96,6 +103,11 @@ class Gripper_Force_Test:
     def dict_values_to_line(self, dict):
         return str.join(",", list(dict.values()))+"\n"
 
+    def _read_oscilloscope(self):
+        for index, key in enumerate(self.measurement_data):
+            self.measurement_data[key] = self.oscilloscope.get_measurement(index+1)
+        print(self.measurement_data)
+
     def _get_stable_force(self) -> float:
         _reading = True
         _try = 1
@@ -123,22 +135,22 @@ class Gripper_Force_Test:
         test_data = self.dict_values_to_line(self.test_data)
         data.append_data_to_file(self.test_name, self.test_file, test_data)
 
-    async def _measure_force(
+    async def _move_gripper_jaw(
         self, api: OT3API, mount: OT3Mount
     ) -> None:
         await api.grip(self.force)
         time.sleep(self.interval)
-        measurement = []
-        for i in range(4):
-            measurement.append(self.oscilloscope.get_measurement(i+1))
-            print(f"MEAS #{i+1}", measurement[i])
 
+        print("Gripper Closed")
+        self._read_oscilloscope()
         force = self._get_stable_force()
         print(f"Grip Force: {force} N")
         self.test_data["Force"] = str(force)
 
         await api.ungrip()
         time.sleep(self.interval)
+        print("Gripper Open")
+        self._read_oscilloscope()
 
     async def _engage_gripper(
         self, api: OT3API, mount: OT3Mount
@@ -168,7 +180,7 @@ class Gripper_Force_Test:
                     for j in range(self.trials):
                         trial = j + 1
                         print(f"\n-->> Measuring Trial {trial}/{self.trials}")
-                        await self._measure_force(self.api, self.mount)
+                        await self._move_gripper_jaw(self.api, self.mount)
                         await self._record_data(cycle, trial)
         except Exception as e:
             await self.exit()
