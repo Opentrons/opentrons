@@ -25,6 +25,7 @@ import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { useRunControls } from '../../organisms/RunTimeControl/hooks'
+import { useTrackEvent } from '../../redux/analytics'
 import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
 import { RUN_LOG_WINDOW_SIZE } from './constants'
 import { useDownloadRunLog, useTrackProtocolRunEvent } from './hooks'
@@ -125,6 +126,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     downloadRunLog()
     closeOverflowMenu(e)
   }
+  const trackEvent = useTrackEvent()
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
   const { reset } = useRunControls(runId, onResetSuccess)
   const { deleteRun } = useDeleteRunMutation()
@@ -136,7 +138,10 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     e.stopPropagation()
 
     reset()
-
+    trackEvent({
+      name: 'proceedToRun',
+      properties: { sourceLocation: 'HistoricalProtocolRun' },
+    })
     trackProtocolRunEvent({ name: 'runAgain' })
   }
 

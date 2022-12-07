@@ -5,7 +5,6 @@ from decoy import Decoy
 from opentrons_shared_data.labware.dev_types import LabwareUri
 
 from opentrons.protocol_api.labware import Labware
-from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocols.geometry.module_geometry import (
     ModuleGeometry,
     ThermocyclerGeometry,
@@ -13,7 +12,11 @@ from opentrons.protocols.geometry.module_geometry import (
 )
 from opentrons.protocol_api.core.labware import AbstractLabware
 
-from opentrons.protocols.geometry.deck_conflict import DeckConflictError, check
+from opentrons.protocol_api.core.protocol_api.deck import DeckItem
+from opentrons.protocol_api.core.protocol_api.deck_conflict import (
+    DeckConflictError,
+    check,
+)
 
 
 def test_empty_no_conflict(decoy: Decoy) -> None:
@@ -64,7 +67,7 @@ def test_only_trash_in_12(decoy: Decoy) -> None:
 
 
 def test_trash_override(decoy: Decoy) -> None:
-    """It should allow the trash labware to be replaced with another trash labware"""
+    """It should allow the trash labware to be replaced with another trash labware."""
     trash_labware = decoy.mock(cls=Labware)
     trash_labware_impl = decoy.mock(cls=AbstractLabware)
     not_trash = decoy.mock(cls=Labware)
