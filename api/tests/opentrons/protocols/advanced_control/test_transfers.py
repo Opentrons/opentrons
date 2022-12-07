@@ -37,6 +37,7 @@ def test_check_if_zero():
 
 
 # +++++++ Test transfer types ++++++++++++
+@pytest.mark.ot2_only
 def test_default_transfers(_instr_labware):
     # Transfer 100ml from row1 of labware1 to row1 of labware2: first with
     #  new_tip = ONCE, then with new_tip = NEVER
@@ -138,6 +139,7 @@ def test_default_transfers(_instr_labware):
     assert consd_plan_list == exp3
 
 
+@pytest.mark.ot2_only
 def test_uneven_transfers(_instr_labware):
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]
@@ -227,6 +229,7 @@ def test_uneven_transfers(_instr_labware):
     assert many_to_one_plan_list == exp3
 
 
+@pytest.mark.ot2_only
 def test_location_wells(_instr_labware):
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]
@@ -273,6 +276,7 @@ def test_location_wells(_instr_labware):
             idx_dest += 1
 
 
+@pytest.mark.ot2_only
 def test_no_new_tip(_instr_labware):
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]
@@ -328,6 +332,7 @@ def test_no_new_tip(_instr_labware):
         assert step["method"] != "drop_tip"
 
 
+@pytest.mark.ot2_only
 def test_new_tip_always(_instr_labware, monkeypatch):
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]
@@ -379,6 +384,7 @@ def test_new_tip_always(_instr_labware, monkeypatch):
     assert tiprack.next_tip() == tiprack.columns()[0][4]
 
 
+@pytest.mark.ot2_only
 def test_transfer_w_touchtip_blowout(_instr_labware):
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]
@@ -479,6 +485,7 @@ def test_transfer_w_touchtip_blowout(_instr_labware):
     assert dist_plan_list == exp2
 
 
+@pytest.mark.ot2_only
 def test_transfer_w_airgap_blowout(_instr_labware):
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]
@@ -598,6 +605,7 @@ def test_transfer_w_airgap_blowout(_instr_labware):
     assert consd_plan_list == exp3
 
 
+@pytest.mark.ot2_only
 def test_touchtip_mix(_instr_labware):
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]
@@ -723,6 +731,7 @@ def test_touchtip_mix(_instr_labware):
     assert consd_plan_list == exp3
 
 
+@pytest.mark.ot2_only
 def test_all_options(_instr_labware):
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]
@@ -792,6 +801,7 @@ def test_all_options(_instr_labware):
     assert xfer_plan_list == exp1
 
 
+@pytest.mark.ot2_only
 def test_oversized_distribute(_instr_labware):
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]
@@ -876,6 +886,7 @@ def test_oversized_distribute(_instr_labware):
     assert xfer_plan_list == exp1
 
 
+@pytest.mark.ot2_only
 def test_oversized_consolidate(_instr_labware):
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]
@@ -960,6 +971,7 @@ def test_oversized_consolidate(_instr_labware):
     assert xfer_plan_list == exp1
 
 
+@pytest.mark.ot2_only
 def test_oversized_transfer(_instr_labware):
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]
@@ -1044,6 +1056,7 @@ def test_oversized_transfer(_instr_labware):
     assert xfer_plan_list == exp1
 
 
+@pytest.mark.ot2_only
 def test_multichannel_transfer_old_version(hardware):
     # for API version below 2.2, multichannel pipette can only
     # reach row A of 384-well plates
@@ -1106,6 +1119,7 @@ def test_multichannel_transfer_old_version(hardware):
             xfer_plan_list.append(step)
 
 
+@pytest.mark.ot2_only
 def test_multichannel_transfer_locs(hardware):
     ctx = papi.create_protocol_context(
         api_version=APIVersion(2, 2),
@@ -1174,6 +1188,7 @@ def test_multichannel_transfer_locs(hardware):
         )
 
 
+@pytest.mark.ot2_only
 def test_zero_volume_results_in_no_transfer(_instr_labware):
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]
@@ -1290,6 +1305,7 @@ def test_zero_volume_results_in_no_transfer(_instr_labware):
         assert step == expected
 
 
+@pytest.mark.ot2_only
 def test_zero_volume_causes_transfer_of_disposal_vol(_instr_labware):
     # This test checks the old behavior of distribute and consolidate
     # with zero volumes in which case the volume aspirated/dispensed
@@ -1408,6 +1424,7 @@ def test_zero_volume_causes_transfer_of_disposal_vol(_instr_labware):
         assert step == expected
 
 
+@pytest.mark.ot2_only
 def test_blowout_to_source(_instr_labware):
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]
@@ -1479,6 +1496,7 @@ def test_blowout_to_source(_instr_labware):
         assert step == expected
 
 
+@pytest.mark.ot2_only
 def test_blowout_to_dest(_instr_labware):
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]

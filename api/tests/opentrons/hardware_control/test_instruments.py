@@ -130,6 +130,9 @@ async def test_cache_instruments(sim_and_instr):
         attached_instruments=dummy_instruments, loop=asyncio.get_running_loop()
     )
     await hw_api.cache_instruments()
+
+    with pytest.raises(RuntimeError):
+        await hw_api.cache_instruments({types.Mount.LEFT: "p400_single_1.0"})
     # TODO (lc 12-5-2022) This is no longer true. We should modify this
     # typecheck once we have static and stateful pipette configurations.
     # typeguard.check_type("left mount dict", attached[types.Mount.LEFT], PipetteDict)
@@ -668,38 +671,50 @@ async def test_blowout_flow_rate(sim_and_instr):
 
 
 async def test_reset_instruments(monkeypatch, sim_and_instr):
-    sim_builder, dummy_instruments = sim_and_instr
+    instruments = {
+        types.Mount.LEFT: {
+            "model": "p1000_single_v3.0",
+            "id": "testy",
+            "name": "p1000_single_gen3",
+        },
+        types.Mount.RIGHT: {
+            "model": "p1000_single_v3.0",
+            "id": "testy",
+            "name": "p1000_single_gen3",
+        },
+    }
+    sim_builder, _ = sim_and_instr
     hw_api = await sim_builder(
-        attached_instruments=dummy_instruments, loop=asyncio.get_running_loop()
+        attached_instruments=instruments, loop=asyncio.get_running_loop()
     )
-    hw_api.set_flow_rate(types.Mount.LEFT, 20)
+    hw_api.set_flow_rate(types.Mount.LEFT, 15)
     hw_api.set_flow_rate(types.Mount.RIGHT, 50)
     # gut check
-    assert hw_api.attached_instruments[types.Mount.LEFT]["aspirate_flow_rate"] == 20
+    assert hw_api.attached_instruments[types.Mount.LEFT]["aspirate_flow_rate"] == 15
     assert hw_api.attached_instruments[types.Mount.RIGHT]["aspirate_flow_rate"] == 50
     old_l = hw_api.hardware_instruments[types.Mount.LEFT]
     old_r = hw_api.hardware_instruments[types.Mount.RIGHT]
 
-    assert old_l.aspirate_flow_rate == 20
+    assert old_l.aspirate_flow_rate == 15
     assert old_r.aspirate_flow_rate == 50
     hw_api.reset_instrument(types.Mount.LEFT)
 
     # after the reset, the left should be more or less the same
     assert old_l.pipette_id == hw_api.hardware_instruments[types.Mount.LEFT].pipette_id
-    assert hw_api.hardware_instruments[types.Mount.LEFT].aspirate_flow_rate != 20
-    assert hw_api.hardware_instruments[types.Mount.LEFT].aspirate_flow_rate == 50
+    assert hw_api.hardware_instruments[types.Mount.LEFT].aspirate_flow_rate != 15
+    assert hw_api.hardware_instruments[types.Mount.RIGHT].aspirate_flow_rate == 50
     # but non-default configs should be changed
-    assert hw_api.attached_instruments[types.Mount.LEFT]["aspirate_flow_rate"] != 20
+    assert hw_api.attached_instruments[types.Mount.LEFT]["aspirate_flow_rate"] != 15
     # and the right pipette remains the same
-    assert hw_api.attached_instruments[types.Mount.LEFT]["aspirate_flow_rate"] == 50
+    assert hw_api.attached_instruments[types.Mount.RIGHT]["aspirate_flow_rate"] == 50
 
     # set the flowrate on the left again
     hw_api.set_flow_rate(types.Mount.LEFT, 50)
-    assert hw_api.attached_instruments[types.Mount.LEFT]["aspirate_flow_rate"] == 20
+    assert hw_api.attached_instruments[types.Mount.LEFT]["aspirate_flow_rate"] == 50
     # reset the configurations of both pipettes
     hw_api.reset_instrument()
-    assert hw_api.attached_instruments[types.Mount.LEFT]["aspirate_flow_rate"] != 20
+    assert hw_api.attached_instruments[types.Mount.LEFT]["aspirate_flow_rate"] != 15
     assert hw_api.attached_instruments[types.Mount.RIGHT]["aspirate_flow_rate"] != 50
 
-    assert hw_api.hardware_instruments[types.Mount.LEFT].aspirate_flow_rate != 20
+    assert hw_api.hardware_instruments[types.Mount.LEFT].aspirate_flow_rate != 15
     assert hw_api.hardware_instruments[types.Mount.LEFT].aspirate_flow_rate != 50

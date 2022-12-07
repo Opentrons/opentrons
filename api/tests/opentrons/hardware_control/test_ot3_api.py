@@ -6,10 +6,7 @@ from math import copysign
 import pytest
 from mock import AsyncMock, patch, Mock
 from opentrons.config.types import GantryLoad, CapacitivePassSettings
-from opentrons.hardware_control.dev_types import (
-    AttachedGripper,
-    OT3AttachedPipette
-)
+from opentrons.hardware_control.dev_types import AttachedGripper, OT3AttachedPipette
 from opentrons.hardware_control.instruments.ot3.gripper_handler import (
     GripError,
     GripperHandler,
@@ -137,29 +134,55 @@ async def mock_instrument_handlers(
     "load_configs,load",
     (
         (
-            {OT3Mount.RIGHT: {"channels": 8, "version": 1.0, "model": "p50"}, OT3Mount.LEFT: {"channels": 1, "version": 1.0, "model": "p1000"}},
+            {
+                OT3Mount.RIGHT: {"channels": 8, "version": 1.0, "model": "p50"},
+                OT3Mount.LEFT: {"channels": 1, "version": 1.0, "model": "p1000"},
+            },
             GantryLoad.TWO_LOW_THROUGHPUT,
         ),
         ({}, GantryLoad.NONE),
-        ({OT3Mount.GRIPPER: {"model": GripperModel.V1, "id": "g12345"}}, GantryLoad.GRIPPER),
-        ({OT3Mount.LEFT: {"channels": 8, "version": 1.0, "model": "p1000"}}, GantryLoad.LOW_THROUGHPUT),
-        ({OT3Mount.RIGHT: {"channels": 8, "version": 1.0, "model": "p1000"}}, GantryLoad.LOW_THROUGHPUT),
-        ({OT3Mount.LEFT: {"channels": 96, "model": "p1000", "version": 1.0}}, GantryLoad.HIGH_THROUGHPUT),
         (
-            {OT3Mount.LEFT: {"channels": 1, "version": 1.0, "model": "p1000"}, OT3Mount.GRIPPER: {"model": GripperModel.V1, "id": "g12345"}},
+            {OT3Mount.GRIPPER: {"model": GripperModel.V1, "id": "g12345"}},
+            GantryLoad.GRIPPER,
+        ),
+        (
+            {OT3Mount.LEFT: {"channels": 8, "version": 1.0, "model": "p1000"}},
             GantryLoad.LOW_THROUGHPUT,
         ),
         (
-            {OT3Mount.RIGHT: {"channels": 8, "version": 1.0,  "model": "p1000"}, OT3Mount.GRIPPER: {"model": GripperModel.V1, "id": "g12345"}},
+            {OT3Mount.RIGHT: {"channels": 8, "version": 1.0, "model": "p1000"}},
             GantryLoad.LOW_THROUGHPUT,
         ),
         (
-            {OT3Mount.LEFT: {"channels": 96, "model": "p1000", "version": 1.0}, OT3Mount.GRIPPER: {"model": GripperModel.V1, "id": "g12345"}},
+            {OT3Mount.LEFT: {"channels": 96, "model": "p1000", "version": 1.0}},
+            GantryLoad.HIGH_THROUGHPUT,
+        ),
+        (
+            {
+                OT3Mount.LEFT: {"channels": 1, "version": 1.0, "model": "p1000"},
+                OT3Mount.GRIPPER: {"model": GripperModel.V1, "id": "g12345"},
+            },
+            GantryLoad.LOW_THROUGHPUT,
+        ),
+        (
+            {
+                OT3Mount.RIGHT: {"channels": 8, "version": 1.0, "model": "p1000"},
+                OT3Mount.GRIPPER: {"model": GripperModel.V1, "id": "g12345"},
+            },
+            GantryLoad.LOW_THROUGHPUT,
+        ),
+        (
+            {
+                OT3Mount.LEFT: {"channels": 96, "model": "p1000", "version": 1.0},
+                OT3Mount.GRIPPER: {"model": GripperModel.V1, "id": "g12345"},
+            },
             GantryLoad.HIGH_THROUGHPUT,
         ),
     ),
 )
-async def test_gantry_load_transform(ot3_hardware: ThreadManager[OT3API], load_configs, load):
+async def test_gantry_load_transform(
+    ot3_hardware: ThreadManager[OT3API], load_configs, load
+):
 
     for mount, configs in load_configs.items():
         if mount == OT3Mount.GRIPPER:
@@ -167,7 +190,9 @@ async def test_gantry_load_transform(ot3_hardware: ThreadManager[OT3API], load_c
             instr_data = AttachedGripper(config=gripper_config, id="g12345")
             await ot3_hardware.cache_gripper(instr_data)
         else:
-            pipette_config = ot3_pipette_config.load_ot3_pipette(configs["model"], configs["channels"], configs["version"])
+            pipette_config = ot3_pipette_config.load_ot3_pipette(
+                configs["model"], configs["channels"], configs["version"]
+            )
             instr_data = OT3AttachedPipette(config=pipette_config, id="fakepip")
             await ot3_hardware.cache_pipette(mount, instr_data, None)
     assert ot3_hardware._gantry_load_from_instruments() == load

@@ -20,6 +20,7 @@ def subject(request: pytest.FixtureRequest) -> InstrumentCore:
     return request.param  # type: ignore[attr-defined, no-any-return]
 
 
+@pytest.mark.ot2_only
 def test_same_pipette(
     instrument_context: InstrumentCore,
     simulating_instrument_context: InstrumentCore,
@@ -31,12 +32,14 @@ def test_same_pipette(
     )
 
 
+@pytest.mark.ot2_only
 def test_prepare_to_aspirate_no_tip(subject: InstrumentCore) -> None:
     """It should raise an error if a tip is not attached."""
     with pytest.raises(NoTipAttachedError, match="Cannot perform PREPARE_ASPIRATE"):
         subject.prepare_for_aspirate()
 
 
+@pytest.mark.ot2_only
 def test_dispense_no_tip(subject: InstrumentCore) -> None:
     """It should raise an error if a tip is not attached."""
     subject.home()
@@ -47,6 +50,7 @@ def test_dispense_no_tip(subject: InstrumentCore) -> None:
         )
 
 
+@pytest.mark.ot2_only
 def test_drop_tip_no_tip(subject: InstrumentCore, tip_rack: LabwareCore) -> None:
     """It should raise an error if a tip is not attached."""
     tip_core = tip_rack.get_well_core("A1")
@@ -56,6 +60,7 @@ def test_drop_tip_no_tip(subject: InstrumentCore, tip_rack: LabwareCore) -> None
         subject.drop_tip(location=None, well_core=tip_core, home_after=False)
 
 
+@pytest.mark.ot2_only
 def test_blow_out_no_tip(subject: InstrumentCore, labware: LabwareCore) -> None:
     """It should raise an error if a tip is not attached."""
     with pytest.raises(NoTipAttachedError, match="Cannot perform BLOWOUT"):
@@ -66,6 +71,7 @@ def test_blow_out_no_tip(subject: InstrumentCore, labware: LabwareCore) -> None:
         )
 
 
+@pytest.mark.ot2_only
 def test_pick_up_tip_no_tip(subject: InstrumentCore, tip_rack: LabwareCore) -> None:
     """It should raise an error if a tip is already attached."""
     tip_core = tip_rack.get_well_core("A1")
@@ -88,6 +94,7 @@ def test_pick_up_tip_no_tip(subject: InstrumentCore, tip_rack: LabwareCore) -> N
         )
 
 
+@pytest.mark.ot2_only
 def test_pick_up_tip_prep_after(
     subject: InstrumentCore, labware: LabwareCore, tip_rack: LabwareCore
 ) -> None:
@@ -145,6 +152,7 @@ def test_pick_up_tip_prep_after(
     subject.drop_tip(location=None, well_core=tip_core, home_after=True)
 
 
+@pytest.mark.ot2_only
 def test_aspirate_too_much(
     subject: InstrumentCore, labware: LabwareCore, tip_rack: LabwareCore
 ) -> None:
@@ -172,6 +180,7 @@ def test_aspirate_too_much(
         )
 
 
+@pytest.mark.ot2_only
 def test_working_volume(subject: InstrumentCore, tip_rack: LabwareCore) -> None:
     """It should have the correct working volume."""
     subject.home()
@@ -188,6 +197,7 @@ def test_working_volume(subject: InstrumentCore, tip_rack: LabwareCore) -> None:
     assert subject.get_hardware_state()["working_volume"] == 100
 
 
+@pytest.mark.ot2_only
 @pytest.mark.parametrize(
     argnames=["side_effector"],
     argvalues=[
@@ -258,6 +268,7 @@ def _aspirate_blowout(i: InstrumentCore, labware: LabwareCore) -> None:
     )
 
 
+@pytest.mark.ot2_only
 @pytest.mark.parametrize(
     argnames=["side_effector"],
     argvalues=[

@@ -17,14 +17,18 @@ from typing import (
     TypeVar,
 )
 
-from opentrons_shared_data.pipette import name_config
+from opentrons_shared_data.pipette.pipette_definition import (
+    PIPETTE_AVAILABLE_TYPES,
+    PIPETTE_CHANNELS_INTS,
+)
+
 from opentrons_shared_data.pipette.dev_types import (
     PipetteName,
 )
 from opentrons_shared_data.gripper.constants import IDLE_STATE_GRIP_FORCE
 
 from opentrons import types as top_types
-from opentrons.config import robot_configs
+from opentrons.config import robot_configs, ot3_pipette_config
 from opentrons.config.types import (
     RobotConfig,
     OT3Config,
@@ -443,8 +447,8 @@ class OT3API(
             pip_offset_cal,
         )
         self._pipette_handler.hardware_instruments[mount] = p
-        if req_instr and p:
-            p.act_as(req_instr)
+        # TODO (lc 12-5-2022) Properly support backwards compatibility
+        # when applicable
 
     async def cache_gripper(self, instrument_data: AttachedGripper) -> None:
         """Set up gripper based on scanned information."""
@@ -475,11 +479,20 @@ class OT3API(
             OT3Mount.from_mount(m): v for m, v in (require or {}).items()
         }
         for mount, name in checked_require.items():
-            if name not in name_config():
+            # TODO (lc 12-5-2022) cache instruments should be receiving
+            # a pipette type / channels rather than the named config.
+            # We should also check version here once we're comfortable.
+            pipette_type, channels, _ = ot3_pipette_config.convert_pipette_name(name)
+            if (
+                pipette_type not in PIPETTE_AVAILABLE_TYPES
+                or channels not in PIPETTE_CHANNELS_INTS
+            ):
                 raise RuntimeError(f"{name} is not a valid pipette name")
         async with self._motion_lock:
+            # we're not actually checking the required instrument except in the context
+            # of simulation and it feels like a lot of work for this function
+            # actually be doing.
             found = await self._backend.get_attached_instruments(checked_require)
-
         for mount, instrument_data in found.items():
             if mount == OT3Mount.GRIPPER:
                 await self.cache_gripper(cast(AttachedGripper, instrument_data))

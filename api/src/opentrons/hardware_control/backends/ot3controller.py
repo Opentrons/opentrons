@@ -428,7 +428,8 @@ class OT3Controller:
     @staticmethod
     def _combine_serial_number(pipette_info: ohc_tool_types.PipetteInformation) -> str:
         serialized_name = OT3Controller._lookup_serial_key(pipette_info.name)
-        return f"{serialized_name}V{pipette_info.model}{pipette_info.serial}"
+        version_removed_decimal = int(float(pipette_info.model) * 10)
+        return f"{serialized_name}V{version_removed_decimal}{pipette_info.serial}"
 
     @staticmethod
     def _build_attached_pip(
@@ -458,7 +459,7 @@ class OT3Controller:
         serial = attached.serial
         return {
             "config": gripper_config.load(model, serial),
-            "id": f"GRPV{model}{serial}",
+            "id": f"GRPV{attached.model}{serial}",
         }
 
     @staticmethod

@@ -126,6 +126,7 @@ class PipetteHandlerProvider(Generic[MountType]):
             else:
                 p.reset_pipette_offset(m, to_default=False)
             p.reload_configurations()
+            p.reset_state()
 
         if not mount:
             for m in type(list(self._attached_instruments.keys())[0]):

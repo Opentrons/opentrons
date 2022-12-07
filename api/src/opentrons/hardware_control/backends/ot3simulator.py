@@ -137,7 +137,7 @@ class OT3Simulator:
                 return pipette_spec
 
             assert passed_ai.get("model")
-            pipette_type, channels, version = ot3_pipette_config.split_pipette_model(
+            pipette_type, channels, version = ot3_pipette_config.convert_pipette_model(
                 cast(PipetteModel, passed_ai["model"])
             )
 
@@ -303,7 +303,7 @@ class OT3Simulator:
             else:
                 return {
                     "config": ot3_pipette_config.load_ot3_pipette(
-                        *ot3_pipette_config.split_pipette_name(expected_instr)
+                        *ot3_pipette_config.convert_pipette_name(expected_instr)
                     ),
                     "id": None,
                 }
@@ -325,9 +325,7 @@ class OT3Simulator:
             # Expected instrument specified and no instrument detected
             return {
                 "config": ot3_pipette_config.load_ot3_pipette(
-                    init_instr["pipette_type"],
-                    init_instr["channels"],
-                    ot3_pipette_config.DEFAULT_MODEL_VERSION,
+                    *ot3_pipette_config.convert_pipette_name(expected_instr)
                 ),
                 "id": None,
             }

@@ -29,7 +29,7 @@ def convert_version_to_float(version: str) -> float:
     return float(version.split("v")[1])
 
 
-def split_pipette_name(name: PipetteName) -> Tuple[str, int, float]:
+def convert_pipette_name(name: PipetteName) -> Tuple[str, int, float]:
     split_pipette_name = name.split("_")
     channels = convert_channels_to_int(split_pipette_name[1])
     if "gen3" in split_pipette_name:
@@ -41,7 +41,7 @@ def split_pipette_name(name: PipetteName) -> Tuple[str, int, float]:
     return split_pipette_name[0], channels, version
 
 
-def split_pipette_model(model: Optional[PipetteModel]) -> Tuple[str, int, float]:
+def convert_pipette_model(model: Optional[PipetteModel]) -> Tuple[str, int, float]:
     # TODO (lc 12-5-2022) This helper function is needed
     # until we stop using "name" and "model" to refer
     # to attached pipettes.
