@@ -145,7 +145,7 @@ export const AppComponent = (): JSX.Element => {
       Component: RobotDashboard,
       exact: true,
       name: 'Robot Dashboard',
-      path: '/robot-dashboard',
+      path: '/dashboard',
     },
   ]
 
