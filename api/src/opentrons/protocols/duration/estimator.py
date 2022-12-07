@@ -7,10 +7,10 @@ import functools
 
 from dataclasses import dataclass
 
-from opentrons.protocols.geometry.deck import Deck
 from opentrons.commands import types
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.duration.errors import DurationEstimatorException
+from opentrons.protocol_api.core.protocol_api.deck import Deck
 from opentrons.types import Location
 
 

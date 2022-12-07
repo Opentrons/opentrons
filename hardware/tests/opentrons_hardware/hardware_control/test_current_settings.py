@@ -78,7 +78,7 @@ async def test_complete_current_settings(
     """It should send correct hold and run current to the correct nodes."""
     await set_currents(mock_can_messenger, current_settings)
     for node_id, currents in current_settings_in_uint32.items():
-        mock_can_messenger.send.assert_any_call(
+        mock_can_messenger.ensure_send.assert_any_call(
             node_id=node_id,
             message=md.WriteMotorCurrentRequest(
                 payload=MotorCurrentPayload(
@@ -86,6 +86,7 @@ async def test_complete_current_settings(
                     run_current=currents[1],
                 )
             ),
+            expected_nodes=[node_id],
         )
 
 
@@ -97,7 +98,7 @@ async def test_send_hold_current_only(
     """It should send correct hold current only to the correct nodes."""
     await set_hold_current(mock_can_messenger, partial_current_settings)
     for node_id, current in partial_current_settings_in_uint32.items():
-        mock_can_messenger.send.assert_any_call(
+        mock_can_messenger.ensure_send.assert_any_call(
             node_id=node_id,
             message=md.WriteMotorCurrentRequest(
                 payload=MotorCurrentPayload(
@@ -105,6 +106,7 @@ async def test_send_hold_current_only(
                     run_current=UInt32Field(0),
                 )
             ),
+            expected_nodes=[node_id],
         )
 
 
@@ -116,7 +118,7 @@ async def test_send_run_current_only(
     """It should send correct run current only to the correct nodes."""
     await set_run_current(mock_can_messenger, partial_current_settings)
     for node_id, current in partial_current_settings_in_uint32.items():
-        mock_can_messenger.send.assert_any_call(
+        mock_can_messenger.ensure_send.assert_any_call(
             node_id=node_id,
             message=md.WriteMotorCurrentRequest(
                 payload=MotorCurrentPayload(
@@ -124,4 +126,5 @@ async def test_send_run_current_only(
                     run_current=current,
                 )
             ),
+            expected_nodes=[node_id],
         )

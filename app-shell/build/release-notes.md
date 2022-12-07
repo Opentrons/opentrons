@@ -6,11 +6,22 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# Opentrons App Changes in 6.1.0
+# Opentrons App Changes in 6.2.0
+
+Welcome to the v6.2.0 release of the Opentrons App! This release focuses on adding support for the Thermocycler Module GEN2.
+
+## New Features
+
+- Thermocycler GEN2 support: analyze, upload, and run protocols that include the Thermocycler GEN2
+- Added a privacy preference for sharing anonymous robot logs with Opentrons.
+
+---
+
+## Opentrons App Changes in 6.1.0
 
 Welcome to the v6.1.0 release of the Opentrons App! This release focuses on adding support for the [Opentrons Heater-Shaker Module](https://shop.opentrons.com/heater-shaker-module/).
 
-## New Features
+### New Features
 
 - Heater-Shaker support
   - Access guided setup instructions for attaching the Heater-Shaker to the deck
@@ -19,12 +30,12 @@ Welcome to the v6.1.0 release of the Opentrons App! This release focuses on addi
   - Update the Heater-Shaker's firmware from the module card
 - Module cards now show if a Heater-Shaker or Thermocycler has an error
 
-## Improved Features
+### Improved Features
 
 - Improvements to the run log, including properly listing labware that is on top of a module
 - Clarification of what data is deleted when performing a factory reset of protocol run history
 
-## Bug Fixes
+### Bug Fixes
 
 - Labware Position Check now suggests the most recent Labware Offset data
 - Tip Length Calibration no longer silently fails when the chosen pipette is not attached
