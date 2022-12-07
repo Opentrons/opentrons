@@ -18,8 +18,7 @@ from typing import (
 )
 
 from opentrons.config.types import OT3Config, GantryLoad
-from opentrons.config import pipette_config, gripper_config
-from opentrons_shared_data.pipette import dummy_model_for_name
+from opentrons.config import ot3_pipette_config, gripper_config
 from .ot3utils import (
     axis_convert,
     create_move_group,
@@ -50,13 +49,14 @@ from opentrons.hardware_control.types import (
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 
-from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
+from opentrons_shared_data.pipette.pipette_definition import PipetteModelType
 from opentrons_shared_data.gripper.dev_types import GripperModel
 from opentrons.hardware_control.dev_types import (
     InstrumentHardwareConfigs,
-    PipetteSpec,
+    OT3PipetteSpec,
     GripperSpec,
-    AttachedPipette,
+    OT3AttachedPipette,
     AttachedGripper,
     OT3AttachedInstruments,
 )
@@ -116,7 +116,7 @@ class OT3Simulator:
 
         def _sanitize_attached_instrument(
             mount: OT3Mount, passed_ai: Optional[Dict[str, Optional[str]]] = None
-        ) -> Union[PipetteSpec, GripperSpec]:
+        ) -> Union[OT3PipetteSpec, GripperSpec]:
             if mount is OT3Mount.GRIPPER:
                 gripper_spec: GripperSpec = {"model": None, "id": None}
                 if passed_ai and passed_ai.get("model"):
@@ -124,17 +124,31 @@ class OT3Simulator:
                     gripper_spec["id"] = passed_ai.get("id")
                 return gripper_spec
 
-            pipette_spec: PipetteSpec = {"model": None, "id": None}
+            # TODO (lc 12-5-2022) need to not always pass in defaults here
+            # but doing it to satisfy linter errors for now.
+            pipette_spec: OT3PipetteSpec = {
+                "model": None,
+                "id": None,
+                "channels": ot3_pipette_config.DEFAULT_CHANNELS,
+                "pipette_type": ot3_pipette_config.DEFAULT_MODEL,
+                "version": ot3_pipette_config.DEFAULT_MODEL_VERSION,
+            }
             if not passed_ai or not passed_ai.get("model"):
                 return pipette_spec
-            if passed_ai["model"] in pipette_config.config_models:
-                return passed_ai  # type: ignore
-            if passed_ai["model"] in pipette_config.config_names:
-                pipette_spec["model"] = dummy_model_for_name(
-                    passed_ai["model"]  # type: ignore
-                )
+
+            assert passed_ai.get("model")
+            pipette_type, channels, version = ot3_pipette_config.convert_pipette_model(
+                cast(PipetteModel, passed_ai["model"])
+            )
+
+            if pipette_type in [m.value for m in PipetteModelType]:
+                pipette_spec["model"] = cast(PipetteModel, passed_ai.get("model"))
                 pipette_spec["id"] = passed_ai.get("id")
+                pipette_spec["channels"] = channels
+                pipette_spec["version"] = version
                 return pipette_spec
+            # TODO (lc 12-05-2022) When the time comes we should properly
+            # support backwards compatibility
             raise KeyError(
                 "If you specify attached_instruments, the model "
                 "should be pipette names or pipette models, but "
@@ -251,13 +265,11 @@ class OT3Simulator:
     def _attached_to_mount(
         self, mount: OT3Mount, expected_instr: Optional[PipetteName]
     ) -> OT3AttachedInstruments:
-        init_instr = self._attached_instruments.get(
-            mount, {"model": None, "id": None}  # type: ignore
-        )
+        init_instr = self._attached_instruments.get(mount, {"model": None, "id": None})
         if mount is OT3Mount.GRIPPER:
             return self._attached_gripper_to_mount(cast(GripperSpec, init_instr))
         return self._attached_pipette_to_mount(
-            mount, cast(PipetteSpec, init_instr), expected_instr
+            mount, cast(OT3PipetteSpec, init_instr), expected_instr
         )
 
     def _attached_gripper_to_mount(self, init_instr: GripperSpec) -> AttachedGripper:
@@ -273,21 +285,15 @@ class OT3Simulator:
     def _attached_pipette_to_mount(
         self,
         mount: OT3Mount,
-        init_instr: PipetteSpec,
+        init_instr: OT3PipetteSpec,
         expected_instr: Optional[PipetteName],
-    ) -> AttachedPipette:
+    ) -> OT3AttachedPipette:
         found_model = init_instr["model"]
-        back_compat: List["PipetteName"] = []
-        if found_model:
-            back_compat = pipette_config.configs[found_model].get("backCompatNames", [])
-        if (
-            expected_instr
-            and found_model
-            and (
-                pipette_config.configs[found_model]["name"] != expected_instr
-                and expected_instr not in back_compat
-            )
-        ):
+
+        # TODO (lc 12-05-2022) When the time comes, we should think about supporting
+        # backwards compatability -- hopefully not relying on config keys only,
+        # but TBD.
+        if found_model and expected_instr and (expected_instr != found_model):
             if self._strict_attached:
                 raise RuntimeError(
                     "mount {}: expected instrument {} but got {}".format(
@@ -296,27 +302,31 @@ class OT3Simulator:
                 )
             else:
                 return {
-                    "config": pipette_config.load(dummy_model_for_name(expected_instr)),
+                    "config": ot3_pipette_config.load_ot3_pipette(
+                        *ot3_pipette_config.convert_pipette_name(expected_instr)
+                    ),
                     "id": None,
                 }
-        elif found_model and expected_instr:
+        if found_model and expected_instr or found_model:
             # Instrument detected matches instrument expected (note:
             # "instrument detected" means passed as an argument to the
             # constructor of this class)
+
+            # OR Instrument detected and no expected instrument specified
             return {
-                "config": pipette_config.load(found_model, init_instr["id"]),
-                "id": init_instr["id"],
-            }
-        elif found_model:
-            # Instrument detected and no expected instrument specified
-            return {
-                "config": pipette_config.load(found_model, init_instr["id"]),
+                "config": ot3_pipette_config.load_ot3_pipette(
+                    init_instr["pipette_type"],
+                    init_instr["channels"],
+                    init_instr["version"],
+                ),
                 "id": init_instr["id"],
             }
         elif expected_instr:
             # Expected instrument specified and no instrument detected
             return {
-                "config": pipette_config.load(dummy_model_for_name(expected_instr)),
+                "config": ot3_pipette_config.load_ot3_pipette(
+                    *ot3_pipette_config.convert_pipette_name(expected_instr)
+                ),
                 "id": None,
             }
         else:

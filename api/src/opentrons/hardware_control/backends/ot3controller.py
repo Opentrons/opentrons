@@ -19,7 +19,7 @@ from typing import (
     Iterator,
 )
 from opentrons.config.types import OT3Config, GantryLoad
-from opentrons.config import pipette_config, gripper_config
+from opentrons.config import ot3_pipette_config, gripper_config
 from .ot3utils import (
     axis_convert,
     create_move_group,
@@ -93,12 +93,11 @@ from opentrons_hardware.hardware_control.tool_sensors import (
 from opentrons_hardware.drivers.gpio import OT3GPIO
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
+    from opentrons_shared_data.pipette.dev_types import PipetteName
     from ..dev_types import (
-        AttachedPipette,
+        OT3AttachedPipette,
         AttachedGripper,
         OT3AttachedInstruments,
-        InstrumentHardwareConfigs,
     )
 
 log = logging.getLogger(__name__)
@@ -397,21 +396,55 @@ class OT3Controller:
             self._encoder_position.update({axis: point[1]})
 
     @staticmethod
-    def _synthesize_model_name(name: FirmwarePipetteName, model: str) -> "PipetteModel":
-        return cast("PipetteModel", f"{name.name}_v{model}")
+    def _convert_channels_to_int(channels: str) -> int:
+        # TODO this is a temporary function. We should
+        # actually just split the pipette type and
+        # channels when we pull out the pipette serial
+        # number.
+        if channels == "96":
+            return 96
+        elif channels == "multi":
+            return 8
+        else:
+            return 1
+
+    @staticmethod
+    def _lookup_serial_key(pipette_name: FirmwarePipetteName) -> str:
+        lookup_name = {
+            FirmwarePipetteName.p1000_single: "P1KS",
+            FirmwarePipetteName.p1000_multi: "P1KM",
+            FirmwarePipetteName.p50_single: "P50S",
+            FirmwarePipetteName.p50_multi: "P50M",
+            FirmwarePipetteName.p1000_96: "P1KH",
+            FirmwarePipetteName.p50_96: "P50H",
+        }
+        return lookup_name[pipette_name]
+
+    @staticmethod
+    def _split_pipette_name(name: FirmwarePipetteName) -> Tuple[str, int]:
+        pipette_type, channels = name.name.split("_")
+        return pipette_type, OT3Controller._convert_channels_to_int(channels)
+
+    @staticmethod
+    def _combine_serial_number(pipette_info: ohc_tool_types.PipetteInformation) -> str:
+        serialized_name = OT3Controller._lookup_serial_key(pipette_info.name)
+        version_removed_decimal = int(float(pipette_info.model) * 10)
+        return f"{serialized_name}V{version_removed_decimal}{pipette_info.serial}"
 
     @staticmethod
     def _build_attached_pip(
         attached: ohc_tool_types.PipetteInformation, mount: OT3Mount
-    ) -> AttachedPipette:
+    ) -> OT3AttachedPipette:
         if attached.name == FirmwarePipetteName.unknown:
             raise InvalidPipetteName(name=attached.name_int, mount=mount)
         try:
+            pipette_type, channels = OT3Controller._split_pipette_name(attached.name)
+            # TODO (lc 12-5-2022) In follow-up we should make the model a float.
             return {
-                "config": pipette_config.load(
-                    OT3Controller._synthesize_model_name(attached.name, attached.model)
+                "config": ot3_pipette_config.load_ot3_pipette(
+                    pipette_type, channels, float(attached.model)
                 ),
-                "id": attached.serial,
+                "id": OT3Controller._combine_serial_number(attached),
             }
         except KeyError:
             raise InvalidPipetteModel(
@@ -426,7 +459,7 @@ class OT3Controller:
         serial = attached.serial
         return {
             "config": gripper_config.load(model, serial),
-            "id": serial,
+            "id": f"GRPV{attached.model}{serial}",
         }
 
     @staticmethod
@@ -654,12 +687,6 @@ class OT3Controller:
                 self._event_watcher.close()
         return None
 
-    async def configure_mount(
-        self, mount: OT3Mount, config: InstrumentHardwareConfigs
-    ) -> None:
-        """Configure a mount."""
-        return None
-
     @staticmethod
     def _get_home_position() -> Dict[NodeId, float]:
         return {
@@ -747,9 +774,13 @@ class OT3Controller:
         # when that method actually does canbus stuff
         instrs = await self.get_attached_instruments({})
         expected = {NodeId.gantry_x, NodeId.gantry_y, NodeId.head}
-        if instrs.get(OT3Mount.LEFT, cast("AttachedPipette", {})).get("config", None):
+        if instrs.get(OT3Mount.LEFT, cast("OT3AttachedPipette", {})).get(
+            "config", None
+        ):
             expected.add(NodeId.pipette_left)
-        if instrs.get(OT3Mount.RIGHT, cast("AttachedPipette", {})).get("config", None):
+        if instrs.get(OT3Mount.RIGHT, cast("OT3AttachedPipette", {})).get(
+            "config", None
+        ):
             expected.add(NodeId.pipette_right)
         if instrs.get(OT3Mount.GRIPPER, cast("AttachedGripper", {})).get(
             "config", None
@@ -759,6 +790,7 @@ class OT3Controller:
         self._present_nodes = self._replace_gripper_node(
             self._replace_head_node(present)
         )
+        log.info(f"The present nodes are now {self._present_nodes}")
 
     def _axis_is_present(self, axis: OT3Axis) -> bool:
         try:

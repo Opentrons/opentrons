@@ -24,6 +24,7 @@ def make_context_and_labware(hardware):
     return _make_context_and_labware
 
 
+@pytest.mark.ot2_only
 @pytest.mark.parametrize(
     "liquid_handling_command", ["transfer", "consolidate", "distribute"]
 )
@@ -45,6 +46,7 @@ def test_blowout_location_unsupported_version(
         )
 
 
+@pytest.mark.ot2_only
 @pytest.mark.parametrize(
     argnames="liquid_handling_command," "blowout_location," "expected_error_match,",
     argvalues=[
@@ -78,6 +80,7 @@ def test_blowout_location_invalid(
         )
 
 
+@pytest.mark.ot2_only
 @pytest.mark.parametrize(
     argnames="liquid_handling_command," "blowout_location," "expected_strat,",
     argvalues=[
