@@ -50,7 +50,7 @@ export const BeforeBeginning = (
           commandType: 'loadPipette' as const,
           params: {
             // @ts-expect-error pipetteName is required but missing in schema v6 type
-            pipetteName: attachedPipette[mount]?.name,
+            pipetteName: attachedPipette[mount].name,
             pipetteId: pipetteId,
             mount: mount,
           },
