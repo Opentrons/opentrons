@@ -72,49 +72,44 @@ Some modules were added to the Protocol API later than others, and some modules 
    | Module             |                               |                           |
    +--------------------+-------------------------------+---------------------------+
 
-Loading Labware onto Your Module
-================================
+Loading Labware onto a Module
+=============================
 
-Like specifying labware that will be present on the deck of the OT-2, you must specify labware that will be present on the module you have just loaded.
-You do this using ``module.load_labware()``. For instance, to load a Temperature Module and specify an `aluminum block for 2 mL tubes <https://labware.opentrons.com/opentrons_24_aluminumblock_generic_2ml_screwcap?category=aluminumBlock>`_, you would do:
+Like specifying labware that will be placed directly on the deck of the OT-2, you must specify labware that will be present on the module you have just loaded, using ``load_labware()``. For instance, to load an `aluminum block for 2 mL tubes <https://labware.opentrons.com/opentrons_24_aluminumblock_generic_2ml_screwcap?category=aluminumBlock>`_ on top of a Temperature Module:
 
 .. code-block:: python
-    :substitutions:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata = {'apiLevel': '2.3'}
 
     def run(protocol: protocol_api.ProtocolContext):
-         module = protocol.load_module('Temperature Module', slot)
-         my_labware = module.load_labware('opentrons_24_aluminumblock_generic_2ml_screwcap',
-                                          label='Temperature-Controlled Tubes')
-
-See :py:meth:`.MagneticModuleContext.load_labware`, :py:meth:`.TemperatureModuleContext.load_labware`, :py:meth:`.ThermocyclerContext.load_labware`, or :py:meth:`.HeaterShakerContext.load_labware` for more details.
-
-Notice that when you load labware on a module, you don't specify the labware's deck slot.  The labware is loaded on the module, on whichever deck slot the module occupies.
-
+         temp_mod = protocol.load_module('temperature module gen2', 1)
+         temp_labware = temp_mod.load_labware(
+            load_name='opentrons_24_aluminumblock_generic_2ml_screwcap',
+            label='Temperature-Controlled Tubes')
 
 .. versionadded:: 2.0
+
+Notice that when you load labware on a module, you don't need to specify the labware's deck slot.  The labware is loaded on the module, on whichever deck slot the module occupies.
+
+Any :ref:`v2-custom-labware` added to your Opentrons App is also accessible when loading labware onto a module. You can find and copy its load name by going to its card on the Labware page.
+
+.. versionadded:: 2.1
+
 
 Module and Labware Compatibility
 --------------------------------
 
-It's up to you to make sure that the labware and module you chose make sense together.
-The Protocol API won't stop you from making nonsensical combinations, like a tube rack on a Thermocycler.
+It's up to you to make sure that the labware and modules you load make sense together. The Protocol API won't raise a warning or error if you load a nonsensical combination, like a tube rack on a Thermocycler.
 
-See: `What labware can I use with my modules? <https://support.opentrons.com/en/articles/3540964-what-labware-can-i-use-with-my-modules>`__
+For further information on what combinations are possible, see the support article `What labware can I use with my modules? <https://support.opentrons.com/en/articles/3540964-what-labware-can-i-use-with-my-modules>`_
 
-Loading Custom Labware Into Your Module
----------------------------------------
 
-Any custom labware added to your Opentrons App (see :ref:`v2-custom-labware`) is accessible when loading labware onto a module.
+Additional Labware Parameters
+-----------------------------
 
-.. versionadded:: 2.1
-
-.. note::
-
-    In API version 2.0, ``module.load_labware()`` only took a ``load_name`` argument. In API version 2.1 (introduced in Robot Software version 3.15.2) or higher you can now specify a label, version, and namespace (though most of the time you won't have to).
+In addition to the mandatory ``load_name`` argument, you can also specify additional parameters. If you specify a ``label``, this name will appear in the Opentrons App and the run log instead of the load name. For labware that has multiple definitions, you can specify ``version`` and ``namespace`` (though most of the time you won't have to). See :py:meth:`.MagneticModuleContext.load_labware`, :py:meth:`.TemperatureModuleContext.load_labware`, :py:meth:`.ThermocyclerContext.load_labware`, or :py:meth:`.HeaterShakerContext.load_labware` for more details.
 
 
 .. _temperature-module:
