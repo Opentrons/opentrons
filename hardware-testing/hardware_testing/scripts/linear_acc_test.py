@@ -5,6 +5,8 @@ import os, time, random
 
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.types import Axis
+# from opentrons_hardware.hardware_control import encoder_hardware as encoder_hardware
+# from hardware_testing.opentrons_api import encoder_hardware as encoder_hardware
 
 from hardware_testing import data
 from hardware_testing.opentrons_api.types import GantryLoad, OT3Mount, OT3Axis, Point
@@ -69,7 +71,7 @@ async def _main(is_simulating: bool) -> None:
     test_name = "linear-acc"
     file_name = data.create_file_name(test_name=test_name, run_id=data.create_run_id(), tag=test_tag)
 
-    await home_ot3(api) # , [OT3Axis.Y])
+    await home_ot3(api, [OT3Axis.Z_R]) # , [OT3Axis.Y])
     # await api.move_rel(mount=MOUNT, delta=Point(y=-60), speed=200)
     # await api.disengage_axes([OT3Axis.Y])
 
@@ -79,12 +81,17 @@ async def _main(is_simulating: bool) -> None:
     # print(f"Set digital scale parallel to X-Axis")
     # input("\n\t>> Continue...")
     z_distance = 210
-    await api.move_rel(mount=Mount.LEFT, delta=Point(z=-(z_distance+5), speed=100) ### Z-Axis test
+    ### await api.move_rel(mount=Mount.LEFT, delta=Point(z=-(z_distance+5), speed=100) ### Z-Axis test
 
     # await api.engage_axes([OT3Axis.Y])
+    time.sleep(0.5)
     starting_read_pos = gauge.read()
+    # starting_enc_pos = await encoder_hardware.get_encoder_position()
 
-    print(f"Attach mount arm and set digital scale to 0\n\t>> Current position: {starting_read_pos}")
+    ### enc_api = OT3API()
+
+
+    print(f"Attach mount arm and set digital scale to 0\n\t>> Current position: {starting_read_pos}") ###, Current encoder position: {enc_api.get_encoder_position()}")
     # await api.disengage_axes([OT3Axis.Y])
     input("\n\t>> Continue...")
     # await api.engage_axes([OT3Axis.Y])
@@ -101,7 +108,8 @@ async def _main(is_simulating: bool) -> None:
     #     print(init_encoder_pos[key])
     # keys = init_encoder_pos.keys()
     # print(keys)
-    init_encoder_pos = init_encoder_pos[Axis.Z_R] #Axis.Y]
+    init_encoder_pos = init_encoder_pos[Axis.A] #Axis.Y]
+    ### print(f"init enc pos: {init_encoder_pos}, new enc pos: {enc_api.get_encoder_position()}")
     # init_encoder_pos = init_encoder_pos["<Axis.X>"]
 
     if test_axis == "Z":
@@ -111,7 +119,7 @@ async def _main(is_simulating: bool) -> None:
 
     input("Press enter to begin test...\n")
 
-    header = ['Cycle', 'Test Robot', 'Test Axis', 'Initial Axis Move (mm)', 'Start Position (mm)', 'Position Read (mm)', 'Distance Moved (mm)', 'Encoder position (mm)','Speed (mm/s)']
+    header = ['Cycle', 'Test Robot', 'Test Axis', 'Start Position (mm)', 'Position Read (mm)', 'Distance Moved (mm)', 'Encoder position (mm)','Speed (mm/s)']
     header_str = data.convert_list_to_csv_line(header)
     data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
 
@@ -122,7 +130,7 @@ async def _main(is_simulating: bool) -> None:
     # distances = [440*0.25, 440*0.5, 440*0.75, 440]
     cur_pos = await api.current_position(MOUNT)
     # print(f"Max Y Travel: {cur_pos[Axis.Y]}")
-    print(f"Max Z_R Travel: {cur_pos[Axis.Z_R]}")
+    print(f"Max Z_R Travel: {cur_pos[Axis.A]}")
     # print(cur_pos.keys())
     # distances = [(cur_pos[Axis.Y]-22.56)*0.25, (cur_pos[Axis.Y]-22.56)*0.25, (cur_pos[Axis.Y]-22.56)*0.25, (cur_pos[Axis.Y]-22.56)*0.25]
     distances = [(z_distance)*0.25, (z_distance)*0.25, (z_distance)*0.25, (z_distance)*0.25]
@@ -131,33 +139,50 @@ async def _main(is_simulating: bool) -> None:
     count = 0
     for cycle in range(CYCLES):
         print(f"Cycle: {cycle+1} out of {CYCLES}")
-        time.sleep(2)
-        await api.move_rel(mount=MOUNT, delta=Point(z=-5))
-        init_move = gauge.read()
-        print(f"\tInit move position:\n\t {init_pos} mm")
+        # start_enc_pos = api.encoder_current_position(MOUNT)
+        # start_enc_pos = init_encoder_pos - start_enc_pos[Axis.A]
+        # print(f"\tInit move position:\n\t {init_move} mm")
         # coordinates = await random_move(api)
         time.sleep(2)
         start_pos = gauge.read()
         print(f"\tStart position:\n\t {start_pos} mm")
+
+        print("Initial Move: 5 mm")
+        await api.move_rel(mount=MOUNT, delta=Point(z=-5), speed=SPEED_Z)
+        time.sleep(2)
+        backlash_pos = gauge.read() - start_pos
+        print(f"\tBacklash position reading:\n\t {backlash_pos} mm")
+        backlash_enc_pos = await api.encoder_current_position(MOUNT)
+        backlash_enc_pos = init_encoder_pos - backlash_enc_pos[Axis.A]
+        print(f"\tBacklash encoder position reading:\n\t {backlash_enc_pos} mm")
+        time.sleep(2)
+
+        backlash_data = [cycle+1, '', '', start_pos, backlash_pos, '5', backlash_enc_pos, test_speed]
+        backlash_data_str = data.convert_list_to_csv_line(backlash_data)
+        data.append_data_to_file(test_name=test_name, file_name=file_name, data=backlash_data_str)
+
+        # print(f"\tStart position:\n\t {start_pos} mm")
         for distance in distances:
             count += 1
             # if count == 1:
             #     time.sleep(2)
             #     start_pos = gauge.read()
-            print(f"\tMove to: {distance*count} mm")
+            print(f"\tMove to: {distance*count + 5} mm")
             await api.move_rel(mount=MOUNT, delta=Point(z=-distance), speed=SPEED_Z)
             time.sleep(2)
             pos_reading = gauge.read() - start_pos
             print(f"\tCurrent position reading:\n\t {pos_reading} mm")
             encoder_pos = await api.encoder_current_position(MOUNT)
             # print(f"Encoder position: {encoder_pos[Axis.X]}, {encoder_pos[Axis.Y]}")
-            encoder_pos = init_encoder_pos - encoder_pos[Axis.Y]
+            encoder_pos = init_encoder_pos - encoder_pos[Axis.A]
             print(f"\tCurrent encoder position reading:\n\t {encoder_pos} mm")
+            # new_enc_pos = await encoder_hardware.get_encoder_position()
+            # print(f"\Current new encoder position reading:\n\t {new_enc_pos} mm")
             # await home_ot3(api, [OT3Axis.X])
             time.sleep(2)
             # if count > 1:
             #     start_pos = ''
-            cycle_data = [cycle+1, '', '', init_move, start_pos, pos_reading, distance*count, encoder_pos, test_speed]
+            cycle_data = [cycle+1, '', '', start_pos, pos_reading, distance*count, encoder_pos, test_speed]
             cycle_data_str = data.convert_list_to_csv_line(cycle_data)
             data.append_data_to_file(test_name=test_name, file_name=file_name, data=cycle_data_str)
         await home_ot3(api, [OT3Axis.Z_R])
