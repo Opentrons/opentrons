@@ -1,5 +1,4 @@
 import pytest
-from typing import TYPE_CHECKING
 from itertools import chain
 from mock import AsyncMock, patch
 from opentrons.hardware_control.backends.ot3controller import OT3Controller

@@ -161,7 +161,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     @property
     def pick_up_configurations(self) -> PickUpTipConfigurations:
         return self._pick_up_configurations
-    
+
     @pick_up_configurations.setter
     def pick_up_configurations(self, pick_up_configs: PickUpTipConfigurations) -> None:
         self._pick_up_configurations = pick_up_configs
