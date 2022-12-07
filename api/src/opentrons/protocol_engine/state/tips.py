@@ -91,9 +91,7 @@ class TipStore(HasState[TipState], HandlesActions):
 
         if pipette_channels == len(tips_in_labware.keys()):
             for well_name in tips_in_labware.keys():
-                tips_in_labware[
-                    well_name
-                ] = TipRackWellState.USED
+                tips_in_labware[well_name] = TipRackWellState.USED
 
         elif pipette_channels == len(columns[0]):
             for column in columns:
@@ -134,7 +132,9 @@ class TipView(HasState[TipState]):
                     if not any(wells[well] == TipRackWellState.USED for well in column):
                         return column[0]
                 else:
-                    if starting_tip_name in column and not any(wells[well] == TipRackWellState.USED for well in column):
+                    if starting_tip_name in column and not any(
+                        wells[well] == TipRackWellState.USED for well in column
+                    ):
                         return column[0]
 
         else:
