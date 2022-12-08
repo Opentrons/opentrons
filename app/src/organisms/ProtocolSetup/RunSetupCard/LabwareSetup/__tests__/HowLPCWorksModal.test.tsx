@@ -18,35 +18,15 @@ describe('HowLPCWorksModal', () => {
 
   it('should render the correct header', () => {
     const { getByRole } = render(props)
-    expect(
-      getByRole('heading', { name: 'How Labware Offsets Work' })
-    ).toBeTruthy()
+    getByRole('heading', { name: 'How labware offsets work' })
   })
   it('should render the correct body', () => {
-    const { getByRole, getByText } = render(props)
-
-    getByRole('heading', { name: 'Positional Adjustments Overview' })
-
+    const { getByText } = render(props)
     getByText(
-      'The OT-2 provides two types of positional adjustments. The first type is robot calibration: Deck calibration, Tip Length calibration and Pipette Offset calibration. These calibrations ensure the OT-2 moves to the expected positions on the deck. It is essential to have good robot calibration before creating any labware offsets and running protocols.'
+      'A Labware Offset is a type of positional adjustment that accounts for small, real-world variances in the overall position of the labware on an OT-2’s deck. Labware Offset data is unique to a specific combination of labware definition, deck slot, and OT-2.'
     )
     getByText(
-      'Opentrons offers a second type of positional adjustment, a Labware Offset. Labware Offsets are intended to account for small, real-world variances in the overall position of the labware on an OT-2’s deck. A Labware Offset is unique to a specific combination of the following during a run: labware, module (if present), deck slot, protocol and OT-2.'
-    )
-    getByRole('heading', {
-      name: 'Creating Labware Offset Data During Labware Position Check',
-    })
-
-    getByText(
-      'Labware Position Check is a recommended workflow that helps you verify the position of every labware on the deck for an added degree of precision in your protocol. When you check a labware, the OT-2’s pipette nozzle or attached tip will stop at the center of the A1 well. If the pipette nozzle or tip is not centered, you can reveal the OT-2’s jog controls to make an adjustment. This Labware Offset will be applied to the entire labware. Offset data is measured to the nearest 1/10th mm and can be made in the X, Y and/or Z directions.'
-    )
-    getByRole('heading', { name: 'Rerunning a Protocol' })
-
-    getByText(
-      'Opentrons displays the connected robot’s last protocol run on on the Protocol Upload page. If you run again, Opentrons loads this protocol and applies Labware Offset data if any exists.'
-    )
-    getByText(
-      'Clicking “Run Again” will take you directly to the Run tab. If you’d like to review the deck setup or run Labware Position Check before running the protocol, navigate to the Protocol tab.'
+      'Labware Position Check is intended to correct for minor variances. Opentrons does not recommend using Labware Position Check to compensate for large positional adjustments. Needing to set large labware offsets could indicate a problem with robot calibration.'
     )
   })
 

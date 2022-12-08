@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { useTrackEvent } from '../../../redux/analytics'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
+import { useTrackEvent } from '../../../redux/analytics'
 import { getSendAllProtocolsToOT3 } from '../../../redux/config'
 import {
   analyzeProtocol,
@@ -74,6 +74,10 @@ describe('ProtocolOverflowMenu', () => {
     fireEvent.click(button)
     const runButton = getByText('Run now')
     fireEvent.click(runButton)
+    expect(mockTrackEvent).toHaveBeenCalledWith({
+      name: 'proceedToRun',
+      properties: { sourceLocation: 'ProtocolsLanding' },
+    })
     expect(mockHandleRunProtocol).toHaveBeenCalled()
   })
 

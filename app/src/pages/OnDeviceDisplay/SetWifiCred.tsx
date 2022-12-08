@@ -29,7 +29,7 @@ import { ConnectingNetwork } from '../../organisms/SetupNetwork/ConnectingNetwor
 import { ConnectedResult } from '../../organisms/SetupNetwork/ConnectedResult'
 
 import type { State, Dispatch } from '../../redux/types'
-import type { NavRouteParams } from '../../App/types'
+import type { OnDeviceRouteParams } from '../../App/types'
 import type { WifiConfigureRequest } from '../../organisms/Devices/RobotSettings/ConnectNetwork/types'
 
 const STATUS_REFRESH_MS = 5000
@@ -37,7 +37,7 @@ const LIST_REFRESH_MS = 10000
 
 export function SetWifiCred(): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
-  const { ssid } = useParams<NavRouteParams>()
+  const { ssid } = useParams<OnDeviceRouteParams>()
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const keyboardRef = React.useRef(null)
@@ -98,7 +98,7 @@ export function SetWifiCred(): JSX.Element {
             alignItems={ALIGN_CENTER}
             marginBottom="3.0625rem"
           >
-            <Btn onClick={() => history.push(`/select-network`)}>
+            <Btn onClick={() => history.push('/network-setup/wifi')}>
               <Flex flexDirection={DIRECTION_ROW}>
                 <Icon
                   name="arrow-back"

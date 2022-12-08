@@ -84,7 +84,7 @@ export const PipetteWizardFlows = (
   const [isExiting, setIsExiting] = React.useState<boolean>(false)
 
   const proceed = (): void => {
-    if (!(isCommandMutationLoading || isStopLoading || isExiting)) {
+    if (!isCommandMutationLoading) {
       setCurrentStepIndex(
         currentStepIndex !== pipetteWizardSteps.length - 1
           ? currentStepIndex + 1
@@ -103,8 +103,8 @@ export const PipetteWizardFlows = (
       ],
       false
     ).then(() => {
-      setIsExiting(false)
       if (runId !== '') stopRun(runId)
+      setIsExiting(false)
     })
   }
   const {
@@ -117,8 +117,7 @@ export const PipetteWizardFlows = (
 
   React.useEffect(() => {
     if (isCommandMutationLoading || isStopLoading || isExiting) {
-      const timer = setTimeout(() => setIsRobotMoving(true), 700)
-      return () => clearTimeout(timer)
+      setIsRobotMoving(true)
     } else {
       setIsRobotMoving(false)
     }
@@ -133,6 +132,7 @@ export const PipetteWizardFlows = (
     attachedPipette,
     setShowErrorMessage,
     errorMessage,
+    robotName,
   }
   const exitModal = (
     <ExitModal goBack={cancelExit} proceed={confirmExit} flowType={flowType} />
@@ -140,7 +140,7 @@ export const PipetteWizardFlows = (
   let onExit
   if (currentStep == null) return null
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
-  if (isExiting === true) {
+  if (isExiting) {
     modalContent = <InProgressModal description={t('stand_back')} />
   }
   if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
@@ -176,11 +176,29 @@ export const PipetteWizardFlows = (
       />
     )
   } else if (currentStep.section === SECTIONS.RESULTS) {
+    const handleProceed = (): void => {
+      if (
+        currentStepIndex === 2 &&
+        //  only proceeds if we know that the pipette was successfully attached
+        attachedPipette[mount] != null
+      ) {
+        proceed()
+        //  if you completed detaching the pipette, robot will home and delete run
+      } else {
+        closeFlow()
+      }
+    }
+
     onExit = confirmExit
     modalContent = showConfirmExit ? (
       exitModal
     ) : (
-      <Results {...currentStep} {...calibrateBaseProps} proceed={closeFlow} />
+      <Results
+        {...currentStep}
+        {...calibrateBaseProps}
+        proceed={handleProceed}
+        handleCleanUpAndClose={handleCleanUpAndClose}
+      />
     )
   } else if (currentStep.section === SECTIONS.MOUNT_PIPETTE) {
     onExit = confirmExit

@@ -21,6 +21,7 @@ import { InstrumentCard } from '../../molecules/InstrumentCard'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ModuleCard } from '../ModuleCard'
 import { useIsOT3, useIsRobotViewable, useRunStatuses } from './hooks'
+import { getIs96ChannelPipetteAttached } from './utils'
 import { PipetteCard } from './PipetteCard'
 
 const EQUIPMENT_POLL_MS = 5000
@@ -40,7 +41,9 @@ export function InstrumentsAndModules({
   const currentRunId = useCurrentRunId()
   const { isRunTerminal } = useRunStatuses()
   const isOT3 = useIsOT3(robotName)
-
+  const is96ChannelAttached = getIs96ChannelPipetteAttached(
+    attachedPipettes?.left ?? null
+  )
   const attachedModules =
     useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
   // split modules in half and map into each column separately to avoid
@@ -105,6 +108,7 @@ export function InstrumentsAndModules({
                 }
                 mount={LEFT}
                 robotName={robotName}
+                is96ChannelAttached={is96ChannelAttached}
               />
               {/* extension mount here */}
               {isOT3 ? (
@@ -131,7 +135,9 @@ export function InstrumentsAndModules({
               ) : null}
               {leftColumnModules.map((module, index) => (
                 <ModuleCard
-                  key={`moduleCard_${module.moduleType}_${index}`}
+                  key={`moduleCard_${String(module.moduleType)}_${String(
+                    index
+                  )}`}
                   robotName={robotName}
                   module={module}
                   isLoadedInRun={false}
@@ -143,20 +149,25 @@ export function InstrumentsAndModules({
               flexDirection={DIRECTION_COLUMN}
               gridGap={SPACING.spacing3}
             >
-              <PipetteCard
-                pipetteId={attachedPipettes.right?.id}
-                pipetteInfo={
-                  attachedPipettes.right?.model != null
-                    ? getPipetteModelSpecs(attachedPipettes.right?.model) ??
-                      null
-                    : null
-                }
-                mount={RIGHT}
-                robotName={robotName}
-              />
+              {!Boolean(is96ChannelAttached) ? (
+                <PipetteCard
+                  pipetteId={attachedPipettes.right?.id}
+                  pipetteInfo={
+                    attachedPipettes.right?.model != null
+                      ? getPipetteModelSpecs(attachedPipettes.right?.model) ??
+                        null
+                      : null
+                  }
+                  mount={RIGHT}
+                  robotName={robotName}
+                  is96ChannelAttached={false}
+                />
+              ) : null}
               {rightColumnModules.map((module, index) => (
                 <ModuleCard
-                  key={`moduleCard_${module.moduleType}_${index}`}
+                  key={`moduleCard_${String(module.moduleType)}_${String(
+                    index
+                  )}`}
                   robotName={robotName}
                   module={module}
                   isLoadedInRun={false}

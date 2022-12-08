@@ -32,7 +32,7 @@ ot_sources := $(ot_py_sources)
 clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc' '**/.mypy_cache'
 
 .PHONY: all
-all: clean wheel
+all: clean sdist wheel
 
 .PHONY: setup
 setup:
@@ -180,7 +180,7 @@ endef
 sync-sw-ot3:
 	cd ../hardware && $(MAKE) push-no-restart-ot3 host=$(host)
 	cd ../api && $(MAKE) push-no-restart-ot3 host=$(host)
-	cd ../shared-data && $(MAKE) push-no-restart-ot3 host=$(host)
+	cd ../shared-data && $(MAKE) all push-no-restart-ot3 host=$(host)
 	cd ../hardware-testing && $(MAKE) push-no-restart-ot3 host=$(host)
 
 .PHONY: sync-fw-ot3

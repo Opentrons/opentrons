@@ -5,7 +5,6 @@ from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.types import DoorState
-from opentrons.protocols.geometry.deck import FIXED_TRASH_ID
 
 from opentrons.protocol_engine import (
     ProtocolEngine,
@@ -31,7 +30,7 @@ async def test_create_engine_initializes_state_with_deck_geometry(
     assert state.labware.get_deck_definition() == standard_deck_def
     assert state.labware.get_all() == [
         LoadedLabware(
-            id=FIXED_TRASH_ID,
+            id="fixedTrash",
             loadName=fixed_trash_def.parameters.loadName,
             definitionUri=uri_from_details(
                 load_name=fixed_trash_def.parameters.loadName,

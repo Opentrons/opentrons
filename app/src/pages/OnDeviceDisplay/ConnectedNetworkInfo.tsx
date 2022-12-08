@@ -28,14 +28,14 @@ import {
 import { getLocalRobot } from '../../redux/discovery'
 
 import type { State, Dispatch } from '../../redux/types'
-import type { NavRouteParams } from '../../App/types'
+import type { OnDeviceRouteParams } from '../../App/types'
 
 const STATUS_REFRESH_MS = 5000
 const LIST_REFRESH_MS = 10000
 
 export function ConnectedNetworkInfo(): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const { ssid } = useParams<NavRouteParams>()
+  const { ssid } = useParams<OnDeviceRouteParams>()
   const dispatch = useDispatch<Dispatch>()
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
@@ -97,7 +97,7 @@ export function ConnectedNetworkInfo(): JSX.Element {
         </Flex>
       </Flex>
       <Flex justifyContent={JUSTIFY_FLEX_END}>
-        <SecondaryButton onClick={() => history.push(`/select-network`)}>
+        <SecondaryButton onClick={() => history.push('/network-setup/wifi')}>
           {t('change_network')}
         </SecondaryButton>
       </Flex>
