@@ -10,6 +10,7 @@ import opentrons.protocol_api as papi
 
 try:
     import opentrons_hardware
+
     # TODO (lc 12-8-2022) Not sure if we plan to keep these tests, but if we do
     # we should re-write them to be agnostic to the underlying hardware. Otherwise
     # I wouldn't really consider these to be proper unit tests.
