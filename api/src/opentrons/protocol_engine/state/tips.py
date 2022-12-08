@@ -93,7 +93,7 @@ class TipStore(HasState[TipState], HandlesActions):
             for well_name in tips_in_labware.keys():
                 tips_in_labware[well_name] = TipRackWellState.USED
 
-        elif pipette_channels == len(columns[0]):
+        elif columns and pipette_channels == len(columns[0]):
             for column in columns:
                 if well_name in column:
                     for well in column:
