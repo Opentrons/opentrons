@@ -206,7 +206,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                 position={POSITION_RELATIVE}
                 width="100%"
                 height="100%"
-                backgroundColor={COLORS.fundamentalsBackground}
+                backgroundColor={COLORS.white}
                 overflow={OVERFLOW_SCROLL}
               >
                 <ModalPortalRoot />
