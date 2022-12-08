@@ -1,7 +1,9 @@
 """Check a deck layout for conflicts."""
 # TODO(mc, 2022-06-15): decouple this interface from DeckItem
 # (and subclasses) so it can be used in ProtocolEngine
-from typing import List, Mapping, NamedTuple, Optional, Union
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, List, Mapping, NamedTuple, Optional, Union
 from typing_extensions import Final
 
 from opentrons_shared_data.labware.dev_types import LabwareUri
@@ -19,7 +21,8 @@ from opentrons.protocols.geometry.module_geometry import (
     HeaterShakerGeometry,
 )
 
-from .deck_item import DeckItem
+if TYPE_CHECKING:
+    from .deck import DeckItem
 
 
 _FIXED_TRASH_SLOT: Final = 12

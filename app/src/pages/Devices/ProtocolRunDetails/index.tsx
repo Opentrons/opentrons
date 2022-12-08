@@ -38,7 +38,10 @@ import { ProtocolRunModuleControls } from '../../../organisms/Devices/ProtocolRu
 import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
 import { fetchProtocols } from '../../../redux/protocol-storage'
 
-import type { NavRouteParams, ProtocolRunDetailsTab } from '../../../App/types'
+import type {
+  DesktopRouteParams,
+  ProtocolRunDetailsTab,
+} from '../../../App/types'
 import type { Dispatch } from '../../../redux/types'
 
 const baseRoundTabStyling = css`
@@ -124,7 +127,7 @@ export function ProtocolRunDetails(): JSX.Element | null {
     robotName,
     runId,
     protocolRunDetailsTab,
-  } = useParams<NavRouteParams>()
+  } = useParams<DesktopRouteParams>()
   const dispatch = useDispatch<Dispatch>()
 
   const protocolRunHeaderRef = React.useRef<HTMLDivElement>(null)

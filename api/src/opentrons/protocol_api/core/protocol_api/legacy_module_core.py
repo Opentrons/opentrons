@@ -381,7 +381,7 @@ class LegacyThermocyclerCore(
                 api_version=self._protocol_core.api_version,
             )
 
-        return cast(Labware, trash)
+        return trash
 
     def _prepare_for_lid_move(self) -> None:
         loaded_instruments = [
