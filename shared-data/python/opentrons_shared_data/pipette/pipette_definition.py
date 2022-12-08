@@ -74,7 +74,9 @@ class PipetteVersionType:
         return f"{self.major}.{self.minor}"
 
     @property
-    def as_tuple(self) -> Tuple[PipetteModelMajorVersionType, PipetteModelMinorVersionType]:
+    def as_tuple(
+        self,
+    ) -> Tuple[PipetteModelMajorVersionType, PipetteModelMinorVersionType]:
         return (self.major, self.minor)
 
 
