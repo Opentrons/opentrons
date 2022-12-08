@@ -403,6 +403,16 @@ class ModuleView(HasState[ModuleState]):
         """Get a list of all module entries in state."""
         return [self.get(mod_id) for mod_id in self._state.slot_by_module_id.keys()]
 
+    def get_by_slot(self, slot_name: DeckSlotName) -> Optional[LoadedModule]:
+        """Get the module located in a given slot, if any."""
+        module_slots = reversed(list(self._state.slot_by_module_id.items()))
+
+        for module_id, module_slot in module_slots:
+            if module_slot == slot_name:
+                return self.get(module_id)
+
+        return None
+
     def _get_module_substate(
         self, module_id: str, expected_type: Type[ModuleSubStateT], expected_name: str
     ) -> ModuleSubStateT:

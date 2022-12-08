@@ -7,13 +7,14 @@ from opentrons.hardware_control.dev_types import PipetteDict
 
 from .. import errors
 from ..types import (
+    OFF_DECK_LOCATION,
     LoadedLabware,
+    LoadedModule,
     WellLocation,
     WellOrigin,
     WellOffset,
     DeckSlotLocation,
     ModuleLocation,
-    OFF_DECK_LOCATION,
     LabwareLocation,
     LabwareOffsetVector,
 )
@@ -389,3 +390,12 @@ class GeometryView:
             )
             return [(slot_5_center.x, slot_5_center.y)]
         return []
+
+    def get_slot_item(
+        self, slot_name: DeckSlotName
+    ) -> Union[LoadedLabware, LoadedModule, None]:
+        """Get the item present in a deck slot, if any."""
+        maybe_labware = self._labware.get_by_slot(slot_name)
+        maybe_module = self._modules.get_by_slot(slot_name)
+
+        return maybe_labware or maybe_module or None

@@ -37,8 +37,6 @@ from ..actions import (
 from .abstract_store import HasState, HandlesActions
 
 
-_TRASH_LOCATION = DeckSlotLocation(slotName=DeckSlotName.FIXED_TRASH)
-
 # URIs of labware whose definitions accidentally specify an engage height
 # in units of half-millimeters instead of millimeters.
 _MAGDECK_HALF_MM_LABWARE = {
@@ -210,6 +208,19 @@ class LabwareView(HasState[LabwareState]):
         raise errors.exceptions.LabwareNotLoadedOnModuleError(
             "There is no labware loaded on this Module"
         )
+
+    def get_by_slot(self, slot_name: DeckSlotName) -> Optional[LoadedLabware]:
+        """Get the labware located in a given slot, if any."""
+        all_labware = reversed(list(self._state.labware_by_id.values()))
+
+        for labware in all_labware:
+            if (
+                isinstance(labware.location, DeckSlotLocation)
+                and labware.location.slotName == slot_name
+            ):
+                return labware
+
+        return None
 
     def get_definition(self, labware_id: str) -> LabwareDefinition:
         """Get labware definition by the labware's unique identifier."""

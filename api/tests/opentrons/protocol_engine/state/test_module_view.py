@@ -1467,3 +1467,72 @@ def test_raise_if_labware_in_location(
     )
     with expected_raise:
         subject.raise_if_module_in_location(location=location)
+
+
+def test_get_by_slot() -> None:
+    """It should get the module in a given slot."""
+    subject = make_module_view(
+        slot_by_module_id={
+            "module-1": DeckSlotName.SLOT_1,
+            "module-2": DeckSlotName.SLOT_2,
+        },
+        hardware_by_module_id={
+            "module-1": HardwareModule(
+                serial_number="serial-number-1",
+                definition=ModuleDefinition.construct(  # type: ignore[call-arg]
+                    model=ModuleModel.TEMPERATURE_MODULE_V1
+                ),
+            ),
+            "module-2": HardwareModule(
+                serial_number="serial-number-2",
+                definition=ModuleDefinition.construct(  # type: ignore[call-arg]
+                    model=ModuleModel.TEMPERATURE_MODULE_V2
+                ),
+            ),
+        },
+    )
+
+    assert subject.get_by_slot(DeckSlotName.SLOT_1) == LoadedModule(
+        id="module-1",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        model=ModuleModel.TEMPERATURE_MODULE_V1,
+        serialNumber="serial-number-1",
+    )
+    assert subject.get_by_slot(DeckSlotName.SLOT_2) == LoadedModule(
+        id="module-2",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
+        model=ModuleModel.TEMPERATURE_MODULE_V2,
+        serialNumber="serial-number-2",
+    )
+    assert subject.get_by_slot(DeckSlotName.SLOT_3) is None
+
+
+def test_get_by_slot_prefers_later() -> None:
+    """It should get the labware in a slot, preferring later items if locations match."""
+    subject = make_module_view(
+        slot_by_module_id={
+            "module-1": DeckSlotName.SLOT_1,
+            "module-1-again": DeckSlotName.SLOT_1,
+        },
+        hardware_by_module_id={
+            "module-1": HardwareModule(
+                serial_number="serial-number-1",
+                definition=ModuleDefinition.construct(  # type: ignore[call-arg]
+                    model=ModuleModel.TEMPERATURE_MODULE_V1
+                ),
+            ),
+            "module-1-again": HardwareModule(
+                serial_number="serial-number-1",
+                definition=ModuleDefinition.construct(  # type: ignore[call-arg]
+                    model=ModuleModel.TEMPERATURE_MODULE_V1
+                ),
+            ),
+        },
+    )
+
+    assert subject.get_by_slot(DeckSlotName.SLOT_1) == LoadedModule(
+        id="module-1-again",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        model=ModuleModel.TEMPERATURE_MODULE_V1,
+        serialNumber="serial-number-1",
+    )
