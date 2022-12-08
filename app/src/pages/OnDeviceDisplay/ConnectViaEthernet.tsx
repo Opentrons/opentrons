@@ -36,7 +36,6 @@ const STATUS_REFRESH_MS = 5000
 
 export function ConnectViaEthernet(): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const [isConnected, setIsConnected] = React.useState<boolean>(false)
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const dispatch = useDispatch<Dispatch>()
@@ -48,12 +47,9 @@ export function ConnectViaEthernet(): JSX.Element {
   const subnetMask = ethernet?.subnetMask
   const macAddress = ethernet?.macAddress
   const headerTitle = t('connect_via', { type: t('ethernet') })
+  const isConnected = ipAddress != null && subnetMask != null
 
   useInterval(() => dispatch(fetchStatus(robotName)), STATUS_REFRESH_MS, true)
-
-  React.useEffect(() => {
-    setIsConnected(ipAddress != null && subnetMask != null)
-  }, [ipAddress, subnetMask])
 
   return (
     <>
@@ -113,7 +109,7 @@ const TitleHeader = ({ title }: TitleHeaderProps): JSX.Element => {
       position={POSITION_RELATIVE}
     >
       {/* ToDo kj 12/05/2022 update path */}
-      <Btn onClick={() => history.push('/network-setup-menu')}>
+      <Btn onClick={() => history.push('/network-setup')}>
         <Flex
           alignItems={ALIGN_CENTER}
           flexDirection={DIRECTION_ROW}

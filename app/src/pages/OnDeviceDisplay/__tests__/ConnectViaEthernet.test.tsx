@@ -96,7 +96,7 @@ describe('ConnectViaEthernet', () => {
     const [{ getByRole }] = render()
     const button = getByRole('button', { name: 'Back' })
     fireEvent.click(button)
-    expect(mockPush).toHaveBeenCalledWith('/network-setup-menu')
+    expect(mockPush).toHaveBeenCalledWith('/network-setup')
   })
 
   // ToDo kj: 12/01/2022 activate this case when merge name screen
