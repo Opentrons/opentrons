@@ -1,5 +1,4 @@
 import pytest
-from typing import TYPE_CHECKING
 from itertools import chain
 from mock import AsyncMock, patch
 from opentrons.hardware_control.backends.ot3controller import OT3Controller
@@ -35,9 +34,6 @@ from opentrons_hardware.hardware_control.tools.types import (
     PipetteInformation,
     GripperInformation,
 )
-
-if TYPE_CHECKING:
-    from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
 
 
 @pytest.fixture
@@ -322,23 +318,21 @@ async def test_probing(
 
 
 @pytest.mark.parametrize(
-    "tool_summary,pipette_id,pipette_name,pipette_model,gripper_id,gripper_name",
+    "tool_summary,pipette_id,gripper_id,gripper_name",
     [
         (
             ToolSummary(
                 left=PipetteInformation(
                     name=FirmwarePipetteName.p1000_single,
                     name_int=FirmwarePipetteName.p1000_single.value,
-                    model="3.0",
+                    model="3.3",
                     serial="hello",
                 ),
                 right=None,
                 gripper=GripperInformation(model="0", serial="fake_serial"),
             ),
-            "hello",
-            "p1000_single_gen3",
-            "p1000_single_v3.0",
-            "fake_serial",
+            "P1KSV33hello",
+            "GRPV0fake_serial",
             "gripper",
         ),
     ],
@@ -348,8 +342,6 @@ async def test_get_attached_instruments(
     mock_tool_detector: OneshotToolDetector,
     tool_summary: ToolSummary,
     pipette_id: str,
-    pipette_name: "PipetteName",
-    pipette_model: "PipetteModel",
     gripper_id: str,
     gripper_name: str,
 ):
@@ -365,8 +357,6 @@ async def test_get_attached_instruments(
         detected = await controller.get_attached_instruments({})
     assert list(detected.keys()) == [OT3Mount.LEFT, OT3Mount.GRIPPER]
     assert detected[OT3Mount.LEFT]["id"] == pipette_id
-    assert detected[OT3Mount.LEFT]["config"].name == pipette_name
-    assert detected[OT3Mount.LEFT]["config"].model == pipette_model
     assert detected[OT3Mount.GRIPPER]["id"] == gripper_id
     assert detected[OT3Mount.GRIPPER]["config"].name == gripper_name
 
@@ -405,7 +395,10 @@ async def test_get_attached_instruments_handles_unknown_model(
 
     tool_summary = ToolSummary(
         left=PipetteInformation(
-            name=FirmwarePipetteName.p1000_single, name_int=0, model=41, serial="hello"
+            name=FirmwarePipetteName.p1000_single,
+            name_int=0,
+            model="4.1",
+            serial="hello",
         ),
         right=None,
         gripper=GripperInformation(model=0, serial="fake_serial"),

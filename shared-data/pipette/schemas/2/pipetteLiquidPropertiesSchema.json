@@ -75,6 +75,15 @@
               "defaultBlowOutFlowRate": {
                 "$ref": "#/definitions/flowRate"
               },
+              "defaultTipLength": {
+                "$ref": "#/definitions/positiveNumber"
+              },
+              "defaultTipOverlap": {
+                "$ref": "#/definitions/positiveNumber"
+              },
+              "defaultReturnTipHeight": {
+                "$ref": "#/definitions/positiveNumber"
+              },
               "aspirate": {
                 "type": "array",
                 "items": { "$ref": "#/definitions/liquidHandlingSpecs" }
