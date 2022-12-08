@@ -1,5 +1,5 @@
 """Opentrons helper methods."""
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from datetime import datetime
 from subprocess import run
 from time import time
@@ -289,7 +289,6 @@ def get_plunger_positions_ot3(
 ) -> Tuple[float, float, float, float]:
     """Update plunger current."""
     pipette = _get_pipette_from_mount(api, mount)
-    cfg = pipette.config
     return (
         pipette.plunger_positions.top,
         pipette.plunger_positions.bottom,
@@ -299,7 +298,7 @@ def get_plunger_positions_ot3(
 
 
 async def update_pick_up_current(
-    api: OT3API, mount: OT3Mount, current: Optional[float] = 0.125
+    api: OT3API, mount: OT3Mount, current: float = 0.125
 ) -> None:
     """Update pick-up-tip current."""
     pipette = _get_pipette_from_mount(api, mount)
@@ -309,7 +308,7 @@ async def update_pick_up_current(
 
 
 async def update_pick_up_distance(
-    api: OT3API, mount: OT3Mount, distance: Optional[float] = 17.0
+    api: OT3API, mount: OT3Mount, distance: float = 17.0
 ) -> None:
     """Update pick-up-tip current."""
     pipette = _get_pipette_from_mount(api, mount)
