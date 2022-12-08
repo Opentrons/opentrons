@@ -922,10 +922,6 @@ class OT3API(
         self._log.info(f"Homing {axes}")
         async with self._motion_lock:
             try:
-                # with self._backend.save_current():
-                #     self._backend.set_active_current(
-                #         {checked_axis: instr.config.plunger_current}
-                #     )
                 await self._backend.home(checked_axes)
             except MoveConditionNotMet:
                 self._log.exception("Homing failed")
