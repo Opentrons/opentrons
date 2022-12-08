@@ -45,7 +45,7 @@ describe('ConnectViaUSB', () => {
     const [{ getByRole }] = render()
     const button = getByRole('button', { name: 'Back' })
     fireEvent.click(button)
-    expect(mockPush).toHaveBeenCalledWith('/network-setup-menu')
+    expect(mockPush).toHaveBeenCalledWith('/network-setup')
   })
 
   // Note the following cases will be activated when the connection check functionality is ready

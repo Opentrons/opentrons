@@ -48,7 +48,7 @@ export function ConnectViaUSB(): JSX.Element {
           <Btn
             position={POSITION_ABSOLUTE}
             left="0"
-            onClick={() => history.push('/network-setup-menu')}
+            onClick={() => history.push('/network-setup')}
           >
             <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
               <Icon name="arrow-back" size="1.9375rem" />
