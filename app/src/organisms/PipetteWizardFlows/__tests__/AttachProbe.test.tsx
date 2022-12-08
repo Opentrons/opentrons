@@ -58,7 +58,7 @@ describe('AttachProbe', () => {
         },
         {
           commandType: 'calibration/moveToMaintenancePosition',
-          params: { mount: 'left', location: 'attachOrDetach' },
+          params: { mount: 'left' },
         },
       ],
       false
@@ -80,7 +80,7 @@ describe('AttachProbe', () => {
     const { getByText, getByAltText } = render(props)
     getByText('Stand Back, Pipette is Calibrating')
     getByText(
-      'The calibration probe will touch the sides of the calibration divot in slot 5 to determine its exact position'
+      'The calibration probe will touch the sides of the calibration divot in slot 2 to determine its exact position'
     )
     getByAltText('Pipette is calibrating')
   })

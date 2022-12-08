@@ -31,12 +31,6 @@ export type CalibrationCreateCommand =
   | CalibratePipetteCreateCommand
   | MoveToMaintenancePositionCreateCommand
 
-export const ATTACH_OR_DETACH = 'attachOrDetach'
-export const PROBE_POSITION = 'probePosition'
-export type CalibrationPosition =
-  | typeof ATTACH_OR_DETACH
-  | typeof PROBE_POSITION
-
 interface CalibratePipetteParams {
   mount: PipetteMount
 }
@@ -47,5 +41,4 @@ interface CalibratePipetteResult {
 
 interface MoveToMaintenancePositionParams {
   mount: PipetteMount
-  location: CalibrationPosition
 }

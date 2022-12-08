@@ -158,7 +158,7 @@ describe('PipetteWizardFlows', () => {
           },
           {
             commandType: 'calibration/moveToMaintenancePosition',
-            params: { mount: LEFT, location: 'attachOrDetach' },
+            params: { mount: LEFT },
           },
         ],
         false
@@ -182,7 +182,7 @@ describe('PipetteWizardFlows', () => {
           },
           {
             commandType: 'calibration/moveToMaintenancePosition',
-            params: { mount: LEFT, location: 'attachOrDetach' },
+            params: { mount: LEFT },
           },
         ],
         false
@@ -294,7 +294,7 @@ describe('PipetteWizardFlows', () => {
         [
           {
             commandType: 'calibration/moveToMaintenancePosition',
-            params: { mount: LEFT, location: 'attachOrDetach' },
+            params: { mount: LEFT },
           },
         ],
         false

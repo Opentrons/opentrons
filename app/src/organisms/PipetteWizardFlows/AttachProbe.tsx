@@ -29,7 +29,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const pipetteId = attachedPipette[mount]?.id
   //  hard coding calibration slot number for now in case it changes
   //  in the future
-  const calSlotNum = '5'
+  const calSlotNum = '2'
   if (pipetteId == null) return null
   const handleOnClick = (): void => {
     chainRunCommands(
@@ -46,7 +46,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
           commandType: 'calibration/moveToMaintenancePosition' as const,
           params: {
             mount: mount,
-            location: 'attachOrDetach',
           },
         },
       ],

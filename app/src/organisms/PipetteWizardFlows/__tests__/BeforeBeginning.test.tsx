@@ -85,7 +85,7 @@ describe('BeforeBeginning', () => {
           },
           {
             commandType: 'calibration/moveToMaintenancePosition',
-            params: { mount: LEFT, location: 'attachOrDetach' },
+            params: { mount: LEFT },
           },
         ],
         false
@@ -151,7 +151,7 @@ describe('BeforeBeginning', () => {
         [
           {
             commandType: 'calibration/moveToMaintenancePosition',
-            params: { mount: LEFT, location: 'attachOrDetach' },
+            params: { mount: LEFT },
           },
         ],
         false
@@ -191,7 +191,7 @@ describe('BeforeBeginning', () => {
           },
           {
             commandType: 'calibration/moveToMaintenancePosition',
-            params: { mount: LEFT, location: 'attachOrDetach' },
+            params: { mount: LEFT },
           },
         ],
         false

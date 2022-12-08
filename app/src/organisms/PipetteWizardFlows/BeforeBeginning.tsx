@@ -87,7 +87,6 @@ export const BeforeBeginning = (
           commandType: 'calibration/moveToMaintenancePosition' as const,
           params: {
             mount: mount,
-            location: 'attachOrDetach',
           },
         },
       ],
@@ -109,7 +108,6 @@ export const BeforeBeginning = (
           commandType: 'calibration/moveToMaintenancePosition' as const,
           params: {
             mount: mount,
-            location: 'attachOrDetach',
           },
         },
       ],
