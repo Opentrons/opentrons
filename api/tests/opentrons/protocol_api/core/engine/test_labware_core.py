@@ -179,7 +179,7 @@ def test_get_next_tip(
     decoy.when(
         mock_engine_client.state.tips.get_next_tip(
             labware_id="cool-labware",
-            use_column=True,
+            tip_amount=8,
             starting_tip_name="B1",
         )
     ).then_return("A2")

@@ -84,7 +84,7 @@ def test_get_next_tip_returns_none(
 
     result = TipView(subject.state).get_next_tip(
         labware_id="cool-labware",
-        use_column=False,
+        tip_amount=1,
         starting_tip_name=None,
     )
 
@@ -99,7 +99,7 @@ def test_get_next_tip_returns_first_tip(
 
     result = TipView(subject.state).get_next_tip(
         labware_id="cool-labware",
-        use_column=False,
+        tip_amount=1,
         starting_tip_name=None,
     )
 
@@ -114,7 +114,7 @@ def test_get_next_tip_used_starting_tip(
 
     result = TipView(subject.state).get_next_tip(
         labware_id="cool-labware",
-        use_column=False,
+        tip_amount=1,
         starting_tip_name="B1",
     )
 
@@ -141,7 +141,7 @@ def test_get_next_tip_skips_picked_up_tip(
 
     result = TipView(subject.state).get_next_tip(
         labware_id="cool-labware",
-        use_column=False,
+        tip_amount=1,
         starting_tip_name=None,
     )
 
@@ -168,7 +168,7 @@ def test_get_next_tip_with_column(
 
     result = TipView(subject.state).get_next_tip(
         labware_id="cool-labware",
-        use_column=True,
+        tip_amount=8,
         starting_tip_name=None,
     )
 
@@ -184,11 +184,11 @@ def test_get_next_tip_with_column_and_starting_tip(
 
     result = TipView(subject.state).get_next_tip(
         labware_id="cool-labware",
-        use_column=True,
+        tip_amount=8,
         starting_tip_name="D1",
     )
 
-    assert result == "A2"
+    assert result == "A1"
 
 
 def test_reset_tips(
@@ -212,7 +212,7 @@ def test_reset_tips(
 
     result = TipView(subject.state).get_next_tip(
         labware_id="cool-labware",
-        use_column=False,
+        tip_amount=1,
         starting_tip_name=None,
     )
 
@@ -257,7 +257,7 @@ def test_tip_tracking(
 
     result = TipView(subject.state).get_next_tip(
         labware_id="cool-labware",
-        use_column=False,
+        tip_amount=1,
         starting_tip_name=None,
     )
 
