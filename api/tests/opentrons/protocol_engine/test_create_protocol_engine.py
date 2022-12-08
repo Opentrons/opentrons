@@ -59,7 +59,7 @@ async def test_create_engine_initializes_state_with_door_state(
         hardware_api=hardware_api,
         config=EngineConfig(
             block_on_door_open=True,
-            robot_type="OT-2 Standard",  # Choce of robot_type is arbitrary.
+            robot_type="OT-2 Standard",  # Choice of robot_type is arbitrary.
         ),
     )
     state = engine.state_view
