@@ -28,7 +28,7 @@ from opentrons.util.helpers import utc_now
 import pytest
 
 try:
-    import opentrons_hardware
+    import opentrons_hardware  # noqa: F401
 
     # TODO (lc 12-8-2022) Not sure if we plan to keep these tests, but if we do
     # we should re-write them to be agnostic to the underlying hardware. Otherwise

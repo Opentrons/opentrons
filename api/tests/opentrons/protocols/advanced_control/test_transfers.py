@@ -8,7 +8,7 @@ from opentrons.protocols.api_support.types import APIVersion
 import opentrons.protocol_api as papi
 
 try:
-    import opentrons_hardware
+    import opentrons_hardware  # noqa: F401
 
     # TODO (lc 12-8-2022) We need to re-write these transfer tests so that
     # they are agnostic to the underlying hardware.
