@@ -2,15 +2,15 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import { BORDERS, Box, COLORS } from '@opentrons/components'
 
-interface ShimmerProps {
+interface SkeletonProps {
   width: string
   height: string
-  //  backgroundSize is the total width to add to every Shimmer in the component which controls the animation speed
+  //  backgroundSize is the total width to add to every Skeleton in the component which controls the animation speed
   backgroundSize: string
 }
-export const Shimmer = (props: ShimmerProps): JSX.Element => {
+export const Skeleton = (props: SkeletonProps): JSX.Element => {
   const { width, height, backgroundSize } = props
-  const shimmer = css`
+  const SKELETON_STYLE = css`
     border-radius: ${BORDERS.radiusSoftCorners};
     animation: shimmer 2s infinite linear;
     background: linear-gradient(
@@ -38,5 +38,5 @@ export const Shimmer = (props: ShimmerProps): JSX.Element => {
     }
   `
 
-  return <Box data-testid="Shimmer" css={shimmer} />
+  return <Box data-testid="Skeleton" css={SKELETON_STYLE} />
 }

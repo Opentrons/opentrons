@@ -10,16 +10,16 @@ import {
 } from '@opentrons/components'
 import { ModalShell } from '../../molecules/Modal'
 import { PrimaryButton } from '../buttons'
-import { Shimmer } from '.'
+import { Skeleton } from '.'
 
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'App/Atoms/Shimmer',
-  component: Shimmer,
+  title: 'App/Atoms/Skeleton',
+  component: Skeleton,
 } as Meta
 
-const Template: Story<React.ComponentProps<typeof Shimmer>> = args => {
+const Template: Story<React.ComponentProps<typeof Skeleton>> = args => {
   return (
     <ModalShell width="47rem">
       <Flex flexDirection={DIRECTION_COLUMN} height="24.6rem">
@@ -35,13 +35,13 @@ const Template: Story<React.ComponentProps<typeof Shimmer>> = args => {
             flex="1"
             gridGap={SPACING.spacing4}
           >
-            <Shimmer height="1.5rem" width="100px" backgroundSize="47rem" />
-            <Shimmer {...args} />
-            <Shimmer {...args} />
-            <Shimmer {...args} />
+            <Skeleton height="1.5rem" width="100px" backgroundSize="47rem" />
+            <Skeleton {...args} />
+            <Skeleton {...args} />
+            <Skeleton {...args} />
           </Flex>
           <Flex flex="1" justifyContent={JUSTIFY_CENTER}>
-            <Shimmer height="12.5rem" width="100%" backgroundSize="47rem" />
+            <Skeleton height="12.5rem" width="100%" backgroundSize="47rem" />
           </Flex>
         </Flex>
         <Flex
