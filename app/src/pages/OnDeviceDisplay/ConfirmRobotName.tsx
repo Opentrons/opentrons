@@ -19,12 +19,15 @@ import screenImage from '../../assets/images/odd/odd_abstract@x2.png'
 
 const IMAGE_ALT = 'finish setting up a robot'
 
-export function FinishSetup(): JSX.Element {
+export function ConfirmRobotName(): JSX.Element {
   const { t } = useTranslation('device_settings')
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name
   return (
-    <Flex padding={SPACING.spacingXXL} flexDirection={DIRECTION_COLUMN}>
+    <Flex
+      padding={`${SPACING.spacing6} ${SPACING.spacingXXL} ${SPACING.spacingXXL}`}
+      flexDirection={DIRECTION_COLUMN}
+    >
       <Flex justifyContent={JUSTIFY_CENTER} marginBottom="3.041875rem">
         <StyledText
           fontSize="2rem"

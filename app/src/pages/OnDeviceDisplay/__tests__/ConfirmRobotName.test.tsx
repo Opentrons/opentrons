@@ -6,7 +6,7 @@ import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
 import { getLocalRobot } from '../../../redux/discovery'
-import { FinishSetup } from '../FinishSetup'
+import { ConfirmRobotName } from '../ConfirmRobotName'
 
 import type { State } from '../../../redux/types'
 
@@ -54,7 +54,7 @@ const mockRobot = {
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <FinishSetup />
+      <ConfirmRobotName />
     </MemoryRouter>,
     {
       i18nInstance: i18n,
@@ -63,7 +63,7 @@ const render = () => {
   )
 }
 
-describe('Finish setup screen', () => {
+describe('ConfirmRobotName', () => {
   beforeEach(() => {
     when(mockGetLocalRobot).calledWith(MOCK_STATE).mockReturnValue(mockRobot)
   })

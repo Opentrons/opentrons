@@ -31,7 +31,7 @@ import { ConnectedNetworkInfo } from '../pages/OnDeviceDisplay/ConnectedNetworkI
 import { SelectNetwork } from '../pages/OnDeviceDisplay/SelectNetwork'
 import { SetWifiCred } from '../pages/OnDeviceDisplay/SetWifiCred'
 import { NameRobot } from '../pages/OnDeviceDisplay/NameRobot'
-import { FinishSetup } from '../pages/OnDeviceDisplay/FinishSetup'
+import { ConfirmRobotName } from '../pages/OnDeviceDisplay/ConfirmRobotName'
 import { getIsOnDevice } from '../redux/config'
 import { getLocalRobot } from '../redux/discovery'
 import { useSoftwareUpdatePoll } from './hooks'
@@ -141,10 +141,10 @@ export const AppComponent = (): JSX.Element => {
       path: '/name-robot',
     },
     {
-      Component: FinishSetup,
+      Component: ConfirmRobotName,
       exact: true,
-      name: 'Finish setup',
-      path: '/finish-setup',
+      name: 'Confirm Robot Name',
+      path: '/confirm-robot-name',
     },
   ]
 

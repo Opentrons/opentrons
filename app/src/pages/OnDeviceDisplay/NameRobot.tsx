@@ -16,6 +16,7 @@ import {
   POSITION_ABSOLUTE,
   COLORS,
   TYPOGRAPHY,
+  Icon,
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 
@@ -43,6 +44,7 @@ export function NameRobot(): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const trackEvent = useTrackEvent()
   const [name, setName] = React.useState<string>('')
+  const [isWaiting, setIsWaiting] = React.useState<boolean>(false)
   const keyboardRef = React.useRef(null)
   const localRobot = useSelector(getLocalRobot)
   const previousName = localRobot?.name != null ? localRobot.name : null
@@ -73,7 +75,9 @@ export function NameRobot(): JSX.Element {
         dispatch(removeRobot(sameNameRobotInUnavailable.name))
       }
       updateRobotName(newName)
-      resetForm({ values: { newRobotName: '' } })
+      setIsWaiting(isNameDone)
+      // !isNameDone && history.push('/confirm-robot-name')
+      // resetForm({ values: { newRobotName: '' } })
     },
     validate: values => {
       const errors: FormikErrors = {}
@@ -94,25 +98,29 @@ export function NameRobot(): JSX.Element {
     },
   })
 
-  const { updateRobotName } = useUpdateRobotNameMutation({
-    onSuccess: (data: UpdatedRobotName) => {
-      data.name != null && history.push('/finish-setup')
-      // remove previousName if it isn't undefined | null
-      previousName != null && dispatch(removeRobot(previousName))
-    },
-    onError: (error: Error) => {
-      console.error('error', error.message)
-    },
-  })
+  const { updateRobotName, isLoading: isNameDone } = useUpdateRobotNameMutation(
+    {
+      onSuccess: (data: UpdatedRobotName) => {
+        // data.name != null && history.push('/confirm-robot-name')
+        // remove previousName if it isn't undefined | null
+        data.name != null &&
+          previousName != null &&
+          dispatch(removeRobot(previousName))
+      },
+      onError: (error: Error) => {
+        console.error('error', error.message)
+      },
+    }
+  )
 
   const handleConfirm = (): void => {
     // check robot name in the same network
+    // setIsWaiting(true)
     trackEvent({
       name: 'renameRobot',
       properties: {
         previousRobotName: previousName,
         newRobotName: formik.values.newRobotName,
-        // Note kj 11/17/2022 we may need to add desktop to RenameSlideout
         appType: 'OnDeviceDisplay',
       },
     })
@@ -143,6 +151,7 @@ export function NameRobot(): JSX.Element {
             lineHeight="2.0425rem"
             onClick={handleConfirm}
           >
+            {isNameDone ? <Icon name="ot-spinner" size="1.25rem" spin /> : null}
             {t('shared:confirm')}
           </TertiaryButton>
         </Flex>
