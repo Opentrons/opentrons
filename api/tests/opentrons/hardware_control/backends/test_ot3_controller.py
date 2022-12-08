@@ -273,13 +273,13 @@ async def test_probing(
                 left=PipetteInformation(
                     name=FirmwarePipetteName.p1000_single,
                     name_int=FirmwarePipetteName.p1000_single.value,
-                    model="3.0",
+                    model="3.3",
                     serial="hello",
                 ),
                 right=None,
                 gripper=GripperInformation(model="0", serial="fake_serial"),
             ),
-            "P1KSV30hello",
+            "P1KSV33hello",
             "GRPV0fake_serial",
             "gripper",
         ),
@@ -343,7 +343,10 @@ async def test_get_attached_instruments_handles_unknown_model(
 
     tool_summary = ToolSummary(
         left=PipetteInformation(
-            name=FirmwarePipetteName.p1000_single, name_int=0, model=41, serial="hello"
+            name=FirmwarePipetteName.p1000_single,
+            name_int=0,
+            model="4.1",
+            serial="hello",
         ),
         right=None,
         gripper=GripperInformation(model=0, serial="fake_serial"),

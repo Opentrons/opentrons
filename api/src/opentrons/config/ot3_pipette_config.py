@@ -91,25 +91,6 @@ def version_from_string(version: str) -> PipetteVersionType:
     return PipetteVersionType(major, minor)
 
 
-def version_from_int(version: int) -> PipetteVersionType:
-    """Convert a version int to a py:obj:PipetteVersionType.
-
-    The version int will be a 2 digit value with the 10s place
-    representing the major version and the 1s place representing
-    a minor version.
-
-    Args:
-        version (int): The int version we wish to convert.
-
-    Returns:
-        PipetteVersionType: A pipette version object.
-
-    """
-    major = cast(PipetteModelMajorVersionType, version // 10)
-    minor = cast(PipetteModelMinorVersionType, version % 10)
-    return PipetteVersionType(major, minor)
-
-
 def version_from_generation(pipette_name_list: List[str]) -> PipetteVersionType:
     """Convert a string generation name to a py:obj:PipetteVersionType.
 
@@ -133,7 +114,7 @@ def version_from_generation(pipette_name_list: List[str]) -> PipetteVersionType:
 
 
 def convert_pipette_name(
-    name: PipetteName, provided_version: Optional[Union[str, int]] = None
+    name: PipetteName, provided_version: Optional[str] = None
 ) -> PipetteModelVersionType:
     """Convert the py:data:PipetteName to a py:obj:PipetteModelVersionType.
 
@@ -149,10 +130,8 @@ def convert_pipette_name(
     """
     split_pipette_name = name.split("_")
     channels = channels_from_string(split_pipette_name[1])
-    if provided_version and isinstance(provided_version, str):
+    if provided_version:
         version = version_from_string(provided_version)
-    elif provided_version and isinstance(provided_version, int):
-        version = version_from_int(provided_version)
     else:
         version = version_from_generation(split_pipette_name)
 

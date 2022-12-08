@@ -91,9 +91,9 @@ from opentrons_hardware.hardware_control.tool_sensors import (
     capacitive_pass,
 )
 from opentrons_hardware.drivers.gpio import OT3GPIO
+from opentrons_shared_data.pipette.dev_types import PipetteName
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.pipette.dev_types import PipetteName
     from ..dev_types import (
         OT3AttachedPipette,
         AttachedGripper,
@@ -410,7 +410,8 @@ class OT3Controller:
     @staticmethod
     def _combine_serial_number(pipette_info: ohc_tool_types.PipetteInformation) -> str:
         serialized_name = OT3Controller._lookup_serial_key(pipette_info.name)
-        return f"{serialized_name}V{pipette_info.model}{pipette_info.serial}"
+        version = ot3_pipette_config.version_from_string(pipette_info.model)
+        return f"{serialized_name}V{version.major}{version.minor}{pipette_info.serial}"
 
     @staticmethod
     def _build_attached_pip(
@@ -419,6 +420,8 @@ class OT3Controller:
         if attached.name == FirmwarePipetteName.unknown:
             raise InvalidPipetteName(name=attached.name_int, mount=mount)
         try:
+            # TODO (lc 12-8-2022) We should return model as an int rather than
+            # a string.
             # TODO (lc 12-6-2022) We should also provide the full serial number
             # for PipetteInformation.serial so we don't have to use
             # helper methods to convert the serial back to what was flashed
