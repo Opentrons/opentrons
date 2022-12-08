@@ -160,33 +160,6 @@ def test_get_next_tip_skips_picked_up_tip(
     assert result == result_well_name
 
 
-def test_get_next_tip_with_column(
-    subject: TipStore,
-    load_labware_command: commands.LoadLabware,
-    pick_up_tip_command: commands.PickUpTip,
-) -> None:
-    """It should return the first tip in a column if column is needed."""
-    subject.handle_action(actions.UpdateCommandAction(command=load_labware_command))
-    subject.handle_action(
-        actions.AddPipetteConfigAction(
-            pipette_id="pipette-id",
-            channels=1,
-            max_volume=15,
-            min_volume=3,
-            model="gen a",
-        )
-    )
-    subject.handle_action(actions.UpdateCommandAction(command=pick_up_tip_command))
-
-    result = TipView(subject.state).get_next_tip(
-        labware_id="cool-labware",
-        tip_amount=8,
-        starting_tip_name=None,
-    )
-
-    assert result == "A2"
-
-
 def test_get_next_tip_with_column_and_starting_tip(
     subject: TipStore,
     load_labware_command: commands.LoadLabware,
@@ -244,33 +217,3 @@ def test_handle_pipette_config_action(subject: TipStore) -> None:
     )
 
     assert TipView(subject.state).get_channels(pipette_id="pipette-id") == 8
-
-
-@pytest.mark.parametrize("input_channels, next_tip_result", [(96, None), (8, "A2")])
-def test_tip_tracking(
-    subject: TipStore,
-    load_labware_command: commands.LoadLabware,
-    pick_up_tip_command: commands.PickUpTip,
-    input_channels: int,
-    next_tip_result: Optional[str],
-) -> None:
-    """Should set tiprack as used."""
-    subject.handle_action(actions.UpdateCommandAction(command=load_labware_command))
-    subject.handle_action(
-        actions.AddPipetteConfigAction(
-            pipette_id="pipette-id",
-            channels=input_channels,
-            max_volume=15,
-            min_volume=3,
-            model="gen a",
-        )
-    )
-    subject.handle_action(actions.UpdateCommandAction(command=pick_up_tip_command))
-
-    result = TipView(subject.state).get_next_tip(
-        labware_id="cool-labware",
-        tip_amount=1,
-        starting_tip_name=None,
-    )
-
-    assert result == next_tip_result
