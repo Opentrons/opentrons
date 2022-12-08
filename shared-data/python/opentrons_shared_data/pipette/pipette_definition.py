@@ -8,14 +8,21 @@ PLUNGER_CURRENT_MINIMUM = 0.1
 PLUNGER_CURRENT_MAXIMUM = 1.5
 
 
-PipetteModelMajorVersion = Literal[1]
-PipetteModelMinorVersion = Literal[0, 1, 2, 3]
+PipetteModelMajorVersion = [1, 2, 3]
+PipetteModelMinorVersion = [0, 1, 2, 3]
+
+# TODO Literals are only good for writing down
+# exact values. Is there a better typing mechanism
+# so we don't need to keep track of versions in two
+# different places?
+PipetteModelMajorVersionType = Literal[1, 2, 3]
+PipetteModelMinorVersionType = Literal[0, 1, 2, 3]
 
 
 class PipetteTipType(Enum):
-    t50 = "t50"
-    t200 = "t200"
-    t1000 = "t1000"
+    t50 = 50
+    t200 = 200
+    t1000 = 1000
 
 
 class PipetteChannelType(Enum):
@@ -27,22 +34,50 @@ class PipetteChannelType(Enum):
     def as_int(self) -> int:
         return self.value
 
+    def __str__(self) -> str:
+        if self.value == 96:
+            return "96"
+        elif self.value == 8:
+            return "multi"
+        else:
+            return "single"
+
 
 class PipetteModelType(Enum):
     p50 = "p50"
     p1000 = "p1000"
 
 
+class PipetteGenerationType(Enum):
+    GEN1 = "GEN1"
+    GEN2 = "GEN2"
+    GEN3 = "GEN3"
+
+
+PIPETTE_AVAILABLE_TYPES = [m.name for m in PipetteModelType]
+PIPETTE_CHANNELS_INTS = [c.as_int for c in PipetteChannelType]
+PIPETTE_GENERATIONS = [g.name.lower() for g in PipetteGenerationType]
+
+
 @dataclass(frozen=True)
 class PipetteVersionType:
-    major: PipetteModelMajorVersion
-    minor: PipetteModelMinorVersion
+    major: PipetteModelMajorVersionType
+    minor: PipetteModelMinorVersionType
 
     @classmethod
     def convert_from_float(cls, version: float) -> "PipetteVersionType":
-        major = cast(PipetteModelMajorVersion, int(version // 1))
-        minor = cast(PipetteModelMinorVersion, int(round((version % 1), 2) * 10))
+        major = cast(PipetteModelMajorVersionType, int(version // 1))
+        minor = cast(PipetteModelMinorVersionType, int(round((version % 1), 2) * 10))
         return cls(major=major, minor=minor)
+
+    def __str__(self) -> str:
+        return f"{self.major}.{self.minor}"
+
+    @property
+    def as_tuple(
+        self,
+    ) -> Tuple[PipetteModelMajorVersionType, PipetteModelMinorVersionType]:
+        return (self.major, self.minor)
 
 
 class SupportedTipsDefinition(BaseModel):
@@ -62,6 +97,21 @@ class SupportedTipsDefinition(BaseModel):
         ...,
         description="The flowrate used in blowouts by default.",
         alias="defaultBlowOutFlowRate",
+    )
+    default_tip_length: float = Field(
+        ...,
+        description="The default tip length associated with this tip type.",
+        alias="defaultTipLength",
+    )
+    default_tip_overlap: float = Field(
+        ...,
+        description="The default tip overlap associated with this tip type.",
+        alias="defaultTipOverlap",
+    )
+    default_return_tip_height: float = Field(
+        ...,
+        description="The height to return a tip to its tiprack.",
+        alias="defaultReturnTipHeight",
     )
     aspirate: Dict[str, List[Tuple[float, float, float]]] = Field(
         ..., description="The default pipetting functions list for aspirate."
@@ -89,10 +139,14 @@ class PlungerPositions(BaseModel):
         ...,
         description="The plunger position that describes min available volume of a pipette in mm.",
     )
-    blowout: float = Field(
-        ..., description="The plunger position past 0 volume to blow out liquid."
+    blow_out: float = Field(
+        ...,
+        description="The plunger position past 0 volume to blow out liquid.",
+        alias="blowout",
     )
-    drop: float = Field(..., description="The plunger position used to drop tips.")
+    drop_tip: float = Field(
+        ..., description="The plunger position used to drop tips.", alias="drop"
+    )
 
 
 class TipHandlingConfigurations(BaseModel):
@@ -151,7 +205,7 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
         description="The pipette model type (related to number of channels).",
         alias="model",
     )
-    display_category: str = Field(
+    display_category: PipetteGenerationType = Field(
         ..., description="The product model of the pipette.", alias="displayCategory"
     )
     pick_up_tip_configurations: PickUpTipConfigurations = Field(
@@ -182,6 +236,12 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
     def convert_channels(cls, v: int) -> PipetteChannelType:
         return PipetteChannelType(v)
 
+    @validator("display_category", pre=True)
+    def convert_display_category(cls, v: str) -> PipetteGenerationType:
+        if not v:
+            return PipetteGenerationType.GEN1
+        return PipetteGenerationType(v)
+
 
 class PipetteGeometryDefinition(BaseModel):
     """The geometry properties definition of a pipette."""
@@ -200,7 +260,7 @@ class PipetteLiquidPropertiesDefinition(BaseModel):
     supported_tips: Dict[PipetteTipType, SupportedTipsDefinition] = Field(
         ..., alias="supportedTips"
     )
-    max_volume: float = Field(
+    max_volume: int = Field(
         ...,
         description="The maximum supported volume of the pipette.",
         alias="maxVolume",
@@ -231,4 +291,6 @@ class PipetteConfigurations(
 ):
     """The full pipette configurations of a given model and version."""
 
-    pass
+    version: PipetteVersionType = Field(
+        ..., description="The version of the configuration loaded."
+    )

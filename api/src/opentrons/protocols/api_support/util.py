@@ -194,12 +194,15 @@ def _find_value_for_api_version(
     for_version: APIVersion, values: Dict[str, float]
 ) -> float:
     """
-    Parse a dict that looks like
+    Either parse a dict that looks like
     {"2.0": 5,
     "2.5": 4}
     (aka the flow rate values from pipette config) and return the value for
-    the highest api level that is at or underneath ``for_version``
+    the highest api level that is at or underneath ``for_version``,
+    or return the value passed in, if it's only a float.
     """
+    if isinstance(values, float):
+        return values
     sorted_versions = sorted({APIVersion.from_string(k): v for k, v in values.items()})
     last = values[str(sorted_versions[0])]
     for version in sorted_versions:
