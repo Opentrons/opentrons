@@ -26,7 +26,7 @@ from opentrons.hardware_control import (
 )
 from opentrons.protocol_api import labware
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
-from opentrons.protocols.geometry.deck import Deck
+from opentrons.protocol_api.core.protocol_api.deck import Deck
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
@@ -921,7 +921,7 @@ class CheckCalibrationUserFlow:
             await self.hardware.gantry_position(self.mount, refresh=True)
             trash = self._deck.get_fixed_trash()
             assert trash, "Bad deck setup"
-            await uf.move(self, trash["A1"].top(), CriticalPoint.XY_CENTER)
+            await uf.move(self, trash["A1"].top(), CriticalPoint.XY_CENTER)  # type: ignore[index]
             await self.hardware.drop_tip(self.mount)
             await self.move_to_tip_rack()
         elif self._current_state == State.comparingNozzle:

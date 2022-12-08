@@ -73,6 +73,7 @@ export interface PipetteWizardStepProps {
   attachedPipette: AttachedPipettesByMount
   setShowErrorMessage: React.Dispatch<React.SetStateAction<string | null>>
   errorMessage: string | null
+  robotName: string
 }
 
 export type SelectablePipettes = '96-Channel' | 'Single-Channel_and_8-Channel'

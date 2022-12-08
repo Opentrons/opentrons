@@ -1,5 +1,6 @@
-import type { LogLevel } from '../../logger'
 import { OT2_MANIFEST_URL, OT3_MANIFEST_URL } from './constants'
+import type { LogLevel } from '../../logger'
+import type { ProtocolSort } from '../../organisms/ProtocolsLanding/hooks'
 
 export type UrlProtocol = 'file:' | 'http:'
 
@@ -14,7 +15,6 @@ export type DevInternalFlag =
   | 'enableLiquidSetup'
   | 'enableManualDeckStateModification'
   | 'enableCalibrationWizards'
-  | 'enableThermocyclerGen2'
   | 'enableExtendedHardware'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>

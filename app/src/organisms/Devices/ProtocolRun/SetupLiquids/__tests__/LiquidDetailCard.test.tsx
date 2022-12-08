@@ -1,15 +1,25 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
 import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
+import { useTrackEvent } from '../../../../../redux/analytics'
 import { LiquidDetailCard } from '../LiquidDetailCard'
 
+jest.mock('../../../../../redux/analytics')
+
+const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
+  typeof useTrackEvent
+>
 const render = (props: React.ComponentProps<typeof LiquidDetailCard>) => {
   return renderWithProviders(<LiquidDetailCard {...props} />)
 }
+let mockTrackEvent: jest.Mock
 
 describe('LiquidDetailCard', () => {
   let props: React.ComponentProps<typeof LiquidDetailCard>
 
   beforeEach(() => {
+    mockTrackEvent = jest.fn()
+    mockUseTrackEvent.mockReturnValue(mockTrackEvent)
     props = {
       liquidId: '0',
       displayName: 'Mock Liquid',
@@ -31,6 +41,14 @@ describe('LiquidDetailCard', () => {
     getByText('Mock Liquid')
     getByText('Mock Description')
     getAllByText(nestedTextMatcher('100 µL'))
+  })
+  it('renders clickable box, clicking on it calls track event', () => {
+    const [{ getByTestId }] = render(props)
+    fireEvent.click(getByTestId('LiquidDetailCard_box'))
+    expect(mockTrackEvent).toHaveBeenCalledWith({
+      name: 'highlightLiquidInDetailModal',
+      properties: {},
+    })
   })
   it('renders well volume information if selected', () => {
     const [{ getByText, getAllByText }] = render({
