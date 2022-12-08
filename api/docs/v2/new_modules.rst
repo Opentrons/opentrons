@@ -84,10 +84,11 @@ Like specifying labware that will be placed directly on the deck of the OT-2, yo
     metadata = {'apiLevel': '2.3'}
 
     def run(protocol: protocol_api.ProtocolContext):
-         temp_mod = protocol.load_module('temperature module gen2', 1)
-         temp_labware = temp_mod.load_labware(
-            load_name='opentrons_24_aluminumblock_generic_2ml_screwcap',
-            label='Temperature-Controlled Tubes')
+        temp_mod = protocol.load_module("temperature module gen2", 1)
+        temp_labware = temp_mod.load_labware(
+            load_name="opentrons_24_aluminumblock_generic_2ml_screwcap",
+            label="Temperature-Controlled Tubes",
+        )
 
 .. versionadded:: 2.0
 
@@ -118,101 +119,62 @@ In addition to the mandatory ``load_name`` argument, you can also specify additi
 Using a Temperature Module
 **************************
 
-The Temperature Module acts as both a cooling and heating device. It can control the temperature
-of its deck between 4 °C and 95 °C with a resolution of 1 °C.
+The Temperature Module acts as both a cooling and heating device. It can control the temperature of its deck between 4 °C and 95 °C with a resolution of 1 °C.
 
-Temperature Modules are represented in code by :py:class:`.TemperatureModuleContext` objects.
+The Temperature Module is represented in code by a :py:class:`.TemperatureModuleContext` object, which has methods for setting target temperatures and reading the module's status.
 
-The Temperature Module has the following methods that can be accessed during a protocol. For the purposes of this
-section, assume we have the following already:
+The examples in this section will use a Temperature Module loaded in slot 3:
 
 .. code-block:: python
     :substitutions:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata = {'apiLevel': '2.3'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        temp_mod = protocol.load_module('temperature module', '1')
+        temp_mod = protocol.load_module('temperature module gen2', '3')
         plate = temp_mod.load_labware('corning_96_wellplate_360ul_flat')
-        # The code from the rest of the examples in this section goes here
 
 .. versionadded:: 2.0
 
-Set Temperature
-===============
+Temperature Control
+===================
 
-To set the Temperature Module to 4 °C do the following:
+The primary function of the module is to control the temperature of its deck, using :py:meth:`~.TemperatureModuleContext.set_temperature`, which takes one parameter: ``celsius``. For example, to set the Temperature Module to 4 °C:
 
 .. code-block:: python
 
-    temp_mod.set_temperature(4)
+    temp_mod.set_temperature(celsius=4)
 
-This function will pause your protocol until your target temperature is reached.
+When using ``set_temperature``, your protocol will wait until the target temperature is reached before proceeding to further commands. In other words, you can pipette to or from the Temperature Module when it is holding at a temperature or idle, but not while it is actively changing temperature. Whenever the module reaches its target temperature, it will hold the temperature until you set a different target or call :py:meth:`~.TemperatureModuleContext.deactivate`, which will stop heating or cooling and will turn off the fan.
 
 .. note::
 
-     This is unlike version 1 of the Python API, in which you would have to use the separate function ``wait_for_temperature`` to block protocol execution until the Temperature Module was ready.
+    The OT-2 will not automatically deactivate the Temperature Module at the end of a protocol. If you need to deactivate the module after a protocol is completed or canceled, use the Temperature Module controls on the device detail page in the Opentrons App or run ``deactivate()`` in Jupyter notebook.
 
 .. versionadded:: 2.0
 
-Read the Current Temperature
-============================
+Temperature Status
+==================
 
-You can read the current real-time temperature of the Temperature Module using the :py:obj:`.TemperatureModuleContext.temperature` property:
-
-.. code-block:: python
-
-    temp_mod.temperature
-
-.. versionadded:: 2.0
-
-Read the Target Temperature
-===========================
-
-You can read the current target temperature of the Temperature Module using the :py:obj:`.TemperatureModuleContext.target` property:
+If you need to confirm in software whether the Temperature Module is holding at a temperature or is idle, use the :py:obj:`~.TemperatureModuleContext.status` property:
 
 .. code-block:: python
 
-    temp_mod.target
-
-.. versionadded:: 2.0
-
-Check the Status
-================
-
-The :py:obj:`.TemperatureModuleContext.status` property is a string that is one of  ``'heating'``, ``'cooling'``, ``'holding at target'`` or ``'idle'``.
-
-.. code-block:: python
-
-    temp_mod.status
-
-Deactivate
-==========
-
-This function will stop heating or cooling and will turn off the fan on the Temperature Module.
-
-.. code-block:: python
-
+    temp_mod.set_temperature(celsius=90)
+    temp_mod.status  # 'holding at target'
     temp_mod.deactivate()
-
-.. note::
-
-    You can also deactivate your temperature module through the Opentrons App by
-    clicking on the ``Pipettes & Modules`` tab. Your Temperature Module will automatically
-    deactivate if another protocol is uploaded to the app. Your Temperature Module will
-    *not* deactivate automatically when the protocol ends, is cancelled, or is reset.
-
-After deactivating your Temperature module, you can later call :py:meth:`.TemperatureModuleContext.set_temperature` to heat or cool phase again.
-
+    temp_mod.status  # 'idle'
+    
+If you don't need to use the status value in your code, and you have physical access to the module, you can read its status and temperature from the LED and display on the module.
+    
 .. versionadded:: 2.0
 
 Changes with the GEN2 Temperature Module
 ========================================
 
-The GEN2 Temperature Module has a plastic insulating rim around the plate, and plastic insulating shrouds designed to fit over our aluminum blocks.
-This mitigates an issue where the GEN1 Temperature Module would have trouble cooling to very low temperatures, especially if it shared the deck with a running Thermocycler.
+All methods of :py:class:`.TemperatureModuleContext` work with both the GEN1 and GEN2 Temperature Module. Physically, the GEN2 module has a plastic insulating rim around the plate, and plastic insulating shrouds designed to fit over Opentrons aluminum blocks. This mitigates an issue where the GEN1 module would have trouble cooling to very low temperatures, especially if it shared the deck with a running Thermocycler.
 
 
 .. _magnetic-module:
