@@ -13,12 +13,14 @@ import runRecord from '../../../organisms/RunDetails/__fixtures__/runRecord.json
 import { useDownloadRunLog, useTrackProtocolRunEvent } from '../hooks'
 import { useRunControls } from '../../RunTimeControl/hooks'
 import { HistoricalProtocolRunOverflowMenu } from '../HistoricalProtocolRunOverflowMenu'
+import { useTrackEvent } from '../../../redux/analytics'
 import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
 
 import type { CommandsData } from '@opentrons/api-client'
 
 const mockPush = jest.fn()
 
+jest.mock('../../../redux/analytics')
 jest.mock('../../../redux/buildroot/selectors')
 jest.mock('../../Devices/hooks')
 jest.mock('../../RunTimeControl/hooks')
@@ -41,6 +43,9 @@ const mockUseRunControls = useRunControls as jest.MockedFunction<
 >
 const mockUseDeleteRunMutation = useDeleteRunMutation as jest.MockedFunction<
   typeof useDeleteRunMutation
+>
+const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
+  typeof useTrackEvent
 >
 const mockUseTrackProtocolRunEvent = useTrackProtocolRunEvent as jest.MockedFunction<
   typeof useTrackProtocolRunEvent
@@ -66,12 +71,15 @@ const render = (
 }
 const PAGE_LENGTH = 101
 const RUN_ID = 'id'
+let mockTrackEvent: jest.Mock
 let mockTrackProtocolRunEvent: jest.Mock
 const mockDownloadRunLog = jest.fn()
 
 describe('HistoricalProtocolRunOverflowMenu', () => {
   let props: React.ComponentProps<typeof HistoricalProtocolRunOverflowMenu>
   beforeEach(() => {
+    mockTrackEvent = jest.fn()
+    mockUseTrackEvent.mockReturnValue(mockTrackEvent)
     mockTrackProtocolRunEvent = jest.fn(
       () => new Promise(resolve => resolve({}))
     )
@@ -142,6 +150,10 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
       name: 'Delete protocol run record',
     })
     fireEvent.click(rerunBtn)
+    expect(mockTrackEvent).toHaveBeenCalledWith({
+      name: 'proceedToRun',
+      properties: { sourceLocation: 'HistoricalProtocolRun' },
+    })
     expect(mockUseRunControls).toHaveBeenCalled()
     expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
     fireEvent.click(deleteBtn)

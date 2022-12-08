@@ -18,6 +18,7 @@ from opentrons.protocol_api import (
     InstrumentContext,
     ModuleContext,
     Labware,
+    Deck,
     validation as mock_validation,
 )
 from opentrons.protocol_api.module_contexts import TemperatureModuleContext
@@ -63,12 +64,22 @@ def test_fixed_trash(
     decoy: Decoy, mock_core: ProtocolCore, subject: ProtocolContext
 ) -> None:
     """It should get the fixed trash labware from the core."""
-    mock_labware = decoy.mock(cls=Labware)
-    decoy.when(mock_core.get_fixed_trash()).then_return(mock_labware)
+    mock_labware_core = decoy.mock(cls=LabwareCore)
+
+    decoy.when(mock_core.get_fixed_trash()).then_return(mock_labware_core)
+    decoy.when(mock_labware_core.get_name()).then_return("cool trash")
+    decoy.when(mock_labware_core.get_well_columns()).then_return([])
 
     result = subject.fixed_trash
 
-    assert result is mock_labware
+    assert isinstance(result, Labware)
+    assert result.name == "cool trash"
+
+
+def test_deck(subject: ProtocolContext) -> None:
+    """It should have a Deck interface."""
+    result = subject.deck
+    assert isinstance(result, Deck)
 
 
 def test_load_instrument(
@@ -78,8 +89,11 @@ def test_load_instrument(
 ) -> None:
     """It should create a instrument using its execution core."""
     mock_instrument_core = decoy.mock(cls=InstrumentCore)
+    mock_trash_core = decoy.mock(cls=LabwareCore)
     mock_tip_racks = [decoy.mock(cls=Labware), decoy.mock(cls=Labware)]
 
+    decoy.when(mock_core.get_fixed_trash()).then_return(mock_trash_core)
+    decoy.when(mock_trash_core.get_well_columns()).then_return([])
     decoy.when(mock_validation.ensure_mount("shadowfax")).then_return(Mount.LEFT)
     decoy.when(mock_validation.ensure_lowercase_name("Gandalf")).then_return("gandalf")
     decoy.when(mock_validation.ensure_pipette_name("gandalf")).then_return(
@@ -123,7 +137,10 @@ def test_load_instrument_replace(
 ) -> None:
     """It should allow/disallow pipette replacement."""
     mock_instrument_core = decoy.mock(cls=InstrumentCore)
+    mock_trash_core = decoy.mock(cls=LabwareCore)
 
+    decoy.when(mock_core.get_fixed_trash()).then_return(mock_trash_core)
+    decoy.when(mock_trash_core.get_well_columns()).then_return([])
     decoy.when(mock_validation.ensure_lowercase_name("ada")).then_return("ada")
     decoy.when(mock_validation.ensure_mount(matchers.IsA(Mount))).then_return(
         Mount.RIGHT

@@ -31,7 +31,7 @@ jest.mock('react-router-dom', () => {
 const render = (path = '/') => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
-      <Route path="/connected-network-info/:ssid">
+      <Route path="/network-setup/wifi/connected-network-info/:ssid">
         <ConnectedNetworkInfo />
       </Route>
     </MemoryRouter>,
@@ -74,7 +74,9 @@ describe('ConnectedNetworkInfo', () => {
   })
 
   it('should render title and description', () => {
-    const [{ getByText }] = render('/connected-network-info/mockWifi')
+    const [{ getByText }] = render(
+      '/network-setup/wifi/connected-network-info/mockWifi'
+    )
     getByText('Set up your robot')
     getByText('mockWifi')
     getByText('IP Address: 127.0.0.100')
@@ -84,9 +86,11 @@ describe('ConnectedNetworkInfo', () => {
   })
 
   it('when clicking Change network button, should call mock function', () => {
-    const [{ getByRole }] = render('/connected-network-info/mockWifi')
+    const [{ getByRole }] = render(
+      '/network-setup/wifi/connected-network-info/mockWifi'
+    )
     const button = getByRole('button', { name: 'Change network' })
     fireEvent.click(button)
-    expect(mockPush).toHaveBeenCalledWith('/connect-via-wifi')
+    expect(mockPush).toHaveBeenCalledWith('/network-setup/wifi')
   })
 })

@@ -19,7 +19,7 @@ from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 
 # todo(mm, 2021-04-09): How customer-facing are these classes? Should they be
 # accessible and documented as part of this package?
-from opentrons.protocols.api_support.util import PlungerSpeeds, FlowRates, Clearances
+from opentrons.protocols.api_support.util import PlungerSpeeds, FlowRates
 
 
 # todo(mm, 2021-04-09): Can/should we remove the word "Context" from the name?
@@ -346,9 +346,4 @@ class PipetteContext:  # noqa: D101
     @property
     def return_height(self) -> float:  # noqa: D102
         # TODO: https://github.com/Opentrons/opentrons/issues/9516
-        raise NotImplementedError()
-
-    @property
-    def well_bottom_clearance(self) -> Clearances:  # noqa: D102
-        # TODO: https://github.com/Opentrons/opentrons/issues/9512
         raise NotImplementedError()
