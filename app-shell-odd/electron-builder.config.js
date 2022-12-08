@@ -55,6 +55,5 @@ module.exports = {
         }
       : null,
   generateUpdatesFilesForAllChannels: true,
-  beforeBuild: path.join(__dirname, './scripts/before-build.js'),
   afterSign: path.join(__dirname, './scripts/after-sign.js'),
 }

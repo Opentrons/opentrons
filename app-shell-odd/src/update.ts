@@ -9,9 +9,12 @@ import type { UpdateInfo } from '@opentrons/app/src/redux/shell/types'
 import type { Action, Dispatch, PlainError } from './types'
 
 updater.logger = createLogger('update')
+
 updater.autoDownload = false
 
-export const CURRENT_VERSION: string = updater.currentVersion.version
+// LATEST_OT_SYSTEM_VERSION is instantiated in the preload file, and updated when
+// an update is available in the onAvailable callback below
+export const getLatestVersion = (): string => global.LATEST_OT_SYSTEM_VERSION
 
 export function registerUpdate(
   dispatch: Dispatch
@@ -21,18 +24,13 @@ export function registerUpdate(
       case UI_INITIALIZED:
       case 'shell:CHECK_UPDATE':
         return checkUpdate(dispatch)
-
-      case 'shell:DOWNLOAD_UPDATE':
-        return downloadUpdate(dispatch)
-
-      case 'shell:APPLY_UPDATE':
-        return updater.quitAndInstall()
     }
   }
 }
 
 function checkUpdate(dispatch: Dispatch): void {
   const onAvailable = (info: UpdateInfo): void => {
+    global.LATEST_OT_SYSTEM_VERSION= info.version
     done({ info, available: true })
   }
   const onNotAvailable = (info: UpdateInfo): void => {
@@ -60,24 +58,6 @@ function checkUpdate(dispatch: Dispatch): void {
     updater.removeListener('update-not-available', onNotAvailable)
     updater.removeListener('error', onError)
     dispatch({ type: 'shell:CHECK_UPDATE_RESULT', payload })
-  }
-}
-
-function downloadUpdate(dispatch: Dispatch): void {
-  const onDownloaded = (): void => done({})
-  const onError = (error: Error): void => {
-    done({ error: PlainObjectError(error) })
-  }
-
-  updater.once('update-downloaded', onDownloaded)
-  updater.once('error', onError)
-  // eslint-disable-next-line @typescript-eslint/no-floating-promises
-  updater.downloadUpdate()
-
-  function done(payload: { error?: PlainError }): void {
-    updater.removeListener('update-downloaded', onDownloaded)
-    updater.removeListener('error', onError)
-    dispatch({ type: 'shell:DOWNLOAD_UPDATE_RESULT', payload })
   }
 }
 

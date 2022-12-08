@@ -8,7 +8,7 @@ import { createLogger } from './log'
 import { registerDiscovery } from './discovery'
 import { registerRobotLogs } from './robot-logs'
 import { registerUpdate } from './update'
-import { registerBuildrootUpdate } from './system-update'
+import { registerRobotSystemUpdate } from './system-update'
 import { getConfig, getStore, getOverrides, registerConfig } from './config'
 
 import type { BrowserWindow } from 'electron'
@@ -79,7 +79,7 @@ function startUp(): void {
     registerDiscovery(dispatch),
     registerRobotLogs(dispatch, mainWindow),
     registerUpdate(dispatch),
-    registerBuildrootUpdate(dispatch),
+    registerRobotSystemUpdate(dispatch),
   ]
 
   ipcMain.on('dispatch', (_, action) => {

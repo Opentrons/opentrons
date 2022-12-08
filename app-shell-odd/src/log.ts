@@ -6,7 +6,7 @@ import path from 'path'
 import dateFormat from 'dateformat'
 import winston from 'winston'
 
-import { getConfig } from './config'
+import { getConfig, getStore } from './config'
 
 import type Transport from 'winston-transport'
 import type { Config } from './config'
@@ -32,6 +32,7 @@ let log: winston.Logger
 export function createLogger(filename: string): winston.Logger {
   // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   if (!config) config = getConfig('log')
+  console.log(getStore())
   // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   if (!transports) initializeTransports()
 

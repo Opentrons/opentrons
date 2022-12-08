@@ -1,7 +1,6 @@
 // tests for the app-shell's discovery module
 import { app } from 'electron'
 import Store from 'electron-store'
-import { noop } from 'lodash'
 import { when } from 'jest-when'
 
 import * as DiscoveryClient from '@opentrons/discovery-client'
@@ -11,13 +10,11 @@ import {
 } from '@opentrons/app/src/redux/discovery'
 import { registerDiscovery } from '../discovery'
 import * as Cfg from '../config'
-import * as SysInfo from '../system-info'
 
 jest.mock('electron')
 jest.mock('electron-store')
 jest.mock('@opentrons/discovery-client')
 jest.mock('../config')
-jest.mock('../system-info')
 
 const createDiscoveryClient = DiscoveryClient.createDiscoveryClient as jest.MockedFunction<
   typeof DiscoveryClient.createDiscoveryClient
@@ -35,9 +32,6 @@ const handleConfigChange = Cfg.handleConfigChange as jest.MockedFunction<
   typeof Cfg.handleConfigChange
 >
 
-const createNetworkInterfaceMonitor = SysInfo.createNetworkInterfaceMonitor as jest.MockedFunction<
-  typeof SysInfo.createNetworkInterfaceMonitor
->
 
 const appOnce = app.once as jest.MockedFunction<typeof app.once>
 
@@ -67,7 +61,6 @@ describe('app-shell/discovery', () => {
     } as unknown) as Cfg.Config)
 
     getOverrides.mockReturnValue({})
-    createNetworkInterfaceMonitor.mockReturnValue({ stop: noop })
     createDiscoveryClient.mockReturnValue(mockClient)
 
     when(MockStore.prototype.get).calledWith('robots', []).mockReturnValue([])

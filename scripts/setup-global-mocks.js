@@ -16,7 +16,8 @@ jest.mock('../app/src/App/portal')
 jest.mock('../app/src/redux/shell/remote')
 jest.mock('../app-shell/src/config')
 jest.mock('../app-shell/src/log')
-
+jest.mock('../app-shell-odd/src/config')
+jest.mock('../app-shell-odd/src/log')
 jest.mock('../protocol-designer/src/labware-defs/utils')
 jest.mock('../protocol-designer/src/components/portals/MainPageModalPortal')
 

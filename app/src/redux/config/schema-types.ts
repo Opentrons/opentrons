@@ -1,4 +1,5 @@
 import type { LogLevel } from '../../logger'
+import { OT2_MANIFEST_URL, OT3_MANIFEST_URL } from './constants'
 
 export type UrlProtocol = 'file:' | 'http:'
 
@@ -154,4 +155,18 @@ export interface ConfigV10 extends Omit<ConfigV9, 'version'> {
   protocols: { sendAllProtocolsToOT3: boolean }
 }
 
-export type Config = ConfigV10
+export interface ConfigV11 extends Omit<ConfigV10, 'version'> {
+  version: 11
+  protocols: ConfigV10['protocols'] & {
+    protocolsStoredSortKey: ProtocolSort | null
+  }
+}
+
+export interface ConfigV12 extends Omit<ConfigV11, 'version' | 'buildroot'> {
+  version: 12
+  robotSystemUpdate: {
+    manifestUrls: { OT2: typeof OT2_MANIFEST_URL; OT3: typeof OT3_MANIFEST_URL }
+  }
+}
+
+export type Config = ConfigV12

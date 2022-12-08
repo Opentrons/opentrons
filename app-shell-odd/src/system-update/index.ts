@@ -6,23 +6,19 @@ import { app } from 'electron'
 import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
 import { createLogger } from '../log'
 import { getConfig } from '../config'
-import { CURRENT_VERSION } from '../update'
+import { getLatestVersion } from '../update'
 import { downloadManifest, getReleaseSet } from './release-manifest'
 import {
   getReleaseFiles,
   readUserFileInfo,
   cleanupReleaseFiles,
 } from './release-files'
-import { startPremigration, uploadSystemFile } from './update'
+import { uploadSystemFile } from './update'
 
 import type { DownloadProgress } from '../http'
 import type { Action, Dispatch } from '../types'
 import type { ReleaseSetUrls, ReleaseSetFilepaths } from './types'
-import type {
-  BuildrootUpdateInfo,
-  BuildrootAction,
-} from '@opentrons/app/src/redux/buildroot/types'
-import type { RobotHost } from '@opentrons/app/src/redux/robot-api/types'
+import type { BuildrootUpdateInfo } from '@opentrons/app/src/redux/buildroot/types'
 
 const log = createLogger('buildroot/index')
 
@@ -32,7 +28,7 @@ const MANIFEST_CACHE = path.join(DIRECTORY, 'releases.json')
 let checkingForUpdates = false
 let updateSet: ReleaseSetFilepaths | null = null
 
-export function registerBuildrootUpdate(dispatch: Dispatch): Dispatch {
+export function registerRobotSystemUpdate(dispatch: Dispatch): Dispatch {
   return function handleAction(action: Action) {
     switch (action.type) {
       case UI_INITIALIZED:
@@ -40,7 +36,7 @@ export function registerBuildrootUpdate(dispatch: Dispatch): Dispatch {
         if (!checkingForUpdates) {
           checkingForUpdates = true
           // eslint-disable-next-line @typescript-eslint/no-floating-promises
-          checkForBuildrootUpdate(dispatch).then(
+          checkForSystemUpdate(dispatch).then(
             () => (checkingForUpdates = false)
           )
         }
@@ -102,16 +98,16 @@ export function registerBuildrootUpdate(dispatch: Dispatch): Dispatch {
   }
 }
 
-export function getBuildrootUpdateUrls(): Promise<ReleaseSetUrls | null> {
-  const manifestUrl: string = getConfig('buildroot').manifestUrl
+export function getSystemUpdateUrls(): Promise<ReleaseSetUrls | null> {
+  const manifestUrl: string = getConfig('robotSystemUpdate').manifestUrls.OT3
 
   return downloadManifest(manifestUrl, MANIFEST_CACHE)
     .then(manifest => {
-      const urls = getReleaseSet(manifest, CURRENT_VERSION)
+      const urls = getReleaseSet(manifest, getLatestVersion())
 
       if (urls === null) {
         log.warn('No release files in manifest', {
-          version: CURRENT_VERSION,
+          version: getLatestVersion(),
           manifest,
         })
       }
@@ -120,7 +116,7 @@ export function getBuildrootUpdateUrls(): Promise<ReleaseSetUrls | null> {
     })
     .catch((error: Error) => {
       log.warn('Error retrieving release manifest', {
-        version: CURRENT_VERSION,
+        version: getLatestVersion(),
         error,
       })
 
@@ -129,21 +125,24 @@ export function getBuildrootUpdateUrls(): Promise<ReleaseSetUrls | null> {
 }
 
 // check for a system update matching the current app version
-//   1. Ensure the buildroot directory exists
+//   1. Ensure the system update directory exists
 //   2. Download the manifest file from S3
 //   3. Get the release files according to the manifest
 //      a. If the files need downloading, dispatch progress updates to UI
 //   4. Cache the filepaths of the update files in memory
 //   5. Dispatch info or error to UI
 export function checkForSystemUpdate(dispatch: Dispatch): Promise<unknown> {
-  const fileDownloadDir = path.join(DIRECTORY, CURRENT_VERSION)
+  const fileDownloadDir = path.join(DIRECTORY, getLatestVersion())
 
   return ensureDir(fileDownloadDir)
-    .then(getBuildrootUpdateUrls)
+    .then(getSystemUpdateUrls)
     .then(urls => {
       if (urls === null) return Promise.resolve()
-
-      dispatch({ type: 'buildroot:UPDATE_VERSION', payload: CURRENT_VERSION })
+      // TODO: change this action type to 'systemUpdate:UPDATE_VERSION'
+      dispatch({
+        type: 'buildroot:UPDATE_VERSION',
+        payload: getLatestVersion(),
+      })
 
       let prevPercentDone = 0
 
@@ -154,6 +153,7 @@ export function checkForSystemUpdate(dispatch: Dispatch): Promise<unknown> {
 
           if (Math.abs(percentDone - prevPercentDone) > 0) {
             dispatch({
+              // TODO: change this action type to 'systemUpdate:DOWNLOAD_PROGRESS'
               type: 'buildroot:DOWNLOAD_PROGRESS',
               payload: percentDone,
             })
@@ -170,7 +170,7 @@ export function checkForSystemUpdate(dispatch: Dispatch): Promise<unknown> {
         .catch((error: Error) =>
           dispatch({ type: 'buildroot:DOWNLOAD_ERROR', payload: error.message })
         )
-        .then(() => cleanupReleaseFiles(DIRECTORY, CURRENT_VERSION))
+        .then(() => cleanupReleaseFiles(DIRECTORY, getLatestVersion()))
         .catch((error: Error) => {
           log.warn('Unable to cleanup old release files', { error })
         })
@@ -183,7 +183,7 @@ function cacheUpdateSet(
   updateSet = filepaths
 
   return readFile(updateSet.releaseNotes, 'utf8').then(releaseNotes => ({
-    version: CURRENT_VERSION,
+    version: getLatestVersion(),
     releaseNotes,
   }))
 }
