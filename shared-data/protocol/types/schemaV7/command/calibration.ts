@@ -6,9 +6,10 @@ export interface CalibratePipetteCreateCommand extends CommonCommandCreateInfo {
   params: CalibratePipetteParams
 }
 
-export interface MoveToLocationCreateCommand extends CommonCommandCreateInfo {
-  commandType: 'calibration/moveToLocation'
-  params: MoveToLocationParams
+export interface MoveToMaintenancePositionCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'calibration/moveToMaintenancePosition'
+  params: MoveToMaintenancePositionParams
 }
 
 export interface CalibratePipetteRunTimeCommand
@@ -17,18 +18,18 @@ export interface CalibratePipetteRunTimeCommand
   result: CalibratePipetteResult
 }
 
-export interface MoveToLocationRunTimeCommand
-  extends MoveToLocationCreateCommand {
-  result: MoveToLocationResult
+export interface MoveToMaintenancePositionRunTimeCommand
+  extends MoveToMaintenancePositionCreateCommand {
+  result: {}
 }
 
 export type CalibrationRunTimeCommand =
   | CalibratePipetteRunTimeCommand
-  | MoveToLocationRunTimeCommand
+  | MoveToMaintenancePositionRunTimeCommand
 
 export type CalibrationCreateCommand =
   | CalibratePipetteCreateCommand
-  | MoveToLocationCreateCommand
+  | MoveToMaintenancePositionCreateCommand
 
 export const ATTACH_OR_DETACH = 'attachOrDetach'
 export const PROBE_POSITION = 'probePosition'
@@ -44,15 +45,7 @@ interface CalibratePipetteResult {
   pipetteOffset: LabwareOffset
 }
 
-interface MoveToLocationParams {
-  pipetteId: string
+interface MoveToMaintenancePositionParams {
+  mount: PipetteMount
   location: CalibrationPosition
-}
-
-interface MoveToLocationResult {
-  deckPoint: {
-    x: number
-    y: number
-    z: number
-  }
 }

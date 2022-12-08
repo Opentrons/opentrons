@@ -149,10 +149,6 @@ describe('PipetteWizardFlows', () => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
         [
           {
-            commandType: 'home',
-            params: {},
-          },
-          {
             commandType: 'loadPipette',
             params: {
               mount: LEFT,
@@ -161,8 +157,8 @@ describe('PipetteWizardFlows', () => {
             },
           },
           {
-            commandType: 'calibration/moveToLocation',
-            params: { pipetteId: 'abc', location: 'attachOrDetach' },
+            commandType: 'calibration/moveToMaintenancePosition',
+            params: { mount: LEFT, location: 'attachOrDetach' },
           },
         ],
         false
@@ -182,15 +178,11 @@ describe('PipetteWizardFlows', () => {
         [
           {
             commandType: 'calibration/calibratePipette',
-            params: { mount: 'left' },
+            params: { mount: LEFT },
           },
           {
-            commandType: 'home',
-            params: { axes: ['leftZ'] },
-          },
-          {
-            commandType: 'calibration/moveToLocation',
-            params: { pipetteId: 'abc', location: 'attachOrDetach' },
+            commandType: 'calibration/moveToMaintenancePosition',
+            params: { mount: LEFT, location: 'attachOrDetach' },
           },
         ],
         false
@@ -301,8 +293,8 @@ describe('PipetteWizardFlows', () => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
         [
           {
-            commandType: 'home',
-            params: {},
+            commandType: 'calibration/moveToMaintenancePosition',
+            params: { mount: LEFT, location: 'attachOrDetach' },
           },
         ],
         false

@@ -26,7 +26,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     setShowErrorMessage,
   } = props
   const { t } = useTranslation('pipette_wizard_flows')
-  const motorAxis = mount === 'left' ? 'leftZ' : 'rightZ'
   const pipetteId = attachedPipette[mount]?.id
   //  hard coding calibration slot number for now in case it changes
   //  in the future
@@ -43,16 +42,10 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
           },
         },
         {
-          commandType: 'home' as const,
-          params: {
-            axes: [motorAxis],
-          },
-        },
-        {
           // @ts-expect-error calibration type not yet supported
-          commandType: 'calibration/moveToLocation' as const,
+          commandType: 'calibration/moveToMaintenancePosition' as const,
           params: {
-            pipetteId: pipetteId,
+            mount: mount,
             location: 'attachOrDetach',
           },
         },

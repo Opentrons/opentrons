@@ -57,12 +57,8 @@ describe('AttachProbe', () => {
           params: { mount: 'left' },
         },
         {
-          commandType: 'home',
-          params: { axes: ['leftZ'] },
-        },
-        {
-          commandType: 'calibration/moveToLocation',
-          params: { pipetteId: 'abc', location: 'attachOrDetach' },
+          commandType: 'calibration/moveToMaintenancePosition',
+          params: { mount: 'left', location: 'attachOrDetach' },
         },
       ],
       false

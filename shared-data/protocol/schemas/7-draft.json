@@ -557,10 +557,15 @@
             "required": ["commandType", "params"],
             "properties": {
               "key": { "type": "string" },
-              "commandType": { "enum": ["calibration/moveToLocation"] },
+              "commandType": {
+                "enum": ["calibration/moveToMaintenancePosition"]
+              },
               "params": {
-                "required": ["pipetteId", "location"],
-                "pipetteId": { "type": "string" },
+                "required": ["mount", "location"],
+                "mount": {
+                  "enum": ["left", "right"],
+                  "description": "Instrument mount to calibrate."
+                },
                 "location": {
                   "description": "Location to move to before starting calibration.",
                   "enum": ["attachOrDetach", "probePosition"]

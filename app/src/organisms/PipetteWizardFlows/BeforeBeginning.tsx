@@ -74,10 +74,6 @@ export const BeforeBeginning = (
     chainRunCommands(
       [
         {
-          commandType: 'home' as const,
-          params: {},
-        },
-        {
           commandType: 'loadPipette' as const,
           params: {
             // @ts-expect-error pipetteName is required but missing in schema v6 type
@@ -88,9 +84,9 @@ export const BeforeBeginning = (
         },
         {
           // @ts-expect-error calibration type not yet supported
-          commandType: 'calibration/moveToLocation' as const,
+          commandType: 'calibration/moveToMaintenancePosition' as const,
           params: {
-            pipetteId: pipetteId,
+            mount: mount,
             location: 'attachOrDetach',
           },
         },
@@ -109,10 +105,13 @@ export const BeforeBeginning = (
     chainRunCommands(
       [
         {
-          commandType: 'home' as const,
-          params: {},
+          // @ts-expect-error calibration type not yet supported
+          commandType: 'calibration/moveToMaintenancePosition' as const,
+          params: {
+            mount: mount,
+            location: 'attachOrDetach',
+          },
         },
-        //  TODO(jr 11/17/22): move to location needs to be added
       ],
       false
     )
