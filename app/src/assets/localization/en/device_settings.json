@@ -175,5 +175,7 @@
   "connected": "Connected",
   "no_network_found": "No network found",
   "no_network_found_description": "Connect an Ethernet cable to the back of the robot to display network connection.",
+  "connect_via_usb_description": "If you haven't already, download and launch the Opentrons App on your computer. Then connect to your OT-3 with the provided USB cable.",
+  "successfully_connected": "Successfully connected!",
   "next_step": "Next step"
 }
