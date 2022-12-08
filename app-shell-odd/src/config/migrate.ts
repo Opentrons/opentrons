@@ -21,6 +21,7 @@ import type {
   ConfigV9,
   ConfigV10,
   ConfigV11,
+  ConfigV12,
 } from '@opentrons/app/src/redux/config/types'
 // format
 // base config v0 defaults
@@ -237,6 +238,22 @@ const toVersion11 = (prevConfig: ConfigV10): ConfigV11 => {
   const nextConfig = {
     ...prevConfig,
     version: 11 as const,
+    protocols: {
+      ...prevConfig.protocols,
+      protocolsStoredSortKey: null,
+    },
+  }
+
+  return nextConfig
+}
+
+// config version 11 migration and defaults
+const toVersion12 = (prevConfig: ConfigV11): ConfigV12 => {
+  // @ts-expect-error deleting a key from the config removes a required param from the prev config
+  delete prevConfig.buildroot
+  const nextConfig = {
+    ...prevConfig,
+    version: 12 as const,
     robotSystemUpdate: {
       manifestUrls: {
         OT2: OT2_MANIFEST_URL,
@@ -259,7 +276,8 @@ const MIGRATIONS: [
   (prevConfig: ConfigV7) => ConfigV8,
   (prevConfig: ConfigV8) => ConfigV9,
   (prevConfig: ConfigV9) => ConfigV10,
-  (prevConfig: ConfigV10) => ConfigV11
+  (prevConfig: ConfigV10) => ConfigV11,
+  (prevConfig: ConfigV11) => ConfigV12
 ] = [
   toVersion1,
   toVersion2,
@@ -272,6 +290,7 @@ const MIGRATIONS: [
   toVersion9,
   toVersion10,
   toVersion11,
+  toVersion12,
 ]
 
 export const DEFAULTS: Config = migrate(DEFAULTS_V0)
@@ -290,6 +309,7 @@ export function migrate(
     | ConfigV9
     | ConfigV10
     | ConfigV11
+    | ConfigV12
 ): Config {
   const prevVersion = prevConfig.version
   let result = prevConfig
