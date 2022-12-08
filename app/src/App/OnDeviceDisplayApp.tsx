@@ -10,6 +10,7 @@ import {
 
 import { BackButton } from '../atoms/buttons'
 import { ConnectedNetworkInfo } from '../pages/OnDeviceDisplay/ConnectedNetworkInfo'
+import { ConnectViaUSB } from '../pages/OnDeviceDisplay/ConnectViaUSB'
 import { InitialSplash } from '../pages/OnDeviceDisplay/InitialSplash'
 import { NetworkSetupMenu } from '../pages/OnDeviceDisplay/NetworkSetupMenu'
 import { RobotDashboard } from '../pages/OnDeviceDisplay/RobotDashboard'
@@ -68,12 +69,7 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     path: '/network-setup/ethernet',
   },
   {
-    Component: () => (
-      <>
-        <BackButton />
-        <Box>connect via usb</Box>
-      </>
-    ),
+    Component: ConnectViaUSB,
     exact: true,
     name: 'Connect via USB',
     path: '/network-setup/usb',
