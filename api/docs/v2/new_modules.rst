@@ -136,6 +136,8 @@ The examples in this section will use a Temperature Module loaded in slot 3:
         temp_mod = protocol.load_module('temperature module gen2', '3')
         plate = temp_mod.load_labware('corning_96_wellplate_360ul_flat')
 
+In order to prevent physical obstruction of other slots, it's best to load the Temperature Module in a slot on the horizontal edges of the deck (1, 4, 7, or 10 on the left or 3, 6, or 9 on the right), with the USB cable and power cord pointing away from the deck.
+
 .. versionadded:: 2.0
 
 Temperature Control

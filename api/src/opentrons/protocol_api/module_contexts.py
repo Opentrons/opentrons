@@ -218,29 +218,7 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
     """An object representing a connected Temperature Module.
 
     It should not be instantiated directly; instead, it should be
-    created through :py:meth:`.ProtocolContext.load_module` using:
-    ``ctx.load_module('Temperature Module', slot_number)``.
-
-    A minimal protocol with a Temperature module would look like this:
-
-    .. code-block:: python
-
-        def run(ctx):
-            slot_number = 10
-            temp_mod = ctx.load_module('Temperature Module', slot_number)
-            temp_plate = temp_mod.load_labware(
-                'biorad_96_wellplate_200ul_pcr')
-
-            temp_mod.set_temperature(45.5)
-            temp_mod.deactivate()
-
-    .. note::
-
-        In order to prevent physical obstruction of other slots, place the
-        Temperature Module in a slot on the horizontal edges of the deck (such
-        as 1, 4, 7, or 10 on the left or 3, 6, or 7 on the right), with the USB
-        cable and power cord pointing away from the deck.
-
+    created through :py:meth:`.ProtocolContext.load_module`.
 
     .. versionadded:: 2.0
 
@@ -251,11 +229,11 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
     @publish(command=cmds.tempdeck_set_temp)
     @requires_version(2, 0)
     def set_temperature(self, celsius: float) -> None:
-        """Set the target temperature, in °C, waiting for the target to be hit.
+        """Set a target temperature and wait until the module reaches the target.
 
-        Must be between 4 and 95 °C based on Opentrons QA.
+        No other protocol commands will execute while waiting for the temperature.
 
-        :param celsius: The target temperature, in °C
+        :param celsius: A value between 4 and 95, representing the target temperature in °C.
         """
         self._core.set_target_temperature(celsius)
         self._core.wait_for_target_temperature()
@@ -263,49 +241,55 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
     @publish(command=cmds.tempdeck_set_temp)
     @requires_version(2, 3)
     def start_set_temperature(self, celsius: float) -> None:
-        """Set the target temperature, in °C, without waiting for the target to be hit.
+        """Set the target temperature without waiting for the target to be hit.
 
-        Must be between 4 and 95 °C based on Opentrons QA.
-
-        :param celsius: The target temperature, in C
+        :param celsius: A value between 4 and 95, representing the target temperature in °C.
         """
         self._core.set_target_temperature(celsius)
 
     @publish(command=cmds.tempdeck_await_temp)
     @requires_version(2, 3)
     def await_temperature(self, celsius: float) -> None:
-        """Wait until module reaches temperature, in °C.
+        """Wait until module reaches temperature.
 
-        Must be between 4 and 95 °C based on Opentrons QA.
-
-        :param celsius: The target temperature, in °C
+        :param celsius: A value between 4 and 95, representing the target temperature in °C.
         """
         self._core.wait_for_target_temperature(celsius)
 
     @publish(command=cmds.tempdeck_deactivate)
     @requires_version(2, 0)
     def deactivate(self) -> None:
-        """Stop heating (or cooling) and turn off the fan."""
+        """Stop heating or cooling, and turn off the fan."""
         self._core.deactivate()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def temperature(self) -> float:
-        """Current temperature in °C."""
+        """The current temperature of the Temperature Module's deck in °C.
+
+        Returns ``0`` in simulation if no target temperature has been set.
+        """
         return self._core.get_current_temperature()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def target(self) -> Optional[float]:
-        """Current target temperature in °C."""
+        """The target temperature of the Temperature Module's deck in °C.
+
+        Returns ``None`` if no target has been set.
+        """
         return self._core.get_target_temperature()
 
     @property  # type: ignore[misc]
     @requires_version(2, 3)
     def status(self) -> str:
-        """The status of the module.
+        """One of four possible temperature statuses:
 
-        Returns ``holding at target``, ``cooling``, ``heating``, or ``idle``.
+        - ``holding at target``: The module has reached its target temperature
+            and is actively maintaining that temperature.
+        - ``cooling``: The module is cooling to a target temperature.
+        - ``heating``: The module is heating to a target temperature.
+        - ``idle``: The module has been deactivated.
         """
         return self._core.get_status().value
 
