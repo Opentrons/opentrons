@@ -27,6 +27,16 @@ from opentrons.util.helpers import utc_now
 
 import pytest
 
+try:
+    import opentrons_hardware
+    # TODO (lc 12-8-2022) Not sure if we plan to keep these tests, but if we do
+    # we should re-write them to be agnostic to the underlying hardware. Otherwise
+    # I wouldn't really consider these to be proper unit tests.
+    pytest.skip("These tests are only valid on the OT-2.", allow_module_level=True)
+except ImportError:
+    # If we don't have opentrons_hardware, we can safely run these tests.
+    pass
+
 
 def set_version_added(attr, mp, version):
     """helper to mock versionadded for an attr
@@ -69,7 +79,6 @@ def get_labware_def(monkeypatch):
     monkeypatch.setattr(papi.labware, "get_labware_definition", dummy_load)
 
 
-@pytest.mark.ot2_only
 async def test_motion(ctx, hardware):
     ctx.home()
     instr = ctx.load_instrument("p10_single", Mount.RIGHT)
@@ -85,7 +94,6 @@ async def test_motion(ctx, hardware):
     ) == pytest.approx(old_pos)
 
 
-@pytest.mark.ot2_only
 def test_max_speeds(ctx, monkeypatch, hardware):
     ctx.home()
     with mock.patch.object(ctx._implementation.get_hardware(), "move_to") as mock_move:
@@ -111,7 +119,6 @@ def test_max_speeds(ctx, monkeypatch, hardware):
         )
 
 
-@pytest.mark.ot2_only
 async def test_location_cache(ctx, monkeypatch, get_labware_def, hardware):
     right = ctx.load_instrument("p10_single", Mount.RIGHT)
     lw = ctx.load_labware("corning_96_wellplate_360ul_flat", 1)
@@ -152,7 +159,6 @@ async def test_location_cache(ctx, monkeypatch, get_labware_def, hardware):
     assert test_args[0].labware.as_well() == lw.wells()[0]  # type: ignore[index]
 
 
-@pytest.mark.ot2_only
 def test_location_cache_two_pipettes(ctx, get_labware_def, hardware):
     """It should be invalidated when next movement is a different pipette
     than the cached location."""
@@ -175,7 +181,6 @@ def test_location_cache_two_pipettes(ctx, get_labware_def, hardware):
         assert m.call_args[0][1] == right_loc
 
 
-@pytest.mark.ot2_only
 def test_location_cache_two_pipettes_fails_pre_2_10(ctx, get_labware_def, hardware):
     """It should reuse location cache even if cached location was set by
     move of a different pipette."""
@@ -198,7 +203,6 @@ def test_location_cache_two_pipettes_fails_pre_2_10(ctx, get_labware_def, hardwa
         assert m.call_args[0][1] == right_loc
 
 
-@pytest.mark.ot2_only
 def test_move_uses_arc(ctx, monkeypatch, get_labware_def, hardware):
     ctx.home()
     right = ctx.load_instrument("p10_single", Mount.RIGHT)
@@ -216,7 +220,6 @@ def test_move_uses_arc(ctx, monkeypatch, get_labware_def, hardware):
         )
 
 
-@pytest.mark.ot2_only
 def test_pipette_info(ctx):
     right = ctx.load_instrument("p300_multi", Mount.RIGHT)
     left = ctx.load_instrument("p1000_single", Mount.LEFT)
@@ -233,7 +236,6 @@ def test_pipette_info(ctx):
     assert left.model == model
 
 
-@pytest.mark.ot2_only
 def test_pick_up_and_drop_tip(ctx, get_labware_def):
     ctx.home()
     tiprack = ctx.load_labware("opentrons_96_tiprack_300ul", 1)
@@ -260,7 +262,6 @@ def test_pick_up_and_drop_tip(ctx, get_labware_def):
     assert pipette.critical_point() == nozzle_offset
 
 
-@pytest.mark.ot2_only
 def test_pick_up_without_prep_after(ctx, get_labware_def):
     ctx.home()
     tiprack = ctx.load_labware("opentrons_96_tiprack_300ul", 1)
@@ -279,7 +280,6 @@ def test_pick_up_without_prep_after(ctx, get_labware_def):
     instr.drop_tip(tiprack["A2"].top())
 
 
-@pytest.mark.ot2_only
 def test_pick_up_tip_old_version(hardware, get_labware_def):
     # API version 2.12, a pick-up tip would not prepare-for-aspirate
     api_version = APIVersion(2, 12)
@@ -310,7 +310,6 @@ def test_pick_up_tip_old_version(hardware, get_labware_def):
         instr.pick_up_tip(tiprack["A2"].top(), prep_after=True)
 
 
-@pytest.mark.ot2_only
 def test_return_tip_old_version(hardware, get_labware_def):
     # API version 2.2, a returned tip would be picked up by the
     # next pick up tip call
@@ -341,7 +340,6 @@ def test_return_tip_old_version(hardware, get_labware_def):
     assert not tiprack.wells()[0].has_tip
 
 
-@pytest.mark.ot2_only
 def test_return_tip(ctx, get_labware_def):
     ctx.home()
     tiprack = ctx.load_labware("opentrons_96_tiprack_300ul", 1)
@@ -368,7 +366,6 @@ def test_return_tip(ctx, get_labware_def):
     assert not tiprack.wells()[1].has_tip
 
 
-@pytest.mark.ot2_only
 def test_use_filter_tips(ctx, get_labware_def):
     ctx.home()
 
@@ -385,7 +382,6 @@ def test_use_filter_tips(ctx, get_labware_def):
     assert pipette.available_volume < pipette.config.max_volume
 
 
-@pytest.mark.ot2_only
 @pytest.mark.parametrize("pipette_model", ["p10_single", "p20_single_gen2"])
 @pytest.mark.parametrize(
     "tiprack_kind", ["opentrons_96_tiprack_10ul", "eppendorf_96_tiprack_10ul_eptips"]
@@ -432,7 +428,6 @@ def test_pick_up_tip_no_location(ctx, get_labware_def, pipette_model, tiprack_ki
     assert not tiprack2.wells()[0].has_tip
 
 
-@pytest.mark.ot2_only
 def test_instrument_trash(ctx, get_labware_def):
     ctx.home()
 
@@ -457,7 +452,6 @@ def test_instrument_trash_ot3(ctx, get_labware_def):
     assert instr.trash_container.name == "opentrons_1_trash_3200ml_fixed"
 
 
-@pytest.mark.ot2_only
 def test_aspirate(ctx, get_labware_def):
     ctx.home()
     lw = ctx.load_labware("corning_96_wellplate_360ul_flat", 1)
@@ -529,7 +523,6 @@ def test_aspirate(ctx, get_labware_def):
         )
 
 
-@pytest.mark.ot2_only
 def test_dispense(ctx, get_labware_def, monkeypatch):
     ctx.home()
     lw = ctx.load_labware("corning_96_wellplate_360ul_flat", 1)
@@ -584,7 +577,6 @@ def test_dispense(ctx, get_labware_def, monkeypatch):
         fake_move.assert_not_called()
 
 
-@pytest.mark.ot2_only
 def test_prevent_liquid_handling_without_tip(ctx):
     ctx.home()
 
@@ -604,7 +596,6 @@ def test_prevent_liquid_handling_without_tip(ctx):
         pipR.dispense(100, plate.wells()[1])
 
 
-@pytest.mark.ot2_only
 def test_starting_tip_and_reset_tipracks(ctx, get_labware_def, monkeypatch):
     ctx.home()
 
@@ -633,7 +624,6 @@ def test_starting_tip_and_reset_tipracks(ctx, get_labware_def, monkeypatch):
     assert tr.wells()[3].has_tip
 
 
-@pytest.mark.ot2_only
 def test_mix(ctx, monkeypatch):
     ctx.home()
     lw = ctx.load_labware("opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap", 1)
@@ -675,7 +665,6 @@ def test_mix(ctx, monkeypatch):
     assert mix_steps == expected_mix_steps
 
 
-@pytest.mark.ot2_only
 def test_touch_tip_default_args(monkeypatch, hardware):
     api_version = APIVersion(2, 3)
     ctx = papi.create_protocol_context(api_version=api_version, hardware_api=hardware)
@@ -714,7 +703,6 @@ def test_touch_tip_default_args(monkeypatch, hardware):
         assert fake_move.call_args_list[0][0][1].z != old_z
 
 
-@pytest.mark.ot2_only
 def test_touch_tip_new_default_args(ctx, monkeypatch):
     ctx.home()
     lw = ctx.load_labware("opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap", 1)
@@ -754,7 +742,6 @@ def test_touch_tip_new_default_args(ctx, monkeypatch):
         assert fake_move.call_args_list[0][0][1].z != old_z
 
 
-@pytest.mark.ot2_only
 def test_touch_tip_disabled(ctx, monkeypatch, get_labware_fixture):
     ctx.home()
     trough1 = get_labware_fixture("fixture_12_trough")
@@ -768,7 +755,6 @@ def test_touch_tip_disabled(ctx, monkeypatch, get_labware_fixture):
     move_mock.assert_not_called()
 
 
-@pytest.mark.ot2_only
 def test_blow_out(ctx, monkeypatch):
     ctx.home()
     lw = ctx.load_labware("opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap", 1)
@@ -800,7 +786,6 @@ def test_blow_out(ctx, monkeypatch):
     assert move_location == lw.wells()[0].bottom()
 
 
-@pytest.mark.ot2_only
 def test_transfer_options(ctx, monkeypatch):
     lw1 = ctx.load_labware("biorad_96_wellplate_200ul_pcr", 1)
     lw2 = ctx.load_labware("corning_96_wellplate_360ul_flat", 2)
@@ -890,7 +875,6 @@ def test_transfer_options(ctx, monkeypatch):
         instr.transfer(300, lw1["A1"], lw2["A1"], air_gap=10000)
 
 
-@pytest.mark.ot2_only
 def test_flow_rate(ctx, monkeypatch):
     old_sfm = ctx._implementation.get_hardware()
 
@@ -917,7 +901,6 @@ def test_flow_rate(ctx, monkeypatch):
     assert instr.flow_rate.blow_out == 2
 
 
-@pytest.mark.ot2_only
 def test_pipette_speed(ctx, monkeypatch):
     old_sfm = ctx._implementation.get_hardware()
 
@@ -942,7 +925,6 @@ def test_pipette_speed(ctx, monkeypatch):
     assert instr.speed.blow_out == 2
 
 
-@pytest.mark.ot2_only
 def test_loaded_labwares(ctx):
     assert ctx.loaded_labwares == {12: ctx.fixed_trash}
     lw1 = ctx.load_labware("opentrons_96_tiprack_300ul", 3)
@@ -956,7 +938,6 @@ def test_loaded_labwares(ctx):
     assert sorted(ctx.loaded_labwares.keys()) == sorted([3, 5, 8, 12])
 
 
-@pytest.mark.ot2_only
 def test_loaded_modules(ctx, monkeypatch):
     assert ctx.loaded_modules == {}
     from collections import OrderedDict
@@ -977,7 +958,6 @@ def test_loaded_modules(ctx, monkeypatch):
     assert ctx.loaded_modules[4] == temp2
 
 
-@pytest.mark.ot2_only
 def test_order_of_module_load():
     import opentrons.hardware_control as hardware_control
     import opentrons.protocol_api as protocol_api
@@ -1024,7 +1004,6 @@ def test_order_of_module_load():
     assert id(async_temp2) == id(hw_temp2)
 
 
-@pytest.mark.ot2_only
 def test_tip_length_for_caldata(ctx, decoy, monkeypatch):
     # TODO (lc 10-27-2022) We need to investigate why the pipette id is
     # being reported as none for this test (and probably all the others)
@@ -1074,7 +1053,6 @@ def test_tip_length_for_caldata(ctx, decoy, monkeypatch):
     )
 
 
-@pytest.mark.ot2_only
 def test_bundled_labware(get_labware_fixture, hardware):
     fixture_96_plate = get_labware_fixture("fixture_96_plate")
     bundled_labware = {"fixture/fixture_96_plate/1": fixture_96_plate}
@@ -1090,7 +1068,6 @@ def test_bundled_labware(get_labware_fixture, hardware):
     assert ctx.loaded_labwares[3]._implementation.get_definition() == fixture_96_plate
 
 
-@pytest.mark.ot2_only
 def test_bundled_labware_missing(get_labware_fixture, hardware):
     bundled_labware: Dict[str, Any] = {}
     with pytest.raises(
@@ -1117,7 +1094,6 @@ def test_bundled_labware_missing(get_labware_fixture, hardware):
         ctx.load_labware("fixture_96_plate", 3, namespace="fixture")
 
 
-@pytest.mark.ot2_only
 def test_bundled_data(hardware):
     bundled_data = {"foo": b"1,2,3"}
     ctx = papi.create_protocol_context(
@@ -1129,7 +1105,6 @@ def test_bundled_data(hardware):
     assert ctx.bundled_data == bundled_data
 
 
-@pytest.mark.ot2_only
 def test_extra_labware(get_labware_fixture, hardware):
     fixture_96_plate = get_labware_fixture("fixture_96_plate")
     bundled_labware = {"fixture/fixture_96_plate/1": fixture_96_plate}
@@ -1144,7 +1119,6 @@ def test_extra_labware(get_labware_fixture, hardware):
     assert ctx.loaded_labwares[3]._implementation.get_definition() == fixture_96_plate
 
 
-@pytest.mark.ot2_only
 def test_api_version_checking(hardware):
     minor_over = APIVersion(
         papi.MAX_SUPPORTED_VERSION.major,
@@ -1161,7 +1135,6 @@ def test_api_version_checking(hardware):
         papi.create_protocol_context(api_version=major_over, hardware_api=hardware)
 
 
-@pytest.mark.ot2_only
 def test_api_per_call_checking(monkeypatch, hardware):
     ctx = papi.create_protocol_context(
         api_version=APIVersion(1, 9),
@@ -1181,7 +1154,6 @@ def test_api_per_call_checking(monkeypatch, hardware):
         ctx.set_rail_lights(on=True)
 
 
-@pytest.mark.ot2_only
 def test_home_plunger(monkeypatch, hardware):
     ctx = papi.create_protocol_context(
         api_version=APIVersion(2, 0),
@@ -1192,7 +1164,6 @@ def test_home_plunger(monkeypatch, hardware):
     instr.home_plunger()
 
 
-@pytest.mark.ot2_only
 def test_move_to_with_thermocycler(
     ctx: papi.ProtocolContext,
 ) -> None:
@@ -1213,7 +1184,6 @@ def test_move_to_with_thermocycler(
     )
 
 
-@pytest.mark.ot2_only
 def test_move_to_with_heater_shaker(
     ctx: papi.ProtocolContext,
     hardware: ThreadManagedHardware,
