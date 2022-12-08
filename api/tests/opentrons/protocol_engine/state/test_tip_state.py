@@ -91,47 +91,59 @@ def test_get_next_tip_returns_none(
     assert result is None
 
 
+@pytest.mark.parametrize("input_tip_amount", [1, 8, 96])
 def test_get_next_tip_returns_first_tip(
-    load_labware_command: commands.LoadLabware, subject: TipStore
+    load_labware_command: commands.LoadLabware, subject: TipStore, input_tip_amount: int
 ) -> None:
     """It should start at the first tip in the labware."""
     subject.handle_action(actions.UpdateCommandAction(command=load_labware_command))
 
     result = TipView(subject.state).get_next_tip(
         labware_id="cool-labware",
-        tip_amount=1,
+        tip_amount=input_tip_amount,
         starting_tip_name=None,
     )
 
     assert result == "A1"
 
 
+@pytest.mark.parametrize(
+    "input_tip_amount, result_well_name", [(1, "B1"), (8, "A1"), (96, "A1")]
+)
 def test_get_next_tip_used_starting_tip(
-    load_labware_command: commands.LoadLabware, subject: TipStore
+    load_labware_command: commands.LoadLabware,
+    subject: TipStore,
+    input_tip_amount: int,
+    result_well_name: str,
 ) -> None:
     """It should start searching at the given starting tip."""
     subject.handle_action(actions.UpdateCommandAction(command=load_labware_command))
 
     result = TipView(subject.state).get_next_tip(
         labware_id="cool-labware",
-        tip_amount=1,
+        tip_amount=input_tip_amount,
         starting_tip_name="B1",
     )
 
-    assert result == "B1"
+    assert result == result_well_name
 
 
+@pytest.mark.parametrize(
+    "input_tip_amount, result_well_name", [(1, "B1"), (8, "A2"), (96, None)]
+)
 def test_get_next_tip_skips_picked_up_tip(
     load_labware_command: commands.LoadLabware,
     pick_up_tip_command: commands.PickUpTip,
     subject: TipStore,
+    input_tip_amount: int,
+    result_well_name: Optional[str],
 ) -> None:
     """It should get the next tip in the column if one has been picked up."""
     subject.handle_action(actions.UpdateCommandAction(command=load_labware_command))
     subject.handle_action(
         actions.AddPipetteConfigAction(
             pipette_id="pipette-id",
-            channels=1,
+            channels=input_tip_amount,
             max_volume=15,
             min_volume=3,
             model="gen a",
@@ -141,11 +153,11 @@ def test_get_next_tip_skips_picked_up_tip(
 
     result = TipView(subject.state).get_next_tip(
         labware_id="cool-labware",
-        tip_amount=1,
+        tip_amount=input_tip_amount,
         starting_tip_name=None,
     )
 
-    assert result == "B1"
+    assert result == result_well_name
 
 
 def test_get_next_tip_with_column(

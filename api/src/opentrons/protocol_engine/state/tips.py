@@ -52,7 +52,6 @@ class TipStore(HasState[TipState], HandlesActions):
         if isinstance(action, UpdateCommandAction) and isinstance(
             action.command.result, LoadLabwareResult
         ):
-            print(action.command.result)
             labware_id = action.command.result.labwareId
             definition = action.command.result.definition
             self._state.tips_by_labware_id[labware_id] = {
@@ -60,7 +59,6 @@ class TipStore(HasState[TipState], HandlesActions):
                 for column in definition.ordering
                 for well_name in column
             }
-            print(definition.ordering)
             self._state.column_by_labware_id[labware_id] = list(
                 column for column in definition.ordering
             )
@@ -136,9 +134,12 @@ class TipView(HasState[TipState]):
                         wells[well] == TipRackWellState.USED for well in column
                     ):
                         return column[0]
-                    
+
         elif tip_amount == len(wells.keys()):
-            if not any(tip_state.USED for well_name, tip_state in wells.items()):
+            if not any(
+                tip_state == TipRackWellState.USED
+                for well_name, tip_state in wells.items()
+            ):
                 return next(iter(wells))
 
         else:
