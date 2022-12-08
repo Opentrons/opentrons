@@ -119,7 +119,7 @@ class TipView(HasState[TipState]):
         """
         self._state = state
 
-    def get_next_tip(
+    def get_next_tip(  # noqa: C901
         self, labware_id: str, tip_amount: int, starting_tip_name: Optional[str]
     ) -> Optional[str]:
         """Get the next available clean tip."""
@@ -136,6 +136,7 @@ class TipView(HasState[TipState]):
                         wells[well] == TipRackWellState.USED for well in column
                     ):
                         return column[0]
+                    
         elif tip_amount == len(wells.keys()):
             if not any(tip_state.USED for well_name, tip_state in wells.items()):
                 return next(iter(wells))
@@ -144,10 +145,7 @@ class TipView(HasState[TipState]):
             for well_name, tip_state in wells.items():
                 seen_start = starting_tip_name is None or well_name == starting_tip_name
 
-                if (
-                    seen_start
-                    and tip_state == TipRackWellState.CLEAN
-                ):
+                if seen_start and tip_state == TipRackWellState.CLEAN:
                     return well_name
 
         return None
