@@ -281,6 +281,12 @@ class OT3Simulator:
         # TODO (lc 12-05-2022) When the time comes, we should think about supporting
         # backwards compatability -- hopefully not relying on config keys only,
         # but TBD.
+        if expected_instr and not ot3_pipette_config.supported_pipette(
+            cast(PipetteModel, expected_instr)
+        ):
+            raise RuntimeError(
+                f"mount {mount.name} requested a {expected_instr} which is not supported on the OT3"
+            )
         if found_model and expected_instr and (expected_instr != found_model):
             if self._strict_attached:
                 raise RuntimeError(
