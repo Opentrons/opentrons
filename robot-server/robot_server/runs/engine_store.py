@@ -47,6 +47,7 @@ class EngineStore:
         Arguments:
             hardware_api: Hardware control API instance used for ProtocolEngine
                 construction.
+            robot_type: Passed along to `opentrons.protocol_engine.Config`.
         """
         self._hardware_api = hardware_api
         self._robot_type = robot_type
