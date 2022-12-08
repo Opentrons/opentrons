@@ -1,5 +1,8 @@
 [flake8]
 
+# set line-length for compatibility with black
+# https://github.com/psf/black/blob/master/docs/compatible_configs.md
+max-line-length = 120
 # max cyclomatic complexity
 max-complexity = 9
 
@@ -8,10 +11,13 @@ extend-ignore =
     E203,
     # do not require type annotations for self nor cls
     ANN101,
-    ANN102
+    ANN102,
+    E722
 
 noqa-require-code = true
 
 per-file-ignores =
     src/driver/drag_drop.py:E501,
     locators.py:F401
+
+exclude = .git,__pycache__,docs/source/conf.py,results,build,dist,files

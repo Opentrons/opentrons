@@ -1,189 +1,203 @@
 """Model for the screen of Labware Setup."""
-import logging
-from typing import Tuple
+from rich.console import Console
 from selenium.webdriver.chrome.webdriver import WebDriver
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.action_chains import ActionChains
 
-from src.driver.highlight import highlight
-
-logger = logging.getLogger(__name__)
-
-"""Class for Labware Setup flow."""
+from src.driver.base import Base, Element
 
 
 class LabwareSetup:
-    def __init__(self, driver: WebDriver) -> None:
+    """Labware setup on setup for run."""
+
+    def __init__(self, driver: WebDriver, console: Console, execution_id: str) -> None:
         """Initialize with driver."""
-        self.driver: WebDriver = driver
+        self.base: Base = Base(driver, console, execution_id)
+        self.console: Console = console
 
-    labware_setup_text_locator: Tuple[str, str] = (
-        By.ID,
-        "CollapsibleStep_Labware Setup",
+    labware_setup_text_locator: Element = Element(
+        (
+            By.ID,
+            "CollapsibleStep_Labware Setup",
+        ),
+        "todo description",
     )
-    securing_labware_to_magnetic_module_link: Tuple[str, str] = (
-        By.ID,
-        "ExtraAttentionWarning_magnetic_module_link",
+    securing_labware_to_magnetic_module_link: Element = Element(
+        (
+            By.ID,
+            "ExtraAttentionWarning_magnetic_module_link",
+        ),
+        "todo description",
     )
-    securing_labware_to_thermocycler_link: Tuple[str, str] = (
-        By.ID,
-        "ExtraAttentionWarning_thermocycler_link",
+    securing_labware_to_thermocycler_link: Element = Element(
+        (
+            By.ID,
+            "ExtraAttentionWarning_thermocycler_link",
+        ),
+        "todo description",
     )
-    magnetic_module_modal: Tuple[str, str] = (
-        By.XPATH,
-        "//h3[text()='How To Secure Labware to the Magnetic Module']",
+    magnetic_module_modal: Element = Element(
+        (
+            By.XPATH,
+            "//h3[text()='How To Secure Labware to the Magnetic Module']",
+        ),
+        "todo description",
     )
-    thermocycler_module_modal: Tuple[str, str] = (
-        By.XPATH,
-        "//h3[text()='How To Secure Labware to the Thermocycler']",
+    thermocycler_module_modal: Element = Element(
+        (
+            By.XPATH,
+            "//h3[text()='How To Secure Labware to the Thermocycler']",
+        ),
+        "todo description",
     )
-    close_button: Tuple[str, str] = (
-        By.XPATH,
-        '//div[contains(normalize-space(@class), "modals")]//button[text()="close"]',
+    close_button: Element = Element(
+        (
+            By.XPATH,
+            '//div[contains(normalize-space(@class), "modals")]//button[text()="close"]',
+        ),
+        "todo description",
     )
-    proceed_to_run_button: Tuple[str, str] = (By.ID, "LabwareSetup_proceedToRunButton")
-
-    start_run_button: Tuple[str, str] = (
-        By.XPATH,
-        "//p[text()='Start Run']",
-    )
-
-    run_again_button: Tuple[str, str] = (
-        By.XPATH,
-        "//p[text()='Run Again']",
-    )
-
-    protocol_complete_banner: Tuple[str, str] = (
-        By.XPATH,
-        "//span[text()='Protocol run complete']",
-    )
-
-    close_protocol_text_locator: Tuple[str, str] = (
-        By.XPATH,
-        "//button[text()='close']",
-    )
-    yes_close_now_text_locator: Tuple[str, str] = (
-        By.XPATH,
-        "//button[text()='Yes, close now']",
+    proceed_to_run_button: Element = Element(
+        (By.ID, "LabwareSetup_proceedToRunButton"),
+        "todo description",
     )
 
-    @highlight
+    start_run_button: Element = Element(
+        (
+            By.XPATH,
+            "//p[text()='Start Run']",
+        ),
+        "todo description",
+    )
+
+    run_again_button: Element = Element(
+        (
+            By.XPATH,
+            "//p[text()='Run Again']",
+        ),
+        "todo description",
+    )
+
+    protocol_complete_banner: Element = Element(
+        (
+            By.XPATH,
+            "//span[text()='Protocol run complete']",
+        ),
+        "todo description",
+    )
+
+    close_protocol_text_locator: Element = Element(
+        (
+            By.XPATH,
+            "//button[text()='close']",
+        ),
+        "todo description",
+    )
+    yes_close_now_text_locator: Element = Element(
+        (
+            By.XPATH,
+            "//button[text()='Yes, close now']",
+        ),
+        "todo description",
+    )
+
     def get_labware_setup_text(self) -> WebElement:
         """Locator for labware setup text."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(LabwareSetup.labware_setup_text_locator)
-        )
+        return self.base.clickable_wrapper(LabwareSetup.labware_setup_text_locator)
 
-    @highlight
     def get_magnetic_module_link(self) -> WebElement:
         """Locator for securing labware to magentic module link."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(
-                LabwareSetup.securing_labware_to_magnetic_module_link
-            )
+        return self.base.clickable_wrapper(
+            LabwareSetup.securing_labware_to_magnetic_module_link
         )
 
     def click_magnetic_module_link(self) -> None:
-        self.get_magnetic_module_link().click()
+        """Click magnetic module link."""
+        self.base.click(LabwareSetup.securing_labware_to_magnetic_module_link)
 
-    @highlight
     def get_thermocycler_link(self) -> WebElement:
         """Locator for securing labware to thermocycler module link."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(
-                LabwareSetup.securing_labware_to_thermocycler_link
-            )
+        return self.base.clickable_wrapper(
+            LabwareSetup.securing_labware_to_thermocycler_link
         )
 
     def click_thermocycler_module_link(self) -> None:
-        self.get_thermocycler_link().click()
+        """Click thermocycler module link."""
+        self.base.click(LabwareSetup.securing_labware_to_thermocycler_link)
 
-    @highlight
     def get_magnetic_module_modal_text(self) -> WebElement:
         """Locator for magnetic module modal."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(LabwareSetup.magnetic_module_modal)
-        )
+        return self.base.clickable_wrapper(LabwareSetup.magnetic_module_modal)
 
-    @highlight
     def get_thermocycler_module_modal_text(self) -> WebElement:
         """Locator for thermocycler module modal."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(LabwareSetup.thermocycler_module_modal)
-        )
+        return self.base.clickable_wrapper(LabwareSetup.thermocycler_module_modal)
 
-    @highlight
     def get_close_button(self) -> WebElement:
         """Locator for close button."""
-        toggle: WebElement = WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(LabwareSetup.close_button)
-        )
-        actions = ActionChains(self.driver)
-        actions.move_to_element(toggle).perform()
+        toggle: WebElement = self.base.clickable_wrapper(LabwareSetup.close_button)
+        actions = ActionChains(self.base.driver)  # type: ignore
+        actions.move_to_element(toggle).perform()  # type: ignore
         return toggle
 
     def click_close_button(self) -> None:
-        self.get_close_button().click()
+        """Click close button."""
+        toggle: WebElement = self.base.clickable_wrapper(LabwareSetup.close_button)
+        actions = ActionChains(self.base.driver)  # type: ignore
+        actions.move_to_element(toggle).perform()  # type: ignore
+        self.base.click(LabwareSetup.close_button)
 
-    @highlight
     def get_proceed_to_run_button(self) -> WebElement:
         """Locator for proceed to run button."""
-        scroll: WebElement = WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(LabwareSetup.proceed_to_run_button)
+        scroll: WebElement = self.base.clickable_wrapper(
+            LabwareSetup.proceed_to_run_button
         )
-        actions = ActionChains(self.driver)
-        actions.move_to_element(scroll).perform()
+        actions = ActionChains(self.base.driver)  # type: ignore
+        actions.move_to_element(scroll).perform()  # type: ignore
         return scroll
 
     def click_proceed_to_run_button(self) -> None:
-        self.get_proceed_to_run_button().click()
+        """Click proceed to run."""
+        scroll: WebElement = self.base.clickable_wrapper(
+            LabwareSetup.proceed_to_run_button
+        )
+        actions = ActionChains(self.base.driver)  # type: ignore
+        actions.move_to_element(scroll).perform()  # type: ignore
+        self.base.click(LabwareSetup.proceed_to_run_button)
 
-    @highlight
     def get_start_run_button(self) -> WebElement:
         """Locator for start run button."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(LabwareSetup.start_run_button)
-        )
+        return self.base.clickable_wrapper(LabwareSetup.start_run_button)
 
     def click_start_run_button(self) -> None:
-        self.get_start_run_button().click()
+        """Click start run."""
+        self.base.click(LabwareSetup.start_run_button)
 
-    @highlight
     def get_run_again_button(self) -> WebElement:
         """Locator for run again button."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(LabwareSetup.run_again_button)
-        )
+        return self.base.clickable_wrapper(LabwareSetup.run_again_button)
 
-    @highlight
     def get_protocol_complete_banner(self) -> WebElement:
         """Locator for protocol complete banner."""
-        return WebDriverWait(self.driver, 10).until(
-            EC.element_to_be_clickable(LabwareSetup.protocol_complete_banner)
-        )
+        return self.base.clickable_wrapper(LabwareSetup.protocol_complete_banner)
 
-    @highlight
     def get_protocol_close_button(self) -> WebElement:
         """Locator for protocol close button."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(LabwareSetup.close_protocol_text_locator)
-        )
+        return self.base.clickable_wrapper(LabwareSetup.close_protocol_text_locator)
 
-    @highlight
     def get_confirmation_close_button(self) -> WebElement:
         """Locator for yes close now button."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(LabwareSetup.yes_close_now_text_locator)
-        )
+        return self.base.clickable_wrapper(LabwareSetup.yes_close_now_text_locator)
 
     def click_protocol_close_button(self) -> None:
-        self.get_protocol_close_button().click()
+        """Click protocol close."""
+        self.base.click(LabwareSetup.close_protocol_text_locator)
 
     def click_confirmation_close_button(self) -> None:
-        self.get_confirmation_close_button().click()
+        """Click confirmation close."""
+        self.base.click(LabwareSetup.yes_close_now_text_locator)
 
     def click_labware_setup_text(self) -> None:
-        self.get_labware_setup_text().click()
+        """Click labware setup text."""
+        self.base.click(LabwareSetup.labware_setup_text_locator)

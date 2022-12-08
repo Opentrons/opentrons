@@ -1,5 +1,4 @@
 """Model for the Labware Landing page that displays labware info for the app."""
-from typing import Optional
 from rich.console import Console
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
@@ -16,108 +15,126 @@ class LabwareLanding:
         self.base: Base = Base(driver, console, execution_id)
         self.console: Console = console
 
-    def get_labware_image(self) -> Optional[WebElement]:
+    def get_labware_image(self) -> WebElement:
         """Get the labware image on the labware card."""
         header: Element = Element(
-            (By.ID, f"LabwareCard_labwareImage"),
+            (By.ID, "LabwareCard_labwareImage"),
             "the labware image on the labware card",
         )
         return self.base.present_wrapper(header, 2)
 
-    def get_labware_name(self) -> Optional[WebElement]:
+    def get_labware_name(self) -> WebElement:
         """Get the labware name on the labware card."""
         header: Element = Element(
-            (By.ID, f"LabwareCard_labwareName"),
+            (By.ID, "LabwareCard_labwareName"),
             "the labware name on the labware card",
         )
         return self.base.present_wrapper(header, 2)
 
-    def get_api_name(self) -> Optional[WebElement]:
+    def get_api_name(self) -> WebElement:
         """Get the labware api name on the labware card."""
         header: Element = Element(
-            (By.ID, f"LabwareCard_apiName"),
+            (By.ID, "LabwareCard_apiName"),
             "the labware api name on the labware card",
         )
         return self.base.present_wrapper(header, 2)
 
-    def get_overflow_menu(self) -> Optional[WebElement]:
+    def get_overflow_menu(self) -> WebElement:
         """Get the labware overflow menu on the labware card."""
         header: Element = Element(
-            (By.ID, f"LabwareCard_overflowMenu"),
+            (By.ID, "LabwareCard_overflowMenu"),
             "the labware overflow menu on the labware card",
         )
         return self.base.present_wrapper(header, 2)
 
-    def get_import_button(self) -> Optional[WebElement]:
-        """Get the import button on the labware landing page."""
-        button: Element = Element(
-            (By.TAG_NAME, f"button"),
-            "the import button on the labware landing page",
-        )
-        return self.base.present_wrapper(button, 5)
-
-    def get_labware_header(self) -> Optional[WebElement]:
+    def get_labware_header(self) -> WebElement:
         """Get the labware heading on the labware landing page."""
         header: Element = Element(
-            (By.TAG_NAME, f"h1"),
+            (By.TAG_NAME, "h1"),
             "the labware heading on the labware landing page",
         )
         return self.base.present_wrapper(header, 2)
 
+    import_button: Element = Element(
+        (By.XPATH, "//button[text()='Import']"),
+        "the import button on the labware landing page",
+    )
+
+    def get_import_button(self) -> WebElement:
+        """Get the import button on the labware landing page."""
+        return self.base.present_wrapper(self.import_button, 5)
+
     def click_import_button(self) -> None:
-        """Click on the import button to labware landing page to import a labware file"""
-        button: Optional[WebElement] = self.get_import_button()
-        if button:
-            button.click()
+        """Click on the import button to labware landing page to import a labware file."""
+        self.base.click(self.import_button)
 
-    def get_import_custom_labware_definition_header(self) -> Optional[WebElement]:
+    import_custom_labware_definition_header: Element = Element(
+        (
+            By.XPATH,
+            "//h2[@data-testid='Slideout_title_Import a Custom Labware Definition']",
+        ),
+        "Slideout_title_Import a Custom Labware Definition",
+    )
+
+    def get_import_custom_labware_definition_header(self) -> WebElement:
         """Get the labware Slideout_title_Import a Custom Labware Definition."""
-        header: Element = Element(
-            (
-                By.XPATH,
-                f"//h2[@data-testid='Slideout_title_Import a Custom Labware Definition']",
-            ),
-            "Slideout_title_Import a Custom Labware Definition",
+        return self.base.present_wrapper(
+            self.import_custom_labware_definition_header, 2
         )
-        return self.base.present_wrapper(header, 2)
 
-    def get_choose_file_button(self) -> Optional[WebElement]:
+    choose_file_button: Element = Element(
+        (By.ID, "UploadInput_protocolUploadButton"),
+        "the choose file button on the labware slideout",
+    )
+
+    def get_choose_file_button(self) -> WebElement:
         """Get the choose file button on the labware slideout."""
-        header: Element = Element(
-            (By.ID, f"UploadInput_protocolUploadButton"),
-            "the choose file button on the labware slideout",
-        )
-        return self.base.present_wrapper(header, 2)
+        return self.base.present_wrapper(self.choose_file_button, 3)
 
-    def get_error_toast_message(self) -> Optional[WebElement]:
+    drag_drop_file_button: Element = Element(
+        (By.XPATH, '//label[@data-testid="file_drop_zone"]'),
+        "the drag and drop file button on Protocol Page",
+    )
+
+    def get_drag_drop_file_button(self) -> WebElement:
+        """Get the drag and drop file area."""
+        return self.base.present_wrapper(self.drag_drop_file_button, 2)
+
+    def get_error_toast_message(self) -> WebElement:
         """Get the error toast message after an invalid labware definition is uploaded."""
         header: Element = Element(
             (
                 By.XPATH,
-                f"//p[text()='Error importing /Users/nehaojha/opentrons/app-testing/files/protocol/json/invalid_labware.json. Invalid labware definition']",
+                "//p[contains(text(),'invalid_labware.json. Invalid labware definition')]",
             ),
             "the error toast message after an invalid labware definition is uploaded",
         )
-        return self.base.present_wrapper(header, 2)
+        return self.base.clickable_wrapper(header, 2)
 
-    def get_success_toast_message(self) -> Optional[WebElement]:
+    def get_success_toast_message(self) -> WebElement:
         """Get the success toast message after an invalid labware definition is uploaded."""
         header: Element = Element(
-            (
-                By.XPATH,
-                f"//p[text()='/Users/nehaojha/opentrons/app-testing/files/protocol/json/sample_labware.json imported.']",
-            ),
+            (By.XPATH, "//p[contains(text(),'sample_labware.json imported.')]"),
             "the success toast message after an invalid labware definition is uploaded",
         )
-        return self.base.present_wrapper(header, 2)
+        return self.base.clickable_wrapper(header, 2)
 
-    def get_dublicate_error_toast_message(self) -> Optional[WebElement]:
-        """Get the dublicate error toast message after an invalid labware definition is uploaded."""
+    def get_duplicate_error_toast_message(self) -> WebElement:
+        """Get the duplicate error toast message after an invalid labware definition is uploaded."""
         header: Element = Element(
             (
                 By.XPATH,
-                f"//p[text()='Error importing /Users/nehaojha/opentrons/app-testing/files/protocol/json/sample_labware.json. Duplicate labware definition']",
+                "//p[contains(text(),'sample_labware.json. Duplicate labware definition')]",
             ),
-            "the dublicate error toast message after an invalid labware definition is uploaded",
+            "the duplicate error toast message after an invalid labware definition is uploaded",
         )
-        return self.base.present_wrapper(header, 2)
+        return self.base.clickable_wrapper(header, 2)
+
+    open_labware_creator: Element = Element(
+        (By.LINK_TEXT, "Open Labware Creator"),
+        "Open labware creator link at bottom of page.",
+    )
+
+    def get_open_labware_creator(self) -> WebElement:
+        """Open labware creator link."""
+        return self.base.clickable_wrapper(self.open_labware_creator, 2)

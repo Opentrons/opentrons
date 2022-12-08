@@ -1,5 +1,6 @@
 """Inject javascript to utilize drag and drop functionality."""
 from pathlib import Path
+
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 
@@ -38,5 +39,5 @@ def drag_and_drop_file(drop_target: WebElement, path: Path) -> None:
     https://stackoverflow.com/questions/43382447/python-with-selenium-drag-and-drop-from-file-system-to-webdriver
     """
     driver: WebDriver = drop_target.parent
-    file_input = driver.execute_script(JS_DROP_FILE, drop_target, 0, 0)
+    file_input = driver.execute_script(JS_DROP_FILE, drop_target, 0, 0)  # type: ignore
     file_input.send_keys(str(path.resolve()))
