@@ -25,7 +25,7 @@ from opentrons.hardware_control.types import Axis
 if TYPE_CHECKING:
     from opentrons.protocol_api.core.instrument import AbstractInstrument
     from opentrons.protocol_api.labware import Well, Labware
-    from opentrons.protocols.geometry.deck import Deck
+    from opentrons.protocol_api.core.protocol_api.deck import Deck
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -244,28 +244,6 @@ class PlungerSpeeds:
         self._instr.set_pipette_speed(
             blow_out=_assert_gzero(new_val, "speed should be a numerical value in mm/s")
         )
-
-
-class Clearances:
-    def __init__(self, default_aspirate: float, default_dispense: float) -> None:
-        self._aspirate = default_aspirate
-        self._dispense = default_dispense
-
-    @property
-    def aspirate(self) -> float:
-        return self._aspirate
-
-    @aspirate.setter
-    def aspirate(self, new_val: float):
-        self._aspirate = float(new_val)
-
-    @property
-    def dispense(self) -> float:
-        return self._dispense
-
-    @dispense.setter
-    def dispense(self, new_val: float):
-        self._dispense = float(new_val)
 
 
 class AxisMaxSpeeds(UserDict):

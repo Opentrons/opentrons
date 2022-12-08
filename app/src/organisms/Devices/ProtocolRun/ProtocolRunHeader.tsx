@@ -280,6 +280,10 @@ export function ProtocolRunHeader({
   const handleResetButtonClick = (): void => {
     reset()
 
+    trackEvent({
+      name: 'proceedToRun',
+      properties: { sourceLocation: 'RunRecordDetail' },
+    })
     trackProtocolRunEvent({ name: 'runAgain' })
   }
 

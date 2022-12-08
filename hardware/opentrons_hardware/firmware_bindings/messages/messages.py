@@ -9,6 +9,7 @@ from ..constants import MessageId
 
 MessageDefinition = Union[
     defs.Acknowledgement,
+    defs.ErrorMessage,
     defs.HeartbeatRequest,
     defs.HeartbeatResponse,
     defs.DeviceInfoRequest,

@@ -55,8 +55,9 @@ class CalibratePipetteImplementation(
             self._hardware_api,
         )
         ot3_mount = OT3Mount.from_mount(params.mount)
+        assert ot3_mount is not OT3Mount.GRIPPER
 
-        pipette_offset = await calibration.calibrate_mount(
+        pipette_offset = await calibration.calibrate_pipette(
             hcapi=ot3_api, mount=ot3_mount
         )
 

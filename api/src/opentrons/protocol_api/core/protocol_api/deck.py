@@ -1,8 +1,10 @@
+# NOTE(mc, 2022-12-05): this module is deprecated;
+# do not add to it unless necessary and do not use in new code
 import functools
 import logging
 from collections import UserDict
-from dataclasses import dataclass
-from typing import Optional, List
+from typing import Dict, Optional, List, Union
+from typing_extensions import Protocol
 
 from opentrons_shared_data.deck import (
     DEFAULT_DECK_DEFINITION_VERSION,
@@ -10,17 +12,22 @@ from opentrons_shared_data.deck import (
 )
 from opentrons_shared_data.deck.dev_types import SlotDefV3
 
-from opentrons import types
+from opentrons.types import DeckLocation, Location, Mount, Point
 from opentrons.hardware_control.modules.types import ModuleType
-from opentrons.protocol_api.labware import load as load_lw, Labware
 from opentrons.protocols.api_support.constants import deck_type
 from opentrons.protocols.api_support.labware_like import LabwareLike
 
-from . import deck_conflict
-from .deck_item import DeckItem
-from .module_geometry import ModuleGeometry, ThermocyclerGeometry
+from opentrons.protocols.geometry.module_geometry import (
+    ModuleGeometry,
+    ThermocyclerGeometry,
+)
 
-MODULE_LOG = logging.getLogger(__name__)
+from ...deck import CalibrationPosition
+from ...labware import load as load_lw, Labware
+from .labware import LabwareImplementation
+from . import deck_conflict
+
+_log = logging.getLogger(__name__)
 
 
 # Amount of slots in a single deck row
@@ -28,20 +35,19 @@ ROW_LENGTH = 3
 FIXED_TRASH_ID = "fixedTrash"
 
 
-@dataclass
-class CalibrationPosition:
-    """
-    A point on the deck of a robot that is used to calibrate
-    aspects of the robot's movement system as defined by
-    opentrons/shared-data/deck/schemas/2.json
-    """
+class DeckItem(Protocol):
+    @property
+    def highest_z(self) -> float:
+        ...
 
-    id: str
-    position: List[float]
-    displayName: str
+    @property
+    def load_name(self) -> str:
+        ...
 
 
-class Deck(UserDict):
+class Deck(UserDict):  # type: ignore[type-arg]
+    data: Dict[int, Optional[DeckItem]]
+
     def __init__(self) -> None:
         super().__init__()
         # TODO(mc, 2022-06-17): move deck type selection
@@ -51,12 +57,12 @@ class Deck(UserDict):
         self._positions = {}
         for slot in self._definition["locations"]["orderedSlots"]:
             self.data[int(slot["id"])] = None
-            self._positions[int(slot["id"])] = types.Point(*slot["position"])
+            self._positions[int(slot["id"])] = Point(*slot["position"])
         self._highest_z = 0.0
         self._load_fixtures()
         self._thermocycler_present = False
 
-    def _load_fixtures(self):
+    def _load_fixtures(self) -> None:
         for f in self._definition["locations"]["fixtures"]:
             slot_name = self._check_name(f["slot"])  # type: ignore
             # TODO(mc, 2022-06-15): this loads the fixed trash as an instance of
@@ -89,7 +95,7 @@ class Deck(UserDict):
         try:
             key_int = Deck._assure_int(key)
         except Exception:
-            MODULE_LOG.exception("Bad slot name: {}".format(key))
+            _log.exception("Bad slot name: {}".format(key))
             should_raise = True
         should_raise = should_raise or key_int not in self.data
         if should_raise:
@@ -97,10 +103,10 @@ class Deck(UserDict):
         else:
             return key_int
 
-    def __getitem__(self, key: types.DeckLocation) -> DeckItem:
+    def __getitem__(self, key: DeckLocation) -> Optional[DeckItem]:
         return self.data[self._check_name(key)]
 
-    def __delitem__(self, key: types.DeckLocation) -> None:
+    def __delitem__(self, key: DeckLocation) -> None:
         checked_key = self._check_name(key)
         old = self.data[checked_key]
         self.data[checked_key] = None
@@ -111,7 +117,7 @@ class Deck(UserDict):
                 isinstance(item, ThermocyclerGeometry) for item in self.data.values()
             )
 
-    def __setitem__(self, key: types.DeckLocation, val: DeckItem) -> None:
+    def __setitem__(self, key: DeckLocation, val: DeckItem) -> None:
         slot_key_int = self._check_name(key)
         existing_items = {
             slot: item for slot, item in self.data.items() if item is not None
@@ -137,7 +143,7 @@ class Deck(UserDict):
             return False
         return key_int in self.data
 
-    def is_edge_move_unsafe(self, mount: types.Mount, target: "Labware") -> bool:
+    def is_edge_move_unsafe(self, mount: Mount, target: "Labware") -> bool:
         """
         Check if slot next to target labware contains a module. Only relevant
         depending on the mount you are using and the column you are moving
@@ -146,7 +152,7 @@ class Deck(UserDict):
         slot = LabwareLike(target).first_parent()
         if not slot:
             return False
-        if mount is types.Mount.RIGHT:
+        if mount is Mount.RIGHT:
             other_labware = self.left_of(slot)
         else:
             other_labware = self.right_of(slot)
@@ -172,16 +178,16 @@ class Deck(UserDict):
             return None
         return self[str(idx)]
 
-    def position_for(self, key: types.DeckLocation) -> types.Location:
+    def position_for(self, key: DeckLocation) -> Location:
         key_int = self._check_name(key)
-        return types.Location(self._positions[key_int], str(key))
+        return Location(self._positions[key_int], str(key))
 
     def recalculate_high_z(self) -> None:
         self._highest_z = 0.0
         for item in [lw for lw in self.data.values() if lw]:
             self._highest_z = max(item.highest_z, self._highest_z)
 
-    def get_slot_definition(self, slot_name) -> "SlotDefV3":
+    def get_slot_definition(self, slot_name: str) -> SlotDefV3:
         slots = self._definition["locations"]["orderedSlots"]
         slot_def = next((slot for slot in slots if slot["id"] == slot_name), None)
         if not slot_def:
@@ -192,17 +198,17 @@ class Deck(UserDict):
             )
         return slot_def
 
-    def get_slot_center(self, slot_name) -> types.Point:
+    def get_slot_center(self, slot_name: str) -> Point:
         defn = self.get_slot_definition(slot_name)
-        return types.Point(
+        return Point(
             defn["position"][0] + defn["boundingBox"]["xDimension"] / 2,
             defn["position"][1] + defn["boundingBox"]["yDimension"] / 2,
             defn["position"][2] + defn["boundingBox"]["zDimension"] / 2,
         )
 
     def resolve_module_location(
-        self, module_type: ModuleType, location: Optional[types.DeckLocation]
-    ) -> types.DeckLocation:
+        self, module_type: ModuleType, location: Optional[DeckLocation]
+    ) -> DeckLocation:
         dn_from_type = {
             ModuleType.MAGNETIC: "Magnetic Module",
             ModuleType.THERMOCYCLER: "Thermocycler",
@@ -243,14 +249,25 @@ class Deck(UserDict):
         return self._highest_z
 
     @property
-    def slots(self) -> List["SlotDefV3"]:
+    def slots(self) -> List[SlotDefV3]:
         """Return the definition of the loaded robot deck."""
         return self._definition["locations"]["orderedSlots"]
 
     @property
     def calibration_positions(self) -> List[CalibrationPosition]:
         raw_positions = self._definition["locations"]["calibrationPoints"]
-        return [CalibrationPosition(**pos) for pos in raw_positions]
+        return [
+            CalibrationPosition(
+                id=raw_position["id"],
+                displayName=raw_position["displayName"],
+                position=(
+                    raw_position["position"][0],
+                    raw_position["position"][1],
+                    raw_position["position"][2],
+                ),
+            )
+            for raw_position in raw_positions
+        ]
 
     def get_calibration_position(self, id: str) -> CalibrationPosition:
         calibration_position = next(
@@ -265,12 +282,16 @@ class Deck(UserDict):
             )
         return calibration_position
 
-    def get_fixed_trash(self) -> Optional[Labware]:
+    def get_fixed_trash(self) -> Optional[Union[Labware, LabwareImplementation]]:
         fixtures = self._definition["locations"]["fixtures"]
         ft = next((f for f in fixtures if f["id"] == FIXED_TRASH_ID), None)
-        return self.data[self._check_name(ft.get("slot"))] if ft else None
 
-    def get_non_fixture_slots(self) -> List[types.DeckLocation]:
+        # NOTE(mc, 2022-12-06): type ignore below because this `Deck` is typed
+        # as contiaining `DeckItem` values, but the contents of slot 12
+        # will always be limited to either a `Labware` or `LabwareImplementation` object
+        return self.data[self._check_name(ft.get("slot"))] if ft else None  # type: ignore[return-value]
+
+    def get_non_fixture_slots(self) -> List[int]:
         fixtures = self._definition["locations"]["fixtures"]
         fixture_slots = {
             self._check_name(f.get("slot")) for f in fixtures if f.get("slot")

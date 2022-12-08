@@ -143,4 +143,28 @@ export const announcements: Announcement[] = [
       </>
     ),
   },
+  {
+    announcementKey: 'thermocyclerGen2Support',
+    image: (
+      <div className={styles.modules_diagrams_row}>
+        <img
+          className={styles.modules_diagram}
+          src={require('../../../images/modules/thermocycler_gen2.png')}
+        />
+      </div>
+    ),
+    heading: "We've updated the Protocol Designer",
+    message: (
+      <>
+        <p>
+          The Opentrons Protocol Designer now supports our Thermocycler Module
+          GEN2!
+        </p>
+        <p>
+          All protocols now require Opentrons App version
+          <strong> 6.2+ </strong> to run.
+        </p>
+      </>
+    ),
+  },
 ]

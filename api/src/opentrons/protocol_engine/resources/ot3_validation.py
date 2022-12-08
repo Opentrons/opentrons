@@ -15,10 +15,10 @@ def ensure_ot3_hardware(
     """Validate that the HardwareControlAPI is of OT-3 instance."""
     try:
         from opentrons.hardware_control.ot3api import OT3API
-    except ImportError:
+    except ImportError as exception:
         raise HardwareNotSupportedError(
             error_msg or "This command is supported by OT-3 only."
-        )
+        ) from exception
 
     if not isinstance(hardware_api, OT3API):
         raise HardwareNotSupportedError(

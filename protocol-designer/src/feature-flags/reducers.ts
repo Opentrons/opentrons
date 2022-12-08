@@ -21,8 +21,6 @@ const initialFlags: Flags = {
     process.env.OT_PD_DISABLE_MODULE_RESTRICTIONS === '1' || false,
   OT_PD_ENABLE_LIQUID_COLOR_ENHANCEMENTS:
     process.env.OT_PD_ENABLE_LIQUID_COLOR_ENHANCEMENTS === '1' || false,
-  OT_PD_ENABLE_THERMOCYCLER_GEN_2:
-    process.env.OT_PD_ENABLE_THERMOCYCLER_GEN_2 === '1' || false,
   OT_PD_ENABLE_OT_3: process.env.OT_PD_ENABLE_OT_3 === '1' || false,
 }
 // @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type

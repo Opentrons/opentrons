@@ -1,11 +1,9 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { useTranslation } from 'react-i18next'
 
 import {
   Box,
   SPACING,
-  IconProps,
   Flex,
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
@@ -13,7 +11,6 @@ import {
 } from '@opentrons/components'
 
 import { Divider } from '../../../atoms/structure'
-import { Toast } from '../../../atoms/Toast'
 import { StyledText } from '../../../atoms/text'
 import { ToggleButton } from '../../../atoms/buttons'
 import { useIsOT3, useIsRobotBusy, useRobot } from '../hooks'
@@ -58,7 +55,6 @@ export function RobotSettingsAdvanced({
   robotName,
   updateRobotStatus,
 }: RobotSettingsAdvancedProps): JSX.Element {
-  const { t } = useTranslation('device_settings')
   const [
     showRenameRobotSlideout,
     setShowRenameRobotSlideout,
@@ -75,13 +71,9 @@ export function RobotSettingsAdvanced({
     showSoftwareUpdateModal,
     setShowSoftwareUpdateModal,
   ] = React.useState<boolean>(false)
-  const [showDownloadToast, setShowDownloadToast] = React.useState<boolean>(
-    false
-  )
 
   const isRobotBusy = useIsRobotBusy({ poll: true })
 
-  const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
   const robot = useRobot(robotName)
   const isOT3 = useIsOT3(robotName)
   const ipAddress = robot?.ip != null ? robot.ip : ''
@@ -117,9 +109,6 @@ export function RobotSettingsAdvanced({
     setIsRobotReachable(isReachable ?? false)
   }
 
-  const updateDownloadLogsStatus = (isDownloading: boolean): void =>
-    setShowDownloadToast(isDownloading)
-
   const dispatch = useDispatch<Dispatch>()
 
   React.useEffect(() => {
@@ -140,16 +129,6 @@ export function RobotSettingsAdvanced({
           close={() => setShowSoftwareUpdateModal(false)}
         />
       ) : null}
-      {showDownloadToast && (
-        <Toast
-          message={t('downloading_logs')}
-          type="info"
-          icon={toastIcon}
-          closeButton={false}
-          onClose={() => setShowDownloadToast(false)}
-          disableTimeout={true}
-        />
-      )}
       <Box>
         {showRenameRobotSlideout && (
           <RenameRobotSlideout
@@ -205,10 +184,7 @@ export function RobotSettingsAdvanced({
           isRobotBusy={isRobotBusy}
           onUpdateStart={() => setShowSoftwareUpdateModal(true)}
         />
-        <Troubleshooting
-          robotName={robotName}
-          updateDownloadLogsStatus={updateDownloadLogsStatus}
-        />
+        <Troubleshooting robotName={robotName} />
         <Divider marginY={SPACING.spacing4} />
         <FactoryReset
           updateIsExpanded={updateIsExpanded}

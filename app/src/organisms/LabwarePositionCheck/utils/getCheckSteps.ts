@@ -41,20 +41,29 @@ export const getCheckSteps = (args: LPCArgs): LabwarePositionCheckStep[] => {
 
   const lastTiprackCheckStep =
     checkTipRacksSectionSteps[checkTipRacksSectionSteps.length - 1]
+  // TODO(BC, 2022-11-30): once robot model is available from analysis output, this should only
+  // be a conflict with heater shaker positioning on OT2's so something like `isOT2Protocol &&`
+  // should be prepended to this boolean
+  const cannotAccessDefaultPickUpTipLocation = args.modules.some(m =>
+    ['1', '3'].includes(m.location.slotName)
+  )
   const pickUpTipSectionStep: PickUpTipStep = {
     section: SECTIONS.PICK_UP_TIP,
     labwareId: lastTiprackCheckStep.labwareId,
     pipetteId: lastTiprackCheckStep.pipetteId,
-    location: PICK_UP_TIP_LOCATION,
+    location: cannotAccessDefaultPickUpTipLocation
+      ? lastTiprackCheckStep.location
+      : PICK_UP_TIP_LOCATION,
   }
-
   const checkLabwareSectionSteps = getCheckLabwareSectionSteps(args)
 
   const returnTipSectionStep: ReturnTipStep = {
     section: SECTIONS.RETURN_TIP,
     labwareId: lastTiprackCheckStep.labwareId,
     pipetteId: lastTiprackCheckStep.pipetteId,
-    location: PICK_UP_TIP_LOCATION,
+    location: cannotAccessDefaultPickUpTipLocation
+      ? lastTiprackCheckStep.location
+      : PICK_UP_TIP_LOCATION,
   }
 
   return [
