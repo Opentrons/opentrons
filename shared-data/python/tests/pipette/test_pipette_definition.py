@@ -1,8 +1,11 @@
 import pytest
+from typing import cast
 from opentrons_shared_data.pipette.pipette_definition import (
     PipetteChannelType,
     PipetteModelType,
     PipetteVersionType,
+    PipetteModelMajorVersionType,
+    PipetteModelMinorVersionType,
 )
 
 
@@ -29,10 +32,12 @@ def test_incorrect_values() -> None:
 
 
 @pytest.mark.parametrize(
-    argnames=["version", "major", "minor"],
-    argvalues=[[1.0, 1, 0], [1.3, 1, 3], [3.9, 3, 9]],
+    argnames=["major", "minor"],
+    argvalues=[[1, 0], [1, 3], [3, 9]],
 )
-def test_version_enum(version: float, major: int, minor: int) -> None:
-    version_type = PipetteVersionType.convert_from_float(version)
-    assert version_type.major == major
-    assert version_type.minor == minor
+def test_version_enum(major: int, minor: int) -> None:
+    version_type = PipetteVersionType(
+        cast(PipetteModelMajorVersionType, major),
+        cast(PipetteModelMinorVersionType, minor),
+    )
+    assert version_type.as_tuple == (major, minor)

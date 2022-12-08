@@ -5,7 +5,6 @@ from dataclasses import replace
 import logging
 from collections import OrderedDict
 from typing import (
-    Mapping,
     cast,
     Callable,
     Dict,
@@ -18,14 +17,13 @@ from typing import (
     TypeVar,
 )
 
-from opentrons_shared_data.pipette import name_config
 from opentrons_shared_data.pipette.dev_types import (
     PipetteName,
 )
 from opentrons_shared_data.gripper.constants import IDLE_STATE_GRIP_FORCE
 
 from opentrons import types as top_types
-from opentrons.config import robot_configs
+from opentrons.config import robot_configs, ot3_pipette_config
 from opentrons.config.types import (
     RobotConfig,
     OT3Config,
@@ -42,10 +40,7 @@ from opentrons_hardware.hardware_control.motion_planning import (
 
 from .util import use_or_initialize_loop, check_motion_bounds
 
-# TODO (lc 09-23-2022) Pull in correct OT3 instrument once
-# instrument model re-working is complete.
-from .instruments.ot2.pipette import (
-    generate_hardware_configs_ot3,
+from .instruments.ot3.pipette import (
     load_from_config_and_check_skip,
 )
 from .instruments.ot3.gripper import compare_gripper_config_and_check_skip
@@ -87,7 +82,7 @@ from .protocols import HardwareControlAPI
 
 # TODO (lc 09/15/2022) We should update our pipette handler to reflect OT-3 properties
 # in a follow-up PR.
-from .instruments.ot2.pipette_handler import OT3PipetteHandler, InstrumentsByMount
+from .instruments.ot3.pipette_handler import OT3PipetteHandler, InstrumentsByMount
 from .instruments.ot3.instrument_calibration import load_pipette_offset
 from .instruments.ot3.gripper_handler import GripperHandler
 from .instruments.ot3.instrument_calibration import (
@@ -106,7 +101,7 @@ from .motion_utilities import (
 
 from .dev_types import (
     AttachedGripper,
-    AttachedPipette,
+    OT3AttachedPipette,
     PipetteDict,
     InstrumentDict,
     GripperDict,
@@ -404,25 +399,23 @@ class OT3API(
         """Update the firmware on the hardware."""
         await self._backend.update_firmware(firmware_file, target)
 
-    @staticmethod
-    def _gantry_load_from_instruments(
-        instruments: Mapping[OT3Mount, Optional[InstrumentDict]]
-    ) -> GantryLoad:
+    def _gantry_load_from_instruments(self) -> GantryLoad:
         """Compute the gantry load based on attached instruments."""
-        left = cast(PipetteDict, instruments.get(OT3Mount.LEFT))
-        right = cast(PipetteDict, instruments.get(OT3Mount.RIGHT))
-        gripper = cast(GripperDict, instruments.get(OT3Mount.GRIPPER))
+        left = self._pipette_handler.has_pipette(OT3Mount.LEFT)
+        right = self._pipette_handler.has_pipette(OT3Mount.RIGHT)
+        gripper = self._gripper_handler.has_gripper()
         if left and right:
             # Only low-throughputs can have the two-instrument case
             return GantryLoad.TWO_LOW_THROUGHPUT
-        if left:
-            # only a low-throughput pipette can be on the left mount
-            return GantryLoad.LOW_THROUGHPUT
         if right:
+            # only a low-throughput pipette can be on the right mount
+            return GantryLoad.LOW_THROUGHPUT
+        if left:
             # as good a measure as any to define low vs high throughput, though
             # we'll want to touch this up as we get pipette definitions for HT
             # pipettes
-            if right["channels"] <= 8:
+            left_hw_pipette = self._pipette_handler.get_pipette(OT3Mount.LEFT)
+            if left_hw_pipette.config.channels.as_int <= 8:
                 return GantryLoad.LOW_THROUGHPUT
             else:
                 return GantryLoad.HIGH_THROUGHPUT
@@ -434,14 +427,14 @@ class OT3API(
     async def cache_pipette(
         self,
         mount: OT3Mount,
-        instrument_data: AttachedPipette,
+        instrument_data: OT3AttachedPipette,
         req_instr: Optional[PipetteName],
     ) -> None:
         """Set up pipette based on scanned information."""
         config = instrument_data.get("config")
         pip_id = instrument_data.get("id")
         pip_offset_cal = load_pipette_offset(pip_id, mount)
-        p, may_skip = load_from_config_and_check_skip(
+        p, _ = load_from_config_and_check_skip(
             config,
             self._pipette_handler.hardware_instruments[mount],
             req_instr,
@@ -449,16 +442,8 @@ class OT3API(
             pip_offset_cal,
         )
         self._pipette_handler.hardware_instruments[mount] = p
-        if req_instr and p:
-            p.act_as(req_instr)
-        if not may_skip:
-            self._log.info(f"Doing full configuration on {mount.name}")
-            hw_config = generate_hardware_configs_ot3(
-                p, self._config, self._backend.board_revision
-            )
-            await self._backend.configure_mount(mount, hw_config)
-        else:
-            self._log.info(f"Skipping configuration on {mount.name}")
+        # TODO (lc 12-5-2022) Properly support backwards compatibility
+        # when applicable
 
     async def cache_gripper(self, instrument_data: AttachedGripper) -> None:
         """Set up gripper based on scanned information."""
@@ -489,24 +474,27 @@ class OT3API(
             OT3Mount.from_mount(m): v for m, v in (require or {}).items()
         }
         for mount, name in checked_require.items():
-            if name not in name_config():
+            # TODO (lc 12-5-2022) cache instruments should be receiving
+            # a pipette type / channels rather than the named config.
+            # We should also check version here once we're comfortable.
+            if not ot3_pipette_config.supported_pipette(name):
                 raise RuntimeError(f"{name} is not a valid pipette name")
         async with self._motion_lock:
+            # we're not actually checking the required instrument except in the context
+            # of simulation and it feels like a lot of work for this function
+            # actually be doing.
             found = await self._backend.get_attached_instruments(checked_require)
-
         for mount, instrument_data in found.items():
             if mount == OT3Mount.GRIPPER:
                 await self.cache_gripper(cast(AttachedGripper, instrument_data))
             else:
                 req_instr_name = checked_require.get(mount, None)
                 await self.cache_pipette(
-                    mount, cast(AttachedPipette, instrument_data), req_instr_name
+                    mount, cast(OT3AttachedPipette, instrument_data), req_instr_name
                 )
 
         await self._backend.probe_network()
-        await self.set_gantry_load(
-            self._gantry_load_from_instruments(self.get_all_attached_instr())
-        )
+        await self.set_gantry_load(self._gantry_load_from_instruments())
 
     # Global actions API
     def pause(self, pause_type: PauseType) -> None:
@@ -609,8 +597,9 @@ class OT3API(
         instr = self._pipette_handler.hardware_instruments[checked_mount]
         if instr:
             target_pos = target_position_from_plunger(
-                checked_mount, instr.config.bottom, self._current_position
+                checked_mount, instr.plunger_positions.bottom, self._current_position
             )
+            self._log.info("Attempting to move the plunger to bottom.")
             await self._move(target_pos, acquire_lock=False, home_flagged_axes=False)
             await self.current_position_ot3(mount=checked_mount, refresh=True)
 
@@ -957,6 +946,7 @@ class OT3API(
             checked_axes = [OT3Axis.from_axis(ax) for ax in axes]
         else:
             checked_axes = [ax for ax in OT3Axis]
+        self._log.info(f"Homing {axes}")
         async with self._motion_lock:
             try:
                 await self._backend.home(checked_axes)
@@ -1172,7 +1162,7 @@ class OT3API(
             speed = self._pipette_handler.plunger_speed(
                 instrument, instrument.blow_out_flow_rate, "aspirate"
             )
-            bottom = instrument.config.bottom
+            bottom = instrument.plunger_positions.bottom
             target_pos = target_position_from_plunger(
                 OT3Mount.from_mount(mount), bottom, self._current_position
             )
@@ -1417,7 +1407,8 @@ class OT3API(
 
     @property
     def hardware_pipettes(self) -> InstrumentsByMount[top_types.Mount]:
-        # override required for type matching
+        # TODO (lc 12-5-2022) We should have ONE entry point into knowing
+        # what pipettes are attached from the hardware controller.
         return {
             m.to_mount(): i
             for m, i in self._pipette_handler.hardware_instruments.items()
@@ -1425,7 +1416,9 @@ class OT3API(
         }
 
     @property
-    def hardware_instruments(self) -> InstrumentsByMount[top_types.Mount]:
+    def hardware_instruments(self) -> InstrumentsByMount[top_types.Mount]:  # type: ignore
+        # see comment in `protocols.instrument_configurer`
+        # override required for type matching
         # Warning: don't use this in new code, used `hardware_pipettes` instead
         return self.hardware_pipettes
 

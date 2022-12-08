@@ -17,7 +17,7 @@ from opentrons.protocol_api.module_contexts import (
 )
 from opentrons.types import Mount, Point, Location, TransferTipPolicy
 from opentrons.hardware_control import API, NoTipAttachedError, ThreadManagedHardware
-from opentrons.hardware_control.instruments import Pipette
+from opentrons.hardware_control.instruments.ot2.pipette import Pipette
 from opentrons.hardware_control.types import Axis
 from opentrons.protocols.advanced_control import transfers as tf
 from opentrons.protocols.api_support import instrument as instrument_support
@@ -26,6 +26,17 @@ from opentrons.calibration_storage import types as cs_types
 from opentrons.util.helpers import utc_now
 
 import pytest
+
+try:
+    import opentrons_hardware  # noqa: F401
+
+    # TODO (lc 12-8-2022) Not sure if we plan to keep these tests, but if we do
+    # we should re-write them to be agnostic to the underlying hardware. Otherwise
+    # I wouldn't really consider these to be proper unit tests.
+    pytest.skip("These tests are only valid on the OT-2.", allow_module_level=True)
+except ImportError:
+    # If we don't have opentrons_hardware, we can safely run these tests.
+    pass
 
 
 def set_version_added(attr, mp, version):
@@ -418,7 +429,6 @@ def test_pick_up_tip_no_location(ctx, get_labware_def, pipette_model, tiprack_ki
     assert not tiprack2.wells()[0].has_tip
 
 
-@pytest.mark.ot2_only
 def test_instrument_trash(ctx, get_labware_def):
     ctx.home()
 
@@ -438,7 +448,7 @@ def test_instrument_trash_ot3(ctx, get_labware_def):
     ctx.home()
 
     mount = Mount.LEFT
-    instr = ctx.load_instrument("p300_single", mount)
+    instr = ctx.load_instrument("p1000_single_gen3", mount)
 
     assert instr.trash_container.name == "opentrons_1_trash_3200ml_fixed"
 
@@ -995,7 +1005,6 @@ def test_order_of_module_load():
     assert id(async_temp2) == id(hw_temp2)
 
 
-@pytest.mark.ot2_only
 def test_tip_length_for_caldata(ctx, decoy, monkeypatch):
     # TODO (lc 10-27-2022) We need to investigate why the pipette id is
     # being reported as none for this test (and probably all the others)
