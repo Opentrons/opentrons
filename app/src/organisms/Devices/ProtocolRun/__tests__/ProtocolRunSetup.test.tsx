@@ -79,7 +79,7 @@ const mockProtocolHasLiquids = protocolHasLiquids as jest.MockedFunction<
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
-
+const MOCK_ROTOCOL_LIQUID_KEY = { liquids: [] }
 const render = () => {
   return renderWithProviders(
     <ProtocolRunSetup
@@ -99,7 +99,10 @@ describe('ProtocolRunSetup', () => {
     when(mockUseProtocolDetailsForRun)
       .calledWith(RUN_ID)
       .mockReturnValue({
-        protocolData: (noModulesProtocol as unknown) as LegacySchemaAdapterOutput,
+        protocolData: ({
+          ...noModulesProtocol,
+          ...MOCK_ROTOCOL_LIQUID_KEY,
+        } as unknown) as LegacySchemaAdapterOutput,
         displayName: 'mock display name',
         protocolKey: 'fakeProtocolKey',
         robotType: 'OT-2 Standard',
@@ -109,7 +112,10 @@ describe('ProtocolRunSetup', () => {
     })
     when(mockUseStoredProtocolAnalysis)
       .calledWith(RUN_ID)
-      .mockReturnValue((noModulesProtocol as unknown) as StoredProtocolAnalysis)
+      .mockReturnValue(({
+        ...noModulesProtocol,
+        ...MOCK_ROTOCOL_LIQUID_KEY,
+      } as unknown) as StoredProtocolAnalysis)
     when(mockParseAllRequiredModuleModels).mockReturnValue([])
     when(mockUseRobot)
       .calledWith(ROBOT_NAME)
@@ -263,7 +269,10 @@ describe('ProtocolRunSetup', () => {
       when(mockUseProtocolDetailsForRun)
         .calledWith(RUN_ID)
         .mockReturnValue({
-          protocolData: (withModulesProtocol as unknown) as LegacySchemaAdapterOutput,
+          protocolData: ({
+            ...withModulesProtocol,
+            ...MOCK_ROTOCOL_LIQUID_KEY,
+          } as unknown) as LegacySchemaAdapterOutput,
           displayName: 'mock display name',
           protocolKey: 'fakeProtocolKey',
           robotType: 'OT-2 Standard',
@@ -309,6 +318,7 @@ describe('ProtocolRunSetup', () => {
         .mockReturnValue({
           protocolData: ({
             ...withModulesProtocol,
+            ...MOCK_ROTOCOL_LIQUID_KEY,
             modules: pick(
               withModulesProtocol.modules,
               Object.keys(withModulesProtocol.modules)[0]
