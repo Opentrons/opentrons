@@ -58,9 +58,9 @@ class TipStore(HasState[TipState], HandlesActions):
                 for column in definition.ordering
                 for well_name in column
             }
-            self._state.column_by_labware_id[labware_id] = list(
+            self._state.columns_by_labware_id[labware_id] = [
                 column for column in definition.ordering
-            )
+            ]
 
         elif isinstance(action, UpdateCommandAction) and isinstance(
             action.command.result, PickUpTipResult
