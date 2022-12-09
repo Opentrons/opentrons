@@ -4,8 +4,8 @@ import pytest
 from rich.console import Console
 from selenium.webdriver.chrome.webdriver import WebDriver
 
-from src.menus.left_menu import LeftMenu
-from src.pages.app_settings import AppSettings
+from automation.menus.left_menu import LeftMenu
+from automation.pages.app_settings import AppSettings
 
 
 @pytest.mark.skip("Need to fix.")

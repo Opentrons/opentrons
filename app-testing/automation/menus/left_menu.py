@@ -5,7 +5,7 @@ from rich.console import Console
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 
-from src.driver.base import Base, Element
+from automation.driver.base import Base, Element
 
 PagesLike = Literal["devices", "protocols", "labware", "app-settings"]
 

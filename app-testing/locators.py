@@ -7,13 +7,6 @@ import importlib
 import os
 
 import rich
-from dotenv import find_dotenv, load_dotenv
-from rich import inspect, pretty, traceback
-from rich.console import Console
-from rich.table import Table
-from selenium.webdriver.chrome.webdriver import WebDriver
-from selenium.webdriver.common.by import By
-
 import src.driver.base
 import src.menus.left_menu
 import src.pages.app_settings
@@ -23,6 +16,13 @@ import src.pages.labware_position_check
 import src.pages.protocol_landing
 import src.resources.ot_robot
 import src.resources.robot_data
+from dotenv import find_dotenv, load_dotenv
+from rich import inspect, pretty, traceback
+from rich.console import Console
+from rich.table import Table
+from selenium.webdriver.chrome.webdriver import WebDriver
+from selenium.webdriver.common.by import By
+
 from conftest import _chrome_options
 
 # to make printing pretty

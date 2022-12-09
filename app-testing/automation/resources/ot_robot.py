@@ -7,7 +7,7 @@ from requests.structures import CaseInsensitiveDict
 from rich.console import Console
 from urllib3.util.retry import Retry
 
-from src.resources.robot_data import Module, RobotDataType
+from automation.resources.robot_data import Module, RobotDataType
 
 
 class OtRobot:
