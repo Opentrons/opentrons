@@ -117,6 +117,7 @@ async def _jog_axis(api: OT3API, mount: OT3Mount) -> None:
 async def _pickuplife(api: OT3API, mount: OT3Mount,tipracks_loc:List,cycles=20) -> None:
     raise_position = 20
     tip_column = 0
+    await api.drop_tip(mount, home_after=True)
     for tiprack in range(len(tipracks_loc)):
         for column in range(13):
             tip_column = column * 9
@@ -125,21 +126,21 @@ async def _pickuplife(api: OT3API, mount: OT3Mount,tipracks_loc:List,cycles=20) 
                                             tipracks_loc[tiprack][OT3Axis.Y],
                                             tipracks_loc[tiprack][OT3Axis.by_mount(mount)]))
             # run cycles
-            for cycle in cycles:
+            for cycle in range(cycles):
                 print('Run TipRack_{}_Column_{}_Cycle_{}'.format(tiprack,column,cycle))
                 # # home z on before every pick up
-                # await api.home_z(mount)
+                await api.home_z(mount)
                 
                 # pick up tips
                 await api.pick_up_tip(mount, tip_length = 57.3)
-                # # move to raise position
-                # current_position = awaitapi.current_position_ot3(mount)
-                # await api.move_to(mount, Point(current_position[OT3Axis.X],
-                #                                 current_position[OT3Axis.Y],
-                #                                 current_position[OT3Axis.by_mount(mount)] + raise_position))
+                # move to raise position
+                current_position = await api.current_position_ot3(mount)
+                await api.move_to(mount, Point(current_position[OT3Axis.X],
+                                                current_position[OT3Axis.Y],
+                                                current_position[OT3Axis.by_mount(mount)] + raise_position))
 
                 # drop tips
-                await api.drop_tip(mount, home_after = True)
+                await api.drop_tip(mount, home_after = False)
 
 
 

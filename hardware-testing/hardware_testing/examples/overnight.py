@@ -20,29 +20,29 @@ from opentrons.types import Mount
 
 
 leftrear_pos = {
-    'X':200,
-    'Y':480,
-    'Z':500
+    'X':-34,
+    'Y':349,
+    'Z':509
 }
 rightrear_pos = {
-    'X':480,
-    'Y':480,
-    'Z':500
+    'X':445,
+    'Y':349,
+    'Z':509
 }
 leftfront_pos = {
-    'X':200,
-    'Y':200,
-    'Z':500
+    'X':-34,
+    'Y':109,
+    'Z':509
 }
 rightfront_pos = {
-    'X':480,
-    'Y':200,
-    'Z':500,
+    'X':445,
+    'Y':109,
+    'Z':509,
 }
 center_pos = {
-    'X':300,
-    'Y':300,
-    'Z':320
+    'X':215,
+    'Y':169,
+    'Z':350
 }
 
 async def _stepscheck() -> None:
@@ -104,20 +104,20 @@ async def _overnight(is_simulating: bool) -> None:
                 # move left mount
                 await api.move_to(mount_left, Point(center_pos['X'],
                                                center_pos['Y'],
-                                               center_pos['Z']))
+                                               350))
 
                 await api.move_to(mount_left, Point(center_pos['X'],
                                                center_pos['Y'],
-                                               current_pos[OT3Axis.by_mount(mount_left)]))
+                                               450))
 
                 # move right mount
                 await api.move_to(mount_right, Point(center_pos['X'],
                                                center_pos['Y'],
-                                               center_pos['Z']))
+                                               350))
 
                 await api.move_to(mount_right, Point(center_pos['X'],
                                                center_pos['Y'],
-                                               current_pos_r[OT3Axis.by_mount(mount_right)]))
+                                               450))
 
             if count % 10 == 0:
                 # Check skipped steps
