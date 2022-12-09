@@ -193,8 +193,10 @@ async def test_raises_when_moving_to_restricted_slots_while_latch_open(
         [7, False, does_not_raise()],  # non-adjacent
     ],
 )
-async def test_raises_on_restricted_movement_with_multi_channel(
+def test_raises_on_restricted_movement_with_multi_channel(
+    decoy: Decoy,
     subject: HeaterShakerMovementFlagger,
+    state_store: StateStore,
     destination_slot: int,
     is_tiprack: bool,
     expected_raise: ContextManager[Any],
@@ -205,7 +207,7 @@ async def test_raises_on_restricted_movement_with_multi_channel(
             plate_shaking=False, latch_closed=True, deck_slot=5
         )
     ]
-
+    decoy.when(state_store.config.robot_type).then_return("OT-2 Standard")
     with expected_raise:
         subject.raise_if_movement_restricted(
             hs_movement_restrictors=heater_shaker_data,
@@ -213,6 +215,26 @@ async def test_raises_on_restricted_movement_with_multi_channel(
             is_multi_channel=True,
             destination_is_tip_rack=is_tiprack,
         )
+
+
+def test_does_not_raise_on_movement_with_multi_channel_on_ot3(
+    decoy: Decoy,
+    subject: HeaterShakerMovementFlagger,
+    state_store: StateStore,
+) -> None:
+    """It should not raise when pipetting with multichannel around a H/S on OT3."""
+    heater_shaker_data = [
+        HeaterShakerMovementRestrictors(
+            plate_shaking=False, latch_closed=True, deck_slot=5
+        )
+    ]
+    decoy.when(state_store.config.robot_type).then_return("OT-3 Standard")
+    subject.raise_if_movement_restricted(
+        hs_movement_restrictors=heater_shaker_data,
+        destination_slot=6,
+        is_multi_channel=True,
+        destination_is_tip_rack=False,
+    )
 
 
 @pytest.mark.parametrize(

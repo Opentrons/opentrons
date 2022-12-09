@@ -161,11 +161,16 @@ class HeaterShakerMovementFlagger:
                 dest_east_west or dest_heater_shaker
             ) and not hs_movement_restrictor.latch_closed:
                 raise PipetteMovementRestrictedByHeaterShakerError(
-                    "Cannot move pipette to Heater-Shaker or adjacent slot to the left or right while labware latch is open"
+                    "Cannot move pipette to Heater-Shaker or adjacent slot to the left "
+                    "or right while labware latch is open."
                 )
 
-            elif is_multi_channel:
-                # Can't go to east/west slot under any circumstances if pipette is multi-channel
+            elif (
+                is_multi_channel
+                and self._state_store.config.robot_type == "OT-2 Standard"
+            ):
+                # Can't go to east/west slot under any circumstances on OT-2
+                # if pipette is multi-channel
                 if dest_east_west:
                     raise PipetteMovementRestrictedByHeaterShakerError(
                         "Cannot move 8-Channel pipette to slot adjacent to the left or right of Heater-Shaker"
