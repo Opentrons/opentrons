@@ -18,13 +18,13 @@ from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.api_support.util import (
     FlowRates,
     PlungerSpeeds,
-    Clearances,
     clamp_value,
     requires_version,
     APIVersionError,
 )
 
 from .core.common import InstrumentCore, ProtocolCore
+from .config import Clearances
 from . import labware
 
 
@@ -34,6 +34,9 @@ AdvancedLiquidHandling = Union[
     Sequence[Union[labware.Well, types.Location]],
     Sequence[Sequence[labware.Well]],
 ]
+
+_DEFAULT_ASPIRATE_CLEARANCE = 1.0
+_DEFAULT_DISPENSE_CLEARANCE = 1.0
 
 _log = logging.getLogger(__name__)
 
@@ -77,6 +80,10 @@ class InstrumentContext(publisher.CommandPublisher):
         self._tip_racks = tip_racks
         self._last_tip_picked_up_from: Union[labware.Well, None] = None
         self._starting_tip: Union[labware.Well, None] = None
+        self._well_bottom_clearances = Clearances(
+            default_aspirate=_DEFAULT_ASPIRATE_CLEARANCE,
+            default_dispense=_DEFAULT_DISPENSE_CLEARANCE,
+        )
 
         self.trash_container = trash
         self.requested_as = requested_as
@@ -169,7 +176,7 @@ class InstrumentContext(publisher.CommandPublisher):
         last_location = self._protocol_core.get_last_location()
 
         if isinstance(location, labware.Well):
-            move_to_location = location.bottom(z=self.well_bottom_clearance.aspirate)
+            move_to_location = location.bottom(z=self._well_bottom_clearances.aspirate)
             well = location
         elif isinstance(location, types.Location):
             move_to_location = location
@@ -278,7 +285,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 move_to_location = location.top()
             else:
                 move_to_location = location.bottom(
-                    z=self.well_bottom_clearance.dispense
+                    z=self._well_bottom_clearances.dispense
                 )
         elif isinstance(location, types.Location):
             move_to_location = location
@@ -1482,7 +1489,7 @@ class InstrumentContext(publisher.CommandPublisher):
             instr.well_bottom_clearance.aspirate = 1
 
         """
-        return self._implementation.get_well_bottom_clearance()
+        return self._well_bottom_clearances
 
     def __repr__(self) -> str:
         return "<{}: {} in {}>".format(
