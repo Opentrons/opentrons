@@ -63,8 +63,7 @@ class LoadLabwareResult(BaseModel):
     )
     offsetId: Optional[str] = Field(
         # Default `None` instead of `...` so this field shows up as non-required in
-        # OpenAPI. The server is
-        # allowed to omit it or make it null.
+        # OpenAPI. The server is allowed to omit it or make it null.
         None,
         description=(
             "An ID referencing the labware offset that will apply"
