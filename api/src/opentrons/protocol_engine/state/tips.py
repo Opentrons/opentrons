@@ -117,7 +117,7 @@ class TipView(HasState[TipState]):
         self._state = state
 
     def get_next_tip(  # noqa: C901
-        self, labware_id: str, tip_amount: int, starting_tip_name: Optional[str]
+        self, labware_id: str, num_tips: int, starting_tip_name: Optional[str]
     ) -> Optional[str]:
         """Get the next available clean tip."""
         wells = self._state.tips_by_labware_id[labware_id]
