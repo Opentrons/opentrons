@@ -16,7 +16,8 @@ import {
   getModuleDisplayName,
   getModuleType,
   getPipetteNameSpecs,
-  TC_MODULE_LOCATION,
+  TC_MODULE_LOCATION_OT2,
+  TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
@@ -33,6 +34,7 @@ interface RobotConfigurationDetailsProps {
   rightMountPipetteName: PipetteName | null
   requiredModuleDetails: LoadModuleRunTimeCommand[] | null
   isLoading: boolean
+  robotType: 'OT-2 Standard' | 'OT-3 Standard' | null
 }
 
 export const RobotConfigurationDetails = (
@@ -43,6 +45,7 @@ export const RobotConfigurationDetails = (
     rightMountPipetteName,
     requiredModuleDetails,
     isLoading,
+    robotType,
   } = props
   const { t } = useTranslation(['protocol_details', 'shared'])
   const enableExtendedHardware = useFeatureFlag('enableExtendedHardware')
@@ -103,6 +106,15 @@ export const RobotConfigurationDetails = (
       emptyText
     )
 
+  const getSlotsForThermocycler = (
+    robotType: 'OT-2 Standard' | 'OT-3 Standard' | null
+  ): typeof TC_MODULE_LOCATION_OT2 | typeof TC_MODULE_LOCATION_OT3 => {
+    if (robotType === 'OT-2 Standard') return TC_MODULE_LOCATION_OT2
+    if (robotType === 'OT-3 Standard') return TC_MODULE_LOCATION_OT3
+    // the protocol was analyzed before the robotType property was added to protocol data, this means it could only be for an OT-2
+    return TC_MODULE_LOCATION_OT2
+  }
+
   return (
     <Flex flexDirection={DIRECTION_COLUMN} paddingBottom={SPACING.spacing5}>
       <RobotConfigurationDetailsItem
@@ -143,7 +155,7 @@ export const RobotConfigurationDetails = (
                     slot_number:
                       getModuleType(module.params.model) ===
                       THERMOCYCLER_MODULE_TYPE
-                        ? TC_MODULE_LOCATION
+                        ? getSlotsForThermocycler(robotType)
                         : module.params.location.slotName,
                   })}
                   item={
