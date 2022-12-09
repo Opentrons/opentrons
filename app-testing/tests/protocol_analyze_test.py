@@ -34,10 +34,7 @@ def test_analyses(
 ) -> None:
     """Analyze many protocols."""
     left_menu: LeftMenu = LeftMenu(driver, console, request.node.nodeid)
-    left_menu.dismiss_version_popup()
     left_menu.navigate("protocols")
-    left_menu.dismiss_version_popup()
-
     protocol_landing: ProtocolLanding = ProtocolLanding(
         driver, console, request.node.nodeid
     )
