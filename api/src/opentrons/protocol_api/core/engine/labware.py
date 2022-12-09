@@ -120,7 +120,7 @@ class LabwareCore(AbstractLabware[WellCore]):
     ) -> Optional[str]:
         return self._engine_client.state.tips.get_next_tip(
             labware_id=self._labware_id,
-            tip_amount=num_tips,
+            num_tips=num_tips,
             starting_tip_name=(
                 starting_tip.get_name()
                 if starting_tip and starting_tip.labware_id == self._labware_id
