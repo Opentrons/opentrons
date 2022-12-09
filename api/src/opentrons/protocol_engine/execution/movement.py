@@ -17,7 +17,7 @@ from ..state import StateStore, CurrentWell
 from ..errors import MustHomeError
 from ..resources import ModelUtils
 from .thermocycler_movement_flagger import ThermocyclerMovementFlagger
-from . import heater_shaker_movement_flagger
+from .heater_shaker_movement_flagger import HeaterShakerMovementFlagger
 
 
 MOTOR_AXIS_TO_HARDWARE_AXIS: Dict[MotorAxis, HardwareAxis] = {
@@ -58,6 +58,7 @@ class MovementHandler:
         hardware_api: HardwareControlAPI,
         model_utils: Optional[ModelUtils] = None,
         thermocycler_movement_flagger: Optional[ThermocyclerMovementFlagger] = None,
+        heater_shaker_movement_flagger: Optional[HeaterShakerMovementFlagger] = None,
     ) -> None:
         """Initialize a MovementHandler instance."""
         self._state_store = state_store
@@ -66,6 +67,12 @@ class MovementHandler:
         self._tc_movement_flagger = (
             thermocycler_movement_flagger
             or ThermocyclerMovementFlagger(
+                state_store=self._state_store, hardware_api=self._hardware_api
+            )
+        )
+        self._hs_movement_flagger = (
+            heater_shaker_movement_flagger
+            or HeaterShakerMovementFlagger(
                 state_store=self._state_store, hardware_api=self._hardware_api
             )
         )
@@ -99,7 +106,7 @@ class MovementHandler:
             attached_pipettes=self._hardware_api.attached_instruments,
         )
 
-        heater_shaker_movement_flagger.raise_if_movement_restricted(
+        self._hs_movement_flagger.raise_if_movement_restricted(
             hs_movement_restrictors=hs_movement_restrictors,
             destination_slot=dest_slot_int,
             is_multi_channel=hw_pipette.config["channels"] > 1,

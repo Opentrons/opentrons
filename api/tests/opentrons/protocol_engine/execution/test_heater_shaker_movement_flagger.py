@@ -22,7 +22,6 @@ from opentrons.protocol_engine.errors import (
     WrongModuleTypeError,
 )
 from opentrons.protocol_engine.execution.heater_shaker_movement_flagger import (
-    raise_if_movement_restricted,
     HeaterShakerMovementFlagger,
 )
 from opentrons.protocol_engine.state import StateStore
@@ -94,6 +93,7 @@ def subject(
     ],
 )
 async def test_raises_when_moving_to_restricted_slots_while_shaking(
+    subject: HeaterShakerMovementFlagger,
     destination_slot: int,
     expected_raise: ContextManager[Any],
 ) -> None:
@@ -105,7 +105,7 @@ async def test_raises_when_moving_to_restricted_slots_while_shaking(
     ]
 
     with expected_raise:
-        raise_if_movement_restricted(
+        subject.raise_if_movement_restricted(
             hs_movement_restrictors=heater_shaker_data,
             destination_slot=destination_slot,
             is_multi_channel=False,
@@ -134,6 +134,7 @@ async def test_raises_when_moving_to_restricted_slots_while_shaking(
     ],
 )
 async def test_raises_when_moving_to_restricted_slots_while_latch_open(
+    subject: HeaterShakerMovementFlagger,
     destination_slot: int,
     expected_raise: ContextManager[Any],
 ) -> None:
@@ -145,7 +146,7 @@ async def test_raises_when_moving_to_restricted_slots_while_latch_open(
     ]
 
     with expected_raise:
-        raise_if_movement_restricted(
+        subject.raise_if_movement_restricted(
             hs_movement_restrictors=heater_shaker_data,
             destination_slot=destination_slot,
             is_multi_channel=False,
@@ -193,6 +194,7 @@ async def test_raises_when_moving_to_restricted_slots_while_latch_open(
     ],
 )
 async def test_raises_on_restricted_movement_with_multi_channel(
+    subject: HeaterShakerMovementFlagger,
     destination_slot: int,
     is_tiprack: bool,
     expected_raise: ContextManager[Any],
@@ -205,7 +207,7 @@ async def test_raises_on_restricted_movement_with_multi_channel(
     ]
 
     with expected_raise:
-        raise_if_movement_restricted(
+        subject.raise_if_movement_restricted(
             hs_movement_restrictors=heater_shaker_data,
             destination_slot=destination_slot,
             is_multi_channel=True,
@@ -225,6 +227,7 @@ async def test_raises_on_restricted_movement_with_multi_channel(
     ],
 )
 async def test_does_not_raise_when_idle_and_latch_closed(
+    subject: HeaterShakerMovementFlagger,
     destination_slot: int,
 ) -> None:
     """It should not raise if single channel pipette moves anywhere near heater-shaker when idle and latch closed."""
@@ -235,7 +238,7 @@ async def test_does_not_raise_when_idle_and_latch_closed(
     ]
 
     with does_not_raise():
-        raise_if_movement_restricted(
+        subject.raise_if_movement_restricted(
             hs_movement_restrictors=heater_shaker_data,
             destination_slot=destination_slot,
             is_multi_channel=False,
