@@ -88,7 +88,7 @@ class TipStore(HasState[TipState], HandlesActions):
         columns = self._state.column_by_labware_id[labware_id]
         tips_in_labware = self._state.tips_by_labware_id[labware_id]
 
-        if pipette_channels == len(tips_in_labware.keys()):
+        if pipette_channels == len(tips_in_labware):
             for well_name in tips_in_labware.keys():
                 tips_in_labware[well_name] = TipRackWellState.USED
 
