@@ -18,6 +18,7 @@ describe('Skeleton', () => {
     }
     const { getByTestId } = render(props)
     const skeleton = getByTestId('Skeleton')
+    expect(skeleton).toHaveStyle('animation: shimmer 2s infinite linear')
     expect(skeleton).toHaveStyle(`width : ${props.width}`)
     expect(skeleton).toHaveStyle(`height: ${props.height}`)
     expect(skeleton).toHaveStyle(`background-size: ${props.backgroundSize}`)
