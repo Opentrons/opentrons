@@ -585,60 +585,6 @@ async def test_load_pipette_uses_provided_id(
     )
 
 
-async def test_load_pipette_checks_existence_with_already_loaded(
-    decoy: Decoy,
-    model_utils: ModelUtils,
-    state_store: StateStore,
-    hardware_api: HardwareControlAPI,
-    action_dispatcher: ActionDispatcher,
-    subject: EquipmentHandler,
-) -> None:
-    """Loading a pipette should cache with pipettes already attached."""
-    decoy.when(model_utils.generate_id()).then_return("unique-id")
-
-    decoy.when(state_store.pipettes.get_by_mount(MountType.RIGHT)).then_return(
-        LoadedPipette(
-            id="pipette-id",
-            mount=MountType.RIGHT,
-            pipetteName=PipetteNameType.P300_MULTI_GEN2,
-        )
-    )
-
-    decoy.when(hardware_api.get_attached_instrument(mount=HwMount.LEFT)).then_return(
-        cast(
-            PipetteDict,
-            {
-                "model": "pipette-model",
-                "min_volume": 1.23,
-                "max_volume": 4.56,
-                "channels": 7,
-            },
-        )
-    )
-
-    result = await subject.load_pipette(
-        pipette_name=PipetteNameType.P300_SINGLE,
-        mount=MountType.LEFT,
-        pipette_id=None,
-    )
-
-    assert result == LoadedPipetteData(pipette_id="unique-id")
-
-    decoy.verify(
-        await hardware_api.cache_instruments(
-            {HwMount.LEFT: PipetteNameType.P300_SINGLE.value}
-        ),
-        action_dispatcher.dispatch(
-            AddPipetteConfigAction(
-                pipette_id="unique-id",
-                static_config=StaticPipetteConfig(
-                    model="pipette-model", min_volume=1.23, max_volume=4.56, channels=7
-                ),
-            )
-        ),
-    )
-
-
 async def test_load_pipette_raises_if_pipette_not_attached(
     decoy: Decoy,
     model_utils: ModelUtils,
