@@ -30,6 +30,7 @@ describe('OffDeckLabwareList', () => {
   it('renders null if labware items is null', () => {
     const { container } = render({
       labwareItems: [],
+      isOt3: false,
     })
     expect(container.firstChild).toBeNull()
   })
@@ -44,6 +45,7 @@ describe('OffDeckLabwareList', () => {
           moduleLocation: null,
         },
       ],
+      isOt3: false,
     })
     getByText('Additional Off-Deck Labware')
     getByText('mock labware list item')

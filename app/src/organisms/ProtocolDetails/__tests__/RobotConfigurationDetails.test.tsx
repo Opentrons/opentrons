@@ -92,7 +92,7 @@ describe('RobotConfigurationDetails', () => {
       rightMountPipetteName: null,
       requiredModuleDetails: null,
       isLoading: false,
-      robotType: "OT-2 Standard"
+      robotType: 'OT-2 Standard',
     }
     const { getByText } = render(props)
     getByText('left mount')
@@ -107,7 +107,7 @@ describe('RobotConfigurationDetails', () => {
       rightMountPipetteName: 'p10_single',
       requiredModuleDetails: null,
       isLoading: false,
-      robotType: "OT-2 Standard"
+      robotType: 'OT-2 Standard',
     }
     const { getByText } = render(props)
     getByText('left mount')
@@ -131,7 +131,7 @@ describe('RobotConfigurationDetails', () => {
       rightMountPipetteName: 'p10_single',
       requiredModuleDetails: mockRequiredModuleDetails,
       isLoading: false,
-      robotType: "OT-2 Standard"
+      robotType: 'OT-2 Standard',
     }
 
     const { getByText } = render(props)
@@ -145,7 +145,7 @@ describe('RobotConfigurationDetails', () => {
       rightMountPipetteName: null,
       requiredModuleDetails: null,
       isLoading: true,
-      robotType: "OT-2 Standard"
+      robotType: 'OT-2 Standard',
     }
     const { getAllByText, getByText } = render(props)
     getByText('right mount')

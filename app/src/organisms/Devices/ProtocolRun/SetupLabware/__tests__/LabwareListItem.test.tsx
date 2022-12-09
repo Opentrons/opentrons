@@ -100,7 +100,7 @@ describe('LabwareListItem', () => {
           ...mockAttachedModuleInfo,
         } as any) as ModuleRenderInfoForProtocol,
       },
-      isOt3: false
+      isOt3: false,
     })
     getByText('Mock Labware Definition')
     getByText('Slot 7,8,10,11, Thermocycler Module GEN1')
@@ -126,7 +126,7 @@ describe('LabwareListItem', () => {
           ...mockAttachedModuleInfo,
         } as any) as ModuleRenderInfoForProtocol,
       },
-      isOt3: true
+      isOt3: true,
     })
     getByText('Mock Labware Definition')
     getByText('Slot 7+10, Thermocycler Module GEN1')
@@ -154,7 +154,7 @@ describe('LabwareListItem', () => {
           ...mockAttachedModuleInfo,
         } as any) as ModuleRenderInfoForProtocol,
       },
-      isOt3: false
+      isOt3: false,
     })
     getByText('Mock Labware Definition')
     getByText('Slot 7, Magnetic Module GEN1')
@@ -185,7 +185,7 @@ describe('LabwareListItem', () => {
           ...mockAttachedModuleInfo,
         } as any) as ModuleRenderInfoForProtocol,
       },
-      isOt3: false
+      isOt3: false,
     })
     getByText('Mock Labware Definition')
     getByText('Slot 7, Temperature Module GEN1')
@@ -213,7 +213,7 @@ describe('LabwareListItem', () => {
           ...mockAttachedModuleInfo,
         } as any) as ModuleRenderInfoForProtocol,
       },
-      isOt3: false
+      isOt3: false,
     })
     getByText('Mock Labware Definition')
     getByText('Slot 7, Heater-Shaker Module GEN1')
@@ -242,7 +242,7 @@ describe('LabwareListItem', () => {
       moduleLocation: null,
       extraAttentionModules: [],
       attachedModuleInfo: {},
-      isOt3: false
+      isOt3: false,
     })
     getByText('Mock Labware Definition')
   })
