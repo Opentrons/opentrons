@@ -37,6 +37,7 @@ class Plot:
         df["Current"] = df["RMS"]*1000
         df["Peak+"] = df["Peak Plus"]*1000
         df["Peak-"] = df["Peak Minus"]*1000
+        df["Frequency"] = df["PWM Frequency"]/1000
         df.name = file
         return df
 
@@ -56,6 +57,8 @@ class Plot:
         self.max_current_force_plot()
         print("Plotting Peak vs. PWM DC...")
         self.peak_pwm_plot()
+        print("Plotting PWM Frequency vs. PWM DC...")
+        self.freq_pwm_plot()
         print("Plots Saved!")
 
     def avg_df(self, df):
@@ -66,8 +69,8 @@ class Plot:
         df_avg["Max Current"] = round(df["Current"].max(), 2)
         df_avg["Peak+"] = round(df["Peak+"].mean(), 2)
         df_avg["Peak-"] = round(df["Peak-"].mean(), 2)
-        df_avg["PWM Duty Cycle"] = round(df["PWM Duty Cycle"].mean(), 2)
-        df_avg["PWM Frequency"] = round(df["PWM Frequency"].mean(), 2)
+        df_avg["Duty Cycle"] = round(df["PWM Duty Cycle"].mean(), 2)
+        df_avg["Frequency"] = round(df["Frequency"].mean(), 2)
         df_avg.reset_index(inplace=True)
         print(df_avg)
         return df_avg
@@ -233,6 +236,42 @@ class Plot:
         self.plot_param["x_range"] = [0, 100]
         self.plot_param["y_range"] = [50, 450]
         self.plot_param["legend"] = "Current"
+        self.plot_param["annotation"] = None
+        self.write_plot(self.plot_param)
+
+    def freq_pwm_plot(self):
+        df = self.df_avg
+        x_axis = "DC"
+        y_axis = "Frequency"
+        avg_freq = df[df["DC"]<=95]["Frequency"].mean()
+        fig1 = px.scatter(df, x=x_axis, y=[y_axis], color="Vref")
+        fig2 = px.line(x=[0, 100], y=[avg_freq, avg_freq], line_dash_sequence=["dash"], color_discrete_sequence=["black"])
+        fig1.update_traces(
+            marker={
+                "size":10,
+                "line":{"width":2, "color":"black"}
+            }
+        )
+        subfig = make_subplots()
+        subfig.add_traces(fig1.data + fig2.data)
+        subfig.update_layout(
+            xaxis_tickmode = 'linear',
+            xaxis_tick0 = 0,
+            xaxis_dtick = 10,
+        )
+        subfig.update_coloraxes(
+            colorbar_title_text = "Vref (V)",
+            cmax = 1,
+            cmin = 0.5,
+        )
+        self.plot_param["figure"] = subfig
+        self.plot_param["filename"] = "plot_freq_pwm"
+        self.plot_param["title"] = f"PWM Frequency vs. PWM Duty Cycle"
+        self.plot_param["x_title"] = "Duty Cycle (%)"
+        self.plot_param["y_title"] = "Measured Frequency (kHz)"
+        self.plot_param["x_range"] = [0, 100]
+        self.plot_param["y_range"] = [32.1, 32.2]
+        self.plot_param["legend"] = "Vref (V)"
         self.plot_param["annotation"] = None
         self.write_plot(self.plot_param)
 
