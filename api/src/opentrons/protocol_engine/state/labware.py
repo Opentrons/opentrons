@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Sequence, Any, Mapping, Union
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Set, Union
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
 from opentrons_shared_data.pipette.dev_types import LabwareUri
@@ -209,14 +209,20 @@ class LabwareView(HasState[LabwareState]):
             "There is no labware loaded on this Module"
         )
 
-    def get_by_slot(self, slot_name: DeckSlotName) -> Optional[LoadedLabware]:
+    # TODO(mc, 2022-12-09): enforce data integrity (e.g. one labware per slot)
+    # rather than shunting this work to callers via `allowed_ids`.
+    # This has larger implications and is tied up in splitting LPC out of the protocol run
+    def get_by_slot(
+        self, slot_name: DeckSlotName, allowed_ids: Set[str]
+    ) -> Optional[LoadedLabware]:
         """Get the labware located in a given slot, if any."""
-        all_labware = reversed(list(self._state.labware_by_id.values()))
+        loaded_labware = reversed(list(self._state.labware_by_id.values()))
 
-        for labware in all_labware:
+        for labware in loaded_labware:
             if (
                 isinstance(labware.location, DeckSlotLocation)
                 and labware.location.slotName == slot_name
+                and labware.id in allowed_ids
             ):
                 return labware
 

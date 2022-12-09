@@ -9,10 +9,11 @@ from typing import (
     NamedTuple,
     Optional,
     Sequence,
-    overload,
-    Union,
+    Set,
     Type,
     TypeVar,
+    Union,
+    overload,
 )
 from numpy import array, dot
 
@@ -403,12 +404,17 @@ class ModuleView(HasState[ModuleState]):
         """Get a list of all module entries in state."""
         return [self.get(mod_id) for mod_id in self._state.slot_by_module_id.keys()]
 
-    def get_by_slot(self, slot_name: DeckSlotName) -> Optional[LoadedModule]:
+    # TODO(mc, 2022-12-09): enforce data integrity (e.g. one module per slot)
+    # rather than shunting this work to callers via `allowed_ids`.
+    # This has larger implications and is tied up in splitting LPC out of the protocol run
+    def get_by_slot(
+        self, slot_name: DeckSlotName, allowed_ids: Set[str]
+    ) -> Optional[LoadedModule]:
         """Get the module located in a given slot, if any."""
-        module_slots = reversed(list(self._state.slot_by_module_id.items()))
+        slots_by_id = reversed(list(self._state.slot_by_module_id.items()))
 
-        for module_id, module_slot in module_slots:
-            if module_slot == slot_name:
+        for module_id, module_slot in slots_by_id:
+            if module_slot == slot_name and module_id in allowed_ids:
                 return self.get(module_id)
 
         return None

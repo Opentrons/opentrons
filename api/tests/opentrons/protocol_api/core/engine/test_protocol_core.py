@@ -127,7 +127,11 @@ def test_get_slot_item_empty(
 ) -> None:
     """It should return None for an empty deck slot."""
     decoy.when(
-        mock_engine_client.state.geometry.get_slot_item(DeckSlotName.SLOT_1)
+        mock_engine_client.state.geometry.get_slot_item(
+            slot_name=DeckSlotName.SLOT_1,
+            allowed_labware_ids={"fixed-trash-123"},
+            allowed_module_ids=set(),
+        )
     ).then_return(None)
 
     assert subject.get_slot_item(DeckSlotName.SLOT_1) is None
@@ -208,7 +212,11 @@ def test_load_labware(
     assert subject.get_labware_cores() == [subject.fixed_trash, result]
 
     decoy.when(
-        mock_engine_client.state.geometry.get_slot_item(DeckSlotName.SLOT_5)
+        mock_engine_client.state.geometry.get_slot_item(
+            slot_name=DeckSlotName.SLOT_5,
+            allowed_labware_ids={"fixed-trash-123", "abc123"},
+            allowed_module_ids=set(),
+        )
     ).then_return(
         LoadedLabware.construct(id="abc123")  # type: ignore[call-arg]
     )
@@ -401,7 +409,11 @@ def test_load_module(
     assert subject.get_module_cores() == [result]
 
     decoy.when(
-        mock_engine_client.state.geometry.get_slot_item(DeckSlotName.SLOT_1)
+        mock_engine_client.state.geometry.get_slot_item(
+            slot_name=DeckSlotName.SLOT_1,
+            allowed_labware_ids={"fixed-trash-123"},
+            allowed_module_ids={"abc123"},
+        )
     ).then_return(
         LoadedModule.construct(id="abc123")  # type: ignore[call-arg]
     )
