@@ -170,14 +170,10 @@ class LabwareImplementation(AbstractLabware[WellImplementation]):
         return self._geometry.z_dimension + self._calibrated_offset.z
 
     @property
-    def separate_calibration(self) -> bool:
-        return False
-
-    @property
     def load_name(self) -> str:
         return self._parameters["loadName"]
 
-    # TODO(mc, 2022-09-26): codify "from labware's base" in defintion schema
+    # TODO(mc, 2022-09-26): codify "from labware's base" in definition schema
     # https://opentrons.atlassian.net/browse/RSS-110
     def get_default_magnet_engage_height(
         self, preserve_half_mm: bool = False

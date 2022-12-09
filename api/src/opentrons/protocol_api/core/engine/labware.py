@@ -45,10 +45,6 @@ class LabwareCore(AbstractLabware[WellCore]):
         )
 
     @property
-    def separate_calibration(self) -> bool:
-        raise NotImplementedError("LabwareCore.separate_calibration not implemented")
-
-    @property
     def load_name(self) -> str:
         """The API load name of the labware definition."""
         return self._definition.parameters.loadName
