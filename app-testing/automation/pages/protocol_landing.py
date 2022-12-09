@@ -7,8 +7,8 @@ from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 
-from src.driver.base import Base, Element
-from src.driver.wait import wait_until_none
+from automation.driver.base import Base, Element
+from automation.driver.wait import wait_until_none
 
 
 class ProtocolLanding:

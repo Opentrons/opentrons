@@ -12,7 +12,7 @@ flake8:
 
 .PHONY: mypy
 mypy:
-	pipenv run python -m mypy conftest.py src tests
+	pipenv run python -m mypy conftest.py automation tests
 
 .PHONY: isort
 isort:

@@ -9,13 +9,13 @@ from pytest import FixtureRequest
 from rich.console import Console
 from selenium.webdriver.chrome.webdriver import WebDriver
 
-from src.driver.drag_drop import drag_and_drop_file
-from src.menus.left_menu import LeftMenu
-from src.pages.labware_position_check import LabwarePositionCheck
-from src.pages.labware_setup import LabwareSetup
-from src.pages.protocol_landing import ProtocolLanding
-from src.resources.ot_robot import OtRobot
-from src.resources.robot_data import Dev, RobotDataType
+from automation.driver.drag_drop import drag_and_drop_file
+from automation.menus.left_menu import LeftMenu
+from automation.pages.labware_position_check import LabwarePositionCheck
+from automation.pages.labware_setup import LabwareSetup
+from automation.pages.protocol_landing import ProtocolLanding
+from automation.resources.ot_robot import OtRobot
+from automation.resources.robot_data import Dev, RobotDataType
 
 
 @pytest.mark.skip("Need to fix.")

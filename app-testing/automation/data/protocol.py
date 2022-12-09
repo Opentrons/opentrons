@@ -5,8 +5,8 @@ from typing import Literal, Optional
 
 from pydantic import BaseModel, Field
 
-from src.data.protocol_files import names
-from src.resources.robot_data import module_types
+from automation.data.protocol_files import names
+from automation.resources.robot_data import module_types
 
 
 class Protocol(BaseModel):

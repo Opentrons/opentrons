@@ -5,11 +5,11 @@ import pytest
 from rich.console import Console
 from selenium.webdriver.chrome.webdriver import WebDriver
 
-from src.data.protocol import Protocol
-from src.data.protocols import Protocols
-from src.driver.drag_drop import drag_and_drop_file
-from src.menus.left_menu import LeftMenu
-from src.pages.protocol_landing import ProtocolLanding
+from automation.data.protocol import Protocol
+from automation.data.protocols import Protocols
+from automation.driver.drag_drop import drag_and_drop_file
+from automation.menus.left_menu import LeftMenu
+from automation.pages.protocol_landing import ProtocolLanding
 
 
 def _what_protocols() -> list[(Protocol)]:

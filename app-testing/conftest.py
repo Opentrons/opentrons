@@ -10,9 +10,9 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.webdriver import WebDriver
 
-from src.menus.left_menu import LeftMenu
-from src.pages.app_settings import AppSettings
-from src.resources.robot_data import ROBOT_MAPPING, RobotDataType
+from automation.menus.left_menu import LeftMenu
+from automation.pages.app_settings import AppSettings
+from automation.resources.robot_data import ROBOT_MAPPING, RobotDataType
 
 collect_ignore_glob = ["files/**/*.py"]
 

@@ -6,10 +6,10 @@ import pytest
 from rich.console import Console
 from selenium.webdriver.chrome.webdriver import WebDriver
 
-from src.driver.drag_drop import drag_and_drop_file
-from src.menus.left_menu import LeftMenu
-from src.pages.labware_landing import LabwareLanding
-from src.resources.robot_data import RobotDataType
+from automation.driver.drag_drop import drag_and_drop_file
+from automation.menus.left_menu import LeftMenu
+from automation.pages.labware_landing import LabwareLanding
+from automation.resources.robot_data import RobotDataType
 
 
 @pytest.mark.skip("Need to fix.")

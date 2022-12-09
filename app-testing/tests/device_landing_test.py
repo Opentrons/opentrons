@@ -8,16 +8,16 @@ import pytest
 from rich.console import Console
 from selenium.webdriver.chrome.webdriver import WebDriver
 
-from src.driver.drag_drop import drag_and_drop_file
-from src.menus.left_menu import LeftMenu
-from src.pages.device_landing import DeviceLanding
-from src.pages.labware_setup import LabwareSetup
-from src.pages.modal import Modal
-from src.pages.module_setup import ModuleSetup
-from src.pages.protocol_landing import ProtocolLanding
-from src.pages.setup_calibration import SetupCalibration
-from src.resources.ot_robot import OtRobot
-from src.resources.robot_data import Dev, EmulatedAlpha, RobotDataType
+from automation.driver.drag_drop import drag_and_drop_file
+from automation.menus.left_menu import LeftMenu
+from automation.pages.device_landing import DeviceLanding
+from automation.pages.labware_setup import LabwareSetup
+from automation.pages.modal import Modal
+from automation.pages.module_setup import ModuleSetup
+from automation.pages.protocol_landing import ProtocolLanding
+from automation.pages.setup_calibration import SetupCalibration
+from automation.resources.ot_robot import OtRobot
+from automation.resources.robot_data import Dev, EmulatedAlpha, RobotDataType
 
 
 @pytest.mark.skip("Need to fix.")

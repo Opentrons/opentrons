@@ -7,11 +7,11 @@ from pytest import FixtureRequest
 from rich.console import Console
 from selenium.webdriver.chrome.webdriver import WebDriver
 
-from src.menus.left_menu import LeftMenu
-from src.pages.deck_calibrate import DeckCalibration
-from src.pages.device_landing import DeviceLanding
-from src.resources.ot_robot import OtRobot
-from src.resources.robot_data import EmulatedAlpha, RobotDataType
+from automation.menus.left_menu import LeftMenu
+from automation.pages.deck_calibrate import DeckCalibration
+from automation.pages.device_landing import DeviceLanding
+from automation.resources.ot_robot import OtRobot
+from automation.resources.robot_data import EmulatedAlpha, RobotDataType
 
 
 @pytest.mark.skip("Need to fix.")
