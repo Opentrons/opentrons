@@ -30,6 +30,7 @@ from opentrons.protocol_engine.state.module_substates.heater_shaker_module_subst
     HeaterShakerModuleSubState,
 )
 from opentrons.types import DeckSlotName
+from opentrons_shared_data.robot.dev_types import RobotType
 
 
 @pytest.fixture
@@ -114,27 +115,42 @@ async def test_raises_when_moving_to_restricted_slots_while_shaking(
 
 
 @pytest.mark.parametrize(
-    argnames=["destination_slot", "expected_raise"],
+    argnames=["robot_type", "destination_slot", "expected_raise"],
     argvalues=[
         [
+            "OT-2 Standard",
             4,
             pytest.raises(PipetteMovementRestrictedByHeaterShakerError, match="latch"),
-        ],  # east
+        ],  # east on OT2
         [
+            "OT-2 Standard",
             6,
             pytest.raises(PipetteMovementRestrictedByHeaterShakerError, match="latch"),
-        ],  # west
+        ],  # west on OT2
         [
+            "OT-2 Standard",
             5,
             pytest.raises(PipetteMovementRestrictedByHeaterShakerError, match="latch"),
-        ],  # h/s
-        [8, does_not_raise()],  # north
-        [2, does_not_raise()],  # south
-        [3, does_not_raise()],  # non-adjacent
+        ],  # to h/s on OT2
+        ["OT-2 Standard", 8, does_not_raise()],  # north on OT2
+        ["OT-2 Standard", 2, does_not_raise()],  # south on OT2
+        ["OT-2 Standard", 3, does_not_raise()],  # non-adjacent
+        [
+            "OT-3 Standard",
+            5,
+            pytest.raises(PipetteMovementRestrictedByHeaterShakerError, match="latch"),
+        ],  # to h/s on OT3
+        ["OT-3 Standard", 4, does_not_raise()],  # east on OT3
+        ["OT-3 Standard", 6, does_not_raise()],  # west on OT3
+        ["OT-3 Standard", 8, does_not_raise()],  # north on OT3
+        ["OT-3 Standard", 2, does_not_raise()],  # south on OT3
     ],
 )
-async def test_raises_when_moving_to_restricted_slots_while_latch_open(
+async def test_raises_when_moving_to_restricted_slots_while_latch_open2(
+    decoy: Decoy,
     subject: HeaterShakerMovementFlagger,
+    state_store: StateStore,
+    robot_type: RobotType,
     destination_slot: int,
     expected_raise: ContextManager[Any],
 ) -> None:
@@ -144,7 +160,7 @@ async def test_raises_when_moving_to_restricted_slots_while_latch_open(
             plate_shaking=False, latch_closed=False, deck_slot=5
         )
     ]
-
+    decoy.when(state_store.config.robot_type).then_return(robot_type)
     with expected_raise:
         subject.raise_if_movement_restricted(
             hs_movement_restrictors=heater_shaker_data,
