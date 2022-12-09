@@ -28,7 +28,6 @@ class TipState:
     """State of all tips."""
 
     tips_by_labware_id: Dict[str, TipRackStateByWellName]
-    # TODO (tz, 12-6-22): should this be a set?
     column_by_labware_id: Dict[str, List[List[str]]]
     channels_by_pipette_id: Dict[str, int]
 
