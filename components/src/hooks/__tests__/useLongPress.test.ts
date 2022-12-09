@@ -10,12 +10,6 @@ describe('useLongPress', () => {
     expect(result.current.isTapped).toBe(false)
   })
 
-  // it('when calling host, isLongPressed true', () => {
-  //     const { result } = renderHook(() => useLongPress())
-
-  //     expect(result.current.isLongPressed).toBe(true)
-  // })
-
   it('when callling disable, isEnabled true', () => {
     const { result } = renderHook(() => useLongPress())
     result.current.enable()

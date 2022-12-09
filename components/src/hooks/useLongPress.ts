@@ -43,10 +43,10 @@ export const useLongPress = (): UseLongPressResult => {
           holdDuration: 600,
         })
         .on('hold', (event: PointerEvent) => {
-          setIsLongPressed(true)
+          setIsLongPressed(isLongPressed => !isLongPressed)
         })
         .on('tap', (event: PointerEvent) => {
-          setIsTapped(true)
+          setIsTapped(isTapped => !isTapped)
         })
     }
   }
