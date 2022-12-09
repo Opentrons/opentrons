@@ -171,6 +171,19 @@ class EquipmentHandler:
             )
         }
 
+        # TODO(mc, 2022-12-09): putting the other pipette in the cache request
+        # is only to support protocol analysis, since the hardware simulator
+        # does not cache requested virtual instruments. Remove per
+        # https://opentrons.atlassian.net/browse/RLIQ-258
+        other_mount = mount.other_mount()
+        other_pipette = self._state_store.pipettes.get_by_mount(other_mount)
+        if other_pipette is not None:
+            cache_request[other_mount.to_hw_mount()] = (
+                other_pipette.pipetteName.value
+                if isinstance(other_pipette.pipetteName, PipetteNameType)
+                else other_pipette.pipetteName
+            )
+
         # TODO(mc, 2020-10-18): calling `cache_instruments` mirrors the
         # behavior of protocol_context.load_instrument, and is used here as a
         # pipette existence check
