@@ -84,7 +84,7 @@ def test_get_next_tip_returns_none(
 
     result = TipView(subject.state).get_next_tip(
         labware_id="cool-labware",
-        tip_amount=1,
+        num_tips=1,
         starting_tip_name=None,
     )
 
@@ -100,7 +100,7 @@ def test_get_next_tip_returns_first_tip(
 
     result = TipView(subject.state).get_next_tip(
         labware_id="cool-labware",
-        tip_amount=input_tip_amount,
+        num_tips=input_tip_amount,
         starting_tip_name=None,
     )
 
@@ -121,7 +121,7 @@ def test_get_next_tip_used_starting_tip(
 
     result = TipView(subject.state).get_next_tip(
         labware_id="cool-labware",
-        tip_amount=input_tip_amount,
+        num_tips=input_tip_amount,
         starting_tip_name="B1",
     )
 
@@ -129,13 +129,20 @@ def test_get_next_tip_used_starting_tip(
 
 
 @pytest.mark.parametrize(
-    "input_tip_amount, result_well_name", [(1, "B1"), (8, "A2"), (96, None)]
+    "input_tip_amount, get_next_tip_tips, input_starting_tip, result_well_name", [
+        (1, 8, "D1", "A2"),
+        (1, 8, "A1", "A2"),
+        (8, 1, "D1", "A2"),
+        (1, 96, "D1", None)
+    ]
 )
 def test_get_next_tip_skips_picked_up_tip(
     load_labware_command: commands.LoadLabware,
     pick_up_tip_command: commands.PickUpTip,
     subject: TipStore,
     input_tip_amount: int,
+    get_next_tip_tips: int,
+    input_starting_tip: Optional[str],
     result_well_name: Optional[str],
 ) -> None:
     """It should get the next tip in the column if one has been picked up."""
@@ -153,8 +160,8 @@ def test_get_next_tip_skips_picked_up_tip(
 
     result = TipView(subject.state).get_next_tip(
         labware_id="cool-labware",
-        tip_amount=input_tip_amount,
-        starting_tip_name=None,
+        num_tips=get_next_tip_tips,
+        starting_tip_name=input_starting_tip
     )
 
     assert result == result_well_name
@@ -169,7 +176,7 @@ def test_get_next_tip_with_column_and_starting_tip(
 
     result = TipView(subject.state).get_next_tip(
         labware_id="cool-labware",
-        tip_amount=8,
+        num_tips=8,
         starting_tip_name="D1",
     )
 
@@ -197,7 +204,7 @@ def test_reset_tips(
 
     result = TipView(subject.state).get_next_tip(
         labware_id="cool-labware",
-        tip_amount=1,
+        num_tips=1,
         starting_tip_name=None,
     )
 
@@ -217,3 +224,4 @@ def test_handle_pipette_config_action(subject: TipStore) -> None:
     )
 
     assert TipView(subject.state).get_channels(pipette_id="pipette-id") == 8
+
