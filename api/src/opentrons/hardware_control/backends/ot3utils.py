@@ -240,6 +240,9 @@ def create_home_group(
     return move_group
 
 
+def create_tip_action_group():
+    return None
+
 def create_gripper_jaw_grip_group(
     duty_cycle: float,
     stop_condition: MoveStopCondition = MoveStopCondition.none,

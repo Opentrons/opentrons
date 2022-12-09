@@ -839,3 +839,6 @@ class OT3Controller:
         )
         self._position[axis_to_node(moving)] += distance_mm
         return data
+
+    async def tip_action() -> None:
+        return None
