@@ -531,31 +531,18 @@ class ModuleView(HasState[ModuleState]):
         definition = self.get_definition(module_id)
         slot = self.get_location(module_id).slotName.value
 
-        pre_transform: array
-        xforms_ser: dict
-        if self._config == "OT2-standard":
-            pre_transform = array(
-                (definition.labwareOffset.x, definition.labwareOffset.y, 1)
+        pre_transform = array(
+            (
+                definition.labwareOffset.x,
+                definition.labwareOffset.y,
+                definition.labwareOffset.z,
+                1,
             )
-            xforms_ser = definition.slotTransforms.get("ot2_standard", {}).get(
-                slot, {"labwareOffset": [[1, 0, 0], [0, 1, 0], [0, 0, 1]]}
-            )
-        # TODO: add ot2 short trash check
-        else:
-            # OT3 deck
-            pre_transform = array(
-                (definition.labwareOffset.x,
-                 definition.labwareOffset.y,
-                 definition.labwareOffset.z,
-                 1)
-            )
-            xforms_ser = definition.slotTransforms.get("ot2_standard", {}).get(
-                slot, {"labwareOffset": [
-                    [1, 0, 0, 0],
-                    [0, 1, 0, 0],
-                    [0, 0, 1, 0],
-                    [0, 0, 0, 1]]}
-            )
+        )
+        xforms_ser = definition.slotTransforms.get("ot2_standard", {}).get(
+            slot,
+            {"labwareOffset": [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]},
+        )
         xforms_ser_offset = xforms_ser["labwareOffset"]
 
         # Apply the slot transform, if any
@@ -564,7 +551,7 @@ class ModuleView(HasState[ModuleState]):
         return LabwareOffsetVector(
             x=xformed[0],
             y=xformed[1],
-            z=xformed[2] if self._config == "OT3_standard" else definition.labwareOffset.z,
+            z=xformed[2],
         )
 
     def get_overall_height(self, module_id: str) -> float:
