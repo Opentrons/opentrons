@@ -10,17 +10,11 @@ from typing import Any, Dict, Optional, Set, Tuple, Union
 
 from opentrons_shared_data.pipette import name_config as pipette_name_config
 
-from opentrons.types import Point
-from opentrons.config import pipette_config, robot_configs, feature_flags
-from opentrons.config.types import RobotConfig, OT3Config
+from opentrons.types import Point, Mount
+from opentrons.config import pipette_config, robot_configs
+from opentrons.config.types import RobotConfig
 from opentrons.drivers.types import MoveSplit
-from opentrons.hardware_control.types import OT3Mount
-from ..instrument_abc import AbstractInstrument, MountType
-from ..ot3.instrument_calibration import (
-    save_pipette_offset_calibration,
-    load_pipette_offset as ot3_pipette_offset,
-    PipetteOffsetByPipetteMount as OT3PipetteOffsetByPipetteMount,
-)
+from ..instrument_abc import AbstractInstrument
 from .instrument_calibration import (
     PipetteOffsetByPipetteMount,
     load_pipette_offset,
@@ -28,7 +22,6 @@ from .instrument_calibration import (
 from opentrons.hardware_control.types import (
     CriticalPoint,
     BoardRevision,
-    OT3AxisKind,
     InvalidMoveError,
 )
 
@@ -52,9 +45,6 @@ INTERNOZZLE_SPACING_MM: Final[float] = 9
 # TODO (lc 11-1-2022) We need to separate out the pipette object
 # into a separate category for OT2 vs OT3 pipettes. At which point
 # this union will be unneccessary
-OffsetCalibrationType = Union[
-    PipetteOffsetByPipetteMount, OT3PipetteOffsetByPipetteMount
-]
 
 
 class Pipette(AbstractInstrument[pipette_config.PipetteConfig]):
@@ -70,7 +60,7 @@ class Pipette(AbstractInstrument[pipette_config.PipetteConfig]):
     def __init__(
         self,
         config: pipette_config.PipetteConfig,
-        pipette_offset_cal: OffsetCalibrationType,
+        pipette_offset_cal: PipetteOffsetByPipetteMount,
         pipette_id: Optional[str] = None,
     ) -> None:
         self._config = config
@@ -134,7 +124,7 @@ class Pipette(AbstractInstrument[pipette_config.PipetteConfig]):
         return self._nozzle_offset
 
     @property
-    def pipette_offset(self) -> OffsetCalibrationType:
+    def pipette_offset(self) -> PipetteOffsetByPipetteMount:
         return self._pipette_offset
 
     def update_config_item(self, elem_name: str, elem_val: Any) -> None:
@@ -143,26 +133,36 @@ class Pipette(AbstractInstrument[pipette_config.PipetteConfig]):
         # Update the cached dict representation
         self._config_as_dict = asdict(self._config)
 
-    def reset_pipette_offset(self, mount: MountType, to_default: bool) -> None:
+    def reload_configurations(self) -> None:
+        self._config = pipette_config.load(self.model, self.pipette_id)
+        self._config_as_dict = asdict(self._config)
+
+    def reset_state(self) -> None:
+        self._current_volume = 0.0
+        self._working_volume = self._config.max_volume
+        self._current_tip_length = 0.0
+        self._current_tiprack_diameter = 0.0
+        self._fallback_tip_length = self._config.tip_length
+        self._tip_overlap_map = self._config.tip_overlap
+        self._has_tip = False
+        self.ready_to_aspirate = False
+        #: True if ready to aspirate
+        self._aspirate_flow_rate = self._config.default_aspirate_flow_rates["2.0"]
+        self._dispense_flow_rate = self._config.default_dispense_flow_rates["2.0"]
+        self._blow_out_flow_rate = self._config.default_blow_out_flow_rates["2.0"]
+
+    def reset_pipette_offset(self, mount: Mount, to_default: bool) -> None:
         """Reset the pipette offset to system defaults."""
         if to_default:
             self._pipette_offset = load_pipette_offset(pip_id=None, mount=mount)
         else:
             self._pipette_offset = load_pipette_offset(self._pipette_id, mount)
 
-    def save_pipette_offset(self, mount: MountType, offset: Point) -> None:
+    def save_pipette_offset(self, mount: Mount, offset: Point) -> None:
         """Update the pipette offset to a new value."""
         # TODO (lc 10-31-2022) We should have this command be supported properly by
         # ot-3 and ot-2 when we split out the pipette class
-        if feature_flags.enable_ot3_hardware_controller():
-            save_pipette_offset_calibration(
-                self._pipette_id, OT3Mount.from_mount(mount), offset
-            )
-            self._pipette_offset = ot3_pipette_offset(
-                self._pipette_id, OT3Mount.from_mount(mount)
-            )
-        else:
-            self._pipette_offset = load_pipette_offset(self._pipette_id, mount)
+        self._pipette_offset = load_pipette_offset(self._pipette_id, mount)
 
     @property
     def name(self) -> PipetteName:
@@ -392,7 +392,7 @@ class Pipette(AbstractInstrument[pipette_config.PipetteConfig]):
 def _reload_and_check_skip(
     new_config: pipette_config.PipetteConfig,
     attached_instr: Pipette,
-    pipette_offset: OffsetCalibrationType,
+    pipette_offset: PipetteOffsetByPipetteMount,
 ) -> Tuple[Pipette, bool]:
     # Once we have determined that the new and attached pipettes
     # are similar enough that we might skip, see if the configs
@@ -425,7 +425,7 @@ def load_from_config_and_check_skip(
     attached: Optional[Pipette],
     requested: Optional[PipetteName],
     serial: Optional[str],
-    pipette_offset: OffsetCalibrationType,
+    pipette_offset: PipetteOffsetByPipetteMount,
 ) -> Tuple[Optional[Pipette], bool]:
     """
     Given the pipette config for an attached pipette (if any) freshly read
@@ -504,32 +504,5 @@ def generate_hardware_configs(
             "idle_current": robot_configs.current_for_revision(
                 robot_config.low_current, revision
             )["B"],
-            "splits": None,
-        }
-
-
-def generate_hardware_configs_ot3(
-    pipette: Optional[Pipette], robot_config: OT3Config, revision: BoardRevision
-) -> InstrumentHardwareConfigs:
-    """
-    Fuse robot and pipette configuration to generate commands to send to
-    the motor driver if required
-    """
-    if pipette:
-        return {
-            "steps_per_mm": 0,
-            "home_pos": 0,
-            "max_travel": pipette.config.max_travel,
-            "idle_current": pipette.config.idle_current,
-            "splits": _build_splits(pipette),
-        }
-    else:
-        return {
-            "steps_per_mm": 0,
-            "home_pos": 0,
-            "max_travel": 0,
-            "idle_current": robot_config.current_settings.hold_current.none[
-                OT3AxisKind.P
-            ],
             "splits": None,
         }
