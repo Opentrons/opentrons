@@ -31,11 +31,11 @@ import { RobotSettingsFeatureFlags } from '../../../organisms/Devices/RobotSetti
 import { RobotSettingsPrivacy } from '../../../organisms/Devices/RobotSettings/RobotSettingsPrivacy'
 import { ReachableBanner } from '../../../organisms/Devices/ReachableBanner'
 
-import type { NavRouteParams, RobotSettingsTab } from '../../../App/types'
+import type { DesktopRouteParams, RobotSettingsTab } from '../../../App/types'
 
 export function RobotSettings(): JSX.Element | null {
   const { t } = useTranslation('device_settings')
-  const { robotName, robotSettingsTab } = useParams<NavRouteParams>()
+  const { robotName, robotSettingsTab } = useParams<DesktopRouteParams>()
   const robot = useRobot(robotName)
   const isCalibrationDisabled = robot?.status !== CONNECTABLE
   const isPrivacyDisabled = robot?.status === UNREACHABLE
