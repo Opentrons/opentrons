@@ -3,6 +3,9 @@ import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 import {
   Flex,
+  useDrag,
+  useLongPress,
+  useSwipe,
   SPACING,
   COLORS,
   DIRECTION_ROW,
@@ -27,6 +30,18 @@ export function ConnectViaUSB(): JSX.Element {
   // const [isConnected, setIsConnected] = React.useState<boolean>(true)
   // const connectedDescription = t('successfully_connected')
   // const buttonLabel = t('next_step')
+  const { ref: dragRef, style: dragStyle } = useDrag({
+    width: 322,
+    height: 181,
+    x: 0,
+    y: 0,
+  })
+  const {
+    isLongPressed,
+    ref: longPressRef,
+    style: longPressStyle,
+  } = useLongPress()
+  const { ref: swipeRef, style: swipeStyle, swipeType } = useSwipe()
 
   return (
     <>
@@ -50,7 +65,13 @@ export function ConnectViaUSB(): JSX.Element {
             left="0"
             onClick={() => history.push('/network-setup')}
           >
-            <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
+            <Flex
+              flexDirection={DIRECTION_ROW}
+              alignItems={ALIGN_CENTER}
+              ref={swipeRef}
+              style={swipeStyle}
+              color={swipeType === 'swipe-right' ? 'green' : 'initial'}
+            >
               <Icon name="arrow-back" size="1.9375rem" />
               <StyledText
                 fontSize="1.625rem"
@@ -62,7 +83,14 @@ export function ConnectViaUSB(): JSX.Element {
             </Flex>
           </Btn>
           <Flex>
-            <StyledText fontSize="2rem" lineHeight="2.75rem" fontWeight="700">
+            <StyledText
+              color={isLongPressed ? 'red' : 'black'}
+              fontSize="2rem"
+              lineHeight="2.75rem"
+              fontWeight="700"
+              ref={longPressRef}
+              style={longPressStyle}
+            >
               {t('connect_via', { type: t('usb') })}
             </StyledText>
           </Flex>
@@ -85,6 +113,8 @@ export function ConnectViaUSB(): JSX.Element {
             height="181"
             alt="connect to a robot via "
             src={usbImage}
+            ref={dragRef}
+            style={dragStyle}
           />
           <StyledText
             marginTop={SPACING.spacing6}
