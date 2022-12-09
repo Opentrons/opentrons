@@ -40,38 +40,42 @@ export const BeforeBeginning = (
   const pipetteId = attachedPipette[mount]?.id
   if (pipetteId == null && flowType === FLOWS.CALIBRATE) return null
   const handleOnClick = (): void => {
-    chainRunCommands(
-      [
-        {
-          commandType: 'home' as const,
-          params: {},
-        },
-        {
-          commandType: 'loadPipette' as const,
-          params: {
-            // @ts-expect-error pipetteName is required but missing in schema v6 type
-            pipetteName: attachedPipette[mount].name,
-            pipetteId: pipetteId,
-            mount: mount,
+    const pipetteName = attachedPipette[mount]?.name
+    if (pipetteName != null) {
+      chainRunCommands(
+        [
+          {
+            commandType: 'home' as const,
+            params: {},
           },
-        },
-        {
-          // @ts-expect-error calibration type not yet supported
-          commandType: 'calibration/moveToLocation' as const,
-          params: {
-            pipetteId: pipetteId,
-            location: 'attachOrDetach',
+          {
+            commandType: 'loadPipette' as const,
+            params: {
+              pipetteName: pipetteName,
+              pipetteId: pipetteId,
+              mount: mount,
+            },
           },
-        },
-      ],
-      false
-    )
-      .then(() => {
-        proceed()
-      })
-      .catch(error => {
-        setShowErrorMessage(error.message)
-      })
+          {
+            // @ts-expect-error calibration type not yet supported
+            commandType: 'calibration/moveToLocation' as const,
+            params: {
+              pipetteId: pipetteId,
+              location: 'attachOrDetach',
+            },
+          },
+        ],
+        false
+      )
+        .then(() => {
+          proceed()
+        })
+        .catch(error => {
+          setShowErrorMessage(error.message)
+        })
+    } else {
+      setShowErrorMessage('No pipette attached')
+    }
   }
   //  TODO(jr, 10/26/22): when we wire up other flows, const will turn into let
   //  for proceedButtonText and rightHandBody
