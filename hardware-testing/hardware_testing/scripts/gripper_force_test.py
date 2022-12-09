@@ -48,9 +48,10 @@ class Gripper_Force_Test:
         self.vref_inc = vref_inc
         self.interval = interval
         self.pwm_start = 5 # %
-        self.vref_start = 0.5 # Volts
         self.pwm_max = 100 # %
-        self.vref_max = 1.0 # Volts
+        self.vref_default = 1.0 # Volts
+        self.vref_start = 0.5 # Volts
+        self.vref_max = 2.7 # Volts
         self.engage_position = Point(0, 0, -78)
         self.measurement_data = {
             "RMS":"None",
@@ -84,6 +85,7 @@ class Gripper_Force_Test:
         else:
             self.gripper_id = self.api._gripper_handler.get_gripper().gripper_id
         self.test_data["Gripper"] = str(self.gripper_id)
+        await self._update_vref(self.api, self.vref_default)
         gripper_config = await get_gripper_jaw_motor_param(self.api._backend._messenger)
         print(f"Initial Gripper Config: {gripper_config}")
         self.start_time = time.time()
@@ -198,13 +200,13 @@ class Gripper_Force_Test:
                 for i in range(self.cycles):
                     cycle = i + 1
                     print(f"\n-> Starting Test Cycle {cycle}/{self.cycles}")
+                    await self._home_gripper(self.api, self.mount)
+                    await self._engage_gripper(self.api, self.mount)
                     for vref in np.arange(self.vref_start, self.vref_max + self.vref_inc, self.vref_inc):
                         print(f"\n-->> Starting Vref {vref} V")
                         await self._update_vref(self.api, vref)
                         for pwm in np.arange(self.pwm_start, self.pwm_max + self.pwm_inc, self.pwm_inc):
                             print(f"\n--->>> Starting Duty Cycle {pwm}%")
-                            await self._home_gripper(self.api, self.mount)
-                            await self._engage_gripper(self.api, self.mount)
                             for j in range(self.trials):
                                 trial = j + 1
                                 print(f"\n---->>>> Measuring Trial {trial}/{self.trials} [Vref={vref}V] (DC={pwm}%)")
