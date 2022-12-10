@@ -123,12 +123,12 @@ def grip_offset(action, item, slot=None, adapter=None):
         "thermo-cycler": Point(x=-19.88, y=67.76, z=-0.04),
     }
     _adapter_offsets = {
-        "universal": 3,
-        "pcr": 3,
-        "non-contact": 2.6,
-        "flat": 1.75,
-        "deep": 1,
-        "round-bottom": 1
+        "universal": Point(z=3),
+        "pcr": Point(z=3),
+        "non-contact": Point(z=2.6),
+        "flat": Point(z=1.75),
+        "deep": Point(z=1),
+        "round-bottom": Point(z=1)
     }
     # make sure arguments are correct
     action_options = ["pick-up", "drop"]
@@ -155,7 +155,7 @@ def grip_offset(action, item, slot=None, adapter=None):
         if adapter:
             _avail_adapters = list(_adapter_offsets.keys())
             assert adapter in _avail_adapters, f"adapter \"{adapter}\" not found in {_avail_adapters}"
-            hw_offset += Point(z=_adapter_offsets[adapter])
+            hw_offset += _adapter_offsets[adapter]
     else:
         hw_offset = _hw_offsets_ot3[item] - _sw_offsets_ot2[item]
     if action == "pick-up":
