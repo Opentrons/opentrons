@@ -6,6 +6,7 @@ from typing import Optional
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from opentrons.protocol_engine import actions, commands
+from opentrons.protocol_engine.errors.exceptions import StartingTipNotAvailableError
 from opentrons.protocol_engine.state.tips import TipStore, TipView
 
 
@@ -108,7 +109,7 @@ def test_get_next_tip_returns_first_tip(
 
 
 @pytest.mark.parametrize(
-    "input_tip_amount, result_well_name", [(1, "B1"), (8, "A2"), (96, "A1")]
+    "input_tip_amount, result_well_name", [(1, "B1"), (8, "A2")]
 )
 def test_get_next_tip_used_starting_tip(
     load_labware_command: commands.LoadLabware,
@@ -136,7 +137,7 @@ def test_get_next_tip_used_starting_tip(
         (8, 8, "B2", "A3"),
         (1, 8, "A1", "A2"),
         (8, 1, "D1", "A2"),
-        (1, 96, "D1", None),
+        (1, 96, "A1", None),
         (1, 8, None, "A2"),
         (8, 1, "D1", "A2"),
         (1, 96, None, None),
@@ -230,3 +231,11 @@ def test_handle_pipette_config_action(subject: TipStore) -> None:
     )
 
     assert TipView(subject.state).get_channels(pipette_id="pipette-id") == 8
+
+
+def test_get_next_tip_raise_excepction_when_not_starting_column(subject: TipStore,     load_labware_command: commands.LoadLabware,) -> None:
+    """Should raise an exception when trying to get_next_tip for a 96 channel and starting tip is not the first."""
+    subject.handle_action(actions.UpdateCommandAction(command=load_labware_command))
+
+    with pytest.raises(StartingTipNotAvailableError):
+        TipView(subject.state).get_next_tip(labware_id="cool-labware", num_tips=96, starting_tip_name="D1")
