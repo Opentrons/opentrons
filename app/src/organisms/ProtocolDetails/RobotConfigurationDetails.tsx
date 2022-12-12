@@ -16,8 +16,6 @@ import {
   getModuleDisplayName,
   getModuleType,
   getPipetteNameSpecs,
-  TC_MODULE_LOCATION_OT2,
-  TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
@@ -25,16 +23,17 @@ import { InstrumentContainer } from '../../atoms/InstrumentContainer'
 import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
 import { useFeatureFlag } from '../../redux/config'
+import { getSlotsForThermocycler } from './utils'
 
 import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-import type { PipetteName } from '@opentrons/shared-data'
+import type { PipetteName, RobotType } from '@opentrons/shared-data'
 
 interface RobotConfigurationDetailsProps {
   leftMountPipetteName: PipetteName | null
   rightMountPipetteName: PipetteName | null
   requiredModuleDetails: LoadModuleRunTimeCommand[] | null
   isLoading: boolean
-  robotType: 'OT-2 Standard' | 'OT-3 Standard' | null
+  robotType: RobotType | null
 }
 
 export const RobotConfigurationDetails = (
@@ -105,15 +104,6 @@ export const RobotConfigurationDetails = (
     ) : (
       emptyText
     )
-
-  const getSlotsForThermocycler = (
-    robotType: 'OT-2 Standard' | 'OT-3 Standard' | null
-  ): typeof TC_MODULE_LOCATION_OT2 | typeof TC_MODULE_LOCATION_OT3 => {
-    if (robotType === 'OT-2 Standard') return TC_MODULE_LOCATION_OT2
-    if (robotType === 'OT-3 Standard') return TC_MODULE_LOCATION_OT3
-    // the protocol was analyzed before the robotType property was added to protocol data, this means it could only be for an OT-2
-    return TC_MODULE_LOCATION_OT2
-  }
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} paddingBottom={SPACING.spacing5}>
