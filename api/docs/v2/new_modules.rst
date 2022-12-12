@@ -185,30 +185,43 @@ All methods of :py:class:`.TemperatureModuleContext` work with both the GEN1 and
 Using a Magnetic Module
 ***********************
 
-The Magnetic Module controls a set of permanent magnets which can move vertically. When the magnets are raised or engaged, they induce a magnetic field in the labware on the module. When they are lowered or disengaged, they do not.
+The Magnetic Module controls a set of permanent magnets which can move vertically to induce a magnetic field in the labware loaded on the module.
 
-The Magnetic Module is represented by a :py:class:`.MagneticModuleContext` object.
+The Magnetic Module is represented by a :py:class:`.MagneticModuleContext` object, which has methods for engaging (raising) and disengaging (lowering) its magnets.
 
-For the purposes of this section, assume we have the following already:
+The examples in this section will use a Magnetic Module loaded in slot 6:
 
 .. code-block:: python
     :substitutions:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata = {'apiLevel': '2.3'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        mag_mod = protocol.load_module('magnetic module', '1')
+        mag_mod = protocol.load_module('magnetic module gen2', '1')
         plate = mag_mod.load_labware('nest_96_wellplate_100ul_pcr_full_skirt')
-        # The code from the rest of the examples in this section goes here
 
 .. versionadded:: 2.0
 
+Loading Labware
+===============
+
+Like with all modules, use the Magnetic Module’s :py:meth:`~.MagneticModuleContext.load_labware` method to specify what you will place on the module. The Magnetic Module supports 96-well PCR plates and deep well plates. For the best compatibility, use a labware definition that specifies how far the magnets should move when engaging with the labware. The following plates in the Opentrons Labware Library include this measurement:
+
+- ``biorad_96_wellplate_200ul_pcr``
+- ``nest_96_wellplate_100ul_pcr_full_skirt``
+- ``nest_96_wellplate_2ml_deep``
+- ``thermoscientificnunc_96_wellplate_1300ul``
+- ``thermoscientificnunc_96_wellplate_2000ul``
+- ``usascientific_96_wellplate_2.4ml_deep``
+
+To check whether a custom labware definition specifies engage height for the Magnetic Module, open its JSON file and look for the key ``magneticModuleEngageHeight`` in the ``parameters`` object. If it's present and has a numerical value, the labware is ready for use with the Magnetic Module.
+
 .. _magnetic-module-engage:
 
-Engage
-======
+Engaging and Disengaging
+========================
 
 The :py:meth:`.MagneticModuleContext.engage` function raises the magnets to induce a magnetic field in the labware on top of the Magnetic Module. The height of the magnets can be specified in several different ways, based on internally stored default heights for labware:
 
