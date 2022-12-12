@@ -10,7 +10,13 @@ from ..load import load_shared_data, get_shared_data_root
 def get_newest_schema_version() -> str:
     command_schemas_dir = get_shared_data_root() / "command" / "schemas"
     command_schemas = os.listdir(command_schemas_dir)
-    return str(max(re.match(r"(\d+).json", v).group(1) for v in command_schemas))
+    all_schema_versions = []
+    for schema_file_name in command_schemas:
+        schema_version_match = re.match(r"(\d+).json", schema_file_name)
+        if schema_version_match is not None:
+            all_schema_versions.append(schema_version_match.group(1))
+
+    return str(max(all_schema_versions))
 
 
 def load_schema_string(version: str) -> str:
