@@ -108,9 +108,7 @@ def test_get_next_tip_returns_first_tip(
     assert result == "A1"
 
 
-@pytest.mark.parametrize(
-    "input_tip_amount, result_well_name", [(1, "B1"), (8, "A2")]
-)
+@pytest.mark.parametrize("input_tip_amount, result_well_name", [(1, "B1"), (8, "A2")])
 def test_get_next_tip_used_starting_tip(
     load_labware_command: commands.LoadLabware,
     subject: TipStore,
@@ -230,12 +228,17 @@ def test_handle_pipette_config_action(subject: TipStore) -> None:
         )
     )
 
-    assert TipView(subject.state).get_channels(pipette_id="pipette-id") == 8
+    assert TipView(subject.state).get_pipette_channels(pipette_id="pipette-id") == 8
 
 
-def test_get_next_tip_raise_excepction_when_not_starting_column(subject: TipStore,     load_labware_command: commands.LoadLabware,) -> None:
+def test_get_next_tip_raise_excepction_when_not_starting_column(
+    subject: TipStore,
+    load_labware_command: commands.LoadLabware,
+) -> None:
     """Should raise an exception when trying to get_next_tip for a 96 channel and starting tip is not the first."""
     subject.handle_action(actions.UpdateCommandAction(command=load_labware_command))
 
     with pytest.raises(StartingTipNotAvailableError):
-        TipView(subject.state).get_next_tip(labware_id="cool-labware", num_tips=96, starting_tip_name="D1")
+        TipView(subject.state).get_next_tip(
+            labware_id="cool-labware", num_tips=96, starting_tip_name="D1"
+        )

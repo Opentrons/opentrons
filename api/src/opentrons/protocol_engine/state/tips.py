@@ -166,6 +166,6 @@ class TipView(HasState[TipState]):
 
         return None
 
-    def get_channels(self, pipette_id: str) -> int:
+    def get_pipette_channels(self, pipette_id: str) -> int:
         """Return the given pipette's number of channels."""
         return self._state.channels_by_pipette_id[pipette_id]
