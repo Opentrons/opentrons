@@ -87,21 +87,21 @@ class TipStore(HasState[TipState], HandlesActions):
     def _set_used_tips(self, pipette_id: str, well_name: str, labware_id: str) -> None:
         pipette_channels = self._state.channels_by_pipette_id.get(pipette_id)
         columns = self._state.column_by_labware_id[labware_id]
-        tips_in_labware = self._state.tips_by_labware_id[labware_id]
+        wells = self._state.tips_by_labware_id[labware_id]
 
-        if pipette_channels == len(tips_in_labware):
-            for well_name in tips_in_labware.keys():
-                tips_in_labware[well_name] = TipRackWellState.USED
+        if pipette_channels == len(wells):
+            for well_name in wells.keys():
+                wells[well_name] = TipRackWellState.USED
 
         elif columns and pipette_channels == len(columns[0]):
             for column in columns:
                 if well_name in column:
                     for well in column:
-                        tips_in_labware[well] = TipRackWellState.USED
+                        wells[well] = TipRackWellState.USED
                     break
 
         else:
-            tips_in_labware[well_name] = TipRackWellState.USED
+            wells[well_name] = TipRackWellState.USED
 
 
 class TipView(HasState[TipState]):

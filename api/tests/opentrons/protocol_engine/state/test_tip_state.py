@@ -231,7 +231,7 @@ def test_handle_pipette_config_action(subject: TipStore) -> None:
     assert TipView(subject.state).get_pipette_channels(pipette_id="pipette-id") == 8
 
 
-def test_get_next_tip_raise_excepction_when_not_starting_column(
+def test_get_next_tip_raise_exception_when_not_starting_column(
     subject: TipStore,
     load_labware_command: commands.LoadLabware,
 ) -> None:
