@@ -17,6 +17,8 @@ module.exports = async (on, config) => {
   // `config` is the resolved Cypress config
   on(
     'file:preprocessor',
-    webpackPreprocessor({ webpackOptions: await require('../../webpack.config') })
+    webpackPreprocessor({
+      webpackOptions: await require('../../webpack.config')(),
+    })
   )
 }
