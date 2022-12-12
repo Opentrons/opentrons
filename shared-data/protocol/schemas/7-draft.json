@@ -310,18 +310,10 @@
       }
     },
 
-    "commandSchemaPath": {
-      "description": "The path relative to the root of @opentrons/shared-data that points to a JSON schema that each item of the 'commands' array will validate against",
-      "type": "string"
-    },
-
     "commands": {
       "description": "An array of command objects representing steps to be executed on the robot.",
       "type": "array",
-      "items": {
-        "description": "An object that describes the command to be executed by the robot. Each Command should validate against the JSON schema found at the value of the 'commandSchemaPath'",
-        "type": "object"
-      }
+      "items": { "$ref": "opentronsCommandSchemaV7" }
     },
 
     "commandAnnotations": {

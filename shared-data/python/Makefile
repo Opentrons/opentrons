@@ -42,7 +42,6 @@ gripper_sources = $(wildcard ../gripper/definitions/*.json) $(wildcard ../grippe
 json_sources = $(deck_sources) $(labware_sources) $(module_sources) $(pipette_sources) $(protocol_sources) $(gripper_sources)
 
 
-
 twine_auth_args := --username $(pypi_username) --password $(pypi_password)
 twine_repository_url ?= $(pypi_test_upload_url)
 
@@ -125,3 +124,8 @@ deploy: wheel
 .PHONY: test
 test:
 	$(python) -m pytest --cov=opentrons_shared_data --cov-report xml:coverage.xml tests
+
+.PHONY: command_schema
+command_schema: 
+	$(python) scripts/generate_command_schema.py $(version) > ../command/schemas/$(version).json
+
