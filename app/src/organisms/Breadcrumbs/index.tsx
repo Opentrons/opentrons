@@ -26,7 +26,7 @@ import { getProtocolDisplayName } from '../../organisms/ProtocolsLanding/utils'
 import { getIsOnDevice } from '../../redux/config'
 import { getStoredProtocol } from '../../redux/protocol-storage'
 
-import type { NavRouteParams } from '../../App/types'
+import type { DesktopRouteParams } from '../../App/types'
 import type { State } from '../../redux/types'
 
 interface CrumbNameProps {
@@ -70,7 +70,7 @@ function BreadcrumbsComponent(): JSX.Element | null {
   const { t } = useTranslation('top_navigation')
   const isOnDevice = useSelector(getIsOnDevice)
 
-  const { protocolKey, robotName, runId } = useParams<NavRouteParams>()
+  const { protocolKey, robotName, runId } = useParams<DesktopRouteParams>()
 
   const runCreatedAtTimestamp = useRunCreatedAtTimestamp(runId)
 
@@ -147,7 +147,7 @@ function BreadcrumbsComponent(): JSX.Element | null {
 }
 
 export function Breadcrumbs(): JSX.Element | null {
-  const { robotName } = useParams<NavRouteParams>()
+  const { robotName } = useParams<DesktopRouteParams>()
   const robot = useRobot(robotName)
 
   return (

@@ -123,6 +123,34 @@ def test_get_display_name(subject: LabwareCore) -> None:
     "labware_definition",
     [
         LabwareDefinition.construct(  # type: ignore[call-arg]
+            parameters=LabwareDefinitionParameters.construct(loadName="load-name"),  # type: ignore[call-arg]
+        ),
+    ],
+)
+def test_get_name_load_name(subject: LabwareCore) -> None:
+    """It should get the load name when no display name is defined."""
+    result = subject.get_name()
+
+    assert result == "load-name"
+
+
+def test_get_name_display_name(decoy: Decoy, mock_engine_client: EngineClient) -> None:
+    """It should get the user display name when one is defined."""
+    decoy.when(
+        mock_engine_client.state.labware.get_display_name("cool-labware")
+    ).then_return("my cool display name")
+
+    subject = LabwareCore(labware_id="cool-labware", engine_client=mock_engine_client)
+
+    result = subject.get_name()
+
+    assert result == "my cool display name"
+
+
+@pytest.mark.parametrize(
+    "labware_definition",
+    [
+        LabwareDefinition.construct(  # type: ignore[call-arg]
             ordering=[],
             parameters=LabwareDefinitionParameters.construct(isTiprack=True),  # type: ignore[call-arg]
         )
@@ -198,3 +226,58 @@ def test_reset_tips(
     """It should reset the tip state of a labware."""
     subject.reset_tips()
     decoy.verify(mock_engine_client.reset_tips(labware_id="cool-labware"), times=1)
+
+
+def test_get_tip_length(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: LabwareCore
+) -> None:
+    """It should get the tip length of a labware."""
+    decoy.when(
+        mock_engine_client.state.labware.get_tip_length("cool-labware")
+    ).then_return(1.23)
+
+    result = subject.get_tip_length()
+
+    assert result == 1.23
+
+
+def test_highest_z(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: LabwareCore
+) -> None:
+    """It should return the highest z of a labware."""
+    decoy.when(
+        mock_engine_client.state.geometry.get_labware_highest_z("cool-labware")
+    ).then_return(9000.1)
+
+    result = subject.highest_z
+
+    assert result == 9000.1
+
+
+def test_get_calibrated_offset(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: LabwareCore
+) -> None:
+    """It should get the calibrated offset."""
+    decoy.when(
+        mock_engine_client.state.geometry.get_labware_position("cool-labware")
+    ).then_return(Point(1, 2, 3))
+
+    result = subject.get_calibrated_offset()
+
+    assert result == Point(1, 2, 3)
+
+
+@pytest.mark.parametrize(
+    "labware_definition",
+    [
+        LabwareDefinition.construct(  # type: ignore[call-arg]
+            ordering=[],
+            parameters=LabwareDefinitionParameters.construct(quirks=["quirk"]),  # type: ignore[call-arg]
+        )
+    ],
+)
+def test_get_quirks(subject: LabwareCore) -> None:
+    """It should get a list of labware quirks."""
+    result = subject.get_quirks()
+
+    assert result == ["quirk"]

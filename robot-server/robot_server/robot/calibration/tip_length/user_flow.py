@@ -4,7 +4,7 @@ from typing import Dict, Awaitable, Callable, Any, Set, List, Optional
 from opentrons.types import Mount, Point, Location
 from opentrons.hardware_control import HardwareControlAPI, CriticalPoint, Pipette
 from opentrons.protocol_api import labware
-from opentrons.protocols.geometry.deck import Deck
+from opentrons.protocol_api.core.protocol_api.deck import Deck
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
@@ -276,6 +276,6 @@ class TipCalibrationUserFlow:
             await self._hardware.gantry_position(self.mount, refresh=True)
             trash = self._deck.get_fixed_trash()
             assert trash, "Bad deck setup"
-            await util.move(self, trash["A1"].top(), CriticalPoint.XY_CENTER)
+            await util.move(self, trash["A1"].top(), CriticalPoint.XY_CENTER)  # type: ignore[index]
             await self.hardware.drop_tip(self.mount)
             await self.move_to_tip_rack()

@@ -1,11 +1,11 @@
 import * as React from 'react'
 import '@testing-library/jest-dom'
-import { resetAllWhenMocks, when } from 'jest-when'
+import { resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 import { StaticRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../i18n'
-import { useFeatureFlag } from '../../../redux/config'
+import { useTrackEvent } from '../../../redux/analytics'
 import {
   getConnectableRobots,
   getReachableRobots,
@@ -26,11 +26,11 @@ import { ChooseRobotSlideout } from '../../ChooseRobotSlideout'
 
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
+jest.mock('../../../redux/analytics')
 jest.mock('../../../redux/custom-labware/selectors')
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../../redux/protocol-storage/selectors')
 jest.mock('../../../molecules/DeckThumbnail')
-jest.mock('../../../redux/config')
 jest.mock('../../ChooseRobotSlideout')
 
 const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
@@ -52,11 +52,11 @@ const mockGetIsProtocolAnalysisInProgress = getIsProtocolAnalysisInProgress as j
 const mockGetValidCustomLabwareFiles = getValidCustomLabwareFiles as jest.MockedFunction<
   typeof getValidCustomLabwareFiles
 >
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
->
 const mockChooseRobotSlideout = ChooseRobotSlideout as jest.MockedFunction<
   typeof ChooseRobotSlideout
+>
+const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
+  typeof useTrackEvent
 >
 
 const render = (
@@ -80,8 +80,11 @@ const description = 'fake protocol description'
 
 const mockMostRecentAnalysis: ProtocolAnalysisOutput = storedProtocolData.mostRecentAnalysis as ProtocolAnalysisOutput
 
+let mockTrackEvent: jest.Mock
+
 describe('ProtocolDetails', () => {
   beforeEach(() => {
+    mockTrackEvent = jest.fn()
     mockGetValidCustomLabwareFiles.mockReturnValue([])
     mockGetConnectableRobots.mockReturnValue([mockConnectableRobot])
     mockGetUnreachableRobots.mockReturnValue([mockUnreachableRobot])
@@ -92,9 +95,7 @@ describe('ProtocolDetails', () => {
       showSlideout ? <div>mock Choose Robot Slideout</div> : null
     )
     mockGetIsProtocolAnalysisInProgress.mockReturnValue(false)
-    when(mockUseFeatureFlag)
-      .calledWith('enableLiquidSetup')
-      .mockReturnValue(true)
+    mockUseTrackEvent.mockReturnValue(mockTrackEvent)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -174,6 +175,10 @@ describe('ProtocolDetails', () => {
     const runProtocolButton = getByRole('button', { name: 'Run protocol' })
     expect(queryByText('mock Choose Robot Slideout')).toBeNull()
     fireEvent.click(runProtocolButton)
+    expect(mockTrackEvent).toHaveBeenCalledWith({
+      name: 'proceedToRun',
+      properties: { sourceLocation: 'ProtocolsDetail' },
+    })
     expect(getByText('mock Choose Robot Slideout')).toBeVisible()
   })
   it('renders the protocol creation method', () => {

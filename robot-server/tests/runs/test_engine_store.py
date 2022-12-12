@@ -6,6 +6,7 @@ import pytest
 from decoy import Decoy, matchers
 
 from opentrons_shared_data import get_shared_data_root
+from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.types import DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI
@@ -23,7 +24,12 @@ def subject(decoy: Decoy) -> EngineStore:
     # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
     # should pass in some sort of actual, valid HardwareAPI instead of a mock
     hardware_api = decoy.mock(cls=HardwareControlAPI)
-    return EngineStore(hardware_api=hardware_api)
+    return EngineStore(
+        hardware_api=hardware_api,
+        # Arbitrary choice of robot_type. Tests where robot_type matters should
+        # construct their own EngineStore.
+        robot_type="OT-2 Standard",
+    )
 
 
 @pytest.fixture
@@ -43,6 +49,21 @@ async def test_create_engine(subject: EngineStore) -> None:
     assert isinstance(result, StateSummary)
     assert isinstance(subject.runner, ProtocolRunner)
     assert isinstance(subject.engine, ProtocolEngine)
+
+
+@pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
+async def test_create_engine_uses_robot_type(
+    decoy: Decoy, robot_type: RobotType
+) -> None:
+    """It should create ProtocolEngines with the given robot type."""
+    # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
+    # should pass in some sort of actual, valid HardwareAPI instead of a mock
+    hardware_api = decoy.mock(cls=HardwareControlAPI)
+    subject = EngineStore(hardware_api=hardware_api, robot_type=robot_type)
+
+    await subject.create(run_id="run-id", labware_offsets=[], protocol=None)
+
+    assert subject.engine.state_view.config.robot_type == robot_type
 
 
 async def test_create_engine_with_labware_offsets(subject: EngineStore) -> None:
@@ -143,13 +164,28 @@ async def test_clear_idle_engine(subject: EngineStore) -> None:
         subject.runner
 
 
-async def test_get_default_engine(subject: EngineStore) -> None:
-    """It should create and retrieve a default ProtocolEngine."""
+async def test_get_default_engine_idempotent(subject: EngineStore) -> None:
+    """It should create and retrieve the same default ProtocolEngine."""
     result = await subject.get_default_engine()
     repeated_result = await subject.get_default_engine()
 
     assert isinstance(result, ProtocolEngine)
     assert repeated_result is result
+
+
+@pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
+async def test_get_default_engine_robot_type(
+    decoy: Decoy, robot_type: RobotType
+) -> None:
+    """It should create default ProtocolEngines with the given robot type."""
+    # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
+    # should pass in some sort of actual, valid HardwareAPI instead of a mock
+    hardware_api = decoy.mock(cls=HardwareControlAPI)
+    subject = EngineStore(hardware_api=hardware_api, robot_type=robot_type)
+
+    result = await subject.get_default_engine()
+
+    assert result.state_view.config.robot_type == robot_type
 
 
 async def test_get_default_engine_current_unstarted(subject: EngineStore) -> None:

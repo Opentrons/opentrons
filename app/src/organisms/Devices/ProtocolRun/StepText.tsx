@@ -1,6 +1,13 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Flex, ALIGN_CENTER, SPACING, TYPOGRAPHY } from '@opentrons/components'
+import {
+  Flex,
+  ALIGN_CENTER,
+  SPACING,
+  TYPOGRAPHY,
+  DIRECTION_COLUMN,
+} from '@opentrons/components'
+
 import { LoadedLabware } from '@opentrons/shared-data'
 import { useRunQuery } from '@opentrons/react-api-client'
 import { StyledText } from '../../../atoms/text'
@@ -166,17 +173,19 @@ export function StepText(props: Props): JSX.Element | null {
           t('tc_run_profile_steps', { celsius: celsius, seconds: holdSeconds })
       )
       messageNode = (
-        <Flex>
-          <StyledText>
+        <Flex flexDirection={DIRECTION_COLUMN}>
+          <StyledText marginBottom={SPACING.spacing2}>
             {t('tc_starting_profile', {
               repetitions: Object.keys(steps).length,
             })}
           </StyledText>
-          <ul>
-            {steps.map((step: string, index: number) => (
-              <li key={index}> {step}</li>
-            ))}
-          </ul>
+          <Flex marginLeft={SPACING.spacing4}>
+            <ul>
+              {steps.map((step: string, index: number) => (
+                <li key={index}> {step}</li>
+              ))}
+            </ul>
+          </Flex>
         </Flex>
       )
       break

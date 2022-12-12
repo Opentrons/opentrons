@@ -563,7 +563,8 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
         - ``open``: The lid is open.
         - ``unknown``: The lid position can't be determined.
         """
-        return self._core.get_lid_position()
+        status = self._core.get_lid_position()
+        return status.value if status is not None else None
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
@@ -577,7 +578,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
         - ``idle``: The block has not heated or cooled since the beginning of the protocol.
         - ``error``: The temperature status can't be determined.
         """
-        return self._core.get_block_temperature_status()
+        return self._core.get_block_temperature_status().value
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
@@ -592,7 +593,8 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
         - ``idle``: The lid has not heated since the beginning of the protocol.
         - ``error``: The temperature status can't be determined.
         """
-        return self._core.get_lid_temperature_status()
+        status = self._core.get_lid_temperature_status()
+        return status.value if status is not None else None
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)

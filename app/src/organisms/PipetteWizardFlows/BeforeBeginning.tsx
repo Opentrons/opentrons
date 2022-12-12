@@ -7,7 +7,7 @@ import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardRequiredEquipmentList } from '../../molecules/WizardRequiredEquipmentList'
-import { CALIBRATION_PROBE, FLOWS } from './constants'
+import { CALIBRATION_PROBE, FLOWS, PIPETTE, HEX_SCREWDRIVER } from './constants'
 import type { Run, CreateRunData } from '@opentrons/api-client'
 import type { PipetteWizardStepProps } from './types'
 import type { AxiosError } from 'axios'
@@ -38,8 +38,39 @@ export const BeforeBeginning = (
   }, [])
 
   const pipetteId = attachedPipette[mount]?.id
-  if (pipetteId == null && flowType === FLOWS.CALIBRATE) return null
-  const handleOnClick = (): void => {
+
+  if (
+    pipetteId == null &&
+    (flowType === FLOWS.CALIBRATE || flowType === FLOWS.DETACH)
+  )
+    return null
+
+  let equipmentList = [CALIBRATION_PROBE]
+  let proceedButtonText: string = t('get_started')
+  let bodyText: string = ''
+
+  switch (flowType) {
+    case FLOWS.CALIBRATE: {
+      bodyText = t('remove_labware_to_get_started')
+      break
+    }
+    case FLOWS.ATTACH: {
+      equipmentList = [PIPETTE, CALIBRATION_PROBE, HEX_SCREWDRIVER]
+      proceedButtonText = t('move_gantry_to_front')
+      bodyText = t('remove_labware')
+      break
+    }
+    case FLOWS.DETACH: {
+      equipmentList = [HEX_SCREWDRIVER]
+      bodyText = t('get_started_detach')
+      break
+    }
+  }
+  const rightHandBody = (
+    <WizardRequiredEquipmentList width="100%" equipmentList={equipmentList} />
+  )
+
+  const handleOnClickCalibrateOrDetach = (): void => {
     chainRunCommands(
       [
         {
@@ -73,21 +104,26 @@ export const BeforeBeginning = (
         setShowErrorMessage(error.message)
       })
   }
-  //  TODO(jr, 10/26/22): when we wire up other flows, const will turn into let
-  //  for proceedButtonText and rightHandBody
-  const proceedButtonText: string = t('get_started')
-  const rightHandBody = (
-    <WizardRequiredEquipmentList
-      width="100%"
-      equipmentList={[CALIBRATION_PROBE]}
-    />
-  )
-  switch (flowType) {
-    case FLOWS.CALIBRATE: {
-      break
-    }
-    //  TODO(jr, 10/26/22): wire up the other flows
+
+  const handleOnClickAttach = (): void => {
+    chainRunCommands(
+      [
+        {
+          commandType: 'home' as const,
+          params: {},
+        },
+        //  TODO(jr 11/17/22): move to location needs to be added
+      ],
+      false
+    )
+      .then(() => {
+        proceed()
+      })
+      .catch(error => {
+        setShowErrorMessage(error.message)
+      })
   }
+
   if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
 
   return errorMessage != null ? (
@@ -106,13 +142,17 @@ export const BeforeBeginning = (
       bodyText={
         <Trans
           t={t}
-          i18nKey="remove_labware_to_get_started"
+          i18nKey={bodyText}
           components={{ block: <StyledText as="p" /> }}
         />
       }
       proceedButtonText={proceedButtonText}
       proceedIsDisabled={isCreateLoading}
-      proceed={handleOnClick}
+      proceed={
+        flowType === FLOWS.ATTACH
+          ? handleOnClickAttach
+          : handleOnClickCalibrateOrDetach
+      }
     />
   )
 }
