@@ -8,7 +8,7 @@ import {
   JUSTIFY_END,
   ALIGN_FLEX_END,
 } from '@opentrons/components'
-import { ModalShell } from '../../molecules/Modal'
+import { Modal } from '../../molecules/Modal'
 import { PrimaryButton } from '../buttons'
 import { Skeleton } from '.'
 
@@ -21,7 +21,7 @@ export default {
 
 const Template: Story<React.ComponentProps<typeof Skeleton>> = args => {
   return (
-    <ModalShell width="47rem">
+    <Modal width="47rem">
       <Flex flexDirection={DIRECTION_COLUMN} height="24.6rem">
         <Flex
           flexDirection={DIRECTION_ROW}
@@ -54,7 +54,7 @@ const Template: Story<React.ComponentProps<typeof Skeleton>> = args => {
           <PrimaryButton>{'Button text'}</PrimaryButton>
         </Flex>
       </Flex>
-    </ModalShell>
+    </Modal>
   )
 }
 

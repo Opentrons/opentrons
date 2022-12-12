@@ -74,7 +74,7 @@ export function ProtocolRunSetup({
     let nextStepKeysInOrder = stepsKeysInOrder
     const showModuleSetup = protocolData != null && modules.length > 0
     const showLiquidSetup =
-      protocolData != null && protocolData.liquids.length > 0
+      protocolData != null && protocolData.liquids?.length > 0
 
     if (showModuleSetup && showLiquidSetup) {
       nextStepKeysInOrder = [
