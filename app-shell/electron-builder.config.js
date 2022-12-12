@@ -9,7 +9,7 @@ const NO_USB_DETECTION = process.env.NO_USB_DETECTION === 'true'
 const project = process.env.OPENTRONS_PROJECT ?? 'robot-stack'
 
 module.exports = async () => ({
-  appId: 'com.opentrons.app',
+  appId: project === 'robot-stack' ? 'com.opentrons.app' : 'com.opentrons.app-ot3',
   electronVersion: '21.3.1',
   files: [
     '**/*',
@@ -25,6 +25,7 @@ module.exports = async () => ({
   ],
   extraMetadata: {
     version: await versionForProject(project),
+    productName: project === 'robot-stack' ? 'Opentrons' : 'Opentrons-OT3'
   },
   extraResources: USE_PYTHON ? ['python'] : [],
   /* eslint-disable no-template-curly-in-string */
@@ -35,6 +36,7 @@ module.exports = async () => ({
     target: process.platform === 'darwin' ? ['dmg', 'zip'] : ['zip'],
     category: 'public.app-category.productivity',
     type: DEV_MODE ? 'development' : 'distribution',
+    icon: project === 'robot-stack' ? 'build/icon.icns' : 'build/three.icns'
   },
   dmg: {
     icon: null,
@@ -42,6 +44,7 @@ module.exports = async () => ({
   win: {
     target: ['nsis'],
     publisherName: 'Opentrons Labworks Inc.',
+    icon: project === 'robot-stack' ? 'build/icon.ico' : 'build/three.ico'
   },
   nsis: {
     oneClick: false,
@@ -50,6 +53,7 @@ module.exports = async () => ({
     target: ['AppImage'],
     executableName: 'opentrons',
     category: 'Science',
+    icon: project === 'robot-stack' ? 'build/icon.icns' : 'build/three.icns'
   },
   publish:
     OT_APP_DEPLOY_BUCKET && OT_APP_DEPLOY_FOLDER

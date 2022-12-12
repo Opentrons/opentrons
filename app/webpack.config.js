@@ -9,7 +9,6 @@ const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin')
 const WorkerPlugin = require('worker-plugin')
 
 const { DEV_MODE, baseConfig } = require('@opentrons/webpack-config')
-const { productName: title } = require('@opentrons/app-shell/package.json')
 const { description, author } = require('./package.json')
 
 const { versionForProject } = require('../scripts/git-version')
@@ -22,6 +21,8 @@ const PORT = process.env.PORT || 8080
 const CONTENT_BASE = path.join(__dirname, './src')
 const PUBLIC_PATH = DEV_MODE ? `http://localhost:${PORT}/` : ''
 const PROJECT = process.env.OPENTRONS_PROJECT ?? 'robot-stack'
+const { productName } = require('@opentrons/app-shell/package.json')
+const title = PROJECT === 'robot-stack' ? productName : `${productName} OT-3`
 
 module.exports = async () => {
   const version = await versionForProject(PROJECT)
