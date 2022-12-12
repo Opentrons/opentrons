@@ -13,8 +13,11 @@ from opentrons.config import feature_flags
 from opentrons.protocol_reader import ProtocolReader
 from opentrons.protocol_runner import create_simulating_runner
 
+from opentrons_shared_data.robot.dev_types import RobotType
+
 from robot_server.app_state import AppState, AppStateAccessor, get_app_state
 from robot_server.deletion_planner import ProtocolDeletionPlanner
+from robot_server.hardware import get_robot_type
 from robot_server.persistence import get_sql_engine, get_persistence_directory
 
 from .protocol_auto_deleter import ProtocolAutoDeleter
@@ -88,16 +91,9 @@ def get_analysis_store(
     return analysis_store
 
 
-async def get_analysis_robot_type() -> Literal["OT-2 Standard", "OT-3 Standard"]:
-    if feature_flags.enable_ot3_hardware_controller():
-        return "OT-3 Standard"
-    else:
-        return "OT-2 Standard"
-
-
 async def get_protocol_analyzer(
     analysis_store: AnalysisStore = Depends(get_analysis_store),
-    analysis_robot_type: Literal["OT-2 Standard", "OT-3 Standard"] = Depends(get_analysis_robot_type),
+    analysis_robot_type: RobotType = Depends(get_robot_type),
 ) -> ProtocolAnalyzer:
     """Construct a ProtocolAnalyzer for a single request."""
     protocol_runner = await create_simulating_runner(robot_type=analysis_robot_type)

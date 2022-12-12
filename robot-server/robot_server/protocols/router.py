@@ -9,8 +9,10 @@ from typing import List, Optional, Union
 from typing_extensions import Literal
 
 from opentrons.protocol_reader import ProtocolReader, ProtocolFilesInvalidError
+from opentrons_shared_data.robot.dev_types import RobotType
 
 from robot_server.errors import ErrorDetails, ErrorBody
+from robot_server.hardware import get_robot_type
 from robot_server.service.task_runner import TaskRunner, get_task_runner
 from robot_server.service.dependencies import get_unique_id, get_current_time
 from robot_server.service.json_api import (
@@ -39,7 +41,6 @@ from .dependencies import (
     get_analysis_store,
     get_protocol_analyzer,
     get_protocol_directory,
-    get_analysis_robot_type,
 )
 
 
@@ -123,7 +124,7 @@ async def create_protocol(
     protocol_analyzer: ProtocolAnalyzer = Depends(get_protocol_analyzer),
     task_runner: TaskRunner = Depends(get_task_runner),
     protocol_auto_deleter: ProtocolAutoDeleter = Depends(get_protocol_auto_deleter),
-    analysis_robot_type: Literal["OT-2 Standard", "OT-3 Standard"] = Depends(get_analysis_robot_type),
+    robot_type: RobotType = Depends(get_robot_type),
     protocol_id: str = Depends(get_unique_id, use_cache=False),
     analysis_id: str = Depends(get_unique_id, use_cache=False),
     created_at: datetime = Depends(get_current_time),
@@ -141,6 +142,8 @@ async def create_protocol(
         task_runner: Background task runner.
         protocol_auto_deleter: An interface to delete old resources to make room for
             the new protocol.
+        robot_type: The type of this robot. Protocols meant for other robot types
+            are rejected.
         protocol_id: Unique identifier to attach to the protocol resource.
         analysis_id: Unique identifier to attach to the analysis resource.
         created_at: Timestamp to attach to the new resource.
@@ -155,12 +158,12 @@ async def create_protocol(
             status.HTTP_422_UNPROCESSABLE_ENTITY
         ) from e
 
-    if source.robot_type != analysis_robot_type:
+    if source.robot_type != robot_type:
         raise ProtocolForDifferentRobotType(
             detail=(
                 f"This protocol is for {source.robot_type} robots."
                 f" It can't be analyzed or run on this robot,"
-                f" which is an {analysis_robot_type}."
+                f" which is an {robot_type}."
             )
         ).as_error(status.HTTP_422_UNPROCESSABLE_ENTITY)
 
