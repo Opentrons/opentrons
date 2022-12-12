@@ -12,6 +12,8 @@ from .types import OT3Mount, OT3Axis, GripperProbe
 from opentrons.types import Point
 import json
 
+from opentrons_shared_data.deck import load as load_deck
+
 if TYPE_CHECKING:
     from .ot3api import OT3API
 
@@ -19,6 +21,16 @@ LOG = getLogger(__name__)
 
 CAL_TRANSIT_HEIGHT: Final[float] = 10
 GRIPPER_GRIP_FORCE: Final[float] = 20
+
+# FIXME: add these to shared-data
+CALIBRATION_SQUARE_DEPTH: Final[float] = -0.25
+CALIBRATION_SQUARE_SIZE: Final[float] = 20
+EDGES = {
+    "left": Point(x=-CALIBRATION_SQUARE_SIZE * 0.5),
+    "right": Point(x=CALIBRATION_SQUARE_SIZE * 0.5),
+    "top": Point(y=CALIBRATION_SQUARE_SIZE * 0.5),
+    "bottom": Point(y=-CALIBRATION_SQUARE_SIZE * 0.5),
+}
 
 
 class CalibrationMethod(Enum):
@@ -42,7 +54,22 @@ class InaccurateNonContactSweepError(RuntimeError):
         )
 
 
-async def find_deck_position(hcapi: OT3API, mount: OT3Mount) -> float:
+def _get_calibration_square_position_in_slot(slot: int) -> Point:
+    """Get slot top-left position."""
+    deck = load_deck("ot3_standard", version=3)
+    slots = deck["locations"]["orderedSlots"]
+    s = slots[slot - 1]
+    assert s["id"] == str(slot)
+    bottom_left = Point(*s["position"])
+    slot_size_x = s["boundingBox"]["xDimension"]
+    slot_size_y = s["boundingBox"]["yDimension"]
+    relative_center = Point(x=float(slot_size_x), y=float(slot_size_y)) * 0.5
+    return bottom_left + relative_center + Point(z=CALIBRATION_SQUARE_DEPTH)
+
+
+async def find_deck_position(
+    hcapi: OT3API, mount: OT3Mount, nominal_center: Point
+) -> float:
     """
     Find the true position of the deck in this mount's frame of reference.
 
@@ -51,17 +78,15 @@ async def find_deck_position(hcapi: OT3API, mount: OT3Mount) -> float:
     particular tool on a particular mount, then the z deck coordinate that
     will cause a collision is not 0. This routine finds that value.
     """
-    z_offset_settings = hcapi.config.calibration.z_offset
-    await hcapi.home_z()
+    z_pass_settings = hcapi.config.calibration.z_offset.pass_settings
+    z_prep_point = nominal_center + Point(x=13, y=13)  # FIXME: add to shared-data
     here = await hcapi.gantry_position(mount)
-    z_prep_point = Point(*z_offset_settings.point)
-    above_point = z_prep_point._replace(z=here.z)
-    await hcapi.move_to(mount, above_point)
+    await hcapi.move_to(mount, z_prep_point._replace(z=here.z))
     deck_z = await hcapi.capacitive_probe(
-        mount, OT3Axis.by_mount(mount), z_prep_point.z, z_offset_settings.pass_settings
+        mount, OT3Axis.by_mount(mount), z_prep_point.z, z_pass_settings
     )
     LOG.info(f"autocalibration: found deck at {deck_z}")
-    await hcapi.move_to(mount, z_prep_point + Point(0, 0, CAL_TRANSIT_HEIGHT))
+    await hcapi.move_rel(mount, Point(0, 0, CAL_TRANSIT_HEIGHT))
     return deck_z
 
 
@@ -148,8 +173,8 @@ async def find_edge(
             interaction_pos
             > slot_edge_nominal.z + edge_settings.early_sense_tolerance_mm
         ):
-            await hcapi.home_z()
             raise EarlyCapacitiveSenseTrigger(interaction_pos, slot_edge_nominal.z)
+        assert edge_settings.overrun_tolerance_mm <= edge_settings.pass_settings.max_overrun_distance_mm
         if interaction_pos < (slot_edge_nominal.z - edge_settings.overrun_tolerance_mm):
             LOG.info(f"Miss at {interaction_pos}")
             # In this block, we've missed the deck
@@ -181,54 +206,32 @@ async def find_edge(
 
 
 async def find_slot_center_binary(
-    hcapi: OT3API, mount: OT3Mount, deck_height: float
+    hcapi: OT3API, mount: OT3Mount, nominal_center: Point, deck_height: float
 ) -> Tuple[float, float]:
     """Find the center of the calibration slot by binary-searching its edges.
 
     Returns the XY-center of the slot.
     """
-    # Find all four edges of the calibration slot
-    plus_x_edge = await find_edge(
-        hcapi,
-        mount,
-        Point(*hcapi.config.calibration.edge_sense.plus_x_pos)._replace(z=deck_height),
-        OT3Axis.X,
-        -1,
-    )
+    real_pos = nominal_center._replace(z=deck_height)
+    # Find X left/right edges
+    plus_x_edge = await find_edge(hcapi, mount, real_pos + EDGES["right"], OT3Axis.X, -1)
     LOG.info(f"Found +x edge at {plus_x_edge}mm")
     minus_x_edge = await find_edge(
-        hcapi,
-        mount,
-        Point(*hcapi.config.calibration.edge_sense.minus_x_pos)._replace(z=deck_height),
-        OT3Axis.X,
-        1,
+        hcapi, mount, real_pos + EDGES["left"], OT3Axis.X, 1
     )
     LOG.info(f"Found -x edge at {minus_x_edge}mm")
+    real_pos = real_pos._replace(x=(plus_x_edge + minus_x_edge) / 2)
 
-    here = await hcapi.gantry_position(mount)
-    await hcapi.move_to(
-        mount,
-        Point(*hcapi.config.calibration.edge_sense.plus_y_pos)._replace(
-            y=here.y, z=CAL_TRANSIT_HEIGHT
-        ),
-    )
+    # Find Y bottom/top edges
     plus_y_edge = await find_edge(
-        hcapi,
-        mount,
-        Point(*hcapi.config.calibration.edge_sense.plus_y_pos)._replace(z=deck_height),
-        OT3Axis.Y,
-        -1,
+        hcapi, mount, real_pos + EDGES["top"], OT3Axis.Y, -1
     )
     LOG.info(f"Found +y edge at {plus_y_edge}mm")
-    minus_y_edge = await find_edge(
-        hcapi,
-        mount,
-        Point(*hcapi.config.calibration.edge_sense.minus_y_pos)._replace(z=deck_height),
-        OT3Axis.Y,
-        1,
-    )
+    minus_y_edge = await find_edge(hcapi, mount, real_pos + EDGES["bottom"], OT3Axis.Y, 1)
     LOG.info(f"Found -y edge at {minus_y_edge}mm")
-    return (plus_x_edge + minus_x_edge) / 2, (plus_y_edge + minus_y_edge) / 2
+    real_pos = real_pos._replace(y=(plus_y_edge + minus_y_edge) / 2)
+
+    return real_pos.x, real_pos.y
 
 
 async def find_axis_center(
@@ -372,22 +375,23 @@ def _edges_from_data(
 
 
 async def find_slot_center_noncontact(
-    hcapi: OT3API, mount: OT3Mount, deck_height: float
+    hcapi: OT3API, mount: OT3Mount, nominal_center: Point, deck_height: float
 ) -> Tuple[float, float]:
     NONCONTACT_INTERVAL_MM: float = 0.1
     target_z = deck_height + NONCONTACT_INTERVAL_MM
+    travel_center = nominal_center._replace(z=target_z)
     x_center = await find_axis_center(
         hcapi,
         mount,
-        Point(*hcapi.config.calibration.edge_sense.minus_x_pos)._replace(z=target_z),
-        Point(*hcapi.config.calibration.edge_sense.plus_x_pos)._replace(z=target_z),
+        travel_center + EDGES["left"],
+        travel_center + EDGES["right"],
         OT3Axis.X,
     )
     y_center = await find_axis_center(
         hcapi,
         mount,
-        Point(*hcapi.config.calibration.edge_sense.minus_y_pos)._replace(z=target_z),
-        Point(*hcapi.config.calibration.edge_sense.plus_y_pos)._replace(z=target_z),
+        travel_center + EDGES["bottom"],
+        travel_center + EDGES["top"],
         OT3Axis.Y,
     )
     return x_center, y_center
@@ -396,6 +400,7 @@ async def find_slot_center_noncontact(
 async def _calibrate_mount(
     hcapi: OT3API,
     mount: OT3Mount,
+    slot: int,
     method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
 ) -> Point:
     """
@@ -423,18 +428,24 @@ async def _calibrate_mount(
     from the current instrument offset to set a new instrument offset.
     """
     # reset instrument offset
+    nominal_center = _get_calibration_square_position_in_slot(slot)
     await hcapi.reset_instrument_offset(mount)
     try:
         # First, find the deck. This will become our z offset value, and will
         # also be used to baseline the edge detection points.
-        z_pos = await find_deck_position(hcapi, mount)
+        z_pos = await find_deck_position(hcapi, mount, nominal_center)
         LOG.info(f"Found deck at {z_pos}mm")
 
         # Perform xy offset search
         if method == CalibrationMethod.BINARY_SEARCH:
-            x_center, y_center = await find_slot_center_binary(hcapi, mount, z_pos)
+            x_center, y_center = await find_slot_center_binary(
+                hcapi, mount, nominal_center, z_pos
+            )
         elif method == CalibrationMethod.NONCONTACT_PASS:
-            x_center, y_center = await find_slot_center_noncontact(hcapi, mount, z_pos)
+            # FIXME: use slot to find ideal position
+            x_center, y_center = await find_slot_center_noncontact(
+                hcapi, mount, nominal_center, z_pos
+            )
         else:
             raise RuntimeError("Unknown calibration method")
 
@@ -474,6 +485,7 @@ def gripper_pin_offsets_mean(front: Point, rear: Point) -> Point:
 async def calibrate_gripper(
     hcapi: OT3API,
     probe: GripperProbe,
+    slot: int,
     method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
 ) -> Point:
     """
@@ -492,7 +504,7 @@ async def calibrate_gripper(
     hcapi.add_gripper_probe(probe)
     try:
         await hcapi.grip(GRIPPER_GRIP_FORCE)
-        offset = await _calibrate_mount(hcapi, OT3Mount.GRIPPER, method)
+        offset = await _calibrate_mount(hcapi, OT3Mount.GRIPPER, slot, method)
         return offset
     finally:
         hcapi.remove_gripper_probe()
@@ -502,6 +514,7 @@ async def calibrate_gripper(
 async def calibrate_pipette(
     hcapi: OT3API,
     mount: Literal[OT3Mount.LEFT, OT3Mount.RIGHT],
+    slot: int,
     method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
 ) -> Point:
     """
@@ -514,10 +527,8 @@ async def calibrate_pipette(
     """
     try:
         await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
-        offset = await _calibrate_mount(hcapi, mount, method)
-        # save instrument offset for pipette
+        offset = await _calibrate_mount(hcapi, mount, slot, method)
         await hcapi.save_instrument_offset(mount, offset)
         return offset
     finally:
-        await hcapi.home_z(mount)
         await hcapi.remove_tip(mount)
