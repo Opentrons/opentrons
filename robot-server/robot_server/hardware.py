@@ -114,7 +114,6 @@ async def get_thread_manager(
     return hardware_api
 
 
-# [NOTE TO SELF: This is used for real runs, not analyses.]
 async def get_hardware(
     thread_manager: ThreadManagedHardware = Depends(get_thread_manager),
 ) -> HardwareControlAPI:
