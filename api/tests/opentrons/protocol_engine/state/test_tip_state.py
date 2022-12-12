@@ -108,7 +108,7 @@ def test_get_next_tip_returns_first_tip(
 
 
 @pytest.mark.parametrize(
-    "input_tip_amount, result_well_name", [(1, "B1"), (8, "A1"), (96, "A1")]
+    "input_tip_amount, result_well_name", [(1, "B1"), (8, "A2"), (96, "A1")]
 )
 def test_get_next_tip_used_starting_tip(
     load_labware_command: commands.LoadLabware,
@@ -176,7 +176,7 @@ def test_get_next_tip_with_column_and_starting_tip(
         starting_tip_name="D1",
     )
 
-    assert result == "A1"
+    assert result == "A2"
 
 
 def test_reset_tips(

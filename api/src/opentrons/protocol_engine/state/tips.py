@@ -127,12 +127,13 @@ class TipView(HasState[TipState]):
             column_head = [column[0] for column in columns]
             starting_column_index = 0
 
-            if starting_tip_name not in column_head:
-                starting_tip_name = None
-            else:
+            if starting_tip_name:
                 for idx, column in enumerate(columns):
                     if starting_tip_name in column:
-                        starting_column_index = idx
+                        if starting_tip_name not in column_head:
+                            starting_column_index = idx + 1
+                        else:
+                            starting_column_index = idx
 
             for column in columns[starting_column_index:]:
                 if not any(wells[well] == TipRackWellState.USED for well in column):
