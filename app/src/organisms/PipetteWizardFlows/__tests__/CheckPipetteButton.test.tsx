@@ -31,6 +31,7 @@ describe('CheckPipetteButton', () => {
       robotName: 'otie',
       proceed: jest.fn(),
       proceedButtonText: 'continue',
+      setPending: jest.fn(),
     }
     dispatchApiRequest = jest.fn()
     mockGetRequestById.mockReturnValue(null)
@@ -41,5 +42,6 @@ describe('CheckPipetteButton', () => {
     const proceedBtn = getByRole('button', { name: 'continue' })
     fireEvent.click(proceedBtn)
     expect(dispatchApiRequest).toBeCalledWith(mockFetchPipettes('otie'))
+    expect(props.setPending).toHaveBeenCalled()
   })
 })

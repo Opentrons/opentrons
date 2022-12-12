@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { Flex, Icon, JUSTIFY_CENTER } from '@opentrons/components'
 import { fetchPipettes, FETCH_PIPETTES } from '../../redux/pipettes'
 import {
   getRequestById,
@@ -17,12 +16,13 @@ import type { State } from '../../redux/types'
 interface CheckPipetteButtonProps {
   robotName: string
   proceedButtonText: string
+  setPending: React.Dispatch<React.SetStateAction<boolean>>
   proceed: () => void
 }
 export const CheckPipetteButton = (
   props: CheckPipetteButtonProps
 ): JSX.Element => {
-  const { robotName, proceedButtonText, proceed } = props
+  const { robotName, proceedButtonText, setPending, proceed } = props
   const fetchPipettesRequestId = React.useRef<string | null>(null)
   const [dispatch] = useDispatchApiRequests(dispatchedAction => {
     if (
@@ -44,20 +44,19 @@ export const CheckPipetteButton = (
   const isPending = requestStatus === PENDING
 
   React.useEffect(() => {
+    if (isPending) {
+      setPending(isPending)
+    }
+  }, [isPending, setPending])
+
+  React.useEffect(() => {
     //  if requestStatus is FAILURE then the error modal will be in the results page
     if (requestStatus === SUCCESS || requestStatus === FAILURE) proceed()
   }, [proceed, requestStatus])
 
   return (
     <PrimaryButton disabled={isPending} onClick={handleCheckPipette}>
-      {isPending ? (
-        //  TODO(jr 11/17/22): temporary spinner until we implement the simmer state
-        <Flex width="5rem" justifyContent={JUSTIFY_CENTER}>
-          <Icon name="ot-spinner" height="1rem" spin />
-        </Flex>
-      ) : (
-        proceedButtonText
-      )}
+      {proceedButtonText}
     </PrimaryButton>
   )
 }
