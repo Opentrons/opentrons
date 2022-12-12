@@ -1,4 +1,4 @@
-import React, * as Rect from 'react'
+import * as React from 'react'
 import { renderWithProviders, COLORS } from '@opentrons/components'
 
 import { LinerProgress } from '..'
