@@ -68,7 +68,7 @@ async def create_simulating_runner(robot_type: RobotType) -> ProtocolRunner:
 
 
 async def _build_hardware_simulator_for_robot_type(
-    robot_type: _RobotType,
+    robot_type: RobotType,
 ) -> HardwareControlAPI:
     if robot_type == "OT-2 Standard":
         return await OT2API.build_hardware_simulator()
