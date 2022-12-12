@@ -137,16 +137,11 @@ class ZSenseSettings:
 
 @dataclass(frozen=True)
 class EdgeSenseSettings:
-    plus_x_pos: Offset
-    minus_x_pos: Offset
-    plus_y_pos: Offset
-    minus_y_pos: Offset
     overrun_tolerance_mm: float
     early_sense_tolerance_mm: float
     pass_settings: CapacitivePassSettings
     search_initial_tolerance_mm: float
     search_iteration_limit: int
-    nominal_center: Offset
 
 
 @dataclass(frozen=True)
