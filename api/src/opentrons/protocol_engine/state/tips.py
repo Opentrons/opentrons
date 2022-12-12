@@ -140,6 +140,7 @@ class TipView(HasState[TipState]):
                     return column[0]
 
         elif num_tips == len(wells.keys()):
+            # not checking against starting_tip_name. for 96c checking that all wells are clean.
             if not any(
                 tip_state == TipRackWellState.USED
                 for well_name, tip_state in wells.items()

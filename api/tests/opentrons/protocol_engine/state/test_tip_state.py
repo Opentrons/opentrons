@@ -130,7 +130,17 @@ def test_get_next_tip_used_starting_tip(
 
 @pytest.mark.parametrize(
     "input_tip_amount, get_next_tip_tips, input_starting_tip, result_well_name",
-    [(1, 8, "A2", "A2"), (1, 8, "A1", "A2"), (8, 1, "D1", "A2"), (1, 96, "D1", None)],
+    [
+        (1, 8, "A2", "A2"),
+        (1, 1, "A2", "A2"),
+        (8, 8, "B2", "A3"),
+        (1, 8, "A1", "A2"),
+        (8, 1, "D1", "A2"),
+        (1, 96, "D1", None),
+        (1, 8, None, "A2"),
+        (8, 1, "D1", "A2"),
+        (1, 96, None, None),
+    ],
 )
 def test_get_next_tip_skips_picked_up_tip(
     load_labware_command: commands.LoadLabware,
