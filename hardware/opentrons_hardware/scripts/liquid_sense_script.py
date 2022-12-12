@@ -89,6 +89,7 @@ class Capturer:
         return list(self._do_get_all())
 
     def set_mount(self, mount: str) -> None:
+        """Set mount to capture CAN messages from."""
         self.mount = mount
 
     def __call__(
@@ -99,20 +100,28 @@ class Capturer:
         """Callback entry point for capturing messages."""
         if isinstance(message, message_definitions.ReadFromSensorResponse):
             data = sensor_types.SensorDataType.build(
-                    message.payload.sensor_data, message.payload.sensor
-                ).to_float()
+                message.payload.sensor_data, message.payload.sensor
+            ).to_float()
             self.response_queue.put_nowait(data)
             print(f"\nsensor data = {data}")
         elif isinstance(message, message_definitions.MoveCompleted):
             if message.payload.ack_id == UInt8Field(2):
-                if arbitration_id.parts.originating_node_id == \
-                NodeId["head_" + self.mount[0]]:
+                if (
+                    arbitration_id.parts.originating_node_id
+                    == NodeId["head_" + self.mount[0]]
+                ):
                     print(f"\nmount position = {message.payload.current_position_um}")
-                    print(f"mount encoder position = {message.payload.encoder_position_um}")
-                elif arbitration_id.parts.originating_node_id == \
-                NodeId["pipette_" + self.mount]:
+                    print(
+                        f"mount encoder position = {message.payload.encoder_position_um}"
+                    )
+                elif (
+                    arbitration_id.parts.originating_node_id
+                    == NodeId["pipette_" + self.mount]
+                ):
                     print(f"\npipette position = {message.payload.current_position_um}")
-                    print(f"pipette encoder position = {message.payload.encoder_position_um}")
+                    print(
+                        f"pipette encoder position = {message.payload.encoder_position_um}"
+                    )
 
 
 async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
@@ -142,7 +151,6 @@ async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
     # 164 x 107 each according to ot3_standards.json
     # using 152 x 103 from ot3repl
 
-    x_dist = float64(slot_dist[args.which_slot][0])
     # print(f"x dist = {x_dist}, should be 75")
     sensor_cap = Capturer()
     sensor_cap.set_mount(args.mount)
@@ -195,7 +203,9 @@ async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
                     },
                     acceleration={},
                     duration=float64(
-                        max(slot_dist[args.which_slot][0], slot_dist[args.which_slot][1])
+                        max(
+                            slot_dist[args.which_slot][0], slot_dist[args.which_slot][1]
+                        )
                         / args.gantry_speed
                     ),
                     present_nodes=[NodeId.gantry_x, NodeId.gantry_y],
@@ -232,6 +242,7 @@ async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
                     },
                     acceleration={},
                     duration=float64(7),
+                    # present_nodes=[target_pipette],
                     present_nodes=[target_z, target_pipette],
                     stop_condition=MoveStopCondition.cap_sensor,
                 ),
@@ -252,30 +263,31 @@ async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
                     acceleration={},
                     duration=float64(6.75),
                     present_nodes=[target_z, target_pipette],
-                    stop_condition=MoveStopCondition.none,
-                ),
-            ],
-            [
-                create_step(
-                    distance={
-                        target_z: float64(-50),
-                    },
-                    velocity={
-                        target_z: float64(-1 * args.mount_speed),
-                    },
-                    acceleration={},
-                    duration=float64(6.75),
-                    present_nodes=[target_z],
                     stop_condition=MoveStopCondition.cap_sensor,
                 ),
-            ]
+            ],
+            # [
+            #     create_step(
+            #         distance={
+            #             target_z: float64(-50),
+            #         },
+            #         velocity={
+            #             target_z: float64(-1 * args.mount_speed),
+            #         },
+            #         acceleration={},
+            #         duration=float64(6.75),
+            #         present_nodes=[target_z],
+            #         stop_condition=MoveStopCondition.none,
+            #     ),
+            # ]
         ]
-    threshold_cmh20 = float(63)
+    threshold_pascals = float(90)
     threshold_payload = payloads.SetSensorThresholdRequestPayload(
         sensor=fields.SensorTypeField(SensorType.pressure),
+        # sensor=fields.SensorTypeField(SensorType.capacitive),
         sensor_id=fields.SensorIdField(0),
         threshold=Int32Field(
-            int(threshold_cmh20 * sensor_types.sensor_fixed_point_conversion)
+            int(threshold_pascals * sensor_types.sensor_fixed_point_conversion)
         ),
         mode=fields.SensorThresholdModeField(SensorThresholdMode.absolute),
     )
@@ -290,12 +302,14 @@ async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
         binding = 1
     stim_payload = payloads.BindSensorOutputRequestPayload(
         sensor=fields.SensorTypeField(SensorType.pressure),
+        # sensor=fields.SensorTypeField(SensorType.capacitive),
         sensor_id=fields.SensorIdField(SensorId.S0),
         binding=fields.SensorOutputBindingField(binding),
     )
     stim_message = message_definitions.BindSensorOutputRequest(payload=stim_payload)
     runner = MoveGroupRunner(move_groups=prep_move_group)
-    position = await runner.run(can_messenger=messenger)
+
+    await runner.run(can_messenger=messenger)
 
     # await messenger.send(target_pipette, reset_message)
     await asyncio.get_running_loop().run_in_executor(
@@ -304,13 +318,13 @@ async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
     await messenger.send(target_pipette, stim_message)
 
     runner = MoveGroupRunner(move_groups=test_move_group)
-    position = await runner.run(can_messenger=messenger)
+    await runner.run(can_messenger=messenger)
     if args.verbose_monitoring:
         print(f"Sensor data: {sensor_cap.get_all()}")
-    # print(f"Final position: {position}")
 
     reset_payload = payloads.BindSensorOutputRequestPayload(
         sensor=fields.SensorTypeField(SensorType.pressure),
+        # sensor=fields.SensorTypeField(SensorType.capacitive),
         sensor_id=fields.SensorIdField(SensorId.S0),
         binding=fields.SensorOutputBindingField(0),
     )
