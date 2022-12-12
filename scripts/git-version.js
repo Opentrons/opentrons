@@ -16,7 +16,7 @@
 // given project that currently exists in the monorepo.
 
 const git = require('simple-git')
-const { dirname } = require('path')
+const { dirname } = require('node:path')
 const REPO_BASE = dirname(__dirname)
 
 function monorepoGit() {
@@ -27,18 +27,15 @@ const detailsFromTag = tag =>
   tag.includes('@') ? tag.split('@') : ['robot-stack', tag.substring(1)]
 
 function tagFromDetails(project, version) {
-  if (project === 'robot-stack') {
-    return 'v' + version
-  } else {
-    return [project, version].join('@')
-  }
+  const prefix = prefixForProject(project)
+  return `${prefix}${version}`
 }
 
 function prefixForProject(project) {
   if (project === 'robot-stack') {
     return 'v'
   } else {
-    return project + '@'
+    return `${project}@`
   }
 }
 
@@ -66,10 +63,10 @@ async function versionForProject(project) {
 }
 
 module.exports = {
-  detailsFromTag: detailsFromTag,
-  tagFromDetails: tagFromDetails,
-  prefixForProject: prefixForProject,
-  latestTagForProject: latestTagForProject,
-  versionForProject: versionForProject,
-  monorepoGit: monorepoGit,
+  detailsFromTag,
+  tagFromDetails,
+  prefixForProject,
+  latestTagForProject,
+  versionForProject,
+  monorepoGit,
 }
