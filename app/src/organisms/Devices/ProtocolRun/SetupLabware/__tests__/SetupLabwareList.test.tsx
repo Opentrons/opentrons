@@ -178,6 +178,7 @@ describe('SetupLabwareList', () => {
         attachedModuleMatch: null,
         moduleId: 'moduleId',
       } as any,
+      isOt3: false,
     })
 
     getAllByText('mock labware list item')
@@ -195,6 +196,7 @@ describe('SetupLabwareList', () => {
         attachedModuleMatch: null,
         moduleId: 'moduleId',
       } as any,
+      isOt3: false,
     })
     expect(queryByText('Additional Off-Deck Labware')).not.toBeInTheDocument()
   })
@@ -204,6 +206,7 @@ describe('SetupLabwareList', () => {
       commands: mockOffDeckCommands,
       extraAttentionModules: [],
       attachedModuleInfo: {} as any,
+      isOt3: false,
     })
     getByText('Additional Off-Deck Labware')
     getAllByText('mock labware list item')

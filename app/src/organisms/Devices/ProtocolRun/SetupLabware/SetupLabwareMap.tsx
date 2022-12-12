@@ -119,7 +119,10 @@ export function SetupLabwareMap({
             )}
           </RobotWorkSpace>
         </Box>
-        <OffDeckLabwareList labwareItems={offDeckItems} />
+        <OffDeckLabwareList
+          labwareItems={offDeckItems}
+          isOt3={robotType === 'OT-3 Standard'}
+        />
       </Flex>
     </Flex>
   )

@@ -14,6 +14,7 @@ import { getModuleTypesThatRequireExtraAttention } from '../../../ProtocolSetup/
 import { ReapplyOffsetsModal } from '../../../ReapplyOffsetsModal'
 import { useCurrentRun } from '../../../ProtocolUpload/hooks'
 import {
+  useIsOT3,
   useModuleRenderInfoForProtocolById,
   useProtocolDetailsForRun,
   useStoredProtocolAnalysis,
@@ -45,6 +46,7 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
     t('list_view'),
     t('map_view')
   )
+  const isOt3 = useIsOT3(robotName)
   /**
    * This component's usage of the reapply offsets modal can be removed
    * along with the enableManualDeckStateMod feature flag.
@@ -85,6 +87,7 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
             attachedModuleInfo={moduleRenderInfoById}
             commands={protocolData?.commands ?? []}
             extraAttentionModules={moduleTypesThatRequireExtraAttention}
+            isOt3={isOt3}
           />
         ) : (
           <SetupLabwareMap
