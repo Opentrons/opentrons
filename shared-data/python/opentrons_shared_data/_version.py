@@ -2,13 +2,6 @@ import sys
 import logging
 
 _pyversion = sys.version_info[0:2]
-if _pyversion < (3, 7):
-    raise RuntimeError(
-        "opentrons requires Python 3.7 or above, this is {0}.{1}".format(
-            _pyversion[0], _pyversion[1]
-        )
-    )
-
 
 if _pyversion >= (3, 8):
     from importlib import metadata
