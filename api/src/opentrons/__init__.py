@@ -24,12 +24,11 @@ from opentrons.util import logging_config
 from opentrons.protocols.types import ApiDeprecationError
 from opentrons.protocols.api_support.types import APIVersion
 
-HERE = os.path.abspath(os.path.dirname(__file__))
-from ._version import version  # noqa: E402
+from ._version import version
 
+HERE = os.path.abspath(os.path.dirname(__file__))
 __version__ = version
 
-from opentrons import config  # noqa: E402
 
 LEGACY_MODULES = ["robot", "reset", "instruments", "containers", "labware", "modules"]
 
