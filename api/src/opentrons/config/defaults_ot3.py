@@ -45,7 +45,7 @@ DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSett
         search_iteration_limit=10,
         nominal_center=(228, 150, 0),
     ),
-    probe_length=34.5,
+    probe_length=44.5,
 )
 
 ROBOT_CONFIG_VERSION: Final = 1
