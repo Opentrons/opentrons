@@ -5,11 +5,10 @@ import logging
 
 from fastapi import Depends
 from sqlalchemy.engine import Engine as SQLEngine
-from typing_extensions import Final, Literal
+from typing_extensions import Final
 from pathlib import Path
 from anyio import Path as AsyncPath
 
-from opentrons.config import feature_flags
 from opentrons.protocol_reader import ProtocolReader
 from opentrons.protocol_runner import create_simulating_runner
 

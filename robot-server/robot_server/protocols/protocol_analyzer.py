@@ -1,6 +1,5 @@
 """Protocol analysis module."""
 import logging
-from typing_extensions import Literal
 
 from opentrons.protocol_runner import ProtocolRunner
 

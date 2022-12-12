@@ -2,7 +2,6 @@
 from datetime import datetime
 from pydantic import BaseModel, Extra, Field
 from typing import Any, List, Optional
-from typing_extensions import Literal
 
 from opentrons.protocol_reader import (
     ProtocolType as ProtocolType,
