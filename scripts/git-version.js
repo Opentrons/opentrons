@@ -59,7 +59,6 @@ async function versionForProject(project) {
       )
       return '0.0.0-dev'
     })
-  }
 }
 
 module.exports = {
