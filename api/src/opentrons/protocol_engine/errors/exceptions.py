@@ -199,7 +199,3 @@ class LabwareMovementNotAllowedError(ProtocolEngineError):
 
 class LocationIsOccupiedError(ProtocolEngineError):
     """An error raised when attempting to place labware in a non-empty location."""
-
-
-class StartingTipNotAvailableError(ProtocolEngineError):
-    """An error raise when trying to access a tip when its not present in tip-rack."""

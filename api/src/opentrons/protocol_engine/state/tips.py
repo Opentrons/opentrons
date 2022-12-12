@@ -11,7 +11,6 @@ from ..actions import (
     AddPipetteConfigAction,
 )
 from ..commands import LoadLabwareResult, PickUpTipResult
-from ..errors.exceptions import StartingTipNotAvailableError
 
 
 class TipRackWellState(Enum):
@@ -142,10 +141,7 @@ class TipView(HasState[TipState]):
 
         elif num_tips == len(wells.keys()):
             if starting_tip_name and starting_tip_name != columns[0][0]:
-                raise StartingTipNotAvailableError(
-                    "Partial pick-up is currently not supported. "
-                    "When using a 96 channel pipette and a start location please use the first well."
-                )
+                return None
 
             if not any(
                 tip_state == TipRackWellState.USED
