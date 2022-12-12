@@ -13,7 +13,6 @@ from opentrons.protocol_engine.types import (
     LoadedPipette,
     OFF_DECK_LOCATION,
     LabwareMovementStrategy,
-    StaticPipetteConfig,
 )
 from opentrons.protocol_engine.actions import (
     SetPipetteMovementSpeedAction,
@@ -24,6 +23,7 @@ from opentrons.protocol_engine.state.pipettes import (
     PipetteStore,
     PipetteState,
     CurrentWell,
+    StaticPipetteConfig,
 )
 
 from .command_fixtures import (
@@ -553,12 +553,13 @@ def test_add_pipette_config(subject: PipetteStore) -> None:
     subject.handle_action(
         AddPipetteConfigAction(
             pipette_id="pipette-id",
-            static_config=StaticPipetteConfig(
-                model="pipette-model", min_volume=1.23, max_volume=4.56, channels=7
-            ),
+            model="pipette-model",
+            min_volume=1.23,
+            max_volume=4.56,
+            channels=7,
         )
     )
 
     assert subject.state.static_config_by_id["pipette-id"] == StaticPipetteConfig(
-        model="pipette-model", min_volume=1.23, max_volume=4.56, channels=7
+        model="pipette-model", min_volume=1.23, max_volume=4.56
     )
