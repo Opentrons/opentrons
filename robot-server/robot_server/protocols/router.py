@@ -108,7 +108,9 @@ protocols_router = APIRouter()
     responses={
         status.HTTP_201_CREATED: {"model": SimpleBody[Protocol]},
         status.HTTP_422_UNPROCESSABLE_ENTITY: {
-            "model": ErrorBody[ProtocolFilesInvalid]
+            "model": ErrorBody[
+                Union[ProtocolFilesInvalid, ProtocolForDifferentRobotType]
+            ]
         },
     },
 )
