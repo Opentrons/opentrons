@@ -16,7 +16,7 @@
 // given project that currently exists in the monorepo.
 
 const git = require('simple-git')
-const { dirname } = require('node:path')
+const { dirname } = require('path')
 const REPO_BASE = dirname(__dirname)
 
 function monorepoGit() {
