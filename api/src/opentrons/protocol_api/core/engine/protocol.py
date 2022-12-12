@@ -16,8 +16,6 @@ from opentrons.hardware_control.modules.types import (
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.geometry.deck import Deck
-from opentrons.protocols.geometry.deck_item import DeckItem
 
 from opentrons.protocol_engine import (
     DeckSlotLocation,
@@ -105,7 +103,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def is_simulating(self) -> bool:
         """Get whether the protocol is being analyzed or actually run."""
-        return self._sync_hardware.is_simulator  # type: ignore[no-any-return]
+        return self._engine_client.state.config.ignore_pause
 
     def add_labware_definition(
         self,
@@ -273,23 +271,19 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def home(self) -> None:
         """Move all axes to their home positions."""
-        raise NotImplementedError("ProtocolCore.home not implemented")
+        self._engine_client.home(axes=None)
 
-    def get_deck(self) -> Deck:
-        """Get an interface to get and modify the deck layout."""
-        raise NotImplementedError("ProtocolCore.get_deck not implemented")
-
-    def get_fixed_trash(self) -> DeckItem:
+    def get_fixed_trash(self) -> LabwareCore:
         """Get the fixed trash labware."""
         return self._fixed_trash_core
 
     def set_rail_lights(self, on: bool) -> None:
         """Set the device's rail lights."""
-        raise NotImplementedError("ProtocolCore.set_rail_lights not implemented")
+        self._engine_client.set_rail_lights(on=on)
 
     def get_rail_lights_on(self) -> bool:
         """Get whether the device's rail lights are on."""
-        raise NotImplementedError("ProtocolCore.get_rail_lights_on not implemented")
+        return self._sync_hardware.get_lights()["rails"]  # type: ignore[no-any-return]
 
     def door_closed(self) -> bool:
         """Get whether the device's front door is closed."""

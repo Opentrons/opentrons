@@ -9,15 +9,13 @@ from opentrons.protocol_engine import (
     create_protocol_engine,
 )
 
+from opentrons_shared_data.robot.dev_types import RobotType
+
 from .legacy_wrappers import LegacySimulatingContextCreator
 from .protocol_runner import ProtocolRunner
 
 
-# TODO(mm, 2022-11-17): Make this a shared enum somewhere.
-_RobotType = Literal["OT-2 Standard", "OT-3 Standard"]
-
-
-async def create_simulating_runner(robot_type: _RobotType) -> ProtocolRunner:
+async def create_simulating_runner(robot_type: RobotType) -> ProtocolRunner:
     """Create a ProtocolRunner wired to a simulating HardwareControlAPI.
 
     Example:
@@ -50,6 +48,7 @@ async def create_simulating_runner(robot_type: _RobotType) -> ProtocolRunner:
     protocol_engine = await create_protocol_engine(
         hardware_api=simulating_hardware_api,
         config=ProtocolEngineConfig(
+            robot_type=robot_type,
             ignore_pause=True,
             use_virtual_modules=True,
             use_virtual_gripper=True,

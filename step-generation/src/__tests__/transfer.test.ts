@@ -1607,6 +1607,7 @@ describe('advanced options', () => {
         // use the dispense > air gap here before moving to trash
         {
           commandType: 'aspirate',
+          meta: AIR_GAP_META,
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
@@ -2271,6 +2272,7 @@ describe('advanced options', () => {
         // dispense > air gap on the way to trash
         {
           commandType: 'aspirate',
+          meta: AIR_GAP_META,
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
@@ -2956,6 +2958,7 @@ describe('advanced options', () => {
         // dispense > air gap
         {
           commandType: 'aspirate',
+          meta: AIR_GAP_META,
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
@@ -3354,6 +3357,7 @@ describe('advanced options', () => {
         // dispense > air gap
         {
           commandType: 'aspirate',
+          meta: AIR_GAP_META,
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
@@ -3680,6 +3684,7 @@ describe('advanced options', () => {
         // dispense > air gap
         {
           commandType: 'aspirate',
+          meta: AIR_GAP_META,
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',

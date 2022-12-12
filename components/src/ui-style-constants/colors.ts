@@ -95,3 +95,6 @@ export const liquidColors = [
   tartRed,
   whaleGrey,
 ]
+
+// touchscreen colors
+export const greyDisabled = '#e0e0e0'

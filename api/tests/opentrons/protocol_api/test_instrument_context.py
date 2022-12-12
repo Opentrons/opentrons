@@ -9,16 +9,14 @@ from opentrons.broker import Broker
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support import instrument as mock_instrument_support
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import Clearances
 from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
-    ProtocolContext,
     InstrumentContext,
     Labware,
     Well,
     labware,
 )
-from opentrons.protocol_api.core.common import InstrumentCore
+from opentrons.protocol_api.core.common import InstrumentCore, ProtocolCore
 from opentrons.types import Location, Mount, Point
 
 
@@ -47,11 +45,10 @@ def mock_instrument_core(decoy: Decoy) -> InstrumentCore:
     return instrument_core
 
 
-# TODO(mc, 2022-10-25): this will be replaced by a protocol core, instead
 @pytest.fixture
-def mock_protocol_context(decoy: Decoy) -> ProtocolContext:
-    """Get a mock ProtocolContext."""
-    return decoy.mock(cls=ProtocolContext)
+def mock_protocol_core(decoy: Decoy) -> ProtocolCore:
+    """Get a mock ProtocolCore."""
+    return decoy.mock(cls=ProtocolCore)
 
 
 @pytest.fixture
@@ -75,15 +72,15 @@ def api_version() -> APIVersion:
 @pytest.fixture
 def subject(
     mock_instrument_core: InstrumentCore,
-    mock_protocol_context: ProtocolContext,
+    mock_protocol_core: ProtocolCore,
     mock_broker: Broker,
     mock_trash: Labware,
     api_version: APIVersion,
 ) -> InstrumentContext:
-    """Get a ProtocolContext test subject with its dependencies mocked out."""
+    """Get a ProtocolCore test subject with its dependencies mocked out."""
     return InstrumentContext(
         implementation=mock_instrument_core,
-        ctx=mock_protocol_context,
+        protocol_core=mock_protocol_core,
         broker=mock_broker,
         api_version=api_version,
         tip_racks=[],
@@ -202,11 +199,7 @@ def test_aspirate(
     mock_well = decoy.mock(cls=Well)
     bottom_location = Location(point=Point(1, 2, 3), labware=mock_well)
 
-    decoy.when(mock_instrument_core.get_well_bottom_clearance()).then_return(
-        Clearances(default_aspirate=1.2, default_dispense=3.4)
-    )
-
-    decoy.when(mock_well.bottom(z=1.2)).then_return(bottom_location)
+    decoy.when(mock_well.bottom(z=1.0)).then_return(bottom_location)
     decoy.when(mock_instrument_core.get_absolute_aspirate_flow_rate(1.23)).then_return(
         5.67
     )
@@ -272,14 +265,14 @@ def test_blow_out_to_location(
 def test_blow_out_in_place(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
-    mock_protocol_context: ProtocolContext,
+    mock_protocol_core: ProtocolCore,
     subject: InstrumentContext,
 ) -> None:
     """It should blow out in place."""
     mock_well = decoy.mock(cls=Well)
     location = Location(point=Point(1, 2, 3), labware=mock_well)
 
-    decoy.when(mock_protocol_context.location_cache).then_return(location)
+    decoy.when(mock_protocol_core.get_last_location()).then_return(location)
 
     subject.blow_out()
 
@@ -295,12 +288,11 @@ def test_blow_out_in_place(
 
 def test_blow_out_no_location_cache_raises(
     decoy: Decoy,
-    mock_instrument_core: InstrumentCore,
-    mock_protocol_context: ProtocolContext,
+    mock_protocol_core: ProtocolCore,
     subject: InstrumentContext,
 ) -> None:
     """It should raise if no location or well is provided and the location cache returns None."""
-    decoy.when(mock_protocol_context.location_cache).then_return(None)
+    decoy.when(mock_protocol_core.get_last_location()).then_return(None)
 
     with pytest.raises(RuntimeError):
         subject.blow_out()
@@ -524,12 +516,8 @@ def test_dispense_with_well_location(
     """It should dispense to a well."""
     mock_well = decoy.mock(cls=Well)
 
-    decoy.when(mock_well.bottom(2.0)).then_return(
+    decoy.when(mock_well.bottom(1.0)).then_return(
         Location(point=Point(1, 2, 3), labware=mock_well)
-    )
-
-    decoy.when(mock_instrument_core.get_well_bottom_clearance()).then_return(
-        Clearances(default_aspirate=3.0, default_dispense=2.0)
     )
 
     decoy.when(mock_instrument_core.get_absolute_dispense_flow_rate(1.0)).then_return(
@@ -554,10 +542,10 @@ def test_dispense_with_no_location(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
     subject: InstrumentContext,
-    mock_protocol_context: ProtocolContext,
+    mock_protocol_core: ProtocolCore,
 ) -> None:
     """It should dispense to a well."""
-    decoy.when(mock_protocol_context.location_cache).then_return(
+    decoy.when(mock_protocol_core.get_last_location()).then_return(
         Location(point=Point(1, 2, 3), labware=None)
     )
 

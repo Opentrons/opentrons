@@ -44,7 +44,7 @@ export function CardButton(props: CardButtonProps): JSX.Element {
       gridGap={SPACING.spacing5}
       justifyContent={JUSTIFY_CENTER}
       alignItems={ALIGN_CENTER}
-      onClick={() => history.push(`/${destinationPath}`)}
+      onClick={() => history.push(destinationPath)}
       width={cardWidth}
       height={cardHeight}
       backgroundColor={COLORS.medBlue}

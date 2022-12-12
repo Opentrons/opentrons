@@ -94,6 +94,7 @@ export interface ProtocolAnalysisOutput {
   modules: LoadedModule[]
   liquids: Liquid[]
   errors: AnalysisError[]
+  robotType?: 'OT-2 Standard' | 'OT-3 Standard'
 }
 
 interface AnalysisSourceFile {

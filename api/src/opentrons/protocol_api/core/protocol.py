@@ -9,8 +9,6 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import Mount, Location, DeckSlotName
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import ModuleModel
-from opentrons.protocols.geometry.deck import Deck
-from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
@@ -116,11 +114,7 @@ class AbstractProtocol(
         ...
 
     @abstractmethod
-    def get_deck(self) -> Deck:
-        ...
-
-    @abstractmethod
-    def get_fixed_trash(self) -> DeckItem:
+    def get_fixed_trash(self) -> LabwareCoreType:
         ...
 
     @abstractmethod

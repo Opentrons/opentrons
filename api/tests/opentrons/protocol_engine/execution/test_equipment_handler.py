@@ -16,9 +16,11 @@ from opentrons.hardware_control.modules import (
     HeaterShaker,
     AbstractModule,
 )
+from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.models import LabwareDefinition
 
 from opentrons.protocol_engine import errors
+from opentrons.protocol_engine.actions import ActionDispatcher, AddPipetteConfigAction
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     ModuleLocation,
@@ -29,6 +31,7 @@ from opentrons.protocol_engine.types import (
     ModuleModel,
     ModuleDefinition,
     OFF_DECK_LOCATION,
+    StaticPipetteConfig,
 )
 
 from opentrons.protocol_engine.state import Config, StateStore
@@ -46,6 +49,13 @@ from opentrons.protocol_engine.execution.equipment import (
 )
 
 
+def _make_config(use_virtual_modules: bool) -> Config:
+    return Config(
+        use_virtual_modules=use_virtual_modules,
+        robot_type="OT-2 Standard",  # Arbitrary.
+    )
+
+
 @pytest.fixture
 def state_store(decoy: Decoy) -> StateStore:
     """Get a mocked out StateStore instance."""
@@ -56,6 +66,12 @@ def state_store(decoy: Decoy) -> StateStore:
 def hardware_api(decoy: Decoy) -> HardwareControlAPI:
     """Get a mocked out HardwareControlAPI instance."""
     return decoy.mock(cls=HardwareControlAPI)
+
+
+@pytest.fixture
+def action_dispatcher(decoy: Decoy) -> ActionDispatcher:
+    """Get a mocked out ActionDispatcher instance."""
+    return decoy.mock(cls=ActionDispatcher)
 
 
 @pytest.fixture
@@ -100,6 +116,7 @@ async def temp_module_v2(decoy: Decoy) -> TempDeck:
 def subject(
     hardware_api: HardwareControlAPI,
     state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
     labware_data_provider: LabwareDataProvider,
     module_data_provider: ModuleDataProvider,
     model_utils: ModelUtils,
@@ -108,6 +125,7 @@ def subject(
     return EquipmentHandler(
         hardware_api=hardware_api,
         state_store=state_store,
+        action_dispatcher=action_dispatcher,
         labware_data_provider=labware_data_provider,
         module_data_provider=module_data_provider,
         model_utils=model_utils,
@@ -445,10 +463,26 @@ async def test_load_pipette(
     decoy: Decoy,
     model_utils: ModelUtils,
     hardware_api: HardwareControlAPI,
+    state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
     subject: EquipmentHandler,
 ) -> None:
     """It should load pipette data, check attachment, and generate an ID."""
     decoy.when(model_utils.generate_id()).then_return("unique-id")
+    decoy.when(state_store.pipettes.get_by_mount(MountType.RIGHT)).then_return(
+        LoadedPipette.construct(pipetteName=PipetteNameType.P300_MULTI)  # type: ignore[call-arg]
+    )
+    decoy.when(hardware_api.get_attached_instrument(mount=HwMount.LEFT)).then_return(
+        cast(
+            PipetteDict,
+            {
+                "model": "pipette-model",
+                "min_volume": 1.23,
+                "max_volume": 4.56,
+                "channels": 7,
+            },
+        )
+    )
 
     result = await subject.load_pipette(
         pipette_name=PipetteNameType.P300_SINGLE,
@@ -457,10 +491,22 @@ async def test_load_pipette(
     )
 
     assert result == LoadedPipetteData(pipette_id="unique-id")
+
     decoy.verify(
         await hardware_api.cache_instruments(
-            {HwMount.LEFT: PipetteNameType.P300_SINGLE.value}
-        )
+            {
+                HwMount.LEFT: PipetteNameType.P300_SINGLE.value,
+                HwMount.RIGHT: PipetteNameType.P300_MULTI.value,
+            }
+        ),
+        action_dispatcher.dispatch(
+            AddPipetteConfigAction(
+                pipette_id="unique-id",
+                static_config=StaticPipetteConfig(
+                    model="pipette-model", min_volume=1.23, max_volume=4.56, channels=7
+                ),
+            )
+        ),
     )
 
 
@@ -468,10 +514,23 @@ async def test_load_pipette_96_channels(
     decoy: Decoy,
     model_utils: ModelUtils,
     hardware_api: HardwareControlAPI,
+    action_dispatcher: ActionDispatcher,
     subject: EquipmentHandler,
 ) -> None:
     """It should load pipette data, check attachment, and generate an ID."""
     decoy.when(model_utils.generate_id()).then_return("unique-id")
+
+    decoy.when(hardware_api.get_attached_instrument(mount=HwMount.LEFT)).then_return(
+        cast(
+            PipetteDict,
+            {
+                "model": "pipette-model",
+                "min_volume": 1.23,
+                "max_volume": 4.56,
+                "channels": 7,
+            },
+        )
+    )
 
     result = await subject.load_pipette(
         pipette_name="p1000_96",
@@ -480,11 +539,39 @@ async def test_load_pipette_96_channels(
     )
 
     assert result == LoadedPipetteData(pipette_id="unique-id")
-    decoy.verify(await hardware_api.cache_instruments({HwMount.LEFT: "p1000_96"}))
+
+    decoy.verify(
+        await hardware_api.cache_instruments({HwMount.LEFT: "p1000_96"}),
+        action_dispatcher.dispatch(
+            AddPipetteConfigAction(
+                pipette_id="unique-id",
+                static_config=StaticPipetteConfig(
+                    model="pipette-model", min_volume=1.23, max_volume=4.56, channels=7
+                ),
+            )
+        ),
+    )
 
 
-async def test_load_pipette_uses_provided_id(subject: EquipmentHandler) -> None:
+async def test_load_pipette_uses_provided_id(
+    decoy: Decoy,
+    hardware_api: HardwareControlAPI,
+    action_dispatcher: ActionDispatcher,
+    subject: EquipmentHandler,
+) -> None:
     """It should use the provided ID rather than generating an ID for the pipette."""
+    decoy.when(hardware_api.get_attached_instrument(mount=HwMount.LEFT)).then_return(
+        cast(
+            PipetteDict,
+            {
+                "model": "pipette-model",
+                "min_volume": 1.23,
+                "max_volume": 4.56,
+                "channels": 7,
+            },
+        )
+    )
+
     result = await subject.load_pipette(
         pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
@@ -493,38 +580,14 @@ async def test_load_pipette_uses_provided_id(subject: EquipmentHandler) -> None:
 
     assert result == LoadedPipetteData(pipette_id="my-pipette-id")
 
-
-async def test_load_pipette_checks_existence_with_already_loaded(
-    decoy: Decoy,
-    model_utils: ModelUtils,
-    state_store: StateStore,
-    hardware_api: HardwareControlAPI,
-    subject: EquipmentHandler,
-) -> None:
-    """Loading a pipette should cache with pipettes already attached."""
-    decoy.when(model_utils.generate_id()).then_return("unique-id")
-
-    decoy.when(state_store.pipettes.get_by_mount(MountType.RIGHT)).then_return(
-        LoadedPipette(
-            id="pipette-id",
-            mount=MountType.RIGHT,
-            pipetteName=PipetteNameType.P300_MULTI_GEN2,
-        )
-    )
-
-    result = await subject.load_pipette(
-        pipette_name=PipetteNameType.P300_SINGLE,
-        mount=MountType.LEFT,
-        pipette_id=None,
-    )
-
-    assert result == LoadedPipetteData(pipette_id="unique-id")
     decoy.verify(
-        await hardware_api.cache_instruments(
-            {
-                HwMount.LEFT: PipetteNameType.P300_SINGLE.value,
-                HwMount.RIGHT: PipetteNameType.P300_MULTI_GEN2.value,
-            }
+        action_dispatcher.dispatch(
+            AddPipetteConfigAction(
+                pipette_id="my-pipette-id",
+                static_config=StaticPipetteConfig(
+                    model="pipette-model", min_volume=1.23, max_volume=4.56, channels=7
+                ),
+            )
         )
     )
 
@@ -535,7 +598,7 @@ async def test_load_pipette_raises_if_pipette_not_attached(
     hardware_api: HardwareControlAPI,
     subject: EquipmentHandler,
 ) -> None:
-    """Loading a pipette should should raise if unable to cache instruments."""
+    """Loading a pipette should raise if unable to cache instruments."""
     decoy.when(model_utils.generate_id()).then_return("unique-id")
 
     decoy.when(
@@ -589,7 +652,7 @@ async def test_load_module(
         ]
     )
 
-    decoy.when(state_store.config).then_return(Config(use_virtual_modules=False))
+    decoy.when(state_store.config).then_return(_make_config(use_virtual_modules=False))
 
     decoy.when(
         state_store.modules.select_hardware_module_to_load(
@@ -638,7 +701,7 @@ async def test_load_module_using_virtual(
         module_data_provider.get_definition(ModuleModel.TEMPERATURE_MODULE_V1)
     ).then_return(tempdeck_v1_def)
 
-    decoy.when(state_store.config).then_return(Config(use_virtual_modules=True))
+    decoy.when(state_store.config).then_return(_make_config(use_virtual_modules=True))
 
     result = await subject.load_module(
         model=ModuleModel.TEMPERATURE_MODULE_V1,
@@ -664,7 +727,7 @@ def test_get_module_hardware_api(
     module_2 = decoy.mock(cls=MagDeck)
     module_3 = decoy.mock(cls=HeaterShaker)
 
-    decoy.when(state_store.config).then_return(Config(use_virtual_modules=False))
+    decoy.when(state_store.config).then_return(_make_config(use_virtual_modules=False))
     decoy.when(state_store.modules.get_serial_number("module-id")).then_return(
         "serial-2"
     )
@@ -691,7 +754,7 @@ def test_get_module_hardware_api_virtual(
     module_2 = decoy.mock(cls=MagDeck)
     module_3 = decoy.mock(cls=HeaterShaker)
 
-    decoy.when(state_store.config).then_return(Config(use_virtual_modules=True))
+    decoy.when(state_store.config).then_return(_make_config(use_virtual_modules=True))
     decoy.when(state_store.modules.get_serial_number("module-id")).then_return(
         "serial-2"
     )
@@ -718,7 +781,7 @@ def test_get_module_hardware_api_missing(
     module_2 = decoy.mock(cls=MagDeck)
     module_3 = decoy.mock(cls=HeaterShaker)
 
-    decoy.when(state_store.config).then_return(Config(use_virtual_modules=False))
+    decoy.when(state_store.config).then_return(_make_config(use_virtual_modules=False))
     decoy.when(state_store.modules.get_serial_number("module-id")).then_return(
         "the-limit-does-not-exist"
     )
