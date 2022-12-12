@@ -100,10 +100,12 @@ class Well:
 
     @has_tip.setter
     def has_tip(self, value: bool) -> None:
-        _log.warning(
-            "Setting the `Well.has_tip` property manually has been deprecated,"
-            " and will raise an error in a future version of the Python Protocol API."
-        )
+        if self._api_version > APIVersion(3, 13):
+            _log.warning(
+                "Setting the `Well.has_tip` property manually has been deprecated"
+                " and will raise an error in a future version of the Python Protocol API."
+            )
+
         self._impl.set_has_tip(value)
 
     @property
