@@ -51,14 +51,14 @@ async function latestTagForProject(project) {
 }
 
 async function versionForProject(project) {
-  try {
-    const tag = await latestTagForProject(project)
-    return detailsFromTag(tag)[1]
-  } catch (error) {
-    console.error(
-      `Could not find a version for project ${project} - no tags yet or no tags fetched? Using 0.0.0-dev`
-    )
-    return '0.0.0-dev'
+  return latestTagForProject(project)
+    .then(tag => detailsFromTag(tag)[1])
+    .catch(error => {
+      console.error(
+        `Could not find a version for project ${project} - no tags yet or no tags fetched? Using 0.0.0-dev`
+      )
+      return '0.0.0-dev'
+    })
   }
 }
 
