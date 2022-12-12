@@ -33,6 +33,8 @@ MessageDefinition = Union[
     defs.MoveCompleted,
     defs.MotorPositionRequest,
     defs.MotorPositionResponse,
+    defs.UpdateMotorPositionRequest,
+    defs.UpdateMotorPositionResponse,
     defs.SetMotionConstraints,
     defs.GetMotionConstraintsRequest,
     defs.GetMotionConstraintsResponse,
