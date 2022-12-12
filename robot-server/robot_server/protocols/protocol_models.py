@@ -9,6 +9,8 @@ from opentrons.protocol_reader import (
     ProtocolFileRole as ProtocolFileRole,
 )
 
+from opentrons_shared_data.robot.dev_types import RobotType
+
 from robot_server.service.json_api import ResourceModel
 from .analysis_models import AnalysisSummary
 
@@ -70,14 +72,10 @@ class Protocol(ResourceModel):
     )
 
     # robotType is provided for symmetry with the output of app-side analysis.
-    # Here in robot-side analysis, the returned robot_type will always match
-    # the robot that we're running on, because otherwise we would have rejected
-    # the upload.
-    #
-    # TODO(mm, 2022-10-21): Make this an enum when we figure out where it should live.
-    robotType: Literal["OT-2 Standard", "OT-3 Standard"] = Field(
-        ...,
-        description="The type of robot that this protocol can run on."
+    # Here on a robot, the robot_type of a protocol will always match the robot hosting
+    # this server, because otherwise this server would have rejected the upload.
+    robotType: RobotType = Field(
+        ..., description="The type of robot that this protocol can run on."
     )
 
     # todo(mm, 2021-09-16): Investigate whether something like `dict[str, Any]` would
