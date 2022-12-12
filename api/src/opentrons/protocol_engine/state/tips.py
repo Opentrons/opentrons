@@ -122,25 +122,21 @@ class TipView(HasState[TipState]):
         """Get the next available clean tip."""
         wells = self._state.tips_by_labware_id[labware_id]
         columns = self._state.column_by_labware_id[labware_id]
+
         if columns and num_tips == len(columns[0]):
             column_head = [column[0] for column in columns]
+            starting_column_index = 0
+
             if starting_tip_name not in column_head:
                 starting_tip_name = None
             else:
-                starting_column_index = starting_tip_name in columns
-                print(starting_column_index)
+                for idx, column in enumerate(columns):
+                    if starting_tip_name in column:
+                        starting_column_index = idx
 
-            for column in columns:
-                if starting_tip_name is None:
-                    if not any(wells[well] == TipRackWellState.USED for well in column):
-                        return column[0]
-                else:
-                    if starting_tip_name in column and not any(
-                        wells[well] == TipRackWellState.USED for well in column
-                    ) or starting_tip_name not in column and not any(
-                        wells[well] == TipRackWellState.USED for well in column
-                    ):
-                        return column[0]
+            for column in columns[starting_column_index:]:
+                if not any(wells[well] == TipRackWellState.USED for well in column):
+                    return column[0]
 
         elif num_tips == len(wells.keys()):
             if not any(
@@ -151,7 +147,11 @@ class TipView(HasState[TipState]):
 
         else:
             for well_name, tip_state in wells.items():
-                seen_start = starting_tip_name is None or well_name == starting_tip_name or wells[starting_tip_name] == TipRackWellState.USED
+                seen_start = (
+                    starting_tip_name is None
+                    or well_name == starting_tip_name
+                    or wells[starting_tip_name] == TipRackWellState.USED
+                )
 
                 if seen_start and tip_state == TipRackWellState.CLEAN:
                     return well_name

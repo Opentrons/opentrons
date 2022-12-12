@@ -129,12 +129,8 @@ def test_get_next_tip_used_starting_tip(
 
 
 @pytest.mark.parametrize(
-    "input_tip_amount, get_next_tip_tips, input_starting_tip, result_well_name", [
-        (1, 8, "D1", "A2"),
-        (1, 8, "A1", "A2"),
-        (8, 1, "D1", "A2"),
-        (1, 96, "D1", None)
-    ]
+    "input_tip_amount, get_next_tip_tips, input_starting_tip, result_well_name",
+    [(1, 8, "A2", "A2"), (1, 8, "A1", "A2"), (8, 1, "D1", "A2"), (1, 96, "D1", None)],
 )
 def test_get_next_tip_skips_picked_up_tip(
     load_labware_command: commands.LoadLabware,
@@ -161,7 +157,7 @@ def test_get_next_tip_skips_picked_up_tip(
     result = TipView(subject.state).get_next_tip(
         labware_id="cool-labware",
         num_tips=get_next_tip_tips,
-        starting_tip_name=input_starting_tip
+        starting_tip_name=input_starting_tip,
     )
 
     assert result == result_well_name
@@ -224,4 +220,3 @@ def test_handle_pipette_config_action(subject: TipStore) -> None:
     )
 
     assert TipView(subject.state).get_channels(pipette_id="pipette-id") == 8
-
