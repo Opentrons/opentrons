@@ -2,7 +2,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, List, Mapping, Optional
-from pydantic import BaseModel
 
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.types import MountType, Mount as HwMount
@@ -53,7 +52,8 @@ class CurrentWell:
     well_name: str
 
 
-class StaticPipetteConfig(BaseModel):
+@dataclass(frozen=True)
+class StaticPipetteConfig:
     """Static config for a pipette."""
 
     model: str
