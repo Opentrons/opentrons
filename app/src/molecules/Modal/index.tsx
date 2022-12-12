@@ -1,7 +1,8 @@
 import * as React from 'react'
-import { StyleProps, SPACING, COLORS, Box } from '@opentrons/components'
+import { SPACING, COLORS, Box } from '@opentrons/components'
 import { ModalHeader } from './ModalHeader'
 import { ModalShell } from './ModalShell'
+import type { StyleProps } from '@opentrons/components'
 
 type ModalType = 'info' | 'warning' | 'error'
 export * from './ModalShell'
@@ -15,7 +16,6 @@ export interface ModalProps extends StyleProps {
   fullPage?: boolean
   childrenPadding?: string | number
   children?: React.ReactNode
-  modalWidth?: string
 }
 
 export const Modal = (props: ModalProps): JSX.Element => {
@@ -26,7 +26,7 @@ export const Modal = (props: ModalProps): JSX.Element => {
     title,
     childrenPadding = `${SPACING.spacing4} ${SPACING.spacing5} ${SPACING.spacing5}`,
     children,
-    modalWidth,
+    ...styleProps
   } = props
 
   const modalHeader = (
@@ -49,7 +49,7 @@ export const Modal = (props: ModalProps): JSX.Element => {
 
   return (
     <ModalShell
-      width={modalWidth ?? '31.25rem'}
+      width={styleProps.width ?? '31.25rem'}
       header={modalHeader}
       onOutsideClick={closeOnOutsideClick ? onClose : undefined}
       // center within viewport aside from nav
