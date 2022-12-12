@@ -29,21 +29,16 @@ DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSett
         ),
     ),
     edge_sense=EdgeSenseSettings(
-        plus_x_pos=(237, 148, 0),
-        minus_x_pos=(215, 148, 0),
-        plus_y_pos=(224, 161, 0),
-        minus_y_pos=(224, 141, 0),
-        overrun_tolerance_mm=0.5,
+        overrun_tolerance_mm=0.2,
         early_sense_tolerance_mm=0.2,
         pass_settings=CapacitivePassSettings(
-            prep_distance_mm=1,
-            max_overrun_distance_mm=1,
-            speed_mm_per_s=1,
-            sensor_threshold_pf=1.0,
+            prep_distance_mm=0.5,
+            max_overrun_distance_mm=0.5,
+            speed_mm_per_s=2,
+            sensor_threshold_pf=0.5,
         ),
         search_initial_tolerance_mm=5.0,
         search_iteration_limit=10,
-        nominal_center=(228, 150, 0),
     ),
     probe_length=44.5,
 )
@@ -345,10 +340,6 @@ def _build_default_edge_sense(
     from_conf: Any, default: EdgeSenseSettings
 ) -> EdgeSenseSettings:
     return EdgeSenseSettings(
-        plus_x_pos=from_conf.get("plus_x_pos", default.plus_x_pos),
-        minus_x_pos=from_conf.get("minus_x_pos", default.minus_x_pos),
-        plus_y_pos=from_conf.get("plus_y_pos", default.plus_y_pos),
-        minus_y_pos=from_conf.get("minus_y_pos", default.minus_y_pos),
         overrun_tolerance_mm=from_conf.get(
             "overrun_tolerance_mm", default.overrun_tolerance_mm
         ),
@@ -364,7 +355,6 @@ def _build_default_edge_sense(
         search_iteration_limit=from_conf.get(
             "search_iteration_limit", default.search_iteration_limit
         ),
-        nominal_center=from_conf.get("nominal_center", default.nominal_center),
     )
 
 
