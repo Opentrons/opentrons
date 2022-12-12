@@ -561,14 +561,10 @@
                 "enum": ["calibration/moveToMaintenancePosition"]
               },
               "params": {
-                "required": ["mount", "location"],
+                "required": ["mount"],
                 "mount": {
                   "enum": ["left", "right"],
                   "description": "Instrument mount to calibrate."
-                },
-                "location": {
-                  "description": "Location to move to before starting calibration.",
-                  "enum": ["attachOrDetach", "probePosition"]
                 }
               }
             }
