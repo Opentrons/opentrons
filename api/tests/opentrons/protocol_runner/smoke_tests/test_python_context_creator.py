@@ -4,6 +4,8 @@ import asyncio
 from functools import partial
 from typing import AsyncIterable
 
+from opentrons_shared_data.deck.dev_types import RobotModel
+
 from opentrons.protocol_runner.python_context_creator import PythonContextCreator
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocol_api_experimental import ProtocolContext, DeckSlotName
@@ -16,9 +18,14 @@ from opentrons.protocol_engine import (
 
 
 @pytest.fixture
-async def protocol_engine(hardware: HardwareAPI) -> AsyncIterable[ProtocolEngine]:
+async def protocol_engine(
+    hardware: HardwareAPI,
+    robot_model: RobotModel,
+) -> AsyncIterable[ProtocolEngine]:
     """Get a ProtocolEngine wired to a simulating HardwareAPI."""
-    engine = await create_protocol_engine(hardware_api=hardware, config=EngineConfig())
+    engine = await create_protocol_engine(
+        hardware_api=hardware, config=EngineConfig(robot_type=robot_model)
+    )
     engine.play()
     yield engine
     await engine.finish()

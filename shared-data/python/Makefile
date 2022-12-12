@@ -127,5 +127,5 @@ test:
 
 .PHONY: command_schema
 command_schema: 
-	$(python) scripts/generate_command_schema.py $(version) > ../command/schemas/$(version).json
+	$(python) opentrons_shared_data/command/generate_command_schema.py $(version) > ../command/schemas/$(version).json
 

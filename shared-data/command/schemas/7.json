@@ -128,6 +128,9 @@
       "$ref": "#/definitions/RunProfileCreate"
     },
     {
+      "$ref": "#/definitions/CalibrateGripperCreate"
+    },
+    {
       "$ref": "#/definitions/CalibratePipetteCreate"
     },
     {
@@ -2845,6 +2848,66 @@
         },
         "params": {
           "$ref": "#/definitions/RunProfileParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "params"
+      ]
+    },
+    "CalibrateGripperParamsProbe": {
+      "title": "CalibrateGripperParamsProbe",
+      "description": "An enumeration.",
+      "enum": [
+        "front",
+        "rear"
+      ]
+    },
+    "CalibrateGripperParams": {
+      "title": "CalibrateGripperParams",
+      "description": "Parameters for a `calibrateGripper` command.",
+      "type": "object",
+      "properties": {
+        "probe": {
+          "description": "Which of the gripper's probes to use to measure its offset. The robot will assume that a human operator has already attached this probe and removed the other probe, if there was one.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CalibrateGripperParamsProbe"
+            }
+          ]
+        }
+      },
+      "required": [
+        "probe"
+      ]
+    },
+    "CalibrateGripperCreate": {
+      "title": "CalibrateGripperCreate",
+      "description": "A request to create a `calibrateGripper` command.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "calibration/calibrateGripper",
+          "enum": [
+            "calibration/calibrateGripper"
+          ],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/CalibrateGripperParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",

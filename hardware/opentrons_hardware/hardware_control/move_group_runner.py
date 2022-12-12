@@ -329,6 +329,9 @@ class MoveScheduler:
                 f"Received completion for {node_id} group {group_id} seq {seq_id}"
                 f", which {'is' if in_group else 'isn''t'} in group"
             )
+            if not self._moves[group_id]:
+                log.info(f"Move group {group_id+self._start_at_index} has completed.")
+                self._event.set()
         except KeyError:
             log.warning(
                 f"Got a move ack for ({node_id}, {seq_id}) which is not in this "
@@ -338,10 +341,6 @@ class MoveScheduler:
             # If we have two move groups running at once, we need to handle
             # moves from a group we don't own
             return
-
-        if not self._moves[group_id]:
-            log.info(f"Move group {group_id+self._start_at_index} has completed.")
-            self._event.set()
 
     def _handle_acknowledge(self, message: Acknowledgement) -> None:
         log.debug("recieved ack")
@@ -441,7 +440,12 @@ class MoveScheduler:
                     max(1.0, self._durations[group_id - self._start_at_index] * 1.1),
                 )
             except asyncio.TimeoutError:
-                log.warning("Move set timed out")
+                log.warning(
+                    f"Move set {str(group_id)} timed out, expected duration {str(max(1.0, self._durations[group_id - self._start_at_index] * 1.1))}"
+                )
+                log.warning(
+                    f"Expected nodes in group {str(group_id)}: {str(self._get_nodes_in_move_group(group_id))}"
+                )
             except RuntimeError:
                 log.error("canceling move group scheduler")
                 raise

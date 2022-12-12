@@ -14,7 +14,7 @@ from opentrons.protocols.geometry.module_geometry import (
     HeaterShakerGeometry,
     PipetteMovementRestrictedByHeaterShakerError,
 )
-from opentrons.protocols.geometry.deck import Deck
+from opentrons.protocol_api.core.protocol_api.deck import Deck
 
 from opentrons_shared_data.module.dev_types import (
     ModuleDefinitionV3,
