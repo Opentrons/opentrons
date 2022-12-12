@@ -13,7 +13,6 @@ from opentrons.protocol_engine.types import (
     LoadedPipette,
     OFF_DECK_LOCATION,
     LabwareMovementStrategy,
-    StaticPipetteConfig,
 )
 from opentrons.protocol_engine.actions import (
     SetPipetteMovementSpeedAction,
@@ -24,6 +23,7 @@ from opentrons.protocol_engine.state.pipettes import (
     PipetteStore,
     PipetteState,
     CurrentWell,
+    StaticPipetteConfig,
 )
 
 from .command_fixtures import (

@@ -101,14 +101,6 @@ class DeckPoint(BaseModel):
     z: float
 
 
-class StaticPipetteConfig(BaseModel):
-    """Static config for a pipette."""
-
-    model: str
-    min_volume: float
-    max_volume: float
-
-
 class LoadedPipette(BaseModel):
     """A pipette that has been loaded."""
 

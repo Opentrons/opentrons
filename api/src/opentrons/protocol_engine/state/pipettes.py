@@ -2,12 +2,13 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, List, Mapping, Optional
+from pydantic import BaseModel
 
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.types import MountType, Mount as HwMount
 
 from .. import errors
-from ..types import LoadedPipette, StaticPipetteConfig, MotorAxis
+from ..types import LoadedPipette, MotorAxis
 
 from ..commands import (
     Command,
@@ -50,6 +51,14 @@ class CurrentWell:
     pipette_id: str
     labware_id: str
     well_name: str
+
+
+class StaticPipetteConfig(BaseModel):
+    """Static config for a pipette."""
+
+    model: str
+    min_volume: float
+    max_volume: float
 
 
 @dataclass

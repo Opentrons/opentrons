@@ -9,7 +9,6 @@ from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
     LoadedPipette,
-    StaticPipetteConfig,
     MotorAxis,
 )
 from opentrons.protocol_engine.state.pipettes import (
@@ -17,6 +16,7 @@ from opentrons.protocol_engine.state.pipettes import (
     PipetteView,
     CurrentWell,
     HardwarePipette,
+    StaticPipetteConfig,
 )
 
 
