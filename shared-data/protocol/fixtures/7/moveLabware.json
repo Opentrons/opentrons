@@ -1211,14 +1211,20 @@
         "labwareId": "fixedTrash",
         "location": {
           "slotName": "12"
-        }
+        },
+        "loadName": "opentrons_1_trash_1100ml_fixed",
+        "namespace": "opentrons",
+        "version": 1
       }
     },
     {
       "commandType": "loadLabware",
       "params": {
         "labwareId": "tipRackId",
-        "location": { "slotName": "1" }
+        "location": { "slotName": "1" },
+        "loadName": "opentrons_96_tiprack_1000ul",
+        "namespace": "opentrons",
+        "version": 1
       }
     },
     {
@@ -1227,13 +1233,17 @@
         "labwareId": "wellPlateId",
         "location": {
           "slotName": "2"
-        }
+        },
+        "loadName": "armadillo_96_wellplate_200ul_pcr_full_skirt",
+        "namespace": "opentrons",
+        "version": 1
       }
     },
     {
       "commandType": "loadPipette",
       "params": {
         "pipetteId": "pipetteId",
+        "pipetteName": "p1000_96",
         "mount": "left"
       }
     },
