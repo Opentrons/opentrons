@@ -232,7 +232,7 @@ jobs:
           APPLE_ID: ${{ secrets.OT_APP_APPLE_ID }}
           APPLE_ID_PASSWORD: ${{ secrets.OT_APP_APPLE_ID_PASSWORD }}
           HOST_PYTHON: python
-          OPENTRONS_PROJECT: ot-3
+          OPENTRONS_PROJECT: ot3
           OT_APP_DEPLOY_BUCKET: ${{ env._APP_DEPLOY_BUCKET_OT3 }}
           OT_APP_DEPLOY_FOLDER: ${{ env._APP_DEPLOY_FOLDER_OT3 }}
 
@@ -251,7 +251,7 @@ jobs:
     name: 'Deploy built app artifacts to S3'
     runs-on: 'ubuntu-22.04'
     needs: ['js-unit-test', 'build-app-test-backend']
-    if: github.event_name != 'pull_request'
+    if: github.event_name == != 'pull_request'
     steps:
       - name: 'download run app builds'
         uses: 'actions/download-artifact@v3'
@@ -277,10 +277,40 @@ jobs:
         uses: 'actions/download-artifact@v3'
         with:
           path: .
+      - name: 'configure ot3 s3 deploy creds'
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.S3_OT3_APP_DEPLOY_KEY_ID }} --profile identity
+          aws configure set aws_secret_access_key ${{ secrets.S3_OT3_APP_DEPLOY_SECRET }} --profile identity
+          aws configure set region us-east-2 --profile identity
+          aws configure set output json --profile identity
+          aws configure set region us-east-2 --profile deploy
+          aws configure set role_arn arn:aws:iam::879285218407:role/administrator --profile deploy
+          aws configure set source_profile identity --profile deploy
+        shell: bash
       - name: 'deploy builds to s3'
-        env:
-          pass
         run: |
           mkdir to_upload
           cp ./opentrons-* ./to_upload
-          aws s3 sync --acl=public-read to_upload s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env._APP_DEPLOY_FOLDER_OT3 }}
+          aws --profile=deploy s3 sync --acl=public-read to_upload s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env._APP_DEPLOY_FOLDER_OT3 }}
+      - name: 'detect build data for notification'
+        id: names
+        run: |
+          cd ./to_upload
+          _windows_build=$(ls Opentrons-*.exe)
+          _mac_build=$(ls Opentrons-*.dmg)
+          _linux_build=$(ls Opentrons-*.Appimage)
+          if [[ -e latest.yml ]] ; then
+              echo "TYPE=release" >> $GITHUB_OUTPUT
+          else
+              echo "TYPE=branch" >> $GITHUB_OUTPUT
+          fi
+          echo "WINDOWS=$_windows_build">>$GITHUB_OUTPUT
+          echo "MAC=$_mac_build">>$GITHUB_OUTPUT
+          echo "LINUX=$_linux_build">>$GITHUB_OUTPUT
+      - name: 'slack notify for ot3 builds'
+        uses: slackapi/slack-github-action@v1.14.0
+        with:
+          payload: "{\"branch_or_tag\":\"${{ github.ref_name }}\",\"build_type\":\"${{ steps.names.outputs.TYPE }}\", \"gh_linkback\":\"https://github.com/Opentrons/opentrons/tree/${{ github.ref_name }}\", \"linux_build\":\"${{ env._ACCESS_URL }}/${{steps.names.outputs.WINDOWS}}\", \"mac_build\":\"${{ env._ACCESS_URL }}/${{steps.names.outputs.MAC}}\", \"windows_build\":\"${{ env._ACCESS_URL }}/${{steps.names.outputs.LINUX}}\"}"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.OT_APP_OT3_SLACK_NOTIFICATION_WEBHOOK_URL }}
+          _ACCESS_URL: https://${{env._APP_DEPLOY_BUCKET_OT3}}/${{env._APP_DEPLOY_FOLDER_OT3}}
