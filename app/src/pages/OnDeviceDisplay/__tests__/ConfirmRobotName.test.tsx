@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { when, resetAllWhenMocks } from 'jest-when'
 
@@ -10,7 +11,16 @@ import { ConfirmRobotName } from '../ConfirmRobotName'
 
 import type { State } from '../../../redux/types'
 
+const mockPush = jest.fn()
+
 jest.mock('../../../redux/discovery')
+jest.mock('react-router-dom', () => {
+  const reactRouterDom = jest.requireActual('react-router-dom')
+  return {
+    ...reactRouterDom,
+    useHistory: () => ({ push: mockPush } as any),
+  }
+})
 
 const MOCK_STATE: State = {
   discovery: {
@@ -79,5 +89,10 @@ describe('ConfirmRobotName', () => {
     getByRole('button', { name: 'Finish setup' })
   })
 
-  // it('when tapping a button, call a mock function', () => {})
+  it('when tapping a button, call a mock function', () => {
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Finish setup' })
+    fireEvent.click(button)
+    expect(mockPush).toBeCalledWith('/dashboard')
+  })
 })

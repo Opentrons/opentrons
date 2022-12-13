@@ -468,7 +468,9 @@ def test_get_channels(
 ) -> None:
     """It should get the pipette's number of channels."""
     decoy.when(
-        mock_engine_client.state.pipettes.get_channels(pipette_id=subject.pipette_id)
+        mock_engine_client.state.tips.get_pipette_channels(
+            pipette_id=subject.pipette_id
+        )
     ).then_return(42)
     assert subject.get_channels() == 42
 

@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
+import { OT2_STANDARD_MODEL } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import { useFeatureFlag } from '../../../redux/config'
 import { RobotConfigurationDetails } from '../RobotConfigurationDetails'
@@ -92,6 +93,7 @@ describe('RobotConfigurationDetails', () => {
       rightMountPipetteName: null,
       requiredModuleDetails: null,
       isLoading: false,
+      robotType: OT2_STANDARD_MODEL,
     }
     const { getByText } = render(props)
     getByText('left mount')
@@ -106,6 +108,7 @@ describe('RobotConfigurationDetails', () => {
       rightMountPipetteName: 'p10_single',
       requiredModuleDetails: null,
       isLoading: false,
+      robotType: OT2_STANDARD_MODEL,
     }
     const { getByText } = render(props)
     getByText('left mount')
@@ -129,6 +132,7 @@ describe('RobotConfigurationDetails', () => {
       rightMountPipetteName: 'p10_single',
       requiredModuleDetails: mockRequiredModuleDetails,
       isLoading: false,
+      robotType: OT2_STANDARD_MODEL,
     }
 
     const { getByText } = render(props)
@@ -142,6 +146,7 @@ describe('RobotConfigurationDetails', () => {
       rightMountPipetteName: null,
       requiredModuleDetails: null,
       isLoading: true,
+      robotType: OT2_STANDARD_MODEL,
     }
     const { getAllByText, getByText } = render(props)
     getByText('right mount')

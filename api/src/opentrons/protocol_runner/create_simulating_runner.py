@@ -7,6 +7,8 @@ from opentrons.protocol_engine import (
     create_protocol_engine,
 )
 
+from opentrons_shared_data.robot.dev_types import RobotType
+
 from .legacy_wrappers import LegacySimulatingContextCreator
 from .protocol_runner import ProtocolRunner
 
@@ -41,8 +43,10 @@ async def create_simulating_runner() -> ProtocolRunner:
         simulating_hardware_api: HardwareControlAPI = (
             await OT3API.build_hardware_simulator()
         )
+        robot_type: RobotType = "OT-3 Standard"
     else:
         simulating_hardware_api = await HardwareAPI.build_hardware_simulator()
+        robot_type = "OT-2 Standard"
 
     # TODO(mc, 2021-08-25): move initial home to protocol engine
     await simulating_hardware_api.home()
@@ -50,6 +54,7 @@ async def create_simulating_runner() -> ProtocolRunner:
     protocol_engine = await create_protocol_engine(
         hardware_api=simulating_hardware_api,
         config=ProtocolEngineConfig(
+            robot_type=robot_type,
             ignore_pause=True,
             use_virtual_modules=True,
             use_virtual_gripper=True,

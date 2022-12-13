@@ -45,10 +45,6 @@ class LabwareCore(AbstractLabware[WellCore]):
         )
 
     @property
-    def separate_calibration(self) -> bool:
-        raise NotImplementedError("LabwareCore.separate_calibration not implemented")
-
-    @property
     def load_name(self) -> str:
         """The API load name of the labware definition."""
         return self._definition.parameters.loadName
@@ -126,7 +122,7 @@ class LabwareCore(AbstractLabware[WellCore]):
     ) -> Optional[str]:
         return self._engine_client.state.tips.get_next_tip(
             labware_id=self._labware_id,
-            use_column=num_tips != 1,
+            num_tips=num_tips,
             starting_tip_name=(
                 starting_tip.get_name()
                 if starting_tip and starting_tip.labware_id == self._labware_id
