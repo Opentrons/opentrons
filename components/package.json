@@ -1,6 +1,6 @@
 {
   "name": "@opentrons/components",
-  "version": "6.1.0",
+  "version": "0.0.0-dev",
   "description": "React components library for Opentrons' projects",
   "source": "src/index.ts",
   "types": "lib/index.d.ts",
@@ -20,16 +20,16 @@
     "react-router-dom": "5.1.1"
   },
   "dependencies": {
-    "@opentrons/shared-data": "6.1.0",
+    "@opentrons/shared-data": "link:../shared-data",
     "@popperjs/core": "2.1.1",
-    "@types/classnames": "^2.2.5",
+    "@types/classnames": "2.2.5",
     "@types/lodash": "^4.14.168",
     "@types/react": "^17.0.1",
     "@types/react-router-dom": "^5.1.7",
     "@types/styled-components": "^5.1.26",
     "@types/webpack-env": "^1.16.0",
     "classnames": "2.2.5",
-    "jest-when": "^3.0.1",
+    "interactjs": "^1.10.17",
     "lodash": "4.17.15",
     "react-popper": "1.0.0",
     "react-remove-scroll": "2.4.3",

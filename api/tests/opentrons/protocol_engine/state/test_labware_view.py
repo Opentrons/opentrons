@@ -711,3 +711,29 @@ def test_raise_if_labware_in_location(
     )
     with expected_raise:
         subject.raise_if_labware_in_location(location=location)
+
+
+def test_get_calibration_coordinates() -> None:
+    """Should return critical point and coordinates."""
+    slot_definitions = {
+        "locations": {
+            "orderedSlots": [
+                {
+                    "id": "2",
+                    "position": [2, 2, 0.0],
+                    "boundingBox": {
+                        "xDimension": 4.0,
+                        "yDimension": 6.0,
+                        "zDimension": 0,
+                    },
+                    "displayName": "Slot 2",
+                }
+            ]
+        }
+    }
+
+    subject = get_labware_view(deck_definition=cast(DeckDefinitionV3, slot_definitions))
+
+    result = subject.get_calibration_coordinates(current_z_position=3.0)
+
+    assert result == Point(x=4, y=5, z=3)

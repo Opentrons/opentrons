@@ -170,6 +170,17 @@ class SetPipetteMovementSpeedAction:
     speed: Optional[float]
 
 
+@dataclass(frozen=True)
+class AddPipetteConfigAction:
+    """Adds a pipette's static config to the state store."""
+
+    pipette_id: str
+    model: str
+    min_volume: float
+    max_volume: float
+    channels: int
+
+
 Action = Union[
     PlayAction,
     PauseAction,
@@ -186,4 +197,5 @@ Action = Union[
     AddLiquidAction,
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
+    AddPipetteConfigAction,
 ]
