@@ -20,7 +20,6 @@ DEFAULT_PIPETTE_OFFSET = [0.0, 0.0, 0.0]
 
 DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSettings(
     z_offset=ZSenseSettings(
-        point=(239, 160, 1),
         pass_settings=CapacitivePassSettings(
             prep_distance_mm=3,
             max_overrun_distance_mm=3,
@@ -328,7 +327,6 @@ def _build_default_cap_pass(
 
 def _build_default_z_pass(from_conf: Any, default: ZSenseSettings) -> ZSenseSettings:
     return ZSenseSettings(
-        point=from_conf.get("point", default.point),
         pass_settings=_build_default_cap_pass(
             from_conf.get("pass_settings", {}), default.pass_settings
         ),
