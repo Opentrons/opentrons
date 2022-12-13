@@ -7,11 +7,12 @@ import type { LabwareSetupItem } from './types'
 
 interface OffDeckLabwareListProps {
   labwareItems: LabwareSetupItem[]
+  isOt3: boolean
 }
 export function OffDeckLabwareList(
   props: OffDeckLabwareListProps
 ): JSX.Element | null {
-  const { labwareItems } = props
+  const { labwareItems, isOt3 } = props
   const { t } = useTranslation('protocol_setup')
   if (labwareItems.length < 1) return null
   return (
@@ -30,6 +31,7 @@ export function OffDeckLabwareList(
           attachedModuleInfo={{}}
           extraAttentionModules={[]}
           {...labwareItem}
+          isOt3={isOt3}
         />
       ))}
     </>

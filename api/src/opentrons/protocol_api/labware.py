@@ -291,6 +291,10 @@ class Labware:
 
     @property
     def separate_calibration(self) -> bool:
+        _log.warning(
+            "Labware.separate_calibrations is a deprecated internal property."
+            " It no longer has meaning, but will always return `False`"
+        )
         return False
 
     @property  # type: ignore

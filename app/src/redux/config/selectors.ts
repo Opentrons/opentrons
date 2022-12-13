@@ -58,9 +58,9 @@ export const getUpdateChannelOptions = (state: State): SelectOption[] => {
     : UPDATE_CHANNEL_OPTS
 }
 
-export const getIsOnDevice: (state: State) => boolean = createSelector(
+export const getIsOnDevice: (state: State) => boolean | null = createSelector(
   getConfig,
-  config => config?.isOnDevice ?? false
+  config => config?.isOnDevice ?? null
 )
 
 export const getSendAllProtocolsToOT3: (

@@ -7,6 +7,7 @@ objects on the deck (as opposed to calling commands on them, which is handled
 by :py:mod:`.module_contexts`)
 """
 from __future__ import annotations
+
 import logging
 from typing import TYPE_CHECKING, Optional
 
@@ -40,7 +41,7 @@ if TYPE_CHECKING:
     from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
 
 
-log = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
 
 
 class NoSuchModuleError(ValueError):
@@ -62,7 +63,10 @@ class ModuleGeometry:
 
     @property
     def separate_calibration(self) -> bool:
-        # If a module is the parent of a labware it affects calibration
+        _log.warning(
+            "ModuleGeometry.separate_calibrations is a deprecated internal property."
+            " It has no longer has meaning, but will always return `True`"
+        )
         return True
 
     def __init__(
@@ -458,7 +462,7 @@ def create_geometry(
     )
     if not parent.labware.is_slot:
         par = ""
-        log.warning(
+        _log.warning(
             f"module location parent labware was {parent.labware} which is"
             "not a slot name; slot transforms will not be loaded"
         )
