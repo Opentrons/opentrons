@@ -5,7 +5,7 @@ from typing import Union, Tuple, List, Dict, Any, Optional
 import datetime
 import numpy as np
 from enum import Enum
-from math import copysign, floor
+from math import floor
 from logging import getLogger
 
 from .types import OT3Mount, OT3Axis, GripperProbe
@@ -144,65 +144,83 @@ async def find_edge(
     The absolute position at which the center of the effector is inside the slot
     and its edge is aligned with the calibration slot edge.
     """
-    here = await hcapi.gantry_position(mount)
-    await hcapi.move_to(mount, here._replace(z=CAL_TRANSIT_HEIGHT))
     edge_settings = hcapi.config.calibration.edge_sense
-    # Our first search position is at the nominal offset by our stride
-    # against the search direction. That way we always start on the deck
-    stride = edge_settings.search_initial_tolerance_mm * search_direction
-    checking_pos = slot_edge_nominal + _offset_in_axis(
-        Point(0, 0, 0), -stride, search_axis
+    assert (
+        edge_settings.overrun_tolerance_mm
+        <= edge_settings.pass_settings.max_overrun_distance_mm
     )
-    # The first time we take a stride, we actually want it to be the full
-    # specified initial tolerance. Since the way our loop works, we halve
-    # the stride before we adjust the offset, we'll initially double our
-    # stride (if we don't do that, we Zeno's Paradox ourselves)
-    stride += edge_settings.search_initial_tolerance_mm * search_direction
-    for _ in range(edge_settings.search_iteration_limit):
-        LOG.info(f"Checking position {checking_pos}")
-        check_prep = checking_pos._replace(z=CAL_TRANSIT_HEIGHT)
-        await hcapi.move_to(mount, check_prep)
-        interaction_pos = await hcapi.capacitive_probe(
+    # Every probe event has a Z-axis window where detections are considered valid
+    allowable_height_range = {
+        "max": slot_edge_nominal.z + edge_settings.early_sense_tolerance_mm,
+        "min": slot_edge_nominal.z - edge_settings.overrun_tolerance_mm,
+    }
+
+    async def _probe_deck_at(target: Point) -> float:
+        here = await hcapi.gantry_position(mount)
+        await hcapi.move_to(mount, here._replace(z=CAL_TRANSIT_HEIGHT))
+        await hcapi.move_to(mount, target._replace(z=CAL_TRANSIT_HEIGHT))
+        _found_pos = await hcapi.capacitive_probe(
             mount,
             OT3Axis.by_mount(mount),
             slot_edge_nominal.z,
             edge_settings.pass_settings,
         )
-        await hcapi.move_to(mount, check_prep)
-        if (
-            interaction_pos
-            > slot_edge_nominal.z + edge_settings.early_sense_tolerance_mm
-        ):
-            raise EarlyCapacitiveSenseTrigger(interaction_pos, slot_edge_nominal.z)
-        assert edge_settings.overrun_tolerance_mm <= edge_settings.pass_settings.max_overrun_distance_mm
-        if interaction_pos < (slot_edge_nominal.z - edge_settings.overrun_tolerance_mm):
-            LOG.info(f"Miss at {interaction_pos}")
-            # In this block, we've missed the deck
-            if copysign(stride, search_direction) == stride:
-                # if we're in our primary direction, from deck to not-deck, then we
-                # need to reverse - this would be the first time we've missed the deck
-                stride = -stride / 2
-            else:
-                # if we are against our primary direction, the last test was off the
-                # deck too, so we want to continue
-                stride = stride / 2
-        else:
-            LOG.info(f"hit at {interaction_pos}")
-            # In this block, we've hit the deck
-            if copysign(stride, search_direction) == stride:
-                # If we're in our primary direction, the last probe was on the deck,
-                # so we want to continue
-                stride = stride / 2
-            else:
-                # if we're against our primary direction, the last probe missed,
-                # so we want to switch back to narrow things down
-                stride = -stride / 2
-        checking_pos = _offset_in_axis(checking_pos, stride, search_axis)
+        await hcapi.move_to(mount, target._replace(z=CAL_TRANSIT_HEIGHT))
+        return _found_pos
 
-    LOG.debug(
-        f"Found edge {search_axis} direction {search_direction} at {checking_pos}"
-    )
-    return _element_of_axis(checking_pos, search_axis)
+    def _stride_should_repeat(s: float) -> bool:
+        return s or s > 1
+
+    # FIXME: add to shared-data
+    stride_distance = [0, 4, 1, 0.25, 0.0625]
+    stride_idx = 0
+    stride_repeat_counter = 0
+    stride_direction = search_direction
+    next_probe_pos = slot_edge_nominal
+    last_probe_touched = False
+    while True:
+        stride = stride_distance[stride_idx] * stride_direction
+        next_probe_pos = _offset_in_axis(next_probe_pos, stride, search_axis)
+        LOG.info(f"Checking position {next_probe_pos}")
+        deck_height = await _probe_deck_at(next_probe_pos)
+        if deck_height > allowable_height_range["max"]:
+            raise EarlyCapacitiveSenseTrigger(deck_height, slot_edge_nominal.z)
+        _probe_touched = deck_height >= allowable_height_range["min"]
+        state_change = _probe_touched != last_probe_touched
+        last_probe_touched = _probe_touched
+        LOG.info(
+            f"Probe found height {deck_height} "
+            f"is {'' if _probe_touched else 'not '}valid"
+        )
+        if state_change:
+            # state change = update stride and direction
+            stride_direction *= -1
+            stride_idx += 1
+            stride_repeat_counter = 0
+        elif not _stride_should_repeat(stride):
+            # no state change, and not a small step = automatically reduce step size, same direction
+            stride_idx += 1
+            stride_repeat_counter = 0
+        else:
+            # no state change, and small step size = continue stepping, same direction
+            stride_repeat_counter += 1
+            assert stride_idx > 0
+            _prev_stride = stride_distance[stride_idx - 1]
+            assert _prev_stride > stride
+            _about_to_travel_with_stride = stride * stride_repeat_counter
+            if _about_to_travel_with_stride >= _prev_stride:
+                # don't go back and probe somewhere we already probed
+                # instead, reduce stride size, and continue pecking
+                stride_idx += 1
+                stride_repeat_counter = 0
+        tried_every_stride = stride_idx >= len(stride_distance)
+        if tried_every_stride:
+            if _probe_touched:
+                LOG.debug(
+                    f"Found edge {search_axis} direction {search_direction} at {next_probe_pos}"
+                )
+                return _element_of_axis(next_probe_pos, search_axis)
+            raise RuntimeError("Unable to find mount")
 
 
 async def find_slot_center_binary(
@@ -214,20 +232,20 @@ async def find_slot_center_binary(
     """
     real_pos = nominal_center._replace(z=deck_height)
     # Find X left/right edges
-    plus_x_edge = await find_edge(hcapi, mount, real_pos + EDGES["right"], OT3Axis.X, -1)
-    LOG.info(f"Found +x edge at {plus_x_edge}mm")
-    minus_x_edge = await find_edge(
-        hcapi, mount, real_pos + EDGES["left"], OT3Axis.X, 1
+    plus_x_edge = await find_edge(
+        hcapi, mount, real_pos + EDGES["right"], OT3Axis.X, -1
     )
+    LOG.info(f"Found +x edge at {plus_x_edge}mm")
+    minus_x_edge = await find_edge(hcapi, mount, real_pos + EDGES["left"], OT3Axis.X, 1)
     LOG.info(f"Found -x edge at {minus_x_edge}mm")
     real_pos = real_pos._replace(x=(plus_x_edge + minus_x_edge) / 2)
 
     # Find Y bottom/top edges
-    plus_y_edge = await find_edge(
-        hcapi, mount, real_pos + EDGES["top"], OT3Axis.Y, -1
-    )
+    plus_y_edge = await find_edge(hcapi, mount, real_pos + EDGES["top"], OT3Axis.Y, -1)
     LOG.info(f"Found +y edge at {plus_y_edge}mm")
-    minus_y_edge = await find_edge(hcapi, mount, real_pos + EDGES["bottom"], OT3Axis.Y, 1)
+    minus_y_edge = await find_edge(
+        hcapi, mount, real_pos + EDGES["bottom"], OT3Axis.Y, 1
+    )
     LOG.info(f"Found -y edge at {minus_y_edge}mm")
     real_pos = real_pos._replace(y=(plus_y_edge + minus_y_edge) / 2)
 
