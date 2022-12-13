@@ -498,14 +498,14 @@ def gripper_pin_offsets_mean(front: Point, rear: Point) -> Point:
     return 0.5 * (front + rear)
 
 
-async def calibrate_gripper(
+async def calibrate_gripper_jaw(
     hcapi: OT3API,
     probe: GripperProbe,
     slot: int,
     method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
 ) -> Point:
     """
-    Run automatic calibration for gripper.
+    Run automatic calibration for gripper jaw.
 
     Before running this function, make sure that the appropriate probe
     has been attached or prepped on the tool (for instance, a capacitive
@@ -517,14 +517,22 @@ async def calibrate_gripper(
     the average of the pin offsets, which can be obtained by passing the
     two offsets into the `gripper_pin_offsets_mean` func.
     """
-    hcapi.add_gripper_probe(probe)
     try:
+        await hcapi.reset_instrument_offset(OT3Mount.GRIPPER)
+        hcapi.add_gripper_probe(probe)
         await hcapi.grip(GRIPPER_GRIP_FORCE)
         offset = await _calibrate_mount(hcapi, OT3Mount.GRIPPER, slot, method)
         return offset
     finally:
         hcapi.remove_gripper_probe()
         await hcapi.ungrip()
+
+
+async def calibrate_gripper(hcapi: OT3API, offset_front: Point, offset_rear: Point) -> Point:
+    """Calibrate gripper."""
+    offset = gripper_pin_offsets_mean(front=offset_front, rear=offset_rear)
+    await hcapi.save_instrument_offset(OT3Mount.GRIPPER, offset)
+    return offset
 
 
 async def calibrate_pipette(
@@ -542,6 +550,7 @@ async def calibrate_pipette(
     or the probe has been lowered). The robot should be homed.
     """
     try:
+        await hcapi.reset_instrument_offset(mount)
         await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
         offset = await _calibrate_mount(hcapi, mount, slot, method)
         await hcapi.save_instrument_offset(mount, offset)

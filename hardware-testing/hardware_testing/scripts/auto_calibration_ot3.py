@@ -4,8 +4,8 @@ import argparse
 
 from opentrons.hardware_control.ot3_calibration import (
     calibrate_pipette,
+    calibrate_gripper_jaw,
     calibrate_gripper,
-    gripper_pin_offsets_mean,
 )
 
 from hardware_testing.opentrons_api.types import OT3Mount, GripperProbe
@@ -21,13 +21,12 @@ async def _main(simulate: bool, slot: int, mount: OT3Mount) -> None:
         use_defaults=True,
     )
     await api.home()
-    await api.reset_instrument_offset(mount)
     if mount == OT3Mount.GRIPPER:
         input("Add probe to gripper FRONT, then press ENTER: ")
-        front_offset = await calibrate_gripper(api, GripperProbe.FRONT, slot)
+        front_offset = await calibrate_gripper_jaw(api, GripperProbe.FRONT, slot)
         input("Add probe to gripper REAR, then press ENTER: ")
-        rear_offset = await calibrate_gripper(api, GripperProbe.REAR, slot)
-        offset = gripper_pin_offsets_mean(front=front_offset, rear=rear_offset)
+        rear_offset = await calibrate_gripper_jaw(api, GripperProbe.REAR, slot)
+        offset = calibrate_gripper(api, front_offset, rear_offset)
     else:
         input("Attach calibration probe to the pipette and press Enter\n")
         offset = await calibrate_pipette(api, mount, slot)
