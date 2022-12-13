@@ -525,7 +525,6 @@ class ModuleView(HasState[ModuleState]):
         """Get the specified module's dimensions."""
         return self.get_definition(module_id).dimensions
 
-    # TODO(mc, 2022-01-19): this method is missing unit test coverage
     def get_module_offset(self, module_id: str) -> LabwareOffsetVector:
         """Get the module's offset vector computed with slot transform."""
         definition = self.get_definition(module_id)
