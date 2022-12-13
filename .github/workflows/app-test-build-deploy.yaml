@@ -251,7 +251,7 @@ jobs:
     name: 'Deploy built app artifacts to S3'
     runs-on: 'ubuntu-22.04'
     needs: ['js-unit-test', 'build-app-test-backend']
-    if: github.event_name == != 'pull_request'
+    if: github.event_name != 'pull_request'
     steps:
       - name: 'download run app builds'
         uses: 'actions/download-artifact@v3'
