@@ -17,6 +17,11 @@ import {
   BORDERS,
   Btn,
 } from '@opentrons/components'
+import {
+  isOT3Pipette,
+  NINETY_SIX_CHANNEL,
+  SINGLE_MOUNT_PIPETTES,
+} from '@opentrons/shared-data'
 import { fetchPipettes, LEFT } from '../../../redux/pipettes'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { Portal } from '../../../App/portal'
@@ -38,6 +43,7 @@ import {
 import { FLOWS } from '../../PipetteWizardFlows/constants'
 import { PipetteWizardFlows } from '../../PipetteWizardFlows'
 import { AskForCalibrationBlockModal } from '../../CalibrateTipLength'
+import { ChoosePipette } from '../../PipetteWizardFlows/ChoosePipette'
 import {
   useDeckCalibrationData,
   useIsOT3,
@@ -46,22 +52,17 @@ import {
 import { PipetteOverflowMenu } from './PipetteOverflowMenu'
 import { PipetteSettingsSlideout } from './PipetteSettingsSlideout'
 import { AboutPipetteSlideout } from './AboutPipetteSlideout'
-
-import type { AttachedPipette, Mount } from '../../../redux/pipettes/types'
-import {
-  isOT3Pipette,
-  NINETY_SIX_CHANNEL,
+import type {
   PipetteModelSpecs,
   PipetteMount,
   PipetteName,
-  SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
+import type { AttachedPipette, Mount } from '../../../redux/pipettes/types'
 import type { Dispatch, State } from '../../../redux/types'
 import type {
   PipetteWizardFlow,
   SelectablePipettes,
 } from '../../PipetteWizardFlows/types'
-import { ChoosePipette } from '../../PipetteWizardFlows/ChoosePipette'
 
 interface PipetteCardProps {
   pipetteInfo: PipetteModelSpecs | null
@@ -119,6 +120,10 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     pipetteId,
     mount
   )
+  const [
+    selectedPipette,
+    setSelectedPipette,
+  ] = React.useState<SelectablePipettes>(SINGLE_MOUNT_PIPETTES)
   const latestRequestId = last(requestIds)
   const isFetching = useSelector<State, boolean>(state =>
     latestRequestId != null
@@ -183,13 +188,9 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     setShowSlideout(true)
   }
 
-  const handleAttachPipette = (selectedPipette: SelectablePipettes): void => {
-    if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
-      setShowAttachPipette(false)
-      setPipetteWizardFlow(FLOWS.ATTACH)
-    } else if (selectedPipette === NINETY_SIX_CHANNEL) {
-      console.log('we still have to wire up the 96 channel attach flow!')
-    }
+  const handleAttachPipette = (): void => {
+    setShowAttachPipette(false)
+    setPipetteWizardFlow(FLOWS.ATTACH)
   }
   return (
     <Flex
@@ -201,15 +202,25 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       {showAttachPipette ? (
         <ChoosePipette
           proceed={handleAttachPipette}
+          setSelectedPipette={setSelectedPipette}
+          selectedPipette={selectedPipette}
           exit={() => setShowAttachPipette(false)}
         />
       ) : null}
       {pipetteWizardFlow != null ? (
         <PipetteWizardFlows
           flowType={pipetteWizardFlow}
-          mount={mount as PipetteMount}
+          mount={
+            //  hardcoding in LEFT mount for whenever a 96 channel is selected
+            selectedPipette === NINETY_SIX_CHANNEL
+              ? LEFT
+              : (mount as PipetteMount)
+          }
           closeFlow={() => setPipetteWizardFlow(null)}
           robotName={robotName}
+          selectedPipette={
+            pipetteName === 'p1000_96' ? NINETY_SIX_CHANNEL : selectedPipette
+          }
         />
       ) : null}
       {showChangePipette && (
@@ -358,12 +369,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
         padding={SPACING.spacing2}
         data-testid={`PipetteCard_overflow_btn_${pipetteDisplayName}`}
       >
-        <OverflowBtn
-          aria-label="overflow"
-          onClick={handleOverflowClick}
-          //  disabling the overflow btn if a 96 channel pipette is attached for now
-          disabled={is96ChannelAttached}
-        />
+        <OverflowBtn aria-label="overflow" onClick={handleOverflowClick} />
       </Box>
       {showOverflowMenu && (
         <>
