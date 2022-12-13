@@ -42,7 +42,7 @@ export const CheckPipetteButton = (
   )?.status
 
   const isPending = requestStatus === PENDING
-console.log(requestStatus)
+
   React.useEffect(() => {
     if (isPending) {
       setPending(isPending)
