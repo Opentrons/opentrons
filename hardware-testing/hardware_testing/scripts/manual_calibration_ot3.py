@@ -110,11 +110,11 @@ async def _test_current_calibration(api: OT3API, mount: OT3Mount, pos: Point) ->
         input("ENTER to move to center of slot to test Pipette calibration: ")
         await api.move_to(mount, pos)
         input("Check by EYE, then press ENTER to continue: ")
-        is_multi = "multi" in api.hardware_pipettes[mount.to_mount()].name
+        pip = api.hardware_pipettes[mount.to_mount()]
+        assert pip, f"No pipette found on mount: {mount}"
+        is_multi = "multi" in pip.name
         if is_multi and "y" in input("check if level to deck? (y/n):"):
-            await _check_multi_channel_to_deck_alignment(
-                api, mount, pos, pos
-            )
+            await _check_multi_channel_to_deck_alignment(api, mount, pos, pos)
         return Point()
 
 
@@ -318,7 +318,9 @@ async def _find_the_square(api: OT3API, mount: OT3Mount, expected_pos: Point) ->
         found_pos = await _find_square_center_of_gripper_jaw(api, expected_pos)
     else:
         helpers_ot3.set_pipette_offset_ot3(api, mount, Point(x=0, y=0, z=0))
-        is_multi = "multi" in api.hardware_pipettes[mount.to_mount()].name
+        pip = api.hardware_pipettes[mount.to_mount()]
+        assert pip, f"No pipette found on mount: {mount}"
+        is_multi = "multi" in pip.name
         if is_multi:
             input("add probe to pipette REAR channel (#1), then press ENTER: ")
         else:

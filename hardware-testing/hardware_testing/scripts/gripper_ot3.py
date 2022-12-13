@@ -2,7 +2,7 @@
 import argparse
 import asyncio
 from dataclasses import dataclass
-from typing import Optional, List, Tuple, Any
+from typing import Optional, List, Tuple, Any, Dict
 
 from opentrons.hardware_control.ot3api import OT3API
 
@@ -79,7 +79,9 @@ def _remove_ot2_sw_offset(o: Point, d_item: str, s: int) -> Point:
     return o
 
 
-def grip_offset(action, item, slot=None, adapter=None):
+def grip_offset(
+    action: str, item: str, slot: Optional[int] = None, adapter: Optional[str] = None
+) -> Dict[str, float]:
     """Grip offset."""
     from opentrons.types import Point
 
@@ -128,7 +130,7 @@ def grip_offset(action, item, slot=None, adapter=None):
         "non-contact": Point(z=2.6),
         "flat": Point(z=1.75),
         "deep": Point(z=1),
-        "round-bottom": Point(z=1)
+        "round-bottom": Point(z=1),
     }
     # make sure arguments are correct
     action_options = ["pick-up", "drop"]
@@ -143,7 +145,7 @@ def grip_offset(action, item, slot=None, adapter=None):
     if item not in item_options:
         raise ValueError(f'"{item}" not recognized, available options: {item_options}')
     if item == "heater-shaker":
-        assert slot, "argument slot= is required when using \"heater-shaker\""
+        assert slot, 'argument slot= is required when using "heater-shaker"'
         if slot in [1, 4, 7, 10]:
             side = "left"
         elif slot in [3, 6, 9, 12]:
@@ -154,7 +156,9 @@ def grip_offset(action, item, slot=None, adapter=None):
         hw_offset = _hw_offsets_ot3[k] - _sw_offsets_ot2[k]
         if adapter:
             _avail_adapters = list(_adapter_offsets.keys())
-            assert adapter in _avail_adapters, f"adapter \"{adapter}\" not found in {_avail_adapters}"
+            assert (
+                adapter in _avail_adapters
+            ), f'adapter "{adapter}" not found in {_avail_adapters}'
             hw_offset += _adapter_offsets[adapter]
     else:
         hw_offset = _hw_offsets_ot3[item] - _sw_offsets_ot2[item]
@@ -250,9 +254,15 @@ def _calculate_src_and_dst_points(
     src_module_offset = types.Point(
         **grip_offset("pick-up", src_deck_item, slot=src_slot, adapter=adapter)
     )
-    src_module_offset = _remove_ot2_sw_offset(src_module_offset, src_deck_item, src_slot)
-    dst_module_offset = types.Point(**grip_offset("drop", dst_deck_item, slot=dst_slot, adapter=adapter))
-    dst_module_offset = _remove_ot2_sw_offset(dst_module_offset, dst_deck_item, dst_slot)
+    src_module_offset = _remove_ot2_sw_offset(
+        src_module_offset, src_deck_item, src_slot
+    )
+    dst_module_offset = types.Point(
+        **grip_offset("drop", dst_deck_item, slot=dst_slot, adapter=adapter)
+    )
+    dst_module_offset = _remove_ot2_sw_offset(
+        dst_module_offset, dst_deck_item, dst_slot
+    )
     # absolute position, on the deck
     src_loc = src_slot_loc + src_module_offset + src_labware_offset
     dst_loc = dst_slot_loc + dst_module_offset + dst_labware_offset
@@ -454,6 +464,6 @@ if __name__ == "__main__":
             inspect=args_parsed.inspect,
             force=args_parsed.force,
             warp=args_parsed.warp,
-            adapter=args_parsed.adapter
+            adapter=args_parsed.adapter,
         )
     )
