@@ -150,7 +150,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
                 'Could not parse designer application version from saved file'
               )
               assert.ok(
-                [null, 'prelease', 'patch', 'prepatch'].includes(
+                [null, 'prerelease', 'patch', 'prepatch'].includes(
                   semver.diff(version, '6.1.0')
                 ),
                 `Saved designer application version ${version} too different from 6.1.0`
