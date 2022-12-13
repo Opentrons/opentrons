@@ -40,11 +40,7 @@ import { FLOWS } from '../../PipetteWizardFlows/constants'
 import { PipetteWizardFlows } from '../../PipetteWizardFlows'
 import { AskForCalibrationBlockModal } from '../../CalibrateTipLength'
 import { ChoosePipette } from '../../PipetteWizardFlows/ChoosePipette'
-import {
-  useDeckCalibrationData,
-  useIsOT3,
-  usePipetteOffsetCalibration,
-} from '../hooks'
+import { useDeckCalibrationData, useIsOT3 } from '../hooks'
 import { PipetteOverflowMenu } from './PipetteOverflowMenu'
 import { PipetteSettingsSlideout } from './PipetteSettingsSlideout'
 import { AboutPipetteSlideout } from './AboutPipetteSlideout'
