@@ -230,19 +230,19 @@ async def find_slot_center_binary(
     """
     real_pos = nominal_center._replace(z=deck_height)
     # Find X left/right edges
-    plus_x_edge = await find_edge(
-        hcapi, mount, real_pos + EDGES["right"], OT3Axis.X, -1
-    )
+    plus_x_edge = await find_edge(hcapi, mount, real_pos + EDGES["right"], OT3Axis.X, 1)
     LOG.info(f"Found +x edge at {plus_x_edge}mm")
-    minus_x_edge = await find_edge(hcapi, mount, real_pos + EDGES["left"], OT3Axis.X, 1)
+    minus_x_edge = await find_edge(
+        hcapi, mount, real_pos + EDGES["left"], OT3Axis.X, -1
+    )
     LOG.info(f"Found -x edge at {minus_x_edge}mm")
     real_pos = real_pos._replace(x=(plus_x_edge + minus_x_edge) / 2)
 
     # Find Y bottom/top edges
-    plus_y_edge = await find_edge(hcapi, mount, real_pos + EDGES["top"], OT3Axis.Y, -1)
+    plus_y_edge = await find_edge(hcapi, mount, real_pos + EDGES["top"], OT3Axis.Y, 1)
     LOG.info(f"Found +y edge at {plus_y_edge}mm")
     minus_y_edge = await find_edge(
-        hcapi, mount, real_pos + EDGES["bottom"], OT3Axis.Y, 1
+        hcapi, mount, real_pos + EDGES["bottom"], OT3Axis.Y, -1
     )
     LOG.info(f"Found -y edge at {minus_y_edge}mm")
     real_pos = real_pos._replace(y=(plus_y_edge + minus_y_edge) / 2)
@@ -528,7 +528,9 @@ async def calibrate_gripper_jaw(
         await hcapi.ungrip()
 
 
-async def calibrate_gripper(hcapi: OT3API, offset_front: Point, offset_rear: Point) -> Point:
+async def calibrate_gripper(
+    hcapi: OT3API, offset_front: Point, offset_rear: Point
+) -> Point:
     """Calibrate gripper."""
     offset = gripper_pin_offsets_mean(front=offset_front, rear=offset_rear)
     await hcapi.save_instrument_offset(OT3Mount.GRIPPER, offset)
