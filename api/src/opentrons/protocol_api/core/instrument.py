@@ -7,7 +7,7 @@ from typing import Any, Generic, Optional, TypeVar
 
 from opentrons import types
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.protocols.api_support.util import Clearances, PlungerSpeeds, FlowRates
+from opentrons.protocols.api_support.util import PlungerSpeeds, FlowRates
 
 from .well import WellCoreType
 
@@ -188,10 +188,6 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
 
     @abstractmethod
     def get_return_height(self) -> float:
-        ...
-
-    @abstractmethod
-    def get_well_bottom_clearance(self) -> Clearances:
         ...
 
     @abstractmethod

@@ -25,6 +25,7 @@ describe('AttachProbe', () => {
   let props: React.ComponentProps<typeof AttachProbe>
   beforeEach(() => {
     props = {
+      robotName: 'otie',
       mount: LEFT,
       goBack: jest.fn(),
       proceed: jest.fn(),
@@ -56,12 +57,8 @@ describe('AttachProbe', () => {
           params: { mount: 'left' },
         },
         {
-          commandType: 'home',
-          params: { axes: ['leftZ'] },
-        },
-        {
-          commandType: 'calibration/moveToLocation',
-          params: { pipetteId: 'abc', location: 'attachOrDetach' },
+          commandType: 'calibration/moveToMaintenancePosition',
+          params: { mount: 'left' },
         },
       ],
       false
@@ -83,7 +80,7 @@ describe('AttachProbe', () => {
     const { getByText, getByAltText } = render(props)
     getByText('Stand Back, Pipette is Calibrating')
     getByText(
-      'The calibration probe will touch the sides of the calibration divot in slot 5 to determine its exact position'
+      'The calibration probe will touch the sides of the calibration divot in slot 2 to determine its exact position'
     )
     getByAltText('Pipette is calibrating')
   })

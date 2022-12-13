@@ -18,6 +18,7 @@ from ..types import (
     LabwareLocation,
     LabwareMovementStrategy,
     ModuleModel,
+    MotorAxis,
     WellLocation,
 )
 from .transports import AbstractSyncTransport
@@ -596,3 +597,9 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
         return cast(commands.temperature_module.DeactivateTemperatureResult, result)
+
+    def home(self, axes: Optional[List[MotorAxis]]) -> commands.HomeResult:
+        """Execute a `home` command and return the result."""
+        request = commands.HomeCreate(params=commands.HomeParams(axes=axes))
+        result = self._transport.execute_command(request=request)
+        return cast(commands.HomeResult, result)

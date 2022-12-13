@@ -2,6 +2,7 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import { BORDERS, COLORS, Flex, SPACING } from '@opentrons/components'
 import { PrimaryButton } from '../../atoms/buttons'
+import { useTrackEvent } from '../../redux/analytics'
 
 const BUTTON_GROUP_STYLES = css`
   border-radius: ${BORDERS.radiusSoftCorners};
@@ -68,11 +69,29 @@ const DEFAULT_STYLE = css`
 
 export const useToggleGroup = (
   left: string,
-  right: string
+  right: string,
+  trackEventName?: string
 ): [string, React.ReactNode] => {
-  const [selectedValue, setSelectedValue] = React.useState<
-    typeof left | typeof right
-  >(left)
+  const [selectedValue, setSelectedValue] = React.useState<string>(left)
+  const trackEvent = useTrackEvent()
+  const handleLeftClick = (): void => {
+    setSelectedValue(left)
+    if (trackEventName != null) {
+      trackEvent({
+        name: trackEventName,
+        properties: { view: 'list' },
+      })
+    }
+  }
+  const handleRightClick = (): void => {
+    setSelectedValue(right)
+    if (trackEventName != null) {
+      trackEvent({
+        name: trackEventName,
+        properties: { view: 'map' },
+      })
+    }
+  }
 
   return [
     selectedValue,
@@ -80,14 +99,16 @@ export const useToggleGroup = (
       <PrimaryButton
         css={selectedValue === left ? ACTIVE_STYLE : DEFAULT_STYLE}
         key={left}
-        onClick={() => setSelectedValue(left)}
+        onClick={handleLeftClick}
+        data-testid="useToggleGroup_leftButton"
       >
         {left}
       </PrimaryButton>
       <PrimaryButton
         css={selectedValue === right ? ACTIVE_STYLE : DEFAULT_STYLE}
         key={right}
-        onClick={() => setSelectedValue(right)}
+        onClick={handleRightClick}
+        data-testid="useToggleGroup_rightButton"
       >
         {right}
       </PrimaryButton>

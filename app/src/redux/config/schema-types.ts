@@ -1,4 +1,5 @@
 import type { LogLevel } from '../../logger'
+import type { ProtocolSort } from '../../organisms/ProtocolsLanding/hooks'
 
 export type UrlProtocol = 'file:' | 'http:'
 
@@ -10,10 +11,8 @@ export type DevInternalFlag =
   | 'allPipetteConfig'
   | 'enableBundleUpload'
   | 'enableChangePipetteWizard'
-  | 'enableLiquidSetup'
   | 'enableManualDeckStateModification'
   | 'enableCalibrationWizards'
-  | 'enableThermocyclerGen2'
   | 'enableExtendedHardware'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
@@ -154,4 +153,11 @@ export interface ConfigV10 extends Omit<ConfigV9, 'version'> {
   protocols: { sendAllProtocolsToOT3: boolean }
 }
 
-export type Config = ConfigV10
+export interface ConfigV11 extends Omit<ConfigV10, 'version'> {
+  version: 11
+  protocols: ConfigV10['protocols'] & {
+    protocolsStoredSortKey: ProtocolSort | null
+  }
+}
+
+export type Config = ConfigV11

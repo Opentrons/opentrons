@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import capitalize from 'lodash/capitalize'
 import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
@@ -27,8 +26,9 @@ export interface GenericWizardTileProps {
   getHelp?: string
   back?: () => void
   proceed?: () => void
-  proceedButtonText?: string
+  proceedButtonText?: React.ReactNode
   proceedIsDisabled?: boolean
+  proceedButton?: JSX.Element
 }
 
 const GO_BACK_BUTTON_STYLE = css`
@@ -50,13 +50,21 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
     proceed,
     proceedButtonText,
     proceedIsDisabled,
+    proceedButton,
   } = props
   const { t } = useTranslation('shared')
 
   let buttonPositioning: string = ''
-  if ((back != null || getHelp != null) && proceed != null) {
+  if (
+    (back != null || getHelp != null) &&
+    (proceedButton != null || proceed != null)
+  ) {
     buttonPositioning = JUSTIFY_SPACE_BETWEEN
-  } else if (back == null && getHelp == null && proceed != null) {
+  } else if (
+    back == null &&
+    getHelp == null &&
+    (proceedButton != null || proceed != null)
+  ) {
     buttonPositioning = JUSTIFY_FLEX_END
   } else if ((back != null || getHelp != null) && proceed == null) {
     buttonPositioning = JUSTIFY_START
@@ -96,11 +104,12 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
           </Btn>
         ) : null}
         {getHelp != null ? <NeedHelpLink href={getHelp} /> : null}
-        {proceed != null ? (
+        {proceed != null && proceedButton == null ? (
           <PrimaryButton disabled={proceedIsDisabled} onClick={proceed}>
-            {capitalize(proceedButtonText)}
+            {proceedButtonText}
           </PrimaryButton>
         ) : null}
+        {proceed == null && proceedButton != null ? proceedButton : null}
       </Flex>
     </Flex>
   )

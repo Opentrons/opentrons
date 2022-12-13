@@ -227,7 +227,7 @@ describe('ProtocolRunHeader', () => {
     )
     mockCloseCurrentRun = jest.fn()
 
-    when(mockUseTrackEvent).calledWith().mockReturnValue(mockTrackEvent)
+    mockUseTrackEvent.mockReturnValue(mockTrackEvent)
     mockConfirmCancelModal.mockReturnValue(<div>Mock ConfirmCancelModal</div>)
     mockHeaterShakerIsRunningModal.mockReturnValue(
       <div>Mock HeaterShakerIsRunningModal</div>
@@ -599,6 +599,10 @@ describe('ProtocolRunHeader', () => {
     getByText('Completed')
     getByText(formatTimestamp(COMPLETED_AT))
     fireEvent.click(button)
+    expect(mockTrackEvent).toBeCalledWith({
+      name: 'proceedToRun',
+      properties: { sourceLocation: 'RunRecordDetail' },
+    })
     expect(mockTrackProtocolRunEvent).toBeCalledWith({ name: 'runAgain' })
   })
 

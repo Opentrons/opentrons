@@ -42,13 +42,21 @@ from .command_fixtures import (
 )
 
 
+def _make_config(block_on_door_open: bool = False) -> Config:
+    return Config(
+        block_on_door_open=block_on_door_open,
+        # Choice of robot_type is arbitrary.
+        robot_type="OT-2 Standard",
+    )
+
+
 @pytest.mark.parametrize(
     ("is_door_open", "config", "expected_is_door_blocking"),
     [
-        (False, Config(), False),
-        (True, Config(), False),
-        (False, Config(block_on_door_open=True), False),
-        (True, Config(block_on_door_open=True), True),
+        (False, _make_config(), False),
+        (True, _make_config(), False),
+        (False, _make_config(block_on_door_open=True), False),
+        (True, _make_config(block_on_door_open=True), True),
     ],
 )
 def test_initial_state(
@@ -213,7 +221,7 @@ def test_command_store_queues_commands(
         params=command_request.params,  # type: ignore[arg-type]
     )
 
-    subject = CommandStore(is_door_open=False, config=Config())
+    subject = CommandStore(is_door_open=False, config=_make_config())
     subject.handle_action(action)
 
     assert subject.state.commands_by_id == {
@@ -230,7 +238,7 @@ def test_command_queue_with_hash() -> None:
         params=commands.WaitForResumeParams(message="hello world"),
     )
 
-    subject = CommandStore(is_door_open=False, config=Config())
+    subject = CommandStore(is_door_open=False, config=_make_config())
     subject.handle_action(
         QueueCommandAction(
             request=create,
@@ -276,7 +284,7 @@ def test_command_queue_and_unqueue() -> None:
         command=create_running_command(command_id="command-id-2"),
     )
 
-    subject = CommandStore(is_door_open=False, config=Config())
+    subject = CommandStore(is_door_open=False, config=_make_config())
 
     subject.handle_action(queue_1)
     assert subject.state.queued_command_ids == OrderedSet(["command-id-1"])
@@ -320,7 +328,7 @@ def test_setup_command_queue_and_unqueue() -> None:
         command=create_running_command(command_id="command-id-2"),
     )
 
-    subject = CommandStore(is_door_open=False, config=Config())
+    subject = CommandStore(is_door_open=False, config=_make_config())
 
     subject.handle_action(queue_1)
     assert subject.state.queued_setup_command_ids == OrderedSet(["command-id-1"])
@@ -359,7 +367,7 @@ def test_setup_queue_action_updates_command_intent() -> None:
         intent=commands.CommandIntent.SETUP,
     )
 
-    subject = CommandStore(is_door_open=False, config=Config())
+    subject = CommandStore(is_door_open=False, config=_make_config())
 
     subject.handle_action(queue_cmd)
     assert subject.state.commands_by_id["command-id-1"] == CommandEntry(
@@ -382,7 +390,7 @@ def test_running_command_id() -> None:
         command=create_succeeded_command(command_id="command-id-1"),
     )
 
-    subject = CommandStore(is_door_open=False, config=Config())
+    subject = CommandStore(is_door_open=False, config=_make_config())
 
     subject.handle_action(queue)
     assert subject.state.running_command_id is None
@@ -403,7 +411,7 @@ def test_running_command_no_queue() -> None:
         command=create_succeeded_command(command_id="command-id-1"),
     )
 
-    subject = CommandStore(is_door_open=False, config=Config())
+    subject = CommandStore(is_door_open=False, config=_make_config())
 
     subject.handle_action(running_update)
     assert subject.state.all_command_ids == ["command-id-1"]
@@ -474,7 +482,7 @@ def test_command_failure_clears_queues() -> None:
         status=commands.CommandStatus.FAILED,
     )
 
-    subject = CommandStore(is_door_open=False, config=Config())
+    subject = CommandStore(is_door_open=False, config=_make_config())
 
     subject.handle_action(queue_1)
     subject.handle_action(queue_2)
@@ -576,7 +584,7 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
         intent=commands.CommandIntent.SETUP,
     )
 
-    subject = CommandStore(is_door_open=False, config=Config())
+    subject = CommandStore(is_door_open=False, config=_make_config())
 
     subject.handle_action(queue_action_1_non_setup)
     subject.handle_action(queue_action_2_setup)
@@ -606,7 +614,7 @@ def test_command_store_preserves_handle_order() -> None:
     command_b = create_running_command(command_id="command-id-2")
     command_c = create_succeeded_command(command_id="command-id-1")
 
-    subject = CommandStore(is_door_open=False, config=Config())
+    subject = CommandStore(is_door_open=False, config=_make_config())
 
     subject.handle_action(UpdateCommandAction(command=command_a))
     assert subject.state.all_command_ids == ["command-id-1"]
@@ -632,7 +640,7 @@ def test_command_store_preserves_handle_order() -> None:
 @pytest.mark.parametrize("pause_source", PauseSource)
 def test_command_store_handles_pause_action(pause_source: PauseSource) -> None:
     """It should clear the running flag on pause."""
-    subject = CommandStore(is_door_open=False, config=Config())
+    subject = CommandStore(is_door_open=False, config=_make_config())
     subject.handle_action(PauseAction(source=pause_source))
 
     assert subject.state == CommandState(
@@ -654,7 +662,7 @@ def test_command_store_handles_pause_action(pause_source: PauseSource) -> None:
 @pytest.mark.parametrize("pause_source", PauseSource)
 def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
     """It should set the running flag on play."""
-    subject = CommandStore(is_door_open=False, config=Config())
+    subject = CommandStore(is_door_open=False, config=_make_config())
     subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
 
     assert subject.state == CommandState(
@@ -675,7 +683,7 @@ def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
 
 def test_command_store_handles_finish_action() -> None:
     """It should change to a succeeded state with FinishAction."""
-    subject = CommandStore(is_door_open=False, config=Config())
+    subject = CommandStore(is_door_open=False, config=_make_config())
 
     subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(FinishAction())
@@ -698,7 +706,7 @@ def test_command_store_handles_finish_action() -> None:
 
 def test_command_store_handles_finish_action_with_stopped() -> None:
     """It should change to a stopped state if FinishAction has set_run_status=False."""
-    subject = CommandStore(is_door_open=False, config=Config())
+    subject = CommandStore(is_door_open=False, config=_make_config())
 
     subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(FinishAction(set_run_status=False))
@@ -708,7 +716,7 @@ def test_command_store_handles_finish_action_with_stopped() -> None:
 
 def test_command_store_handles_stop_action() -> None:
     """It should mark the engine as non-gracefully stopped on StopAction."""
-    subject = CommandStore(is_door_open=False, config=Config())
+    subject = CommandStore(is_door_open=False, config=_make_config())
 
     subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(StopAction())
@@ -731,7 +739,7 @@ def test_command_store_handles_stop_action() -> None:
 
 def test_command_store_cannot_restart_after_should_stop() -> None:
     """It should reject a play action after finish."""
-    subject = CommandStore(is_door_open=False, config=Config())
+    subject = CommandStore(is_door_open=False, config=_make_config())
     subject.handle_action(FinishAction())
     subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
 
@@ -753,7 +761,7 @@ def test_command_store_cannot_restart_after_should_stop() -> None:
 
 def test_command_store_save_started_completed_run_timestamp() -> None:
     """It should save started and completed timestamps."""
-    subject = CommandStore(config=Config(), is_door_open=False)
+    subject = CommandStore(config=_make_config(), is_door_open=False)
     start_time = datetime(year=2021, month=1, day=1)
     hardware_stopped_time = datetime(year=2022, month=2, day=2)
 
@@ -766,7 +774,7 @@ def test_command_store_save_started_completed_run_timestamp() -> None:
 
 def test_timestamps_are_latched() -> None:
     """It should not change startedAt or completedAt once set."""
-    subject = CommandStore(config=Config(), is_door_open=False)
+    subject = CommandStore(config=_make_config(), is_door_open=False)
 
     play_time_1 = datetime(year=2021, month=1, day=1)
     play_time_2 = datetime(year=2022, month=2, day=2)
@@ -785,7 +793,7 @@ def test_timestamps_are_latched() -> None:
 
 def test_command_store_saves_unknown_finish_error() -> None:
     """It not store a ProtocolEngineError that comes in with the stop action."""
-    subject = CommandStore(is_door_open=False, config=Config())
+    subject = CommandStore(is_door_open=False, config=_make_config())
 
     error_details = FinishErrorDetails(
         error=RuntimeError("oh no"),
@@ -819,7 +827,7 @@ def test_command_store_saves_unknown_finish_error() -> None:
 
 def test_command_store_ignores_stop_after_graceful_finish() -> None:
     """It should no-op on stop if already gracefully finished."""
-    subject = CommandStore(is_door_open=False, config=Config())
+    subject = CommandStore(is_door_open=False, config=_make_config())
 
     subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(FinishAction())
@@ -843,7 +851,7 @@ def test_command_store_ignores_stop_after_graceful_finish() -> None:
 
 def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
     """It should no-op on finish if already ungracefully stopped."""
-    subject = CommandStore(is_door_open=False, config=Config())
+    subject = CommandStore(is_door_open=False, config=_make_config())
 
     subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(StopAction())
@@ -882,7 +890,7 @@ def test_command_store_handles_command_failed() -> None:
         completed_at=datetime(year=2022, month=2, day=2),
     )
 
-    subject = CommandStore(is_door_open=False, config=Config())
+    subject = CommandStore(is_door_open=False, config=_make_config())
     subject.handle_action(UpdateCommandAction(command=command))
     subject.handle_action(
         FailCommandAction(
@@ -913,7 +921,7 @@ def test_command_store_handles_command_failed() -> None:
 
 def test_handles_hardware_stopped() -> None:
     """It should mark the hardware as stopped on HardwareStoppedAction."""
-    subject = CommandStore(is_door_open=False, config=Config())
+    subject = CommandStore(is_door_open=False, config=_make_config())
     completed_at = datetime(year=2021, day=1, month=1)
     subject.handle_action(HardwareStoppedAction(completed_at=completed_at))
 
@@ -936,10 +944,10 @@ def test_handles_hardware_stopped() -> None:
 @pytest.mark.parametrize(
     ("is_door_open", "config", "expected_queue_status"),
     [
-        (False, Config(), QueueStatus.RUNNING),
-        (True, Config(), QueueStatus.RUNNING),
-        (False, Config(block_on_door_open=True), QueueStatus.RUNNING),
-        (True, Config(block_on_door_open=True), QueueStatus.PAUSED),
+        (False, _make_config(), QueueStatus.RUNNING),
+        (True, _make_config(), QueueStatus.RUNNING),
+        (False, _make_config(block_on_door_open=True), QueueStatus.RUNNING),
+        (True, _make_config(block_on_door_open=True), QueueStatus.PAUSED),
     ],
 )
 def test_command_store_handles_play_according_to_initial_door_state(
@@ -959,8 +967,8 @@ def test_command_store_handles_play_according_to_initial_door_state(
 @pytest.mark.parametrize(
     ("config", "expected_is_door_blocking"),
     [
-        (Config(block_on_door_open=True), True),
-        (Config(block_on_door_open=False), False),
+        (_make_config(block_on_door_open=True), True),
+        (_make_config(block_on_door_open=False), False),
     ],
 )
 def test_handles_door_open_and_close_event_before_play(
@@ -983,8 +991,8 @@ def test_handles_door_open_and_close_event_before_play(
 @pytest.mark.parametrize(
     ("config", "expected_queue_status", "expected_is_door_blocking"),
     [
-        (Config(block_on_door_open=True), QueueStatus.PAUSED, True),
-        (Config(block_on_door_open=False), QueueStatus.RUNNING, False),
+        (_make_config(block_on_door_open=True), QueueStatus.PAUSED, True),
+        (_make_config(block_on_door_open=False), QueueStatus.RUNNING, False),
     ],
 )
 def test_handles_door_open_and_close_event_after_play(
@@ -1007,7 +1015,9 @@ def test_handles_door_open_and_close_event_after_play(
 
 def test_command_store_handles_stop_action_with_queued_commands() -> None:
     """It should clear queued commands."""
-    subject = CommandStore(config=Config(block_on_door_open=False), is_door_open=False)
+    subject = CommandStore(
+        config=_make_config(block_on_door_open=False), is_door_open=False
+    )
 
     action = QueueCommandAction(
         request=commands.WaitForResumeCreate(

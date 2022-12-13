@@ -44,7 +44,7 @@ import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { Modal } from '../../molecules/Modal'
-import { useFeatureFlag } from '../../redux/config'
+import { useTrackEvent } from '../../redux/analytics'
 import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
 import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
@@ -240,6 +240,7 @@ interface ProtocolDetailsProps extends StoredProtocolData {}
 export function ProtocolDetails(
   props: ProtocolDetailsProps
 ): JSX.Element | null {
+  const trackEvent = useTrackEvent()
   const { protocolKey, srcFileNames, mostRecentAnalysis, modified } = props
   const { t } = useTranslation(['protocol_details', 'shared'])
   const [currentTab, setCurrentTab] = React.useState<
@@ -251,7 +252,6 @@ export function ProtocolDetails(
     getIsProtocolAnalysisInProgress(state, protocolKey)
   )
   const analysisStatus = getAnalysisStatus(isAnalyzing, mostRecentAnalysis)
-  const liquidSetupEnabled = useFeatureFlag('enableLiquidSetup')
   if (analysisStatus === 'missing') return null
 
   const { left: leftMountPipetteName, right: rightMountPipetteName } =
@@ -319,6 +319,7 @@ export function ProtocolDetails(
     mostRecentAnalysis?.createdAt != null
       ? format(new Date(mostRecentAnalysis.createdAt), 'MMM dd yy HH:mm')
       : t('shared:no_data')
+  const robotType = mostRecentAnalysis?.robotType ?? null
 
   const contentsByTabName = {
     labware: (
@@ -330,6 +331,7 @@ export function ProtocolDetails(
         rightMountPipetteName={rightMountPipetteName}
         requiredModuleDetails={requiredModuleDetails}
         isLoading={analysisStatus === 'loading'}
+        robotType={robotType}
       />
     ),
     liquids: (
@@ -365,6 +367,14 @@ export function ProtocolDetails(
         {deckThumbnail}
       </Box>
     ),
+  }
+
+  const handleRunProtocolButtonClick = (): void => {
+    trackEvent({
+      name: 'proceedToRun',
+      properties: { sourceLocation: 'ProtocolsDetail' },
+    })
+    setShowSlideout(true)
   }
 
   return (
@@ -466,7 +476,7 @@ export function ProtocolDetails(
                 `}
               >
                 <PrimaryButton
-                  onClick={() => setShowSlideout(true)}
+                  onClick={() => handleRunProtocolButtonClick()}
                   data-testid="ProtocolDetails_runProtocol"
                   disabled={analysisStatus === 'loading'}
                 >
@@ -586,8 +596,7 @@ export function ProtocolDetails(
                   {t('labware')}
                 </StyledText>
               </RoundTab>
-              {liquidSetupEnabled &&
-                mostRecentAnalysis != null &&
+              {mostRecentAnalysis != null &&
                 protocolHasLiquids(mostRecentAnalysis) && (
                   <RoundTab
                     data-testid="ProtocolDetails_liquids"

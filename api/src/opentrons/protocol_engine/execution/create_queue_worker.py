@@ -28,6 +28,7 @@ def create_queue_worker(
     equipment_handler = EquipmentHandler(
         hardware_api=hardware_api,
         state_store=state_store,
+        action_dispatcher=action_dispatcher,
     )
 
     movement_handler = MovementHandler(

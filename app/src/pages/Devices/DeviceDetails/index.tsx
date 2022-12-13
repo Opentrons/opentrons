@@ -19,10 +19,10 @@ import { RecentProtocolRuns } from '../../../organisms/Devices/RecentProtocolRun
 import { RobotOverview } from '../../../organisms/Devices/RobotOverview'
 import { getScanning } from '../../../redux/discovery'
 
-import type { NavRouteParams } from '../../../App/types'
+import type { DesktopRouteParams } from '../../../App/types'
 
 export function DeviceDetails(): JSX.Element | null {
-  const { robotName } = useParams<NavRouteParams>()
+  const { robotName } = useParams<DesktopRouteParams>()
   const robot = useRobot(robotName)
   const isScanning = useSelector(getScanning)
 
