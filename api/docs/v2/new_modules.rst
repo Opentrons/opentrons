@@ -223,9 +223,9 @@ To check whether a custom labware definition specifies engage height for the Mag
 Engaging and Disengaging
 ========================
 
-The :py:meth:`.MagneticModuleContext.engage` function raises the magnets to induce a magnetic field in the labware on top of the Magnetic Module. The height of the magnets can be specified in several different ways, based on internally stored default heights for labware:
+Raising and lowering the module's magnets are done with the  :py:meth:`~.MagneticModuleContext.engage` and :py:meth:`.MagneticModuleContext.disengage` functions, respectively.
 
-- If neither ``height_from_base``, ``height`` nor ``offset`` is specified **and** the labware is supported on the Magnetic Module, the magnets will raise to a reasonable default height based on the specified labware.
+If your loaded labware is fully compatible with the Magnetic Module, you can call ``engage()`` with no argument:
 
   .. code-block:: python
 
@@ -233,60 +233,41 @@ The :py:meth:`.MagneticModuleContext.engage` function raises the magnets to indu
 
   .. versionadded:: 2.0
 
-- The recommended way to specify the magnets' position is to utilize the ``height_from_base`` parameter, which allows you to raise the height of the magnets relative to the base of the labware.
+This will move the magnets upward to the default height for the labware, which should be close to the bottom of the labware's wells. If your loaded labware doesn't specify a default height, this will raise an ``ExceptionInProtocolError``.
+
+For certain applications, you may want to move the magnets to a different height. [TK note about GEN1 half-millimeters vs. GEN2 true millimeters]. You can specify one (and only one) of three parameters to alter the height:
+
+- ``height_from_base`` is the distance above the base of the labware (its lowest point, where it rests on the module). This is the recommended way to adjust the magnets' height. Setting a value of ``0`` should move the tops of the magnets level with the base of the labware. However, there is up to 1 mm of manufacturing variance across Magnetic Module units, so observe the exact position and adjust as necessary before running your protocol.
+- ``height`` is the distance above the magnets' home position, which is 2.5 mm below the labware base position.
+- ``offset`` is the distance from the labware's default position (close to the bottom of its wells). Like using ``engage()`` with no argument, this will raise an error if there is no default height for the loaded labware.
+
+Here are some examples of where the magnets will move when using the different parameters, in combination with the loaded NEST PCR plate, which specifies a default height of 20 mm:
 
   .. code-block:: python
 
-      mag_mod.engage(height_from_base=13.5)
+      mag_mod.engage(height_from_base=13.5)  # 13.5 mm
+      mag_mod.engage(height=18.5)            # 16.0 mm
+      mag_mod.engage(offset=-2)              # 18.0 mm
 
-  A ``mag_mod.engage(height_from_base=0)`` call should move the tops of the magnets to level with base of the labware.
-
-  .. versionadded:: 2.2
-
-.. note::
-    There is a +/- 1 mm variance across magnetic module units, using ``height_from_base=0`` might not be able to get the magnets to completely flush with base of the labware. Please test before carrying out your experiment to ensure the desired engage height for your labware.
-
-- You can also specify ``height``, which should be a distance from the home position of the magnets.
-
-  .. code-block:: python
-
-      mag_mod.engage(height=18.5)
+Note that both ``height`` and ``offset`` take into account the fact that the magnets' home position is measured as −2.5 mm.
 
   .. versionadded:: 2.0
+  .. versionchanged:: 2.2
+     Added the ``height_from_base`` parameter.
 
-- An ``offset`` can be applied to move the magnets relatively from the default engage height of the labware, **if** the labware is supported on the Magnetic Module.
+When you need to retract the magnets back to their home position, call :py:meth:`.MagneticModuleContext.disengage`. 
 
   .. code-block:: python
 
-      mag_mod.engage(offset=-2)
-
-  .. versionadded:: 2.0
-
-.. note::
-
-    Only certain labwares have defined engage heights for the Magnetic Module. If a labware that does not have a defined engage height is loaded on the Magnetic Module (or if no labware is loaded), then ``height_from_labware`` (since version 2.2) or ``height``, must be specified.
+      mag_mod.disengage()  # -2.5 mm
 
 .. versionadded:: 2.0
 
-Disengage
-=========
+If at any point you need to check whether the magnets are engaged or not, use the :py:obj:`.MagneticModuleContext.status` property. This will return either the string ``engaged`` or ``disengaged``, not the exact height of the magnets.
 
-.. code-block:: python
+.. note:: 
 
-   mag_mod.disengage()
-
-The Magnetic Module will disengage when the device is turned on. It will not auto-disengage otherwise unless you call :py:meth:`.MagneticModuleContext.disengage` in your protocol.
-
-.. versionadded:: 2.0
-
-Check the Status
-================
-
-The :py:obj:`.MagneticModuleContext.status` property is a string that is one of ``'engaged'`` or ``'disengaged'``.
-
-.. code-block:: python
-
-    mag_mod.status
+    The OT-2 will not automatically deactivate the Magnetic Module at the end of a protocol. If you need to deactivate the module after a protocol is completed or canceled, use the Magnetic Module controls on the device detail page in the Opentrons App or run ``deactivate()`` in Jupyter notebook.
     
 Changes with the GEN2 Magnetic Module
 =====================================

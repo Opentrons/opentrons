@@ -360,7 +360,7 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
         The units of ``height_from_base``, ``height``, and ``offset``
         depend on which generation of Magnetic Module you're using:
 
-           - For GEN1 Magnetic Modules, they're in *half-millimeters,*
+           - For GEN1 Magnetic Modules, they're in *half-millimeters*,
              for historical reasons. This will not be the case in future
              releases of the Python Protocol API.
            - For GEN2 Magnetic Modules, they're in true millimeters.
