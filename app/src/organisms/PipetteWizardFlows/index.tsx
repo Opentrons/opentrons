@@ -2,7 +2,10 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { useConditionalConfirm } from '@opentrons/components'
-import { SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
+import {
+  NINETY_SIX_CHANNEL,
+  SINGLE_MOUNT_PIPETTES,
+} from '@opentrons/shared-data'
 import {
   useHost,
   useCreateRunMutation,
@@ -275,6 +278,15 @@ export const PipetteWizardFlows = (
     <Portal level="top">
       <ModalShell
         width="47rem"
+        height={
+          //  changing modal height for now on BeforeBeginning 96 channel attach flow
+          //  until we do design qa to normalize the modal sizes
+          currentStep.section === SECTIONS.BEFORE_BEGINNING &&
+          selectedPipette === NINETY_SIX_CHANNEL &&
+          flowType === FLOWS.ATTACH
+            ? '70%'
+            : 'auto'
+        }
         header={
           <WizardHeader
             title={wizardTitle}
