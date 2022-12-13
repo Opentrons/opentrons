@@ -41,7 +41,7 @@ class ProtocolReader:
 
         Arguments:
             files: List of files-like objects. Do not attempt to reuse any objects
-                objects in this list once they've been passed to the ProtocolReader.
+                in this list once they've been passed to the ProtocolReader.
             directory: Name of the directory to create and place files in.
 
         Returns:
