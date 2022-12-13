@@ -110,6 +110,7 @@ class ProtocolReader:
         all_files: List[RoleAnalysisFile] = [
             role_analysis.main_file,
             *role_analysis.labware_files,
+            *role_analysis.data_files,
         ]
 
         # TODO(mc, 2022-04-01): these asserts are a bit awkward,
