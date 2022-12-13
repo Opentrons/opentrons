@@ -7,6 +7,16 @@ from opentrons.protocols.api_support.types import APIVersion
 
 import opentrons.protocol_api as papi
 
+try:
+    import opentrons_hardware  # noqa: F401
+
+    # TODO (lc 12-8-2022) We need to re-write these transfer tests so that
+    # they are agnostic to the underlying hardware.
+    pytest.skip("These tests are only valid on the OT-2.", allow_module_level=True)
+except ImportError:
+    # If we don't have opentrons_hardware, we can safely run these tests.
+    pass
+
 
 @pytest.fixture
 def _instr_labware(ctx):

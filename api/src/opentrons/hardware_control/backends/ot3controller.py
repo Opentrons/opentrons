@@ -19,7 +19,7 @@ from typing import (
     Iterator,
 )
 from opentrons.config.types import OT3Config, GantryLoad
-from opentrons.config import pipette_config, gripper_config
+from opentrons.config import ot3_pipette_config, gripper_config
 from .ot3utils import (
     axis_convert,
     create_move_group,
@@ -33,6 +33,7 @@ from .ot3utils import (
     create_gripper_jaw_grip_group,
     create_gripper_jaw_home_group,
     create_gripper_jaw_hold_group,
+    create_tip_action_group,
 )
 
 try:
@@ -91,14 +92,13 @@ from opentrons_hardware.hardware_control.tool_sensors import (
     capacitive_pass,
 )
 from opentrons_hardware.drivers.gpio import OT3GPIO
+from opentrons_shared_data.pipette.dev_types import PipetteName
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
     from ..dev_types import (
-        AttachedPipette,
+        OT3AttachedPipette,
         AttachedGripper,
         OT3AttachedInstruments,
-        InstrumentHardwareConfigs,
     )
 
 log = logging.getLogger(__name__)
@@ -333,6 +333,8 @@ class OT3Controller:
         positions = await asyncio.gather(*coros)
         if OT3Axis.G in checked_axes:
             await self.gripper_home_jaw()
+        if OT3Axis.Q in checked_axes:
+            await self.tip_action()
         for position in positions:
             for p in position.items():
                 self._position.update({p[0]: p[1][0]})
@@ -364,6 +366,14 @@ class OT3Controller:
             New position.
         """
         return await self.home(axes)
+
+    async def tip_action(self, distance: float = 33, speed: float = -5.5, tip_action: str="drop") -> None:
+        move_group = create_tip_action_group(distance, speed, tip_action)
+        runner = MoveGroupRunner(move_groups=[move_group])
+        positions = await runner.run(can_messenger=self._messenger)
+        for axis, point in positions.items():
+            self._position.update({axis: point[0]})
+            self._encoder_position.update({axis: point[1]})
 
     async def gripper_grip_jaw(
         self,
@@ -397,21 +407,43 @@ class OT3Controller:
             self._encoder_position.update({axis: point[1]})
 
     @staticmethod
-    def _synthesize_model_name(name: FirmwarePipetteName, model: str) -> "PipetteModel":
-        return cast("PipetteModel", f"{name.name}_v{model}")
+    def _lookup_serial_key(pipette_name: FirmwarePipetteName) -> str:
+        lookup_name = {
+            FirmwarePipetteName.p1000_single: "P1KS",
+            FirmwarePipetteName.p1000_multi: "P1KM",
+            FirmwarePipetteName.p50_single: "P50S",
+            FirmwarePipetteName.p50_multi: "P50M",
+            FirmwarePipetteName.p1000_96: "P1KH",
+            FirmwarePipetteName.p50_96: "P50H",
+        }
+        return lookup_name[pipette_name]
+
+    @staticmethod
+    def _combine_serial_number(pipette_info: ohc_tool_types.PipetteInformation) -> str:
+        serialized_name = OT3Controller._lookup_serial_key(pipette_info.name)
+        version = ot3_pipette_config.version_from_string(pipette_info.model)
+        return f"{serialized_name}V{version.major}{version.minor}{pipette_info.serial}"
 
     @staticmethod
     def _build_attached_pip(
         attached: ohc_tool_types.PipetteInformation, mount: OT3Mount
-    ) -> AttachedPipette:
+    ) -> OT3AttachedPipette:
         if attached.name == FirmwarePipetteName.unknown:
             raise InvalidPipetteName(name=attached.name_int, mount=mount)
         try:
+            # TODO (lc 12-8-2022) We should return model as an int rather than
+            # a string.
+            # TODO (lc 12-6-2022) We should also provide the full serial number
+            # for PipetteInformation.serial so we don't have to use
+            # helper methods to convert the serial back to what was flashed
+            # on the eeprom.
             return {
-                "config": pipette_config.load(
-                    OT3Controller._synthesize_model_name(attached.name, attached.model)
+                "config": ot3_pipette_config.load_ot3_pipette(
+                    ot3_pipette_config.convert_pipette_name(
+                        cast(PipetteName, attached.name.name), attached.model
+                    )
                 ),
-                "id": attached.serial,
+                "id": OT3Controller._combine_serial_number(attached),
             }
         except KeyError:
             raise InvalidPipetteModel(
@@ -426,7 +458,7 @@ class OT3Controller:
         serial = attached.serial
         return {
             "config": gripper_config.load(model, serial),
-            "id": serial,
+            "id": f"GRPV{attached.model}{serial}",
         }
 
     @staticmethod
@@ -654,12 +686,6 @@ class OT3Controller:
                 self._event_watcher.close()
         return None
 
-    async def configure_mount(
-        self, mount: OT3Mount, config: InstrumentHardwareConfigs
-    ) -> None:
-        """Configure a mount."""
-        return None
-
     @staticmethod
     def _get_home_position() -> Dict[NodeId, float]:
         return {
@@ -747,9 +773,13 @@ class OT3Controller:
         # when that method actually does canbus stuff
         instrs = await self.get_attached_instruments({})
         expected = {NodeId.gantry_x, NodeId.gantry_y, NodeId.head}
-        if instrs.get(OT3Mount.LEFT, cast("AttachedPipette", {})).get("config", None):
+        if instrs.get(OT3Mount.LEFT, cast("OT3AttachedPipette", {})).get(
+            "config", None
+        ):
             expected.add(NodeId.pipette_left)
-        if instrs.get(OT3Mount.RIGHT, cast("AttachedPipette", {})).get("config", None):
+        if instrs.get(OT3Mount.RIGHT, cast("OT3AttachedPipette", {})).get(
+            "config", None
+        ):
             expected.add(NodeId.pipette_right)
         if instrs.get(OT3Mount.GRIPPER, cast("AttachedGripper", {})).get(
             "config", None
@@ -759,6 +789,7 @@ class OT3Controller:
         self._present_nodes = self._replace_gripper_node(
             self._replace_head_node(present)
         )
+        log.info(f"The present nodes are now {self._present_nodes}")
 
     def _axis_is_present(self, axis: OT3Axis) -> bool:
         try:
