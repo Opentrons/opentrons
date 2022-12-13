@@ -109,9 +109,12 @@ async def clean_up_persistence(app_state: AppState) -> None:
     This should be called exactly once at server shutdown.
     """
     sql_engine_init_task = _sql_engine_init_task_accessor.get_from(app_state=app_state)
+    directory_init_task = _directory_init_task_accessor.get_from(app_state=app_state)
     if sql_engine_init_task is not None:
         sql_engine = await sql_engine_init_task
         sql_engine.dispose()
+    if directory_init_task is not None:
+        await directory_init_task
 
 
 async def get_sql_engine(
