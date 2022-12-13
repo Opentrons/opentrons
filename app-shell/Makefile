@@ -32,7 +32,7 @@ ssh_opts ?= $(default_ssh_opts)
 # if tagged build (tag ~= ^v.+) -> b$(BUILD_NUMBER)
 # if branch exists -> b$(BUILD_NUMBER)-$(BRANCH_NAME)
 # only copy update files publish directory on tagged builds
-publish_update := $(filter v%,$(OT_TAG))
+publish_update := $(or $(filter v%,$(OT_TAG)),$(filter ot3@%,$(OT_TAG)))
 branch_suffix := $(if $(publish_update),,-$(subst /,-,$(OT_BRANCH)))
 build_id := $(or $(and $(OT_BUILD),b$(OT_BUILD)$(branch_suffix)),dev)
 

@@ -22,6 +22,7 @@ on:
       - '**'
     tags:
       - 'v*'
+      - 'ot3@*'
   pull_request:
     paths:
       - 'Makefile'
