@@ -33,6 +33,7 @@ from ..types import (
     LabwareOffsetVector,
     HeaterShakerMovementRestrictors,
     ModuleLocation,
+    DeckType,
 )
 from .. import errors
 from ..commands import (
@@ -525,7 +526,9 @@ class ModuleView(HasState[ModuleState]):
         """Get the specified module's dimensions."""
         return self.get_definition(module_id).dimensions
 
-    def get_module_offset(self, module_id: str) -> LabwareOffsetVector:
+    def get_module_offset(
+        self, module_id: str, deck_type: DeckType
+    ) -> LabwareOffsetVector:
         """Get the module's offset vector computed with slot transform."""
         definition = self.get_definition(module_id)
         slot = self.get_location(module_id).slotName.value
@@ -538,7 +541,7 @@ class ModuleView(HasState[ModuleState]):
                 1,
             )
         )
-        xforms_ser = definition.slotTransforms.get("ot2_standard", {}).get(
+        xforms_ser = definition.slotTransforms.get(str(deck_type.value), {}).get(
             slot,
             {"labwareOffset": [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]},
         )

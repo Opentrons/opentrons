@@ -1,4 +1,6 @@
 """Tests for module state accessors in the protocol engine state store."""
+import math
+
 import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 
@@ -15,6 +17,7 @@ from opentrons.protocol_engine.types import (
     ModuleModel,
     ModuleLocation,
     LabwareOffsetVector,
+    DeckType,
 )
 from opentrons.protocol_engine.state.modules import (
     ModuleView,
@@ -279,7 +282,7 @@ def test_get_properties_by_id(
         ),
     ],
 )
-def test_get_module_offset(
+def test_get_module_offset_for_ot2_standard(
     module_def: ModuleDefinition,
     slot: DeckSlotName,
     expected_offset: LabwareOffsetVector,
@@ -294,7 +297,84 @@ def test_get_module_offset(
             )
         },
     )
-    assert subject.get_module_offset("module-id") == expected_offset
+    assert (
+        subject.get_module_offset("module-id", DeckType.OT2_STANDARD) == expected_offset
+    )
+
+
+@pytest.mark.parametrize(
+    argnames=["module_def", "slot", "expected_offset"],
+    argvalues=[
+        (
+            lazy_fixture("tempdeck_v2_def"),
+            DeckSlotName.SLOT_1,
+            LabwareOffsetVector(x=2.17, y=0, z=9),
+        ),
+        (
+            lazy_fixture("tempdeck_v2_def"),
+            DeckSlotName.SLOT_3,
+            LabwareOffsetVector(x=-2.17, y=0, z=9),
+        ),
+        (
+            lazy_fixture("thermocycler_v2_def"),
+            DeckSlotName.SLOT_7,
+            LabwareOffsetVector(x=-19.88, y=67.76, z=-0.04),
+        ),
+        (
+            lazy_fixture("heater_shaker_v1_def"),
+            DeckSlotName.SLOT_1,
+            LabwareOffsetVector(x=3, y=1, z=19),
+        ),
+        (
+            lazy_fixture("heater_shaker_v1_def"),
+            DeckSlotName.SLOT_3,
+            LabwareOffsetVector(x=-3, y=-1, z=19),
+        ),
+    ],
+)
+def test_get_module_offset_for_ot3_standard(
+    module_def: ModuleDefinition,
+    slot: DeckSlotName,
+    expected_offset: LabwareOffsetVector,
+) -> None:
+    """It should return the correct labware offset for module in specified slot."""
+    subject = make_module_view(
+        slot_by_module_id={"module-id": slot},
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="module-serial",
+                definition=module_def,
+            )
+        },
+    )
+    assert _labware_offsets_are_close(
+        subject.get_module_offset("module-id", DeckType.OT3_STANDARD), expected_offset
+    )
+
+
+def _labware_offsets_are_close(
+    offset1: LabwareOffsetVector, offset2: LabwareOffsetVector
+) -> bool:
+    """Return whether the two labware offset vectors are close."""
+    return all(
+        [
+            math.isclose(
+                offset1.x,
+                offset2.x,
+                abs_tol=0.001,
+            ),
+            math.isclose(
+                offset1.y,
+                offset2.y,
+                abs_tol=0.001,
+            ),
+            math.isclose(
+                offset1.z,
+                offset2.z,
+                abs_tol=0.001,
+            ),
+        ]
+    )
 
 
 def test_get_magnetic_module_substate(

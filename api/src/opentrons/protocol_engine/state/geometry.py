@@ -16,11 +16,12 @@ from ..types import (
     OFF_DECK_LOCATION,
     LabwareLocation,
     LabwareOffsetVector,
+    DeckType,
 )
 from .labware import LabwareView
 from .modules import ModuleView
 from .pipettes import CurrentWell
-
+from .config import Config
 
 DEFAULT_TIP_DROP_HEIGHT_FACTOR = 0.5
 
@@ -49,8 +50,11 @@ class TipGeometry:
 class GeometryView:
     """Geometry computed state getters."""
 
-    def __init__(self, labware_view: LabwareView, module_view: ModuleView) -> None:
+    def __init__(
+        self, config: Config, labware_view: LabwareView, module_view: ModuleView
+    ) -> None:
         """Initialize a GeometryView instance."""
+        self._config = config
         self._labware = labware_view
         self._modules = module_view
 
@@ -124,7 +128,15 @@ class GeometryView:
         if module_id is None:
             return slot_pos
         else:
-            module_offset = self._modules.get_module_offset(module_id)
+            # TODO (spp, 2022-12-13): wire up selection of short-trash deck type
+            deck_type = (
+                DeckType.OT3_STANDARD
+                if self._config.robot_type == "OT-3 Standard"
+                else DeckType.OT2_STANDARD
+            )
+            module_offset = self._modules.get_module_offset(
+                module_id=module_id, deck_type=deck_type
+            )
             return Point(
                 x=slot_pos.x + module_offset.x,
                 y=slot_pos.y + module_offset.y,
@@ -365,7 +377,14 @@ class GeometryView:
         module_offset = LabwareOffsetVector(x=0, y=0, z=0)
         location_slot: DeckSlotName
         if isinstance(location, ModuleLocation):
-            module_offset = self._modules.get_module_offset(location.moduleId)
+            deck_type = (
+                DeckType.OT3_STANDARD
+                if self._config.robot_type == "OT-3 Standard"
+                else DeckType.OT2_STANDARD
+            )
+            module_offset = self._modules.get_module_offset(
+                module_id=location.moduleId, deck_type=deck_type
+            )
             location_slot = self._modules.get_location(location.moduleId).slotName
         else:
             location_slot = location.slotName
