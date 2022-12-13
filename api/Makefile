@@ -175,7 +175,7 @@ push: push-no-restart
 	$(call restart-service,$(host),$(br_ssh_key),$(ssh_opts),"jupyter-notebook opentrons-robot-server")
 
 .PHONY: push-no-restart-ot3
-push-no-restart-ot3: $(sdist_file)
+push-no-restart-ot3: sdist
 	echo $(sdist_file)
 	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,opentrons,src)
 	ssh $(ssh_opts) root@$(host) "mkdir -p /usr/local/bin"
