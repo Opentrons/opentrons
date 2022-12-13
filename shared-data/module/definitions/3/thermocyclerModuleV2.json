@@ -47,7 +47,8 @@
           [0, 0, 0, 1]
         ]
       }
-    },
+    }
+  },
   "compatibleWith": [],
   "twoDimensionalRendering": {
     "name": "svg",
