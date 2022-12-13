@@ -10,6 +10,7 @@ from logging import getLogger
 
 from .types import OT3Mount, OT3Axis, GripperProbe
 from opentrons.types import Point
+from opentrons.config.types import CapacitivePassSettings
 import json
 
 from opentrons_shared_data.deck import load as load_deck
@@ -106,6 +107,19 @@ def _element_of_axis(point: Point, axis: OT3Axis) -> float:
     raise KeyError(axis)
 
 
+async def _probe_deck_at(
+    api: OT3API, mount: OT3Mount, target: Point, settings: CapacitivePassSettings
+) -> float:
+    here = await api.gantry_position(mount)
+    await api.move_to(mount, here._replace(z=CAL_TRANSIT_HEIGHT))
+    await api.move_to(mount, target._replace(z=CAL_TRANSIT_HEIGHT))
+    _found_pos = await api.capacitive_probe(
+        mount, OT3Axis.by_mount(mount), target.z, settings
+    )
+    await api.move_to(mount, target._replace(z=CAL_TRANSIT_HEIGHT))
+    return _found_pos
+
+
 async def find_edge(
     hcapi: OT3API,
     mount: OT3Mount,
@@ -155,34 +169,26 @@ async def find_edge(
         "min": slot_edge_nominal.z - edge_settings.overrun_tolerance_mm,
     }
 
-    async def _probe_deck_at(target: Point) -> float:
-        here = await hcapi.gantry_position(mount)
-        await hcapi.move_to(mount, here._replace(z=CAL_TRANSIT_HEIGHT))
-        await hcapi.move_to(mount, target._replace(z=CAL_TRANSIT_HEIGHT))
-        _found_pos = await hcapi.capacitive_probe(
-            mount,
-            OT3Axis.by_mount(mount),
-            slot_edge_nominal.z,
-            edge_settings.pass_settings,
-        )
-        await hcapi.move_to(mount, target._replace(z=CAL_TRANSIT_HEIGHT))
-        return _found_pos
-
     def _stride_should_repeat(s: float) -> bool:
-        return s or s > 1
+        return bool(s or s > 1)
+
+    def _stop_repeating_stride(s: float, prev: float, count: int) -> bool:
+        return s * count < prev
 
     # FIXME: add to shared-data
     stride_distance = [0, 4, 1, 0.25, 0.0625]
     stride_idx = 0
     stride_repeat_counter = 0
-    stride_direction = search_direction
+    stride_direction = int(search_direction)
     next_probe_pos = slot_edge_nominal
     last_probe_touched = False
     while True:
         stride = stride_distance[stride_idx] * stride_direction
         next_probe_pos = _offset_in_axis(next_probe_pos, stride, search_axis)
         LOG.info(f"Checking position {next_probe_pos}")
-        deck_height = await _probe_deck_at(next_probe_pos)
+        deck_height = await _probe_deck_at(
+            hcapi, mount, next_probe_pos, edge_settings.pass_settings
+        )
         if deck_height > allowable_height_range["max"]:
             raise EarlyCapacitiveSenseTrigger(deck_height, slot_edge_nominal.z)
         _probe_touched = deck_height >= allowable_height_range["min"]
@@ -192,25 +198,17 @@ async def find_edge(
             f"Probe found height {deck_height} "
             f"is {'' if _probe_touched else 'not '}valid"
         )
-        if state_change:
-            # state change = update stride and direction
-            stride_direction *= -1
+        _repeat = _stride_should_repeat(stride)
+        if state_change or not _repeat:
             stride_idx += 1
             stride_repeat_counter = 0
-        elif not _stride_should_repeat(stride):
-            # no state change, and not a small step = automatically reduce step size, same direction
-            stride_idx += 1
-            stride_repeat_counter = 0
+            stride_direction *= -1 if state_change else 1
         else:
-            # no state change, and small step size = continue stepping, same direction
             stride_repeat_counter += 1
-            assert stride_idx > 0
             _prev_stride = stride_distance[stride_idx - 1]
-            assert _prev_stride > stride
-            _about_to_travel_with_stride = stride * stride_repeat_counter
-            if _about_to_travel_with_stride >= _prev_stride:
+            if _stop_repeating_stride(stride, _prev_stride, stride_repeat_counter):
                 # don't go back and probe somewhere we already probed
-                # instead, reduce stride size, and continue pecking
+                # instead, reduce stride size, and continue pecking, same direction
                 stride_idx += 1
                 stride_repeat_counter = 0
         tried_every_stride = stride_idx >= len(stride_distance)
