@@ -20,12 +20,13 @@ def build_arg_parser():
     arg_parser = argparse.ArgumentParser(description='OT-3 Pipette Calibration Test')
     arg_parser.add_argument('-m', '--mount', choices=['l','r'], required=False, help='The pipette mount to be tested', default='l')
     arg_parser.add_argument('-c', '--cycles', type=int, required=False, help='Number of testing cycles', default=1)
+    arg_parser.add_argument('-o', '--slot', type=int, required=False, help='Deck slot number', default=5)
     arg_parser.add_argument('-s', '--simulate', action="store_true", required=False, help='Simulate this test script')
     return arg_parser
 
 class Pipette_Calibration_Test:
     def __init__(
-        self, simulate: bool, cycles: int
+        self, simulate: bool, cycles: int, slot: int
     ) -> None:
         self.api = None
         self.mount = None
@@ -36,10 +37,12 @@ class Pipette_Calibration_Test:
         self.slot_center = None
         self.simulate = simulate
         self.cycles = cycles
+        self.slot = slot
         self.axes = [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R]
         self.test_data ={
             "Time":"None",
             "Cycle":"None",
+            "Slot":"None",
             "Pipette":"None",
             "X Gauge":"None",
             "Y Gauge":"None",
@@ -64,6 +67,7 @@ class Pipette_Calibration_Test:
         self.pipette_id = self.api._pipette_handler.get_pipette(self.mount)._pipette_id
         self.deck_definition = load("ot3_standard", version=3)
         # await self.api.add_tip(self.mount, self.PROBE_LENGTH)
+        self.test_data["Slot"] = str(self.slot)
         self.test_data["Pipette"] = str(self.pipette_id)
         self.start_time = time.time()
         print(f"\nStarting Pipette Calibration Test!\n")
@@ -71,7 +75,7 @@ class Pipette_Calibration_Test:
     def file_setup(self):
         class_name = self.__class__.__name__
         self.test_name = class_name.lower()
-        self.test_tag = f"slot5"
+        self.test_tag = f"slot{self.slot}"
         self.test_header = self.dict_keys_to_line(self.test_data)
         self.test_id = data.create_run_id()
         self.test_path = data.create_folder_for_test_data(self.test_name)
@@ -92,10 +96,10 @@ class Pipette_Calibration_Test:
         return str.join(",", list(dict.values()))+"\n"
 
     async def _calibrate(
-        self, api: OT3API, mount: OT3Mount
+        self, api: OT3API, mount: OT3Mount, slot: int
     ) -> None:
         # Calibrate pipette
-        offset = await calibrate_pipette(api, mount)
+        offset = await calibrate_pipette(api, mount, slot)
         print(f"New Pipette Offset: {offset}")
 
     async def _home(
@@ -127,7 +131,7 @@ class Pipette_Calibration_Test:
                     cycle = i + 1
                     print(f"\n-> Starting Test Cycle {cycle}/{self.cycles}")
                     await self._home(self.api, self.mount)
-                    await self._calibrate(self.api, self.mount)
+                    await self._calibrate(self.api, self.mount, self.slot)
                     await self._reset(self.api, self.mount)
         except Exception as e:
             await self.exit()
@@ -142,5 +146,5 @@ if __name__ == '__main__':
     print("\nOT-3 Pipette Calibration Test\n")
     arg_parser = build_arg_parser()
     args = arg_parser.parse_args()
-    test = Pipette_Calibration_Test(args.simulate, args.cycles)
+    test = Pipette_Calibration_Test(args.simulate, args.cycles, args.slot)
     asyncio.run(test.run())
