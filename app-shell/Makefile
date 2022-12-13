@@ -19,7 +19,7 @@ ui_dir := ../app
 noop := cd .
 
 # build and publish options
-dist_files := "dist/**/Opentrons-v*"
+dist_files := "dist/**/Opentrons-*"
 update_files := "dist/@(alpha|beta|latest)*.@(yml|json)"
 publish_dir := dist/publish
 
@@ -40,7 +40,7 @@ publish_update := $(or $(_publish_ot2),$(_publish_ot3))
 branch_suffix := $(if $(publish_update),,-$(subst /,-,$(OT_BRANCH)))
 build_id := $(or $(and $(OT_BUILD),b$(OT_BUILD)$(branch_suffix)),dev)
 OPENTRONS_PROJECT ?= $(if $(filter ot3@%,$(publish_update)),ot3,robot-stack)
-$(info "ot tag is $(OT_TAG), publish $(publish_update), branch $(branch_suffix), build id $(build_id), project is $(OPENTRONS_PROJECT)")
+
 # set this to anything on command-line invocations of this makefile to skip bundling
 # standalone python, as is necessary for on-device app builds:
 # make dist no_python_bundle=true or =1 or whatever

@@ -99,7 +99,6 @@ jobs:
       matrix:
         os: ['windows-2022', 'ubuntu-22.04', 'macos-latest']
     name: 'opentrons app backend unit tests and build'
-    needs: ['js-unit-test']
     runs-on: ${{ matrix.os }}
     steps:
       - uses: 'actions/checkout@v3'
@@ -178,8 +177,7 @@ jobs:
     strategy:
       matrix:
         os: ['windows-2022', 'ubuntu-22.04', 'macos-latest']
-    name: 'opentrons app backend unit tests and build'
-    needs: ['js-unit-test']
+    name: 'opentrons app backend unit tests and build for OT3'
     runs-on: ${{ matrix.os }}
     steps:
       - uses: 'actions/checkout@v3'
