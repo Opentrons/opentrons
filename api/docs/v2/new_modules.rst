@@ -223,7 +223,7 @@ To check whether a custom labware definition specifies engage height for the Mag
 Engaging and Disengaging
 ========================
 
-Raising and lowering the module's magnets are done with the  :py:meth:`~.MagneticModuleContext.engage` and :py:meth:`.MagneticModuleContext.disengage` functions, respectively.
+Raising and lowering the module's magnets are done with the  :py:meth:`~.MagneticModuleContext.engage` and :py:meth:`~.MagneticModuleContext.disengage` functions, respectively.
 
 If your loaded labware is fully compatible with the Magnetic Module, you can call ``engage()`` with no argument:
 
@@ -235,21 +235,19 @@ If your loaded labware is fully compatible with the Magnetic Module, you can cal
 
 This will move the magnets upward to the default height for the labware, which should be close to the bottom of the labware's wells. If your loaded labware doesn't specify a default height, this will raise an ``ExceptionInProtocolError``.
 
-For certain applications, you may want to move the magnets to a different height. [TK note about GEN1 half-millimeters vs. GEN2 true millimeters]. You can specify one (and only one) of three parameters to alter the height:
+For certain applications, you may want to move the magnets to a different height. The recommended way is to use the ``height_from_base`` parameter, which represents the distance above the base of the labware (its lowest point, where it rests on the module). Setting ``height_from_base=0`` should move the tops of the magnets level with the base of the labware. Alternatively, you can use the ``offset`` parameter, which represent the distance above *or below* the labware's default position (close to the bottom of its wells). Like using ``engage()`` with no argument, this will raise an error if there is no default height for the loaded labware.
 
-- ``height_from_base`` is the distance above the base of the labware (its lowest point, where it rests on the module). This is the recommended way to adjust the magnets' height. Setting a value of ``0`` should move the tops of the magnets level with the base of the labware. However, there is up to 1 mm of manufacturing variance across Magnetic Module units, so observe the exact position and adjust as necessary before running your protocol.
-- ``height`` is the distance above the magnets' home position, which is 2.5 mm below the labware base position.
-- ``offset`` is the distance from the labware's default position (close to the bottom of its wells). Like using ``engage()`` with no argument, this will raise an error if there is no default height for the loaded labware.
+.. note::
+    There is up to 1 mm of manufacturing variance across Magnetic Module units, so observe the exact position and adjust as necessary before running your protocol.
 
-Here are some examples of where the magnets will move when using the different parameters, in combination with the loaded NEST PCR plate, which specifies a default height of 20 mm:
+Here are some examples of where the magnets will move when using the different parameters in combination with the loaded NEST PCR plate, which specifies a default height of 20 mm:
 
   .. code-block:: python
 
       mag_mod.engage(height_from_base=13.5)  # 13.5 mm
-      mag_mod.engage(height=18.5)            # 16.0 mm
-      mag_mod.engage(offset=-2)              # 18.0 mm
+      mag_mod.engage(offset=-2)              # 15.5 mm
 
-Note that both ``height`` and ``offset`` take into account the fact that the magnets' home position is measured as −2.5 mm.
+Note that ``offset`` takes into account the fact that the magnets' home position is measured as −2.5 mm for GEN2 modules.
 
   .. versionadded:: 2.0
   .. versionchanged:: 2.2
@@ -272,14 +270,9 @@ If at any point you need to check whether the magnets are engaged or not, use th
 Changes with the GEN2 Magnetic Module
 =====================================
 
-The GEN2 Magnetic Module uses smaller magnets than the GEN1 version.
-This mitigates an issue where beads would be attracted even when the magnets were retracted.
+The GEN2 Magnetic Module uses smaller magnets than the GEN1 version to mitigate an issue with the magnets attracting beads even from their retracted position.
 
-This means it will take longer for the GEN2 module to attract beads. If you need additional strength for your application, use the available `Adapter Magnets <https://support.opentrons.com/s/article/Adapter-magnets>`_.
-
-Recommended Magnetic Module GEN2 bead attraction time:
-    - Total liquid volume <= 50 uL: 5 minutes
-    - Total liquid volume > 50 uL: 7 minutes
+This means it takes longer for the GEN2 module to attract beads. The recommended attraction time is 5 minutes for liquid volumes up to 50 µL and 7 minutes for volumes greater than 50 µL. If your application needs additional magnetic strength to attract beads within  these timeframes, use the available `Adapter Magnets <https://support.opentrons.com/s/article/Adapter-magnets>`_.
 
 
 .. _thermocycler-module:
