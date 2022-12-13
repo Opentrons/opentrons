@@ -90,6 +90,10 @@ def start_initializing_persistence(
         and _sql_engine_init_task_accessor.get_from(app_state=app_state) is None
     ), "Cannot initialize more than once."
 
+    # We keep initialization of the persistence directory separate, and do not combine
+    # it with initialization of the SQL engine. This lets PersistenceResetter remain
+    # usable even if initializing the SQL engine fails, which is important to let users
+    # recover from corrupt databases.
     directory_init_task = asyncio.create_task(init_directory_and_log())
     _directory_init_task_accessor.set_on(app_state=app_state, value=directory_init_task)
 
