@@ -62,6 +62,7 @@ class ProtocolReader:
         all_files: List[RoleAnalysisFile] = [
             role_analysis.main_file,
             *role_analysis.labware_files,
+            *role_analysis.data_files,
         ]
 
         await self._file_reader_writer.write(directory=directory, files=all_files)

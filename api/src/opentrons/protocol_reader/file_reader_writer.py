@@ -1,4 +1,5 @@
 """Input file reading."""
+import json
 from json import JSONDecodeError
 from anyio import Path as AsyncPath, create_task_group, wrap_file
 from dataclasses import dataclass
@@ -63,7 +64,11 @@ class FileReaderWriter:
 
             if filename.lower().endswith(".json"):
                 try:
-                    data = parse_raw_as(BufferedJsonFileData, contents)  # type: ignore[arg-type]
+                    json_dict = json.loads(contents)
+                    if json_dict.get('$otSharedSchema'):
+                        data = parse_raw_as(Union[JsonProtocol, ProtocolSchemaV6], contents)  # type: ignore[arg-type]
+                    elif json_dict.get('schemaVersion'):
+                        data = parse_raw_as(LabwareDefinition, contents)
 
                 # unlike other Pydantic functions/methods, `parse_raw_as` can
                 # raise both JSONDecodeError and ValidationError separately

@@ -30,6 +30,7 @@ class ProtocolFileRole(str, Enum):
 
     MAIN = "main"
     LABWARE = "labware"
+    DATA = "data"
 
 
 @dataclass(frozen=True)

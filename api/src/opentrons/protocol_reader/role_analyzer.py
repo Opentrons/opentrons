@@ -33,6 +33,12 @@ class LabwareFile(RoleAnalysisFile):
     role: Literal[ProtocolFileRole.LABWARE] = ProtocolFileRole.LABWARE
 
 
+@dataclass(frozen=True)
+class DataFile(RoleAnalysisFile):
+
+    role: Union[Literal[ProtocolFileRole.DATA]] = ProtocolFileRole.DATA
+
+
 # TODO(mc, 2021-12-07): add support for python support files and data files
 @dataclass(frozen=True)
 class RoleAnalysis:
@@ -41,6 +47,7 @@ class RoleAnalysis:
     main_file: MainFile
     labware_files: List[LabwareFile]
     labware_definitions: List[LabwareDefinition]
+    data_files: List[DataFile]
 
 
 class RoleAnalysisError(ValueError):
@@ -58,6 +65,7 @@ class RoleAnalyzer:
 
         main_file_candidates = []
         labware_files = []
+        bundled_data_files = []
 
         for f in files:
             if f.name.lower().endswith(".py") or isinstance(
@@ -75,6 +83,12 @@ class RoleAnalyzer:
             elif isinstance(f.data, LabwareDefinition):
                 labware_files.append(
                     LabwareFile(
+                        name=f.name, contents=f.contents, data=f.data, path=f.path
+                    )
+                )
+            else:
+                bundled_data_files.append(
+                    DataFile(
                         name=f.name, contents=f.contents, data=f.data, path=f.path
                     )
                 )
@@ -108,4 +122,5 @@ class RoleAnalyzer:
             main_file=main_file,
             labware_files=labware_files,
             labware_definitions=labware_definitions,
+            data_files=bundled_data_files,
         )
