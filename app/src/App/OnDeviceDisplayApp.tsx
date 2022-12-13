@@ -10,6 +10,9 @@ import {
 
 import { BackButton } from '../atoms/buttons'
 import { ConnectedNetworkInfo } from '../pages/OnDeviceDisplay/ConnectedNetworkInfo'
+import { ConnectViaEthernet } from '../pages/OnDeviceDisplay/ConnectViaEthernet'
+import { ConnectViaUSB } from '../pages/OnDeviceDisplay/ConnectViaUSB'
+import { ConfirmRobotName } from '../pages/OnDeviceDisplay/ConfirmRobotName'
 import { InitialSplash } from '../pages/OnDeviceDisplay/InitialSplash'
 import { NetworkSetupMenu } from '../pages/OnDeviceDisplay/NetworkSetupMenu'
 import { RobotDashboard } from '../pages/OnDeviceDisplay/RobotDashboard'
@@ -57,26 +60,22 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     path: '/network-setup/wifi/connected-network-info/:ssid',
   },
   {
-    Component: () => (
-      <>
-        <BackButton />
-        <Box>connect via ethernet</Box>
-      </>
-    ),
+    Component: ConnectViaEthernet,
     exact: true,
     name: 'Connect via Ethernet',
     path: '/network-setup/ethernet',
   },
   {
-    Component: () => (
-      <>
-        <BackButton />
-        <Box>connect via usb</Box>
-      </>
-    ),
+    Component: ConnectViaUSB,
     exact: true,
     name: 'Connect via USB',
     path: '/network-setup/usb',
+  },
+  {
+    Component: ConfirmRobotName,
+    exact: true,
+    name: 'Name confirmation',
+    path: '/network-setup/end',
   },
   {
     Component: () => (

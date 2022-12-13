@@ -26,7 +26,8 @@ import {
   LabwareDefinition2,
   MAGNETIC_MODULE_TYPE,
   ModuleType,
-  TC_MODULE_LOCATION,
+  TC_MODULE_LOCATION_OT2,
+  TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
@@ -55,6 +56,7 @@ const LabwareRow = styled.div`
 interface LabwareListItemProps extends LabwareSetupItem {
   attachedModuleInfo: { [moduleId: string]: ModuleRenderInfoForProtocol }
   extraAttentionModules: ModuleTypesThatRequireExtraAttention[]
+  isOt3: boolean
 }
 
 export function LabwareListItem(
@@ -68,6 +70,7 @@ export function LabwareListItem(
     moduleModel,
     moduleLocation,
     extraAttentionModules,
+    isOt3,
   } = props
   const { t } = useTranslation('protocol_setup')
   const [
@@ -104,7 +107,7 @@ export function LabwareListItem(
     )
     let moduleSlotName = moduleLocation.slotName
     if (moduleType === THERMOCYCLER_MODULE_TYPE) {
-      moduleSlotName = TC_MODULE_LOCATION
+      moduleSlotName = isOt3 ? TC_MODULE_LOCATION_OT3 : TC_MODULE_LOCATION_OT2
     }
     slotInfo = t('module_slot_location', {
       slotName: moduleSlotName,

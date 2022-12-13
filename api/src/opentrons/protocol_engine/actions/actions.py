@@ -14,7 +14,7 @@ from opentrons.hardware_control.modules import LiveData
 
 from ..commands import Command, CommandCreate
 from ..errors import ProtocolEngineError
-from ..types import LabwareOffsetCreate, ModuleDefinition, Liquid, StaticPipetteConfig
+from ..types import LabwareOffsetCreate, ModuleDefinition, Liquid
 
 
 @dataclass(frozen=True)
@@ -175,7 +175,10 @@ class AddPipetteConfigAction:
     """Adds a pipette's static config to the state store."""
 
     pipette_id: str
-    static_config: StaticPipetteConfig
+    model: str
+    min_volume: float
+    max_volume: float
+    channels: int
 
 
 Action = Union[
