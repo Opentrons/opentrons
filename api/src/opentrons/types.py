@@ -198,6 +198,9 @@ class DeckSlotName(str, enum.Enum):
         str_val = str(value)
         return cls(str_val)
 
+    def as_int(self) -> int:
+        return int(self.value)
+
     def __str__(self) -> str:
         """Stringify to a simple integer string."""
         return str(self.value)

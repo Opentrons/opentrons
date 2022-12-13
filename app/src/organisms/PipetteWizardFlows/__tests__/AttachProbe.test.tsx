@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import { LEFT } from '@opentrons/shared-data'
+import { LEFT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import {
   mockAttachedPipette,
@@ -39,6 +39,7 @@ describe('AttachProbe', () => {
       setShowErrorMessage: jest.fn(),
       isRobotMoving: false,
       isExiting: false,
+      selectedPipette: SINGLE_MOUNT_PIPETTES,
     }
   })
   it('returns the correct information, buttons work as expected', async () => {
@@ -57,12 +58,8 @@ describe('AttachProbe', () => {
           params: { mount: 'left' },
         },
         {
-          commandType: 'home',
-          params: { axes: ['leftZ'] },
-        },
-        {
-          commandType: 'calibration/moveToLocation',
-          params: { pipetteId: 'abc', location: 'attachOrDetach' },
+          commandType: 'calibration/moveToMaintenancePosition',
+          params: { mount: 'left' },
         },
       ],
       false
@@ -84,7 +81,7 @@ describe('AttachProbe', () => {
     const { getByText, getByAltText } = render(props)
     getByText('Stand Back, Pipette is Calibrating')
     getByText(
-      'The calibration probe will touch the sides of the calibration divot in slot 5 to determine its exact position'
+      'The calibration probe will touch the sides of the calibration divot in slot 2 to determine its exact position'
     )
     getByAltText('Pipette is calibrating')
   })

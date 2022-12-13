@@ -1,7 +1,11 @@
 import * as React from 'react'
 import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import { LEFT } from '@opentrons/shared-data'
+import {
+  LEFT,
+  NINETY_SIX_CHANNEL,
+  SINGLE_MOUNT_PIPETTES,
+} from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import {
   mockAttachedGen3Pipette,
@@ -39,6 +43,7 @@ describe('BeforeBeginning', () => {
   let props: React.ComponentProps<typeof BeforeBeginning>
   beforeEach(() => {
     props = {
+      selectedPipette: SINGLE_MOUNT_PIPETTES,
       robotName: 'otie',
       mount: LEFT,
       goBack: jest.fn(),
@@ -58,7 +63,7 @@ describe('BeforeBeginning', () => {
     // mockNeedHelpLink.mockReturnValue(<div>mock need help link</div>)
     mockInProgressModal.mockReturnValue(<div>mock in progress</div>)
   })
-  describe('calibrate flow', () => {
+  describe('calibrate flow single mount', () => {
     it('returns the correct information for calibrate flow', async () => {
       const { getByText, getByAltText, getByRole } = render(props)
       getByText('Before you begin')
@@ -76,10 +81,6 @@ describe('BeforeBeginning', () => {
       expect(props.chainRunCommands).toHaveBeenCalledWith(
         [
           {
-            commandType: 'home',
-            params: {},
-          },
-          {
             commandType: 'loadPipette',
             params: {
               mount: LEFT,
@@ -88,8 +89,8 @@ describe('BeforeBeginning', () => {
             },
           },
           {
-            commandType: 'calibration/moveToLocation',
-            params: { pipetteId: 'abc', location: 'attachOrDetach' },
+            commandType: 'calibration/moveToMaintenancePosition',
+            params: { mount: LEFT },
           },
         ],
         false
@@ -127,7 +128,7 @@ describe('BeforeBeginning', () => {
       getByText('error shmerror')
     })
   })
-  describe('attach flow', () => {
+  describe('attach flow single mount', () => {
     it('renders the modal with all correct text. clicking on proceed button sends commands', async () => {
       props = {
         ...props,
@@ -154,8 +155,8 @@ describe('BeforeBeginning', () => {
       expect(props.chainRunCommands).toHaveBeenCalledWith(
         [
           {
-            commandType: 'home',
-            params: {},
+            commandType: 'calibration/moveToMaintenancePosition',
+            params: { mount: LEFT },
           },
         ],
         false
@@ -165,7 +166,7 @@ describe('BeforeBeginning', () => {
       })
     })
   })
-  describe('detach flow', () => {
+  describe('detach flow single mount', () => {
     it('renders the modal with all correct text. clicking on proceed button sends commands for detach flow', async () => {
       props = {
         ...props,
@@ -186,9 +187,91 @@ describe('BeforeBeginning', () => {
       expect(props.chainRunCommands).toHaveBeenCalledWith(
         [
           {
-            commandType: 'home',
-            params: {},
+            commandType: 'loadPipette',
+            params: {
+              mount: LEFT,
+              pipetteId: 'abc',
+              pipetteName: 'p1000_single_gen3',
+            },
           },
+          {
+            commandType: 'calibration/moveToMaintenancePosition',
+            params: { mount: LEFT },
+          },
+        ],
+        false
+      )
+      await waitFor(() => {
+        expect(props.proceed).toHaveBeenCalled()
+      })
+    })
+  })
+  describe('attach flow 96 channel', () => {
+    it('renders the modal with all the correct text, clicking on proceed button sends commands for attach flow', async () => {
+      props = {
+        ...props,
+        attachedPipette: { left: null, right: null },
+        flowType: FLOWS.ATTACH,
+        selectedPipette: NINETY_SIX_CHANNEL,
+      }
+      const { getByText, getByAltText, getByRole } = render(props)
+      getByText('Before you begin')
+      getByText(
+        'To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
+      )
+      getByText(
+        'The calibration probe is included with the robot and should be stored on the right-hand side of the door opening.'
+      )
+      getByText(
+        'The 96-channel pipette is <weight> so be cautious during uninstall. Having a helper near by can be really useful for this process'
+      )
+      getByAltText('2.5 mm Hex Screwdriver')
+      getByAltText('Calibration Probe')
+      getByAltText('96 Channel Pipette')
+      getByAltText('96 Channel Mounting Plate')
+      getByText(
+        'Provided with robot. Using another size can strip the instruments’s screws.'
+      )
+      const proceedBtn = getByRole('button', {
+        name: 'Move gantry to front',
+      })
+      fireEvent.click(proceedBtn)
+      expect(props.chainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'calibration/moveToMaintenancePosition',
+            params: { mount: LEFT },
+          },
+        ],
+        false
+      )
+      await waitFor(() => {
+        expect(props.proceed).toHaveBeenCalled()
+      })
+    })
+  })
+  describe('detach flow 96 channel', () => {
+    it('renders the modal with all correct text. clicking on proceed button sends commands for detach flow', async () => {
+      props = {
+        ...props,
+        attachedPipette: { left: mockPipette, right: null },
+        flowType: FLOWS.DETACH,
+        selectedPipette: NINETY_SIX_CHANNEL,
+      }
+      const { getByText, getByAltText, getByRole } = render(props)
+      getByText('Before you begin')
+      getByText(
+        'The 96-channel pipette is <weight> so be cautious during uninstall. Having a helper near by can be really useful for this process'
+      )
+      getByText(
+        'To get started, remove labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right'
+      )
+      getByAltText('2.5 mm Hex Screwdriver')
+      getByAltText('Calibration Probe')
+      const proceedBtn = getByRole('button', { name: 'Get started' })
+      fireEvent.click(proceedBtn)
+      expect(props.chainRunCommands).toHaveBeenCalledWith(
+        [
           {
             commandType: 'loadPipette',
             params: {
@@ -198,8 +281,8 @@ describe('BeforeBeginning', () => {
             },
           },
           {
-            commandType: 'calibration/moveToLocation',
-            params: { pipetteId: 'abc', location: 'attachOrDetach' },
+            commandType: 'calibration/moveToMaintenancePosition',
+            params: { mount: LEFT },
           },
         ],
         false
