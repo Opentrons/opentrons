@@ -109,7 +109,6 @@ const mockAttachedPipettes = {
 describe('ChangePipette', () => {
   let props: React.ComponentProps<typeof ChangePipette>
   let dispatchApiRequest: DispatchApiRequestType
-  let startWizard: any
 
   beforeEach(() => {
     props = {
@@ -117,7 +116,6 @@ describe('ChangePipette', () => {
       mount: 'left',
       closeModal: jest.fn(),
     }
-    startWizard = jest.fn()
     dispatchApiRequest = jest.fn()
     mockGetAttachedPipettes.mockReturnValue({ left: null, right: null })
     mockGetRequestById.mockReturnValue(null)

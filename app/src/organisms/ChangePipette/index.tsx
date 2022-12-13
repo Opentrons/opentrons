@@ -324,8 +324,6 @@ export function ChangePipette(props: Props): JSX.Element | null {
       />
     )
   }
-  console.log(wantedPipette)
-  console.log(actualPipette)
   return (
     <ModalShell width="42.375rem">
       <WizardHeader
