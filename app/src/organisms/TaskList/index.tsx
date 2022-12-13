@@ -19,6 +19,8 @@ import {
 import { TertiaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 
+import type { SubTaskProps, TaskProps } from './types'
+
 interface ProgressTrackerItemProps {
   activeIndex: [number, number] | null
   subTasks: SubTaskProps[]
@@ -181,22 +183,6 @@ function ProgressTrackerItem({
   )
 }
 
-interface SubTaskCTA {
-  label: string
-  onClick: () => void
-}
-
-interface SubTaskProps {
-  activeIndex: [number, number] | null
-  description: string
-  subTaskIndex: number
-  taskIndex: number
-  title: string
-  cta?: SubTaskCTA
-  footer?: string
-  isComplete?: boolean
-}
-
 function SubTask({
   activeIndex,
   subTaskIndex,
@@ -253,11 +239,6 @@ function SubTask({
       ) : null}
     </Flex>
   )
-}
-
-interface TaskProps extends Omit<SubTaskProps, 'subTaskIndex'> {
-  subTasks: SubTaskProps[]
-  taskListLength: number
 }
 
 function Task({
