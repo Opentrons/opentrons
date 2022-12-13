@@ -170,9 +170,9 @@ async def find_edge(
     }
 
     def _stride_should_repeat(s: float) -> bool:
-        return bool(s or s > 1)
+        return 0 < s <= 1.0
 
-    def _stop_repeating_stride(s: float, prev: float, count: int) -> bool:
+    def _repeat_should_cancel(s: float, prev: float, count: int) -> bool:
         return s * count < prev
 
     # FIXME: add to shared-data
@@ -185,7 +185,7 @@ async def find_edge(
     while True:
         stride = stride_distance[stride_idx] * stride_direction
         next_probe_pos = _offset_in_axis(next_probe_pos, stride, search_axis)
-        LOG.info(f"Checking position {next_probe_pos}")
+        LOG.warning(f"Checking position {next_probe_pos} (stride={stride})")
         deck_height = await _probe_deck_at(
             hcapi, mount, next_probe_pos, edge_settings.pass_settings
         )
@@ -194,11 +194,12 @@ async def find_edge(
         _probe_touched = deck_height >= allowable_height_range["min"]
         state_change = _probe_touched != last_probe_touched
         last_probe_touched = _probe_touched
-        LOG.info(
+        LOG.warning(
             f"Probe found height {deck_height} "
             f"is {'' if _probe_touched else 'not '}valid"
         )
         _repeat = _stride_should_repeat(stride)
+        LOG.warning(f"state_change={state_change}, repeat={_repeat}")
         if state_change or not _repeat:
             stride_idx += 1
             stride_repeat_counter = 0
@@ -206,7 +207,7 @@ async def find_edge(
         else:
             stride_repeat_counter += 1
             _prev_stride = stride_distance[stride_idx - 1]
-            if _stop_repeating_stride(stride, _prev_stride, stride_repeat_counter):
+            if _repeat_should_cancel(stride, _prev_stride, stride_repeat_counter):
                 # don't go back and probe somewhere we already probed
                 # instead, reduce stride size, and continue pecking, same direction
                 stride_idx += 1
