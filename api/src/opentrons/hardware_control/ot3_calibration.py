@@ -170,10 +170,10 @@ async def find_edge(
     }
 
     def _stride_should_repeat(s: float) -> bool:
-        return 0 < s <= 1.0
+        return 0 < abs(s) <= 1.0
 
     def _repeat_should_cancel(s: float, prev: float, count: int) -> bool:
-        return s * count < prev
+        return abs(s) * count >= abs(prev)
 
     # FIXME: add to shared-data
     stride_distance = [0, 4, 1, 0.25, 0.0625]
@@ -201,13 +201,16 @@ async def find_edge(
         _repeat = _stride_should_repeat(stride)
         LOG.warning(f"state_change={state_change}, repeat={_repeat}")
         if state_change or not _repeat:
+            LOG.warning("going to next stride")
             stride_idx += 1
             stride_repeat_counter = 0
             stride_direction *= -1 if state_change else 1
         else:
+            LOG.warning("repeating previous stride")
             stride_repeat_counter += 1
             _prev_stride = stride_distance[stride_idx - 1]
             if _repeat_should_cancel(stride, _prev_stride, stride_repeat_counter):
+                LOG.warning("actually...cancelling repeat, going to next stride")
                 # don't go back and probe somewhere we already probed
                 # instead, reduce stride size, and continue pecking, same direction
                 stride_idx += 1

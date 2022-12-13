@@ -131,7 +131,6 @@ class CapacitivePassSettings:
 
 @dataclass(frozen=True)
 class ZSenseSettings:
-    point: Offset
     pass_settings: CapacitivePassSettings
 
 
