@@ -8,10 +8,10 @@ import { onDeviceDisplayRoutes } from '../../../App/OnDeviceDisplayApp'
 
 import type { RouteProps } from '../../../App/types'
 
-export function RobotDashboard(): JSX.Element {
+export function ODDMenu(): JSX.Element {
   return (
     <>
-      <Flex marginBottom="2rem">Robot Dashboard</Flex>
+      <Flex marginBottom="2rem">ODDMenu</Flex>
       {/* TODO(bh, 2022-12-7): TEMP links to all routes to allow development throughout the app */}
       {onDeviceDisplayRoutes.map((route: RouteProps) => (
         <Flex key={route.path} margin="0.5rem">
