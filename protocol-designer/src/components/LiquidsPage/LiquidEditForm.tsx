@@ -13,7 +13,6 @@ import {
   PrimaryButton,
 } from '@opentrons/components'
 import { selectors } from '../../labware-ingred/selectors'
-import { selectors as featureFlagSelectors } from '../../feature-flags'
 import styles from './LiquidEditForm.css'
 import formStyles from '../forms/forms.css'
 
@@ -51,9 +50,6 @@ export const liquidEditFormSchema: Yup.Schema<
 
 export function LiquidEditForm(props: Props): JSX.Element {
   const { deleteLiquidGroup, cancelForm, canDelete, saveForm } = props
-  const enableLiquidColorEnhancements = useSelector(
-    featureFlagSelectors.getEnabledLiquidColorEnhancements
-  )
   const selectedLiquid = useSelector(selectors.getSelectedLiquidGroupState)
   const nextGroupId = useSelector(selectors.getNextLiquidGroupId)
   const liquidId = selectedLiquid.liquidGroupId ?? nextGroupId
@@ -118,18 +114,16 @@ export function LiquidEditForm(props: Props): JSX.Element {
                     onChange={handleChange}
                   />
                 </FormGroup>
-                {enableLiquidColorEnhancements ? (
-                  <FormGroup label={i18n.t('form.liquid_edit.displayColor')}>
-                    <Field
-                      name="displayColor"
-                      component={ColorPicker}
-                      value={values.displayColor}
-                      onChange={(color: ColorResult['hex']) => {
-                        setFieldValue('displayColor', color)
-                      }}
-                    />
-                  </FormGroup>
-                ) : null}
+                <FormGroup label={i18n.t('form.liquid_edit.displayColor')}>
+                  <Field
+                    name="displayColor"
+                    component={ColorPicker}
+                    value={values.displayColor}
+                    onChange={(color: ColorResult['hex']) => {
+                      setFieldValue('displayColor', color)
+                    }}
+                  />
+                </FormGroup>
               </div>
             </section>
 
