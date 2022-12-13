@@ -37,8 +37,7 @@
   "displayName": "Thermocycler Module GEN2",
   "quirks": [],
   "slotTransforms": {
-    "ot3_standard":
-    {
+    "ot3_standard": {
       "7": {
         "labwareOffset": [
           [1, 0, 0, -19.88],
