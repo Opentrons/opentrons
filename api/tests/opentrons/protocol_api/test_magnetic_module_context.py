@@ -7,6 +7,7 @@ from opentrons.hardware_control.modules import MagneticStatus
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, MagneticModuleContext
 from opentrons.protocol_api.core.common import ProtocolCore, MagneticModuleCore
+from opentrons.protocol_api.core.core_map import LoadedCoreMap
 
 
 @pytest.fixture
@@ -19,6 +20,12 @@ def mock_core(decoy: Decoy) -> MagneticModuleCore:
 def mock_protocol_core(decoy: Decoy) -> ProtocolCore:
     """Get a mock protocol implementation core."""
     return decoy.mock(cls=ProtocolCore)
+
+
+@pytest.fixture
+def mock_core_map(decoy: Decoy) -> LoadedCoreMap:
+    """Get a mock LoadedCoreMap."""
+    return decoy.mock(cls=LoadedCoreMap)
 
 
 @pytest.fixture
@@ -38,12 +45,14 @@ def subject(
     api_version: APIVersion,
     mock_core: MagneticModuleCore,
     mock_protocol_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
     mock_broker: Broker,
 ) -> MagneticModuleContext:
     """Get a magnetic module context with its dependencies mocked out."""
     return MagneticModuleContext(
         core=mock_core,
         protocol_core=mock_protocol_core,
+        core_map=mock_core_map,
         broker=mock_broker,
         api_version=api_version,
     )

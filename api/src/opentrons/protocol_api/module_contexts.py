@@ -27,6 +27,7 @@ from .core.common import (
     ThermocyclerCore,
     HeaterShakerCore,
 )
+from .core.core_map import LoadedCoreMap
 
 from .module_validation_and_errors import (
     validate_heater_shaker_temperature,
@@ -54,12 +55,14 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
         self,
         core: ModuleCore,
         protocol_core: ProtocolCore,
+        core_map: LoadedCoreMap,
         api_version: APIVersion,
         broker: Broker,
     ) -> None:
         super().__init__(broker=broker)
         self._core = core
         self._protocol_core = protocol_core
+        self._core_map = core_map
         self._api_version = api_version
         self._labware: Optional[Labware] = None
 
@@ -133,6 +136,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
         )
 
         labware = self._core.add_labware_core(labware_core)
+        self._core_map.add(labware_core, labware)
 
         return labware
 

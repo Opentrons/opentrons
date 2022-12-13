@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod, ABC
-from typing import Dict, Generic, Optional, Union
+from typing import Dict, Generic, List, Optional, Union
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -22,6 +22,12 @@ from .module import ModuleCoreType
 class AbstractProtocol(
     ABC, Generic[InstrumentCoreType, LabwareCoreType, ModuleCoreType]
 ):
+    @property
+    @abstractmethod
+    def fixed_trash(self) -> LabwareCoreType:
+        """Get the fixed trash labware core."""
+        ...
+
     @abstractmethod
     def get_bundled_data(self) -> Dict[str, bytes]:
         """Get a mapping of name to contents"""
@@ -92,10 +98,6 @@ class AbstractProtocol(
         ...
 
     @abstractmethod
-    def get_loaded_instruments(self) -> Dict[Mount, Optional[InstrumentCoreType]]:
-        ...
-
-    @abstractmethod
     def pause(self, msg: Optional[str]) -> None:
         ...
 
@@ -113,10 +115,6 @@ class AbstractProtocol(
 
     @abstractmethod
     def home(self) -> None:
-        ...
-
-    @abstractmethod
-    def get_fixed_trash(self) -> LabwareCoreType:
         ...
 
     @abstractmethod
@@ -163,3 +161,11 @@ class AbstractProtocol(
     @abstractmethod
     def get_highest_z(self) -> float:
         """Get the highest Z point of all deck items."""
+
+    @abstractmethod
+    def get_labware_cores(self) -> List[LabwareCoreType]:
+        """Get all loaded labware cores."""
+
+    @abstractmethod
+    def get_module_cores(self) -> List[ModuleCoreType]:
+        """Get all loaded module cores."""

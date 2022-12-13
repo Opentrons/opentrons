@@ -372,17 +372,6 @@ class LegacyThermocyclerCore(
         """
         self._geometry.flag_unsafe_move(to_loc, from_loc, self.get_lid_position())
 
-    def _get_fixed_trash(self) -> Labware:
-        trash = self._protocol_core.get_fixed_trash()
-
-        if isinstance(trash, LabwareImplementation):
-            trash = Labware(
-                implementation=trash,
-                api_version=self._protocol_core.api_version,
-            )
-
-        return trash
-
     def _prepare_for_lid_move(self) -> None:
         loaded_instruments = [
             instr
@@ -401,8 +390,10 @@ class LegacyThermocyclerCore(
             hardware = protocol_core.get_hardware()
             hardware.retract(instr_core.get_mount())
             high_point = hardware.current_position(instr_core.get_mount())
-            trash_top = self._get_fixed_trash().wells()[0].top()
-            safe_point = trash_top.point._replace(
+            trash_top = protocol_core.fixed_trash.get_well_core("A1").get_top(
+                z_offset=0
+            )
+            safe_point = trash_top._replace(
                 z=high_point[Axis.by_mount(instr_core.get_mount())]
             )
             instr_core.move_to(
