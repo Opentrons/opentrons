@@ -158,7 +158,7 @@ class LabwareCore(AbstractLabware[WellCore]):
         )
 
     def get_deck_slot(self) -> Optional[DeckSlotName]:
-        """Get the deck slot the labware is in, if in a deck slot."""
+        """Get the deck slot the labware is in, if on deck."""
         try:
             return self._engine_client.state.geometry.get_ancestor_slot_name(
                 self.labware_id
