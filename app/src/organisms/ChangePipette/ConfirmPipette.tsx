@@ -150,7 +150,7 @@ function TryAgainButton(props: ConfirmPipetteProps): JSX.Element {
     setWrongWantedPipette,
     wrongWantedPipette,
   } = props
-  const { t } = useTranslation('change_pipette')
+  const { t } = useTranslation(['change_pipette', 'shared'])
 
   if (wantedPipette && attachedWrong && !wrongWantedPipette) {
     return (
@@ -183,7 +183,7 @@ function TryAgainButton(props: ConfirmPipetteProps): JSX.Element {
       <SecondaryButton marginRight={SPACING.spacing3} onClick={exit}>
         {t('leave_attached')}
       </SecondaryButton>
-      <PrimaryButton onClick={tryAgain}>{t('try_again')}</PrimaryButton>
+      <PrimaryButton onClick={tryAgain}>{t('shared:try_again')}</PrimaryButton>
     </>
   )
 }
