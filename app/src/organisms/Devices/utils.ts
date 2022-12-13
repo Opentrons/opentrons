@@ -1,6 +1,7 @@
 import { format, parseISO } from 'date-fns'
-import { PipetteOffsetCalibration } from '../../redux/calibration/api-types'
+import type { PipetteOffsetCalibration } from '../../redux/calibration/api-types'
 import type {
+  FetchPipettesResponseBody,
   FetchPipettesResponsePipette,
   Mount,
 } from '../../redux/pipettes/types'
@@ -44,11 +45,19 @@ export function getIs96ChannelPipetteAttached(
 
 export function getOffsetCalibrationForMount(
   pipetteOffsetCalibrations: PipetteOffsetCalibration[] | null,
+  attachedPipettes:
+    | FetchPipettesResponseBody
+    | { left: undefined; right: undefined },
   mount: Mount
 ): PipetteOffsetCalibration | null {
   if (pipetteOffsetCalibrations === null) {
     return null
   } else {
-    return pipetteOffsetCalibrations.find(cal => cal.mount === mount) || null
+    return (
+      pipetteOffsetCalibrations.find(
+        cal =>
+          cal.mount === mount && cal.pipette === attachedPipettes[mount]?.id
+      ) || null
+    )
   }
 }

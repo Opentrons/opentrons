@@ -81,16 +81,30 @@ export function InstrumentsAndModules({
   // data to the associated card via props
   const pipetteOffsetCalibrations = usePipetteOffsetCalibrations(robotName)
 
+  const allAttachedPipettesHaveOffsetCals = (): boolean => {
+    if (pipetteOffsetCalibrations == null) {
+      return false
+    }
+    for (const [mount, data] of Object.entries(attachedPipettes)) {
+      if (data != null) {
+        if (
+          pipetteOffsetCalibrations.find(
+            cal => cal.mount === mount && cal.pipette === data.id
+          ) === undefined
+        ) {
+          return false
+        }
+      }
+    }
+
+    return true
+  }
+
   useInterval(
     () => {
       dispatch(fetchPipetteOffsetCalibrations(robotName))
     },
-    pipetteOffsetCalibrations === null ||
-      (Array.isArray(pipetteOffsetCalibrations) &&
-        pipetteOffsetCalibrations.length !==
-          Object.keys(attachedPipettes).length)
-      ? 1000
-      : FETCH_PIPETTE_CAL_MS,
+    allAttachedPipettesHaveOffsetCals() ? FETCH_PIPETTE_CAL_MS : 1000,
     true
   )
 
@@ -142,6 +156,7 @@ export function InstrumentsAndModules({
                 }
                 pipetteOffsetCalibration={getOffsetCalibrationForMount(
                   pipetteOffsetCalibrations,
+                  attachedPipettes,
                   LEFT
                 )}
                 mount={LEFT}
@@ -198,6 +213,7 @@ export function InstrumentsAndModules({
                   }
                   pipetteOffsetCalibration={getOffsetCalibrationForMount(
                     pipetteOffsetCalibrations,
+                    attachedPipettes,
                     RIGHT
                   )}
                   mount={RIGHT}

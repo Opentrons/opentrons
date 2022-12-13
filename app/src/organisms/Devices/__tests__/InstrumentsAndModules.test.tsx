@@ -148,6 +148,29 @@ describe('InstrumentsAndModules', () => {
     expect(mockUseInterval.mock.calls[0][1]).toBe(INTERVAL_FREQUENT)
   })
   it('fetches offset calibrations status more frequently when calibrations do not exist for every pipette', () => {
+    const { pipette: pipette1 } = mockPipetteOffsetCalibration1
+    const { pipette: pipette2 } = mockPipetteOffsetCalibration2
+
+    mockUsePipettesQuery.mockReturnValue({
+      data: {
+        left: {
+          id: pipette1,
+          name: `test-${pipette1}`,
+          model: 'p10_single_v1',
+          tip_length: 0,
+          mount_axis: 'z',
+          plunger_axis: 'b',
+        },
+        right: {
+          id: pipette2,
+          name: `test-${pipette2}`,
+          model: 'p10_single_v1',
+          tip_length: 0,
+          mount_axis: 'y',
+          plunger_axis: 'a',
+        },
+      },
+    } as any)
     mockUsePipetteOffsetCalibrations.mockReturnValue([
       mockPipetteOffsetCalibration1,
     ])
@@ -155,6 +178,29 @@ describe('InstrumentsAndModules', () => {
     expect(mockUseInterval.mock.calls[0][1]).toBe(INTERVAL_FREQUENT)
   })
   it('fetches offset calibrations status less frequently when calibrations exist for every pipette', () => {
+    const { pipette: pipette1 } = mockPipetteOffsetCalibration1
+    const { pipette: pipette2 } = mockPipetteOffsetCalibration2
+
+    mockUsePipettesQuery.mockReturnValue({
+      data: {
+        left: {
+          id: pipette1,
+          name: `test-${pipette1}`,
+          model: 'p10_single_v1',
+          tip_length: 0,
+          mount_axis: 'z',
+          plunger_axis: 'b',
+        },
+        right: {
+          id: pipette2,
+          name: `test-${pipette2}`,
+          model: 'p10_single_v1',
+          tip_length: 0,
+          mount_axis: 'y',
+          plunger_axis: 'a',
+        },
+      },
+    } as any)
     mockUsePipetteOffsetCalibrations.mockReturnValue([
       mockPipetteOffsetCalibration1,
       mockPipetteOffsetCalibration2,
