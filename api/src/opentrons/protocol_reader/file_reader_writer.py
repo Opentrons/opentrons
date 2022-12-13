@@ -38,7 +38,7 @@ class FileReadError(Exception):
 class FileReaderWriter:
     """Input file reader/writer interface."""
 
-    @staticmethod
+    @staticmethod  # noqa: C901
     async def read(
         files: Sequence[Union[AbstractInputFile, Path]]
     ) -> List[BufferedFile]:
@@ -65,9 +65,9 @@ class FileReaderWriter:
             if filename.lower().endswith(".json"):
                 try:
                     json_dict = json.loads(contents)
-                    if json_dict.get('$otSharedSchema'):
+                    if json_dict.get("$otSharedSchema"):
                         data = parse_raw_as(Union[JsonProtocol, ProtocolSchemaV6], contents)  # type: ignore[arg-type]
-                    elif json_dict.get('schemaVersion'):
+                    elif json_dict.get("schemaVersion"):
                         data = parse_raw_as(LabwareDefinition, contents)
 
                 # unlike other Pydantic functions/methods, `parse_raw_as` can

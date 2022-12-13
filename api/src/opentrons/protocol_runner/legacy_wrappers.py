@@ -68,7 +68,11 @@ class LegacyFileReader:
         """Read a PAPIv2 protocol into a data structure."""
         protocol_file_path = protocol_source.main_file
         protocol_contents = protocol_file_path.read_text(encoding="utf-8")
-        data_file_paths = [data_file.path for data_file in protocol_source.files if data_file.role == ProtocolFileRole.DATA]
+        data_file_paths = [
+            data_file.path
+            for data_file in protocol_source.files
+            if data_file.role == ProtocolFileRole.DATA
+        ]
 
         return parse(
             protocol_file=protocol_contents,
@@ -81,7 +85,9 @@ class LegacyFileReader:
                 ): cast(LegacyLabwareDefinition, lw.dict(exclude_none=True))
                 for lw in protocol_source.labware_definitions
             },
-            extra_data={data_path.name: data_path.read_bytes() for data_path in data_file_paths}
+            extra_data={
+                data_path.name: data_path.read_bytes() for data_path in data_file_paths
+            },
         )
 
 
@@ -119,7 +125,11 @@ class LegacyContextCreator:
             else None
         )
 
-        bundled_data = protocol.bundled_data if isinstance(protocol, LegacyPythonProtocol) else None
+        bundled_data = (
+            protocol.bundled_data
+            if isinstance(protocol, LegacyPythonProtocol)
+            else None
+        )
 
         return create_protocol_context(
             api_version=protocol.api_level,
@@ -130,7 +140,7 @@ class LegacyContextCreator:
             equipment_broker=equipment_broker,
             extra_labware=extra_labware,
             use_simulating_core=self._USE_SIMULATING_CORE,
-            bundled_data=bundled_data
+            bundled_data=bundled_data,
         )
 
 

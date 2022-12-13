@@ -35,6 +35,7 @@ class LabwareFile(RoleAnalysisFile):
 
 @dataclass(frozen=True)
 class DataFile(RoleAnalysisFile):
+    """An arbitrary data file."""
 
     role: Union[Literal[ProtocolFileRole.DATA]] = ProtocolFileRole.DATA
 
@@ -88,9 +89,7 @@ class RoleAnalyzer:
                 )
             else:
                 bundled_data_files.append(
-                    DataFile(
-                        name=f.name, contents=f.contents, data=f.data, path=f.path
-                    )
+                    DataFile(name=f.name, contents=f.contents, data=f.data, path=f.path)
                 )
 
         if len(main_file_candidates) == 0:

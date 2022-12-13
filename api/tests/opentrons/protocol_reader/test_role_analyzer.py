@@ -194,7 +194,10 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
             main_file=MainFile(name="protocol.py", contents=b"", path=None),
             labware_files=[],
             labware_definitions=[],
-            data_files=[DataFile(name="extra_data.json", contents=b"", path=None, data=None), DataFile(name="extra_data.csv", contents=b"", path=None, data=None)],
+            data_files=[
+                DataFile(name="extra_data.json", contents=b"", path=None, data=None),
+                DataFile(name="extra_data.csv", contents=b"", path=None, data=None),
+            ],
         ),
     ),
 ]

@@ -265,7 +265,10 @@ async def test_read_files_no_copy(
     )
 
     analyzed_roles = RoleAnalysis(
-        main_file=main_file, labware_files=[], labware_definitions=[], data_files=[],
+        main_file=main_file,
+        labware_files=[],
+        labware_definitions=[],
+        data_files=[],
     )
     analyzed_config = ConfigAnalysis(
         metadata={"hey": "there"},
