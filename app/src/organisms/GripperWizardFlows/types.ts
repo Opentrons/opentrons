@@ -59,6 +59,7 @@ export type CreateRunCommand = (
 
 export interface GripperWizardStepProps {
   flowType: GripperWizardFlowType
+  isOnDevice: boolean
   proceed: () => void
   goBack: () => void
   chainRunCommands: (

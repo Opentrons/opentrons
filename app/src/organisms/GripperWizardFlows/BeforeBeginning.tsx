@@ -55,6 +55,7 @@ export const BeforeBeginning = (
     attachedGripper,
     isCreateLoading,
     isRobotMoving,
+    isOnDevice
     // chainRunCommands,
     // setIsBetweenCommands,
   } = props
@@ -106,6 +107,7 @@ export const BeforeBeginning = (
       header={t('before_you_begin')}
       //  TODO(BC, 11/8/22): wire up this URL and unhide the link!
       // getHelp={BEFORE_YOU_BEGIN_URL}
+      height={isOnDevice ? "calc(100vh - 3.5rem)" : "24.625rem"}
       rightHandBody={
         <WizardRequiredEquipmentList equipmentList={equipmentList} />
       }

@@ -8,8 +8,9 @@ import {
   SPACING,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
+import type { StyleProps } from '@opentrons/components'
 
-interface Props {
+interface Props extends StyleProps {
   iconColor: string
   header: string
   isSuccess: boolean
@@ -18,10 +19,10 @@ interface Props {
 }
 
 export function SimpleWizardBody(props: Props): JSX.Element {
-  const { iconColor, children, header, subHeader, isSuccess } = props
+  const { iconColor, children, header, subHeader, isSuccess, ...styleProps } = props
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <Flex flexDirection={DIRECTION_COLUMN} {...styleProps}>
       <Flex
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}

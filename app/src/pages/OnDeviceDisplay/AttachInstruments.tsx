@@ -20,6 +20,10 @@ import { PipetteWizardFlows } from '../../organisms/PipetteWizardFlows'
 import { PrimaryButton, TertiaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 
+import { GripperWizardFlows } from '../../organisms/GripperWizardFlows'
+import { GRIPPER_FLOW_TYPES } from '../../organisms/GripperWizardFlows/constants'
+import { GripperWizardFlowType } from '../../organisms/GripperWizardFlows/types'
+
 import type { Mount } from '../../redux/pipettes/types'
 import type {
   PipetteWizardFlow,
@@ -41,12 +45,7 @@ export function AttachedInstruments(): JSX.Element {
     >
       <PipetteMountItem mount={LEFT} />
       <PipetteMountItem mount={RIGHT} />
-      <Flex gridGap={SPACING.spacing2} alignItems={ALIGN_CENTER}>
-        <StyledText as="h3">GRIPPER ACTIONS:</StyledText>
-        <PrimaryButton >ATTACH GRIPPER</PrimaryButton>
-      </Flex>
-
-
+      <ExtensionMountItem />
 
       {/* temp button to robot dashboard */}
       <Flex
@@ -98,6 +97,60 @@ function PipetteMountItem(props: PipetteMountItemProps): JSX.Element {
         />
       ) : null}
 
+    </Flex>
+  )
+}
+
+const TEMP_STUB_ATTACHED_GRIPPER = {
+  model: 'temp_fake_gripper_model',
+  serialNumber: 'temp_fake_gripper_serial_number',
+}
+
+function ExtensionMountItem(): JSX.Element {
+  // TODO(BC, 2022-12-13): replace with attachedGripper after RLAB-88 is done
+  const [tempAttachedGripper, tempSetAttachedGripper] = React.useState<{
+    model: string
+    serialNumber: string
+  } | null>(null)
+
+  const [
+    openWizardFlowType,
+    setOpenWizardFlowType,
+  ] = React.useState<GripperWizardFlowType | null>(null)
+  const handleAttach: React.MouseEventHandler<HTMLButtonElement> = () => {
+    tempSetAttachedGripper(TEMP_STUB_ATTACHED_GRIPPER)
+    setOpenWizardFlowType(GRIPPER_FLOW_TYPES.ATTACH)
+  }
+
+  const handleDetach: React.MouseEventHandler<HTMLButtonElement> = () => {
+    tempSetAttachedGripper(null)
+    setOpenWizardFlowType(GRIPPER_FLOW_TYPES.DETACH)
+  }
+
+  const handleCalibrate: React.MouseEventHandler<HTMLButtonElement> = () => {
+    setOpenWizardFlowType(GRIPPER_FLOW_TYPES.RECALIBRATE)
+  }
+
+
+  return (
+    <Flex gridGap={SPACING.spacing2} alignItems={ALIGN_CENTER}>
+      <StyledText as="h3">GRIPPER MOUNT ACTIONS:</StyledText>
+      {tempAttachedGripper == null ?
+        (
+          <PrimaryButton onClick={handleAttach}>ATTACH</PrimaryButton>
+        ) : (
+          <>
+            <PrimaryButton onClick={handleDetach}>DETACH</PrimaryButton>
+            <PrimaryButton onClick={handleCalibrate}>CALIBRATE</PrimaryButton>
+          </>
+        )
+      }
+      {openWizardFlowType != null ? (
+        <GripperWizardFlows
+          flowType={openWizardFlowType}
+          closeFlow={() => setOpenWizardFlowType(null)}
+        />
+      ) : null}
     </Flex>
   )
 }

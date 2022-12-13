@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { css } from 'styled-components'
+import { css, StyledProps } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
@@ -18,13 +18,14 @@ import {
 import { StyledText } from '../../atoms/text'
 import { PrimaryButton } from '../../atoms/buttons'
 import { NeedHelpLink } from '../../organisms/CalibrationPanels'
+import type { StyleProps } from '@opentrons/components'
 
 const CAPITALIZE_FIRST_LETTER_STYLE = css`
   &:first-letter {
     text-transform: uppercase;
   }
 `
-export interface GenericWizardTileProps {
+export interface GenericWizardTileProps extends StyleProps {
   rightHandBody: React.ReactNode
   bodyText: React.ReactNode
   header: string
@@ -56,6 +57,7 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
     proceedButtonText,
     proceedIsDisabled,
     proceedButton,
+    ...styleProps
   } = props
   const { t } = useTranslation('shared')
 
@@ -81,6 +83,7 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       height="24.625rem"
       padding={SPACING.spacing6}
+      {...styleProps}
     >
       <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacingXXL}>
         <Flex

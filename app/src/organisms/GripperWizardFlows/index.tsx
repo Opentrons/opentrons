@@ -19,6 +19,8 @@ import { Success } from './Success'
 import { ExitConfirmation } from './ExitConfirmation'
 
 import type { GripperWizardFlowType } from './types'
+import { getIsOnDevice } from '../../redux/config'
+import { useSelector } from 'react-redux'
 
 interface GripperWizardFlowsProps {
   flowType: GripperWizardFlowType
@@ -37,6 +39,7 @@ export const GripperWizardFlows = (
   const totalStepCount = gripperWizardSteps.length - 1
   const currentStep = gripperWizardSteps?.[currentStepIndex]
   const isFinalStep = currentStepIndex === gripperWizardSteps.length - 1
+  const isOnDevice = useSelector(getIsOnDevice)
 
   const goBack = (): void => {
     setCurrentStepIndex(isFinalStep ? currentStepIndex : currentStepIndex - 1)
@@ -112,6 +115,7 @@ export const GripperWizardFlows = (
 
   const sharedProps = {
     flowType,
+    isOnDevice,
     runId,
     attachedGripper,
     proceed,
@@ -183,6 +187,7 @@ export const GripperWizardFlows = (
     <Portal level="top">
       <ModalShell
         width="48rem"
+        fullPage={!!isOnDevice}
         header={
           <WizardHeader
             title={titleByFlowType[flowType]}
