@@ -31,6 +31,7 @@ from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
 from .core.common import ModuleCore, ProtocolCore
+from .core.core_map import LoadedCoreMap
 from .core.labware import AbstractLabware
 from .core.module import (
     AbstractTemperatureModuleCore,
@@ -39,9 +40,6 @@ from .core.module import (
     AbstractHeaterShakerCore,
 )
 from .core.engine.protocol import ProtocolCore as ProtocolEngineCore
-from .core.protocol_api.protocol_context import (
-    ProtocolContextImplementation as LegacyProtocolCore,
-)
 
 from . import validation
 from .deck import Deck
@@ -98,6 +96,8 @@ class ProtocolContext(CommandPublisher):
         api_version: APIVersion,
         implementation: ProtocolCore,
         broker: Optional[Broker] = None,
+        core_map: Optional[LoadedCoreMap] = None,
+        deck: Optional[Deck] = None,
     ) -> None:
         """Build a :py:class:`.ProtocolContext`.
 
@@ -108,30 +108,25 @@ class ProtocolContext(CommandPublisher):
         :param broker: An optional command broker to link to. If not
                       specified, a dummy one is used.
         """
-        super().__init__(broker)
+        if api_version > MAX_SUPPORTED_VERSION:
+            raise RuntimeError(
+                f"API version {api_version} is not supported by this robot software."
+                f" Please reduce your API version to {MAX_SUPPORTED_VERSION} or below"
+                f" or update your robot."
+            )
 
+        super().__init__(broker)
         self._api_version = api_version
         self._implementation = implementation
-
-        if self._api_version > MAX_SUPPORTED_VERSION:
-            raise RuntimeError(
-                f"API version {self._api_version} is not supported by this "
-                f"robot software. Please either reduce your requested API "
-                f"version or update your robot."
-            )
+        self._loaded_cores = core_map or LoadedCoreMap()
+        self._deck = deck or Deck(
+            protocol_core=implementation, core_map=self._loaded_cores
+        )
 
         self._instruments: Dict[Mount, Optional[InstrumentContext]] = {
             mount: None for mount in Mount
         }
         self._modules: Dict[DeckSlotName, ModuleTypes] = {}
-
-        # TODO(mc, 2022-12-06): replace with API version guard once
-        # new `Deck` is fully implemented
-        self._deck: Deck = (
-            Deck(protocol_core=implementation)
-            if not isinstance(implementation, LegacyProtocolCore)
-            else implementation.get_deck()  # type: ignore[attr-defined]
-        )
 
         self._commands: List[str] = []
         self._unsubscribe_commands: Optional[Callable[[], None]] = None

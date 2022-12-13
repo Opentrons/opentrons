@@ -5,8 +5,10 @@ from __future__ import annotations
 from abc import abstractmethod, ABC
 from typing import Dict, Generic, Optional, Union
 
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons.types import Mount, Location, DeckSlotName
+
+from opentrons.types import DeckSlotName, Location, Mount, Point
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import ModuleModel
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
@@ -143,3 +145,21 @@ class AbstractProtocol(
         mount: Optional[Mount] = None,
     ) -> None:
         ...
+
+    @abstractmethod
+    def get_deck_definition(self) -> DeckDefinitionV3:
+        """Get the geometry definition of the robot's deck."""
+
+    @abstractmethod
+    def get_slot_item(
+        self, slot_name: DeckSlotName
+    ) -> Union[LabwareCoreType, ModuleCoreType, None]:
+        """Get the contents of a given slot, if any."""
+
+    @abstractmethod
+    def get_slot_center(self, slot_name: DeckSlotName) -> Point:
+        """Get the absolute coordinate of a slot's center."""
+
+    @abstractmethod
+    def get_highest_z(self) -> float:
+        """Get the highest Z point of all deck items."""

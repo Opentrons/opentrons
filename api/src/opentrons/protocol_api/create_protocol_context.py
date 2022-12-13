@@ -1,6 +1,6 @@
 """ProtocolContext factory."""
 import asyncio
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Optional, Union, cast
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
@@ -17,9 +17,9 @@ from opentrons.protocol_engine.clients import SyncClient, ChildThreadTransport
 from opentrons.protocols.api_support.types import APIVersion
 
 from .protocol_context import ProtocolContext
+from .deck import Deck
 
-
-from .core.protocol import AbstractProtocol
+from .core.common import ProtocolCore as AbstractProtocolCore
 from .core.protocol_api.protocol_context import ProtocolContextImplementation
 from .core.protocol_api.labware_offset_provider import (
     AbstractLabwareOffsetProvider,
@@ -70,7 +70,7 @@ def create_protocol_context(
     """
     sync_hardware: SynchronousAdapter[HardwareControlAPI]
     labware_offset_provider: AbstractLabwareOffsetProvider
-    core: AbstractProtocol[Any, Any, Any]
+    core: Union[ProtocolCore, ProtocolContextSimulation, ProtocolContextImplementation]
 
     if isinstance(hardware_api, ThreadManager):
         sync_hardware = hardware_api.sync
@@ -122,4 +122,13 @@ def create_protocol_context(
             extra_labware=extra_labware,
         )
 
-    return ProtocolContext(api_version=api_version, broker=broker, implementation=core)
+    # TODO(mc, 2022-12-06): add API version guard in addition to instance check
+    # this swap may happen once `ctx.move_labware` off-deck is implemented
+    deck = None if isinstance(core, ProtocolCore) else cast(Deck, core.get_deck())
+
+    return ProtocolContext(
+        api_version=api_version,
+        broker=broker,
+        implementation=cast(AbstractProtocolCore, core),
+        deck=deck,
+    )

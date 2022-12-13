@@ -17,11 +17,12 @@ from opentrons.protocol_api import (
     ProtocolContext,
     InstrumentContext,
     ModuleContext,
+    TemperatureModuleContext,
     Labware,
     Deck,
     validation as mock_validation,
 )
-from opentrons.protocol_api.module_contexts import TemperatureModuleContext
+from opentrons.protocol_api.core.core_map import LoadedCoreMap
 from opentrons.protocol_api.core.labware import LabwareLoadParams
 from opentrons.protocol_api.core.common import (
     InstrumentCore,
@@ -52,11 +53,27 @@ def mock_core(decoy: Decoy) -> ProtocolCore:
 
 
 @pytest.fixture
-def subject(mock_core: ProtocolCore) -> ProtocolContext:
+def mock_core_map(decoy: Decoy) -> LoadedCoreMap:
+    """Get a mock LoadedCoreMap."""
+    return decoy.mock(cls=LoadedCoreMap)
+
+
+@pytest.fixture
+def mock_deck(decoy: Decoy) -> Deck:
+    """Get a mock Deck."""
+    return decoy.mock(cls=Deck)
+
+
+@pytest.fixture
+def subject(
+    mock_core: ProtocolCore, mock_core_map: LoadedCoreMap, mock_deck: Deck
+) -> ProtocolContext:
     """Get a ProtocolContext test subject with its dependencies mocked out."""
     return ProtocolContext(
         api_version=MAX_SUPPORTED_VERSION,
         implementation=mock_core,
+        core_map=mock_core_map,
+        deck=mock_deck,
     )
 
 

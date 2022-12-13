@@ -1,10 +1,11 @@
 import logging
 from typing import Dict, List, Optional, Set, Union
 
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
-from opentrons.types import Mount, Location, DeckSlotName
+from opentrons.types import DeckSlotName, Location, Mount, Point
 from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules import AbstractModule, ModuleModel, ModuleType
@@ -381,3 +382,23 @@ class ProtocolContextImplementation(
     def get_module_cores(self) -> List[legacy_module_core.LegacyModuleCore]:
         """Get loaded module cores."""
         return self._module_cores
+
+    def get_deck_definition(self) -> DeckDefinitionV3:
+        """Get the geometry definition of the robot's deck."""
+        raise NotImplementedError(
+            "LegacyProtocolCore.get_deck_definition not implemented"
+        )
+
+    def get_slot_item(
+        self, slot_name: DeckSlotName
+    ) -> Union[LabwareImplementation, legacy_module_core.LegacyModuleCore, None]:
+        """Get the contents of a given slot, if any."""
+        raise NotImplementedError("LegacyProtocolCore.get_slot_item not implemented")
+
+    def get_slot_center(self, slot_name: DeckSlotName) -> Point:
+        """Get the absolute coordinate of a slot's center."""
+        raise NotImplementedError("LegacyProtocolCore.get_slot_center not implemented.")
+
+    def get_highest_z(self) -> float:
+        """Get the highest Z point of all deck items."""
+        raise NotImplementedError("LegacyProtocolCore.get_highest_z not implemented")
