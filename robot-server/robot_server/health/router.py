@@ -5,7 +5,7 @@ from opentrons import __version__, config, protocol_api
 from opentrons.hardware_control import HardwareControlAPI
 
 from robot_server.hardware import get_hardware
-from robot_server.persistence import get_sql_engine
+from robot_server.persistence import get_sql_engine as ensure_sql_engine_is_ready
 from robot_server.service.legacy.models import V1BasicResponse
 from .models import Health, HealthLinks
 
@@ -36,7 +36,7 @@ async def get_health(
     # block off most of its robot details UI. This prevents the user from trying things
     # like viewing runs and uploading protocols, which would hit "database not ready"
     # errors that would present in a confusing way.
-    sql_engine: object = Depends(get_sql_engine),
+    sql_engine: object = Depends(ensure_sql_engine_is_ready),
 ) -> Health:
     """Get information about the health of the robot server.
 
