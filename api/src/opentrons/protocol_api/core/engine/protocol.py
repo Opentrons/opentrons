@@ -1,12 +1,13 @@
 """ProtocolEngine-based Protocol API core implementation."""
-from typing import Dict, Optional, Type, Union
+from typing import Dict, List, Optional, Type, Union
 from typing_extensions import Literal
 
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
-from opentrons.types import Mount, MountType, Location, DeckSlotName
+from opentrons.types import DeckSlotName, Location, Mount, MountType, Point
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
 from opentrons.hardware_control.modules import AbstractModule
 from opentrons.hardware_control.modules.types import (
@@ -22,6 +23,8 @@ from opentrons.protocol_engine import (
     ModuleLocation,
     ModuleModel as EngineModuleModel,
     LabwareMovementStrategy,
+    LoadedLabware,
+    LoadedModule,
 )
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 
@@ -60,17 +63,29 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         self._engine_client = engine_client
         self._api_version = api_version
         self._sync_hardware = sync_hardware
-        self._fixed_trash_core = LabwareCore(
-            labware_id=engine_client.state.labware.get_fixed_trash_id(),
-            engine_client=engine_client,
-        )
         self._last_location: Optional[Location] = None
         self._last_mount: Optional[Mount] = None
+        self._labware_cores_by_id: Dict[str, LabwareCore] = {}
+        self._module_cores_by_id: Dict[str, ModuleCore] = {}
+        self._load_fixed_trash()
 
     @property
     def api_version(self) -> APIVersion:
         """Get the api version protocol target."""
         return self._api_version
+
+    @property
+    def fixed_trash(self) -> LabwareCore:
+        """Get the fixed trash labware."""
+        trash_id = self._engine_client.state.labware.get_fixed_trash_id()
+        return self._labware_cores_by_id[trash_id]
+
+    def _load_fixed_trash(self) -> None:
+        trash_id = self._engine_client.state.labware.get_fixed_trash_id()
+        self._labware_cores_by_id[trash_id] = LabwareCore(
+            labware_id=trash_id,
+            engine_client=self._engine_client,
+        )
 
     def get_bundled_data(self) -> Dict[str, bytes]:
         """Get a map of file names to byte contents.
@@ -137,10 +152,14 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             version=version or 1,
             display_name=label,
         )
-        return LabwareCore(
+        labware_core = LabwareCore(
             labware_id=load_result.labwareId,
             engine_client=self._engine_client,
         )
+
+        self._labware_cores_by_id[labware_core.labware_id] = labware_core
+
+        return labware_core
 
     def move_labware(
         self,
@@ -214,12 +233,16 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         elif module_type == ModuleType.HEATER_SHAKER:
             module_core_cls = HeaterShakerModuleCore
 
-        return module_core_cls(
+        module_core = module_core_cls(
             module_id=result.moduleId,
             engine_client=self._engine_client,
             api_version=self.api_version,
             sync_module_hardware=SynchronousAdapter(selected_hardware),
         )
+
+        self._module_cores_by_id[module_core.module_id] = module_core
+
+        return module_core
 
     # TODO (tz, 11-23-22): remove Union when refactoring load_pipette for 96 channels.
     # https://opentrons.atlassian.net/browse/RLIQ-255
@@ -247,10 +270,6 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             default_movement_speed=400,
         )
 
-    def get_loaded_instruments(self) -> Dict[Mount, Optional[InstrumentCore]]:
-        """Get all loaded instruments by mount."""
-        raise NotImplementedError("ProtocolCore.get_loaded_instruments not implemented")
-
     def pause(self, msg: Optional[str]) -> None:
         """Pause the protocol."""
         self._engine_client.wait_for_resume(message=msg)
@@ -272,10 +291,6 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
     def home(self) -> None:
         """Move all axes to their home positions."""
         self._engine_client.home(axes=None)
-
-    def get_fixed_trash(self) -> LabwareCore:
-        """Get the fixed trash labware."""
-        return self._fixed_trash_core
 
     def set_rail_lights(self, on: bool) -> None:
         """Set the device's rail lights."""
@@ -307,3 +322,41 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         """Set the last accessed location."""
         self._last_location = location
         self._last_mount = mount
+
+    def get_deck_definition(self) -> DeckDefinitionV3:
+        """Get the geometry definition of the robot's deck."""
+        return self._engine_client.state.labware.get_deck_definition()
+
+    def get_slot_item(
+        self, slot_name: DeckSlotName
+    ) -> Union[LabwareCore, ModuleCore, None]:
+        """Get the contents of a given slot, if any."""
+        loaded_item = self._engine_client.state.geometry.get_slot_item(
+            slot_name=slot_name,
+            allowed_labware_ids=set(self._labware_cores_by_id.keys()),
+            allowed_module_ids=set(self._module_cores_by_id.keys()),
+        )
+
+        if isinstance(loaded_item, LoadedLabware):
+            return self._labware_cores_by_id[loaded_item.id]
+
+        if isinstance(loaded_item, LoadedModule):
+            return self._module_cores_by_id[loaded_item.id]
+
+        return None
+
+    def get_slot_center(self, slot_name: DeckSlotName) -> Point:
+        """Get the absolute coordinate of a slot's center."""
+        return self._engine_client.state.labware.get_slot_center_position(slot_name)
+
+    def get_highest_z(self) -> float:
+        """Get the highest Z point of all deck items."""
+        return self._engine_client.state.geometry.get_all_labware_highest_z()
+
+    def get_labware_cores(self) -> List[LabwareCore]:
+        """Get all loaded labware cores."""
+        return list(self._labware_cores_by_id.values())
+
+    def get_module_cores(self) -> List[ModuleCore]:
+        """Get all loaded module cores."""
+        return list(self._module_cores_by_id.values())

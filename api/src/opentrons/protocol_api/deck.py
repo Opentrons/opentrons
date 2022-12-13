@@ -3,11 +3,15 @@ from dataclasses import dataclass
 from typing import Iterator, List, Mapping, Optional, Tuple, Union
 
 from opentrons_shared_data.deck.dev_types import SlotDefV3
-from opentrons.types import DeckLocation, Location, Point
+from opentrons.motion_planning import adjacent_slots_getters
+from opentrons.types import DeckLocation, DeckSlotName, Location, Point
 
 from .core.common import ProtocolCore
+from .core.core_map import LoadedCoreMap
 from .labware import Labware
 from .module_contexts import ModuleContext
+from . import validation
+
 
 DeckItem = Union[Labware, ModuleContext]
 
@@ -27,62 +31,99 @@ class CalibrationPosition:
     displayName: str
 
 
+def _get_slot_name(slot_key: DeckLocation) -> DeckSlotName:
+    try:
+        return validation.ensure_deck_slot(slot_key)
+    except (TypeError, ValueError) as error:
+        raise KeyError(str(error)) from error
+
+
 class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
     """A dictionary-like object to access Protocol API objects loaded on the deck.
 
     Accessible via :py:meth:`ProtocolContext.deck`.
     """
 
-    def __init__(self, protocol_core: ProtocolCore) -> None:
+    def __init__(self, protocol_core: ProtocolCore, core_map: LoadedCoreMap) -> None:
         self._protocol_core = protocol_core
+        self._core_map = core_map
+
+        deck_locations = protocol_core.get_deck_definition()["locations"]
+
+        self._slot_definitions_by_name = {
+            slot["id"]: slot for slot in deck_locations["orderedSlots"]
+        }
+        self._calibration_positions = [
+            CalibrationPosition(
+                id=point["id"],
+                displayName=point["displayName"],
+                position=(
+                    point["position"][0],
+                    point["position"][1],
+                    point["position"][2],
+                ),
+            )
+            for point in deck_locations["calibrationPoints"]
+        ]
 
     def __getitem__(self, key: DeckLocation) -> Optional[DeckItem]:
         """Get the item, if any, located in a given slot."""
-        raise NotImplementedError("Deck.__getitem__ not implemented")
+        slot_name = _get_slot_name(key)
+        item_core = self._protocol_core.get_slot_item(slot_name)
+        item = self._core_map.get(item_core)
 
-    def __iter__(self) -> Iterator[DeckLocation]:
+        return item
+
+    def __iter__(self) -> Iterator[str]:
         """Iterate through all deck slots."""
-        raise NotImplementedError("Deck.__iter__ not implemented")
+        return iter(self._slot_definitions_by_name)
 
     def __len__(self) -> int:
-        """Get the number of items loaded into the deck."""
-        raise NotImplementedError("Deck.__len__ not implemented")
+        """Get the number of slots on the deck."""
+        return len(self._slot_definitions_by_name)
 
     def right_of(self, slot: DeckLocation) -> Optional[DeckItem]:
         """Get the item directly to the right of the given slot, if any."""
-        raise NotImplementedError("Deck.right_of not implemented")
+        slot_name = _get_slot_name(slot)
+        east_slot = adjacent_slots_getters.get_east_slot(slot_name.as_int())
+
+        return self[east_slot] if east_slot is not None else None
 
     def left_of(self, slot: DeckLocation) -> Optional[DeckItem]:
         """Get the item directly to the left of the given slot, if any."""
-        raise NotImplementedError("Deck.left_of not implemented")
+        slot_name = _get_slot_name(slot)
+        west_slot = adjacent_slots_getters.get_west_slot(slot_name.as_int())
 
-    def position_for(self, key: DeckLocation) -> Location:
+        return self[west_slot] if west_slot is not None else None
+
+    def position_for(self, slot: DeckLocation) -> Location:
         """Get the absolute location of a deck slot's front-left corner."""
-        raise NotImplementedError("Deck.position_for not implemented")
+        slot_definition = self.get_slot_definition(slot)
+        x, y, z = slot_definition["position"]
 
-    def get_slot_definition(self, slot_name: DeckLocation) -> SlotDefV3:
+        return Location(point=Point(x, y, z), labware=slot_definition["id"])
+
+    def get_slot_definition(self, slot: DeckLocation) -> SlotDefV3:
         """Get the geometric definition data of a slot."""
-        raise NotImplementedError("Deck.get_slot_definition not implemented")
+        slot_name = _get_slot_name(slot)
+        return self._slot_definitions_by_name[slot_name.value]
 
-    def get_slot_center(self, slot_name: DeckLocation) -> Point:
+    def get_slot_center(self, slot: DeckLocation) -> Point:
         """Get the absolute coordinates of a slot's center."""
-        raise NotImplementedError("Deck.get_slot_center not implemented")
+        slot_name = _get_slot_name(slot)
+        return self._protocol_core.get_slot_center(slot_name)
 
     @property
     def highest_z(self) -> float:
         """Get the height of the tallest known point on the deck."""
-        raise NotImplementedError("Deck.highest_z not implemented")
+        return self._protocol_core.get_highest_z()
 
     @property
     def slots(self) -> List[SlotDefV3]:
         """Get a list of all slot definitions."""
-        raise NotImplementedError("Deck.slots not implemented")
+        return list(self._slot_definitions_by_name.values())
 
     @property
     def calibration_positions(self) -> List[CalibrationPosition]:
         """Get a list of all calibration positions on the deck."""
-        raise NotImplementedError("Deck.calibration_positions not implemented")
-
-    def get_non_fixture_slots(self) -> List[str]:
-        """Get a list of all slot names that are user-accessible."""
-        raise NotImplementedError("Deck.get_non_fixture_slots not implemented")
+        return list(self._calibration_positions)

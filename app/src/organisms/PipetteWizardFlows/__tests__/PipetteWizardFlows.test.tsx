@@ -412,10 +412,6 @@ describe('PipetteWizardFlows', () => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
         [
           {
-            commandType: 'home',
-            params: {},
-          },
-          {
             commandType: 'loadPipette',
             params: {
               mount: LEFT,
@@ -424,8 +420,8 @@ describe('PipetteWizardFlows', () => {
             },
           },
           {
-            commandType: 'calibration/moveToLocation',
-            params: { pipetteId: 'abc', location: 'attachOrDetach' },
+            commandType: 'calibration/moveToMaintenancePosition',
+            params: { mount: LEFT },
           },
         ],
         false
