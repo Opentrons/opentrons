@@ -145,6 +145,13 @@ mypy-ot2:
 mypy-ot3:
 	$(call python,ot-3/robot-server) -m mypy --python-version 3.8 src tests
 
+.PHONY: mypy-dev
+mypy-dev:
+	$(call python,dev) -m mypy --python-version 3.10 src tests
+
+.PHONY: lint-dev
+lint-dev: black-check flake8 mypy-dev
+
 .PHONY: lint
 lint: black-check flake8 mypy-ot2 mypy-ot3
 

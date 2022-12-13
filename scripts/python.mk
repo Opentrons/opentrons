@@ -1,7 +1,7 @@
 # add node_modules/.bin to PATH
 PATH := $(shell cd .. && yarn bin):$(PATH)
 # because path includes node_modules/.bin shx is on the path
-SHX := yarn -s shx
+SHX := shx
 
 # This environment variable can be used to select a specific
 # Python executable to use to run pipenv. Note: pipenv will not
