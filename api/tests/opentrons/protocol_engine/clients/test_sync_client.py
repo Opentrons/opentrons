@@ -18,7 +18,7 @@ from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from opentrons.types import DeckSlotName, MountType
-from opentrons.protocol_engine import DeckSlotLocation, DeckPoint, MotorAxis, commands
+from opentrons.protocol_engine import DeckSlotLocation, DeckPoint, commands
 from opentrons.protocol_engine.clients import SyncClient, AbstractSyncTransport
 from opentrons.protocol_engine.types import (
     ModuleDefinition,
@@ -431,22 +431,6 @@ def test_wait_for_resume(
 
     result = subject.wait_for_resume(message="hello world")
 
-    assert result == response
-
-
-def test_home(
-    decoy: Decoy,
-    transport: AbstractSyncTransport,
-    subject: SyncClient,
-) -> None:
-    """It should execute a home command."""
-    request = commands.HomeCreate(
-        params=commands.HomeParams(axes=[MotorAxis.X, MotorAxis.LEFT_Z])
-    )
-    response = commands.HomeResult()
-    decoy.when(transport.execute_command(request=request)).then_return(response)
-
-    result = subject.home(axes=[MotorAxis.X, MotorAxis.LEFT_Z])
     assert result == response
 
 
