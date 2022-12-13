@@ -19,7 +19,6 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
-import { InstrumentCard } from '../../molecules/InstrumentCard'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ModuleCard } from '../ModuleCard'
 import {
@@ -33,6 +32,7 @@ import {
   getOffsetCalibrationForMount,
 } from './utils'
 import { PipetteCard } from './PipetteCard'
+import { GripperCard } from '../GripperCard'
 import { fetchPipetteOffsetCalibrations } from '../../redux/calibration'
 
 import type { Dispatch } from '../../redux/types'
@@ -56,6 +56,13 @@ export function InstrumentsAndModules({
   const { isRunTerminal } = useRunStatuses()
   const isOT3 = useIsOT3(robotName)
   const dispatch = useDispatch<Dispatch>()
+
+  // TODO(BC, 2022-12-05): replace with attachedGripper after RLAB-88 is done
+  const [tempAttachedGripper, tempSetAttachedGripper] = React.useState<{
+    model: string
+    serialNumber: string
+  } | null>(null)
+
   const is96ChannelAttached = getIs96ChannelPipetteAttached(
     attachedPipettes?.left ?? null
   )
@@ -70,10 +77,6 @@ export function InstrumentsAndModules({
     : Math.ceil(attachedModules?.length / 2)
   const leftColumnModules = attachedModules?.slice(0, halfAttachedModulesSize)
   const rightColumnModules = attachedModules?.slice(halfAttachedModulesSize)
-
-  // TODO(bh, 2022-10-27): get gripper data, create interface
-  // const gripper = { model: null }
-  const gripper = { model: 'Opentrons Gripper GEN1' }
 
   // The following pipetteOffset related code has been lifted out of the PipetteCard component
   // to eliminate duplicated useInterval calls to `calibration/pipette_offset` coming from each card.
@@ -165,25 +168,10 @@ export function InstrumentsAndModules({
               />
               {/* extension mount here */}
               {isOT3 ? (
-                <InstrumentCard
-                  description={
-                    gripper.model != null ? gripper.model : t('shared:empty')
-                  }
-                  isGripperAttached={gripper.model != null}
-                  label={t('shared:extension_mount')}
-                  // TODO(bh, 2022-10-27): insert gripper recalibrate and detach functions, empty mount menu items
-                  menuOverlayItems={[
-                    {
-                      label: 'Recalibrate gripper',
-                      disabled: gripper.model == null,
-                      onClick: () => console.log('Recalibrate gripper'),
-                    },
-                    {
-                      label: 'Detach gripper',
-                      disabled: gripper.model == null,
-                      onClick: () => console.log('Detach gripper'),
-                    },
-                  ]}
+                <GripperCard
+                  robotName={robotName}
+                  attachedGripper={tempAttachedGripper}
+                  tempSetAttachedGripper={tempSetAttachedGripper}
                 />
               ) : null}
               {leftColumnModules.map((module, index) => (
