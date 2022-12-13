@@ -86,7 +86,7 @@ class Gripper_Force_Test:
         else:
             self.gripper_id = self.api._gripper_handler.get_gripper().gripper_id
         self.test_data["Gripper"] = str(self.gripper_id)
-        # await self._update_vref(self.api, self.vref_default)
+        await self._update_vref(self.api, self.vref_default)
         gripper_config = await get_gripper_jaw_motor_param(self.api._backend._messenger)
         print(f"Initial Gripper Config: {gripper_config}")
         self.start_time = time.time()
