@@ -27,7 +27,7 @@ runs:
           **/Pipfile.*
     - shell: bash
       name: install pipenv on 3.7
-      run: make python-globals OT_PYTHON=$(which python)
+      run: make setup-python-globals OT_PYTHON=$(which python)
     - shell: bash
       working-directory: environments
       name: setup ot2
@@ -41,7 +41,7 @@ runs:
           **/Pipfile.*
     - shell: bash
       name: install pipenv on 3.8
-      run: make python-globals OT_PYTHON=$(which python)
+      run: make setup-python-globals OT_PYTHON=$(which python)
     - shell: bash
       working-directory: environments
       name: setup ot3
@@ -55,7 +55,7 @@ runs:
           **/Pipfile.*
     - shell: bash
       name: install pipenv on 3.10
-      run: make python-globals OT_PYTHON=$(which python)
+      run: make setup-python-globals OT_PYTHON=$(which python)
     - shell: bash
       name: setup the dev and app environment
       run: make setup-py PYTHON_SETUP_DIRS="environments/dev environments/app" -j

@@ -37,7 +37,7 @@ runs:
       run: echo "OT_PYTHON=$(which python)" >> $GITHUB_ENV
     - name: Install pipenv
       shell: bash
-      run: make python-globals
+      run: make setup-python-globals
     - shell: bash
       name: setup ${{ inputs.environment }}
       run: make -C ${{ inputs.environment }} setup

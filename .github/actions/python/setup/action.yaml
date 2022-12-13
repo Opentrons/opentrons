@@ -34,7 +34,7 @@ runs:
           **/Pipfile.*
     - name: install pipenv
       shell: bash
-      run: make python-globals
+      run: make setup-python-globals
     - shell: bash
       name: setup project ${{ inputs.project }}
       run: make -C ${{ inputs.project }} setup
