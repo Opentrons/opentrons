@@ -47,10 +47,10 @@ class Gripper_Force_Test:
         self.pwm_inc = pwm_inc
         self.vref_inc = vref_inc
         self.interval = interval
-        self.pwm_start = 5 # %
-        self.pwm_max = 100 # %
+        self.pwm_start = 10 # %
+        self.pwm_max = 90 # %
         self.vref_default = 1.0 # Volts
-        self.vref_start = 0.5 # Volts
+        self.vref_start = 1.0 # Volts
         self.vref_max = 2.7 # Volts
         self.engage_position = Point(0, 0, -78)
         self.measurement_data = {
@@ -67,6 +67,7 @@ class Gripper_Force_Test:
             "Gripper":"None",
             "Force":"None",
             "Vref":"None",
+            "Firmware Vref":"None",
             "DC":"None",
         }
         self.force_gauge = None
@@ -85,7 +86,7 @@ class Gripper_Force_Test:
         else:
             self.gripper_id = self.api._gripper_handler.get_gripper().gripper_id
         self.test_data["Gripper"] = str(self.gripper_id)
-        await self._update_vref(self.api, self.vref_default)
+        # await self._update_vref(self.api, self.vref_default)
         gripper_config = await get_gripper_jaw_motor_param(self.api._backend._messenger)
         print(f"Initial Gripper Config: {gripper_config}")
         self.start_time = time.time()
@@ -178,8 +179,8 @@ class Gripper_Force_Test:
     async def _home_gripper(
         self, api: OT3API, mount: OT3Mount
     ) -> None:
-        await api.home_gripper_jaw()
         await api.home_z(mount)
+        await api.home_gripper_jaw()
         self.home = await api.gantry_position(mount)
 
     async def _update_vref(
@@ -188,6 +189,8 @@ class Gripper_Force_Test:
         await set_reference_voltage(api._backend._messenger, vref)
         gripper_config = await get_gripper_jaw_motor_param(api._backend._messenger)
         print(f"New Gripper Config: {gripper_config}")
+        fw_vref = round(gripper_config.reference_voltage, 3)
+        self.test_data["Firmware Vref"] = str(fw_vref)
 
     async def exit(self):
         if self.api and self.mount:
@@ -203,6 +206,8 @@ class Gripper_Force_Test:
                     await self._home_gripper(self.api, self.mount)
                     await self._engage_gripper(self.api, self.mount)
                     for vref in np.arange(self.vref_start, self.vref_max + self.vref_inc, self.vref_inc):
+                        vref = round(vref, 1)
+                        time.sleep(2.0)
                         print(f"\n-->> Starting Vref {vref} V")
                         await self._update_vref(self.api, vref)
                         for pwm in np.arange(self.pwm_start, self.pwm_max + self.pwm_inc, self.pwm_inc):
