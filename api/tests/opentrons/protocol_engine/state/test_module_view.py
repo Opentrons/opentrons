@@ -13,7 +13,8 @@ from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     ModuleDefinition,
     ModuleModel,
-    ModuleLocation, LabwareOffsetVector,
+    ModuleLocation,
+    LabwareOffsetVector,
 )
 from opentrons.protocol_engine.state.modules import (
     ModuleView,
@@ -226,30 +227,72 @@ def test_get_properties_by_id(
 @pytest.mark.parametrize(
     argnames=["module_def", "slot", "expected_offset"],
     argvalues=[
-        (lazy_fixture("tempdeck_v1_def"), DeckSlotName.SLOT_1, LabwareOffsetVector(x=-0.15, y=-0.15, z=80.09)),
-        (lazy_fixture("tempdeck_v2_def"), DeckSlotName.SLOT_1, LabwareOffsetVector(x=-1.45, y=-0.15, z=80.09)),
-        (lazy_fixture("tempdeck_v2_def"), DeckSlotName.SLOT_3, LabwareOffsetVector(x=1.15, y=-0.15, z=80.09)),
-        (lazy_fixture("magdeck_v1_def"), DeckSlotName.SLOT_1, LabwareOffsetVector(x=0.125, y=-0.125, z=82.25)),
-        (lazy_fixture("magdeck_v2_def"), DeckSlotName.SLOT_1, LabwareOffsetVector(x=-1.175, y=-0.125, z=82.25)),
-        (lazy_fixture("magdeck_v2_def"), DeckSlotName.SLOT_3, LabwareOffsetVector(x=1.425, y=-0.125, z=82.25)),
-        (lazy_fixture("thermocycler_v1_def"), DeckSlotName.SLOT_7, LabwareOffsetVector(x=0, y=82.56, z=97.8)),
-        (lazy_fixture("thermocycler_v2_def"), DeckSlotName.SLOT_7, LabwareOffsetVector(x=0, y=68.06, z=98.26)),
-        (lazy_fixture("heater_shaker_v1_def"), DeckSlotName.SLOT_1, LabwareOffsetVector(x=-0.125, y=1.125, z=68.275)),
-        (lazy_fixture("heater_shaker_v1_def"), DeckSlotName.SLOT_3, LabwareOffsetVector(x=0.125, y=-1.125, z=68.275)),
-    ]
+        (
+            lazy_fixture("tempdeck_v1_def"),
+            DeckSlotName.SLOT_1,
+            LabwareOffsetVector(x=-0.15, y=-0.15, z=80.09),
+        ),
+        (
+            lazy_fixture("tempdeck_v2_def"),
+            DeckSlotName.SLOT_1,
+            LabwareOffsetVector(x=-1.45, y=-0.15, z=80.09),
+        ),
+        (
+            lazy_fixture("tempdeck_v2_def"),
+            DeckSlotName.SLOT_3,
+            LabwareOffsetVector(x=1.15, y=-0.15, z=80.09),
+        ),
+        (
+            lazy_fixture("magdeck_v1_def"),
+            DeckSlotName.SLOT_1,
+            LabwareOffsetVector(x=0.125, y=-0.125, z=82.25),
+        ),
+        (
+            lazy_fixture("magdeck_v2_def"),
+            DeckSlotName.SLOT_1,
+            LabwareOffsetVector(x=-1.175, y=-0.125, z=82.25),
+        ),
+        (
+            lazy_fixture("magdeck_v2_def"),
+            DeckSlotName.SLOT_3,
+            LabwareOffsetVector(x=1.425, y=-0.125, z=82.25),
+        ),
+        (
+            lazy_fixture("thermocycler_v1_def"),
+            DeckSlotName.SLOT_7,
+            LabwareOffsetVector(x=0, y=82.56, z=97.8),
+        ),
+        (
+            lazy_fixture("thermocycler_v2_def"),
+            DeckSlotName.SLOT_7,
+            LabwareOffsetVector(x=0, y=68.06, z=98.26),
+        ),
+        (
+            lazy_fixture("heater_shaker_v1_def"),
+            DeckSlotName.SLOT_1,
+            LabwareOffsetVector(x=-0.125, y=1.125, z=68.275),
+        ),
+        (
+            lazy_fixture("heater_shaker_v1_def"),
+            DeckSlotName.SLOT_3,
+            LabwareOffsetVector(x=0.125, y=-1.125, z=68.275),
+        ),
+    ],
 )
 def test_get_module_offset(
-        module_def: ModuleDefinition,
-        slot: DeckSlotName,
-        expected_offset: LabwareOffsetVector,
+    module_def: ModuleDefinition,
+    slot: DeckSlotName,
+    expected_offset: LabwareOffsetVector,
 ) -> None:
     """It should return the correct labware offset for module in specified slot."""
     subject = make_module_view(
         slot_by_module_id={"module-id": slot},
-        hardware_by_module_id={"module-id": HardwareModule(
-            serial_number="module-serial",
-            definition=module_def,
-        )}
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="module-serial",
+                definition=module_def,
+            )
+        },
     )
     assert subject.get_module_offset("module-id") == expected_offset
 
