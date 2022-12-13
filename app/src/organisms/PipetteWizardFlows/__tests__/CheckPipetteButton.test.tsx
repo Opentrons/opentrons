@@ -42,6 +42,5 @@ describe('CheckPipetteButton', () => {
     const proceedBtn = getByRole('button', { name: 'continue' })
     fireEvent.click(proceedBtn)
     expect(dispatchApiRequest).toBeCalledWith(mockFetchPipettes('otie'))
-    expect(props.setPending).toHaveBeenCalled()
   })
 })
