@@ -1,7 +1,11 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import { LEFT } from '@opentrons/shared-data'
+import {
+  LEFT,
+  NINETY_SIX_CHANNEL,
+  SINGLE_MOUNT_PIPETTES,
+} from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import {
   mockAttachedPipette,
@@ -37,6 +41,7 @@ describe('DetachPipette', () => {
   beforeEach(() => {
     props = {
       robotName: 'otie',
+      selectedPipette: SINGLE_MOUNT_PIPETTES,
       mount: LEFT,
       goBack: jest.fn(),
       proceed: jest.fn(),
@@ -51,7 +56,7 @@ describe('DetachPipette', () => {
     mockInProgressModal.mockReturnValue(<div>mock in progress</div>)
     mockCheckPipetteButton.mockReturnValue(<div>mock check pipette button</div>)
   })
-  it('returns the correct information, buttons work as expected', () => {
+  it('returns the correct information, buttons work as expected for single mount pipettes', () => {
     const { getByText, getByAltText, getByRole } = render(props)
     getByText('Loosen Screws and Detach')
     getByText(
@@ -70,5 +75,24 @@ describe('DetachPipette', () => {
     }
     const { getByText } = render(props)
     getByText('mock in progress')
+  })
+  it('returns the correct information, buttons work as expected for 96 channel pipettes', () => {
+    props = {
+      ...props,
+      selectedPipette: NINETY_SIX_CHANNEL,
+    }
+    const { getByText, getByAltText, getByRole } = render(props)
+    getByText('Unscrew and Remove 96 Channel Pipette')
+    getByText(
+      'Place your hand onto the pipette so it does not fall. Begin by unscrewing the 4 captive screws found in the front of the 96 channel pipette. Once all the screws are lossened, proceed to slowly remove the pipette by sliding off the supporting pins.'
+    )
+    getByText(
+      'The pipette is heavy so be cautious during uninstall. Having a helper near can be really helpful during this process.'
+    )
+    getByAltText('Unscrew 96 channel pipette')
+    getByText('mock check pipette button')
+    const backBtn = getByRole('button', { name: 'Go back' })
+    fireEvent.click(backBtn)
+    expect(props.goBack).toHaveBeenCalled()
   })
 })
