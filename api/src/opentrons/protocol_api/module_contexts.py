@@ -328,45 +328,31 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
         offset: Optional[float] = None,
         height_from_base: Optional[float] = None,
     ) -> None:
-        """Raise the Magnetic Module's magnets.
+        """Raise the Magnetic Module's magnets.  You can specify how high the magnets 
+        should move:
 
-        You can specify how high the magnets should go in several different ways:
-
-           - If you specify ``height_from_base``, it's measured relative to the bottom
-             of the labware.
+           - No parameter: Move to the default height for the loaded labware. If 
+             the loaded labware has no default, or if no labware is loaded, this will
+             raise an error.
+             
+           - ``height_from_base``: Move this many millimeters above the bottom
+             of the labware. Acceptable values are between ``0`` and ``25``.
 
              This is the recommended way to adjust the magnets' height.
+             
+           - ``offset``: Move this many millimeters above (positive value) or below
+             (negative value) the default height for the loaded labware. The sum of
+             the default height and ``offset`` must be between 0 and 25.
 
-           - If you specify ``height``, it's measured relative to the magnets'
-             home position.
+           - ``height``: Intended to move this many millimeters above the magnets'
+             home position. However, depending on the generation of module and the loaded
+             labware, this may produce unpredictable results. You should normally use 
+             ``height_from_base`` instead.
+             
+             This parameter may be deprecated in a future release of the Python API.
 
-             You should normally use ``height_from_base`` instead.
-
-           - If you specify nothing,
-             the magnets will rise to a reasonable default height
-             based on what labware you've loaded on this Magnetic Module.
-
-             Only certain labware have a defined engage height.
-             If you've loaded a labware that doesn't,
-             or if you haven't loaded any labware, then you'll need to specify
-             a height yourself with ``height`` or ``height_from_base``.
-             Otherwise, an exception will be raised.
-
-           - If you specify ``offset``,
-             it's measured relative to the default height, as described above.
-             A positive number moves the magnets higher and
-             a negative number moves the magnets lower.
-
-        The units of ``height_from_base``, ``height``, and ``offset``
-        depend on which generation of Magnetic Module you're using:
-
-           - For GEN1 Magnetic Modules, they're in *half-millimeters*,
-             for historical reasons. This will not be the case in future
-             releases of the Python Protocol API.
-           - For GEN2 Magnetic Modules, they're in true millimeters.
-
-        You may not specify more than one of
-        ``height_from_base``, ``height``, and ``offset``.
+        You should not specify more than one of these parameters. However, if you do,
+        their order of precedence is ``height``, then ``height_from_base``, then ``offset``.
 
         .. versionadded:: 2.2
             The *height_from_base* parameter.
