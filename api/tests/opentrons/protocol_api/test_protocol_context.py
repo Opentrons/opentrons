@@ -17,17 +17,20 @@ from opentrons.protocol_api import (
     ProtocolContext,
     InstrumentContext,
     ModuleContext,
+    TemperatureModuleContext,
+    MagneticModuleContext,
     Labware,
     Deck,
     validation as mock_validation,
 )
-from opentrons.protocol_api.module_contexts import TemperatureModuleContext
+from opentrons.protocol_api.core.core_map import LoadedCoreMap
 from opentrons.protocol_api.core.labware import LabwareLoadParams
 from opentrons.protocol_api.core.common import (
     InstrumentCore,
     LabwareCore,
     ProtocolCore,
     TemperatureModuleCore,
+    MagneticModuleCore,
 )
 
 
@@ -48,30 +51,56 @@ def _mock_instrument_support_module(
 @pytest.fixture
 def mock_core(decoy: Decoy) -> ProtocolCore:
     """Get a mock implementation core."""
-    return decoy.mock(cls=ProtocolCore)
+    mock_core = decoy.mock(cls=ProtocolCore)
+    decoy.when(mock_core.fixed_trash.get_name()).then_return("cool trash")
+    decoy.when(mock_core.fixed_trash.get_display_name()).then_return("Cool Trash")
+    decoy.when(mock_core.fixed_trash.get_well_columns()).then_return([])
+    return mock_core
 
 
 @pytest.fixture
-def subject(mock_core: ProtocolCore) -> ProtocolContext:
+def mock_core_map(decoy: Decoy) -> LoadedCoreMap:
+    """Get a mock LoadedCoreMap."""
+    return decoy.mock(cls=LoadedCoreMap)
+
+
+@pytest.fixture
+def mock_deck(decoy: Decoy) -> Deck:
+    """Get a mock Deck."""
+    return decoy.mock(cls=Deck)
+
+
+@pytest.fixture
+def subject(
+    mock_core: ProtocolCore, mock_core_map: LoadedCoreMap, mock_deck: Deck
+) -> ProtocolContext:
     """Get a ProtocolContext test subject with its dependencies mocked out."""
     return ProtocolContext(
         api_version=MAX_SUPPORTED_VERSION,
         implementation=mock_core,
+        core_map=mock_core_map,
+        deck=mock_deck,
     )
 
 
 def test_fixed_trash(
-    decoy: Decoy, mock_core: ProtocolCore, subject: ProtocolContext
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    subject: ProtocolContext,
 ) -> None:
     """It should get the fixed trash labware from the core."""
-    mock_labware_core = decoy.mock(cls=LabwareCore)
+    trash_captor = matchers.Captor()
 
-    decoy.when(mock_core.get_fixed_trash()).then_return(mock_labware_core)
-    decoy.when(mock_labware_core.get_name()).then_return("cool trash")
-    decoy.when(mock_labware_core.get_well_columns()).then_return([])
+    decoy.verify(mock_core_map.add(mock_core.fixed_trash, trash_captor), times=1)
+
+    trash = trash_captor.value
+
+    decoy.when(mock_core_map.get(mock_core.fixed_trash)).then_return(trash)
 
     result = subject.fixed_trash
 
+    assert result is trash
     assert isinstance(result, Labware)
     assert result.name == "cool trash"
 
@@ -89,11 +118,8 @@ def test_load_instrument(
 ) -> None:
     """It should create a instrument using its execution core."""
     mock_instrument_core = decoy.mock(cls=InstrumentCore)
-    mock_trash_core = decoy.mock(cls=LabwareCore)
     mock_tip_racks = [decoy.mock(cls=Labware), decoy.mock(cls=Labware)]
 
-    decoy.when(mock_core.get_fixed_trash()).then_return(mock_trash_core)
-    decoy.when(mock_trash_core.get_well_columns()).then_return([])
     decoy.when(mock_validation.ensure_mount("shadowfax")).then_return(Mount.LEFT)
     decoy.when(mock_validation.ensure_lowercase_name("Gandalf")).then_return("gandalf")
     decoy.when(mock_validation.ensure_pipette_name("gandalf")).then_return(
@@ -137,10 +163,7 @@ def test_load_instrument_replace(
 ) -> None:
     """It should allow/disallow pipette replacement."""
     mock_instrument_core = decoy.mock(cls=InstrumentCore)
-    mock_trash_core = decoy.mock(cls=LabwareCore)
 
-    decoy.when(mock_core.get_fixed_trash()).then_return(mock_trash_core)
-    decoy.when(mock_trash_core.get_well_columns()).then_return([])
     decoy.when(mock_validation.ensure_lowercase_name("ada")).then_return("ada")
     decoy.when(mock_validation.ensure_mount(matchers.IsA(Mount))).then_return(
         Mount.RIGHT
@@ -171,6 +194,7 @@ def test_load_instrument_replace(
 def test_load_labware(
     decoy: Decoy,
     mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
     subject: ProtocolContext,
 ) -> None:
     """It should create a labware using its execution core."""
@@ -192,6 +216,7 @@ def test_load_labware(
     ).then_return(mock_labware_core)
 
     decoy.when(mock_labware_core.get_name()).then_return("Full Name")
+    decoy.when(mock_labware_core.get_display_name()).then_return("Display Name")
     decoy.when(mock_labware_core.get_well_columns()).then_return([])
 
     result = subject.load_labware(
@@ -204,6 +229,8 @@ def test_load_labware(
 
     assert isinstance(result, Labware)
     assert result.name == "Full Name"
+
+    decoy.verify(mock_core_map.add(mock_labware_core, result), times=1)
 
 
 def test_load_labware_from_definition(
@@ -246,6 +273,31 @@ def test_load_labware_from_definition(
     assert result.name == "Full Name"
 
 
+def test_loaded_labware(
+    decoy: Decoy,
+    mock_core_map: LoadedCoreMap,
+    mock_core: ProtocolCore,
+    subject: ProtocolContext,
+) -> None:
+    """It should return a list of all loaded modules."""
+    labware_core_4 = decoy.mock(cls=LabwareCore)
+    labware_core_6 = decoy.mock(cls=LabwareCore)
+    labware_4 = decoy.mock(cls=Labware)
+    labware_6 = decoy.mock(cls=Labware)
+
+    decoy.when(mock_core.get_labware_cores()).then_return(
+        [labware_core_4, labware_core_6]
+    )
+    decoy.when(labware_core_4.get_deck_slot()).then_return(DeckSlotName.SLOT_4)
+    decoy.when(labware_core_6.get_deck_slot()).then_return(DeckSlotName.SLOT_6)
+    decoy.when(mock_core_map.get(labware_core_4)).then_return(labware_4)
+    decoy.when(mock_core_map.get(labware_core_6)).then_return(labware_6)
+
+    result = subject.loaded_labwares
+
+    assert result == {4: labware_4, 6: labware_6}
+
+
 def test_move_labware_to_slot(
     decoy: Decoy,
     mock_core: ProtocolCore,
@@ -279,6 +331,7 @@ def test_move_labware_to_slot(
 def test_move_labware_to_module(
     decoy: Decoy,
     mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
     subject: ProtocolContext,
 ) -> None:
     """It should move labware to new module location."""
@@ -295,6 +348,7 @@ def test_move_labware_to_module(
     module_location = TemperatureModuleContext(
         core=mock_module_core,
         protocol_core=mock_core,
+        core_map=mock_core_map,
         api_version=MAX_SUPPORTED_VERSION,
         broker=mock_broker,
     )
@@ -312,6 +366,7 @@ def test_move_labware_to_module(
 def test_load_module(
     decoy: Decoy,
     mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
     subject: ProtocolContext,
 ) -> None:
     """It should load a module."""
@@ -341,7 +396,7 @@ def test_load_module(
     result = subject.load_module(module_name="spline reticulator", location=42)
 
     assert isinstance(result, ModuleContext)
-    assert subject.loaded_modules[3] is result
+    decoy.verify(mock_core_map.add(mock_module_core, result), times=1)
 
 
 def test_load_module_default_location(
@@ -377,7 +432,29 @@ def test_load_module_default_location(
     result = subject.load_module(module_name="spline reticulator", location=42)
 
     assert isinstance(result, ModuleContext)
-    assert subject.loaded_modules[3] is result
+
+
+def test_loaded_modules(
+    decoy: Decoy,
+    mock_core_map: LoadedCoreMap,
+    mock_core: ProtocolCore,
+    subject: ProtocolContext,
+) -> None:
+    """It should return a list of all loaded modules."""
+    module_core_4 = decoy.mock(cls=TemperatureModuleCore)
+    module_core_6 = decoy.mock(cls=MagneticModuleCore)
+    module_4 = decoy.mock(cls=TemperatureModuleContext)
+    module_6 = decoy.mock(cls=MagneticModuleContext)
+
+    decoy.when(mock_core.get_module_cores()).then_return([module_core_4, module_core_6])
+    decoy.when(module_core_4.get_deck_slot()).then_return(DeckSlotName.SLOT_4)
+    decoy.when(module_core_6.get_deck_slot()).then_return(DeckSlotName.SLOT_6)
+    decoy.when(mock_core_map.get(module_core_4)).then_return(module_4)
+    decoy.when(mock_core_map.get(module_core_6)).then_return(module_6)
+
+    result = subject.loaded_modules
+
+    assert result == {4: module_4, 6: module_6}
 
 
 def test_home(

@@ -1,6 +1,6 @@
 {
   "name": "@opentrons/app",
-  "version": "6.2.0",
+  "version": "0.0.0-dev",
   "description": "Opentrons desktop application UI",
   "source": "src/index.tsx",
   "types": "lib/index.d.ts",
@@ -20,10 +20,10 @@
   "dependencies": {
     "@fontsource/public-sans": "4.5.11",
     "@hot-loader/react-dom": "17.0.1",
-    "@opentrons/api-client": "6.2.0",
-    "@opentrons/components": "6.2.0",
-    "@opentrons/react-api-client": "6.2.0",
-    "@opentrons/shared-data": "6.2.0",
+    "@opentrons/api-client": "link:../api-client",
+    "@opentrons/components": "link:../components",
+    "@opentrons/react-api-client": "link:../react-api-client",
+    "@opentrons/shared-data": "link:../shared-data",
     "@thi.ng/paths": "1.6.5",
     "classnames": "2.2.5",
     "connected-react-router": "6.8.0",

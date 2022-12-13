@@ -14,11 +14,12 @@ from python_build_utils import normalize_version
 
 def get_version():
     buildno = os.getenv("BUILD_NUMBER")
+    project = os.getenv("OPENTRONS_PROJECT", "robot-stack")
     if buildno:
         normalize_opts = {"extra_tag": buildno}
     else:
         normalize_opts = {}
-    return normalize_version("notify-server", **normalize_opts)
+    return normalize_version("notify-server", project, **normalize_opts)
 
 
 VERSION = get_version()

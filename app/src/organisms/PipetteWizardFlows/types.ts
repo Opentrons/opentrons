@@ -11,6 +11,8 @@ export type PipetteWizardStep =
   | ResultsStep
   | MountPipetteStep
   | DetachPipetteStep
+  | MountingPlateStep
+  | CarriageStep
 
 export type PipetteWizardFlow =
   | typeof FLOWS.ATTACH
@@ -50,6 +52,12 @@ export interface MountPipetteStep extends BaseStep {
 export interface DetachPipetteStep extends BaseStep {
   section: typeof SECTIONS.DETACH_PIPETTE
 }
+export interface CarriageStep extends BaseStep {
+  section: typeof SECTIONS.CARRIAGE
+}
+export interface MountingPlateStep extends BaseStep {
+  section: typeof SECTIONS.MOUNTING_PLATE
+}
 
 type CreateCommandMutate = ReturnType<
   typeof useCreateCommandMutation
@@ -58,6 +66,8 @@ export type CreateRunCommand = (
   params: Parameters<CreateCommandMutate>,
   options?: Parameters<CreateCommandMutate>[1]
 ) => ReturnType<CreateCommandMutate>
+
+export type SelectablePipettes = '96-Channel' | 'Single-Channel_and_8-Channel'
 
 export interface PipetteWizardStepProps {
   flowType: PipetteWizardFlow
@@ -74,6 +84,5 @@ export interface PipetteWizardStepProps {
   setShowErrorMessage: React.Dispatch<React.SetStateAction<string | null>>
   errorMessage: string | null
   robotName: string
+  selectedPipette: SelectablePipettes
 }
-
-export type SelectablePipettes = '96-Channel' | 'Single-Channel_and_8-Channel'
