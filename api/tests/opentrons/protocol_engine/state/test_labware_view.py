@@ -747,8 +747,13 @@ def test_get_by_slot() -> None:
     labware_2 = LoadedLabware.construct(  # type: ignore[call-arg]
         id="2", location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2)
     )
+    labware_3 = LoadedLabware.construct(  # type: ignore[call-arg]
+        id="3", location=ModuleLocation(moduleId="cool-module")
+    )
 
-    subject = get_labware_view(labware_by_id={"1": labware_1, "2": labware_2})
+    subject = get_labware_view(
+        labware_by_id={"1": labware_1, "2": labware_2, "3": labware_3}
+    )
 
     assert subject.get_by_slot(DeckSlotName.SLOT_1, {"1", "2"}) == labware_1
     assert subject.get_by_slot(DeckSlotName.SLOT_2, {"1", "2"}) == labware_2

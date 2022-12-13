@@ -40,6 +40,7 @@ class LoadedCoreMap:
         core: Union[LabwareCore, ModuleCore],
         context: Union[Labware, ModuleTypes],
     ) -> None:
+        """Add a core and its associated public PAPI object."""
         self._contexts_by_core[core] = context
 
     @overload
