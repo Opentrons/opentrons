@@ -16,6 +16,7 @@ from opentrons_shared_data.pipette.pipette_definition import (
     SupportedTipsDefinition,
     TipHandlingConfigurations,
     PipetteModelType,
+    PipetteChannelType
 )
 from ..instrument_abc import AbstractInstrument
 from .instrument_calibration import (
@@ -137,6 +138,10 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     @property
     def config(self) -> PipetteConfigurations:
         return self._config
+
+    @property
+    def channels(self) -> PipetteChannelType:
+        return self._max_channels
 
     @property
     def tip_overlap(self) -> Dict[str, float]:

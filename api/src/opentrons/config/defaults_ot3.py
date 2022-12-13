@@ -74,6 +74,7 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
         OT3AxisKind.Y: 500,
         OT3AxisKind.Z: 35,
         OT3AxisKind.P: 5,
+        OT3AxisKind.Q: 40,
     },
     low_throughput={
         OT3AxisKind.X: 500,
@@ -101,6 +102,7 @@ DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryL
         OT3AxisKind.Y: 1000,
         OT3AxisKind.Z: 100,
         OT3AxisKind.P: 10,
+        OT3AxisKind.Q: 10,
     },
     low_throughput={
         OT3AxisKind.X: 1000,
@@ -132,6 +134,7 @@ DEFAULT_MAX_SPEED_DISCONTINUITY: Final[
         OT3AxisKind.Y: 10,
         OT3AxisKind.Z: 10,
         OT3AxisKind.P: 10,
+        OT3AxisKind.Q: 10,
     },
     low_throughput={
         OT3AxisKind.X: 10,
@@ -163,6 +166,7 @@ DEFAULT_DIRECTION_CHANGE_SPEED_DISCONTINUITY: Final[
         OT3AxisKind.Y: 5,
         OT3AxisKind.Z: 5,
         OT3AxisKind.P: 5,
+        OT3AxisKind.Q: 5,
     },
     low_throughput={
         OT3AxisKind.X: 5,
@@ -192,6 +196,7 @@ DEFAULT_HOLD_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLo
         OT3AxisKind.Y: 0.1,
         OT3AxisKind.Z: 0.8,
         OT3AxisKind.P: 0.3,
+        OT3AxisKind.Q: 0.3,
     },
     low_throughput={
         OT3AxisKind.X: 0.1,
@@ -221,6 +226,7 @@ DEFAULT_RUN_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoa
         OT3AxisKind.Y: 1.4,
         OT3AxisKind.Z: 1.4,
         OT3AxisKind.P: 2.0,
+        OT3AxisKind.Q: 2.0,
     },
     low_throughput={
         OT3AxisKind.X: 1.4,
