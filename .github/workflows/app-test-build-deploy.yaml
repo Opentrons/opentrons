@@ -270,7 +270,7 @@ jobs:
   deploy-app-ot3:
     name: 'Deploy built OT3 app artifacts to S3'
     runs-on: 'ubuntu-22.04'
-    needs: ['js-unit-test', 'build-ot3-app']
+    needs: ['js-unit-test', 'build-app-ot3']
     if: github.event_name != 'pull_request'
     steps:
       - name: 'download run app builds'
