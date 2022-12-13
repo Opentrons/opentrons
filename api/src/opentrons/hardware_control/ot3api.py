@@ -945,7 +945,9 @@ class OT3API(
         if axes:
             checked_axes = [OT3Axis.from_axis(ax) for ax in axes]
         else:
-            checked_axes = [ax for ax in OT3Axis]
+            checked_axes = [ax for ax in OT3Axis if ax != OT3Axis.Q]
+        if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
+            checked_axes.append(OT3Axis.Q)
         self._log.info(f"Homing {axes}")
         async with self._motion_lock:
             try:
@@ -1299,30 +1301,51 @@ class OT3API(
             home_flagged_axes=False,
         )
 
-        for press in spec.presses:
+        if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
             async with self._backend.restore_current():
                 await self._backend.set_active_current(
-                    {axis: current for axis, current in press.current.items()}
+                    {axis: current for axis, current in spec.currents.items()}
                 )
+                # Move to pick up position
                 target_down = target_position_from_relative(
-                    realmount, press.relative_down, self._current_position
+                    realmount, spec.tiprack_target, self._current_position
                 )
-                await self._move(target_down, speed=press.speed)
-            target_up = target_position_from_relative(
-                realmount, press.relative_up, self._current_position
-            )
-            await self._move(target_up)
+                await self._move(target_down)
+                # perform pick up tip
+                await self._backend.tip_action(spec.pick_up_distance, spec.speed, "pick_up")
+                # # Move to pick up position
+                # target_up = target_position_from_relative(
+                #     realmount, spec.retract_target, self._current_position
+                # )
+                # await self._move(target_up)
+
+        else:
+            for press in spec.presses:
+                async with self._backend.restore_current():
+                    await self._backend.set_active_current(
+                        {axis: current for axis, current in press.current.items()}
+                    )
+                    target_down = target_position_from_relative(
+                        realmount, press.relative_down, self._current_position
+                    )
+                    await self._move(target_down, speed=press.speed)
+                target_up = target_position_from_relative(
+                    realmount, press.relative_up, self._current_position
+                )
+                await self._move(target_up)
+
+            # neighboring tips tend to get stuck in the space between
+            # the volume chamber and the drop-tip sleeve on p1000.
+            # This extra shake ensures those tips are removed
+            for rel_point, speed in spec.shake_off_list:
+                await self.move_rel(realmount, rel_point, speed=speed)
+            # Here we add in the debounce distance for the switch as
+            # a safety precaution
+            await self.retract(realmount, spec.retract_target)
 
         _add_tip_to_instrs()
 
-        # neighboring tips tend to get stuck in the space between
-        # the volume chamber and the drop-tip sleeve on p1000.
-        # This extra shake ensures those tips are removed
-        for rel_point, speed in spec.shake_off_list:
-            await self.move_rel(realmount, rel_point, speed=speed)
-        # Here we add in the debounce distance for the switch as
-        # a safety precaution
-        await self.retract(realmount, spec.retract_target)
+
         if prep_after:
             await self.prepare_for_aspirate(realmount)
 
@@ -1359,14 +1382,17 @@ class OT3API(
                     for axis, current in move.current.items()
                 }
             )
-            target_pos = target_position_from_plunger(
-                realmount, move.target_position, self._current_position
-            )
-            await self._move(
-                target_pos,
-                speed=move.speed,
-                home_flagged_axes=False,
-            )
+
+            if move.is_ht_tip_action:
+                await self._backend.tip_action(move.target_position, move.speed, "drop")
+            else:
+                target_pos = target_position_from_plunger(
+                    realmount, move.target_position, self._current_position)
+                await self._move(
+                    target_pos,
+                    speed=move.speed,
+                    home_flagged_axes=False,
+                )
             if move.home_after:
                 machine_pos = await self._backend.fast_home(
                     [OT3Axis.from_axis(ax) for ax in move.home_axes],

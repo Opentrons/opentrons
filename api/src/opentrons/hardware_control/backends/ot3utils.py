@@ -1,5 +1,6 @@
 """Shared utilities for ot3 hardware control."""
 from typing import Dict, Iterable, List, Tuple, TypeVar
+from typing_extensions import Literal
 from opentrons.config.types import OT3MotionSettings, OT3CurrentSettings, GantryLoad
 from opentrons.hardware_control.types import (
     OT3Axis,
@@ -12,7 +13,7 @@ from opentrons.hardware_control.types import (
 )
 import numpy as np
 
-from opentrons_hardware.firmware_bindings.constants import NodeId, SensorId
+from opentrons_hardware.firmware_bindings.constants import NodeId, SensorId, PipetteTipActionType
 from opentrons_hardware.hardware_control.motion_planning import (
     AxisConstraints,
     SystemConstraints,
@@ -32,11 +33,14 @@ from opentrons_hardware.hardware_control.motion import (
     MoveType,
     MoveStopCondition,
     create_gripper_jaw_step,
+    create_tip_action_step,
 )
 
 GRIPPER_JAW_HOME_TIME: float = 120
 GRIPPER_JAW_GRIP_TIME: float = 1
 GRIPPER_JAW_HOME_DC: float = 100
+
+PipetteAction = Literal["pick_up", "drop"]
 
 # TODO: These methods exist to defer uses of NodeId to inside
 # method bodies, which won't be evaluated until called. This is needed
@@ -240,8 +244,13 @@ def create_home_group(
     return move_group
 
 
-def create_tip_action_group():
-    return None
+def create_tip_action_group(distance, velocity, action: PipetteAction) -> MoveGroup:
+    step = create_tip_action_step(
+        velocity=velocity,
+        duration=abs(distance / velocity),
+        action=PipetteTipActionType[action]
+        )
+    return [step]
 
 def create_gripper_jaw_grip_group(
     duty_cycle: float,

@@ -33,6 +33,7 @@ from .ot3utils import (
     create_gripper_jaw_grip_group,
     create_gripper_jaw_home_group,
     create_gripper_jaw_hold_group,
+    create_tip_action_group,
 )
 
 try:
@@ -336,6 +337,8 @@ class OT3Controller:
         positions = await asyncio.gather(*coros)
         if OT3Axis.G in checked_axes:
             await self.gripper_home_jaw()
+        if OT3Axis.Q in checked_axes:
+            await self.tip_action()
         for position in positions:
             for axis, p in position.items():
                 self._position.update({axis: p[0]})
@@ -368,6 +371,14 @@ class OT3Controller:
             New position.
         """
         return await self.home(axes)
+
+    async def tip_action(self, distance: float = 33, speed: float = -5.5, tip_action: str="drop") -> None:
+        move_group = create_tip_action_group(distance, speed, tip_action)
+        runner = MoveGroupRunner(move_groups=[move_group])
+        positions = await runner.run(can_messenger=self._messenger)
+        for axis, point in positions.items():
+            self._position.update({axis: point[0]})
+            self._encoder_position.update({axis: point[1]})
 
     async def gripper_grip_jaw(
         self,
@@ -839,6 +850,3 @@ class OT3Controller:
         )
         self._position[axis_to_node(moving)] += distance_mm
         return data
-
-    async def tip_action() -> None:
-        return None
