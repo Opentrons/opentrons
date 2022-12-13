@@ -277,16 +277,16 @@ export const PipetteWizardFlows = (
   return (
     <Portal level="top">
       <ModalShell
-        fullPage
-        // height={
-        //   //  changing modal height for now on BeforeBeginning 96 channel attach flow
-        //   //  until we do design qa to normalize the modal sizes
-        //   currentStep.section === SECTIONS.BEFORE_BEGINNING &&
-        //   selectedPipette === NINETY_SIX_CHANNEL &&
-        //   flowType === FLOWS.ATTACH
-        //     ? '70%'
-        //     : 'auto'
-        // }
+        width="47rem"
+        height={
+          //  changing modal height for now on BeforeBeginning 96 channel attach flow
+          //  until we do design qa to normalize the modal sizes
+          currentStep.section === SECTIONS.BEFORE_BEGINNING &&
+          selectedPipette === NINETY_SIX_CHANNEL &&
+          flowType === FLOWS.ATTACH
+            ? '70%'
+            : 'auto'
+        }
         header={
           <WizardHeader
             title={wizardTitle}
