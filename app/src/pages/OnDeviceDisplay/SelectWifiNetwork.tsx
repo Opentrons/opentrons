@@ -70,7 +70,9 @@ export function SelectWifiNetwork(): JSX.Element {
               alignItems={ALIGN_CENTER}
               marginBottom={SPACING.spacing3}
               borderRadius="0.75rem"
-              onClick={() => history.push(`/set-wifi-cred/${nw.ssid}`)}
+              onClick={() =>
+                history.push(`/network-setup/wifi/set-wifi-cred/${nw.ssid}`)
+              }
             >
               <Icon name="wifi" size="2.25rem" />
               <StyledText marginLeft={SPACING.spacing4} color="#000">

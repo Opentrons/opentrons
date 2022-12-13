@@ -84,7 +84,7 @@ describe('LabwareListItem', () => {
     } as any)
   })
 
-  it('renders the correct info for a thermocycler, clicking on secure labware instructions opens the modal', () => {
+  it('renders the correct info for a thermocycler (OT2), clicking on secure labware instructions opens the modal', () => {
     const { getByText } = render({
       nickName: mockNickName,
       definition: mockLabwareDef,
@@ -100,13 +100,36 @@ describe('LabwareListItem', () => {
           ...mockAttachedModuleInfo,
         } as any) as ModuleRenderInfoForProtocol,
       },
+      isOt3: false,
     })
     getByText('Mock Labware Definition')
-    getByText('Slot 7+10, Thermocycler Module GEN1')
+    getByText('Slot 7,8,10,11, Thermocycler Module GEN1')
     const button = getByText('Secure labware instructions')
     fireEvent.click(button)
     getByText('mock secure labware modal')
     getByText('nickName')
+  })
+
+  it('renders the correct info for a thermocycler (OT3)', () => {
+    const { getByText } = render({
+      nickName: mockNickName,
+      definition: mockLabwareDef,
+      initialLocation: { moduleId: mockModuleId },
+      moduleModel: 'thermocyclerModuleV1' as ModuleModel,
+      moduleLocation: mockModuleSlot,
+      extraAttentionModules: ['thermocyclerModuleType'],
+      attachedModuleInfo: {
+        [mockModuleId]: ({
+          moduleId: 'thermocyclerModuleId',
+          attachedModuleMatch: (mockThermocycler as any) as AttachedModule,
+          moduleDef: mockThermocyclerModuleDefinition as any,
+          ...mockAttachedModuleInfo,
+        } as any) as ModuleRenderInfoForProtocol,
+      },
+      isOt3: true,
+    })
+    getByText('Mock Labware Definition')
+    getByText('Slot 7+10, Thermocycler Module GEN1')
   })
 
   it('renders the correct info for a labware on top of a magnetic module', () => {
@@ -131,6 +154,7 @@ describe('LabwareListItem', () => {
           ...mockAttachedModuleInfo,
         } as any) as ModuleRenderInfoForProtocol,
       },
+      isOt3: false,
     })
     getByText('Mock Labware Definition')
     getByText('Slot 7, Magnetic Module GEN1')
@@ -140,7 +164,7 @@ describe('LabwareListItem', () => {
     getByText('nickName')
   })
 
-  it('renders the correct info for a labware on top of a temperature module ', () => {
+  it('renders the correct info for a labware on top of a temperature module', () => {
     const { getByText } = render({
       nickName: mockNickName,
       definition: mockLabwareDef,
@@ -161,6 +185,7 @@ describe('LabwareListItem', () => {
           ...mockAttachedModuleInfo,
         } as any) as ModuleRenderInfoForProtocol,
       },
+      isOt3: false,
     })
     getByText('Mock Labware Definition')
     getByText('Slot 7, Temperature Module GEN1')
@@ -188,6 +213,7 @@ describe('LabwareListItem', () => {
           ...mockAttachedModuleInfo,
         } as any) as ModuleRenderInfoForProtocol,
       },
+      isOt3: false,
     })
     getByText('Mock Labware Definition')
     getByText('Slot 7, Heater-Shaker Module GEN1')
@@ -216,6 +242,7 @@ describe('LabwareListItem', () => {
       moduleLocation: null,
       extraAttentionModules: [],
       attachedModuleInfo: {},
+      isOt3: false,
     })
     getByText('Mock Labware Definition')
   })

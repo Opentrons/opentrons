@@ -1,5 +1,11 @@
 import * as React from 'react'
-import { Flex, DIRECTION_ROW, SPACING } from '@opentrons/components'
+import {
+  Flex,
+  DIRECTION_ROW,
+  DIRECTION_COLUMN,
+  SPACING,
+  useLongPress,
+} from '@opentrons/components'
 import {
   PrimaryButton,
   SecondaryButton,
@@ -10,6 +16,7 @@ import {
   ToggleButton,
 } from './index'
 import type { Story, Meta } from '@storybook/react'
+import { StyledText } from '../text'
 
 export default {
   title: 'App/Atoms/Buttons',
@@ -134,4 +141,45 @@ export const Toggle = ToggleButtonTemplate.bind({})
 Toggle.args = {
   label: 'toggle button',
   id: 'storybook-toggle-button',
+}
+
+const LongPressButtonTemplate: Story<
+  React.ComponentProps<typeof PrimaryButton>
+> = args => {
+  const { children } = args
+  const longPress = useLongPress()
+  const [tapCount, setTapCount] = React.useState(0)
+
+  const handlePress = (): void => {
+    if (Boolean(longPress.isLongPressed)) {
+      alert('pressed the button more than 3 sec')
+    } else {
+      setTapCount(prev => prev + 1)
+    }
+  }
+
+  React.useEffect(() => {
+    if (Boolean(longPress.isLongPressed)) {
+      alert('pressed the button more than 2 sec')
+      longPress.setIsLongPressed(false)
+    }
+  }, [longPress, longPress.isLongPressed])
+
+  return (
+    <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing4}>
+      <PrimaryButton ref={longPress.ref} width="16rem" onClick={handlePress}>
+        {children}
+      </PrimaryButton>
+      {
+        <StyledText
+          marginTop={SPACING.spacing4}
+        >{`You tapped ${tapCount} times`}</StyledText>
+      }
+    </Flex>
+  )
+}
+
+export const LongPress = LongPressButtonTemplate.bind({})
+LongPress.args = {
+  children: 'long press - 2sec / tap',
 }

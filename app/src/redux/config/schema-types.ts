@@ -11,10 +11,8 @@ export type DevInternalFlag =
   | 'allPipetteConfig'
   | 'enableBundleUpload'
   | 'enableChangePipetteWizard'
-  | 'enableLiquidSetup'
   | 'enableManualDeckStateModification'
   | 'enableCalibrationWizards'
-  | 'enableThermocyclerGen2'
   | 'enableExtendedHardware'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>

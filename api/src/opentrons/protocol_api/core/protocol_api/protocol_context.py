@@ -12,14 +12,14 @@ from opentrons.hardware_control.types import DoorState, PauseType
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import AxisMaxSpeeds, UnsupportedAPIError
 from opentrons.protocols.geometry import module_geometry
-from opentrons.protocols.geometry.deck import Deck
-from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocols import labware as labware_definition
 
+from ...labware import Labware
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 
 from . import legacy_module_core
+from .deck import Deck
 from .instrument_context import InstrumentContextImplementation
 from .labware_offset_provider import AbstractLabwareOffsetProvider
 from .labware import LabwareImplementation
@@ -340,12 +340,12 @@ class ProtocolContextImplementation(
         """Get the deck layout."""
         return self._deck_layout
 
-    def get_fixed_trash(self) -> DeckItem:
+    def get_fixed_trash(self) -> Union[Labware, LabwareImplementation]:  # type: ignore[override]
         """The trash fixed to slot 12 of the robot deck."""
         trash = self._deck_layout["12"]
         if not trash:
             raise RuntimeError("Robot must have a trash container in 12")
-        return trash
+        return trash  # type: ignore[return-value]
 
     def set_rail_lights(self, on: bool) -> None:
         """Set the rail light state."""

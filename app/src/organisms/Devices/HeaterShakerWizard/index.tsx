@@ -21,7 +21,7 @@ import {
 } from '@opentrons/components'
 
 import type { ModuleModel } from '@opentrons/shared-data'
-import type { NavRouteParams } from '../../../App/types'
+import type { DesktopRouteParams } from '../../../App/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type { ProtocolModuleInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 
@@ -37,7 +37,7 @@ export const HeaterShakerWizard = (
   const { onCloseClick, moduleFromProtocol, attachedModule } = props
   const { t } = useTranslation(['heater_shaker', 'shared'])
   const [currentPage, setCurrentPage] = React.useState(0)
-  const { robotName } = useParams<NavRouteParams>()
+  const { robotName } = useParams<DesktopRouteParams>()
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   let isPrimaryCTAEnabled: boolean = true

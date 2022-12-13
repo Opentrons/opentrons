@@ -11,7 +11,7 @@ from opentrons.protocols.api_support import instrument as instrument_support
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
-from opentrons.protocols.api_support.util import FlowRates, PlungerSpeeds, Clearances
+from opentrons.protocols.api_support.util import FlowRates, PlungerSpeeds
 from opentrons.protocols.geometry import planning
 
 from ..instrument import AbstractInstrument
@@ -295,9 +295,6 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
 
     def get_return_height(self) -> float:
         return self._pipette_dict["return_tip_height"]
-
-    def get_well_bottom_clearance(self) -> Clearances:
-        return Clearances(default_aspirate=1, default_dispense=1)
 
     def get_speed(self) -> PlungerSpeeds:
         return self._plunger_speeds

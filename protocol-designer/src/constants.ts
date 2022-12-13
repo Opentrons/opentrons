@@ -130,48 +130,6 @@ export const MODELS_FOR_MODULE_TYPE: Record<
   ],
 }
 
-export const MODELS_FOR_MODULE_TYPE_NO_FF: Record<
-  ModuleType,
-  Array<{
-    name: string
-    value: ModuleModel
-    disabled?: boolean
-  }>
-> = {
-  [MAGNETIC_MODULE_TYPE]: [
-    {
-      name: i18n.t(`modules.model_display_name.${MAGNETIC_MODULE_V1}`),
-      value: MAGNETIC_MODULE_V1,
-    },
-    {
-      name: i18n.t(`modules.model_display_name.${MAGNETIC_MODULE_V2}`),
-      value: MAGNETIC_MODULE_V2,
-    },
-  ],
-  [TEMPERATURE_MODULE_TYPE]: [
-    {
-      name: i18n.t(`modules.model_display_name.${TEMPERATURE_MODULE_V1}`),
-      value: TEMPERATURE_MODULE_V1,
-    },
-    {
-      name: i18n.t(`modules.model_display_name.${TEMPERATURE_MODULE_V2}`),
-      value: TEMPERATURE_MODULE_V2,
-    },
-  ],
-  [THERMOCYCLER_MODULE_TYPE]: [
-    {
-      name: i18n.t(`modules.model_display_name.${THERMOCYCLER_MODULE_V1}`),
-      value: THERMOCYCLER_MODULE_V1,
-    },
-  ],
-  [HEATERSHAKER_MODULE_TYPE]: [
-    {
-      name: i18n.t(`modules.model_display_name.${HEATERSHAKER_MODULE_V1}`),
-      value: HEATERSHAKER_MODULE_V1,
-    },
-  ],
-}
-
 export const DEFAULT_MODEL_FOR_MODULE_TYPE: Record<ModuleType, ModuleModel> = {
   [MAGNETIC_MODULE_TYPE]: MAGNETIC_MODULE_V1,
   [TEMPERATURE_MODULE_TYPE]: TEMPERATURE_MODULE_V1,

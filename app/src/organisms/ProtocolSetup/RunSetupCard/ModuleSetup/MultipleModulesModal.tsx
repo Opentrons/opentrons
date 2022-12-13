@@ -32,7 +32,7 @@ export const MultipleModulesModal = (
       <Modal
         title={t('multiple_modules_modal')}
         onClose={props.onCloseClick}
-        modalWidth="44.75rem"
+        width="44.75rem"
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
           <Flex flexDirection={DIRECTION_ROW}>
