@@ -449,7 +449,12 @@ def create_geometry(
     function; all definitions passed here are assumed to be valid.
     """
     pre_transform = np.array(
-        (definition["labwareOffset"]["x"], definition["labwareOffset"]["y"], definition["labwareOffset"]["z"], 1)
+        (
+            definition["labwareOffset"]["x"],
+            definition["labwareOffset"]["y"],
+            definition["labwareOffset"]["z"],
+            1,
+        )
     )
     if not parent.labware.is_slot:
         par = ""
@@ -465,7 +470,10 @@ def create_geometry(
     xforms_ser = (
         definition["slotTransforms"]
         .get("ot2_standard", {})
-        .get(par, {"labwareOffset": [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]})
+        .get(
+            par,
+            {"labwareOffset": [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]},
+        )
     )
     xform_ser = xforms_ser["labwareOffset"]
 
