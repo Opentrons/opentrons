@@ -98,6 +98,7 @@ class ProtocolContext(CommandPublisher):
         api_version: APIVersion,
         implementation: ProtocolCore,
         broker: Optional[Broker] = None,
+        bundled_data: Optional[Dict[str, bytes]] = None,
     ) -> None:
         """Build a :py:class:`.ProtocolContext`.
 
@@ -107,11 +108,16 @@ class ProtocolContext(CommandPublisher):
                                         module contexts will get labware offsets from.
         :param broker: An optional command broker to link to. If not
                       specified, a dummy one is used.
+        :param bundled_data: A dict mapping filenames to the contents of data
+                             files. Can be used by the protocol, since it is
+                             exposed as
+                             :py:attr:`.ProtocolContext.bundled_data`
         """
         super().__init__(broker)
 
         self._api_version = api_version
         self._implementation = implementation
+        self._bundled_data: Dict[str, bytes] = bundled_data or {}
 
         if self._api_version > MAX_SUPPORTED_VERSION:
             raise RuntimeError(
@@ -169,7 +175,7 @@ class ProtocolContext(CommandPublisher):
         ``data/mydata/aspirations.csv`` it will be in the dict as
         ``'aspirations.csv'``) to the bytes contents of the files.
         """
-        return self._implementation.get_bundled_data()
+        return self._bundled_data
 
     def cleanup(self) -> None:
         """Finalize and clean up the protocol context."""

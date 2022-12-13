@@ -107,7 +107,6 @@ def create_protocol_context(
             equipment_broker=equipment_broker,
             api_version=api_version,
             bundled_labware=bundled_labware,
-            bundled_data=bundled_data,
             extra_labware=extra_labware,
         )
 
@@ -118,8 +117,12 @@ def create_protocol_context(
             equipment_broker=equipment_broker,
             api_version=api_version,
             bundled_labware=bundled_labware,
-            bundled_data=bundled_data,
             extra_labware=extra_labware,
         )
 
-    return ProtocolContext(api_version=api_version, broker=broker, implementation=core)
+    return ProtocolContext(
+        api_version=api_version,
+        broker=broker,
+        implementation=core,
+        bundled_data=bundled_data,
+    )

@@ -72,13 +72,6 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         """Get the api version protocol target."""
         return self._api_version
 
-    def get_bundled_data(self) -> Dict[str, bytes]:
-        """Get a map of file names to byte contents.
-
-        Deprecated method for past experiment with ZIP protocols.
-        """
-        raise NotImplementedError("ProtocolCore.get_bundled_data not implemented")
-
     def get_bundled_labware(self) -> Optional[Dict[str, LabwareDefDict]]:
         """Get a map of labware names to definition dicts.
 

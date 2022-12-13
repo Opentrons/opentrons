@@ -21,11 +21,6 @@ class AbstractProtocol(
     ABC, Generic[InstrumentCoreType, LabwareCoreType, ModuleCoreType]
 ):
     @abstractmethod
-    def get_bundled_data(self) -> Dict[str, bytes]:
-        """Get a mapping of name to contents"""
-        ...
-
-    @abstractmethod
     def get_bundled_labware(self) -> Optional[Dict[str, LabwareDefinition]]:
         ...
 
