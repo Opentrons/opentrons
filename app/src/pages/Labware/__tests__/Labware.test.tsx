@@ -3,6 +3,7 @@ import { fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
+import { useToast } from '../../../atoms/Toast'
 import { useTrackEvent } from '../../../redux/analytics'
 import { LabwareCard } from '../../../organisms/LabwareCard'
 import { AddCustomLabwareSlideout } from '../../../organisms/AddCustomLabwareSlideout'
@@ -10,10 +11,10 @@ import { useAllLabware, useLabwareFailure, useNewLabwareName } from '../hooks'
 import { Labware } from '..'
 import { mockDefinition } from '../../../redux/custom-labware/__fixtures__'
 
+jest.mock('../../../atoms/Toast')
 jest.mock('../../../organisms/LabwareCard')
 jest.mock('../../../organisms/AddCustomLabwareSlideout')
 jest.mock('../hooks')
-jest.mock('../helpers/getAllDefs')
 jest.mock('../../../redux/analytics')
 
 const mockLabwareCard = LabwareCard as jest.MockedFunction<typeof LabwareCard>
@@ -32,8 +33,11 @@ const mockUseNewLabwareName = useNewLabwareName as jest.MockedFunction<
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
+const mockUseToast = useToast as jest.MockedFunction<typeof useToast>
 
 let mockTrackEvent: jest.Mock
+const mockMakeToast = jest.fn()
+const mockEatToast = jest.fn()
 
 const render = () => {
   return renderWithProviders(
@@ -62,6 +66,10 @@ describe('Labware', () => {
     mockUseNewLabwareName.mockReturnValue({
       newLabwareName: null,
       clearLabwareName: jest.fn(),
+    })
+    mockUseToast.mockReturnValue({
+      makeToast: mockMakeToast,
+      eatToast: mockEatToast,
     })
   })
   afterEach(() => {
@@ -100,16 +108,24 @@ describe('Labware', () => {
       labwareFailureMessage: 'mock failure message',
       clearLabwareFailure: jest.fn(),
     })
-    const [{ getByText }] = render()
-    getByText('mock failure message')
+    render()
+    expect(mockMakeToast).toBeCalledWith(
+      'mock failure message',
+      'error',
+      expect.any(Object)
+    )
   })
   it('renders success toast if there is a new labware name', () => {
     mockUseNewLabwareName.mockReturnValue({
       newLabwareName: 'mock filename',
       clearLabwareName: jest.fn(),
     })
-    const [{ getByText }] = render()
-    getByText('mock filename imported.')
+    render()
+    expect(mockMakeToast).toBeCalledWith(
+      'mock filename imported.',
+      'success',
+      expect.any(Object)
+    )
   })
   it('renders filter by menu when it is clicked', () => {
     const [{ getByText, getByRole }] = render()

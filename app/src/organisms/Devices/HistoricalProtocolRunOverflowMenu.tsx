@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { NavLink, useHistory } from 'react-router-dom'
+
 import {
   Flex,
   POSITION_ABSOLUTE,
@@ -17,16 +18,17 @@ import {
   useDeleteRunMutation,
   useAllCommandsQuery,
 } from '@opentrons/react-api-client'
+
 import { Divider } from '../../atoms/structure'
 import { Tooltip } from '../../atoms/Tooltip'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { useRunControls } from '../RunTimeControl/hooks'
-import { RUN_LOG_WINDOW_SIZE } from './constants'
-import { DownloadRunLogToast } from './DownloadRunLogToast'
-import { useTrackProtocolRunEvent } from './hooks'
+import { useRunControls } from '../../organisms/RunTimeControl/hooks'
+import { useTrackEvent } from '../../redux/analytics'
 import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
+import { RUN_LOG_WINDOW_SIZE } from './constants'
+import { useDownloadRunLog, useTrackProtocolRunEvent } from './hooks'
 
 import type { Run } from '@opentrons/api-client'
 import type { State } from '../../redux/types'
@@ -50,17 +52,19 @@ export function HistoricalProtocolRunOverflowMenu(
   const protocolRunOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => setShowOverflowMenu(false),
   })
-  const [
-    showDownloadRunLogToast,
-    setShowDownloadRunLogToast,
-  ] = React.useState<boolean>(false)
 
   const commands = useAllCommandsQuery(
     runId,
     { cursor: 0, pageLength: RUN_LOG_WINDOW_SIZE },
     { staleTime: Infinity }
   )
-  const runTotalCommandCount = commands?.data?.meta?.totalLength
+  const runTotalCommandCount = commands?.data?.meta?.totalLength ?? 0
+
+  const { downloadRunLog, isRunLogLoading } = useDownloadRunLog(
+    robotName,
+    runId,
+    runTotalCommandCount
+  )
 
   return (
     <Flex
@@ -78,27 +82,21 @@ export function HistoricalProtocolRunOverflowMenu(
             <MenuDropdown
               {...props}
               closeOverflowMenu={handleOverflowClick}
-              setShowDownloadRunLogToast={setShowDownloadRunLogToast}
+              downloadRunLog={downloadRunLog}
+              isRunLogLoading={isRunLogLoading}
             />
           </Box>
           {menuOverlay}
         </>
       )}
-      {runTotalCommandCount != null && showDownloadRunLogToast ? (
-        <DownloadRunLogToast
-          robotName={robotName}
-          runId={runId}
-          pageLength={runTotalCommandCount}
-          onClose={() => setShowDownloadRunLogToast(false)}
-        />
-      ) : null}
     </Flex>
   )
 }
 
 interface MenuDropdownProps extends HistoricalProtocolRunOverflowMenuProps {
   closeOverflowMenu: React.MouseEventHandler<HTMLButtonElement>
-  setShowDownloadRunLogToast: (showDownloadRunLogToastValue: boolean) => void
+  downloadRunLog: () => void
+  isRunLogLoading: boolean
 }
 function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   const { t } = useTranslation('device_details')
@@ -109,7 +107,8 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     robotName,
     robotIsBusy,
     closeOverflowMenu,
-    setShowDownloadRunLogToast,
+    downloadRunLog,
+    isRunLogLoading,
   } = props
   const isRobotOnWrongVersionOfSoftware = ['upgrade', 'downgrade'].includes(
     useSelector((state: State) => {
@@ -124,9 +123,10 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   const onDownloadClick: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
-    setShowDownloadRunLogToast(true)
+    downloadRunLog()
     closeOverflowMenu(e)
   }
+  const trackEvent = useTrackEvent()
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
   const { reset } = useRunControls(runId, onResetSuccess)
   const { deleteRun } = useDeleteRunMutation()
@@ -138,7 +138,10 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     e.stopPropagation()
 
     reset()
-
+    trackEvent({
+      name: 'proceedToRun',
+      properties: { sourceLocation: 'HistoricalProtocolRun' },
+    })
     trackProtocolRunEvent({ name: 'runAgain' })
   }
 
@@ -181,6 +184,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
       )}
       <MenuItem
         data-testid="RecentProtocolRun_OverflowMenu_downloadRunLog"
+        disabled={isRunLogLoading}
         onClick={onDownloadClick}
       >
         {t('download_run_log')}

@@ -521,6 +521,37 @@ def test_home(
     mock_engine_client: EngineClient,
     subject: ProtocolCore,
 ) -> None:
-    """It should issue a home command."""
+    """It should home all axes."""
     subject.home()
-    decoy.verify(mock_engine_client.home())
+    decoy.verify(mock_engine_client.home(axes=None), times=1)
+
+
+def test_is_simulating(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: ProtocolCore,
+) -> None:
+    """It should return if simulating."""
+    decoy.when(mock_engine_client.state.config.ignore_pause).then_return(True)
+    assert subject.is_simulating()
+
+
+def test_set_rail_lights(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: ProtocolCore
+) -> None:
+    """It should verify a call to sync client."""
+    subject.set_rail_lights(on=True)
+    decoy.verify(mock_engine_client.set_rail_lights(on=True))
+
+    subject.set_rail_lights(on=False)
+    decoy.verify(mock_engine_client.set_rail_lights(on=False))
+
+
+def test_get_rail_lights(
+    decoy: Decoy, mock_sync_hardware_api: SyncHardwareAPI, subject: ProtocolCore
+) -> None:
+    """It should get rails light state."""
+    decoy.when(mock_sync_hardware_api.get_lights()).then_return({"rails": True})
+
+    result = subject.get_rail_lights_on()
+    assert result is True
