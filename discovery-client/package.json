@@ -1,6 +1,6 @@
 {
   "name": "@opentrons/discovery-client",
-  "version": "6.2.0",
+  "version": "0.0.0-dev",
   "description": "Node.js client for discovering Opentrons robots on the network",
   "main": "lib/index.js",
   "flow:main": "flow-types/index.js.flow",
