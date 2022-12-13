@@ -15,9 +15,8 @@ runs:
     - uses: 'actions/setup-node@v3'
       with:
         node-version: '16'
-        cache: 'yarn'
     - shell: bash
-      run: make setup-js-root
+      run: npm i -g shx@0.3.3
     - uses: 'actions/setup-python@v4'
       with:
         python-version: '3.7'
