@@ -5,6 +5,7 @@ import {
   COLORS,
   SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { CheckPipettesButton } from './CheckPipettesButton'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
@@ -183,7 +184,12 @@ function TryAgainButton(props: ConfirmPipetteProps): JSX.Element {
       <SecondaryButton marginRight={SPACING.spacing3} onClick={exit}>
         {t('leave_attached')}
       </SecondaryButton>
-      <PrimaryButton onClick={tryAgain}>{t('shared:try_again')}</PrimaryButton>
+      <PrimaryButton
+        onClick={tryAgain}
+        textTransform={TYPOGRAPHY.textTransformCapitalize}
+      >
+        {t('shared:try_again')}
+      </PrimaryButton>
     </>
   )
 }

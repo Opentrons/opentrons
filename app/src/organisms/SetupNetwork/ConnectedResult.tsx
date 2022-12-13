@@ -99,7 +99,11 @@ export function ConnectedResult({
           </>
         ) : (
           <>
-            <SecondaryButton flex="1" onClick={onConnect}>
+            <SecondaryButton
+              flex="1"
+              onClick={onConnect}
+              textTransform={TYPOGRAPHY.textTransformCapitalize}
+            >
               {t('shared:try_again')}
             </SecondaryButton>
             <PrimaryButton
