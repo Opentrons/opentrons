@@ -21,6 +21,7 @@ import { SetWifiCred } from '../pages/OnDeviceDisplay/SetWifiCred'
 import { PortalRoot as ModalPortalRoot } from './portal'
 
 import type { RouteProps } from './types'
+import { AttachedInstruments } from '../pages/OnDeviceDisplay/AttachInstruments'
 
 export const onDeviceDisplayRoutes: RouteProps[] = [
   {
@@ -170,12 +171,7 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     path: '/protocols/:protocolId/:runId/run',
   },
   {
-    Component: () => (
-      <>
-        <BackButton />
-        <Box>attach instruments</Box>
-      </>
-    ),
+    Component: AttachedInstruments,
     exact: true,
     name: 'Attach Instruments Dashboard',
     path: '/attach-instruments',
