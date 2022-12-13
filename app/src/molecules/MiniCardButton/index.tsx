@@ -14,13 +14,18 @@ import { StyledText } from '../../atoms/text'
 
 import type { IconName } from '@opentrons/components'
 
+// Note: kj
 interface MiniCardButtonProps {
+  width?: string
+  height?: string
   iconName: IconName
   cardName: string
   destinationPath: string
 }
 
 export function MiniCardButton({
+  width = '14rem',
+  height = '9.375rem',
   iconName,
   cardName,
   destinationPath,
@@ -35,8 +40,8 @@ export function MiniCardButton({
       borderRadius="12px"
       onClick={() => history.push(`/${destinationPath}`)}
       backgroundColor={COLORS.lightGreyPressed}
-      width="14rem"
-      height="9.375rem"
+      width={width}
+      height={height}
     >
       <Icon
         name={iconName}
