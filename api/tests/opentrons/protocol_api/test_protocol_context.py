@@ -388,3 +388,14 @@ def test_home(
     """It should home all axes."""
     subject.home()
     decoy.verify(mock_core.home(), times=1)
+
+
+def test_bundled_data(decoy: Decoy, mock_core: ProtocolCore) -> None:
+    """It should return bundled data."""
+    subject = ProtocolContext(
+        api_version=MAX_SUPPORTED_VERSION,
+        implementation=mock_core,
+        bundled_data={"foo": b"ar"},
+    )
+
+    assert subject.bundled_data == {"foo": b"ar"}
