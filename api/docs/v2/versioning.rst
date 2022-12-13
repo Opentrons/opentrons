@@ -268,5 +268,6 @@ Upcoming, not yet released.
 - :py:class:`.Labware` and :py:class:`.Well` objects will adhere to the protocol's API level setting. Prior to this version, they incorrectly ignore the setting.
 - :py:meth:`.ModuleContext.load_labware_object` will be deprecated.
 - :py:meth:`.MagneticModuleContext.calibrate` will be deprecated.
-- Several internal properties of :py:class:`.Labware` and :py:class:`.ModuleContext` will be deprecated and/or removed:
-    - ``Labware.separate_calibration`` and ``ModuleContext.separate_calibration``, which are holdovers from a calibration system that no longer exists
+- Several internal properties of :py:class:`.Labware`, :py:class:`.Well`, and :py:class:`.ModuleContext` will be deprecated and/or removed:
+    - ``Labware.separate_calibration`` and ``ModuleContext.separate_calibration``, which are holdovers from a calibration system that no longer exists.
+    - The ``Well.has_tip`` setter, which will cease to function in a future upgrade to the Python protocol execution system. The corresponding `Well.has_tip` getter will not be deprecated..
