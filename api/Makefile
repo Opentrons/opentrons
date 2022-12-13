@@ -3,8 +3,6 @@
 include ../scripts/push.mk
 include ../scripts/python.mk
 
-SHX := npx shx
-
 # make push wheel file (= rather than := to expand at every use)
 firmware = $(wildcard smoothie/*.hex)
 

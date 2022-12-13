@@ -3,7 +3,6 @@
 include ../scripts/push.mk
 include ../scripts/python.mk
 
-SHX := npx shx
 
 # Find the version of the wheel from package.json using a helper script. We
 # use python here so we can use the same version normalization that will be

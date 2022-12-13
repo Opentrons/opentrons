@@ -6,11 +6,6 @@ include ../scripts/python.mk
 # using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
 SHELL := bash
 
-# add yarn CLI dev deps to PATH (for cross platform POSIX commands via shx)
-# and also make an explicit version for shx for use in the shell function,
-# where PATH won’t be propagated
-PATH := $(shell cd .. && yarn bin):$(PATH)
-SHX := npx shx
 
 # Path of source package
 SRC_PATH = notify_server

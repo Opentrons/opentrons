@@ -2,7 +2,6 @@
 
 include ../scripts/python.mk
 
-SHX := npx shx
 
 # These variables can be overriden when make is invoked to customize the
 # behavior of pytest. For instance,

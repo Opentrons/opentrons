@@ -3,7 +3,6 @@
 include ../scripts/push.mk
 include ../scripts/python.mk
 
-SHX := npx shx
 
 sdist_file = dist/hardware_testing-0.0.1.tar.gz
 wheel_file = dist/hardware_testing-0.0.1-py3-none-any.whl

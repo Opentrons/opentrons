@@ -11,8 +11,6 @@ ssh_opts ?= $(default_ssh_opts)
 # using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
 SHELL := bash
 
-# add node_modules/.bin to PATH
-PATH := $(shell cd ../.. && yarn bin):$(PATH)
 
 # This may be set as an environment variable (and is by CI tasks that upload
 # to test pypi) to add a .dev extension to the python package versions. If
@@ -21,8 +19,6 @@ PATH := $(shell cd ../.. && yarn bin):$(PATH)
 BUILD_NUMBER ?=
 
 BUILD_DIR := dist
-
-SHX := npx shx
 
 wheel_file = $(BUILD_DIR)/$(call python_get_wheelname,shared-data,opentrons_shared_data,$(BUILD_NUMBER),../../scripts/python_build_utils.py)
 sdist_file = $(BUILD_DIR)/$(call python_get_sdistname,shared-data,opentrons_shared_data,,../../scripts/python_build_utils.py)

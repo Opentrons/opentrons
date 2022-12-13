@@ -53,47 +53,59 @@ usb_host=$(shell yarn run -s discovery find -i 169.254)
 .PHONY: setup
 setup: setup-js setup-py
 
-# front-end dependecies handled by yarn
-.PHONY: setup-js
-setup-js: js-globals
+.PHONY: setup-js-root
+setup-js-root: setup-js-globals
 	yarn config set network-timeout 60000
 	yarn
+
+.PHONY: setup-app-shell
+setup-app-shell: setup-js-root
 	$(MAKE) -C $(APP_SHELL_DIR) setup
+
+.PHONY: setup-js-shared-data
+setup-shared-data-js: setup-js-root
 	$(MAKE) -C $(SHARED_DATA_DIR) setup-js
 
-# this is the source of truth for the required pipenv version
-.PHONY: python-globals
-python-globals:
+# front-end dependecies handled by yarn
+.PHONY: setup-js
+setup-js: setup-js-globals setup-js-root setup-app-shell setup-js-shared-data
+
+# this is the source of truth for pipenv version
+.PHONY: setup-python-globals
+setup-python-globals:
 	$(OT_PYTHON) -m pip install pipenv==2021.5.29
 
-# this is the source of truth for npm, yarn, and shx version
-# shx is used heavilily in python project makefiles
-.PHONY: js-globals
-js-globals:
-	npm i -g npm@6
-	npm i -g yarn@1 shx@0.3.3
+# this is the source of truth for yarn version
+.PHONY: setup-js-globals
+setup-js-globals:
+	npm i -g yarn@1
 
 .PHONY: setup-globals
-setup-globals: js-globals python-globals
+setup-globals: setup-js-globals setup-python-globals
 
 PYTHON_SETUP_TARGETS := $(addsuffix -py-setup, $(PYTHON_SETUP_DIRS))
 
 %-py-setup:
 	$(MAKE) -C $* setup
 
+# python setup depends on node setup
 .PHONY: setup-py
-setup-py: setup-globals
+setup-py: setup-globals setup-js-root
 	$(MAKE) $(PYTHON_SETUP_TARGETS)
 
 # uninstall all project dependencies
 # does not remove the python or js globals
+# ensuring order using $(MAKE) because python teardown depends on shx
 .PHONY: teardown
-teardown: teardown-py teardown-js
+teardown:
+	$(MAKE) teardown-py
+	$(MAKE) teardown-js
 
 .PHONY: teardown-js
 teardown-js: clean-js
 	yarn shx rm -rf "**/node_modules"
 
+# this will not complete correctly if you do not have shx
 .PHONY: teardown-py
 teardown-py:
 	$(MAKE) $(PYTHON_TEARDOWN_TARGETS)

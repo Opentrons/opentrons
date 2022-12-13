@@ -3,7 +3,6 @@
 include ../scripts/push.mk
 include ../scripts/python.mk
 
-SHX := npx shx
 
 # Path of source package
 SRC_PATH = robot_server
