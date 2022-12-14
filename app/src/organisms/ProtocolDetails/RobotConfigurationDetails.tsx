@@ -16,7 +16,6 @@ import {
   getModuleDisplayName,
   getModuleType,
   getPipetteNameSpecs,
-  TC_MODULE_LOCATION,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
@@ -24,9 +23,10 @@ import { InstrumentContainer } from '../../atoms/InstrumentContainer'
 import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
 import { useFeatureFlag } from '../../redux/config'
+import { getSlotsForThermocycler } from './utils'
 
 import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-import type { PipetteName } from '@opentrons/shared-data'
+import type { PipetteName, RobotType } from '@opentrons/shared-data'
 
 interface RobotConfigurationDetailsProps {
   leftMountPipetteName: PipetteName | null
@@ -34,6 +34,7 @@ interface RobotConfigurationDetailsProps {
   requiredModuleDetails: LoadModuleRunTimeCommand[] | null
   isLoading: boolean
   isOT3Protocol: boolean
+  robotType: RobotType | null
 }
 
 export const RobotConfigurationDetails = (
@@ -45,6 +46,7 @@ export const RobotConfigurationDetails = (
     requiredModuleDetails,
     isLoading,
     isOT3Protocol,
+    robotType,
   } = props
   const { t } = useTranslation(['protocol_details', 'shared'])
   const enableExtendedHardware = useFeatureFlag('enableExtendedHardware')
@@ -150,7 +152,7 @@ export const RobotConfigurationDetails = (
                     slot_number:
                       getModuleType(module.params.model) ===
                       THERMOCYCLER_MODULE_TYPE
-                        ? TC_MODULE_LOCATION
+                        ? getSlotsForThermocycler(robotType)
                         : module.params.location.slotName,
                   })}
                   item={

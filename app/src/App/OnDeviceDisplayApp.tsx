@@ -12,6 +12,7 @@ import { BackButton } from '../atoms/buttons'
 import { ConnectedNetworkInfo } from '../pages/OnDeviceDisplay/ConnectedNetworkInfo'
 import { ConnectViaEthernet } from '../pages/OnDeviceDisplay/ConnectViaEthernet'
 import { ConnectViaUSB } from '../pages/OnDeviceDisplay/ConnectViaUSB'
+import { ConfirmRobotName } from '../pages/OnDeviceDisplay/ConfirmRobotName'
 import { InitialSplash } from '../pages/OnDeviceDisplay/InitialSplash'
 import { NetworkSetupMenu } from '../pages/OnDeviceDisplay/NetworkSetupMenu'
 import { RobotDashboard } from '../pages/OnDeviceDisplay/RobotDashboard'
@@ -69,6 +70,12 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     exact: true,
     name: 'Connect via USB',
     path: '/network-setup/usb',
+  },
+  {
+    Component: ConfirmRobotName,
+    exact: true,
+    name: 'Name confirmation',
+    path: '/network-setup/end',
   },
   {
     Component: () => (

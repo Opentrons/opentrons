@@ -20,7 +20,10 @@ def change_notifier(decoy: Decoy) -> ChangeNotifier:
 @pytest.fixture
 def engine_config() -> Config:
     """Get a ProtocolEngine config value object."""
-    return Config()
+    return Config(
+        # Choice of robot_type is arbitrary.
+        robot_type="OT-2 Standard"
+    )
 
 
 @pytest.fixture

@@ -45,7 +45,6 @@ import { StyledText } from '../../atoms/text'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { Modal } from '../../molecules/Modal'
 import { useTrackEvent } from '../../redux/analytics'
-import { useFeatureFlag } from '../../redux/config'
 import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
 import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
@@ -255,7 +254,6 @@ export function ProtocolDetails(
   )
   const analysisStatus = getAnalysisStatus(isAnalyzing, mostRecentAnalysis)
   const isOT3Protocol = getIsOT3Protocol(mostRecentAnalysis)
-  const liquidSetupEnabled = useFeatureFlag('enableLiquidSetup')
   if (analysisStatus === 'missing') return null
 
   const { left: leftMountPipetteName, right: rightMountPipetteName } =
@@ -323,6 +321,7 @@ export function ProtocolDetails(
     mostRecentAnalysis?.createdAt != null
       ? format(new Date(mostRecentAnalysis.createdAt), 'MMM dd yy HH:mm')
       : t('shared:no_data')
+  const robotType = mostRecentAnalysis?.robotType ?? null
 
   const contentsByTabName = {
     labware: (
@@ -335,6 +334,7 @@ export function ProtocolDetails(
         requiredModuleDetails={requiredModuleDetails}
         isLoading={analysisStatus === 'loading'}
         isOT3Protocol={isOT3Protocol}
+        robotType={robotType}
       />
     ),
     liquids: (
@@ -600,8 +600,7 @@ export function ProtocolDetails(
                   {t('labware')}
                 </StyledText>
               </RoundTab>
-              {liquidSetupEnabled &&
-                mostRecentAnalysis != null &&
+              {mostRecentAnalysis != null &&
                 protocolHasLiquids(mostRecentAnalysis) && (
                   <RoundTab
                     data-testid="ProtocolDetails_liquids"

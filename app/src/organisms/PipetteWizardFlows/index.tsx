@@ -1,14 +1,18 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { getAttachedPipettes } from '../../redux/pipettes'
 import { useConditionalConfirm } from '@opentrons/components'
+import {
+  NINETY_SIX_CHANNEL,
+  SINGLE_MOUNT_PIPETTES,
+} from '@opentrons/shared-data'
 import {
   useHost,
   useCreateRunMutation,
   useStopRunMutation,
 } from '@opentrons/react-api-client'
 import { ModalShell } from '../../molecules/Modal'
+import { getAttachedPipettes } from '../../redux/pipettes'
 import { Portal } from '../../App/portal'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
@@ -22,27 +26,33 @@ import { Results } from './Results'
 import { ExitModal } from './ExitModal'
 import { MountPipette } from './MountPipette'
 import { DetachPipette } from './DetachPipette'
-
+import { Carriage } from './Carriage'
+import { MountingPlate } from './MountingPlate'
 import type { PipetteMount } from '@opentrons/shared-data'
 import type { State } from '../../redux/types'
-import type { PipetteWizardFlow } from './types'
+import type { PipetteWizardFlow, SelectablePipettes } from './types'
 
 interface PipetteWizardFlowsProps {
   flowType: PipetteWizardFlow
   mount: PipetteMount
   robotName: string
+  selectedPipette: SelectablePipettes
   closeFlow: () => void
 }
 
 export const PipetteWizardFlows = (
   props: PipetteWizardFlowsProps
 ): JSX.Element | null => {
-  const { flowType, mount, closeFlow, robotName } = props
+  const { flowType, mount, closeFlow, robotName, selectedPipette } = props
   const { t } = useTranslation('pipette_wizard_flows')
   const attachedPipette = useSelector((state: State) =>
     getAttachedPipettes(state, robotName)
   )
-  const pipetteWizardSteps = getPipetteWizardSteps(flowType, mount)
+  const pipetteWizardSteps = getPipetteWizardSteps(
+    flowType,
+    mount,
+    selectedPipette
+  )
   const host = useHost()
   const [runId, setRunId] = React.useState<string>('')
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
@@ -133,6 +143,7 @@ export const PipetteWizardFlows = (
     setShowErrorMessage,
     errorMessage,
     robotName,
+    selectedPipette,
   }
   const exitModal = (
     <ExitModal goBack={cancelExit} proceed={confirmExit} flowType={flowType} />
@@ -214,20 +225,45 @@ export const PipetteWizardFlows = (
     ) : (
       <DetachPipette {...currentStep} {...calibrateBaseProps} />
     )
+  } else if (currentStep.section === SECTIONS.CARRIAGE) {
+    onExit = confirmExit
+    modalContent = showConfirmExit ? (
+      exitModal
+    ) : (
+      <Carriage {...currentStep} {...calibrateBaseProps} />
+    )
+  } else if (currentStep.section === SECTIONS.MOUNTING_PLATE) {
+    onExit = confirmExit
+    modalContent = showConfirmExit ? (
+      exitModal
+    ) : (
+      <MountingPlate {...currentStep} {...calibrateBaseProps} />
+    )
   }
-
   let wizardTitle: string = 'unknown page'
   switch (flowType) {
     case FLOWS.CALIBRATE: {
-      wizardTitle = t('calibrate_pipette')
+      if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
+        wizardTitle = t('calibrate_pipette')
+      } else {
+        wizardTitle = t('calibrate_96_channel')
+      }
       break
     }
     case FLOWS.ATTACH: {
-      wizardTitle = t('attach_pipette')
+      if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
+        wizardTitle = t('attach_pipette')
+      } else {
+        wizardTitle = t('attach_96_channel')
+      }
       break
     }
     case FLOWS.DETACH: {
-      wizardTitle = t('detach_pipette')
+      if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
+        wizardTitle = t('detach_pipette')
+      } else {
+        wizardTitle = t('detach_96_channel')
+      }
       break
     }
   }
@@ -242,6 +278,15 @@ export const PipetteWizardFlows = (
     <Portal level="top">
       <ModalShell
         width="47rem"
+        height={
+          //  changing modal height for now on BeforeBeginning 96 channel attach flow
+          //  until we do design qa to normalize the modal sizes
+          currentStep.section === SECTIONS.BEFORE_BEGINNING &&
+          selectedPipette === NINETY_SIX_CHANNEL &&
+          flowType === FLOWS.ATTACH
+            ? '70%'
+            : 'auto'
+        }
         header={
           <WizardHeader
             title={wizardTitle}

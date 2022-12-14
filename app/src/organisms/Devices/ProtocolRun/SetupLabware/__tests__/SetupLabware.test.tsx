@@ -171,24 +171,13 @@ describe('SetupLabwareMap', () => {
     when(mockSetupLabwareList).mockReturnValue(
       <div> mock setup labware list</div>
     )
-    when(mockUseFeatureFlag)
-      .calledWith('enableLiquidSetup')
-      .mockReturnValue(false)
   })
 
   afterEach(() => {
     resetAllWhenMocks()
   })
 
-  it('should render the map view when ff is turned off', () => {
-    const { getByText } = render()
-    getByText('mock setup labware map')
-  })
-
-  it('should render the list view when ff is turned off, clicking the toggle button will turn to map view', () => {
-    when(mockUseFeatureFlag)
-      .calledWith('enableLiquidSetup')
-      .mockReturnValue(true)
+  it('should render the list view, clicking the toggle button will turn to map view', () => {
     const { getByText, getByRole } = render()
     getByText('mock setup labware list')
     getByRole('button', { name: 'List View' })

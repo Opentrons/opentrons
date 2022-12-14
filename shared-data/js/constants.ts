@@ -101,7 +101,9 @@ export const OT3_PIPETTES = [
   'p50_single_gen3',
   'p50_multi_gen3',
   'p1000_multi_gen3',
+  'p1000_96',
 ]
+
 //  magnetic module info
 export const MM: 'mm' = 'mm'
 export const MAGNETIC_MODULES_MAX_ENGAGE_HEIGHT = 20
@@ -139,4 +141,5 @@ export const SINGLE_MOUNT_PIPETTES: 'Single-Channel_and_8-Channel' =
   'Single-Channel_and_8-Channel'
 
 // Thermocycler module info
-export const TC_MODULE_LOCATION: '7+10' = '7+10'
+export const TC_MODULE_LOCATION_OT2: '7,8,10,11' = '7,8,10,11'
+export const TC_MODULE_LOCATION_OT3: '7+10' = '7+10'

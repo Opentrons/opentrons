@@ -14,8 +14,9 @@ from opentrons_shared_data.labware.labware_definition import (
     Metadata as LabwareDefinitionMetadata,
 )
 
-from opentrons.types import Point
+from opentrons.types import DeckSlotName, Point
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
+from opentrons.protocol_engine.errors import LabwareNotOnDeckError
 
 from opentrons.protocol_api.core.labware import LabwareLoadParams
 from opentrons.protocol_api.core.engine import LabwareCore, WellCore
@@ -207,7 +208,7 @@ def test_get_next_tip(
     decoy.when(
         mock_engine_client.state.tips.get_next_tip(
             labware_id="cool-labware",
-            use_column=True,
+            num_tips=8,
             starting_tip_name="B1",
         )
     ).then_return("A2")
@@ -281,3 +282,20 @@ def test_get_quirks(subject: LabwareCore) -> None:
     result = subject.get_quirks()
 
     assert result == ["quirk"]
+
+
+def test_get_deck_slot(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: LabwareCore
+) -> None:
+    """It should return its deck slot location, if in a slot."""
+    decoy.when(
+        mock_engine_client.state.geometry.get_ancestor_slot_name("cool-labware")
+    ).then_return(DeckSlotName.SLOT_5)
+
+    assert subject.get_deck_slot() == DeckSlotName.SLOT_5
+
+    decoy.when(
+        mock_engine_client.state.geometry.get_ancestor_slot_name("cool-labware")
+    ).then_raise(LabwareNotOnDeckError("oh no"))
+
+    assert subject.get_deck_slot() is None

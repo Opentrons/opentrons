@@ -11,7 +11,6 @@ export type DevInternalFlag =
   | 'allPipetteConfig'
   | 'enableBundleUpload'
   | 'enableChangePipetteWizard'
-  | 'enableLiquidSetup'
   | 'enableManualDeckStateModification'
   | 'enableCalibrationWizards'
   | 'enableExtendedHardware'

@@ -1,12 +1,14 @@
 'use strict'
 const path = require('path')
+const { versionForProject } = require('../scripts/git-version')
 
 const { OT_APP_DEPLOY_BUCKET, OT_APP_DEPLOY_FOLDER } = process.env
 const DEV_MODE = process.env.NODE_ENV !== 'production'
 const USE_PYTHON = process.env.NO_PYTHON !== 'true'
 const NO_USB_DETECTION = process.env.NO_USB_DETECTION === 'true'
+const project = process.env.OPENTRONS_PROJECT ?? 'robot-stack'
 
-module.exports = {
+module.exports = async () => ({
   appId: 'com.opentrons.app',
   electronVersion: '21.3.1',
   files: [
@@ -21,6 +23,9 @@ module.exports = {
       filter: ['**/*'],
     },
   ],
+  extraMetadata: {
+    version: await versionForProject(project),
+  },
   extraResources: USE_PYTHON ? ['python'] : [],
   /* eslint-disable no-template-curly-in-string */
   artifactName: '${productName}-v${version}-${os}-${env.BUILD_ID}.${ext}',
@@ -57,4 +62,4 @@ module.exports = {
   generateUpdatesFilesForAllChannels: true,
   beforeBuild: path.join(__dirname, './scripts/before-build.js'),
   afterSign: path.join(__dirname, './scripts/after-sign.js'),
-}
+})
