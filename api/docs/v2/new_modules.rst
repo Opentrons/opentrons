@@ -31,16 +31,14 @@ Use :py:meth:`.ProtocolContext.load_module` to load a module.  It will return an
          # Load a Temperature Module GEN1 in deck slot 3.
          temperature_module = protocol.load_module('temperature module', 3)
 
-.. note::
-
-    When you load a module in a protocol, you inform the OT-2 that you want the specified module to be present. Even if you do not use the module anywhere else in your protocol, the Opentrons App and the OT-2 will not let your protocol proceed until all modules loaded with ``load_module`` are attached to the OT-2.
+When you load a module in a protocol, you inform the OT-2 that you want the specified module to be present. Even if you don't use the module anywhere else in your protocol, the Opentrons App and the OT-2 won't let your protocol proceed until all modules loaded with ``load_module`` are attached to the OT-2.
 
 .. versionadded:: 2.0
 
 Available Modules
 -----------------
 
-The first parameter to :py:meth:`.ProtocolContext.load_module`, the module's *load name*, specifies the kind of module to load. The table below lists the load names for each kind of module.
+The first parameter of :py:meth:`.ProtocolContext.load_module`, the module's *load name*, specifies the kind of module to load. The table below lists the load names for each kind of module.
 
 Some modules were added to the Protocol API later than others, and some modules have multiple hardware generations (GEN2 modules have a "GEN2" label on the device). Make sure your protocol's metadata specifies a :ref:`Protocol API version <v2-versioning>` high enough to support all the modules you want to use.
 
@@ -199,7 +197,7 @@ The examples in this section will use a Magnetic Module loaded in slot 6:
     metadata = {'apiLevel': '2.3'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        mag_mod = protocol.load_module('magnetic module gen2', '1')
+        mag_mod = protocol.load_module('magnetic module gen2', '6')
         plate = mag_mod.load_labware('nest_96_wellplate_100ul_pcr_full_skirt')
 
 .. versionadded:: 2.0
@@ -216,7 +214,7 @@ Like with all modules, use the Magnetic Module’s :py:meth:`~.MagneticModuleCon
 - ``thermoscientificnunc_96_wellplate_2000ul``
 - ``usascientific_96_wellplate_2.4ml_deep``
 
-To check whether a custom labware definition specifies engage height for the Magnetic Module, open its JSON file and look for the key ``magneticModuleEngageHeight`` in the ``parameters`` object. If it's present and has a numerical value, the labware is ready for use with the Magnetic Module.
+To check whether a custom labware definition specifies this measurement, open its JSON file and look for the key ``magneticModuleEngageHeight`` in the ``parameters`` object. If it's present and has a numerical value, the labware is ready for use with the Magnetic Module.
 
 .. _magnetic-module-engage:
 
@@ -235,7 +233,7 @@ If your loaded labware is fully compatible with the Magnetic Module, you can cal
 
 This will move the magnets upward to the default height for the labware, which should be close to the bottom of the labware's wells. If your loaded labware doesn't specify a default height, this will raise an ``ExceptionInProtocolError``.
 
-For certain applications, you may want to move the magnets to a different height. The recommended way is to use the ``height_from_base`` parameter, which represents the distance above the base of the labware (its lowest point, where it rests on the module). Setting ``height_from_base=0`` should move the tops of the magnets level with the base of the labware. Alternatively, you can use the ``offset`` parameter, which represent the distance above *or below* the labware's default position (close to the bottom of its wells). Like using ``engage()`` with no argument, this will raise an error if there is no default height for the loaded labware.
+For certain applications, you may want to move the magnets to a different height. The recommended way is to use the ``height_from_base`` parameter, which represents the distance above the base of the labware (its lowest point, where it rests on the module). Setting ``height_from_base=0`` should move the tops of the magnets level with the base of the labware. Alternatively, you can use the ``offset`` parameter, which represents the distance above *or below* the labware's default position (close to the bottom of its wells). Like using ``engage()`` with no argument, this will raise an error if there is no default height for the loaded labware.
 
 .. note::
     There is up to 1 mm of manufacturing variance across Magnetic Module units, so observe the exact position and adjust as necessary before running your protocol.
@@ -253,7 +251,7 @@ Note that ``offset`` takes into account the fact that the magnets' home position
   .. versionchanged:: 2.2
      Added the ``height_from_base`` parameter.
 
-When you need to retract the magnets back to their home position, call :py:meth:`.MagneticModuleContext.disengage`. 
+When you need to retract the magnets back to their home position, call :py:meth:`~.MagneticModuleContext.disengage`. 
 
   .. code-block:: python
 
@@ -261,7 +259,7 @@ When you need to retract the magnets back to their home position, call :py:meth:
 
 .. versionadded:: 2.0
 
-If at any point you need to check whether the magnets are engaged or not, use the :py:obj:`.MagneticModuleContext.status` property. This will return either the string ``engaged`` or ``disengaged``, not the exact height of the magnets.
+If at any point you need to check whether the magnets are engaged or not, use the :py:obj:`~.MagneticModuleContext.status` property. This will return either the string ``engaged`` or ``disengaged``, not the exact height of the magnets.
 
 .. note:: 
 
@@ -270,9 +268,7 @@ If at any point you need to check whether the magnets are engaged or not, use th
 Changes with the GEN2 Magnetic Module
 =====================================
 
-The GEN2 Magnetic Module uses smaller magnets than the GEN1 version to mitigate an issue with the magnets attracting beads even from their retracted position.
-
-This means it takes longer for the GEN2 module to attract beads. The recommended attraction time is 5 minutes for liquid volumes up to 50 µL and 7 minutes for volumes greater than 50 µL. If your application needs additional magnetic strength to attract beads within  these timeframes, use the available `Adapter Magnets <https://support.opentrons.com/s/article/Adapter-magnets>`_.
+The GEN2 Magnetic Module uses smaller magnets than the GEN1 version to mitigate an issue with the magnets attracting beads even from their retracted position. This means it takes longer for the GEN2 module to attract beads. The recommended attraction time is 5 minutes for liquid volumes up to 50 µL and 7 minutes for volumes greater than 50 µL. If your application needs additional magnetic strength to attract beads within  these timeframes, use the available `Adapter Magnets <https://support.opentrons.com/s/article/Adapter-magnets>`_.
 
 
 .. _thermocycler-module:
@@ -282,7 +278,7 @@ Using a Thermocycler Module
 ***************************
 
 
-The Thermocycler Module provides on-deck, fully automated thermocycling and can heat and cool very quickly during operation. The module's block can heat and cool between 4 °C and 99 °C, and the module's lid can heat up to 110 °C.
+The Thermocycler Module provides on-deck, fully automated thermocycling and can heat and cool very quickly during operation. The module's block can heat and cool between 4 and 99 °C, and the module's lid can heat up to 110 °C.
 
 The Thermocycler is represented in code by a :py:class:`.ThermocyclerContext` object, which has methods for controlling the lid, controlling the block, and setting *profiles* — timed heating and cooling routines that can be automatically repeated. 
 

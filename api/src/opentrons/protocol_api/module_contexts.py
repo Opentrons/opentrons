@@ -328,30 +328,30 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
         offset: Optional[float] = None,
         height_from_base: Optional[float] = None,
     ) -> None:
-        """Raise the Magnetic Module's magnets.  You can specify how high the magnets 
+        """Raise the Magnetic Module's magnets.  You can specify how high the magnets
         should move:
 
-           - No parameter: Move to the default height for the loaded labware. If 
+           - No parameter: Move to the default height for the loaded labware. If
              the loaded labware has no default, or if no labware is loaded, this will
              raise an error.
-             
+
            - ``height_from_base``: Move this many millimeters above the bottom
              of the labware. Acceptable values are between ``0`` and ``25``.
 
              This is the recommended way to adjust the magnets' height.
-             
+
            - ``offset``: Move this many millimeters above (positive value) or below
              (negative value) the default height for the loaded labware. The sum of
              the default height and ``offset`` must be between 0 and 25.
 
            - ``height``: Intended to move this many millimeters above the magnets'
              home position. However, depending on the generation of module and the loaded
-             labware, this may produce unpredictable results. You should normally use 
+             labware, this may produce unpredictable results. You should normally use
              ``height_from_base`` instead.
-             
+
              This parameter may be deprecated in a future release of the Python API.
 
-        You should not specify more than one of these parameters. However, if you do,
+        You shouldn't specify more than one of these parameters. However, if you do,
         their order of precedence is ``height``, then ``height_from_base``, then ``offset``.
 
         .. versionadded:: 2.2
@@ -383,7 +383,7 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
     @property  # type: ignore
     @requires_version(2, 0)
     def status(self) -> str:
-        """The status of the module: either ``engaged`` or ``disengaged``"""
+        """The status of the module, either ``engaged`` or ``disengaged``."""
         return self._core.get_status().value
 
 
@@ -545,7 +545,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
             and is actively maintaining that temperature.
         - ``cooling``: The block is cooling to a target temperature.
         - ``heating``: The block is heating to a target temperature.
-        - ``idle``: The block has not heated or cooled since the beginning of the protocol.
+        - ``idle``: The block is not currently heating or cooling.
         - ``error``: The temperature status can't be determined.
         """
         return self._core.get_block_temperature_status().value
@@ -659,13 +659,13 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     @property  # type: ignore[misc]
     @requires_version(2, 13)
     def current_speed(self) -> int:
-        """The current speed in RPM of the Heater-Shaker's plate."""
+        """The current speed of the Heater-Shaker's plate in rpm."""
         return self._core.get_current_speed()
 
     @property  # type: ignore[misc]
     @requires_version(2, 13)
     def target_speed(self) -> Optional[int]:
-        """Target speed in RPM of the Heater-Shaker's plate."""
+        """Target speed of the Heater-Shaker's plate in rpm."""
         return self._core.get_target_speed()
 
     @property  # type: ignore[misc]
@@ -734,7 +734,8 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
 
         Sets the Heater-Shaker's target temperature and returns immediately without
         waiting for the target to be reached. Does not delay the protocol until
-        target temperature has reached. Use `wait_for_target_temperature` to delay
+        target temperature has reached.
+        Use :py:meth:`~.HeaterShakerContext.wait_for_temperature` to delay
         protocol execution.
 
         :param celsius: A value between 27 and 95, representing the target temperature in °C.
@@ -748,14 +749,16 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     @publish(command=cmds.heater_shaker_wait_for_temperature)
     def wait_for_temperature(self) -> None:
         """Delays protocol execution until the Heater-Shaker has reached its target
-        temperature. Returns an error if no target temperature was previously set.
+        temperature.
+
+        Raises an error if no target temperature was previously set.
         """
         self._core.wait_for_target_temperature()
 
     @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_set_and_wait_for_shake_speed)
     def set_and_wait_for_shake_speed(self, rpm: int) -> None:
-        """Set a shake speed in RPM and block execution of further commands until the module reaches the target.
+        """Set a shake speed in rpm and block execution of further commands until the module reaches the target.
 
         Reaching a target shake speed typically only takes a few seconds.
 
@@ -802,7 +805,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     def deactivate_shaker(self) -> None:
         """Stops shaking.
 
-        Decelerating to 0 RPM typically only takes a few seconds.
+        Decelerating to 0 rpm typically only takes a few seconds.
         """
         self._core.deactivate_shaker()
 
