@@ -40,8 +40,10 @@ jobs:
         if: startsWith(matrix.os, 'macos')
         run: echo "SETUP_TIMEOUT=35" >> $GITHUB_ENV
       - uses: 'actions/checkout@v3'
+        with:
+          fetch-depth: 0
       - uses: './.github/actions/python/setup-single-environment'
-        timeout-minutes: ${{ env.SETUP_TIMEOUT }}
+        timeout-minutes: ${{ fromJSON(env.SETUP_TIMEOUT) }}
         with:
           python-version: '${{ matrix.python }}'
           environment: 'environments/app'
