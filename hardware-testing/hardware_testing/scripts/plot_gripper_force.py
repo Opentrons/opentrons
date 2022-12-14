@@ -28,6 +28,11 @@ class Plot:
             "legend":None,
             "annotation":None
         }
+        self.ranges = {
+            "DC":[10,60],
+            "Current":[50,400],
+            "Force":[5,30],
+        }
         self.create_folder()
         self.df_data = self.import_file(self.data)
         self.df_avg = self.avg_df(self.df_data)
@@ -66,6 +71,7 @@ class Plot:
         df = df.groupby(["Vref","DC"])
         df_avg["Force"] = df["Force"].mean()
         df_avg["Current"] = round(df["Current"].mean(), 2)
+        df_avg["Min Current"] = round(df["Current"].min(), 2)
         df_avg["Max Current"] = round(df["Current"].max(), 2)
         df_avg["Peak+"] = round(df["Peak+"].mean(), 2)
         df_avg["Peak-"] = round(df["Peak-"].mean(), 2)
@@ -130,6 +136,8 @@ class Plot:
 
     def current_pwm_plot(self):
         df = self.df_avg
+        df = df[df["Vref"]==2.0]
+        df = df[df["DC"]<=60]
         x_axis = "DC"
         y_axis = "Current"
         fig = px.line(df, x=x_axis, y=[y_axis], color="Vref", markers=True)
@@ -143,14 +151,16 @@ class Plot:
         self.plot_param["title"] = "Current vs. PWM Duty Cycle"
         self.plot_param["x_title"] = "Duty Cycle (%)"
         self.plot_param["y_title"] = "Average Current [RMS] (mA)"
-        self.plot_param["x_range"] = [0, 100]
-        self.plot_param["y_range"] = [50, 350]
+        self.plot_param["x_range"] = self.ranges["DC"]
+        self.plot_param["y_range"] = self.ranges["Current"]
         self.plot_param["legend"] = "Vref (V)"
         self.plot_param["annotation"] = None
         self.write_plot(self.plot_param)
 
     def force_pwm_plot(self):
         df = self.df_avg
+        df = df[df["Vref"]==2.0]
+        df = df[df["DC"]<=60]
         x_axis = "DC"
         y_axis = "Force"
         fig = px.line(df, x=x_axis, y=[y_axis], color="Vref", markers=True)
@@ -164,14 +174,16 @@ class Plot:
         self.plot_param["title"] = "Force vs. PWM Duty Cycle"
         self.plot_param["x_title"] = "Duty Cycle (%)"
         self.plot_param["y_title"] = "Average Force (N)"
-        self.plot_param["x_range"] = [0, 100]
-        self.plot_param["y_range"] = [0, 35]
+        self.plot_param["x_range"] = self.ranges["DC"]
+        self.plot_param["y_range"] = self.ranges["Force"]
         self.plot_param["legend"] = "Vref (V)"
         self.plot_param["annotation"] = None
         self.write_plot(self.plot_param)
 
     def avg_current_force_plot(self):
         df = self.df_avg
+        df = df[df["Vref"]==2.0]
+        df = df[df["Force"]<=31]
         x_axis = "Force"
         y_axis = "Current"
         fig = px.line(df, x=x_axis, y=[y_axis], color="Vref", markers=True)
@@ -185,8 +197,8 @@ class Plot:
         self.plot_param["title"] = "Current vs. Force"
         self.plot_param["x_title"] = "Average Force (N)"
         self.plot_param["y_title"] = "Average Current [RMS] (mA)"
-        self.plot_param["x_range"] = [0, 35]
-        self.plot_param["y_range"] = [50, 350]
+        self.plot_param["x_range"] = self.ranges["Force"]
+        self.plot_param["y_range"] = self.ranges["Current"]
         self.plot_param["legend"] = "Vref (V)"
         self.plot_param["annotation"] = None
         self.write_plot(self.plot_param)
@@ -206,16 +218,18 @@ class Plot:
         self.plot_param["title"] = "Max Current vs. Force"
         self.plot_param["x_title"] = "Average Force (N)"
         self.plot_param["y_title"] = "Max Current [RMS] (mA)"
-        self.plot_param["x_range"] = [0, 35]
-        self.plot_param["y_range"] = [50, 350]
+        self.plot_param["x_range"] = self.ranges["Force"]
+        self.plot_param["y_range"] = self.ranges["Current"]
         self.plot_param["legend"] = "Vref (V)"
         self.plot_param["annotation"] = None
         self.write_plot(self.plot_param)
 
     def peak_pwm_plot(self):
         df = self.df_avg
-        max_vref = df["Vref"].max()
+        # max_vref = df["Vref"].max()
+        max_vref = 2.0
         df = df[df["Vref"]==max_vref]
+        df = df[df["DC"]<=60]
         x_axis = "DC"
         y_axis = ["Peak+","Peak-"]
         fig1 = px.bar(df, x=x_axis, y=y_axis, barmode="group")
@@ -233,8 +247,8 @@ class Plot:
         self.plot_param["title"] = f"Peak vs. PWM Duty Cycle @ Max Vref [{max_vref} V]"
         self.plot_param["x_title"] = "Duty Cycle (%)"
         self.plot_param["y_title"] = "Current [Peak] (mA)"
-        self.plot_param["x_range"] = [0, 100]
-        self.plot_param["y_range"] = [50, 450]
+        self.plot_param["x_range"] = [0, 70]
+        self.plot_param["y_range"] = [0, 600]
         self.plot_param["legend"] = "Current"
         self.plot_param["annotation"] = None
         self.write_plot(self.plot_param)
@@ -261,8 +275,8 @@ class Plot:
         )
         subfig.update_coloraxes(
             colorbar_title_text = "Vref (V)",
-            cmax = 1,
-            cmin = 0.5,
+            cmax = 2.7,
+            cmin = 1.0,
         )
         self.plot_param["figure"] = subfig
         self.plot_param["filename"] = "plot_freq_pwm"
@@ -270,7 +284,7 @@ class Plot:
         self.plot_param["x_title"] = "Duty Cycle (%)"
         self.plot_param["y_title"] = "Measured Frequency (kHz)"
         self.plot_param["x_range"] = [0, 100]
-        self.plot_param["y_range"] = [32.1, 32.2]
+        self.plot_param["y_range"] = [32, 32.2]
         self.plot_param["legend"] = "Vref (V)"
         self.plot_param["annotation"] = None
         self.write_plot(self.plot_param)
