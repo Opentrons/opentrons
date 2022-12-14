@@ -50,7 +50,6 @@ import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSli
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
 import {
   getAnalysisStatus,
-  getIsOT3Protocol,
   getProtocolDisplayName,
 } from '../ProtocolsLanding/utils'
 import { ProtocolOverflowMenu } from '../ProtocolsLanding/ProtocolOverflowMenu'
@@ -253,7 +252,6 @@ export function ProtocolDetails(
     getIsProtocolAnalysisInProgress(state, protocolKey)
   )
   const analysisStatus = getAnalysisStatus(isAnalyzing, mostRecentAnalysis)
-  const isOT3Protocol = getIsOT3Protocol(mostRecentAnalysis)
   if (analysisStatus === 'missing') return null
 
   const { left: leftMountPipetteName, right: rightMountPipetteName } =
@@ -333,7 +331,6 @@ export function ProtocolDetails(
         rightMountPipetteName={rightMountPipetteName}
         requiredModuleDetails={requiredModuleDetails}
         isLoading={analysisStatus === 'loading'}
-        isOT3Protocol={isOT3Protocol}
         robotType={robotType}
       />
     ),

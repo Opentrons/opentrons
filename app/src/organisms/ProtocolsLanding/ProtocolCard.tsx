@@ -40,8 +40,8 @@ import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
 import {
   getAnalysisStatus,
-  getIsOT3Protocol,
   getProtocolDisplayName,
+  getRobotTypeDisplayName,
 } from './utils'
 
 import type { StoredProtocolData } from '../../redux/protocol-storage'
@@ -119,7 +119,6 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
   } = props
   const { t } = useTranslation(['protocol_list', 'shared'])
   const analysisStatus = getAnalysisStatus(isAnalyzing, mostRecentAnalysis)
-  const isOT3Protocol = getIsOT3Protocol(mostRecentAnalysis)
 
   const { left: leftMountPipetteName, right: rightMountPipetteName } =
     mostRecentAnalysis != null
@@ -130,6 +129,8 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
   )
 
   const requiredModuleTypes = requiredModuleModels.map(getModuleType)
+
+  const robotType = mostRecentAnalysis?.robotType ?? null
 
   return (
     <Flex
@@ -194,7 +195,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                   {t('robot')}
                 </StyledText>
                 <StyledText as="p">
-                  {isOT3Protocol ? 'OT-3' : 'OT-2'}
+                  {getRobotTypeDisplayName(robotType)}
                 </StyledText>
               </Flex>
               <Flex

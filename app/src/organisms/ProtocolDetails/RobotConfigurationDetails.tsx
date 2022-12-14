@@ -23,6 +23,7 @@ import { InstrumentContainer } from '../../atoms/InstrumentContainer'
 import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
 import { useFeatureFlag } from '../../redux/config'
+import { getRobotTypeDisplayName } from '../ProtocolsLanding/utils'
 import { getSlotsForThermocycler } from './utils'
 
 import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
@@ -33,7 +34,6 @@ interface RobotConfigurationDetailsProps {
   rightMountPipetteName: PipetteName | null
   requiredModuleDetails: LoadModuleRunTimeCommand[] | null
   isLoading: boolean
-  isOT3Protocol: boolean
   robotType: RobotType | null
 }
 
@@ -45,7 +45,6 @@ export const RobotConfigurationDetails = (
     rightMountPipetteName,
     requiredModuleDetails,
     isLoading,
-    isOT3Protocol,
     robotType,
   } = props
   const { t } = useTranslation(['protocol_details', 'shared'])
@@ -115,7 +114,7 @@ export const RobotConfigurationDetails = (
           isLoading ? (
             loadingText
           ) : (
-            <StyledText as="p">{isOT3Protocol ? 'OT-3' : 'OT-2'}</StyledText>
+            <StyledText as="p">{getRobotTypeDisplayName(robotType)}</StyledText>
           )
         }
       />

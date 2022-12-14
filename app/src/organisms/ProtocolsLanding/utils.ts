@@ -1,7 +1,8 @@
 import first from 'lodash/first'
+import { OT3_STANDARD_MODEL } from '@opentrons/shared-data'
 import type { ProtocolAnalysisOutput, RobotType } from '@opentrons/shared-data'
 
-import { ROBOT_MODEL_OT3 } from '../../redux/discovery'
+// import { ROBOT_MODEL_OT3 } from '../../redux/discovery'
 
 type AnalysisStatus = 'missing' | 'loading' | 'error' | 'complete'
 
@@ -26,14 +27,21 @@ export function getProtocolDisplayName(
   return analysis?.metadata?.protocolName ?? first(srcFileNames) ?? protocolKey
 }
 
-// TODO(bh, 2022-12-12): replace when robotType added to ProtocolAnalysisOutput interface
-export type ProtocolAnalysisOutputWithRobotType = ProtocolAnalysisOutput & {
-  robotType?: RobotType
+export function getRobotTypeDisplayName(
+  robotType: RobotType | null
+): 'OT-2' | 'OT-3' {
+  if (robotType === OT3_STANDARD_MODEL) {
+    return 'OT-3'
+  } else {
+    // defaults to OT-2 display name. may want to reconsider for protocols that fail analysis
+    return 'OT-2'
+  }
 }
+
 export function getIsOT3Protocol(
-  protocolAnalysis?: ProtocolAnalysisOutputWithRobotType | null
+  protocolAnalysis?: ProtocolAnalysisOutput | null
 ): boolean {
-  if (protocolAnalysis?.robotType === ROBOT_MODEL_OT3) {
+  if (protocolAnalysis?.robotType === OT3_STANDARD_MODEL) {
     return true
   } else {
     return false

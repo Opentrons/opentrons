@@ -87,7 +87,6 @@ describe('RobotConfigurationDetails', () => {
       rightMountPipetteName: null,
       requiredModuleDetails: null,
       isLoading: false,
-      isOT3Protocol: false,
       robotType: OT2_STANDARD_MODEL,
     }
     const { getByText } = render(props)
@@ -101,7 +100,6 @@ describe('RobotConfigurationDetails', () => {
       rightMountPipetteName: null,
       requiredModuleDetails: null,
       isLoading: false,
-      isOT3Protocol: true,
       robotType: OT3_STANDARD_MODEL,
     }
     const { getByText } = render(props)
@@ -115,7 +113,6 @@ describe('RobotConfigurationDetails', () => {
       rightMountPipetteName: null,
       requiredModuleDetails: null,
       isLoading: false,
-      isOT3Protocol: false,
       robotType: OT2_STANDARD_MODEL,
     }
     const { getByText } = render(props)
@@ -131,7 +128,6 @@ describe('RobotConfigurationDetails', () => {
       rightMountPipetteName: 'p10_single',
       requiredModuleDetails: null,
       isLoading: false,
-      isOT3Protocol: false,
       robotType: OT2_STANDARD_MODEL,
     }
     const { getByText } = render(props)
@@ -156,7 +152,6 @@ describe('RobotConfigurationDetails', () => {
       rightMountPipetteName: 'p10_single',
       requiredModuleDetails: mockRequiredModuleDetails,
       isLoading: false,
-      isOT3Protocol: false,
       robotType: OT2_STANDARD_MODEL,
     }
 
@@ -171,7 +166,6 @@ describe('RobotConfigurationDetails', () => {
       rightMountPipetteName: null,
       requiredModuleDetails: null,
       isLoading: true,
-      isOT3Protocol: false,
       robotType: OT2_STANDARD_MODEL,
     }
     const { getAllByText, getByText } = render(props)
