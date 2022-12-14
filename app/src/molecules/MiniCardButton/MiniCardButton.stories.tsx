@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { Flex, SPACING } from '@opentrons/components'
+import { GlobalStyle } from '../../atoms/GlobalStyle'
 import { MiniCardButton } from '.'
 
 import type { Story, Meta } from '@storybook/react'
@@ -8,6 +9,14 @@ import type { Story, Meta } from '@storybook/react'
 export default {
   title: 'App/Molecules/MiniCardButton',
   component: MiniCardButton,
+  decorators: [
+    Story => (
+      <>
+        <GlobalStyle isOnDevice />
+        <Story />
+      </>
+    ),
+  ],
 } as Meta
 
 const Template: Story<React.ComponentProps<typeof MiniCardButton>> = args => (
