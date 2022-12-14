@@ -256,6 +256,7 @@ async def find_slot_center_binary(
     )
     LOG.info(f"Found -x edge at {minus_x_edge}mm")
     real_pos = real_pos._replace(x=(plus_x_edge + minus_x_edge) / 2)
+    print(f"Real Position: {real_pos}")
     # Find Y bottom/top edges
     plus_y_edge = await find_edge(hcapi, mount, real_pos + EDGES["top"], OT3Axis.Y, 1)
     LOG.info(f"Found +y edge at {plus_y_edge}mm")
@@ -265,6 +266,7 @@ async def find_slot_center_binary(
     )
     LOG.info(f"Found -y edge at {minus_y_edge}mm")
     real_pos = real_pos._replace(y=(plus_y_edge + minus_y_edge) / 2)
+    print(f"Real Position: {real_pos}")
 
     return real_pos.x, real_pos.y
 
