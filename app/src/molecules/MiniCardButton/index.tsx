@@ -38,7 +38,7 @@ export function MiniCardButton({
       alignItems={ALIGN_FLEX_START}
       padding={SPACING.spacing5}
       borderRadius="12px"
-      onClick={() => history.push(`/${destinationPath}`)}
+      onClick={() => history.push(`${destinationPath}`)}
       backgroundColor={COLORS.lightGreyPressed}
       width={width}
       height={height}
