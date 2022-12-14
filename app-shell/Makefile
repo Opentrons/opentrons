@@ -19,7 +19,7 @@ ui_dir := ../app
 noop := cd .
 
 # build and publish options
-dist_files := "dist/**/Opentrons-*"
+dist_files = $(if $(filter $(1),robot-stack),"dist/**/Opentrons-*","dist/**/Opentrons-OT3*")
 update_files := "dist/@(alpha|beta|latest)*.@(yml|json)"
 publish_dir := dist/publish
 
@@ -152,7 +152,7 @@ dist-windows-2022: dist-win
 .PHONY: _dist-collect-artifacts
 _dist-collect-artifacts:
 	shx mkdir -p dist/publish
-	shx cp $(dist_files) $(publish_dir)
+	shx cp $(call dist_files,$(OPENTRONS_PROJECT)) $(publish_dir)
 	$(and $(publish_update),shx cp $(update_files) $(publish_dir) || $(noop))
 
 # development
