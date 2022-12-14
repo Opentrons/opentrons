@@ -409,7 +409,7 @@ class MoveScheduler:
                 # the execute even gets sent.
                 await asyncio.wait_for(
                     self._event.wait(),
-                    max(0.1, self._durations[group_id - self._start_at_index] + 0.1),
+                    max(0.1, self._durations[group_id - self._start_at_index] * 1.03),
                 )
             except asyncio.TimeoutError:
                 unresponsive_ids = set(
