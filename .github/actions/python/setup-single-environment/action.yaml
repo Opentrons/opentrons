@@ -29,7 +29,6 @@ runs:
         python-version: ${{ inputs.python-version }}
         cache: 'pipenv'
         cache-dependency-path: |
-          **/setup.*
           **/Pipfile.*
     - name: Set the OT_PYTHON env variable
       shell: bash

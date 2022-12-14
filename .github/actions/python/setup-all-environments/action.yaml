@@ -22,7 +22,6 @@ runs:
         python-version: '3.7'
         cache: 'pipenv'
         cache-dependency-path: |
-          **/setup.*
           **/Pipfile.*
     - shell: bash
       name: install pipenv on 3.7
@@ -36,7 +35,6 @@ runs:
         python-version: '3.8'
         cache: 'pipenv'
         cache-dependency-path: |
-          **/setup.*
           **/Pipfile.*
     - shell: bash
       name: install pipenv on 3.8
@@ -50,7 +48,6 @@ runs:
         python-version: '3.10'
         cache: 'pipenv'
         cache-dependency-path: |
-          **/setup.*
           **/Pipfile.*
     - shell: bash
       name: install pipenv on 3.10

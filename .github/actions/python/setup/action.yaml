@@ -29,7 +29,6 @@ runs:
         python-version: ${{ inputs.python-version }}
         cache: 'pipenv'
         cache-dependency-path: |
-          **/setup.*
           **/Pipfile.*
     - name: install pipenv
       shell: bash
