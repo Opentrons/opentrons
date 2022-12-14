@@ -144,6 +144,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
       />
       <Box
         css={isExpanded ?? false ? EXPANDED_STYLE : collapsedStyle}
+        cursor="auto"
         position={POSITION_FIXED}
         right="0"
         top="0"
