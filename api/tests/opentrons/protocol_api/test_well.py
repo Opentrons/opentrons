@@ -102,3 +102,12 @@ def test_well_center(decoy: Decoy, mock_well_core: WellCore, subject: Well) -> N
     assert isinstance(result, Location)
     assert result.point == Point(1, 2, 3)
     assert result.labware.as_well() is subject
+
+
+def test_has_tip(decoy: Decoy, mock_well_core: WellCore, subject: Well) -> None:
+    """It should get tip state from the core."""
+    decoy.when(mock_well_core.has_tip()).then_return(True)
+    assert subject.has_tip is True
+
+    decoy.when(mock_well_core.has_tip()).then_return(False)
+    assert subject.has_tip is False

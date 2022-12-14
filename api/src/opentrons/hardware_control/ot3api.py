@@ -558,6 +558,11 @@ class OT3API(
         self._log.info("Recovering from halt")
         await self.reset()
 
+        # TODO: (2022-11-21 AA) remove this logic when encoder is added to the gripper
+        # Always refresh gripper z position as a safeguard, since we don't have an
+        # encoder position for reference
+        await self.home_z(OT3Mount.GRIPPER)
+
         if home_after:
             await self.home()
 
@@ -643,7 +648,8 @@ class OT3API(
         position_axes = [OT3Axis.X, OT3Axis.Y, z_ax, plunger_ax]
 
         if fail_on_not_homed and (
-            not self._backend.is_homed(position_axes) or not self._current_position
+            not self._backend.check_ready_for_movement(position_axes)
+            or not self._current_position
         ):
             raise MustHomeError(
                 f"Current position of {str(mount)} pipette is unknown, please home."
@@ -692,7 +698,7 @@ class OT3API(
         position_axes = [OT3Axis.X, OT3Axis.Y, z_ax, plunger_ax]
 
         if fail_on_not_homed and (
-            not self._backend.is_homed(position_axes)
+            not self._backend.check_ready_for_movement(position_axes)
             or not self._encoder_current_position
         ):
             raise MustHomeError(
@@ -769,10 +775,12 @@ class OT3API(
     ) -> None:
         """Move the critical point of the specified mount to a location
         relative to the deck, at the specified speed."""
-        if not self._current_position:
-            await self.home()
-
         realmount = OT3Mount.from_mount(mount)
+
+        axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
+        if not self._backend.check_ready_for_movement(axes_moving):
+            await self.home(axes_moving)
+
         target_position = target_position_from_absolute(
             realmount,
             abs_position,
@@ -810,18 +818,19 @@ class OT3API(
         mhe = MustHomeError(
             "Cannot make a relative move because absolute position is unknown"
         )
-        if not self._current_position:
+
+        realmount = OT3Mount.from_mount(mount)
+        axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
+        if not self._backend.check_ready_for_movement([axis for axis in axes_moving]):
             if fail_on_not_homed:
                 raise mhe
             else:
-                await self.home()
+                await self.home(axes_moving)
 
-        realmount = OT3Mount.from_mount(mount)
         target_position = target_position_from_relative(
             realmount, delta, self._current_position
         )
-        axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
-        if fail_on_not_homed and not self._backend.is_homed(
+        if fail_on_not_homed and not self._backend.check_ready_for_movement(
             [axis for axis in axes_moving if axis is not None]
         ):
             raise mhe
@@ -865,8 +874,13 @@ class OT3API(
             and mount_in_use != OT3Mount.GRIPPER
             and self._gripper_handler.gripper.state != GripperJawState.GRIPPING
         ):
-            # allows for safer gantry movement at minimum force
-            await self.grip(force_newtons=IDLE_STATE_GRIP_FORCE)
+            if self._gripper_handler.gripper.state == GripperJawState.UNHOMED:
+                self._log.warning(
+                    "Gripper jaw is not homed. Can't be moved to idle position"
+                )
+            else:
+                # allows for safer gantry movement at minimum force
+                await self.grip(force_newtons=IDLE_STATE_GRIP_FORCE)
 
     @ExecutionManagerProvider.wait_for_running
     async def _move(

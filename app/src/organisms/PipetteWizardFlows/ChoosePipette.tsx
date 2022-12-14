@@ -29,7 +29,9 @@ import { FLOWS } from './constants'
 import type { SelectablePipettes } from './types'
 
 interface ChoosePipetteProps {
-  proceed: (selectedPipette: SelectablePipettes) => void
+  proceed: () => void
+  selectedPipette: SelectablePipettes
+  setSelectedPipette: React.Dispatch<React.SetStateAction<SelectablePipettes>>
   exit: () => void
 }
 const unselectedOptionStyles = css`
@@ -57,12 +59,8 @@ const selectedOptionStyles = css`
 `
 
 export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
-  const { proceed, exit } = props
+  const { selectedPipette, setSelectedPipette, proceed, exit } = props
   const { t } = useTranslation('pipette_wizard_flows')
-  const [
-    selectedPipette,
-    setSelectedPipette,
-  ] = React.useState<SelectablePipettes>(SINGLE_MOUNT_PIPETTES)
   const [setShowExit, showExit] = React.useState<boolean>(false)
   const proceedButtonText: string = t('attach_this_pipette')
   const nintySixChannelWrapper =
@@ -158,13 +156,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
               </Flex>
             }
             proceedButtonText={proceedButtonText}
-            proceed={() =>
-              proceed(
-                selectedPipette === SINGLE_MOUNT_PIPETTES
-                  ? SINGLE_MOUNT_PIPETTES
-                  : NINETY_SIX_CHANNEL
-              )
-            }
+            proceed={() => proceed()}
           />
         )}
       </ModalShell>

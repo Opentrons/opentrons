@@ -25,7 +25,6 @@ import {
   ROBOT_MODEL_OT3,
 } from '../../../redux/discovery/constants'
 import { useAttachedModules, useAttachedPipettes } from '../hooks'
-import { useFeatureFlag } from '../../../redux/config'
 import { UpdateRobotBanner } from '../../UpdateRobotBanner'
 import { RobotStatusHeader } from '../RobotStatusHeader'
 import { RobotCard } from '../RobotCard'
@@ -101,9 +100,6 @@ const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.
 const mockGetRobotModelByName = getRobotModelByName as jest.MockedFunction<
   typeof getRobotModelByName
 >
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
->
 
 const render = (props: React.ComponentProps<typeof RobotCard>) => {
   return renderWithProviders(
@@ -122,7 +118,6 @@ describe('RobotCard', () => {
 
   beforeEach(() => {
     props = { robot: mockConnectableRobot }
-    mockUseFeatureFlag.mockReturnValue(false)
     mockUseAttachedModules.mockReturnValue(
       mockFetchModulesSuccessActionPayloadModules
     )

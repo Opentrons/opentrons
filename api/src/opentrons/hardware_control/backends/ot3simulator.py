@@ -150,6 +150,7 @@ class OT3Simulator:
         self._encoder_position = self._get_home_position()
         self._present_nodes: Set[NodeId] = set()
         self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
+        self._homed_nodes: Set[NodeId] = set()
 
     @property
     def board_revision(self) -> BoardRevision:
@@ -173,7 +174,10 @@ class OT3Simulator:
             self._configuration.current_settings, gantry_load
         )
 
-    def is_homed(self, axes: Sequence[OT3Axis]) -> bool:
+    def check_ready_for_movement(self, axes: Sequence[OT3Axis]) -> bool:
+        for a in axes:
+            if axis_to_node(a) not in self._homed_nodes:
+                return False
         return True
 
     async def update_position(self) -> OT3AxisMap[float]:
@@ -214,6 +218,12 @@ class OT3Simulator:
         Returns:
             Homed position.
         """
+        if axes:
+            homed = [axis_to_node(a) for a in axes]
+        else:
+            homed = list(self._position.keys())
+        for h in homed:
+            self._homed_nodes.add(h)
         return axis_convert(self._position, 0.0)
 
     async def fast_home(
@@ -228,6 +238,9 @@ class OT3Simulator:
         Returns:
             New position.
         """
+        homed = [axis_to_node(a) for a in axes] if axes else self._position.keys()
+        for h in homed:
+            self._homed_nodes.add(h)
         return axis_convert(self._position, 0.0)
 
     async def gripper_grip_jaw(
@@ -241,6 +254,7 @@ class OT3Simulator:
     async def gripper_home_jaw(self) -> None:
         """Move gripper outward."""
         _ = create_gripper_jaw_home_group()
+        self._homed_nodes.add(NodeId.gripper_g)
 
     async def gripper_hold_jaw(
         self,

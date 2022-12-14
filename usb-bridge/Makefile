@@ -12,13 +12,16 @@ SHX := npx shx
 # add yarn CLI dev deps to PATH (for cross platform POSIX commands via shx)
 PATH := $(shell cd .. && yarn bin):$(PATH)
 
+ot_project := $(OPENTRONS_PROJECT)
+project_ot3_default = $(if $(ot_project),$(ot_project),ot3)
+
 # These variables can be overriden when make is invoked to customize the
 # behavior of pytest. For instance,
 # make test tests=tests/ot3usb/abcd.py would run only the
 # specified test
 tests ?= tests
 test_opts ?=
-sdist_file = $(call python_get_sdistname,usb-bridge,ot3usb)
+sdist_file = $(call python_get_sdistname,usb-bridge,$(project_ot3_default),ot3usb)
 # Host key location for buildroot robot
 br_ssh_key ?= $(default_ssh_key)
 # Other SSH args for buildroot robots
@@ -59,6 +62,7 @@ format:
 	$(python) -m black ot3usb tests
 
 .PHONY: sdist
+sdist: export OPENTRONS_PROJECT=$(project_ot3_default)
 sdist: clean
 	$(python) setup.py sdist
 	$(SHX) rm -rf build

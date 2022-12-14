@@ -10,10 +10,9 @@ from opentrons_shared_data.labware.dev_types import (
     LabwareDefinition as LabwareDefinitionDict,
 )
 
-from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocols.geometry.labware_geometry import AbstractLabwareGeometry
 from opentrons.protocols.api_support.tip_tracker import TipTracker
-from opentrons.types import Point
+from opentrons.types import DeckSlotName, Point
 
 from .well import WellCoreType
 
@@ -35,8 +34,18 @@ class LabwareLoadParams(NamedTuple):
         return cls(namespace, load_name, int(version_str))
 
 
-class AbstractLabware(DeckItem, ABC, Generic[WellCoreType]):
+class AbstractLabware(ABC, Generic[WellCoreType]):
     """Labware implementation core interface."""
+
+    @property
+    @abstractmethod
+    def load_name(self) -> str:
+        """Get the labware's load name."""
+
+    @property
+    @abstractmethod
+    def highest_z(self) -> float:
+        """Get the Z coordinate of the labware's highest point"""
 
     @abstractmethod
     def get_uri(self) -> str:
@@ -139,6 +148,10 @@ class AbstractLabware(DeckItem, ABC, Generic[WellCoreType]):
     @abstractmethod
     def get_well_core(self, well_name: str) -> WellCoreType:
         """Get a well core interface to a given well in this labware."""
+
+    @abstractmethod
+    def get_deck_slot(self) -> Optional[DeckSlotName]:
+        """Get the deck slot the labware or its parent is in, if any."""
 
 
 LabwareCoreType = TypeVar("LabwareCoreType", bound=AbstractLabware[Any])

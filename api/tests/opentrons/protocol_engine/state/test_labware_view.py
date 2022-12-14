@@ -711,3 +711,82 @@ def test_raise_if_labware_in_location(
     )
     with expected_raise:
         subject.raise_if_labware_in_location(location=location)
+
+
+def test_get_calibration_coordinates() -> None:
+    """Should return critical point and coordinates."""
+    slot_definitions = {
+        "locations": {
+            "orderedSlots": [
+                {
+                    "id": "2",
+                    "position": [2, 2, 0.0],
+                    "boundingBox": {
+                        "xDimension": 4.0,
+                        "yDimension": 6.0,
+                        "zDimension": 0,
+                    },
+                    "displayName": "Slot 2",
+                }
+            ]
+        }
+    }
+
+    subject = get_labware_view(deck_definition=cast(DeckDefinitionV3, slot_definitions))
+
+    result = subject.get_calibration_coordinates(current_z_position=3.0)
+
+    assert result == Point(x=4, y=5, z=3)
+
+
+def test_get_by_slot() -> None:
+    """It should get the labware in a given slot."""
+    labware_1 = LoadedLabware.construct(  # type: ignore[call-arg]
+        id="1", location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+    )
+    labware_2 = LoadedLabware.construct(  # type: ignore[call-arg]
+        id="2", location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2)
+    )
+    labware_3 = LoadedLabware.construct(  # type: ignore[call-arg]
+        id="3", location=ModuleLocation(moduleId="cool-module")
+    )
+
+    subject = get_labware_view(
+        labware_by_id={"1": labware_1, "2": labware_2, "3": labware_3}
+    )
+
+    assert subject.get_by_slot(DeckSlotName.SLOT_1, {"1", "2"}) == labware_1
+    assert subject.get_by_slot(DeckSlotName.SLOT_2, {"1", "2"}) == labware_2
+    assert subject.get_by_slot(DeckSlotName.SLOT_3, {"1", "2"}) is None
+
+
+def test_get_by_slot_prefers_later() -> None:
+    """It should get the labware in a slot, preferring later items if locations match."""
+    labware_1 = LoadedLabware.construct(  # type: ignore[call-arg]
+        id="1", location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+    )
+    labware_1_again = LoadedLabware.construct(  # type: ignore[call-arg]
+        id="1-again", location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+    )
+
+    subject = get_labware_view(
+        labware_by_id={"1": labware_1, "1-again": labware_1_again}
+    )
+
+    assert subject.get_by_slot(DeckSlotName.SLOT_1, {"1", "1-again"}) == labware_1_again
+
+
+def test_get_by_slot_filter_ids() -> None:
+    """It should filter labwares in the same slot using IDs."""
+    labware_1 = LoadedLabware.construct(  # type: ignore[call-arg]
+        id="1", location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+    )
+    labware_1_again = LoadedLabware.construct(  # type: ignore[call-arg]
+        id="1-again", location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+    )
+
+    subject = get_labware_view(
+        labware_by_id={"1": labware_1, "1-again": labware_1_again}
+    )
+
+    assert subject.get_by_slot(DeckSlotName.SLOT_1, {"1"}) == labware_1
