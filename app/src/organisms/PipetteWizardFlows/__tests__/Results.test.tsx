@@ -1,6 +1,10 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
-import { LEFT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
+import {
+  LEFT,
+  NINETY_SIX_CHANNEL,
+  SINGLE_MOUNT_PIPETTES,
+} from '@opentrons/shared-data'
 import { COLORS, renderWithProviders } from '@opentrons/components'
 import {
   mockAttachedPipette,
@@ -10,9 +14,15 @@ import { i18n } from '../../../i18n'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { Results } from '../Results'
 import { FLOWS } from '../constants'
+import { getIsGantryEmpty } from '../utils'
 
 import type { AttachedPipette } from '../../../redux/pipettes/types'
 
+jest.mock('../utils')
+
+const mockGetIsGantryEmpty = getIsGantryEmpty as jest.MockedFunction<
+  typeof getIsGantryEmpty
+>
 const render = (props: React.ComponentProps<typeof Results>) => {
   return renderWithProviders(<Results {...props} />, {
     i18nInstance: i18n,
@@ -39,7 +49,9 @@ describe('Results', () => {
       setShowErrorMessage: jest.fn(),
       flowType: FLOWS.CALIBRATE,
       handleCleanUpAndClose: jest.fn(),
+      currentStepIndex: 2,
     }
+    mockGetIsGantryEmpty.mockReturnValue(true)
   })
   it('renders the correct information when pipette cal is a success for calibrate flow', () => {
     const { getByText, getByRole, getByLabelText } = render(props)
@@ -110,5 +122,37 @@ describe('Results', () => {
     const exit = getByRole('button', { name: 'Results_exit' })
     fireEvent.click(exit)
     expect(props.handleCleanUpAndClose).toHaveBeenCalled()
+  })
+  it('renders the correct information when pipette wizard is a fail for 96 channel attach flow and gantry not empty', () => {
+    mockGetIsGantryEmpty.mockReturnValue(false)
+    props = {
+      ...props,
+      flowType: FLOWS.ATTACH,
+      selectedPipette: NINETY_SIX_CHANNEL,
+    }
+    const { getByText, getByRole, getByLabelText } = render(props)
+    getByText('Pipette failed to detach')
+    expect(getByLabelText('ot-alert')).toHaveStyle(
+      `color: ${COLORS.errorEnabled}`
+    )
+    const exit = getByRole('button', { name: 'Results_exit' })
+    fireEvent.click(exit)
+    expect(props.handleCleanUpAndClose).toHaveBeenCalled()
+  })
+  it('renders the correct information when pipette wizard is a success for 96 channel attach flow and gantry not empty', () => {
+    mockGetIsGantryEmpty.mockReturnValue(true)
+    props = {
+      ...props,
+      flowType: FLOWS.ATTACH,
+      selectedPipette: NINETY_SIX_CHANNEL,
+    }
+    const { getByText, getByRole, getByLabelText } = render(props)
+    getByText('Pipette Successfully Detached')
+    expect(getByLabelText('ot-check')).toHaveStyle(
+      `color: ${COLORS.successEnabled}`
+    )
+    const exit = getByRole('button', { name: 'Results_exit' })
+    fireEvent.click(exit)
+    expect(props.proceed).toHaveBeenCalled()
   })
 })

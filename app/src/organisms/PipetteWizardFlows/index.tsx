@@ -3,8 +3,10 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { useConditionalConfirm } from '@opentrons/components'
 import {
+  LEFT,
   NINETY_SIX_CHANNEL,
   SINGLE_MOUNT_PIPETTES,
+  RIGHT,
 } from '@opentrons/shared-data'
 import {
   useHost,
@@ -48,10 +50,13 @@ export const PipetteWizardFlows = (
   const attachedPipette = useSelector((state: State) =>
     getAttachedPipettes(state, robotName)
   )
+  const isGantryEmpty =
+    attachedPipette[LEFT] == null && attachedPipette[RIGHT] == null
   const pipetteWizardSteps = getPipetteWizardSteps(
     flowType,
     mount,
-    selectedPipette
+    selectedPipette,
+    isGantryEmpty
   )
   const host = useHost()
   const [runId, setRunId] = React.useState<string>('')
@@ -212,6 +217,7 @@ export const PipetteWizardFlows = (
         {...calibrateBaseProps}
         proceed={handleProceed}
         handleCleanUpAndClose={handleCleanUpAndClose}
+        currentStepIndex={currentStepIndex}
       />
     )
   } else if (currentStep.section === SECTIONS.MOUNT_PIPETTE) {

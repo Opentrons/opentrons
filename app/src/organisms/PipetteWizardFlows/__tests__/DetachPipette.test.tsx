@@ -16,16 +16,21 @@ import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { FLOWS } from '../constants'
 import { DetachPipette } from '../DetachPipette'
 import { CheckPipetteButton } from '../CheckPipetteButton'
+import { getIsGantryEmpty } from '../utils'
 import type { AttachedPipette } from '../../../redux/pipettes/types'
 
 jest.mock('../CheckPipetteButton')
 jest.mock('../../../molecules/InProgressModal/InProgressModal')
+jest.mock('../utils')
 
 const mockInProgressModal = InProgressModal as jest.MockedFunction<
   typeof InProgressModal
 >
 const mockCheckPipetteButton = CheckPipetteButton as jest.MockedFunction<
   typeof CheckPipetteButton
+>
+const mockGetIsGantryEmpty = getIsGantryEmpty as jest.MockedFunction<
+  typeof getIsGantryEmpty
 >
 const render = (props: React.ComponentProps<typeof DetachPipette>) => {
   return renderWithProviders(<DetachPipette {...props} />, {
@@ -57,6 +62,7 @@ describe('DetachPipette', () => {
     }
     mockInProgressModal.mockReturnValue(<div>mock in progress</div>)
     mockCheckPipetteButton.mockReturnValue(<div>mock check pipette button</div>)
+    mockGetIsGantryEmpty.mockReturnValue(true)
   })
   it('returns the correct information, buttons work as expected for single mount pipettes', () => {
     const { getByText, getByAltText, getByLabelText } = render(props)
@@ -81,6 +87,7 @@ describe('DetachPipette', () => {
   it('returns the correct information, buttons work as expected for 96 channel pipettes', () => {
     props = {
       ...props,
+      flowType: FLOWS.ATTACH,
       selectedPipette: NINETY_SIX_CHANNEL,
     }
     const { getByText, getByAltText, getByLabelText } = render(props)
@@ -107,5 +114,22 @@ describe('DetachPipette', () => {
     getAllByTestId('Skeleton')
     const backBtn = getByLabelText('back')
     expect(backBtn).toBeDisabled()
+  })
+  it('returns the correct information, buttons work as expected for 96 channel pipette flow when single mount is attached', () => {
+    mockGetIsGantryEmpty.mockReturnValue(false)
+    props = {
+      ...props,
+      flowType: FLOWS.ATTACH,
+      selectedPipette: NINETY_SIX_CHANNEL,
+    }
+    const { getByText, getByAltText, getByLabelText } = render(props)
+    getByText('Loosen Screws and Detach')
+    getByText(
+      'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette'
+    )
+    getByAltText('Detach pipette')
+    getByText('mock check pipette button')
+    getByLabelText('back').click()
+    expect(props.goBack).toHaveBeenCalled()
   })
 })

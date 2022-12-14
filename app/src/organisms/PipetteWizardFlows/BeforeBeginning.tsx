@@ -2,7 +2,9 @@ import * as React from 'react'
 import { UseMutateFunction } from 'react-query'
 import { COLORS } from '@opentrons/components'
 import {
+  LEFT,
   NINETY_SIX_CHANNEL,
+  RIGHT,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 import { Trans, useTranslation } from 'react-i18next'
@@ -20,9 +22,10 @@ import {
   NINETY_SIX_CHANNEL_PIPETTE,
   NINETY_SIX_CHANNEL_MOUNTING_PLATE,
 } from './constants'
+import { getIsGantryEmpty } from './utils'
+import type { AxiosError } from 'axios'
 import type { Run, CreateRunData } from '@opentrons/api-client'
 import type { PipetteWizardStepProps } from './types'
-import type { AxiosError } from 'axios'
 
 interface BeforeBeginningProps extends PipetteWizardStepProps {
   createRun: UseMutateFunction<Run, AxiosError<any>, CreateRunData, unknown>
@@ -49,8 +52,28 @@ export const BeforeBeginning = (
   React.useEffect(() => {
     createRun({})
   }, [])
+  let pipetteId = attachedPipette[mount]?.id
 
-  const pipetteId = attachedPipette[mount]?.id
+  const isGantryEmpty = getIsGantryEmpty(attachedPipette)
+  const isGantryEmptyFor96ChannelAttachment =
+    isGantryEmpty &&
+    selectedPipette === NINETY_SIX_CHANNEL &&
+    flowType === FLOWS.ATTACH
+
+  let mountInfo: string = mount
+  if (
+    flowType === FLOWS.ATTACH &&
+    !isGantryEmpty &&
+    selectedPipette === NINETY_SIX_CHANNEL
+  ) {
+    if (attachedPipette[LEFT] == null) {
+      mountInfo = RIGHT
+      pipetteId = attachedPipette[RIGHT]?.id
+    } else if (attachedPipette[RIGHT] == null) {
+      mountInfo = LEFT
+      pipetteId = attachedPipette[LEFT]?.id
+    }
+  }
 
   if (
     pipetteId == null &&
@@ -103,16 +126,16 @@ export const BeforeBeginning = (
           commandType: 'loadPipette' as const,
           params: {
             // @ts-expect-error pipetteName is required but missing in schema v6 type
-            pipetteName: attachedPipette[mount]?.name,
+            pipetteName: attachedPipette[mountInfo]?.name,
             pipetteId: pipetteId,
-            mount: mount,
+            mount: mountInfo,
           },
         },
         {
           // @ts-expect-error calibration type not yet supported
           commandType: 'calibration/moveToMaintenancePosition' as const,
           params: {
-            mount: mount,
+            mount: mountInfo,
           },
         },
       ],
@@ -178,7 +201,8 @@ export const BeforeBeginning = (
       proceedButtonText={proceedButtonText}
       proceedIsDisabled={isCreateLoading}
       proceed={
-        flowType === FLOWS.ATTACH
+        isGantryEmptyFor96ChannelAttachment ||
+        (flowType === FLOWS.ATTACH && selectedPipette === SINGLE_MOUNT_PIPETTES)
           ? handleOnClickAttach
           : handleOnClickCalibrateOrDetach
       }

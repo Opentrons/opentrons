@@ -315,6 +315,7 @@ describe('PipetteWizardFlows', () => {
     })
   })
   it('renders the correct information, calling the correct commands for the attach flow 96 channel', async () => {
+    mockGetAttachedPipettes.mockReturnValue({ left: null, right: null })
     props = {
       ...props,
       flowType: FLOWS.ATTACH,
@@ -370,6 +371,7 @@ describe('PipetteWizardFlows', () => {
     // TODO wait until commands are wired up to write out more of this test!
   })
   it('renders the correct information, calling the correct commands for the detach flow 96 channel', async () => {
+    mockGetAttachedPipettes.mockReturnValue({ left: mockPipette, right: null })
     props = {
       ...props,
       flowType: FLOWS.DETACH,
@@ -435,5 +437,67 @@ describe('PipetteWizardFlows', () => {
     await waitFor(() => {
       expect(dispatchApiRequest).toBeCalledWith(mockFetchPipettes('otie'))
     })
+  })
+  it('renders the correct information, calling the correct commands for the attach flow 96 channel with gantry not empty', async () => {
+    mockGetAttachedPipettes.mockReturnValue({ left: null, right: mockPipette })
+    props = {
+      ...props,
+      flowType: FLOWS.ATTACH,
+      selectedPipette: NINETY_SIX_CHANNEL,
+    }
+    mockGetPipetteWizardSteps.mockReturnValue([
+      {
+        section: SECTIONS.BEFORE_BEGINNING,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.DETACH_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
+      {
+        section: SECTIONS.CARRIAGE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.MOUNTING_PLATE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.MOUNT_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+    ])
+    const { getByText, getByRole } = render(props)
+    getByText('Attach 96-Channel Pipette')
+    getByText('Before you begin')
+    // page 1
+    const getStarted = getByRole('button', { name: 'Move gantry to front' })
+    fireEvent.click(getStarted)
+    await waitFor(() => {
+      expect(mockChainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'calibration/moveToMaintenancePosition',
+            params: { mount: LEFT },
+          },
+        ],
+        false
+      )
+      expect(mockCreateRun).toHaveBeenCalled()
+    })
+    // page 2
+    getByText('Loosen Screws and Detach')
+    getByText('Continue')
   })
 })
