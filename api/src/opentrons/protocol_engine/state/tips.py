@@ -47,9 +47,10 @@ class TipStore(HasState[TipState], HandlesActions):
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
-        # TODO(mc, 2022-11-09): check if tip rack
-        if isinstance(action, UpdateCommandAction) and isinstance(
-            action.command.result, LoadLabwareResult
+        if (
+            isinstance(action, UpdateCommandAction)
+            and isinstance(action.command.result, LoadLabwareResult)
+            and action.command.result.definition.parameters.isTiprack
         ):
             labware_id = action.command.result.labwareId
             definition = action.command.result.definition
@@ -85,8 +86,8 @@ class TipStore(HasState[TipState], HandlesActions):
 
     def _set_used_tips(self, pipette_id: str, well_name: str, labware_id: str) -> None:
         pipette_channels = self._state.channels_by_pipette_id.get(pipette_id)
-        columns = self._state.column_by_labware_id[labware_id]
-        wells = self._state.tips_by_labware_id[labware_id]
+        columns = self._state.column_by_labware_id.get(labware_id, [])
+        wells = self._state.tips_by_labware_id.get(labware_id, {})
 
         if pipette_channels == len(wells):
             for well_name in wells.keys():
@@ -120,8 +121,8 @@ class TipView(HasState[TipState]):
         self, labware_id: str, num_tips: int, starting_tip_name: Optional[str]
     ) -> Optional[str]:
         """Get the next available clean tip."""
-        wells = self._state.tips_by_labware_id[labware_id]
-        columns = self._state.column_by_labware_id[labware_id]
+        wells = self._state.tips_by_labware_id.get(labware_id, {})
+        columns = self._state.column_by_labware_id.get(labware_id, [])
 
         if columns and num_tips == len(columns[0]):
             column_head = [column[0] for column in columns]
@@ -144,8 +145,7 @@ class TipView(HasState[TipState]):
                 return None
 
             if not any(
-                tip_state == TipRackWellState.USED
-                for well_name, tip_state in wells.items()
+                tip_state == TipRackWellState.USED for tip_state in wells.values()
             ):
                 return next(iter(wells))
 
@@ -165,3 +165,19 @@ class TipView(HasState[TipState]):
     def get_pipette_channels(self, pipette_id: str) -> int:
         """Return the given pipette's number of channels."""
         return self._state.channels_by_pipette_id[pipette_id]
+
+    def has_clean_tip(self, labware_id: str, well_name: str) -> bool:
+        """Get whether a well in a labware has a clean tip.
+
+        Args:
+            labware_id: The labware ID to check.
+            well_name: The well name to check.
+
+        Returns:
+            True if the labware is a tip rack and the well has a clean tip,
+            otherwise False.
+        """
+        tip_rack = self._state.tips_by_labware_id.get(labware_id)
+        well_state = tip_rack.get(well_name) if tip_rack else None
+
+        return well_state == TipRackWellState.CLEAN

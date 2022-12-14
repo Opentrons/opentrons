@@ -1,7 +1,11 @@
 import * as React from 'react'
 import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import { LEFT } from '@opentrons/shared-data'
+import {
+  LEFT,
+  NINETY_SIX_CHANNEL,
+  SINGLE_MOUNT_PIPETTES,
+} from '@opentrons/shared-data'
 import {
   useCreateRunMutation,
   // useDeleteRunMutation,
@@ -85,6 +89,7 @@ describe('PipetteWizardFlows', () => {
     .mockImplementation(() => Promise.resolve())
   beforeEach(() => {
     props = {
+      selectedPipette: SINGLE_MOUNT_PIPETTES,
       flowType: FLOWS.CALIBRATE,
       mount: LEFT,
       robotName: 'otie',
@@ -149,10 +154,6 @@ describe('PipetteWizardFlows', () => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
         [
           {
-            commandType: 'home',
-            params: {},
-          },
-          {
             commandType: 'loadPipette',
             params: {
               mount: LEFT,
@@ -161,8 +162,8 @@ describe('PipetteWizardFlows', () => {
             },
           },
           {
-            commandType: 'calibration/moveToLocation',
-            params: { pipetteId: 'abc', location: 'attachOrDetach' },
+            commandType: 'calibration/moveToMaintenancePosition',
+            params: { mount: LEFT },
           },
         ],
         false
@@ -182,15 +183,11 @@ describe('PipetteWizardFlows', () => {
         [
           {
             commandType: 'calibration/calibratePipette',
-            params: { mount: 'left' },
+            params: { mount: LEFT },
           },
           {
-            commandType: 'home',
-            params: { axes: ['leftZ'] },
-          },
-          {
-            commandType: 'calibration/moveToLocation',
-            params: { pipetteId: 'abc', location: 'attachOrDetach' },
+            commandType: 'calibration/moveToMaintenancePosition',
+            params: { mount: LEFT },
           },
         ],
         false
@@ -301,6 +298,65 @@ describe('PipetteWizardFlows', () => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
         [
           {
+            commandType: 'calibration/moveToMaintenancePosition',
+            params: { mount: LEFT },
+          },
+        ],
+        false
+      )
+      expect(mockCreateRun).toHaveBeenCalled()
+    })
+    // page 2
+    getByText('Connect and screw in pipette')
+    const continueBtn = getByRole('button', { name: 'Continue' })
+    fireEvent.click(continueBtn)
+    await waitFor(() => {
+      expect(dispatchApiRequest).toBeCalledWith(mockFetchPipettes('otie'))
+    })
+  })
+  it('renders the correct information, calling the correct commands for the attach flow 96 channel', async () => {
+    props = {
+      ...props,
+      flowType: FLOWS.ATTACH,
+      selectedPipette: NINETY_SIX_CHANNEL,
+    }
+    mockGetPipetteWizardSteps.mockReturnValue([
+      {
+        section: SECTIONS.BEFORE_BEGINNING,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.CARRIAGE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.MOUNTING_PLATE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.MOUNT_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+    ])
+    const { getByText, getByRole } = render(props)
+    getByText('Attach 96-Channel Pipette')
+    getByText('Before you begin')
+    // page 1
+    const getStarted = getByRole('button', { name: 'Move gantry to front' })
+    fireEvent.click(getStarted)
+    await waitFor(() => {
+      expect(mockChainRunCommands).toHaveBeenCalledWith(
+        [
+          {
             commandType: 'home',
             params: {},
           },
@@ -310,7 +366,70 @@ describe('PipetteWizardFlows', () => {
       expect(mockCreateRun).toHaveBeenCalled()
     })
     // page 2
-    getByText('Connect and screw in pipette')
+    getByText('Unscrew Z Axis Carriage')
+    // TODO wait until commands are wired up to write out more of this test!
+  })
+  it('renders the correct information, calling the correct commands for the detach flow 96 channel', async () => {
+    props = {
+      ...props,
+      flowType: FLOWS.DETACH,
+      selectedPipette: NINETY_SIX_CHANNEL,
+    }
+    mockGetPipetteWizardSteps.mockReturnValue([
+      {
+        section: SECTIONS.BEFORE_BEGINNING,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.DETACH_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.MOUNTING_PLATE,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.CARRIAGE,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+    ])
+    const { getByText, getByRole } = render(props)
+    getByText('Detach 96-Channel Pipette')
+    getByText('Before you begin')
+    // page 1
+    const getStarted = getByRole('button', { name: 'Get started' })
+    fireEvent.click(getStarted)
+    await waitFor(() => {
+      expect(mockChainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'loadPipette',
+            params: {
+              mount: LEFT,
+              pipetteId: 'abc',
+              pipetteName: 'p1000_single_gen3',
+            },
+          },
+          {
+            commandType: 'calibration/moveToMaintenancePosition',
+            params: { mount: LEFT },
+          },
+        ],
+        false
+      )
+      expect(mockCreateRun).toHaveBeenCalled()
+    })
+    // page 2
+    getByText('Unscrew and Remove 96 Channel Pipette')
     const continueBtn = getByRole('button', { name: 'Continue' })
     fireEvent.click(continueBtn)
     await waitFor(() => {
