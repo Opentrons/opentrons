@@ -151,6 +151,7 @@ class OT3Controller:
             )
         self._present_nodes: Set[NodeId] = set()
         self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
+        self._homed_nodes: Set[NodeId] = set()
 
     async def update_to_default_current_settings(self, gantry_load: GantryLoad) -> None:
         self._current_settings = get_current_settings(
@@ -196,7 +197,10 @@ class OT3Controller:
         """Set the module controls"""
         self._module_controls = module_controls
 
-    def is_homed(self, axes: Sequence[OT3Axis]) -> bool:
+    def check_ready_for_movement(self, axes: Sequence[OT3Axis]) -> bool:
+        for a in axes:
+            if axis_to_node(a) not in self._homed_nodes:
+                return False
         return True
 
     async def update_position(self) -> OT3AxisMap[float]:
@@ -334,9 +338,10 @@ class OT3Controller:
         if OT3Axis.G in checked_axes:
             await self.gripper_home_jaw()
         for position in positions:
-            for p in position.items():
-                self._position.update({p[0]: p[1][0]})
-                self._encoder_position.update({p[0]: p[1][1]})
+            for axis, p in position.items():
+                self._position.update({axis: p[0]})
+                self._encoder_position.update({axis: p[1]})
+                self._homed_nodes.add(axis)
         return axis_convert(self._position, 0.0)
 
     def _filter_move_group(self, move_group: MoveGroup) -> MoveGroup:
@@ -395,6 +400,7 @@ class OT3Controller:
         for axis, point in positions.items():
             self._position.update({axis: point[0]})
             self._encoder_position.update({axis: point[1]})
+            self._homed_nodes.add(axis)
 
     @staticmethod
     def _synthesize_model_name(name: FirmwarePipetteName, model: str) -> "PipetteModel":

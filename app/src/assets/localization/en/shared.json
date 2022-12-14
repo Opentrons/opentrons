@@ -48,7 +48,7 @@
   "a_software_update_is_available": "A software update is available for this robot. Update to run protocols.",
   "robot_is_busy_no_protocol_run_allowed": "This robot is busy and can’t run this protocol right now. <robotLink>Go to Robot</robotLink>",
   "reanalyze": "Reanalyze",
-  "stand_back_robot_is_in_motion": "Stand back, robot is in motion",
+  "stand_back_robot_is_in_motion": "Stand Back, Robot is in Motion",
   "step": "Step {{current}} / {{max}}",
   "none": "None",
   "remember_my_selection_and_do_not_ask_again": "Remember my selection and don't ask again",

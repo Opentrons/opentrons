@@ -140,7 +140,7 @@ describe('ConfirmPipette', () => {
     fireEvent.click(leaveAttachedBtn)
     expect(props.exit).toBeCalled()
 
-    const tryAgainBtn = getByRole('button', { name: 'Try again' })
+    const tryAgainBtn = getByRole('button', { name: 'try again' })
     fireEvent.click(tryAgainBtn)
     expect(props.tryAgain).toBeCalled()
   })

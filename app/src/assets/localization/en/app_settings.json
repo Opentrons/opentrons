@@ -25,7 +25,6 @@
   "ip_available": "Available",
   "not_found": "Not Found",
   "searching": "Searching for 30s",
-  "try_again": "Try again",
   "discovery_timeout": "Discovery timed out.",
   "setup_connection": "Set up connection",
   "software_update_available": "Software Update Available",
