@@ -116,7 +116,7 @@ jobs:
         run: make --version
       - name: 'install libudev'
         if: startsWith(matrix.os, 'ubuntu')
-        run: sudo apt-get update && sudo apt-get upgrade && sudo apt-get install libudev-dev
+        run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'set complex environment variables'
         id: 'set-vars'
         uses: actions/github-script@v6.1.1
@@ -195,7 +195,7 @@ jobs:
         run: make --version
       - name: 'install libudev'
         if: startsWith(matrix.os, 'ubuntu')
-        run: sudo apt-get update && sudo apt-get upgrade && sudo apt-get install libudev-dev
+        run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'set complex environment variables'
         id: 'set-vars'
         uses: actions/github-script@v6.1.1
