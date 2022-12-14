@@ -16,7 +16,7 @@ class ProtocolType(str, Enum):
     PYTHON = "python"
 
 
-# TODO(mc, 2021-12-07): add data and python support roles
+# TODO(mc, 2021-12-07): add python support roles
 class ProtocolFileRole(str, Enum):
     """The purpose of a given file in a protocol.
 
@@ -26,6 +26,8 @@ class ProtocolFileRole(str, Enum):
             that exports the main `run` method.
         LABWARE: A labware definition file, loadable by a
             Python file in the same protocol.
+        DATA: An arbitrary text or csv file for usage in `bundled_data`
+            for a Python protool
     """
 
     MAIN = "main"

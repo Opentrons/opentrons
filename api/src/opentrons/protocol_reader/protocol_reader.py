@@ -58,7 +58,6 @@ class ProtocolReader:
         except (FileReadError, RoleAnalysisError, ConfigAnalysisError) as e:
             raise ProtocolFilesInvalidError(str(e)) from e
 
-        # TODO(mc, 2021-12-07): add support for other files, like arbitrary data files
         all_files: List[RoleAnalysisFile] = [
             role_analysis.main_file,
             *role_analysis.labware_files,
@@ -106,7 +105,6 @@ class ProtocolReader:
         except (FileReadError, RoleAnalysisError, ConfigAnalysisError) as e:
             raise ProtocolFilesInvalidError(str(e)) from e
 
-        # TODO(mc, 2021-12-07): add support for other files, like arbitrary data files
         all_files: List[RoleAnalysisFile] = [
             role_analysis.main_file,
             *role_analysis.labware_files,

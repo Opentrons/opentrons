@@ -65,10 +65,13 @@ class FileReaderWriter:
             if filename.lower().endswith(".json"):
                 try:
                     json_dict = json.loads(contents)
-                    if json_dict.get("ordering") and json_dict.get("wells"):
+                    if json_dict.get("ordering") is not None and json_dict.get("wells") is not None:
                         data = parse_raw_as(LabwareDefinition, contents)
-                    elif json_dict.get("schemaVersion") and json_dict.get("commands"):
-                        data = parse_raw_as(Union[JsonProtocol, ProtocolSchemaV6], contents)  # type: ignore[arg-type]
+                    elif json_dict.get("schemaVersion") and json_dict.get("commands") is not None:
+                        if json_dict.get("schemaVersion") == 6:
+                            data = parse_raw_as(ProtocolSchemaV6, contents)
+                        else:
+                            data = parse_raw_as(JsonProtocol, contents)
 
                 # unlike other Pydantic functions/methods, `parse_raw_as` can
                 # raise both JSONDecodeError and ValidationError separately

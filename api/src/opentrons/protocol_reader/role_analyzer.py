@@ -37,7 +37,7 @@ class LabwareFile(RoleAnalysisFile):
 class DataFile(RoleAnalysisFile):
     """An arbitrary data file."""
 
-    role: Union[Literal[ProtocolFileRole.DATA]] = ProtocolFileRole.DATA
+    role: Literal[ProtocolFileRole.DATA] = ProtocolFileRole.DATA
 
 
 # TODO(mc, 2021-12-07): add support for python support files and data files
