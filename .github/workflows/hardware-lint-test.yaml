@@ -45,6 +45,8 @@ jobs:
     steps:
       - name: Checkout opentrons repo
         uses: 'actions/checkout@v3'
+        with:
+          fetch-depth: 0
       - uses: './.github/actions/python/setup-all-environments'
 
       # TODO(amit, 2022-03-08): Enable once ot3 emulation is ready

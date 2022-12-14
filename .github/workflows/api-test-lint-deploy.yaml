@@ -55,6 +55,8 @@ jobs:
     runs-on: 'ubuntu-22.04'
     steps:
       - uses: 'actions/checkout@v3'
+        with:
+          fetch-depth: 0
       - uses: './.github/actions/python/setup-all-environments'
         id: 'setup'
       - uses: './.github/actions/python/lint'
@@ -71,6 +73,8 @@ jobs:
     runs-on: '${{ matrix.os }}'
     steps:
       - uses: 'actions/checkout@v3'
+        with:
+          fetch-depth: 0
       - name: setup python environment Windows and Mac
         if: matrix.os != 'ubuntu-22.04'
         uses: './.github/actions/python/setup-single-environment'
@@ -120,6 +124,8 @@ jobs:
     if: github.event_name == 'push'
     steps:
       - uses: 'actions/checkout@v3'
+        with:
+          fetch-depth: 0
       - uses: './.github/actions/python/setup-all-environments'
       - name: 'set complex environment variables'
         uses: actions/github-script@v6.1.1

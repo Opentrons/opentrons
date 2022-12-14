@@ -95,10 +95,16 @@ class Well:
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def has_tip(self) -> bool:
+        """If parent labware is a tip rack, whether this well contains a tip."""
         return self._impl.has_tip()
 
     @has_tip.setter
     def has_tip(self, value: bool) -> None:
+        _log.warning(
+            "Setting the `Well.has_tip` property manually has been deprecated"
+            " and will raise an error in a future version of the Python Protocol API."
+        )
+
         self._impl.set_has_tip(value)
 
     @property

@@ -4,14 +4,22 @@ import codecs
 import os
 from setuptools import setup, find_packages
 import json
+import sys
 
 HERE = os.path.abspath(os.path.dirname(__file__))
+sys.path.append(os.path.join(HERE, "..", "scripts"))
+
+from python_build_utils import normalize_version  # noqa: E402
 
 
 def get_version():
-    with open(os.path.join(HERE, 'otupdate', 'package.json')) as pkg:
-        package_json = json.load(pkg)
-        return package_json.get('version')
+    buildno = os.getenv("BUILD_NUMBER")
+    project = os.getenv('OPENTRONS_PROJECT', 'robot-stack')
+    if buildno:
+        normalize_opts = {"extra_tag": buildno}
+    else:
+        normalize_opts = {}
+    return normalize_version("update-server", project, **normalize_opts)
 
 
 VERSION = get_version()

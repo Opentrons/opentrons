@@ -1,6 +1,6 @@
 """ Tests for behaviors specific to the OT3 hardware controller.
 """
-from typing import cast, Iterator, Union, Dict, Tuple
+from typing import cast, Iterator, Union, Dict, Tuple, List
 from typing_extensions import Literal
 from math import copysign
 import pytest
@@ -52,6 +52,19 @@ def mock_move_to(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
         AsyncMock(
             spec=ot3_hardware.managed_obj.move_to,
             wraps=ot3_hardware.managed_obj.move_to,
+        ),
+    ) as mock_move:
+        yield mock_move
+
+
+@pytest.fixture
+def mock_home(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+    with patch.object(
+        ot3_hardware.managed_obj,
+        "home",
+        AsyncMock(
+            spec=ot3_hardware.managed_obj.home,
+            wraps=ot3_hardware.managed_obj.home,
         ),
     ) as mock_move:
         yield mock_move
@@ -213,6 +226,38 @@ def mock_backend_capacitive_pass(
 
         mock_pass.side_effect = _update_position
         yield mock_pass
+
+
+@pytest.mark.parametrize(
+    "mount,homed_axis",
+    [
+        (OT3Mount.RIGHT, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_R]),
+        (OT3Mount.LEFT, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L]),
+        (OT3Mount.GRIPPER, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_G]),
+    ],
+)
+async def test_move_to_without_homing_first(
+    ot3_hardware: ThreadManager[OT3API],
+    mock_home: AsyncMock,
+    mount: OT3Mount,
+    homed_axis: List[OT3Axis],
+) -> None:
+    """Before a mount can be moved, XY and the corresponding Z  must be homed first"""
+    if mount == OT3Mount.GRIPPER:
+        # attach a gripper if we're testing the gripper mount
+        gripper_config = gc.load(GripperModel.V1, "test")
+        instr_data = AttachedGripper(config=gripper_config, id="test")
+        await ot3_hardware.cache_gripper(instr_data)
+
+    ot3_hardware._backend._homed_nodes = set()
+    assert not ot3_hardware._backend.check_ready_for_movement(homed_axis)
+
+    await ot3_hardware.move_to(
+        mount,
+        Point(0.001, 0.001, 0.001),
+    )
+    mock_home.assert_called_once_with(homed_axis)
+    assert ot3_hardware._backend.check_ready_for_movement(homed_axis)
 
 
 @pytest.mark.parametrize(

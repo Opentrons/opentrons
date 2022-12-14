@@ -96,6 +96,7 @@ def axis_to_node(axis: OT3Axis) -> "NodeId":
         OT3Axis.P_R: NodeId.pipette_right,
         OT3Axis.Z_G: NodeId.gripper_z,
         OT3Axis.G: NodeId.gripper_g,
+        OT3Axis.Q: NodeId.pipette_left,
     }
     return anm[axis]
 

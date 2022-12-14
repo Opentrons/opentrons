@@ -142,7 +142,7 @@ describe('PipetteCard', () => {
     getByText('left Mount')
     getByText('Left Pipette')
   })
-  it('renders information for a 96 channel pipette with overflow menu button disabled', () => {
+  it('renders information for a 96 channel pipette with overflow menu button not disabled', () => {
     const { getByText, getByRole } = render({
       pipetteInfo: mockLeftSpecs,
       mount: LEFT,
@@ -154,7 +154,9 @@ describe('PipetteCard', () => {
     const overflowButton = getByRole('button', {
       name: /overflow/i,
     })
-    expect(overflowButton).toBeDisabled()
+    fireEvent.click(overflowButton)
+    expect(overflowButton).not.toBeDisabled()
+    getByText('mock pipette overflow menu')
   })
   it('renders information for a right pipette', () => {
     const { getByText } = render({

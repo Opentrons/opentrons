@@ -3,10 +3,16 @@ import pytest
 
 from typing import Optional
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.labware_definition import (
+    LabwareDefinition,
+    Parameters as LabwareParameters,
+)
 
 from opentrons.protocol_engine import actions, commands
 from opentrons.protocol_engine.state.tips import TipStore, TipView
+
+
+_tip_rack_parameters = LabwareParameters.construct(isTiprack=True)  # type: ignore[call-arg]
 
 
 @pytest.fixture
@@ -32,7 +38,8 @@ def labware_definition() -> LabwareDefinition:
             ["A10", "B10", "C10", "D10", "E10", "F10", "G10", "H10"],
             ["A11", "B11", "C11", "D11", "E11", "F11", "G11", "H11"],
             ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"],
-        ]
+        ],
+        parameters=_tip_rack_parameters,
     )
 
 
@@ -74,7 +81,9 @@ def drop_tip_command() -> commands.DropTip:
 
 @pytest.mark.parametrize(
     "labware_definition",
-    [LabwareDefinition.construct(ordering=[])],  # type: ignore[call-arg]
+    [
+        LabwareDefinition.construct(ordering=[], parameters=_tip_rack_parameters)  # type: ignore[call-arg]
+    ],
 )
 def test_get_next_tip_returns_none(
     load_labware_command: commands.LoadLabware, subject: TipStore
@@ -228,3 +237,34 @@ def test_handle_pipette_config_action(subject: TipStore) -> None:
     )
 
     assert TipView(subject.state).get_pipette_channels(pipette_id="pipette-id") == 8
+
+
+@pytest.mark.parametrize(
+    "labware_definition",
+    [
+        LabwareDefinition.construct(  # type: ignore[call-arg]
+            ordering=[["A1"]],
+            parameters=LabwareParameters.construct(isTiprack=False),  # type: ignore[call-arg]
+        )
+    ],
+)
+def test_has_tip_not_tip_rack(
+    load_labware_command: commands.LoadLabware, subject: TipStore
+) -> None:
+    """It should return False if labware isn't a tip rack."""
+    subject.handle_action(actions.UpdateCommandAction(command=load_labware_command))
+
+    result = TipView(state=subject.state).has_clean_tip("cool-labware", "A1")
+
+    assert result is False
+
+
+def test_has_tip_tip_rack(
+    load_labware_command: commands.LoadLabware, subject: TipStore
+) -> None:
+    """It should return False if labware isn't a tip rack."""
+    subject.handle_action(actions.UpdateCommandAction(command=load_labware_command))
+
+    result = TipView(state=subject.state).has_clean_tip("cool-labware", "A1")
+
+    assert result is True

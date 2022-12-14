@@ -13,6 +13,7 @@ from opentrons.protocol_api import (
     validation as mock_validation,
 )
 from opentrons.protocol_api.core.common import ProtocolCore, ThermocyclerCore
+from opentrons.protocol_api.core.core_map import LoadedCoreMap
 
 
 @pytest.fixture(autouse=True)
@@ -34,6 +35,12 @@ def mock_protocol_core(decoy: Decoy) -> ProtocolCore:
 
 
 @pytest.fixture
+def mock_core_map(decoy: Decoy) -> LoadedCoreMap:
+    """Get a mock LoadedCoreMap."""
+    return decoy.mock(cls=LoadedCoreMap)
+
+
+@pytest.fixture
 def mock_broker(decoy: Decoy) -> Broker:
     """Get a mock command message broker."""
     return decoy.mock(cls=Broker)
@@ -50,12 +57,14 @@ def subject(
     api_version: APIVersion,
     mock_core: ThermocyclerCore,
     mock_protocol_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
     mock_broker: Broker,
 ) -> ThermocyclerContext:
     """Get a thermocycler module context with its dependencies mocked out."""
     return ThermocyclerContext(
         core=mock_core,
         protocol_core=mock_protocol_core,
+        core_map=mock_core_map,
         broker=mock_broker,
         api_version=api_version,
     )

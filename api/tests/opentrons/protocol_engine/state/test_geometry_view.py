@@ -1004,3 +1004,55 @@ def test_get_extra_waypoints(
     extra_waypoints = subject.get_extra_waypoints("to-labware-id", location)
 
     assert extra_waypoints == expected_waypoints
+
+
+def test_get_slot_item(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    subject: GeometryView,
+) -> None:
+    """It should get items in certain slots."""
+    allowed_labware_ids = {"foo", "bar"}
+    allowed_module_ids = {"fizz", "buzz"}
+    labware = LoadedLabware.construct(id="cool-labware")  # type: ignore[call-arg]
+    module = LoadedModule.construct(id="cool-module")  # type: ignore[call-arg]
+
+    decoy.when(
+        labware_view.get_by_slot(DeckSlotName.SLOT_1, allowed_labware_ids)
+    ).then_return(None)
+    decoy.when(
+        labware_view.get_by_slot(DeckSlotName.SLOT_2, allowed_labware_ids)
+    ).then_return(labware)
+    decoy.when(
+        labware_view.get_by_slot(DeckSlotName.SLOT_3, allowed_labware_ids)
+    ).then_return(None)
+
+    decoy.when(
+        module_view.get_by_slot(DeckSlotName.SLOT_1, allowed_module_ids)
+    ).then_return(None)
+    decoy.when(
+        module_view.get_by_slot(DeckSlotName.SLOT_2, allowed_module_ids)
+    ).then_return(None)
+    decoy.when(
+        module_view.get_by_slot(DeckSlotName.SLOT_3, allowed_module_ids)
+    ).then_return(module)
+
+    assert (
+        subject.get_slot_item(
+            DeckSlotName.SLOT_1, allowed_labware_ids, allowed_module_ids
+        )
+        is None
+    )
+    assert (
+        subject.get_slot_item(
+            DeckSlotName.SLOT_2, allowed_labware_ids, allowed_module_ids
+        )
+        == labware
+    )
+    assert (
+        subject.get_slot_item(
+            DeckSlotName.SLOT_3, allowed_labware_ids, allowed_module_ids
+        )
+        == module
+    )

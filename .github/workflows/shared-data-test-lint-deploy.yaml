@@ -48,6 +48,8 @@ jobs:
     runs-on: 'ubuntu-22.04'
     steps:
       - uses: 'actions/checkout@v3'
+        with:
+          fetch-depth: 0
       - uses: './.github/actions/python/setup-all-environments'
         id: 'setup'
       - uses: './.github/actions/python/lint'
@@ -65,6 +67,8 @@ jobs:
     runs-on: '${{ matrix.os }}'
     steps:
       - uses: 'actions/checkout@v3'
+        with:
+          fetch-depth: 0
       - name: 'install udev for usb-detection'
         if: startsWith(matrix.os, 'ubuntu')
         run: sudo apt-get update && sudo apt-get install libudev-dev
@@ -139,6 +143,8 @@ jobs:
     if: github.event_name == 'push'
     steps:
       - uses: 'actions/checkout@v3'
+        with:
+          fetch-depth: 0
       - name: 'install udev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - uses: './.github/actions/python/setup-all-environments'
