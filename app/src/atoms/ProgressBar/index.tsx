@@ -3,7 +3,7 @@ import { css } from 'styled-components'
 
 import { COLORS, Box } from '@opentrons/components'
 
-interface LinerProgressProps {
+interface ProgressBarProps {
   completed: number
   /** optional liner progress's background the color default color is white */
   bgColor?: string
@@ -13,17 +13,18 @@ interface LinerProgressProps {
   color?: string
   /** optional liner progress bar radius the default is 0 */
   borderRadius?: string
-  /** optional  */
+  /** optional the default is ease-in-out  */
   animationStyle?: string
 }
 
-export function LinerProgress({
+export function ProgressBar({
   completed,
   bgColor = COLORS.white,
   height = '0.5rem',
   color = COLORS.blueEnabled,
   borderRadius = '0',
-}: LinerProgressProps): JSX.Element {
+  animationStyle = 'ease-in-out',
+}: ProgressBarProps): JSX.Element {
   const [progress, setProgress] = React.useState<string>(`${completed}%`)
 
   const LINER_PROGRESS_CONTAINER_STYLE = css`
@@ -40,7 +41,7 @@ export function LinerProgress({
     height: ${height};
     width: ${progress};
     background: ${color};
-    transition: ${progress} 1s ease-in-out;
+    transition: ${progress} 1s ${animationStyle};
     display: flex;
     align-items: center;
     justify-content: right;
@@ -62,11 +63,11 @@ export function LinerProgress({
     <Box
       role="progressbar"
       css={LINER_PROGRESS_CONTAINER_STYLE}
-      data-testid="LinerProgress_Container"
+      data-testid="ProgressBar_Container"
     >
       <Box
         css={LINER_PROGRESS_FILLER_STYLE}
-        data-testid="LinerProgress_Bar"
+        data-testid="ProgressBar_Bar"
       ></Box>
     </Box>
   )

@@ -4,16 +4,16 @@ import { Flex, DIRECTION_COLUMN, SPACING, COLORS } from '@opentrons/components'
 
 import { SecondaryButton } from '../buttons'
 import { StyledText } from '../text'
-import { LinerProgress } from './index'
+import { ProgressBar } from './index'
 
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'App/Atoms/LinerProgress',
-  component: LinerProgress,
+  title: 'App/Atoms/ProgressBar',
+  component: ProgressBar,
 } as Meta
 
-const Template: Story<React.ComponentProps<typeof LinerProgress>> = args => {
+const Template: Story<React.ComponentProps<typeof ProgressBar>> = args => {
   const [progress, setProgress] = React.useState<number>(args.completed)
   React.useEffect(() => {
     if (progress < 100) {
@@ -32,7 +32,7 @@ const Template: Story<React.ComponentProps<typeof LinerProgress>> = args => {
       padding={SPACING.spacing4}
     >
       <StyledText>{'Add 5% to the current progress every 0.2 sec'}</StyledText>
-      <LinerProgress completed={progress} />
+      <ProgressBar completed={progress} />
       <SecondaryButton onClick={() => setProgress(0)} width="5rem">
         {'reset'}
       </SecondaryButton>
