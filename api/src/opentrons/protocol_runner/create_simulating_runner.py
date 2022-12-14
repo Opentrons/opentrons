@@ -1,8 +1,5 @@
 """Simulating ProtocolRunner factory."""
 
-from typing_extensions import Literal
-
-from opentrons.config import feature_flags
 from opentrons.hardware_control import API as OT2API, HardwareControlAPI
 from opentrons.protocol_engine import (
     Config as ProtocolEngineConfig,
