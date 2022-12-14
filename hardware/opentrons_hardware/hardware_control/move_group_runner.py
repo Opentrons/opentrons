@@ -9,6 +9,7 @@ from opentrons_hardware.firmware_bindings import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     ErrorCode,
+    MotorPositionFlags,
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition
@@ -101,7 +102,7 @@ class MoveGroupRunner:
 
     async def execute(
         self, can_messenger: CanMessenger
-    ) -> NodeDict[Tuple[float, float]]:
+    ) -> NodeDict[Tuple[float, float, bool, bool]]:
         """Execute a pre-prepared move group. The second thing that run() does.
 
         prep() and execute() can be used to replace a single call to run() to
@@ -120,7 +121,9 @@ class MoveGroupRunner:
             raise
         return self._accumulate_move_completions(move_completion_data)
 
-    async def run(self, can_messenger: CanMessenger) -> NodeDict[Tuple[float, float]]:
+    async def run(
+        self, can_messenger: CanMessenger
+    ) -> NodeDict[Tuple[float, float, bool, bool]]:
         """Run the move group.
 
         Args:
@@ -144,10 +147,10 @@ class MoveGroupRunner:
     @staticmethod
     def _accumulate_move_completions(
         completions: _Completions,
-    ) -> NodeDict[Tuple[float, float]]:
-        position: NodeDict[List[Tuple[Tuple[int, int], float, float]]] = defaultdict(
-            list
-        )
+    ) -> NodeDict[Tuple[float, float, bool, bool]]:
+        position: NodeDict[
+            List[Tuple[Tuple[int, int], float, float, bool, bool]]
+        ] = defaultdict(list)
         for arbid, completion in completions:
             position[NodeId(arbid.parts.originating_node_id)].append(
                 (
@@ -157,6 +160,14 @@ class MoveGroupRunner:
                     ),
                     float(completion.payload.current_position_um.value) / 1000.0,
                     float(completion.payload.encoder_position_um.value) / 1000.0,
+                    bool(
+                        completion.payload.position_flags.value
+                        & MotorPositionFlags.stepper_position_ok
+                    ),
+                    bool(
+                        completion.payload.position_flags.value
+                        & MotorPositionFlags.encoder_position_ok
+                    ),
                 )
             )
         # for each node, pull the position from the completion with the largest

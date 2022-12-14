@@ -126,7 +126,7 @@ home_test_params = [
 def move_group_run_side_effect(controller, axes_to_home):
     """Return homed position for axis that is present and was commanded to home."""
     gantry_homes = {
-        axis_to_node(ax): (0.0, 0.0)
+        axis_to_node(ax): (0.0, 0.0, True, True)
         for ax in OT3Axis.gantry_axes()
         if ax in axes_to_home and axis_to_node(ax) in controller._present_nodes
     }
@@ -134,7 +134,7 @@ def move_group_run_side_effect(controller, axes_to_home):
         yield gantry_homes
 
     pipette_homes = {
-        axis_to_node(ax): (0.0, 0.0)
+        axis_to_node(ax): (0.0, 0.0, True, True)
         for ax in OT3Axis.pipette_axes()
         if ax in axes_to_home and axis_to_node(ax) in controller._present_nodes
     }

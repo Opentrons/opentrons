@@ -47,6 +47,7 @@ from opentrons.hardware_control.types import (
     CurrentConfig,
     OT3SubSystem,
     InstrumentProbeType,
+    MotorStatus,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 
@@ -69,6 +70,7 @@ class OT3Simulator:
 
     _position: Dict[NodeId, float]
     _encoder_position: Dict[NodeId, float]
+    _motor_status: Dict[NodeId, MotorStatus]
 
     @classmethod
     async def build(
@@ -148,6 +150,7 @@ class OT3Simulator:
         self._module_controls: Optional[AttachedModulesControl] = None
         self._position = self._get_home_position()
         self._encoder_position = self._get_home_position()
+        self._motor_status = {}
         self._present_nodes: Set[NodeId] = set()
         self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
         self._homed_nodes: Set[NodeId] = set()
@@ -173,6 +176,15 @@ class OT3Simulator:
         self._current_settings = get_current_settings(
             self._configuration.current_settings, gantry_load
         )
+
+    def _handle_motor_status_update(self, response: Dict[NodeId, float]) -> None:
+        self._position.update(response)
+        self._encoder_position.update(response)
+        self._motor_status = MotorStatus(motor_ok=True, encoder_ok=True)
+
+    async def update_motor_status(self) -> None:
+        """Retreieve motor and encoder status and position from all present nodes"""
+        self._motor_status = MotorStatus(motor_ok=True, encoder_ok=True)
 
     def check_ready_for_movement(self, axes: Sequence[OT3Axis]) -> bool:
         for a in axes:
