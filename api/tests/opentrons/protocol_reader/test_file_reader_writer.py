@@ -14,6 +14,7 @@ from opentrons.protocol_reader.file_reader_writer import (
     FileReaderWriter,
     FileReadError,
     BufferedFile,
+    UnknownJsonFileError,
 )
 
 
@@ -112,22 +113,32 @@ async def test_read_opentrons_json_bad_parse() -> None:
         await subject.read([in_file])
 
 
-async def test_read_opentrons_arbitrary_json_validate() -> None:
-    """It should still pass if a JSON file cannot be validated into a known model."""
+@pytest.mark.parametrize(
+    "contents",
+    [
+        b'{"schemaVersion": 6, "commands": []}',
+        b'{"schemaVersion": 5, "commands": []}',
+        b'{"ordering": [], "wells": {}}',
+    ],
+)
+async def test_read_opentrons_json_bad_validate(contents: bytes) -> None:
+    """It should error if a JSON file cannot be validated into a known model."""
+    in_file = InputFile(filename="hello.json", file=io.BytesIO(contents))
+
+    subject = FileReaderWriter()
+
+    with pytest.raises(FileReadError, match="known Opentrons format"):
+        await subject.read([in_file])
+
+
+async def test_read_opentrons_json_unknown_format() -> None:
+    """It should error if a JSON file is determined to be an unknown format."""
     in_file = InputFile(filename="hello.json", file=io.BytesIO(b'{"oh": "no"}'))
 
     subject = FileReaderWriter()
 
-    result = await subject.read([in_file])
-
-    assert result == [
-        BufferedFile(
-            name="hello.json",
-            contents=b'{"oh": "no"}',
-            data=None,
-            path=None,
-        ),
-    ]
+    with pytest.raises(UnknownJsonFileError, match="unknown Opentrons format"):
+        await subject.read([in_file])
 
 
 async def test_write(tmp_path: Path) -> None:

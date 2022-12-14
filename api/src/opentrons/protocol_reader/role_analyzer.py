@@ -58,7 +58,7 @@ class RoleAnalysisError(ValueError):
 class RoleAnalyzer:
     """Input file role analysis interface."""
 
-    @staticmethod
+    @staticmethod  # noqa: C901
     def analyze(files: Sequence[BufferedFile]) -> RoleAnalysis:
         """Analyze a set of input files to determine each of their roles."""
         if len(files) == 0:
@@ -69,7 +69,8 @@ class RoleAnalyzer:
         bundled_data_files = []
 
         for f in files:
-            if f.name.lower().endswith(".py") or isinstance(
+            filename = f.name.lower()
+            if filename.endswith(".py") or isinstance(
                 f.data, (ProtocolSchemaV5, ProtocolSchemaV6)
             ):
                 data = (
@@ -87,7 +88,7 @@ class RoleAnalyzer:
                         name=f.name, contents=f.contents, data=f.data, path=f.path
                     )
                 )
-            else:
+            elif filename.endswith(".txt") or filename.endswith(".csv"):
                 bundled_data_files.append(
                     DataFile(name=f.name, contents=f.contents, data=f.data, path=f.path)
                 )

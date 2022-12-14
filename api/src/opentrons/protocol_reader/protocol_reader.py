@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import List, Optional, Sequence
 
 from .input_file import AbstractInputFile
-from .file_reader_writer import FileReaderWriter, FileReadError
+from .file_reader_writer import FileReaderWriter, FileReadError, UnknownJsonFileError
 from .role_analyzer import RoleAnalyzer, RoleAnalysisFile, RoleAnalysisError
 from .config_analyzer import ConfigAnalyzer, ConfigAnalysisError
 from .protocol_source import ProtocolSource, ProtocolSourceFile
@@ -55,7 +55,12 @@ class ProtocolReader:
             buffered_files = await self._file_reader_writer.read(files)
             role_analysis = self._role_analyzer.analyze(buffered_files)
             config_analysis = self._config_analyzer.analyze(role_analysis.main_file)
-        except (FileReadError, RoleAnalysisError, ConfigAnalysisError) as e:
+        except (
+            FileReadError,
+            UnknownJsonFileError,
+            RoleAnalysisError,
+            ConfigAnalysisError,
+        ) as e:
             raise ProtocolFilesInvalidError(str(e)) from e
 
         all_files: List[RoleAnalysisFile] = [
@@ -102,7 +107,12 @@ class ProtocolReader:
             buffered_files = await self._file_reader_writer.read(files)
             role_analysis = self._role_analyzer.analyze(buffered_files)
             config_analysis = self._config_analyzer.analyze(role_analysis.main_file)
-        except (FileReadError, RoleAnalysisError, ConfigAnalysisError) as e:
+        except (
+            FileReadError,
+            UnknownJsonFileError,
+            RoleAnalysisError,
+            ConfigAnalysisError,
+        ) as e:
             raise ProtocolFilesInvalidError(str(e)) from e
 
         all_files: List[RoleAnalysisFile] = [
