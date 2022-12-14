@@ -6,7 +6,7 @@ _pyversion = sys.version_info[0:2]
 if _pyversion >= (3, 8):
     from importlib import metadata
 else:
-    import importlib_metadata as metadata  # type: ignore[no-redef]
+    import importlib_metadata as metadata  # type: ignore[no-redef, import]
 
 try:
     version: str = metadata.version("opentrons_shared_data")  # type: ignore[attr-defined]

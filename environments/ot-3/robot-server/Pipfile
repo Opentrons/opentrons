@@ -33,6 +33,7 @@ robot-server = { editable = true, path = "../../../robot-server" }
 opentrons = { editable = true, path = "../../../api" }
 opentrons-shared-data = { editable = true, path = "../../../shared-data/python" }
 notify-server = { editable = true, path = "../../../notify-server" }
+opentrons-hardware = { editable = true, path = "../../../hardware" }
 anyio = "==3.3.0"
 fastapi = "==0.68.1"
 python-dotenv = "==0.19.0"
@@ -46,6 +47,5 @@ idna = "==3.3"
 click = "==8.0.1"
 numpy = "==1.21.2"
 zipp = "==3.5.0"
-opentrons-hardware = { editable = true, path = "../../../hardware" }
 sqlalchemy = "==1.4.32"
 aiosqlite = "==0.17.0"

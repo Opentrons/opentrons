@@ -193,5 +193,5 @@ sync-fw-ot3:
 .PHONY: sync-ot3
 sync-ot3: sync-sw-ot3 sync-fw-ot3
 
-update:
+update: teardown
 	$(pipenv) update --dev

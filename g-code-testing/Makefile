@@ -97,5 +97,6 @@ update-g-code-configuration-comparison:
 check-for-missing-comparison-files:
 	$(pipenv) run python cli.py check-for-missing-comparison-files --error_on_missing_configuration_files
 
-update:
+.PHONY: update
+update: teardown
 	$(pipenv) update --dev

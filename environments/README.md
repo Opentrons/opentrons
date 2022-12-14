@@ -7,3 +7,7 @@ Each of these projects is also used in multiple different target environments - 
 This directory contains Pipenv files defining those target environments. Because they are linked to environments rather than projects, multiple projects can be executed within them.
 
 You can set them up by running `make setup`.
+
+## Gotchas
+
+- If the INSTALL_REQUIRES value changes in the `setup.py` of a project, `make update` must be run on any environment using that project.
