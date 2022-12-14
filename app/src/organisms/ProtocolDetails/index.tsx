@@ -47,10 +47,11 @@ import { Modal } from '../../molecules/Modal'
 import { useTrackEvent } from '../../redux/analytics'
 import { useFeatureFlag } from '../../redux/config'
 import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
-import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
+import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
 import {
   getAnalysisStatus,
+  getIsOT3Protocol,
   getProtocolDisplayName,
 } from '../ProtocolsLanding/utils'
 import { ProtocolOverflowMenu } from '../ProtocolsLanding/ProtocolOverflowMenu'
@@ -253,6 +254,7 @@ export function ProtocolDetails(
     getIsProtocolAnalysisInProgress(state, protocolKey)
   )
   const analysisStatus = getAnalysisStatus(isAnalyzing, mostRecentAnalysis)
+  const isOT3Protocol = getIsOT3Protocol(mostRecentAnalysis)
   const liquidSetupEnabled = useFeatureFlag('enableLiquidSetup')
   if (analysisStatus === 'missing') return null
 
@@ -332,6 +334,7 @@ export function ProtocolDetails(
         rightMountPipetteName={rightMountPipetteName}
         requiredModuleDetails={requiredModuleDetails}
         isLoading={analysisStatus === 'loading'}
+        isOT3Protocol={isOT3Protocol}
       />
     ),
     liquids: (
@@ -394,7 +397,7 @@ export function ProtocolDetails(
         padding={SPACING.spacing4}
         width="100%"
       >
-        <ChooseRobotSlideout
+        <ChooseRobotToRunProtocolSlideout
           onCloseClick={() => setShowSlideout(false)}
           showSlideout={showSlideout}
           storedProtocolData={props}
@@ -527,6 +530,7 @@ export function ProtocolDetails(
           >
             <ProtocolOverflowMenu
               handleRunProtocol={() => setShowSlideout(true)}
+              protocolDisplayName={protocolDisplayName}
               protocolKey={protocolKey}
               data-testid="ProtocolDetails_overFlowMenu"
             />

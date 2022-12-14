@@ -23,7 +23,7 @@ import { storedProtocolData } from '../../../redux/protocol-storage/__fixtures__
 import { ProtocolDetails } from '..'
 import { DeckThumbnail } from '../../../molecules/DeckThumbnail'
 import { getValidCustomLabwareFiles } from '../../../redux/custom-labware/selectors'
-import { ChooseRobotSlideout } from '../../ChooseRobotSlideout'
+import { ChooseRobotToRunProtocolSlideout } from '../../ChooseRobotToRunProtocolSlideout'
 
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
@@ -33,7 +33,7 @@ jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../../redux/protocol-storage/selectors')
 jest.mock('../../../molecules/DeckThumbnail')
 jest.mock('../../../redux/config')
-jest.mock('../../ChooseRobotSlideout')
+jest.mock('../../ChooseRobotToRunProtocolSlideout')
 
 const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
   typeof getConnectableRobots
@@ -57,8 +57,8 @@ const mockGetValidCustomLabwareFiles = getValidCustomLabwareFiles as jest.Mocked
 const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
   typeof useFeatureFlag
 >
-const mockChooseRobotSlideout = ChooseRobotSlideout as jest.MockedFunction<
-  typeof ChooseRobotSlideout
+const mockChooseRobotToRunProtocolSlideout = ChooseRobotToRunProtocolSlideout as jest.MockedFunction<
+  typeof ChooseRobotToRunProtocolSlideout
 >
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
@@ -96,8 +96,9 @@ describe('ProtocolDetails', () => {
     mockGetReachableRobots.mockReturnValue([mockReachableRobot])
     mockGetScanning.mockReturnValue(false)
     mockDeckThumbnail.mockReturnValue(<div>mock Deck Thumbnail</div>)
-    mockChooseRobotSlideout.mockImplementation(({ showSlideout }) =>
-      showSlideout ? <div>mock Choose Robot Slideout</div> : null
+    mockChooseRobotToRunProtocolSlideout.mockImplementation(
+      ({ showSlideout }) =>
+        showSlideout ? <div>mock Choose Robot Slideout</div> : null
     )
     mockGetIsProtocolAnalysisInProgress.mockReturnValue(false)
     mockUseTrackEvent.mockReturnValue(mockTrackEvent)

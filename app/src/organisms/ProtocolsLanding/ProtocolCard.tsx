@@ -38,7 +38,11 @@ import { StyledText } from '../../atoms/text'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
-import { getAnalysisStatus, getProtocolDisplayName } from './utils'
+import {
+  getAnalysisStatus,
+  getIsOT3Protocol,
+  getProtocolDisplayName,
+} from './utils'
 
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
@@ -89,6 +93,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
         right={SPACING.spacing2}
       >
         <ProtocolOverflowMenu
+          protocolDisplayName={protocolDisplayName}
           protocolKey={protocolKey}
           handleRunProtocol={handleRunProtocol}
         />
@@ -114,6 +119,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
   } = props
   const { t } = useTranslation(['protocol_list', 'shared'])
   const analysisStatus = getAnalysisStatus(isAnalyzing, mostRecentAnalysis)
+  const isOT3Protocol = getIsOT3Protocol(mostRecentAnalysis)
 
   const { left: leftMountPipetteName, right: rightMountPipetteName } =
     mostRecentAnalysis != null
@@ -187,8 +193,9 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 <StyledText as="h6" color={COLORS.darkGreyEnabled}>
                   {t('robot')}
                 </StyledText>
-                {/* TODO(bh, 2022-10-14): read intended robot from protocol */}
-                <StyledText as="p">OT-2</StyledText>
+                <StyledText as="p">
+                  {isOT3Protocol ? 'OT-3' : 'OT-2'}
+                </StyledText>
               </Flex>
               <Flex
                 flex="1"

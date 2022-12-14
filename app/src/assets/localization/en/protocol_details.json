@@ -22,14 +22,19 @@
   "robot_is_busy_with_protocol": "{{robotName}} is busy with {{protocolName}} in {{runStatus}} state. Do you want to clear it and proceed?",
   "run_protocol": "Run protocol",
   "show_in_folder": "Show in folder",
-  "unavailable_robot_not_listed": "{{count}} unavailable robot is not listed",
-  "unavailable_robot_not_listed_plural": "{{count}} unavailable robots are not listed",
-  "view_unavailable_robots": "View unavailable robots on the <devicesLink>Devices page</devicesLink>",
+  "unavailable_robot_not_listed": "{{count}} unavailable robot is not listed.",
+  "unavailable_robot_not_listed_plural": "{{count}} unavailable robots are not listed.",
+  "view_unavailable_robots": "View unavailable robots on the Devices page",
   "view_run_details": "View run details",
   "labware_name": "Labware Name",
   "quantity": "Quantity",
   "go_to_labware_definition": "Go to labware definition",
   "protocol_designer_version": "Protocol Designer {{version}}",
   "python_api_version": "Python API {{version}}",
-  "connect_modules_to_see_controls": "Connect modules to see controls"
+  "connect_modules_to_see_controls": "Connect modules to see controls",
+  "send": "Send",
+  "sending": "Sending",
+  "send_protocol_to_ot3": "Send protocol to an OT-3",
+  "successfully_sent": "Successfully sent",
+  "unsuccessfully_sent": "Unsuccessfully sent"
 }

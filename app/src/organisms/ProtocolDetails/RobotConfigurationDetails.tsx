@@ -33,6 +33,7 @@ interface RobotConfigurationDetailsProps {
   rightMountPipetteName: PipetteName | null
   requiredModuleDetails: LoadModuleRunTimeCommand[] | null
   isLoading: boolean
+  isOT3Protocol: boolean
 }
 
 export const RobotConfigurationDetails = (
@@ -43,6 +44,7 @@ export const RobotConfigurationDetails = (
     rightMountPipetteName,
     requiredModuleDetails,
     isLoading,
+    isOT3Protocol,
   } = props
   const { t } = useTranslation(['protocol_details', 'shared'])
   const enableExtendedHardware = useFeatureFlag('enableExtendedHardware')
@@ -107,8 +109,13 @@ export const RobotConfigurationDetails = (
     <Flex flexDirection={DIRECTION_COLUMN} paddingBottom={SPACING.spacing5}>
       <RobotConfigurationDetailsItem
         label={t('robot')}
-        // TODO(bh, 2022-10-18): read intended robot from protocol
-        item={isLoading ? loadingText : <StyledText as="p">OT-2</StyledText>}
+        item={
+          isLoading ? (
+            loadingText
+          ) : (
+            <StyledText as="p">{isOT3Protocol ? 'OT-3' : 'OT-2'}</StyledText>
+          )
+        }
       />
       <Divider marginY="0.75rem" width="100%" />
       {leftAndRightMountsItem ?? (

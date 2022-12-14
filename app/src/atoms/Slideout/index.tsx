@@ -19,7 +19,7 @@ import {
 import { Divider } from '../structure'
 import { StyledText } from '../text'
 
-interface Props {
+export interface SlideoutProps {
   title: string | React.ReactElement
   children: React.ReactNode
   onCloseClick: () => unknown
@@ -102,7 +102,7 @@ const CLOSE_ICON_STYLE = css`
   }
 `
 
-export const Slideout = (props: Props): JSX.Element | null => {
+export const Slideout = (props: SlideoutProps): JSX.Element => {
   const { isExpanded, title, onCloseClick, children, footer } = props
   const slideOutRef = React.useRef<HTMLDivElement>(null)
   const [isReachedBottom, setIsReachedBottom] = React.useState<boolean>(false)
