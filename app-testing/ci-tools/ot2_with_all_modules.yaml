@@ -4,21 +4,21 @@
 
 # This system builds an OT2 and 1 of each module.
 
-      # - name: Substitute current sha into yaml
-      #   id: sub-step
-      #   uses: Opentrons/opentrons-emulation@release-v2.3.1
-      #   with:
-      #     command: yaml-sub
-      #     substitutions: >-
-      #       [
-      #         ["otie", "source-location", "${{ github.sha }}"],
-      #         ["t00-hot-to-handle", "source-location", "${{ github.sha }}"],
-      #         ["fatal-attraction", "source-location", "${{ github.sha }}"],
-      #         ["temperamental", "source-location", "${{ github.sha }}"],
-      #         ["maggy", "source-location", "${{ github.sha }}"],
-      #       ]
-      #     input-file: ${{ github.workspace }}/ot3-firmware/emulation_setups/ci/ot3_only.yaml
-      #     output-file-location: ${{ github.workspace }}/output.yaml
+# - name: Substitute current sha into yaml
+#   id: sub-step
+#   uses: Opentrons/opentrons-emulation@release-v2.3.1
+#   with:
+#     command: yaml-sub
+#     substitutions: >-
+#       [
+#         ["otie", "source-location", "${{ github.sha }}"],
+#         ["t00-hot-to-handle", "source-location", "${{ github.sha }}"],
+#         ["fatal-attraction", "source-location", "${{ github.sha }}"],
+#         ["temperamental", "source-location", "${{ github.sha }}"],
+#         ["maggy", "source-location", "${{ github.sha }}"],
+#       ]
+#     input-file: ${{ github.workspace }}/ot3-firmware/emulation_setups/ci/ot3_only.yaml
+#     output-file-location: ${{ github.workspace }}/output.yaml
 
 system-unique-id: ot2-with-all-modules
 robot:
