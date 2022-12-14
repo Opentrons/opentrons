@@ -316,7 +316,7 @@ def test_move_labware_to_slot(
     )
     decoy.when(
         mock_validation.ensure_valid_labware_offset_vector(drop_offset)
-    ).then_return({"x": 1, "y": 2, "z": 3})
+    ).then_return((1, 2, 3))
     subject.move_labware(
         labware=movable_labware,
         new_location=42,
@@ -332,7 +332,7 @@ def test_move_labware_to_slot(
             use_pick_up_location_lpc_offset=True,
             use_drop_location_lpc_offset=False,
             pick_up_offset=None,
-            drop_offset={"x": 1, "y": 2, "z": 3},
+            drop_offset=(1, 2, 3),
         )
     )
 

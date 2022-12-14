@@ -1,5 +1,5 @@
 """Test for the ProtocolEngine-based protocol API core."""
-from typing import Optional, Type, cast, Dict
+from typing import Optional, Type, cast, Tuple
 
 import pytest
 from decoy import Decoy
@@ -242,8 +242,8 @@ def test_load_labware(
     argvalues=[
         (False, False, None, None),
         (True, False, None, None),
-        (False, True, None, {"x": 4, "y": 5, "z": 6}),
-        (True, True, {"x": 4, "y": 5, "z": 6}, {"x": 4, "y": 5, "z": 6}),
+        (False, True, None, (4, 5, 6)),
+        (True, True, (4, 5, 6), (4, 5, 6)),
     ],
 )
 def test_move_labware(
@@ -255,8 +255,8 @@ def test_move_labware(
     use_gripper: bool,
     use_pick_up_location_lpc_offset: bool,
     use_drop_location_lpc_offset: bool,
-    pick_up_offset: Optional[Dict[str, float]],
-    drop_offset: Optional[Dict[str, float]],
+    pick_up_offset: Optional[Tuple[float, float, float]],
+    drop_offset: Optional[Tuple[float, float, float]],
 ) -> None:
     """It should issue a move labware command to the engine."""
     decoy.when(

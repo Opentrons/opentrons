@@ -1,6 +1,6 @@
 """ProtocolEngine-based Protocol API core implementation."""
 from typing_extensions import Literal
-from typing import Dict, Optional, Type, Union, Mapping, List
+from typing import Dict, Optional, Type, Union, List, Tuple
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
@@ -170,8 +170,8 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         use_gripper: bool,
         use_pick_up_location_lpc_offset: bool,
         use_drop_location_lpc_offset: bool,
-        pick_up_offset: Optional[Mapping[str, float]],
-        drop_offset: Optional[Mapping[str, float]],
+        pick_up_offset: Optional[Tuple[float, float, float]],
+        drop_offset: Optional[Tuple[float, float, float]],
     ) -> None:
         """Move the given labware to a new location."""
         to_location: Union[ModuleLocation, DeckSlotLocation]
@@ -187,15 +187,13 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         )
         _pick_up_offset = (
             LabwareOffsetVector(
-                x=pick_up_offset["x"], y=pick_up_offset["y"], z=pick_up_offset["z"]
+                x=pick_up_offset[0], y=pick_up_offset[1], z=pick_up_offset[2]
             )
             if pick_up_offset
             else None
         )
         _drop_offset = (
-            LabwareOffsetVector(
-                x=drop_offset["x"], y=drop_offset["y"], z=drop_offset["z"]
-            )
+            LabwareOffsetVector(x=drop_offset[0], y=drop_offset[1], z=drop_offset[2])
             if drop_offset
             else None
         )

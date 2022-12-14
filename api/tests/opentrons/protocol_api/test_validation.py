@@ -243,10 +243,10 @@ def test_ensure_thermocycler_profile_steps_invalid(
 @pytest.mark.parametrize("offset", [{}, [1, 2, 3], 1, {"a", "b", "c"}, "abc"])
 def test_ensure_valid_labware_offset_vector(offset: Dict[str, float]) -> None:
     """It should raise ValueError when given offset is invalid."""
-    assert subject.ensure_valid_labware_offset_vector({"x": 1.1, "y": 2, "z": 3.3}) == {
-        "x": 1.1,
-        "y": 2,
-        "z": 3.3,
-    }
-    with pytest.raises(ValueError):
+    assert subject.ensure_valid_labware_offset_vector({"x": 1.1, "y": 2, "z": 3.3}) == (
+        1.1,
+        2,
+        3.3,
+    )
+    with pytest.raises(TypeError):
         subject.ensure_valid_labware_offset_vector(offset)

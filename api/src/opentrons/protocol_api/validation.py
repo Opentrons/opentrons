@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Sequence, Union, Mapping
+from typing import Any, Dict, List, Optional, Sequence, Union, Tuple, Mapping
 from typing_extensions import TypeGuard
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -165,15 +165,18 @@ def is_all_strings(items: Sequence[Any]) -> TypeGuard[Sequence[str]]:
 
 def ensure_valid_labware_offset_vector(
     offset: Mapping[str, float]
-) -> Mapping[str, float]:
-    if isinstance(offset, dict):
-        # TODO: find a better way to unpack these values
-        if all([offset.get(axis) is not None for axis in ["x", "y", "z"]]) and all(
-            [isinstance(val, (float, int)) for val in offset.values()]
-        ):
-            return offset
-    raise ValueError(
-        "Labware offset vector is expected to be a dictionary with"
-        " with floating point offset values for all 3 axes."
-        " For example: {'x': 1.1, 'y': 2.2, 'z': 3.3}"
-    )
+) -> Tuple[float, float, float]:
+    if not isinstance(offset, dict):
+        raise TypeError("Labware offset must be a dictionary.")
+
+    try:
+        offsets = (offset["x"], offset["y"], offset["z"])
+    except KeyError:
+        raise TypeError(
+            "Labware offset vector is expected to be a dictionary with"
+            " with floating point offset values for all 3 axes."
+            " For example: {'x': 1.1, 'y': 2.2, 'z': 3.3}"
+        )
+    if not all(isinstance(v, (float, int)) for v in offsets):
+        raise TypeError("Offset values should be a number (int or float).")
+    return offsets
