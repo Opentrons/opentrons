@@ -17,12 +17,7 @@ def generate_command_schema(version: str) -> str:
     return json.dumps(schema_as_dict, indent=2)
 
 
-def main() -> int:
-    """Handler for command line invocation to generate a command schema.
-    :returns int: A success or failure value suitable for use as a shell
-                  return code passed to :py:obj:`sys.exit` (0 means success,
-                  anything else is a kind of failure).
-    """
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         prog="generate_command_schema",
         description="Generate A JSON-schema of all possible Create-Commands accepted by the current Protocol Engine",
@@ -35,8 +30,6 @@ def main() -> int:
     args = parser.parse_args()
     print(generate_command_schema(args.version))
 
-    return 0
+    sys.exit()
 
-
-if __name__ == "__main__":
-    sys.exit(main())
+__all__ = ["generate_command_schema"]

@@ -26,4 +26,3 @@ pytest-clarity = "~=1.0.0"
 
 [packages]
 opentrons-shared-data = { editable = true, path = "." }
-opentrons = { editable = true, path = "../../api" }

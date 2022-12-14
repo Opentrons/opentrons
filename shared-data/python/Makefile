@@ -134,5 +134,5 @@ test:
 
 .PHONY: command-schema
 command-schema: 
-	$(python) opentrons_shared_data/command/generate_command_schema.py $(COMMAND_SCHEMA_VERSION) > ../command/schemas/$(COMMAND_SCHEMA_VERSION).json
+	$(python) ../../api/src/opentrons/protocol_engine/commands/generate_command_schema.py $(COMMAND_SCHEMA_VERSION) > ../command/schemas/$(COMMAND_SCHEMA_VERSION).json
 

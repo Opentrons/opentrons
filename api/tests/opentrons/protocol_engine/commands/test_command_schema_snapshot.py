@@ -24,4 +24,3 @@ def test_command_schema_has_not_changed() -> None:
     generated_schema_string = generate_command_schema(newest_version)
 
     assert generated_schema_string == existing_schema_string, SCHEMA_CHANGED_MESSAGE
-
