@@ -6,10 +6,13 @@ from opentrons.protocol_engine.commands.command_unions import CommandCreate
 
 
 class CreateCommandUnion(pydantic.BaseModel):
+    """Model that validates a union of all CommandCreate models"""
+
     __root__: CommandCreate
 
 
 def generate_command_schema(version: str) -> str:
+    """Generate a JSON Schema that all valid create commands can validate against"""
     raw_json_schema = CreateCommandUnion.schema_json()
     schema_as_dict = json.loads(raw_json_schema)
     schema_as_dict["$id"] = f"opentronsCommandSchemaV{version}"
