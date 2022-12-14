@@ -6,7 +6,10 @@ from opentrons.config.robot_configs import (
     default_pipette_offset,
     default_gripper_calibration_offset,
 )
-from opentrons.types import Point
+from opentrons.types import Point, Mount
+
+# TODO change this when imports are fixed
+from opentrons.calibration_storage.ot3.pipette_offset import save_pipette_calibration
 from opentrons.calibration_storage import (
     types as cal_top_types,
     get_pipette_offset,
@@ -73,6 +76,19 @@ def load_pipette_offset(
     return pip_cal_obj
 
 
+def save_pipette_offset_calibration(
+    pip_id: typing.Optional[str], mount: typing.Union[Mount, OT3Mount], offset: Point
+) -> None:
+    # TODO this can be removed once we switch to using
+    # ot3 pipette types in the ot3 hardware controller.
+    if isinstance(mount, OT3Mount):
+        checked_mount = mount.to_mount()
+    else:
+        checked_mount = mount
+    if pip_id:
+        save_pipette_calibration(offset, pip_id, checked_mount)
+
+
 def load_gripper_calibration_offset(
     gripper_id: typing.Optional[str],
 ) -> GripperCalibrationOffset:
@@ -96,3 +112,10 @@ def load_gripper_calibration_offset(
                 ),
             )
     return grip_cal_obj
+
+
+def save_gripper_calibration_offset(
+    gripper_id: typing.Optional[str], delta: Point
+) -> None:
+    if gripper_id and ff.enable_ot3_hardware_controller():
+        ot3_gripper_offset.save_gripper_calibration(delta, gripper_id)

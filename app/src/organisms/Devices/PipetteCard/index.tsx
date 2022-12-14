@@ -17,6 +17,11 @@ import {
   BORDERS,
   Btn,
 } from '@opentrons/components'
+import {
+  isOT3Pipette,
+  NINETY_SIX_CHANNEL,
+  SINGLE_MOUNT_PIPETTES,
+} from '@opentrons/shared-data'
 import { fetchPipettes, LEFT } from '../../../redux/pipettes'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { Portal } from '../../../App/portal'
@@ -38,53 +43,69 @@ import {
 import { FLOWS } from '../../PipetteWizardFlows/constants'
 import { PipetteWizardFlows } from '../../PipetteWizardFlows'
 import { AskForCalibrationBlockModal } from '../../CalibrateTipLength'
-import { useDeckCalibrationData, usePipetteOffsetCalibration } from '../hooks'
+import { ChoosePipette } from '../../PipetteWizardFlows/ChoosePipette'
+import {
+  useDeckCalibrationData,
+  useIsOT3,
+  usePipetteOffsetCalibration,
+} from '../hooks'
 import { PipetteOverflowMenu } from './PipetteOverflowMenu'
 import { PipetteSettingsSlideout } from './PipetteSettingsSlideout'
 import { AboutPipetteSlideout } from './AboutPipetteSlideout'
-
-import type { AttachedPipette, Mount } from '../../../redux/pipettes/types'
-import {
-  isOT3Pipette,
+import type {
   PipetteModelSpecs,
   PipetteMount,
   PipetteName,
 } from '@opentrons/shared-data'
+import type { AttachedPipette, Mount } from '../../../redux/pipettes/types'
 import type { Dispatch, State } from '../../../redux/types'
-import type { PipetteWizardFlow } from '../../PipetteWizardFlows/types'
+import type {
+  PipetteWizardFlow,
+  SelectablePipettes,
+} from '../../PipetteWizardFlows/types'
 
 interface PipetteCardProps {
   pipetteInfo: PipetteModelSpecs | null
   pipetteId?: AttachedPipette['id'] | null
   mount: Mount
   robotName: string
+  is96ChannelAttached: boolean
 }
 
 const FETCH_PIPETTE_CAL_MS = 30000
 
 export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const { t } = useTranslation(['device_details', 'protocol_setup'])
-  const { pipetteInfo, mount, robotName, pipetteId } = props
+  const {
+    pipetteInfo,
+    mount,
+    robotName,
+    pipetteId,
+    is96ChannelAttached,
+  } = props
   const {
     menuOverlay,
     handleOverflowClick,
     showOverflowMenu,
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
+  const isOt3 = useIsOT3(robotName)
   const dispatch = useDispatch<Dispatch>()
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
   const pipetteName = pipetteInfo?.name
+  const isOT3PipetteAttached = isOT3Pipette(pipetteName as PipetteName)
   const pipetteDisplayName = pipetteInfo?.displayName
   const pipetteOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => setShowOverflowMenu(false),
   })
-  const isOT3PipetteAttached = isOT3Pipette(pipetteName as PipetteName)
   const [showChangePipette, setChangePipette] = React.useState(false)
   const [showBanner, setShowBanner] = React.useState(true)
   const [showSlideout, setShowSlideout] = React.useState(false)
-  const [showPipetteWizardFlows, setShowPipetteWizardFlows] = React.useState(
-    false
-  )
+  const [
+    pipetteWizardFlow,
+    setPipetteWizardFlow,
+  ] = React.useState<PipetteWizardFlow | null>(null)
+  const [showAttachPipette, setShowAttachPipette] = React.useState(false)
   const [showAboutSlideout, setShowAboutSlideout] = React.useState(false)
   const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
   const configHasCalibrationBlock = useSelector(getHasCalibrationBlock)
@@ -99,6 +120,10 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     pipetteId,
     mount
   )
+  const [
+    selectedPipette,
+    setSelectedPipette,
+  ] = React.useState<SelectablePipettes>(SINGLE_MOUNT_PIPETTES)
   const latestRequestId = last(requestIds)
   const isFetching = useSelector<State, boolean>(state =>
     latestRequestId != null
@@ -143,11 +168,17 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   }
 
   const handleChangePipette = (): void => {
-    setChangePipette(true)
+    if (isOT3PipetteAttached && isOt3) {
+      setPipetteWizardFlow(FLOWS.DETACH)
+    } else if (!isOT3PipetteAttached && isOt3) {
+      setShowAttachPipette(true)
+    } else {
+      setChangePipette(true)
+    }
   }
   const handleCalibrate = (): void => {
     isOT3PipetteAttached
-      ? setShowPipetteWizardFlows(true)
+      ? setPipetteWizardFlow(FLOWS.CALIBRATE)
       : startPipetteOffsetCalibrationBlockModal(null)
   }
   const handleAboutSlideout = (): void => {
@@ -157,6 +188,10 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     setShowSlideout(true)
   }
 
+  const handleAttachPipette = (): void => {
+    setShowAttachPipette(false)
+    setPipetteWizardFlow(FLOWS.ATTACH)
+  }
   return (
     <Flex
       backgroundColor={COLORS.fundamentalsBackground}
@@ -164,12 +199,28 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       width="100%"
       data-testid={`PipetteCard_${pipetteDisplayName}`}
     >
-      {showPipetteWizardFlows ? (
+      {showAttachPipette ? (
+        <ChoosePipette
+          proceed={handleAttachPipette}
+          setSelectedPipette={setSelectedPipette}
+          selectedPipette={selectedPipette}
+          exit={() => setShowAttachPipette(false)}
+        />
+      ) : null}
+      {pipetteWizardFlow != null ? (
         <PipetteWizardFlows
-          flowType={FLOWS.CALIBRATE as PipetteWizardFlow}
-          mount={mount as PipetteMount}
-          closeFlow={() => setShowPipetteWizardFlows(false)}
+          flowType={pipetteWizardFlow}
+          mount={
+            //  hardcoding in LEFT mount for whenever a 96 channel is selected
+            selectedPipette === NINETY_SIX_CHANNEL
+              ? LEFT
+              : (mount as PipetteMount)
+          }
+          closeFlow={() => setPipetteWizardFlow(null)}
           robotName={robotName}
+          selectedPipette={
+            pipetteName === 'p1000_96' ? NINETY_SIX_CHANNEL : selectedPipette
+          }
         />
       ) : null}
       {showChangePipette && (
@@ -296,9 +347,11 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               paddingBottom={SPACING.spacing2}
               data-testid={`PipetteCard_mount_${pipetteDisplayName}`}
             >
-              {t('mount', {
-                side: mount === LEFT ? t('left') : t('right'),
-              })}
+              {is96ChannelAttached
+                ? t('both_mounts')
+                : t('mount', {
+                    side: mount === LEFT ? t('left') : t('right'),
+                  })}
             </StyledText>
             <Flex
               paddingBottom={SPACING.spacing2}

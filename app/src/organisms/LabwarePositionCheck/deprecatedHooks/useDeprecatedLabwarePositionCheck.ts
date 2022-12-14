@@ -7,6 +7,7 @@ import {
   getLabwareDefIsStandard,
   getLabwareDisplayName,
   IDENTITY_VECTOR,
+  LoadedLabware,
 } from '@opentrons/shared-data'
 import {
   useHost,
@@ -141,7 +142,7 @@ export const useTitleText = (
   loading: boolean,
   command: LabwarePositionCheckMovementCommand,
   runId: string | null,
-  labware?: ProtocolFile<{}>['labware'],
+  labware?: LoadedLabware[],
   labwareDefinitions?: ProtocolFile<{}>['labwareDefinitions']
 ): string => {
   const { protocolData } = useProtocolDetailsForRun(runId)
@@ -187,7 +188,9 @@ export const useTitleText = (
   } else {
     if (labware == null || labwareDefinitions == null) return ''
 
-    const labwareDefId = labware[labwareId].definitionId
+    //  @ts-expect-error: will be an error until we remove the schemaV6Adapter
+    const labwareDefId = labware.find(item => item.id === labwareId)
+      .definitionUri
     const labwareDisplayName = getLabwareDisplayName(
       labwareDefinitions[labwareDefId]
     )

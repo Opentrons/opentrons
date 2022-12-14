@@ -38,6 +38,7 @@ async def test_move_to_coordinates_implementation(
         coordinates=DeckPoint(x=1.11, y=2.22, z=3.33),
         minimumZHeight=1234,
         forceDirect=True,
+        speed=567.8,
     )
 
     result = await subject.execute(params=params)
@@ -49,5 +50,6 @@ async def test_move_to_coordinates_implementation(
             deck_coordinates=DeckPoint(x=1.11, y=2.22, z=3.33),
             direct=True,
             additional_min_travel_z=1234,
+            speed=567.8,
         )
     )

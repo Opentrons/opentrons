@@ -1,3 +1,4 @@
+import type { ViewableRobot } from '../discovery/types'
 import type { RobotHost } from '../robot-api/types'
 
 export type BuildrootUpdateType = 'upgrade' | 'downgrade' | 'reinstall'
@@ -114,7 +115,7 @@ export type BuildrootAction =
     }
   | {
       type: 'buildroot:UPLOAD_FILE'
-      payload: { host: RobotHost; path: string; systemFile: string | null }
+      payload: { host: ViewableRobot; path: string; systemFile: string | null }
       meta: { shell: true }
     }
   | { type: 'buildroot:FILE_UPLOAD_DONE'; payload: string }

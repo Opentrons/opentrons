@@ -21,7 +21,6 @@ from opentrons.protocol_api.core.protocol_api.well import WellImplementation
 from opentrons.calibration_storage import helpers
 from opentrons.types import Point, Location
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.protocol_api.core.labware import AbstractLabware
 
 test_data: Dict[str, WellDefinition] = {
@@ -220,7 +219,8 @@ def corning_96_wellplate_360ul_flat(corning_96_wellplate_360ul_flat_def):
         implementation=LabwareImplementation(
             definition=corning_96_wellplate_360ul_flat_def,
             parent=Location(Point(0, 0, 0), "Test Slot"),
-        )
+        ),
+        api_version=MAX_SUPPORTED_VERSION,
     )
 
 
@@ -236,7 +236,8 @@ def opentrons_96_tiprack_300ul(opentrons_96_tiprack_300ul_def):
         implementation=LabwareImplementation(
             definition=opentrons_96_tiprack_300ul_def,
             parent=Location(Point(0, 0, 0), "Test Slot"),
-        )
+        ),
+        api_version=MAX_SUPPORTED_VERSION,
     )
 
 
@@ -415,18 +416,6 @@ def test_select_next_tip(
     tiprack.use_tips(well_list[0])
     tiprack.use_tips(well_list[0])
 
-    # you can't on api level 2.1 or previous
-    early_tr = labware.Labware(
-        implementation=LabwareImplementation(
-            definition=opentrons_96_tiprack_300ul_def,
-            parent=Location(Point(0, 0, 0), "Test Slot"),
-        ),
-        api_version=APIVersion(2, 1),
-    )
-    early_tr.use_tips(well_list[0])
-    with pytest.raises(AssertionError):
-        early_tr.use_tips(well_list[0])
-
 
 def test_previous_tip(opentrons_96_tiprack_300ul) -> None:
     tiprack = opentrons_96_tiprack_300ul
@@ -540,12 +529,14 @@ def test_tiprack_list():
     tiprack = labware.Labware(
         implementation=LabwareImplementation(
             labware_def, Location(Point(0, 0, 0), "Test Slot")
-        )
+        ),
+        api_version=MAX_SUPPORTED_VERSION,
     )
     tiprack_2 = labware.Labware(
         implementation=LabwareImplementation(
             labware_def, Location(Point(0, 0, 0), "Test Slot")
-        )
+        ),
+        api_version=MAX_SUPPORTED_VERSION,
     )
 
     assert labware.select_tiprack_from_list([tiprack], 1) == (tiprack, tiprack["A1"])
@@ -582,7 +573,8 @@ def test_uris():
     lw = labware.Labware(
         implementation=LabwareImplementation(
             defn, Location(Point(0, 0, 0), "Test Slot")
-        )
+        ),
+        api_version=MAX_SUPPORTED_VERSION,
     )
     assert lw.uri == uri
 
@@ -609,8 +601,8 @@ def test_labware_hash_func_same_implementation_different_version(
         minimal_labware_def, Location(Point(0, 0, 0), "Test Slot")
     )
 
-    l1 = labware.Labware(implementation=impl, api_version=APIVersion(2, 3))
-    l2 = labware.Labware(implementation=impl, api_version=APIVersion(2, 4))
+    l1 = labware.Labware(implementation=impl, api_version=APIVersion(2, 13))
+    l2 = labware.Labware(implementation=impl, api_version=APIVersion(2, 14))
 
     assert len({l1, l2}) == 2
 
@@ -636,13 +628,10 @@ def test_labware_hash_func_diff_implementation_same_version(
 def test_set_offset(decoy: Decoy) -> None:
     """It should set the labware's offset using the implementation."""
     labware_impl = decoy.mock(cls=AbstractLabware)
-    subject = labware.Labware(implementation=labware_impl)
+    decoy.when(labware_impl.get_well_columns()).then_return([])
+    subject = labware.Labware(
+        implementation=labware_impl, api_version=APIVersion(2, 12)
+    )
 
     subject.set_offset(x=1.1, y=2.2, z=3.3)
     decoy.verify(labware_impl.set_calibration(Point(1.1, 2.2, 3.3)))
-
-    subject = labware.Labware(
-        implementation=labware_impl, api_version=APIVersion(2, 11)
-    )
-    with pytest.raises(APIVersionError):
-        subject.set_offset(x=4.4, y=5.5, z=6.6)

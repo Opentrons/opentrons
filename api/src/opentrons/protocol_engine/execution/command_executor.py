@@ -1,4 +1,5 @@
 """Command side-effect execution logic container."""
+import asyncio
 from logging import getLogger
 from typing import Optional
 
@@ -8,7 +9,7 @@ from ..state import StateStore
 from ..resources import ModelUtils
 from ..commands import CommandStatus
 from ..actions import ActionDispatcher, UpdateCommandAction, FailCommandAction
-from ..errors import ProtocolEngineError, UnexpectedProtocolError
+from ..errors import ProtocolEngineError, RunStoppedError, UnexpectedProtocolError
 from .equipment import EquipmentHandler
 from .movement import MovementHandler
 from .labware_movement import LabwareMovementHandler
@@ -87,10 +88,14 @@ class CommandExecutor:
             )
             result = await command_impl.execute(command.params)  # type: ignore[arg-type]
 
-        except Exception as error:
+        except (Exception, asyncio.CancelledError) as error:
             log.warning(f"Execution of {command.id} failed", exc_info=error)
 
-            if not isinstance(error, ProtocolEngineError):
+            # TODO(mc, 2022-11-14): mark command as stopped rather than failed
+            # https://opentrons.atlassian.net/browse/RCORE-390
+            if isinstance(error, asyncio.CancelledError):
+                error = RunStoppedError("Run was cancelled")
+            elif not isinstance(error, ProtocolEngineError):
                 error = UnexpectedProtocolError(error)
 
             self._action_dispatcher.dispatch(

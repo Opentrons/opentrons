@@ -1,6 +1,5 @@
 #!/bin/sh
 
-GIT_HASH=$(git rev-parse --short=8 HEAD)
 TEMP_DIR_NAME="./ot3-firmware"
 TAR_NAME="$TEMP_DIR_NAME"
 
@@ -19,6 +18,7 @@ FW_PATH_GRIPPER="$REPO_DIR/build-cross/gripper/firmware/gripper-rev1.hex"
 
 # build all the firmware
 cd "$REPO_DIR" || cd "$THIS_DIR" || exit
+GIT_HASH=$(git rev-parse --short=8 HEAD)
 cmake --preset=cross .
 cmake --build --preset=gantry-x --target=gantry-x-rev1-flash || true
 cmake --build --preset=gantry-y --target=gantry-y-rev1-flash || true

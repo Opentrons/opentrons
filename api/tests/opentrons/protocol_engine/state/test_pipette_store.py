@@ -14,11 +14,16 @@ from opentrons.protocol_engine.types import (
     OFF_DECK_LOCATION,
     LabwareMovementStrategy,
 )
-from opentrons.protocol_engine.actions import UpdateCommandAction
+from opentrons.protocol_engine.actions import (
+    SetPipetteMovementSpeedAction,
+    UpdateCommandAction,
+    AddPipetteConfigAction,
+)
 from opentrons.protocol_engine.state.pipettes import (
     PipetteStore,
     PipetteState,
     CurrentWell,
+    StaticPipetteConfig,
 )
 
 from .command_fixtures import (
@@ -49,6 +54,8 @@ def test_sets_initial_state(subject: PipetteStore) -> None:
         aspirated_volume_by_id={},
         current_well=None,
         attached_tip_labware_by_id={},
+        movement_speed_by_id={},
+        static_config_by_id={},
     )
 
 
@@ -70,6 +77,7 @@ def test_handles_load_pipette(subject: PipetteStore) -> None:
         mount=MountType.LEFT,
     )
     assert result.aspirated_volume_by_id["pipette-id"] == 0
+    assert result.movement_speed_by_id["pipette-id"] is None
 
 
 def test_pipette_volume_adds_aspirate(subject: PipetteStore) -> None:
@@ -523,3 +531,35 @@ def test_tip_commands_update_has_tip(subject: PipetteStore) -> None:
     subject.handle_action(UpdateCommandAction(command=drop_tip_command))
 
     assert not subject.state.attached_tip_labware_by_id
+
+
+def test_set_movement_speed(subject: PipetteStore) -> None:
+    """It should issue an action to set the movement speed."""
+    pipette_id = "pipette-id"
+    load_pipette_command = create_load_pipette_command(
+        pipette_id=pipette_id,
+        pipette_name=PipetteNameType.P300_SINGLE,
+        mount=MountType.LEFT,
+    )
+    subject.handle_action(UpdateCommandAction(command=load_pipette_command))
+    subject.handle_action(
+        SetPipetteMovementSpeedAction(pipette_id=pipette_id, speed=123.456)
+    )
+    assert subject.state.movement_speed_by_id[pipette_id] == 123.456
+
+
+def test_add_pipette_config(subject: PipetteStore) -> None:
+    """It should issue an action to add a pipette config."""
+    subject.handle_action(
+        AddPipetteConfigAction(
+            pipette_id="pipette-id",
+            model="pipette-model",
+            min_volume=1.23,
+            max_volume=4.56,
+            channels=7,
+        )
+    )
+
+    assert subject.state.static_config_by_id["pipette-id"] == StaticPipetteConfig(
+        model="pipette-model", min_volume=1.23, max_volume=4.56
+    )

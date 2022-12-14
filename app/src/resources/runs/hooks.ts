@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { useCreateCommandMutation } from '@opentrons/react-api-client'
 import { chainRunCommands } from './utils'
 import type { CreateCommand } from '@opentrons/shared-data'
@@ -29,13 +30,25 @@ export function useCreateRunCommandMutation(
 export function useChainRunCommands(
   runId: string
 ): {
-  chainRunCommands: (commands: CreateCommand[]) => Promise<unknown>
+  chainRunCommands: (
+    commands: CreateCommand[],
+    continuePastCommandFailure: boolean
+  ) => Promise<unknown>
   isCommandMutationLoading: boolean
 } {
-  const { createRunCommand, isLoading } = useCreateRunCommandMutation(runId)
+  const [isLoading, setIsLoading] = React.useState(false)
+  const { createRunCommand } = useCreateRunCommandMutation(runId)
   return {
-    chainRunCommands: (commands: CreateCommand[]) =>
-      chainRunCommands(commands, createRunCommand),
+    chainRunCommands: (
+      commands: CreateCommand[],
+      continuePastCommandFailure: boolean
+    ) =>
+      chainRunCommands(
+        commands,
+        createRunCommand,
+        continuePastCommandFailure,
+        setIsLoading
+      ),
     isCommandMutationLoading: isLoading,
   }
 }

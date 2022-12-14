@@ -137,9 +137,26 @@ describe('PipetteCard', () => {
       mount: LEFT,
       robotName: mockRobotName,
       pipetteId: 'id',
+      is96ChannelAttached: false,
     })
     getByText('left Mount')
     getByText('Left Pipette')
+  })
+  it('renders information for a 96 channel pipette with overflow menu button not disabled', () => {
+    const { getByText, getByRole } = render({
+      pipetteInfo: mockLeftSpecs,
+      mount: LEFT,
+      robotName: mockRobotName,
+      pipetteId: 'id',
+      is96ChannelAttached: true,
+    })
+    getByText('Both Mounts')
+    const overflowButton = getByRole('button', {
+      name: /overflow/i,
+    })
+    fireEvent.click(overflowButton)
+    expect(overflowButton).not.toBeDisabled()
+    getByText('mock pipette overflow menu')
   })
   it('renders information for a right pipette', () => {
     const { getByText } = render({
@@ -147,6 +164,7 @@ describe('PipetteCard', () => {
       mount: RIGHT,
       robotName: mockRobotName,
       pipetteId: 'id',
+      is96ChannelAttached: false,
     })
     getByText('right Mount')
     getByText('Right Pipette')
@@ -161,6 +179,7 @@ describe('PipetteCard', () => {
       mount: RIGHT,
       robotName: mockRobotName,
       pipetteId: 'id',
+      is96ChannelAttached: false,
     })
     getByText('right Mount')
     getByText('Right Pipette')
@@ -172,6 +191,7 @@ describe('PipetteCard', () => {
       mount: RIGHT,
       robotName: mockRobotName,
       pipetteId: 'id',
+      is96ChannelAttached: false,
     })
     getByText('right Mount')
     getByText('Right Pipette')
@@ -187,6 +207,7 @@ describe('PipetteCard', () => {
       mount: RIGHT,
       robotName: mockRobotName,
       pipetteId: 'id',
+      is96ChannelAttached: false,
     })
     getByText('right Mount')
     getByText('Right Pipette')
@@ -197,6 +218,7 @@ describe('PipetteCard', () => {
       pipetteInfo: null,
       mount: RIGHT,
       robotName: mockRobotName,
+      is96ChannelAttached: false,
     })
     getByText('right Mount')
     getByText('Empty')
@@ -206,6 +228,7 @@ describe('PipetteCard', () => {
       pipetteInfo: null,
       mount: LEFT,
       robotName: mockRobotName,
+      is96ChannelAttached: false,
     })
     getByText('left Mount')
     getByText('Empty')
@@ -215,6 +238,7 @@ describe('PipetteCard', () => {
       pipetteInfo: mockRightSpecs,
       mount: RIGHT,
       robotName: mockRobotName,
+      is96ChannelAttached: false,
     })
 
     const overflowButton = getByRole('button', {
@@ -234,6 +258,7 @@ describe('PipetteCard', () => {
       mount: RIGHT,
       robotName: mockRobotName,
       pipetteId: 'id',
+      is96ChannelAttached: false,
     })
     expect(queryByText('mock banner')).toBeNull()
   })

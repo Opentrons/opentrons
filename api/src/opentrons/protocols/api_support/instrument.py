@@ -14,7 +14,7 @@ from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.instruments.ot2 import (
     instrument_calibration as instr_cal,
 )
-from opentrons.protocol_api.labware import Labware, Well
+from opentrons.protocol_api.labware import Labware
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons_shared_data.protocol.dev_types import (
     LiquidHandlingCommand,
@@ -95,31 +95,9 @@ def validate_tiprack(
         valid_vols = VALID_PIP_TIPRACK_VOL[instrument_name.split("_")[0]]
         if tiprack_vol not in valid_vols:
             log.warning(
-                f"The pipette {instrument_name} and its tip rack "
-                f"{tip_rack.load_name} in slot {tip_rack.parent} appear to "
-                "be mismatched. Please check your protocol before running "
-                "on the robot."
+                f"The pipette {instrument_name} and its tip rack {tip_rack.load_name}"
+                " appear to be mismatched. Please check your protocol."
             )
-
-
-def determine_drop_target(
-    api_version: APIVersion,
-    location: Well,
-    return_height: float,
-    version_breakpoint: APIVersion = None,
-) -> types.Location:
-    """Determine the drop target based on well and api version."""
-    version_breakpoint = version_breakpoint or APIVersion(2, 2)
-    if api_version < version_breakpoint:
-        bot = location.bottom()
-        return types.Location(
-            point=bot.point._replace(z=bot.point.z + 10), labware=location
-        )
-    else:
-        tr = location.parent
-        assert tr.is_tiprack
-        z_height = return_height * tr.tip_length
-        return location.top(-z_height)
 
 
 def validate_takes_liquid(location: types.Location, reject_module: bool) -> None:

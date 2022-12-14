@@ -27,6 +27,7 @@ from .core.common import (
     ThermocyclerCore,
     HeaterShakerCore,
 )
+from .core.core_map import LoadedCoreMap
 
 from .module_validation_and_errors import (
     validate_heater_shaker_temperature,
@@ -54,12 +55,14 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
         self,
         core: ModuleCore,
         protocol_core: ProtocolCore,
+        core_map: LoadedCoreMap,
         api_version: APIVersion,
         broker: Broker,
     ) -> None:
         super().__init__(broker=broker)
         self._core = core
         self._protocol_core = protocol_core
+        self._core_map = core_map
         self._api_version = api_version
         self._labware: Optional[Labware] = None
 
@@ -133,6 +136,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
         )
 
         labware = self._core.add_labware_core(labware_core)
+        self._core_map.add(labware_core, labware)
 
         return labware
 
@@ -431,13 +435,13 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     @publish(command=cmds.thermocycler_open)
     @requires_version(2, 0)
     def open_lid(self) -> str:
-        """Opens the lid"""
+        """Open the lid."""
         return self._core.open_lid().value
 
     @publish(command=cmds.thermocycler_close)
     @requires_version(2, 0)
     def close_lid(self) -> str:
-        """Closes the lid"""
+        """Close the lid."""
         return self._core.close_lid().value
 
     @publish(command=cmds.thermocycler_set_block_temp)
@@ -452,31 +456,25 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     ) -> None:
         """Set the target temperature for the well block, in °C.
 
-        Valid operational range yet to be determined.
-
-        :param temperature: The target temperature, in °C.
+        :param temperature: A value between 4 and 99, representing the target
+                            temperature in °C.
         :param hold_time_minutes: The number of minutes to hold, after reaching
                                   ``temperature``, before proceeding to the
-                                  next command.
+                                  next command. If ``hold_time_seconds`` is also
+                                  specified, the times are added together.
         :param hold_time_seconds: The number of seconds to hold, after reaching
                                   ``temperature``, before proceeding to the
-                                  next command. If ``hold_time_minutes`` and
-                                  ``hold_time_seconds`` are not specified,
-                                  the Thermocycler will proceed to the next
-                                  command after ``temperature`` is reached.
-        :param ramp_rate: The target rate of temperature change, in °C/sec.
-                          If ``ramp_rate`` is not specified, it will default
-                          to the maximum ramp rate as defined in the device
-                          configuration.
-        :param block_max_volume: The maximum volume of any individual well
-                                 of the loaded labware. If not supplied,
-                                 the thermocycler will default to 25µL/well.
+                                  next command. If ``hold_time_minutes`` is also
+                                  specified, the times are added together.
+        :param block_max_volume: The greatest volume of liquid contained in any
+                                 individual well of the loaded labware, in µL.
+                                 If not specified, the default is 25 µL.
 
         .. note:
 
             If ``hold_time_minutes`` and ``hold_time_seconds`` are not
             specified, the Thermocycler will proceed to the next command
-            after ``temperature`` is reached.
+            immediately after ``temperature`` is reached.
         """
         seconds = validation.ensure_hold_time_seconds(
             seconds=hold_time_seconds, minutes=hold_time_minutes
@@ -493,12 +491,12 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     def set_lid_temperature(self, temperature: float) -> None:
         """Set the target temperature for the heated lid, in °C.
 
-        :param temperature: The target temperature, in °C clamped to the
-                            range 20°C to 105°C.
+        :param temperature: A value between 37 and 110, representing the target
+                            temperature in °C.
 
         .. note:
 
-            The Thermocycler will proceed to the next command after
+            The Thermocycler will proceed to the next command immediately after
             ``temperature`` has been reached.
 
         """
@@ -513,24 +511,24 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
         repetitions: int,
         block_max_volume: Optional[float] = None,
     ) -> None:
-        """Execute a Thermocycler Profile defined as a cycle of
-        ``steps`` to repeat for a given number of ``repetitions``.
+        """Execute a Thermocycler profile, defined as a cycle of
+        ``steps``, for a given number of ``repetitions``.
 
         :param steps: List of unique steps that make up a single cycle.
                       Each list item should be a dictionary that maps to
                       the parameters of the :py:meth:`set_block_temperature`
-                      method with keys 'temperature', 'hold_time_seconds',
-                      and 'hold_time_minutes'.
+                      method with a ``temperature`` key, and either or both of
+                      ``hold_time_seconds`` and ``hold_time_minutes``.
         :param repetitions: The number of times to repeat the cycled steps.
-        :param block_max_volume: The maximum volume of any individual well
-                                 of the loaded labware. If not supplied,
-                                 the thermocycler will default to 25µL/well.
+        :param block_max_volume: The greatest volume of liquid contained in any
+                                 individual well of the loaded labware, in µL.
+                                 If not specified, the default is 25 µL.
 
         .. note:
 
-            Unlike the :py:meth:`set_block_temperature`, either or both of
-            'hold_time_minutes' and 'hold_time_seconds' must be defined
-            and finite for each step.
+            Unlike with :py:meth:`set_block_temperature`, either or both of
+            ``hold_time_minutes`` and ``hold_time_seconds`` must be defined
+            and for each step.
 
         """
         repetitions = validation.ensure_thermocycler_repetition_count(repetitions)
@@ -544,73 +542,98 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     @publish(command=cmds.thermocycler_deactivate_lid)
     @requires_version(2, 0)
     def deactivate_lid(self) -> None:
-        """Turn off the heated lid"""
+        """Turn off the lid heater."""
         self._core.deactivate_lid()
 
     @publish(command=cmds.thermocycler_deactivate_block)
     @requires_version(2, 0)
     def deactivate_block(self) -> None:
-        """Turn off the well block temperature controller"""
+        """Turn off the well block temperature controller."""
         self._core.deactivate_block()
 
     @publish(command=cmds.thermocycler_deactivate)
     @requires_version(2, 0)
     def deactivate(self) -> None:
-        """Turn off the well block temperature controller, and heated lid"""
+        """Turn off both the well block temperature controller and the lid heater."""
         self._core.deactivate()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def lid_position(self) -> Optional[str]:
-        """Lid open/close status string"""
-        return self._core.get_lid_position()
+        """One of these possible lid statuses:
+
+        - ``closed``: The lid is closed.
+        - ``in_between``: The lid is neither open nor closed.
+        - ``open``: The lid is open.
+        - ``unknown``: The lid position can't be determined.
+        """
+        status = self._core.get_lid_position()
+        return status.value if status is not None else None
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def block_temperature_status(self) -> str:
-        """Block temperature status string"""
-        return self._core.get_block_temperature_status()
+        """One of five possible temperature statuses:
+
+        - ``holding at target``: The block has reached its target temperature
+            and is actively maintaining that temperature.
+        - ``cooling``: The block is cooling to a target temperature.
+        - ``heating``: The block is heating to a target temperature.
+        - ``idle``: The block has not heated or cooled since the beginning of the protocol.
+        - ``error``: The temperature status can't be determined.
+        """
+        return self._core.get_block_temperature_status().value
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def lid_temperature_status(self) -> Optional[str]:
-        """Lid temperature status string"""
-        return self._core.get_lid_temperature_status()
+        """One of five possible temperature statuses:
+
+        - ``holding at target``: The lid has reached its target temperature
+            and is actively maintaining that temperature.
+        - ``cooling``: The lid has previously heated and is now passively cooling.
+            `The Thermocycler lid does not have active cooling.`
+        - ``heating``: The lid is heating to a target temperature.
+        - ``idle``: The lid has not heated since the beginning of the protocol.
+        - ``error``: The temperature status can't be determined.
+        """
+        status = self._core.get_lid_temperature_status()
+        return status.value if status is not None else None
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def block_temperature(self) -> Optional[float]:
-        """Current temperature in degrees C"""
+        """The current temperature of the well block in °C."""
         return self._core.get_block_temperature()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def block_target_temperature(self) -> Optional[float]:
-        """Target temperature in degrees C"""
+        """The target temperature of the well block in °C."""
         return self._core.get_block_target_temperature()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def lid_temperature(self) -> Optional[float]:
-        """Current temperature in degrees C"""
+        """The current temperature of the lid in °C."""
         return self._core.get_lid_temperature()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def lid_target_temperature(self) -> Optional[float]:
-        """Target temperature in degrees C"""
+        """The target temperature of the lid in °C."""
         return self._core.get_lid_target_temperature()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def ramp_rate(self) -> Optional[float]:
-        """Current ramp rate in degrees C/sec"""
+        """The current ramp rate in °C/s."""
         return self._core.get_ramp_rate()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def hold_time(self) -> Optional[float]:
-        """Remaining hold time in sec"""
+        """Remaining hold time in seconds."""
         return self._core.get_hold_time()
 
     @property  # type: ignore[misc]

@@ -28,6 +28,7 @@ from .aspirate import (
 from .custom import (
     Custom,
     CustomParams,
+    CustomCreate,
     CustomResult,
     CustomCommandType,
 )
@@ -219,8 +220,9 @@ Command = Union[
     thermocycler.OpenLid,
     thermocycler.CloseLid,
     thermocycler.RunProfile,
+    calibration.CalibrateGripper,
     calibration.CalibratePipette,
-    calibration.MoveToLocation,
+    calibration.MoveToMaintenancePosition,
 ]
 
 CommandParams = Union[
@@ -267,8 +269,9 @@ CommandParams = Union[
     thermocycler.CloseLidParams,
     thermocycler.RunProfileParams,
     thermocycler.RunProfileStepParams,
+    calibration.CalibrateGripperParams,
     calibration.CalibratePipetteParams,
-    calibration.MoveToLocationParams,
+    calibration.MoveToMaintenancePositionParams,
 ]
 
 CommandType = Union[
@@ -314,12 +317,14 @@ CommandType = Union[
     thermocycler.OpenLidCommandType,
     thermocycler.CloseLidCommandType,
     thermocycler.RunProfileCommandType,
+    calibration.CalibrateGripperCommandType,
     calibration.CalibratePipetteCommandType,
-    calibration.MoveToLocationCommandType,
+    calibration.MoveToMaintenancePositionCommandType,
 ]
 
 CommandCreate = Union[
     AspirateCreate,
+    CustomCreate,
     DispenseCreate,
     DispenseInPlaceCreate,
     BlowOutCreate,
@@ -360,8 +365,9 @@ CommandCreate = Union[
     thermocycler.OpenLidCreate,
     thermocycler.CloseLidCreate,
     thermocycler.RunProfileCreate,
+    calibration.CalibrateGripperCreate,
     calibration.CalibratePipetteCreate,
-    calibration.MoveToLocationCreate,
+    calibration.MoveToMaintenancePositionCreate,
 ]
 
 CommandResult = Union[
@@ -407,6 +413,7 @@ CommandResult = Union[
     thermocycler.OpenLidResult,
     thermocycler.CloseLidResult,
     thermocycler.RunProfileResult,
+    calibration.CalibrateGripperResult,
     calibration.CalibratePipetteResult,
-    calibration.MoveToLocationResult,
+    calibration.MoveToMaintenancePositionResult,
 ]

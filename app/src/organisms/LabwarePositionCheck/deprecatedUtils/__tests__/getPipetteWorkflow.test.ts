@@ -3,6 +3,7 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { getPipetteWorkflow } from '../getPipetteWorkflow'
 import { doesPipetteVisitAllTipracks } from '../../utils/doesPipetteVisitAllTipracks'
 import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
+import type { LoadedLabware } from '@opentrons/shared-data'
 
 jest.mock('../../utils/doesPipetteVisitAllTipracks')
 
@@ -20,7 +21,7 @@ describe('getPipetteWorkflow', () => {
       getPipetteWorkflow({
         pipetteNames,
         primaryPipetteId: 'someId',
-        labware: {},
+        labware: [] as LoadedLabware[],
         labwareDefinitions: {},
         commands: [],
       })
@@ -32,7 +33,7 @@ describe('getPipetteWorkflow', () => {
       getPipetteWorkflow({
         pipetteNames,
         primaryPipetteId: 'someId',
-        labware: {},
+        labware: [] as LoadedLabware[],
         labwareDefinitions: {},
         commands: [],
       })
@@ -41,7 +42,7 @@ describe('getPipetteWorkflow', () => {
   it('should return 1 if the primary pipette visits all tipracks', () => {
     const pipetteNames: PipetteName[] = ['p1000_single', 'p1000_single_gen2']
     const primaryPipetteId = 'someId'
-    const labware = {}
+    const labware: LoadedLabware[] = []
     const labwareDefinitions = {}
     const moveToWellCommand: RunTimeCommand = {
       id: '1',
@@ -79,7 +80,7 @@ describe('getPipetteWorkflow', () => {
   it('should return 2 if the primary pipette does NOT visit all tipracks', () => {
     const pipetteNames: PipetteName[] = ['p1000_single', 'p1000_single_gen2']
     const primaryPipetteId = 'someId'
-    const labware = {}
+    const labware: LoadedLabware[] = []
     const labwareDefinitions = {}
     const moveToWellCommand: RunTimeCommand = {
       id: '1',

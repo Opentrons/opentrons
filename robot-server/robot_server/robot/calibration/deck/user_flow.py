@@ -20,9 +20,8 @@ from opentrons.calibration_storage import (
 )
 from opentrons.hardware_control import robot_calibration as robot_cal
 from opentrons.hardware_control import HardwareControlAPI, CriticalPoint, Pipette
-from opentrons.hardware_control.instruments.ot2 import instrument_calibration
 from opentrons.protocol_api import labware
-from opentrons.protocols.geometry.deck import Deck
+from opentrons.protocol_api.core.protocol_api.deck import Deck
 from opentrons.types import Mount, Point, Location
 from opentrons.util import linal
 
@@ -115,9 +114,7 @@ class DeckCalibrationUserFlow:
         self.hardware.set_robot_calibration(
             robot_cal.build_temporary_identity_calibration()
         )
-        self._hw_pipette.update_pipette_offset(
-            instrument_calibration.load_pipette_offset(pip_id=None, mount=self._mount)
-        )
+        self._hw_pipette.reset_pipette_offset(self._mount, to_default=True)
         self._supported_commands = SupportedCommands(namespace="calibration")
         self._supported_commands.loadLabware = True
 
@@ -379,6 +376,6 @@ class DeckCalibrationUserFlow:
         if self._current_state != State.preparingPipette:
             trash = self._deck.get_fixed_trash()
             assert trash, "Bad deck setup"
-            await uf.move(self, trash["A1"].top(), CriticalPoint.XY_CENTER)
+            await uf.move(self, trash["A1"].top(), CriticalPoint.XY_CENTER)  # type: ignore[index]
             await self.hardware.drop_tip(self.mount)
         await self.move_to_tip_rack()

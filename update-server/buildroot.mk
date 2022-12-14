@@ -3,13 +3,13 @@
 # python-opentrons-update-server
 #
 ################################################################################
-# Get a key from package.json (like version)
-define get_pkg_json_key
-	$(shell python -c "import json; print(json.load(open('$(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/update-server/otupdate/package.json'))[\"$(1)\"])")
+
+define OTUPDATESERVER_CALL_PBU
+	$(shell python $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python_build_utils.py update-server robot-stack $(1))
 endef
 
-PYTHON_OPENTRONS_UPDATE_SERVER_VERSION = $(call get_pkg_json_key,version)
-PYTHON_OPENTRONS_UPDATE_SERVER_LICENSE = $(call get_pkg_json_key,license)
+PYTHON_OPENTRONS_UPDATE_SERVER_VERSION = $(call OTUPDATESERVER_CALL_PBU,get_version)
+PYTHON_OPENTRONS_UPDATE_SERVER_LICENSE = Apache-2
 PYTHON_OPENTRONS_UPDATE_SERVER_LICENSE_FILES = $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/LICENSE
 PYTHON_OPENTRONS_UPDATE_SERVER_SETUP_TYPE = setuptools
 PYTHON_OPENTRONS_UPDATE_SERVER_SITE_METHOD = local
@@ -18,11 +18,11 @@ PYTHON_OPENTRONS_UPDATE_SERVER_SUBDIR = update-server
 PYTHON_OPENTRONS_UPDATE_SERVER_POST_INSTALL_TARGET_HOOKS = PYTHON_OPENTRONS_UPDATE_SERVER_INSTALL_VERSION
 
 define OTUS_DUMP_BR_VERSION
-  $(shell python $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python_build_utils.py update-server dump_br_version)
+  $(shell python $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python_build_utils.py update-server robot-stack dump_br_version)
 endef
 
 define PYTHON_OPENTRONS_UPDATE_SERVER_INSTALL_VERSION
-	echo '$(call OTUS_DUMP_BR_VERSION)' > $(BINARIES_DIR)/opentrons-update-server-version.json
+	echo '$(call OTUPDATESERVER_CALL_PBU,dump_br_version)' > $(BINARIES_DIR)/opentrons-update-server-version.json
 endef
 
 otupdate_name := python-opentrons-update-server

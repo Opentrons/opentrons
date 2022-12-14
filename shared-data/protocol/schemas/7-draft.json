@@ -453,6 +453,11 @@
                     "description": "If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the `minimumZHeight` param to be ignored. A 'direct' movement is in X/Y/Z simultaneously.",
                     "type": "boolean",
                     "default": false
+                  },
+                  "speed": {
+                    "description": "Override the travel speed in mm/s. This controls the straight linear speed of motion.",
+                    "type": "number",
+                    "minimum": 0
                   }
                 }
               }
@@ -514,6 +519,22 @@
           },
 
           {
+            "description": "[This command is for internal use only and should NOT be used in protocols.] Initiate automatic calibration of a gripper. This must be run once for each gripper probe.",
+            "type": "object",
+            "required": ["commandType", "params"],
+            "properties": {
+              "key": { "type": "string" },
+              "commandType": { "enum": ["calibration/calibrateGripper"] },
+              "params": {
+                "required": ["probe"],
+                "probe": {
+                  "enum": ["front", "rear"]
+                }
+              }
+            }
+          },
+
+          {
             "description": "[This command is for internal use only and should NOT be used in protocols.] Initiate automatic calibration of a pipette.",
             "type": "object",
             "required": ["commandType", "params"],
@@ -536,13 +557,14 @@
             "required": ["commandType", "params"],
             "properties": {
               "key": { "type": "string" },
-              "commandType": { "enum": ["calibration/moveToLocation"] },
+              "commandType": {
+                "enum": ["calibration/moveToMaintenancePosition"]
+              },
               "params": {
-                "required": ["pipetteId", "location"],
-                "pipetteId": { "type": "string" },
-                "location": {
-                  "description": "Location to move to before starting calibration.",
-                  "enum": ["attachOrDetach", "probePosition"]
+                "required": ["mount"],
+                "mount": {
+                  "enum": ["left", "right"],
+                  "description": "Instrument mount to calibrate."
                 }
               }
             }
@@ -1114,6 +1136,11 @@
                     "description": "If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the `minimumZHeight` param to be ignored. A 'direct' movement is in X/Y/Z simultaneously.",
                     "type": "boolean",
                     "default": false
+                  },
+                  "speed": {
+                    "description": "Override the travel speed in mm/s. This controls the straight linear speed of motion.",
+                    "type": "number",
+                    "minimum": 0
                   }
                 }
               }

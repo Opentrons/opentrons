@@ -12,7 +12,6 @@ import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/test
 
 import { i18n } from '../../../../i18n'
 import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
-import { useFeatureFlag } from '../../../../redux/config'
 import {
   useIsOT3,
   useProtocolDetailsForRun,
@@ -29,7 +28,7 @@ import { ProtocolRunSetup } from '../ProtocolRunSetup'
 import { SetupModules } from '../SetupModules'
 
 import {
-  ProtocolAnalysisFile,
+  LegacySchemaAdapterOutput,
   protocolHasLiquids,
 } from '@opentrons/shared-data'
 import type { StoredProtocolAnalysis } from '../../hooks'
@@ -40,7 +39,6 @@ jest.mock('../SetupLabware')
 jest.mock('../SetupRobotCalibration')
 jest.mock('../SetupModules')
 jest.mock('../SetupLiquids')
-jest.mock('../../../../redux/config')
 jest.mock('@opentrons/shared-data/js/helpers/parseProtocolData')
 
 const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
@@ -75,16 +73,13 @@ const mockSetupModules = SetupModules as jest.MockedFunction<
 const mockSetupLiquids = SetupLiquids as jest.MockedFunction<
   typeof SetupLiquids
 >
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
->
 const mockProtocolHasLiquids = protocolHasLiquids as jest.MockedFunction<
   typeof protocolHasLiquids
 >
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
-
+const MOCK_ROTOCOL_LIQUID_KEY = { liquids: [] }
 const render = () => {
   return renderWithProviders(
     <ProtocolRunSetup
@@ -104,7 +99,10 @@ describe('ProtocolRunSetup', () => {
     when(mockUseProtocolDetailsForRun)
       .calledWith(RUN_ID)
       .mockReturnValue({
-        protocolData: (noModulesProtocol as unknown) as ProtocolAnalysisFile,
+        protocolData: ({
+          ...noModulesProtocol,
+          ...MOCK_ROTOCOL_LIQUID_KEY,
+        } as unknown) as LegacySchemaAdapterOutput,
         displayName: 'mock display name',
         protocolKey: 'fakeProtocolKey',
         robotType: 'OT-2 Standard',
@@ -114,7 +112,10 @@ describe('ProtocolRunSetup', () => {
     })
     when(mockUseStoredProtocolAnalysis)
       .calledWith(RUN_ID)
-      .mockReturnValue((noModulesProtocol as unknown) as StoredProtocolAnalysis)
+      .mockReturnValue(({
+        ...noModulesProtocol,
+        ...MOCK_ROTOCOL_LIQUID_KEY,
+      } as unknown) as StoredProtocolAnalysis)
     when(mockParseAllRequiredModuleModels).mockReturnValue([])
     when(mockUseRobot)
       .calledWith(ROBOT_NAME)
@@ -237,17 +238,14 @@ describe('ProtocolRunSetup', () => {
   })
 
   describe('when liquids are in the protocol', () => {
-    it('renders correct text for liquids when FF is on', () => {
-      when(mockUseFeatureFlag)
-        .calledWith('enableLiquidSetup')
-        .mockReturnValue(true)
+    it('renders correct text for liquids', () => {
       when(mockUseProtocolDetailsForRun)
         .calledWith(RUN_ID)
         .mockReturnValue({
           protocolData: ({
             ...noModulesProtocol,
             liquids: [{ displayName: 'water', description: 'liquid H2O' }],
-          } as unknown) as ProtocolAnalysisFile,
+          } as unknown) as LegacySchemaAdapterOutput,
           displayName: 'mock display name',
           protocolKey: 'fakeProtocolKey',
           robotType: 'OT-2 Standard',
@@ -271,7 +269,10 @@ describe('ProtocolRunSetup', () => {
       when(mockUseProtocolDetailsForRun)
         .calledWith(RUN_ID)
         .mockReturnValue({
-          protocolData: (withModulesProtocol as unknown) as ProtocolAnalysisFile,
+          protocolData: ({
+            ...withModulesProtocol,
+            ...MOCK_ROTOCOL_LIQUID_KEY,
+          } as unknown) as LegacySchemaAdapterOutput,
           displayName: 'mock display name',
           protocolKey: 'fakeProtocolKey',
           robotType: 'OT-2 Standard',
@@ -317,11 +318,12 @@ describe('ProtocolRunSetup', () => {
         .mockReturnValue({
           protocolData: ({
             ...withModulesProtocol,
+            ...MOCK_ROTOCOL_LIQUID_KEY,
             modules: pick(
               withModulesProtocol.modules,
               Object.keys(withModulesProtocol.modules)[0]
             ),
-          } as unknown) as ProtocolAnalysisFile,
+          } as unknown) as LegacySchemaAdapterOutput,
           displayName: 'mock display name',
           protocolKey: 'fakeProtocolKey',
           robotType: 'OT-2 Standard',

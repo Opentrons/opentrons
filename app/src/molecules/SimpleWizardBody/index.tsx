@@ -6,16 +6,15 @@ import {
   Icon,
   JUSTIFY_FLEX_END,
   SPACING,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 
 interface Props {
   iconColor: string
-  children: React.ReactNode
   header: string
-  subHeader?: string
   isSuccess: boolean
+  children?: React.ReactNode
+  subHeader?: string
 }
 
 export function SimpleWizardBody(props: Props): JSX.Element {
@@ -37,7 +36,7 @@ export function SimpleWizardBody(props: Props): JSX.Element {
           aria-label={isSuccess ? 'ot-check' : 'ot-alert'}
         />
         <StyledText
-          css={TYPOGRAPHY.h1Default}
+          as="h1"
           marginTop={SPACING.spacing5}
           marginBottom={SPACING.spacing3}
         >

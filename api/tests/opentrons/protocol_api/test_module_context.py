@@ -7,10 +7,10 @@ from decoy import Decoy
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 
 from opentrons.broker import Broker
-from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, ModuleContext, Labware
 from opentrons.protocol_api.core.common import LabwareCore, ModuleCore, ProtocolCore
 from opentrons.protocol_api.core.labware import LabwareLoadParams
+from opentrons.protocol_api.core.core_map import LoadedCoreMap
 
 
 @pytest.fixture
@@ -20,17 +20,15 @@ def mock_core(decoy: Decoy) -> ModuleCore:
 
 
 @pytest.fixture
-def mock_deck(decoy: Decoy) -> Deck:
-    """Get a mock protocol implementation core."""
-    return decoy.mock(cls=Deck)
+def mock_core_map(decoy: Decoy) -> LoadedCoreMap:
+    """Get a mock core map."""
+    return decoy.mock(cls=LoadedCoreMap)
 
 
 @pytest.fixture
-def mock_protocol_core(decoy: Decoy, mock_deck: Deck) -> ProtocolCore:
+def mock_protocol_core(decoy: Decoy) -> ProtocolCore:
     """Get a mock protocol implementation core."""
-    mock_core = decoy.mock(cls=ProtocolCore)
-    decoy.when(mock_core.get_deck()).then_return(mock_deck)
-    return mock_core
+    return decoy.mock(cls=ProtocolCore)
 
 
 @pytest.fixture
@@ -41,11 +39,15 @@ def mock_broker(decoy: Decoy) -> Broker:
 
 @pytest.fixture
 def subject(
-    mock_core: ModuleCore, mock_protocol_core: ProtocolCore, mock_broker: Broker
+    mock_core: ModuleCore,
+    mock_core_map: LoadedCoreMap,
+    mock_protocol_core: ProtocolCore,
+    mock_broker: Broker,
 ) -> ModuleContext[Any]:
     """Get a generic module context with its dependencies mocked out."""
     return ModuleContext(
         core=mock_core,
+        core_map=mock_core_map,
         protocol_core=mock_protocol_core,
         broker=mock_broker,
         api_version=MAX_SUPPORTED_VERSION,
@@ -65,8 +67,8 @@ def test_get_labware(
 def test_load_labware(
     decoy: Decoy,
     mock_protocol_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
     mock_core: ModuleCore,
-    mock_deck: Deck,
     subject: ModuleContext[Any],
 ) -> None:
     """It should load labware by load parameters."""
@@ -95,6 +97,7 @@ def test_load_labware(
     )
 
     assert result is mock_labware
+    decoy.verify(mock_core_map.add(mock_labware_core, result), times=1)
 
 
 def test_load_labware_from_definition(

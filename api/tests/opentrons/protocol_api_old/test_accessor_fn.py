@@ -1,13 +1,6 @@
 from opentrons.types import Point
 
 
-def test_labware_init(min_lw_impl, minimal_labware_def):
-    ordering = [well for col in minimal_labware_def["ordering"] for well in col]
-    assert min_lw_impl._ordering == ordering
-    assert min_lw_impl._well_definition == minimal_labware_def["wells"]
-    assert min_lw_impl.get_geometry()._offset == Point(x=10, y=10, z=5)
-
-
 def test_wells_accessor(min_lw, min_lw_impl, minimal_labware_def):
     depth1 = minimal_labware_def["wells"]["A1"]["depth"]
     depth2 = minimal_labware_def["wells"]["A2"]["depth"]

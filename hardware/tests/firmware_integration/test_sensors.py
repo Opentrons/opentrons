@@ -70,9 +70,8 @@ async def test_write_to_sensors(
 @pytest.mark.parametrize(
     argnames=["sensor_type", "expected_data"],
     argvalues=[
-        [SensorType.capacitive, 0.02],
-        # Data should be 12.7291 for humidity
-        [SensorType.environment, (0.0, 57.67)],
+        [SensorType.capacitive, 0.05],
+        [SensorType.environment, (12.73, 100.07)],
         [SensorType.pressure, 0.02],
     ],
 )
@@ -84,9 +83,6 @@ async def test_read_from_sensors(
     expected_data: Union[float, Tuple[float, float]],
 ) -> None:
     """We should be able to read from all the sensors."""
-    # TODO when the data sizing bug is fixed in bit_utils.hpp
-    # we should change the humidity sensor expected data
-    # back to the correct value.
     read_message = ReadFromSensorRequest(
         payload=ReadFromSensorRequestPayload(
             sensor=SensorTypeField(sensor_type),
@@ -136,7 +132,7 @@ async def test_read_from_sensors(
 @pytest.mark.parametrize(
     argnames=["sensor_type", "expected_value"],
     argvalues=[
-        [SensorType.environment, (0.0, 57.67)],
+        [SensorType.environment, (12.73, 100.07)],
     ],
 )
 @pytest.mark.requires_emulator
@@ -193,7 +189,7 @@ async def test_baseline_poll_environment(
 @pytest.mark.parametrize(
     argnames=["sensor_type", "expected_value"],
     argvalues=[
-        [SensorType.capacitive, 0.02],
+        [SensorType.capacitive, 0.05],
     ],
 )
 @pytest.mark.requires_emulator

@@ -1,10 +1,10 @@
 """ Tests for behaviors specific to the OT3 hardware controller.
 """
-from typing import cast, Iterator, Union, Dict
+from typing import cast, Iterator, Union, Dict, Tuple, List
 from typing_extensions import Literal
 from math import copysign
 import pytest
-from mock import AsyncMock, patch
+from mock import AsyncMock, patch, Mock
 from opentrons.config.types import GantryLoad, CapacitivePassSettings
 from opentrons.hardware_control.dev_types import (
     InstrumentDict,
@@ -12,18 +12,23 @@ from opentrons.hardware_control.dev_types import (
 )
 from opentrons.hardware_control.instruments.ot3.gripper_handler import (
     GripError,
+    GripperHandler,
 )
+from opentrons.hardware_control.instruments.ot2.pipette_handler import OT3PipetteHandler
 from opentrons.hardware_control.types import (
     OT3Mount,
     OT3Axis,
     GripperNotAttachedError,
     InvalidMoveError,
     CriticalPoint,
+    GripperProbe,
+    InstrumentProbeType,
 )
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control import ThreadManager
 from opentrons.hardware_control.backends.ot3utils import axis_to_node
-from opentrons.types import Point
+from opentrons.types import Point, Mount
+
 
 from opentrons.config import gripper_config as gc
 from opentrons_shared_data.gripper.dev_types import GripperModel
@@ -47,6 +52,19 @@ def mock_move_to(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
         AsyncMock(
             spec=ot3_hardware.managed_obj.move_to,
             wraps=ot3_hardware.managed_obj.move_to,
+        ),
+    ) as mock_move:
+        yield mock_move
+
+
+@pytest.fixture
+def mock_home(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+    with patch.object(
+        ot3_hardware.managed_obj,
+        "home",
+        AsyncMock(
+            spec=ot3_hardware.managed_obj.home,
+            wraps=ot3_hardware.managed_obj.home,
         ),
     ) as mock_move:
         yield mock_move
@@ -114,6 +132,20 @@ async def mock_backend_move(ot3_hardware: ThreadManager[OT3API]) -> Iterator[Asy
         yield mock_move
 
 
+@pytest.fixture
+async def mock_instrument_handlers(
+    ot3_hardware: ThreadManager[OT3API],
+) -> Iterator[Tuple[Mock]]:
+    with patch.object(
+        ot3_hardware.managed_obj,
+        "_gripper_handler",
+        Mock(spec=GripperHandler),
+    ) as mock_gripper_handler, patch.object(
+        ot3_hardware.managed_obj, "_pipette_handler", Mock(spec=OT3PipetteHandler)
+    ) as mock_pipette_handler:
+        yield mock_gripper_handler, mock_pipette_handler
+
+
 @pytest.mark.parametrize(
     "attached,load",
     (
@@ -164,6 +196,7 @@ def mock_backend_capacitive_probe(
             distance_mm: float,
             speed_mm_per_s: float,
             threshold_pf: float,
+            probe: InstrumentProbeType,
         ) -> None:
             ot3_hardware._backend._position[axis_to_node(moving)] += distance_mm / 2
 
@@ -182,13 +215,49 @@ def mock_backend_capacitive_pass(
     ) as mock_pass:
 
         async def _update_position(
-            mount: OT3Mount, moving: OT3Axis, distance_mm: float, speed_mm_per_s: float
+            mount: OT3Mount,
+            moving: OT3Axis,
+            distance_mm: float,
+            speed_mm_per_s: float,
+            probe: InstrumentProbeType,
         ) -> None:
             ot3_hardware._backend._position[axis_to_node(moving)] += distance_mm / 2
             return [1, 2, 3, 4, 5, 6, 8]
 
         mock_pass.side_effect = _update_position
         yield mock_pass
+
+
+@pytest.mark.parametrize(
+    "mount,homed_axis",
+    [
+        (OT3Mount.RIGHT, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_R]),
+        (OT3Mount.LEFT, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L]),
+        (OT3Mount.GRIPPER, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_G]),
+    ],
+)
+async def test_move_to_without_homing_first(
+    ot3_hardware: ThreadManager[OT3API],
+    mock_home: AsyncMock,
+    mount: OT3Mount,
+    homed_axis: List[OT3Axis],
+) -> None:
+    """Before a mount can be moved, XY and the corresponding Z  must be homed first"""
+    if mount == OT3Mount.GRIPPER:
+        # attach a gripper if we're testing the gripper mount
+        gripper_config = gc.load(GripperModel.V1, "test")
+        instr_data = AttachedGripper(config=gripper_config, id="test")
+        await ot3_hardware.cache_gripper(instr_data)
+
+    ot3_hardware._backend._homed_nodes = set()
+    assert not ot3_hardware._backend.check_ready_for_movement(homed_axis)
+
+    await ot3_hardware.move_to(
+        mount,
+        Point(0.001, 0.001, 0.001),
+    )
+    mock_home.assert_called_once_with(homed_axis)
+    assert ot3_hardware._backend.check_ready_for_movement(homed_axis)
 
 
 @pytest.mark.parametrize(
@@ -222,7 +291,9 @@ async def test_capacitive_probe(
 
     # This is a negative probe because the current position is the home position
     # which is very large.
-    mock_backend_capacitive_probe.assert_called_once_with(mount, moving, 3.0, 4, 1.0)
+    mock_backend_capacitive_probe.assert_called_once_with(
+        mount, moving, 3, 4, 1.0, InstrumentProbeType.PRIMARY
+    )
 
     original = moving.set_in_point(here, 0)
     for call in mock_move_to.call_args_list:
@@ -323,7 +394,7 @@ async def test_capacitive_probe_invalid_axes(
         (OT3Axis.Y, Point(0, 0, 0), Point(0, -1, 0), 1),
     ],
 )
-async def test_capacitive_sweep(
+async def test_pipette_capacitive_sweep(
     axis: OT3Axis,
     begin: Point,
     end: Point,
@@ -335,7 +406,48 @@ async def test_capacitive_sweep(
     data = await ot3_hardware.capacitive_sweep(OT3Mount.RIGHT, axis, begin, end, 3)
     assert data == [1, 2, 3, 4, 5, 6, 8]
     mock_backend_capacitive_pass.assert_called_once_with(
-        OT3Mount.RIGHT, axis, distance, 3
+        OT3Mount.RIGHT, axis, distance, 3, InstrumentProbeType.PRIMARY
+    )
+
+
+@pytest.mark.parametrize(
+    "probe,intr_probe",
+    [
+        (GripperProbe.FRONT, InstrumentProbeType.PRIMARY),
+        (GripperProbe.REAR, InstrumentProbeType.SECONDARY),
+    ],
+)
+@pytest.mark.parametrize(
+    "axis,begin,end,distance",
+    [
+        # Points must be passed through the attitude transform and therefore
+        # flipped
+        (OT3Axis.X, Point(0, 0, 0), Point(1, 0, 0), -1),
+        (OT3Axis.Y, Point(0, 0, 0), Point(0, -1, 0), 1),
+    ],
+)
+async def test_gripper_capacitive_sweep(
+    probe: GripperProbe,
+    intr_probe: InstrumentProbeType,
+    axis: OT3Axis,
+    begin: Point,
+    end: Point,
+    distance: float,
+    ot3_hardware: ThreadManager[OT3API],
+    mock_move_to: AsyncMock,
+    mock_backend_capacitive_pass: AsyncMock,
+) -> None:
+    gripper_config = gc.load(GripperModel.V1, "g12345")
+    instr_data = AttachedGripper(config=gripper_config, id="g12345")
+    await ot3_hardware.cache_gripper(instr_data)
+    await ot3_hardware.home()
+    await ot3_hardware.grip(1)
+    ot3_hardware._gripper_handler.get_gripper().current_jaw_displacement = 5
+    ot3_hardware.add_gripper_probe(probe)
+    data = await ot3_hardware.capacitive_sweep(OT3Mount.GRIPPER, axis, begin, end, 3)
+    assert data == [1, 2, 3, 4, 5, 6, 8]
+    mock_backend_capacitive_pass.assert_called_once_with(
+        OT3Mount.GRIPPER, axis, distance, 3, intr_probe
     )
 
 
@@ -460,7 +572,6 @@ async def test_gripper_mount_not_movable(
     [
         CriticalPoint.NOZZLE,
         CriticalPoint.TIP,
-        CriticalPoint.XY_CENTER,
         CriticalPoint.FRONT_NOZZLE,
     ],
 )
@@ -519,3 +630,55 @@ async def test_gripper_move_to(
             OT3Axis.Y,
             OT3Axis.Z_G,
         ]
+
+
+@pytest.mark.parametrize(
+    "mount",
+    (
+        OT3Mount.RIGHT,
+        OT3Mount.LEFT,
+        OT3Mount.GRIPPER,
+        Mount.RIGHT,
+        Mount.LEFT,
+    ),
+)
+async def test_reset_instrument_offset(
+    ot3_hardware: ThreadManager[OT3API],
+    mount: Union[OT3Mount, Mount],
+    mock_instrument_handlers: Tuple[Mock],
+) -> None:
+    gripper_handler, pipette_handler = mock_instrument_handlers
+    await ot3_hardware.reset_instrument_offset(mount)
+    if mount == OT3Mount.GRIPPER:
+        gripper_handler.reset_instrument_offset.assert_called_once_with(True)
+    else:
+        converted_mount = OT3Mount.from_mount(mount)
+        pipette_handler.reset_instrument_offset.assert_called_once_with(
+            converted_mount, True
+        )
+
+
+@pytest.mark.parametrize(
+    "mount",
+    (
+        OT3Mount.RIGHT,
+        OT3Mount.LEFT,
+        OT3Mount.GRIPPER,
+        Mount.RIGHT,
+        Mount.LEFT,
+    ),
+)
+async def test_save_instrument_offset(
+    ot3_hardware: ThreadManager[OT3API],
+    mount: Union[OT3Mount, Mount],
+    mock_instrument_handlers: Tuple[Mock],
+) -> None:
+    gripper_handler, pipette_handler = mock_instrument_handlers
+    await ot3_hardware.save_instrument_offset(mount, Point(1, 1, 1))
+    if mount == OT3Mount.GRIPPER:
+        gripper_handler.save_instrument_offset.assert_called_once_with(Point(1, 1, 1))
+    else:
+        converted_mount = OT3Mount.from_mount(mount)
+        pipette_handler.save_instrument_offset.assert_called_once_with(
+            converted_mount, Point(1, 1, 1)
+        )

@@ -48,6 +48,7 @@ from .aspirate import (
 from .custom import (
     Custom,
     CustomParams,
+    CustomCreate,
     CustomResult,
     CustomCommandType,
 )
@@ -228,6 +229,7 @@ __all__ = [
     "AspirateCommandType",
     # custom command models
     "Custom",
+    "CustomCreate",
     "CustomParams",
     "CustomResult",
     "CustomCommandType",

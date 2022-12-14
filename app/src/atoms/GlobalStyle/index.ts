@@ -1,13 +1,15 @@
 import { createGlobalStyle } from 'styled-components'
 import { COLORS } from '@opentrons/components'
 import 'typeface-open-sans'
+import '@fontsource/public-sans'
 
-export const GlobalStyle = createGlobalStyle`
+export const GlobalStyle = createGlobalStyle<{ isOnDevice?: boolean }>`
   * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Open Sans', sans-serif;
+    font-family: ${props =>
+      props.isOnDevice ?? false ? 'Public Sans' : 'Open Sans'}, sans-serif;
   }
 
   html,

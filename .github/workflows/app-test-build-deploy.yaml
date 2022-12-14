@@ -99,6 +99,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: 'actions/checkout@v3'
+        with:
+          fetch-depth: 0
       - uses: 'actions/setup-node@v3'
         with:
           node-version: '16'
@@ -154,6 +156,7 @@ jobs:
           APPLE_ID: ${{ secrets.OT_APP_APPLE_ID }}
           APPLE_ID_PASSWORD: ${{ secrets.OT_APP_APPLE_ID_PASSWORD }}
           HOST_PYTHON: python
+          OPENTRONS_PROJECT: robot-stack
         run: |
           make -C app-shell dist-${{ matrix.os }}
 

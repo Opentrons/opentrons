@@ -40,10 +40,16 @@ def subject(
     )
 
 
-@pytest.mark.parametrize("api_version", [APIVersion(2, 0), APIVersion(2, 1)])
+@pytest.mark.parametrize("api_version", [APIVersion(2, 13)])
 def test_api_version(api_version: APIVersion, subject: Well) -> None:
     """It should have an api_version property."""
     assert subject.api_version == api_version
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 12)])
+def test_api_version_clamped(subject: Well) -> None:
+    """It should not allow the API version to go any lower than 2.13."""
+    assert subject.api_version == APIVersion(2, 13)
 
 
 def test_parent(mock_parent: Labware, subject: Well) -> None:
@@ -96,3 +102,12 @@ def test_well_center(decoy: Decoy, mock_well_core: WellCore, subject: Well) -> N
     assert isinstance(result, Location)
     assert result.point == Point(1, 2, 3)
     assert result.labware.as_well() is subject
+
+
+def test_has_tip(decoy: Decoy, mock_well_core: WellCore, subject: Well) -> None:
+    """It should get tip state from the core."""
+    decoy.when(mock_well_core.has_tip()).then_return(True)
+    assert subject.has_tip is True
+
+    decoy.when(mock_well_core.has_tip()).then_return(False)
+    assert subject.has_tip is False

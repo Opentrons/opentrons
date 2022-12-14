@@ -9,13 +9,14 @@ import {
 import type {
   ProtocolFile,
   LabwareDefinition2,
+  LoadedLabware,
   RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { DeprecatedLabwarePositionCheckStep } from '../types'
 
 export const getOnePipettePositionCheckSteps = (args: {
   primaryPipetteId: string
-  labware: ProtocolFile<{}>['labware']
+  labware: LoadedLabware[]
   labwareDefinitions: Record<string, LabwareDefinition2>
   modules: ProtocolFile<{}>['modules']
   commands: RunTimeCommand[]
@@ -33,14 +34,12 @@ export const getOnePipettePositionCheckSteps = (args: {
     labwareDefinitions,
     commands
   )
-
   const orderedLabwareIds = getLabwareIdsInOrder(
     labware,
     labwareDefinitions,
     modules,
     commands
   )
-
   const moveToTiprackSteps = getMoveToTiprackSteps(
     orderedTiprackIds,
     primaryPipetteId,
