@@ -73,6 +73,7 @@ class AbstractProtocol(
         """Load a labware using its identifying parameters."""
         ...
 
+    # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     @abstractmethod
     def move_labware(
         self,

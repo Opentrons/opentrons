@@ -208,6 +208,7 @@ class ProtocolContextImplementation(
 
         return labware_core
 
+    # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     def move_labware(
         self,
         labware_core: LabwareImplementation,

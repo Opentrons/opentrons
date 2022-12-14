@@ -62,8 +62,9 @@ class LabwareMovementStrategy(str, Enum):
     MANUAL_MOVE_WITHOUT_PAUSE = "manualMoveWithoutPause"
 
 
+# TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
 @dataclass(frozen=True)
-class ExperimentalOffsetData:
+class ExperimentalOffsetData(BaseModel):
     """The result of a load module procedure."""
 
     usePickUpLocationLpcOffset: bool

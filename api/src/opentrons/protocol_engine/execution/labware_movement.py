@@ -182,6 +182,7 @@ class LabwareMovementHandler:
         ]
         return waypoints
 
+    # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     @staticmethod
     def get_experimental_labware_movement_offset_vector(
         use_current_offset: bool,

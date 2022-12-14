@@ -351,6 +351,7 @@ class ProtocolContext(CommandPublisher):
             if slot is not None
         }
 
+    # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     # TODO: gate move_labware behind API version
     def move_labware(
         self,
