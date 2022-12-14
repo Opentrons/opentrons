@@ -5,6 +5,7 @@ import { COLORS, TEXT_TRANSFORM_CAPITALIZE } from '@opentrons/components'
 import { PrimaryButton } from '../../atoms/buttons'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { FLOWS } from './constants'
+import { getIsGantryEmpty } from './utils'
 import type { PipetteWizardStepProps } from './types'
 
 interface ResultsProps extends PipetteWizardStepProps {
@@ -25,7 +26,6 @@ export const Results = (props: ResultsProps): JSX.Element => {
     totalStepCount,
   } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
-
   let header: string = 'unknown results screen'
   let iconColor: string = COLORS.successEnabled
   let isSuccess: boolean = true
