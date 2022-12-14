@@ -26,6 +26,8 @@ from opentrons.protocol_engine import (
     Liquid,
 )
 
+from opentrons_shared_data.robot.dev_types import RobotType
+
 
 @click.command()
 @click.argument(
@@ -142,7 +144,7 @@ class AnalyzeResults(BaseModel):
     files: List[ProtocolFile]
     config: Union[JsonConfig, PythonConfig]
     metadata: Dict[str, Any]
-    robotType: Literal["OT-2 Standard", "OT-3 Standard"]
+    robotType: RobotType
     commands: List[Command]
     labware: List[LoadedLabware]
     pipettes: List[LoadedPipette]

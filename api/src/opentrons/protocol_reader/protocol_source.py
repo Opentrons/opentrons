@@ -8,6 +8,8 @@ from typing_extensions import Literal
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.models import LabwareDefinition
 
+from opentrons_shared_data.robot.dev_types import RobotType
+
 
 class ProtocolType(str, Enum):
     """Type of protocol, JSON or Python."""
@@ -114,6 +116,6 @@ class ProtocolSource:
     files: List[ProtocolSourceFile]
     metadata: Metadata
     # TODO(mm, 2022-10-21): Make this an enum once we figure out where to put it.
-    robot_type: Literal["OT-2 Standard", "OT-3 Standard"]
+    robot_type: RobotType
     config: ProtocolConfig
     labware_definitions: List[LabwareDefinition]
