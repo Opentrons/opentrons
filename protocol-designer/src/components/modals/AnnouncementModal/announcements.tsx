@@ -167,4 +167,21 @@ export const announcements: Announcement[] = [
       </>
     ),
   },
+  {
+    announcementKey: 'liquidColorEnhancement',
+    image: null,
+    heading: "We've updated the Protocol Designer",
+    message: (
+      <>
+        <p>
+          The Opentrons Protocol Designer now supports Liquid Color
+          Enhancements!
+        </p>
+        <p>
+          All protocols now require Opentrons App version
+          <strong> 6.3+ </strong> to run.
+        </p>
+      </>
+    ),
+  },
 ]

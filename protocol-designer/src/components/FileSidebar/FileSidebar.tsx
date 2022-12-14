@@ -142,9 +142,9 @@ function getWarningContent({
 export const v6WarningContent: JSX.Element = (
   <div>
     <p>
-      {i18n.t(`alert.hint.export_v6_protocol_6_20.body1`)}{' '}
-      <strong>{i18n.t(`alert.hint.export_v6_protocol_6_20.body2`)}</strong>
-      {i18n.t(`alert.hint.export_v6_protocol_6_20.body3`)}
+      {i18n.t(`alert.hint.export_v6_protocol_6_30.body1`)}{' '}
+      <strong>{i18n.t(`alert.hint.export_v6_protocol_6_30.body2`)}</strong>
+      {i18n.t(`alert.hint.export_v6_protocol_6_30.body3`)}
     </p>
   </div>
 )
@@ -202,7 +202,7 @@ export function FileSidebar(props: Props): JSX.Element {
     content: React.ReactNode
   } => {
     return {
-      hintKey: 'export_v6_protocol_6_20',
+      hintKey: 'export_v6_protocol_6_30',
       content: v6WarningContent,
     }
   }
