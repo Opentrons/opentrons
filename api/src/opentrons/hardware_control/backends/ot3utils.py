@@ -244,10 +244,12 @@ def create_home_group(
     return move_group
 
 
-def create_tip_action_group(distance, velocity, action: PipetteAction) -> MoveGroup:
+def create_tip_action_group(axes: List[OT3Axis], distance: float, velocity: float, action: PipetteAction) -> MoveGroup:
+    current_nodes = [axis_to_node(ax) for ax in axes]
     step = create_tip_action_step(
-        velocity=velocity,
-        duration=abs(distance / velocity),
+        velocity={node_id: np.float64(velocity) for node_id in current_nodes},
+        distance={node_id: np.float64(distance) for node_id in current_nodes},
+        present_nodes=current_nodes,
         action=PipetteTipActionType[action]
         )
     return [step]
