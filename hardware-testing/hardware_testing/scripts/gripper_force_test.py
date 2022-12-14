@@ -30,7 +30,7 @@ def build_arg_parser():
     arg_parser.add_argument('-t', '--trials', type=int, required=False, help='Number of trials', default=5)
     arg_parser.add_argument('-p', '--pwm_inc', type=int, required=False, help='Gripper PWM duty cycle increment', default=5)
     arg_parser.add_argument('-v', '--vref_inc', type=float, required=False, help='Gripper reference voltage increment', default=0.1)
-    arg_parser.add_argument('-i', '--interval', type=float, required=False, help='Interval between grip trials in seconds', default=3)
+    arg_parser.add_argument('-i', '--interval', type=float, required=False, help='Interval between grip trials in seconds', default=5)
     arg_parser.add_argument('-s', '--simulate', action="store_true", required=False, help='Simulate this test script')
     return arg_parser
 
@@ -48,10 +48,10 @@ class Gripper_Force_Test:
         self.vref_inc = vref_inc
         self.interval = interval
         self.pwm_start = 10 # %
-        self.pwm_max = 90 # %
+        self.pwm_max = 60 # %
         self.vref_default = 1.0 # Volts
-        self.vref_start = 1.0 # Volts
-        self.vref_max = 2.7 # Volts
+        self.vref_start = 2.0 # Volts
+        self.vref_max = 2.0 # Volts
         self.engage_position = Point(0, 0, -78)
         self.measurement_data = {
             "RMS":"None",
