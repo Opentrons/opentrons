@@ -4,6 +4,7 @@ from typing import Set, Tuple
 import logging
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
+    WaitableCallback,
     MultipleMessagesWaitableCallback,
 )
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
@@ -27,25 +28,29 @@ MotorPositionStatus = NodeMap[Tuple[float, float, bool, bool]]
 
 
 async def _parser_motor_position_response(
-    reader: MultipleMessagesWaitableCallback, expected: Set[NodeId]
+    reader: WaitableCallback, expected: Set[NodeId]
 ) -> MotorPositionStatus:
     seen: Set[NodeId] = set()
-    data: MotorPositionStatus = {}
+    data = {}
     while not expected.issubset(seen):
         async for response, arb_id in reader:
             assert isinstance(response, MotorPositionResponse)
             node = NodeId(arb_id.parts.originating_node_id)
-            data[node] = (
-                float(response.payload.current_position.value / 1000.0),
-                float(response.payload.encoder_position.value) / 1000.0,
-                bool(
-                    response.payload.position_flags.value
-                    & MotorPositionFlags.stepper_position_ok
-                ),
-                bool(
-                    response.payload.position_flags.value
-                    & MotorPositionFlags.encoder_position_ok
-                ),
+            data.update(
+                {
+                    node: (
+                        float(response.payload.current_position.value / 1000.0),
+                        float(response.payload.encoder_position.value) / 1000.0,
+                        bool(
+                            response.payload.position_flags.value
+                            & MotorPositionFlags.stepper_position_ok.value
+                        ),
+                        bool(
+                            response.payload.position_flags.value
+                            & MotorPositionFlags.encoder_position_ok.value
+                        ),
+                    )
+                }
             )
     return data
 
@@ -64,9 +69,11 @@ async def get_motor_position(
             node_id=NodeId.broadcast, message=MotorPositionRequest()
         )
         try:
-            return await asyncio.wait_for(
-                _parser_motor_position_response(),
+            data = await asyncio.wait_for(
+                _parser_motor_position_response(reader, nodes),
                 timeout,
             )
         except asyncio.TimeoutError:
             log.warning("Motor position timed out")
+
+    return data
