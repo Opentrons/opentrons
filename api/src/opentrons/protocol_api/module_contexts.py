@@ -285,11 +285,11 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
     def status(self) -> str:
         """One of four possible temperature statuses:
 
-        - ``holding at target``: The module has reached its target temperature
-            and is actively maintaining that temperature.
-        - ``cooling``: The module is cooling to a target temperature.
-        - ``heating``: The module is heating to a target temperature.
-        - ``idle``: The module has been deactivated.
+        - ``holding at target`` – The module has reached its target temperature
+          and is actively maintaining that temperature.
+        - ``cooling`` – The module is cooling to a target temperature.
+        - ``heating`` – The module is heating to a target temperature.
+        - ``idle`` – The module has been deactivated.
         """
         return self._core.get_status().value
 
@@ -335,16 +335,16 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
              the loaded labware has no default, or if no labware is loaded, this will
              raise an error.
 
-           - ``height_from_base``: Move this many millimeters above the bottom
+           - ``height_from_base`` – Move this many millimeters above the bottom
              of the labware. Acceptable values are between ``0`` and ``25``.
 
              This is the recommended way to adjust the magnets' height.
 
-           - ``offset``: Move this many millimeters above (positive value) or below
+           - ``offset`` – Move this many millimeters above (positive value) or below
              (negative value) the default height for the loaded labware. The sum of
              the default height and ``offset`` must be between 0 and 25.
 
-           - ``height``: Intended to move this many millimeters above the magnets'
+           - ``height`` – Intended to move this many millimeters above the magnets'
              home position. However, depending on the generation of module and the loaded
              labware, this may produce unpredictable results. You should normally use
              ``height_from_base`` instead.
@@ -528,10 +528,10 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     def lid_position(self) -> Optional[str]:
         """One of these possible lid statuses:
 
-        - ``closed``: The lid is closed.
-        - ``in_between``: The lid is neither open nor closed.
-        - ``open``: The lid is open.
-        - ``unknown``: The lid position can't be determined.
+        - ``closed`` – The lid is closed.
+        - ``in_between`` – The lid is neither open nor closed.
+        - ``open`` – The lid is open.
+        - ``unknown`` – The lid position can't be determined.
         """
         status = self._core.get_lid_position()
         return status.value if status is not None else None
@@ -541,12 +541,12 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     def block_temperature_status(self) -> str:
         """One of five possible temperature statuses:
 
-        - ``holding at target``: The block has reached its target temperature
-            and is actively maintaining that temperature.
-        - ``cooling``: The block is cooling to a target temperature.
-        - ``heating``: The block is heating to a target temperature.
-        - ``idle``: The block is not currently heating or cooling.
-        - ``error``: The temperature status can't be determined.
+        - ``holding at target`` – The block has reached its target temperature
+          and is actively maintaining that temperature.
+        - ``cooling`` – The block is cooling to a target temperature.
+        - ``heating`` – The block is heating to a target temperature.
+        - ``idle`` – The block is not currently heating or cooling.
+        - ``error`` – The temperature status can't be determined.
         """
         return self._core.get_block_temperature_status().value
 
@@ -555,13 +555,13 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     def lid_temperature_status(self) -> Optional[str]:
         """One of five possible temperature statuses:
 
-        - ``holding at target``: The lid has reached its target temperature
-            and is actively maintaining that temperature.
-        - ``cooling``: The lid has previously heated and is now passively cooling.
+        - ``holding at target`` – The lid has reached its target temperature
+          and is actively maintaining that temperature.
+        - ``cooling`` – The lid has previously heated and is now passively cooling.
             `The Thermocycler lid does not have active cooling.`
-        - ``heating``: The lid is heating to a target temperature.
-        - ``idle``: The lid has not heated since the beginning of the protocol.
-        - ``error``: The temperature status can't be determined.
+        - ``heating`` – The lid is heating to a target temperature.
+        - ``idle`` – The lid has not heated since the beginning of the protocol.
+        - ``error`` – The temperature status can't be determined.
         """
         status = self._core.get_lid_temperature_status()
         return status.value if status is not None else None
@@ -673,13 +673,13 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     def temperature_status(self) -> str:
         """One of five possible temperature statuses:
 
-        - ``holding at target``: The module has reached its target temperature
-            and is actively maintaining that temperature.
-        - ``cooling``: The module has previously heated and is now passively cooling.
-            `The Heater-Shaker does not have active cooling.`
-        - ``heating``: The module is heating to a target temperature.
-        - ``idle``: The module has not heated since the beginning of the protocol.
-        - ``error``: The temperature status can't be determined.
+        - ``holding at target`` – The module has reached its target temperature
+          and is actively maintaining that temperature.
+        - ``cooling`` – The module has previously heated and is now passively cooling.
+          `The Heater-Shaker does not have active cooling.`
+        - ``heating`` – The module is heating to a target temperature.
+        - ``idle`` – The module has not heated since the beginning of the protocol.
+        - ``error`` – The temperature status can't be determined.
         """
         return self._core.get_temperature_status().value
 
@@ -688,13 +688,13 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     def speed_status(self) -> str:
         """One of five possible shaking statuses:
 
-        - ``holding at target``: The module has reached its target shake speed
-            and is actively maintaining that speed.
-        - ``speeding up``: The module is increasing its shake speed towards a target.
-        - ``slowing down``: The module was previously shaking at a faster speed
-            and is currently reducing its speed to a lower target or to deactivate.
-        - ``idle``: The module is not shaking.
-        - ``error``: The shaking status can't be determined.
+        - ``holding at target`` – The module has reached its target shake speed
+          and is actively maintaining that speed.
+        - ``speeding up`` – The module is increasing its shake speed towards a target.
+        - ``slowing down`` – The module was previously shaking at a faster speed
+          and is currently reducing its speed to a lower target or to deactivate.
+        - ``idle`` – The module is not shaking.
+        - ``error`` – The shaking status can't be determined.
         """
         return self._core.get_speed_status().value
 
@@ -703,14 +703,14 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     def labware_latch_status(self) -> str:
         """One of six possible latch statuses:
 
-        - ``opening``: The latch is currently opening (in motion).
-        - ``idle_open``: The latch is open and not moving.
-        - ``closing``: The latch is currently closing (in motion).
-        - ``idle_closed``: The latch is closed and not moving.
-        - ``idle_unknown``: The default status upon reset, regardless of physical latch position.
-            Use :py:meth:`~HeaterShakerContext.close_labware_latch` before other commands
-            requiring confirmation that the latch is closed.
-        - ``unknown``: The latch status can't be determined.
+        - ``opening`` – The latch is currently opening (in motion).
+        - ``idle_open`` – The latch is open and not moving.
+        - ``closing`` – The latch is currently closing (in motion).
+        - ``idle_closed`` – The latch is closed and not moving.
+        - ``idle_unknown`` – The default status upon reset, regardless of physical latch position.
+          Use :py:meth:`~HeaterShakerContext.close_labware_latch` before other commands
+          requiring confirmation that the latch is closed.
+        - ``unknown`` – The latch status can't be determined.
         """
         return self._core.get_labware_latch_status().value
 
