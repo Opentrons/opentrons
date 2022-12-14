@@ -1285,7 +1285,7 @@ class OT3API(
                 )
                 await self._move(target_down)
                 # perform pick up tip
-                await self._backend.tip_action(spec.pick_up_distance, spec.speed, "pick_up")
+                await self._backend.tip_action([OT3Axis.by_mount(mount)], spec.pick_up_distance, spec.speed, "pick_up")
                 # # Move to pick up position
                 # target_up = target_position_from_relative(
                 #     realmount, spec.retract_target, self._current_position
@@ -1357,7 +1357,7 @@ class OT3API(
             )
 
             if move.is_ht_tip_action:
-                await self._backend.tip_action(move.target_position, move.speed, "drop")
+                await self._backend.tip_action([OT3Axis.by_mount(mount)], move.target_position, move.speed, "drop")
             else:
                 target_pos = target_position_from_plunger(
                     realmount, move.target_position, self._current_position)

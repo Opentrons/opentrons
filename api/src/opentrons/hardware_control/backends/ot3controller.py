@@ -334,7 +334,7 @@ class OT3Controller:
         if OT3Axis.G in checked_axes:
             await self.gripper_home_jaw()
         if OT3Axis.Q in checked_axes:
-            await self.tip_action()
+            await self.tip_action([OT3Axis.Q])
         for position in positions:
             for p in position.items():
                 self._position.update({p[0]: p[1][0]})
@@ -367,8 +367,8 @@ class OT3Controller:
         """
         return await self.home(axes)
 
-    async def tip_action(self, distance: float = 33, speed: float = -5.5, tip_action: str="drop") -> None:
-        move_group = create_tip_action_group(distance, speed, tip_action)
+    async def tip_action(self, axes: Sequence[OT3Axis], distance: float = 33, speed: float = -5.5, tip_action: str="drop") -> None:
+        move_group = create_tip_action_group(axes, distance, speed, tip_action)
         runner = MoveGroupRunner(move_groups=[move_group])
         positions = await runner.run(can_messenger=self._messenger)
         for axis, point in positions.items():
