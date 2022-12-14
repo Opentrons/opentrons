@@ -80,7 +80,7 @@ class ForcePickUpTipSpec:
 @dataclass(frozen=True)
 class TipMotorPickUpTipSpec:
     plunger_prep_pos: float
-    currents: Dict[OT3Axis, float]
+    plunger_currents: Dict[OT3Axis, float]
     tiprack_target: top_types.Point
     retract_target: float
     pick_up_distance: float
@@ -622,7 +622,7 @@ class PipetteHandlerProvider:
             return (
                 TipMotorPickUpTipSpec(
                 plunger_prep_pos=instrument.plunger_positions.bottom,
-                currents={
+                plunger_currents={
                     OT3Axis.of_main_tool_actuator(
                         mount
                     ): instrument.plunger_motor_current.run,

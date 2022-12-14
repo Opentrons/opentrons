@@ -1304,7 +1304,7 @@ class OT3API(
         if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
             async with self._backend.restore_current():
                 await self._backend.set_active_current(
-                    {axis: current for axis, current in spec.currents.items()}
+                    {axis: current for axis, current in spec.plunger_currents.items()}
                 )
                 # Move to pick up position
                 target_down = target_position_from_relative(
