@@ -402,7 +402,8 @@ class MoveScheduler:
     def _get_nodes_in_move_group(self, group_id: int) -> List[NodeId]:
         nodes = []
         for (node_id, seq_id) in self._moves[group_id - self._start_at_index]:
-            nodes.append(NodeId(node_id))
+            if node_id not in nodes:
+                nodes.append(NodeId(node_id))
         return nodes
 
     async def run(self, can_messenger: CanMessenger) -> _Completions:
