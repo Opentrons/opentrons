@@ -189,15 +189,23 @@ async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
             [
                 create_home_step(
                     {
+                        target_z: float64(1000),
+                    },
+                    {
+                        target_z: float64(-10),
+                    },
+                )
+            ],
+            [
+                create_home_step(
+                    {
                         NodeId.gantry_x: float64(-1000),
                         NodeId.gantry_y: float64(-1000),
-                        target_z: float64(1000),
                         target_pipette: float64(500),
                     },
                     {
                         NodeId.gantry_x: float64(-40),
                         NodeId.gantry_y: float64(-40),
-                        target_z: float64(-10),
                         target_pipette: float64(-10),
                     },
                 )
@@ -257,6 +265,7 @@ async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
             ),
         ],
     ]
+
     threshold_payload = payloads.SetSensorThresholdRequestPayload(
         sensor=fields.SensorTypeField(SensorType.pressure),
         sensor_id=fields.SensorIdField(0),
@@ -307,7 +316,7 @@ async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
 
     await messenger.send(target_pipette, reset_message)
     if not args.pipette_only:
-        runner = MoveGroupRunner(move_groups=[prep_move_group[0]])
+        runner = MoveGroupRunner(move_groups=[prep_move_group[0], prep_move_group[1]])
         await runner.run(can_messenger=messenger)
     await messenger.send(NodeId.broadcast, message_definitions.DisableMotorRequest())
 
