@@ -262,6 +262,7 @@ jobs:
           AWS_DEFAULT_REGION: us-east-2
         run: |
           mkdir to_upload
+          rm ./opentrons-*/Opentrons-OT3*
           cp ./opentrons-*/* ./to_upload/
           aws s3 sync --acl=public-read to_upload/ s3://${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}/${{ env._APP_DEPLOY_FOLDER_ROBOTSTACK }}
 
@@ -288,7 +289,7 @@ jobs:
       - name: 'deploy builds to s3'
         run: |
           mkdir to_upload
-          cp ./opentrons-* ./to_upload
+          cp ./opentrons-*/Opentrons-OT3* ./to_upload
           aws --profile=deploy s3 sync --acl=public-read to_upload s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env._APP_DEPLOY_FOLDER_OT3 }}
       - name: 'detect build data for notification'
         id: names
