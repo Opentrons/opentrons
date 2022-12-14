@@ -2,11 +2,11 @@ import json
 import pydantic
 import argparse
 import sys
-from opentrons import protocol_engine
+from opentrons.protocol_engine.commands.command_unions import CommandCreate
 
 
 class CreateCommandUnion(pydantic.BaseModel):
-    __root__: protocol_engine.CommandCreate
+    __root__: CommandCreate
 
 
 def generate_command_schema(version: str) -> str:
