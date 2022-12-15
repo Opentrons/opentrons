@@ -309,7 +309,7 @@ jobs:
       - name: 'slack notify for ot3 builds'
         uses: slackapi/slack-github-action@v1.14.0
         with:
-          payload: "{\"branch_or_tag\":\"${{ github.ref_name }}\",\"build_type\":\"${{ steps.names.outputs.TYPE }}\", \"gh_linkback\":\"https://github.com/Opentrons/opentrons/tree/${{ github.ref_name }}\", \"linux_build\":\"${{ env._ACCESS_URL }}/${{steps.names.outputs.WINDOWS}}\", \"mac_build\":\"${{ env._ACCESS_URL }}/${{steps.names.outputs.MAC}}\", \"windows_build\":\"${{ env._ACCESS_URL }}/${{steps.names.outputs.LINUX}}\"}"
+          payload: "{\"branch_or_tag\":\"${{ github.ref_name }}\",\"build_type\":\"${{ steps.names.outputs.TYPE }}\", \"gh_linkback\":\"https://github.com/Opentrons/opentrons/tree/${{ github.ref_name }}\", \"windows_build\":\"${{ env._ACCESS_URL }}/${{steps.names.outputs.WINDOWS}}\", \"mac_build\":\"${{ env._ACCESS_URL }}/${{steps.names.outputs.MAC}}\", \"linux_build\":\"${{ env._ACCESS_URL }}/${{steps.names.outputs.LINUX}}\"}"
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.OT_APP_OT3_SLACK_NOTIFICATION_WEBHOOK_URL }}
           _ACCESS_URL: https://${{env._APP_DEPLOY_BUCKET_OT3}}/${{env._APP_DEPLOY_FOLDER_OT3}}
