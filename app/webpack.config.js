@@ -24,6 +24,8 @@ const PROJECT = process.env.OPENTRONS_PROJECT ?? 'robot-stack'
 const { productName } = require('@opentrons/app-shell/package.json')
 const title = PROJECT === 'robot-stack' ? productName : `${productName} OT-3`
 
+const project = process.env.OPENTRONS_PROJECT ?? 'robot-stack'
+
 module.exports = async () => {
   const version = await versionForProject(PROJECT)
   return webpackMerge(baseConfig, {
@@ -57,7 +59,10 @@ module.exports = async () => {
       }),
 
       new ScriptExtHtmlWebpackPlugin({ defaultAttribute: 'defer' }),
-      new webpack.DefinePlugin({ _PKG_VERSION_: JSON.stringify(version) }),
+      new webpack.DefinePlugin({
+        _PKG_VERSION_: JSON.stringify(version),
+        _OPENTRONS_PROJECT_: JSON.stringify(project),
+      }),
     ],
     node: {
       __filename: true,
