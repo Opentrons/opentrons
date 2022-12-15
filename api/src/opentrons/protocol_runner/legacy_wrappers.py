@@ -64,7 +64,7 @@ class LegacyFileReader:
     """Interface to read Protocol API v2 protocols prior to execution."""
 
     @staticmethod
-    async def read(protocol_source: ProtocolSource) -> LegacyProtocol:
+    def read(protocol_source: ProtocolSource) -> LegacyProtocol:
         """Read a PAPIv2 protocol into a data structure."""
         protocol_file_path = protocol_source.main_file
         protocol_contents = protocol_file_path.read_text(encoding="utf-8")

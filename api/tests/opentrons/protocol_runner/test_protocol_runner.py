@@ -415,7 +415,7 @@ async def test_load_legacy_python(
 
     legacy_context = decoy.mock(cls=LegacyProtocolContext)
 
-    decoy.when(await legacy_file_reader.read(legacy_protocol_source)).then_return(
+    decoy.when(legacy_file_reader.read(legacy_protocol_source)).then_return(
         legacy_protocol
     )
     decoy.when(
@@ -475,7 +475,7 @@ async def test_load_legacy_python_with_pe_papi_core(
 
     decoy.when(feature_flags.enable_protocol_engine_papi_core()).then_return(True)
 
-    decoy.when(await legacy_file_reader.read(legacy_protocol_source)).then_return(
+    decoy.when(legacy_file_reader.read(legacy_protocol_source)).then_return(
         legacy_protocol
     )
     decoy.when(
@@ -521,7 +521,7 @@ async def test_load_legacy_json(
 
     legacy_context = decoy.mock(cls=LegacyProtocolContext)
 
-    decoy.when(await legacy_file_reader.read(legacy_protocol_source)).then_return(
+    decoy.when(legacy_file_reader.read(legacy_protocol_source)).then_return(
         legacy_protocol
     )
     decoy.when(
