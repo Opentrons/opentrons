@@ -126,7 +126,7 @@ class EngineStore:
             raise EngineConflictError("Another run is currently active.")
 
         if protocol is not None:
-            runner.load(protocol.source)
+            await runner.load(protocol.source)
 
         for offset in labware_offsets:
             engine.add_labware_offset(offset)

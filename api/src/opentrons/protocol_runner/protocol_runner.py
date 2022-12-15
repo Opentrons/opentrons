@@ -89,7 +89,7 @@ class ProtocolRunner:
         """
         return self._protocol_engine.state_view.commands.has_been_played()
 
-    def load(self, protocol_source: ProtocolSource) -> None:
+    async def load(self, protocol_source: ProtocolSource) -> None:
         """Load a ProtocolSource into managed ProtocolEngine.
 
         Calling this method is only necessary if the runner will be used
@@ -142,7 +142,7 @@ class ProtocolRunner:
         # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`
         # currently `protocol_source` arg is only used by tests
         if protocol_source:
-            self.load(protocol_source)
+            await self.load(protocol_source)
 
         await self._hardware_api.home()
         self.play()
