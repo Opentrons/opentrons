@@ -16,7 +16,7 @@ describe('GenericWizardTile', () => {
   beforeEach(() => {
     props = {
       rightHandBody: <div>right hand body</div>,
-      bodyText: 'body',
+      bodyText: <div>body</div>,
       proceed: jest.fn(),
       proceedButtonText: <div>Continue</div>,
       header: 'header',
@@ -50,8 +50,9 @@ describe('GenericWizardTile', () => {
       back: jest.fn(),
       backIsDisabled: true,
     }
-    const { getByText } = render(props)
-    const btn = getByText('Go back')
+    const { getByLabelText } = render(props)
+    const btn = getByLabelText('back')
+    fireEvent.click(btn)
     expect(btn).toBeDisabled()
   })
 })

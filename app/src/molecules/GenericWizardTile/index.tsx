@@ -104,7 +104,7 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
       </Flex>
       <Flex justifyContent={buttonPositioning} alignItems={ALIGN_FLEX_END}>
         {back != null ? (
-          <Btn onClick={back} disabled={backIsDisabled}>
+          <Btn onClick={back} disabled={backIsDisabled} aria-label="back">
             <StyledText
               css={
                 backIsDisabled
