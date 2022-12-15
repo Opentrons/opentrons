@@ -22,7 +22,10 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
     ExecuteMoveGroupRequestPayload,
     HomeRequestPayload,
 )
-from opentrons_hardware.firmware_bindings.messages.fields import MotorPositionFlagsField
+from opentrons_hardware.firmware_bindings.messages.fields import (
+    MotorPositionFlagsField,
+    MoveStopConditionField,
+)
 from opentrons_hardware.hardware_control.constants import (
     interrupts_per_sec,
 )
@@ -274,7 +277,7 @@ async def test_single_send_setup_commands(
             payload=AddLinearMoveRequestPayload(
                 group_id=UInt8Field(0),
                 seq_id=UInt8Field(0),
-                request_stop_condition=UInt8Field(0),
+                request_stop_condition=MoveStopConditionField(0),
                 velocity=Int32Field(calc_velocity(step)),
                 acceleration=Int32Field(calc_acceleration(step)),
                 duration=UInt32Field(calc_duration(step)),
@@ -299,7 +302,7 @@ async def test_multi_send_setup_commands(
             payload=AddLinearMoveRequestPayload(
                 group_id=UInt8Field(0),
                 seq_id=UInt8Field(0),
-                request_stop_condition=UInt8Field(0),
+                request_stop_condition=MoveStopConditionField(0),
                 velocity=Int32Field(calc_velocity(step)),
                 acceleration=Int32Field(calc_acceleration(step)),
                 duration=UInt32Field(calc_duration(step)),
@@ -316,7 +319,7 @@ async def test_multi_send_setup_commands(
             payload=AddLinearMoveRequestPayload(
                 group_id=UInt8Field(1),
                 seq_id=UInt8Field(0),
-                request_stop_condition=UInt8Field(0),
+                request_stop_condition=MoveStopConditionField(0),
                 velocity=Int32Field(calc_velocity(step)),
                 acceleration=Int32Field(calc_acceleration(step)),
                 duration=UInt32Field(calc_duration(step)),
@@ -332,7 +335,7 @@ async def test_multi_send_setup_commands(
             payload=AddLinearMoveRequestPayload(
                 group_id=UInt8Field(1),
                 seq_id=UInt8Field(0),
-                request_stop_condition=UInt8Field(0),
+                request_stop_condition=MoveStopConditionField(0),
                 velocity=Int32Field(calc_velocity(step)),
                 acceleration=Int32Field(calc_acceleration(step)),
                 duration=UInt32Field(calc_duration(step)),
@@ -349,7 +352,7 @@ async def test_multi_send_setup_commands(
             payload=AddLinearMoveRequestPayload(
                 group_id=UInt8Field(2),
                 seq_id=UInt8Field(0),
-                request_stop_condition=UInt8Field(0),
+                request_stop_condition=MoveStopConditionField(0),
                 velocity=Int32Field(calc_velocity(step)),
                 acceleration=Int32Field(calc_acceleration(step)),
                 duration=UInt32Field(calc_duration(step)),
@@ -365,7 +368,7 @@ async def test_multi_send_setup_commands(
             payload=AddLinearMoveRequestPayload(
                 group_id=UInt8Field(2),
                 seq_id=UInt8Field(1),
-                request_stop_condition=UInt8Field(0),
+                request_stop_condition=MoveStopConditionField(0),
                 velocity=Int32Field(calc_velocity(step)),
                 acceleration=Int32Field(calc_acceleration(step)),
                 duration=UInt32Field(calc_duration(step)),
