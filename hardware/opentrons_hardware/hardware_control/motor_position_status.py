@@ -58,6 +58,8 @@ async def _parser_motor_position_response(
 async def get_motor_position(
     can_messenger: CanMessenger, nodes: Set[NodeId], timeout: float = 1.0
 ) -> MotorPositionStatus:
+    """Request node to respond with motor and encoder status."""
+
     def _listener_filter(arbitration_id: ArbitrationId) -> bool:
         return (NodeId(arbitration_id.parts.originating_node_id) in nodes) and (
             MessageId(arbitration_id.parts.message_id)

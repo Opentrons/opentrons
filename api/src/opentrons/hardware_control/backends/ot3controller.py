@@ -208,7 +208,7 @@ class OT3Controller:
 
     def check_ready_for_movement(self, axes: Sequence[OT3Axis]) -> bool:
         return all(
-            self._motor_status.get(axis_to_node(a)) is not None
+            isinstance(self._motor_status.get(axis_to_node(a)), MotorStatus)
             and self._motor_status.get(axis_to_node(a)).motor_ok
             for a in axes
         )

@@ -162,11 +162,11 @@ class MoveGroupRunner:
                     float(completion.payload.encoder_position_um.value) / 1000.0,
                     bool(
                         completion.payload.position_flags.value
-                        & MotorPositionFlags.stepper_position_ok
+                        & MotorPositionFlags.stepper_position_ok.value
                     ),
                     bool(
                         completion.payload.position_flags.value
-                        & MotorPositionFlags.encoder_position_ok
+                        & MotorPositionFlags.encoder_position_ok.value
                     ),
                 )
             )
@@ -177,7 +177,7 @@ class MoveGroupRunner:
                 reversed(
                     sorted(poslist, key=lambda position_element: position_element[0])
                 )
-            )[1:3]
+            )[1:]
             for node, poslist in position.items()
         }
 

@@ -190,10 +190,10 @@ class OT3Simulator:
         )
 
     def check_ready_for_movement(self, axes: Sequence[OT3Axis]) -> bool:
+        get_stat = lambda ax: [self._motor_status.get(axis_to_node(a)) for a in ax]
         return all(
-            self._motor_status.get(axis_to_node(a)) is not None
-            and self._motor_status.get(axis_to_node(a)).motor_ok
-            for a in axes
+            isinstance(status, MotorStatus) and status.motor_ok
+            for status in get_stat(axes)
         )
 
     async def update_position(self) -> OT3AxisMap[float]:
