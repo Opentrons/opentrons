@@ -16,6 +16,7 @@ from opentrons_shared_data.pipette.pipette_definition import (
     SupportedTipsDefinition,
     TipHandlingConfigurations,
     PipetteModelType,
+    PipetteChannelType,
 )
 from ..instrument_abc import AbstractInstrument
 from .instrument_calibration import (
@@ -139,6 +140,10 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         return self._config
 
     @property
+    def channels(self) -> PipetteChannelType:
+        return self._max_channels
+
+    @property
     def tip_overlap(self) -> Dict[str, float]:
         return self._tip_overlap
 
@@ -253,6 +258,21 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         """
         instr = Point(*self._pipette_offset.offset)
         offsets = self.nozzle_offset
+        # Temporary solution for the 96 channel critical point locations.
+        # We should instead record every channel "critical point" in
+        # the pipette configurations.
+        if self.channels.value == 96:
+            NUM_ROWS = 12
+            NUM_COLS = 8
+        elif self.channels.value == 8:
+            NUM_ROWS = 1
+            NUM_COLS = 8
+        else:
+            NUM_ROWS = 1
+            NUM_COLS = 1
+
+        x_offset_to_right_nozzle = INTERNOZZLE_SPACING_MM * (NUM_ROWS - 1)
+        y_offset_to_front_nozzle = INTERNOZZLE_SPACING_MM * (NUM_COLS - 1)
 
         if cp_override in [
             CriticalPoint.GRIPPER_JAW_CENTER,
@@ -271,19 +291,17 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             tip_length = self.current_tip_length
         if cp_override == CriticalPoint.XY_CENTER:
             mod_offset_xy = [
-                offsets[0],
-                offsets[1]
-                - (INTERNOZZLE_SPACING_MM * (self._config.channels.as_int - 1) / 2),
+                offsets[0] - x_offset_to_right_nozzle / 2,
+                offsets[1] - y_offset_to_front_nozzle / 2,
                 offsets[2],
             ]
             cp_type = CriticalPoint.XY_CENTER
         elif cp_override == CriticalPoint.FRONT_NOZZLE:
+            # front left nozzle of the 96 channel and
+            # front nozzle of the 8 channel
             mod_offset_xy = [
-                0,
-                (
-                    offsets[1]
-                    - INTERNOZZLE_SPACING_MM * (self._config.channels.as_int - 1)
-                ),
+                offsets[0],
+                offsets[1] - y_offset_to_front_nozzle,
                 offsets[2],
             ]
             cp_type = CriticalPoint.FRONT_NOZZLE
