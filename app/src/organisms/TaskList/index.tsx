@@ -19,7 +19,7 @@ import {
 import { TertiaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 
-import type { SubTaskProps, TaskProps } from './types'
+import type { SubTaskProps, TaskListProps, TaskProps } from './types'
 
 interface ProgressTrackerItemProps {
   activeIndex: [number, number] | null
@@ -348,13 +348,6 @@ function Task({
       </Flex>
     </Flex>
   )
-}
-
-interface TaskListProps {
-  // activeIndex: a tuple [i, j] indicating activeTaskIndex i and activeSubtaskIndex j
-  // null activeIndex: all tasks complete
-  activeIndex: [number, number] | null
-  taskList: TaskProps[]
 }
 
 export function TaskList({
