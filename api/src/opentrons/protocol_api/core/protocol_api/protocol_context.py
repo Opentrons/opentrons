@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, List, Optional, Set, Union, cast
+from typing import Dict, List, Optional, Set, Union, cast, Tuple
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
@@ -208,11 +208,16 @@ class ProtocolContextImplementation(
 
         return labware_core
 
+    # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     def move_labware(
         self,
         labware_core: LabwareImplementation,
         new_location: Union[DeckSlotName, legacy_module_core.LegacyModuleCore],
         use_gripper: bool,
+        use_pick_up_location_lpc_offset: bool,
+        use_drop_location_lpc_offset: bool,
+        pick_up_offset: Optional[Tuple[float, float, float]],
+        drop_offset: Optional[Tuple[float, float, float]],
     ) -> None:
         """Move labware to new location."""
         raise UnsupportedAPIError(
