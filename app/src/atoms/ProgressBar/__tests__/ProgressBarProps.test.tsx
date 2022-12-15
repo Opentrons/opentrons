@@ -12,7 +12,7 @@ describe('ProgressBar', () => {
 
   beforeEach(() => {
     props = {
-      completed: 0,
+      percentComplete: 0,
     }
   })
 
@@ -29,7 +29,7 @@ describe('ProgressBar', () => {
   })
 
   it('renders LinerProgress Bar at 50% width', () => {
-    props.completed = 50
+    props.percentComplete = 50
     const [{ getByTestId }] = render(props)
     const bar = getByTestId('ProgressBar_Bar')
     expect(bar).toHaveStyle(`background: ${COLORS.blueEnabled}`)
@@ -37,7 +37,7 @@ describe('ProgressBar', () => {
   })
 
   it('renders LinerProgress Bar at 100% width', () => {
-    props.completed = 100
+    props.percentComplete = 100
     const [{ getByTestId }] = render(props)
     const bar = getByTestId('ProgressBar_Bar')
     expect(bar).toHaveStyle(`background: ${COLORS.blueEnabled}`)
@@ -45,7 +45,7 @@ describe('ProgressBar', () => {
   })
 
   it('renders LinerProgress Bar at 50% + red width', () => {
-    props.completed = 50
+    props.percentComplete = 50
     props.color = COLORS.errorEnabled
     const [{ getByTestId }] = render(props)
     const bar = getByTestId('ProgressBar_Bar')

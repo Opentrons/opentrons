@@ -4,7 +4,8 @@ import { css } from 'styled-components'
 import { COLORS, Box } from '@opentrons/components'
 
 interface ProgressBarProps {
-  completed: number
+  /** the completed progress the range 0-100  */
+  percentComplete: number
   /** optional liner progress's background the color default color is white */
   bgColor?: string
   /** optional liner progress's height the default height is 0.5rem(8px) */
@@ -18,14 +19,15 @@ interface ProgressBarProps {
 }
 
 export function ProgressBar({
-  completed,
+  percentComplete,
   bgColor = COLORS.white,
   height = '0.5rem',
   color = COLORS.blueEnabled,
   borderRadius = '0',
   animationStyle = 'ease-in-out',
 }: ProgressBarProps): JSX.Element {
-  const [progress, setProgress] = React.useState<string>(`${completed}%`)
+  const ratio = percentComplete / 100
+  const progress = ratio > 1 ? '100%' : `${String(ratio * 100)}%`
 
   const LINER_PROGRESS_CONTAINER_STYLE = css`
     height: ${height};
@@ -47,17 +49,6 @@ export function ProgressBar({
     justify-content: right;
     border-radius: inherit;
   `
-
-  const getCurrentProgress = (): string => {
-    const ratio = completed / 100
-    return ratio > 1 ? '100%' : `${String(ratio * 100)}%`
-  }
-
-  const currentProgress = getCurrentProgress()
-
-  React.useEffect(() => {
-    requestAnimationFrame(() => setProgress(currentProgress))
-  }, [currentProgress])
 
   return (
     <Box
