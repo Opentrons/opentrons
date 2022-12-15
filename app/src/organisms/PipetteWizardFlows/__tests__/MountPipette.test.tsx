@@ -47,6 +47,8 @@ describe('MountPipette', () => {
       errorMessage: null,
       setShowErrorMessage: jest.fn(),
       isRobotMoving: false,
+      isPending: false,
+      setPending: jest.fn(),
     }
     mockCheckPipetteButton.mockReturnValue(<div>mock check pipette button</div>)
   })
@@ -82,5 +84,15 @@ describe('MountPipette', () => {
     fireEvent.click(goBack)
     expect(props.goBack).toHaveBeenCalled()
     getByText('mock check pipette button')
+  })
+  it('returns skeletons and disabled buttons when isPending is true', () => {
+    props = {
+      ...props,
+      isPending: true,
+    }
+    const { getAllByTestId, getByRole } = render(props)
+    getAllByTestId('Skeleton')
+    const backBtn = getByRole('button', { name: 'Go back' })
+    expect(backBtn).toBeDisabled()
   })
 })

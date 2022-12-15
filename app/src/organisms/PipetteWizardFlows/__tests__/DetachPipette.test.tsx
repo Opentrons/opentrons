@@ -52,6 +52,8 @@ describe('DetachPipette', () => {
       errorMessage: null,
       setShowErrorMessage: jest.fn(),
       isRobotMoving: false,
+      isPending: false,
+      setPending: jest.fn(),
     }
     mockInProgressModal.mockReturnValue(<div>mock in progress</div>)
     mockCheckPipetteButton.mockReturnValue(<div>mock check pipette button</div>)
@@ -94,5 +96,16 @@ describe('DetachPipette', () => {
     const backBtn = getByRole('button', { name: 'Go back' })
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()
+  })
+  it('returns skeletons and disabled buttons when isPending is true', () => {
+    props = {
+      ...props,
+      selectedPipette: NINETY_SIX_CHANNEL,
+      isPending: true,
+    }
+    const { getAllByTestId, getByRole } = render(props)
+    getAllByTestId('Skeleton')
+    const backBtn = getByRole('button', { name: 'Go back' })
+    expect(backBtn).toBeDisabled()
   })
 })

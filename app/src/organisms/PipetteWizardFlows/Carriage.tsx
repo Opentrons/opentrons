@@ -20,9 +20,13 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
 
   return (
     <GenericWizardTile
-      header={t(
-        flowType === FLOWS.ATTACH ? 'unscrew_carriage' : 'reattach_carriage'
-      )}
+      header={
+        <StyledText as="h1">
+          {t(
+            flowType === FLOWS.ATTACH ? 'unscrew_carriage' : 'reattach_carriage'
+          )}
+        </StyledText>
+      }
       rightHandBody={
         <img
           //  TODO(jr 12/2/22): update images

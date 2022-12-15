@@ -10,13 +10,23 @@ import { Skeleton } from '../../atoms/Skeleton'
 import { CheckPipetteButton } from './CheckPipetteButton'
 import type { PipetteWizardStepProps } from './types'
 
+interface MountPipetteProps extends PipetteWizardStepProps {
+  isPending: boolean
+  setPending: React.Dispatch<React.SetStateAction<boolean>>
+}
 const BACKGROUND_SIZE = '47rem'
 
-export const MountPipette = (props: PipetteWizardStepProps): JSX.Element => {
-  const { proceed, goBack, robotName, selectedPipette } = props
+export const MountPipette = (props: MountPipetteProps): JSX.Element => {
+  const {
+    proceed,
+    goBack,
+    robotName,
+    selectedPipette,
+    isPending,
+    setPending,
+  } = props
   const { t } = useTranslation('pipette_wizard_flows')
   const isSingleMountPipette = selectedPipette === SINGLE_MOUNT_PIPETTES
-  const [isPending, setPending] = React.useState<boolean>(false)
   const bodyTextSkeleton = (
     <Skeleton
       width="18rem"
@@ -34,7 +44,7 @@ export const MountPipette = (props: PipetteWizardStepProps): JSX.Element => {
         {bodyTextSkeleton}
       </>
     )
-  } else if (isSingleMountPipette && !isPending) {
+  } else if (isSingleMountPipette) {
     bodyText = (
       <Trans
         t={t}
@@ -44,22 +54,34 @@ export const MountPipette = (props: PipetteWizardStepProps): JSX.Element => {
         }}
       />
     )
-  } else if (!isSingleMountPipette && !isPending) {
+  } else {
     bodyText = <StyledText as="p"> {t('hold_pipette_carefully')}</StyledText>
   }
 
   return (
     <GenericWizardTile
-      header={t(
-        isSingleMountPipette
-          ? 'connect_and_screw_in_pipette'
-          : 'connect_96_channel'
-      )}
+      header={
+        isPending ? (
+          <Skeleton
+            width="17rem"
+            height="1.75rem"
+            backgroundSize={BACKGROUND_SIZE}
+          />
+        ) : (
+          <StyledText as="h1">
+            {t(
+              isSingleMountPipette
+                ? 'connect_and_screw_in_pipette'
+                : 'connect_96_channel'
+            )}
+          </StyledText>
+        )
+      }
       rightHandBody={
         isPending ? (
           <Skeleton
-            width="171px"
-            height="248px"
+            width="10.6875rem"
+            height="15.5rem"
             backgroundSize={BACKGROUND_SIZE}
           />
         ) : (
@@ -79,22 +101,16 @@ export const MountPipette = (props: PipetteWizardStepProps): JSX.Element => {
         )
       }
       bodyText={bodyText}
+      backIsDisabled={isPending}
       back={goBack}
       proceedButton={
-        isPending ? (
-          <Skeleton
-            width="5.6rem"
-            height="2.375rem"
-            backgroundSize={BACKGROUND_SIZE}
-          />
-        ) : (
-          <CheckPipetteButton
-            proceed={proceed}
-            robotName={robotName}
-            proceedButtonText={t('continue')}
-            setPending={setPending}
-          />
-        )
+        <CheckPipetteButton
+          isDisabled={isPending}
+          proceed={proceed}
+          robotName={robotName}
+          proceedButtonText={t('continue')}
+          setPending={setPending}
+        />
       }
     />
   )

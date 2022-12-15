@@ -44,4 +44,14 @@ describe('GenericWizardTile', () => {
     fireEvent.click(btn)
     expect(props.back).toHaveBeenCalled()
   })
+  it('renders correct generic tile information with back button disabled', () => {
+    props = {
+      ...props,
+      back: jest.fn(),
+      backIsDisabled: true,
+    }
+    const { getByText } = render(props)
+    const btn = getByText('Go back')
+    expect(btn).toBeDisabled()
+  })
 })

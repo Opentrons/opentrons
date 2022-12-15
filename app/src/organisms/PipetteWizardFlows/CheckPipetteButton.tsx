@@ -18,11 +18,18 @@ interface CheckPipetteButtonProps {
   proceedButtonText: string
   setPending: React.Dispatch<React.SetStateAction<boolean>>
   proceed: () => void
+  isDisabled: boolean
 }
 export const CheckPipetteButton = (
   props: CheckPipetteButtonProps
 ): JSX.Element => {
-  const { robotName, proceedButtonText, setPending, proceed } = props
+  const {
+    robotName,
+    proceedButtonText,
+    setPending,
+    proceed,
+    isDisabled,
+  } = props
   const fetchPipettesRequestId = React.useRef<string | null>(null)
   const [dispatch] = useDispatchApiRequests(dispatchedAction => {
     if (
@@ -55,7 +62,7 @@ export const CheckPipetteButton = (
   }, [proceed, requestStatus])
 
   return (
-    <PrimaryButton disabled={isPending} onClick={handleCheckPipette}>
+    <PrimaryButton disabled={isDisabled} onClick={handleCheckPipette}>
       {proceedButtonText}
     </PrimaryButton>
   )

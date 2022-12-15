@@ -158,7 +158,7 @@ export const BeforeBeginning = (
     />
   ) : (
     <GenericWizardTile
-      header={t('before_you_begin')}
+      header={<StyledText as="h1">{t('before_you_begin')}</StyledText>}
       //  TODO(jr, 11/3/22): wire up this URL and unhide the link!
       // getHelp={BEFORE_YOU_BEGIN_URL}
       rightHandBody={rightHandBody}

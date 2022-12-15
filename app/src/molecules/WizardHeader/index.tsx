@@ -19,6 +19,7 @@ interface WizardHeaderProps {
   onExit?: (() => void) | null
   totalSteps?: number
   currentStep?: number | null
+  isDisabled?: boolean
 }
 
 const EXIT_BUTTON_STYLE = css`
@@ -31,7 +32,7 @@ const EXIT_BUTTON_STYLE = css`
   }
 `
 export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
-  const { totalSteps, currentStep, title, onExit } = props
+  const { totalSteps, currentStep, title, onExit, isDisabled } = props
   const { t } = useTranslation('shared')
 
   return (
@@ -55,7 +56,7 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
           ) : null}
         </Flex>
         {onExit != null ? (
-          <Btn onClick={onExit} aria-label="Exit">
+          <Btn onClick={onExit} aria-label="Exit" disabled={isDisabled}>
             <StyledText css={EXIT_BUTTON_STYLE}>{t('exit')}</StyledText>
           </Btn>
         ) : null}

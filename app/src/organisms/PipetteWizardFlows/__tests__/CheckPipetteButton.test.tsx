@@ -32,6 +32,7 @@ describe('CheckPipetteButton', () => {
       proceed: jest.fn(),
       proceedButtonText: 'continue',
       setPending: jest.fn(),
+      isDisabled: false,
     }
     dispatchApiRequest = jest.fn()
     mockGetRequestById.mockReturnValue(null)
@@ -42,5 +43,14 @@ describe('CheckPipetteButton', () => {
     const proceedBtn = getByRole('button', { name: 'continue' })
     fireEvent.click(proceedBtn)
     expect(dispatchApiRequest).toBeCalledWith(mockFetchPipettes('otie'))
+  })
+  it('renders button disbaled when isDisabled is true', () => {
+    props = {
+      ...props,
+      isDisabled: true,
+    }
+    const { getByRole } = render(props)
+    const proceedBtn = getByRole('button', { name: 'continue' })
+    expect(proceedBtn).toBeDisabled()
   })
 })

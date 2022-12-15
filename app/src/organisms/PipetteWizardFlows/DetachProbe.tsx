@@ -17,7 +17,7 @@ export const DetachProbe = (props: DetachProbeProps): JSX.Element => {
   if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
   return (
     <GenericWizardTile
-      header={t('remove_cal_probe')}
+      header={<StyledText as="h1">{t('remove_cal_probe')}</StyledText>}
       //  TODO(Jr, 10/26/22): replace image with correct one!
       rightHandBody={<img src={removeProbe} width="100%" alt="Remove probe" />}
       bodyText={<StyledText as="p">{t('remove_probe')}</StyledText>}

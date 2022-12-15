@@ -89,7 +89,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     />
   ) : (
     <GenericWizardTile
-      header={t('attach_probe')}
+      header={<StyledText as="h1">{t('attach_probe')}</StyledText>}
       //  TODO(Jr, 10/26/22): replace image with correct one!
       rightHandBody={<img src={attachProbe} width="100%" alt="Attach probe" />}
       bodyText={<StyledText as="p">{t('install_probe')}</StyledText>}

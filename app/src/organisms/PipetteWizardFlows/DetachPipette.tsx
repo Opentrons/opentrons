@@ -11,14 +11,24 @@ import detach96Pipette from '../../assets/images/change-pip/detach-96-pipette.pn
 import { CheckPipetteButton } from './CheckPipetteButton'
 import type { PipetteWizardStepProps } from './types'
 
+interface DetachPipetteProps extends PipetteWizardStepProps {
+  isPending: boolean
+  setPending: React.Dispatch<React.SetStateAction<boolean>>
+}
 const BACKGROUND_SIZE = '47rem'
 
-export const DetachPipette = (props: PipetteWizardStepProps): JSX.Element => {
-  const { isRobotMoving, goBack, proceed, robotName, selectedPipette } = props
+export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
+  const {
+    isRobotMoving,
+    goBack,
+    proceed,
+    robotName,
+    selectedPipette,
+    isPending,
+    setPending,
+  } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
   const isSingleMountPipette = selectedPipette === SINGLE_MOUNT_PIPETTES
-  const [isPending, setPending] = React.useState<boolean>(false)
-
   let bodyText: React.ReactNode = <div></div>
   if (isPending) {
     bodyText = (
@@ -35,9 +45,9 @@ export const DetachPipette = (props: PipetteWizardStepProps): JSX.Element => {
         />
       </>
     )
-  } else if (isSingleMountPipette && !isPending) {
+  } else if (isSingleMountPipette) {
     bodyText = <StyledText as="p">{t('hold_and_loosen')}</StyledText>
-  } else if (!isSingleMountPipette && !isPending) {
+  } else {
     bodyText = (
       <Trans
         t={t}
@@ -52,9 +62,23 @@ export const DetachPipette = (props: PipetteWizardStepProps): JSX.Element => {
   if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
   return (
     <GenericWizardTile
-      header={t(
-        isSingleMountPipette ? 'loose_detach' : 'unscrew_remove_96_channel'
-      )}
+      header={
+        isPending ? (
+          <Skeleton
+            width="17rem"
+            height="1.75rem"
+            backgroundSize={BACKGROUND_SIZE}
+          />
+        ) : (
+          <StyledText as="p">
+            {t(
+              isSingleMountPipette
+                ? 'loose_detach'
+                : 'unscrew_remove_96_channel'
+            )}
+          </StyledText>
+        )
+      }
       //  TODO(Jr, 11/8/22): replace image with correct one!
       rightHandBody={
         isPending ? (
@@ -76,22 +100,16 @@ export const DetachPipette = (props: PipetteWizardStepProps): JSX.Element => {
         )
       }
       bodyText={bodyText}
+      backIsDisabled={isPending}
       back={goBack}
       proceedButton={
-        isPending ? (
-          <Skeleton
-            width="5.6rem"
-            height="2.375rem"
-            backgroundSize={BACKGROUND_SIZE}
-          />
-        ) : (
-          <CheckPipetteButton
-            robotName={robotName}
-            proceedButtonText={capitalize(t('shared:continue'))}
-            proceed={proceed}
-            setPending={setPending}
-          />
-        )
+        <CheckPipetteButton
+          isDisabled={isPending}
+          robotName={robotName}
+          proceedButtonText={capitalize(t('shared:continue'))}
+          proceed={proceed}
+          setPending={setPending}
+        />
       }
     />
   )
