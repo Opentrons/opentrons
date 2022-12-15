@@ -246,7 +246,7 @@ async def find_slot_center_binary(
 
     Returns the XY-center of the slot.
     """
-    real_pos = nominal_center._replace(z=deck_height)
+    real_pos = nominal_center._replace(y=nominal_center.y - 1, z=deck_height)
     # Find X left/right edges
     plus_x_edge = await find_edge(hcapi, mount, real_pos + EDGES["right"], OT3Axis.X, 1)
     LOG.info(f"Found +x edge at {plus_x_edge}mm")
@@ -255,8 +255,10 @@ async def find_slot_center_binary(
         hcapi, mount, real_pos + EDGES["left"], OT3Axis.X, -1
     )
     LOG.info(f"Found -x edge at {minus_x_edge}mm")
-    real_pos = real_pos._replace(x=(plus_x_edge + minus_x_edge) / 2)
-    print(f"Real Position: {real_pos}")
+    x_center = (plus_x_edge + minus_x_edge) / 2
+    x_center_off = x_center - 2
+    real_pos = real_pos._replace(x=x_center_off)
+    await hcapi.move_to(mount, real_pos, speed=20)
     # Find Y bottom/top edges
     plus_y_edge = await find_edge(hcapi, mount, real_pos + EDGES["top"], OT3Axis.Y, 1)
     LOG.info(f"Found +y edge at {plus_y_edge}mm")
@@ -265,8 +267,9 @@ async def find_slot_center_binary(
         hcapi, mount, real_pos + EDGES["bottom"], OT3Axis.Y, -1
     )
     LOG.info(f"Found -y edge at {minus_y_edge}mm")
-    real_pos = real_pos._replace(y=(plus_y_edge + minus_y_edge) / 2)
-    print(f"Real Position: {real_pos}")
+    y_center = (plus_y_edge + minus_y_edge) / 2
+    real_pos = real_pos._replace(y=y_center)
+    real_pos = real_pos._replace(x=x_center)
 
     return real_pos.x, real_pos.y
 
@@ -492,7 +495,7 @@ async def _calibrate_mount(
         LOG.info(
             f"Found calibration value {center} for mount {mount.name} (offset={offset})"
         )
-        return offset
+        return offset, center
 
     except (InaccurateNonContactSweepError, EarlyCapacitiveSenseTrigger):
         LOG.info(
