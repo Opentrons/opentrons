@@ -28,6 +28,7 @@ from opentrons.protocol_engine import (
     LoadedModule,
 )
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
+from opentrons.protocol_engine.types import Liquid
 
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
@@ -381,3 +382,9 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
     def get_module_cores(self) -> List[ModuleCore]:
         """Get all loaded module cores."""
         return list(self._module_cores_by_id.values())
+
+    def create_liquid(
+        self, display_name: str, description: str, display_color: str
+    ) -> Liquid:
+        """create a liquid to load into a labware."""
+        pass

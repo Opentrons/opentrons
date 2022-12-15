@@ -15,6 +15,8 @@ from opentrons.protocols.api_support.util import AxisMaxSpeeds, UnsupportedAPIEr
 from opentrons.protocols.geometry import module_geometry
 from opentrons.protocols import labware as labware_definition
 
+from opentrons.protocol_engine.types import Liquid
+
 from ...labware import Labware
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
@@ -418,3 +420,9 @@ class ProtocolContextImplementation(
     def get_highest_z(self) -> float:
         """Get the highest Z point of all deck items."""
         raise NotImplementedError("LegacyProtocolCore.get_highest_z not implemented")
+
+    def create_liquid(
+        self, display_name: str, description: str, display_color: str
+    ) -> Liquid:
+        """Create a liquid to load on a labware."""
+        raise UnsupportedAPIError("Creating a liquid is not supported in this API version.")
