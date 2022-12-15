@@ -78,14 +78,12 @@ def _latest_tag_for_prefix(prefix):
             + '- build before release or no tags. Using 0.0.0-dev\n')
         tags_result = prefix.encode() + b'0.0.0-dev'
     tags_matching = tags_result.strip().split(b'\n')
-
-
     return tags_matching[-1].decode()
 
 def _latest_version_for_project(project):
     prefix = project_entries[project].tag_prefix
     tag = _latest_tag_for_prefix(prefix)
-    return tag.split(prefix)[1]
+    return prefix.join(tag.split(prefix)[1:])
 
 def _ref_from_sha(sha):
     # codebuild leaves us in detached HEAD, so we need to pull some
