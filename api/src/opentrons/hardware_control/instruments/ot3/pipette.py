@@ -271,8 +271,8 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             NUM_ROWS = 1
             NUM_COLS = 1
 
-        x_offset_by_spacing = INTERNOZZLE_SPACING_MM * (NUM_ROWS - 1) / 2
-        y_offset_by_spacing = INTERNOZZLE_SPACING_MM * (NUM_COLS - 1) / 2
+        x_offset_to_right_nozzle = INTERNOZZLE_SPACING_MM * (NUM_ROWS - 1)
+        y_offset_to_front_nozzle = INTERNOZZLE_SPACING_MM * (NUM_COLS - 1)
 
         if cp_override in [
             CriticalPoint.GRIPPER_JAW_CENTER,
@@ -291,15 +291,17 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             tip_length = self.current_tip_length
         if cp_override == CriticalPoint.XY_CENTER:
             mod_offset_xy = [
-                offsets[0] - x_offset_by_spacing,
-                offsets[1] - y_offset_by_spacing,
+                offsets[0] - x_offset_to_right_nozzle / 2,
+                offsets[1] - y_offset_to_front_nozzle / 2,
                 offsets[2],
             ]
             cp_type = CriticalPoint.XY_CENTER
         elif cp_override == CriticalPoint.FRONT_NOZZLE:
+            # front left nozzle of the 96 channel and
+            # front nozzle of the 8 channel
             mod_offset_xy = [
-                0,
-                offsets[1] - y_offset_by_spacing,
+                offsets[0],
+                offsets[1] - y_offset_to_front_nozzle,
                 offsets[2],
             ]
             cp_type = CriticalPoint.FRONT_NOZZLE

@@ -256,40 +256,59 @@ def test_flow_rate_setting(
 
 
 @pytest.mark.parametrize(
-    argnames=["pipette_builder", "model", "expected_critical_point"],
+    argnames=[
+        "pipette_builder",
+        "model",
+        "expected_xy_critical_point",
+        "expected_front_critical_point",
+    ],
     argvalues=[
-        [lazy_fixture("hardware_pipette_ot2"), "p10_single_v1", Point(0, 0, 12.0)],
+        [
+            lazy_fixture("hardware_pipette_ot2"),
+            "p10_single_v1",
+            Point(0, 0, 12.0),
+            Point(0, 0, 12.0),
+        ],
         [
             lazy_fixture("hardware_pipette_ot2"),
             "p300_multi_v2.0",
             Point(0.0, 0.0, 35.52),
+            Point(0.0, -31.5, 35.52),
         ],
         [
             lazy_fixture("hardware_pipette_ot3"),
             ot3_pipette_config.convert_pipette_model("p1000_single_v1.0"),
+            Point(-8.0, -22.0, -259.15),
             Point(-8.0, -22.0, -259.15),
         ],
         [
             lazy_fixture("hardware_pipette_ot3"),
             ot3_pipette_config.convert_pipette_model("p1000_multi_v1.0"),
             Point(-8.0, -47.5, -259.15),
+            Point(-8.0, -79.0, -259.15),
         ],
         [
             lazy_fixture("hardware_pipette_ot3"),
             ot3_pipette_config.convert_pipette_model("p1000_96", "1.0"),
             Point(-85.5, -57.0, -259.15),
+            Point(-36.0, -88.5, -259.15),
         ],
     ],
 )
-def test_xy_center(
+def test_alternative_critical_points(
     pipette_builder: Callable,
     model: Union[str, ot3_pipette_config.PipetteModelVersionType],
-    expected_critical_point: Point,
+    expected_xy_critical_point: Point,
+    expected_front_critical_point: Point,
 ) -> None:
     hw_pipette = pipette_builder(model)
     assert (
         hw_pipette.critical_point(types.CriticalPoint.XY_CENTER)
-        == expected_critical_point
+        == expected_xy_critical_point
+    )
+    assert (
+        hw_pipette.critical_point(types.CriticalPoint.FRONT_NOZZLE)
+        == expected_front_critical_point
     )
 
 
