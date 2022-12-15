@@ -46,14 +46,14 @@ describe('UnmountGripper', () => {
   })
 
   it('clicking go back calls back', () => {
-    const { getByRole } = render()[0]
-    getByRole('button', { name: 'Go back' }).click()
+    const { getByLabelText } = render()[0]
+    getByLabelText('back').click()
     expect(mockGoBack).toHaveBeenCalled()
   })
 
   it('renders correct text', () => {
-    const { getByRole, getByText } = render()[0]
-    getByRole('heading', { name: 'Loosen Screws and Detach' })
+    const { getByText } = render()[0]
+    getByText('Loosen Screws and Detach')
     getByText(
       'Hold the gripper in place and loosen the screws. (The screws are captive and will not come apart from the gripper) Then carefully remove the gripper'
     )

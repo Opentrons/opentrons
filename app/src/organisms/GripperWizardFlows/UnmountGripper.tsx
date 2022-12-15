@@ -37,7 +37,7 @@ export const UnmountGripper = (
     )
   return (
     <GenericWizardTile
-      header={t('loosen_screws_and_detach')}
+      header={<StyledText as="p">{t('loosen_screws_and_detach')}</StyledText>}
       rightHandBody={
         <StyledText>TODO image of gripper being unmounted</StyledText>
       }

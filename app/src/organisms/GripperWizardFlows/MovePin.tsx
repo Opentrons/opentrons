@@ -98,7 +98,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
   if (isRobotMoving) return <InProgressModal description={inProgressText} />
   return (
     <GenericWizardTile
-      header={header}
+      header={<StyledText as="p">{header}</StyledText>}
       rightHandBody={image}
       bodyText={<StyledText as="p">{body}</StyledText>}
       proceedButtonText={buttonText}

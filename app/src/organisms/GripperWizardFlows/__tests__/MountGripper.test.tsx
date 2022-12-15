@@ -46,14 +46,14 @@ describe('MountGripper', () => {
   })
 
   it('clicking go back calls back', () => {
-    const { getByRole } = render()[0]
-    getByRole('button', { name: 'Go back' }).click()
+    const { getByLabelText } = render()[0]
+    getByLabelText('back').click()
     expect(mockGoBack).toHaveBeenCalled()
   })
 
   it('renders correct text', () => {
-    const { getByRole, getByText } = render()[0]
-    getByRole('heading', { name: 'Connect and Screw In Gripper' })
+    const { getByText } = render()[0]
+    getByText('Connect and Screw In Gripper')
     getByText(
       'Attach the gripper to the robot by alinging the connector and ensuring a secure connection. Hold the gripper in place and use the hex screwdriver to tighten the gripper screws. Then test that the gripper is securely attached by gently pulling it side to side.'
     )
