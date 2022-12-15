@@ -1,4 +1,3 @@
-from pathlib import Path
 from typing import AsyncGenerator, Generator
 
 import pytest
@@ -6,10 +5,10 @@ import pytest
 from tests.integration.dev_server import DevServer
 from tests.integration.robot_client import RobotClient
 
+from .persistence_snapshots_dir import PERSISTENCE_SNAPSHOTS_DIR
 
-# FIXME(mm, 2022-09-09): This assumes the current working directory is
-# the root project directory. See Jira RSS-104.
-_OLDER_PERSISTENCE_DIR = Path("tests/integration/persistence_snapshots/v6.0.1")
+
+_OLDER_PERSISTENCE_DIR = PERSISTENCE_SNAPSHOTS_DIR / "v6.0.1"
 
 _EXPECTED_PROTOCOL_COUNT = 4
 _EXPECTED_RUN_COUNT = 5

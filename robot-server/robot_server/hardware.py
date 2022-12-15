@@ -33,7 +33,7 @@ _event_unsubscribe_accessor = AppStateAccessor[Callable[[], None]](
 
 
 class HardwareNotYetInitialized(ErrorDetails):
-    """An error when accessing the HardwareAPI before it's initialized."""
+    """An error when accessing the hardware API before it's initialized."""
 
     id: Literal["HardwareNotYetInitialized"] = "HardwareNotYetInitialized"
     title: str = "Hardware Not Yet Initialized"
@@ -41,14 +41,17 @@ class HardwareNotYetInitialized(ErrorDetails):
 
 
 class HardwareFailedToInitialize(ErrorDetails):
-    """An error if the HardwareAPI fails to initialize."""
+    """An error if the hardware API fails to initialize."""
 
     id: Literal["HardwareFailedToInitialize"] = "HardwareFailedToInitialize"
     title: str = "Hardware Failed to Initialize"
 
 
-def initialize_hardware(app_state: AppState) -> None:
-    """Initialize the HardwareAPI singleton, attaching it to global state."""
+def start_initializing_hardware(app_state: AppState) -> None:
+    """Initialize the hardware API singleton, attaching it to global state.
+
+    Returns immediately while the hardware API initializes in the background.
+    """
     initialize_task = _init_task_accessor.get_from(app_state)
 
     if initialize_task is None:
@@ -56,7 +59,7 @@ def initialize_hardware(app_state: AppState) -> None:
         _init_task_accessor.set_on(app_state, initialize_task)
 
 
-async def cleanup_hardware(app_state: AppState) -> None:
+async def clean_up_hardware(app_state: AppState) -> None:
     """Shutdown the HardwareAPI singleton and remove it from global state."""
     initialize_task = _init_task_accessor.get_from(app_state)
     thread_manager = _hw_api_accessor.get_from(app_state)
@@ -68,6 +71,7 @@ async def cleanup_hardware(app_state: AppState) -> None:
 
     if initialize_task is not None:
         initialize_task.cancel()
+        # Ignore exceptions, since they've already been logged.
         await asyncio.gather(initialize_task, return_exceptions=True)
 
     if unsubscribe_from_events is not None:
@@ -77,6 +81,8 @@ async def cleanup_hardware(app_state: AppState) -> None:
         thread_manager.clean_up()
 
 
+# TODO(mm, 2022-10-18): Deduplicate this background initialization infrastructure
+# with similar code used for initializing the persistence layer.
 async def get_thread_manager(
     app_state: AppState = Depends(get_app_state),
 ) -> ThreadManagedHardware:
@@ -189,6 +195,10 @@ async def _initialize_hardware_api(app_state: AppState) -> None:
         log.info("Opentrons hardware API initialized")
 
     except Exception:
+        # If something went wrong, log it here, in case the robot is powered off
+        # ungracefully before our cleanup code has a chance to run and receive
+        # the exception.
+        #
         # todo(mm, 2021-10-22): Logging this exception should be the responsibility
         # of calling code, but currently, nothing catches exceptions raised from
         # this background initialization task. Once that's fixed, this log.error()
