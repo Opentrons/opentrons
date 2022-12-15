@@ -175,11 +175,11 @@ class ProtocolRunner:
             context=context,
         )
 
-    def _load_legacy(
+    async def _load_legacy(
         self,
         protocol_source: ProtocolSource,
     ) -> None:
-        protocol = self._legacy_file_reader.read(protocol_source)
+        protocol = await self._legacy_file_reader.read(protocol_source)
         broker = None
         equipment_broker = None
 
