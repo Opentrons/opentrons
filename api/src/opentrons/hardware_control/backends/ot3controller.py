@@ -155,7 +155,6 @@ class OT3Controller:
             )
         self._present_nodes: Set[NodeId] = set()
         self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
-        self._homed_nodes: Set[NodeId] = set()
 
     async def update_to_default_current_settings(self, gantry_load: GantryLoad) -> None:
         self._current_settings = get_current_settings(
@@ -208,10 +207,11 @@ class OT3Controller:
         self._module_controls = module_controls
 
     def check_ready_for_movement(self, axes: Sequence[OT3Axis]) -> bool:
-        for a in axes:
-            if axis_to_node(a) not in self._homed_nodes:
-                return False
-        return True
+        return all(
+            self._motor_status.get(axis_to_node(a)) is not None
+            and self._motor_status.get(axis_to_node(a)).motor_ok
+            for a in axes
+        )
 
     async def update_position(self) -> OT3AxisMap[float]:
         """Get the current position."""
@@ -224,7 +224,6 @@ class OT3Controller:
     def _handle_motor_status_response(
         self,
         response: NodeMap[Tuple[float, float, bool, bool]],
-        from_home: bool = False,
     ) -> None:
         for axis, pos in response.items():
             self._position.update({axis: pos[0]})
@@ -232,8 +231,6 @@ class OT3Controller:
             self._motor_status.update(
                 {axis: MotorStatus(motor_ok=pos[2], encoder_ok=pos[3])}
             )
-            if from_home:
-                self._homed_nodes.add(axis)
 
     async def move(
         self,
@@ -360,7 +357,7 @@ class OT3Controller:
         if OT3Axis.G in checked_axes:
             await self.gripper_home_jaw()
         for position in positions:
-            self._handle_motor_status_response(position, from_home=True)
+            self._handle_motor_status_response(position)
         return axis_convert(self._position, 0.0)
 
     def _filter_move_group(self, move_group: MoveGroup) -> MoveGroup:
@@ -412,7 +409,7 @@ class OT3Controller:
         move_group = create_gripper_jaw_home_group()
         runner = MoveGroupRunner(move_groups=[move_group])
         positions = await runner.run(can_messenger=self._messenger)
-        self._handle_motor_status_response(positions, from_home=True)
+        self._handle_motor_status_response(positions)
 
     @staticmethod
     def _synthesize_model_name(name: FirmwarePipetteName, model: str) -> "PipetteModel":

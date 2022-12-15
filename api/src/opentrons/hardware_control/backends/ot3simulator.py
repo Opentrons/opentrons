@@ -153,7 +153,6 @@ class OT3Simulator:
         self._motor_status = {}
         self._present_nodes: Set[NodeId] = set()
         self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
-        self._homed_nodes: Set[NodeId] = set()
 
     @property
     def board_revision(self) -> BoardRevision:
@@ -180,17 +179,22 @@ class OT3Simulator:
     def _handle_motor_status_update(self, response: Dict[NodeId, float]) -> None:
         self._position.update(response)
         self._encoder_position.update(response)
-        self._motor_status = MotorStatus(motor_ok=True, encoder_ok=True)
+        self._motor_status.update(
+            (node, MotorStatus(True, True)) for node in response.keys()
+        )
 
     async def update_motor_status(self) -> None:
         """Retreieve motor and encoder status and position from all present nodes"""
-        self._motor_status = MotorStatus(motor_ok=True, encoder_ok=True)
+        self._motor_status.update(
+            (node, MotorStatus(True, True)) for node in self._present_nodes
+        )
 
     def check_ready_for_movement(self, axes: Sequence[OT3Axis]) -> bool:
-        for a in axes:
-            if axis_to_node(a) not in self._homed_nodes:
-                return False
-        return True
+        return all(
+            self._motor_status.get(axis_to_node(a)) is not None
+            and self._motor_status.get(axis_to_node(a)).motor_ok
+            for a in axes
+        )
 
     async def update_position(self) -> OT3AxisMap[float]:
         """Get the current position."""
@@ -235,7 +239,7 @@ class OT3Simulator:
         else:
             homed = list(self._position.keys())
         for h in homed:
-            self._homed_nodes.add(h)
+            self._motor_status[h] = MotorStatus(True, True)
         return axis_convert(self._position, 0.0)
 
     async def fast_home(
@@ -252,7 +256,7 @@ class OT3Simulator:
         """
         homed = [axis_to_node(a) for a in axes] if axes else self._position.keys()
         for h in homed:
-            self._homed_nodes.add(h)
+            self._motor_status[h] = MotorStatus(True, True)
         return axis_convert(self._position, 0.0)
 
     async def gripper_grip_jaw(
@@ -266,7 +270,7 @@ class OT3Simulator:
     async def gripper_home_jaw(self) -> None:
         """Move gripper outward."""
         _ = create_gripper_jaw_home_group()
-        self._homed_nodes.add(NodeId.gripper_g)
+        self._motor_status[NodeId.gripper_g] = MotorStatus(True, True)
 
     async def gripper_hold_jaw(
         self,
