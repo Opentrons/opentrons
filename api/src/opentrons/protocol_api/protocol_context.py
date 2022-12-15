@@ -18,6 +18,7 @@ from opentrons.protocols.api_support.util import (
     APIVersionError,
 )
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
+from opentrons.protocol_engine.types import Liquid
 
 from .core.common import ModuleCore, ProtocolCore
 from .core.core_map import LoadedCoreMap
@@ -737,6 +738,23 @@ class ProtocolContext(CommandPublisher):
         :param bool on: If true, turn on rail lights; otherwise, turn off.
         """
         self._implementation.set_rail_lights(on=on)
+
+    @requires_version(2, 13)
+    def create_liquid(
+        self, display_name: str, description: str, display_color: str
+    ) -> Liquid:
+        """
+        Create a liquid in a protocol.
+
+        :param str display_name: An human-readable name for this liquid.
+        :param str description: A description of this liquid.
+        :param str display_color: An optional Hex color code, with hash included, to represent the specified liquid. Standard three-value, four-value, six-value, and eight-value syntax are all acceptable.
+        """
+        return self._implementation.create_liquid(
+            display_name=display_name,
+            description=description,
+            display_color=display_color,
+        )
 
     @property  # type: ignore
     @requires_version(2, 5)
