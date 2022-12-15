@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import AsyncIterable, List
+from typing import List
 
 import anyio
 
@@ -11,7 +11,7 @@ from .protocol_source import ProtocolFileRole, ProtocolSource, ProtocolType
 
 async def extract_labware_definitions(
     protocol_source: ProtocolSource,
-) -> AsyncIterable[LabwareDefinition]:
+) -> List[LabwareDefinition]:
     """Extract all the labware definitions that are in the given protocol source.
 
     This accounts for differences between JSON protocols,
@@ -19,17 +19,15 @@ async def extract_labware_definitions(
     and Python protocols, which have them in separate sidecar files.
     """
     if protocol_source.config.protocol_type == ProtocolType.JSON:
-        for labware in await _extract_from_json_protocol_file(
-            path=protocol_source.main_file
-        ):
-            yield labware
+        return await _extract_from_json_protocol_file(path=protocol_source.main_file)
         # Ignore separate labware files.
 
     else:
         assert protocol_source.config.protocol_type == ProtocolType.PYTHON
-        for file in protocol_source.files:
-            if file.role == ProtocolFileRole.LABWARE:
-                yield await _extract_from_labware_file(file.path)
+        return [
+            await _extract_from_labware_file(file.path)
+            for file in protocol_source.files
+        ]
 
 
 async def _extract_from_labware_file(path: Path) -> LabwareDefinition:
