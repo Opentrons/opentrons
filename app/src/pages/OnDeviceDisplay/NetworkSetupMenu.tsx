@@ -16,7 +16,7 @@ import {
 import { TertiaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { StepMeter } from '../../atoms/StepMeter'
-import { CardButton } from '../../molecules/SetupNetwork/CardButton'
+import { CardButton } from '../../molecules/CardButton'
 
 import type { IconName } from '@opentrons/components'
 
