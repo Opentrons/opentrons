@@ -286,7 +286,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
 
     let wizardTitleConfirmPipette
     if (wantedPipette == null && actualPipette == null) {
-      wizardTitleConfirmPipette = t('detatch_pipette_from_mount', {
+      wizardTitleConfirmPipette = t('detach_pipette_from_mount', {
         mount: mount[0].toUpperCase() + mount.slice(1),
       })
     } else if (wantedPipette == null && actualPipette != null) {

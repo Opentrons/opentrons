@@ -52,7 +52,7 @@ describe('CheckPipettesButton', () => {
     jest.resetAllMocks()
   })
 
-  it('renders the confirm attachment btn  and clicking on it calls fetchPipettes', () => {
+  it('renders the confirm attachment btn and clicking on it calls fetchPipettes', () => {
     props = {
       robotName: 'otie',
       onDone: jest.fn(),
