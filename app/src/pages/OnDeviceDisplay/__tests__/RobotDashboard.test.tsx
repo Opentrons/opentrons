@@ -61,7 +61,8 @@ describe('RobotDashboard', () => {
     getByText('Instrument + Module Hub')
     getByText('Settings')
     const buttons = getAllByRole('button')
-    expect(buttons.length).toBe(5)
+    // ToDo this will be removed when removing the link to odd menu
+    expect(buttons.length).toBe(6)
   })
 
   // ToDo: kj 12/07/2022 enable this case when the design is fixed
