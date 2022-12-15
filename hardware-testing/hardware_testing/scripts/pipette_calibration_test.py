@@ -38,8 +38,10 @@ class Pipette_Calibration_Test:
         self.simulate = simulate
         self.cycles = cycles
         self.slot = slot
-        self.jog_distance = 7 # mm
         self.jog_speed = 10 # mm/s
+        self.CUTOUT_HEIGHT = 2 # mm
+        self.CUTOUT_SIZE = 20 # mm
+        self.CUTOUT_HALF = self.CUTOUT_SIZE / 2
         self.axes = [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R]
         self.test_data ={
             "Time":"None",
@@ -107,31 +109,79 @@ class Pipette_Calibration_Test:
     def dict_values_to_line(self, dict):
         return str.join(",", list(dict.values()))+"\n"
 
+    async def _get_encoder(self):
+        encoder_position = await self.api.encoder_current_position(self.mount)
+        encoders = []
+        for key in encoder_position:
+            encoders.append(round(encoder_position[key], 3))
+        return encoders
+
     async def _read_gauge(self, axis):
-        gauge_encoder = f"{axis} Gauge Encoder"
+        gauge_encoder = "{} Gauge Encoder".format(axis)
         gauge_position = self.slot_center + self.gauge_offsets[axis]
         if axis == "X":
-            start_position = gauge_position._replace(x=gauge_position.x - 5)
-            jog_position = start_position._replace(x=start_position.x - self.jog_distance)
+            jog_position = gauge_position._replace(x=gauge_position.x - self.CUTOUT_HALF)
         elif axis == "Y":
-            start_position = gauge_position._replace(y=gauge_position.y + 5)
-            jog_position = start_position._replace(y=start_position.y + self.jog_distance)
+            jog_position = gauge_position._replace(y=gauge_position.y + self.CUTOUT_HALF)
         elif axis == "Z":
-            start_position = gauge_position._replace(z=gauge_position.z - 2)
-            jog_position = start_position._replace(z=start_position.z - self.jog_distance)
+            jog_position = gauge_position._replace(z=gauge_position.z - self.CUTOUT_HEIGHT)
         # Move to gauge position
         await self.api.move_to(self.mount, gauge_position, speed=100)
-        # Move to start position
-        await self.api.move_to(self.mount, start_position, speed=50)
         # Move to jog position
-        await self.api.move_to(self.mount, jog_position, speed=10)
-        # encoder_position = await self._get_encoder()
-        # self.test_data[gauge_encoder] = str(encoder_position).replace(", ",";")
+        await self.api.move_to(self.mount, jog_position, speed=self.jog_speed)
+        # Read encoder
+        encoder_position = await self._get_encoder()
+        self.test_data[gauge_encoder] = str(encoder_position).replace(", ",";")
         # Read gauge
         gauge = self.gauges[axis].read_stable(timeout=20)
-        # Return to start position
-        await self.api.move_to(self.mount, start_position, speed=100)
+        # Return to gauge position
+        await self.api.move_to(self.mount, gauge_position, speed=100)
         return gauge
+
+    def _zero_gauges(self):
+        print(f"\nPlace Gauge Block on Deck Slot #{self.slot}")
+        for axis in self.gauges:
+            gauge_zero = "{} Zero".format(axis)
+            input(f"\nPush block against {axis}-axis Gauge and Press ENTER\n")
+            _reading = True
+            while _reading:
+                zeros = []
+                for i in range(5):
+                    gauge = self.gauges[axis].read_stable(timeout=20)
+                    zeros.append(gauge)
+                _variance = abs(max(zeros) - min(zeros))
+                print(f"Variance = {_variance}")
+                if _variance < 0.1:
+                    _reading = False
+            zero = sum(zeros) / len(zeros)
+            self.test_data[gauge_zero] = str(zero)
+            print(f"{axis} Gauge Zero = {zero}mm")
+        input(f"\nRemove Gauge Block from Deck Slot #{self.slot} and Press ENTER\n")
+
+    async def _measure_gauges(
+        self, api: OT3API, mount: OT3Mount
+    ) -> None:
+        # Add calibration tip
+        await api.add_tip(mount, api.config.calibration.probe_length)
+        # Move to slot center
+        await api.move_to(mount, self.slot_center, speed=20)
+        # Measure X-axis gauge
+        print("Measuring X Gauge...")
+        x_gauge = await self._read_gauge("X")
+        self.test_data["X Gauge"] = str(x_gauge)
+        print(f"X Gauge = ", self.test_data["X Gauge"])
+        # Measure Y-axis gauge
+        print("Measuring Y Gauge...")
+        y_gauge = await self._read_gauge("Y")
+        self.test_data["Y Gauge"] = str(y_gauge)
+        print(f"Y Gauge = ", self.test_data["Y Gauge"])
+        # Measure Z-axis gauge
+        # print("Measuring Z Gauge...")
+        # z_gauge = await self._read_gauge("Z")
+        # self.test_data["Z Gauge"] = str(z_gauge)
+        # print(f"Z Gauge = ", self.test_data["Z Gauge"])
+        # Remove tip
+        await api.remove_tip(mount)
 
     async def _record_data(self, cycle):
         elapsed_time = (time.time() - self.start_time)/60
@@ -140,31 +190,11 @@ class Pipette_Calibration_Test:
         test_data = self.dict_values_to_line(self.test_data)
         data.append_data_to_file(self.test_name, self.test_file, test_data)
 
-    async def _measure_gauges(
-        self, api: OT3API, mount: OT3Mount
-    ) -> None:
-        # Measure X-axis gauge
-        print("Measuring X Gauge...")
-        x_gauge = await self._read_gauge("X")
-        self.test_data["X Gauge"] = str(x_gauge)
-        print(f"X Gauge = ", self.test_data["X Gauge"])
-
-        # Measure Y-axis gauge
-        print("Measuring Y Gauge...")
-        y_gauge = await self._read_gauge("Y")
-        self.test_data["Y Gauge"] = str(y_gauge)
-        print(f"Y Gauge = ", self.test_data["Y Gauge"])
-
-        # Measure Z-axis gauge
-        # print("Measuring Z Gauge...")
-
     async def _calibrate_slot(
         self, api: OT3API, mount: OT3Mount, slot: int
     ) -> None:
         # Calibrate pipette
         self.offset, self.slot_center = await calibrate_pipette(api, mount, slot)
-        await api.add_tip(mount, api.config.calibration.probe_length)
-        await api.move_to(mount, self.slot_center, speed=20)
         print(f"New Slot Center: {self.slot_center}")
         print(f"New Pipette Offset: {self.offset}")
         self.test_data["X Center"] = str(self.slot_center.x)
@@ -181,8 +211,6 @@ class Pipette_Calibration_Test:
     async def _reset(
         self, api: OT3API, mount: OT3Mount
     ) -> None:
-        # Remove tip
-        await api.remove_tip(mount)
         # Home Z-Axis
         current_position = await api.gantry_position(mount)
         home_z = current_position._replace(z=self.home.z)
@@ -198,6 +226,7 @@ class Pipette_Calibration_Test:
         try:
             await self.test_setup()
             if self.api and self.mount:
+                self._zero_gauges()
                 for i in range(self.cycles):
                     cycle = i + 1
                     print(f"\n-> Starting Test Cycle {cycle}/{self.cycles}")
