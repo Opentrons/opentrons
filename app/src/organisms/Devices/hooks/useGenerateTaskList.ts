@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next'
-import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import {
   useAttachedPipettes,
   useDeckCalibrationData,
@@ -22,7 +21,7 @@ export function useGenerateTaskList(robotName: string): TaskListProps {
   let taskIndex = 0
   let activeTaskIndices: [number, number] | null = null
   const taskList: TaskListProps = {
-    activeIndex: activeTaskIndices,
+    activeIndex: null,
     taskList: [],
   }
   // 3 main tasks: Deck, Left Mount, and Right Mount Calibrations
@@ -86,8 +85,7 @@ export function useGenerateTaskList(robotName: string): TaskListProps {
       taskList.taskList.push(pipetteTask)
       taskIndex++
     } else {
-      const displayName =
-        (getPipetteModelSpecs(pipetteData.model)?.displayName as string) ?? ''
+      const displayName = pipetteData.modelSpecs.displayName ?? ''
 
       pipetteTask.description = t('robot_calibration:pipette_name_and_serial', {
         name: displayName,
@@ -156,7 +154,7 @@ export function useGenerateTaskList(robotName: string): TaskListProps {
           tipLengthCalForPipette.status.markedBad
         ) {
           // We've got a bad, or non-existent tip length calibration
-          if (activeTaskIndices === null) {
+          if (activeTaskIndices == null) {
             // only updating this if it is still null, otherwise we'd be forgetting about the previous task that already modified this
             activeTaskIndices = [taskIndex, 0]
           }
@@ -176,8 +174,8 @@ export function useGenerateTaskList(robotName: string): TaskListProps {
           offsetCalForPipette.status.markedBad
         ) {
           // We've got a bad, or non-existent offset calibration
-          if (activeTaskIndices === null) {
-            activeTaskIndices = [taskIndex, 0]
+          if (activeTaskIndices == null) {
+            activeTaskIndices = [taskIndex, 1]
           }
           offsetSubTask.description = t('robot_calibration:pipette_offset_calibration_on_mount', {
             mount,
@@ -205,5 +203,6 @@ export function useGenerateTaskList(robotName: string): TaskListProps {
     }
   }
 
+  taskList.activeIndex = activeTaskIndices
   return taskList
 }
