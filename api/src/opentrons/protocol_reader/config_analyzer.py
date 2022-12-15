@@ -32,13 +32,19 @@ class ConfigAnalyzer:
     def analyze(main_file: RoleAnalysisFile) -> ConfigAnalysis:
         """Analyze the main file of a protocol to identify its config and metadata."""
         if isinstance(main_file.data, (ProtocolSchemaV5, ProtocolSchemaV6)):
-            return ConfigAnalysis(
-                metadata=main_file.data.metadata.dict(exclude_none=True),
-                config=JsonProtocolConfig(schema_version=main_file.data.schemaVersion),
-            )
+            return _analyze_json(main_file.data)
 
         else:
             return _analyze_python(main_file)
+
+
+def _analyze_json(
+    main_file_data: Union[ProtocolSchemaV5, ProtocolSchemaV6]
+) -> ConfigAnalysis:
+    return ConfigAnalysis(
+        metadata=main_file_data.metadata.dict(exclude_none=True),
+        config=JsonProtocolConfig(schema_version=main_file_data.schemaVersion),
+    )
 
 
 # todo(mm, 2021-09-13): Deduplicate with opentrons.protocols.parse.
