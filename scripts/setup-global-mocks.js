@@ -1,6 +1,7 @@
 'use strict'
 
 global._PKG_VERSION_ = '0.0.0-test'
+global._OPENTRONS_PROJECT_ = 'robot-stack'
 
 // electron and native stuff that will break in unit tests
 jest.mock('electron')
