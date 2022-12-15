@@ -10,7 +10,7 @@ const project = process.env.OPENTRONS_PROJECT ?? 'robot-stack'
 
 module.exports = async () => ({
   appId:
-    project === 'robot-stack' ? 'com.opentrons.app' : 'com.opentrons.app-ot3',
+    project === 'robot-stack' ? 'com.opentrons.app' : 'com.opentrons.appot3',
   electronVersion: '21.3.1',
   files: [
     '**/*',
