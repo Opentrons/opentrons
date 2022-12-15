@@ -1,6 +1,7 @@
 """Movement command handling."""
 from __future__ import annotations
 
+import logging
 from typing import Dict, Optional, List
 from dataclasses import dataclass
 
@@ -28,6 +29,8 @@ MOTOR_AXIS_TO_HARDWARE_AXIS: Dict[MotorAxis, HardwareAxis] = {
     MotorAxis.LEFT_PLUNGER: HardwareAxis.B,
     MotorAxis.RIGHT_PLUNGER: HardwareAxis.C,
 }
+
+log = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -98,6 +101,11 @@ class MovementHandler:
         hs_movement_restrictors = (
             self._state_store.modules.get_heater_shaker_movement_restrictors()
         )
+
+        # TODO (spp, 2022-12-14): remove once we understand why sometimes moveLabware
+        #  fails saying that h/s latch is closed even when it is not.
+        log.info(f"H/S movement restrictors: {hs_movement_restrictors}")
+
         dest_slot_int = int(
             self._state_store.geometry.get_ancestor_slot_name(labware_id)
         )
