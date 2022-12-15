@@ -33,6 +33,7 @@ class RoleAnalyzerErrorSpec(NamedTuple):
 
 
 ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
+    # Just a Python protocol file:
     RoleAnalyzerSpec(
         files=[
             BufferedFile(name="protocol.py", path=None, contents=b"", data=None),
@@ -42,6 +43,7 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
             labware_files=[],
         ),
     ),
+    # Just a JSON protocol file:
     RoleAnalyzerSpec(
         files=[
             BufferedFile(
@@ -67,6 +69,7 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
             labware_files=[],
         ),
     ),
+    # A Python protocol file plus a standalone labware file:
     RoleAnalyzerSpec(
         files=[
             BufferedFile(
@@ -96,6 +99,7 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
             ],
         ),
     ),
+    # A JSON protocol file plus a standalone labware file:
     RoleAnalyzerSpec(
         files=[
             BufferedFile(
@@ -126,40 +130,23 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
                     labwareDefinitions=matchers.Anything()
                 ),
             ),
-            labware_files=[],
+            labware_files=[
+                LabwareFile(
+                    name="labware.json",
+                    contents=b"",
+                    path=None,
+                    data=LabwareDefinition.construct(version=2)  # type: ignore[call-arg]
+                )
+            ],
         ),
     ),
+    # A protocol file with weird capitalization:
     RoleAnalyzerSpec(
         files=[
             BufferedFile(name="PROTOCOL.PY", contents=b"", data=None, path=None),
         ],
         expected=RoleAnalysis(
             main_file=MainFile(name="PROTOCOL.PY", contents=b"", path=None),
-            labware_files=[],
-        ),
-    ),
-    RoleAnalyzerSpec(
-        files=[
-            BufferedFile(
-                name="protocol.json",
-                contents=b"",
-                path=None,
-                data=ProtocolSchemaV6.construct(  # type: ignore[call-arg]
-                    labwareDefinitions={
-                        "uri": LabwareDefinition.construct()  # type: ignore[call-arg]
-                    },
-                ),
-            ),
-        ],
-        expected=RoleAnalysis(
-            main_file=MainFile(
-                name="protocol.json",
-                contents=b"",
-                path=None,
-                data=ProtocolSchemaV6.construct(  # type: ignore[call-arg]
-                    labwareDefinitions=matchers.Anything()
-                ),
-            ),
             labware_files=[],
         ),
     ),
