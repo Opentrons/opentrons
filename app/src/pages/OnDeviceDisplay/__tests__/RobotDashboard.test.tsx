@@ -87,6 +87,6 @@ describe('RobotDashboard', () => {
     expect(mockPush).toHaveBeenCalledTimes(3)
     expect(mockPush).toHaveBeenCalledWith('/protocols')
     expect(mockPush).toHaveBeenCalledWith('/robot-settings')
-    expect(mockPush).toHaveBeenCalledWith('/tbd')
+    expect(mockPush).toHaveBeenCalledWith('/attach-instruments')
   })
 })

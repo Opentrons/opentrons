@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 from abc import abstractmethod, ABC
-from typing import Dict, Generic, Optional, Union
+from typing import Dict, Generic, List, Optional, Union
 
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons.types import Mount, Location, DeckSlotName
+
+from opentrons.types import DeckSlotName, Location, Mount, Point
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import ModuleModel
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
@@ -20,6 +22,12 @@ from .module import ModuleCoreType
 class AbstractProtocol(
     ABC, Generic[InstrumentCoreType, LabwareCoreType, ModuleCoreType]
 ):
+    @property
+    @abstractmethod
+    def fixed_trash(self) -> LabwareCoreType:
+        """Get the fixed trash labware core."""
+        ...
+
     @abstractmethod
     def get_bundled_data(self) -> Dict[str, bytes]:
         """Get a mapping of name to contents"""
@@ -90,10 +98,6 @@ class AbstractProtocol(
         ...
 
     @abstractmethod
-    def get_loaded_instruments(self) -> Dict[Mount, Optional[InstrumentCoreType]]:
-        ...
-
-    @abstractmethod
     def pause(self, msg: Optional[str]) -> None:
         ...
 
@@ -111,10 +115,6 @@ class AbstractProtocol(
 
     @abstractmethod
     def home(self) -> None:
-        ...
-
-    @abstractmethod
-    def get_fixed_trash(self) -> LabwareCoreType:
         ...
 
     @abstractmethod
@@ -143,3 +143,29 @@ class AbstractProtocol(
         mount: Optional[Mount] = None,
     ) -> None:
         ...
+
+    @abstractmethod
+    def get_deck_definition(self) -> DeckDefinitionV3:
+        """Get the geometry definition of the robot's deck."""
+
+    @abstractmethod
+    def get_slot_item(
+        self, slot_name: DeckSlotName
+    ) -> Union[LabwareCoreType, ModuleCoreType, None]:
+        """Get the contents of a given slot, if any."""
+
+    @abstractmethod
+    def get_slot_center(self, slot_name: DeckSlotName) -> Point:
+        """Get the absolute coordinate of a slot's center."""
+
+    @abstractmethod
+    def get_highest_z(self) -> float:
+        """Get the highest Z point of all deck items."""
+
+    @abstractmethod
+    def get_labware_cores(self) -> List[LabwareCoreType]:
+        """Get all loaded labware cores."""
+
+    @abstractmethod
+    def get_module_cores(self) -> List[ModuleCoreType]:
+        """Get all loaded module cores."""

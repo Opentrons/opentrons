@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
 
 import {
   Flex,
@@ -13,9 +14,11 @@ import {
   Icon,
   TYPOGRAPHY,
   ALIGN_CENTER,
+  ALIGN_FLEX_END,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
+import { TertiaryButton } from '../../atoms/buttons'
 import { MiniCardButton } from '../../molecules/MiniCardButton'
 import { getLocalRobot } from '../../redux/discovery'
 
@@ -33,13 +36,8 @@ const DASHBOARD_ITEMS: MiniCardButtonProps[] = [
   {
     iconName: 'wifi',
     cardName: 'Instrument + Module Hub',
-    destinationPath: '/tbd',
+    destinationPath: '/attach-instruments',
   },
-  // {
-  //   iconName: 'wifi',
-  //   cardName: 'Module Hub',
-  //   destinationPath: '/tbd',
-  // },
   {
     iconName: 'wifi',
     cardName: 'Settings',
@@ -154,6 +152,16 @@ export function RobotDashboard(): JSX.Element {
         {DASHBOARD_ITEMS.map((card, index) => (
           <MiniCardButton key={`miniCardButton_${index}`} {...card} />
         ))}
+      </Flex>
+      {/* temp button to robot dashboard until we can detect setup status */}
+      <Flex
+        alignSelf={ALIGN_FLEX_END}
+        marginTop={SPACING.spacing5}
+        width="fit-content"
+      >
+        <Link to="menu">
+          <TertiaryButton>To ODD Menu</TertiaryButton>
+        </Link>
       </Flex>
     </Flex>
   )
