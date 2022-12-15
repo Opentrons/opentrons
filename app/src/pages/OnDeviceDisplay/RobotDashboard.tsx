@@ -28,27 +28,27 @@ const DASHBOARD_ITEMS: MiniCardButtonProps[] = [
   {
     iconName: 'wifi',
     cardName: 'Run a protocol',
-    destinationPath: 'tbd',
+    destinationPath: '/protocols',
   },
   {
     iconName: 'wifi',
-    cardName: 'Instrument Hub',
-    destinationPath: 'tbd',
+    cardName: 'Instrument + Module Hub',
+    destinationPath: '/tbd',
   },
-  {
-    iconName: 'wifi',
-    cardName: 'Module Hub',
-    destinationPath: 'tbd',
-  },
+  // {
+  //   iconName: 'wifi',
+  //   cardName: 'Module Hub',
+  //   destinationPath: '/tbd',
+  // },
   {
     iconName: 'wifi',
     cardName: 'Settings',
-    destinationPath: 'tbd',
+    destinationPath: '/robot-settings',
   },
 ]
 
 export function RobotDashboard(): JSX.Element {
-  const { t } = useTranslation('device_settings')
+  const { t } = useTranslation('device_details')
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
 

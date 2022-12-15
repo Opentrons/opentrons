@@ -15,7 +15,7 @@ import { ConnectViaUSB } from '../pages/OnDeviceDisplay/ConnectViaUSB'
 import { ConfirmRobotName } from '../pages/OnDeviceDisplay/ConfirmRobotName'
 import { InitialSplash } from '../pages/OnDeviceDisplay/InitialSplash'
 import { NetworkSetupMenu } from '../pages/OnDeviceDisplay/NetworkSetupMenu'
-import { ODDMenu } from '../pages/OnDeviceDisplay/ODDMenu'
+import { TempODDMenu } from '../pages/OnDeviceDisplay/TempODDMenu'
 import { RobotDashboard } from '../pages/OnDeviceDisplay/RobotDashboard'
 import { SelectWifiNetwork } from '../pages/OnDeviceDisplay/SelectWifiNetwork'
 import { SetWifiCred } from '../pages/OnDeviceDisplay/SetWifiCred'
@@ -31,9 +31,9 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     path: '/',
   },
   {
-    Component: ODDMenu,
+    Component: TempODDMenu,
     exact: true,
-    name: 'ODD Menu',
+    name: 'Temp ODD Menu',
     path: '/menu',
   },
   {

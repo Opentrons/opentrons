@@ -25,7 +25,7 @@ describe('MiniCardButton', () => {
     props = {
       iconName: 'play',
       cardName: 'mockMiniCard',
-      destinationPath: 'mockPath',
+      destinationPath: '/mockPath',
     }
   })
 
