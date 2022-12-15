@@ -1,5 +1,7 @@
 """Protocol run control and management."""
-from typing import List, NamedTuple, Optional
+from typing import Iterable, List, NamedTuple, Optional
+
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from opentrons.broker import Broker
 from opentrons.equipment_broker import EquipmentBroker
@@ -97,7 +99,8 @@ class ProtocolRunner:
         """
         config = protocol_source.config
 
-        for definition in protocol_source.labware_definitions:
+        labware_definitions = protocol_source.labware_definitions
+        for definition in labware_definitions:
             self._protocol_engine.add_labware_definition(definition)
 
         if isinstance(config, JsonProtocolConfig):
@@ -106,7 +109,7 @@ class ProtocolRunner:
             if schema_version >= LEGACY_JSON_SCHEMA_VERSION_CUTOFF:
                 self._load_json(protocol_source)
             else:
-                self._load_legacy(protocol_source)
+                self._load_legacy(protocol_source, labware_definitions)
 
         elif isinstance(config, PythonProtocolConfig):
             api_version = config.api_version
@@ -114,7 +117,7 @@ class ProtocolRunner:
             if api_version >= LEGACY_PYTHON_API_VERSION_CUTOFF:
                 self._load_python(protocol_source)
             else:
-                self._load_legacy(protocol_source)
+                self._load_legacy(protocol_source, labware_definitions)
 
     def play(self) -> None:
         """Start or resume the run."""
@@ -178,8 +181,9 @@ class ProtocolRunner:
     def _load_legacy(
         self,
         protocol_source: ProtocolSource,
+        labware_definitions: Iterable[LabwareDefinition],
     ) -> None:
-        protocol = self._legacy_file_reader.read(protocol_source)
+        protocol = self._legacy_file_reader.read(protocol_source, labware_definitions)
         broker = None
         equipment_broker = None
 
