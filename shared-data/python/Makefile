@@ -75,24 +75,17 @@ teardown-py:
 clean:
 	$(clean_cmd)
 
-
 .PHONY: wheel
-wheel: $(wheel_file)
-
-
-.PHONY: sdist
-sdist: $(sdist_file)
-
-
-$(wheel_file): export OPENTRONS_PROJECT=$(project_rs_default)
-$(wheel_file): setup.py $(py_sources) $(json_sources)
+wheel: export OPENTRONS_PROJECT=$(project_rs_default)
+wheel: setup.py $(py_sources) $(json_sources)
 	$(SHX) mkdir -p build
 	$(python) setup.py $(wheel_opts) bdist_wheel
 	$(SHX) ls $(BUILD_DIR)
 
 
-$(sdist_file): export OPENTRONS_PROJECT=$(project_ot3_default)
-$(sdist_file): setup.py $(py_sources) $(json_sources)
+.PHONY: sdist
+sdist: export OPENTRONS_PROJECT=$(project_ot3_default)
+sdist: setup.py $(py_sources) $(json_sources)
 	$(SHX) mkdir -p build
 	$(python) setup.py sdist
 	$(SHX) ls $(BUILD_DIR)
@@ -109,7 +102,7 @@ format:
 	$(python) -m black opentrons_shared_data tests setup.py
 
 .PHONY: push-no-restart
-push-no-restart: $(wheel_file)
+push-no-restart: wheel
 	$(call push-python-package,$(host),$(br_ssh_key),$(ssh_opts),$(wheel_file))
 
 .PHONY: push
@@ -117,7 +110,7 @@ push: push-no-restart
 	$(call restart-service,$(host),$(br_ssh_key),$(ssh_opts),opentrons-robot-server)
 
 .PHONY: push-no-restart-ot3
-push-no-restart-ot3: $(sdist_file)
+push-no-restart-ot3: sdist
 	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,opentrons_shared_data)
 
 .PHONY: push-ot3

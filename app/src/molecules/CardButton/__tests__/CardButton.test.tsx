@@ -3,7 +3,7 @@ import { fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-import { CardButton } from '../CardButton'
+import { CardButton } from '..'
 
 const mockPush = jest.fn()
 
