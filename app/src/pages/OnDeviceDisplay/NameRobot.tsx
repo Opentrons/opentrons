@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import { useFormik } from 'formik'
+import { css } from 'styled-components'
 
 import {
   Flex,
@@ -26,6 +27,7 @@ import {
   getReachableRobots,
   getUnreachableRobots,
   getLocalRobot,
+  startDiscovery,
 } from '../../redux/discovery'
 import { useTrackEvent } from '../../redux/analytics'
 import { StyledText } from '../../atoms/text'
@@ -36,6 +38,28 @@ import { TertiaryButton } from '../../atoms/buttons'
 import type { UpdatedRobotName } from '@opentrons/api-client'
 import type { State, Dispatch } from '../../redux/types'
 
+const INPUT_FIELD_ODD_STYLE = css`
+  padding-top: ${SPACING.spacingXXL};
+  padding-bottom: ${SPACING.spacingXXL};
+  font-size: 2.5rem;
+  line-height: 3.25rem;
+  border: none;
+  outline: none;
+  text-align: center;
+  &:focus-visible {
+    border: none;
+    outline: none;
+  }
+  &:focus {
+    border: none;
+    outline: none;
+  }
+  &:active {
+    border: none;
+    outline: none;
+  }
+`
+
 interface FormikErrors {
   newRobotName?: string
 }
@@ -43,11 +67,11 @@ interface FormikErrors {
 export function NameRobot(): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const trackEvent = useTrackEvent()
-  const [name, setName] = React.useState<string>('')
-  const [isWaiting, setIsWaiting] = React.useState<boolean>(false)
-  const keyboardRef = React.useRef(null)
   const localRobot = useSelector(getLocalRobot)
   const previousName = localRobot?.name != null ? localRobot.name : null
+  // const [oldName, setOldName] = React.useState<string>('')
+  const [name, setName] = React.useState<string>('')
+  const keyboardRef = React.useRef(null)
   const history = useHistory()
   const dispatch = useDispatch<Dispatch>()
 
@@ -75,8 +99,11 @@ export function NameRobot(): JSX.Element {
         dispatch(removeRobot(sameNameRobotInUnavailable.name))
       }
       updateRobotName(newName)
-      setIsWaiting(isNameDone)
-      // !isNameDone && history.push('/confirm-robot-name')
+      console.log('isNaming: ', isNaming)
+      console.log(previousName)
+      // !Boolean(isNaming) &&
+      //   newName !== previousName &&
+      //   history.push('/network-setup/confirm-name')
       // resetForm({ values: { newRobotName: '' } })
     },
     validate: values => {
@@ -98,20 +125,20 @@ export function NameRobot(): JSX.Element {
     },
   })
 
-  const { updateRobotName, isLoading: isNameDone } = useUpdateRobotNameMutation(
-    {
-      onSuccess: (data: UpdatedRobotName) => {
-        // data.name != null && history.push('/confirm-robot-name')
-        // remove previousName if it isn't undefined | null
-        data.name != null &&
-          previousName != null &&
-          dispatch(removeRobot(previousName))
-      },
-      onError: (error: Error) => {
-        console.error('error', error.message)
-      },
-    }
-  )
+  const { updateRobotName, isLoading: isNaming } = useUpdateRobotNameMutation({
+    onSuccess: (data: UpdatedRobotName) => {
+      // data.name != null && history.push('/confirm-robot-name')
+      // remove previousName if it isn't undefined | null
+      console.log('new name', data.name)
+      data.name != null &&
+        previousName != null &&
+        dispatch(removeRobot(previousName))
+      dispatch(startDiscovery())
+    },
+    onError: (error: Error) => {
+      console.error('error', error.message)
+    },
+  })
 
   const handleConfirm = (): void => {
     // check robot name in the same network
@@ -151,7 +178,14 @@ export function NameRobot(): JSX.Element {
             lineHeight="2.0425rem"
             onClick={handleConfirm}
           >
-            {isNameDone ? <Icon name="ot-spinner" size="1.25rem" spin /> : null}
+            {Boolean(isNaming) ? (
+              <Icon
+                name="ot-spinner"
+                size="1.25rem"
+                spin
+                marginRight={SPACING.spacing3}
+              />
+            ) : null}
             {t('shared:confirm')}
           </TertiaryButton>
         </Flex>
@@ -175,6 +209,8 @@ export function NameRobot(): JSX.Element {
           flexDirection={DIRECTION_ROW}
           alignItems={ALIGN_CENTER}
           marginBottom="0.625rem"
+          justifyContent={JUSTIFY_CENTER}
+          width="100%"
         >
           <InputField
             data-testid="name-robot_input"
@@ -184,6 +220,7 @@ export function NameRobot(): JSX.Element {
             onChange={formik.handleChange}
             value={name}
             error={formik.errors.newRobotName && ''}
+            css={INPUT_FIELD_ODD_STYLE}
           />
         </Flex>
         <StyledText
