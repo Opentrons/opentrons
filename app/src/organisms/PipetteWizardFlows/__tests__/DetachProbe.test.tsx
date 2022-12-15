@@ -48,7 +48,7 @@ describe('DetachProbe', () => {
     mockInProgressModal.mockReturnValue(<div>mock in progress</div>)
   })
   it('returns the correct information, buttons work as expected', () => {
-    const { getByText, getByAltText, getByRole } = render(props)
+    const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
     getByText('Remove Calibration Probe')
     getByText(
       'Unlatch the calibration probe, remove it from the pipette nozzle, and return it to its storage location.'
@@ -57,7 +57,7 @@ describe('DetachProbe', () => {
     const proceedBtn = getByRole('button', { name: 'Complete calibration' })
     fireEvent.click(proceedBtn)
     expect(props.handleCleanUp).toHaveBeenCalled()
-    const backBtn = getByRole('button', { name: 'Go back' })
+    const backBtn = getByLabelText('back')
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()
   })

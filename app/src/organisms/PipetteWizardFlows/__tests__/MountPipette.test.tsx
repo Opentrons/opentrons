@@ -53,7 +53,7 @@ describe('MountPipette', () => {
     mockCheckPipetteButton.mockReturnValue(<div>mock check pipette button</div>)
   })
   it('returns the correct information, buttons work as expected for single mount pipettes', () => {
-    const { getByText, getByAltText, getByRole } = render(props)
+    const { getByText, getByAltText, getByLabelText } = render(props)
     getByText('Connect and screw in pipette')
     getByText(
       'Hold onto the pipette so it does not fall. Attach the pipette to the robot by alinging the pins and ensuring a secure connection with the pins.'
@@ -63,8 +63,8 @@ describe('MountPipette', () => {
     )
     getByAltText('Screw pattern')
 
-    const goBack = getByRole('button', { name: 'Go back' })
-    fireEvent.click(goBack)
+    const backBtn = getByLabelText('back')
+    fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()
     getByText('mock check pipette button')
   })
@@ -74,14 +74,14 @@ describe('MountPipette', () => {
       ...props,
       selectedPipette: NINETY_SIX_CHANNEL,
     }
-    const { getByText, getByAltText, getByRole } = render(props)
+    const { getByText, getByAltText, getByLabelText } = render(props)
     getByText('Connect and Attach 96 Channel Pipette')
     getByText(
       'Hold onto the pipette so it does not fall. Attach the 96 channel to thegantry by alinging the 2 protruding rods on the mounting plate and ensuring a secure connection by screwing in the 4 front screws with the provided screw driver.'
     )
     getByAltText('Attach 96 channel pipette')
-    const goBack = getByRole('button', { name: 'Go back' })
-    fireEvent.click(goBack)
+    const backBtn = getByLabelText('back')
+    fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()
     getByText('mock check pipette button')
   })
@@ -90,9 +90,9 @@ describe('MountPipette', () => {
       ...props,
       isPending: true,
     }
-    const { getAllByTestId, getByRole } = render(props)
+    const { getAllByTestId, getByLabelText } = render(props)
     getAllByTestId('Skeleton')
-    const backBtn = getByRole('button', { name: 'Go back' })
+    const backBtn = getByLabelText('back')
     expect(backBtn).toBeDisabled()
   })
 })
