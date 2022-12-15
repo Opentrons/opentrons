@@ -294,9 +294,10 @@ jobs:
       - name: 'detect build data for notification'
         id: names
         run: |
-          _windows_build=$(basename $(ls ./to_upload/opentrons-*/Opentrons-OT3*.exe))
-          _mac_build=$(basename $(ls ./to_upload/opentrons-*/Opentrons-OT3*.dmg))
-          _linux_build=$(basename $(ls ./to_upload/opentrons-*/Opentrons-OT3*.Appimage))
+          ls ./to_upload
+          _windows_build=$(basename $(ls ./to_upload/Opentrons-OT3*.exe))
+          _mac_build=$(basename $(ls ./to_upload/Opentrons-OT3*.dmg))
+          _linux_build=$(basename $(ls ./to_upload/Opentrons-OT3*.Appimage))
           if [[ -e latest.yml ]] ; then
               echo "TYPE=release" >> $GITHUB_OUTPUT
           else
