@@ -1,4 +1,4 @@
-""" opentrons_shared_data.module: functions and types for module defs """
+""" opentrons_shared_data.command: functions command schemas """
 from pathlib import Path
 import json
 import os
