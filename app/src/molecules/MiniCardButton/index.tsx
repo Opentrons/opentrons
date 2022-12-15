@@ -14,8 +14,8 @@ import { StyledText } from '../../atoms/text'
 
 import type { IconName } from '@opentrons/components'
 
-// Note: kj
-interface MiniCardButtonProps {
+// Note: kj width & height default values would be changed in hi-fi
+export interface MiniCardButtonProps {
   width?: string
   height?: string
   iconName: IconName
@@ -24,7 +24,7 @@ interface MiniCardButtonProps {
 }
 
 export function MiniCardButton({
-  width = '14rem',
+  width = '19rem',
   height = '9.375rem',
   iconName,
   cardName,
@@ -46,7 +46,7 @@ export function MiniCardButton({
       <Icon
         name={iconName}
         size="3rem"
-        data-testid={`miniCardButton_${iconName}`}
+        data-testid={`miniCardButton_${String(iconName)}`}
       />
       <StyledText
         marginTop={SPACING.spacing5}
