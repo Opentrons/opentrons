@@ -18,6 +18,7 @@ class Plot:
         self.PLOT_PATH = "plot_pipette_calibration/"
         self.PLOT_FORMAT = ".png"
         self.axes = ["X", "Y"]
+        self.jog_offset = 2 # mm
         self.plot_param = {
             "figure":None,
             "filename":None,
@@ -38,8 +39,8 @@ class Plot:
         df = pd.read_csv(file)
         self.total_cycles = df["Cycle"].max()
         self.slot = df["Slot"].iloc[0]
-        df["X Zeroed"] = round(df["X Gauge"] - df["X Zero"] - (self.PROBE_DIA/2 + 2), 3)
-        df["Y Zeroed"] = round(df["Y Gauge"] - df["Y Zero"] - (self.PROBE_DIA/2 + 2), 3)
+        df["X Zeroed"] = round(df["X Gauge"] - df["X Zero"] - (self.PROBE_DIA/2 + self.jog_offset), 3)
+        df["Y Zeroed"] = round(df["Y Gauge"] - df["Y Zero"] - (self.PROBE_DIA/2 + self.jog_offset), 3)
         df.name = file
         return df
 
@@ -53,6 +54,9 @@ class Plot:
         self.deck_height_plot()
         print("Plotting Slot Center...")
         self.slot_center_plot()
+        print("Plotting Axis Center...")
+        for idx, axis in enumerate(self.axes):
+            self.axis_center_plot(axis, idx)
         print("Plotting Gauge Data...")
         for idx, axis in enumerate(self.axes):
             self.gauge_plot(axis, idx)
@@ -172,6 +176,61 @@ class Plot:
         self.plot_param["y_range"] = [y_avg - y_off, y_avg + y_off]
         self.plot_param["legend"] = "Data"
         self.plot_param["annotation"] = None
+        self.write_plot(self.plot_param)
+
+    def axis_center_plot(self, axis, index):
+        df = self.df_data
+        x_axis = "Cycle"
+        y_axis = f"{axis} Center"
+        x_start = df[x_axis].iloc[0]
+        x_end = df[x_axis].iloc[-1]
+        y_start = df[y_axis].iloc[0]
+        y_end = df[y_axis].iloc[-1]
+        x_avg = df[x_axis].mean()
+        y_avg = df[y_axis].mean()
+        x_off = 0.10
+        y_off = 0.10
+
+        y_min = round(df[y_axis].min(), 3)
+        y_min_id = df[y_axis].idxmin()
+        y_min_xpos = df.loc[y_min_id][x_axis].item()
+        y_min_text = f"{axis} Min = {y_min}mm"
+
+        y_max = round(df[y_axis].max(), 3)
+        y_max_id = df[y_axis].idxmax()
+        y_max_xpos = df.loc[y_max_id][x_axis].item()
+        y_max_text = f"{axis} Max = {y_max}mm"
+
+        y_avg = round(y_avg, 2)
+        y_avg_xpos = 0
+        y_avg_text = f"{axis} Avg = {y_avg}mm"
+
+        y_start = round(y_min, 2) - 0.05
+        y_end = round(y_max, 2) + 0.05
+
+        annotation_ymin = self.set_annotation(y_min_xpos, y_min, y_min_text, ax_pos=100, ay_pos=100)
+        annotation_ymax = self.set_annotation(y_max_xpos, y_max, y_max_text, ax_pos=100, ay_pos=-100)
+        annotation_yavg = self.set_annotation(y_avg_xpos, y_avg, y_avg_text, ax_pos=100, ay_pos=-100)
+
+        fig1 = px.line(df, x=x_axis, y=[y_axis], markers=True, color_discrete_sequence=self.list_colors[index:])
+        fig2 = px.line(x=[-self.LIMIT, self.LIMIT], y=[[y_avg, y_avg]], line_dash_sequence=["dash"], color_discrete_sequence=["black"])
+        self.set_legend(fig2, ["Average"])
+        subfig = make_subplots()
+        subfig.add_traces(fig1.data + fig2.data)
+        subfig.update_layout(
+            xaxis_tickmode = 'linear',
+            xaxis_tick0 = 0,
+            xaxis_dtick = 10,
+        )
+        self.plot_param["figure"] = subfig
+        self.plot_param["filename"] = f"plot_center_{axis}"
+        self.plot_param["title"] = f"{axis} Center Data"
+        self.plot_param["x_title"] = "Cycle Number"
+        self.plot_param["y_title"] = f"{axis} Center (mm)"
+        self.plot_param["x_range"] = [0, x_end]
+        self.plot_param["y_range"] = [y_avg - y_off, y_avg + y_off]
+        self.plot_param["legend"] = "Data"
+        self.plot_param["annotation"] = [annotation_ymin, annotation_ymax, annotation_yavg]
         self.write_plot(self.plot_param)
 
     def gauge_plot(self, axis, index, zero=False):
