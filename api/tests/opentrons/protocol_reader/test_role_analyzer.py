@@ -40,7 +40,6 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
         expected=RoleAnalysis(
             main_file=MainFile(name="protocol.py", contents=b"", path=None),
             labware_files=[],
-            labware_definitions=[],
         ),
     ),
     RoleAnalyzerSpec(
@@ -66,9 +65,6 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
                 ),
             ),
             labware_files=[],
-            labware_definitions=[
-                LabwareDefinition.construct()  # type: ignore[call-arg]
-            ],
         ),
     ),
     RoleAnalyzerSpec(
@@ -97,9 +93,6 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
                     path=Path("/dev/null/labware.json"),
                     data=LabwareDefinition.construct(),  # type: ignore[call-arg]
                 )
-            ],
-            labware_definitions=[
-                LabwareDefinition.construct(),  # type: ignore[call-arg]
             ],
         ),
     ),
@@ -134,9 +127,6 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
                 ),
             ),
             labware_files=[],
-            labware_definitions=[
-                LabwareDefinition.construct(version=1)  # type: ignore[call-arg]
-            ],
         ),
     ),
     RoleAnalyzerSpec(
@@ -146,7 +136,6 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
         expected=RoleAnalysis(
             main_file=MainFile(name="PROTOCOL.PY", contents=b"", path=None),
             labware_files=[],
-            labware_definitions=[],
         ),
     ),
     RoleAnalyzerSpec(
@@ -172,9 +161,6 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
                 ),
             ),
             labware_files=[],
-            labware_definitions=[
-                LabwareDefinition.construct()  # type: ignore[call-arg]
-            ],
         ),
     ),
 ]

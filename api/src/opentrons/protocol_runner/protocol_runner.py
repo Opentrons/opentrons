@@ -7,6 +7,7 @@ from opentrons.broker import Broker
 from opentrons.equipment_broker import EquipmentBroker
 from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
+from opentrons import protocol_reader
 from opentrons.protocol_reader import (
     ProtocolSource,
     PythonProtocolConfig,
@@ -99,7 +100,9 @@ class ProtocolRunner:
         """
         config = protocol_source.config
 
-        labware_definitions = protocol_source.labware_definitions
+        labware_definitions = await protocol_reader.extract_labware_definitions(
+            protocol_source=protocol_source
+        )
         for definition in labware_definitions:
             self._protocol_engine.add_labware_definition(definition)
 

@@ -10,10 +10,12 @@ from .protocol_source import (
     JsonProtocolConfig,
     PythonProtocolConfig,
 )
+from ._extract_labware_definitions import extract_labware_definitions
 
 __all__ = [
-    # main interface
+    # main interfaces
     "ProtocolReader",
+    "extract_labware_definitions",
     # input values
     "AbstractInputFile",
     # errors
