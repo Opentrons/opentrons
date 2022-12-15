@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import {
   useAttachedPipettes,
@@ -16,6 +17,7 @@ import type {
 import type { AttachedPipette } from '../../../redux/pipettes/types'
 
 export function useGenerateTaskList(robotName: string): TaskListProps {
+  const { t } = useTranslation(['robot_calibration', 'devices_landing'])
   const TASK_LIST_LENGTH = 3
   let taskIndex = 0
   let activeTaskIndices: [number, number] | null = null
@@ -36,7 +38,7 @@ export function useGenerateTaskList(robotName: string): TaskListProps {
   const deckTask: TaskProps = {
     activeIndex: activeTaskIndices,
     subTasks: [],
-    title: 'Deck Calibration',
+    title: t('deck_calibration'),
     description: '',
     taskIndex,
     cta: undefined,
@@ -49,15 +51,16 @@ export function useGenerateTaskList(robotName: string): TaskListProps {
       deckCalibrationData != null &&
       'lastModified' in deckCalibrationData &&
       deckCalibrationData.lastModified != null
-        ? `Last completed ${formatTimestamp(deckCalibrationData.lastModified)}`
+        ? t('last_completed_on', {
+            timestamp: formatTimestamp(deckCalibrationData.lastModified),
+          })
         : ''
     // todo(jb, 2022-12-14): wire up ctas to actually launch wizards (RAUT-292)
-    deckTask.cta = { label: 'Recalibrate', onClick: () => {} }
+    deckTask.cta = { label: t('recalibrate'), onClick: () => {} }
   } else {
     activeTaskIndices = [0, 0]
-    deckTask.description =
-      'Start with Deck Calibration, which is the basis for the rest of calibration.'
-    deckTask.cta = { label: 'Calibrate', onClick: () => {} }
+    deckTask.description = t('start_with_deck_calibration')
+    deckTask.cta = { label: t('calibrate'), onClick: () => {} }
   }
 
   taskList.taskList.push(deckTask)
@@ -70,14 +73,14 @@ export function useGenerateTaskList(robotName: string): TaskListProps {
     const pipetteTask: TaskProps = {
       activeIndex: activeTaskIndices,
       subTasks: [],
-      title: `${mount[0].toUpperCase() + mount.slice(1)} Mount`,
+      title: t(mount === 'left' ? 'left_mount' : 'right_mount'),
       description: '',
       taskIndex,
       taskListLength: TASK_LIST_LENGTH,
     }
 
     if (pipetteData == null) {
-      pipetteTask.description = 'Empty'
+      pipetteTask.description = t('empty')
       pipetteTask.isComplete = true
 
       taskList.taskList.push(pipetteTask)
@@ -86,7 +89,10 @@ export function useGenerateTaskList(robotName: string): TaskListProps {
       const displayName =
         (getPipetteModelSpecs(pipetteData.model)?.displayName as string) ?? ''
 
-      pipetteTask.description = `${displayName}, ${pipetteData.id}`
+      pipetteTask.description = t('pipette_name_and_serial', {
+        name: displayName,
+        serial: pipetteData.id,
+      })
 
       const tipLengthCalForPipette = tipLengthCalibrations?.find(
         cal => cal.pipette === pipetteData.id
@@ -99,14 +105,14 @@ export function useGenerateTaskList(robotName: string): TaskListProps {
         activeIndex: activeTaskIndices,
         subTaskIndex: 0,
         taskIndex,
-        title: 'Tip Length Calibration',
+        title: t('tip_length_calibration'),
         description: '',
       }
       const offsetSubTask: SubTaskProps = {
         activeIndex: activeTaskIndices,
         subTaskIndex: 1,
         taskIndex,
-        title: 'Pipette Offset Calibration',
+        title: t('pipette_offset_calibration'),
         description: '',
       }
 
@@ -117,16 +123,16 @@ export function useGenerateTaskList(robotName: string): TaskListProps {
         !offsetCalForPipette.status.markedBad
       ) {
         // all pipette calibrations are complete and valid, set the appropriate subTask values
-        tipLengthSubTask.footer = `Last completed ${formatTimestamp(
-          tipLengthCalForPipette.lastModified
-        )}`
-        tipLengthSubTask.cta = { label: 'Recalibrate', onClick: () => {} }
+        tipLengthSubTask.footer = t('last_completed_on', {
+          timestamp: formatTimestamp(tipLengthCalForPipette.lastModified),
+        })
+        tipLengthSubTask.cta = { label: t('recalibrate'), onClick: () => {} }
         tipLengthSubTask.isComplete = true
 
-        offsetSubTask.footer = `Last completed ${formatTimestamp(
-          offsetCalForPipette.lastModified
-        )}`
-        offsetSubTask.cta = { label: 'Recalibrate', onClick: () => {} }
+        offsetSubTask.footer = t('last_completed_on', {
+          timestamp: formatTimestamp(offsetCalForPipette.lastModified),
+        })
+        offsetSubTask.cta = { label: t('recalibrate'), onClick: () => {} }
         offsetSubTask.isComplete = true
 
         // also the parent pipette task can be marked as complete as well
@@ -154,15 +160,14 @@ export function useGenerateTaskList(robotName: string): TaskListProps {
             // only updating this if it is still null, otherwise we'd be forgetting about the previous task that already modified this
             activeTaskIndices = [taskIndex, 0]
           }
-          tipLengthSubTask.description =
-            'Calibrate the length if a tip on this pipette.'
-          tipLengthSubTask.cta = { label: 'Calibrate', onClick: () => {} }
+          tipLengthSubTask.description = t('calibrate_tip_length')
+          tipLengthSubTask.cta = { label: t('calibrate'), onClick: () => {} }
         } else {
           // the tip length calibration is present and valid
-          tipLengthSubTask.footer = `Last completed ${formatTimestamp(
-            tipLengthCalForPipette.lastModified
-          )}`
-          tipLengthSubTask.cta = { label: 'Recalibrate', onClick: () => {} }
+          tipLengthSubTask.footer = t('last_completed_on', {
+            timestamp: formatTimestamp(tipLengthCalForPipette.lastModified),
+          })
+          tipLengthSubTask.cta = { label: t('recalibrate'), onClick: () => {} }
           tipLengthSubTask.isComplete = true
         }
 
@@ -174,14 +179,16 @@ export function useGenerateTaskList(robotName: string): TaskListProps {
           if (activeTaskIndices === null) {
             activeTaskIndices = [taskIndex, 0]
           }
-          offsetSubTask.description = `Calibrate this pipette's offset while attached to the robot's ${mount} mount.`
-          offsetSubTask.cta = { label: 'Calibrate', onClick: () => {} }
+          offsetSubTask.description = t('pipette_offset_calibration_on_mount', {
+            mount,
+          })
+          offsetSubTask.cta = { label: t('calibrate'), onClick: () => {} }
         } else {
           // the tip length calibration is present and valid
-          offsetSubTask.footer = `Last completed ${formatTimestamp(
-            offsetCalForPipette.lastModified
-          )}`
-          offsetSubTask.cta = { label: 'Recalibrate', onClick: () => {} }
+          offsetSubTask.footer = t('last_completed_on', {
+            timestamp: formatTimestamp(offsetCalForPipette.lastModified),
+          })
+          offsetSubTask.cta = { label: t('recalibrate'), onClick: () => {} }
           offsetSubTask.isComplete = true
         }
 
