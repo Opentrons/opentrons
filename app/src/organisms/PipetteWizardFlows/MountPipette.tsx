@@ -68,13 +68,11 @@ export const MountPipette = (props: MountPipetteProps): JSX.Element => {
             backgroundSize={BACKGROUND_SIZE}
           />
         ) : (
-          <StyledText as="h1">
-            {t(
-              isSingleMountPipette
-                ? 'connect_and_screw_in_pipette'
-                : 'connect_96_channel'
-            )}
-          </StyledText>
+          t(
+            isSingleMountPipette
+              ? 'connect_and_screw_in_pipette'
+              : 'connect_96_channel'
+          )
         )
       }
       rightHandBody={

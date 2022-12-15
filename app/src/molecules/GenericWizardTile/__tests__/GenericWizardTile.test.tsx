@@ -16,7 +16,7 @@ describe('GenericWizardTile', () => {
   beforeEach(() => {
     props = {
       rightHandBody: <div>right hand body</div>,
-      bodyText: <div>body</div>,
+      bodyText: 'body',
       proceed: jest.fn(),
       proceedButtonText: <div>Continue</div>,
       header: 'header',

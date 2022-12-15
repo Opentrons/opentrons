@@ -44,7 +44,7 @@ describe('WizardHeader', () => {
   it('renders exit button as disabled when isDisabled is true', () => {
     props = {
       ...props,
-      isDisabled: true,
+      exitDisabled: true,
     }
     const { getByText, getByRole } = render(props)
     getByText('Tip Length Calibrations')

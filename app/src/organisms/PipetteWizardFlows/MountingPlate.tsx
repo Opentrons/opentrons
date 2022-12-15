@@ -21,15 +21,11 @@ export const MountingPlate = (
 
   return (
     <GenericWizardTile
-      header={
-        <StyledText as="p">
-          {t(
-            flowType === FLOWS.ATTACH
-              ? 'connect_mounting_plate'
-              : 'unscrew_and_detach'
-          )}
-        </StyledText>
-      }
+      header={t(
+        flowType === FLOWS.ATTACH
+          ? 'connect_mounting_plate'
+          : 'unscrew_and_detach'
+      )}
       rightHandBody={
         <img
           //  TODO(jr 12/2/22): update image

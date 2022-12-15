@@ -27,7 +27,7 @@ const CAPITALIZE_FIRST_LETTER_STYLE = css`
 export interface GenericWizardTileProps {
   rightHandBody: React.ReactNode
   bodyText: React.ReactNode
-  header: React.ReactNode
+  header: string | React.ReactNode
   getHelp?: string
   back?: () => void
   proceed?: () => void
@@ -95,7 +95,11 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
           flex="1"
           gridGap={SPACING.spacing3}
         >
-          {header}
+          {typeof header === 'string' ? (
+            <StyledText as="h1">{header}</StyledText>
+          ) : (
+            header
+          )}
           {bodyText}
         </Flex>
         <Flex flex="1" justifyContent={JUSTIFY_CENTER}>

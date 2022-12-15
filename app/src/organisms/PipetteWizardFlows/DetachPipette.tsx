@@ -70,13 +70,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
             backgroundSize={BACKGROUND_SIZE}
           />
         ) : (
-          <StyledText as="p">
-            {t(
-              isSingleMountPipette
-                ? 'loose_detach'
-                : 'unscrew_remove_96_channel'
-            )}
-          </StyledText>
+          t(isSingleMountPipette ? 'loose_detach' : 'unscrew_remove_96_channel')
         )
       }
       //  TODO(Jr, 11/8/22): replace image with correct one!

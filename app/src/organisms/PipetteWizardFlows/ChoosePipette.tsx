@@ -100,7 +100,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
           />
         ) : (
           <GenericWizardTile
-            header={<StyledText as="h1">{t('choose_pipette')}</StyledText>}
+            header={t('choose_pipette')}
             rightHandBody={
               <Flex
                 onClick={() => setSelectedPipette(NINETY_SIX_CHANNEL)}

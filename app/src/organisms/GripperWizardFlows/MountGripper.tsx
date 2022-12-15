@@ -37,9 +37,7 @@ export const MountGripper = (
     )
   return (
     <GenericWizardTile
-      header={
-        <StyledText as="p">{t('connect_and_screw_in_gripper')}</StyledText>
-      }
+      header={t('connect_and_screw_in_gripper')}
       rightHandBody={
         <StyledText>TODO image of gripper being mounted</StyledText>
       }

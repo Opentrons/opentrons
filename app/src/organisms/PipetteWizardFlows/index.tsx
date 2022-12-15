@@ -302,7 +302,7 @@ export const PipetteWizardFlows = (
         }
         header={
           <WizardHeader
-            isDisabled={isRobotMoving || isFetchingPipettes}
+            exitDisabled={isRobotMoving || isFetchingPipettes}
             title={wizardTitle}
             currentStep={currentStepIndex}
             totalSteps={totalStepCount}
