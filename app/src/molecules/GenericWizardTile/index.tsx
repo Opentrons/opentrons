@@ -27,13 +27,14 @@ const CAPITALIZE_FIRST_LETTER_STYLE = css`
 export interface GenericWizardTileProps {
   rightHandBody: React.ReactNode
   bodyText: React.ReactNode
-  header: string
+  header: string | React.ReactNode
   getHelp?: string
   back?: () => void
   proceed?: () => void
   proceedButtonText?: React.ReactNode
   proceedIsDisabled?: boolean
   proceedButton?: JSX.Element
+  backIsDisabled?: boolean
 }
 
 const GO_BACK_BUTTON_STYLE = css`
@@ -43,6 +44,11 @@ const GO_BACK_BUTTON_STYLE = css`
   &:hover {
     opacity: 70%;
   }
+`
+const GO_BACK_BUTTON_DISABLED_STYLE = css`
+  ${TYPOGRAPHY.pSemiBold};
+  color: ${COLORS.darkGreyEnabled};
+  opacity: 70%;
 `
 
 export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
@@ -56,6 +62,7 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
     proceedButtonText,
     proceedIsDisabled,
     proceedButton,
+    backIsDisabled,
   } = props
   const { t } = useTranslation('shared')
 
@@ -88,7 +95,11 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
           flex="1"
           gridGap={SPACING.spacing3}
         >
-          <StyledText as="h1">{header}</StyledText>
+          {typeof header === 'string' ? (
+            <StyledText as="h1">{header}</StyledText>
+          ) : (
+            header
+          )}
           {bodyText}
         </Flex>
         <Flex flex="1" justifyContent={JUSTIFY_CENTER}>
@@ -97,8 +108,16 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
       </Flex>
       <Flex justifyContent={buttonPositioning} alignItems={ALIGN_FLEX_END}>
         {back != null ? (
-          <Btn onClick={back}>
-            <StyledText css={GO_BACK_BUTTON_STYLE}>{t('go_back')}</StyledText>
+          <Btn onClick={back} disabled={backIsDisabled} aria-label="back">
+            <StyledText
+              css={
+                backIsDisabled
+                  ? GO_BACK_BUTTON_DISABLED_STYLE
+                  : GO_BACK_BUTTON_STYLE
+              }
+            >
+              {t('go_back')}
+            </StyledText>
           </Btn>
         ) : null}
         {getHelp != null ? <NeedHelpLink href={getHelp} /> : null}
