@@ -84,6 +84,18 @@ export const mockCompleteTipLengthCalibrations: TipLengthCalibration[] = [
   },
 ]
 
+export const mockIncompleteTipLengthCalibrations: TipLengthCalibration[] = [
+  {
+    tipLength: 0,
+    lastModified: '2022-01-03T12:00:00.000000+00:00',
+    tiprack: 'test_tip_rack',
+    pipette: 'test-right',
+    source: 'user',
+    status: { markedBad: false, source: null, markedAt: null },
+    id: 'test-tip-length-id-2',
+  },
+]
+
 export const mockCompletePipetteOffsetCalibrations: PipetteOffsetCalibration[] = [
   {
     pipette: 'test-left',

@@ -206,7 +206,7 @@ export function useGenerateTaskList(robotName: string): TaskListProps {
             onClick: () => {},
           }
         } else {
-          // the tip length calibration is present and valid
+          // the offset calibration is present and valid
           offsetSubTask.footer = t('robot_calibration:last_completed_on', {
             timestamp: formatTimestamp(offsetCalForPipette.lastModified),
           })

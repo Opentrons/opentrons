@@ -18,6 +18,8 @@ import {
   mockIncompleteDeckCalibration,
   mockSingleAttachedPipetteResponse,
   mockIncompletePipetteOffsetCalibrations,
+  mockIncompleteTipLengthCalibrations,
+  expectedTaskList,
 } from '../__fixtures__/taskListFixtures'
 import { i18n } from '../../../../i18n'
 
@@ -172,5 +174,61 @@ describe('useGenerateTaskList hook', () => {
     })
 
     expect(result.current.activeIndex).toEqual([0, 0])
+  })
+
+  it('returns descriptions for tasks that need to be completed', () => {
+    when(mockUseAttachedPipettes)
+      .calledWith()
+      .mockReturnValue(mockAttachedPipettesResponse)
+    when(mockUseDeckCalibrationData)
+      .calledWith('otie')
+      .mockReturnValue(mockIncompleteDeckCalibration) // isDeckCalibrated === false
+    when(mockUseTipLengthCalibrations)
+      .calledWith('otie')
+      .mockReturnValue(mockIncompleteTipLengthCalibrations) // left calibration missing
+    when(mockUsePipetteOffsetCalibrations)
+      .calledWith('otie')
+      .mockReturnValue(mockIncompletePipetteOffsetCalibrations) // right mount marked as bad
+    const { result } = renderHook(() => useGenerateTaskList('otie'), {
+      wrapper,
+    })
+
+    expect(result.current.taskList[0].description).toEqual(
+      'Start with Deck Calibration, which is the basis for the rest of calibration.'
+    )
+    expect(result.current.taskList[1].subTasks[0].description).toEqual(
+      'Calibrate the length of a tip on this pipette.'
+    )
+    expect(result.current.taskList[2].subTasks[1].description).toEqual(
+      "Calibrate this pipette's offset while attached to the robot's right mount."
+    )
+  })
+
+  it('returns timestamps for tasks that have been completed', () => {
+    when(mockUseAttachedPipettes)
+      .calledWith()
+      .mockReturnValue(mockAttachedPipettesResponse)
+    when(mockUseDeckCalibrationData)
+      .calledWith('otie')
+      .mockReturnValue(mockCompleteDeckCalibration)
+    when(mockUseTipLengthCalibrations)
+      .calledWith('otie')
+      .mockReturnValue(mockCompleteTipLengthCalibrations)
+    when(mockUsePipetteOffsetCalibrations)
+      .calledWith('otie')
+      .mockReturnValue(mockCompletePipetteOffsetCalibrations)
+    const { result } = renderHook(() => useGenerateTaskList('otie'), {
+      wrapper,
+    })
+
+    expect(result.current.taskList[0].footer).toEqual(
+      expectedTaskList.taskList[0].footer
+    )
+    expect(result.current.taskList[1].subTasks[0].footer).toEqual(
+      expectedTaskList.taskList[1].subTasks[0].footer
+    )
+    expect(result.current.taskList[2].subTasks[1].footer).toEqual(
+      expectedTaskList.taskList[2].subTasks[1].footer
+    )
   })
 })
