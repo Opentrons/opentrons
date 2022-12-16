@@ -67,8 +67,24 @@ export const getPipetteWizardSteps = (
   } else if (selectedPipette === NINETY_SIX_CHANNEL) {
     switch (flowType) {
       case FLOWS.CALIBRATE: {
-        //  TODO(jr 12/1/22): add the calibrate flow steps
-        return []
+        return [
+          {
+            section: SECTIONS.BEFORE_BEGINNING,
+            mount: mount,
+            flowType: flowType,
+          },
+          {
+            section: SECTIONS.ATTACH_PROBE,
+            mount: mount,
+            flowType: flowType,
+          },
+          {
+            section: SECTIONS.DETACH_PROBE,
+            mount: mount,
+            flowType: flowType,
+          },
+          { section: SECTIONS.RESULTS, mount: mount, flowType: flowType },
+        ]
       }
       case FLOWS.ATTACH: {
         let detachMount = mount
@@ -112,6 +128,21 @@ export const getPipetteWizardSteps = (
               flowType: flowType,
             },
             { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
+            {
+              section: SECTIONS.ATTACH_PROBE,
+              mount: mount,
+              flowType: flowType,
+            },
+            {
+              section: SECTIONS.DETACH_PROBE,
+              mount: mount,
+              flowType: flowType,
+            },
+            {
+              section: SECTIONS.RESULTS,
+              mount: mount,
+              flowType: FLOWS.CALIBRATE,
+            },
           ]
         } else {
           return [
@@ -135,7 +166,22 @@ export const getPipetteWizardSteps = (
               mount: mount,
               flowType: flowType,
             },
-            { section: SECTIONS.RESULTS, mount: mount, flowType: flowType },
+            { section: SECTIONS.RESULTS, mount: mount, flowType: FLOWS.ATTACH },
+            {
+              section: SECTIONS.ATTACH_PROBE,
+              mount: mount,
+              flowType: flowType,
+            },
+            {
+              section: SECTIONS.DETACH_PROBE,
+              mount: mount,
+              flowType: flowType,
+            },
+            {
+              section: SECTIONS.RESULTS,
+              mount: mount,
+              flowType: FLOWS.CALIBRATE,
+            },
           ]
         }
       }

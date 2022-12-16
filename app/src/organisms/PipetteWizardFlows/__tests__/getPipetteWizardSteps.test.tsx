@@ -165,6 +165,21 @@ describe('getPipetteWizardSteps', () => {
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },
+      {
+        section: SECTIONS.ATTACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.DETACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
     ] as PipetteWizardStep[]
 
     expect(
@@ -250,6 +265,21 @@ describe('getPipetteWizardSteps', () => {
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },
+      {
+        section: SECTIONS.ATTACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.DETACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
     ] as PipetteWizardStep[]
 
     expect(
@@ -264,7 +294,29 @@ describe('getPipetteWizardSteps', () => {
   })
   //  TODO(jr, 12/5/22): fix this test when the calibrate steps are added
   it('returns the corect array of info for calibrate pipette 96 channel', () => {
-    const mockDetachPipetteFlowSteps = [] as PipetteWizardStep[]
+    const mockCalibrateFlowSteps = [
+      {
+        section: SECTIONS.BEFORE_BEGINNING,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+      {
+        section: SECTIONS.ATTACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+      {
+        section: SECTIONS.DETACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+      {
+        section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+    ] as PipetteWizardStep[]
+
     expect(
       getPipetteWizardSteps(
         FLOWS.CALIBRATE,
@@ -273,6 +325,6 @@ describe('getPipetteWizardSteps', () => {
         false,
         mockAttachedPipettesNotEmpty
       )
-    ).toStrictEqual(mockDetachPipetteFlowSteps)
+    ).toStrictEqual(mockCalibrateFlowSteps)
   })
 })

@@ -149,4 +149,52 @@ describe('Results', () => {
     fireEvent.click(exit)
     expect(props.proceed).toHaveBeenCalled()
   })
+  it('renders the correct information when pipette wizard succeeds to calibrate in attach flow 96-channel', () => {
+    mockGetIsGantryEmpty.mockReturnValue(true)
+    props = {
+      ...props,
+      flowType: FLOWS.ATTACH,
+      selectedPipette: NINETY_SIX_CHANNEL,
+      currentStepIndex: 7,
+    }
+    const { getByText, getByRole, getByLabelText } = render(props)
+    getByText('Pipette Successfully Calibrated')
+    expect(getByLabelText('ot-check')).toHaveStyle(
+      `color: ${COLORS.successEnabled}`
+    )
+    getByRole('button', { name: 'Results_exit' }).click()
+    expect(props.proceed).toHaveBeenCalled()
+  })
+  it('renders the correct information when pipette wizard succeeds to calibrate in attach flow 96-channel with pipette attached initially ', () => {
+    mockGetIsGantryEmpty.mockReturnValue(true)
+    props = {
+      ...props,
+      flowType: FLOWS.ATTACH,
+      selectedPipette: NINETY_SIX_CHANNEL,
+      currentStepIndex: 9,
+    }
+    const { getByText, getByRole, getByLabelText } = render(props)
+    getByText('Pipette Successfully Calibrated')
+    expect(getByLabelText('ot-check')).toHaveStyle(
+      `color: ${COLORS.successEnabled}`
+    )
+    getByRole('button', { name: 'Results_exit' }).click()
+    expect(props.proceed).toHaveBeenCalled()
+  })
+  it('renders the correct information when pipette wizard succeeds to calibrate in attach flow single mount', () => {
+    mockGetIsGantryEmpty.mockReturnValue(true)
+    props = {
+      ...props,
+      flowType: FLOWS.ATTACH,
+      selectedPipette: SINGLE_MOUNT_PIPETTES,
+      currentStepIndex: 5,
+    }
+    const { getByText, getByRole, getByLabelText } = render(props)
+    getByText('Pipette Successfully Calibrated')
+    expect(getByLabelText('ot-check')).toHaveStyle(
+      `color: ${COLORS.successEnabled}`
+    )
+    getByRole('button', { name: 'Results_exit' }).click()
+    expect(props.proceed).toHaveBeenCalled()
+  })
 })
