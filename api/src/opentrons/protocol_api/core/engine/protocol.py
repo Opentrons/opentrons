@@ -384,7 +384,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         """Get all loaded module cores."""
         return list(self._module_cores_by_id.values())
 
-    def create_liquid(
+    def add_liquid(
         self, display_name: str, description: str, display_color: str
     ) -> Liquid:
         """create a liquid to load into a labware."""

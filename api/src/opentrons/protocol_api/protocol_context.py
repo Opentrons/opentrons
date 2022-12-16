@@ -740,17 +740,17 @@ class ProtocolContext(CommandPublisher):
         self._implementation.set_rail_lights(on=on)
 
     @requires_version(2, 13)
-    def create_liquid(
+    def add_liquid(
         self, display_name: str, description: str, display_color: str
     ) -> Liquid:
         """
-        Create a liquid in a protocol.
+        Add a liquid to the protocol.
 
         :param str display_name: An human-readable name for this liquid.
         :param str description: A description of this liquid.
         :param str display_color: An optional Hex color code, with hash included, to represent the specified liquid. Standard three-value, four-value, six-value, and eight-value syntax are all acceptable.
         """
-        return self._implementation.create_liquid(
+        return self._implementation.add_liquid(
             display_name=display_name,
             description=description,
             display_color=display_color,

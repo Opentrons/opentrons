@@ -421,10 +421,10 @@ class ProtocolContextImplementation(
         """Get the highest Z point of all deck items."""
         raise NotImplementedError("LegacyProtocolCore.get_highest_z not implemented")
 
-    def create_liquid(
+    def add_liquid(
         self, display_name: str, description: str, display_color: str
     ) -> Liquid:
-        """Create a liquid to load on a labware."""
+        """Add a liquid to load on a labware."""
         raise UnsupportedAPIError(
             "Creating a liquid is not supported in this API version."
         )

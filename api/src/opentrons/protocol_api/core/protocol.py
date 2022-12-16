@@ -178,7 +178,7 @@ class AbstractProtocol(
         """Get all loaded module cores."""
 
     @abstractmethod
-    def create_liquid(
+    def add_liquid(
         self, display_name: str, description: str, display_color: str
     ) -> Liquid:
-        """create a liquid to load into a labware."""
+        """Add a liquid to load into a labware."""

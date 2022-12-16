@@ -2,7 +2,7 @@
 from typing import Optional, Type, cast, Tuple
 
 import pytest
-from decoy import Decoy
+from decoy import Decoy, matchers
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -644,18 +644,19 @@ def test_get_highest_z(
     assert result == 9001
 
 
-def test_create_liquid(
+def test_add_liquid(
     decoy: Decoy, mock_engine_client: EngineClient, subject: ProtocolCore
 ) -> None:
     """It should return the created liquid."""
-    liquid = Liquid.construct(  # type: ignore[call-arg]
+    liquid = Liquid.construct(
+        id=matchers.IsA(str),
         displayName="water",
         description="water desc",
         displayColor=HexColor(__root__="#fff"),
     )
     decoy.when(mock_engine_client.add_liquid(liquid)).then_return(liquid)
 
-    result = subject.create_liquid(
+    result = subject.add_liquid(
         display_name="water", description="water desc", display_color="#fff"
     )
     assert result == liquid
