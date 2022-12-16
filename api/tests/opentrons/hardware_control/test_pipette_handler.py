@@ -18,6 +18,7 @@ from opentrons.hardware_control.instruments.ot3.pipette_handler import (
 def mock_pipette(decoy: Decoy) -> Pipette:
     return decoy.mock(cls=Pipette)
 
+
 @pytest.fixture
 def mock_pipette_ot3(decoy: Decoy) -> OT3Pipette:
     return decoy.mock(cls=OT3Pipette)
@@ -28,6 +29,7 @@ def subject(decoy: Decoy, mock_pipette: Pipette) -> PipetteHandlerProvider:
     inst_by_mount = {types.Mount.LEFT: mock_pipette, types.Mount.RIGHT: None}
     subject = PipetteHandlerProvider(attached_instruments=inst_by_mount)
     return subject
+
 
 @pytest.fixture
 def subject_ot3(decoy: Decoy, mock_pipette: OT3Pipette) -> OT3PipetteHandlerProvider:
@@ -70,7 +72,8 @@ def test_plan_check_pick_up_tip_with_presses_argument(
 
 
 @pytest.mark.parametrize(
-    "presses_input, expected_array_length, channels", [(0, 0, 96), (None, 3, 8), (3, 3, 1)]
+    "presses_input, expected_array_length, channels",
+    [(0, 0, 96), (None, 3, 8), (3, 3, 1)],
 )
 def test_plan_check_pick_up_tip_with_presses_argument_ot3(
     decoy: Decoy,
@@ -78,7 +81,7 @@ def test_plan_check_pick_up_tip_with_presses_argument_ot3(
     mock_pipette_ot3: Pipette,
     presses_input: int,
     expected_array_length: int,
-    channels: int
+    channels: int,
 ) -> None:
     """Should return an array with expected length."""
     tip_length = 25.0

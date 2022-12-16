@@ -13,7 +13,11 @@ from opentrons.hardware_control.types import (
 )
 import numpy as np
 
-from opentrons_hardware.firmware_bindings.constants import NodeId, SensorId, PipetteTipActionType
+from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
+    SensorId,
+    PipetteTipActionType,
+)
 from opentrons_hardware.hardware_control.motion_planning import (
     AxisConstraints,
     SystemConstraints,
@@ -238,15 +242,18 @@ def create_home_group(
     return move_group
 
 
-def create_tip_action_group(axes: Sequence[OT3Axis], distance: float, velocity: float, action: PipetteAction) -> MoveGroup:
+def create_tip_action_group(
+    axes: Sequence[OT3Axis], distance: float, velocity: float, action: PipetteAction
+) -> MoveGroup:
     current_nodes = [axis_to_node(ax) for ax in axes]
     step = create_tip_action_step(
         velocity={node_id: np.float64(velocity) for node_id in current_nodes},
         distance={node_id: np.float64(distance) for node_id in current_nodes},
         present_nodes=current_nodes,
-        action=PipetteTipActionType[action]
-        )
+        action=PipetteTipActionType[action],
+    )
     return [step]
+
 
 def create_gripper_jaw_grip_group(
     duty_cycle: float,

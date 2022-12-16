@@ -1306,18 +1306,30 @@ class OT3API(
         if spec.pick_up_motor_actions:
             async with self._backend.restore_current():
                 await self._backend.set_active_current(
-                    {axis: current for axis, current in spec.pick_up_motor_actions.currents.items()}
+                    {
+                        axis: current
+                        for axis, current in spec.pick_up_motor_actions.currents.items()
+                    }
                 )
                 # Move to pick up position
                 target_down = target_position_from_relative(
-                    realmount, spec.pick_up_motor_actions.tiprack_down, self._current_position
+                    realmount,
+                    spec.pick_up_motor_actions.tiprack_down,
+                    self._current_position,
                 )
                 await self._move(target_down)
                 # perform pick up tip
-                await self._backend.tip_action([OT3Axis.by_mount(mount)], spec.pick_up_motor_actions.pick_up_distance, spec.pick_up_motor_actions.speed, "pick_up")
+                await self._backend.tip_action(
+                    [OT3Axis.by_mount(mount)],
+                    spec.pick_up_motor_actions.pick_up_distance,
+                    spec.pick_up_motor_actions.speed,
+                    "pick_up",
+                )
                 # # Move to pick up position
                 target_up = target_position_from_relative(
-                    realmount, spec.pick_up_motor_actions.tiprack_up, self._current_position
+                    realmount,
+                    spec.pick_up_motor_actions.tiprack_up,
+                    self._current_position,
                 )
                 await self._move(target_up)
 
@@ -1346,7 +1358,6 @@ class OT3API(
         await self.retract(realmount, spec.retract_target)
 
         _add_tip_to_instrs()
-
 
         if prep_after:
             await self.prepare_for_aspirate(realmount)
@@ -1385,11 +1396,16 @@ class OT3API(
                 }
             )
 
-            if move.is_ht_tip_action:
-                await self._backend.tip_action([OT3Axis.by_mount(mount)], move.target_position, move.speed, "drop")
+            if move.is_ht_tip_action and move.speed:
+                # The speed check is needed because speed can sometimes be None.
+                # Not sure why
+                await self._backend.tip_action(
+                    [OT3Axis.by_mount(mount)], move.target_position, move.speed, "drop"
+                )
             else:
                 target_pos = target_position_from_plunger(
-                    realmount, move.target_position, self._current_position)
+                    realmount, move.target_position, self._current_position
+                )
                 await self._move(
                     target_pos,
                     speed=move.speed,

@@ -266,8 +266,16 @@ class OT3Simulator:
     ) -> None:
         _ = create_gripper_jaw_hold_group(encoder_position_um)
 
-    async def tip_action(self, axes: Sequence[OT3Axis], distance: float = 33, speed: float = -5.5, tip_action: str="drop") -> None:
-        _ = create_tip_action_group(axes, distance, speed, cast(PipetteAction, tip_action))
+    async def tip_action(
+        self,
+        axes: Sequence[OT3Axis],
+        distance: float = 33,
+        speed: float = -5.5,
+        tip_action: str = "drop",
+    ) -> None:
+        _ = create_tip_action_group(
+            axes, distance, speed, cast(PipetteAction, tip_action)
+        )
 
     def _attached_to_mount(
         self, mount: OT3Mount, expected_instr: Optional[PipetteName]
