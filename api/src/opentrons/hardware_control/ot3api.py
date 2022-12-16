@@ -1320,7 +1320,7 @@ class OT3API(
                 await self._move(target_down)
                 # perform pick up tip
                 await self._backend.tip_action(
-                    [OT3Axis.by_mount(mount)],
+                    [OT3Axis.of_main_tool_actuator(mount)],
                     spec.pick_up_motor_actions.pick_up_distance,
                     spec.pick_up_motor_actions.speed,
                     "pick_up",
