@@ -657,8 +657,8 @@ class PipetteHandlerProvider:
                     retract_target=instrument.pick_up_configurations.distance,
                     pick_up_motor_actions=TipMotorPickUpTipSpec(
                         # Move onto the posts
-                        tiprack_down=top_types.Point(0, 0, 5),
-                        tiprack_up=top_types.Point(0, 0, -7),
+                        tiprack_down=top_types.Point(0, 0, -5),
+                        tiprack_up=top_types.Point(0, 0, 7),
                         pick_up_distance=instrument.pick_up_configurations.distance,
                         speed=instrument.pick_up_configurations.speed,
                         currents={OT3Axis.Q: instrument.pick_up_configurations.current},
