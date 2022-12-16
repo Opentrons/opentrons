@@ -1,5 +1,5 @@
 """Shared utilities for ot3 hardware control."""
-from typing import Dict, Iterable, List, Tuple, TypeVar
+from typing import Dict, Iterable, List, Tuple, TypeVar, Sequence
 from typing_extensions import Literal
 from opentrons.config.types import OT3MotionSettings, OT3CurrentSettings, GantryLoad
 from opentrons.hardware_control.types import (
@@ -238,7 +238,7 @@ def create_home_group(
     return move_group
 
 
-def create_tip_action_group(axes: List[OT3Axis], distance: float, velocity: float, action: PipetteAction) -> MoveGroup:
+def create_tip_action_group(axes: Sequence[OT3Axis], distance: float, velocity: float, action: PipetteAction) -> MoveGroup:
     current_nodes = [axis_to_node(ax) for ax in axes]
     step = create_tip_action_step(
         velocity={node_id: np.float64(velocity) for node_id in current_nodes},

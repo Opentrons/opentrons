@@ -34,6 +34,7 @@ from .ot3utils import (
     create_gripper_jaw_home_group,
     create_gripper_jaw_hold_group,
     create_tip_action_group,
+    PipetteAction,
 )
 
 try:
@@ -373,7 +374,7 @@ class OT3Controller:
         return await self.home(axes)
 
     async def tip_action(self, axes: Sequence[OT3Axis], distance: float = 33, speed: float = -5.5, tip_action: str="drop") -> None:
-        move_group = create_tip_action_group(axes, distance, speed, tip_action)
+        move_group = create_tip_action_group(axes, distance, speed, cast(PipetteAction, tip_action))
         runner = MoveGroupRunner(move_groups=[move_group])
         positions = await runner.run(can_messenger=self._messenger)
         for axis, point in positions.items():

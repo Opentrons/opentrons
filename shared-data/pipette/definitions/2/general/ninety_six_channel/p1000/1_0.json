@@ -4,14 +4,14 @@
   "model": "p1000",
   "displayCategory": "GEN3",
   "pickUpTipConfigurations": {
-    "current": 0.4,
-    "presses": 1,
+    "current": 1.5,
+    "presses": 0.0,
     "speed": 10,
-    "increment": 0.5,
-    "distance": 1.0
+    "increment": 0.0,
+    "distance": 13.75
   },
   "dropTipConfigurations": {
-    "current": 1.0,
+    "current": 1.5,
     "speed": 10
   },
   "plungerMotorConfigurations": {
