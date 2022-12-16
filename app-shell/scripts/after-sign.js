@@ -2,16 +2,13 @@
 
 const path = require('path')
 const { notarize } = require('electron-notarize')
-const config = require('../electron-builder.config')
 
-const { APPLE_ID, APPLE_ID_PASSWORD } = process.env
+const { APPLE_ID, APPLE_ID_PASSWORD, APPLE_TEAM_ID } = process.env
 const DEV_MODE = process.env.NODE_ENV !== 'production'
 const PLATFORM_DARWIN = 'darwin'
 
 module.exports = async function afterSign(context) {
   const { electronPlatformName, appOutDir } = context
-  const appId = (await config()).appId
-  console.log(`Signing appId: ${appId}`)
   if (
     process.platform !== PLATFORM_DARWIN ||
     electronPlatformName !== PLATFORM_DARWIN
@@ -40,9 +37,10 @@ module.exports = async function afterSign(context) {
   console.log(`Submitting app for notarization: ${appPath}`)
 
   return await notarize({
-    appBundleId: appId,
+    tool: 'notarytool',
     appleId: APPLE_ID,
     appleIdPassword: APPLE_ID_PASSWORD,
+    teamId: APPLE_TEAM_ID,
     appPath,
   })
 }
