@@ -34,6 +34,7 @@ class MoveType(int, Enum):
             MoveStopCondition.cap_sensor: cls.calibration,
             MoveStopCondition.encoder_position: cls.linear,
             MoveStopCondition.gripper_force: cls.grip,
+            MoveStopCondition.stall: cls.linear,
         }
         return mapping[condition]
 

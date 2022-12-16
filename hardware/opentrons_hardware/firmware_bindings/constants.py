@@ -263,3 +263,4 @@ class MoveStopCondition(int, Enum):
     cap_sensor = 0x2
     encoder_position = 0x4
     gripper_force = 0x5
+    stall = 0x6
