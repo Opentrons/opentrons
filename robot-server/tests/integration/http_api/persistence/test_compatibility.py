@@ -21,9 +21,7 @@ class Snapshot(BaseModel):
     @property
     def db_path(self) -> Path:
         """Path of the DB."""
-        # FIXME(mm, 2022-09-09): This assumes the current working directory is
-        # the root project directory. See Jira RSS-104.
-        return Path(f"tests/integration/persistence_snapshots/{self.version}")
+        return Path(PERSISTENCE_SNAPSHOTS_DIR, self.version)
 
 
 class Snapshots:
