@@ -12,7 +12,6 @@ from typing import (
     Sequence,
     Iterator,
     TypeVar,
-    Union,
 )
 from typing_extensions import Final
 from opentrons_shared_data.pipette.dev_types import UlPerMmAction
