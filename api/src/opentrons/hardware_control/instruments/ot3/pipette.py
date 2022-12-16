@@ -261,9 +261,11 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         # Temporary solution for the 96 channel critical point locations.
         # We should instead record every channel "critical point" in
         # the pipette configurations.
+        DIRECTION_VALUE = 1
         if self.channels.value == 96:
             NUM_ROWS = 12
             NUM_COLS = 8
+            DIRECTION_VALUE = -1
         elif self.channels.value == 8:
             NUM_ROWS = 1
             NUM_COLS = 8
@@ -271,8 +273,8 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             NUM_ROWS = 1
             NUM_COLS = 1
 
-        x_offset_to_right_nozzle = INTERNOZZLE_SPACING_MM * (NUM_ROWS - 1)
-        y_offset_to_front_nozzle = INTERNOZZLE_SPACING_MM * (NUM_COLS - 1)
+        x_offset_to_right_nozzle = DIRECTION_VALUE * INTERNOZZLE_SPACING_MM * (NUM_ROWS - 1)
+        y_offset_to_front_nozzle = DIRECTION_VALUE * INTERNOZZLE_SPACING_MM * (NUM_COLS - 1)
 
         if cp_override in [
             CriticalPoint.GRIPPER_JAW_CENTER,
