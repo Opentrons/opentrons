@@ -6,6 +6,8 @@ from pydantic import BaseModel, Field
 from tests.integration.dev_server import DevServer
 from tests.integration.robot_client import RobotClient
 
+from .persistence_snapshots_dir import PERSISTENCE_SNAPSHOTS_DIR
+
 
 class Snapshot(BaseModel):
     """Model to describe a database snapshot."""

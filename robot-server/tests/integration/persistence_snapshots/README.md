@@ -20,3 +20,8 @@ It includes these protocols, which were uploaded by manually issuing HTTP `POST`
 The JSON protocols were chosen to cover a wide breadth of Protocol Engine commands.
 
 Each protocol has one completed analysis and one successful run. multipleTipracksWithTC.json also has one failed run from a mismatched pipette error.
+
+## corrupt
+
+Contains an invalid SQLite database file, to simulate a database that's been corrupted.
+
