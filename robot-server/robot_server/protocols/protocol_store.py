@@ -406,7 +406,7 @@ async def _compute_protocol_sources(
         #  * We don't try to compute the source of any protocol whose insertion
         #    failed halfway through and left files behind.
         protocol_files = [Path(f) async for f in protocol_subdirectory.iterdir()]
-        protocol_source = await protocol_reader.read_saved(
+        protocol_source = await protocol_reader.read_saved_prevalidated(
             files=protocol_files, directory=Path(protocol_subdirectory)
         )
         sources_by_id[protocol_id] = protocol_source

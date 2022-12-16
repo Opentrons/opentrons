@@ -39,13 +39,17 @@ class ProtocolReader:
     ) -> ProtocolSource:
         """Compute a `ProtocolSource` from file-like objects and save them as files.
 
+        The input is parsed and statically analyzed to ensure it's basically
+        well-formed--for example, labware definition files must conform to the labware
+        definition schema.
+
         Arguments:
             files: List of files-like objects. Do not attempt to reuse any objects
                 objects in this list once they've been passed to the ProtocolReader.
             directory: Name of the directory to create and place files in.
 
         Returns:
-            A validated ProtocolSource.
+            A ProtocolSource describing the validated protocol.
 
         Raises:
             ProtocolFilesInvalidError: Input file list given to the reader
@@ -85,12 +89,16 @@ class ProtocolReader:
     ) -> ProtocolSource:
         """Compute a `ProtocolSource` from protocol source files on the filesystem.
 
+        The input is parsed and statically analyzed to ensure it's basically
+        well-formed--for example, labware definition files must conform to the labware
+        definition schema.
+
         Arguments:
             files: The files comprising the protocol.
             directory: Passed through to `ProtocolSource.directory`. Otherwise unused.
 
         Returns:
-            A validated ProtocolSource.
+            A ProtocolSource describing the validated protocol.
 
         Raises:
             ProtocolFilesInvalidError: Input file list given to the reader
@@ -127,3 +135,20 @@ class ProtocolReader:
             config=config_analysis.config,
             metadata=config_analysis.metadata,
         )
+
+    async def read_saved_prevalidated(
+        self,
+        files: Sequence[Path],
+        directory: Path,
+    ) -> ProtocolSource:
+        """Compute a `ProtocolSource` from already-validated protocol source files.
+
+        This is just like `read_saved()`, except it assumes the input represents
+        a protocol that's known to be valid. And instead of fully parsing and statically
+        analyzing, it only does the minimum required to extract the stuff for the
+        `ProtocolSource`.
+
+        So this is faster, but it should only be used with input that's already
+        been fully validated by this class at least once before.
+        """
+        raise NotImplementedError()
