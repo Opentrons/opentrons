@@ -20,6 +20,7 @@ from opentrons.hardware_control.types import (
     OT3Mount,
     InvalidPipetteName,
     InvalidPipetteModel,
+    MotorStatus,
 )
 from opentrons_hardware.firmware_bindings.utils import UInt8Field
 
@@ -126,7 +127,7 @@ home_test_params = [
 def move_group_run_side_effect(controller, axes_to_home):
     """Return homed position for axis that is present and was commanded to home."""
     gantry_homes = {
-        axis_to_node(ax): (0.0, 0.0)
+        axis_to_node(ax): (0.0, 0.0, True, True)
         for ax in OT3Axis.gantry_axes()
         if ax in axes_to_home and axis_to_node(ax) in controller._present_nodes
     }
@@ -134,7 +135,7 @@ def move_group_run_side_effect(controller, axes_to_home):
         yield gantry_homes
 
     pipette_homes = {
-        axis_to_node(ax): (0.0, 0.0)
+        axis_to_node(ax): (0.0, 0.0, True, True)
         for ax in OT3Axis.pipette_axes()
         if ax in axes_to_home and axis_to_node(ax) in controller._present_nodes
     }
@@ -147,7 +148,7 @@ async def test_home_execute(
 ):
     mock_move_group_run.side_effect = move_group_run_side_effect(controller, axes)
     # nothing has been homed
-    assert len(controller._homed_nodes) == 0
+    assert not controller._motor_status
 
     commanded_homes = set(axes)
     await controller.home(axes)
@@ -162,7 +163,7 @@ async def test_home_execute(
     assert not commanded_homes
 
     # all commanded axes have been homed
-    assert controller._homed_nodes == set(axis_to_node(ax) for ax in axes)
+    assert all(controller._motor_status[axis_to_node(ax)].motor_ok for ax in axes)
     assert controller.check_ready_for_movement(axes)
 
 
@@ -172,7 +173,7 @@ async def test_home_prioritize_mount(
 ):
     mock_move_group_run.side_effect = move_group_run_side_effect(controller, axes)
     # nothing has been homed
-    assert not len(controller._homed_nodes)
+    assert not controller._motor_status
 
     await controller.home(axes)
     has_xy = len({OT3Axis.X, OT3Axis.Y} & set(axes)) > 0
@@ -188,7 +189,7 @@ async def test_home_prioritize_mount(
         assert len(run) == 1
 
     # all commanded axes have been homed
-    assert controller._homed_nodes == set(axis_to_node(ax) for ax in axes)
+    assert all(controller._motor_status[axis_to_node(ax)].motor_ok for ax in axes)
     assert controller.check_ready_for_movement(axes)
 
 
@@ -197,7 +198,7 @@ async def test_home_build_runners(
     controller: OT3Controller, mock_move_group_run, axes, mock_present_nodes
 ):
     mock_move_group_run.side_effect = move_group_run_side_effect(controller, axes)
-    assert not len(controller._homed_nodes)
+    assert not controller._motor_status
 
     await controller.home(axes)
     has_pipette = len(set(OT3Axis.pipette_axes()) & set(axes)) > 0
@@ -218,7 +219,7 @@ async def test_home_build_runners(
         mock_move_group_run.assert_awaited_once()
 
     # all commanded axes have been homed
-    assert controller._homed_nodes == set(axis_to_node(ax) for ax in axes)
+    assert all(controller._motor_status[axis_to_node(ax)].motor_ok for ax in axes)
     assert controller.check_ready_for_movement(axes)
 
 
@@ -244,8 +245,7 @@ async def test_home_only_present_nodes(
     mock_move_group_run.side_effect = move_group_run_side_effect(controller, axes)
 
     # nothing has been homed
-    assert not len(controller._homed_nodes)
-
+    assert not controller._motor_status
     await controller.home(axes)
 
     for call in mock_move_group_run.call_args_list:
@@ -267,8 +267,7 @@ async def test_home_only_present_nodes(
     for node, pos in controller._position.items():
         assert pos == expected_position[node]
     # check that the homed axis is tracked by _homed_nodes
-    assert len(controller._homed_nodes) == len(homed_position.keys())
-    assert controller._homed_nodes == homed_position.keys()
+    assert controller._motor_status.keys() == homed_position.keys()
 
 
 async def test_probing(
@@ -515,3 +514,37 @@ async def test_get_limit_switches(controller: OT3Controller) -> None:
         assert passed_nodes == {NodeId.gantry_x, NodeId.gantry_y}
         assert OT3Axis.X in res
         assert OT3Axis.Y in res
+
+
+@pytest.mark.parametrize(
+    "motor_status,ready",
+    [
+        ({}, False),
+        ({NodeId.gripper_g: MotorStatus(True, True)}, False),
+        (
+            {
+                NodeId.gantry_x: MotorStatus(True, True),
+                NodeId.gantry_y: MotorStatus(True, True),
+                NodeId.head_l: MotorStatus(False, True),
+            },
+            False,
+        ),
+        (
+            {
+                NodeId.gantry_x: MotorStatus(True, True),
+                NodeId.gantry_y: MotorStatus(True, True),
+                NodeId.head_l: MotorStatus(True, True),
+            },
+            True,
+        ),
+    ],
+)
+async def test_ready_for_movement(
+    controller: OT3Controller,
+    motor_status: MotorStatus,
+    ready: bool,
+) -> None:
+    controller._motor_status = motor_status
+
+    axes = [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L]
+    assert controller.check_ready_for_movement(axes) == ready

@@ -249,7 +249,7 @@ async def test_move_to_without_homing_first(
         instr_data = AttachedGripper(config=gripper_config, id="test")
         await ot3_hardware.cache_gripper(instr_data)
 
-    ot3_hardware._backend._homed_nodes = set()
+    ot3_hardware._backend._motor_status = {}
     assert not ot3_hardware._backend.check_ready_for_movement(homed_axis)
 
     await ot3_hardware.move_to(
