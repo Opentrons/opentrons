@@ -38,26 +38,15 @@ import { TertiaryButton } from '../../atoms/buttons'
 import type { UpdatedRobotName } from '@opentrons/api-client'
 import type { State, Dispatch } from '../../redux/types'
 
+// Note: kj 12/15/2022 the current input field is optimized for the desktop
+// Need to update the InputField for the ODD app
+// That will be done in another PR
 const INPUT_FIELD_ODD_STYLE = css`
   padding-top: ${SPACING.spacingXXL};
   padding-bottom: ${SPACING.spacingXXL};
   font-size: 2.5rem;
   line-height: 3.25rem;
-  border: none;
-  outline: none;
   text-align: center;
-  &:focus-visible {
-    border: none;
-    outline: none;
-  }
-  &:focus {
-    border: none;
-    outline: none;
-  }
-  &:active {
-    border: none;
-    outline: none;
-  }
 `
 
 interface FormikErrors {
