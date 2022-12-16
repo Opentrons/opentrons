@@ -239,8 +239,8 @@ describe('BeforeBeginning', () => {
       expect(props.chainRunCommands).toHaveBeenCalledWith(
         [
           {
-            commandType: 'home',
-            params: {},
+            commandType: 'calibration/moveToMaintenancePosition',
+            params: { mount: LEFT },
           },
         ],
         false
@@ -273,10 +273,6 @@ describe('BeforeBeginning', () => {
       expect(props.chainRunCommands).toHaveBeenCalledWith(
         [
           {
-            commandType: 'home',
-            params: {},
-          },
-          {
             commandType: 'loadPipette',
             params: {
               mount: LEFT,
@@ -285,8 +281,8 @@ describe('BeforeBeginning', () => {
             },
           },
           {
-            commandType: 'calibration/moveToLocation',
-            params: { pipetteId: 'abc', location: 'attachOrDetach' },
+            commandType: 'calibration/moveToMaintenancePosition',
+            params: { mount: LEFT },
           },
         ],
         false

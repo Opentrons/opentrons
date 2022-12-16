@@ -17,6 +17,7 @@ import { ConfirmRobotName } from '../pages/OnDeviceDisplay/ConfirmRobotName'
 import { InitialSplash } from '../pages/OnDeviceDisplay/InitialSplash'
 import { NameRobot } from '../pages/OnDeviceDisplay/NameRobot'
 import { NetworkSetupMenu } from '../pages/OnDeviceDisplay/NetworkSetupMenu'
+import { TempODDMenu } from '../pages/OnDeviceDisplay/TempODDMenu'
 import { RobotDashboard } from '../pages/OnDeviceDisplay/RobotDashboard'
 import { SelectWifiNetwork } from '../pages/OnDeviceDisplay/SelectWifiNetwork'
 import { SetWifiCred } from '../pages/OnDeviceDisplay/SetWifiCred'
@@ -30,6 +31,12 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     exact: true,
     name: 'Initial Splash',
     path: '/',
+  },
+  {
+    Component: TempODDMenu,
+    exact: true,
+    name: 'Temp ODD Menu',
+    path: '/menu',
   },
   {
     Component: RobotDashboard,

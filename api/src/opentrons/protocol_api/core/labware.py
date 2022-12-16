@@ -12,7 +12,7 @@ from opentrons_shared_data.labware.dev_types import (
 
 from opentrons.protocols.geometry.labware_geometry import AbstractLabwareGeometry
 from opentrons.protocols.api_support.tip_tracker import TipTracker
-from opentrons.types import Point
+from opentrons.types import DeckSlotName, Point
 
 from .well import WellCoreType
 
@@ -148,6 +148,10 @@ class AbstractLabware(ABC, Generic[WellCoreType]):
     @abstractmethod
     def get_well_core(self, well_name: str) -> WellCoreType:
         """Get a well core interface to a given well in this labware."""
+
+    @abstractmethod
+    def get_deck_slot(self) -> Optional[DeckSlotName]:
+        """Get the deck slot the labware or its parent is in, if any."""
 
 
 LabwareCoreType = TypeVar("LabwareCoreType", bound=AbstractLabware[Any])

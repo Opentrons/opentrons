@@ -8,6 +8,7 @@ from opentrons.hardware_control.modules import TemperatureStatus, SpeedStatus
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, HeaterShakerContext
 from opentrons.protocol_api.core.common import ProtocolCore, HeaterShakerCore
+from opentrons.protocol_api.core.core_map import LoadedCoreMap
 
 
 @pytest.fixture
@@ -20,6 +21,12 @@ def mock_core(decoy: Decoy) -> HeaterShakerCore:
 def mock_protocol_core(decoy: Decoy) -> ProtocolCore:
     """Get a mock protocol implementation core."""
     return decoy.mock(cls=ProtocolCore)
+
+
+@pytest.fixture
+def mock_core_map(decoy: Decoy) -> LoadedCoreMap:
+    """Get a mock LoadedCoreMap."""
+    return decoy.mock(cls=LoadedCoreMap)
 
 
 @pytest.fixture
@@ -39,12 +46,14 @@ def subject(
     api_version: APIVersion,
     mock_core: HeaterShakerCore,
     mock_protocol_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
     mock_broker: Broker,
 ) -> HeaterShakerContext:
     """Get a temperature module context with its dependencies mocked out."""
     return HeaterShakerContext(
         core=mock_core,
         protocol_core=mock_protocol_core,
+        core_map=mock_core_map,
         broker=mock_broker,
         api_version=api_version,
     )

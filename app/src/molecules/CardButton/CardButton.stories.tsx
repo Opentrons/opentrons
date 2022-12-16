@@ -2,7 +2,7 @@ import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { Flex, SPACING } from '@opentrons/components'
 import { GlobalStyle } from '../../atoms/GlobalStyle'
-import { CardButton } from './CardButton'
+import { CardButton } from '.'
 
 import type { Story, Meta } from '@storybook/react'
 

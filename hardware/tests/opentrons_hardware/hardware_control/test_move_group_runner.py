@@ -562,6 +562,14 @@ async def test_multi_group_move(
             expected_nodes.update(set((k.value, seq_id) for k in mgs.keys()))
         expected_nodes_list.append([NodeId(n) for n, s in expected_nodes])
 
+    # remove duplicates from the expected nodes lists
+    for i, enl in enumerate(expected_nodes_list):
+        res = []
+        for n in enl:
+            if n not in res:
+                res.append(n)
+        expected_nodes_list[i] = res
+
     mock_can_messenger.ensure_send.assert_has_calls(
         calls=[
             call(
@@ -641,6 +649,14 @@ async def test_multi_group_move_with_stale_complete(
         for seq_id, mgs in enumerate(movegroup):
             expected_nodes.update(set((k.value, seq_id) for k in mgs.keys()))
         expected_nodes_list.append([NodeId(n) for n, s in expected_nodes])
+
+    # remove duplicates from the expected nodes lists
+    for i, enl in enumerate(expected_nodes_list):
+        res = []
+        for n in enl:
+            if n not in res:
+                res.append(n)
+        expected_nodes_list[i] = res
 
     mock_can_messenger.ensure_send.assert_has_calls(
         calls=[
