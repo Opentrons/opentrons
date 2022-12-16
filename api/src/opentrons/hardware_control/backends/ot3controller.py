@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 import logging
 from copy import deepcopy
 from typing import (
+    Callable,
     Dict,
     List,
     Optional,
@@ -207,10 +208,12 @@ class OT3Controller:
         self._module_controls = module_controls
 
     def check_ready_for_movement(self, axes: Sequence[OT3Axis]) -> bool:
+        get_stat: Callable[
+            [Sequence[OT3Axis]], List[Optional[MotorStatus]]
+        ] = lambda ax: [self._motor_status.get(axis_to_node(a)) for a in ax]
         return all(
-            isinstance(self._motor_status.get(axis_to_node(a)), MotorStatus)
-            and self._motor_status.get(axis_to_node(a)).motor_ok
-            for a in axes
+            isinstance(status, MotorStatus) and status.motor_ok
+            for status in get_stat(axes)
         )
 
     async def update_position(self) -> OT3AxisMap[float]:

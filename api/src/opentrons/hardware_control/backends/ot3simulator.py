@@ -5,6 +5,7 @@ import asyncio
 from contextlib import asynccontextmanager
 import logging
 from typing import (
+    Callable,
     Dict,
     List,
     Optional,
@@ -190,7 +191,9 @@ class OT3Simulator:
         )
 
     def check_ready_for_movement(self, axes: Sequence[OT3Axis]) -> bool:
-        get_stat = lambda ax: [self._motor_status.get(axis_to_node(a)) for a in ax]
+        get_stat: Callable[
+            [Sequence[OT3Axis]], List[Optional[MotorStatus]]
+        ] = lambda ax: [self._motor_status.get(axis_to_node(a)) for a in ax]
         return all(
             isinstance(status, MotorStatus) and status.motor_ok
             for status in get_stat(axes)
