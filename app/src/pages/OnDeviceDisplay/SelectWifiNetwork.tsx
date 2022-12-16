@@ -14,6 +14,8 @@ import {
   JUSTIFY_CENTER,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
+  Btn,
+  COLORS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
@@ -27,6 +29,7 @@ import type { State, Dispatch } from '../../redux/types'
 const LIST_REFRESH_MS = 10000
 
 export function SelectWifiNetwork(): JSX.Element {
+  const { t } = useTranslation('device_settings')
   const [isSearching, setIsSearching] = React.useState<boolean>(false)
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
@@ -60,26 +63,64 @@ export function SelectWifiNetwork(): JSX.Element {
             isSearching={isSearching}
           />
           {list.map(nw => (
-            <Flex
+            <Btn
+              backgroundColor="#d6d6d6"
+              key={nw.ssid}
               width="59rem"
               height="4rem"
-              flexDirection={DIRECTION_ROW}
-              padding={SPACING.spacing4}
-              key={nw.ssid}
-              backgroundColor="#d6d6d6"
-              alignItems={ALIGN_CENTER}
+              borderRadius="12px"
               marginBottom={SPACING.spacing3}
-              borderRadius="0.75rem"
-              onClick={() =>
-                history.push(`/network-setup/wifi/set-wifi-cred/${nw.ssid}`)
-              }
             >
-              <Icon name="wifi" size="2.25rem" />
-              <StyledText marginLeft={SPACING.spacing4} color="#000">
-                {nw.ssid}
+              <Flex
+                flexDirection={DIRECTION_ROW}
+                padding={SPACING.spacing4}
+                alignItems={ALIGN_CENTER}
+                onClick={() =>
+                  history.push(`/network-setup/wifi/set-wifi-cred/${nw.ssid}`)
+                }
+              >
+                <Icon
+                  name="wifi"
+                  size="2.25rem"
+                  color={COLORS.darkGreyEnabled}
+                />
+                <StyledText
+                  marginLeft={SPACING.spacing4}
+                  fontSize="1.5rem"
+                  lineHeight="2.0625rem"
+                  fontWeight="400"
+                  color={COLORS.black}
+                >
+                  {nw.ssid}
+                </StyledText>
+              </Flex>
+            </Btn>
+          ))}
+          <Btn
+            onClick={() => console.log('go to manual setup')}
+            marginTop={SPACING.spacing3}
+            width="59rem"
+            height="4rem"
+            backgroundColor="#d6d6d6"
+            borderRadius="12px"
+          >
+            <Flex
+              padding={SPACING.spacing4}
+              flexDirection={DIRECTION_ROW}
+              alignItems={ALIGN_CENTER}
+            >
+              <Icon name="plus" size="2.25rem" color={COLORS.darkGreyEnabled} />
+              <StyledText
+                marginLeft={SPACING.spacingSM}
+                color={COLORS.black}
+                fontSize="1.5rem"
+                lineHeight="1.8125rem"
+                fontWeight="400"
+              >
+                {t('join_other_network')}
               </StyledText>
             </Flex>
-          ))}
+          </Btn>
         </>
       ) : (
         <SearchNetwork />

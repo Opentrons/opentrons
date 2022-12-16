@@ -4,12 +4,14 @@ import { useTranslation } from 'react-i18next'
 import {
   Flex,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
   ALIGN_CENTER,
   JUSTIFY_CENTER,
   COLORS,
   SPACING,
   TYPOGRAPHY,
   Icon,
+  Btn,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
@@ -23,32 +25,60 @@ export function SearchNetwork(): JSX.Element {
           {t('connect_to_a_network')}
         </StyledText>
       </Flex>
-      <Flex
-        height="26.5625rem"
-        backgroundColor="#D6D6D6"
-        justifyContent={JUSTIFY_CENTER}
-      >
+      <Flex flexDirection={DIRECTION_COLUMN}>
         <Flex
+          height="22rem"
+          backgroundColor="#D6D6D6"
           justifyContent={JUSTIFY_CENTER}
-          alignItems={ALIGN_CENTER}
-          flexDirection={DIRECTION_COLUMN}
+          borderRadius="12px"
         >
-          <Icon
-            name="ot-spinner"
-            size="5.125rem"
-            color={COLORS.darkGreyEnabled}
-            aria-label="spinner"
-            spin
-          />
-          <StyledText
-            fontSize="2rem"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            lineHeight="2.72375rem"
-            marginTop={SPACING.spacingXXL}
+          <Flex
+            justifyContent={JUSTIFY_CENTER}
+            alignItems={ALIGN_CENTER}
+            flexDirection={DIRECTION_COLUMN}
           >
-            {t('searching_for_network')}
-          </StyledText>
+            <Icon
+              name="ot-spinner"
+              size="5.125rem"
+              color={COLORS.darkGreyEnabled}
+              aria-label="spinner"
+              spin
+            />
+            <StyledText
+              fontSize="2rem"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              lineHeight="2.72375rem"
+              marginTop={SPACING.spacingXXL}
+            >
+              {t('searching_for_networks')}
+            </StyledText>
+          </Flex>
         </Flex>
+        <Btn
+          onClick={() => console.log('go to manual setup')}
+          marginTop={SPACING.spacing3}
+          width="59rem"
+          height="4rem"
+          backgroundColor="#d6d6d6"
+          borderRadius="12px"
+        >
+          <Flex
+            padding={SPACING.spacing4}
+            flexDirection={DIRECTION_ROW}
+            alignItems={ALIGN_CENTER}
+          >
+            <Icon name="plus" size="2.25rem" color={COLORS.darkGreyEnabled} />
+            <StyledText
+              marginLeft={SPACING.spacingSM}
+              color={COLORS.black}
+              fontSize="1.5rem"
+              lineHeight="1.8125rem"
+              fontWeight="400"
+            >
+              {t('join_other_network')}
+            </StyledText>
+          </Flex>
+        </Btn>
       </Flex>
     </>
   )
