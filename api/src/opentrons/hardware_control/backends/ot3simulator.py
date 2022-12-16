@@ -186,8 +186,9 @@ class OT3Simulator:
 
     async def update_motor_status(self) -> None:
         """Retreieve motor and encoder status and position from all present nodes"""
+        # Simulate condition at boot, status would not be ok
         self._motor_status.update(
-            (node, MotorStatus(True, True)) for node in self._present_nodes
+            (node, MotorStatus(False, False)) for node in self._present_nodes
         )
 
     def check_ready_for_movement(self, axes: Sequence[OT3Axis]) -> bool:
