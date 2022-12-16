@@ -1,22 +1,21 @@
+from dataclasses import dataclass
 from pathlib import Path
 from typing import List
 
 import pytest
-from pydantic import BaseModel, Field
 from tests.integration.dev_server import DevServer
 from tests.integration.robot_client import RobotClient
 
 from .persistence_snapshots_dir import PERSISTENCE_SNAPSHOTS_DIR
 
 
-class Snapshot(BaseModel):
+@dataclass
+class Snapshot:
     """Model to describe a database snapshot."""
 
-    version: str = Field(description="Name of the directory (version) to test.")
-    expected_protocol_count: int = Field(
-        description="How many protocols are in the db snapshot."
-    )
-    expected_run_count: int = Field(description="How many runs are in the db snapshot.")
+    version: str
+    expected_protocol_count: int
+    expected_run_count: int
 
     @property
     def db_path(self) -> Path:
@@ -24,22 +23,15 @@ class Snapshot(BaseModel):
         return Path(PERSISTENCE_SNAPSHOTS_DIR, self.version)
 
 
-class Snapshots:
-    v601: Snapshot = Snapshot(
-        version="v6.0.1", expected_protocol_count=4, expected_run_count=5
-    )
-    v620: Snapshot = Snapshot(
-        version="v6.2.0", expected_protocol_count=2, expected_run_count=2
-    )
-
-    def to_test(self) -> List[(Snapshot)]:
-        """The List of snapshots to test."""
-        return [(self.v601), (self.v620)]
+snapshots: List[(Snapshot)] = [
+    Snapshot(version="v6.0.1", expected_protocol_count=4, expected_run_count=5),
+    Snapshot(version="v6.2.0", expected_protocol_count=2, expected_run_count=2),
+]
 
 
 @pytest.mark.parametrize(
     "snapshot",
-    Snapshots().to_test(),
+    snapshots,
 )
 async def test_protocols_analyses_and_runs_available_from_older_persistence_dir(
     snapshot: Snapshot,
@@ -77,6 +69,10 @@ async def test_protocols_analyses_and_runs_available_from_older_persistence_dir(
             all_run_ids = [r["id"] for r in all_runs["data"]]
 
             assert len(all_run_ids) == snapshot.expected_run_count
+
+            # Ideally, we would also fetch full commands via
+            # `GET /runs/{run_id}/commands/{command_id}`.
+            # We skip it for performance. On my machine, it would take ~7 seconds.
 
             for run_id in all_run_ids:
                 await robot_client.get_run(run_id=run_id)
