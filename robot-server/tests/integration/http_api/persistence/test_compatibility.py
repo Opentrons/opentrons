@@ -34,7 +34,7 @@ class Snapshots:
 
     def to_test(self) -> List[(Snapshot)]:
         """The List of snapshots to test."""
-        return [(self.v601),(self.v620)]
+        return [(self.v601), (self.v620)]
 
 
 @pytest.mark.parametrize(
