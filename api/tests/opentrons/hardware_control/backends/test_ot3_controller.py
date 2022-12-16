@@ -508,3 +508,29 @@ async def test_get_limit_switches(controller: OT3Controller) -> None:
         assert passed_nodes == {NodeId.gantry_x, NodeId.gantry_y}
         assert OT3Axis.X in res
         assert OT3Axis.Y in res
+
+
+async def test_tip_action(controller: OT3Controller, mock_move_group_run) -> None:
+    await controller.tip_action([OT3Axis.P_L], tip_action="pick_up")
+    for call in mock_move_group_run.call_args_list:
+        move_group_runner = call[0][0]
+        for move_group in move_group_runner._move_groups:
+            assert move_group  # don't pass in empty groups
+            assert len(move_group) == 1
+        # we should be sending this command to the pipette axes to process.
+        assert list(move_group[0].keys()) == [NodeId.pipette_left]
+        step = move_group[0][NodeId.pipette_left]
+        assert step.stop_condition == MoveStopCondition.none
+
+    mock_move_group_run.reset_mock()
+
+    await controller.tip_action([OT3Axis.P_L], tip_action="drop")
+    for call in mock_move_group_run.call_args_list:
+        move_group_runner = call[0][0]
+        for move_group in move_group_runner._move_groups:
+            assert move_group  # don't pass in empty groups
+            assert len(move_group) == 1
+        # we should be sending this command to the pipette axes to process.
+        assert list(move_group[0].keys()) == [NodeId.pipette_left]
+        step = move_group[0][NodeId.pipette_left]
+        assert step.stop_condition == MoveStopCondition.limit_switch

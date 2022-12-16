@@ -1400,7 +1400,10 @@ class OT3API(
                 # The speed check is needed because speed can sometimes be None.
                 # Not sure why
                 await self._backend.tip_action(
-                    [OT3Axis.of_main_tool_actuator(mount)], move.target_position, move.speed, "drop"
+                    [OT3Axis.of_main_tool_actuator(mount)],
+                    move.target_position,
+                    move.speed,
+                    "drop",
                 )
             else:
                 target_pos = target_position_from_plunger(
