@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
-import { useHistory } from 'react-router-dom'
+// import { useHistory } from 'react-router-dom'
 import { useFormik } from 'formik'
 import { css } from 'styled-components'
 
@@ -61,7 +61,7 @@ export function NameRobot(): JSX.Element {
   // const [oldName, setOldName] = React.useState<string>('')
   const [name, setName] = React.useState<string>('')
   const keyboardRef = React.useRef(null)
-  const history = useHistory()
+  // const history = useHistory()
   const dispatch = useDispatch<Dispatch>()
 
   // check for robot name
