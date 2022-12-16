@@ -10,7 +10,7 @@ const PLATFORM_DARWIN = 'darwin'
 
 module.exports = function afterSign(context) {
   const { electronPlatformName, appOutDir } = context
-
+  console.log(`after-sign appid: ${appId}`)
   if (
     process.platform !== PLATFORM_DARWIN ||
     electronPlatformName !== PLATFORM_DARWIN
