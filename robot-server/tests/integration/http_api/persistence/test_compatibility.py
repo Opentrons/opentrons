@@ -70,10 +70,6 @@ async def test_protocols_analyses_and_runs_available_from_older_persistence_dir(
 
             assert len(all_run_ids) == snapshot.expected_run_count
 
-            # Ideally, we would also fetch full commands via
-            # `GET /runs/{run_id}/commands/{command_id}`.
-            # We skip it for performance. On my machine, it would take ~7 seconds.
-
             for run_id in all_run_ids:
                 await robot_client.get_run(run_id=run_id)
 
