@@ -41,7 +41,7 @@ class ProtocolReader:
 
         Arguments:
             files: List of files-like objects. Do not attempt to reuse any objects
-                objects in this list once they've been passed to the ProtocolReader.
+                in this list once they've been passed to the ProtocolReader.
             directory: Name of the directory to create and place files in.
 
         Returns:
@@ -58,10 +58,10 @@ class ProtocolReader:
         except (FileReadError, RoleAnalysisError, ConfigAnalysisError) as e:
             raise ProtocolFilesInvalidError(str(e)) from e
 
-        # TODO(mc, 2021-12-07): add support for other files, like arbitrary data files
         all_files: List[RoleAnalysisFile] = [
             role_analysis.main_file,
             *role_analysis.labware_files,
+            *role_analysis.data_files,
         ]
 
         await self._file_reader_writer.write(directory=directory, files=all_files)
@@ -105,10 +105,10 @@ class ProtocolReader:
         except (FileReadError, RoleAnalysisError, ConfigAnalysisError) as e:
             raise ProtocolFilesInvalidError(str(e)) from e
 
-        # TODO(mc, 2021-12-07): add support for other files, like arbitrary data files
         all_files: List[RoleAnalysisFile] = [
             role_analysis.main_file,
             *role_analysis.labware_files,
+            *role_analysis.data_files,
         ]
 
         # TODO(mc, 2022-04-01): these asserts are a bit awkward,
