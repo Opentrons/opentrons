@@ -54,11 +54,12 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
     showConnectionTroubleshootingModal,
     setShowConnectionTroubleshootingModal,
   ] = React.useState<boolean>(false)
-  const isRobotOnWrongVersionOfSoftware = ['upgrade', 'downgrade'].includes(
-    useSelector((state: State) => {
-      return getBuildrootUpdateDisplayInfo(state, robot.name)
-    })?.autoUpdateAction
-  )
+
+  const { autoUpdateAction } = useSelector((state: State) => {
+    return getBuildrootUpdateDisplayInfo(state, robot.name)
+  })
+  const isRobotOnWrongVersionOfSoftware =
+    autoUpdateAction === 'upgrade' || autoUpdateAction === 'downgrade'
 
   const handleClickRun: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
@@ -86,7 +87,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
           {t('run_a_protocol')}
         </MenuItem>
         {isRobotOnWrongVersionOfSoftware && (
-          <Tooltip tooltipProps={tooltipProps}>
+          <Tooltip tooltipProps={tooltipProps} whiteSpace="normal">
             {t('shared:a_software_update_is_available')}
           </Tooltip>
         )}
