@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import List, Optional, Sequence
 
 from .input_file import AbstractInputFile
-from .file_reader_writer import FileReaderWriter, FileReadError, UnknownJsonFileError
+from .file_reader_writer import FileReaderWriter, FileReadError
 from .role_analyzer import RoleAnalyzer, RoleAnalysisFile, RoleAnalysisError
 from .config_analyzer import ConfigAnalyzer, ConfigAnalysisError
 from .protocol_source import ProtocolSource, ProtocolSourceFile
