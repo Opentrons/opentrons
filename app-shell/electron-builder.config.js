@@ -38,6 +38,8 @@ module.exports = async () => ({
     category: 'public.app-category.productivity',
     type: DEV_MODE ? 'development' : 'distribution',
     icon: project === 'robot-stack' ? 'build/icon.icns' : 'build/three.icns',
+    strictCodeSigning: true,
+    forceCodeSigning: true,
     gatekeeperAssess: true,
   },
   dmg: {
