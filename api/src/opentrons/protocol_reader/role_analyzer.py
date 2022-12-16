@@ -5,7 +5,7 @@ from typing_extensions import Literal
 
 from opentrons_shared_data.protocol.models import ProtocolSchemaV6
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons.protocols.models import JsonProtocol as ProtocolSchemaV5
+from opentrons.protocols.models import JsonProtocol as LegacyProtocolSchema
 from .protocol_source import ProtocolFileRole
 from .file_reader_writer import BufferedFile
 
@@ -21,7 +21,7 @@ class RoleAnalysisFile(BufferedFile):
 class MainFile(RoleAnalysisFile):
     """A protocol's main file, either Python or JSON."""
 
-    data: Optional[Union[ProtocolSchemaV5, ProtocolSchemaV6]] = None
+    data: Optional[Union[LegacyProtocolSchema, ProtocolSchemaV6]] = None
     role: Literal[ProtocolFileRole.MAIN] = ProtocolFileRole.MAIN
 
 
@@ -71,11 +71,11 @@ class RoleAnalyzer:
         for f in files:
             filename = f.name.lower()
             if filename.endswith(".py") or isinstance(
-                f.data, (ProtocolSchemaV5, ProtocolSchemaV6)
+                f.data, (LegacyProtocolSchema, ProtocolSchemaV6)
             ):
                 data = (
                     f.data
-                    if isinstance(f.data, (ProtocolSchemaV5, ProtocolSchemaV6))
+                    if isinstance(f.data, (LegacyProtocolSchema, ProtocolSchemaV6))
                     else None
                 )
                 main_file_candidates.append(
@@ -112,7 +112,7 @@ class RoleAnalyzer:
 
         # ignore extra custom labware files for JSON protocols, while
         # maintaining a reference to the protocol's labware
-        if isinstance(main_file.data, (ProtocolSchemaV5, ProtocolSchemaV6)):
+        if isinstance(main_file.data, (LegacyProtocolSchema, ProtocolSchemaV6)):
             labware_files = []
             labware_definitions = list(main_file.data.labwareDefinitions.values())
         else:

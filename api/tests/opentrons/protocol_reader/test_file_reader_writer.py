@@ -127,7 +127,7 @@ async def test_read_opentrons_json_bad_validate(contents: bytes) -> None:
 
     subject = FileReaderWriter()
 
-    with pytest.raises(FileReadError, match="known Opentrons format"):
+    with pytest.raises(FileReadError, match="has missing or incorrect data"):
         await subject.read([in_file])
 
 
@@ -137,7 +137,7 @@ async def test_read_opentrons_json_unknown_format() -> None:
 
     subject = FileReaderWriter()
 
-    with pytest.raises(UnknownJsonFileError, match="unknown Opentrons format"):
+    with pytest.raises(UnknownJsonFileError, match="not a known Opentrons format"):
         await subject.read([in_file])
 
 

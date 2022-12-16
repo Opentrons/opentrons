@@ -35,7 +35,7 @@ class FileReadError(Exception):
     """An error raised if input files cannot be read."""
 
 
-class UnknownJsonFileError(Exception):
+class UnknownJsonFileError(FileReadError):
     """An error raised if JSON file does not match a known Opentrons model."""
 
 
@@ -69,22 +69,16 @@ class FileReaderWriter:
             if filename.lower().endswith(".json"):
                 try:
                     json_dict = json.loads(contents)
-                    if (
-                        json_dict.get("ordering") is not None
-                        and json_dict.get("wells") is not None
-                    ):
+                    if "ordering" in json_dict and "wells" in json_dict:
                         data = parse_raw_as(LabwareDefinition, contents)
-                    elif (
-                        json_dict.get("schemaVersion")
-                        and json_dict.get("commands") is not None
-                    ):
+                    elif "schemaVersion" in json_dict and "commands" in json_dict:
                         if json_dict.get("schemaVersion") == 6:
                             data = parse_raw_as(ProtocolSchemaV6, contents)
                         else:
                             data = parse_raw_as(JsonProtocol, contents)
                     else:
                         raise UnknownJsonFileError(
-                            f"JSON file {filename} has unknown Opentrons format."
+                            f"JSON file {filename} is not a known Opentrons format."
                         )
 
                 # unlike other Pydantic functions/methods, `parse_raw_as` can
@@ -94,8 +88,7 @@ class FileReaderWriter:
 
                 except ValidationError as e:
                     raise FileReadError(
-                        f"JSON file {filename} did not"
-                        " match a known Opentrons format."
+                        f"JSON file {filename} has missing or incorrect data."
                     ) from e
 
             results[index] = BufferedFile(

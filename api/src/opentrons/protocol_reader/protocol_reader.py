@@ -55,12 +55,7 @@ class ProtocolReader:
             buffered_files = await self._file_reader_writer.read(files)
             role_analysis = self._role_analyzer.analyze(buffered_files)
             config_analysis = self._config_analyzer.analyze(role_analysis.main_file)
-        except (
-            FileReadError,
-            UnknownJsonFileError,
-            RoleAnalysisError,
-            ConfigAnalysisError,
-        ) as e:
+        except (FileReadError, RoleAnalysisError, ConfigAnalysisError) as e:
             raise ProtocolFilesInvalidError(str(e)) from e
 
         all_files: List[RoleAnalysisFile] = [
@@ -107,12 +102,7 @@ class ProtocolReader:
             buffered_files = await self._file_reader_writer.read(files)
             role_analysis = self._role_analyzer.analyze(buffered_files)
             config_analysis = self._config_analyzer.analyze(role_analysis.main_file)
-        except (
-            FileReadError,
-            UnknownJsonFileError,
-            RoleAnalysisError,
-            ConfigAnalysisError,
-        ) as e:
+        except (FileReadError, RoleAnalysisError, ConfigAnalysisError) as e:
             raise ProtocolFilesInvalidError(str(e)) from e
 
         all_files: List[RoleAnalysisFile] = [
