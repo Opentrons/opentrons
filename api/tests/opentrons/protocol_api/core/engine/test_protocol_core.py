@@ -36,7 +36,7 @@ from opentrons.protocol_engine import (
     LabwareOffsetVector,
 )
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons.protocol_engine.types import Liquid
+from opentrons.protocol_engine.types import Liquid, HexColor
 
 from opentrons.protocol_api.core.labware import LabwareLoadParams
 from opentrons.protocol_api.core.engine import (
@@ -643,14 +643,19 @@ def test_get_highest_z(
 
     assert result == 9001
 
+
 def test_create_liquid(
     decoy: Decoy, mock_engine_client: EngineClient, subject: ProtocolCore
 ) -> None:
     """It should return the created liquid."""
-    liquid_result = Liquid(displayName="water", description="water desc", displayColor="#fff")
-    decoy.when(
-        mock_engine_client.create_liquid(display_name="water", description="water desc", display_color="#fff")
-    ).then_return(liquid_result)
+    liquid = Liquid.construct(  # type: ignore[call-arg]
+        displayName="water",
+        description="water desc",
+        displayColor=HexColor(__root__="#fff"),
+    )
+    decoy.when(mock_engine_client.add_liquid(liquid)).then_return(liquid)
 
-    result = subject.create_liquid(display_name="water", description="water desc", display_color="#fff")
-    assert result == liquid_result
+    result = subject.create_liquid(
+        display_name="water", description="water desc", display_color="#fff"
+    )
+    assert result == liquid

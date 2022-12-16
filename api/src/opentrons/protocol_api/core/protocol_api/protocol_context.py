@@ -425,4 +425,6 @@ class ProtocolContextImplementation(
         self, display_name: str, description: str, display_color: str
     ) -> Liquid:
         """Create a liquid to load on a labware."""
-        raise UnsupportedAPIError("Creating a liquid is not supported in this API version.")
+        raise UnsupportedAPIError(
+            "Creating a liquid is not supported in this API version."
+        )

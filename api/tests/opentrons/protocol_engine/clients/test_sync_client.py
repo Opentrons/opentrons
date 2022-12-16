@@ -27,6 +27,7 @@ from opentrons.protocol_engine.types import (
     WellOffset,
     WellLocation,
     MotorAxis,
+    Liquid,
 )
 
 
@@ -61,6 +62,26 @@ def test_add_labware_definition(
     result = subject.add_labware_definition(labware_definition)
 
     assert result == expected_labware_uri
+
+
+def test_add_liquid(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should add a labware definition."""
+    liquid = Liquid.construct(displayName="water")  # type: ignore[call-arg]
+
+    decoy.when(
+        transport.call_method(
+            "add_liquid",
+            liquid=liquid,
+        )
+    ).then_return(liquid)
+
+    result = subject.add_liquid(liquid)
+
+    assert result == liquid
 
 
 def test_reset_tips(

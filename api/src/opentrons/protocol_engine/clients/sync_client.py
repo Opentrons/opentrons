@@ -21,6 +21,7 @@ from ..types import (
     WellLocation,
     LabwareOffsetVector,
     MotorAxis,
+    Liquid,
 )
 from .transports import AbstractSyncTransport
 
@@ -43,6 +44,10 @@ class SyncClient:
             "add_labware_definition",
             definition=definition,
         )
+
+    def add_liquid(self, liquid: Liquid) -> Liquid:
+        """Add a liquid to the engine."""
+        return self._transport.call_method("add_liquid", liquid=liquid)  # type: ignore[no-any-return]
 
     def reset_tips(self, labware_id: str) -> None:
         """Reset a labware's tip tracking state.."""

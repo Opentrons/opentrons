@@ -288,9 +288,10 @@ class ProtocolEngine:
         )
         return self._state_store.labware.get_uri_from_definition(definition)
 
-    def add_liquid(self, liquid: Liquid) -> None:
+    def add_liquid(self, liquid: Liquid) -> Liquid:
         """Add a liquid to the state for subsequent liquid loads."""
         self._action_dispatcher.dispatch(AddLiquidAction(liquid=liquid))
+        return liquid
 
     def reset_tips(self, labware_id: str) -> None:
         """Reset the tip state of a given labware."""
