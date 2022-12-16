@@ -7,8 +7,8 @@ import {
   JUSTIFY_FLEX_END,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../../atoms/text'
-import { PrimaryButton } from '../../../atoms/buttons'
+import { StyledText } from '../../atoms/text'
+import { PrimaryButton } from '../../atoms/buttons'
 
 export interface ClearDeckModalProps {
   onContinueClick: () => void

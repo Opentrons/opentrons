@@ -102,8 +102,8 @@ export function NetworkSetupMenu(): JSX.Element {
           marginTop={SPACING.spacing5}
           width="fit-content"
         >
-          <Link to="dashboard">
-            <TertiaryButton>To Robot Dashboard</TertiaryButton>
+          <Link to="menu">
+            <TertiaryButton>To ODD Menu</TertiaryButton>
           </Link>
         </Flex>
       </Flex>

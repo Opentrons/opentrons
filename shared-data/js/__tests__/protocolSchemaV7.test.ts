@@ -7,6 +7,7 @@ import omit from 'lodash/omit'
 
 import protocolSchema from '../../protocol/schemas/7-draft.json'
 import labwareV2Schema from '../../labware/schemas/2.json'
+import commandV7Schema from '../../command/schemas/7.json'
 import simpleV7Fixture from '../../protocol/fixtures/7/simpleV7.json'
 
 const fixturesGlobPath = path.join(
@@ -17,8 +18,9 @@ const fixturesGlobPath = path.join(
 const protocolFixtures = glob.sync(fixturesGlobPath)
 const ajv = new Ajv({ allErrors: true, jsonPointers: true })
 
-// v7 protocol schema contains reference to v2 labware schema, so give AJV access to it
+// v7 protocol schema contains reference to v2 labware schema, and v7 command schema, so give AJV access to it
 ajv.addSchema(labwareV2Schema)
+ajv.addSchema(commandV7Schema)
 
 const validateProtocol = ajv.compile(protocolSchema)
 
