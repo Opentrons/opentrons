@@ -6,7 +6,7 @@ import anyio
 
 from opentrons.protocols.models import LabwareDefinition
 
-from .protocol_source import ProtocolSource, ProtocolType
+from .protocol_source import ProtocolFileRole, ProtocolSource, ProtocolType
 
 
 async def extract_labware_definitions(
@@ -27,6 +27,7 @@ async def extract_labware_definitions(
         return [
             await _extract_from_labware_file(file.path)
             for file in protocol_source.files
+            if file.role == ProtocolFileRole.LABWARE
         ]
 
 
