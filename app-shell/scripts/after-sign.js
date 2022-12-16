@@ -2,15 +2,16 @@
 
 const path = require('path')
 const { notarize } = require('electron-notarize')
-const { appId } = require('../electron-builder.config')
+const config = require('../electron-builder.config')
 
 const { APPLE_ID, APPLE_ID_PASSWORD } = process.env
 const DEV_MODE = process.env.NODE_ENV !== 'production'
 const PLATFORM_DARWIN = 'darwin'
 
-module.exports = function afterSign(context) {
+module.exports = async function afterSign(context) {
   const { electronPlatformName, appOutDir } = context
-  console.log(`after-sign appid: ${appId}`)
+  const appId = (await config()).appId
+  console.log(`Signing appId: ${appId}`)
   if (
     process.platform !== PLATFORM_DARWIN ||
     electronPlatformName !== PLATFORM_DARWIN
@@ -18,19 +19,19 @@ module.exports = function afterSign(context) {
     console.log(
       'Not running on and/or building for macOS; skipping notarization'
     )
-    return Promise.resolve()
+    return
   }
 
   if (DEV_MODE) {
     console.log('Not in a production environment; skipping notarization')
-    return Promise.resolve()
+    return
   }
 
   if (!APPLE_ID || !APPLE_ID_PASSWORD) {
     console.warn(
       'No Apple Account credentials available; skipping notarization'
     )
-    return Promise.resolve()
+    return
   }
 
   const appName = context.packager.appInfo.productFilename
@@ -38,7 +39,7 @@ module.exports = function afterSign(context) {
 
   console.log(`Submitting app for notarization: ${appPath}`)
 
-  return notarize({
+  return await notarize({
     appBundleId: appId,
     appleId: APPLE_ID,
     appleIdPassword: APPLE_ID_PASSWORD,
