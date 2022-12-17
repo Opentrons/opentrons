@@ -93,19 +93,19 @@ export function CalibrationDataDownload({
               </Box>
               <StyledText as="p" marginBottom={SPACING.spacing3}>
                 {t(
-                  downloadIsPossible
-                    ? 'robot_calibration:download_calibration_available'
-                    : 'robot_calibration:download_calibration_unavailable'
+                  downloadIsPossible ?? false
+                    ? 'robot_calibration:download_calibration_data_available'
+                    : 'robot_calibration:download_calibration_data_unavailable'
                 )}
               </StyledText>
             </Box>
             <TertiaryButton
               onClick={onClickSaveAs}
-              disabled={!downloadIsPossible}
+              disabled={downloadIsPossible !== true}
             >
               <Icon
                 name="download"
-                width="0.625rem"
+                size="0.75rem"
                 marginRight={SPACING.spacing3}
               />
               {t('download_calibration_data')}
