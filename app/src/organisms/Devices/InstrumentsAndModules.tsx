@@ -38,7 +38,8 @@ import { fetchPipetteOffsetCalibrations } from '../../redux/calibration'
 import type { Dispatch } from '../../redux/types'
 
 const EQUIPMENT_POLL_MS = 5000
-const FETCH_PIPETTE_CAL_MS = 30000
+const FETCH_PIPETTE_LONG_POLL = 30000
+const FETCH_PIPETTE_SHORT_POLL = 1000
 interface InstrumentsAndModulesProps {
   robotName: string
 }
@@ -83,31 +84,28 @@ export function InstrumentsAndModules({
   // Instead we now capture all offset calibration data here, and pass the appropriate calibration
   // data to the associated card via props
   const pipetteOffsetCalibrations = usePipetteOffsetCalibrations(robotName)
+  const leftMountOffsetCalibration = getOffsetCalibrationForMount(
+    pipetteOffsetCalibrations,
+    attachedPipettes,
+    LEFT
+  )
+  const rightMountOffsetCalibration = getOffsetCalibrationForMount(
+    pipetteOffsetCalibrations,
+    attachedPipettes,
+    RIGHT
+  )
 
-  const allAttachedPipettesHaveOffsetCals = (): boolean => {
-    if (pipetteOffsetCalibrations == null) {
-      return false
-    }
-    for (const [mount, data] of Object.entries(attachedPipettes)) {
-      if (data != null) {
-        if (
-          pipetteOffsetCalibrations.find(
-            cal => cal.mount === mount && cal.pipette === data.id
-          ) === undefined
-        ) {
-          return false
-        }
-      }
-    }
-
-    return true
-  }
+  const allAttachedPipettesHaveOffsetCals =
+    (attachedPipettes.left == null || leftMountOffsetCalibration != null) &&
+    (attachedPipettes.right == null || rightMountOffsetCalibration != null)
 
   useInterval(
     () => {
       dispatch(fetchPipetteOffsetCalibrations(robotName))
     },
-    allAttachedPipettesHaveOffsetCals() ? FETCH_PIPETTE_CAL_MS : 1000,
+    allAttachedPipettesHaveOffsetCals
+      ? FETCH_PIPETTE_LONG_POLL
+      : FETCH_PIPETTE_SHORT_POLL,
     true
   )
 
@@ -157,11 +155,7 @@ export function InstrumentsAndModules({
                     ? getPipetteModelSpecs(attachedPipettes.left?.model) ?? null
                     : null
                 }
-                pipetteOffsetCalibration={getOffsetCalibrationForMount(
-                  pipetteOffsetCalibrations,
-                  attachedPipettes,
-                  LEFT
-                )}
+                pipetteOffsetCalibration={leftMountOffsetCalibration}
                 mount={LEFT}
                 robotName={robotName}
                 is96ChannelAttached={is96ChannelAttached}
@@ -199,11 +193,7 @@ export function InstrumentsAndModules({
                         null
                       : null
                   }
-                  pipetteOffsetCalibration={getOffsetCalibrationForMount(
-                    pipetteOffsetCalibrations,
-                    attachedPipettes,
-                    RIGHT
-                  )}
+                  pipetteOffsetCalibration={rightMountOffsetCalibration}
                   mount={RIGHT}
                   robotName={robotName}
                   is96ChannelAttached={false}

@@ -33,7 +33,13 @@ jest.mock('../../ModuleCard')
 jest.mock('../PipetteCard')
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../../../atoms/Banner')
-jest.mock('../utils')
+jest.mock('../utils', () => {
+  const actualUtils = jest.requireActual('../utils')
+  return {
+    ...actualUtils,
+    getIs96ChannelPipetteAttached: jest.fn(),
+  }
+})
 jest.mock('../../RunTimeControl/hooks')
 
 const mockUseModulesQuery = useModulesQuery as jest.MockedFunction<
@@ -143,6 +149,26 @@ describe('InstrumentsAndModules', () => {
     getByText('Mock PipetteCard')
   })
   it('fetches offset calibrations status more frequently when calibrations do not exist', () => {
+    mockUsePipettesQuery.mockReturnValue({
+      data: {
+        left: {
+          id: 'uncalibrated1',
+          name: `test-uncalibrated1`,
+          model: 'p10_single_v1',
+          tip_length: 0,
+          mount_axis: 'z',
+          plunger_axis: 'b',
+        },
+        right: {
+          id: 'uncalibrated2',
+          name: `test-uncalibrated2`,
+          model: 'p10_single_v1',
+          tip_length: 0,
+          mount_axis: 'y',
+          plunger_axis: 'a',
+        },
+      },
+    } as any)
     mockUsePipetteOffsetCalibrations.mockReturnValue(null)
     render()
     expect(mockUseInterval.mock.calls[0][1]).toBe(INTERVAL_FREQUENT)

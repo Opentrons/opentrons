@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { resetAllWhenMocks, when } from 'jest-when'
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { isOT3Pipette, LEFT, RIGHT } from '@opentrons/shared-data'
 import { i18n } from '../../../../i18n'
@@ -196,8 +196,7 @@ describe('PipetteCard', () => {
     getByText('mock banner')
   })
   it('does not render pipette offset cal banner with a valid calibration', () => {
-    const calBanner = screen.queryByText('mock banner')
-    const { getByText } = render({
+    const { getByText, queryByText } = render({
       pipetteInfo: mockRightSpecs,
       mount: RIGHT,
       robotName: mockRobotName,
@@ -219,6 +218,7 @@ describe('PipetteCard', () => {
         id: 'test',
       },
     })
+    const calBanner = queryByText('mock banner')
     getByText('right Mount')
     getByText('Right Pipette')
     expect(calBanner).not.toBeInTheDocument()

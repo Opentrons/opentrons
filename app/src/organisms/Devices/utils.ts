@@ -50,7 +50,7 @@ export function getOffsetCalibrationForMount(
     | { left: undefined; right: undefined },
   mount: Mount
 ): PipetteOffsetCalibration | null {
-  if (pipetteOffsetCalibrations === null) {
+  if (pipetteOffsetCalibrations == null) {
     return null
   } else {
     return (
