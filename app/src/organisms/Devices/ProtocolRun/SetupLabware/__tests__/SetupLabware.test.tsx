@@ -24,7 +24,6 @@ import { SetupLabware } from '..'
 
 jest.mock('../SetupLabwareList')
 jest.mock('../SetupLabwareMap')
-jest.mock('../../../../ProtocolSetup/hooks')
 jest.mock('../../../../LabwarePositionCheck')
 jest.mock('../../utils/getModuleTypesThatRequireExtraAttention')
 jest.mock('../../../../RunTimeControl/hooks')
