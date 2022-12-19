@@ -99,7 +99,7 @@ describe('getOffsetCalibrationForMount', () => {
       right: {
         id: pipette,
         name: `test-${pipette}`,
-        model: 'test model',
+        model: 'p10_single_v1',
         tip_length: 0,
         mount_axis: 'z',
         plunger_axis: 'a',
