@@ -115,7 +115,6 @@ class ProtocolSource:
     main_file: Path
     files: List[ProtocolSourceFile]
     metadata: Metadata
-    # TODO(mm, 2022-10-21): Make this an enum once we figure out where to put it.
     robot_type: RobotType
     config: ProtocolConfig
     labware_definitions: List[LabwareDefinition]
