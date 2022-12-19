@@ -12,7 +12,7 @@ from opentrons_shared_data.labware.dev_types import (
 )
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from opentrons.types import DeckSlotName, Mount, MountType, Point
+from opentrons.types import DeckSlotName, Mount, MountType, Point, LoadedLiquid
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.modules import AbstractModule
@@ -37,6 +37,7 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.types import Liquid, HexColor
+from opentrons.protocol_engine.resources.model_utils import ModelUtils
 
 from opentrons.protocol_api.core.labware import LabwareLoadParams
 from opentrons.protocol_api.core.engine import (
@@ -78,6 +79,12 @@ def mock_sync_module_hardware(decoy: Decoy) -> SynchronousAdapter[AbstractModule
 def mock_sync_hardware_api(decoy: Decoy) -> SyncHardwareAPI:
     """Get a mock hardware API."""
     return decoy.mock(cls=SyncHardwareAPI)
+
+
+@pytest.fixture
+def model_utils(decoy: Decoy) -> ModelUtils:
+    """Get a mocked out ModelUtils."""
+    return decoy.mock(cls=ModelUtils)
 
 
 @pytest.fixture
@@ -645,7 +652,7 @@ def test_get_highest_z(
 
 
 def test_add_liquid(
-    decoy: Decoy, mock_engine_client: EngineClient, subject: ProtocolCore
+    decoy: Decoy, mock_engine_client: EngineClient, subject: ProtocolCore, model_utils: ModelUtils
 ) -> None:
     """It should return the created liquid."""
     liquid = Liquid.construct(
@@ -654,9 +661,20 @@ def test_add_liquid(
         description="water desc",
         displayColor=HexColor(__root__="#fff"),
     )
+
+    expected_result = LoadedLiquid(
+        id="water-id",
+        display_name="water",
+        description="water desc",
+        display_color="#fff",
+    )
+
+    decoy.when(model_utils.generate_id()).then_return("water-id")
+
     decoy.when(mock_engine_client.add_liquid(liquid)).then_return(liquid)
 
     result = subject.add_liquid(
         display_name="water", description="water desc", display_color="#fff"
     )
-    assert result == liquid
+
+    assert result == expected_result

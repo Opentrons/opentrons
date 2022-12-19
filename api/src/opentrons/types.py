@@ -1,4 +1,5 @@
 from __future__ import annotations
+from dataclasses import dataclass
 import enum
 from math import sqrt, isclose
 from typing import TYPE_CHECKING, Any, NamedTuple, Iterable, Union, Optional
@@ -215,7 +216,8 @@ class TransferTipPolicy(enum.Enum):
 DeckLocation = Union[int, str]
 
 
-class LoadedLiquid(NamedTuple):
+@dataclass(frozen=True)
+class LoadedLiquid:
     id: str
     display_name: str
     description: str

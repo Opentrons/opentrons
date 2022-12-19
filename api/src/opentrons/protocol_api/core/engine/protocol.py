@@ -404,6 +404,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
                 displayColor=HexColor(__root__=display_color),
             )
         )
+
         return LoadedLiquid(
             id=loaded_liquid.id,
             display_name=loaded_liquid.displayName,
