@@ -40,6 +40,7 @@ module.exports = async () => ({
     icon: project === 'robot-stack' ? 'build/icon.icns' : 'build/three.icns',
     forceCodeSigning: true,
     gatekeeperAssess: true,
+    binaries: ['node_modules/usb-detection/build/Release/detection.node']
   },
   dmg: {
     icon: null,
