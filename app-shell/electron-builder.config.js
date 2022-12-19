@@ -17,8 +17,8 @@ module.exports = async () => ({
     'build/br-premigration-wheels',
     '!Makefile',
     '!python',
-    '!node_modules/usb-detection',
-    'node_modules/usb-detection/bin',
+    '!node_modules/usb-detection/build',
+    'node_modules/usb-detection/build/Release',
     {
       from: '../app/dist',
       to: './ui',
