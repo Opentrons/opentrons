@@ -64,12 +64,14 @@ class Plot:
         self.peak_pwm_plot()
         print("Plotting PWM Frequency vs. PWM DC...")
         self.freq_pwm_plot()
+        print("Plotting Force Polynomial...")
+        self.force_poly_plot(2.0)
         print("Plots Saved!")
 
     def avg_df(self, df):
         df_avg = pd.DataFrame()
         df = df.groupby(["Vref","DC"])
-        df_avg["Force"] = df["Force"].mean()
+        df_avg["Force"] = round(df["Force"].mean(), 2)
         df_avg["Current"] = round(df["Current"].mean(), 2)
         df_avg["Min Current"] = round(df["Current"].min(), 2)
         df_avg["Max Current"] = round(df["Current"].max(), 2)
@@ -78,6 +80,7 @@ class Plot:
         df_avg["Duty Cycle"] = round(df["PWM Duty Cycle"].mean(), 2)
         df_avg["Frequency"] = round(df["Frequency"].mean(), 2)
         df_avg.reset_index(inplace=True)
+        df_avg["Polynomial"] = round(0.0017*pow(df_avg["DC"], 2) + 0.3531*df_avg["DC"] + 1.5, 2)
         print(df_avg)
         return df_avg
 
@@ -85,6 +88,7 @@ class Plot:
         for idx, name in enumerate(legend):
             figure.data[idx].name = name
             figure.data[idx].hovertemplate = name
+            figure.data[idx].showlegend = True
 
     def set_annotation(self, x_pos, y_pos, text, ax_pos=0, ay_pos=0, y_ref="y1"):
         annotation = {
@@ -159,8 +163,8 @@ class Plot:
 
     def force_pwm_plot(self):
         df = self.df_avg
-        df = df[df["Vref"]==2.0]
-        df = df[df["DC"]<=60]
+        # df = df[df["Vref"]==2.0]
+        # df = df[df["DC"]<=60]
         x_axis = "DC"
         y_axis = "Force"
         fig = px.line(df, x=x_axis, y=[y_axis], color="Vref", markers=True)
@@ -178,6 +182,46 @@ class Plot:
         self.plot_param["y_range"] = self.ranges["Force"]
         self.plot_param["legend"] = "Vref (V)"
         self.plot_param["annotation"] = None
+        self.write_plot(self.plot_param)
+
+    def force_poly_plot(self, vref):
+        df = self.df_avg
+        df = df[df["Vref"]==vref]
+        df = df[df["DC"]<=60]
+        x_axis = "DC"
+        y_axis = "Force"
+        poly = "Polynomial"
+
+        df_table = df[[x_axis, y_axis, poly]].copy()
+        df_table.set_index(x_axis, inplace=True)
+        df_table.to_csv(self.PLOT_PATH + "force-pwm.csv")
+
+        poly_xpos = 35
+        poly_id = df.index[df[x_axis] == poly_xpos].tolist()
+        poly_ypos = df.loc[poly_id]["Polynomial"].item()
+        poly_text = "y = 0.0017x<sup>2</sup> + 0.3531x + 1.5"
+
+        annotation_poly = self.set_annotation(poly_xpos, poly_ypos, poly_text, ax_pos=-100, ay_pos=-100)
+
+        fig1 = px.line(df, x=x_axis, y=[y_axis], markers=True)
+        fig2 = px.line(df, x=x_axis, y=[poly], line_dash_sequence=["dash"], color_discrete_sequence=["red"])
+        self.set_legend(fig1, ["Measured Force"])
+        subfig = make_subplots()
+        subfig.add_traces(fig1.data + fig2.data)
+        subfig.update_layout(
+            xaxis_tickmode = 'linear',
+            xaxis_tick0 = 0,
+            xaxis_dtick = 10,
+        )
+        self.plot_param["figure"] = subfig
+        self.plot_param["filename"] = "plot_force_poly"
+        self.plot_param["title"] = f"Force vs. PWM Duty Cycle (Vref = {vref}V)"
+        self.plot_param["x_title"] = "Duty Cycle (%)"
+        self.plot_param["y_title"] = "Average Force (N)"
+        self.plot_param["x_range"] = self.ranges["DC"]
+        self.plot_param["y_range"] = self.ranges["Force"]
+        self.plot_param["legend"] = "Data"
+        self.plot_param["annotation"] = [annotation_poly]
         self.write_plot(self.plot_param)
 
     def avg_current_force_plot(self):
