@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 import { getPipetteModelSpecs, LEFT, RIGHT } from '@opentrons/shared-data'
 import { useModulesQuery, usePipettesQuery } from '@opentrons/react-api-client'
 
@@ -13,18 +14,32 @@ import {
   SIZE_3,
   SPACING,
   TYPOGRAPHY,
+  useInterval,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ModuleCard } from '../ModuleCard'
-import { useIsOT3, useIsRobotViewable, useRunStatuses } from './hooks'
-import { getIs96ChannelPipetteAttached } from './utils'
+import {
+  useIsOT3,
+  useIsRobotViewable,
+  usePipetteOffsetCalibrations,
+  useRunStatuses,
+} from './hooks'
+import {
+  getIs96ChannelPipetteAttached,
+  getOffsetCalibrationForMount,
+} from './utils'
 import { PipetteCard } from './PipetteCard'
 import { GripperCard } from '../GripperCard'
+import { fetchPipetteOffsetCalibrations } from '../../redux/calibration'
+
+import type { Dispatch } from '../../redux/types'
 
 const EQUIPMENT_POLL_MS = 5000
+const FETCH_PIPETTE_LONG_POLL = 30000
+const FETCH_PIPETTE_SHORT_POLL = 1000
 interface InstrumentsAndModulesProps {
   robotName: string
 }
@@ -41,6 +56,7 @@ export function InstrumentsAndModules({
   const currentRunId = useCurrentRunId()
   const { isRunTerminal } = useRunStatuses()
   const isOT3 = useIsOT3(robotName)
+  const dispatch = useDispatch<Dispatch>()
 
   // TODO(BC, 2022-12-05): replace with attachedGripper after RLAB-88 is done
   const [tempAttachedGripper, tempSetAttachedGripper] = React.useState<{
@@ -62,6 +78,36 @@ export function InstrumentsAndModules({
     : Math.ceil(attachedModules?.length / 2)
   const leftColumnModules = attachedModules?.slice(0, halfAttachedModulesSize)
   const rightColumnModules = attachedModules?.slice(halfAttachedModulesSize)
+
+  // The following pipetteOffset related code has been lifted out of the PipetteCard component
+  // to eliminate duplicated useInterval calls to `calibration/pipette_offset` coming from each card.
+  // Instead we now capture all offset calibration data here, and pass the appropriate calibration
+  // data to the associated card via props
+  const pipetteOffsetCalibrations = usePipetteOffsetCalibrations(robotName)
+  const leftMountOffsetCalibration = getOffsetCalibrationForMount(
+    pipetteOffsetCalibrations,
+    attachedPipettes,
+    LEFT
+  )
+  const rightMountOffsetCalibration = getOffsetCalibrationForMount(
+    pipetteOffsetCalibrations,
+    attachedPipettes,
+    RIGHT
+  )
+
+  const allAttachedPipettesHaveOffsetCals =
+    (attachedPipettes.left == null || leftMountOffsetCalibration != null) &&
+    (attachedPipettes.right == null || rightMountOffsetCalibration != null)
+
+  useInterval(
+    () => {
+      dispatch(fetchPipetteOffsetCalibrations(robotName))
+    },
+    allAttachedPipettesHaveOffsetCals
+      ? FETCH_PIPETTE_LONG_POLL
+      : FETCH_PIPETTE_SHORT_POLL,
+    true
+  )
 
   return (
     <Flex
@@ -109,6 +155,7 @@ export function InstrumentsAndModules({
                     ? getPipetteModelSpecs(attachedPipettes.left?.model) ?? null
                     : null
                 }
+                pipetteOffsetCalibration={leftMountOffsetCalibration}
                 mount={LEFT}
                 robotName={robotName}
                 is96ChannelAttached={is96ChannelAttached}
@@ -146,6 +193,7 @@ export function InstrumentsAndModules({
                         null
                       : null
                   }
+                  pipetteOffsetCalibration={rightMountOffsetCalibration}
                   mount={RIGHT}
                   robotName={robotName}
                   is96ChannelAttached={false}
