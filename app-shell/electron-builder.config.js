@@ -17,7 +17,8 @@ module.exports = async () => ({
     'build/br-premigration-wheels',
     '!Makefile',
     '!python',
-    NO_USB_DETECTION ? '!node_modules/usb-detection' : '',
+    '!node_modules/usb-detection',
+    'node_modules/usb-detection/bin',
     {
       from: '../app/dist',
       to: './ui',
@@ -40,7 +41,6 @@ module.exports = async () => ({
     icon: project === 'robot-stack' ? 'build/icon.icns' : 'build/three.icns',
     forceCodeSigning: true,
     gatekeeperAssess: true,
-    binaries: ['node_modules/usb-detection/build/Release/detection.node']
   },
   dmg: {
     icon: null,
