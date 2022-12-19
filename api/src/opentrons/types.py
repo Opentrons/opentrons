@@ -1,7 +1,7 @@
 from __future__ import annotations
 import enum
 from math import sqrt, isclose
-from typing import TYPE_CHECKING, Any, NamedTuple, Iterable, Union, Optional
+from typing import TYPE_CHECKING, Any, NamedTuple, Iterable, Union
 
 from .protocols.api_support.labware_like import LabwareLike
 
