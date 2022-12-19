@@ -116,7 +116,7 @@ describe('useGenerateTaskList hook', () => {
     expect(result.current.taskList[2].description).toEqual('Empty')
   })
 
-  it('returns the the correct active index for a task that needs to be completed without subtasks', () => {
+  it('returns the the correct active when Deck Calibration is needed', () => {
     when(mockUseAttachedPipettes)
       .calledWith()
       .mockReturnValue(mockAttachedPipettesResponse)
@@ -136,7 +136,7 @@ describe('useGenerateTaskList hook', () => {
     expect(result.current.activeIndex).toEqual([0, 0])
   })
 
-  it('returns the the correct active index for a task with a subtask that needs to be completed', () => {
+  it('returns the the correct active index when a pipette is missing Offset Calibrations', () => {
     when(mockUseAttachedPipettes)
       .calledWith()
       .mockReturnValue(mockAttachedPipettesResponse)
@@ -154,6 +154,26 @@ describe('useGenerateTaskList hook', () => {
     })
 
     expect(result.current.activeIndex).toEqual([2, 1])
+  })
+
+  it('returns the the correct active index when a pipette is missing Tip Length Calibrations', () => {
+    when(mockUseAttachedPipettes)
+      .calledWith()
+      .mockReturnValue(mockAttachedPipettesResponse)
+    when(mockUseDeckCalibrationData)
+      .calledWith('otie')
+      .mockReturnValue(mockCompleteDeckCalibration)
+    when(mockUseTipLengthCalibrations)
+      .calledWith('otie')
+      .mockReturnValue(mockIncompleteTipLengthCalibrations)
+    when(mockUsePipetteOffsetCalibrations)
+      .calledWith('otie')
+      .mockReturnValue(mockCompletePipetteOffsetCalibrations) // right mount marked as bad
+    const { result } = renderHook(() => useGenerateTaskList('otie'), {
+      wrapper,
+    })
+
+    expect(result.current.activeIndex).toEqual([1, 0])
   })
 
   it('returns the earliest encountered task as the active index when multiple tasks require calibrations', () => {
