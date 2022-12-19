@@ -65,7 +65,9 @@ export function AvailableRobotOption(
           marginTop={SPACING.spacing3}
           marginBottom={SPACING.spacing4}
         >
-          <StyledText as="h6">{robotModel}</StyledText>
+          <StyledText as="h6" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            {robotModel}
+          </StyledText>
           <Box maxWidth="9.5rem">
             <StyledText
               as="p"
