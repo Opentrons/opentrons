@@ -33,7 +33,9 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
   const { t } = useTranslation(['protocol_details', 'shared', 'app_settings'])
   const { storedProtocolData, showSlideout, onCloseClick } = props
   const history = useHistory()
-  const [shouldApplyOffsets, setShouldApplyOffsets] = React.useState(true)
+  const [shouldApplyOffsets, setShouldApplyOffsets] = React.useState<boolean>(
+    true
+  )
   const {
     protocolKey,
     srcFileNames,
