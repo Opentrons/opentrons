@@ -13,7 +13,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { StyledText } from '../../../atoms/text'
-import { ModuleInfo } from '../../ProtocolSetup/RunSetupCard/ModuleSetup/ModuleInfo'
+import { ModuleInfo } from '../ModuleInfo'
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 

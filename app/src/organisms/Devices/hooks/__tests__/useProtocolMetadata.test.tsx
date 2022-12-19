@@ -4,13 +4,13 @@ import { when } from 'jest-when'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 import { renderHook } from '@testing-library/react-hooks'
-import { useProtocolMetadata } from '../hooks'
-import { useCurrentProtocol } from '../../ProtocolUpload/hooks'
+import { useCurrentProtocol } from '../../../ProtocolUpload/hooks'
+import { useProtocolMetadata } from '../useProtocolMetadata'
 
 import type { Store } from 'redux'
-import type { State } from '../../../redux/types'
+import type { State } from '../../../../redux/types'
 
-jest.mock('../../ProtocolUpload/hooks')
+jest.mock('../../../ProtocolUpload/hooks')
 
 const mockUseCurrentProtocol = useCurrentProtocol as jest.MockedFunction<
   typeof useCurrentProtocol

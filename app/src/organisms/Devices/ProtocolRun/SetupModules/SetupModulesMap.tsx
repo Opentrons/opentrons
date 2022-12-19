@@ -13,7 +13,7 @@ import {
   getDeckDefFromRobotType,
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
-import { ModuleInfo } from '../../../ProtocolSetup/RunSetupCard/ModuleSetup/ModuleInfo'
+import { ModuleInfo } from '../../ModuleInfo'
 import {
   useModuleRenderInfoForProtocolById,
   useProtocolDetailsForRun,

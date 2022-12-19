@@ -16,9 +16,9 @@ import { PrimaryButton } from '../../../../atoms/buttons'
 import { Modal } from '../../../../molecules/Modal'
 import secureMagModBracketImage from '../../../../assets/images/secure_mag_mod_bracket.png'
 import secureTCLatchImage from '../../../../assets/images/secure_tc_latch.png'
-import { getModuleName } from './utils/getModuleName'
+import { getModuleName } from '../utils/getModuleName'
 
-import type { ModuleTypesThatRequireExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
+import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 
 interface SecureLabwareModalProps {
   onCloseClick: () => unknown

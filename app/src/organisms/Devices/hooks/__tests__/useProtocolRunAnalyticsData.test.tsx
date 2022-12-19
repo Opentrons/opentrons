@@ -10,14 +10,14 @@ import { useProtocolRunAnalyticsData } from '../useProtocolRunAnalyticsData'
 import { hash } from '../../../../redux/analytics/hash'
 import { getStoredProtocol } from '../../../../redux/protocol-storage'
 import { useStoredProtocolAnalysis, useProtocolDetailsForRun } from '../'
-import { useProtocolMetadata } from '../../../ProtocolSetup/hooks'
+import { useProtocolMetadata } from '../useProtocolMetadata'
 import { useRunTimestamps } from '../../../RunTimeControl/hooks'
 import { formatInterval } from '../../../RunTimeControl/utils'
 
 jest.mock('../../../../redux/analytics/hash')
 jest.mock('../../../../redux/protocol-storage')
 jest.mock('../../hooks')
-jest.mock('../../../ProtocolSetup/hooks')
+jest.mock('../useProtocolMetadata')
 jest.mock('../../../RunTimeControl/hooks')
 jest.mock('../../../RunTimeControl/utils')
 
