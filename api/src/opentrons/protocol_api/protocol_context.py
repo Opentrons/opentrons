@@ -5,7 +5,7 @@ from typing import Callable, Dict, List, NamedTuple, Optional, Type, Union, Mapp
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
-from opentrons.types import Mount, Location, DeckLocation
+from opentrons.types import Mount, Location, DeckLocation, LoadedLiquid
 from opentrons.broker import Broker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
@@ -18,7 +18,6 @@ from opentrons.protocols.api_support.util import (
     APIVersionError,
 )
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
-from opentrons.protocol_engine.types import Liquid
 
 from .core.common import ModuleCore, ProtocolCore
 from .core.core_map import LoadedCoreMap
@@ -742,7 +741,7 @@ class ProtocolContext(CommandPublisher):
     @requires_version(2, 13)
     def add_liquid(
         self, display_name: str, description: str, display_color: str
-    ) -> Liquid:
+    ) -> LoadedLiquid:
         """
         Add a liquid to the protocol.
 

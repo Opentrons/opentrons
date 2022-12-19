@@ -7,7 +7,14 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
-from opentrons.types import DeckSlotName, Location, Mount, MountType, Point
+from opentrons.types import (
+    DeckSlotName,
+    Location,
+    Mount,
+    MountType,
+    Point,
+    LoadedLiquid,
+)
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
 from opentrons.hardware_control.modules import AbstractModule
 from opentrons.hardware_control.modules.types import (
@@ -386,14 +393,22 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def add_liquid(
         self, display_name: str, description: str, display_color: str
-    ) -> Liquid:
+    ) -> LoadedLiquid:
         """create a liquid to load into a labware."""
         model_utils = ModelUtils()
-        return self._engine_client.add_liquid(
+        loaded_liquid = self._engine_client.add_liquid(
             Liquid(
                 id=model_utils.generate_id(),
                 displayName=display_name,
                 description=description,
                 displayColor=HexColor(__root__=display_color),
             )
+        )
+        return LoadedLiquid(
+            id=loaded_liquid.id,
+            display_name=loaded_liquid.displayName,
+            description=loaded_liquid.description,
+            display_color=loaded_liquid.displayColor.__root__
+            if loaded_liquid.displayColor
+            else None,
         )

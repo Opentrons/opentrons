@@ -5,7 +5,7 @@ from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
-from opentrons.types import DeckSlotName, Location, Mount, Point
+from opentrons.types import DeckSlotName, Location, Mount, Point, LoadedLiquid
 from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules import AbstractModule, ModuleModel, ModuleType
@@ -14,8 +14,6 @@ from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import AxisMaxSpeeds, UnsupportedAPIError
 from opentrons.protocols.geometry import module_geometry
 from opentrons.protocols import labware as labware_definition
-
-from opentrons.protocol_engine.types import Liquid
 
 from ...labware import Labware
 from ..protocol import AbstractProtocol
@@ -423,7 +421,7 @@ class ProtocolContextImplementation(
 
     def add_liquid(
         self, display_name: str, description: str, display_color: str
-    ) -> Liquid:
+    ) -> LoadedLiquid:
         """Add a liquid to load on a labware."""
         raise UnsupportedAPIError(
             "Creating a liquid is not supported in this API version."

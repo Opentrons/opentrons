@@ -1,7 +1,7 @@
 from __future__ import annotations
 import enum
 from math import sqrt, isclose
-from typing import TYPE_CHECKING, Any, NamedTuple, Iterable, Union
+from typing import TYPE_CHECKING, Any, NamedTuple, Iterable, Union, Optional
 
 from .protocols.api_support.labware_like import LabwareLike
 
@@ -213,3 +213,10 @@ class TransferTipPolicy(enum.Enum):
 
 
 DeckLocation = Union[int, str]
+
+
+class LoadedLiquid(NamedTuple):
+    id: str
+    display_name: str
+    description: str
+    display_color: Optional[str]
