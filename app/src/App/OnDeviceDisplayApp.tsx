@@ -84,7 +84,9 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     Component: ConfirmRobotName,
     exact: true,
     name: 'Name confirmation',
-    path: '/network-setup/confirm-name',
+    // Note: kj 12/19/2022 this path might be changed since the ODD app will have rename screen
+    // and it will use the same components for doing that.
+    path: '/network-setup/confirm-name/:robotName',
   },
   {
     Component: () => (

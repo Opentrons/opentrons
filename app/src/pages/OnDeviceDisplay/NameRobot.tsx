@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
-// import { useHistory } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import { useFormik } from 'formik'
 import { css } from 'styled-components'
 
@@ -59,10 +59,9 @@ export function NameRobot(): JSX.Element {
   const trackEvent = useTrackEvent()
   const localRobot = useSelector(getLocalRobot)
   const previousName = localRobot?.name != null ? localRobot.name : null
-  // const [oldName, setOldName] = React.useState<string>('')
   const [name, setName] = React.useState<string>('')
   const keyboardRef = React.useRef(null)
-  // const history = useHistory()
+  const history = useHistory()
   const dispatch = useDispatch<Dispatch>()
 
   // check for robot name
@@ -89,12 +88,9 @@ export function NameRobot(): JSX.Element {
         dispatch(removeRobot(sameNameRobotInUnavailable.name))
       }
       updateRobotName(newName)
-      console.log('isNaming: ', isNaming)
-      console.log(previousName)
-      // !Boolean(isNaming) &&
-      //   newName !== previousName &&
-      //   history.push('/network-setup/confirm-name')
-      // resetForm({ values: { newRobotName: '' } })
+      !Boolean(isNaming) &&
+        history.push(`/network-setup/confirm-name/${newName}`)
+      resetForm({ values: { newRobotName: '' } })
     },
     validate: values => {
       const errors: FormikErrors = {}
@@ -117,9 +113,6 @@ export function NameRobot(): JSX.Element {
 
   const { updateRobotName, isLoading: isNaming } = useUpdateRobotNameMutation({
     onSuccess: (data: UpdatedRobotName) => {
-      // data.name != null && history.push('/confirm-robot-name')
-      // remove previousName if it isn't undefined | null
-      console.log('new name', data.name)
       data.name != null &&
         previousName != null &&
         dispatch(removeRobot(previousName))
@@ -132,7 +125,6 @@ export function NameRobot(): JSX.Element {
 
   const handleConfirm = (): void => {
     // check robot name in the same network
-    // setIsWaiting(true)
     trackEvent({
       name: 'renameRobot',
       properties: {
