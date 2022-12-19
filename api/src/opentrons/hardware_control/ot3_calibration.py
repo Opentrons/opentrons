@@ -431,18 +431,21 @@ async def _calibrate_mount(
         LOG.info(f"Found deck at {z_pos}mm")
 
         # Perform xy offset search
-        if method == CalibrationMethod.BINARY_SEARCH:
-            x_center, y_center = await find_slot_center_binary(hcapi, mount, z_pos)
-        elif method == CalibrationMethod.NONCONTACT_PASS:
-            x_center, y_center = await find_slot_center_noncontact(hcapi, mount, z_pos)
-        else:
-            raise RuntimeError("Unknown calibration method")
+        # if method == CalibrationMethod.BINARY_SEARCH:
+        #     x_center, y_center = await find_slot_center_binary(hcapi, mount, z_pos)
+        # elif method == CalibrationMethod.NONCONTACT_PASS:
+        #     x_center, y_center = await find_slot_center_noncontact(hcapi, mount, z_pos)
+        # else:
+        #     raise RuntimeError("Unknown calibration method")
 
         # update center with values obtained during calibration
+        x_center, y_center = await find_slot_center_binary(hcapi, mount, z_pos)
         center = Point(x_center, y_center, z_pos)
+        offset = center - Point(*hcapi.config.calibration.edge_sense.nominal_center)
         LOG.info(f"Found calibration value {center} for mount {mount.name}")
 
-        return center - Point(*hcapi.config.calibration.edge_sense.nominal_center)
+        return offset, center
+        # return z_pos
 
     except (InaccurateNonContactSweepError, EarlyCapacitiveSenseTrigger):
         LOG.info(
@@ -514,10 +517,12 @@ async def calibrate_pipette(
     """
     try:
         await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
-        offset = await _calibrate_mount(hcapi, mount, method)
+        # z_pos = await find_deck_position(hcapi, mount)
+        # return z_pos
+        offset, center = await _calibrate_mount(hcapi, mount, method)
         # save instrument offset for pipette
         await hcapi.save_instrument_offset(mount, offset)
-        return offset
+        return offset, center
     finally:
-        await hcapi.home_z(mount)
+        # await hcapi.home_z(mount)
         await hcapi.remove_tip(mount)
