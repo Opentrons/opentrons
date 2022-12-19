@@ -20,6 +20,7 @@ from opentrons.protocol_api import (
     TemperatureModuleContext,
     MagneticModuleContext,
     Labware,
+    Well,
     Deck,
     validation as mock_validation,
 )
@@ -32,6 +33,7 @@ from opentrons.protocol_api.core.common import (
     TemperatureModuleCore,
     MagneticModuleCore,
 )
+from opentrons.protocol_api.core.protocol import LoadedLiquid
 
 
 @pytest.fixture(autouse=True)
@@ -492,4 +494,21 @@ def test_add_liquid(
             display_name="water", description="water desc", display_color="#1234"
         ),
         times=1,
+    )
+
+
+def test_load_liquid(
+    decoy: Decoy, mock_core: ProtocolCore, subject: ProtocolContext
+) -> None:
+    """It should load a liquid to a location."""
+    mocked_labware = decoy.mock(cls=Labware)
+    mocked_liquid = decoy.mock(cls=LoadedLiquid)
+    mocked_well = decoy.mock(cls=Well)
+
+    subject.load_liquid(
+        labware=mocked_labware, liquid=mocked_liquid, volumeByWell={mocked_well: 20}
+    )
+
+    decoy.verify(
+        mock_core.load_liquid(labware=mocked_labware, liquid=mocked_liquid), times=1
     )

@@ -13,7 +13,6 @@ from opentrons.types import (
     Mount,
     MountType,
     Point,
-    LoadedLiquid,
 )
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
 from opentrons.hardware_control.modules import AbstractModule
@@ -38,7 +37,7 @@ from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.types import Liquid, HexColor
 from opentrons.protocol_engine.resources import ModelUtils
 
-from ..protocol import AbstractProtocol
+from ..protocol import AbstractProtocol, LoadedLiquid
 from ..labware import LabwareLoadParams
 from .labware import LabwareCore
 from .instrument import InstrumentCore

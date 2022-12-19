@@ -12,7 +12,7 @@ from opentrons_shared_data.labware.dev_types import (
 )
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from opentrons.types import DeckSlotName, Mount, MountType, Point, LoadedLiquid
+from opentrons.types import DeckSlotName, Mount, MountType, Point
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.modules import AbstractModule
@@ -46,6 +46,7 @@ from opentrons.protocol_api.core.engine import (
     LabwareCore,
     ModuleCore,
 )
+from opentrons.protocol_api.core.protocol import LoadedLiquid
 from opentrons.protocol_api.core.engine.exceptions import InvalidModuleLocationError
 from opentrons.protocol_api.core.engine.module_core import (
     TemperatureModuleCore,
@@ -652,7 +653,10 @@ def test_get_highest_z(
 
 
 def test_add_liquid(
-    decoy: Decoy, mock_engine_client: EngineClient, subject: ProtocolCore, model_utils: ModelUtils
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: ProtocolCore,
+    model_utils: ModelUtils,
 ) -> None:
     """It should return the created liquid."""
     liquid = Liquid.construct(

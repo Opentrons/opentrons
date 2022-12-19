@@ -4,12 +4,13 @@ from __future__ import annotations
 
 from abc import abstractmethod, ABC
 from typing import Dict, Generic, List, Optional, Union, Tuple
+from dataclasses import dataclass
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
-from opentrons.types import DeckSlotName, Location, Mount, Point, LoadedLiquid
+from opentrons.types import DeckSlotName, Location, Mount, Point
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import ModuleModel
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
@@ -17,6 +18,14 @@ from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from .instrument import InstrumentCoreType
 from .labware import LabwareCoreType, LabwareLoadParams
 from .module import ModuleCoreType
+
+
+@dataclass(frozen=True)
+class LoadedLiquid:
+    id: str
+    display_name: str
+    description: str
+    display_color: Optional[str]
 
 
 class AbstractProtocol(

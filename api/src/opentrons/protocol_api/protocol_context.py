@@ -5,7 +5,7 @@ from typing import Callable, Dict, List, NamedTuple, Optional, Type, Union, Mapp
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
-from opentrons.types import Mount, Location, DeckLocation, LoadedLiquid
+from opentrons.types import Mount, Location, DeckLocation
 from opentrons.broker import Broker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
@@ -27,12 +27,13 @@ from .core.module import (
     AbstractThermocyclerCore,
     AbstractHeaterShakerCore,
 )
+from .core.protocol import LoadedLiquid
 from .core.engine.protocol import ProtocolCore as ProtocolEngineCore
 
 from . import validation
 from .deck import Deck
 from .instrument_context import InstrumentContext
-from .labware import Labware
+from .labware import Labware, Well
 from .module_contexts import (
     MagneticModuleContext,
     TemperatureModuleContext,
@@ -738,6 +739,7 @@ class ProtocolContext(CommandPublisher):
         """
         self._implementation.set_rail_lights(on=on)
 
+    # TODO (tz, 12-19-22): Should the api version be 2.14?
     @requires_version(2, 13)
     def add_liquid(
         self, display_name: str, description: str, display_color: str
@@ -754,6 +756,19 @@ class ProtocolContext(CommandPublisher):
             description=description,
             display_color=display_color,
         )
+
+    @requires_version(2, 13)
+    def load_liquid(
+        self, labware: Labware, liquid: LoadedLiquid, volumeByWell: Dict[Well, int]
+    ) -> LoadedLiquid:
+        """
+        Add a liquid to the protocol.
+
+        :param str display_name: An human-readable name for this liquid.
+        :param str description: A description of this liquid.
+        :param str display_color: An optional Hex color code, with hash included, to represent the specified liquid. Standard three-value, four-value, six-value, and eight-value syntax are all acceptable.
+        """
+        pass
 
     @property  # type: ignore
     @requires_version(2, 5)

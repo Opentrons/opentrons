@@ -5,7 +5,7 @@ from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
-from opentrons.types import DeckSlotName, Location, Mount, Point, LoadedLiquid
+from opentrons.types import DeckSlotName, Location, Mount, Point
 from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules import AbstractModule, ModuleModel, ModuleType
@@ -16,7 +16,7 @@ from opentrons.protocols.geometry import module_geometry
 from opentrons.protocols import labware as labware_definition
 
 from ...labware import Labware
-from ..protocol import AbstractProtocol
+from ..protocol import AbstractProtocol, LoadedLiquid
 from ..labware import LabwareLoadParams
 
 from . import legacy_module_core
