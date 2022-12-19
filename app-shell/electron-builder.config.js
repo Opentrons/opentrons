@@ -8,6 +8,23 @@ const USE_PYTHON = process.env.NO_PYTHON !== 'true'
 const NO_USB_DETECTION = process.env.NO_USB_DETECTION === 'true'
 const project = process.env.OPENTRONS_PROJECT ?? 'robot-stack'
 
+const ot3PublishConfig =
+  OT_APP_DEPLOY_BUCKET && OT_APP_DEPLOY_FOLDER
+    ? {
+        provider: 'generic',
+        url: `https://${OT_APP_DEPLOY_BUCKET}/${OT_APP_DEPLOY_FOLDER}/`,
+      }
+    : null
+
+const robotStackPublishConfig =
+  OT_APP_DEPLOY_BUCKET && OT_APP_DEPLOY_FOLDER
+    ? {
+        provider: 's3',
+        bucket: OT_APP_DEPLOY_BUCKET,
+        path: OT_APP_DEPLOY_FOLDER,
+      }
+    : null
+
 module.exports = async () => ({
   appId:
     project === 'robot-stack' ? 'com.opentrons.app' : 'com.opentrons.appot3',
@@ -17,6 +34,11 @@ module.exports = async () => ({
     'build/br-premigration-wheels',
     '!Makefile',
     '!python',
+    // this detail with node modules makes sure that any byproducts from the build process
+    // of the usb-detection submodule - which should only exist anyway if we don't get a
+    // prebuild - won't get packed into the app. If they are, they'll prevent the app
+    // from running on OSX, because they intern paths on the action runner in their binaries
+    // sometimes and gatekeeper will scan them, notice, and fail us.
     '!node_modules/usb-detection/build',
     'node_modules/usb-detection/build/Release',
     {
@@ -59,14 +81,7 @@ module.exports = async () => ({
     category: 'Science',
     icon: project === 'robot-stack' ? 'build/icon.icns' : 'build/three.icns',
   },
-  publish:
-    OT_APP_DEPLOY_BUCKET && OT_APP_DEPLOY_FOLDER
-      ? {
-          provider: 's3',
-          bucket: OT_APP_DEPLOY_BUCKET,
-          path: OT_APP_DEPLOY_FOLDER,
-        }
-      : null,
+  publish: project === 'ot3' ? ot3PublishConfig : robotStackPublishConfig,
   generateUpdatesFilesForAllChannels: true,
   beforeBuild: path.join(__dirname, './scripts/before-build.js'),
   afterSign: path.join(__dirname, './scripts/after-sign.js'),
