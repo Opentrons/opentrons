@@ -41,7 +41,6 @@ from .types import (
     ModuleModel,
     ModuleDefinition,
     Liquid,
-    StaticPipetteConfig,
 )
 
 

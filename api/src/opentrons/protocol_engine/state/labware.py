@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Sequence, Any, Mapping, Union
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Set, Union
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
 from opentrons_shared_data.pipette.dev_types import LabwareUri
@@ -36,8 +36,6 @@ from ..actions import (
 )
 from .abstract_store import HasState, HandlesActions
 
-
-_TRASH_LOCATION = DeckSlotLocation(slotName=DeckSlotName.FIXED_TRASH)
 
 # URIs of labware whose definitions accidentally specify an engage height
 # in units of half-millimeters instead of millimeters.
@@ -210,6 +208,25 @@ class LabwareView(HasState[LabwareState]):
         raise errors.exceptions.LabwareNotLoadedOnModuleError(
             "There is no labware loaded on this Module"
         )
+
+    # TODO(mc, 2022-12-09): enforce data integrity (e.g. one labware per slot)
+    # rather than shunting this work to callers via `allowed_ids`.
+    # This has larger implications and is tied up in splitting LPC out of the protocol run
+    def get_by_slot(
+        self, slot_name: DeckSlotName, allowed_ids: Set[str]
+    ) -> Optional[LoadedLabware]:
+        """Get the labware located in a given slot, if any."""
+        loaded_labware = reversed(list(self._state.labware_by_id.values()))
+
+        for labware in loaded_labware:
+            if (
+                isinstance(labware.location, DeckSlotLocation)
+                and labware.location.slotName == slot_name
+                and labware.id in allowed_ids
+            ):
+                return labware
+
+        return None
 
     def get_definition(self, labware_id: str) -> LabwareDefinition:
         """Get labware definition by the labware's unique identifier."""

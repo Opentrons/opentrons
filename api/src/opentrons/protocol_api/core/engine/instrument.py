@@ -359,7 +359,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         return self._sync_hardware_api.get_attached_instrument(self.get_mount())  # type: ignore[no-any-return]
 
     def get_channels(self) -> int:
-        return self._engine_client.state.pipettes.get_channels(self._pipette_id)
+        return self._engine_client.state.tips.get_pipette_channels(self._pipette_id)
 
     def has_tip(self) -> bool:
         return self.get_hardware_state()["has_tip"]

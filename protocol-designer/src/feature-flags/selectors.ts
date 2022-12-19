@@ -15,10 +15,6 @@ export const getDisableModuleRestrictions: Selector<
   getFeatureFlagData,
   flags => flags.OT_PD_DISABLE_MODULE_RESTRICTIONS
 )
-export const getEnabledLiquidColorEnhancements: Selector<boolean> = createSelector(
-  getFeatureFlagData,
-  flags => flags.OT_PD_ENABLE_LIQUID_COLOR_ENHANCEMENTS ?? false
-)
 export const getEnabledOT3: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_OT_3 ?? false

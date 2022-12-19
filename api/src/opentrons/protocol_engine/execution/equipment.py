@@ -36,7 +36,6 @@ from ..types import (
     LabwareOffsetLocation,
     ModuleModel,
     ModuleDefinition,
-    StaticPipetteConfig,
 )
 
 
@@ -198,12 +197,10 @@ class EquipmentHandler:
         self._action_dispatcher.dispatch(
             AddPipetteConfigAction(
                 pipette_id=pipette_id,
-                static_config=StaticPipetteConfig(
-                    model=pipette_dict["model"],
-                    min_volume=pipette_dict["min_volume"],
-                    max_volume=pipette_dict["max_volume"],
-                    channels=pipette_dict["channels"],
-                ),
+                model=pipette_dict["model"],
+                min_volume=pipette_dict["min_volume"],
+                max_volume=pipette_dict["max_volume"],
+                channels=pipette_dict["channels"],
             )
         )
 

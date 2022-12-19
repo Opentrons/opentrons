@@ -6,11 +6,12 @@ from opentrons_shared_data.labware.dev_types import (
     LabwareDefinition as LabwareDefinitionDict,
 )
 
+from opentrons.protocol_engine.errors import LabwareNotOnDeckError, ModuleNotOnDeckError
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocols.geometry.labware_geometry import LabwareGeometry
 from opentrons.protocols.api_support.tip_tracker import TipTracker
 from opentrons.protocols.api_support.util import APIVersionError
-from opentrons.types import Point
+from opentrons.types import DeckSlotName, Point
 
 from ..labware import AbstractLabware, LabwareLoadParams
 from .well import WellCore
@@ -122,7 +123,7 @@ class LabwareCore(AbstractLabware[WellCore]):
     ) -> Optional[str]:
         return self._engine_client.state.tips.get_next_tip(
             labware_id=self._labware_id,
-            use_column=num_tips != 1,
+            num_tips=num_tips,
             starting_tip_name=(
                 starting_tip.get_name()
                 if starting_tip and starting_tip.labware_id == self._labware_id
@@ -155,3 +156,12 @@ class LabwareCore(AbstractLabware[WellCore]):
             labware_id=self._labware_id,
             engine_client=self._engine_client,
         )
+
+    def get_deck_slot(self) -> Optional[DeckSlotName]:
+        """Get the deck slot the labware is in, if on deck."""
+        try:
+            return self._engine_client.state.geometry.get_ancestor_slot_name(
+                self.labware_id
+            )
+        except (LabwareNotOnDeckError, ModuleNotOnDeckError):
+            return None

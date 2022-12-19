@@ -319,6 +319,7 @@ export function ProtocolDetails(
     mostRecentAnalysis?.createdAt != null
       ? format(new Date(mostRecentAnalysis.createdAt), 'MMM dd yy HH:mm')
       : t('shared:no_data')
+  const robotType = mostRecentAnalysis?.robotType ?? null
 
   const contentsByTabName = {
     labware: (
@@ -330,6 +331,7 @@ export function ProtocolDetails(
         rightMountPipetteName={rightMountPipetteName}
         requiredModuleDetails={requiredModuleDetails}
         isLoading={analysisStatus === 'loading'}
+        robotType={robotType}
       />
     ),
     liquids: (
