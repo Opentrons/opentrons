@@ -14,6 +14,7 @@ from opentrons.protocol_reader.role_analyzer import (
     RoleAnalysis,
     MainFile,
     LabwareFile,
+    DataFile,
     RoleAnalysisError,
 )
 
@@ -41,6 +42,7 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
             main_file=MainFile(name="protocol.py", contents=b"", path=None),
             labware_files=[],
             labware_definitions=[],
+            data_files=[],
         ),
     ),
     RoleAnalyzerSpec(
@@ -69,6 +71,7 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
             labware_definitions=[
                 LabwareDefinition.construct()  # type: ignore[call-arg]
             ],
+            data_files=[],
         ),
     ),
     RoleAnalyzerSpec(
@@ -101,6 +104,7 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
             labware_definitions=[
                 LabwareDefinition.construct(),  # type: ignore[call-arg]
             ],
+            data_files=[],
         ),
     ),
     RoleAnalyzerSpec(
@@ -137,6 +141,7 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
             labware_definitions=[
                 LabwareDefinition.construct(version=1)  # type: ignore[call-arg]
             ],
+            data_files=[],
         ),
     ),
     RoleAnalyzerSpec(
@@ -147,6 +152,7 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
             main_file=MainFile(name="PROTOCOL.PY", contents=b"", path=None),
             labware_files=[],
             labware_definitions=[],
+            data_files=[],
         ),
     ),
     RoleAnalyzerSpec(
@@ -174,6 +180,24 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
             labware_files=[],
             labware_definitions=[
                 LabwareDefinition.construct()  # type: ignore[call-arg]
+            ],
+            data_files=[],
+        ),
+    ),
+    RoleAnalyzerSpec(
+        files=[
+            BufferedFile(name="protocol.py", path=None, contents=b"", data=None),
+            BufferedFile(name="extra_data.dat", path=None, contents=b"", data=None),
+            BufferedFile(name="extra_data.csv", path=None, contents=b"", data=None),
+            BufferedFile(name="extra_data.txt", path=None, contents=b"", data=None),
+        ],
+        expected=RoleAnalysis(
+            main_file=MainFile(name="protocol.py", contents=b"", path=None),
+            labware_files=[],
+            labware_definitions=[],
+            data_files=[
+                DataFile(name="extra_data.csv", contents=b"", path=None, data=None),
+                DataFile(name="extra_data.txt", contents=b"", path=None, data=None),
             ],
         ),
     ),
