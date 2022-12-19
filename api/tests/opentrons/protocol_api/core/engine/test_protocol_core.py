@@ -54,7 +54,7 @@ from opentrons.protocol_api.core.engine.module_core import (
     ThermocyclerModuleCore,
     HeaterShakerModuleCore,
 )
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION, Labware, Well
 from opentrons.protocols.api_support.types import APIVersion
 
 
@@ -682,3 +682,26 @@ def test_add_liquid(
     )
 
     assert result == expected_result
+
+
+def test_load_liquid(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: ProtocolCore,
+    model_utils: ModelUtils,
+) -> None:
+    """It should load a liquid into a labware."""
+    mock_labware = decoy.mock(cls=Labware)
+    mock_well = decoy.mock(cls=Well)
+    mock_liquid = decoy.mock(cls=LoadedLiquid)
+
+    subject.load_liquid(
+        labware=mock_labware, liquid=mock_liquid, volume_by_well={mock_well: 20}
+    )
+
+    decoy.verify(
+        mock_engine_client.load_liquid(
+            labware_id="labware-id", liquid_id="liquid-id", volume_by_well={"A1": 20}
+        ),
+        times=1,
+    )
