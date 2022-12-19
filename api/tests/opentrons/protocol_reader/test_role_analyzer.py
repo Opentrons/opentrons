@@ -135,7 +135,7 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
                     name="labware.json",
                     contents=b"",
                     path=None,
-                    data=LabwareDefinition.construct(version=2)  # type: ignore[call-arg]
+                    data=LabwareDefinition.construct(version=2),  # type: ignore[call-arg]
                 )
             ],
         ),
