@@ -1,4 +1,5 @@
 """Input file reading."""
+import enum
 from json import JSONDecodeError
 from anyio import Path as AsyncPath, create_task_group, wrap_file
 from dataclasses import dataclass
@@ -13,13 +14,6 @@ from opentrons.protocols.models import JsonProtocol, LabwareDefinition
 from .input_file import AbstractInputFile
 
 
-# TODO(mc, 2021-12-07): add support for arbitrary JSON data files
-BufferedJsonFileData = Union[JsonProtocol, LabwareDefinition, ProtocolSchemaV6]
-
-
-# TODO(mc, 2021-12-07): re-evaluate if JSON parsing (and this `data` field)
-# are really conceptually appropriate for this unit. The answer is likely
-# "no", especially if we need to make perf. improvements to parsing
 @dataclass(frozen=True)
 class BufferedFile:
     """A file that has been read into memory."""
@@ -27,7 +21,6 @@ class BufferedFile:
     name: str
     contents: bytes
     path: Optional[Path]
-    data: Optional[BufferedJsonFileData]
 
 
 class FileReadError(Exception):
@@ -59,30 +52,14 @@ class FileReaderWriter:
                 async with wrap_file(input_file.file) as f:
                     contents = await f.read()
 
-            data: Optional[BufferedJsonFileData] = None
-
-            if filename.lower().endswith(".json"):
-                try:
-                    data = parse_raw_as(BufferedJsonFileData, contents)  # type: ignore[arg-type]
-
-                # unlike other Pydantic functions/methods, `parse_raw_as` can
-                # raise both JSONDecodeError and ValidationError separately
-                except JSONDecodeError as e:
-                    raise FileReadError(f"{filename} is not valid JSON.") from e
-
-                except ValidationError as e:
-                    raise FileReadError(
-                        f"JSON file {filename} did not"
-                        " match a known Opentrons format."
-                    ) from e
-
             results[index] = BufferedFile(
                 name=filename,
                 contents=contents,
-                data=data,
                 path=path,
             )
 
+        # TODO BEFORE MERGE:
+        # Simplify this to read files serially.
         async with create_task_group() as tg:
             for index, input_file in enumerate(files):
                 tg.start_soon(_read_file, input_file, index)
