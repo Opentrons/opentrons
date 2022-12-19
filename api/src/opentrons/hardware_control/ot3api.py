@@ -504,6 +504,7 @@ class OT3API(
                 )
 
         await self._backend.probe_network()
+        await self._backend.update_motor_status()
         await self.set_gantry_load(
             self._gantry_load_from_instruments(self.get_all_attached_instr())
         )

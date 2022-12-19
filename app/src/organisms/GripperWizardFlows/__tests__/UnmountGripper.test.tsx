@@ -46,8 +46,8 @@ describe('UnmountGripper', () => {
   })
 
   it('clicking go back calls back', () => {
-    const { getByRole } = render()[0]
-    getByRole('button', { name: 'Go back' }).click()
+    const { getByLabelText } = render()[0]
+    getByLabelText('back').click()
     expect(mockGoBack).toHaveBeenCalled()
   })
 

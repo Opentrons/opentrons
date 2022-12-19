@@ -1242,6 +1242,7 @@
       "id": "0abc123",
       "params": {
         "pipetteId": "pipetteId",
+        "pipetteName": "p1000_96",
         "mount": "left"
       }
     },
@@ -1250,6 +1251,7 @@
       "id": "1abc123",
       "params": {
         "moduleId": "magneticModuleId",
+        "model": "magneticModuleV2",
         "location": { "slotName": "3" }
       }
     },
@@ -1258,6 +1260,7 @@
       "id": "2abc123",
       "params": {
         "moduleId": "temperatureModuleId",
+        "model": "temperatureModuleV2",
         "location": { "slotName": "1" }
       }
     },
@@ -1266,6 +1269,9 @@
       "id": "3abc123",
       "params": {
         "labwareId": "sourcePlateId",
+        "loadName": "armadillo_96_wellplate_200ul_pcr_full_skirt",
+        "namespace": "opentrons",
+        "version": 1,
         "location": {
           "moduleId": "temperatureModuleId"
         }
@@ -1276,6 +1282,9 @@
       "id": "4abc123",
       "params": {
         "labwareId": "destPlateId",
+        "loadName": "armadillo_96_wellplate_200ul_pcr_full_skirt",
+        "namespace": "opentrons",
+        "version": 1,
         "location": {
           "moduleId": "magneticModuleId"
         },
@@ -1287,7 +1296,10 @@
       "id": "5abc123",
       "params": {
         "labwareId": "tipRackId",
-        "location": { "slotName": "8" }
+        "location": { "slotName": "8" },
+        "loadName": "opentrons_96_tiprack_1000ul",
+        "namespace": "opentrons",
+        "version": 1
       }
     },
     {
@@ -1297,7 +1309,10 @@
         "labwareId": "fixedTrash",
         "location": {
           "slotName": "12"
-        }
+        },
+        "loadName": "opentrons_1_trash_1100ml_fixed",
+        "namespace": "opentrons",
+        "version": 1
       }
     },
     {
@@ -1342,7 +1357,7 @@
       }
     },
     {
-      "commandType": "delay",
+      "commandType": "waitForDuration",
       "id": "10abc123",
       "params": {
         "seconds": 42
@@ -1391,15 +1406,11 @@
       }
     },
     {
-      "commandType": "moveToSlot",
+      "commandType": "moveToCoordinates",
       "id": "14abc123",
       "params": {
         "pipetteId": "pipetteId",
-        "slotName": "5",
-        "wellLocation": {
-          "origin": "bottom",
-          "offset": { "x": 1, "y": 2, "z": 3 }
-        }
+        "coordinates": { "x": 100, "y": 100, "z": 100 }
       }
     },
     {

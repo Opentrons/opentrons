@@ -163,7 +163,7 @@ function TryAgainButton(props: ConfirmPipetteProps): JSX.Element {
           {t('use_attached_pipette')}
         </SecondaryButton>
         <PrimaryButton onClick={tryAgain}>
-          {t('detatch_try_again')}
+          {t('detach_try_again')}
         </PrimaryButton>
       </>
     )
