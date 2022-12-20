@@ -3,6 +3,7 @@ import { getLabwareDisplayName } from '@opentrons/shared-data'
 
 import { GroupedLabwareSetupItems, LabwareSetupItem } from './types'
 import { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import type { LabwareOffset } from '@opentrons/api-client'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 
 const LABWARE_ACCESS_COMMAND_TYPES = [
@@ -84,4 +85,27 @@ export function getLabwareSetupItemGroups(
     ({ initialLocation }) => initialLocation === 'offDeck'
   )
   return { onDeckItems, offDeckItems }
+}
+
+export function getLatestCurrentOffsets(
+  currentOffsets: LabwareOffset[]
+): LabwareOffset[] {
+  const reverseCurrentOffsets = [...currentOffsets].reverse()
+  const uniqueSlots = [
+    ...new Set(
+      reverseCurrentOffsets.map(
+        currentOffset => currentOffset.location.slotName
+      )
+    ),
+  ]
+  const latestCurrentOffsets = reverseCurrentOffsets.filter(
+    (currentOffset, index) =>
+      currentOffset.location.slotName === uniqueSlots[index] &&
+      !(
+        currentOffset.vector.x === 0 &&
+        currentOffset.vector.y === 0 &&
+        currentOffset.vector.z === 0
+      )
+  )
+  return latestCurrentOffsets
 }

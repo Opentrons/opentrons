@@ -23,6 +23,7 @@ import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../redux/config'
 import { ModalHeader, ModalShell } from '../../../../molecules/Modal'
 import { PrimaryButton } from '../../../../atoms/buttons'
 import { OffsetVector } from '../../../../molecules/OffsetVector'
+import { getLatestCurrentOffsets } from './utils'
 import type { LabwareOffset } from '@opentrons/api-client'
 
 const OffsetTable = styled('table')`
@@ -63,7 +64,7 @@ export function CurrentOffsetsModal(
   const isLabwareOffsetCodeSnippetsOn = useSelector(
     getIsLabwareOffsetCodeSnippetsOn
   )
-
+  const latestCurrentOffsets = getLatestCurrentOffsets(currentOffsets)
   return (
     <ModalShell
       maxWidth="40rem"
@@ -101,7 +102,7 @@ export function CurrentOffsetsModal(
             </tr>
           </thead>
           <tbody>
-            {currentOffsets.map(offset => {
+            {latestCurrentOffsets.map(offset => {
               const labwareDisplayName =
                 offset.definitionUri in defsByURI
                   ? getLabwareDisplayName(defsByURI[offset.definitionUri])
