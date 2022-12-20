@@ -33,8 +33,7 @@ export const DEFAULTS_V0: ConfigV0 = {
   },
 
   buildroot: {
-    manifestUrl:
-      'https://opentrons-buildroot-ci.s3.us-east-2.amazonaws.com/releases.json',
+    manifestUrl: _DEFAULT_ROBOT_UPDATE_MANIFEST_URL_,
   },
 
   // logging config
