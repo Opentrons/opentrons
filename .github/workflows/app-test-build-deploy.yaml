@@ -162,7 +162,7 @@ jobs:
           HOST_PYTHON: python
           OPENTRONS_PROJECT: robot-stack
           OT_APP_DEPLOY_BUCKET: ${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}
-          OT_APP_DEPLOY_FOLDER: ${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}
+          OT_APP_DEPLOY_FOLDER: ${{ env._APP_DEPLOY_FOLDER_ROBOTSTACK }}
 
         run: |
           make -C app-shell dist-${{ matrix.os }}
