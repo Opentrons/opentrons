@@ -8,10 +8,11 @@ import logging
 import datetime
 from typing import Callable
 from logging.config import dictConfig
+import subprocess
 
 from opentrons_hardware.drivers.can_bus.build import build_driver
 from opentrons_hardware.drivers.can_bus import build, CanMessenger,  WaitableCallback
-from opentrons_hardware.firmware_bindings.constants import NodeId
+from opentrons_hardware.firmware_bindings.constants import NodeId, PipetteName
 from opentrons_hardware.firmware_bindings import ArbitrationId
 from opentrons_hardware.firmware_bindings.messages import (
     message_definitions,
@@ -154,6 +155,20 @@ async def move_to(messenger: CanMessenger, node, distance, velocity):
     axis_dict= await move_runner.run(can_messenger = messenger)
     return axis_dict
 
+def determine_abbreviation(pipette_name):
+    if pipette_name == 'p1000_single':
+        return 'P1KS'
+    elif pipette_name == 'p1000_multi':
+        return 'P1KM'
+    elif pipette_name == 'p50_single':
+        return 'P50S'
+    elif pipette_name == 'p50_multi':
+        return 'P50M'
+    elif pipette_name == 'P1000_96':
+        return 'P1KH'
+    else:
+        raise('Unknown Pipette')
+
 async def read_epprom(messenger: CanMessenger, node):
     await messenger.send(node, InstrumentInfoRequest())
     target = datetime.datetime.now()
@@ -161,10 +176,12 @@ async def read_epprom(messenger: CanMessenger, node):
         while True:
             with WaitableCallback(messenger) as wc:
                 message, arb = await asyncio.wait_for(wc.read(), 1.0)
-                serial = message.payload.serial.value.decode('ascii')
-                print(message.payload.name)
-                print(message.payload.model.value)
-                print(serial.rstrip('\x00'))
+                pipette_name = PipetteName(message.payload.name.value).name
+                pipette_version = str(message.payload.model.value)
+                serial_number = determine_abbreviation(pipette_name) + \
+                            pipette_version + \
+                            str(message.payload.serial.value.decode('ascii').rstrip('\x00'))
+                return serial_number
     except asyncio.TimeoutError:
         pass
 
@@ -173,13 +190,20 @@ async def run(args: argparse.Namespace) -> None:
     # build a GPIO handler, which will automatically release estop
     # gpio = OT3GPIO(__name__)
     # gpio.deactivate_estop()
+    subprocess.run(["systemctl", "stop", "opentrons-robot-server"])
     position = {'pipette': 0}
     node = NodeId.pipette_left
     driver = await build_driver(build_settings(args))
     messenger = CanMessenger(driver=driver)
     messenger.start()
     if args.home:
+        print('Homing')
         await home(messenger, node)
+        print('Homed')
+
+    if args.jog:
+        await _jog_axis(messenger, node, position)
+
     if args.limit_switch:
         res = await get_limit_switches(messenger, [node])
         print(f'Current Limit switch State: {res}')
@@ -187,11 +211,9 @@ async def run(args: argparse.Namespace) -> None:
         res = await get_limit_switches(messenger, [node])
         print(f'Current Limit switch State: {res}')
 
-    if args.jog:
-        await _jog_axis(messenger, node, position)
-
     if args.read_epprom:
-        await read_epprom(messenger, node)
+        serial_number = await read_epprom(messenger, node)
+        print(f'SN: {serial_number}')
 
 log = logging.getLogger(__name__)
 
@@ -250,12 +272,6 @@ def main() -> None:
         type=float,
         help="The speed with which to move the plunger",
         default=10.0,
-    )
-    parser.add_argument(
-        "--distance",
-        type=float,
-        help="The distance in mm to move the axis",
-        default=30,
     )
 
     parser.add_argument("--limit_switch", action="store_true")
