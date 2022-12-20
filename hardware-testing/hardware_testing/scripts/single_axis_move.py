@@ -13,6 +13,9 @@ from hardware_testing.opentrons_api.helpers_ot3 import (
     home_ot3,
 )
 
+import logging
+logging.basicConfig(level=logging.INFO)
+
 MOUNT = OT3Mount.LEFT
 LOAD = GantryLoad.NONE
 CYCLES = 1
