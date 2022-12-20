@@ -29,24 +29,26 @@ module.exports = async () => ({
   appId:
     project === 'robot-stack' ? 'com.opentrons.app' : 'com.opentrons.appot3',
   electronVersion: '21.3.1',
-  files: [
-    '**/*',
-    'build/br-premigration-wheels',
-    '!Makefile',
-    '!python',
-    // this detail with node modules makes sure that any byproducts from the build process
-    // of the usb-detection submodule - which should only exist anyway if we don't get a
-    // prebuild - won't get packed into the app. If they are, they'll prevent the app
-    // from running on OSX, because they intern paths on the action runner in their binaries
-    // sometimes and gatekeeper will scan them, notice, and fail us.
-    '!node_modules/usb-detection/build',
-    'node_modules/usb-detection/build/Release',
-    {
-      from: '../app/dist',
-      to: './ui',
-      filter: ['**/*'],
-    },
-  ],
+  files:
+    ['**/*', 'build/br-premigration-wheels', '!Makefile', '!python'] +
+    (NO_USB_DETECTION
+      ? ['node_modules/usb-detection']
+      : // this detail with node modules makes sure that any byproducts from the build process
+        // of the usb-detection submodule - which should only exist anyway if we don't get a
+        // prebuild - won't get packed into the app. If they are, they'll prevent the app
+        // from running on OSX, because they intern paths on the action runner in their binaries
+        // sometimes and gatekeeper will scan them, notice, and fail us.
+        [
+          '!node_modules/usb-detection/build',
+          'node_modules/usb-detection/build/Release',
+        ]) +
+    [
+      {
+        from: '../app/dist',
+        to: './ui',
+        filter: ['**/*'],
+      },
+    ],
   extraMetadata: {
     version: await versionForProject(project),
     productName: project === 'robot-stack' ? 'Opentrons' : 'Opentrons-OT3',
