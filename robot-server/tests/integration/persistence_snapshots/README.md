@@ -21,13 +21,19 @@ The JSON protocols were chosen to cover a wide breadth of Protocol Engine comman
 
 Each protocol has one completed analysis and one successful run. multipleTipracksWithTC.json also has one failed run from a mismatched pipette error.
 
+### v6.1.0
+
+This snapshot comes from v6.1.0 on a real non-refresh robot. The robot was restarted following the successful execution of both protocols.
+
+The 2 protocols are to provide basic coverage of a python and json protocol. Each protocol has 1 successful analysis and run.
+
 ### v6.2.0
 
-This snapshot comes from v6.2.0 on a real non-refresh robot. The robot was power cycled following the successful execution of both protocols.
+This snapshot comes from v6.2.0 on a real non-refresh robot. The robot was restarted following the successful execution of both protocols.
 
-The 2 protocols are to provide basic coverage of a python and json protocols. Each protocol has 1 successful analysis and run.
+The 2 protocols are to provide basic coverage of a python and json protocol. Each protocol has 1 successful analysis and run.
 
-A broader set of protocols and protocol status is forthcoming.
+**NOTE** This db will cause a downgrade migration issue if loaded on a robot with 6.1
 
 ### corrupt
 
