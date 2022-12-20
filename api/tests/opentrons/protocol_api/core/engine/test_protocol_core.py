@@ -695,6 +695,12 @@ def test_load_liquid(
     mock_well = decoy.mock(cls=Well)
     mock_liquid = decoy.mock(cls=LoadedLiquid)
 
+    decoy.when(mock_labware._implementation.labware_id).then_return("labware-id")
+
+    decoy.when(mock_liquid.id).then_return("liquid-id")
+
+    decoy.when(mock_well.well_name).then_return("A1")
+
     subject.load_liquid(
         labware=mock_labware, liquid=mock_liquid, volume_by_well={mock_well: 20}
     )

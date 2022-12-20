@@ -416,6 +416,17 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def load_liquid(
         self, labware: Labware, liquid: LoadedLiquid, volume_by_well: Dict[Well, int]
-    ) -> LoadedLiquid:
+    ) -> None:
         """Load liquid into a labware."""
-        pass
+        labware_id = labware._implementation.labware_id
+        liquid_id = liquid.id
+
+        volume_by_well_name: Dict[str, int] = {}
+        for well, volume in volume_by_well.items():
+            volume_by_well_name[well.well_name] = volume
+
+        self._engine_client.load_liquid(
+            labware_id=labware_id,
+            liquid_id=liquid_id,
+            volume_by_well=volume_by_well_name,
+        )
