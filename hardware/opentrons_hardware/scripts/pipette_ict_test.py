@@ -80,14 +80,14 @@ async def _jog_axis(messenger: CanMessenger, node, position) -> None:
             sys.stdout.flush()
             pos = pos + step
             position['pipette'] = pos
-            res = await move_to(messenger, node, step, speed)
+            res = await move_to(messenger, node, step, -speed)
 
         elif input == 's':
             #minus pipette direction
             sys.stdout.flush()
             pos = pos - step
             position['pipette'] = pos
-            res = await move_to(messenger, node, step, -speed)
+            res = await move_to(messenger, node, step, speed)
 
         elif input == 'q':
             sys.stdout.flush()
@@ -112,8 +112,8 @@ async def _jog_axis(messenger: CanMessenger, node, position) -> None:
             sys.stdout.flush()
             return position
         print('Coordinates: ', round(position['pipette'], 2), ',',
-                                'motor position', res[node][0], ', ',
-                                'encoder position', res[node][1], ', '
+                                'motor position: ', res[node][0], ', ',
+                                'encoder position: ', res[node][1], ', '
                                 ' Motor Step: ',
                                 step_size[step_length_index],
                                 end = '')
@@ -197,14 +197,19 @@ async def run(args: argparse.Namespace) -> None:
     messenger = CanMessenger(driver=driver)
     messenger.start()
     if args.home:
-        print('Homing')
+        print('\n')
+        print('-------------------Test Homing--------------------------')
         await home(messenger, node)
         print('Homed')
 
     if args.jog:
+        print('\n')
+        print('----------Read Motor Position and Encoder--------------')
         await _jog_axis(messenger, node, position)
 
     if args.limit_switch:
+        print('\n')
+        print('-----------------Read Limit Switch--------------')
         res = await get_limit_switches(messenger, [node])
         print(f'Current Limit switch State: {res}')
         input("Block the limit switch and press enter")
@@ -212,6 +217,8 @@ async def run(args: argparse.Namespace) -> None:
         print(f'Current Limit switch State: {res}')
 
     if args.read_epprom:
+        print('\n')
+        print('-----------------Read EPPROM--------------')
         serial_number = await read_epprom(messenger, node)
         print(f'SN: {serial_number}')
 
@@ -248,7 +255,7 @@ def main() -> None:
     """
         1. Motor movement - check
         2. Limit switch- check
-        3. Encoder - in progress
+        3. Encoder - check
         4. EEPROM - kinda working
     """
     parser = argparse.ArgumentParser(
