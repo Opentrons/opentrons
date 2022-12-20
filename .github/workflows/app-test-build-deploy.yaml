@@ -285,7 +285,7 @@ jobs:
           aws configure set region us-east-2 --profile identity
           aws configure set output json --profile identity
           aws configure set region us-east-2 --profile deploy
-          aws configure set role_arn arn:aws:iam::879285218407:role/administrator --profile deploy
+          aws configure set role_arn ${{ secrets.OT_APP_OT3_DEPLOY_ROLE }} --profile deploy
           aws configure set source_profile identity --profile deploy
         shell: bash
       - name: 'deploy builds to s3'
