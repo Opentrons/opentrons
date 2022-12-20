@@ -68,13 +68,13 @@ class ProtocolFilesInvalid(ErrorDetails):
     title: str = "Protocol File(s) Invalid"
 
 
-class ProtocolForDifferentRobotType(ErrorDetails):
+class ProtocolRobotTypeMismatch(ErrorDetails):
     """An error returned when an uploaded protocol is for a different type of robot.
 
     For example, if the protocol is for an OT-3, but this server is running on an OT-2.
     """
 
-    id: Literal["ProtocolForDifferentRobotType"] = "ProtocolForDifferentRobotType"
+    id: Literal["ProtocolRobotTypeMismatch"] = "ProtocolRobotTypeMismatch"
     title: str = "Protocol For Different Robot Type"
 
 
@@ -109,7 +109,7 @@ protocols_router = APIRouter()
         status.HTTP_201_CREATED: {"model": SimpleBody[Protocol]},
         status.HTTP_422_UNPROCESSABLE_ENTITY: {
             "model": ErrorBody[
-                Union[ProtocolFilesInvalid, ProtocolForDifferentRobotType]
+                Union[ProtocolFilesInvalid, ProtocolRobotTypeMismatch]
             ]
         },
     },
@@ -161,7 +161,7 @@ async def create_protocol(
         ) from e
 
     if source.robot_type != robot_type:
-        raise ProtocolForDifferentRobotType(
+        raise ProtocolRobotTypeMismatch(
             detail=(
                 f"This protocol is for {source.robot_type} robots."
                 f" It can't be analyzed or run on this robot,"

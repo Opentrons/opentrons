@@ -405,7 +405,7 @@ async def test_create_protocol_different_robot_type(
         )
 
     assert exc_info.value.status_code == 422
-    assert exc_info.value.content["errors"][0]["id"] == "ProtocolForDifferentRobotType"
+    assert exc_info.value.content["errors"][0]["id"] == "ProtocolRobotTypeMismatch"
 
 
 async def test_delete_protocol_by_id(
