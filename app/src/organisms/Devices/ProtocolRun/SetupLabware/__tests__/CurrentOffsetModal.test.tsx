@@ -4,11 +4,16 @@ import _uncastedProtocolWithTC from '@opentrons/shared-data/protocol/fixtures/6/
 import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
 import { i18n } from '../../../../../i18n'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../../redux/config'
+import { LabwarePositionCheck } from '../../../../LabwarePositionCheck'
+import { RUN_ID_1 } from '../../../../RunTimeControl/__fixtures__'
+import { useLPCDisabledReason } from '../../../hooks'
 import { CurrentOffsetsModal } from '../CurrentOffsetsModal'
 import { getLatestCurrentOffsets } from '../utils'
 import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 import type { LabwareOffset } from '@opentrons/api-client'
 
+jest.mock('../../../hooks')
+jest.mock('../../../../LabwarePositionCheck')
 jest.mock('../../../../../redux/config')
 jest.mock('../utils')
 jest.mock('@opentrons/shared-data', () => {
@@ -27,6 +32,13 @@ const mockGetIsLabwareOffsetCodeSnippetsOn = getIsLabwareOffsetCodeSnippetsOn as
 const mockGetLatestCurrentOffsets = getLatestCurrentOffsets as jest.MockedFunction<
   typeof getLatestCurrentOffsets
 >
+const mockLabwarePositionCheck = LabwarePositionCheck as jest.MockedFunction<
+  typeof LabwarePositionCheck
+>
+const mockUseLPCDisabledReason = useLPCDisabledReason as jest.MockedFunction<
+  typeof useLPCDisabledReason
+>
+
 const render = (props: React.ComponentProps<typeof CurrentOffsetsModal>) => {
   return renderWithProviders(<CurrentOffsetsModal {...props} />, {
     i18nInstance: i18n,
@@ -73,9 +85,15 @@ describe('CurrentOffsetsModal', () => {
       currentOffsets: mockCurrentOffsets,
       commands: protocolWithTC.commands,
       onCloseClick: jest.fn(),
+      runId: RUN_ID_1,
+      robotName: 'otie',
     }
+    mockUseLPCDisabledReason.mockReturnValue(null)
     mockGetLoadedLabwareDefinitionsByUri.mockReturnValue(
       protocolWithTC.labware as any
+    )
+    mockLabwarePositionCheck.mockReturnValue(
+      <div>mock labware position check</div>
     )
     mockGetIsLabwareOffsetCodeSnippetsOn.mockReturnValue(false)
     mockGetLatestCurrentOffsets.mockReturnValue([
@@ -88,14 +106,16 @@ describe('CurrentOffsetsModal', () => {
       },
     ])
   })
-  it('renders the correct text', () => {
-    const { getByText } = render(props)
+  it('renders the correct text and buttons CTA work', () => {
+    const { getByText, getByTestId } = render(props)
     getByText('Applied Labware Offset data')
     getByText('location')
     getByText('labware')
     getByText('labware offset data')
     getByText('cancel').click()
     expect(props.onCloseClick).toHaveBeenCalled()
+    getByTestId('CurrentOffsetsModal_lpcButton').click()
+    getByText('mock labware position check')
   })
 
   it('renders 1 offset with the correct information', () => {
@@ -109,5 +129,10 @@ describe('CurrentOffsetsModal', () => {
     const { getByText } = render(props)
     getByText('Get Labware Offset Data').click()
     getByText('TODO ADD JUPYTER/CLI SNIPPET SUPPORT')
+  })
+  it('renders the LPC button as disabled when there is a disabled reason', () => {
+    mockUseLPCDisabledReason.mockReturnValue('mockDisabledReason')
+    const { getByTestId } = render(props)
+    expect(getByTestId('CurrentOffsetsModal_lpcButton')).toBeDisabled()
   })
 })
