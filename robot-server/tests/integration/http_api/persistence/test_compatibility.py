@@ -25,6 +25,7 @@ class Snapshot:
 
 snapshots: List[(Snapshot)] = [
     Snapshot(version="v6.0.1", expected_protocol_count=4, expected_run_count=5),
+    Snapshot(version="v6.1.0", expected_protocol_count=2, expected_run_count=2),
     Snapshot(version="v6.2.0", expected_protocol_count=2, expected_run_count=2),
 ]
 
