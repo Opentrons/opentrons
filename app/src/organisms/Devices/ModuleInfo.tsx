@@ -18,8 +18,8 @@ import {
   getModuleDef2,
 } from '@opentrons/shared-data'
 
-import { StyledText } from '../../../../atoms/text'
-import { useRunHasStarted } from '../../../../organisms/Devices/hooks'
+import { StyledText } from '../../atoms/text'
+import { useRunHasStarted } from './hooks'
 
 export interface ModuleInfoProps {
   moduleModel: ModuleModel

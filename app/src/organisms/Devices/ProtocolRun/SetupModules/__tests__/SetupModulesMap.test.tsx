@@ -17,7 +17,6 @@ import {
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 
 import { i18n } from '../../../../../i18n'
-import { ModuleInfo } from '../../../../ProtocolSetup/RunSetupCard/ModuleSetup/ModuleInfo'
 import {
   mockThermocycler as mockThermocyclerFixture,
   mockMagneticModule as mockMagneticModuleFixture,
@@ -26,6 +25,7 @@ import {
   useModuleRenderInfoForProtocolById,
   useProtocolDetailsForRun,
 } from '../../../hooks'
+import { ModuleInfo } from '../../../ModuleInfo'
 import { SetupModulesMap } from '../SetupModulesMap'
 
 jest.mock('@opentrons/components', () => {
@@ -42,7 +42,7 @@ jest.mock('@opentrons/shared-data', () => {
     inferModuleOrientationFromXCoordinate: jest.fn(),
   }
 })
-jest.mock('../../../../ProtocolSetup/RunSetupCard/ModuleSetup/ModuleInfo')
+jest.mock('../../../ModuleInfo')
 jest.mock('../../../hooks')
 
 const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById as jest.MockedFunction<

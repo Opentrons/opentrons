@@ -11,15 +11,13 @@ import {
   mockThermocycler,
 } from '../../../../../redux/modules/__fixtures__'
 import { mockLabwareDef } from '../../../../LabwarePositionCheck/__fixtures__/mockLabwareDef'
-import { SecureLabwareModal } from '../../../../ProtocolSetup/RunSetupCard/LabwareSetup/SecureLabwareModal'
+import { SecureLabwareModal } from '../SecureLabwareModal'
 import { LabwareListItem } from '../LabwareListItem'
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import type { AttachedModule } from '../../../../../redux/modules/types'
 import type { ModuleRenderInfoForProtocol } from '../../../hooks'
 
-jest.mock(
-  '../../../../ProtocolSetup/RunSetupCard/LabwareSetup/SecureLabwareModal'
-)
+jest.mock('../SecureLabwareModal')
 jest.mock('@opentrons/react-api-client')
 
 const mockSecureLabwareModal = SecureLabwareModal as jest.MockedFunction<

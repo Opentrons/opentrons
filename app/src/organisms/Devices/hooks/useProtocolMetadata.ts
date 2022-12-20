@@ -1,5 +1,4 @@
-import { useContext, createContext } from 'react'
-import { useCurrentProtocol } from '../ProtocolUpload/hooks'
+import { useCurrentProtocol } from '../../ProtocolUpload/hooks'
 
 interface ProtocolMetadata {
   author?: string
@@ -24,16 +23,4 @@ export function useProtocolMetadata(): ProtocolMetadata {
     description,
     creationMethod,
   }
-}
-
-// this context is used to trigger an LPC success toast render from an LPC component lower in the tree
-export const LPCSuccessToastContext = createContext<{
-  setIsShowingLPCSuccessToast: (isShowing: boolean) => void
-}>({ setIsShowingLPCSuccessToast: () => null })
-
-export function useLPCSuccessToast(): {
-  setIsShowingLPCSuccessToast: (isShowing: boolean) => void
-} {
-  const { setIsShowingLPCSuccessToast } = useContext(LPCSuccessToastContext)
-  return { setIsShowingLPCSuccessToast }
 }
