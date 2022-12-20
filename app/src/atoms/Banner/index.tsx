@@ -119,7 +119,7 @@ export function Banner(props: BannerProps): JSX.Element {
       <Flex flex="1" alignItems={ALIGN_CENTER}>
         {props.children}
       </Flex>
-      {onCloseClick && !(isCloseActionLoading ?? false) ? (
+      {onCloseClick != null && !(isCloseActionLoading ?? false) ? (
         <Btn data-testid="Banner_close-button" onClick={props.onCloseClick}>
           {closeButton ?? (
             <Icon
@@ -132,7 +132,7 @@ export function Banner(props: BannerProps): JSX.Element {
           )}
         </Btn>
       ) : null}
-      {isCloseActionLoading && (
+      {(isCloseActionLoading ?? false) && (
         <Icon name="ot-spinner" size={SIZE_1} aria-label="ot-spinner" spin />
       )}
     </Flex>

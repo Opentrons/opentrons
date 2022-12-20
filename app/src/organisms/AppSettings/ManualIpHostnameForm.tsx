@@ -89,6 +89,7 @@ export function ManualIpHostnameForm({
     validate: values => {
       const errors: FormikErrors = {}
       const ip = values.ip.trim()
+      // ToDo: kj 12/19/2022 for this, the best way is to use the regex because invisible unicode characters
       if (!ip) {
         errors.ip = t('add_ip_error')
         const inputForm = document.getElementById('ip')

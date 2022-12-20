@@ -1,0 +1,1380 @@
+
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\App\__tests__\hooks.test.tsx
+  21:18  warning  'children' is missing in props validation  react/prop-types
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\App\portal.tsx
+  54:31  warning  Unexpected nullable object value in conditional. An explicit null check is required  @typescript-eslint/strict-boolean-expressions
+  60:10  warning  Unexpected nullable object value in conditional. An explicit null check is required  @typescript-eslint/strict-boolean-expressions
+  62:34  warning  Unexpected nullable object value in conditional. An explicit null check is required  @typescript-eslint/strict-boolean-expressions
+  67:10  warning  Unexpected nullable object value in conditional. An explicit null check is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\assets\labware\findLabware.ts
+  16:5   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  19:12  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  19:62  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  20:12  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  20:54  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  21:12  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  23:7   warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\assets\labware\getLabware.ts
+  17:8   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  23:10  warning  This assertion is unnecessary since it does not change the type of the expression                          @typescript-eslint/no-unnecessary-type-assertion
+  30:10  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  30:14  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  46:8   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  53:34  warning  Invalid type "any" of template literal expression                                                          @typescript-eslint/restrict-template-expressions
+  53:49  warning  Invalid type "any" of template literal expression                                                          @typescript-eslint/restrict-template-expressions
+  75:10  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  75:14  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\atoms\Banner\index.tsx
+  122:8  warning  Unexpected nullable object value in conditional. An explicit null check is required          @typescript-eslint/strict-boolean-expressions
+  135:8  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\atoms\CheckboxField\index.tsx
+  131:8  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\atoms\Interstitial\Interstitial.tsx
+  60:10  warning  Unexpected value in conditional. A boolean expression is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\atoms\Interstitial\InterstitiallTitleBar.tsx
+  46:66  warning  Invalid type "ReactNode" of template literal expression                              @typescript-eslint/restrict-template-expressions
+  62:8   warning  Unexpected nullable object value in conditional. An explicit null check is required  @typescript-eslint/strict-boolean-expressions
+  65:36  warning  Invalid type "string | undefined" of template literal expression                     @typescript-eslint/restrict-template-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\atoms\SelectField\index.tsx
+  71:17  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  71:68  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\atoms\Slideout\index.tsx
+  141:13  warning  Invalid type "FlattenSimpleInterpolation" of template literal expression  @typescript-eslint/restrict-template-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\atoms\StatusLabel\__tests__\StatusLabel.test.tsx
+  92:10  warning  Invalid type "string | undefined" of template literal expression  @typescript-eslint/restrict-template-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\atoms\StatusLabel\index.tsx
+  51:48  warning  Invalid type "string | undefined" of template literal expression  @typescript-eslint/restrict-template-expressions
+  63:28  warning  Invalid type "string | undefined" of template literal expression  @typescript-eslint/restrict-template-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\i18n.ts
+   5:1   warning  Promises must be handled appropriately or explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+  28:36  warning  Invalid type "string[]" of template literal expression                                           @typescript-eslint/restrict-template-expressions
+  29:35  warning  Invalid type "string[]" of template literal expression                                           @typescript-eslint/restrict-template-expressions
+  33:9   warning  Unexpected any value in conditional. An explicit comparison or type cast is required             @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\logger.ts
+  63:7  warning  Unexpected nullable object value in conditional. An explicit null check is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\molecules\DeckThumbnail\index.tsx
+  61:16  warning  Unexpected nullable object value in conditional. An explicit null check is required                @typescript-eslint/strict-boolean-expressions
+  72:13  warning  Unexpected nullable object value in conditional. An explicit null check is required                @typescript-eslint/strict-boolean-expressions
+  76:27  warning  Unexpected nullable object value in conditional. An explicit null check is required                @typescript-eslint/strict-boolean-expressions
+  77:23  warning  Unexpected nullable object value in conditional. An explicit null check is required                @typescript-eslint/strict-boolean-expressions
+  81:13  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\molecules\GenericWizardTile\index.tsx
+  114:17  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\molecules\Modal\index.tsx
+  54:23  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\molecules\PipetteSelect\PipetteSelect.stories.tsx
+  11:3  warning  'pipetteName' is missing in props validation  react/prop-types
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\molecules\PipetteSelect\index.tsx
+  72:5   warning  Unexpected object value in conditional. The condition is always true                @typescript-eslint/strict-boolean-expressions
+  90:23  warning  Unexpected string value in conditional. An explicit empty string check is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\molecules\PythonLabwareOffsetSnippet\index.tsx
+  31:6   warning  React Hook React.useEffect has missing dependencies: 'labwareOffsets' and 'protocol'. Either include them or remove the dependency array        react-hooks/exhaustive-deps
+  31:13  warning  React Hook React.useEffect has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked  react-hooks/exhaustive-deps
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\molecules\ReleaseNotes\index.tsx
+  24:8  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\molecules\ToggleGroup\__tests__\useToggleGroup.test.tsx
+  55:5  warning  Promises must be handled appropriately or explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+  75:5  warning  Promises must be handled appropriately or explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\molecules\UploadInput\index.tsx
+  89:5  warning  Unexpected nullable object value in conditional. An explicit null check is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\molecules\modals\ErrorModal.tsx
+  22:19  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  22:33  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  28:7   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\molecules\modals\ScrollableAlertModal.tsx
+  20:8  warning  Unexpected nullable object value in conditional. An explicit null check is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Alerts\index.tsx
+  22:9  warning  Unexpected value in conditional. A boolean expression is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\AppSettings\ConnectRobotSlideout.tsx
+  104:12  warning  Unexpected any value in conditional. An explicit comparison or type cast is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\AppSettings\ManualIpHostnameForm.tsx
+  92:12  warning  Unexpected string value in conditional. An explicit empty string check is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\AppSettings\__tests__\ConnectRobotSlideout.test.tsx
+  148:5  warning  Promises must be handled appropriately or explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+  149:5  warning  Promises must be handled appropriately or explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\ApplyHistoricOffsets\hooks\useOffsetCandidatesForAnalysis.ts
+  21:5  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Breadcrumbs\index.tsx
+  91:18  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\CalibrateDeck\__tests__\CalibrateDeck.test.tsx
+  107:11  warning  Avoid calling `expect` conditionally`  jest/no-conditional-expect
+  111:11  warning  Avoid calling `expect` conditionally`  jest/no-conditional-expect
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\CalibrateDeck\index.tsx
+   64:5   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+   64:22  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+   75:18  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+   76:12  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+   80:9   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+   84:17  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+   84:24  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+   92:9   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  104:6   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  104:6   warning  Prefer using an optional chain expression instead, as it's more concise and easier to read                 @typescript-eslint/prefer-optional-chain
+  106:8   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  106:20  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\CalibratePipetteOffset\__tests__\CalibratePipetteOffset.test.tsx
+  102:11  warning  Avoid calling `expect` conditionally`  jest/no-conditional-expect
+  106:11  warning  Avoid calling `expect` conditionally`  jest/no-conditional-expect
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\CalibratePipetteOffset\useCalibratePipetteOffset.tsx
+   98:7   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+  105:7   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+  112:7   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+  119:7   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+  126:7   warning  Unexpected nullable object value in conditional. An explicit null check is required                @typescript-eslint/strict-boolean-expressions
+  126:7   warning  Prefer using an optional chain expression instead, as it's more concise and easier to read         @typescript-eslint/prefer-optional-chain
+  166:9   warning  Unexpected nullable object value in conditional. An explicit null check is required                @typescript-eslint/strict-boolean-expressions
+  173:5   warning  Unexpected nullable object value in conditional. An explicit null check is required                @typescript-eslint/strict-boolean-expressions
+  229:28  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly        @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\CalibrateTipLength\__tests__\CalibrateTipLength.test.tsx
+  105:11  warning  Avoid calling `expect` conditionally`  jest/no-conditional-expect
+  109:11  warning  Avoid calling `expect` conditionally`  jest/no-conditional-expect
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\CalibrationPanels\ChooseTipRack.tsx
+   84:5   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+   84:18  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+   89:5   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+   89:18  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+   89:31  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+   99:5   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  103:26  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  107:9   warning  Unexpected object value in conditional. The condition is always true                                       @typescript-eslint/strict-boolean-expressions
+  111:11  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  116:13  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  120:12  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  121:11  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  130:52  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  154:5   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  163:5   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\CalibrationPanels\ChosenTipRackRender.tsx
+  43:17  warning  Invalid type "string | undefined" of template literal expression  @typescript-eslint/restrict-template-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\CalibrationPanels\DeckSetup.tsx
+  110:24  warning  Unexpected nullable object value in conditional. An explicit null check is required  @typescript-eslint/strict-boolean-expressions
+  114:30  warning  Unexpected nullable object value in conditional. An explicit null check is required  @typescript-eslint/strict-boolean-expressions
+  118:26  warning  Unexpected nullable object value in conditional. An explicit null check is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\CalibrationPanels\SaveZPoint.tsx
+  50:11  warning  Unexpected string value in conditional. An explicit empty string check is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\CalibrationPanels\__tests__\useConfirmCrashRecovery.test.tsx
+  30:18  warning  'children' is missing in props validation  react/prop-types
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\ChangePipette\CheckPipettesButton.tsx
+  43:7   warning  Unexpected any value in conditional. An explicit comparison or type cast is required               @typescript-eslint/strict-boolean-expressions
+  52:5   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+  59:38  warning  Unexpected nullable object value in conditional. An explicit null check is required                @typescript-eslint/strict-boolean-expressions
+  86:12  warning  Unexpected nullable object value in conditional. An explicit null check is required                @typescript-eslint/strict-boolean-expressions
+  93:12  warning  Unexpected nullable object value in conditional. An explicit null check is required                @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\ChangePipette\ConfirmPipette.tsx
+   73:10  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+   73:36  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+   73:39  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+   76:18  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+   80:16  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  108:5   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  120:20  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  120:39  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  129:23  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  132:21  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  132:40  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  156:7   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  156:42  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  170:15  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  209:9   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  210:8   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  210:27  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  210:42  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\ChangePipette\InstructionStep.tsx
+  49:56  warning  Invalid type ""GEN1" | "GEN2" | "GEN3" | null" of template literal expression  @typescript-eslint/restrict-template-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\ChangePipette\Instructions.tsx
+   73:20  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+   75:7   warning  Unexpected value in conditional. A boolean expression is required                                          @typescript-eslint/strict-boolean-expressions
+   75:31  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+   91:9   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+   91:27  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  106:13  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  106:27  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  194:29  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\ChangePipette\index.tsx
+   75:25  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+   79:25  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+   79:53  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+   81:5   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+   98:12  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  123:18  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  123:45  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  123:75  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  125:7   warning  Unexpected value in conditional. A boolean expression is required                                          @typescript-eslint/strict-boolean-expressions
+  125:38  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  125:72  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  133:21  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  163:7   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  163:25  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\CheckCalibration\ResultsSummary\RenderMountInformation.tsx
+  29:58  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\CheckCalibration\ResultsSummary\index.tsx
+   91:30  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly  @typescript-eslint/strict-boolean-expressions
+   99:16  warning  Unexpected value in conditional. A boolean expression is required                            @typescript-eslint/strict-boolean-expressions
+  102:19  warning  Unexpected value in conditional. A boolean expression is required                            @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\CheckCalibration\ReturnTip.tsx
+  26:6  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly  @typescript-eslint/strict-boolean-expressions
+  42:7  warning  Unexpected nullable object value in conditional. An explicit null check is required          @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\CheckCalibration\__tests__\CheckCalibration.test.tsx
+  112:11  warning  Avoid calling `expect` conditionally`  jest/no-conditional-expect
+  116:11  warning  Avoid calling `expect` conditionally`  jest/no-conditional-expect
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\CheckCalibration\index.tsx
+  109:7   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  109:24  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  120:18  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  121:12  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  124:47  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  129:9   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  133:17  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  133:24  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  141:9   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  160:8   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  160:20  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\ConfigurePipette\ConfigForm.tsx
+   72:10  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  125:22  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  125:22  warning  Prefer using an optional chain expression instead, as it's more concise and easier to read                 @typescript-eslint/prefer-optional-chain
+  126:19  warning  Unexpected value in conditional. A boolean expression is required                                          @typescript-eslint/strict-boolean-expressions
+  126:31  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\ConfigurePipette\ConfigFormGroup.tsx
+  39:5  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+  39:5  warning  Prefer using an optional chain expression instead, as it's more concise and easier to read         @typescript-eslint/prefer-optional-chain
+  54:8  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\ConfigurePipette\index.tsx
+  48:5  warning  Unexpected nullable object value in conditional. An explicit null check is required                                                           @typescript-eslint/strict-boolean-expressions
+  50:9  warning  Unexpected any value in conditional. An explicit comparison or type cast is required                                                          @typescript-eslint/strict-boolean-expressions
+  54:9  warning  Variable name `__showHiddenFields` trimmed as `_showHiddenFields` must match one of the following formats: camelCase, PascalCase, UPPER_CASE  @typescript-eslint/naming-convention
+  65:8  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly                                             @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\DeprecatedCalibrateDeck\__tests__\CalibrateDeck.test.tsx
+  137:11  warning  Avoid calling `expect` conditionally`  jest/no-conditional-expect
+  139:11  warning  Avoid calling `expect` conditionally`  jest/no-conditional-expect
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\DeprecatedCalibrateDeck\index.tsx
+  104:5   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  104:22  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  115:18  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  116:12  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  120:9   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  124:17  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  124:24  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  132:9   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  144:6   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  144:6   warning  Prefer using an optional chain expression instead, as it's more concise and easier to read                 @typescript-eslint/prefer-optional-chain
+  146:8   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  146:20  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  164:21  warning  Unexpected value in conditional. A boolean expression is required                                          @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\DeprecatedCalibratePipetteOffset\__tests__\DeprecatedCalibratePipetteOffset.test.tsx
+  139:11  warning  Avoid calling `expect` conditionally`  jest/no-conditional-expect
+  141:11  warning  Avoid calling `expect` conditionally`  jest/no-conditional-expect
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\DeprecatedCalibratePipetteOffset\index.tsx
+  113:5   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  113:22  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  124:6   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  124:6   warning  Prefer using an optional chain expression instead, as it's more concise and easier to read                 @typescript-eslint/prefer-optional-chain
+  125:47  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  130:18  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  131:12  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  135:9   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  147:9   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  158:8   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  158:20  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\DeprecatedCalibrateTipLength\__tests__\AskForCalibrationBlockModal.test.tsx
+  80:8   warning  Title must be a string                                                                       jest/valid-title
+  94:9   warning  Avoid calling `expect` conditionally`                                                        jest/no-conditional-expect
+  95:40  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly  @typescript-eslint/strict-boolean-expressions
+  98:9   warning  Avoid calling `expect` conditionally`                                                        jest/no-conditional-expect
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\DeprecatedCalibrateTipLength\__tests__\DeprecatedCalibrateTipLength.test.tsx
+  135:11  warning  Avoid calling `expect` conditionally`  jest/no-conditional-expect
+  137:11  warning  Avoid calling `expect` conditionally`  jest/no-conditional-expect
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\DeprecatedCalibrateTipLength\index.tsx
+  102:48  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  102:65  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  105:18  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  106:12  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  110:6   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  110:6   warning  Prefer using an optional chain expression instead, as it's more concise and easier to read                 @typescript-eslint/prefer-optional-chain
+  111:47  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  116:9   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  120:17  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  120:24  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  128:9   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  147:8   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  147:20  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\DeprecatedCalibrationPanels\ChooseTipRack.tsx
+  124:5   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  124:18  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  129:5   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  129:18  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  129:31  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  139:5   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  143:26  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  147:9   warning  Unexpected object value in conditional. The condition is always true                                       @typescript-eslint/strict-boolean-expressions
+  151:11  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  156:13  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  160:12  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  161:11  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  170:52  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  194:5   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  203:5   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\DeprecatedCalibrationPanels\ChosenTipRackRender.tsx
+  96:14  warning  Unexpected nullable object value in conditional. An explicit null check is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\DeprecatedCalibrationPanels\CompleteConfirmation.tsx
+   73:35  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly  @typescript-eslint/strict-boolean-expressions
+  110:8   warning  Unexpected nullable object value in conditional. An explicit null check is required          @typescript-eslint/strict-boolean-expressions
+  136:10  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly  @typescript-eslint/strict-boolean-expressions
+  146:11  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly  @typescript-eslint/strict-boolean-expressions
+  148:14  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\DeprecatedCalibrationPanels\DeckSetup.tsx
+   75:8   warning  Unexpected nullable object value in conditional. An explicit null check is required          @typescript-eslint/strict-boolean-expressions
+   80:32  warning  Unexpected nullable object value in conditional. An explicit null check is required          @typescript-eslint/strict-boolean-expressions
+   83:33  warning  Unexpected nullable object value in conditional. An explicit null check is required          @typescript-eslint/strict-boolean-expressions
+  118:35  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly  @typescript-eslint/strict-boolean-expressions
+  148:15  warning  Unexpected nullable object value in conditional. An explicit null check is required          @typescript-eslint/strict-boolean-expressions
+  189:22  warning  Unexpected nullable object value in conditional. An explicit null check is required          @typescript-eslint/strict-boolean-expressions
+  193:28  warning  Unexpected nullable object value in conditional. An explicit null check is required          @typescript-eslint/strict-boolean-expressions
+  197:24  warning  Unexpected nullable object value in conditional. An explicit null check is required          @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\DeprecatedCalibrationPanels\Introduction.tsx
+  116:14  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+  121:14  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+  126:14  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+  192:11  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly        @typescript-eslint/strict-boolean-expressions
+  414:5   warning  Unexpected nullable object value in conditional. An explicit null check is required                @typescript-eslint/strict-boolean-expressions
+  425:7   warning  Unexpected nullable object value in conditional. An explicit null check is required                @typescript-eslint/strict-boolean-expressions
+  425:7   warning  Prefer using an optional chain expression instead, as it's more concise and easier to read         @typescript-eslint/prefer-optional-chain
+  479:10  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+  485:10  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+  508:15  warning  Unexpected nullable object value in conditional. An explicit null check is required                @typescript-eslint/strict-boolean-expressions
+  523:12  warning  Unexpected nullable object value in conditional. An explicit null check is required                @typescript-eslint/strict-boolean-expressions
+  559:19  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+  561:10  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+  631:10  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly        @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\DeprecatedCalibrationPanels\MeasureNozzle.tsx
+  106:29  warning  Unexpected nullable object value in conditional. An explicit null check is required  @typescript-eslint/strict-boolean-expressions
+  111:28  warning  Unexpected nullable object value in conditional. An explicit null check is required  @typescript-eslint/strict-boolean-expressions
+  119:7   warning  Unexpected string value in conditional. An explicit empty string check is required   @typescript-eslint/strict-boolean-expressions
+  120:8   warning  Unexpected nullable object value in conditional. An explicit null check is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\DeprecatedCalibrationPanels\MeasureTip.tsx
+  112:29  warning  Unexpected nullable object value in conditional. An explicit null check is required          @typescript-eslint/strict-boolean-expressions
+  117:28  warning  Unexpected nullable object value in conditional. An explicit null check is required          @typescript-eslint/strict-boolean-expressions
+  125:7   warning  Unexpected string value in conditional. An explicit empty string check is required           @typescript-eslint/strict-boolean-expressions
+  126:8   warning  Unexpected nullable object value in conditional. An explicit null check is required          @typescript-eslint/strict-boolean-expressions
+  157:9   warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\DeprecatedCalibrationPanels\SaveXYPoint.tsx
+  202:7   warning  Unexpected any value in conditional. An explicit comparison or type cast is required                  @typescript-eslint/strict-boolean-expressions
+  225:7   warning  Unexpected any value in conditional. An explicit comparison or type cast is required                  @typescript-eslint/strict-boolean-expressions
+  226:7   warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly           @typescript-eslint/strict-boolean-expressions
+  230:16  warning  Unexpected any value in conditional. An explicit comparison or type cast is required                  @typescript-eslint/strict-boolean-expressions
+  242:5   warning  Unexpected nullable number value in conditional. Please handle the nullish/zero/NaN cases explicitly  @typescript-eslint/strict-boolean-expressions
+  276:24  warning  Invalid type "any" of template literal expression                                                     @typescript-eslint/restrict-template-expressions
+  276:24  warning  Unexpected any value in conditional. An explicit comparison or type cast is required                  @typescript-eslint/strict-boolean-expressions
+  290:27  warning  Invalid type "any" of template literal expression                                                     @typescript-eslint/restrict-template-expressions
+  290:27  warning  Unexpected any value in conditional. An explicit comparison or type cast is required                  @typescript-eslint/strict-boolean-expressions
+  294:20  warning  Invalid type "any" of template literal expression                                                     @typescript-eslint/restrict-template-expressions
+  295:61  warning  Invalid type "any" of template literal expression                                                     @typescript-eslint/restrict-template-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\DeprecatedCalibrationPanels\SaveZPoint.tsx
+  118:11  warning  Unexpected string value in conditional. An explicit empty string check is required  @typescript-eslint/strict-boolean-expressions
+  200:20  warning  Invalid type "any" of template literal expression                                   @typescript-eslint/restrict-template-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\DeprecatedCalibrationPanels\TipConfirmation.tsx
+  59:22  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\DeprecatedCalibrationPanels\TipPickUp.tsx
+  119:14  warning  Unexpected nullable object value in conditional. An explicit null check is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\DeprecatedCalibrationPanels\__tests__\TipConfirmation.test.tsx
+  69:6  warning  should not have leading or trailing spaces  jest/valid-title
+  81:6  warning  should not have leading or trailing spaces  jest/valid-title
+  93:6  warning  should not have leading or trailing spaces  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\DeprecatedCheckCalibration\ResultsSummary.tsx
+   89:8   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+   89:33  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  123:20  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  129:20  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  135:30  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly                @typescript-eslint/strict-boolean-expressions
+  143:16  warning  Unexpected value in conditional. A boolean expression is required                                          @typescript-eslint/strict-boolean-expressions
+  146:19  warning  Unexpected value in conditional. A boolean expression is required                                          @typescript-eslint/strict-boolean-expressions
+  172:15  warning  Unexpected value in conditional. A boolean expression is required                                          @typescript-eslint/strict-boolean-expressions
+  215:16  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  216:15  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  218:15  warning  Unexpected number value in conditional. An explicit zero/NaN check is required                             @typescript-eslint/strict-boolean-expressions
+  272:8   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  301:5   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  301:58  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  352:34  warning  This expression unnecessarily compares a boolean value to a boolean instead of using it directly           @typescript-eslint/no-unnecessary-boolean-literal-compare
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\DeprecatedCheckCalibration\ReturnTip.tsx
+  26:6  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly  @typescript-eslint/strict-boolean-expressions
+  42:7  warning  Unexpected nullable object value in conditional. An explicit null check is required          @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\DeprecatedCheckCalibration\__tests__\DeprecatedCheckCalibration.test.tsx
+  136:11  warning  Avoid calling `expect` conditionally`  jest/no-conditional-expect
+  138:11  warning  Avoid calling `expect` conditionally`  jest/no-conditional-expect
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\DeprecatedCheckCalibration\index.tsx
+  117:7   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  117:24  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  128:18  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  129:12  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  132:47  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  137:9   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  141:17  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  141:24  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  149:9   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  162:8   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  162:20  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\HistoricalProtocolRun.tsx
+   89:50  warning  Invalid type "string | undefined" of template literal expression  @typescript-eslint/restrict-template-expressions
+  105:57  warning  Invalid type "string | undefined" of template literal expression  @typescript-eslint/restrict-template-expressions
+  106:55  warning  Invalid type "string | undefined" of template literal expression  @typescript-eslint/restrict-template-expressions
+  116:57  warning  Invalid type "string | undefined" of template literal expression  @typescript-eslint/restrict-template-expressions
+  127:53  warning  Invalid type "string | undefined" of template literal expression  @typescript-eslint/restrict-template-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\PipetteCard\index.tsx
+  142:21  warning  Unexpected nullable object value in conditional. An explicit null check is required          @typescript-eslint/strict-boolean-expressions
+  181:35  warning  Invalid type "string | undefined" of template literal expression                             @typescript-eslint/restrict-template-expressions
+  198:18  warning  This assertion is unnecessary since it does not change the type of the expression            @typescript-eslint/no-unnecessary-type-assertion
+  302:34  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly  @typescript-eslint/strict-boolean-expressions
+  329:49  warning  Invalid type "string | undefined" of template literal expression                             @typescript-eslint/restrict-template-expressions
+  339:56  warning  Invalid type "string | undefined" of template literal expression                             @typescript-eslint/restrict-template-expressions
+  351:50  warning  Invalid type "string | undefined" of template literal expression                             @typescript-eslint/restrict-template-expressions
+  359:55  warning  Invalid type "string | undefined" of template literal expression                             @typescript-eslint/restrict-template-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\ProtocolRun\DeprecatedSetupTipLengthCalibrationButton.tsx
+  177:7  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+  184:7  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+  191:7  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\ProtocolRun\LabwareInfoOverlay.tsx
+  49:24  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly  @typescript-eslint/strict-boolean-expressions
+  70:10  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\ProtocolRun\ProtocolRunHeader.tsx
+  168:6   warning  React Hook React.useEffect has missing dependencies: 'robotAnalyticsData' and 'trackProtocolRunEvent'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  299:25  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator                                                  @typescript-eslint/prefer-nullish-coalescing
+  341:7   warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly                                                                @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\ProtocolRun\ProtocolRunModuleControls.tsx
+  70:6  warning  React Hook React.useEffect has missing dependencies: 'createCommand', 'loadCommands', 'protocolData', and 'runId'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\ProtocolRun\ProtocolRunSetup.tsx
+  100:6  warning  React Hook React.useEffect has missing dependencies: 'modules.length', 'protocolData', and 'stepsKeysInOrder'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  100:7  warning  React Hook React.useEffect has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked                     react-hooks/exhaustive-deps
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\ProtocolRun\RunLog.tsx
+  103:9  warning  The 'runCommands' logical expression could make the dependencies of useEffect Hook (at line 253) change on every render. To fix this, wrap the initialization of 'runCommands' in its own useMemo() Hook     react-hooks/exhaustive-deps
+  144:9  warning  The 'runStartDateTime' conditional could make the dependencies of useEffect Hook (at line 253) change on every render. To fix this, wrap the initialization of 'runStartDateTime' in its own useMemo() Hook  react-hooks/exhaustive-deps
+  171:6  warning  React Hook React.useEffect has a missing dependency: 'firstNonSetupIndex'. Either include it or remove the dependency array                                                                                  react-hooks/exhaustive-deps
+  300:6  warning  React Hook React.useEffect has a missing dependency: 'jumpToCurrentCommandWindow'. Either include it or remove the dependency array                                                                          react-hooks/exhaustive-deps
+  316:6  warning  React Hook React.useEffect has missing dependencies: 'indexOfFirstWindowContainingCurrentCommand' and 'indexOfLastWindowContainingCurrentCommand'. Either include them or remove the dependency array        react-hooks/exhaustive-deps
+  327:9  warning  Unexpected nullable object value in conditional. An explicit null check is required                                                                                                                          @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\ProtocolRun\SetupLabware\LabwareListItem.tsx
+  156:9   warning  Unexpected lexical declaration in case block                                                no-case-declarations
+  157:11  warning  Prefer using an optional chain expression instead, as it's more concise and easier to read  @typescript-eslint/prefer-optional-chain
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\ProtocolRun\SetupModules\SetupModulesList.tsx
+  221:8  warning  Unexpected object value in conditional. The condition is always true  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\ProtocolRun\SetupStep.tsx
+  90:40  warning  Invalid type "ReactNode" of template literal expression  @typescript-eslint/restrict-template-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\ProtocolRun\SetupTipLengthCalibrationButton.tsx
+  150:7  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+  157:7  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+  164:7  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\ProtocolRun\StepItem.tsx
+  113:5  warning  Prefer using an optional chain expression instead, as it's more concise and easier to read  @typescript-eslint/prefer-optional-chain
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\ProtocolRun\__tests__\ProtocolRunHeader.test.tsx
+  759:5  warning  Promises must be handled appropriately or explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\RobotSettings\AdvancedTab\AdvancedTabSlideouts\RenameRobotSlideout.tsx
+  164:18  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+  169:10  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\RobotSettings\AdvancedTab\AdvancedTabSlideouts\__tests__\RenameRobotSlideout.test.tsx
+  188:3  warning  Some tests seem to be commented  jest/no-commented-out-tests
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\RobotSettings\AdvancedTab\DisableHoming.tsx
+  34:17  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly        @typescript-eslint/strict-boolean-expressions
+  35:14  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\RobotSettings\AdvancedTab\LegacySettings.tsx
+  34:17  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly        @typescript-eslint/strict-boolean-expressions
+  35:14  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\RobotSettings\AdvancedTab\ShortTrashBin.tsx
+  34:17  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly        @typescript-eslint/strict-boolean-expressions
+  35:14  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\RobotSettings\AdvancedTab\UsageSettings.tsx
+  34:17  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly        @typescript-eslint/strict-boolean-expressions
+  35:14  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\RobotSettings\AdvancedTab\UseOlderAspirateBehavior.tsx
+  34:17  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly        @typescript-eslint/strict-boolean-expressions
+  35:14  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\RobotSettings\AdvancedTab\UseOlderProtocol.tsx
+  33:17  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly        @typescript-eslint/strict-boolean-expressions
+  34:14  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\RobotSettings\ConnectNetwork\ConnectModal\KeyFileField.tsx
+  41:7  warning  Unexpected nullable object value in conditional. An explicit null check is required         @typescript-eslint/strict-boolean-expressions
+  41:7  warning  Prefer using an optional chain expression instead, as it's more concise and easier to read  @typescript-eslint/prefer-optional-chain
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\RobotSettings\ConnectNetwork\ConnectModal\TextField.tsx
+  25:60  warning  Unexpected any value in conditional. An explicit comparison or type cast is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\RobotSettings\ConnectNetwork\ConnectModal\UploadKeyInput.tsx
+  45:9   warning  Unexpected nullable object value in conditional. An explicit null check is required  @typescript-eslint/strict-boolean-expressions
+  58:33  warning  Unexpected nullable object value in conditional. An explicit null check is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\RobotSettings\ConnectNetwork\ConnectModal\form-fields.ts
+   90:8   warning  Unexpected nullable object value in conditional. An explicit null check is required                @typescript-eslint/strict-boolean-expressions
+   91:48  warning  Unexpected nullable object value in conditional. An explicit null check is required                @typescript-eslint/strict-boolean-expressions
+  150:28  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+  156:6   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+  164:7   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+  178:46  warning  Unexpected any value in conditional. An explicit comparison or type cast is required               @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\RobotSettings\ConnectNetwork\ConnectModal\form-state.ts
+  24:9  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\RobotSettings\ConnectNetwork\ConnectModal\index.tsx
+  35:9  warning  Unexpected nullable object value in conditional. An explicit null check is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\RobotSettings\ConnectNetwork\ResultModal.tsx
+  30:7  warning  Unexpected nullable object value in conditional. An explicit null check is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\RobotSettings\RobotSettingsAdvanced.tsx
+  244:46  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\RobotSettings\RobotSettingsFeatureFlags.tsx
+  84:44  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\RobotSettings\SettingToggle.tsx
+  42:44  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\RobotSettings\UpdateBuildroot\InstallModalContents.tsx
+  23:16  warning  Unexpected value in conditional. A boolean expression is required                                          @typescript-eslint/strict-boolean-expressions
+  23:27  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\RobotSettings\UpdateBuildroot\UpdateAppMessage.tsx
+  25:5   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+  25:33  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\RobotSettings\UpdateBuildroot\VersionList.tsx
+  10:45  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  10:64  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\RobotSettings\UpdateBuildroot\index.tsx
+  34:27  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  34:35  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  73:7   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\RobotSettings\UpdateBuildroot\progress.tsx
+  24:20  warning  Unexpected nullable number value in conditional. Please handle the nullish/zero/NaN cases explicitly       @typescript-eslint/strict-boolean-expressions
+  24:35  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\hooks\__tests__\useAttachedPipetteCalibrations.test.tsx
+  80:18  warning  'children' is missing in props validation  react/prop-types
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\hooks\__tests__\useDeckCalibrationData.test.tsx
+  46:18  warning  'children' is missing in props validation  react/prop-types
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\hooks\__tests__\useDeckCalibrationStatus.test.tsx
+  39:18  warning  'children' is missing in props validation  react/prop-types
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\hooks\__tests__\useIsLegacySessionInProgress.test.ts
+  12:10  warning  should not have leading or trailing spaces  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\hooks\__tests__\useIsOT3.test.tsx
+  24:18  warning  'children' is missing in props validation  react/prop-types
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\hooks\__tests__\useIsRobotBusy.test.ts
+  74:3  warning  Some tests seem to be commented  jest/no-commented-out-tests
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\hooks\__tests__\useIsRobotViewable.test.tsx
+  29:18  warning  'children' is missing in props validation  react/prop-types
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\hooks\__tests__\useLights.test.tsx
+  33:18  warning  'children' is missing in props validation  react/prop-types
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\hooks\__tests__\usePipetteOffsetCalibration.test.tsx
+  48:18  warning  'children' is missing in props validation  react/prop-types
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\hooks\__tests__\usePipetteOffsetCalibrations.test.tsx
+  49:18  warning  'children' is missing in props validation  react/prop-types
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\hooks\__tests__\useProtocolDetailsForRun.test.tsx
+  102:24  warning  This assertion is unnecessary since it does not change the type of the expression  @typescript-eslint/no-unnecessary-type-assertion
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\hooks\__tests__\useProtocolRunAnalyticsData.test.tsx
+  80:18  warning  'children' is missing in props validation  react/prop-types
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\hooks\__tests__\useRobot.test.tsx
+  25:18  warning  'children' is missing in props validation  react/prop-types
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\hooks\__tests__\useRobotAnalyticsData.test.tsx
+  59:18  warning  'children' is missing in props validation  react/prop-types
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\hooks\__tests__\useRunStatuses.test.tsx
+  23:10  warning  should not have leading or trailing spaces  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\hooks\__tests__\useStoredProtocolAnalysis.test.tsx
+  75:18  warning  'children' is missing in props validation  react/prop-types
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\hooks\__tests__\useSyncRobotClock.test.tsx
+  20:18  warning  'children' is missing in props validation  react/prop-types
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\hooks\__tests__\useTipLengthCalibrations.test.tsx
+  49:18  warning  'children' is missing in props validation  react/prop-types
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\hooks\__tests__\useTrackCreateProtocolRunEvent.test.tsx
+  48:18  warning  'children' is missing in props validation  react/prop-types
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\hooks\__tests__\useTrackProtocolRunEvent.test.tsx
+  40:18  warning  'children' is missing in props validation  react/prop-types
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\hooks\useAttachedModules.ts
+  7:10  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  7:45  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\hooks\useAttachedPipettes.ts
+  14:24  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  14:58  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  16:9   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  16:9   warning  Prefer using an optional chain expression instead, as it's more concise and easier to read                 @typescript-eslint/prefer-optional-chain
+  16:21  warning  Unexpected value in conditional. A boolean expression is required                                          @typescript-eslint/strict-boolean-expressions
+  17:34  warning  This assertion is unnecessary since it does not change the type of the expression                          @typescript-eslint/no-unnecessary-type-assertion
+  20:11  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  20:11  warning  Prefer using an optional chain expression instead, as it's more concise and easier to read                 @typescript-eslint/prefer-optional-chain
+  20:23  warning  Unexpected value in conditional. A boolean expression is required                                          @typescript-eslint/strict-boolean-expressions
+  20:41  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\hooks\useLights.ts
+  16:46  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\hooks\useModuleRenderInfoForProtocolById.ts
+  51:19  warning  Unexpected nullable object value in conditional. An explicit null check is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\hooks\useRobotAnalyticsData.ts
+  48:34  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  48:60  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  49:33  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  49:64  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  50:29  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  50:50  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  51:30  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  51:52  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\hooks\useRunPipetteInfoByMount.ts
+   95:50  warning  This assertion is unnecessary since it does not change the type of the expression           @typescript-eslint/no-unnecessary-type-assertion
+  149:5   warning  Prefer using an optional chain expression instead, as it's more concise and easier to read  @typescript-eslint/prefer-optional-chain
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\Devices\utils.ts
+  57:7  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  60:9  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\GripperWizardFlows\BeforeBeginning.tsx
+  64:6  warning  React Hook React.useEffect has a missing dependency: 'createRun'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\LabwareDetails\__tests__\LabwareDetails.test.tsx
+  115:5  warning  Promises must be handled appropriately or explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\LabwareDetails\helpers\labels.ts
+  34:7   warning  Unexpected value in conditional. A boolean expression is required                    @typescript-eslint/strict-boolean-expressions
+  34:26  warning  Unexpected string value in conditional. An explicit empty string check is required   @typescript-eslint/strict-boolean-expressions
+  38:7   warning  Unexpected nullable object value in conditional. An explicit null check is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\LabwareDetails\helpers\labwareInference.ts
+  41:14  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  41:26  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\LabwareDetails\measurementGuide\index.ts
+  145:12  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+  146:41  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly        @typescript-eslint/strict-boolean-expressions
+  149:10  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+  155:12  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly        @typescript-eslint/strict-boolean-expressions
+  160:10  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+  167:12  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+  167:31  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+  171:10  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+  171:29  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\LabwarePositionCheck\CheckItem.tsx
+   94:6  warning  React Hook React.useEffect has missing dependencies: 'createRunCommand' and 'modulePrepCommands'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  161:7  warning  Promises must be handled appropriately or explicitly marked as ignored with the `void` operator                                                       @typescript-eslint/no-floating-promises
+  182:5  warning  Promises must be handled appropriately or explicitly marked as ignored with the `void` operator                                                       @typescript-eslint/no-floating-promises
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\LabwarePositionCheck\DeprecatedComponents\DeprecatedDeckMap.tsx
+   92:21  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly  @typescript-eslint/strict-boolean-expressions
+  103:21  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly  @typescript-eslint/strict-boolean-expressions
+  137:16  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\LabwarePositionCheck\DeprecatedComponents\DeprecatedSectionList.tsx
+  59:11  warning  Prefer using an optional chain expression instead, as it's more concise and easier to read        @typescript-eslint/prefer-optional-chain
+  63:20  warning  This expression unnecessarily compares a boolean value to a boolean instead of using it directly  @typescript-eslint/no-unnecessary-boolean-literal-compare
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\LabwarePositionCheck\LabwarePositionCheckComponent.tsx
+  207:11  warning  Prefer using an optional chain expression instead, as it's more concise and easier to read  @typescript-eslint/prefer-optional-chain
+  213:63  warning  Invalid type "null" of template literal expression                                          @typescript-eslint/restrict-template-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\LabwarePositionCheck\PickUpTip.tsx
+  126:9   warning  Promises must be handled appropriately or explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+  141:5   warning  Promises must be handled appropriately or explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+  154:11  warning  Promises must be handled appropriately or explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+  204:5   warning  Promises must be handled appropriately or explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\LabwarePositionCheck\ResultsSummary.tsx
+  74:41  warning  Invalid type "VectorOffset | null" of template literal expression                                                                                    @typescript-eslint/restrict-template-expressions
+  74:80  warning  Invalid type "VectorOffset | null" of template literal expression                                                                                    @typescript-eslint/restrict-template-expressions
+  91:6   warning  React Hook React.useMemo has missing dependencies: 'existingOffsets' and 'protocolData.labware'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\LabwarePositionCheck\__tests__\CheckItem.test.tsx
+   68:16  warning  Unexpected any value in conditional. An explicit comparison or type cast is required        @typescript-eslint/strict-boolean-expressions
+   68:16  warning  Prefer using an optional chain expression instead, as it's more concise and easier to read  @typescript-eslint/prefer-optional-chain
+  114:12  warning  This assertion is unnecessary since it does not change the type of the expression           @typescript-eslint/no-unnecessary-type-assertion
+  204:12  warning  This assertion is unnecessary since it does not change the type of the expression           @typescript-eslint/no-unnecessary-type-assertion
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\LabwarePositionCheck\__tests__\PickUpTip.test.tsx
+  101:12  warning  This assertion is unnecessary since it does not change the type of the expression  @typescript-eslint/no-unnecessary-type-assertion
+  130:12  warning  This assertion is unnecessary since it does not change the type of the expression  @typescript-eslint/no-unnecessary-type-assertion
+  189:12  warning  This assertion is unnecessary since it does not change the type of the expression  @typescript-eslint/no-unnecessary-type-assertion
+  209:12  warning  This assertion is unnecessary since it does not change the type of the expression  @typescript-eslint/no-unnecessary-type-assertion
+  229:12  warning  This assertion is unnecessary since it does not change the type of the expression  @typescript-eslint/no-unnecessary-type-assertion
+  249:12  warning  This assertion is unnecessary since it does not change the type of the expression  @typescript-eslint/no-unnecessary-type-assertion
+  273:26  warning  This assertion is unnecessary since it does not change the type of the expression  @typescript-eslint/no-unnecessary-type-assertion
+  292:26  warning  This assertion is unnecessary since it does not change the type of the expression  @typescript-eslint/no-unnecessary-type-assertion
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\LabwarePositionCheck\deprecatedHooks\useDeprecatedLabwarePositionCheck.ts
+  382:7   warning  Unexpected value in conditional. A boolean expression is required                                @typescript-eslint/strict-boolean-expressions
+  382:35  warning  Unexpected nullable object value in conditional. An explicit null check is required              @typescript-eslint/strict-boolean-expressions
+  578:7   warning  Promises must be handled appropriately or explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+  608:9   warning  Promises must be handled appropriately or explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+  691:9   warning  Prefer using an optional chain expression instead, as it's more concise and easier to read       @typescript-eslint/prefer-optional-chain
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\LabwarePositionCheck\utils\chainRunCommands.ts
+  10:3  warning  Promises must be handled appropriately or explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\LabwarePositionCheck\utils\labware.ts
+  118:74  warning  Invalid type "string | undefined" of template literal expression  @typescript-eslint/restrict-template-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\ModuleCard\ErrorInfo.tsx
+  49:7  warning  This expression unnecessarily compares a boolean value to a boolean instead of using it directly  @typescript-eslint/no-unnecessary-boolean-literal-compare
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\ModuleCard\HeaterShakerModuleData.tsx
+  110:8  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\ModuleCard\ModuleOverflowMenu.tsx
+  51:37  warning  Unexpected object value in conditional. The condition is always true                  @typescript-eslint/strict-boolean-expressions
+  82:31  warning  Unexpected any value in conditional. An explicit comparison or type cast is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\ModuleCard\ThermocyclerModuleSlideout.tsx
+   62:22  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly  @typescript-eslint/strict-boolean-expressions
+   66:7   warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly  @typescript-eslint/strict-boolean-expressions
+   99:20  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly  @typescript-eslint/strict-boolean-expressions
+  109:20  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly  @typescript-eslint/strict-boolean-expressions
+  166:14  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly  @typescript-eslint/strict-boolean-expressions
+  170:51  warning  Invalid type "boolean | undefined" of template literal expression                            @typescript-eslint/restrict-template-expressions
+  171:42  warning  Invalid type "boolean | undefined" of template literal expression                            @typescript-eslint/restrict-template-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\ModuleCard\__tests__\TemperatureModuleData.test.tsx
+  88:26  warning  Invalid type "number | null" of template literal expression  @typescript-eslint/restrict-template-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\ModuleCard\__tests__\hooks.test.tsx
+  237:5  warning  Promises must be handled appropriately or explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+  262:5  warning  Promises must be handled appropriately or explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+  330:5  warning  Promises must be handled appropriately or explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+  371:5  warning  Promises must be handled appropriately or explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+  402:5  warning  Promises must be handled appropriately or explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+  432:5  warning  Promises must be handled appropriately or explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+  469:5  warning  Promises must be handled appropriately or explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+  498:5  warning  Promises must be handled appropriately or explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+  535:5  warning  Promises must be handled appropriately or explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+  565:5  warning  Promises must be handled appropriately or explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+  603:5  warning  Promises must be handled appropriately or explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+  641:5  warning  Promises must be handled appropriately or explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\ModuleCard\hooks.tsx
+  220:104  warning  Invalid type "string | null" of template literal expression  @typescript-eslint/restrict-template-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\ModuleCard\index.tsx
+  112:5  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+  120:5  warning  Unexpected string value in conditional. An explicit empty string check is required                 @typescript-eslint/strict-boolean-expressions
+  126:7  warning  This expression unnecessarily compares a boolean value to a boolean instead of using it directly   @typescript-eslint/no-unnecessary-boolean-literal-compare
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\PipetteWizardFlows\BeforeBeginning.tsx
+  51:6  warning  React Hook React.useEffect has a missing dependency: 'createRun'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\PipetteWizardFlows\CheckPipetteButton.tsx
+  38:7  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+  46:5  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\PipetteWizardFlows\__tests__\ExitModal.test.tsx
+  24:6  warning  should not have leading or trailing spaces  jest/valid-title
+  38:6  warning  should not have leading or trailing spaces  jest/valid-title
+  56:6  warning  should not have leading or trailing spaces  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\PipetteWizardFlows\index.tsx
+  110:5  warning  Promises must be handled appropriately or explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\ProtocolUpload\hooks\__tests__\useCloneRun.test.tsx
+  62:5  warning  Unexpected object value in conditional. The condition is always true                        @typescript-eslint/strict-boolean-expressions
+  62:5  warning  Prefer using an optional chain expression instead, as it's more concise and easier to read  @typescript-eslint/prefer-optional-chain
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\ProtocolsLanding\__tests__\UploadInput.test.tsx
+  42:5  warning  Promises must be handled appropriately or explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+  43:5  warning  Promises must be handled appropriately or explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+  44:5  warning  Promises must be handled appropriately or explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\RobotSettingsCalibration\CalibrationDetails\TipLengthCalibrationItems.tsx
+  98:18  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\RobotSettingsCalibration\CalibrationDetails\utils.ts
+  14:33  warning  Unexpected string value in conditional. An explicit empty string check is required   @typescript-eslint/strict-boolean-expressions
+  21:10  warning  Unexpected nullable object value in conditional. An explicit null check is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\RobotSettingsCalibration\RobotSettingsDeckCalibration.tsx
+  95:5  warning  Unexpected value in conditional. A boolean expression is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\RobotSettingsCalibration\__tests__\CalibrationHealthCheck.test.tsx
+  153:7  warning  Promises must be handled appropriately or explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\RobotSettingsCalibration\index.tsx
+  104:6   warning  React Hook React.useEffect has missing dependencies: 'dispatch' and 'robotName'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  187:7   warning  Unexpected nullable object value in conditional. An explicit null check is required                                                  @typescript-eslint/strict-boolean-expressions
+  340:19  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly                                    @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\TaskList\index.tsx
+  137:25  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\organisms\UpdateAppModal\index.tsx
+  134:5  warning  Unexpected nullable object value in conditional. An explicit null check is required         @typescript-eslint/strict-boolean-expressions
+  134:5  warning  Prefer using an optional chain expression instead, as it's more concise and easier to read  @typescript-eslint/prefer-optional-chain
+  139:7  warning  Unexpected nullable object value in conditional. An explicit null check is required         @typescript-eslint/strict-boolean-expressions
+  139:7  warning  Prefer using an optional chain expression instead, as it's more concise and easier to read  @typescript-eslint/prefer-optional-chain
+  143:7  warning  Unexpected nullable object value in conditional. An explicit null check is required         @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\pages\AppSettings\AdvancedSettings.tsx
+  494:22  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\pages\OnDeviceDisplay\__tests__\ConnectViaEthernet.test.tsx
+  103:3  warning  Some tests seem to be commented  jest/no-commented-out-tests
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\pages\OnDeviceDisplay\__tests__\ConnectedViaUSB.test.tsx
+  52:3  warning  Some tests seem to be commented  jest/no-commented-out-tests
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\pages\OnDeviceDisplay\__tests__\RobotDashboard.test.tsx
+  69:3  warning  Some tests seem to be commented  jest/no-commented-out-tests
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\alerts\selectors.ts
+  34:10  warning  Unexpected nullable object value in conditional. An explicit null check is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\analytics\__tests__\custom-labware-events.test.ts
+  108:8  warning  Title must be a string  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\analytics\epic.ts
+  49:22  warning  Unexpected nullable object value in conditional. An explicit null check is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\analytics\hooks.ts
+  19:19  warning  Unexpected nullable object value in conditional. An explicit null check is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\analytics\make-event.ts
+  268:9   warning  Unexpected nullable object value in conditional. An explicit null check is required   @typescript-eslint/strict-boolean-expressions
+  286:11  warning  Unexpected lexical declaration in case block                                          no-case-declarations
+  288:13  warning  Unexpected nullable object value in conditional. An explicit null check is required   @typescript-eslint/strict-boolean-expressions
+  296:11  warning  Unexpected lexical declaration in case block                                          no-case-declarations
+  298:13  warning  Unexpected nullable object value in conditional. An explicit null check is required   @typescript-eslint/strict-boolean-expressions
+  313:11  warning  Unexpected lexical declaration in case block                                          no-case-declarations
+  319:13  warning  Unexpected nullable object value in conditional. An explicit null check is required   @typescript-eslint/strict-boolean-expressions
+  329:11  warning  Unexpected lexical declaration in case block                                          no-case-declarations
+  330:15  warning  Unexpected object value in conditional. The condition is always true                  @typescript-eslint/strict-boolean-expressions
+  337:15  warning  Unexpected nullable object value in conditional. An explicit null check is required   @typescript-eslint/strict-boolean-expressions
+  343:43  warning  Unexpected any value in conditional. An explicit comparison or type cast is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\analytics\mixpanel.ts
+  24:7  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+  42:7  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+  43:9  warning  Unexpected nullable object value in conditional. An explicit null check is required                @typescript-eslint/strict-boolean-expressions
+  45:9  warning  Unexpected any value in conditional. An explicit comparison or type cast is required               @typescript-eslint/strict-boolean-expressions
+  50:7  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\analytics\selectors.ts
+  132:9   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  132:66  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  136:26  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  136:52  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  137:25  warning  Unexpected value in conditional. A boolean expression is required                                          @typescript-eslint/strict-boolean-expressions
+  137:51  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  143:12  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  143:27  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  284:7   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  299:7   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\buildroot\__tests__\actions.test.ts
+  171:8  warning  Title must be a string  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\buildroot\__tests__\epic.test.ts
+   33:21  warning  This assertion is unnecessary since it does not change the type of the expression  @typescript-eslint/no-unnecessary-type-assertion
+   35:22  warning  This assertion is unnecessary since it does not change the type of the expression  @typescript-eslint/no-unnecessary-type-assertion
+   45:17  warning  This assertion is unnecessary since it does not change the type of the expression  @typescript-eslint/no-unnecessary-type-assertion
+  145:47  warning  This assertion is unnecessary since it does not change the type of the expression  @typescript-eslint/no-unnecessary-type-assertion
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\buildroot\__tests__\reducer.test.ts
+  265:8  warning  Title must be a string  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\buildroot\epic.ts
+  112:28  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  112:47  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  121:28  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  121:54  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  137:9   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  137:38  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  138:41  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  264:6   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  283:26  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  283:60  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  309:44  warning  Invalid type "any" of template literal expression                                                          @typescript-eslint/restrict-template-expressions
+  327:20  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  327:61  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  338:50  warning  Invalid type "any" of template literal expression                                                          @typescript-eslint/restrict-template-expressions
+  366:10  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\buildroot\reducer.ts
+   21:17  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+   21:39  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+   64:23  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+   64:37  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+   74:23  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+   74:37  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+   83:12  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+   86:28  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+   86:49  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  100:14  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  109:14  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  118:14  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  127:14  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  136:14  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  145:14  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  156:14  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\buildroot\selectors.ts
+   31:10  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+   31:34  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+   37:10  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+   37:31  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+   42:5   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+   42:52  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+   43:29  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+   81:10  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+   81:45  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+   93:7   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  100:10  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  113:7   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  113:22  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  148:26  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  180:7   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  183:10  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  183:26  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\calibration\__tests__\actions.test.ts
+  61:8  warning  Title must be a string  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\calibration\pipette-offset\__tests__\actions.test.ts
+  61:8  warning  Title must be a string  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\calibration\pipette-offset\selectors.ts
+  10:8   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  14:5   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  14:68  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  39:5   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  43:7   warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\calibration\tip-length\__tests__\actions.test.ts
+  61:8  warning  Title must be a string  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\calibration\tip-length\selectors.ts
+  10:8   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  14:5   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  14:64  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  28:5   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  32:7   warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  65:12  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\config\selectors.ts
+  56:10  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly                @typescript-eslint/strict-boolean-expressions
+  56:33  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\custom-labware\__tests__\actions.test.ts
+  193:8  warning  Title must be a string  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\custom-labware\__tests__\reducer.test.ts
+  162:8  warning  Title must be a string  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\discovery\__tests__\actions.test.ts
+  59:8  warning  Title must be a string  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\discovery\__tests__\reducer.test.ts
+  68:8  warning  Title must be a string  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\discovery\__tests__\selectors.test.ts
+  590:8  warning  Title must be a string  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\discovery\epic.ts
+  27:23  warning  Unexpected any value in conditional. An explicit comparison or type cast is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\discovery\selectors.ts
+   69:13  warning  Unexpected value in conditional. A boolean expression is required                                          @typescript-eslint/strict-boolean-expressions
+   69:23  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+   69:27  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+   94:18  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  110:43  warning  Unexpected value in conditional. A boolean expression is required                                          @typescript-eslint/strict-boolean-expressions
+  110:59  warning  Unexpected value in conditional. A boolean expression is required                                          @typescript-eslint/strict-boolean-expressions
+  111:13  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  123:59  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly                @typescript-eslint/strict-boolean-expressions
+  185:10  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  185:67  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  198:4   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  198:4   warning  Prefer using an optional chain expression instead, as it's more concise and easier to read                 @typescript-eslint/prefer-optional-chain
+  201:4   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  202:4   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  208:4   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  208:4   warning  Prefer using an optional chain expression instead, as it's more concise and easier to read                 @typescript-eslint/prefer-optional-chain
+  209:4   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  209:4   warning  Prefer using an optional chain expression instead, as it's more concise and easier to read                 @typescript-eslint/prefer-optional-chain
+  217:8   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  225:10  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  226:10  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  235:10  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\modules\__tests__\actions.test.ts
+  59:8  warning  Title must be a string  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\networking\__tests__\actions.test.ts
+  316:8  warning  Title must be a string  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\networking\__tests__\reducer.test.ts
+  236:8  warning  Title must be a string  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\networking\__tests__\selectors.test.ts
+  385:8  warning  Title must be a string  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\networking\reducer.ts
+  18:31  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  18:48  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  63:23  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\networking\selectors.ts
+   40:34  warning  Unexpected string value in conditional. An explicit empty string check is required                    @typescript-eslint/strict-boolean-expressions
+   43:13  warning  Unexpected nullable number value in conditional. Please handle the nullish/zero/NaN cases explicitly  @typescript-eslint/strict-boolean-expressions
+  115:32  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly     @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\pipettes\__tests__\actions.test.ts
+  161:8  warning  Title must be a string  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\pipettes\__tests__\reducer.test.ts
+  106:8  warning  Title must be a string  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\pipettes\__tests__\selectors.test.ts
+  57:8  warning  Title must be a string  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\pipettes\reducer.ts
+  21:26  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  21:43  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  31:26  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  31:43  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  41:26  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  41:43  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  44:12  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  44:29  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\pipettes\selectors.ts
+  24:5   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  28:26  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  28:51  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  30:11  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  30:11  warning  Prefer using an optional chain expression instead, as it's more concise and easier to read                 @typescript-eslint/prefer-optional-chain
+  30:23  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  34:13  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  34:13  warning  Prefer using an optional chain expression instead, as it's more concise and easier to read                 @typescript-eslint/prefer-optional-chain
+  34:25  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  34:43  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  61:13  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  64:14  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\protocol-storage\__tests__\actions.test.ts
+  124:8  warning  Title must be a string  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\protocol-storage\__tests__\reducer.test.ts
+  190:8  warning  Title must be a string  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\protocol\__tests__\reducer.test.ts
+  57:8  warning  Title must be a string  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\protocol\__tests__\selectors.test.ts
+  502:8  warning  Title must be a string  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\protocol\selectors.ts
+   56:7   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+   65:11  warning  Unexpected any value in conditional. An explicit comparison or type cast is required                       @typescript-eslint/strict-boolean-expressions
+   94:22  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+   96:10  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  180:11  warning  Unexpected value in conditional. A boolean expression is required                                          @typescript-eslint/strict-boolean-expressions
+  180:22  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\robot-admin\__tests__\actions.test.ts
+  130:8  warning  Title must be a string  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\robot-admin\epic\restartEpic.ts
+  25:5   warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  25:58  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\robot-admin\selectors.ts
+   69:8   warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+   93:24  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+   96:28  warning  Unexpected value in conditional. A boolean expression is required                                          @typescript-eslint/strict-boolean-expressions
+   96:41  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  103:10  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  103:59  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\robot-api\__tests__\actions.test.ts
+  26:8  warning  Title must be a string  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\robot-api\__tests__\http.test.ts
+   37:13  warning  Unexpected object value in conditional. The condition is always true                  @typescript-eslint/strict-boolean-expressions
+   60:9   warning  Unexpected any value in conditional. An explicit comparison or type cast is required  @typescript-eslint/strict-boolean-expressions
+  245:45  warning  Invalid type "any" of template literal expression                                     @typescript-eslint/restrict-template-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\robot-api\__tests__\reducer.test.ts
+  72:8  warning  Title must be a string  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\robot-api\__tests__\selectors.test.ts
+  39:8  warning  Title must be a string  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\robot-api\__utils__\epic-test-mocks.ts
+  53:17  warning  Unexpected any value in conditional. An explicit comparison or type cast is required  @typescript-eslint/strict-boolean-expressions
+  87:9   warning  Unexpected nullable object value in conditional. An explicit null check is required   @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\robot-api\helpers.ts
+   9:7   warning  Unexpected any value in conditional. An explicit comparison or type cast is required  @typescript-eslint/strict-boolean-expressions
+  15:7   warning  Unexpected any value in conditional. An explicit comparison or type cast is required  @typescript-eslint/strict-boolean-expressions
+  17:42  warning  Unexpected any value in conditional. An explicit comparison or type cast is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\robot-api\hooks.ts
+  102:14  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+  109:9   warning  Unexpected nullable object value in conditional. An explicit null check is required                @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\robot-api\http.ts
+  26:7  warning  Unexpected nullable object value in conditional. An explicit null check is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\robot-api\reducer.ts
+  20:16  warning  Unexpected any value in conditional. An explicit comparison or type cast is required        @typescript-eslint/strict-boolean-expressions
+  23:10  warning  Unexpected any value in conditional. An explicit comparison or type cast is required        @typescript-eslint/strict-boolean-expressions
+  27:9   warning  Unexpected any value in conditional. An explicit comparison or type cast is required        @typescript-eslint/strict-boolean-expressions
+  37:9   warning  Unexpected any value in conditional. An explicit comparison or type cast is required        @typescript-eslint/strict-boolean-expressions
+  37:9   warning  Prefer using an optional chain expression instead, as it's more concise and easier to read  @typescript-eslint/prefer-optional-chain
+  37:27  warning  Unexpected any value in conditional. An explicit comparison or type cast is required        @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\robot-api\selectors.ts
+  8:10  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  8:29  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\robot-controls\__tests__\actions.test.ts
+  174:8  warning  Title must be a string  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\robot-controls\__tests__\reducer.test.ts
+  125:8  warning  Title must be a string  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\robot-controls\__tests__\selectors.test.ts
+  88:8  warning  Title must be a string  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\robot-controls\epic\__tests__\fetchLightsEpic.test.ts
+  30:40  warning  This assertion is unnecessary since it does not change the type of the expression  @typescript-eslint/no-unnecessary-type-assertion
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\robot-controls\epic\__tests__\homeEpic.test.ts
+  30:40  warning  This assertion is unnecessary since it does not change the type of the expression  @typescript-eslint/no-unnecessary-type-assertion
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\robot-controls\epic\__tests__\moveEpic.test.ts
+  36:40  warning  This assertion is unnecessary since it does not change the type of the expression  @typescript-eslint/no-unnecessary-type-assertion
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\robot-controls\epic\__tests__\updateLightsEpic.test.ts
+  31:40  warning  This assertion is unnecessary since it does not change the type of the expression  @typescript-eslint/no-unnecessary-type-assertion
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\robot-controls\epic\moveEpic.ts
+  41:18  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  41:49  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\robot-controls\reducer.ts
+  20:22  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  20:39  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\robot-controls\selectors.ts
+  16:10  warning  Unexpected value in conditional. A boolean expression is required                                          @typescript-eslint/strict-boolean-expressions
+  16:57  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\robot-settings\__tests__\actions.test.ts
+  109:8  warning  Title must be a string  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\robot-settings\__tests__\reducer.test.ts
+  97:8  warning  Title must be a string  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\robot-settings\__tests__\selectors.test.ts
+  75:8  warning  Title must be a string  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\robot-settings\epic\__tests__\fetchSettingsEpic.test.ts
+  37:40  warning  This assertion is unnecessary since it does not change the type of the expression  @typescript-eslint/no-unnecessary-type-assertion
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\robot-settings\epic\__tests__\updateSettingEpic.test.ts
+  37:40  warning  This assertion is unnecessary since it does not change the type of the expression  @typescript-eslint/no-unnecessary-type-assertion
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\robot-settings\epic\fetchSettingsEpic.ts
+  34:9  warning  Unexpected any value in conditional. An explicit comparison or type cast is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\robot-settings\epic\updateSettingEpic.ts
+  35:9  warning  Unexpected any value in conditional. An explicit comparison or type cast is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\robot-settings\reducer.ts
+  28:26  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  28:43  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\robot-settings\selectors.ts
+  14:10  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  14:49  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  21:10  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+  21:52  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\sessions\calibration-check\selectors.ts
+  16:5  warning  Unexpected nullable object value in conditional. An explicit null check is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\sessions\deck-calibration\selectors.ts
+  16:5  warning  Unexpected nullable object value in conditional. An explicit null check is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\sessions\epic\ensureSessionEpic.ts
+  48:15  warning  Unexpected any value in conditional. An explicit comparison or type cast is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\sessions\pipette-offset-calibration\selectors.ts
+  16:5  warning  Unexpected nullable object value in conditional. An explicit null check is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\sessions\reducer.ts
+  24:26  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  24:43  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  39:26  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  39:43  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  56:26  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  56:43  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  70:26  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  70:43  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\sessions\selectors.ts
+  15:11  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  15:46  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  23:24  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  23:59  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  28:10  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly          @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\sessions\tip-length-calibration\selectors.ts
+  16:5  warning  Unexpected nullable object value in conditional. An explicit null check is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\shell\__tests__\update.test.ts
+   38:10  warning  Title must be a string  jest/valid-title
+  109:10  warning  Title must be a string  jest/valid-title
+  142:10  warning  Title must be a string  jest/valid-title
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\shell\epic.ts
+  27:25  warning  Prefer using an optional chain expression instead, as it's more concise and easier to read  @typescript-eslint/prefer-optional-chain
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\shell\reducer.ts
+  39:16  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+  39:37  warning  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  40:22  warning  Unexpected nullable object value in conditional. An explicit null check is required                        @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\shell\robot-logs\actions.ts
+  6:22  warning  Unexpected nullable object value in conditional. An explicit null check is required         @typescript-eslint/strict-boolean-expressions
+  6:22  warning  Prefer using an optional chain expression instead, as it's more concise and easier to read  @typescript-eslint/prefer-optional-chain
+  8:9   warning  Unexpected nullable object value in conditional. An explicit null check is required         @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\shell\update.ts
+  30:22  warning  Unexpected nullable object value in conditional. An explicit null check is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\store.ts
+  21:4  warning  Unexpected any value in conditional. An explicit comparison or type cast is required  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\system-info\selectors.ts
+  24:8  warning  Unexpected nullable object value in conditional. An explicit null check is required                @typescript-eslint/strict-boolean-expressions
+  34:7  warning  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions
+
+C:\Users\19172\Desktop\dev\opentrons\app\src\redux\system-info\utils.ts
+  58:10  warning  Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly  @typescript-eslint/strict-boolean-expressions
