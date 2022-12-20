@@ -63,8 +63,8 @@ class Pipette_Calibration_Test:
         }
         self.gauges = {}
         self.gauge_ports = {
-            "X":"/dev/ttyUSB0",
-            "Y":"/dev/ttyUSB1",
+            # "X":"/dev/ttyUSB0",
+            # "Y":"/dev/ttyUSB1",
             # "Z":"/dev/ttyUSB2",
         }
         self.gauge_offsets = {
@@ -195,17 +195,21 @@ class Pipette_Calibration_Test:
     ) -> None:
         # Calibrate pipette
         self.offset, self.slot_center = await calibrate_pipette(api, mount, slot)
+        # self.deck_z = await calibrate_pipette(api, mount, slot)
         print(f"New Slot Center: {self.slot_center}")
         print(f"New Pipette Offset: {self.offset}")
+        # print(f"New Deck Height: {self.deck_z}")
         self.test_data["X Center"] = str(self.slot_center.x)
         self.test_data["Y Center"] = str(self.slot_center.y)
         self.test_data["Deck Height"] = str(self.slot_center.z)
+        # self.test_data["Deck Height"] = str(self.deck_z)
 
     async def _home(
         self, api: OT3API, mount: OT3Mount
     ) -> None:
         # Home grantry
         await home_ot3(api, self.axes)
+        # await api.home()
         self.home = await api.gantry_position(mount)
 
     async def _reset(
@@ -232,7 +236,8 @@ class Pipette_Calibration_Test:
                     print(f"\n-> Starting Test Cycle {cycle}/{self.cycles}")
                     await self._home(self.api, self.mount)
                     await self._calibrate_slot(self.api, self.mount, self.slot)
-                    await self._measure_gauges(self.api, self.mount)
+                    if len(self.gauges) > 0:
+                        await self._measure_gauges(self.api, self.mount)
                     await self._record_data(cycle)
                     await self._reset(self.api, self.mount)
         except Exception as e:
