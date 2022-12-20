@@ -496,6 +496,7 @@ async def _calibrate_mount(
             f"Found calibration value {center} for mount {mount.name} (offset={offset})"
         )
         return offset, center
+        # return z_pos
 
     except (InaccurateNonContactSweepError, EarlyCapacitiveSenseTrigger):
         LOG.info(
@@ -580,8 +581,10 @@ async def calibrate_pipette(
     try:
         await hcapi.reset_instrument_offset(mount)
         await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
-        offset = await _calibrate_mount(hcapi, mount, slot, method)
+        offset, center = await _calibrate_mount(hcapi, mount, slot, method)
+        # z_pos = await _calibrate_mount(hcapi, mount, slot, method)
         await hcapi.save_instrument_offset(mount, offset)
-        return offset
+        return offset, center
+        # return z_pos
     finally:
         await hcapi.remove_tip(mount)
