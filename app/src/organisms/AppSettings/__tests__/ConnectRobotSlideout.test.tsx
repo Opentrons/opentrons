@@ -135,7 +135,7 @@ describe('ConnectRobotSlideout', () => {
   })
 
   it('Clicking Add button with an IP address/hostname should display the IP address/hostname and Not Found label', async () => {
-    const { getByRole, queryByText } = render(props)
+    const { getByRole, findByText } = render(props)
     const notFoundIpAddress = '1.1.1.2'
     const inputBox = getByRole('textbox')
     const addButton = getByRole('button', { name: 'Add' })
@@ -145,8 +145,8 @@ describe('ConnectRobotSlideout', () => {
       })
       await fireEvent.click(addButton)
     })
-    queryByText(notFoundIpAddress)
-    queryByText('Not Found')
+    findByText(notFoundIpAddress)
+    findByText('Not Found')
   })
 
   it('Clicking Close button in a row should remove an IP address/hostname', async () => {
