@@ -31,7 +31,7 @@ export type AppSettingsTab =
   | 'advanced'
   | 'feature-flags'
 
-export type ProtocolRunDetailsTab = 'setup' | 'module-controls' | 'run-log'
+export type ProtocolRunDetailsTab = 'setup' | 'module-controls' | 'run-log' |'analyzed-steps'
 
 /**
  * desktop app route params type definition

@@ -16,7 +16,7 @@ import {
 import { ProtocolRunHeader } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunHeader'
 import { ProtocolRunModuleControls } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
 import { ProtocolRunSetup } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
-import { RunLog } from '../../../../organisms/Devices/ProtocolRun/RunLog'
+import { RunLog } from '../../../../organisms/Devices/ProtocolRun/AnalyzedSteps'
 import { useCurrentRunId } from '../../../../organisms/ProtocolUpload/hooks'
 import { ProtocolRunDetails } from '..'
 import { ModuleModel, ModuleType } from '@opentrons/shared-data'

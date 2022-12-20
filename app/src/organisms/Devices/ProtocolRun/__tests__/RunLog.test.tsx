@@ -17,7 +17,7 @@ import {
 import { useDownloadRunLog, useProtocolDetailsForRun } from '../../hooks'
 import { RunLogProtocolSetupInfo } from '../RunLogProtocolSetupInfo'
 import { StepItemComponent as StepItem } from '../StepItem'
-import { RunLog } from '../RunLog'
+import { RunLog } from '../AnalyzedSteps'
 
 import type { CommandsData, Run } from '@opentrons/api-client'
 import type { LegacySchemaAdapterOutput } from '@opentrons/shared-data'

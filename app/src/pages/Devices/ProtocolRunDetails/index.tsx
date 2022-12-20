@@ -32,7 +32,7 @@ import {
   useSyncRobotClock,
 } from '../../../organisms/Devices/hooks'
 import { ProtocolRunHeader } from '../../../organisms/Devices/ProtocolRun/ProtocolRunHeader'
-import { RunLog } from '../../../organisms/Devices/ProtocolRun/RunLog'
+import { AnalyzedSteps } from '../../../organisms/Devices/ProtocolRun/AnalyzedSteps'
 import { ProtocolRunSetup } from '../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
 import { ProtocolRunModuleControls } from '../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
 import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
@@ -43,6 +43,7 @@ import type {
   ProtocolRunDetailsTab,
 } from '../../../App/types'
 import type { Dispatch } from '../../../redux/types'
+import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
 const baseRoundTabStyling = css`
   ${TYPOGRAPHY.pSemiBold}
@@ -148,7 +149,8 @@ export function ProtocolRunDetails(): JSX.Element | null {
     'module-controls': (
       <ProtocolRunModuleControls robotName={robotName} runId={runId} />
     ),
-    'run-log': <RunLog robotName={robotName} runId={runId} />,
+    'run-log': <AnalyzedSteps runId={runId} />,
+    'analyzed-steps': <AnalyzedSteps runId={runId} />,
   }
 
   const protocolRunDetailsContent = protocolRunDetailsContentByTab[
@@ -187,7 +189,7 @@ export function ProtocolRunDetails(): JSX.Element | null {
           <Flex>
             <SetupTab robotName={robotName} runId={runId} />
             <ModuleControlsTab robotName={robotName} runId={runId} />
-            <RunLogTab robotName={robotName} runId={runId} />
+            <AnalyzedStepsTab robotName={robotName} runId={runId} />
           </Flex>
           <Box
             backgroundColor={COLORS.white}
@@ -282,19 +284,18 @@ const ModuleControlsTab = (
   )
 }
 
-const RunLogTab = (props: SetupTabProps): JSX.Element | null => {
+const AnalyzedStepsTab = (props: SetupTabProps): JSX.Element | null => {
   const { robotName, runId } = props
   const { t } = useTranslation('run_details')
-  const { protocolData } = useProtocolDetailsForRun(runId)
 
-  const disabled = protocolData == null
+  const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
 
   return (
     <RoundTab
-      id="ProtocolRunDetails_runLogTab"
-      disabled={disabled}
-      to={`/devices/${robotName}/protocol-runs/${runId}/run-log`}
-      tabName={t('run_log')}
+      id="ProtocolRunDetails_analyzedStepsTab"
+      disabled={robotSideAnalysis == null}
+      to={`/devices/${robotName}/protocol-runs/${runId}/analyzed-steps`}
+      tabName={t('analyzed_steps')}
     />
   )
 }
