@@ -760,7 +760,7 @@ class ProtocolContext(CommandPublisher):
     # TODO (tz, 12-19-22): Should the api version be 2.14?
     @requires_version(2, 13)
     def load_liquid(
-        self, labware: Labware, liquid: LoadedLiquid, volume_by_well: Dict[Well, int]
+        self, labware: Labware, liquid: LoadedLiquid, volume_by_well: Dict[Well, float]
     ) -> None:
         """
         Load a liquid into a labware.
@@ -770,7 +770,9 @@ class ProtocolContext(CommandPublisher):
         :param volume_by_well: A key value per representing the well and the volume of liquid to load into.
         """
         self._implementation.load_liquid(
-            labware=labware, liquid=liquid, volume_by_well=volume_by_well
+            labware_core=labware._implementation,
+            liquid=liquid,
+            volume_by_well=volume_by_well,
         )
 
     @property  # type: ignore

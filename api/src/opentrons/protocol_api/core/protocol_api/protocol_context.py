@@ -428,7 +428,10 @@ class ProtocolContextImplementation(
         )
 
     def load_liquid(
-        self, labware: Labware, liquid: LoadedLiquid, volume_by_well: Dict[Well, int]
+        self,
+        labware_core: LabwareImplementation,
+        liquid: LoadedLiquid,
+        volume_by_well: Dict[Well, float],
     ) -> None:
         """Load liquid into a labware."""
         raise UnsupportedAPIError(

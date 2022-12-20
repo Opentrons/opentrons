@@ -38,7 +38,7 @@ from opentrons.protocol_engine.types import Liquid, HexColor
 from opentrons.protocol_engine.resources import ModelUtils
 
 from ..protocol import AbstractProtocol, LoadedLiquid
-from ...labware import Labware, Well
+from ...labware import Well
 from ..labware import LabwareLoadParams
 from .labware import LabwareCore
 from .instrument import InstrumentCore
@@ -415,13 +415,16 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         )
 
     def load_liquid(
-        self, labware: Labware, liquid: LoadedLiquid, volume_by_well: Dict[Well, int]
+        self,
+        labware_core: LabwareCore,
+        liquid: LoadedLiquid,
+        volume_by_well: Dict[Well, float],
     ) -> None:
         """Load liquid into a labware."""
-        labware_id = labware._implementation.labware_id
+        labware_id = labware_core.labware_id
         liquid_id = liquid.id
 
-        volume_by_well_name: Dict[str, int] = {}
+        volume_by_well_name: Dict[str, float] = {}
         for well, volume in volume_by_well.items():
             volume_by_well_name[well.well_name] = volume
 

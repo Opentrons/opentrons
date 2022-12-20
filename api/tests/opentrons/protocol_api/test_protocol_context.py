@@ -506,12 +506,14 @@ def test_load_liquid(
     mocked_well = decoy.mock(cls=Well)
 
     subject.load_liquid(
-        labware=mocked_labware, liquid=mocked_liquid, volume_by_well={mocked_well: 20}
+        labware=mocked_labware,
+        liquid=mocked_liquid,
+        volume_by_well={mocked_well: 20},
     )
 
     decoy.verify(
         mock_core.load_liquid(
-            labware=mocked_labware,
+            labware_core=mocked_labware._implementation,
             liquid=mocked_liquid,
             volume_by_well={mocked_well: 20},
         ),

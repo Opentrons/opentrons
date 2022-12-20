@@ -927,3 +927,23 @@ def test_home(
     result = subject.home(axes=[MotorAxis.X, MotorAxis.Y])
 
     assert result == response
+
+
+def test_load_liquid(
+    decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
+) -> None:
+    """It should execute load liquid command."""
+    request = commands.LoadLiquidCreate(
+        params=commands.LoadLiquidParams(
+            labwareId="labware-id", liquidId="liquid-id", volumeByWell={"A1": 20}
+        )
+    )
+    response = commands.LoadLiquidResult()
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.load_liquid(
+        labware_id="labware-id", liquid_id="liquid-id", volume_by_well={"A1": 20}
+    )
+
+    assert result == response

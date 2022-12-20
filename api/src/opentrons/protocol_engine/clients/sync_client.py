@@ -1,5 +1,5 @@
 """Synchronous ProtocolEngine client module."""
-from typing import cast, List, Optional, Union
+from typing import cast, List, Optional, Union, Dict
 from typing_extensions import Literal
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -620,3 +620,15 @@ class SyncClient:
         request = commands.HomeCreate(params=commands.HomeParams(axes=axes))
         result = self._transport.execute_command(request=request)
         return cast(commands.HomeResult, result)
+
+    def load_liquid(
+        self, labware_id: str, liquid_id: str, volume_by_well: Dict[str, float]
+    ) -> commands.LoadLiquidResult:
+        """Execute a load_liquid command and return the result."""
+        request = commands.LoadLiquidCreate(
+            params=commands.LoadLiquidParams(
+                labwareId=labware_id, liquidId=liquid_id, volumeByWell=volume_by_well
+            )
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.LoadLiquidResult, result)
