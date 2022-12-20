@@ -1,10 +1,11 @@
 import partition from 'lodash/partition'
-import { getLabwareDisplayName } from '@opentrons/shared-data'
+import isEqual from 'lodash/isEqual'
+import { getLabwareDisplayName, IDENTITY_VECTOR } from '@opentrons/shared-data'
 
-import { GroupedLabwareSetupItems, LabwareSetupItem } from './types'
-import { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-import type { LabwareOffset } from '@opentrons/api-client'
+import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import type { RunTimeCommand } from '@opentrons/shared-data'
+import type { LabwareOffset } from '@opentrons/api-client'
+import type { GroupedLabwareSetupItems, LabwareSetupItem } from './types'
 
 const LABWARE_ACCESS_COMMAND_TYPES = [
   'moveToWell',
@@ -90,22 +91,32 @@ export function getLabwareSetupItemGroups(
 export function getLatestCurrentOffsets(
   currentOffsets: LabwareOffset[]
 ): LabwareOffset[] {
-  const reverseCurrentOffsets = [...currentOffsets].reverse()
-  const uniqueSlots = [
-    ...new Set(
-      reverseCurrentOffsets.map(
-        currentOffset => currentOffset.location.slotName
-      )
-    ),
-  ]
-  const latestCurrentOffsets = reverseCurrentOffsets.filter(
-    (currentOffset, index) =>
-      currentOffset.location.slotName === uniqueSlots[index] &&
-      !(
-        currentOffset.vector.x === 0 &&
-        currentOffset.vector.y === 0 &&
-        currentOffset.vector.z === 0
-      )
+  const nonIdentityOffsets = currentOffsets.filter(
+    currentOffset => !isEqual(currentOffset.vector, IDENTITY_VECTOR)
   )
+
+  const latestCurrentOffsets = nonIdentityOffsets.reduce<LabwareOffset[]>(
+    (acc, offset) => {
+      const previousMatchIndex = acc.findIndex(
+        ao =>
+          isEqual(offset.location, ao.location) &&
+          isEqual(offset.definitionUri, ao.definitionUri)
+      )
+      if (
+        previousMatchIndex >= 0 &&
+        new Date(acc[previousMatchIndex].createdAt) < new Date(offset.createdAt)
+      ) {
+        return [
+          ...acc.slice(0, previousMatchIndex),
+          ...acc.slice(previousMatchIndex + 1),
+          offset,
+        ]
+      } else {
+        return [...acc, offset]
+      }
+    },
+    []
+  )
+
   return latestCurrentOffsets
 }
