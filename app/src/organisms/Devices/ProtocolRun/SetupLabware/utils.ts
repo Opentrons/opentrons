@@ -98,9 +98,9 @@ export function getLatestCurrentOffsets(
   const latestCurrentOffsets = nonIdentityOffsets.reduce<LabwareOffset[]>(
     (acc, offset) => {
       const previousMatchIndex = acc.findIndex(
-        ao =>
-          isEqual(offset.location, ao.location) &&
-          isEqual(offset.definitionUri, ao.definitionUri)
+        currentLabwareOffsets =>
+          isEqual(offset.location, currentLabwareOffsets.location) &&
+          isEqual(offset.definitionUri, currentLabwareOffsets.definitionUri)
       )
       if (
         previousMatchIndex >= 0 &&
