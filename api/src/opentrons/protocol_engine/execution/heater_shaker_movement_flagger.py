@@ -19,52 +19,6 @@ from ...hardware_control.modules import HeaterShaker as HardwareHeaterShaker
 from ...drivers.types import HeaterShakerLabwareLatchStatus
 
 
-def raise_if_movement_restricted(
-    hs_movement_restrictors: List[HeaterShakerMovementRestrictors],
-    destination_slot: int,
-    is_multi_channel: bool,
-    destination_is_tip_rack: bool,
-) -> None:
-    """Flag restricted movement around/to a Heater-Shaker."""
-    for hs_movement_restrictor in hs_movement_restrictors:
-        dest_east_west = destination_slot in get_east_west_slots(
-            hs_movement_restrictor.deck_slot
-        )
-        dest_north_south = destination_slot in get_north_south_slots(
-            hs_movement_restrictor.deck_slot
-        )
-        dest_heater_shaker = destination_slot == hs_movement_restrictor.deck_slot
-
-        # If Heater-Shaker is running, can't move to or around it
-        if (
-            any([dest_east_west, dest_north_south, dest_heater_shaker])
-            and hs_movement_restrictor.plate_shaking
-        ):
-            raise PipetteMovementRestrictedByHeaterShakerError(
-                "Cannot move pipette to Heater-Shaker or adjacent slot while module is shaking"
-            )
-
-        # If Heater-Shaker's latch is open, can't move to it or east and west of it
-        elif (
-            dest_east_west or dest_heater_shaker
-        ) and not hs_movement_restrictor.latch_closed:
-            raise PipetteMovementRestrictedByHeaterShakerError(
-                "Cannot move pipette to Heater-Shaker or adjacent slot to the left or right while labware latch is open"
-            )
-
-        elif is_multi_channel:
-            # Can't go to east/west slot under any circumstances if pipette is multi-channel
-            if dest_east_west:
-                raise PipetteMovementRestrictedByHeaterShakerError(
-                    "Cannot move 8-Channel pipette to slot adjacent to the left or right of Heater-Shaker"
-                )
-            # Can only go north/south if the labware is a tip rack
-            elif dest_north_south and not destination_is_tip_rack:
-                raise PipetteMovementRestrictedByHeaterShakerError(
-                    "Cannot move 8-Channel pipette to non-tip-rack labware directly in front of or behind a Heater-Shaker"
-                )
-
-
 class HeaterShakerMovementFlagger:
     """A helper for flagging unsafe movements to a Heater-Shaker."""
 
@@ -175,6 +129,63 @@ class HeaterShakerMovementFlagger:
             ):
                 return module
         return None
+
+    def raise_if_movement_restricted(
+        self,
+        hs_movement_restrictors: List[HeaterShakerMovementRestrictors],
+        destination_slot: int,
+        is_multi_channel: bool,
+        destination_is_tip_rack: bool,
+    ) -> None:
+        """Flag restricted movement around/to a Heater-Shaker."""
+        for hs_movement_restrictor in hs_movement_restrictors:
+            dest_east_west = destination_slot in get_east_west_slots(
+                hs_movement_restrictor.deck_slot
+            )
+            dest_north_south = destination_slot in get_north_south_slots(
+                hs_movement_restrictor.deck_slot
+            )
+            dest_heater_shaker = destination_slot == hs_movement_restrictor.deck_slot
+
+            # If Heater-Shaker is running, can't move to or around it
+            if (
+                any([dest_east_west, dest_north_south, dest_heater_shaker])
+                and hs_movement_restrictor.plate_shaking
+            ):
+                raise PipetteMovementRestrictedByHeaterShakerError(
+                    "Cannot move pipette to Heater-Shaker or adjacent slot while module is shaking"
+                )
+
+            # If Heater-Shaker's latch is open, can't move to it or east and west of it
+            elif not hs_movement_restrictor.latch_closed:
+                if dest_heater_shaker:
+                    raise PipetteMovementRestrictedByHeaterShakerError(
+                        "Cannot move pipette to Heater-Shaker while labware latch is open."
+                    )
+                if (
+                    dest_east_west
+                    and self._state_store.config.robot_type == "OT-2 Standard"
+                ):
+                    raise PipetteMovementRestrictedByHeaterShakerError(
+                        "Cannot move pipette to left or right of Heater-Shaker "
+                        "while labware latch is open."
+                    )
+
+            elif (
+                is_multi_channel
+                and self._state_store.config.robot_type == "OT-2 Standard"
+            ):
+                # Can't go to east/west slot under any circumstances on OT-2
+                # if pipette is multi-channel
+                if dest_east_west:
+                    raise PipetteMovementRestrictedByHeaterShakerError(
+                        "Cannot move 8-Channel pipette to slot adjacent to the left or right of Heater-Shaker"
+                    )
+                # Can only go north/south if the labware is a tip rack
+                elif dest_north_south and not destination_is_tip_rack:
+                    raise PipetteMovementRestrictedByHeaterShakerError(
+                        "Cannot move 8-Channel pipette to non-tip-rack labware directly in front of or behind a Heater-Shaker"
+                    )
 
     class _HardwareHeaterShakerMissingError(Exception):
         pass

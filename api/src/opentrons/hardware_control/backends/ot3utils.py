@@ -12,7 +12,10 @@ from opentrons.hardware_control.types import (
 )
 import numpy as np
 
-from opentrons_hardware.firmware_bindings.constants import NodeId, SensorId
+from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
+    SensorId,
+)
 from opentrons_hardware.hardware_control.motion_planning import (
     AxisConstraints,
     SystemConstraints,
@@ -96,6 +99,7 @@ def axis_to_node(axis: OT3Axis) -> "NodeId":
         OT3Axis.P_R: NodeId.pipette_right,
         OT3Axis.Z_G: NodeId.gripper_z,
         OT3Axis.G: NodeId.gripper_g,
+        OT3Axis.Q: NodeId.pipette_left,
     }
     return anm[axis]
 

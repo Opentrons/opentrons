@@ -18,7 +18,7 @@ from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from opentrons.types import DeckSlotName, MountType
-from opentrons.protocol_engine import DeckSlotLocation, DeckPoint, MotorAxis, commands
+from opentrons.protocol_engine import DeckSlotLocation, DeckPoint, commands
 from opentrons.protocol_engine.clients import SyncClient, AbstractSyncTransport
 from opentrons.protocol_engine.types import (
     ModuleDefinition,
@@ -26,6 +26,7 @@ from opentrons.protocol_engine.types import (
     WellOrigin,
     WellOffset,
     WellLocation,
+    MotorAxis,
 )
 
 

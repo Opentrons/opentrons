@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 import logging
 from copy import deepcopy
 from typing import (
+    Callable,
     Dict,
     List,
     Optional,
@@ -53,6 +54,7 @@ from opentrons_hardware.hardware_control.motor_enable_disable import (
     set_enable_motor,
     set_disable_motor,
 )
+from opentrons_hardware.hardware_control.motor_position_status import get_motor_position
 from opentrons_hardware.hardware_control.limit_switches import get_limit_switches
 from opentrons_hardware.hardware_control.network import probe
 from opentrons_hardware.hardware_control.current_settings import (
@@ -78,6 +80,7 @@ from opentrons.hardware_control.types import (
     InvalidPipetteName,
     InvalidPipetteModel,
     InstrumentProbeType,
+    MotorStatus,
 )
 from opentrons_hardware.hardware_control.motion import (
     MoveStopCondition,
@@ -112,6 +115,7 @@ class OT3Controller:
     _messenger: CanMessenger
     _position: Dict[NodeId, float]
     _encoder_position: Dict[NodeId, float]
+    _motor_status: Dict[NodeId, MotorStatus]
     _tool_detector: detector.OneshotToolDetector
 
     @classmethod
@@ -142,6 +146,7 @@ class OT3Controller:
         self._tool_detector = detector.OneshotToolDetector(self._messenger)
         self._position = self._get_home_position()
         self._encoder_position = self._get_home_position()
+        self._motor_status = {}
         try:
             self._event_watcher = self._build_event_watcher()
         except AttributeError:
@@ -157,6 +162,12 @@ class OT3Controller:
             self._configuration.current_settings, gantry_load
         )
         await self.set_default_currents()
+
+    async def update_motor_status(self) -> None:
+        """Retreieve motor and encoder status and position from all present nodes"""
+        assert len(self._present_nodes)
+        response = await get_motor_position(self._messenger, self._present_nodes)
+        self._handle_motor_status_response(response)
 
     @property
     def motor_run_currents(self) -> OT3AxisMap[float]:
@@ -196,8 +207,14 @@ class OT3Controller:
         """Set the module controls"""
         self._module_controls = module_controls
 
-    def is_homed(self, axes: Sequence[OT3Axis]) -> bool:
-        return True
+    def check_ready_for_movement(self, axes: Sequence[OT3Axis]) -> bool:
+        get_stat: Callable[
+            [Sequence[OT3Axis]], List[Optional[MotorStatus]]
+        ] = lambda ax: [self._motor_status.get(axis_to_node(a)) for a in ax]
+        return all(
+            isinstance(status, MotorStatus) and status.motor_ok
+            for status in get_stat(axes)
+        )
 
     async def update_position(self) -> OT3AxisMap[float]:
         """Get the current position."""
@@ -206,6 +223,17 @@ class OT3Controller:
     async def update_encoder_position(self) -> OT3AxisMap[float]:
         """Get the encoder current position."""
         return axis_convert(self._encoder_position, 0.0)
+
+    def _handle_motor_status_response(
+        self,
+        response: NodeMap[Tuple[float, float, bool, bool]],
+    ) -> None:
+        for axis, pos in response.items():
+            self._position.update({axis: pos[0]})
+            self._encoder_position.update({axis: pos[1]})
+            self._motor_status.update(
+                {axis: MotorStatus(motor_ok=pos[2], encoder_ok=pos[3])}
+            )
 
     async def move(
         self,
@@ -227,9 +255,7 @@ class OT3Controller:
         move_group, _ = group
         runner = MoveGroupRunner(move_groups=[move_group])
         positions = await runner.run(can_messenger=self._messenger)
-        for axis, point in positions.items():
-            self._position.update({axis: point[0]})
-            self._encoder_position.update({axis: point[1]})
+        self._handle_motor_status_response(positions)
 
     def _build_home_pipettes_runner(
         self, axes: Sequence[OT3Axis]
@@ -334,9 +360,7 @@ class OT3Controller:
         if OT3Axis.G in checked_axes:
             await self.gripper_home_jaw()
         for position in positions:
-            for p in position.items():
-                self._position.update({p[0]: p[1][0]})
-                self._encoder_position.update({p[0]: p[1][1]})
+            self._handle_motor_status_response(position)
         return axis_convert(self._position, 0.0)
 
     def _filter_move_group(self, move_group: MoveGroup) -> MoveGroup:
@@ -373,9 +397,7 @@ class OT3Controller:
         move_group = create_gripper_jaw_grip_group(duty_cycle, stop_condition)
         runner = MoveGroupRunner(move_groups=[move_group])
         positions = await runner.run(can_messenger=self._messenger)
-        for axis, point in positions.items():
-            self._position.update({axis: point[0]})
-            self._encoder_position.update({axis: point[1]})
+        self._handle_motor_status_response(positions)
 
     async def gripper_hold_jaw(
         self,
@@ -384,17 +406,13 @@ class OT3Controller:
         move_group = create_gripper_jaw_hold_group(encoder_position_um)
         runner = MoveGroupRunner(move_groups=[move_group])
         positions = await runner.run(can_messenger=self._messenger)
-        for axis, point in positions.items():
-            self._position.update({axis: point[0]})
-            self._encoder_position.update({axis: point[1]})
+        self._handle_motor_status_response(positions)
 
     async def gripper_home_jaw(self) -> None:
         move_group = create_gripper_jaw_home_group()
         runner = MoveGroupRunner(move_groups=[move_group])
         positions = await runner.run(can_messenger=self._messenger)
-        for axis, point in positions.items():
-            self._position.update({axis: point[0]})
-            self._encoder_position.update({axis: point[1]})
+        self._handle_motor_status_response(positions)
 
     @staticmethod
     def _synthesize_model_name(name: FirmwarePipetteName, model: str) -> "PipetteModel":

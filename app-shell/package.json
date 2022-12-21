@@ -2,7 +2,7 @@
   "name": "@opentrons/app-shell",
   "private": true,
   "productName": "Opentrons",
-  "version": "6.2.0",
+  "version": "0.0.0-dev",
   "description": "Opentrons desktop application",
   "main": "lib/main.js",
   "types": "lib/main.d.ts",
@@ -29,9 +29,9 @@
     ]
   },
   "devDependencies": {
-    "@opentrons/app": "6.2.0",
-    "@opentrons/discovery-client": "6.2.0",
-    "@opentrons/shared-data": "6.2.0",
+    "@opentrons/app": "link:../app",
+    "@opentrons/discovery-client": "link:../discovery-client",
+    "@opentrons/shared-data": "link:../shared-data",
     "electron": "21.3.1",
     "electron-builder": "24.0.0-alpha.4",
     "electron-notarize": "^1.2.1",

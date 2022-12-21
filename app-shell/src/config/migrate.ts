@@ -39,7 +39,7 @@ export const DEFAULTS_V0: ConfigV0 = {
   },
 
   buildroot: {
-    manifestUrl: OT2_MANIFEST_URL,
+    manifestUrl: _DEFAULT_ROBOT_UPDATE_MANIFEST_URL_,
   },
 
   // logging config

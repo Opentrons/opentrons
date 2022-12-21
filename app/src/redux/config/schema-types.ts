@@ -11,8 +11,6 @@ export type DiscoveryCandidates = string[]
 export type DevInternalFlag =
   | 'allPipetteConfig'
   | 'enableBundleUpload'
-  | 'enableChangePipetteWizard'
-  | 'enableLiquidSetup'
   | 'enableManualDeckStateModification'
   | 'enableCalibrationWizards'
   | 'enableExtendedHardware'

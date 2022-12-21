@@ -10,7 +10,7 @@
   "name": "protocol-designer",
   "productName": "Opentrons Protocol Designer BETA",
   "private": true,
-  "version": "6.2.0",
+  "version": "0.0.0-dev",
   "description": "Protocol designer app",
   "main": "src/index.js",
   "bugs": {
@@ -20,8 +20,9 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@hot-loader/react-dom": "17.0.1",
-    "@opentrons/components": "6.2.0",
-    "@opentrons/step-generation": "6.2.0",
+    "@opentrons/components": "link:../components",
+    "@opentrons/step-generation": "link:../step-generation",
+    "@opentrons/shared-data": "link:../shared-data",
     "@typeform/embed": "0.16.0",
     "@types/redux-actions": "2.6.1",
     "@types/ua-parser-js": "0.7.36",

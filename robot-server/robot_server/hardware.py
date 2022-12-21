@@ -6,6 +6,8 @@ from fastapi import Depends, status
 from typing import Callable, Union
 from typing_extensions import Literal
 
+from opentrons_shared_data.robot.dev_types import RobotType
+
 from opentrons import initialize as initialize_api, should_use_ot3
 from opentrons.config import IS_ROBOT, ARCHITECTURE, SystemArchitecture
 from opentrons.util.helpers import utc_now
@@ -131,6 +133,11 @@ async def get_hardware(
         ApiError: The Hardware API is still initializing or failed to initialize.
     """
     return thread_manager.wrapped()
+
+
+async def get_robot_type() -> RobotType:
+    """Return what kind of robot this server is running on."""
+    return "OT-3 Standard" if should_use_ot3() else "OT-2 Standard"
 
 
 async def _initialize_hardware_api(app_state: AppState) -> None:

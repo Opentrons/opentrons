@@ -88,6 +88,8 @@ def mock_deck(decoy: Decoy) -> Deck:
     setattr(
         deck, "resolve_module_location", decoy.mock(name="Deck.resolve_module_location")
     )
+    deck["12"] = decoy.mock(cls=LabwareImplementation)
+
     return cast(Deck, deck)
 
 

@@ -1,6 +1,9 @@
 'use strict'
 
 global._PKG_VERSION_ = '0.0.0-test'
+global._OPENTRONS_PROJECT_ = 'robot-stack'
+global._DEFAULT_ROBOT_UPDATE_MANIFEST_URL_ =
+  'https://opentrons-buildroot-ci.s3.us-east-2.amazonaws.com/releases.json'
 
 // electron and native stuff that will break in unit tests
 jest.mock('electron')

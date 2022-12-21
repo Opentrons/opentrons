@@ -9,7 +9,6 @@ from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
     LoadedPipette,
-    StaticPipetteConfig,
     MotorAxis,
 )
 from opentrons.protocol_engine.state.pipettes import (
@@ -17,6 +16,7 @@ from opentrons.protocol_engine.state.pipettes import (
     PipetteView,
     CurrentWell,
     HardwarePipette,
+    StaticPipetteConfig,
 )
 
 
@@ -294,7 +294,7 @@ def test_get_static_config() -> None:
     subject = get_pipette_view(
         static_config_by_id={
             "pipette-id": StaticPipetteConfig(
-                model="pipette-model", min_volume=1.23, max_volume=4.56, channels=7
+                model="pipette-model", min_volume=1.23, max_volume=4.56
             )
         }
     )
@@ -302,7 +302,6 @@ def test_get_static_config() -> None:
     assert subject.get_model_name("pipette-id") == "pipette-model"
     assert subject.get_minimum_volume("pipette-id") == 1.23
     assert subject.get_maximum_volume("pipette-id") == 4.56
-    assert subject.get_channels("pipette-id") == 7
 
 
 @pytest.mark.parametrize(

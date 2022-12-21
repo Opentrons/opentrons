@@ -12,7 +12,7 @@ from opentrons.hardware_control.modules.types import (
 )
 from opentrons.protocols.geometry.module_geometry import ThermocyclerGeometry
 
-from opentrons.protocol_api.labware import Labware, Well
+from opentrons.protocol_api.labware import Labware
 from opentrons.protocol_api.core.protocol_api.protocol_context import (
     ProtocolContextImplementation,
 )
@@ -23,6 +23,7 @@ from opentrons.protocol_api.core.protocol_api.legacy_module_core import (
 from opentrons.protocol_api.core.protocol_api.instrument_context import (
     InstrumentContextImplementation,
 )
+from opentrons.protocol_api.core.protocol_api.well import WellImplementation
 
 SyncThermocyclerHardware = SynchronousAdapter[Thermocycler]
 
@@ -68,9 +69,9 @@ def mock_labware(decoy: Decoy) -> Labware:
 
 
 @pytest.fixture
-def mock_well(decoy: Decoy) -> Well:
-    """Get a mock well."""
-    return decoy.mock(cls=Well)
+def mock_trash_well_core(decoy: Decoy) -> WellImplementation:
+    """Get a mock well implementation for the trash."""
+    return decoy.mock(cls=WellImplementation)
 
 
 @pytest.fixture
@@ -259,8 +260,7 @@ def test_open_lid(
     mock_protocol_core: ProtocolContextImplementation,
     mock_instrument_core: InstrumentContextImplementation,
     mock_geometry: ThermocyclerGeometry,
-    mock_labware: Labware,
-    mock_well: Well,
+    mock_trash_well_core: WellImplementation,
     subject: LegacyThermocyclerCore,
 ) -> None:
     """It should open the lid with the hardware."""
@@ -271,10 +271,11 @@ def test_open_lid(
     decoy.when(mock_sync_hardware_api.current_position(Mount.RIGHT)).then_return(
         {Axis.A: 4}
     )
-    decoy.when(subject._get_fixed_trash()).then_return(mock_labware)
-    decoy.when(mock_labware.wells()).then_return([mock_well])
-    decoy.when(mock_well.top()).then_return(
-        Location(point=Point(x=1, y=2, z=3), labware=mock_well)
+    decoy.when(mock_protocol_core.fixed_trash.get_well_core("A1")).then_return(
+        mock_trash_well_core
+    )
+    decoy.when(mock_trash_well_core.get_top(z_offset=0)).then_return(
+        Point(x=1, y=2, z=3)
     )
 
     decoy.when(mock_sync_module_hardware.open()).then_return("open")
@@ -302,8 +303,7 @@ def test_close_lid(
     mock_protocol_core: ProtocolContextImplementation,
     mock_instrument_core: InstrumentContextImplementation,
     mock_geometry: ThermocyclerGeometry,
-    mock_labware: Labware,
-    mock_well: Well,
+    mock_trash_well_core: WellImplementation,
     subject: LegacyThermocyclerCore,
 ) -> None:
     """It should close the lid with the hardware."""
@@ -314,10 +314,11 @@ def test_close_lid(
     decoy.when(mock_sync_hardware_api.current_position(Mount.LEFT)).then_return(
         {Axis.Z: 4}
     )
-    decoy.when(subject._get_fixed_trash()).then_return(mock_labware)
-    decoy.when(mock_labware.wells()).then_return([mock_well])
-    decoy.when(mock_well.top()).then_return(
-        Location(point=Point(x=1, y=2, z=3), labware=mock_well)
+    decoy.when(mock_protocol_core.fixed_trash.get_well_core("A1")).then_return(
+        mock_trash_well_core
+    )
+    decoy.when(mock_trash_well_core.get_top(z_offset=0)).then_return(
+        Point(x=1, y=2, z=3)
     )
 
     decoy.when(mock_sync_module_hardware.close()).then_return("closed")

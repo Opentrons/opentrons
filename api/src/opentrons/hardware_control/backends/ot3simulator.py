@@ -5,6 +5,7 @@ import asyncio
 from contextlib import asynccontextmanager
 import logging
 from typing import (
+    Callable,
     Dict,
     List,
     Optional,
@@ -47,6 +48,7 @@ from opentrons.hardware_control.types import (
     CurrentConfig,
     OT3SubSystem,
     InstrumentProbeType,
+    MotorStatus,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 
@@ -69,6 +71,7 @@ class OT3Simulator:
 
     _position: Dict[NodeId, float]
     _encoder_position: Dict[NodeId, float]
+    _motor_status: Dict[NodeId, MotorStatus]
 
     @classmethod
     async def build(
@@ -148,6 +151,7 @@ class OT3Simulator:
         self._module_controls: Optional[AttachedModulesControl] = None
         self._position = self._get_home_position()
         self._encoder_position = self._get_home_position()
+        self._motor_status = {}
         self._present_nodes: Set[NodeId] = set()
         self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
 
@@ -173,8 +177,28 @@ class OT3Simulator:
             self._configuration.current_settings, gantry_load
         )
 
-    def is_homed(self, axes: Sequence[OT3Axis]) -> bool:
-        return True
+    def _handle_motor_status_update(self, response: Dict[NodeId, float]) -> None:
+        self._position.update(response)
+        self._encoder_position.update(response)
+        self._motor_status.update(
+            (node, MotorStatus(True, True)) for node in response.keys()
+        )
+
+    async def update_motor_status(self) -> None:
+        """Retreieve motor and encoder status and position from all present nodes"""
+        # Simulate condition at boot, status would not be ok
+        self._motor_status.update(
+            (node, MotorStatus(False, False)) for node in self._present_nodes
+        )
+
+    def check_ready_for_movement(self, axes: Sequence[OT3Axis]) -> bool:
+        get_stat: Callable[
+            [Sequence[OT3Axis]], List[Optional[MotorStatus]]
+        ] = lambda ax: [self._motor_status.get(axis_to_node(a)) for a in ax]
+        return all(
+            isinstance(status, MotorStatus) and status.motor_ok
+            for status in get_stat(axes)
+        )
 
     async def update_position(self) -> OT3AxisMap[float]:
         """Get the current position."""
@@ -214,6 +238,12 @@ class OT3Simulator:
         Returns:
             Homed position.
         """
+        if axes:
+            homed = [axis_to_node(a) for a in axes]
+        else:
+            homed = list(self._position.keys())
+        for h in homed:
+            self._motor_status[h] = MotorStatus(True, True)
         return axis_convert(self._position, 0.0)
 
     async def fast_home(
@@ -228,6 +258,9 @@ class OT3Simulator:
         Returns:
             New position.
         """
+        homed = [axis_to_node(a) for a in axes] if axes else self._position.keys()
+        for h in homed:
+            self._motor_status[h] = MotorStatus(True, True)
         return axis_convert(self._position, 0.0)
 
     async def gripper_grip_jaw(
@@ -241,6 +274,7 @@ class OT3Simulator:
     async def gripper_home_jaw(self) -> None:
         """Move gripper outward."""
         _ = create_gripper_jaw_home_group()
+        self._motor_status[NodeId.gripper_g] = MotorStatus(True, True)
 
     async def gripper_hold_jaw(
         self,

@@ -7,7 +7,7 @@ from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.types import MountType, Mount as HwMount
 
 from .. import errors
-from ..types import LoadedPipette, StaticPipetteConfig, MotorAxis
+from ..types import LoadedPipette, MotorAxis
 
 from ..commands import (
     Command,
@@ -52,6 +52,15 @@ class CurrentWell:
     well_name: str
 
 
+@dataclass(frozen=True)
+class StaticPipetteConfig:
+    """Static config for a pipette."""
+
+    model: str
+    min_volume: float
+    max_volume: float
+
+
 @dataclass
 class PipetteState:
     """Basic pipette data state and getter methods."""
@@ -87,7 +96,11 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         elif isinstance(action, SetPipetteMovementSpeedAction):
             self._state.movement_speed_by_id[action.pipette_id] = action.speed
         elif isinstance(action, AddPipetteConfigAction):
-            self._state.static_config_by_id[action.pipette_id] = action.static_config
+            self._state.static_config_by_id[action.pipette_id] = StaticPipetteConfig(
+                model=action.model,
+                min_volume=action.min_volume,
+                max_volume=action.max_volume,
+            )
 
     def _handle_command(self, command: Command) -> None:
         self._update_current_well(command)
@@ -308,10 +321,6 @@ class PipetteView(HasState[PipetteState]):
     def get_maximum_volume(self, pipette_id: str) -> float:
         """Return the given pipette's maximum volume."""
         return self._get_static_config(pipette_id).max_volume
-
-    def get_channels(self, pipette_id: str) -> int:
-        """Return the given pipette's number of channels."""
-        return self._get_static_config(pipette_id).channels
 
     def get_z_axis(self, pipette_id: str) -> MotorAxis:
         """Get the MotorAxis representing this pipette's Z stage."""
