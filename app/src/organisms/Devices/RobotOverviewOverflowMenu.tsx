@@ -96,11 +96,7 @@ export const RobotOverviewOverflowMenu = (
           />
         </Portal>
       ) : null}
-      <OverflowBtn
-        aria-label="overflow"
-        onClick={handleOverflowClick}
-        disabled={robot.status !== CONNECTABLE}
-      />
+      <OverflowBtn aria-label="overflow" onClick={handleOverflowClick} />
       {showOverflowMenu ? (
         <Flex
           whiteSpace="nowrap"
