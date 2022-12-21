@@ -25,18 +25,28 @@ describe('SecondaryButton', () => {
   it('renders primary button with text', () => {
     const { getByText } = render(props)
     const button = getByText('secondary button')
-    expect(button).toHaveStyle(`background-color: ${COLORS.transparent}`)
     expect(button).toHaveStyle(
-      `padding: ${SPACING.spacing3} ${SPACING.spacing4} ${SPACING.spacing3} ${SPACING.spacing4}`
+      `background-color: ${String(COLORS.transparent)}`
     )
-    expect(button).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSizeP}`)
-    expect(button).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`)
-    expect(button).toHaveStyle(`line-height: ${TYPOGRAPHY.lineHeight20}`)
-    expect(button).toHaveStyle(`border-radius: ${BORDERS.radiusSoftCorners}`)
     expect(button).toHaveStyle(
-      `text-transform: ${TYPOGRAPHY.textTransformNone}`
+      `padding: ${String(SPACING.spacing3)} ${String(
+        SPACING.spacing4
+      )} ${String(SPACING.spacing3)} ${String(SPACING.spacing4)}`
     )
-    expect(button).toHaveStyle(`color: ${COLORS.blueEnabled}`)
+    expect(button).toHaveStyle(`font-size: ${String(TYPOGRAPHY.fontSizeP)}`)
+    expect(button).toHaveStyle(
+      `font-weight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
+    )
+    expect(button).toHaveStyle(
+      `line-height: ${String(TYPOGRAPHY.lineHeight20)}`
+    )
+    expect(button).toHaveStyle(
+      `border-radius: ${String(BORDERS.radiusSoftCorners)}`
+    )
+    expect(button).toHaveStyle(
+      `text-transform: ${String(TYPOGRAPHY.textTransformNone)}`
+    )
+    expect(button).toHaveStyle(`color: ${String(COLORS.blueEnabled)}`)
   })
 
   it('renders secondary button with text and disabled', () => {
@@ -63,7 +73,7 @@ describe('SecondaryButton', () => {
     const button = getByText('secondary button')
     expect(button).toHaveStyleRule(
       'box-shadow',
-      `0 0 0 3px ${COLORS.warningEnabled}`,
+      `0 0 0 3px ${String(COLORS.warningEnabled)}`,
       {
         modifier: ':focus-visible',
       }
@@ -74,6 +84,6 @@ describe('SecondaryButton', () => {
     props.color = COLORS.errorEnabled
     const { getByText } = render(props)
     const button = getByText('secondary button')
-    expect(button).toHaveStyle(`color: ${COLORS.errorEnabled}`)
+    expect(button).toHaveStyle(`color: ${String(COLORS.errorEnabled)}`)
   })
 })
