@@ -82,11 +82,11 @@ flake8:
 
 .PHONY: mypy-ot2
 mypy-ot2:
-	$(call python,ot-2) -m mypy opentrons_shared_data tests
+	$(call python,ot-2) $(MYPY_OT2) opentrons_shared_data tests
 
 .PHONY: mypy-ot3
 mypy-ot3:
-	$(call python,ot-3/robot-server) -m mypy opentrons_shared_data tests
+	$(call python,ot-3/robot-server) $(MYPY_OT3) opentrons_shared_data tests
 
 .PHONY: lint
 lint: black-check flake8 mypy-ot2 mypy-ot3

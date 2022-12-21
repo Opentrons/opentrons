@@ -116,11 +116,11 @@ flake8:
 
 .PHONY: mypy-ot2
 mypy-ot2:
-	$(call python,ot-2) -m mypy $(SRC_PATH) $(tests)
+	$(call python,ot-2) $(MYPY_OT2) $(SRC_PATH) $(tests)
 
 .PHONY: mypy-ot3
 mypy-ot3:
-	$(call python,ot-3/robot-server) -m mypy $(SRC_PATH) $(tests)
+	$(call python,ot-3/robot-server) $(MYPY_OT3) $(SRC_PATH) $(tests)
 
 .PHONY: lint
 lint: black-check flake8 mypy-ot2 mypy-ot3

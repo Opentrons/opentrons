@@ -42,8 +42,8 @@ class UnknownJsonFileError(FileReadError):
 class FileReaderWriter:
     """Input file reader/writer interface."""
 
-    @staticmethod  # noqa: C901
-    async def read(
+    @staticmethod
+    async def read(  # noqa: C901 max-complexity: 12
         files: Sequence[Union[AbstractInputFile, Path]]
     ) -> List[BufferedFile]:
         """Read a set of input files into memory."""

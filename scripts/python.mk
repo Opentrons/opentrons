@@ -3,6 +3,10 @@ PATH := $(shell cd .. && yarn bin):$(PATH)
 # because path includes node_modules/.bin shx is on the path
 SHX := $(if $(CI),npx shx,shx)
 
+# call mypy for the robot specific environment
+MYPY_OT2 := -m mypy --python-version 3.7
+MYPY_OT3 := -m mypy --python-version 3.8
+
 # This environment variable can be used to select a specific
 # Python executable to use to run pipenv. Note: pipenv will not
 # necessary select this Python to create its virtual environments.

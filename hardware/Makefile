@@ -104,7 +104,7 @@ flake8:
 
 .PHONY: mypy-ot3
 mypy-ot3:
-	$(call python,ot-3/robot-server) -m mypy opentrons_hardware tests
+	$(call python,ot-3/robot-server) $(MYPY_OT3) opentrons_hardware tests
 
 .PHONY: lint
 lint: black-check flake8 mypy-ot3

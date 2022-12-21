@@ -49,7 +49,6 @@ env:
   _APP_DEPLOY_BUCKET_OT3: ot3-development.builds.opentrons.com
   _APP_DEPLOY_FOLDER_OT3: app
 
-
 jobs:
   js-unit-test:
     # unit tests for js frontend projects (e.g. not app-shell or discovery-client) do not need
@@ -242,7 +241,6 @@ jobs:
           name: 'opentrons-ot3-${{ matrix.os }}'
           path: app-shell/dist/publish
 
-
   deploy-app:
     name: 'Deploy built app artifacts to S3'
     runs-on: 'ubuntu-22.04'
@@ -307,7 +305,7 @@ jobs:
       - name: 'slack notify for ot3 builds'
         uses: slackapi/slack-github-action@v1.14.0
         with:
-          payload: "{\"branch_or_tag\":\"${{ github.ref_name }}\",\"build_type\":\"${{ steps.names.outputs.TYPE }}\", \"gh_linkback\":\"https://github.com/Opentrons/opentrons/tree/${{ github.ref_name }}\", \"windows_build\":\"${{ env._ACCESS_URL }}/${{steps.names.outputs.WINDOWS}}\", \"mac_build\":\"${{ env._ACCESS_URL }}/${{steps.names.outputs.MAC}}\", \"linux_build\":\"${{ env._ACCESS_URL }}/${{steps.names.outputs.LINUX}}\"}"
+          payload: '{"branch_or_tag":"${{ github.ref_name }}","build_type":"${{ steps.names.outputs.TYPE }}", "gh_linkback":"https://github.com/Opentrons/opentrons/tree/${{ github.ref_name }}", "windows_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.WINDOWS}}", "mac_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.MAC}}", "linux_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.LINUX}}"}'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.OT_APP_OT3_SLACK_NOTIFICATION_WEBHOOK_URL }}
           _ACCESS_URL: https://${{env._APP_DEPLOY_BUCKET_OT3}}/${{env._APP_DEPLOY_FOLDER_OT3}}

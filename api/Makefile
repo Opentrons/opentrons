@@ -113,7 +113,7 @@ test-dev:
 
 .PHONY: test-ot2
 test-ot2:
-	$(call pytest,ot-2) $(tests) -m 'not ot3_only' $(test_opts) --ot2-only --ignore-glob="**/*ot3*"
+	$(call pytest,ot-2) -m 'not ot3_only' $(tests) $(test_opts) --ot2-only --ignore-glob="**/*ot3*"
 
 .PHONY: test-ot3
 test-ot3:
@@ -137,11 +137,11 @@ flake8:
 
 .PHONY: mypy-ot2
 mypy-ot2:
-	$(call python,ot-2) -m mypy --python-version 3.7 src --exclude=.*ot3.*
+	$(call python,ot-2) $(MYPY_OT2) src --exclude=.*ot3.*
 
 .PHONY: mypy-ot3
 mypy-ot3:
-	$(call python,ot-3/robot-server) -m mypy --python-version 3.8 src tests
+	$(call python,ot-3/robot-server) $(MYPY_OT3) src tests
 
 .PHONY: mypy-dev
 mypy-dev:

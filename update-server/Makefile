@@ -58,7 +58,7 @@ test-ot3:
 lint:
 	$(call python,dev) -m black --check ./otupdate ./tests
 	$(call python,dev) -m flake8 otupdate tests
-	$(call python,ot-3/update-server) -m mypy otupdate tests
+	$(call python,ot-3/update-server) $(MYPY_OT3) otupdate tests
 
 .PHONY: format
 format:

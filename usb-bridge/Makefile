@@ -51,7 +51,7 @@ test:
 
 .PHONY: lint
 lint:
-	$(python) -m mypy ot3usb tests
+	$(python) $(MYPY_OT3) ot3usb tests
 	$(python) -m black --check ./ot3usb ./tests
 	$(python) -m flake8 ot3usb tests
 

@@ -85,7 +85,7 @@ test-integration:
 
 .PHONY: lint
 lint:
-	$(python) -m mypy hardware_testing tests protocols
+	$(python) $(MYPY_OT3) hardware_testing tests protocols
 	$(python) -m black --check hardware_testing tests protocols setup.py
 	$(python) -m flake8 hardware_testing tests protocols setup.py
 
