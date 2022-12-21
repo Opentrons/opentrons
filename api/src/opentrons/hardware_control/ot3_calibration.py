@@ -84,8 +84,10 @@ async def find_deck_position(
     """
     z_pass_settings = hcapi.config.calibration.z_offset.pass_settings
     z_prep_point = nominal_center + Point(x=13, y=13, z=0)  # FIXME: add to shared-data
-    deck_z = await _probe_deck_at(hcapi, mount, z_prep_point, z_pass_settings)
+    deck_z, enc_pos = await _probe_deck_at(hcapi, mount, z_prep_point, z_pass_settings)
     LOG.info(f"autocalibration: found deck at {deck_z}")
+    print(f"Deck Position: {deck_z}")
+    print(f"Encoder Position: {enc_pos}")
     return deck_z
 
 
@@ -120,13 +122,13 @@ async def _probe_deck_at(
     await api.move_to(mount, here._replace(z=safe_height))
     await api.move_to(mount, target._replace(z=safe_height))
     await api.move_to(mount, target._replace(z=abs_transit_height))
-    _found_pos = await api.capacitive_probe(
+    _found_pos, _enc_pos = await api.capacitive_probe(
         mount, OT3Axis.by_mount(mount), target.z, settings
     )
     # don't use found Z position to calculate an updated transit height
     # because the probe may have gone through the hole
     await api.move_to(mount, target._replace(z=abs_transit_height))
-    return _found_pos
+    return _found_pos, _enc_pos
 
 
 async def find_edge(
@@ -200,7 +202,7 @@ async def find_edge(
         stride = stride_distance[stride_idx] * stride_direction
         next_probe_pos = _offset_in_axis(next_probe_pos, stride, search_axis)
         LOG.info(f"Checking position {next_probe_pos} (stride={stride})")
-        deck_height = await _probe_deck_at(
+        deck_height, enc_pos = await _probe_deck_at(
             hcapi, mount, next_probe_pos, edge_settings.pass_settings
         )
         if deck_height > allowable_height_range["max"]:
