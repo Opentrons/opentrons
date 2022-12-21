@@ -27,7 +27,6 @@ import {
   getReachableRobots,
   getUnreachableRobots,
   getLocalRobot,
-  startDiscovery,
 } from '../../redux/discovery'
 import { useTrackEvent } from '../../redux/analytics'
 import { StyledText } from '../../atoms/text'
