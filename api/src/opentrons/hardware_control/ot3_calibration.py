@@ -88,7 +88,7 @@ async def find_deck_position(
     LOG.info(f"autocalibration: found deck at {deck_z}")
     print(f"Deck Position: {deck_z}")
     print(f"Encoder Position: {enc_pos}")
-    return deck_z
+    return deck_z, enc_pos
 
 
 def _offset_in_axis(point: Point, offset: float, axis: OT3Axis) -> Point:
@@ -475,7 +475,7 @@ async def _calibrate_mount(
     try:
         # First, find the deck. This will become our z offset value, and will
         # also be used to baseline the edge detection points.
-        z_pos = await find_deck_position(hcapi, mount, nominal_center)
+        z_pos, enc_pos = await find_deck_position(hcapi, mount, nominal_center)
         LOG.info(f"Found deck at {z_pos}mm")
 
         # Perform xy offset search
@@ -497,7 +497,7 @@ async def _calibrate_mount(
         LOG.info(
             f"Found calibration value {center} for mount {mount.name} (offset={offset})"
         )
-        return offset, center
+        return offset, center, enc_pos
         # return z_pos
 
     except (InaccurateNonContactSweepError, EarlyCapacitiveSenseTrigger):
@@ -583,10 +583,10 @@ async def calibrate_pipette(
     try:
         await hcapi.reset_instrument_offset(mount)
         await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
-        offset, center = await _calibrate_mount(hcapi, mount, slot, method)
+        offset, center, enc_pos = await _calibrate_mount(hcapi, mount, slot, method)
         # z_pos = await _calibrate_mount(hcapi, mount, slot, method)
         await hcapi.save_instrument_offset(mount, offset)
-        return offset, center
+        return offset, center, enc_pos
         # return z_pos
     finally:
         await hcapi.remove_tip(mount)
