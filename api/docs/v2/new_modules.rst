@@ -31,7 +31,7 @@ Use :py:meth:`.ProtocolContext.load_module` to load a module.  It will return an
          # Load a Temperature Module GEN1 in deck slot 3.
          temperature_module = protocol.load_module('temperature module', 3)
 
-When you load a module in a protocol, you inform the OT-2 that you want the specified module to be present. Even if you don't use the module anywhere else in your protocol, the Opentrons App and the OT-2 won't let your protocol proceed until all modules loaded with ``load_module`` are attached to the OT-2.
+When you load a module in a protocol, you inform the OT-2 that you want the specified module to be present. Even if you don't use the module anywhere else in your protocol, the Opentrons App and the OT-2 won't let you start the protocol run until all loaded modules are connected to the OT-2 and powered on.
 
 .. versionadded:: 2.0
 
@@ -102,7 +102,7 @@ Module and Labware Compatibility
 
 It's up to you to make sure that the labware and modules you load make sense together. The Protocol API won't raise a warning or error if you load a nonsensical combination, like a tube rack on a Thermocycler.
 
-For further information on what combinations are possible, see the support article `What labware can I use with my modules? <https://support.opentrons.com/en/articles/3540964-what-labware-can-i-use-with-my-modules>`_
+For further information on what combinations are possible, see the support article `What labware can I use with my modules? <https://support.opentrons.com/s/article/What-labware-can-I-use-with-my-modules>`_
 
 
 Additional Labware Parameters
@@ -214,7 +214,7 @@ Like with all modules, use the Magnetic Module’s :py:meth:`~.MagneticModuleCon
 - ``thermoscientificnunc_96_wellplate_2000ul``
 - ``usascientific_96_wellplate_2.4ml_deep``
 
-To check whether a custom labware definition specifies this measurement, open its JSON file and look for the key ``magneticModuleEngageHeight`` in the ``parameters`` object. If it's present and has a numerical value, the labware is ready for use with the Magnetic Module.
+To check whether a custom labware definition specifies this measurement, load the labware and query its :py:attr:`~.Labware.magdeck_engage_height` property. If has a numerical value, the labware is ready for use with the Magnetic Module.
 
 .. _magnetic-module-engage:
 
