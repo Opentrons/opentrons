@@ -58,6 +58,9 @@ export const PipetteWizardFlows = (
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const totalStepCount = pipetteWizardSteps.length - 1
   const currentStep = pipetteWizardSteps?.[currentStepIndex]
+  const [isFetchingPipettes, setIsFetchingPipettes] = React.useState<boolean>(
+    false
+  )
 
   const goBack = (): void => {
     setCurrentStepIndex(
@@ -216,14 +219,24 @@ export const PipetteWizardFlows = (
     modalContent = showConfirmExit ? (
       exitModal
     ) : (
-      <MountPipette {...currentStep} {...calibrateBaseProps} />
+      <MountPipette
+        {...currentStep}
+        {...calibrateBaseProps}
+        isPending={isFetchingPipettes}
+        setPending={setIsFetchingPipettes}
+      />
     )
   } else if (currentStep.section === SECTIONS.DETACH_PIPETTE) {
     onExit = confirmExit
     modalContent = showConfirmExit ? (
       exitModal
     ) : (
-      <DetachPipette {...currentStep} {...calibrateBaseProps} />
+      <DetachPipette
+        {...currentStep}
+        {...calibrateBaseProps}
+        isPending={isFetchingPipettes}
+        setPending={setIsFetchingPipettes}
+      />
     )
   } else if (currentStep.section === SECTIONS.CARRIAGE) {
     onExit = confirmExit
@@ -289,6 +302,7 @@ export const PipetteWizardFlows = (
         }
         header={
           <WizardHeader
+            exitDisabled={isRobotMoving || isFetchingPipettes}
             title={wizardTitle}
             currentStep={currentStepIndex}
             totalSteps={totalStepCount}

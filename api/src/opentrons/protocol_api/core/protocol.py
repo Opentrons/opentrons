@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod, ABC
-from typing import Dict, Generic, List, Optional, Union
+from typing import Dict, Generic, List, Optional, Union, Tuple
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -26,11 +26,6 @@ class AbstractProtocol(
     @abstractmethod
     def fixed_trash(self) -> LabwareCoreType:
         """Get the fixed trash labware core."""
-        ...
-
-    @abstractmethod
-    def get_bundled_data(self) -> Dict[str, bytes]:
-        """Get a mapping of name to contents"""
         ...
 
     @abstractmethod
@@ -73,12 +68,17 @@ class AbstractProtocol(
         """Load a labware using its identifying parameters."""
         ...
 
+    # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     @abstractmethod
     def move_labware(
         self,
         labware_core: LabwareCoreType,
         new_location: Union[DeckSlotName, ModuleCoreType],
         use_gripper: bool,
+        use_pick_up_location_lpc_offset: bool,
+        use_drop_location_lpc_offset: bool,
+        pick_up_offset: Optional[Tuple[float, float, float]],
+        drop_offset: Optional[Tuple[float, float, float]],
     ) -> None:
         ...
 

@@ -17,6 +17,7 @@ import {
   mockTipLengthCalibration2,
   mockTipLengthCalibration3,
 } from '../../../redux/calibration/tip-length/__fixtures__'
+import { useFeatureFlag } from '../../../redux/config'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import {
   useDeckCalibrationData,
@@ -29,10 +30,14 @@ import { CalibrationDataDownload } from '../CalibrationDataDownload'
 
 jest.mock('file-saver')
 jest.mock('../../../redux/analytics')
+jest.mock('../../../redux/config')
 jest.mock('../../../organisms/Devices/hooks')
 
 const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction<
   typeof useDeckCalibrationData
+>
+const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
+  typeof useFeatureFlag
 >
 const mockUsePipetteOffsetCalibrations = usePipetteOffsetCalibrations as jest.MockedFunction<
   typeof usePipetteOffsetCalibrations
@@ -76,6 +81,9 @@ describe('CalibrationDataDownload', () => {
 
   beforeEach(() => {
     mockTrackEvent = jest.fn()
+    when(mockUseFeatureFlag)
+      .calledWith('enableCalibrationWizards')
+      .mockReturnValue(false)
     when(mockUseTrackEvent).calledWith().mockReturnValue(mockTrackEvent)
     when(mockUseDeckCalibrationData)
       .calledWith(mockConnectableRobot.name)
@@ -128,5 +136,64 @@ describe('CalibrationDataDownload', () => {
     const [{ getByRole }] = render()
     getByRole('button', { name: 'See how robot calibration works' }).click()
     expect(mockSetShowHowCalibrationWorksModal).toHaveBeenCalled()
+  })
+
+  it('renders correct title and description when enableCalibrationWizards feature flag is set', () => {
+    when(mockUseFeatureFlag)
+      .calledWith('enableCalibrationWizards')
+      .mockReturnValue(true)
+    const [{ getByText }] = render()
+    getByText('Download Calibration Data')
+    getByText('Save all three types of calibration data as a JSON file.')
+
+    const downloadButton = getByText('Download calibration data')
+    expect(downloadButton).toBeEnabled()
+  })
+
+  // TODO: RAUT-94 Verify the logic for these three test conditions holds for the new calibration flow
+
+  it('renders disabled button when enableCalibrationWizards feature flag is set and deck is not calibrated', () => {
+    when(mockUseFeatureFlag)
+      .calledWith('enableCalibrationWizards')
+      .mockReturnValue(true)
+    when(mockUseDeckCalibrationData)
+      .calledWith(mockConnectableRobot.name)
+      .mockReturnValue({
+        deckCalibrationData: mockDeckCalData,
+        isDeckCalibrated: false,
+      })
+    const [{ getByText }] = render()
+    getByText('No calibration data available.')
+
+    const downloadButton = getByText('Download calibration data')
+    expect(downloadButton).toBeDisabled()
+  })
+
+  it('renders disabled button when enableCalibrationWizards feature flag is set and pipettes are not calibrated', () => {
+    when(mockUseFeatureFlag)
+      .calledWith('enableCalibrationWizards')
+      .mockReturnValue(true)
+    when(mockUsePipetteOffsetCalibrations)
+      .calledWith(mockConnectableRobot.name)
+      .mockReturnValue([])
+    const [{ getByText }] = render()
+    getByText('No calibration data available.')
+
+    const downloadButton = getByText('Download calibration data')
+    expect(downloadButton).toBeDisabled()
+  })
+
+  it('renders disabled button when enableCalibrationWizards feature flag is set and tip lengths are not calibrated', () => {
+    when(mockUseFeatureFlag)
+      .calledWith('enableCalibrationWizards')
+      .mockReturnValue(true)
+    when(mockUseTipLengthCalibrations)
+      .calledWith(mockConnectableRobot.name)
+      .mockReturnValue([])
+    const [{ getByText }] = render()
+    getByText('No calibration data available.')
+
+    const downloadButton = getByText('Download calibration data')
+    expect(downloadButton).toBeDisabled()
   })
 })

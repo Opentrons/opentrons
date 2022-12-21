@@ -12,7 +12,10 @@ from opentrons.hardware_control.types import (
 )
 import numpy as np
 
-from opentrons_hardware.firmware_bindings.constants import NodeId, SensorId
+from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
+    SensorId,
+)
 from opentrons_hardware.hardware_control.motion_planning import (
     AxisConstraints,
     SystemConstraints,

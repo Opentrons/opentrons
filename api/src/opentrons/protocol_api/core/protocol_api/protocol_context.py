@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, List, Optional, Set, Union, cast
+from typing import Dict, List, Optional, Set, Union, cast, Tuple
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
@@ -44,7 +44,6 @@ class ProtocolContextImplementation(
         equipment_broker: Optional[EquipmentBroker[LoadInfo]] = None,
         deck_layout: Optional[Deck] = None,
         bundled_labware: Optional[Dict[str, LabwareDefinition]] = None,
-        bundled_data: Optional[Dict[str, bytes]] = None,
         extra_labware: Optional[Dict[str, LabwareDefinition]] = None,
     ) -> None:
         """Build a :py:class:`.ProtocolContextImplementation`.
@@ -79,7 +78,6 @@ class ProtocolContextImplementation(
         }
         self._bundled_labware = bundled_labware
         self._extra_labware = extra_labware or {}
-        self._bundled_data: Dict[str, bytes] = bundled_data or {}
         self._default_max_speeds = AxisMaxSpeeds()
         self._last_location: Optional[Location] = None
         self._last_mount: Optional[Mount] = None
@@ -103,12 +101,6 @@ class ProtocolContextImplementation(
         Calling code may only subscribe or unsubscribe.
         """
         return self._equipment_broker
-
-    def get_bundled_data(self) -> Dict[str, bytes]:
-        """Extra bundled data."""
-        # TODO AL 20201110 - This should be removed along with the bundling
-        #  feature as we move to HTTP based protocol execution.
-        return self._bundled_data
 
     def get_bundled_labware(self) -> Optional[Dict[str, LabwareDefinition]]:
         """Bundled labware definition."""
@@ -208,11 +200,16 @@ class ProtocolContextImplementation(
 
         return labware_core
 
+    # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     def move_labware(
         self,
         labware_core: LabwareImplementation,
         new_location: Union[DeckSlotName, legacy_module_core.LegacyModuleCore],
         use_gripper: bool,
+        use_pick_up_location_lpc_offset: bool,
+        use_drop_location_lpc_offset: bool,
+        pick_up_offset: Optional[Tuple[float, float, float]],
+        drop_offset: Optional[Tuple[float, float, float]],
     ) -> None:
         """Move labware to new location."""
         raise UnsupportedAPIError(

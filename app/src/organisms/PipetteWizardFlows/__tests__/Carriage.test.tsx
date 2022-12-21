@@ -45,7 +45,7 @@ describe('Carriage', () => {
     }
   })
   it('returns the correct information, buttons work as expected when flow is attach', () => {
-    const { getByText, getByAltText, getByRole } = render(props)
+    const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
     getByText('Unscrew Z Axis Carriage')
     getByText(
       'Reach the top of of the gantry carriage and unscrew the captive screw connecting right pippete mount to the the z axis.'
@@ -57,7 +57,7 @@ describe('Carriage', () => {
     const proceedBtn = getByRole('button', { name: 'Continue' })
     fireEvent.click(proceedBtn)
     expect(props.proceed).toHaveBeenCalled()
-    const backBtn = getByRole('button', { name: 'Go back' })
+    const backBtn = getByLabelText('back')
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()
   })
@@ -66,7 +66,7 @@ describe('Carriage', () => {
       ...props,
       flowType: FLOWS.DETACH,
     }
-    const { getByText, getByAltText, getByRole } = render(props)
+    const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
     getByText('Reattach Z Axis Carriage')
     getByText(
       'Take the right carriage and push it to the top of the z axis. Reach the top of of the gantry carriage and screw in the captive screw to connect right pippete mount to the the z axis.'
@@ -78,7 +78,7 @@ describe('Carriage', () => {
     const proceedBtn = getByRole('button', { name: 'Continue' })
     fireEvent.click(proceedBtn)
     expect(props.proceed).toHaveBeenCalled()
-    const backBtn = getByRole('button', { name: 'Go back' })
+    const backBtn = getByLabelText('back')
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()
   })

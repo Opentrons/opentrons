@@ -537,7 +537,11 @@ stages:
                 startedAt: !anystr
                 completedAt: !anystr
             errors: []
-            liquids: []
+            liquids:
+              - id: waterId
+                displayName: Water
+                description: Liquid H2O
+                displayColor: '#7332a8'
 
 ---
 test_name: Upload and analyze a JSONv6 protocol, with liquids
@@ -545,7 +549,6 @@ test_name: Upload and analyze a JSONv6 protocol, with liquids
 marks:
   - usefixtures:
       - run_server
-      - set_enable_load_liquid
 
 stages:
   - name: Upload simple v6 protocol

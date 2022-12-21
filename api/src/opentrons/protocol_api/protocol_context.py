@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Callable, Dict, List, NamedTuple, Optional, Type, Union
+from typing import Callable, Dict, List, NamedTuple, Optional, Type, Union, Mapping
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
@@ -86,6 +86,7 @@ class ProtocolContext(CommandPublisher):
         broker: Optional[Broker] = None,
         core_map: Optional[LoadedCoreMap] = None,
         deck: Optional[Deck] = None,
+        bundled_data: Optional[Dict[str, bytes]] = None,
     ) -> None:
         """Build a :py:class:`.ProtocolContext`.
 
@@ -95,6 +96,10 @@ class ProtocolContext(CommandPublisher):
                                         module contexts will get labware offsets from.
         :param broker: An optional command broker to link to. If not
                       specified, a dummy one is used.
+        :param bundled_data: A dict mapping filenames to the contents of data
+                             files. Can be used by the protocol, since it is
+                             exposed as
+                             :py:attr:`.ProtocolContext.bundled_data`
         """
         if api_version > MAX_SUPPORTED_VERSION:
             raise RuntimeError(
@@ -111,6 +116,7 @@ class ProtocolContext(CommandPublisher):
         self._instruments: Dict[Mount, Optional[InstrumentContext]] = {
             mount: None for mount in Mount
         }
+        self._bundled_data: Dict[str, bytes] = bundled_data or {}
         self._load_fixed_trash()
 
         self._commands: List[str] = []
@@ -149,7 +155,7 @@ class ProtocolContext(CommandPublisher):
         ``data/mydata/aspirations.csv`` it will be in the dict as
         ``'aspirations.csv'``) to the bytes contents of the files.
         """
-        return self._implementation.get_bundled_data()
+        return self._bundled_data
 
     def cleanup(self) -> None:
         """Finalize and clean up the protocol context."""
@@ -351,12 +357,17 @@ class ProtocolContext(CommandPublisher):
             if slot is not None
         }
 
+    # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     # TODO: gate move_labware behind API version
     def move_labware(
         self,
         labware: Labware,
         new_location: Union[DeckLocation, ModuleTypes],
         use_gripper: bool = False,
+        use_pick_up_location_lpc_offset: bool = False,
+        use_drop_location_lpc_offset: bool = False,
+        pick_up_offset: Optional[Mapping[str, float]] = None,
+        drop_offset: Optional[Mapping[str, float]] = None,
     ) -> None:
         """Move a loaded labware to a new location.
 
@@ -373,6 +384,14 @@ class ProtocolContext(CommandPublisher):
                             If False, will pause protocol execution to allow the user
                             to perform a manual move and click resume to continue
                             protocol execution.
+        Other experimental params:
+        :param use_pick_up_location_lpc_offset: Whether to use LPC offset of the labware
+                            associated with its pick up location.
+        :param use_drop_location_lpc_offset: Whether to use LPC offset of the labware
+                            associated with its drop off location.
+        :param pick_up_offset: Offset to use when picking up labware.
+        :param drop_offset: Offset to use when dropping off labware.
+
         Before moving a labware from or to a hardware module, make sure that the labware
         and its new location is reachable by the gripper. So, thermocycler lid should be
         open and heater-shaker's labware latch should be open.
@@ -391,10 +410,24 @@ class ProtocolContext(CommandPublisher):
             else validation.ensure_deck_slot(new_location)
         )
 
+        _pick_up_offset = (
+            validation.ensure_valid_labware_offset_vector(pick_up_offset)
+            if pick_up_offset
+            else None
+        )
+        _drop_offset = (
+            validation.ensure_valid_labware_offset_vector(drop_offset)
+            if drop_offset
+            else None
+        )
         self._implementation.move_labware(
             labware_core=labware._implementation,
             new_location=location,
             use_gripper=use_gripper,
+            use_pick_up_location_lpc_offset=use_pick_up_location_lpc_offset,
+            use_drop_location_lpc_offset=use_drop_location_lpc_offset,
+            pick_up_offset=_pick_up_offset,
+            drop_offset=_drop_offset,
         )
 
     @requires_version(2, 0)

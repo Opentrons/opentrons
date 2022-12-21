@@ -21,8 +21,9 @@
       "path": "cz-conventional-changelog"
     }
   },
+  "packageManager": "yarn@1.22.19",
   "engines": {
-    "node": ">=16"
+    "node": "^16.9.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",
