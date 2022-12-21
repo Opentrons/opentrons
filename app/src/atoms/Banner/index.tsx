@@ -29,7 +29,7 @@ export interface BannerProps extends StyleProps {
   /** Banner contents */
   children?: React.ReactNode
   /** optional handler to show close button/clear alert  */
-  onCloseClick?: (() => unknown) | React.MouseEventHandler<HTMLButtonElement>
+  onCloseClick?: (() => void) | React.MouseEventHandler<HTMLButtonElement>
   /** Override the default Alert Icon */
   icon?: IconProps
   /** some banner onCloseClicks fire events, this allows a spinner after click but before event finishes */
