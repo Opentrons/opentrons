@@ -23,14 +23,14 @@ import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'
 import type { Dispatch, State } from '../../redux/types'
 import type { OnDeviceRouteParams } from '../../App/types'
 
-export function SelectSecurityType(): JSX.Element {
+export function SelectAuthenticationType(): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const history = useHistory()
   const { ssid } = useParams<OnDeviceRouteParams>()
   const dispatch = useDispatch<Dispatch>()
   // ToDo kj 12/20/2022 use this for two buttons(wpa2-personal and none) styling and this will be passed to another component
   // waiting the response from the designer
-  const [securityType, setSecurityType] = React.useState<'wpa' | 'none'>('wpa')
+  const [authType, setAuthType] = React.useState<'wpa' | 'none'>('wpa')
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const { wifi } = useSelector((state: State) =>
@@ -84,7 +84,7 @@ export function SelectSecurityType(): JSX.Element {
             lineHeight="2.0425rem"
             onClick={() =>
               history.push(
-                `/network-setup/wifi/set-wifi-cred/${ssid}/${securityType}`
+                `/network-setup/wifi/set-wifi-cred/${ssid}/${authType}`
               )
             }
           >
@@ -112,7 +112,7 @@ export function SelectSecurityType(): JSX.Element {
                 SPACING.spacing6
               )}`}
               borderRadius="3.5625rem"
-              onClick={() => setSecurityType('wpa')}
+              onClick={() => setAuthType('wpa')}
             >
               <StyledText
                 fontSize="2rem"
@@ -127,7 +127,7 @@ export function SelectSecurityType(): JSX.Element {
               padding={`${String(SPACING.spacing4)} ${String(
                 SPACING.spacing6
               )}`}
-              onClick={() => setSecurityType('none')}
+              onClick={() => setAuthType('none')}
             >
               <StyledText fontSize="2rem" lineHeight="2.75rem" fontWeight="600">
                 {t('shared:none')}

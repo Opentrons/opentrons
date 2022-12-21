@@ -75,9 +75,7 @@ export function SetWifiSsid(): JSX.Element {
             fontWeight="500"
             lineHeight="2.0425rem"
             onClick={() =>
-              history.push(
-                `/network-setup/wifi/select-security-type/${inputSsid}`
-              )
+              history.push(`/network-setup/wifi/select-auth-type/${inputSsid}`)
             }
           >
             {t('shared:next')}

@@ -37,7 +37,7 @@ const LIST_REFRESH_MS = 10000
 
 export function SetWifiCred(): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
-  const { ssid, security } = useParams<OnDeviceRouteParams>()
+  const { ssid, authType } = useParams<OnDeviceRouteParams>()
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const keyboardRef = React.useRef(null)
@@ -57,7 +57,8 @@ export function SetWifiCred(): JSX.Element {
 
   React.useEffect(() => {
     // if securityType is none directly connect to a network without showing password form
-    security === 'none' && handleConnect()
+    authType === 'none' && handleConnect()
+    dispatch(Networking.fetchStatus(robotName))
   }, [])
 
   const formatNetworkSettings = (): WifiConfigureRequest => {
@@ -95,7 +96,7 @@ export function SetWifiCred(): JSX.Element {
 
   return (
     <>
-      {requestState == null ? (
+      {requestState == null && authType === 'wpa' ? (
         <Flex flexDirection={DIRECTION_COLUMN} margin={SPACING.spacingXXL}>
           <Flex
             flexDirection={DIRECTION_ROW}
@@ -189,7 +190,7 @@ export function SetWifiCred(): JSX.Element {
             <ConnectedResult
               ssid={ssid}
               isConnected={requestState?.status === RobotApi.SUCCESS}
-              requestState={requestState}
+              requestState={requestState != null ? requestState : undefined}
               onConnect={handleConnect}
             />
           )}

@@ -17,7 +17,7 @@ import { InitialSplash } from '../pages/OnDeviceDisplay/InitialSplash'
 import { NetworkSetupMenu } from '../pages/OnDeviceDisplay/NetworkSetupMenu'
 import { TempODDMenu } from '../pages/OnDeviceDisplay/TempODDMenu'
 import { RobotDashboard } from '../pages/OnDeviceDisplay/RobotDashboard'
-import { SelectSecurityType } from '../pages/OnDeviceDisplay/SelectSecurityType'
+import { SelectAuthenticationType } from '../pages/OnDeviceDisplay/SelectAuthenticationType'
 import { SetWifiSsid } from '../pages/OnDeviceDisplay/SetWifiSsid'
 import { SelectWifiNetwork } from '../pages/OnDeviceDisplay/SelectWifiNetwork'
 import { SetWifiCred } from '../pages/OnDeviceDisplay/SetWifiCred'
@@ -57,10 +57,10 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     path: '/network-setup/wifi',
   },
   {
-    Component: SelectSecurityType,
+    Component: SelectAuthenticationType,
     exact: true,
     name: 'Connected Network Info',
-    path: '/network-setup/wifi/select-security-type/:ssid',
+    path: '/network-setup/wifi/select-auth-type/:ssid',
   },
   {
     Component: SetWifiSsid,
@@ -72,7 +72,7 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     Component: SetWifiCred,
     exact: true,
     name: 'Set Wifi Cred',
-    path: '/network-setup/wifi/set-wifi-cred/:ssid/:security',
+    path: '/network-setup/wifi/set-wifi-cred/:ssid/:auth',
   },
   {
     Component: ConnectedNetworkInfo,
