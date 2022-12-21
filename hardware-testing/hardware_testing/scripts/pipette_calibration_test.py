@@ -32,9 +32,10 @@ class Pipette_Calibration_Test:
         self.mount = None
         self.home = None
         self.pipette_id = None
-        self.deck_z = None
         self.deck_definition = None
         self.slot_center = None
+        self.deck_encoder = None
+        self.deck_z = None
         self.simulate = simulate
         self.cycles = cycles
         self.slot = slot
@@ -57,14 +58,15 @@ class Pipette_Calibration_Test:
             "X Center":"None",
             "Y Center":"None",
             "Deck Height":"None",
+            "Deck Encoder":"None",
             "X Gauge Encoder":"None",
             "Y Gauge Encoder":"None",
             "Z Gauge Encoder":"None",
         }
         self.gauges = {}
         self.gauge_ports = {
-            # "X":"/dev/ttyUSB0",
-            # "Y":"/dev/ttyUSB1",
+            "X":"/dev/ttyUSB0",
+            "Y":"/dev/ttyUSB1",
             # "Z":"/dev/ttyUSB2",
         }
         self.gauge_offsets = {
@@ -109,12 +111,15 @@ class Pipette_Calibration_Test:
     def dict_values_to_line(self, dict):
         return str.join(",", list(dict.values()))+"\n"
 
-    async def _get_encoder(self):
-        encoder_position = await self.api.encoder_current_position(self.mount)
+    def _encoder_tolist(self, encoder_position):
         encoders = []
         for key in encoder_position:
             encoders.append(round(encoder_position[key], 3))
         return encoders
+
+    async def _get_encoder(self):
+        encoder_position = await self.api.encoder_current_position(self.mount)
+        return self._encoder_tolist(encoder_position)
 
     async def _read_gauge(self, axis):
         gauge_encoder = "{} Gauge Encoder".format(axis)
@@ -194,14 +199,17 @@ class Pipette_Calibration_Test:
         self, api: OT3API, mount: OT3Mount, slot: int
     ) -> None:
         # Calibrate pipette
-        self.offset, self.slot_center = await calibrate_pipette(api, mount, slot)
+        self.offset, self.slot_center, enc_pos = await calibrate_pipette(api, mount, slot)
+        self.deck_encoder = self._encoder_tolist(enc_pos)
         # self.deck_z = await calibrate_pipette(api, mount, slot)
+        print(f"New Deck Encoder: {self.deck_encoder}")
         print(f"New Slot Center: {self.slot_center}")
         print(f"New Pipette Offset: {self.offset}")
         # print(f"New Deck Height: {self.deck_z}")
         self.test_data["X Center"] = str(self.slot_center.x)
         self.test_data["Y Center"] = str(self.slot_center.y)
         self.test_data["Deck Height"] = str(self.slot_center.z)
+        self.test_data["Deck Encoder"] = str(self.deck_encoder)
         # self.test_data["Deck Height"] = str(self.deck_z)
 
     async def _home(
@@ -230,7 +238,8 @@ class Pipette_Calibration_Test:
         try:
             await self.test_setup()
             if self.api and self.mount:
-                self._zero_gauges()
+                if len(self.gauges) > 0:
+                    self._zero_gauges()
                 for i in range(self.cycles):
                     cycle = i + 1
                     print(f"\n-> Starting Test Cycle {cycle}/{self.cycles}")
