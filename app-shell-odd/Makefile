@@ -124,9 +124,9 @@ dist-ot3: package-deps
 
 .PHONY: push-ot3
 push-ot3: dist-ot3
-	ssh $(ssh_opts) root@$(host) "systemctl stop opentrons-robot-app && rm -rf /opt/opentrons-app && mkdir -p /opt/opentrons-app"
+	ssh $(ssh_opts) root@$(host) "mount -o remount,rw / && systemctl stop opentrons-robot-app && rm -rf /opt/opentrons-app && mkdir -p /opt/opentrons-app"
 	scp -r $(ssh_opts) ./dist/linux-arm64-unpacked/* root@$(host):/opt/opentrons-app
-	ssh $(ssh_opts) root@$(host) "systemctl start opentrons-robot-app"
+	ssh $(ssh_opts) root@$(host) "systemctl start opentrons-robot-app && mount -o remount,ro /"
 
 # Aliases matching github actions OS names for easier calling in
 # workflows

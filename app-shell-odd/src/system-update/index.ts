@@ -207,6 +207,7 @@ function cacheUpdateSet(
 ): Promise<BuildrootUpdateInfo> {
   console.log('caching update set')
   updateSet = filepaths
+  console.log({updateSet})
 
   return readFile(updateSet.releaseNotes, 'utf8').then(releaseNotes => ({
     version: getLatestVersion(),

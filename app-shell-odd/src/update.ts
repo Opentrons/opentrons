@@ -11,7 +11,7 @@ import type { Action, Dispatch, PlainError } from './types'
 updater.logger = createLogger('update')
 
 updater.autoDownload = false
-let LATEST_OT_SYSTEM_VERSION = updater.currentVersion.version
+let LATEST_OT_SYSTEM_VERSION = "6.2.0"
 
 // LATEST_OT_SYSTEM_VERSION is instantiated in the preload file, and updated when
 // an update is available in the onAvailable callback below

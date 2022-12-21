@@ -17,7 +17,7 @@ import { getLocalRobot } from '../../../redux/discovery'
 
 import type { RouteProps } from '../../../App/types'
 
-export function RobotDashboard(): JSX.Element {
+export function TempODDMenu(): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
 
   useMountEffect(() => {
@@ -31,7 +31,6 @@ export function RobotDashboard(): JSX.Element {
 
   console.log(currentVersion, latestRobotSystemVersion)
 
-
   if (
     latestRobotSystemVersion != null &&
     semver.gt(latestRobotSystemVersion, currentVersion)
@@ -41,19 +40,13 @@ export function RobotDashboard(): JSX.Element {
 
   return (
     <>
-      <Flex marginBottom="2rem">Robot Dashboard</Flex>
-      {localRobot?.displayName &&
-        latestRobotSystemVersion != null &&
-        semver.gt(latestRobotSystemVersion, currentVersion) && (
-          <PrimaryButton
-            onClick={() =>
-              dispatch(startBuildrootUpdate(localRobot?.displayName))
-            }
-          >
-            {' '}
-            Download Update{' '}
-          </PrimaryButton>
-        )}
+      <Flex marginBottom="2rem">Robot Dashboard</Flex>(
+      <PrimaryButton
+        onClick={() => dispatch(startBuildrootUpdate(localRobot?.displayName ?? ''))}
+      >
+        {' '}
+        Download Latest Update{' '}
+      </PrimaryButton>
       {/* TODO(bh, 2022-12-7): TEMP links to all routes to allow development throughout the app */}
       {onDeviceDisplayRoutes.map((route: RouteProps) => (
         <Flex key={route.path} margin="0.5rem">
