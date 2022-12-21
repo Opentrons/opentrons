@@ -111,14 +111,14 @@ export const BeforeBeginning = (
             // @ts-expect-error pipetteName is required but missing in schema v6 type
             pipetteName: attachedPipettes[mount]?.name,
             pipetteId: pipetteId,
-            mount: mountInfo,
+            mount: mount,
           },
         },
         {
           // @ts-expect-error calibration type not yet supported
           commandType: 'calibration/moveToMaintenancePosition' as const,
           params: {
-            mount: mountInfo,
+            mount: mount,
           },
         },
       ],
