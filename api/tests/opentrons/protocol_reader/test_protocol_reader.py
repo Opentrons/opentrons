@@ -1,4 +1,6 @@
 """Tests for the ProtocolReader interface."""
+from __future__ import annotations
+
 import pytest
 import io
 from dataclasses import dataclass
@@ -45,6 +47,10 @@ class InputFile(AbstractInputFile):
     filename: str
     file: IO[bytes]
 
+    @classmethod
+    def make(cls, filename: str, contents: bytes) -> InputFile:
+        return cls(filename=filename, file=io.BytesIO(contents))
+
 
 @pytest.fixture
 def file_reader_writer(decoy: Decoy) -> FileReaderWriter:
@@ -87,7 +93,7 @@ async def test_read_files(
     subject: ProtocolReader,
 ) -> None:
     """It should read a single file protocol source."""
-    input_file = InputFile(
+    input_file = InputFile.make(
         filename="protocol.py",
         file=io.BytesIO(b"# hello world"),
     )
@@ -153,9 +159,9 @@ async def test_read_error(
     subject: ProtocolReader,
 ) -> None:
     """It should catch read/parse errors."""
-    input_file = InputFile(
+    input_file = InputFile.make(
         filename="protocol.py",
-        file=io.BytesIO(b"# hello world"),
+        contents=b"# hello world",
     )
 
     decoy.when(await file_reader_writer.read([input_file])).then_raise(
@@ -174,9 +180,9 @@ async def test_role_error(
     subject: ProtocolReader,
 ) -> None:
     """It should catch role analysis errors."""
-    input_file = InputFile(
+    input_file = InputFile.make(
         filename="protocol.py",
-        file=io.BytesIO(b"# hello world"),
+        contents=b"# hello world",
     )
     buffered_file = BufferedFile(
         name="protocol.py",
@@ -203,9 +209,9 @@ async def test_config_error(
     subject: ProtocolReader,
 ) -> None:
     """It should catch config analysis errors."""
-    input_file = InputFile(
+    input_file = InputFile.make(
         filename="protocol.py",
-        file=io.BytesIO(b"# hello world"),
+        contents=b"# hello world",
     )
     buffered_file = BufferedFile(
         name="protocol.py",
