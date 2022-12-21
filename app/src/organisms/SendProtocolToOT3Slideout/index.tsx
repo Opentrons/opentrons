@@ -1,6 +1,7 @@
 import * as React from 'react'
 import path from 'path'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 import { useCreateProtocolMutation } from '@opentrons/react-api-client'
 
@@ -12,11 +13,14 @@ import {
   useToast,
 } from '../../atoms/Toast'
 import { ChooseRobotSlideout } from '../../organisms/ChooseRobotSlideout'
+import { getAnalysisStatus } from '../../organisms/ProtocolsLanding/utils'
+import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
 
 import type { AxiosError } from 'axios'
 import type { IconProps, StyleProps } from '@opentrons/components'
 import type { Robot } from '../../redux/discovery/types'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
+import type { State } from '../../redux/types'
 
 interface SendProtocolToOT3SlideoutProps extends StyleProps {
   protocolDisplayName: string
@@ -44,6 +48,17 @@ export function SendProtocolToOT3Slideout(
     {},
     selectedRobot != null ? { hostname: selectedRobot.ip } : null
   )
+
+  const isAnalyzing = useSelector((state: State) =>
+    getIsProtocolAnalysisInProgress(state, protocolKey)
+  )
+
+  const analysisStatus = getAnalysisStatus(
+    isAnalyzing,
+    storedProtocolData.mostRecentAnalysis
+  )
+
+  const isAnalysisError = analysisStatus === 'error'
 
   const { protocolKey, srcFileNames, srcFiles } = storedProtocolData
   if (protocolKey == null || srcFileNames == null || srcFiles == null) {
@@ -113,6 +128,7 @@ export function SendProtocolToOT3Slideout(
       selectedRobot={selectedRobot}
       setSelectedRobot={setSelectedRobot}
       showOT3Only
+      isAnalysisError={isAnalysisError}
     />
   )
 }

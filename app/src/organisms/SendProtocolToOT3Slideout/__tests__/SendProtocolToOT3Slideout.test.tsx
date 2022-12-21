@@ -30,6 +30,7 @@ import {
   mockReachableRobot,
   mockUnreachableRobot,
 } from '../../../redux/discovery/__fixtures__'
+import { getIsProtocolAnalysisInProgress } from '../../../redux/protocol-storage/selectors'
 import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
 import { SendProtocolToOT3Slideout } from '..'
 
@@ -37,6 +38,7 @@ jest.mock('@opentrons/react-api-client')
 jest.mock('../../../atoms/Toast')
 jest.mock('../../../redux/buildroot')
 jest.mock('../../../redux/discovery')
+jest.mock('../../../redux/protocol-storage/selectors')
 
 const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
   typeof getBuildrootUpdateDisplayInfo
@@ -60,6 +62,9 @@ const mockUseAllRunsQuery = useAllRunsQuery as jest.MockedFunction<
 >
 const mockUseCreateProtocolMutation = useCreateProtocolMutation as jest.MockedFunction<
   typeof useCreateProtocolMutation
+>
+const mockGetIsProtocolAnalysisInProgress = getIsProtocolAnalysisInProgress as jest.MockedFunction<
+  typeof getIsProtocolAnalysisInProgress
 >
 
 const render = (
@@ -110,6 +115,7 @@ describe('SendProtocolToOT3Slideout', () => {
     mockGetReachableRobots.mockReturnValue([mockReachableOT3])
     mockGetScanning.mockReturnValue(false)
     mockStartDiscovery.mockReturnValue({ type: 'mockStartDiscovery' } as any)
+    mockGetIsProtocolAnalysisInProgress.mockReturnValue(false)
     when(mockUseToast).calledWith().mockReturnValue({
       makeToast: mockMakeToast,
       eatToast: mockEatToast,

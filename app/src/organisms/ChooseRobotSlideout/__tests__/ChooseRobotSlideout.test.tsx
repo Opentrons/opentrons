@@ -91,6 +91,19 @@ describe('ChooseRobotSlideout', () => {
     expect(queryAllByText('Choose Robot to Run').length).toEqual(0)
     expect(queryAllByText('fakeSrcFileName').length).toEqual(0)
   })
+  it('shows a warning if the protocol has failed analysis', () => {
+    const [{ getByText }] = render({
+      onCloseClick: jest.fn(),
+      isExpanded: true,
+      selectedRobot: null,
+      setSelectedRobot: jest.fn(),
+      title: 'choose robot slideout title',
+      isAnalysisError: true,
+    })
+    getByText(
+      'This protocol failed its last analysis and may not be usable on your robot.'
+    )
+  })
   it('renders an available robot option for every connectable robot, and link for other robots', () => {
     const [{ queryByText }] = render({
       onCloseClick: jest.fn(),

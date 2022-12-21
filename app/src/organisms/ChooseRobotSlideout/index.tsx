@@ -15,7 +15,6 @@ import {
   DISPLAY_INLINE_BLOCK,
   TYPOGRAPHY,
   SIZE_1,
-  SIZE_2,
   ALIGN_CENTER,
   ALIGN_FLEX_END,
   JUSTIFY_CENTER,
@@ -33,6 +32,7 @@ import {
   ROBOT_MODEL_OT3,
 } from '../../redux/discovery'
 import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
+import { Banner } from '../../atoms/Banner'
 import { Slideout } from '../../atoms/Slideout'
 import { StyledText } from '../../atoms/text'
 import { AvailableRobotOption } from './AvailableRobotOption'
@@ -84,6 +84,7 @@ interface ChooseRobotSlideoutProps
   selectedRobot: Robot | null
   setSelectedRobot: (robot: Robot | null) => void
   showOT3Only?: boolean
+  isAnalysisError?: boolean
 }
 
 export function ChooseRobotSlideout(
@@ -96,6 +97,7 @@ export function ChooseRobotSlideout(
     title,
     footer,
     showOT3Only = false,
+    isAnalysisError = false,
     isCreatingRun = false,
     reset: resetCreateRun,
     runCreationError,
@@ -164,12 +166,11 @@ export function ChooseRobotSlideout(
       title={title}
       footer={footer}
     >
-      <Flex flexDirection={DIRECTION_COLUMN}>
-        <Flex
-          alignSelf={ALIGN_FLEX_END}
-          marginBottom={SPACING.spacing3}
-          height={SIZE_2}
-        >
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+        {isAnalysisError ? (
+          <Banner type="warning">{t('protocol_failed_last_analysis')}</Banner>
+        ) : null}
+        <Flex alignSelf={ALIGN_FLEX_END} marginY={SPACING.spacing2}>
           {isScanning ? (
             <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
               <StyledText

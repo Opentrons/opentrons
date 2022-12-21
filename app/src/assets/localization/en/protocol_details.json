@@ -34,6 +34,7 @@
   "protocol_designer_version": "Protocol Designer {{version}}",
   "python_api_version": "Python API {{version}}",
   "connect_modules_to_see_controls": "Connect modules to see controls",
+  "protocol_failed_last_analysis": "This protocol failed its last analysis and may not be usable on your robot.",
   "send": "Send",
   "sending": "Sending",
   "send_protocol_to_ot3": "Send protocol to an OT-3",
