@@ -1,9 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  NINETY_SIX_CHANNEL,
-  SINGLE_MOUNT_PIPETTES,
-} from '@opentrons/shared-data'
 import { COLORS, TEXT_TRANSFORM_CAPITALIZE } from '@opentrons/components'
 import { PrimaryButton } from '../../atoms/buttons'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
@@ -23,7 +19,6 @@ export const Results = (props: ResultsProps): JSX.Element => {
     attachedPipettes,
     mount,
     handleCleanUpAndClose,
-    selectedPipette,
     currentStepIndex,
     totalStepCount,
   } = props
