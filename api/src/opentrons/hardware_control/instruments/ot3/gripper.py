@@ -198,9 +198,7 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
             raise InvalidMoveError(f"Critical point {cp_override} is not valid")
 
     def duty_cycle_by_force(self, newton: float) -> float:
-        return gripper_config.piecewise_force_conversion(
-            newton, self.config.jaw_force_per_duty_cycle
-        )
+        return gripper_config.force_to_pwm_polynomial(newton)
 
     def __str__(self) -> str:
         return f"{self._config.display_name}"
