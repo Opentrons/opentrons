@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
+import { css } from 'styled-components'
 
 import {
   Flex,
@@ -27,6 +28,12 @@ import { SearchNetwork } from '../../organisms/SetupNetwork/SearchNetwork'
 import type { State, Dispatch } from '../../redux/types'
 
 const LIST_REFRESH_MS = 10000
+
+const NETWORK_ROW_STYLE = css`
+  &:active {
+    background-color: ${COLORS.blueEnabled};
+  }
+`
 
 export function SelectWifiNetwork(): JSX.Element {
   const { t } = useTranslation('device_settings')
@@ -103,6 +110,7 @@ export function SelectWifiNetwork(): JSX.Element {
             height="4rem"
             backgroundColor="#d6d6d6"
             borderRadius="12px"
+            css={NETWORK_ROW_STYLE}
           >
             <Flex
               padding={SPACING.spacing4}
@@ -162,7 +170,9 @@ const HeaderWithIPs = ({
           lineHeight="2.0425rem"
           onClick={handleSearch}
         >
-          {!isSearching ? t('search_again') : t('searching')}
+          {!isSearching ? null : (
+            <Icon name="ot-spinner" size="3.3125rem" spin />
+          )}
         </TertiaryButton>
       </Flex>
     </Flex>

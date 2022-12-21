@@ -93,7 +93,7 @@ describe('OnDeviceDisplayApp', () => {
     getByText('Mock SelectWifiNetwork')
   })
 
-  it('renders a SetWifiCred component from /network-setup/wifi/set-wifi-cred/:ssid', () => {
+  it('renders a SetWifiCred component from /network-setup/wifi/set-wifi-cred/:ssid/:auth', () => {
     const [{ getByText }] = render(
       '/network-setup/wifi/set-wifi-cred/mockWifi/none'
     )
