@@ -171,6 +171,40 @@ async def test_extraction_from_json_protocol(
     assert summarized_result == json_protocol.expected_labware
 
 
+async def test_extraction_from_json_protocol_ignores_separate_labware_files() -> None:
+    """Test extraction from a JSON protocol that also includes separate labware files.
+
+    The separate labware files should be ignored. Only the ones from the main protocol
+    file should be returned.
+    """
+    json_protocol = json_protocol_fixtures[0]
+
+    extra_labware_load_names = {
+        "corning_96_wellplate_360ul_flat",
+        "opentrons_24_tuberack_generic_2ml_screwcap"
+    }
+
+    main_file = ProtocolSourceFile(path=json_protocol.path, role=ProtocolFileRole.MAIN)
+    extra_labware_files = [
+        ProtocolSourceFile(path=get_standard_labware_path(load_name=load_name), role=ProtocolFileRole.LABWARE) for load_name in extra_labware_load_names
+    ]
+    protocol_source = ProtocolSource(
+        directory=None,
+        main_file=json_protocol.path,
+        files=[main_file] + extra_labware_files,
+        metadata={},
+        config=JsonProtocolConfig(schema_version=json_protocol.schema_version),
+    )
+
+    result = await extract_labware_definitions(protocol_source)
+    summarized_result = {LabwareSummary.from_full_definition(l) for l in result}
+
+    # It should include the definitions from the main file:
+    assert summarized_result == json_protocol.expected_labware
+    # It should not include any definitions from the separate files:
+    assert extra_labware_load_names.isdisjoint({l.load_name for l in summarized_result})
+
+
 async def test_extraction_from_python_protocol() -> None:
     """Test extraction of labware definitions from Python protocols.
 
@@ -209,8 +243,3 @@ async def test_extraction_from_python_protocol() -> None:
     result = await extract_labware_definitions(protocol_source)
     summarized_result = {LabwareSummary.from_full_definition(l) for l in result}
     assert summarized_result == expected_labware
-
-
-# TO DO BEFORE MERGE:
-#
-# - Test that if there is a JSON file, standalone files are ignored

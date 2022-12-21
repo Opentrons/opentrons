@@ -24,7 +24,10 @@ async def extract_labware_definitions(
     """
     if protocol_source.config.protocol_type == ProtocolType.JSON:
         return await _extract_from_json_protocol_file(path=protocol_source.main_file)
-        # Ignore separate labware files.
+        # If there are any separate labware files, ignore them. This avoids custom
+        # labware definitions shadowing the ones intrinsic to the main file, which would
+        # be confusing. Note that, at least as of v6.2.0, the Opentrons App sends us
+        # *every* custom labware definition along with *every* protocol.
 
     else:
         assert protocol_source.config.protocol_type == ProtocolType.PYTHON
