@@ -17,6 +17,10 @@ async def extract_labware_definitions(
     This accounts for differences between JSON protocols,
     which embed their labware definitions in the main protocol file,
     and Python protocols, which have them in separate sidecar files.
+
+    May raise an exception if the files are not well-formed. Do not depend on the exact
+    exception type. This should not happen if the `ProtocolSource` was acquired from a
+    `ProtocolReader`, which should have validated the files.
     """
     if protocol_source.config.protocol_type == ProtocolType.JSON:
         return await _extract_from_json_protocol_file(path=protocol_source.main_file)
