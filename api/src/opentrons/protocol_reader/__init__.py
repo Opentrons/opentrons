@@ -10,7 +10,7 @@ from .protocol_source import (
     JsonProtocolConfig,
     PythonProtocolConfig,
 )
-from ._extract_labware_definitions import extract_labware_definitions
+from .extract_labware_definitions import extract_labware_definitions
 
 __all__ = [
     # main interfaces
