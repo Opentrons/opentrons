@@ -58,7 +58,7 @@ describe('BeforeBeginning', () => {
         .fn()
         .mockImplementationOnce(() => Promise.resolve()),
       runId: RUN_ID_1,
-      attachedPipette: { left: mockPipette, right: null },
+      attachedPipettes: { left: mockPipette, right: null },
       flowType: FLOWS.CALIBRATE,
       createRun: jest.fn(),
       errorMessage: null,
@@ -139,7 +139,7 @@ describe('BeforeBeginning', () => {
     it('renders the modal with all correct text. clicking on proceed button sends commands', async () => {
       props = {
         ...props,
-        attachedPipette: { left: null, right: null },
+        attachedPipettes: { left: null, right: null },
         flowType: FLOWS.ATTACH,
       }
       const { getByText, getByAltText, getByRole } = render(props)
@@ -177,7 +177,7 @@ describe('BeforeBeginning', () => {
     it('renders the modal with all correct text. clicking on proceed button sends commands for detach flow', async () => {
       props = {
         ...props,
-        attachedPipette: { left: mockPipette, right: null },
+        attachedPipettes: { left: mockPipette, right: null },
         flowType: FLOWS.DETACH,
       }
       const { getByText, getByAltText, getByRole } = render(props)
@@ -218,7 +218,7 @@ describe('BeforeBeginning', () => {
       mockGetIsGantryEmpty.mockReturnValue(true)
       props = {
         ...props,
-        attachedPipette: { left: null, right: null },
+        attachedPipettes: { left: null, right: null },
         flowType: FLOWS.ATTACH,
         selectedPipette: NINETY_SIX_CHANNEL,
       }
@@ -262,7 +262,7 @@ describe('BeforeBeginning', () => {
       props = {
         ...props,
         mount: RIGHT,
-        attachedPipette: { left: null, right: mockPipette },
+        attachedPipettes: { left: null, right: mockPipette },
         flowType: FLOWS.ATTACH,
         selectedPipette: NINETY_SIX_CHANNEL,
       }
@@ -313,7 +313,7 @@ describe('BeforeBeginning', () => {
       mockGetIsGantryEmpty.mockReturnValue(false)
       props = {
         ...props,
-        attachedPipette: { left: mockPipette, right: null },
+        attachedPipettes: { left: mockPipette, right: null },
         flowType: FLOWS.ATTACH,
         selectedPipette: NINETY_SIX_CHANNEL,
       }
@@ -365,7 +365,7 @@ describe('BeforeBeginning', () => {
     it('renders the modal with all correct text. clicking on proceed button sends commands for detach flow', async () => {
       props = {
         ...props,
-        attachedPipette: { left: mockPipette, right: null },
+        attachedPipettes: { left: mockPipette, right: null },
         flowType: FLOWS.DETACH,
         selectedPipette: NINETY_SIX_CHANNEL,
       }

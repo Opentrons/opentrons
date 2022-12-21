@@ -38,7 +38,7 @@ describe('Results', () => {
       chainRunCommands: jest.fn(),
       isRobotMoving: false,
       runId: RUN_ID_1,
-      attachedPipette: { left: mockPipette, right: null },
+      attachedPipettes: { left: mockPipette, right: null },
       errorMessage: null,
       setShowErrorMessage: jest.fn(),
       flowType: FLOWS.CALIBRATE,
@@ -76,7 +76,7 @@ describe('Results', () => {
   it('renders the correct information when pipette wizard is a fail for attach flow', () => {
     props = {
       ...props,
-      attachedPipette: { left: null, right: null },
+      attachedPipettes: { left: null, right: null },
       flowType: FLOWS.ATTACH,
     }
     const { getByText, getByRole, getByLabelText } = render(props)
@@ -91,7 +91,7 @@ describe('Results', () => {
   it('renders the correct information when pipette wizard is a success for detach flow', () => {
     props = {
       ...props,
-      attachedPipette: { left: null, right: null },
+      attachedPipettes: { left: null, right: null },
       currentStepIndex: 6,
       flowType: FLOWS.DETACH,
     }
@@ -137,7 +137,7 @@ describe('Results', () => {
     props = {
       ...props,
       flowType: FLOWS.DETACH,
-      attachedPipette: { left: null, right: null },
+      attachedPipettes: { left: null, right: null },
       selectedPipette: NINETY_SIX_CHANNEL,
     }
     const { getByText, getByRole, getByLabelText } = render(props)

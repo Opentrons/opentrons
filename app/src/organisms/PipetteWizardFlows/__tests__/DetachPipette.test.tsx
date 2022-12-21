@@ -47,7 +47,7 @@ describe('DetachPipette', () => {
       proceed: jest.fn(),
       chainRunCommands: jest.fn(),
       runId: RUN_ID_1,
-      attachedPipette: { left: mockPipette, right: null },
+      attachedPipettes: { left: mockPipette, right: null },
       flowType: FLOWS.CALIBRATE,
       errorMessage: null,
       setShowErrorMessage: jest.fn(),
@@ -83,7 +83,7 @@ describe('DetachPipette', () => {
       ...props,
       flowType: FLOWS.ATTACH,
       selectedPipette: NINETY_SIX_CHANNEL,
-      attachedPipette: {
+      attachedPipettes: {
         left: {
           id: 'abc',
           name: 'p1000_96',

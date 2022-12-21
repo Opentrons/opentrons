@@ -148,7 +148,7 @@ export const PipetteWizardFlows = (
     proceed,
     runId,
     goBack,
-    attachedPipette: attachedPipettes,
+    attachedPipettes,
     setShowErrorMessage,
     errorMessage,
     robotName,

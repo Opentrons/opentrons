@@ -22,14 +22,13 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
     goBack,
     proceed,
     robotName,
-    attachedPipette,
+    attachedPipettes,
     mount,
     isPending,
     setPending,
   } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
-  // swap this out with util
-  const is96ChannelPipette = attachedPipette[mount]?.name === 'p1000_96'
+  const is96ChannelPipette = attachedPipettes[mount]?.name === 'p1000_96'
 
   let bodyText: React.ReactNode = <div></div>
   if (isPending) {

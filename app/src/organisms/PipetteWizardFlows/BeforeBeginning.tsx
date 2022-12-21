@@ -37,7 +37,7 @@ export const BeforeBeginning = (
     proceed,
     flowType,
     createRun,
-    attachedPipette,
+    attachedPipettes,
     chainRunCommands,
     isCreateLoading,
     mount,
@@ -50,9 +50,9 @@ export const BeforeBeginning = (
   React.useEffect(() => {
     createRun({})
   }, [])
-  const pipetteId = attachedPipette[mount]?.id
+  const pipetteId = attachedPipettes[mount]?.id
 
-  const isGantryEmpty = getIsGantryEmpty(attachedPipette)
+  const isGantryEmpty = getIsGantryEmpty(attachedPipettes)
   const isGantryEmptyFor96ChannelAttachment =
     isGantryEmpty &&
     selectedPipette === NINETY_SIX_CHANNEL &&
@@ -109,7 +109,7 @@ export const BeforeBeginning = (
           commandType: 'loadPipette' as const,
           params: {
             // @ts-expect-error pipetteName is required but missing in schema v6 type
-            pipetteName: attachedPipette[mount]?.name,
+            pipetteName: attachedPipettes[mount]?.name,
             pipetteId: pipetteId,
             mount: mount,
           },

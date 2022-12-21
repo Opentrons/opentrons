@@ -17,7 +17,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
   const {
     proceed,
     flowType,
-    attachedPipette,
+    attachedPipettes,
     mount,
     handleCleanUpAndClose,
     selectedPipette,
@@ -37,8 +37,8 @@ export const Results = (props: ResultsProps): JSX.Element => {
     }
     case FLOWS.ATTACH: {
       // attachment flow success
-      if (attachedPipette[mount] != null) {
-        const pipetteName = attachedPipette[mount]?.modelSpecs.displayName
+      if (attachedPipettes[mount] != null) {
+        const pipetteName = attachedPipettes[mount]?.modelSpecs.displayName
         header = t('pipette_attached', { pipetteName: pipetteName })
         if (selectedPipette === NINETY_SIX_CHANNEL) {
           buttonText = t('shared:exit')
@@ -54,7 +54,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
       break
     }
     case FLOWS.DETACH: {
-      if (attachedPipette[mount] != null) {
+      if (attachedPipettes[mount] != null) {
         header = t('pipette_failed_to_detach')
         iconColor = COLORS.errorEnabled
         isSuccess = false
