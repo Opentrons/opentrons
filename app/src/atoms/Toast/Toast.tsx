@@ -119,7 +119,9 @@ export function Toast(props: ToastProps): JSX.Element {
       borderWidth={SPACING.spacingXXS}
       border={BORDER_STYLE_SOLID}
       backgroundColor={toastStyleByType[type].backgroundColor}
-      padding={`${SPACING.spacing3} ${SPACING.spacing3} ${SPACING.spacing3} 0.75rem`}
+      padding={`${String(SPACING.spacing3)} ${String(
+        SPACING.spacing3
+      )} ${String(SPACING.spacing3)} 0.75rem`}
       data-testid={`Toast_${type}`}
       maxWidth="88%"
       minWidth="fit-content"
