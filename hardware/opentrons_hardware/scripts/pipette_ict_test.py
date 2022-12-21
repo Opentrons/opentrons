@@ -1,4 +1,3 @@
-"""A very simple script to run a move group and wait for it to complete."""
 import argparse
 import asyncio
 from numpy import float64
@@ -9,10 +8,11 @@ import datetime
 from typing import Callable
 from logging.config import dictConfig
 import subprocess
+from enum import Enum, unique
 
 from opentrons_hardware.drivers.can_bus.build import build_driver
-from opentrons_hardware.drivers.can_bus import build, CanMessenger,  WaitableCallback
-from opentrons_hardware.firmware_bindings.constants import NodeId, PipetteName
+from opentrons_hardware.drivers.can_bus import build, CanMessenger, WaitableCallback
+from opentrons_hardware.firmware_bindings.constants import NodeId, PipetteName, SensorId
 from opentrons_hardware.firmware_bindings import ArbitrationId
 from opentrons_hardware.firmware_bindings.messages import (
     message_definitions,
@@ -33,6 +33,7 @@ from opentrons_hardware.hardware_control.motion import (
 )
 
 from opentrons_hardware.hardware_control.limit_switches import get_limit_switches
+from opentrons_hardware.sensors import sensor_driver, sensor_types
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 
@@ -41,11 +42,37 @@ from opentrons_hardware.drivers.gpio import OT3GPIO
 GetInputFunc = Callable[[str], str]
 OutputFunc = Callable[[str], None]
 
+ot3_nodes = {
+    "gantry_x": NodeId.gantry_x,
+    "gantry_y": NodeId.gantry_y,
+    "head_l": NodeId.head_l,
+    "head_l": NodeId.head_r,
+    "pipette_left": NodeId.pipette_left,
+    "pipette_right": NodeId.pipette_right,
+    "gripper_z": NodeId.gripper_z,
+    "gripper_g": NodeId.gripper_g,
+}
+
+
+@unique
+class PipetteAbbreviation(int, Enum):
+    """Pipette Abbreviation matchs"""
+
+    P1KS = 0x00
+    P1KM = 0x01
+    P50S = 0x02
+    P50M = 0x03
+    P1KH = 0x04
+    P50H = 0x05
+    unknown = 0xFFFF
+
+
 def getch():
     """
-        fd: file descriptor stdout, stdin, stderr
-        This functions gets a single input keyboard character from the user
+    fd: file descriptor stdout, stdin, stderr
+    This functions gets a single input keyboard character from the user
     """
+
     def _getch():
         fd = sys.stdin.fileno()
         old_settings = termios.tcgetattr(fd)
@@ -55,15 +82,17 @@ def getch():
         finally:
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
         return ch
+
     return _getch()
 
-async def _jog_axis(messenger: CanMessenger, node, position) -> None:
+
+async def _jog_axis(messenger: CanMessenger, node, position) -> Dict[NodeId, float]:
     step_size = [0.1, 0.5, 1, 10, 20, 50]
     step_length_index = 3
     step = step_size[step_length_index]
     pos = 0
     speed = 10
-    res = {node: (0,0,0)}
+    res = {node: (0, 0, 0)}
     information_str = """
         Click  >>   w  << to move up
         Click  >>   s  << to move downward
@@ -75,66 +104,69 @@ async def _jog_axis(messenger: CanMessenger, node, position) -> None:
     print(information_str)
     while True:
         input = getch()
-        if input == 'w':
-            #plus pipette direction
+        if input == "w":
+            # plus pipette direction
             sys.stdout.flush()
             pos = pos + step
-            position['pipette'] = pos
+            position["pipette"] = pos
             res = await move_to(messenger, node, step, -speed)
 
-        elif input == 's':
-            #minus pipette direction
+        elif input == "s":
+            # minus pipette direction
             sys.stdout.flush()
             pos = pos - step
-            position['pipette'] = pos
+            position["pipette"] = pos
             res = await move_to(messenger, node, step, speed)
 
-        elif input == 'q':
+        elif input == "q":
             sys.stdout.flush()
             print("TEST CANCELLED")
             quit()
 
-        elif input == '+':
+        elif input == "+":
             sys.stdout.flush()
             step_length_index = step_length_index + 1
             if step_length_index >= 5:
                 step_length_index = 5
             step = step_size[step_length_index]
 
-        elif input == '-':
+        elif input == "-":
             sys.stdout.flush()
-            step_length_index = step_length_index -1
+            step_length_index = step_length_index - 1
             if step_length_index <= 0:
                 step_length_index = 0
             step = step_size[step_length_index]
 
-        elif input == '\r' or input == '\n' or input == '\r\n':
+        elif input == "\r" or input == "\n" or input == "\r\n":
             sys.stdout.flush()
             return position
-        print('Coordinates: ', round(position['pipette'], 2), ',',
-                                'motor position: ', res[node][0], ', ',
-                                'encoder position: ', res[node][1], ', '
-                                ' Motor Step: ',
-                                step_size[step_length_index],
-                                end = '')
-        print('\r', end='')
+        print(
+            "Coordinates: ",
+            round(position["pipette"], 2),
+            ",",
+            "motor position: ",
+            res[node][0],
+            ", ",
+            "encoder position: ",
+            res[node][1],
+            ", " " Motor Step: ",
+            step_size[step_length_index],
+            end="",
+        )
+        print("\r", end="")
+
 
 def calc_time(distance, speed):
-    time = abs(distance/speed)
+    time = abs(distance / speed)
     return time
+
 
 async def home(messenger, node):
     home_runner = MoveGroupRunner(
-        move_groups=[
-            [
-                create_home_step(
-                    {node: float64(100.0)},
-                    {node: float64(-5)}
-                )
-            ]
-        ]
+        move_groups=[[create_home_step({node: float64(100.0)}, {node: float64(-5)})]]
     )
-    await home_runner.run(can_messenger = messenger)
+    await home_runner.run(can_messenger=messenger)
+
 
 async def move_to(messenger: CanMessenger, node, distance, velocity):
     move_runner = MoveGroupRunner(
@@ -145,29 +177,19 @@ async def move_to(messenger: CanMessenger, node, distance, velocity):
                     node: MoveGroupSingleAxisStep(
                         distance_mm=float64(0),
                         velocity_mm_sec=float64(velocity),
-                        duration_sec=float64(calc_time(distance,
-                                                        velocity)),
+                        duration_sec=float64(calc_time(distance, velocity)),
                     )
                 }
             ]
         ],
     )
-    axis_dict= await move_runner.run(can_messenger = messenger)
+    axis_dict = await move_runner.run(can_messenger=messenger)
     return axis_dict
 
-def determine_abbreviation(pipette_name):
-    if pipette_name == 'p1000_single':
-        return 'P1KS'
-    elif pipette_name == 'p1000_multi':
-        return 'P1KM'
-    elif pipette_name == 'p50_single':
-        return 'P50S'
-    elif pipette_name == 'p50_multi':
-        return 'P50M'
-    elif pipette_name == 'P1000_96':
-        return 'P1KH'
-    else:
-        raise('Unknown Pipette')
+
+def determine_abbreviation(pipette_val) -> PipetteAbbreviation:
+    return PipetteAbbreviation(pipette_val).name
+
 
 async def read_epprom(messenger: CanMessenger, node):
     await messenger.send(node, InstrumentInfoRequest())
@@ -176,51 +198,84 @@ async def read_epprom(messenger: CanMessenger, node):
         while True:
             with WaitableCallback(messenger) as wc:
                 message, arb = await asyncio.wait_for(wc.read(), 1.0)
-                pipette_name = PipetteName(message.payload.name.value).name
-                pipette_version = str(message.payload.model.value)
-                serial_number = determine_abbreviation(pipette_name) + \
-                            pipette_version + \
-                            str(message.payload.serial.value.decode('ascii').rstrip('\x00'))
+                pipette_val = PipetteName(message.payload.name.value)
+                pipette_version = "V" + str(message.payload.model.value)
+                serial_number = (
+                    determine_abbreviation(pipette_val)
+                    + pipette_version
+                    + str(message.payload.serial.value.decode("ascii").rstrip("\x00"))
+                )
                 return serial_number
     except asyncio.TimeoutError:
         pass
+
+
+async def read_capacitive_sensor(messenger: CanMessenger, node):
+    capacitive = sensor_types.CapacitiveSensor.build(SensorId.S0, node)
+    s_driver = sensor_driver.SensorDriver()
+    data = await s_driver.read(CanMessenger, capacitive, offset=False, timeout=1)
+    if data is None:
+        raise ValueError("Unexpected None value from sensor: {}".format(data))
+    return dataa.to_float()
+
+
+async def read_pressure_sensor(messenger: CanMessenger, node):
+    capacitive = sensor_types.PressureSensor.build(SensorId.S0, node)
+    s_driver = sensor_driver.SensorDriver()
+    data = await s_driver.read(CanMessenger, capacitive, offset=False, timeout=1)
+    if data is None:
+        raise ValueError("Unexpected None value from sensor: {}".format(data))
+    return dataa.to_float()
+
+
+async def read_environment_sensor(messenger: CanMessenger, node):
+    capacitive = sensor_types.EnvironmentSensor.build(SensorId.S0, node)
+    s_driver = sensor_driver.SensorDriver()
+    data = await s_driver.read(CanMessenger, capacitive, offset=False, timeout=1)
+    if data is None:
+        raise ValueError("Unexpected None value from sensor: {}".format(data))
+    return dataa.to_float()
+
 
 async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
     # build a GPIO handler, which will automatically release estop
     # gpio = OT3GPIO(__name__)
     # gpio.deactivate_estop()
+    node = ot3_nodes[args.node]
     subprocess.run(["systemctl", "stop", "opentrons-robot-server"])
-    position = {'pipette': 0}
-    node = NodeId.pipette_left
+    position = {"pipette": 0}
     driver = await build_driver(build_settings(args))
     messenger = CanMessenger(driver=driver)
     messenger.start()
     if args.home:
-        print('\n')
-        print('-------------------Test Homing--------------------------')
+        print("\n")
+        print("-------------------Test Homing--------------------------")
         await home(messenger, node)
-        print('Homed')
+        print("Homed")
 
     if args.jog:
-        print('\n')
-        print('----------Read Motor Position and Encoder--------------')
+        print("\n")
+        print("----------Read Motor Position and Encoder--------------")
         await _jog_axis(messenger, node, position)
 
     if args.limit_switch:
-        print('\n')
-        print('-----------------Read Limit Switch--------------')
+        print("\n")
+        print("-----------------Read Limit Switch--------------")
         res = await get_limit_switches(messenger, [node])
-        print(f'Current Limit switch State: {res}')
+        print(f"Current Limit switch State: {res}")
         input("Block the limit switch and press enter")
         res = await get_limit_switches(messenger, [node])
-        print(f'Current Limit switch State: {res}')
+        print(f"Current Limit switch State: {res}")
 
     if args.read_epprom:
-        print('\n')
-        print('-----------------Read EPPROM--------------')
+        print("\n")
+        print("-----------------Read EPPROM--------------")
         serial_number = await read_epprom(messenger, node)
-        print(f'SN: {serial_number}')
+        print(f"SN: {serial_number}")
+
+    print("\n")
+
 
 log = logging.getLogger(__name__)
 
@@ -250,17 +305,18 @@ LOG_CONFIG = {
 
 
 def main() -> None:
-    """Entry point."""
+    """This test script performs the following:
+    1. Motor movement
+    2. Limit switch
+    3. Encoder
+    4. EEPROM
+    5. Capacitive Read
+    6. Pressure Read
+    7. Environment Read
+    8. Tip Presensce Read
+    """
     dictConfig(LOG_CONFIG)
-    """
-        1. Motor movement - check
-        2. Limit switch- check
-        3. Encoder - check
-        4. EEPROM - kinda working
-    """
-    parser = argparse.ArgumentParser(
-        description="Pipette ICT TEST SCRIPT"
-    )
+    parser = argparse.ArgumentParser(description="Pipette ICT TEST SCRIPT")
     add_can_args(parser)
     parser.add_argument(
         "--plunger_run_current",
@@ -280,6 +336,9 @@ def main() -> None:
         help="The speed with which to move the plunger",
         default=10.0,
     )
+    parser.add_argument(
+        "--node", type=str, help="NodeId to use", default="pipette_left"
+    )
 
     parser.add_argument("--limit_switch", action="store_true")
     parser.add_argument("--jog", action="store_true")
@@ -287,7 +346,6 @@ def main() -> None:
     parser.add_argument("--home", action="store_true")
 
     args = parser.parse_args()
-
     asyncio.run(run(args))
 
 
