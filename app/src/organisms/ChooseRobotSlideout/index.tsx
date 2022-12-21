@@ -30,6 +30,7 @@ import {
   getScanning,
   startDiscovery,
   RE_ROBOT_MODEL_OT3,
+  ROBOT_MODEL_OT3,
 } from '../../redux/discovery'
 import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
 import { Slideout } from '../../atoms/Slideout'
@@ -40,6 +41,42 @@ import type { SlideoutProps } from '../../atoms/Slideout'
 import type { UseCreateRun } from '../../organisms/ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import type { State, Dispatch } from '../../redux/types'
 import type { Robot } from '../../redux/discovery/types'
+
+interface RobotIsBusyAction {
+  type: 'robotIsBusy'
+  robotName: string
+}
+
+interface RobotIsIdleAction {
+  type: 'robotIsIdle'
+  robotName: string
+}
+
+interface RobotBusyStatusByName {
+  [robotName: string]: boolean
+}
+
+export type RobotBusyStatusAction = RobotIsBusyAction | RobotIsIdleAction
+
+function robotBusyStatusByNameReducer(
+  state: RobotBusyStatusByName,
+  action: RobotBusyStatusAction
+): RobotBusyStatusByName {
+  switch (action.type) {
+    case 'robotIsBusy': {
+      return {
+        ...state,
+        [action.robotName]: true,
+      }
+    }
+    case 'robotIsIdle': {
+      return {
+        ...state,
+        [action.robotName]: false,
+      }
+    }
+  }
+}
 
 interface ChooseRobotSlideoutProps
   extends Omit<SlideoutProps, 'children'>,
@@ -81,9 +118,16 @@ export function ChooseRobotSlideout(
   )
   const healthyReachableRobots = useSelector((state: State) =>
     getConnectableRobots(state)
-  ).filter(robot =>
-    showOT3Only ? RE_ROBOT_MODEL_OT3.test(robot.robotModel) : true
+  ).filter(robot => (showOT3Only ? robot.robotModel === ROBOT_MODEL_OT3 : true))
+
+  const [robotBusyStatusByName, registerRobotBusyStatus] = React.useReducer(
+    robotBusyStatusByNameReducer,
+    {}
   )
+
+  const reducerBusyCount = healthyReachableRobots.filter(
+    robot => robotBusyStatusByName[robot.name]
+  ).length
 
   // this useEffect sets the default selection to the first robot in the list. state is managed by the caller
   React.useEffect(() => {
@@ -109,6 +153,9 @@ export function ChooseRobotSlideout(
 
   const unavailableCount =
     unhealthyReachableRobots.length + unreachableRobots.length
+
+  // for now, the only use case for showing idle only is also the only use case for showing OT-3 only
+  const showIdleOnly = showOT3Only
 
   return (
     <Slideout
@@ -172,8 +219,7 @@ export function ChooseRobotSlideout(
               <Flex key={robot.ip} flexDirection={DIRECTION_COLUMN}>
                 <AvailableRobotOption
                   key={robot.ip}
-                  robotName={robot.name}
-                  local={robot.local}
+                  robot={robot}
                   // TODO: generalize to a disabled/reset prop
                   onClick={() => {
                     if (!isCreatingRun) {
@@ -186,6 +232,8 @@ export function ChooseRobotSlideout(
                   isOnDifferentSoftwareVersion={
                     isSelectedRobotOnWrongVersionOfSoftware
                   }
+                  showIdleOnly={showIdleOnly}
+                  registerRobotBusyStatus={registerRobotBusyStatus}
                 />
                 {runCreationError != null && isSelected && (
                   <StyledText
@@ -229,7 +277,13 @@ export function ChooseRobotSlideout(
             marginTop={SPACING.spacing5}
           >
             <StyledText as="p" color={COLORS.darkGreyEnabled}>
-              {t('unavailable_robot_not_listed', { count: unavailableCount })}
+              {showIdleOnly
+                ? t('unavailable_or_busy_robot_not_listed', {
+                    count: unavailableCount + reducerBusyCount,
+                  })
+                : t('unavailable_robot_not_listed', {
+                    count: unavailableCount,
+                  })}
             </StyledText>
             <NavLink to="/devices" css={TYPOGRAPHY.linkPSemiBold}>
               {t('view_unavailable_robots')}

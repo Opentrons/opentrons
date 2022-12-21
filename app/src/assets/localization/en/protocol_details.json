@@ -24,6 +24,8 @@
   "show_in_folder": "Show in folder",
   "unavailable_robot_not_listed": "{{count}} unavailable robot is not listed.",
   "unavailable_robot_not_listed_plural": "{{count}} unavailable robots are not listed.",
+  "unavailable_or_busy_robot_not_listed": "{{count}} unavailable or busy robot is not listed.",
+  "unavailable_or_busy_robot_not_listed_plural": "{{count}} unavailable or busy robots are not listed.",
   "view_unavailable_robots": "View unavailable robots on the Devices page",
   "view_run_details": "View run details",
   "labware_name": "Labware Name",

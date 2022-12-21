@@ -7,7 +7,12 @@ import {
   mockOT3HealthResponse,
   mockOT3ServerHealthResponse,
 } from '@opentrons/discovery-client/src/__fixtures__'
+import {
+  useAllRunsQuery,
+  useCreateProtocolMutation,
+} from '@opentrons/react-api-client'
 
+import { mockSuccessQueryResults } from '../../../__fixtures__'
 import { i18n } from '../../../i18n'
 import { useToast } from '../../../atoms/Toast'
 import {
@@ -16,6 +21,8 @@ import {
   getScanning,
   getUnreachableRobots,
   startDiscovery,
+  ROBOT_MODEL_OT2,
+  ROBOT_MODEL_OT3,
 } from '../../../redux/discovery'
 import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
 import {
@@ -26,6 +33,7 @@ import {
 import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
 import { SendProtocolToOT3Slideout } from '..'
 
+jest.mock('@opentrons/react-api-client')
 jest.mock('../../../atoms/Toast')
 jest.mock('../../../redux/buildroot')
 jest.mock('../../../redux/discovery')
@@ -47,6 +55,12 @@ const mockStartDiscovery = startDiscovery as jest.MockedFunction<
   typeof startDiscovery
 >
 const mockUseToast = useToast as jest.MockedFunction<typeof useToast>
+const mockUseAllRunsQuery = useAllRunsQuery as jest.MockedFunction<
+  typeof useAllRunsQuery
+>
+const mockUseCreateProtocolMutation = useCreateProtocolMutation as jest.MockedFunction<
+  typeof useCreateProtocolMutation
+>
 
 const render = (
   props: React.ComponentProps<typeof SendProtocolToOT3Slideout>
@@ -65,20 +79,24 @@ const mockConnectableOT3 = {
   ...mockConnectableRobot,
   health: mockOT3HealthResponse,
   serverHealth: mockOT3ServerHealthResponse,
+  robotModel: ROBOT_MODEL_OT3,
 }
 const mockReachableOT3 = {
   ...mockReachableRobot,
   health: mockOT3HealthResponse,
   serverHealth: mockOT3ServerHealthResponse,
+  robotModel: ROBOT_MODEL_OT3,
 }
 const mockUnreachableOT3 = {
   ...mockUnreachableRobot,
   health: mockOT3HealthResponse,
   serverHealth: mockOT3ServerHealthResponse,
+  robotModel: ROBOT_MODEL_OT3,
 }
 
 const mockMakeToast = jest.fn()
 const mockEatToast = jest.fn()
+const mockMutateAsync = jest.fn()
 
 describe('SendProtocolToOT3Slideout', () => {
   beforeEach(() => {
@@ -96,6 +114,18 @@ describe('SendProtocolToOT3Slideout', () => {
       makeToast: mockMakeToast,
       eatToast: mockEatToast,
     })
+    when(mockUseAllRunsQuery)
+      .calledWith(expect.any(Object), expect.any(Object))
+      .mockReturnValue(
+        mockSuccessQueryResults({
+          data: [],
+          links: {},
+        })
+      )
+    when(mockUseCreateProtocolMutation)
+      .calledWith(expect.any(Object), expect.any(Object))
+      .mockReturnValue({ mutateAsync: mockMutateAsync } as any)
+    when(mockMutateAsync).mockImplementation(() => Promise.resolve())
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -124,8 +154,42 @@ describe('SendProtocolToOT3Slideout', () => {
     })
     expect(queryByText('opentrons-robot-name')).toBeInTheDocument()
     expect(
-      queryByText('2 unavailable robots are not listed.')
+      queryByText('2 unavailable or busy robots are not listed.')
     ).toBeInTheDocument()
+  })
+  it('does not render a robot option for a busy OT-3', () => {
+    when(mockUseAllRunsQuery)
+      .calledWith(expect.any(Object), { hostname: mockConnectableOT3.ip })
+      .mockReturnValue(
+        mockSuccessQueryResults({
+          data: [],
+          links: { current: { href: 'a current run' } },
+        })
+      )
+    const [{ queryByText }] = render({
+      protocolDisplayName: PROTOCOL_DISPLAY_NAME,
+      storedProtocolData: storedProtocolDataFixture,
+      onCloseClick: jest.fn(),
+      isExpanded: true,
+    })
+    expect(queryByText('opentrons-robot-name')).not.toBeInTheDocument()
+  })
+  it('does not render an available robot option for a connectable OT-2', () => {
+    mockGetConnectableRobots.mockReturnValue([
+      mockConnectableOT3,
+      {
+        ...mockConnectableRobot,
+        name: 'ot-2-robot-name',
+        robotModel: ROBOT_MODEL_OT2,
+      },
+    ])
+    const [{ queryByText }] = render({
+      protocolDisplayName: PROTOCOL_DISPLAY_NAME,
+      storedProtocolData: storedProtocolDataFixture,
+      onCloseClick: jest.fn(),
+      isExpanded: true,
+    })
+    expect(queryByText('ot-2-robot-name')).not.toBeInTheDocument()
   })
   it('if scanning, show robots, but do not show link to other devices', () => {
     mockGetScanning.mockReturnValue(true)
@@ -137,7 +201,7 @@ describe('SendProtocolToOT3Slideout', () => {
     })
     expect(queryByText('opentrons-robot-name')).toBeInTheDocument()
     expect(
-      queryByText('2 unavailable robots are not listed.')
+      queryByText('2 unavailable or busy robots are not listed.')
     ).not.toBeInTheDocument()
   })
   it('if not scanning, show refresh button, start discovery if clicked', () => {
@@ -171,5 +235,6 @@ describe('SendProtocolToOT3Slideout', () => {
     mockRobot.click()
     expect(sendButton).not.toBeDisabled()
     sendButton.click()
+    expect(mockMutateAsync).toBeCalled()
   })
 })
