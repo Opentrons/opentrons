@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useHistory } from 'react-router-dom'
 
 import {
   Flex,
@@ -15,11 +16,14 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
+import { StepMeter } from '../../atoms/StepMeter'
 
 export function SearchNetwork(): JSX.Element {
   const { t } = useTranslation('device_settings')
+  const history = useHistory()
   return (
     <>
+      <StepMeter totalSteps={5} currentStep={2} OnDevice />
       <Flex justifyContent={JUSTIFY_CENTER} marginBottom="3.041875rem">
         <StyledText fontSize="2rem" fontWeight="700" lineHeight="2.72375rem">
           {t('connect_to_a_network')}
@@ -55,7 +59,7 @@ export function SearchNetwork(): JSX.Element {
           </Flex>
         </Flex>
         <Btn
-          onClick={() => console.log('go to manual setup')}
+          onClick={() => history.push('/network-setup/wifi/set-wifi-ssid')}
           marginTop={SPACING.spacing3}
           width="59rem"
           height="4rem"

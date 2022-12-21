@@ -37,7 +37,7 @@ const LIST_REFRESH_MS = 10000
 
 export function SetWifiCred(): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
-  const { ssid } = useParams<OnDeviceRouteParams>()
+  const { ssid, security } = useParams<OnDeviceRouteParams>()
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const keyboardRef = React.useRef(null)
@@ -54,6 +54,11 @@ export function SetWifiCred(): JSX.Element {
     Networking.getWifiList(state, robotName)
   )
   const selectedNetwork = list.find(nw => nw.ssid === ssid)
+
+  React.useEffect(() => {
+    // if securityType is none directly connect to a network without showing password form
+    security === 'none' && handleConnect()
+  }, [])
 
   const formatNetworkSettings = (): WifiConfigureRequest => {
     // ToDo kj 11/02/22 eapConfig for TLS
@@ -134,7 +139,14 @@ export function SetWifiCred(): JSX.Element {
             flexDirection={DIRECTION_COLUMN}
             paddingLeft="6.25rem"
           >
-            <StyledText marginBottom="0.75rem">{'Enter password'}</StyledText>
+            <StyledText
+              marginBottom="0.75rem"
+              fontSize="1.375rem"
+              lineHeight="1.875rem"
+              fontWeight="500"
+            >
+              {'Enter password'}
+            </StyledText>
             <Flex flexDirection={DIRECTION_ROW}>
               <Box width="36.375rem">
                 <InputField

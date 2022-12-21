@@ -180,5 +180,10 @@
   "name_love_it": "{{name}}, love it!",
   "your_robot_is_ready_to_go": "Your robot is ready to go!",
   "finish_setup": "Finish setup",
-  "join_other_network": "Join other network"
+  "join_other_network": "Join other network",
+  "connect_to": "Connect to {{ssid}}",
+  "select_authentication_method": "Select authentication method for your selected network.",
+  "wpa2_personal": "WPA2 Personal",
+  "switch_to_usb_description": "If your network uses a different authentication method, connect to the Opentrons App and finish Wi-Fi setup there.",
+  "enter_ssid": "Enter SSID"
 }

@@ -97,7 +97,7 @@ export function SelectWifiNetwork(): JSX.Element {
             </Btn>
           ))}
           <Btn
-            onClick={() => console.log('go to manual setup')}
+            onClick={() => history.push('/network-setup/wifi/set-wifi-ssid')}
             marginTop={SPACING.spacing3}
             width="59rem"
             height="4rem"

@@ -53,4 +53,5 @@ export interface OnDeviceRouteParams {
   protocolId: string
   runId: string
   ssid: string
+  security: 'wpa' | 'none'
 }
