@@ -23,6 +23,8 @@ make setup
 make -C app dev
 ```
 
+**Note:** By default, `make dev` will run the OT-2 spin of the app. If you'd like to run the OT-3 spin, you can pass `OPENTRONS_PROJECT=ot3` to make as an environment variable or flag: `make -C app dev OPENTRONS_PROJECT=ot3`. Unlike in the packaged app, the dev app will have the same product name as the OT-2 spin and so will reuse configuration; this means you won't get some default settings unless you remove the config directory first.
+
 **Note:** If you would like to interact with a virtual robot server being served at `localhost`, you will need to manually add `localhost` to the discovery candidates list. This can be done through the app's GUI settings for "Connect to a robot via IP address / Add Manual IP Address"
 
 At this point, the Electron app will be running with [HMR][] and various Chrome devtools enabled. The app and dev server look for the following environment variables (defaults set in Makefile):

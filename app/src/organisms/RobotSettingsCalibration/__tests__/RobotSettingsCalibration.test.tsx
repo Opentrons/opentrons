@@ -146,6 +146,12 @@ describe('RobotSettingsCalibration', () => {
     getByText('Mock CalibrationDataDownload')
   })
 
+  it('renders a Calibration Data Download component when the calibration wizard feature flag is set', () => {
+    mockUseFeatureFlag.mockReturnValue(true)
+    const [{ getByText }] = render()
+    getByText('Mock CalibrationDataDownload')
+  })
+
   it('renders a Calibration Status component when the calibration wizard feature flag is set', () => {
     mockUseFeatureFlag.mockReturnValue(true)
     const [{ getByText }] = render()

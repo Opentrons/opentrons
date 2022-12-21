@@ -10,9 +10,7 @@ from ..errors import PipetteNotAttachedError, HardwareNotSupportedError
 
 from .movement import MovementHandler
 from .pipetting import PipettingHandler
-
 from ...hardware_control.types import OT3Mount
-
 
 log = logging.getLogger(__name__)
 

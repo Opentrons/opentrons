@@ -36,7 +36,7 @@ describe('MountingPlate', () => {
       proceed: jest.fn(),
       chainRunCommands: jest.fn(),
       runId: RUN_ID_1,
-      attachedPipette: { left: mockPipette, right: null },
+      attachedPipettes: { left: mockPipette, right: null },
       flowType: FLOWS.ATTACH,
       errorMessage: null,
       setShowErrorMessage: jest.fn(),
@@ -45,7 +45,7 @@ describe('MountingPlate', () => {
     }
   })
   it('returns the correct information, buttons work as expected for attach flow', () => {
-    const { getByText, getByAltText, getByRole } = render(props)
+    const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
     getByText('Connect and Attach Mounting Plate')
     getByText(
       'Hold onto the pipette so it does not fall. Attach the monting plate to the robot by alinging the pins on the mounting plate to the slots on the z axis carriage.'
@@ -57,7 +57,7 @@ describe('MountingPlate', () => {
     const proceedBtn = getByRole('button', { name: 'Continue' })
     fireEvent.click(proceedBtn)
     expect(props.proceed).toHaveBeenCalled()
-    const backBtn = getByRole('button', { name: 'Go back' })
+    const backBtn = getByLabelText('back')
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()
   })
@@ -67,7 +67,7 @@ describe('MountingPlate', () => {
       ...props,
       flowType: FLOWS.DETACH,
     }
-    const { getByText, getByAltText, getByRole } = render(props)
+    const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
     getByText('Unscrew and Dettach Mounting Plate')
     getByText(
       'Hold onto the pipette so it does not fall. Dettach the monting plate to the robot by removing the pins on the plate from the slots on the gantry carriage'
@@ -76,7 +76,7 @@ describe('MountingPlate', () => {
     const proceedBtn = getByRole('button', { name: 'Continue' })
     fireEvent.click(proceedBtn)
     expect(props.proceed).toHaveBeenCalled()
-    const backBtn = getByRole('button', { name: 'Go back' })
+    const backBtn = getByLabelText('back')
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()
   })

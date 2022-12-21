@@ -11,8 +11,8 @@ import {
   mockMagneticModuleGen2,
   mockThermocycler,
 } from '../../../../../redux/modules/__fixtures__'
-import { MultipleModulesModal } from '../../../../ProtocolSetup/RunSetupCard/ModuleSetup/MultipleModulesModal'
-import { UnMatchedModuleWarning } from '../../../../ProtocolSetup/RunSetupCard/ModuleSetup/UnMatchedModuleWarning'
+import { MultipleModulesModal } from '../MultipleModulesModal'
+import { UnMatchedModuleWarning } from '../UnMatchedModuleWarning'
 import {
   useIsOT3,
   useModuleRenderInfoForProtocolById,
@@ -25,13 +25,9 @@ import { SetupModulesList } from '../SetupModulesList'
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
 jest.mock('../../../hooks')
-jest.mock(
-  '../../../../ProtocolSetup/RunSetupCard/ModuleSetup/UnMatchedModuleWarning'
-)
+jest.mock('../UnMatchedModuleWarning')
 jest.mock('../../../HeaterShakerWizard')
-jest.mock(
-  '../../../../ProtocolSetup/RunSetupCard/ModuleSetup/MultipleModulesModal'
-)
+jest.mock('../MultipleModulesModal')
 const mockUseIsOt3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
 const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById as jest.MockedFunction<
   typeof useModuleRenderInfoForProtocolById

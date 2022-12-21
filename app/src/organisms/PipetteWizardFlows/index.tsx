@@ -3,8 +3,10 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { useConditionalConfirm } from '@opentrons/components'
 import {
+  LEFT,
   NINETY_SIX_CHANNEL,
   SINGLE_MOUNT_PIPETTES,
+  RIGHT,
 } from '@opentrons/shared-data'
 import {
   useHost,
@@ -45,19 +47,26 @@ export const PipetteWizardFlows = (
 ): JSX.Element | null => {
   const { flowType, mount, closeFlow, robotName, selectedPipette } = props
   const { t } = useTranslation('pipette_wizard_flows')
-  const attachedPipette = useSelector((state: State) =>
+  const attachedPipettes = useSelector((state: State) =>
     getAttachedPipettes(state, robotName)
   )
+  const isGantryEmpty =
+    attachedPipettes[LEFT] == null && attachedPipettes[RIGHT] == null
   const pipetteWizardSteps = getPipetteWizardSteps(
     flowType,
     mount,
-    selectedPipette
+    selectedPipette,
+    isGantryEmpty,
+    attachedPipettes
   )
   const host = useHost()
   const [runId, setRunId] = React.useState<string>('')
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const totalStepCount = pipetteWizardSteps.length - 1
   const currentStep = pipetteWizardSteps?.[currentStepIndex]
+  const [isFetchingPipettes, setIsFetchingPipettes] = React.useState<boolean>(
+    false
+  )
 
   const goBack = (): void => {
     setCurrentStepIndex(
@@ -139,7 +148,7 @@ export const PipetteWizardFlows = (
     proceed,
     runId,
     goBack,
-    attachedPipette,
+    attachedPipettes,
     setShowErrorMessage,
     errorMessage,
     robotName,
@@ -188,13 +197,8 @@ export const PipetteWizardFlows = (
     )
   } else if (currentStep.section === SECTIONS.RESULTS) {
     const handleProceed = (): void => {
-      if (
-        currentStepIndex === 2 &&
-        //  only proceeds if we know that the pipette was successfully attached
-        attachedPipette[mount] != null
-      ) {
+      if (currentStepIndex < totalStepCount) {
         proceed()
-        //  if you completed detaching the pipette, robot will home and delete run
       } else {
         closeFlow()
       }
@@ -209,6 +213,8 @@ export const PipetteWizardFlows = (
         {...calibrateBaseProps}
         proceed={handleProceed}
         handleCleanUpAndClose={handleCleanUpAndClose}
+        currentStepIndex={currentStepIndex}
+        totalStepCount={totalStepCount}
       />
     )
   } else if (currentStep.section === SECTIONS.MOUNT_PIPETTE) {
@@ -216,14 +222,24 @@ export const PipetteWizardFlows = (
     modalContent = showConfirmExit ? (
       exitModal
     ) : (
-      <MountPipette {...currentStep} {...calibrateBaseProps} />
+      <MountPipette
+        {...currentStep}
+        {...calibrateBaseProps}
+        isPending={isFetchingPipettes}
+        setPending={setIsFetchingPipettes}
+      />
     )
   } else if (currentStep.section === SECTIONS.DETACH_PIPETTE) {
     onExit = confirmExit
     modalContent = showConfirmExit ? (
       exitModal
     ) : (
-      <DetachPipette {...currentStep} {...calibrateBaseProps} />
+      <DetachPipette
+        {...currentStep}
+        {...calibrateBaseProps}
+        isPending={isFetchingPipettes}
+        setPending={setIsFetchingPipettes}
+      />
     )
   } else if (currentStep.section === SECTIONS.CARRIAGE) {
     onExit = confirmExit
@@ -289,6 +305,7 @@ export const PipetteWizardFlows = (
         }
         header={
           <WizardHeader
+            exitDisabled={isRobotMoving || isFetchingPipettes}
             title={wizardTitle}
             currentStep={currentStepIndex}
             totalSteps={totalStepCount}

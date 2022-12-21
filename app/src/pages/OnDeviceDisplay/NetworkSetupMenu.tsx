@@ -16,7 +16,7 @@ import {
 import { TertiaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { StepMeter } from '../../atoms/StepMeter'
-import { CardButton } from '../../molecules/SetupNetwork/CardButton'
+import { CardButton } from '../../molecules/CardButton'
 
 import type { IconName } from '@opentrons/components'
 
@@ -102,8 +102,8 @@ export function NetworkSetupMenu(): JSX.Element {
           marginTop={SPACING.spacing5}
           width="fit-content"
         >
-          <Link to="dashboard">
-            <TertiaryButton>To Robot Dashboard</TertiaryButton>
+          <Link to="menu">
+            <TertiaryButton>To ODD Menu</TertiaryButton>
           </Link>
         </Flex>
       </Flex>

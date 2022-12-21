@@ -5,9 +5,9 @@ import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
-import { useLPCSuccessToast } from '../../../../ProtocolSetup/hooks'
+import { useLPCSuccessToast } from '../../../hooks/useLPCSuccessToast'
 import { LabwarePositionCheck } from '../../../../LabwarePositionCheck'
-import { getModuleTypesThatRequireExtraAttention } from '../../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
+import { getModuleTypesThatRequireExtraAttention } from '../../utils/getModuleTypesThatRequireExtraAttention'
 import {
   getIsLabwareOffsetCodeSnippetsOn,
   useFeatureFlag,
@@ -24,14 +24,12 @@ import { SetupLabware } from '..'
 
 jest.mock('../SetupLabwareList')
 jest.mock('../SetupLabwareMap')
-jest.mock('../../../../ProtocolSetup/hooks')
 jest.mock('../../../../LabwarePositionCheck')
-jest.mock(
-  '../../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
-)
+jest.mock('../../utils/getModuleTypesThatRequireExtraAttention')
 jest.mock('../../../../RunTimeControl/hooks')
 jest.mock('../../../../../redux/config')
 jest.mock('../../../hooks')
+jest.mock('../../../hooks/useLPCSuccessToast')
 
 const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
   typeof useFeatureFlag

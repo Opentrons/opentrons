@@ -1,6 +1,6 @@
 """ProtocolEngine-based Protocol API core implementation."""
-from typing import Dict, List, Optional, Type, Union
 from typing_extensions import Literal
+from typing import Dict, Optional, Type, Union, List, Tuple
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
@@ -23,6 +23,7 @@ from opentrons.protocol_engine import (
     ModuleLocation,
     ModuleModel as EngineModuleModel,
     LabwareMovementStrategy,
+    LabwareOffsetVector,
     LoadedLabware,
     LoadedModule,
 )
@@ -86,13 +87,6 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             labware_id=trash_id,
             engine_client=self._engine_client,
         )
-
-    def get_bundled_data(self) -> Dict[str, bytes]:
-        """Get a map of file names to byte contents.
-
-        Deprecated method for past experiment with ZIP protocols.
-        """
-        raise NotImplementedError("ProtocolCore.get_bundled_data not implemented")
 
     def get_bundled_labware(self) -> Optional[Dict[str, LabwareDefDict]]:
         """Get a map of labware names to definition dicts.
@@ -161,11 +155,16 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
         return labware_core
 
+    # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     def move_labware(
         self,
         labware_core: LabwareCore,
         new_location: Union[DeckSlotName, ModuleCore],
         use_gripper: bool,
+        use_pick_up_location_lpc_offset: bool,
+        use_drop_location_lpc_offset: bool,
+        pick_up_offset: Optional[Tuple[float, float, float]],
+        drop_offset: Optional[Tuple[float, float, float]],
     ) -> None:
         """Move the given labware to a new location."""
         to_location: Union[ModuleLocation, DeckSlotLocation]
@@ -179,11 +178,26 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             if use_gripper
             else LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE
         )
-
+        _pick_up_offset = (
+            LabwareOffsetVector(
+                x=pick_up_offset[0], y=pick_up_offset[1], z=pick_up_offset[2]
+            )
+            if pick_up_offset
+            else None
+        )
+        _drop_offset = (
+            LabwareOffsetVector(x=drop_offset[0], y=drop_offset[1], z=drop_offset[2])
+            if drop_offset
+            else None
+        )
         self._engine_client.move_labware(
             labware_id=labware_core.labware_id,
             new_location=to_location,
             strategy=strategy,
+            use_pick_up_location_lpc_offset=use_pick_up_location_lpc_offset,
+            use_drop_location_lpc_offset=use_drop_location_lpc_offset,
+            pick_up_offset=_pick_up_offset,
+            drop_offset=_drop_offset,
         )
 
     def _resolve_module_hardware(
