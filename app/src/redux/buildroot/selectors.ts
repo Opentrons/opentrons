@@ -87,14 +87,19 @@ export const getBuildrootRobot: (
   getViewableRobots,
   getBuildrootRobotName,
   (robots, robotName) => {
-    if (robotName === null) return null
+    if (robotName === null) {
+      console.log('returning null!')
+      return null
+    }
 
     return (
       robots.find(robot => {
         const searchName =
-          robot.serverHealth?.capabilities?.buildrootUpdate != null
+          robot.serverHealth?.capabilities?.buildrootUpdate != null ||
+          robot.serverHealth?.capabilities.systemUpdate != null
             ? robotName.replace(/^opentrons-/, '')
             : robotName
+        console.log(robot.name)
 
         return robot.name === searchName
       }) || null

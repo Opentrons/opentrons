@@ -14,9 +14,10 @@ import type { ReleaseSetUrls, ReleaseSetFilepaths, UserFileInfo } from './types'
 
 const VERSION_FILENAME = 'VERSION.json'
 
-const log = createLogger('buildroot/release-files')
-const outPath = (dir: string, url: string): string =>
-  path.join(dir, path.basename(url))
+const log = createLogger('bulsildroot/release-files')
+const outPath = (dir: string, url: string): string => {
+  return path.join(dir, path.basename(url))
+}
 
 // checks `directory` for buildroot files matching the given `urls`, and
 // download them if they can't be found
@@ -25,24 +26,36 @@ export function getReleaseFiles(
   directory: string,
   onProgress: (progress: DownloadProgress) => unknown
 ): Promise<ReleaseSetFilepaths> {
+  console.log('getting the release files')
+  console.log({ urls })
   return readdir(directory)
     .catch(error => {
+      console.log('Error retrieving files from filesystem', { error })
       log.warn('Error retrieving files from filesystem', { error })
       return []
     })
     .then((files: string[]) => {
+      console.log('Files in buildroot download directoryy', { files })
       log.debug('Files in buildroot download directory', { files })
+      console.log('files length: ', files.length)
+      console.log('before call to outPath')
       const system = outPath(directory, urls.system)
-      const releaseNotes = outPath(directory, urls.releaseNotes)
+      const releaseNotes = outPath(directory, urls.releaseNotes ?? '')
+      console.log('after call to outPath')
+      console.log({ system, releaseNotes })
 
       // TODO(mc, 2019-07-02): this is a pretty naive filename check; we may
       // want to explore putting hashes in the manifest and checking those
-      if (
-        files.some(f => f === path.basename(system)) &&
-        files.some(f => f === path.basename(releaseNotes))
-      ) {
+      console.log('path basename info')
+      console.log(path.basename(system))
+      console.log(path.basename(releaseNotes))
+      if (files.some(f => f === path.basename(system))) {
+        console.log('weve got a match!')
+        console.log({ system, releaseNotes })
         return { system, releaseNotes }
       }
+
+      console.log('downloading the release files')
 
       return downloadReleaseFiles(urls, directory, onProgress)
     })
@@ -58,22 +71,33 @@ export function downloadReleaseFiles(
   onProgress: (progress: DownloadProgress) => unknown
 ): Promise<ReleaseSetFilepaths> {
   const tempDir: string = tempy.directory()
+  urls.releaseNotes = null
   const tempSystemPath = outPath(tempDir, urls.system)
-  const tempNotesPath = outPath(tempDir, urls.releaseNotes)
+  const tempNotesPath = outPath(tempDir, urls.releaseNotes ?? '')
 
   log.debug('directory created for BR downloads', { tempDir })
+  console.log('directory created for BR downloads', { tempDir })
 
   // downloads are streamed directly to the filesystem to avoid loading them
   // all into memory simultaneously
+  console.log('fetching system req')
   const systemReq = fetchToFile(urls.system, tempSystemPath, { onProgress })
-  const notesReq = fetchToFile(urls.releaseNotes, tempNotesPath)
+  console.log('fetching notes req')
+  const notesReq = urls.releaseNotes
+    ? fetchToFile(urls.releaseNotes, tempNotesPath)
+    : Promise.resolve('')
+
+  console.log({ systemReq, notesReq })
 
   return Promise.all([systemReq, notesReq]).then(results => {
+    console.log('in promise all')
     const [systemTemp, releaseNotesTemp] = results
+    console.log({ systemTemp, releaseNotesTemp })
     const systemPath = outPath(directory, systemTemp)
     const notesPath = outPath(directory, releaseNotesTemp)
 
     log.debug('renaming directory', { from: tempDir, to: directory })
+    console.log('renaming directory', { from: tempDir, to: directory })
 
     return move(tempDir, directory, { overwrite: true }).then(() => ({
       system: systemPath,
@@ -130,6 +154,7 @@ export function cleanupReleaseFiles(
   downloadsDir: string,
   currentRelease: string
 ): Promise<unknown> {
+  console.log('cleaning up release files')
   return readdir(downloadsDir, { withFileTypes: true })
     .then(files => {
       return (

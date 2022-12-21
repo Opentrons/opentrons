@@ -10,7 +10,6 @@ declare global {
       APP_SHELL_REMOTE: {
         ipcRenderer: IpcRenderer
       }
-      LATEST_OT_SYSTEM_VERSION: string
     }
   }
 }

@@ -6,6 +6,13 @@ const DEV_MODE = process.env.NODE_ENV !== 'production'
 const USE_PYTHON = process.env.NO_PYTHON !== 'true'
 const NO_USB_DETECTION = process.env.NO_USB_DETECTION === 'true'
 
+console.log('deploy stuff')
+console.log({
+  provider: 's3',
+  bucket: OT_APP_DEPLOY_BUCKET,
+  path: OT_APP_DEPLOY_FOLDER,
+})
+
 module.exports = {
   appId: 'com.opentrons.app',
   electronVersion: '21.3.1',

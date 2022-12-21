@@ -14,7 +14,7 @@ const COMMON_CONFIG = {
   output: { path: OUTPUT_PATH },
   plugins: [
     new DefinePlugin({
-      _PKG_VERSION_: JSON.stringify(pkg.version),
+      _PKG_VERSION_: JSON.stringify("6.1.0"),
       _PKG_PRODUCT_NAME_: JSON.stringify(pkg.productName),
       _PKG_BUGS_URL_: JSON.stringify(pkg.bugs.url),
     }),

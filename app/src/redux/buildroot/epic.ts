@@ -111,6 +111,9 @@ export const startUpdateEpic: Epic = (action$, state$) =>
       const host = getBuildrootRobot(state)
       const serverHealth = host?.serverHealth || null
 
+      console.log('host', host)
+      console.log('serverHealth', serverHealth)
+
       // we need the target robot's update server to be up to do anything
       if (host === null || serverHealth === null) {
         return unexpectedBuildrootError(

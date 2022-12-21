@@ -10,7 +10,7 @@ PATH := $(shell cd .. && yarn bin):$(PATH)
 PORT ?= 8090
 
 # dependency directories for dev
-shell_dir := ../app-shell
+shell_dir := ../app-shell-odd
 discovery_client_dir = ../discovery-client
 
 # standard targets

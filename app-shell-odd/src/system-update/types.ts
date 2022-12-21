@@ -2,7 +2,7 @@ export interface ReleaseSetUrls {
   fullImage: string
   system: string
   version: string
-  releaseNotes: string
+  releaseNotes?: string
 }
 
 export interface ReleaseManifest {

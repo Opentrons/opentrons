@@ -11,10 +11,14 @@ import type { Action, Dispatch, PlainError } from './types'
 updater.logger = createLogger('update')
 
 updater.autoDownload = false
+let LATEST_OT_SYSTEM_VERSION = updater.currentVersion.version
 
 // LATEST_OT_SYSTEM_VERSION is instantiated in the preload file, and updated when
 // an update is available in the onAvailable callback below
-export const getLatestVersion = (): string => global.LATEST_OT_SYSTEM_VERSION
+export const getLatestVersion = (): string => {
+  console.log('latest version is', LATEST_OT_SYSTEM_VERSION)
+  return LATEST_OT_SYSTEM_VERSION
+}
 
 export function registerUpdate(
   dispatch: Dispatch
@@ -29,11 +33,15 @@ export function registerUpdate(
 }
 
 function checkUpdate(dispatch: Dispatch): void {
+  console.log('checking for shell update')
   const onAvailable = (info: UpdateInfo): void => {
-    global.LATEST_OT_SYSTEM_VERSION= info.version
+    console.log('update available!')
+    console.log(info)
+    LATEST_OT_SYSTEM_VERSION = info.version
     done({ info, available: true })
   }
   const onNotAvailable = (info: UpdateInfo): void => {
+    console.log('no update available :(')
     done({ info, available: false })
   }
   const onError = (error: Error): void => {
@@ -44,8 +52,8 @@ function checkUpdate(dispatch: Dispatch): void {
   updater.once('update-not-available', onNotAvailable)
   updater.once('error', onError)
 
-  // @ts-expect-error(mc, 2021-02-16): do not use dot-path notation
   updater.channel = getConfig('update.channel')
+  console.log(updater.channel)
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   updater.checkForUpdates()
 
