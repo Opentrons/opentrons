@@ -88,8 +88,6 @@ export function NameRobot(): JSX.Element {
         dispatch(removeRobot(sameNameRobotInUnavailable.name))
       }
       updateRobotName(newName)
-      !Boolean(isNaming) &&
-        history.push(`/network-setup/confirm-name/${newName}`)
       resetForm({ values: { newRobotName: '' } })
     },
     validate: values => {
@@ -116,7 +114,8 @@ export function NameRobot(): JSX.Element {
       data.name != null &&
         previousName != null &&
         dispatch(removeRobot(previousName))
-      dispatch(startDiscovery())
+      !Boolean(isNaming) &&
+        history.push(`/network-setup/confirm-name/${String(data.name)}`)
     },
     onError: (error: Error) => {
       console.error('error', error.message)
