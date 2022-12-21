@@ -1,8 +1,4 @@
 import * as React from 'react'
-import {
-  NINETY_SIX_CHANNEL,
-  SINGLE_MOUNT_PIPETTES,
-} from '@opentrons/shared-data'
 import capitalize from 'lodash/capitalize'
 import { Trans, useTranslation } from 'react-i18next'
 import { StyledText } from '../../atoms/text'
@@ -12,8 +8,6 @@ import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal
 import detachPipette from '../../assets/images/change-pip/single-channel-detach-pipette.png'
 import detach96Pipette from '../../assets/images/change-pip/detach-96-pipette.png'
 import { CheckPipetteButton } from './CheckPipetteButton'
-import { getIsGantryEmpty } from './utils'
-import { FLOWS } from './constants'
 import type { PipetteWizardStepProps } from './types'
 
 interface DetachPipetteProps extends PipetteWizardStepProps {
@@ -28,19 +22,14 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
     goBack,
     proceed,
     robotName,
-    selectedPipette,
     attachedPipette,
-    flowType,
+    mount,
     isPending,
     setPending,
   } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
-  const isSingleMountPipette = selectedPipette === SINGLE_MOUNT_PIPETTES
-  const isGantryEmpty = getIsGantryEmpty(attachedPipette)
-  const isPipetteAttachedFor96ChannelAttachement =
-    !isGantryEmpty &&
-    selectedPipette === NINETY_SIX_CHANNEL &&
-    flowType === FLOWS.ATTACH
+  // swap this out with util
+  const is96ChannelPipette = attachedPipette[mount]?.name === 'p1000_96'
 
   let bodyText: React.ReactNode = <div></div>
   if (isPending) {
@@ -58,7 +47,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
         />
       </>
     )
-  } else if (isSingleMountPipette || isPipetteAttachedFor96ChannelAttachement) {
+  } else if (!is96ChannelPipette) {
     bodyText = <StyledText as="p">{t('hold_and_loosen')}</StyledText>
   } else {
     bodyText = (
@@ -83,11 +72,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
             backgroundSize={BACKGROUND_SIZE}
           />
         ) : (
-          t(
-            isSingleMountPipette || isPipetteAttachedFor96ChannelAttachement
-              ? 'loose_detach'
-              : 'unscrew_remove_96_channel'
-          )
+          t(!is96ChannelPipette ? 'loose_detach' : 'unscrew_remove_96_channel')
         )
       }
       //  TODO(Jr, 11/8/22): replace image with correct one!
@@ -100,14 +85,10 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
           />
         ) : (
           <img
-            src={
-              isSingleMountPipette || isPipetteAttachedFor96ChannelAttachement
-                ? detachPipette
-                : detach96Pipette
-            }
+            src={!is96ChannelPipette ? detachPipette : detach96Pipette}
             width="100%"
             alt={
-              isSingleMountPipette || isPipetteAttachedFor96ChannelAttachement
+              !is96ChannelPipette
                 ? 'Detach pipette'
                 : 'Unscrew 96 channel pipette'
             }

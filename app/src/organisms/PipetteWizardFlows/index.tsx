@@ -47,16 +47,17 @@ export const PipetteWizardFlows = (
 ): JSX.Element | null => {
   const { flowType, mount, closeFlow, robotName, selectedPipette } = props
   const { t } = useTranslation('pipette_wizard_flows')
-  const attachedPipette = useSelector((state: State) =>
+  const attachedPipettes = useSelector((state: State) =>
     getAttachedPipettes(state, robotName)
   )
   const isGantryEmpty =
-    attachedPipette[LEFT] == null && attachedPipette[RIGHT] == null
+    attachedPipettes[LEFT] == null && attachedPipettes[RIGHT] == null
   const pipetteWizardSteps = getPipetteWizardSteps(
     flowType,
     mount,
     selectedPipette,
-    isGantryEmpty
+    isGantryEmpty,
+    attachedPipettes
   )
   const host = useHost()
   const [runId, setRunId] = React.useState<string>('')
@@ -147,7 +148,7 @@ export const PipetteWizardFlows = (
     proceed,
     runId,
     goBack,
-    attachedPipette,
+    attachedPipette: attachedPipettes,
     setShowErrorMessage,
     errorMessage,
     robotName,
@@ -196,13 +197,8 @@ export const PipetteWizardFlows = (
     )
   } else if (currentStep.section === SECTIONS.RESULTS) {
     const handleProceed = (): void => {
-      if (
-        currentStepIndex === 2 &&
-        //  only proceeds if we know that the pipette was successfully attached
-        attachedPipette[mount] != null
-      ) {
+      if (currentStepIndex < totalStepCount) {
         proceed()
-        //  if you completed detaching the pipette, robot will home and delete run
       } else {
         closeFlow()
       }
@@ -218,6 +214,7 @@ export const PipetteWizardFlows = (
         proceed={handleProceed}
         handleCleanUpAndClose={handleCleanUpAndClose}
         currentStepIndex={currentStepIndex}
+        totalStepCount={totalStepCount}
       />
     )
   } else if (currentStep.section === SECTIONS.MOUNT_PIPETTE) {

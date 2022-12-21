@@ -5,12 +5,12 @@ import { COLORS, TEXT_TRANSFORM_CAPITALIZE } from '@opentrons/components'
 import { PrimaryButton } from '../../atoms/buttons'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { FLOWS } from './constants'
-import { getIsGantryEmpty } from './utils'
 import type { PipetteWizardStepProps } from './types'
 
 interface ResultsProps extends PipetteWizardStepProps {
   handleCleanUpAndClose: () => void
   currentStepIndex: number
+  totalStepCount: number
 }
 
 export const Results = (props: ResultsProps): JSX.Element => {
@@ -22,14 +22,9 @@ export const Results = (props: ResultsProps): JSX.Element => {
     handleCleanUpAndClose,
     selectedPipette,
     currentStepIndex,
+    totalStepCount,
   } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
-  const isGantryEmpty = getIsGantryEmpty(attachedPipette)
-  const is96ChannelAttachFailedToDetachOthers =
-    flowType === FLOWS.ATTACH &&
-    selectedPipette === NINETY_SIX_CHANNEL &&
-    currentStepIndex === 2 &&
-    !isGantryEmpty
 
   let header: string = 'unknown results screen'
   let iconColor: string = COLORS.successEnabled
@@ -41,25 +36,8 @@ export const Results = (props: ResultsProps): JSX.Element => {
       break
     }
     case FLOWS.ATTACH: {
-      //  96-channel attachment with pipette attached before hand failed to detach
-      if (
-        !isGantryEmpty &&
-        selectedPipette === NINETY_SIX_CHANNEL &&
-        currentStepIndex === 2
-      ) {
-        header = t('pipette_failed_to_detach')
-        iconColor = COLORS.errorEnabled
-        isSuccess = false
-        //  96-channel attachment with pipette attached before hand succeeded to detach
-      } else if (
-        isGantryEmpty &&
-        selectedPipette === NINETY_SIX_CHANNEL &&
-        currentStepIndex === 2
-      ) {
-        header = t('pipette_detached')
-        buttonText = t('continue')
-        // normal attachment flow success
-      } else if (attachedPipette[mount] != null) {
+      // attachment flow success
+      if (attachedPipette[mount] != null) {
         const pipetteName = attachedPipette[mount]?.modelSpecs.displayName
         header = t('pipette_attached', { pipetteName: pipetteName })
         if (selectedPipette === NINETY_SIX_CHANNEL) {
@@ -67,7 +45,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
         } else {
           buttonText = t('cal_pipette')
         }
-        // normal detachment flow fail
+        // attachment flow fail
       } else {
         header = t('pipette_failed_to_attach')
         iconColor = COLORS.errorEnabled
@@ -88,7 +66,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
   }
 
   const handleProceed = (): void => {
-    if (flowType === FLOWS.DETACH || is96ChannelAttachFailedToDetachOthers) {
+    if (currentStepIndex === totalStepCount || !isSuccess) {
       handleCleanUpAndClose()
     } else {
       proceed()
