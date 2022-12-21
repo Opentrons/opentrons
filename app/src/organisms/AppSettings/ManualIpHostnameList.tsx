@@ -18,35 +18,39 @@ export function ManualIpHostnameList({
   setMostRecentAddition,
   setMostRecentDiscovered,
 }: IpHostnameListProps): JSX.Element {
-  const candidates = useSelector(
-    (state: State) => getConfig(state)?.discovery.candidates ?? []
-  )
+  const candidates = useSelector((state: State) => {
+    const results = getConfig(state)?.discovery.candidates
+    return typeof results === 'string' ? [].concat(results) : results
+  })
+
   const robots = useSelector((state: State) => getViewableRobots(state))
   const dispatch = useDispatch<Dispatch>()
 
   return (
     <>
-      {candidates
-        .map<[string, boolean]>(candidate => {
-          const discovered = robots.some(robot => robot.ip === candidate)
-          return [candidate, discovered]
-        })
-        .sort(([_candidateA, aDiscovered], [_candidateB, bDiscovered]) =>
-          bDiscovered && !aDiscovered ? -1 : 1
-        )
-        .map(([candidate, discovered], index) => (
-          <React.Fragment key={index}>
-            <ManualIpHostnameItem
-              candidate={candidate}
-              removeIp={() => dispatch(removeManualIp(candidate))}
-              discovered={discovered}
-              mostRecentAddition={mostRecentAddition}
-              setMostRecentAddition={setMostRecentAddition}
-              setMostRecentDiscovered={setMostRecentDiscovered}
-              isLast={index === candidates.length - 1}
-            />
-          </React.Fragment>
-        ))}
+      {candidates != null && candidates.length > 0
+        ? candidates
+            .map<[string, boolean]>(candidate => {
+              const discovered = robots.some(robot => robot.ip === candidate)
+              return [candidate, discovered]
+            })
+            .sort(([_candidateA, aDiscovered], [_candidateB, bDiscovered]) =>
+              bDiscovered && !aDiscovered ? -1 : 1
+            )
+            .map(([candidate, discovered], index) => (
+              <React.Fragment key={index}>
+                <ManualIpHostnameItem
+                  candidate={candidate}
+                  removeIp={() => dispatch(removeManualIp(candidate))}
+                  discovered={discovered}
+                  mostRecentAddition={mostRecentAddition}
+                  setMostRecentAddition={setMostRecentAddition}
+                  setMostRecentDiscovered={setMostRecentDiscovered}
+                  isLast={index === candidates.length - 1}
+                />
+              </React.Fragment>
+            ))
+        : null}
     </>
   )
 }

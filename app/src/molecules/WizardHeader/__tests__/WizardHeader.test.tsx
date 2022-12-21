@@ -41,6 +41,17 @@ describe('WizardHeader', () => {
     getByText('Step 1 / 5')
   })
 
+  it('renders exit button as disabled when isDisabled is true', () => {
+    props = {
+      ...props,
+      exitDisabled: true,
+    }
+    const { getByText, getByRole } = render(props)
+    getByText('Tip Length Calibrations')
+    const exit = getByRole('button', { name: 'Exit' })
+    expect(exit).toBeDisabled()
+  })
+
   it('renders correct information with no step count visible due to currentStep = 0', () => {
     props = {
       ...props,

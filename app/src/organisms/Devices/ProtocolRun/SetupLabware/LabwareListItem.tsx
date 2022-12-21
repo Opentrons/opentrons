@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
+
 import {
   Flex,
   SPACING,
@@ -18,6 +19,7 @@ import {
   WELL_LABEL_OPTIONS,
   SIZE_AUTO,
 } from '@opentrons/components'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   getLabwareDisplayName,
   getModuleDisplayName,
@@ -26,20 +28,22 @@ import {
   LabwareDefinition2,
   MAGNETIC_MODULE_TYPE,
   ModuleType,
-  TC_MODULE_LOCATION,
+  TC_MODULE_LOCATION_OT2,
+  TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+
 import { ToggleButton } from '../../../../atoms/buttons'
 import { StyledText } from '../../../../atoms/text'
-import { SecureLabwareModal } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/SecureLabwareModal'
+import { SecureLabwareModal } from './SecureLabwareModal'
+
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
-import type { ModuleTypesThatRequireExtraAttention } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
 import type { ModuleRenderInfoForProtocol } from '../../hooks'
+import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 import type { LabwareSetupItem } from './types'
 
 const LabwareRow = styled.div`
@@ -55,6 +59,7 @@ const LabwareRow = styled.div`
 interface LabwareListItemProps extends LabwareSetupItem {
   attachedModuleInfo: { [moduleId: string]: ModuleRenderInfoForProtocol }
   extraAttentionModules: ModuleTypesThatRequireExtraAttention[]
+  isOt3: boolean
 }
 
 export function LabwareListItem(
@@ -68,6 +73,7 @@ export function LabwareListItem(
     moduleModel,
     moduleLocation,
     extraAttentionModules,
+    isOt3,
   } = props
   const { t } = useTranslation('protocol_setup')
   const [
@@ -104,7 +110,7 @@ export function LabwareListItem(
     )
     let moduleSlotName = moduleLocation.slotName
     if (moduleType === THERMOCYCLER_MODULE_TYPE) {
-      moduleSlotName = TC_MODULE_LOCATION
+      moduleSlotName = isOt3 ? TC_MODULE_LOCATION_OT3 : TC_MODULE_LOCATION_OT2
     }
     slotInfo = t('module_slot_location', {
       slotName: moduleSlotName,

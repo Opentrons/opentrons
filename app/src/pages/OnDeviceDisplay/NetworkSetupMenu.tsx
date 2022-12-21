@@ -1,5 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
+
 import {
   Flex,
   SPACING,
@@ -8,10 +10,13 @@ import {
   JUSTIFY_CENTER,
   ALIGN_CENTER,
   DIRECTION_ROW,
+  ALIGN_FLEX_END,
 } from '@opentrons/components'
+
+import { TertiaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { StepMeter } from '../../atoms/StepMeter'
-import { CardButton } from '../../molecules/SetupNetwork/CardButton'
+import { CardButton } from '../../molecules/CardButton'
 
 import type { IconName } from '@opentrons/components'
 
@@ -22,7 +27,7 @@ const NetworkSetupOptions = [
     title: 'wifi',
     iconName: 'wifi' as IconName,
     description: 'connection_description',
-    destinationPath: 'connect-via-wifi',
+    destinationPath: '/network-setup/wifi',
   },
   {
     cardWidth: '19rem',
@@ -30,7 +35,7 @@ const NetworkSetupOptions = [
     title: 'ethernet',
     iconName: 'ethernet' as IconName,
     description: 'connection_description',
-    destinationPath: 'connect-via-ethernet',
+    destinationPath: '/network-setup/ethernet',
   },
   {
     cardWidth: '19rem',
@@ -38,7 +43,7 @@ const NetworkSetupOptions = [
     title: 'usb',
     iconName: 'usb' as IconName,
     description: 'connection_description',
-    destinationPath: 'connect-via-usb',
+    destinationPath: '/network-setup/usb',
   },
 ]
 
@@ -90,6 +95,16 @@ export function NetworkSetupMenu(): JSX.Element {
               description={t(networkOption.description)}
             />
           ))}
+        </Flex>
+        {/* temp button to robot dashboard until we can detect setup status */}
+        <Flex
+          alignSelf={ALIGN_FLEX_END}
+          marginTop={SPACING.spacing5}
+          width="fit-content"
+        >
+          <Link to="menu">
+            <TertiaryButton>To ODD Menu</TertiaryButton>
+          </Link>
         </Flex>
       </Flex>
     </>

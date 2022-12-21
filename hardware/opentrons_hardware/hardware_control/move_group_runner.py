@@ -9,6 +9,7 @@ from opentrons_hardware.firmware_bindings import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     ErrorCode,
+    MotorPositionFlags,
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition
@@ -101,7 +102,7 @@ class MoveGroupRunner:
 
     async def execute(
         self, can_messenger: CanMessenger
-    ) -> NodeDict[Tuple[float, float]]:
+    ) -> NodeDict[Tuple[float, float, bool, bool]]:
         """Execute a pre-prepared move group. The second thing that run() does.
 
         prep() and execute() can be used to replace a single call to run() to
@@ -120,7 +121,9 @@ class MoveGroupRunner:
             raise
         return self._accumulate_move_completions(move_completion_data)
 
-    async def run(self, can_messenger: CanMessenger) -> NodeDict[Tuple[float, float]]:
+    async def run(
+        self, can_messenger: CanMessenger
+    ) -> NodeDict[Tuple[float, float, bool, bool]]:
         """Run the move group.
 
         Args:
@@ -144,10 +147,10 @@ class MoveGroupRunner:
     @staticmethod
     def _accumulate_move_completions(
         completions: _Completions,
-    ) -> NodeDict[Tuple[float, float]]:
-        position: NodeDict[List[Tuple[Tuple[int, int], float, float]]] = defaultdict(
-            list
-        )
+    ) -> NodeDict[Tuple[float, float, bool, bool]]:
+        position: NodeDict[
+            List[Tuple[Tuple[int, int], float, float, bool, bool]]
+        ] = defaultdict(list)
         for arbid, completion in completions:
             position[NodeId(arbid.parts.originating_node_id)].append(
                 (
@@ -157,6 +160,14 @@ class MoveGroupRunner:
                     ),
                     float(completion.payload.current_position_um.value) / 1000.0,
                     float(completion.payload.encoder_position_um.value) / 1000.0,
+                    bool(
+                        completion.payload.position_flags.value
+                        & MotorPositionFlags.stepper_position_ok.value
+                    ),
+                    bool(
+                        completion.payload.position_flags.value
+                        & MotorPositionFlags.encoder_position_ok.value
+                    ),
                 )
             )
         # for each node, pull the position from the completion with the largest
@@ -166,7 +177,7 @@ class MoveGroupRunner:
                 reversed(
                     sorted(poslist, key=lambda position_element: position_element[0])
                 )
-            )[1:3]
+            )[1:]
             for node, poslist in position.items()
         }
 
@@ -329,6 +340,9 @@ class MoveScheduler:
                 f"Received completion for {node_id} group {group_id} seq {seq_id}"
                 f", which {'is' if in_group else 'isn''t'} in group"
             )
+            if not self._moves[group_id]:
+                log.info(f"Move group {group_id+self._start_at_index} has completed.")
+                self._event.set()
         except KeyError:
             log.warning(
                 f"Got a move ack for ({node_id}, {seq_id}) which is not in this "
@@ -338,10 +352,6 @@ class MoveScheduler:
             # If we have two move groups running at once, we need to handle
             # moves from a group we don't own
             return
-
-        if not self._moves[group_id]:
-            log.info(f"Move group {group_id+self._start_at_index} has completed.")
-            self._event.set()
 
     def _handle_acknowledge(self, message: Acknowledgement) -> None:
         log.debug("recieved ack")
@@ -403,7 +413,8 @@ class MoveScheduler:
     def _get_nodes_in_move_group(self, group_id: int) -> List[NodeId]:
         nodes = []
         for (node_id, seq_id) in self._moves[group_id - self._start_at_index]:
-            nodes.append(NodeId(node_id))
+            if node_id not in nodes:
+                nodes.append(NodeId(node_id))
         return nodes
 
     async def run(self, can_messenger: CanMessenger) -> _Completions:
@@ -441,7 +452,12 @@ class MoveScheduler:
                     max(1.0, self._durations[group_id - self._start_at_index] * 1.1),
                 )
             except asyncio.TimeoutError:
-                log.warning("Move set timed out")
+                log.warning(
+                    f"Move set {str(group_id)} timed out, expected duration {str(max(1.0, self._durations[group_id - self._start_at_index] * 1.1))}"
+                )
+                log.warning(
+                    f"Expected nodes in group {str(group_id)}: {str(self._get_nodes_in_move_group(group_id))}"
+                )
             except RuntimeError:
                 log.error("canceling move group scheduler")
                 raise

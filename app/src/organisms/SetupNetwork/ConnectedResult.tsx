@@ -31,7 +31,7 @@ export function ConnectedResult({
   requestState,
   onConnect,
 }: ConnectedResultProps): JSX.Element {
-  const { t } = useTranslation('device_settings')
+  const { t } = useTranslation(['device_settings', 'shared'])
   const history = useHistory()
 
   return (
@@ -82,25 +82,33 @@ export function ConnectedResult({
           <>
             <SecondaryButton
               flex="1"
-              onClick={() => history.push('/connect-via-wifi')}
+              onClick={() => history.push('/network-setup/wifi')}
             >
               {t('change_network')}
             </SecondaryButton>
             <PrimaryButton
               flex="1"
-              onClick={() => history.push(`/connected-network-info/${ssid}`)}
+              onClick={() =>
+                history.push(
+                  `/network-setup/wifi/connected-network-info/${ssid}`
+                )
+              }
             >
               {t('done')}
             </PrimaryButton>
           </>
         ) : (
           <>
-            <SecondaryButton flex="1" onClick={onConnect}>
-              {t('try_again')}
+            <SecondaryButton
+              flex="1"
+              onClick={onConnect}
+              textTransform={TYPOGRAPHY.textTransformCapitalize}
+            >
+              {t('shared:try_again')}
             </SecondaryButton>
             <PrimaryButton
               flex="1"
-              onClick={() => history.push('/connect-via-wifi')}
+              onClick={() => history.push('/network-setup/wifi')}
             >
               {t('change_network')}
             </PrimaryButton>

@@ -8,6 +8,7 @@ from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.types import Point
 
 from opentrons.protocol_api.core.engine import WellCore
@@ -130,3 +131,22 @@ def test_get_center(
     ).then_return(Point(1, 2, 3))
 
     assert subject.get_center() == Point(1, 2, 3)
+
+
+def test_has_tip(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: WellCore
+) -> None:
+    """It should get whether a clean tip is present."""
+    decoy.when(
+        mock_engine_client.state.tips.has_clean_tip(
+            labware_id="labware-id", well_name="well-name"
+        )
+    ).then_return(True)
+
+    assert subject.has_tip() is True
+
+
+def test_set_has_tip(subject: WellCore) -> None:
+    """Trying to set the has tip state should raise an error."""
+    with pytest.raises(APIVersionError):
+        subject.set_has_tip(True)
