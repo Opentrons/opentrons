@@ -80,7 +80,7 @@ export interface PipetteWizardStepProps {
   ) => Promise<unknown>
   isRobotMoving: boolean
   runId: string
-  attachedPipette: AttachedPipettesByMount
+  attachedPipettes: AttachedPipettesByMount
   setShowErrorMessage: React.Dispatch<React.SetStateAction<string | null>>
   errorMessage: string | null
   robotName: string
