@@ -93,7 +93,7 @@ describe('getPipetteWizardSteps', () => {
       {
         section: SECTIONS.RESULTS,
         mount: LEFT,
-        flowType: FLOWS.ATTACH,
+        flowType: FLOWS.CALIBRATE,
       },
     ] as PipetteWizardStep[]
 
