@@ -30,42 +30,32 @@ class FileReadError(Exception):
 class FileReaderWriter:
     """Input file reader/writer interface."""
 
-    @staticmethod
+    @classmethod
     async def read(
-        files: Sequence[Union[AbstractInputFile, Path]]
+        cls, files: Sequence[Union[AbstractInputFile, Path]]
     ) -> List[BufferedFile]:
         """Read a set of input files into memory."""
-        results: List[Optional[BufferedFile]] = [None for f in files]
+        return [await cls._read_file(input_file=file) for file in files]
 
-        async def _read_file(
-            input_file: Union[AbstractInputFile, Path], index: int
-        ) -> None:
-            if isinstance(input_file, Path):
-                path: Optional[Path] = input_file
-                filename = input_file.name
-                contents = await AsyncPath(input_file).read_bytes()
-            elif not input_file.filename:
-                raise FileReadError("File was missing a name")
-            else:
-                path = None
-                filename = input_file.filename
-                async with wrap_file(input_file.file) as f:
-                    contents = await f.read()
+    @staticmethod
+    async def _read_file(input_file: Union[AbstractInputFile, Path]) -> None:
+        if isinstance(input_file, Path):
+            path: Optional[Path] = input_file
+            filename = input_file.name
+            contents = await AsyncPath(input_file).read_bytes()
+        elif not input_file.filename:
+            raise FileReadError("File was missing a name")
+        else:
+            path = None
+            filename = input_file.filename
+            async with wrap_file(input_file.file) as f:
+                contents = await f.read()
 
-            results[index] = BufferedFile(
-                name=filename,
-                contents=contents,
-                path=path,
-            )
-
-        # TODO BEFORE MERGE:
-        # Simplify this to read files serially.
-        async with create_task_group() as tg:
-            for index, input_file in enumerate(files):
-                tg.start_soon(_read_file, input_file, index)
-
-        assert all(results), "Expected all files to be read"
-        return [f for f in results if f]
+        return BufferedFile(
+            name=filename,
+            contents=contents,
+            path=path,
+        )
 
     @staticmethod
     async def write(directory: Path, files: Sequence[BufferedFile]) -> None:
