@@ -38,7 +38,7 @@ class FileReaderWriter:
         return [await cls._read_file(input_file=file) for file in files]
 
     @staticmethod
-    async def _read_file(input_file: Union[AbstractInputFile, Path]) -> None:
+    async def _read_file(input_file: Union[AbstractInputFile, Path]) -> BufferedFile:
         if isinstance(input_file, Path):
             path: Optional[Path] = input_file
             filename = input_file.name
