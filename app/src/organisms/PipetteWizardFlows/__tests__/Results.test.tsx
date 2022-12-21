@@ -14,15 +14,9 @@ import { i18n } from '../../../i18n'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { Results } from '../Results'
 import { FLOWS } from '../constants'
-import { getIsGantryEmpty } from '../utils'
 
 import type { AttachedPipette } from '../../../redux/pipettes/types'
 
-jest.mock('../utils')
-
-const mockGetIsGantryEmpty = getIsGantryEmpty as jest.MockedFunction<
-  typeof getIsGantryEmpty
->
 const render = (props: React.ComponentProps<typeof Results>) => {
   return renderWithProviders(<Results {...props} />, {
     i18nInstance: i18n,
@@ -50,8 +44,8 @@ describe('Results', () => {
       flowType: FLOWS.CALIBRATE,
       handleCleanUpAndClose: jest.fn(),
       currentStepIndex: 2,
+      totalStepCount: 6,
     }
-    mockGetIsGantryEmpty.mockReturnValue(true)
   })
   it('renders the correct information when pipette cal is a success for calibrate flow', () => {
     const { getByText, getByRole, getByLabelText } = render(props)
@@ -92,12 +86,13 @@ describe('Results', () => {
     )
     const exit = getByRole('button', { name: 'Results_exit' })
     fireEvent.click(exit)
-    expect(props.proceed).toHaveBeenCalled()
+    expect(props.handleCleanUpAndClose).toHaveBeenCalled()
   })
   it('renders the correct information when pipette wizard is a success for detach flow', () => {
     props = {
       ...props,
       attachedPipette: { left: null, right: null },
+      currentStepIndex: 6,
       flowType: FLOWS.DETACH,
     }
     const { getByText, getByRole, getByLabelText } = render(props)
@@ -124,10 +119,9 @@ describe('Results', () => {
     expect(props.handleCleanUpAndClose).toHaveBeenCalled()
   })
   it('renders the correct information when pipette wizard is a fail for 96 channel attach flow and gantry not empty', () => {
-    mockGetIsGantryEmpty.mockReturnValue(false)
     props = {
       ...props,
-      flowType: FLOWS.ATTACH,
+      flowType: FLOWS.DETACH,
       selectedPipette: NINETY_SIX_CHANNEL,
     }
     const { getByText, getByRole, getByLabelText } = render(props)
@@ -140,10 +134,10 @@ describe('Results', () => {
     expect(props.handleCleanUpAndClose).toHaveBeenCalled()
   })
   it('renders the correct information when pipette wizard is a success for 96 channel attach flow and gantry not empty', () => {
-    mockGetIsGantryEmpty.mockReturnValue(true)
     props = {
       ...props,
-      flowType: FLOWS.ATTACH,
+      flowType: FLOWS.DETACH,
+      attachedPipette: { left: null, right: null },
       selectedPipette: NINETY_SIX_CHANNEL,
     }
     const { getByText, getByRole, getByLabelText } = render(props)

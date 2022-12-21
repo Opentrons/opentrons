@@ -16,21 +16,16 @@ import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { FLOWS } from '../constants'
 import { DetachPipette } from '../DetachPipette'
 import { CheckPipetteButton } from '../CheckPipetteButton'
-import { getIsGantryEmpty } from '../utils'
 import type { AttachedPipette } from '../../../redux/pipettes/types'
 
 jest.mock('../CheckPipetteButton')
 jest.mock('../../../molecules/InProgressModal/InProgressModal')
-jest.mock('../utils')
 
 const mockInProgressModal = InProgressModal as jest.MockedFunction<
   typeof InProgressModal
 >
 const mockCheckPipetteButton = CheckPipetteButton as jest.MockedFunction<
   typeof CheckPipetteButton
->
-const mockGetIsGantryEmpty = getIsGantryEmpty as jest.MockedFunction<
-  typeof getIsGantryEmpty
 >
 const render = (props: React.ComponentProps<typeof DetachPipette>) => {
   return renderWithProviders(<DetachPipette {...props} />, {
@@ -62,7 +57,6 @@ describe('DetachPipette', () => {
     }
     mockInProgressModal.mockReturnValue(<div>mock in progress</div>)
     mockCheckPipetteButton.mockReturnValue(<div>mock check pipette button</div>)
-    mockGetIsGantryEmpty.mockReturnValue(true)
   })
   it('returns the correct information, buttons work as expected for single mount pipettes', () => {
     const { getByText, getByAltText, getByLabelText } = render(props)
@@ -89,6 +83,18 @@ describe('DetachPipette', () => {
       ...props,
       flowType: FLOWS.ATTACH,
       selectedPipette: NINETY_SIX_CHANNEL,
+      attachedPipette: {
+        left: {
+          id: 'abc',
+          name: 'p1000_96',
+          model: 'p1000_96_v1.0',
+          tip_length: 42,
+          mount_axis: 'c',
+          plunger_axis: 'd',
+          modelSpecs: mockGen3P1000PipetteSpecs,
+        },
+        right: null,
+      },
     }
     const { getByText, getByAltText, getByLabelText } = render(props)
     getByText('Unscrew and Remove 96 Channel Pipette')
@@ -116,7 +122,6 @@ describe('DetachPipette', () => {
     expect(backBtn).toBeDisabled()
   })
   it('returns the correct information, buttons work as expected for 96 channel pipette flow when single mount is attached', () => {
-    mockGetIsGantryEmpty.mockReturnValue(false)
     props = {
       ...props,
       flowType: FLOWS.ATTACH,

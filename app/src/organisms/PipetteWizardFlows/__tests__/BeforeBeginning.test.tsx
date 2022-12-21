@@ -261,6 +261,7 @@ describe('BeforeBeginning', () => {
       mockGetIsGantryEmpty.mockReturnValue(false)
       props = {
         ...props,
+        mount: RIGHT,
         attachedPipette: { left: null, right: mockPipette },
         flowType: FLOWS.ATTACH,
         selectedPipette: NINETY_SIX_CHANNEL,

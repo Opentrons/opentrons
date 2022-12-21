@@ -371,7 +371,18 @@ describe('PipetteWizardFlows', () => {
     // TODO wait until commands are wired up to write out more of this test!
   })
   it('renders the correct information, calling the correct commands for the detach flow 96 channel', async () => {
-    mockGetAttachedPipettes.mockReturnValue({ left: mockPipette, right: null })
+    mockGetAttachedPipettes.mockReturnValue({
+      left: {
+        id: 'abc',
+        name: 'p1000_96',
+        model: 'p1000_96_v1.0',
+        tip_length: 42,
+        mount_axis: 'c',
+        plunger_axis: 'd',
+        modelSpecs: mockGen3P1000PipetteSpecs,
+      },
+      right: null,
+    })
     props = {
       ...props,
       flowType: FLOWS.DETACH,
