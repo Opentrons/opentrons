@@ -11,25 +11,6 @@
     "model": "OT-2 Standard",
     "deckId": "ot2_standard"
   },
-  "pipettes": {
-    "pipetteId": {
-      "name": "p10_single"
-    }
-  },
-  "labware": {
-    "fixedTrash": {
-      "displayName": "Trash",
-      "definitionId": "opentrons/opentrons_1_trash_1100ml_fixed/1"
-    },
-    "tipRackId": {
-      "displayName": "Opentrons 96 Tip Rack 10 µL",
-      "definitionId": "opentrons/opentrons_96_tiprack_10ul/1"
-    },
-    "wellPlateId": {
-      "displayName": "Super Duper Plate",
-      "definitionId": "opentrons/corning_6_wellplate_16.8ml_flat/1"
-    }
-  },
   "labwareDefinitions": {
     "opentrons/opentrons_1_trash_1100ml_fixed/1": {
       "ordering": [["A1"]],
@@ -1211,14 +1192,22 @@
         "labwareId": "fixedTrash",
         "location": {
           "slotName": "12"
-        }
+        },
+        "loadName": "opentrons_1_trash_1100ml_fixed",
+        "namespace": "opentrons",
+        "version": 1,
+        "displayName": "Trash"
       }
     },
     {
       "commandType": "loadLabware",
       "params": {
         "labwareId": "tipRackId",
-        "location": { "slotName": "1" }
+        "location": { "slotName": "1" },
+        "loadName": "opentrons_96_tiprack_1000ul",
+        "namespace": "opentrons",
+        "version": 1,
+        "displayName": "Opentrons 96 Tip Rack 10 µL"
       }
     },
     {
@@ -1227,13 +1216,18 @@
         "labwareId": "wellPlateId",
         "location": {
           "slotName": "2"
-        }
+        },
+        "loadName": "armadillo_96_wellplate_200ul_pcr_full_skirt",
+        "namespace": "opentrons",
+        "version": 1,
+        "displayName": "Super Duper Plate"
       }
     },
     {
       "commandType": "loadPipette",
       "params": {
         "pipetteId": "pipetteId",
+        "pipetteName": "p1000_96",
         "mount": "left"
       }
     },

@@ -1,19 +1,20 @@
 """Geometry state getters."""
 from dataclasses import dataclass
-from typing import Optional, List, Tuple, Union
+from typing import Optional, List, Set, Tuple, Union
 
 from opentrons.types import Point, DeckSlotName
 from opentrons.hardware_control.dev_types import PipetteDict
 
 from .. import errors
 from ..types import (
+    OFF_DECK_LOCATION,
     LoadedLabware,
+    LoadedModule,
     WellLocation,
     WellOrigin,
     WellOffset,
     DeckSlotLocation,
     ModuleLocation,
-    OFF_DECK_LOCATION,
     LabwareLocation,
     LabwareOffsetVector,
 )
@@ -389,3 +390,24 @@ class GeometryView:
             )
             return [(slot_5_center.x, slot_5_center.y)]
         return []
+
+    # TODO(mc, 2022-12-09): enforce data integrity (e.g. one module per slot)
+    # rather than shunting this work to callers via `allowed_ids`.
+    # This has larger implications and is tied up in splitting LPC out of the protocol run
+    def get_slot_item(
+        self,
+        slot_name: DeckSlotName,
+        allowed_labware_ids: Set[str],
+        allowed_module_ids: Set[str],
+    ) -> Union[LoadedLabware, LoadedModule, None]:
+        """Get the item present in a deck slot, if any."""
+        maybe_labware = self._labware.get_by_slot(
+            slot_name=slot_name,
+            allowed_ids=allowed_labware_ids,
+        )
+        maybe_module = self._modules.get_by_slot(
+            slot_name=slot_name,
+            allowed_ids=allowed_module_ids,
+        )
+
+        return maybe_labware or maybe_module or None

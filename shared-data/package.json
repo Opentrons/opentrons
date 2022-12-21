@@ -1,6 +1,6 @@
 {
   "name": "@opentrons/shared-data",
-  "version": "6.1.0",
+  "version": "0.0.0-dev",
   "description": "Default labware definitions for Opentrons robots",
   "repository": {
     "type": "git",
@@ -14,7 +14,7 @@
   "dependencies": {
     "ajv": "6.10.2",
     "html-react-parser": "^1.2.8",
-    "lodash": "4.17.15",
+    "lodash": "4.17.21",
     "svgson": "^5.2.1"
   }
 }

@@ -9,7 +9,6 @@ from opentrons.broker import Broker
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support import instrument as mock_instrument_support
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import Clearances
 from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
     InstrumentContext,
@@ -200,11 +199,7 @@ def test_aspirate(
     mock_well = decoy.mock(cls=Well)
     bottom_location = Location(point=Point(1, 2, 3), labware=mock_well)
 
-    decoy.when(mock_instrument_core.get_well_bottom_clearance()).then_return(
-        Clearances(default_aspirate=1.2, default_dispense=3.4)
-    )
-
-    decoy.when(mock_well.bottom(z=1.2)).then_return(bottom_location)
+    decoy.when(mock_well.bottom(z=1.0)).then_return(bottom_location)
     decoy.when(mock_instrument_core.get_absolute_aspirate_flow_rate(1.23)).then_return(
         5.67
     )
@@ -521,12 +516,8 @@ def test_dispense_with_well_location(
     """It should dispense to a well."""
     mock_well = decoy.mock(cls=Well)
 
-    decoy.when(mock_well.bottom(2.0)).then_return(
+    decoy.when(mock_well.bottom(1.0)).then_return(
         Location(point=Point(1, 2, 3), labware=mock_well)
-    )
-
-    decoy.when(mock_instrument_core.get_well_bottom_clearance()).then_return(
-        Clearances(default_aspirate=3.0, default_dispense=2.0)
     )
 
     decoy.when(mock_instrument_core.get_absolute_dispense_flow_rate(1.0)).then_return(

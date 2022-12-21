@@ -17,8 +17,6 @@ import {
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 
 import { i18n } from '../../../../../i18n'
-import { useFeatureFlag } from '../../../../../redux/config'
-import { ModuleInfo } from '../../../../ProtocolSetup/RunSetupCard/ModuleSetup/ModuleInfo'
 import {
   mockThermocycler as mockThermocyclerFixture,
   mockMagneticModule as mockMagneticModuleFixture,
@@ -26,11 +24,10 @@ import {
 import {
   useModuleRenderInfoForProtocolById,
   useProtocolDetailsForRun,
-  useUnmatchedModulesForProtocol,
 } from '../../../hooks'
+import { ModuleInfo } from '../../../ModuleInfo'
 import { SetupModulesMap } from '../SetupModulesMap'
 
-jest.mock('../../../../../redux/config')
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
   return {
@@ -45,14 +42,11 @@ jest.mock('@opentrons/shared-data', () => {
     inferModuleOrientationFromXCoordinate: jest.fn(),
   }
 })
-jest.mock('../../../../ProtocolSetup/RunSetupCard/ModuleSetup/ModuleInfo')
+jest.mock('../../../ModuleInfo')
 jest.mock('../../../hooks')
 
 const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById as jest.MockedFunction<
   typeof useModuleRenderInfoForProtocolById
->
-const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jest.MockedFunction<
-  typeof useUnmatchedModulesForProtocol
 >
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
@@ -63,9 +57,6 @@ const mockInferModuleOrientationFromXCoordinate = inferModuleOrientationFromXCoo
 >
 const mockRobotWorkSpace = RobotWorkSpace as jest.MockedFunction<
   typeof RobotWorkSpace
->
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
 >
 const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
   (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
@@ -131,16 +122,9 @@ describe('SetupModulesMap', () => {
       robotName: MOCK_ROBOT_NAME,
       runId: MOCK_RUN_ID,
     }
-    when(mockUseUnmatchedModulesForProtocol)
-      .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
-      .mockReturnValue({
-        missingModuleIds: [],
-        remainingAttachedModules: [],
-      })
     when(mockUseProtocolDetailsForRun)
       .calledWith(MOCK_RUN_ID)
       .mockReturnValue({ protocolData: {} } as any)
-    when(mockUseFeatureFlag).mockReturnValue(false)
     when(mockInferModuleOrientationFromXCoordinate)
       .calledWith(expect.anything())
       .mockReturnValue(STUBBED_ORIENTATION_VALUE)

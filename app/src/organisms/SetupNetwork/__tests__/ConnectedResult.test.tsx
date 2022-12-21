@@ -68,10 +68,12 @@ describe('ConnectedResult', () => {
     const [{ getByRole }] = render(props)
     const changeNetworkButton = getByRole('button', { name: 'Change network' })
     fireEvent.click(changeNetworkButton)
-    expect(mockPush).toHaveBeenCalledWith('/connect-via-wifi')
+    expect(mockPush).toHaveBeenCalledWith('/network-setup/wifi')
     const doneButton = getByRole('button', { name: 'Done' })
     fireEvent.click(doneButton)
-    expect(mockPush).toHaveBeenCalledWith('/connected-network-info/mockWifi')
+    expect(mockPush).toHaveBeenCalledWith(
+      '/network-setup/wifi/connected-network-info/mockWifi'
+    )
   })
 
   it('should render a failure screen when the status is failed', () => {
@@ -79,7 +81,7 @@ describe('ConnectedResult', () => {
     props.requestState = failureState
     const [{ getByText, getByRole }] = render(props)
     getByText('Failed to connect to mockWifi')
-    getByRole('button', { name: 'Try again' })
+    getByRole('button', { name: 'try again' })
     getByRole('button', { name: 'Change network' })
   })
 
@@ -87,11 +89,11 @@ describe('ConnectedResult', () => {
     props.isConnected = false
     props.requestState = failureState
     const [{ getByRole }] = render(props)
-    const tryAgainButton = getByRole('button', { name: 'Try again' })
+    const tryAgainButton = getByRole('button', { name: 'try again' })
     fireEvent.click(tryAgainButton)
     expect(mockFunc).toHaveBeenCalled()
     const changeNetworkButton = getByRole('button', { name: 'Change network' })
     fireEvent.click(changeNetworkButton)
-    expect(mockPush).toHaveBeenCalledWith('/connect-via-wifi')
+    expect(mockPush).toHaveBeenCalledWith('/network-setup/wifi')
   })
 })

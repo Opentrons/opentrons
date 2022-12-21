@@ -292,6 +292,12 @@ class CurrentConfig:
         return self.hold_current, self.run_current
 
 
+@dataclass(frozen=True)
+class MotorStatus:
+    motor_ok: bool
+    encoder_ok: bool
+
+
 class DoorState(enum.Enum):
     OPEN = False
     CLOSED = True

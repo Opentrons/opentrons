@@ -123,7 +123,7 @@ export function ConnectRobotSlideout({
                   >
                     {t('discovery_timeout')}
                   </StyledText>
-                  {displayLinkButton(t('try_again'))}
+                  {displayLinkButton(t('shared:try_again'))}
                 </>
               ) : (
                 displayLinkButton(t('shared:refresh'))

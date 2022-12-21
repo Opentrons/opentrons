@@ -27,6 +27,7 @@ from .core.common import (
     ThermocyclerCore,
     HeaterShakerCore,
 )
+from .core.core_map import LoadedCoreMap
 
 from .module_validation_and_errors import (
     validate_heater_shaker_temperature,
@@ -54,12 +55,14 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
         self,
         core: ModuleCore,
         protocol_core: ProtocolCore,
+        core_map: LoadedCoreMap,
         api_version: APIVersion,
         broker: Broker,
     ) -> None:
         super().__init__(broker=broker)
         self._core = core
         self._protocol_core = protocol_core
+        self._core_map = core_map
         self._api_version = api_version
         self._labware: Optional[Labware] = None
 
@@ -133,6 +136,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
         )
 
         labware = self._core.add_labware_core(labware_core)
+        self._core_map.add(labware_core, labware)
 
         return labware
 
@@ -563,7 +567,8 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
         - ``open``: The lid is open.
         - ``unknown``: The lid position can't be determined.
         """
-        return self._core.get_lid_position()
+        status = self._core.get_lid_position()
+        return status.value if status is not None else None
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
@@ -577,7 +582,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
         - ``idle``: The block has not heated or cooled since the beginning of the protocol.
         - ``error``: The temperature status can't be determined.
         """
-        return self._core.get_block_temperature_status()
+        return self._core.get_block_temperature_status().value
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
@@ -592,7 +597,8 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
         - ``idle``: The lid has not heated since the beginning of the protocol.
         - ``error``: The temperature status can't be determined.
         """
-        return self._core.get_lid_temperature_status()
+        status = self._core.get_lid_temperature_status()
+        return status.value if status is not None else None
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)

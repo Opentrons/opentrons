@@ -7,7 +7,7 @@ from opentrons.config.advanced_settings import _migrate, _ensure
 
 @pytest.fixture
 def migrated_file_version() -> int:
-    return 18
+    return 19
 
 
 @pytest.fixture
@@ -22,7 +22,6 @@ def default_file_settings() -> Dict[str, Any]:
         "disableFastProtocolUpload": None,
         "enableOT3HardwareController": None,
         "enableProtocolEnginePAPICore": None,
-        "enableLoadLiquid": None,
     }
 
 
@@ -342,5 +341,4 @@ def test_ensures_config() -> None:
         "disableFastProtocolUpload": None,
         "enableOT3HardwareController": None,
         "enableProtocolEnginePAPICore": None,
-        "enableLoadLiquid": None,
     }

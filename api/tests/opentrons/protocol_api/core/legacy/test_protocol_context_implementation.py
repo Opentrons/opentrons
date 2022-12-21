@@ -17,16 +17,17 @@ from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.modules import AbstractModule
 from opentrons.hardware_control.modules.types import ModuleType, TemperatureModuleModel
 from opentrons.protocols import labware as mock_labware
-from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocol_api.core.labware import LabwareLoadParams
+
+from opentrons.protocol_api.core.protocol_api.deck import Deck
 from opentrons.protocol_api.core.protocol_api.load_info import (
     LoadInfo,
     LabwareLoadInfo,
     InstrumentLoadInfo,
     ModuleLoadInfo,
 )
-from opentrons.protocol_api.core.labware import LabwareLoadParams
 from opentrons.protocol_api.core.protocol_api.labware_offset_provider import (
     AbstractLabwareOffsetProvider,
     ProvidedLabwareOffset,
@@ -87,6 +88,8 @@ def mock_deck(decoy: Decoy) -> Deck:
     setattr(
         deck, "resolve_module_location", decoy.mock(name="Deck.resolve_module_location")
     )
+    deck["12"] = decoy.mock(cls=LabwareImplementation)
+
     return cast(Deck, deck)
 
 

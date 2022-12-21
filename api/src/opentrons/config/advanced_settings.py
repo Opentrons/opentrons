@@ -184,11 +184,6 @@ settings = [
             " Do not enable."
         ),
     ),
-    SettingDefinition(
-        _id="enableLoadLiquid",
-        title="Enable load liquid command and liquids translation",
-        description="Allow load liquid command and liquids translation.",
-    ),
 ]
 
 if ARCHITECTURE == SystemArchitecture.BUILDROOT:
@@ -495,6 +490,16 @@ def _migrate17to18(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate18to19(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 19 of the feature flags file.
+
+    - Removes deprecated enableLoadLiquid option
+    """
+    removals = ["enableLoadLiquid"]
+    newmap = {k: v for k, v in previous.items() if k not in removals}
+    return newmap
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -514,6 +519,7 @@ _MIGRATIONS = [
     _migrate15to16,
     _migrate16to17,
     _migrate17to18,
+    _migrate18to19,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

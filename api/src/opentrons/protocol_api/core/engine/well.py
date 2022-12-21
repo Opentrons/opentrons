@@ -3,6 +3,7 @@ from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
+from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.types import Point
 
@@ -42,11 +43,15 @@ class WellCore(AbstractWellCore):
 
     def has_tip(self) -> bool:
         """Whether the well contains a tip."""
-        raise NotImplementedError("WellCore.has_tip not implemented")
+        return self._engine_client.state.tips.has_clean_tip(
+            self._labware_id, self._name
+        )
 
     def set_has_tip(self, value: bool) -> None:
         """Set the well as containing or not containing a tip."""
-        raise NotImplementedError("WellCore.set_has_tip not implemented")
+        raise APIVersionError(
+            "Manually setting the tip state of a well in a tip rack has been deprecated."
+        )
 
     def get_display_name(self) -> str:
         """Get the well's full display name."""
