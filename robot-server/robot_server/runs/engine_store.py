@@ -126,6 +126,9 @@ class EngineStore:
             raise EngineConflictError("Another run is currently active.")
 
         if protocol is not None:
+            # FIXME(mm, 2022-12-21): This `await` introduces a concurrency hazard. If
+            # two requests simultaneously call this method, they will both "succeed"
+            # (with undefined results) instead of one raising EngineConflictError.
             await runner.load(protocol.source)
 
         for offset in labware_offsets:
