@@ -1,30 +1,20 @@
 """Tests for opentrons.protocol_reader.file_reader_writer.FileReaderWriter."""
-import io
 import pytest
-from dataclasses import dataclass
 from pathlib import Path
-from typing import IO
 
-from opentrons.protocol_reader.input_file import AbstractInputFile
 from opentrons.protocol_reader.file_reader_writer import (
     FileReaderWriter,
     FileReadError,
     BufferedFile,
 )
 
-
-@dataclass(frozen=True)
-class InputFile(AbstractInputFile):
-    """Concrete input file data model."""
-
-    filename: str
-    file: IO[bytes]
+from ._input_file import InputFile
 
 
 async def test_read_with_abstract_input_file() -> None:
     """It should read file-likes."""
-    file_1 = InputFile(filename="hello.txt", file=io.BytesIO(b"# hello"))
-    file_2 = InputFile(filename="world.txt", file=io.BytesIO(b"# world"))
+    file_1 = InputFile.make(filename="hello.txt", contents=b"# hello")
+    file_2 = InputFile.make(filename="world.txt", contents=b"# world")
 
     subject = FileReaderWriter()
     result = await subject.read([file_1, file_2])
@@ -54,7 +44,7 @@ async def test_read_with_path(tmp_path: Path) -> None:
 
 async def test_read_missing_filename() -> None:
     """It should error if a file has no filename."""
-    in_file = InputFile(filename="", file=io.BytesIO(b""))
+    in_file = InputFile.make(filename="", contents=b"")
 
     subject = FileReaderWriter()
 

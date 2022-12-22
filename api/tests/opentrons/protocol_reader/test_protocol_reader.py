@@ -2,11 +2,9 @@
 from __future__ import annotations
 
 import pytest
-import io
-from dataclasses import dataclass
 from decoy import Decoy, matchers
 from pathlib import Path
-from typing import IO, Optional
+from typing import Optional
 
 from opentrons.protocols.api_support.types import APIVersion
 
@@ -17,8 +15,6 @@ from opentrons.protocol_reader import (
     ProtocolFileRole,
     PythonProtocolConfig,
 )
-
-from opentrons.protocol_reader.input_file import AbstractInputFile
 from opentrons.protocol_reader.file_reader_writer import (
     FileReaderWriter,
     BufferedFile,
@@ -34,17 +30,7 @@ from opentrons.protocol_reader.file_identifier import (
 )
 from opentrons.protocol_reader.file_format_validator import FileFormatValidator
 
-
-@dataclass(frozen=True)
-class InputFile(AbstractInputFile):
-    """Concrete input file data model."""
-
-    filename: str
-    file: IO[bytes]
-
-    @classmethod
-    def make(cls, filename: str, contents: bytes) -> InputFile:
-        return cls(filename=filename, file=io.BytesIO(contents))
+from ._input_file import InputFile
 
 
 @pytest.fixture
