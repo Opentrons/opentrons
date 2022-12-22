@@ -23,10 +23,6 @@ from .protocol_source import (
 )
 
 
-class ProtocolFilesInvalidError(ValueError):
-    """An error raised if the input files cannot be read to a protocol."""
-
-
 class ProtocolReader:
     """Collaborator to turn a set of files into a protocol object."""
 

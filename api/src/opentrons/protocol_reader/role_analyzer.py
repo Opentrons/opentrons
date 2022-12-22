@@ -8,6 +8,7 @@ from .basic_info_extractor import (
     PythonProtocolFileInfo,
     LabwareDefinitionFileInfo,
 )
+from .protocol_files_invalid_error import ProtocolFilesInvalidError
 
 
 @dataclass(frozen=True)
@@ -24,10 +25,8 @@ class RoleAnalysis:
         return [self.main_file, *self.labware_files]
 
 
-# FIX BEFORE MERGE: Rename exception.
-class RoleAnalysisError(ValueError):
+class RoleAnalysisError(ProtocolFilesInvalidError):
     """Error raised if the input file list is invalid."""
-    pass
 
 
 class RoleAnalyzer:
