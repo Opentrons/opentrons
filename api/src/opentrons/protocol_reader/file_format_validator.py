@@ -8,26 +8,26 @@ from opentrons_shared_data.protocol.models import ProtocolSchemaV6 as JsonProtoc
 from opentrons.protocols.models import JsonProtocol as JsonProtocolUpToV5
 
 from .file_identifier import (
-    FileInfo,
-    JsonProtocolFileInfo,
-    PythonProtocolFileInfo,
-    LabwareDefinitionFileInfo,
+    IdentifiedFile,
+    IdentifiedJsonMain,
+    IdentifiedPythonMain,
+    IdentifiedLabwareDefinition,
 )
 
 
 class FileFormatValidator:
     @staticmethod
-    async def validate(files: Iterable[FileInfo]) -> None:
+    async def validate(files: Iterable[IdentifiedFile]) -> None:
         for file in files:
-            if isinstance(file, JsonProtocolFileInfo):
+            if isinstance(file, IdentifiedJsonMain):
                 await _validate_json_protocol(file)
-            elif isinstance(file, PythonProtocolFileInfo):
+            elif isinstance(file, IdentifiedPythonMain):
                 pass  # No more validation to do for Python protocols.
-            elif isinstance(file, LabwareDefinitionFileInfo):
+            elif isinstance(file, IdentifiedLabwareDefinition):
                 await _validate_labware_definition(file)
 
 
-async def _validate_labware_definition(info: LabwareDefinitionFileInfo) -> None:
+async def _validate_labware_definition(info: IdentifiedLabwareDefinition) -> None:
     def validate_sync() -> None:
         LabwareDefinition.parse_obj(info.unvalidated_json)
 
@@ -35,7 +35,7 @@ async def _validate_labware_definition(info: LabwareDefinitionFileInfo) -> None:
     # FIX BEFORE MERGE: Wrap exception?
 
 
-async def _validate_json_protocol(info: JsonProtocolFileInfo) -> None:
+async def _validate_json_protocol(info: IdentifiedJsonMain) -> None:
     def validate_v6_sync() -> None:
         JsonProtocolV6.parse_obj(info.unvalidated_json)
 

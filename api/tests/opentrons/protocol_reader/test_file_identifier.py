@@ -21,10 +21,10 @@ from opentrons.protocol_reader.role_analyzer import RoleAnalysis
 
 from opentrons.protocol_reader.file_identifier import (
     FileIdentifier,
-    FileInfo,
-    JsonProtocolFileInfo,
-    PythonProtocolFileInfo,
-    LabwareDefinitionFileInfo,
+    IdentifiedFile,
+    IdentifiedJsonMain,
+    IdentifiedPythonMain,
+    IdentifiedLabwareDefinition,
     ConfigAnalysisError,
 )
 
@@ -75,7 +75,7 @@ async def test_valid_python_protocol(spec: ValidPythonProtocolSpec) -> None:
     input_file = BufferedFile(
         name=spec.file_name, contents=spec.contents.encode("utf-8"), path=None
     )
-    expected_result = PythonProtocolFileInfo(
+    expected_result = IdentifiedPythonMain(
         original_file=input_file,
         api_level=spec.expected_api_level,
         metadata=spec.expected_metadata,
@@ -175,7 +175,7 @@ class ValidJsonProtocolSpec:
 )
 async def test_valid_json_protocol(spec: ValidJsonProtocolSpec) -> None:
     input_file = BufferedFile(name=spec.file_name, contents=spec.contents, path=None)
-    expected_result = JsonProtocolFileInfo(
+    expected_result = IdentifiedJsonMain(
         original_file=input_file,
         schema_version=spec.expected_schema_version,
         metadata=spec.expected_metadata,
@@ -211,7 +211,7 @@ class ValidLabwareDefinitionSpec:
 )
 async def test_valid_labware_definition(spec: ValidLabwareDefinitionSpec) -> None:
     input_file = BufferedFile(name=spec.file_name, contents=spec.contents, path=None)
-    expected_result = LabwareDefinitionFileInfo(
+    expected_result = IdentifiedLabwareDefinition(
         original_file=input_file, unvalidated_json=json.loads(spec.contents)
     )
     subject = FileIdentifier()

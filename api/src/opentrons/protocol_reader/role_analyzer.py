@@ -3,10 +3,10 @@ from dataclasses import dataclass
 from typing import List, Sequence, Union
 
 from .file_identifier import (
-    FileInfo,
-    JsonProtocolFileInfo,
-    PythonProtocolFileInfo,
-    LabwareDefinitionFileInfo,
+    IdentifiedFile,
+    IdentifiedJsonMain,
+    IdentifiedPythonMain,
+    IdentifiedLabwareDefinition,
 )
 from .protocol_files_invalid_error import ProtocolFilesInvalidError
 
@@ -15,12 +15,12 @@ from .protocol_files_invalid_error import ProtocolFilesInvalidError
 class RoleAnalysis:
     """Role analysis results."""
 
-    main_file: Union[JsonProtocolFileInfo, PythonProtocolFileInfo]
-    labware_files: List[LabwareDefinitionFileInfo]
+    main_file: Union[IdentifiedJsonMain, IdentifiedPythonMain]
+    labware_files: List[IdentifiedLabwareDefinition]
     # todo(mm, 2022-12-19): Add data files like .txt and .csv.
 
     @property
-    def all_files(self) -> List[FileInfo]:
+    def all_files(self) -> List[IdentifiedFile]:
         """Return all contained files."""
         return [self.main_file, *self.labware_files]
 
@@ -33,7 +33,7 @@ class RoleAnalyzer:
     """Input file role analysis interface."""
 
     @staticmethod
-    def analyze(files: Sequence[FileInfo]) -> RoleAnalysis:
+    def analyze(files: Sequence[IdentifiedFile]) -> RoleAnalysis:
         """Analyze a set of input files to determine the role that each one fills.
 
         This validates that there is exactly one main protocol file.
@@ -45,11 +45,11 @@ class RoleAnalyzer:
         labware_files = []
 
         for f in files:
-            if isinstance(f, (JsonProtocolFileInfo, PythonProtocolFileInfo)):
+            if isinstance(f, (IdentifiedJsonMain, IdentifiedPythonMain)):
                 main_file_candidates.append(f)
             else:
                 # todo(mm, 2022-12-21): Support data files like .txt and .csv.
-                assert isinstance(f, LabwareDefinitionFileInfo)
+                assert isinstance(f, IdentifiedLabwareDefinition)
                 labware_files.append(f)
 
         if len(main_file_candidates) == 0:

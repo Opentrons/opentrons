@@ -33,9 +33,9 @@ from opentrons.protocol_reader.role_analyzer import (
 )
 from opentrons.protocol_reader.file_identifier import (
     FileIdentifier,
-    FileInfo,
-    PythonProtocolFileInfo,
-    LabwareDefinitionFileInfo,
+    IdentifiedFile,
+    IdentifiedPythonMain,
+    IdentifiedLabwareDefinition,
 )
 from opentrons.protocol_reader.file_format_validator import FileFormatValidator
 
@@ -122,12 +122,12 @@ async def test_read_and_save(
         path=None,
     )
 
-    main_file = PythonProtocolFileInfo(
+    main_file = IdentifiedPythonMain(
         original_file=buffered_main_file,
         api_level=APIVersion(123, 456),
         metadata={"hey": "there"},
     )
-    labware_file = LabwareDefinitionFileInfo(
+    labware_file = IdentifiedLabwareDefinition(
         original_file=buffered_labware_file,
         unvalidated_json={},
     )
@@ -207,12 +207,12 @@ async def test_read_saved(
         path=Path("/path/to/labware.json"),
     )
 
-    main_file = PythonProtocolFileInfo(
+    main_file = IdentifiedPythonMain(
         original_file=buffered_main_file,
         api_level=APIVersion(123, 456),
         metadata={"hey": "there"},
     )
-    labware_file = LabwareDefinitionFileInfo(
+    labware_file = IdentifiedLabwareDefinition(
         original_file=buffered_labware_file,
         unvalidated_json={},
     )

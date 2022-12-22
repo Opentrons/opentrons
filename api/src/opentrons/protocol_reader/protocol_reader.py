@@ -5,10 +5,10 @@ from typing import List, Optional, Sequence
 from .input_file import AbstractInputFile
 from .file_identifier import (
     FileIdentifier,
-    FileInfo,
-    JsonProtocolFileInfo,
-    PythonProtocolFileInfo,
-    LabwareDefinitionFileInfo,
+    IdentifiedFile,
+    IdentifiedJsonMain,
+    IdentifiedPythonMain,
+    IdentifiedLabwareDefinition,
 )
 from .role_analyzer import RoleAnalyzer, RoleAnalysis
 from .file_format_validator import FileFormatValidator
@@ -148,17 +148,17 @@ class ProtocolReader:
         )
 
     @staticmethod
-    def _map_file_role(file: FileInfo) -> ProtocolFileRole:
-        if isinstance(file, (JsonProtocolFileInfo, PythonProtocolFileInfo)):
+    def _map_file_role(file: IdentifiedFile) -> ProtocolFileRole:
+        if isinstance(file, (IdentifiedJsonMain, IdentifiedPythonMain)):
             return ProtocolFileRole.MAIN
-        elif isinstance(file, LabwareDefinitionFileInfo):
+        elif isinstance(file, IdentifiedLabwareDefinition):
             return ProtocolFileRole.LABWARE
 
     @staticmethod
     def _map_config(protocol_info: RoleAnalysis) -> ProtocolConfig:
-        if isinstance(protocol_info.main_file, JsonProtocolFileInfo):
+        if isinstance(protocol_info.main_file, IdentifiedJsonMain):
             return JsonProtocolConfig(
                 schema_version=protocol_info.main_file.schema_version
             )
-        elif isinstance(protocol_info.main_file, PythonProtocolFileInfo):
+        elif isinstance(protocol_info.main_file, IdentifiedPythonMain):
             return PythonProtocolConfig(api_version=protocol_info.main_file.api_level)

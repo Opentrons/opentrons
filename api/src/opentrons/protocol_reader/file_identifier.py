@@ -18,7 +18,7 @@ _JSONDict = Dict[str, Any]
 
 
 @dataclass(frozen=True)
-class JsonProtocolFileInfo:
+class IdentifiedJsonMain:
     original_file: BufferedFile
     unvalidated_json: _JSONDict
     schema_version: int
@@ -26,28 +26,28 @@ class JsonProtocolFileInfo:
 
 
 @dataclass(frozen=True)
-class PythonProtocolFileInfo:
+class IdentifiedPythonMain:
     original_file: BufferedFile
     api_level: APIVersion
     metadata: Metadata
 
 
 @dataclass(frozen=True)
-class LabwareDefinitionFileInfo:
+class IdentifiedLabwareDefinition:
     original_file: BufferedFile
     unvalidated_json: _JSONDict
 
 
-FileInfo = Union[
-    JsonProtocolFileInfo,
-    PythonProtocolFileInfo,
-    LabwareDefinitionFileInfo,
+IdentifiedFile = Union[
+    IdentifiedJsonMain,
+    IdentifiedPythonMain,
+    IdentifiedLabwareDefinition,
 ]
 
 
 class FileIdentifier:
     @staticmethod
-    async def identify(files: List[BufferedFile]) -> List[FileInfo]:
+    async def identify(files: List[BufferedFile]) -> List[IdentifiedFile]:
         return [await _identify(file) for file in files]
 
 
@@ -56,7 +56,7 @@ class ConfigAnalysisError(ProtocolFilesInvalidError):
     pass
 
 
-async def _identify(file: BufferedFile) -> FileInfo:
+async def _identify(file: BufferedFile) -> IdentifiedFile:
     if file.name.lower().endswith(".json"):
         return await _analyze_json(json_file=file)
     elif file.name.lower().endswith(".py"):
@@ -68,7 +68,7 @@ async def _identify(file: BufferedFile) -> FileInfo:
 
 async def _analyze_json(
     json_file: BufferedFile,
-) -> Union[JsonProtocolFileInfo, LabwareDefinitionFileInfo]:
+) -> Union[IdentifiedJsonMain, IdentifiedLabwareDefinition]:
     try:
         json_contents = await anyio.to_thread.run_sync(json.loads, json_file.contents)
     except json.JSONDecodeError as e:
@@ -78,7 +78,7 @@ async def _analyze_json(
         ) from e
 
     if _json_seems_like_labware(json_contents):
-        return LabwareDefinitionFileInfo(
+        return IdentifiedLabwareDefinition(
             original_file=json_file,
             unvalidated_json=json_contents,
         )
@@ -108,7 +108,7 @@ def _json_seems_like_protocol(json: _JSONDict) -> bool:
 
 def _analyze_json_protocol(
     original_file: BufferedFile, json_contents: _JSONDict
-) -> JsonProtocolFileInfo:
+) -> IdentifiedJsonMain:
     try:
         metadata = json_contents["metadata"]
         schema_version = json_contents["schemaVersion"]
@@ -125,7 +125,7 @@ def _analyze_json_protocol(
         # FIX BEFORE MERGE: Exception type and message.
         raise ConfigAnalysisError
 
-    return JsonProtocolFileInfo(
+    return IdentifiedJsonMain(
         original_file=original_file,
         unvalidated_json=json_contents,
         schema_version=schema_version,
@@ -136,7 +136,7 @@ def _analyze_json_protocol(
 # todo(mm, 2021-09-13): Deduplicate with opentrons.protocols.parse.
 def _analyze_python_protocol(
     py_file: BufferedFile,
-) -> PythonProtocolFileInfo:  # noqa: C901
+) -> IdentifiedPythonMain:  # noqa: C901
     try:
         # todo(mm, 2021-09-13): Investigate whether it's really appropriate to leave
         # the Python compilation flags at their defaults. For example, we probably
@@ -184,7 +184,7 @@ def _analyze_python_protocol(
             f"version or update your robot."
         )
 
-    return PythonProtocolFileInfo(
+    return IdentifiedPythonMain(
         original_file=py_file,
         metadata=metadata,
         api_level=api_version,

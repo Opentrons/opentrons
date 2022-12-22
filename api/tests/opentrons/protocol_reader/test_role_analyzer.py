@@ -6,10 +6,10 @@ from opentrons.protocols.api_support.types import APIVersion
 
 from opentrons.protocol_reader.file_reader_writer import BufferedFile
 from opentrons.protocol_reader.file_identifier import (
-    FileInfo,
-    JsonProtocolFileInfo,
-    PythonProtocolFileInfo,
-    LabwareDefinitionFileInfo,
+    IdentifiedFile,
+    IdentifiedJsonMain,
+    IdentifiedPythonMain,
+    IdentifiedLabwareDefinition,
 )
 from opentrons.protocol_reader.role_analyzer import (
     RoleAnalyzer,
@@ -18,18 +18,18 @@ from opentrons.protocol_reader.role_analyzer import (
 )
 
 
-def dummy_python_protocol_file(file_name: str) -> PythonProtocolFileInfo:
-    """Return a PythonProtocolFileInfo with trivial placeholder data."""
-    return PythonProtocolFileInfo(
+def dummy_python_protocol_file(file_name: str) -> IdentifiedPythonMain:
+    """Return a IdentifiedPythonMain with trivial placeholder data."""
+    return IdentifiedPythonMain(
         original_file=BufferedFile(name=file_name, path=None, contents=b""),
         api_level=APIVersion(9001, 9001),
         metadata={},
     )
 
 
-def dummy_json_protocol_file(file_name: str) -> JsonProtocolFileInfo:
-    """Return a JsonProtocolFileInfo with trivial placeholder data."""
-    return JsonProtocolFileInfo(
+def dummy_json_protocol_file(file_name: str) -> IdentifiedJsonMain:
+    """Return a IdentifiedJsonMain with trivial placeholder data."""
+    return IdentifiedJsonMain(
         original_file=BufferedFile(
             name=file_name,
             contents=b"",
@@ -41,9 +41,9 @@ def dummy_json_protocol_file(file_name: str) -> JsonProtocolFileInfo:
     )
 
 
-def dummy_labware_definition_file(file_name: str) -> LabwareDefinitionFileInfo:
-    """Return a LabwareDefinitionFileInfo with trivial placeholder data."""
-    return LabwareDefinitionFileInfo(
+def dummy_labware_definition_file(file_name: str) -> IdentifiedLabwareDefinition:
+    """Return a IdentifiedLabwareDefinition with trivial placeholder data."""
+    return IdentifiedLabwareDefinition(
         original_file=BufferedFile(
             name=file_name,
             contents=b"",
@@ -72,7 +72,7 @@ def test_role_analysis_all_files() -> None:
     ],
 )
 def test_single_main_file(
-    main_file: Union[JsonProtocolFileInfo, PythonProtocolFileInfo]
+    main_file: Union[IdentifiedJsonMain, IdentifiedPythonMain]
 ) -> None:
     """It should analyze a file list containing only a single main file."""
     subject = RoleAnalyzer()
@@ -91,10 +91,10 @@ def test_single_main_file(
     ],
 )
 def test_single_main_file_and_labware(
-    main_file: Union[JsonProtocolFileInfo, PythonProtocolFileInfo]
+    main_file: Union[IdentifiedJsonMain, IdentifiedPythonMain]
 ) -> None:
     """It should analyze a file list containing a single main file, plus labware."""
-    labware_file_1 = LabwareDefinitionFileInfo(
+    labware_file_1 = IdentifiedLabwareDefinition(
         original_file=BufferedFile(
             name="labware_1",
             contents=b"",
@@ -102,7 +102,7 @@ def test_single_main_file_and_labware(
         ),
         unvalidated_json={},
     )
-    labware_file_2 = LabwareDefinitionFileInfo(
+    labware_file_2 = IdentifiedLabwareDefinition(
         original_file=BufferedFile(
             name="labware_2",
             contents=b"",
@@ -147,7 +147,7 @@ def test_error_if_no_files() -> None:
     ],
 )
 def test_error_if_multiple_main_files(
-    main_file_1: FileInfo, main_file_2: FileInfo
+    main_file_1: IdentifiedFile, main_file_2: IdentifiedFile
 ) -> None:
     """It should raise if multiple main files are provided."""
     subject = RoleAnalyzer()
@@ -175,7 +175,7 @@ def test_error_if_multiple_main_files(
     ],
 )
 def test_error_if_files_but_no_main(
-    labware_files: List[FileInfo], expected_message: str
+    labware_files: List[IdentifiedFile], expected_message: str
 ) -> None:
     """It should raise if no main files are provided, but other files are."""
     subject = RoleAnalyzer()
