@@ -30,32 +30,12 @@ class FileReadError(Exception):
 class FileReaderWriter:
     """Input file reader/writer interface."""
 
-    @classmethod
+    @staticmethod
     async def read(
-        cls, files: Sequence[Union[AbstractInputFile, Path]]
+        files: Sequence[Union[AbstractInputFile, Path]]
     ) -> List[BufferedFile]:
         """Read a set of input files into memory."""
-        return [await cls._read_file(input_file=file) for file in files]
-
-    @staticmethod
-    async def _read_file(input_file: Union[AbstractInputFile, Path]) -> BufferedFile:
-        if isinstance(input_file, Path):
-            path: Optional[Path] = input_file
-            filename = input_file.name
-            contents = await AsyncPath(input_file).read_bytes()
-        elif not input_file.filename:
-            raise FileReadError("File was missing a name")
-        else:
-            path = None
-            filename = input_file.filename
-            async with wrap_file(input_file.file) as f:
-                contents = await f.read()
-
-        return BufferedFile(
-            name=filename,
-            contents=contents,
-            path=path,
-        )
+        return [await _read_file(input_file=file) for file in files]
 
     @staticmethod
     async def write(directory: Path, files: Sequence[BufferedFile]) -> None:
@@ -66,3 +46,23 @@ class FileReaderWriter:
             for f in files:
                 path = AsyncPath(directory / f.name)
                 tg.start_soon(path.write_bytes, f.contents)
+
+
+async def _read_file(input_file: Union[AbstractInputFile, Path]) -> BufferedFile:
+    if isinstance(input_file, Path):
+        path: Optional[Path] = input_file
+        filename = input_file.name
+        contents = await AsyncPath(input_file).read_bytes()
+    elif not input_file.filename:
+        raise FileReadError("File was missing a name")
+    else:
+        path = None
+        filename = input_file.filename
+        async with wrap_file(input_file.file) as f:
+            contents = await f.read()
+
+    return BufferedFile(
+        name=filename,
+        contents=contents,
+        path=path,
+    )
