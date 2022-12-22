@@ -36,6 +36,7 @@ async def _parser_motor_position_response(
         async for response, arb_id in reader:
             assert isinstance(response, MotorPositionResponse)
             node = NodeId(arb_id.parts.originating_node_id)
+            seen.add(node)
             data.update(
                 {
                     node: (
