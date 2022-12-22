@@ -113,6 +113,27 @@ class SensorDriver(AbstractSensorDriver):
         write = WriteSensorInformation(sensor.sensor, data)
         await self._scheduler.send_write(write, can_messenger)
 
+    async def send_stop_threshold(
+        self,
+        can_messenger: CanMessenger,
+        sensor: ThresholdSensorType,
+        timeout: int = 1,
+    ) -> Optional[SensorReturnType]:
+        """Send threshold for stopping a move."""
+
+        write = SensorThresholdInformation(
+            sensor.sensor,
+            SensorDataType.build(sensor.stop_threshold, sensor.sensor.sensor_type),
+            SensorThresholdMode.absolute,
+        )
+        threshold_data = await self._scheduler.send_threshold(
+            write, can_messenger, timeout
+        )
+        if not threshold_data:
+            return threshold_data
+        sensor.stop_threshold = threshold_data.to_float()
+        return threshold_data
+
     async def send_zero_threshold(
         self,
         can_messenger: CanMessenger,

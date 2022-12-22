@@ -29,6 +29,7 @@ from opentrons.config.types import (
     OT3Config,
     GantryLoad,
     CapacitivePassSettings,
+    LiquidProbeSettings,
 )
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons_hardware.hardware_control.motion_planning import (
@@ -929,14 +930,13 @@ class OT3API(
             self._transforms.deck_calibration.attitude,
             self._transforms.carriage_offset,
         )
-        bounds = self._backend.axis_bounds
+        bounds = self._backend.phony_bounds
         to_check = {
             ax: machine_pos[ax]
             for ax in target_position.keys()
             if ax in OT3Axis.gantry_axes()
         }
         check_motion_bounds(to_check, target_position, bounds, check_bounds)
-
         # TODO: (2022-02-10) Use actual max speed for MoveTarget
         checked_speed = speed or 400
         self._move_manager.update_constraints(
@@ -1660,6 +1660,34 @@ class OT3API(
 
     def remove_gripper_probe(self) -> None:
         self._gripper_handler.remove_probe()
+
+    async def liquid_probe(
+        self,
+        mount: OT3Mount,
+        slot_num: int,
+        threshold_pascals: float = 1114112,
+        probe_settings: Optional[LiquidProbeSettings] = None,
+    ) -> None:
+        """Find liquid."""
+        if not probe_settings:
+            probe_settings = self.config.liquid_sense
+        slot_center = self._backend.get_slot_center_pos(slot_num)
+
+        starting_target_pos = top_types.Point(
+            x=slot_center[OT3Axis.X],
+            y=slot_center[OT3Axis.Y],
+            z=probe_settings.starting_mount_height,
+        )
+        # move to center of slot, slightly above labware
+        await self.move_to(mount=mount, abs_position=starting_target_pos)
+        await self._backend.liquid_probe(
+            mount,
+            probe_settings.pipette_distance,
+            probe_settings.pipette_speed,
+            probe_settings.mount_distance,
+            probe_settings.mount_speed,
+            threshold_pascals,
+        )
 
     async def capacitive_probe(
         self,

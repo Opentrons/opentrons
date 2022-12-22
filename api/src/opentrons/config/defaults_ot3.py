@@ -12,11 +12,20 @@ from .types import (
     Offset,
     OT3CalibrationSettings,
     CapacitivePassSettings,
+    LiquidProbeSettings,
     ZSenseSettings,
     EdgeSenseSettings,
 )
 
 DEFAULT_PIPETTE_OFFSET = [0.0, 0.0, 0.0]
+
+DEFAULT_LIQUID_PROBE_SETTINGS: Final[LiquidProbeSettings] = LiquidProbeSettings(
+    starting_mount_height=80,
+    pipette_distance=100,
+    mount_distance=50,
+    mount_speed=10,
+    pipette_speed=10,
+)
 
 DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSettings(
     z_offset=ZSenseSettings(
@@ -332,6 +341,20 @@ def _build_default_cap_pass(
     )
 
 
+def _build_default_liquid_probe(
+    from_conf: Any, default: LiquidProbeSettings
+) -> LiquidProbeSettings:
+    return LiquidProbeSettings(
+        starting_mount_height=from_conf.get(
+            "starting_mount_height", default.starting_mount_height
+        ),
+        pipette_distance=from_conf.get("pipette_distance", default.pipette_distance),
+        mount_distance=from_conf.get("mount_distance", default.mount_distance),
+        mount_speed=from_conf.get("mount_speed", default.mount_speed),
+        pipette_speed=from_conf.get("pipette_speed", default.pipette_speed),
+    )
+
+
 def _build_default_z_pass(from_conf: Any, default: ZSenseSettings) -> ZSenseSettings:
     return ZSenseSettings(
         point=from_conf.get("point", default.point),
@@ -437,6 +460,9 @@ def build_with_defaults(robot_settings: Dict[str, Any]) -> OT3Config:
         ),
         calibration=_build_default_calibration(
             robot_settings.get("calibration", {}), DEFAULT_CALIBRATION_SETTINGS
+        ),
+        liquid_sense=_build_default_liquid_probe(
+            robot_settings.get("liquid_sense", {}), DEFAULT_LIQUID_PROBE_SETTINGS
         ),
     )
 
