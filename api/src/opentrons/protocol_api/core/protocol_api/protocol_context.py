@@ -15,7 +15,7 @@ from opentrons.protocols.api_support.util import AxisMaxSpeeds, UnsupportedAPIEr
 from opentrons.protocols.geometry import module_geometry
 from opentrons.protocols import labware as labware_definition
 
-from ...labware import Labware, Well
+from ...labware import Labware
 from ..protocol import AbstractProtocol, LoadedLiquid
 from ..labware import LabwareLoadParams
 
@@ -24,6 +24,7 @@ from .deck import Deck
 from .instrument_context import InstrumentContextImplementation
 from .labware_offset_provider import AbstractLabwareOffsetProvider
 from .labware import LabwareImplementation
+from .well import WellImplementation
 from .load_info import LoadInfo, InstrumentLoadInfo, LabwareLoadInfo, ModuleLoadInfo
 
 logger = logging.getLogger(__name__)
@@ -431,7 +432,7 @@ class ProtocolContextImplementation(
         self,
         labware_core: LabwareImplementation,
         liquid: LoadedLiquid,
-        volume_by_well: Dict[Well, float],
+        volume_by_well: Dict[WellImplementation, float],
     ) -> None:
         """Load liquid into a labware."""
         raise UnsupportedAPIError(

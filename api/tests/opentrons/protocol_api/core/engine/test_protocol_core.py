@@ -45,6 +45,7 @@ from opentrons.protocol_api.core.engine import (
     InstrumentCore,
     LabwareCore,
     ModuleCore,
+    WellCore,
 )
 from opentrons.protocol_api.core.protocol import LoadedLiquid
 from opentrons.protocol_api.core.engine.exceptions import InvalidModuleLocationError
@@ -54,7 +55,7 @@ from opentrons.protocol_api.core.engine.module_core import (
     ThermocyclerModuleCore,
     HeaterShakerModuleCore,
 )
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION, Well
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion
 
 
@@ -692,14 +693,14 @@ def test_load_liquid(
 ) -> None:
     """It should load a liquid into a labware."""
     mock_labware = decoy.mock(cls=LabwareCore)
-    mock_well = decoy.mock(cls=Well)
+    mock_well = decoy.mock(cls=WellCore)
     mock_liquid = decoy.mock(cls=LoadedLiquid)
 
     decoy.when(mock_labware.labware_id).then_return("labware-id")
 
     decoy.when(mock_liquid.id).then_return("liquid-id")
 
-    decoy.when(mock_well.well_name).then_return("A1")
+    decoy.when(mock_well.get_name()).then_return("A1")
 
     subject.load_liquid(
         labware_core=mock_labware, liquid=mock_liquid, volume_by_well={mock_well: 20}

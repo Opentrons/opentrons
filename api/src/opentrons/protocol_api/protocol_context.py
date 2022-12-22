@@ -27,7 +27,6 @@ from .core.module import (
     AbstractThermocyclerCore,
     AbstractHeaterShakerCore,
 )
-from .core.well import WellCoreType
 from .core.protocol import LoadedLiquid
 from .core.engine.protocol import ProtocolCore as ProtocolEngineCore
 
@@ -770,7 +769,7 @@ class ProtocolContext(CommandPublisher):
         :param liquid: The loaded liquid to load into a well.
         :param volume_by_well: A key value per representing the well and the volume of liquid to load into.
         """
-        volume_by_well_core: Dict[WellCoreType, float] = {}
+        volume_by_well_core = {}
         for well, volume in volume_by_well.items():
             volume_by_well_core[well._impl] = volume
 
