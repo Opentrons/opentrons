@@ -84,7 +84,7 @@ Like specifying labware that will be placed directly on the deck of the OT-2, yo
     def run(protocol: protocol_api.ProtocolContext):
         temp_mod = protocol.load_module("temperature module gen2", 1)
         temp_labware = temp_mod.load_labware(
-            load_name="opentrons_24_aluminumblock_generic_2ml_screwcap",
+            "opentrons_24_aluminumblock_generic_2ml_screwcap",
             label="Temperature-Controlled Tubes",
         )
 
