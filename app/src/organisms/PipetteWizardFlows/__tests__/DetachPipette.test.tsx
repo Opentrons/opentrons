@@ -47,7 +47,7 @@ describe('DetachPipette', () => {
       proceed: jest.fn(),
       chainRunCommands: jest.fn(),
       runId: RUN_ID_1,
-      attachedPipette: { left: mockPipette, right: null },
+      attachedPipettes: { left: mockPipette, right: null },
       flowType: FLOWS.CALIBRATE,
       errorMessage: null,
       setShowErrorMessage: jest.fn(),
@@ -81,7 +81,20 @@ describe('DetachPipette', () => {
   it('returns the correct information, buttons work as expected for 96 channel pipettes', () => {
     props = {
       ...props,
+      flowType: FLOWS.ATTACH,
       selectedPipette: NINETY_SIX_CHANNEL,
+      attachedPipettes: {
+        left: {
+          id: 'abc',
+          name: 'p1000_96',
+          model: 'p1000_96_v1.0',
+          tip_length: 42,
+          mount_axis: 'c',
+          plunger_axis: 'd',
+          modelSpecs: mockGen3P1000PipetteSpecs,
+        },
+        right: null,
+      },
     }
     const { getByText, getByAltText, getByLabelText } = render(props)
     getByText('Unscrew and Remove 96 Channel Pipette')
@@ -107,5 +120,21 @@ describe('DetachPipette', () => {
     getAllByTestId('Skeleton')
     const backBtn = getByLabelText('back')
     expect(backBtn).toBeDisabled()
+  })
+  it('returns the correct information, buttons work as expected for 96 channel pipette flow when single mount is attached', () => {
+    props = {
+      ...props,
+      flowType: FLOWS.ATTACH,
+      selectedPipette: NINETY_SIX_CHANNEL,
+    }
+    const { getByText, getByAltText, getByLabelText } = render(props)
+    getByText('Loosen Screws and Detach')
+    getByText(
+      'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette'
+    )
+    getByAltText('Detach pipette')
+    getByText('mock check pipette button')
+    getByLabelText('back').click()
+    expect(props.goBack).toHaveBeenCalled()
   })
 })

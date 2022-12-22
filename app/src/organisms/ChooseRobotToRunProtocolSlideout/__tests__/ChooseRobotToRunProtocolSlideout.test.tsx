@@ -1,22 +1,19 @@
-/**
- * This component test can be removed along with the
- * enableManualDeckStateMod feature flag. It's coverage will be
- * replaced by the ChooseRobotSlideout.text.tsx file
- */
-
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { StaticRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
-import { when } from 'jest-when'
+import { when, resetAllWhenMocks } from 'jest-when'
 
 import { i18n } from '../../../i18n'
 import {
   useProtocolDetailsForRun,
   useTrackCreateProtocolRunEvent,
-} from '../../Devices/hooks'
-import { useCloseCurrentRun, useCurrentRunId } from '../../ProtocolUpload/hooks'
-import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
+} from '../../../organisms/Devices/hooks'
+import {
+  useCloseCurrentRun,
+  useCurrentRunId,
+} from '../../../organisms/ProtocolUpload/hooks'
+import { useCurrentRunStatus } from '../../../organisms/RunTimeControl/hooks'
 import {
   getConnectableRobots,
   getReachableRobots,
@@ -33,9 +30,10 @@ import {
 import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
 import { useFeatureFlag } from '../../../redux/config'
 import { useCreateRunFromProtocol } from '../useCreateRunFromProtocol'
-import { ChooseRobotSlideout } from '..'
+import { useOffsetCandidatesForAnalysis } from '../../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
+import { ChooseRobotToRunProtocolSlideout } from '../'
 
-import type { ProtocolDetails } from '../../Devices/hooks'
+import type { ProtocolDetails } from '../../../organisms/Devices/hooks'
 import type { State } from '../../../redux/types'
 
 jest.mock('../../../organisms/Devices/hooks')
@@ -45,9 +43,13 @@ jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/buildroot')
 jest.mock('../../../redux/config')
 jest.mock('../useCreateRunFromProtocol')
+jest.mock('../../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis')
 
 const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
   typeof useFeatureFlag
+>
+const mockUseOffsetCandidatesForAnalysis = useOffsetCandidatesForAnalysis as jest.MockedFunction<
+  typeof useOffsetCandidatesForAnalysis
 >
 const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
   typeof getBuildrootUpdateDisplayInfo
@@ -87,10 +89,12 @@ const mockUseTrackCreateProtocolRunEvent = useTrackCreateProtocolRunEvent as jes
   typeof useTrackCreateProtocolRunEvent
 >
 
-const render = (props: React.ComponentProps<typeof ChooseRobotSlideout>) => {
+const render = (
+  props: React.ComponentProps<typeof ChooseRobotToRunProtocolSlideout>
+) => {
   return renderWithProviders(
     <StaticRouter>
-      <ChooseRobotSlideout {...props} />
+      <ChooseRobotToRunProtocolSlideout {...props} />
     </StaticRouter>,
     {
       i18nInstance: i18n,
@@ -103,7 +107,7 @@ let mockResetCreateRun: jest.Mock
 let mockCreateRunFromProtocolSource: jest.Mock
 let mockTrackCreateProtocolRunEvent: jest.Mock
 
-describe('ChooseRobotSlideout', () => {
+describe('ChooseRobotToRunProtocolSlideout', () => {
   beforeEach(() => {
     mockCloseCurrentRun = jest.fn()
     mockResetCreateRun = jest.fn()
@@ -130,19 +134,41 @@ describe('ChooseRobotSlideout', () => {
     mockUseProtocolDetailsForRun.mockReturnValue({
       displayName: 'A Protocol for Otie',
     } as ProtocolDetails)
-    mockUseCreateRunFromProtocol.mockReturnValue({
-      createRunFromProtocolSource: mockCreateRunFromProtocolSource,
-      reset: mockResetCreateRun,
-    } as any)
+    when(mockUseCreateRunFromProtocol)
+      .calledWith(
+        expect.any(Object),
+        { hostname: expect.any(String) },
+        expect.any(Array)
+      )
+      .mockReturnValue({
+        createRunFromProtocolSource: mockCreateRunFromProtocolSource,
+        reset: mockResetCreateRun,
+      } as any)
+    when(mockUseCreateRunFromProtocol)
+      .calledWith(expect.any(Object), null, expect.any(Array))
+      .mockReturnValue({
+        createRunFromProtocolSource: mockCreateRunFromProtocolSource,
+        reset: mockResetCreateRun,
+      } as any)
     mockUseTrackCreateProtocolRunEvent.mockReturnValue({
       trackCreateProtocolRunEvent: mockTrackCreateProtocolRunEvent,
     })
     when(mockUseFeatureFlag)
       .calledWith('enableManualDeckStateModification')
-      .mockReturnValue(false)
+      .mockReturnValue(true)
+    when(mockUseOffsetCandidatesForAnalysis)
+      .calledWith(storedProtocolDataFixture.mostRecentAnalysis, null)
+      .mockReturnValue([])
+    when(mockUseOffsetCandidatesForAnalysis)
+      .calledWith(
+        storedProtocolDataFixture.mostRecentAnalysis,
+        expect.any(String)
+      )
+      .mockReturnValue([])
   })
   afterEach(() => {
     jest.resetAllMocks()
+    resetAllWhenMocks()
   })
 
   it('renders slideout if showSlideout true', () => {
@@ -171,7 +197,7 @@ describe('ChooseRobotSlideout', () => {
     })
     expect(queryByText('opentrons-robot-name')).toBeInTheDocument()
     expect(
-      queryByText('2 unavailable robots are not listed')
+      queryByText('2 unavailable robots are not listed.')
     ).toBeInTheDocument()
   })
   it('if scanning, show robots, but do not show link to other devices', () => {
@@ -183,7 +209,7 @@ describe('ChooseRobotSlideout', () => {
     })
     expect(queryByText('opentrons-robot-name')).toBeInTheDocument()
     expect(
-      queryByText('2 unavailable robots are not listed')
+      queryByText('2 unavailable robots are not listed.')
     ).not.toBeInTheDocument()
   })
   it('if not scanning, show refresh button, start discovery if clicked', () => {
@@ -293,5 +319,98 @@ describe('ChooseRobotSlideout', () => {
     const link = getByRole('link', { name: 'Go to Robot' })
     fireEvent.click(link)
     expect(link.getAttribute('href')).toEqual('/devices/opentrons-robot-name')
+  })
+
+  it('renders apply historic offsets as determinate if candidates available', () => {
+    const mockOffsetCandidate = {
+      id: 'third_offset_id',
+      labwareDisplayName: 'Third Fake Labware Display Name',
+      location: { slotName: '3' },
+      vector: { x: 7, y: 8, z: 9 },
+      definitionUri: 'thirdFakeDefURI',
+      createdAt: '2022-05-11T13:34:51.012179+00:00',
+      runCreatedAt: '2022-05-11T13:33:51.012179+00:00',
+    }
+    when(mockUseOffsetCandidatesForAnalysis)
+      .calledWith(storedProtocolDataFixture.mostRecentAnalysis, '127.0.0.1')
+      .mockReturnValue([mockOffsetCandidate])
+    mockGetConnectableRobots.mockReturnValue([
+      mockConnectableRobot,
+      { ...mockConnectableRobot, name: 'otherRobot', ip: 'otherIp' },
+    ])
+    const [{ getByRole }] = render({
+      storedProtocolData: storedProtocolDataFixture,
+      onCloseClick: jest.fn(),
+      showSlideout: true,
+    })
+    expect(mockUseCreateRunFromProtocol).toHaveBeenCalledWith(
+      expect.any(Object),
+      { hostname: '127.0.0.1' },
+      [
+        {
+          vector: mockOffsetCandidate.vector,
+          location: mockOffsetCandidate.location,
+          definitionUri: mockOffsetCandidate.definitionUri,
+        },
+      ]
+    )
+    expect(getByRole('checkbox')).toBeChecked()
+    const proceedButton = getByRole('button', { name: 'Proceed to setup' })
+    proceedButton.click()
+    expect(mockCreateRunFromProtocolSource).toHaveBeenCalledWith({
+      files: [expect.any(File)],
+      protocolKey: storedProtocolDataFixture.protocolKey,
+    })
+  })
+
+  it('renders apply historic offsets as indeterminate if no candidates available', () => {
+    const mockOffsetCandidate = {
+      id: 'third_offset_id',
+      labwareDisplayName: 'Third Fake Labware Display Name',
+      location: { slotName: '3' },
+      vector: { x: 7, y: 8, z: 9 },
+      definitionUri: 'thirdFakeDefURI',
+      createdAt: '2022-05-11T13:34:51.012179+00:00',
+      runCreatedAt: '2022-05-11T13:33:51.012179+00:00',
+    }
+    when(mockUseOffsetCandidatesForAnalysis)
+      .calledWith(storedProtocolDataFixture.mostRecentAnalysis, '127.0.0.1')
+      .mockReturnValue([mockOffsetCandidate])
+    when(mockUseOffsetCandidatesForAnalysis)
+      .calledWith(storedProtocolDataFixture.mostRecentAnalysis, 'otherIp')
+      .mockReturnValue([])
+    mockGetConnectableRobots.mockReturnValue([
+      mockConnectableRobot,
+      { ...mockConnectableRobot, name: 'otherRobot', ip: 'otherIp' },
+    ])
+    const [{ getByRole, getByText }] = render({
+      storedProtocolData: storedProtocolDataFixture,
+      onCloseClick: jest.fn(),
+      showSlideout: true,
+    })
+    const otherRobot = getByText('otherRobot')
+    otherRobot.click() // unselect default robot
+
+    expect(getByRole('checkbox')).toBeChecked()
+    const proceedButton = getByRole('button', { name: 'Proceed to setup' })
+    proceedButton.click()
+    expect(mockUseCreateRunFromProtocol).nthCalledWith(
+      2,
+      expect.any(Object),
+      { hostname: '127.0.0.1' },
+      [
+        {
+          vector: mockOffsetCandidate.vector,
+          location: mockOffsetCandidate.location,
+          definitionUri: mockOffsetCandidate.definitionUri,
+        },
+      ]
+    )
+    expect(mockUseCreateRunFromProtocol).nthCalledWith(
+      3,
+      expect.any(Object),
+      { hostname: 'otherIp' },
+      []
+    )
   })
 })

@@ -9,9 +9,11 @@ import {
   BORDER_STYLE_SOLID,
   BORDERS,
   COLORS,
+  DIRECTION_COLUMN,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { StyledText } from '../text'
@@ -31,13 +33,14 @@ export type ToastType =
 
 export interface ToastProps extends StyleProps {
   id: string
-  message: string | JSX.Element
+  message: string
   type: ToastType
   icon?: IconProps
   closeButton?: boolean
   onClose?: () => void
   disableTimeout?: boolean
   duration?: number
+  heading?: string
 }
 
 const TOAST_ANIMATION_DURATION = 500
@@ -99,6 +102,7 @@ export function Toast(props: ToastProps): JSX.Element {
     onClose,
     disableTimeout = false,
     duration = 8000,
+    heading,
     ...styleProps
   } = props
 
@@ -109,7 +113,7 @@ export function Toast(props: ToastProps): JSX.Element {
   }
 
   return (
-    // maxWidth is based on default app size ratio
+    // maxWidth is based on default app size ratio, minWidth of 384px
     <Flex
       css={EXPANDED_STYLE}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -119,15 +123,16 @@ export function Toast(props: ToastProps): JSX.Element {
       borderWidth={SPACING.spacingXXS}
       border={BORDER_STYLE_SOLID}
       backgroundColor={toastStyleByType[type].backgroundColor}
-      padding={`${String(SPACING.spacing3)} ${String(
+      // adjust padding when heading is present and creates extra column
+      padding={`${heading != null ? SPACING.spacing2 : SPACING.spacing3} ${
         SPACING.spacing3
-      )} ${String(SPACING.spacing3)} 0.75rem`}
+      } ${heading != null ? SPACING.spacing2 : SPACING.spacing3} 0.75rem`}
       data-testid={`Toast_${type}`}
       maxWidth="88%"
-      minWidth="fit-content"
+      minWidth="24rem"
       {...styleProps}
     >
-      <Flex flexDirection={DIRECTION_ROW}>
+      <Flex flexDirection={DIRECTION_ROW} overflow="hidden" width="100%">
         <Icon
           name={icon?.name ?? toastStyleByType[type].iconName}
           color={toastStyleByType[type].color}
@@ -136,7 +141,20 @@ export function Toast(props: ToastProps): JSX.Element {
           spin={icon?.spin != null ? icon.spin : false}
           aria-label={`icon_${type}`}
         />
-        <StyledText as="p">{message}</StyledText>
+        <Flex flexDirection={DIRECTION_COLUMN} overflow="hidden" width="100%">
+          {heading != null ? (
+            <StyledText
+              as="p"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              overflow="hidden"
+              textOverflow="ellipsis"
+              whiteSpace="nowrap"
+            >
+              {heading}
+            </StyledText>
+          ) : null}
+          <StyledText as="p">{message}</StyledText>
+        </Flex>
       </Flex>
       {closeButton === true && (
         <Link onClick={onClose} role="button" height={SPACING.spacing5}>

@@ -30,16 +30,22 @@ export function createSnippet(
           loadedLabware.definitionUri
         ].parameters
         if (command.params.location === 'offDeck') {
-          loadStatement = `labware_${labwareCount} = protocol.load_labware("${loadName}", location="offDeck")`
+          loadStatement = `labware_${labwareCount} = protocol.load_labware("${String(
+            loadName
+          )}", location="offDeck")`
         } else if ('slotName' in command.params.location) {
           // load labware on deck
           const { slotName } = command.params.location
-          loadStatement = `labware_${labwareCount} = protocol.load_labware("${loadName}", location="${slotName}")`
+          loadStatement = `labware_${labwareCount} = protocol.load_labware("${String(
+            loadName
+          )}", location="${String(slotName)}")`
         } else if ('moduleId' in command.params.location) {
           // load labware on module
           const moduleVariable =
             moduleVariableById[command.params.location.moduleId]
-          loadStatement = `labware_${labwareCount} = ${moduleVariable}.load_labware("${loadName}")`
+          loadStatement = `labware_${labwareCount} = ${moduleVariable}.load_labware("${String(
+            loadName
+          )}")`
         }
         const labwareDefUri = getLabwareDefinitionUri(
           command.result.labwareId,
@@ -65,9 +71,9 @@ export function createSnippet(
           const { x, y, z } = labwareOffset.vector
           addendum = [
             loadStatement,
-            `labware_${labwareCount}.set_offset(x=${x.toFixed(
-              2
-            )}, y=${y.toFixed(2)}, z=${z.toFixed(2)})`,
+            `labware_${labwareCount}.set_offset(x=${String(
+              x.toFixed(2)
+            )}, y=${String(y.toFixed(2))}, z=${String(z.toFixed(2))})`,
             '',
           ]
         }
@@ -83,7 +89,9 @@ export function createSnippet(
         const { model } = protocol.modules[command.params.moduleId]
         const { slotName } = command.params.location
         addendum = [
-          `${moduleVariable} = protocol.load_module("${model}", location="${slotName}")`,
+          `${moduleVariable} = protocol.load_module("${String(
+            model
+          )}", location="${String(slotName)}")`,
           '',
         ]
       }
@@ -95,9 +103,9 @@ export function createSnippet(
 
   return loadCommandLines.reduce<string>((acc, line) => {
     if (mode === 'jupyter') {
-      return `${acc}\n${line}`
+      return `${String(acc)}\n${String(line)}`
     } else {
-      return `${acc}\n${PYTHON_INDENT}${line}`
+      return `${String(acc)}\n${PYTHON_INDENT}${String(line)}`
     }
   }, `${mode === 'jupyter' ? JUPYTER_PREFIX : CLI_PREFIX}`)
 }
