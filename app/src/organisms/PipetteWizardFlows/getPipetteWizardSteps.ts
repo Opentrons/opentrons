@@ -1,10 +1,5 @@
 import { FLOWS, SECTIONS } from './constants'
-import {
-  SINGLE_MOUNT_PIPETTES,
-  NINETY_SIX_CHANNEL,
-  LEFT,
-  RIGHT,
-} from '@opentrons/shared-data'
+import { SINGLE_MOUNT_PIPETTES, LEFT, RIGHT } from '@opentrons/shared-data'
 import type {
   PipetteWizardStep,
   PipetteWizardFlow,
@@ -20,21 +15,21 @@ export const getPipetteWizardSteps = (
   isGantryEmpty: boolean,
   attachedPipettes: AttachedPipettesByMount
 ): PipetteWizardStep[] => {
-  if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
-    switch (flowType) {
-      case FLOWS.CALIBRATE: {
-        return [
-          {
-            section: SECTIONS.BEFORE_BEGINNING,
-            mount: mount,
-            flowType: flowType,
-          },
-          { section: SECTIONS.ATTACH_PROBE, mount: mount, flowType: flowType },
-          { section: SECTIONS.DETACH_PROBE, mount: mount, flowType: flowType },
-          { section: SECTIONS.RESULTS, mount: mount, flowType: flowType },
-        ]
-      }
-      case FLOWS.ATTACH: {
+  switch (flowType) {
+    case FLOWS.CALIBRATE: {
+      return [
+        {
+          section: SECTIONS.BEFORE_BEGINNING,
+          mount: mount,
+          flowType: flowType,
+        },
+        { section: SECTIONS.ATTACH_PROBE, mount: mount, flowType: flowType },
+        { section: SECTIONS.DETACH_PROBE, mount: mount, flowType: flowType },
+        { section: SECTIONS.RESULTS, mount: mount, flowType: flowType },
+      ]
+    }
+    case FLOWS.ATTACH: {
+      if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
         return [
           {
             section: SECTIONS.BEFORE_BEGINNING,
@@ -51,54 +46,14 @@ export const getPipetteWizardSteps = (
             flowType: FLOWS.CALIBRATE,
           },
         ]
-      }
-      case FLOWS.DETACH: {
-        return [
-          {
-            section: SECTIONS.BEFORE_BEGINNING,
-            mount: mount,
-            flowType: flowType,
-          },
-          {
-            section: SECTIONS.DETACH_PIPETTE,
-            mount: mount,
-            flowType: flowType,
-          },
-          { section: SECTIONS.RESULTS, mount: mount, flowType: flowType },
-        ]
-      }
-    }
-  } else if (selectedPipette === NINETY_SIX_CHANNEL) {
-    switch (flowType) {
-      case FLOWS.CALIBRATE: {
-        return [
-          {
-            section: SECTIONS.BEFORE_BEGINNING,
-            mount: mount,
-            flowType: flowType,
-          },
-          {
-            section: SECTIONS.ATTACH_PROBE,
-            mount: mount,
-            flowType: flowType,
-          },
-          {
-            section: SECTIONS.DETACH_PROBE,
-            mount: mount,
-            flowType: flowType,
-          },
-          { section: SECTIONS.RESULTS, mount: mount, flowType: flowType },
-        ]
-      }
-      case FLOWS.ATTACH: {
+      } else {
         let detachMount = mount
         if (attachedPipettes[LEFT] == null) {
           detachMount = RIGHT
         } else if (attachedPipettes[RIGHT] == null) {
           detachMount = LEFT
         }
-
-        //  for attaching 96 channel but a pipette is attached
+        //  pipette needs to be detached before attached 96 channel
         if (!isGantryEmpty) {
           return [
             {
@@ -148,6 +103,7 @@ export const getPipetteWizardSteps = (
               flowType: FLOWS.CALIBRATE,
             },
           ]
+          //  gantry empty to attach 96 channel
         } else {
           return [
             {
@@ -189,7 +145,24 @@ export const getPipetteWizardSteps = (
           ]
         }
       }
-      case FLOWS.DETACH: {
+    }
+    case FLOWS.DETACH: {
+      if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
+        return [
+          {
+            section: SECTIONS.BEFORE_BEGINNING,
+            mount: mount,
+            flowType: flowType,
+          },
+          {
+            section: SECTIONS.DETACH_PIPETTE,
+            mount: mount,
+            flowType: flowType,
+          },
+          { section: SECTIONS.RESULTS, mount: mount, flowType: flowType },
+        ]
+        //  96 channel detach
+      } else {
         return [
           {
             section: SECTIONS.BEFORE_BEGINNING,
@@ -215,8 +188,6 @@ export const getPipetteWizardSteps = (
         ]
       }
     }
-  } else {
-    return []
   }
   return []
 }
