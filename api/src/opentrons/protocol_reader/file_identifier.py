@@ -1,7 +1,9 @@
+"""File identifier interface."""
+
 import ast
 import json
 from dataclasses import dataclass
-from typing import Any, Dict, List, Sequence, Union
+from typing import Any, Dict, List, Union
 
 import anyio
 
@@ -14,28 +16,57 @@ from .protocol_files_invalid_error import ProtocolFilesInvalidError
 from .protocol_source import Metadata
 
 
-_JSONDict = Dict[str, Any]
+JsonDict = Dict[str, Any]
 
 
 @dataclass(frozen=True)
 class IdentifiedJsonMain:
+    """A file identified as a JSON protocol's main .json file."""
+
     original_file: BufferedFile
-    unvalidated_json: _JSONDict
+    """The original file that this was identified from."""
+
+    unvalidated_json: JsonDict
+    """The parsed JSON contents.
+
+    Believed, but not confirmed at this point, to conform to one of our JSON protocol
+    schemas.
+    """
+
     schema_version: int
+    """The JSON protocol schema that this file is believed to conform to."""
+
     metadata: Metadata
+    """The protocol metadata extracted from this file."""
 
 
 @dataclass(frozen=True)
 class IdentifiedPythonMain:
+    """A file identified as a Python protocol's main .py file."""
+
     original_file: BufferedFile
+    """The original file that this was identified from."""
+
     api_level: APIVersion
+    """The Python Protocol API apiLevel declared by the Python source."""
+
     metadata: Metadata
+    """The protocol metadata extracted from this file."""
 
 
 @dataclass(frozen=True)
 class IdentifiedLabwareDefinition:
+    """A file identified as a labware definition."""
+
     original_file: BufferedFile
-    unvalidated_json: _JSONDict
+    """The original file that this was identified from."""
+
+    unvalidated_json: JsonDict
+    """The parsed JSON contents.
+
+    Believed, but not confirmed at this point, to conform to our labware definition
+    schema v2.
+    """
 
 
 IdentifiedFile = Union[
@@ -45,15 +76,24 @@ IdentifiedFile = Union[
 ]
 
 
-class FileIdentifier:
-    @staticmethod
-    async def identify(files: List[BufferedFile]) -> List[IdentifiedFile]:
-        return [await _identify(file) for file in files]
-
-
 # FIX BEFORE MERGE: Rename exception.
 class ConfigAnalysisError(ProtocolFilesInvalidError):
-    pass
+    """Raised when FileIdentifier detects an invalid file."""
+
+
+class FileIdentifier:
+    """File identifier interface."""
+
+    @staticmethod
+    async def identify(files: List[BufferedFile]) -> List[IdentifiedFile]:
+        """Identify the type and extract basic information from each file.
+
+        This is intended to take ≲1 second per protocol on an OT-2, so it can extract
+        basic information about all stored protocols relatively quickly. Fully parsing
+        and validating protocols can take 10-100x longer, so that's left to other units,
+        for only when it's really needed.
+        """
+        return [await _identify(file) for file in files]
 
 
 async def _identify(file: BufferedFile) -> IdentifiedFile:
@@ -92,12 +132,12 @@ async def _analyze_json(
         raise ConfigAnalysisError(f"{json_file.name} is not a known Opentrons format.")
 
 
-def _json_seems_like_labware(json: _JSONDict) -> bool:
+def _json_seems_like_labware(json: JsonDict) -> bool:
     # "ordering" and "wells" are required properties in our labware schema v2.
     return "ordering" in json and "wells" in json
 
 
-def _json_seems_like_protocol(json: _JSONDict) -> bool:
+def _json_seems_like_protocol(json: JsonDict) -> bool:
     # "schemaVersion" and "commands" are required properties in all of our JSON
     # protocol schemas since schema v3. (v7 is the latest at the time of writing.)
     #
@@ -107,7 +147,7 @@ def _json_seems_like_protocol(json: _JSONDict) -> bool:
 
 
 def _analyze_json_protocol(
-    original_file: BufferedFile, json_contents: _JSONDict
+    original_file: BufferedFile, json_contents: JsonDict
 ) -> IdentifiedJsonMain:
     try:
         metadata = json_contents["metadata"]
