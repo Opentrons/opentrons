@@ -180,6 +180,7 @@ export function SelectAuthenticationType(): JSX.Element {
               marginLeft={SPACING.spacingSM}
               padding={`0.75rem ${String(SPACING.spacing5)}`}
               width="13.8125rem"
+              onClick={() => history.push('/network-setup/usb')}
             >
               <StyledText
                 fontSize="1.375rem"
