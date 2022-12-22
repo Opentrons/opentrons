@@ -2,7 +2,6 @@
 from typing import Dict, Iterable, List, Tuple, TypeVar, Sequence
 from typing_extensions import Literal
 from opentrons.config.types import OT3MotionSettings, OT3CurrentSettings, GantryLoad
-from opentrons.types import Mount
 from opentrons.hardware_control.types import (
     OT3Axis,
     OT3AxisKind,
@@ -312,10 +311,11 @@ _sensor_node_lookup: Dict[OT3Mount, ProbeTarget] = {
 }
 
 _head_node_lookup: Dict[OT3Mount, NodeId] = {
-        OT3Mount.LEFT: NodeId.head_l,
-        OT3Mount.RIGHT: NodeId.head_r,
-        OT3Mount.GRIPPER: NodeId.gripper_z,
+    OT3Mount.LEFT: NodeId.head_l,
+    OT3Mount.RIGHT: NodeId.head_r,
+    OT3Mount.GRIPPER: NodeId.gripper_z,
 }
+
 
 def head_node_for_mount(mount: OT3Mount) -> NodeId:
     return _head_node_lookup[mount]

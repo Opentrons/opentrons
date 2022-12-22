@@ -923,7 +923,6 @@ class OT3Controller:
         sensor_id: SensorId = SensorId.S0,
     ) -> None:
         head_node = head_node_for_mount(OT3Mount(mount.value))
-        head_axis = OT3Axis.by_mount(mount)
         tool = sensor_node_for_mount(OT3Mount(mount.value))
         positions = await liquid_probe(
             self._messenger,

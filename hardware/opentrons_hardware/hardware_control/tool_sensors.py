@@ -11,7 +11,6 @@ from opentrons_hardware.firmware_bindings.constants import (
     SensorType,
     SensorThresholdMode,
 )
-from .types import NodeDict
 from opentrons_hardware.sensors.types import SensorDataType
 from opentrons_hardware.sensors.sensor_types import SensorInformation, PressureSensor
 from opentrons_hardware.sensors.sensor_driver import SensorDriver
@@ -34,7 +33,8 @@ def _build_pass_step(
     distance: Dict[NodeId, float],
     speed: Dict[NodeId, float],
 ) -> MoveGroupStep:
-    max_distance_axis = max(distance, key=distance.get)
+    # this assumes there is one mount axis present, and that the mount moves the farthest
+    mount_axis = [ax for ax in movers if ax in [NodeId.head_l, NodeId.head_r]][0]
     return create_step(
         distance={ax: float64(abs(distance[ax])) for ax in movers},
         velocity={
@@ -57,7 +57,7 @@ async def liquid_probe(
     mount_speed: float,
     sensor_id: SensorId = SensorId.S0,
     threshold_pascals: float = 1.0,
-) -> NodeDict[Tuple[float, float]]:
+) -> Dict[NodeId, Tuple[float, float, bool, bool]]:
     """Just send mount down, then move mount and pipette."""
     sensor_driver = SensorDriver()
     pressure_sensor = PressureSensor.build(
@@ -138,7 +138,7 @@ async def capacitive_pass(
         sensor_id=sensor_id,
         node_id=tool,
     )
-    pass_group = _build_pass_step(mover, distance, speed)
+    pass_group = _build_pass_step([mover], {mover: distance}, {mover: speed})
     runner = MoveGroupRunner(move_groups=[[pass_group]])
     await runner.prep(messenger)
     async with sensor_scheduler.capture_output(sensor_info, messenger) as output_queue:
