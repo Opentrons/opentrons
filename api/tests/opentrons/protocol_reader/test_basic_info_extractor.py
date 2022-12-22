@@ -24,6 +24,7 @@ from opentrons.protocol_reader.basic_info_extractor import (
     FileInfo,
     JsonProtocolFileInfo,
     PythonProtocolFileInfo,
+    LabwareDefinitionFileInfo,
     ConfigAnalysisError,
 )
 
