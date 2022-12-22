@@ -932,14 +932,13 @@ class OT3API(
             self._transforms.deck_calibration.attitude,
             self._transforms.carriage_offset,
         )
-        bounds = self._backend.axis_bounds
+        bounds = self._backend.phony_bounds
         to_check = {
             ax: machine_pos[ax]
             for ax in target_position.keys()
             if ax in OT3Axis.gantry_axes()
         }
         check_motion_bounds(to_check, target_position, bounds, check_bounds)
-
         # TODO: (2022-02-10) Use actual max speed for MoveTarget
         checked_speed = speed or 400
         self._move_manager.update_constraints(

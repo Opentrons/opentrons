@@ -102,6 +102,7 @@ class Capturer:
             self.csv_writer.writerow([data, (time.time() - self.start_time)])
 
 
+
 def _build_pass_step(
     movers: List[NodeId],
     distance: Dict[NodeId, float],
