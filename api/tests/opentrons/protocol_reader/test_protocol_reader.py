@@ -9,7 +9,6 @@ from pathlib import Path
 from typing import IO, Optional
 
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.models import LabwareDefinition
 
 from opentrons.protocol_reader import (
     ProtocolReader,
@@ -17,23 +16,19 @@ from opentrons.protocol_reader import (
     ProtocolSourceFile,
     ProtocolFileRole,
     PythonProtocolConfig,
-    ProtocolFilesInvalidError,
 )
 
 from opentrons.protocol_reader.input_file import AbstractInputFile
 from opentrons.protocol_reader.file_reader_writer import (
     FileReaderWriter,
-    FileReadError,
     BufferedFile,
 )
 from opentrons.protocol_reader.role_analyzer import (
     RoleAnalyzer,
     RoleAnalysis,
-    RoleAnalysisError,
 )
 from opentrons.protocol_reader.file_identifier import (
     FileIdentifier,
-    IdentifiedFile,
     IdentifiedPythonMain,
     IdentifiedLabwareDefinition,
 )

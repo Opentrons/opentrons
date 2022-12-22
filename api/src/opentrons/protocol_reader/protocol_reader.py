@@ -1,6 +1,6 @@
 """Read relevant protocol information from a set of files."""
 from pathlib import Path
-from typing import List, Optional, Sequence
+from typing import Optional, Sequence
 
 from .input_file import AbstractInputFile
 from .file_identifier import (
@@ -12,7 +12,7 @@ from .file_identifier import (
 )
 from .role_analyzer import RoleAnalyzer, RoleAnalysis
 from .file_format_validator import FileFormatValidator
-from .file_reader_writer import FileReaderWriter, FileReadError
+from .file_reader_writer import FileReaderWriter
 from .protocol_source import (
     ProtocolSource,
     ProtocolSourceFile,
@@ -38,7 +38,8 @@ class ProtocolReader:
         Arguments:
             file_reader_writer: Input file reader/writer. Default impl. used if None.
             file_identifier: File identifier. Default impl. used if None.
-            config_analyzer: Protocol config analyzer. Default impl. used if None.
+            role_analyzer: File role analyzer. Default impl. used if None.
+            file_format_validator: File format validator. Default impl. used if None.
         """
         self._file_reader_writer = file_reader_writer or FileReaderWriter()
         self._file_identifier = file_identifier or FileIdentifier()

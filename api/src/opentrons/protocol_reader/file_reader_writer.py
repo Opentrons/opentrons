@@ -1,15 +1,10 @@
 """Input file reading."""
-import enum
-from json import JSONDecodeError
-from anyio import Path as AsyncPath, create_task_group, wrap_file
+
 from dataclasses import dataclass
 from pathlib import Path
-from pydantic import ValidationError, parse_raw_as
 from typing import List, Optional, Sequence, Union
 
-from opentrons_shared_data.protocol.models import ProtocolSchemaV6
-
-from opentrons.protocols.models import JsonProtocol, LabwareDefinition
+from anyio import Path as AsyncPath, create_task_group, wrap_file
 
 from .input_file import AbstractInputFile
 from .protocol_files_invalid_error import ProtocolFilesInvalidError

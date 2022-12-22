@@ -1,3 +1,5 @@
+# noqa: D100
+
 import json
 from pathlib import Path
 from typing import List

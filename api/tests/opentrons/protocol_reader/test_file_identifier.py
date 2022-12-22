@@ -1,38 +1,28 @@
-"""Tests for opentrons.protocol_reader.config_analyzer.ConfigAnalyzer."""
+"""Tests for opentrons.protocol_reader.file_identifier."""
+
 import json
 from dataclasses import dataclass
-import pytest
 import textwrap
-from typing import Dict, List, NamedTuple
+
+import pytest
 
 from opentrons_shared_data import load_shared_data
+
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.models import JsonProtocol
-
-from opentrons.protocol_reader import (
-    ProtocolFileRole,
-    PythonProtocolConfig,
-    JsonProtocolConfig,
-)
-
-from opentrons.protocol_reader.protocol_source import Metadata
-
-from opentrons.protocol_reader.role_analyzer import RoleAnalysis
 
 from opentrons.protocol_reader.file_identifier import (
     FileIdentifier,
-    IdentifiedFile,
+    FileIdentificationError,
     IdentifiedJsonMain,
     IdentifiedPythonMain,
     IdentifiedLabwareDefinition,
-    FileIdentificationError,
 )
-
 from opentrons.protocol_reader.file_reader_writer import BufferedFile
+from opentrons.protocol_reader.protocol_source import Metadata
 
 
 @dataclass
-class ValidPythonProtocolSpec:
+class _ValidPythonProtocolSpec:
     file_name: str
     contents: str
     expected_api_level: APIVersion
@@ -43,7 +33,7 @@ class ValidPythonProtocolSpec:
     "spec",
     [
         # Basic Python:
-        ValidPythonProtocolSpec(
+        _ValidPythonProtocolSpec(
             file_name="foo.py",
             contents=textwrap.dedent(
                 """
@@ -57,7 +47,7 @@ class ValidPythonProtocolSpec:
             expected_metadata={"author": "Dr. Sy. N. Tist", "apiLevel": "2.11"},
         ),
         # Python with a weirdly capitalized file extension:
-        ValidPythonProtocolSpec(
+        _ValidPythonProtocolSpec(
             file_name="foo.Py",
             contents=textwrap.dedent(
                 """
@@ -71,7 +61,8 @@ class ValidPythonProtocolSpec:
         ),
     ],
 )
-async def test_valid_python_protocol(spec: ValidPythonProtocolSpec) -> None:
+async def test_valid_python_protocol(spec: _ValidPythonProtocolSpec) -> None:
+    """It should identify the file as a Python main file and extract basic info."""
     input_file = BufferedFile(
         name=spec.file_name, contents=spec.contents.encode("utf-8"), path=None
     )
@@ -86,7 +77,7 @@ async def test_valid_python_protocol(spec: ValidPythonProtocolSpec) -> None:
 
 
 @dataclass
-class ValidJsonProtocolSpec:
+class _ValidJsonProtocolSpec:
     file_name: str
     contents: bytes
     expected_schema_version: int
@@ -98,7 +89,7 @@ class ValidJsonProtocolSpec:
     [
         # Basic JSON protocols of various versions:
         # todo(mm, 2022-12-22): Add a v7 protocol when we support that in production.
-        ValidJsonProtocolSpec(
+        _ValidJsonProtocolSpec(
             file_name="foo.json",
             contents=load_shared_data("protocol/fixtures/6/simpleV6.json"),
             expected_schema_version=6,
@@ -110,7 +101,7 @@ class ValidJsonProtocolSpec:
                 "tags": ["unitTest"],
             },
         ),
-        ValidJsonProtocolSpec(
+        _ValidJsonProtocolSpec(
             file_name="foo.json",
             contents=load_shared_data("protocol/fixtures/5/simpleV5.json"),
             expected_schema_version=5,
@@ -125,7 +116,7 @@ class ValidJsonProtocolSpec:
                 "tags": ["unitTest"],
             },
         ),
-        ValidJsonProtocolSpec(
+        _ValidJsonProtocolSpec(
             file_name="foo.json",
             contents=load_shared_data("protocol/fixtures/4/simpleV4.json"),
             expected_schema_version=4,
@@ -140,7 +131,7 @@ class ValidJsonProtocolSpec:
                 "tags": ["unitTest"],
             },
         ),
-        ValidJsonProtocolSpec(
+        _ValidJsonProtocolSpec(
             file_name="foo.json",
             contents=load_shared_data("protocol/fixtures/3/simple.json"),
             expected_schema_version=3,
@@ -156,7 +147,7 @@ class ValidJsonProtocolSpec:
             },
         ),
         # JSON with a weirdly capitalized file extension:
-        ValidJsonProtocolSpec(
+        _ValidJsonProtocolSpec(
             file_name="foo.JsOn",
             contents=load_shared_data("protocol/fixtures/3/simple.json"),
             expected_schema_version=3,
@@ -173,7 +164,8 @@ class ValidJsonProtocolSpec:
         ),
     ],
 )
-async def test_valid_json_protocol(spec: ValidJsonProtocolSpec) -> None:
+async def test_valid_json_protocol(spec: _ValidJsonProtocolSpec) -> None:
+    """It should identify the file as a JSON main file and extract basic info."""
     input_file = BufferedFile(name=spec.file_name, contents=spec.contents, path=None)
     expected_result = IdentifiedJsonMain(
         original_file=input_file,
@@ -187,7 +179,7 @@ async def test_valid_json_protocol(spec: ValidJsonProtocolSpec) -> None:
 
 
 @dataclass
-class ValidLabwareDefinitionSpec:
+class _ValidLabwareDefinitionSpec:
     file_name: str
     contents: bytes
 
@@ -195,13 +187,13 @@ class ValidLabwareDefinitionSpec:
 @pytest.mark.parametrize(
     "spec",
     [
-        ValidLabwareDefinitionSpec(
+        _ValidLabwareDefinitionSpec(
             file_name="foo.json",
             contents=load_shared_data(
                 "labware/definitions/2/armadillo_96_wellplate_200ul_pcr_full_skirt/1.json"
             ),
         ),
-        ValidLabwareDefinitionSpec(
+        _ValidLabwareDefinitionSpec(
             file_name="foo.json",
             contents=load_shared_data(
                 "labware/definitions/2/opentrons_96_tiprack_10ul/1.json"
@@ -209,7 +201,8 @@ class ValidLabwareDefinitionSpec:
         ),
     ],
 )
-async def test_valid_labware_definition(spec: ValidLabwareDefinitionSpec) -> None:
+async def test_valid_labware_definition(spec: _ValidLabwareDefinitionSpec) -> None:
+    """It should identify the file as a labware definition and extract basic info."""
     input_file = BufferedFile(name=spec.file_name, contents=spec.contents, path=None)
     expected_result = IdentifiedLabwareDefinition(
         original_file=input_file, unvalidated_json=json.loads(spec.contents)
@@ -220,7 +213,7 @@ async def test_valid_labware_definition(spec: ValidLabwareDefinitionSpec) -> Non
 
 
 @dataclass
-class InvalidSpec:
+class _InvalidInputSpec:
     file_name: str
     contents: str
     expected_message: str
@@ -233,7 +226,7 @@ class InvalidSpec:
     "spec",
     [
         # Python syntax error:
-        InvalidSpec(
+        _InvalidInputSpec(
             file_name="protocol.py",
             contents=textwrap.dedent(
                 """
@@ -248,7 +241,7 @@ class InvalidSpec:
             expected_message="Unable to parse",
         ),
         # Python with various kinds of invalid metadata dict or apiLevel:
-        InvalidSpec(
+        _InvalidInputSpec(
             file_name="protocol.py",
             contents=textwrap.dedent(
                 """
@@ -257,7 +250,7 @@ class InvalidSpec:
             ),
             expected_message="metadata.apiLevel missing",
         ),
-        InvalidSpec(
+        _InvalidInputSpec(
             file_name="protocol.py",
             contents=textwrap.dedent(
                 """
@@ -267,7 +260,7 @@ class InvalidSpec:
             ),
             expected_message="metadata.apiLevel missing",
         ),
-        InvalidSpec(
+        _InvalidInputSpec(
             file_name="protocol.py",
             contents=textwrap.dedent(
                 """
@@ -277,7 +270,7 @@ class InvalidSpec:
             ),
             expected_message="metadata.apiLevel missing",
         ),
-        InvalidSpec(
+        _InvalidInputSpec(
             file_name="protocol.py",
             contents=textwrap.dedent(
                 """
@@ -287,7 +280,7 @@ class InvalidSpec:
             ),
             expected_message="Unable to extract metadata from protocol.py",
         ),
-        InvalidSpec(
+        _InvalidInputSpec(
             file_name="protocol.py",
             contents=textwrap.dedent(
                 """
@@ -300,7 +293,7 @@ class InvalidSpec:
             # suggests it should allow ints. This error message should be different.
             expected_message="Unable to extract metadata from protocol.py",
         ),
-        InvalidSpec(
+        _InvalidInputSpec(
             file_name="protocol.py",
             contents=textwrap.dedent(
                 """
@@ -310,7 +303,7 @@ class InvalidSpec:
             ),
             expected_message="is not of the format X.Y",
         ),
-        InvalidSpec(
+        _InvalidInputSpec(
             file_name="protocol.py",
             contents=textwrap.dedent(
                 """
@@ -321,7 +314,7 @@ class InvalidSpec:
             expected_message="API version 123.456 is not supported by this robot software. Please either reduce your requested API version or update your robot.",
         ),
         # Unrecognized file extension:
-        InvalidSpec(
+        _InvalidInputSpec(
             file_name="protocol.python",
             contents=textwrap.dedent(
                 """
@@ -336,20 +329,20 @@ class InvalidSpec:
             expected_message="protocol.python has an unrecognized file extension.",
         ),
         # .json file that isn't JSON:
-        InvalidSpec(
+        _InvalidInputSpec(
             file_name="foo.json",
             contents="!@#$%",
             expected_message="foo.json is not valid JSON.",
         ),
         # .json file that doesn't conform to any of our protocol or labware schemas:
-        InvalidSpec(
+        _InvalidInputSpec(
             file_name="foo.json",
             contents="{}",
             expected_message="foo.json is not a known Opentrons format.",
         ),
     ],
 )
-async def test_invalid_input(spec: InvalidSpec) -> None:
+async def test_invalid_input(spec: _InvalidInputSpec) -> None:
     """It should raise errors on invalid input."""
     input_file = BufferedFile(
         name=spec.file_name, contents=spec.contents.encode("utf-8"), path=None

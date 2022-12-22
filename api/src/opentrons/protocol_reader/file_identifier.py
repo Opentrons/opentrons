@@ -177,9 +177,9 @@ def _analyze_json_protocol(
 
 
 # todo(mm, 2021-09-13): Deduplicate with opentrons.protocols.parse.
-def _analyze_python_protocol(
+def _analyze_python_protocol(  # noqa: C901
     py_file: BufferedFile,
-) -> IdentifiedPythonMain:  # noqa: C901
+) -> IdentifiedPythonMain:
     try:
         # todo(mm, 2021-09-13): Investigate whether it's really appropriate to leave
         # the Python compilation flags at their defaults. For example, we probably
