@@ -94,9 +94,21 @@ class ValidJsonProtocolSpec:
 
 @pytest.mark.parametrize(
     "spec",
-    # FIX BEFORE MERGE: Do for v6 and v7, too.
     [
         # Basic JSON protocols of various versions:
+        # todo(mm, 2022-12-22): Add a v7 protocol when we support that in production.
+        ValidJsonProtocolSpec(
+            file_name="protocol.json",
+            contents=load_shared_data("protocol/fixtures/6/simpleV6.json"),
+            expected_schema_version=6,
+            expected_metadata={
+                "protocolName": "Simple test protocol",
+                "author": "engineering <engineering@opentrons.com>",
+                "description": "A short test protocol",
+                "created": 1223131231,
+                "tags": ["unitTest"],
+            },
+        ),
         ValidJsonProtocolSpec(
             file_name="protocol.json",
             contents=load_shared_data("protocol/fixtures/5/simpleV5.json"),
