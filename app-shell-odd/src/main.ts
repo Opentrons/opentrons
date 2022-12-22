@@ -49,9 +49,7 @@ function startUp(): void {
   process.on('unhandledRejection', reason =>
     log.error('Uncaught Promise rejection: ', { reason })
   )
-  log.info('Fetching latest software version')
-  updateLatestVersion()
-
+  
   mainWindow = createUi()
   rendererLogger = createRendererLogger()
 
@@ -75,6 +73,9 @@ function startUp(): void {
       mainWindow.webContents.send('dispatch', action)
     }
   }
+
+  log.info('Fetching latest software version')
+  updateLatestVersion(dispatch)
 
   const actionHandlers: Dispatch[] = [
     registerConfig(dispatch),

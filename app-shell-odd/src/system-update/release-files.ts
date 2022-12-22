@@ -71,6 +71,7 @@ export function downloadReleaseFiles(
   onProgress: (progress: DownloadProgress) => unknown
 ): Promise<ReleaseSetFilepaths> {
   const tempDir: string = tempy.directory()
+  // @ts-expect-error delete this when the OT-3 manifest has release notes
   urls.releaseNotes = null
   const tempSystemPath = outPath(tempDir, urls.system)
   const tempNotesPath = outPath(tempDir, urls.releaseNotes ?? '')

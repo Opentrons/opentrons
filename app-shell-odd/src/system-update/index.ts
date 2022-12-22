@@ -6,7 +6,7 @@ import { app } from 'electron'
 import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
 import { createLogger } from '../log'
 import { getConfig } from '../config'
-import { getLatestVersion } from '../update'
+import { getLatestVersion, updateLatestVersion } from '../update'
 import { downloadManifest, getReleaseSet } from './release-manifest'
 import {
   getReleaseFiles,
@@ -36,14 +36,22 @@ export function registerRobotSystemUpdate(dispatch: Dispatch): Dispatch {
       case 'shell:CHECK_UPDATE':
         console.log({ checkingForUpdates })
         if (!checkingForUpdates) {
-          console.log('setting checking for updates to TRUE')
-          checkingForUpdates = true
-          // eslint-disable-next-line @typescript-eslint/no-floating-promises
-          console.log('checking for update!')
-          checkForSystemUpdate(dispatch).then(() => {
-            console.log('setting checking for updates to FALSE')
-            checkingForUpdates = false
-          })
+          updateLatestVersion()
+            .then(() => {
+              console.log('setting checking for updates to TRUE')
+              checkingForUpdates = true
+              // eslint-disable-next-line @typescript-eslint/no-floating-promises
+              console.log('checking for update!')
+              checkForSystemUpdate(dispatch).then(() => {
+                console.log('setting checking for updates to FALSE')
+                checkingForUpdates = false
+              })
+            })
+            .catch((error: Error) => {
+              log.warn('Error checking for update', {
+                error,
+              })
+            })
         }
         break
 
@@ -153,11 +161,6 @@ export function checkForSystemUpdate(dispatch: Dispatch): Promise<unknown> {
       console.log('got the urls: ')
       console.log(urls)
       if (urls === null) return Promise.resolve()
-      // TODO: change this action type to 'systemUpdate:UPDATE_VERSION'
-      dispatch({
-        type: 'buildroot:UPDATE_VERSION',
-        payload: getLatestVersion(),
-      })
 
       let prevPercentDone = 0
 
@@ -183,9 +186,14 @@ export function checkForSystemUpdate(dispatch: Dispatch): Promise<unknown> {
           console.log('caching')
           return cacheUpdateSet(filepaths)
         })
-        .then(updateInfo =>
-          dispatch({ type: 'buildroot:UPDATE_INFO', payload: updateInfo })
-        )
+        .then(({ version, releaseNotes }) => {
+          dispatch({ type: 'buildroot:UPDATE_INFO', payload: { releaseNotes } })
+          console.log(
+            'telling app that a new buildroot update version is ready! ',
+            version
+          )
+          dispatch({ type: 'buildroot:UPDATE_VERSION', payload: version })
+        })
         .catch((error: Error) => {
           console.log('got an errorrr')
           console.log(error)
@@ -204,10 +212,10 @@ export function checkForSystemUpdate(dispatch: Dispatch): Promise<unknown> {
 
 function cacheUpdateSet(
   filepaths: ReleaseSetFilepaths
-): Promise<BuildrootUpdateInfo> {
+): Promise<{ version: string; releaseNotes: string }> {
   console.log('caching update set')
   updateSet = filepaths
-  console.log({updateSet})
+  console.log({ updateSet })
 
   return readFile(updateSet.releaseNotes, 'utf8').then(releaseNotes => ({
     version: getLatestVersion(),

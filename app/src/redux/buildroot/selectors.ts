@@ -96,7 +96,7 @@ export const getBuildrootRobot: (
       robots.find(robot => {
         const searchName =
           robot.serverHealth?.capabilities?.buildrootUpdate != null ||
-          robot.serverHealth?.capabilities.systemUpdate != null
+          robot.serverHealth?.capabilities?.systemUpdate != null
             ? robotName.replace(/^opentrons-/, '')
             : robotName
         console.log(robot.name)
