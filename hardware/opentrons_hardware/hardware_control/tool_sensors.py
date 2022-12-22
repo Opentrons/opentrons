@@ -26,6 +26,7 @@ from opentrons_hardware.sensors.types import (
     SensorDataType,
     sensor_fixed_point_conversion,
 )
+from opentrons_hardware.sensors.types import SensorDataType
 from opentrons_hardware.sensors.sensor_types import SensorInformation, PressureSensor
 from opentrons_hardware.sensors.sensor_driver import SensorDriver
 from opentrons_hardware.sensors.scheduler import SensorScheduler
