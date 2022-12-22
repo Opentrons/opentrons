@@ -4,13 +4,13 @@ from typing import List, Optional, Sequence
 
 from .input_file import AbstractInputFile
 from .basic_info_extractor import (
-    BasicInfo,
     BasicInfoExtractor,
     FileInfo,
     JsonProtocolFileInfo,
     PythonProtocolFileInfo,
     LabwareDefinitionFileInfo,
 )
+from .role_analyzer import RoleAnalyzer, RoleAnalysis
 from .file_format_validator import FileFormatValidator
 from .file_reader_writer import FileReaderWriter, FileReadError
 from .protocol_source import (
@@ -34,6 +34,7 @@ class ProtocolReader:
         self,
         file_reader_writer: Optional[FileReaderWriter] = None,
         basic_info_extractor: Optional[BasicInfoExtractor] = None,
+        role_analyzer: Optional[RoleAnalyzer] = None,
         file_format_validator: Optional[FileFormatValidator] = None,
     ) -> None:
         """Initialize the reader with its dependencies.
@@ -46,6 +47,7 @@ class ProtocolReader:
         """
         self._file_reader_writer = file_reader_writer or FileReaderWriter()
         self._basic_info_extractor = basic_info_extractor or BasicInfoExtractor()
+        self._role_analyzer = role_analyzer or RoleAnalyzer()
         self._file_format_validator = file_format_validator or FileFormatValidator()
 
     async def read_and_save(
@@ -72,28 +74,29 @@ class ProtocolReader:
         try:
             buffered_files = await self._file_reader_writer.read(files)
             basic_info = await self._basic_info_extractor.extract(buffered_files)
-            await self._file_format_validator.validate(basic_info.all_files)
+            role_analysis = self._role_analyzer.analyze(basic_info)
+            await self._file_format_validator.validate(role_analysis.all_files)
         except Exception as e:
             # FIX BEFORE MERGE: Catch specific exception types
             raise ProtocolFilesInvalidError(str(e)) from e
 
-        files_to_write = [f.original_file for f in basic_info.all_files]
+        files_to_write = [f.original_file for f in role_analysis.all_files]
         await self._file_reader_writer.write(directory=directory, files=files_to_write)
 
-        main_file = directory / basic_info.main_file.original_file.name
+        main_file = directory / role_analysis.main_file.original_file.name
         output_files = [
             ProtocolSourceFile(
                 path=directory / f.original_file.name, role=self._map_file_role(f)
             )
-            for f in basic_info.all_files
+            for f in role_analysis.all_files
         ]
 
         return ProtocolSource(
             directory=directory,
             main_file=main_file,
             files=output_files,
-            config=self._map_config(basic_info),
-            metadata=basic_info.main_file.metadata,
+            config=self._map_config(role_analysis),
+            metadata=role_analysis.main_file.metadata,
         )
 
     async def read_saved(
@@ -127,8 +130,9 @@ class ProtocolReader:
         try:
             buffered_files = await self._file_reader_writer.read(files)
             basic_info = await self._basic_info_extractor.extract(buffered_files)
+            role_analysis = self._role_analyzer.analyze(basic_info)
             if not files_are_prevalidated:
-                await self._file_format_validator.validate(basic_info.all_files)
+                await self._file_format_validator.validate(role_analysis.all_files)
         except Exception as e:
             # FIX BEFORE MERGE: Catch specific exception types
             raise ProtocolFilesInvalidError(str(e)) from e
@@ -137,21 +141,23 @@ class ProtocolReader:
         # not AbstractInputFiles, to FileReaderWriter.
         # TODO(mc, 2022-04-01): these asserts are a bit awkward,
         # consider restructuring so they're not needed.
-        assert isinstance(basic_info.main_file.original_file.path, Path)
-        assert all(isinstance(f.original_file.path, Path) for f in basic_info.all_files)
+        assert isinstance(role_analysis.main_file.original_file.path, Path)
+        assert all(
+            isinstance(f.original_file.path, Path) for f in role_analysis.all_files
+        )
 
-        main_file = basic_info.main_file.original_file.path
+        main_file = role_analysis.main_file.original_file.path
         output_files = [
             ProtocolSourceFile(path=f.original_file.path, role=self._map_file_role(f))  # type: ignore[arg-type]
-            for f in basic_info.all_files
+            for f in role_analysis.all_files
         ]
 
         return ProtocolSource(
             directory=directory,
             main_file=main_file,
             files=output_files,
-            config=self._map_config(basic_info),
-            metadata=basic_info.main_file.metadata,
+            config=self._map_config(role_analysis),
+            metadata=role_analysis.main_file.metadata,
         )
 
     @staticmethod
@@ -162,7 +168,7 @@ class ProtocolReader:
             return ProtocolFileRole.LABWARE
 
     @staticmethod
-    def _map_config(protocol_info: BasicInfo) -> ProtocolConfig:
+    def _map_config(protocol_info: RoleAnalysis) -> ProtocolConfig:
         if isinstance(protocol_info.main_file, JsonProtocolFileInfo):
             return JsonProtocolConfig(
                 schema_version=protocol_info.main_file.schema_version
