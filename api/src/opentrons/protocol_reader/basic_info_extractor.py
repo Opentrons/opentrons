@@ -63,7 +63,7 @@ async def _analyze(file: BufferedFile) -> FileInfo:
         return _analyze_python_protocol(py_file=file)
     else:
         # FIX BEFORE MERGE: Use a better exception type.
-        raise RuntimeError(f"{file.name} has an unrecognized file extension.")
+        raise ConfigAnalysisError(f"{file.name} has an unrecognized file extension.")
 
 
 async def _analyze_json(
@@ -73,7 +73,7 @@ async def _analyze_json(
         json_contents = await anyio.to_thread.run_sync(json.loads, json_file.contents)
     except json.JSONDecodeError as e:
         # FIX BEFORE MERGE: Exception type.
-        raise RuntimeError(f"Error decoding {json_file.name} as JSON. {str(e)}")
+        raise ConfigAnalysisError(f"{json_file.name} is not valid JSON. {str(e)}") from e
 
     if _json_seems_like_labware(json_contents):
         return LabwareDefinitionFileInfo(
@@ -87,7 +87,7 @@ async def _analyze_json(
         )
     else:
         # FIX BEFORE MERGE: Exception type and message.
-        raise RuntimeError("Unrecognized JSON file.")
+        raise ConfigAnalysisError(f"{json_file.name} is not a known Opentrons format.")
 
 
 def _json_seems_like_labware(json: _JSONDict) -> bool:
@@ -112,16 +112,16 @@ def _analyze_json_protocol(
         schema_version = json_contents["schemaVersion"]
     except KeyError as e:
         # FIX BEFORE MERGE: Exception type and message.
-        raise RuntimeError from e
+        raise ConfigAnalysisError from e
 
     # FIX BEFORE MERGE: Use the actual Metadata model?
     if not isinstance(metadata, dict):
         # FIX BEFORE MERGE: Exception type and message.
-        raise RuntimeError
+        raise ConfigAnalysisError
 
     if not isinstance(schema_version, int):
         # FIX BEFORE MERGE: Exception type and message.
-        raise RuntimeError
+        raise ConfigAnalysisError
 
     return JsonProtocolFileInfo(
         original_file=original_file,
@@ -143,7 +143,7 @@ def _analyze_python_protocol(
     except (SyntaxError, ValueError) as e:
         # ast.parse() raises SyntaxError for most errors,
         # but ValueError if the source contains null bytes.
-        raise RuntimeError(f"Unable to parse {py_file.name}.") from e
+        raise ConfigAnalysisError(f"Unable to parse {py_file.name}.") from e
         # FIX BEFORE MERGE: Exception type.
 
     try:
