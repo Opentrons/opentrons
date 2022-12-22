@@ -13,7 +13,13 @@ from opentrons_hardware.hardware_control.types import NodeDict
 
 from opentrons_hardware.drivers.can_bus.build import build_driver
 from opentrons_hardware.drivers.can_bus import build, CanMessenger, WaitableCallback
-from opentrons_hardware.firmware_bindings.constants import NodeId, PipetteName, SensorId, SensorType,SensorThresholdMode
+from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
+    PipetteName,
+    SensorId,
+    SensorType,
+    SensorThresholdMode,
+)
 
 from opentrons_hardware.firmware_bindings import ArbitrationId
 from opentrons_hardware.firmware_bindings.messages import (
@@ -27,7 +33,6 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     MotorPositionRequest,
     InstrumentInfoRequest,
     ReadFromSensorResponse,
-
 )
 
 from opentrons_hardware.hardware_control.motion import (
@@ -112,7 +117,7 @@ async def _jog_axis(
         Click  >> q << to quit the test script
                     """
     print(information_str)
-    print('\n')
+    print("\n")
     while True:
         input = getch()
         if input == "w":
@@ -222,88 +227,77 @@ async def read_epprom(messenger: CanMessenger, node: NodeId) -> str:
         pass
     return serial_number
 
-async def do_run(messenger: CanMessenger,
-                callback: WaitableCallback,
-                target_node: NodeId,
-                target_sensor: SensorType,
-                sensor_id: SensorId,
-                threshold: float,
-                node: NodeId) -> float:
-        """Configure and start the monitoring."""
-        threshold_payload = payloads.SetSensorThresholdRequestPayload(
-            sensor=fields.SensorTypeField(SensorType.capacitive),
-            sensor_id=fields.SensorIdField(sensor_id),
-            threshold=Int32Field(int(threshold * sensor_fixed_point_conversion)),
-            mode=fields.SensorThresholdModeField(SensorThresholdMode.absolute),
-        )
-        threshold_message = message_definitions.SetSensorThresholdRequest(
-            payload=threshold_payload
-        )
-        await messenger.send(target_node, threshold_message)
-        stim_payload = payloads.BindSensorOutputRequestPayload(
-            sensor=fields.SensorTypeField(target_sensor.value),
-            sensor_id=fields.SensorIdField(sensor_id),
-            binding=fields.SensorOutputBindingField(3),
-        )
-        stim_message = message_definitions.BindSensorOutputRequest(payload=stim_payload)
-        reset_payload = payloads.BindSensorOutputRequestPayload(
-            sensor=fields.SensorTypeField(target_sensor.value),
-            sensor_id=fields.SensorIdField(sensor_id),
-            binding=fields.SensorOutputBindingField(0),
-        )
-        reset_message = message_definitions.BindSensorOutputRequest(payload=reset_payload)
-        #print(f"Sending stimulus to {target_node.name} {target_sensor.name}")
-        await messenger.send(target_node, stim_message)
-        start = datetime.datetime.now()
-        sensor_list = []
-        try:
-            async for message, _arbid in callback:
-                if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
-                    line = input()
-                    return sensor_list
-                if isinstance(message, ReadFromSensorResponse):
-                    ts = (datetime.datetime.now() - start).total_seconds()
-                    s = SensorType(message.payload.sensor.value).name
-                    d = SensorDataType.build(
-                        message.payload.sensor_data, message.payload.sensor
-                    )
-                    rd = message.payload.sensor_data
-                    sensor_list.append(d.to_float())
-                    print(f"{ts:.3f}: {s} {d.to_float():5.3f}, \traw data: {str(rd)}")
-                    #return d.to_float()
-        finally:
-            await messenger.send(target_node, reset_message)
 
-async def read_sensor(messenger: CanMessenger, node: NodeId, threshold: float, sensor: SensorType, sensor_id: SensorId) -> float:
+async def do_run(
+    messenger: CanMessenger,
+    callback: WaitableCallback,
+    target_node: NodeId,
+    target_sensor: SensorType,
+    sensor_id: SensorId,
+    threshold: float,
+    node: NodeId,
+) -> float:
+    """Configure and start the monitoring."""
+    threshold_payload = payloads.SetSensorThresholdRequestPayload(
+        sensor=fields.SensorTypeField(SensorType.capacitive),
+        sensor_id=fields.SensorIdField(sensor_id),
+        threshold=Int32Field(int(threshold * sensor_fixed_point_conversion)),
+        mode=fields.SensorThresholdModeField(SensorThresholdMode.absolute),
+    )
+    threshold_message = message_definitions.SetSensorThresholdRequest(
+        payload=threshold_payload
+    )
+    await messenger.send(target_node, threshold_message)
+    stim_payload = payloads.BindSensorOutputRequestPayload(
+        sensor=fields.SensorTypeField(target_sensor.value),
+        sensor_id=fields.SensorIdField(sensor_id),
+        binding=fields.SensorOutputBindingField(3),
+    )
+    stim_message = message_definitions.BindSensorOutputRequest(payload=stim_payload)
+    reset_payload = payloads.BindSensorOutputRequestPayload(
+        sensor=fields.SensorTypeField(target_sensor.value),
+        sensor_id=fields.SensorIdField(sensor_id),
+        binding=fields.SensorOutputBindingField(0),
+    )
+    reset_message = message_definitions.BindSensorOutputRequest(payload=reset_payload)
+    # print(f"Sending stimulus to {target_node.name} {target_sensor.name}")
+    await messenger.send(target_node, stim_message)
+    start = datetime.datetime.now()
+    sensor_list = []
+    try:
+        async for message, _arbid in callback:
+            if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
+                line = input()
+                return sensor_list
+            if isinstance(message, ReadFromSensorResponse):
+                ts = (datetime.datetime.now() - start).total_seconds()
+                s = SensorType(message.payload.sensor.value).name
+                d = SensorDataType.build(
+                    message.payload.sensor_data, message.payload.sensor
+                )
+                rd = message.payload.sensor_data
+                sensor_list.append(d.to_float())
+                print(f"{ts:.3f}: {s} {d.to_float():5.3f}, \traw data: {str(rd)}")
+                # return d.to_float()
+    finally:
+        await messenger.send(target_node, reset_message)
+
+
+async def read_sensor(
+    messenger: CanMessenger,
+    node: NodeId,
+    threshold: float,
+    sensor: SensorType,
+    sensor_id: SensorId,
+) -> float:
     try:
         with WaitableCallback(messenger) as reader:
-            p =  await do_run(
+            p = await do_run(
                 messenger, reader, node, sensor, sensor_id, threshold, node
             )
             return p
     except asyncio.TimeoutError:
         pass
-
-async def read_pressure_sensor(messenger: CanMessenger, node: NodeId, threshold: float) -> float:
-    sensor = SensorType.pressure
-    sensor_id = SensorId.S0
-    try:
-        with WaitableCallback(messenger) as reader:
-            p =  await do_run(
-                messenger, reader, node, sensor, sensor_id, threshold, node
-            )
-            return p
-    except asyncio.TimeoutError:
-        pass
-
-
-async def read_environment_sensor(messenger: CanMessenger, node: NodeId) -> float:
-    environment = sensor_types.EnvironmentSensor.build(SensorId.S0, node)
-    s_driver = sensor_driver.SensorDriver()
-    data = await s_driver.read(messenger, environment, offset=False, timeout=1)
-    if data is None:
-        raise ValueError("Unexpected None value from sensor: {}".format(data))
-    return data.to_float()  # type: ignore[union-attr]
 
 
 async def run(args: argparse.Namespace) -> None:
@@ -347,20 +341,26 @@ async def run(args: argparse.Namespace) -> None:
     if args.capacitive:
         print("\n")
         print("-----------------Read Capacitive--------------")
-        cap_val = await read_sensor(messenger, node, args.threshold, SensorType.capacitive, SensorId.S0)
+        cap_val = await read_sensor(
+            messenger, node, args.threshold, SensorType.capacitive, SensorId.S0
+        )
         print(f"Capacitive(uF): {cap_val}")
         await asyncio.sleep(2)
 
     if args.pressure:
         print("\n")
         print("-----------------Read pressure--------------")
-        p = await read_sensor(messenger, node, args.threshold, SensorType.pressure, SensorId.S0)
+        p = await read_sensor(
+            messenger, node, args.threshold, SensorType.pressure, SensorId.S0
+        )
         await asyncio.sleep(2)
 
     if args.environment:
         print("\n")
         print("-----------------Read Environment--------------")
-        en_val = await read_sensor(messenger, node, args.threshold, SensorType.environment, SensorId.S0)
+        en_val = await read_sensor(
+            messenger, node, args.threshold, SensorType.environment, SensorId.S0
+        )
         print(f"Environment: {en_val}")
         await asyncio.sleep(2)
 
