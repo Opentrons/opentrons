@@ -1,6 +1,6 @@
 """Functions for commanding motion limited by tool sensors."""
 import asyncio
-from typing import Union, List, Iterator, Tuple
+from typing import Union, List, Iterator, Tuple, Dict
 from logging import getLogger
 from numpy import float64
 from math import copysign
@@ -11,8 +11,10 @@ from opentrons_hardware.firmware_bindings.constants import (
     SensorType,
     SensorThresholdMode,
 )
+from .types import NodeDict
 from opentrons_hardware.sensors.types import SensorDataType
-from opentrons_hardware.sensors.sensor_types import SensorInformation
+from opentrons_hardware.sensors.sensor_types import SensorInformation, PressureSensor
+from opentrons_hardware.sensors.sensor_driver import SensorDriver
 from opentrons_hardware.sensors.scheduler import SensorScheduler
 from opentrons_hardware.sensors.utils import SensorThresholdInformation
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
@@ -27,15 +29,56 @@ LOG = getLogger(__name__)
 ProbeTarget = Union[Literal[NodeId.pipette_left, NodeId.pipette_right, NodeId.gripper]]
 
 
-def _build_pass_step(mover: NodeId, distance: float, speed: float) -> MoveGroupStep:
+def _build_pass_step(
+    movers: List[NodeId],
+    distance: Dict[NodeId, float],
+    speed: Dict[NodeId, float],
+) -> MoveGroupStep:
+    max_distance_axis = max(distance, key=distance.get)
     return create_step(
-        distance={mover: float64(abs(distance))},
-        velocity={mover: float64(speed * copysign(1.0, distance))},
+        distance={ax: float64(abs(distance[ax])) for ax in movers},
+        velocity={
+            ax: float64(speed[ax] * copysign(1.0, distance[ax])) for ax in movers
+        },
         acceleration={},
-        duration=float64(abs(distance / speed)),
-        present_nodes=[mover],
+        duration=float64(abs(distance[movers[0]] / speed[movers[0]])),
+        present_nodes=movers,
         stop_condition=MoveStopCondition.sync_line,
     )
+
+
+async def liquid_probe(
+    messenger: CanMessenger,
+    tool: ProbeTarget,
+    mount: NodeId,
+    pipette_distance: float,
+    pipette_speed: float,
+    mount_distance: float,
+    mount_speed: float,
+    sensor_id: SensorId = SensorId.S0,
+    threshold_pascals: float = 1.0,
+) -> NodeDict[Tuple[float, float]]:
+    """Just send mount down, then move mount and pipette."""
+    sensor_driver = SensorDriver()
+    pressure_sensor = PressureSensor.build(
+        sensor_id=sensor_id,
+        node_id=tool,
+        stop_threshold=threshold_pascals,
+    )
+
+    pass_group = _build_pass_step(
+        movers=[mount, tool],
+        distance={mount: mount_distance, tool: pipette_distance},
+        speed={mount: mount_speed, tool: pipette_speed},
+    )
+
+    await sensor_driver.send_stop_threshold(messenger, pressure_sensor)
+    runner = MoveGroupRunner(move_groups=[[pass_group]])
+    async with sensor_driver.bind_output(
+        messenger,
+        pressure_sensor,
+    ):
+        return await runner.run(can_messenger=messenger)
 
 
 async def capacitive_probe(
@@ -69,7 +112,7 @@ async def capacitive_probe(
     if not threshold:
         raise RuntimeError("Could not set threshold for probe")
     LOG.info(f"starting capacitive probe with threshold {threshold.to_float()}")
-    pass_group = _build_pass_step(mover, distance, speed)
+    pass_group = _build_pass_step([mover], {mover: distance}, {mover: speed})
     runner = MoveGroupRunner(move_groups=[[pass_group]])
     async with sensor_scheduler.bind_sync(
         sensor_info,

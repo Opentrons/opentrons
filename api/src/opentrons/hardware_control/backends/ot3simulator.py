@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 import asyncio
+import math
 from contextlib import asynccontextmanager
 import logging
 from typing import (
@@ -437,24 +438,47 @@ class OT3Simulator:
         ]
         await self.module_controls.register_modules(new_mods_at_ports=new_mods_at_ports)
 
+    def get_slot_center_pos(self, slot_num: int) -> OT3AxisMap[float]:
+        """Return the slot center."""
+        slot_width = self.axis_bounds[OT3Axis.X][1] / 3
+        slot_depth = self.axis_bounds[OT3Axis.Y][1] / 4
+
+        centers_x = [slot_width * 2.5, slot_width * 0.5, slot_width * 1.5]
+        center_y = (math.ceil(slot_num / 3) - 0.5) * slot_depth
+
+        return {OT3Axis.X: centers_x[slot_num % 3], OT3Axis.Y: center_y}
+
     @property
     def axis_bounds(self) -> OT3AxisMap[Tuple[float, float]]:
+        """Get the axis bounds."""
+        # TODO (CM): gripper axis bounds need to be defined
+        return {
+            OT3Axis.Z_L: (0, 160),
+            OT3Axis.Z_R: (0, 160),
+            OT3Axis.P_L: (0, 110),
+            OT3Axis.P_R: (0, 110),
+            OT3Axis.X: (0, 455),
+            OT3Axis.Y: (0, 412),
+            OT3Axis.Z_G: (0, 1000),
+        }
+
+    @property
+    def phony_bounds(self) -> OT3AxisMap[Tuple[float, float]]:
         """Get the axis bounds."""
         # TODO (AL, 2021-11-18): The bounds need to be defined
         phony_bounds = (0, 10000)
         return {
-            OT3Axis.Z_R: phony_bounds,
             OT3Axis.Z_L: phony_bounds,
+            OT3Axis.Z_R: phony_bounds,
             OT3Axis.P_L: phony_bounds,
             OT3Axis.P_R: phony_bounds,
-            OT3Axis.Y: phony_bounds,
             OT3Axis.X: phony_bounds,
+            OT3Axis.Y: phony_bounds,
             OT3Axis.Z_G: phony_bounds,
-            OT3Axis.G: phony_bounds,
         }
 
     def single_boundary(self, boundary: int) -> OT3AxisMap[float]:
-        return {ax: bound[boundary] for ax, bound in self.axis_bounds.items()}
+        return {ax: bound[boundary] for ax, bound in self.phony_bounds.items()}
 
     @property
     def fw_version(self) -> Optional[str]:

@@ -135,6 +135,15 @@ class ZSenseSettings:
     pass_settings: CapacitivePassSettings
 
 
+@dataclass
+class LiquidProbeSettings:
+    starting_mount_height: float
+    pipette_distance: float
+    mount_distance: float
+    mount_speed: float
+    pipette_speed: float
+
+
 @dataclass(frozen=True)
 class EdgeSenseSettings:
     plus_x_pos: Offset
@@ -172,3 +181,4 @@ class OT3Config:
     right_mount_offset: Offset
     gripper_mount_offset: Offset
     calibration: OT3CalibrationSettings
+    liquid_sense: LiquidProbeSettings
