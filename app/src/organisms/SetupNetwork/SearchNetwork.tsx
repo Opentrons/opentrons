@@ -26,7 +26,7 @@ export function SearchNetwork(): JSX.Element {
       <StepMeter totalSteps={5} currentStep={2} OnDevice />
       <Flex justifyContent={JUSTIFY_CENTER} marginBottom="3.041875rem">
         <StyledText fontSize="2rem" fontWeight="700" lineHeight="2.72375rem">
-          {t('connect_to_a_network')}
+          {t('connect_via', { type: t('wifi') })}
         </StyledText>
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN}>
