@@ -18,7 +18,7 @@ class Plot:
         self.PLOT_PATH = "plot_pipette_calibration/"
         self.PLOT_FORMAT = ".png"
         self.axes = ["X", "Y"]
-        self.jog_offset = 2 # mm
+        self.jog_offset = 0 # mm
         self.plot_param = {
             "figure":None,
             "filename":None,
@@ -41,6 +41,7 @@ class Plot:
         self.slot = df["Slot"].iloc[0]
         df["X Zeroed"] = round(df["X Gauge"] - df["X Zero"] - (self.PROBE_DIA/2 + self.jog_offset), 3)
         df["Y Zeroed"] = round(df["Y Gauge"] - df["Y Zero"] - (self.PROBE_DIA/2 + self.jog_offset), 3)
+        df["Deck Z Encoder"] = df["Deck Encoder"].str.strip("][").str.split(";").str[2].astype(float)
         df.name = file
         return df
 
@@ -52,6 +53,8 @@ class Plot:
     def create_plot(self):
         print("Plotting Deck Height...")
         self.deck_height_plot()
+        print("Plotting Deck Encoder...")
+        self.deck_encoder_plot()
         print("Plotting Slot Center...")
         self.slot_center_plot()
         print("Plotting Axis Center...")
@@ -116,6 +119,45 @@ class Plot:
         for key, value in self.plot_param.items():
             self.plot_param[key] = None
 
+    def deck_encoder_plot(self):
+        df = self.df_data
+        x_axis = "Cycle"
+        y_axis = "Deck Z Encoder"
+        x_start = df[x_axis].iloc[0]
+        x_end = df[x_axis].iloc[-1]
+        y_start = df[y_axis].iloc[0]
+        y_end = df[y_axis].iloc[-1]
+
+        y_min = round(df[y_axis].min(), 3)
+        y_min_id = df[y_axis].idxmin()
+        y_min_xpos = df.loc[y_min_id][x_axis].item()
+        y_min_text = f"Z-Axis Min = {y_min}mm"
+
+        y_max = round(df[y_axis].max(), 3)
+        y_max_id = df[y_axis].idxmax()
+        y_max_xpos = df.loc[y_max_id][x_axis].item()
+        y_max_text = f"Z-Axis Max = {y_max}mm"
+
+        annotation_ymin = self.set_annotation(y_min_xpos, y_min, y_min_text, ax_pos=100, ay_pos=100)
+        annotation_ymax = self.set_annotation(y_max_xpos, y_max, y_max_text, ax_pos=-100, ay_pos=-100)
+
+        fig = px.line(df, x=x_axis, y=[y_axis], markers=True)
+        fig.update_layout(
+            xaxis_tickmode = 'linear',
+            xaxis_tick0 = 0,
+            xaxis_dtick = 10,
+        )
+        self.plot_param["figure"] = fig
+        self.plot_param["filename"] = "plot_deck_encoder"
+        self.plot_param["title"] = "Deck Encoder"
+        self.plot_param["x_title"] = "Cycle Number"
+        self.plot_param["y_title"] = "Z-Axis Encoder (mm)"
+        self.plot_param["x_range"] = [0, x_end]
+        self.plot_param["y_range"] = [2.744, 2.76]
+        self.plot_param["legend"] = "Data"
+        self.plot_param["annotation"] = [annotation_ymin, annotation_ymax]
+        self.write_plot(self.plot_param)
+
     def deck_height_plot(self):
         df = self.df_data
         x_axis = "Cycle"
@@ -124,6 +166,20 @@ class Plot:
         x_end = df[x_axis].iloc[-1]
         y_start = df[y_axis].iloc[0]
         y_end = df[y_axis].iloc[-1]
+
+        y_min = round(df[y_axis].min(), 3)
+        y_min_id = df[y_axis].idxmin()
+        y_min_xpos = df.loc[y_min_id][x_axis].item()
+        y_min_text = f"Deck Min = {y_min}mm"
+
+        y_max = round(df[y_axis].max(), 3)
+        y_max_id = df[y_axis].idxmax()
+        y_max_xpos = df.loc[y_max_id][x_axis].item()
+        y_max_text = f"Deck Max = {y_max}mm"
+
+        annotation_ymin = self.set_annotation(y_min_xpos, y_min, y_min_text, ax_pos=-100, ay_pos=-100)
+        annotation_ymax = self.set_annotation(y_max_xpos, y_max, y_max_text, ax_pos=100, ay_pos=100)
+
         fig = px.line(df, x=x_axis, y=[y_axis], markers=True)
         fig.update_layout(
             xaxis_tickmode = 'linear',
@@ -136,9 +192,9 @@ class Plot:
         self.plot_param["x_title"] = "Cycle Number"
         self.plot_param["y_title"] = "Deck Height (mm)"
         self.plot_param["x_range"] = [0, x_end]
-        self.plot_param["y_range"] = [round(y_end, 1), round(y_start, 1)]
+        self.plot_param["y_range"] = [-1.8, round(y_start, 1)]
         self.plot_param["legend"] = "Data"
-        self.plot_param["annotation"] = None
+        self.plot_param["annotation"] = [annotation_ymin, annotation_ymax]
         self.write_plot(self.plot_param)
 
     def slot_center_plot(self):
@@ -153,6 +209,10 @@ class Plot:
         y_avg = df[y_axis].mean()
         x_off = 0.10
         y_off = 0.10
+        x_precision = round(abs(abs(df[x_axis].max()) - abs(df[x_axis].min())), 3)
+        y_precision = round(abs(abs(df[y_axis].max()) - abs(df[y_axis].min())), 3)
+        print(f"X-Axis Center Precision: {x_avg} mm ±{x_precision} mm")
+        print(f"Y-Axis Center Precision: {y_avg} mm ±{y_precision} mm")
         fig1 = px.scatter(df, x=x_axis, y=[y_axis], color_discrete_sequence=["green"])
         fig2 = px.line(x=[-self.LIMIT, self.LIMIT], y=[[y_avg, y_avg]], line_dash_sequence=["dash"], color_discrete_sequence=["blue"])
         fig3 = px.line(x=[x_avg, x_avg], y=[[-self.LIMIT, self.LIMIT]], line_dash_sequence=["dash"], color_discrete_sequence=["red"])
@@ -265,9 +325,9 @@ class Plot:
         y_start = round(y_min, 2) - 0.05
         y_end = round(y_max, 2) + 0.05
 
-        annotation_ymin = self.set_annotation(y_min_xpos, y_min, y_min_text, ax_pos=-100, ay_pos=100)
+        annotation_ymin = self.set_annotation(y_min_xpos, y_min, y_min_text, ax_pos=100, ay_pos=100)
         annotation_ymax = self.set_annotation(y_max_xpos, y_max, y_max_text, ax_pos=100, ay_pos=-100)
-        annotation_yavg = self.set_annotation(y_avg_xpos, y_avg, y_avg_text, ax_pos=100, ay_pos=100)
+        annotation_yavg = self.set_annotation(y_avg_xpos, y_avg, y_avg_text, ax_pos=100, ay_pos=-100)
 
         fig1 = px.line(df, x=x_axis, y=[y_axis], markers=True, color_discrete_sequence=self.list_colors[index:])
         fig2 = px.line(x=[-self.LIMIT, self.LIMIT], y=[[y_avg, y_avg]], line_dash_sequence=["dash"], color_discrete_sequence=["black"])
