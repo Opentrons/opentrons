@@ -1,6 +1,6 @@
 """Tests for opentrons.protocol_reader.role_analyzer.RoleAnalyzer."""
 import pytest
-from typing import List, NamedTuple
+from typing import List, Union
 
 from opentrons.protocols.api_support.types import APIVersion
 
@@ -18,55 +18,70 @@ from opentrons.protocol_reader.role_analyzer import (
 )
 
 
+def dummy_python_protocol_file(file_name: str) -> PythonProtocolFileInfo:
+    """Return a PythonProtocolFileInfo with trivial placeholder data."""
+    return PythonProtocolFileInfo(
+        original_file=BufferedFile(name=file_name, path=None, contents=b""),
+        api_level=APIVersion(9001, 9001),
+        metadata={},
+    )
+
+
+def dummy_json_protocol_file(file_name: str) -> JsonProtocolFileInfo:
+    """Return a JsonProtocolFileInfo with trivial placeholder data."""
+    return JsonProtocolFileInfo(
+        original_file=BufferedFile(
+            name=file_name,
+            contents=b"",
+            path=None,
+        ),
+        unvalidated_json={},
+        schema_version=123,
+        metadata={},
+    )
+
+
+def dummy_labware_definition_file(file_name: str) -> LabwareDefinitionFileInfo:
+    """Return a LabwareDefinitionFileInfo with trivial placeholder data."""
+    return LabwareDefinitionFileInfo(
+        original_file=BufferedFile(
+            name=file_name,
+            contents=b"",
+            path=None,
+        ),
+        unvalidated_json={},
+    )
+
+
 @pytest.mark.parametrize(
     "main_file",
     [
-        PythonProtocolFileInfo(
-            original_file=BufferedFile(name="foo", path=None, contents=b""),
-            api_level=APIVersion(9001, 9001),
-            metadata={},
-        ),
-        JsonProtocolFileInfo(
-            original_file=BufferedFile(
-                name="foo",
-                contents=b"",
-                path=None,
-            ),
-            unvalidated_json={},
-            schema_version=123,
-            metadata={},
-        ),
+        dummy_python_protocol_file(file_name="foo"),
+        dummy_json_protocol_file(file_name="foo"),
     ],
 )
-def test_single_main_file(main_file: FileInfo) -> None:
+def test_single_main_file(
+    main_file: Union[JsonProtocolFileInfo, PythonProtocolFileInfo]
+) -> None:
     """It should analyze a file list containing only a single main file."""
     subject = RoleAnalyzer()
     result = subject.analyze([main_file])
-    assert result.main_file == main_file
-    assert result.labware_files == []
+    assert result == RoleAnalysis(
+        main_file=main_file,
+        labware_files=[],
+    )
 
 
 @pytest.mark.parametrize(
     "main_file",
     [
-        PythonProtocolFileInfo(
-            original_file=BufferedFile(name="foo", path=None, contents=b""),
-            api_level=APIVersion(9001, 9001),
-            metadata={},
-        ),
-        JsonProtocolFileInfo(
-            original_file=BufferedFile(
-                name="foo",
-                contents=b"",
-                path=None,
-            ),
-            unvalidated_json={},
-            schema_version=123,
-            metadata={},
-        ),
+        dummy_python_protocol_file(file_name="foo"),
+        dummy_json_protocol_file(file_name="bar"),
     ],
 )
-def test_single_main_file_and_labware(main_file: FileInfo) -> None:
+def test_single_main_file_and_labware(
+    main_file: Union[JsonProtocolFileInfo, PythonProtocolFileInfo]
+) -> None:
     """It should analyze a file list containing a single main file, plus labware."""
     labware_file_1 = LabwareDefinitionFileInfo(
         original_file=BufferedFile(
@@ -87,8 +102,10 @@ def test_single_main_file_and_labware(main_file: FileInfo) -> None:
 
     subject = RoleAnalyzer()
     result = subject.analyze([main_file, labware_file_1, labware_file_2])
-    assert result.main_file == main_file
-    assert result.labware_files == [labware_file_1, labware_file_2]
+    assert result == RoleAnalysis(
+        main_file=main_file,
+        labware_files=[labware_file_1, labware_file_2],
+    )
 
 
 def test_error_if_no_files() -> None:
@@ -103,57 +120,18 @@ def test_error_if_no_files() -> None:
     [
         # Python plus Python:
         (
-            PythonProtocolFileInfo(
-                original_file=BufferedFile(name="main_file_1", path=None, contents=b""),
-                api_level=APIVersion(9001, 9001),
-                metadata={},
-            ),
-            PythonProtocolFileInfo(
-                original_file=BufferedFile(name="main_file_2", path=None, contents=b""),
-                api_level=APIVersion(9001, 9001),
-                metadata={},
-            ),
+            dummy_python_protocol_file(file_name="main_file_1"),
+            dummy_python_protocol_file(file_name="main_file_2"),
         ),
         # Python plus JSON:
         (
-            PythonProtocolFileInfo(
-                original_file=BufferedFile(name="main_file_1", path=None, contents=b""),
-                api_level=APIVersion(9001, 9001),
-                metadata={},
-            ),
-            JsonProtocolFileInfo(
-                original_file=BufferedFile(
-                    name="main_file_2",
-                    contents=b"",
-                    path=None,
-                ),
-                unvalidated_json={},
-                schema_version=123,
-                metadata={},
-            ),
+            dummy_python_protocol_file(file_name="main_file_1"),
+            dummy_json_protocol_file(file_name="main_file_2"),
         ),
         # JSON plus JSON:
         (
-            JsonProtocolFileInfo(
-                original_file=BufferedFile(
-                    name="main_file_1",
-                    contents=b"",
-                    path=None,
-                ),
-                unvalidated_json={},
-                schema_version=123,
-                metadata={},
-            ),
-            JsonProtocolFileInfo(
-                original_file=BufferedFile(
-                    name="main_file_2",
-                    contents=b"",
-                    path=None,
-                ),
-                unvalidated_json={},
-                schema_version=123,
-                metadata={},
-            ),
+            dummy_json_protocol_file(file_name="main_file_1"),
+            dummy_json_protocol_file(file_name="main_file_2"),
         ),
     ],
 )
@@ -173,36 +151,13 @@ def test_error_if_multiple_main_files(
     "labware_files, expected_message",
     [
         (
-            [
-                LabwareDefinitionFileInfo(
-                    original_file=BufferedFile(
-                        name="labware",
-                        contents=b"",
-                        path=None,
-                    ),
-                    unvalidated_json={},
-                )
-            ],
+            [dummy_labware_definition_file(file_name="labware")],
             '"labware" is not a valid protocol file.',
         ),
         (
             [
-                LabwareDefinitionFileInfo(
-                    original_file=BufferedFile(
-                        name="labware_1",
-                        contents=b"",
-                        path=None,
-                    ),
-                    unvalidated_json={},
-                ),
-                LabwareDefinitionFileInfo(
-                    original_file=BufferedFile(
-                        name="labware_2",
-                        contents=b"",
-                        path=None,
-                    ),
-                    unvalidated_json={},
-                ),
+                dummy_labware_definition_file(file_name="labware_1"),
+                dummy_labware_definition_file(file_name="labware_2"),
             ],
             'No valid protocol file found in "labware_1", "labware_2"',
         ),
