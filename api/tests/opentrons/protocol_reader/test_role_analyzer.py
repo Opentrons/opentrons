@@ -53,6 +53,17 @@ def dummy_labware_definition_file(file_name: str) -> LabwareDefinitionFileInfo:
     )
 
 
+def test_role_analysis_all_files() -> None:
+    """It should return all member files."""
+    main_file = dummy_python_protocol_file(file_name="main")
+    labware_file_1 = dummy_labware_definition_file(file_name="labware_1")
+    labware_file_2 = dummy_labware_definition_file(file_name="labware_2")
+    subject = RoleAnalysis(
+        main_file=main_file, labware_files=[labware_file_1, labware_file_2]
+    )
+    assert subject.all_files == [main_file, labware_file_1, labware_file_2]
+
+
 @pytest.mark.parametrize(
     "main_file",
     [
