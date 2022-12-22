@@ -10,12 +10,19 @@ from opentrons.broker import Broker
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, ModuleContext, Labware
 from opentrons.protocol_api.core.common import LabwareCore, ModuleCore, ProtocolCore
 from opentrons.protocol_api.core.labware import LabwareLoadParams
+from opentrons.protocol_api.core.core_map import LoadedCoreMap
 
 
 @pytest.fixture
 def mock_core(decoy: Decoy) -> ModuleCore:
     """Get a mock module implementation core."""
     return decoy.mock(cls=ModuleCore)
+
+
+@pytest.fixture
+def mock_core_map(decoy: Decoy) -> LoadedCoreMap:
+    """Get a mock core map."""
+    return decoy.mock(cls=LoadedCoreMap)
 
 
 @pytest.fixture
@@ -32,11 +39,15 @@ def mock_broker(decoy: Decoy) -> Broker:
 
 @pytest.fixture
 def subject(
-    mock_core: ModuleCore, mock_protocol_core: ProtocolCore, mock_broker: Broker
+    mock_core: ModuleCore,
+    mock_core_map: LoadedCoreMap,
+    mock_protocol_core: ProtocolCore,
+    mock_broker: Broker,
 ) -> ModuleContext[Any]:
     """Get a generic module context with its dependencies mocked out."""
     return ModuleContext(
         core=mock_core,
+        core_map=mock_core_map,
         protocol_core=mock_protocol_core,
         broker=mock_broker,
         api_version=MAX_SUPPORTED_VERSION,
@@ -56,6 +67,7 @@ def test_get_labware(
 def test_load_labware(
     decoy: Decoy,
     mock_protocol_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
     mock_core: ModuleCore,
     subject: ModuleContext[Any],
 ) -> None:
@@ -85,6 +97,7 @@ def test_load_labware(
     )
 
     assert result is mock_labware
+    decoy.verify(mock_core_map.add(mock_labware_core, result), times=1)
 
 
 def test_load_labware_from_definition(

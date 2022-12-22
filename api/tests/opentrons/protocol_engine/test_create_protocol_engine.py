@@ -22,11 +22,18 @@ async def test_create_engine_initializes_state_with_deck_geometry(
     """It should load deck geometry data into the store on create."""
     engine = await create_protocol_engine(
         hardware_api=hardware_api,
-        config=EngineConfig(),
+        config=EngineConfig(
+            # robot_type chosen to match hardware_api.
+            robot_type="OT-2 Standard"
+        ),
     )
     state = engine.state_view
 
     assert isinstance(engine, ProtocolEngine)
+
+    # TODO(mm, 2022-12-07): The expected deck definition and fixed trash
+    # labware should depend on EngineConfig, and we should parametrize this
+    # test to cover that.
     assert state.labware.get_deck_definition() == standard_deck_def
     assert state.labware.get_all() == [
         LoadedLabware(
@@ -50,7 +57,10 @@ async def test_create_engine_initializes_state_with_door_state(
     hardware_api.door_state = DoorState.OPEN
     engine = await create_protocol_engine(
         hardware_api=hardware_api,
-        config=EngineConfig(block_on_door_open=True),
+        config=EngineConfig(
+            block_on_door_open=True,
+            robot_type="OT-2 Standard",  # Choice of robot_type is arbitrary.
+        ),
     )
     state = engine.state_view
     assert state.commands.get_is_door_blocking() is True

@@ -20,9 +20,14 @@
 
 const parseArgs = require('./lib/parseArgs')
 const conventionalChangelog = require('conventional-changelog')
-const git = require('simple-git')
 const semver = require('semver')
 const { Octokit } = require('@octokit/rest')
+const {
+  detailsFromTag,
+  tagFromDetails,
+  prefixForProject,
+  monorepoGit,
+} = require('../git-version')
 
 const USAGE =
   '\nUsage:\n node ./scripts/deploy/create-release <token> <tag> [--deploy] [--allow-old]'
@@ -35,25 +40,6 @@ const ALLOWED_VERSION_TYPES = ['alpha', 'beta', 'candidate', 'production']
 const REPO_DETAILS = {
   owner: 'Opentrons',
   repo: 'opentrons',
-}
-
-const detailsFromTag = tag =>
-  tag.includes('@') ? tag.split('@') : ['robot-stack', tag.substring(1)]
-
-function tagFromDetails(project, version) {
-  if (project === 'robot-stack') {
-    return 'v' + version
-  } else {
-    return [project, version].join('@')
-  }
-}
-
-function prefixForProject(project) {
-  if (project === 'robot-stack') {
-    return 'v'
-  } else {
-    return project + '@'
-  }
 }
 
 // The release kind is normally just the semver preproduction stage, but we need to account
@@ -97,7 +83,7 @@ function versionPrevious(currentVersion, previousVersions) {
 
 async function versionDetailsFromGit(tag, allowOld) {
   if (!allowOld) {
-    const last100 = await git().log({ from: 'HEAD~100', to: 'HEAD' })
+    const last100 = await monorepoGit().log({ from: 'HEAD~100', to: 'HEAD' })
     if (!last100.all.some(commit => commit.refs.includes('tag: ' + tag))) {
       throw new Error(
         `Cannot find tag ${tag} in last 100 commits. You must run this script from a ref with ` +
@@ -109,7 +95,8 @@ async function versionDetailsFromGit(tag, allowOld) {
 
   const [project, currentVersion] = detailsFromTag(tag)
 
-  const allTags = (await git().tags([prefixForProject(project) + '*'])).all
+  const allTags = (await monorepoGit().tags([prefixForProject(project) + '*']))
+    .all
   if (!allTags.includes(tag)) {
     throw new Error(
       `Tag ${tag} does not exist - create it before running this script`

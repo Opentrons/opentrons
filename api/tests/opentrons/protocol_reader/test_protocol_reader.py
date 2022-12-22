@@ -110,6 +110,7 @@ async def test_read_files(
         main_file=main_file,
         labware_files=[labware_file],
         labware_definitions=[labware_data],
+        data_files=[],
     )
     analyzed_config = ConfigAnalysis(
         metadata={"hey": "there"},
@@ -226,6 +227,7 @@ async def test_config_error(
         main_file=main_file,
         labware_files=[],
         labware_definitions=[],
+        data_files=[],
     )
 
     decoy.when(await file_reader_writer.read([input_file])).then_return([buffered_file])
@@ -263,7 +265,10 @@ async def test_read_files_no_copy(
     )
 
     analyzed_roles = RoleAnalysis(
-        main_file=main_file, labware_files=[], labware_definitions=[]
+        main_file=main_file,
+        labware_files=[],
+        labware_definitions=[],
+        data_files=[],
     )
     analyzed_config = ConfigAnalysis(
         metadata={"hey": "there"},

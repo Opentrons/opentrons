@@ -9,8 +9,10 @@ from typing import List, Optional, Union
 from typing_extensions import Literal
 
 from opentrons.protocol_reader import ProtocolReader, ProtocolFilesInvalidError
+from opentrons_shared_data.robot.dev_types import RobotType
 
 from robot_server.errors import ErrorDetails, ErrorBody
+from robot_server.hardware import get_robot_type
 from robot_server.service.task_runner import TaskRunner, get_task_runner
 from robot_server.service.dependencies import get_unique_id, get_current_time
 from robot_server.service.json_api import (
@@ -66,6 +68,16 @@ class ProtocolFilesInvalid(ErrorDetails):
     title: str = "Protocol File(s) Invalid"
 
 
+class ProtocolRobotTypeMismatch(ErrorDetails):
+    """An error returned when an uploaded protocol is for a different type of robot.
+
+    For example, if the protocol is for an OT-3, but this server is running on an OT-2.
+    """
+
+    id: Literal["ProtocolRobotTypeMismatch"] = "ProtocolRobotTypeMismatch"
+    title: str = "Protocol For Different Robot Type"
+
+
 class ProtocolUsedByRun(ErrorDetails):
     """An error returned when a protocol is used by a run and cannot be deleted."""
 
@@ -96,7 +108,7 @@ protocols_router = APIRouter()
     responses={
         status.HTTP_201_CREATED: {"model": SimpleBody[Protocol]},
         status.HTTP_422_UNPROCESSABLE_ENTITY: {
-            "model": ErrorBody[ProtocolFilesInvalid]
+            "model": ErrorBody[Union[ProtocolFilesInvalid, ProtocolRobotTypeMismatch]]
         },
     },
 )
@@ -112,6 +124,7 @@ async def create_protocol(
     protocol_analyzer: ProtocolAnalyzer = Depends(get_protocol_analyzer),
     task_runner: TaskRunner = Depends(get_task_runner),
     protocol_auto_deleter: ProtocolAutoDeleter = Depends(get_protocol_auto_deleter),
+    robot_type: RobotType = Depends(get_robot_type),
     protocol_id: str = Depends(get_unique_id, use_cache=False),
     analysis_id: str = Depends(get_unique_id, use_cache=False),
     created_at: datetime = Depends(get_current_time),
@@ -129,6 +142,8 @@ async def create_protocol(
         task_runner: Background task runner.
         protocol_auto_deleter: An interface to delete old resources to make room for
             the new protocol.
+        robot_type: The type of this robot. Protocols meant for other robot types
+            are rejected.
         protocol_id: Unique identifier to attach to the protocol resource.
         analysis_id: Unique identifier to attach to the analysis resource.
         created_at: Timestamp to attach to the new resource.
@@ -141,7 +156,16 @@ async def create_protocol(
     except ProtocolFilesInvalidError as e:
         raise ProtocolFilesInvalid(detail=str(e)).as_error(
             status.HTTP_422_UNPROCESSABLE_ENTITY
-        )
+        ) from e
+
+    if source.robot_type != robot_type:
+        raise ProtocolRobotTypeMismatch(
+            detail=(
+                f"This protocol is for {source.robot_type} robots."
+                f" It can't be analyzed or run on this robot,"
+                f" which is an {robot_type}."
+            )
+        ).as_error(status.HTTP_422_UNPROCESSABLE_ENTITY)
 
     protocol_resource = ProtocolResource(
         protocol_id=protocol_id,
@@ -167,6 +191,7 @@ async def create_protocol(
         id=protocol_id,
         createdAt=created_at,
         protocolType=source.config.protocol_type,
+        robotType=source.robot_type,
         metadata=Metadata.parse_obj(source.metadata),
         analysisSummaries=[pending_analysis],
         key=key,
@@ -198,10 +223,11 @@ async def get_protocols(
     """
     protocol_resources = protocol_store.get_all()
     data = [
-        Protocol(
+        Protocol.construct(
             id=r.protocol_id,
             createdAt=r.created_at,
             protocolType=r.source.config.protocol_type,
+            robotType=r.source.robot_type,
             metadata=Metadata.parse_obj(r.source.metadata),
             analysisSummaries=analysis_store.get_summaries_by_protocol(r.protocol_id),
             key=r.protocol_key,
@@ -248,6 +274,7 @@ async def get_protocol_by_id(
         id=protocolId,
         createdAt=resource.created_at,
         protocolType=resource.source.config.protocol_type,
+        robotType=resource.source.robot_type,
         metadata=Metadata.parse_obj(resource.source.metadata),
         analysisSummaries=analyses,
         key=resource.protocol_key,

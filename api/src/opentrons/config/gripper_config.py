@@ -113,3 +113,10 @@ def piecewise_force_conversion(
                 return newton * x[1] / x[0]
     # return max duty cycle in config
     return sequence[-1][1]
+
+
+def force_to_pwm_polynomial(newton: float) -> float:
+    assert (
+        5.0 <= newton <= 30.0
+    ), f"{newton} N exceeds gripper force range: 5.0 - 30.0 N"
+    return -3.38 + 2.68 * newton - 0.0174 * newton**2

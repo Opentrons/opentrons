@@ -562,6 +562,14 @@ async def test_multi_group_move(
             expected_nodes.update(set((k.value, seq_id) for k in mgs.keys()))
         expected_nodes_list.append([NodeId(n) for n, s in expected_nodes])
 
+    # remove duplicates from the expected nodes lists
+    for i, enl in enumerate(expected_nodes_list):
+        res = []
+        for n in enl:
+            if n not in res:
+                res.append(n)
+        expected_nodes_list[i] = res
+
     mock_can_messenger.ensure_send.assert_has_calls(
         calls=[
             call(
@@ -641,6 +649,14 @@ async def test_multi_group_move_with_stale_complete(
         for seq_id, mgs in enumerate(movegroup):
             expected_nodes.update(set((k.value, seq_id) for k in mgs.keys()))
         expected_nodes_list.append([NodeId(n) for n, s in expected_nodes])
+
+    # remove duplicates from the expected nodes lists
+    for i, enl in enumerate(expected_nodes_list):
+        res = []
+        for n in enl:
+            if n not in res:
+                res.append(n)
+        expected_nodes_list[i] = res
 
     mock_can_messenger.ensure_send.assert_has_calls(
         calls=[
@@ -789,7 +805,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                     ),
                 ),
             ],
-            {NodeId.gantry_x: (10, 40)},
+            {NodeId.gantry_x: (10, 40, False, False)},
         ),
         (
             # multiple axes with different numbers of completions
@@ -834,7 +850,10 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                     ),
                 ),
             ],
-            {NodeId.gantry_x: (10, 40), NodeId.gantry_y: (30, 40)},
+            {
+                NodeId.gantry_x: (10, 40, False, False),
+                NodeId.gantry_y: (30, 40, False, False),
+            },
         ),
         (
             # empty base case
@@ -844,7 +863,8 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
     ],
 )
 def test_accumulate_move_completions(
-    completions: List[_CompletionPacket], position_map: NodeMap[Tuple[float, float]]
+    completions: List[_CompletionPacket],
+    position_map: NodeMap[Tuple[float, float, bool, bool]],
 ) -> None:
     """Build correct move results."""
     assert MoveGroupRunner._accumulate_move_completions(completions) == position_map
