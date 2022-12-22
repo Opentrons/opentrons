@@ -193,14 +193,8 @@ async def test_read_saved(
     subject: ProtocolReader,
 ) -> None:
     """It should read a single file protocol source without copying elsewhere."""
-    input_main_file = InputFile.make(
-        filename="protocol.py",
-        contents=b"# hello world",
-    )
-    input_labware_file = InputFile.make(
-        filename="labware.json",
-        contents=b"wow",
-    )
+    input_main_file = Path("/path/to/protocol.py")
+    input_labware_file = Path("/path/to/labware.json")
 
     buffered_main_file = BufferedFile(
         name="protocol.py",
