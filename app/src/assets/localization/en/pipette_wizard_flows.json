@@ -41,7 +41,6 @@
   "get_started_detach": "<block>To get started, remove labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right</block>",
   "pipette_failed_to_detach": "Pipette failed to detach",
   "pipette_detached": "Pipette Successfully Detached",
-  "get_started_flow": "<block>To get started, remove labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right</block>",
   "unscrew_carriage": "Unscrew Z Axis Carriage",
   "unscrew_at_top": "<block>Reach the top of of the gantry carriage and unscrew the captive screw connecting right pippete mount to the the z axis.</block><block>The detached right mount should freely move up and down the z axis.</block>",
   "connect_mounting_plate": "Connect and Attach Mounting Plate",
