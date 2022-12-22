@@ -303,8 +303,8 @@ async def read_sensor(
 async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
     # build a GPIO handler, which will automatically release estop
-    # gpio = OT3GPIO(__name__)
-    # gpio.deactivate_estop()
+    gpio = OT3GPIO(__name__)
+    gpio.deactivate_estop()
     node = ot3_nodes[args.node]
     subprocess.run(["systemctl", "stop", "opentrons-robot-server"])
     position = {node: 0.0}
@@ -330,6 +330,7 @@ async def run(args: argparse.Namespace) -> None:
         input("Block the limit switch and press enter")
         res = await get_limit_switches(messenger, [node])  # type: ignore[valid-type]
         print(f"Current Limit switch State: {res}")
+        print("Press Enter to Continue")
 
     if args.read_epprom:
         print("\n")
@@ -341,27 +342,28 @@ async def run(args: argparse.Namespace) -> None:
     if args.capacitive:
         print("\n")
         print("-----------------Read Capacitive--------------")
-        cap_val = await read_sensor(
+        capacitive_data = await read_sensor(
             messenger, node, args.threshold, SensorType.capacitive, SensorId.S0
         )
-        print(f"Capacitive(uF): {cap_val}")
+        print(f"Capacitive(uF): {capacitive_data}")
         await asyncio.sleep(2)
 
     if args.pressure:
         print("\n")
         print("-----------------Read pressure--------------")
-        p = await read_sensor(
+        pressure_data = await read_sensor(
             messenger, node, args.threshold, SensorType.pressure, SensorId.S0
         )
+        print(f"Pressure(Pa): {pressure_data}")
         await asyncio.sleep(2)
 
     if args.environment:
         print("\n")
         print("-----------------Read Environment--------------")
-        en_val = await read_sensor(
+        environment_data = await read_sensor(
             messenger, node, args.threshold, SensorType.environment, SensorId.S0
         )
-        print(f"Environment: {en_val}")
+        print(f"Environment(C ,RH): {environment_data}")
         await asyncio.sleep(2)
 
     print("\n")
@@ -434,13 +436,13 @@ def main() -> None:
         "-t", "--threshold", type=float, help="sensor threshold", default=50
     )
 
-    parser.add_argument("--limit_switch", action="store_true")
-    parser.add_argument("--jog", action="store_true")
-    parser.add_argument("--read_epprom", action="store_true")
-    parser.add_argument("--home", action="store_true")
-    parser.add_argument("--capacitive", action="store_true")
-    parser.add_argument("--pressure", action="store_true")
-    parser.add_argument("--environment", action="store_true")
+    parser.add_argument("--limit_switch", action="store_false")
+    parser.add_argument("--jog", action="store_false")
+    parser.add_argument("--read_epprom", action="store_false")
+    parser.add_argument("--home", action="store_false")
+    parser.add_argument("--capacitive", action="store_false")
+    parser.add_argument("--pressure", action="store_false")
+    parser.add_argument("--environment", action="store_false")
 
     args = parser.parse_args()
     asyncio.run(run(args))
