@@ -1,6 +1,7 @@
 """Protocol file reading interfaces."""
 
-from .protocol_reader import ProtocolReader, ProtocolFilesInvalidError
+from .protocol_files_invalid_error import ProtocolFilesInvalidError
+from .protocol_reader import ProtocolReader
 from .input_file import AbstractInputFile
 from .protocol_source import (
     ProtocolSource,

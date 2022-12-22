@@ -71,14 +71,10 @@ class ProtocolReader:
             ProtocolFilesInvalidError: Input file list given to the reader
                 could not be validated as a protocol.
         """
-        try:
-            buffered_files = await self._file_reader_writer.read(files)
-            basic_info = await self._basic_info_extractor.extract(buffered_files)
-            role_analysis = self._role_analyzer.analyze(basic_info)
-            await self._file_format_validator.validate(role_analysis.all_files)
-        except Exception as e:
-            # FIX BEFORE MERGE: Catch specific exception types
-            raise ProtocolFilesInvalidError(str(e)) from e
+        buffered_files = await self._file_reader_writer.read(files)
+        basic_info = await self._basic_info_extractor.extract(buffered_files)
+        role_analysis = self._role_analyzer.analyze(basic_info)
+        await self._file_format_validator.validate(role_analysis.all_files)
 
         files_to_write = [f.original_file for f in role_analysis.all_files]
         await self._file_reader_writer.write(directory=directory, files=files_to_write)
@@ -127,15 +123,11 @@ class ProtocolReader:
             ProtocolFilesInvalidError: Input file list given to the reader
                 could not be validated as a protocol.
         """
-        try:
-            buffered_files = await self._file_reader_writer.read(files)
-            basic_info = await self._basic_info_extractor.extract(buffered_files)
-            role_analysis = self._role_analyzer.analyze(basic_info)
-            if not files_are_prevalidated:
-                await self._file_format_validator.validate(role_analysis.all_files)
-        except Exception as e:
-            # FIX BEFORE MERGE: Catch specific exception types
-            raise ProtocolFilesInvalidError(str(e)) from e
+        buffered_files = await self._file_reader_writer.read(files)
+        basic_info = await self._basic_info_extractor.extract(buffered_files)
+        role_analysis = self._role_analyzer.analyze(basic_info)
+        if not files_are_prevalidated:
+            await self._file_format_validator.validate(role_analysis.all_files)
 
         # We know these paths will not be None because we supplied real Paths,
         # not AbstractInputFiles, to FileReaderWriter.

@@ -12,6 +12,7 @@ from opentrons_shared_data.protocol.models import ProtocolSchemaV6
 from opentrons.protocols.models import JsonProtocol, LabwareDefinition
 
 from .input_file import AbstractInputFile
+from .protocol_files_invalid_error import ProtocolFilesInvalidError
 
 
 @dataclass(frozen=True)
@@ -23,7 +24,7 @@ class BufferedFile:
     path: Optional[Path]
 
 
-class FileReadError(Exception):
+class FileReadError(ProtocolFilesInvalidError):
     """An error raised if input files cannot be read."""
 
 

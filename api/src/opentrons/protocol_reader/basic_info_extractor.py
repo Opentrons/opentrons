@@ -10,6 +10,7 @@ from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.parse import extract_metadata as extract_python_metadata
 
 from .file_reader_writer import BufferedFile
+from .protocol_files_invalid_error import ProtocolFilesInvalidError
 from .protocol_source import Metadata
 
 
@@ -51,7 +52,7 @@ class BasicInfoExtractor:
 
 
 # FIX BEFORE MERGE: Rename exception.
-class ConfigAnalysisError(ValueError):
+class ConfigAnalysisError(ProtocolFilesInvalidError):
     pass
 
 
