@@ -10,3 +10,14 @@ export type { Action, PlainError }
 export type Dispatch = (action: Action) => void
 
 export type { Logger }
+
+export interface Manifest {
+  production: {
+    [version: string]: {
+      fullImage: [url: string]
+      system: [url: string]
+      version: [url: string]
+      releaseNotes: [url: string]
+    }
+  }
+}

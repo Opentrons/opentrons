@@ -7,7 +7,7 @@ import { initializeMenu } from './menu'
 import { createLogger } from './log'
 import { registerDiscovery } from './discovery'
 import { registerRobotLogs } from './robot-logs'
-import { registerUpdate } from './update'
+import { registerUpdate, updateLatestVersion } from './update'
 import { registerRobotSystemUpdate } from './system-update'
 import { getConfig, getStore, getOverrides, registerConfig } from './config'
 
@@ -49,6 +49,8 @@ function startUp(): void {
   process.on('unhandledRejection', reason =>
     log.error('Uncaught Promise rejection: ', { reason })
   )
+  log.info('Fetching latest software version')
+  updateLatestVersion()
 
   mainWindow = createUi()
   rendererLogger = createRendererLogger()

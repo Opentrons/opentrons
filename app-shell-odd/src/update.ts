@@ -4,14 +4,37 @@ import { autoUpdater as updater } from 'electron-updater'
 import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
 import { createLogger } from './log'
 import { getConfig } from './config'
+import { fetchJson } from './http'
 
 import type { UpdateInfo } from '@opentrons/app/src/redux/shell/types'
 import type { Action, Dispatch, PlainError } from './types'
+import type { ReleaseManifest } from './system-update/types'
+import semver from 'semver'
 
 updater.logger = createLogger('update')
 
 updater.autoDownload = false
-let LATEST_OT_SYSTEM_VERSION = "6.2.0"
+let LATEST_OT_SYSTEM_VERSION = _PKG_VERSION_
+
+export const updateLatestVersion = (): void => {
+  const manifestURL = getConfig('robotSystemUpdate').manifestUrls.OT3
+  fetchJson<ReleaseManifest>(manifestURL)
+    .then(response => {
+      const sortedVersions = Object.values(response.production)
+        .map(({ version }) => version)
+        .sort((a, b) => {
+          if (semver.gt(a, b)) {
+            return 1
+          }
+          return -1
+        })
+      console.log({ sortedVersions })
+      LATEST_OT_SYSTEM_VERSION = sortedVersions[sortedVersions.length - 1]
+    })
+    .catch((e: Error) => {
+      console.log(`error sorting update versions: ${e.message}`)
+    })
+}
 
 // LATEST_OT_SYSTEM_VERSION is instantiated in the preload file, and updated when
 // an update is available in the onAvailable callback below
