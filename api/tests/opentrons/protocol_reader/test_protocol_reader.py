@@ -141,7 +141,7 @@ async def test_read_and_save(
         await file_reader_writer.read([input_main_file, input_labware_file])
     ).then_return([buffered_main_file, buffered_labware_file])
     decoy.when(
-        await file_identifier.extract([buffered_main_file, buffered_labware_file])
+        await file_identifier.identify([buffered_main_file, buffered_labware_file])
     ).then_return([main_file, labware_file])
     decoy.when(role_analyzer.analyze([main_file, labware_file])).then_return(
         role_analysis
@@ -226,7 +226,7 @@ async def test_read_saved(
         await file_reader_writer.read([input_main_file, input_labware_file])
     ).then_return([buffered_main_file, buffered_labware_file])
     decoy.when(
-        await file_identifier.extract([buffered_main_file, buffered_labware_file])
+        await file_identifier.identify([buffered_main_file, buffered_labware_file])
     ).then_return([main_file, labware_file])
     decoy.when(role_analyzer.analyze([main_file, labware_file])).then_return(
         role_analysis

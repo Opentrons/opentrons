@@ -47,8 +47,8 @@ FileInfo = Union[
 
 class FileIdentifier:
     @staticmethod
-    async def extract(files: List[BufferedFile]) -> List[FileInfo]:
-        return [await _analyze(file) for file in files]
+    async def identify(files: List[BufferedFile]) -> List[FileInfo]:
+        return [await _identify(file) for file in files]
 
 
 # FIX BEFORE MERGE: Rename exception.
@@ -56,7 +56,7 @@ class ConfigAnalysisError(ProtocolFilesInvalidError):
     pass
 
 
-async def _analyze(file: BufferedFile) -> FileInfo:
+async def _identify(file: BufferedFile) -> FileInfo:
     if file.name.lower().endswith(".json"):
         return await _analyze_json(json_file=file)
     elif file.name.lower().endswith(".py"):

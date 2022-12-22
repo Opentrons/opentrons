@@ -67,7 +67,7 @@ class ProtocolReader:
                 could not be validated as a protocol.
         """
         buffered_files = await self._file_reader_writer.read(files)
-        identified_files = await self._file_identifier.extract(buffered_files)
+        identified_files = await self._file_identifier.identify(buffered_files)
         role_analysis = self._role_analyzer.analyze(identified_files)
         await self._file_format_validator.validate(role_analysis.all_files)
 
@@ -119,7 +119,7 @@ class ProtocolReader:
                 could not be validated as a protocol.
         """
         buffered_files = await self._file_reader_writer.read(files)
-        identified_files = await self._file_identifier.extract(buffered_files)
+        identified_files = await self._file_identifier.identify(buffered_files)
         role_analysis = self._role_analyzer.analyze(identified_files)
         if not files_are_prevalidated:
             await self._file_format_validator.validate(role_analysis.all_files)

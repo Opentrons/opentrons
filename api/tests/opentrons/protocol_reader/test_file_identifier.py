@@ -81,7 +81,7 @@ async def test_valid_python_protocol(spec: ValidPythonProtocolSpec) -> None:
         metadata=spec.expected_metadata,
     )
     subject = FileIdentifier()
-    [result] = await subject.extract([input_file])
+    [result] = await subject.identify([input_file])
     assert result == expected_result
 
 
@@ -182,7 +182,7 @@ async def test_valid_json_protocol(spec: ValidJsonProtocolSpec) -> None:
         unvalidated_json=json.loads(spec.contents),
     )
     subject = FileIdentifier()
-    [result] = await subject.extract([input_file])
+    [result] = await subject.identify([input_file])
     assert result == expected_result
 
 
@@ -215,7 +215,7 @@ async def test_valid_labware_definition(spec: ValidLabwareDefinitionSpec) -> Non
         original_file=input_file, unvalidated_json=json.loads(spec.contents)
     )
     subject = FileIdentifier()
-    [result] = await subject.extract([input_file])
+    [result] = await subject.identify([input_file])
     assert result == expected_result
 
 
@@ -356,4 +356,4 @@ async def test_invalid_input(spec: InvalidSpec) -> None:
     )
     subject = FileIdentifier()
     with pytest.raises(ConfigAnalysisError, match=spec.expected_message):
-        await subject.extract([input_file])
+        await subject.identify([input_file])
