@@ -79,7 +79,7 @@ export function Banner(props: BannerProps): JSX.Element {
     onCloseClick,
     icon,
     children,
-    isCloseActionLoading,
+    isCloseActionLoading = false,
     padding,
     closeButton,
     iconMarginLeft,
@@ -134,7 +134,7 @@ export function Banner(props: BannerProps): JSX.Element {
           )}
         </Btn>
       ) : null}
-      {(isCloseActionLoading ?? false) && (
+      {isCloseActionLoading && (
         <Icon name="ot-spinner" size={SIZE_1} aria-label="ot-spinner" spin />
       )}
     </Flex>
