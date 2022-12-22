@@ -5,7 +5,7 @@ from typing import List, Union
 from opentrons.protocols.api_support.types import APIVersion
 
 from opentrons.protocol_reader.file_reader_writer import BufferedFile
-from opentrons.protocol_reader.basic_info_extractor import (
+from opentrons.protocol_reader.file_identifier import (
     FileInfo,
     JsonProtocolFileInfo,
     PythonProtocolFileInfo,

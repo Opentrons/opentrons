@@ -7,7 +7,7 @@ from opentrons_shared_data.protocol.models import ProtocolSchemaV6 as JsonProtoc
 
 from opentrons.protocols.models import JsonProtocol as JsonProtocolUpToV5
 
-from .basic_info_extractor import (
+from .file_identifier import (
     FileInfo,
     JsonProtocolFileInfo,
     PythonProtocolFileInfo,

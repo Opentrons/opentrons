@@ -19,8 +19,8 @@ from opentrons.protocol_reader.protocol_source import Metadata
 
 from opentrons.protocol_reader.role_analyzer import RoleAnalysis
 
-from opentrons.protocol_reader.basic_info_extractor import (
-    BasicInfoExtractor,
+from opentrons.protocol_reader.file_identifier import (
+    FileIdentifier,
     FileInfo,
     JsonProtocolFileInfo,
     PythonProtocolFileInfo,
@@ -80,7 +80,7 @@ async def test_valid_python_protocol(spec: ValidPythonProtocolSpec) -> None:
         api_level=spec.expected_api_level,
         metadata=spec.expected_metadata,
     )
-    subject = BasicInfoExtractor()
+    subject = FileIdentifier()
     [result] = await subject.extract([input_file])
     assert result == expected_result
 
@@ -181,7 +181,7 @@ async def test_valid_json_protocol(spec: ValidJsonProtocolSpec) -> None:
         metadata=spec.expected_metadata,
         unvalidated_json=json.loads(spec.contents),
     )
-    subject = BasicInfoExtractor()
+    subject = FileIdentifier()
     [result] = await subject.extract([input_file])
     assert result == expected_result
 
@@ -214,7 +214,7 @@ async def test_valid_labware_definition(spec: ValidLabwareDefinitionSpec) -> Non
     expected_result = LabwareDefinitionFileInfo(
         original_file=input_file, unvalidated_json=json.loads(spec.contents)
     )
-    subject = BasicInfoExtractor()
+    subject = FileIdentifier()
     [result] = await subject.extract([input_file])
     assert result == expected_result
 
@@ -354,6 +354,6 @@ async def test_invalid_input(spec: InvalidSpec) -> None:
     input_file = BufferedFile(
         name=spec.file_name, contents=spec.contents.encode("utf-8"), path=None
     )
-    subject = BasicInfoExtractor()
+    subject = FileIdentifier()
     with pytest.raises(ConfigAnalysisError, match=spec.expected_message):
         await subject.extract([input_file])

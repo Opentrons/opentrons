@@ -31,8 +31,8 @@ from opentrons.protocol_reader.role_analyzer import (
     RoleAnalysis,
     RoleAnalysisError,
 )
-from opentrons.protocol_reader.basic_info_extractor import (
-    BasicInfoExtractor,
+from opentrons.protocol_reader.file_identifier import (
+    FileIdentifier,
     FileInfo,
     PythonProtocolFileInfo,
     LabwareDefinitionFileInfo,
@@ -59,9 +59,9 @@ def file_reader_writer(decoy: Decoy) -> FileReaderWriter:
 
 
 @pytest.fixture
-def basic_info_extractor(decoy: Decoy) -> BasicInfoExtractor:
-    """Get a mocked out BasicInfoExtractor."""
-    return decoy.mock(cls=BasicInfoExtractor)
+def file_identifier(decoy: Decoy) -> FileIdentifier:
+    """Get a mocked out FileIdentifier."""
+    return decoy.mock(cls=FileIdentifier)
 
 
 @pytest.fixture
@@ -80,14 +80,14 @@ def file_format_validator(decoy: Decoy) -> FileFormatValidator:
 def subject(
     file_reader_writer: FileReaderWriter,
     role_analyzer: RoleAnalyzer,
-    basic_info_extractor: BasicInfoExtractor,
+    file_identifier: FileIdentifier,
     file_format_validator: FileFormatValidator,
 ) -> ProtocolReader:
     """Create a ProtocolReader test subject."""
     return ProtocolReader(
         file_reader_writer=file_reader_writer,
         role_analyzer=role_analyzer,
-        basic_info_extractor=basic_info_extractor,
+        file_identifier=file_identifier,
         file_format_validator=file_format_validator,
     )
 
@@ -96,7 +96,7 @@ async def test_read_and_save(
     decoy: Decoy,
     tmp_path: Path,
     file_reader_writer: FileReaderWriter,
-    basic_info_extractor: BasicInfoExtractor,
+    file_identifier: FileIdentifier,
     role_analyzer: RoleAnalyzer,
     file_format_validator: FileFormatValidator,
     subject: ProtocolReader,
@@ -141,7 +141,7 @@ async def test_read_and_save(
         await file_reader_writer.read([input_main_file, input_labware_file])
     ).then_return([buffered_main_file, buffered_labware_file])
     decoy.when(
-        await basic_info_extractor.extract([buffered_main_file, buffered_labware_file])
+        await file_identifier.extract([buffered_main_file, buffered_labware_file])
     ).then_return([main_file, labware_file])
     decoy.when(role_analyzer.analyze([main_file, labware_file])).then_return(
         role_analysis
@@ -187,7 +187,7 @@ async def test_read_saved(
     files_are_prevalidated: bool,
     validator_expected_times_called: int,
     file_reader_writer: FileReaderWriter,
-    basic_info_extractor: BasicInfoExtractor,
+    file_identifier: FileIdentifier,
     role_analyzer: RoleAnalyzer,
     file_format_validator: FileFormatValidator,
     subject: ProtocolReader,
@@ -226,7 +226,7 @@ async def test_read_saved(
         await file_reader_writer.read([input_main_file, input_labware_file])
     ).then_return([buffered_main_file, buffered_labware_file])
     decoy.when(
-        await basic_info_extractor.extract([buffered_main_file, buffered_labware_file])
+        await file_identifier.extract([buffered_main_file, buffered_labware_file])
     ).then_return([main_file, labware_file])
     decoy.when(role_analyzer.analyze([main_file, labware_file])).then_return(
         role_analysis

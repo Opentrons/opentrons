@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from typing import List, Sequence, Union
 
-from .basic_info_extractor import (
+from .file_identifier import (
     FileInfo,
     JsonProtocolFileInfo,
     PythonProtocolFileInfo,

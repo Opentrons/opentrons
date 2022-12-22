@@ -3,8 +3,8 @@ from pathlib import Path
 from typing import List, Optional, Sequence
 
 from .input_file import AbstractInputFile
-from .basic_info_extractor import (
-    BasicInfoExtractor,
+from .file_identifier import (
+    FileIdentifier,
     FileInfo,
     JsonProtocolFileInfo,
     PythonProtocolFileInfo,
@@ -29,7 +29,7 @@ class ProtocolReader:
     def __init__(
         self,
         file_reader_writer: Optional[FileReaderWriter] = None,
-        basic_info_extractor: Optional[BasicInfoExtractor] = None,
+        file_identifier: Optional[FileIdentifier] = None,
         role_analyzer: Optional[RoleAnalyzer] = None,
         file_format_validator: Optional[FileFormatValidator] = None,
     ) -> None:
@@ -37,12 +37,11 @@ class ProtocolReader:
 
         Arguments:
             file_reader_writer: Input file reader/writer. Default impl. used if None.
-            basic_info_extractor: Extracts basic info from protocols. Default impl. used
-                if None.
+            file_identifier: File identifier. Default impl. used if None.
             config_analyzer: Protocol config analyzer. Default impl. used if None.
         """
         self._file_reader_writer = file_reader_writer or FileReaderWriter()
-        self._basic_info_extractor = basic_info_extractor or BasicInfoExtractor()
+        self._file_identifier = file_identifier or FileIdentifier()
         self._role_analyzer = role_analyzer or RoleAnalyzer()
         self._file_format_validator = file_format_validator or FileFormatValidator()
 
@@ -68,8 +67,8 @@ class ProtocolReader:
                 could not be validated as a protocol.
         """
         buffered_files = await self._file_reader_writer.read(files)
-        basic_info = await self._basic_info_extractor.extract(buffered_files)
-        role_analysis = self._role_analyzer.analyze(basic_info)
+        identified_files = await self._file_identifier.extract(buffered_files)
+        role_analysis = self._role_analyzer.analyze(identified_files)
         await self._file_format_validator.validate(role_analysis.all_files)
 
         files_to_write = [f.original_file for f in role_analysis.all_files]
@@ -120,8 +119,8 @@ class ProtocolReader:
                 could not be validated as a protocol.
         """
         buffered_files = await self._file_reader_writer.read(files)
-        basic_info = await self._basic_info_extractor.extract(buffered_files)
-        role_analysis = self._role_analyzer.analyze(basic_info)
+        identified_files = await self._file_identifier.extract(buffered_files)
+        role_analysis = self._role_analyzer.analyze(identified_files)
         if not files_are_prevalidated:
             await self._file_format_validator.validate(role_analysis.all_files)
 

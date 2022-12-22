@@ -45,7 +45,7 @@ FileInfo = Union[
 ]
 
 
-class BasicInfoExtractor:
+class FileIdentifier:
     @staticmethod
     async def extract(files: List[BufferedFile]) -> List[FileInfo]:
         return [await _analyze(file) for file in files]
