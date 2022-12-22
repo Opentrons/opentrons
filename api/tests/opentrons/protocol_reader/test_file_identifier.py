@@ -25,7 +25,7 @@ from opentrons.protocol_reader.file_identifier import (
     IdentifiedJsonMain,
     IdentifiedPythonMain,
     IdentifiedLabwareDefinition,
-    ConfigAnalysisError,
+    FileIdentificationError,
 )
 
 from opentrons.protocol_reader.file_reader_writer import BufferedFile
@@ -355,5 +355,5 @@ async def test_invalid_input(spec: InvalidSpec) -> None:
         name=spec.file_name, contents=spec.contents.encode("utf-8"), path=None
     )
     subject = FileIdentifier()
-    with pytest.raises(ConfigAnalysisError, match=spec.expected_message):
+    with pytest.raises(FileIdentificationError, match=spec.expected_message):
         await subject.identify([input_file])

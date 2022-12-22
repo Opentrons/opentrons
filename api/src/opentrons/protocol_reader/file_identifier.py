@@ -76,8 +76,7 @@ IdentifiedFile = Union[
 ]
 
 
-# FIX BEFORE MERGE: Rename exception.
-class ConfigAnalysisError(ProtocolFilesInvalidError):
+class FileIdentificationError(ProtocolFilesInvalidError):
     """Raised when FileIdentifier detects an invalid file."""
 
 
@@ -103,7 +102,9 @@ async def _identify(file: BufferedFile) -> IdentifiedFile:
         return _analyze_python_protocol(py_file=file)
     else:
         # FIX BEFORE MERGE: Use a better exception type.
-        raise ConfigAnalysisError(f"{file.name} has an unrecognized file extension.")
+        raise FileIdentificationError(
+            f"{file.name} has an unrecognized file extension."
+        )
 
 
 async def _analyze_json(
@@ -113,7 +114,7 @@ async def _analyze_json(
         json_contents = await anyio.to_thread.run_sync(json.loads, json_file.contents)
     except json.JSONDecodeError as e:
         # FIX BEFORE MERGE: Exception type.
-        raise ConfigAnalysisError(
+        raise FileIdentificationError(
             f"{json_file.name} is not valid JSON. {str(e)}"
         ) from e
 
@@ -129,7 +130,9 @@ async def _analyze_json(
         )
     else:
         # FIX BEFORE MERGE: Exception type and message.
-        raise ConfigAnalysisError(f"{json_file.name} is not a known Opentrons format.")
+        raise FileIdentificationError(
+            f"{json_file.name} is not a known Opentrons format."
+        )
 
 
 def _json_seems_like_labware(json: JsonDict) -> bool:
@@ -154,16 +157,16 @@ def _analyze_json_protocol(
         schema_version = json_contents["schemaVersion"]
     except KeyError as e:
         # FIX BEFORE MERGE: Exception type and message.
-        raise ConfigAnalysisError from e
+        raise FileIdentificationError from e
 
     # FIX BEFORE MERGE: Use the actual Metadata model?
     if not isinstance(metadata, dict):
         # FIX BEFORE MERGE: Exception type and message.
-        raise ConfigAnalysisError
+        raise FileIdentificationError
 
     if not isinstance(schema_version, int):
         # FIX BEFORE MERGE: Exception type and message.
-        raise ConfigAnalysisError
+        raise FileIdentificationError
 
     return IdentifiedJsonMain(
         original_file=original_file,
@@ -185,26 +188,26 @@ def _analyze_python_protocol(
     except (SyntaxError, ValueError) as e:
         # ast.parse() raises SyntaxError for most errors,
         # but ValueError if the source contains null bytes.
-        raise ConfigAnalysisError(f"Unable to parse {py_file.name}.") from e
+        raise FileIdentificationError(f"Unable to parse {py_file.name}.") from e
         # FIX BEFORE MERGE: Exception type.
 
     try:
         metadata = extract_python_metadata(module_ast)
     except ValueError as e:
-        raise ConfigAnalysisError(
+        raise FileIdentificationError(
             f"Unable to extract metadata from {py_file.name}."
         ) from e
 
     try:
         api_level = metadata["apiLevel"]
     except KeyError as e:
-        raise ConfigAnalysisError(
+        raise FileIdentificationError(
             "metadata.apiLevel missing or not statically analyzable"
             f" in {py_file.name}."
         ) from e
 
     if not isinstance(api_level, str):
-        raise ConfigAnalysisError(
+        raise FileIdentificationError(
             f"metadata.apiLevel must be a string, but it instead has type"
             f' "{type(api_level)}" in {py_file.name}.'
         )
@@ -212,13 +215,13 @@ def _analyze_python_protocol(
     try:
         api_version = APIVersion.from_string(api_level)
     except ValueError as e:
-        raise ConfigAnalysisError(
+        raise FileIdentificationError(
             f'metadata.apiLevel "{api_level}" is not of the format X.Y'
             f" in {py_file.name}."
         ) from e
 
     if api_version > MAX_SUPPORTED_VERSION:
-        raise ConfigAnalysisError(
+        raise FileIdentificationError(
             f"API version {api_version} is not supported by this "
             f"robot software. Please either reduce your requested API "
             f"version or update your robot."
