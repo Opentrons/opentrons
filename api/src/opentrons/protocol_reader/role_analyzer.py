@@ -5,7 +5,7 @@ from typing_extensions import Literal
 
 from opentrons_shared_data.protocol.models import ProtocolSchemaV6
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons.protocols.models import JsonProtocol as ProtocolSchemaV5
+from opentrons.protocols.models import JsonProtocol as LegacyProtocolSchema
 from .protocol_source import ProtocolFileRole
 from .file_reader_writer import BufferedFile
 
@@ -21,7 +21,7 @@ class RoleAnalysisFile(BufferedFile):
 class MainFile(RoleAnalysisFile):
     """A protocol's main file, either Python or JSON."""
 
-    data: Optional[Union[ProtocolSchemaV5, ProtocolSchemaV6]] = None
+    data: Optional[Union[LegacyProtocolSchema, ProtocolSchemaV6]] = None
     role: Literal[ProtocolFileRole.MAIN] = ProtocolFileRole.MAIN
 
 
@@ -33,6 +33,13 @@ class LabwareFile(RoleAnalysisFile):
     role: Literal[ProtocolFileRole.LABWARE] = ProtocolFileRole.LABWARE
 
 
+@dataclass(frozen=True)
+class DataFile(RoleAnalysisFile):
+    """An arbitrary data file."""
+
+    role: Literal[ProtocolFileRole.DATA] = ProtocolFileRole.DATA
+
+
 # TODO(mc, 2021-12-07): add support for python support files and data files
 @dataclass(frozen=True)
 class RoleAnalysis:
@@ -41,6 +48,7 @@ class RoleAnalysis:
     main_file: MainFile
     labware_files: List[LabwareFile]
     labware_definitions: List[LabwareDefinition]
+    data_files: List[DataFile]
 
 
 class RoleAnalysisError(ValueError):
@@ -50,7 +58,7 @@ class RoleAnalysisError(ValueError):
 class RoleAnalyzer:
     """Input file role analysis interface."""
 
-    @staticmethod
+    @staticmethod  # noqa: C901
     def analyze(files: Sequence[BufferedFile]) -> RoleAnalysis:
         """Analyze a set of input files to determine each of their roles."""
         if len(files) == 0:
@@ -58,14 +66,16 @@ class RoleAnalyzer:
 
         main_file_candidates = []
         labware_files = []
+        bundled_data_files = []
 
         for f in files:
-            if f.name.lower().endswith(".py") or isinstance(
-                f.data, (ProtocolSchemaV5, ProtocolSchemaV6)
+            filename = f.name.lower()
+            if filename.endswith(".py") or isinstance(
+                f.data, (LegacyProtocolSchema, ProtocolSchemaV6)
             ):
                 data = (
                     f.data
-                    if isinstance(f.data, (ProtocolSchemaV5, ProtocolSchemaV6))
+                    if isinstance(f.data, (LegacyProtocolSchema, ProtocolSchemaV6))
                     else None
                 )
                 main_file_candidates.append(
@@ -77,6 +87,10 @@ class RoleAnalyzer:
                     LabwareFile(
                         name=f.name, contents=f.contents, data=f.data, path=f.path
                     )
+                )
+            elif filename.endswith(".txt") or filename.endswith(".csv"):
+                bundled_data_files.append(
+                    DataFile(name=f.name, contents=f.contents, data=f.data, path=f.path)
                 )
 
         if len(main_file_candidates) == 0:
@@ -98,7 +112,7 @@ class RoleAnalyzer:
 
         # ignore extra custom labware files for JSON protocols, while
         # maintaining a reference to the protocol's labware
-        if isinstance(main_file.data, (ProtocolSchemaV5, ProtocolSchemaV6)):
+        if isinstance(main_file.data, (LegacyProtocolSchema, ProtocolSchemaV6)):
             labware_files = []
             labware_definitions = list(main_file.data.labwareDefinitions.values())
         else:
@@ -108,4 +122,5 @@ class RoleAnalyzer:
             main_file=main_file,
             labware_files=labware_files,
             labware_definitions=labware_definitions,
+            data_files=bundled_data_files,
         )

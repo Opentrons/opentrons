@@ -77,7 +77,7 @@ async def capacitive_probe(
         do_log=log_sensor_values,
     ):
         position = await runner.run(can_messenger=messenger)
-        return position[mover]
+        return position[mover][:2]
 
 
 async def capacitive_pass(

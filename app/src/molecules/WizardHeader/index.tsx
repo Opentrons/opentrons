@@ -38,7 +38,7 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
   return (
     <Box backgroundColor={COLORS.white}>
       <Flex
-        padding={`${SPACING.spacing4} ${SPACING.spacing6}`}
+        padding={`${String(SPACING.spacing4)} ${String(SPACING.spacing6)}`}
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >

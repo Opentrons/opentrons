@@ -1,4 +1,4 @@
-import { getModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
+import { getModuleTypesThatRequireExtraAttention } from '../getModuleTypesThatRequireExtraAttention'
 
 describe('getModuleTypesThatRequireExtraAttention', () => {
   it('should return an empty list when there are no modules', () => {

@@ -43,11 +43,8 @@ jest.mock('@opentrons/shared-data', () => {
     inferModuleOrientationFromXCoordinate: jest.fn(),
   }
 })
-jest.mock('../../../../ProtocolSetup/hooks')
 jest.mock('../../LabwareInfoOverlay')
-jest.mock(
-  '../../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
-)
+jest.mock('../../utils/getModuleTypesThatRequireExtraAttention')
 jest.mock('../../../../RunTimeControl/hooks')
 jest.mock('../../../hooks')
 

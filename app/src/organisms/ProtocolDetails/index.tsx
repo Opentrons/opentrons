@@ -46,7 +46,7 @@ import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { Modal } from '../../molecules/Modal'
 import { useTrackEvent } from '../../redux/analytics'
 import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
-import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
+import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
 import {
   getAnalysisStatus,
@@ -394,7 +394,7 @@ export function ProtocolDetails(
         padding={SPACING.spacing4}
         width="100%"
       >
-        <ChooseRobotSlideout
+        <ChooseRobotToRunProtocolSlideout
           onCloseClick={() => setShowSlideout(false)}
           showSlideout={showSlideout}
           storedProtocolData={props}
@@ -527,6 +527,7 @@ export function ProtocolDetails(
           >
             <ProtocolOverflowMenu
               handleRunProtocol={() => setShowSlideout(true)}
+              protocolDisplayName={protocolDisplayName}
               protocolKey={protocolKey}
               data-testid="ProtocolDetails_overFlowMenu"
             />

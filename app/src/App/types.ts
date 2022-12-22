@@ -54,4 +54,5 @@ export interface OnDeviceRouteParams {
   runId: string
   ssid: string
   authType: 'wpa' | 'none'
+  robotName: string
 }
