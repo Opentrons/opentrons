@@ -191,15 +191,17 @@ export function ProtocolRunDetails(): JSX.Element | null {
           </Flex>
           <Box
             backgroundColor={COLORS.white}
-            border={`${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.medGreyEnabled}`}
+            border={`${String(SPACING.spacingXXS)} ${String(
+              BORDERS.styleSolid
+            )} ${String(COLORS.medGreyEnabled)}`}
             // remove left upper corner border radius when first tab is active
             borderRadius={`${
               protocolRunDetailsTab === 'setup'
                 ? '0'
-                : BORDERS.radiusSoftCorners
-            } ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} ${
+                : String(BORDERS.radiusSoftCorners)
+            } ${String(BORDERS.radiusSoftCorners)} ${String(
               BORDERS.radiusSoftCorners
-            }`}
+            )} ${String(BORDERS.radiusSoftCorners)}`}
           >
             {protocolRunDetailsContent}
           </Box>
