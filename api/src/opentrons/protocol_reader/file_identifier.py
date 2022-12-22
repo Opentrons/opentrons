@@ -101,7 +101,6 @@ async def _identify(file: BufferedFile) -> IdentifiedFile:
     elif file.name.lower().endswith(".py"):
         return _analyze_python_protocol(py_file=file)
     else:
-        # FIX BEFORE MERGE: Use a better exception type.
         raise FileIdentificationError(
             f"{file.name} has an unrecognized file extension."
         )
@@ -113,7 +112,6 @@ async def _analyze_json(
     try:
         json_contents = await anyio.to_thread.run_sync(json.loads, json_file.contents)
     except json.JSONDecodeError as e:
-        # FIX BEFORE MERGE: Exception type.
         raise FileIdentificationError(
             f"{json_file.name} is not valid JSON. {str(e)}"
         ) from e
@@ -129,7 +127,6 @@ async def _analyze_json(
             json_contents=json_contents,
         )
     else:
-        # FIX BEFORE MERGE: Exception type and message.
         raise FileIdentificationError(
             f"{json_file.name} is not a known Opentrons format."
         )
@@ -152,21 +149,22 @@ def _json_seems_like_protocol(json: JsonDict) -> bool:
 def _analyze_json_protocol(
     original_file: BufferedFile, json_contents: JsonDict
 ) -> IdentifiedJsonMain:
+    error_message = f"{original_file.name} is not a valid JSON protocol."
+
     try:
         metadata = json_contents["metadata"]
         schema_version = json_contents["schemaVersion"]
     except KeyError as e:
-        # FIX BEFORE MERGE: Exception type and message.
-        raise FileIdentificationError from e
+        raise FileIdentificationError(error_message) from e
 
-    # FIX BEFORE MERGE: Use the actual Metadata model?
+    # todo(mm, 2022-12-22): A JSON protocol file's metadata is not quite just an
+    # arbitrary dict: its fields are supposed to follow a schema. Should we validate
+    # this metadata against that schema instead of doing this simple isinstance() check?
     if not isinstance(metadata, dict):
-        # FIX BEFORE MERGE: Exception type and message.
-        raise FileIdentificationError
+        raise FileIdentificationError(error_message)
 
     if not isinstance(schema_version, int):
-        # FIX BEFORE MERGE: Exception type and message.
-        raise FileIdentificationError
+        raise FileIdentificationError(error_message)
 
     return IdentifiedJsonMain(
         original_file=original_file,
@@ -189,7 +187,6 @@ def _analyze_python_protocol(  # noqa: C901
         # ast.parse() raises SyntaxError for most errors,
         # but ValueError if the source contains null bytes.
         raise FileIdentificationError(f"Unable to parse {py_file.name}.") from e
-        # FIX BEFORE MERGE: Exception type.
 
     try:
         metadata = extract_python_metadata(module_ast)
