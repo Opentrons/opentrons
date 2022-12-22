@@ -2,6 +2,7 @@
 import asyncio
 import argparse
 import time
+import string
 import numpy as np
 
 from opentrons.hardware_control.ot3api import OT3API
@@ -26,9 +27,11 @@ from hardware_testing.drivers import (
 
 def build_arg_parser():
     arg_parser = argparse.ArgumentParser(description='Gripper Force Test')
+    arg_parser.add_argument('-u', '--input', choices=['dc','force'], required=False, help='Input type to be tested', default='dc')
     arg_parser.add_argument('-c', '--cycles', type=int, required=False, help='Number of testing cycles', default=1)
     arg_parser.add_argument('-t', '--trials', type=int, required=False, help='Number of trials', default=5)
     arg_parser.add_argument('-p', '--pwm_inc', type=int, required=False, help='Gripper PWM duty cycle increment', default=5)
+    arg_parser.add_argument('-f', '--force_inc', type=float, required=False, help='Gripper force increment', default=1)
     arg_parser.add_argument('-v', '--vref_inc', type=float, required=False, help='Gripper reference voltage increment', default=0.1)
     arg_parser.add_argument('-i', '--interval', type=float, required=False, help='Interval between grip trials in seconds', default=5)
     arg_parser.add_argument('-s', '--simulate', action="store_true", required=False, help='Simulate this test script')
@@ -36,19 +39,23 @@ def build_arg_parser():
 
 class Gripper_Force_Test:
     def __init__(
-        self, simulate: bool, cycles: int, trials: int, pwm_inc: float, vref_inc: float, interval: float
+        self, simulate: bool, input: string, cycles: int, trials: int, pwm_inc: int, force_inc: float, vref_inc: float, interval: float
     ) -> None:
         self.api = None
         self.mount = None
         self.gripper_id = None
         self.simulate = simulate
+        self.input = input
         self.cycles = cycles
         self.trials = trials
         self.pwm_inc = pwm_inc
+        self.force_inc = force_inc
         self.vref_inc = vref_inc
         self.interval = interval
         self.pwm_start = 10 # %
         self.pwm_max = 60 # %
+        self.force_start = 5 # %
+        self.force_max = 30 # %
         self.vref_default = 1.0 # Volts
         self.vref_start = 2.0 # Volts
         self.vref_max = 2.0 # Volts
@@ -68,7 +75,8 @@ class Gripper_Force_Test:
             "Force":"None",
             "Vref":"None",
             "Firmware Vref":"None",
-            "DC":"None",
+            "Input DC":"None",
+            "Input Force":"None",
         }
         self.force_gauge = None
         self.oscilloscope = None
@@ -90,7 +98,7 @@ class Gripper_Force_Test:
         gripper_config = await get_gripper_jaw_motor_param(self.api._backend._messenger)
         print(f"Initial Gripper Config: {gripper_config}")
         self.start_time = time.time()
-        print(f"\nStarting Gripper Force Test:\n")
+        print(f"\nStarting Gripper Force Test: (Input = {self.input.upper()})\n")
 
     def file_setup(self):
         class_name = self.__class__.__name__
@@ -144,22 +152,26 @@ class Gripper_Force_Test:
         force = sum(forces) / len(forces)
         return force
 
-    async def _record_data(self, cycle, trial, vref, pwm):
+    async def _record_data(self, cycle: int, trial: int, vref: float, input_dc: int = 0, input_force: float = 0):
         elapsed_time = (time.time() - self.start_time)/60
         self.test_data["Time"] = str(round(elapsed_time, 3))
         self.test_data["Cycle"] = str(cycle)
         self.test_data["Trial"] = str(trial)
         self.test_data["Vref"] = str(vref)
-        self.test_data["DC"] = str(pwm)
+        self.test_data["Input DC"] = str(input_dc)
+        self.test_data["Input Force"] = str(input_force)
         test_data = self.test_data.copy()
         test_data.update(self.measurement_data)
         test_data = self.dict_values_to_line(test_data)
         data.append_data_to_file(self.test_name, self.test_file, test_data)
 
     async def _move_gripper_jaw(
-        self, api: OT3API, mount: OT3Mount, duty_cycle: int
+        self, api: OT3API, mount: OT3Mount, input_dc: int = 0, input_force: float = 0
     ) -> None:
-        await api._grip(duty_cycle)
+        if input_dc > 0:
+            await api._grip(input_dc)
+        else:
+            await api.grip(input_force)
         api._gripper_handler.set_jaw_state(GripperJawState.GRIPPING)
         time.sleep(self.interval)
 
@@ -210,13 +222,22 @@ class Gripper_Force_Test:
                         time.sleep(2.0)
                         print(f"\n-->> Starting Vref {vref} V")
                         await self._update_vref(self.api, vref)
-                        for pwm in np.arange(self.pwm_start, self.pwm_max + self.pwm_inc, self.pwm_inc):
-                            print(f"\n--->>> Starting Duty Cycle {pwm}%")
-                            for j in range(self.trials):
-                                trial = j + 1
-                                print(f"\n---->>>> Measuring Trial {trial}/{self.trials} [Vref={vref}V] (DC={pwm}%)")
-                                await self._move_gripper_jaw(self.api, self.mount, pwm)
-                                await self._record_data(cycle, trial, vref, pwm)
+                        if self.input == 'dc':
+                            for pwm in np.arange(self.pwm_start, self.pwm_max + self.pwm_inc, self.pwm_inc):
+                                print(f"\n--->>> Starting Duty Cycle {pwm}%")
+                                for j in range(self.trials):
+                                    trial = j + 1
+                                    print(f"\n---->>>> Measuring Trial {trial}/{self.trials} [Vref={vref}V] (DC={pwm}%)")
+                                    await self._move_gripper_jaw(self.api, self.mount, input_dc=pwm)
+                                    await self._record_data(cycle, trial, vref, input_dc=pwm)
+                        else:
+                            for force in np.arange(self.force_start, self.force_max + self.force_inc, self.force_inc):
+                                print(f"\n--->>> Starting Force {force}N")
+                                for j in range(self.trials):
+                                    trial = j + 1
+                                    print(f"\n---->>>> Measuring Trial {trial}/{self.trials} [Vref={vref}V] (Force={force}N)")
+                                    await self._move_gripper_jaw(self.api, self.mount, input_force=force)
+                                    await self._record_data(cycle, trial, vref, input_force=force)
         except Exception as e:
             await self.exit()
             raise e
@@ -231,5 +252,5 @@ if __name__ == '__main__':
     print("\nOT-3 Gripper Force Test\n")
     arg_parser = build_arg_parser()
     args = arg_parser.parse_args()
-    test = Gripper_Force_Test(args.simulate, args.cycles, args.trials, args.pwm_inc, args.vref_inc, args.interval)
+    test = Gripper_Force_Test(args.simulate, args.input, args.cycles, args.trials, args.pwm_inc, args.force_inc, args.vref_inc, args.interval)
     asyncio.run(test.run())
