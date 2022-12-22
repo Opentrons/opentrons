@@ -201,23 +201,21 @@ class Pipette_Calibration_Test:
         # Calibrate pipette
         self.offset, self.slot_center, enc_pos = await calibrate_pipette(api, mount, slot)
         self.deck_encoder = self._encoder_tolist(enc_pos)
-        # self.deck_z = await calibrate_pipette(api, mount, slot)
+
         print(f"New Deck Encoder: {self.deck_encoder}")
         print(f"New Slot Center: {self.slot_center}")
         print(f"New Pipette Offset: {self.offset}")
-        # print(f"New Deck Height: {self.deck_z}")
+
         self.test_data["X Center"] = str(self.slot_center.x)
         self.test_data["Y Center"] = str(self.slot_center.y)
         self.test_data["Deck Height"] = str(self.slot_center.z)
-        self.test_data["Deck Encoder"] = str(self.deck_encoder)
-        # self.test_data["Deck Height"] = str(self.deck_z)
+        self.test_data["Deck Encoder"] = str(self.deck_encoder).replace(", ",";")
 
     async def _home(
         self, api: OT3API, mount: OT3Mount
     ) -> None:
         # Home grantry
         await home_ot3(api, self.axes)
-        # await api.home()
         self.home = await api.gantry_position(mount)
 
     async def _reset(
@@ -257,6 +255,7 @@ class Pipette_Calibration_Test:
             print("Test Cancelled!")
         finally:
             await self.exit()
+            print("Test Completed!")
 
 if __name__ == '__main__':
     print("\nOT-3 Pipette Calibration Test\n")
