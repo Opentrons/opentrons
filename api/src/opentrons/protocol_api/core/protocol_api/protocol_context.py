@@ -24,7 +24,6 @@ from .deck import Deck
 from .instrument_context import InstrumentContextImplementation
 from .labware_offset_provider import AbstractLabwareOffsetProvider
 from .labware import LabwareImplementation
-from .well import WellImplementation
 from .load_info import LoadInfo, InstrumentLoadInfo, LabwareLoadInfo, ModuleLoadInfo
 
 logger = logging.getLogger(__name__)
@@ -432,7 +431,7 @@ class ProtocolContextImplementation(
         self,
         labware_core: LabwareImplementation,
         liquid: LoadedLiquid,
-        volume_by_well: Dict[WellImplementation, float],
+        volume_by_well: Dict[str, float],
     ) -> None:
         """Load liquid into a labware."""
         raise UnsupportedAPIError(

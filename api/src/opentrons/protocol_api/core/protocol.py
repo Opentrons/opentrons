@@ -18,7 +18,6 @@ from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from .instrument import InstrumentCoreType
 from .labware import LabwareCoreType, LabwareLoadParams
 from .module import ModuleCoreType
-from .well import WellCoreType
 
 
 # TODO (tz, 12-19-22): move to a better location
@@ -197,6 +196,6 @@ class AbstractProtocol(
         self,
         labware_core: LabwareCoreType,
         liquid: LoadedLiquid,
-        volume_by_well: Dict[WellCoreType, float],
+        volume_by_well: Dict[str, float],
     ) -> None:
         """Load liquid into a labware."""

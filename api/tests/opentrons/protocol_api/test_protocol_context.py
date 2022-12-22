@@ -32,7 +32,6 @@ from opentrons.protocol_api.core.common import (
     ProtocolCore,
     TemperatureModuleCore,
     MagneticModuleCore,
-    WellCore,
 )
 from opentrons.protocol_api.core.protocol import LoadedLiquid
 
@@ -505,9 +504,8 @@ def test_load_liquid(
     mocked_labware = decoy.mock(cls=Labware)
     mocked_liquid = decoy.mock(cls=LoadedLiquid)
     mocked_well = decoy.mock(cls=Well)
-    mocked_well_core = decoy.mock(cls=WellCore)
 
-    decoy.when(mocked_well._impl).then_return(mocked_well_core)
+    decoy.when(mocked_well._impl.get_name()).then_return("A1")
 
     subject.load_liquid(
         labware=mocked_labware,
@@ -519,7 +517,7 @@ def test_load_liquid(
         mock_core.load_liquid(
             labware_core=mocked_labware._implementation,
             liquid=mocked_liquid,
-            volume_by_well={mocked_well_core: 20},
+            volume_by_well={"A1": 20},
         ),
         times=1,
     )

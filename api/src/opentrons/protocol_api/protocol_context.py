@@ -771,7 +771,7 @@ class ProtocolContext(CommandPublisher):
         """
         volume_by_well_core = {}
         for well, volume in volume_by_well.items():
-            volume_by_well_core[well._impl] = volume
+            volume_by_well_core[well._impl.get_name()] = volume
 
         self._implementation.load_liquid(
             labware_core=labware._implementation,

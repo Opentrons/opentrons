@@ -40,7 +40,6 @@ from opentrons.protocol_engine.resources import ModelUtils
 from ..protocol import AbstractProtocol, LoadedLiquid
 from ..labware import LabwareLoadParams
 from .labware import LabwareCore
-from .well import WellCore
 from .instrument import InstrumentCore
 from .module_core import (
     ModuleCore,
@@ -418,18 +417,14 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         self,
         labware_core: LabwareCore,
         liquid: LoadedLiquid,
-        volume_by_well: Dict[WellCore, float],
+        volume_by_well: Dict[str, float],
     ) -> None:
         """Load liquid into a labware."""
         labware_id = labware_core.labware_id
         liquid_id = liquid.id
 
-        volume_by_well_name: Dict[str, float] = {}
-        for well, volume in volume_by_well.items():
-            volume_by_well_name[well.get_name()] = volume
-
         self._engine_client.load_liquid(
             labware_id=labware_id,
             liquid_id=liquid_id,
-            volume_by_well=volume_by_well_name,
+            volume_by_well=volume_by_well,
         )
