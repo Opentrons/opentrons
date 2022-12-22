@@ -1,5 +1,6 @@
 // app-shell self-update tests
-import * as ElectronUpdater from 'electron-updater'
+import { when, resetAllWhenMocks } from 'jest-when'
+import * as http from '../http'
 import { registerUpdate } from '../update'
 import * as Cfg from '../config'
 
@@ -9,12 +10,13 @@ jest.unmock('electron-updater')
 jest.mock('electron-updater')
 jest.mock('../log')
 jest.mock('../config')
+jest.mock('../http')
 
 const getConfig = Cfg.getConfig as jest.MockedFunction<typeof Cfg.getConfig>
+const fetchJson = http.fetchJson as jest.MockedFunction<typeof http.fetchJson>
 
-const autoUpdater = ElectronUpdater.autoUpdater as jest.Mocked<
-  typeof ElectronUpdater.autoUpdater
->
+const MOCK_OT2_MANIFEST_URL = 'OT-2 manifest url'
+const MOCK_OT3_MANIFEST_URL = 'OT-3 manifest url'
 
 describe('update', () => {
   let dispatch: Dispatch
@@ -27,70 +29,32 @@ describe('update', () => {
 
   afterEach(() => {
     jest.resetAllMocks()
-    ;(ElectronUpdater as any).__mockReset()
+    resetAllWhenMocks()
   })
 
   it('handles shell:CHECK_UPDATE with available update', () => {
-    getConfig.mockReturnValue('dev' as any)
+    when(getConfig)
+      // @ts-expect-error getConfig mock not recognizing correct type overload
+      .calledWith('robotSystemUpdate')
+      .mockReturnValue({
+        manifestUrls: {
+          OT2: MOCK_OT2_MANIFEST_URL,
+          OT3: MOCK_OT3_MANIFEST_URL,
+        },
+      } as any)
+      // @ts-expect-error getConfig mock not recognizing correct type overload
+      .calledWith('update')
+      .mockReturnValue({
+        channel: 'latest',
+      } as any)
+
+    when(fetchJson)
+      .calledWith(MOCK_OT3_MANIFEST_URL)
+      .mockResolvedValue({ production: { '5.0.0': {}, '6.0.0': {} } })
     handleAction({ type: 'shell:CHECK_UPDATE', meta: { shell: true } })
 
-    expect(getConfig).toHaveBeenCalledWith('update.channel')
-    expect(autoUpdater.channel).toEqual('dev')
-    expect(autoUpdater.checkForUpdates).toHaveBeenCalledTimes(1)
+    expect(getConfig).toHaveBeenCalledWith('update')
 
-    autoUpdater.emit('update-available', { version: '1.0.0' })
-
-    expect(dispatch).toHaveBeenCalledWith({
-      type: 'shell:CHECK_UPDATE_RESULT',
-      payload: { available: true, info: { version: '1.0.0' } },
-    })
-  })
-
-  it('handles shell:CHECK_UPDATE with no available update', () => {
-    handleAction({ type: 'shell:CHECK_UPDATE', meta: { shell: true } })
-    autoUpdater.emit('update-not-available', { version: '1.0.0' })
-
-    expect(dispatch).toHaveBeenCalledWith({
-      type: 'shell:CHECK_UPDATE_RESULT',
-      payload: { available: false, info: { version: '1.0.0' } },
-    })
-  })
-
-  it('handles shell:CHECK_UPDATE with error', () => {
-    handleAction({ type: 'shell:CHECK_UPDATE', meta: { shell: true } })
-    autoUpdater.emit('error', new Error('AH'))
-
-    expect(dispatch).toHaveBeenCalledWith({
-      type: 'shell:CHECK_UPDATE_RESULT',
-      payload: { error: { name: 'Error', message: 'AH' } },
-    })
-  })
-
-  it('handles shell:DOWNLOAD_UPDATE', () => {
-    handleAction({ type: 'shell:DOWNLOAD_UPDATE', meta: { shell: true } })
-
-    expect(autoUpdater.downloadUpdate).toHaveBeenCalledTimes(1)
-
-    autoUpdater.emit('update-downloaded', { version: '1.0.0' })
-
-    expect(dispatch).toHaveBeenCalledWith({
-      type: 'shell:DOWNLOAD_UPDATE_RESULT',
-      payload: {},
-    })
-  })
-
-  it('handles shell:DOWNLOAD_UPDATE with error', () => {
-    handleAction({ type: 'shell:DOWNLOAD_UPDATE', meta: { shell: true } })
-    autoUpdater.emit('error', new Error('AH'))
-
-    expect(dispatch).toHaveBeenCalledWith({
-      type: 'shell:DOWNLOAD_UPDATE_RESULT',
-      payload: { error: { name: 'Error', message: 'AH' } },
-    })
-  })
-
-  it('handles shell:APPLY_UPDATE', () => {
-    handleAction({ type: 'shell:APPLY_UPDATE', meta: { shell: true } })
-    expect(autoUpdater.quitAndInstall).toHaveBeenCalledTimes(1)
+    expect(fetchJson).toHaveBeenCalledWith('OT-3 manifest url')
   })
 })

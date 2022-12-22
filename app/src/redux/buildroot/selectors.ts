@@ -99,7 +99,6 @@ export const getBuildrootRobot: (
           robot.serverHealth?.capabilities?.systemUpdate != null
             ? robotName.replace(/^opentrons-/, '')
             : robotName
-        console.log(robot.name)
 
         return robot.name === searchName
       }) || null

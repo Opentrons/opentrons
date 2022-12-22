@@ -75,7 +75,7 @@ function startUp(): void {
   }
 
   log.info('Fetching latest software version')
-  updateLatestVersion(dispatch)
+  updateLatestVersion()
 
   const actionHandlers: Dispatch[] = [
     registerConfig(dispatch),
