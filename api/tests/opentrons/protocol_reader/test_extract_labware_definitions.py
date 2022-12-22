@@ -181,12 +181,16 @@ async def test_extraction_from_json_protocol_ignores_separate_labware_files() ->
 
     extra_labware_load_names = {
         "corning_96_wellplate_360ul_flat",
-        "opentrons_24_tuberack_generic_2ml_screwcap"
+        "opentrons_24_tuberack_generic_2ml_screwcap",
     }
 
     main_file = ProtocolSourceFile(path=json_protocol.path, role=ProtocolFileRole.MAIN)
     extra_labware_files = [
-        ProtocolSourceFile(path=get_standard_labware_path(load_name=load_name), role=ProtocolFileRole.LABWARE) for load_name in extra_labware_load_names
+        ProtocolSourceFile(
+            path=get_standard_labware_path(load_name=load_name),
+            role=ProtocolFileRole.LABWARE,
+        )
+        for load_name in extra_labware_load_names
     ]
     protocol_source = ProtocolSource(
         directory=None,

@@ -233,7 +233,9 @@ async def test_read_saved(
     )
 
     result = await subject.read_saved(
-        files=[input_main_file, input_labware_file], directory=directory, files_are_prevalidated=files_are_prevalidated
+        files=[input_main_file, input_labware_file],
+        directory=directory,
+        files_are_prevalidated=files_are_prevalidated,
     )
 
     assert result == ProtocolSource(
@@ -262,5 +264,6 @@ async def test_read_saved(
     )
 
     decoy.verify(
-        await file_format_validator.validate([main_file, labware_file]), times=validator_expected_times_called
+        await file_format_validator.validate([main_file, labware_file]),
+        times=validator_expected_times_called,
     )

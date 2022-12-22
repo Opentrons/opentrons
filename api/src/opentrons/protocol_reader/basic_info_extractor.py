@@ -73,7 +73,9 @@ async def _analyze_json(
         json_contents = await anyio.to_thread.run_sync(json.loads, json_file.contents)
     except json.JSONDecodeError as e:
         # FIX BEFORE MERGE: Exception type.
-        raise ConfigAnalysisError(f"{json_file.name} is not valid JSON. {str(e)}") from e
+        raise ConfigAnalysisError(
+            f"{json_file.name} is not valid JSON. {str(e)}"
+        ) from e
 
     if _json_seems_like_labware(json_contents):
         return LabwareDefinitionFileInfo(

@@ -52,8 +52,12 @@ class RoleAnalyzer:
                 file_list = ", ".join(f'"{f.original_file.name}"' for f in files)
                 raise RoleAnalysisError(f"No valid protocol file found in {file_list}.")
         elif len(main_file_candidates) > 1:
-            file_list = ", ".join(f'"{f.original_file.name}"' for f in main_file_candidates)
-            raise RoleAnalysisError(f"Could not pick single main file from {file_list}.")
+            file_list = ", ".join(
+                f'"{f.original_file.name}"' for f in main_file_candidates
+            )
+            raise RoleAnalysisError(
+                f"Could not pick single main file from {file_list}."
+            )
         else:
             main_file = main_file_candidates[0]
 
