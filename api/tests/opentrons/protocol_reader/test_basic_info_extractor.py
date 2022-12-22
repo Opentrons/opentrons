@@ -43,7 +43,7 @@ class ValidPythonProtocolSpec:
     [
         # Basic Python:
         ValidPythonProtocolSpec(
-            file_name="protocol.py",
+            file_name="foo.py",
             contents=textwrap.dedent(
                 """
                 metadata = {
@@ -57,7 +57,7 @@ class ValidPythonProtocolSpec:
         ),
         # Python with a weirdly capitalized file extension:
         ValidPythonProtocolSpec(
-            file_name="protocol.Py",
+            file_name="foo.Py",
             contents=textwrap.dedent(
                 """
                 metadata = {
@@ -98,7 +98,7 @@ class ValidJsonProtocolSpec:
         # Basic JSON protocols of various versions:
         # todo(mm, 2022-12-22): Add a v7 protocol when we support that in production.
         ValidJsonProtocolSpec(
-            file_name="protocol.json",
+            file_name="foo.json",
             contents=load_shared_data("protocol/fixtures/6/simpleV6.json"),
             expected_schema_version=6,
             expected_metadata={
@@ -110,7 +110,7 @@ class ValidJsonProtocolSpec:
             },
         ),
         ValidJsonProtocolSpec(
-            file_name="protocol.json",
+            file_name="foo.json",
             contents=load_shared_data("protocol/fixtures/5/simpleV5.json"),
             expected_schema_version=5,
             expected_metadata={
@@ -125,7 +125,7 @@ class ValidJsonProtocolSpec:
             },
         ),
         ValidJsonProtocolSpec(
-            file_name="protocol.json",
+            file_name="foo.json",
             contents=load_shared_data("protocol/fixtures/4/simpleV4.json"),
             expected_schema_version=4,
             expected_metadata={
@@ -140,7 +140,7 @@ class ValidJsonProtocolSpec:
             },
         ),
         ValidJsonProtocolSpec(
-            file_name="protocol.json",
+            file_name="foo.json",
             contents=load_shared_data("protocol/fixtures/3/simple.json"),
             expected_schema_version=3,
             expected_metadata={
@@ -156,7 +156,7 @@ class ValidJsonProtocolSpec:
         ),
         # JSON with a weirdly capitalized file extension:
         ValidJsonProtocolSpec(
-            file_name="protocol.JsOn",
+            file_name="foo.JsOn",
             contents=load_shared_data("protocol/fixtures/3/simple.json"),
             expected_schema_version=3,
             expected_metadata={
@@ -185,7 +185,37 @@ async def test_valid_json_protocol(spec: ValidJsonProtocolSpec) -> None:
     assert result == expected_result
 
 
-# FIX BEFORE MERGE: Test labware parsing.
+@dataclass
+class ValidLabwareDefinitionSpec:
+    file_name: str
+    contents: bytes
+
+
+@pytest.mark.parametrize(
+    "spec",
+    [
+        ValidLabwareDefinitionSpec(
+            file_name="foo.json",
+            contents=load_shared_data(
+                "labware/definitions/2/armadillo_96_wellplate_200ul_pcr_full_skirt/1.json"
+            ),
+        ),
+        ValidLabwareDefinitionSpec(
+            file_name="foo.json",
+            contents=load_shared_data(
+                "labware/definitions/2/opentrons_96_tiprack_10ul/1.json"
+            ),
+        ),
+    ],
+)
+async def test_valid_labware_definition(spec: ValidLabwareDefinitionSpec) -> None:
+    input_file = BufferedFile(name=spec.file_name, contents=spec.contents, path=None)
+    expected_result = LabwareDefinitionFileInfo(
+        original_file=input_file, unvalidated_json=json.loads(spec.contents)
+    )
+    subject = BasicInfoExtractor()
+    [result] = await subject.extract([input_file])
+    assert result == expected_result
 
 
 @dataclass
