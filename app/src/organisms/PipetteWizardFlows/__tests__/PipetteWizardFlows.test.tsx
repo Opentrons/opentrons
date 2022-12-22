@@ -511,4 +511,82 @@ describe('PipetteWizardFlows', () => {
     getByText('Loosen Screws and Detach')
     getByText('Continue')
   })
+  it('renders the correct information, calling the correct commands for the 96-channel calibration flow', async () => {
+    props = {
+      ...props,
+      flowType: FLOWS.CALIBRATE,
+      selectedPipette: NINETY_SIX_CHANNEL,
+    }
+    const { getByText, getByRole } = render(props)
+    //  first page
+    getByText('Calibrate 96-Channel pipette')
+    getByText('Before you begin')
+    getByText(
+      'To get started, remove labware from the rest of the deck and clean up the work area to make attachment and calibration easier. Also gather the needed equipment shown on the right hand side'
+    )
+    getByText(
+      'The calibration probe is included with the robot and should be stored on the right hand side of the door opening.'
+    )
+    getByRole('button', { name: 'Get started' }).click()
+    await waitFor(() => {
+      expect(mockChainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'loadPipette',
+            params: {
+              mount: LEFT,
+              pipetteId: 'abc',
+              pipetteName: 'p1000_single_gen3',
+            },
+          },
+          {
+            commandType: 'calibration/moveToMaintenancePosition',
+            params: { mount: LEFT },
+          },
+        ],
+        false
+      )
+      expect(mockCreateRun).toHaveBeenCalled()
+    })
+    // second page
+    getByText('Step 1 / 3')
+    getByText('Attach Calibration Probe')
+    getByText(
+      'Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
+    )
+    getByRole('button', { name: 'Initiate calibration' }).click()
+    await waitFor(() => {
+      expect(mockChainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'calibration/calibratePipette',
+            params: { mount: LEFT },
+          },
+          {
+            commandType: 'calibration/moveToMaintenancePosition',
+            params: { mount: LEFT },
+          },
+        ],
+        false
+      )
+    })
+    //  third page
+    getByText('Step 2 / 3')
+    getByText('Remove Calibration Probe')
+    getByText(
+      'Unlatch the calibration probe, remove it from the pipette nozzle, and return it to its storage location.'
+    )
+    getByRole('button', { name: 'Complete calibration' }).click()
+    await waitFor(() => {
+      expect(mockChainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'home',
+            params: {},
+          },
+        ],
+        false
+      )
+    })
+  })
 })
