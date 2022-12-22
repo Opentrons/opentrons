@@ -37,7 +37,9 @@ export function getLabwareSetupItemGroups(
           )
           if (loadModuleCommand == null) {
             console.error(
-              `could not find load module command for module with id ${location.moduleId}`
+              `could not find load module command for module with id ${String(
+                location.moduleId
+              )}`
             )
           } else {
             moduleModel = loadModuleCommand.params.model

@@ -144,8 +144,8 @@ export const HeaterShakerSlideout = (
         </StyledText>
         <form id="HeaterShakerSlideout_submitValue">
           <InputField
-            data-testid={`${module.moduleModel}_setTemp`}
-            id={`${module.moduleModel}_setTemp`}
+            data-testid={`${String(module.moduleModel)}_setTemp`}
+            id={`${String(module.moduleModel)}_setTemp`}
             units={unit}
             autoFocus
             value={hsValue != null ? Math.round(hsValue) : null}

@@ -51,7 +51,7 @@ describe('Results', () => {
     const { getByText, getByRole, getByLabelText } = render(props)
     getByText('Pipette Successfully Calibrated')
     expect(getByLabelText('ot-check')).toHaveStyle(
-      `color: ${COLORS.successEnabled}`
+      `color: ${String(COLORS.successEnabled)}`
     )
     const exit = getByRole('button', { name: 'Results_exit' })
     fireEvent.click(exit)
@@ -66,7 +66,7 @@ describe('Results', () => {
     const { getByText, getByRole, getByLabelText } = render(props)
     getByText('P1000 Single-Channel GEN3 Successfully Attached')
     expect(getByLabelText('ot-check')).toHaveStyle(
-      `color: ${COLORS.successEnabled}`
+      `color: ${String(COLORS.successEnabled)}`
     )
     getByText('Calibrate pipette')
     const exit = getByRole('button', { name: 'Results_exit' })
@@ -82,7 +82,7 @@ describe('Results', () => {
     const { getByText, getByRole, getByLabelText } = render(props)
     getByText('Pipette failed to attach')
     expect(getByLabelText('ot-alert')).toHaveStyle(
-      `color: ${COLORS.errorEnabled}`
+      `color: ${String(COLORS.errorEnabled)}`
     )
     const exit = getByRole('button', { name: 'Results_exit' })
     fireEvent.click(exit)
@@ -98,7 +98,7 @@ describe('Results', () => {
     const { getByText, getByRole, getByLabelText } = render(props)
     getByText('Pipette Successfully Detached')
     expect(getByLabelText('ot-check')).toHaveStyle(
-      `color: ${COLORS.successEnabled}`
+      `color: ${String(COLORS.successEnabled)}`
     )
     const exit = getByRole('button', { name: 'Results_exit' })
     fireEvent.click(exit)
@@ -112,7 +112,7 @@ describe('Results', () => {
     const { getByText, getByRole, getByLabelText } = render(props)
     getByText('Pipette failed to detach')
     expect(getByLabelText('ot-alert')).toHaveStyle(
-      `color: ${COLORS.errorEnabled}`
+      `color: ${String(COLORS.errorEnabled)}`
     )
     const exit = getByRole('button', { name: 'Results_exit' })
     fireEvent.click(exit)
@@ -127,7 +127,7 @@ describe('Results', () => {
     const { getByText, getByRole, getByLabelText } = render(props)
     getByText('Pipette failed to detach')
     expect(getByLabelText('ot-alert')).toHaveStyle(
-      `color: ${COLORS.errorEnabled}`
+      `color: ${String(COLORS.errorEnabled)}`
     )
     const exit = getByRole('button', { name: 'Results_exit' })
     fireEvent.click(exit)
@@ -143,7 +143,7 @@ describe('Results', () => {
     const { getByText, getByRole, getByLabelText } = render(props)
     getByText('Pipette Successfully Detached')
     expect(getByLabelText('ot-check')).toHaveStyle(
-      `color: ${COLORS.successEnabled}`
+      `color: ${String(COLORS.successEnabled)}`
     )
     const exit = getByRole('button', { name: 'Results_exit' })
     fireEvent.click(exit)

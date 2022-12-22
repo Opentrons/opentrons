@@ -401,7 +401,7 @@ export function ProtocolDetails(
         />
         <Flex
           backgroundColor={COLORS.white}
-          border={`1px solid ${COLORS.medGreyEnabled}`}
+          border={`1px solid ${String(COLORS.medGreyEnabled)}`}
           borderRadius={BORDERS.radiusSoftCorners}
           position={POSITION_RELATIVE}
           flexDirection={DIRECTION_ROW}
@@ -411,7 +411,9 @@ export function ProtocolDetails(
           <Flex
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing4}
-            padding={`${SPACING.spacing4} 0 ${SPACING.spacing4} ${SPACING.spacing4}`}
+            padding={`${String(SPACING.spacing4)} 0 ${String(
+              SPACING.spacing4
+            )} ${String(SPACING.spacing4)}`}
             width="100%"
           >
             {analysisStatus !== 'loading' &&
@@ -537,10 +539,10 @@ export function ProtocolDetails(
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
           <Flex
-            flex={`0 0 ${SIZE_5}`}
+            flex={`0 0 ${String(SIZE_5)}`}
             flexDirection={DIRECTION_COLUMN}
             backgroundColor={COLORS.white}
-            border={`1px solid ${COLORS.medGreyEnabled}`}
+            border={`1px solid ${String(COLORS.medGreyEnabled)}`}
             borderRadius={BORDERS.radiusSoftCorners}
             height="100%"
             data-testid="ProtocolDetails_deckMap"
@@ -616,11 +618,15 @@ export function ProtocolDetails(
               border={BORDERS.lineBorder}
               // remove left upper corner border radius when first tab is active
               borderRadius={`${
-                currentTab === 'robot_config' ? '0' : BORDERS.radiusSoftCorners
-              } ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} ${
+                currentTab === 'robot_config'
+                  ? '0'
+                  : String(BORDERS.radiusSoftCorners)
+              } ${String(BORDERS.radiusSoftCorners)} ${String(
                 BORDERS.radiusSoftCorners
-              }`}
-              padding={`${SPACING.spacing4} ${SPACING.spacing4} 0 ${SPACING.spacing4}`}
+              )} ${String(BORDERS.radiusSoftCorners)}`}
+              padding={`${String(SPACING.spacing4)} ${String(
+                SPACING.spacing4
+              )} 0 ${String(SPACING.spacing4)}`}
             >
               {contentsByTabName[currentTab]}
             </Box>

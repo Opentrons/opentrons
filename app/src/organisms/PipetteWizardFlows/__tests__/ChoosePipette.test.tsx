@@ -36,9 +36,11 @@ describe('ChoosePipette', () => {
 
     //  Single and 8-Channel pipettes are selected first by default
     expect(singleMountPipettes).toHaveStyle(
-      `background-color: ${COLORS.lightBlue}`
+      `background-color: ${String(COLORS.lightBlue)}`
     )
-    expect(ninetySixPipette).toHaveStyle(`background-color: ${COLORS.white}`)
+    expect(ninetySixPipette).toHaveStyle(
+      `background-color: ${String(COLORS.white)}`
+    )
 
     //  Selecting 96-Channel called setSelectedPipette prop
     fireEvent.click(ninetySixPipette)
@@ -81,9 +83,11 @@ describe('ChoosePipette', () => {
     const { getByTestId } = render(props)
     const singleMountPipettes = getByTestId('ChoosePipette_SingleAndEight')
     const ninetySixPipette = getByTestId('ChoosePipette_NinetySix')
-    expect(singleMountPipettes).toHaveStyle(`background-color: ${COLORS.white}`)
+    expect(singleMountPipettes).toHaveStyle(
+      `background-color: ${String(COLORS.white)}`
+    )
     expect(ninetySixPipette).toHaveStyle(
-      `background-color: ${COLORS.lightBlue}`
+      `background-color: ${String(COLORS.lightBlue)}`
     )
   })
 })

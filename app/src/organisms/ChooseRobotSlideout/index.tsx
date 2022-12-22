@@ -270,7 +270,7 @@ export function ChooseRobotSlideoutComponent(
                     color={COLORS.errorText}
                     overflowWrap="anywhere"
                     display={DISPLAY_INLINE_BLOCK}
-                    marginTop={`-${SPACING.spacing2}`}
+                    marginTop={`-${String(SPACING.spacing2)}`}
                     marginBottom={SPACING.spacing3}
                   >
                     {runCreationErrorCode === 409 ? (
@@ -529,7 +529,7 @@ export function DeprecatedChooseRobotSlideout(
                     color={COLORS.errorText}
                     overflowWrap="anywhere"
                     display={DISPLAY_INLINE_BLOCK}
-                    marginTop={`-${SPACING.spacing2}`}
+                    marginTop={`-${String(SPACING.spacing2)}`}
                     marginBottom={SPACING.spacing3}
                   >
                     {runCreationErrorCode === 409 ? (
