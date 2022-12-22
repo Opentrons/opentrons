@@ -120,7 +120,6 @@ class SensorDriver(AbstractSensorDriver):
         timeout: int = 1,
     ) -> Optional[SensorReturnType]:
         """Send threshold for stopping a move."""
-
         write = SensorThresholdInformation(
             sensor.sensor,
             SensorDataType.build(sensor.stop_threshold, sensor.sensor.sensor_type),

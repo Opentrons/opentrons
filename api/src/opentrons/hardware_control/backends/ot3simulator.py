@@ -34,7 +34,7 @@ from .ot3utils import (
     PipetteAction,
 )
 
-from opentrons_hardware.firmware_bindings.constants import NodeId
+from opentrons_hardware.firmware_bindings.constants import NodeId, SensorId
 from opentrons_hardware.hardware_control.motion_planning import (
     Move,
     Coordinates,
@@ -223,6 +223,19 @@ class OT3Simulator:
     async def update_encoder_position(self) -> OT3AxisMap[float]:
         """Get the encoder current position."""
         return axis_convert(self._encoder_position, 0.0)
+
+    @ensure_yield
+    async def liquid_probe(
+        self,
+        mount: OT3Mount,
+        pipette_distance: float,
+        pipette_speed: float,
+        mount_distance: float,
+        mount_speed: float,
+        threshold_pascals: float,
+        sensor_id: SensorId = SensorId.S0,
+    ) -> None:
+        return
 
     @ensure_yield
     async def move(
