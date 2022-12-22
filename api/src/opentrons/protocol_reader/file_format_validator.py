@@ -4,6 +4,7 @@
 from typing import Iterable
 
 import anyio
+from pydantic import ValidationError as PydanticValidationError
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.protocol.models import ProtocolSchemaV6 as JsonProtocolV6
@@ -16,6 +17,11 @@ from .file_identifier import (
     IdentifiedPythonMain,
     IdentifiedLabwareDefinition,
 )
+from .protocol_files_invalid_error import ProtocolFilesInvalidError
+
+
+class FileFormatValidationError(ProtocolFilesInvalidError):
+    """Raised when a file does not conform to the format it's supposed to."""
 
 
 class FileFormatValidator:
@@ -35,21 +41,26 @@ class FileFormatValidator:
 
 async def _validate_labware_definition(info: IdentifiedLabwareDefinition) -> None:
     def validate_sync() -> None:
-        LabwareDefinition.parse_obj(info.unvalidated_json)
+        try:
+            LabwareDefinition.parse_obj(info.unvalidated_json)
+        except PydanticValidationError as e:
+            raise FileFormatValidationError(
+                f"{info.original_file.name} could not be read as a labware definition."
+            ) from e
 
     await anyio.to_thread.run_sync(validate_sync)
-    # FIX BEFORE MERGE: Wrap exception?
 
 
 async def _validate_json_protocol(info: IdentifiedJsonMain) -> None:
-    def validate_v6_sync() -> None:
-        JsonProtocolV6.parse_obj(info.unvalidated_json)
+    def validate_sync() -> None:
+        try:
+            if info.schema_version == 6:
+                JsonProtocolV6.parse_obj(info.unvalidated_json)
+            else:
+                JsonProtocolUpToV5.parse_obj(info.unvalidated_json)
+        except PydanticValidationError as e:
+            raise FileFormatValidationError(
+                f"{info.original_file.name} could not be read as a JSON protocol."
+            ) from e
 
-    def validate_up_to_v5_sync() -> None:
-        JsonProtocolUpToV5.parse_obj(info.unvalidated_json)
-
-    if info.schema_version == 6:
-        await anyio.to_thread.run_sync(validate_v6_sync)
-    else:
-        await anyio.to_thread.run_sync(validate_up_to_v5_sync)
-    # FIX BEFORE MERGE: Wrap exception?
+    await anyio.to_thread.run_sync(validate_sync)
