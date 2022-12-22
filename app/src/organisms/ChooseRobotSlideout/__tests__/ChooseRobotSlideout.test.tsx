@@ -101,7 +101,7 @@ describe('ChooseRobotSlideout', () => {
       isAnalysisError: true,
     })
     getByText(
-      'This protocol failed its last analysis and may not be usable on your robot.'
+      'This protocol failed in-app analysis. It may be unusable on robots without custom software configurations.'
     )
   })
   it('renders an available robot option for every connectable robot, and link for other robots', () => {

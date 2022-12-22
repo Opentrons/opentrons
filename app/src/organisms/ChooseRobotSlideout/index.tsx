@@ -168,7 +168,7 @@ export function ChooseRobotSlideout(
     >
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
         {isAnalysisError ? (
-          <Banner type="warning">{t('protocol_failed_last_analysis')}</Banner>
+          <Banner type="warning">{t('protocol_failed_app_analysis')}</Banner>
         ) : null}
         <Flex alignSelf={ALIGN_FLEX_END} marginY={SPACING.spacing2}>
           {isScanning ? (
