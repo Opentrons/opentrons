@@ -1,3 +1,6 @@
+"""File format validation interface."""
+
+
 from typing import Iterable
 
 import anyio
@@ -16,8 +19,11 @@ from .file_identifier import (
 
 
 class FileFormatValidator:
+    """File format validation interface."""
+
     @staticmethod
     async def validate(files: Iterable[IdentifiedFile]) -> None:
+        """Validate that each file actually conforms to the format we think it does."""
         for file in files:
             if isinstance(file, IdentifiedJsonMain):
                 await _validate_json_protocol(file)
