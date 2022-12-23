@@ -149,95 +149,99 @@ export function ChooseProtocolSlideoutComponent(
       }
     >
       {storedProtocols.length > 0 ? (
-        storedProtocols.map(storedProtocol => {
-          const isSelected =
-            selectedProtocol != null &&
-            storedProtocol.protocolKey === selectedProtocol.protocolKey
-          return (
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              key={storedProtocol.protocolKey}
-            >
-              <MiniCard
-                isSelected={isSelected}
-                isError={runCreationError != null}
-                onClick={() => {
-                  if (!isCreatingRun) {
-                    resetCreateRun()
-                    setSelectedProtocol(storedProtocol)
-                  }
-                }}
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+          {storedProtocols.map(storedProtocol => {
+            const isSelected =
+              selectedProtocol != null &&
+              storedProtocol.protocolKey === selectedProtocol.protocolKey
+            return (
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                key={storedProtocol.protocolKey}
               >
-                <Box display="grid" gridTemplateColumns="1fr 3fr">
-                  <Box
-                    marginY={SPACING.spacingAuto}
-                    backgroundColor={isSelected ? COLORS.white : 'inherit'}
-                    marginRight={SPACING.spacing4}
-                    height="4.25rem"
-                    width="4.75rem"
-                  >
-                    <DeckThumbnail
-                      commands={
-                        storedProtocol.mostRecentAnalysis?.commands ?? []
-                      }
-                      labware={storedProtocol.mostRecentAnalysis?.labware ?? []}
-                    />
-                  </Box>
-                  <StyledText
-                    as="p"
-                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                    overflowWrap="anywhere"
-                  >
-                    {storedProtocol.mostRecentAnalysis?.metadata
-                      ?.protocolName ??
-                      first(storedProtocol.srcFileNames) ??
-                      storedProtocol.protocolKey}
-                  </StyledText>
-                </Box>
-                {runCreationError != null && isSelected ? (
-                  <>
-                    <Box flex="1 1 auto" />
-                    <Icon
-                      name="alert-circle"
-                      size="1.25rem"
-                      color={COLORS.errorEnabled}
-                    />
-                  </>
-                ) : null}
-              </MiniCard>
-              {runCreationError != null && isSelected ? (
-                <StyledText
-                  as="label"
-                  color={COLORS.errorText}
-                  overflowWrap="anywhere"
-                  display={DISPLAY_BLOCK}
-                  marginTop={`-${SPACING.spacing2}`}
-                  marginBottom={SPACING.spacing3}
+                <MiniCard
+                  isSelected={isSelected}
+                  isError={runCreationError != null}
+                  onClick={() => {
+                    if (!isCreatingRun) {
+                      resetCreateRun()
+                      setSelectedProtocol(storedProtocol)
+                    }
+                  }}
                 >
-                  {runCreationErrorCode === 409 ? (
-                    <Trans
-                      t={t}
-                      i18nKey="shared:robot_is_busy_no_protocol_run_allowed"
-                      components={{
-                        robotLink: (
-                          <NavLink
-                            css={css`
-                              color: ${COLORS.errorText};
-                              text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
-                            `}
-                            to={`/devices/${robot.name}`}
-                          />
-                        ),
-                      }}
-                    />
-                  ) : (
-                    runCreationError
-                  )}
-                </StyledText>
-              ) : null}
-            </Flex>
-          )
-        })
+                  <Box display="grid" gridTemplateColumns="1fr 3fr">
+                    <Box
+                      marginY={SPACING.spacingAuto}
+                      backgroundColor={isSelected ? COLORS.white : 'inherit'}
+                      marginRight={SPACING.spacing4}
+                      height="4.25rem"
+                      width="4.75rem"
+                    >
+                      <DeckThumbnail
+                        commands={
+                          storedProtocol.mostRecentAnalysis?.commands ?? []
+                        }
+                        labware={
+                          storedProtocol.mostRecentAnalysis?.labware ?? []
+                        }
+                      />
+                    </Box>
+                    <StyledText
+                      as="p"
+                      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                      overflowWrap="anywhere"
+                    >
+                      {storedProtocol.mostRecentAnalysis?.metadata
+                        ?.protocolName ??
+                        first(storedProtocol.srcFileNames) ??
+                        storedProtocol.protocolKey}
+                    </StyledText>
+                  </Box>
+                  {runCreationError != null && isSelected ? (
+                    <>
+                      <Box flex="1 1 auto" />
+                      <Icon
+                        name="alert-circle"
+                        size="1.25rem"
+                        color={COLORS.errorEnabled}
+                      />
+                    </>
+                  ) : null}
+                </MiniCard>
+                {runCreationError != null && isSelected ? (
+                  <StyledText
+                    as="label"
+                    color={COLORS.errorText}
+                    overflowWrap="anywhere"
+                    display={DISPLAY_BLOCK}
+                    marginTop={`-${SPACING.spacing2}`}
+                    marginBottom={SPACING.spacing3}
+                  >
+                    {runCreationErrorCode === 409 ? (
+                      <Trans
+                        t={t}
+                        i18nKey="shared:robot_is_busy_no_protocol_run_allowed"
+                        components={{
+                          robotLink: (
+                            <NavLink
+                              css={css`
+                                color: ${COLORS.errorText};
+                                text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
+                              `}
+                              to={`/devices/${robot.name}`}
+                            />
+                          ),
+                        }}
+                      />
+                    ) : (
+                      runCreationError
+                    )}
+                  </StyledText>
+                ) : null}
+              </Flex>
+            )
+          })}
+        </Flex>
       ) : (
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -372,95 +376,99 @@ export function DeprecatedChooseProtocolSlideout(
       }
     >
       {storedProtocols.length > 0 ? (
-        storedProtocols.map(storedProtocol => {
-          const isSelected =
-            selectedProtocol != null &&
-            storedProtocol.protocolKey === selectedProtocol.protocolKey
-          return (
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              key={storedProtocol.protocolKey}
-            >
-              <MiniCard
-                isSelected={isSelected}
-                isError={runCreationError != null}
-                onClick={() => {
-                  if (!isCreatingRun) {
-                    resetCreateRun()
-                    setSelectedProtocol(storedProtocol)
-                  }
-                }}
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+          {storedProtocols.map(storedProtocol => {
+            const isSelected =
+              selectedProtocol != null &&
+              storedProtocol.protocolKey === selectedProtocol.protocolKey
+            return (
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                key={storedProtocol.protocolKey}
               >
-                <Box display="grid" gridTemplateColumns="1fr 3fr">
-                  <Box
-                    marginY={SPACING.spacingAuto}
-                    backgroundColor={isSelected ? COLORS.white : 'inherit'}
-                    marginRight={SPACING.spacing4}
-                    height="4.25rem"
-                    width="4.75rem"
-                  >
-                    <DeckThumbnail
-                      commands={
-                        storedProtocol.mostRecentAnalysis?.commands ?? []
-                      }
-                      labware={storedProtocol.mostRecentAnalysis?.labware ?? []}
-                    />
-                  </Box>
-                  <StyledText
-                    as="p"
-                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                    overflowWrap="anywhere"
-                  >
-                    {storedProtocol.mostRecentAnalysis?.metadata
-                      ?.protocolName ??
-                      first(storedProtocol.srcFileNames) ??
-                      storedProtocol.protocolKey}
-                  </StyledText>
-                </Box>
-                {runCreationError != null && isSelected ? (
-                  <>
-                    <Box flex="1 1 auto" />
-                    <Icon
-                      name="alert-circle"
-                      size="1.25rem"
-                      color={COLORS.errorEnabled}
-                    />
-                  </>
-                ) : null}
-              </MiniCard>
-              {runCreationError != null && isSelected ? (
-                <StyledText
-                  as="label"
-                  color={COLORS.errorText}
-                  overflowWrap="anywhere"
-                  display={DISPLAY_BLOCK}
-                  marginTop={`-${SPACING.spacing2}`}
-                  marginBottom={SPACING.spacing3}
+                <MiniCard
+                  isSelected={isSelected}
+                  isError={runCreationError != null}
+                  onClick={() => {
+                    if (!isCreatingRun) {
+                      resetCreateRun()
+                      setSelectedProtocol(storedProtocol)
+                    }
+                  }}
                 >
-                  {runCreationErrorCode === 409 ? (
-                    <Trans
-                      t={t}
-                      i18nKey="shared:robot_is_busy_no_protocol_run_allowed"
-                      components={{
-                        robotLink: (
-                          <NavLink
-                            css={css`
-                              color: ${COLORS.errorText};
-                              text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
-                            `}
-                            to={`/devices/${robot.name}`}
-                          />
-                        ),
-                      }}
-                    />
-                  ) : (
-                    runCreationError
-                  )}
-                </StyledText>
-              ) : null}
-            </Flex>
-          )
-        })
+                  <Box display="grid" gridTemplateColumns="1fr 3fr">
+                    <Box
+                      marginY={SPACING.spacingAuto}
+                      backgroundColor={isSelected ? COLORS.white : 'inherit'}
+                      marginRight={SPACING.spacing4}
+                      height="4.25rem"
+                      width="4.75rem"
+                    >
+                      <DeckThumbnail
+                        commands={
+                          storedProtocol.mostRecentAnalysis?.commands ?? []
+                        }
+                        labware={
+                          storedProtocol.mostRecentAnalysis?.labware ?? []
+                        }
+                      />
+                    </Box>
+                    <StyledText
+                      as="p"
+                      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                      overflowWrap="anywhere"
+                    >
+                      {storedProtocol.mostRecentAnalysis?.metadata
+                        ?.protocolName ??
+                        first(storedProtocol.srcFileNames) ??
+                        storedProtocol.protocolKey}
+                    </StyledText>
+                  </Box>
+                  {runCreationError != null && isSelected ? (
+                    <>
+                      <Box flex="1 1 auto" />
+                      <Icon
+                        name="alert-circle"
+                        size="1.25rem"
+                        color={COLORS.errorEnabled}
+                      />
+                    </>
+                  ) : null}
+                </MiniCard>
+                {runCreationError != null && isSelected ? (
+                  <StyledText
+                    as="label"
+                    color={COLORS.errorText}
+                    overflowWrap="anywhere"
+                    display={DISPLAY_BLOCK}
+                    marginTop={`-${SPACING.spacing2}`}
+                    marginBottom={SPACING.spacing3}
+                  >
+                    {runCreationErrorCode === 409 ? (
+                      <Trans
+                        t={t}
+                        i18nKey="shared:robot_is_busy_no_protocol_run_allowed"
+                        components={{
+                          robotLink: (
+                            <NavLink
+                              css={css`
+                                color: ${COLORS.errorText};
+                                text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
+                              `}
+                              to={`/devices/${robot.name}`}
+                            />
+                          ),
+                        }}
+                      />
+                    ) : (
+                      runCreationError
+                    )}
+                  </StyledText>
+                ) : null}
+              </Flex>
+            )
+          })}
+        </Flex>
       ) : (
         <Flex
           flexDirection={DIRECTION_COLUMN}
