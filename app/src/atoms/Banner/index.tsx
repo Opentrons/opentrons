@@ -29,7 +29,7 @@ export interface BannerProps extends StyleProps {
   /** Banner contents */
   children?: React.ReactNode
   /** optional handler to show close button/clear alert  */
-  onCloseClick?: (() => unknown) | React.MouseEventHandler<HTMLButtonElement>
+  onCloseClick?: (() => void) | React.MouseEventHandler<HTMLButtonElement>
   /** Override the default Alert Icon */
   icon?: IconProps
   /** some banner onCloseClicks fire events, this allows a spinner after click but before event finishes */
@@ -79,7 +79,7 @@ export function Banner(props: BannerProps): JSX.Element {
     onCloseClick,
     icon,
     children,
-    isCloseActionLoading,
+    isCloseActionLoading = false,
     padding,
     closeButton,
     iconMarginLeft,
@@ -102,7 +102,9 @@ export function Banner(props: BannerProps): JSX.Element {
       fontWeight={TYPOGRAPHY.fontWeightRegular}
       borderRadius={SPACING.spacing2}
       backgroundColor={BANNER_PROPS_BY_TYPE[type].backgroundColor}
-      border={`${SPACING.spacingXXS} ${BORDERS.styleSolid} ${BANNER_PROPS_BY_TYPE[type].color}`}
+      border={`${String(SPACING.spacingXXS)} ${String(BORDERS.styleSolid)} ${
+        BANNER_PROPS_BY_TYPE[type].color
+      }`}
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
