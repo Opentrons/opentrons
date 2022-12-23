@@ -119,7 +119,7 @@ export function ConnectRobotSlideout({
                   <StyledText
                     as="p"
                     color={COLORS.darkGreyEnabled}
-                    margin={`0 ${SPACING.spacing2}`}
+                    margin={`0 ${String(SPACING.spacing2)}`}
                   >
                     {t('discovery_timeout')}
                   </StyledText>

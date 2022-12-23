@@ -120,10 +120,12 @@ function BreadcrumbsComponent(): JSX.Element | null {
     <Flex
       alignItems={ALIGN_FLEX_START}
       backgroundColor={COLORS.white}
-      borderBottom={`1px solid ${COLORS.medGreyEnabled}`}
+      borderBottom={`1px solid ${String(COLORS.medGreyEnabled)}`}
       css={TYPOGRAPHY.labelRegular}
       flexDirection={DIRECTION_ROW}
-      padding={`${SPACING.spacing2} 0 ${SPACING.spacing2} ${SPACING.spacing3}`}
+      padding={`${String(SPACING.spacing2)} 0 ${String(
+        SPACING.spacing2
+      )} ${String(SPACING.spacing3)}`}
     >
       {pathCrumbs.map((crumb, i) => {
         const isLastCrumb = i === pathCrumbs.length - 1

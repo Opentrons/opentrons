@@ -97,7 +97,9 @@ export function ReapplyOffsetsModal(
             <OffsetTableDatum>
               {t('slot', { slotName: offset.location.slotName })}
               {offset.location.moduleModel != null
-                ? ` - ${getModuleDisplayName(offset.location.moduleModel)}`
+                ? ` - ${String(
+                    getModuleDisplayName(offset.location.moduleModel)
+                  )}`
                 : null}
             </OffsetTableDatum>
             <OffsetTableDatum>

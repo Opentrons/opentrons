@@ -71,7 +71,9 @@ export const ResultsSummary = (
           throw new Error(
             `cannot create offset for labware with id ${labwareId}, in location ${JSON.stringify(
               location
-            )}, with initial position ${initialPosition}, and final position ${finalPosition}`
+            )}, with initial position ${String(
+              initialPosition
+            )}, and final position ${String(finalPosition)}`
           )
         }
 
