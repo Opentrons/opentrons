@@ -16,7 +16,7 @@ interface AttachProbeProps extends PipetteWizardStepProps {
 export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const {
     proceed,
-    attachedPipette,
+    attachedPipettes,
     chainRunCommands,
     mount,
     isRobotMoving,
@@ -26,7 +26,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     setShowErrorMessage,
   } = props
   const { t } = useTranslation('pipette_wizard_flows')
-  const pipetteId = attachedPipette[mount]?.id
+  const pipetteId = attachedPipettes[mount]?.id
   //  hard coding calibration slot number for now in case it changes
   //  in the future
   const calSlotNum = '2'

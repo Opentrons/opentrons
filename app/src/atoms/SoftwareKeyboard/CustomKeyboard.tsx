@@ -24,17 +24,7 @@ const customLayout = {
 
 const customDisplay = {
   '{numbers}': '123',
-  '{escape}': 'esc ⎋',
-  '{tab}': 'tab ⇥',
-  '{backspace}': '⌫',
-  '{capslock}': 'caps lock ⇪',
-  '{shift}': '⇧',
-  '{controlleft}': 'ctrl ⌃',
-  '{controlright}': 'ctrl ⌃',
-  '{altleft}': 'alt ⌥',
-  '{altright}': 'alt ⌥',
-  '{metaleft}': 'cmd ⌘',
-  '{metaright}': 'cmd ⌘',
+  '{backspace}': 'del',
   '{abc}': 'ABC',
 }
 
