@@ -87,10 +87,7 @@ export const getBuildrootRobot: (
   getViewableRobots,
   getBuildrootRobotName,
   (robots, robotName) => {
-    if (robotName === null) {
-      console.log('returning null!')
-      return null
-    }
+    if (robotName === null) return null
 
     return (
       robots.find(robot => {
