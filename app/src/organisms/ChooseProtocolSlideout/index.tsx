@@ -31,7 +31,7 @@ import { MiniCard } from '../../molecules/MiniCard'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { useFeatureFlag } from '../../redux/config'
 import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
-import { useCreateRunFromProtocol } from '../ChooseRobotSlideout/useCreateRunFromProtocol'
+import { useCreateRunFromProtocol } from '../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 

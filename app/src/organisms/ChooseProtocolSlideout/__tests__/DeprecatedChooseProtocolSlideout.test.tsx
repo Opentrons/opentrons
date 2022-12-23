@@ -16,10 +16,10 @@ import { useFeatureFlag } from '../../../redux/config'
 import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
 import { DeckThumbnail } from '../../../molecules/DeckThumbnail'
 import { useTrackCreateProtocolRunEvent } from '../../../organisms/Devices/hooks'
-import { useCreateRunFromProtocol } from '../../ChooseRobotSlideout/useCreateRunFromProtocol'
+import { useCreateRunFromProtocol } from '../../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import { ChooseProtocolSlideout } from '../'
 
-jest.mock('../../ChooseRobotSlideout/useCreateRunFromProtocol')
+jest.mock('../../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol')
 jest.mock('../../../redux/protocol-storage')
 jest.mock('../../../molecules/DeckThumbnail')
 jest.mock('../../../organisms/Devices/hooks')
