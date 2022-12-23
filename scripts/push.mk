@@ -4,7 +4,22 @@ find_robot=$(shell yarn run -s discovery find -i 169.254)
 default_ssh_key := ~/.ssh/robot_key
 default_ssh_opts := -o stricthostkeychecking=no -o userknownhostsfile=/dev/null
 is-ot3 = $(shell ssh $(if $(2),"-i $(2)") $(3) root@$(1) systemctl status opentrons-robot-app)
+ssh-version := $(shell ssh -V)
+need-copy-scp := $(subst _, ,OpenSSH_9.0p1, LibreSSL 3.3.6)
+$(info $$ssh is $(ssh-version))
+$(info $$need-copy-scp is [${need-copy-scp}])
 
+
+INPUT=someletters_12345_moreleters.ext 
+SUBSTRING=$(cut -d'_' -f 2 $(INPUT))
+$(info $$SUBSTRING is [${SUBSTRING}])
+
+$(info test [${echo "abcdefg" | cut -c3-5}])
+
+
+FILTER_OUT = $(foreach v,$(3),$(if $(findstring $(1),$(2),$(v)),,$(v)))
+foo = $(call FILTER_OUT,_,p, $(ssh-version))
+$(info $$foo is [${foo}])
 # push-python-package: execute a push to the robot of a particular python
 # package.
 #
