@@ -131,6 +131,8 @@ export function cleanupReleaseFiles(
   downloadsDir: string,
   currentRelease: string
 ): Promise<unknown> {
+  log.debug('deleting release files not part of release ', currentRelease)
+
   return readdir(downloadsDir, { withFileTypes: true })
     .then(files => {
       return (
