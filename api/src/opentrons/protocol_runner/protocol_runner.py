@@ -160,6 +160,8 @@ class ProtocolRunner:
         return ProtocolRunResult(commands=commands, state_summary=run_data)
 
     def _load_json(self, protocol_source: ProtocolSource) -> None:
+        # fixme(mm, 2022-12-23): This does I/O and compute-bound parsing that will block
+        # the event loop. Jira RSS-165.
         protocol = self._json_file_reader.read(protocol_source)
         commands = self._json_translator.translate_commands(protocol)
 
@@ -173,6 +175,8 @@ class ProtocolRunner:
         self._task_queue.set_run_func(func=self._protocol_engine.wait_until_complete)
 
     def _load_python(self, protocol_source: ProtocolSource) -> None:
+        # fixme(mm, 2022-12-23): This does I/O and compute-bound parsing that will block
+        # the event loop. Jira RSS-165.
         protocol = self._python_file_reader.read(protocol_source)
         context = self._python_context_creator.create(self._protocol_engine)
         self._task_queue.set_run_func(
@@ -186,6 +190,8 @@ class ProtocolRunner:
         protocol_source: ProtocolSource,
         labware_definitions: Iterable[LabwareDefinition],
     ) -> None:
+        # fixme(mm, 2022-12-23): This does I/O and compute-bound parsing that will block
+        # the event loop. Jira RSS-165.
         protocol = self._legacy_file_reader.read(protocol_source, labware_definitions)
         broker = None
         equipment_broker = None
