@@ -101,7 +101,7 @@ export function ConnectRobotSlideout({
           marginBottom={SPACING.spacing4}
           justifyContent={ALIGN_FLEX_END}
         >
-          {isScanning ? (
+          {Boolean(isScanning) ? (
             <Flex flexDirection={DIRECTION_ROW}>
               <StyledText
                 as="p"
