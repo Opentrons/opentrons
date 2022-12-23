@@ -113,6 +113,7 @@ def _pipette_dict_to_pipette(pipette_dict: PipetteDict) -> Pipette:
     summary="Get attached instruments.",
     description="Get a list of all instruments (pipettes & gripper) currently attached"
                 " to the robot.",
+    response_model_exclude_none=False,
     responses={
         status.HTTP_200_OK: {"model": SimpleMultiBody[AttachedInstrument]}
     }
