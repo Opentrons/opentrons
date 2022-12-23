@@ -67,7 +67,11 @@ def call_once(fn: AsyncFuncT) -> AsyncFuncT:
     @wraps(fn)
     async def wrapped(*args: Any, **kwargs: Any) -> Any:
         if not hasattr(wrapped, _CALL_ONCE_TASK_ATTR):
-            setattr(wrapped, _CALL_ONCE_TASK_ATTR, asyncio.create_task(fn(*args, **kwargs)))
+            setattr(
+                wrapped,
+                _CALL_ONCE_TASK_ATTR,
+                asyncio.create_task(fn(*args, **kwargs))
+            )
 
         result_task = getattr(wrapped, _CALL_ONCE_TASK_ATTR)
         return await result_task
