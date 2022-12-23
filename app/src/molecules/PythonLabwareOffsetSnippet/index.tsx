@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { FONT_SIZE_CAPTION, SPACING_2 } from '@opentrons/components'
+import { TYPOGRAPHY, SPACING } from '@opentrons/components'
 import { createSnippet } from './createSnippet'
 import type { LegacySchemaAdapterOutput } from '@opentrons/shared-data'
 import type { LabwareOffset } from '@opentrons/api-client'
@@ -8,8 +8,8 @@ import type { LabwareOffset } from '@opentrons/api-client'
 const JsonTextArea = styled.textarea`
   min-height: 30vh;
   width: 100%;
-  padding: ${SPACING_2};
-  font-size: ${FONT_SIZE_CAPTION};
+  padding: ${SPACING.spacing3};
+  font-size: ${TYPOGRAPHY.fontSizeCaption};
   font-family: monospace;
 `
 interface PythonLabwareOffsetSnippetProps {
