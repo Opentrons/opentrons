@@ -28,7 +28,7 @@ export function TempODDMenu(): JSX.Element {
 
   return (
     <>
-      <Flex marginBottom="2rem">Robot Dashboard</Flex>(
+      <Flex marginBottom="2rem">Robot Dashboard</Flex>
       {latestRobotSystemVersion && (
         <PrimaryButton
           onClick={() =>
