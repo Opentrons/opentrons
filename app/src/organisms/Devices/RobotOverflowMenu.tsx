@@ -118,13 +118,13 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
       <>
         <MenuItem
           onClick={handleClickConnectionTroubleshooting}
-          id={`RobotOverflowMenu_${robot.name}_robotUnavailable`}
+          id={`RobotOverflowMenu_${String(robot.name)}_robotUnavailable`}
         >
           {t('why_is_this_robot_unavailable')}
         </MenuItem>
         <MenuItem
           onClick={() => dispatch(removeRobot(robot.name))}
-          id={`RobotOverflowMenu_${robot.name}_removeRobot`}
+          id={`RobotOverflowMenu_${String(robot.name)}_removeRobot`}
         >
           {t('forget_unavailable_robot')}
         </MenuItem>
@@ -133,7 +133,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
   }
   return (
     <Flex
-      data-testid={`RobotCard_${robot.name}_overflowMenu`}
+      data-testid={`RobotCard_${String(robot.name)}_overflowMenu`}
       flexDirection={DIRECTION_COLUMN}
       position={POSITION_RELATIVE}
       onClick={e => {
@@ -157,7 +157,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
           top="2.25rem"
           right="0"
           flexDirection={DIRECTION_COLUMN}
-          id={`RobotOverflowMenu_${robot.name}_buttons`}
+          id={`RobotOverflowMenu_${String(robot.name)}_buttons`}
         >
           {menuItems}
         </Flex>

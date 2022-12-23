@@ -16,6 +16,7 @@ import {
   COLORS,
   ALIGN_CENTER,
   SPACING,
+  SIZE_1,
 } from '@opentrons/components'
 import { PrimaryButton } from '../../atoms/buttons'
 
@@ -49,7 +50,7 @@ export function CheckPipettesButton(
 
   const handleClick = (): void => dispatch(fetchPipettes(robotName, true))
   const requestStatus = useSelector<State, RequestState | null>(state =>
-    fetchPipettesRequestId.current
+    fetchPipettesRequestId.current != null
       ? getRequestById(state, fetchPipettesRequestId.current)
       : null
   )?.status
@@ -78,19 +79,20 @@ export function CheckPipettesButton(
       <>
         <Icon
           name="ot-spinner"
-          height="1rem"
+          height={SIZE_1}
           spin
           marginRight={SPACING.spacing3}
         />
         <StyledText>
-          {actualPipette
+          {actualPipette != null
             ? t('confirming_detachment')
             : t('confirming_attachment')}
         </StyledText>
       </>
     )
   } else if (children == null && !isPending) {
-    body = actualPipette ? t('confirm_detachment') : t('confirm_attachment')
+    body =
+      actualPipette != null ? t('confirm_detachment') : t('confirm_attachment')
   }
 
   return (

@@ -76,7 +76,9 @@ export const DownloadOffsetDataModal = (
                 onClick={() => setMode(m)}
                 width={SIZE_5}
                 paddingY={SPACING_2}
-                borderRadius={`${BORDER_RADIUS_DEFAULT} ${BORDER_RADIUS_DEFAULT} 0 0`}
+                borderRadius={`${String(BORDER_RADIUS_DEFAULT)} ${String(
+                  BORDER_RADIUS_DEFAULT
+                )} 0 0`}
                 borderColor={C_MED_GRAY}
                 borderWidth={m === mode ? '1px 1px 0 1px' : '0 0 1px 0'}
               >
@@ -86,13 +88,15 @@ export const DownloadOffsetDataModal = (
             <Box
               flex="1 1 auto"
               alignSelf={ALIGN_FLEX_END}
-              borderRadius={`0 ${BORDER_RADIUS_DEFAULT} 0 0`}
-              borderBottom={`${C_MED_GRAY} 1px solid`}
+              borderRadius={`0 ${String(BORDER_RADIUS_DEFAULT)} 0 0`}
+              borderBottom={`${String(C_MED_GRAY)} 1px solid`}
             />
           </Flex>
           <Flex
-            borderRadius={`0 0 ${BORDER_RADIUS_DEFAULT} ${BORDER_RADIUS_DEFAULT}`}
-            border={`solid ${C_MED_GRAY}`}
+            borderRadius={`0 0 ${String(BORDER_RADIUS_DEFAULT)} ${String(
+              BORDER_RADIUS_DEFAULT
+            )}`}
+            border={`solid ${String(C_MED_GRAY)}`}
             borderWidth="0 1px 1px 1px"
             padding={SPACING_3}
           >

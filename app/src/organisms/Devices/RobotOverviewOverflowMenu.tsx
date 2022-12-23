@@ -132,7 +132,9 @@ export const RobotOverviewOverflowMenu = (
           {isRobotOnWrongVersionOfSoftware && !isRobotUnavailable ? (
             <MenuItem
               onClick={handleClickUpdateBuildroot}
-              data-testid={`RobotOverviewOverflowMenu_updateSoftware_${robot.name}`}
+              data-testid={`RobotOverviewOverflowMenu_updateSoftware_${String(
+                robot.name
+              )}`}
             >
               {t('update_robot_software')}
             </MenuItem>
@@ -157,14 +159,18 @@ export const RobotOverviewOverflowMenu = (
           <MenuItem
             disabled={isRobotUnavailable}
             onClick={handleClickHomeGantry}
-            data-testid={`RobotOverviewOverflowMenu_homeGantry_${robot.name}`}
+            data-testid={`RobotOverviewOverflowMenu_homeGantry_${String(
+              robot.name
+            )}`}
           >
             {t('home_gantry')}
           </MenuItem>
           <MenuItem
             disabled={isRobotUnavailable}
             onClick={handleClickRestart}
-            data-testid={`RobotOverviewOverflowMenu_restartRobot_${robot.name}`}
+            data-testid={`RobotOverviewOverflowMenu_restartRobot_${String(
+              robot.name
+            )}`}
           >
             {t('robot_controls:restart_label')}
           </MenuItem>
@@ -179,7 +185,9 @@ export const RobotOverviewOverflowMenu = (
               (robot?.status === REACHABLE &&
                 robot?.serverHealthStatus !== 'ok')
             }
-            data-testid={`RobotOverviewOverflowMenu_robotSettings_${robot.name}`}
+            data-testid={`RobotOverviewOverflowMenu_robotSettings_${String(
+              robot.name
+            )}`}
           >
             {t('robot_settings')}
           </MenuItem>

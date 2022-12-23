@@ -2,12 +2,12 @@ import React from 'react'
 import '@testing-library/jest-dom'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { ModuleModel, ModuleType } from '@opentrons/shared-data'
-import { ModuleInfo } from '../ModuleInfo'
 import { renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../../../../i18n'
-import { useRunHasStarted } from '../../../../../organisms/Devices/hooks'
+import { i18n } from '../../../i18n'
+import { ModuleInfo } from '../ModuleInfo'
+import { useRunHasStarted } from '../hooks'
 
-jest.mock('../../../../../organisms/Devices/hooks')
+jest.mock('../hooks')
 
 const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
   typeof useRunHasStarted

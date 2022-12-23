@@ -6,7 +6,7 @@ import { useTrackEvent } from '../../../../redux/analytics'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { useProtocolDetailsForRun } from '../../../Devices/hooks'
-import { useLPCSuccessToast } from '../../../ProtocolSetup/hooks'
+import { useLPCSuccessToast } from '../../../Devices/hooks/useLPCSuccessToast'
 import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
 import { DeprecatedSectionList } from '../DeprecatedSectionList'
 import { DeprecatedDeckMap } from '../DeprecatedDeckMap'
@@ -18,7 +18,7 @@ import { DeprecatedSection } from '../types'
 jest.mock('../../../../redux/analytics')
 jest.mock('../../../ProtocolUpload/hooks')
 jest.mock('../../../Devices/hooks')
-jest.mock('../../../ProtocolSetup/hooks')
+jest.mock('../../../Devices/hooks/useLPCSuccessToast')
 jest.mock('../DeprecatedSectionList')
 jest.mock('../../deprecatedHooks')
 jest.mock('../DeprecatedDeckMap')

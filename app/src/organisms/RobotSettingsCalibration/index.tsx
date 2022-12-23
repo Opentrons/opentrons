@@ -416,6 +416,15 @@ export function RobotSettingsCalibration({
         robotName={robotName}
         updateRobotStatus={updateRobotStatus}
       />
+      {enableCalibrationWizards ? (
+        <>
+          <Line />
+          <CalibrationDataDownload
+            robotName={robotName}
+            setShowHowCalibrationWorksModal={setShowHowCalibrationWorksModal}
+          />
+        </>
+      ) : null}
     </>
   )
 }

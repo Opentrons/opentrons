@@ -13,8 +13,8 @@ import { getLabwareSetupItemGroups } from './utils'
 import { LabwareListItem } from './LabwareListItem'
 import { OffDeckLabwareList } from './OffDeckLabwareList'
 
-import type { ModuleTypesThatRequireExtraAttention } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
 import type { ModuleRenderInfoForProtocol } from '../../hooks'
+import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 
 const HeaderRow = styled.div`
   display: grid;

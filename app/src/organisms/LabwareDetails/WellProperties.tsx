@@ -62,7 +62,7 @@ export function WellProperties(props: WellPropertiesProps): JSX.Element {
           <StyledText as="h6">{t('max_volume')}</StyledText>
           <StyledText as="p">
             {vol != null
-              ? `${getDisplayVolume(vol, units, 2)} ${units}`
+              ? `${String(getDisplayVolume(vol, units, 2))} ${String(units)}`
               : t('various')}
           </StyledText>
         </Flex>
@@ -78,7 +78,10 @@ export function WellProperties(props: WellPropertiesProps): JSX.Element {
               </StyledText>
               <StyledText as="p">{wellBottomValue}</StyledText>
             </Flex>
-            <Icon height="20px" name={BOTTOM_SHAPE_TO_ICON[wellBottomShape]} />
+            <Icon
+              height="1.25rem"
+              name={BOTTOM_SHAPE_TO_ICON[wellBottomShape]}
+            />
           </Flex>
         )}
       </Flex>

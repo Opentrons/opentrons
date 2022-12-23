@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { useHistory } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { useHistory, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -13,24 +12,26 @@ import {
   COLORS,
 } from '@opentrons/components'
 
-import { getLocalRobot } from '../../redux/discovery'
 import { StyledText } from '../../atoms/text'
 import { PrimaryButton } from '../../atoms/buttons'
 import { StepMeter } from '../../atoms/StepMeter'
 import screenImage from '../../assets/images/odd/odd_abstract@x2.png'
+
+import type { OnDeviceRouteParams } from '../../App/types'
 
 const IMAGE_ALT = 'finish setting up a robot'
 
 export function ConfirmRobotName(): JSX.Element {
   const { t } = useTranslation('device_settings')
   const history = useHistory()
-  const localRobot = useSelector(getLocalRobot)
-  const robotName = localRobot?.name
+  const { robotName } = useParams<OnDeviceRouteParams>()
   return (
     <>
       <StepMeter totalSteps={5} currentStep={5} OnDevice />
       <Flex
-        padding={`${SPACING.spacing6} ${SPACING.spacingXXL} ${SPACING.spacingXXL}`}
+        padding={`${String(SPACING.spacing6)} ${String(
+          SPACING.spacingXXL
+        )} ${String(SPACING.spacingXXL)}`}
         flexDirection={DIRECTION_COLUMN}
       >
         <Flex justifyContent={JUSTIFY_CENTER} marginBottom="3.041875rem">
