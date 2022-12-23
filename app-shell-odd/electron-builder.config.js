@@ -41,14 +41,6 @@ module.exports = {
     executableName: 'opentrons',
     category: 'Science',
   },
-  publish:
-    OT_APP_DEPLOY_BUCKET && OT_APP_DEPLOY_FOLDER
-      ? {
-          provider: 's3',
-          bucket: OT_APP_DEPLOY_BUCKET,
-          path: OT_APP_DEPLOY_FOLDER,
-        }
-      : null,
   generateUpdatesFilesForAllChannels: true,
   afterSign: path.join(__dirname, './scripts/after-sign.js'),
 }
