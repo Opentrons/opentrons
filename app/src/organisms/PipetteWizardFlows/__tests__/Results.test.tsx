@@ -149,4 +149,47 @@ describe('Results', () => {
     fireEvent.click(exit)
     expect(props.proceed).toHaveBeenCalled()
   })
+  it('renders the correct information when pipette wizard succeeds to calibrate in attach flow 96-channel', () => {
+    props = {
+      ...props,
+      flowType: FLOWS.CALIBRATE,
+    }
+    const { getByText, getByRole, getByLabelText } = render(props)
+    getByText('Pipette Successfully Calibrated')
+    expect(getByLabelText('ot-check')).toHaveStyle(
+      `color: ${COLORS.successEnabled}`
+    )
+    getByRole('button', { name: 'Results_exit' }).click()
+    expect(props.proceed).toHaveBeenCalled()
+  })
+  it('renders the correct information when pipette wizard succeeds to calibrate in attach flow 96-channel with pipette attached initially ', () => {
+    props = {
+      ...props,
+      flowType: FLOWS.CALIBRATE,
+      currentStepIndex: 9,
+      totalStepCount: 9,
+    }
+    const { getByText, getByRole, getByLabelText } = render(props)
+    getByText('Pipette Successfully Calibrated')
+    expect(getByLabelText('ot-check')).toHaveStyle(
+      `color: ${COLORS.successEnabled}`
+    )
+    getByRole('button', { name: 'Results_exit' }).click()
+    expect(props.handleCleanUpAndClose).toHaveBeenCalled()
+  })
+  it('renders the correct information when pipette wizard succeeds to calibrate in attach flow single mount', () => {
+    props = {
+      ...props,
+      flowType: FLOWS.CALIBRATE,
+      currentStepIndex: 5,
+      totalStepCount: 5,
+    }
+    const { getByText, getByRole, getByLabelText } = render(props)
+    getByText('Pipette Successfully Calibrated')
+    expect(getByLabelText('ot-check')).toHaveStyle(
+      `color: ${COLORS.successEnabled}`
+    )
+    getByRole('button', { name: 'Results_exit' }).click()
+    expect(props.handleCleanUpAndClose).toHaveBeenCalled()
+  })
 })

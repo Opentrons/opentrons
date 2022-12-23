@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
 import { COLORS, TEXT_TRANSFORM_CAPITALIZE } from '@opentrons/components'
 import { PrimaryButton } from '../../atoms/buttons'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
@@ -20,12 +19,10 @@ export const Results = (props: ResultsProps): JSX.Element => {
     attachedPipettes,
     mount,
     handleCleanUpAndClose,
-    selectedPipette,
     currentStepIndex,
     totalStepCount,
   } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
-
   let header: string = 'unknown results screen'
   let iconColor: string = COLORS.successEnabled
   let isSuccess: boolean = true
@@ -40,11 +37,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
       if (attachedPipettes[mount] != null) {
         const pipetteName = attachedPipettes[mount]?.modelSpecs.displayName
         header = t('pipette_attached', { pipetteName: pipetteName })
-        if (selectedPipette === NINETY_SIX_CHANNEL) {
-          buttonText = t('shared:exit')
-        } else {
-          buttonText = t('cal_pipette')
-        }
+        buttonText = t('cal_pipette')
         // attachment flow fail
       } else {
         header = t('pipette_failed_to_attach')
