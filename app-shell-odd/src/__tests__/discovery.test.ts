@@ -32,7 +32,6 @@ const handleConfigChange = Cfg.handleConfigChange as jest.MockedFunction<
   typeof Cfg.handleConfigChange
 >
 
-
 const appOnce = app.once as jest.MockedFunction<typeof app.once>
 
 const MockStore = Store as jest.MockedClass<typeof Store>

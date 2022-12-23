@@ -32,7 +32,6 @@ let log: winston.Logger
 export function createLogger(filename: string): winston.Logger {
   // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   if (!config) config = getConfig('log')
-  console.log(getStore())
   // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   if (!transports) initializeTransports()
 

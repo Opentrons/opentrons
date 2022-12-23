@@ -49,7 +49,7 @@ function startUp(): void {
   process.on('unhandledRejection', reason =>
     log.error('Uncaught Promise rejection: ', { reason })
   )
-  
+
   mainWindow = createUi()
   rendererLogger = createRendererLogger()
 

@@ -26,36 +26,20 @@ export function getReleaseFiles(
   directory: string,
   onProgress: (progress: DownloadProgress) => unknown
 ): Promise<ReleaseSetFilepaths> {
-  console.log('getting the release files')
-  console.log({ urls })
   return readdir(directory)
     .catch(error => {
-      console.log('Error retrieving files from filesystem', { error })
       log.warn('Error retrieving files from filesystem', { error })
       return []
     })
     .then((files: string[]) => {
-      console.log('Files in buildroot download directoryy', { files })
       log.debug('Files in buildroot download directory', { files })
-      console.log('files length: ', files.length)
-      console.log('before call to outPath')
       const system = outPath(directory, urls.system)
       const releaseNotes = outPath(directory, urls.releaseNotes ?? '')
-      console.log('after call to outPath')
-      console.log({ system, releaseNotes })
 
-      // TODO(mc, 2019-07-02): this is a pretty naive filename check; we may
-      // want to explore putting hashes in the manifest and checking those
-      console.log('path basename info')
-      console.log(path.basename(system))
-      console.log(path.basename(releaseNotes))
+      // TODO: check for release notes when OT-3 manifest points to real release notes
       if (files.some(f => f === path.basename(system))) {
-        console.log('weve got a match!')
-        console.log({ system, releaseNotes })
         return { system, releaseNotes }
       }
-
-      console.log('downloading the release files')
 
       return downloadReleaseFiles(urls, directory, onProgress)
     })
@@ -77,28 +61,20 @@ export function downloadReleaseFiles(
   const tempNotesPath = outPath(tempDir, urls.releaseNotes ?? '')
 
   log.debug('directory created for BR downloads', { tempDir })
-  console.log('directory created for BR downloads', { tempDir })
 
   // downloads are streamed directly to the filesystem to avoid loading them
   // all into memory simultaneously
-  console.log('fetching system req')
   const systemReq = fetchToFile(urls.system, tempSystemPath, { onProgress })
-  console.log('fetching notes req')
   const notesReq = urls.releaseNotes
     ? fetchToFile(urls.releaseNotes, tempNotesPath)
     : Promise.resolve('')
 
-  console.log({ systemReq, notesReq })
-
   return Promise.all([systemReq, notesReq]).then(results => {
-    console.log('in promise all')
     const [systemTemp, releaseNotesTemp] = results
-    console.log({ systemTemp, releaseNotesTemp })
     const systemPath = outPath(directory, systemTemp)
     const notesPath = outPath(directory, releaseNotesTemp)
 
     log.debug('renaming directory', { from: tempDir, to: directory })
-    console.log('renaming directory', { from: tempDir, to: directory })
 
     return move(tempDir, directory, { overwrite: true }).then(() => ({
       system: systemPath,
@@ -155,7 +131,6 @@ export function cleanupReleaseFiles(
   downloadsDir: string,
   currentRelease: string
 ): Promise<unknown> {
-  console.log('cleaning up release files')
   return readdir(downloadsDir, { withFileTypes: true })
     .then(files => {
       return (

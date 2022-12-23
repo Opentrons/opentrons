@@ -12,7 +12,6 @@ const log = createLogger('update')
 let LATEST_OT_SYSTEM_VERSION = _PKG_VERSION_
 
 export const updateLatestVersion = (): Promise<string> => {
-  console.log( getConfig('robotSystemUpdate'))
   const manifestURL = getConfig('robotSystemUpdate').manifestUrls.OT3
   const channel = getConfig('update').channel
 

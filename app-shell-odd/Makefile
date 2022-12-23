@@ -36,15 +36,10 @@ publish_update := $(filter v%,$(OT_TAG))
 branch_suffix := $(if $(publish_update),,-$(subst /,-,$(OT_BRANCH)))
 build_id := $(or $(and $(OT_BUILD),b$(OT_BUILD)$(branch_suffix)),dev)
 
-# set this to anything on command-line invocations of this makefile to skip bundling
-# standalone python, as is necessary for on-device app builds:
-# make dist no_python_bundle=true or =1 or whatever
-no_python_bundle ?=
-
 builder := yarn electron-builder \
 	--config electron-builder.config.js \
 	--publish never
-
+  
 
 electron := yarn electron . \
 	--devtools \
@@ -52,7 +47,6 @@ electron := yarn electron . \
 	--disable_ui.webPreferences.webSecurity \
 	--ui.url.protocol="http:" \
 	--ui.url.path="localhost:$(PORT)" \
-	--python.pathToPythonOverride=$(shell cd ../api && pipenv --venv)
 
 # standard targets
 #####################################################################
@@ -72,7 +66,7 @@ setup:
 
 .PHONY: clean
 clean:
-	shx rm -rf lib dist python
+	shx rm -rf lib dist
 
 # artifacts
 #####################################################################
@@ -91,7 +85,6 @@ package-deps: clean lib deps
 
 package dist-posix dist-osx dist-linux dist-win: export NODE_ENV := production
 package dist-posix dist-osx dist-linux dist-win: export BUILD_ID := $(build_id)
-package dist-posix dist-osx dist-linux dist-win: export NO_PYTHON := $(if $(no_python_bundle),true,false)
 
 .PHONY: package
 package: package-deps
@@ -119,7 +112,7 @@ dist-win: package-deps
 
 .PHONY: dist-ot3
 dist-ot3: package-deps
-	NO_PYTHON=true NO_USB_DETECTION=true OT_APP_DEPLOY_BUCKET=opentrons-app OT_APP_DEPLOY_FOLDER=builds $(builder) --linux --arm64 --dir
+	NO_USB_DETECTION=true OT_APP_DEPLOY_BUCKET=opentrons-app OT_APP_DEPLOY_FOLDER=builds $(builder) --linux --arm64 --dir
 	cd dist/linux-arm64-unpacked
 
 .PHONY: push-ot3

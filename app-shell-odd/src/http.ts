@@ -48,13 +48,9 @@ export function fetchToFile(
   destination: string,
   options?: Partial<{ onProgress: (progress: DownloadProgress) => unknown }>
 ): Promise<string> {
-  console.log('in fetch to file with input: ', input)
   return fetch(input).then(response => {
-    console.log('got response')
-    console.log({ response })
     let downloaded = 0
     const size = Number(response.headers.get('Content-Length')) || null
-    console.log({ size })
 
     // with node-fetch, response.body will be a Node.js readable stream
     // rather than a browser-land ReadableStream
@@ -80,8 +76,6 @@ export function fetchToFile(
       pump(inputStream, progressReader, outputStream, error => {
         // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
         if (error) {
-          console.log('got an error')
-          console.log({ error })
           // if we error out, delete the temp dir to clean up
           return remove(destination).then(() => reject(error))
         }
