@@ -6,7 +6,7 @@ import path from 'path'
 import dateFormat from 'dateformat'
 import winston from 'winston'
 
-import { getConfig, getStore } from './config'
+import { getConfig } from './config'
 
 import type Transport from 'winston-transport'
 import type { Config } from './config'

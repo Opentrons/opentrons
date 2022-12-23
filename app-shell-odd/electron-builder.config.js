@@ -1,7 +1,5 @@
 'use strict'
 const path = require('path')
-
-const { OT_APP_DEPLOY_BUCKET, OT_APP_DEPLOY_FOLDER } = process.env
 const DEV_MODE = process.env.NODE_ENV !== 'production'
 
 module.exports = {
