@@ -121,7 +121,6 @@ async def test_create_protocol_run(
             config=JsonProtocolConfig(schema_version=123),
             files=[],
             metadata={},
-            labware_definitions=[],
         ),
     )
 

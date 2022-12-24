@@ -58,7 +58,6 @@ async def test_insert_and_get_protocol(
             config=JsonProtocolConfig(schema_version=123),
             files=[],
             metadata={},
-            labware_definitions=[],
         ),
         protocol_key="dummy-data-111",
     )
@@ -85,7 +84,6 @@ async def test_insert_with_duplicate_key_raises(
             config=JsonProtocolConfig(schema_version=123),
             files=[],
             metadata={},
-            labware_definitions=[],
         ),
         protocol_key="dummy-data-111",
     )
@@ -98,7 +96,6 @@ async def test_insert_with_duplicate_key_raises(
             config=JsonProtocolConfig(schema_version=456),
             files=[],
             metadata={},
-            labware_definitions=[],
         ),
         protocol_key="dummy-data-222",
     )
@@ -134,7 +131,6 @@ async def test_get_all_protocols(
             config=PythonProtocolConfig(api_version=APIVersion(1234, 5678)),
             files=[],
             metadata={},
-            labware_definitions=[],
         ),
         protocol_key="dummy-data-111",
     )
@@ -147,7 +143,6 @@ async def test_get_all_protocols(
             config=JsonProtocolConfig(schema_version=1234),
             files=[],
             metadata={},
-            labware_definitions=[],
         ),
         protocol_key="dummy-data-222",
     )
@@ -182,7 +177,6 @@ async def test_remove_protocol(
                 ProtocolSourceFile(path=other_file, role=ProtocolFileRole.LABWARE),
             ],
             metadata={},
-            labware_definitions=[],
         ),
         protocol_key="dummy-data-111",
     )
@@ -220,7 +214,6 @@ def test_remove_protocol_conflict(
             config=JsonProtocolConfig(schema_version=123),
             files=[],
             metadata={},
-            labware_definitions=[],
         ),
         protocol_key=None,
     )
@@ -253,7 +246,6 @@ def test_get_usage_info(
             config=JsonProtocolConfig(schema_version=123),
             files=[],
             metadata={},
-            labware_definitions=[],
         ),
         protocol_key=None,
     )
@@ -266,7 +258,6 @@ def test_get_usage_info(
             config=JsonProtocolConfig(schema_version=123),
             files=[],
             metadata={},
-            labware_definitions=[],
         ),
         protocol_key=None,
     )

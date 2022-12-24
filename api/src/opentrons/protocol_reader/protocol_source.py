@@ -6,7 +6,6 @@ from typing import Any, Dict, List, Optional, Union
 from typing_extensions import Literal
 
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.models import LabwareDefinition
 
 
 class ProtocolType(str, Enum):
@@ -114,4 +113,3 @@ class ProtocolSource:
     files: List[ProtocolSourceFile]
     metadata: Metadata
     config: ProtocolConfig
-    labware_definitions: List[LabwareDefinition]

@@ -1,10 +1,13 @@
 """Protocol run control and management."""
-from typing import List, NamedTuple, Optional
+from typing import Iterable, List, NamedTuple, Optional
+
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from opentrons.broker import Broker
 from opentrons.equipment_broker import EquipmentBroker
 from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
+from opentrons import protocol_reader
 from opentrons.protocol_reader import (
     ProtocolSource,
     PythonProtocolConfig,
@@ -89,7 +92,7 @@ class ProtocolRunner:
         """
         return self._protocol_engine.state_view.commands.has_been_played()
 
-    def load(self, protocol_source: ProtocolSource) -> None:
+    async def load(self, protocol_source: ProtocolSource) -> None:
         """Load a ProtocolSource into managed ProtocolEngine.
 
         Calling this method is only necessary if the runner will be used
@@ -97,7 +100,10 @@ class ProtocolRunner:
         """
         config = protocol_source.config
 
-        for definition in protocol_source.labware_definitions:
+        labware_definitions = await protocol_reader.extract_labware_definitions(
+            protocol_source=protocol_source
+        )
+        for definition in labware_definitions:
             self._protocol_engine.add_labware_definition(definition)
 
         if isinstance(config, JsonProtocolConfig):
@@ -106,7 +112,7 @@ class ProtocolRunner:
             if schema_version >= LEGACY_JSON_SCHEMA_VERSION_CUTOFF:
                 self._load_json(protocol_source)
             else:
-                self._load_legacy(protocol_source)
+                self._load_legacy(protocol_source, labware_definitions)
 
         elif isinstance(config, PythonProtocolConfig):
             api_version = config.api_version
@@ -114,7 +120,7 @@ class ProtocolRunner:
             if api_version >= LEGACY_PYTHON_API_VERSION_CUTOFF:
                 self._load_python(protocol_source)
             else:
-                self._load_legacy(protocol_source)
+                self._load_legacy(protocol_source, labware_definitions)
 
     def play(self) -> None:
         """Start or resume the run."""
@@ -142,7 +148,7 @@ class ProtocolRunner:
         # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`
         # currently `protocol_source` arg is only used by tests
         if protocol_source:
-            self.load(protocol_source)
+            await self.load(protocol_source)
 
         await self._hardware_api.home()
         self.play()
@@ -154,6 +160,8 @@ class ProtocolRunner:
         return ProtocolRunResult(commands=commands, state_summary=run_data)
 
     def _load_json(self, protocol_source: ProtocolSource) -> None:
+        # fixme(mm, 2022-12-23): This does I/O and compute-bound parsing that will block
+        # the event loop. Jira RSS-165.
         protocol = self._json_file_reader.read(protocol_source)
         commands = self._json_translator.translate_commands(protocol)
 
@@ -167,6 +175,8 @@ class ProtocolRunner:
         self._task_queue.set_run_func(func=self._protocol_engine.wait_until_complete)
 
     def _load_python(self, protocol_source: ProtocolSource) -> None:
+        # fixme(mm, 2022-12-23): This does I/O and compute-bound parsing that will block
+        # the event loop. Jira RSS-165.
         protocol = self._python_file_reader.read(protocol_source)
         context = self._python_context_creator.create(self._protocol_engine)
         self._task_queue.set_run_func(
@@ -178,8 +188,11 @@ class ProtocolRunner:
     def _load_legacy(
         self,
         protocol_source: ProtocolSource,
+        labware_definitions: Iterable[LabwareDefinition],
     ) -> None:
-        protocol = self._legacy_file_reader.read(protocol_source)
+        # fixme(mm, 2022-12-23): This does I/O and compute-bound parsing that will block
+        # the event loop. Jira RSS-165.
+        protocol = self._legacy_file_reader.read(protocol_source, labware_definitions)
         broker = None
         equipment_broker = None
 

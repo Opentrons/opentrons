@@ -69,7 +69,6 @@ def make_dummy_protocol_resource(protocol_id: str) -> ProtocolResource:
             config=JsonProtocolConfig(schema_version=123),
             files=[],
             metadata={},
-            labware_definitions=[],
         ),
         protocol_key=None,
     )
