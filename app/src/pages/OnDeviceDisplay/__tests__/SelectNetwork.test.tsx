@@ -7,6 +7,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { getWifiList } from '../../../redux/networking'
 import * as Fixtures from '../../../redux/networking/__fixtures__'
+import { SetWifiCred } from '../../../organisms/SetupNetwork/SetWifiCred'
 import { SelectWifiNetwork } from '../SelectWifiNetwork'
 
 const mockPush = jest.fn()
@@ -19,6 +20,7 @@ const mockWifiList = [
   },
 ]
 
+jest.mock('../../../organisms/SetupNetwork/SetWifiCred')
 jest.mock('../../../redux/networking/selectors')
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('react-router-dom', () => {
@@ -41,10 +43,12 @@ const render = () => {
 }
 
 const mockGetWifiList = getWifiList as jest.MockedFunction<typeof getWifiList>
+const mockSetWifiCred = SetWifiCred as jest.MockedFunction<typeof SetWifiCred>
 
 describe('SelectNetwork', () => {
   beforeEach(() => {
     mockGetWifiList.mockReturnValue(mockWifiList)
+    mockSetWifiCred.mockReturnValue(<div>Mock SetWifiCred</div>)
   })
 
   it('should render a wifi list', () => {
@@ -55,10 +59,10 @@ describe('SelectNetwork', () => {
     getByText('baz')
   })
 
-  it('should call mock function when tapping a one of wifi ssid', () => {
+  it('render setwificred when tapping a one of wifi ssid', () => {
     const [{ getByText }] = render()
     const ssid = getByText('foo')
     fireEvent.click(ssid)
-    expect(mockPush).toHaveBeenCalledWith('/network-setup/wifi/set-wifi-cred')
+    getByText('Mock SetWifiCred')
   })
 })
