@@ -82,7 +82,12 @@ from .protocols import HardwareControlAPI
 
 # TODO (lc 09/15/2022) We should update our pipette handler to reflect OT-3 properties
 # in a follow-up PR.
-from .instruments.ot3.pipette_handler import OT3PipetteHandler, InstrumentsByMount
+from .instruments.ot3.pipette_handler import (
+    OT3PipetteHandler,
+    InstrumentsByMount,
+    PickUpTipSpec,
+    TipMotorPickUpTipSpec,
+)
 from .instruments.ot3.instrument_calibration import load_pipette_offset
 from .instruments.ot3.gripper_handler import GripperHandler
 from .instruments.ot3.instrument_calibration import (
@@ -1277,6 +1282,52 @@ class OT3API(
             blowout_spec.instr.set_current_volume(0)
             blowout_spec.instr.ready_to_aspirate = False
 
+    async def _force_pick_up_tip(
+        self, mount: OT3Mount, pipette_spec: PickUpTipSpec
+    ) -> None:
+        for press in pipette_spec.presses:
+            async with self._backend.restore_current():
+                await self._backend.set_active_current(
+                    {axis: current for axis, current in press.current.items()}
+                )
+                target_down = target_position_from_relative(
+                    mount, press.relative_down, self._current_position
+                )
+                await self._move(target_down, speed=press.speed)
+            target_up = target_position_from_relative(
+                mount, press.relative_up, self._current_position
+            )
+            await self._move(target_up)
+
+    async def _motor_pick_up_tip(
+        self, mount: OT3Mount, pipette_spec: TipMotorPickUpTipSpec
+    ) -> None:
+        async with self._backend.restore_current():
+            await self._backend.set_active_current(
+                {axis: current for axis, current in pipette_spec.currents.items()}
+            )
+            # Move to pick up position
+            target_down = target_position_from_relative(
+                mount,
+                pipette_spec.tiprack_down,
+                self._current_position,
+            )
+            await self._move(target_down)
+            # perform pick up tip
+            await self._backend.tip_action(
+                [OT3Axis.of_main_tool_actuator(mount)],
+                pipette_spec.pick_up_distance,
+                pipette_spec.speed,
+                "pick_up",
+            )
+            # Move to pick up position
+            target_up = target_position_from_relative(
+                mount,
+                pipette_spec.tiprack_up,
+                self._current_position,
+            )
+            await self._move(target_up)
+
     async def pick_up_tip(
         self,
         mount: Union[top_types.Mount, OT3Mount],
@@ -1304,49 +1355,9 @@ class OT3API(
             )
 
         if spec.pick_up_motor_actions:
-            async with self._backend.restore_current():
-                await self._backend.set_active_current(
-                    {
-                        axis: current
-                        for axis, current in spec.pick_up_motor_actions.currents.items()
-                    }
-                )
-                # Move to pick up position
-                target_down = target_position_from_relative(
-                    realmount,
-                    spec.pick_up_motor_actions.tiprack_down,
-                    self._current_position,
-                )
-                await self._move(target_down)
-                # perform pick up tip
-                await self._backend.tip_action(
-                    [OT3Axis.of_main_tool_actuator(mount)],
-                    spec.pick_up_motor_actions.pick_up_distance,
-                    spec.pick_up_motor_actions.speed,
-                    "pick_up",
-                )
-                # # Move to pick up position
-                target_up = target_position_from_relative(
-                    realmount,
-                    spec.pick_up_motor_actions.tiprack_up,
-                    self._current_position,
-                )
-                await self._move(target_up)
-
+            await self._motor_pick_up_tip(realmount, spec.pick_up_motor_actions)
         else:
-            for press in spec.presses:
-                async with self._backend.restore_current():
-                    await self._backend.set_active_current(
-                        {axis: current for axis, current in press.current.items()}
-                    )
-                    target_down = target_position_from_relative(
-                        realmount, press.relative_down, self._current_position
-                    )
-                    await self._move(target_down, speed=press.speed)
-                target_up = target_position_from_relative(
-                    realmount, press.relative_up, self._current_position
-                )
-                await self._move(target_up)
+            await self._force_pick_up_tip(realmount, spec)
 
         # neighboring tips tend to get stuck in the space between
         # the volume chamber and the drop-tip sleeve on p1000.
