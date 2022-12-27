@@ -48,9 +48,8 @@ describe('SelectNetwork', () => {
   })
 
   it('should render a wifi list', () => {
-    const [{ getByText, getByRole }] = render()
+    const [{ getByText }] = render()
     getByText('Connect to a network')
-    getByRole('button', { name: 'Search again' })
     getByText('foo')
     getByText('bar')
     getByText('baz')
@@ -60,16 +59,6 @@ describe('SelectNetwork', () => {
     const [{ getByText }] = render()
     const ssid = getByText('foo')
     fireEvent.click(ssid)
-    expect(mockPush).toHaveBeenCalledWith(
-      '/network-setup/wifi/set-wifi-cred/foo'
-    )
-  })
-
-  it('should call mock function when tapping search again', () => {
-    const [{ getByRole, queryByText }, { dispatch }] = render()
-    const button = getByRole('button', { name: 'Search again' })
-    fireEvent.click(button)
-    expect(dispatch).toHaveBeenCalled()
-    expect(queryByText('Searching')).toBeInTheDocument()
+    expect(mockPush).toHaveBeenCalledWith('/network-setup/wifi/set-wifi-cred')
   })
 })

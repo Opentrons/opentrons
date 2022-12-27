@@ -12,7 +12,6 @@ import { InitialSplash } from '../../pages/OnDeviceDisplay/InitialSplash'
 import { NetworkSetupMenu } from '../../pages/OnDeviceDisplay/NetworkSetupMenu'
 import { RobotDashboard } from '../../pages/OnDeviceDisplay/RobotDashboard'
 import { SelectWifiNetwork } from '../../pages/OnDeviceDisplay/SelectWifiNetwork'
-import { SetWifiCred } from '../../pages/OnDeviceDisplay/SetWifiCred'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
 
 jest.mock('../../pages/OnDeviceDisplay/ConnectedNetworkInfo')
@@ -22,7 +21,6 @@ jest.mock('../../pages/OnDeviceDisplay/ConnectViaUSB')
 jest.mock('../../pages/OnDeviceDisplay/ConfirmRobotName')
 jest.mock('../../pages/OnDeviceDisplay/RobotDashboard')
 jest.mock('../../pages/OnDeviceDisplay/SelectWifiNetwork')
-jest.mock('../../pages/OnDeviceDisplay/SetWifiCred')
 
 const mockInitialSplash = InitialSplash as jest.MockedFunction<
   typeof InitialSplash
@@ -39,7 +37,6 @@ const mockConfirmRobotName = ConfirmRobotName as jest.MockedFunction<
 const mockSelectWifiNetwork = SelectWifiNetwork as jest.MockedFunction<
   typeof SelectWifiNetwork
 >
-const mockSetWifiCred = SetWifiCred as jest.MockedFunction<typeof SetWifiCred>
 const mockConnectedNetworkInfo = ConnectedNetworkInfo as jest.MockedFunction<
   typeof ConnectedNetworkInfo
 >
@@ -63,7 +60,6 @@ describe('OnDeviceDisplayApp', () => {
     mockConnectViaUSB.mockReturnValue(<div>Mock ConnectViaUSB</div>)
     mockConfirmRobotName.mockReturnValue(<div>Mock ConfirmRobotName</div>)
     mockSelectWifiNetwork.mockReturnValue(<div>Mock SelectWifiNetwork</div>)
-    mockSetWifiCred.mockReturnValue(<div>Mock SetWifiCred</div>)
     mockConnectedNetworkInfo.mockReturnValue(
       <div>Mock ConnectedNetworkInfo</div>
     )
@@ -93,15 +89,8 @@ describe('OnDeviceDisplayApp', () => {
     getByText('Mock SelectWifiNetwork')
   })
 
-  it('renders a SetWifiCred component from /network-setup/wifi/set-wifi-cred/:ssid', () => {
-    const [{ getByText }] = render('/network-setup/wifi/set-wifi-cred/mockWifi')
-    getByText('Mock SetWifiCred')
-  })
-
-  it('renders a ConnectedNetworkInfo component from /network-setup/wifi/connected-network-info/:ssid', () => {
-    const [{ getByText }] = render(
-      '/network-setup/wifi/connected-network-info/mockWifi'
-    )
+  it('renders a ConnectedNetworkInfo component from /network-setup/wifi/connected-network-info', () => {
+    const [{ getByText }] = render('/network-setup/wifi/connected-network-info')
     getByText('Mock ConnectedNetworkInfo')
   })
   it('renders a RobotDashboard component from /dashboard', () => {

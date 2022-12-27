@@ -184,5 +184,6 @@
   "next_step": "Next step",
   "name_love_it": "{{name}}, love it!",
   "your_robot_is_ready_to_go": "Your robot is ready to go!",
-  "finish_setup": "Finish setup"
+  "finish_setup": "Finish setup",
+  "check_for_updates": "Check for updates"
 }

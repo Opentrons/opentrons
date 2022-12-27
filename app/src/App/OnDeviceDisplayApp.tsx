@@ -20,7 +20,6 @@ import { NetworkSetupMenu } from '../pages/OnDeviceDisplay/NetworkSetupMenu'
 import { TempODDMenu } from '../pages/OnDeviceDisplay/TempODDMenu'
 import { RobotDashboard } from '../pages/OnDeviceDisplay/RobotDashboard'
 import { SelectWifiNetwork } from '../pages/OnDeviceDisplay/SelectWifiNetwork'
-import { SetWifiCred } from '../pages/OnDeviceDisplay/SetWifiCred'
 import { PortalRoot as ModalPortalRoot } from './portal'
 
 import type { RouteProps } from './types'
@@ -57,16 +56,10 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     path: '/network-setup/wifi',
   },
   {
-    Component: SetWifiCred,
-    exact: true,
-    name: 'Set Wifi Cred',
-    path: '/network-setup/wifi/set-wifi-cred/:ssid',
-  },
-  {
     Component: ConnectedNetworkInfo,
     exact: true,
     name: 'Connected Network Info',
-    path: '/network-setup/wifi/connected-network-info/:ssid',
+    path: '/network-setup/wifi/connected-network-info',
   },
   {
     Component: ConnectViaEthernet,

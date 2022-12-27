@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { MemoryRouter, Route } from 'react-router-dom'
+import { MemoryRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
@@ -47,12 +47,10 @@ const mockPostWifiConfigure = Networking.postWifiConfigure as jest.MockedFunctio
   typeof Networking.postWifiConfigure
 >
 
-const render = (path = '/') => {
+const render = (props: React.ComponentProps<typeof SetWifiCred>) => {
   return renderWithProviders(
-    <MemoryRouter initialEntries={[path]} initialIndex={0}>
-      <Route path="/network-setup/wifi/set-wifi-cred/:ssid">
-        <SetWifiCred />
-      </Route>
+    <MemoryRouter>
+      <SetWifiCred {...props} />
     </MemoryRouter>,
     {
       i18nInstance: i18n,
@@ -64,9 +62,15 @@ const mockGetWifiList = Networking.getWifiList as jest.MockedFunction<
   typeof Networking.getWifiList
 >
 
+// ToDo: kj 12/27/2022 authType test cases will be added in another PR
+// props authType none case
 describe('SetWifiCred', () => {
+  let props: React.ComponentProps<typeof SetWifiCred>
   let dispatchApiRequest: DispatchApiRequestType
   beforeEach(() => {
+    props = {
+      ssid: 'mockWifi',
+    }
     mockGetWifiList.mockReturnValue(mockWifiList)
     dispatchApiRequest = jest.fn()
     mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, []])
@@ -78,7 +82,7 @@ describe('SetWifiCred', () => {
 
   it('should render text, button and software keyboard', () => {
     const [{ getByText, getByRole, getAllByRole, getByLabelText }] = render(
-      '/network-setup/wifi/set-wifi-cred/mockWifi'
+      props
     )
     getByText('mockWifi')
     getByText('Back')
@@ -94,9 +98,7 @@ describe('SetWifiCred', () => {
   })
 
   it('should display a dot when typing a char', () => {
-    const [{ getByRole, getByLabelText }] = render(
-      '/network-setup/wifi/set-wifi-cred/mockWifi'
-    )
+    const [{ getByRole, getByLabelText }] = render(props)
     const inputBox = getByLabelText('wifi_password')
     const aKey = getByRole('button', { name: 'a' })
     const bKey = getByRole('button', { name: 'b' })
@@ -108,9 +110,7 @@ describe('SetWifiCred', () => {
   })
 
   it('should switch the input type and button text when tapping the icon next to the input', () => {
-    const [{ getByRole, getByLabelText }] = render(
-      '/network-setup/wifi/set-wifi-cred/mockWifi'
-    )
+    const [{ getByRole, getByLabelText }] = render(props)
     const button = getByRole('button', { name: 'Show' })
     // ToDo: 11/08/2022 kj switch to getByRole once understand the issue on this input
     const inputBox = getByLabelText('wifi_password')
@@ -121,14 +121,14 @@ describe('SetWifiCred', () => {
   })
 
   it('should call mock function when tapping back', () => {
-    const [{ getByText }] = render('/network-setup/wifi/set-wifi-cred/mockWifi')
+    const [{ getByText }] = render(props)
     const button = getByText('Back')
     fireEvent.click(button)
     expect(mockPush).toHaveBeenCalledWith('/network-setup/wifi')
   })
 
   it('should call mock function when tapping connect', () => {
-    const [{ getByRole }] = render('/network-setup/wifi/set-wifi-cred/mockWifi')
+    const [{ getByRole }] = render(props)
     const button = getByRole('button', { name: 'Connect' })
     fireEvent.click(button)
     expect(dispatchApiRequest).toBeCalledWith(

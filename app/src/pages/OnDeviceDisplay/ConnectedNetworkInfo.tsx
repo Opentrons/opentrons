@@ -1,26 +1,30 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
-import { useParams, useHistory, Link } from 'react-router-dom'
+import { useHistory, Link } from 'react-router-dom'
 
 import {
   Flex,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
-  JUSTIFY_FLEX_END,
   SPACING,
   Icon,
   COLORS,
   TYPOGRAPHY,
-  JUSTIFY_START,
   ALIGN_CENTER,
   useInterval,
   ALIGN_FLEX_END,
+  JUSTIFY_CENTER,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
-import { SecondaryButton, TertiaryButton } from '../../atoms/buttons'
+import {
+  PrimaryButton,
+  SecondaryButton,
+  TertiaryButton,
+} from '../../atoms/buttons'
+import { StepMeter } from '../../atoms/StepMeter'
 import {
   getNetworkInterfaces,
   fetchStatus,
@@ -29,21 +33,25 @@ import {
 import { getLocalRobot } from '../../redux/discovery'
 
 import type { State, Dispatch } from '../../redux/types'
-import type { OnDeviceRouteParams } from '../../App/types'
 
 const STATUS_REFRESH_MS = 5000
 const LIST_REFRESH_MS = 10000
 
-export function ConnectedNetworkInfo(): JSX.Element {
-  const { t } = useTranslation('device_settings')
-  const { ssid } = useParams<OnDeviceRouteParams>()
+interface ConnectedNetworkInfoProps {
+  ssid: string
+  authType?: 'wpa' | 'none'
+}
+
+export function ConnectedNetworkInfo({
+  ssid,
+  authType = 'wpa', // ToDo kj 12/27/2022 this default will be removed by the PR for manual connection
+}: ConnectedNetworkInfoProps): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const { wifi } = useSelector((state: State) =>
     getNetworkInterfaces(state, robotName)
   )
-  const history = useHistory()
 
   useInterval(() => dispatch(fetchStatus(robotName)), STATUS_REFRESH_MS, true)
   useInterval(() => dispatch(fetchWifiList(robotName)), LIST_REFRESH_MS, true)
@@ -55,65 +63,179 @@ export function ConnectedNetworkInfo(): JSX.Element {
 
   return (
     <>
-      <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacingXXL}>
-        <Flex justifyContent={JUSTIFY_START} marginBottom="3.125rem">
-          <StyledText fontSize="2rem" fontWeight="700" lineHeight="2.72375">
-            {'Set up your robot'}
-          </StyledText>
-        </Flex>
-        <Flex
-          flexDirection={DIRECTION_ROW}
-          paddingX={SPACING.spacing6}
-          paddingY={SPACING.spacing5}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-          backgroundColor={COLORS.darkGreyDisabled}
-          marginBottom="13.1875rem"
-          borderRadius="0.75rem"
-        >
-          <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-            <Icon name="wifi" size="2.4rem" />
-            <StyledText
-              marginLeft={SPACING.spacing2}
-              fontSize="1.5rem"
-              lineHeight="1.8rem"
-              fontWeight="700"
-            >
-              {ssid}
-            </StyledText>
-          </Flex>
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            textAlign={TYPOGRAPHY.textAlignRight}
-            gridColumn={SPACING.spacing2}
-          >
-            <StyledText fontSize="1.5rem" lineHeight="1.8rem">
-              {/* ToDo: if wifi is undefined no data or empty */}
-              {`${t('ip_address')}:  ${String(wifi?.ipAddress)}`}
-            </StyledText>
-            <StyledText fontSize="1.5rem" lineHeight="1.8rem">
-              {`${t('subnet_mask')}: ${String(wifi?.subnetMask)}`}
-            </StyledText>
-            <StyledText fontSize="1.5rem" lineHeight="1.8rem">
-              {`${t('mac_address')}: ${String(wifi?.macAddress)}`}
-            </StyledText>
-          </Flex>
-        </Flex>
-        <Flex justifyContent={JUSTIFY_FLEX_END}>
-          <SecondaryButton onClick={() => history.push('/network-setup/wifi')}>
-            {t('change_network')}
-          </SecondaryButton>
-        </Flex>
-      </Flex>
-      {/* temp button to odd menu until software update screen is ready */}
+      <StepMeter totalSteps={5} currentStep={2} OnDevice />
       <Flex
-        alignSelf={ALIGN_FLEX_END}
-        marginTop={SPACING.spacing5}
-        width="fit-content"
+        margin={`${String(SPACING.spacing6)} ${String(
+          SPACING.spacingXXL
+        )} ${String(SPACING.spacingXXL)}`}
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing5}
       >
-        <Link to="menu">
-          <TertiaryButton>To ODD Menu</TertiaryButton>
-        </Link>
+        <TitleHeader />
+        <DisplayConnectionStatus />
+        <DisplayConnectedNetworkInfo
+          wifi={wifi}
+          ssid={ssid}
+          authType={authType}
+        />
+        <DisplayButtons />
+        <Flex
+          alignSelf={ALIGN_FLEX_END}
+          marginTop={SPACING.spacing5}
+          width="fit-content"
+        >
+          <Link to="menu">
+            <TertiaryButton>To ODD Menu</TertiaryButton>
+          </Link>
+        </Flex>
       </Flex>
     </>
+  )
+}
+
+// Note: kj 12/22/2022 the followings might be a component for network setup process
+// but still the design is the mid-fi
+const TitleHeader = (): JSX.Element => {
+  const { t } = useTranslation('device_settings')
+  return (
+    <Flex
+      flexDirection={DIRECTION_ROW}
+      justifyContent={JUSTIFY_CENTER}
+      alignItems={ALIGN_CENTER}
+      marginBottom="1.5625rem"
+    >
+      <StyledText fontSize="2rem" lineHeight="2.75rem" fontWeight="700">
+        {t('connect_via', { type: t('wifi') })}
+      </StyledText>
+    </Flex>
+  )
+}
+
+const DisplayConnectionStatus = (): JSX.Element => {
+  const { t } = useTranslation('device_settings')
+  return (
+    <Flex
+      flexDirection={DIRECTION_ROW}
+      padding={`${String(SPACING.spacing5)} ${String(SPACING.spacingXXL)}`}
+      backgroundColor={COLORS.successBackgroundMed}
+      alignItems={ALIGN_CENTER}
+      justifyContent={JUSTIFY_CENTER}
+      borderRadius="12px"
+    >
+      <Icon name="ot-check" size="2.5rem" color={COLORS.successEnabled} />
+      <StyledText
+        marginLeft={SPACING.spacing5}
+        fontSize="1.625rem"
+        fontWeight="700"
+        lineHeight="2.1875rem"
+        color={COLORS.black}
+      >
+        {t('connection_status')}
+      </StyledText>
+      <StyledText
+        marginLeft="0.625rem"
+        fontSize="1.625rem"
+        fontWeight={TYPOGRAPHY.fontWeightRegular}
+        lineHeight="2.1875rem"
+        color={COLORS.black}
+      >
+        {t('connected')}
+      </StyledText>
+    </Flex>
+  )
+}
+
+interface DisplayConnectedNetworkInfoProps {
+  ssid: string
+  wifi: any
+  authType: 'wpa' | 'none'
+}
+
+const DisplayConnectedNetworkInfo = ({
+  wifi,
+  ssid,
+  authType,
+}: DisplayConnectedNetworkInfoProps): JSX.Element => {
+  const { t } = useTranslation('device_settings')
+  return (
+    <Flex
+      flexDirection={DIRECTION_ROW}
+      paddingX={SPACING.spacing6}
+      paddingY={SPACING.spacing5}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      backgroundColor={COLORS.darkGreyDisabled}
+      borderRadius="0.75rem"
+    >
+      <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
+        <Icon name="wifi" size="2.4rem" />
+        <StyledText
+          marginLeft={SPACING.spacing2}
+          fontSize="1.5rem"
+          lineHeight="1.8rem"
+          fontWeight="700"
+        >
+          {ssid}
+        </StyledText>
+      </Flex>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        textAlign={TYPOGRAPHY.textAlignRight}
+        gridGap={SPACING.spacing2}
+      >
+        <StyledText fontSize="1.5rem" lineHeight="2.0625rem" fontWeight="400">
+          {/* ToDo: if wifi is undefined no data or empty */}
+          {`${t('ip_address')}:  ${String(wifi?.ipAddress)}`}
+        </StyledText>
+        <StyledText fontSize="1.5rem" lineHeight="2.0625rem" fontWeight="400">
+          {`Authentication: ${String(authType === 'wpa' ? 'WPA2' : 'None')}`}
+        </StyledText>
+        <StyledText fontSize="1.5rem" lineHeight="2.0625rem" fontWeight="400">
+          {`${t('subnet_mask')}: ${String(wifi?.subnetMask)}`}
+        </StyledText>
+        <StyledText fontSize="1.5rem" lineHeight="2.0625rem" fontWeight="400">
+          {`${t('mac_address')}: ${String(wifi?.macAddress)}`}
+        </StyledText>
+      </Flex>
+    </Flex>
+  )
+}
+
+const DisplayButtons = (): JSX.Element => {
+  const { t } = useTranslation(['device_settings'])
+  const history = useHistory()
+  return (
+    <Flex
+      flexDirection={DIRECTION_ROW}
+      gridGap="0.75rem"
+      height="4.375rem"
+      marginTop="1.4375rem"
+    >
+      <SecondaryButton
+        onClick={() => history.push('/network-setup/wifi')}
+        width="100%"
+      >
+        <StyledText
+          fontSize="1.5rem"
+          lineHeight="1.375rem"
+          fontWeight="500"
+          color={COLORS.blueEnabled}
+        >
+          {t('change_network')}
+        </StyledText>
+      </SecondaryButton>
+      <PrimaryButton
+        onClick={() => history.push('/robot-settings/update-robot')}
+        width="100%"
+      >
+        <StyledText
+          fontSize="1.5rem"
+          lineHeight="1.375rem"
+          fontWeight="500"
+          color={COLORS.white}
+        >
+          {t('check_for_updates')}
+        </StyledText>
+      </PrimaryButton>
+    </Flex>
   )
 }
