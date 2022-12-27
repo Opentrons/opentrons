@@ -131,9 +131,9 @@ DESCRIPTION = (
 )
 PACKAGES = find_packages(where=".", exclude=["tests"])
 INSTALL_REQUIRES = [
-    "jsonschema==3.0.2",
+    "jsonschema>=3.0.2,<4",
     "typing-extensions>=4.0.0,<5",
-    "pydantic==1.8.2",
+    "pydantic>=1.8.2,<2",
 ]
 
 
