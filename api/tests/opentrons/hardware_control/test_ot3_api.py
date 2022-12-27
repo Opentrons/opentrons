@@ -11,7 +11,13 @@ from opentrons.hardware_control.instruments.ot3.gripper_handler import (
     GripError,
     GripperHandler,
 )
-from opentrons.hardware_control.instruments.ot2.pipette_handler import OT3PipetteHandler
+from opentrons.hardware_control.instruments.ot3.pipette_handler import (
+    OT3PipetteHandler,
+    PickUpTipSpec,
+    TipMotorPickUpTipSpec,
+    DropTipMove,
+    DropTipSpec,
+)
 from opentrons.hardware_control.types import (
     OT3Mount,
     OT3Axis,
@@ -723,3 +729,78 @@ async def test_save_instrument_offset(
         pipette_handler.save_instrument_offset.assert_called_once_with(
             converted_mount, Point(1, 1, 1)
         )
+
+
+async def test_pick_up_tip_full_tiprack(
+    ot3_hardware: ThreadManager[OT3API],
+    mock_instrument_handlers: Tuple[Mock],
+) -> None:
+    await ot3_hardware.home()
+    _, pipette_handler = mock_instrument_handlers
+    backend = ot3_hardware.managed_obj._backend
+
+    def _fake_function():
+        return None
+
+    with patch.object(
+        backend, "tip_action", AsyncMock(spec=backend.tip_action)
+    ) as tip_action:
+
+        pipette_handler.plan_check_pick_up_tip.return_value = (
+            PickUpTipSpec(
+                plunger_prep_pos=0,
+                plunger_currents={
+                    OT3Axis.of_main_tool_actuator(Mount.LEFT): 0,
+                },
+                presses=[],
+                shake_off_list=[],
+                retract_target=0,
+                pick_up_motor_actions=TipMotorPickUpTipSpec(
+                    # Move onto the posts
+                    tiprack_down=Point(0, 0, 0),
+                    tiprack_up=Point(0, 0, 0),
+                    pick_up_distance=0,
+                    speed=0,
+                    currents={OT3Axis.Q: 0},
+                ),
+            ),
+            _fake_function,
+        )
+        await ot3_hardware.pick_up_tip(Mount.LEFT, 40.0)
+        pipette_handler.plan_check_pick_up_tip.assert_called_once_with(
+            OT3Mount.LEFT, 40.0, None, None
+        )
+        tip_action.assert_called_once_with([OT3Axis.P_L], 0, 0, "pick_up")
+
+
+async def test_drop_tip_full_tiprack(
+    ot3_hardware: ThreadManager[OT3API],
+    mock_instrument_handlers: Tuple[Mock],
+) -> None:
+    _, pipette_handler = mock_instrument_handlers
+    backend = ot3_hardware.managed_obj._backend
+
+    def _fake_function():
+        return None
+
+    with patch.object(
+        backend, "tip_action", AsyncMock(spec=backend.tip_action)
+    ) as tip_action:
+        pipette_handler.plan_check_drop_tip.return_value = (
+            DropTipSpec(
+                drop_moves=[
+                    DropTipMove(
+                        target_position=1,
+                        current={OT3Axis.P_L: 1.0},
+                        speed=1,
+                        is_ht_tip_action=True,
+                    )
+                ],
+                shake_moves=[],
+                ending_current={OT3Axis.P_L: 1.0},
+            ),
+            _fake_function,
+        )
+        await ot3_hardware.drop_tip(Mount.LEFT)
+        pipette_handler.plan_check_drop_tip.assert_called_once_with(OT3Mount.LEFT, True)
+        tip_action.assert_called_once_with([OT3Axis.P_L], 1, 1, "drop")

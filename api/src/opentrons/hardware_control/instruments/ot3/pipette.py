@@ -261,9 +261,13 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         # Temporary solution for the 96 channel critical point locations.
         # We should instead record every channel "critical point" in
         # the pipette configurations.
+        X_DIRECTION_VALUE = 1
+        Y_DIVISION = 2
         if self.channels.value == 96:
             NUM_ROWS = 12
             NUM_COLS = 8
+            X_DIRECTION_VALUE = -1
+            Y_DIVISION = 3
         elif self.channels.value == 8:
             NUM_ROWS = 1
             NUM_COLS = 8
@@ -271,7 +275,9 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             NUM_ROWS = 1
             NUM_COLS = 1
 
-        x_offset_to_right_nozzle = INTERNOZZLE_SPACING_MM * (NUM_ROWS - 1)
+        x_offset_to_right_nozzle = (
+            X_DIRECTION_VALUE * INTERNOZZLE_SPACING_MM * (NUM_ROWS - 1)
+        )
         y_offset_to_front_nozzle = INTERNOZZLE_SPACING_MM * (NUM_COLS - 1)
 
         if cp_override in [
@@ -292,7 +298,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         if cp_override == CriticalPoint.XY_CENTER:
             mod_offset_xy = [
                 offsets[0] - x_offset_to_right_nozzle / 2,
-                offsets[1] - y_offset_to_front_nozzle / 2,
+                offsets[1] - y_offset_to_front_nozzle / Y_DIVISION,
                 offsets[2],
             ]
             cp_type = CriticalPoint.XY_CENTER

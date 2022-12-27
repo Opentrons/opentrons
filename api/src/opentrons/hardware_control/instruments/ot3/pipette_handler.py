@@ -69,12 +69,22 @@ class PickUpTipPressSpec:
 
 
 @dataclass(frozen=True)
+class TipMotorPickUpTipSpec:
+    tiprack_down: top_types.Point
+    tiprack_up: top_types.Point
+    pick_up_distance: float
+    speed: float
+    currents: Dict[OT3Axis, float]
+
+
+@dataclass(frozen=True)
 class PickUpTipSpec:
     plunger_prep_pos: float
     plunger_currents: Dict[OT3Axis, float]
     presses: List[PickUpTipPressSpec]
     shake_off_list: List[Tuple[top_types.Point, Optional[float]]]
     retract_target: float
+    pick_up_motor_actions: Optional[TipMotorPickUpTipSpec]
 
 
 @dataclass(frozen=True)
@@ -85,6 +95,7 @@ class DropTipMove:
     home_after: bool = False
     home_after_safety_margin: float = 0
     home_axes: Sequence[OT3Axis] = tuple()
+    is_ht_tip_action: bool = False
 
 
 @dataclass(frozen=True)
@@ -603,6 +614,10 @@ class PipetteHandlerProvider:
             raise TipAttachedError("Cannot pick up tip with a tip attached")
         self._ihp_log.debug(f"Picking up tip on {mount.name}")
 
+        def add_tip_to_instr() -> None:
+            instrument.add_tip(tip_length=tip_length)
+            instrument.set_current_volume(0)
+
         if presses is None or presses < 0:
             checked_presses = instrument.pick_up_configurations.presses
         else:
@@ -628,10 +643,29 @@ class PipetteHandlerProvider:
                 backup_dist = -press_dist
                 yield (press_dist, backup_dist)
 
-        def add_tip_to_instr() -> None:
-            instrument.add_tip(tip_length=tip_length)
-            instrument.set_current_volume(0)
-
+        if instrument.channels.value == 96:
+            return (
+                PickUpTipSpec(
+                    plunger_prep_pos=instrument.plunger_positions.bottom,
+                    plunger_currents={
+                        OT3Axis.of_main_tool_actuator(
+                            mount
+                        ): instrument.plunger_motor_current.run,
+                    },
+                    presses=[],
+                    shake_off_list=[],
+                    retract_target=instrument.pick_up_configurations.distance,
+                    pick_up_motor_actions=TipMotorPickUpTipSpec(
+                        # Move onto the posts
+                        tiprack_down=top_types.Point(0, 0, -5),
+                        tiprack_up=top_types.Point(0, 0, 7),
+                        pick_up_distance=instrument.pick_up_configurations.distance,
+                        speed=instrument.pick_up_configurations.speed,
+                        currents={OT3Axis.Q: instrument.pick_up_configurations.current},
+                    ),
+                ),
+                add_tip_to_instr,
+            )
         return (
             PickUpTipSpec(
                 plunger_prep_pos=instrument.plunger_positions.bottom,
@@ -657,6 +691,7 @@ class PipetteHandlerProvider:
                 retract_target=instrument.pick_up_configurations.distance
                 + check_incr * checked_presses
                 + 2,
+                pick_up_motor_actions=None,
             ),
             add_tip_to_instr,
         )
@@ -690,6 +725,7 @@ class PipetteHandlerProvider:
         speed: float,
         home_after: bool,
         home_axes: Sequence[OT3Axis],
+        is_ht_pipette: bool = False,
     ) -> Callable[[], List[DropTipMove]]:
         def build() -> List[DropTipMove]:
             base = [
@@ -703,6 +739,7 @@ class PipetteHandlerProvider:
                     home_after=home_after,
                     home_after_safety_margin=abs(bottom_pos - droptip_pos),
                     home_axes=home_axes,
+                    is_ht_tip_action=is_ht_pipette,
                 ),
                 DropTipMove(  # always finish drop-tip at a known safe plunger position
                     target_position=bottom_pos, current=plunger_currents, speed=None
@@ -746,6 +783,7 @@ class PipetteHandlerProvider:
             speed,
             home_after,
             (OT3Axis.of_main_tool_actuator(mount),),
+            instrument.channels.value == 96,
         )
 
         seq_ot3 = seq_builder_ot3()

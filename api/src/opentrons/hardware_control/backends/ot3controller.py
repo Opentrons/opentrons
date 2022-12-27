@@ -34,6 +34,8 @@ from .ot3utils import (
     create_gripper_jaw_grip_group,
     create_gripper_jaw_home_group,
     create_gripper_jaw_hold_group,
+    create_tip_action_group,
+    PipetteAction,
 )
 
 try:
@@ -358,6 +360,15 @@ class OT3Controller:
         positions = await asyncio.gather(*coros)
         if OT3Axis.G in checked_axes:
             await self.gripper_home_jaw()
+        if OT3Axis.Q in checked_axes:
+            await self.tip_action(
+                [OT3Axis.Q],
+                self.axis_bounds[OT3Axis.Q][1] - self.axis_bounds[OT3Axis.Q][0],
+                -1
+                * self._configuration.motion_settings.default_max_speed.high_throughput[
+                    OT3Axis.to_kind(OT3Axis.Q)
+                ],
+            )
         for position in positions:
             self._handle_motor_status_response(position)
         return axis_convert(self._position, 0.0)
@@ -387,6 +398,22 @@ class OT3Controller:
             New position.
         """
         return await self.home(axes)
+
+    async def tip_action(
+        self,
+        axes: Sequence[OT3Axis],
+        distance: float,
+        speed: float,
+        tip_action: str = "drop",
+    ) -> None:
+        move_group = create_tip_action_group(
+            axes, distance, speed, cast(PipetteAction, tip_action)
+        )
+        runner = MoveGroupRunner(move_groups=[move_group])
+        positions = await runner.run(can_messenger=self._messenger)
+        for axis, point in positions.items():
+            self._position.update({axis: point[0]})
+            self._encoder_position.update({axis: point[1]})
 
     async def gripper_grip_jaw(
         self,
@@ -614,6 +641,7 @@ class OT3Controller:
             OT3Axis.X: phony_bounds,
             OT3Axis.Y: phony_bounds,
             OT3Axis.Z_G: phony_bounds,
+            OT3Axis.Q: phony_bounds,
         }
 
     def single_boundary(self, boundary: int) -> OT3AxisMap[float]:

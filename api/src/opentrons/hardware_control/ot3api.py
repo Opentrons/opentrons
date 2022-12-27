@@ -82,7 +82,12 @@ from .protocols import HardwareControlAPI
 
 # TODO (lc 09/15/2022) We should update our pipette handler to reflect OT-3 properties
 # in a follow-up PR.
-from .instruments.ot3.pipette_handler import OT3PipetteHandler, InstrumentsByMount
+from .instruments.ot3.pipette_handler import (
+    OT3PipetteHandler,
+    InstrumentsByMount,
+    PickUpTipSpec,
+    TipMotorPickUpTipSpec,
+)
 from .instruments.ot3.instrument_calibration import load_pipette_offset
 from .instruments.ot3.gripper_handler import GripperHandler
 from .instruments.ot3.instrument_calibration import (
@@ -946,7 +951,9 @@ class OT3API(
         if axes:
             checked_axes = [OT3Axis.from_axis(ax) for ax in axes]
         else:
-            checked_axes = [ax for ax in OT3Axis]
+            checked_axes = [ax for ax in OT3Axis if ax != OT3Axis.Q]
+        if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
+            checked_axes.append(OT3Axis.Q)
         self._log.info(f"Homing {axes}")
         async with self._motion_lock:
             try:
@@ -1276,6 +1283,52 @@ class OT3API(
             blowout_spec.instr.set_current_volume(0)
             blowout_spec.instr.ready_to_aspirate = False
 
+    async def _force_pick_up_tip(
+        self, mount: OT3Mount, pipette_spec: PickUpTipSpec
+    ) -> None:
+        for press in pipette_spec.presses:
+            async with self._backend.restore_current():
+                await self._backend.set_active_current(
+                    {axis: current for axis, current in press.current.items()}
+                )
+                target_down = target_position_from_relative(
+                    mount, press.relative_down, self._current_position
+                )
+                await self._move(target_down, speed=press.speed)
+            target_up = target_position_from_relative(
+                mount, press.relative_up, self._current_position
+            )
+            await self._move(target_up)
+
+    async def _motor_pick_up_tip(
+        self, mount: OT3Mount, pipette_spec: TipMotorPickUpTipSpec
+    ) -> None:
+        async with self._backend.restore_current():
+            await self._backend.set_active_current(
+                {axis: current for axis, current in pipette_spec.currents.items()}
+            )
+            # Move to pick up position
+            target_down = target_position_from_relative(
+                mount,
+                pipette_spec.tiprack_down,
+                self._current_position,
+            )
+            await self._move(target_down)
+            # perform pick up tip
+            await self._backend.tip_action(
+                [OT3Axis.of_main_tool_actuator(mount)],
+                pipette_spec.pick_up_distance,
+                pipette_spec.speed,
+                "pick_up",
+            )
+            # Move to pick up position
+            target_up = target_position_from_relative(
+                mount,
+                pipette_spec.tiprack_up,
+                self._current_position,
+            )
+            await self._move(target_up)
+
     async def pick_up_tip(
         self,
         mount: Union[top_types.Mount, OT3Mount],
@@ -1289,32 +1342,23 @@ class OT3API(
         spec, _add_tip_to_instrs = self._pipette_handler.plan_check_pick_up_tip(
             realmount, tip_length, presses, increment
         )
-        await self._backend.set_active_current(
-            {axis: current for axis, current in spec.plunger_currents.items()}
-        )
+
         target_absolute = target_position_from_plunger(
             realmount, spec.plunger_prep_pos, self._current_position
         )
-        await self._move(
-            target_absolute,
-            home_flagged_axes=False,
-        )
-
-        for press in spec.presses:
-            async with self._backend.restore_current():
-                await self._backend.set_active_current(
-                    {axis: current for axis, current in press.current.items()}
-                )
-                target_down = target_position_from_relative(
-                    realmount, press.relative_down, self._current_position
-                )
-                await self._move(target_down, speed=press.speed)
-            target_up = target_position_from_relative(
-                realmount, press.relative_up, self._current_position
+        async with self._backend.restore_current():
+            await self._backend.set_active_current(
+                {axis: current for axis, current in spec.plunger_currents.items()}
             )
-            await self._move(target_up)
+            await self._move(
+                target_absolute,
+                home_flagged_axes=False,
+            )
 
-        _add_tip_to_instrs()
+        if spec.pick_up_motor_actions:
+            await self._motor_pick_up_tip(realmount, spec.pick_up_motor_actions)
+        else:
+            await self._force_pick_up_tip(realmount, spec)
 
         # neighboring tips tend to get stuck in the space between
         # the volume chamber and the drop-tip sleeve on p1000.
@@ -1324,6 +1368,9 @@ class OT3API(
         # Here we add in the debounce distance for the switch as
         # a safety precaution
         await self.retract(realmount, spec.retract_target)
+
+        _add_tip_to_instrs()
+
         if prep_after:
             await self.prepare_for_aspirate(realmount)
 
@@ -1360,14 +1407,25 @@ class OT3API(
                     for axis, current in move.current.items()
                 }
             )
-            target_pos = target_position_from_plunger(
-                realmount, move.target_position, self._current_position
-            )
-            await self._move(
-                target_pos,
-                speed=move.speed,
-                home_flagged_axes=False,
-            )
+
+            if move.is_ht_tip_action and move.speed:
+                # The speed check is needed because speed can sometimes be None.
+                # Not sure why
+                await self._backend.tip_action(
+                    [OT3Axis.of_main_tool_actuator(mount)],
+                    move.target_position,
+                    move.speed,
+                    "drop",
+                )
+            else:
+                target_pos = target_position_from_plunger(
+                    realmount, move.target_position, self._current_position
+                )
+                await self._move(
+                    target_pos,
+                    speed=move.speed,
+                    home_flagged_axes=False,
+                )
             if move.home_after:
                 machine_pos = await self._backend.fast_home(
                     [OT3Axis.from_axis(ax) for ax in move.home_axes],
