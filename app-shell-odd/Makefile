@@ -18,29 +18,13 @@ ui_dir := ../app
 # cross-platform noop command
 noop := cd .
 
-# build and publish options
-dist_files := "dist/**/Opentrons-v*"
-update_files := "dist/@(alpha|beta|latest)*.@(yml|json)"
-publish_dir := dist/publish
-
 # Other SSH args for buildroot robots
 ssh_opts ?= $(default_ssh_opts)
-
-# TODO(mc, 2018-03-27): move all this to some sort of envfile
-# build id suffix to add to artifacts
-# if no build number -> dev
-# if tagged build (tag ~= ^v.+) -> b$(BUILD_NUMBER)
-# if branch exists -> b$(BUILD_NUMBER)-$(BRANCH_NAME)
-# only copy update files publish directory on tagged builds
-publish_update := $(filter v%,$(OT_TAG))
-branch_suffix := $(if $(publish_update),,-$(subst /,-,$(OT_BRANCH)))
-build_id := $(or $(and $(OT_BUILD),b$(OT_BUILD)$(branch_suffix)),dev)
 
 builder := yarn electron-builder \
 	--config electron-builder.config.js \
 	--publish never
   
-
 electron := yarn electron . \
 	--devtools \
 	--log.level.console="debug" \
@@ -50,10 +34,6 @@ electron := yarn electron . \
 
 # standard targets
 #####################################################################
-
-.PHONY: branch-suffix
-branch-suffix:
-	echo $(branch_suffix)
 
 .PHONY: all
 all: package
@@ -83,65 +63,15 @@ deps:
 .PHONY: package-deps
 package-deps: clean lib deps
 
-package dist-posix dist-osx dist-linux dist-win: export NODE_ENV := production
-package dist-posix dist-osx dist-linux dist-win: export BUILD_ID := $(build_id)
-
-.PHONY: package
-package: package-deps
-	$(builder) --dir
-
-.PHONY: dist-posix
-dist-posix: package-deps
-	$(builder) --linux --mac
-	$(MAKE) _dist-collect-artifacts
-
-.PHONY: dist-osx
-dist-osx: package-deps
-	$(builder) --mac
-	$(MAKE) _dist-collect-artifacts
-
-.PHONY: dist-linux
-dist-linux: package-deps
-	$(builder) --linux
-	$(MAKE) _dist-collect-artifacts
-
-.PHONY: dist-win
-dist-win: package-deps
-	$(builder) --win --x64
-	$(MAKE) _dist-collect-artifacts
-
 .PHONY: dist-ot3
 dist-ot3: package-deps
 	NO_USB_DETECTION=true OT_APP_DEPLOY_BUCKET=opentrons-app OT_APP_DEPLOY_FOLDER=builds $(builder) --linux --arm64 --dir
-	cd dist/linux-arm64-unpacked
 
 .PHONY: push-ot3
 push-ot3: dist-ot3
 	ssh $(ssh_opts) root@$(host) "mount -o remount,rw / && systemctl stop opentrons-robot-app && rm -rf /opt/opentrons-app && mkdir -p /opt/opentrons-app"
 	scp -r $(ssh_opts) ./dist/linux-arm64-unpacked/* root@$(host):/opt/opentrons-app
 	ssh $(ssh_opts) root@$(host) "systemctl start opentrons-robot-app && mount -o remount,ro /"
-
-# Aliases matching github actions OS names for easier calling in
-# workflows
-.PHONY: dist-macos-latest
-dist-macos-latest: dist-osx
-
-.PHONY: dist-ubuntu-latest
-dist-ubuntu-latest: dist-linux
-
-.PHONY: dist-ubuntu-22.04
-dist-ubuntu-22.04: dist-linux
-
-.PHONY: dist-windows-2022
-dist-windows-2022: dist-win
-
-# copy distributable artifacts to the publish directory
-# update files will not exist for all OSs, so noop if cp errors
-.PHONY: _dist-collect-artifacts
-_dist-collect-artifacts:
-	shx mkdir -p dist/publish
-	shx cp $(dist_files) $(publish_dir)
-	$(and $(publish_update),shx cp $(update_files) $(publish_dir) || $(noop))
 
 # development
 #####################################################################

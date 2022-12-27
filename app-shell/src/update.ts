@@ -33,7 +33,6 @@ export function registerUpdate(
 
 function checkUpdate(dispatch: Dispatch): void {
   const onAvailable = (info: UpdateInfo): void => {
-    console.log('update available!')
     done({ info, available: true })
   }
   const onNotAvailable = (info: UpdateInfo): void => {

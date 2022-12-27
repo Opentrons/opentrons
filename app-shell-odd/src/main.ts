@@ -1,9 +1,6 @@
 // electron main entry point
 import { app, ipcMain } from 'electron'
-import contextMenu from 'electron-context-menu'
-
 import { createUi } from './ui'
-import { initializeMenu } from './menu'
 import { createLogger } from './log'
 import { registerDiscovery } from './discovery'
 import { registerRobotLogs } from './robot-logs'
@@ -54,16 +51,6 @@ function startUp(): void {
   rendererLogger = createRendererLogger()
 
   mainWindow.once('closed', () => (mainWindow = null))
-
-  contextMenu({
-    menu: actions => {
-      return config.devtools
-        ? [actions.copy({}), actions.searchWithGoogle({}), actions.inspect()]
-        : [actions.copy({}), actions.searchWithGoogle({})]
-    },
-  })
-
-  initializeMenu()
 
   // wire modules to UI dispatches
   const dispatch: Dispatch = action => {

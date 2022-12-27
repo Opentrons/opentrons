@@ -1,3 +1,4 @@
+import semver from 'semver'
 import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
 import { createLogger } from './log'
 import { getConfig } from './config'
@@ -5,7 +6,6 @@ import { fetchJson } from './http'
 
 import type { Action, Dispatch } from './types'
 import type { ReleaseManifest } from './system-update/types'
-import semver from 'semver'
 
 const log = createLogger('update')
 
@@ -41,7 +41,7 @@ export const updateLatestVersion = (): Promise<string> => {
       return LATEST_OT_SYSTEM_VERSION
     })
     .catch((e: Error) => {
-      log.warn(`error sorting update versions: ${e.message}`)
+      log.warn(`error fetching latest system version: ${e.message}`)
       return _PKG_VERSION_
     })
 }
