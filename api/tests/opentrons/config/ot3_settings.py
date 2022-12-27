@@ -22,6 +22,7 @@ ot3_dummy_settings = {
                 "Y": 2,
                 "Z": 15,
                 "P": 15,
+                "Q": 5,
             },
             "two_low_throughput": {"X": 1.1, "Y": 2.2},
             "gripper": {
@@ -48,6 +49,7 @@ ot3_dummy_settings = {
                 "Y": 2,
                 "Z": 3,
                 "P": 4,
+                "Q": 5,
             },
             "two_low_throughput": {
                 "X": 4,
@@ -76,6 +78,7 @@ ot3_dummy_settings = {
                 "Y": 2,
                 "Z": 3,
                 "P": 6,
+                "Q": 5,
             },
             "two_low_throughput": {
                 "X": 1,
@@ -104,6 +107,7 @@ ot3_dummy_settings = {
                 "Y": 2,
                 "Z": 3,
                 "P": 6,
+                "Q": 5,
             },
             "two_low_throughput": {
                 "X": 0.5,
@@ -134,6 +138,7 @@ ot3_dummy_settings = {
                 "Y": 0.7,
                 "Z": 0.7,
                 "P": 0.8,
+                "Q": 0.3,
             },
             "two_low_throughput": {"X": 0.7, "Y": 0.7, "Z": 0.6},
             "gripper": {
@@ -159,6 +164,7 @@ ot3_dummy_settings = {
                 "Y": 0.5,
                 "Z": 0.4,
                 "P": 2.0,
+                "Q": 0.3,
             },
             "two_low_throughput": {"X": 9, "Y": 0.1, "Z": 0.6},
             "gripper": {
