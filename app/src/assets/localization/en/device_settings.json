@@ -164,7 +164,7 @@
   "connect": "Connect",
   "done": "Done",
   "connected_to_ssid": "Connected to {{ssid}}",
-  "failed_to_connect_to_ssid": "Failed to connect to {{ssid}}",
+  "failed_to_connect_to_ssid": "Failed to connect to {{ssid}}.",
   "ip_address": "IP Address",
   "subnet_mask": "Subnet Mask",
   "mac_address": "MAC Address",
