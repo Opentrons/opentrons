@@ -5,7 +5,6 @@ import '@testing-library/jest-dom'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../i18n'
-import { ConnectedNetworkInfo } from '../../pages/OnDeviceDisplay/ConnectedNetworkInfo'
 import { ConnectViaUSB } from '../../pages/OnDeviceDisplay/ConnectViaUSB'
 import { ConfirmRobotName } from '../../pages/OnDeviceDisplay/ConfirmRobotName'
 import { InitialSplash } from '../../pages/OnDeviceDisplay/InitialSplash'
@@ -37,9 +36,6 @@ const mockConfirmRobotName = ConfirmRobotName as jest.MockedFunction<
 const mockSelectWifiNetwork = SelectWifiNetwork as jest.MockedFunction<
   typeof SelectWifiNetwork
 >
-const mockConnectedNetworkInfo = ConnectedNetworkInfo as jest.MockedFunction<
-  typeof ConnectedNetworkInfo
->
 const mockRobotDashboard = RobotDashboard as jest.MockedFunction<
   typeof RobotDashboard
 >
@@ -60,9 +56,6 @@ describe('OnDeviceDisplayApp', () => {
     mockConnectViaUSB.mockReturnValue(<div>Mock ConnectViaUSB</div>)
     mockConfirmRobotName.mockReturnValue(<div>Mock ConfirmRobotName</div>)
     mockSelectWifiNetwork.mockReturnValue(<div>Mock SelectWifiNetwork</div>)
-    mockConnectedNetworkInfo.mockReturnValue(
-      <div>Mock ConnectedNetworkInfo</div>
-    )
     mockRobotDashboard.mockReturnValue(<div>Mock RobotDashboard</div>)
   })
   afterEach(() => {
@@ -89,10 +82,6 @@ describe('OnDeviceDisplayApp', () => {
     getByText('Mock SelectWifiNetwork')
   })
 
-  it('renders a ConnectedNetworkInfo component from /network-setup/wifi/connected-network-info', () => {
-    const [{ getByText }] = render('/network-setup/wifi/connected-network-info')
-    getByText('Mock ConnectedNetworkInfo')
-  })
   it('renders a RobotDashboard component from /dashboard', () => {
     const [{ getByText }] = render('/dashboard')
     getByText('Mock RobotDashboard')

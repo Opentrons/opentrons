@@ -10,7 +10,6 @@ import {
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { BackButton } from '../atoms/buttons'
-import { ConnectedNetworkInfo } from '../pages/OnDeviceDisplay/ConnectedNetworkInfo'
 import { ConnectViaEthernet } from '../pages/OnDeviceDisplay/ConnectViaEthernet'
 import { ConnectViaUSB } from '../pages/OnDeviceDisplay/ConnectViaUSB'
 import { ConfirmRobotName } from '../pages/OnDeviceDisplay/ConfirmRobotName'
@@ -54,12 +53,6 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     exact: true,
     name: 'Select Network',
     path: '/network-setup/wifi',
-  },
-  {
-    Component: ConnectedNetworkInfo,
-    exact: true,
-    name: 'Connected Network Info',
-    path: '/network-setup/wifi/connected-network-info',
   },
   {
     Component: ConnectViaEthernet,
