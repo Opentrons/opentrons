@@ -339,7 +339,14 @@ class OT3Controller:
         if OT3Axis.G in checked_axes:
             await self.gripper_home_jaw()
         if OT3Axis.Q in checked_axes:
-            await self.tip_action([OT3Axis.Q])
+            await self.tip_action(
+                [OT3Axis.Q],
+                self.axis_bounds[OT3Axis.Q][1] - self.axis_bounds[OT3Axis.Q][0],
+                -1
+                * self._configuration.motion_settings.default_max_speed.high_throughput[
+                    OT3Axis.to_kind(OT3Axis.Q)
+                ],
+            )
         for position in positions:
             for axis, p in position.items():
                 self._position.update({axis: p[0]})
@@ -376,8 +383,8 @@ class OT3Controller:
     async def tip_action(
         self,
         axes: Sequence[OT3Axis],
-        distance: float = 33,
-        speed: float = -5.5,
+        distance: float,
+        speed: float,
         tip_action: str = "drop",
     ) -> None:
         move_group = create_tip_action_group(
@@ -622,6 +629,7 @@ class OT3Controller:
             OT3Axis.X: phony_bounds,
             OT3Axis.Y: phony_bounds,
             OT3Axis.Z_G: phony_bounds,
+            OT3Axis.Q: phony_bounds,
         }
 
     def single_boundary(self, boundary: int) -> OT3AxisMap[float]:

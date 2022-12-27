@@ -278,9 +278,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         x_offset_to_right_nozzle = (
             X_DIRECTION_VALUE * INTERNOZZLE_SPACING_MM * (NUM_ROWS - 1)
         )
-        y_offset_to_front_nozzle = (
-            INTERNOZZLE_SPACING_MM * (NUM_COLS - 1)
-        )
+        y_offset_to_front_nozzle = INTERNOZZLE_SPACING_MM * (NUM_COLS - 1)
 
         if cp_override in [
             CriticalPoint.GRIPPER_JAW_CENTER,

@@ -511,7 +511,7 @@ async def test_get_limit_switches(controller: OT3Controller) -> None:
 
 
 async def test_tip_action(controller: OT3Controller, mock_move_group_run) -> None:
-    await controller.tip_action([OT3Axis.P_L], tip_action="pick_up")
+    await controller.tip_action([OT3Axis.P_L], 33, -5.5, tip_action="pick_up")
     for call in mock_move_group_run.call_args_list:
         move_group_runner = call[0][0]
         for move_group in move_group_runner._move_groups:
@@ -524,7 +524,7 @@ async def test_tip_action(controller: OT3Controller, mock_move_group_run) -> Non
 
     mock_move_group_run.reset_mock()
 
-    await controller.tip_action([OT3Axis.P_L], tip_action="drop")
+    await controller.tip_action([OT3Axis.P_L], 33, -5.5, tip_action="drop")
     for call in mock_move_group_run.call_args_list:
         move_group_runner = call[0][0]
         for move_group in move_group_runner._move_groups:
