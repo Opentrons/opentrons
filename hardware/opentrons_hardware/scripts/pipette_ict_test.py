@@ -156,21 +156,20 @@ async def jog_axis(
             sys.stdout.flush()
             return position
 
-        else:
-            print(
-                "Coordinates: ",
-                round(position[node], 2),
-                ",",
-                "motor position: ",
-                res[node][0],
-                ", ",
-                "encoder position: ",
-                res[node][1],
-                ", " " Motor Step: ",
-                step_size[step_length_index],
-                end="",
-            )
-            print("\r", end="")
+        print(
+            "Coordinates: ",
+            round(position[node], 2),
+            ",",
+            "motor position: ",
+            res[node][0],
+            ", ",
+            "encoder position: ",
+            res[node][1],
+            ", " " Motor Step: ",
+            step_size[step_length_index],
+            end="",
+        )
+        print("\r", end="")
 
 def calc_time(distance: float, speed: float) -> float:
     """Calculates time based on distance and speed."""
@@ -309,17 +308,20 @@ async def run(args: argparse.Namespace) -> None:
     messenger = CanMessenger(driver=driver)
     messenger.start()
     if args.home:
+        await asyncio.sleep(2)
         print("\n")
         print("-------------------Test Homing--------------------------")
         await home(messenger, node)
         print("Homed")
 
     if args.jog:
+        await asyncio.sleep(2)
         print("\n")
         print("----------Read Motor Position and Encoder--------------")
         await jog_axis(messenger, node, position, args.speed)
 
     if args.limit_switch:
+        await asyncio.sleep(2)
         print("\n")
         print("-----------------Read Limit Switch--------------")
         # eslint-disable-next-line no-use-before-define
@@ -332,6 +334,7 @@ async def run(args: argparse.Namespace) -> None:
         print("Press Enter to Continue")
 
     if args.read_epprom:
+        await asyncio.sleep(2)
         print("\n")
         print("-----------------Read EPPROM--------------")
         serial_number = await read_epprom(messenger, node)
@@ -339,6 +342,7 @@ async def run(args: argparse.Namespace) -> None:
         await asyncio.sleep(2)
 
     if args.capacitive:
+        await asyncio.sleep(2)
         print("\n")
         print("-----------------Read Capacitive--------------")
         capacitive_data = await read_sensor(
@@ -348,6 +352,7 @@ async def run(args: argparse.Namespace) -> None:
         await asyncio.sleep(2)
 
     if args.pressure:
+        await asyncio.sleep(2)
         print("\n")
         print("-----------------Read pressure--------------")
         pressure_data = await read_sensor(
@@ -357,6 +362,7 @@ async def run(args: argparse.Namespace) -> None:
         await asyncio.sleep(2)
 
     if args.environment:
+        await asyncio.sleep(2)
         print("\n")
         print("-----------------Read Environment--------------")
         environment_data = await read_sensor(
@@ -407,6 +413,12 @@ def main() -> None:
         default=10.0,
     )
     parser.add_argument(
+        "--home_speed",
+        type=float,
+        help="The home speed with which to move the plunger.",
+        default=5.0,
+    )
+    parser.add_argument(
         "--node", type=str, help="Node id to operate.", default="pipette_left"
     )
 
@@ -415,23 +427,23 @@ def main() -> None:
     )
 
     parser.add_argument(
-        "--limit_switch", help="Test limit switch.", action="store_false"
+        "--limit_switch", help="Test limit switch.", action="store_true"
     )
     parser.add_argument(
-        "--jog", help="Test motor action with jog.", action="store_false"
+        "--jog", help="Test motor action with jog.", action="store_true"
     )
     parser.add_argument(
-        "--read_epprom", help="Test epprom memory.", action="store_false"
+        "--read_epprom", help="Test epprom memory.", action="store_true"
     )
-    parser.add_argument("--home", help="Test homing routine.", action="store_false")
+    parser.add_argument("--home", help="Test homing routine.", action="store_true")
     parser.add_argument(
-        "--capacitive", help="Test capacitive sensor.", action="store_false"
-    )
-    parser.add_argument(
-        "--pressure", help="Test pressure sensor.", action="store_false"
+        "--capacitive", help="Test capacitive sensor.", action="store_true"
     )
     parser.add_argument(
-        "--environment", help="Test environment Sensor.", action="store_false"
+        "--pressure", help="Test pressure sensor.", action="store_true"
+    )
+    parser.add_argument(
+        "--environment", help="Test environment Sensor.", action="store_true"
     )
 
     args = parser.parse_args()
