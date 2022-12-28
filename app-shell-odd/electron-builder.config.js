@@ -40,5 +40,4 @@ module.exports = {
     category: 'Science',
   },
   generateUpdatesFilesForAllChannels: true,
-  afterSign: path.join(__dirname, './scripts/after-sign.js'),
 }

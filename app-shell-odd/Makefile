@@ -54,18 +54,18 @@ clean:
 .PHONY: lib
 lib: export NODE_ENV := production
 lib:
-	webpack --profile
+	OPENTRONS_PROJECT=ot3 webpack --profile
 
 .PHONY: deps
 deps:
-	$(MAKE) -C $(ui_dir)
+	$(MAKE) -C $(ui_dir) OPENTRONS_PROJECT=ot3
 
 .PHONY: package-deps
 package-deps: clean lib deps
 
 .PHONY: dist-ot3
 dist-ot3: package-deps
-	NO_USB_DETECTION=true OT_APP_DEPLOY_BUCKET=opentrons-app OT_APP_DEPLOY_FOLDER=builds $(builder) --linux --arm64 --dir
+	NO_USB_DETECTION=true OT_APP_DEPLOY_BUCKET=opentrons-app OT_APP_DEPLOY_FOLDER=builds OPENTRONS_PROJECT=ot3 $(builder) --linux --arm64 --dir
 
 .PHONY: push-ot3
 push-ot3: dist-ot3
