@@ -163,7 +163,7 @@
   "connect": "Connect",
   "done": "Done",
   "connected_to_ssid": "Connected to {{ssid}}",
-  "failed_to_connect_to_ssid": "Failed to connect to {{ssid}}",
+  "failed_to_connect_to_ssid": "Failed to connect to {{ssid}}.",
   "ip_address": "IP Address",
   "subnet_mask": "Subnet Mask",
   "mac_address": "MAC Address",
@@ -189,5 +189,6 @@
   "select_authentication_method": "Select authentication method for your selected network.",
   "wpa2_personal": "WPA2 Personal",
   "switch_to_usb_description": "If your network uses a different authentication method, connect to the Opentrons App and finish Wi-Fi setup there.",
-  "enter_ssid": "Enter SSID"
+  "enter_ssid": "Enter SSID",
+  "check_for_updates": "Check for updates"
 }

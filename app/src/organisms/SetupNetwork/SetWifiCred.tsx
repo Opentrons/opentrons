@@ -1,8 +1,9 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
-import { useParams, useHistory } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import last from 'lodash/last'
+import { css } from 'styled-components'
 
 import {
   Box,
@@ -25,24 +26,53 @@ import { TertiaryButton } from '../../atoms/buttons'
 import * as RobotApi from '../../redux/robot-api'
 import * as Networking from '../../redux/networking'
 import { getLocalRobot } from '../../redux/discovery'
-import { ConnectingNetwork } from '../../organisms/SetupNetwork/ConnectingNetwork'
-import { ConnectedResult } from '../../organisms/SetupNetwork/ConnectedResult'
+import { ConnectingNetwork } from './ConnectingNetwork'
+import { FailedToConnect } from './FailedToConnect'
+import { ConnectedNetworkInfo } from '../../pages/OnDeviceDisplay/ConnectedNetworkInfo'
+import {
+  /* 
+  Note: kj 12/27/2022 These will be used in RobotSettings networking function
+  CONNECT,
+  DISCONNECT,
+  */
+  JOIN_OTHER,
+} from '../Devices/RobotSettings/ConnectNetwork/constants'
 
 import type { State, Dispatch } from '../../redux/types'
-import type { OnDeviceRouteParams } from '../../App/types'
-import type { WifiConfigureRequest } from '../../organisms/Devices/RobotSettings/ConnectNetwork/types'
+import type {
+  WifiConfigureRequest,
+  NetworkChangeState,
+} from '../Devices/RobotSettings/ConnectNetwork/types'
 
 const STATUS_REFRESH_MS = 5000
 const LIST_REFRESH_MS = 10000
 
-export function SetWifiCred(): JSX.Element {
+const SSID_INPUT_FIELD_STYLE = css`
+  padding-top: ${SPACING.spacing5};
+  padding-bottom: ${SPACING.spacing5};
+  font-size: 2.5rem;
+  line-height: 3.25rem;
+  text-align: center;
+`
+
+interface SetWifiCredProps {
+  ssid: string
+  authType?: 'wpa' | 'none'
+}
+
+export function SetWifiCred({
+  ssid,
+  authType = 'wpa',
+}: SetWifiCredProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
-  const { ssid, authType } = useParams<OnDeviceRouteParams>()
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const keyboardRef = React.useRef(null)
   const [password, setPassword] = React.useState<string>('')
   const [showPassword, setShowPassword] = React.useState<boolean>(false)
+  const [changeState, setChangeState] = React.useState<NetworkChangeState>({
+    type: null,
+  })
   const dispatch = useDispatch<Dispatch>()
   const [dispatchApiRequest, requestIds] = RobotApi.useDispatchApiRequest()
   const requestState = useSelector((state: State) => {
@@ -80,6 +110,9 @@ export function SetWifiCred(): JSX.Element {
     const options = formatNetworkSettings()
     dispatchApiRequest(Networking.postWifiConfigure(robotName, options))
     // ToDo There will be needed codes for manual connect for wpa-2
+    if (changeState.type === JOIN_OTHER) {
+      setChangeState({ ...changeState, ssid: options.ssid })
+    }
   }
 
   useInterval(
@@ -155,6 +188,7 @@ export function SetWifiCred(): JSX.Element {
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   type={showPassword ? 'text' : 'password'}
+                  css={SSID_INPUT_FIELD_STYLE}
                 />
               </Box>
               <Btn
@@ -186,11 +220,13 @@ export function SetWifiCred(): JSX.Element {
         <>
           {requestState?.status === RobotApi.PENDING ? (
             <ConnectingNetwork />
+          ) : requestState?.status === RobotApi.SUCCESS ? (
+            <ConnectedNetworkInfo ssid={ssid} />
           ) : (
-            <ConnectedResult
+            <FailedToConnect
               ssid={ssid}
-              isConnected={requestState?.status === RobotApi.SUCCESS}
-              requestState={requestState != null ? requestState : undefined}
+              requestState={requestState}
+              type={changeState.type}
               onConnect={handleConnect}
             />
           )}

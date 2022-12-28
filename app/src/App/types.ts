@@ -52,7 +52,5 @@ export interface DesktopRouteParams {
 export interface OnDeviceRouteParams {
   protocolId: string
   runId: string
-  ssid: string
-  authType: 'wpa' | 'none'
   robotName: string
 }

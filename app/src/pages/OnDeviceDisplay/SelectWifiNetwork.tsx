@@ -13,17 +13,15 @@ import {
   DIRECTION_ROW,
   Icon,
   JUSTIFY_CENTER,
-  POSITION_ABSOLUTE,
-  POSITION_RELATIVE,
-  Btn,
   COLORS,
+  Btn,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
-import { TertiaryButton } from '../../atoms/buttons'
 import * as Networking from '../../redux/networking'
 import { getLocalRobot } from '../../redux/discovery'
 import { SearchNetwork } from '../../organisms/SetupNetwork/SearchNetwork'
+import { SetWifiCred } from '../../organisms/SetupNetwork/SetWifiCred'
 
 import type { State, Dispatch } from '../../redux/types'
 
@@ -38,13 +36,17 @@ const NETWORK_ROW_STYLE = css`
 export function SelectWifiNetwork(): JSX.Element {
   const { t } = useTranslation('device_settings')
   const [isSearching, setIsSearching] = React.useState<boolean>(false)
+  const [isShowSetWifiCred, setIsShowSetWifiCred] = React.useState<boolean>(
+    false
+  )
+  const [selectedSsid, setSelectedSsid] = React.useState<string>('')
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
+  const history = useHistory()
   const dispatch = useDispatch<Dispatch>()
   const list = useSelector((state: State) =>
     Networking.getWifiList(state, robotName)
   )
-  const history = useHistory()
 
   React.useEffect(() => {
     dispatch(Networking.fetchWifiList(robotName))
@@ -62,8 +64,15 @@ export function SelectWifiNetwork(): JSX.Element {
   }
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacingXXL}>
-      {list.length > 0 ? (
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      padding={`${String(SPACING.spacing6)} ${String(
+        SPACING.spacingXXL
+      )} ${String(SPACING.spacingXXL)}`}
+    >
+      {isShowSetWifiCred ? (
+        <SetWifiCred ssid={selectedSsid} />
+      ) : list.length > 0 ? (
         <>
           <HeaderWithIPs
             handleSearch={handleSearch}
@@ -77,6 +86,10 @@ export function SelectWifiNetwork(): JSX.Element {
               height="4rem"
               borderRadius="12px"
               marginBottom={SPACING.spacing3}
+              onClick={() => {
+                setSelectedSsid(nw.ssid)
+                setIsShowSetWifiCred(true)
+              }}
             >
               <Flex
                 flexDirection={DIRECTION_ROW}
@@ -152,28 +165,12 @@ const HeaderWithIPs = ({
       flexDirection={DIRECTION_ROW}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
-      position={POSITION_RELATIVE}
       marginBottom="3.041875rem"
     >
       <Flex>
         <StyledText fontSize="2rem" fontWeight="700" lineHeight="2.72375rem">
           {t('connect_to_a_network')}
         </StyledText>
-      </Flex>
-
-      <Flex position={POSITION_ABSOLUTE} right="0">
-        <TertiaryButton
-          width="11.8125rem"
-          height="3.75rem"
-          fontSize="1.5rem"
-          fontWeight="500"
-          lineHeight="2.0425rem"
-          onClick={handleSearch}
-        >
-          {!isSearching ? null : (
-            <Icon name="ot-spinner" size="3.3125rem" spin />
-          )}
-        </TertiaryButton>
       </Flex>
     </Flex>
   )

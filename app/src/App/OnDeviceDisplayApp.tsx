@@ -10,7 +10,6 @@ import {
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { BackButton } from '../atoms/buttons'
-import { ConnectedNetworkInfo } from '../pages/OnDeviceDisplay/ConnectedNetworkInfo'
 import { ConnectViaEthernet } from '../pages/OnDeviceDisplay/ConnectViaEthernet'
 import { ConnectViaUSB } from '../pages/OnDeviceDisplay/ConnectViaUSB'
 import { ConfirmRobotName } from '../pages/OnDeviceDisplay/ConfirmRobotName'
@@ -22,7 +21,6 @@ import { RobotDashboard } from '../pages/OnDeviceDisplay/RobotDashboard'
 import { SelectAuthenticationType } from '../pages/OnDeviceDisplay/SelectAuthenticationType'
 import { SetWifiSsid } from '../pages/OnDeviceDisplay/SetWifiSsid'
 import { SelectWifiNetwork } from '../pages/OnDeviceDisplay/SelectWifiNetwork'
-import { SetWifiCred } from '../pages/OnDeviceDisplay/SetWifiCred'
 import { PortalRoot as ModalPortalRoot } from './portal'
 
 import type { RouteProps } from './types'
@@ -57,30 +55,6 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     exact: true,
     name: 'Select Network',
     path: '/network-setup/wifi',
-  },
-  {
-    Component: SelectAuthenticationType,
-    exact: true,
-    name: 'Connected Network Info',
-    path: '/network-setup/wifi/select-auth-type/:ssid',
-  },
-  {
-    Component: SetWifiSsid,
-    exact: true,
-    name: 'Set Wifi SSID',
-    path: '/network-setup/wifi/set-wifi-ssid',
-  },
-  {
-    Component: SetWifiCred,
-    exact: true,
-    name: 'Set Wifi Cred',
-    path: '/network-setup/wifi/set-wifi-cred/:ssid/:auth',
-  },
-  {
-    Component: ConnectedNetworkInfo,
-    exact: true,
-    name: 'Connected Network Info',
-    path: '/network-setup/wifi/connected-network-info/:ssid',
   },
   {
     Component: ConnectViaEthernet,
