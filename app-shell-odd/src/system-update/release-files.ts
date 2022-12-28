@@ -14,7 +14,7 @@ import type { ReleaseSetUrls, ReleaseSetFilepaths, UserFileInfo } from './types'
 
 const VERSION_FILENAME = 'VERSION.json'
 
-const log = createLogger('bulsildroot/release-files')
+const log = createLogger('systemUpdate/release-files')
 const outPath = (dir: string, url: string): string => {
   return path.join(dir, path.basename(url))
 }

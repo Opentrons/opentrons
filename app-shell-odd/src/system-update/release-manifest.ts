@@ -1,7 +1,10 @@
 import { readJson, writeJson } from 'fs-extra'
 import { fetchJson } from '../http'
+import { createLogger } from '../log'
 import { getManifestCacheDir } from './directories'
 import type { ReleaseManifest, ReleaseSetUrls } from './types'
+
+const log = createLogger('systemUpdate/release-manifest')
 
 export function getReleaseSet(
   manifest: ReleaseManifest,
@@ -20,4 +23,7 @@ export const downloadAndCacheReleaseManifest = (
     .then(manifest => {
       return writeJson(getManifestCacheDir(), manifest).then(() => manifest)
     })
-    .catch(() => readJson(getManifestCacheDir()))
+    .catch((error: Error) => {
+      log.error('Error downloading the release manifest', { error })
+      return readJson(getManifestCacheDir())
+    })
