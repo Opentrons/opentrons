@@ -1,4 +1,4 @@
-import { readJson, writeJson } from 'fs-extra'
+import { readJson, outputJson } from 'fs-extra'
 import { fetchJson } from '../http'
 import { createLogger } from '../log'
 import { getManifestCacheDir } from './directories'
@@ -21,7 +21,7 @@ export const downloadAndCacheReleaseManifest = (
 ): Promise<ReleaseManifest> =>
   fetchJson<ReleaseManifest>(manifestUrl)
     .then(manifest => {
-      return writeJson(getManifestCacheDir(), manifest).then(() => manifest)
+      return outputJson(getManifestCacheDir(), manifest).then(() => manifest)
     })
     .catch((error: Error) => {
       log.error('Error downloading the release manifest', { error })

@@ -26,7 +26,9 @@ module.exports = async () => {
         _PKG_VERSION_: JSON.stringify(version),
         _PKG_PRODUCT_NAME_: JSON.stringify(pkg.productName),
         _PKG_BUGS_URL_: JSON.stringify(pkg.bugs.url),
-        _DEFAULT_ROBOT_UPDATE_MANIFEST_URL_: JSON.stringify(OT3_UPDATE_MANIFEST_URL),
+        _DEFAULT_ROBOT_UPDATE_MANIFEST_URL_: JSON.stringify(
+          OT3_UPDATE_MANIFEST_URL
+        ),
       }),
     ],
   }

@@ -9,7 +9,7 @@ jest.mock('../../http')
 jest.mock('../directories')
 
 const fetchJson = Http.fetchJson as jest.MockedFunction<typeof Http.fetchJson>
-const writeJson = fse.writeJson as jest.MockedFunction<typeof fse.writeJson>
+const outputJson = fse.outputJson as jest.MockedFunction<typeof fse.outputJson>
 const readJson = fse.readJson as jest.MockedFunction<typeof fse.readJson>
 const getManifestCacheDir = Dirs.getManifestCacheDir as jest.MockedFunction<
   typeof Dirs.getManifestCacheDir
@@ -22,10 +22,10 @@ describe('release manifest utilities', () => {
   beforeEach(() => {
     getManifestCacheDir.mockReturnValue(MOCK_DIR)
     when(fetchJson).calledWith(MANIFEST_URL).mockResolvedValue(MOCK_MANIFEST)
-    when(writeJson)
-      // @ts-expect-error writeJson takes additional optional arguments which is tweaking jest-when
+    when(outputJson)
+      // @ts-expect-error outputJson takes additional optional arguments which is tweaking jest-when
       .calledWith(MOCK_DIR, MOCK_MANIFEST)
-      // @ts-expect-error writeJson takes additional optional arguments which is tweaking jest-when
+      // @ts-expect-error outputJson takes additional optional arguments which is tweaking jest-when
       .mockResolvedValue()
     when(readJson)
       // @ts-expect-error readJson takes additional optional arguments which is tweaking jest-when
@@ -42,7 +42,7 @@ describe('release manifest utilities', () => {
   it('should download and save the manifest from a url', () => {
     return downloadAndCacheReleaseManifest(MANIFEST_URL).then(manifest => {
       expect(manifest).toBe(MOCK_MANIFEST)
-      expect(writeJson).toHaveBeenCalledWith(MOCK_DIR, MOCK_MANIFEST)
+      expect(outputJson).toHaveBeenCalledWith(MOCK_DIR, MOCK_MANIFEST)
     })
   })
 
