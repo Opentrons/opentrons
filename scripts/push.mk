@@ -4,22 +4,25 @@ find_robot=$(shell yarn run -s discovery find -i 169.254)
 default_ssh_key := ~/.ssh/robot_key
 default_ssh_opts := -o stricthostkeychecking=no -o userknownhostsfile=/dev/null
 is-ot3 = $(shell ssh $(if $(2),"-i $(2)") $(3) root@$(1) systemctl status opentrons-robot-app)
-ssh-version := $(shell ssh -V)
-need-copy-scp := $(subst _, ,OpenSSH_9.0p1, LibreSSL 3.3.6)
-$(info $$ssh is $(ssh-version))
+SSH-VERSION=$(shell ssh -V 2>&1)
+VERSION-NUMBER=$($(subst p1, ,($(subst _, ,$(SSH-VERSION)))) | sed -n 's/.* \([0-9]*\).*/\1/p')
+need-copy-scp := $(filter ‘[0-9]{,2}.[0-9]’, $($(subst p1, ,($(subst _, ,$(SSH-VERSION))))))
+$(info $(subst p1, ,($(subst _, ,$(SSH-VERSION)))))
+
+$(info $$ssh is $(SSH-VERSION))
+$(info $$version number $(VERSION-NUMBER))
 $(info $$need-copy-scp is [${need-copy-scp}])
 
+ssh_version := $(shell ssh -V 2>&1 | grep -o "[0-9]*\.[0-9]*" | head -1)
 
-INPUT=someletters_12345_moreleters.ext 
-SUBSTRING=$(cut -d'_' -f 2 $(INPUT))
-$(info $$SUBSTRING is [${SUBSTRING}])
+$(info $(ssh_version))
+$(info $$is larger $(ssh_version == '9.0'))
 
-$(info test [${echo "abcdefg" | cut -c3-5}])
+ifeq ($(ssh_version), "9.0")
+	$(info $$equal)
+endif
 
 
-FILTER_OUT = $(foreach v,$(3),$(if $(findstring $(1),$(2),$(v)),,$(v)))
-foo = $(call FILTER_OUT,_,p, $(ssh-version))
-$(info $$foo is [${foo}])
 # push-python-package: execute a push to the robot of a particular python
 # package.
 #
