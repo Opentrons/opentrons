@@ -43,7 +43,7 @@ export const updateLatestVersion = (): Promise<string> => {
 
   return downloadAndCacheReleaseManifest(manifestURL)
     .then(response => {
-      const lastestAvailableVersion = Object.keys(response.production)
+      const latestAvailableVersion = Object.keys(response.production)
         .map(version => version)
         .sort((a, b) => {
           if (semver.lt(a, b)) {
@@ -53,7 +53,7 @@ export const updateLatestVersion = (): Promise<string> => {
         })
         .find(verson => channelFinder(verson, channel))
 
-      LATEST_OT_SYSTEM_VERSION = lastestAvailableVersion ?? _PKG_VERSION_
+      LATEST_OT_SYSTEM_VERSION = latestAvailableVersion ?? _PKG_VERSION_
       return LATEST_OT_SYSTEM_VERSION
     })
     .catch((e: Error) => {
