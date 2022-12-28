@@ -11,6 +11,7 @@ jest.mock('electron-updater')
 jest.mock('../log')
 jest.mock('../config')
 jest.mock('../http')
+jest.mock('fs-extra')
 
 const getConfig = Cfg.getConfig as jest.MockedFunction<typeof Cfg.getConfig>
 const fetchJson = http.fetchJson as jest.MockedFunction<typeof http.fetchJson>
