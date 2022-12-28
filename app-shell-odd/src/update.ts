@@ -2,53 +2,74 @@ import semver from 'semver'
 import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
 import { createLogger } from './log'
 import { getConfig } from './config'
-import { fetchJson } from './http'
+import {
+  downloadAndCacheReleaseManifest,
+  getCachedReleaseManifest,
+  getReleaseSet,
+} from './system-update/release-manifest'
 
 import type { Action, Dispatch } from './types'
-import type { ReleaseManifest } from './system-update/types'
+import type { ReleaseSetUrls } from './system-update/types'
 
 const log = createLogger('update')
 
 let LATEST_OT_SYSTEM_VERSION = _PKG_VERSION_
 
+const channelFinder = (version: string, channel: string): boolean => {
+  // return the latest alpha/beta if a user subscribes to alpha/beta updates
+  if (['alpha', 'beta'].includes(channel)) {
+    return version.includes(channel)
+  } else {
+    // otherwise get the latest stable version
+    return !version.includes('alpha') && !version.includes('beta')
+  }
+}
+
+export const getLatestSystemUpdateUrls = (): Promise<ReleaseSetUrls | null> => {
+  return getCachedReleaseManifest()
+    .then(manifest => getReleaseSet(manifest, getLatestVersion()))
+    .catch((error: Error) => {
+      log.warn('Error retrieving release manifest', {
+        version: getLatestVersion(),
+        error,
+      })
+      return Promise.reject(error)
+    })
+}
+
 export const updateLatestVersion = (): Promise<string> => {
   const manifestURL = getConfig('robotSystemUpdate').manifestUrls.OT3
   const channel = getConfig('update').channel
 
-  const channelFinder = (version: string): boolean => {
-    // return the latest alpha/beta if a user subscribes to alpha/beta updates
-    if (['alpha', 'beta'].includes(channel)) {
-      return version.includes(channel)
-    } else {
-      // otherwise get the latest stable version
-      return !version.includes('alpha') && !version.includes('beta')
-    }
-  }
-
-  return fetchJson<ReleaseManifest>(manifestURL)
+  return downloadAndCacheReleaseManifest(manifestURL)
     .then(response => {
-      const lastestAvailableVersion =
-        Object.keys(response.production)
-          .map(version => version)
-          .sort((a, b) => {
-            if (semver.lt(a, b)) {
-              return 1
-            }
-            return -1
-          })
-          .find(channelFinder) ?? _PKG_VERSION_
-      LATEST_OT_SYSTEM_VERSION = lastestAvailableVersion
+      const lastestAvailableVersion = Object.keys(response.production)
+        .map(version => version)
+        .sort((a, b) => {
+          if (semver.lt(a, b)) {
+            return 1
+          }
+          return -1
+        })
+        .find(verson => channelFinder(verson, channel))
+
+      LATEST_OT_SYSTEM_VERSION = lastestAvailableVersion ?? _PKG_VERSION_
       return LATEST_OT_SYSTEM_VERSION
     })
     .catch((e: Error) => {
       log.warn(`error fetching latest system version: ${e.message}`)
-      return _PKG_VERSION_
+      return LATEST_OT_SYSTEM_VERSION
     })
 }
 
 export const getLatestVersion = (): string => {
   return LATEST_OT_SYSTEM_VERSION
 }
+
+export const getCurrentVersion = (): string => _PKG_VERSION_
+
+export const isUpdateAvailable = (): boolean =>
+  getLatestVersion() !== getCurrentVersion()
 
 export function registerUpdate(
   dispatch: Dispatch

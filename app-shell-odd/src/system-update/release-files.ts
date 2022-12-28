@@ -19,8 +19,8 @@ const outPath = (dir: string, url: string): string => {
   return path.join(dir, path.basename(url))
 }
 
-// checks `directory` for buildroot files matching the given `urls`, and
-// download them if they can't be found
+// checks `directory` for system update files matching the given `urls`, and
+// downloads them if they can't be found
 export function getReleaseFiles(
   urls: ReleaseSetUrls,
   directory: string,

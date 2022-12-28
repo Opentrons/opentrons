@@ -1,30 +1,29 @@
 // buildroot update files
 import path from 'path'
 import { ensureDir } from 'fs-extra'
-import { app } from 'electron'
-
 import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
 import { createLogger } from '../log'
-import { getConfig } from '../config'
-import { getLatestVersion, updateLatestVersion } from '../update'
-import { downloadManifest, getReleaseSet } from './release-manifest'
+import {
+  getLatestSystemUpdateUrls,
+  getLatestVersion,
+  isUpdateAvailable,
+  updateLatestVersion,
+} from '../update'
 import {
   getReleaseFiles,
   readUserFileInfo,
   cleanupReleaseFiles,
 } from './release-files'
 import { uploadSystemFile } from './update'
+import { getSystemUpdateDir } from './directories'
 
 import type { DownloadProgress } from '../http'
 import type { Action, Dispatch } from '../types'
-import type { ReleaseSetUrls, ReleaseSetFilepaths } from './types'
+import type { ReleaseSetFilepaths } from './types'
 
 const log = createLogger('buildroot/index')
 
-const DIRECTORY = path.join(app.getPath('sessionData'), '__ot_system_update__')
-const MANIFEST_CACHE = path.join(DIRECTORY, 'releases.json')
-
-let checkingForUpdates = false
+let isGettingLatestSystemFiles = false
 let updateSet: ReleaseSetFilepaths | null = null
 
 export function registerRobotSystemUpdate(dispatch: Dispatch): Dispatch {
@@ -32,21 +31,23 @@ export function registerRobotSystemUpdate(dispatch: Dispatch): Dispatch {
     switch (action.type) {
       case UI_INITIALIZED:
       case 'shell:CHECK_UPDATE':
-        if (!checkingForUpdates) {
-          updateLatestVersion()
-            .then(() => {
-              checkingForUpdates = true
-              // eslint-disable-next-line @typescript-eslint/no-floating-promises
-              checkForSystemUpdate(dispatch).then(() => {
-                checkingForUpdates = false
-              })
+        updateLatestVersion()
+          .then(() => {
+            if (isUpdateAvailable() && !isGettingLatestSystemFiles) {
+              isGettingLatestSystemFiles = true
+              return getLatestSystemUpdateFiles(dispatch)
+            }
+          })
+          .then(() => {
+            isGettingLatestSystemFiles = false
+          })
+          .catch((error: Error) => {
+            log.warn('Error checking for update', {
+              error,
             })
-            .catch((error: Error) => {
-              log.warn('Error checking for update', {
-                error,
-              })
-            })
-        }
+            isGettingLatestSystemFiles = false
+          })
+
         break
 
       case 'buildroot:UPLOAD_FILE': {
@@ -104,46 +105,30 @@ export function registerRobotSystemUpdate(dispatch: Dispatch): Dispatch {
   }
 }
 
-export function getSystemUpdateUrls(): Promise<ReleaseSetUrls | null> {
-  const manifestUrl: string = getConfig('robotSystemUpdate').manifestUrls.OT3
-
-  return downloadManifest(manifestUrl, MANIFEST_CACHE)
-    .then(manifest => {
-      const urls = getReleaseSet(manifest, getLatestVersion())
-
-      if (urls === null) {
-        log.warn('No release files in manifest', {
-          version: getLatestVersion(),
-          manifest,
-        })
-      }
-
-      return urls
-    })
-    .catch((error: Error) => {
-      log.warn('Error retrieving release manifest', {
-        version: getLatestVersion(),
-        error,
-      })
-
-      return null
-    })
-}
-
-// check for a system update matching the current app version
+// Get latest system update version
 //   1. Ensure the system update directory exists
-//   2. Download the manifest file from S3
+//   2. Get the manifest file from the local cache
 //   3. Get the release files according to the manifest
 //      a. If the files need downloading, dispatch progress updates to UI
 //   4. Cache the filepaths of the update files in memory
 //   5. Dispatch info or error to UI
-export function checkForSystemUpdate(dispatch: Dispatch): Promise<unknown> {
-  const fileDownloadDir = path.join(DIRECTORY, getLatestVersion())
+export function getLatestSystemUpdateFiles(
+  dispatch: Dispatch
+): Promise<unknown> {
+  const fileDownloadDir = path.join(getSystemUpdateDir(), getLatestVersion())
 
   return ensureDir(fileDownloadDir)
-    .then(getSystemUpdateUrls)
+    .then(() => getLatestSystemUpdateUrls())
     .then(urls => {
-      if (urls === null) return Promise.resolve()
+      if (urls === null) {
+        const latestVersion = getLatestVersion()
+        log.warn('No release files in manifest', {
+          version: latestVersion,
+        })
+        return Promise.reject(
+          new Error(`No release files in manifest for version ${latestVersion}`)
+        )
+      }
 
       let prevPercentDone = 0
 
@@ -176,7 +161,7 @@ export function checkForSystemUpdate(dispatch: Dispatch): Promise<unknown> {
             payload: error.message,
           })
         })
-        .then(() => cleanupReleaseFiles(DIRECTORY, getLatestVersion()))
+        .then(() => cleanupReleaseFiles(getSystemUpdateDir(), getLatestVersion()))
         .catch((error: Error) => {
           log.warn('Unable to cleanup old release files', { error })
         })

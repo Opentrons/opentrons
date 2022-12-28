@@ -1,59 +1,55 @@
+import { when, resetAllWhenMocks } from 'jest-when'
 import fse from 'fs-extra'
-import tempy from 'tempy'
 import * as Http from '../../http'
-import { downloadManifest } from '../release-manifest'
+import * as Dirs from '../directories'
+import { downloadAndCacheReleaseManifest } from '../release-manifest'
 
+jest.mock('fs-extra')
 jest.mock('../../http')
+jest.mock('../directories')
 
 const fetchJson = Http.fetchJson as jest.MockedFunction<typeof Http.fetchJson>
+const writeJson = fse.writeJson as jest.MockedFunction<typeof fse.writeJson>
+const readJson = fse.readJson as jest.MockedFunction<typeof fse.readJson>
+const getManifestCacheDir = Dirs.getManifestCacheDir as jest.MockedFunction<
+  typeof Dirs.getManifestCacheDir
+>
+const MOCK_DIR = 'mock_dir'
+const MANIFEST_URL = 'http://example.com/releases.json'
+const MOCK_MANIFEST = {}
 
 describe('release manifest utilities', () => {
-  let manifestFile: string
-
   beforeEach(() => {
-    manifestFile = tempy.file({ extension: 'json' })
+    getManifestCacheDir.mockReturnValue(MOCK_DIR)
+    when(fetchJson).calledWith(MANIFEST_URL).mockResolvedValue(MOCK_MANIFEST)
+    when(writeJson)
+      // @ts-expect-error writeJson takes additional optional arguments which is tweaking jest-when
+      .calledWith(MOCK_DIR, MOCK_MANIFEST)
+      // @ts-expect-error writeJson takes additional optional arguments which is tweaking jest-when
+      .mockResolvedValue()
+    when(readJson)
+      // @ts-expect-error readJson takes additional optional arguments which is tweaking jest-when
+      .calledWith(MOCK_DIR)
+      // @ts-expect-error readJson takes additional optional arguments which is tweaking jest-when
+      .mockResolvedValue(MOCK_MANIFEST)
   })
 
   afterEach(() => {
-    return fse.remove(manifestFile)
+    resetAllWhenMocks()
+    jest.resetAllMocks()
   })
 
-  it('should download the manifest from a url', () => {
-    const result = { mockResult: true }
-    const manifestUrl = 'http://example.com/releases.json'
-
-    fetchJson.mockImplementation(
-      (url: unknown): Promise<unknown> => {
-        if (url === manifestUrl) return Promise.resolve(result)
-        return Promise.resolve()
-      }
-    )
-
-    return expect(downloadManifest(manifestUrl, manifestFile)).resolves.toBe(
-      result
-    )
-  })
-
-  it('should save the manifest to the given path', () => {
-    const result = { mockResult: true }
-    const manifestUrl = 'http://example.com/releases.json'
-
-    fetchJson.mockResolvedValue(result)
-
-    return downloadManifest(manifestUrl, manifestFile)
-      .then(() => fse.readJson(manifestFile))
-      .then(file => expect(file).toEqual(result))
+  it('should download and save the manifest from a url', () => {
+    return downloadAndCacheReleaseManifest(MANIFEST_URL).then(manifest => {
+      expect(manifest).toBe(MOCK_MANIFEST)
+      expect(writeJson).toHaveBeenCalledWith(MOCK_DIR, MOCK_MANIFEST)
+    })
   })
 
   it('should pull the manifest from the file if the manifest download fails', () => {
-    const manifest = { mockResult: true }
-    const manifestUrl = 'http://example.com/releases.json'
-
-    fse.writeJsonSync(manifestFile, manifest)
-    fetchJson.mockRejectedValue(new Error('AH'))
-
-    return downloadManifest(manifestUrl, manifestFile).then(result =>
-      expect(result).toEqual(manifest)
+    when(fetchJson).calledWith(MANIFEST_URL).mockRejectedValue('oh no!')
+    return downloadAndCacheReleaseManifest(MANIFEST_URL).then((manifest) =>
+      expect(manifest).toBe(MOCK_MANIFEST)
     )
   })
 })
