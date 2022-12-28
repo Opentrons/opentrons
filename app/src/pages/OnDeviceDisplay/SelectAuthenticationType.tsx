@@ -82,11 +82,7 @@ export function SelectAuthenticationType(): JSX.Element {
             fontSize="1.5rem"
             fontWeight="500"
             lineHeight="2.0425rem"
-            onClick={() =>
-              history.push(
-                `/network-setup/wifi/set-wifi-cred/${ssid}/${authType}`
-              )
-            }
+            onClick={() => console.log('wifi password set')}
           >
             {t('shared:next')}
           </TertiaryButton>
