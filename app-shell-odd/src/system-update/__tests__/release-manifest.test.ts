@@ -48,7 +48,7 @@ describe('release manifest utilities', () => {
 
   it('should pull the manifest from the file if the manifest download fails', () => {
     when(fetchJson).calledWith(MANIFEST_URL).mockRejectedValue('oh no!')
-    return downloadAndCacheReleaseManifest(MANIFEST_URL).then((manifest) =>
+    return downloadAndCacheReleaseManifest(MANIFEST_URL).then(manifest =>
       expect(manifest).toBe(MOCK_MANIFEST)
     )
   })

@@ -1,4 +1,4 @@
-// buildroot update files
+// system update files
 import path from 'path'
 import { ensureDir } from 'fs-extra'
 import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
@@ -21,7 +21,7 @@ import type { DownloadProgress } from '../http'
 import type { Action, Dispatch } from '../types'
 import type { ReleaseSetFilepaths } from './types'
 
-const log = createLogger('buildroot/index')
+const log = createLogger('systemUpdate/index')
 
 let isGettingLatestSystemFiles = false
 let updateSet: ReleaseSetFilepaths | null = null
@@ -161,7 +161,9 @@ export function getLatestSystemUpdateFiles(
             payload: error.message,
           })
         })
-        .then(() => cleanupReleaseFiles(getSystemUpdateDir(), getLatestVersion()))
+        .then(() =>
+          cleanupReleaseFiles(getSystemUpdateDir(), getLatestVersion())
+        )
         .catch((error: Error) => {
           log.warn('Unable to cleanup old release files', { error })
         })

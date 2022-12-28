@@ -18,7 +18,7 @@ ui_dir := ../app
 # cross-platform noop command
 noop := cd .
 
-# Other SSH args for buildroot robots
+# Other SSH args for robots
 ssh_opts ?= $(default_ssh_opts)
 
 builder := yarn electron-builder \

@@ -32,7 +32,7 @@ export function getReleaseFiles(
       return []
     })
     .then((files: string[]) => {
-      log.debug('Files in buildroot download directory', { files })
+      log.debug('Files in system update download directory', { files })
       const system = outPath(directory, urls.system)
       const releaseNotes = outPath(directory, urls.releaseNotes ?? '')
 

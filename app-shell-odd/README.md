@@ -1,12 +1,12 @@
-# Opentrons Desktop Shell
+# Opentrons On Design Display (ODD) Shell
 
 [![JavaScript Style Guide][style-guide-badge]][style-guide]
 
-> Desktop application wrapper for the [Opentrons App](../app) using Electron
+> On Design Display (ODD) application wrapper for the [Opentrons App](../app) using Electron
 
 ## overview
 
-This directory contains the code for the [Electron main process][electron-main] that runs the Opentrons application.
+This directory contains the code for the [Electron main process][electron-main] that runs the Opentrons application on the ODD.
 
 ### configuration
 
@@ -114,12 +114,12 @@ Forces the devtools extensions to be re-installed. Make sure you enable **both**
 
 Sets the app's self-update channel. Options are `alpha`, `beta`, or `latest`. `alpha` is the least tested/stable, followed by `beta`, followed by `latest`. `alpha` and `beta` get new features earlier than `latest`.
 
-##### buildroot.manifestUrl
+##### robotSystemUpdate.manifestUrls.OT3
 
-- CLI argument: `--buildroot.manifestUrl`
-- Environment variable: `OT_APP_BUILDROOT__MANIFEST_URL`
-- JSON path: `buildroot.manifestUrl`
-- Default: `"https://opentrons-buildroot-ci.s3.us-east-2.amazonaws.com/releases.json"`
+- CLI argument: `--robotSystemUpdate.manifestUrls.OT3`
+- Environment variable: `OT_APP_ROBOT_SYSTEM_UPDATE__MANIFEST_URLS__OT3`
+- JSON path: `robotSystemUpdate.manifestUrls.OT3`
+- Default: `"https://ot3-development.builds.opentrons.com/ot3-oe/releases.json"`
 
 Sets the file that the app checks for its corresponding robot update.
 
