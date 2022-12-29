@@ -97,7 +97,7 @@ def getch() -> str:
     return _getch()
 
 
-def file_setup(test_header: List[str], node: NodeId, test_type: str) -> str:
+def file_setup(test_header: str, node: NodeId, test_type: str) -> str:
     """Setup CSV file."""
     D = datetime.datetime.now().strftime("%Y_%m_%d")
     test_tag = "{}-{}".format(test_type, int(time.time()))
@@ -121,7 +121,6 @@ async def jog_axis(
     step_size = [0.1, 0.5, 1, 10, 20, 50]
     step_length_index = 3
     step = step_size[step_length_index]
-    pos = 0.0
     res = {node: (0, 0, 0)}
     start_time = time.perf_counter()
     information_str = """
@@ -139,7 +138,7 @@ async def jog_axis(
         if input == "w":
             # plus move direction
             sys.stdout.flush()
-            position[node.name] += step
+            position[node] += step
             res = await move_to(messenger, node, step, -speed)  # type: ignore[assignment]
             elasped_time = time.perf_counter() - start_time
             d_str = f"{elasped_time},{res[node][0]}, {res[node][1]} \n"
@@ -148,7 +147,7 @@ async def jog_axis(
         elif input == "s":
             # minus move direction
             sys.stdout.flush()
-            position[node.name] -= step
+            position[node] -= step
             res = await move_to(messenger, node, step, speed)  # type: ignore[assignment]
             elasped_time = time.perf_counter() - start_time
             d_str = f"{elasped_time},{res[node][0]}, {res[node][1]} \n"
@@ -179,7 +178,7 @@ async def jog_axis(
 
         print(
             "Coordinates: ",
-            round(position[node.name], 2),
+            round(position[node], 2),
             ",",
             "motor position: ",
             res[node][0],
@@ -326,7 +325,7 @@ async def run(args: argparse.Namespace) -> None:
     node = ot3_nodes[args.node]
     subprocess.run(["systemctl", "stop", "opentrons-robot-server"])
     await asyncio.sleep(1)
-    position = {node.name: 0.0}
+    position = {node: 0.0}
     driver = await build_driver(build_settings(args))
     messenger = CanMessenger(driver=driver)
     messenger.start()
