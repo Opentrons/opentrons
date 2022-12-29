@@ -377,16 +377,15 @@ async def _main(simulate: bool, mount: OT3Mount, columns: int, fixture) -> None:
         await api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
         print('Test Finished')
 
-
-
 if __name__ == "__main__":
-    arg_parser = argparse.ArgumentParser(description="OT-3 Manual Calibration")
+    arg_parser = argparse.ArgumentParser(description="OT-3 Assembly QC")
     arg_parser.add_argument(
         "--mount", choices=["left", "right", "gripper"], required=True
     )
     arg_parser.add_argument("--columns", type = int, default = 2)
     arg_parser.add_argument("--wait_time", type = int, default = 30)
-    arg_parser.add_argument("--asp_volume_1", type = int, default = 1000)
+    arg_parser.add_argument("--asp_volume_1", type = int, default = 1000.0)
+    arg_parser.add_argument("--asp_volume_2", type = int, default = 50.0)
     arg_parser.add_argument("--simulate", action="store_true")
     arg_parser.add_argument("--leak_test", action="store_true")
     arg_parser.add_argument("--check_pressure_test", action="store_true")
