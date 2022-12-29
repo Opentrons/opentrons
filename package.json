@@ -2,7 +2,6 @@
   "name": "opentrons",
   "private": true,
   "workspaces": [
-    "api/src/opentrons",
     "app",
     "app-shell",
     "components",
@@ -11,13 +10,9 @@
     "labware-library",
     "protocol-designer",
     "protocol-library-kludge",
-    "robot-server/robot_server",
     "shared-data",
     "step-generation",
-    "update-server/otupdate",
     "webpack-config",
-    "notify-server/notify_server",
-    "hardware/hardware",
     "api-client",
     "react-api-client"
   ],
@@ -26,8 +21,9 @@
       "path": "cz-conventional-changelog"
     }
   },
+  "packageManager": "yarn@1.22.19",
   "engines": {
-    "node": ">=16"
+    "node": "^16.9.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",
@@ -39,6 +35,7 @@
     "@babel/preset-typescript": "^7.12.7",
     "@babel/register": "^7.12.10",
     "@cypress/webpack-preprocessor": "^5.1.2",
+    "@octokit/rest": "^19.0.5",
     "@rollup/plugin-alias": "^3.1.2",
     "@rollup/plugin-babel": "^5.3.0",
     "@rollup/plugin-commonjs": "^18.0.0",
@@ -56,7 +53,7 @@
     "@types/express": "^4.17.11",
     "@types/jest": "^26.0.20",
     "@types/jest-when": "^2.7.2",
-    "@types/lodash": "^4.14.168",
+    "@types/lodash": "^4.14.191",
     "@types/multer": "^1.4.5",
     "@types/netmask": "^1.0.30",
     "@types/react-color": "^3.0.6",
@@ -67,15 +64,16 @@
     "@typescript-eslint/eslint-plugin": "^4.18.0",
     "@typescript-eslint/parser": "^4.18.0",
     "@wojtekmaj/enzyme-adapter-react-17": "^0.6.3",
-    "ajv": "^6.10.2",
+    "ajv": "^6.12.3",
     "aws-sdk": "^2.493.0",
     "babel-jest": "^26.6.3",
     "babel-loader": "^8.2.2",
     "babel-plugin-dynamic-import-node": "^2.3.3",
     "babel-plugin-module-resolver": "^4.1.0",
-    "babel-plugin-styled-components": "1.12.0",
+    "babel-plugin-styled-components": "2.0.7",
     "babel-plugin-unassert": "^3.0.1",
     "concurrently": "^4.1.2",
+    "conventional-changelog": "^3.1.25",
     "core-js": "^3.6.4",
     "css-loader": "^3.2.0",
     "cypress": "^6.6.0",
@@ -110,9 +108,8 @@
     "html-webpack-plugin": "^3.2.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^26.6.3",
-    "jest-styled-components": "7.0.2",
+    "jest-styled-components": "7.1.1",
     "jest-when": "^3.2.1",
-    "lerna": "^3.16.4",
     "lost": "^8.3.1",
     "madge": "^3.6.0",
     "mime": "^2.4.4",
@@ -142,7 +139,9 @@
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "rollup-plugin-terser": "^7.0.2",
     "script-ext-html-webpack-plugin": "^2.1.4",
+    "semver": "^7.3.8",
     "shx": "^0.3.3",
+    "simple-git": "^3.15.1",
     "style-loader": "^1.1.3",
     "stylelint": "^11.0.0",
     "stylelint-config-standard": "^19.0.0",
@@ -159,5 +158,6 @@
     "webpack-merge": "^4.2.2",
     "webpack-node-externals": "^1.7.2",
     "worker-plugin": "^5.0.0"
-  }
+  },
+  "dependencies": {}
 }

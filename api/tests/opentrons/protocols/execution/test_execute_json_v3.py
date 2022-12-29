@@ -7,7 +7,7 @@ from copy import deepcopy
 import pytest
 from opentrons.types import Location, Point
 from opentrons.protocols.parse import parse
-from opentrons.protocols.geometry.deck import Deck
+from opentrons.protocol_api.core.protocol_api.deck import Deck
 from opentrons.protocol_api import (
     ProtocolContext,
     InstrumentContext,
@@ -54,7 +54,8 @@ def test_get_well(minimal_labware_def2):
     deck = Location(Point(0, 0, 0), "deck")
     well_name = "A2"
     some_labware = labware.Labware(
-        implementation=LabwareImplementation(minimal_labware_def2, deck)
+        implementation=LabwareImplementation(minimal_labware_def2, deck),
+        api_version=MAX_SUPPORTED_VERSION,
     )
     loaded_labware = {"someLabwareId": some_labware}
     params = {"labware": "someLabwareId", "well": well_name}
@@ -113,7 +114,8 @@ def test_get_location_with_offset_fixed_trash(minimal_labware_def2):
     trash_labware_def = deepcopy(minimal_labware_def2)
     trash_labware_def["parameters"]["quirks"] = ["fixedTrash"]
     trash_labware = labware.Labware(
-        implementation=LabwareImplementation(trash_labware_def, deck)
+        implementation=LabwareImplementation(trash_labware_def, deck),
+        api_version=MAX_SUPPORTED_VERSION,
     )
 
     loaded_labware = {"someLabwareId": trash_labware}
@@ -202,7 +204,8 @@ def test_air_gap(minimal_labware_def2):
     deck = Location(Point(0, 0, 0), "deck")
     well_name = "A2"
     some_labware = labware.Labware(
-        implementation=LabwareImplementation(minimal_labware_def2, deck)
+        implementation=LabwareImplementation(minimal_labware_def2, deck),
+        api_version=MAX_SUPPORTED_VERSION,
     )
     loaded_labware = {"someLabwareId": some_labware}
     params = {"labware": "someLabwareId", "well": well_name}
@@ -456,6 +459,7 @@ def test_dispatch_json_invalid_command():
         )
 
 
+@pytest.mark.ot2_only
 def test_papi_execute_json_v3(monkeypatch, ctx, get_json_protocol_fixture):
     protocol_data = get_json_protocol_fixture("3", "testAllAtomicSingleV3", False)
     protocol = parse(protocol_data, None)

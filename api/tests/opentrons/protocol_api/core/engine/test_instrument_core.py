@@ -11,6 +11,7 @@ from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocol_engine import (
     DeckPoint,
     LoadedPipette,
+    MotorAxis,
     WellLocation,
     WellOffset,
     WellOrigin,
@@ -150,9 +151,9 @@ def test_move_to_well(
     subject.move_to(
         location=location,
         well_core=well_core,
-        force_direct=False,
-        minimum_z_height=None,
-        speed=None,
+        force_direct=True,
+        minimum_z_height=9.87,
+        speed=6.54,
     )
 
     decoy.verify(
@@ -163,6 +164,9 @@ def test_move_to_well(
             well_location=WellLocation(
                 origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
             ),
+            force_direct=True,
+            minimum_z_height=9.87,
+            speed=6.54,
         ),
         mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )
@@ -182,7 +186,7 @@ def test_move_to_coordinates(
         well_core=None,
         force_direct=True,
         minimum_z_height=42.0,
-        speed=None,
+        speed=4.56,
     )
 
     decoy.verify(
@@ -191,6 +195,7 @@ def test_move_to_coordinates(
             coordinates=DeckPoint(x=1, y=2, z=3),
             minimum_z_height=42.0,
             force_direct=True,
+            speed=4.56,
         ),
         mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )
@@ -414,3 +419,96 @@ def test_get_default_speed(
         )
     ).then_return(9000.1)
     assert subject.get_default_speed() == 9000.1
+
+
+def test_get_model(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should get the pipette's model name."""
+    decoy.when(
+        mock_engine_client.state.pipettes.get_model_name(pipette_id=subject.pipette_id)
+    ).then_return("pipette-model")
+    assert subject.get_model() == "pipette-model"
+
+
+def test_get_min_volume(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should get the pipette's min volume."""
+    decoy.when(
+        mock_engine_client.state.pipettes.get_minimum_volume(
+            pipette_id=subject.pipette_id
+        )
+    ).then_return(1.23)
+    assert subject.get_min_volume() == 1.23
+
+
+def test_get_max_volume(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should get the pipette's max volume."""
+    decoy.when(
+        mock_engine_client.state.pipettes.get_maximum_volume(
+            pipette_id=subject.pipette_id
+        )
+    ).then_return(4.56)
+    assert subject.get_max_volume() == 4.56
+
+
+def test_get_channels(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should get the pipette's number of channels."""
+    decoy.when(
+        mock_engine_client.state.tips.get_pipette_channels(
+            pipette_id=subject.pipette_id
+        )
+    ).then_return(42)
+    assert subject.get_channels() == 42
+
+
+def test_home_z(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should home its Z-stage and plunger."""
+    decoy.when(mock_engine_client.state.pipettes.get_z_axis("abc123")).then_return(
+        MotorAxis.RIGHT_Z
+    )
+    decoy.when(
+        mock_engine_client.state.pipettes.get_plunger_axis("abc123")
+    ).then_return(MotorAxis.RIGHT_PLUNGER)
+
+    subject.home()
+
+    decoy.verify(
+        mock_engine_client.home(axes=[MotorAxis.RIGHT_Z, MotorAxis.RIGHT_PLUNGER]),
+        times=1,
+    )
+
+
+def test_home_plunger(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should home its plunger."""
+    decoy.when(
+        mock_engine_client.state.pipettes.get_plunger_axis("abc123")
+    ).then_return(MotorAxis.LEFT_PLUNGER)
+
+    subject.home_plunger()
+
+    decoy.verify(
+        mock_engine_client.home(axes=[MotorAxis.LEFT_PLUNGER]),
+        times=1,
+    )

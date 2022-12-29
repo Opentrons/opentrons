@@ -7,11 +7,12 @@ import type { LabwareSetupItem } from './types'
 
 interface OffDeckLabwareListProps {
   labwareItems: LabwareSetupItem[]
+  isOt3: boolean
 }
 export function OffDeckLabwareList(
   props: OffDeckLabwareListProps
 ): JSX.Element | null {
-  const { labwareItems } = props
+  const { labwareItems, isOt3 } = props
   const { t } = useTranslation('protocol_setup')
   if (labwareItems.length < 1) return null
   return (
@@ -20,7 +21,9 @@ export function OffDeckLabwareList(
         as="h3"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         textTransform={TYPOGRAPHY.textTransformCapitalize}
-        margin={`${SPACING.spacing4} ${SPACING.spacing4} ${SPACING.spacing3}`}
+        margin={`${String(SPACING.spacing4)} ${String(
+          SPACING.spacing4
+        )} ${String(SPACING.spacing3)}`}
       >
         {t('additional_off_deck_labware')}
       </StyledText>
@@ -30,6 +33,7 @@ export function OffDeckLabwareList(
           attachedModuleInfo={{}}
           extraAttentionModules={[]}
           {...labwareItem}
+          isOt3={isOt3}
         />
       ))}
     </>

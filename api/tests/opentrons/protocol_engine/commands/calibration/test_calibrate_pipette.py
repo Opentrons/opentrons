@@ -43,7 +43,7 @@ async def test_calibrate_pipette_implementation(
     )
 
     decoy.when(
-        await calibration.calibrate_mount(hcapi=ot3_hardware_api, mount=OT3Mount.LEFT)
+        await calibration.calibrate_pipette(hcapi=ot3_hardware_api, mount=OT3Mount.LEFT)
     ).then_return(Point(x=3, y=4, z=6))
 
     result = await subject.execute(params)

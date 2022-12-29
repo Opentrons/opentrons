@@ -70,8 +70,8 @@ async def test_write_to_sensors(
 @pytest.mark.parametrize(
     argnames=["sensor_type", "expected_data"],
     argvalues=[
-        [SensorType.capacitive, 0.048828125],
-        [SensorType.environment, (12.7291, 100.07286)],
+        [SensorType.capacitive, 0.05],
+        [SensorType.environment, (12.73, 100.07)],
         [SensorType.pressure, 0.02],
     ],
 )
@@ -132,7 +132,7 @@ async def test_read_from_sensors(
 @pytest.mark.parametrize(
     argnames=["sensor_type", "expected_value"],
     argvalues=[
-        [SensorType.environment, (0.0, 57.67)],
+        [SensorType.environment, (12.73, 100.07)],
     ],
 )
 @pytest.mark.requires_emulator
@@ -189,7 +189,7 @@ async def test_baseline_poll_environment(
 @pytest.mark.parametrize(
     argnames=["sensor_type", "expected_value"],
     argvalues=[
-        [SensorType.capacitive, 0.02],
+        [SensorType.capacitive, 0.05],
     ],
 )
 @pytest.mark.requires_emulator

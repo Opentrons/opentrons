@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { useTrackEvent } from '../../../redux/analytics'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
+import { useTrackEvent } from '../../../redux/analytics'
 import { getSendAllProtocolsToOT3 } from '../../../redux/config'
 import {
   analyzeProtocol,
@@ -19,6 +19,7 @@ jest.mock('../../../redux/config')
 jest.mock('../../../redux/protocol-storage')
 
 const PROTOCOL_KEY = 'mock-protocol-key'
+const PROTOCOL_DISPLAY_NAME = 'a protocol for otie'
 const mockHandleRunProtocol = jest.fn()
 
 const mockViewProtocolSourceFolder = viewProtocolSourceFolder as jest.MockedFunction<
@@ -39,6 +40,7 @@ const render = () => {
     <MemoryRouter>
       <ProtocolOverflowMenu
         protocolKey={PROTOCOL_KEY}
+        protocolDisplayName={PROTOCOL_DISPLAY_NAME}
         handleRunProtocol={mockHandleRunProtocol}
       />
     </MemoryRouter>,
@@ -74,6 +76,10 @@ describe('ProtocolOverflowMenu', () => {
     fireEvent.click(button)
     const runButton = getByText('Run now')
     fireEvent.click(runButton)
+    expect(mockTrackEvent).toHaveBeenCalledWith({
+      name: 'proceedToRun',
+      properties: { sourceLocation: 'ProtocolsLanding' },
+    })
     expect(mockHandleRunProtocol).toHaveBeenCalled()
   })
 
@@ -87,7 +93,7 @@ describe('ProtocolOverflowMenu', () => {
     expect(store.dispatch).toHaveBeenCalledWith(analyzeProtocol(PROTOCOL_KEY))
   })
 
-  it('should call send to OT-3 when clicking send to OT-3', () => {
+  it('should open send to OT-3 slideout when clicking send to OT-3', () => {
     mockGetSendAllProtocolsToOT3.mockReturnValue(true)
 
     const [{ getByTestId, getByText }] = render()

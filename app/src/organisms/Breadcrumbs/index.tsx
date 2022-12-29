@@ -26,7 +26,7 @@ import { getProtocolDisplayName } from '../../organisms/ProtocolsLanding/utils'
 import { getIsOnDevice } from '../../redux/config'
 import { getStoredProtocol } from '../../redux/protocol-storage'
 
-import type { NavRouteParams } from '../../App/types'
+import type { DesktopRouteParams } from '../../App/types'
 import type { State } from '../../redux/types'
 
 interface CrumbNameProps {
@@ -70,7 +70,7 @@ function BreadcrumbsComponent(): JSX.Element | null {
   const { t } = useTranslation('top_navigation')
   const isOnDevice = useSelector(getIsOnDevice)
 
-  const { protocolKey, robotName, runId } = useParams<NavRouteParams>()
+  const { protocolKey, robotName, runId } = useParams<DesktopRouteParams>()
 
   const runCreatedAtTimestamp = useRunCreatedAtTimestamp(runId)
 
@@ -88,7 +88,7 @@ function BreadcrumbsComponent(): JSX.Element | null {
 
   // determines whether a crumb is displayed for a path, and the displayed name
   const crumbNameByPath: { [index: string]: string | null } = {
-    '/devices': !isOnDevice ? t('devices') : null,
+    '/devices': !(isOnDevice ?? false) ? t('devices') : null,
     [`/devices/${robotName}`]: robotName,
     [`/devices/${robotName}/robot-settings`]: t('robot_settings'),
     [`/devices/${robotName}/protocol-runs/${runId}`]: runCreatedAtTimestamp,
@@ -120,10 +120,12 @@ function BreadcrumbsComponent(): JSX.Element | null {
     <Flex
       alignItems={ALIGN_FLEX_START}
       backgroundColor={COLORS.white}
-      borderBottom={`1px solid ${COLORS.medGreyEnabled}`}
+      borderBottom={`1px solid ${String(COLORS.medGreyEnabled)}`}
       css={TYPOGRAPHY.labelRegular}
       flexDirection={DIRECTION_ROW}
-      padding={`${SPACING.spacing2} 0 ${SPACING.spacing2} ${SPACING.spacing3}`}
+      padding={`${String(SPACING.spacing2)} 0 ${String(
+        SPACING.spacing2
+      )} ${String(SPACING.spacing3)}`}
     >
       {pathCrumbs.map((crumb, i) => {
         const isLastCrumb = i === pathCrumbs.length - 1
@@ -147,7 +149,7 @@ function BreadcrumbsComponent(): JSX.Element | null {
 }
 
 export function Breadcrumbs(): JSX.Element | null {
-  const { robotName } = useParams<NavRouteParams>()
+  const { robotName } = useParams<DesktopRouteParams>()
   const robot = useRobot(robotName)
 
   return (

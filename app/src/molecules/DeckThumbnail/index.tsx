@@ -2,8 +2,6 @@ import * as React from 'react'
 import map from 'lodash/map'
 
 import { RobotWorkSpace, Module, LabwareRender } from '@opentrons/components'
-import { useFeatureFlag } from '../../redux/config'
-
 import {
   inferModuleOrientationFromXCoordinate,
   getModuleDef2,
@@ -38,9 +36,6 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
   const { commands, liquids, labware = [] } = props
   const robotType = getRobotTypeFromLoadedLabware(labware)
   const deckDef = getDeckDefFromRobotType(robotType)
-  const liquidSetupEnabled = useFeatureFlag('enableLiquidSetup')
-  const enableThermocyclerGen2 = useFeatureFlag('enableThermocyclerGen2')
-
   const initialLoadedLabwareBySlot = parseInitialLoadedLabwareBySlot(commands)
   const initialLoadedModulesBySlot = parseInitialLoadedModulesBySlot(commands)
   const initialLoadedLabwareByModuleId = parseInitialLoadedLabwareByModuleId(
@@ -83,7 +78,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
             ? labwareInModule.result.labwareId
             : labwareId
           const wellFill =
-            labwareId && liquids != null && liquidSetupEnabled
+            labwareId && liquids != null
               ? getWellFillFromLabwareId(
                   labwareId,
                   liquidsInLoadOrder,
@@ -92,11 +87,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
               : null
           return (
             <React.Fragment key={slotId}>
-              {/* TODO(jr, 9/28/22): revert this logic to only moduleInSlot != null when we remove the enableThermocyclerGen2 FF */}
-              {(moduleInSlot != null && enableThermocyclerGen2) ||
-              (moduleInSlot != null &&
-                !enableThermocyclerGen2 &&
-                moduleInSlot.params.model !== 'thermocyclerModuleV2') ? (
+              {moduleInSlot != null ? (
                 <Module
                   x={slot.position[0]}
                   y={slot.position[1]}
@@ -120,7 +111,9 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
               ) : null}
               {labwareInSlot != null ? (
                 <g
-                  transform={`translate(${slot.position[0]},${slot.position[1]})`}
+                  transform={`translate(${String(slot.position[0])},${String(
+                    slot.position[1]
+                  )})`}
                 >
                   <LabwareRender
                     definition={labwareInSlot.result.definition}

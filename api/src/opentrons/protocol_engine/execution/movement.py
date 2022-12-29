@@ -1,10 +1,11 @@
 """Movement command handling."""
 from __future__ import annotations
 
-from typing import Dict, Optional, Sequence
+import logging
+from typing import Dict, Optional, List
 from dataclasses import dataclass
 
-from opentrons.types import Point
+from opentrons.types import Point, Mount
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import (
     CriticalPoint,
@@ -17,7 +18,7 @@ from ..state import StateStore, CurrentWell
 from ..errors import MustHomeError
 from ..resources import ModelUtils
 from .thermocycler_movement_flagger import ThermocyclerMovementFlagger
-from . import heater_shaker_movement_flagger
+from .heater_shaker_movement_flagger import HeaterShakerMovementFlagger
 
 
 MOTOR_AXIS_TO_HARDWARE_AXIS: Dict[MotorAxis, HardwareAxis] = {
@@ -28,6 +29,8 @@ MOTOR_AXIS_TO_HARDWARE_AXIS: Dict[MotorAxis, HardwareAxis] = {
     MotorAxis.LEFT_PLUNGER: HardwareAxis.B,
     MotorAxis.RIGHT_PLUNGER: HardwareAxis.C,
 }
+
+log = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -58,6 +61,7 @@ class MovementHandler:
         hardware_api: HardwareControlAPI,
         model_utils: Optional[ModelUtils] = None,
         thermocycler_movement_flagger: Optional[ThermocyclerMovementFlagger] = None,
+        heater_shaker_movement_flagger: Optional[HeaterShakerMovementFlagger] = None,
     ) -> None:
         """Initialize a MovementHandler instance."""
         self._state_store = state_store
@@ -69,6 +73,12 @@ class MovementHandler:
                 state_store=self._state_store, hardware_api=self._hardware_api
             )
         )
+        self._hs_movement_flagger = (
+            heater_shaker_movement_flagger
+            or HeaterShakerMovementFlagger(
+                state_store=self._state_store, hardware_api=self._hardware_api
+            )
+        )
 
     async def move_to_well(
         self,
@@ -77,6 +87,9 @@ class MovementHandler:
         well_name: str,
         well_location: Optional[WellLocation] = None,
         current_well: Optional[CurrentWell] = None,
+        force_direct: bool = False,
+        minimum_z_height: Optional[float] = None,
+        speed: Optional[float] = None,
     ) -> None:
         """Move to a specific well."""
         await self._tc_movement_flagger.raise_if_labware_in_non_open_thermocycler(
@@ -88,6 +101,11 @@ class MovementHandler:
         hs_movement_restrictors = (
             self._state_store.modules.get_heater_shaker_movement_restrictors()
         )
+
+        # TODO (spp, 2022-12-14): remove once we understand why sometimes moveLabware
+        #  fails saying that h/s latch is closed even when it is not.
+        log.info(f"H/S movement restrictors: {hs_movement_restrictors}")
+
         dest_slot_int = int(
             self._state_store.geometry.get_ancestor_slot_name(labware_id)
         )
@@ -96,7 +114,7 @@ class MovementHandler:
             attached_pipettes=self._hardware_api.attached_instruments,
         )
 
-        heater_shaker_movement_flagger.raise_if_movement_restricted(
+        self._hs_movement_flagger.raise_if_movement_restricted(
             hs_movement_restrictors=hs_movement_restrictors,
             destination_slot=dest_slot_int,
             is_multi_channel=hw_pipette.config["channels"] > 1,
@@ -128,9 +146,13 @@ class MovementHandler:
             origin_cp=origin_cp,
             max_travel_z=max_travel_z,
             current_well=current_well,
+            force_direct=force_direct,
+            minimum_z_height=minimum_z_height,
         )
 
-        speed = self._state_store.pipettes.get_movement_speed(pipette_id=pipette_id)
+        speed = self._state_store.pipettes.get_movement_speed(
+            pipette_id=pipette_id, requested_speed=speed
+        )
 
         # move through the waypoints
         for waypoint in waypoints:
@@ -219,16 +241,28 @@ class MovementHandler:
             position=DeckPoint(x=point.x, y=point.y, z=point.z),
         )
 
-    async def home(self, axes: Optional[Sequence[MotorAxis]]) -> None:
+    async def home(self, axes: Optional[List[MotorAxis]]) -> None:
         """Send the requested axes to their "home" positions.
 
         If axes is `None`, will home all motors.
         """
-        hardware_axes = None
-        if axes is not None:
+        # TODO(mc, 2022-12-01): this is overly complicated
+        # https://opentrons.atlassian.net/browse/RET-1287
+        if axes is None:
+            await self._hardware_api.home()
+        elif axes == [MotorAxis.LEFT_PLUNGER]:
+            await self._hardware_api.home_plunger(Mount.LEFT)
+        elif axes == [MotorAxis.RIGHT_PLUNGER]:
+            await self._hardware_api.home_plunger(Mount.RIGHT)
+        elif axes == [MotorAxis.LEFT_Z, MotorAxis.LEFT_PLUNGER]:
+            await self._hardware_api.home_z(Mount.LEFT)
+            await self._hardware_api.home_plunger(Mount.LEFT)
+        elif axes == [MotorAxis.RIGHT_Z, MotorAxis.RIGHT_PLUNGER]:
+            await self._hardware_api.home_z(Mount.RIGHT)
+            await self._hardware_api.home_plunger(Mount.RIGHT)
+        else:
             hardware_axes = [MOTOR_AXIS_TO_HARDWARE_AXIS[a] for a in axes]
-
-        await self._hardware_api.home(axes=hardware_axes)
+            await self._hardware_api.home(axes=hardware_axes)
 
     async def move_to_coordinates(
         self,
@@ -236,6 +270,7 @@ class MovementHandler:
         deck_coordinates: DeckPoint,
         direct: bool,
         additional_min_travel_z: Optional[float],
+        speed: Optional[float] = None,
     ) -> None:
         """Move pipette to a given deck coordinate."""
         pipette_location = self._state_store.motion.get_pipette_location(
@@ -268,7 +303,9 @@ class MovementHandler:
             additional_min_travel_z=additional_min_travel_z,
         )
 
-        speed = self._state_store.pipettes.get_movement_speed(pipette_id=pipette_id)
+        speed = self._state_store.pipettes.get_movement_speed(
+            pipette_id=pipette_id, requested_speed=speed
+        )
 
         # move through the waypoints
         for waypoint in waypoints:

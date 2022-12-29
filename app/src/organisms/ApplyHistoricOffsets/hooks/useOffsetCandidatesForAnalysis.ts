@@ -18,7 +18,7 @@ export function useOffsetCandidatesForAnalysis(
   robotIp: string | null
 ): OffsetCandidate[] {
   const allHistoricOffsets = useAllHistoricOffsets(
-    robotIp ? { hostname: robotIp } : null
+    robotIp != null ? { hostname: robotIp } : null
   )
   if (allHistoricOffsets.length === 0 || analysisOutput == null) return []
   const { commands, labware, modules } = analysisOutput

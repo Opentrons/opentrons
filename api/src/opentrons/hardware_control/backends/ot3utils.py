@@ -1,5 +1,6 @@
 """Shared utilities for ot3 hardware control."""
-from typing import Dict, Iterable, List, Tuple, TypeVar
+from typing import Dict, Iterable, List, Tuple, TypeVar, Sequence
+from typing_extensions import Literal
 from opentrons.config.types import OT3MotionSettings, OT3CurrentSettings, GantryLoad
 from opentrons.hardware_control.types import (
     OT3Axis,
@@ -8,10 +9,15 @@ from opentrons.hardware_control.types import (
     CurrentConfig,
     OT3SubSystem,
     OT3Mount,
+    InstrumentProbeType,
 )
 import numpy as np
 
-from opentrons_hardware.firmware_bindings.constants import NodeId
+from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
+    SensorId,
+    PipetteTipActionType,
+)
 from opentrons_hardware.hardware_control.motion_planning import (
     AxisConstraints,
     SystemConstraints,
@@ -31,11 +37,14 @@ from opentrons_hardware.hardware_control.motion import (
     MoveType,
     MoveStopCondition,
     create_gripper_jaw_step,
+    create_tip_action_step,
 )
 
 GRIPPER_JAW_HOME_TIME: float = 120
 GRIPPER_JAW_GRIP_TIME: float = 1
 GRIPPER_JAW_HOME_DC: float = 100
+
+PipetteAction = Literal["pick_up", "drop"]
 
 # TODO: These methods exist to defer uses of NodeId to inside
 # method bodies, which won't be evaluated until called. This is needed
@@ -95,6 +104,7 @@ def axis_to_node(axis: OT3Axis) -> "NodeId":
         OT3Axis.P_R: NodeId.pipette_right,
         OT3Axis.Z_G: NodeId.gripper_z,
         OT3Axis.G: NodeId.gripper_g,
+        OT3Axis.Q: NodeId.pipette_left,
     }
     return anm[axis]
 
@@ -148,13 +158,7 @@ def get_current_settings(
 ) -> OT3AxisMap[CurrentConfig]:
     conf_by_pip = config.by_gantry_load(gantry_load)
     currents = {}
-    for axis_kind in [
-        OT3AxisKind.P,
-        OT3AxisKind.X,
-        OT3AxisKind.Y,
-        OT3AxisKind.Z,
-        OT3AxisKind.Z_G,
-    ]:
+    for axis_kind in conf_by_pip["hold_current"].keys():
         for axis in OT3Axis.of_kind(axis_kind):
             currents[axis] = CurrentConfig(
                 conf_by_pip["hold_current"][axis_kind],
@@ -238,6 +242,19 @@ def create_home_group(
     return move_group
 
 
+def create_tip_action_group(
+    axes: Sequence[OT3Axis], distance: float, velocity: float, action: PipetteAction
+) -> MoveGroup:
+    current_nodes = [axis_to_node(ax) for ax in axes]
+    step = create_tip_action_step(
+        velocity={node_id: np.float64(velocity) for node_id in current_nodes},
+        distance={node_id: np.float64(distance) for node_id in current_nodes},
+        present_nodes=current_nodes,
+        action=PipetteTipActionType[action],
+    )
+    return [step]
+
+
 def create_gripper_jaw_grip_group(
     duty_cycle: float,
     stop_condition: MoveStopCondition = MoveStopCondition.none,
@@ -297,3 +314,13 @@ _sensor_node_lookup: Dict[OT3Mount, ProbeTarget] = {
 
 def sensor_node_for_mount(mount: OT3Mount) -> ProbeTarget:
     return _sensor_node_lookup[mount]
+
+
+_instr_sensor_id_lookup: Dict[InstrumentProbeType, SensorId] = {
+    InstrumentProbeType.PRIMARY: SensorId.S0,
+    InstrumentProbeType.SECONDARY: SensorId.S1,
+}
+
+
+def sensor_id_for_instrument(probe: InstrumentProbeType) -> SensorId:
+    return _instr_sensor_id_lookup[probe]

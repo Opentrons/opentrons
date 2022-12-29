@@ -7,7 +7,7 @@ from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.types import MountType, Mount as HwMount
 
 from .. import errors
-from ..types import LoadedPipette
+from ..types import LoadedPipette, MotorAxis
 
 from ..commands import (
     Command,
@@ -26,7 +26,12 @@ from ..commands import (
     thermocycler,
     heater_shaker,
 )
-from ..actions import Action, SetPipetteMovementSpeedAction, UpdateCommandAction
+from ..actions import (
+    Action,
+    SetPipetteMovementSpeedAction,
+    UpdateCommandAction,
+    AddPipetteConfigAction,
+)
 from .abstract_store import HasState, HandlesActions
 
 
@@ -47,6 +52,15 @@ class CurrentWell:
     well_name: str
 
 
+@dataclass(frozen=True)
+class StaticPipetteConfig:
+    """Static config for a pipette."""
+
+    model: str
+    min_volume: float
+    max_volume: float
+
+
 @dataclass
 class PipetteState:
     """Basic pipette data state and getter methods."""
@@ -56,6 +70,7 @@ class PipetteState:
     current_well: Optional[CurrentWell]
     attached_tip_labware_by_id: Dict[str, str]
     movement_speed_by_id: Dict[str, Optional[float]]
+    static_config_by_id: Dict[str, StaticPipetteConfig]
 
 
 class PipetteStore(HasState[PipetteState], HandlesActions):
@@ -71,6 +86,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             current_well=None,
             attached_tip_labware_by_id={},
             movement_speed_by_id={},
+            static_config_by_id={},
         )
 
     def handle_action(self, action: Action) -> None:
@@ -79,6 +95,12 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._handle_command(action.command)
         elif isinstance(action, SetPipetteMovementSpeedAction):
             self._state.movement_speed_by_id[action.pipette_id] = action.speed
+        elif isinstance(action, AddPipetteConfigAction):
+            self._state.static_config_by_id[action.pipette_id] = StaticPipetteConfig(
+                model=action.model,
+                min_volume=action.min_volume,
+                max_volume=action.max_volume,
+            )
 
     def _handle_command(self, command: Command) -> None:
         self._update_current_well(command)
@@ -273,6 +295,43 @@ class PipetteView(HasState[PipetteState]):
         """Get the tiprack ids of attached tip by pipette ids."""
         return self._state.attached_tip_labware_by_id
 
-    def get_movement_speed(self, pipette_id: str) -> Optional[float]:
-        """Return the given pipette's current movement speed."""
-        return self._state.movement_speed_by_id[pipette_id]
+    def get_movement_speed(
+        self, pipette_id: str, requested_speed: Optional[float] = None
+    ) -> Optional[float]:
+        """Return the given pipette's requested or current movement speed."""
+        return requested_speed or self._state.movement_speed_by_id[pipette_id]
+
+    def _get_static_config(self, pipette_id: str) -> StaticPipetteConfig:
+        """Get the static pipette configuration by pipette id."""
+        try:
+            return self._state.static_config_by_id[pipette_id]
+        except KeyError:
+            raise errors.PipetteNotLoadedError(
+                f"Pipette {pipette_id} not found; unable to get pipette configuration."
+            )
+
+    def get_model_name(self, pipette_id: str) -> str:
+        """Return the given pipette's model name."""
+        return self._get_static_config(pipette_id).model
+
+    def get_minimum_volume(self, pipette_id: str) -> float:
+        """Return the given pipette's minimum volume."""
+        return self._get_static_config(pipette_id).min_volume
+
+    def get_maximum_volume(self, pipette_id: str) -> float:
+        """Return the given pipette's maximum volume."""
+        return self._get_static_config(pipette_id).max_volume
+
+    def get_z_axis(self, pipette_id: str) -> MotorAxis:
+        """Get the MotorAxis representing this pipette's Z stage."""
+        mount = self.get(pipette_id).mount
+        return MotorAxis.LEFT_Z if mount == MountType.LEFT else MotorAxis.RIGHT_Z
+
+    def get_plunger_axis(self, pipette_id: str) -> MotorAxis:
+        """Get the MotorAxis representing this pipette's plunger."""
+        mount = self.get(pipette_id).mount
+        return (
+            MotorAxis.LEFT_PLUNGER
+            if mount == MountType.LEFT
+            else MotorAxis.RIGHT_PLUNGER
+        )

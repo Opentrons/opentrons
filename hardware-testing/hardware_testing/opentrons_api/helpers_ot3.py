@@ -1,5 +1,5 @@
 """Opentrons helper methods."""
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from datetime import datetime
 from subprocess import run
 from time import time
@@ -15,7 +15,7 @@ from opentrons.hardware_control.backends.ot3utils import sensor_node_for_mount
 
 # TODO (lc 10-27-2022) This should be changed to an ot3 pipette object once we
 # have that well defined.
-from opentrons.hardware_control.instruments.ot2.pipette import Pipette
+from opentrons.hardware_control.instruments.ot3.pipette import Pipette
 from opentrons.hardware_control.motion_utilities import deck_from_machine
 from opentrons.hardware_control.ot3api import OT3API
 
@@ -289,24 +289,32 @@ def get_plunger_positions_ot3(
 ) -> Tuple[float, float, float, float]:
     """Update plunger current."""
     pipette = _get_pipette_from_mount(api, mount)
-    cfg = pipette.config
-    return cfg.top, cfg.bottom, cfg.blow_out, cfg.drop_tip
+    return (
+        pipette.plunger_positions.top,
+        pipette.plunger_positions.bottom,
+        pipette.plunger_positions.blow_out,
+        pipette.plunger_positions.drop_tip,
+    )
 
 
 async def update_pick_up_current(
-    api: OT3API, mount: OT3Mount, current: Optional[float] = 0.125
+    api: OT3API, mount: OT3Mount, current: float = 0.125
 ) -> None:
     """Update pick-up-tip current."""
     pipette = _get_pipette_from_mount(api, mount)
-    pipette._config = replace(pipette.config, pick_up_current=current)
+    config_model = pipette.pick_up_configurations
+    config_model.current = current
+    pipette.pick_up_configurations = config_model
 
 
 async def update_pick_up_distance(
-    api: OT3API, mount: OT3Mount, distance: Optional[float] = 17.0
+    api: OT3API, mount: OT3Mount, distance: float = 17.0
 ) -> None:
     """Update pick-up-tip current."""
     pipette = _get_pipette_from_mount(api, mount)
-    pipette._config = replace(pipette.config, pick_up_distance=distance)
+    config_model = pipette.pick_up_configurations
+    config_model.distance = distance
+    pipette.pick_up_configurations = config_model
 
 
 async def move_plunger_absolute_ot3(
@@ -373,6 +381,16 @@ def get_endstop_position_ot3(api: OT3API, mount: OT3Mount) -> Dict[OT3Axis, floa
     return {ax: val for ax, val in mount_pos_per_axis.items()}
 
 
+def get_gantry_homed_position_ot3(api: OT3API, mount: OT3Mount) -> Point:
+    """Get the homed coordinate by mount."""
+    axes_pos = get_endstop_position_ot3(api, mount)
+    return Point(
+        x=axes_pos[OT3Axis.X],
+        y=axes_pos[OT3Axis.Y],
+        z=axes_pos[OT3Axis.by_mount(mount)],
+    )
+
+
 class OT3JogTermination(Exception):
     """Jogging terminated."""
 
@@ -427,15 +445,14 @@ async def _jog_print_current_position(
     motors_pos = await api.current_position_ot3(
         mount=mount, critical_point=critical_point
     )
-    enc_pos = await api.encoder_current_position(
+    enc_pos = await api.encoder_current_position_ot3(
         mount=mount, critical_point=critical_point
     )
     mx, my, mz, mp = [
         round(motors_pos[ax], 2) for ax in [OT3Axis.X, OT3Axis.Y, z_axis, instr_axis]
     ]
     ex, ey, ez, ep = [
-        round(enc_pos[ax.to_axis()], 2)
-        for ax in [OT3Axis.X, OT3Axis.Y, z_axis, instr_axis]
+        round(enc_pos[ax], 2) for ax in [OT3Axis.X, OT3Axis.Y, z_axis, instr_axis]
     ]
     print(f"Deck Coordinate: X={mx}, Y={my}, Z={mz}, Instr={mp}")
     print(f"Enc. Coordinate: X={ex}, Y={ey}, Z={ez}, Instr={ep}")
@@ -579,11 +596,30 @@ async def wait_for_stable_capacitance_ot3(
         )
 
 
+def get_pipette_offset_ot3(api: OT3API, mount: OT3Mount) -> Point:
+    """Get pipette offset OT3."""
+    pipette = api.hardware_pipettes[mount.to_mount()]
+    assert pipette, f"No pipette found on mount: {mount}"
+    return pipette._pipette_offset.offset + Point()
+
+
 def set_pipette_offset_ot3(api: OT3API, mount: OT3Mount, offset: Point) -> None:
     """Set pipette offset OT3."""
     pipette = api.hardware_pipettes[mount.to_mount()]
     assert pipette, f"No pipette found on mount: {mount}"
     pipette._pipette_offset.offset = offset
+
+
+def get_gripper_offset_ot3(api: OT3API) -> Point:
+    """Get gripper offset OT3."""
+    assert api.has_gripper, "No gripper found"
+    return api._gripper_handler._gripper._calibration_offset.offset  # type: ignore[union-attr]
+
+
+def set_gripper_offset_ot3(api: OT3API, offset: Point) -> None:
+    """Set gripper offset OT3."""
+    assert api.has_gripper, "No gripper found"
+    api._gripper_handler._gripper._calibration_offset.offset = offset  # type: ignore[union-attr]
 
 
 def get_slot_top_left_position_ot3(slot: int) -> Point:

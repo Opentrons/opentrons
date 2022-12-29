@@ -1,115 +1,24 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { Switch, Route, Redirect } from 'react-router-dom'
 import { hot } from 'react-hot-loader/root'
 
-import {
-  Flex,
-  Box,
-  POSITION_RELATIVE,
-  POSITION_FIXED,
-  DIRECTION_ROW,
-  COLORS,
-  OVERFLOW_SCROLL,
-} from '@opentrons/components'
+import { Flex, POSITION_FIXED, DIRECTION_ROW } from '@opentrons/components'
 
 import { GlobalStyle } from '../atoms/GlobalStyle'
-import { Alerts } from '../organisms/Alerts'
-import { Breadcrumbs } from '../organisms/Breadcrumbs'
-import { CalibrationDashboard } from '../pages/Devices/CalibrationDashboard'
-import { DeviceDetails } from '../pages/Devices/DeviceDetails'
-import { DevicesLanding } from '../pages/Devices/DevicesLanding'
-import { ProtocolRunDetails } from '../pages/Devices/ProtocolRunDetails'
-import { RobotSettings } from '../pages/Devices/RobotSettings'
-import { ProtocolsLanding } from '../pages/Protocols/ProtocolsLanding'
-import { ProtocolDetails } from '../pages/Protocols/ProtocolDetails'
-import { AppSettings } from '../pages/AppSettings'
-import { Labware } from '../pages/Labware'
 import { getIsOnDevice } from '../redux/config'
-import { getLocalRobot } from '../redux/discovery'
-import { useSoftwareUpdatePoll } from './hooks'
-import { Navbar } from './Navbar'
-import { PortalRoot as ModalPortalRoot, TopPortalRoot } from './portal'
-
-import type { RouteProps } from './types'
+import { DesktopApp } from './DesktopApp'
+import { OnDeviceDisplayApp } from './OnDeviceDisplayApp'
+import { TopPortalRoot } from './portal'
 
 const stopEvent = (event: React.MouseEvent): void => event.preventDefault()
 
-export const AppComponent = (): JSX.Element => {
-  useSoftwareUpdatePoll()
-
+export const AppComponent = (): JSX.Element | null => {
   const isOnDevice = useSelector(getIsOnDevice)
-  const localRobot = useSelector(getLocalRobot)
 
-  const allRoutes: RouteProps[] = [
-    {
-      Component: ProtocolsLanding,
-      exact: true,
-      name: 'Protocols',
-      navLinkTo: '/protocols',
-      path: '/protocols',
-    },
-    {
-      Component: ProtocolDetails,
-      exact: true,
-      name: 'Protocol Details',
-      path: '/protocols/:protocolKey',
-    },
-    {
-      Component: Labware,
-      name: 'Labware',
-      navLinkTo: '/labware',
-      path: '/labware',
-    },
-    {
-      Component: DevicesLanding,
-      exact: true,
-      name: 'Devices',
-      navLinkTo: !isOnDevice ? '/devices' : undefined,
-      path: '/devices',
-    },
-    {
-      Component: DeviceDetails,
-      exact: true,
-      name: 'Device',
-      navLinkTo: isOnDevice
-        ? // placeholder robot name, for empty localhost discovery cache
-          `/devices/${localRobot?.name ?? 'localhost-robot-name'}`
-        : undefined,
-      path: '/devices/:robotName',
-    },
-    {
-      Component: RobotSettings,
-      exact: true,
-      name: 'Robot Settings',
-      path: '/devices/:robotName/robot-settings/:robotSettingsTab?',
-    },
-    {
-      Component: CalibrationDashboard,
-      exact: true,
-      name: 'Calibration Dashboard',
-      path: '/devices/:robotName/robot-settings/calibration/dashboard',
-    },
-    {
-      Component: ProtocolRunDetails,
-      name: 'Run Details',
-      path: '/devices/:robotName/protocol-runs/:runId/:protocolRunDetailsTab?',
-    },
-    {
-      Component: AppSettings,
-      exact: true,
-      name: 'App Settings',
-      path: '/app-settings/:appSettingsTab?',
-    },
-  ]
-
-  const isOnDeviceRoutes = allRoutes.filter(route => route.path !== '/devices')
-
-  const routes = isOnDevice ? isOnDeviceRoutes : allRoutes
-
-  return (
+  // render null until getIsOnDevice returns the isOnDevice value from config
+  return isOnDevice != null ? (
     <>
-      <GlobalStyle />
+      <GlobalStyle isOnDevice={isOnDevice} />
       <Flex
         position={POSITION_FIXED}
         flexDirection={DIRECTION_ROW}
@@ -119,33 +28,10 @@ export const AppComponent = (): JSX.Element => {
         onDrop={stopEvent}
       >
         <TopPortalRoot />
-        <Navbar routes={routes} />
-        <Box width="100%">
-          <Switch>
-            {routes.map(({ Component, exact, path }: RouteProps) => {
-              return (
-                <Route key={path} exact={exact} path={path}>
-                  <Breadcrumbs />
-                  <Box
-                    position={POSITION_RELATIVE}
-                    width="100%"
-                    height="100%"
-                    backgroundColor={COLORS.fundamentalsBackground}
-                    overflow={OVERFLOW_SCROLL}
-                  >
-                    <ModalPortalRoot />
-                    <Component />
-                  </Box>
-                </Route>
-              )
-            })}
-            <Redirect exact from="/" to="/protocols" />
-          </Switch>
-          <Alerts />
-        </Box>
+        {isOnDevice ? <OnDeviceDisplayApp /> : <DesktopApp />}
       </Flex>
     </>
-  )
+  ) : null
 }
 
 export const App = hot(AppComponent)

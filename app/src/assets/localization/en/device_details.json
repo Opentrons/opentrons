@@ -120,5 +120,10 @@
   "module_name_error": "{{moduleName}} error",
   "view": "View",
   "error_details": "error details",
-  "module_error_contact_support": "Try powering the module off and on again. If the error persists, contact Opentrons Support."
+  "module_error_contact_support": "Try powering the module off and on again. If the error persists, contact Opentrons Support.",
+  "both_mounts": "Both Mounts",
+  "ready": "Ready",
+  "run_again": "Run again",
+  "have_not_run": "You haven’t run anything!",
+  "have_not_run_description": "Send a protocol to your OT-3 from the desktop app to get started!"
 }

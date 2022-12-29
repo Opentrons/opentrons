@@ -7,6 +7,7 @@ objects on the deck (as opposed to calling commands on them, which is handled
 by :py:mod:`.module_contexts`)
 """
 from __future__ import annotations
+
 import logging
 from typing import TYPE_CHECKING, Optional
 
@@ -31,7 +32,7 @@ from opentrons.hardware_control.modules.types import (
     ThermocyclerModuleModel,
     HeaterShakerModuleModel,
 )
-from opentrons.protocols.geometry.deck_item import DeckItem
+from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
 from .types import ThermocyclerConfiguration
 
@@ -40,7 +41,7 @@ if TYPE_CHECKING:
     from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
 
 
-log = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
 
 
 class NoSuchModuleError(ValueError):
@@ -52,7 +53,7 @@ class PipetteMovementRestrictedByHeaterShakerError(Exception):
 
 
 # TODO (spp, 2022-05-09): add tests
-class ModuleGeometry(DeckItem):
+class ModuleGeometry:
     """
     This class represents an active peripheral, such as an Opentrons Magnetic
     Module, Temperature Module or Thermocycler Module. It defines the physical
@@ -62,7 +63,10 @@ class ModuleGeometry(DeckItem):
 
     @property
     def separate_calibration(self) -> bool:
-        # If a module is the parent of a labware it affects calibration
+        _log.warning(
+            "ModuleGeometry.separate_calibrations is a deprecated internal property."
+            " It has no longer has meaning, but will always return `True`"
+        )
         return True
 
     def __init__(
@@ -257,7 +261,9 @@ class ThermocyclerGeometry(ModuleGeometry):
         else:
             return {7, 8, 10, 11}
 
-    # NOTE: this func is unused until "semi" configuration
+    # TODO(mc, 2022-11-16): this method causes bugs and should not be used;
+    # Thermocycler `configuration="semi"` does not work properly and should be removed
+    # https://opentrons.atlassian.net/browse/RSS-106
     def labware_accessor(self, labware: Labware) -> Labware:
         from opentrons.protocol_api.labware import Labware
         from opentrons.protocol_api.core.protocol_api.labware import (
@@ -269,6 +275,7 @@ class ThermocyclerGeometry(ModuleGeometry):
         definition["ordering"] = definition["ordering"][2::]
         return Labware(
             implementation=LabwareImplementation(definition, super().location),
+            api_version=MAX_SUPPORTED_VERSION,
         )
 
     def add_labware(self, labware: Labware) -> Labware:
@@ -450,7 +457,7 @@ def create_geometry(
     )
     if not parent.labware.is_slot:
         par = ""
-        log.warning(
+        _log.warning(
             f"module location parent labware was {parent.labware} which is"
             "not a slot name; slot transforms will not be loaded"
         )

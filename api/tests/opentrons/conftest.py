@@ -117,14 +117,6 @@ async def enable_ot3_hardware_controller(
     decoy.when(config.feature_flags.enable_ot3_hardware_controller()).then_return(True)
 
 
-@pytest.fixture
-async def enable_load_liquid() -> AsyncGenerator[None, None]:
-    """Fixture enabling load-liquid support."""
-    await config.advanced_settings.set_adv_setting("enableLoadLiquid", True)
-    yield
-    await config.advanced_settings.set_adv_setting("enableLoadLiquid", False)
-
-
 @pytest.fixture()
 def protocol_file() -> str:
     return "testosaur_v2.py"
@@ -644,12 +636,12 @@ def min_lw2_impl(minimal_labware_def2: LabwareDefinition) -> LabwareImplementati
 
 @pytest.fixture()
 def min_lw(min_lw_impl: LabwareImplementation) -> Labware:
-    return Labware(implementation=min_lw_impl)
+    return Labware(implementation=min_lw_impl, api_version=MAX_SUPPORTED_VERSION)
 
 
 @pytest.fixture()
 def min_lw2(min_lw2_impl: LabwareImplementation) -> Labware:
-    return Labware(implementation=min_lw2_impl)
+    return Labware(implementation=min_lw2_impl, api_version=MAX_SUPPORTED_VERSION)
 
 
 @pytest.fixture()

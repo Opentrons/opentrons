@@ -9,10 +9,11 @@ from typing import (
     NamedTuple,
     Optional,
     Sequence,
-    overload,
-    Union,
+    Set,
     Type,
     TypeVar,
+    Union,
+    overload,
 )
 from numpy import array, dot
 
@@ -403,6 +404,21 @@ class ModuleView(HasState[ModuleState]):
         """Get a list of all module entries in state."""
         return [self.get(mod_id) for mod_id in self._state.slot_by_module_id.keys()]
 
+    # TODO(mc, 2022-12-09): enforce data integrity (e.g. one module per slot)
+    # rather than shunting this work to callers via `allowed_ids`.
+    # This has larger implications and is tied up in splitting LPC out of the protocol run
+    def get_by_slot(
+        self, slot_name: DeckSlotName, allowed_ids: Set[str]
+    ) -> Optional[LoadedModule]:
+        """Get the module located in a given slot, if any."""
+        slots_by_id = reversed(list(self._state.slot_by_module_id.items()))
+
+        for module_id, module_slot in slots_by_id:
+            if module_slot == slot_name and module_id in allowed_ids:
+                return self.get(module_id)
+
+        return None
+
     def _get_module_substate(
         self, module_id: str, expected_type: Type[ModuleSubStateT], expected_name: str
     ) -> ModuleSubStateT:
@@ -525,7 +541,6 @@ class ModuleView(HasState[ModuleState]):
         """Get the specified module's dimensions."""
         return self.get_definition(module_id).dimensions
 
-    # TODO(mc, 2022-01-19): this method is missing unit test coverage
     def get_module_offset(self, module_id: str) -> LabwareOffsetVector:
         """Get the module's offset vector computed with slot transform."""
         definition = self.get_definition(module_id)

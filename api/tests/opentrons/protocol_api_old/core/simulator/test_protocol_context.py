@@ -30,6 +30,7 @@ def subject(request: pytest.FixtureRequest) -> ProtocolCore:
     return request.param  # type: ignore[attr-defined, no-any-return]
 
 
+@pytest.mark.ot2_only
 def test_replacing_instrument_tip_state(
     subject: ProtocolCore, tip_rack: LabwareCore
 ) -> None:
@@ -47,9 +48,9 @@ def test_replacing_instrument_tip_state(
 
     pip1.pick_up_tip(
         location=Location(
-            point=tip_rack.get_wells()[0].get_top(z_offset=0), labware=None
+            point=tip_rack.get_well_core("A1").get_top(z_offset=0), labware=None
         ),
-        well_core=tip_rack.get_wells()[0],
+        well_core=tip_rack.get_well_core("A1"),
         presses=None,
         increment=None,
         prep_after=False,
@@ -57,7 +58,9 @@ def test_replacing_instrument_tip_state(
     assert pip1.has_tip() is True
     assert pip2.has_tip() is True
 
-    pip2.drop_tip(location=None, well_core=tip_rack.get_wells()[0], home_after=False)
+    pip2.drop_tip(
+        location=None, well_core=tip_rack.get_well_core("A1"), home_after=False
+    )
 
     assert pip1.has_tip() is False
     assert pip2.has_tip() is False

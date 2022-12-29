@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 import { getPipetteModelSpecs, LEFT, RIGHT } from '@opentrons/shared-data'
 import { useModulesQuery, usePipettesQuery } from '@opentrons/react-api-client'
 
@@ -13,17 +14,32 @@ import {
   SIZE_3,
   SPACING,
   TYPOGRAPHY,
+  useInterval,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
-import { InstrumentCard } from '../../molecules/InstrumentCard'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ModuleCard } from '../ModuleCard'
-import { useIsOT3, useIsRobotViewable, useRunStatuses } from './hooks'
+import {
+  useIsOT3,
+  useIsRobotViewable,
+  usePipetteOffsetCalibrations,
+  useRunStatuses,
+} from './hooks'
+import {
+  getIs96ChannelPipetteAttached,
+  getOffsetCalibrationForMount,
+} from './utils'
 import { PipetteCard } from './PipetteCard'
+import { GripperCard } from '../GripperCard'
+import { fetchPipetteOffsetCalibrations } from '../../redux/calibration'
+
+import type { Dispatch } from '../../redux/types'
 
 const EQUIPMENT_POLL_MS = 5000
+const FETCH_PIPETTE_LONG_POLL = 30000
+const FETCH_PIPETTE_SHORT_POLL = 1000
 interface InstrumentsAndModulesProps {
   robotName: string
 }
@@ -40,7 +56,17 @@ export function InstrumentsAndModules({
   const currentRunId = useCurrentRunId()
   const { isRunTerminal } = useRunStatuses()
   const isOT3 = useIsOT3(robotName)
+  const dispatch = useDispatch<Dispatch>()
 
+  // TODO(BC, 2022-12-05): replace with attachedGripper after RLAB-88 is done
+  const [tempAttachedGripper, tempSetAttachedGripper] = React.useState<{
+    model: string
+    serialNumber: string
+  } | null>(null)
+
+  const is96ChannelAttached = getIs96ChannelPipetteAttached(
+    attachedPipettes?.left ?? null
+  )
   const attachedModules =
     useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
   // split modules in half and map into each column separately to avoid
@@ -53,9 +79,35 @@ export function InstrumentsAndModules({
   const leftColumnModules = attachedModules?.slice(0, halfAttachedModulesSize)
   const rightColumnModules = attachedModules?.slice(halfAttachedModulesSize)
 
-  // TODO(bh, 2022-10-27): get gripper data, create interface
-  // const gripper = { model: null }
-  const gripper = { model: 'Opentrons Gripper GEN1' }
+  // The following pipetteOffset related code has been lifted out of the PipetteCard component
+  // to eliminate duplicated useInterval calls to `calibration/pipette_offset` coming from each card.
+  // Instead we now capture all offset calibration data here, and pass the appropriate calibration
+  // data to the associated card via props
+  const pipetteOffsetCalibrations = usePipetteOffsetCalibrations(robotName)
+  const leftMountOffsetCalibration = getOffsetCalibrationForMount(
+    pipetteOffsetCalibrations,
+    attachedPipettes,
+    LEFT
+  )
+  const rightMountOffsetCalibration = getOffsetCalibrationForMount(
+    pipetteOffsetCalibrations,
+    attachedPipettes,
+    RIGHT
+  )
+
+  const allAttachedPipettesHaveOffsetCals =
+    (attachedPipettes.left == null || leftMountOffsetCalibration != null) &&
+    (attachedPipettes.right == null || rightMountOffsetCalibration != null)
+
+  useInterval(
+    () => {
+      dispatch(fetchPipetteOffsetCalibrations(robotName))
+    },
+    allAttachedPipettesHaveOffsetCals
+      ? FETCH_PIPETTE_LONG_POLL
+      : FETCH_PIPETTE_SHORT_POLL,
+    true
+  )
 
   return (
     <Flex
@@ -103,35 +155,24 @@ export function InstrumentsAndModules({
                     ? getPipetteModelSpecs(attachedPipettes.left?.model) ?? null
                     : null
                 }
+                pipetteOffsetCalibration={leftMountOffsetCalibration}
                 mount={LEFT}
                 robotName={robotName}
+                is96ChannelAttached={is96ChannelAttached}
               />
               {/* extension mount here */}
               {isOT3 ? (
-                <InstrumentCard
-                  description={
-                    gripper.model != null ? gripper.model : t('shared:empty')
-                  }
-                  isGripperAttached={gripper.model != null}
-                  label={t('shared:extension_mount')}
-                  // TODO(bh, 2022-10-27): insert gripper recalibrate and detach functions, empty mount menu items
-                  menuOverlayItems={[
-                    {
-                      label: 'Recalibrate gripper',
-                      disabled: gripper.model == null,
-                      onClick: () => console.log('Recalibrate gripper'),
-                    },
-                    {
-                      label: 'Detach gripper',
-                      disabled: gripper.model == null,
-                      onClick: () => console.log('Detach gripper'),
-                    },
-                  ]}
+                <GripperCard
+                  robotName={robotName}
+                  attachedGripper={tempAttachedGripper}
+                  tempSetAttachedGripper={tempSetAttachedGripper}
                 />
               ) : null}
               {leftColumnModules.map((module, index) => (
                 <ModuleCard
-                  key={`moduleCard_${module.moduleType}_${index}`}
+                  key={`moduleCard_${String(module.moduleType)}_${String(
+                    index
+                  )}`}
                   robotName={robotName}
                   module={module}
                   isLoadedInRun={false}
@@ -143,20 +184,26 @@ export function InstrumentsAndModules({
               flexDirection={DIRECTION_COLUMN}
               gridGap={SPACING.spacing3}
             >
-              <PipetteCard
-                pipetteId={attachedPipettes.right?.id}
-                pipetteInfo={
-                  attachedPipettes.right?.model != null
-                    ? getPipetteModelSpecs(attachedPipettes.right?.model) ??
-                      null
-                    : null
-                }
-                mount={RIGHT}
-                robotName={robotName}
-              />
+              {!Boolean(is96ChannelAttached) ? (
+                <PipetteCard
+                  pipetteId={attachedPipettes.right?.id}
+                  pipetteInfo={
+                    attachedPipettes.right?.model != null
+                      ? getPipetteModelSpecs(attachedPipettes.right?.model) ??
+                        null
+                      : null
+                  }
+                  pipetteOffsetCalibration={rightMountOffsetCalibration}
+                  mount={RIGHT}
+                  robotName={robotName}
+                  is96ChannelAttached={false}
+                />
+              ) : null}
               {rightColumnModules.map((module, index) => (
                 <ModuleCard
-                  key={`moduleCard_${module.moduleType}_${index}`}
+                  key={`moduleCard_${String(module.moduleType)}_${String(
+                    index
+                  )}`}
                   robotName={robotName}
                   module={module}
                   isLoadedInRun={false}

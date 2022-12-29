@@ -1,5 +1,6 @@
 """Synchronous ProtocolEngine client module."""
-from typing import cast, List, Optional
+from typing import cast, List, Optional, Union
+from typing_extensions import Literal
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareUri
@@ -18,6 +19,8 @@ from ..types import (
     LabwareMovementStrategy,
     ModuleModel,
     WellLocation,
+    LabwareOffsetVector,
+    MotorAxis,
 )
 from .transports import AbstractSyncTransport
 
@@ -83,33 +86,43 @@ class SyncClient:
 
         return cast(commands.LoadLabwareResult, result)
 
+    # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     def move_labware(
         self,
         labware_id: str,
         new_location: LabwareLocation,
         strategy: LabwareMovementStrategy,
+        use_pick_up_location_lpc_offset: bool,
+        use_drop_location_lpc_offset: bool,
+        pick_up_offset: Optional[LabwareOffsetVector],
+        drop_offset: Optional[LabwareOffsetVector],
     ) -> commands.MoveLabwareResult:
         """Execute a MoveLabware command and return the result."""
         request = commands.MoveLabwareCreate(
             params=commands.MoveLabwareParams(
-                labwareId=labware_id, newLocation=new_location, strategy=strategy
+                labwareId=labware_id,
+                newLocation=new_location,
+                strategy=strategy,
+                usePickUpLocationLpcOffset=use_pick_up_location_lpc_offset,
+                useDropLocationLpcOffset=use_drop_location_lpc_offset,
+                pickUpOffset=pick_up_offset,
+                dropOffset=drop_offset,
             )
         )
         result = self._transport.execute_command(request=request)
 
         return cast(commands.MoveLabwareResult, result)
 
+    # TODO (tz, 11-23-22): remove Union when refactoring load_pipette for 96 channels.
+    # https://opentrons.atlassian.net/browse/RLIQ-255
     def load_pipette(
         self,
-        pipette_name: PipetteNameType,
+        pipette_name: Union[PipetteNameType, Literal["p1000_96"]],
         mount: MountType,
     ) -> commands.LoadPipetteResult:
         """Execute a LoadPipette command and return the result."""
         request = commands.LoadPipetteCreate(
-            params=commands.LoadPipetteParams(
-                pipetteName=pipette_name,
-                mount=mount,
-            )
+            params=commands.LoadPipetteParams(mount=mount, pipetteName=pipette_name)
         )
         result = self._transport.execute_command(request=request)
 
@@ -121,6 +134,9 @@ class SyncClient:
         labware_id: str,
         well_name: str,
         well_location: WellLocation,
+        minimum_z_height: Optional[float],
+        force_direct: bool,
+        speed: Optional[float],
     ) -> commands.MoveToWellResult:
         """Execute a MoveToWell command and return the result."""
         request = commands.MoveToWellCreate(
@@ -129,6 +145,9 @@ class SyncClient:
                 labwareId=labware_id,
                 wellName=well_name,
                 wellLocation=well_location,
+                forceDirect=force_direct,
+                minimumZHeight=minimum_z_height,
+                speed=speed,
             )
         )
         result = self._transport.execute_command(request=request)
@@ -141,6 +160,7 @@ class SyncClient:
         coordinates: DeckPoint,
         minimum_z_height: Optional[float],
         force_direct: bool,
+        speed: Optional[float],
     ) -> commands.MoveToCoordinatesResult:
         """Execute a MoveToCoordinates command and return the result."""
         request = commands.MoveToCoordinatesCreate(
@@ -149,6 +169,7 @@ class SyncClient:
                 coordinates=coordinates,
                 minimumZHeight=minimum_z_height,
                 forceDirect=force_direct,
+                speed=speed,
             )
         )
         result = self._transport.execute_command(request=request)
@@ -588,3 +609,9 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
         return cast(commands.temperature_module.DeactivateTemperatureResult, result)
+
+    def home(self, axes: Optional[List[MotorAxis]]) -> commands.HomeResult:
+        """Execute a `home` command and return the result."""
+        request = commands.HomeCreate(params=commands.HomeParams(axes=axes))
+        result = self._transport.execute_command(request=request)
+        return cast(commands.HomeResult, result)

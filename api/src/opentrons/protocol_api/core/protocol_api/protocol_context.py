@@ -1,10 +1,11 @@
 import logging
-from typing import Dict, List, Optional, Set, Union
+from typing import Dict, List, Optional, Set, Union, cast, Tuple
 
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
-from opentrons.types import Mount, Location, DeckSlotName
+from opentrons.types import DeckSlotName, Location, Mount, Point
 from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules import AbstractModule, ModuleModel, ModuleType
@@ -12,14 +13,14 @@ from opentrons.hardware_control.types import DoorState, PauseType
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import AxisMaxSpeeds, UnsupportedAPIError
 from opentrons.protocols.geometry import module_geometry
-from opentrons.protocols.geometry.deck import Deck
-from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocols import labware as labware_definition
 
+from ...labware import Labware
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 
 from . import legacy_module_core
+from .deck import Deck
 from .instrument_context import InstrumentContextImplementation
 from .labware_offset_provider import AbstractLabwareOffsetProvider
 from .labware import LabwareImplementation
@@ -43,7 +44,6 @@ class ProtocolContextImplementation(
         equipment_broker: Optional[EquipmentBroker[LoadInfo]] = None,
         deck_layout: Optional[Deck] = None,
         bundled_labware: Optional[Dict[str, LabwareDefinition]] = None,
-        bundled_data: Optional[Dict[str, bytes]] = None,
         extra_labware: Optional[Dict[str, LabwareDefinition]] = None,
     ) -> None:
         """Build a :py:class:`.ProtocolContextImplementation`.
@@ -78,12 +78,17 @@ class ProtocolContextImplementation(
         }
         self._bundled_labware = bundled_labware
         self._extra_labware = extra_labware or {}
-        self._bundled_data: Dict[str, bytes] = bundled_data or {}
         self._default_max_speeds = AxisMaxSpeeds()
         self._last_location: Optional[Location] = None
         self._last_mount: Optional[Mount] = None
         self._loaded_modules: Set["AbstractModule"] = set()
         self._module_cores: List[legacy_module_core.LegacyModuleCore] = []
+        self._labware_cores: List[LabwareImplementation] = [self.fixed_trash]
+
+    @property
+    def api_version(self) -> APIVersion:
+        """Get the API version the protocol is adhering to."""
+        return self._api_version
 
     @property
     def equipment_broker(self) -> EquipmentBroker[LoadInfo]:
@@ -96,12 +101,6 @@ class ProtocolContextImplementation(
         Calling code may only subscribe or unsubscribe.
         """
         return self._equipment_broker
-
-    def get_bundled_data(self) -> Dict[str, bytes]:
-        """Extra bundled data."""
-        # TODO AL 20201110 - This should be removed along with the bundling
-        #  feature as we move to HTTP based protocol execution.
-        return self._bundled_data
 
     def get_bundled_labware(self) -> Optional[Dict[str, LabwareDefinition]]:
         """Bundled labware definition."""
@@ -182,6 +181,7 @@ class ProtocolContextImplementation(
         )
         labware_core.set_calibration(labware_offset.delta)
 
+        self._labware_cores.append(labware_core)
         if isinstance(location, DeckSlotName):
             self._deck_layout[location.value] = labware_core
 
@@ -200,11 +200,16 @@ class ProtocolContextImplementation(
 
         return labware_core
 
+    # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     def move_labware(
         self,
         labware_core: LabwareImplementation,
         new_location: Union[DeckSlotName, legacy_module_core.LegacyModuleCore],
         use_gripper: bool,
+        use_pick_up_location_lpc_offset: bool,
+        use_drop_location_lpc_offset: bool,
+        pick_up_offset: Optional[Tuple[float, float, float]],
+        drop_offset: Optional[Tuple[float, float, float]],
     ) -> None:
         """Move labware to new location."""
         raise UnsupportedAPIError(
@@ -335,12 +340,17 @@ class ProtocolContextImplementation(
         """Get the deck layout."""
         return self._deck_layout
 
-    def get_fixed_trash(self) -> DeckItem:
+    @property
+    def fixed_trash(self) -> LabwareImplementation:
         """The trash fixed to slot 12 of the robot deck."""
         trash = self._deck_layout["12"]
-        if not trash:
-            raise RuntimeError("Robot must have a trash container in 12")
-        return trash
+
+        if isinstance(trash, LabwareImplementation):
+            return trash
+        if isinstance(trash, Labware):
+            return cast(LabwareImplementation, trash._implementation)
+
+        raise RuntimeError("Robot must have a trash container in 12")
 
     def set_rail_lights(self, on: bool) -> None:
         """Set the rail light state."""
@@ -376,3 +386,27 @@ class ProtocolContextImplementation(
     def get_module_cores(self) -> List[legacy_module_core.LegacyModuleCore]:
         """Get loaded module cores."""
         return self._module_cores
+
+    def get_labware_cores(self) -> List[LabwareImplementation]:
+        """Get all loaded labware cores."""
+        return self._labware_cores
+
+    def get_deck_definition(self) -> DeckDefinitionV3:
+        """Get the geometry definition of the robot's deck."""
+        raise NotImplementedError(
+            "LegacyProtocolCore.get_deck_definition not implemented"
+        )
+
+    def get_slot_item(
+        self, slot_name: DeckSlotName
+    ) -> Union[LabwareImplementation, legacy_module_core.LegacyModuleCore, None]:
+        """Get the contents of a given slot, if any."""
+        raise NotImplementedError("LegacyProtocolCore.get_slot_item not implemented")
+
+    def get_slot_center(self, slot_name: DeckSlotName) -> Point:
+        """Get the absolute coordinate of a slot's center."""
+        raise NotImplementedError("LegacyProtocolCore.get_slot_center not implemented.")
+
+    def get_highest_z(self) -> float:
+        """Get the highest Z point of all deck items."""
+        raise NotImplementedError("LegacyProtocolCore.get_highest_z not implemented")

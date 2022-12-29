@@ -1,10 +1,9 @@
 """ProtocolEngine-based Well core implementations."""
-import re
-
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
+from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.types import Point
 
@@ -20,8 +19,6 @@ class WellCore(AbstractWellCore):
         engine_client: Synchronous ProtocolEngine client.
     """
 
-    _well_name_pattern = re.compile(WELL_NAME_PATTERN, re.X)
-
     def __init__(self, name: str, labware_id: str, engine_client: EngineClient) -> None:
         self._labware_id = labware_id
         self._engine_client = engine_client
@@ -29,9 +26,7 @@ class WellCore(AbstractWellCore):
             labware_id=labware_id, well_name=name
         )
 
-        # TODO(mc, 2022-11-11): redo this implementation
-        # https://opentrons.atlassian.net/browse/RCORE-380
-        name_match = self._well_name_pattern.match(name)
+        name_match = WELL_NAME_PATTERN.match(name)
         self._name = name
         self._row_name = name_match.group(1) if name_match is not None else ""
         self._column_name = name_match.group(2) if name_match is not None else ""
@@ -41,13 +36,22 @@ class WellCore(AbstractWellCore):
         """Get the ID of the well's parent labware."""
         return self._labware_id
 
+    @property
+    def geometry(self) -> WellGeometry:
+        """Get the well's geometry information interface."""
+        raise NotImplementedError("WellCore.geometry not implemented")
+
     def has_tip(self) -> bool:
         """Whether the well contains a tip."""
-        raise NotImplementedError("WellCore.has_tip not implemented")
+        return self._engine_client.state.tips.has_clean_tip(
+            self._labware_id, self._name
+        )
 
     def set_has_tip(self, value: bool) -> None:
         """Set the well as containing or not containing a tip."""
-        raise NotImplementedError("WellCore.set_has_tip not implemented")
+        raise APIVersionError(
+            "Manually setting the tip state of a well in a tip rack has been deprecated."
+        )
 
     def get_display_name(self) -> str:
         """Get the well's full display name."""
@@ -99,7 +103,3 @@ class WellCore(AbstractWellCore):
             labware_id=self.labware_id, well_name=self._name
         )
         return self.get_bottom(z_offset=well_height / 2)
-
-    def get_geometry(self) -> WellGeometry:
-        """Get the well's geometry information interface."""
-        raise NotImplementedError("WellCore.get_geometry not implemented")

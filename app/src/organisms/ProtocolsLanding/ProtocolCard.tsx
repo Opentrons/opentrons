@@ -8,7 +8,6 @@ import {
   getModuleType,
   getPipetteNameSpecs,
   ProtocolAnalysisOutput,
-  THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 import {
   Box,
@@ -33,14 +32,17 @@ import {
   parseAllRequiredModuleModels,
 } from '@opentrons/api-client'
 
-import { useFeatureFlag } from '../../redux/config'
 import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
 import { InstrumentContainer } from '../../atoms/InstrumentContainer'
 import { StyledText } from '../../atoms/text'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
-import { getAnalysisStatus, getProtocolDisplayName } from './utils'
+import {
+  getAnalysisStatus,
+  getProtocolDisplayName,
+  getRobotTypeDisplayName,
+} from './utils'
 
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
@@ -91,6 +93,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
         right={SPACING.spacing2}
       >
         <ProtocolOverflowMenu
+          protocolDisplayName={protocolDisplayName}
           protocolKey={protocolKey}
           handleRunProtocol={handleRunProtocol}
         />
@@ -115,7 +118,6 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
     modified,
   } = props
   const { t } = useTranslation(['protocol_list', 'shared'])
-  const enableThermocyclerGen2 = useFeatureFlag('enableThermocyclerGen2')
   const analysisStatus = getAnalysisStatus(isAnalyzing, mostRecentAnalysis)
 
   const { left: leftMountPipetteName, right: rightMountPipetteName } =
@@ -126,11 +128,9 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
     mostRecentAnalysis != null ? mostRecentAnalysis.commands : []
   )
 
-  const requiredModuleModelsWithFF = enableThermocyclerGen2
-    ? requiredModuleModels
-    : requiredModuleModels.filter(mod => mod !== THERMOCYCLER_MODULE_V2)
+  const requiredModuleTypes = requiredModuleModels.map(getModuleType)
 
-  const requiredModuleTypes = requiredModuleModelsWithFF.map(getModuleType)
+  const robotType = mostRecentAnalysis?.robotType ?? null
 
   return (
     <Flex
@@ -187,15 +187,16 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
             <Flex gridGap={SPACING.spacing4}>
               <Flex
-                flex={`0 0 ${SIZE_2}`}
+                flex={`0 0 ${String(SIZE_2)}`}
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing2}
               >
                 <StyledText as="h6" color={COLORS.darkGreyEnabled}>
                   {t('robot')}
                 </StyledText>
-                {/* TODO(bh, 2022-10-14): read intended robot from protocol */}
-                <StyledText as="p">OT-2</StyledText>
+                <StyledText as="p">
+                  {getRobotTypeDisplayName(robotType)}
+                </StyledText>
               </Flex>
               <Flex
                 flex="1"

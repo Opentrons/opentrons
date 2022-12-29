@@ -12,6 +12,7 @@ from opentrons_shared_data.pipette.dev_types import (
     PipetteName,
     ChannelCount,
 )
+from opentrons_shared_data.pipette.pipette_definition import PipetteConfigurations
 from opentrons_shared_data.gripper.dev_types import (
     GripperModel,
     GripperName,
@@ -41,6 +42,11 @@ class AttachedPipette(TypedDict):
     id: Optional[str]
 
 
+class OT3AttachedPipette(TypedDict):
+    config: Optional[PipetteConfigurations]
+    id: Optional[str]
+
+
 class AttachedGripper(TypedDict):
     config: Optional[GripperConfig]
     id: Optional[str]
@@ -48,7 +54,7 @@ class AttachedGripper(TypedDict):
 
 AttachedInstruments = Dict[Mount, AttachedPipette]
 
-OT3AttachedInstruments = Union[AttachedPipette, AttachedGripper]
+OT3AttachedInstruments = Union[OT3AttachedPipette, AttachedGripper]
 
 EIGHT_CHANNELS = Literal[8]
 ONE_CHANNEL = Literal[1]

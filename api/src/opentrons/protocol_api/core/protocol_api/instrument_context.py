@@ -11,7 +11,6 @@ from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
-    Clearances,
     build_edges,
     FlowRates,
     PlungerSpeeds,
@@ -48,9 +47,6 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
         self._mount = mount
         self._instrument_name = instrument_name
         self._default_speed = default_speed
-        self._well_bottom_clearances = Clearances(
-            default_aspirate=1.0, default_dispense=1.0
-        )
         self._flow_rates = FlowRates(self)
         self._speeds = PlungerSpeeds(self)
         self._flow_rates.set_defaults(api_level=self._api_version)
@@ -153,12 +149,13 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
         from opentrons.protocol_api.labware import Labware, Well
 
         edges = build_edges(
-            # TODO(mc, 2022-10-26): respect api_version
-            # https://opentrons.atlassian.net/browse/RSS-97
             where=Well(
-                parent=Labware(implementation=location.get_geometry().parent),
+                parent=Labware(
+                    implementation=location.geometry.parent,
+                    api_version=self._api_version,
+                ),
                 well_implementation=location,
-                api_version=MAX_SUPPORTED_VERSION,
+                api_version=self._api_version,
             ),
             offset=v_offset,
             mount=self._mount,
@@ -179,7 +176,7 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
     ) -> None:
         """Pick up a tip for the pipette to run liquid-handling commands."""
         hw = self._protocol_interface.get_hardware()
-        geometry = well_core.get_geometry()
+        geometry = well_core.geometry
         tip_rack_core = geometry.parent
         tip_length = instrument_support.tip_length_for(
             pipette=self.get_hardware_state(),
@@ -210,7 +207,7 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
             well_core: The well we're dropping into
             home_after: Whether to home the pipette after the tip is dropped.
         """
-        labware_core = well_core.get_geometry().parent
+        labware_core = well_core.geometry.parent
 
         if location is None:
             from opentrons.protocol_api.labware import Labware, Well
@@ -406,10 +403,6 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
     def get_return_height(self) -> float:
         """The height to return a tip to its tiprack."""
         return self.get_hardware_state().get("return_tip_height", 0.5)
-
-    def get_well_bottom_clearance(self) -> Clearances:
-        """The distance above the bottom of a well to aspirate or dispense."""
-        return self._well_bottom_clearances
 
     def get_flow_rate(self) -> FlowRates:
         return self._flow_rates

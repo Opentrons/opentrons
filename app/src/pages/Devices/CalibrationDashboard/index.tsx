@@ -5,12 +5,12 @@ import { useHistory, useParams } from 'react-router-dom'
 import { COLORS } from '@opentrons/components'
 
 import { Modal } from '../../../molecules/Modal'
-import type { NavRouteParams } from '../../../App/types'
+import type { DesktopRouteParams } from '../../../App/types'
 
 export function CalibrationDashboard(): JSX.Element {
   const { t } = useTranslation('robot_calibration')
   const history = useHistory()
-  const { robotName } = useParams<NavRouteParams>()
+  const { robotName } = useParams<DesktopRouteParams>()
 
   return (
     <Modal
