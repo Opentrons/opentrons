@@ -277,7 +277,7 @@ async def do_run(
             sensor_list.append(d.to_float())
             print(f"{ts:.3f}: {s} {d.to_float():5.3f}, \traw data: {str(rd)}")
         if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
-            # line = input()
+            line = input()
             await messenger.send(target_node, reset_message)
             break
     return sensor_list
