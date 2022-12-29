@@ -65,7 +65,7 @@ package-deps: clean lib deps
 
 .PHONY: dist-ot3
 dist-ot3: package-deps
-	NO_USB_DETECTION=true OT_APP_DEPLOY_BUCKET=opentrons-app OT_APP_DEPLOY_FOLDER=builds OPENTRONS_PROJECT=ot3 $(builder) --linux --arm64 --dir
+	NO_USB_DETECTION=true OT_APP_DEPLOY_BUCKET=opentrons-app OT_APP_DEPLOY_FOLDER=builds OPENTRONS_PROJECT=ot3 $(builder) --linux --arm64
 
 .PHONY: push-ot3
 push-ot3: dist-ot3
