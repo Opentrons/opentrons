@@ -6,10 +6,8 @@ import termios
 import sys
 import tty
 import select
-import logging
 import datetime
 from typing import Callable, Dict, Tuple, List
-from logging.config import dictConfig
 import subprocess
 from enum import Enum, unique
 from opentrons_hardware.hardware_control.types import NodeDict
@@ -303,6 +301,7 @@ async def run(args: argparse.Namespace) -> None:
     #gpio.deactivate_estop()
     node = ot3_nodes[args.node]
     subprocess.run(["systemctl", "stop", "opentrons-robot-server"])
+    await asyncio.sleep(1)
     position = {node: 0.0}
     driver = await build_driver(build_settings(args))
     messenger = CanMessenger(driver=driver)
@@ -373,37 +372,8 @@ async def run(args: argparse.Namespace) -> None:
 
     print("\n")
 
-
-log = logging.getLogger(__name__)
-
-LOG_CONFIG = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "basic": {"format": "%(asctime)s %(name)s %(levelname)s %(message)s"}
-    },
-    "handlers": {
-        "file_handler": {
-            "class": "logging.handlers.RotatingFileHandler",
-            "formatter": "basic",
-            "filename": "HT_tip_handling.log",
-            "maxBytes": 5000000,
-            "level": logging.INFO,
-            "backupCount": 3,
-        },
-    },
-    "loggers": {
-        "": {
-            "handlers": ["file_handler"],
-            "level": logging.INFO,
-        },
-    },
-}
-
-
 def main() -> None:
     """Entry point."""
-    dictConfig(LOG_CONFIG)
     parser = argparse.ArgumentParser(description="Pipette ICT TEST SCRIPT.")
     add_can_args(parser)
     parser.add_argument(
