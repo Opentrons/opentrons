@@ -53,7 +53,7 @@ def test_execute_function_apiv2(
         "id": "testid",
     }
     mock_get_attached_instr.return_value[types.Mount.RIGHT] = {
-        "config": load(PipetteModel("p300_single_v1.5")),
+        "config": load(PipetteModel("p1000_single_v1")),
         "id": "testid2",
     }
     entries = []
@@ -64,10 +64,10 @@ def test_execute_function_apiv2(
 
     execute.execute(protocol.filelike, "testosaur_v2.py", emit_runlog=emit_runlog)
     assert [item["payload"]["text"] for item in entries if item["$"] == "before"] == [
-        "Picking up tip from A1 of Opentrons 96 Tip Rack 300 µL on 1",
-        "Aspirating 10.0 uL from A1 of Corning 96 Well Plate 360 µL Flat on 2 at 150.0 uL/sec",
-        "Dispensing 10.0 uL into B1 of Corning 96 Well Plate 360 µL Flat on 2 at 300.0 uL/sec",
-        "Dropping tip into H12 of Opentrons 96 Tip Rack 300 µL on 1",
+        "Picking up tip from A1 of Opentrons 96 Tip Rack 1000 µL on 1",
+        "Aspirating 100.0 uL from A1 of Corning 96 Well Plate 360 µL Flat on 2 at 500.0 uL/sec",
+        "Dispensing 100.0 uL into B1 of Corning 96 Well Plate 360 µL Flat on 2 at 1000.0 uL/sec",
+        "Dropping tip into H12 of Opentrons 96 Tip Rack 1000 µL on 1",
     ]
 
 

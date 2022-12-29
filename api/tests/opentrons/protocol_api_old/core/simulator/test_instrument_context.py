@@ -9,6 +9,17 @@ from opentrons.hardware_control.types import TipAttachedError
 from opentrons.protocol_api.core.common import InstrumentCore, LabwareCore
 from opentrons.types import Location, Point
 
+try:
+    import opentrons_hardware  # noqa: F401
+
+    # TODO (lc 12-8-2022) Not sure if we plan to keep these tests, but if we do
+    # we should re-write them to be agnostic to the underlying hardware. Otherwise
+    # I wouldn't really consider these to be proper unit tests.
+    pytest.skip("These tests are only valid on the OT-2.", allow_module_level=True)
+except ImportError:
+    # If we don't have opentrons_hardware, we can safely run these tests.
+    pass
+
 
 @pytest.fixture(
     params=[

@@ -64,7 +64,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
       <img
         src={robotModel === 'OT-2' ? OT2_PNG : OT3_PNG}
         style={{ width: '6rem' }}
-        id={`RobotCard_${robotName}_robotImage`}
+        id={`RobotCard_${String(robotName)}_robotImage`}
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}
@@ -123,7 +123,7 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
       <Flex>
         {attachedModules.map((module, i) => (
           <ModuleIcon
-            key={`${module.moduleModel}_${i}_${robotName}`}
+            key={`${String(module.moduleModel)}_${i}_${robotName}`}
             tooltipText={t('this_robot_has_connected_and_power_on_module', {
               moduleName: getModuleDisplayName(module.moduleModel),
             })}
