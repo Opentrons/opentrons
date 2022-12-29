@@ -1,5 +1,11 @@
 import pytest
-from typing import TYPE_CHECKING
+from typing import (
+    TYPE_CHECKING,
+    List,
+    Optional,
+    Set,
+    Tuple
+)
 from itertools import chain
 from mock import AsyncMock, patch
 from opentrons.hardware_control.backends.ot3controller import OT3Controller
@@ -7,9 +13,14 @@ from opentrons.hardware_control.backends.ot3utils import (
     node_to_axis,
     axis_to_node,
 )
+from opentrons_hardware.drivers.can_bus.can_messenger import (
+    MessageListenerCallback,
+    MessageListenerCallbackFilter
+)
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons.config.types import OT3Config
 from opentrons.config.robot_configs import build_config_ot3
+from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     PipetteName as FirmwarePipetteName,
@@ -23,8 +34,7 @@ from opentrons.hardware_control.types import (
     MotorStatus,
 )
 from opentrons_hardware.firmware_bindings.utils import UInt8Field
-
-
+from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
 from opentrons_hardware.hardware_control.motion import (
     MoveType,
     MoveStopCondition,
@@ -45,15 +55,43 @@ def mock_config() -> OT3Config:
     return build_config_ot3({})
 
 
-@pytest.fixture
-def mock_messenger():
-    with patch(
-        "opentrons.hardware_control.backends.ot3controller.CanMessenger",
-        AsyncMock,
-        spec=CanMessenger,
-    ):
-        yield
+class MockCanMessageNotifier:
+    """A CanMessage notifier."""
 
+    def __init__(self) -> None:
+        """Constructor."""
+        self._listeners: List[
+            Tuple[MessageListenerCallback, Optional[MessageListenerCallbackFilter]]
+        ] = []
+
+    def add_listener(
+        self,
+        listener: MessageListenerCallback,
+        filter: Optional[MessageListenerCallbackFilter] = None,
+    ) -> None:
+        """Add listener."""
+        self._listeners.append((listener, filter))
+
+    def notify(self, message: MessageDefinition, arbitration_id: ArbitrationId) -> None:
+        """Notify."""
+        for listener, filter in self._listeners:
+            if filter and not filter(arbitration_id):
+                continue
+            listener(message, arbitration_id)
+
+
+@pytest.fixture
+def can_message_notifier() -> MockCanMessageNotifier:
+    """A fixture that notifies mock_messenger listeners of a new message."""
+    return MockCanMessageNotifier()
+
+
+@pytest.fixture
+def mock_messenger(can_message_notifier: MockCanMessageNotifier) -> AsyncMock:
+    """Mock can messenger."""
+    mock = AsyncMock(spec=CanMessenger)
+    mock.add_listener.side_effect = can_message_notifier.add_listener
+    return mock
 
 @pytest.fixture
 def mock_driver(mock_messenger) -> AbstractCanDriver:
@@ -548,3 +586,22 @@ async def test_ready_for_movement(
 
     axes = [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L]
     assert controller.check_ready_for_movement(axes) == ready
+
+
+async def test_update_motor_status(
+    mock_messenger: CanMessenger,
+    controller: OT3Controller
+) -> None:
+    async def fake_gmp(
+        can_messenger: CanMessenger, nodes: Set[NodeId], timeout: float = 1.0
+    ):
+        return {node: (0.223, 0.323, False, True) for node in nodes}
+
+    with patch("opentrons.hardware_control.backends.ot3controller.get_motor_position", fake_gmp):
+        nodes = set([NodeId.gantry_x, NodeId.gantry_y, NodeId.head])
+        controller._present_nodes = nodes
+        await controller.update_motor_status()
+        for node in nodes:
+            assert controller._position.get(node) == 0.223
+            assert controller._encoder_position.get(node) == 0.323
+            assert controller._motor_status.get(node) == MotorStatus(False, True)
