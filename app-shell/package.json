@@ -33,7 +33,7 @@
     "@opentrons/discovery-client": "link:../discovery-client",
     "@opentrons/shared-data": "link:../shared-data",
     "electron-notarize": "^1.2.1",
-    "electron-publisher-s3": "^20.17.2",
+    "electron-publisher-s3": "^20.17.2"
   },
   "dependencies": {
     "@thi.ng/paths": "1.6.5",
