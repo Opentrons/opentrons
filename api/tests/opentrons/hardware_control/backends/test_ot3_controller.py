@@ -1,5 +1,5 @@
 import pytest
-from typing import TYPE_CHECKING, List, Optional, Set, Tuple
+from typing import List, Optional, Set, Tuple
 from itertools import chain
 from mock import AsyncMock, patch
 from opentrons.hardware_control.backends.ot3controller import OT3Controller
