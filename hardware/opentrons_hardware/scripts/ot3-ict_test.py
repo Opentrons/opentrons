@@ -299,8 +299,8 @@ async def read_sensor(
 async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
     # build a GPIO handler, which will automatically release estop
-    gpio = OT3GPIO(__name__)
-    gpio.deactivate_estop()
+    #gpio = OT3GPIO(__name__)
+    #gpio.deactivate_estop()
     node = ot3_nodes[args.node]
     subprocess.run(["systemctl", "stop", "opentrons-robot-server"])
     position = {node: 0.0}
