@@ -242,8 +242,8 @@ export const MagneticModuleSlideout = (
         </StyledText>
         <form id="MagneticModuleSlideout_submitValue">
           <InputField
-            data-testid={`${module.moduleModel}`}
-            id={`${module.moduleModel}`}
+            data-testid={`${String(module.moduleModel)}`}
+            id={`${String(module.moduleModel)}`}
             units={info.units}
             value={engageHeightValue}
             autoFocus

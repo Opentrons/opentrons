@@ -155,7 +155,9 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
           ({ moduleDef, attachedModuleMatch, slotName, moduleId }) => {
             return (
               <ModulesListItem
-                key={`SetupModulesList_${moduleDef.model}_slot_${slotName}`}
+                key={`SetupModulesList_${String(
+                  moduleDef.model
+                )}_slot_${slotName}`}
                 moduleModel={moduleDef.model}
                 displayName={moduleDef.displayName}
                 location={slotName}

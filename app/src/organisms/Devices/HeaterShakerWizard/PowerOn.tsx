@@ -52,7 +52,7 @@ export function PowerOn(props: PowerOnProps): JSX.Element {
         data-testid="heater_shaker_svg_and_info"
       >
         {() => (
-          <React.Fragment key={`Power_on_${moduleDef.model}`}>
+          <React.Fragment key={`Power_on_${String(moduleDef.model)}`}>
             <Module
               x={0}
               y={0}

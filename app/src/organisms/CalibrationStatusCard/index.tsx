@@ -54,7 +54,9 @@ export function CalibrationStatusCard({
           </StyledText>
           <StatusLabel
             status={t('missing_calibration_data')}
-            backgroundColor={`${COLORS.errorEnabled}${COLORS.opacity12HexCode}`}
+            backgroundColor={`${String(COLORS.errorEnabled)}${String(
+              COLORS.opacity12HexCode
+            )}`}
             iconColor={COLORS.errorEnabled}
             textColor={COLORS.darkBlackEnabled}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
