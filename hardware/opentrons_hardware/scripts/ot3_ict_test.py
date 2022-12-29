@@ -7,11 +7,13 @@ import sys
 import tty
 import select
 import datetime
+import time
 from typing import Callable, Dict, Tuple, List
 import subprocess
 from enum import Enum, unique
 from opentrons_hardware.hardware_control.types import NodeDict
 
+from hardware_testing import data  # type: ignore[import]
 from opentrons_hardware.drivers.can_bus.build import build_driver
 from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
 from opentrons_hardware.firmware_bindings.constants import (
@@ -46,8 +48,6 @@ from opentrons_hardware.sensors.types import (
 from opentrons_hardware.hardware_control.limit_switches import get_limit_switches
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
-
-from opentrons_hardware.drivers.gpio import OT3GPIO
 
 GetInputFunc = Callable[[str], str]
 OutputFunc = Callable[[str], None]
@@ -97,15 +97,33 @@ def getch() -> str:
     return _getch()
 
 
+def file_setup(test_header: List[str], node: NodeId, test_type: str) -> str:
+    """Setup CSV file."""
+    D = datetime.datetime.now().strftime("%Y_%m_%d")
+    test_tag = "{}-{}".format(test_type, int(time.time()))
+    test_id = data.create_run_id()
+    test_path = data.create_folder_for_test_data(node.name)
+    test_file = data.create_file_name(node.name, test_id, test_tag)
+    data.append_data_to_file(node.name, test_file, str(node.name) + "\n")
+    data.append_data_to_file(node.name, test_file, D + "\n")
+    data.append_data_to_file(node.name, test_file, test_header + "\n")
+    print("FILE PATH = ", test_path)
+    print("FILE NAME = ", test_file)
+    return str(test_file)
+
+
 async def jog_axis(
     messenger: CanMessenger, node: NodeId, position: Dict[NodeId, float], speed: float
 ) -> Dict[NodeId, float]:
     """This Function allows a operator to jog the axis based on the buttons presented to them on the screen."""
+    test_data = "Time(s), Motor(mm), Encoder(mm)"
+    test_f = file_setup(test_data, node, "encoder_test")
     step_size = [0.1, 0.5, 1, 10, 20, 50]
     step_length_index = 3
     step = step_size[step_length_index]
     pos = 0.0
     res = {node: (0, 0, 0)}
+    start_time = time.perf_counter()
     information_str = """
         Click  >>   w  << to move up
         Click  >>   s  << to move downward
@@ -116,20 +134,25 @@ async def jog_axis(
                     """
     print(information_str)
     print("\n")
-
     while True:
         input = getch()
         if input == "w":
             # plus move direction
             sys.stdout.flush()
-            position[node] = pos + step
+            position[node.name] += step
             res = await move_to(messenger, node, step, -speed)  # type: ignore[assignment]
+            elasped_time = time.perf_counter() - start_time
+            d_str = f"{elasped_time},{res[node][0]}, {res[node][1]} \n"
+            data.append_data_to_file(node.name, test_f, d_str)
 
         elif input == "s":
             # minus move direction
             sys.stdout.flush()
-            position[node] = pos - step
+            position[node.name] -= step
             res = await move_to(messenger, node, step, speed)  # type: ignore[assignment]
+            elasped_time = time.perf_counter() - start_time
+            d_str = f"{elasped_time},{res[node][0]}, {res[node][1]} \n"
+            data.append_data_to_file(node.name, test_f, d_str)
 
         elif input == "q":
             sys.stdout.flush()
@@ -156,7 +179,7 @@ async def jog_axis(
 
         print(
             "Coordinates: ",
-            round(position[node], 2),
+            round(position[node.name], 2),
             ",",
             "motor position: ",
             res[node][0],
@@ -303,7 +326,7 @@ async def run(args: argparse.Namespace) -> None:
     node = ot3_nodes[args.node]
     subprocess.run(["systemctl", "stop", "opentrons-robot-server"])
     await asyncio.sleep(1)
-    position = {node: 0.0}
+    position = {node.name: 0.0}
     driver = await build_driver(build_settings(args))
     messenger = CanMessenger(driver=driver)
     messenger.start()
@@ -315,6 +338,7 @@ async def run(args: argparse.Namespace) -> None:
         print("Homed")
 
     if args.jog:
+
         await asyncio.sleep(2)
         print("\n")
         print("----------Read Motor Position and Encoder--------------")
