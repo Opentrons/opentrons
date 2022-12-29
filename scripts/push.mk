@@ -11,13 +11,13 @@ need-scp-option-from-version=9.0
 # $(info $(subst p1, ,($(subst _, ,$(SSH-VERSION)))))
 
 $(info $$ssh is $(SSH-VERSION))
-$(info $$need-copy-scp is [${need-copy-scp}])
+# $(info $$need-copy-scp is [${need-copy-scp}])
 
-ssh_version := $(shell ssh -V 2>&1 | grep -o "[0-9]*\.[0-9]*" | head -1)
+ssh_version := $(shell ssh -V 2>&1 | grep -E -o "[0-9]*\.[0-9]*" | head -1)
 $(info $(ssh_version))
 
-is-ge = $(shell if ("$(ssh_version)" -ge "$(need-copy-scp-version)" | bc); then echo "a is more than 5"; fi)
-
+is-ge = $(shell if [ "$(ssh_version)" -ge "$(need-copy-scp-version)" ]; then echo "a is more than 5"; fi)
+$(info $(is-ge))
 need-scp-option = $(shell if [ "$(shell ssh -V 2>&1 | grep -o "[0-9]*\.[0-9]*" | head -1)" -ge 9 ]; then echo 1; fi)
 $(info $(need-scp-option))
 
