@@ -5,9 +5,9 @@ import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
-import { getWifiList } from '../../../redux/networking'
+import * as Networking from '../../../redux/networking'
 import * as Fixtures from '../../../redux/networking/__fixtures__'
-import { SetWifiCred } from '../../../organisms/SetupNetwork/SetWifiCred'
+import { SelectAuthenticationType } from '../../../organisms/SetupNetwork/SelectAuthenticationType'
 import { SelectWifiNetwork } from '../SelectWifiNetwork'
 
 const mockPush = jest.fn()
@@ -20,8 +20,8 @@ const mockWifiList = [
   },
 ]
 
-jest.mock('../../../organisms/SetupNetwork/SetWifiCred')
-jest.mock('../../../redux/networking/selectors')
+jest.mock('../../../organisms/SetupNetwork/SelectAuthenticationType')
+jest.mock('../../../redux/networking')
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('react-router-dom', () => {
   const reactRouterDom = jest.requireActual('react-router-dom')
@@ -42,13 +42,19 @@ const render = () => {
   )
 }
 
-const mockGetWifiList = getWifiList as jest.MockedFunction<typeof getWifiList>
-const mockSetWifiCred = SetWifiCred as jest.MockedFunction<typeof SetWifiCred>
+const mockGetWifiList = Networking.getWifiList as jest.MockedFunction<
+  typeof Networking.getWifiList
+>
+const mockSelectAuthenticationType = SelectAuthenticationType as jest.MockedFunction<
+  typeof SelectAuthenticationType
+>
 
 describe('SelectNetwork', () => {
   beforeEach(() => {
     mockGetWifiList.mockReturnValue(mockWifiList)
-    mockSetWifiCred.mockReturnValue(<div>Mock SetWifiCred</div>)
+    mockSelectAuthenticationType.mockReturnValue(
+      <div>Mock SelectAuthenticationType</div>
+    )
   })
 
   it('should render a wifi list', () => {
@@ -59,10 +65,11 @@ describe('SelectNetwork', () => {
     getByText('baz')
   })
 
-  it('render setwificred when tapping a one of wifi ssid', () => {
-    const [{ getByText }] = render()
-    const ssid = getByText('foo')
-    fireEvent.click(ssid)
-    getByText('Mock SetWifiCred')
+  it('should render SetWifiCred when tapping a one of wifi ssid', () => {
+    const [{ getByText, getByRole }] = render()
+    getByText('foo')
+    const button = getByRole('button', { name: 'foo' })
+    fireEvent.click(button)
+    getByText('Mock SelectAuthenticationType')
   })
 })

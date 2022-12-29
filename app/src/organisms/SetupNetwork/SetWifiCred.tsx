@@ -28,7 +28,7 @@ import * as Networking from '../../redux/networking'
 import { getLocalRobot } from '../../redux/discovery'
 import { ConnectingNetwork } from './ConnectingNetwork'
 import { FailedToConnect } from './FailedToConnect'
-import { ConnectedNetworkInfo } from '../../pages/OnDeviceDisplay/ConnectedNetworkInfo'
+import { ConnectedNetworkInfo } from './ConnectedNetworkInfo'
 import {
   /* 
   Note: kj 12/27/2022 These will be used in RobotSettings networking function

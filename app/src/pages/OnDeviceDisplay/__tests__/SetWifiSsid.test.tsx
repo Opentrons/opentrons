@@ -1,14 +1,16 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, getByText } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
+import { SelectAuthenticationType } from '../../../organisms/SetupNetwork/SelectAuthenticationType'
 import { SetWifiSsid } from '../SetWifiSsid'
 
 const mockPush = jest.fn()
 
+jest.mock('../../../organisms/SetupNetwork/SelectAuthenticationType')
 jest.mock('react-router-dom', () => {
   const reactRouterDom = jest.requireActual('react-router-dom')
   return {
@@ -16,6 +18,10 @@ jest.mock('react-router-dom', () => {
     useHistory: () => ({ push: mockPush } as any),
   }
 })
+
+const mockSelectAuthenticationType = SelectAuthenticationType as jest.MockedFunction<
+  typeof SelectAuthenticationType
+>
 
 const render = () => {
   return renderWithProviders(
@@ -29,6 +35,12 @@ const render = () => {
 }
 
 describe('SetWifiSsid', () => {
+  beforeEach(() => {
+    mockSelectAuthenticationType.mockReturnValue(
+      <div>Mock SelectAuthenticationType</div>
+    )
+  })
+
   it('should render text, buttons, input and software keyboard', () => {
     const [{ getByText, getByRole, getByLabelText }] = render()
     getByText('Join other network')
@@ -50,12 +62,10 @@ describe('SetWifiSsid', () => {
   })
 
   it('when tapping next button, call a mock function', () => {
-    const [{ getByRole }] = render()
+    const [{ getByText, getByRole }] = render()
     const button = getByRole('button', { name: 'Next' })
     fireEvent.click(button)
-    expect(mockPush).toHaveBeenCalledWith(
-      '/network-setup/wifi/select-auth-type/'
-    )
+    getByText('Mock SelectAuthenticationType')
   })
 
   it('when tapping keys, tapped key value is displayed in the input', () => {

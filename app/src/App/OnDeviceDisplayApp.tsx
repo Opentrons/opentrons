@@ -18,7 +18,6 @@ import { NameRobot } from '../pages/OnDeviceDisplay/NameRobot'
 import { NetworkSetupMenu } from '../pages/OnDeviceDisplay/NetworkSetupMenu'
 import { TempODDMenu } from '../pages/OnDeviceDisplay/TempODDMenu'
 import { RobotDashboard } from '../pages/OnDeviceDisplay/RobotDashboard'
-import { SelectAuthenticationType } from '../pages/OnDeviceDisplay/SelectAuthenticationType'
 import { SetWifiSsid } from '../pages/OnDeviceDisplay/SetWifiSsid'
 import { SelectWifiNetwork } from '../pages/OnDeviceDisplay/SelectWifiNetwork'
 import { PortalRoot as ModalPortalRoot } from './portal'
@@ -55,6 +54,12 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     exact: true,
     name: 'Select Network',
     path: '/network-setup/wifi',
+  },
+  {
+    Component: SetWifiSsid,
+    exact: true,
+    name: 'Set Wi-Fi SSID',
+    path: '/network-setup/wifi/set-wifi-ssid',
   },
   {
     Component: ConnectViaEthernet,

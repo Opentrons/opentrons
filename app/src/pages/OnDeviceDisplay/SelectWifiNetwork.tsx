@@ -21,7 +21,7 @@ import { StyledText } from '../../atoms/text'
 import * as Networking from '../../redux/networking'
 import { getLocalRobot } from '../../redux/discovery'
 import { SearchNetwork } from '../../organisms/SetupNetwork/SearchNetwork'
-import { SetWifiCred } from '../../organisms/SetupNetwork/SetWifiCred'
+import { SelectAuthenticationType } from '../../organisms/SetupNetwork/SelectAuthenticationType'
 
 import type { State, Dispatch } from '../../redux/types'
 
@@ -30,15 +30,17 @@ const LIST_REFRESH_MS = 10000
 const NETWORK_ROW_STYLE = css`
   &:active {
     background-color: ${COLORS.blueEnabled};
+    color: ${COLORS.white};
   }
 `
 
 export function SelectWifiNetwork(): JSX.Element {
   const { t } = useTranslation('device_settings')
   const [isSearching, setIsSearching] = React.useState<boolean>(false)
-  const [isShowSetWifiCred, setIsShowSetWifiCred] = React.useState<boolean>(
-    false
-  )
+  const [
+    isShowSelectAuthType,
+    setIsShowSelectAuthType,
+  ] = React.useState<boolean>(false)
   const [selectedSsid, setSelectedSsid] = React.useState<string>('')
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
@@ -70,8 +72,8 @@ export function SelectWifiNetwork(): JSX.Element {
         SPACING.spacingXXL
       )} ${String(SPACING.spacingXXL)}`}
     >
-      {isShowSetWifiCred ? (
-        <SetWifiCred ssid={selectedSsid} />
+      {isShowSelectAuthType ? (
+        <SelectAuthenticationType ssid={selectedSsid} fromWifiList />
       ) : list.length > 0 ? (
         <>
           <HeaderWithIPs
@@ -86,18 +88,16 @@ export function SelectWifiNetwork(): JSX.Element {
               height="4rem"
               borderRadius="12px"
               marginBottom={SPACING.spacing3}
+              css={NETWORK_ROW_STYLE}
               onClick={() => {
                 setSelectedSsid(nw.ssid)
-                setIsShowSetWifiCred(true)
+                setIsShowSelectAuthType(true)
               }}
             >
               <Flex
                 flexDirection={DIRECTION_ROW}
                 padding={SPACING.spacing4}
                 alignItems={ALIGN_CENTER}
-                onClick={() =>
-                  history.push(`/network-setup/wifi/set-wifi-cred/${nw.ssid}`)
-                }
               >
                 <Icon
                   name="wifi"
@@ -109,7 +109,7 @@ export function SelectWifiNetwork(): JSX.Element {
                   fontSize="1.5rem"
                   lineHeight="2.0625rem"
                   fontWeight="400"
-                  color={COLORS.black}
+                  // color={COLORS.black}
                 >
                   {nw.ssid}
                 </StyledText>
