@@ -85,6 +85,6 @@ async def test_parse_motor_position(waitable_reader: AsyncIter) -> None:
 
 
 async def test_get_motor_position(mock_messenger: CanMessenger) -> None:
-    """Test the get moror position"""
+    """Test the get moror position."""
     nodes = set([NodeId.gantry_x, NodeId.gantry_y, NodeId.head])
     await motor_position_status.get_motor_position(mock_messenger, nodes)
