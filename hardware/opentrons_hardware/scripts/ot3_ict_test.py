@@ -169,6 +169,7 @@ async def jog_axis(
         )
         print("\r", end="")
 
+
 def calc_time(distance: float, speed: float) -> float:
     """Calculates time based on distance and speed."""
     time = abs(distance / speed)
@@ -275,7 +276,7 @@ async def do_run(
             sensor_list.append(d.to_float())
             print(f"{ts:.3f}: {s} {d.to_float():5.3f}, \traw data: {str(rd)}")
         if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
-            line = input()
+            input()
             await messenger.send(target_node, reset_message)
             break
     return sensor_list
@@ -297,8 +298,8 @@ async def read_sensor(
 async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
     # build a GPIO handler, which will automatically release estop
-    #gpio = OT3GPIO(__name__)
-    #gpio.deactivate_estop()
+    # gpio = OT3GPIO(__name__)
+    # gpio.deactivate_estop()
     node = ot3_nodes[args.node]
     subprocess.run(["systemctl", "stop", "opentrons-robot-server"])
     await asyncio.sleep(1)
@@ -372,6 +373,7 @@ async def run(args: argparse.Namespace) -> None:
 
     print("\n")
 
+
 def main() -> None:
     """Entry point."""
     parser = argparse.ArgumentParser(description="Pipette ICT TEST SCRIPT.")
@@ -409,9 +411,7 @@ def main() -> None:
     parser.add_argument(
         "--capacitive", help="Test capacitive sensor.", action="store_true"
     )
-    parser.add_argument(
-        "--pressure", help="Test pressure sensor.", action="store_true"
-    )
+    parser.add_argument("--pressure", help="Test pressure sensor.", action="store_true")
     parser.add_argument(
         "--environment", help="Test environment Sensor.", action="store_true"
     )
