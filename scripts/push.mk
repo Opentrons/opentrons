@@ -7,15 +7,19 @@ is-ot3 = $(shell ssh $(if $(2),"-i $(2)") $(3) root@$(1) systemctl status opentr
 SSH-VERSION=$(shell ssh -V 2>&1)
 need-scp-option-from-version=9.0
 # example with text functions
-need-copy-scp := $(filter ‘[0-9]{,2}.[0-9]’, $($(subst p1, ,($(subst _, ,$(SSH-VERSION))))))
-$(info $(subst p1, ,($(subst _, ,$(SSH-VERSION)))))
+# need-copy-scp := $(filter ‘[0-9]{,2}.[0-9]’, $($(subst p1, ,($(subst _, ,$(SSH-VERSION))))))
+# $(info $(subst p1, ,($(subst _, ,$(SSH-VERSION)))))
 
 $(info $$ssh is $(SSH-VERSION))
 $(info $$need-copy-scp is [${need-copy-scp}])
 
 ssh_version := $(shell ssh -V 2>&1 | grep -o "[0-9]*\.[0-9]*" | head -1)
-need-scp-option = $(shell if (($(ssh_version) -ge $(need-scp-option-from-version)) | bc); then echo 1; fi)
-$(info $$needs scp option $(need-scp-option))
+$(info $(ssh_version))
+
+is-ge = $(shell if ("$(ssh_version)" -ge "$(need-copy-scp-version)" | bc); then echo "a is more than 5"; fi)
+
+need-scp-option = $(shell if [ "$(shell ssh -V 2>&1 | grep -o "[0-9]*\.[0-9]*" | head -1)" -ge 9 ]; then echo 1; fi)
+$(info $(need-scp-option))
 
 # push-python-package: execute a push to the robot of a particular python
 # package.
@@ -27,7 +31,7 @@ $(info $$needs scp option $(need-scp-option))
 
 define push-python-package
 $(if $(is-ot3), echo "This is an OT-3. Use 'make push-ot3' instead." && exit 1)
-scp -i $(2) $(if $(need-scp-option),"-O") $(3) "$(4)" root@$(1):/data/$(notdir $(4))
+scp -i $(2) $(3) "$(4)" root@$(1):/data/$(notdir $(4))
 ssh -i $(2) $(3) root@$(1) \
 "function cleanup () { rm -f /data/$(notdir $(4)) && mount -o remount,ro / ; } ;\
 mount -o remount,rw / &&\
