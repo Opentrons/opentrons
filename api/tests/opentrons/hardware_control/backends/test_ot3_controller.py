@@ -1,11 +1,5 @@
 import pytest
-from typing import (
-    TYPE_CHECKING,
-    List,
-    Optional,
-    Set,
-    Tuple
-)
+from typing import TYPE_CHECKING, List, Optional, Set, Tuple
 from itertools import chain
 from mock import AsyncMock, patch
 from opentrons.hardware_control.backends.ot3controller import OT3Controller
@@ -15,7 +9,7 @@ from opentrons.hardware_control.backends.ot3utils import (
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     MessageListenerCallback,
-    MessageListenerCallbackFilter
+    MessageListenerCallbackFilter,
 )
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons.config.types import OT3Config
@@ -89,6 +83,7 @@ def mock_messenger(can_message_notifier: MockCanMessageNotifier) -> AsyncMock:
     mock = AsyncMock(spec=CanMessenger)
     mock.add_listener.side_effect = can_message_notifier.add_listener
     return mock
+
 
 @pytest.fixture
 def mock_driver(mock_messenger) -> AbstractCanDriver:
@@ -609,15 +604,16 @@ async def test_tip_action(controller: OT3Controller, mock_move_group_run) -> Non
 
 
 async def test_update_motor_status(
-    mock_messenger: CanMessenger,
-    controller: OT3Controller
+    mock_messenger: CanMessenger, controller: OT3Controller
 ) -> None:
     async def fake_gmp(
         can_messenger: CanMessenger, nodes: Set[NodeId], timeout: float = 1.0
     ):
         return {node: (0.223, 0.323, False, True) for node in nodes}
 
-    with patch("opentrons.hardware_control.backends.ot3controller.get_motor_position", fake_gmp):
+    with patch(
+        "opentrons.hardware_control.backends.ot3controller.get_motor_position", fake_gmp
+    ):
         nodes = set([NodeId.gantry_x, NodeId.gantry_y, NodeId.head])
         controller._present_nodes = nodes
         await controller.update_motor_status()
