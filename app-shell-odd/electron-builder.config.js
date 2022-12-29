@@ -1,7 +1,7 @@
 'use strict'
 
 module.exports = {
-  appId: 'com.opentrons.app',
+  appId: 'com.opentrons.odd',
   electronVersion: '21.3.1',
   files: [
     '**/*',

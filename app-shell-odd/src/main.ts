@@ -62,7 +62,9 @@ function startUp(): void {
   }
 
   log.info('Fetching latest software version')
-  updateLatestVersion()
+  updateLatestVersion().catch((error: Error) => {
+    log.error('Error fetching latest software version: ', { error })
+  })
 
   const actionHandlers: Dispatch[] = [
     registerConfig(dispatch),

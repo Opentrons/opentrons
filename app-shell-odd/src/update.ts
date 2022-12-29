@@ -44,7 +44,6 @@ export const updateLatestVersion = (): Promise<string> => {
   return downloadAndCacheReleaseManifest(manifestURL)
     .then(response => {
       const latestAvailableVersion = Object.keys(response.production)
-        .map(version => version)
         .sort((a, b) => {
           if (semver.lt(a, b)) {
             return 1
