@@ -97,7 +97,7 @@ jobs:
     # to run cross-platform just like builds, might as well do them in the same job
     strategy:
       matrix:
-        os: ['windows-2022', 'ubuntu-22.04', 'macos-11']
+        os: ['windows-2019', 'ubuntu-22.04', 'macos-11']
     name: 'opentrons app backend unit tests and build'
     runs-on: ${{ matrix.os }}
     steps:
@@ -175,7 +175,7 @@ jobs:
   build-app-ot3:
     strategy:
       matrix:
-        os: ['windows-2022', 'ubuntu-22.04', 'macos-latest']
+        os: ['windows-2019', 'ubuntu-22.04', 'macos-latest']
     name: 'opentrons app backend unit tests and build for OT3'
     runs-on: ${{ matrix.os }}
     steps:

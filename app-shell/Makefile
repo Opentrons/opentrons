@@ -141,6 +141,9 @@ dist-ubuntu-latest: dist-linux
 .PHONY: dist-ubuntu-22.04
 dist-ubuntu-22.04: dist-linux
 
+.PHONY: dist-windows-2019
+dist-windows-2019: dist-win
+
 .PHONY: dist-windows-2022
 dist-windows-2022: dist-win
 
