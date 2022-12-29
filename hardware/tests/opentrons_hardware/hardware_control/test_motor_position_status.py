@@ -3,6 +3,7 @@ import pytest
 from typing import Tuple, List, Any
 import asyncio
 
+from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.utils import (
     UInt32Field,
     Int32Field,
@@ -81,3 +82,9 @@ async def test_parse_motor_position(waitable_reader: AsyncIter) -> None:
     expected = (0.123, 0.123, True, False)
     for n in nodes:
         assert data.get(n) == expected
+
+
+async def test_get_motor_position(mock_messenger: CanMessenger) -> None:
+    """Test the get moror position"""
+    nodes = set([NodeId.gantry_x, NodeId.gantry_y, NodeId.head])
+    await motor_position_status.get_motor_position(mock_messenger, nodes)
