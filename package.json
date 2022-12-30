@@ -23,7 +23,10 @@
   },
   "packageManager": "yarn@1.22.19",
   "engines": {
-    "node": "^16.9.0"
+    "node": "^16.9.0",
+    "yarn": "1.22.19",
+    "npm": "Please use yarn instead",
+    "pnpm": "Please use yarn instead"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",
