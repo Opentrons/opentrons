@@ -325,7 +325,7 @@ class Labware:
     def parent(self) -> LocationLabware:
         """The parent of this labware. Usually a slot name."""
         if isinstance(self._implementation, LabwareImplementation):
-            return self._implementation.get_geometry().parent.labware.object
+            return self._implementation.get_geometry().parent.labware.object  # type: ignore[attr-defined]
         return self._implementation.parent
 
     @property  # type: ignore[misc]
