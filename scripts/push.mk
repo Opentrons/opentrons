@@ -22,7 +22,7 @@ $(info $(need-scp-option))
 
 define push-python-package
 $(if $(is-ot3), echo "This is an OT-3. Use 'make push-ot3' instead." && exit 1)
-scp -i $(2) $(if $(need-scp-option),"-o") $(3) "$(4)" root@$(1):/data/$(notdir $(4))
+scp -i $(2) $(if $(need-scp-option),"-O") $(3) "$(4)" root@$(1):/data/$(notdir $(4))
 ssh -i $(2) $(3) root@$(1) \
 "function cleanup () { rm -f /data/$(notdir $(4)) && mount -o remount,ro / ; } ;\
 mount -o remount,rw / &&\
