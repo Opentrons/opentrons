@@ -13,7 +13,6 @@ import { RobotDashboard } from '../../pages/OnDeviceDisplay/RobotDashboard'
 import { SelectWifiNetwork } from '../../pages/OnDeviceDisplay/SelectWifiNetwork'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
 
-jest.mock('../../pages/OnDeviceDisplay/ConnectedNetworkInfo')
 jest.mock('../../pages/OnDeviceDisplay/InitialSplash')
 jest.mock('../../pages/OnDeviceDisplay/NetworkSetupMenu')
 jest.mock('../../pages/OnDeviceDisplay/ConnectViaUSB')
