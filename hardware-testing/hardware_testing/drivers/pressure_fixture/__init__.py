@@ -5,6 +5,4 @@ from .ot3_pressure_fixture import (
     SimOt3PressureFixture,
 )
 
-from .types import PressureChannels
-
 __all__ = ["Ot3PressureFixture", "Ot3PressureFixtureBase", "SimOt3PressureFixture"]

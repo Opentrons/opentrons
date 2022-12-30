@@ -1,6 +1,6 @@
 import time, random, re
 from typing import Any, Dict, Union, List, Optional, Tuple
-from serial import Serial
+from serial import Serial #type: ignore[import]
 import time
 from abc import ABC, abstractmethod
 
@@ -36,7 +36,7 @@ class Ot3PressureFixtureBase(ABC):
         ...
 
     @abstractmethod
-    def read_all_pressure_channel(self) -> float:
+    def read_all_pressure_channel(self) -> List[float]:
         """Read all pressure channels on fixture in Pascals."""
         ...
 
@@ -52,7 +52,7 @@ class SimOt3PressureFixture(Ot3PressureFixtureBase):
         """Disconnect."""
         return
 
-    def read_all_pressure_channel(self) -> float:
+    def read_all_pressure_channel(self) -> List[float]:
         """Read Pressure for all channels."""
         total_fixture_channels = 8
         pressure = [random.uniform(2.5, 2) for ch in range(total_fixture_channels)]
@@ -130,7 +130,7 @@ class Ot3PressureFixture(Ot3PressureFixtureBase):
                     "GETPRESSURE:{}\r\n".format(channel).encode("utf-8")
                 )
 
-    def read_all_pressure_channel(self):
+    def read_all_pressure_channel(self) -> List[float]:
         """
         Reads from all the channels from the fixture
         Output: []
@@ -146,7 +146,9 @@ class Ot3PressureFixture(Ot3PressureFixtureBase):
             length_of_data = self.isValInLst(data, verify_data)
             if length_of_data == bytes:
                 res = self._parse_pressure_data(data)
+                read = False
                 if len(res) == 8:
-                    return res
+                    read = False
             else:
                 self._fixture.write("GETPRESSURE:15\r\n".encode("utf-8"))
+        return res
