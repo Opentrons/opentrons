@@ -478,7 +478,7 @@ async def _main(simulate: bool, mount: OT3Mount, columns: int, fixture) -> None:
 
 
 if __name__ == "__main__":
-    arg_parser = argparse.ArgumentParser(description="OT-3 Assembly QC")
+    arg_parser = argparse.ArgumentParser(description="OT-3 Pipette Assembly QC Test")
     arg_parser.add_argument(
         "--mount", choices=["left", "right", "gripper"], required=True
     )
