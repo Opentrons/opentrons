@@ -7,6 +7,8 @@ from threading import Thread
 from datetime import datetime
 from opentrons.hardware_control.ot3api import OT3API
 
+from typing import Dict, List
+
 from hardware_testing.opentrons_api.types import OT3Mount, OT3Axis, Point
 from hardware_testing.opentrons_api import helpers_ot3
 from opentrons.calibration_storage.ot3.pipette_offset import (
@@ -17,8 +19,8 @@ from hardware_testing import data
 from hardware_testing.drivers.pressure_fixture import Ot3PressureFixture
 
 
-async def suspend_timer(suspend_time: float):
-    """ """
+async def suspend_timer(suspend_time: float) -> None:
+    """Counter for the leak test. """
     time_suspend = 0
     while time_suspend < suspend_time:
         asyncio.sleep(1)
@@ -29,12 +31,14 @@ async def suspend_timer(suspend_time: float):
 
 
 def fixture_setup():
+    """Return a fixture object to use."""
     fixture = Ot3PressureFixture.create(port="/dev/ttyACM0")
     fixture.connect()
     return fixture
 
 
 def getch():
+    """"""
     def _getch():
         fd = sys.stdin.fileno()
         old_settings = termios.tcgetattr(fd)
@@ -86,7 +90,7 @@ def run_pressure_fixture(gauge, test_name, test_file):
         data.append_data_to_file(test_name, test_file, d_str)
 
 
-async def _jog_axis(api: OT3API, mount: OT3Mount, axis: OT3Axis) -> None:
+async def _jog_axis(api: OT3API, mount: OT3Mount, axis: OT3Axis) -> Dict[OT3Axis, float]:
     ax = axis.name.lower()[0]
     step_size = [0.1, 0.5, 1, 10, 20, 50]
     step_length_index = 3
@@ -184,7 +188,7 @@ async def _jog_axis(api: OT3API, mount: OT3Mount, axis: OT3Axis) -> None:
         elif input == "\r":
             sys.stdout.flush()
             pos = await api.current_position_ot3(mount)
-            return pos
+            break
 
         current_position = await api.current_position_ot3(mount)
         print(
@@ -198,6 +202,7 @@ async def _jog_axis(api: OT3API, mount: OT3Mount, axis: OT3Axis) -> None:
             end="",
         )
         print("\r", end="")
+    return pos
 
 
 async def _leak_test(api: OT3API, mount: OT3Mount, columns: int) -> None:
@@ -396,7 +401,7 @@ async def _check_pressure_leak(
         await asyncio.sleep(2)
         phase = "Aspirate"
         await api.aspirate(mount, volume=50)
-        await asyncio.sleep()
+        await asyncio.sleep(2)
         phase = "Dispense"
         await api.dispense(mount)
         phase = "Move"
