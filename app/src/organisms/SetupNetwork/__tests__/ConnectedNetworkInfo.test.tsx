@@ -85,7 +85,7 @@ describe('ConnectedNetworkInfo', () => {
 
   it('should render authentication none', () => {
     props.authType = 'none'
-    const [{ getByText, getByRole }] = render(props)
+    const [{ getByText }] = render(props)
     getByText('Authentication: None')
   })
 
