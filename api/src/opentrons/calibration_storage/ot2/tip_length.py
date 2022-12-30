@@ -160,9 +160,6 @@ def clear_tip_length_calibration() -> None:
 def create_tip_length_data(
     definition: "LabwareDefinition",
     length: float,
-    cal_status: typing.Optional[
-        typing.Union[local_types.CalibrationStatus, v1.CalibrationStatus]
-    ] = None,
 ) -> typing.Dict[str, v1.TipLengthModel]:
     """
     Function to correctly format tip length data.
@@ -173,17 +170,11 @@ def create_tip_length_data(
     labware_hash = helpers.hash_labware_def(definition)
     labware_uri = helpers.uri_from_definition(definition)
 
-    if isinstance(cal_status, local_types.CalibrationStatus):
-        cal_status_model = v1.CalibrationStatus(**asdict(cal_status))
-    elif isinstance(cal_status, v1.CalibrationStatus):
-        cal_status_model = cal_status
-    else:
-        cal_status_model = v1.CalibrationStatus()
     tip_length_data = v1.TipLengthModel(
         tipLength=length,
         lastModified=utc_now(),
         source=local_types.SourceType.user,
-        status=cal_status_model,
+        status=v1.CalibrationStatus(),
         uri=labware_uri,
     )
 
