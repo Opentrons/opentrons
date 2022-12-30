@@ -56,6 +56,7 @@ describe('ConnectedNetworkInfo', () => {
   beforeEach(() => {
     props = {
       ssid: 'mockWifi',
+      authType: 'wpa',
     }
     mockGetNetworkInterfaces.mockReturnValue({
       wifi: initialMockWifi,
@@ -76,9 +77,16 @@ describe('ConnectedNetworkInfo', () => {
     getByText('mockWifi')
     getByText('IP Address: 127.0.0.100')
     getByText('Subnet Mask: 255.255.255.230')
+    getByText('Authentication: WPA2')
     getByText('MAC Address: WI:FI:00:00:00:00')
     getByRole('button', { name: 'Check for updates' })
     getByRole('button', { name: 'Change network' })
+  })
+
+  it('should render authentication none', () => {
+    props.authType = 'none'
+    const [{ getByText, getByRole }] = render(props)
+    getByText('Authentication: None')
   })
 
   it('when clicking Check for updates button, should call mock function', () => {

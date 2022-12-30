@@ -39,7 +39,7 @@ const LIST_REFRESH_MS = 10000
 
 interface ConnectedNetworkInfoProps {
   ssid: string
-  authType?: 'wpa' | 'none'
+  authType: 'wpa' | 'none'
 }
 
 export function ConnectedNetworkInfo({

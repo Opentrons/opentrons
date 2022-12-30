@@ -221,7 +221,7 @@ export function SetWifiCred({
           {requestState?.status === RobotApi.PENDING ? (
             <ConnectingNetwork />
           ) : requestState?.status === RobotApi.SUCCESS ? (
-            <ConnectedNetworkInfo ssid={ssid} />
+            <ConnectedNetworkInfo ssid={ssid} authType={authType} />
           ) : (
             <FailedToConnect
               ssid={ssid}
