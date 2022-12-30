@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Generic, List, Optional, TypeVar, cast
+from typing import Generic, List, Optional, TypeVar, cast, Union
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
@@ -822,3 +822,11 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         The Heater-Shaker does not have active cooling.
         """
         self._core.deactivate_heater()
+
+
+ModuleTypes = Union[
+    TemperatureModuleContext,
+    MagneticModuleContext,
+    ThermocyclerContext,
+    HeaterShakerContext,
+]

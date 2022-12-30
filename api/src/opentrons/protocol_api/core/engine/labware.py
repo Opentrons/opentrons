@@ -9,12 +9,12 @@ from opentrons_shared_data.labware.dev_types import (
 from opentrons.protocol_engine.errors import LabwareNotOnDeckError, ModuleNotOnDeckError
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocols.geometry.labware_geometry import LabwareGeometry
-from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.protocols.api_support.tip_tracker import TipTracker
 from opentrons.protocols.api_support.util import APIVersionError
-from opentrons.types import DeckSlotName, Point
 
-from opentrons.protocol_api.module_contexts import ModuleContext
+from opentrons.protocol_api.module_contexts import ModuleTypes
+
+from opentrons.types import DeckSlotName, Point
 
 from ..labware import AbstractLabware, LabwareLoadParams
 from .well import WellCore
@@ -54,10 +54,10 @@ class LabwareCore(AbstractLabware[WellCore]):
         return self._definition.parameters.loadName
 
     @property
-    def parent(self) -> Optional[Union[ModuleContext[ModuleGeometry], str]]:
+    def parent(self) -> Optional[Union[ModuleTypes, str]]:
         """Get the labware's parent.
 
-        In case the labware is present on the deck, return well name.
+        In case the labware is present on the deck, return slot name.
         In case the labware is on a module, return ModuleContext.
         In case the labware is off the deck return None.
         """

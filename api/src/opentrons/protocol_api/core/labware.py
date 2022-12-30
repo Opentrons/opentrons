@@ -11,11 +11,11 @@ from opentrons_shared_data.labware.dev_types import (
 )
 
 from opentrons.protocols.geometry.labware_geometry import AbstractLabwareGeometry
-from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.protocols.api_support.tip_tracker import TipTracker
-from opentrons.types import DeckSlotName, Point
 
-from opentrons.protocol_api.module_contexts import ModuleContext
+from opentrons.protocol_api.module_contexts import ModuleTypes
+
+from opentrons.types import DeckSlotName, Point
 
 from .well import WellCoreType
 
@@ -52,10 +52,10 @@ class AbstractLabware(ABC, Generic[WellCoreType]):
 
     @property
     @abstractmethod
-    def parent(self) -> Optional[Union[ModuleContext[ModuleGeometry], str]]:
+    def parent(self) -> Optional[Union[ModuleTypes, str]]:
         """Get the labware's parent.
 
-        In case the labware is present on the deck, return well name.
+        In case the labware is present on the deck, return slot name.
         In case the labware is on a module, return ModuleContext.
         In case the labware is off the deck return None.
         """

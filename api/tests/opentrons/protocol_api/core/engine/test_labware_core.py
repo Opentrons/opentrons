@@ -299,3 +299,8 @@ def test_get_deck_slot(
     ).then_raise(LabwareNotOnDeckError("oh no"))
 
     assert subject.get_deck_slot() is None
+
+
+def test_parent_slot_name(subject: LabwareCore) -> None:
+    """Should get the labware's parent."""
+    subject.parent == "1"

@@ -6,9 +6,10 @@ from typing import overload
 
 from .common import ModuleCore, LabwareCore
 
+from opentrons.protocol_api.module_contexts import ModuleTypes
+
 if TYPE_CHECKING:
     from ..labware import Labware
-    from ..protocol_context import ModuleTypes
 
 
 class LoadedCoreMap:
