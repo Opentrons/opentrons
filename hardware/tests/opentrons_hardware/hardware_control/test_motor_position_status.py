@@ -74,7 +74,7 @@ async def test_parse_motor_position(waitable_reader: AsyncIter) -> None:
     nodes = set([NodeId.gantry_x, NodeId.gantry_y, NodeId.head])
     data = await asyncio.wait_for(
         motor_position_status._parser_motor_position_response(
-            waitable_reader, nodes  # type: ignore[arg-type]
+            waitable_reader  # type: ignore[arg-type]
         ),
         1,
     )
