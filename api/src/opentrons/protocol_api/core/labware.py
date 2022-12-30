@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Generic, List, NamedTuple, Optional, TypeVar
+from typing import Any, Generic, List, NamedTuple, Optional, TypeVar, Union
 
 from opentrons_shared_data.labware.dev_types import (
     LabwareUri,
@@ -13,6 +13,8 @@ from opentrons_shared_data.labware.dev_types import (
 from opentrons.protocols.geometry.labware_geometry import AbstractLabwareGeometry
 from opentrons.protocols.api_support.tip_tracker import TipTracker
 from opentrons.types import DeckSlotName, Point
+
+from opentrons.protocol_api.module_contexts import ModuleContext
 
 from .well import WellCoreType
 
@@ -46,6 +48,16 @@ class AbstractLabware(ABC, Generic[WellCoreType]):
     @abstractmethod
     def highest_z(self) -> float:
         """Get the Z coordinate of the labware's highest point"""
+
+    @property
+    @abstractmethod
+    def parent(self) -> Optional[Union[ModuleContext, str]]:
+        """Get the labware's parent.
+
+        In case the labware is present on the deck, return well name.
+        In case the labware is on a module, return ModuleContext.
+        In case the labware is off the deck return None.
+        """
 
     @abstractmethod
     def get_uri(self) -> str:

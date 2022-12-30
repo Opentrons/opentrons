@@ -50,6 +50,15 @@ class LabwareCore(AbstractLabware[WellCore]):
         """The API load name of the labware definition."""
         return self._definition.parameters.loadName
 
+    @property
+    def parent(self) -> Optional[Union[ModuleContext, str]]:
+        """Get the labware's parent.
+
+        In case the labware is present on the deck, return well name.
+        In case the labware is on a module, return ModuleContext.
+        In case the labware is off the deck return None.
+        """
+
     def get_uri(self) -> str:
         """Get the URI string of the labware's definition.
 
