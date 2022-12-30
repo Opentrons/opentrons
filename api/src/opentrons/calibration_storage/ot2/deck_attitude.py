@@ -39,19 +39,9 @@ def save_robot_deck_attitude(
     transform: local_types.AttitudeMatrix,
     pip_id: Optional[str],
     lw_hash: Optional[str],
-    source: Optional[local_types.SourceType] = None,
-    cal_status: Optional[
-        Union[local_types.CalibrationStatus, v1.CalibrationStatus]
-    ] = None,
+    source: local_types.SourceType,
 ) -> None:
     robot_dir = config.get_opentrons_path("robot_calibration_dir")
-
-    if isinstance(cal_status, local_types.CalibrationStatus):
-        cal_status_model = v1.CalibrationStatus(**asdict(cal_status))
-    elif isinstance(cal_status, v1.CalibrationStatus):
-        cal_status_model = cal_status
-    else:
-        cal_status_model = v1.CalibrationStatus()
 
     gantry_calibration = v1.DeckCalibrationModel(
         attitude=transform,
@@ -59,7 +49,7 @@ def save_robot_deck_attitude(
         last_modified=utc_now(),
         tiprack=lw_hash,
         source=source or local_types.SourceType.user,
-        status=cal_status_model,
+        status=v1.CalibrationStatus(),
     )
     # convert to schema + validate json conversion
     io.save_to_file(robot_dir, "deck_calibration", gantry_calibration)

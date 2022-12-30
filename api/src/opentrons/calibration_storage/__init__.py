@@ -52,30 +52,30 @@ CalibrationStatusType = typing.TypeVar(
 def save_robot_deck_attitude(
     transform: local_types.AttitudeMatrix,
     pipette_id: str,
-    source: typing.Optional[local_types.SourceType] = local_types.SourceType.user,
-    calibration_status: typing.Optional[CalibrationStatusType] = None,
-    lw_hash: typing.Optional[str] = None,
+    source: local_types.SourceType = local_types.SourceType.user,
+    lw_hash: str = "",
 ) -> None:
     # add can't save file error for pipette id
     if config.feature_flags.enable_ot3_hardware_controller():
         from .ot3 import ot3_save_robot_deck_attitude
 
-        ot3_save_robot_deck_attitude(transform, pipette_id, source, calibration_status)
+        ot3_save_robot_deck_attitude(transform, pipette_id, source)
     else:
         from .ot2 import ot2_save_robot_deck_attitude
 
         ot2_save_robot_deck_attitude(
-            transform, pipette_id, lw_hash, source, calibration_status
+            transform, pipette_id, lw_hash, source
         )
 
 
 def get_robot_deck_attitude() -> typing.Optional[DeckCalibrationType]:
     if config.feature_flags.enable_ot3_hardware_controller():
         from .ot3 import ot3_get_robot_deck_attitude
-        return ot3_get_robot_deck_attitude()
+        deck_attitude: DeckCalibrationType = ot3_get_robot_deck_attitude()
     else:
         from .ot2 import ot2_get_robot_deck_attitude
-        return ot2_get_robot_deck_attitude()
+        deck_attitude = ot2_get_robot_deck_attitude()
+    return deck_attitude
 
 
 def delete_robot_deck_attitude() -> None:
@@ -91,9 +91,9 @@ def save_pipette_calibration(
     offset: Point,
     pipette_id: str,
     mount: Mount,
-    calibration_status: typing.Optional[CalibrationStatusType] = None,
-    tiprack_hash: typing.Optional[str] = None,
-    tiprack_uri: typing.Optional[str] = None,
+    calibration_status: CalibrationStatusType = local_types.CalibrationStatus(),
+    tiprack_hash: str = "",
+    tiprack_uri: str = "",
 ) -> None:
     # check pip id and tiprack info here
     if config.feature_flags.enable_ot3_hardware_controller():
@@ -146,7 +146,7 @@ def delete_pipette_offset_file(pipette_id: str, mount: Mount) -> None:
 def create_tip_length_data(
     definition: "LabwareDefinition",
     length: float,
-    calibration_status: typing.Optional[CalibrationStatusType] = None,
+    calibration_status: CalibrationStatusType = local_types.CalibrationStatus(),
 ) -> typing.Dict[str, TipLengthCalibrationType]:
     if config.feature_flags.enable_ot3_hardware_controller():
         from .ot3 import ot3_create_tip_length_data
