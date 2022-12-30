@@ -44,7 +44,7 @@ interface ConnectedNetworkInfoProps {
 
 export function ConnectedNetworkInfo({
   ssid,
-  authType = 'wpa', // ToDo kj 12/27/2022 this default will be removed by the PR for manual connection
+  authType,
 }: ConnectedNetworkInfoProps): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   const localRobot = useSelector(getLocalRobot)

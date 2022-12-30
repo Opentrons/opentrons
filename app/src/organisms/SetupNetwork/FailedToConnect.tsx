@@ -23,8 +23,8 @@ import type { NetworkChangeType } from '../Devices/RobotSettings/ConnectNetwork/
 
 interface FailedToConnectProps {
   ssid: string
-  requestState?: RequestState
-  type: NetworkChangeType | null // ToDo kj 12/27/2022 Null will be removed by the PR for manual connection
+  requestState?: RequestState | null
+  type: NetworkChangeType | null
   onConnect: () => void
 }
 
