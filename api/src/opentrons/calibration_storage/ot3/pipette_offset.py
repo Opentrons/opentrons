@@ -1,8 +1,7 @@
 import json
 import logging
 from pydantic import ValidationError
-from typing import Optional, Union, no_type_check
-from dataclasses import asdict
+from typing import Optional
 
 from opentrons import config, types
 
@@ -16,7 +15,6 @@ log = logging.getLogger(__name__)
 # Delete Pipette Offset Calibrations
 
 
-@no_type_check
 def delete_pipette_offset_file(pipette: str, mount: types.Mount) -> None:
     """
     Delete pipette offset file based on mount and pipette serial number
@@ -40,38 +38,24 @@ def clear_pipette_offset_calibrations() -> None:
 
 # Save Pipette Offset Calibrations
 
-
-@no_type_check
 def save_pipette_calibration(
     offset: types.Point,
     pip_id: str,
     mount: types.Mount,
-    cal_status: Optional[
-        Union[local_types.CalibrationStatus, v1.CalibrationStatus]
-    ] = None,
 ) -> None:
     pip_dir = config.get_opentrons_path("pipette_calibration_dir") / mount.name.lower()
-
-    if isinstance(cal_status, local_types.CalibrationStatus):
-        cal_status_model = v1.CalibrationStatus(**asdict(cal_status))
-    elif isinstance(cal_status, v1.CalibrationStatus):
-        cal_status_model = cal_status
-    else:
-        cal_status_model = v1.CalibrationStatus()
 
     pipette_calibration = v1.InstrumentOffsetModel(
         offset=offset,
         lastModified=utc_now(),
         source=local_types.SourceType.user,
-        status=cal_status_model,
+        status=v1.CalibrationStatus(),
     )
     io.save_to_file(pip_dir, pip_id, pipette_calibration)
 
 
 # Get Pipette Offset Calibrations
 
-
-@no_type_check
 def get_pipette_offset(
     pipette_id: str, mount: types.Mount
 ) -> Optional[v1.InstrumentOffsetModel]:
