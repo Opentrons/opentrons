@@ -211,6 +211,7 @@ jobs:
         run: |
           npm config set cache ${{ github.workspace }}/.npm-cache
           yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
+          npm cache clean
           make setup-js
 
       # build the app and deploy it

@@ -25,13 +25,14 @@
   "homepage": "https://github.com/Opentrons/opentrons",
   "workspaces": {
     "nohoist": [
-      "**"
+      "electron"
     ]
   },
   "devDependencies": {
     "@opentrons/app": "link:../app",
     "@opentrons/discovery-client": "link:../discovery-client",
-    "@opentrons/shared-data": "link:../shared-data"
+    "@opentrons/shared-data": "link:../shared-data",
+    "electron": "21.3.1"
   },
   "dependencies": {
     "@thi.ng/paths": "1.6.5",
@@ -42,7 +43,6 @@
     "@types/uuid": "^3.4.7",
     "ajv": "6.10.2",
     "dateformat": "3.0.3",
-    "electron": "21.3.1",
     "electron-debug": "3.0.1",
     "electron-devtools-installer": "3.2.0",
     "electron-dl": "1.14.0",
