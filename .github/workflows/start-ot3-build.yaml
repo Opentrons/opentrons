@@ -34,7 +34,6 @@ jobs:
             {
               "oe-core-ref": "-",
               "monorepo-ref": "${{ github.ref }}",
-              "monorepo-tag": "${{ github.tag }}",
               "infra-stage": "stage-prod"
             }
 
