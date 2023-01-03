@@ -18,12 +18,12 @@ import {
   BORDERS,
 } from '@opentrons/components'
 import { useRunQuery } from '@opentrons/react-api-client'
-import { useLPCSuccessToast } from '../../../ProtocolSetup/hooks'
+import { useLPCSuccessToast } from '../../hooks/useLPCSuccessToast'
 import { SecondaryButton } from '../../../../atoms/buttons'
 import { Tooltip } from '../../../../atoms/Tooltip'
 import { StyledText } from '../../../../atoms/text'
 import { LabwarePositionCheck } from '../../../LabwarePositionCheck'
-import { HowLPCWorksModal } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/HowLPCWorksModal'
+import { HowLPCWorksModal } from './HowLPCWorksModal'
 import {
   useProtocolDetailsForRun,
   useRunCalibrationStatus,

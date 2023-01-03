@@ -60,7 +60,7 @@ async def test_runner_with_modules_in_legacy_python(
         directory=None,
     )
 
-    subject = await create_simulating_runner()
+    subject = await create_simulating_runner(robot_type="OT-2 Standard")
     result = await subject.run(protocol_source)
     commands_result = result.commands
 

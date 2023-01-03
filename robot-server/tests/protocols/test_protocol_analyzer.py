@@ -127,6 +127,5 @@ async def test_analyze(
             pipettes=[analysis_pipette],
             errors=[analysis_error],
             liquids=[],
-            robot_type="OT-3 Standard",
         ),
     )

@@ -38,7 +38,7 @@ describe('DetachProbe', () => {
       proceed: jest.fn(),
       chainRunCommands: jest.fn(),
       runId: RUN_ID_1,
-      attachedPipette: { left: mockPipette, right: null },
+      attachedPipettes: { left: mockPipette, right: null },
       flowType: FLOWS.CALIBRATE,
       handleCleanUp: jest.fn(),
       errorMessage: null,

@@ -59,7 +59,9 @@ export function HistoricalProtocolRunOffsetDrawer(
       <Box
         backgroundColor={COLORS.fundamentalsBackground}
         width="100%"
-        padding={`${SPACING.spacing4} ${SPACING.spacing3} ${SPACING.spacing4} ${SPACING.spacing7}`}
+        padding={`${String(SPACING.spacing4)} ${String(
+          SPACING.spacing3
+        )} ${String(SPACING.spacing4)} ${String(SPACING.spacing7)}`}
       >
         <Box
           backgroundColor={COLORS.white}
@@ -82,7 +84,9 @@ export function HistoricalProtocolRunOffsetDrawer(
     <Box
       backgroundColor={COLORS.fundamentalsBackground}
       width="100%"
-      padding={`${SPACING.spacing4} ${SPACING.spacing3} ${SPACING.spacing4} ${SPACING.spacing7}`}
+      padding={`${String(SPACING.spacing4)} ${String(
+        SPACING.spacing3
+      )} ${String(SPACING.spacing4)} ${String(SPACING.spacing7)}`}
     >
       {isOutOfDate ? (
         <Banner type="warning" marginTop={SPACING.spacing3}>
@@ -143,7 +147,9 @@ export function HistoricalProtocolRunOffsetDrawer(
             <StyledText width="23.5%" as="label">
               {t('slot', { slotName: offset.location.slotName })}
               {offset.location.moduleModel != null &&
-                ` - ${getModuleDisplayName(offset.location.moduleModel)}`}
+                ` - ${String(
+                  getModuleDisplayName(offset.location.moduleModel)
+                )}`}
             </StyledText>
             <StyledText
               as="label"

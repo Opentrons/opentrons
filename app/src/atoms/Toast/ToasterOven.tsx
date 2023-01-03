@@ -31,13 +31,13 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
 
   /**
    * makes toast, rendering it in the toaster oven display container
-   * @param {string | JSX.Element} message
+   * @param {string} message
    * @param {ToastType} type
    * @param {MakeToastOptions} options
    * @returns {string} returns the id to allow imperative eatToast close from caller
    */
   function makeToast(
-    message: string | JSX.Element,
+    message: string,
     type: ToastType,
     options?: MakeToastOptions
   ): string {

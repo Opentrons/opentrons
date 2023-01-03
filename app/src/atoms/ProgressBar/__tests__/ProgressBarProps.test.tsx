@@ -24,7 +24,7 @@ describe('ProgressBar', () => {
     const [{ getByTestId }] = render(props)
     const container = getByTestId('ProgressBar_Container')
     const bar = getByTestId('ProgressBar_Bar')
-    expect(container).toHaveStyle(`background: ${COLORS.white}`)
+    expect(container).toHaveStyle(`background: ${String(COLORS.white)}`)
     expect(bar).toHaveStyle('width: 0%')
   })
 
@@ -32,7 +32,7 @@ describe('ProgressBar', () => {
     props.percentComplete = 50
     const [{ getByTestId }] = render(props)
     const bar = getByTestId('ProgressBar_Bar')
-    expect(bar).toHaveStyle(`background: ${COLORS.blueEnabled}`)
+    expect(bar).toHaveStyle(`background: ${String(COLORS.blueEnabled)}`)
     expect(bar).toHaveStyle('width: 50%')
   })
 
@@ -40,7 +40,7 @@ describe('ProgressBar', () => {
     props.percentComplete = 100
     const [{ getByTestId }] = render(props)
     const bar = getByTestId('ProgressBar_Bar')
-    expect(bar).toHaveStyle(`background: ${COLORS.blueEnabled}`)
+    expect(bar).toHaveStyle(`background: ${String(COLORS.blueEnabled)}`)
     expect(bar).toHaveStyle('width: 100%')
   })
 
@@ -49,8 +49,8 @@ describe('ProgressBar', () => {
     props.color = COLORS.errorEnabled
     const [{ getByTestId }] = render(props)
     const bar = getByTestId('ProgressBar_Bar')
-    expect(bar).not.toHaveStyle(`background: ${COLORS.blueEnabled}`)
-    expect(bar).toHaveStyle(`background: ${COLORS.errorEnabled}`)
+    expect(bar).not.toHaveStyle(`background: ${String(COLORS.blueEnabled)}`)
+    expect(bar).toHaveStyle(`background: ${String(COLORS.errorEnabled)}`)
     expect(bar).toHaveStyle('width: 50%')
   })
 })

@@ -12,37 +12,6 @@
     "model": "OT-2 Standard",
     "deckId": "ot2_standard"
   },
-  "pipettes": {
-    "pipetteId": {
-      "name": "p10_single"
-    }
-  },
-  "modules": {
-    "magneticModuleId": {
-      "model": "magneticModuleV2"
-    },
-    "temperatureModuleId": {
-      "model": "temperatureModuleV2"
-    }
-  },
-  "labware": {
-    "fixedTrash": {
-      "displayName": "Trash",
-      "definitionId": "opentrons/opentrons_1_trash_1100ml_fixed/1"
-    },
-    "tipRackId": {
-      "displayName": "Opentrons 96 Tip Rack 10 µL",
-      "definitionId": "opentrons/opentrons_96_tiprack_10ul/1"
-    },
-    "sourcePlateId": {
-      "displayName": "Source Plate",
-      "definitionId": "example/plate/1"
-    },
-    "destPlateId": {
-      "displayName": "Sample Collection Plate",
-      "definitionId": "example/plate/1"
-    }
-  },
   "liquids": {
     "waterId": {
       "displayName": "Water",
@@ -1274,7 +1243,8 @@
         "version": 1,
         "location": {
           "moduleId": "temperatureModuleId"
-        }
+        },
+        "displayName": "Source Plate"
       }
     },
     {
@@ -1299,7 +1269,8 @@
         "location": { "slotName": "8" },
         "loadName": "opentrons_96_tiprack_1000ul",
         "namespace": "opentrons",
-        "version": 1
+        "version": 1,
+        "displayName": "Opentrons 96 Tip Rack 10 µL"
       }
     },
     {
@@ -1312,7 +1283,8 @@
         },
         "loadName": "opentrons_1_trash_1100ml_fixed",
         "namespace": "opentrons",
-        "version": 1
+        "version": 1,
+        "displayName": "Trash"
       }
     },
     {

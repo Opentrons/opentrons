@@ -453,6 +453,14 @@ class BrushedMotorPwmPayload(EmptyPayload):
 
 
 @dataclass(eq=False)
+class BrushedMotorConfPayload(EmptyPayload):
+    """A response carrying data about a brushed motor driver."""
+
+    v_ref: utils.UInt32Field
+    duty_cycle: utils.UInt32Field
+
+
+@dataclass(eq=False)
 class GripperInfoResponsePayload(EmptyPayload):
     """A response carrying data about an attached gripper."""
 
