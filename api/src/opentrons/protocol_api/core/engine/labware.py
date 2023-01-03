@@ -52,23 +52,6 @@ class LabwareCore(AbstractLabware[WellCore]):
         """The API load name of the labware definition."""
         return self._definition.parameters.loadName
 
-    @property
-    def parent(self) -> Optional[Union[str]]:
-        """Get the labware's parent.
-
-        slot name in case the labware is present on the deck.
-        ModuleContext in case the labware is on a module.
-        None in case the labware is off the deck.
-        """
-        labware_loaction = self._engine_client.state.labware.get_location(
-            self.labware_id
-        )
-        if labware_loaction == "offDeck":
-            return None
-        elif isinstance(labware_loaction, ModuleLocation):
-            raise NotImplementedError("labwre parent on a module is not implemented.")
-        return labware_loaction
-
     def get_uri(self) -> str:
         """Get the URI string of the labware's definition.
 

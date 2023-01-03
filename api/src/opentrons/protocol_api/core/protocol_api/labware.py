@@ -4,7 +4,6 @@ from opentrons.calibration_storage import helpers
 from opentrons.protocols.geometry.labware_geometry import LabwareGeometry
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocols.api_support.tip_tracker import TipTracker
-from opentrons.protocols.api_support.util import UnsupportedAPIError
 
 from opentrons.types import DeckSlotName, Location, Point
 from opentrons_shared_data.labware.dev_types import LabwareParameters, LabwareDefinition
@@ -165,18 +164,6 @@ class LabwareImplementation(AbstractLabware[WellImplementation]):
 
     def get_geometry(self) -> LabwareGeometry:
         return self._geometry
-
-    @property
-    def parent(self) -> Optional[Union[str]]:
-        """Get the labware's parent.
-
-        In case the labware is present on the deck, return slot name.
-        In case the labware is on a module, return ModuleContext.
-        In case the labware is off the deck return None.
-        """
-        raise UnsupportedAPIError(
-            "Labware parent is not supported in this API version. Please use LabwareGeometry."
-        )
 
     @property
     def highest_z(self) -> float:

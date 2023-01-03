@@ -50,16 +50,6 @@ class AbstractLabware(ABC, Generic[WellCoreType]):
     def highest_z(self) -> float:
         """Get the Z coordinate of the labware's highest point"""
 
-    @property
-    @abstractmethod
-    def parent(self) -> Optional[Union[str]]:
-        """Get the labware's parent.
-
-        In case the labware is present on the deck, return slot name.
-        In case the labware is on a module, return ModuleContext.
-        In case the labware is off the deck return None.
-        """
-
     @abstractmethod
     def get_uri(self) -> str:
         """Get the URI string string of the labware's definition.

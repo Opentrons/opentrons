@@ -374,3 +374,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
     def get_module_cores(self) -> List[ModuleCore]:
         """Get all loaded module cores."""
         return list(self._module_cores_by_id.values())
+
+    def get_module_core_by_module_id(self, module_id: str) -> ModuleCore:
+        """Get ModuleContext for a given module id."""
+        return self._module_cores_by_id[module_id]

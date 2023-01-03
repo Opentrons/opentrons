@@ -33,6 +33,7 @@ from . import validation
 from .core import well_grid
 from .core.labware import AbstractLabware
 from .core.protocol_api.labware import LabwareImplementation
+from .core.core_map import LoadedCoreMap
 
 if TYPE_CHECKING:
     from opentrons.protocols.geometry.module_geometry import (  # noqa: F401
@@ -42,7 +43,7 @@ if TYPE_CHECKING:
         LabwareDefinition,
         LabwareParameters,
     )
-    from .core.common import LabwareCore, WellCore
+    from .core.common import LabwareCore, WellCore, ProtocolCore
 
 
 _log = logging.getLogger(__name__)
@@ -267,6 +268,8 @@ class Labware:
         self,
         implementation: AbstractLabware[Any],
         api_version: APIVersion,
+        protocol_core: Optional[ProtocolCore] = None,
+        core_map: Optional[LoadedCoreMap] = None,
     ) -> None:
         """
         :param implementation: The class that implements the public interface
@@ -326,7 +329,17 @@ class Labware:
         """The parent of this labware. Usually a slot name."""
         if isinstance(self._implementation, LabwareImplementation):
             return self._implementation.get_geometry().parent.labware.object
-        return self._implementation.parent
+
+        labware_loaction = (
+            self._implementation._engine_client.state.labware.get_location(
+                self._implementation.labware_id
+            )
+        )
+        if labware_loaction == "offDeck":
+            return None
+        # elif isinstance(labware_loaction, ModuleLocation):
+        #     raise NotImplementedError("labwre parent on a module is not implemented.")
+        return labware_loaction
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
