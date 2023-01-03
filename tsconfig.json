@@ -8,9 +8,6 @@
       "path": "./app-shell"
     },
     {
-      "path": "./app-shell-odd"
-    },
-    {
       "path": "./components"
     },
     {

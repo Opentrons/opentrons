@@ -97,7 +97,7 @@ jobs:
     # to run cross-platform just like builds, might as well do them in the same job
     strategy:
       matrix:
-        os: ['windows-2019', 'ubuntu-22.04', 'macos-11']
+        os: ['windows-2022', 'ubuntu-22.04', 'macos-11']
     name: 'opentrons app backend unit tests and build'
     runs-on: ${{ matrix.os }}
     steps:
@@ -124,8 +124,17 @@ jobs:
           script: |
             const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
+      - name: 'cache yarn cache'
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/.npm-cache/_prebuild
+            ${{ github.workspace }}/.yarn-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
       - name: setup-js
         run: |
+          npm config set cache ${{ github.workspace }}/.npm-cache
+          yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
           make setup-js
       - name: 'test native(er) packages'
         run: |
@@ -168,7 +177,7 @@ jobs:
   build-app-ot3:
     strategy:
       matrix:
-        os: ['windows-2019', 'ubuntu-22.04', 'macos-latest']
+        os: ['windows-2022', 'ubuntu-22.04', 'macos-latest']
     name: 'opentrons app backend unit tests and build for OT3'
     runs-on: ${{ matrix.os }}
     steps:
@@ -195,6 +204,13 @@ jobs:
           script: |
             const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
+      - name: 'cache yarn cache'
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/.npm-cache/_prebuild
+            ${{ github.workspace }}/.yarn-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
       - name: setup-js
         run: |
           npm config set cache ${{ github.workspace }}/.npm-cache
