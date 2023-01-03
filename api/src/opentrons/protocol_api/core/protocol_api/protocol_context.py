@@ -128,7 +128,7 @@ class ProtocolContextImplementation(
         self,
         definition: LabwareDefinition,
     ) -> LabwareLoadParams:
-        """Add a labware defintion to the set of loadable definitions."""
+        """Add a labware definition to the set of loadable definitions."""
         load_params = LabwareLoadParams(
             namespace=definition["namespace"],
             load_name=definition["parameters"]["loadName"],
@@ -402,6 +402,12 @@ class ProtocolContextImplementation(
     ) -> Union[LabwareImplementation, legacy_module_core.LegacyModuleCore, None]:
         """Get the contents of a given slot, if any."""
         raise NotImplementedError("LegacyProtocolCore.get_slot_item not implemented")
+
+    def get_module_item(
+        self, module_core: legacy_module_core.LegacyModuleCore
+    ) -> Optional[LabwareImplementation]:
+        """Get the item on top of a given module, if any."""
+        raise NotImplementedError("LegacyProtocolCore.get_module_item not implemented")
 
     def get_slot_center(self, slot_name: DeckSlotName) -> Point:
         """Get the absolute coordinate of a slot's center."""

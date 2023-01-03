@@ -52,7 +52,7 @@ class CannotPerformModuleAction(RuntimeError):
     """An error raised when attempting to execute an invalid module action."""
 
 
-class LegacyModuleCore(AbstractModuleCore[LabwareImplementation]):
+class LegacyModuleCore(AbstractModuleCore):
     """Legacy ModuleCore implementation for pre-ProtocolEngine protocols."""
 
     def __init__(
@@ -97,7 +97,6 @@ class LegacyModuleCore(AbstractModuleCore[LabwareImplementation]):
 
     def add_labware_core(self, labware_core: LabwareImplementation) -> Labware:
         """Add a labware to the module."""
-        # TODO (mc, 2022-10-25): RSS-105 and RSS-106. Refactor so we do not return Labware from the method.
         labware = self.geometry.add_labware(
             Labware(
                 implementation=labware_core,
@@ -108,9 +107,7 @@ class LegacyModuleCore(AbstractModuleCore[LabwareImplementation]):
         return labware
 
 
-class LegacyTemperatureModuleCore(
-    LegacyModuleCore, AbstractTemperatureModuleCore[LabwareImplementation]
-):
+class LegacyTemperatureModuleCore(LegacyModuleCore, AbstractTemperatureModuleCore):
     """Legacy core control implementation for an attached Temperature Module."""
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.TempDeck]
@@ -123,7 +120,7 @@ class LegacyTemperatureModuleCore(
         """Wait until the module's target temperature is reached.
 
         Specifying a value for ``celsius`` that is different than
-        the module's current target temperature may beahave unpredictably.
+        the module's current target temperature may behave unpredictably.
         """
         self._sync_module_hardware.await_temperature(celsius)
 
@@ -144,9 +141,7 @@ class LegacyTemperatureModuleCore(
         return self._sync_module_hardware.status  # type: ignore[no-any-return]
 
 
-class LegacyMagneticModuleCore(
-    LegacyModuleCore, AbstractMagneticModuleCore[LabwareImplementation]
-):
+class LegacyMagneticModuleCore(LegacyModuleCore, AbstractMagneticModuleCore):
     """Core control interface for an attached Magnetic Module."""
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.MagDeck]
@@ -240,9 +235,7 @@ class LegacyMagneticModuleCore(
         return labware
 
 
-class LegacyThermocyclerCore(
-    LegacyModuleCore, AbstractThermocyclerCore[LabwareImplementation]
-):
+class LegacyThermocyclerCore(LegacyModuleCore, AbstractThermocyclerCore):
     """Core control interface for an attached Thermocycler Module."""
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.Thermocycler]
@@ -405,9 +398,7 @@ class LegacyThermocyclerCore(
             )
 
 
-class LegacyHeaterShakerCore(
-    LegacyModuleCore, AbstractHeaterShakerCore[LabwareImplementation]
-):
+class LegacyHeaterShakerCore(LegacyModuleCore, AbstractHeaterShakerCore):
     """Core control interface for an attached Heater-Shaker Module."""
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.HeaterShaker]

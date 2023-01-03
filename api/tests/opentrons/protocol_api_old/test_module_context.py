@@ -182,7 +182,7 @@ def test_load_simulating_module(ctx, loadname, klass, model):
     mod = ctx.load_module(loadname, 7)
     assert isinstance(mod, klass)
     assert mod.geometry.model.value == model
-    assert mod._module.model() == model
+    assert mod._core._sync_module_hardware.model() == model
 
 
 # _________ Magnetic Module tests __________
@@ -428,19 +428,22 @@ async def test_magdeck_gen1_labware_props(ctx):
     mod = ctx.load_module("magdeck", 1)
     assert mod.labware is None
     mod.engage(height=45)
-    assert mod._module.current_height == 45
+    assert mod._core._sync_module_hardware.current_height == 45
     with pytest.raises(ValueError):
         mod.engage(height=45.1)  # max engage height for gen1 is 45 mm
     mod.load_labware(labware_name)
     mod.engage()
     lw_offset = labware_def["parameters"]["magneticModuleEngageHeight"]
-    assert await mod._module._driver.get_plate_height() == lw_offset
+    assert await mod._core._sync_module_hardware._driver.get_plate_height() == lw_offset
     mod.disengage()
     mod.engage(offset=2)
-    assert await mod._module._driver.get_plate_height() == lw_offset + 2
+    assert (
+        await mod._core._sync_module_hardware._driver.get_plate_height()
+        == lw_offset + 2
+    )
     mod.disengage()
     mod.engage(height=3)
-    assert await mod._module._driver.get_plate_height() == 3
+    assert await mod._core._sync_module_hardware._driver.get_plate_height() == 3
     mod.geometry.reset_labware()
     labware_name = "corning_96_wellplate_360ul_flat"
     mod.load_labware(labware_name)
@@ -449,24 +452,24 @@ async def test_magdeck_gen1_labware_props(ctx):
     with pytest.raises(ValueError):
         mod.engage(offset=1)
     mod.engage(height=2)
-    assert await mod._module._driver.get_plate_height() == 2
+    assert await mod._core._sync_module_hardware._driver.get_plate_height() == 2
     mod.engage(height=0)
-    assert await mod._module._driver.get_plate_height() == 0
+    assert await mod._core._sync_module_hardware._driver.get_plate_height() == 0
     mod.engage(height_from_base=2)
     assert (
-        await mod._module._driver.get_plate_height()
-        == 2 + OFFSET_TO_LABWARE_BOTTOM[mod._module.model()]
+        await mod._core._sync_module_hardware._driver.get_plate_height()
+        == 2 + OFFSET_TO_LABWARE_BOTTOM[mod._core._sync_module_hardware.model()]
     )
 
 
 def test_magdeck_gen2_labware_props(ctx):
     mod = ctx.load_module("magnetic module gen2", 1)
     mod.engage(height=25)
-    assert mod._module.current_height == 25
+    assert mod._core._sync_module_hardware.current_height == 25
     with pytest.raises(ValueError):
         mod.engage(height=25.1)  # max engage height for gen2 is 25 mm
     mod.engage(height=0)
-    assert mod._module.current_height == 0
+    assert mod._core._sync_module_hardware.current_height == 0
 
 
 def test_module_compatibility():

@@ -167,8 +167,10 @@ async def _build_ot2_hw() -> AsyncGenerator[ThreadManagedHardware, None]:
         yield hw_sim
     finally:
         config.robot_configs.clear()
-        for m in hw_sim.attached_modules:
-            await m.cleanup()
+        await asyncio.gather(
+            (m.cleanup() for m in hw_sim.wrapped().attached_modules),
+            return_exceptions=True,
+        )
         hw_sim.set_config(old_config)
         hw_sim.clean_up()
 
@@ -190,8 +192,10 @@ async def _build_ot3_hw() -> AsyncGenerator[ThreadManagedHardware, None]:
         yield hw_sim
     finally:
         config.robot_configs.clear()
-        for m in hw_sim.attached_modules:
-            await m.cleanup()
+        await asyncio.gather(
+            (m.cleanup() for m in hw_sim.wrapped().attached_modules),
+            return_exceptions=True,
+        )
         hw_sim.set_config(old_config)
         hw_sim.clean_up()
 
@@ -258,14 +262,10 @@ async def hardware(
 
 
 @pytest.fixture()
-def ctx(hardware: ThreadManagedHardware) -> Generator[ProtocolContext, None, None]:
-    c = create_protocol_context(
+def ctx(hardware: ThreadManagedHardware) -> ProtocolContext:
+    return create_protocol_context(
         api_version=MAX_SUPPORTED_VERSION, hardware_api=hardware
     )
-    yield c
-    # Manually clean up all the modules.
-    for m in c.loaded_modules.items():
-        m[1]._module.cleanup()
 
 
 @pytest.fixture()
