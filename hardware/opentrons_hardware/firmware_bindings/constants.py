@@ -169,6 +169,7 @@ class ErrorCode(int, Enum):
     estop_detected = 0x07
     collision_detected = 0x08
     labware_dropped = 0x09
+    estop_released = 0x0A
 
 
 @unique
