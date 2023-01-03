@@ -9,7 +9,6 @@ from opentrons.drivers.types import (
     ThermocyclerLidStatus,
 )
 from opentrons.hardware_control.modules.types import (
-    ModuleModel,
     ModuleType,
     TemperatureStatus,
     ThermocyclerStep,
@@ -20,6 +19,9 @@ from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.types import DeckSlotName
 
 from .labware import LabwareCoreType
+
+
+from opentrons_shared_data.module.dev_types import ModuleModel
 
 if TYPE_CHECKING:
     from opentrons.protocol_api.labware import Labware
@@ -34,7 +36,7 @@ class AbstractModuleCore(ABC, Generic[LabwareCoreType]):
         """Get the module's geometry interface."""
 
     @abstractmethod
-    def get_model(self) -> str:
+    def get_model(self) -> ModuleModel:
         """Get the module's model identifier as a string."""
 
     @abstractmethod

@@ -6,6 +6,7 @@ from opentrons.hardware_control import SynchronousAdapter
 from opentrons.hardware_control.modules import AbstractModule
 from opentrons.protocol_engine import DeckSlotLocation
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
+from opentrons.protocol_engine.types import ModuleModel
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api.core.engine.module_core import ModuleCore
@@ -76,3 +77,14 @@ def test_add_labware_core(
     result = subject.add_labware_core(labware_core=labware_core)
 
     assert result.api_version == api_version
+
+
+def test_get_model(
+    decoy: Decoy, subject: ModuleCore, mock_engine_client: EngineClient
+) -> None:
+    """It should return the module model."""
+    decoy.when(mock_engine_client.state.modules.get_model("1234")).then_return(ModuleModel.HEATER_SHAKER_MODULE_V1)
+
+    result = subject.get_model()
+
+    assert result == "heaterShakerModuleV1"

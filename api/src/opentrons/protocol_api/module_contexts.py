@@ -4,7 +4,7 @@ import logging
 from typing import Generic, List, Optional, TypeVar, cast
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons_shared_data.module.dev_types import ModuleModelType, ModuleModel
+from opentrons_shared_data.module.dev_types import ModuleModel
 
 from opentrons.broker import Broker
 from opentrons.hardware_control import SynchronousAdapter, modules
@@ -73,7 +73,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
 
     @property
     def model(self) -> ModuleModel:
-        return ModuleModelType(self._core.get_model()).value
+        return self._core.get_model()
 
     # TODO(mc, 2022-09-08): Remove this method
     @requires_version(2, 0)

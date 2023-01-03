@@ -39,20 +39,6 @@ ModuleModel = Union[
 ]
 
 
-class ModuleModelType(str, Enum):
-    """Module model values."""
-
-    value: ModuleModel
-
-    MAGNETIC_MODULE_V1 = "magneticModuleV1"
-    MAGNETIC_MODULE_V2 = "magneticModuleV2"
-    TEMPERATURE_MODULE_V1 = "temperatureModuleV1"
-    TEMPERATURE_MODULE_V2 = "temperatureModuleV2"
-    THERMOCYCLER_MODULE_V1 = "thermocyclerModuleV1"
-    THERMOCYCLER_MODULE_V2 = "thermocyclerModuleV2"
-    HEATER_SHAKER_MODULE_V1 = "heaterShakerModuleV1"
-
-
 ModuleSlotTransform = TypedDict(
     "ModuleSlotTransform", {"labwareOffset": List[List[float]]}
 )

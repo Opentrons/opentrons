@@ -26,6 +26,8 @@ from opentrons.protocols.geometry.module_geometry import (
 )
 from opentrons.types import DeckSlotName, Location
 
+from opentrons_shared_data.module.dev_types import ModuleModel as SharedDataModuleModel
+
 from ..module import (
     AbstractModuleCore,
     AbstractTemperatureModuleCore,
@@ -71,9 +73,9 @@ class LegacyModuleCore(AbstractModuleCore[LabwareImplementation]):
     def geometry(self) -> ModuleGeometry:
         return self._geometry
 
-    def get_model(self) -> str:
+    def get_model(self) -> SharedDataModuleModel:
         """Get the module's model identifier."""
-        return cast(str, self._geometry.model)
+        return cast(SharedDataModuleModel, self._geometry.model.value)
 
     def get_loaded_model(self) -> ModuleModel:
         return self._geometry.model

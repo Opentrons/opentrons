@@ -4,6 +4,8 @@ from __future__ import annotations
 from typing import Optional, List
 from typing_extensions import TYPE_CHECKING
 
+from opentrons_shared_data.module.dev_types import ModuleModel
+
 from opentrons.hardware_control import SynchronousAdapter, modules as hw_modules
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
@@ -75,7 +77,7 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
         """Get the module's geometry interface."""
         raise NotImplementedError("geometry not implemented")
 
-    def get_model(self) -> str:
+    def get_model(self) -> ModuleModel:
         """Get the module's model identifier."""
         return self._engine_client.state.modules.get_model(self.module_id).value
 
