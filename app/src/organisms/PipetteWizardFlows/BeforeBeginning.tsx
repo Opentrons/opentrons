@@ -20,9 +20,10 @@ import {
   NINETY_SIX_CHANNEL_PIPETTE,
   NINETY_SIX_CHANNEL_MOUNTING_PLATE,
 } from './constants'
+import { getIsGantryEmpty } from './utils'
+import type { AxiosError } from 'axios'
 import type { Run, CreateRunData } from '@opentrons/api-client'
 import type { PipetteWizardStepProps } from './types'
-import type { AxiosError } from 'axios'
 
 interface BeforeBeginningProps extends PipetteWizardStepProps {
   createRun: UseMutateFunction<Run, AxiosError<any>, CreateRunData, unknown>
@@ -36,7 +37,7 @@ export const BeforeBeginning = (
     proceed,
     flowType,
     createRun,
-    attachedPipette,
+    attachedPipettes,
     chainRunCommands,
     isCreateLoading,
     mount,
@@ -49,8 +50,13 @@ export const BeforeBeginning = (
   React.useEffect(() => {
     createRun({})
   }, [])
+  const pipetteId = attachedPipettes[mount]?.id
 
-  const pipetteId = attachedPipette[mount]?.id
+  const isGantryEmpty = getIsGantryEmpty(attachedPipettes)
+  const isGantryEmptyFor96ChannelAttachment =
+    isGantryEmpty &&
+    selectedPipette === NINETY_SIX_CHANNEL &&
+    flowType === FLOWS.ATTACH
 
   if (
     pipetteId == null &&
@@ -103,7 +109,7 @@ export const BeforeBeginning = (
           commandType: 'loadPipette' as const,
           params: {
             // @ts-expect-error pipetteName is required but missing in schema v6 type
-            pipetteName: attachedPipette[mount]?.name,
+            pipetteName: attachedPipettes[mount]?.name,
             pipetteId: pipetteId,
             mount: mount,
           },
@@ -178,7 +184,8 @@ export const BeforeBeginning = (
       proceedButtonText={proceedButtonText}
       proceedIsDisabled={isCreateLoading}
       proceed={
-        flowType === FLOWS.ATTACH
+        isGantryEmptyFor96ChannelAttachment ||
+        (flowType === FLOWS.ATTACH && selectedPipette === SINGLE_MOUNT_PIPETTES)
           ? handleOnClickAttach
           : handleOnClickCalibrateOrDetach
       }

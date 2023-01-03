@@ -37,9 +37,11 @@ from opentrons.hardware_control.constants import (
 
 from opentrons.hardware_control.dev_types import PipetteDict
 from .pipette import Pipette
-from .instrument_calibration import load_pipette_offset
-from ..instrument_abc import MountType
 
+# TODO both pipette handlers should be combined once the pipette configurations
+# are unified AND we separate out the concept of changing pipette state versus static state
+
+MountType = TypeVar("MountType", top_types.Mount, OT3Mount)
 
 InstrumentsByMount = Dict[MountType, Optional[Pipette]]
 PipetteHandlingData = Tuple[Pipette, MountType]
@@ -116,11 +118,15 @@ class PipetteHandlerProvider(Generic[MountType]):
             p = self._attached_instruments[m]
             if not p:
                 return
-            new_p = Pipette(
-                p._config, load_pipette_offset(p.pipette_id, m), p.pipette_id
-            )
-            new_p.act_as(p.acting_as)
-            self._attached_instruments[m] = new_p
+            if isinstance(m, OT3Mount):
+                # This is to satisfy lint. Code will be cleaner once
+                # we can combine the pipette handler for OT2 and OT3
+                # pipettes again.
+                p.reset_pipette_offset(m.to_mount(), to_default=False)
+            else:
+                p.reset_pipette_offset(m, to_default=False)
+            p.reload_configurations()
+            p.reset_state()
 
         if not mount:
             for m in type(list(self._attached_instruments.keys())[0]):
@@ -133,8 +139,15 @@ class PipetteHandlerProvider(Generic[MountType]):
         Temporarily reset the pipette offset to default values.
         :param mount: Modify the given mount.
         """
-        pipette = self.get_pipette(mount)
-        pipette.reset_pipette_offset(mount, to_default)
+        if isinstance(mount, OT3Mount):
+            # This is to satisfy lint. Code will be cleaner once
+            # we can combine the pipette handler for OT2 and OT3
+            # pipettes again.
+            pipette = self.get_pipette(mount)
+            pipette.reset_pipette_offset(mount.to_mount(), to_default)
+        else:
+            pipette = self.get_pipette(mount)
+            pipette.reset_pipette_offset(mount, to_default)
 
     def save_instrument_offset(self, mount: MountType, delta: top_types.Point) -> None:
         """
@@ -142,8 +155,15 @@ class PipetteHandlerProvider(Generic[MountType]):
         :param mount: Modify the given mount.
         :param delta: The offset to set for the pipette.
         """
-        pipette = self.get_pipette(mount)
-        pipette.save_pipette_offset(mount, delta)
+        if isinstance(mount, OT3Mount):
+            # This is to satisfy lint. Code will be cleaner once
+            # we can combine the pipette handler for OT2 and OT3
+            # pipettes again.
+            pipette = self.get_pipette(mount)
+            pipette.save_pipette_offset(mount.to_mount(), delta)
+        else:
+            pipette = self.get_pipette(mount)
+            pipette.save_pipette_offset(mount, delta)
 
     # TODO(mc, 2022-01-11): change returned map value type to `Optional[PipetteDict]`
     # instead of potentially returning an empty dict
@@ -213,6 +233,8 @@ class PipetteHandlerProvider(Generic[MountType]):
                 instr, instr.blow_out_flow_rate, "dispense"
             )
             result["ready_to_aspirate"] = instr.ready_to_aspirate
+            # TODO (12-5-2022) figure out why this is using default aspirate flow rate
+            # rather than default dispense flow rate.
             result["default_blow_out_speeds"] = {
                 alvl: self.plunger_speed(instr, fr, "dispense")
                 for alvl, fr in instr.config.default_aspirate_flow_rates.items()

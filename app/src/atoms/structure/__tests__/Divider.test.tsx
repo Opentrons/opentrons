@@ -19,11 +19,11 @@ describe('Divider', () => {
     const { getByTestId } = render(props)
     const divider = getByTestId('divider')
     expect(divider).toHaveStyle(
-      `borderBottom: 1px solid ${COLORS.medGreyEnabled}`
+      `borderBottom: 1px solid ${String(COLORS.medGreyEnabled)}`
     )
     expect(divider).toHaveStyle('width: 80%')
-    expect(divider).toHaveStyle(`margin-top: ${SPACING.spacing2}`)
-    expect(divider).toHaveStyle(`margin-bottom: ${SPACING.spacing2}`)
+    expect(divider).toHaveStyle(`margin-top: ${String(SPACING.spacing2)}`)
+    expect(divider).toHaveStyle(`margin-bottom: ${String(SPACING.spacing2)}`)
   })
 
   it('renders divider with additional props', () => {
@@ -36,7 +36,7 @@ describe('Divider', () => {
     }
     const { getByTestId } = render(props)
     const divider = getByTestId('divider')
-    expect(divider).toHaveStyle(`color: ${COLORS.blueEnabled}`)
+    expect(divider).toHaveStyle(`color: ${String(COLORS.blueEnabled)}`)
     expect(divider).toHaveStyle('width: 100%')
     expect(divider).toHaveStyle('margin-top: 0')
     expect(divider).toHaveStyle('margin-bottom: 0')

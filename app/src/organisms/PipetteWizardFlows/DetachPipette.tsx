@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 import capitalize from 'lodash/capitalize'
 import { Trans, useTranslation } from 'react-i18next'
 import { StyledText } from '../../atoms/text'
@@ -23,12 +22,14 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
     goBack,
     proceed,
     robotName,
-    selectedPipette,
+    attachedPipettes,
+    mount,
     isPending,
     setPending,
   } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
-  const isSingleMountPipette = selectedPipette === SINGLE_MOUNT_PIPETTES
+  const is96ChannelPipette = attachedPipettes[mount]?.name === 'p1000_96'
+
   let bodyText: React.ReactNode = <div></div>
   if (isPending) {
     bodyText = (
@@ -45,7 +46,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
         />
       </>
     )
-  } else if (isSingleMountPipette) {
+  } else if (!is96ChannelPipette) {
     bodyText = <StyledText as="p">{t('hold_and_loosen')}</StyledText>
   } else {
     bodyText = (
@@ -70,7 +71,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
             backgroundSize={BACKGROUND_SIZE}
           />
         ) : (
-          t(isSingleMountPipette ? 'loose_detach' : 'unscrew_remove_96_channel')
+          t(!is96ChannelPipette ? 'loose_detach' : 'unscrew_remove_96_channel')
         )
       }
       //  TODO(Jr, 11/8/22): replace image with correct one!
@@ -83,10 +84,10 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
           />
         ) : (
           <img
-            src={isSingleMountPipette ? detachPipette : detach96Pipette}
+            src={!is96ChannelPipette ? detachPipette : detach96Pipette}
             width="100%"
             alt={
-              isSingleMountPipette
+              !is96ChannelPipette
                 ? 'Detach pipette'
                 : 'Unscrew 96 channel pipette'
             }

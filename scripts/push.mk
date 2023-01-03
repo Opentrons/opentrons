@@ -36,9 +36,10 @@ define push-python-sdist
 $(if $(is-ot3), ,echo "This is an OT-2. Use 'make push' instead." && exit 1)
 scp $(if $(2),"-i $(2)") $(3) $(4) root@$(1):/var/$(notdir $(4))
 ssh $(if $(2),"-i $(2)") $(3) root@$(1) \
-"function cleanup () { rm -f /var/$(notdir $(4)) ; rm -rf /var/$(notdir $(4))-unzip; } ; \
+"function cleanup () { rm -f /var/$(notdir $(4)) ; rm -rf /var/$(notdir $(4))-unzip; mount -o remount,ro / ; } ;\
  mkdir -p /var/$(notdir $(4))-unzip ; \
  cd /var/$(notdir $(4))-unzip && tar xf ../$(notdir $(4)) ; \
+ mount -o remount,rw / ; \
  rm -rf $(5)/$(6) $(5)/$(6)*.egg-info ; \
  mv /var/$(notdir $(4))-unzip/$(basename $(basename $(notdir $(4))))/$(if $(7),$(7)/)$(6) $(5)/ ; \
  mv /var/$(notdir $(4))-unzip/$(basename $(basename $(notdir $(4))))/$(if $(7),$(7)/)$(6)*.$(if $(8),$(8),egg)-info $(5)/$(basename $(basename $(notdir $(4)))).$(if $(8),$(8),egg)-info ; \

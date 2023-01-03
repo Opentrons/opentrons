@@ -1,5 +1,5 @@
 import pytest
-from typing import TYPE_CHECKING
+from typing import List, Optional, Set, Tuple
 from itertools import chain
 from mock import AsyncMock, patch
 from opentrons.hardware_control.backends.ot3controller import OT3Controller
@@ -7,9 +7,14 @@ from opentrons.hardware_control.backends.ot3utils import (
     node_to_axis,
     axis_to_node,
 )
+from opentrons_hardware.drivers.can_bus.can_messenger import (
+    MessageListenerCallback,
+    MessageListenerCallbackFilter,
+)
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons.config.types import OT3Config
 from opentrons.config.robot_configs import build_config_ot3
+from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     PipetteName as FirmwarePipetteName,
@@ -23,8 +28,7 @@ from opentrons.hardware_control.types import (
     MotorStatus,
 )
 from opentrons_hardware.firmware_bindings.utils import UInt8Field
-
-
+from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
 from opentrons_hardware.hardware_control.motion import (
     MoveType,
     MoveStopCondition,
@@ -36,23 +40,49 @@ from opentrons_hardware.hardware_control.tools.types import (
     GripperInformation,
 )
 
-if TYPE_CHECKING:
-    from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
-
 
 @pytest.fixture
 def mock_config() -> OT3Config:
     return build_config_ot3({})
 
 
+class MockCanMessageNotifier:
+    """A CanMessage notifier."""
+
+    def __init__(self) -> None:
+        """Constructor."""
+        self._listeners: List[
+            Tuple[MessageListenerCallback, Optional[MessageListenerCallbackFilter]]
+        ] = []
+
+    def add_listener(
+        self,
+        listener: MessageListenerCallback,
+        filter: Optional[MessageListenerCallbackFilter] = None,
+    ) -> None:
+        """Add listener."""
+        self._listeners.append((listener, filter))
+
+    def notify(self, message: MessageDefinition, arbitration_id: ArbitrationId) -> None:
+        """Notify."""
+        for listener, filter in self._listeners:
+            if filter and not filter(arbitration_id):
+                continue
+            listener(message, arbitration_id)
+
+
 @pytest.fixture
-def mock_messenger():
-    with patch(
-        "opentrons.hardware_control.backends.ot3controller.CanMessenger",
-        AsyncMock,
-        spec=CanMessenger,
-    ):
-        yield
+def can_message_notifier() -> MockCanMessageNotifier:
+    """A fixture that notifies mock_messenger listeners of a new message."""
+    return MockCanMessageNotifier()
+
+
+@pytest.fixture
+def mock_messenger(can_message_notifier: MockCanMessageNotifier) -> AsyncMock:
+    """Mock can messenger."""
+    mock = AsyncMock(spec=CanMessenger)
+    mock.add_listener.side_effect = can_message_notifier.add_listener
+    return mock
 
 
 @pytest.fixture
@@ -322,23 +352,21 @@ async def test_probing(
 
 
 @pytest.mark.parametrize(
-    "tool_summary,pipette_id,pipette_name,pipette_model,gripper_id,gripper_name",
+    "tool_summary,pipette_id,gripper_id,gripper_name",
     [
         (
             ToolSummary(
                 left=PipetteInformation(
                     name=FirmwarePipetteName.p1000_single,
                     name_int=FirmwarePipetteName.p1000_single.value,
-                    model="3.0",
+                    model="3.3",
                     serial="hello",
                 ),
                 right=None,
                 gripper=GripperInformation(model="0", serial="fake_serial"),
             ),
-            "hello",
-            "p1000_single_gen3",
-            "p1000_single_v3.0",
-            "fake_serial",
+            "P1KSV33hello",
+            "GRPV0fake_serial",
             "gripper",
         ),
     ],
@@ -348,8 +376,6 @@ async def test_get_attached_instruments(
     mock_tool_detector: OneshotToolDetector,
     tool_summary: ToolSummary,
     pipette_id: str,
-    pipette_name: "PipetteName",
-    pipette_model: "PipetteModel",
     gripper_id: str,
     gripper_name: str,
 ):
@@ -365,8 +391,6 @@ async def test_get_attached_instruments(
         detected = await controller.get_attached_instruments({})
     assert list(detected.keys()) == [OT3Mount.LEFT, OT3Mount.GRIPPER]
     assert detected[OT3Mount.LEFT]["id"] == pipette_id
-    assert detected[OT3Mount.LEFT]["config"].name == pipette_name
-    assert detected[OT3Mount.LEFT]["config"].model == pipette_model
     assert detected[OT3Mount.GRIPPER]["id"] == gripper_id
     assert detected[OT3Mount.GRIPPER]["config"].name == gripper_name
 
@@ -405,7 +429,10 @@ async def test_get_attached_instruments_handles_unknown_model(
 
     tool_summary = ToolSummary(
         left=PipetteInformation(
-            name=FirmwarePipetteName.p1000_single, name_int=0, model=41, serial="hello"
+            name=FirmwarePipetteName.p1000_single,
+            name_int=0,
+            model="4.1",
+            serial="hello",
         ),
         right=None,
         gripper=GripperInformation(model=0, serial="fake_serial"),
@@ -548,3 +575,49 @@ async def test_ready_for_movement(
 
     axes = [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L]
     assert controller.check_ready_for_movement(axes) == ready
+
+
+async def test_tip_action(controller: OT3Controller, mock_move_group_run) -> None:
+    await controller.tip_action([OT3Axis.P_L], 33, -5.5, tip_action="pick_up")
+    for call in mock_move_group_run.call_args_list:
+        move_group_runner = call[0][0]
+        for move_group in move_group_runner._move_groups:
+            assert move_group  # don't pass in empty groups
+            assert len(move_group) == 1
+        # we should be sending this command to the pipette axes to process.
+        assert list(move_group[0].keys()) == [NodeId.pipette_left]
+        step = move_group[0][NodeId.pipette_left]
+        assert step.stop_condition == MoveStopCondition.none
+
+    mock_move_group_run.reset_mock()
+
+    await controller.tip_action([OT3Axis.P_L], 33, -5.5, tip_action="drop")
+    for call in mock_move_group_run.call_args_list:
+        move_group_runner = call[0][0]
+        for move_group in move_group_runner._move_groups:
+            assert move_group  # don't pass in empty groups
+            assert len(move_group) == 1
+        # we should be sending this command to the pipette axes to process.
+        assert list(move_group[0].keys()) == [NodeId.pipette_left]
+        step = move_group[0][NodeId.pipette_left]
+        assert step.stop_condition == MoveStopCondition.limit_switch
+
+
+async def test_update_motor_status(
+    mock_messenger: CanMessenger, controller: OT3Controller
+) -> None:
+    async def fake_gmp(
+        can_messenger: CanMessenger, nodes: Set[NodeId], timeout: float = 1.0
+    ):
+        return {node: (0.223, 0.323, False, True) for node in nodes}
+
+    with patch(
+        "opentrons.hardware_control.backends.ot3controller.get_motor_position", fake_gmp
+    ):
+        nodes = set([NodeId.gantry_x, NodeId.gantry_y, NodeId.head])
+        controller._present_nodes = nodes
+        await controller.update_motor_status()
+        for node in nodes:
+            assert controller._position.get(node) == 0.223
+            assert controller._encoder_position.get(node) == 0.323
+            assert controller._motor_status.get(node) == MotorStatus(False, True)

@@ -22,26 +22,32 @@ describe('OffsetVector', () => {
     const { getByText, getAllByRole } = render(props)
     expect(getAllByRole('heading', { level: 6 })).toHaveLength(6)
 
-    expect(getByText('X')).toHaveStyle(`margin-right: ${SPACING.spacing2}`)
     expect(getByText('X')).toHaveStyle(
-      `font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`
+      `margin-right: ${String(SPACING.spacing2)}`
+    )
+    expect(getByText('X')).toHaveStyle(
+      `font-weight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
     )
     const x = getByText('10.00')
-    expect(x).toHaveStyle(`margin-right: ${SPACING.spacing3}`)
+    expect(x).toHaveStyle(`margin-right: ${String(SPACING.spacing3)}`)
 
-    expect(getByText('Y')).toHaveStyle(`margin-right: ${SPACING.spacing2}`)
     expect(getByText('Y')).toHaveStyle(
-      `font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`
+      `margin-right: ${String(SPACING.spacing2)}`
+    )
+    expect(getByText('Y')).toHaveStyle(
+      `font-weight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
     )
     const y = getByText('20.00')
-    expect(y).toHaveStyle(`margin-right: ${SPACING.spacing3}`)
+    expect(y).toHaveStyle(`margin-right: ${String(SPACING.spacing3)}`)
 
-    expect(getByText('Z')).toHaveStyle(`margin-right: ${SPACING.spacing2}`)
     expect(getByText('Z')).toHaveStyle(
-      `font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`
+      `margin-right: ${String(SPACING.spacing2)}`
+    )
+    expect(getByText('Z')).toHaveStyle(
+      `font-weight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
     )
     const z = getByText('30.00')
-    expect(z).toHaveStyle(`margin-right: ${SPACING.spacing3}`)
+    expect(z).toHaveStyle(`margin-right: ${String(SPACING.spacing3)}`)
   })
 
   it('renders numbers using fixed-point notation', () => {

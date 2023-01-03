@@ -19,6 +19,7 @@ jest.mock('../../../redux/config')
 jest.mock('../../../redux/protocol-storage')
 
 const PROTOCOL_KEY = 'mock-protocol-key'
+const PROTOCOL_DISPLAY_NAME = 'a protocol for otie'
 const mockHandleRunProtocol = jest.fn()
 
 const mockViewProtocolSourceFolder = viewProtocolSourceFolder as jest.MockedFunction<
@@ -39,6 +40,7 @@ const render = () => {
     <MemoryRouter>
       <ProtocolOverflowMenu
         protocolKey={PROTOCOL_KEY}
+        protocolDisplayName={PROTOCOL_DISPLAY_NAME}
         handleRunProtocol={mockHandleRunProtocol}
       />
     </MemoryRouter>,
@@ -91,7 +93,7 @@ describe('ProtocolOverflowMenu', () => {
     expect(store.dispatch).toHaveBeenCalledWith(analyzeProtocol(PROTOCOL_KEY))
   })
 
-  it('should call send to OT-3 when clicking send to OT-3', () => {
+  it('should open send to OT-3 slideout when clicking send to OT-3', () => {
     mockGetSendAllProtocolsToOT3.mockReturnValue(true)
 
     const [{ getByTestId, getByText }] = render()

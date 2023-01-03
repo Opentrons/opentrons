@@ -89,7 +89,7 @@ describe('StatusLabel', () => {
     expect(pulsingCircle).toHaveAttribute('attributeName', 'fill')
     expect(pulsingCircle).toHaveAttribute(
       'values',
-      `${props.iconColor}; transparent`
+      `${String(props.iconColor)}; transparent`
     )
     expect(pulsingCircle).toHaveAttribute('dur', '1s')
     expect(pulsingCircle).toHaveAttribute('calcMode', 'discrete')
