@@ -594,6 +594,24 @@ class SetBrushedMotorPwmRequest(BaseMessage):  # noqa: D101
 
 
 @dataclass
+class BrushedMotorConfRequest(EmptyPayloadMessage):  # noqa: D101
+    message_id: Literal[
+        MessageId.brushed_motor_conf_request
+    ] = MessageId.brushed_motor_conf_request
+
+
+@dataclass
+class BrushedMotorConfResponse(BaseMessage):  # noqa: D101
+    payload: payloads.BrushedMotorConfPayload
+    payload_type: Type[
+        payloads.BrushedMotorConfPayload
+    ] = payloads.BrushedMotorConfPayload
+    message_id: Literal[
+        MessageId.brushed_motor_conf_response
+    ] = MessageId.brushed_motor_conf_response
+
+
+@dataclass
 class GripperGripRequest(BaseMessage):  # noqa: D101
     payload: payloads.GripperMoveRequestPayload
     payload_type: Type[

@@ -27,7 +27,7 @@ import { useSortedProtocols } from './hooks'
 import { StyledText } from '../../atoms/text'
 import { SecondaryButton } from '../../atoms/buttons'
 import { Slideout } from '../../atoms/Slideout'
-import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
+import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
 import { UploadInput } from './UploadInput'
 import { ProtocolCard } from './ProtocolCard'
 import { EmptyStateLinks } from './EmptyStateLinks'
@@ -100,7 +100,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
   return (
     <Box padding={SPACING.spacing4}>
       {selectedProtocol != null ? (
-        <ChooseRobotSlideout
+        <ChooseRobotToRunProtocolSlideout
           onCloseClick={() => setSelectedProtocol(null)}
           showSlideout={selectedProtocol != null}
           storedProtocolData={selectedProtocol}

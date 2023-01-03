@@ -106,6 +106,8 @@ class MessageId(int, Enum):
     gripper_grip_request = 0x42
     gripper_home_request = 0x43
     add_brushed_linear_move_request = 0x44
+    brushed_motor_conf_request = 0x45
+    brushed_motor_conf_response = 0x46
 
     acknowledgement = 0x50
 
@@ -169,6 +171,7 @@ class ErrorCode(int, Enum):
     estop_detected = 0x07
     collision_detected = 0x08
     labware_dropped = 0x09
+    estop_released = 0x0A
     motor_busy = 0x0B
 
 
