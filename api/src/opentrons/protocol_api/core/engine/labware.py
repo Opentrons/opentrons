@@ -12,8 +12,6 @@ from opentrons.protocols.geometry.labware_geometry import LabwareGeometry
 from opentrons.protocols.api_support.tip_tracker import TipTracker
 from opentrons.protocols.api_support.util import APIVersionError
 
-from opentrons.protocol_api.module_contexts import ModuleTypes
-
 from opentrons.types import DeckSlotName, Point
 
 from ..labware import AbstractLabware, LabwareLoadParams
@@ -54,7 +52,7 @@ class LabwareCore(AbstractLabware[WellCore]):
         return self._definition.parameters.loadName
 
     @property
-    def parent(self) -> Optional[Union[ModuleTypes, str]]:
+    def parent(self) -> Optional[Union[str]]:
         """Get the labware's parent.
 
         In case the labware is present on the deck, return slot name.

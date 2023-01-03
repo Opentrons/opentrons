@@ -19,8 +19,6 @@ from opentrons.protocols.api_support.util import (
 )
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
-from opentrons.protocol_api.module_contexts import ModuleTypes
-
 from .core.common import ModuleCore, ProtocolCore
 from .core.core_map import LoadedCoreMap
 from .core.module import (
@@ -45,6 +43,14 @@ from .module_contexts import (
 
 
 logger = logging.getLogger(__name__)
+
+
+ModuleTypes = Union[
+    TemperatureModuleContext,
+    MagneticModuleContext,
+    ThermocyclerContext,
+    HeaterShakerContext,
+]
 
 
 class HardwareManager(NamedTuple):
