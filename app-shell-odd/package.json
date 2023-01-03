@@ -31,7 +31,7 @@
   "devDependencies": {
     "@opentrons/app": "link:../app",
     "@opentrons/discovery-client": "link:../discovery-client",
-    "@opentrons/shared-data": "link:../shared-data",
+    "@opentrons/shared-data": "link:../shared-data"
   },
   "dependencies": {
     "@thi.ng/paths": "1.6.5",
