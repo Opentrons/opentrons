@@ -1,5 +1,5 @@
 """Tests for opentrons.protocol_api.core.engine.LabwareCore."""
-from typing import cast
+from typing import cast, Union, Optional
 
 import pytest
 from decoy import Decoy
@@ -17,6 +17,11 @@ from opentrons_shared_data.labware.labware_definition import (
 from opentrons.types import DeckSlotName, Point
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.errors import LabwareNotOnDeckError
+from opentrons.protocol_engine.types import (
+    DeckSlotLocation,
+    ModuleLocation,
+    _OffDeckLocationType,
+)
 
 from opentrons.protocol_api.core.labware import LabwareLoadParams
 from opentrons.protocol_api.core.engine import LabwareCore, WellCore
@@ -301,6 +306,23 @@ def test_get_deck_slot(
     assert subject.get_deck_slot() is None
 
 
-def test_parent_slot_name(subject: LabwareCore) -> None:
+@pytest.mark.parametrize(
+    "labware_location, expected_result",
+    [
+        (DeckSlotLocation(slotName=DeckSlotName.SLOT_1), "1"),
+        ("offDeck", None),
+        (ModuleLocation(moduleId="module-id"), None),
+    ],
+)
+def test_parent_slot_name(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: LabwareCore,
+    labware_location: Union[DeckSlotLocation],
+    expected_result: Optional[str],
+) -> None:
     """Should get the labware's parent."""
-    subject.parent == "1"
+    decoy.when(
+        mock_engine_client.state.labware.get_location("cool-labware")
+    ).then_return(labware_location)
+    subject.parent == expected_result

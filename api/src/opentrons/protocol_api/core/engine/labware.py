@@ -8,6 +8,7 @@ from opentrons_shared_data.labware.dev_types import (
 
 from opentrons.protocol_engine.errors import LabwareNotOnDeckError, ModuleNotOnDeckError
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
+from opentrons.protocol_engine.types import ModuleLocation
 from opentrons.protocols.geometry.labware_geometry import LabwareGeometry
 from opentrons.protocols.api_support.tip_tracker import TipTracker
 from opentrons.protocols.api_support.util import APIVersionError
@@ -55,11 +56,18 @@ class LabwareCore(AbstractLabware[WellCore]):
     def parent(self) -> Optional[Union[str]]:
         """Get the labware's parent.
 
-        In case the labware is present on the deck, return slot name.
-        In case the labware is on a module, return ModuleContext.
-        In case the labware is off the deck return None.
+        slot name in case the labware is present on the deck.
+        ModuleContext in case the labware is on a module.
+        None in case the labware is off the deck.
         """
-        raise NotImplementedError("LabwareCore.parent is not implemented")
+        labware_loaction = self._engine_client.state.labware.get_location(
+            self.labware_id
+        )
+        if labware_loaction == "offDeck":
+            return None
+        elif isinstance(labware_loaction, ModuleLocation):
+            raise NotImplementedError("labwre parent on a module is not implemented.")
+        return labware_loaction
 
     def get_uri(self) -> str:
         """Get the URI string of the labware's definition.
