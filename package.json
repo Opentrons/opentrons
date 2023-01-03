@@ -17,10 +17,6 @@
       "webpack-config",
       "api-client",
       "react-api-client"
-    ],
-    "nohoist": [
-      "**/electron",
-      "**/electron/**"
     ]
   },
   "config": {
@@ -89,6 +85,7 @@
     "cz-conventional-changelog": "2.1.0",
     "decompress": "4.2.1",
     "download": "8.0.0",
+    "electron": "21.3.1",
     "electron-builder": "24.0.0-alpha.4",
     "enzyme": "^3.11.0",
     "enzyme-to-json": "^3.4.4",
