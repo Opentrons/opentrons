@@ -710,7 +710,7 @@ class TipActionResponse(BaseMessage):  # noqa: D101
 
 
 @dataclass
-class GearWriteMotorDriverRegister(BaseMessage):  # noqa: D101
+class GearWriteMotorDriverRegisterRequest(BaseMessage):  # noqa: D101
     payload: payloads.MotorDriverRegisterDataPayload
     payload_type: Type[
         payloads.MotorDriverRegisterPayload
@@ -721,7 +721,7 @@ class GearWriteMotorDriverRegister(BaseMessage):  # noqa: D101
 
 
 @dataclass
-class GearReadMotorDriverRequest(BaseMessage):  # noqa: D101
+class GearReadMotorDriverRegisterRequest(BaseMessage):  # noqa: D101
     payload: payloads.MotorDriverRegisterPayload
     payload_type: Type[
         payloads.MotorDriverRegisterPayload
@@ -732,7 +732,7 @@ class GearReadMotorDriverRequest(BaseMessage):  # noqa: D101
 
 
 @dataclass
-class WriteMotorCurrentRequest(BaseMessage):  # noqa: D101
+class GearWriteMotorCurrentRequest(BaseMessage):  # noqa: D101
     payload: payloads.MotorCurrentPayload
     payload_type: Type[payloads.MotorCurrentPayload] = payloads.MotorCurrentPayload
     message_id: Literal[
