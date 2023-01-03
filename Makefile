@@ -6,7 +6,6 @@ include ./scripts/python.mk
 
 API_DIR := api
 APP_SHELL_DIR := app-shell
-APP_SHELL_ODD_DIR := app-shell-odd
 COMPONENTS_DIR := components
 DISCOVERY_CLIENT_DIR := discovery-client
 G_CODE_TESTING_DIR := g-code-testing
@@ -53,7 +52,6 @@ setup-js:
 	yarn config set network-timeout 60000
 	yarn
 	$(MAKE) -C $(APP_SHELL_DIR) setup
-	$(MAKE) -C $(APP_SHELL_ODD_DIR) setup
 	$(MAKE) -C $(SHARED_DATA_DIR) setup-js
 
 PYTHON_SETUP_TARGETS := $(addsuffix -py-setup, $(PYTHON_DIRS))
@@ -150,7 +148,6 @@ push-ot3:
 	$(MAKE) -C $(NOTIFY_SERVER_DIR) push-no-restart-ot3
 	$(MAKE) -C $(ROBOT_SERVER_DIR) push-ot3
 	$(MAKE) -C $(UPDATE_SERVER_DIR) push-ot3
-	$(MAKE) -C $(APP_SHELL_ODD_DIR) push-ot3
 
 
 .PHONY: term

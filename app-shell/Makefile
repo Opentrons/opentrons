@@ -48,7 +48,6 @@ no_python_bundle ?=
 
 builder := yarn electron-builder \
 	--config electron-builder.config.js \
-	--config.electronVersion=21.3.1 \
 	--publish never
 
 
@@ -128,6 +127,12 @@ dist-ot3: package-deps
 	NO_PYTHON=true NO_USB_DETECTION=true $(builder) --linux --arm64 --dir
 	cd dist/linux-arm64-unpacked
 
+.PHONY: push-ot3
+push-ot3: dist-ot3
+	ssh $(ssh_opts) root@$(host) "systemctl stop opentrons-robot-app && mount -o remount,rw / && rm -rf /opt/opentrons-app && mkdir -p /opt/opentrons-app"
+	scp -r $(ssh_opts) ./dist/linux-arm64-unpacked/* root@$(host):/opt/opentrons-app
+	ssh $(ssh_opts) root@$(host) "mount -o remount,ro / && systemctl start opentrons-robot-app"
+
 # Aliases matching github actions OS names for easier calling in
 # workflows
 .PHONY: dist-macos-latest
@@ -141,9 +146,6 @@ dist-ubuntu-latest: dist-linux
 
 .PHONY: dist-ubuntu-22.04
 dist-ubuntu-22.04: dist-linux
-
-.PHONY: dist-windows-2019
-dist-windows-2019: dist-win
 
 .PHONY: dist-windows-2022
 dist-windows-2022: dist-win

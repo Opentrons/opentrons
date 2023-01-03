@@ -27,7 +27,6 @@ module.exports = {
   collectCoverageFrom: [
     'app/src/**/*.(js|ts|tsx)',
     'app-shell/src/**/*.(js|ts|tsx)',
-    'app-shell-odd/src/**/*.(js|ts|tsx)',
     'components/src/**/*.(js|ts|tsx)',
     'discovery-client/src/**/*.(js|ts|tsx)',
     'labware-library/src/**/*.(js|ts|tsx)',

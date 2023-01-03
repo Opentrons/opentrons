@@ -1,7 +1,3 @@
-import {
-  OT2_MANIFEST_URL,
-  OT3_MANIFEST_URL,
-} from '@opentrons/app/src/redux/config'
 import type {
   ConfigV0,
   ConfigV1,
@@ -15,7 +11,6 @@ import type {
   ConfigV9,
   ConfigV10,
   ConfigV11,
-  ConfigV12,
 } from '@opentrons/app/src/redux/config/types'
 
 export const MOCK_CONFIG_V0: ConfigV0 = {
@@ -170,17 +165,3 @@ export const MOCK_CONFIG_V11: ConfigV11 = {
     protocolsStoredSortKey: null,
   },
 }
-
-export const MOCK_CONFIG_V12: ConfigV12 = (() => {
-  const { buildroot, ...restOfV11Config } = { ...MOCK_CONFIG_V11 } as ConfigV11
-  return {
-    ...restOfV11Config,
-    version: 12 as const,
-    robotSystemUpdate: {
-      manifestUrls: {
-        OT2: OT2_MANIFEST_URL,
-        OT3: OT3_MANIFEST_URL,
-      },
-    },
-  }
-})()
