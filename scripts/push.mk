@@ -5,11 +5,15 @@ default_ssh_key := ~/.ssh/robot_key
 default_ssh_opts := -o stricthostkeychecking=no -o userknownhostsfile=/dev/null
 is-ot3 = $(shell ssh $(if $(2),"-i $(2)") $(3) root@$(1) systemctl status opentrons-robot-app)
 need-scp-option-from-version=9
-# example with text functions
-# need-copy-scp := $(filter ‘[0-9]{,2}.[0-9]’, $($(subst p1, ,($(subst _, ,$(SSH-VERSION))))))
-# $(info $(subst p1, ,($(subst _, ,$(SSH-VERSION)))))
-
-need-scp-option = $(shell if [ "$(shell ssh -V 2>&1 | grep -o "[0-9]*\.[0-9]*" | grep -oe '[0-9]' | head -1)" -ge $(need-scp-option-from-version) ]; then echo 1; fi)
+comma=,
+ssh-version-output = $(shell ssh -V 2>&1)
+ssh-version-line=$(filter OpenSSH_%, $(ssh-version-output))
+ssh-version-words=$(subst _, ,$(ssh-version-line))
+ssh-version-label=$(filter %p1$(comma),$(ssh-version-words))
+ssh-version-parts=$(subst p, ,$(ssh-version-label))
+ssh-version=$(firstword $(ssh-version-parts))
+ssh-version-number=$(subst ., ,$(ssh-version))
+need-scp-option = $(shell if [ $(firstword $(ssh-version-number)) -ge $(need-scp-option-from-version) ]; then echo 1; fi)
 $(info $(need-scp-option))
 
 # push-python-package: execute a push to the robot of a particular python
