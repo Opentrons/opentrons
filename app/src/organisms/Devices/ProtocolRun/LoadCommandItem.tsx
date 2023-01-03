@@ -20,8 +20,13 @@ export const LoadCommandItem = ({
 }: LoadCommandItemProps): JSX.Element | null => {
   const { t } = useTranslation('run_details')
 
-  const { labware, modules, pipettes, liquids, robotType } = robotSideAnalysis
-
+  const { labware = [], modules = [], pipettes, liquids, robotType } = robotSideAnalysis
+  // TODO FOR TOMORROW:
+  // write a series of helper functions which get entities by id from the two params of analysis and id
+  // e.g.  getLabware(robotSideAnalysis, labwareId) 
+  // these functions should have predictable and consistent error handling
+  // they should also handle lookup migrations from analysis version to analysis version. hopefully sequestering these changes in a clear way
+  console.table({modules, labware})
   let commandText
 
   switch (command.commandType) {
@@ -47,7 +52,7 @@ export const LoadCommandItem = ({
     }
     case 'loadLabware': {
       if (command.params.location !== 'offDeck' && 'moduleId' in command.params.location) {
-        const moduleData = modules[command.params.location.moduleId]
+        const moduleData = modules.find(m => m.id === command.params.location.moduleId)
         moduleName = getModuleDisplayName(moduleData.model)
         commandText = t("load_labware_info_protocol_setup", {
           count: getOccludedSlotCountForModule(getModuleType(moduleData.model)),
