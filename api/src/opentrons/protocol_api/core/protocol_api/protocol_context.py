@@ -269,7 +269,7 @@ class ProtocolContextImplementation(
         self.equipment_broker.publish(
             ModuleLoadInfo(
                 requested_model=model,
-                loaded_model=module_core.get_model(),
+                loaded_model=module_core.get_loaded_model(),
                 module_serial=module_core.get_serial_number(),
                 deck_slot=module_core.get_deck_slot(),
                 configuration=configuration,

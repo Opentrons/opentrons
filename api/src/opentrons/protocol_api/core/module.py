@@ -34,8 +34,8 @@ class AbstractModuleCore(ABC, Generic[LabwareCoreType]):
         """Get the module's geometry interface."""
 
     @abstractmethod
-    def get_model(self) -> ModuleModel:
-        """Get the module's model identifier."""
+    def get_model(self) -> str:
+        """Get the module's model identifier as a string."""
 
     @abstractmethod
     def get_type(self) -> ModuleType:

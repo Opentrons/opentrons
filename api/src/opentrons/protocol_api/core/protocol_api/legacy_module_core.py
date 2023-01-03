@@ -71,8 +71,11 @@ class LegacyModuleCore(AbstractModuleCore[LabwareImplementation]):
     def geometry(self) -> ModuleGeometry:
         return self._geometry
 
-    def get_model(self) -> ModuleModel:
+    def get_model(self) -> str:
         """Get the module's model identifier."""
+        return cast(str, self._geometry.model)
+
+    def get_loaded_model(self) -> ModuleModel:
         return self._geometry.model
 
     def get_type(self) -> ModuleType:

@@ -4,10 +4,10 @@ import logging
 from typing import Generic, List, Optional, TypeVar, cast
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.module.dev_types import ModuleModelType, ModuleModel
 
 from opentrons.broker import Broker
 from opentrons.hardware_control import SynchronousAdapter, modules
-from opentrons.hardware_control.modules import ModuleModel
 from opentrons.commands import module_commands as cmds
 from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support.types import APIVersion
@@ -70,6 +70,10 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
     @requires_version(2, 0)
     def api_version(self) -> APIVersion:
         return self._api_version
+
+    @property
+    def model(self) -> ModuleModel:
+        return ModuleModelType(self._core.get_model()).value
 
     # TODO(mc, 2022-09-08): Remove this method
     @requires_version(2, 0)

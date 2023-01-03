@@ -400,7 +400,7 @@ def test_load_module(
         )
     ).then_return(mock_module_core)
 
-    decoy.when(mock_module_core.get_model()).then_return(
+    decoy.when(mock_module_core.get_loaded_model()).then_return(    # type: ignore[attr-defined]
         TemperatureModuleModel.TEMPERATURE_V2
     )
     decoy.when(mock_module_core.get_serial_number()).then_return("cap'n crunch")
@@ -436,7 +436,7 @@ def test_load_module_default_location(
     ).then_return(mock_module_core)
 
     decoy.when(mock_module_core.get_type()).then_return(ModuleType.TEMPERATURE)
-    decoy.when(mock_module_core.get_model()).then_return(
+    decoy.when(mock_module_core.get_loaded_model()).then_return(    # type: ignore[attr-defined]
         TemperatureModuleModel.TEMPERATURE_V2
     )
     decoy.when(mock_module_core.get_serial_number()).then_return("cap'n crunch")

@@ -3,6 +3,7 @@ opentrons_shared_data.module.dev_types: types requiring typing_extensions
 for modules
 """
 
+from enum import Enum
 from typing import Any, Dict, List, Union
 from typing_extensions import Literal, TypedDict
 
@@ -36,6 +37,21 @@ ModuleModel = Union[
     ThermocyclerModuleModel,
     HeaterShakerModuleModel,
 ]
+
+
+class ModuleModelType(str, Enum):
+    """Module model values."""
+
+    value: ModuleModel
+
+    MAGNETIC_MODULE_V1 = "magneticModuleV1"
+    MAGNETIC_MODULE_V2 = "magneticModuleV2"
+    TEMPERATURE_MODULE_V1 = "temperatureModuleV1"
+    TEMPERATURE_MODULE_V2 = "temperatureModuleV2"
+    THERMOCYCLER_MODULE_V1 = "thermocyclerModuleV1"
+    THERMOCYCLER_MODULE_V2 = "thermocyclerModuleV2"
+    HEATER_SHAKER_MODULE_V1 = "heaterShakerModuleV1"
+
 
 ModuleSlotTransform = TypedDict(
     "ModuleSlotTransform", {"labwareOffset": List[List[float]]}

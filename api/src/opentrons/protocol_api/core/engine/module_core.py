@@ -75,9 +75,9 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
         """Get the module's geometry interface."""
         raise NotImplementedError("geometry not implemented")
 
-    def get_model(self) -> ModuleModel:
+    def get_model(self) -> str:
         """Get the module's model identifier."""
-        raise NotImplementedError("get_model not implemented")
+        return self._engine_client.state.modules.get_model(self.module_id).value
 
     def get_type(self) -> ModuleType:
         """Get the module's general type identifier."""
