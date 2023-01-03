@@ -577,6 +577,7 @@ class OT3Controller:
             self._axis_map_to_present_nodes(
                 {k: v.as_tuple() for k, v in self._current_settings.items()}
             ),
+            use_tip_motor_message=OT3Axis.Q in self._current_settings.keys(),
         )
 
     async def set_active_current(self, axis_currents: OT3AxisMap[float]) -> None:
@@ -590,7 +591,9 @@ class OT3Controller:
         """
         assert self._current_settings, "Invalid current settings"
         await set_run_current(
-            self._messenger, self._axis_map_to_present_nodes(axis_currents)
+            self._messenger,
+            self._axis_map_to_present_nodes(axis_currents),
+            use_tip_motor_message=OT3Axis.Q in axis_currents.keys(),
         )
         for axis, current in axis_currents.items():
             self._current_settings[axis].run_current = current
@@ -606,7 +609,9 @@ class OT3Controller:
         """
         assert self._current_settings, "Invalid current settings"
         await set_hold_current(
-            self._messenger, self._axis_map_to_present_nodes(axis_currents)
+            self._messenger,
+            self._axis_map_to_present_nodes(axis_currents),
+            use_tip_motor_message=OT3Axis.Q in axis_currents.keys(),
         )
         for axis, current in axis_currents.items():
             self._current_settings[axis].hold_current = current
