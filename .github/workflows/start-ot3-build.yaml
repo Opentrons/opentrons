@@ -29,6 +29,7 @@ jobs:
           owner: opentrons
           repo: oe-core
           workflow-id: build-ot3-actions.yml
+          ref: main
           inputs: |
             {
               "oe-core-ref": "-",
