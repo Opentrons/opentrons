@@ -4,15 +4,16 @@ find_robot=$(shell yarn run -s discovery find -i 169.254)
 default_ssh_key := ~/.ssh/robot_key
 default_ssh_opts := -o stricthostkeychecking=no -o userknownhostsfile=/dev/null
 is-ot3 = $(shell ssh $(if $(2),"-i $(2)") $(3) root@$(1) systemctl status opentrons-robot-app)
-
-need-scp-legacy-option-from-version=9
+# make version less than 4.4 do not use intcmp
+allowed-ssh-versions="1 2 3 4 5 6 7 8"
+# in order to use comma in a string we have to set it to a var
 comma=,
 ssh-version-output = $(shell ssh -V 2>&1)
 ssh-version-words=$(subst _, ,$(filter OpenSSH_%, $(ssh-version-output)))
 ssh-version-label=$(filter %p1$(comma),$(ssh-version-words))
 ssh-version-number=$(subst ., ,$(firstword $(subst p, ,$(ssh-version-label))))
-need-scp-legacy-option = $(shell if [ $(firstword $(ssh-version-number)) -ge $(need-scp-legacy-option-from-version) ]; then echo 1; fi)
-$(info $(need-scp-legacy-option))
+is-in-version=$(findstring $(firstword $(ssh-version-number)),$(allowed-ssh-versions))
+scp-legacy-option-flag = $(if $(is-in-version),,-O)
 
 # push-python-package: execute a push to the robot of a particular python
 # package.
@@ -24,7 +25,7 @@ $(info $(need-scp-legacy-option))
 
 define push-python-package
 $(if $(is-ot3), echo "This is an OT-3. Use 'make push-ot3' instead." && exit 1)
-scp -i $(2) $(if $(need-scp-legacy-option),"-O") $(3) "$(4)" root@$(1):/data/$(notdir $(4))
+scp -i $(2) $(scp-legacy-option-flag) $(3) "$(4)" root@$(1):/data/$(notdir $(4))
 ssh -i $(2) $(3) root@$(1) \
 "function cleanup () { rm -f /data/$(notdir $(4)) && mount -o remount,ro / ; } ;\
 mount -o remount,rw / &&\
