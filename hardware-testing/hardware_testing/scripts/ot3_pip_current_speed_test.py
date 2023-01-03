@@ -38,6 +38,12 @@ def get_type_and_version(SN):
     version = version[0] + "." + version[1]
     return pipette.upper(), version
 
+def create_model( mount = "right"):
+    model = asyncio.run_coroutine_threadsafe(robot.read_pipette_model(mount),
+                                hardware._loop).result()
+    print(model)
+    return model
+
 mounts = {"left": "ZB", "right": "AC"}
 Current_list = [0.5, 0.4, 0.25, 0.2, 0.1]
 
@@ -79,7 +85,7 @@ async def _main(is_simulating: bool) -> None:
                 break
 
             ### READ PIPETTE SN ###
-            api.get_attached_pipette(MOUNT)
+            SN = api.get_attached_pipette(MOUNT)
 
             pipette, version = get_type_and_version(SN)
             ### HOW TO CREATE MODEL? ###
