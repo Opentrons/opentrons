@@ -8,6 +8,7 @@ is-ot3 = $(shell ssh $(if $(2),"-i $(2)") $(3) root@$(1) systemctl status opentr
 allowed-ssh-versions="1 2 3 4 5 6 7 8"
 # in order to use comma in a string we have to set it to a var
 comma=,
+# string manipulations to extract the int version number
 ssh-version-output = $(shell ssh -V 2>&1)
 ssh-version-words=$(subst _, ,$(filter OpenSSH_%, $(ssh-version-output)))
 ssh-version-label=$(filter %p1$(comma),$(ssh-version-words))
