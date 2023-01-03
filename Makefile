@@ -51,7 +51,7 @@ setup: setup-js setup-py
 .PHONY: setup-js
 setup-js:
 	yarn config set network-timeout 60000
-	yarn --verbose
+	yarn
 	$(MAKE) -C $(APP_SHELL_DIR) setup
 	$(MAKE) -C $(APP_SHELL_ODD_DIR) setup
 	$(MAKE) -C $(SHARED_DATA_DIR) setup-js
