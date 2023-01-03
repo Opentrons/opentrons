@@ -162,7 +162,7 @@ def save_attitude_matrix(
     save_robot_deck_attitude(
         attitude,
         pipette_id,
-        tiprack_hash,
+        lw_hash=tiprack_hash,
     )
 
 
@@ -180,7 +180,7 @@ def load_attitude_matrix() -> DeckCalibration:
             attitude = migrate_affine_xy_to_attitude(gantry_cal)
             save_robot_deck_attitude(
                 transform=attitude,
-                pip_id=None,
+                pipette_id=None,
                 lw_hash=None,
                 source=types.SourceType.legacy,
             )

@@ -53,7 +53,7 @@ from .robot_calibration import (
 )
 from .protocols import HardwareControlAPI
 from .instruments.ot2.pipette_handler import PipetteHandlerProvider
-from .instruments.ot2.instrument_calibration import load_pipette_offset
+from .instruments.instrument_calibration import load_pipette_offset
 from .motion_utilities import (
     target_position_from_absolute,
     target_position_from_relative,

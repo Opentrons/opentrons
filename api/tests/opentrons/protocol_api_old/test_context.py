@@ -1008,7 +1008,7 @@ def test_order_of_module_load():
 def test_tip_length_for_caldata(ctx, decoy, monkeypatch):
     # TODO (lc 10-27-2022) We need to investigate why the pipette id is
     # being reported as none for this test (and probably all the others)
-    from opentrons.hardware_control.instruments.ot2 import (
+    from opentrons.hardware_control.instruments import (
         instrument_calibration as instr_cal,
     )
     from opentrons.calibration_storage import types as CSTypes
@@ -1029,7 +1029,7 @@ def test_tip_length_for_caldata(ctx, decoy, monkeypatch):
             status=CSTypes.CalibrationStatus(markedBad=False),
             uri=LabwareUri("opentrons/geb_96_tiprack_10ul/1"),
             tiprack="somehash",
-            pipette=None,  # type: ignore[arg-type]
+            pipette=None,
         )
     )
 

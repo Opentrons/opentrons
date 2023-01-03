@@ -15,7 +15,7 @@ from opentrons.config import pipette_config, robot_configs
 from opentrons.config.types import RobotConfig
 from opentrons.drivers.types import MoveSplit
 from ..instrument_abc import AbstractInstrument
-from .instrument_calibration import (
+from ..instrument_calibration import (
     PipetteOffsetByPipetteMount,
     load_pipette_offset,
 )
