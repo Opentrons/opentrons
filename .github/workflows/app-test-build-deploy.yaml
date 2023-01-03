@@ -207,11 +207,12 @@ jobs:
             ${{ github.workspace }}/.npm-cache/_prebuild
             ${{ github.workspace }}/.yarn-cache
           key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+      - name: Support longpaths
+        run: git config --system core.longpaths true
       - name: setup-js
         run: |
           npm config set cache ${{ github.workspace }}/.npm-cache
           yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
-          npm cache clean
           make setup-js
 
       # build the app and deploy it
