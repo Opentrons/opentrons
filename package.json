@@ -19,7 +19,8 @@
       "react-api-client"
     ],
     "nohoist": [
-      "electron"
+      "**/electron",
+      "**/electron/**"
     ]
   },
   "config": {
