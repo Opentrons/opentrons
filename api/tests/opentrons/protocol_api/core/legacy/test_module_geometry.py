@@ -1,3 +1,4 @@
+"""Tests for the legacy ModuleGeometry interface."""
 import pytest
 import mock
 
@@ -8,7 +9,7 @@ from opentrons.types import Location, Point
 
 from opentrons.hardware_control.modules.types import ModuleType, HeaterShakerModuleModel
 
-from opentrons.protocols.geometry.module_geometry import (
+from opentrons.protocol_api.core.protocol_api.module_geometry import (
     create_geometry,
     ModuleGeometry,
     HeaterShakerGeometry,
@@ -40,9 +41,10 @@ def v1_mag_module_schema_v3_definition() -> ModuleDefinitionV3:
         "displayName": "Sample Module",
         "quirks": [],
         "slotTransforms": {},
-        "compatibleWith": ["someSimilarModule"],
+        "compatibleWith": ["someSimilarModule"],  # type: ignore[list-item]
         "cornerOffsetFromSlot": {"x": 111, "y": 222, "z": 333},
         "twoDimensionalRendering": {},
+        "config": {},
     }
 
 
@@ -64,9 +66,10 @@ def minimal_heater_shaker_definition() -> ModuleDefinitionV3:
         "displayName": "Sample H/S Module",
         "quirks": [],
         "slotTransforms": {},
-        "compatibleWith": ["someSimilarModule"],
+        "compatibleWith": ["someSimilarModule"],  # type: ignore[list-item]
         "cornerOffsetFromSlot": {"x": 111, "y": 222, "z": 333},
         "twoDimensionalRendering": {},
+        "config": {},
     }
 
 
@@ -142,9 +145,11 @@ def test_create_geometry(
     assert str(load_result) == expected_repr
 
 
-def test_create_geometry_raises(v1_mag_module_schema_v3_definition) -> None:
+def test_create_geometry_raises(
+    v1_mag_module_schema_v3_definition: ModuleDefinitionV3,
+) -> None:
     """It raises when an invalid definition is passed."""
-    v1_mag_module_schema_v3_definition.update({"moduleType": "blahblahModuleType"})
+    v1_mag_module_schema_v3_definition.update({"moduleType": "blahblahModuleType"})  # type: ignore[typeddict-item]
 
     with pytest.raises(ValueError):
         create_geometry(
@@ -212,7 +217,6 @@ def test_hs_raises_when_moving_to_restricted_slots_while_shaking(
     expected_raise: ContextManager[Any],
 ) -> None:
     """It should raise if restricted movement around a heater-shaker is attempted while module is shaking."""
-
     with expected_raise:
         heater_shaker_geometry.flag_unsafe_move(
             to_slot=destination_slot,
@@ -249,7 +253,6 @@ def test_raises_when_moving_to_restricted_slots_while_latch_open(
     expected_raise: ContextManager[Any],
 ) -> None:
     """It should raise if restricted movement around a heater-shaker is attempted while latch is open."""
-
     with expected_raise:
         heater_shaker_geometry.flag_unsafe_move(
             to_slot=destination_slot,
@@ -306,7 +309,6 @@ def test_raises_on_restricted_movement_with_multi_channel(
     expected_raise: ContextManager[Any],
 ) -> None:
     """It should raise if restricted movement around a heater-shaker is attempted with a multi-channel pipette."""
-
     with expected_raise:
         heater_shaker_geometry.flag_unsafe_move(
             to_slot=destination_slot,
@@ -332,10 +334,7 @@ def test_does_not_raise_when_idle_and_latch_closed(
     heater_shaker_geometry: HeaterShakerGeometry,
     destination_slot: int,
 ) -> None:
-    """
-    It should not raise if single channel pipette moves anywhere near heater-shaker
-    when idle and latch closed.
-    """
+    """It should not raise if single channel pipette moves anywhere near heater-shaker when idle and latch closed."""
     with does_not_raise():
         heater_shaker_geometry.flag_unsafe_move(
             to_slot=destination_slot,
@@ -401,7 +400,6 @@ def test_pipette_is_blocking_shake_and_latch_movements_with_no_pipette_slot(
     mock_location: mock.MagicMock,
 ) -> None:
     """It should return True if pipette's last location slot is not known."""
-
     assert (
         heater_shaker_geometry.is_pipette_blocking_shake_movement(
             pipette_location=Location(point=Point(3, 2, 1), labware=None)

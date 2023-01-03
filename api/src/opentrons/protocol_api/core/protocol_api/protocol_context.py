@@ -12,14 +12,13 @@ from opentrons.hardware_control.modules import AbstractModule, ModuleModel, Modu
 from opentrons.hardware_control.types import DoorState, PauseType
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import AxisMaxSpeeds, UnsupportedAPIError
-from opentrons.protocols.geometry import module_geometry
 from opentrons.protocols import labware as labware_definition
 
 from ...labware import Labware
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 
-from . import legacy_module_core
+from . import legacy_module_core, module_geometry
 from .deck import Deck
 from .instrument_context import InstrumentContextImplementation
 from .labware_offset_provider import AbstractLabwareOffsetProvider

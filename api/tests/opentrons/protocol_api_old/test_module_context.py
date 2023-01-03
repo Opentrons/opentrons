@@ -5,7 +5,6 @@ import mock
 import pytest
 
 import opentrons.protocol_api as papi
-import opentrons.protocols.geometry as papi_geometry
 
 from opentrons.types import Point, Location
 from opentrons.drivers.types import (
@@ -18,14 +17,9 @@ from opentrons.hardware_control.modules.types import (
     SpeedStatus,
     ThermocyclerModuleModel,
 )
-
-from opentrons.protocol_api import ProtocolContext
-from opentrons.protocol_api.module_contexts import (
-    HeaterShakerContext,
-)
-
-from opentrons.protocols.geometry.module_geometry import (
+from opentrons.protocol_api.core.protocol_api.module_geometry import (
     PipetteMovementRestrictedByHeaterShakerError,
+    models_compatible,
 )
 
 from opentrons_shared_data import load_shared_data
@@ -50,7 +44,7 @@ def mock_pipette_location() -> mock.MagicMock:
 @pytest.fixture
 def ctx_with_tempdeck(
     mock_hardware: mock.MagicMock, mock_module_controller: mock.MagicMock
-) -> ProtocolContext:
+) -> papi.ProtocolContext:
     """Context fixture with a mock temp deck."""
     mock_module_controller.model.return_value = "temperatureModuleV2"
     mock_module_controller.mock_add_spec(hw_modules.TempDeck)
@@ -65,7 +59,7 @@ def ctx_with_tempdeck(
 @pytest.fixture
 def ctx_with_magdeck(
     mock_hardware: mock.AsyncMock, mock_module_controller: mock.MagicMock
-) -> ProtocolContext:
+) -> papi.ProtocolContext:
     """Context fixture with a mock mag deck."""
     mock_module_controller.model.return_value = "magneticModuleV1"
     mock_module_controller.mock_add_spec(hw_modules.MagDeck)
@@ -80,7 +74,7 @@ def ctx_with_magdeck(
 @pytest.fixture
 async def ctx_with_thermocycler(
     mock_hardware: mock.AsyncMock, mock_module_controller: mock.MagicMock
-) -> ProtocolContext:
+) -> papi.ProtocolContext:
     """Context fixture with a mock thermocycler."""
     mock_module_controller.model.return_value = "thermocyclerModuleV1"
     mock_module_controller.mock_add_spec(hw_modules.Thermocycler)
@@ -97,7 +91,7 @@ def ctx_with_heater_shaker(
     mock_hardware: mock.AsyncMock,
     mock_module_controller: mock.MagicMock,
     mock_pipette_location: mock.MagicMock,
-) -> ProtocolContext:
+) -> papi.ProtocolContext:
     """Context fixture with a mock heater-shaker."""
     mock_module_controller.model.return_value = "heaterShakerModuleV1"
     mock_module_controller.mock_add_spec(hw_modules.HeaterShaker)
@@ -290,7 +284,7 @@ def test_thermocycler_flag_unsafe_move(ctx_with_thermocycler, mock_module_contro
     argvalues=[("geb_96_tiprack_1000ul", True), ("biorad_384_wellplate_50ul", False)],
 )
 def test_heater_shaker_unsafe_move_flagger(
-    ctx_with_heater_shaker: ProtocolContext,
+    ctx_with_heater_shaker: papi.ProtocolContext,
     mock_module_controller: mock.MagicMock,
     labware_name: str,
     is_tiprack: bool,
@@ -304,7 +298,7 @@ def test_heater_shaker_unsafe_move_flagger(
     type(mock_module_controller).labware_latch_status = mock_latch_status
 
     mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 3)
-    assert isinstance(mod, HeaterShakerContext)
+    assert isinstance(mod, papi.HeaterShakerContext)
 
     labware = ctx_with_heater_shaker.load_labware(labware_name, 5)
 
@@ -322,7 +316,7 @@ def test_heater_shaker_unsafe_move_flagger(
 
 
 def test_hs_flag_unsafe_move_raises(
-    ctx_with_heater_shaker: ProtocolContext,
+    ctx_with_heater_shaker: papi.ProtocolContext,
 ) -> None:
     """Test unsafe move raises underlying error."""
 
@@ -332,7 +326,7 @@ def test_hs_flag_unsafe_move_raises(
     mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 3)
     labware = ctx_with_heater_shaker.load_labware("geb_96_tiprack_1000ul", 5)
 
-    assert isinstance(mod, HeaterShakerContext)
+    assert isinstance(mod, papi.HeaterShakerContext)
     mod._core.geometry.flag_unsafe_move = mock.MagicMock(side_effect=raiser)  # type: ignore[attr-defined]
 
     with pytest.raises(PipetteMovementRestrictedByHeaterShakerError, match="uh oh"):
@@ -340,12 +334,12 @@ def test_hs_flag_unsafe_move_raises(
 
 
 def test_hs_flag_unsafe_move_skips_non_labware_locations(
-    ctx_with_heater_shaker: ProtocolContext,
+    ctx_with_heater_shaker: papi.ProtocolContext,
     mock_module_controller: mock.MagicMock,
 ) -> None:
     """Test that purely point locations do not raise error."""
     mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 3)
-    assert isinstance(mod, HeaterShakerContext)
+    assert isinstance(mod, papi.HeaterShakerContext)
     mod._core.geometry.flag_unsafe_move = mock.MagicMock()  # type: ignore[attr-defined]
 
     mod._core.flag_unsafe_move(  # type: ignore[attr-defined]
@@ -355,7 +349,7 @@ def test_hs_flag_unsafe_move_skips_non_labware_locations(
 
 
 def test_heater_shaker_loading(
-    ctx_with_heater_shaker: ProtocolContext,
+    ctx_with_heater_shaker: papi.ProtocolContext,
     mock_module_controller: mock.MagicMock,
 ) -> None:
     """It should load a heater-shaker in the specified slot."""
@@ -474,7 +468,7 @@ def test_magdeck_gen2_labware_props(ctx):
 
 def test_module_compatibility():
     assert (
-        papi_geometry.module_geometry.models_compatible(
+        models_compatible(
             requested_model=ThermocyclerModuleModel.THERMOCYCLER_V1,
             candidate_definition=cast(
                 ModuleDefinitionV3, {"model": "thermocyclerModuleV1"}
@@ -484,7 +478,7 @@ def test_module_compatibility():
     )
 
     assert (
-        papi_geometry.module_geometry.models_compatible(
+        models_compatible(
             requested_model=ThermocyclerModuleModel.THERMOCYCLER_V2,
             candidate_definition=cast(
                 ModuleDefinitionV3,
@@ -498,7 +492,7 @@ def test_module_compatibility():
     )
 
     assert (
-        papi_geometry.module_geometry.models_compatible(
+        models_compatible(
             requested_model=ThermocyclerModuleModel.THERMOCYCLER_V1,
             candidate_definition=cast(
                 ModuleDefinitionV3,
