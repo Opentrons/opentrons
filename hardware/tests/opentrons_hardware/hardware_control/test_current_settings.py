@@ -136,7 +136,11 @@ async def test_send_current_for_tip_motors(
     current_settings_in_uint32: Dict[NodeId, Tuple[UInt32Field, UInt32Field]],
 ) -> None:
     """Test setting currents when specifying that you want to modify the tip motors."""
-    await set_currents(mock_can_messenger, current_settings, use_tip_motor_message=True)
+    await set_currents(
+        mock_can_messenger,
+        current_settings,
+        use_tip_motor_message_for=[NodeId.pipette_left],
+    )
     for node_id, currents in current_settings_in_uint32.items():
         if node_id == NodeId.pipette_left:
             mock_can_messenger.ensure_send.assert_any_call(

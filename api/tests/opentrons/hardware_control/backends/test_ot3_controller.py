@@ -657,9 +657,9 @@ async def test_update_motor_estimation(
 @pytest.mark.parametrize(
     argnames=["gantry_load", "expected_call"],
     argvalues=[
-        [GantryLoad.NONE, False],
-        [GantryLoad.HIGH_THROUGHPUT, True],
-        [GantryLoad.LOW_THROUGHPUT, False],
+        [GantryLoad.NONE, []],
+        [GantryLoad.HIGH_THROUGHPUT, [NodeId.pipette_left]],
+        [GantryLoad.LOW_THROUGHPUT, []],
     ],
 )
 async def test_set_default_currents(
@@ -674,7 +674,7 @@ async def test_set_default_currents(
         mocked_currents.assert_called_once_with(
             mocked_currents.call_args_list[0][0][0],
             mocked_currents.call_args_list[0][0][1],
-            use_tip_motor_message=expected_call,
+            use_tip_motor_message_for=expected_call,
         )
 
         for k, v in mock_present_nodes._current_settings.items():
@@ -689,12 +689,12 @@ async def test_set_default_currents(
         [
             {OT3Axis.X: 1.0, OT3Axis.Y: 2.0},
             GantryLoad.NONE,
-            [{NodeId.gantry_x: 1.0, NodeId.gantry_y: 2.0}, False],
+            [{NodeId.gantry_x: 1.0, NodeId.gantry_y: 2.0}, []],
         ],
         [
             {OT3Axis.Q: 1.5},
             GantryLoad.HIGH_THROUGHPUT,
-            [{NodeId.pipette_left: 1.5}, True],
+            [{NodeId.pipette_left: 1.5}, [NodeId.pipette_left]],
         ],
     ],
 )
@@ -713,7 +713,7 @@ async def test_set_run_current(
         mocked_currents.assert_called_once_with(
             mocked_currents.call_args_list[0][0][0],
             expected_call[0],
-            use_tip_motor_message=expected_call[1],
+            use_tip_motor_message_for=expected_call[1],
         )
 
 
@@ -723,12 +723,12 @@ async def test_set_run_current(
         [
             {OT3Axis.P_L: 0.5, OT3Axis.Y: 0.8},
             GantryLoad.NONE,
-            [{NodeId.pipette_left: 0.5, NodeId.gantry_y: 0.8}, False],
+            [{NodeId.pipette_left: 0.5, NodeId.gantry_y: 0.8}, []],
         ],
         [
             {OT3Axis.Q: 0.8},
             GantryLoad.HIGH_THROUGHPUT,
-            [{NodeId.pipette_left: 0.8}, True],
+            [{NodeId.pipette_left: 0.8}, [NodeId.pipette_left]],
         ],
     ],
 )
@@ -747,5 +747,5 @@ async def test_set_hold_current(
         mocked_currents.assert_called_once_with(
             mocked_currents.call_args_list[0][0][0],
             expected_call[0],
-            use_tip_motor_message=expected_call[1],
+            use_tip_motor_message_for=expected_call[1],
         )
