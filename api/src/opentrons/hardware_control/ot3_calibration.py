@@ -240,6 +240,16 @@ async def find_edge(
                 )
             raise RuntimeError("Unable to find mount")
 
+async def _arc_move(
+    hcapi: OT3API, mount: OT3Mount, deck_height: float, position: Point, offset: float = 5
+) -> None:
+    # Move up
+    current_pos = await hcapi.gantry_position(mount)
+    z_offset = current_pos._replace(z=deck_height + offset)
+    await hcapi.move_to(mount, z_offset, speed=20)
+    # Move to position
+    end_position = position._replace(z=deck_height + offset)
+    await hcapi.move_to(mount, end_position, speed=20)
 
 async def find_slot_center_binary(
     hcapi: OT3API, mount: OT3Mount, nominal_center: Point, deck_height: float
@@ -253,18 +263,27 @@ async def find_slot_center_binary(
     plus_x_edge = await find_edge(hcapi, mount, real_pos + EDGES["right"], OT3Axis.X, 1)
     LOG.info(f"Found +x edge at {plus_x_edge}mm")
     real_pos = real_pos._replace(x=plus_x_edge - (CALIBRATION_SQUARE_SIZE * 0.5))
+    # Arc Move
+    await _arc_move(hcapi, mount, deck_height, position=real_pos + EDGES["left"])
+
     minus_x_edge = await find_edge(
         hcapi, mount, real_pos + EDGES["left"], OT3Axis.X, -1
     )
     LOG.info(f"Found -x edge at {minus_x_edge}mm")
+
     x_center = (plus_x_edge + minus_x_edge) / 2
     x_center_off = x_center - 2
     real_pos = real_pos._replace(x=x_center_off)
-    await hcapi.move_to(mount, real_pos, speed=20)
+    # Arc Move
+    await _arc_move(hcapi, mount, deck_height, position=real_pos)
+
     # Find Y bottom/top edges
     plus_y_edge = await find_edge(hcapi, mount, real_pos + EDGES["top"], OT3Axis.Y, 1)
     LOG.info(f"Found +y edge at {plus_y_edge}mm")
     real_pos = real_pos._replace(y=plus_y_edge - (CALIBRATION_SQUARE_SIZE * 0.5))
+    # Arc Move
+    await _arc_move(hcapi, mount, deck_height, position=real_pos + EDGES["bottom"])
+
     minus_y_edge = await find_edge(
         hcapi, mount, real_pos + EDGES["bottom"], OT3Axis.Y, -1
     )
