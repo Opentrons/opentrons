@@ -12,7 +12,6 @@ from opentrons_shared_data.labware.dev_types import (
 
 from opentrons.protocols.geometry.labware_geometry import AbstractLabwareGeometry
 from opentrons.protocols.api_support.tip_tracker import TipTracker
-
 from opentrons.types import DeckSlotName, Point
 
 from .well import WellCoreType

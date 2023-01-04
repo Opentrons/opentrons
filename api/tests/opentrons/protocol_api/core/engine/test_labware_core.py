@@ -1,5 +1,5 @@
 """Tests for opentrons.protocol_api.core.engine.LabwareCore."""
-from typing import cast, Union, Optional
+from typing import cast
 
 import pytest
 from decoy import Decoy
