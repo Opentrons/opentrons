@@ -71,17 +71,20 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
     def api_version(self) -> APIVersion:
         return self._api_version
 
-    @property
+    @property  # type: ignore[misc]
+    @requires_version(2, 14)
     def model(self) -> ModuleModel:
         """Get the module's model identifier."""
         return self._core.get_model()
 
-    @property
+    @property  # type: ignore[misc]
+    @requires_version(2, 14)
     def type(self) -> ModuleType:
         """Get the module's general type identifier."""
         return self._core.get_type()
 
-    @property
+    @property  # type: ignore[misc]
+    @requires_version(2, 14)
     def serial_number(self) -> str:
         """Get the module's unique hardware serial number."""
         return self._core.get_serial_number()
