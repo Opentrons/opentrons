@@ -392,6 +392,9 @@ class ProtocolContextImplementation(
         self, module_id: str
     ) -> Optional[legacy_module_core.LegacyModuleCore]:
         """Get Module core for a given module id."""
+        raise NotImplementedError(
+            "LegacyProtocolCore.get_module_core_item not implemented"
+        )
 
     def get_labware_cores(self) -> List[LabwareImplementation]:
         """Get all loaded labware cores."""

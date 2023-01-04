@@ -353,7 +353,7 @@ class Labware:
             )
             return self._core_map.get(module_core)
 
-        return labware_location
+        return labware_location.slotName.value
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
