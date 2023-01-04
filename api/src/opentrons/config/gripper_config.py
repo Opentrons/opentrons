@@ -119,4 +119,7 @@ def force_to_pwm_polynomial(newton: float) -> float:
     assert (
         5.0 <= newton <= 30.0
     ), f"{newton} N exceeds gripper force range: 5.0 - 30.0 N"
-    return -3.38 + 2.68 * newton - 0.0174 * newton**2
+    duty_cycle = 2.09*newton - 0.282
+    if duty_cycle > 60:
+        duty_cycle = 60
+    return duty_cycle
