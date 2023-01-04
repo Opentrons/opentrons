@@ -28,6 +28,7 @@ from opentrons.protocol_engine import (
     LoadedModule,
 )
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
+from opentrons.protocol_engine.errors.exceptions import ModuleNotLoadedError
 
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
@@ -375,6 +376,9 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         """Get all loaded module cores."""
         return list(self._module_cores_by_id.values())
 
-    def get_module_core_by_module_id(self, module_id: str) -> ModuleCore:
-        """Get ModuleContext for a given module id."""
-        return self._module_cores_by_id[module_id]
+    def get_module_core_item(self, module_id: str) -> Optional[ModuleCore]:
+        """Get Module core for a given module id."""
+        try:
+            return self._module_cores_by_id[module_id]
+        except ModuleNotLoadedError:
+            return None

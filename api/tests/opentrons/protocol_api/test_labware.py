@@ -1,13 +1,23 @@
 """Tests for the InstrumentContext public interface."""
 import inspect
 
+from typing import Optional, Union
+
 import pytest
 from decoy import Decoy
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, Labware, Well
 from opentrons.protocol_api.core import well_grid
-from opentrons.protocol_api.core.common import LabwareCore, WellCore
+from opentrons.protocol_api.core.common import LabwareCore, WellCore, ProtocolCore
+from opentrons.protocol_api.core.core_map import LoadedCoreMap
+
+from opentrons.protocol_engine.types import (
+    DeckSlotLocation,
+    ModuleLocation,
+)
+
+from opentrons.types import DeckSlotName
 
 
 @pytest.fixture(autouse=True)
@@ -24,6 +34,18 @@ def mock_labware_core(decoy: Decoy) -> LabwareCore:
 
 
 @pytest.fixture
+def mock_protocol_core(decoy: Decoy) -> ProtocolCore:
+    """Get a mock protocol implementation core."""
+    return decoy.mock(cls=ProtocolCore)
+
+
+@pytest.fixture
+def mock_map_core(decoy: Decoy) -> LoadedCoreMap:
+    """Get a mock map core."""
+    return decoy.mock(cls=LoadedCoreMap)
+
+
+@pytest.fixture
 def api_version() -> APIVersion:
     """Get the API version to test at."""
     return MAX_SUPPORTED_VERSION
@@ -31,14 +53,23 @@ def api_version() -> APIVersion:
 
 @pytest.fixture
 def subject(
-    decoy: Decoy, mock_labware_core: LabwareCore, api_version: APIVersion
+    decoy: Decoy,
+    mock_labware_core: LabwareCore,
+    mock_protocol_core: ProtocolCore,
+    mock_map_core: LoadedCoreMap,
+    api_version: APIVersion,
 ) -> Labware:
     """Get a Labware test subject with its dependencies mocked out."""
     decoy.when(mock_labware_core.get_well_columns()).then_return([])
     decoy.when(well_grid.create([])).then_return(
         well_grid.WellGrid(columns_by_name={}, rows_by_name={})
     )
-    return Labware(implementation=mock_labware_core, api_version=api_version)
+    return Labware(
+        implementation=mock_labware_core,
+        api_version=api_version,
+        core_map=mock_map_core,
+        protocol_core=mock_protocol_core,
+    )
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 13)])
@@ -113,3 +144,30 @@ def test_reset_tips(
     """It should reset and tip state."""
     subject.reset()
     decoy.verify(mock_labware_core.reset_tips(), times=1)
+
+
+@pytest.mark.parametrize(
+    "labware_location, expected_result",
+    [
+        (DeckSlotLocation(slotName=DeckSlotName.SLOT_1), "1"),
+        ("offDeck", None),
+        (ModuleLocation(moduleId="module-id"), None),
+    ],
+)
+def test_parent(
+    decoy: Decoy,
+    subject: Labware,
+    mock_labware_core: LabwareCore,
+    mock_protocol_core: ProtocolCore,
+    mock_map_core: LoadedCoreMap,
+    labware_location: Union[str, DeckSlotLocation, ModuleLocation],
+    expected_result: Optional[str],
+) -> None:
+    """Should get the labware's parent."""
+    decoy.when(mock_labware_core.labware_id).then_return("cool-labware")
+
+    decoy.when(
+        mock_labware_core._engine_client.state.labware.get_location("cool-labware")
+    ).then_return(labware_location)
+
+    subject.parent == expected_result

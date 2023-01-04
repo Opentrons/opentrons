@@ -304,25 +304,3 @@ def test_get_deck_slot(
     ).then_raise(LabwareNotOnDeckError("oh no"))
 
     assert subject.get_deck_slot() is None
-
-
-@pytest.mark.parametrize(
-    "labware_location, expected_result",
-    [
-        (DeckSlotLocation(slotName=DeckSlotName.SLOT_1), "1"),
-        ("offDeck", None),
-        (ModuleLocation(moduleId="module-id"), None),
-    ],
-)
-def test_parent_slot_name(
-    decoy: Decoy,
-    mock_engine_client: EngineClient,
-    subject: LabwareCore,
-    labware_location: Union[DeckSlotLocation],
-    expected_result: Optional[str],
-) -> None:
-    """Should get the labware's parent."""
-    decoy.when(
-        mock_engine_client.state.labware.get_location("cool-labware")
-    ).then_return(labware_location)
-    subject.parent == expected_result

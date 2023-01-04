@@ -16,7 +16,7 @@ from typing import TYPE_CHECKING, Any, List, Dict, Optional, Union, Tuple
 
 from opentrons.types import Location, Point, LocationLabware
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import requires_version
+from opentrons.protocols.api_support.util import requires_version, APIVersionError
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 
@@ -28,6 +28,8 @@ from opentrons.protocols.labware import (  # noqa: F401
     verify_definition as verify_definition,
     save_definition as save_definition,
 )
+
+from opentrons.protocol_engine import ModuleLocation
 
 from . import validation
 from .core import well_grid
@@ -285,6 +287,8 @@ class Labware:
 
         self._api_version = api_version
         self._implementation: LabwareCore = implementation
+        self._protocol_core = protocol_core
+        self._core_map = core_map
 
         well_columns = implementation.get_well_columns()
         self._well_grid = well_grid.create(columns=well_columns)
@@ -330,15 +334,22 @@ class Labware:
         if isinstance(self._implementation, LabwareImplementation):
             return self._implementation.get_geometry().parent.labware.object
 
-        labware_loaction = (
-            self._implementation._engine_client.state.labware.get_location(
-                self._implementation.labware_id
-            )
+        labware_loaction = self._implementation._engine_client.state.labware.get_location(  # type: ignore[attr-defined]
+            self._implementation.labware_id  # type: ignore[attr-defined]
         )
+
         if labware_loaction == "offDeck":
             return None
-        # elif isinstance(labware_loaction, ModuleLocation):
-        #     raise NotImplementedError("labwre parent on a module is not implemented.")
+        elif isinstance(labware_loaction, ModuleLocation):
+            if self._protocol_core is None or self._core_map is None:
+                raise APIVersionError(
+                    "Loaded labware on a module is not supported in this api version."
+                )
+            module_core = self._protocol_core.get_module_core_item(
+                labware_loaction.moduleId
+            )
+            return self._core_map.get(module_core)
+
         return labware_loaction
 
     @property  # type: ignore[misc]
