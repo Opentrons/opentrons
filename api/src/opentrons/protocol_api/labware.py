@@ -44,7 +44,6 @@ if TYPE_CHECKING:
     from .protocol_context import ModuleTypes
 
 
-
 _log = logging.getLogger(__name__)
 
 
