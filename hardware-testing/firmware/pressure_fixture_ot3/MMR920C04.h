@@ -3,19 +3,20 @@
 
 #include <Arduino.h>
 #include <Wire.h>
+#define MMRADDR     0x67
+//  Constants for setting measurement resolution
 
-#define MMR920C04_I2C_ADDR (0x67)
-#define MMR920C04_I2C_FREQ (100000)
-
-class MMR920C04 {
-    public:
-        MMR920C04();
-        void begin(void);
-        void reset(void);
-        void writeReg(uint8_t data);
-        void readReg(uint8_t *readData, uint8_t dataLength);
-    private:
-        TwoWire *myWire;
+//
+class MMR920C04
+{
+public:
+  MMR920C04(uint8_t addr);            // Initialize the HDC2080
+  void begin(void);             // Join I2C bus
+  void writeReg(uint8_t tempdata);
+  void readReg(uint8_t *readData, uint8_t dataLength);
+  int GetDRDYBStatus(void);
+private:
+  int _addr;
 };
 
 #endif

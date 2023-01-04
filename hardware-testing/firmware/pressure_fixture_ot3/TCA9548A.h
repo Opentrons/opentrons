@@ -4,35 +4,42 @@
 #include <Arduino.h>
 #include <Wire.h>
 
-#define TCA9548A_ADDR_MIN (0x70)
-#define TCA9548A_ADDR_MAX (0x77)
-#define TCA9548A_ADDR_DEFAULT TCA9548A_ADDR_MIN
-#define TCA9548A_PIN_NONE (255)  // placeholder for when using defaults
+/* Channel hex values for writeRegister() function */
+#define TCA_CHANNEL_0 0x1
+#define TCA_CHANNEL_1 0x2
+#define TCA_CHANNEL_2 0x4
+#define TCA_CHANNEL_3 0x8
+#define TCA_CHANNEL_4 0x10
+#define TCA_CHANNEL_5 0x20
+#define TCA_CHANNEL_6 0x40
+#define TCA_CHANNEL_7 0x80
 
-class TCA9548A {
+const int RESET = 22;
+const int Addr0 = 24;
+const int Addr1 = 23;
+const int Addr2 = 25;
+
+class TCA9548A
+{
     public:
-        TCA9548A(uint8_t reset = TCA9548A_PIN_NONE,
-                 uint8_t addr_0 = TCA9548A_PIN_NONE,
-                 uint8_t addr_1 = TCA9548A_PIN_NONE,
-                 uint8_t addr_2 = TCA9548A_PIN_NONE,
-                 uint8_t address = TCA9548A_ADDR_DEFAULT);
-        void begin(TwoWire &inWire = Wire);
+        TCA9548A(uint8_t address = 0x70);  // Default IC Address
+
+        void begin(TwoWire &inWire = Wire); // Default TwoWire Instance
         void openChannel(uint8_t channel);
         void closeChannel(uint8_t channel);
+        void writeRegister(uint8_t value);
+        inline byte readRegister() { return (byte)read(); }
         void closeAll();
         void openAll();
         
     protected:
     private:
         TwoWire *myWire;
-        uint8_t _reset;
         uint8_t _address;
-        uint8_t _pin_addr_0;
-        uint8_t _pin_addr_1;
-        uint8_t _pin_addr_2;
         uint8_t _channels;
-        void write();
-        void configAddressPin(uint8_t pin, uint8_t bit);
+
+        void write(uint8_t inData);
+        uint8_t read();
 };
 
 #endif

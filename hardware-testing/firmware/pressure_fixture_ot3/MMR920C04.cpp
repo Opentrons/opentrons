@@ -1,34 +1,59 @@
 #include "MMR920C04.h"
-
 #include <Wire.h>
 
-#define MMR920C04_CMD_RESET (0x72)
+//Define Register Map
 
-MMR920C04::MMR920C04() {
+
+MMR920C04::MMR920C04(uint8_t addr)
+{
+  _addr = addr;
 }
 
-void MMR920C04::begin(void) {
-    Wire.begin();
-    Wire.setClock(MMR920C04_I2C_FREQ);
+void MMR920C04::begin(void)
+{
+  Wire.begin();
+  Wire.setClock(100000);
 }
-
-void MMR920C04::reset(void) {
-    writeReg(MMR920C04_CMD_RESET);
+int MMR920C04::GetDRDYBStatus(void)
+{
+  //return digitalRead(DRDYB);
 }
-
-void MMR920C04::readReg(uint8_t *readData, uint8_t dataLength) {
-    Wire.requestFrom(MMR920C04_I2C_ADDR, dataLength);
-    // TODO: delay a bit here?
-    if (Wire.available() < dataLength) {
-        return
+void MMR920C04::readReg(uint8_t *readData, uint8_t dataLength)
+{
+  //Wire.beginTransmission(_addr);
+  //Wire.write(0x01);  //set Address Pointer Register as conf Register
+  //Wire.endTransmission();
+  Wire.requestFrom(_addr, dataLength); // Request 1 byte from open register
+  if (Wire.available() == 0)
+  {
+    for(uint8_t i = 0; i<dataLength; i++)
+    {
+      readData[i] = 0;
     }
-    for(uint8_t i = 0; i < dataLength; i++) {
-        readData[i] = Wire.read();
+  }
+  else
+  {
+    for(uint8_t i = 0; i<dataLength; i++)
+    {
+      readData[i] = Wire.read();
     }
+  }
 }
 
-void MMR920C04::writeReg(uint8_t data) {
-  Wire.beginTransmission(MMR920C04_I2C_ADDR);
-  Wire.write(data);
-  Wire.endTransmission();
+void MMR920C04::writeReg(uint8_t tempdata)
+{
+
+  Wire.beginTransmission(_addr); // Open Device
+  Wire.write(tempdata);        // Write data to register
+  Wire.endTransmission();      // Relinquish bus control
 }
+/*
+void MMR920C04::Sensor_reset()    //Reset the sensor
+{
+  writeReg(0x72);
+}
+void MMR920C04::Sensor_start()
+{
+  writeReg(0xA6);
+}
+*/
