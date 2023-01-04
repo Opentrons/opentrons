@@ -7,6 +7,7 @@ from decoy import Decoy, matchers
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
+from opentrons_shared_data.module.dev_types import ModuleType as SharedDataModuleType
 
 from opentrons.types import Mount, DeckSlotName
 from opentrons.broker import Broker
@@ -400,7 +401,7 @@ def test_load_module(
         )
     ).then_return(mock_module_core)
 
-    decoy.when(mock_module_core.get_loaded_model()).then_return(    # type: ignore[attr-defined]
+    decoy.when(mock_module_core.get_loaded_model()).then_return(  # type: ignore[attr-defined]
         TemperatureModuleModel.TEMPERATURE_V2
     )
     decoy.when(mock_module_core.get_serial_number()).then_return("cap'n crunch")
@@ -435,8 +436,10 @@ def test_load_module_default_location(
         )
     ).then_return(mock_module_core)
 
-    decoy.when(mock_module_core.get_type()).then_return(ModuleType.TEMPERATURE)
-    decoy.when(mock_module_core.get_loaded_model()).then_return(    # type: ignore[attr-defined]
+    decoy.when(mock_module_core.get_type()).then_return(
+        cast(SharedDataModuleType, ModuleType.TEMPERATURE)
+    )
+    decoy.when(mock_module_core.get_loaded_model()).then_return(  # type: ignore[attr-defined]
         TemperatureModuleModel.TEMPERATURE_V2
     )
     decoy.when(mock_module_core.get_serial_number()).then_return("cap'n crunch")

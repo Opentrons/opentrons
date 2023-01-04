@@ -198,19 +198,6 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
         """
         return cast(GeometryType, self._core.geometry)
 
-    @property
-    def requested_as(self) -> ModuleModel:
-        """How the protocol requested this module.
-
-        For example, a physical ``temperatureModuleV2`` might have been requested
-        either as ``temperatureModuleV2`` or ``temperatureModuleV1``.
-
-        For Opentrons internal use only.
-
-        :meta private:
-        """
-        return self._core.get_requested_model()
-
     # TODO(mc, 2022-09-08): remove this property
     @property
     def _module(self) -> SynchronousAdapter[modules.AbstractModule]:

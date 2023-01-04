@@ -12,7 +12,6 @@ from opentrons.hardware_control import SynchronousAdapter, modules as hw_modules
 from opentrons.hardware_control.types import Axis
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
-    ModuleType,
     TemperatureStatus,
     MagneticStatus,
     SpeedStatus,
@@ -26,7 +25,10 @@ from opentrons.protocols.geometry.module_geometry import (
 )
 from opentrons.types import DeckSlotName, Location
 
-from opentrons_shared_data.module.dev_types import ModuleModel as SharedDataModuleModel
+from opentrons_shared_data.module.dev_types import (
+    ModuleModel as SharedDataModuleModel,
+    ModuleType,
+)
 
 from ..module import (
     AbstractModuleCore,
@@ -82,7 +84,7 @@ class LegacyModuleCore(AbstractModuleCore[LabwareImplementation]):
 
     def get_type(self) -> ModuleType:
         """Get the module's general type."""
-        return self._geometry.module_type
+        return cast(ModuleType, self._geometry.module_type.value)
 
     def get_requested_model(self) -> ModuleModel:
         """Get the model identifier the module was requested as.

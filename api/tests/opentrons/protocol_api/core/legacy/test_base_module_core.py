@@ -72,7 +72,7 @@ def test_get_type(
     """It should get the model from the geometry."""
     decoy.when(mock_geometry.module_type).then_return(ModuleType.TEMPERATURE)
     result = subject.get_type()
-    assert result == ModuleType.TEMPERATURE
+    assert result == "temperatureModuleType"
 
 
 def test_get_serial_number(
