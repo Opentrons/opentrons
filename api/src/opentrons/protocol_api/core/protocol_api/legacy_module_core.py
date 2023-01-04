@@ -19,11 +19,6 @@ from opentrons.hardware_control.modules.types import (
     MagneticModuleModel,
     ThermocyclerStep,
 )
-from opentrons.protocols.geometry.module_geometry import (
-    ModuleGeometry,
-    ThermocyclerGeometry,
-    HeaterShakerGeometry,
-)
 from opentrons.types import DeckSlotName, Location
 
 from ..module import (
@@ -35,6 +30,7 @@ from ..module import (
 )
 
 from .labware import LabwareImplementation
+from .module_geometry import ModuleGeometry, ThermocyclerGeometry, HeaterShakerGeometry
 from ...labware import Labware
 
 if TYPE_CHECKING:

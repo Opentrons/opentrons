@@ -12,8 +12,6 @@ from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError, requires_version
 
-from opentrons.protocols.geometry.module_geometry import ModuleGeometry
-
 from .core.common import (
     ProtocolCore,
     ModuleCore,
@@ -24,6 +22,7 @@ from .core.common import (
 )
 from .core.core_map import LoadedCoreMap
 from .core.protocol_api.legacy_module_core import LegacyModuleCore
+from .core.protocol_api.module_geometry import ModuleGeometry as LegacyModuleGeometry
 from .core.protocol_api.labware import LabwareImplementation as LegacyLabwareCore
 
 from .module_validation_and_errors import (
@@ -194,14 +193,12 @@ class ModuleContext(CommandPublisher):
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
-    def geometry(self) -> ModuleGeometry:
+    def geometry(self) -> LegacyModuleGeometry:
         """The object representing the module as an item on the deck.
 
         .. deprecated:: 2.14
             Use properties of the :py:class:`ModuleContext` instead,
             like :py:meth:`model` and :py:meth:`type`
-
-        :returns: ModuleGeometry
         """
         if isinstance(self._core, LegacyModuleCore):
             return self._core.geometry
