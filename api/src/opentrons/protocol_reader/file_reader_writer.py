@@ -1,4 +1,5 @@
 """Input file reading."""
+import json
 from json import JSONDecodeError
 from anyio import Path as AsyncPath, create_task_group, wrap_file
 from dataclasses import dataclass
@@ -34,10 +35,14 @@ class FileReadError(Exception):
     """An error raised if input files cannot be read."""
 
 
+class UnknownJsonFileError(FileReadError):
+    """An error raised if JSON file does not match a known Opentrons model."""
+
+
 class FileReaderWriter:
     """Input file reader/writer interface."""
 
-    @staticmethod
+    @staticmethod  # noqa: C901
     async def read(
         files: Sequence[Union[AbstractInputFile, Path]]
     ) -> List[BufferedFile]:
@@ -63,7 +68,18 @@ class FileReaderWriter:
 
             if filename.lower().endswith(".json"):
                 try:
-                    data = parse_raw_as(BufferedJsonFileData, contents)  # type: ignore[arg-type]
+                    json_dict = json.loads(contents)
+                    if "ordering" in json_dict and "wells" in json_dict:
+                        data = parse_raw_as(LabwareDefinition, contents)
+                    elif "schemaVersion" in json_dict and "commands" in json_dict:
+                        if json_dict.get("schemaVersion") == 6:
+                            data = parse_raw_as(ProtocolSchemaV6, contents)
+                        else:
+                            data = parse_raw_as(JsonProtocol, contents)
+                    else:
+                        raise UnknownJsonFileError(
+                            f"JSON file {filename} is not a known Opentrons format."
+                        )
 
                 # unlike other Pydantic functions/methods, `parse_raw_as` can
                 # raise both JSONDecodeError and ValidationError separately
@@ -72,8 +88,7 @@ class FileReaderWriter:
 
                 except ValidationError as e:
                     raise FileReadError(
-                        f"JSON file {filename} did not"
-                        " match a known Opentrons format."
+                        f"JSON file {filename} has missing or incorrect data."
                     ) from e
 
             results[index] = BufferedFile(

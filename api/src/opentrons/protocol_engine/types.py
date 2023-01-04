@@ -62,6 +62,17 @@ class LabwareMovementStrategy(str, Enum):
     MANUAL_MOVE_WITHOUT_PAUSE = "manualMoveWithoutPause"
 
 
+# TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
+@dataclass(frozen=True)
+class ExperimentalOffsetData(BaseModel):
+    """The result of a load module procedure."""
+
+    usePickUpLocationLpcOffset: bool
+    useDropLocationLpcOffset: bool
+    pickUpOffset: Optional[LabwareOffsetVector]
+    dropOffset: Optional[LabwareOffsetVector]
+
+
 class WellOrigin(str, Enum):
     """Origin of WellLocation offset."""
 
@@ -101,15 +112,6 @@ class DeckPoint(BaseModel):
     x: float
     y: float
     z: float
-
-
-class StaticPipetteConfig(BaseModel):
-    """Static config for a pipette."""
-
-    model: str
-    min_volume: float
-    max_volume: float
-    channels: int
 
 
 class LoadedPipette(BaseModel):

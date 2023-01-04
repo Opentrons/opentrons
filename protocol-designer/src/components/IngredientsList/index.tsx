@@ -2,7 +2,6 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { selectors } from '../../labware-ingred/selectors'
-import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { IconButton, SidePanel } from '@opentrons/components'
 import { sortWells } from '@opentrons/shared-data'
 import { i18n } from '../../localization'
@@ -49,10 +48,6 @@ const LiquidGroupCard = (props: LiquidGroupCardProps): JSX.Element | null => {
   const wellsWithIngred = Object.keys(labwareWellContents)
     .sort(sortWells)
     .filter(well => labwareWellContents[well][groupId])
-
-  const enableLiquidColorEnhancements = useSelector(
-    featureFlagSelectors.getEnabledLiquidColorEnhancements
-  )
   const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
 
   if (wellsWithIngred.length < 1) {
@@ -65,9 +60,7 @@ const LiquidGroupCard = (props: LiquidGroupCardProps): JSX.Element | null => {
       title={ingredGroup.name || i18n.t('card.unnamedLiquid')}
       iconProps={{
         style: {
-          fill: enableLiquidColorEnhancements
-            ? liquidDisplayColors[Number(groupId)] ?? swatchColors(groupId)
-            : swatchColors(groupId),
+          fill: liquidDisplayColors[Number(groupId)] ?? swatchColors(groupId),
         },
       }}
       iconName="circle"

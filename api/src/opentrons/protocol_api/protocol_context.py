@@ -1,21 +1,11 @@
 from __future__ import annotations
 
 import logging
-from typing import (
-    Callable,
-    Dict,
-    Iterator,
-    List,
-    NamedTuple,
-    Optional,
-    Tuple,
-    Type,
-    Union,
-)
+from typing import Callable, Dict, List, NamedTuple, Optional, Type, Union, Mapping
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
-from opentrons.types import Mount, Location, DeckLocation, DeckSlotName
+from opentrons.types import Mount, Location, DeckLocation
 from opentrons.broker import Broker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
@@ -27,11 +17,10 @@ from opentrons.protocols.api_support.util import (
     requires_version,
     APIVersionError,
 )
-from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
 from .core.common import ModuleCore, ProtocolCore
-from .core.labware import AbstractLabware
+from .core.core_map import LoadedCoreMap
 from .core.module import (
     AbstractTemperatureModuleCore,
     AbstractMagneticModuleCore,
@@ -39,9 +28,6 @@ from .core.module import (
     AbstractHeaterShakerCore,
 )
 from .core.engine.protocol import ProtocolCore as ProtocolEngineCore
-from .core.protocol_api.protocol_context import (
-    ProtocolContextImplementation as LegacyProtocolCore,
-)
 
 from . import validation
 from .deck import Deck
@@ -98,6 +84,9 @@ class ProtocolContext(CommandPublisher):
         api_version: APIVersion,
         implementation: ProtocolCore,
         broker: Optional[Broker] = None,
+        core_map: Optional[LoadedCoreMap] = None,
+        deck: Optional[Deck] = None,
+        bundled_data: Optional[Dict[str, bytes]] = None,
     ) -> None:
         """Build a :py:class:`.ProtocolContext`.
 
@@ -107,31 +96,28 @@ class ProtocolContext(CommandPublisher):
                                         module contexts will get labware offsets from.
         :param broker: An optional command broker to link to. If not
                       specified, a dummy one is used.
+        :param bundled_data: A dict mapping filenames to the contents of data
+                             files. Can be used by the protocol, since it is
+                             exposed as
+                             :py:attr:`.ProtocolContext.bundled_data`
         """
-        super().__init__(broker)
-
-        self._api_version = api_version
-        self._implementation = implementation
-
-        if self._api_version > MAX_SUPPORTED_VERSION:
+        if api_version > MAX_SUPPORTED_VERSION:
             raise RuntimeError(
-                f"API version {self._api_version} is not supported by this "
-                f"robot software. Please either reduce your requested API "
-                f"version or update your robot."
+                f"API version {api_version} is not supported by this robot software."
+                f" Please reduce your API version to {MAX_SUPPORTED_VERSION} or below"
+                f" or update your robot."
             )
 
+        super().__init__(broker)
+        self._api_version = api_version
+        self._implementation = implementation
+        self._core_map = core_map or LoadedCoreMap()
+        self._deck = deck or Deck(protocol_core=implementation, core_map=self._core_map)
         self._instruments: Dict[Mount, Optional[InstrumentContext]] = {
             mount: None for mount in Mount
         }
-        self._modules: Dict[DeckSlotName, ModuleTypes] = {}
-
-        # TODO(mc, 2022-12-06): replace with API version guard once
-        # new `Deck` is fully implemented
-        self._deck: Deck = (
-            Deck(protocol_core=implementation)
-            if not isinstance(implementation, LegacyProtocolCore)
-            else implementation.get_deck()  # type: ignore[attr-defined]
-        )
+        self._bundled_data: Dict[str, bytes] = bundled_data or {}
+        self._load_fixed_trash()
 
         self._commands: List[str] = []
         self._unsubscribe_commands: Optional[Callable[[], None]] = None
@@ -169,7 +155,7 @@ class ProtocolContext(CommandPublisher):
         ``data/mydata/aspirations.csv`` it will be in the dict as
         ``'aspirations.csv'``) to the bytes contents of the files.
         """
-        return self._implementation.get_bundled_data()
+        return self._bundled_data
 
     def cleanup(self) -> None:
         """Finalize and clean up the protocol context."""
@@ -319,7 +305,10 @@ class ProtocolContext(CommandPublisher):
             version=version,
         )
 
-        return Labware(implementation=labware_core, api_version=self._api_version)
+        labware = Labware(implementation=labware_core, api_version=self._api_version)
+        self._core_map.add(labware_core, labware)
+
+        return labware
 
     @requires_version(2, 0)
     def load_labware_by_name(
@@ -357,29 +346,28 @@ class ProtocolContext(CommandPublisher):
         :returns: Dict mapping deck slot number to labware, sorted in order of
                   the locations.
         """
+        labware_cores = (
+            (core.get_deck_slot(), core)
+            for core in self._implementation.get_labware_cores()
+        )
 
-        def _only_labwares() -> Iterator[Tuple[int, Labware]]:
-            for slotnum, slotitem in self._deck.items():
-                slotnum = int(slotnum)
+        return {
+            slot.as_int(): self._core_map.get(core)
+            for slot, core in labware_cores
+            if slot is not None
+        }
 
-                if isinstance(slotitem, AbstractLabware):
-                    yield slotnum, Labware(
-                        implementation=slotitem, api_version=self._api_version
-                    )
-                elif isinstance(slotitem, Labware):
-                    yield slotnum, slotitem
-                elif isinstance(slotitem, ModuleGeometry):
-                    if slotitem.labware:
-                        yield slotnum, slotitem.labware
-
-        return dict(_only_labwares())
-
+    # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     # TODO: gate move_labware behind API version
     def move_labware(
         self,
         labware: Labware,
         new_location: Union[DeckLocation, ModuleTypes],
         use_gripper: bool = False,
+        use_pick_up_location_lpc_offset: bool = False,
+        use_drop_location_lpc_offset: bool = False,
+        pick_up_offset: Optional[Mapping[str, float]] = None,
+        drop_offset: Optional[Mapping[str, float]] = None,
     ) -> None:
         """Move a loaded labware to a new location.
 
@@ -396,6 +384,14 @@ class ProtocolContext(CommandPublisher):
                             If False, will pause protocol execution to allow the user
                             to perform a manual move and click resume to continue
                             protocol execution.
+        Other experimental params:
+        :param use_pick_up_location_lpc_offset: Whether to use LPC offset of the labware
+                            associated with its pick up location.
+        :param use_drop_location_lpc_offset: Whether to use LPC offset of the labware
+                            associated with its drop off location.
+        :param pick_up_offset: Offset to use when picking up labware.
+        :param drop_offset: Offset to use when dropping off labware.
+
         Before moving a labware from or to a hardware module, make sure that the labware
         and its new location is reachable by the gripper. So, thermocycler lid should be
         open and heater-shaker's labware latch should be open.
@@ -414,10 +410,24 @@ class ProtocolContext(CommandPublisher):
             else validation.ensure_deck_slot(new_location)
         )
 
+        _pick_up_offset = (
+            validation.ensure_valid_labware_offset_vector(pick_up_offset)
+            if pick_up_offset
+            else None
+        )
+        _drop_offset = (
+            validation.ensure_valid_labware_offset_vector(drop_offset)
+            if drop_offset
+            else None
+        )
         self._implementation.move_labware(
             labware_core=labware._implementation,
             new_location=location,
             use_gripper=use_gripper,
+            use_pick_up_location_lpc_offset=use_pick_up_location_lpc_offset,
+            use_drop_location_lpc_offset=use_drop_location_lpc_offset,
+            pick_up_offset=_pick_up_offset,
+            drop_offset=_drop_offset,
         )
 
     @requires_version(2, 0)
@@ -478,11 +488,12 @@ class ProtocolContext(CommandPublisher):
         module_context = _create_module_context(
             module_core=module_core,
             protocol_core=self._implementation,
+            core_map=self._core_map,
             broker=self._broker,
             api_version=self._api_version,
         )
 
-        self._modules[module_core.get_deck_slot()] = module_context
+        self._core_map.add(module_core, module_context)
 
         return module_context
 
@@ -503,7 +514,8 @@ class ProtocolContext(CommandPublisher):
                                            ordered by slot number.
         """
         return {
-            int(deck_slot.value): module for deck_slot, module in self._modules.items()
+            core.get_deck_slot().as_int(): self._core_map.get(core)
+            for core in self._implementation.get_module_cores()
         }
 
     @requires_version(2, 0)
@@ -714,14 +726,14 @@ class ProtocolContext(CommandPublisher):
         It has one well and should be accessed like labware in your protocol.
         e.g. ``protocol.fixed_trash['A1']``
         """
-        trash = self._implementation.get_fixed_trash()
+        return self._core_map.get(self._implementation.fixed_trash)
 
-        # TODO AL 20201113 - remove this when DeckLayout only holds
-        #  LabwareInterface instances.
-        if not isinstance(trash, Labware):
-            return Labware(implementation=trash, api_version=self._api_version)
-
-        return trash
+    def _load_fixed_trash(self) -> None:
+        fixed_trash_core = self._implementation.fixed_trash
+        fixed_trash = Labware(
+            implementation=fixed_trash_core, api_version=self._api_version
+        )
+        self._core_map.add(fixed_trash_core, fixed_trash)
 
     @requires_version(2, 5)
     def set_rail_lights(self, on: bool) -> None:
@@ -748,6 +760,7 @@ class ProtocolContext(CommandPublisher):
 def _create_module_context(
     module_core: ModuleCore,
     protocol_core: ProtocolCore,
+    core_map: LoadedCoreMap,
     api_version: APIVersion,
     broker: Broker,
 ) -> ModuleTypes:
@@ -766,6 +779,7 @@ def _create_module_context(
     return module_cls(
         core=module_core,
         protocol_core=protocol_core,
+        core_map=core_map,
         api_version=api_version,
         broker=broker,
     )

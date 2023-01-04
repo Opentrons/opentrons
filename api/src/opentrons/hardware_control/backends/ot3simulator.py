@@ -5,6 +5,7 @@ import asyncio
 from contextlib import asynccontextmanager
 import logging
 from typing import (
+    Callable,
     Dict,
     List,
     Optional,
@@ -18,8 +19,7 @@ from typing import (
 )
 
 from opentrons.config.types import OT3Config, GantryLoad
-from opentrons.config import pipette_config, gripper_config
-from opentrons_shared_data.pipette import dummy_model_for_name
+from opentrons.config import ot3_pipette_config, gripper_config
 from .ot3utils import (
     axis_convert,
     create_move_group,
@@ -29,6 +29,8 @@ from .ot3utils import (
     create_gripper_jaw_hold_group,
     create_gripper_jaw_grip_group,
     create_gripper_jaw_home_group,
+    create_tip_action_group,
+    PipetteAction,
 )
 
 from opentrons_hardware.firmware_bindings.constants import NodeId
@@ -47,16 +49,17 @@ from opentrons.hardware_control.types import (
     CurrentConfig,
     OT3SubSystem,
     InstrumentProbeType,
+    MotorStatus,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 
-from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
 from opentrons_shared_data.gripper.dev_types import GripperModel
 from opentrons.hardware_control.dev_types import (
     InstrumentHardwareConfigs,
     PipetteSpec,
     GripperSpec,
-    AttachedPipette,
+    OT3AttachedPipette,
     AttachedGripper,
     OT3AttachedInstruments,
 )
@@ -69,6 +72,7 @@ class OT3Simulator:
 
     _position: Dict[NodeId, float]
     _encoder_position: Dict[NodeId, float]
+    _motor_status: Dict[NodeId, MotorStatus]
 
     @classmethod
     async def build(
@@ -124,17 +128,20 @@ class OT3Simulator:
                     gripper_spec["id"] = passed_ai.get("id")
                 return gripper_spec
 
+            # TODO (lc 12-5-2022) need to not always pass in defaults here
+            # but doing it to satisfy linter errors for now.
             pipette_spec: PipetteSpec = {"model": None, "id": None}
             if not passed_ai or not passed_ai.get("model"):
                 return pipette_spec
-            if passed_ai["model"] in pipette_config.config_models:
-                return passed_ai  # type: ignore
-            if passed_ai["model"] in pipette_config.config_names:
-                pipette_spec["model"] = dummy_model_for_name(
-                    passed_ai["model"]  # type: ignore
-                )
+
+            if ot3_pipette_config.supported_pipette(
+                cast(PipetteModel, passed_ai["model"])
+            ):
+                pipette_spec["model"] = cast(PipetteModel, passed_ai.get("model"))
                 pipette_spec["id"] = passed_ai.get("id")
                 return pipette_spec
+            # TODO (lc 12-05-2022) When the time comes we should properly
+            # support backwards compatibility
             raise KeyError(
                 "If you specify attached_instruments, the model "
                 "should be pipette names or pipette models, but "
@@ -148,6 +155,7 @@ class OT3Simulator:
         self._module_controls: Optional[AttachedModulesControl] = None
         self._position = self._get_home_position()
         self._encoder_position = self._get_home_position()
+        self._motor_status = {}
         self._present_nodes: Set[NodeId] = set()
         self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
 
@@ -173,8 +181,28 @@ class OT3Simulator:
             self._configuration.current_settings, gantry_load
         )
 
-    def is_homed(self, axes: Sequence[OT3Axis]) -> bool:
-        return True
+    def _handle_motor_status_update(self, response: Dict[NodeId, float]) -> None:
+        self._position.update(response)
+        self._encoder_position.update(response)
+        self._motor_status.update(
+            (node, MotorStatus(True, True)) for node in response.keys()
+        )
+
+    async def update_motor_status(self) -> None:
+        """Retreieve motor and encoder status and position from all present nodes"""
+        # Simulate condition at boot, status would not be ok
+        self._motor_status.update(
+            (node, MotorStatus(False, False)) for node in self._present_nodes
+        )
+
+    def check_ready_for_movement(self, axes: Sequence[OT3Axis]) -> bool:
+        get_stat: Callable[
+            [Sequence[OT3Axis]], List[Optional[MotorStatus]]
+        ] = lambda ax: [self._motor_status.get(axis_to_node(a)) for a in ax]
+        return all(
+            isinstance(status, MotorStatus) and status.motor_ok
+            for status in get_stat(axes)
+        )
 
     async def update_position(self) -> OT3AxisMap[float]:
         """Get the current position."""
@@ -214,6 +242,12 @@ class OT3Simulator:
         Returns:
             Homed position.
         """
+        if axes:
+            homed = [axis_to_node(a) for a in axes]
+        else:
+            homed = list(self._position.keys())
+        for h in homed:
+            self._motor_status[h] = MotorStatus(True, True)
         return axis_convert(self._position, 0.0)
 
     async def fast_home(
@@ -228,6 +262,9 @@ class OT3Simulator:
         Returns:
             New position.
         """
+        homed = [axis_to_node(a) for a in axes] if axes else self._position.keys()
+        for h in homed:
+            self._motor_status[h] = MotorStatus(True, True)
         return axis_convert(self._position, 0.0)
 
     async def gripper_grip_jaw(
@@ -241,6 +278,7 @@ class OT3Simulator:
     async def gripper_home_jaw(self) -> None:
         """Move gripper outward."""
         _ = create_gripper_jaw_home_group()
+        self._motor_status[NodeId.gripper_g] = MotorStatus(True, True)
 
     async def gripper_hold_jaw(
         self,
@@ -248,12 +286,21 @@ class OT3Simulator:
     ) -> None:
         _ = create_gripper_jaw_hold_group(encoder_position_um)
 
+    async def tip_action(
+        self,
+        axes: Sequence[OT3Axis],
+        distance: float = 33,
+        speed: float = -5.5,
+        tip_action: str = "drop",
+    ) -> None:
+        _ = create_tip_action_group(
+            axes, distance, speed, cast(PipetteAction, tip_action)
+        )
+
     def _attached_to_mount(
         self, mount: OT3Mount, expected_instr: Optional[PipetteName]
     ) -> OT3AttachedInstruments:
-        init_instr = self._attached_instruments.get(
-            mount, {"model": None, "id": None}  # type: ignore
-        )
+        init_instr = self._attached_instruments.get(mount, {"model": None, "id": None})  # type: ignore
         if mount is OT3Mount.GRIPPER:
             return self._attached_gripper_to_mount(cast(GripperSpec, init_instr))
         return self._attached_pipette_to_mount(
@@ -275,19 +322,19 @@ class OT3Simulator:
         mount: OT3Mount,
         init_instr: PipetteSpec,
         expected_instr: Optional[PipetteName],
-    ) -> AttachedPipette:
+    ) -> OT3AttachedPipette:
         found_model = init_instr["model"]
-        back_compat: List["PipetteName"] = []
-        if found_model:
-            back_compat = pipette_config.configs[found_model].get("backCompatNames", [])
-        if (
-            expected_instr
-            and found_model
-            and (
-                pipette_config.configs[found_model]["name"] != expected_instr
-                and expected_instr not in back_compat
-            )
+
+        # TODO (lc 12-05-2022) When the time comes, we should think about supporting
+        # backwards compatability -- hopefully not relying on config keys only,
+        # but TBD.
+        if expected_instr and not ot3_pipette_config.supported_pipette(
+            cast(PipetteModel, expected_instr)
         ):
+            raise RuntimeError(
+                f"mount {mount.name} requested a {expected_instr} which is not supported on the OT3"
+            )
+        if found_model and expected_instr and (expected_instr != found_model):
             if self._strict_attached:
                 raise RuntimeError(
                     "mount {}: expected instrument {} but got {}".format(
@@ -296,27 +343,29 @@ class OT3Simulator:
                 )
             else:
                 return {
-                    "config": pipette_config.load(dummy_model_for_name(expected_instr)),
+                    "config": ot3_pipette_config.load_ot3_pipette(
+                        ot3_pipette_config.convert_pipette_name(expected_instr)
+                    ),
                     "id": None,
                 }
-        elif found_model and expected_instr:
+        if found_model and expected_instr or found_model:
             # Instrument detected matches instrument expected (note:
             # "instrument detected" means passed as an argument to the
             # constructor of this class)
+
+            # OR Instrument detected and no expected instrument specified
             return {
-                "config": pipette_config.load(found_model, init_instr["id"]),
-                "id": init_instr["id"],
-            }
-        elif found_model:
-            # Instrument detected and no expected instrument specified
-            return {
-                "config": pipette_config.load(found_model, init_instr["id"]),
+                "config": ot3_pipette_config.load_ot3_pipette(
+                    ot3_pipette_config.convert_pipette_model(found_model)
+                ),
                 "id": init_instr["id"],
             }
         elif expected_instr:
             # Expected instrument specified and no instrument detected
             return {
-                "config": pipette_config.load(dummy_model_for_name(expected_instr)),
+                "config": ot3_pipette_config.load_ot3_pipette(
+                    ot3_pipette_config.convert_pipette_name(expected_instr)
+                ),
                 "id": None,
             }
         else:

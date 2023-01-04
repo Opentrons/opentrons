@@ -123,7 +123,9 @@ async def test_move_integration(
     ]
     home_runner = MoveGroupRunner([home_move])
     position = await home_runner.run(can_messenger)
-    assert position == {motor_node: (0.0, 0.0) for motor_node in all_motor_nodes}
+    assert position == {
+        motor_node: (0.0, 0.0, False, False) for motor_node in all_motor_nodes
+    }
     # these moves test position accumulation to reasonably realistic values
     # and have to do it over a kind of long time so that the velocities are low
     # enough that the pipettes, with their extremely high steps/mm values,

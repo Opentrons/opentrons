@@ -68,7 +68,9 @@ export function SetupLabwareMap({
                     nestedLabwareDisplayName,
                   }) => (
                     <Module
-                      key={`LabwareSetup_Module_${moduleDef.model}_${x}${y}`}
+                      key={`LabwareSetup_Module_${String(
+                        moduleDef.model
+                      )}_${x}${y}`}
                       x={x}
                       y={y}
                       orientation={inferModuleOrientationFromXCoordinate(x)}
@@ -81,7 +83,9 @@ export function SetupLabwareMap({
                     >
                       {nestedLabwareDef != null && nestedLabwareId != null ? (
                         <React.Fragment
-                          key={`LabwareSetup_Labware_${nestedLabwareDef.metadata.displayName}_${x}${y}`}
+                          key={`LabwareSetup_Labware_${String(
+                            nestedLabwareDef.metadata.displayName
+                          )}_${x}${y}`}
                         >
                           <LabwareRender definition={nestedLabwareDef} />
                           <LabwareInfoOverlay
@@ -100,7 +104,9 @@ export function SetupLabwareMap({
                   ({ x, y, labwareDef, displayName }, labwareId) => {
                     return (
                       <React.Fragment
-                        key={`LabwareSetup_Labware_${labwareDef.metadata.displayName}_${x}${y}`}
+                        key={`LabwareSetup_Labware_${String(
+                          labwareDef.metadata.displayName
+                        )}_${x}${y}`}
                       >
                         <g transform={`translate(${x},${y})`}>
                           <LabwareRender definition={labwareDef} />
@@ -119,7 +125,10 @@ export function SetupLabwareMap({
             )}
           </RobotWorkSpace>
         </Box>
-        <OffDeckLabwareList labwareItems={offDeckItems} />
+        <OffDeckLabwareList
+          labwareItems={offDeckItems}
+          isOt3={robotType === 'OT-3 Standard'}
+        />
       </Flex>
     </Flex>
   )

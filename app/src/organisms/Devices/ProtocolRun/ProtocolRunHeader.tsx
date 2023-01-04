@@ -468,11 +468,13 @@ export function ProtocolRunHeader({
           {showCancelButton && (
             <SecondaryButton
               style={{
-                color: `${COLORS.errorText}`,
+                color: `${String(COLORS.errorText)}`,
                 backgroundColor: 'none',
-                borderColor: `${COLORS.errorEnabled}`,
+                borderColor: `${String(COLORS.errorEnabled)}`,
               }}
-              padding={`${SPACING.spacingSM} ${SPACING.spacing4}`}
+              padding={`${String(SPACING.spacingSM)} ${String(
+                SPACING.spacing4
+              )}`}
               onClick={handleCancelClick}
               id="ProtocolRunHeader_cancelRunButton"
               disabled={isClosingCurrentRun}
@@ -582,7 +584,7 @@ export function ProtocolRunHeader({
               >
                 <animate
                   attributeName="fill"
-                  values={`${COLORS.blueEnabled}; transparent`}
+                  values={`${String(COLORS.blueEnabled)}; transparent`}
                   dur="1s"
                   calcMode="discrete"
                   repeatCount="indefinite"
@@ -594,7 +596,7 @@ export function ProtocolRunHeader({
               css={TYPOGRAPHY.pRegular}
               id="ProtocolRunHeader_runStatus"
             >
-              {runStatus != null ? t(`status_${runStatus}`) : ''}
+              {runStatus != null ? t(`status_${String(runStatus)}`) : ''}
             </StyledText>
           </Flex>
         </Box>
@@ -630,7 +632,7 @@ export function ProtocolRunHeader({
             alignItems={ALIGN_CENTER}
             boxShadow="none"
             display={DISPLAY_FLEX}
-            padding={`${SPACING.spacingSM} ${SPACING.spacing4}`}
+            padding={`${String(SPACING.spacingSM)} ${String(SPACING.spacing4)}`}
             disabled={isRunControlButtonDisabled}
             onClick={handleButtonClick}
             id="ProtocolRunHeader_runControlButton"

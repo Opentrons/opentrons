@@ -5,7 +5,7 @@ from opentrons.protocols.geometry.labware_geometry import LabwareGeometry
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocols.api_support.tip_tracker import TipTracker
 
-from opentrons.types import Point, Location
+from opentrons.types import DeckSlotName, Location, Point
 from opentrons_shared_data.labware.dev_types import LabwareParameters, LabwareDefinition
 
 from ..labware import AbstractLabware, LabwareLoadParams
@@ -170,14 +170,10 @@ class LabwareImplementation(AbstractLabware[WellImplementation]):
         return self._geometry.z_dimension + self._calibrated_offset.z
 
     @property
-    def separate_calibration(self) -> bool:
-        return False
-
-    @property
     def load_name(self) -> str:
         return self._parameters["loadName"]
 
-    # TODO(mc, 2022-09-26): codify "from labware's base" in defintion schema
+    # TODO(mc, 2022-09-26): codify "from labware's base" in definition schema
     # https://opentrons.atlassian.net/browse/RSS-110
     def get_default_magnet_engage_height(
         self, preserve_half_mm: bool = False
@@ -203,3 +199,8 @@ class LabwareImplementation(AbstractLabware[WellImplementation]):
 
     def get_well_core(self, well_name: str) -> WellImplementation:
         return self._wells_by_name[well_name]
+
+    def get_deck_slot(self) -> Optional[DeckSlotName]:
+        """Get the deck slot the labware is in, if in a deck slot."""
+        slot = self._geometry.parent.labware.first_parent()
+        return DeckSlotName.from_primitive(slot) if slot is not None else None

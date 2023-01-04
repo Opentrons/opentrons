@@ -27,6 +27,7 @@ from .core.common import (
     ThermocyclerCore,
     HeaterShakerCore,
 )
+from .core.core_map import LoadedCoreMap
 
 from .module_validation_and_errors import (
     validate_heater_shaker_temperature,
@@ -54,12 +55,14 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
         self,
         core: ModuleCore,
         protocol_core: ProtocolCore,
+        core_map: LoadedCoreMap,
         api_version: APIVersion,
         broker: Broker,
     ) -> None:
         super().__init__(broker=broker)
         self._core = core
         self._protocol_core = protocol_core
+        self._core_map = core_map
         self._api_version = api_version
         self._labware: Optional[Labware] = None
 
@@ -133,6 +136,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
         )
 
         labware = self._core.add_labware_core(labware_core)
+        self._core_map.add(labware_core, labware)
 
         return labware
 
@@ -218,29 +222,7 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
     """An object representing a connected Temperature Module.
 
     It should not be instantiated directly; instead, it should be
-    created through :py:meth:`.ProtocolContext.load_module` using:
-    ``ctx.load_module('Temperature Module', slot_number)``.
-
-    A minimal protocol with a Temperature module would look like this:
-
-    .. code-block:: python
-
-        def run(ctx):
-            slot_number = 10
-            temp_mod = ctx.load_module('Temperature Module', slot_number)
-            temp_plate = temp_mod.load_labware(
-                'biorad_96_wellplate_200ul_pcr')
-
-            temp_mod.set_temperature(45.5)
-            temp_mod.deactivate()
-
-    .. note::
-
-        In order to prevent physical obstruction of other slots, place the
-        Temperature Module in a slot on the horizontal edges of the deck (such
-        as 1, 4, 7, or 10 on the left or 3, 6, or 7 on the right), with the USB
-        cable and power cord pointing away from the deck.
-
+    created through :py:meth:`.ProtocolContext.load_module`.
 
     .. versionadded:: 2.0
 
@@ -251,11 +233,11 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
     @publish(command=cmds.tempdeck_set_temp)
     @requires_version(2, 0)
     def set_temperature(self, celsius: float) -> None:
-        """Set the target temperature, in °C, waiting for the target to be hit.
+        """Set a target temperature and wait until the module reaches the target.
 
-        Must be between 4 and 95 °C based on Opentrons QA.
+        No other protocol commands will execute while waiting for the temperature.
 
-        :param celsius: The target temperature, in °C
+        :param celsius: A value between 4 and 95, representing the target temperature in °C.
         """
         self._core.set_target_temperature(celsius)
         self._core.wait_for_target_temperature()
@@ -263,49 +245,55 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
     @publish(command=cmds.tempdeck_set_temp)
     @requires_version(2, 3)
     def start_set_temperature(self, celsius: float) -> None:
-        """Set the target temperature, in °C, without waiting for the target to be hit.
+        """Set the target temperature without waiting for the target to be hit.
 
-        Must be between 4 and 95 °C based on Opentrons QA.
-
-        :param celsius: The target temperature, in C
+        :param celsius: A value between 4 and 95, representing the target temperature in °C.
         """
         self._core.set_target_temperature(celsius)
 
     @publish(command=cmds.tempdeck_await_temp)
     @requires_version(2, 3)
     def await_temperature(self, celsius: float) -> None:
-        """Wait until module reaches temperature, in °C.
+        """Wait until module reaches temperature.
 
-        Must be between 4 and 95 °C based on Opentrons QA.
-
-        :param celsius: The target temperature, in °C
+        :param celsius: A value between 4 and 95, representing the target temperature in °C.
         """
         self._core.wait_for_target_temperature(celsius)
 
     @publish(command=cmds.tempdeck_deactivate)
     @requires_version(2, 0)
     def deactivate(self) -> None:
-        """Stop heating (or cooling) and turn off the fan."""
+        """Stop heating or cooling, and turn off the fan."""
         self._core.deactivate()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def temperature(self) -> float:
-        """Current temperature in °C."""
+        """The current temperature of the Temperature Module's deck in °C.
+
+        Returns ``0`` in simulation if no target temperature has been set.
+        """
         return self._core.get_current_temperature()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def target(self) -> Optional[float]:
-        """Current target temperature in °C."""
+        """The target temperature of the Temperature Module's deck in °C.
+
+        Returns ``None`` if no target has been set.
+        """
         return self._core.get_target_temperature()
 
     @property  # type: ignore[misc]
     @requires_version(2, 3)
     def status(self) -> str:
-        """The status of the module.
+        """One of four possible temperature statuses:
 
-        Returns ``holding at target``, ``cooling``, ``heating``, or ``idle``.
+        - ``holding at target`` – The module has reached its target temperature
+          and is actively maintaining that temperature.
+        - ``cooling`` – The module is cooling to a target temperature.
+        - ``heating`` – The module is heating to a target temperature.
+        - ``idle`` – The module has been deactivated.
         """
         return self._core.get_status().value
 
@@ -344,45 +332,31 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
         offset: Optional[float] = None,
         height_from_base: Optional[float] = None,
     ) -> None:
-        """Raise the Magnetic Module's magnets.
+        """Raise the Magnetic Module's magnets.  You can specify how high the magnets
+        should move:
 
-        You can specify how high the magnets should go in several different ways:
+           - No parameter: Move to the default height for the loaded labware. If
+             the loaded labware has no default, or if no labware is loaded, this will
+             raise an error.
 
-           - If you specify ``height_from_base``, it's measured relative to the bottom
-             of the labware.
+           - ``height_from_base`` – Move this many millimeters above the bottom
+             of the labware. Acceptable values are between ``0`` and ``25``.
 
              This is the recommended way to adjust the magnets' height.
 
-           - If you specify ``height``, it's measured relative to the magnets'
-             home position.
+           - ``offset`` – Move this many millimeters above (positive value) or below
+             (negative value) the default height for the loaded labware. The sum of
+             the default height and ``offset`` must be between 0 and 25.
 
-             You should normally use ``height_from_base`` instead.
+           - ``height`` – Intended to move this many millimeters above the magnets'
+             home position. However, depending on the generation of module and the loaded
+             labware, this may produce unpredictable results. You should normally use
+             ``height_from_base`` instead.
 
-           - If you specify nothing,
-             the magnets will rise to a reasonable default height
-             based on what labware you've loaded on this Magnetic Module.
+             This parameter may be deprecated in a future release of the Python API.
 
-             Only certain labware have a defined engage height.
-             If you've loaded a labware that doesn't,
-             or if you haven't loaded any labware, then you'll need to specify
-             a height yourself with ``height`` or ``height_from_base``.
-             Otherwise, an exception will be raised.
-
-           - If you specify ``offset``,
-             it's measured relative to the default height, as described above.
-             A positive number moves the magnets higher and
-             a negative number moves the magnets lower.
-
-        The units of ``height_from_base``, ``height``, and ``offset``
-        depend on which generation of Magnetic Module you're using:
-
-           - For GEN1 Magnetic Modules, they're in *half-millimeters,*
-             for historical reasons. This will not be the case in future
-             releases of the Python Protocol API.
-           - For GEN2 Magnetic Modules, they're in true millimeters.
-
-        You may not specify more than one of
-        ``height_from_base``, ``height``, and ``offset``.
+        You shouldn't specify more than one of these parameters. However, if you do,
+        their order of precedence is ``height``, then ``height_from_base``, then ``offset``.
 
         .. versionadded:: 2.2
             The *height_from_base* parameter.
@@ -413,7 +387,7 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
     @property  # type: ignore
     @requires_version(2, 0)
     def status(self) -> str:
-        """The status of the module: either ``engaged`` or ``disengaged``"""
+        """The status of the module, either ``engaged`` or ``disengaged``."""
         return self._core.get_status().value
 
 
@@ -558,10 +532,10 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     def lid_position(self) -> Optional[str]:
         """One of these possible lid statuses:
 
-        - ``closed``: The lid is closed.
-        - ``in_between``: The lid is neither open nor closed.
-        - ``open``: The lid is open.
-        - ``unknown``: The lid position can't be determined.
+        - ``closed`` – The lid is closed.
+        - ``in_between`` – The lid is neither open nor closed.
+        - ``open`` – The lid is open.
+        - ``unknown`` – The lid position can't be determined.
         """
         status = self._core.get_lid_position()
         return status.value if status is not None else None
@@ -571,12 +545,12 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     def block_temperature_status(self) -> str:
         """One of five possible temperature statuses:
 
-        - ``holding at target``: The block has reached its target temperature
-            and is actively maintaining that temperature.
-        - ``cooling``: The block is cooling to a target temperature.
-        - ``heating``: The block is heating to a target temperature.
-        - ``idle``: The block has not heated or cooled since the beginning of the protocol.
-        - ``error``: The temperature status can't be determined.
+        - ``holding at target`` – The block has reached its target temperature
+          and is actively maintaining that temperature.
+        - ``cooling`` – The block is cooling to a target temperature.
+        - ``heating`` – The block is heating to a target temperature.
+        - ``idle`` – The block is not currently heating or cooling.
+        - ``error`` – The temperature status can't be determined.
         """
         return self._core.get_block_temperature_status().value
 
@@ -585,13 +559,13 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     def lid_temperature_status(self) -> Optional[str]:
         """One of five possible temperature statuses:
 
-        - ``holding at target``: The lid has reached its target temperature
-            and is actively maintaining that temperature.
-        - ``cooling``: The lid has previously heated and is now passively cooling.
+        - ``holding at target`` – The lid has reached its target temperature
+          and is actively maintaining that temperature.
+        - ``cooling`` – The lid has previously heated and is now passively cooling.
             `The Thermocycler lid does not have active cooling.`
-        - ``heating``: The lid is heating to a target temperature.
-        - ``idle``: The lid has not heated since the beginning of the protocol.
-        - ``error``: The temperature status can't be determined.
+        - ``heating`` – The lid is heating to a target temperature.
+        - ``idle`` – The lid has not heated since the beginning of the protocol.
+        - ``error`` – The temperature status can't be determined.
         """
         status = self._core.get_lid_temperature_status()
         return status.value if status is not None else None
@@ -689,13 +663,13 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     @property  # type: ignore[misc]
     @requires_version(2, 13)
     def current_speed(self) -> int:
-        """The current speed in RPM of the Heater-Shaker's plate."""
+        """The current speed of the Heater-Shaker's plate in rpm."""
         return self._core.get_current_speed()
 
     @property  # type: ignore[misc]
     @requires_version(2, 13)
     def target_speed(self) -> Optional[int]:
-        """Target speed in RPM of the Heater-Shaker's plate."""
+        """Target speed of the Heater-Shaker's plate in rpm."""
         return self._core.get_target_speed()
 
     @property  # type: ignore[misc]
@@ -703,13 +677,13 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     def temperature_status(self) -> str:
         """One of five possible temperature statuses:
 
-        - ``holding at target``: The module has reached its target temperature
-            and is actively maintaining that temperature.
-        - ``cooling``: The module has previously heated and is now passively cooling.
-            `The Heater-Shaker does not have active cooling.`
-        - ``heating``: The module is heating to a target temperature.
-        - ``idle``: The module has not heated since the beginning of the protocol.
-        - ``error``: The temperature status can't be determined.
+        - ``holding at target`` – The module has reached its target temperature
+          and is actively maintaining that temperature.
+        - ``cooling`` – The module has previously heated and is now passively cooling.
+          `The Heater-Shaker does not have active cooling.`
+        - ``heating`` – The module is heating to a target temperature.
+        - ``idle`` – The module has not heated since the beginning of the protocol.
+        - ``error`` – The temperature status can't be determined.
         """
         return self._core.get_temperature_status().value
 
@@ -718,13 +692,13 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     def speed_status(self) -> str:
         """One of five possible shaking statuses:
 
-        - ``holding at target``: The module has reached its target shake speed
-            and is actively maintaining that speed.
-        - ``speeding up``: The module is increasing its shake speed towards a target.
-        - ``slowing down``: The module was previously shaking at a faster speed
-            and is currently reducing its speed to a lower target or to deactivate.
-        - ``idle``: The module is not shaking.
-        - ``error``: The shaking status can't be determined.
+        - ``holding at target`` – The module has reached its target shake speed
+          and is actively maintaining that speed.
+        - ``speeding up`` – The module is increasing its shake speed towards a target.
+        - ``slowing down`` – The module was previously shaking at a faster speed
+          and is currently reducing its speed to a lower target or to deactivate.
+        - ``idle`` – The module is not shaking.
+        - ``error`` – The shaking status can't be determined.
         """
         return self._core.get_speed_status().value
 
@@ -733,14 +707,14 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     def labware_latch_status(self) -> str:
         """One of six possible latch statuses:
 
-        - ``opening``: The latch is currently opening (in motion).
-        - ``idle_open``: The latch is open and not moving.
-        - ``closing``: The latch is currently closing (in motion).
-        - ``idle_closed``: The latch is closed and not moving.
-        - ``idle_unknown``: The default status upon reset, regardless of physical latch position.
-            Use :py:meth:`~HeaterShakerContext.close_labware_latch` before other commands
-            requiring confirmation that the latch is closed.
-        - ``unknown``: The latch status can't be determined.
+        - ``opening`` – The latch is currently opening (in motion).
+        - ``idle_open`` – The latch is open and not moving.
+        - ``closing`` – The latch is currently closing (in motion).
+        - ``idle_closed`` – The latch is closed and not moving.
+        - ``idle_unknown`` – The default status upon reset, regardless of physical latch position.
+          Use :py:meth:`~HeaterShakerContext.close_labware_latch` before other commands
+          requiring confirmation that the latch is closed.
+        - ``unknown`` – The latch status can't be determined.
         """
         return self._core.get_labware_latch_status().value
 
@@ -764,7 +738,8 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
 
         Sets the Heater-Shaker's target temperature and returns immediately without
         waiting for the target to be reached. Does not delay the protocol until
-        target temperature has reached. Use `wait_for_target_temperature` to delay
+        target temperature has reached.
+        Use :py:meth:`~.HeaterShakerContext.wait_for_temperature` to delay
         protocol execution.
 
         :param celsius: A value between 27 and 95, representing the target temperature in °C.
@@ -778,14 +753,16 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     @publish(command=cmds.heater_shaker_wait_for_temperature)
     def wait_for_temperature(self) -> None:
         """Delays protocol execution until the Heater-Shaker has reached its target
-        temperature. Returns an error if no target temperature was previously set.
+        temperature.
+
+        Raises an error if no target temperature was previously set.
         """
         self._core.wait_for_target_temperature()
 
     @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_set_and_wait_for_shake_speed)
     def set_and_wait_for_shake_speed(self, rpm: int) -> None:
-        """Set a shake speed in RPM and block execution of further commands until the module reaches the target.
+        """Set a shake speed in rpm and block execution of further commands until the module reaches the target.
 
         Reaching a target shake speed typically only takes a few seconds.
 
@@ -832,7 +809,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     def deactivate_shaker(self) -> None:
         """Stops shaking.
 
-        Decelerating to 0 RPM typically only takes a few seconds.
+        Decelerating to 0 rpm typically only takes a few seconds.
         """
         self._core.deactivate_shaker()
 

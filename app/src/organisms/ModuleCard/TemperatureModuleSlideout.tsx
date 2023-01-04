@@ -132,8 +132,8 @@ export const TemperatureModuleSlideout = (
         </StyledText>
         <form id="TemperatureModuleSlideout_submitValue">
           <InputField
-            id={`${module.moduleModel}`}
-            data-testid={`${module.moduleModel}`}
+            id={`${String(module.moduleModel)}`}
+            data-testid={`${String(module.moduleModel)}`}
             units={CELSIUS}
             value={
               temperatureValue != null ? Math.round(temperatureValue) : null
