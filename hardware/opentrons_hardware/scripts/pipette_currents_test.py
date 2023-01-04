@@ -175,8 +175,8 @@ def main() -> None:
                 await move_to(messenger, node, 10, move_speed)
                 try:
                     for t in range(1, CYCLES + 1):
-                        await move_to(messenger, node, 50, move_speed)
-                        await move_to(messenger, node, 50, -move_speed)
+                        await move_to(messenger, node, 60, move_speed)
+                        await move_to(messenger, node, 60, -move_speed)
                 except Exception as e:
                     print(e)
                     results["{}A".format(current)] = "Fail_Stuck"
@@ -184,18 +184,12 @@ def main() -> None:
 
                 try:
                     print("    moving to ", Tolerances[pipette_model])
-                    step = 50 - Tolerances[pipette_model]
+                    step = 60 - Tolerances[pipette_model]
                     await move_to(messenger, node, step, move_speed)
                 except Exception as e:
                     results["{}A".format(current)] = "Fail_Lose Step"
                     break
 
-
-                try:
-                    print("    moving to ", point + Tolerances[pipette_model])
-                except Exception as e:
-                    results["{}A".format(current)] = "Fail_Lose Step"
-                    break
 
                 if sus_str is results["{}A".format(current)]:
                     results["{}A".format(current)] = "Pass_ ----"
@@ -208,14 +202,14 @@ def main() -> None:
                     print(data_format.format(i, result, reason))
             except IndexError:
                 pass
-            with open('{}.csv'.format(D), 'a', newline='') as f:
-                writer = csv.writer(f, delimiter=',', quoting=csv.QUOTE_NONE)
-                li = []
-                for i in results:
-                    li.append(i)
-                    li.append(results[i].split("_")[0])
-                    li.append(results[i].split("_")[1])
-                writer.writerow([pipette, "V" + version, SN, D, T] + li)
+            # with open('{}.csv'.format(D), 'a', newline='') as f:
+            #     writer = csv.writer(f, delimiter=',', quoting=csv.QUOTE_NONE)
+            #     li = []
+            #     for i in results:
+            #         li.append(i)
+            #         li.append(results[i].split("_")[0])
+            #         li.append(results[i].split("_")[1])
+            #     writer.writerow([pipette, "V" + version, SN, D, T] + li)
 
         except:
             pass
