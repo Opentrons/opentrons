@@ -40,7 +40,6 @@ class Pipette_Calibration_Test:
         self.cycles = cycles
         self.slot = slot
         self.jog_speed = 10 # mm/s
-        self.CUTOUT_HEIGHT = 2 # mm
         self.CUTOUT_SIZE = 20 # mm
         self.CUTOUT_HALF = self.CUTOUT_SIZE / 2
         self.axes = [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R]
@@ -67,12 +66,12 @@ class Pipette_Calibration_Test:
         self.gauge_ports = {
             "X":"/dev/ttyUSB0",
             "Y":"/dev/ttyUSB1",
-            # "Z":"/dev/ttyUSB2",
+            "Z":"/dev/ttyUSB2",
         }
         self.gauge_offsets = {
             "X":Point(x=0, y=5, z=5),
             "Y":Point(x=5, y=0, z=5),
-            "Z":Point(x=0, y=0, z=0),
+            "Z":Point(x=0, y=0, z=5),
         }
 
     async def test_setup(self):
@@ -129,7 +128,7 @@ class Pipette_Calibration_Test:
         elif axis == "Y":
             jog_position = gauge_position._replace(y=gauge_position.y + self.CUTOUT_HALF)
         elif axis == "Z":
-            jog_position = gauge_position._replace(z=gauge_position.z - self.CUTOUT_HEIGHT)
+            jog_position = self.slot_center
         # Move to gauge position
         await self.api.move_to(self.mount, gauge_position, speed=100)
         # Move to jog position
@@ -168,8 +167,13 @@ class Pipette_Calibration_Test:
     ) -> None:
         # Add calibration tip
         await api.add_tip(mount, api.config.calibration.probe_length)
-        # Move to slot center
-        await api.move_to(mount, self.slot_center, speed=20)
+        # Move up
+        current_pos = await api.gantry_position(mount)
+        z_offset = current_pos + self.gauge_offsets["Z"]
+        await api.move_to(mount, z_offset, speed=20)
+        # Move above slot center
+        above_slot_center = self.slot_center + self.gauge_offsets["Z"]
+        await api.move_to(mount, above_slot_center, speed=20)
         # Measure X-axis gauge
         print("Measuring X Gauge...")
         x_gauge = await self._read_gauge("X")
@@ -181,10 +185,10 @@ class Pipette_Calibration_Test:
         self.test_data["Y Gauge"] = str(y_gauge)
         print(f"Y Gauge = ", self.test_data["Y Gauge"])
         # Measure Z-axis gauge
-        # print("Measuring Z Gauge...")
-        # z_gauge = await self._read_gauge("Z")
-        # self.test_data["Z Gauge"] = str(z_gauge)
-        # print(f"Z Gauge = ", self.test_data["Z Gauge"])
+        print("Measuring Z Gauge...")
+        z_gauge = await self._read_gauge("Z")
+        self.test_data["Z Gauge"] = str(z_gauge)
+        print(f"Z Gauge = ", self.test_data["Z Gauge"])
         # Remove tip
         await api.remove_tip(mount)
 
