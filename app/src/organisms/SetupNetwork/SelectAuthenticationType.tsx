@@ -54,7 +54,6 @@ export function SelectAuthenticationType({
     } else {
       history.push('/network-setup/wifi/set-wifi-ssid')
     }
-    location.reload()
   }
 
   React.useEffect(() => {

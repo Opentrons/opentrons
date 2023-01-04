@@ -32,6 +32,10 @@ const NETWORK_ROW_STYLE = css`
     background-color: ${COLORS.blueEnabled};
     color: ${COLORS.white};
   }
+  &:hover {
+    background-color: ${COLORS.blueEnabled};
+    color: ${COLORS.white};
+  }
 `
 
 export function SelectWifiNetwork(): JSX.Element {
