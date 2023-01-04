@@ -59,7 +59,7 @@ export const SetupModulesMap = ({
                   const { model } = moduleDef
                   return (
                     <React.Fragment
-                      key={`ModuleSetup_Module_${model}_${x}${y}`}
+                      key={`ModuleSetup_Module_${String(model)}_${x}${y}`}
                     >
                       <Module
                         x={x}

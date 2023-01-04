@@ -178,7 +178,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       backgroundColor={COLORS.fundamentalsBackground}
       borderRadius={BORDERS.radiusSoftCorners}
       width="100%"
-      data-testid={`PipetteCard_${pipetteDisplayName}`}
+      data-testid={`PipetteCard_${String(pipetteDisplayName)}`}
     >
       {showAttachPipette ? (
         <ChoosePipette
@@ -240,7 +240,10 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
           />
         </Portal>
       )}
-      <Box padding={`${SPACING.spacing4} ${SPACING.spacing3}`} width="100%">
+      <Box
+        padding={`${String(SPACING.spacing4)} ${String(SPACING.spacing3)}`}
+        width="100%"
+      >
         <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing3}>
           <Flex alignItems={ALIGN_START}>
             {pipetteInfo === null ? null : (
@@ -326,7 +329,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               fontSize={TYPOGRAPHY.fontSizeH6}
               paddingBottom={SPACING.spacing2}
-              data-testid={`PipetteCard_mount_${pipetteDisplayName}`}
+              data-testid={`PipetteCard_mount_${String(pipetteDisplayName)}`}
             >
               {is96ChannelAttached
                 ? t('both_mounts')
@@ -336,7 +339,9 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
             </StyledText>
             <Flex
               paddingBottom={SPACING.spacing2}
-              data-testid={`PipetteCard_display_name_${pipetteDisplayName}`}
+              data-testid={`PipetteCard_display_name_${String(
+                pipetteDisplayName
+              )}`}
             >
               <StyledText fontSize={TYPOGRAPHY.fontSizeP}>
                 {pipetteDisplayName ?? t('empty')}
@@ -348,7 +353,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       <Box
         alignSelf={ALIGN_START}
         padding={SPACING.spacing2}
-        data-testid={`PipetteCard_overflow_btn_${pipetteDisplayName}`}
+        data-testid={`PipetteCard_overflow_btn_${String(pipetteDisplayName)}`}
       >
         <OverflowBtn aria-label="overflow" onClick={handleOverflowClick} />
       </Box>
@@ -356,7 +361,9 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
         <>
           <Box
             ref={pipetteOverflowWrapperRef}
-            data-testid={`PipetteCard_overflow_menu_${pipetteDisplayName}`}
+            data-testid={`PipetteCard_overflow_menu_${String(
+              pipetteDisplayName
+            )}`}
             onClick={() => setShowOverflowMenu(false)}
           >
             <PipetteOverflowMenu

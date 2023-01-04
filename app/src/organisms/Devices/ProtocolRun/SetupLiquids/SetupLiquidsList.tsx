@@ -191,7 +191,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                 marginBottom={SPACING.spacing3}
                 padding={SPACING.spacing4}
                 backgroundColor={COLORS.white}
-                data-testid={`LiquidsListItem_slotRow_${index}`}
+                data-testid={`LiquidsListItem_slotRow_${String(index)}`}
                 onClick={handleLiquidDetailsLabwareId}
               >
                 <Flex

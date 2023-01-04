@@ -5,7 +5,7 @@ from decoy import Decoy
 from opentrons_shared_data.labware.dev_types import LabwareUri
 
 from opentrons.protocol_api.labware import Labware
-from opentrons.protocols.geometry.module_geometry import (
+from opentrons.protocol_api.core.protocol_api.module_geometry import (
     ModuleGeometry,
     ThermocyclerGeometry,
     HeaterShakerGeometry,

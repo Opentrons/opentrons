@@ -68,7 +68,7 @@ export function useDownloadRunLog(
         commands,
       }
       const createdAt = new Date(run.createdAt).toISOString()
-      const fileName = `${robotName}_${protocolName}_${createdAt}.json`
+      const fileName = `${robotName}_${String(protocolName)}_${createdAt}.json`
       downloadFile(runDetails, fileName)
     }
   }

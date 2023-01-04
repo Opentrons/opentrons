@@ -71,4 +71,4 @@ sdist: clean
 .PHONY: push-ot3
 push-ot3: sdist
 	$(call push-python-sdist,$(host),,$(br_ssh_opts),dist/$(sdist_file),/opt/ot3usb,ot3usb)
-	# todo (fs, 2022-09-15): add a restart when appropriate
+	$(call restart-service,$(host),,$(br_ssh_opts),opentrons-usb-bridge)

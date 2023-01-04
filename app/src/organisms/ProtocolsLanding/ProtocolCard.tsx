@@ -187,7 +187,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
             <Flex gridGap={SPACING.spacing4}>
               <Flex
-                flex={`0 0 ${SIZE_2}`}
+                flex={`0 0 ${String(SIZE_2)}`}
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing2}
               >

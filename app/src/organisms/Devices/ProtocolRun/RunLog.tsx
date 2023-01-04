@@ -453,7 +453,7 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
                 key={index}
                 color={COLORS.errorEnabled}
                 marginBottom={SPACING.spacing3}
-              >{`${errorType}: ${detail}`}</StyledText>
+              >{`${String(errorType)}: ${String(detail)}`}</StyledText>
             ))
           : null}
         {protocolSetupCommandList.length > 0 ? (
@@ -541,7 +541,7 @@ function ProtocolSetupItem(props: ProtocolSetupItemProps): JSX.Element {
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      padding={`0.75rem ${SPACING.spacing3}`}
+      padding={`0.75rem ${String(SPACING.spacing3)}`}
       backgroundColor={COLORS.fundamentalsBackground}
       width="100%"
       alignSelf={ALIGN_STRETCH}

@@ -9,7 +9,7 @@ jest.mock('@opentrons/react-api-client')
 const mockUseAllSessionsQuery = useAllSessionsQuery as jest.MockedFunction<
   typeof useAllSessionsQuery
 >
-describe(' useIsLegacySessionInProgress ', () => {
+describe('useIsLegacySessionInProgress', () => {
   beforeEach(() => {
     mockUseAllSessionsQuery.mockReturnValue(({
       data: [],

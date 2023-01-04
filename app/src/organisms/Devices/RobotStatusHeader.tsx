@@ -60,13 +60,15 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
           paddingRight={SPACING.spacing3}
           overflowWrap="anywhere"
         >
-          {`${displayName}; ${t(`run_details:status_${currentRunStatus}`)}`}
+          {`${String(displayName)}; ${t(
+            `run_details:status_${String(currentRunStatus)}`
+          )}`}
         </StyledText>
         <Link
           to={`/devices/${name}/protocol-runs/${currentRunId}/${
             currentRunStatus === RUN_STATUS_IDLE ? 'setup' : 'run-log'
           }`}
-          id={`RobotStatusHeader_${name}_goToRun`}
+          id={`RobotStatusHeader_${String(name)}_goToRun`}
         >
           <SecondaryTertiaryButton>{t('go_to_run')}</SecondaryTertiaryButton>
         </Link>
@@ -81,7 +83,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
           color={COLORS.darkGreyEnabled}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           paddingBottom={SPACING.spacing1}
-          id={`RobotStatusHeader_${name}_robotModel`}
+          id={`RobotStatusHeader_${String(name)}_robotModel`}
         >
           {robotModel}
         </StyledText>
@@ -89,7 +91,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
           <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
             <StyledText
               as="h3"
-              id={`RobotStatusHeader_${name}_robotName`}
+              id={`RobotStatusHeader_${String(name)}_robotName`}
               overflowWrap="anywhere"
             >
               {name}
