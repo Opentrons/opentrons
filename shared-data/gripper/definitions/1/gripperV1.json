@@ -24,14 +24,8 @@
     "type": "float"
   },
   "jawDutyCyclePolynomial": [
-    [
-      0,
-      -0.282
-    ],
-    [
-      1,
-      2.09
-    ]
+    [0, -0.282],
+    [1, 2.09]
   ],
   "baseOffsetFromMount": {
     "x": 19.5,

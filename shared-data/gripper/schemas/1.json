@@ -24,11 +24,7 @@
     "coordinates": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "x",
-        "y",
-        "z"
-      ],
+      "required": ["x", "y", "z"],
       "properties": {
         "x": {
           "type": "number"
@@ -47,10 +43,7 @@
     },
     "jawWidthValue": {
       "type": "object",
-      "required": [
-        "min",
-        "max"
-      ],
+      "required": ["min", "max"],
       "properties": {
         "min": {
           "$ref": "#/definitions/positiveNumber"
