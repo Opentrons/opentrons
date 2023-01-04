@@ -3,7 +3,6 @@ opentrons_shared_data.module.dev_types: types requiring typing_extensions
 for modules
 """
 
-from enum import Enum
 from typing import Any, Dict, List, Union
 from typing_extensions import Literal, TypedDict
 
