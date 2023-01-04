@@ -48,9 +48,14 @@
     "z": -88.475
   },
   "pinCenterOffsetFromBase": {
-    "x": 4,
+    "x": 0,
     "y": 0,
     "z": -100.475
+  },
+  "pinCenterInsertedOffsetFromBase": {
+    "x": 4,
+    "y": 0,
+    "z": -108.475
   },
   "pinOneOffsetFromBase": {
     "x": 4,
