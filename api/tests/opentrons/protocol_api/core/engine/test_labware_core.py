@@ -17,11 +17,6 @@ from opentrons_shared_data.labware.labware_definition import (
 from opentrons.types import DeckSlotName, Point
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.errors import LabwareNotOnDeckError
-from opentrons.protocol_engine.types import (
-    DeckSlotLocation,
-    ModuleLocation,
-    _OffDeckLocationType,
-)
 
 from opentrons.protocol_api.core.labware import LabwareLoadParams
 from opentrons.protocol_api.core.engine import LabwareCore, WellCore

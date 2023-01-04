@@ -1,5 +1,5 @@
 """ProtocolEngine-based Labware core implementations."""
-from typing import List, Optional, cast, Union
+from typing import List, Optional, cast
 
 from opentrons_shared_data.labware.dev_types import (
     LabwareParameters as LabwareParametersDict,
@@ -8,11 +8,9 @@ from opentrons_shared_data.labware.dev_types import (
 
 from opentrons.protocol_engine.errors import LabwareNotOnDeckError, ModuleNotOnDeckError
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
-from opentrons.protocol_engine.types import ModuleLocation
 from opentrons.protocols.geometry.labware_geometry import LabwareGeometry
 from opentrons.protocols.api_support.tip_tracker import TipTracker
 from opentrons.protocols.api_support.util import APIVersionError
-
 from opentrons.types import DeckSlotName, Point
 
 from ..labware import AbstractLabware, LabwareLoadParams

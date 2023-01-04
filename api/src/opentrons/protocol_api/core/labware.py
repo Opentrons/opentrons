@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Generic, List, NamedTuple, Optional, TypeVar, Union
+from typing import Any, Generic, List, NamedTuple, Optional, TypeVar
 
 from opentrons_shared_data.labware.dev_types import (
     LabwareUri,
@@ -12,8 +12,6 @@ from opentrons_shared_data.labware.dev_types import (
 
 from opentrons.protocols.geometry.labware_geometry import AbstractLabwareGeometry
 from opentrons.protocols.api_support.tip_tracker import TipTracker
-
-# from opentrons.protocol_api.core.common import ModuleTypes
 
 from opentrons.types import DeckSlotName, Point
 

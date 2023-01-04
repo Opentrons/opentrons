@@ -1,4 +1,4 @@
-from typing import List, Optional, Union
+from typing import List, Optional
 
 from opentrons.calibration_storage import helpers
 from opentrons.protocols.geometry.labware_geometry import LabwareGeometry

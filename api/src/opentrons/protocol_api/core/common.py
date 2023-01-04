@@ -1,6 +1,4 @@
 """Common APIs for protocol core interfaces."""
-from typing import Union
-
 # TODO(mc, 2022-08-22): move to __init__ when dependency cycles are resolved
 from .instrument import AbstractInstrument
 from .labware import AbstractLabware
