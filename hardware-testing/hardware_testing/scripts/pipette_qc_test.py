@@ -16,7 +16,7 @@ from opentrons.calibration_storage.ot3.pipette_offset import (
 )
 
 from hardware_testing import data
-from hardware_testing.drivers.pressure_fixture import Ot3PressureFixture
+from hardware_testing.drivers.pressure_fixture import ot3_pressure_fixture
 
 
 async def suspend_timer(suspend_time: float) -> None:
