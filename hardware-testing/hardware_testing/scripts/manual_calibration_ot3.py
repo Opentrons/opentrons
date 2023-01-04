@@ -212,15 +212,61 @@ async def _find_square_center(
     return found_square_pos
 
 
+async def _find_square_center_of_gripper_jaw_with_new_probe(
+    api: OT3API, expected_pos: Point
+) -> Point:
+    # first, we grip the jaw, so that the jaws are fully pressing inwards
+    # this removes wiggle/backlash from jaws during probing
+    await api.disengage_axes([OT3Axis.G])
+    input("ENTER to GRIP:")
+    await api.grip(GRIP_FORCE_CALIBRATION)
+    await asyncio.sleep(2)
+    # FIXME: (AS) run grip again, to make sure the correct encoder position is read.
+    #        This avoids a bug where jaw movements timeout too quickly, so the encoder
+    #        position is never read back. This is bad for calibration, b/c the encoder
+    #        is used to calculate the position of the calibration pins
+    await api.grip(GRIP_FORCE_CALIBRATION)
+    api.add_gripper_probe(GripperProbe.CENTER)
+    await api.home_z(OT3Mount.GRIPPER)  # home after attaching probe, if motor skips
+    found_square_center = await _find_square_center(
+        api,
+        OT3Mount.GRIPPER,
+        expected_pos,
+    )
+    input("Press ENTER to move to found center:")
+    await api.move_to(
+        OT3Mount.GRIPPER,
+        found_square_center,
+    )
+    input("Check by EYE, then press ENTER to continue:")
+    current_position = await api.gantry_position(
+        OT3Mount.GRIPPER,
+    )
+    await api.move_to(
+        OT3Mount.GRIPPER,
+        current_position + Point(z=PROBE_CHANGE_Z),
+    )
+    await api.disengage_axes([OT3Axis.G])
+    input("Remove probe from Gripper, then press ENTER: ")
+    api.remove_gripper_probe()
+    # ungrip the jaws
+    await api.home_gripper_jaw()
+    print(f"\nGripper Slot Center Position = {found_square_center}")
+    print(f"\tOffset from Expected = {expected_pos - found_square_center}")
+    return found_square_center
+
+
 async def _find_square_center_of_gripper_jaw(api: OT3API, expected_pos: Point) -> Point:
     # first, we grip the jaw, so that the jaws are fully pressing inwards
     # this removes wiggle/backlash from jaws during probing
+    await api.disengage_axes([OT3Axis.G])
     input("ENTER to GRIP:")
     await api.grip(GRIP_FORCE_CALIBRATION)
     input("add probe to Gripper FRONT, then press ENTER: ")
     # FIXME: (AS) run grip again, to make sure the correct encoder position is read.
     #        This avoids a bug where jaw movements timeout too quickly, so the encoder
-    #        position is never read back. This is bad for calibration.
+    #        position is never read back. This is bad for calibration, b/c the encoder
+    #        is used to calculate the position of the calibration pins
     await api.grip(GRIP_FORCE_CALIBRATION)
     api.add_gripper_probe(GripperProbe.FRONT)
     await api.home_z(OT3Mount.GRIPPER)  # home after attaching probe, if motor skips
@@ -315,7 +361,12 @@ async def _check_multi_channel_to_deck_alignment(
 async def _find_the_square(api: OT3API, mount: OT3Mount, expected_pos: Point) -> Point:
     if mount == OT3Mount.GRIPPER:
         helpers_ot3.set_gripper_offset_ot3(api, Point(x=0, y=0, z=0))
-        found_pos = await _find_square_center_of_gripper_jaw(api, expected_pos)
+        if 'y' in input('Use new centered probe? (y/n): '):
+            print("using new centered probe")
+            found_pos = await _find_square_center_of_gripper_jaw_with_new_probe(api, expected_pos)
+        else:
+            print("using original rear/front probes")
+            found_pos = await _find_square_center_of_gripper_jaw(api, expected_pos)
     else:
         helpers_ot3.set_pipette_offset_ot3(api, mount, Point(x=0, y=0, z=0))
         pip = api.hardware_pipettes[mount.to_mount()]

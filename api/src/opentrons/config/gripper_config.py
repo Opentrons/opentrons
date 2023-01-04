@@ -42,6 +42,7 @@ class GripperConfig:
     jaw_center_offset_from_base: Offset
     pin_one_offset_from_base: Offset
     pin_two_offset_from_base: Offset
+    pin_center_offset_from_base: Offset
     quirks: List[str]
     jaw_sizes_mm: Dict[str, float]
 
@@ -82,6 +83,9 @@ def load(
         ),
         pin_one_offset_from_base=_get_offset(gripper_def.pin_one_offset_from_base),
         pin_two_offset_from_base=_get_offset(gripper_def.pin_two_offset_from_base),
+        pin_center_offset_from_base=_get_offset(
+            gripper_def.pin_center_offset_from_base
+        ),
         quirks=gripper_def.quirks,
         jaw_sizes_mm=gripper_def.jaw_sizes_mm,
     )

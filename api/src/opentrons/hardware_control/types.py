@@ -424,6 +424,11 @@ class CriticalPoint(enum.Enum):
     back calibration pin slot.
     """
 
+    GRIPPER_CENTER_CALIBRATION_PIN = enum.auto()
+    """
+    The center of the bottom face of a calibration pin being held by the gripper jaws.
+    """
+
 
 class ExecutionState(enum.Enum):
     RUNNING = enum.auto()
@@ -505,6 +510,7 @@ class InstrumentProbeType(enum.Enum):
 class GripperProbe(enum.Enum):
     FRONT = enum.auto()
     REAR = enum.auto()
+    CENTER = enum.auto()
 
     @classmethod
     def to_type(cls, gp: "GripperProbe") -> InstrumentProbeType:

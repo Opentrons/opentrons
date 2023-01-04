@@ -47,6 +47,11 @@
     "y": 0,
     "z": -88.475
   },
+  "pinCenterOffsetFromBase": {
+    "x": 4,
+    "y": 0,
+    "z": -100.475
+  },
   "pinOneOffsetFromBase": {
     "x": 4,
     "y": -57,

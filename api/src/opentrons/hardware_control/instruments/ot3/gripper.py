@@ -59,6 +59,11 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
         self._rear_calibration_pin_offset = (
             Point(*self._config.pin_two_offset_from_base) + base_offset
         )
+        #: the distance between the gripper mount and the center calibration pin
+        #: at home
+        self._center_calibration_pin_offset = (
+            Point(*self._config.pin_center_offset_from_base) + base_offset
+        )
         #: the distance between the gripper mount and the rear calibration pin
         #: at home
         self._calibration_offset = gripper_cal_offset
@@ -178,11 +183,17 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
         else:
             if self._attached_probe is GripperProbe.REAR:
                 cp = cp_override or CriticalPoint.GRIPPER_REAR_CALIBRATION_PIN
-            else:
+            elif self._attached_probe is GripperProbe.FRONT:
                 cp = cp_override or CriticalPoint.GRIPPER_FRONT_CALIBRATION_PIN
+            else:
+                cp = cp_override or CriticalPoint.GRIPPER_CENTER_CALIBRATION_PIN
 
         if cp in [CriticalPoint.GRIPPER_JAW_CENTER, CriticalPoint.XY_CENTER]:
             return self._jaw_center_offset + Point(*self._calibration_offset.offset)
+        elif cp == CriticalPoint.GRIPPER_CENTER_CALIBRATION_PIN:
+            return self._center_calibration_pin_offset + Point(
+                *self._calibration_offset.offset
+            )
         elif cp == CriticalPoint.GRIPPER_FRONT_CALIBRATION_PIN:
             self.check_calibration_pin_location_is_accurate()
             return (
