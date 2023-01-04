@@ -103,14 +103,17 @@ describe('PipetteOverflowMenu', () => {
     expect(props.handleCalibrate).toHaveBeenCalled()
   })
 
+  it('should render calibrate pipette offset text when the calibration wizard feature flag is set and no calibration exists', () => {
+    mockUseFeatureFlag.mockReturnValue(true)
+    const { getByRole } = render(props)
+    const calibrate = getByRole('button', { name: 'Calibrate pipette offset' })
+    fireEvent.click(calibrate)
+    expect(props.handleCalibrate).toHaveBeenCalled()
+  })
+
   it('does not render recalibrate pipette offset text when the calibration wizard feature flag is set', () => {
     props = {
-      pipetteSpecs: mockLeftProtoPipette.modelSpecs,
-      mount: LEFT,
-      handleChangePipette: jest.fn(),
-      handleCalibrate: jest.fn(),
-      handleAboutSlideout: jest.fn(),
-      handleSettingsSlideout: jest.fn(),
+      ...props,
       isPipetteCalibrated: true,
     }
     mockUseFeatureFlag.mockReturnValue(true)
@@ -142,16 +145,19 @@ describe('PipetteOverflowMenu', () => {
     expect(props.handleCalibrate).toHaveBeenCalled()
   })
 
+  it('should render calibrate pipette text for OT-3 pipette when the calibration wizard feature flag is set and no calibration exists', () => {
+    mockIsOT3Pipette.mockReturnValue(true)
+    mockUseFeatureFlag.mockReturnValue(true)
+    const { getByRole } = render(props)
+    const calibrate = getByRole('button', { name: 'Calibrate pipette' })
+    fireEvent.click(calibrate)
+    expect(props.handleCalibrate).toHaveBeenCalled()
+  })
+
   it('does not render recalibrate pipette text for OT-3 pipette when the calibration wizard feature flag is set', () => {
     mockIsOT3Pipette.mockReturnValue(true)
-
     props = {
-      pipetteSpecs: mockLeftProtoPipette.modelSpecs,
-      mount: LEFT,
-      handleChangePipette: jest.fn(),
-      handleCalibrate: jest.fn(),
-      handleAboutSlideout: jest.fn(),
-      handleSettingsSlideout: jest.fn(),
+      ...props,
       isPipetteCalibrated: true,
     }
     mockUseFeatureFlag.mockReturnValue(true)

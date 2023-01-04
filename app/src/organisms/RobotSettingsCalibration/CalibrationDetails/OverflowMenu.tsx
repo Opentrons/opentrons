@@ -263,7 +263,7 @@ export function OverflowMenu({
         >
           {enableCalibrationWizards &&
             calType === 'pipetteOffset' &&
-            applicablePipetteOffsetCal === null && (
+            applicablePipetteOffsetCal == null && (
               <MenuItem
                 onClick={e => handleCalibration(calType, e)}
                 disabled={disabledReason !== null}
