@@ -51,6 +51,9 @@ class PressureFixtureBase(ABC):
 class SimPressureFixture(PressureFixtureBase):
     """Simulating OT3 Pressure Fixture Driver."""
 
+    def __init__(self, slot_side: str = "left") -> None:
+        self._slot_side = slot_side
+
     def connect(self) -> None:
         """Connect."""
         return
@@ -72,20 +75,22 @@ class SimPressureFixture(PressureFixtureBase):
 class PressureFixture(PressureFixtureBase):
     """OT3 Pressure Fixture Driver."""
 
-    def __init__(self, connection: Serial) -> None:
+    def __init__(self, connection: Serial, slot_side: str) -> None:
         """Constructor."""
         self._port = connection
+        assert slot_side in ["left", "right"], f"Unexpected slot side: {slot_side}"
+        self._slot_side = slot_side
 
     @classmethod
     def create(
-            cls, port: str, baudrate: int = FIXTURE_BAUD_RATE, timeout: float = 1
+            cls, port: str, slot_side: str = "left"
     ) -> "PressureFixture":
         """Create a Radwag scale driver."""
         conn = Serial()
         conn.port = port
-        conn.baudrate = baudrate
-        conn.timeout = timeout
-        return PressureFixture(connection=conn)
+        conn.baudrate = FIXTURE_BAUD_RATE
+        conn.timeout = 1
+        return PressureFixture(connection=conn, slot_side=slot_side)
 
     def connect(self) -> None:
         """Connect."""
@@ -114,15 +119,22 @@ class PressureFixture(PressureFixtureBase):
         self._port.write(cmd_str.encode("utf-8"))
         response = self._port.readline().decode("utf-8")
         res_list = response.split(",")[:-1]  # ignore the last comma
-        data = [float(d.split("=")[-1]) for d in res_list]
+        data_str = [d.split("=")[-1].strip() for d in res_list]  # remove PRESSURE=
+        for i in range(len(data_str)):  # replace all -0.00 with 0.00
+            if data_str[i] == "-0.00":
+                data_str[i] = "0.00"
+        data = [float(d) for d in data_str]  # convert to float
+        if self._slot_side == "left":
+            data.reverse()  # reverse order, so pipette channel 1 is at index 0
         return data
 
 
 if __name__ == "__main__":
-    port_name = "COM10"
-    fixture = PressureFixture.create(port=port_name)
+    port_name = input("type the port of the device (eg: COM1): ")
+    fixture = PressureFixture.create(port=port_name, slot_side="left")
     fixture.connect()
     print(f"Device firmware version: {fixture.firmware_version()}")
-    readings = fixture.read_all_pressure_channel()
-    print(readings)
-    fixture.disconnect()
+    while True:
+        readings = fixture.read_all_pressure_channel()
+        print(readings)
+        sleep(0.1)
