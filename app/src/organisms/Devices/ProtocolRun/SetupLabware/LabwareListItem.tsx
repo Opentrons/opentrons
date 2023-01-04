@@ -266,7 +266,9 @@ function StandaloneLabware(props: {
   const { definition } = props
   return (
     <LabwareThumbnail
-      viewBox={` 0 0 ${definition.dimensions.xDimension} ${definition.dimensions.yDimension}`}
+      viewBox={` 0 0 ${String(definition.dimensions.xDimension)} ${String(
+        definition.dimensions.yDimension
+      )}`}
     >
       <LabwareRender
         definition={definition}

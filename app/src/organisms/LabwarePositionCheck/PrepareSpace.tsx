@@ -100,7 +100,7 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
                 )
               } else {
                 labwareToPrepare = (
-                  <g transform={`translate(${x},${y})`}>
+                  <g transform={`translate(${String(x)},${String(y)})`}>
                     <LabwareRender definition={labwareDef} />
                   </g>
                 )

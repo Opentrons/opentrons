@@ -46,7 +46,7 @@ export function RecentProtocolRuns({
       borderRadius={BORDERS.radiusSoftCorners}
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing4}
-      padding={`0 0 ${SPACING.spacing3}`}
+      padding={`0 0 ${String(SPACING.spacing3)}`}
       width="100%"
       marginBottom="6rem"
     >
@@ -64,7 +64,7 @@ export function RecentProtocolRuns({
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
         minHeight={SIZE_4}
-        padding={`0 ${SPACING.spacing4}`}
+        padding={`0 ${String(SPACING.spacing4)}`}
         width="100%"
       >
         {isRobotViewable && runs && runs.length > 0 && (

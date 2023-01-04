@@ -56,7 +56,9 @@ function ProgressTrackerItem({
       marginTop="-0.75rem"
       // shorten connector length when subtasks are present
       marginBottom={
-        hasSubTasks ? `-${SPACING.spacing3}` : `-${SPACING.spacingM}`
+        hasSubTasks
+          ? `-${String(SPACING.spacing3)}`
+          : `-${String(SPACING.spacingM)}`
       }
       height="100%"
     />
@@ -163,12 +165,12 @@ function ProgressTrackerItem({
                       ? COLORS.blueEnabled
                       : ''
                   }
-                  marginTop={`-${SPACING.spacing3}`}
+                  marginTop={`-${String(SPACING.spacing3)}`}
                   marginBottom={
                     // extend connector for last subtask
                     isLastSubTask
-                      ? `-${SPACING.spacingM}`
-                      : `-${SPACING.spacing3}`
+                      ? `-${String(SPACING.spacingM)}`
+                      : `-${String(SPACING.spacing3)}`
                   }
                   height="100%"
                 />
