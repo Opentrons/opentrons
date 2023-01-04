@@ -5,6 +5,7 @@ import pytest
 from decoy import Decoy
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
+from opentrons_shared_data.module.dev_types import ModuleModel, ModuleType
 
 from opentrons.broker import Broker
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, ModuleContext, Labware
@@ -137,3 +138,40 @@ def test_load_labware_from_definition(
     )
 
     assert result is mock_labware
+
+
+def test_module_model(
+    decoy: Decoy,
+    mock_core: ModuleCore,
+    subject: ModuleContext[Any],
+) -> None:
+    """It should get module's model."""
+    decoy.when(mock_core.get_model()).then_return(
+        cast(ModuleModel, "heaterShakerModuleV1")
+    )
+    result = subject.model
+    assert result == "heaterShakerModuleV1"
+
+
+def test_module_type(
+    decoy: Decoy,
+    mock_core: ModuleCore,
+    subject: ModuleContext[Any],
+) -> None:
+    """It should get module's type."""
+    decoy.when(mock_core.get_type()).then_return(
+        cast(ModuleType, "heaterShakerModuleType")
+    )
+    result = subject.type
+    assert result == "heaterShakerModuleType"
+
+
+def test_serial_number(
+    decoy: Decoy,
+    mock_core: ModuleCore,
+    subject: ModuleContext[Any],
+) -> None:
+    """It should get the module's unique serial number."""
+    decoy.when(mock_core.get_serial_number()).then_return("abc-123")
+    result = subject.serial_number
+    assert result == "abc-123"
