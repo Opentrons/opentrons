@@ -1,69 +1,24 @@
 """OT-3 Manual Calibration."""
-import asyncio
 import argparse
-import termios
-import sys, tty, time
-from threading import Thread
+import asyncio
 from datetime import datetime
+from threading import Thread
+import time
+
 from opentrons.hardware_control.ot3api import OT3API
 
-from typing import Dict, List
-
-from hardware_testing.opentrons_api.types import OT3Mount, OT3Axis, Point
-from hardware_testing.opentrons_api import helpers_ot3
-from opentrons.calibration_storage.ot3.pipette_offset import (
-    save_pipette_calibration as save_offset_ot3,
-)
-
 from hardware_testing import data
-from hardware_testing.drivers.pressure_fixture import Ot3PressureFixture
+from hardware_testing.drivers.pressure_fixture import (
+    PressureFixture,
+    SimPressureFixture,
+)
+from hardware_testing.opentrons_api import helpers_ot3
+from hardware_testing.opentrons_api.types import OT3Mount, OT3Axis, Point
 
 
-async def suspend_timer(suspend_time: float) -> None:
-    """Counter for the leak test. """
-    time_suspend = 0
-    while time_suspend < suspend_time:
-        asyncio.sleep(1)
-        time_suspend += 1
-        print("Remaining time: ", suspend_time - time_suspend, " (s)", end="")
-        print("\r", end="")
-    print("")
-
-
-def fixture_setup():
-    """Return a fixture object to use."""
-    fixture = Ot3PressureFixture.create(port="/dev/ttyACM0")
-    fixture.connect()
-    return fixture
-
-
-def getch():
-    """"""
-    def _getch():
-        fd = sys.stdin.fileno()
-        old_settings = termios.tcgetattr(fd)
-        try:
-            tty.setraw(fd)
-            ch = sys.stdin.read(1)
-        finally:
-            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-        return ch
-
-    return _getch()
-
-
-def dict_values_to_line(dict):
-    return str.join(",", list(dict.values())) + "\n"
-
-
-def dict_keys_to_line(dict):
-    return str.join(",", list(dict.keys())) + "\n"
-
-
-def file_setup(test_data, pipette, pipette_sn):
-    test_name = "pipette_qc"
+def file_setup(test_data, pipette_sn) -> str:
     D = datetime.now().strftime("%Y_%m_%d")
-    test_header = dict_keys_to_line(test_data)
+    test_header = ",".join(list(test_data.keys())) + "\n"
     test_tag = "{}-{}".format(pipette_sn, int(time.time()))
     test_id = data.create_run_id()
     test_path = data.create_folder_for_test_data(pipette_sn)
@@ -74,135 +29,7 @@ def file_setup(test_data, pipette, pipette_sn):
     data.append_data_to_file(pipette_sn, test_file, test_header)
     print("FILE PATH = ", test_path)
     print("FILE NAME = ", test_file)
-    return pipette_sn, test_file
-
-
-def run_pressure_fixture(gauge, test_name, test_file):
-    global read
-    global phase
-    start_time = time.perf_counter()
-    while read:
-        p = gauge.read_all_pressure_channel()
-        p_channels = str([float(x) for x in p]).replace("[", "").replace("]", "")
-        elasped_time = time.perf_counter() - start_time
-        d_str = f"{elasped_time},{p_channels}, {phase} \n"
-        print(d_str)
-        data.append_data_to_file(test_name, test_file, d_str)
-
-
-async def _jog_axis(api: OT3API, mount: OT3Mount, axis: OT3Axis) -> Dict[OT3Axis, float]:
-    ax = axis.name.lower()[0]
-    step_size = [0.1, 0.5, 1, 10, 20, 50]
-    step_length_index = 3
-    step = step_size[step_length_index]
-    information_str = """
-        Click  >>   i   << to move up
-        Click  >>   k   << to move down
-        Click  >>   a  << to move left
-        Click  >>   d  << to move right
-        Click  >>   w  << to move forward
-        Click  >>   s  << to move back
-        Click  >>   +   << to Increase the length of each step
-        Click  >>   -   << to decrease the length of each step
-        Click  >> Enter << to save position
-        Click  >> q << to quit the test script
-                    """
-    print(information_str)
-    while True:
-        input = getch()
-        if input == "a":
-            sys.stdout.flush()
-            pos = await api.current_position_ot3(mount)
-            await api.move_to(
-                mount,
-                Point(
-                    pos[OT3Axis.X] - step, pos[OT3Axis.Y], pos[OT3Axis.by_mount(mount)]
-                ),
-            )
-        elif input == "d":
-            sys.stdout.flush()
-            pos = await api.current_position_ot3(mount)
-            await api.move_to(
-                mount,
-                Point(
-                    pos[OT3Axis.X] + step, pos[OT3Axis.Y], pos[OT3Axis.by_mount(mount)]
-                ),
-            )
-        elif input == "w":
-            sys.stdout.flush()
-            pos = await api.current_position_ot3(mount)
-            await api.move_to(
-                mount,
-                Point(
-                    pos[OT3Axis.X], pos[OT3Axis.Y] + step, pos[OT3Axis.by_mount(mount)]
-                ),
-            )
-            # speed = 40)
-        elif input == "s":
-            sys.stdout.flush()
-            pos = await api.current_position_ot3(mount)
-            await api.move_to(
-                mount,
-                Point(
-                    pos[OT3Axis.X], pos[OT3Axis.Y] - step, pos[OT3Axis.by_mount(mount)]
-                ),
-            )
-            # speed = 40)
-        elif input == "i":
-            sys.stdout.flush()
-            pos = await api.current_position_ot3(mount)
-            await api.move_to(
-                mount,
-                Point(
-                    pos[OT3Axis.X], pos[OT3Axis.Y], pos[OT3Axis.by_mount(mount)] + step
-                ),
-            )
-        elif input == "k":
-            sys.stdout.flush()
-            pos = await api.current_position_ot3(mount)
-            await api.move_to(
-                mount,
-                Point(
-                    pos[OT3Axis.X], pos[OT3Axis.Y], pos[OT3Axis.by_mount(mount)] - step
-                ),
-            )
-        elif input == "q":
-            sys.stdout.flush()
-            print("TEST CANCELLED")
-            quit()
-
-        elif input == "+":
-            sys.stdout.flush()
-            step_length_index = step_length_index + 1
-            if step_length_index >= len(step_size):
-                step_length_index = len(step_size) - 1
-            step = step_size[step_length_index]
-
-        elif input == "-":
-            sys.stdout.flush()
-            step_length_index = step_length_index - 1
-            if step_length_index <= 0:
-                step_length_index = 0
-            step = step_size[step_length_index]
-
-        elif input == "\r":
-            sys.stdout.flush()
-            pos = await api.current_position_ot3(mount)
-            break
-
-        current_position = await api.current_position_ot3(mount)
-        print(
-            "Coordinates: X: {} Y: {} Z: {}".format(
-                round(current_position[OT3Axis.X], 2),
-                round(current_position[OT3Axis.Y], 2),
-                round(current_position[OT3Axis.by_mount(mount)], 2),
-            ),
-            "      Motor Step: ",
-            step_size[step_length_index],
-            end="",
-        )
-        print("\r", end="")
-    return pos
+    return test_file
 
 
 async def _leak_test(api: OT3API, mount: OT3Mount, columns: int) -> None:
@@ -210,7 +37,7 @@ async def _leak_test(api: OT3API, mount: OT3Mount, columns: int) -> None:
     home_pos = await api.current_position_ot3(mount)
     await api.move_to(mount, Point(175.6, 189.4, home_pos[OT3Axis.by_mount(mount)]))
     print("Jog to the TipRack")
-    tiprack_loc = await _jog_axis(api, mount, OT3Axis.by_mount(mount))
+    tiprack_loc = await helpers_ot3.jog_mount_ot3(api, mount)
     tip_column = 0
     for col in range(1, columns + 1):
         await api.move_to(
@@ -241,7 +68,7 @@ async def _leak_test(api: OT3API, mount: OT3Mount, columns: int) -> None:
         pos = await api.current_position_ot3(mount)
         if col <= 1:
             print("Jog to the Trough Liquid Height, 2mm below the liquid")
-            trough_pos = await _jog_axis(api, mount, OT3Axis.by_mount(mount))
+            trough_pos = await helpers_ot3.jog_mount_ot3(api, mount)
         # Move to Trough aspiration position
         else:
             await api.move_to(
@@ -269,7 +96,9 @@ async def _leak_test(api: OT3API, mount: OT3Mount, columns: int) -> None:
                 tip_attached_home_z_pos[OT3Axis.by_mount(mount)],
             ),
         )
-        await suspend_timer(args.wait_time)
+        for t in range(args.wait_time):
+            print("Remaining time: ", args.wait_time - t, " (s)")
+            await asyncio.sleep(1)
         input("Press Enter to Continue")
         pos = await api.current_position_ot3(mount)
         await api.move_to(
@@ -330,7 +159,7 @@ async def _check_pressure_leak(
     home_pos = await api.current_position_ot3(mount)
     await api.move_to(mount, Point(175.6, 189.4, home_pos[OT3Axis.by_mount(mount)]))
     print("Jog to next set of tips")
-    tiprack_loc = await _jog_axis(api, mount, OT3Axis.by_mount(mount))
+    tiprack_loc = await helpers_ot3.jog_mount_ot3(api, mount)
     tip_column = 0
     columns = 1
     descend_position = 14
@@ -363,7 +192,7 @@ async def _check_pressure_leak(
         pos = await api.current_position_ot3(mount)
         if col <= 1:
             print("Jog to the top of the fixture")
-            fixture_loc = await _jog_axis(api, mount, OT3Axis.by_mount(mount))
+            fixture_loc = await helpers_ot3.jog_mount_ot3(api, mount)
         # Move to Trough aspiration position
         else:
             await api.move_to(
@@ -374,9 +203,15 @@ async def _check_pressure_leak(
                     tip_attached_home_z_pos[OT3Axis.by_mount(mount)],
                 ),
             )
-        global read
-        global phase
         read = True
+        phase = "Move"
+
+        def run_pressure_fixture(gauge, test_name, test_file):
+            start_time = time.time()
+            while read:
+                pressure_data = gauge.read_all_pressure_channel()
+                d_str = f"{time.time() - start_time},{pressure_data},{phase} \n"
+                data.append_data_to_file(test_name, test_file, d_str)
 
         PTH = Thread(target=run_pressure_fixture, args=(fixture, test_name, test_file))
         PTH.start()
@@ -440,7 +275,12 @@ async def _check_pressure_leak(
         )
 
 
-async def _main(simulate: bool, mount: OT3Mount, columns: int, fixture) -> None:
+async def _main(simulate: bool, mount: OT3Mount, columns: int) -> None:
+    if simulate:
+        fixture = SimPressureFixture()
+    else:
+        fixture = PressureFixture.create(port="/dev/ttyACM0")
+    fixture.connect()
     test_data = {
         "Time": None,
         "P1": None,
@@ -453,30 +293,22 @@ async def _main(simulate: bool, mount: OT3Mount, columns: int, fixture) -> None:
         "P8": None,
         "Phase": None,
     }
-
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=simulate, use_defaults=True
     )
     # Get pipette id
     pipette = api.hardware_pipettes[mount.to_mount()]
-    pipette_info = input("Enter Pipette Serial SN: ")
     assert pipette, f"No pipette found on mount: {mount}"
+    pipette_info = helpers_ot3.get_pipette_serial_ot3(pipette)
     print(f"Pipette: {pipette_info}")
-    test_n, test_f = file_setup(test_data, pipette, pipette_info)
-    d_str = f"Pipette: {pipette} \n"
-    data.append_data_to_file(test_n, test_f, d_str)
+    test_f = file_setup(test_data, pipette_info)
+    data.append_data_to_file(pipette_info, test_f, f"Pipette: {pipette_info}")
     try:
-        # Home gantry
         await api.home()
-        home_pos = await api.current_position_ot3(mount)
-        pos = await api.current_position_ot3(mount)
         if args.leak_test:
             await _leak_test(api, mount, columns)
         if args.check_pressure_test:
-            await _check_pressure_leak(api, mount, test_n, test_f)
-    except KeyboardInterrupt:
-        await api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
-        print("Cancelled")
+            await _check_pressure_leak(api, mount, pipette_info, test_f)
     finally:
         await api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
         print("Test Finished")
@@ -500,7 +332,5 @@ if __name__ == "__main__":
         "right": OT3Mount.RIGHT,
         "gripper": OT3Mount.GRIPPER,
     }
-
     _mount = ot3_mounts[args.mount]
-    fixture = fixture_setup()
-    asyncio.run(_main(args.simulate, _mount, args.columns, fixture))
+    asyncio.run(_main(args.simulate, _mount, args.columns))
