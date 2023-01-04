@@ -33,15 +33,19 @@ def _build_pass_step(
     distance: Dict[NodeId, float],
     speed: Dict[NodeId, float],
 ) -> MoveGroupStep:
-    # this assumes there is one mount axis present, and that the mount moves the farthest
-    mount_axis = [ax for ax in movers if ax in [NodeId.head_l, NodeId.head_r]][0]
+    # if a pipette is present, choose the mount axis present to be the primary
+    #   mover and determine the step duration
+    if NodeId.pipette_left in movers or NodeId.pipette_right in movers:
+        primary_mover = [ax for ax in movers if ax in [NodeId.head_l, NodeId.head_r]][0]
+    else:
+        primary_mover = movers[0]
     return create_step(
         distance={ax: float64(abs(distance[ax])) for ax in movers},
         velocity={
             ax: float64(speed[ax] * copysign(1.0, distance[ax])) for ax in movers
         },
         acceleration={},
-        duration=float64(abs(distance[mount_axis] / speed[mount_axis])),
+        duration=float64(abs(distance[primary_mover] / speed[primary_mover])),
         present_nodes=movers,
         stop_condition=MoveStopCondition.cap_sensor,
     )
