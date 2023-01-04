@@ -16,7 +16,7 @@ from typing import TYPE_CHECKING, Any, List, Dict, Optional, Union, Tuple
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition, LabwareParameters
 
-from opentrons.types import Location, Point, LocationLabware
+from opentrons.types import Location, Point
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import requires_version, APIVersionError
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
@@ -31,7 +31,7 @@ from opentrons.protocols.labware import (  # noqa: F401
     save_definition as save_definition,
 )
 
-from opentrons.protocol_engine import ModuleLocation
+from opentrons.protocol_engine import ModuleLocation, DeckSlotLocation
 
 from . import validation
 from .core import well_grid
@@ -340,15 +340,15 @@ class Labware:
             self._implementation
         )
 
-        if labware_location == "offDeck":
-            return None
+        if isinstance(labware_location, DeckSlotLocation):
+            return labware_location.slotName.value
         elif isinstance(labware_location, ModuleLocation):
             module_core = self._protocol_core.get_module_core_item(
                 labware_location.moduleId
             )
             return self._core_map.get(module_core)
 
-        return labware_location.slotName.value
+        return None
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)

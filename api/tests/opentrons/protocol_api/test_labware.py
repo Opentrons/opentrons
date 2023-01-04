@@ -165,7 +165,7 @@ def test_parent_slot(
     labware_location: Union[Literal["offDeck"], DeckSlotLocation],
     expected_result: Optional[str],
 ) -> None:
-    """Should get the labware's parent."""
+    """Should get the labware's parent slot name or None."""
     decoy.when(mock_protocol_core.get_labware_location(mock_labware_core)).then_return(
         labware_location
     )
@@ -180,6 +180,7 @@ def test_parent_module_context(
     mock_protocol_core: ProtocolCore,
     mock_map_core: LoadedCoreMap,
 ) -> None:
+    """Should get labware parent module context."""
     mock_module_core = decoy.mock(cls=ModuleCore)
     mock_temp_module_context = decoy.mock(cls=TemperatureModuleContext)
 
