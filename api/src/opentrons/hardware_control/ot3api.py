@@ -576,7 +576,7 @@ class OT3API(
         mount: Optional[Union[top_types.Mount, OT3Mount]] = None,
         allow_home_other: bool = True,
     ) -> None:
-        """Home the two z-axes"""
+        """Home all of the z-axes."""
         self._reset_last_mount()
         if isinstance(mount, (top_types.Mount, OT3Mount)):
             axes = [OT3Axis.by_mount(mount)]
