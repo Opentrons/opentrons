@@ -99,7 +99,7 @@ describe('DetachPipette', () => {
     const { getByText, getByAltText, getByLabelText } = render(props)
     getByText('Unscrew and Remove 96 Channel Pipette')
     getByText(
-      'Place your hand onto the pipette so it does not fall. Begin by unscrewing the 4 captive screws found in the front of the 96 channel pipette. Once all the screws are lossened, proceed to slowly remove the pipette by sliding off the supporting pins.'
+      'Place your hand onto the pipette so it does not fall. Begin by unscrewing the 4 captive screws found in the front of the 96 channel pipette. Once all the screws are loosened, proceed to slowly remove the pipette by sliding off the supporting pins.'
     )
     getByText(
       'The pipette is heavy so be cautious during uninstall. Having a helper near can be really helpful during this process.'

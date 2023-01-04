@@ -48,7 +48,7 @@ describe('Carriage', () => {
     const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
     getByText('Unscrew Z Axis Carriage')
     getByText(
-      'Reach the top of of the gantry carriage and unscrew the captive screw connecting right pippete mount to the the z axis.'
+      'Reach the top of of the gantry carriage and unscrew the captive screw connecting right pipette mount to the the z axis.'
     )
     getByText(
       'The detached right mount should freely move up and down the z axis.'
@@ -69,7 +69,7 @@ describe('Carriage', () => {
     const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
     getByText('Reattach Z Axis Carriage')
     getByText(
-      'Take the right carriage and push it to the top of the z axis. Reach the top of of the gantry carriage and screw in the captive screw to connect right pippete mount to the the z axis.'
+      'Take the right carriage and push it to the top of the z axis. Reach the top of of the gantry carriage and screw in the captive screw to connect right pipette mount to the the z axis.'
     )
     getByText(
       'The detached right mount should freely move up and down the z axis.'

@@ -48,10 +48,10 @@ describe('MountingPlate', () => {
     const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
     getByText('Connect and Attach Mounting Plate')
     getByText(
-      'Hold onto the pipette so it does not fall. Attach the monting plate to the robot by alinging the pins on the mounting plate to the slots on the z axis carriage.'
+      'Hold onto the pipette so it does not fall. Attach the mounting plate to the robot by aligning the pins on the mounting plate to the slots on the z axis carriage.'
     )
     getByText(
-      'You may need to adjust the z axis to align the left and right channels for propper fitment.'
+      'You may need to adjust the z axis to align the left and right channels for proper fitment.'
     )
     getByAltText('Attach mounting plate')
     const proceedBtn = getByRole('button', { name: 'Continue' })
@@ -68,9 +68,9 @@ describe('MountingPlate', () => {
       flowType: FLOWS.DETACH,
     }
     const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
-    getByText('Unscrew and Dettach Mounting Plate')
+    getByText('Unscrew and Detach Mounting Plate')
     getByText(
-      'Hold onto the pipette so it does not fall. Dettach the monting plate to the robot by removing the pins on the plate from the slots on the gantry carriage'
+      'Hold onto the pipette so it does not fall. Detach the mounting plate to the robot by removing the pins on the plate from the slots on the gantry carriage'
     )
     getByAltText('Detach mounting plate')
     const proceedBtn = getByRole('button', { name: 'Continue' })
