@@ -54,12 +54,11 @@ data_format = "||{0:^12}|{1:^12}|{2:^12}||"
 
 async def _main(is_simulating: bool) -> None:
     api = await build_async_ot3_hardware_api(is_simulating=is_simulating, use_defaults=True)
-    # await set_gantry_load_per_axis_settings_ot3(api, SETTINGS, load=LOAD)
 
     while True:
         try:
             await api.cache_instruments()
-            pipettes_attached = api.get_attached_pipette(MOUNT) ### await _get_pipette_from_mount(api, MOUNT) ### from helpers_ot3.py
+            pipettes_attached = api.get_attached_pipette(MOUNT)
             print(pipettes_attached)
             api.home_plunger(MOUNT)
             D = datetime.now().strftime("%Y-%m-%d")
@@ -100,7 +99,7 @@ async def _main(is_simulating: bool) -> None:
             for current in Current_dic[pipette_model]:
                 print("    Current test current is {}".format(current))
                 print(Current_dic[pipette_model])
-                await home_ot3(api, [OT3Axis.P_R]) ### pipette_home(mounts[mount])
+                await home_ot3(api, [PLUNGER]) ### pipette_home(mounts[mount])
                 print(point - 10)
                 move_plunger_absolute_ot3(api, MOUNT, point - 10, current=plunger_current, speed=move_speed) ### move_plunger(mounts[mount], point - 10, speed=move_speed, current=plunger_current)
                 try:
@@ -153,7 +152,7 @@ async def _main(is_simulating: bool) -> None:
                     li.append(results[i].split("_")[0])
                     li.append(results[i].split("_")[1])
                 writer.writerow([pipette, "V"+version, SN,D,T]+li)
-                await home_ot3(api, [OT3Axis.P_R]) ### pipette_home(mounts[mount])
+                await home_ot3(api, [PLUNGER]) ### pipette_home(mounts[mount])
                 move_plunger_absolute_ot3(api, MOUNT, bottom_pos, current=plunger_current, speed=move_speed) ### move_plunger(mounts[mount], pip_config.bottom, speed=move_speed, current=plunger_current)
 
         except TypeError:
@@ -169,7 +168,9 @@ if __name__ == "__main__":
     CYCLES = args.cycles
     if args.mount == "right":
         MOUNT = OT3Mount.RIGHT
+        PLUNGER = OT3Axis.P_R
     else:
         MOUNT = OT3Mount.LEFT
+        PLUNGER = OT3Axis.P_L
 
     asyncio.run(_main(args.simulate))
