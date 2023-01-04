@@ -167,10 +167,8 @@ async def _build_ot2_hw() -> AsyncGenerator[ThreadManagedHardware, None]:
         yield hw_sim
     finally:
         config.robot_configs.clear()
-        await asyncio.gather(
-            (m.cleanup() for m in hw_sim.wrapped().attached_modules),
-            return_exceptions=True,
-        )
+        for m in hw_sim.wrapped().attached_modules:
+            await m.cleanup()
         hw_sim.set_config(old_config)
         hw_sim.clean_up()
 
@@ -192,10 +190,8 @@ async def _build_ot3_hw() -> AsyncGenerator[ThreadManagedHardware, None]:
         yield hw_sim
     finally:
         config.robot_configs.clear()
-        await asyncio.gather(
-            (m.cleanup() for m in hw_sim.wrapped().attached_modules),
-            return_exceptions=True,
-        )
+        for m in hw_sim.wrapped().attached_modules:
+            await m.cleanup()
         hw_sim.set_config(old_config)
         hw_sim.clean_up()
 

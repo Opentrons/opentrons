@@ -360,7 +360,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
         return None
 
-    def get_module_item(self, module_core: ModuleCore) -> Optional[LabwareCore]:
+    def get_labware_on_module(self, module_core: ModuleCore) -> Optional[LabwareCore]:
         """Get the item on top of a given module, if any."""
         try:
             labware_id = self._engine_client.state.labware.get_id_by_module(

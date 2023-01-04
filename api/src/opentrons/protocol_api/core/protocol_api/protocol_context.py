@@ -391,6 +391,17 @@ class ProtocolContextImplementation(
         """Get all loaded labware cores."""
         return self._labware_cores
 
+    def get_labware_on_module(
+        self, module_core: legacy_module_core.LegacyModuleCore
+    ) -> Optional[LabwareImplementation]:
+        """Get the item on top of a given module, if any."""
+        labware = module_core.geometry.labware
+        return (
+            cast(LabwareImplementation, labware._implementation)
+            if labware is not None
+            else None
+        )
+
     def get_deck_definition(self) -> DeckDefinitionV3:
         """Get the geometry definition of the robot's deck."""
         raise NotImplementedError(
@@ -402,12 +413,6 @@ class ProtocolContextImplementation(
     ) -> Union[LabwareImplementation, legacy_module_core.LegacyModuleCore, None]:
         """Get the contents of a given slot, if any."""
         raise NotImplementedError("LegacyProtocolCore.get_slot_item not implemented")
-
-    def get_module_item(
-        self, module_core: legacy_module_core.LegacyModuleCore
-    ) -> Optional[LabwareImplementation]:
-        """Get the item on top of a given module, if any."""
-        raise NotImplementedError("LegacyProtocolCore.get_module_item not implemented")
 
     def get_slot_center(self, slot_name: DeckSlotName) -> Point:
         """Get the absolute coordinate of a slot's center."""

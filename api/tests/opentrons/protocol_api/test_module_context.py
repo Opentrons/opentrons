@@ -73,7 +73,7 @@ def test_get_labware(
     mock_labware_core = decoy.mock(cls=LabwareCore)
     mock_labware = decoy.mock(cls=Labware)
 
-    decoy.when(mock_protocol_core.get_module_item(mock_core)).then_return(
+    decoy.when(mock_protocol_core.get_labware_on_module(mock_core)).then_return(
         mock_labware_core
     )
     decoy.when(mock_core_map.get(mock_labware_core)).then_return(mock_labware)

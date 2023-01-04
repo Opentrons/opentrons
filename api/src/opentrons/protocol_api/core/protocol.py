@@ -155,7 +155,9 @@ class AbstractProtocol(
         """Get the contents of a given slot, if any."""
 
     @abstractmethod
-    def get_module_item(self, module_core: ModuleCoreType) -> Optional[LabwareCoreType]:
+    def get_labware_on_module(
+        self, module_core: ModuleCoreType
+    ) -> Optional[LabwareCoreType]:
         """Get the labware on a given module, if any."""
 
     @abstractmethod

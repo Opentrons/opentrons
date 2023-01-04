@@ -340,7 +340,7 @@ def test_load_labware_on_module(
         mock_engine_client.state.labware.get_id_by_module("module-id")
     ).then_return("abc123")
 
-    assert subject.get_module_item(module_core) is result
+    assert subject.get_labware_on_module(module_core) is result
 
 
 def test_add_labware_definition(
@@ -461,6 +461,7 @@ def test_load_module(
     )
 
     assert subject.get_slot_item(DeckSlotName.SLOT_1) is result
+    assert subject.get_labware_on_module(result) is None
 
 
 @pytest.mark.parametrize(

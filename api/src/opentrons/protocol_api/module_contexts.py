@@ -189,10 +189,7 @@ class ModuleContext(CommandPublisher):
     @requires_version(2, 0)
     def labware(self) -> Optional[Labware]:
         """The labware (if any) present on this module."""
-        if isinstance(self._core, LegacyModuleCore):
-            return self._core.geometry.labware
-
-        labware_core = self._protocol_core.get_module_item(self._core)
+        labware_core = self._protocol_core.get_labware_on_module(self._core)
         return self._core_map.get(labware_core)
 
     @property  # type: ignore[misc]
