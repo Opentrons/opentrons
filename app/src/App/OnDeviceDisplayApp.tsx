@@ -7,6 +7,7 @@ import {
   COLORS,
   OVERFLOW_SCROLL,
 } from '@opentrons/components'
+import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { BackButton } from '../atoms/buttons'
 import { ConnectedNetworkInfo } from '../pages/OnDeviceDisplay/ConnectedNetworkInfo'
@@ -14,6 +15,7 @@ import { ConnectViaEthernet } from '../pages/OnDeviceDisplay/ConnectViaEthernet'
 import { ConnectViaUSB } from '../pages/OnDeviceDisplay/ConnectViaUSB'
 import { ConfirmRobotName } from '../pages/OnDeviceDisplay/ConfirmRobotName'
 import { InitialSplash } from '../pages/OnDeviceDisplay/InitialSplash'
+import { NameRobot } from '../pages/OnDeviceDisplay/NameRobot'
 import { NetworkSetupMenu } from '../pages/OnDeviceDisplay/NetworkSetupMenu'
 import { TempODDMenu } from '../pages/OnDeviceDisplay/TempODDMenu'
 import { RobotDashboard } from '../pages/OnDeviceDisplay/RobotDashboard'
@@ -82,7 +84,9 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     Component: ConfirmRobotName,
     exact: true,
     name: 'Name confirmation',
-    path: '/network-setup/end',
+    // Note: kj 12/19/2022 this path might be changed since the ODD app will have rename screen
+    // and it will use the same components for doing that.
+    path: '/network-setup/confirm-name/:robotName',
   },
   {
     Component: () => (
@@ -108,12 +112,7 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     path: '/robot-settings/factory-reset',
   },
   {
-    Component: () => (
-      <>
-        <BackButton />
-        <Box>rename robot</Box>
-      </>
-    ),
+    Component: NameRobot,
     exact: true,
     name: 'Rename Robot',
     path: '/robot-settings/rename-robot',
@@ -203,25 +202,29 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
 
 export const OnDeviceDisplayApp = (): JSX.Element => {
   return (
-    <Box width="100%">
-      <Switch>
-        {onDeviceDisplayRoutes.map(({ Component, exact, path }: RouteProps) => {
-          return (
-            <Route key={path} exact={exact} path={path}>
-              <Box
-                position={POSITION_RELATIVE}
-                width="100%"
-                height="100%"
-                backgroundColor={COLORS.white}
-                overflow={OVERFLOW_SCROLL}
-              >
-                <ModalPortalRoot />
-                <Component />
-              </Box>
-            </Route>
-          )
-        })}
-      </Switch>
-    </Box>
+    <ApiHostProvider hostname="localhost">
+      <Box width="100%">
+        <Switch>
+          {onDeviceDisplayRoutes.map(
+            ({ Component, exact, path }: RouteProps) => {
+              return (
+                <Route key={path} exact={exact} path={path}>
+                  <Box
+                    position={POSITION_RELATIVE}
+                    width="100%"
+                    height="100%"
+                    backgroundColor={COLORS.white}
+                    overflow={OVERFLOW_SCROLL}
+                  >
+                    <ModalPortalRoot />
+                    <Component />
+                  </Box>
+                </Route>
+              )
+            }
+          )}
+        </Switch>
+      </Box>
+    </ApiHostProvider>
   )
 }

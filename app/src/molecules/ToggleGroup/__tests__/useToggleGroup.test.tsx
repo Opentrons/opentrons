@@ -40,7 +40,7 @@ describe('useToggleGroup', () => {
 
     expect(result.current[0]).toBe('List View')
   })
-  it('should record an analytics event for list view', () => {
+  it('should record an analytics event for list view', async () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
       <Provider store={store}>{children}</Provider>
     )

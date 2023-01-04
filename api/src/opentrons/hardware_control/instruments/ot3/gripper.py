@@ -132,6 +132,9 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
     def gripper_id(self) -> str:
         return self._gripper_id
 
+    def reload_configurations(self) -> None:
+        return None
+
     def reset_offset(self, to_default: bool) -> None:
         """Tempoarily reset the gripper offsets to default values."""
         if to_default:

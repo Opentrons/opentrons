@@ -250,7 +250,10 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           currentRunId={currentRunId != null ? currentRunId : undefined}
         />
       )}
-      <Box padding={`${SPACING.spacing4} ${SPACING.spacing3}`} width="100%">
+      <Box
+        padding={`${String(SPACING.spacing4)} ${String(SPACING.spacing3)}`}
+        width="100%"
+      >
         <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing3}>
           <Flex alignItems={ALIGN_START} opacity={isPending ? '50%' : '100%'}>
             <img

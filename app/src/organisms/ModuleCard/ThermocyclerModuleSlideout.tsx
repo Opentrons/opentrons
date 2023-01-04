@@ -167,8 +167,10 @@ export const ThermocyclerModuleSlideout = (
         </StyledText>
         <form id="ThermocyclerModuleSlideout_submitValue">
           <InputField
-            data-testid={`${module.moduleModel}_${isSecondaryTemp}`}
-            id={`${module.moduleModel}_${isSecondaryTemp}`}
+            data-testid={`${String(module.moduleModel)}_${String(
+              isSecondaryTemp
+            )}`}
+            id={`${String(module.moduleModel)}_${String(isSecondaryTemp)}`}
             units={CELSIUS}
             value={tempValue != null ? Math.round(tempValue) : null}
             autoFocus

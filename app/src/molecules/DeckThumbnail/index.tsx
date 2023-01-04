@@ -111,7 +111,9 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
               ) : null}
               {labwareInSlot != null ? (
                 <g
-                  transform={`translate(${slot.position[0]},${slot.position[1]})`}
+                  transform={`translate(${String(slot.position[0])},${String(
+                    slot.position[1]
+                  )})`}
                 >
                   <LabwareRender
                     definition={labwareInSlot.result.definition}
