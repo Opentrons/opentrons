@@ -9,11 +9,18 @@ import subprocess
 
 from opentrons.config import pipette_config
 
-from opentrons_hardware.drivers.can_bus import build
+from opentrons_hardware.drivers.can_bus.build import build_driver
+from opentrons_hardware.drivers.can_bus import build, CanMessenger,  WaitableCallback
+from opentrons_hardware.firmware_bindings.constants import NodeId, PipetteName
+from opentrons_hardware.firmware_bindings import ArbitrationId
+from opentrons_hardware.firmware_bindings.messages import (
+    message_definitions,
+    payloads,
+    fields,
+)
 from opentrons_hardware.firmware_bindings.constants import NodeId,PipetteName
 
 from opentrons_hardware.hardware_control.current_settings import set_currents
-from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 
 
 from opentrons_hardware.hardware_control.motion import (
