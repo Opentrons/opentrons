@@ -86,6 +86,7 @@ module.exports = async () => ({
     icon: project === 'robot-stack' ? 'build/icon.icns' : 'build/three.icns',
   },
   publish: project === 'ot3' ? ot3PublishConfig : robotStackPublishConfig,
+  npmRebuild: false,
   generateUpdatesFilesForAllChannels: true,
   beforeBuild: path.join(__dirname, './scripts/before-build.js'),
   afterSign: path.join(__dirname, './scripts/after-sign.js'),
