@@ -2,6 +2,7 @@
 import inspect
 
 from typing import Optional, Union
+from typing_extensions import Literal
 
 import pytest
 from decoy import Decoy
@@ -9,9 +10,14 @@ from decoy import Decoy
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, Labware, Well
 from opentrons.protocol_api.core import well_grid
-from opentrons.protocol_api.core.common import LabwareCore, WellCore, ProtocolCore
+from opentrons.protocol_api.core.common import (
+    LabwareCore,
+    WellCore,
+    ProtocolCore,
+    ModuleCore,
+)
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
-from opentrons.protocol_api.module_contexts import ModuleContext
+from opentrons.protocol_api.module_contexts import TemperatureModuleContext
 
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
@@ -149,22 +155,20 @@ def test_reset_tips(
 
 @pytest.mark.parametrize(
     "labware_location, expected_result",
-    [(DeckSlotLocation(slotName=DeckSlotName.SLOT_1), "1"), ("offDeck", None)],
+    [(DeckSlotLocation(slotName=DeckSlotName.SLOT_1), "1"), (Literal["offDeck"], None)],
 )
 def test_parent_slot(
     decoy: Decoy,
     subject: Labware,
     mock_labware_core: LabwareCore,
     mock_protocol_core: ProtocolCore,
-    labware_location: Union[str, DeckSlotLocation],
+    labware_location: Union[Literal["offDeck"], DeckSlotLocation],
     expected_result: Optional[str],
 ) -> None:
     """Should get the labware's parent."""
-    decoy.when(mock_labware_core.labware_id).then_return("cool-labware")
-
-    decoy.when(
-        mock_labware_core._engine_client.state.labware.get_location("cool-labware")
-    ).then_return(labware_location)
+    decoy.when(mock_protocol_core.get_labware_location(mock_labware_core)).then_return(
+        labware_location
+    )
 
     subject.parent == expected_result
 
@@ -176,15 +180,19 @@ def test_parent_module_context(
     mock_protocol_core: ProtocolCore,
     mock_map_core: LoadedCoreMap,
 ) -> None:
-    mock_module_context = decoy.mock(cls=ModuleContext)
-    decoy.when(mock_labware_core.labware_id).then_return("cool-labware")
+    mock_module_core = decoy.mock(cls=ModuleCore)
+    mock_temp_module_context = decoy.mock(cls=TemperatureModuleContext)
 
-    decoy.when(
-        mock_labware_core._engine_client.state.labware.get_location("cool-labware")
-    ).then_return(ModuleLocation(moduleId="module-id"))
-
-    decoy.when(mock_protocol_core.get_module_core_item("module-id")).then_return(
-        mock_module_context
+    decoy.when(mock_protocol_core.get_labware_location(mock_labware_core)).then_return(
+        ModuleLocation(moduleId="module-id")
     )
 
-    subject.parent == mock_module_context
+    decoy.when(mock_protocol_core.get_module_core_item("module-id")).then_return(
+        mock_module_core
+    )
+
+    decoy.when(mock_map_core.get(mock_module_core)).then_return(
+        mock_temp_module_context
+    )
+
+    subject.parent == mock_temp_module_context

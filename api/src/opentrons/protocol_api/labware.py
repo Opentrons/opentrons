@@ -46,6 +46,7 @@ if TYPE_CHECKING:
         LabwareParameters,
     )
     from .core.common import LabwareCore, WellCore, ProtocolCore
+    from .protocol_context import ModuleTypes
 
 
 _log = logging.getLogger(__name__)
@@ -329,28 +330,30 @@ class Labware:
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
-    def parent(self) -> LocationLabware:
+    def parent(self) -> Optional[Union[str, ModuleTypes]]:
         """The parent of this labware. Usually a slot name."""
         if isinstance(self._implementation, LabwareImplementation):
-            return self._implementation.get_geometry().parent.labware.object
+            # Type ignoring because preserve backwards compatibility
+            return self._implementation.get_geometry().parent.labware.object  # type: ignore[no-any-return]
 
-        labware_loaction = self._implementation._engine_client.state.labware.get_location(  # type: ignore[attr-defined]
-            self._implementation.labware_id  # type: ignore[attr-defined]
+        if self._protocol_core is None or self._core_map is None:
+            raise APIVersionError(
+                "Labware parent is not supported in this api version."
+            )
+
+        labware_location = self._protocol_core.get_labware_location(
+            self._implementation
         )
 
-        if labware_loaction == "offDeck":
+        if labware_location == "offDeck":
             return None
-        elif isinstance(labware_loaction, ModuleLocation):
-            if self._protocol_core is None or self._core_map is None:
-                raise APIVersionError(
-                    "Loaded labware on a module is not supported in this api version."
-                )
+        elif isinstance(labware_location, ModuleLocation):
             module_core = self._protocol_core.get_module_core_item(
-                labware_loaction.moduleId
+                labware_location.moduleId
             )
             return self._core_map.get(module_core)
 
-        return labware_loaction
+        return labware_location
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)

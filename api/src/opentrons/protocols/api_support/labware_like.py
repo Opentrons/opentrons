@@ -77,7 +77,7 @@ class LabwareLike:
         parent = None
         if self.has_parent:
             parent = self.object.parent  # type: ignore
-        return LabwareLike(parent)
+        return LabwareLike(parent)  # type: ignore[arg-type]
 
     @property
     def is_well(self) -> bool:

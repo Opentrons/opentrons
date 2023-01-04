@@ -91,7 +91,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
             " Use `module.load_labware` or `load_labware_by_definition` instead."
         )
         assert (
-            labware.parent == self.geometry
+            labware.parent == self.geometry  # type: ignore[comparison-overlap]
         ), "Labware is not configured with this module as its parent"
 
         return self._core.geometry.add_labware(labware)
