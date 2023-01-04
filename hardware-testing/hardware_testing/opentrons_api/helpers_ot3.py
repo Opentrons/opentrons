@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from subprocess import run
 from time import time
-from typing import List, Optional, Dict, Tuple
+from typing import List, Optional, Dict, Tuple, Union
 
 from opentrons_hardware.firmware_bindings.constants import SensorId
 from opentrons_hardware.sensors import sensor_driver, sensor_types
@@ -15,7 +15,8 @@ from opentrons.hardware_control.backends.ot3utils import sensor_node_for_mount
 
 # TODO (lc 10-27-2022) This should be changed to an ot3 pipette object once we
 # have that well defined.
-from opentrons.hardware_control.instruments.ot3.pipette import Pipette
+from opentrons.hardware_control.instruments.ot2.pipette import Pipette as PipetteOT2
+from opentrons.hardware_control.instruments.ot3.pipette import Pipette as PipetteOT3
 from opentrons.hardware_control.motion_utilities import deck_from_machine
 from opentrons.hardware_control.ot3api import OT3API
 
@@ -277,7 +278,7 @@ async def home_ot3(api: OT3API, axes: Optional[List[OT3Axis]] = None) -> None:
         )
 
 
-def _get_pipette_from_mount(api: OT3API, mount: OT3Mount) -> Pipette:
+def _get_pipette_from_mount(api: OT3API, mount: OT3Mount) -> Union[PipetteOT2, PipetteOT3]:
     pipette = api.hardware_pipettes[mount.to_mount()]
     if pipette is None:
         raise RuntimeError(f"No pipette currently attaced to mount {mount}")
@@ -639,3 +640,16 @@ def get_slot_calibration_square_position_ot3(slot: int) -> Point:
     slot_top_left = get_slot_top_left_position_ot3(slot)
     calib_sq_offset = CALIBRATION_SQUARE_EVT.top_left_offset
     return slot_top_left + calib_sq_offset
+
+
+def get_pipette_serial_ot3(pipette: Union[PipetteOT2, PipetteOT3]) -> str:
+    model = pipette.model
+    volume = model.split("_")[0].replace("p", "")
+    volume = "1K" if volume == "1000" else volume
+    channels = "S" if "single" in model else "M"
+    version = model.split("v")[-1].strip().replace(".", "")
+    if "P" in pipette.pipette_id:
+        id = pipette.pipette_id[7:]  # P1KSV33yyyymmddAxx
+    else:
+        id = pipette.pipette_id
+    return f"P{volume}{channels}V{version}{id}"
