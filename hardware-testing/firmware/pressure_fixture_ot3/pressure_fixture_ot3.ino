@@ -3,6 +3,8 @@
 #include"MMR920C04.h"
 #include "TCA9548A.h"
 
+#define VERSION ("0.0.0")
+
 String inputString = "";         // a String to hold incoming data
 bool stringComplete = false;  // whether the string is complete
 int numdata=0;
@@ -158,6 +160,9 @@ void processCmdParse(String strCMD,int tempData)
   if(strCMD == "DAC")                    //set the dac output value
   {
     Serial.println("DAC");
+  }
+  else if (strCMD == "VERSION") {
+    Serial.println(VERSION);
   }
   else if(strCMD == "GETPRESSURE")
   {
