@@ -144,7 +144,7 @@ async def get_pipette_model(messenger: CanMessenger, node):
     except asyncio.TimeoutError:
         pass
 
-def main() -> None:
+async def main() -> None:
     subprocess.run(["systemctl", "stop", "opentrons-robot-server"])
     position = {'pipette': 0}
     node = NodeId.pipette_left
@@ -225,4 +225,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
