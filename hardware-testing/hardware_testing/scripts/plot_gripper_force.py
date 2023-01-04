@@ -28,13 +28,23 @@ class Plot:
             "legend":None,
             "annotation":None
         }
+        self.titles = {
+            "Input DC":"Input Duty Cycle (%)",
+            "Input Force":"Input Force (N)",
+        }
         self.ranges = {
-            "DC":[10,60],
-            "Current":[50,400],
+            "Input DC":[10,60],
+            "Input Force":[5,30],
+            "Current":[100,450],
             "Force":[5,30],
+        }
+        self.dticks = {
+            "Input DC":10,
+            "Input Force":5,
         }
         self.create_folder()
         self.df_data = self.import_file(self.data)
+        self.input = self.get_input(self.df_data)
         self.df_avg = self.avg_df(self.df_data)
 
     def import_file(self, file):
@@ -52,6 +62,8 @@ class Plot:
             os.makedirs(path)
 
     def create_plot(self):
+        print("Plotting Trial Data...")
+        self.trial_plot(1)
         print("Plotting Current vs. PWM DC...")
         self.current_pwm_plot()
         print("Plotting Force vs. PWM DC...")
@@ -64,13 +76,20 @@ class Plot:
         self.peak_pwm_plot()
         print("Plotting PWM Frequency vs. PWM DC...")
         self.freq_pwm_plot()
-        print("Plotting Force Polynomial...")
-        self.force_poly_plot(2.0)
+        # if self.input == "Input DC":
+        #     print("Plotting Force Polynomial...")
+        #     self.force_poly_plot(2.0)
         print("Plots Saved!")
+
+    def get_input(self, df):
+        if df["Input DC"].iloc[0] > 0:
+            return "Input DC"
+        else:
+            return "Input Force"
 
     def avg_df(self, df):
         df_avg = pd.DataFrame()
-        df = df.groupby(["Vref","DC"])
+        df = df.groupby(["Vref", self.input])
         df_avg["Force"] = round(df["Force"].mean(), 2)
         df_avg["Current"] = round(df["Current"].mean(), 2)
         df_avg["Min Current"] = round(df["Current"].min(), 2)
@@ -80,8 +99,8 @@ class Plot:
         df_avg["Duty Cycle"] = round(df["PWM Duty Cycle"].mean(), 2)
         df_avg["Frequency"] = round(df["Frequency"].mean(), 2)
         df_avg.reset_index(inplace=True)
-        df_avg["Polynomial"] = round(0.0017*pow(df_avg["DC"], 2) + 0.3531*df_avg["DC"] + 1.5, 2)
-        print(df_avg)
+        if self.input == "Input DC":
+            df_avg["Polynomial"] = round(0.0017*pow(df_avg[self.input], 2) + 0.3531*df_avg[self.input] + 1.5, 2)
         return df_avg
 
     def set_legend(self, figure, legend):
@@ -138,24 +157,53 @@ class Plot:
         for key, value in self.plot_param.items():
             self.plot_param[key] = None
 
+    def trial_plot(self, cycle):
+        df = self.df_data
+        df = df[df["Cycle"]==cycle]
+        dc = df[self.input].iloc[0]
+        x_axis = "Trial"
+        fig1 = px.line(df, x=x_axis, y=["Force"], markers=True, color_discrete_sequence=self.list_colors[0:])
+        fig2 = px.line(df, x=x_axis, y=["Current"], markers=True, color_discrete_sequence=self.list_colors[1:])
+        fig2.update_traces(yaxis="y2")
+        subfig = make_subplots(specs=[[{"secondary_y": True}]])
+        subfig.add_traces(fig1.data + fig2.data)
+        subfig.update_layout(
+            yaxis_tickmode = 'linear',
+            yaxis_dtick = 2.5,
+            yaxis2_tickmode = 'linear',
+            yaxis2_dtick = 40,
+        )
+        self.plot_param["figure"] = subfig
+        self.plot_param["filename"] = "plot_trial"
+        self.plot_param["title"] = f"Trial Data (Input = {dc}%)"
+        self.plot_param["x_title"] = "Trial Number"
+        self.plot_param["y_title"] = "Measured Force (N)"
+        self.plot_param["y2_title"] = "Measured Current [RMS] (mA)"
+        self.plot_param["x_range"] = [0, 20]
+        self.plot_param["y_range"] = [25, 35]
+        self.plot_param["y2_range"] = [160, 480]
+        self.plot_param["legend"] = "Data"
+        self.plot_param["annotation"] = None
+        self.write_plot(self.plot_param)
+
     def current_pwm_plot(self):
         df = self.df_avg
         df = df[df["Vref"]==2.0]
-        df = df[df["DC"]<=60]
-        x_axis = "DC"
+        df = df[df[self.input]<=60]
+        x_axis = self.input
         y_axis = "Current"
         fig = px.line(df, x=x_axis, y=[y_axis], color="Vref", markers=True)
         fig.update_layout(
             xaxis_tickmode = 'linear',
             xaxis_tick0 = 0,
-            xaxis_dtick = 10,
+            xaxis_dtick = self.dticks[self.input],
         )
         self.plot_param["figure"] = fig
         self.plot_param["filename"] = "plot_current_pwm"
-        self.plot_param["title"] = "Current vs. PWM Duty Cycle"
-        self.plot_param["x_title"] = "Duty Cycle (%)"
+        self.plot_param["title"] = f"Current vs. {self.input}"
+        self.plot_param["x_title"] = self.titles[self.input]
         self.plot_param["y_title"] = "Average Current [RMS] (mA)"
-        self.plot_param["x_range"] = self.ranges["DC"]
+        self.plot_param["x_range"] = self.ranges[self.input]
         self.plot_param["y_range"] = self.ranges["Current"]
         self.plot_param["legend"] = "Vref (V)"
         self.plot_param["annotation"] = None
@@ -164,21 +212,21 @@ class Plot:
     def force_pwm_plot(self):
         df = self.df_avg
         # df = df[df["Vref"]==2.0]
-        # df = df[df["DC"]<=60]
-        x_axis = "DC"
+        # df = df[df[self.input]<=60]
+        x_axis = self.input
         y_axis = "Force"
         fig = px.line(df, x=x_axis, y=[y_axis], color="Vref", markers=True)
         fig.update_layout(
             xaxis_tickmode = 'linear',
             xaxis_tick0 = 0,
-            xaxis_dtick = 10,
+            xaxis_dtick = self.dticks[self.input],
         )
         self.plot_param["figure"] = fig
         self.plot_param["filename"] = "plot_force_pwm"
-        self.plot_param["title"] = "Force vs. PWM Duty Cycle"
-        self.plot_param["x_title"] = "Duty Cycle (%)"
+        self.plot_param["title"] = f"Force vs. {self.input}"
+        self.plot_param["x_title"] = self.titles[self.input]
         self.plot_param["y_title"] = "Average Force (N)"
-        self.plot_param["x_range"] = self.ranges["DC"]
+        self.plot_param["x_range"] = self.ranges[self.input]
         self.plot_param["y_range"] = self.ranges["Force"]
         self.plot_param["legend"] = "Vref (V)"
         self.plot_param["annotation"] = None
@@ -187,8 +235,8 @@ class Plot:
     def force_poly_plot(self, vref):
         df = self.df_avg
         df = df[df["Vref"]==vref]
-        df = df[df["DC"]<=60]
-        x_axis = "DC"
+        df = df[df[self.input]<=60]
+        x_axis = self.input
         y_axis = "Force"
         poly = "Polynomial"
 
@@ -216,9 +264,9 @@ class Plot:
         self.plot_param["figure"] = subfig
         self.plot_param["filename"] = "plot_force_poly"
         self.plot_param["title"] = f"Force vs. PWM Duty Cycle (Vref = {vref}V)"
-        self.plot_param["x_title"] = "Duty Cycle (%)"
+        self.plot_param["x_title"] = self.titles[self.input]
         self.plot_param["y_title"] = "Average Force (N)"
-        self.plot_param["x_range"] = self.ranges["DC"]
+        self.plot_param["x_range"] = self.ranges[self.input]
         self.plot_param["y_range"] = self.ranges["Force"]
         self.plot_param["legend"] = "Data"
         self.plot_param["annotation"] = [annotation_poly]
@@ -273,8 +321,8 @@ class Plot:
         # max_vref = df["Vref"].max()
         max_vref = 2.0
         df = df[df["Vref"]==max_vref]
-        df = df[df["DC"]<=60]
-        x_axis = "DC"
+        df = df[df[self.input]<=60]
+        x_axis = self.input
         y_axis = ["Peak+","Peak-"]
         fig1 = px.bar(df, x=x_axis, y=y_axis, barmode="group")
         fig2 = px.line(df, x=x_axis, y=["Current"], line_dash_sequence=["dash"], color_discrete_sequence=["black"], markers=True)
@@ -284,14 +332,14 @@ class Plot:
         subfig.update_layout(
             xaxis_tickmode = 'linear',
             xaxis_tick0 = 0,
-            xaxis_dtick = 10,
+            xaxis_dtick = self.dticks[self.input]
         )
         self.plot_param["figure"] = subfig
         self.plot_param["filename"] = "plot_peak_pwm"
-        self.plot_param["title"] = f"Peak vs. PWM Duty Cycle @ Max Vref [{max_vref} V]"
-        self.plot_param["x_title"] = "Duty Cycle (%)"
+        self.plot_param["title"] = f"Peak vs. {self.input} @ Max Vref [{max_vref} V]"
+        self.plot_param["x_title"] = self.titles[self.input]
         self.plot_param["y_title"] = "Current [Peak] (mA)"
-        self.plot_param["x_range"] = [0, 70]
+        self.plot_param["x_range"] = [0, max(self.ranges[self.input])+min(self.ranges[self.input])]
         self.plot_param["y_range"] = [0, 600]
         self.plot_param["legend"] = "Current"
         self.plot_param["annotation"] = None
@@ -299,9 +347,9 @@ class Plot:
 
     def freq_pwm_plot(self):
         df = self.df_avg
-        x_axis = "DC"
+        x_axis = self.input
         y_axis = "Frequency"
-        avg_freq = df[df["DC"]<=95]["Frequency"].mean()
+        avg_freq = df[df[self.input]<=95]["Frequency"].mean()
         fig1 = px.scatter(df, x=x_axis, y=[y_axis], color="Vref")
         fig2 = px.line(x=[0, 100], y=[avg_freq, avg_freq], line_dash_sequence=["dash"], color_discrete_sequence=["black"])
         fig1.update_traces(
@@ -325,9 +373,9 @@ class Plot:
         self.plot_param["figure"] = subfig
         self.plot_param["filename"] = "plot_freq_pwm"
         self.plot_param["title"] = f"PWM Frequency vs. PWM Duty Cycle"
-        self.plot_param["x_title"] = "Duty Cycle (%)"
+        self.plot_param["x_title"] = self.titles[self.input]
         self.plot_param["y_title"] = "Measured Frequency (kHz)"
-        self.plot_param["x_range"] = [0, 100]
+        self.plot_param["x_range"] = self.ranges[self.input]
         self.plot_param["y_range"] = [32, 32.2]
         self.plot_param["legend"] = "Vref (V)"
         self.plot_param["annotation"] = None
