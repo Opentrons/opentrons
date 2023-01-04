@@ -16,7 +16,7 @@ from opentrons.calibration_storage.ot3.pipette_offset import (
 )
 
 from hardware_testing import data
-from hardware_testing.drivers.pressure_fixture import ot3_pressure_fixture
+from hardware_testing.drivers.pressure_fixture import PressureFixture
 
 
 async def suspend_timer(suspend_time: float) -> None:
@@ -32,7 +32,7 @@ async def suspend_timer(suspend_time: float) -> None:
 
 def fixture_setup():
     """Return a fixture object to use."""
-    fixture = Ot3PressureFixture.create(port="/dev/ttyACM0")
+    fixture = PressureFixture.create(port="/dev/ttyACM0")
     fixture.connect()
     return fixture
 
