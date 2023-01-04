@@ -4,7 +4,7 @@ import logging
 from typing import Generic, List, Optional, TypeVar, cast
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons_shared_data.module.dev_types import ModuleModel
+from opentrons_shared_data.module.dev_types import ModuleModel, ModuleType
 
 from opentrons.broker import Broker
 from opentrons.hardware_control import SynchronousAdapter, modules
@@ -73,7 +73,18 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
 
     @property
     def model(self) -> ModuleModel:
+        """Get the module's model identifier."""
         return self._core.get_model()
+
+    @property
+    def type(self) -> ModuleType:
+        """Get the module's general type identifier."""
+        return self._core.get_type()
+
+    @property
+    def serial_number(self) -> str:
+        """Get the module's unique hardware serial number."""
+        return self._core.get_serial_number()
 
     # TODO(mc, 2022-09-08): Remove this method
     @requires_version(2, 0)

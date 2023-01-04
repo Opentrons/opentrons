@@ -36,7 +36,7 @@ class AbstractModuleCore(ABC, Generic[LabwareCoreType]):
 
     @abstractmethod
     def get_model(self) -> ModuleModel:
-        """Get the module's model identifier as a string."""
+        """Get the module's model identifier."""
 
     @abstractmethod
     def get_type(self) -> ModuleType:

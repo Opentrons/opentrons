@@ -93,7 +93,7 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
 
     def get_serial_number(self) -> str:
         """Get the module's unique hardware serial number."""
-        raise NotImplementedError("get_serial_number not implemented")
+        return self._engine_client.state.modules.get_serial_number(self.module_id)
 
     def get_deck_slot(self) -> DeckSlotName:
         """Get the module's deck slot."""
