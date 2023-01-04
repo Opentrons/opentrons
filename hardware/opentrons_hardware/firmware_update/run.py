@@ -1,5 +1,6 @@
 """Complete FW updater."""
 import logging
+import asyncio
 from typing import Optional, TextIO
 
 from opentrons_hardware.drivers.can_bus import CanMessenger
@@ -74,4 +75,49 @@ async def run_update(
     await messenger.send(
         node_id=target.bootloader_node,
         message=FirmwareUpdateStartApp(),
+    )
+
+
+async def run_updates(
+    messenger: CanMessenger,
+    node_id1: NodeId,
+    node_id2: NodeId,
+    hex_file1: TextIO,
+    hex_file2: TextIO,
+    retry_count: int,
+    timeout_seconds: float,
+    erase: Optional[bool] = True,
+) -> None:
+    """Perform a firmware update on multiple node targets.
+
+    Args:
+        messenger: The can messenger to use.
+        node_id1: The first node being updated.
+        node_id2: The second node being updated.
+        hex_file1: File containing first node's firmware.
+        hex_file2: File containing second node's firmware.
+        retry_count: Number of times to retry.
+        timeout_seconds: How much to wait for responses.
+        erase: Whether to erase flash before updating.
+
+    Returns:
+        None
+    """
+    await asyncio.gather(
+        run_update(
+            messenger=messenger,
+            node_id=node_id1,
+            hex_file=hex_file1,
+            retry_count=retry_count,
+            timeout_seconds=timeout_seconds,
+            erase=erase,
+        ),
+        run_update(
+            messenger=messenger,
+            node_id=node_id2,
+            hex_file=hex_file2,
+            retry_count=retry_count,
+            timeout_seconds=timeout_seconds,
+            erase=erase,
+        ),
     )
