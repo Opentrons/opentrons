@@ -5,9 +5,6 @@ from pathlib import Path
 from typing import Dict, List
 
 import pytest
-from rich.console import Console
-from selenium.webdriver.chrome.webdriver import WebDriver
-
 from automation.driver.drag_drop import drag_and_drop_file
 from automation.menus.left_menu import LeftMenu
 from automation.pages.device_landing import DeviceLanding
@@ -18,6 +15,8 @@ from automation.pages.protocol_landing import ProtocolLanding
 from automation.pages.setup_calibration import SetupCalibration
 from automation.resources.ot_robot import OtRobot
 from automation.resources.robot_data import Dev, EmulatedAlpha, RobotDataType
+from rich.console import Console
+from selenium.webdriver.chrome.webdriver import WebDriver
 
 
 @pytest.mark.skip("Need to fix.")
@@ -48,50 +47,27 @@ def test_device_landing(
     ot_robot = OtRobot(console, robot)
 
     if ot_robot.is_alive():
-        console.print(
-            f"Testing against robot {ot_robot.data.name}", style="white on blue"
-        )
+        console.print(f"Testing against robot {ot_robot.data.name}", style="white on blue")
     else:
-        console.print(
-            f"Robot {ot_robot.data.display_name} not alive.", style="white on blue"
-        )
-        assert False, "Fail Fast robot not alive."
+        console.print(f"Robot {ot_robot.data.display_name} not alive.", style="white on blue")
+        raise AssertionError("Fail Fast robot not alive.")
 
     # Is the robot connected?
     device_landing.robot_banner(robot_name=ot_robot.data.display_name)
-    assert device_landing.get_robot_image(
-        robot_name=ot_robot.data.display_name
-    ).is_displayed()
-    assert device_landing.get_left_mount_pipette(
-        robot_name=ot_robot.data.display_name
-    ).is_displayed()
-    assert device_landing.get_right_mount_pipette(
-        robot_name=ot_robot.data.display_name
-    ).is_displayed()
-    assert device_landing.get_overflow_button_on_device_landing(
-        ot_robot.data.display_name
-    ).is_displayed()
+    assert device_landing.get_robot_image(robot_name=ot_robot.data.display_name).is_displayed()
+    assert device_landing.get_left_mount_pipette(robot_name=ot_robot.data.display_name).is_displayed()
+    assert device_landing.get_right_mount_pipette(robot_name=ot_robot.data.display_name).is_displayed()
+    assert device_landing.get_overflow_button_on_device_landing(ot_robot.data.display_name).is_displayed()
     # go to the detail page
     device_landing.get_robot_image(robot_name=ot_robot.data.display_name).click()
     assert device_landing.get_image_robot_overview().is_displayed()
-    assert device_landing.get_robot_name_device_detail(
-        robot_name=ot_robot.data.display_name
-    ).is_displayed()
-    assert (
-        device_landing.get_pipettes_and_modules_header_text() == "Pipettes and Modules"
-    )
-    assert (
-        device_landing.get_recent_protocol_runs_header_text()
-        == f"{ot_robot.data.display_name}'s Protocol Runs"
-    )
+    assert device_landing.get_robot_name_device_detail(robot_name=ot_robot.data.display_name).is_displayed()
+    assert device_landing.get_pipettes_and_modules_header_text() == "Pipettes and Modules"
+    assert device_landing.get_recent_protocol_runs_header_text() == f"{ot_robot.data.display_name}'s Protocol Runs"
     assert device_landing.set_lights(True) is True, "Lights toggle was not set to on."
 
-    assert device_landing.get_left_mount_pipette_device_detail(
-        ot_robot.data.left_pipette_model
-    ).is_displayed()
-    assert device_landing.get_right_mount_pipette_device_detail(
-        ot_robot.data.right_pipette_model
-    ).is_displayed()
+    assert device_landing.get_left_mount_pipette_device_detail(ot_robot.data.left_pipette_model).is_displayed()
+    assert device_landing.get_right_mount_pipette_device_detail(ot_robot.data.right_pipette_model).is_displayed()
     # assert device_landing.get_mag_deck_image().is_displayed()
     # assert device_landing.get_mag_module_name().is_displayed()
     assert device_landing.get_thermocycler_gen2_deck_image().is_displayed()
@@ -133,23 +109,14 @@ def test_run_protocol_robot_landing_page(
     console.print(f"Testing against robot {ot_robot.data.name}", style="white on blue")
     assert ot_robot.is_alive(), "is the robot available?"
     if device_landing.get_robot_banner_safe(ot_robot.data.display_name) is None:
-        assert (
-            False
-        ), f"Stopping the test, the robot with name {ot_robot.data.display_name} is not found."
+        raise AssertionError(f"Stopping the test, the robot with name {ot_robot.data.display_name} is not found.")
     if device_landing.get_go_to_run_safe(ot_robot.data.display_name) is not None:
-        assert (
-            False
-        ), f"Stopping the test, the robot with name {ot_robot.data.display_name} has an active run."
-    device_landing.click_overflow_menu_button_on_device_landing(
-        ot_robot.data.display_name
-    )
+        raise AssertionError(f"Stopping the test, the robot with name {ot_robot.data.display_name} has an active run.")
+    device_landing.click_overflow_menu_button_on_device_landing(ot_robot.data.display_name)
     device_landing.click_run_a_protocol_on_overflow(ot_robot.data.display_name)
     assert device_landing.get_protocol_name_device_detail_slideout().is_displayed()
     # see that the overflow menu has disappeared (fixed bug)
-    assert (
-        device_landing.get_run_a_protocol_on_overflow(ot_robot.data.display_name)
-        is None
-    )
+    assert device_landing.get_run_a_protocol_on_overflow(ot_robot.data.display_name) is None
     device_landing.click_proceed_to_setup_button_device_landing_page()
     time.sleep(5)
 
@@ -160,10 +127,7 @@ def test_run_protocol_robot_landing_page(
     assert setup_calibrate.get_deck_calibration().text == "Deck Calibration"
     assert setup_calibrate.get_required_pipettes().text == "Required Pipettes"
     assert setup_calibrate.get_calibration_ready_locator().text == "Calibration Ready"
-    assert (
-        setup_calibrate.get_required_tip_length_calibration().text
-        == "Required Tip Length Calibrations"
-    )
+    assert setup_calibrate.get_required_tip_length_calibration().text == "Required Tip Length Calibrations"
     module_setup = ModuleSetup(driver, console, request.node.nodeid)
     assert module_setup.get_proceed_to_module_setup().is_displayed()
     module_setup.click_proceed_to_module_setup()
@@ -218,18 +182,12 @@ def test_run_protocol_robot_detail_page(
     # this test is against only the dev robot
     robot = next(robot for robot in robots if robot.display_name == Dev.display_name)
     ot_robot = OtRobot(console, robot)
-    console.print(
-        f"Testing against robot {ot_robot.data.display_name}", style="white on blue"
-    )
+    console.print(f"Testing against robot {ot_robot.data.display_name}", style="white on blue")
     assert ot_robot.is_alive(), "is the robot available?"
     if device_landing.get_robot_banner_safe(ot_robot.data.display_name) is None:
-        assert (
-            False
-        ), f"Stopping the test, the robot with name {ot_robot.data.display_name} is not found."
+        raise AssertionError(f"Stopping the test, the robot with name {ot_robot.data.display_name} is not found.")
     if device_landing.get_go_to_run_safe(ot_robot.data.display_name) is not None:
-        assert (
-            False
-        ), f"Stopping the test, the robot with name {ot_robot.data.display_name} has an active run."
+        raise AssertionError(f"Stopping the test, the robot with name {ot_robot.data.display_name} has an active run.")
     device_landing.click_robot_banner(ot_robot.data.display_name)
     # now we are on the device detail page
     # click Run a protocol button to open the slider
@@ -245,10 +203,7 @@ def test_run_protocol_robot_detail_page(
     assert setup_calibrate.get_deck_calibration().text == "Deck Calibration"
     assert setup_calibrate.get_required_pipettes().text == "Required Pipettes"
     assert setup_calibrate.get_calibration_ready_locator().text == "Calibration Ready"
-    assert (
-        setup_calibrate.get_required_tip_length_calibration().text
-        == "Required Tip Length Calibrations"
-    )
+    assert setup_calibrate.get_required_tip_length_calibration().text == "Required Tip Length Calibrations"
     module_setup = ModuleSetup(driver, console, request.node.nodeid)
     assert module_setup.get_proceed_to_module_setup().is_displayed()
     module_setup.click_proceed_to_module_setup()
