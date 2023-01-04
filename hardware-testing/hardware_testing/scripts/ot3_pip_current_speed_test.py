@@ -26,23 +26,7 @@ from hardware_testing.opentrons_api.helpers_ot3 import (
     get_endstop_position_ot3,
 )
 
-MOUNT = OT3Mount.RIGHT
-LOAD = GantryLoad.NONE
 CYCLES = 10
-
-def get_type_and_version(SN):
-    pipette = SN[0:4]
-    pipette = pipette.lower()
-    version = SN[5:7]
-    version = version.lower()
-    version = version[0] + "." + version[1]
-    return pipette.upper(), version
-
-def create_model( mount = "right"):
-    model = asyncio.run_coroutine_threadsafe(robot.read_pipette_model(mount),
-                                hardware._loop).result()
-    print(model)
-    return model
 
 mounts = {"left": "ZB", "right": "AC"}
 Current_list = [0.5, 0.4, 0.25, 0.2, 0.1]
@@ -84,12 +68,24 @@ async def _main(is_simulating: bool) -> None:
             if res == "q":
                 break
 
-            ### READ PIPETTE SN ###
-            SN = api.get_attached_pipette(MOUNT)
+            pip_info = api.get_attached_pipette(MOUNT)
+            pipette_model = pip_info['model']
+            version = pipette_model[-3:]
+            if 'p1000' in pipette_model:
+                if 'single' in pipette_model:
+                    pipette = 'P1KS'
+                    SN = pipette + 'V' + version.replace('.', '')  + pip_info['pipette_id']
+                else:
+                    pipette = 'P1KM'
+                    SN = pipette + 'V' + version.replace('.', '') + pip_info['pipette_id']
+            elif 'p50' in pipette_model:
+                if 'single' in pipette_model:
+                    pipette = 'P50S'
+                    SN = pipette + 'V' + version.replace('.', '')  + pip_info['pipette_id']
+                else:
+                    pipette = 'P50M'
+                    SN = pipette + 'V' + version.replace('.', '') + pip_info['pipette_id']
 
-            pipette, version = get_type_and_version(SN)
-            ### HOW TO CREATE MODEL? ###
-            pipette_model = create_model()
             pip_config = pipette_config.load(pipette_model)
 
             drop_tip_pos = pip_config.drop_tip
@@ -167,12 +163,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--cycles", type=int, default=CYCLES)
-    parser.add_argument("--port", "-p", type=str, required=False, default = "/dev/ttyUSB0")
     parser.add_argument("--mount", "-m", type=str, required=False, default="right")
     args = parser.parse_args()
 
     CYCLES = args.cycles
-    port = args.port
-    mount = args.mount
+    if args.mount == "right":
+        MOUNT = OT3Mount.RIGHT
+    else:
+        MOUNT = OT3Mount.LEFT
 
     asyncio.run(_main(args.simulate))
