@@ -263,7 +263,8 @@ async def find_slot_center_binary(
     plus_x_edge = await find_edge(hcapi, mount, real_pos + EDGES["right"], OT3Axis.X, 1)
     LOG.info(f"Found +x edge at {plus_x_edge}mm")
     real_pos = real_pos._replace(x=plus_x_edge - (CALIBRATION_SQUARE_SIZE * 0.5))
-    # Arc Move
+
+    # Move above Z-axis gauge plunger
     await _arc_move(hcapi, mount, deck_height, position=real_pos + EDGES["left"])
 
     minus_x_edge = await find_edge(
@@ -274,14 +275,16 @@ async def find_slot_center_binary(
     x_center = (plus_x_edge + minus_x_edge) / 2
     x_center_off = x_center - 2
     real_pos = real_pos._replace(x=x_center_off)
-    # Arc Move
+
+    # Move above Z-axis gauge plunger
     await _arc_move(hcapi, mount, deck_height, position=real_pos)
 
     # Find Y bottom/top edges
     plus_y_edge = await find_edge(hcapi, mount, real_pos + EDGES["top"], OT3Axis.Y, 1)
     LOG.info(f"Found +y edge at {plus_y_edge}mm")
     real_pos = real_pos._replace(y=plus_y_edge - (CALIBRATION_SQUARE_SIZE * 0.5))
-    # Arc Move
+
+    # Move above Z-axis gauge plunger
     await _arc_move(hcapi, mount, deck_height, position=real_pos + EDGES["bottom"])
 
     minus_y_edge = await find_edge(
