@@ -581,7 +581,7 @@ class OT3API(
         if isinstance(mount, (top_types.Mount, OT3Mount)):
             axes = [OT3Axis.by_mount(mount)]
         else:
-            axes = [OT3Axis.Z_R, OT3Axis.Z_L]
+            axes = list(OT3Axis.mount_axes())
         await self.home(axes)
 
     async def home_gripper_jaw(self) -> None:
