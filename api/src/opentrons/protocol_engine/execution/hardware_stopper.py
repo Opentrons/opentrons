@@ -10,9 +10,7 @@ from ..errors import PipetteNotAttachedError, HardwareNotSupportedError
 
 from .movement import MovementHandler
 from .pipetting import PipettingHandler
-
 from ...hardware_control.types import OT3Mount
-
 
 log = logging.getLogger(__name__)
 
@@ -55,7 +53,7 @@ class HardwareStopper:
             try:
                 ot3api = ensure_ot3_hardware(hardware_api=self._hardware_api)
                 if (
-                    self._state_store.config.use_virtual_gripper
+                    not self._state_store.config.use_virtual_gripper
                     and ot3api.has_gripper()
                 ):
                     await ot3api.home_z(mount=OT3Mount.GRIPPER)

@@ -27,10 +27,14 @@ describe('MiniCard', () => {
   it('renders the correct style unselectedOptionStyles', () => {
     const { getByText } = render(props)
     const miniCard = getByText('mock mini card')
-    expect(miniCard).toHaveStyle(`background-color: ${COLORS.white}`)
-    expect(miniCard).toHaveStyle(`border: 1px solid ${COLORS.medGreyEnabled}`)
-    expect(miniCard).toHaveStyle(`border-radius: ${BORDERS.radiusSoftCorners}`)
-    expect(miniCard).toHaveStyle(`padding: ${SPACING.spacing3}`)
+    expect(miniCard).toHaveStyle(`background-color: ${String(COLORS.white)}`)
+    expect(miniCard).toHaveStyle(
+      `border: 1px solid ${String(COLORS.medGreyEnabled)}`
+    )
+    expect(miniCard).toHaveStyle(
+      `border-radius: ${String(BORDERS.radiusSoftCorners)}`
+    )
+    expect(miniCard).toHaveStyle(`padding: ${String(SPACING.spacing3)}`)
     expect(miniCard).toHaveStyle(`width: 100%`)
     expect(miniCard).toHaveStyle(`cursor: pointer`)
   })
@@ -39,22 +43,28 @@ describe('MiniCard', () => {
     props.isSelected = true
     const { getByText } = render(props)
     const miniCard = getByText('mock mini card')
-    expect(miniCard).toHaveStyle(`background-color: ${COLORS.lightBlue}`)
-    expect(miniCard).toHaveStyle(`border: 1px solid ${COLORS.blueEnabled}`)
-    expect(miniCard).toHaveStyle(`border-radius: ${BORDERS.radiusSoftCorners}`)
-    expect(miniCard).toHaveStyle(`padding: ${SPACING.spacing3}`)
+    expect(miniCard).toHaveStyle(
+      `background-color: ${String(COLORS.lightBlue)}`
+    )
+    expect(miniCard).toHaveStyle(
+      `border: 1px solid ${String(COLORS.blueEnabled)}`
+    )
+    expect(miniCard).toHaveStyle(
+      `border-radius: ${String(BORDERS.radiusSoftCorners)}`
+    )
+    expect(miniCard).toHaveStyle(`padding: ${String(SPACING.spacing3)}`)
     expect(miniCard).toHaveStyle(`width: 100%`)
     expect(miniCard).toHaveStyle(`cursor: pointer`)
     expect(miniCard).toHaveStyleRule(
       'border',
-      `1px solid ${COLORS.blueEnabled}`,
+      `1px solid ${String(COLORS.blueEnabled)}`,
       {
         modifier: ':hover',
       }
     )
     expect(miniCard).toHaveStyleRule(
       'background-color',
-      `${COLORS.lightBlue}`,
+      `${String(COLORS.lightBlue)}`,
       {
         modifier: ':hover',
       }
@@ -67,23 +77,27 @@ describe('MiniCard', () => {
     const { getByText } = render(props)
     const miniCard = getByText('mock mini card')
     expect(miniCard).toHaveStyle(
-      `background-color: ${COLORS.errorBackgroundLight}`
+      `background-color: ${String(COLORS.errorBackgroundLight)}`
     )
-    expect(miniCard).toHaveStyle(`border: 1px solid ${COLORS.errorEnabled}`)
-    expect(miniCard).toHaveStyle(`border-radius: ${BORDERS.radiusSoftCorners}`)
-    expect(miniCard).toHaveStyle(`padding: ${SPACING.spacing3}`)
+    expect(miniCard).toHaveStyle(
+      `border: 1px solid ${String(COLORS.errorEnabled)}`
+    )
+    expect(miniCard).toHaveStyle(
+      `border-radius: ${String(BORDERS.radiusSoftCorners)}`
+    )
+    expect(miniCard).toHaveStyle(`padding: ${String(SPACING.spacing3)}`)
     expect(miniCard).toHaveStyle(`width: 100%`)
     expect(miniCard).toHaveStyle(`cursor: pointer`)
     expect(miniCard).toHaveStyleRule(
       'border',
-      `1px solid ${COLORS.errorEnabled}`,
+      `1px solid ${String(COLORS.errorEnabled)}`,
       {
         modifier: ':hover',
       }
     )
     expect(miniCard).toHaveStyleRule(
       'background-color',
-      `${COLORS.errorBackgroundLight}`,
+      `${String(COLORS.errorBackgroundLight)}`,
       {
         modifier: ':hover',
       }

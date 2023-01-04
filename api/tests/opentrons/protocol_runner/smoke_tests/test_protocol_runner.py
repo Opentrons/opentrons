@@ -5,8 +5,8 @@ hooked to a simulating HardwareAPI.
 
 Minimal, but valid and complete, protocol files are then loaded from
 disk into the runner, and the protocols are run to completion. From
-there, the ProtocolEngine state is inspected to everything was loaded
-and ran as expected.
+there, the ProtocolEngine state is inspected to check that
+everything was loaded and run as expected.
 """
 import pytest
 
@@ -44,7 +44,7 @@ async def test_runner_with_python(
         directory=None,
     )
 
-    subject = await create_simulating_runner()
+    subject = await create_simulating_runner(robot_type="OT-2 Standard")
     result = await subject.run(protocol_source)
     commands_result = result.commands
     pipettes_result = result.state_summary.pipettes
@@ -100,9 +100,7 @@ async def test_runner_with_python(
     assert expected_command in commands_result
 
 
-async def test_runner_with_json(
-    json_protocol_file: Path, enable_load_liquid: None
-) -> None:
+async def test_runner_with_json(json_protocol_file: Path) -> None:
     """It should run a JSON protocol on the ProtocolRunner."""
     protocol_reader = ProtocolReader()
     protocol_source = await protocol_reader.read_saved(
@@ -110,7 +108,7 @@ async def test_runner_with_json(
         directory=None,
     )
 
-    subject = await create_simulating_runner()
+    subject = await create_simulating_runner(robot_type="OT-2 Standard")
     result = await subject.run(protocol_source)
     commands_result = result.commands
     pipettes_result = result.state_summary.pipettes
@@ -163,7 +161,7 @@ async def test_runner_with_legacy_python(legacy_python_protocol_file: Path) -> N
         directory=None,
     )
 
-    subject = await create_simulating_runner()
+    subject = await create_simulating_runner(robot_type="OT-2 Standard")
     result = await subject.run(protocol_source)
 
     commands_result = result.commands
@@ -218,7 +216,7 @@ async def test_runner_with_legacy_json(legacy_json_protocol_file: Path) -> None:
         directory=None,
     )
 
-    subject = await create_simulating_runner()
+    subject = await create_simulating_runner(robot_type="OT-2 Standard")
     result = await subject.run(protocol_source)
 
     commands_result = result.commands

@@ -1,9 +1,10 @@
 """Test for the ProtocolEngine-based protocol API core."""
-from typing import Optional, Type, cast
+from typing import Optional, Type, cast, Tuple
 
 import pytest
 from decoy import Decoy
 
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import (
     LabwareDefinition as LabwareDefDict,
@@ -11,7 +12,7 @@ from opentrons_shared_data.labware.dev_types import (
 )
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from opentrons.types import Mount, MountType, DeckSlotName
+from opentrons.types import DeckSlotName, Mount, MountType, Point
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.modules import AbstractModule
@@ -28,8 +29,11 @@ from opentrons.protocol_engine import (
     ModuleLocation,
     ModuleDefinition,
     LabwareMovementStrategy,
+    LoadedLabware,
+    LoadedModule,
     LoadedPipette,
     commands,
+    LabwareOffsetVector,
 )
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 
@@ -107,15 +111,31 @@ def test_api_version(
     assert subject.api_version == api_version
 
 
-def test_get_fixed_trash(subject: ProtocolCore) -> None:
+def test_fixed_trash(subject: ProtocolCore) -> None:
     """It should have a single labware core for the fixed trash."""
-    result = subject.get_fixed_trash()
+    result = subject.fixed_trash
 
     assert isinstance(result, LabwareCore)
     assert result.labware_id == "fixed-trash-123"
+    assert subject.get_labware_cores() == [result]
 
     # verify it's the same core every time
-    assert subject.get_fixed_trash() is result
+    assert subject.fixed_trash is result
+
+
+def test_get_slot_item_empty(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: ProtocolCore
+) -> None:
+    """It should return None for an empty deck slot."""
+    decoy.when(
+        mock_engine_client.state.geometry.get_slot_item(
+            slot_name=DeckSlotName.SLOT_1,
+            allowed_labware_ids={"fixed-trash-123"},
+            allowed_module_ids=set(),
+        )
+    ).then_return(None)
+
+    assert subject.get_slot_item(DeckSlotName.SLOT_1) is None
 
 
 def test_load_instrument(
@@ -190,6 +210,19 @@ def test_load_labware(
 
     assert isinstance(result, LabwareCore)
     assert result.labware_id == "abc123"
+    assert subject.get_labware_cores() == [subject.fixed_trash, result]
+
+    decoy.when(
+        mock_engine_client.state.geometry.get_slot_item(
+            slot_name=DeckSlotName.SLOT_5,
+            allowed_labware_ids={"fixed-trash-123", "abc123"},
+            allowed_module_ids=set(),
+        )
+    ).then_return(
+        LoadedLabware.construct(id="abc123")  # type: ignore[call-arg]
+    )
+
+    assert subject.get_slot_item(DeckSlotName.SLOT_5) is result
 
 
 @pytest.mark.parametrize(
@@ -199,6 +232,20 @@ def test_load_labware(
         (False, LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE),
     ],
 )
+@pytest.mark.parametrize(
+    argnames=[
+        "use_pick_up_location_lpc_offset",
+        "use_drop_location_lpc_offset",
+        "pick_up_offset",
+        "drop_offset",
+    ],
+    argvalues=[
+        (False, False, None, None),
+        (True, False, None, None),
+        (False, True, None, (4, 5, 6)),
+        (True, True, (4, 5, 6), (4, 5, 6)),
+    ],
+)
 def test_move_labware(
     decoy: Decoy,
     subject: ProtocolCore,
@@ -206,6 +253,10 @@ def test_move_labware(
     api_version: APIVersion,
     expected_strategy: LabwareMovementStrategy,
     use_gripper: bool,
+    use_pick_up_location_lpc_offset: bool,
+    use_drop_location_lpc_offset: bool,
+    pick_up_offset: Optional[Tuple[float, float, float]],
+    drop_offset: Optional[Tuple[float, float, float]],
 ) -> None:
     """It should issue a move labware command to the engine."""
     decoy.when(
@@ -215,13 +266,25 @@ def test_move_labware(
     )
     labware = LabwareCore(labware_id="labware-id", engine_client=mock_engine_client)
     subject.move_labware(
-        labware_core=labware, new_location=DeckSlotName.SLOT_5, use_gripper=use_gripper
+        labware_core=labware,
+        new_location=DeckSlotName.SLOT_5,
+        use_gripper=use_gripper,
+        use_pick_up_location_lpc_offset=use_pick_up_location_lpc_offset,
+        use_drop_location_lpc_offset=use_drop_location_lpc_offset,
+        pick_up_offset=pick_up_offset,
+        drop_offset=drop_offset,
     )
     decoy.verify(
         mock_engine_client.move_labware(
             labware_id="labware-id",
             new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
             strategy=expected_strategy,
+            use_pick_up_location_lpc_offset=use_pick_up_location_lpc_offset,
+            use_drop_location_lpc_offset=use_drop_location_lpc_offset,
+            pick_up_offset=LabwareOffsetVector(x=4, y=5, z=6)
+            if pick_up_offset
+            else None,
+            drop_offset=LabwareOffsetVector(x=4, y=5, z=6) if drop_offset else None,
         )
     )
 
@@ -374,6 +437,19 @@ def test_load_module(
 
     assert isinstance(result, expected_core_cls)
     assert result.module_id == "abc123"
+    assert subject.get_module_cores() == [result]
+
+    decoy.when(
+        mock_engine_client.state.geometry.get_slot_item(
+            slot_name=DeckSlotName.SLOT_1,
+            allowed_labware_ids={"fixed-trash-123"},
+            allowed_module_ids={"abc123"},
+        )
+    ).then_return(
+        LoadedModule.construct(id="abc123")  # type: ignore[call-arg]
+    )
+
+    assert subject.get_slot_item(DeckSlotName.SLOT_1) is result
 
 
 @pytest.mark.parametrize(
@@ -483,3 +559,85 @@ def test_comment(
     """It should issue a comment command."""
     subject.comment("Hello, world!")
     decoy.verify(mock_engine_client.comment("Hello, world!"))
+
+
+def test_home(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: ProtocolCore,
+) -> None:
+    """It should home all axes."""
+    subject.home()
+    decoy.verify(mock_engine_client.home(axes=None), times=1)
+
+
+def test_is_simulating(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: ProtocolCore,
+) -> None:
+    """It should return if simulating."""
+    decoy.when(mock_engine_client.state.config.ignore_pause).then_return(True)
+    assert subject.is_simulating()
+
+
+def test_set_rail_lights(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: ProtocolCore
+) -> None:
+    """It should verify a call to sync client."""
+    subject.set_rail_lights(on=True)
+    decoy.verify(mock_engine_client.set_rail_lights(on=True))
+
+    subject.set_rail_lights(on=False)
+    decoy.verify(mock_engine_client.set_rail_lights(on=False))
+
+
+def test_get_rail_lights(
+    decoy: Decoy, mock_sync_hardware_api: SyncHardwareAPI, subject: ProtocolCore
+) -> None:
+    """It should get rails light state."""
+    decoy.when(mock_sync_hardware_api.get_lights()).then_return({"rails": True})
+
+    result = subject.get_rail_lights_on()
+    assert result is True
+
+
+def test_get_deck_definition(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: ProtocolCore
+) -> None:
+    """It should return the loaded deck definition from engine state."""
+    deck_definition = cast(DeckDefinitionV3, {"schemaVersion": "3"})
+
+    decoy.when(mock_engine_client.state.labware.get_deck_definition()).then_return(
+        deck_definition
+    )
+
+    result = subject.get_deck_definition()
+
+    assert result == deck_definition
+
+
+def test_get_slot_center(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: ProtocolCore
+) -> None:
+    """It should return a slot center from engine state."""
+    decoy.when(
+        mock_engine_client.state.labware.get_slot_center_position(DeckSlotName.SLOT_2)
+    ).then_return(Point(1, 2, 3))
+
+    result = subject.get_slot_center(DeckSlotName.SLOT_2)
+
+    assert result == Point(1, 2, 3)
+
+
+def test_get_highest_z(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: ProtocolCore
+) -> None:
+    """It should return a slot center from engine state."""
+    decoy.when(
+        mock_engine_client.state.geometry.get_all_labware_highest_z()
+    ).then_return(9001)
+
+    result = subject.get_highest_z()
+
+    assert result == 9001

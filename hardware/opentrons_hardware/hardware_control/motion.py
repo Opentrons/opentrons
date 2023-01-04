@@ -121,6 +121,12 @@ def create_step(
         A Move
     """
     ordered_nodes = sorted(present_nodes, key=lambda node: node.value)
+    # Gripper G cannont process this type of move and this will
+    # result in numerous move set timeouts if the gripper is attached
+    # possible TODO if requested is to also add a move group step that
+    # adds a MoveGroupeSingleGripperStep
+    ordered_nodes = list([n for n in present_nodes if n != NodeId.gripper_g])
+
     step: MoveGroupStep = {}
     for axis_node in ordered_nodes:
         step[axis_node] = MoveGroupSingleAxisStep(
@@ -153,22 +159,21 @@ def create_home_step(
 
 def create_tip_action_step(
     velocity: Dict[NodeId, np.float64],
-    duration: np.float64,
+    distance: Dict[NodeId, np.float64],
     present_nodes: Iterable[NodeId],
     action: PipetteTipActionType,
 ) -> MoveGroupStep:
     """Creates a step for tip handling actions that require motor movement."""
-    ordered_nodes = sorted(present_nodes, key=lambda node: node.value)
     step: MoveGroupStep = {}
     stop_condition = (
         MoveStopCondition.limit_switch
         if action == PipetteTipActionType.drop
         else MoveStopCondition.none
     )
-    for axis_node in ordered_nodes:
+    for axis_node in present_nodes:
         step[axis_node] = MoveGroupTipActionStep(
-            velocity_mm_sec=velocity.get(axis_node, np.float64(0)),
-            duration_sec=duration,
+            velocity_mm_sec=velocity[axis_node],
+            duration_sec=abs(distance[axis_node] / velocity[axis_node]),
             stop_condition=stop_condition,
             action=action,
         )

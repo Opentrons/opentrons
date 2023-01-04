@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import { LEFT } from '@opentrons/shared-data'
+import { LEFT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import {
   mockAttachedPipette,
@@ -25,6 +25,7 @@ describe('AttachProbe', () => {
   let props: React.ComponentProps<typeof AttachProbe>
   beforeEach(() => {
     props = {
+      robotName: 'otie',
       mount: LEFT,
       goBack: jest.fn(),
       proceed: jest.fn(),
@@ -32,16 +33,17 @@ describe('AttachProbe', () => {
         .fn()
         .mockImplementationOnce(() => Promise.resolve()),
       runId: RUN_ID_1,
-      attachedPipette: { left: mockPipette, right: null },
+      attachedPipettes: { left: mockPipette, right: null },
       flowType: FLOWS.CALIBRATE,
       errorMessage: null,
       setShowErrorMessage: jest.fn(),
       isRobotMoving: false,
       isExiting: false,
+      selectedPipette: SINGLE_MOUNT_PIPETTES,
     }
   })
   it('returns the correct information, buttons work as expected', async () => {
-    const { getByText, getByAltText, getByRole } = render(props)
+    const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
     getByText('Attach Calibration Probe')
     getByText(
       'Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
@@ -56,12 +58,8 @@ describe('AttachProbe', () => {
           params: { mount: 'left' },
         },
         {
-          commandType: 'home',
-          params: { axes: ['leftZ'] },
-        },
-        {
-          commandType: 'calibration/moveToLocation',
-          params: { pipetteId: 'abc', location: 'attachOrDetach' },
+          commandType: 'calibration/moveToMaintenancePosition',
+          params: { mount: 'left' },
         },
       ],
       false
@@ -70,7 +68,7 @@ describe('AttachProbe', () => {
       expect(props.proceed).toHaveBeenCalled()
     })
 
-    const backBtn = getByRole('button', { name: 'Go back' })
+    const backBtn = getByLabelText('back')
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()
   })
@@ -83,7 +81,7 @@ describe('AttachProbe', () => {
     const { getByText, getByAltText } = render(props)
     getByText('Stand Back, Pipette is Calibrating')
     getByText(
-      'The calibration probe will touch the sides of the calibration divot in slot 5 to determine its exact position'
+      'The calibration probe will touch the sides of the calibration divot in slot 2 to determine its exact position'
     )
     getByAltText('Pipette is calibrating')
   })

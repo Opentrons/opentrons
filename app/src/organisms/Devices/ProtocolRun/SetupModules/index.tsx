@@ -7,7 +7,6 @@ import {
   SPACING,
   useHoverTooltip,
 } from '@opentrons/components'
-import { useFeatureFlag } from '../../../../redux/config'
 import { useRunHasStarted, useUnmatchedModulesForProtocol } from '../../hooks'
 import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
 import { PrimaryButton } from '../../../../atoms/buttons'
@@ -27,7 +26,6 @@ export const SetupModules = ({
   runId,
 }: SetupModulesProps): JSX.Element => {
   const { t } = useTranslation('protocol_setup')
-  const enableLiquidSetup = useFeatureFlag('enableLiquidSetup')
   const [selectedValue, toggleGroup] = useToggleGroup(
     t('list_view'),
     t('map_view')
@@ -37,29 +35,23 @@ export const SetupModules = ({
   const [targetProps, tooltipProps] = useHoverTooltip()
   return (
     <>
-      {enableLiquidSetup ? (
-        <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing6}>
-          {toggleGroup}
-          {selectedValue === t('list_view') ? (
-            <SetupModulesList robotName={robotName} runId={runId} />
-          ) : (
-            <SetupModulesMap robotName={robotName} runId={runId} />
-          )}
-        </Flex>
-      ) : (
-        <SetupModulesMap robotName={robotName} runId={runId} />
-      )}
+      <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing6}>
+        {toggleGroup}
+        {selectedValue === t('list_view') ? (
+          <SetupModulesList robotName={robotName} runId={runId} />
+        ) : (
+          <SetupModulesMap robotName={robotName} runId={runId} />
+        )}
+      </Flex>
       <Flex justifyContent={JUSTIFY_CENTER}>
         <PrimaryButton
           disabled={missingModuleIds.length > 0 || runHasStarted}
           onClick={expandLabwareSetupStep}
           id="ModuleSetup_proceedToLabwareSetup"
-          padding={`${SPACING.spacing3} ${SPACING.spacing4}`}
+          padding={`${String(SPACING.spacing3)} ${String(SPACING.spacing4)}`}
           {...targetProps}
         >
-          {enableLiquidSetup
-            ? t('proceed_to_labware_setup_prep')
-            : t('proceed_to_labware_setup_step')}
+          {t('proceed_to_labware_setup_prep')}
         </PrimaryButton>
       </Flex>
       {missingModuleIds.length > 0 || runHasStarted ? (

@@ -7,7 +7,7 @@ from copy import deepcopy
 import pytest
 from opentrons.types import Location, Point
 from opentrons.protocols.parse import parse
-from opentrons.protocols.geometry.deck import Deck
+from opentrons.protocol_api.core.protocol_api.deck import Deck
 from opentrons.protocol_api import (
     ProtocolContext,
     InstrumentContext,
@@ -459,6 +459,7 @@ def test_dispatch_json_invalid_command():
         )
 
 
+@pytest.mark.ot2_only
 def test_papi_execute_json_v3(monkeypatch, ctx, get_json_protocol_fixture):
     protocol_data = get_json_protocol_fixture("3", "testAllAtomicSingleV3", False)
     protocol = parse(protocol_data, None)

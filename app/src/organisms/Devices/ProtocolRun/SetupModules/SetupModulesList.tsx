@@ -20,15 +20,17 @@ import {
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
-  TC_MODULE_LOCATION,
+  TC_MODULE_LOCATION_OT2,
+  TC_MODULE_LOCATION_OT3,
 } from '@opentrons/shared-data'
 import { Banner } from '../../../../atoms/Banner'
 import { StyledText } from '../../../../atoms/text'
 import { StatusLabel } from '../../../../atoms/StatusLabel'
-import { UnMatchedModuleWarning } from '../../../ProtocolSetup/RunSetupCard/ModuleSetup/UnMatchedModuleWarning'
-import { MultipleModulesModal } from '../../../ProtocolSetup/RunSetupCard/ModuleSetup/MultipleModulesModal'
+import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
+import { MultipleModulesModal } from './MultipleModulesModal'
 import {
   ModuleRenderInfoForProtocol,
+  useIsOT3,
   useModuleRenderInfoForProtocolById,
   useUnmatchedModulesForProtocol,
 } from '../../hooks'
@@ -55,6 +57,8 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
     missingModuleIds,
     remainingAttachedModules,
   } = useUnmatchedModulesForProtocol(robotName, runId)
+
+  const isOt3 = useIsOT3(robotName)
 
   const [
     showMultipleModulesModal,
@@ -151,7 +155,9 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
           ({ moduleDef, attachedModuleMatch, slotName, moduleId }) => {
             return (
               <ModulesListItem
-                key={`SetupModulesList_${moduleDef.model}_slot_${slotName}`}
+                key={`SetupModulesList_${String(
+                  moduleDef.model
+                )}_slot_${slotName}`}
                 moduleModel={moduleDef.model}
                 displayName={moduleDef.displayName}
                 location={slotName}
@@ -162,6 +168,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
                     ? moduleRenderInfoForProtocolById[moduleId]
                     : null
                 }
+                isOt3={isOt3}
               />
             )
           }
@@ -177,6 +184,7 @@ interface ModulesListItemProps {
   location: string
   attachedModuleMatch: AttachedModule | null
   heaterShakerModuleFromProtocol: ModuleRenderInfoForProtocol | null
+  isOt3: boolean
 }
 
 export const ModulesListItem = ({
@@ -185,6 +193,7 @@ export const ModulesListItem = ({
   location,
   attachedModuleMatch,
   heaterShakerModuleFromProtocol,
+  isOt3,
 }: ModulesListItemProps): JSX.Element => {
   const { t } = useTranslation('protocol_setup')
   const moduleConnectionStatus =
@@ -267,7 +276,9 @@ export const ModulesListItem = ({
           {t('slot_location', {
             slotName:
               getModuleType(moduleModel) === 'thermocyclerModuleType'
-                ? TC_MODULE_LOCATION
+                ? isOt3
+                  ? TC_MODULE_LOCATION_OT3
+                  : TC_MODULE_LOCATION_OT2
                 : location,
           })}
         </StyledText>

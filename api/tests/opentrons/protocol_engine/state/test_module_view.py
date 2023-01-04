@@ -14,6 +14,7 @@ from opentrons.protocol_engine.types import (
     ModuleDefinition,
     ModuleModel,
     ModuleLocation,
+    LabwareOffsetVector,
 )
 from opentrons.protocol_engine.state.modules import (
     ModuleView,
@@ -179,6 +180,121 @@ def test_get_all_modules(
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
         ),
     ]
+
+
+def test_get_properties_by_id(
+    tempdeck_v1_def: ModuleDefinition,
+    tempdeck_v2_def: ModuleDefinition,
+) -> None:
+    """It should return a loaded module's properties by ID."""
+    subject = make_module_view(
+        slot_by_module_id={
+            "module-1": DeckSlotName.SLOT_1,
+            "module-2": DeckSlotName.SLOT_2,
+        },
+        hardware_by_module_id={
+            "module-1": HardwareModule(
+                serial_number="serial-1",
+                definition=tempdeck_v1_def,
+            ),
+            "module-2": HardwareModule(
+                serial_number="serial-2",
+                definition=tempdeck_v2_def,
+            ),
+        },
+    )
+
+    assert subject.get_definition("module-1") == tempdeck_v1_def
+    assert subject.get_dimensions("module-1") == tempdeck_v1_def.dimensions
+    assert subject.get_model("module-1") == ModuleModel.TEMPERATURE_MODULE_V1
+    assert subject.get_serial_number("module-1") == "serial-1"
+    assert subject.get_location("module-1") == DeckSlotLocation(
+        slotName=DeckSlotName.SLOT_1
+    )
+
+    assert subject.get_definition("module-2") == tempdeck_v2_def
+    assert subject.get_dimensions("module-2") == tempdeck_v2_def.dimensions
+    assert subject.get_model("module-2") == ModuleModel.TEMPERATURE_MODULE_V2
+    assert subject.get_serial_number("module-2") == "serial-2"
+    assert subject.get_location("module-2") == DeckSlotLocation(
+        slotName=DeckSlotName.SLOT_2
+    )
+
+    with pytest.raises(errors.ModuleNotLoadedError):
+        subject.get_definition("Not a module ID oh no")
+
+
+@pytest.mark.parametrize(
+    argnames=["module_def", "slot", "expected_offset"],
+    argvalues=[
+        (
+            lazy_fixture("tempdeck_v1_def"),
+            DeckSlotName.SLOT_1,
+            LabwareOffsetVector(x=-0.15, y=-0.15, z=80.09),
+        ),
+        (
+            lazy_fixture("tempdeck_v2_def"),
+            DeckSlotName.SLOT_1,
+            LabwareOffsetVector(x=-1.45, y=-0.15, z=80.09),
+        ),
+        (
+            lazy_fixture("tempdeck_v2_def"),
+            DeckSlotName.SLOT_3,
+            LabwareOffsetVector(x=1.15, y=-0.15, z=80.09),
+        ),
+        (
+            lazy_fixture("magdeck_v1_def"),
+            DeckSlotName.SLOT_1,
+            LabwareOffsetVector(x=0.125, y=-0.125, z=82.25),
+        ),
+        (
+            lazy_fixture("magdeck_v2_def"),
+            DeckSlotName.SLOT_1,
+            LabwareOffsetVector(x=-1.175, y=-0.125, z=82.25),
+        ),
+        (
+            lazy_fixture("magdeck_v2_def"),
+            DeckSlotName.SLOT_3,
+            LabwareOffsetVector(x=1.425, y=-0.125, z=82.25),
+        ),
+        (
+            lazy_fixture("thermocycler_v1_def"),
+            DeckSlotName.SLOT_7,
+            LabwareOffsetVector(x=0, y=82.56, z=97.8),
+        ),
+        (
+            lazy_fixture("thermocycler_v2_def"),
+            DeckSlotName.SLOT_7,
+            LabwareOffsetVector(x=0, y=68.06, z=98.26),
+        ),
+        (
+            lazy_fixture("heater_shaker_v1_def"),
+            DeckSlotName.SLOT_1,
+            LabwareOffsetVector(x=-0.125, y=1.125, z=68.275),
+        ),
+        (
+            lazy_fixture("heater_shaker_v1_def"),
+            DeckSlotName.SLOT_3,
+            LabwareOffsetVector(x=0.125, y=-1.125, z=68.275),
+        ),
+    ],
+)
+def test_get_module_offset(
+    module_def: ModuleDefinition,
+    slot: DeckSlotName,
+    expected_offset: LabwareOffsetVector,
+) -> None:
+    """It should return the correct labware offset for module in specified slot."""
+    subject = make_module_view(
+        slot_by_module_id={"module-id": slot},
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="module-serial",
+                definition=module_def,
+            )
+        },
+    )
+    assert subject.get_module_offset("module-id") == expected_offset
 
 
 def test_get_magnetic_module_substate(
@@ -354,48 +470,6 @@ def test_get_temperature_module_substate(
 
     with pytest.raises(errors.ModuleNotLoadedError):
         subject.get_temperature_module_substate(module_id="nonexistent-module-id")
-
-
-def test_get_properties_by_id(
-    tempdeck_v1_def: ModuleDefinition,
-    tempdeck_v2_def: ModuleDefinition,
-) -> None:
-    """It should return a loaded module's properties by ID."""
-    subject = make_module_view(
-        slot_by_module_id={
-            "module-1": DeckSlotName.SLOT_1,
-            "module-2": DeckSlotName.SLOT_2,
-        },
-        hardware_by_module_id={
-            "module-1": HardwareModule(
-                serial_number="serial-1",
-                definition=tempdeck_v1_def,
-            ),
-            "module-2": HardwareModule(
-                serial_number="serial-2",
-                definition=tempdeck_v2_def,
-            ),
-        },
-    )
-
-    assert subject.get_definition("module-1") == tempdeck_v1_def
-    assert subject.get_dimensions("module-1") == tempdeck_v1_def.dimensions
-    assert subject.get_model("module-1") == ModuleModel.TEMPERATURE_MODULE_V1
-    assert subject.get_serial_number("module-1") == "serial-1"
-    assert subject.get_location("module-1") == DeckSlotLocation(
-        slotName=DeckSlotName.SLOT_1
-    )
-
-    assert subject.get_definition("module-2") == tempdeck_v2_def
-    assert subject.get_dimensions("module-2") == tempdeck_v2_def.dimensions
-    assert subject.get_model("module-2") == ModuleModel.TEMPERATURE_MODULE_V2
-    assert subject.get_serial_number("module-2") == "serial-2"
-    assert subject.get_location("module-2") == DeckSlotLocation(
-        slotName=DeckSlotName.SLOT_2
-    )
-
-    with pytest.raises(errors.ModuleNotLoadedError):
-        subject.get_definition("Not a module ID oh no")
 
 
 def test_get_plate_target_temperature(heater_shaker_v1_def: ModuleDefinition) -> None:
@@ -1393,3 +1467,103 @@ def test_raise_if_labware_in_location(
     )
     with expected_raise:
         subject.raise_if_module_in_location(location=location)
+
+
+def test_get_by_slot() -> None:
+    """It should get the module in a given slot."""
+    subject = make_module_view(
+        slot_by_module_id={
+            "1": DeckSlotName.SLOT_1,
+            "2": DeckSlotName.SLOT_2,
+        },
+        hardware_by_module_id={
+            "1": HardwareModule(
+                serial_number="serial-number-1",
+                definition=ModuleDefinition.construct(  # type: ignore[call-arg]
+                    model=ModuleModel.TEMPERATURE_MODULE_V1
+                ),
+            ),
+            "2": HardwareModule(
+                serial_number="serial-number-2",
+                definition=ModuleDefinition.construct(  # type: ignore[call-arg]
+                    model=ModuleModel.TEMPERATURE_MODULE_V2
+                ),
+            ),
+        },
+    )
+
+    assert subject.get_by_slot(DeckSlotName.SLOT_1, {"1", "2"}) == LoadedModule(
+        id="1",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        model=ModuleModel.TEMPERATURE_MODULE_V1,
+        serialNumber="serial-number-1",
+    )
+    assert subject.get_by_slot(DeckSlotName.SLOT_2, {"1", "2"}) == LoadedModule(
+        id="2",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
+        model=ModuleModel.TEMPERATURE_MODULE_V2,
+        serialNumber="serial-number-2",
+    )
+    assert subject.get_by_slot(DeckSlotName.SLOT_3, {"1", "2"}) is None
+
+
+def test_get_by_slot_prefers_later() -> None:
+    """It should get the module in a slot, preferring later items if locations match."""
+    subject = make_module_view(
+        slot_by_module_id={
+            "1": DeckSlotName.SLOT_1,
+            "1-again": DeckSlotName.SLOT_1,
+        },
+        hardware_by_module_id={
+            "1": HardwareModule(
+                serial_number="serial-number-1",
+                definition=ModuleDefinition.construct(  # type: ignore[call-arg]
+                    model=ModuleModel.TEMPERATURE_MODULE_V1
+                ),
+            ),
+            "1-again": HardwareModule(
+                serial_number="serial-number-1-again",
+                definition=ModuleDefinition.construct(  # type: ignore[call-arg]
+                    model=ModuleModel.TEMPERATURE_MODULE_V1
+                ),
+            ),
+        },
+    )
+
+    assert subject.get_by_slot(DeckSlotName.SLOT_1, {"1", "1-again"}) == LoadedModule(
+        id="1-again",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        model=ModuleModel.TEMPERATURE_MODULE_V1,
+        serialNumber="serial-number-1-again",
+    )
+
+
+def test_get_by_slot_filter_ids() -> None:
+    """It should filter modules by ID in addition to checking the slot."""
+    subject = make_module_view(
+        slot_by_module_id={
+            "1": DeckSlotName.SLOT_1,
+            "1-again": DeckSlotName.SLOT_1,
+        },
+        hardware_by_module_id={
+            "1": HardwareModule(
+                serial_number="serial-number-1",
+                definition=ModuleDefinition.construct(  # type: ignore[call-arg]
+                    model=ModuleModel.TEMPERATURE_MODULE_V1
+                ),
+            ),
+            "1-again": HardwareModule(
+                serial_number="serial-number-1-again",
+                definition=ModuleDefinition.construct(  # type: ignore[call-arg]
+                    model=ModuleModel.TEMPERATURE_MODULE_V1
+                ),
+            ),
+        },
+    )
+
+    assert subject.get_by_slot(DeckSlotName.SLOT_1, {"1"}) == LoadedModule(
+        id="1",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        model=ModuleModel.TEMPERATURE_MODULE_V1,
+        serialNumber="serial-number-1",
+    )

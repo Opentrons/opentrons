@@ -128,7 +128,7 @@ export function CheckboxField(props: CheckboxFieldProps): JSX.Element {
 
   return (
     <label css={OUTER_STYLE}>
-      {props.isIndeterminate ? (
+      {props.isIndeterminate ?? false ? (
         <Flex
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}

@@ -12,8 +12,11 @@ from anyio import Path as AsyncPath
 from opentrons.protocol_reader import ProtocolReader
 from opentrons.protocol_runner import create_simulating_runner
 
+from opentrons_shared_data.robot.dev_types import RobotType
+
 from robot_server.app_state import AppState, AppStateAccessor, get_app_state
 from robot_server.deletion_planner import ProtocolDeletionPlanner
+from robot_server.hardware import get_robot_type
 from robot_server.persistence import get_sql_engine, get_persistence_directory
 
 from .protocol_auto_deleter import ProtocolAutoDeleter
@@ -89,9 +92,10 @@ def get_analysis_store(
 
 async def get_protocol_analyzer(
     analysis_store: AnalysisStore = Depends(get_analysis_store),
+    analysis_robot_type: RobotType = Depends(get_robot_type),
 ) -> ProtocolAnalyzer:
     """Construct a ProtocolAnalyzer for a single request."""
-    protocol_runner = await create_simulating_runner()
+    protocol_runner = await create_simulating_runner(robot_type=analysis_robot_type)
 
     return ProtocolAnalyzer(
         protocol_runner=protocol_runner,

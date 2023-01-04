@@ -31,90 +31,84 @@ Use :py:meth:`.ProtocolContext.load_module` to load a module.  It will return an
          # Load a Temperature Module GEN1 in deck slot 3.
          temperature_module = protocol.load_module('temperature module', 3)
 
-.. note::
-
-    When you load a module in a protocol, you inform the OT-2 that you want the specified module to be present. Even if you do not use the module anywhere else in your protocol, the Opentrons App and the OT-2 will not let your protocol proceed until all modules loaded with ``load_module`` are attached to the OT-2.
+When you load a module in a protocol, you inform the OT-2 that you want the specified module to be present. Even if you don't use the module anywhere else in your protocol, the Opentrons App and the OT-2 won't let you start the protocol run until all loaded modules are connected to the OT-2 and powered on.
 
 .. versionadded:: 2.0
 
 Available Modules
 -----------------
 
-The first parameter to :py:meth:`.ProtocolContext.load_module`, the module's *load name*, specifies the kind of module to load. The table below lists the load names for each kind of module.
+The first parameter of :py:meth:`.ProtocolContext.load_module`, the module's *load name*, specifies the kind of module to load. The table below lists the load names for each kind of module.
 
 Some modules were added to the Protocol API later than others, and some modules have multiple hardware generations (GEN2 modules have a "GEN2" label on the device). Make sure your protocol's metadata specifies a :ref:`Protocol API version <v2-versioning>` high enough to support all the modules you want to use.
 
 .. table::
    :widths: 4 5 2
    
-   +--------------------+-------------------------------+---------------------+
-   | Module             | Load Name                     | Minimum API Version |
-   +====================+===============================+=====================+
-   | Temperature Module | ``temperature module``        | 2.0                 |
-   | GEN1               | or ``tempdeck``               |                     |
-   +--------------------+-------------------------------+---------------------+
-   | Temperature Module | ``temperature module gen2``   | 2.3                 |
-   | GEN2               |                               |                     |
-   +--------------------+-------------------------------+---------------------+
-   | Magnetic Module    | ``magnetic module``           | 2.0                 |
-   | GEN1               | or ``magdeck``                |                     |
-   +--------------------+-------------------------------+---------------------+
-   | Magnetic Module    | ``magnetic module gen2``      | 2.3                 |
-   | GEN2               |                               |                     |
-   +--------------------+-------------------------------+---------------------+
-   | Thermocycler       | ``thermocycler module``       | 2.0                 |
-   | Module GEN1        | or ``thermocycler``           |                     |
-   +--------------------+-------------------------------+---------------------+
-   | Thermocycler       | ``thermocycler module gen2``  | 2.14                |
-   | Module GEN2        | or ``thermocyclerModuleV2``   |                     |
-   +--------------------+-------------------------------+---------------------+
-   | Heater-Shaker      | ``heaterShakerModuleV1``      | 2.13                |
-   | Module             |                               |                     |
-   +--------------------+-------------------------------+---------------------+
+   +--------------------+-------------------------------+---------------------------+
+   | Module             | Load Name                     | Introduced in API Version |
+   +====================+===============================+===========================+
+   | Temperature Module | ``temperature module``        | 2.0                       |
+   | GEN1               | or ``tempdeck``               |                           |
+   +--------------------+-------------------------------+---------------------------+
+   | Temperature Module | ``temperature module gen2``   | 2.3                       |
+   | GEN2               |                               |                           |
+   +--------------------+-------------------------------+---------------------------+
+   | Magnetic Module    | ``magnetic module``           | 2.0                       |
+   | GEN1               | or ``magdeck``                |                           |
+   +--------------------+-------------------------------+---------------------------+
+   | Magnetic Module    | ``magnetic module gen2``      | 2.3                       |
+   | GEN2               |                               |                           |
+   +--------------------+-------------------------------+---------------------------+
+   | Thermocycler       | ``thermocycler module``       | 2.0                       |
+   | Module GEN1        | or ``thermocycler``           |                           |
+   +--------------------+-------------------------------+---------------------------+
+   | Thermocycler       | ``thermocycler module gen2``  | 2.13                      |
+   | Module GEN2        | or ``thermocyclerModuleV2``   |                           |
+   +--------------------+-------------------------------+---------------------------+
+   | Heater-Shaker      | ``heaterShakerModuleV1``      | 2.13                      |
+   | Module             |                               |                           |
+   +--------------------+-------------------------------+---------------------------+
 
-Loading Labware onto Your Module
-================================
+Loading Labware onto a Module
+=============================
 
-Like specifying labware that will be present on the deck of the OT-2, you must specify labware that will be present on the module you have just loaded.
-You do this using ``module.load_labware()``. For instance, to load a Temperature Module and specify an `aluminum block for 2 mL tubes <https://labware.opentrons.com/opentrons_24_aluminumblock_generic_2ml_screwcap?category=aluminumBlock>`_, you would do:
+Like specifying labware that will be placed directly on the deck of the OT-2, you must specify labware that will be present on the module you have just loaded, using ``load_labware()``. For instance, to load an `aluminum block for 2 mL tubes <https://labware.opentrons.com/opentrons_24_aluminumblock_generic_2ml_screwcap?category=aluminumBlock>`_ on top of a Temperature Module:
 
 .. code-block:: python
-    :substitutions:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata = {'apiLevel': '2.3'}
 
     def run(protocol: protocol_api.ProtocolContext):
-         module = protocol.load_module('Temperature Module', slot)
-         my_labware = module.load_labware('opentrons_24_aluminumblock_generic_2ml_screwcap',
-                                          label='Temperature-Controlled Tubes')
-
-See :py:meth:`.MagneticModuleContext.load_labware`, :py:meth:`.TemperatureModuleContext.load_labware`, :py:meth:`.ThermocyclerContext.load_labware`, or :py:meth:`.HeaterShakerContext.load_labware` for more details.
-
-Notice that when you load labware on a module, you don't specify the labware's deck slot.  The labware is loaded on the module, on whichever deck slot the module occupies.
-
+        temp_mod = protocol.load_module("temperature module gen2", 1)
+        temp_labware = temp_mod.load_labware(
+            "opentrons_24_aluminumblock_generic_2ml_screwcap",
+            label="Temperature-Controlled Tubes",
+        )
 
 .. versionadded:: 2.0
+
+Notice that when you load labware on a module, you don't need to specify the labware's deck slot.  The labware is loaded on the module, on whichever deck slot the module occupies.
+
+Any :ref:`v2-custom-labware` added to your Opentrons App is also accessible when loading labware onto a module. You can find and copy its load name by going to its card on the Labware page.
+
+.. versionadded:: 2.1
+
 
 Module and Labware Compatibility
 --------------------------------
 
-It's up to you to make sure that the labware and module you chose make sense together.
-The Protocol API won't stop you from making nonsensical combinations, like a tube rack on a Thermocycler.
+It's up to you to make sure that the labware and modules you load make sense together. The Protocol API won't raise a warning or error if you load a nonsensical combination, like a tube rack on a Thermocycler.
 
-See: `What labware can I use with my modules? <https://support.opentrons.com/en/articles/3540964-what-labware-can-i-use-with-my-modules>`__
+For further information on what combinations are possible, see the support article `What labware can I use with my modules? <https://support.opentrons.com/s/article/What-labware-can-I-use-with-my-modules>`_
 
-Loading Custom Labware Into Your Module
----------------------------------------
 
-Any custom labware added to your Opentrons App (see :ref:`v2-custom-labware`) is accessible when loading labware onto a module.
+Additional Labware Parameters
+-----------------------------
 
-.. versionadded:: 2.1
-
-.. note::
-
-    In API version 2.0, ``module.load_labware()`` only took a ``load_name`` argument. In API version 2.1 (introduced in Robot Software version 3.15.2) or higher you can now specify a label, version, and namespace (though most of the time you won't have to).
+In addition to the mandatory ``load_name`` argument, you can also specify additional parameters. If you specify a ``label``, this name will appear in the Opentrons App and the run log instead of the load name. For labware that has multiple definitions, you can specify ``version`` and ``namespace`` (though most of the time you won't have to). See :py:meth:`.MagneticModuleContext.load_labware`, :py:meth:`.TemperatureModuleContext.load_labware`, :py:meth:`.ThermocyclerContext.load_labware`, or :py:meth:`.HeaterShakerContext.load_labware` for more details.
 
 
 .. _temperature-module:
@@ -123,101 +117,64 @@ Any custom labware added to your Opentrons App (see :ref:`v2-custom-labware`) is
 Using a Temperature Module
 **************************
 
-The Temperature Module acts as both a cooling and heating device. It can control the temperature
-of its deck between 4 °C and 95 °C with a resolution of 1 °C.
+The Temperature Module acts as both a cooling and heating device. It can control the temperature of its deck between 4 °C and 95 °C with a resolution of 1 °C.
 
-Temperature Modules are represented in code by :py:class:`.TemperatureModuleContext` objects.
+The Temperature Module is represented in code by a :py:class:`.TemperatureModuleContext` object, which has methods for setting target temperatures and reading the module's status.
 
-The Temperature Module has the following methods that can be accessed during a protocol. For the purposes of this
-section, assume we have the following already:
+The examples in this section will use a Temperature Module loaded in slot 3:
 
 .. code-block:: python
     :substitutions:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata = {'apiLevel': '2.3'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        temp_mod = protocol.load_module('temperature module', '1')
+        temp_mod = protocol.load_module('temperature module gen2', '3')
         plate = temp_mod.load_labware('corning_96_wellplate_360ul_flat')
-        # The code from the rest of the examples in this section goes here
+
+In order to prevent physical obstruction of other slots, it's best to load the Temperature Module in a slot on the horizontal edges of the deck (1, 4, 7, or 10 on the left or 3, 6, or 9 on the right), with the USB cable and power cord pointing away from the deck.
 
 .. versionadded:: 2.0
 
-Set Temperature
-===============
+Temperature Control
+===================
 
-To set the Temperature Module to 4 °C do the following:
+The primary function of the module is to control the temperature of its deck, using :py:meth:`~.TemperatureModuleContext.set_temperature`, which takes one parameter: ``celsius``. For example, to set the Temperature Module to 4 °C:
 
 .. code-block:: python
 
-    temp_mod.set_temperature(4)
+    temp_mod.set_temperature(celsius=4)
 
-This function will pause your protocol until your target temperature is reached.
+When using ``set_temperature``, your protocol will wait until the target temperature is reached before proceeding to further commands. In other words, you can pipette to or from the Temperature Module when it is holding at a temperature or idle, but not while it is actively changing temperature. Whenever the module reaches its target temperature, it will hold the temperature until you set a different target or call :py:meth:`~.TemperatureModuleContext.deactivate`, which will stop heating or cooling and will turn off the fan.
 
 .. note::
 
-     This is unlike version 1 of the Python API, in which you would have to use the separate function ``wait_for_temperature`` to block protocol execution until the Temperature Module was ready.
+    The OT-2 will not automatically deactivate the Temperature Module at the end of a protocol. If you need to deactivate the module after a protocol is completed or canceled, use the Temperature Module controls on the device detail page in the Opentrons App or run ``deactivate()`` in Jupyter notebook.
 
 .. versionadded:: 2.0
 
-Read the Current Temperature
-============================
+Temperature Status
+==================
 
-You can read the current real-time temperature of the Temperature Module using the :py:obj:`.TemperatureModuleContext.temperature` property:
-
-.. code-block:: python
-
-    temp_mod.temperature
-
-.. versionadded:: 2.0
-
-Read the Target Temperature
-===========================
-
-You can read the current target temperature of the Temperature Module using the :py:obj:`.TemperatureModuleContext.target` property:
+If you need to confirm in software whether the Temperature Module is holding at a temperature or is idle, use the :py:obj:`~.TemperatureModuleContext.status` property:
 
 .. code-block:: python
 
-    temp_mod.target
-
-.. versionadded:: 2.0
-
-Check the Status
-================
-
-The :py:obj:`.TemperatureModuleContext.status` property is a string that is one of  ``'heating'``, ``'cooling'``, ``'holding at target'`` or ``'idle'``.
-
-.. code-block:: python
-
-    temp_mod.status
-
-Deactivate
-==========
-
-This function will stop heating or cooling and will turn off the fan on the Temperature Module.
-
-.. code-block:: python
-
+    temp_mod.set_temperature(celsius=90)
+    temp_mod.status  # 'holding at target'
     temp_mod.deactivate()
-
-.. note::
-
-    You can also deactivate your temperature module through the Opentrons App by
-    clicking on the ``Pipettes & Modules`` tab. Your Temperature Module will automatically
-    deactivate if another protocol is uploaded to the app. Your Temperature Module will
-    *not* deactivate automatically when the protocol ends, is cancelled, or is reset.
-
-After deactivating your Temperature module, you can later call :py:meth:`.TemperatureModuleContext.set_temperature` to heat or cool phase again.
-
+    temp_mod.status  # 'idle'
+    
+If you don't need to use the status value in your code, and you have physical access to the module, you can read its status and temperature from the LED and display on the module.
+    
 .. versionadded:: 2.0
 
 Changes with the GEN2 Temperature Module
 ========================================
 
-The GEN2 Temperature Module has a plastic insulating rim around the plate, and plastic insulating shrouds designed to fit over our aluminum blocks.
-This mitigates an issue where the GEN1 Temperature Module would have trouble cooling to very low temperatures, especially if it shared the deck with a running Thermocycler.
+All methods of :py:class:`.TemperatureModuleContext` work with both the GEN1 and GEN2 Temperature Module. Physically, the GEN2 module has a plastic insulating rim around the plate, and plastic insulating shrouds designed to fit over Opentrons aluminum blocks. This mitigates an issue where the GEN1 module would have trouble cooling to very low temperatures, especially if it shared the deck with a running Thermocycler.
 
 
 .. _magnetic-module:
@@ -226,34 +183,47 @@ This mitigates an issue where the GEN1 Temperature Module would have trouble coo
 Using a Magnetic Module
 ***********************
 
-The Magnetic Module controls a set of permanent magnets which can move vertically. When the magnets are raised or engaged, they induce a magnetic field in the labware on the module. When they are lowered or disengaged, they do not.
+The Magnetic Module controls a set of permanent magnets which can move vertically to induce a magnetic field in the labware loaded on the module.
 
-The Magnetic Module is represented by a :py:class:`.MagneticModuleContext` object.
+The Magnetic Module is represented by a :py:class:`.MagneticModuleContext` object, which has methods for engaging (raising) and disengaging (lowering) its magnets.
 
-For the purposes of this section, assume we have the following already:
+The examples in this section will use a Magnetic Module loaded in slot 6:
 
 .. code-block:: python
     :substitutions:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata = {'apiLevel': '2.3'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        mag_mod = protocol.load_module('magnetic module', '1')
+        mag_mod = protocol.load_module('magnetic module gen2', '6')
         plate = mag_mod.load_labware('nest_96_wellplate_100ul_pcr_full_skirt')
-        # The code from the rest of the examples in this section goes here
 
 .. versionadded:: 2.0
 
+Loading Labware
+===============
+
+Like with all modules, use the Magnetic Module’s :py:meth:`~.MagneticModuleContext.load_labware` method to specify what you will place on the module. The Magnetic Module supports 96-well PCR plates and deep well plates. For the best compatibility, use a labware definition that specifies how far the magnets should move when engaging with the labware. The following plates in the Opentrons Labware Library include this measurement:
+
+- ``biorad_96_wellplate_200ul_pcr``
+- ``nest_96_wellplate_100ul_pcr_full_skirt``
+- ``nest_96_wellplate_2ml_deep``
+- ``thermoscientificnunc_96_wellplate_1300ul``
+- ``thermoscientificnunc_96_wellplate_2000ul``
+- ``usascientific_96_wellplate_2.4ml_deep``
+
+To check whether a custom labware definition specifies this measurement, load the labware and query its :py:attr:`~.Labware.magdeck_engage_height` property. If has a numerical value, the labware is ready for use with the Magnetic Module.
+
 .. _magnetic-module-engage:
 
-Engage
-======
+Engaging and Disengaging
+========================
 
-The :py:meth:`.MagneticModuleContext.engage` function raises the magnets to induce a magnetic field in the labware on top of the Magnetic Module. The height of the magnets can be specified in several different ways, based on internally stored default heights for labware:
+Raising and lowering the module's magnets are done with the  :py:meth:`~.MagneticModuleContext.engage` and :py:meth:`~.MagneticModuleContext.disengage` functions, respectively.
 
-- If neither ``height_from_base``, ``height`` nor ``offset`` is specified **and** the labware is supported on the Magnetic Module, the magnets will raise to a reasonable default height based on the specified labware.
+If your loaded labware is fully compatible with the Magnetic Module, you can call ``engage()`` with no argument:
 
   .. code-block:: python
 
@@ -261,72 +231,44 @@ The :py:meth:`.MagneticModuleContext.engage` function raises the magnets to indu
 
   .. versionadded:: 2.0
 
-- The recommended way to specify the magnets' position is to utilize the ``height_from_base`` parameter, which allows you to raise the height of the magnets relative to the base of the labware.
+This will move the magnets upward to the default height for the labware, which should be close to the bottom of the labware's wells. If your loaded labware doesn't specify a default height, this will raise an ``ExceptionInProtocolError``.
 
-  .. code-block:: python
-
-      mag_mod.engage(height_from_base=13.5)
-
-  A ``mag_mod.engage(height_from_base=0)`` call should move the tops of the magnets to level with base of the labware.
-
-  .. versionadded:: 2.2
+For certain applications, you may want to move the magnets to a different height. The recommended way is to use the ``height_from_base`` parameter, which represents the distance above the base of the labware (its lowest point, where it rests on the module). Setting ``height_from_base=0`` should move the tops of the magnets level with the base of the labware. Alternatively, you can use the ``offset`` parameter, which represents the distance above *or below* the labware's default position (close to the bottom of its wells). Like using ``engage()`` with no argument, this will raise an error if there is no default height for the loaded labware.
 
 .. note::
-    There is a +/- 1 mm variance across magnetic module units, using ``height_from_base=0`` might not be able to get the magnets to completely flush with base of the labware. Please test before carrying out your experiment to ensure the desired engage height for your labware.
+    There is up to 1 mm of manufacturing variance across Magnetic Module units, so observe the exact position and adjust as necessary before running your protocol.
 
-- You can also specify ``height``, which should be a distance from the home position of the magnets.
-
-  .. code-block:: python
-
-      mag_mod.engage(height=18.5)
-
-  .. versionadded:: 2.0
-
-- An ``offset`` can be applied to move the magnets relatively from the default engage height of the labware, **if** the labware is supported on the Magnetic Module.
+Here are some examples of where the magnets will move when using the different parameters in combination with the loaded NEST PCR plate, which specifies a default height of 20 mm:
 
   .. code-block:: python
 
-      mag_mod.engage(offset=-2)
+      mag_mod.engage(height_from_base=13.5)  # 13.5 mm
+      mag_mod.engage(offset=-2)              # 15.5 mm
+
+Note that ``offset`` takes into account the fact that the magnets' home position is measured as −2.5 mm for GEN2 modules.
 
   .. versionadded:: 2.0
+  .. versionchanged:: 2.2
+     Added the ``height_from_base`` parameter.
 
-.. note::
+When you need to retract the magnets back to their home position, call :py:meth:`~.MagneticModuleContext.disengage`. 
 
-    Only certain labwares have defined engage heights for the Magnetic Module. If a labware that does not have a defined engage height is loaded on the Magnetic Module (or if no labware is loaded), then ``height_from_labware`` (since version 2.2) or ``height``, must be specified.
+  .. code-block:: python
+
+      mag_mod.disengage()  # -2.5 mm
 
 .. versionadded:: 2.0
 
-Disengage
-=========
+If at any point you need to check whether the magnets are engaged or not, use the :py:obj:`~.MagneticModuleContext.status` property. This will return either the string ``engaged`` or ``disengaged``, not the exact height of the magnets.
 
-.. code-block:: python
+.. note:: 
 
-   mag_mod.disengage()
-
-The Magnetic Module will disengage when the device is turned on. It will not auto-disengage otherwise unless you call :py:meth:`.MagneticModuleContext.disengage` in your protocol.
-
-.. versionadded:: 2.0
-
-Check the Status
-================
-
-The :py:obj:`.MagneticModuleContext.status` property is a string that is one of ``'engaged'`` or ``'disengaged'``.
-
-.. code-block:: python
-
-    mag_mod.status
+    The OT-2 will not automatically deactivate the Magnetic Module at the end of a protocol. If you need to deactivate the module after a protocol is completed or canceled, use the Magnetic Module controls on the device detail page in the Opentrons App or run ``deactivate()`` in Jupyter notebook.
     
 Changes with the GEN2 Magnetic Module
 =====================================
 
-The GEN2 Magnetic Module uses smaller magnets than the GEN1 version.
-This mitigates an issue where beads would be attracted even when the magnets were retracted.
-
-This means it will take longer for the GEN2 module to attract beads. If you need additional strength for your application, use the available `Adapter Magnets <https://support.opentrons.com/s/article/Adapter-magnets>`_.
-
-Recommended Magnetic Module GEN2 bead attraction time:
-    - Total liquid volume <= 50 uL: 5 minutes
-    - Total liquid volume > 50 uL: 7 minutes
+The GEN2 Magnetic Module uses smaller magnets than the GEN1 version to mitigate an issue with the magnets attracting beads even from their retracted position. This means it takes longer for the GEN2 module to attract beads. The recommended attraction time is 5 minutes for liquid volumes up to 50 µL and 7 minutes for volumes greater than 50 µL. If your application needs additional magnetic strength to attract beads within  these timeframes, use the available `Adapter Magnets <https://support.opentrons.com/s/article/Adapter-magnets>`_.
 
 
 .. _thermocycler-module:
@@ -336,7 +278,7 @@ Using a Thermocycler Module
 ***************************
 
 
-The Thermocycler Module provides on-deck, fully automated thermocycling and can heat and cool very quickly during operation. The module's block can heat and cool between 4 °C and 99 °C, and the module's lid can heat up to 110 °C.
+The Thermocycler Module provides on-deck, fully automated thermocycling and can heat and cool very quickly during operation. The module's block can heat and cool between 4 and 99 °C, and the module's lid can heat up to 110 °C.
 
 The Thermocycler is represented in code by a :py:class:`.ThermocyclerContext` object, which has methods for controlling the lid, controlling the block, and setting *profiles* — timed heating and cooling routines that can be automatically repeated. 
 
@@ -347,7 +289,7 @@ The examples in this section will use a Thermocycler loaded as follows:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.14'}
+    metadata = {'apiLevel': '2.13'}
 
     def run(protocol: protocol_api.ProtocolContext):
         tc_mod = protocol.load_module('thermocyclerModuleV2')
@@ -360,8 +302,6 @@ The ``location`` parameter of :py:meth:`.load_module` isn't required for the The
     If you want to specify a slot for the Thermocycler (for parallelism with other ``load_module()`` calls in your protocol), you can do so: the only accepted value is ``7``.
 
 .. versionadded:: 2.0
-.. versionchanged:: 2.14
-   Added support for Thermocycler Module GEN2.
 
 
 Lid Control
@@ -375,7 +315,7 @@ You can also control the temperature of the lid. Acceptable target temperatures 
 
 .. code-block:: python
 
-    tc_mod.set_lid_temperature(50)
+    tc_mod.set_lid_temperature(temperature=50)
 
 The protocol will only proceed once the lid temperature reaches 50 °C. This is the case whether the previous temperature was lower than 50 °C (in which case the lid will actively heat) or higher than 50 °C (in which case the lid will passively cool).
 
@@ -488,9 +428,7 @@ However, this code would generate 60 lines in the protocol's run log, while exec
 Changes with the GEN2 Thermocycler Module
 =========================================
 
-All methods of :py:class:`.ThermocyclerContext` work with both the GEN1 and GEN2 Thermocycler. One difference is that the GEN2 module has an automatic plate lift feature. When executing :py:meth:`~.ThermocyclerContext.open_lid`,  the GEN2 module physically moves the loaded plate upward to make it easier to remove the plate from the module.
-
-.. versionchanged: 2.14
+All methods of :py:class:`.ThermocyclerContext` work with both the GEN1 and GEN2 Thermocycler. One practical difference is that the GEN2 module has a plate lift feature to make it easier to remove the plate manually or with a robotic gripper. To activate the plate lift, press the button on the Thermocycler for three seconds while the lid is open. If you need to do this in the middle of a run, call :py:meth:`~.ProtocolContext.pause`, lift and move the plate, and then resume the run from the Opentrons App.
 
 
 .. _heater-shaker-module:

@@ -29,7 +29,6 @@ from opentrons.protocol_engine.state import (
     CurrentWell,
     HardwarePipette,
 )
-from opentrons.protocol_engine.execution import heater_shaker_movement_flagger
 from opentrons.protocol_engine.execution.movement import (
     MovementHandler,
     MoveRelativeData,
@@ -38,21 +37,10 @@ from opentrons.protocol_engine.execution.movement import (
 from opentrons.protocol_engine.execution.thermocycler_movement_flagger import (
     ThermocyclerMovementFlagger,
 )
-
+from opentrons.protocol_engine.execution.heater_shaker_movement_flagger import (
+    HeaterShakerMovementFlagger,
+)
 from .mock_defs import MockPipettes
-
-
-@pytest.fixture(autouse=True)
-def mock_raise_heater_shaker_movement_restriction(
-    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    """Mock out raise heater-shaker movement restriction."""
-    mock_raise = decoy.mock(
-        func=heater_shaker_movement_flagger.raise_if_movement_restricted
-    )
-    monkeypatch.setattr(
-        heater_shaker_movement_flagger, "raise_if_movement_restricted", mock_raise
-    )
 
 
 @pytest.fixture
@@ -82,16 +70,24 @@ def thermocycler_movement_flagger(decoy: Decoy) -> ThermocyclerMovementFlagger:
 
 
 @pytest.fixture
+def heater_shaker_movement_flagger(decoy: Decoy) -> HeaterShakerMovementFlagger:
+    """Get a mock in the shape of a HeaterShakerMovementFlagger."""
+    return decoy.mock(cls=HeaterShakerMovementFlagger)
+
+
+@pytest.fixture
 def subject(
     state_store: StateStore,
     hardware_api: HardwareAPI,
     thermocycler_movement_flagger: ThermocyclerMovementFlagger,
+    heater_shaker_movement_flagger: HeaterShakerMovementFlagger,
 ) -> MovementHandler:
     """Create a PipettingHandler with its dependencies mocked out."""
     return MovementHandler(
         state_store=state_store,
         hardware_api=hardware_api,
         thermocycler_movement_flagger=thermocycler_movement_flagger,
+        heater_shaker_movement_flagger=heater_shaker_movement_flagger,
     )
 
 
@@ -100,6 +96,7 @@ async def test_move_to_well(
     state_store: StateStore,
     hardware_api: HardwareAPI,
     thermocycler_movement_flagger: ThermocyclerMovementFlagger,
+    heater_shaker_movement_flagger: HeaterShakerMovementFlagger,
     mock_hw_pipettes: MockPipettes,
     subject: MovementHandler,
 ) -> None:
@@ -216,6 +213,7 @@ async def test_move_to_well_from_starting_location(
     state_store: StateStore,
     hardware_api: HardwareAPI,
     thermocycler_movement_flagger: ThermocyclerMovementFlagger,
+    heater_shaker_movement_flagger: HeaterShakerMovementFlagger,
     mock_hw_pipettes: MockPipettes,
     subject: MovementHandler,
 ) -> None:
@@ -660,9 +658,54 @@ async def test_home(
         ),
         times=1,
     )
+    decoy.reset()
 
     await subject.home(axes=None)
-    decoy.verify(await hardware_api.home(axes=None), times=1)
+    decoy.verify(await hardware_api.home(), times=1)
+    decoy.reset()
 
     await subject.home(axes=[])
     decoy.verify(await hardware_api.home(axes=[]), times=1)
+
+
+# TODO(mc, 2022-12-01): this is overly complicated
+# https://opentrons.atlassian.net/browse/RET-1287
+async def test_home_z(
+    decoy: Decoy,
+    hardware_api: HardwareAPI,
+    subject: MovementHandler,
+) -> None:
+    """It should home a single Z axis and plunger."""
+    await subject.home(axes=[MotorAxis.LEFT_Z, MotorAxis.LEFT_PLUNGER])
+    decoy.verify(
+        await hardware_api.home_z(Mount.LEFT),
+        await hardware_api.home_plunger(Mount.LEFT),
+    )
+    decoy.reset()
+
+    await subject.home(axes=[MotorAxis.RIGHT_Z, MotorAxis.RIGHT_PLUNGER])
+    decoy.verify(
+        await hardware_api.home_z(Mount.RIGHT),
+        await hardware_api.home_plunger(Mount.RIGHT),
+    )
+    decoy.reset()
+
+    await subject.home(axes=[MotorAxis.LEFT_PLUNGER])
+    decoy.verify(
+        await hardware_api.home_plunger(Mount.LEFT),
+        times=1,
+    )
+    decoy.reset()
+
+    await subject.home(axes=[MotorAxis.RIGHT_PLUNGER])
+    decoy.verify(
+        await hardware_api.home_plunger(Mount.RIGHT),
+        times=1,
+    )
+    decoy.reset()
+
+    await subject.home(axes=[MotorAxis.RIGHT_Z, MotorAxis.LEFT_PLUNGER])
+    decoy.verify(
+        await hardware_api.home([HardwareAxis.A, HardwareAxis.B]),
+        times=1,
+    )

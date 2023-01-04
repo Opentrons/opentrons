@@ -48,7 +48,9 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
         alignItems={ALIGN_CENTER}
         marginTop={SPACING.spacing2}
         marginBottom={SPACING.spacing2}
-        data-testid={`status_label_${status}_${id}`}
+        data-testid={
+          id != null ? `status_label_${status}_${id}` : `status_label_${status}`
+        }
       >
         {showIcon ? (
           <Icon

@@ -19,6 +19,8 @@ from ..types import (
     LabwareMovementStrategy,
     ModuleModel,
     WellLocation,
+    LabwareOffsetVector,
+    MotorAxis,
 )
 from .transports import AbstractSyncTransport
 
@@ -84,16 +86,27 @@ class SyncClient:
 
         return cast(commands.LoadLabwareResult, result)
 
+    # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     def move_labware(
         self,
         labware_id: str,
         new_location: LabwareLocation,
         strategy: LabwareMovementStrategy,
+        use_pick_up_location_lpc_offset: bool,
+        use_drop_location_lpc_offset: bool,
+        pick_up_offset: Optional[LabwareOffsetVector],
+        drop_offset: Optional[LabwareOffsetVector],
     ) -> commands.MoveLabwareResult:
         """Execute a MoveLabware command and return the result."""
         request = commands.MoveLabwareCreate(
             params=commands.MoveLabwareParams(
-                labwareId=labware_id, newLocation=new_location, strategy=strategy
+                labwareId=labware_id,
+                newLocation=new_location,
+                strategy=strategy,
+                usePickUpLocationLpcOffset=use_pick_up_location_lpc_offset,
+                useDropLocationLpcOffset=use_drop_location_lpc_offset,
+                pickUpOffset=pick_up_offset,
+                dropOffset=drop_offset,
             )
         )
         result = self._transport.execute_command(request=request)
@@ -596,3 +609,9 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
         return cast(commands.temperature_module.DeactivateTemperatureResult, result)
+
+    def home(self, axes: Optional[List[MotorAxis]]) -> commands.HomeResult:
+        """Execute a `home` command and return the result."""
+        request = commands.HomeCreate(params=commands.HomeParams(axes=axes))
+        result = self._transport.execute_command(request=request)
+        return cast(commands.HomeResult, result)

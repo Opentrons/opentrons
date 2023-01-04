@@ -23,6 +23,7 @@ export type RobotSettingsTab =
   | 'networking'
   | 'advanced'
   | 'feature-flags'
+  | 'privacy'
 
 export type AppSettingsTab =
   | 'general'
@@ -33,9 +34,9 @@ export type AppSettingsTab =
 export type ProtocolRunDetailsTab = 'setup' | 'module-controls' | 'run-log'
 
 /**
- * route params type definition for the next gen app
+ * desktop app route params type definition
  */
-export interface NavRouteParams {
+export interface DesktopRouteParams {
   appSettingsTab: AppSettingsTab
   robotName: string
   protocolKey: string
@@ -43,5 +44,14 @@ export interface NavRouteParams {
   robotSettingsTab: RobotSettingsTab
   runId: string
   protocolRunDetailsTab: ProtocolRunDetailsTab
+}
+
+/**
+ * on device display app route params type definition
+ */
+export interface OnDeviceRouteParams {
+  protocolId: string
+  runId: string
   ssid: string
+  robotName: string
 }

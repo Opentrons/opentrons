@@ -22,7 +22,8 @@ export function SetupLiquids(props: SetupLiquidsProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const [selectedValue, toggleGroup] = useToggleGroup(
     t('list_view'),
-    t('map_view')
+    t('map_view'),
+    'liquidSetupViewToggle'
   )
   return (
     <Flex
@@ -42,6 +43,7 @@ export function SetupLiquids(props: SetupLiquidsProps): JSX.Element {
           protocolRunHeaderRef={props.protocolRunHeaderRef}
           robotName={props.robotName}
           runId={props.runId}
+          sourceLocation="SetupLiquids"
         />
       </Flex>
     </Flex>

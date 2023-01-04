@@ -16,31 +16,25 @@ import {
   RunTimeCommand,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
-import { useFeatureFlag } from '../../../../redux/config'
-import { ModuleExtraAttention } from '../ModuleExtraAttention'
-import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import {
   useLabwareRenderInfoForRunById,
   useModuleRenderInfoForProtocolById,
   useProtocolDetailsForRun,
-  useRunHasStarted,
 } from '../../hooks'
-import type { ModuleTypesThatRequireExtraAttention } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
+import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
+import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
 import { getLabwareSetupItemGroups } from './utils'
 import { OffDeckLabwareList } from './OffDeckLabwareList'
-import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
 
 interface SetupLabwareMapProps {
   robotName: string
   runId: string
   commands: RunTimeCommand[]
-  extraAttentionModules: ModuleTypesThatRequireExtraAttention[]
 }
 
 export function SetupLabwareMap({
   robotName,
   runId,
-  extraAttentionModules,
   commands,
 }: SetupLabwareMapProps): JSX.Element {
   const moduleRenderInfoById = useModuleRenderInfoForProtocolById(
@@ -49,24 +43,12 @@ export function SetupLabwareMap({
   )
   const { robotType } = useProtocolDetailsForRun(runId)
   const labwareRenderInfoById = useLabwareRenderInfoForRunById(runId)
-  const runHasStarted = useRunHasStarted(runId)
-  const enableLiquidSetup = useFeatureFlag('enableLiquidSetup')
-
   const deckDef = getDeckDefFromRobotType(robotType)
 
   const { offDeckItems } = getLabwareSetupItemGroups(commands)
   return (
     <Flex flex="1" maxHeight="180vh" flexDirection={DIRECTION_COLUMN}>
       <Flex flexDirection={DIRECTION_COLUMN} marginY={SPACING.spacing4}>
-        {!runHasStarted &&
-        !enableLiquidSetup &&
-        extraAttentionModules.length > 0 &&
-        moduleRenderInfoById ? (
-          <ModuleExtraAttention
-            moduleTypes={extraAttentionModules}
-            modulesInfo={moduleRenderInfoById}
-          />
-        ) : null}
         <Box margin="0 auto" maxWidth="46.25rem" width="100%">
           <RobotWorkSpace
             deckDef={deckDef}
@@ -86,7 +68,9 @@ export function SetupLabwareMap({
                     nestedLabwareDisplayName,
                   }) => (
                     <Module
-                      key={`LabwareSetup_Module_${moduleDef.model}_${x}${y}`}
+                      key={`LabwareSetup_Module_${String(
+                        moduleDef.model
+                      )}_${x}${y}`}
                       x={x}
                       y={y}
                       orientation={inferModuleOrientationFromXCoordinate(x)}
@@ -99,7 +83,9 @@ export function SetupLabwareMap({
                     >
                       {nestedLabwareDef != null && nestedLabwareId != null ? (
                         <React.Fragment
-                          key={`LabwareSetup_Labware_${nestedLabwareDef.metadata.displayName}_${x}${y}`}
+                          key={`LabwareSetup_Labware_${String(
+                            nestedLabwareDef.metadata.displayName
+                          )}_${x}${y}`}
                         >
                           <LabwareRender definition={nestedLabwareDef} />
                           <LabwareInfoOverlay
@@ -118,7 +104,9 @@ export function SetupLabwareMap({
                   ({ x, y, labwareDef, displayName }, labwareId) => {
                     return (
                       <React.Fragment
-                        key={`LabwareSetup_Labware_${labwareDef.metadata.displayName}_${x}${y}`}
+                        key={`LabwareSetup_Labware_${String(
+                          labwareDef.metadata.displayName
+                        )}_${x}${y}`}
                       >
                         <g transform={`translate(${x},${y})`}>
                           <LabwareRender definition={labwareDef} />
@@ -137,7 +125,10 @@ export function SetupLabwareMap({
             )}
           </RobotWorkSpace>
         </Box>
-        <OffDeckLabwareList labwareItems={offDeckItems} />
+        <OffDeckLabwareList
+          labwareItems={offDeckItems}
+          isOt3={robotType === 'OT-3 Standard'}
+        />
       </Flex>
     </Flex>
   )

@@ -9,10 +9,7 @@ import { Banner } from '../../../../atoms/Banner'
 import { useDispatchApiRequest } from '../../../../redux/robot-api'
 import { AskForCalibrationBlockModal } from '../../../CalibrateTipLength'
 import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCalibratePipetteOffset'
-import {
-  useDeckCalibrationData,
-  usePipetteOffsetCalibration,
-} from '../../hooks'
+import { useDeckCalibrationData } from '../../hooks'
 import { PipetteOverflowMenu } from '../PipetteOverflowMenu'
 import { AboutPipetteSlideout } from '../AboutPipetteSlideout'
 import { PipetteCard } from '..'
@@ -54,9 +51,6 @@ const mockUseCalibratePipetteOffset = useCalibratePipetteOffset as jest.MockedFu
 >
 const mockAskForCalibrationBlockModal = AskForCalibrationBlockModal as jest.MockedFunction<
   typeof AskForCalibrationBlockModal
->
-const mockUsePipetteOffsetCalibration = usePipetteOffsetCalibration as jest.MockedFunction<
-  typeof usePipetteOffsetCalibration
 >
 const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction<
   typeof useDeckCalibrationData
@@ -115,7 +109,6 @@ describe('PipetteCard', () => {
     when(mockPipetteOverflowMenu).mockReturnValue(
       <div>mock pipette overflow menu</div>
     )
-    when(mockUsePipetteOffsetCalibration).mockReturnValue(null)
     when(mockGetHasCalibrationBlock).mockReturnValue(null)
     when(mockUseCalibratePipetteOffset).mockReturnValue([startWizard, null])
     when(mockAskForCalibrationBlockModal).mockReturnValue(
@@ -138,23 +131,27 @@ describe('PipetteCard', () => {
       robotName: mockRobotName,
       pipetteId: 'id',
       is96ChannelAttached: false,
+      pipetteOffsetCalibration: null,
     })
     getByText('left Mount')
     getByText('Left Pipette')
   })
-  it('renders information for a 96 channel pipette with overflow menu button disabled', () => {
+  it('renders information for a 96 channel pipette with overflow menu button not disabled', () => {
     const { getByText, getByRole } = render({
       pipetteInfo: mockLeftSpecs,
       mount: LEFT,
       robotName: mockRobotName,
       pipetteId: 'id',
       is96ChannelAttached: true,
+      pipetteOffsetCalibration: null,
     })
     getByText('Both Mounts')
     const overflowButton = getByRole('button', {
       name: /overflow/i,
     })
-    expect(overflowButton).toBeDisabled()
+    fireEvent.click(overflowButton)
+    expect(overflowButton).not.toBeDisabled()
+    getByText('mock pipette overflow menu')
   })
   it('renders information for a right pipette', () => {
     const { getByText } = render({
@@ -163,6 +160,7 @@ describe('PipetteCard', () => {
       robotName: mockRobotName,
       pipetteId: 'id',
       is96ChannelAttached: false,
+      pipetteOffsetCalibration: null,
     })
     getByText('right Mount')
     getByText('Right Pipette')
@@ -178,6 +176,7 @@ describe('PipetteCard', () => {
       robotName: mockRobotName,
       pipetteId: 'id',
       is96ChannelAttached: false,
+      pipetteOffsetCalibration: null,
     })
     getByText('right Mount')
     getByText('Right Pipette')
@@ -190,10 +189,39 @@ describe('PipetteCard', () => {
       robotName: mockRobotName,
       pipetteId: 'id',
       is96ChannelAttached: false,
+      pipetteOffsetCalibration: null,
     })
     getByText('right Mount')
     getByText('Right Pipette')
     getByText('mock banner')
+  })
+  it('does not render pipette offset cal banner with a valid calibration', () => {
+    const { getByText, queryByText } = render({
+      pipetteInfo: mockRightSpecs,
+      mount: RIGHT,
+      robotName: mockRobotName,
+      pipetteId: 'id',
+      is96ChannelAttached: false,
+      pipetteOffsetCalibration: {
+        pipette: 'test',
+        mount: RIGHT,
+        offset: [42, 42, 42],
+        tiprack: 'test',
+        tiprackUri: 'test',
+        lastModified: 'test',
+        source: 'user',
+        status: {
+          markedBad: false,
+          source: null,
+          markedAt: null,
+        },
+        id: 'test',
+      },
+    })
+    const calBanner = queryByText('mock banner')
+    getByText('right Mount')
+    getByText('Right Pipette')
+    expect(calBanner).not.toBeInTheDocument()
   })
   it('renders information for a right pipette with bad deck cal banner', () => {
     when(mockUseDeckCalibrationData).calledWith(mockRobotName).mockReturnValue({
@@ -206,6 +234,7 @@ describe('PipetteCard', () => {
       robotName: mockRobotName,
       pipetteId: 'id',
       is96ChannelAttached: false,
+      pipetteOffsetCalibration: null,
     })
     getByText('right Mount')
     getByText('Right Pipette')
@@ -217,6 +246,7 @@ describe('PipetteCard', () => {
       mount: RIGHT,
       robotName: mockRobotName,
       is96ChannelAttached: false,
+      pipetteOffsetCalibration: null,
     })
     getByText('right Mount')
     getByText('Empty')
@@ -227,6 +257,7 @@ describe('PipetteCard', () => {
       mount: LEFT,
       robotName: mockRobotName,
       is96ChannelAttached: false,
+      pipetteOffsetCalibration: null,
     })
     getByText('left Mount')
     getByText('Empty')
@@ -237,6 +268,7 @@ describe('PipetteCard', () => {
       mount: RIGHT,
       robotName: mockRobotName,
       is96ChannelAttached: false,
+      pipetteOffsetCalibration: null,
     })
 
     const overflowButton = getByRole('button', {
@@ -257,6 +289,7 @@ describe('PipetteCard', () => {
       robotName: mockRobotName,
       pipetteId: 'id',
       is96ChannelAttached: false,
+      pipetteOffsetCalibration: null,
     })
     expect(queryByText('mock banner')).toBeNull()
   })

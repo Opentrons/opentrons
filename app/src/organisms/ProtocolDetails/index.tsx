@@ -44,9 +44,9 @@ import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { Modal } from '../../molecules/Modal'
-import { useFeatureFlag } from '../../redux/config'
+import { useTrackEvent } from '../../redux/analytics'
 import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
-import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
+import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
 import {
   getAnalysisStatus,
@@ -240,6 +240,7 @@ interface ProtocolDetailsProps extends StoredProtocolData {}
 export function ProtocolDetails(
   props: ProtocolDetailsProps
 ): JSX.Element | null {
+  const trackEvent = useTrackEvent()
   const { protocolKey, srcFileNames, mostRecentAnalysis, modified } = props
   const { t } = useTranslation(['protocol_details', 'shared'])
   const [currentTab, setCurrentTab] = React.useState<
@@ -251,7 +252,6 @@ export function ProtocolDetails(
     getIsProtocolAnalysisInProgress(state, protocolKey)
   )
   const analysisStatus = getAnalysisStatus(isAnalyzing, mostRecentAnalysis)
-  const liquidSetupEnabled = useFeatureFlag('enableLiquidSetup')
   if (analysisStatus === 'missing') return null
 
   const { left: leftMountPipetteName, right: rightMountPipetteName } =
@@ -319,6 +319,7 @@ export function ProtocolDetails(
     mostRecentAnalysis?.createdAt != null
       ? format(new Date(mostRecentAnalysis.createdAt), 'MMM dd yy HH:mm')
       : t('shared:no_data')
+  const robotType = mostRecentAnalysis?.robotType ?? null
 
   const contentsByTabName = {
     labware: (
@@ -330,6 +331,7 @@ export function ProtocolDetails(
         rightMountPipetteName={rightMountPipetteName}
         requiredModuleDetails={requiredModuleDetails}
         isLoading={analysisStatus === 'loading'}
+        robotType={robotType}
       />
     ),
     liquids: (
@@ -367,6 +369,14 @@ export function ProtocolDetails(
     ),
   }
 
+  const handleRunProtocolButtonClick = (): void => {
+    trackEvent({
+      name: 'proceedToRun',
+      properties: { sourceLocation: 'ProtocolsDetail' },
+    })
+    setShowSlideout(true)
+  }
+
   return (
     <>
       <Portal level="top">
@@ -384,14 +394,14 @@ export function ProtocolDetails(
         padding={SPACING.spacing4}
         width="100%"
       >
-        <ChooseRobotSlideout
+        <ChooseRobotToRunProtocolSlideout
           onCloseClick={() => setShowSlideout(false)}
           showSlideout={showSlideout}
           storedProtocolData={props}
         />
         <Flex
           backgroundColor={COLORS.white}
-          border={`1px solid ${COLORS.medGreyEnabled}`}
+          border={`1px solid ${String(COLORS.medGreyEnabled)}`}
           borderRadius={BORDERS.radiusSoftCorners}
           position={POSITION_RELATIVE}
           flexDirection={DIRECTION_ROW}
@@ -401,7 +411,9 @@ export function ProtocolDetails(
           <Flex
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing4}
-            padding={`${SPACING.spacing4} 0 ${SPACING.spacing4} ${SPACING.spacing4}`}
+            padding={`${String(SPACING.spacing4)} 0 ${String(
+              SPACING.spacing4
+            )} ${String(SPACING.spacing4)}`}
             width="100%"
           >
             {analysisStatus !== 'loading' &&
@@ -466,7 +478,7 @@ export function ProtocolDetails(
                 `}
               >
                 <PrimaryButton
-                  onClick={() => setShowSlideout(true)}
+                  onClick={() => handleRunProtocolButtonClick()}
                   data-testid="ProtocolDetails_runProtocol"
                   disabled={analysisStatus === 'loading'}
                 >
@@ -517,6 +529,7 @@ export function ProtocolDetails(
           >
             <ProtocolOverflowMenu
               handleRunProtocol={() => setShowSlideout(true)}
+              protocolDisplayName={protocolDisplayName}
               protocolKey={protocolKey}
               data-testid="ProtocolDetails_overFlowMenu"
             />
@@ -527,10 +540,10 @@ export function ProtocolDetails(
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
           <Flex
-            flex={`0 0 ${SIZE_5}`}
+            flex={`0 0 ${String(SIZE_5)}`}
             flexDirection={DIRECTION_COLUMN}
             backgroundColor={COLORS.white}
-            border={`1px solid ${COLORS.medGreyEnabled}`}
+            border={`1px solid ${String(COLORS.medGreyEnabled)}`}
             borderRadius={BORDERS.radiusSoftCorners}
             height="100%"
             data-testid="ProtocolDetails_deckMap"
@@ -586,8 +599,7 @@ export function ProtocolDetails(
                   {t('labware')}
                 </StyledText>
               </RoundTab>
-              {liquidSetupEnabled &&
-                mostRecentAnalysis != null &&
+              {mostRecentAnalysis != null &&
                 protocolHasLiquids(mostRecentAnalysis) && (
                   <RoundTab
                     data-testid="ProtocolDetails_liquids"
@@ -607,11 +619,15 @@ export function ProtocolDetails(
               border={BORDERS.lineBorder}
               // remove left upper corner border radius when first tab is active
               borderRadius={`${
-                currentTab === 'robot_config' ? '0' : BORDERS.radiusSoftCorners
-              } ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} ${
+                currentTab === 'robot_config'
+                  ? '0'
+                  : String(BORDERS.radiusSoftCorners)
+              } ${String(BORDERS.radiusSoftCorners)} ${String(
                 BORDERS.radiusSoftCorners
-              }`}
-              padding={`${SPACING.spacing4} ${SPACING.spacing4} 0 ${SPACING.spacing4}`}
+              )} ${String(BORDERS.radiusSoftCorners)}`}
+              padding={`${String(SPACING.spacing4)} ${String(
+                SPACING.spacing4
+              )} 0 ${String(SPACING.spacing4)}`}
             >
               {contentsByTabName[currentTab]}
             </Box>

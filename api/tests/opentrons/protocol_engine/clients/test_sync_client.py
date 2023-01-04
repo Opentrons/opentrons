@@ -26,6 +26,7 @@ from opentrons.protocol_engine.types import (
     WellOrigin,
     WellOffset,
     WellLocation,
+    MotorAxis,
 )
 
 
@@ -887,5 +888,21 @@ def test_temperature_module_wait_for_target_temperature(
     result = subject.temperature_module_wait_for_target_temperature(
         module_id="module-id", celsius=38.7
     )
+
+    assert result == response
+
+
+def test_home(
+    decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
+) -> None:
+    """It should execute a home command."""
+    request = commands.HomeCreate(
+        params=commands.HomeParams(axes=[MotorAxis.X, MotorAxis.Y]),
+    )
+    response = commands.HomeResult()
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.home(axes=[MotorAxis.X, MotorAxis.Y])
 
     assert result == response

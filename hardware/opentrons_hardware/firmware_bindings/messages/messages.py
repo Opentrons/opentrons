@@ -9,6 +9,7 @@ from ..constants import MessageId
 
 MessageDefinition = Union[
     defs.Acknowledgement,
+    defs.ErrorMessage,
     defs.HeartbeatRequest,
     defs.HeartbeatResponse,
     defs.DeviceInfoRequest,
@@ -78,6 +79,8 @@ MessageDefinition = Union[
     defs.PeripheralStatusResponse,
     defs.SetSerialNumber,
     defs.InstrumentInfoRequest,
+    defs.BrushedMotorConfRequest,
+    defs.BrushedMotorConfResponse,
 ]
 
 

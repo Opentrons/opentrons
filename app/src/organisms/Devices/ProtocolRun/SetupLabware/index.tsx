@@ -10,10 +10,11 @@ import {
 import { useFeatureFlag } from '../../../../redux/config'
 import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
 import { PrimaryButton } from '../../../../atoms/buttons'
-import { getModuleTypesThatRequireExtraAttention } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
+import { getModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 import { ReapplyOffsetsModal } from '../../../ReapplyOffsetsModal'
 import { useCurrentRun } from '../../../ProtocolUpload/hooks'
 import {
+  useIsOT3,
   useModuleRenderInfoForProtocolById,
   useProtocolDetailsForRun,
   useStoredProtocolAnalysis,
@@ -21,8 +22,9 @@ import {
 import { ProceedToRunButton } from '../ProceedToRunButton'
 import { SetupLabwareMap } from './SetupLabwareMap'
 import { SetupLabwareList } from './SetupLabwareList'
-import type { StepKey } from '../ProtocolRunSetup'
 import { LaunchLabwarePositionCheck } from './LaunchLabwarePositionCheck'
+
+import type { StepKey } from '../ProtocolRunSetup'
 
 interface SetupLabwareProps {
   protocolRunHeaderRef: React.RefObject<HTMLDivElement> | null
@@ -35,7 +37,6 @@ interface SetupLabwareProps {
 export function SetupLabware(props: SetupLabwareProps): JSX.Element {
   const { robotName, runId, nextStep, expandStep, protocolRunHeaderRef } = props
   const { t } = useTranslation('protocol_setup')
-  const enableLiquidSetup = useFeatureFlag('enableLiquidSetup')
   const { protocolData: robotProtocolAnalysis } = useProtocolDetailsForRun(
     runId
   )
@@ -45,6 +46,7 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
     t('list_view'),
     t('map_view')
   )
+  const isOt3 = useIsOT3(robotName)
   /**
    * This component's usage of the reapply offsets modal can be removed
    * along with the enableManualDeckStateMod feature flag.
@@ -79,30 +81,19 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
         justifyContent={JUSTIFY_CENTER}
         marginTop={SPACING.spacing6}
       >
-        {enableLiquidSetup ? (
-          <>
-            {toggleGroup}
-            {selectedValue === t('list_view') ? (
-              <SetupLabwareList
-                attachedModuleInfo={moduleRenderInfoById}
-                commands={protocolData?.commands ?? []}
-                extraAttentionModules={moduleTypesThatRequireExtraAttention}
-              />
-            ) : (
-              <SetupLabwareMap
-                runId={runId}
-                commands={protocolData?.commands ?? []}
-                robotName={robotName}
-                extraAttentionModules={moduleTypesThatRequireExtraAttention}
-              />
-            )}
-          </>
+        {toggleGroup}
+        {selectedValue === t('list_view') ? (
+          <SetupLabwareList
+            attachedModuleInfo={moduleRenderInfoById}
+            commands={protocolData?.commands ?? []}
+            extraAttentionModules={moduleTypesThatRequireExtraAttention}
+            isOt3={isOt3}
+          />
         ) : (
           <SetupLabwareMap
             runId={runId}
             commands={protocolData?.commands ?? []}
             robotName={robotName}
-            extraAttentionModules={moduleTypesThatRequireExtraAttention}
           />
         )}
         <LaunchLabwarePositionCheck robotName={robotName} runId={runId} />
@@ -113,6 +104,7 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
             protocolRunHeaderRef={protocolRunHeaderRef}
             robotName={robotName}
             runId={runId}
+            sourceLocation="SetupLabware"
           />
         ) : (
           <PrimaryButton onClick={() => expandStep(nextStep)}>

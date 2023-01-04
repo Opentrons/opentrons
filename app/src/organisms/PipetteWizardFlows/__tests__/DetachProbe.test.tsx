@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import { LEFT } from '@opentrons/shared-data'
+import { LEFT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import {
   mockAttachedPipette,
@@ -31,12 +31,14 @@ describe('DetachProbe', () => {
   let props: React.ComponentProps<typeof DetachProbe>
   beforeEach(() => {
     props = {
+      selectedPipette: SINGLE_MOUNT_PIPETTES,
+      robotName: 'otie',
       mount: LEFT,
       goBack: jest.fn(),
       proceed: jest.fn(),
       chainRunCommands: jest.fn(),
       runId: RUN_ID_1,
-      attachedPipette: { left: mockPipette, right: null },
+      attachedPipettes: { left: mockPipette, right: null },
       flowType: FLOWS.CALIBRATE,
       handleCleanUp: jest.fn(),
       errorMessage: null,
@@ -46,7 +48,7 @@ describe('DetachProbe', () => {
     mockInProgressModal.mockReturnValue(<div>mock in progress</div>)
   })
   it('returns the correct information, buttons work as expected', () => {
-    const { getByText, getByAltText, getByRole } = render(props)
+    const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
     getByText('Remove Calibration Probe')
     getByText(
       'Unlatch the calibration probe, remove it from the pipette nozzle, and return it to its storage location.'
@@ -55,7 +57,7 @@ describe('DetachProbe', () => {
     const proceedBtn = getByRole('button', { name: 'Complete calibration' })
     fireEvent.click(proceedBtn)
     expect(props.handleCleanUp).toHaveBeenCalled()
-    const backBtn = getByRole('button', { name: 'Go back' })
+    const backBtn = getByLabelText('back')
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()
   })

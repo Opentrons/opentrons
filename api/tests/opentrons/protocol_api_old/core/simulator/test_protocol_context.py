@@ -30,6 +30,7 @@ def subject(request: pytest.FixtureRequest) -> ProtocolCore:
     return request.param  # type: ignore[attr-defined, no-any-return]
 
 
+@pytest.mark.ot2_only
 def test_replacing_instrument_tip_state(
     subject: ProtocolCore, tip_rack: LabwareCore
 ) -> None:
