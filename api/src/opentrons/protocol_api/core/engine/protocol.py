@@ -29,7 +29,6 @@ from opentrons.protocol_engine import (
     LabwareLocation,
 )
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
-from opentrons.protocol_engine.errors.exceptions import ModuleNotLoadedError
 
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
@@ -381,7 +380,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         """Get Module core for a given module id."""
         try:
             return self._module_cores_by_id[module_id]
-        except ModuleNotLoadedError:
+        except KeyError:
             return None
 
     def get_labware_location(self, labware_core: LabwareCore) -> LabwareLocation:

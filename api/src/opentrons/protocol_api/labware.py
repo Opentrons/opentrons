@@ -333,8 +333,8 @@ class Labware:
     def parent(self) -> Optional[Union[str, ModuleTypes]]:
         """The parent of this labware. Usually a slot name."""
         if isinstance(self._implementation, LabwareImplementation):
-            # Type ignoring because preserve backwards compatibility
-            return self._implementation.get_geometry().parent.labware.object  # type: ignore[no-any-return]
+            # Type ignoring to preserve backwards compatibility
+            return self._implementation.get_geometry().parent.labware.object  # type: ignore
 
         if self._protocol_core is None or self._core_map is None:
             raise APIVersionError(

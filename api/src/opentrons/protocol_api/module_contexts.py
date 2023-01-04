@@ -90,6 +90,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
             "`module.load_labware_object` is an internal, deprecated method."
             " Use `module.load_labware` or `load_labware_by_definition` instead."
         )
+        # Type ignoring to preserve backwards compatibility
         assert (
             labware.parent == self.geometry  # type: ignore[comparison-overlap]
         ), "Labware is not configured with this module as its parent"
