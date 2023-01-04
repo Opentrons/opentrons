@@ -14,6 +14,8 @@ import logging
 from itertools import dropwhile
 from typing import TYPE_CHECKING, Any, List, Dict, Optional, Union, Tuple
 
+from opentrons_shared_data.labware.dev_types import LabwareDefinition, LabwareParameters
+
 from opentrons.types import Location, Point, LocationLabware
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import requires_version, APIVersionError
@@ -34,19 +36,13 @@ from opentrons.protocol_engine import ModuleLocation
 from . import validation
 from .core import well_grid
 from .core.labware import AbstractLabware
-from .core.protocol_api.labware import LabwareImplementation
+from .core.protocol_api.labware import LabwareImplementation as LegacyLabwareCore
 from .core.core_map import LoadedCoreMap
 
 if TYPE_CHECKING:
-    from opentrons.protocols.geometry.module_geometry import (  # noqa: F401
-        ModuleGeometry,
-    )
-    from opentrons_shared_data.labware.dev_types import (
-        LabwareDefinition,
-        LabwareParameters,
-    )
     from .core.common import LabwareCore, WellCore, ProtocolCore
     from .protocol_context import ModuleTypes
+
 
 
 _log = logging.getLogger(__name__)
@@ -332,7 +328,7 @@ class Labware:
     @requires_version(2, 0)
     def parent(self) -> Optional[Union[str, ModuleTypes]]:
         """The parent of this labware. Usually a slot name."""
-        if isinstance(self._implementation, LabwareImplementation):
+        if isinstance(self._implementation, LegacyLabwareCore):
             # Type ignoring to preserve backwards compatibility
             return self._implementation.get_geometry().parent.labware.object  # type: ignore
 
@@ -863,7 +859,7 @@ def load_from_definition(
                       defaults to ``MAX_SUPPORTED_VERSION``.
     """
     return Labware(
-        implementation=LabwareImplementation(
+        implementation=LegacyLabwareCore(
             definition=definition,
             parent=parent,
             label=label,
