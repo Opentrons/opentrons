@@ -1,3 +1,4 @@
+"""Pressure Fixture Driver."""
 from abc import ABC, abstractmethod
 import random
 from serial import Serial  # type: ignore[import]
@@ -8,10 +9,6 @@ from typing_extensions import Final
 FIXTURE_REBOOT_TIME = 2
 FIXTURE_NUM_CHANNELS: Final[int] = 8
 FIXTURE_BAUD_RATE: Final[int] = 115200
-FIXTURE_VID_PID: Final[Tuple] = (
-    0x0483,
-    0xA1AD,
-)
 
 FIXTURE_CMD_TERMINATOR = "\r\n"
 FIXTURE_CMD_GET_VERSION = "VERSION"
@@ -25,7 +22,7 @@ class PressureFixtureBase(ABC):
     def vid_pid(cls) -> Tuple[int, int]:
         """OT3 Pressure Fixture VID:PID."""
         # Check what's the VID and PID for this device
-        return FIXTURE_VID_PID
+        return 0x0483, 0xA1AD
 
     @abstractmethod
     def connect(self) -> None:
@@ -52,6 +49,7 @@ class SimPressureFixture(PressureFixtureBase):
     """Simulating OT3 Pressure Fixture Driver."""
 
     def __init__(self, slot_side: str = "left") -> None:
+        """Simulation of Pressure Fixture."""
         self._slot_side = slot_side
 
     def connect(self) -> None:
@@ -96,7 +94,7 @@ class PressureFixture(PressureFixtureBase):
         self._port.flushInput()
         # NOTE: device might take a few seconds to boot up
         sleep(FIXTURE_REBOOT_TIME)
-        assert self.firmware_version(), f"No version read from device"
+        assert self.firmware_version(), "No version read from device"
 
     def disconnect(self) -> None:
         """Disconnect."""
@@ -109,10 +107,7 @@ class PressureFixture(PressureFixtureBase):
         return self._port.readline().decode("utf-8").strip()
 
     def read_all_pressure_channel(self) -> List[float]:
-        """
-        Reads from all the channels from the fixture
-        Output: []
-        """
+        """Reads from all the channels from the fixture."""
         cmd_str = f"{FIXTURE_CMD_GET_ALL_PRESSURE}{FIXTURE_CMD_TERMINATOR}"
         self._port.write(cmd_str.encode("utf-8"))
         response = self._port.readline().decode("utf-8")

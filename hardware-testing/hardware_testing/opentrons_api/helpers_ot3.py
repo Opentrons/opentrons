@@ -282,9 +282,7 @@ async def home_ot3(api: OT3API, axes: Optional[List[OT3Axis]] = None) -> None:
         )
 
 
-def _get_pipette_from_mount(
-    api: OT3API, mount: OT3Mount
-) -> Union[PipetteOT2, PipetteOT3]:
+def _get_pipette_from_mount(api: OT3API, mount: OT3Mount) -> PipetteOT3:
     pipette = api.hardware_pipettes[mount.to_mount()]
     if pipette is None:
         raise RuntimeError(f"No pipette currently attaced to mount {mount}")
@@ -634,6 +632,7 @@ def set_gripper_offset_ot3(api: OT3API, offset: Point) -> None:
 
 
 def get_slot_size() -> Point:
+    """Get OT3 Slot Size."""
     deck = load_deck("ot3_standard", version=3)
     slots = deck["locations"]["orderedSlots"]
     bounding_box = slots[0]["boundingBox"]
@@ -645,6 +644,7 @@ def get_slot_size() -> Point:
 
 
 def get_default_tip_length(volume: int) -> float:
+    """Get default tip length for specified volume of tip."""
     return TIP_LENGTH_LOOKUP[volume]
 
 
@@ -683,11 +683,13 @@ def get_slot_calibration_square_position_ot3(slot: int) -> Point:
 
 
 def get_pipette_serial_ot3(pipette: Union[PipetteOT2, PipetteOT3]) -> str:
+    """Get pipette serial number."""
     model = pipette.model
     volume = model.split("_")[0].replace("p", "")
     volume = "1K" if volume == "1000" else volume
     channels = "S" if "single" in model else "M"
     version = model.split("v")[-1].strip().replace(".", "")
+    assert pipette.pipette_id, f"no pipette_id found for pipette: {pipette}"
     if "P" in pipette.pipette_id:
         id = pipette.pipette_id[7:]  # P1KSV33yyyymmddAxx
     else:

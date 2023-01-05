@@ -30,6 +30,8 @@ FIXTURE_LOCATION_A1_RIGHT = FIXTURE_LOCATION_A1_LEFT._replace(x=128 - 14.4)
 
 @dataclass
 class TestConfig:
+    """Test Configurations."""
+
     operator_name: str
     fixture_port: str
     fixture_depth: int
@@ -45,17 +47,25 @@ class TestConfig:
 
 @dataclass
 class LabwareLocations:
+    """Test Labware Locations."""
+
     trash: Optional[Point]
     tip_rack: Optional[Point]
     reservoir: Optional[Point]
     fixture: Optional[Point]
 
 
-IDEAL_LABWARE_LOCATIONS: Optional[LabwareLocations] = None
-CALIBRATED_LABWARE_LOCATIONS: Optional[LabwareLocations] = None
+# start with dummy values, these will be immediately overwritten
+# we start with actual values here to pass linting
+IDEAL_LABWARE_LOCATIONS: LabwareLocations = LabwareLocations(
+    trash=None, tip_rack=None, reservoir=None, fixture=None
+)
+CALIBRATED_LABWARE_LOCATIONS: LabwareLocations = LabwareLocations(
+    trash=None, tip_rack=None, reservoir=None, fixture=None
+)
 
 
-def get_ideal_labware_locations(test_config: TestConfig) -> LabwareLocations:
+def _get_ideal_labware_locations(test_config: TestConfig) -> LabwareLocations:
     tip_rack_loc_ideal = helpers_ot3.get_theoretical_a1_position(
         test_config.slot_tip_rack, f"opentrons_96_tiprack_{test_config.tip_volume}ul"
     )
@@ -84,6 +94,7 @@ async def _calibrate_and_pick_up_tip(
 ) -> None:
     if not CALIBRATED_LABWARE_LOCATIONS.tip_rack:
         print("calibrate the tip-rack location")
+        assert IDEAL_LABWARE_LOCATIONS.tip_rack
         await helpers_ot3.move_to_arched_ot3(
             api, mount, IDEAL_LABWARE_LOCATIONS.tip_rack + Point(z=10)
         )
@@ -100,6 +111,7 @@ async def _calibrate_and_pick_up_tip(
 
 async def _calibrate_and_move_to_liquid(api: OT3API, mount: OT3Mount) -> None:
     if not CALIBRATED_LABWARE_LOCATIONS.reservoir:
+        assert IDEAL_LABWARE_LOCATIONS.reservoir
         await helpers_ot3.move_to_arched_ot3(
             api, mount, IDEAL_LABWARE_LOCATIONS.reservoir + Point(z=10)
         )
@@ -115,6 +127,7 @@ async def _calibrate_and_move_to_liquid(api: OT3API, mount: OT3Mount) -> None:
 
 async def _calibrate_and_move_to_fixture(api: OT3API, mount: OT3Mount) -> None:
     if not CALIBRATED_LABWARE_LOCATIONS.fixture:
+        assert IDEAL_LABWARE_LOCATIONS.fixture
         await helpers_ot3.move_to_arched_ot3(
             api, mount, IDEAL_LABWARE_LOCATIONS.fixture + Point(z=10)
         )
@@ -177,6 +190,7 @@ async def _fixture_check_for_leak(
 
 
 async def _drop_tip_in_trash(api: OT3API, mount: OT3Mount) -> None:
+    assert IDEAL_LABWARE_LOCATIONS.trash
     await helpers_ot3.move_to_arched_ot3(
         api,
         mount,
@@ -232,18 +246,18 @@ async def _main(simulate: bool, mount: OT3Mount, test_config: TestConfig) -> Non
     print(f"Pipette: {pipette_sn}")
 
     # setup our labware locations
-    IDEAL_LABWARE_LOCATIONS = get_ideal_labware_locations(test_config)
+    IDEAL_LABWARE_LOCATIONS = _get_ideal_labware_locations(test_config)
     CALIBRATED_LABWARE_LOCATIONS = LabwareLocations(
         trash=None, tip_rack=None, reservoir=None, fixture=None
     )
 
     # connect to the pressure fixture
-    if simulate:
-        fixture = SimPressureFixture()
-    else:
+    if not simulate:
         fixture = PressureFixture.create(
             port=test_config.fixture_port, slot_side=test_config.fixture_side
         )
+    else:
+        fixture = SimPressureFixture()  # type: ignore[assignment]
     fixture.connect()
 
     # create the CSV file, using the Pipette serial number as the tag
@@ -275,12 +289,12 @@ async def _main(simulate: bool, mount: OT3Mount, test_config: TestConfig) -> Non
     await api.home()
     for tip in tips_liquid:
         test_passed = await _test_for_leak_by_eye(api, mount, test_config, tip)
-        _append_csv_data([f"droplet-test", tip, "PASS" if test_passed else "FAIL"])
+        _append_csv_data(["droplet-test", tip, "PASS" if test_passed else "FAIL"])
     for tip in tips_fixture:
         test_passed = await _test_for_leak(
             api, mount, test_config, tip, fixture=fixture, write_cb=_append_csv_data
         )
-        _append_csv_data([f"pressure-test", tip, "PASS" if test_passed else "FAIL"])
+        _append_csv_data(["pressure-test", tip, "PASS" if test_passed else "FAIL"])
     await api.home()
 
 
