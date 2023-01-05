@@ -17,14 +17,10 @@ from opentrons.hardware_control.modules.types import ModuleType
 from opentrons.protocols.api_support.constants import deck_type
 from opentrons.protocols.api_support.labware_like import LabwareLike
 
-from opentrons.protocols.geometry.module_geometry import (
-    ModuleGeometry,
-    ThermocyclerGeometry,
-)
-
 from ...deck import CalibrationPosition
 from ...labware import load as load_lw, Labware
 from .labware import LabwareImplementation
+from .module_geometry import ModuleGeometry, ThermocyclerGeometry
 from . import deck_conflict
 
 _log = logging.getLogger(__name__)

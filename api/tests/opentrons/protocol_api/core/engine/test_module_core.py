@@ -10,7 +10,6 @@ from opentrons.protocol_engine.types import ModuleModel
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api.core.engine.module_core import ModuleCore
-from opentrons.protocol_api.core.engine.labware import LabwareCore
 from opentrons.types import DeckSlotName
 
 
@@ -48,9 +47,7 @@ def subject(
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 3)])
-def test_api_version(
-    decoy: Decoy, subject: ModuleCore, api_version: APIVersion
-) -> None:
+def test_api_version(subject: ModuleCore, api_version: APIVersion) -> None:
     """Should return the api_version property."""
     assert subject.api_version == api_version
 
@@ -64,19 +61,6 @@ def test_get_deck_slot(
     )
 
     assert subject.get_deck_slot() == DeckSlotName.SLOT_1
-
-
-def test_add_labware_core(
-    decoy: Decoy, subject: ModuleCore, api_version: APIVersion
-) -> None:
-    """Should return a Labware object."""
-    labware_core = decoy.mock(cls=LabwareCore)
-
-    decoy.when(labware_core.get_well_columns()).then_return([])
-
-    result = subject.add_labware_core(labware_core=labware_core)
-
-    assert result.api_version == api_version
 
 
 def test_get_model(

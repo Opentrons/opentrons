@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Generic, List, Optional, TypeVar, ClassVar
+from typing import List, Optional, TypeVar, ClassVar
 
 from opentrons.drivers.types import (
     HeaterShakerLabwareLatchStatus,
@@ -16,25 +16,13 @@ from opentrons.hardware_control.modules.types import (
     MagneticStatus,
     SpeedStatus,
 )
-from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.types import DeckSlotName
 
-from .labware import LabwareCoreType
 
-
-if TYPE_CHECKING:
-    from opentrons.protocol_api.labware import Labware
-
-
-class AbstractModuleCore(ABC, Generic[LabwareCoreType]):
+class AbstractModuleCore(ABC):
     """Abstract core module control interface."""
 
     MODULE_TYPE: ClassVar[ModuleType]
-
-    @property
-    @abstractmethod
-    def geometry(self) -> ModuleGeometry:
-        """Get the module's geometry interface."""
 
     @abstractmethod
     def get_model(self) -> ModuleModel:
@@ -48,16 +36,11 @@ class AbstractModuleCore(ABC, Generic[LabwareCoreType]):
     def get_deck_slot(self) -> DeckSlotName:
         """Get the module's deck slot."""
 
-    @abstractmethod
-    # TODO(mc, 2022-10-20): make this a side-effect, not a return
-    def add_labware_core(self, labware_core: LabwareCoreType) -> Labware:
-        """Add a labware to the module."""
+
+ModuleCoreType = TypeVar("ModuleCoreType", bound=AbstractModuleCore)
 
 
-ModuleCoreType = TypeVar("ModuleCoreType", bound=AbstractModuleCore[Any])
-
-
-class AbstractTemperatureModuleCore(AbstractModuleCore[LabwareCoreType]):
+class AbstractTemperatureModuleCore(AbstractModuleCore):
     """Core control interface for an attached Temperature Module."""
 
     MODULE_TYPE: ClassVar = ModuleType.TEMPERATURE
@@ -71,7 +54,7 @@ class AbstractTemperatureModuleCore(AbstractModuleCore[LabwareCoreType]):
         """Wait until the module's target temperature is reached.
 
         Specifying a value for ``celsius`` that is different than
-        the module's current target temperature may beahave unpredictably.
+        the module's current target temperature may behave unpredictably.
         """
 
     @abstractmethod
@@ -91,7 +74,7 @@ class AbstractTemperatureModuleCore(AbstractModuleCore[LabwareCoreType]):
         """Get the module's current temperature status."""
 
 
-class AbstractMagneticModuleCore(AbstractModuleCore[LabwareCoreType]):
+class AbstractMagneticModuleCore(AbstractModuleCore):
     """Core control interface for an attached Magnetic Module."""
 
     ModuleType: ClassVar = ModuleType.MAGNETIC
@@ -136,7 +119,7 @@ class AbstractMagneticModuleCore(AbstractModuleCore[LabwareCoreType]):
         """Get the module's current magnet status."""
 
 
-class AbstractThermocyclerCore(AbstractModuleCore[LabwareCoreType]):
+class AbstractThermocyclerCore(AbstractModuleCore):
     """Core control interface for an attached Thermocycler Module."""
 
     MODULE_TYPE: ClassVar = ModuleType.THERMOCYCLER
@@ -274,7 +257,7 @@ class AbstractThermocyclerCore(AbstractModuleCore[LabwareCoreType]):
         """Get the index of the current step within the current cycle."""
 
 
-class AbstractHeaterShakerCore(AbstractModuleCore[LabwareCoreType]):
+class AbstractHeaterShakerCore(AbstractModuleCore):
     """Core control interface for an attached Heater-Shaker Module."""
 
     MODULE_TYPE: ClassVar = ModuleType.HEATER_SHAKER
