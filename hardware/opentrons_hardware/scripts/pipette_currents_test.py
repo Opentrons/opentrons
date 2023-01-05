@@ -6,7 +6,14 @@ import logging
 from logging.config import dictConfig
 from typing import Dict, Tuple
 import subprocess
-
+import argparse
+import asyncio
+from numpy import float64
+import termios
+import sys, tty
+import datetime
+from logging.config import dictConfig
+import subprocess
 from opentrons.config import pipette_config
 
 from opentrons_hardware.drivers.can_bus.build import build_driver
@@ -28,7 +35,11 @@ from opentrons_hardware.hardware_control.motion import (
     MoveStopCondition,
     create_home_step,
 )
-
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    EnableMotorRequest,
+    MotorPositionRequest,
+    InstrumentInfoRequest,
+)
 from opentrons_hardware.hardware_control.limit_switches import get_limit_switches
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
@@ -37,25 +48,27 @@ from opentrons_hardware.drivers.gpio import OT3GPIO
 
 
 Current_dic = {
-    'p1000_single_v3.3':[0.6, 0.5,0.4, 0.3, 0.2,0.15,0.1,0.05],
-    'p50_single_v4.3':[0.6, 0.5,0.4, 0.3, 0.2,0.15,0.1,0.05],
+    'p1000_single_v43':[0.6, 0.5,0.4, 0.3, 0.2,0.15,0.1,0.05],
+    'p50_single_v43':[0.6, 0.5,0.4, 0.3, 0.2,0.15,0.1,0.05],
 
-    'p1000_multi_v3.3':[0.6, 0.5,0.4, 0.3, 0.2,0.15,0.1,0.05],
-    'p50_multi_v3.3':[0.6, 0.5,0.4, 0.3, 0.2,0.15,0.1,0.05]
+    'p1000_multi_v33':[0.6, 0.5,0.4, 0.3, 0.2,0.15,0.1,0.05],
+    'p50_multi_v33':[0.6, 0.5,0.4, 0.3, 0.2,0.15,0.1,0.05]
 }
 Tolerances = {
-    'p1000_single_v3.3':0.4,
-    'p50_single_v4.3':0.4,
-    'p1000_multi_v3.3':0.4,
-    'p50_multi_v3.3':0.4
+    'p1000_single_v43':0.4,
+    'p50_single_v43':0.4,
+    'p1000_multi_v33':0.4,
+    'p50_multi_v33':0.4
 
 }
 
+data_format = "||{0:^12}|{1:^12}|{2:^12}||"
+
 CYCLES = 10
-move_speed = 30
+move_speed = 10
 sus_str = "----_----"
 
-async def set_pipette_current(run_current) -> None:
+async def set_pipette_current(run_current,args) -> None:
 
     currents: Dict[NodeId, Tuple[float, float]] = {}
     currents[NodeId.pipette_left] = (float(0), float(run_current))
@@ -77,6 +90,10 @@ async def home(messenger, node):
         ]
     )
     await home_runner.run(can_messenger = messenger)
+
+def calc_time(distance, speed):
+    time = abs(distance/speed)
+    return time
 
 async def move_to(messenger: CanMessenger, node, distance, velocity):
     move_runner = MoveGroupRunner(
@@ -136,7 +153,7 @@ async def get_pipette_model(messenger: CanMessenger, node):
                 message, arb = await asyncio.wait_for(wc.read(), 1.0)
                 pipette_name = PipetteName(message.payload.name.value).name
                 pipette_version = str(message.payload.model.value)
-                pipette_model = '{}_{}'.format(pipette_name,pipette_version)
+                pipette_model = '{}_v{}'.format(pipette_name,pipette_version)
                 # serial_number = determine_abbreviation(pipette_name) + \
                 #             pipette_version + \
                 #             str(message.payload.serial.value.decode('ascii').rstrip('\x00'))
@@ -148,6 +165,35 @@ async def main() -> None:
     subprocess.run(["systemctl", "stop", "opentrons-robot-server"])
     position = {'pipette': 0}
     node = NodeId.pipette_left
+    parser = argparse.ArgumentParser(
+        description="Pipette ICT TEST SCRIPT"
+    )
+    add_can_args(parser)
+    parser.add_argument(
+        "--plunger_run_current",
+        type=float,
+        help="Active current of the plunger",
+        default=1.0,
+    )
+    parser.add_argument(
+        "--plunger_hold_current",
+        type=float,
+        help="Active current of the plunger",
+        default=0.1,
+    )
+    parser.add_argument(
+        "--speed",
+        type=float,
+        help="The speed with which to move the plunger",
+        default=10.0,
+    )
+
+    parser.add_argument("--limit_switch", action="store_true")
+    parser.add_argument("--jog", action="store_true")
+    parser.add_argument("--read_epprom", action="store_true")
+    parser.add_argument("--home", action="store_true")
+
+    args = parser.parse_args()
     driver = await build_driver(build_settings(args))
     messenger = CanMessenger(driver=driver)
     messenger.start()
@@ -165,18 +211,19 @@ async def main() -> None:
     print('Homed')
     while True:
         try:
-            D = datetime.now().strftime("%Y-%m-%d")
-            T = datetime.now().strftime('%H:%M')
             res = input("\n    Enter 'q' to exit")
             if res == "q":
                 break
-
             results = {}
-            for i in Current_dic[pipette_model]:
+            print(Current_dic)
+            for i in Current_dic[str(pipette_model)]:
                 results["{}A".format(i)] = sus_str
+            for current in Current_dic[str(pipette_model)]:
+                print('-------------------Test Homing--------------------------')
+                await home(messenger, node)
+                print('Homed')
 
-            for current in Current_dic[pipette_model]:
-                await set_pipette_current(current)
+                await set_pipette_current(current,args)
                 print("    Current test current is {}".format(current))
                 print(Current_dic[pipette_model])
                 await move_to(messenger, node, 10, move_speed)
@@ -209,15 +256,6 @@ async def main() -> None:
                     print(data_format.format(i, result, reason))
             except IndexError:
                 pass
-            # with open('{}.csv'.format(D), 'a', newline='') as f:
-            #     writer = csv.writer(f, delimiter=',', quoting=csv.QUOTE_NONE)
-            #     li = []
-            #     for i in results:
-            #         li.append(i)
-            #         li.append(results[i].split("_")[0])
-            #         li.append(results[i].split("_")[1])
-            #     writer.writerow([pipette, "V" + version, SN, D, T] + li)
-
         except:
             pass
 
@@ -225,4 +263,4 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(main()) 
