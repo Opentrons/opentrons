@@ -258,7 +258,7 @@ LOG_CONFIG = {
 
 def main() -> None:
     """Entry point."""
-    dictConfig(LOG_CONFIG)
+    #dictConfig(LOG_CONFIG)
     """
         1. Motor movement - check
         2. Limit switch- check
