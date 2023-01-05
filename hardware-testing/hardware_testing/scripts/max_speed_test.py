@@ -162,14 +162,17 @@ async def _main(is_simulating: bool) -> None:
             initial_accel = SETTINGS[AXIS_MAP[a]].acceleration
             valid_speed = True
             valid_accel = True
-            while(valid_speed and SETTINGS[AXIS_MAP[a]].max_speed < MAX_SPEED):
-                while(valid_accel and SETTINGS[AXIS_MAP[a]].acceleration < MAX_ACCEL):
+            while(SETTINGS[AXIS_MAP[a]].max_speed < MAX_SPEED):
+                while(SETTINGS[AXIS_MAP[a]].acceleration < MAX_ACCEL):
+                    #update the robot settings to use test speed/accel
                     await match_z_settings(a,
                                      SETTINGS[AXIS_MAP[a]].max_speed,
                                      SETTINGS[AXIS_MAP[a]].acceleration)
                     await set_gantry_load_per_axis_settings_ot3(api,
                                                     SETTINGS,
                                                     load=None)
+
+                    #attempt to cycle with the test settings
                     await api.home([AXIS_MAP[a]])
                     move_output_tuple = await _single_axis_move(a,
                                                                 api,
@@ -178,6 +181,7 @@ async def _main(is_simulating: bool) -> None:
                     cycles_completed = move_output_tuple[1]
                     cur_speed = SETTINGS[AXIS_MAP[a]].max_speed
                     cur_accel = SETTINGS[AXIS_MAP[a]].acceleration
+                    #this acceletation setting failed
                     if(abs(run_avg_error) >= 0.1):
                         valid_accel = False
                         if(cur_accel == initial_accel):
@@ -199,9 +203,11 @@ async def _main(is_simulating: bool) -> None:
                                          'acceleration': cur_accel,
                                          'error': run_avg_error,
                                          'cycles': cycles_completed})
-                        SETTINGS[AXIS_MAP[a]].acceleration = cur_accel + 250
 
+                    #increment to the next acceleration
+                    SETTINGS[AXIS_MAP[a]].acceleration = cur_accel + 250
 
+                #increment to the next speed
                 SETTINGS[AXIS_MAP[a]].acceleration = initial_accel
                 valid_accel = True
                 cur_speed = SETTINGS[AXIS_MAP[a]].max_speed
