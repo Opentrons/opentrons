@@ -69,13 +69,13 @@ class ModuleContext(CommandPublisher):
     @requires_version(2, 14)
     def model(self) -> ModuleModel:
         """Get the module's model identifier."""
-        return cast(ModuleModel, self._core.get_model())
+        return cast(ModuleModel, self._core.get_model().value)
 
     @property  # type: ignore[misc]
     @requires_version(2, 14)
     def type(self) -> ModuleType:
         """Get the module's general type identifier."""
-        return cast(ModuleType, self._core.MODULE_TYPE)
+        return cast(ModuleType, self._core.MODULE_TYPE.value)
 
     @property  # type: ignore[misc]
     @requires_version(2, 14)

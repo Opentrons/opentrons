@@ -10,6 +10,7 @@ from opentrons.hardware_control.modules.types import (
     MagneticStatus,
     ThermocyclerStep,
     SpeedStatus,
+    module_model_from_string,
 )
 from opentrons.drivers.types import (
     HeaterShakerLabwareLatchStatus,
@@ -65,7 +66,9 @@ class ModuleCore(AbstractModuleCore):
 
     def get_model(self) -> ModuleModel:
         """Get the module's model identifier."""
-        return self._engine_client.state.modules.get_model(self.module_id).value
+        return module_model_from_string(
+            self._engine_client.state.modules.get_model(self.module_id)
+        )
 
     def get_serial_number(self) -> str:
         """Get the module's unique hardware serial number."""

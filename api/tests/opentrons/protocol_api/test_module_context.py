@@ -6,7 +6,7 @@ from decoy import Decoy
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 
-from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
+from opentrons.hardware_control.modules.types import ModuleType, HeaterShakerModuleModel
 from opentrons.broker import Broker
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, ModuleContext, Labware
@@ -170,7 +170,7 @@ def test_module_model(
 ) -> None:
     """It should get module's model."""
     decoy.when(mock_core.get_model()).then_return(
-        cast(ModuleModel, "heaterShakerModuleV1")
+        HeaterShakerModuleModel("heaterShakerModuleV1")
     )
     result = subject.model
     assert result == "heaterShakerModuleV1"
@@ -182,9 +182,7 @@ def test_module_type(
     subject: ModuleContext,
 ) -> None:
     """It should get module's type."""
-    decoy.when(mock_core.MODULE_TYPE).then_return(
-        cast(ModuleType, "heaterShakerModuleType")
-    )
+    decoy.when(mock_core.MODULE_TYPE).then_return(ModuleType("heaterShakerModuleType"))
     result = subject.type
     assert result == "heaterShakerModuleType"
 

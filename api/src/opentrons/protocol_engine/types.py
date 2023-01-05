@@ -12,7 +12,6 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType, DeckSlotName
 from opentrons.hardware_control.modules import (
     ModuleType as ModuleType,
-    ModuleModel as HwModuleModel,
 )
 
 from opentrons_shared_data.pipette.dev_types import (  # noqa: F401
@@ -149,8 +148,6 @@ class MotorAxis(str, Enum):
 # TODO(mc, 2022-01-18): use opentrons_shared_data.module.dev_types.ModuleModel
 class ModuleModel(str, Enum):
     """All available modules' models."""
-
-    value: HwModuleModel
 
     TEMPERATURE_MODULE_V1 = "temperatureModuleV1"
     TEMPERATURE_MODULE_V2 = "temperatureModuleV2"
