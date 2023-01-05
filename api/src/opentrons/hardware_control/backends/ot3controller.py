@@ -677,16 +677,6 @@ class OT3Controller:
         while can_watch and (not self._event_watcher.closed):
             await self._handle_watch_event()
 
-    def get_slot_center_pos(self, slot_num: int) -> OT3AxisMap[float]:
-        """Return the slot center."""
-        slot_width = self.axis_bounds[OT3Axis.X][1] / 3
-        slot_depth = self.axis_bounds[OT3Axis.Y][1] / 4
-
-        centers_x = [slot_width * 2.5, slot_width * 0.5, slot_width * 1.5]
-        center_y = (math.ceil(slot_num / 3) - 0.5) * slot_depth
-
-        return {OT3Axis.X: centers_x[slot_num % 3], OT3Axis.Y: center_y}
-
     @property
     def axis_bounds(self) -> OT3AxisMap[Tuple[float, float]]:
         """Get the axis bounds."""
