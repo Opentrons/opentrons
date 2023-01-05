@@ -150,6 +150,7 @@ async def test_get_protocols(
         createdAt=created_at_1,
         protocolType=ProtocolType.PYTHON,
         metadata=Metadata(),
+        robotType="OT-2 Standard",
         analysisSummaries=[analysis_1],
         files=[],
         key="dummy-key-111",
@@ -159,6 +160,7 @@ async def test_get_protocols(
         createdAt=created_at_2,
         protocolType=ProtocolType.JSON,
         metadata=Metadata(),
+        robotType="OT-3 Standard",
         analysisSummaries=[analysis_2],
         files=[],
         key="dummy-key-222",
@@ -224,6 +226,7 @@ async def test_get_protocol_by_id(
         createdAt=datetime(year=2021, month=1, day=1),
         protocolType=ProtocolType.PYTHON,
         metadata=Metadata(),
+        robotType="OT-2 Standard",
         analysisSummaries=[analysis_summary],
         files=[],
         key="dummy-key-111",
@@ -313,6 +316,7 @@ async def test_create_protocol(
         protocol_analyzer=protocol_analyzer,
         task_runner=task_runner,
         protocol_auto_deleter=protocol_auto_deleter,
+        robot_type="OT-2 Standard",
         protocol_id="protocol-id",
         analysis_id="analysis-id",
         created_at=datetime(year=2021, month=1, day=1),
@@ -323,6 +327,7 @@ async def test_create_protocol(
         createdAt=datetime(year=2021, month=1, day=1),
         protocolType=ProtocolType.JSON,
         metadata=Metadata(this_is_fake_metadata=True),  # type: ignore[call-arg]
+        robotType="OT-2 Standard",
         analysisSummaries=[pending_analysis],
         files=[ProtocolFile(name="foo.json", role=ProtocolFileRole.MAIN)],
         key="dummy-key-111",
@@ -344,7 +349,7 @@ async def test_create_protocol_not_readable(
     decoy: Decoy,
     protocol_reader: ProtocolReader,
 ) -> None:
-    """It should 400 if the protocol is rejected by the pre-analyzer."""
+    """It should 422 if the protocol is rejected by the pre-analyzer."""
     decoy.when(
         await protocol_reader.read_and_save(
             directory=matchers.Anything(),
@@ -361,7 +366,46 @@ async def test_create_protocol_not_readable(
         )
 
     assert exc_info.value.status_code == 422
+    assert exc_info.value.content["errors"][0]["id"] == "ProtocolFilesInvalid"
     assert exc_info.value.content["errors"][0]["detail"] == "oh no"
+
+
+async def test_create_protocol_different_robot_type(
+    decoy: Decoy, protocol_reader: ProtocolReader
+) -> None:
+    """It should 422 if the protocol's robot type doesn't match the server's."""
+    decoy.when(
+        await protocol_reader.read_and_save(
+            directory=matchers.Anything(),
+            files=matchers.Anything(),
+        )
+    ).then_return(
+        ProtocolSource(
+            directory=Path("/dev/null"),
+            main_file=Path("/dev/null/foo.json"),
+            files=[
+                ProtocolSourceFile(
+                    path=Path("/dev/null/foo.json"),
+                    role=ProtocolFileRole.MAIN,
+                )
+            ],
+            metadata={},
+            robot_type="OT-2 Standard",
+            config=JsonProtocolConfig(schema_version=123),
+            labware_definitions=[],
+        )
+    )
+
+    with pytest.raises(ApiError) as exc_info:
+        await create_protocol(
+            files=[],
+            protocol_directory=Path("/dev/null"),
+            protocol_reader=protocol_reader,
+            protocol_id="protocol-id",
+        )
+
+    assert exc_info.value.status_code == 422
+    assert exc_info.value.content["errors"][0]["id"] == "ProtocolRobotTypeMismatch"
 
 
 async def test_delete_protocol_by_id(

@@ -29,8 +29,12 @@ export function InstructionStep(props: Props): JSX.Element {
 
   const display =
     displayCategory === 'GEN2'
-      ? require(`../../assets/images/change-pip/${direction}-${mount}-${channelsKey}-GEN2-${diagram}@3x.png`)
-      : require(`../../assets/images/change-pip/${direction}-${mount}-${channelsKey}-${diagram}@3x.png`)
+      ? require(`../../assets/images/change-pip/${direction}-${String(
+          mount
+        )}-${channelsKey}-GEN2-${diagram}@3x.png`)
+      : require(`../../assets/images/change-pip/${direction}-${String(
+          mount
+        )}-${channelsKey}-${diagram}@3x.png`)
 
   return (
     <Flex justifyContent={JUSTIFY_SPACE_EVENLY}>
@@ -46,7 +50,9 @@ export function InstructionStep(props: Props): JSX.Element {
           src={display}
           height={diagram === 'tab' ? '100%' : '245px'}
           width={diagram === 'tab' ? '240px' : '200px'}
-          alt={`${direction}-${mount}-${channelsKey}-${displayCategory}-${diagram}`}
+          alt={`${direction}-${String(mount)}-${channelsKey}-${String(
+            displayCategory
+          )}-${diagram}`}
         />
       </Box>
     </Flex>

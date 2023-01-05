@@ -111,7 +111,7 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
           <Btn onClick={back} disabled={backIsDisabled} aria-label="back">
             <StyledText
               css={
-                backIsDisabled
+                backIsDisabled ?? false
                   ? GO_BACK_BUTTON_DISABLED_STYLE
                   : GO_BACK_BUTTON_STYLE
               }

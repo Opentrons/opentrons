@@ -2,7 +2,6 @@
 import ast
 from dataclasses import dataclass
 from typing import Union
-from typing_extensions import Literal
 
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.parse import (
@@ -12,6 +11,7 @@ from opentrons.protocols.parse import (
 from opentrons.protocols.types import StaticPythonInfo
 from opentrons.protocols.models import JsonProtocol as ProtocolSchemaV5
 from opentrons_shared_data.protocol.models import ProtocolSchemaV6
+from opentrons_shared_data.robot.dev_types import RobotType
 
 from .protocol_source import Metadata, PythonProtocolConfig, JsonProtocolConfig
 from .role_analyzer import RoleAnalysisFile
@@ -22,9 +22,7 @@ class ConfigAnalysis:
     """Protocol config analyzed from main file."""
 
     metadata: Metadata
-    # TODO(mm, 2022-10-21): Make robot_type an enum when we figure out where it should
-    # live.
-    robot_type: Literal["OT-2 Standard", "OT-3 Standard"]
+    robot_type: RobotType
     config: Union[PythonProtocolConfig, JsonProtocolConfig]
 
 
@@ -100,7 +98,7 @@ def _analyze_python(main_file: RoleAnalysisFile) -> ConfigAnalysis:
 
 def _robot_type_from_static_python_info(
     static_python_info: StaticPythonInfo,
-) -> Literal["OT-2 Standard", "OT-3 Standard"]:
+) -> RobotType:
     python_robot_type = (static_python_info.requirements or {}).get("robotType", None)
     if python_robot_type in (None, "OT-2"):
         return "OT-2 Standard"

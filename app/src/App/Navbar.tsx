@@ -20,6 +20,8 @@ import {
 } from '@opentrons/components'
 
 import logoSvg from '../assets/images/logo_nav.svg'
+import logoSvgThree from '../assets/images/logo_nav_three.svg'
+
 import { NAV_BAR_WIDTH } from './constants'
 import { StyledText } from '../atoms/text'
 
@@ -125,7 +127,10 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
         alignItems={ALIGN_FLEX_START}
         alignSelf={ALIGN_STRETCH}
       >
-        <LogoImg src={logoSvg} alt="opentrons logo" />
+        <LogoImg
+          src={_OPENTRONS_PROJECT_ === 'ot3' ? logoSvgThree : logoSvg}
+          alt="opentrons logo"
+        />
         {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
           <NavbarLink key={name} to={navLinkTo as string}>
             <StyledText

@@ -5,7 +5,7 @@ from decoy import Decoy
 from opentrons.hardware_control import SynchronousAdapter
 from opentrons.hardware_control.modules import MagDeck, MagneticStatus
 from opentrons.hardware_control.modules.types import MagneticModuleModel
-from opentrons.protocols.geometry.module_geometry import ModuleGeometry
+from opentrons.protocol_api.core.protocol_api.module_geometry import ModuleGeometry
 
 from opentrons.protocol_api.core.protocol_api.protocol_context import (
     ProtocolContextImplementation,
@@ -25,7 +25,7 @@ def mock_geometry(decoy: Decoy) -> ModuleGeometry:
 @pytest.fixture
 def mock_sync_module_hardware(decoy: Decoy) -> SynchronousAdapter[MagDeck]:
     """Get a mock module hardware control interface."""
-    return decoy.mock(name="SynchronousAdapater[AbstractModule]")  # type: ignore[no-any-return]
+    return decoy.mock(name="SynchronousAdapter[AbstractModule]")  # type: ignore[no-any-return]
 
 
 @pytest.fixture

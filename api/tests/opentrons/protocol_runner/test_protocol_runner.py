@@ -292,7 +292,6 @@ def test_load_json_liquids_ff_on(
     protocol_engine: ProtocolEngine,
     task_queue: TaskQueue,
     subject: ProtocolRunner,
-    enable_load_liquid: None,
 ) -> None:
     """It should load a JSON protocol file."""
     json_protocol_source = ProtocolSource(
