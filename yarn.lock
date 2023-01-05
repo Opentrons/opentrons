@@ -2180,6 +2180,7 @@
 "@opentrons/app@link:app":
   version "0.0.0-dev"
   dependencies:
+    "@fontsource/public-sans" "4.5.11"
     "@hot-loader/react-dom" "17.0.1"
     "@opentrons/api-client" "link:api-client"
     "@opentrons/components" "link:components"
@@ -2196,7 +2197,7 @@
     history "4.7.2"
     i18next "^19.8.3"
     is-ip "3.1.0"
-    lodash "4.17.15"
+    lodash "4.17.21"
     mixpanel-browser "2.22.1"
     netmask "2.0.2"
     path-to-regexp "3.0.0"
@@ -2209,6 +2210,7 @@
     react-router-dom "5.1.1"
     react-select "5.4.0"
     react-simple-keyboard "^3.4.187"
+    react-viewport-list "6.3.0"
     redux "4.0.5"
     redux-observable "1.1.0"
     redux-thunk "2.3.0"
@@ -2233,6 +2235,7 @@
     "@types/styled-components" "^5.1.26"
     "@types/webpack-env" "^1.16.0"
     classnames "2.2.5"
+    interactjs "^1.10.17"
     lodash "4.17.15"
     react-popper "1.0.0"
     react-remove-scroll "2.4.3"
@@ -2242,10 +2245,10 @@
 "@opentrons/discovery-client@link:discovery-client":
   version "0.0.0-dev"
   dependencies:
-    "@types/lodash" "^4.14.168"
+    "@types/lodash" "^4.14.191"
     "@types/node-fetch" "^2.5.8"
     escape-string-regexp "1.0.5"
-    lodash "4.17.15"
+    lodash "4.17.21"
     mdns-js "1.0.1"
     node-fetch "2.6.0"
     redux "4.0.5"
@@ -2265,7 +2268,7 @@
   dependencies:
     ajv "6.10.2"
     html-react-parser "^1.2.8"
-    lodash "4.17.15"
+    lodash "4.17.21"
     svgson "^5.2.1"
 
 "@opentrons/step-generation@link:step-generation":
@@ -2274,7 +2277,7 @@
     "@opentrons/shared-data" "link:shared-data"
     core-js "3.2.1"
     immer "5.1.0"
-    lodash "4.17.15"
+    lodash "4.17.21"
     uuid "3.3.2"
 
 "@pmmmwh/react-refresh-webpack-plugin@^0.5.3":
@@ -17655,6 +17658,11 @@ react-transition-group@^4.3.0:
     dom-helpers "^5.0.1"
     loose-envify "^1.4.0"
     prop-types "^15.6.2"
+
+react-viewport-list@6.3.0:
+  version "6.3.0"
+  resolved "https://registry.yarnpkg.com/react-viewport-list/-/react-viewport-list-6.3.0.tgz#dc73210d590c2a10f49be8902d86bb5e04a4b47e"
+  integrity sha512-IV7/yeqpurCa2FytCnUWyY664kbDxg5EgQQJHQhI6X2zUZXEq8BlQLfDoPRF2MA8YsVihsC7y3iEf2wGt+Lluw==
 
 react@17.0.1:
   version "17.0.1"

@@ -26,7 +26,6 @@ import { StyledText } from '../../../atoms/text'
 import { Tooltip } from '../../../atoms/Tooltip'
 import {
   useModuleRenderInfoForProtocolById,
-  useProtocolDetailsForRun,
   useRobot,
   useRunStatuses,
   useSyncRobotClock,
@@ -136,8 +135,6 @@ export function ProtocolRunDetails(): JSX.Element | null {
   const robot = useRobot(robotName)
   useSyncRobotClock(robotName)
 
-  const [focusedAnalysisCommandId, setFocusedAnalysisCommandId] = React.useState<string | null>(null)
-
   const protocolRunDetailsContentByTab: {
     [K in ProtocolRunDetailsTab]: JSX.Element | null
   } = {
@@ -151,8 +148,8 @@ export function ProtocolRunDetails(): JSX.Element | null {
     'module-controls': (
       <ProtocolRunModuleControls robotName={robotName} runId={runId} />
     ),
-    'run-log': <AnalyzedSteps runId={runId} focusedCommandId={focusedAnalysisCommandId}/>,
-    'analyzed-steps': <AnalyzedSteps runId={runId} focusedCommandId={focusedAnalysisCommandId}/>,
+    'run-log': <AnalyzedSteps runId={runId} />,
+    'analyzed-steps': <AnalyzedSteps runId={runId} />,
   }
 
   const protocolRunDetailsContent = protocolRunDetailsContentByTab[
