@@ -169,6 +169,70 @@ async def res_check(pipette_model,node,res) -> None:
     diff = float(motor_pos) - float(encoder_pos)
     if abs(diff) > Tolerances[pipette_model]:
         raise Exception('Fail_Lose Step')
+
+async def _jog_axis(messenger: CanMessenger, node, position) -> None:
+    step_size = [0.1, 0.5, 1, 10, 20, 50]
+    step_length_index = 3
+    step = step_size[step_length_index]
+    pos = 0
+    speed = 10
+    res = {node: (0,0,0)}
+    information_str = """
+        Click  >>   w  << to move up
+        Click  >>   s  << to move downward
+        Click  >>   +   << to Increase the length of each step
+        Click  >>   -   << to decrease the length of each step
+        Click  >> Enter << to save position
+        Click  >> q << to quit the test script
+                    """
+    print(information_str)
+    while True:
+        input = getch()
+        if input == 'w':
+            #plus pipette direction
+            sys.stdout.flush()
+            pos = pos + step
+            position['pipette'] = pos
+            res = await move_to(messenger, node, step, -speed)
+
+        elif input == 's':
+            #minus pipette direction
+            sys.stdout.flush()
+            pos = pos - step
+            position['pipette'] = pos
+            res = await move_to(messenger, node, step, speed)
+
+        elif input == 'q':
+            sys.stdout.flush()
+            print("TEST CANCELLED")
+            quit()
+
+        elif input == '+':
+            sys.stdout.flush()
+            step_length_index = step_length_index + 1
+            if step_length_index >= 5:
+                step_length_index = 5
+            step = step_size[step_length_index]
+
+        elif input == '-':
+            sys.stdout.flush()
+            step_length_index = step_length_index -1
+            if step_length_index <= 0:
+                step_length_index = 0
+            step = step_size[step_length_index]
+
+        elif input == '\r' or input == '\n' or input == '\r\n':
+            sys.stdout.flush()
+            return position
+        print('Coordinates: ', round(position['pipette'], 2), ',',
+                                'motor position: ', res[node][0], ', ',
+                                'encoder position: ', res[node][1], ', '
+                                ' Motor Step: ',
+                                step_size[step_length_index],
+                                end = '')
+        print('\r', end='')
+
+
 async def run(args: argparse.Namespace) -> None:
     subprocess.run(["systemctl", "stop", "opentrons-robot-server"])
     position = {'pipette': 0}
@@ -176,6 +240,18 @@ async def run(args: argparse.Namespace) -> None:
     driver = await build_driver(build_settings(args))
     messenger = CanMessenger(driver=driver)
     messenger.start()
+
+
+    if args.home:
+        print('\n')
+        print('-------------------Test Homing--------------------------')
+        await home(messenger, node)
+        print('Homed')
+
+    if args.jog:
+        print('\n')
+        print('----------Read Motor Position and Encoder--------------')
+        await _jog_axis(messenger, node, position)
 
     print('-----------------Read EPPROM--------------')
     serial_number = await read_epprom(messenger, node)
