@@ -77,7 +77,7 @@ class AbstractTemperatureModuleCore(AbstractModuleCore):
 class AbstractMagneticModuleCore(AbstractModuleCore):
     """Core control interface for an attached Magnetic Module."""
 
-    ModuleType: ClassVar = ModuleType.MAGNETIC
+    MODULE_TYPE: ClassVar = ModuleType.MAGNETIC
 
     @abstractmethod
     def engage(
