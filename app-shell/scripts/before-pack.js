@@ -12,6 +12,12 @@ const HOST_PYTHON = process.env.HOST_PYTHON ?? 'python3.10'
 
 const PYTHON_BY_PLATFORM = {
   darwin: {
+    1: {
+      url:
+        'https://github.com/indygreg/python-build-standalone/releases/download/20220318/cpython-3.10.3+20220318-x86_64-apple-darwin-install_only.tar.gz',
+      sha256:
+        'ec2e90b6a589db7ef9f74358b1436558167629f9e4d725c8150496f9cb08a9d4',
+    },
     x64: {
       url:
         'https://github.com/indygreg/python-build-standalone/releases/download/20220318/cpython-3.10.3+20220318-x86_64-apple-darwin-install_only.tar.gz',
@@ -22,9 +28,9 @@ const PYTHON_BY_PLATFORM = {
   linux: {
     1: {
       url:
-        'https://github.com/indygreg/python-build-standalone/releases/download/20220318/cpython-3.10.3+20220318-x86_64-apple-darwin-install_only.tar.gz',
+        'https://github.com/indygreg/python-build-standalone/releases/download/20220318/cpython-3.10.3+20220318-x86_64-unknown-linux-gnu-install_only.tar.gz',
       sha256:
-        'ec2e90b6a589db7ef9f74358b1436558167629f9e4d725c8150496f9cb08a9d4',
+        'b9989411bed71ba4867538c991f20b55f549dd9131905733f0df9f3fde81ad1d',
     },
     x64: {
       url:
@@ -34,6 +40,12 @@ const PYTHON_BY_PLATFORM = {
     },
   },
   win32: {
+    1: {
+      url:
+        'https://github.com/indygreg/python-build-standalone/releases/download/20220318/cpython-3.10.3+20220318-x86_64-pc-windows-msvc-shared-install_only.tar.gz',
+      sha256:
+        'ba593370742ed8a7bc70ce563dd6a53e30ece1f6881e3888d334c1b485b0d9d0',
+    },
     x64: {
       url:
         'https://github.com/indygreg/python-build-standalone/releases/download/20220318/cpython-3.10.3+20220318-x86_64-pc-windows-msvc-shared-install_only.tar.gz',
