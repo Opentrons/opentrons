@@ -48,7 +48,7 @@ from opentrons_hardware.drivers.gpio import OT3GPIO
 
 
 Current_dic = {
-    'p1000_single_v43':[0.2,0.15,0.1,0.05],
+    'p1000_single_v43':[0.6, 0.5,0.4, 0.3, 0.2,0.15,0.1,0.05],
     'p50_single_v43':[0.6, 0.5,0.4, 0.3, 0.2,0.15,0.1,0.05],
 
     'p1000_multi_v33':[0.6, 0.5,0.4, 0.3, 0.2,0.15,0.1,0.05],
@@ -170,165 +170,72 @@ async def res_check(pipette_model,node,res) -> None:
     if abs(diff) > Tolerances[pipette_model]:
         raise Exception('Fail_Lose Step')
 
-def getch():
-    """
-        fd: file descriptor stdout, stdin, stderr
-        This functions gets a single input keyboard character from the user
-    """
-    def _getch():
-        fd = sys.stdin.fileno()
-        old_settings = termios.tcgetattr(fd)
-        try:
-            tty.setraw(fd)
-            ch = sys.stdin.read(1)
-        finally:
-            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-        return ch
-    return _getch()
-
-async def _jog_axis(messenger: CanMessenger, node, position) -> None:
-    step_size = [0.1, 0.5, 1, 10, 20, 50]
-    step_length_index = 3
-    step = step_size[step_length_index]
-    pos = 0
-    speed = 10
-    res = {node: (0,0,0)}
-    information_str = """
-        Click  >>   w  << to move up
-        Click  >>   s  << to move downward
-        Click  >>   +   << to Increase the length of each step
-        Click  >>   -   << to decrease the length of each step
-        Click  >> Enter << to save position
-        Click  >> q << to quit the test script
-                    """
-    print(information_str)
-    while True:
-        input = getch()
-        if input == 'w':
-            #plus pipette direction
-            sys.stdout.flush()
-            pos = pos + step
-            position['pipette'] = pos
-            res = await move_to(messenger, node, step, -speed)
-
-        elif input == 's':
-            #minus pipette direction
-            sys.stdout.flush()
-            pos = pos - step
-            position['pipette'] = pos
-            res = await move_to(messenger, node, step, speed)
-
-        elif input == 'q':
-            sys.stdout.flush()
-            print("TEST CANCELLED")
-            quit()
-
-        elif input == '+':
-            sys.stdout.flush()
-            step_length_index = step_length_index + 1
-            if step_length_index >= 5:
-                step_length_index = 5
-            step = step_size[step_length_index]
-
-        elif input == '-':
-            sys.stdout.flush()
-            step_length_index = step_length_index -1
-            if step_length_index <= 0:
-                step_length_index = 0
-            step = step_size[step_length_index]
-
-        elif input == '\r' or input == '\n' or input == '\r\n':
-            sys.stdout.flush()
-            return position
-        print('Coordinates: ', round(position['pipette'], 2), ',',
-                                'motor position: ', res[node][0], ', ',
-                                'encoder position: ', res[node][1], ', '
-                                ' Motor Step: ',
-                                step_size[step_length_index],
-                                end = '')
-        print('\r', end='')
-
-
 async def run(args: argparse.Namespace) -> None:
     subprocess.run(["systemctl", "stop", "opentrons-robot-server"])
-    position = {'pipette': 0}
     node = NodeId.pipette_left
     driver = await build_driver(build_settings(args))
     messenger = CanMessenger(driver=driver)
     messenger.start()
 
+    print('\n')
+    print('-------------------Test Currents--------------------------')
+    print('-----------------Read EPPROM--------------')
+    serial_number = await read_epprom(messenger, node)
+    print(f'SN: {serial_number}')
 
-    if args.home:
-        print('\n')
-        print('-------------------Test Homing--------------------------')
-        await home(messenger, node)
-        print('Homed')
+    print('-----------------Get pipette model--------------')
+    pipette_model = await get_pipette_model(messenger, node)
+    print(f'Model: {pipette_model}')
 
-    if args.jog:
-        print('\n')
-        print('----------Read Motor Position and Encoder--------------')
-        await _jog_axis(messenger, node, position)
-
-    if args.current:
-        print('\n')
-        print('-------------------Test Currents--------------------------')
-        print('-----------------Read EPPROM--------------')
-        serial_number = await read_epprom(messenger, node)
-        print(f'SN: {serial_number}')
-
-        print('-----------------Get pipette model--------------')
-        pipette_model = await get_pipette_model(messenger, node)
-        print(f'Model: {pipette_model}')
-
-        print('-------------------Test Homing--------------------------')
-        await home(messenger, node)
-        print('Homed')
-        while True:
-            try:
-                re = input("\n    Enter 'q' to exit")
-                if re == "q":
-                    break
-                results = {}
-                # print(Current_dic)
-                for i in Current_dic[str(pipette_model)]:
-                    results["{}A".format(i)] = sus_str
-                for current in Current_dic[str(pipette_model)]:
-                    print('-------------------Test Homing--------------------------')
-                    await home(messenger, node)
-                    print('Homed')
-
-                    await set_pipette_current(current,args)
-                    print("    Current test current is {}".format(current))
-                    # print(Current_dic[pipette_model])
-                    res = await move_to(messenger, node, 10, move_speed)
-                    print('motor position: ', res[node][0], ', ',
-                          'encoder position: ', res[node][1])
-                    # await res_check(pipette_model, node, res)
-                    try:
-                        for t in range(1, CYCLES + 1):
-                            res = await move_to(messenger, node, 60, move_speed)
-                            await res_check(pipette_model, node, res)
-                            res = await move_to(messenger, node, 60, -move_speed)
-                            await res_check(pipette_model, node, res)
-                    except Exception as e:
-                        print(e)
-                        results["{}A".format(current)] = "Fail_Stuck"
-                        break
-
-
-                    if sus_str is results["{}A".format(current)]:
-                        results["{}A".format(current)] = "Pass_ ----"
-
+    print('-------------------Test Homing--------------------------')
+    await home(messenger, node)
+    print('Homed')
+    while True:
+        try:
+            re = input("\n    Enter 'q' to exit")
+            if re == "q":
+                break
+            results = {}
+            # print(Current_dic)
+            for i in Current_dic[str(pipette_model)]:
+                results["{}A".format(i)] = sus_str
+            for current in Current_dic[str(pipette_model)]:
+                print('-------------------Test Homing--------------------------')
+                await home(messenger, node)
+                print('Homed')
+                res = {node: (0, 0, 0)}
+                await set_pipette_current(current, args)
+                print("    Current test current is {}".format(current))
+                # print(Current_dic[pipette_model])
+                res = await move_to(messenger, node, 10, move_speed)
+                print('motor position: ', res[node][0], ', ',
+                      'encoder position: ', res[node][1])
+                # await res_check(pipette_model, node, res)
                 try:
-                    print(data_format.format("Type", "result", "reason"))
-                    for i in results:
-                        result = results[i].split("_")[0]
-                        reason = results[i].split("_")[1]
-                        print(data_format.format(i, result, reason))
-                except IndexError:
-                    pass
-            except:
+                    for t in range(1, CYCLES + 1):
+                        res = await move_to(messenger, node, 60, move_speed)
+                        await res_check(pipette_model, node, res)
+                        res = await move_to(messenger, node, 60, -move_speed)
+                        await res_check(pipette_model, node, res)
+                except Exception as e:
+                    print(e)
+                    results["{}A".format(current)] = "Fail_Stuck"
+                    break
+
+                if sus_str is results["{}A".format(current)]:
+                    results["{}A".format(current)] = "Pass_ ----"
+
+            try:
+                print(data_format.format("Type", "result", "reason"))
+                for i in results:
+                    result = results[i].split("_")[0]
+                    reason = results[i].split("_")[1]
+                    print(data_format.format(i, result, reason))
+            except IndexError:
                 pass
+        except:
+            pass
+
 
 def main() -> None:
     parser = argparse.ArgumentParser(
@@ -353,12 +260,6 @@ def main() -> None:
         help="The speed with which to move the plunger",
         default=10.0,
     )
-
-    parser.add_argument("--limit_switch", action="store_true")
-    parser.add_argument("--jog", action="store_true")
-    parser.add_argument("--read_epprom", action="store_true")
-    parser.add_argument("--home", action="store_true")
-    parser.add_argument("--current", action="store_true")
 
     args = parser.parse_args()
 
