@@ -82,9 +82,7 @@ class PressureFixture(PressureFixtureBase):
         self._slot_side = slot_side
 
     @classmethod
-    def create(
-            cls, port: str, slot_side: str = "left"
-    ) -> "PressureFixture":
+    def create(cls, port: str, slot_side: str = "left") -> "PressureFixture":
         """Create a Radwag scale driver."""
         conn = Serial()
         conn.port = port

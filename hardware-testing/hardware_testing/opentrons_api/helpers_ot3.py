@@ -9,6 +9,7 @@ from opentrons_hardware.firmware_bindings.constants import SensorId
 from opentrons_hardware.sensors import sensor_driver, sensor_types
 
 from opentrons_shared_data.deck import load as load_deck
+from opentrons_shared_data.labware import load_definition as load_labware
 
 from opentrons.config.robot_configs import build_config_ot3, load_ot3 as load_ot3_config
 from opentrons.hardware_control.backends.ot3utils import sensor_node_for_mount
@@ -28,6 +29,9 @@ from .types import (
     Point,
     CriticalPoint,
 )
+
+# TODO: use values from shared data, so we don't need to update here again
+TIP_LENGTH_LOOKUP = {50: 57.9, 200: 58.35, 1000: 95.6}
 
 
 @dataclass
@@ -278,7 +282,9 @@ async def home_ot3(api: OT3API, axes: Optional[List[OT3Axis]] = None) -> None:
         )
 
 
-def _get_pipette_from_mount(api: OT3API, mount: OT3Mount) -> Union[PipetteOT2, PipetteOT3]:
+def _get_pipette_from_mount(
+    api: OT3API, mount: OT3Mount
+) -> Union[PipetteOT2, PipetteOT3]:
     pipette = api.hardware_pipettes[mount.to_mount()]
     if pipette is None:
         raise RuntimeError(f"No pipette currently attaced to mount {mount}")
@@ -493,6 +499,10 @@ async def jog_mount_ot3(
     api: OT3API, mount: OT3Mount, critical_point: Optional[CriticalPoint] = None
 ) -> Dict[OT3Axis, float]:
     """Jog an OT3 mount's gantry XYZ and pipettes axes."""
+    if api.is_simulator:
+        return await api.current_position_ot3(
+            mount=mount, critical_point=critical_point
+        )
     axis: str = ""
     distance: float = 0.0
     do_home: bool = False
@@ -623,16 +633,46 @@ def set_gripper_offset_ot3(api: OT3API, offset: Point) -> None:
     api._gripper_handler._gripper._calibration_offset.offset = offset  # type: ignore[union-attr]
 
 
-def get_slot_top_left_position_ot3(slot: int) -> Point:
-    """Get slot top-left position."""
+def get_slot_size() -> Point:
+    deck = load_deck("ot3_standard", version=3)
+    slots = deck["locations"]["orderedSlots"]
+    bounding_box = slots[0]["boundingBox"]
+    return Point(
+        x=bounding_box["xDimension"],
+        y=bounding_box["yDimension"],
+        z=bounding_box["zDimension"],
+    )
+
+
+def get_default_tip_length(volume: int) -> float:
+    return TIP_LENGTH_LOOKUP[volume]
+
+
+def get_slot_bottom_left_position_ot3(slot: int) -> Point:
+    """Get slot bottom-left position."""
     deck = load_deck("ot3_standard", version=3)
     slots = deck["locations"]["orderedSlots"]
     s = slots[slot - 1]
     assert s["id"] == str(slot)
-    bottom_left = Point(*s["position"])
-    s_height = s["boundingBox"]["yDimension"]
-    top_left = bottom_left + Point(y=float(s_height))
-    return top_left
+    return Point(*s["position"])
+
+
+def get_slot_top_left_position_ot3(slot: int) -> Point:
+    """Get slot top-left position."""
+    bottom_left = get_slot_bottom_left_position_ot3(slot)
+    slot_size = get_slot_size()
+    return bottom_left + Point(y=slot_size.y)
+
+
+def get_theoretical_a1_position(slot: int, labware: str) -> Point:
+    """Get the theoretical A1 position of a labware in a slot."""
+    labware_def = load_labware(loadname=labware, version=1)
+    dims = labware_def["dimensions"]
+    well_a1 = labware_def["wells"]["A1"]
+    a1_pos = Point(x=well_a1["x"], y=well_a1["y"], z=dims["zDimension"])
+    slot_pos = get_slot_bottom_left_position_ot3(slot)
+    y_shift_from_clips = (get_slot_size().y - dims["yDimension"]) * 0.5
+    return slot_pos + a1_pos + Point(y=y_shift_from_clips)
 
 
 def get_slot_calibration_square_position_ot3(slot: int) -> Point:
