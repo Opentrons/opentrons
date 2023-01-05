@@ -2180,6 +2180,7 @@
 "@opentrons/app@link:app":
   version "0.0.0-dev"
   dependencies:
+    "@fontsource/public-sans" "4.5.11"
     "@hot-loader/react-dom" "17.0.1"
     "@opentrons/api-client" "link:api-client"
     "@opentrons/components" "link:components"
@@ -2196,7 +2197,7 @@
     history "4.7.2"
     i18next "^19.8.3"
     is-ip "3.1.0"
-    lodash "4.17.15"
+    lodash "4.17.21"
     mixpanel-browser "2.22.1"
     netmask "2.0.2"
     path-to-regexp "3.0.0"
@@ -2233,6 +2234,7 @@
     "@types/styled-components" "^5.1.26"
     "@types/webpack-env" "^1.16.0"
     classnames "2.2.5"
+    interactjs "^1.10.17"
     lodash "4.17.15"
     react-popper "1.0.0"
     react-remove-scroll "2.4.3"
@@ -2242,10 +2244,10 @@
 "@opentrons/discovery-client@link:discovery-client":
   version "0.0.0-dev"
   dependencies:
-    "@types/lodash" "^4.14.168"
+    "@types/lodash" "^4.14.191"
     "@types/node-fetch" "^2.5.8"
     escape-string-regexp "1.0.5"
-    lodash "4.17.15"
+    lodash "4.17.21"
     mdns-js "1.0.1"
     node-fetch "2.6.0"
     redux "4.0.5"
@@ -2265,7 +2267,7 @@
   dependencies:
     ajv "6.10.2"
     html-react-parser "^1.2.8"
-    lodash "4.17.15"
+    lodash "4.17.21"
     svgson "^5.2.1"
 
 "@opentrons/step-generation@link:step-generation":
@@ -2274,7 +2276,7 @@
     "@opentrons/shared-data" "link:shared-data"
     core-js "3.2.1"
     immer "5.1.0"
-    lodash "4.17.15"
+    lodash "4.17.21"
     uuid "3.3.2"
 
 "@pmmmwh/react-refresh-webpack-plugin@^0.5.3":
