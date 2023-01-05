@@ -457,13 +457,14 @@ class OT3Simulator:
         # TODO (AL, 2021-11-18): The bounds need to be defined
         phony_bounds = (0, 10000)
         return {
-            OT3Axis.Z_L: phony_bounds,
             OT3Axis.Z_R: phony_bounds,
+            OT3Axis.Z_L: phony_bounds,
             OT3Axis.P_L: phony_bounds,
             OT3Axis.P_R: phony_bounds,
-            OT3Axis.X: phony_bounds,
             OT3Axis.Y: phony_bounds,
+            OT3Axis.X: phony_bounds,
             OT3Axis.Z_G: phony_bounds,
+            OT3Axis.G: phony_bounds,
         }
 
     def single_boundary(self, boundary: int) -> OT3AxisMap[float]:
