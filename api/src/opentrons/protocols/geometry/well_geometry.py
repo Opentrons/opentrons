@@ -74,6 +74,18 @@ class WellGeometry:
     def diameter(self) -> Optional[float]:
         return self._diameter
 
+    @property
+    def length(self) -> Optional[float]:
+        return self._length
+
+    @property
+    def width(self) -> Optional[float]:
+        return self._width
+
+    @property
+    def depth(self) -> float:
+        return self._depth
+
     def top(self, z: float = 0.0) -> Point:
         return self._position + Point(0, 0, z)
 

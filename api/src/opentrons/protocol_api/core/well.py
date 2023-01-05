@@ -1,7 +1,7 @@
 """Abstract interface for Well core implementations."""
 
 from abc import ABC, abstractmethod
-from typing import TypeVar
+from typing import TypeVar, Optional
 
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.types import Point
@@ -14,6 +14,26 @@ class AbstractWellCore(ABC):
     @abstractmethod
     def geometry(self) -> WellGeometry:
         """Get the well's geometry information interface."""
+
+    @property
+    @abstractmethod
+    def diameter(self) -> Optional[float]:
+        """Get the well's diameter, if circular."""
+
+    @property
+    @abstractmethod
+    def length(self) -> Optional[float]:
+        """Get the well's length, if rectangular."""
+
+    @property
+    @abstractmethod
+    def width(self) -> Optional[float]:
+        """Get the well's width, if rectangular."""
+
+    @property
+    @abstractmethod
+    def depth(self) -> float:
+        """Get the well's depth."""
 
     @abstractmethod
     def has_tip(self) -> bool:
@@ -54,6 +74,10 @@ class AbstractWellCore(ABC):
     @abstractmethod
     def get_center(self) -> Point:
         """Get the coordinate of the well's center."""
+
+    @abstractmethod
+    def from_center_cartesian(self, x: float, y: float, z: float) -> Point:
+        """Gets point in deck coordinates based on percentage of the radius of each axis."""
 
 
 WellCoreType = TypeVar("WellCoreType", bound=AbstractWellCore)

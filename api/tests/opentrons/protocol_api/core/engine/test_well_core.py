@@ -150,3 +150,97 @@ def test_set_has_tip(subject: WellCore) -> None:
     """Trying to set the has tip state should raise an error."""
     with pytest.raises(APIVersionError):
         subject.set_has_tip(True)
+
+
+@pytest.mark.parametrize(
+    "well_definition",
+    [WellDefinition.construct(diameter=123.4)],  # type: ignore[call-arg]
+)
+def test_diameter(subject: WellCore) -> None:
+    """It should get the diameter."""
+    assert subject.diameter == 123.4
+
+
+@pytest.mark.parametrize(
+    "well_definition",
+    [WellDefinition.construct(xDimension=567.8)],  # type: ignore[call-arg]
+)
+def test_length(subject: WellCore) -> None:
+    """It should get the length."""
+    assert subject.length == 567.8
+
+
+@pytest.mark.parametrize(
+    "well_definition",
+    [WellDefinition.construct(yDimension=987.6)],  # type: ignore[call-arg]
+)
+def test_width(subject: WellCore) -> None:
+    """It should get the width."""
+    assert subject.width == 987.6
+
+
+@pytest.mark.parametrize(
+    "well_definition",
+    [WellDefinition.construct(depth=42.0)],  # type: ignore[call-arg]
+)
+def test_depth(subject: WellCore) -> None:
+    """It should get the depth."""
+    assert subject.depth == 42.0
+
+
+@pytest.mark.parametrize(
+    "well_definition",
+    [WellDefinition.construct(diameter=2.0, depth=4.0)],  # type: ignore[call-arg]
+)
+def test_from_center_cartesian_circular(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: WellCore
+) -> None:
+    """It should get the relative point from a circular well."""
+    decoy.when(
+        mock_engine_client.state.geometry.get_well_height(
+            labware_id="labware-id", well_name="well-name"
+        )
+    ).then_return(42.0)
+
+    decoy.when(
+        mock_engine_client.state.geometry.get_well_position(
+            labware_id="labware-id",
+            well_name="well-name",
+            well_location=WellLocation(
+                origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=21)
+            ),
+        )
+    ).then_return(Point(1, 2, 3))
+
+    result = subject.from_center_cartesian(x=3, y=3, z=1.5)
+
+    assert result == Point(4, 5, 6)
+
+
+@pytest.mark.parametrize(
+    "well_definition",
+    [WellDefinition.construct(xDimension=2.0, yDimension=3.0, depth=4.0)],  # type: ignore[call-arg]
+)
+def test_from_center_cartesian_rectangular(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: WellCore
+) -> None:
+    """It should get the relative point from a rectangular well."""
+    decoy.when(
+        mock_engine_client.state.geometry.get_well_height(
+            labware_id="labware-id", well_name="well-name"
+        )
+    ).then_return(42.0)
+
+    decoy.when(
+        mock_engine_client.state.geometry.get_well_position(
+            labware_id="labware-id",
+            well_name="well-name",
+            well_location=WellLocation(
+                origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=21)
+            ),
+        )
+    ).then_return(Point(1, 2, 3))
+
+    result = subject.from_center_cartesian(x=3, y=2, z=1.5)
+
+    assert result == Point(4, 5, 6)
