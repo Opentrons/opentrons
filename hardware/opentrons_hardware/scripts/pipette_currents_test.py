@@ -48,7 +48,7 @@ from opentrons_hardware.drivers.gpio import OT3GPIO
 
 
 Current_dic = {
-    'p1000_single_v43':[0.6, 0.5,0.4, 0.3, 0.2,0.15,0.1,0.05],
+    'p1000_single_v43':[0.2,0.15,0.1,0.05],
     'p50_single_v43':[0.6, 0.5,0.4, 0.3, 0.2,0.15,0.1,0.05],
 
     'p1000_multi_v33':[0.6, 0.5,0.4, 0.3, 0.2,0.15,0.1,0.05],
@@ -65,7 +65,7 @@ Tolerances = {
 data_format = "||{0:^12}|{1:^12}|{2:^12}||"
 
 CYCLES = 10
-move_speed = 10
+move_speed = 15
 sus_str = "----_----"
 
 async def set_pipette_current(run_current,args) -> None:
@@ -161,6 +161,14 @@ async def get_pipette_model(messenger: CanMessenger, node):
     except asyncio.TimeoutError:
         pass
 
+
+async def res_check(pipette_model,node,res) -> None:
+    motor_pos = res[node][0]
+    encoder_pos = res[node][1]
+    print('motor position: {} , encoder position: {}'.format(motor_pos,encoder_pos))
+    diff = float(motor_pos) - float(encoder_pos)
+    if abs(diff) > Tolerances[pipette_model]:
+        raise Exception('Fail_Lose Step')
 async def main() -> None:
     subprocess.run(["systemctl", "stop", "opentrons-robot-server"])
     position = {'pipette': 0}
@@ -211,11 +219,11 @@ async def main() -> None:
     print('Homed')
     while True:
         try:
-            res = input("\n    Enter 'q' to exit")
-            if res == "q":
+            re = input("\n    Enter 'q' to exit")
+            if re == "q":
                 break
             results = {}
-            print(Current_dic)
+            # print(Current_dic)
             for i in Current_dic[str(pipette_model)]:
                 results["{}A".format(i)] = sus_str
             for current in Current_dic[str(pipette_model)]:
@@ -226,22 +234,17 @@ async def main() -> None:
                 await set_pipette_current(current,args)
                 print("    Current test current is {}".format(current))
                 print(Current_dic[pipette_model])
-                await move_to(messenger, node, 10, move_speed)
+                res = await move_to(messenger, node, 10, move_speed)
+                await res_check(pipette_model, node, res)
                 try:
                     for t in range(1, CYCLES + 1):
-                        await move_to(messenger, node, 60, move_speed)
-                        await move_to(messenger, node, 60, -move_speed)
+                        res = await move_to(messenger, node, 60, move_speed)
+                        await res_check(pipette_model, node, res)
+                        res = await move_to(messenger, node, 60, -move_speed)
+                        await res_check(pipette_model, node, res)
                 except Exception as e:
                     print(e)
                     results["{}A".format(current)] = "Fail_Stuck"
-                    break
-
-                try:
-                    print("    moving to ", Tolerances[pipette_model])
-                    step = 60 - Tolerances[pipette_model]
-                    await move_to(messenger, node, step, move_speed)
-                except Exception as e:
-                    results["{}A".format(current)] = "Fail_Lose Step"
                     break
 
 
