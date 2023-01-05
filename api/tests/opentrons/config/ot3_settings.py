@@ -180,6 +180,13 @@ ot3_dummy_settings = {
     "right_mount_offset": (3, 2, 1),
     "left_mount_offset": (2, 2, 2),
     "gripper_mount_offset": (1, 1, 1),
+    "liquid_sense": {
+        "starting_mount_height": 80,
+        "pipette_distance": 100,
+        "mount_distance": 50,
+        "mount_speed": 10,
+        "pipette_speed": 10,
+    },
     "calibration": {
         "z_offset": {
             "point": [1, 2, 3],
