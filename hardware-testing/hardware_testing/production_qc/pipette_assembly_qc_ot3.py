@@ -26,6 +26,7 @@ LEAK_HOVER_ABOVE_LIQUID_MM: Final = 50
 
 FIXTURE_LOCATION_A1_LEFT = Point(x=14.4, y=74.5, z=71.2)
 FIXTURE_LOCATION_A1_RIGHT = FIXTURE_LOCATION_A1_LEFT._replace(x=128 - 14.4)
+FIXTURE_ASPIRATE_VOLUME = 50
 
 
 @dataclass
@@ -38,10 +39,12 @@ class TestConfig:
     fixture_side: str
     tip_volume: int
     aspirate_volume: float
-    slot_tip_rack: int
+    slot_tip_rack_liquid: int
+    slot_tip_rack_fixture: int
     slot_reservoir: int
     slot_fixture: int
     num_trials: int
+    num_samples: int
     wait_seconds: int
 
 
@@ -50,7 +53,8 @@ class LabwareLocations:
     """Test Labware Locations."""
 
     trash: Optional[Point]
-    tip_rack: Optional[Point]
+    tip_rack_liquid: Optional[Point]
+    tip_rack_fixture: Optional[Point]
     reservoir: Optional[Point]
     fixture: Optional[Point]
 
@@ -58,27 +62,45 @@ class LabwareLocations:
 # start with dummy values, these will be immediately overwritten
 # we start with actual values here to pass linting
 IDEAL_LABWARE_LOCATIONS: LabwareLocations = LabwareLocations(
-    trash=None, tip_rack=None, reservoir=None, fixture=None
+    trash=None,
+    tip_rack_liquid=None,
+    tip_rack_fixture=None,
+    reservoir=None,
+    fixture=None,
 )
 CALIBRATED_LABWARE_LOCATIONS: LabwareLocations = LabwareLocations(
-    trash=None, tip_rack=None, reservoir=None, fixture=None
+    trash=None,
+    tip_rack_liquid=None,
+    tip_rack_fixture=None,
+    reservoir=None,
+    fixture=None,
 )
 
 
 def _get_ideal_labware_locations(test_config: TestConfig) -> LabwareLocations:
-    tip_rack_loc_ideal = helpers_ot3.get_theoretical_a1_position(
-        test_config.slot_tip_rack, f"opentrons_96_tiprack_{test_config.tip_volume}ul"
+    tip_rack_liquid_loc_ideal = helpers_ot3.get_theoretical_a1_position(
+        test_config.slot_tip_rack_liquid,
+        f"opentrons_ot3_96_tiprack_{test_config.tip_volume}ul",
+    )
+    tip_rack_fixture_loc_ideal = helpers_ot3.get_theoretical_a1_position(
+        test_config.slot_tip_rack_fixture,
+        f"opentrons_ot3_96_tiprack_50ul",  # always will be 50uL
     )
     reservoir_loc_ideal = helpers_ot3.get_theoretical_a1_position(
         test_config.slot_reservoir, "nest_1_reservoir_195ml"
     )
     trash_loc_ideal = helpers_ot3.get_slot_calibration_square_position_ot3(TRASH_SLOT)
     trash_loc_ideal += Point(z=TRASH_HEIGHT_MM)
+    if test_config.fixture_side == "left":
+        fixture_loc_ideal = FIXTURE_LOCATION_A1_LEFT
+    else:
+        fixture_loc_ideal = FIXTURE_LOCATION_A1_RIGHT
     return LabwareLocations(
-        tip_rack=tip_rack_loc_ideal,
+        tip_rack_liquid=tip_rack_liquid_loc_ideal,
+        tip_rack_fixture=tip_rack_fixture_loc_ideal,
         reservoir=reservoir_loc_ideal,
         trash=trash_loc_ideal,
-        fixture=Point(x=14.4, y=74.5, z=71.2),  # TODO: get actual location of fixture
+        fixture=fixture_loc_ideal,
     )
 
 
@@ -89,56 +111,85 @@ def _tip_name_to_xy_offset(tip: str) -> Point:
     return Point(x=tip_column * 9, y=tip_row * 9)
 
 
-async def _calibrate_and_pick_up_tip(
-    api: OT3API, mount: OT3Mount, test_config: TestConfig, tip: str
-) -> None:
-    if not CALIBRATED_LABWARE_LOCATIONS.tip_rack:
-        print("calibrate the tip-rack location")
-        assert IDEAL_LABWARE_LOCATIONS.tip_rack
-        await helpers_ot3.move_to_arched_ot3(
-            api, mount, IDEAL_LABWARE_LOCATIONS.tip_rack + Point(z=10)
-        )
-        print("jog to the tip-rack")
+async def _move_to_or_calibrate(
+    api: OT3API, mount: OT3Mount, expected: Optional[Point], actual: Optional[Point]
+) -> Point:
+    if not actual:
+        assert expected
+        await helpers_ot3.move_to_arched_ot3(api, mount, expected + Point(z=10))
         await helpers_ot3.jog_mount_ot3(api, mount)
-        CALIBRATED_LABWARE_LOCATIONS.tip_rack = await api.gantry_position(mount)
-        await api.move_rel(mount, Point(z=5))
+        actual = await api.gantry_position(mount)
+    else:
+        await helpers_ot3.move_to_arched_ot3(api, mount, actual)
+    return actual
+
+
+async def _pick_up_tip(
+    api: OT3API,
+    mount: OT3Mount,
+    test_config: TestConfig,
+    tip: str,
+    expected: Optional[Point],
+    actual: Optional[Point],
+) -> Point:
+    actual = await _move_to_or_calibrate(api, mount, expected, actual)
     tip_offset = _tip_name_to_xy_offset(tip)
-    tip_pos = CALIBRATED_LABWARE_LOCATIONS.tip_rack + tip_offset
+    tip_pos = actual + tip_offset
     await helpers_ot3.move_to_arched_ot3(api, mount, tip_pos, safe_height=tip_pos.z + 5)
     tip_length = helpers_ot3.get_default_tip_length(test_config.tip_volume)
     await api.pick_up_tip(mount, tip_length=tip_length)
+    return actual
 
 
-async def _calibrate_and_move_to_liquid(api: OT3API, mount: OT3Mount) -> None:
-    if not CALIBRATED_LABWARE_LOCATIONS.reservoir:
-        assert IDEAL_LABWARE_LOCATIONS.reservoir
-        await helpers_ot3.move_to_arched_ot3(
-            api, mount, IDEAL_LABWARE_LOCATIONS.reservoir + Point(z=10)
-        )
-        print("jog to reservoir, 2mm below the liquid")
-        await helpers_ot3.jog_mount_ot3(api, mount)
-        CALIBRATED_LABWARE_LOCATIONS.reservoir = await api.gantry_position(mount)
-    else:
-        print("moving to the reservoir")
-        await helpers_ot3.move_to_arched_ot3(
-            api, mount, CALIBRATED_LABWARE_LOCATIONS.reservoir
-        )
+async def _pick_up_tip_for_liquid(
+    api: OT3API, mount: OT3Mount, test_config: TestConfig, tip: str
+) -> None:
+    CALIBRATED_LABWARE_LOCATIONS.tip_rack_liquid = await _pick_up_tip(
+        api,
+        mount,
+        test_config,
+        tip,
+        IDEAL_LABWARE_LOCATIONS.tip_rack_liquid,
+        CALIBRATED_LABWARE_LOCATIONS.tip_rack_liquid,
+    )
 
 
-async def _calibrate_and_move_to_fixture(api: OT3API, mount: OT3Mount) -> None:
-    if not CALIBRATED_LABWARE_LOCATIONS.fixture:
-        assert IDEAL_LABWARE_LOCATIONS.fixture
-        await helpers_ot3.move_to_arched_ot3(
-            api, mount, IDEAL_LABWARE_LOCATIONS.fixture + Point(z=10)
-        )
-        print("jog to fixture")
-        await helpers_ot3.jog_mount_ot3(api, mount)
-        CALIBRATED_LABWARE_LOCATIONS.fixture = await api.gantry_position(mount)
-    else:
-        print("moving to the fixture")
-        await helpers_ot3.move_to_arched_ot3(
-            api, mount, CALIBRATED_LABWARE_LOCATIONS.fixture
-        )
+async def _pick_up_tip_for_fixture(
+    api: OT3API, mount: OT3Mount, test_config: TestConfig, tip: str
+) -> None:
+    CALIBRATED_LABWARE_LOCATIONS.tip_rack_fixture = await _pick_up_tip(
+        api,
+        mount,
+        test_config,
+        tip,
+        IDEAL_LABWARE_LOCATIONS.tip_rack_fixture,
+        CALIBRATED_LABWARE_LOCATIONS.tip_rack_fixture,
+    )
+
+
+async def _move_to_liquid(api: OT3API, mount: OT3Mount) -> None:
+    CALIBRATED_LABWARE_LOCATIONS.reservoir = await _move_to_or_calibrate(
+        api,
+        mount,
+        IDEAL_LABWARE_LOCATIONS.reservoir,
+        CALIBRATED_LABWARE_LOCATIONS.reservoir,
+    )
+
+
+async def _move_to_fixture(api: OT3API, mount: OT3Mount) -> None:
+    CALIBRATED_LABWARE_LOCATIONS.fixture = await _move_to_or_calibrate(
+        api,
+        mount,
+        IDEAL_LABWARE_LOCATIONS.fixture,
+        CALIBRATED_LABWARE_LOCATIONS.fixture,
+    )
+
+
+async def _drop_tip_in_trash(api: OT3API, mount: OT3Mount) -> None:
+    CALIBRATED_LABWARE_LOCATIONS.trash = await _move_to_or_calibrate(
+        api, mount, IDEAL_LABWARE_LOCATIONS.trash, CALIBRATED_LABWARE_LOCATIONS.trash
+    )
+    await api.drop_tip(mount, home_after=False)
 
 
 async def _aspirate_and_look_for_droplets(
@@ -166,38 +217,43 @@ async def _aspirate_and_look_for_droplets(
     return leak_test_passed
 
 
-async def _fixture_check_for_leak(
+async def _fixture_check_pressure(
     api: OT3API,
     mount: OT3Mount,
     test_config: TestConfig,
     write_cb: Callable,
     fixture: PressureFixture,
+    num_samples: int,
 ) -> bool:
-    pre_pressure = fixture.read_all_pressure_channel()
+    def _list_of_floats_to_str(l: List[float]) -> List[str]:
+        return [str(round(p, 2)) for p in l]
+
+    def _read_pressure(tag: str) -> List[List[float]]:
+        _samples = []
+        for _ in range(num_samples):
+            _samples.append(fixture.read_all_pressure_channel())
+            write_cb([tag] + _list_of_floats_to_str(_samples[-1]))
+        return _samples
+
+    # above the fixture
+    _read_pressure("pre-pressure")
+    # insert into the fixture
     await api.move_rel(mount, Point(z=-test_config.fixture_depth))
-    insert_pressure = fixture.read_all_pressure_channel()
-    await api.aspirate(mount, test_config.aspirate_volume)
-    aspirate_pressure = fixture.read_all_pressure_channel()
-    await api.dispense(mount, test_config.aspirate_volume)
-    dispense_pressure = fixture.read_all_pressure_channel()
+    _read_pressure("insert-pressure")
+    # aspirate 50uL
+    await api.aspirate(mount, FIXTURE_ASPIRATE_VOLUME)
+    _read_pressure("aspirate-pressure")
+    # dispense
+    await api.dispense(mount, FIXTURE_ASPIRATE_VOLUME)
+    _read_pressure("dispense-pressure")
+    # retract out of fixture
     await api.move_rel(mount, Point(z=test_config.fixture_depth))
-    post_pressure = fixture.read_all_pressure_channel()
+    _read_pressure("post-pressure")
     if api.is_simulator:
         return True
     # TODO: figure out how to analyze this data, detect pass/fail
     # TODO: save pass/fail to CSV
     return True
-
-
-async def _drop_tip_in_trash(api: OT3API, mount: OT3Mount) -> None:
-    assert IDEAL_LABWARE_LOCATIONS.trash
-    await helpers_ot3.move_to_arched_ot3(
-        api,
-        mount,
-        IDEAL_LABWARE_LOCATIONS.trash,
-        safe_height=IDEAL_LABWARE_LOCATIONS.trash.z + 20,
-    )
-    await api.drop_tip(mount, home_after=False)
 
 
 async def _test_for_leak(
@@ -208,15 +264,20 @@ async def _test_for_leak(
     fixture: Optional[PressureFixture],
     write_cb: Optional[Callable],
 ) -> bool:
-    await _calibrate_and_pick_up_tip(api, mount, test_config, tip=tip)
+    await _pick_up_tip_for_liquid(api, mount, test_config, tip=tip)
     if fixture:
         assert write_cb, "pressure fixture requires recording data to disk"
-        await _calibrate_and_move_to_fixture(api, mount)
-        test_passed = await _fixture_check_for_leak(
-            api, mount, test_config, write_cb=write_cb, fixture=fixture
+        await _move_to_fixture(api, mount)
+        test_passed = await _fixture_check_pressure(
+            api,
+            mount,
+            test_config,
+            write_cb=write_cb,
+            fixture=fixture,
+            num_samples=test_config.num_samples,
         )
     else:
-        await _calibrate_and_move_to_liquid(api, mount)
+        await _move_to_liquid(api, mount)
         test_passed = await _aspirate_and_look_for_droplets(api, mount, test_config)
     await _drop_tip_in_trash(api, mount)
     pass_msg = "PASS" if test_passed else "FAIL"
@@ -248,7 +309,11 @@ async def _main(simulate: bool, mount: OT3Mount, test_config: TestConfig) -> Non
     # setup our labware locations
     IDEAL_LABWARE_LOCATIONS = _get_ideal_labware_locations(test_config)
     CALIBRATED_LABWARE_LOCATIONS = LabwareLocations(
-        trash=None, tip_rack=None, reservoir=None, fixture=None
+        trash=None,
+        tip_rack_liquid=None,
+        tip_rack_fixture=None,
+        reservoir=None,
+        fixture=None,
     )
 
     # connect to the pressure fixture
@@ -283,7 +348,7 @@ async def _main(simulate: bool, mount: OT3Mount, test_config: TestConfig) -> Non
 
     # prepare to run the test
     tips_liquid = [f"A{i + 1}" for i in range(test_config.num_trials)]
-    tips_fixture = [f"B{i + 1}" for i in range(test_config.num_trials)]
+    tips_fixture = [f"A{i + 1}" for i in range(test_config.num_trials)]
 
     # run the test
     await api.home()
@@ -309,8 +374,10 @@ if __name__ == "__main__":
     arg_parser.add_argument("--fixture-side", choices=["left", "right"], default="left")
     arg_parser.add_argument("--port", type=str, default="")
     arg_parser.add_argument("--num-trials", type=int, default=2)
+    arg_parser.add_argument("--num-samples", type=int, default=10)
     arg_parser.add_argument("--wait", type=int, default=30)
-    arg_parser.add_argument("--slot-tip-rack", type=int, default=1)
+    arg_parser.add_argument("--slot-tip-rack-liquid", type=int, default=1)
+    arg_parser.add_argument("--slot-tip-rack-fixture", type=int, default=1)
     arg_parser.add_argument("--slot-reservoir", type=int, default=5)
     arg_parser.add_argument("--slot-fixture", type=int, default=2)
     arg_parser.add_argument("--insert-depth", type=int, default=14)
@@ -336,10 +403,12 @@ if __name__ == "__main__":
         fixture_side=args.fixture_side,
         aspirate_volume=args.volume,
         tip_volume=args.tip,
-        slot_tip_rack=args.slot_tip_rack,
+        slot_tip_rack_liquid=args.slot_tip_rack_liquid,
+        slot_tip_rack_fixture=args.slot_tip_rack_fixture,
         slot_reservoir=args.slot_reservoir,
         slot_fixture=args.slot_fixture,
         num_trials=args.num_trials,
+        num_samples=args.num_samples,
         wait_seconds=args.wait,
     )
     asyncio.run(_main(args.simulate, _mount, _cfg))
