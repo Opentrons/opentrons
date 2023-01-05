@@ -41,7 +41,7 @@ class WellCore(AbstractWellCore):
     @property
     def geometry(self) -> WellGeometry:
         """Get the well's geometry information interface."""
-        raise NotImplementedError("WellCore.geometry not implemented")
+        raise APIVersionError("WellCore.geometry has been deprecated.")
 
     @property
     def diameter(self) -> Optional[float]:
