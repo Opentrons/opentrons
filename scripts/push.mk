@@ -13,8 +13,8 @@ ssh-version-output = $(shell ssh -V 2>&1)
 ssh-version-words=$(subst _, ,$(filter OpenSSH_%, $(ssh-version-output)))
 ssh-version-label=$(filter %p1$(comma),$(ssh-version-words))
 ssh-version-number=$(subst ., ,$(firstword $(subst p, ,$(ssh-version-label))))
-$(if $(ssh-version-number),,"$(warning Could not find ssh version for version $(ssh-version-output), scp flags may be wrong"))
-is-in-version=$(findstring $(firstword $(ssh-version-number)),$(allowed-ssh-versions))
+checked-ssh-version=$(if $(ssh-version-number),$(ssh-version-number),"$(warning Could not find ssh version for version $(ssh-version-output), scp flags may be wrong")))
+is-in-version=$(findstring $(firstword $(checked-ssh-version)),$(allowed-ssh-versions))
 # when using an OpenSSH version larger than 8.9,
 # we need to add a flag to use legacy scp with SFTP protocol
 scp-legacy-option-flag = $(if $(is-in-version),,-O)
@@ -48,7 +48,7 @@ endef
 # argument 8 is either egg or dist (default egg)
 define push-python-sdist
 $(if $(is-ot3), ,echo "This is an OT-2. Use 'make push' instead." && exit 1)
-scp $(if $(2),"-i $(2)") $(3) $(4) root@$(1):/var/$(notdir $(4))
+scp $(if $(2),"-i $(2)") $(scp-legacy-option-flag) $(3) $(4) root@$(1):/var/$(notdir $(4))
 ssh $(if $(2),"-i $(2)") $(3) root@$(1) \
 "function cleanup () { rm -f /var/$(notdir $(4)) ; rm -rf /var/$(notdir $(4))-unzip; mount -o remount,ro / ; } ;\
  mkdir -p /var/$(notdir $(4))-unzip ; \
@@ -80,6 +80,6 @@ endef
 # argument 3 is any further ssh options, quoted
 # argument 4 is the unit file path
 define push-systemd-unit
-	scp -i $(2) $(3) "$(4)" root@$(1):/data/
+	scp -i $(2) $(scp-legacy-option-flag) $(3) "$(4)" root@$(1):/data/
 	ssh -i $(2) $(3) root@$(1) "mount -o remount,rw / && mv /data/$(notdir $(4)) /etc/systemd/system/ && systemctl daemon-reload && mount -o remount,ro / || mount -o remount,ro /"
 endef
