@@ -28,7 +28,7 @@ interface Props {
 }
 export function StepText(props: Props): JSX.Element | null {
   const { analysisCommand, robotName, runCommand, runId } = props
-  const { t } = useTranslation('commands_run_log')
+  const { t } = useTranslation('protocol_command_text')
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
   const { protocolData } = useProtocolDetailsForRun(runId)
 

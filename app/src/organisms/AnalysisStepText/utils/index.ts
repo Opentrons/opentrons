@@ -1,4 +1,4 @@
-export * from './getLabwareLocation'
+export * from './getLabwareDisplayLocation'
 export * from './getLabwareName'
 export * from './getPipetteNameOnMount'
 export * from './getModuleModel'

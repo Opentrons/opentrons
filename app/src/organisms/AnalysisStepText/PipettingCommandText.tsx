@@ -1,57 +1,32 @@
 // @ts-nocheck
 import * as React from 'react'
-import { TFunction, useTranslation } from 'react-i18next'
-import { getModuleDisplayName, getModuleType, getOccludedSlotCountForModule, } from '@opentrons/shared-data'
-import { getPipetteNameSpecs, OT2_STANDARD_MODEL } from '@opentrons/shared-data/js'
+import { useTranslation } from 'react-i18next'
 
-import { StyledText } from '../../../atoms/text'
+import { StyledText } from '../../atoms/text'
 
 import type { RunTimeCommand, CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import type { PipetteModel, LoadedLabware, LoadedModule, ModuleModel } from '@opentrons/shared-data'
-import type { LabwareLocation } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import { getLabwareDisplayLocation, getLabwareName } from './utils'
 
 interface PipettingCommandText {
   command: RunTimeCommand
   robotSideAnalysis: CompletedProtocolAnalysis
 }
 
-function getLoadedLabware(analysis: CompletedProtocolAnalysis, labwareId: string): LoadedLabware | undefined {
-  // NOTE: old analysis contains a object dictionary of labware entities by id, this case is supported for backwards compatibility purposes
-  return Array.isArray(analysis.labware) ? analysis.labware.find(l => l.id === labwareId) : analysis.labware[labwareId]
-}
-function getLoadedPipette(analysis: CompletedProtocolAnalysis, mount: string): LoadedPipette | undefined {
-  // NOTE: old analysis contains a object dictionary of pipette entities by id, this case is supported for backwards compatibility purposes
-  return Array.isArray(analysis.pipettes) ? analysis.pipettes.find(l => l.mount === mount) : analysis.pipettes[mount]
-}
-function getLoadedModule(analysis: CompletedProtocolAnalysis, moduleId: string): LoadedModule | undefined {
-  // NOTE: old analysis contains a object dictionary of module entities by id, this case is supported for backwards compatibility purposes
-  return Array.isArray(analysis.modules) ? analysis.modules.find(l => l.moduleId === moduleId) : analysis.modules[moduleId]
-}
-
-function getDisplayLocation(analysis: CompletedProtocolAnalysis, location: LabwareLocation, t: TFunction){
-  if (location === 'offDeck') {
-    t('off_deck')
-  }
-}
-
 export const PipettingCommandText = ({
   command,
   robotSideAnalysis,
 }: PipettingCommandText): JSX.Element | null => {
-  const { t } = useTranslation('run_details')
+  const { t } = useTranslation('protocol_command_text')
 
   let commandText
 
   switch (command.commandType) {
     case 'aspirate': {
       const { wellName, labwareId, volume, flowRate } = command.params
-      const labwareEntity = labware.find(l => l.id === labwareId)
-      const definitionUri = labwareEntity?.definitionUri ?? ''
-      const location = labwareEntity?.location
-      messageNode = t('aspirate', {
+      commandText = t('aspirate', {
         well_name: wellName,
-        labware: definitionUri,
-        labware_location: JSON.stringify(location),
+        labware: getLabwareName(robotSideAnalysis, labwareId),
+        labware_location: getLabwareDisplayLocation(robotSideAnalysis, labwareId, t),
         volume: volume,
         flow_rate: flowRate,
       })
@@ -59,14 +34,10 @@ export const PipettingCommandText = ({
     }
     case 'dispense': {
       const { wellName, labwareId, volume, flowRate } = command.params
-      const labwareEntity = labware.find(l => l.id === labwareId)
-      const definitionUri = labwareEntity?.definitionUri ?? ''
-      const location = labwareEntity?.location
-
-      messageNode = t('dispense', {
+      commandText = t('dispense', {
         well_name: wellName,
-        labware: definitionUri,
-        labware_location: JSON.stringify(location),
+        labware: getLabwareName(robotSideAnalysis, labwareId),
+        labware_location: getLabwareDisplayLocation(robotSideAnalysis, labwareId, t),
         volume: volume,
         flow_rate: flowRate,
       })
@@ -75,14 +46,10 @@ export const PipettingCommandText = ({
     }
     case 'blowout': {
       const { wellName, labwareId, flowRate } = command.params
-      const labwareEntity = labware.find(l => l.id === labwareId)
-      const definitionUri = labwareEntity?.definitionUri ?? ''
-      const location = labwareEntity?.location
-
-      messageNode = t('blowout', {
+      commandText = t('blowout', {
         well_name: wellName,
-        labware: definitionUri,
-        labware_location: JSON.stringify(location),
+        labware: getLabwareName(robotSideAnalysis, labwareId),
+        labware_location: getLabwareDisplayLocation(robotSideAnalysis, labwareId, t),
         flow_rate: flowRate,
       })
       break
@@ -93,7 +60,7 @@ export const PipettingCommandText = ({
       const definitionUri = labwareEntity?.definitionUri ?? ''
       const location = labwareEntity?.location
 
-      messageNode = t('move_to_well', {
+      commandText = t('move_to_well', {
         well_name: wellName,
         labware: definitionUri,
         labware_location: JSON.stringify(location),
@@ -102,25 +69,19 @@ export const PipettingCommandText = ({
     }
     case 'dropTip': {
       const { wellName, labwareId } = command.params
-      const labwareEntity = labware.find(l => l.id === labwareId)
-      const definitionUri = labwareEntity?.definitionUri ?? ''
-      const location = labwareEntity?.location
-      messageNode = t('drop_tip', {
+      commandText = t('drop_tip', {
         well_name: wellName,
-        labware: definitionUri,
-        labware_location: JSON.stringify(location),
+        labware: getLabwareName(robotSideAnalysis, labwareId),
+        labware_location: getLabwareDisplayLocation(robotSideAnalysis, labwareId, t),
       })
       break
     }
     case 'pickUpTip': {
       const { wellName, labwareId } = command.params
-      const labwareEntity = labware.find(l => l.id === labwareId)
-      const definitionUri = labwareEntity?.definitionUri ?? ''
-      const location = labwareEntity?.location
-      messageNode = t('pickup_tip', {
+      commandText = t('pickup_tip', {
         well_name: wellName,
-        labware: definitionUri,
-        labware_location: JSON.stringify(location),
+        labware: getLabwareName(robotSideAnalysis, labwareId),
+        labware_location: getLabwareDisplayLocation(robotSideAnalysis, labwareId, t),
       })
       break
     }

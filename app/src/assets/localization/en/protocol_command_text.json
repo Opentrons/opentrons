@@ -36,5 +36,7 @@
   "home_gantry": "Homing all gantry, pipette, and plunger axes",
   "save_position": "Saving position",
   "comment": "Comment",
-  "wait_for_resume": "Pausing protocol"
+  "wait_for_resume": "Pausing protocol",
+  "slot": "Slot {{slot_name}}",
+  "module_in_slot": "{{module_name}} in Slot {{slot_name}}"
 }

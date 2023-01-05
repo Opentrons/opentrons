@@ -9,7 +9,6 @@ import { StyledText } from '../../atoms/text'
 import type { RunTimeCommand, CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import { 
   getLabwareName,
-  getLabwareLocation,
   getPipetteNameOnMount,
   getModuleModel,
   getModuleDisplayLocation,
@@ -61,11 +60,10 @@ export const LoadCommandText = ({
           module_name: moduleName,
         })
       } else {
-        const labwareLocation = getLabwareLocation(robotSideAnalysis, command.result.labwareId)
         commandText = t("load_labware_info_protocol_setup_no_module",
           {
             labware: command.result?.definition.metadata.displayName,
-            slot_name: labwareLocation === 'offDeck' ? t('off_deck') : labwareLocation?.slotName,
+            slot_name: command.params.location === 'offDeck' ? t('off_deck') : command.params.location?.slotName,
           }
         )
       }
