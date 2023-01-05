@@ -26,6 +26,9 @@ SPEED_Z = 200
 SPEED_Y = 500
 ACCEL_Y = 500
 
+MAX_ACCEL = 3000
+MAX_SPEED = 1000
+
 
 SETTINGS = {
     OT3Axis.X: GantryLoadSettings(
@@ -33,33 +36,33 @@ SETTINGS = {
         acceleration=1000,
         max_start_stop_speed=20,
         max_change_dir_speed=5,
-        hold_current=1.5,
-        run_current=1.5,
+        hold_current=0.7,
+        run_current=1.5
     ),
     OT3Axis.Y: GantryLoadSettings(
         max_speed=SPEED_Y,
         acceleration=ACCEL_Y,
         max_start_stop_speed=20,
         max_change_dir_speed=5,
-        hold_current=1.5,
-        run_current=1.5,
+        hold_current=0.7,
+        run_current=1.5
     ),
     OT3Axis.Z_L: GantryLoadSettings(
         max_speed=SPEED_Z,
-        acceleration=50,
-        max_start_stop_speed=1,
-        max_change_dir_speed=5,
-        hold_current=1.5,
-        run_current=1.5,
+        acceleration=300,
+        max_start_stop_speed=10,
+        max_change_dir_speed=1,
+        hold_current=0.7,
+        run_current=1.5
     ),
     OT3Axis.Z_R: GantryLoadSettings(
         max_speed=SPEED_Z,
         acceleration=400,
-        max_start_stop_speed=20,
-        max_change_dir_speed=5,
-        hold_current=1.5,
-        run_current=1.5,
-    ),
+        max_start_stop_speed=10,
+        max_change_dir_speed=1,
+        hold_current=0.7,
+        run_current=1.5
+    )
 }
 
 AXIS_MAP = {'Y': OT3Axis.Y,
@@ -71,7 +74,7 @@ AXIS_MAP = {'Y': OT3Axis.Y,
 
 step_x = 530
 step_y = 400
-step_z = 210
+step_z = 180
 POINT_MAP = {'Y': Point(y=step_y),
              'X': Point(x=step_x),
              'L': Point(z=step_z),
@@ -105,31 +108,31 @@ def check_move_error(delta_move, point_delta, axis):
     return abs(move_error)
 
 
-async def _single_axis_move(api: OT3API, cycles: int = 1) -> None:
+async def _single_axis_move(axis, api: OT3API, cycles: int = 1) -> None:
     avg_error = []
     for c in range(cycles):
-        if(AXIS == 'R'):
-            MOUNT = OT3Mount.RIGHT
-        else:
+        if(AXIS == 'L'):
             MOUNT = OT3Mount.LEFT
+        else:
+            MOUNT = OT3Mount.RIGHT
         inital_pos = await api.encoder_current_position_ot3(mount=MOUNT)
-        cur_speed = SETTINGS[AXIS_MAP[AXIS]].max_speed
+        cur_speed = SETTINGS[AXIS_MAP[axis]].max_speed
 
-        await api.move_rel(mount=MOUNT, delta=NEG_POINT_MAP[AXIS], speed=cur_speed)
+        await api.move_rel(mount=MOUNT, delta=NEG_POINT_MAP[axis], speed=cur_speed)
 
         move_pos = await api.encoder_current_position_ot3(mount=MOUNT)
         delta_move_pos = get_pos_delta(move_pos, inital_pos)
-        delta_move_axis = delta_move_pos[AXIS_MAP[AXIS]]
-        move_error = check_move_error(delta_move_axis, NEG_POINT_MAP[AXIS], AXIS)
+        delta_move_axis = delta_move_pos[AXIS_MAP[axis]]
+        move_error = check_move_error(delta_move_axis, NEG_POINT_MAP[axis], axis)
         if(move_error >= 0.1):
             return (move_error, c+1)
 
-        await api.move_rel(mount=MOUNT, delta=POINT_MAP[AXIS], speed=cur_speed)
+        await api.move_rel(mount=MOUNT, delta=POINT_MAP[axis], speed=cur_speed)
 
         final_pos = await api.encoder_current_position_ot3(mount=MOUNT)
         delta_pos = get_pos_delta(final_pos, inital_pos)
-        delta_pos_axis = delta_pos[AXIS_MAP[AXIS]]
-        print(AXIS + ' Error: ' + str(delta_pos_axis))
+        delta_pos_axis = delta_pos[AXIS_MAP[axis]]
+        print(axis + ' Error: ' + str(delta_pos_axis))
         if(abs(delta_pos_axis) >= 0.1):
             return (delta_pos_axis, c+1);
         else:
@@ -137,29 +140,44 @@ async def _single_axis_move(api: OT3API, cycles: int = 1) -> None:
     return (sum(avg_error)/len(avg_error), c+1)
 
 
+async def match_z_settings(axis, speed, accel):
+    if(axis == 'L' or axis == 'R'):
+        SETTINGS[AXIS_MAP['L']].acceleration = accel
+        SETTINGS[AXIS_MAP['L']].max_speed = speed
+        SETTINGS[AXIS_MAP['R']].acceleration = accel
+        SETTINGS[AXIS_MAP['R']].max_speed = speed
+
+    return True
+
 async def _main(is_simulating: bool) -> None:
     api = await build_async_ot3_hardware_api(is_simulating=is_simulating)
     try:
-        with open('speed_test_output_' + AXIS + '.csv', mode='w') as csv_file:
-            fieldnames = ['speed', 'acceleration', 'error', 'cycles']
+        a = AXIS
+        with open('speed_test_output_' + a + '.csv', mode='w') as csv_file:
+            fieldnames = ['axis','speed', 'acceleration', 'error', 'cycles']
             writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
             writer.writeheader()
 
-            initial_speed = SETTINGS[AXIS_MAP[AXIS]].max_speed
-            initial_accel = SETTINGS[AXIS_MAP[AXIS]].acceleration
+            initial_speed = SETTINGS[AXIS_MAP[a]].max_speed
+            initial_accel = SETTINGS[AXIS_MAP[a]].acceleration
             valid_speed = True
             valid_accel = True
-            while(valid_speed):
-                while(valid_accel):
+            while(valid_speed and SETTINGS[AXIS_MAP[a]].max_speed < MAX_SPEED):
+                while(valid_accel and SETTINGS[AXIS_MAP[a]].acceleration < MAX_ACCEL):
+                    await match_z_settings(a,
+                                     SETTINGS[AXIS_MAP[a]].max_speed,
+                                     SETTINGS[AXIS_MAP[a]].acceleration)
                     await set_gantry_load_per_axis_settings_ot3(api,
                                                     SETTINGS,
                                                     load=None)
-                    await api.home([AXIS_MAP[AXIS]])
-                    move_output_tuple = await _single_axis_move(api, cycles=CYCLES)
+                    await api.home([AXIS_MAP[a]])
+                    move_output_tuple = await _single_axis_move(a,
+                                                                api,
+                                                                cycles=CYCLES)
                     run_avg_error = move_output_tuple[0]
                     cycles_completed = move_output_tuple[1]
-                    cur_speed = SETTINGS[AXIS_MAP[AXIS]].max_speed
-                    cur_accel = SETTINGS[AXIS_MAP[AXIS]].acceleration
+                    cur_speed = SETTINGS[AXIS_MAP[a]].max_speed
+                    cur_accel = SETTINGS[AXIS_MAP[a]].acceleration
                     if(abs(run_avg_error) >= 0.1):
                         valid_accel = False
                         if(cur_accel == initial_accel):
@@ -167,7 +185,8 @@ async def _main(is_simulating: bool) -> None:
                         print("Error: " + str(run_avg_error))
                         print("Failed Speed: " + str(cur_speed))
                         print("Failed Acceleration: " + str(cur_accel))
-                        writer.writerow({'speed': cur_speed,
+                        writer.writerow({'axis': a,
+                                         'speed': cur_speed,
                                          'acceleration': cur_accel,
                                          'error': run_avg_error,
                                          'cycles': cycles_completed})
@@ -175,16 +194,18 @@ async def _main(is_simulating: bool) -> None:
                         print("Speed: " + str(cur_speed))
                         print("Acceleration: " + str(cur_accel))
                         print("Error: " + str(run_avg_error))
-                        writer.writerow({'speed': cur_speed,
+                        writer.writerow({'axis': a,
+                                         'speed': cur_speed,
                                          'acceleration': cur_accel,
                                          'error': run_avg_error,
                                          'cycles': cycles_completed})
-                        SETTINGS[AXIS_MAP[AXIS]].acceleration = cur_accel + 100
+                        SETTINGS[AXIS_MAP[a]].acceleration = cur_accel + 250
 
-                SETTINGS[AXIS_MAP[AXIS]].acceleration = initial_accel
+
+                SETTINGS[AXIS_MAP[a]].acceleration = initial_accel
                 valid_accel = True
-                cur_speed = SETTINGS[AXIS_MAP[AXIS]].max_speed
-                SETTINGS[AXIS_MAP[AXIS]].max_speed = cur_speed + 25
+                cur_speed = SETTINGS[AXIS_MAP[a]].max_speed
+                SETTINGS[AXIS_MAP[a]].max_speed = cur_speed + 25
     except KeyboardInterrupt:
         await api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
     finally:
