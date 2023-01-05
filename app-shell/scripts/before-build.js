@@ -20,6 +20,12 @@ const PYTHON_BY_PLATFORM = {
     },
   },
   linux: {
+    1: {
+      url:
+        'https://github.com/indygreg/python-build-standalone/releases/download/20220318/cpython-3.10.3+20220318-x86_64-apple-darwin-install_only.tar.gz',
+      sha256:
+        'ec2e90b6a589db7ef9f74358b1436558167629f9e4d725c8150496f9cb08a9d4',
+    },
     x64: {
       url:
         'https://github.com/indygreg/python-build-standalone/releases/download/20220318/cpython-3.10.3+20220318-x86_64-unknown-linux-gnu-install_only.tar.gz',
