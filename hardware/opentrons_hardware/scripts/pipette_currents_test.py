@@ -233,9 +233,11 @@ async def main() -> None:
 
                 await set_pipette_current(current,args)
                 print("    Current test current is {}".format(current))
-                print(Current_dic[pipette_model])
+                # print(Current_dic[pipette_model])
                 res = await move_to(messenger, node, 10, move_speed)
-                await res_check(pipette_model, node, res)
+                print('motor position: ', res[node][0], ', ',
+                      'encoder position: ', res[node][1])
+                # await res_check(pipette_model, node, res)
                 try:
                     for t in range(1, CYCLES + 1):
                         res = await move_to(messenger, node, 60, move_speed)
