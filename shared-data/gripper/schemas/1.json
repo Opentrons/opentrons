@@ -1,30 +1,14 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
-    "idleZCurrentRange": {
-      "type": "number",
-      "minimum": 0.01,
-      "maximum": 1.0
-    },
-    "activeZCurrentRange": {
-      "type": "number",
-      "minimum": 0.02,
-      "maximum": 2.0
-    },
-    "jawReferenceVoltageRange": {
-      "type": "number",
-      "minimum": 0.01,
-      "maximum": 3.3
-    },
-    "percentage": {
-      "type": "number",
-      "minimum": 0,
-      "maximum": 100
-    },
     "coordinates": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["x", "y", "z"],
+      "required": [
+        "x",
+        "y",
+        "z"
+      ],
       "properties": {
         "x": {
           "type": "number"
@@ -41,17 +25,20 @@
       "type": "number",
       "minimum": 0
     },
-    "jawWidthValue": {
-      "type": "object",
-      "required": ["min", "max"],
-      "properties": {
-        "min": {
-          "$ref": "#/definitions/positiveNumber"
+    "polynomialTerm": {
+      "type": "array",
+      "description": "Array representing a polynomial term. The first element (a non-negative integer) describes the degree of the variable, and the second the coefficient.",
+      "items": [
+        {
+          "type": "integer",
+          "minimum": 0
         },
-        "max": {
-          "$ref": "#/definitions/positiveNumber"
+        {
+          "type": "number"
         }
-      }
+      ],
+      "minItems": 2,
+      "maxItems": 2
     }
   },
   "description": "Gripper specification",
@@ -60,16 +47,10 @@
     "$otSharedSchema",
     "displayName",
     "model",
-    "idleZCurrent",
-    "activeZCurrent",
-    "jawReferenceVoltage",
-    "jawDutyCyclePolynomial",
-    "baseOffsetFromMount",
-    "jawCenterOffsetFromBase",
-    "pinOneOffsetFromBase",
-    "pinTwoOffsetFromBase",
-    "quirks",
-    "jawSizes_mm"
+    "zMotorConfigurations",
+    "jawMotorConfigurations",
+    "gripForceProfile",
+    "geometry"
   ],
   "additionalProperties": false,
   "properties": {
@@ -84,62 +65,108 @@
       "type": "string",
       "pattern": "^gripperV[0-9]$"
     },
-    "idleZCurrent": {
+    "gripForceProfile": {
       "type": "object",
-      "value": {
-        "$ref": "#/definitions/idleZCurrentRange"
-      }
-    },
-    "activeZCurrent": {
-      "type": "object",
-      "value": {
-        "$ref": "#/definitions/activeZCurrentRange"
-      }
-    },
-    "jawReferenceVoltage": {
-      "type": "object",
-      "value": {
-        "$ref": "#/definitions/jawReferenceVoltageRange"
-      }
-    },
-    "jawDutyCyclePolynomial": {
-      "type": "array",
-      "items": {
-        "type": "array",
-        "items": [
-          {
-            "type": "integer"
+      "description": "Grip force (in N) configurations.",
+      "properties": {
+        "polynomial": {
+          "type": "array",
+          "description": "Polynomial function to convert a grip force in Newton to the jaw motor duty cycle value, which will be read by the gripper firmware.",
+          "items": {
+            "$ref": "#/definitions/polynomialTerm"
           },
-          {
-            "type": "number"
-          }
-        ],
-        "minItems": 2,
-        "maxItems": 2
-      },
-      "minItems": 1
-    },
-    "baseOffsetFromMount": {
-      "$ref": "#/definitions/coordinates"
-    },
-    "jawCenterOffsetFromBase": {
-      "$ref": "#/definitions/coordinates"
-    },
-    "pinOneOffsetFromBase": {
-      "$ref": "#/definitions/coordinates"
-    },
-    "pinTwoOffsetFromBase": {
-      "$ref": "#/definitions/coordinates"
-    },
-    "quirks": {
-      "type": "array",
-      "description": "Array of valid quirks for a given gripper",
-      "items": {
-        "type": "string"
+          "minItems": 1
+        },
+        "defaultGripForce": {
+          "$ref": "#/definitions/positiveNumber"
+        },
+        "defaultHomeForce": {
+          "$ref": "#/definitions/positiveNumber"
+        },
+        "minForce": {
+          "$ref": "#/definitions/positiveNumber"
+        },
+        "maxForce": {
+          "$ref": "#/definitions/positiveNumber"
+        }
       }
     },
-    "jawSizes_mm": {
-      "$ref": "#/definitions/jawWidthValue"
+    "zMotorConfigurations": {
+      "type": "object",
+      "description": "Object containing configurations specific to the z motor.",
+      "properties": {
+        "idle": {
+          "descriptions": "Motor idle current (A)",
+          "type": "number",
+          "minimum": 0.02,
+          "maximum": 1.0
+        },
+        "run": {
+          "descriptions": "Motor active current (A)",
+          "type": "number",
+          "minimum": 0.67,
+          "maximum": 2.5
+        }
+      },
+      "required": [
+        "idle",
+        "run"
+      ]
+    },
+    "jawMotorConfigurations": {
+      "type": "object",
+      "description": "Object containing configurations specific to the jaw motor.",
+      "properties": {
+        "vref": {
+          "descriptions": "Reference voltage (V)",
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 2.5
+        }
+      },
+      "required": [
+        "vref"
+      ]
+    },
+    "geometry": {
+      "type": "object",
+      "properties": {
+        "baseOffsetFromMount": {
+          "$ref": "#/definitions/coordinates"
+        },
+        "jawCenterOffsetFromBase": {
+          "$ref": "#/definitions/coordinates"
+        },
+        "pinOneOffsetFromBase": {
+          "$ref": "#/definitions/coordinates"
+        },
+        "pinTwoOffsetFromBase": {
+          "$ref": "#/definitions/coordinates"
+        },
+        "jawWidth": {
+          "type": "object",
+          "description": "The widths of gripper jaw when it is fully closed (min) and fully open (max).",
+          "properties": {
+            "min": {
+              "$ref": "#/definitions/positiveNumber"
+            },
+            "max": {
+              "$ref": "#/definitions/positiveNumber"
+            }
+          },
+          "required": [
+            "min",
+            "max"
+          ]
+        }
+      },
+      "required": [
+        "baseOffsetFromMount",
+        "jawCenterOffsetFromBase",
+        "pinOneOffsetFromBase",
+        "pinTwoOffsetFromBase",
+        "jawWidth"
+      ]
     }
   }
 }
