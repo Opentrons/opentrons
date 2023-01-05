@@ -253,63 +253,66 @@ async def run(args: argparse.Namespace) -> None:
         print('----------Read Motor Position and Encoder--------------')
         await _jog_axis(messenger, node, position)
 
-    print('-----------------Read EPPROM--------------')
-    serial_number = await read_epprom(messenger, node)
-    print(f'SN: {serial_number}')
+    if args.current:
+        print('\n')
+        print('-------------------Test Currents--------------------------')
+        print('-----------------Read EPPROM--------------')
+        serial_number = await read_epprom(messenger, node)
+        print(f'SN: {serial_number}')
 
-    print('-----------------Get pipette model--------------')
-    pipette_model = await get_pipette_model(messenger, node)
-    print(f'Model: {pipette_model}')
+        print('-----------------Get pipette model--------------')
+        pipette_model = await get_pipette_model(messenger, node)
+        print(f'Model: {pipette_model}')
 
-    print('-------------------Test Homing--------------------------')
-    await home(messenger, node)
-    print('Homed')
-    while True:
-        try:
-            re = input("\n    Enter 'q' to exit")
-            if re == "q":
-                break
-            results = {}
-            # print(Current_dic)
-            for i in Current_dic[str(pipette_model)]:
-                results["{}A".format(i)] = sus_str
-            for current in Current_dic[str(pipette_model)]:
-                print('-------------------Test Homing--------------------------')
-                await home(messenger, node)
-                print('Homed')
-
-                await set_pipette_current(current,args)
-                print("    Current test current is {}".format(current))
-                # print(Current_dic[pipette_model])
-                res = await move_to(messenger, node, 10, move_speed)
-                print('motor position: ', res[node][0], ', ',
-                      'encoder position: ', res[node][1])
-                # await res_check(pipette_model, node, res)
-                try:
-                    for t in range(1, CYCLES + 1):
-                        res = await move_to(messenger, node, 60, move_speed)
-                        await res_check(pipette_model, node, res)
-                        res = await move_to(messenger, node, 60, -move_speed)
-                        await res_check(pipette_model, node, res)
-                except Exception as e:
-                    print(e)
-                    results["{}A".format(current)] = "Fail_Stuck"
-                    break
-
-
-                if sus_str is results["{}A".format(current)]:
-                    results["{}A".format(current)] = "Pass_ ----"
-
+        print('-------------------Test Homing--------------------------')
+        await home(messenger, node)
+        print('Homed')
+        while True:
             try:
-                print(data_format.format("Type", "result", "reason"))
-                for i in results:
-                    result = results[i].split("_")[0]
-                    reason = results[i].split("_")[1]
-                    print(data_format.format(i, result, reason))
-            except IndexError:
+                re = input("\n    Enter 'q' to exit")
+                if re == "q":
+                    break
+                results = {}
+                # print(Current_dic)
+                for i in Current_dic[str(pipette_model)]:
+                    results["{}A".format(i)] = sus_str
+                for current in Current_dic[str(pipette_model)]:
+                    print('-------------------Test Homing--------------------------')
+                    await home(messenger, node)
+                    print('Homed')
+
+                    await set_pipette_current(current,args)
+                    print("    Current test current is {}".format(current))
+                    # print(Current_dic[pipette_model])
+                    res = await move_to(messenger, node, 10, move_speed)
+                    print('motor position: ', res[node][0], ', ',
+                          'encoder position: ', res[node][1])
+                    # await res_check(pipette_model, node, res)
+                    try:
+                        for t in range(1, CYCLES + 1):
+                            res = await move_to(messenger, node, 60, move_speed)
+                            await res_check(pipette_model, node, res)
+                            res = await move_to(messenger, node, 60, -move_speed)
+                            await res_check(pipette_model, node, res)
+                    except Exception as e:
+                        print(e)
+                        results["{}A".format(current)] = "Fail_Stuck"
+                        break
+
+
+                    if sus_str is results["{}A".format(current)]:
+                        results["{}A".format(current)] = "Pass_ ----"
+
+                try:
+                    print(data_format.format("Type", "result", "reason"))
+                    for i in results:
+                        result = results[i].split("_")[0]
+                        reason = results[i].split("_")[1]
+                        print(data_format.format(i, result, reason))
+                except IndexError:
+                    pass
+            except:
                 pass
-        except:
-            pass
 
 def main() -> None:
     parser = argparse.ArgumentParser(
@@ -339,6 +342,7 @@ def main() -> None:
     parser.add_argument("--jog", action="store_true")
     parser.add_argument("--read_epprom", action="store_true")
     parser.add_argument("--home", action="store_true")
+    parser.add_argument("--current", action="store_true")
 
     args = parser.parse_args()
 
