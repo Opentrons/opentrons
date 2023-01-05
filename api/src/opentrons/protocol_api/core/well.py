@@ -3,8 +3,9 @@
 from abc import ABC, abstractmethod
 from typing import TypeVar, Optional
 
-from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.types import Point
+
+from .protocol_api.well_geometry import WellGeometry
 
 
 class AbstractWellCore(ABC):

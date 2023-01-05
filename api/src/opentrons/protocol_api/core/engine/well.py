@@ -6,10 +6,10 @@ from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.util import APIVersionError
-from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.types import Point
 
 from ..well import AbstractWellCore
+from ..protocol_api.well_geometry import WellGeometry
 
 
 class WellCore(AbstractWellCore):

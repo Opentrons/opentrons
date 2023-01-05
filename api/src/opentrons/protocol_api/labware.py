@@ -20,7 +20,6 @@ from opentrons.types import Location, Point, LocationLabware
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import requires_version
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
-from opentrons.protocols.geometry.well_geometry import WellGeometry
 
 # TODO(mc, 2022-09-02): re-exports provided for backwards compatibility
 # remove when their usage is no longer needed
@@ -35,6 +34,7 @@ from . import validation
 from .core import well_grid
 from .core.labware import AbstractLabware
 from .core.protocol_api.labware import LabwareImplementation as LegacyLabwareCore
+from .core.protocol_api.well_geometry import WellGeometry
 
 if TYPE_CHECKING:
     from .core.common import LabwareCore, WellCore
