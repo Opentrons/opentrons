@@ -170,6 +170,22 @@ async def res_check(pipette_model,node,res) -> None:
     if abs(diff) > Tolerances[pipette_model]:
         raise Exception('Fail_Lose Step')
 
+def getch():
+    """
+        fd: file descriptor stdout, stdin, stderr
+        This functions gets a single input keyboard character from the user
+    """
+    def _getch():
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        try:
+            tty.setraw(fd)
+            ch = sys.stdin.read(1)
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        return ch
+    return _getch()
+
 async def _jog_axis(messenger: CanMessenger, node, position) -> None:
     step_size = [0.1, 0.5, 1, 10, 20, 50]
     step_length_index = 3
