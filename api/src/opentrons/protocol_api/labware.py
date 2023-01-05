@@ -325,7 +325,7 @@ class Labware:
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
-    def parent(self) -> Optional[Union[str, ModuleTypes]]:
+    def parent(self) -> Union[str, ModuleTypes, None]:
         """The parent of this labware. Usually a slot name."""
         if isinstance(self._implementation, LegacyLabwareCore):
             # Type ignoring to preserve backwards compatibility
