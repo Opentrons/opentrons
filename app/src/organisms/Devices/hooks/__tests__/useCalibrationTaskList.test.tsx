@@ -2,13 +2,13 @@ import * as React from 'react'
 import { I18nextProvider } from 'react-i18next'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { renderHook } from '@testing-library/react-hooks'
-import { useGenerateTaskList } from '../useGenerateTaskList'
+import { useCalibrationTaskList } from '../useCalibrationTaskList'
 import {
   useAttachedPipettes,
   useTipLengthCalibrations,
   usePipetteOffsetCalibrations,
   useDeckCalibrationData,
-} from '../'
+} from '..'
 import {
   TASK_COUNT,
   mockAttachedPipettesResponse,
@@ -38,7 +38,7 @@ const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction
   typeof useDeckCalibrationData
 >
 
-describe('useGenerateTaskList hook', () => {
+describe('useCalibrationTaskList hook', () => {
   let wrapper: React.FunctionComponent<{}>
   beforeEach(() => {
     wrapper = ({ children }) => (
@@ -65,7 +65,7 @@ describe('useGenerateTaskList hook', () => {
       .calledWith('otie')
       .mockReturnValue(mockCompletePipetteOffsetCalibrations)
 
-    const { result } = renderHook(() => useGenerateTaskList('otie'), {
+    const { result } = renderHook(() => useCalibrationTaskList('otie'), {
       wrapper,
     })
 
@@ -89,7 +89,7 @@ describe('useGenerateTaskList hook', () => {
       .calledWith('otie')
       .mockReturnValue(mockCompletePipetteOffsetCalibrations)
 
-    const { result } = renderHook(() => useGenerateTaskList('otie'), {
+    const { result } = renderHook(() => useCalibrationTaskList('otie'), {
       wrapper,
     })
 
@@ -109,7 +109,7 @@ describe('useGenerateTaskList hook', () => {
     when(mockUsePipetteOffsetCalibrations)
       .calledWith('otie')
       .mockReturnValue(mockCompletePipetteOffsetCalibrations)
-    const { result } = renderHook(() => useGenerateTaskList('otie'), {
+    const { result } = renderHook(() => useCalibrationTaskList('otie'), {
       wrapper,
     })
 
@@ -129,7 +129,7 @@ describe('useGenerateTaskList hook', () => {
     when(mockUsePipetteOffsetCalibrations)
       .calledWith('otie')
       .mockReturnValue(mockCompletePipetteOffsetCalibrations)
-    const { result } = renderHook(() => useGenerateTaskList('otie'), {
+    const { result } = renderHook(() => useCalibrationTaskList('otie'), {
       wrapper,
     })
 
@@ -149,7 +149,7 @@ describe('useGenerateTaskList hook', () => {
     when(mockUsePipetteOffsetCalibrations)
       .calledWith('otie')
       .mockReturnValue(mockIncompletePipetteOffsetCalibrations) // right mount marked as bad
-    const { result } = renderHook(() => useGenerateTaskList('otie'), {
+    const { result } = renderHook(() => useCalibrationTaskList('otie'), {
       wrapper,
     })
 
@@ -169,7 +169,7 @@ describe('useGenerateTaskList hook', () => {
     when(mockUsePipetteOffsetCalibrations)
       .calledWith('otie')
       .mockReturnValue(mockCompletePipetteOffsetCalibrations) // right mount marked as bad
-    const { result } = renderHook(() => useGenerateTaskList('otie'), {
+    const { result } = renderHook(() => useCalibrationTaskList('otie'), {
       wrapper,
     })
 
@@ -189,7 +189,7 @@ describe('useGenerateTaskList hook', () => {
     when(mockUsePipetteOffsetCalibrations)
       .calledWith('otie')
       .mockReturnValue(mockIncompletePipetteOffsetCalibrations) // right mount marked as bad
-    const { result } = renderHook(() => useGenerateTaskList('otie'), {
+    const { result } = renderHook(() => useCalibrationTaskList('otie'), {
       wrapper,
     })
 
@@ -209,7 +209,7 @@ describe('useGenerateTaskList hook', () => {
     when(mockUsePipetteOffsetCalibrations)
       .calledWith('otie')
       .mockReturnValue(mockIncompletePipetteOffsetCalibrations) // right mount marked as bad
-    const { result } = renderHook(() => useGenerateTaskList('otie'), {
+    const { result } = renderHook(() => useCalibrationTaskList('otie'), {
       wrapper,
     })
 
@@ -237,7 +237,7 @@ describe('useGenerateTaskList hook', () => {
     when(mockUsePipetteOffsetCalibrations)
       .calledWith('otie')
       .mockReturnValue(mockCompletePipetteOffsetCalibrations)
-    const { result } = renderHook(() => useGenerateTaskList('otie'), {
+    const { result } = renderHook(() => useCalibrationTaskList('otie'), {
       wrapper,
     })
 

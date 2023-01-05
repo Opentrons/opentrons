@@ -4,7 +4,7 @@ import {
   useDeckCalibrationData,
   usePipetteOffsetCalibrations,
   useTipLengthCalibrations,
-} from './'
+} from '.'
 
 import { formatTimestamp } from '../utils'
 
@@ -15,7 +15,7 @@ import type {
 } from '../../TaskList/types'
 import type { AttachedPipette } from '../../../redux/pipettes/types'
 
-export function useGenerateTaskList(robotName: string): TaskListProps {
+export function useCalibrationTaskList(robotName: string): TaskListProps {
   const { t } = useTranslation(['robot_calibration', 'devices_landing'])
   const TASK_LIST_LENGTH = 3
   let taskIndex = 0
