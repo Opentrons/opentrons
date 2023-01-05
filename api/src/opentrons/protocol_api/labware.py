@@ -31,11 +31,10 @@ from opentrons.protocols.labware import (  # noqa: F401
     save_definition as save_definition,
 )
 
-from opentrons.protocol_engine import ModuleLocation, DeckSlotLocation
-
 from . import validation
 from .core import well_grid
 from .core.labware import AbstractLabware
+from .core.module import AbstractModuleCore
 from .core.protocol_api.labware import LabwareImplementation as LegacyLabwareCore
 from .core.core_map import LoadedCoreMap
 
@@ -340,15 +339,10 @@ class Labware:
             self._implementation
         )
 
-        if isinstance(labware_location, DeckSlotLocation):
-            return labware_location.slotName.value
-        elif isinstance(labware_location, ModuleLocation):
-            module_core = self._protocol_core.get_module_core_item(
-                labware_location.moduleId
-            )
-            return self._core_map.get(module_core)
+        if isinstance(labware_location, AbstractModuleCore):
+            return self._core_map.get(labware_location)
 
-        return None
+        return labware_location
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
