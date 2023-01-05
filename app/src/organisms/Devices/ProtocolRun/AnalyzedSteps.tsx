@@ -12,7 +12,8 @@ import {
 } from '@opentrons/components'
 import { StyledText } from '../../../atoms/text'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { LoadCommandItem } from './LoadCommandItem'
+import { LoadCommandItem } from '../../AnalysisStepText/LoadCommandText'
+import { PipettingCommandItem } from './PipettingCommandItem'
 
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data/js'
@@ -75,33 +76,20 @@ export function StepText(props: Props): JSX.Element | null {
       )
       break
     }
-    case 'dropTip': {
-      const { wellName, labwareId } = command.params
-      const labwareEntity = labware.find(l => l.id === labwareId)
-      const definitionUri = labwareEntity?.definitionUri ?? ''
-      const location = labwareEntity?.location
-      messageNode = t('drop_tip', {
-        well_name: wellName,
-        labware: definitionUri,
-        labware_location: JSON.stringify(location),
-      })
-      break
-    }
-    case 'pickUpTip': {
-      const { wellName, labwareId } = command.params
-      const labwareEntity = labware.find(l => l.id === labwareId)
-      const definitionUri = labwareEntity?.definitionUri ?? ''
-      const location = labwareEntity?.location
-      messageNode = t('pickup_tip', {
-        well_name: wellName,
-        labware: definitionUri,
-        labware_location: JSON.stringify(location),
-      })
-      break
-    }
+
     case 'pause':
     case 'waitForResume': {
       messageNode = command.params?.message ?? t('wait_for_resume')
+      break
+    }
+
+    case 'aspirate': 
+    case 'dispense':
+    case 'blowout':
+    case 'moveToWell':
+    case 'dropTip':
+    case 'pickUpTip': {
+      messageNode = <PipettingCommandItem command={command} robotSideAnalysis={robotSideAnalysis} />
       break
     }
     case 'loadLabware':
@@ -233,50 +221,7 @@ export function StepText(props: Props): JSX.Element | null {
       })
       break
     }
-    case 'aspirate': {
-      const { wellName, labwareId, volume, flowRate } = command.params
-      const labwareEntity = labware.find(l => l.id === labwareId)
-      const definitionUri = labwareEntity?.definitionUri ?? ''
-      const location = labwareEntity?.location
-      messageNode = t('aspirate', {
-        well_name: wellName,
-        labware: definitionUri,
-        labware_location: JSON.stringify(location),
-        volume: volume,
-        flow_rate: flowRate,
-      })
-      break
-    }
-    case 'dispense': {
-      const { wellName, labwareId, volume, flowRate } = command.params
-      const labwareEntity = labware.find(l => l.id === labwareId)
-      const definitionUri = labwareEntity?.definitionUri ?? ''
-      const location = labwareEntity?.location
 
-      messageNode = t('dispense', {
-        well_name: wellName,
-        labware: definitionUri,
-        labware_location: JSON.stringify(location),
-        volume: volume,
-        flow_rate: flowRate,
-      })
-
-      break
-    }
-    case 'blowout': {
-      const { wellName, labwareId, flowRate } = command.params
-      const labwareEntity = labware.find(l => l.id === labwareId)
-      const definitionUri = labwareEntity?.definitionUri ?? ''
-      const location = labwareEntity?.location
-
-      messageNode = t('blowout', {
-        well_name: wellName,
-        labware: definitionUri,
-        labware_location: JSON.stringify(location),
-        flow_rate: flowRate,
-      })
-      break
-    }
     case 'touchTip': {
       messageNode = t('touch_tip')
       break
@@ -288,19 +233,7 @@ export function StepText(props: Props): JSX.Element | null {
       })
       break
     }
-    case 'moveToWell': {
-      const { wellName, labwareId } = command.params
-      const labwareEntity = labware.find(l => l.id === labwareId)
-      const definitionUri = labwareEntity?.definitionUri ?? ''
-      const location = labwareEntity?.location
 
-      messageNode = t('move_to_well', {
-        well_name: wellName,
-        labware: definitionUri,
-        labware_location: JSON.stringify(location),
-      })
-      break
-    }
     case 'moveRelative': {
       const { axis, distance } = command.params
       messageNode = t('move_relative', {
