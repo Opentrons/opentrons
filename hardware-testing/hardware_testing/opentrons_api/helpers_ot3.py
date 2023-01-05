@@ -31,6 +31,7 @@ from .types import (
 )
 
 # TODO: use values from shared data, so we don't need to update here again
+TIP_LENGTH_OVERLAP = 10.5
 TIP_LENGTH_LOOKUP = {50: 57.9, 200: 58.35, 1000: 95.6}
 
 
@@ -528,9 +529,9 @@ async def move_to_arched_ot3(
 ) -> None:
     """Move OT3 gantry in an arched path."""
     z_ax = OT3Axis.by_mount(mount)
-    max_z = get_endstop_position_ot3(api, mount)[z_ax] - 1
+    max_z = get_endstop_position_ot3(api, mount)[z_ax]
     here = await api.gantry_position(mount=mount, refresh=True)
-    arch_z = min(max(here.z, safe_height), max_z)
+    arch_z = min(max(here.z, abs_position.z, safe_height), max_z)
     points = [
         here._replace(z=arch_z),
         abs_position._replace(z=arch_z),
@@ -645,7 +646,7 @@ def get_slot_size() -> Point:
 
 def get_default_tip_length(volume: int) -> float:
     """Get default tip length for specified volume of tip."""
-    return TIP_LENGTH_LOOKUP[volume]
+    return TIP_LENGTH_LOOKUP[volume] - TIP_LENGTH_OVERLAP
 
 
 def get_slot_bottom_left_position_ot3(slot: int) -> Point:
