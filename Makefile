@@ -148,6 +148,7 @@ push-ot3:
 	$(MAKE) -C $(NOTIFY_SERVER_DIR) push-no-restart-ot3
 	$(MAKE) -C $(ROBOT_SERVER_DIR) push-ot3
 	$(MAKE) -C $(UPDATE_SERVER_DIR) push-ot3
+	$(MAKE) -C $(USB_BRIDGE_DIR) push-ot3
 
 
 .PHONY: term
@@ -181,6 +182,7 @@ test-py: test-py-windows
 	$(MAKE) -C $(ROBOT_SERVER_DIR) test
 	$(MAKE) -C $(NOTIFY_SERVER_DIR) test
 	$(MAKE) -C $(G_CODE_TESTING_DIR) test
+	$(MAKE) -C $(USB_BRIDGE_DIR) test
 
 .PHONY: test-js
 test-js:

@@ -14,6 +14,8 @@ import logging
 from itertools import dropwhile
 from typing import TYPE_CHECKING, Any, List, Dict, Optional, Union, Tuple
 
+from opentrons_shared_data.labware.dev_types import LabwareDefinition, LabwareParameters
+
 from opentrons.types import Location, Point, LocationLabware
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import requires_version
@@ -32,16 +34,9 @@ from opentrons.protocols.labware import (  # noqa: F401
 from . import validation
 from .core import well_grid
 from .core.labware import AbstractLabware
-from .core.protocol_api.labware import LabwareImplementation
+from .core.protocol_api.labware import LabwareImplementation as LegacyLabwareCore
 
 if TYPE_CHECKING:
-    from opentrons.protocols.geometry.module_geometry import (  # noqa: F401
-        ModuleGeometry,
-    )
-    from opentrons_shared_data.labware.dev_types import (
-        LabwareDefinition,
-        LabwareParameters,
-    )
     from .core.common import LabwareCore, WellCore
 
 
@@ -834,7 +829,7 @@ def load_from_definition(
                       defaults to ``MAX_SUPPORTED_VERSION``.
     """
     return Labware(
-        implementation=LabwareImplementation(
+        implementation=LegacyLabwareCore(
             definition=definition,
             parent=parent,
             label=label,

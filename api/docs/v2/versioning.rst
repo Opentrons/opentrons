@@ -270,4 +270,6 @@ Upcoming, not yet released.
 - :py:meth:`.MagneticModuleContext.calibrate` will be deprecated.
 - Several internal properties of :py:class:`.Labware`, :py:class:`.Well`, and :py:class:`.ModuleContext` will be deprecated and/or removed:
     - ``Labware.separate_calibration`` and ``ModuleContext.separate_calibration``, which are holdovers from a calibration system that no longer exists.
-    - The ``Well.has_tip`` setter, which will cease to function in a future upgrade to the Python protocol execution system. The corresponding `Well.has_tip` getter will not be deprecated..
+    - The ``Well.has_tip`` setter, which will cease to function in a future upgrade to the Python protocol execution system. The corresponding `Well.has_tip` getter will not be deprecated.
+- :py:meth:`.ModuleContext.geometry` will be deprecated
+    - The `model` and `type` properties of this interface will be replaced by :py:meth:`.ModuleContext.model` and :py:meth:`.ModuleContext.type`, respectively
