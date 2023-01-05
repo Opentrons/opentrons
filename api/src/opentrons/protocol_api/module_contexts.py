@@ -65,22 +65,30 @@ class ModuleContext(CommandPublisher):
     def api_version(self) -> APIVersion:
         return self._api_version
 
-    @property  # type: ignore[misc]
-    @requires_version(2, 14)
+    @property
     def model(self) -> ModuleModel:
         """Get the module's model identifier."""
+        # TODO(jbl 2023-01-05) replace this was requires_version decorator when API version is bumped to 2.14
+        if isinstance(self._core, LegacyModuleCore):
+            raise APIVersionError("ModuleContext.model not supported for legacy core.")
         return cast(ModuleModel, self._core.get_model().value)
 
-    @property  # type: ignore[misc]
-    @requires_version(2, 14)
+    @property
     def type(self) -> ModuleType:
         """Get the module's general type identifier."""
+        # TODO(jbl 2023-01-05) replace this was requires_version decorator when API version is bumped to 2.14
+        if isinstance(self._core, LegacyModuleCore):
+            raise APIVersionError("ModuleContext.type not supported for legacy core.")
         return cast(ModuleType, self._core.MODULE_TYPE.value)
 
-    @property  # type: ignore[misc]
-    @requires_version(2, 14)
+    @property
     def serial_number(self) -> str:
         """Get the module's unique hardware serial number."""
+        # TODO(jbl 2023-01-05) replace this was requires_version decorator when API version is bumped to 2.14
+        if isinstance(self._core, LegacyModuleCore):
+            raise APIVersionError(
+                "ModuleContext.serial_number not supported for legacy core."
+            )
         return self._core.get_serial_number()
 
     # TODO(mc, 2022-09-08): Remove this method
