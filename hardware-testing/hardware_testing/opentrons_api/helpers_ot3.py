@@ -410,7 +410,7 @@ class OT3JogNoInput(Exception):
 
 
 def _jog_read_user_input(terminator: str, home_key: str) -> Tuple[str, float, bool]:
-    user_input = input(f'Jog eg: x-10.5 ("{terminator}" to stop): ')
+    user_input = input(f'\tJog eg: x-10.5 ("{terminator}" to stop): ')
     user_input = user_input.strip().replace(" ", "")
     if user_input == terminator:
         raise OT3JogTermination()
@@ -460,8 +460,8 @@ async def _jog_print_current_position(
     ex, ey, ez, ep = [
         round(enc_pos[ax], 2) for ax in [OT3Axis.X, OT3Axis.Y, z_axis, instr_axis]
     ]
-    print(f"Deck Coordinate: X={mx}, Y={my}, Z={mz}, Instr={mp}")
-    print(f"Enc. Coordinate: X={ex}, Y={ey}, Z={ez}, Instr={ep}")
+    print(f"\tDeck Coordinate: X={mx}, Y={my}, Z={mz}, Instr={mp}")
+    print(f"\tEnc. Coordinate: X={ex}, Y={ey}, Z={ez}, Instr={ep}")
 
 
 async def _jog_do_print_then_input_then_move(
@@ -471,14 +471,16 @@ async def _jog_do_print_then_input_then_move(
     axis: str,
     distance: float,
     do_home: bool,
+    display: Optional[bool] = True
 ) -> Tuple[str, float, bool]:
     try:
-        await _jog_print_current_position(api, mount, critical_point)
+        if display:
+            await _jog_print_current_position(api, mount, critical_point)
         axis, distance, do_home = _jog_read_user_input(
             terminator="stop", home_key="home"
         )
     except OT3JogNoInput:
-        print("No input, repeating previous jog")
+        print("\tno input, repeating previous jog")
     if do_home:
         str_to_axes = {
             "X": OT3Axis.X,
@@ -495,7 +497,7 @@ async def _jog_do_print_then_input_then_move(
 
 
 async def jog_mount_ot3(
-    api: OT3API, mount: OT3Mount, critical_point: Optional[CriticalPoint] = None
+    api: OT3API, mount: OT3Mount, critical_point: Optional[CriticalPoint] = None, display: Optional[bool] = True
 ) -> Dict[OT3Axis, float]:
     """Jog an OT3 mount's gantry XYZ and pipettes axes."""
     if api.is_simulator:
@@ -505,16 +507,17 @@ async def jog_mount_ot3(
     axis: str = ""
     distance: float = 0.0
     do_home: bool = False
+    print("jogging")
     while True:
         try:
             axis, distance, do_home = await _jog_do_print_then_input_then_move(
-                api, mount, critical_point, axis, distance, do_home
+                api, mount, critical_point, axis, distance, do_home, display=display
             )
         except ValueError as e:
             print(e)
             continue
         except OT3JogTermination:
-            print("Done jogging")
+            print("done jogging")
             return await api.current_position_ot3(
                 mount=mount, critical_point=critical_point
             )
