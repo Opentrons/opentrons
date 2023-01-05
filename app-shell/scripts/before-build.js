@@ -42,8 +42,9 @@ const PYTHON_SITE_PACKAGES_TARGET_POSIX = 'python/lib/python3.10/site-packages'
 const PYTHON_SITE_PACKAGES_TARGET_WINDOWS = 'python/Lib/site-packages'
 
 module.exports = function beforeBuild(context) {
-  const { platform, arch } = context
-  const platformName = platform.nodeName
+  console.log({ context })
+  const { platform, arch, electronPlatformName } = context
+  const platformName = electronPlatformName ?? platform.nodeName
   const standalonePython = PYTHON_BY_PLATFORM?.[platformName]?.[arch]
   if (!USE_PYTHON) {
     return Promise.resolve(true)
