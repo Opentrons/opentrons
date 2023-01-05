@@ -37,7 +37,6 @@ ModuleModel = Union[
     HeaterShakerModuleModel,
 ]
 
-
 ModuleSlotTransform = TypedDict(
     "ModuleSlotTransform", {"labwareOffset": List[List[float]]}
 )
