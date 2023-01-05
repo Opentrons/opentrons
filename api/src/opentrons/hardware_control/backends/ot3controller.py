@@ -304,7 +304,7 @@ class OT3Controller:
         )
 
         distances_pipette = {
-            ax: -1 * self.phony_bounds[ax][1] - self.phony_bounds[ax][0]
+            ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
             for ax in axes
             if ax in OT3Axis.pipette_axes()
         }
@@ -333,7 +333,7 @@ class OT3Controller:
         )
 
         distances_gantry = {
-            ax: -1 * self.phony_bounds[ax][1] - self.phony_bounds[ax][0]
+            ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
             for ax in axes
             if ax in OT3Axis.gantry_axes() and ax not in OT3Axis.mount_axes()
         }
@@ -343,7 +343,7 @@ class OT3Controller:
             if ax in OT3Axis.gantry_axes() and ax not in OT3Axis.mount_axes()
         }
         distances_z = {
-            ax: -1 * self.phony_bounds[ax][1] - self.phony_bounds[ax][0]
+            ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
             for ax in axes
             if ax in OT3Axis.mount_axes()
         }
@@ -690,20 +690,6 @@ class OT3Controller:
     @property
     def axis_bounds(self) -> OT3AxisMap[Tuple[float, float]]:
         """Get the axis bounds."""
-        # TODO (CM): gripper axis bounds need to be defined
-        return {
-            OT3Axis.Z_L: (0, 160),
-            OT3Axis.Z_R: (0, 160),
-            OT3Axis.P_L: (0, 110),
-            OT3Axis.P_R: (0, 110),
-            OT3Axis.X: (0, 455),
-            OT3Axis.Y: (0, 412),
-            OT3Axis.Z_G: (0, 1000),
-        }
-
-    @property
-    def phony_bounds(self) -> OT3AxisMap[Tuple[float, float]]:
-        """Get the axis bounds."""
         # TODO (AL, 2021-11-18): The bounds need to be defined
         phony_bounds = (0, 10000)
         return {
@@ -718,7 +704,7 @@ class OT3Controller:
         }
 
     def single_boundary(self, boundary: int) -> OT3AxisMap[float]:
-        return {ax: bound[boundary] for ax, bound in self.phony_bounds.items()}
+        return {ax: bound[boundary] for ax, bound in self.axis_bounds.items()}
 
     @property
     def fw_version(self) -> Optional[str]:
@@ -935,7 +921,6 @@ class OT3Controller:
             sensor_id,
             threshold_pascals,
         )
-        print(f"move_group_position = {positions}")
         for axis, point in positions.items():
             self._position.update({axis: point[0]})
             self._encoder_position.update({axis: point[1]})
