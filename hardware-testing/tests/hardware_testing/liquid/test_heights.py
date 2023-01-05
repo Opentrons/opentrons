@@ -178,8 +178,8 @@ def test_before_and_after_heights() -> None:
     #       the Corning plate assumes a perfect cylinder without a lookup table
     tiprack, trough, plate, _ = _load_labware(ctx)
     # load a pipette
-    single = ctx.load_instrument("p300_single_gen2", mount="left", tip_racks=[tiprack])
-    multi = ctx.load_instrument("p300_multi_gen2", mount="right", tip_racks=[tiprack])
+    single = ctx.load_instrument("p1000_single_gen3", mount="left", tip_racks=[tiprack])
+    multi = ctx.load_instrument("p1000_multi_gen3", mount="right", tip_racks=[tiprack])
     # initialize liquid tracker
     tracker = LiquidTracker()
     tracker.initialize_from_deck(ctx)
@@ -234,8 +234,8 @@ def test_update_affected_wells() -> None:
     #       the Corning plate assumes a perfect cylinder without a lookup table
     tiprack, trough, plate, _ = _load_labware(ctx)
     # load a pipette
-    single = ctx.load_instrument("p300_single_gen2", mount="left", tip_racks=[tiprack])
-    multi = ctx.load_instrument("p300_multi_gen2", mount="right", tip_racks=[tiprack])
+    single = ctx.load_instrument("p1000_single_gen3", mount="left", tip_racks=[tiprack])
+    multi = ctx.load_instrument("p1000_multi_gen3", mount="right", tip_racks=[tiprack])
     # initialize liquid tracker
     tracker = LiquidTracker()
     tracker.initialize_from_deck(ctx)
