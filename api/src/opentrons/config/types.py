@@ -142,6 +142,7 @@ class LiquidProbeSettings:
     mount_distance: float
     mount_speed: float
     pipette_speed: float
+    sensor_threshold_pascals: float
 
 
 @dataclass(frozen=True)

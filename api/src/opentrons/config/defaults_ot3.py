@@ -25,6 +25,7 @@ DEFAULT_LIQUID_PROBE_SETTINGS: Final[LiquidProbeSettings] = LiquidProbeSettings(
     mount_distance=50,
     mount_speed=10,
     pipette_speed=10,
+    sensor_threshold_pascals=1114112,
 )
 
 DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSettings(
@@ -352,6 +353,9 @@ def _build_default_liquid_probe(
         mount_distance=from_conf.get("mount_distance", default.mount_distance),
         mount_speed=from_conf.get("mount_speed", default.mount_speed),
         pipette_speed=from_conf.get("pipette_speed", default.pipette_speed),
+        sensor_threshold_pascals=from_conf.get(
+            "sensor_threshold_pascals", default.sensor_threshold_pascals
+        ),
     )
 
 
