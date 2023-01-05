@@ -6,7 +6,7 @@
   "pickUpTipConfigurations": {
     "current": 0.15,
     "presses": 1,
-    "speed": 10,
+    "speed": 5,
     "increment": 0.0,
     "distance": 13.0
   },
