@@ -169,39 +169,10 @@ async def res_check(pipette_model,node,res) -> None:
     diff = float(motor_pos) - float(encoder_pos)
     if abs(diff) > Tolerances[pipette_model]:
         raise Exception('Fail_Lose Step')
-async def main() -> None:
+async def run(args: argparse.Namespace) -> None:
     subprocess.run(["systemctl", "stop", "opentrons-robot-server"])
     position = {'pipette': 0}
     node = NodeId.pipette_left
-    parser = argparse.ArgumentParser(
-        description="Pipette ICT TEST SCRIPT"
-    )
-    add_can_args(parser)
-    parser.add_argument(
-        "--plunger_run_current",
-        type=float,
-        help="Active current of the plunger",
-        default=1.0,
-    )
-    parser.add_argument(
-        "--plunger_hold_current",
-        type=float,
-        help="Active current of the plunger",
-        default=0.1,
-    )
-    parser.add_argument(
-        "--speed",
-        type=float,
-        help="The speed with which to move the plunger",
-        default=10.0,
-    )
-
-    parser.add_argument("--limit_switch", action="store_true")
-    parser.add_argument("--jog", action="store_true")
-    parser.add_argument("--read_epprom", action="store_true")
-    parser.add_argument("--home", action="store_true")
-
-    args = parser.parse_args()
     driver = await build_driver(build_settings(args))
     messenger = CanMessenger(driver=driver)
     messenger.start()
@@ -264,8 +235,39 @@ async def main() -> None:
         except:
             pass
 
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Pipette Currents Test SCRIPT"
+    )
+    add_can_args(parser)
+    parser.add_argument(
+        "--plunger_run_current",
+        type=float,
+        help="Active current of the plunger",
+        default=1.0,
+    )
+    parser.add_argument(
+        "--plunger_hold_current",
+        type=float,
+        help="Active current of the plunger",
+        default=0.1,
+    )
+    parser.add_argument(
+        "--speed",
+        type=float,
+        help="The speed with which to move the plunger",
+        default=10.0,
+    )
 
+    parser.add_argument("--limit_switch", action="store_true")
+    parser.add_argument("--jog", action="store_true")
+    parser.add_argument("--read_epprom", action="store_true")
+    parser.add_argument("--home", action="store_true")
+
+    args = parser.parse_args()
+
+    asyncio.run(run(args))
 
 
 if __name__ == "__main__":
-    asyncio.run(main()) 
+    main()
