@@ -56,6 +56,8 @@ def test_get_well(minimal_labware_def2):
     some_labware = labware.Labware(
         implementation=LabwareImplementation(minimal_labware_def2, deck),
         api_version=MAX_SUPPORTED_VERSION,
+        protocol_core=None,  # type: ignore[arg-type]
+        core_map=None,  # type: ignore[arg-type]
     )
     loaded_labware = {"someLabwareId": some_labware}
     params = {"labware": "someLabwareId", "well": well_name}
@@ -116,6 +118,8 @@ def test_get_location_with_offset_fixed_trash(minimal_labware_def2):
     trash_labware = labware.Labware(
         implementation=LabwareImplementation(trash_labware_def, deck),
         api_version=MAX_SUPPORTED_VERSION,
+        protocol_core=None,  # type: ignore[arg-type]
+        core_map=None,  # type: ignore[arg-type]
     )
 
     loaded_labware = {"someLabwareId": trash_labware}
@@ -206,6 +210,8 @@ def test_air_gap(minimal_labware_def2):
     some_labware = labware.Labware(
         implementation=LabwareImplementation(minimal_labware_def2, deck),
         api_version=MAX_SUPPORTED_VERSION,
+        protocol_core=None,  # type: ignore[arg-type]
+        core_map=None,  # type: ignore[arg-type]
     )
     loaded_labware = {"someLabwareId": some_labware}
     params = {"labware": "someLabwareId", "well": well_name}

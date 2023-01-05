@@ -265,8 +265,8 @@ class Labware:
         self,
         implementation: AbstractLabware[Any],
         api_version: APIVersion,
-        protocol_core: Optional[ProtocolCore] = None,
-        core_map: Optional[LoadedCoreMap] = None,
+        protocol_core: ProtocolCore,
+        core_map: LoadedCoreMap,
     ) -> None:
         """
         :param implementation: The class that implements the public interface
@@ -858,6 +858,8 @@ def load_from_definition(
             label=label,
         ),
         api_version=api_level or MAX_SUPPORTED_VERSION,
+        protocol_core=None,  # type: ignore[arg-type]
+        core_map=None,  # type: ignore[arg-type]
     )
 
 

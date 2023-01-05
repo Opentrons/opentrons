@@ -140,6 +140,8 @@ class ModuleContext(CommandPublisher):
             labware = Labware(
                 implementation=labware_core,
                 api_version=self._api_version,
+                protocol_core=self._protocol_core,
+                core_map=self._core_map,
             )
 
         self._core_map.add(labware_core, labware)

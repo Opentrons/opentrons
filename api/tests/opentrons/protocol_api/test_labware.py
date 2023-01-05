@@ -100,6 +100,8 @@ def test_wells(
     decoy: Decoy,
     api_version: APIVersion,
     mock_labware_core: LabwareCore,
+    mock_protocol_core: ProtocolCore,
+    mock_map_core: LoadedCoreMap,
     subject: Labware,
 ) -> None:
     """It should return a list of wells."""
@@ -120,7 +122,12 @@ def test_wells(
     decoy.when(mock_labware_core.get_well_core("B1")).then_return(mock_well_core_2)
     decoy.when(well_grid.create([["A1", "B1"]])).then_return(grid)
 
-    subject = Labware(implementation=mock_labware_core, api_version=api_version)
+    subject = Labware(
+        implementation=mock_labware_core,
+        api_version=api_version,
+        protocol_core=mock_protocol_core,
+        core_map=mock_map_core,
+    )
     result = subject.wells()
     result_a1 = result[0]
     result_b1 = result[1]
