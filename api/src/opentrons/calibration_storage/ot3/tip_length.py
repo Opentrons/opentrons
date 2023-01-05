@@ -128,7 +128,7 @@ def clear_tip_length_calibration() -> None:
 
 def save_tip_length_calibration(
     pip_id: str,
-    tip_length_cal: typing.Dict[str, v1.TipLengthModel],
+    tip_length_cal: typing.Mapping[str, v1.TipLengthModel],
 ) -> None:
     """
     Function used to save tip length calibration to file.

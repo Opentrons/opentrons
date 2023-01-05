@@ -134,7 +134,7 @@ def delete_pipette_offset_file(pipette_id: str, mount: Mount) -> None:
 def create_tip_length_data(
     definition: "LabwareDefinition",
     length: float,
-) -> typing.Dict[str, TipLengthCalibrationType]:
+) -> typing.Mapping[str, TipLengthCalibrationType]:
     if config.feature_flags.enable_ot3_hardware_controller():
         from .ot3 import ot3_create_tip_length_data
         return ot3_create_tip_length_data(definition, length)
@@ -145,11 +145,10 @@ def create_tip_length_data(
 
 
 def save_tip_length_calibration(
-    pipette_id: str, tip_length_cal: typing.Dict[str, TipLengthCalibrationType]
+    pipette_id: str, tip_length_cal: typing.Mapping[str, TipLengthCalibrationType]
 ) -> None:
     if config.feature_flags.enable_ot3_hardware_controller():
         from .ot3 import ot3_save_tip_length_calibration
-
         ot3_save_tip_length_calibration(pipette_id, tip_length_cal)
     else:
         from .ot2 import ot2_save_tip_length_calibration
@@ -181,7 +180,7 @@ def clear_tip_length_calibration() -> None:
 
 def tip_lengths_for_pipette(
     pipette_id: str,
-) -> typing.Dict[str, TipLengthCalibrationType]:
+) -> typing.Mapping[str, TipLengthCalibrationType]:
     if config.feature_flags.enable_ot3_hardware_controller():
         from .ot3 import ot3_tip_lengths_for_pipette
 

@@ -39,7 +39,7 @@ def save_robot_deck_attitude(
     transform: local_types.AttitudeMatrix,
     pip_id: Optional[str],
     lw_hash: Optional[str],
-    source: local_types.SourceType,
+    source: Optional[local_types.SourceType],
 ) -> None:
     robot_dir = config.get_opentrons_path("robot_calibration_dir")
 
