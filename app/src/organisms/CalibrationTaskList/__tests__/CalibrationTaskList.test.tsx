@@ -2,14 +2,14 @@ import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { CalibrationTaskList } from '..'
-import { useGenerateTaskList } from '../../Devices/hooks'
+import { useCalibrationTaskList } from '../../Devices/hooks'
 import { expectedTaskList } from '../../Devices/hooks/__fixtures__/taskListFixtures'
 import { StaticRouter } from 'react-router-dom'
 
 jest.mock('../../Devices/hooks')
 
-const mockUseGenerateTaskList = useGenerateTaskList as jest.MockedFunction<
-  typeof useGenerateTaskList
+const mockUseCalibrationTaskList = useCalibrationTaskList as jest.MockedFunction<
+  typeof useCalibrationTaskList
 >
 
 const render = () => {
@@ -29,7 +29,7 @@ describe('CalibrationTaskList', () => {
   })
 
   it('renders the Calibration Task List', () => {
-    mockUseGenerateTaskList.mockReturnValue(expectedTaskList)
+    mockUseCalibrationTaskList.mockReturnValue(expectedTaskList)
     const [{ getByText }] = render()
     getByText('Deck Calibration')
     getByText('Left Mount')

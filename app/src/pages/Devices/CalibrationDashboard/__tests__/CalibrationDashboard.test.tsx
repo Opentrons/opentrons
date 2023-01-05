@@ -6,13 +6,13 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { CalibrationDashboard } from '..'
 
-import { useGenerateTaskList } from '../../../../organisms/Devices/hooks'
+import { useCalibrationTaskList } from '../../../../organisms/Devices/hooks'
 import { expectedTaskList } from '../../../../organisms/Devices/hooks/__fixtures__/taskListFixtures'
 
 jest.mock('../../../../organisms/Devices/hooks')
 
-const mockUseGenerateTaskList = useGenerateTaskList as jest.MockedFunction<
-  typeof useGenerateTaskList
+const mockUseCalibrationTaskList = useCalibrationTaskList as jest.MockedFunction<
+  typeof useCalibrationTaskList
 >
 
 const render = (path = '/') => {
@@ -30,7 +30,7 @@ const render = (path = '/') => {
 
 describe('CalibrationDashboard', () => {
   beforeEach(() => {
-    mockUseGenerateTaskList.mockReturnValue(expectedTaskList)
+    mockUseCalibrationTaskList.mockReturnValue(expectedTaskList)
   })
 
   it('renders a robot calibration dashboard title', () => {

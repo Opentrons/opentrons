@@ -6,7 +6,7 @@ import { COLORS } from '@opentrons/components'
 import { Modal } from '../../molecules/Modal'
 import { TaskList } from '../TaskList'
 
-import { useGenerateTaskList } from '../Devices/hooks'
+import { useCalibrationTaskList } from '../Devices/hooks'
 
 interface CalibrationTaskListProps {
   robotName: string
@@ -17,7 +17,7 @@ export function CalibrationTaskList({
 }: CalibrationTaskListProps): JSX.Element {
   const { t } = useTranslation('robot_calibration')
   const history = useHistory()
-  const { activeIndex, taskList } = useGenerateTaskList(robotName)
+  const { activeIndex, taskList } = useCalibrationTaskList(robotName)
 
   return (
     <Modal
