@@ -423,7 +423,7 @@ class ProtocolContextImplementation(
 
     def get_labware_location(
         self, labware_core: LabwareImplementation
-    ) -> Union[DeckSlotName, legacy_module_core.LegacyModuleCore]:
+    ) -> Union[DeckSlotName, legacy_module_core.LegacyModuleCore, None]:
         """Get labware parent location."""
         raise NotImplementedError(
             "LegacyProtocolCore.get_labware_location not implemented"
