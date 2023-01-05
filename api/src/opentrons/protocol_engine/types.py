@@ -9,9 +9,11 @@ from typing import Optional, Union, List, Dict, Any, NamedTuple
 from typing_extensions import Literal, TypeGuard
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons_shared_data.module.dev_types import ModuleModel as SharedDataModuleModel
 from opentrons.types import MountType, DeckSlotName
-from opentrons.hardware_control.modules import ModuleType as ModuleType
+from opentrons.hardware_control.modules import (
+    ModuleType as ModuleType,
+    ModuleModel as HwModuleModel,
+)
 
 from opentrons_shared_data.pipette.dev_types import (  # noqa: F401
     # convenience re-export of LabwareUri type
@@ -148,7 +150,7 @@ class MotorAxis(str, Enum):
 class ModuleModel(str, Enum):
     """All available modules' models."""
 
-    value: SharedDataModuleModel
+    value: HwModuleModel
 
     TEMPERATURE_MODULE_V1 = "temperatureModuleV1"
     TEMPERATURE_MODULE_V2 = "temperatureModuleV2"

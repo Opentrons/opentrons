@@ -4,7 +4,7 @@ from decoy import Decoy
 
 from opentrons.hardware_control import SynchronousAdapter
 from opentrons.hardware_control.modules import AbstractModule
-from opentrons.hardware_control.modules.types import ModuleType, TemperatureModuleModel
+from opentrons.hardware_control.modules.types import TemperatureModuleModel
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 
 from opentrons.protocol_api.core.protocol_api.protocol_context import (
@@ -64,15 +64,6 @@ def test_get_model(
     decoy.when(mock_geometry.model).then_return(TemperatureModuleModel.TEMPERATURE_V2)
     result = subject.get_model()
     assert result == "temperatureModuleV2"
-
-
-def test_get_type(
-    decoy: Decoy, mock_geometry: ModuleGeometry, subject: LegacyModuleCore
-) -> None:
-    """It should get the model from the geometry."""
-    decoy.when(mock_geometry.module_type).then_return(ModuleType.TEMPERATURE)
-    result = subject.get_type()
-    assert result == "temperatureModuleType"
 
 
 def test_get_serial_number(

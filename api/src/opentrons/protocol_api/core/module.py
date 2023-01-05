@@ -2,13 +2,15 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Generic, List, Optional, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, List, Optional, TypeVar, ClassVar
 
 from opentrons.drivers.types import (
     HeaterShakerLabwareLatchStatus,
     ThermocyclerLidStatus,
 )
 from opentrons.hardware_control.modules.types import (
+    ModuleModel,
+    ModuleType,
     TemperatureStatus,
     ThermocyclerStep,
     MagneticStatus,
@@ -20,14 +22,14 @@ from opentrons.types import DeckSlotName
 from .labware import LabwareCoreType
 
 
-from opentrons_shared_data.module.dev_types import ModuleModel, ModuleType
-
 if TYPE_CHECKING:
     from opentrons.protocol_api.labware import Labware
 
 
 class AbstractModuleCore(ABC, Generic[LabwareCoreType]):
     """Abstract core module control interface."""
+
+    MODULE_TYPE: ClassVar[ModuleType]
 
     @property
     @abstractmethod
@@ -37,10 +39,6 @@ class AbstractModuleCore(ABC, Generic[LabwareCoreType]):
     @abstractmethod
     def get_model(self) -> ModuleModel:
         """Get the module's model identifier."""
-
-    @abstractmethod
-    def get_type(self) -> ModuleType:
-        """Get the module's general type identifier."""
 
     @abstractmethod
     def get_serial_number(self) -> str:
@@ -61,6 +59,8 @@ ModuleCoreType = TypeVar("ModuleCoreType", bound=AbstractModuleCore[Any])
 
 class AbstractTemperatureModuleCore(AbstractModuleCore[LabwareCoreType]):
     """Core control interface for an attached Temperature Module."""
+
+    MODULE_TYPE: ClassVar = ModuleType.TEMPERATURE
 
     @abstractmethod
     def set_target_temperature(self, celsius: float) -> None:
@@ -93,6 +93,8 @@ class AbstractTemperatureModuleCore(AbstractModuleCore[LabwareCoreType]):
 
 class AbstractMagneticModuleCore(AbstractModuleCore[LabwareCoreType]):
     """Core control interface for an attached Magnetic Module."""
+
+    ModuleType: ClassVar = ModuleType.MAGNETIC
 
     @abstractmethod
     def engage(
@@ -136,6 +138,8 @@ class AbstractMagneticModuleCore(AbstractModuleCore[LabwareCoreType]):
 
 class AbstractThermocyclerCore(AbstractModuleCore[LabwareCoreType]):
     """Core control interface for an attached Thermocycler Module."""
+
+    MODULE_TYPE: ClassVar = ModuleType.THERMOCYCLER
 
     @abstractmethod
     def open_lid(self) -> ThermocyclerLidStatus:
@@ -272,6 +276,8 @@ class AbstractThermocyclerCore(AbstractModuleCore[LabwareCoreType]):
 
 class AbstractHeaterShakerCore(AbstractModuleCore[LabwareCoreType]):
     """Core control interface for an attached Heater-Shaker Module."""
+
+    MODULE_TYPE: ClassVar = ModuleType.HEATER_SHAKER
 
     @abstractmethod
     def set_target_temperature(self, celsius: float) -> None:

@@ -1,21 +1,12 @@
 """Protocol API module implementation logic."""
 from __future__ import annotations
 
-from typing import Optional, List, cast
+from typing import Optional, List
 from typing_extensions import TYPE_CHECKING
-
-from opentrons_shared_data.module.dev_types import (
-    ModuleModel,
-    ModuleType,
-    TemperatureModuleType,
-    MagneticModuleType,
-    ThermocyclerModuleType,
-    HeaterShakerModuleType,
-)
 
 from opentrons.hardware_control import SynchronousAdapter, modules as hw_modules
 from opentrons.hardware_control.modules.types import (
-    ModuleType as HwModuleType,
+    ModuleModel,
     TemperatureStatus,
     MagneticStatus,
     ThermocyclerStep,
@@ -87,10 +78,6 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
         """Get the module's model identifier."""
         return self._engine_client.state.modules.get_model(self.module_id).value
 
-    def get_type(self) -> ModuleType:
-        """Get the module's general type identifier."""
-        pass
-
     def get_serial_number(self) -> str:
         """Get the module's unique hardware serial number."""
         return self._engine_client.state.modules.get_serial_number(self.module_id)
@@ -110,9 +97,6 @@ class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore[LabwareCor
     """Temperature Module core logic implementation for Python protocols."""
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.TempDeck]
-
-    def get_type(self) -> TemperatureModuleType:
-        return cast(TemperatureModuleType, HwModuleType.TEMPERATURE)
 
     def set_target_temperature(self, celsius: float) -> None:
         """Set the Temperature Module's target temperature in °C."""
@@ -151,9 +135,6 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
     """Magnetic Module control interface via a ProtocolEngine."""
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.MagDeck]
-
-    def get_type(self) -> MagneticModuleType:
-        return cast(MagneticModuleType, HwModuleType.MAGNETIC)
 
     def engage(
         self,
@@ -229,9 +210,6 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
     _sync_module_hardware: SynchronousAdapter[hw_modules.Thermocycler]
     _repetitions: Optional[int] = None
     _step_count: Optional[int] = None
-
-    def get_type(self) -> ThermocyclerModuleType:
-        return cast(ThermocyclerModuleType, HwModuleType.THERMOCYCLER)
 
     def open_lid(self) -> ThermocyclerLidStatus:
         """Open the Thermocycler's lid."""
@@ -373,9 +351,6 @@ class HeaterShakerModuleCore(ModuleCore, AbstractHeaterShakerCore[LabwareCore]):
     """Core control interface for an attached Heater-Shaker Module."""
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.HeaterShaker]
-
-    def get_type(self) -> HeaterShakerModuleType:
-        return cast(HeaterShakerModuleType, HwModuleType.HEATER_SHAKER)
 
     def set_target_temperature(self, celsius: float) -> None:
         """Set the labware plate's target temperature in °C."""

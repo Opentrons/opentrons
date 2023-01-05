@@ -5,8 +5,8 @@ import pytest
 from decoy import Decoy
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
-from opentrons_shared_data.module.dev_types import ModuleModel, ModuleType
 
+from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
 from opentrons.broker import Broker
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, ModuleContext, Labware
 from opentrons.protocol_api.core.common import LabwareCore, ModuleCore, ProtocolCore
@@ -159,7 +159,7 @@ def test_module_type(
     subject: ModuleContext[Any],
 ) -> None:
     """It should get module's type."""
-    decoy.when(mock_core.get_type()).then_return(
+    decoy.when(mock_core.MODULE_TYPE).then_return(
         cast(ModuleType, "heaterShakerModuleType")
     )
     result = subject.type

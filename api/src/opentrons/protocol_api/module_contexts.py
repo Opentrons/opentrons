@@ -75,13 +75,13 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
     @requires_version(2, 14)
     def model(self) -> ModuleModel:
         """Get the module's model identifier."""
-        return self._core.get_model()
+        return cast(ModuleModel, self._core.get_model())
 
     @property  # type: ignore[misc]
     @requires_version(2, 14)
     def type(self) -> ModuleType:
         """Get the module's general type identifier."""
-        return self._core.get_type()
+        return cast(ModuleType, self._core.MODULE_TYPE)
 
     @property  # type: ignore[misc]
     @requires_version(2, 14)
