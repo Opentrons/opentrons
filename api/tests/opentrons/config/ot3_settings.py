@@ -186,6 +186,7 @@ ot3_dummy_settings = {
         "mount_distance": 50,
         "mount_speed": 10,
         "pipette_speed": 10,
+        "sensor_threshold_pascals": 17,
     },
     "calibration": {
         "z_offset": {

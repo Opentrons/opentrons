@@ -11,7 +11,10 @@ from opentrons_hardware.firmware_bindings.constants import (
     SensorType,
     SensorThresholdMode,
 )
-from opentrons_hardware.sensors.types import SensorDataType
+from opentrons_hardware.sensors.types import (
+    SensorDataType,
+    sensor_fixed_point_conversion,
+)
 from opentrons_hardware.sensors.sensor_types import SensorInformation, PressureSensor
 from opentrons_hardware.sensors.sensor_driver import SensorDriver
 from opentrons_hardware.sensors.scheduler import SensorScheduler
@@ -64,10 +67,11 @@ async def liquid_probe(
 ) -> Dict[NodeId, Tuple[float, float, bool, bool]]:
     """Just send mount down, then move mount and pipette."""
     sensor_driver = SensorDriver()
+    threshold_fixed_point = threshold_pascals * sensor_fixed_point_conversion
     pressure_sensor = PressureSensor.build(
         sensor_id=sensor_id,
         node_id=tool,
-        stop_threshold=threshold_pascals,
+        stop_threshold=threshold_fixed_point,
     )
 
     pass_group = _build_pass_step(
