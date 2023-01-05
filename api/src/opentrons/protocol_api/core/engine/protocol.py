@@ -26,7 +26,6 @@ from opentrons.protocol_engine import (
     LabwareOffsetVector,
     LoadedLabware,
     LoadedModule,
-    LabwareLocation,
 )
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
@@ -387,13 +386,22 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         """Get all loaded module cores."""
         return list(self._module_cores_by_id.values())
 
-    def get_module_core_item(self, module_id: str) -> Optional[ModuleCore]:
+    def get_labware_location(
+        self, labware_core: LabwareCore
+    ) -> Union[DeckSlotName, ModuleCore, None]:
+        """Get labware parent location."""
+        labware_location = self._engine_client.state.labware.get_location(
+            labware_core.labware_id
+        )
+        if isinstance(labware_location, DeckSlotLocation):
+            return labware_location.slotName
+        elif isinstance(labware_location, ModuleLocation):
+            return self._get_module_core_item(labware_location.moduleId)
+        return None
+
+    def _get_module_core_item(self, module_id: str) -> Optional[ModuleCore]:
         """Get Module core for a given module id."""
         try:
             return self._module_cores_by_id[module_id]
         except KeyError:
             return None
-
-    def get_labware_location(self, labware_core: LabwareCore) -> LabwareLocation:
-        """Get labware parent location."""
-        return self._engine_client.state.labware.get_location(labware_core.labware_id)

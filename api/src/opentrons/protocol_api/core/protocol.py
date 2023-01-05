@@ -13,8 +13,6 @@ from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import ModuleModel
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons.protocol_engine.types import LabwareLocation
-
 
 from .instrument import InstrumentCoreType
 from .labware import LabwareCoreType, LabwareLoadParams
@@ -179,9 +177,7 @@ class AbstractProtocol(
         """Get all loaded module cores."""
 
     @abstractmethod
-    def get_module_core_item(self, module_id: str) -> Optional[ModuleCoreType]:
-        """Get Module core for a given module id."""
-
-    @abstractmethod
-    def get_labware_location(self, labware_core: LabwareCoreType) -> LabwareLocation:
+    def get_labware_location(
+        self, labware_core: LabwareCoreType
+    ) -> Union[DeckSlotName, ModuleCoreType, None]:
         """Get labware parent location."""

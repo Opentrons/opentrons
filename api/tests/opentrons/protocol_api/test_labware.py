@@ -2,7 +2,6 @@
 import inspect
 
 from typing import Optional, Union
-from typing_extensions import Literal
 
 import pytest
 from decoy import Decoy
@@ -18,11 +17,6 @@ from opentrons.protocol_api.core.common import (
 )
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
 from opentrons.protocol_api.module_contexts import TemperatureModuleContext
-
-from opentrons.protocol_engine.types import (
-    DeckSlotLocation,
-    ModuleLocation,
-)
 
 from opentrons.types import DeckSlotName
 
@@ -155,14 +149,14 @@ def test_reset_tips(
 
 @pytest.mark.parametrize(
     "labware_location, expected_result",
-    [(DeckSlotLocation(slotName=DeckSlotName.SLOT_1), "1"), (Literal["offDeck"], None)],
+    [(DeckSlotName.SLOT_1, "1"), (None, None)],
 )
 def test_parent_slot(
     decoy: Decoy,
     subject: Labware,
     mock_labware_core: LabwareCore,
     mock_protocol_core: ProtocolCore,
-    labware_location: Union[Literal["offDeck"], DeckSlotLocation],
+    labware_location: Union[None, DeckSlotName],
     expected_result: Optional[str],
 ) -> None:
     """Should get the labware's parent slot name or None."""
@@ -185,10 +179,6 @@ def test_parent_module_context(
     mock_temp_module_context = decoy.mock(cls=TemperatureModuleContext)
 
     decoy.when(mock_protocol_core.get_labware_location(mock_labware_core)).then_return(
-        ModuleLocation(moduleId="module-id")
-    )
-
-    decoy.when(mock_protocol_core.get_module_core_item("module-id")).then_return(
         mock_module_core
     )
 

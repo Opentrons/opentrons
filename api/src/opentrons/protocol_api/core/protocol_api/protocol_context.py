@@ -1,7 +1,6 @@
 import logging
 from typing import Dict, List, Optional, Set, Union, cast, Tuple
 
-from opentrons.protocol_engine import LabwareLocation
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -387,14 +386,6 @@ class ProtocolContextImplementation(
         """Get loaded module cores."""
         return self._module_cores
 
-    def get_module_core_item(
-        self, module_id: str
-    ) -> Optional[legacy_module_core.LegacyModuleCore]:
-        """Get Module core for a given module id."""
-        raise NotImplementedError(
-            "LegacyProtocolCore.get_module_core_item not implemented"
-        )
-
     def get_labware_cores(self) -> List[LabwareImplementation]:
         """Get all loaded labware cores."""
         return self._labware_cores
@@ -432,7 +423,7 @@ class ProtocolContextImplementation(
 
     def get_labware_location(
         self, labware_core: LabwareImplementation
-    ) -> LabwareLocation:
+    ) -> Union[DeckSlotName, legacy_module_core.LegacyModuleCore]:
         """Get labware parent location."""
         raise NotImplementedError(
             "LegacyProtocolCore.get_labware_location not implemented"
