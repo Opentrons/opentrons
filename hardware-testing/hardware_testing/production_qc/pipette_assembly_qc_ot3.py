@@ -22,7 +22,7 @@ from hardware_testing.measure.pressure.config import (
     PressureEventConfig,
 )
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import OT3Mount, Point
+from hardware_testing.opentrons_api.types import OT3Mount, Point, OT3Axis
 
 TRASH_HEIGHT_MM: Final = 45
 LEAK_HOVER_ABOVE_LIQUID_MM: Final = 50
@@ -42,6 +42,7 @@ class TestConfig:
     skip_liquid: bool
     skip_fixture: bool
     skip_diagnostics: bool
+    skip_plunger: bool
     fixture_port: str
     fixture_depth: int
     fixture_side: str
@@ -268,7 +269,11 @@ async def _read_pressure_and_check_results(
         print(f"{i + 1}/{pressure_event_config.sample_count}: {csv_data_sample}")
         write_cb(csv_data_sample)
         delay_time = next_sample_time - time()
-        if not api.is_simulator and i < pressure_event_config.sample_count - 1 and delay_time > 0:
+        if (
+            not api.is_simulator
+            and i < pressure_event_config.sample_count - 1
+            and delay_time > 0
+        ):
             await asyncio.sleep(pressure_event_config.sample_delay)
     _samples_channel_1 = [s[0] for s in _samples]
     _samples_channel_1.sort()
@@ -387,6 +392,37 @@ def _connect_to_fixture(test_config: TestConfig) -> PressureFixture:
     return fixture
 
 
+async def _test_diagnostics(api: OT3API, mount: OT3Mount) -> bool:
+    # TODO: encoder (normal plus stall)
+    # TODO: temperature sensor (normal range)
+    # TODO: pressure sensor (open-air and blocked-tip)
+    # TODO: capacitive sensor (open-air, probe-attached, and probing-trigger)
+    return True
+
+
+async def _test_plunger_positions(api: OT3API, mount: OT3Mount) -> bool:
+    print("homing Z axis")
+    await api.home([OT3Axis.by_mount(mount)])
+    print("homing the plunger")
+    await api.home([OT3Axis.of_main_tool_actuator(mount)])
+    _, bottom, blow_out, drop_tip = helpers_ot3.get_plunger_positions_ot3(api, mount)
+    print("moving plunger to BLOW-OUT")
+    await helpers_ot3.move_plunger_absolute_ot3(api, mount, blow_out)
+    if api.is_simulator:
+        blow_out_passed = True
+    else:
+        blow_out_passed = _get_operator_answer_to_question("is BLOW-OUT correct?")
+    print("moving plunger to DROP-TIP")
+    await helpers_ot3.move_plunger_absolute_ot3(api, mount, drop_tip)
+    if api.is_simulator:
+        drop_tip_passed = True
+    else:
+        drop_tip_passed = _get_operator_answer_to_question("is DROP-TIP correct?")
+    print("homing the plunger")
+    await api.home([OT3Axis.of_main_tool_actuator(mount)])
+    return blow_out_passed and drop_tip_passed
+
+
 async def _main(test_config: TestConfig) -> None:
     global IDEAL_LABWARE_LOCATIONS
     global CALIBRATED_LABWARE_LOCATIONS
@@ -470,21 +506,31 @@ async def _main(test_config: TestConfig) -> None:
         _append_csv_data(["----"])
         # save final test results, to be saved and displayed at the end
         _final_test_results = []
+
+        def _handle_final_test_results(t: str, r: bool) -> None:
+            # save final test results to both the CSV and to display at end of script
+            _res = [t, "PASS" if r else "FAIL"]
+            _append_csv_data(_res)
+            _final_test_results.append(_res)
+
         print("homing")
         await api.home()
+        print("moving over slot 2")
+        pos_slot_2 = helpers_ot3.get_slot_calibration_square_position_ot3(2)
+        current_pos = await api.gantry_position(mount)
+        hover_over_slot_2 = pos_slot_2._replace(z=current_pos.z)
+        await api.move_to(mount, hover_over_slot_2)
+        if not test_config.skip_diagnostics:
+            test_passed = await _test_diagnostics(api, mount)
+            _handle_final_test_results("diagnostics", test_passed)
+        if not test_config.skip_plunger:
+            test_passed = await _test_plunger_positions(api, mount)
+            _handle_final_test_results("plunger-positions", test_passed)
         if not test_config.skip_liquid:
             tips_liquid = [f"A{i + 1}" for i in range(test_config.num_trials)]
             for tip in tips_liquid:
                 test_passed = await _test_for_leak_by_eye(api, mount, test_config, tip)
-                _append_csv_data(
-                    ["droplet-test", tip, "PASS" if test_passed else "FAIL"]
-                )
-                _final_test_results.append(
-                    (
-                        f"droplet-test-{tip}",
-                        test_passed,
-                    )
-                )
+                _handle_final_test_results("droplets", test_passed)
         if not test_config.skip_fixture:
             tips_fixture = [f"A{i + 1}" for i in range(test_config.num_trials)]
             for tip in tips_fixture:
@@ -496,15 +542,7 @@ async def _main(test_config: TestConfig) -> None:
                     fixture=fixture,
                     write_cb=_append_csv_data,
                 )
-                _append_csv_data(
-                    ["pressure-test", tip, "PASS" if test_passed else "FAIL"]
-                )
-                _final_test_results.append(
-                    (
-                        f"pressure-test-{tip}",
-                        test_passed,
-                    )
-                )
+                _handle_final_test_results("pressure", test_passed)
 
         print("test complete")
         _append_csv_data(["-------"])
@@ -512,10 +550,8 @@ async def _main(test_config: TestConfig) -> None:
         _append_csv_data(["-------"])
         print("final test results:")
         for result in _final_test_results:
-            _result_tag = result[0]
-            _pass_fail = "PASS" if result[1] else "FAIL"
-            _append_csv_data([_result_tag, _pass_fail])
-            print(f" - {_result_tag}\t{_pass_fail}")
+            _append_csv_data(result)
+            print(" - " + "\t".join(result))
         # print the filepath again, to help debugging
         print(f"CSV: {csv_display_name}")
         print("homing")
@@ -529,11 +565,14 @@ if __name__ == "__main__":
     arg_parser.add_argument("--skip-liquid", action="store_true")
     arg_parser.add_argument("--skip-fixture", action="store_true")
     arg_parser.add_argument("--skip-diagnostics", action="store_true")
+    arg_parser.add_argument("--skip-plunger", action="store_true")
     arg_parser.add_argument("--fixture-side", choices=["left", "right"], default="left")
     arg_parser.add_argument("--port", type=str, default="")
     arg_parser.add_argument("--num-trials", type=int, default=2)
     arg_parser.add_argument(
-        "--aspirate-sample-count", type=float, default=PRESSURE_CFG[PressureEvent.ASPIRATE].sample_count
+        "--aspirate-sample-count",
+        type=int,
+        default=PRESSURE_CFG[PressureEvent.ASPIRATE].sample_count,
     )
     arg_parser.add_argument("--wait", type=int, default=30)
     arg_parser.add_argument("--slot-tip-rack-liquid", type=int, default=7)
@@ -549,6 +588,7 @@ if __name__ == "__main__":
         skip_liquid=args.skip_liquid,
         skip_fixture=args.skip_fixture,
         skip_diagnostics=args.skip_diagnostics,
+        skip_plunger=args.skip_plunger,
         fixture_port=args.port,
         fixture_depth=args.insert_depth,
         fixture_side=args.fixture_side,
@@ -564,5 +604,7 @@ if __name__ == "__main__":
     )
     # NOTE: overwrite default aspirate sample-count from user's input
     # FIXME: this value is being set in a few places, maybe there's a way to clean this up
-    PRESSURE_CFG[PressureEvent.ASPIRATE].sample_count = _cfg.fixture_aspirate_sample_count
+    PRESSURE_CFG[
+        PressureEvent.ASPIRATE
+    ].sample_count = _cfg.fixture_aspirate_sample_count
     asyncio.run(_main(_cfg))
