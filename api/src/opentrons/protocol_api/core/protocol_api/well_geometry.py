@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional, cast, Any, TYPE_CHECKING
+from typing import Optional, cast, TYPE_CHECKING
 
 from opentrons.types import Point
 from opentrons_shared_data.labware.dev_types import (
@@ -10,7 +10,7 @@ from opentrons_shared_data.labware.dev_types import (
 )
 
 if TYPE_CHECKING:
-    from ..labware import AbstractLabware
+    from .labware import LabwareImplementation
 
 
 class WellGeometry:
@@ -18,7 +18,7 @@ class WellGeometry:
         self,
         well_props: WellDefinition,
         parent_point: Point,
-        parent_object: AbstractLabware[Any],
+        parent_object: LabwareImplementation,
     ):
         """
         Construct a well geometry object.
@@ -62,7 +62,7 @@ class WellGeometry:
         self._depth = well_props["depth"]
 
     @property
-    def parent(self) -> AbstractLabware[Any]:
+    def parent(self) -> LabwareImplementation:
         return self._parent
 
     @property
