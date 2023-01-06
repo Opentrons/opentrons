@@ -1,5 +1,5 @@
 """ProtocolEngine-based Well core implementations."""
-from typing import Optional
+from typing import Optional, cast
 
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
@@ -123,11 +123,15 @@ class WellCore(AbstractWellCore):
     def from_center_cartesian(self, x: float, y: float, z: float) -> Point:
         """Gets point in deck coordinates based on percentage of the radius of each axis."""
         center = self.get_center()
-        return self._engine_client.state.labware.from_center_cartesian(
-            labware_id=self._labware_id,
-            well_name=self._name,
-            center=center,
-            x=x,
-            y=y,
-            z=z,
+        if self.diameter is not None:
+            x_size = y_size = self.diameter
+        else:
+            # If diameter is None we know these values will be floats
+            x_size = cast(float, self.length)
+            y_size = cast(float, self.width)
+
+        return Point(
+            x=center.x + (x * (x_size / 2.0)),
+            y=center.y + (y * (y_size / 2.0)),
+            z=center.z + (z * (self.depth / 2.0)),
         )

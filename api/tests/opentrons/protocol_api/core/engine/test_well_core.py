@@ -188,10 +188,14 @@ def test_depth(subject: WellCore) -> None:
     assert subject.depth == 42.0
 
 
-def test_from_center_cartesian(
+@pytest.mark.parametrize(
+    "well_definition",
+    [WellDefinition.construct(diameter=2.0, depth=4.0)],  # type: ignore[call-arg]
+)
+def test_from_center_cartesian_circular(
     decoy: Decoy, mock_engine_client: EngineClient, subject: WellCore
 ) -> None:
-    """It should get the relative point from a specific well."""
+    """It should get the relative point from a circular well."""
     decoy.when(
         mock_engine_client.state.geometry.get_well_height(
             labware_id="labware-id", well_name="well-name"
@@ -208,17 +212,35 @@ def test_from_center_cartesian(
         )
     ).then_return(Point(1, 2, 3))
 
+    result = subject.from_center_cartesian(x=3, y=3, z=1.5)
+
+    assert result == Point(4, 5, 6)
+
+
+@pytest.mark.parametrize(
+    "well_definition",
+    [WellDefinition.construct(xDimension=2.0, yDimension=3.0, depth=4.0)],  # type: ignore[call-arg]
+)
+def test_from_center_cartesian_rectangular(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: WellCore
+) -> None:
+    """It should get the relative point from a rectangular well."""
     decoy.when(
-        mock_engine_client.state.labware.from_center_cartesian(
+        mock_engine_client.state.geometry.get_well_height(
+            labware_id="labware-id", well_name="well-name"
+        )
+    ).then_return(42.0)
+
+    decoy.when(
+        mock_engine_client.state.geometry.get_well_position(
             labware_id="labware-id",
             well_name="well-name",
-            center=Point(1, 2, 3),
-            x=4,
-            y=5,
-            z=6,
+            well_location=WellLocation(
+                origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=21)
+            ),
         )
-    ).then_return(Point(7, 8, 9))
+    ).then_return(Point(1, 2, 3))
 
-    result = subject.from_center_cartesian(x=4, y=5, z=6)
+    result = subject.from_center_cartesian(x=3, y=2, z=1.5)
 
-    assert result == Point(7, 8, 9)
+    assert result == Point(4, 5, 6)
