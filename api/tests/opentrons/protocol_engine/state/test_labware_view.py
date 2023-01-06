@@ -255,6 +255,34 @@ def test_get_well_definition_get_first(well_plate_def: LabwareDefinition) -> Non
     assert result == expected_well_def
 
 
+def test_from_center_cartesian_circular(well_plate_def: LabwareDefinition) -> None:
+    """It should get the relative point from a circular well."""
+    subject = get_labware_view(
+        labware_by_id={"plate-id": plate},
+        definitions_by_uri={"some-plate-uri": well_plate_def},
+    )
+
+    result = subject.from_center_cartesian(
+        labware_id="plate-id", well_name="A1", center=Point(1, 2, 4), x=2, y=4, z=6
+    )
+
+    assert result == Point(x=7.86, y=15.72, z=36.01)
+
+
+def test_from_center_cartesian_rectangular(reservoir_def: LabwareDefinition) -> None:
+    """It should get the relative point from a circular well."""
+    subject = get_labware_view(
+        labware_by_id={"reservoir-id": reservoir},
+        definitions_by_uri={"some-reservoir-uri": reservoir_def},
+    )
+
+    result = subject.from_center_cartesian(
+        labware_id="reservoir-id", well_name="A1", center=Point(1, 2, 4), x=2, y=4, z=8
+    )
+
+    assert result == Point(x=9.2, y=144.4, z=111.4)
+
+
 def test_labware_has_well(falcon_tuberack_def: LabwareDefinition) -> None:
     """It should return a list of wells from definition."""
     subject = get_labware_view(
