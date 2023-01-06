@@ -50,6 +50,8 @@ from opentrons_hardware.drivers.gpio import OT3GPIO
 Current_dic = {
     'p1000_single_v43':[0.6, 0.5,0.4, 0.3, 0.2,0.15,0.1,0.05],
     'p50_single_v43':[0.6, 0.5,0.4, 0.3, 0.2,0.15,0.1,0.05],
+    'p1000_single_v33':[0.6, 0.5,0.4, 0.3, 0.2,0.15,0.1,0.05],
+    'p50_single_v33':[0.6, 0.5,0.4, 0.3, 0.2,0.15,0.1,0.05],
 
     'p1000_multi_v33':[0.6, 0.5,0.4, 0.3, 0.2,0.15,0.1,0.05],
     'p50_multi_v33':[0.6, 0.5,0.4, 0.3, 0.2,0.15,0.1,0.05]
@@ -57,6 +59,8 @@ Current_dic = {
 Tolerances = {
     'p1000_single_v43':0.4,
     'p50_single_v43':0.4,
+    'p1000_single_v33':0.4,
+    'p50_single_v33':0.4,
     'p1000_multi_v33':0.4,
     'p50_multi_v33':0.4
 
@@ -213,6 +217,7 @@ async def run(args: argparse.Namespace) -> None:
                 # await res_check(pipette_model, node, res)
                 try:
                     for t in range(1, CYCLES + 1):
+                        print('Cycle-{}'.format(t))
                         res = await move_to(messenger, node, 60, move_speed)
                         await res_check(pipette_model, node, res)
                         res = await move_to(messenger, node, 60, -move_speed)
