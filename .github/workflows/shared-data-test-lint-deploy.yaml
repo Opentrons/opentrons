@@ -72,29 +72,28 @@ jobs:
       - name: 'install udev for usb-detection'
         if: startsWith(matrix.os, 'ubuntu')
         run: sudo apt-get update && sudo apt-get install libudev-dev
-      - name: setup python environment Windows
-        if: matrix.os == 'windows-2022'
+      - name: setup python environments Ubuntu
+        if: startsWith(matrix.os, 'ubuntu')
+        uses: './.github/actions/python/setup-all-environments'
+      - name: setup python environment Windows and Mac
+        if: startsWith(matrix.os, 'ubuntu') != true
         uses: './.github/actions/python/setup-single-environment'
         with:
           environment: 'environments/app'
           python-version: '3.10'
-      - name: setup python environments NOT Windows
-        if: matrix.os != 'windows-2022'
-        uses: './.github/actions/python/setup-all-environments'
       - name: 'set complex environment variables'
         uses: actions/github-script@v6.1.1
         with:
           script: |
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
-      - name: Test Not Windows
-        if: matrix.os != 'windows-2022'
+      - name: Test OT-2 and OT-3 environments
+        if: startsWith(matrix.os, 'ubuntu')
         run: make -C shared-data/python test
-      - name: Test Windows
-        if: matrix.os == 'windows-2022'
+      - name: Test app environment
         run: make -C shared-data/python test-app
       - name: Ensure assets build
-        if: matrix.os != 'windows-2022'
+        if: startsWith(matrix.os, 'ubuntu')
         run: make -C shared-data/python sdist wheel
       - name: 'Upload coverage report'
         uses: codecov/codecov-action@v3
