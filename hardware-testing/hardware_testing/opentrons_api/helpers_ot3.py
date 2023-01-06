@@ -13,6 +13,7 @@ from opentrons_shared_data.labware import load_definition as load_labware
 
 from opentrons.config.robot_configs import build_config_ot3, load_ot3 as load_ot3_config
 from opentrons.hardware_control.backends.ot3utils import sensor_node_for_mount
+from opentrons.hardware_control.types import OT3AxisKind
 
 # TODO (lc 10-27-2022) This should be changed to an ot3 pipette object once we
 # have that well defined.
@@ -140,6 +141,24 @@ def set_gantry_per_axis_setting_ot3(
         settings.none[axis_kind] = value
     elif load == GantryLoad.GRIPPER:
         settings.gripper[axis_kind] = value
+
+
+def get_gantry_per_axis_setting_ot3(
+    settings: PerPipetteAxisSettings, axis: OT3Axis, load: GantryLoad
+) -> float:
+    """Set a value in an OT3 Gantry's per-axis-settings."""
+    axis_kind = OT3Axis.to_kind(axis)
+    if load == GantryLoad.HIGH_THROUGHPUT:
+        return settings.high_throughput[axis_kind]
+    elif load == GantryLoad.LOW_THROUGHPUT:
+        return settings.low_throughput[axis_kind]
+    elif load == GantryLoad.TWO_LOW_THROUGHPUT:
+        return settings.two_low_throughput[axis_kind]
+    elif load == GantryLoad.NONE:
+        return settings.none[axis_kind]
+    elif load == GantryLoad.GRIPPER:
+        return settings.gripper[axis_kind]
+    raise ValueError(f"unexpected gantry load: {load}")
 
 
 def set_gantry_load_per_axis_current_settings_ot3(
@@ -548,6 +567,10 @@ async def move_to_arched_ot3(
         await api.move_to(mount=mount, abs_position=p, speed=speed)
 
 
+class SensorResponseBad(Exception):
+    pass
+
+
 async def get_capacitance_ot3(api: OT3API, mount: OT3Mount) -> float:
     """Get the capacitance reading from the pipette."""
     if api.is_simulator:
@@ -560,11 +583,13 @@ async def get_capacitance_ot3(api: OT3API, mount: OT3Mount) -> float:
         api._backend._messenger, capacitive, offset=False, timeout=1  # type: ignore[union-attr]
     )
     if data is None:
-        raise ValueError("Unexpected None value from sensor")
+        raise SensorResponseBad("no response from sensor")
     return data.to_float()  # type: ignore[union-attr]
 
 
-async def get_temperature_humidity_ot3(api: OT3API, mount: OT3Mount) -> Tuple[float, float]:
+async def get_temperature_humidity_ot3(
+    api: OT3API, mount: OT3Mount
+) -> Tuple[float, float]:
     """Get the temperature/humidity reading from the pipette."""
     if api.is_simulator:
         return 25.0, 50.0
@@ -576,7 +601,7 @@ async def get_temperature_humidity_ot3(api: OT3API, mount: OT3Mount) -> Tuple[fl
         api._backend._messenger, environment, offset=False, timeout=1  # type: ignore[union-attr]
     )
     if data is None:
-        raise ValueError("Unexpected None value from sensor")
+        raise SensorResponseBad("no response from sensor")
     return data.temperature.to_float(), data.humidity.to_float()  # type: ignore[union-attr]
 
 
@@ -592,7 +617,7 @@ async def get_pressure_ot3(api: OT3API, mount: OT3Mount) -> float:
         api._backend._messenger, pressure, offset=False, timeout=1  # type: ignore[union-attr]
     )
     if data is None:
-        raise ValueError("Unexpected None value from sensor")
+        raise SensorResponseBad("no response from sensor")
     return data.to_float()  # type: ignore[union-attr]
 
 

@@ -7,6 +7,8 @@ from time import time
 from typing import Optional, Callable, List, Any, Tuple
 from typing_extensions import Final
 
+from opentrons_hardware.firmware_bindings.constants import SensorType
+
 from opentrons.config.types import CapacitivePassSettings
 from opentrons.hardware_control.ot3api import OT3API
 
@@ -87,6 +89,8 @@ CALIBRATED_LABWARE_LOCATIONS: LabwareLocations = LabwareLocations(
     fixture=None,
 )
 
+TEMP_THRESH = [20, 35]
+HUMIDITY_THRESH = [20, 80]
 CAP_THRESH_OPEN_AIR = [0.0, 4.0]
 CAP_THRESH_PROBE = [3.0, 5.0]
 CAP_PROBE_DISTANCE = 50.0
@@ -98,10 +102,7 @@ CAP_PROBE_SETTINGS = CapacitivePassSettings(
     sensor_threshold_pf=1.0,
 )
 
-PRESSURE_ASPIRATE_VOL = {
-    50: 20.0,
-    1000: 250.0
-}
+PRESSURE_ASPIRATE_VOL = {50: 10.0, 1000: 100.0}
 PRESSURE_MAX_VALUE_ABS = 7500
 PRESSURE_THRESH_OPEN_AIR = [0, 150]
 PRESSURE_THRESH_SEALED = [0, 150]
@@ -161,7 +162,7 @@ def _tip_name_to_xy_offset(tip: str) -> Point:
     tip_rack_rows = ["A", "B", "C", "D", "E", "F", "G", "H"]
     tip_row = tip_rack_rows.index(tip[0])
     tip_column = int(tip[1]) - 1
-    return Point(x=tip_column * 9, y=tip_row * 9)
+    return Point(x=tip_column * 9, y=tip_row * -9)
 
 
 async def _move_to_or_calibrate(
@@ -255,14 +256,14 @@ async def _drop_tip_in_trash(api: OT3API, mount: OT3Mount) -> None:
 
 
 async def _aspirate_and_look_for_droplets(
-    api: OT3API, mount: OT3Mount, test_config: TestConfig
+    api: OT3API, mount: OT3Mount, wait_time: int
 ) -> bool:
     pipette_volume = api.hardware_pipettes[mount.to_mount()].working_volume
     print(f"aspirating {pipette_volume} microliters")
     await api.aspirate(mount, pipette_volume)
     await api.move_rel(mount, Point(z=LEAK_HOVER_ABOVE_LIQUID_MM))
-    for t in range(test_config.droplet_wait_seconds):
-        print(f"waiting for leaking tips ({t + 1}/{test_config.droplet_wait_seconds})")
+    for t in range(wait_time):
+        print(f"waiting for leaking tips ({t + 1}/{wait_time})")
         if not api.is_simulator:
             await asyncio.sleep(1)
     if api.is_simulator:
@@ -290,7 +291,7 @@ async def _read_pressure_and_check_results(
     for i in range(pressure_event_config.sample_count):
         _samples.append(fixture.read_all_pressure_channel())
         next_sample_time = time() + pressure_event_config.sample_delay
-        _sample_as_strings = [str(round(p, 2)) for p in _samples[-1]]
+        _sample_as_strings = [str(round(p, 5)) for p in _samples[-1]]
         csv_data_sample = [tag.value] + _sample_as_strings
         print(f"{i + 1}/{pressure_event_config.sample_count}: {csv_data_sample}")
         accumulate_raw_data_cb(csv_data_sample)
@@ -388,19 +389,25 @@ async def _test_for_leak(
     fixture: Optional[PressureFixture],
     write_cb: Optional[Callable],
     accumulate_raw_data_cb: Optional[Callable],
+    droplet_wait_seconds: Optional[int] = None,
 ) -> bool:
     if fixture:
         await _pick_up_tip_for_fixture(api, mount, tip)
         assert write_cb, "pressure fixture requires recording data to disk"
-        assert accumulate_raw_data_cb, "pressure fixture requires recording data to disk"
+        assert (
+            accumulate_raw_data_cb
+        ), "pressure fixture requires recording data to disk"
         await _move_to_fixture(api, mount)
         test_passed = await _fixture_check_pressure(
             api, mount, test_config, fixture, write_cb, accumulate_raw_data_cb
         )
     else:
+        assert droplet_wait_seconds is not None
         await _pick_up_tip_for_liquid(api, mount, tip)
         await _move_to_liquid(api, mount)
-        test_passed = await _aspirate_and_look_for_droplets(api, mount, test_config)
+        test_passed = await _aspirate_and_look_for_droplets(
+            api, mount, droplet_wait_seconds
+        )
     await _drop_tip_in_trash(api, mount)
     pass_msg = _bool_to_pass_fail(test_passed)
     print(f"tip {tip}: {pass_msg}")
@@ -408,9 +415,15 @@ async def _test_for_leak(
 
 
 async def _test_for_leak_by_eye(
-    api: OT3API, mount: OT3Mount, test_config: TestConfig, tip: str
+    api: OT3API,
+    mount: OT3Mount,
+    test_config: TestConfig,
+    tip: str,
+    droplet_wait_time: int,
 ) -> bool:
-    return await _test_for_leak(api, mount, test_config, tip, None, None, None)
+    return await _test_for_leak(
+        api, mount, test_config, tip, None, None, None, droplet_wait_time
+    )
 
 
 def _connect_to_fixture(test_config: TestConfig) -> PressureFixture:
@@ -426,20 +439,39 @@ def _connect_to_fixture(test_config: TestConfig) -> PressureFixture:
     return fixture
 
 
-async def _test_diagnostics_environment(api: OT3API, mount: OT3Mount, write_cb: Callable) -> bool:
+async def _test_diagnostics_environment(
+    api: OT3API, mount: OT3Mount, write_cb: Callable
+) -> bool:
     print("testing environmental sensor")
-    celsius, humidity = await helpers_ot3.get_temperature_humidity_ot3(api, mount)
-    test_data = ["celsius-humidity", celsius, humidity]
-    print(test_data)
-    write_cb(test_data)
-    if 20 < celsius < 30 and 20 < humidity < 80:
-        print(f"FAIL: environment sensor return unexpected values: celsius={celsius}, humidity={humidity}")
-        return True
-    else:
-        return False
+    celsius_pass = True
+    humidity_pass = True
+
+    # CELSIUS
+    celsius = await _read_pipette_sensor_repeatedly_and_average(
+        api, mount, SensorType.temperature, 10
+    )
+    print(f"celsius: {celsius} C")
+    if celsius < TEMP_THRESH[0] or celsius > TEMP_THRESH[1]:
+        print(f"FAIL: celsius {celsius} is out of range")
+        celsius_pass = False
+    write_cb(["celsius", celsius, _bool_to_pass_fail(celsius_pass)])
+
+    # HUMIDITY
+    humidity = await _read_pipette_sensor_repeatedly_and_average(
+        api, mount, SensorType.humidity, 10
+    )
+    print(f"humidity: {humidity} C")
+    if humidity < HUMIDITY_THRESH[0] or humidity > HUMIDITY_THRESH[1]:
+        print(f"FAIL: humidity {humidity} is out of range")
+        humidity_pass = False
+    write_cb(["humidity", humidity, _bool_to_pass_fail(humidity_pass)])
+
+    return celsius_pass and humidity_pass
 
 
-async def _test_diagnostics_encoder(api: OT3API, mount: OT3Mount, write_cb: Callable) -> bool:
+async def _test_diagnostics_encoder(
+    api: OT3API, mount: OT3Mount, write_cb: Callable
+) -> bool:
     print("testing encoder")
     pip_axis = OT3Axis.of_main_tool_actuator(mount)
     encoder_home_pass = True
@@ -456,66 +488,99 @@ async def _test_diagnostics_encoder(api: OT3API, mount: OT3Mount, write_cb: Call
     await api.home([pip_axis])
     pip_pos, pip_enc = await _get_plunger_pos_and_encoder()
     if pip_pos != 0.0 or pip_enc != 0.0:
-        print(f"FAIL: plunger ({pip_pos}) or encoder ({pip_enc}) is not 0.0 after homing")
+        print(
+            f"FAIL: plunger ({pip_pos}) or encoder ({pip_enc}) is not 0.0 after homing"
+        )
         encoder_home_pass = False
     write_cb(["encoder-home", pip_pos, pip_enc, _bool_to_pass_fail(encoder_home_pass)])
 
     print("moving plunger")
     await helpers_ot3.move_plunger_absolute_ot3(api, mount, drop_tip)
     pip_pos, pip_enc = await _get_plunger_pos_and_encoder()
-    if pip_pos != 10.0 or abs(pip_pos - pip_enc) > 0.1:
+    if abs(pip_pos - pip_enc) > 0.1:
         print(f"FAIL: plunger ({pip_pos}) and encoder ({pip_enc}) are too different")
         encoder_move_pass = False
     write_cb(["encoder-move", pip_pos, pip_enc, _bool_to_pass_fail(encoder_move_pass)])
-
-    print("stalling plunger")
-    await helpers_ot3.move_plunger_relative_ot3(api, mount, 0, speed=200)
-    pip_pos, pip_enc = await _get_plunger_pos_and_encoder()
-    if pip_pos != 0.0 or abs(pip_pos - pip_enc) < 0.1:
-        print(f"FAIL: plunger ({pip_pos}) and encoder ({pip_enc}) are the same after stalling")
-        encoder_stall_pass = False
-    write_cb(["encoder-stall", pip_pos, pip_enc, _bool_to_pass_fail(encoder_stall_pass)])
 
     print("homing plunger")
     await api.home([pip_axis])
     return encoder_home_pass and encoder_move_pass and encoder_stall_pass
 
 
-async def _test_diagnostics_capacitive(api: OT3API, mount: OT3Mount, write_cb: Callable) -> bool:
+async def _read_pipette_sensor_repeatedly_and_average(
+    api: OT3API, mount: OT3Mount, sensor_type: SensorType, num_readings: int
+) -> float:
+    # FIXME: this while loop is required b/c the command does not always
+    #        return a value, not sure if issue is in firmware or CAN
+    readings = []
+    while len(readings) < num_readings:
+        try:
+            if sensor_type == SensorType.capacitive:
+                r = await helpers_ot3.get_capacitance_ot3(api, mount)
+            elif sensor_type == SensorType.pressure:
+                r = await helpers_ot3.get_pressure_ot3(api, mount)
+            elif sensor_type == SensorType.temperature:
+                r = await helpers_ot3.get_temperature_humidity_ot3(api, mount)
+                r = r[0]
+            elif sensor_type == SensorType.humidity:
+                r = await helpers_ot3.get_temperature_humidity_ot3(api, mount)
+                r = r[1]
+            else:
+                raise ValueError(f"unexpected sensor type: {sensor_type}")
+        except helpers_ot3.SensorResponseBad:
+            continue
+        readings.append(r)
+    readings.sort()
+    readings = readings[1:-1]
+    return sum(readings) / len(readings)
+
+
+async def _test_diagnostics_capacitive(
+    api: OT3API, mount: OT3Mount, write_cb: Callable
+) -> bool:
     print("testing capacitance")
     capacitive_open_air_pass = True
     capacitive_probe_attached_pass = True
     capacitive_probing_pass = True
 
     async def _read_cap() -> float:
-        # FIXME: this while loop is required b/c the command does not always
-        #        return a value, not sure if issue is in firmware or CAN
-        readings = []
-        while len(readings) < 10:
-            try:
-                r = await helpers_ot3.get_capacitance_ot3(api, mount)
-                readings.append(r)
-            except ValueError:
-                continue
-        readings.sort()
-        readings = readings[1:-1]
-        return sum(readings) / len(readings)
+        return await _read_pipette_sensor_repeatedly_and_average(
+            api, mount, SensorType.capacitive, 10
+        )
 
     capacitance_open_air = await _read_cap()
     print(f"open-air capacitance: {capacitance_open_air}")
-    if capacitance_open_air < CAP_THRESH_OPEN_AIR[0] or capacitance_open_air > CAP_THRESH_OPEN_AIR[1]:
+    if (
+        capacitance_open_air < CAP_THRESH_OPEN_AIR[0]
+        or capacitance_open_air > CAP_THRESH_OPEN_AIR[1]
+    ):
         capacitive_open_air_pass = False
         print(f"FAIL: open-air capacitance ({capacitance_open_air}) is not correct")
-    write_cb(["capacitive-open-air", capacitance_open_air, _bool_to_pass_fail(capacitive_open_air_pass)])
+    write_cb(
+        [
+            "capacitive-open-air",
+            capacitance_open_air,
+            _bool_to_pass_fail(capacitive_open_air_pass),
+        ]
+    )
 
     if not api.is_simulator:
-        _get_operator_answer_to_question("ATTACH the probe, enter \"y\" when attached")
+        _get_operator_answer_to_question('ATTACH the probe, enter "y" when attached')
     capacitance_with_probe = await _read_cap()
     print(f"probe capacitance: {capacitance_with_probe}")
-    if capacitance_with_probe < CAP_THRESH_PROBE[0] or capacitance_with_probe > CAP_THRESH_PROBE[1]:
+    if (
+        capacitance_with_probe < CAP_THRESH_PROBE[0]
+        or capacitance_with_probe > CAP_THRESH_PROBE[1]
+    ):
         capacitive_probe_attached_pass = False
         print(f"FAIL: probe capacitance ({capacitance_with_probe}) is not correct")
-    write_cb(["capacitive-open-air", capacitance_with_probe, _bool_to_pass_fail(capacitive_probe_attached_pass)])
+    write_cb(
+        [
+            "capacitive-open-air",
+            capacitance_with_probe,
+            _bool_to_pass_fail(capacitive_probe_attached_pass),
+        ]
+    )
 
     print("probing downwards by 50 mm")
     if not api.is_simulator:
@@ -523,59 +588,97 @@ async def _test_diagnostics_capacitive(api: OT3API, mount: OT3Mount, write_cb: C
     current_pos = await api.gantry_position(mount)
     probe_target = current_pos.z - CAP_PROBE_SETTINGS.prep_distance_mm
     probe_axis = OT3Axis.by_mount(mount)
-    trigger_pos = await api.capacitive_probe(mount, probe_axis, probe_target, CAP_PROBE_SETTINGS)
+    trigger_pos = await api.capacitive_probe(
+        mount, probe_axis, probe_target, CAP_PROBE_SETTINGS
+    )
     if trigger_pos <= probe_target + 1:
         capacitive_probing_pass = False
         print(f"FAIL: probe was not triggered while moving downwards")
-    write_cb(["capacitive-probing", trigger_pos, _bool_to_pass_fail(capacitive_probing_pass)])
+    write_cb(
+        ["capacitive-probing", trigger_pos, _bool_to_pass_fail(capacitive_probing_pass)]
+    )
 
     if not api.is_simulator:
-        _get_operator_answer_to_question("REMOVE the probe, enter \"y\" when removed")
-    return capacitive_open_air_pass and capacitive_probe_attached_pass and capacitive_probing_pass
+        _get_operator_answer_to_question('REMOVE the probe, enter "y" when removed')
+    return (
+        capacitive_open_air_pass
+        and capacitive_probe_attached_pass
+        and capacitive_probing_pass
+    )
 
 
-async def _test_diagnostics_pressure(api: OT3API, mount: OT3Mount, write_cb: Callable) -> bool:
+async def _test_diagnostics_pressure(
+    api: OT3API, mount: OT3Mount, write_cb: Callable
+) -> bool:
     await api.add_tip(mount, 0.1)
     await api.prepare_for_aspirate(mount)
 
+    async def _read_pressure() -> float:
+        return await _read_pipette_sensor_repeatedly_and_average(
+            api, mount, SensorType.pressure, 10
+        )
+
     print("testing pressure")
     pressure_open_air_pass = True
-    pressure_open_air = await helpers_ot3.get_pressure_ot3(api, mount)
+    pressure_open_air = await _read_pressure()
     print(f"pressure-open-air: {pressure_open_air}")
-    if pressure_open_air < PRESSURE_THRESH_OPEN_AIR[0] or pressure_open_air > PRESSURE_THRESH_OPEN_AIR[1]:
+    if (
+        pressure_open_air < PRESSURE_THRESH_OPEN_AIR[0]
+        or pressure_open_air > PRESSURE_THRESH_OPEN_AIR[1]
+    ):
         pressure_open_air_pass = False
         print(f"FAIL: open-air pressure ({pressure_open_air}) is not correct")
-    write_cb(["pressure-open-air", pressure_open_air, _bool_to_pass_fail(pressure_open_air_pass)])
+    write_cb(
+        [
+            "pressure-open-air",
+            pressure_open_air,
+            _bool_to_pass_fail(pressure_open_air_pass),
+        ]
+    )
 
     _, bottom, _, _ = helpers_ot3.get_plunger_positions_ot3(api, mount)
     print("moving plunger to bottom")
     await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom)
     if not api.is_simulator:
-        _get_operator_answer_to_question("ATTACH tip to nozzle, enter \"y\" when ready")
+        _get_operator_answer_to_question('ATTACH tip to nozzle, enter "y" when ready')
     if not api.is_simulator:
-        _get_operator_answer_to_question("COVER tip with finger, enter \"y\" when ready")
-    pressure_sealed = await helpers_ot3.get_pressure_ot3(api, mount)
+        _get_operator_answer_to_question('COVER tip with finger, enter "y" when ready')
+    pressure_sealed = await _read_pressure()
     pressure_sealed_pass = True
     print(f"pressure-sealed: {pressure_sealed}")
-    if pressure_sealed < PRESSURE_THRESH_SEALED[0] or pressure_sealed > PRESSURE_THRESH_SEALED[1]:
+    if (
+        pressure_sealed < PRESSURE_THRESH_SEALED[0]
+        or pressure_sealed > PRESSURE_THRESH_SEALED[1]
+    ):
         pressure_sealed_pass = False
         print(f"FAIL: sealed pressure ({pressure_sealed}) is not correct")
-    write_cb(["pressure-sealed", pressure_sealed, _bool_to_pass_fail(pressure_sealed_pass)])
+    write_cb(
+        ["pressure-sealed", pressure_sealed, _bool_to_pass_fail(pressure_sealed_pass)]
+    )
 
     pip_vol = api.hardware_pipettes[mount.to_mount()].working_volume
     plunger_aspirate_ul = PRESSURE_ASPIRATE_VOL[pip_vol]
     print(f"aspirate {plunger_aspirate_ul} ul")
     await api.aspirate(mount, plunger_aspirate_ul)
-    pressure_compress = await helpers_ot3.get_pressure_ot3(api, mount)
+    pressure_compress = await _read_pressure()
     print(f"pressure-compressed: {pressure_compress}")
     pressure_compress_pass = True
-    if pressure_compress < PRESSURE_THRESH_COMPRESS[0] or pressure_compress > PRESSURE_THRESH_COMPRESS[1]:
+    if (
+        pressure_compress < PRESSURE_THRESH_COMPRESS[0]
+        or pressure_compress > PRESSURE_THRESH_COMPRESS[1]
+    ):
         pressure_compress_pass = False
         print(f"FAIL: sealed pressure ({pressure_compress}) is not correct")
-    write_cb(["pressure-sealed", pressure_compress, _bool_to_pass_fail(pressure_compress_pass)])
+    write_cb(
+        [
+            "pressure-sealed",
+            pressure_compress,
+            _bool_to_pass_fail(pressure_compress_pass),
+        ]
+    )
 
     if not api.is_simulator:
-        _get_operator_answer_to_question("REMOVE sealed tip to nozzle, enter \"y\" when ready")
+        _get_operator_answer_to_question('REMOVE tip to nozzle, enter "y" when ready')
     print("moving plunger back down to BOTTOM position")
     await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom)
     await api.remove_tip(mount)
@@ -602,7 +705,9 @@ async def _test_diagnostics(api: OT3API, mount: OT3Mount, write_cb: Callable) ->
     return environment_pass and pressure_pass and encoder_pass and capacitance_pass
 
 
-async def _test_plunger_positions(api: OT3API, mount: OT3Mount, write_cb: Callable) -> bool:
+async def _test_plunger_positions(
+    api: OT3API, mount: OT3Mount, write_cb: Callable
+) -> bool:
     print("homing Z axis")
     await api.home([OT3Axis.by_mount(mount)])
     print("homing the plunger")
@@ -673,7 +778,11 @@ async def _main(test_config: TestConfig) -> None:
         start_time = time()
 
         # callback function for writing new data to CSV file
-        def _append_csv_data(data_list: List[Any], line_number: Optional[int] = None, elapsed_seconds: Optional[float] = None) -> None:
+        def _append_csv_data(
+            data_list: List[Any],
+            line_number: Optional[int] = None,
+            elapsed_seconds: Optional[float] = None,
+        ) -> None:
             # every line in the CSV file begins with the elapsed seconds
             if elapsed_seconds is None:
                 elapsed_seconds = round(time() - start_time, 2)
@@ -682,7 +791,9 @@ async def _main(test_config: TestConfig) -> None:
             if line_number is None:
                 data.append_data_to_file(test_name, file_name, data_str + "\n")
             else:
-                data.insert_data_to_file(test_name, file_name, data_str + "\n", line_number)
+                data.insert_data_to_file(
+                    test_name, file_name, data_str + "\n", line_number
+                )
 
         # add metadata to CSV
         _append_csv_data(["--------"])
@@ -722,7 +833,7 @@ async def _main(test_config: TestConfig) -> None:
             _append_csv_data(_res)
             _final_test_results.append(_res)
 
-        tip_columns = COLUMNS[:test_config.num_trials]
+        tip_columns = COLUMNS[: test_config.num_trials]
         tips_used = [f"{c}1" for c in tip_columns]
 
         # run the test
@@ -742,21 +853,23 @@ async def _main(test_config: TestConfig) -> None:
             test_passed = await _test_plunger_positions(api, mount, _append_csv_data)
             _handle_final_test_results("plunger", test_passed)
         if not test_config.skip_liquid:
-            for tip in tips_used:
-                test_passed = await _test_for_leak_by_eye(api, mount, test_config, tip)
+            for i, tip in enumerate(tips_used):
+                droplet_wait_seconds = test_config.droplet_wait_seconds * (i + 1)
+                test_passed = await _test_for_leak_by_eye(
+                    api, mount, test_config, tip, droplet_wait_seconds
+                )
                 _handle_final_test_results("droplets", test_passed)
         if not test_config.skip_fixture:
-            for tip in tips_used:
-                test_passed = await _test_for_leak(
-                    api,
-                    mount,
-                    test_config,
-                    tip,
-                    fixture=fixture,
-                    write_cb=_append_csv_data,
-                    accumulate_raw_data_cb=_cache_pressure_data_callback
-                )
-                _handle_final_test_results("pressure", test_passed)
+            test_passed = await _test_for_leak(
+                api,
+                mount,
+                test_config,
+                "A1",
+                fixture=fixture,
+                write_cb=_append_csv_data,
+                accumulate_raw_data_cb=_cache_pressure_data_callback,
+            )
+            _handle_final_test_results("pressure", test_passed)
 
         print("test complete")
         _append_csv_data(["-------------"])

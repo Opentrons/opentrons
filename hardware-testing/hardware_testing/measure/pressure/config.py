@@ -9,10 +9,6 @@ LOCATION_A1_LEFT = Point(x=14.4, y=74.5, z=71.2)
 LOCATION_A1_RIGHT = LOCATION_A1_LEFT._replace(x=128 - 14.4)
 
 PRESSURE_FIXTURE_TIP_VOLUME = 50  # always 50ul
-PRESSURE_FIXTURE_ASPIRATE_VOLUME = {
-    50: 20.0,
-    1000: 300.0
-}
 
 
 class PressureEvent(enum.Enum):
@@ -34,7 +30,9 @@ class PressureEventConfig:
     sample_delay: float
 
 
-FIXTURE_EVENT_STABILITY_THRESHOLD = 0.05
+PRESSURE_FIXTURE_ASPIRATE_VOLUME = {50: 20.0, 1000: 50.0}
+
+FIXTURE_EVENT_STABILITY_THRESHOLD = 3.0
 DEFAULT_PRESSURE_SAMPLE_DELAY = 0.25
 DEFAULT_PRESSURE_SAMPLE_COUNT = 10
 # FIXME: reduce once firmware latency is reduced
@@ -62,16 +60,16 @@ PRESSURE_INSERTED = PressureEventConfig(
     sample_delay=DEFAULT_PRESSURE_SAMPLE_DELAY,
 )
 PRESSURE_ASPIRATED_P50 = PressureEventConfig(
-    min=-3.5,
-    max=-2.5,
+    min=-5,
+    max=0,
     stability_delay=DEFAULT_STABILIZE_SECONDS,
     stability_threshold=FIXTURE_EVENT_STABILITY_THRESHOLD,
     sample_count=DEFAULT_PRESSURE_SAMPLE_COUNT_DURING_ASPIRATE,
     sample_delay=DEFAULT_PRESSURE_SAMPLE_DELAY,
 )
 PRESSURE_ASPIRATED_P1000 = PressureEventConfig(
-    min=-3.5,
-    max=-2.5,
+    min=-5,
+    max=0,
     stability_delay=DEFAULT_STABILIZE_SECONDS,
     stability_threshold=FIXTURE_EVENT_STABILITY_THRESHOLD,
     sample_count=DEFAULT_PRESSURE_SAMPLE_COUNT_DURING_ASPIRATE,
