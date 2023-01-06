@@ -11,11 +11,11 @@ LOCATION_A1_RIGHT = LOCATION_A1_LEFT._replace(x=128 - 14.4)
 
 # some tags to label the different pressure-fixture events that we record
 class PressureEvent(enum.Enum):
-    PRE = "pressure-event-pre"
-    INSERT = "pressure-event-insert"
-    ASPIRATE = "pressure-event-aspirate"
-    DISPENSE = "pressure-event-dispense"
-    POST = "pressure-event-post"
+    PRE = "pre"
+    INSERT = "insert"
+    ASPIRATE = "aspirate"
+    DISPENSE = "dispense"
+    POST = "post"
 
 
 @dataclass

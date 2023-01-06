@@ -70,3 +70,15 @@ def dump_data_to_file(test_name: str, file_name: str, data: str) -> None:
 def append_data_to_file(test_name: str, file_name: str, data: str) -> None:
     """Append new content to an already existing file on disk."""
     return _save_data(test_name, file_name, data, perm="a+")
+
+
+def insert_data_to_file(test_name: str, file_name: str, data: str, line: int) -> None:
+    """Insert new data at a specified line."""
+    test_path = create_folder_for_test_data(test_name)
+    data_path = test_path / file_name
+    # read data from file, insert line, then overwrite previous file
+    with open(data_path, "r") as f:
+        contents = f.readlines()
+    contents.insert(line, data)
+    with open(data_path, "w") as f:
+        f.write("".join(contents))
