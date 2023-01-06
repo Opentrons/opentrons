@@ -6,11 +6,11 @@ from typing import Optional, List
 from opentrons.hardware_control import SynchronousAdapter, modules as hw_modules
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
-    ModuleType,
     TemperatureStatus,
     MagneticStatus,
     ThermocyclerStep,
     SpeedStatus,
+    module_model_from_string,
 )
 from opentrons.drivers.types import (
     HeaterShakerLabwareLatchStatus,
@@ -66,22 +66,13 @@ class ModuleCore(AbstractModuleCore):
 
     def get_model(self) -> ModuleModel:
         """Get the module's model identifier."""
-        raise NotImplementedError("get_model not implemented")
-
-    def get_type(self) -> ModuleType:
-        """Get the module's general type identifier."""
-        raise NotImplementedError("get_type not implemented")
-
-    def get_requested_model(self) -> ModuleModel:
-        """Get the model identifier the module was requested as.
-
-        This may differ from the actual model returned by `get_model`.
-        """
-        raise NotImplementedError("get_requested_model not implemented")
+        return module_model_from_string(
+            self._engine_client.state.modules.get_model(self.module_id)
+        )
 
     def get_serial_number(self) -> str:
         """Get the module's unique hardware serial number."""
-        raise NotImplementedError("get_serial_number not implemented")
+        return self._engine_client.state.modules.get_serial_number(self.module_id)
 
     def get_deck_slot(self) -> DeckSlotName:
         """Get the module's deck slot."""
