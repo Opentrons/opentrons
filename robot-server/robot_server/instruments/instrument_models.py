@@ -19,7 +19,7 @@ from opentrons_shared_data.gripper.dev_types import (
     GripperModel,
 )
 
-InstrumentT = TypeVar("InstrumentT", bound=Union[GripperName, PipetteName])
+InstrumentNameT = TypeVar("InstrumentNameT", bound=Union[GripperName, PipetteName])
 InstrumentModelT = TypeVar("InstrumentModelT", bound=Union[GripperModel, PipetteModel])
 InstrumentDataT = TypeVar("InstrumentDataT", bound=BaseModel)
 
@@ -41,10 +41,10 @@ class GenericInstrument(
     mount: MountType = Field(
         ..., description="The mount this instrument is attached to."
     )
-    instrumentName: Union[PipetteName, GripperName] = Field(
+    instrumentName: InstrumentNameT = = Field(
         ..., description="Name of the instrument."
     )
-    instrumentModel: Union[PipetteModel, GripperModel] = Field(
+    instrumentModel: InstrumentModelT = Field(
         ..., description="Instrument model."
     )
     instrumentSerial: str = Field(..., description="Instrument hardware serial number.")
@@ -73,11 +73,11 @@ class PipetteData(BaseModel):
 
 
 class Pipette(GenericInstrument[PipetteName, PipetteModel, PipetteData]):
-    """Attached gripper info & configuration."""
+    """Attached pipette info & configuration."""
 
     instrumentName: PipetteName
     instrumentModel: PipetteModel
-    instrumentSerial: str
+    serialNumber: str
     data: PipetteData
 
 
