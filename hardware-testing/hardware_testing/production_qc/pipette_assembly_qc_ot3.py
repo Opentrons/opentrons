@@ -448,7 +448,8 @@ async def _main(test_config: TestConfig) -> None:
         run_id = data.create_run_id()
         folder_path = data.create_folder_for_test_data(TEST_NAME)
         file_name = data.create_file_name(TEST_NAME, run_id, pipette_sn)
-        print(f"CSV: {os.path.join(folder_path, file_name)}")
+        csv_display_name = os.path.join(folder_path, file_name)
+        print(f"CSV: {csv_display_name}")
         start_time = time()
 
         # callback function for writing new data to CSV file
@@ -484,9 +485,11 @@ async def _main(test_config: TestConfig) -> None:
             _append_csv_data([tag, threshold[0], threshold[1]])
 
         # run the test
-        _append_csv_data(["-----"])
-        _append_csv_data(["BEGIN"])
-        _append_csv_data(["-----"])
+        _append_csv_data(["----"])
+        _append_csv_data(["TEST"])
+        _append_csv_data(["----"])
+        # save final test results, to be saved and displayed at the end
+        _final_test_results = []
         print("homing")
         await api.home()
         if not test_config.skip_liquid:
@@ -496,6 +499,7 @@ async def _main(test_config: TestConfig) -> None:
                 _append_csv_data(
                     ["droplet-test", tip, "PASS" if test_passed else "FAIL"]
                 )
+                _final_test_results.append((f"droplet-test-{tip}", test_passed,))
         if not test_config.skip_fixture:
             tips_fixture = [f"A{i + 1}" for i in range(test_config.num_trials)]
             for tip in tips_fixture:
@@ -510,14 +514,23 @@ async def _main(test_config: TestConfig) -> None:
                 _append_csv_data(
                     ["pressure-test", tip, "PASS" if test_passed else "FAIL"]
                 )
+                _final_test_results.append((f"pressure-test-{tip}", test_passed,))
 
-        _append_csv_data(["---"])
-        _append_csv_data(["END"])
-        _append_csv_data(["---"])
         print("test complete")
-        print(f"CSV: {os.path.join(folder_path, file_name)}")
+        _append_csv_data(["-------"])
+        _append_csv_data(["RESULTS"])
+        _append_csv_data(["-------"])
+        print("final test results:")
+        for result in _final_test_results:
+            _result_tag = result[0]
+            _pass_fail = "PASS" if result[1] else "FAIL"
+            _append_csv_data([_result_tag, _pass_fail])
+            print(f" - {_result_tag}\t{_pass_fail}")
+        # print the filepath again, to help debugging
+        print(f"CSV: {csv_display_name}")
         print("homing")
         await api.home()
+    print("done")
 
 
 if __name__ == "__main__":
