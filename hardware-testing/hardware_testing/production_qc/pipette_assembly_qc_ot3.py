@@ -535,6 +535,9 @@ async def _test_diagnostics_capacitive(api: OT3API, mount: OT3Mount, write_cb: C
 
 
 async def _test_diagnostics_pressure(api: OT3API, mount: OT3Mount, write_cb: Callable) -> bool:
+    await api.add_tip(mount, 0.1)
+    await api.prepare_for_aspirate(mount)
+
     print("testing pressure")
     pressure_open_air_pass = True
     pressure_open_air = await helpers_ot3.get_pressure_ot3(api, mount)
@@ -548,7 +551,9 @@ async def _test_diagnostics_pressure(api: OT3API, mount: OT3Mount, write_cb: Cal
     print("moving plunger to bottom")
     await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom)
     if not api.is_simulator:
-        _get_operator_answer_to_question("ATTACH sealed tip to nozzle, enter \"y\" when ready")
+        _get_operator_answer_to_question("ATTACH tip to nozzle, enter \"y\" when ready")
+    if not api.is_simulator:
+        _get_operator_answer_to_question("COVER tip with finger, enter \"y\" when ready")
     pressure_sealed = await helpers_ot3.get_pressure_ot3(api, mount)
     pressure_sealed_pass = True
     print(f"pressure-sealed: {pressure_sealed}")
@@ -560,10 +565,7 @@ async def _test_diagnostics_pressure(api: OT3API, mount: OT3Mount, write_cb: Cal
     pip_vol = api.hardware_pipettes[mount.to_mount()].working_volume
     plunger_aspirate_ul = PRESSURE_ASPIRATE_VOL[pip_vol]
     print(f"aspirate {plunger_aspirate_ul} ul")
-    await api.add_tip(mount, 0.1)
-    await api.prepare_for_aspirate(mount)
     await api.aspirate(mount, plunger_aspirate_ul)
-    await api.remove_tip(mount)
     pressure_compress = await helpers_ot3.get_pressure_ot3(api, mount)
     print(f"pressure-compressed: {pressure_compress}")
     pressure_compress_pass = True
@@ -576,6 +578,7 @@ async def _test_diagnostics_pressure(api: OT3API, mount: OT3Mount, write_cb: Cal
         _get_operator_answer_to_question("REMOVE sealed tip to nozzle, enter \"y\" when ready")
     print("moving plunger back down to BOTTOM position")
     await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom)
+    await api.remove_tip(mount)
     return pressure_open_air_pass and pressure_sealed_pass and pressure_compress_pass
 
 
