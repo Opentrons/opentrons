@@ -182,6 +182,7 @@ ot3_dummy_settings = {
     "gripper_mount_offset": (1, 1, 1),
     "liquid_sense": {
         "starting_mount_height": 80,
+        "prep_move_speed": 40,
         "pipette_distance": 100,
         "mount_distance": 50,
         "mount_speed": 10,

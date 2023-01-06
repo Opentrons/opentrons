@@ -1668,8 +1668,15 @@ class OT3API(
         probe_settings: Optional[LiquidProbeSettings] = None,
     ) -> None:
         """Find liquid."""
+        pipette_axis = OT3Axis.of_main_tool_actuator(mount)
         if not probe_settings:
             probe_settings = self.config.liquid_sense
+
+        if not self._current_position:
+            await self.home()
+        new_position = await self.current_position_ot3(mount)
+        if new_position[pipette_axis] != 0:
+            await self.home_plunger(mount)
 
         await self._backend.liquid_probe(
             mount,
@@ -1678,6 +1685,8 @@ class OT3API(
             probe_settings.mount_distance,
             probe_settings.mount_speed,
             probe_settings.sensor_threshold_pascals,
+            probe_settings.starting_mount_height,
+            probe_settings.prep_move_speed,
         )
 
     async def capacitive_probe(

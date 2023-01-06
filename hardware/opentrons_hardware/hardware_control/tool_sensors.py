@@ -62,6 +62,8 @@ async def liquid_probe(
     pipette_speed: float,
     mount_distance: float,
     mount_speed: float,
+    starting_mount_height: float,
+    prep_move_speed: float,
     sensor_id: SensorId = SensorId.S0,
     threshold_pascals: float = 1.0,
 ) -> Dict[NodeId, Tuple[float, float, bool, bool]]:
@@ -80,13 +82,27 @@ async def liquid_probe(
         speed={mount: mount_speed, tool: pipette_speed},
     )
 
+    prep_move = create_step(
+        distance={mount: float64(abs(starting_mount_height))},
+        velocity={mount: float64(prep_move_speed)},
+        acceleration={},
+        duration=float64(abs(starting_mount_height / prep_move_speed)),
+        present_nodes=[mount],
+        stop_condition=MoveStopCondition.none,
+    )
+
+    print(f"pass group = {pass_group}")
+    print(f"prep move = {prep_move}")
+
     await sensor_driver.send_stop_threshold(messenger, pressure_sensor)
-    runner = MoveGroupRunner(move_groups=[[pass_group]])
+    prep_runner = MoveGroupRunner(move_groups=[[prep_move]])
+    sensor_runner = MoveGroupRunner(move_groups=[[pass_group]])
+    await prep_runner.run(can_messenger=messenger)
     async with sensor_driver.bind_output(
         messenger,
         pressure_sensor,
     ):
-        return await runner.run(can_messenger=messenger)
+        return await sensor_runner.run(can_messenger=messenger)
 
 
 async def capacitive_probe(
