@@ -84,9 +84,10 @@ async def get_motor_position(
             log.warning("Motor position timed out")
     return data
 
+
 async def _parser_update_motor_position_response(
-    reader: WaitableCallback, expected: Set[NodeId]
-) -> MotorPositionStatus:
+    reader: WaitableCallback, expected: NodeId
+) -> Tuple[float, float, bool, bool]:
     async for response, arb_id in reader:
         assert isinstance(response, UpdateMotorPositionEstimationResponse)
         node = NodeId(arb_id.parts.originating_node_id)
@@ -125,7 +126,9 @@ async def update_motor_position_estimation(
 
     for node in nodes:
         with WaitableCallback(can_messenger, _listener_filter) as reader:
-            await can_messenger.send(node_id=node, message=UpdateMotorPositionEstimationRequest())
+            await can_messenger.send(
+                node_id=node, message=UpdateMotorPositionEstimationRequest()
+            )
             try:
                 data[node] = await asyncio.wait_for(
                     _parser_update_motor_position_response(reader, node), timeout
@@ -135,4 +138,3 @@ async def update_motor_position_estimation(
                 raise StopAsyncIteration
 
     return data
-
