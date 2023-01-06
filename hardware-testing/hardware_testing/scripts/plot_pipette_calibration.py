@@ -155,7 +155,7 @@ class Plot:
         self.plot_param["x_title"] = "Cycle Number"
         self.plot_param["y_title"] = "Z-Axis Encoder (mm)"
         self.plot_param["x_range"] = [0, x_end]
-        self.plot_param["y_range"] = [2.754, 2.764]
+        self.plot_param["y_range"] = [2.752, 2.762]
         self.plot_param["legend"] = "Data"
         self.plot_param["annotation"] = [annotation_ymin, annotation_ymax]
         self.write_plot(self.plot_param)
@@ -194,7 +194,7 @@ class Plot:
         self.plot_param["x_title"] = "Cycle Number"
         self.plot_param["y_title"] = "Deck Height (mm)"
         self.plot_param["x_range"] = [0, x_end]
-        self.plot_param["y_range"] = [-3, -1.8]
+        self.plot_param["y_range"] = [-1.9, -1]
         self.plot_param["legend"] = "Data"
         self.plot_param["annotation"] = [annotation_ymin, annotation_ymax]
         self.write_plot(self.plot_param)
@@ -327,11 +327,11 @@ class Plot:
         y_start = round(y_min, 2) - 0.05
         y_end = round(y_max, 2) + 0.05
 
-        annotation_ymin = self.set_annotation(y_min_xpos, y_min, y_min_text, ax_pos=100, ay_pos=100)
-        if axis == "Y":
-            annotation_ymax = self.set_annotation(y_max_xpos, y_max, y_max_text, ax_pos=-100, ay_pos=-100)
+        if axis == "Z":
+            annotation_ymin = self.set_annotation(y_min_xpos, y_min, y_min_text, ax_pos=-100, ay_pos=100)
         else:
-            annotation_ymax = self.set_annotation(y_max_xpos, y_max, y_max_text, ax_pos=100, ay_pos=-100)
+            annotation_ymin = self.set_annotation(y_min_xpos, y_min, y_min_text, ax_pos=100, ay_pos=100)
+        annotation_ymax = self.set_annotation(y_max_xpos, y_max, y_max_text, ax_pos=100, ay_pos=-100)
         annotation_yavg = self.set_annotation(y_avg_xpos, y_avg, y_avg_text, ax_pos=100, ay_pos=-100)
 
         fig1 = px.line(df, x=x_axis, y=[y_axis], markers=True, color_discrete_sequence=self.list_colors[index:])
