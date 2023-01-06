@@ -4,7 +4,7 @@ import asyncio
 from dataclasses import dataclass, fields
 import os
 from time import time
-from typing import Optional, Callable, List, Any, Tuple
+from typing import Optional, Callable, List, Any
 from typing_extensions import Final
 
 from opentrons.hardware_control.ot3api import OT3API
@@ -15,53 +15,23 @@ from hardware_testing.drivers.pressure_fixture import (
     PressureFixture,
     SimPressureFixture,
 )
+from hardware_testing.measure.pressure.config import (
+    PRESSURE_FIXTURE_EVENT_CONFIGS as PRESSURE_CFG,
+    pressure_fixture_a1_location,
+    PressureEvent,
+    PressureEventConfig,
+)
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import OT3Mount, Point
-
-TEST_NAME: Final = "pipette-assembly-qc"
-CSV_HEADER_FIXTURE: Final = "time,p1,p2,p3,p4,p5,p6,p7,p8,phase"
 
 TRASH_HEIGHT_MM: Final = 45
 LEAK_HOVER_ABOVE_LIQUID_MM: Final = 50
 
-FIXTURE_LOCATION_A1_LEFT = Point(x=14.4, y=74.5, z=71.2)
-FIXTURE_LOCATION_A1_RIGHT = FIXTURE_LOCATION_A1_LEFT._replace(x=128 - 14.4)
-FIXTURE_TIP_VOLUME = 50
-FIXTURE_ASPIRATE_VOLUME = FIXTURE_TIP_VOLUME
-FIXTURE_PAUSE_AFTER_MOVEMENT_SECONDS = 1
-
-FIXTURE_EVENT_TAG_PRE = "pressure-pre"
-FIXTURE_EVENT_TAG_INSERT = "pressure-insert"
-FIXTURE_EVENT_TAG_ASPIRATE = "pressure-aspirate"
-FIXTURE_EVENT_TAG_DISPENSE = "pressure-dispense"
-FIXTURE_EVENT_TAG_POST = "pressure-post"
-
-FIXTURE_EVENT_STABILITY_THRESHOLD = 0.05
-FIXTURE_EVENT_THRESHOLDS = {
-    FIXTURE_EVENT_TAG_PRE: (
-        -0.01,
-        0.01,
-    ),
-    FIXTURE_EVENT_TAG_INSERT: (
-        0.2,
-        0.5,
-    ),
-    FIXTURE_EVENT_TAG_ASPIRATE: (
-        -3.5,
-        -2.5,
-    ),
-    FIXTURE_EVENT_TAG_DISPENSE: (
-        0.2,
-        0.5,
-    ),
-    FIXTURE_EVENT_TAG_POST: (
-        -0.01,
-        0.01,
-    ),
-}
-
 SAFE_HEIGHT_TRAVEL = 10
 SAFE_HEIGHT_CALIBRATE = 10
+
+FIXTURE_TIP_VOLUME = 50  # always 50ul, to reduce risk of damaging pressure sensor
+FIXTURE_ASPIRATE_VOLUME = FIXTURE_TIP_VOLUME  # TODO: how much should the P50 aspirate?
 
 
 @dataclass
@@ -75,15 +45,14 @@ class TestConfig:
     fixture_port: str
     fixture_depth: int
     fixture_side: str
-    fixture_sample_count: int
-    fixture_sample_delay: float
+    fixture_aspirate_sample_count: int
     slot_tip_rack_liquid: int
     slot_tip_rack_fixture: int
     slot_reservoir: int
     slot_fixture: int
     slot_trash: int
     num_trials: int
-    wait_seconds: int
+    droplet_wait_seconds: int
     simulate: bool
 
 
@@ -149,10 +118,9 @@ def _get_ideal_labware_locations(
     fixture_slot_pos = helpers_ot3.get_slot_bottom_left_position_ot3(
         test_config.slot_fixture
     )
-    if test_config.fixture_side == "left":
-        fixture_loc_ideal = fixture_slot_pos + FIXTURE_LOCATION_A1_LEFT
-    else:
-        fixture_loc_ideal = fixture_slot_pos + FIXTURE_LOCATION_A1_RIGHT
+    fixture_loc_ideal = fixture_slot_pos + pressure_fixture_a1_location(
+        test_config.fixture_side
+    )
     return LabwareLocations(
         tip_rack_liquid=tip_rack_liquid_loc_ideal,
         tip_rack_fixture=tip_rack_fixture_loc_ideal,
@@ -266,8 +234,8 @@ async def _aspirate_and_look_for_droplets(
     print(f"aspirating {pipette_volume} microliters")
     await api.aspirate(mount, pipette_volume)
     await api.move_rel(mount, Point(z=LEAK_HOVER_ABOVE_LIQUID_MM))
-    for t in range(test_config.wait_seconds):
-        print(f"waiting for leaking tips ({t + 1}/{test_config.wait_seconds})")
+    for t in range(test_config.droplet_wait_seconds):
+        print(f"waiting for leaking tips ({t + 1}/{test_config.droplet_wait_seconds})")
         if not api.is_simulator:
             await asyncio.sleep(1)
     if api.is_simulator:
@@ -284,41 +252,52 @@ async def _aspirate_and_look_for_droplets(
 
 async def _read_pressure_and_check_results(
     api: OT3API,
-    test_config: TestConfig,
     fixture: PressureFixture,
-    tag: str,
+    tag: PressureEvent,
     write_cb: Callable,
 ) -> bool:
+    pressure_event_config: PressureEventConfig = PRESSURE_CFG[tag]
     if not api.is_simulator:
-        # TODO: remove once firmware has been fixed so values update quicker
-        await asyncio.sleep(FIXTURE_PAUSE_AFTER_MOVEMENT_SECONDS)
+        await asyncio.sleep(pressure_event_config.stability_delay)
     _samples = []
-    for i in range(test_config.fixture_sample_count):
+    for i in range(pressure_event_config.sample_count):
         _samples.append(fixture.read_all_pressure_channel())
+        next_sample_time = time() + pressure_event_config.sample_delay
         _sample_as_strings = [str(round(p, 2)) for p in _samples[-1]]
-        csv_data_sample = [tag] + _sample_as_strings
-        print(csv_data_sample)
+        csv_data_sample = [tag.value] + _sample_as_strings
+        print(f"{i + 1}/{pressure_event_config.sample_count}: {csv_data_sample}")
         write_cb(csv_data_sample)
-        if not api.is_simulator and i < test_config.fixture_sample_count - 1:
-            await asyncio.sleep(test_config.fixture_sample_delay)
+        delay_time = next_sample_time - time()
+        if not api.is_simulator and i < pressure_event_config.sample_count - 1 and delay_time > 0:
+            await asyncio.sleep(pressure_event_config.sample_delay)
     _samples_channel_1 = [s[0] for s in _samples]
     _samples_channel_1.sort()
     _samples_clipped = _samples_channel_1[1:-1]
     _samples_min = min(_samples_clipped)
     _samples_max = max(_samples_clipped)
-    if _samples_max - _samples_min > FIXTURE_EVENT_STABILITY_THRESHOLD:
+    if _samples_max - _samples_min > pressure_event_config.stability_threshold:
         test_pass_stability = False
     else:
         test_pass_stability = True
-    csv_data_stability = [tag + "-stability", "PASS" if test_pass_stability else "FAIL"]
+    csv_data_stability = [
+        tag.value,
+        "stability",
+        "PASS" if test_pass_stability else "FAIL",
+    ]
     print(csv_data_stability)
     write_cb(csv_data_stability)
-    thresholds = FIXTURE_EVENT_THRESHOLDS[tag]
-    if _samples_min < thresholds[0] or _samples_max > thresholds[1]:
+    if (
+        _samples_min < pressure_event_config.min
+        or _samples_max > pressure_event_config.max
+    ):
         test_pass_accuracy = False
     else:
         test_pass_accuracy = True
-    csv_data_accuracy = [tag + "-accuracy", "PASS" if test_pass_accuracy else "FAIL"]
+    csv_data_accuracy = [
+        tag.value,
+        "accuracy",
+        "PASS" if test_pass_accuracy else "FAIL",
+    ]
     print(csv_data_accuracy)
     write_cb(csv_data_accuracy)
     return test_pass_stability and test_pass_accuracy
@@ -334,31 +313,31 @@ async def _fixture_check_pressure(
     results = []
     # above the fixture
     r = await _read_pressure_and_check_results(
-        api, test_config, fixture, FIXTURE_EVENT_TAG_PRE, write_cb
+        api, fixture, PressureEvent.PRE, write_cb
     )
     results.append(r)
     # insert into the fixture
     await api.move_rel(mount, Point(z=-test_config.fixture_depth))
     r = await _read_pressure_and_check_results(
-        api, test_config, fixture, FIXTURE_EVENT_TAG_INSERT, write_cb
+        api, fixture, PressureEvent.INSERT, write_cb
     )
     results.append(r)
     # aspirate 50uL
     await api.aspirate(mount, FIXTURE_ASPIRATE_VOLUME)
     r = await _read_pressure_and_check_results(
-        api, test_config, fixture, FIXTURE_EVENT_TAG_ASPIRATE, write_cb
+        api, fixture, PressureEvent.ASPIRATE, write_cb
     )
     results.append(r)
     # dispense
     await api.dispense(mount, FIXTURE_ASPIRATE_VOLUME)
     r = await _read_pressure_and_check_results(
-        api, test_config, fixture, FIXTURE_EVENT_TAG_DISPENSE, write_cb
+        api, fixture, PressureEvent.DISPENSE, write_cb
     )
     results.append(r)
     # retract out of fixture
     await api.move_rel(mount, Point(z=test_config.fixture_depth))
     r = await _read_pressure_and_check_results(
-        api, test_config, fixture, FIXTURE_EVENT_TAG_POST, write_cb
+        api, fixture, PressureEvent.POST, write_cb
     )
     results.append(r)
     return False not in results
@@ -446,19 +425,20 @@ async def _main(test_config: TestConfig) -> None:
 
         # create the CSV file, using the Pipette serial number as the tag
         run_id = data.create_run_id()
-        folder_path = data.create_folder_for_test_data(TEST_NAME)
-        file_name = data.create_file_name(TEST_NAME, run_id, pipette_sn)
+        test_name = data.create_test_name_from_file(__file__)
+        folder_path = data.create_folder_for_test_data(test_name)
+        file_name = data.create_file_name(test_name, run_id, pipette_sn)
         csv_display_name = os.path.join(folder_path, file_name)
         print(f"CSV: {csv_display_name}")
         start_time = time()
 
         # callback function for writing new data to CSV file
         def _append_csv_data(data_list: List[Any]) -> None:
-            # prepend the elapsed seconds, so the time is always in the first column
+            # every line in the CSV file begins with the elapsed seconds
             elapsed_seconds = round(time() - start_time, 2)
             data_list_with_time = [elapsed_seconds] + data_list
             data_str = ",".join([str(d) for d in data_list_with_time])
-            data.append_data_to_file(TEST_NAME, file_name, data_str + "\n")
+            data.append_data_to_file(test_name, file_name, data_str + "\n")
 
         # add metadata to CSV
         _append_csv_data(["--------"])
@@ -466,23 +446,23 @@ async def _main(test_config: TestConfig) -> None:
         _append_csv_data(["--------"])
         if test_config.simulate:
             _append_csv_data(["simulating"])
-        _append_csv_data(["test-name", TEST_NAME])
+        _append_csv_data(["test-name", test_name])
         _append_csv_data(["operator-name", test_config.operator_name])
         _append_csv_data(["run-id", run_id])  # includes a date/time string
         _append_csv_data(["pipette", pipette_sn])
         # add test configurations to CSV
-        _append_csv_data(["--------------"])
-        _append_csv_data(["CONFIGURATIONS"])
-        _append_csv_data(["--------------"])
+        _append_csv_data(["-------------------"])
+        _append_csv_data(["TEST-CONFIGURATIONS"])
+        _append_csv_data(["-------------------"])
         for f in fields(test_config):
             _append_csv_data([f.name, getattr(test_config, f.name)])
         # add pressure thresholds to CSV
-        _append_csv_data(["----------"])
-        _append_csv_data(["THRESHOLDS"])
-        _append_csv_data(["----------"])
-        _append_csv_data(["pressure-stability", FIXTURE_EVENT_STABILITY_THRESHOLD])
-        for tag, threshold in FIXTURE_EVENT_THRESHOLDS.items():
-            _append_csv_data([tag, threshold[0], threshold[1]])
+        _append_csv_data(["-----------------------"])
+        _append_csv_data(["PRESSURE-CONFIGURATIONS"])
+        _append_csv_data(["-----------------------"])
+        for tag, config in PRESSURE_CFG.items():
+            for f in fields(config):
+                _append_csv_data([tag, f.name, getattr(config, f.name)])
 
         # run the test
         _append_csv_data(["----"])
@@ -499,7 +479,12 @@ async def _main(test_config: TestConfig) -> None:
                 _append_csv_data(
                     ["droplet-test", tip, "PASS" if test_passed else "FAIL"]
                 )
-                _final_test_results.append((f"droplet-test-{tip}", test_passed,))
+                _final_test_results.append(
+                    (
+                        f"droplet-test-{tip}",
+                        test_passed,
+                    )
+                )
         if not test_config.skip_fixture:
             tips_fixture = [f"A{i + 1}" for i in range(test_config.num_trials)]
             for tip in tips_fixture:
@@ -514,7 +499,12 @@ async def _main(test_config: TestConfig) -> None:
                 _append_csv_data(
                     ["pressure-test", tip, "PASS" if test_passed else "FAIL"]
                 )
-                _final_test_results.append((f"pressure-test-{tip}", test_passed,))
+                _final_test_results.append(
+                    (
+                        f"pressure-test-{tip}",
+                        test_passed,
+                    )
+                )
 
         print("test complete")
         _append_csv_data(["-------"])
@@ -542,8 +532,9 @@ if __name__ == "__main__":
     arg_parser.add_argument("--fixture-side", choices=["left", "right"], default="left")
     arg_parser.add_argument("--port", type=str, default="")
     arg_parser.add_argument("--num-trials", type=int, default=2)
-    arg_parser.add_argument("--sample-count", type=float, default=10)
-    arg_parser.add_argument("--sample-delay", type=float, default=0.25)
+    arg_parser.add_argument(
+        "--aspirate-sample-count", type=float, default=PRESSURE_CFG[PressureEvent.ASPIRATE].sample_count
+    )
     arg_parser.add_argument("--wait", type=int, default=30)
     arg_parser.add_argument("--slot-tip-rack-liquid", type=int, default=7)
     arg_parser.add_argument("--slot-tip-rack-fixture", type=int, default=1)
@@ -561,15 +552,17 @@ if __name__ == "__main__":
         fixture_port=args.port,
         fixture_depth=args.insert_depth,
         fixture_side=args.fixture_side,
-        fixture_sample_count=args.sample_count,
-        fixture_sample_delay=args.sample_delay,
+        fixture_aspirate_sample_count=args.aspirate_sample_count,
         slot_tip_rack_liquid=args.slot_tip_rack_liquid,
         slot_tip_rack_fixture=args.slot_tip_rack_fixture,
         slot_reservoir=args.slot_reservoir,
         slot_fixture=args.slot_fixture,
         slot_trash=args.slot_trash,
         num_trials=args.num_trials,
-        wait_seconds=args.wait,
+        droplet_wait_seconds=args.wait,
         simulate=args.simulate,
     )
+    # NOTE: overwrite default aspirate sample-count from user's input
+    # FIXME: this value is being set in a few places, maybe there's a way to clean this up
+    PRESSURE_CFG[PressureEvent.ASPIRATE].sample_count = _cfg.fixture_aspirate_sample_count
     asyncio.run(_main(_cfg))

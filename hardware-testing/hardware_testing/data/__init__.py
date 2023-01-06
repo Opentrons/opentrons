@@ -20,6 +20,11 @@ def _initialize_testing_data_base_dir() -> Path:
     return base
 
 
+def create_test_name_from_file(f: str) -> str:
+    """Create test name from file name."""
+    return os.path.basename(f).replace("_", "-").replace(".py", "")
+
+
 def create_folder_for_test_data(test_name: str) -> Path:
     """Create a folder for test data."""
     base = _initialize_testing_data_base_dir()
