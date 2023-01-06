@@ -56,6 +56,7 @@ stages:
             - name: simpleV6.json
               role: main
           protocolType: json
+          robotType: OT-2 Standard
           metadata:
             tags:
               - unitTest
@@ -81,7 +82,6 @@ stages:
           - id: '{analysis_id}'
             status: completed
             result: ok
-            robotType: 'OT-2 Standard'
             pipettes:
               - id: pipetteId
                 pipetteName: p10_single
@@ -537,7 +537,11 @@ stages:
                 startedAt: !anystr
                 completedAt: !anystr
             errors: []
-            liquids: []
+            liquids:
+              - id: waterId
+                displayName: Water
+                description: Liquid H2O
+                displayColor: '#7332a8'
 
 ---
 test_name: Upload and analyze a JSONv6 protocol, with liquids
@@ -545,7 +549,6 @@ test_name: Upload and analyze a JSONv6 protocol, with liquids
 marks:
   - usefixtures:
       - run_server
-      - set_enable_load_liquid
 
 stages:
   - name: Upload simple v6 protocol
@@ -604,4 +607,3 @@ stages:
                 displayName: Water
                 description: Liquid H2O
                 displayColor: '#7332a8'
-            robotType: "OT-2 Standard"

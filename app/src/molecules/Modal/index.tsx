@@ -24,7 +24,9 @@ export const Modal = (props: ModalProps): JSX.Element => {
     onClose,
     closeOnOutsideClick,
     title,
-    childrenPadding = `${SPACING.spacing4} ${SPACING.spacing5} ${SPACING.spacing5}`,
+    childrenPadding = `${String(SPACING.spacing4)} ${String(
+      SPACING.spacing5
+    )} ${String(SPACING.spacing5)}`,
     children,
     ...styleProps
   } = props
@@ -51,7 +53,7 @@ export const Modal = (props: ModalProps): JSX.Element => {
     <ModalShell
       width={styleProps.width ?? '31.25rem'}
       header={modalHeader}
-      onOutsideClick={closeOnOutsideClick ? onClose : undefined}
+      onOutsideClick={closeOnOutsideClick ?? false ? onClose : undefined}
       // center within viewport aside from nav
       marginLeft="7.125rem"
       {...props}

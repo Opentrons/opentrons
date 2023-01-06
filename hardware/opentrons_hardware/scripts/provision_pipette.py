@@ -164,7 +164,7 @@ def log_config(log_level: int) -> Tuple[logging.Logger, logging.Logger]:
                 "main_log_handler": {
                     "class": "logging.handlers.RotatingFileHandler",
                     "formatter": "basic",
-                    "filename": "provision_pipette_debug.log",
+                    "filename": "/var/log/provision_pipette_debug.log",
                     "maxBytes": 5000000,
                     "level": log_level,
                     "backupCount": 3,
@@ -177,7 +177,7 @@ def log_config(log_level: int) -> Tuple[logging.Logger, logging.Logger]:
                 "trace_log_handler": {
                     "class": "logging.handlers.RotatingFileHandler",
                     "formatter": "basic",
-                    "filename": "provision_pipette.log",
+                    "filename": "/var/log/provision_pipette.log",
                     "maxBytes": 5000000,
                     "level": logging.INFO,
                     "backupCount": 3,

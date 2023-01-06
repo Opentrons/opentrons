@@ -29,11 +29,6 @@ class AbstractProtocol(
         ...
 
     @abstractmethod
-    def get_bundled_data(self) -> Dict[str, bytes]:
-        """Get a mapping of name to contents"""
-        ...
-
-    @abstractmethod
     def get_bundled_labware(self) -> Optional[Dict[str, LabwareDefinition]]:
         ...
 
@@ -58,7 +53,7 @@ class AbstractProtocol(
         self,
         definition: LabwareDefinition,
     ) -> LabwareLoadParams:
-        """Add a labware defintion to the set of loadable definitions."""
+        """Add a labware definition to the set of loadable definitions."""
         ...
 
     @abstractmethod
@@ -158,6 +153,12 @@ class AbstractProtocol(
         self, slot_name: DeckSlotName
     ) -> Union[LabwareCoreType, ModuleCoreType, None]:
         """Get the contents of a given slot, if any."""
+
+    @abstractmethod
+    def get_labware_on_module(
+        self, module_core: ModuleCoreType
+    ) -> Optional[LabwareCoreType]:
+        """Get the labware on a given module, if any."""
 
     @abstractmethod
     def get_slot_center(self, slot_name: DeckSlotName) -> Point:

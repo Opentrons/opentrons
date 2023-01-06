@@ -17,9 +17,9 @@ from .well import AbstractWellCore
 WellCore = AbstractWellCore
 LabwareCore = AbstractLabware[WellCore]
 InstrumentCore = AbstractInstrument[WellCore]
-ModuleCore = AbstractModuleCore[LabwareCore]
-TemperatureModuleCore = AbstractTemperatureModuleCore[LabwareCore]
-MagneticModuleCore = AbstractMagneticModuleCore[LabwareCore]
-ThermocyclerCore = AbstractThermocyclerCore[LabwareCore]
-HeaterShakerCore = AbstractHeaterShakerCore[LabwareCore]
+ModuleCore = AbstractModuleCore
+TemperatureModuleCore = AbstractTemperatureModuleCore
+MagneticModuleCore = AbstractMagneticModuleCore
+ThermocyclerCore = AbstractThermocyclerCore
+HeaterShakerCore = AbstractHeaterShakerCore
 ProtocolCore = AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]

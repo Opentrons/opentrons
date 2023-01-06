@@ -11,4 +11,5 @@ declare global {
     }
   }
   export const _PKG_VERSION_: string
+  export const _OPENTRONS_PROJECT_: string
 }

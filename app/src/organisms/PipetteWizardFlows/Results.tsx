@@ -8,18 +8,21 @@ import type { PipetteWizardStepProps } from './types'
 
 interface ResultsProps extends PipetteWizardStepProps {
   handleCleanUpAndClose: () => void
+  currentStepIndex: number
+  totalStepCount: number
 }
 
 export const Results = (props: ResultsProps): JSX.Element => {
   const {
     proceed,
     flowType,
-    attachedPipette,
+    attachedPipettes,
     mount,
     handleCleanUpAndClose,
+    currentStepIndex,
+    totalStepCount,
   } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
-
   let header: string = 'unknown results screen'
   let iconColor: string = COLORS.successEnabled
   let isSuccess: boolean = true
@@ -30,10 +33,12 @@ export const Results = (props: ResultsProps): JSX.Element => {
       break
     }
     case FLOWS.ATTACH: {
-      if (attachedPipette[mount] != null) {
-        const pipetteName = attachedPipette[mount]?.modelSpecs.displayName
+      // attachment flow success
+      if (attachedPipettes[mount] != null) {
+        const pipetteName = attachedPipettes[mount]?.modelSpecs.displayName
         header = t('pipette_attached', { pipetteName: pipetteName })
         buttonText = t('cal_pipette')
+        // attachment flow fail
       } else {
         header = t('pipette_failed_to_attach')
         iconColor = COLORS.errorEnabled
@@ -42,7 +47,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
       break
     }
     case FLOWS.DETACH: {
-      if (attachedPipette[mount] != null) {
+      if (attachedPipettes[mount] != null) {
         header = t('pipette_failed_to_detach')
         iconColor = COLORS.errorEnabled
         isSuccess = false
@@ -54,7 +59,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
   }
 
   const handleProceed = (): void => {
-    if (flowType === FLOWS.DETACH) {
+    if (currentStepIndex === totalStepCount || !isSuccess) {
       handleCleanUpAndClose()
     } else {
       proceed()

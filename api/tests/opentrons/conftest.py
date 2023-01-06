@@ -117,14 +117,6 @@ async def enable_ot3_hardware_controller(
     decoy.when(config.feature_flags.enable_ot3_hardware_controller()).then_return(True)
 
 
-@pytest.fixture
-async def enable_load_liquid() -> AsyncGenerator[None, None]:
-    """Fixture enabling load-liquid support."""
-    await config.advanced_settings.set_adv_setting("enableLoadLiquid", True)
-    yield
-    await config.advanced_settings.set_adv_setting("enableLoadLiquid", False)
-
-
 @pytest.fixture()
 def protocol_file() -> str:
     return "testosaur_v2.py"
@@ -175,7 +167,7 @@ async def _build_ot2_hw() -> AsyncGenerator[ThreadManagedHardware, None]:
         yield hw_sim
     finally:
         config.robot_configs.clear()
-        for m in hw_sim.attached_modules:
+        for m in hw_sim.wrapped().attached_modules:
             await m.cleanup()
         hw_sim.set_config(old_config)
         hw_sim.clean_up()
@@ -198,7 +190,7 @@ async def _build_ot3_hw() -> AsyncGenerator[ThreadManagedHardware, None]:
         yield hw_sim
     finally:
         config.robot_configs.clear()
-        for m in hw_sim.attached_modules:
+        for m in hw_sim.wrapped().attached_modules:
             await m.cleanup()
         hw_sim.set_config(old_config)
         hw_sim.clean_up()
@@ -266,14 +258,10 @@ async def hardware(
 
 
 @pytest.fixture()
-def ctx(hardware: ThreadManagedHardware) -> Generator[ProtocolContext, None, None]:
-    c = create_protocol_context(
+def ctx(hardware: ThreadManagedHardware) -> ProtocolContext:
+    return create_protocol_context(
         api_version=MAX_SUPPORTED_VERSION, hardware_api=hardware
     )
-    yield c
-    # Manually clean up all the modules.
-    for m in c.loaded_modules.items():
-        m[1]._module.cleanup()
 
 
 @pytest.fixture()

@@ -12,8 +12,9 @@ from opentrons.hardware_control.modules.types import (
     TemperatureStatus,
     SpeedStatus,
 )
-from opentrons.protocols.geometry.module_geometry import HeaterShakerGeometry
-
+from opentrons.protocol_api.core.protocol_api.module_geometry import (
+    HeaterShakerGeometry,
+)
 from opentrons.protocol_api.core.protocol_api.protocol_context import (
     ProtocolContextImplementation,
 )

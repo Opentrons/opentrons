@@ -97,7 +97,9 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
                 nestedLabwareDisplayName,
               }) => (
                 <Module
-                  key={`LabwareSetup_Module_${moduleDef.model}_${x}${y}`}
+                  key={`LabwareSetup_Module_${String(
+                    moduleDef.model
+                  )}_${x}${y}`}
                   x={x}
                   y={y}
                   orientation={inferModuleOrientationFromXCoordinate(x)}
@@ -110,7 +112,9 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
                 >
                   {nestedLabwareDef != null && nestedLabwareId != null ? (
                     <React.Fragment
-                      key={`LabwareSetup_Labware_${nestedLabwareDef.metadata.displayName}_${x}${y}`}
+                      key={`LabwareSetup_Labware_${String(
+                        nestedLabwareDef.metadata.displayName
+                      )}_${x}${y}`}
                     >
                       <LabwareRender definition={nestedLabwareDef} />
                       <LabwareInfoOverlay
@@ -135,7 +139,9 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
                 const labwareHasLiquid = !isEmpty(wellFill)
                 return (
                   <React.Fragment
-                    key={`LabwareSetup_Labware_${labwareDef.metadata.displayName}_${x}${y}`}
+                    key={`LabwareSetup_Labware_${String(
+                      labwareDef.metadata.displayName
+                    )}_${x}${y}`}
                   >
                     <g
                       transform={`translate(${x},${y})`}

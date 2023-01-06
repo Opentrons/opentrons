@@ -9,6 +9,7 @@ from typing import (
     Tuple,
     Awaitable,
     Union,
+    cast,
     TYPE_CHECKING,
 )
 from typing_extensions import TypedDict
@@ -77,6 +78,20 @@ class ThermocyclerModuleModel(str, Enum):
 
 class HeaterShakerModuleModel(str, Enum):
     HEATER_SHAKER_V1: str = "heaterShakerModuleV1"
+
+
+def module_model_from_string(model_string: str) -> ModuleModel:
+    for model_enum in {
+        MagneticModuleModel,
+        TemperatureModuleModel,
+        ThermocyclerModuleModel,
+        HeaterShakerModuleModel,
+    }:
+        try:
+            return cast(ModuleModel, model_enum(model_string))
+        except ValueError:
+            pass
+    raise ValueError(f"No such module model {model_string}")
 
 
 @dataclass
