@@ -4,13 +4,19 @@ import json
 from pathlib import Path
 
 from .. import load_shared_data
-from .dev_types import (
+from .gripper_definition import (
     GripperDefinitionV1,
     GripperSchema,
     GripperModel,
     GripperSchemaVersion,
-    InvalidGripperDefinition,
 )
+
+
+class InvalidGripperDefinition(Exception):
+    """Incorrect gripper definition."""
+
+    pass
+
 
 
 def load_schema(version: GripperSchemaVersion) -> GripperSchema:

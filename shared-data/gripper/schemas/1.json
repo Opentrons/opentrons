@@ -96,7 +96,7 @@
       "description": "Object containing configurations specific to the z motor.",
       "properties": {
         "idle": {
-          "descriptions": "Motor idle current (A)",
+          "descriptions": "",
           "type": "number",
           "minimum": 0.02,
           "maximum": 1.0
