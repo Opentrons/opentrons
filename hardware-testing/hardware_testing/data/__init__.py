@@ -30,7 +30,7 @@ def create_folder_for_test_data(test_name: str) -> Path:
 
 def create_datetime_string() -> str:
     """Create datetime string."""
-    return datetime.now().strftime("%y%m%d%H%M%S")
+    return datetime.now().strftime("%y-%m-%d-%H-%M-%S")
 
 
 def create_run_id() -> str:

@@ -3,19 +3,21 @@ from dataclasses import dataclass
 from datetime import datetime
 from subprocess import run
 from time import time
-from typing import List, Optional, Dict, Tuple
+from typing import List, Optional, Dict, Tuple, Union
 
 from opentrons_hardware.firmware_bindings.constants import SensorId
 from opentrons_hardware.sensors import sensor_driver, sensor_types
 
 from opentrons_shared_data.deck import load as load_deck
+from opentrons_shared_data.labware import load_definition as load_labware
 
 from opentrons.config.robot_configs import build_config_ot3, load_ot3 as load_ot3_config
 from opentrons.hardware_control.backends.ot3utils import sensor_node_for_mount
 
 # TODO (lc 10-27-2022) This should be changed to an ot3 pipette object once we
 # have that well defined.
-from opentrons.hardware_control.instruments.ot3.pipette import Pipette
+from opentrons.hardware_control.instruments.ot2.pipette import Pipette as PipetteOT2
+from opentrons.hardware_control.instruments.ot3.pipette import Pipette as PipetteOT3
 from opentrons.hardware_control.motion_utilities import deck_from_machine
 from opentrons.hardware_control.ot3api import OT3API
 
@@ -27,6 +29,10 @@ from .types import (
     Point,
     CriticalPoint,
 )
+
+# TODO: use values from shared data, so we don't need to update here again
+TIP_LENGTH_OVERLAP = 10.5
+TIP_LENGTH_LOOKUP = {50: 57.9, 200: 58.35, 1000: 95.6}
 
 
 @dataclass
@@ -277,7 +283,7 @@ async def home_ot3(api: OT3API, axes: Optional[List[OT3Axis]] = None) -> None:
         )
 
 
-def _get_pipette_from_mount(api: OT3API, mount: OT3Mount) -> Pipette:
+def _get_pipette_from_mount(api: OT3API, mount: OT3Mount) -> PipetteOT3:
     pipette = api.hardware_pipettes[mount.to_mount()]
     if pipette is None:
         raise RuntimeError(f"No pipette currently attaced to mount {mount}")
@@ -404,7 +410,7 @@ class OT3JogNoInput(Exception):
 
 
 def _jog_read_user_input(terminator: str, home_key: str) -> Tuple[str, float, bool]:
-    user_input = input(f'Jog eg: x-10.5 ("{terminator}" to stop): ')
+    user_input = input(f'\tJog eg: x-10.5 ("{terminator}" to stop): ')
     user_input = user_input.strip().replace(" ", "")
     if user_input == terminator:
         raise OT3JogTermination()
@@ -454,8 +460,8 @@ async def _jog_print_current_position(
     ex, ey, ez, ep = [
         round(enc_pos[ax], 2) for ax in [OT3Axis.X, OT3Axis.Y, z_axis, instr_axis]
     ]
-    print(f"Deck Coordinate: X={mx}, Y={my}, Z={mz}, Instr={mp}")
-    print(f"Enc. Coordinate: X={ex}, Y={ey}, Z={ez}, Instr={ep}")
+    print(f"\tDeck Coordinate: X={mx}, Y={my}, Z={mz}, Instr={mp}")
+    print(f"\tEnc. Coordinate: X={ex}, Y={ey}, Z={ez}, Instr={ep}")
 
 
 async def _jog_do_print_then_input_then_move(
@@ -465,14 +471,16 @@ async def _jog_do_print_then_input_then_move(
     axis: str,
     distance: float,
     do_home: bool,
+    display: Optional[bool] = True
 ) -> Tuple[str, float, bool]:
     try:
-        await _jog_print_current_position(api, mount, critical_point)
+        if display:
+            await _jog_print_current_position(api, mount, critical_point)
         axis, distance, do_home = _jog_read_user_input(
             terminator="stop", home_key="home"
         )
     except OT3JogNoInput:
-        print("No input, repeating previous jog")
+        print("\tno input, repeating previous jog")
     if do_home:
         str_to_axes = {
             "X": OT3Axis.X,
@@ -489,22 +497,27 @@ async def _jog_do_print_then_input_then_move(
 
 
 async def jog_mount_ot3(
-    api: OT3API, mount: OT3Mount, critical_point: Optional[CriticalPoint] = None
+    api: OT3API, mount: OT3Mount, critical_point: Optional[CriticalPoint] = None, display: Optional[bool] = True
 ) -> Dict[OT3Axis, float]:
     """Jog an OT3 mount's gantry XYZ and pipettes axes."""
+    if api.is_simulator:
+        return await api.current_position_ot3(
+            mount=mount, critical_point=critical_point
+        )
     axis: str = ""
     distance: float = 0.0
     do_home: bool = False
+    print("jogging")
     while True:
         try:
             axis, distance, do_home = await _jog_do_print_then_input_then_move(
-                api, mount, critical_point, axis, distance, do_home
+                api, mount, critical_point, axis, distance, do_home, display=display
             )
         except ValueError as e:
             print(e)
             continue
         except OT3JogTermination:
-            print("Done jogging")
+            print("done jogging")
             return await api.current_position_ot3(
                 mount=mount, critical_point=critical_point
             )
@@ -519,9 +532,9 @@ async def move_to_arched_ot3(
 ) -> None:
     """Move OT3 gantry in an arched path."""
     z_ax = OT3Axis.by_mount(mount)
-    max_z = get_endstop_position_ot3(api, mount)[z_ax] - 1
+    max_z = get_endstop_position_ot3(api, mount)[z_ax]
     here = await api.gantry_position(mount=mount, refresh=True)
-    arch_z = min(max(here.z, safe_height), max_z)
+    arch_z = min(max(here.z, abs_position.z, safe_height), max_z)
     points = [
         here._replace(z=arch_z),
         abs_position._replace(z=arch_z),
@@ -622,16 +635,48 @@ def set_gripper_offset_ot3(api: OT3API, offset: Point) -> None:
     api._gripper_handler._gripper._calibration_offset.offset = offset  # type: ignore[union-attr]
 
 
-def get_slot_top_left_position_ot3(slot: int) -> Point:
-    """Get slot top-left position."""
+def get_slot_size() -> Point:
+    """Get OT3 Slot Size."""
+    deck = load_deck("ot3_standard", version=3)
+    slots = deck["locations"]["orderedSlots"]
+    bounding_box = slots[0]["boundingBox"]
+    return Point(
+        x=bounding_box["xDimension"],
+        y=bounding_box["yDimension"],
+        z=bounding_box["zDimension"],
+    )
+
+
+def get_default_tip_length(volume: int) -> float:
+    """Get default tip length for specified volume of tip."""
+    return TIP_LENGTH_LOOKUP[volume] - TIP_LENGTH_OVERLAP
+
+
+def get_slot_bottom_left_position_ot3(slot: int) -> Point:
+    """Get slot bottom-left position."""
     deck = load_deck("ot3_standard", version=3)
     slots = deck["locations"]["orderedSlots"]
     s = slots[slot - 1]
     assert s["id"] == str(slot)
-    bottom_left = Point(*s["position"])
-    s_height = s["boundingBox"]["yDimension"]
-    top_left = bottom_left + Point(y=float(s_height))
-    return top_left
+    return Point(*s["position"])
+
+
+def get_slot_top_left_position_ot3(slot: int) -> Point:
+    """Get slot top-left position."""
+    bottom_left = get_slot_bottom_left_position_ot3(slot)
+    slot_size = get_slot_size()
+    return bottom_left + Point(y=slot_size.y)
+
+
+def get_theoretical_a1_position(slot: int, labware: str) -> Point:
+    """Get the theoretical A1 position of a labware in a slot."""
+    labware_def = load_labware(loadname=labware, version=1)
+    dims = labware_def["dimensions"]
+    well_a1 = labware_def["wells"]["A1"]
+    a1_pos = Point(x=well_a1["x"], y=well_a1["y"], z=dims["zDimension"])
+    slot_pos = get_slot_bottom_left_position_ot3(slot)
+    y_shift_from_clips = (get_slot_size().y - dims["yDimension"]) * 0.5
+    return slot_pos + a1_pos + Point(y=y_shift_from_clips)
 
 
 def get_slot_calibration_square_position_ot3(slot: int) -> Point:
@@ -639,3 +684,18 @@ def get_slot_calibration_square_position_ot3(slot: int) -> Point:
     slot_top_left = get_slot_top_left_position_ot3(slot)
     calib_sq_offset = CALIBRATION_SQUARE_EVT.top_left_offset
     return slot_top_left + calib_sq_offset
+
+
+def get_pipette_serial_ot3(pipette: Union[PipetteOT2, PipetteOT3]) -> str:
+    """Get pipette serial number."""
+    model = pipette.model
+    volume = model.split("_")[0].replace("p", "")
+    volume = "1K" if volume == "1000" else volume
+    channels = "S" if "single" in model else "M"
+    version = model.split("v")[-1].strip().replace(".", "")
+    assert pipette.pipette_id, f"no pipette_id found for pipette: {pipette}"
+    if "P" in pipette.pipette_id:
+        id = pipette.pipette_id[7:]  # P1KSV33yyyymmddAxx
+    else:
+        id = pipette.pipette_id
+    return f"P{volume}{channels}V{version}{id}"
