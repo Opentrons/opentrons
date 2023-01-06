@@ -401,7 +401,4 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def _get_module_core_item(self, module_id: str) -> Optional[ModuleCore]:
         """Get Module core for a given module id."""
-        try:
-            return self._module_cores_by_id[module_id]
-        except KeyError:
-            return None
+        return self._module_cores_by_id.get(module_id)
