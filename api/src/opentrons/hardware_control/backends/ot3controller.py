@@ -895,6 +895,8 @@ class OT3Controller:
         mount_distance: float,
         mount_speed: float,
         threshold_pascals: float,
+        starting_mount_height: float,
+        prep_move_speed: float,
         sensor_id: SensorId = SensorId.S0,
     ) -> None:
         head_node = head_node_for_mount(OT3Mount(mount.value))
@@ -907,6 +909,8 @@ class OT3Controller:
             pipette_speed,
             mount_distance,
             mount_speed,
+            starting_mount_height,
+            prep_move_speed,
             sensor_id,
             threshold_pascals,
         )

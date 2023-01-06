@@ -232,6 +232,8 @@ class OT3Simulator:
         mount_distance: float,
         mount_speed: float,
         threshold_pascals: float,
+        starting_mount_height: float,
+        prep_move_speed: float,
         sensor_id: SensorId = SensorId.S0,
     ) -> None:
         return
