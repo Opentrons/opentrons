@@ -8,12 +8,18 @@ from hardware_testing.opentrons_api.types import Point
 LOCATION_A1_LEFT = Point(x=14.4, y=74.5, z=71.2)
 LOCATION_A1_RIGHT = LOCATION_A1_LEFT._replace(x=128 - 14.4)
 
+PRESSURE_FIXTURE_TIP_VOLUME = 50  # always 50ul
+PRESSURE_FIXTURE_ASPIRATE_VOLUME = {
+    50: 20.0,
+    1000: 300.0
+}
 
-# some tags to label the different pressure-fixture events that we record
+
 class PressureEvent(enum.Enum):
     PRE = "pre"
     INSERT = "insert"
-    ASPIRATE = "aspirate"
+    ASPIRATE_P50 = "aspirate"
+    ASPIRATE_P1000 = "aspirate"
     DISPENSE = "dispense"
     POST = "post"
 
@@ -55,7 +61,15 @@ PRESSURE_INSERTED = PressureEventConfig(
     sample_count=DEFAULT_PRESSURE_SAMPLE_COUNT,
     sample_delay=DEFAULT_PRESSURE_SAMPLE_DELAY,
 )
-PRESSURE_ASPIRATED_50_UL = PressureEventConfig(
+PRESSURE_ASPIRATED_P50 = PressureEventConfig(
+    min=-3.5,
+    max=-2.5,
+    stability_delay=DEFAULT_STABILIZE_SECONDS,
+    stability_threshold=FIXTURE_EVENT_STABILITY_THRESHOLD,
+    sample_count=DEFAULT_PRESSURE_SAMPLE_COUNT_DURING_ASPIRATE,
+    sample_delay=DEFAULT_PRESSURE_SAMPLE_DELAY,
+)
+PRESSURE_ASPIRATED_P1000 = PressureEventConfig(
     min=-3.5,
     max=-2.5,
     stability_delay=DEFAULT_STABILIZE_SECONDS,
@@ -66,7 +80,8 @@ PRESSURE_ASPIRATED_50_UL = PressureEventConfig(
 PRESSURE_FIXTURE_EVENT_CONFIGS: Dict[PressureEvent, PressureEventConfig] = {
     PressureEvent.PRE: PRESSURE_NONE,
     PressureEvent.INSERT: PRESSURE_INSERTED,
-    PressureEvent.ASPIRATE: PRESSURE_ASPIRATED_50_UL,
+    PressureEvent.ASPIRATE_P50: PRESSURE_ASPIRATED_P50,
+    PressureEvent.ASPIRATE_P1000: PRESSURE_ASPIRATED_P1000,
     PressureEvent.DISPENSE: PRESSURE_INSERTED,
     PressureEvent.POST: PRESSURE_NONE,
 }

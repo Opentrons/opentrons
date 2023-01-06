@@ -17,6 +17,8 @@ from hardware_testing.drivers.pressure_fixture import (
     SimPressureFixture,
 )
 from hardware_testing.measure.pressure.config import (
+    PRESSURE_FIXTURE_TIP_VOLUME,
+    PRESSURE_FIXTURE_ASPIRATE_VOLUME,
     PRESSURE_FIXTURE_EVENT_CONFIGS as PRESSURE_CFG,
     pressure_fixture_a1_location,
     PressureEvent,
@@ -30,9 +32,6 @@ LEAK_HOVER_ABOVE_LIQUID_MM: Final = 50
 
 SAFE_HEIGHT_TRAVEL = 10
 SAFE_HEIGHT_CALIBRATE = 10
-
-FIXTURE_TIP_VOLUME = 50  # always 50ul
-FIXTURE_ASPIRATE_VOLUME = FIXTURE_TIP_VOLUME  # TODO: how much should the P50 aspirate?
 
 
 @dataclass
@@ -130,7 +129,7 @@ def _get_ideal_labware_locations(
     )
     tip_rack_fixture_loc_ideal = helpers_ot3.get_theoretical_a1_position(
         test_config.slot_tip_rack_fixture,
-        f"opentrons_ot3_96_tiprack_{FIXTURE_TIP_VOLUME}ul",
+        f"opentrons_ot3_96_tiprack_{PRESSURE_FIXTURE_TIP_VOLUME}ul",
     )
     reservoir_loc_ideal = helpers_ot3.get_theoretical_a1_position(
         test_config.slot_reservoir, "nest_1_reservoir_195ml"
@@ -222,7 +221,7 @@ async def _pick_up_tip_for_fixture(api: OT3API, mount: OT3Mount, tip: str) -> No
         tip,
         IDEAL_LABWARE_LOCATIONS.tip_rack_fixture,
         CALIBRATED_LABWARE_LOCATIONS.tip_rack_fixture,
-        tip_volume=FIXTURE_TIP_VOLUME,
+        tip_volume=PRESSURE_FIXTURE_TIP_VOLUME,
     )
 
 
@@ -268,7 +267,6 @@ async def _aspirate_and_look_for_droplets(
         leak_test_passed = True
     else:
         leak_test_passed = _get_operator_answer_to_question("did it pass? no leaking?")
-    # TODO: save pass/fail to CSV
     print("dispensing back into reservoir")
     await api.move_rel(mount, Point(z=-LEAK_HOVER_ABOVE_LIQUID_MM))
     await api.dispense(mount, pipette_volume)
@@ -355,13 +353,18 @@ async def _fixture_check_pressure(
     )
     results.append(r)
     # aspirate 50uL
-    await api.aspirate(mount, FIXTURE_ASPIRATE_VOLUME)
+    pip_vol = api.hardware_pipettes[mount.to_mount()].working_volume
+    await api.aspirate(mount, PRESSURE_FIXTURE_ASPIRATE_VOLUME[pip_vol])
+    if pip_vol == 50:
+        asp_evt = PressureEvent.ASPIRATE_P50
+    else:
+        asp_evt = PressureEvent.ASPIRATE_P1000
     r = await _read_pressure_and_check_results(
-        api, fixture, PressureEvent.ASPIRATE, write_cb, accumulate_raw_data_cb
+        api, fixture, asp_evt, write_cb, accumulate_raw_data_cb
     )
     results.append(r)
     # dispense
-    await api.dispense(mount, FIXTURE_ASPIRATE_VOLUME)
+    await api.dispense(mount, PRESSURE_FIXTURE_ASPIRATE_VOLUME[pip_vol])
     r = await _read_pressure_and_check_results(
         api, fixture, PressureEvent.DISPENSE, write_cb, accumulate_raw_data_cb
     )
@@ -783,7 +786,7 @@ if __name__ == "__main__":
     arg_parser.add_argument(
         "--aspirate-sample-count",
         type=int,
-        default=PRESSURE_CFG[PressureEvent.ASPIRATE].sample_count,
+        default=PRESSURE_CFG[PressureEvent.ASPIRATE_P50].sample_count,
     )
     arg_parser.add_argument("--wait", type=int, default=30)
     arg_parser.add_argument("--slot-tip-rack-liquid", type=int, default=7)
@@ -815,7 +818,6 @@ if __name__ == "__main__":
     )
     # NOTE: overwrite default aspirate sample-count from user's input
     # FIXME: this value is being set in a few places, maybe there's a way to clean this up
-    PRESSURE_CFG[
-        PressureEvent.ASPIRATE
-    ].sample_count = _cfg.fixture_aspirate_sample_count
+    for tag in [PressureEvent.ASPIRATE_P50, PressureEvent.ASPIRATE_P1000]:
+        PRESSURE_CFG[tag].sample_count = _cfg.fixture_aspirate_sample_count
     asyncio.run(_main(_cfg))
