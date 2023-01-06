@@ -5,19 +5,7 @@ from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from opentrons.types import Location, Mount
-from opentrons.protocol_api.core.protocol import (
-    AbstractProtocol as BaseAbstractProtocol,
-)
-from opentrons.protocol_api.core.labware import AbstractLabware
-from opentrons.protocol_api.core.instrument import AbstractInstrument
-from opentrons.protocol_api.core.module import AbstractModuleCore
-from opentrons.protocol_api.core.well import AbstractWellCore
-
-
-InstrumentCore = AbstractInstrument[AbstractWellCore]
-LabwareCore = AbstractLabware[AbstractWellCore]
-ModuleCore = AbstractModuleCore[LabwareCore]
-ProtocolCore = BaseAbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]
+from opentrons.protocol_api.core.common import LabwareCore, ProtocolCore
 
 
 @pytest.fixture(

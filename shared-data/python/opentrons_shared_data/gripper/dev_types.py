@@ -86,7 +86,7 @@ class GripperDefinitionV1:
     z_idle_current: GripperCustomizableFloat
     z_active_current: GripperCustomizableFloat
     jaw_reference_voltage: GripperCustomizableFloat
-    jaw_force_per_duty_cycle: List[Tuple[float, int]]
+    jaw_duty_cycle_polynomial: List[Tuple[int, float]]
     base_offset_from_mount: GripperOffset
     jaw_center_offset_from_base: GripperOffset
     pin_one_offset_from_base: GripperOffset
@@ -108,8 +108,8 @@ class GripperDefinitionV1:
                 jaw_reference_voltage=GripperCustomizableFloat.build(
                     **data["jawReferenceVoltage"]
                 ),
-                jaw_force_per_duty_cycle=[
-                    (element[0], element[1]) for element in data["jawForcePerDutyCycle"]
+                jaw_duty_cycle_polynomial=[
+                    (d[0], d[1]) for d in data["jawDutyCyclePolynomial"]
                 ],
                 base_offset_from_mount=GripperOffset(**data["baseOffsetFromMount"]),
                 jaw_center_offset_from_base=GripperOffset(

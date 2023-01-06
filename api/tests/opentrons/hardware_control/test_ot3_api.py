@@ -579,7 +579,7 @@ async def test_gripper_action(
     await ot3_hardware.home([OT3Axis.G])
     await ot3_hardware.grip(5.0)
     mock_grip.assert_called_once_with(
-        gc.piecewise_force_conversion(5.0, gripper_config.jaw_force_per_duty_cycle),
+        gc.duty_cycle_by_force(5.0, gripper_config.jaw_duty_cycle_polynomial),
     )
 
     await ot3_hardware.ungrip()
