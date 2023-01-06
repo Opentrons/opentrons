@@ -410,7 +410,7 @@ class OT3JogNoInput(Exception):
 
 
 def _jog_read_user_input(terminator: str, home_key: str) -> Tuple[str, float, bool]:
-    user_input = input(f'\tJog eg: x-10.5 ("{terminator}" to stop): ')
+    user_input = input(f'\tJog eg: x-10.5 (ENTER to repeat, "{terminator}" to stop): ')
     user_input = user_input.strip().replace(" ", "")
     if user_input == terminator:
         raise OT3JogTermination()
@@ -480,7 +480,8 @@ async def _jog_do_print_then_input_then_move(
             terminator="stop", home_key="home"
         )
     except OT3JogNoInput:
-        print("\tno input, repeating previous jog")
+        # print("\tno input, repeating previous jog")
+        pass
     if do_home:
         str_to_axes = {
             "X": OT3Axis.X,
