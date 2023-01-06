@@ -18,7 +18,7 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition, LabwarePa
 
 from opentrons.types import Location, Point, LocationLabware
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import requires_version
+from opentrons.protocols.api_support.util import requires_version, APIVersionError
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
 # TODO(mc, 2022-09-02): re-exports provided for backwards compatibility
@@ -34,6 +34,7 @@ from . import validation
 from .core import well_grid
 from .core.labware import AbstractLabware
 from .core.protocol_api.labware import LabwareImplementation as LegacyLabwareCore
+from .core.protocol_api.well import WellImplementation as LegacyWellCore
 from .core.protocol_api.well_geometry import WellGeometry
 
 if TYPE_CHECKING:
@@ -108,7 +109,9 @@ class Well:
 
     @property
     def geometry(self) -> WellGeometry:
-        return self._impl.geometry
+        if isinstance(self._impl, LegacyWellCore):
+            return self._impl.geometry
+        raise APIVersionError("WellCore.geometry has been deprecated.")
 
     @property  # type: ignore
     @requires_version(2, 0)

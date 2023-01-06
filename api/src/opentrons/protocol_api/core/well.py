@@ -5,16 +5,9 @@ from typing import TypeVar, Optional
 
 from opentrons.types import Point
 
-from .protocol_api.well_geometry import WellGeometry
-
 
 class AbstractWellCore(ABC):
     """Well core interface."""
-
-    @property
-    @abstractmethod
-    def geometry(self) -> WellGeometry:
-        """Get the well's geometry information interface."""
 
     @property
     @abstractmethod

@@ -9,7 +9,6 @@ from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.types import Point
 
 from ..well import AbstractWellCore
-from ..protocol_api.well_geometry import WellGeometry
 
 
 class WellCore(AbstractWellCore):
@@ -37,11 +36,6 @@ class WellCore(AbstractWellCore):
     def labware_id(self) -> str:
         """Get the ID of the well's parent labware."""
         return self._labware_id
-
-    @property
-    def geometry(self) -> WellGeometry:
-        """Get the well's geometry information interface."""
-        raise APIVersionError("WellCore.geometry has been deprecated.")
 
     @property
     def diameter(self) -> Optional[float]:
