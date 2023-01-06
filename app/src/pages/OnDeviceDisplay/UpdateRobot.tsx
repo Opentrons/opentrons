@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+import capitalize from 'lodash/capitalize'
 
 import {
   Flex,
@@ -16,15 +17,29 @@ import {
 
 import { restartRobot } from '../../redux/robot-admin'
 import { getLocalRobot, UNREACHABLE } from '../../redux/discovery'
-import { getBuildrootUpdateAvailable } from '../../redux/buildroot'
+import {
+  getBuildrootUpdateAvailable,
+  getBuildrootDownloadProgress,
+  getBuildrootDownloadError,
+  getBuildrootSession,
+  startBuildrootUpdate,
+} from '../../redux/buildroot'
 import { StyledText } from '../../atoms/text'
 import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
+import { ProgressBar } from '../../atoms/ProgressBar'
 
 import type { Dispatch, State } from '../../redux/types'
 
 // Note typography isn't used in this component since properties will be changed in hi-fi design
 // currently most of them are hard-coded.
 export function UpdateRobot(): JSX.Element {
+  const { t } = useTranslation('device_settings')
+  const [
+    isShowCheckingUpdates,
+    setIsShowCheckingUpdates,
+  ] = React.useState<boolean>(true)
+  const [isDownloading, setIsDownloading] = React.useState<boolean>(false)
+  const [isInstalling, setIsInstalling] = React.useState<boolean>(false)
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const isViewableRobot =
@@ -36,6 +51,24 @@ export function UpdateRobot(): JSX.Element {
       ? getBuildrootUpdateAvailable(state, localRobot)
       : null
   })
+  const downloadProgress = useSelector(getBuildrootDownloadProgress)
+  const downloadError =
+    useSelector(getBuildrootDownloadError) != null ? t('download_error') : null
+  const session = useSelector(getBuildrootSession)
+  const { step, error: sessionError } = session || { step: null, error: null }
+  const dispatch = useDispatch<Dispatch>()
+
+  React.useEffect(() => {
+    robotUpdateType != null && setIsShowCheckingUpdates(false)
+  }, [robotUpdateType])
+
+  console.log('robotUpdateType', robotUpdateType)
+
+  React.useEffect(() => {
+    if (isDownloading) {
+      dispatch(startBuildrootUpdate(robotName))
+    }
+  }, [isDownloading, dispatch, robotName])
 
   return (
     <Flex
@@ -43,11 +76,56 @@ export function UpdateRobot(): JSX.Element {
         SPACING.spacingXXL
       )} ${String(SPACING.spacingXXL)}`}
     >
-      {robotUpdateType === 'reinstall' || robotUpdateType === 'downgrade' ? (
+      {isShowCheckingUpdates ? (
+        <CheckUpdates isDownloading={isDownloading} />
+      ) : (
+        <>
+          {robotUpdateType === 'reinstall' ||
+          robotUpdateType === 'downgrade' ? (
+            <NoUpdateFound />
+          ) : (
+            // Download software
+            <>
+              <UpdateSoftware
+                isDownloading={isDownloading}
+                processProgress={
+                  downloadProgress != null ? downloadProgress : 0
+                }
+              />
+              {downloadError != null ? (
+                <ErrorUpdateSoftware errorMessage={downloadError} />
+              ) : (
+                // Install software
+                <>
+                  <UpdateSoftware
+                    isDownloading={false}
+                    processProgress={session?.progress ? session.progress : 0}
+                  />
+                  {sessionError ? (
+                    <ErrorUpdateSoftware errorMessage={sessionError} />
+                  ) : (
+                    // Update complete
+                    <>
+                      {step === 'finished' ? (
+                        <CompleteUpdate
+                          robotName={robotName}
+                          dispatch={dispatch}
+                        />
+                      ) : null}
+                    </>
+                  )}
+                </>
+              )}
+            </>
+          )}
+        </>
+      )}
+
+      {/* {robotUpdateType === 'reinstall' || robotUpdateType === 'downgrade' ? (
         <NoUpdateFound />
       ) : (
-        <CompleteUpdate robotName={robotName} />
-      )}
+        <p>todo</p>
+      )} */}
       {/* <CheckUpdates /> */}
       {/* <UpdateSoftware /> */}
       {/* <NoUpdateFound /> */}
@@ -57,8 +135,11 @@ export function UpdateRobot(): JSX.Element {
   )
 }
 
+interface CheckUpdatesProps {
+  isDownloading: boolean
+}
 // This might be a molecules component since WiFi connection part has the same screen
-const CheckUpdates = (): JSX.Element => {
+const CheckUpdates = ({ isDownloading }: CheckUpdatesProps): JSX.Element => {
   const { t } = useTranslation('device_settings')
   return (
     <Flex
@@ -88,7 +169,14 @@ const CheckUpdates = (): JSX.Element => {
   )
 }
 
-const UpdateSoftware = (): JSX.Element => {
+interface UpdateSoftwareProps {
+  isDownloading: boolean
+  processProgress: number
+}
+const UpdateSoftware = ({
+  isDownloading,
+  processProgress,
+}: UpdateSoftwareProps): JSX.Element => {
   const { t } = useTranslation('device_settings')
   return (
     <Flex
@@ -112,17 +200,17 @@ const UpdateSoftware = (): JSX.Element => {
         fontSize="1.5rem"
         lineHeight="2.0625rem"
         fontWeight="400"
-        marginBottom={SPACING.spacing5}
+        marginBottom={SPACING.spacingXXL}
       >
-        {t('downloading_software')}
+        {isDownloading ? t('downloading_software') : t('')}
       </StyledText>
-      {'loading bar here'}
+      <ProgressBar percentComplete={processProgress} />
     </Flex>
   )
 }
 
 const NoUpdateFound = (): JSX.Element => {
-  const { t } = useTranslation(['device_settings'])
+  const { t } = useTranslation(['device_settings', 'shared'])
   const history = useHistory()
   return (
     <Flex flexDirection={DIRECTION_COLUMN} width="100%">
@@ -154,7 +242,7 @@ const NoUpdateFound = (): JSX.Element => {
         onClick={() => history.push('/robot-settings/rename-robot')}
       >
         <StyledText fontSize="1.5rem" lineHeight="1.375rem" fontWeight="500">
-          {t('next')}
+          {t('shared:next')}
         </StyledText>
       </PrimaryButton>
     </Flex>
@@ -163,10 +251,13 @@ const NoUpdateFound = (): JSX.Element => {
 
 interface CompleteUpdateProps {
   robotName: string
+  dispatch: Dispatch
 }
-const CompleteUpdate = ({ robotName }: CompleteUpdateProps): JSX.Element => {
+const CompleteUpdate = ({
+  robotName,
+  dispatch,
+}: CompleteUpdateProps): JSX.Element => {
   const { t } = useTranslation(['device_settings', 'robot_controls'])
-  const dispatch = useDispatch<Dispatch>()
 
   const handleRestartRobot: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
@@ -205,7 +296,12 @@ const CompleteUpdate = ({ robotName }: CompleteUpdateProps): JSX.Element => {
   )
 }
 
-const ErrorUpdateSoftware = (): JSX.Element => {
+interface ErrorUpdateSoftwareProps {
+  errorMessage: string
+}
+const ErrorUpdateSoftware = ({
+  errorMessage,
+}: ErrorUpdateSoftwareProps): JSX.Element => {
   const { t } = useTranslation(['device_settings', 'shared'])
   const history = useHistory()
   return (
@@ -228,6 +324,7 @@ const ErrorUpdateSoftware = (): JSX.Element => {
           {t('software_update_error')}
         </StyledText>
         {/* ToDo add error */}
+        {errorMessage}
       </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}
@@ -245,7 +342,7 @@ const ErrorUpdateSoftware = (): JSX.Element => {
         </SecondaryButton>
         <PrimaryButton height="4.4375rem" width="100%">
           <StyledText fontSize="1.5rem" lineHeight="1.375rem" fontWeight="500">
-            {t('next')}
+            {capitalize(t('shared:try_again'))}
           </StyledText>
         </PrimaryButton>
       </Flex>
