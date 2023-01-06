@@ -10,8 +10,8 @@ from opentrons_hardware.drivers.can_bus.can_messenger import (
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     MotorPositionRequest,
     MotorPositionResponse,
-    UpdateMotorPositionRequest,
-    UpdateMotorPositionResponse,
+    UpdateMotorPositionEstimationRequest,
+    UpdateMotorPositionEstimationResponse,
 )
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import (
@@ -87,29 +87,24 @@ async def get_motor_position(
 async def _parser_update_motor_position_response(
     reader: WaitableCallback, expected: Set[NodeId]
 ) -> MotorPositionStatus:
-    seen: Set[NodeId] = set()
-    data = {}
-    while not expected.issubset(seen):
-        async for response, arb_id in reader:
-            assert isinstance(response, UpdateMotorPositionResponse)
-            node = NodeId(arb_id.parts.originating_node_id)
-            data.update(
-                {
-                    node: (
-                        float(response.payload.current_position.value / 1000.0),
-                        float(response.payload.encoder_position.value) / 1000.0,
-                        bool(
-                            response.payload.position_flags.value
-                            & MotorPositionFlags.stepper_position_ok.value
-                        ),
-                        bool(
-                            response.payload.position_flags.value
-                            & MotorPositionFlags.encoder_position_ok.value
-                        ),
-                    )
-                }
+    async for response, arb_id in reader:
+        assert isinstance(response, UpdateMotorPositionEstimationResponse)
+        node = NodeId(arb_id.parts.originating_node_id)
+        if node == expected:
+            return (
+                float(response.payload.current_position.value / 1000.0),
+                float(response.payload.encoder_position.value) / 1000.0,
+                bool(
+                    response.payload.position_flags.value
+                    & MotorPositionFlags.stepper_position_ok.value
+                ),
+                bool(
+                    response.payload.position_flags.value
+                    & MotorPositionFlags.encoder_position_ok.value
+                ),
             )
-    return data
+    raise StopAsyncIteration
+
 
 async def update_motor_position_estimation(
     can_messenger: CanMessenger, nodes: Set[NodeId], timeout: float = 1.0
@@ -123,19 +118,21 @@ async def update_motor_position_estimation(
     def _listener_filter(arbitration_id: ArbitrationId) -> bool:
         return (NodeId(arbitration_id.parts.originating_node_id) in nodes) and (
             MessageId(arbitration_id.parts.message_id)
-            == UpdateMotorPositionResponse.message_id
+            == UpdateMotorPositionEstimationResponse.message_id
         )
 
-    with MultipleMessagesWaitableCallback(can_messenger, _listener_filter) as reader:
-        await can_messenger.send(
-            node_id=NodeId.broadcast, message=UpdateMotorPositionRequest()
-        )
-        try:
-            data = await asyncio.wait_for(
-                _parser_update_motor_position_response(reader, nodes),
-                timeout,
-            )
-        except asyncio.TimeoutError:
-            log.warning("Motor position estimation timed out")
+    data = {}
+
+    for node in nodes:
+        with WaitableCallback(can_messenger, _listener_filter) as reader:
+            await can_messenger.send(node_id=node, message=UpdateMotorPositionEstimationRequest())
+            try:
+                data[node] = await asyncio.wait_for(
+                    _parser_update_motor_position_response(reader, node), timeout
+                )
+            except asyncio.TimeoutError:
+                log.warning("Update motor position estimation timed out")
+                raise StopAsyncIteration
 
     return data
+
