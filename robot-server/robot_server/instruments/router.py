@@ -28,7 +28,7 @@ from .instrument_models import (
 instruments_router = APIRouter()
 
 
-def _pipette_dict_to_pipette(pipette_dict: PipetteDict, mount: MountType) -> Pipette:
+def _pipette_dict_to_pipette_res(pipette_dict: PipetteDict, mount: MountType) -> Pipette:
     """Convert PipetteDict to local Pipette class."""
     return Pipette(
         mount=mount,
@@ -41,6 +41,20 @@ def _pipette_dict_to_pipette(pipette_dict: PipetteDict, mount: MountType) -> Pip
             max_volume=pipette_dict["max_volume"],
         ),
     )
+
+
+def _gripper_dict_to_gripper_res(gripper_dict: GripperDict) -> Gripper:
+    """Convert GripperDict to local Gripper class."""
+    return Gripper(
+                mount=MountType.EXTENSION,
+                instrumentName=gripper_dict["name"],
+                instrumentModel=gripper_dict["model"],
+                instrumentSerial=gripper_dict["gripper_id"],
+                data=GripperData(
+                    jawState=gripper_dict["state"],
+                    calibratedOffset=gripper_dict["calibration_offset"],
+                ),
+            )
 
 
 @instruments_router.get(
@@ -83,24 +97,15 @@ async def get_attached_instruments(
 
     if gripper:
         response_data.append(
-            Gripper(
-                mount=MountType.EXTENSION,
-                instrumentName=gripper["name"],
-                instrumentModel=gripper["model"],
-                instrumentSerial=gripper["gripper_id"],
-                data=GripperData(
-                    jawState=gripper["state"],
-                    calibratedOffset=gripper["calibration_offset"],
-                ),
-            )
+            _gripper_dict_to_gripper_res(gripper_dict=gripper)
         )
     if left_pip:
         response_data.append(
-            _pipette_dict_to_pipette(pipette_dict=left_pip, mount=MountType.LEFT)
+            _pipette_dict_to_pipette_res(pipette_dict=left_pip, mount=MountType.LEFT)
         )
     if right_pip:
         response_data.append(
-            _pipette_dict_to_pipette(pipette_dict=right_pip, mount=MountType.RIGHT)
+            _pipette_dict_to_pipette_res(pipette_dict=right_pip, mount=MountType.RIGHT)
         )
 
     return await PydanticResponse.create(
