@@ -125,7 +125,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         directory=None,
     )
 
-    subject = await create_simulating_runner()
+    subject = await create_simulating_runner(robot_type="OT-2 Standard")
     result = await subject.run(protocol_source)
     commands_result = result.commands
 

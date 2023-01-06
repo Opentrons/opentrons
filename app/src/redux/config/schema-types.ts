@@ -1,3 +1,4 @@
+import { OT2_MANIFEST_URL, OT3_MANIFEST_URL } from './constants'
 import type { LogLevel } from '../../logger'
 import type { ProtocolSort } from '../../organisms/ProtocolsLanding/hooks'
 
@@ -159,4 +160,11 @@ export interface ConfigV11 extends Omit<ConfigV10, 'version'> {
   }
 }
 
-export type Config = ConfigV11
+export interface ConfigV12 extends Omit<ConfigV11, 'version' | 'buildroot'> {
+  version: 12
+  robotSystemUpdate: {
+    manifestUrls: { OT2: typeof OT2_MANIFEST_URL; OT3: typeof OT3_MANIFEST_URL }
+  }
+}
+
+export type Config = ConfigV12

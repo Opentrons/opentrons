@@ -36,7 +36,9 @@ export function Interstitial(props: InterstitialProps): JSX.Element {
       top="0"
       bottom="0"
       justifyContent={JUSTIFY_FLEX_START}
-      padding={`${SPACING.spacingXXL} ${SPACING.spacing7} ${SPACING.spacing4} ${SPACING.spacing7}`}
+      padding={`${String(SPACING.spacingXXL)} ${String(
+        SPACING.spacing7
+      )} ${String(SPACING.spacing4)} ${String(SPACING.spacing7)}`}
       data-testid="interstitial"
       {...outerProps}
     >
@@ -50,14 +52,14 @@ export function Interstitial(props: InterstitialProps): JSX.Element {
         padding={SPACING.spacing4}
         position={POSITION_RELATIVE}
         boxShadow="0px 1px 3px rgba(0, 0, 0, 0.3)"
-        border={`1px solid ${COLORS.medGreyEnabled}`}
+        border={`1px solid ${String(COLORS.medGreyEnabled)}`}
         backgroundColor={COLORS.white}
         maxHeight="100%"
         overflowY="auto"
         paddingTop={SPACING.spacing4}
         {...innerProps}
       >
-        {heading && (
+        {heading != null ? (
           <Flex
             marginTop="0"
             marginBottom={SPACING.spacing4}
@@ -66,7 +68,7 @@ export function Interstitial(props: InterstitialProps): JSX.Element {
           >
             <h3>{heading}</h3>
           </Flex>
-        )}
+        ) : null}
         {props.children}
       </Box>
     </Box>

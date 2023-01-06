@@ -9,12 +9,14 @@ by :py:mod:`.module_contexts`)
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Optional
+from enum import Enum
+from typing import TYPE_CHECKING, Optional, Set, cast
 
 import numpy as np
 
 from opentrons_shared_data import module
 from opentrons_shared_data.labware.dev_types import LabwareUri
+from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
 
 from opentrons.types import Location, Point, LocationLabware
 from opentrons.motion_planning.adjacent_slots_getters import (
@@ -32,16 +34,18 @@ from opentrons.hardware_control.modules.types import (
     ThermocyclerModuleModel,
     HeaterShakerModuleModel,
 )
-from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
-from .types import ThermocyclerConfiguration
 
 if TYPE_CHECKING:
     from opentrons.protocol_api.labware import Labware
-    from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
 
 
 _log = logging.getLogger(__name__)
+
+
+class ThermocyclerConfiguration(str, Enum):
+    FULL = "full"
+    SEMI = "semi"
 
 
 class NoSuchModuleError(ValueError):
@@ -121,7 +125,7 @@ class ModuleGeometry:
         self._labware = labware
         return self._labware
 
-    def reset_labware(self):
+    def reset_labware(self) -> None:
         self._labware = None
 
     @property
@@ -130,7 +134,7 @@ class ModuleGeometry:
 
     @property
     def load_name(self) -> str:
-        return self.model.value
+        return cast(str, self.model.value)
 
     @property
     def module_type(self) -> ModuleType:
@@ -247,7 +251,7 @@ class ThermocyclerGeometry(ModuleGeometry):
         return self._lid_status
 
     @lid_status.setter
-    def lid_status(self, status) -> None:
+    def lid_status(self, status: ThermocyclerLidStatus) -> None:
         self._lid_status = status
 
     @property
@@ -255,7 +259,7 @@ class ThermocyclerGeometry(ModuleGeometry):
         return bool(self._configuration == ThermocyclerConfiguration.SEMI)
 
     @property
-    def covered_slots(self) -> set:
+    def covered_slots(self) -> Set[int]:
         if self.is_semi_configuration:
             return {7, 10}
         else:
@@ -275,7 +279,7 @@ class ThermocyclerGeometry(ModuleGeometry):
         definition["ordering"] = definition["ordering"][2::]
         return Labware(
             implementation=LabwareImplementation(definition, super().location),
-            api_version=MAX_SUPPORTED_VERSION,
+            api_version=labware.api_version,
         )
 
     def add_labware(self, labware: Labware) -> Labware:
@@ -292,7 +296,7 @@ class ThermocyclerGeometry(ModuleGeometry):
         to_loc: Location,
         from_loc: Location,
         lid_position: Optional[str],
-    ):
+    ) -> None:
         to_lw, to_well = to_loc.labware.get_parent_labware_and_well()
         from_lw, from_well = from_loc.labware.get_parent_labware_and_well()
 
@@ -475,7 +479,7 @@ def create_geometry(
 
     # apply the slot transform if any
     xform = np.array(xform_ser)
-    xformed = np.dot(xform, pre_transform)
+    xformed = np.dot(xform, pre_transform)  # type: ignore[no-untyped-call]
     module_type = ModuleType(definition["moduleType"])
 
     if module_type == ModuleType.MAGNETIC or module_type == ModuleType.TEMPERATURE:
@@ -545,7 +549,7 @@ def module_model_from_string(model_string: str) -> ModuleModel:
         HeaterShakerModuleModel,
     }:
         try:
-            return model_enum(model_string)
+            return cast(ModuleModel, model_enum(model_string))
         except ValueError:
             pass
     raise ValueError(f"No such module model {model_string}")

@@ -13,7 +13,7 @@ from opentrons.hardware_control.dev_types import PipetteSpec
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.pipette.dev_types import PipetteModel
 
-defs = json.loads(load_shared_data("pipette/definitions/pipetteModelSpecs.json"))
+defs = json.loads(load_shared_data("pipette/definitions/1/pipetteModelSpecs.json"))
 
 
 def check_sequences_close(
@@ -275,6 +275,8 @@ def test_validate_overrides_pass(
 # TODO(mc, 2022-06-10): this fixture reaches into internals of the HardwareAPI
 # that are only present in the simulator, not the actual controller. It is not
 # an effective test of whether anything actually works
+# TODO (lc, 12-05-2022): Re-write these tests when the OT2 pipette
+# configurations are ported over to the new format.
 @pytest.fixture
 async def attached_pipettes(
     hardware: HardwareControlAPI,
@@ -317,6 +319,7 @@ async def attached_pipettes(
     (CONFIG["pipette_config_overrides_dir"] / "abcd123.json").unlink()
 
 
+@pytest.mark.ot2_only
 async def test_override(attached_pipettes: Dict[str, PipetteSpec]) -> None:
     # This test will check that setting modified pipette configs
     # works as expected
@@ -350,6 +353,7 @@ async def test_override(attached_pipettes: Dict[str, PipetteSpec]) -> None:
     )
 
 
+@pytest.mark.ot2_only
 async def test_incorrect_modify_pipette_settings(
     attached_pipettes: Dict[str, PipetteSpec]
 ) -> None:

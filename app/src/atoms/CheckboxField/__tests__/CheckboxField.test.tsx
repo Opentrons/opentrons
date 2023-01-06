@@ -42,30 +42,46 @@ describe('CheckboxField', () => {
     const checkBoxIcon = getByTestId('CheckboxField_icon')
 
     // INNER_STYLE_NO_VALUE
-    expect(checkBoxIcon).toHaveStyle(`width: ${SPACING.spacingM}`)
-    expect(checkBoxIcon).toHaveStyle(`min-width: ${SPACING.spacingM}`)
-    expect(checkBoxIcon).toHaveStyle(`color: ${COLORS.darkGreyEnabled}`)
+    expect(checkBoxIcon).toHaveStyle(`width: ${String(SPACING.spacingM)}`)
+    expect(checkBoxIcon).toHaveStyle(`min-width: ${String(SPACING.spacingM)}`)
+    expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.darkGreyEnabled)}`)
     expect(checkBoxIcon).toHaveStyle(`display: flex`)
-    expect(checkBoxIcon).toHaveStyle(`border-radius: ${SPACING.spacingXXS}`)
-    expect(checkBoxIcon).toHaveStyle(`justify-content: ${JUSTIFY_CENTER}`)
-    expect(checkBoxIcon).toHaveStyle(`align-items: ${ALIGN_CENTER}`)
+    expect(checkBoxIcon).toHaveStyle(
+      `border-radius: ${String(SPACING.spacingXXS)}`
+    )
+    expect(checkBoxIcon).toHaveStyle(
+      `justify-content: ${String(JUSTIFY_CENTER)}`
+    )
+    expect(checkBoxIcon).toHaveStyle(`align-items: ${String(ALIGN_CENTER)}`)
     expect(checkBoxIcon).toHaveStyleRule('cursor', 'pointer', {
       modifier: ':hover',
     })
-    expect(checkBoxIcon).toHaveStyleRule('color', `${COLORS.darkGreyHover}`, {
-      modifier: ':hover',
-    })
-    expect(checkBoxIcon).toHaveStyleRule('color', `${COLORS.darkGreyPressed}`, {
-      modifier: ':active',
-    })
+    expect(checkBoxIcon).toHaveStyleRule(
+      'color',
+      `${String(COLORS.darkGreyHover)}`,
+      {
+        modifier: ':hover',
+      }
+    )
+    expect(checkBoxIcon).toHaveStyleRule(
+      'color',
+      `${String(COLORS.darkGreyPressed)}`,
+      {
+        modifier: ':active',
+      }
+    )
     expect(checkBoxIcon).toHaveStyleRule(
       'box-shadow',
-      `0 0 0 3px ${COLORS.fundamentalsFocus}`,
+      `0 0 0 3px ${String(COLORS.fundamentalsFocus)}`,
       { modifier: ':focus' }
     )
-    expect(checkBoxIcon).toHaveStyleRule('color', `${COLORS.darkGreyPressed}`, {
-      modifier: ':disabled',
-    })
+    expect(checkBoxIcon).toHaveStyleRule(
+      'color',
+      `${String(COLORS.darkGreyPressed)}`,
+      {
+        modifier: ':disabled',
+      }
+    )
 
     // TODO: kj 09/15/2022 This part will be update later OUTER_STYLE
     // const checkBoxLabel = getByTestId('CheckboxField_label')
@@ -81,22 +97,26 @@ describe('CheckboxField', () => {
     expect(checkBoxInput).toHaveStyle(`position: absolute`)
     expect(checkBoxInput).toHaveStyle(`overflow: hidden`)
     expect(checkBoxInput).toHaveStyle(`clip: rect(0 0 0 0)`)
-    expect(checkBoxInput).toHaveStyle(`height: ${SPACING.spacingXXS}`)
-    expect(checkBoxInput).toHaveStyle(`width: ${SPACING.spacingXXS}`)
+    expect(checkBoxInput).toHaveStyle(`height: ${String(SPACING.spacingXXS)}`)
+    expect(checkBoxInput).toHaveStyle(`width: ${String(SPACING.spacingXXS)}`)
     expect(checkBoxInput).toHaveStyle(`margin: -1px`)
     expect(checkBoxInput).toHaveStyle(`padding: 0`)
     expect(checkBoxInput).toHaveStyle(`border: 0`)
     expect(checkBoxInput).toHaveAttribute('tabindex', '0')
 
     // LABEL_TEXT_STYLE
-    expect(checkBoxFieldBox).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSizeP}`)
     expect(checkBoxFieldBox).toHaveStyle(
-      `font-weight: ${TYPOGRAPHY.fontWeightRegular}`
+      `font-size: ${String(TYPOGRAPHY.fontSizeP)}`
     )
-    expect(checkBoxFieldBox).toHaveStyle(`color: ${COLORS.darkBlackEnabled}`)
+    expect(checkBoxFieldBox).toHaveStyle(
+      `font-weight: ${String(TYPOGRAPHY.fontWeightRegular)}`
+    )
+    expect(checkBoxFieldBox).toHaveStyle(
+      `color: ${String(COLORS.darkBlackEnabled)}`
+    )
     expect(checkBoxFieldBox).toHaveStyle(`flex: 0 0 auto`)
     expect(checkBoxFieldBox).toHaveStyle(
-      `padding: ${SPACING.spacing3} ${SPACING.spacing3}`
+      `padding: ${String(SPACING.spacing3)} ${String(SPACING.spacing3)}`
     )
     expect(checkBoxFieldBox).toHaveStyleRule('padding', '0', {
       modifier: ':empty',
@@ -108,26 +128,34 @@ describe('CheckboxField', () => {
     props.value = true
     const { getByTestId } = render(props)
     const checkBoxIcon = getByTestId('CheckboxField_icon')
-    expect(checkBoxIcon).toHaveStyle(`width: ${SPACING.spacingM}`)
-    expect(checkBoxIcon).toHaveStyle(`min-width: ${SPACING.spacingM}`)
-    expect(checkBoxIcon).toHaveStyle(`color: ${COLORS.blueEnabled}`)
+    expect(checkBoxIcon).toHaveStyle(`width: ${String(SPACING.spacingM)}`)
+    expect(checkBoxIcon).toHaveStyle(`min-width: ${String(SPACING.spacingM)}`)
+    expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.blueEnabled)}`)
     expect(checkBoxIcon).toHaveStyle(`display: flex`)
-    expect(checkBoxIcon).toHaveStyle(`border-radius: ${SPACING.spacingXXS}`)
-    expect(checkBoxIcon).toHaveStyle(`justify-content: ${JUSTIFY_CENTER}`)
-    expect(checkBoxIcon).toHaveStyle(`align-items: ${ALIGN_CENTER}`)
+    expect(checkBoxIcon).toHaveStyle(
+      `border-radius: ${String(SPACING.spacingXXS)}`
+    )
+    expect(checkBoxIcon).toHaveStyle(
+      `justify-content: ${String(JUSTIFY_CENTER)}`
+    )
+    expect(checkBoxIcon).toHaveStyle(`align-items: ${String(ALIGN_CENTER)}`)
   })
 
   it('renders label with correct style - value undefine', () => {
     props.value = undefined
     const { getByTestId } = render(props)
     const checkBoxIcon = getByTestId('CheckboxField_icon')
-    expect(checkBoxIcon).toHaveStyle(`width: ${SPACING.spacingM}`)
-    expect(checkBoxIcon).toHaveStyle(`min-width: ${SPACING.spacingM}`)
-    expect(checkBoxIcon).toHaveStyle(`color: ${COLORS.darkGreyEnabled}`)
+    expect(checkBoxIcon).toHaveStyle(`width: ${String(SPACING.spacingM)}`)
+    expect(checkBoxIcon).toHaveStyle(`min-width: ${String(SPACING.spacingM)}`)
+    expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.darkGreyEnabled)}`)
     expect(checkBoxIcon).toHaveStyle(`display: flex`)
-    expect(checkBoxIcon).toHaveStyle(`border-radius: ${SPACING.spacingXXS}`)
-    expect(checkBoxIcon).toHaveStyle(`justify-content: ${JUSTIFY_CENTER}`)
-    expect(checkBoxIcon).toHaveStyle(`align-items: ${ALIGN_CENTER}`)
+    expect(checkBoxIcon).toHaveStyle(
+      `border-radius: ${String(SPACING.spacingXXS)}`
+    )
+    expect(checkBoxIcon).toHaveStyle(
+      `justify-content: ${String(JUSTIFY_CENTER)}`
+    )
+    expect(checkBoxIcon).toHaveStyle(`align-items: ${String(ALIGN_CENTER)}`)
   })
 
   it('renders label with correct style - disabled true', () => {

@@ -7,7 +7,7 @@ from .protocols.api_support.labware_like import LabwareLike
 
 if TYPE_CHECKING:
     from .protocol_api.labware import Labware, Well
-    from .protocols.geometry.module_geometry import ModuleGeometry
+    from .protocol_api.core.protocol_api.module_geometry import ModuleGeometry
 
 
 class PipetteNotAttachedError(KeyError):

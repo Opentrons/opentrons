@@ -21,7 +21,7 @@ export const MenuList = (props: MenuListProps): JSX.Element | null => {
       position={POSITION_ABSOLUTE}
       backgroundColor={COLORS.white}
       top="2.6rem"
-      right={`calc(50% + ${SPACING.spacing2})`}
+      right={`calc(50% + ${String(SPACING.spacing2)})`}
       flexDirection={DIRECTION_COLUMN}
     >
       {props.buttons}

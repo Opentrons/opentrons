@@ -3,6 +3,7 @@ from typing import Any, Optional
 from typing_extensions import Final
 from unittest import mock
 from logging import getLogger
+from time import sleep
 
 CONSUMER_NAME_DEFAULT: Final[str] = "opentrons"
 ESTOP_OUT_GPIO_NAME: Final[str] = "SODIMM_210"
@@ -47,6 +48,7 @@ class OT3GPIO:
         )
         self.deactivate_estop()
         self.deactivate_nsync_out()
+        sleep(1)
 
     def activate_estop(self) -> None:
         """Assert the emergency stop, which will disable all motors."""

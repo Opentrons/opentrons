@@ -47,9 +47,15 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
         >
           {t('3a')}
         </StyledText>
-        <Flex border={`${SPACING.spacingXXS} solid ${COLORS.medGreyEnabled}`}>
+        <Flex
+          border={`${String(SPACING.spacingXXS)} solid ${String(
+            COLORS.medGreyEnabled
+          )}`}
+        >
           <Flex
-            padding={`${SPACING.spacing2} 5rem ${SPACING.spacing4} ${SPACING.spacing7}`}
+            padding={`${String(SPACING.spacing2)} 5rem ${String(
+              SPACING.spacing4
+            )} ${String(SPACING.spacing7)}`}
             data-testid="attach_adapter_screw_in_adapter_image"
           >
             <img height="160px" src={screwInAdapter} alt="screw_in_adapter" />
@@ -122,11 +128,15 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
           {t('3b')}
         </StyledText>
         <Flex
-          border={`${SPACING.spacingXXS} solid ${COLORS.medGreyEnabled}`}
+          border={`${String(SPACING.spacingXXS)} solid ${String(
+            COLORS.medGreyEnabled
+          )}`}
           width="100%"
         >
           <Flex
-            padding={`${SPACING.spacingM} ${SPACING.spacingXXL} ${SPACING.spacingXL} ${SPACING.spacingXL}`}
+            padding={`${String(SPACING.spacingM)} ${String(
+              SPACING.spacingXXL
+            )} ${String(SPACING.spacingXL)} ${String(SPACING.spacingXL)}`}
             data-testid="attach_adapter_alignment_image"
           >
             <img
@@ -157,10 +167,14 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
           {t('3c')}
         </StyledText>
         <Flex
-          border={`${SPACING.spacingXXS} solid ${COLORS.medGreyEnabled}`}
+          border={`${String(SPACING.spacingXXS)} solid ${String(
+            COLORS.medGreyEnabled
+          )}`}
           flexDirection={DIRECTION_COLUMN}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          padding={`${SPACING.spacing4} ${SPACING.spacingM} ${SPACING.spacingM} ${SPACING.spacing4}`}
+          padding={`${String(SPACING.spacing4)} ${String(
+            SPACING.spacingM
+          )} ${String(SPACING.spacingM)} ${String(SPACING.spacing4)}`}
           width="100%"
           marginBottom={SPACING.spacingSM}
           data-testid="attach_adapter_check_alignment_instructions"

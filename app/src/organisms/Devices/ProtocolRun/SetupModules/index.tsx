@@ -48,7 +48,7 @@ export const SetupModules = ({
           disabled={missingModuleIds.length > 0 || runHasStarted}
           onClick={expandLabwareSetupStep}
           id="ModuleSetup_proceedToLabwareSetup"
-          padding={`${SPACING.spacing3} ${SPACING.spacing4}`}
+          padding={`${String(SPACING.spacing3)} ${String(SPACING.spacing4)}`}
           {...targetProps}
         >
           {t('proceed_to_labware_setup_prep')}

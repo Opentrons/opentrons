@@ -5,6 +5,7 @@
 include ./scripts/python.mk
 
 APP_SHELL_DIR := app-shell
+APP_SHELL_ODD_DIR := app-shell-odd
 COMPONENTS_DIR := components
 DISCOVERY_CLIENT_DIR := discovery-client
 LABWARE_LIBRARY_DIR := labware-library
@@ -58,17 +59,21 @@ setup-js-root: setup-js-globals
 	yarn config set network-timeout 60000
 	yarn
 
+.PHONY: setup-app-shell-odd
+setup-app-shell-odd: setup-js-root
+	$(MAKE) -C $(APP_SHELL_ODD_DIR) setup
+
 .PHONY: setup-app-shell
 setup-app-shell: setup-js-root
 	$(MAKE) -C $(APP_SHELL_DIR) setup
 
 .PHONY: setup-js-shared-data
-setup-shared-data-js: setup-js-root
+setup-js-shared-data: setup-js-root
 	$(MAKE) -C $(SHARED_DATA_DIR) setup-js
 
 # front-end dependecies handled by yarn
 .PHONY: setup-js
-setup-js: setup-js-globals setup-js-root setup-app-shell setup-js-shared-data
+setup-js: setup-js-globals setup-js-root setup-app-shell setup-app-shell-odd setup-js-shared-data
 
 # this is the source of truth for pipenv version
 .PHONY: setup-python-globals
@@ -180,6 +185,8 @@ push-ot3:
 	$(MAKE) -C $(NOTIFY_SERVER_DIR) push-no-restart-ot3
 	$(MAKE) -C $(ROBOT_SERVER_DIR) push-ot3
 	$(MAKE) -C $(UPDATE_SERVER_DIR) push-ot3
+	$(MAKE) -C $(APP_SHELL_ODD_DIR) push-ot3
+	$(MAKE) -C $(USB_BRIDGE_DIR) push-ot3
 
 
 .PHONY: term
@@ -214,6 +221,7 @@ test-py: test-py-windows
 	$(MAKE) -C $(G_CODE_TESTING_DIR) test
 	$(MAKE) -C $(HARDWARE_DIR) test
 	$(MAKE) -C $(HARDWARE_TESTING_DIR) test
+	$(MAKE) -C $(USB_BRIDGE_DIR) test
 
 .PHONY: test-js
 test-js:

@@ -33,7 +33,7 @@ describe('AttachProbe', () => {
         .fn()
         .mockImplementationOnce(() => Promise.resolve()),
       runId: RUN_ID_1,
-      attachedPipette: { left: mockPipette, right: null },
+      attachedPipettes: { left: mockPipette, right: null },
       flowType: FLOWS.CALIBRATE,
       errorMessage: null,
       setShowErrorMessage: jest.fn(),

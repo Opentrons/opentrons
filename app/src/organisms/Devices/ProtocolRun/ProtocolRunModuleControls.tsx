@@ -97,7 +97,7 @@ export const ProtocolRunModuleControls = ({
         {leftColumnModules.map((module, index) =>
           module.attachedModuleMatch != null ? (
             <ModuleCard
-              key={`moduleCard_${module.moduleDef.moduleType}_${index}`}
+              key={`moduleCard_${String(module.moduleDef.moduleType)}_${index}`}
               robotName={robotName}
               runId={runId}
               module={module.attachedModuleMatch}
@@ -111,7 +111,7 @@ export const ProtocolRunModuleControls = ({
         {rightColumnModules.map((module, index) =>
           module.attachedModuleMatch != null ? (
             <ModuleCard
-              key={`moduleCard_${module.moduleDef.moduleType}_${index}`}
+              key={`moduleCard_${String(module.moduleDef.moduleType)}_${index}`}
               robotName={robotName}
               runId={runId}
               module={module.attachedModuleMatch}

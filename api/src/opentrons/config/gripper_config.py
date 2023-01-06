@@ -37,7 +37,7 @@ class GripperConfig:
     z_idle_current: float
     z_active_current: float
     jaw_reference_voltage: float
-    jaw_force_per_duty_cycle: List[Tuple[float, int]]
+    jaw_duty_cycle_polynomial: List[Tuple[int, float]]
     base_offset_from_mount: Offset
     jaw_center_offset_from_base: Offset
     pin_one_offset_from_base: Offset
@@ -75,7 +75,7 @@ def load(
         z_idle_current=_verify_value(gripper_def.z_idle_current),
         z_active_current=_verify_value(gripper_def.z_active_current),
         jaw_reference_voltage=_verify_value(gripper_def.jaw_reference_voltage),
-        jaw_force_per_duty_cycle=gripper_def.jaw_force_per_duty_cycle,
+        jaw_duty_cycle_polynomial=gripper_def.jaw_duty_cycle_polynomial,
         base_offset_from_mount=_get_offset(gripper_def.base_offset_from_mount),
         jaw_center_offset_from_base=_get_offset(
             gripper_def.jaw_center_offset_from_base
@@ -87,29 +87,15 @@ def load(
     )
 
 
-def piecewise_force_conversion(
-    newton: float, sequence: List[Tuple[float, int]]
-) -> float:
+def duty_cycle_by_force(newton: float, sequence: List[Tuple[int, float]]) -> float:
     """
-    Takes a force in newton and a sequence representing a piecewise
-    function for the slope for a force/duty-cycle function, where each
-    sub-list in the sequence contains the slope and valid domain for
-    the specific linear segment.
+    Takes a force in newton and a sequence representing the polymomial
+    equation of the gripper's force function in terms of duty cycle, where the
+    integer represent the degree of the indeterminate (duty cycle), and
+    the float representing its constant coefficient.
 
     The values come from shared-data/gripper/definitions/gripperVx.json.
 
     :return: the duty-cycle value for the specified force
     """
-    # pick the first item from the seq for which the target is less than
-    # the bracketing element
-    for i, x in enumerate(sequence):
-        if newton <= x[0]:
-            if i > 0:
-                # get slope m
-                prev_x = sequence[i - 1]
-                m = (x[0] - prev_x[0]) / (x[1] - prev_x[1])
-                return (x[0] - newton) / m + x[1]
-            else:
-                return newton * x[1] / x[0]
-    # return max duty cycle in config
-    return sequence[-1][1]
+    return sum(ele[1] * (newton ** ele[0]) for ele in sequence)
