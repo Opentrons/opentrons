@@ -17,14 +17,14 @@ from opentrons.types import Point, Mount
 from opentrons_shared_data.gripper.dev_types import GripperModel
 from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
 
-from robot_server.instruments.router import (
-    get_attached_instruments,
+from robot_server.instruments.instrument_models import (
     MountType,
     Gripper,
     GripperData,
     Pipette,
     PipetteData,
 )
+from robot_server.instruments.router import get_attached_instruments
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
@@ -75,10 +75,7 @@ async def test_get_instruments_empty(
 ) -> None:
     """It should get an empty instruments list from hardware API."""
     decoy.when(ot3_hardware_api.attached_gripper).then_return(None)
-    result = await get_attached_instruments(
-        requested_version=_HTTP_API_VERSION,
-        hardware=ot3_hardware_api,
-    )
+    result = await get_attached_instruments(hardware=ot3_hardware_api)
     assert result.content.data == []
     assert result.status_code == 200
 
@@ -117,10 +114,7 @@ async def test_get_all_attached_instruments(
             ),
         }
     )
-    result = await get_attached_instruments(
-        requested_version=_HTTP_API_VERSION,
-        hardware=ot3_hardware_api,
-    )
+    result = await get_attached_instruments(hardware=ot3_hardware_api)
     assert result.content.data == [
         Gripper(
             mount=MountType.EXTENSION,

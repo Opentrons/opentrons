@@ -22,7 +22,7 @@ from .instrument_models import (
     Pipette,
     GripperData,
     Gripper,
-    AttachedInstrument
+    AttachedInstrument,
 )
 
 instruments_router = APIRouter()
