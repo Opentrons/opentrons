@@ -552,10 +552,43 @@ async def get_capacitance_ot3(api: OT3API, mount: OT3Mount) -> float:
     if api.is_simulator:
         return 0.0
     node_id = sensor_node_for_mount(mount)
+    # FIXME: allow SensorId to specify which sensor on the device to read from
     capacitive = sensor_types.CapacitiveSensor.build(SensorId.S0, node_id)
     s_driver = sensor_driver.SensorDriver()
     data = await s_driver.read(
         api._backend._messenger, capacitive, offset=False, timeout=1  # type: ignore[union-attr]
+    )
+    if data is None:
+        raise ValueError("Unexpected None value from sensor")
+    return data.to_float()  # type: ignore[union-attr]
+
+
+async def get_temperature_humidity_ot3(api: OT3API, mount: OT3Mount) -> Tuple[float, float]:
+    """Get the temperature/humidity reading from the pipette."""
+    if api.is_simulator:
+        return 25.0, 50.0
+    node_id = sensor_node_for_mount(mount)
+    # FIXME: allow SensorId to specify which sensor on the device to read from
+    environment = sensor_types.EnvironmentSensor.build(SensorId.S0, node_id)
+    s_driver = sensor_driver.SensorDriver()
+    data = await s_driver.read(
+        api._backend._messenger, environment, offset=False, timeout=1  # type: ignore[union-attr]
+    )
+    if data is None:
+        raise ValueError("Unexpected None value from sensor")
+    return data.temperature.to_float(), data.humidity.to_float()  # type: ignore[union-attr]
+
+
+async def get_pressure_ot3(api: OT3API, mount: OT3Mount) -> float:
+    """Get the pressure reading from the pipette."""
+    if api.is_simulator:
+        return 0.0
+    node_id = sensor_node_for_mount(mount)
+    # FIXME: allow SensorId to specify which sensor on the device to read from
+    pressure = sensor_types.PressureSensor.build(SensorId.S0, node_id)
+    s_driver = sensor_driver.SensorDriver()
+    data = await s_driver.read(
+        api._backend._messenger, pressure, offset=False, timeout=1  # type: ignore[union-attr]
     )
     if data is None:
         raise ValueError("Unexpected None value from sensor")
