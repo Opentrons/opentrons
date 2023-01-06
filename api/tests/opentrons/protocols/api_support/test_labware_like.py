@@ -4,7 +4,7 @@ import pytest
 from opentrons.hardware_control.modules.types import TemperatureModuleModel
 from opentrons.protocol_api import labware
 from opentrons.protocols.api_support.labware_like import LabwareLike, LabwareLikeType
-from opentrons.protocols.geometry import module_geometry
+from opentrons.protocol_api.core.protocol_api import module_geometry
 from opentrons.protocol_api.core.protocol_api.deck import Deck
 from opentrons.types import Location
 

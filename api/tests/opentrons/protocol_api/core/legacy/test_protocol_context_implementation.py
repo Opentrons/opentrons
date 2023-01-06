@@ -17,7 +17,7 @@ from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.modules import AbstractModule
 from opentrons.hardware_control.modules.types import ModuleType, TemperatureModuleModel
 from opentrons.protocols import labware as mock_labware
-from opentrons.protocols.geometry.module_geometry import ModuleGeometry
+from opentrons.protocol_api.core.protocol_api.module_geometry import ModuleGeometry
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocol_api.core.labware import LabwareLoadParams
 
@@ -41,9 +41,9 @@ from opentrons.protocol_api.core.protocol_api.protocol_context import (
     ProtocolContextImplementation,
 )
 
-from opentrons.protocols.geometry import module_geometry as mock_module_geometry
 from opentrons.protocol_api.core.protocol_api import (
     legacy_module_core as mock_legacy_module_core,
+    module_geometry as mock_module_geometry,
 )
 
 

@@ -1,21 +1,24 @@
 {
   "name": "opentrons",
   "private": true,
-  "workspaces": [
-    "app",
-    "app-shell",
-    "components",
-    "discovery-client",
-    "labware-designer",
-    "labware-library",
-    "protocol-designer",
-    "protocol-library-kludge",
-    "shared-data",
-    "step-generation",
-    "webpack-config",
-    "api-client",
-    "react-api-client"
-  ],
+  "workspaces": {
+    "packages": [
+      "app",
+      "app-shell",
+      "app-shell-odd",
+      "components",
+      "discovery-client",
+      "labware-designer",
+      "labware-library",
+      "protocol-designer",
+      "protocol-library-kludge",
+      "shared-data",
+      "step-generation",
+      "webpack-config",
+      "api-client",
+      "react-api-client"
+    ]
+  },
   "config": {
     "commitizen": {
       "path": "cz-conventional-changelog"
@@ -35,6 +38,7 @@
     "@babel/preset-typescript": "^7.12.7",
     "@babel/register": "^7.12.10",
     "@cypress/webpack-preprocessor": "^5.1.2",
+    "@electron/rebuild": "^3.2.10",
     "@octokit/rest": "^19.0.5",
     "@rollup/plugin-alias": "^3.1.2",
     "@rollup/plugin-babel": "^5.3.0",
@@ -81,6 +85,8 @@
     "cz-conventional-changelog": "2.1.0",
     "decompress": "4.2.1",
     "download": "8.0.0",
+    "electron": "21.3.1",
+    "electron-builder": "24.0.0-alpha.4",
     "enzyme": "^3.11.0",
     "enzyme-to-json": "^3.4.4",
     "eslint": "^7.22.0",
