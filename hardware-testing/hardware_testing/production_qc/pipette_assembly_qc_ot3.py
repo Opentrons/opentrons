@@ -445,6 +445,7 @@ async def _test_diagnostics_encoder(api: OT3API, mount: OT3Mount, write_cb: Call
     encoder_home_pass = True
     encoder_move_pass = True
     encoder_stall_pass = True
+    _, _, _, drop_tip = helpers_ot3.get_plunger_positions_ot3(api, mount)
 
     async def _get_plunger_pos_and_encoder() -> Tuple[float, float]:
         _pos = await api.current_position_ot3(mount)
@@ -460,7 +461,7 @@ async def _test_diagnostics_encoder(api: OT3API, mount: OT3Mount, write_cb: Call
     write_cb(["encoder-home", pip_pos, pip_enc, _bool_to_pass_fail(encoder_home_pass)])
 
     print("moving plunger")
-    await helpers_ot3.move_plunger_relative_ot3(api, mount, 10.0)
+    await helpers_ot3.move_plunger_absolute_ot3(api, mount, drop_tip)
     pip_pos, pip_enc = await _get_plunger_pos_and_encoder()
     if pip_pos != 10.0 or abs(pip_pos - pip_enc) > 0.1:
         print(f"FAIL: plunger ({pip_pos}) and encoder ({pip_enc}) are too different")
@@ -468,9 +469,9 @@ async def _test_diagnostics_encoder(api: OT3API, mount: OT3Mount, write_cb: Call
     write_cb(["encoder-move", pip_pos, pip_enc, _bool_to_pass_fail(encoder_move_pass)])
 
     print("stalling plunger")
-    await helpers_ot3.move_plunger_relative_ot3(api, mount, 100.0)
+    await helpers_ot3.move_plunger_relative_ot3(api, mount, 0, speed=200)
     pip_pos, pip_enc = await _get_plunger_pos_and_encoder()
-    if pip_pos != 110.0 or abs(pip_pos - pip_enc) < 0.1:
+    if pip_pos != 0.0 or abs(pip_pos - pip_enc) < 0.1:
         print(f"FAIL: plunger ({pip_pos}) and encoder ({pip_enc}) are the same after stalling")
         encoder_stall_pass = False
     write_cb(["encoder-stall", pip_pos, pip_enc, _bool_to_pass_fail(encoder_stall_pass)])
