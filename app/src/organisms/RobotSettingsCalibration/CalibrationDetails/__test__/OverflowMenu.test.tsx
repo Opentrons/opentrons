@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { when } from 'jest-when'
 import { fireEvent, screen } from '@testing-library/react'
 import { saveAs } from 'file-saver'
 import { OT3_PIPETTES } from '@opentrons/shared-data'
@@ -6,6 +7,7 @@ import { renderWithProviders, Mount } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
 import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
+import { useFeatureFlag } from '../../../../redux/config'
 import { PipetteWizardFlows } from '../../../PipetteWizardFlows'
 import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCalibratePipetteOffset'
 import {
@@ -42,17 +44,20 @@ jest.mock('../../../../organisms/ProtocolUpload/hooks')
 jest.mock('../../../../organisms/Devices/hooks')
 jest.mock('../../../PipetteWizardFlows')
 
+const mockPipetteWizardFlow = PipetteWizardFlows as jest.MockedFunction<
+  typeof PipetteWizardFlows
+>
 const mockUseCalibratePipetteOffset = useCalibratePipetteOffset as jest.MockedFunction<
   typeof useCalibratePipetteOffset
->
-const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
-  typeof useRunStatuses
 >
 const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction<
   typeof useDeckCalibrationData
 >
-const mockPipetteWizardFlow = PipetteWizardFlows as jest.MockedFunction<
-  typeof PipetteWizardFlows
+const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
+  typeof useFeatureFlag
+>
+const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
+  typeof useRunStatuses
 >
 
 const RUN_STATUSES = {
@@ -82,6 +87,9 @@ describe('OverflowMenu', () => {
       isDeckCalibrated: true,
       deckCalibrationData: mockDeckCalData,
     })
+    when(mockUseFeatureFlag)
+      .calledWith('enableCalibrationWizards')
+      .mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -135,6 +143,30 @@ describe('OverflowMenu', () => {
     fireEvent.click(button)
     getByText('Recalibrate Tip Length and Pipette Offset')
     getByText('Download calibration data')
+  })
+
+  it('should render Overflow tip length calibration button when the calibration wizard feature flag is set and no calibration exists', () => {
+    mockUseFeatureFlag.mockReturnValue(true)
+    const [{ getByLabelText, getByText }] = render(props)
+    const button = getByLabelText('CalibrationOverflowMenu_button')
+    fireEvent.click(button)
+    const calibrationButton = getByText('Calibrate Pipette Offset')
+    fireEvent.click(calibrationButton)
+    expect(startCalibration).toHaveBeenCalled()
+  })
+
+  it('should not render Overflow tip length recalibration button when the calibration wizard feature flag is set', () => {
+    props = {
+      ...props,
+      calType: 'tipLength',
+    }
+    mockUseFeatureFlag.mockReturnValue(true)
+    const [{ getByLabelText, queryByText }] = render(props)
+    const button = getByLabelText('CalibrationOverflowMenu_button')
+    fireEvent.click(button)
+    expect(
+      queryByText('Recalibrate Tip Length and Pipette Offset')
+    ).not.toBeInTheDocument()
   })
 
   it('should not render calibrate menu item when mount is undefined', () => {

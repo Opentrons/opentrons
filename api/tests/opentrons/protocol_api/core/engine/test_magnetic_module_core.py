@@ -4,7 +4,7 @@ from decoy import Decoy
 
 from opentrons.hardware_control import SynchronousAdapter
 from opentrons.hardware_control.modules import MagDeck
-from opentrons.hardware_control.modules.types import MagneticStatus
+from opentrons.hardware_control.modules.types import MagneticStatus, ModuleType
 
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.types import ModuleModel
@@ -45,6 +45,23 @@ def subject(
         api_version=MAX_SUPPORTED_VERSION,
         sync_module_hardware=mock_sync_module_hardware,
     )
+
+
+def test_create(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_sync_module_hardware: MagDeckHardware,
+) -> None:
+    """It should be able to create a magnetic module core."""
+    result = MagneticModuleCore(
+        module_id="1234",
+        engine_client=mock_engine_client,
+        api_version=MAX_SUPPORTED_VERSION,
+        sync_module_hardware=mock_sync_module_hardware,
+    )
+
+    assert result.module_id == "1234"
+    assert result.MODULE_TYPE == ModuleType.MAGNETIC
 
 
 def test_engage_from_home_raises_exception(
