@@ -28,7 +28,9 @@ from .instrument_models import (
 instruments_router = APIRouter()
 
 
-def _pipette_dict_to_pipette_res(pipette_dict: PipetteDict, mount: MountType) -> Pipette:
+def _pipette_dict_to_pipette_res(
+    pipette_dict: PipetteDict, mount: MountType
+) -> Pipette:
     """Convert PipetteDict to local Pipette class."""
     return Pipette(
         mount=mount,
@@ -46,15 +48,15 @@ def _pipette_dict_to_pipette_res(pipette_dict: PipetteDict, mount: MountType) ->
 def _gripper_dict_to_gripper_res(gripper_dict: GripperDict) -> Gripper:
     """Convert GripperDict to local Gripper class."""
     return Gripper(
-                mount=MountType.EXTENSION,
-                instrumentName=gripper_dict["name"],
-                instrumentModel=gripper_dict["model"],
-                instrumentSerial=gripper_dict["gripper_id"],
-                data=GripperData(
-                    jawState=gripper_dict["state"],
-                    calibratedOffset=gripper_dict["calibration_offset"],
-                ),
-            )
+        mount=MountType.EXTENSION,
+        instrumentName=gripper_dict["name"],
+        instrumentModel=gripper_dict["model"],
+        instrumentSerial=gripper_dict["gripper_id"],
+        data=GripperData(
+            jawState=gripper_dict["state"],
+            calibratedOffset=gripper_dict["calibration_offset"],
+        ),
+    )
 
 
 @instruments_router.get(
@@ -96,9 +98,7 @@ async def get_attached_instruments(
     right_pip = pipettes.get(Mount.RIGHT)
 
     if gripper:
-        response_data.append(
-            _gripper_dict_to_gripper_res(gripper_dict=gripper)
-        )
+        response_data.append(_gripper_dict_to_gripper_res(gripper_dict=gripper))
     if left_pip:
         response_data.append(
             _pipette_dict_to_pipette_res(pipette_dict=left_pip, mount=MountType.LEFT)
