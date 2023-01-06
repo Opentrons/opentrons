@@ -152,53 +152,53 @@ async def get_and_update_serial_once(
 
 def log_config(log_level: int) -> Tuple[logging.Logger, logging.Logger]:
     """Configure logging."""
-    logging.config.dictConfig(
-        {
-            "version": 1,
-            "disable_existing_loggers": True,
-            "formatters": {
-                "basic": {"format": "%(asctime)s %(name)s %(levelname)s %(message)s"},
-                "production_trace": {"format": "%(asctime)s %(message)s"},
-            },
-            "handlers": {
-                "main_log_handler": {
-                    "class": "logging.handlers.RotatingFileHandler",
-                    "formatter": "basic",
-                    "filename": "provision_pipette_debug.log",
-                    "maxBytes": 5000000,
-                    "level": log_level,
-                    "backupCount": 3,
-                },
-                "stream_handler": {
-                    "class": "logging.StreamHandler",
-                    "formatter": "basic",
-                    "level": log_level,
-                },
-                "trace_log_handler": {
-                    "class": "logging.handlers.RotatingFileHandler",
-                    "formatter": "basic",
-                    "filename": "provision_pipette.log",
-                    "maxBytes": 5000000,
-                    "level": logging.INFO,
-                    "backupCount": 3,
-                },
-            },
-            "loggers": {
-                "": {
-                    "handlers": (
-                        ["main_log_handler"]
-                        if log_level > logging.INFO
-                        else ["main_log_handler", "stream_handler"]
-                    ),
-                    "level": log_level,
-                },
-                "trace_log": {
-                    "handlers": ["trace_log_handler"],
-                    "level": logging.INFO,
-                },
-            },
-        }
-    )
+    # logging.config.dictConfig(
+    #     {
+    #         "version": 1,
+    #         "disable_existing_loggers": True,
+    #         "formatters": {
+    #             "basic": {"format": "%(asctime)s %(name)s %(levelname)s %(message)s"},
+    #             "production_trace": {"format": "%(asctime)s %(message)s"},
+    #         },
+    #         "handlers": {
+    #             "main_log_handler": {
+    #                 "class": "logging.handlers.RotatingFileHandler",
+    #                 "formatter": "basic",
+    #                 "filename": "provision_pipette_debug.log",
+    #                 "maxBytes": 5000000,
+    #                 "level": log_level,
+    #                 "backupCount": 3,
+    #             },
+    #             "stream_handler": {
+    #                 "class": "logging.StreamHandler",
+    #                 "formatter": "basic",
+    #                 "level": log_level,
+    #             },
+    #             "trace_log_handler": {
+    #                 "class": "logging.handlers.RotatingFileHandler",
+    #                 "formatter": "basic",
+    #                 "filename": "provision_pipette.log",
+    #                 "maxBytes": 5000000,
+    #                 "level": logging.INFO,
+    #                 "backupCount": 3,
+    #             },
+    #         },
+    #         "loggers": {
+    #             "": {
+    #                 "handlers": (
+    #                     ["main_log_handler"]
+    #                     if log_level > logging.INFO
+    #                     else ["main_log_handler", "stream_handler"]
+    #                 ),
+    #                 "level": log_level,
+    #             },
+    #             "trace_log": {
+    #                 "handlers": ["trace_log_handler"],
+    #                 "level": logging.INFO,
+    #             },
+    #         },
+    #     }
+    # )
     return logging.getLogger(__name__), logging.getLogger("trace_log")
 
 
