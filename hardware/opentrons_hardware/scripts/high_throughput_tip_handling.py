@@ -186,7 +186,7 @@ LOG_CONFIG = {
         "file_handler": {
             "class": "logging.handlers.RotatingFileHandler",
             "formatter": "basic",
-            "filename": "HT_tip_handling.log",
+            "filename": "/var/log/HT_tip_handling.log",
             "maxBytes": 5000000,
             "level": logging.INFO,
             "backupCount": 3,

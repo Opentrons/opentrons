@@ -6,8 +6,7 @@ from decoy import Decoy
 
 from opentrons.hardware_control.modules import ModuleType
 
-from opentrons.protocols.geometry.module_geometry import ModuleGeometry
-
+from opentrons.protocol_api.core.protocol_api.module_geometry import ModuleGeometry
 from opentrons.protocol_api.core.protocol_api import deck_conflict
 from opentrons.protocol_api.core.protocol_api.deck import Deck, DeckItem
 

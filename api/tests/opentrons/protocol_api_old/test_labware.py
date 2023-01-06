@@ -12,16 +12,16 @@ from opentrons.hardware_control.modules.types import (
     HeaterShakerModuleModel,
 )
 
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION, labware, validation
-from opentrons.protocols.geometry import module_geometry
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.geometry.well_geometry import WellGeometry
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION, labware, validation
+from opentrons.protocol_api.core.labware import AbstractLabware
+from opentrons.protocol_api.core.protocol_api import module_geometry
 from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
 from opentrons.protocol_api.core.protocol_api.well import WellImplementation
 
 from opentrons.calibration_storage import helpers
 from opentrons.types import Point, Location
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocol_api.core.labware import AbstractLabware
 
 test_data: Dict[str, WellDefinition] = {
     "circular_well_json": {

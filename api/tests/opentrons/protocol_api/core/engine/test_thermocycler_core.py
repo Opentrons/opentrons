@@ -4,7 +4,11 @@ from decoy import Decoy
 
 from opentrons.drivers.types import ThermocyclerLidStatus
 from opentrons.hardware_control import SynchronousAdapter
-from opentrons.hardware_control.modules import Thermocycler, TemperatureStatus
+from opentrons.hardware_control.modules import (
+    Thermocycler,
+    TemperatureStatus,
+    ModuleType,
+)
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_api.core.engine.module_core import ThermocyclerModuleCore
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
@@ -52,6 +56,7 @@ def test_create(
     )
 
     assert result.module_id == "1234"
+    assert result.MODULE_TYPE == ModuleType.THERMOCYCLER
 
 
 def test_open_lid(

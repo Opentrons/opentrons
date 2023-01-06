@@ -27,16 +27,10 @@ from opentrons.util.helpers import utc_now
 
 import pytest
 
-try:
-    import opentrons_hardware  # noqa: F401
-
-    # TODO (lc 12-8-2022) Not sure if we plan to keep these tests, but if we do
-    # we should re-write them to be agnostic to the underlying hardware. Otherwise
-    # I wouldn't really consider these to be proper unit tests.
-    pytest.skip("These tests are only valid on the OT-2.", allow_module_level=True)
-except ImportError:
-    # If we don't have opentrons_hardware, we can safely run these tests.
-    pass
+# TODO (lc 12-8-2022) Not sure if we plan to keep these tests, but if we do
+# we should re-write them to be agnostic to the underlying hardware. Otherwise
+# I wouldn't really consider these to be proper unit tests.
+pytestmark = pytest.mark.ot2_only
 
 
 def set_version_added(attr, mp, version):
@@ -981,8 +975,8 @@ def test_order_of_module_load():
     temp1 = ctx1.load_module("tempdeck", 4)
     ctx1.load_module("thermocycler")
     temp2 = ctx1.load_module("tempdeck", 1)
-    async_temp1 = temp1._module._obj_to_adapt
-    async_temp2 = temp2._module._obj_to_adapt
+    async_temp1 = temp1._core._sync_module_hardware._obj_to_adapt  # type: ignore[union-attr]
+    async_temp2 = temp2._core._sync_module_hardware._obj_to_adapt  # type: ignore[union-attr]
 
     assert id(async_temp1) == id(hw_temp1)
     assert id(async_temp2) == id(hw_temp2)
@@ -999,8 +993,8 @@ def test_order_of_module_load():
     temp1 = ctx2.load_module("tempdeck", 1)
     temp2 = ctx2.load_module("tempdeck", 4)
 
-    async_temp1 = temp1._module._obj_to_adapt
-    async_temp2 = temp2._module._obj_to_adapt
+    async_temp1 = temp1._core._sync_module_hardware._obj_to_adapt  # type: ignore[union-attr]
+    async_temp2 = temp2._core._sync_module_hardware._obj_to_adapt  # type: ignore[union-attr]
     assert id(async_temp1) == id(hw_temp1)
     assert id(async_temp2) == id(hw_temp2)
 
@@ -1206,4 +1200,3 @@ def test_move_to_with_heater_shaker(
         to_loc=Location(Point(0, 0, 0), None),
         is_multichannel=True,
     )
-    mod._module.cleanup()

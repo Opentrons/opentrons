@@ -28,6 +28,7 @@ from opentrons.protocol_engine import (
     LoadedModule,
 )
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
+from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
 
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
@@ -358,6 +359,16 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             return self._module_cores_by_id[loaded_item.id]
 
         return None
+
+    def get_labware_on_module(self, module_core: ModuleCore) -> Optional[LabwareCore]:
+        """Get the item on top of a given module, if any."""
+        try:
+            labware_id = self._engine_client.state.labware.get_id_by_module(
+                module_core.module_id
+            )
+            return self._labware_cores_by_id[labware_id]
+        except LabwareNotLoadedOnModuleError:
+            return None
 
     def get_slot_center(self, slot_name: DeckSlotName) -> Point:
         """Get the absolute coordinate of a slot's center."""
