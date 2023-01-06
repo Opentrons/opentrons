@@ -33,6 +33,8 @@ LEAK_HOVER_ABOVE_LIQUID_MM: Final = 50
 SAFE_HEIGHT_TRAVEL = 10
 SAFE_HEIGHT_CALIBRATE = 10
 
+COLUMNS = "ABCDEFGH"
+
 
 @dataclass
 class TestConfig:
@@ -487,11 +489,16 @@ async def _test_diagnostics_capacitive(api: OT3API, mount: OT3Mount, write_cb: C
     async def _read_cap() -> float:
         # FIXME: this while loop is required b/c the command does not always
         #        return a value, not sure if issue is in firmware or CAN
-        while True:
+        readings = []
+        while len(readings) < 10:
             try:
-                return await helpers_ot3.get_capacitance_ot3(api, mount)
+                r = await helpers_ot3.get_capacitance_ot3(api, mount)
+                readings.append(r)
             except ValueError:
                 continue
+        readings.sort()
+        readings = readings[1:-1]
+        return sum(readings) / len(readings)
 
     capacitance_open_air = await _read_cap()
     print(f"open-air capacitance: {capacitance_open_air}")
@@ -711,6 +718,9 @@ async def _main(test_config: TestConfig) -> None:
             _append_csv_data(_res)
             _final_test_results.append(_res)
 
+        tip_columns = COLUMNS[:test_config.num_trials]
+        tips_used = [f"{c}1" for c in tip_columns]
+
         # run the test
         _append_csv_data(["----"])
         _append_csv_data(["TEST"])
@@ -728,13 +738,11 @@ async def _main(test_config: TestConfig) -> None:
             test_passed = await _test_plunger_positions(api, mount, _append_csv_data)
             _handle_final_test_results("plunger", test_passed)
         if not test_config.skip_liquid:
-            tips_liquid = [f"A{i + 1}" for i in range(test_config.num_trials)]
-            for tip in tips_liquid:
+            for tip in tips_used:
                 test_passed = await _test_for_leak_by_eye(api, mount, test_config, tip)
                 _handle_final_test_results("droplets", test_passed)
         if not test_config.skip_fixture:
-            tips_fixture = [f"A{i + 1}" for i in range(test_config.num_trials)]
-            for tip in tips_fixture:
+            for tip in tips_used:
                 test_passed = await _test_for_leak(
                     api,
                     mount,
