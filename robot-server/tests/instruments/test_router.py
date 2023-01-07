@@ -116,11 +116,12 @@ async def test_get_all_attached_instruments(
     )
     result = await get_attached_instruments(hardware=ot3_hardware_api)
     assert result.content.data == [
-        Gripper(
+        Gripper.construct(
             mount=MountType.EXTENSION,
+            instrumentType="gripper",
             instrumentName="gripper",
             instrumentModel=GripperModel.V1,
-            instrumentSerial="GripperID321",
+            serialNumber="GripperID321",
             data=GripperData(
                 jawState=GripperJawState.UNHOMED,
                 calibratedOffset=GripperCalibrationOffset(
@@ -131,22 +132,24 @@ async def test_get_all_attached_instruments(
                 ),
             ),
         ),
-        Pipette(
+        Pipette.construct(
             mount=MountType.LEFT,
+            instrumentType="pipette",
             instrumentName="p10_multi",
             instrumentModel=PipetteModel("abc"),
-            instrumentSerial="my-pipette-id",
+            serialNumber="my-pipette-id",
             data=PipetteData(
                 channels=1,
                 min_volume=1,
                 max_volume=1,
             ),
         ),
-        Pipette(
+        Pipette.construct(
             mount=MountType.RIGHT,
+            instrumentType="pipette",
             instrumentName="p20_multi_gen2",
             instrumentModel=PipetteModel("xyz"),
-            instrumentSerial="my-other-pipette-id",
+            serialNumber="my-other-pipette-id",
             data=PipetteData(
                 channels=1,
                 min_volume=1,

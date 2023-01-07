@@ -1,4 +1,5 @@
 """Request and response models for /instruments endpoints."""
+from typing_extensions import Literal
 from typing import Optional, TypeVar, Union, Generic
 from enum import Enum
 from pydantic import BaseModel, Field
@@ -23,6 +24,8 @@ InstrumentNameT = TypeVar("InstrumentNameT", bound=Union[GripperName, PipetteNam
 InstrumentModelT = TypeVar("InstrumentModelT", bound=Union[GripperModel, PipetteModel])
 InstrumentDataT = TypeVar("InstrumentDataT", bound=BaseModel)
 
+InstrumentType = Literal["pipette", "gripper"]
+
 
 # TODO (spp, 2023-01-03): use MountType from opentrons.types once it has extension type
 class MountType(str, Enum):
@@ -34,20 +37,20 @@ class MountType(str, Enum):
 
 
 class GenericInstrument(
-    GenericModel, Generic[InstrumentT, InstrumentModelT, InstrumentDataT]
+    GenericModel, Generic[InstrumentNameT, InstrumentModelT, InstrumentDataT]
 ):
     """Base instrument response."""
 
     mount: MountType = Field(
         ..., description="The mount this instrument is attached to."
     )
-    instrumentName: InstrumentNameT = = Field(
-        ..., description="Name of the instrument."
+    instrumentType: InstrumentType = Field(
+        ..., description="Type of instrument- either a pipette or a gripper."
     )
-    instrumentModel: InstrumentModelT = Field(
-        ..., description="Instrument model."
-    )
-    instrumentSerial: str = Field(..., description="Instrument hardware serial number.")
+    instrumentName: InstrumentNameT = Field(..., description="Name of the instrument.")
+    instrumentModel: InstrumentModelT = Field(..., description="Instrument model.")
+    # TODO (spp, 2023-01-06): add firmware version field
+    serialNumber: str = Field(..., description="Instrument hardware serial number.")
     data: InstrumentDataT
 
 
@@ -68,25 +71,25 @@ class PipetteData(BaseModel):
     channels: ChannelCount = Field(..., description="Number of pipette channels.")
     min_volume: float = Field(..., description="Minimum pipette volume.")
     max_volume: float = Field(..., description="Maximum pipette volume.")
-    # TODO (spp, 2022-12-20): update/ add fields according to client needs and
+    # TODO (spp, 2022-12-20): update/ add fields according to client needs.
     #  add calibration data as decided by https://opentrons.atlassian.net/browse/RSS-167
 
 
 class Pipette(GenericInstrument[PipetteName, PipetteModel, PipetteData]):
     """Attached pipette info & configuration."""
 
+    instrumentType: Literal["pipette"] = "pipette"
     instrumentName: PipetteName
     instrumentModel: PipetteModel
-    serialNumber: str
     data: PipetteData
 
 
 class Gripper(GenericInstrument[GripperName, GripperModel, GripperData]):
     """Attached gripper info & configuration."""
 
+    instrumentType: Literal["gripper"] = "gripper"
     instrumentName: GripperName
     instrumentModel: GripperModel
-    instrumentSerial: str
     data: GripperData
 
 

@@ -32,11 +32,11 @@ def _pipette_dict_to_pipette_res(
     pipette_dict: PipetteDict, mount: MountType
 ) -> Pipette:
     """Convert PipetteDict to local Pipette class."""
-    return Pipette(
+    return Pipette.construct(
         mount=mount,
         instrumentName=pipette_dict["name"],
         instrumentModel=pipette_dict["model"],
-        instrumentSerial=pipette_dict["pipette_id"],
+        serialNumber=pipette_dict["pipette_id"],
         data=PipetteData(
             channels=pipette_dict["channels"],
             min_volume=pipette_dict["min_volume"],
@@ -47,11 +47,11 @@ def _pipette_dict_to_pipette_res(
 
 def _gripper_dict_to_gripper_res(gripper_dict: GripperDict) -> Gripper:
     """Convert GripperDict to local Gripper class."""
-    return Gripper(
+    return Gripper.construct(
         mount=MountType.EXTENSION,
         instrumentName=gripper_dict["name"],
         instrumentModel=gripper_dict["model"],
-        instrumentSerial=gripper_dict["gripper_id"],
+        serialNumber=gripper_dict["gripper_id"],
         data=GripperData(
             jawState=gripper_dict["state"],
             calibratedOffset=gripper_dict["calibration_offset"],
