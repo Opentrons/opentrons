@@ -56,7 +56,7 @@ jobs:
           ref: RCORE-468_add_releases_json
           inputs: |
             {
-              "oe-core-ref": "-",
+              "oe-core-ref": "RCORE-468_add_releases_json",
               "monorepo-ref": "refs/heads/${{ github.head_ref }}",
               "infra-stage": "stage-prod"
             }
