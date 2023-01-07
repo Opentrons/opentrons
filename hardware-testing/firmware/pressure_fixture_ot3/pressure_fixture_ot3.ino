@@ -173,7 +173,7 @@ void processCmdParse(String strCMD,int tempData)
       Serial.print("PRESSURE");
       Serial.print(tempData);
       Serial.print("= ");
-      Serial.println(pressure[tempData-1]);
+      Serial.println(pressure[tempData-1], 5);
      // Serial.println("OK");1`
     }
     else if(tempData == 0x0F)                    //channel all;
@@ -184,7 +184,7 @@ void processCmdParse(String strCMD,int tempData)
         Serial.print("PRESSURE");
         Serial.print(i+1);
         Serial.print("= ");
-         Serial.print(pressure[i]);
+         Serial.print(pressure[i], 5);
         Serial.print(",");
       }
       Serial.println("");

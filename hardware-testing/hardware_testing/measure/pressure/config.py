@@ -14,9 +14,9 @@ PRESSURE_FIXTURE_TIP_VOLUME = 50  # always 50ul
 class PressureEvent(enum.Enum):
     PRE = "pre"
     INSERT = "insert"
-    ASPIRATE_P50 = "aspirate"
-    ASPIRATE_P1000 = "aspirate"
-    DISPENSE = "dispense"
+    ASPIRATE_P50 = "holding"
+    ASPIRATE_P1000 = "holding"
+    DISPENSE = "dispensed"
     POST = "post"
 
 
