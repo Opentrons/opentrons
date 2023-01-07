@@ -32,7 +32,7 @@ class PressureEventConfig:
 
 PRESSURE_FIXTURE_ASPIRATE_VOLUME = {50: 20.0, 1000: 50.0}
 
-FIXTURE_EVENT_STABILITY_THRESHOLD = 3.0
+FIXTURE_EVENT_STABILITY_THRESHOLD = 3000.0
 DEFAULT_PRESSURE_SAMPLE_DELAY = 0.25
 DEFAULT_PRESSURE_SAMPLE_COUNT = 10
 # FIXME: reduce once firmware latency is reduced
@@ -44,32 +44,32 @@ DEFAULT_PRESSURE_SAMPLE_COUNT_DURING_ASPIRATE = int(
     (2 * 60) / DEFAULT_PRESSURE_SAMPLE_DELAY
 )
 PRESSURE_NONE = PressureEventConfig(
-    min=-0.01,
-    max=0.01,
+    min=-10.0,
+    max=10.0,
     stability_delay=DEFAULT_STABILIZE_SECONDS,
     stability_threshold=FIXTURE_EVENT_STABILITY_THRESHOLD,
     sample_count=DEFAULT_PRESSURE_SAMPLE_COUNT,
     sample_delay=DEFAULT_PRESSURE_SAMPLE_DELAY,
 )
 PRESSURE_INSERTED = PressureEventConfig(
-    min=0.2,
-    max=0.5,
+    min=200.0,
+    max=500.0,
     stability_delay=DEFAULT_STABILIZE_SECONDS,
     stability_threshold=FIXTURE_EVENT_STABILITY_THRESHOLD,
     sample_count=DEFAULT_PRESSURE_SAMPLE_COUNT,
     sample_delay=DEFAULT_PRESSURE_SAMPLE_DELAY,
 )
 PRESSURE_ASPIRATED_P50 = PressureEventConfig(
-    min=-5,
-    max=0,
+    min=-5000.0,
+    max=0.0,
     stability_delay=DEFAULT_STABILIZE_SECONDS,
     stability_threshold=FIXTURE_EVENT_STABILITY_THRESHOLD,
     sample_count=DEFAULT_PRESSURE_SAMPLE_COUNT_DURING_ASPIRATE,
     sample_delay=DEFAULT_PRESSURE_SAMPLE_DELAY,
 )
 PRESSURE_ASPIRATED_P1000 = PressureEventConfig(
-    min=-5,
-    max=0,
+    min=-5000.0,
+    max=0.0,
     stability_delay=DEFAULT_STABILIZE_SECONDS,
     stability_threshold=FIXTURE_EVENT_STABILITY_THRESHOLD,
     sample_count=DEFAULT_PRESSURE_SAMPLE_COUNT_DURING_ASPIRATE,

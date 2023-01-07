@@ -12,7 +12,7 @@ String cmd = "";
 MMR920C04 Pressure(MMRADDR);
 TCA9548A I2CMux;              //Address can be passed into the constructor
 int32_t tempPressure = 0;
-float pressure[8] = {0.0};
+double pressure[8] = {0.0};
 //float pressure = 0.0;
 
 uint8_t dataTemp[3] = {0};
@@ -64,7 +64,7 @@ void GetPressureTask(void)
         {
           pressure[PressureChannel] = sensor_conv_pressure(dataTemp);//(float)tempPressure/pow(10,5);
         
-          pressure[PressureChannel] = pressure[PressureChannel]/10.1972;         //filter conver from cmH20 to kPa
+          pressure[PressureChannel] = pressure[PressureChannel]/0.0101972;         //filter conver from cmH20 to Pa
         }
         break;
       }
@@ -173,7 +173,7 @@ void processCmdParse(String strCMD,int tempData)
       Serial.print("PRESSURE");
       Serial.print(tempData);
       Serial.print("= ");
-      Serial.println(pressure[tempData-1], 5);
+      Serial.println(pressure[tempData-1], 2);
      // Serial.println("OK");1`
     }
     else if(tempData == 0x0F)                    //channel all;
@@ -184,7 +184,7 @@ void processCmdParse(String strCMD,int tempData)
         Serial.print("PRESSURE");
         Serial.print(i+1);
         Serial.print("= ");
-         Serial.print(pressure[i], 5);
+         Serial.print(pressure[i], 2);
         Serial.print(",");
       }
       Serial.println("");
