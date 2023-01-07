@@ -75,11 +75,13 @@ async def test_get_instruments_empty(
 ) -> None:
     """It should get an empty instruments list from hardware API."""
     decoy.when(ot3_hardware_api.attached_gripper).then_return(None)
+    decoy.when(ot3_hardware_api.attached_pipettes).then_return({})
     result = await get_attached_instruments(hardware=ot3_hardware_api)
     assert result.content.data == []
     assert result.status_code == 200
 
 
+@pytest.mark.ot3_only
 async def test_get_all_attached_instruments(
     decoy: Decoy,
     ot3_hardware_api: OT3API,
@@ -116,22 +118,6 @@ async def test_get_all_attached_instruments(
     )
     result = await get_attached_instruments(hardware=ot3_hardware_api)
     assert result.content.data == [
-        Gripper.construct(
-            mount=MountType.EXTENSION,
-            instrumentType="gripper",
-            instrumentName="gripper",
-            instrumentModel=GripperModel.V1,
-            serialNumber="GripperID321",
-            data=GripperData(
-                jawState=GripperJawState.UNHOMED,
-                calibratedOffset=GripperCalibrationOffset(
-                    offset=Point(x=1, y=2, z=3),
-                    source=SourceType.default,
-                    status=CalibrationStatus(),
-                    last_modified=None,
-                ),
-            ),
-        ),
         Pipette.construct(
             mount=MountType.LEFT,
             instrumentType="pipette",
@@ -156,4 +142,59 @@ async def test_get_all_attached_instruments(
                 max_volume=1,
             ),
         ),
+        Gripper.construct(
+            mount=MountType.EXTENSION,
+            instrumentType="gripper",
+            instrumentName="gripper",
+            instrumentModel=GripperModel.V1,
+            serialNumber="GripperID321",
+            data=GripperData(
+                jawState=GripperJawState.UNHOMED,
+                calibratedOffset=GripperCalibrationOffset(
+                    offset=Point(x=1, y=2, z=3),
+                    source=SourceType.default,
+                    status=CalibrationStatus(),
+                    last_modified=None,
+                ),
+            ),
+        ),
+    ]
+
+
+async def test_get_ot2_instruments(
+    decoy: Decoy,
+    hardware_api: HardwareControlAPI,
+) -> None:
+    """It should return attached pipettes on OT2."""
+    # Return empty data when no pipettes attached
+    decoy.when(hardware_api.attached_instruments).then_return({})
+    result1 = await get_attached_instruments(hardware=hardware_api)
+    assert result1.content.data == []
+    assert result1.status_code == 200
+
+    # Return attached pipettes
+    decoy.when(hardware_api.attached_instruments).then_return(
+        {
+            Mount.RIGHT: get_sample_pipette_dict(
+                name="p20_multi_gen2",
+                model=PipetteModel("xyz"),
+                pipette_id="pipette-id",
+            ),
+        }
+    )
+    result2 = await get_attached_instruments(hardware=hardware_api)
+    assert result2.status_code == 200
+    assert result2.content.data == [
+        Pipette.construct(
+            mount=MountType.RIGHT,
+            instrumentType="pipette",
+            instrumentName="p20_multi_gen2",
+            instrumentModel=PipetteModel("xyz"),
+            serialNumber="pipette-id",
+            data=PipetteData(
+                channels=1,
+                min_volume=1,
+                max_volume=1,
+            ),
+        )
     ]

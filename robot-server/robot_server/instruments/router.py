@@ -28,12 +28,10 @@ from .instrument_models import (
 instruments_router = APIRouter()
 
 
-def _pipette_dict_to_pipette_res(
-    pipette_dict: PipetteDict, mount: MountType
-) -> Pipette:
-    """Convert PipetteDict to local Pipette class."""
+def _pipette_dict_to_pipette_res(pipette_dict: PipetteDict, mount: Mount) -> Pipette:
+    """Convert PipetteDict to Pipette response model."""
     return Pipette.construct(
-        mount=mount,
+        mount=MountType.from_hw_mount(mount),
         instrumentName=pipette_dict["name"],
         instrumentModel=pipette_dict["model"],
         serialNumber=pipette_dict["pipette_id"],
@@ -46,7 +44,7 @@ def _pipette_dict_to_pipette_res(
 
 
 def _gripper_dict_to_gripper_res(gripper_dict: GripperDict) -> Gripper:
-    """Convert GripperDict to local Gripper class."""
+    """Convert GripperDict to Gripper response model."""
     return Gripper.construct(
         mount=MountType.EXTENSION,
         instrumentName=gripper_dict["name"],
@@ -67,6 +65,9 @@ def _gripper_dict_to_gripper_res(gripper_dict: GripperDict) -> Gripper:
     responses={status.HTTP_200_OK: {"model": SimpleMultiBody[AttachedInstrument]}},
 )
 async def get_attached_instruments(
+    # TODO (spp, 2023-01-06): Active scan restriction is probably not relevant for OT3.
+    #  Furthermore, it might be better to have the server decide whether to do
+    #  an active scan depending on whether a protocol or calibration session is active.
     refresh: Optional[bool] = Query(
         False,
         description="If true, actively scan for attached pipettes. Note:"
@@ -77,7 +78,6 @@ async def get_attached_instruments(
     hardware: HardwareControlAPI = Depends(get_hardware),
 ) -> PydanticResponse[SimpleMultiBody[AttachedInstrument]]:
     """Get a list of all attached instruments."""
-    response_data: List[AttachedInstrument] = []
     pipettes: Dict[Mount, PipetteDict]
     gripper: Optional[GripperDict] = None
 
@@ -94,19 +94,13 @@ async def get_attached_instruments(
         # OT2
         pipettes = hardware.attached_instruments
 
-    left_pip = pipettes.get(Mount.LEFT)
-    right_pip = pipettes.get(Mount.RIGHT)
+    response_data: List[AttachedInstrument] = [
+        _pipette_dict_to_pipette_res(pipette_dict=pipette_dict, mount=mount)
+        for mount, pipette_dict in pipettes.items()
+    ]
 
     if gripper:
         response_data.append(_gripper_dict_to_gripper_res(gripper_dict=gripper))
-    if left_pip:
-        response_data.append(
-            _pipette_dict_to_pipette_res(pipette_dict=left_pip, mount=MountType.LEFT)
-        )
-    if right_pip:
-        response_data.append(
-            _pipette_dict_to_pipette_res(pipette_dict=right_pip, mount=MountType.RIGHT)
-        )
 
     return await PydanticResponse.create(
         content=SimpleMultiBody.construct(

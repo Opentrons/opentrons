@@ -1,4 +1,6 @@
 """Request and response models for /instruments endpoints."""
+from __future__ import annotations
+
 from typing_extensions import Literal
 from typing import Optional, TypeVar, Union, Generic
 from enum import Enum
@@ -9,6 +11,7 @@ from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
 )
 from opentrons.hardware_control.types import GripperJawState
+from opentrons.types import Mount
 
 from opentrons_shared_data.pipette.dev_types import (
     PipetteName,
@@ -34,6 +37,12 @@ class MountType(str, Enum):
     LEFT = "left"
     RIGHT = "right"
     EXTENSION = "extension"
+
+    @staticmethod
+    def from_hw_mount(mount: Mount) -> MountType:
+        """Convert from Mount to MountType."""
+        mount_map = {Mount.LEFT: MountType.LEFT, Mount.RIGHT: MountType.RIGHT}
+        return mount_map[mount]
 
 
 class GenericInstrument(
