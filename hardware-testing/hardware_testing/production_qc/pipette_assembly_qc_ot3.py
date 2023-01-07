@@ -36,6 +36,7 @@ SAFE_HEIGHT_TRAVEL = 10
 SAFE_HEIGHT_CALIBRATE = 10
 
 COLUMNS = "ABCDEFGH"
+PRESSURE_DATA_HEADER = ["PHASE", "CH1", "CH2", "CH3", "CH4", "CH5", "CH6", "CH7", "CH8"]
 
 
 @dataclass
@@ -782,18 +783,39 @@ async def _main(test_config: TestConfig) -> None:
             data_list: List[Any],
             line_number: Optional[int] = None,
             elapsed_seconds: Optional[float] = None,
+            timestamp_included: bool = False,
         ) -> None:
             # every line in the CSV file begins with the elapsed seconds
-            if elapsed_seconds is None:
-                elapsed_seconds = round(time() - start_time, 2)
-            data_list_with_time = [elapsed_seconds] + data_list
-            data_str = ",".join([str(d) for d in data_list_with_time])
+            if not timestamp_included:
+                if elapsed_seconds is None:
+                    elapsed_seconds = round(time() - start_time, 2)
+                data_list = [elapsed_seconds] + data_list
+            data_str = ",".join([str(d) for d in data_list])
             if line_number is None:
                 data.append_data_to_file(test_name, file_name, data_str + "\n")
             else:
                 data.insert_data_to_file(
                     test_name, file_name, data_str + "\n", line_number
                 )
+
+        # NOTE: there is a ton of pressure data, so we want it on the bottom of the CSV
+        #       so here we cache these readings, and append them to the CSV in the end
+        _cached_pressure_data = []
+        # save final test results, to be saved and displayed at the end
+        _final_test_results = []
+
+        def _cache_pressure_data_callback(d: List[Any]) -> None:
+            elapsed_seconds = round(time() - start_time, 2)
+            data_list_with_time = [elapsed_seconds] + d
+            _cached_pressure_data.append(data_list_with_time)
+
+        _cache_pressure_data_callback(PRESSURE_DATA_HEADER)
+
+        def _handle_final_test_results(t: str, r: bool) -> None:
+            # save final test results to both the CSV and to display at end of script
+            _res = [t, _bool_to_pass_fail(r)]
+            _append_csv_data(_res)
+            _final_test_results.append(_res)
 
         # add metadata to CSV
         _append_csv_data(["--------"])
@@ -814,24 +836,9 @@ async def _main(test_config: TestConfig) -> None:
         # add pressure thresholds to CSV
         _append_csv_data(["-----------------------"])
         _append_csv_data(["PRESSURE-CONFIGURATIONS"])
-        for tag, config in PRESSURE_CFG.items():
+        for t, config in PRESSURE_CFG.items():
             for f in fields(config):
-                _append_csv_data([tag, f.name, getattr(config, f.name)])
-
-        # NOTE: there is a ton of pressure data, so we want it on the bottom of the CSV
-        #       so here we cache these readings, and append them to the CSV in the end
-        _cached_pressure_data = []
-        # save final test results, to be saved and displayed at the end
-        _final_test_results = []
-
-        def _cache_pressure_data_callback(d: List[Any]) -> None:
-            _cached_pressure_data.append(d)
-
-        def _handle_final_test_results(t: str, r: bool) -> None:
-            # save final test results to both the CSV and to display at end of script
-            _res = [t, _bool_to_pass_fail(r)]
-            _append_csv_data(_res)
-            _final_test_results.append(_res)
+                _append_csv_data([t.value, f.name, getattr(config, f.name)])
 
         tip_columns = COLUMNS[: test_config.num_trials]
         tips_used = [f"{c}1" for c in tip_columns]
@@ -841,11 +848,12 @@ async def _main(test_config: TestConfig) -> None:
         _append_csv_data(["TEST"])
         print("homing")
         await api.home()
-        print("moving over slot 3")
-        pos_slot_2 = helpers_ot3.get_slot_calibration_square_position_ot3(3)
-        current_pos = await api.gantry_position(mount)
-        hover_over_slot_2 = pos_slot_2._replace(z=current_pos.z)
-        await api.move_to(mount, hover_over_slot_2)
+        if not test_config.skip_plunger or not test_config.skip_diagnostics:
+            print("moving over slot 3")
+            pos_slot_2 = helpers_ot3.get_slot_calibration_square_position_ot3(3)
+            current_pos = await api.gantry_position(mount)
+            hover_over_slot_2 = pos_slot_2._replace(z=current_pos.z)
+            await api.move_to(mount, hover_over_slot_2)
         if not test_config.skip_diagnostics:
             test_passed = await _test_diagnostics(api, mount, _append_csv_data)
             _handle_final_test_results("diagnostics", test_passed)
@@ -875,7 +883,7 @@ async def _main(test_config: TestConfig) -> None:
         _append_csv_data(["-------------"])
         _append_csv_data(["PRESSURE-DATA"])
         for press_data in _cached_pressure_data:
-            _append_csv_data(press_data)
+            _append_csv_data(press_data, timestamp_included=True)
 
         # put the top-line results at the top of the CSV file
         # so here we cache each data line, then add them to the top
