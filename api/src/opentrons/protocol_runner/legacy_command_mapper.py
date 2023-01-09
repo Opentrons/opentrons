@@ -246,7 +246,7 @@ class LegacyCommandMapper:
             command["name"] == legacy_command_types.ASPIRATE
             or command["name"] == legacy_command_types.DISPENSE
         ):
-            engine_command = self._build_liquid_handling_commands(
+            engine_command = self._build_liquid_handling_command(
                 command=command, command_id=command_id, now=now
             )
         elif command["name"] == legacy_command_types.BLOW_OUT:
@@ -338,7 +338,7 @@ class LegacyCommandMapper:
             ),
         )
 
-    def _build_liquid_handling_commands(
+    def _build_liquid_handling_command(
         self,
         command: Union[
             legacy_command_types.AspirateMessage, legacy_command_types.DispenseMessage
@@ -351,7 +351,7 @@ class LegacyCommandMapper:
         volume = command["payload"]["volume"]
         # TODO:(jr, 15.08.2022): aspirate and dispense commands with no specified labware
         # get filtered into custom. Refactor this in followup legacy command mapping
-        if isinstance(location, Location) and location.labware.is_well:
+        if location.labware.is_well:
             well = location.labware.as_well()
             slot = DeckSlotName(location.labware.first_parent())
             parent_module_id = self._module_id_by_slot.get(slot)
