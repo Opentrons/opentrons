@@ -16,7 +16,6 @@ import {
 import { StyledText } from '../../atoms/text'
 import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import { DISCONNECT } from '../Devices/RobotSettings/ConnectNetwork/constants'
-import { SetWifiCred } from './SetWifiCred'
 
 import type { RequestState } from '../../redux/robot-api/types'
 import type { NetworkChangeType } from '../Devices/RobotSettings/ConnectNetwork/types'
