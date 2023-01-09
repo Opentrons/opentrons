@@ -199,7 +199,7 @@ class ModuleContext(CommandPublisher):
     @requires_version(2, 13)
     def parent(self) -> str:
         """The name of the slot the module is on."""
-        return self._core.get_deck_slot()
+        return self._core.get_deck_slot().value
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
