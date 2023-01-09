@@ -398,6 +398,3 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         elif isinstance(labware_location, ModuleLocation):
             return self._get_module_core_item(labware_location.moduleId)
         return None
-
-    def _get_module_core_item(self, module_id: str) -> Optional[ModuleCore]:
-        return self._module_cores_by_id.get(module_id)

@@ -36,19 +36,6 @@ def module(trough):
 
 
 @pytest.fixture(scope="session")
-def module_context(trough):
-    deck = Deck()
-    mod = module_geometry.create_geometry(
-        definition=module_geometry.load_definition(
-            TemperatureModuleModel.TEMPERATURE_V2
-        ),
-        parent=deck.position_for("6"),
-        configuration=None,
-    )
-    return mod
-
-
-@pytest.fixture(scope="session")
 def mod_trough(trough_definition, module):
     mod_trough = module.add_labware(
         labware.load_from_definition(trough_definition, module.location)
@@ -81,16 +68,6 @@ def test_module(module):
     assert ll.object_type == LabwareLikeType.MODULE
     assert ll.is_module
     assert ll.as_module() == module
-
-
-def test_module_context(module_context):
-    ll = LabwareLike(module_context)
-    assert ll.has_parent is True
-    assert ll.parent.object is module_context.parent
-    assert ll.object is module_context
-    assert ll.object_type == LabwareLikeType.MODULE_CONTEXT
-    assert ll.is_module
-    assert ll.as_module() == module_context
 
 
 def test_slot():
