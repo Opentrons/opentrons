@@ -154,7 +154,9 @@ class LegacyCommandMapper:
                 elif isinstance(running_command, pe_commands.Aspirate):
                     completed_command = running_command.copy(
                         update={
-                            "result": pe_commands.AspirateResult.construct(
+                            # Don't .construct() result, because we want to validate
+                            # volume.
+                            "result": pe_commands.AspirateResult(
                                 volume=running_command.params.volume
                             ),
                             "status": pe_commands.CommandStatus.SUCCEEDED,
@@ -164,7 +166,9 @@ class LegacyCommandMapper:
                 elif isinstance(running_command, pe_commands.Dispense):
                     completed_command = running_command.copy(
                         update={
-                            "result": pe_commands.DispenseResult.construct(
+                            # Don't .construct() result, because we want to validate
+                            # volume.
+                            "result": pe_commands.DispenseResult(
                                 volume=running_command.params.volume
                             ),
                             "status": pe_commands.CommandStatus.SUCCEEDED,
@@ -368,7 +372,9 @@ class LegacyCommandMapper:
                     status=pe_commands.CommandStatus.RUNNING,
                     createdAt=now,
                     startedAt=now,
-                    params=pe_commands.AspirateParams.construct(
+                    # Don't .construct() params, because we want to validate
+                    # volume and flowRate.
+                    params=pe_commands.AspirateParams(
                         pipetteId=pipette_id,
                         labwareId=labware_id,
                         wellName=well_name,
@@ -384,7 +390,9 @@ class LegacyCommandMapper:
                     status=pe_commands.CommandStatus.RUNNING,
                     createdAt=now,
                     startedAt=now,
-                    params=pe_commands.DispenseParams.construct(
+                    # Don't .construct params, because we want to validate
+                    # volume and flowRate.
+                    params=pe_commands.DispenseParams(
                         pipetteId=pipette_id,
                         labwareId=labware_id,
                         wellName=well_name,
@@ -434,7 +442,8 @@ class LegacyCommandMapper:
                 status=pe_commands.CommandStatus.RUNNING,
                 createdAt=now,
                 startedAt=now,
-                params=pe_commands.BlowOutParams.construct(
+                # Don't .construct() params, because we want to validate flowRate.
+                params=pe_commands.BlowOutParams(
                     pipetteId=pipette_id,
                     labwareId=labware_id,
                     wellName=well_name,
