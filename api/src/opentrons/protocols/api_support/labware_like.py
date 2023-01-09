@@ -4,10 +4,11 @@ from typing import TYPE_CHECKING, Optional, Union, cast, Tuple, List, Set
 if TYPE_CHECKING:
     from opentrons.protocol_api.labware import Labware, Well
     from opentrons.protocol_api.core.protocol_api.module_geometry import ModuleGeometry
+    from opentrons.protocol_api.protocol_context import ModuleTypes
 
 
 WrappableLabwareLike = Union[
-    "Labware", "Well", str, "ModuleGeometry", "LabwareLike", None
+    "Labware", "Well", str, "ModuleGeometry", "LabwareLike", None, "ModuleTypes"
 ]
 
 
@@ -84,7 +85,7 @@ class LabwareLike:
         parent = None
         if self.has_parent:
             parent = self.object.parent  # type: ignore
-        return LabwareLike(parent)  # type: ignore[arg-type]
+        return LabwareLike(parent)
 
     @property
     def is_well(self) -> bool:
