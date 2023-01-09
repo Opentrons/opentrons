@@ -16,6 +16,7 @@ class LabwareLikeType(int, Enum):
     SLOT = auto()
     WELL = auto()
     MODULE = auto()
+    MODULE_CONTEXT = auto()
     NONE = auto()
 
 
@@ -31,6 +32,7 @@ class LabwareLike:
         from opentrons.protocol_api.core.protocol_api.module_geometry import (
             ModuleGeometry,
         )
+        from opentrons.protocol_api.module_contexts import ModuleContext
 
         self._labware_like = labware_like
         self._type = LabwareLikeType.NONE
@@ -46,7 +48,9 @@ class LabwareLike:
         elif isinstance(self._labware_like, str):
             self._type = LabwareLikeType.SLOT
             self._as_str = self._labware_like
-        # TODO(mc, 2023-01-06): add `ModuleContext` to this check
+        elif isinstance(self._labware_like, ModuleContext):
+            self._type = LabwareLikeType.MODULE_CONTEXT
+            self._as_str = repr(self._labware_like)
         elif isinstance(self._labware_like, ModuleGeometry):
             self._type = LabwareLikeType.MODULE
             self._as_str = repr(self._labware_like)
