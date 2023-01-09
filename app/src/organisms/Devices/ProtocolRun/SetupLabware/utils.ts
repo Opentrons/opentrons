@@ -91,11 +91,7 @@ export function getLabwareSetupItemGroups(
 export function getLatestCurrentOffsets(
   currentOffsets: LabwareOffset[]
 ): LabwareOffset[] {
-  const nonIdentityOffsets = currentOffsets.filter(
-    currentOffset => !isEqual(currentOffset.vector, IDENTITY_VECTOR)
-  )
-
-  const latestCurrentOffsets = nonIdentityOffsets.reduce<LabwareOffset[]>(
+  const latestCurrentOffsets = currentOffsets.reduce<LabwareOffset[]>(
     (acc, offset) => {
       const previousMatchIndex = acc.findIndex(
         currentLabwareOffsets =>
@@ -118,5 +114,9 @@ export function getLatestCurrentOffsets(
     []
   )
 
-  return latestCurrentOffsets
+  const nonIdentityOffsets = latestCurrentOffsets.filter(
+    currentOffset => !isEqual(currentOffset.vector, IDENTITY_VECTOR)
+  )
+
+  return nonIdentityOffsets 
 }
