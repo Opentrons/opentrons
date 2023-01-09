@@ -99,6 +99,93 @@ CompletedTaskList.args = {
   ],
 }
 
+export const CompletedTaskListWithFinalSubtask = Template.bind({})
+CompletedTaskListWithFinalSubtask.args = {
+  activeIndex: null,
+  taskList: [
+    {
+      title: 'task 1',
+      description: 'this is the first task',
+      footer: 'it happened at noon',
+      subTasks: [
+        {
+          title: 'subtask 1',
+          description: 'this is the first subtask',
+          cta: {
+            label: 'do this',
+            onClick: () => console.log('click 1'),
+          },
+        },
+      ],
+    },
+    {
+      title: 'the second task',
+      description:
+        'the second task happens after the first, and has longer text so that we can see what it looks like with longer text',
+      cta: {
+        label: 'do the second thing',
+        onClick: () => console.log('click 2'),
+      },
+      subTasks: [],
+    },
+    {
+      title: 'a third task',
+      description: 'in the future',
+      subTasks: [
+        {
+          title: 'subtask 1',
+          description: 'this is the first subtask',
+          cta: {
+            label: 'do this',
+            onClick: () => console.log('click 1'),
+          },
+        },
+      ],
+    },
+    {
+      title: 'task 4',
+      description: 'already done',
+      isComplete: true,
+      cta: {
+        label: 'redo',
+        onClick: () => console.log('redo'),
+      },
+      subTasks: [],
+    },
+    {
+      title: 'a fifth task',
+      description: 'we need a third task',
+      subTasks: [
+        {
+          title: 'subtask 1',
+          description: 'this is the first subtask',
+          cta: {
+            label: 'do this',
+            onClick: () => console.log('click 1'),
+          },
+        },
+        {
+          title: 'subtask 2',
+          description: 'this is the second subtask',
+          cta: {
+            label: 'calibrate this',
+            onClick: () => console.log('click 1'),
+          },
+        },
+        {
+          title: 'subtask 3',
+          description: 'this is the third subtask: it is complete',
+          isComplete: true,
+          cta: {
+            label: 'calibrate this',
+            onClick: () => console.log('click 1'),
+          },
+        },
+      ],
+    },
+  ],
+}
+
 export const InProgressTaskList = Template.bind({})
 InProgressTaskList.args = {
   activeIndex: [2, 1],
@@ -182,6 +269,93 @@ InProgressTaskList.args = {
         onClick: () => console.log('redo'),
       },
       subTasks: [],
+    },
+  ],
+}
+
+export const InProgressTaskListwithFinalSubtask = Template.bind({})
+InProgressTaskListwithFinalSubtask.args = {
+  activeIndex: [4, 1],
+  taskList: [
+    {
+      title: 'task 1',
+      description: 'this is the first task',
+      footer: 'it happened at noon',
+      subTasks: [
+        {
+          title: 'subtask 1',
+          description: 'this is the first subtask',
+          cta: {
+            label: 'do this',
+            onClick: () => console.log('click 1'),
+          },
+        },
+      ],
+    },
+    {
+      title: 'the second task',
+      description:
+        'the second task happens after the first, and has longer text so that we can see what it looks like with longer text',
+      cta: {
+        label: 'do the second thing',
+        onClick: () => console.log('click 2'),
+      },
+      subTasks: [],
+    },
+    {
+      title: 'a third task',
+      description: 'in the future',
+      subTasks: [
+        {
+          title: 'subtask 1',
+          description: 'this is the first subtask',
+          cta: {
+            label: 'do this',
+            onClick: () => console.log('click 1'),
+          },
+        },
+      ],
+    },
+    {
+      title: 'task 4',
+      description: 'already done',
+      isComplete: true,
+      cta: {
+        label: 'redo',
+        onClick: () => console.log('redo'),
+      },
+      subTasks: [],
+    },
+    {
+      title: 'a Fifth task',
+      description: 'we need a fifth task',
+      subTasks: [
+        {
+          title: 'subtask 1',
+          description: 'this is the first subtask',
+          cta: {
+            label: 'do this',
+            onClick: () => console.log('click 1'),
+          },
+        },
+        {
+          title: 'subtask 2',
+          description: 'this is the second subtask',
+          cta: {
+            label: 'calibrate this',
+            onClick: () => console.log('click 1'),
+          },
+        },
+        {
+          title: 'subtask 3',
+          description: 'this is the third subtask: it is complete',
+          isComplete: true,
+          cta: {
+            label: 'calibrate this',
+            onClick: () => console.log('click 1'),
+          },
+        },
+      ],
     },
   ],
 }
