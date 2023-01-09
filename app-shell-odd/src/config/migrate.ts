@@ -21,7 +21,7 @@ export const DEFAULTS_V12: ConfigV12 = {
   log: { level: { file: 'debug', console: 'info' } },
   ui: {
     width: 1024,
-    height: 768,
+    height: 600,
     url: { protocol: 'file:', path: 'ui/index.html' },
     webPreferences: { webSecurity: true },
     minWidth: 600,
