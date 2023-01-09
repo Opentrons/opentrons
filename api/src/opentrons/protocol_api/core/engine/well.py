@@ -115,7 +115,7 @@ class WellCore(AbstractWellCore):
     # Make this change carefully with respect to the robot-server because
     # `WellOrigin` is a public enum that may be persisted
     def get_center(self) -> Point:
-        """Get the coordinate of the well's center, with a z-offset."""
+        """Get the coordinate of the well's center."""
         well_height = self._engine_client.state.geometry.get_well_height(
             labware_id=self.labware_id, well_name=self._name
         )

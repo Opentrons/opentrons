@@ -321,9 +321,18 @@ class LabwareView(HasState[LabwareState]):
             ) from e
 
     def get_well_size(
-        self, labware_id: str, well_name: Optional[str] = None
+        self, labware_id: str, well_name: str
     ) -> Tuple[float, float, float]:
-        """Get a well's size in x, y, z dimensions based on its shape."""
+        """Get a well's size in x, y, z dimensions based on its shape.
+
+        Args:
+            labware_id: Labware identifier.
+            well_name: Name of well in labware.
+
+        Returns:
+            A tuple of dimensions in x, y, and z. If well is circular,
+            the x and y dimensions will both be set to the diameter.
+        """
         well_definition = self.get_well_definition(labware_id, well_name)
 
         if well_definition.diameter is not None:

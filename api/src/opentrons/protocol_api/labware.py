@@ -111,7 +111,7 @@ class Well:
     def geometry(self) -> WellGeometry:
         if isinstance(self._impl, LegacyWellCore):
             return self._impl.geometry
-        raise APIVersionError("WellCore.geometry has been deprecated.")
+        raise APIVersionError("Well.geometry has been deprecated.")
 
     @property  # type: ignore
     @requires_version(2, 0)
