@@ -86,6 +86,7 @@ describe('CurrentOffsetsModal', () => {
       commands: protocolWithTC.commands,
       onCloseClick: jest.fn(),
       runId: RUN_ID_1,
+      handleRelaunchLPC: jest.fn(),
       robotName: 'otie',
     }
     mockUseLPCDisabledReason.mockReturnValue(null)
@@ -114,8 +115,8 @@ describe('CurrentOffsetsModal', () => {
     getByText('labware offset data')
     getByText('cancel').click()
     expect(props.onCloseClick).toHaveBeenCalled()
-    getByTestId('CurrentOffsetsModal_lpcButton').click()
-    getByText('mock labware position check')
+    getByText('run labware position check').click()
+    expect(props.handleRelaunchLPC).toHaveBeenCalled()
   })
 
   it('renders 1 offset with the correct information', () => {
@@ -132,7 +133,7 @@ describe('CurrentOffsetsModal', () => {
   })
   it('renders the LPC button as disabled when there is a disabled reason', () => {
     mockUseLPCDisabledReason.mockReturnValue('mockDisabledReason')
-    const { getByTestId } = render(props)
-    expect(getByTestId('CurrentOffsetsModal_lpcButton')).toBeDisabled()
+    const { getByText } = render(props)
+    expect(getByText('run labware position check')).toBeDisabled()
   })
 })
