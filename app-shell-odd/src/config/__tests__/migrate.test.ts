@@ -1,7 +1,5 @@
 // config migration tests
-import {
-  MOCK_CONFIG_V12,
-} from '../__fixtures__'
+import { MOCK_CONFIG_V12 } from '../__fixtures__'
 import { migrate } from '../migrate'
 
 describe('config migration', () => {
