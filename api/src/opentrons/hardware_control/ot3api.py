@@ -37,6 +37,7 @@ from opentrons_hardware.hardware_control.motion_planning import (
     ZeroLengthMoveError,
 )
 
+from opentrons_hardware.hardware_control.motion import MoveStopCondition
 
 from .util import use_or_initialize_loop, check_motion_bounds
 
@@ -767,6 +768,7 @@ class OT3API(
         speed: Optional[float] = None,
         critical_point: Optional[CriticalPoint] = None,
         max_speeds: Union[None, Dict[Axis, float], OT3AxisMap[float]] = None,
+        check_stalls: bool = False,
     ) -> None:
         """Move the critical point of the specified mount to a location
         relative to the deck, at the specified speed."""
@@ -793,7 +795,12 @@ class OT3API(
 
         await self._cache_and_maybe_retract_mount(realmount)
         await self._move_gripper_to_idle_position(realmount)
-        await self._move(target_position, speed=speed, max_speeds=checked_max)
+        await self._move(
+            target_position,
+            speed=speed,
+            max_speeds=checked_max,
+            check_stalls=check_stalls,
+        )
 
     async def move_rel(
         self,
@@ -803,6 +810,7 @@ class OT3API(
         max_speeds: Union[None, Dict[Axis, float], OT3AxisMap[float]] = None,
         check_bounds: MotionChecks = MotionChecks.NONE,
         fail_on_not_homed: bool = False,
+        check_stalls: bool = False,
     ) -> None:
         """Move the critical point of the specified mount by a specified
         displacement in a specified direction, at the specified speed."""
@@ -842,6 +850,7 @@ class OT3API(
             speed=speed,
             max_speeds=checked_max,
             check_bounds=check_bounds,
+            check_stalls=check_stalls,
         )
 
     async def _cache_and_maybe_retract_mount(self, mount: OT3Mount) -> None:
@@ -886,6 +895,7 @@ class OT3API(
         max_speeds: Optional[OT3AxisMap[float]] = None,
         acquire_lock: bool = True,
         check_bounds: MotionChecks = MotionChecks.NONE,
+        check_stalls: bool = False,
     ) -> None:
         """Worker function to apply robot motion."""
         machine_pos = machine_from_deck(
@@ -923,7 +933,11 @@ class OT3API(
             if acquire_lock:
                 await stack.enter_async_context(self._motion_lock)
             try:
-                await self._backend.move(origin, moves[0])
+                await self._backend.move(
+                    origin,
+                    moves[0],
+                    MoveStopCondition.stall if check_stalls else MoveStopCondition.none,
+                )
                 encoder_machine_pos = await self._backend.update_encoder_position()
             except Exception:
                 self._log.exception("Move failed")

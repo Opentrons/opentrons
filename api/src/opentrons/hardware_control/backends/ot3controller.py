@@ -240,7 +240,7 @@ class OT3Controller:
         self,
         origin: Coordinates[OT3Axis, float],
         moves: List[Move[OT3Axis]],
-        stop_condition: MoveStopCondition = MoveStopCondition.stall,
+        stop_condition: MoveStopCondition = MoveStopCondition.none,
     ) -> None:
         """Move to a position.
 

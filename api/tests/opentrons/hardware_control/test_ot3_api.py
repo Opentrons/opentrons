@@ -32,6 +32,7 @@ from opentrons.hardware_control import ThreadManager
 from opentrons.hardware_control.backends.ot3utils import axis_to_node
 from opentrons.types import Point, Mount
 
+from opentrons_hardware.hardware_control.motion import MoveStopCondition
 
 from opentrons.config import gripper_config as gc, ot3_pipette_config
 from opentrons_shared_data.gripper.dev_types import GripperModel
@@ -659,7 +660,7 @@ async def test_gripper_move_to(
     await ot3_hardware.cache_gripper(instr_data)
 
     await ot3_hardware.move_to(OT3Mount.GRIPPER, Point(0, 0, 0))
-    origin, moves = mock_backend_move.call_args_list[0][0]
+    origin, moves, _ = mock_backend_move.call_args_list[0][0]
     # The moves that it emits should move only x, y, and the gripper z
     assert origin == {
         OT3Axis.X: 0,
@@ -677,6 +678,25 @@ async def test_gripper_move_to(
             OT3Axis.Y,
             OT3Axis.Z_G,
         ]
+
+
+@pytest.mark.parametrize("enable_stalls", [True, False])
+async def test_move_stall_flag(
+    ot3_hardware: ThreadManager[OT3API],
+    mock_backend_move: AsyncMock,
+    enable_stalls: bool,
+) -> None:
+
+    expected = MoveStopCondition.stall if enable_stalls else MoveStopCondition.none
+
+    await ot3_hardware.move_to(Mount.LEFT, Point(0, 0, 0), check_stalls=enable_stalls)
+    _, _, condition = mock_backend_move.call_args_list[0][0]
+    assert condition == expected
+
+    mock_backend_move.reset_mock()
+    await ot3_hardware.move_rel(Mount.LEFT, Point(0, 0, 0), check_stalls=enable_stalls)
+    _, _, condition = mock_backend_move.call_args_list[0][0]
+    assert condition == expected
 
 
 @pytest.mark.parametrize(
