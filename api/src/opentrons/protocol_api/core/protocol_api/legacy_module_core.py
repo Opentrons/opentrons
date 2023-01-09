@@ -93,6 +93,8 @@ class LegacyModuleCore(AbstractModuleCore):
             Labware(
                 implementation=labware_core,
                 api_version=self._protocol_core.api_version,
+                protocol_core=None,  # type: ignore[arg-type]
+                core_map=None,  # type: ignore[arg-type]
             )
         )
         self._protocol_core.get_deck().recalculate_high_z()
