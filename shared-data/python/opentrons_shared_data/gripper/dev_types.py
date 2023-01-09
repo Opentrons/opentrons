@@ -118,7 +118,7 @@ class GripperDefinitionV1:
                 ),
                 pin_one_offset_from_base=GripperOffset(**data["pinOneOffsetFromBase"]),
                 pin_two_offset_from_base=GripperOffset(**data["pinTwoOffsetFromBase"]),
-                pin_center_offset_from_base=GripperOffset(**data["pinCenterOffsetFromBase"]),
+                pin_center_offset_from_base=GripperOffset(**data["pinCenterInsertedOffsetFromBase"]),
                 quirks=data["quirks"],
                 jaw_sizes_mm=data["jawSizes_mm"],
             )
