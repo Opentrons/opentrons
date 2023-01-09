@@ -18,7 +18,7 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition, LabwarePa
 
 from opentrons.types import Location, Point
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import requires_version, APIVersionError
+from opentrons.protocols.api_support.util import requires_version
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 

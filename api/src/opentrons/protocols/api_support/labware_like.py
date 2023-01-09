@@ -120,11 +120,12 @@ class LabwareLike:
 
     def as_module(self) -> Union["ModuleContext", "ModuleGeometry"]:
         from opentrons.protocol_api.core.protocol_api.module_geometry import (
-            ModuleGeometry)
+            ModuleGeometry,
+        )
         from opentrons.protocol_api.module_contexts import ModuleContext
 
         if isinstance(self.object, ModuleContext):
-            return cast(ModuleContext, self.object)
+            return self.object
 
         return cast(ModuleGeometry, self.object)
 

@@ -396,5 +396,5 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         if isinstance(labware_location, DeckSlotLocation):
             return labware_location.slotName
         elif isinstance(labware_location, ModuleLocation):
-            return self._get_module_core_item(labware_location.moduleId)
+            return self._module_cores_by_id.get(labware_location.moduleId)
         return None
