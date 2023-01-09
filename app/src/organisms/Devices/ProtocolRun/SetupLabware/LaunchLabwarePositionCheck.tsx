@@ -154,6 +154,10 @@ export function LaunchLabwarePositionCheck(
           currentOffsets={currentOffsets}
           commands={protocolData?.commands ?? []}
           onCloseClick={() => setShowCurrentOffsetsModal(false)}
+          handleRelaunchLPC={() => {
+            setShowCurrentOffsetsModal(false)
+            setShowLabwarePositionCheckModal(true)
+          }}
           runId={runId}
           robotName={robotName}
         />

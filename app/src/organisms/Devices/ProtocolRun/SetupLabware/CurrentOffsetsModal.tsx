@@ -28,7 +28,6 @@ import { ModalHeader, ModalShell } from '../../../../molecules/Modal'
 import { PrimaryButton } from '../../../../atoms/buttons'
 import { Tooltip } from '../../../../atoms/Tooltip'
 import { OffsetVector } from '../../../../molecules/OffsetVector'
-import { LabwarePositionCheck } from '../../../LabwarePositionCheck'
 import { useLPCDisabledReason } from '../../hooks'
 import { getLatestCurrentOffsets } from './utils'
 
@@ -63,11 +62,19 @@ interface CurrentOffsetsModalProps {
   runId: string
   robotName: string
   onCloseClick: () => void
+  handleRelaunchLPC: () => void
 }
 export function CurrentOffsetsModal(
   props: CurrentOffsetsModalProps
 ): JSX.Element {
-  const { currentOffsets, commands, runId, robotName, onCloseClick } = props
+  const {
+    currentOffsets,
+    commands,
+    runId,
+    robotName,
+    onCloseClick,
+    handleRelaunchLPC,
+  } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const defsByURI = getLoadedLabwareDefinitionsByUri(commands)
   const [showCodeSnippet, setShowCodeSnippet] = React.useState<boolean>(false)
@@ -78,113 +85,95 @@ export function CurrentOffsetsModal(
     placement: TOOLTIP_LEFT,
   })
   const lpcDisabledReason = useLPCDisabledReason(robotName, runId)
-  const [
-    showLabwarePositionCheckModal,
-    setShowLabwarePositionCheckModal,
-  ] = React.useState(false)
   const latestCurrentOffsets = getLatestCurrentOffsets(currentOffsets)
   return (
-    <>
-      {showLabwarePositionCheckModal && (
-        <LabwarePositionCheck
-          onCloseClick={() => setShowLabwarePositionCheckModal(false)}
-          runId={runId}
-        />
-      )}
-      <ModalShell
-        maxWidth="40rem"
-        header={
-          <ModalHeader
-            title={t('applied_offset_data')}
-            onClose={onCloseClick}
-          />
-        }
+    <ModalShell
+      maxWidth="40rem"
+      header={
+        <ModalHeader title={t('applied_offset_data')} onClose={onCloseClick} />
+      }
+    >
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        padding={SPACING.spacing6}
       >
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-          padding={SPACING.spacing6}
-        >
-          {isLabwareOffsetCodeSnippetsOn ? (
-            <Link
-              role="link"
-              css={TYPOGRAPHY.labelSemiBold}
-              color={COLORS.darkBlackEnabled}
-              onClick={() => setShowCodeSnippet(true)}
-            >
-              {t('get_labware_offset_data')}
-            </Link>
-          ) : null}
-          {showCodeSnippet ? (
-            <PrimaryButton onClick={() => setShowCodeSnippet(false)}>
-              TODO ADD JUPYTER/CLI SNIPPET SUPPORT
-            </PrimaryButton>
-          ) : null}
-          <OffsetTable>
-            <thead>
-              <tr>
-                <OffsetTableHeader>{t('location')}</OffsetTableHeader>
-                <OffsetTableHeader>{t('labware')}</OffsetTableHeader>
-                <OffsetTableHeader>
-                  {t('labware_offset_data')}
-                </OffsetTableHeader>
-              </tr>
-            </thead>
-            <tbody>
-              {latestCurrentOffsets.map(offset => {
-                const labwareDisplayName =
-                  offset.definitionUri in defsByURI
-                    ? getLabwareDisplayName(defsByURI[offset.definitionUri])
-                    : offset.definitionUri
-                return (
-                  <OffsetTableRow key={offset.id}>
-                    <OffsetTableDatum>
-                      {t('slot', { slotName: offset.location.slotName })}
-                      {offset.location.moduleModel != null
-                        ? ` - ${getModuleDisplayName(
-                            offset.location.moduleModel
-                          )}`
-                        : null}
-                    </OffsetTableDatum>
-                    <OffsetTableDatum>{labwareDisplayName}</OffsetTableDatum>
-                    <OffsetTableDatum>
-                      <OffsetVector {...offset.vector} />
-                    </OffsetTableDatum>
-                  </OffsetTableRow>
-                )
-              })}
-            </tbody>
-          </OffsetTable>
-          <Flex
-            width="100%"
-            marginTop={SPACING.spacing6}
-            justifyContent={JUSTIFY_FLEX_END}
-            alignItems={ALIGN_CENTER}
-            gridGap={SPACING.spacing3}
+        {isLabwareOffsetCodeSnippetsOn ? (
+          <Link
+            role="link"
+            css={TYPOGRAPHY.labelSemiBold}
+            color={COLORS.darkBlackEnabled}
+            onClick={() => setShowCodeSnippet(true)}
           >
-            <Link
-              css={TYPOGRAPHY.linkPSemiBold}
-              textTransform={TYPOGRAPHY.textTransformCapitalize}
-              onClick={onCloseClick}
-              role="button"
-            >
-              {t('shared:cancel')}
-            </Link>
-            <PrimaryButton
-              textTransform={TYPOGRAPHY.textTransformCapitalize}
-              onClick={() => setShowLabwarePositionCheckModal(true)}
-              disabled={lpcDisabledReason !== null}
-              {...targetProps}
-              data-testid={'CurrentOffsetsModal_lpcButton'}
-            >
-              {t('run_labware_position_check')}
-            </PrimaryButton>
-            {lpcDisabledReason !== null ? (
-              <Tooltip tooltipProps={tooltipProps}>{lpcDisabledReason}</Tooltip>
-            ) : null}
-          </Flex>
+            {t('get_labware_offset_data')}
+          </Link>
+        ) : null}
+        {showCodeSnippet ? (
+          <PrimaryButton onClick={() => setShowCodeSnippet(false)}>
+            TODO ADD JUPYTER/CLI SNIPPET SUPPORT
+          </PrimaryButton>
+        ) : null}
+        <OffsetTable>
+          <thead>
+            <tr>
+              <OffsetTableHeader>{t('location')}</OffsetTableHeader>
+              <OffsetTableHeader>{t('labware')}</OffsetTableHeader>
+              <OffsetTableHeader>{t('labware_offset_data')}</OffsetTableHeader>
+            </tr>
+          </thead>
+          <tbody>
+            {latestCurrentOffsets.map(offset => {
+              const labwareDisplayName =
+                offset.definitionUri in defsByURI
+                  ? getLabwareDisplayName(defsByURI[offset.definitionUri])
+                  : offset.definitionUri
+              return (
+                <OffsetTableRow key={offset.id}>
+                  <OffsetTableDatum>
+                    {t('slot', { slotName: offset.location.slotName })}
+                    {offset.location.moduleModel != null
+                      ? ` - ${getModuleDisplayName(
+                          offset.location.moduleModel
+                        )}`
+                      : null}
+                  </OffsetTableDatum>
+                  <OffsetTableDatum>{labwareDisplayName}</OffsetTableDatum>
+                  <OffsetTableDatum>
+                    <OffsetVector {...offset.vector} />
+                  </OffsetTableDatum>
+                </OffsetTableRow>
+              )
+            })}
+          </tbody>
+        </OffsetTable>
+        <Flex
+          width="100%"
+          marginTop={SPACING.spacing6}
+          justifyContent={JUSTIFY_FLEX_END}
+          alignItems={ALIGN_CENTER}
+          gridGap={SPACING.spacing3}
+        >
+          <Link
+            css={TYPOGRAPHY.linkPSemiBold}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
+            onClick={onCloseClick}
+            role="button"
+          >
+            {t('shared:cancel')}
+          </Link>
+          <PrimaryButton
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
+            onClick={handleRelaunchLPC}
+            disabled={lpcDisabledReason !== null}
+            {...targetProps}
+          >
+            {t('run_labware_position_check')}
+          </PrimaryButton>
+          {lpcDisabledReason !== null ? (
+            <Tooltip tooltipProps={tooltipProps}>{lpcDisabledReason}</Tooltip>
+          ) : null}
         </Flex>
-      </ModalShell>
-    </>
+      </Flex>
+    </ModalShell>
   )
 }

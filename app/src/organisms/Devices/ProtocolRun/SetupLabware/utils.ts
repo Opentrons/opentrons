@@ -118,5 +118,5 @@ export function getLatestCurrentOffsets(
     currentOffset => !isEqual(currentOffset.vector, IDENTITY_VECTOR)
   )
 
-  return nonIdentityOffsets 
+  return nonIdentityOffsets
 }
