@@ -268,6 +268,12 @@ class OT3SubSystem(enum.Enum):
         return self.name
 
 
+class OT2SubSystem(enum.Enum):
+    """An enumeration of programmable OT-2 components."""
+
+    motor_control_board = 0
+
+
 BCAxes = Union[Axis, OT3Axis]
 AxisMapValue = TypeVar("AxisMapValue")
 OT3AxisMap = Dict[OT3Axis, AxisMapValue]

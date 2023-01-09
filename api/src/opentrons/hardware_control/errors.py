@@ -1,4 +1,5 @@
-from .types import OT3Mount
+from typing import List, Union
+from .types import OT3Mount, OT3SubSystem, OT2SubSystem
 
 
 class OutOfBoundsMove(RuntimeError):
@@ -67,3 +68,14 @@ class InvalidPipetteModel(KeyError):
     def __str__(self) -> str:
         return f"{self.__class__.__name__}: {self.name} on {self.mount.name} has an unknown model {self.model}"
 
+
+class FirmwareUpdateRequiredError(Exception):
+    """
+    Raised when an operation cannot happen because one or more connected
+    devices requires a firmware update.
+    """
+
+    required_for: List[Union[OT2SubSystem, OT3SubSystem]]
+
+    def __init__(self, to_update: List[Union[OT2SubSystem, OT3SubSystem]]) -> None:
+        self.required_for = to_update
