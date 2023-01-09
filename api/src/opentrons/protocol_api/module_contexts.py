@@ -194,8 +194,9 @@ class ModuleContext(CommandPublisher):
         labware_core = self._protocol_core.get_labware_on_module(self._core)
         return self._core_map.get(labware_core)
 
+    # TODO (tz, 1-7-23): change this to version 2.14?
     @property  # type: ignore[misc]
-    @requires_version(2, 14)
+    @requires_version(2, 13)
     def parent(self) -> str:
         """The parent of this labware. Usually a slot name."""
         return self._core.get_deck_slot()
