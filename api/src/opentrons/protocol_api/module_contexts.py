@@ -198,7 +198,7 @@ class ModuleContext(CommandPublisher):
     @property  # type: ignore[misc]
     @requires_version(2, 13)
     def parent(self) -> str:
-        """The parent of this labware. Usually a slot name."""
+        """The name of the slot the module is on."""
         return self._core.get_deck_slot()
 
     @property  # type: ignore[misc]
