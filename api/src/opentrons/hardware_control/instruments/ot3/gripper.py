@@ -163,10 +163,10 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
             raise RuntimeError(
                 f"must grip the jaws before starting calibration (jaw displacement is {self.current_jaw_displacement})"
             )
-        if self.current_jaw_displacement > self._max_jaw_displacement() - 1:
-            raise RuntimeError(
-                f"must hold something between gripper jaws during calibration (jaw displacement is {self.current_jaw_displacement})"
-            )
+        # if self.current_jaw_displacement > self._max_jaw_displacement() - 1:
+        #     raise RuntimeError(
+        #         f"must hold something between gripper jaws during calibration (jaw displacement is {self.current_jaw_displacement})"
+        #     )
 
     def critical_point(self, cp_override: Optional[CriticalPoint] = None) -> Point:
         """
