@@ -48,10 +48,7 @@ class LabwareLike:
         elif isinstance(self._labware_like, str):
             self._type = LabwareLikeType.SLOT
             self._as_str = self._labware_like
-        elif isinstance(self._labware_like, ModuleContext):
-            self._type = LabwareLikeType.MODULE
-            self._as_str = repr(self._labware_like)
-        elif isinstance(self._labware_like, ModuleGeometry):
+        elif isinstance(self._labware_like, (ModuleGeometry, ModuleContext)):
             self._type = LabwareLikeType.MODULE
             self._as_str = repr(self._labware_like)
         elif isinstance(self._labware_like, LabwareLike):
