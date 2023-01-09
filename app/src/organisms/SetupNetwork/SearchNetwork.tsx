@@ -46,7 +46,7 @@ export function SearchNetwork(): JSX.Element {
             lineHeight="2.72375rem"
             marginTop={SPACING.spacingXXL}
           >
-            {t('searching_for_network')}
+            {t('searching_for_networks')}
           </StyledText>
         </Flex>
       </Flex>
