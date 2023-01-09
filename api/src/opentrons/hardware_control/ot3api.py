@@ -760,6 +760,18 @@ class OT3API(
             z=cur_pos[OT3Axis.by_mount(realmount)],
         )
 
+    async def home_and_recover_position(
+        self, mount: OT3Mount, axes_moving: List[OT3Axis]
+    ) -> None:
+        origin = await self.gantry_position(mount)
+        await self._cache_and_maybe_retract_mount(mount)
+        await self._move_gripper_to_idle_position(mount)
+        await self.home(axes_moving)
+        for ax in axes_moving:
+            # move back to the origin location one axis at a time after homing all axes
+            here = await self.gantry_position(mount, refresh=True)
+            await self.move_to(mount, ax.set_in_point(here, ax.of_point(origin)))
+
     async def move_to(
         self,
         mount: Union[top_types.Mount, OT3Mount],
@@ -774,7 +786,8 @@ class OT3API(
 
         axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
         if not self._backend.check_ready_for_movement(axes_moving):
-            await self.home(axes_moving)
+            self._log.info(f"Motor status not ok, homing all moving axes.")
+            await self.home_and_recover_position(realmount, axes_moving)
 
         target_position = target_position_from_absolute(
             realmount,
@@ -820,7 +833,7 @@ class OT3API(
             if fail_on_not_homed:
                 raise mhe
             else:
-                await self.home(axes_moving)
+                await self.home_and_recover_position(realmount, axes_moving)
 
         target_position = target_position_from_relative(
             realmount, delta, self._current_position
