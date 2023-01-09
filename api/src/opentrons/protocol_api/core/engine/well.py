@@ -1,5 +1,5 @@
 """ProtocolEngine-based Well core implementations."""
-from typing import Optional, cast
+from typing import Optional
 
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
@@ -8,6 +8,7 @@ from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.types import Point
 
+from . import point_calculations
 from ..well import AbstractWellCore
 
 
@@ -122,16 +123,14 @@ class WellCore(AbstractWellCore):
 
     def from_center_cartesian(self, x: float, y: float, z: float) -> Point:
         """Gets point in deck coordinates based on percentage of the radius of each axis."""
-        center = self.get_center()
-        if self.diameter is not None:
-            x_size = y_size = self.diameter
-        else:
-            # If diameter is None we know these values will be floats
-            x_size = cast(float, self.length)
-            y_size = cast(float, self.width)
+        well_size = self._engine_client.state.labware.get_well_size(
+            labware_id=self.labware_id, well_name=self._name
+        )
 
-        return Point(
-            x=center.x + (x * (x_size / 2.0)),
-            y=center.y + (y * (y_size / 2.0)),
-            z=center.z + (z * (self.depth / 2.0)),
+        return point_calculations.get_relative_offset(
+            point=self.get_center(),
+            size=well_size,
+            x_ratio=x,
+            y_ratio=y,
+            z_ratio=z,
         )
