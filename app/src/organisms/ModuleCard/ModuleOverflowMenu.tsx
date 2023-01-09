@@ -74,11 +74,11 @@ export const ModuleOverflowMenu = (
           menuOverflowItemsByModuleType[module.moduleType].map(
             (item: any, index: number) => {
               return (
-                <React.Fragment key={`${index}_${module.moduleType}`}>
+                <React.Fragment key={`${index}_${String(module.moduleType)}`}>
                   <MenuItem
-                    key={`${index}_${module.moduleModel}`}
+                    key={`${index}_${String(module.moduleModel)}`}
                     onClick={() => item.onClick(item.isSecondary)}
-                    data-testid={`module_setting_${module.moduleModel}`}
+                    data-testid={`module_setting_${String(module.moduleModel)}`}
                     disabled={item.disabledReason || isDisabled}
                     whiteSpace="nowrap"
                   >

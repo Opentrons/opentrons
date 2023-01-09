@@ -9,6 +9,7 @@ import {
   Flex,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
+  useHoverTooltip,
   useMountEffect,
 } from '@opentrons/components'
 import { checkShellUpdate } from '../../redux/shell'
@@ -16,11 +17,14 @@ import { restartRobot } from '../../redux/robot-admin'
 import { home, ROBOT } from '../../redux/robot-controls'
 import { UNREACHABLE, CONNECTABLE, REACHABLE } from '../../redux/discovery'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
+import { Tooltip } from '../../atoms/Tooltip'
 import { Portal } from '../../App/portal'
 import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { Divider } from '../../atoms/structure'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
+import { useCurrentRunId } from '../ProtocolUpload/hooks'
+import { ChooseProtocolSlideout } from '../ChooseProtocolSlideout'
 import { useIsRobotBusy } from './hooks'
 import { UpdateBuildroot } from './RobotSettings/UpdateBuildroot'
 
@@ -35,7 +39,7 @@ export const RobotOverviewOverflowMenu = (
   props: RobotOverviewOverflowMenuProps
 ): JSX.Element => {
   const { robot } = props
-  const { t } = useTranslation(['devices_landing', 'robot_controls'])
+  const { t } = useTranslation(['devices_landing', 'robot_controls', 'shared'])
   const {
     menuOverlay,
     handleOverflowClick,
@@ -44,6 +48,8 @@ export const RobotOverviewOverflowMenu = (
   } = useMenuHandleClickOutside()
   const history = useHistory()
   const isRobotBusy = useIsRobotBusy()
+  const runId = useCurrentRunId()
+  const [targetProps, tooltipProps] = useHoverTooltip()
 
   const dispatch = useDispatch<Dispatch>()
 
@@ -63,6 +69,10 @@ export const RobotOverviewOverflowMenu = (
     showSoftwareUpdateModal,
     setShowSoftwareUpdateModal,
   ] = React.useState<boolean>(false)
+  const [
+    showChooseProtocolSlideout,
+    setShowChooseProtocolSlideout,
+  ] = React.useState<boolean>(false)
 
   useMountEffect(() => {
     dispatch(checkShellUpdate())
@@ -74,9 +84,18 @@ export const RobotOverviewOverflowMenu = (
     setShowSoftwareUpdateModal(true)
   }
 
+  const handleClickRun: React.MouseEventHandler<HTMLButtonElement> = e => {
+    e.preventDefault()
+    e.stopPropagation()
+    setShowChooseProtocolSlideout(true)
+    setShowOverflowMenu(false)
+  }
+
   const { autoUpdateAction } = useSelector((state: State) => {
     return getBuildrootUpdateDisplayInfo(state, robot.name)
   })
+  const isRobotOnWrongVersionOfSoftware =
+    autoUpdateAction === 'upgrade' || autoUpdateAction === 'downgrade'
   const isRobotUnavailable = isRobotBusy || robot?.status !== CONNECTABLE
 
   return (
@@ -110,25 +129,48 @@ export const RobotOverviewOverflowMenu = (
           right={0}
           flexDirection={DIRECTION_COLUMN}
         >
-          {autoUpdateAction === 'upgrade' && !isRobotUnavailable ? (
+          {isRobotOnWrongVersionOfSoftware && !isRobotUnavailable ? (
             <MenuItem
               onClick={handleClickUpdateBuildroot}
-              data-testid={`RobotOverviewOverflowMenu_updateSoftware_${robot.name}`}
+              data-testid={`RobotOverviewOverflowMenu_updateSoftware_${String(
+                robot.name
+              )}`}
             >
               {t('update_robot_software')}
             </MenuItem>
           ) : null}
+          {robot.status === CONNECTABLE && runId == null ? (
+            <>
+              <MenuItem
+                {...targetProps}
+                onClick={handleClickRun}
+                disabled={isRobotOnWrongVersionOfSoftware || isRobotBusy}
+                data-testid={`RobotOverflowMenu_${robot.name}_runProtocol`}
+              >
+                {t('run_a_protocol')}
+              </MenuItem>
+              {isRobotOnWrongVersionOfSoftware && (
+                <Tooltip tooltipProps={tooltipProps} whiteSpace="normal">
+                  {t('shared:a_software_update_is_available')}
+                </Tooltip>
+              )}
+            </>
+          ) : null}
           <MenuItem
             disabled={isRobotUnavailable}
             onClick={handleClickHomeGantry}
-            data-testid={`RobotOverviewOverflowMenu_homeGantry_${robot.name}`}
+            data-testid={`RobotOverviewOverflowMenu_homeGantry_${String(
+              robot.name
+            )}`}
           >
             {t('home_gantry')}
           </MenuItem>
           <MenuItem
             disabled={isRobotUnavailable}
             onClick={handleClickRestart}
-            data-testid={`RobotOverviewOverflowMenu_restartRobot_${robot.name}`}
+            data-testid={`RobotOverviewOverflowMenu_restartRobot_${String(
+              robot.name
+            )}`}
           >
             {t('robot_controls:restart_label')}
           </MenuItem>
@@ -143,11 +185,20 @@ export const RobotOverviewOverflowMenu = (
               (robot?.status === REACHABLE &&
                 robot?.serverHealthStatus !== 'ok')
             }
-            data-testid={`RobotOverviewOverflowMenu_robotSettings_${robot.name}`}
+            data-testid={`RobotOverviewOverflowMenu_robotSettings_${String(
+              robot.name
+            )}`}
           >
             {t('robot_settings')}
           </MenuItem>
         </Flex>
+      ) : null}
+      {robot.status === CONNECTABLE ? (
+        <ChooseProtocolSlideout
+          robot={robot}
+          showSlideout={showChooseProtocolSlideout}
+          onCloseClick={() => setShowChooseProtocolSlideout(false)}
+        />
       ) : null}
       {menuOverlay}
     </Flex>

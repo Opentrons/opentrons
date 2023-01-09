@@ -1,22 +1,24 @@
 {
   "name": "opentrons",
   "private": true,
-  "workspaces": [
-    "app",
-    "app-shell",
-    "app-shell-odd",
-    "components",
-    "discovery-client",
-    "labware-designer",
-    "labware-library",
-    "protocol-designer",
-    "protocol-library-kludge",
-    "shared-data",
-    "step-generation",
-    "webpack-config",
-    "api-client",
-    "react-api-client"
-  ],
+  "workspaces": {
+    "packages": [
+      "app",
+      "app-shell",
+      "app-shell-odd",
+      "components",
+      "discovery-client",
+      "labware-designer",
+      "labware-library",
+      "protocol-designer",
+      "protocol-library-kludge",
+      "shared-data",
+      "step-generation",
+      "webpack-config",
+      "api-client",
+      "react-api-client"
+    ]
+  },
   "config": {
     "commitizen": {
       "path": "cz-conventional-changelog"

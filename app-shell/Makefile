@@ -48,6 +48,7 @@ no_python_bundle ?=
 
 builder := yarn electron-builder \
 	--config electron-builder.config.js \
+	--config.electronVersion=21.3.1 \
 	--publish never
 
 
@@ -140,6 +141,9 @@ dist-ubuntu-latest: dist-linux
 
 .PHONY: dist-ubuntu-22.04
 dist-ubuntu-22.04: dist-linux
+
+.PHONY: dist-windows-2019
+dist-windows-2019: dist-win
 
 .PHONY: dist-windows-2022
 dist-windows-2022: dist-win

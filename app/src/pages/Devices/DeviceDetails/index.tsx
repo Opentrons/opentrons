@@ -43,7 +43,7 @@ export function DeviceDetails(): JSX.Element | null {
         <Flex
           alignItems={ALIGN_CENTER}
           backgroundColor={COLORS.white}
-          border={`1px solid ${COLORS.medGreyEnabled}`}
+          border={`1px solid ${String(COLORS.medGreyEnabled)}`}
           borderRadius="3px"
           flexDirection={DIRECTION_COLUMN}
           marginBottom={SPACING.spacing4}

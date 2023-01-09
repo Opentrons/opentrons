@@ -8,8 +8,7 @@ import {
   Icon,
   BaseModal,
   NewPrimaryBtn,
-  SPACING_3,
-  SPACING_4,
+  SPACING,
   SIZE_1,
   SIZE_2,
   SIZE_4,
@@ -22,7 +21,6 @@ import {
   C_MED_GRAY,
   ALIGN_FLEX_END,
   BORDER_RADIUS_DEFAULT,
-  SPACING_2,
   FONT_BODY_1_DARK,
 } from '@opentrons/components'
 import { useRunQuery } from '@opentrons/react-api-client'
@@ -59,14 +57,14 @@ export const DownloadOffsetDataModal = (
             flexDirection={DIRECTION_ROW}
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
-            marginBottom={SPACING_3}
+            marginBottom={SPACING.spacing4}
           >
             <Text css={FONT_HEADER_DARK}>{t('get_labware_offset_data')}</Text>
             <Box onClick={onCloseClick} id="DownloadOffsetDataModal_xButton">
               <Icon name="close" size={SIZE_2} />
             </Box>
           </Flex>
-          <Text css={FONT_BODY_1_DARK} marginBottom={SPACING_3}>
+          <Text css={FONT_BODY_1_DARK} marginBottom={SPACING.spacing4}>
             {t('choose_snippet_type')}
           </Text>
           <Flex>
@@ -75,8 +73,10 @@ export const DownloadOffsetDataModal = (
                 key={m}
                 onClick={() => setMode(m)}
                 width={SIZE_5}
-                paddingY={SPACING_2}
-                borderRadius={`${BORDER_RADIUS_DEFAULT} ${BORDER_RADIUS_DEFAULT} 0 0`}
+                paddingY={SPACING.spacing3}
+                borderRadius={`${String(BORDER_RADIUS_DEFAULT)} ${String(
+                  BORDER_RADIUS_DEFAULT
+                )} 0 0`}
                 borderColor={C_MED_GRAY}
                 borderWidth={m === mode ? '1px 1px 0 1px' : '0 0 1px 0'}
               >
@@ -86,15 +86,17 @@ export const DownloadOffsetDataModal = (
             <Box
               flex="1 1 auto"
               alignSelf={ALIGN_FLEX_END}
-              borderRadius={`0 ${BORDER_RADIUS_DEFAULT} 0 0`}
-              borderBottom={`${C_MED_GRAY} 1px solid`}
+              borderRadius={`0 ${String(BORDER_RADIUS_DEFAULT)} 0 0`}
+              borderBottom={`${String(C_MED_GRAY)} 1px solid`}
             />
           </Flex>
           <Flex
-            borderRadius={`0 0 ${BORDER_RADIUS_DEFAULT} ${BORDER_RADIUS_DEFAULT}`}
-            border={`solid ${C_MED_GRAY}`}
+            borderRadius={`0 0 ${String(BORDER_RADIUS_DEFAULT)} ${String(
+              BORDER_RADIUS_DEFAULT
+            )}`}
+            border={`solid ${String(C_MED_GRAY)}`}
             borderWidth="0 1px 1px 1px"
-            padding={SPACING_3}
+            padding={SPACING.spacing4}
           >
             <PythonLabwareOffsetSnippet
               mode={mode}
@@ -102,7 +104,7 @@ export const DownloadOffsetDataModal = (
               labwareOffsets={labwareOffsets}
             />
           </Flex>
-          <Box textAlign={ALIGN_CENTER} marginTop={SPACING_4}>
+          <Box textAlign={ALIGN_CENTER} marginTop={SPACING.spacing6}>
             <NewPrimaryBtn
               onClick={onCloseClick}
               width={SIZE_4}

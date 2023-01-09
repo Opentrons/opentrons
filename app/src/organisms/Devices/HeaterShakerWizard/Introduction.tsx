@@ -78,7 +78,9 @@ const IntroItem = (props: IntroContainerProps): JSX.Element => {
   return (
     <Flex
       marginTop={SPACING.spacing3}
-      border={`${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.medGreyEnabled}`}
+      border={`${String(SPACING.spacingXXS)} ${String(
+        BORDERS.styleSolid
+      )} ${String(COLORS.medGreyEnabled)}`}
       flexDirection={DIRECTION_ROW}
       width="21.5rem"
       paddingBottom={SPACING.spacing3}
@@ -166,7 +168,10 @@ export function Introduction(props: IntroductionProps): JSX.Element {
                   height="4.313rem"
                   css={THERMAL_ADAPTER_TRANSFORM}
                 >
-                  <img src={adapterImage} alt={`${thermalAdapterName}`} />
+                  <img
+                    src={adapterImage}
+                    alt={`${String(thermalAdapterName)}`}
+                  />
                 </Flex>
               ) : undefined
             }
