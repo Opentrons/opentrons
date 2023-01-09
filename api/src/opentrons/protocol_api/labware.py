@@ -330,10 +330,7 @@ class Labware:
             # Type ignoring to preserve backwards compatibility
             return self._implementation.get_geometry().parent.labware.object  # type: ignore
 
-        if self._protocol_core is None or self._core_map is None:
-            raise APIVersionError(
-                "Labware parent is not supported in this api version."
-            )
+        assert self._protocol_core and self._core_map, "Labware initialized incorrectly"
 
         labware_location = self._protocol_core.get_labware_location(
             self._implementation
