@@ -6,7 +6,6 @@ This launches the installed app.
 import importlib
 import os
 
-import rich
 import src.driver.base
 import src.menus.left_menu
 import src.pages.app_settings
@@ -16,14 +15,12 @@ import src.pages.labware_position_check
 import src.pages.protocol_landing
 import src.resources.ot_robot
 import src.resources.robot_data
+from conftest import _chrome_options
 from dotenv import find_dotenv, load_dotenv
-from rich import inspect, pretty, traceback
+from rich import pretty, traceback
 from rich.console import Console
 from rich.table import Table
 from selenium.webdriver.chrome.webdriver import WebDriver
-from selenium.webdriver.common.by import By
-
-from conftest import _chrome_options
 
 # to make printing pretty
 console = Console()
@@ -80,9 +77,7 @@ def instantiate(driver: WebDriver, console: Console) -> None:
     global dev
     dev = src.resources.ot_robot.OtRobot(console, src.resources.robot_data.Dev())
     global emulated_alpha
-    dev = src.resources.ot_robot.OtRobot(
-        console, src.resources.robot_data.EmulatedAlpha()
-    )
+    emulated_alpha = src.resources.ot_robot.OtRobot(console, src.resources.robot_data.EmulatedAlpha())
     global device_landing
     device_landing = src.pages.device_landing.DeviceLanding(driver, console, "REPL")
     global left_menu
@@ -90,15 +85,11 @@ def instantiate(driver: WebDriver, console: Console) -> None:
     global app_settings
     app_settings = src.pages.app_settings.AppSettings(driver, console, "REPL")
     global protocol_landing
-    protocol_landing = src.pages.protocol_landing.ProtocolLanding(
-        driver, console, "REPL"
-    )
+    protocol_landing = src.pages.protocol_landing.ProtocolLanding(driver, console, "REPL")
     global labware_landing
     labware_landing = src.pages.labware_landing.LabwareLanding(driver, console, "REPL")
     global labware_position_check
-    labware_position_check = src.pages.labware_position_check.LabwarePositionCheck(
-        driver, console, "REPL"
-    )
+    labware_position_check = src.pages.labware_position_check.LabwarePositionCheck(driver, console, "REPL")
 
 
 # Check to see if we have a dotenv file and use it

@@ -1,6 +1,6 @@
+# import that does not work
 from opentrons import protocol_api
 
-# import that does not work
 import superspecialmagic
 
 metadata = {

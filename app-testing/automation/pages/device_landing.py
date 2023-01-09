@@ -20,9 +20,7 @@ class DeviceLanding:
         self.base: Base = Base(driver, console, execution_id)
         self.console: Console = console
 
-    header: Element = Element(
-        (By.ID, "DevicesLanding_title"), "Header that is 'Devices'"
-    )
+    header: Element = Element((By.ID, "DevicesLanding_title"), "Header that is 'Devices'")
 
     def get_go_to_run_safe(self, robot_name: str) -> Optional[WebElement]:
         """Look if a robot has a run by name. Return WebElement or None if not."""
@@ -65,16 +63,12 @@ class DeviceLanding:
 
     def get_lights_toggle(self) -> WebElement:
         """Get the lights toggle button."""
-        lights: Element = Element(
-            (By.ID, "RobotOverview_lightsToggle"), "Lights toggle button."
-        )
+        lights: Element = Element((By.ID, "RobotOverview_lightsToggle"), "Lights toggle button.")
         return self.base.clickable_wrapper(lights, 5)
 
     def get_robot_image(self, robot_name: str) -> WebElement:
         """Get the robot_image."""
-        image: Element = Element(
-            (By.ID, f"RobotCard_{robot_name}_robotImage"), "Robot image."
-        )
+        image: Element = Element((By.ID, f"RobotCard_{robot_name}_robotImage"), "Robot image.")
         return self.base.clickable_wrapper(image, 5)
 
     def get_robot_name_device_detail(self, robot_name: str) -> WebElement:
@@ -87,9 +81,7 @@ class DeviceLanding:
 
     def get_left_mount_pipette(self, robot_name: str) -> WebElement:
         """Get the left mount pipette."""
-        text: Element = Element(
-            (By.ID, f"RobotCard_{robot_name}_leftMountPipette"), "Left mount pipette."
-        )
+        text: Element = Element((By.ID, f"RobotCard_{robot_name}_leftMountPipette"), "Left mount pipette.")
         return self.base.clickable_wrapper(text, 5)
 
     def get_right_mount_pipette(self, robot_name: str) -> WebElement:
@@ -182,9 +174,7 @@ class DeviceLanding:
         if not on and not toggled_on:  # light is already off
             return True
         button = self.get_lights_toggle()
-        if (
-            not button
-        ):  # None check but the finder raises so this *should* be unreachable
+        if not button:  # None check but the finder raises so this *should* be unreachable
             return False
         button.click()
         # get status of the toggle again
@@ -194,9 +184,7 @@ class DeviceLanding:
 
     def get_pipettes_and_modules_header_text(self) -> str:
         """Pipettes and modules header."""
-        header: Element = Element(
-            (By.ID, "InstrumentsAndModules_title"), "header 'Instruments and Modules'"
-        )
+        header: Element = Element((By.ID, "InstrumentsAndModules_title"), "header 'Instruments and Modules'")
         element = self.base.clickable_wrapper(header, 5)
         if not element:
             return ""
@@ -212,9 +200,7 @@ class DeviceLanding:
 
     def get_recent_protocol_runs_header_text(self) -> str:
         """Recent runs header."""
-        header: Element = Element(
-            (By.ID, "RecentProtocolRuns_title"), "header 'Recent Protocol Runs'"
-        )
+        header: Element = Element((By.ID, "RecentProtocolRuns_title"), "header 'Recent Protocol Runs'")
         element = self.base.clickable_wrapper(header, 5)
         if not element:
             return ""
@@ -553,9 +539,7 @@ class DeviceLanding:
 
     def get_pipette_calibration_overflow_1(self) -> WebElement:
         """Get the first pipette three dot menu button."""
-        scroll: WebElement = self.base.clickable_wrapper(
-            self.pipette_calibration_overflow_1, 3
-        )
+        scroll: WebElement = self.base.clickable_wrapper(self.pipette_calibration_overflow_1, 3)
         actions = ActionChains(self.base.driver)  # type: ignore
         actions.move_to_element(scroll).perform()  # type: ignore
         return scroll
@@ -571,9 +555,7 @@ class DeviceLanding:
 
     def get_pipette_calibration_overflow_2(self) -> WebElement:
         """Get the first pipette three dot menu button."""
-        scroll: WebElement = self.base.clickable_wrapper(
-            self.pipette_calibration_overflow_2, 3
-        )
+        scroll: WebElement = self.base.clickable_wrapper(self.pipette_calibration_overflow_2, 3)
         actions = ActionChains(self.base.driver)  # type: ignore
         actions.move_to_element(scroll).perform()  # type: ignore
         return scroll
@@ -590,9 +572,7 @@ class DeviceLanding:
 
     def click_pipette_offset_calibrate_button(self) -> None:
         """Click the calibrate button."""
-        scroll: WebElement = self.base.clickable_wrapper(
-            self.calibrate_pipette_offset_button, 3
-        )
+        scroll: WebElement = self.base.clickable_wrapper(self.calibrate_pipette_offset_button, 3)
         actions = ActionChains(self.base.driver)  # type: ignore
         actions.move_to_element(scroll).perform()  # type: ignore
         self.base.click(self.calibrate_pipette_offset_button)
@@ -680,9 +660,7 @@ class DeviceLanding:
         """Click Continue to pipette offset button."""
         # there can be 2 of these, seems UI bug, click the second one if there are 2
         self.base.clickable_wrapper(self.continue_to_pipette_offset, 3)
-        buttons: List[WebElement] = self.base.finds_wrapper(
-            self.continue_to_pipette_offset
-        )
+        buttons: List[WebElement] = self.base.finds_wrapper(self.continue_to_pipette_offset)
         self.base.click_webelement(buttons[-1])
 
     def shift_down_arrow_key(self) -> None:
@@ -700,9 +678,7 @@ class DeviceLanding:
         """Save_calibration_move_to_slot_1 button."""
         # there can be 2 of these, seems UI bug, click the second one if there are 2
         self.base.clickable_wrapper(self.save_calibration_move_to_slot_1, 3)
-        buttons: List[WebElement] = self.base.finds_wrapper(
-            self.save_calibration_move_to_slot_1
-        )
+        buttons: List[WebElement] = self.base.finds_wrapper(self.save_calibration_move_to_slot_1)
         self.base.click_webelement(buttons[-1])
 
     def up_arrow_key(self) -> None:
