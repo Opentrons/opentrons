@@ -1,5 +1,6 @@
 from typing import cast, Awaitable, Optional
 from opentrons.types import Mount
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from robot_server.robot.calibration.tip_length.user_flow import TipCalibrationUserFlow
 from robot_server.robot.calibration.models import SessionCreateParams
 from robot_server.robot.calibration.tip_length.models import TipCalibrationSessionStatus
@@ -54,9 +55,7 @@ class TipLengthCalibration(BaseSession):
         mount = instance_meta.create_params.mount
         tip_rack_def = instance_meta.create_params.tipRackDefinition
         if tip_rack_def:
-            verified_definition = labware.verify_definition(tip_rack_def)
-        else:
-            raise SessionCreationException("No tiprack def provided")
+            labware.verify_definition(tip_rack_def)
         # if lights are on already it's because the user clicked the button,
         # so a) we don't need to turn them on now and b) we shouldn't turn them
         # off after
@@ -68,7 +67,7 @@ class TipLengthCalibration(BaseSession):
                 hardware=configuration.hardware,
                 mount=Mount[mount.upper()],
                 has_calibration_block=has_calibration_block,
-                tip_rack=verified_definition,
+                tip_rack=cast(LabwareDefinition, tip_rack_def),
             )
         except AssertionError as e:
             raise SessionCreationException(str(e))
