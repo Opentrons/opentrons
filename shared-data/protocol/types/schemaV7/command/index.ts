@@ -6,6 +6,7 @@ import type { GantryRunTimeCommand, GantryCreateCommand } from './gantry'
 import type { ModuleRunTimeCommand, ModuleCreateCommand } from './module'
 import type { SetupRunTimeCommand, SetupCreateCommand } from './setup'
 import type { TimingRunTimeCommand, TimingCreateCommand } from './timing'
+import type { AnnotationRunTimeCommand, AnnotationCreateCommand } from './annotation'
 import type {
   CalibrationRunTimeCommand,
   CalibrationCreateCommand,
@@ -38,10 +39,7 @@ export type CreateCommand =
   | TimingCreateCommand // effecting the timing of command execution
   // TODO (sb 10/26/22): Separate out calibration commands from protocol schema in RAUT-272
   | CalibrationCreateCommand // for automatic pipette calibration
-  | ({
-      commandType: 'custom'
-      params: { [key: string]: any }
-    } & CommonCommandCreateInfo) // allows for experimentation between schema versions with no expectation of system support
+  | AnnotationCreateCommand // annotating command execution
 
 // commands will be required to have a key, but will not be created with one
 export type RunTimeCommand =
@@ -52,8 +50,4 @@ export type RunTimeCommand =
   | TimingRunTimeCommand // effecting the timing of command execution
   // TODO (sb 10/26/22): Separate out calibration commands from protocol schema in RAUT-272
   | CalibrationRunTimeCommand // for automatic pipette calibration
-  | ({
-      commandType: 'custom'
-      params: { [key: string]: any }
-      result: any
-    } & CommonCommandRunTimeInfo) // allows for experimentation between schema versions with no expectation of system support
+  | AnnotationRunTimeCommand // annotating command execution
