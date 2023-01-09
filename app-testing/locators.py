@@ -77,7 +77,7 @@ def instantiate(driver: WebDriver, console: Console) -> None:
     global dev
     dev = src.resources.ot_robot.OtRobot(console, src.resources.robot_data.Dev())
     global emulated_alpha
-    dev = src.resources.ot_robot.OtRobot(console, src.resources.robot_data.EmulatedAlpha())
+    emulated_alpha = src.resources.ot_robot.OtRobot(console, src.resources.robot_data.EmulatedAlpha())
     global device_landing
     device_landing = src.pages.device_landing.DeviceLanding(driver, console, "REPL")
     global left_menu
