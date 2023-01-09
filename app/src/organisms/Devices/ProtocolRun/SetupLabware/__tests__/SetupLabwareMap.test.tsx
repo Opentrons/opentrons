@@ -19,9 +19,7 @@ import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fi
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 
 import { i18n } from '../../../../../i18n'
-import { useFeatureFlag } from '../../../../../redux/config'
 import { LabwareInfoOverlay } from '../../LabwareInfoOverlay'
-import { LabwareOffsetModal } from '../../../../ProtocolSetup/RunSetupCard/LabwareSetup/LabwareOffsetModal'
 import {
   useLabwareRenderInfoForRunById,
   useModuleRenderInfoForProtocolById,
@@ -29,7 +27,6 @@ import {
 } from '../../../hooks'
 import { SetupLabwareMap } from '../SetupLabwareMap'
 
-jest.mock('../../../../../redux/config')
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
   return {
@@ -46,14 +43,8 @@ jest.mock('@opentrons/shared-data', () => {
     inferModuleOrientationFromXCoordinate: jest.fn(),
   }
 })
-jest.mock('../../../../ProtocolSetup/hooks')
 jest.mock('../../LabwareInfoOverlay')
-jest.mock(
-  '../../../../ProtocolSetup/RunSetupCard/LabwareSetup/LabwareOffsetModal'
-)
-jest.mock(
-  '../../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
-)
+jest.mock('../../utils/getModuleTypesThatRequireExtraAttention')
 jest.mock('../../../../RunTimeControl/hooks')
 jest.mock('../../../hooks')
 
@@ -72,9 +63,6 @@ const mockRobotWorkSpace = RobotWorkSpace as jest.MockedFunction<
 const mockLabwareRender = LabwareRender as jest.MockedFunction<
   typeof LabwareRender
 >
-const mockLabwareOffsetModal = LabwareOffsetModal as jest.MockedFunction<
-  typeof LabwareOffsetModal
->
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
 >
@@ -83,9 +71,6 @@ const mockUseLabwareRenderInfoForRunById = useLabwareRenderInfoForRunById as jes
 >
 const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById as jest.MockedFunction<
   typeof useModuleRenderInfoForProtocolById
->
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
 >
 const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
   (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
@@ -140,20 +125,9 @@ const render = (props: React.ComponentProps<typeof SetupLabwareMap>) => {
 
 describe('SetupLabwareMap', () => {
   beforeEach(() => {
-    when(mockUseFeatureFlag).mockReturnValue(false)
     when(mockInferModuleOrientationFromXCoordinate)
       .calledWith(expect.anything())
       .mockReturnValue(STUBBED_ORIENTATION_VALUE)
-
-    when(mockLabwareOffsetModal)
-      .calledWith(
-        componentPropsMatcher({
-          onCloseClick: expect.anything(),
-        })
-      )
-      .mockImplementation(({ onCloseClick }) => (
-        <div onClick={onCloseClick}>mock LabwareOffsetModal </div>
-      ))
 
     when(mockLabwareRender)
       .mockReturnValue(<div></div>) // this (default) empty div will be returned when LabwareRender isn't called with expected labware definition
@@ -239,7 +213,7 @@ describe('SetupLabwareMap', () => {
     const { getByText } = render({
       robotName: ROBOT_NAME,
       runId: RUN_ID,
-      extraAttentionModules: [],
+      commands: [],
     })
 
     expect(mockModule).not.toHaveBeenCalled()
@@ -312,7 +286,7 @@ describe('SetupLabwareMap', () => {
     const { getByText } = render({
       robotName: ROBOT_NAME,
       runId: RUN_ID,
-      extraAttentionModules: [],
+      commands: [],
     })
 
     getByText('mock module viz magneticModuleType')

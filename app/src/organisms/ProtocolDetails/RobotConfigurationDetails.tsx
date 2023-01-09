@@ -16,7 +16,6 @@ import {
   getModuleDisplayName,
   getModuleType,
   getPipetteNameSpecs,
-  TC_MODULE_LOCATION,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
@@ -24,15 +23,18 @@ import { InstrumentContainer } from '../../atoms/InstrumentContainer'
 import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
 import { useFeatureFlag } from '../../redux/config'
+import { getRobotTypeDisplayName } from '../ProtocolsLanding/utils'
+import { getSlotsForThermocycler } from './utils'
 
 import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-import type { PipetteName } from '@opentrons/shared-data'
+import type { PipetteName, RobotType } from '@opentrons/shared-data'
 
 interface RobotConfigurationDetailsProps {
   leftMountPipetteName: PipetteName | null
   rightMountPipetteName: PipetteName | null
   requiredModuleDetails: LoadModuleRunTimeCommand[] | null
   isLoading: boolean
+  robotType: RobotType | null
 }
 
 export const RobotConfigurationDetails = (
@@ -43,6 +45,7 @@ export const RobotConfigurationDetails = (
     rightMountPipetteName,
     requiredModuleDetails,
     isLoading,
+    robotType,
   } = props
   const { t } = useTranslation(['protocol_details', 'shared'])
   const enableExtendedHardware = useFeatureFlag('enableExtendedHardware')
@@ -107,8 +110,13 @@ export const RobotConfigurationDetails = (
     <Flex flexDirection={DIRECTION_COLUMN} paddingBottom={SPACING.spacing5}>
       <RobotConfigurationDetailsItem
         label={t('robot')}
-        // TODO(bh, 2022-10-18): read intended robot from protocol
-        item={isLoading ? loadingText : <StyledText as="p">OT-2</StyledText>}
+        item={
+          isLoading ? (
+            loadingText
+          ) : (
+            <StyledText as="p">{getRobotTypeDisplayName(robotType)}</StyledText>
+          )
+        }
       />
       <Divider marginY="0.75rem" width="100%" />
       {leftAndRightMountsItem ?? (
@@ -143,7 +151,7 @@ export const RobotConfigurationDetails = (
                     slot_number:
                       getModuleType(module.params.model) ===
                       THERMOCYCLER_MODULE_TYPE
-                        ? TC_MODULE_LOCATION
+                        ? getSlotsForThermocycler(robotType)
                         : module.params.location.slotName,
                   })}
                   item={

@@ -1,9 +1,10 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent } from '@testing-library/react'
+
 import { renderWithProviders } from '@opentrons/components'
-import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
+
 import { i18n } from '../../../i18n'
 import { home } from '../../../redux/robot-controls'
 import * as Buildroot from '../../../redux/buildroot'
@@ -13,20 +14,24 @@ import {
   mockReachableRobot,
   mockUnreachableRobot,
 } from '../../../redux/discovery/__fixtures__'
-import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
+import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
+import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
 import { useIsRobotBusy } from '../hooks'
 import { UpdateBuildroot } from '../RobotSettings/UpdateBuildroot'
 
-jest.mock('../../RunTimeControl/hooks')
+import type { State } from '../../../redux/types'
+
 jest.mock('../../../redux/robot-controls')
 jest.mock('../../../redux/robot-admin')
 jest.mock('../hooks')
 jest.mock('../../../redux/buildroot')
+jest.mock('../../ChooseProtocolSlideout')
+jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../RobotSettings/UpdateBuildroot')
 
-const mockUseCurrentRunStatus = useCurrentRunStatus as jest.MockedFunction<
-  typeof useCurrentRunStatus
+const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
+  typeof useCurrentRunId
 >
 const getBuildrootUpdateDisplayInfo = Buildroot.getBuildrootUpdateDisplayInfo as jest.MockedFunction<
   typeof Buildroot.getBuildrootUpdateDisplayInfo
@@ -40,6 +45,9 @@ const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
 >
 const mockUpdateBuildroot = UpdateBuildroot as jest.MockedFunction<
   typeof UpdateBuildroot
+>
+const mockChooseProtocolSlideout = ChooseProtocolSlideout as jest.MockedFunction<
+  typeof ChooseProtocolSlideout
 >
 
 const render = (
@@ -59,20 +67,53 @@ describe('RobotOverviewOverflowMenu', () => {
   let props: React.ComponentProps<typeof RobotOverviewOverflowMenu>
   beforeEach(() => {
     props = { robot: mockConnectableRobot }
-    when(getBuildrootUpdateDisplayInfo).mockReturnValue({
-      autoUpdateAction: 'upgrade',
-      autoUpdateDisabledReason: null,
-      updateFromFileDisabledReason: null,
-    })
-    when(mockUseCurrentRunStatus).calledWith().mockReturnValue(RUN_STATUS_IDLE)
+    when(getBuildrootUpdateDisplayInfo)
+      .calledWith({} as State, mockConnectableRobot.name)
+      .mockReturnValue({
+        autoUpdateAction: 'reinstall',
+        autoUpdateDisabledReason: null,
+        updateFromFileDisabledReason: null,
+      })
+    when(mockUseCurrentRunId).calledWith().mockReturnValue(null)
     when(mockUseIsRobotBusy).calledWith().mockReturnValue(false)
     when(mockUpdateBuildroot).mockReturnValue(<div>mock update buildroot</div>)
+    when(mockChooseProtocolSlideout).mockReturnValue(
+      <div>choose protocol slideout</div>
+    )
   })
   afterEach(() => {
     resetAllWhenMocks()
   })
 
   it('should render enabled buttons in the menu when the status is idle', () => {
+    const { getByRole, queryByText } = render(props)
+
+    const btn = getByRole('button')
+    fireEvent.click(btn)
+
+    const runAProtocolBtn = getByRole('button', {
+      name: 'Run a protocol',
+    })
+    const restartBtn = getByRole('button', { name: 'Restart robot' })
+    const homeBtn = getByRole('button', { name: 'Home gantry' })
+    const settingsBtn = getByRole('button', { name: 'Robot settings' })
+
+    expect(queryByText('Update robot software')).toBeNull()
+    expect(runAProtocolBtn).toBeEnabled()
+    expect(restartBtn).toBeEnabled()
+    expect(homeBtn).toBeEnabled()
+    expect(settingsBtn).toBeEnabled()
+  })
+
+  it('should render update robot software button when robot is on wrong version of software', () => {
+    when(getBuildrootUpdateDisplayInfo)
+      .calledWith({} as State, mockConnectableRobot.name)
+      .mockReturnValue({
+        autoUpdateAction: 'upgrade',
+        autoUpdateDisabledReason: null,
+        updateFromFileDisabledReason: null,
+      })
+
     const { getByRole, getByText } = render(props)
 
     const btn = getByRole('button')
@@ -81,11 +122,15 @@ describe('RobotOverviewOverflowMenu', () => {
     const updateRobotSoftwareBtn = getByRole('button', {
       name: 'Update robot software',
     })
+    const runAProtocolBtn = getByRole('button', {
+      name: 'Run a protocol',
+    })
     const restartBtn = getByRole('button', { name: 'Restart robot' })
     const homeBtn = getByRole('button', { name: 'Home gantry' })
     const settingsBtn = getByRole('button', { name: 'Robot settings' })
 
     expect(updateRobotSoftwareBtn).toBeEnabled()
+    expect(runAProtocolBtn).toBeDisabled()
     expect(restartBtn).toBeEnabled()
     expect(homeBtn).toBeEnabled()
     expect(settingsBtn).toBeEnabled()
@@ -93,31 +138,27 @@ describe('RobotOverviewOverflowMenu', () => {
     getByText('mock update buildroot')
   })
 
-  it('should render disabled restart and home gantry menu items when robot is busy', () => {
+  it('should render disabled run a protocol, restart, and home gantry menu items when robot is busy', () => {
     when(mockUseIsRobotBusy).calledWith().mockReturnValue(true)
-    when(mockUseCurrentRunStatus)
-      .calledWith()
-      .mockReturnValue(RUN_STATUS_RUNNING)
 
     const { getByRole } = render(props)
 
     const btn = getByRole('button')
     fireEvent.click(btn)
 
-    expect(screen.queryByText('Update robot software')).toBeNull()
+    expect(getByRole('button', { name: 'Run a protocol' })).toBeDisabled()
     expect(getByRole('button', { name: 'Restart robot' })).toBeDisabled()
     expect(getByRole('button', { name: 'Home gantry' })).toBeDisabled()
-    getByRole('button', { name: 'Robot settings' })
+    expect(getByRole('button', { name: 'Robot settings' })).toBeEnabled()
   })
 
   it('should render menu items when the robot is reachable', () => {
-    when(mockUseIsRobotBusy).calledWith().mockReturnValue(true)
-    when(mockUseCurrentRunStatus)
-      .calledWith()
-      .mockReturnValue(RUN_STATUS_RUNNING)
     const { getByRole } = render({ robot: mockReachableRobot })
-    const btn = getByRole('button')
-    expect(btn).not.toBeDisabled()
+
+    getByRole('button').click()
+    expect(getByRole('button', { name: 'Restart robot' })).toBeDisabled()
+    expect(getByRole('button', { name: 'Home gantry' })).toBeDisabled()
+    expect(getByRole('button', { name: 'Robot settings' })).toBeEnabled()
   })
 
   it('clicking home gantry should home the gantry', () => {
@@ -143,27 +184,15 @@ describe('RobotOverviewOverflowMenu', () => {
 
     expect(mockRestartRobot).toBeCalled()
   })
-  it('render overflow menu buttons without the update robot software button', () => {
-    when(getBuildrootUpdateDisplayInfo).mockReturnValue({
-      autoUpdateAction: 'reinstall',
-      autoUpdateDisabledReason: null,
-      updateFromFileDisabledReason: null,
-    })
-    const { getByRole } = render(props)
-    const btn = getByRole('button')
-    fireEvent.click(btn)
-    getByRole('button', { name: 'Restart robot' })
-    getByRole('button', { name: 'Home gantry' })
-    getByRole('button', { name: 'Robot settings' })
-  })
+
   it('should render disabled menu items when the robot is unreachable', () => {
     when(mockUseIsRobotBusy).calledWith().mockReturnValue(true)
-    when(mockUseCurrentRunStatus)
-      .calledWith()
-      .mockReturnValue(RUN_STATUS_RUNNING)
-    const { getByRole } = render({ robot: mockUnreachableRobot })
+
+    const { getByRole, queryByRole } = render({ robot: mockUnreachableRobot })
     const btn = getByRole('button')
     btn.click()
+    expect(queryByRole('Update robot software')).toBeNull()
+    expect(queryByRole('button', { name: 'Run a protocol' })).toBeNull()
     expect(getByRole('button', { name: 'Restart robot' })).toBeDisabled()
     expect(getByRole('button', { name: 'Home gantry' })).toBeDisabled()
     expect(getByRole('button', { name: 'Robot settings' })).toBeDisabled()

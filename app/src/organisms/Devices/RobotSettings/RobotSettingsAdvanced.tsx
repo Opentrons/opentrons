@@ -1,11 +1,18 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { useTranslation } from 'react-i18next'
 
-import { Box, SPACING, IconProps } from '@opentrons/components'
+import {
+  Box,
+  SPACING,
+  Flex,
+  ALIGN_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 
 import { Divider } from '../../../atoms/structure'
-import { Toast } from '../../../atoms/Toast'
+import { StyledText } from '../../../atoms/text'
+import { ToggleButton } from '../../../atoms/buttons'
 import { useIsOT3, useIsRobotBusy, useRobot } from '../hooks'
 import { DisplayRobotName } from './AdvancedTab/DisplayRobotName'
 import { RobotInformation } from './AdvancedTab/RobotInformation'
@@ -20,7 +27,11 @@ import { UseOlderProtocol } from './AdvancedTab/UseOlderProtocol'
 import { LegacySettings } from './AdvancedTab/LegacySettings'
 import { ShortTrashBin } from './AdvancedTab/ShortTrashBin'
 import { UseOlderAspirateBehavior } from './AdvancedTab/UseOlderAspirateBehavior'
-import { getRobotSettings, fetchSettings } from '../../../redux/robot-settings'
+import {
+  updateSetting,
+  getRobotSettings,
+  fetchSettings,
+} from '../../../redux/robot-settings'
 import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRobotSlideout'
 import { FactoryResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetSlideout'
 import { FactoryResetModal } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetModal'
@@ -44,7 +55,6 @@ export function RobotSettingsAdvanced({
   robotName,
   updateRobotStatus,
 }: RobotSettingsAdvancedProps): JSX.Element {
-  const { t } = useTranslation('device_settings')
   const [
     showRenameRobotSlideout,
     setShowRenameRobotSlideout,
@@ -61,13 +71,9 @@ export function RobotSettingsAdvanced({
     showSoftwareUpdateModal,
     setShowSoftwareUpdateModal,
   ] = React.useState<boolean>(false)
-  const [showDownloadToast, setShowDownloadToast] = React.useState<boolean>(
-    false
-  )
 
   const isRobotBusy = useIsRobotBusy({ poll: true })
 
-  const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
   const robot = useRobot(robotName)
   const isOT3 = useIsOT3(robotName)
   const ipAddress = robot?.ip != null ? robot.ip : ''
@@ -103,9 +109,6 @@ export function RobotSettingsAdvanced({
     setIsRobotReachable(isReachable ?? false)
   }
 
-  const updateDownloadLogsStatus = (isDownloading: boolean): void =>
-    setShowDownloadToast(isDownloading)
-
   const dispatch = useDispatch<Dispatch>()
 
   React.useEffect(() => {
@@ -126,16 +129,6 @@ export function RobotSettingsAdvanced({
           close={() => setShowSoftwareUpdateModal(false)}
         />
       ) : null}
-      {showDownloadToast && (
-        <Toast
-          message={t('downloading_logs')}
-          type="info"
-          icon={toastIcon}
-          closeButton={false}
-          onClose={() => setShowDownloadToast(false)}
-          disableTimeout={true}
-        />
-      )}
       <Box>
         {showRenameRobotSlideout && (
           <RenameRobotSlideout
@@ -191,10 +184,7 @@ export function RobotSettingsAdvanced({
           isRobotBusy={isRobotBusy}
           onUpdateStart={() => setShowSoftwareUpdateModal(true)}
         />
-        <Troubleshooting
-          robotName={robotName}
-          updateDownloadLogsStatus={updateDownloadLogsStatus}
-        />
+        <Troubleshooting robotName={robotName} />
         <Divider marginY={SPACING.spacing4} />
         <FactoryReset
           updateIsExpanded={updateIsExpanded}
@@ -230,5 +220,49 @@ export function RobotSettingsAdvanced({
         )}
       </Box>
     </>
+  )
+}
+
+interface FeatureFlagToggleProps {
+  settingField: RobotSettingsField
+  robotName: string
+  isRobotBusy: boolean
+}
+
+export function FeatureFlagToggle({
+  settingField,
+  robotName,
+  isRobotBusy,
+}: FeatureFlagToggleProps): JSX.Element | null {
+  const dispatch = useDispatch<Dispatch>()
+  const { value, id, title, description } = settingField
+
+  if (id == null) return null
+
+  const handleClick: React.MouseEventHandler<Element> = () => {
+    if (!isRobotBusy) {
+      dispatch(updateSetting(robotName, id, !value))
+    }
+  }
+
+  return (
+    <Flex
+      alignItems={ALIGN_CENTER}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      marginBottom={SPACING.spacing4}
+    >
+      <Box width="70%">
+        <StyledText css={TYPOGRAPHY.pSemiBold} paddingBottom={SPACING.spacing2}>
+          {title}
+        </StyledText>
+        <StyledText as="p">{description}</StyledText>
+      </Box>
+      <ToggleButton
+        label={title}
+        toggledOn={value === true}
+        onClick={handleClick}
+        disabled={isRobotBusy}
+      />
+    </Flex>
   )
 }

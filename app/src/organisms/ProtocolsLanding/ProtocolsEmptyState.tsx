@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { StyledText } from '../../atoms/text'
+
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -8,6 +8,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 
+import { StyledText } from '../../atoms/text'
 import { UploadInput } from './UploadInput'
 import { EmptyStateLinks } from './EmptyStateLinks'
 export function ProtocolsEmptyState(): JSX.Element | null {

@@ -62,6 +62,7 @@
   "robot_has_no_offsets_from_previous_runs": "This robot has no useable offsets for labware used in this protocol. You can still add new offsets with Labware Position Check.",
   "see_how_offsets_work": "See how labware offsets work",
   "stored_offset_data": "Stored Labware Offset data",
+  "applied_offset_data": "Applied Labware Offset data",
   "stored_offsets_for_this_protocol": "Stored Labware Offset data that applies to this protocol",
   "labware": "labware",
   "tip_rack": "tip rack",
@@ -80,5 +81,6 @@
   "apply_offsets": "Apply Offsets",
   "labware_position_check_description": "<block>Labware Position Check is a guided workflow that checks every labware on the deck for an added degree of precision in your protocol.</block><block>Labware Position Check first checks tip racks, and then checks all other labware used in your protocol.</block>",
   "all_modules_and_labware_from_protocol": "All modules and labware used in the protocol",
-  "module_in_slot": "{{module}} in {{slot}}"
+  "module_in_slot": "{{module}} in {{slot}}",
+  "run_labware_position_check": "run labware position check"
 }

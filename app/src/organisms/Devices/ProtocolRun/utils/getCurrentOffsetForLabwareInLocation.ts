@@ -16,9 +16,11 @@ export function getCurrentOffsetForLabwareInLocation(
     offset => {
       const locationKey =
         offset.location.moduleModel != null
-          ? `${offset.location.moduleModel}_${offset.location.slotName}`
+          ? `${String(offset.location.moduleModel)}_${String(
+              offset.location.slotName
+            )}`
           : offset.location.slotName
-      return `${offset.definitionUri}_${locationKey}`
+      return `${String(offset.definitionUri)}_${String(locationKey)}`
     }
   )
   return (

@@ -1,12 +1,11 @@
 """Legacy Well core implementation."""
-
-import re
+from typing import Optional
 
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
-from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.types import Point
 
+from .well_geometry import WellGeometry
 from ..well import AbstractWellCore
 
 
@@ -21,8 +20,6 @@ class WellImplementation(AbstractWellCore):
             Must match pattern /^([A-Z]+)([0-9]+)$/.
     """
 
-    pattern = re.compile(WELL_NAME_PATTERN, re.X)
-
     def __init__(
         self, well_geometry: WellGeometry, display_name: str, has_tip: bool, name: str
     ) -> None:
@@ -30,14 +27,41 @@ class WellImplementation(AbstractWellCore):
         self._has_tip = has_tip
         self._name = name
 
-        match = WellImplementation.pattern.match(name)
-        assert match, (
-            f"could not match '{name}' using "
-            f"pattern '{WellImplementation.pattern.pattern}'"
-        )
+        match = WELL_NAME_PATTERN.match(name)
+        assert match, f"could not match '{name}' using pattern '{WELL_NAME_PATTERN}'"
         self._row_name = match.group(1)
         self._column_name = match.group(2)
         self._geometry = well_geometry
+
+    @property
+    def geometry(self) -> WellGeometry:
+        """Get the well's geometry information interface."""
+        return self._geometry
+
+    @geometry.setter
+    def geometry(self, well_geometry: WellGeometry) -> None:
+        """Update the well's geometry interface."""
+        self._geometry = well_geometry
+
+    @property
+    def diameter(self) -> Optional[float]:
+        """Get the well's diameter, if circular."""
+        return self._geometry.diameter
+
+    @property
+    def length(self) -> Optional[float]:
+        """Get the well's length, if rectangular."""
+        return self._geometry.length
+
+    @property
+    def width(self) -> Optional[float]:
+        """Get the well's width, if rectangular."""
+        return self._geometry.width
+
+    @property
+    def depth(self) -> float:
+        """Get the well's depth."""
+        return self._geometry.depth
 
     def has_tip(self) -> bool:
         """Whether the well contains a tip."""
@@ -56,11 +80,11 @@ class WellImplementation(AbstractWellCore):
         return self._name
 
     def get_column_name(self) -> str:
-        """Get the column portion of the well name (e.g. "A")."""
+        """Get the column portion of the well name (e.g. "1")."""
         return self._column_name
 
     def get_row_name(self) -> str:
-        """Get the row portion of the well name (e.g. "1")."""
+        """Get the row portion of the well name (e.g. "A")."""
         return self._row_name
 
     def get_max_volume(self) -> float:
@@ -79,9 +103,9 @@ class WellImplementation(AbstractWellCore):
         """Get the coordinate of the well's center."""
         return self._geometry.center()
 
-    def get_geometry(self) -> WellGeometry:
-        """Get the well's geometry information interface."""
-        return self._geometry
+    def from_center_cartesian(self, x: float, y: float, z: float) -> Point:
+        """Gets point in deck coordinates based on percentage of the radius of each axis."""
+        return self._geometry.from_center_cartesian(x, y, z)
 
     # TODO(mc, 2022-10-28): is this used and/or necessary?
     def __repr__(self) -> str:

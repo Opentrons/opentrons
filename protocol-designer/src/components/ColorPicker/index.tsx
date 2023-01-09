@@ -29,7 +29,10 @@ export function ColorPicker(props: ColorPickerProps): JSX.Element {
         />
       </div>
       {showColorPicker ? (
-        <div className={styles.popover}>
+        <div
+          className={styles.popover}
+          onBlur={() => setShowColorPicker(false)}
+        >
           <div
             className={styles.cover}
             onClick={() => setShowColorPicker(false)}
@@ -39,7 +42,6 @@ export function ColorPicker(props: ColorPickerProps): JSX.Element {
             color={props.value}
             onChange={(color, event) => {
               props.onChange(color.hex)
-              setShowColorPicker(showColorPicker => !showColorPicker)
             }}
             triangle="top-right"
           />

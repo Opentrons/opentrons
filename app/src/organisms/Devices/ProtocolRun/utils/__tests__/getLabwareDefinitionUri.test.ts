@@ -1,5 +1,6 @@
 import { getLabwareDefURI, LabwareDefinition2 } from '@opentrons/shared-data'
 import { getLabwareDefinitionUri } from '../getLabwareDefinitionUri'
+import type { LoadedLabware } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/shared-data')
 
@@ -16,15 +17,17 @@ describe('getLabwareDefinitionUri', () => {
   })
   it('should return the definition uri of a given labware', () => {
     const MOCK_LABWARE_ID = 'some_labware'
-    const DEF_ID = `${MOCK_DEFINITION_URI}_id`
-    const mockLabware = {
-      [MOCK_LABWARE_ID]: {
-        definitionId: `${MOCK_DEFINITION_URI}_id`,
+    const mockLabware = [
+      {
+        id: MOCK_LABWARE_ID,
+        loadName: 'some loadname',
+        definitionUri: MOCK_DEFINITION_URI,
         displayName: 'some dope labware',
-      },
-    }
+      } as LoadedLabware,
+    ]
+
     const mockLabwareDefinitions = {
-      [DEF_ID]: MOCK_DEF,
+      [MOCK_DEFINITION_URI]: MOCK_DEF,
     }
     expect(
       getLabwareDefinitionUri(

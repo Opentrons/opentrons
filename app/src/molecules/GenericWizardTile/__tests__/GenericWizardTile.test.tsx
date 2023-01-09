@@ -18,7 +18,7 @@ describe('GenericWizardTile', () => {
       rightHandBody: <div>right hand body</div>,
       bodyText: 'body',
       proceed: jest.fn(),
-      proceedButtonText: 'continue',
+      proceedButtonText: <div>Continue</div>,
       header: 'header',
       getHelp: 'getHelpUrl',
     }
@@ -26,7 +26,7 @@ describe('GenericWizardTile', () => {
   it('renders correct generic tile information with a help link', () => {
     const { getByText } = render(props)
     getByText('body')
-    const btn = getByText('continue')
+    const btn = getByText('Continue')
     getByText('header')
     fireEvent.click(btn)
     expect(props.proceed).toHaveBeenCalled()
@@ -43,5 +43,16 @@ describe('GenericWizardTile', () => {
     const btn = getByText('Go back')
     fireEvent.click(btn)
     expect(props.back).toHaveBeenCalled()
+  })
+  it('renders correct generic tile information with back button disabled', () => {
+    props = {
+      ...props,
+      back: jest.fn(),
+      backIsDisabled: true,
+    }
+    const { getByLabelText } = render(props)
+    const btn = getByLabelText('back')
+    fireEvent.click(btn)
+    expect(btn).toBeDisabled()
   })
 })

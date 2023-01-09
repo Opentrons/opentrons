@@ -10,8 +10,9 @@ from typing_extensions import Literal, TypeGuard
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType, DeckSlotName
-from opentrons.hardware_control.modules import ModuleType as ModuleType
-
+from opentrons.hardware_control.modules import (
+    ModuleType as ModuleType,
+)
 
 from opentrons_shared_data.pipette.dev_types import (  # noqa: F401
     # convenience re-export of LabwareUri type
@@ -63,6 +64,17 @@ class LabwareMovementStrategy(str, Enum):
     MANUAL_MOVE_WITHOUT_PAUSE = "manualMoveWithoutPause"
 
 
+# TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
+@dataclass(frozen=True)
+class ExperimentalOffsetData(BaseModel):
+    """The result of a load module procedure."""
+
+    usePickUpLocationLpcOffset: bool
+    useDropLocationLpcOffset: bool
+    pickUpOffset: Optional[LabwareOffsetVector]
+    dropOffset: Optional[LabwareOffsetVector]
+
+
 class WellOrigin(str, Enum):
     """Origin of WellLocation offset."""
 
@@ -70,6 +82,7 @@ class WellOrigin(str, Enum):
     BOTTOM = "bottom"
 
 
+# This is deliberately a separate type from Vec3f to let components default to 0.
 class WellOffset(BaseModel):
     """An offset vector in (x, y, z)."""
 
@@ -94,6 +107,7 @@ class Dimensions:
     z: float
 
 
+# TODO(mm, 2022-11-07): Deduplicate with Vec3f.
 class DeckPoint(BaseModel):
     """Coordinates of a point in deck space."""
 
@@ -106,7 +120,9 @@ class LoadedPipette(BaseModel):
     """A pipette that has been loaded."""
 
     id: str
-    pipetteName: PipetteNameType
+    # TODO (tz, 11-23-22): remove Union when refactoring load_pipette for 96 channels.
+    # https://opentrons.atlassian.net/browse/RLIQ-255
+    pipetteName: Union[PipetteNameType, Literal["p1000_96"]]
     mount: MountType
 
 
@@ -203,6 +219,15 @@ class ModuleDimensions(BaseModel):
     lidHeight: Optional[float]
 
 
+class Vec3f(BaseModel):
+    """A 3D vector of floats."""
+
+    x: float
+    y: float
+    z: float
+
+
+# TODO(mm, 2022-11-07): Deduplicate with Vec3f.
 class ModuleCalibrationPoint(BaseModel):
     """Calibration Point type for module definition."""
 
@@ -211,6 +236,7 @@ class ModuleCalibrationPoint(BaseModel):
     z: float
 
 
+# TODO(mm, 2022-11-07): Deduplicate with Vec3f.
 class LabwareOffsetVector(BaseModel):
     """Offset, in deck coordinates from nominal to actual position."""
 
@@ -219,6 +245,7 @@ class LabwareOffsetVector(BaseModel):
     z: float
 
 
+# TODO(mm, 2022-11-07): Deduplicate with Vec3f.
 class InstrumentOffsetVector(BaseModel):
     """Instrument Offset from home position to robot deck."""
 

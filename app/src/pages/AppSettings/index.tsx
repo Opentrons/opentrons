@@ -23,12 +23,12 @@ import { FeatureFlags } from '../../organisms/AppSettings/FeatureFlags'
 import { NavTab } from '../../molecules/NavTab'
 import { Line } from '../../atoms/structure'
 
-import type { NavRouteParams, AppSettingsTab } from '../../App/types'
+import type { DesktopRouteParams, AppSettingsTab } from '../../App/types'
 
 export function AppSettings(): JSX.Element {
   const { t } = useTranslation('app_settings')
   const devToolsOn = useSelector(Config.getDevtoolsEnabled)
-  const { appSettingsTab } = useParams<NavRouteParams>()
+  const { appSettingsTab } = useParams<DesktopRouteParams>()
 
   const appSettingsContentByTab: {
     [K in AppSettingsTab]: JSX.Element
@@ -50,7 +50,9 @@ export function AppSettings(): JSX.Element {
         backgroundColor={COLORS.white}
         height="100%"
         width="100%"
-        border={`${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.medGreyEnabled}`}
+        border={`${String(SPACING.spacingXXS)} ${String(
+          BORDERS.styleSolid
+        )} ${String(COLORS.medGreyEnabled)}`}
         borderRadius={BORDERS.radiusSoftCorners}
         minHeight="95%"
       >

@@ -3,7 +3,6 @@ test_name: Upload and run a JSONv6 protocol.
 marks:
   - usefixtures:
       - run_server
-      - set_enable_load_liquid
 stages:
   - name: Upload simple JSONv6 protocol
     request:
@@ -254,6 +253,7 @@ stages:
                   x: 0
                   'y': 0
                   z: 0
+              forceDirect: false
           - id: !anystr
             key: !anystr
             commandType: moveToWell
@@ -269,6 +269,9 @@ stages:
                   x: 2
                   y: 3
                   z: 10
+              minimumZHeight: 35
+              forceDirect: true
+              speed: 12.3
           - id: !anystr
             key: !anystr
             commandType: dropTip
@@ -516,6 +519,7 @@ stages:
                   x: 0
                   'y': 0
                   z: 0
+              forceDirect: false
           - id: !anystr
             key: !anystr
             commandType: moveToWell
@@ -533,6 +537,9 @@ stages:
                   x: 2
                   y: 3
                   z: 10
+              minimumZHeight: 35
+              forceDirect: true
+              speed: 12.3
           - id: !anystr
             key: !anystr
             commandType: dropTip

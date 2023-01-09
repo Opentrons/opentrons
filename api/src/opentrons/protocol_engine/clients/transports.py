@@ -50,6 +50,15 @@ class AbstractSyncTransport(ABC):
     @overload
     def call_method(
         self,
+        method_name: Literal["reset_tips"],
+        *,
+        labware_id: str,
+    ) -> None:
+        ...
+
+    @overload
+    def call_method(
+        self,
         method_name: str,
         **kwargs: Any,
     ) -> Any:

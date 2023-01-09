@@ -72,7 +72,9 @@ export const AboutModuleSlideout = (
       {module.hasAvailableUpdate && !isDisabled && showBanner ? (
         <Flex paddingBottom={SPACING.spacing4}>
           <Banner
-            data-testid={`alert_item_firmware_update_${module.moduleModel}`}
+            data-testid={`alert_item_firmware_update_${String(
+              module.moduleModel
+            )}`}
             css={ALERT_ITEM_STYLE}
             type="warning"
             onCloseClick={() => setShowBanner(false)}
@@ -94,7 +96,7 @@ export const AboutModuleSlideout = (
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Flex
             flexDirection={DIRECTION_COLUMN}
-            data-testid={`alert_item_version_${module.moduleModel}`}
+            data-testid={`alert_item_version_${String(module.moduleModel)}`}
             color={COLORS.darkGreyEnabled}
           >
             <StyledText as="h6">{t('current_version')}</StyledText>
@@ -106,7 +108,9 @@ export const AboutModuleSlideout = (
         <StyledText
           paddingTop={SPACING.spacing4}
           as="h6"
-          data-testid={`alert_item_serial_number_text_${module.moduleModel}`}
+          data-testid={`alert_item_serial_number_text_${String(
+            module.moduleModel
+          )}`}
           color={COLORS.darkBlackEnabled}
         >
           {t('serial_number')}
@@ -114,7 +118,7 @@ export const AboutModuleSlideout = (
         <StyledText
           as="h6"
           paddingTop={SPACING.spacing2}
-          data-testid={`alert_item_serial_${module.moduleModel}`}
+          data-testid={`alert_item_serial_${String(module.moduleModel)}`}
         >
           {module.serialNumber}
         </StyledText>

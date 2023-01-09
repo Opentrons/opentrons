@@ -10,14 +10,14 @@ import { useProtocolRunAnalyticsData } from '../useProtocolRunAnalyticsData'
 import { hash } from '../../../../redux/analytics/hash'
 import { getStoredProtocol } from '../../../../redux/protocol-storage'
 import { useStoredProtocolAnalysis, useProtocolDetailsForRun } from '../'
-import { useProtocolMetadata } from '../../../ProtocolSetup/hooks'
+import { useProtocolMetadata } from '../useProtocolMetadata'
 import { useRunTimestamps } from '../../../RunTimeControl/hooks'
 import { formatInterval } from '../../../RunTimeControl/utils'
 
 jest.mock('../../../../redux/analytics/hash')
 jest.mock('../../../../redux/protocol-storage')
 jest.mock('../../hooks')
-jest.mock('../../../ProtocolSetup/hooks')
+jest.mock('../useProtocolMetadata')
 jest.mock('../../../RunTimeControl/hooks')
 jest.mock('../../../RunTimeControl/utils')
 
@@ -47,10 +47,10 @@ let store: Store<any> = createStore(jest.fn(), {})
 const RUN_ID = '1'
 const RUN_ID_2 = '2'
 
-const PIPETTES = {
-  left: { id: '1', name: 'testModelLeft' },
-  right: { id: '2', name: 'testModelRight' },
-}
+const PIPETTES = [
+  { id: '1', pipetteName: 'testModelLeft' },
+  { id: '2', pipetteName: 'testModelRight' },
+]
 const FORMATTED_PIPETTES = 'testModelLeft,testModelRight'
 const MODULES = {
   module1: { model: 'module1' },

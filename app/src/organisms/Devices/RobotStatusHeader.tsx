@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useHistory } from 'react-router-dom'
 
+import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   Btn,
@@ -21,7 +22,6 @@ import { StyledText } from '../../atoms/text'
 import { Tooltip } from '../../atoms/Tooltip'
 import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../organisms/RunTimeControl/hooks'
-import { useProtocolDetailsForRun } from './hooks'
 
 import type { StyleProps } from '@opentrons/components'
 import type { DiscoveredRobot } from '../../redux/discovery/types'
@@ -43,7 +43,14 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
 
   const currentRunId = useCurrentRunId()
   const currentRunStatus = useCurrentRunStatus()
-  const { displayName } = useProtocolDetailsForRun(currentRunId)
+  const { data: runRecord } = useRunQuery(currentRunId, { staleTime: Infinity })
+  const protocolId = runRecord?.data?.protocolId ?? null
+  const { data: protocolRecord } = useProtocolQuery(protocolId, {
+    staleTime: Infinity,
+  })
+  const displayName =
+    protocolRecord?.data.metadata.protocolName ??
+    protocolRecord?.data.files[0].name
 
   const runningProtocolBanner: JSX.Element | null =
     currentRunId != null && currentRunStatus != null && displayName != null ? (
@@ -53,13 +60,15 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
           paddingRight={SPACING.spacing3}
           overflowWrap="anywhere"
         >
-          {`${displayName}; ${t(`run_details:status_${currentRunStatus}`)}`}
+          {`${String(displayName)}; ${t(
+            `run_details:status_${String(currentRunStatus)}`
+          )}`}
         </StyledText>
         <Link
           to={`/devices/${name}/protocol-runs/${currentRunId}/${
             currentRunStatus === RUN_STATUS_IDLE ? 'setup' : 'run-log'
           }`}
-          id={`RobotStatusHeader_${name}_goToRun`}
+          id={`RobotStatusHeader_${String(name)}_goToRun`}
         >
           <SecondaryTertiaryButton>{t('go_to_run')}</SecondaryTertiaryButton>
         </Link>
@@ -74,7 +83,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
           color={COLORS.darkGreyEnabled}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           paddingBottom={SPACING.spacing1}
-          id={`RobotStatusHeader_${name}_robotModel`}
+          id={`RobotStatusHeader_${String(name)}_robotModel`}
         >
           {robotModel}
         </StyledText>
@@ -82,7 +91,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
           <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
             <StyledText
               as="h3"
-              id={`RobotStatusHeader_${name}_robotName`}
+              id={`RobotStatusHeader_${String(name)}_robotName`}
               overflowWrap="anywhere"
             >
               {name}

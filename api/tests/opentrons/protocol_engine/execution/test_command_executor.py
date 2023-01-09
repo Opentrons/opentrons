@@ -1,9 +1,11 @@
 """Smoke tests for the CommandExecutor class."""
-import pytest
+import asyncio
 from datetime import datetime
+from typing import Any, Optional, Type, cast
+
+import pytest
 from decoy import Decoy, matchers
 from pydantic import BaseModel
-from typing import Any, Optional, Type, cast
 
 from opentrons.hardware_control import HardwareControlAPI
 
@@ -246,6 +248,10 @@ async def test_execute(
         (
             RuntimeError("oh no"),
             matchers.ErrorMatching(errors.UnexpectedProtocolError, match="oh no"),
+        ),
+        (
+            asyncio.CancelledError(),
+            matchers.ErrorMatching(errors.RunStoppedError),
         ),
     ],
 )

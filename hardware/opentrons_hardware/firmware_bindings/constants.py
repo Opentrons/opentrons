@@ -63,6 +63,8 @@ class MessageId(int, Enum):
 
     stop_request = 0x00
 
+    error_message = 0x02
+
     get_status_request = 0x01
     get_status_response = 0x05
 
@@ -83,8 +85,10 @@ class MessageId(int, Enum):
     home_request = 0x20
     move_completed = 0x13
 
-    encoder_position_request = 0x12
-    encoder_position_response = 0x14
+    motor_position_request = 0x12
+    motor_position_response = 0x14
+    update_motor_position_estimation_request = 0x21
+    update_motor_position_estimation_response = 0x22
 
     set_motion_constraints = 0x101
     get_motion_constraints_request = 0x102
@@ -102,6 +106,10 @@ class MessageId(int, Enum):
     gripper_grip_request = 0x42
     gripper_home_request = 0x43
     add_brushed_linear_move_request = 0x44
+    brushed_motor_conf_request = 0x45
+    brushed_motor_conf_response = 0x46
+
+    acknowledgement = 0x50
 
     read_presence_sensing_voltage_request = 0x600
     read_presence_sensing_voltage_response = 0x601
@@ -141,6 +149,15 @@ class MessageId(int, Enum):
 
 
 @unique
+class ErrorSeverity(int, Enum):
+    """Error Severity levels."""
+
+    warning = 0x1
+    recoverable = 0x2
+    unrecoverable = 0x3
+
+
+@unique
 class ErrorCode(int, Enum):
     """Common error codes."""
 
@@ -150,6 +167,12 @@ class ErrorCode(int, Enum):
     invalid_byte_count = 0x03
     invalid_input = 0x04
     hardware = 0x05
+    timeout = 0x06
+    estop_detected = 0x07
+    collision_detected = 0x08
+    labware_dropped = 0x09
+    estop_released = 0x0A
+    motor_busy = 0x0B
 
 
 @unique
@@ -195,6 +218,8 @@ class PipetteName(int, Enum):
     p1000_multi = 0x01
     p50_single = 0x02
     p50_multi = 0x03
+    p1000_96 = 0x04
+    p50_96 = 0x05
     unknown = 0xFFFF
 
 
@@ -221,3 +246,15 @@ class PipetteTipActionType(int, Enum):
 
     pick_up = 0x0
     drop = 0x01
+
+
+@unique
+class MotorPositionFlags(Enum):
+    """Flags for motor position validity."""
+
+    # Referring to the position in microsteps reported by firmware, which is
+    # an open-loop accumulation of all moves since the last homing event.
+    stepper_position_ok = 0x1
+    # Referring to the closed-loop encoder on the relevant axis.
+    # Generally only unset if the motor board has not homed since power-on.
+    encoder_position_ok = 0x2

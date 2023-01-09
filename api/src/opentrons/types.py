@@ -7,7 +7,7 @@ from .protocols.api_support.labware_like import LabwareLike
 
 if TYPE_CHECKING:
     from .protocol_api.labware import Labware, Well
-    from .protocols.geometry.module_geometry import ModuleGeometry
+    from .protocol_api.core.protocol_api.module_geometry import ModuleGeometry
 
 
 class PipetteNotAttachedError(KeyError):
@@ -197,6 +197,9 @@ class DeckSlotName(str, enum.Enum):
     def from_primitive(cls, value: DeckLocation) -> DeckSlotName:
         str_val = str(value)
         return cls(str_val)
+
+    def as_int(self) -> int:
+        return int(self.value)
 
     def __str__(self) -> str:
         """Stringify to a simple integer string."""

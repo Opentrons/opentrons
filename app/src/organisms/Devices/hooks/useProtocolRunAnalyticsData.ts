@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import { hash } from '../../../redux/analytics/hash'
 import { getStoredProtocol } from '../../../redux/protocol-storage'
 import { useStoredProtocolAnalysis, useProtocolDetailsForRun } from './'
-import { useProtocolMetadata } from '../../ProtocolSetup/hooks'
+import { useProtocolMetadata } from './useProtocolMetadata'
 import { useRunTimestamps } from '../../RunTimeControl/hooks'
 import { formatInterval } from '../../RunTimeControl/utils'
 import { EMPTY_TIMESTAMP } from '../constants'
@@ -38,7 +38,7 @@ export const parseProtocolRunAnalyticsData = (
       protocolSource: protocolAnalysis?.metadata?.source ?? '',
       protocolName: protocolAnalysis?.metadata?.protocolName ?? '',
       pipettes: Object.values(protocolAnalysis?.pipettes ?? {})
-        .map(pipette => pipette.name)
+        .map(pipette => pipette.pipetteName)
         .join(','),
       modules: Object.values(protocolAnalysis?.modules ?? {})
         .map(module => module.model)

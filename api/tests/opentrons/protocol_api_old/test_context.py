@@ -17,16 +17,20 @@ from opentrons.protocol_api.module_contexts import (
 )
 from opentrons.types import Mount, Point, Location, TransferTipPolicy
 from opentrons.hardware_control import API, NoTipAttachedError, ThreadManagedHardware
-from opentrons.hardware_control.instruments import Pipette
+from opentrons.hardware_control.instruments.ot2.pipette import Pipette
 from opentrons.hardware_control.types import Axis
 from opentrons.protocols.advanced_control import transfers as tf
-from opentrons.config.pipette_config import config_names
 from opentrons.protocols.api_support import instrument as instrument_support
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.calibration_storage import types as cs_types
 from opentrons.util.helpers import utc_now
 
 import pytest
+
+# TODO (lc 12-8-2022) Not sure if we plan to keep these tests, but if we do
+# we should re-write them to be agnostic to the underlying hardware. Otherwise
+# I wouldn't really consider these to be proper unit tests.
+pytestmark = pytest.mark.ot2_only
 
 
 def set_version_added(attr, mp, version):
@@ -68,17 +72,6 @@ def get_labware_def(monkeypatch):
         return labware_def
 
     monkeypatch.setattr(papi.labware, "get_labware_definition", dummy_load)
-
-
-@pytest.mark.parametrize("name", config_names)
-def test_load_instrument(name, ctx):
-    assert ctx.loaded_instruments == {}
-    loaded = ctx.load_instrument(name, Mount.LEFT, replace=True)
-    assert ctx.loaded_instruments[Mount.LEFT.name.lower()] == loaded
-    assert loaded.name == name
-    loaded = ctx.load_instrument(name, Mount.RIGHT, replace=True)
-    assert ctx.loaded_instruments[Mount.RIGHT.name.lower()] == loaded
-    assert loaded.name == name
 
 
 async def test_motion(ctx, hardware):
@@ -430,7 +423,6 @@ def test_pick_up_tip_no_location(ctx, get_labware_def, pipette_model, tiprack_ki
     assert not tiprack2.wells()[0].has_tip
 
 
-@pytest.mark.ot2_only
 def test_instrument_trash(ctx, get_labware_def):
     ctx.home()
 
@@ -450,7 +442,7 @@ def test_instrument_trash_ot3(ctx, get_labware_def):
     ctx.home()
 
     mount = Mount.LEFT
-    instr = ctx.load_instrument("p300_single", mount)
+    instr = ctx.load_instrument("p1000_single_gen3", mount)
 
     assert instr.trash_container.name == "opentrons_1_trash_3200ml_fixed"
 
@@ -768,11 +760,11 @@ def test_blow_out(ctx, monkeypatch):
     instr.pick_up_tip()
     instr.aspirate(10, lw.wells()[0])
 
-    def fake_move(loc, publish):
+    def fake_move(location):
         nonlocal move_location
-        move_location = loc
+        move_location = location
 
-    monkeypatch.setattr(instr, "move_to", fake_move)
+    monkeypatch.setattr(instr._implementation, "move_to", fake_move)
 
     instr.blow_out()
     # pipette should not move, if no location is passed
@@ -983,8 +975,8 @@ def test_order_of_module_load():
     temp1 = ctx1.load_module("tempdeck", 4)
     ctx1.load_module("thermocycler")
     temp2 = ctx1.load_module("tempdeck", 1)
-    async_temp1 = temp1._module._obj_to_adapt
-    async_temp2 = temp2._module._obj_to_adapt
+    async_temp1 = temp1._core._sync_module_hardware._obj_to_adapt  # type: ignore[union-attr]
+    async_temp2 = temp2._core._sync_module_hardware._obj_to_adapt  # type: ignore[union-attr]
 
     assert id(async_temp1) == id(hw_temp1)
     assert id(async_temp2) == id(hw_temp2)
@@ -1001,13 +993,12 @@ def test_order_of_module_load():
     temp1 = ctx2.load_module("tempdeck", 1)
     temp2 = ctx2.load_module("tempdeck", 4)
 
-    async_temp1 = temp1._module._obj_to_adapt
-    async_temp2 = temp2._module._obj_to_adapt
+    async_temp1 = temp1._core._sync_module_hardware._obj_to_adapt  # type: ignore[union-attr]
+    async_temp2 = temp2._core._sync_module_hardware._obj_to_adapt  # type: ignore[union-attr]
     assert id(async_temp1) == id(hw_temp1)
     assert id(async_temp2) == id(hw_temp2)
 
 
-@pytest.mark.ot2_only
 def test_tip_length_for_caldata(ctx, decoy, monkeypatch):
     # TODO (lc 10-27-2022) We need to investigate why the pipette id is
     # being reported as none for this test (and probably all the others)
@@ -1209,4 +1200,3 @@ def test_move_to_with_heater_shaker(
         to_loc=Location(Point(0, 0, 0), None),
         is_multichannel=True,
     )
-    mod._module.cleanup()

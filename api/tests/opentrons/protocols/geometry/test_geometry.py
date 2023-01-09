@@ -6,9 +6,9 @@ from opentrons.protocols.geometry.planning import (
     safe_height,
     should_dodge_thermocycler,
 )
-from opentrons.protocols.geometry.deck import Deck
+from opentrons.protocol_api.core.protocol_api import module_geometry
+from opentrons.protocol_api.core.protocol_api.deck import Deck
 from opentrons.protocol_api import labware
-from opentrons.protocols.geometry import module_geometry
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.hardware_control.modules.types import (
     ThermocyclerModuleModel,

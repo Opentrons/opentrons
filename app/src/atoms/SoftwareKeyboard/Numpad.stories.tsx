@@ -7,7 +7,6 @@ import {
 } from '@opentrons/components'
 import { InputField } from '../InputField'
 import { Numpad } from './'
-import '../../styles.global.css'
 
 import type { Story, Meta } from '@storybook/react'
 
@@ -30,7 +29,7 @@ const Template: Story<React.ComponentProps<typeof Numpad>> = args => {
           onFocus={() => setShowKeyboard(true)}
         />
       </form>
-      <Flex position={POSITION_ABSOLUTE} top="15%" width="15rem">
+      <Flex position={POSITION_ABSOLUTE} top="20%" width="15rem">
         {showKeyboard && (
           <Numpad
             onChange={e => e != null && setValue(String(e))}

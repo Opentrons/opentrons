@@ -6,6 +6,7 @@ import { useTrackEvent } from '../../../../redux/analytics'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { useProtocolDetailsForRun } from '../../../Devices/hooks'
+import { useLPCSuccessToast } from '../../../Devices/hooks/useLPCSuccessToast'
 import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
 import { DeprecatedSectionList } from '../DeprecatedSectionList'
 import { DeprecatedDeckMap } from '../DeprecatedDeckMap'
@@ -13,12 +14,11 @@ import { DeprecatedSummaryScreen } from '../DeprecatedSummaryScreen'
 import { DeprecatedLabwareOffsetsSummary } from '../DeprecatedLabwareOffsetsSummary'
 import { useIntroInfo, useLabwareOffsets } from '../../deprecatedHooks'
 import { DeprecatedSection } from '../types'
-import { useLPCSuccessToast } from '../../../ProtocolSetup/hooks'
 
 jest.mock('../../../../redux/analytics')
 jest.mock('../../../ProtocolUpload/hooks')
 jest.mock('../../../Devices/hooks')
-jest.mock('../../../ProtocolSetup/hooks')
+jest.mock('../../../Devices/hooks/useLPCSuccessToast')
 jest.mock('../DeprecatedSectionList')
 jest.mock('../../deprecatedHooks')
 jest.mock('../DeprecatedDeckMap')
@@ -100,13 +100,16 @@ describe('DeprecatedSummaryScreen', () => {
       .calledWith(MOCK_RUN_ID)
       .mockReturnValue({
         protocolData: {
-          labware: {
-            '1d57fc10-67ad-11ea-9f8b-3b50068bd62d:opentrons/opentrons_96_filtertiprack_200ul/1': {
+          labware: [
+            {
+              id:
+                '1d57fc10-67ad-11ea-9f8b-3b50068bd62d:opentrons/opentrons_96_filtertiprack_200ul/1',
               slot: '1',
               displayName: 'someDisplayName',
               definitionId: LABWARE_DEF_ID,
+              loadName: 'someLoadName',
             },
-          },
+          ],
           labwareDefinitions: {
             [LABWARE_DEF_ID]: LABWARE_DEF,
           },

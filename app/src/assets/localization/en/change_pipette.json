@@ -45,7 +45,8 @@
   "recheck_connection": "Re-check connection",
   "leave_attached": "Leave attached",
   "calibrate_pipette_offset": "Calibrate pipette offset",
-  "try_again": "Try again",
-  "detatch_try_again": "Detach and try again",
-  "detatch_pipette_from_mount": "Detach Pipette from {{mount}} Mount"
+  "detach_try_again": "Detach and try again",
+  "detach_pipette_from_mount": "Detach Pipette from {{mount}} Mount",
+  "pipette_setup": "Pipette Setup",
+  "mount": "{{mount}} mount"
 }

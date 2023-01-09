@@ -1,6 +1,8 @@
 """In-memory storage of ProtocolEngine instances."""
 from typing import List, NamedTuple, Optional
 
+from opentrons_shared_data.robot.dev_types import RobotType
+
 from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_runner import ProtocolRunner, ProtocolRunResult
@@ -35,14 +37,20 @@ class RunnerEnginePair(NamedTuple):
 class EngineStore:
     """Factory and in-memory storage for ProtocolEngine."""
 
-    def __init__(self, hardware_api: HardwareControlAPI) -> None:
+    def __init__(
+        self,
+        hardware_api: HardwareControlAPI,
+        robot_type: RobotType,
+    ) -> None:
         """Initialize an engine storage interface.
 
         Arguments:
             hardware_api: Hardware control API instance used for ProtocolEngine
                 construction.
+            robot_type: Passed along to `opentrons.protocol_engine.Config`.
         """
         self._hardware_api = hardware_api
+        self._robot_type = robot_type
         self._default_engine: Optional[ProtocolEngine] = None
         self._runner_engine_pair: Optional[RunnerEnginePair] = None
 
@@ -88,7 +96,10 @@ class EngineStore:
             # TODO(mc, 2022-03-21): potential race condition
             engine = await create_protocol_engine(
                 hardware_api=self._hardware_api,
-                config=ProtocolEngineConfig(),
+                config=ProtocolEngineConfig(
+                    robot_type=self._robot_type,
+                    block_on_door_open=False,
+                ),
             )
             self._default_engine = engine
 
@@ -117,7 +128,8 @@ class EngineStore:
         engine = await create_protocol_engine(
             hardware_api=self._hardware_api,
             config=ProtocolEngineConfig(
-                block_on_door_open=feature_flags.enable_door_safety_switch()
+                robot_type=self._robot_type,
+                block_on_door_open=feature_flags.enable_door_safety_switch(),
             ),
         )
         runner = ProtocolRunner(protocol_engine=engine, hardware_api=self._hardware_api)

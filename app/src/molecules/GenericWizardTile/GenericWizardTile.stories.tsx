@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
+import { Skeleton } from '../../atoms/Skeleton'
+import { PrimaryButton } from '../../atoms/buttons'
 import { ModalShell } from '../Modal'
 import { WizardHeader } from '../WizardHeader'
 import { GenericWizardTile } from './index'
@@ -37,6 +39,19 @@ const rightHandBody = (
     <StyledText as="p">{'and this'}</StyledText>
   </Flex>
 )
+const skeleton = (
+  <Skeleton width="18rem" height="1.125rem" backgroundSize="47rem" />
+)
+
+const skeletons = (
+  <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+    {skeleton}
+    {skeleton}
+    {skeleton}
+    {skeleton}
+  </Flex>
+)
+
 export const WithGetHelpLink = Template.bind({})
 WithGetHelpLink.args = {
   rightHandBody: rightHandBody,
@@ -53,4 +68,16 @@ WithBackButton.args = {
   header: 'example header',
   back: () => console.log('back'),
   proceedButtonText: 'Continue',
+}
+
+export const WithSkeletons = Template.bind({})
+WithSkeletons.args = {
+  rightHandBody: (
+    <Skeleton width="10.6875rem" height="15.5rem" backgroundSize="47rem" />
+  ),
+  bodyText: skeletons,
+  header: <Skeleton width="17rem" height="1.75rem" backgroundSize="47rem" />,
+  back: () => console.log('back'),
+  backIsDisabled: true,
+  proceedButton: <PrimaryButton disabled={true}>{'Continue'}</PrimaryButton>,
 }

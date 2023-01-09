@@ -10,7 +10,7 @@ The API is versioned with a major and minor version, expressed like this: ``majo
 Major and Minor Version
 -----------------------
 
-The major version of the API is increased whenever there are signficant structural or behavioral changes to protocols. For instance, major version 2 of the API was introduced because protocols must now have a ``run`` function that takes a ``protocol`` argument rather than importing the ``robot``, ``instruments``, and ``labware`` modules. A similar level of structural change would require a major version 3. Another major version bump would be if all of the default units switched to nanoliters instead of microliters (we won't do this, it's just an example). This major behavioral change would also require a major version 3.
+The major version of the API is increased whenever there are significant structural or behavioral changes to protocols. For instance, major version 2 of the API was introduced because protocols must now have a ``run`` function that takes a ``protocol`` argument rather than importing the ``robot``, ``instruments``, and ``labware`` modules. A similar level of structural change would require a major version 3. Another major version bump would be if all of the default units switched to nanoliters instead of microliters (we won't do this, it's just an example). This major behavioral change would also require a major version 3.
 
 The minor version of the API is increased whenever we add new functionality that might change the way a protocol is written, or when we want to make a behavior change to an aspect of the API but not the whole thing. For instance, if we added support for a new module, added an option for specifying volume units in the ``aspirate`` and ``dispense`` functions, or added a way to queue up actions from multiple different modules and execute them at the same time, we would increase the minor version of the API. Another minor version bump would be if we added automatic liquid level tracking, and the position at which the OT-2 aspirated from wells was now dynamic - some people might not want that change appearing suddenly in their well-tested protocol, so we would increase the minor version.
 
@@ -248,7 +248,7 @@ Version 2.12
 ++++++++++++
 
 - :py:meth:`.ProtocolContext.resume` has been deprecated.
-- :py:meth:`.ProtocolContext.set_offset` has been added to apply labware offsets to protocols run (exclusively) outside of the Opentrons app (Jupyter Notebook and SSH).
+- :py:meth:`.Labware.set_offset` has been added to apply labware offsets to protocols run (exclusively) outside of the Opentrons app (Jupyter Notebook and SSH).
 
 
 Version 2.13
@@ -265,5 +265,11 @@ Version 2.14
 
 Upcoming, not yet released.
 
-- :py:meth:`.ModuleContext.load_labware_object` has been deprecated.
-- :py:meth:`.MagneticModuleContext.calibrate` has been deprecated.
+- :py:class:`.Labware` and :py:class:`.Well` objects will adhere to the protocol's API level setting. Prior to this version, they incorrectly ignore the setting.
+- :py:meth:`.ModuleContext.load_labware_object` will be deprecated.
+- :py:meth:`.MagneticModuleContext.calibrate` will be deprecated.
+- Several internal properties of :py:class:`.Labware`, :py:class:`.Well`, and :py:class:`.ModuleContext` will be deprecated and/or removed:
+    - ``Labware.separate_calibration`` and ``ModuleContext.separate_calibration``, which are holdovers from a calibration system that no longer exists.
+    - The ``Well.has_tip`` setter, which will cease to function in a future upgrade to the Python protocol execution system. The corresponding `Well.has_tip` getter will not be deprecated.
+- :py:meth:`.ModuleContext.geometry` will be deprecated
+    - The `model` and `type` properties of this interface will be replaced by :py:meth:`.ModuleContext.model` and :py:meth:`.ModuleContext.type`, respectively

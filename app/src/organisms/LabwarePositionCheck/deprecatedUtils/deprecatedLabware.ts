@@ -1,10 +1,10 @@
-import reduce from 'lodash/reduce'
 import {
   getIsTiprack,
   getTiprackVolume,
   ProtocolFile,
   LabwareDefinition2,
   getSlotHasMatingSurfaceUnitVector,
+  LoadedLabware,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
@@ -37,17 +37,16 @@ export const orderBySlot = (
 }
 
 export const getTiprackIdsInOrder = (
-  labware: ProtocolFile<{}>['labware'],
+  labware: LoadedLabware[],
   labwareDefinitions: Record<string, LabwareDefinition2>,
   commands: RunTimeCommand[]
 ): string[] => {
-  const unorderedTipracks = reduce<typeof labware, LabwareToOrder[]>(
-    labware,
-    (tipracks, currentLabware, labwareId) => {
-      const labwareDef = labwareDefinitions[currentLabware.definitionId]
+  const unorderedTipracks = labware.reduce<LabwareToOrder[]>(
+    (tipracks, currentLabware) => {
+      const labwareDef = labwareDefinitions[currentLabware.definitionUri]
       const isTiprack = getIsTiprack(labwareDef)
       if (isTiprack) {
-        const labwareLocation = getLabwareLocation(labwareId, commands)
+        const labwareLocation = getLabwareLocation(currentLabware.id, commands)
         if (labwareLocation === 'offDeck' || !('slotName' in labwareLocation)) {
           throw new Error('expected tiprack location to be a slot')
         }
@@ -56,7 +55,7 @@ export const getTiprackIdsInOrder = (
           ...tipracks,
           {
             definition: labwareDef,
-            labwareId: labwareId,
+            labwareId: currentLabware.id,
             slot: labwareLocation.slotName,
           },
         ]
@@ -75,7 +74,7 @@ export const getTiprackIdsInOrder = (
 export const getAllTipracksIdsThatPipetteUsesInOrder = (
   pipetteId: string,
   commands: RunTimeCommand[],
-  labware: ProtocolFile<{}>['labware'],
+  labware: LoadedLabware[],
   labwareDefinitions: Record<string, LabwareDefinition2>
 ): string[] => {
   const pickUpTipCommandsWithPipette: PickUpTipRunTimeCommand[] = commands
@@ -95,8 +94,11 @@ export const getAllTipracksIdsThatPipetteUsesInOrder = (
 
   const orderedTiprackIds = tipracksVisited
     .map<LabwareToOrder>(tiprackId => {
-      const labwareDefId = labware[tiprackId].definitionId
-      const definition = labwareDefinitions[labwareDefId]
+      const matchingLabware = labware.find(
+        labwareItem => labwareItem.id === tiprackId
+      )
+      const labwareDefUri = matchingLabware?.definitionUri ?? ''
+      const definition = labwareDefinitions[labwareDefUri]
       const tiprackLocation = getLabwareLocation(tiprackId, commands)
       if (tiprackLocation === 'offDeck' || !('slotName' in tiprackLocation)) {
         throw new Error('expected tiprack location to be a slot')
@@ -114,17 +116,16 @@ export const getAllTipracksIdsThatPipetteUsesInOrder = (
 }
 
 export const getLabwareIdsInOrder = (
-  labware: ProtocolFile<{}>['labware'],
+  labware: LoadedLabware[],
   labwareDefinitions: Record<string, LabwareDefinition2>,
   modules: ProtocolFile<{}>['modules'],
   commands: RunTimeCommand[]
 ): string[] => {
-  const unorderedLabware = reduce<typeof labware, LabwareToOrder[]>(
-    labware,
-    (unorderedLabware, currentLabware, labwareId) => {
-      const labwareDef = labwareDefinitions[currentLabware.definitionId]
+  const unorderedLabware = labware.reduce<LabwareToOrder[]>(
+    (unorderedLabware, currentLabware) => {
+      const labwareDef = labwareDefinitions[currentLabware.definitionUri]
       const isTiprack = getIsTiprack(labwareDef)
-      const labwareLocation = getLabwareLocation(labwareId, commands)
+      const labwareLocation = getLabwareLocation(currentLabware.id, commands)
       // skip any labware that is not a tiprack
       if (!isTiprack) {
         if (labwareLocation !== 'offDeck' && 'moduleId' in labwareLocation) {
@@ -132,7 +133,7 @@ export const getLabwareIdsInOrder = (
             ...unorderedLabware,
             {
               definition: labwareDef,
-              labwareId: labwareId,
+              labwareId: currentLabware.id,
               slot: getModuleInitialLoadInfo(labwareLocation.moduleId, commands)
                 .location.slotName,
             },
@@ -153,7 +154,7 @@ export const getLabwareIdsInOrder = (
           ...unorderedLabware,
           {
             definition: labwareDef,
-            labwareId: labwareId,
+            labwareId: currentLabware.id,
             slot:
               labwareLocation === 'offDeck'
                 ? 'offDeck'

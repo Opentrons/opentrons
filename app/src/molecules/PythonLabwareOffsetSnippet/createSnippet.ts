@@ -1,6 +1,6 @@
 import isEqual from 'lodash/isEqual'
 import { getLabwareDefinitionUri } from '../../organisms/Devices/ProtocolRun/utils/getLabwareDefinitionUri'
-import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
+import type { LegacySchemaAdapterOutput } from '@opentrons/shared-data'
 import type { LabwareOffset } from '@opentrons/api-client'
 import { getLabwareOffsetLocation } from '../../organisms/Devices/ProtocolRun/utils/getLabwareOffsetLocation'
 
@@ -11,7 +11,7 @@ const CLI_PREFIX = `from opentrons import protocol_api\n\nmetadata = {\n${PYTHON
 
 export function createSnippet(
   mode: 'jupyter' | 'cli',
-  protocol: ProtocolAnalysisFile,
+  protocol: LegacySchemaAdapterOutput,
   labwareOffsets?: LabwareOffset[]
 ): string | null {
   let moduleVariableById: { [moduleId: string]: string } = {}
@@ -22,28 +22,37 @@ export function createSnippet(
       let addendum = null
       if (command.commandType === 'loadLabware') {
         labwareCount = labwareCount + 1
-        const loadedLabware = protocol.labware[command.result.labwareId]
+        const loadedLabware = protocol.labware.find(
+          item => item.id === command.result.labwareId
+        )
         if (loadedLabware == null) return acc
         const { loadName } = protocol.labwareDefinitions[
-          loadedLabware.definitionId
+          loadedLabware.definitionUri
         ].parameters
         if (command.params.location === 'offDeck') {
-          loadStatement = `labware_${labwareCount} = protocol.load_labware("${loadName}", location="offDeck")`
+          loadStatement = `labware_${labwareCount} = protocol.load_labware("${String(
+            loadName
+          )}", location="offDeck")`
         } else if ('slotName' in command.params.location) {
           // load labware on deck
           const { slotName } = command.params.location
-          loadStatement = `labware_${labwareCount} = protocol.load_labware("${loadName}", location="${slotName}")`
+          loadStatement = `labware_${labwareCount} = protocol.load_labware("${String(
+            loadName
+          )}", location="${String(slotName)}")`
         } else if ('moduleId' in command.params.location) {
           // load labware on module
           const moduleVariable =
             moduleVariableById[command.params.location.moduleId]
-          loadStatement = `labware_${labwareCount} = ${moduleVariable}.load_labware("${loadName}")`
+          loadStatement = `labware_${labwareCount} = ${moduleVariable}.load_labware("${String(
+            loadName
+          )}")`
         }
         const labwareDefUri = getLabwareDefinitionUri(
           command.result.labwareId,
           protocol.labware,
           protocol.labwareDefinitions
         )
+
         const offsetLocation = getLabwareOffsetLocation(
           command.result.labwareId,
           protocol.commands,
@@ -62,9 +71,9 @@ export function createSnippet(
           const { x, y, z } = labwareOffset.vector
           addendum = [
             loadStatement,
-            `labware_${labwareCount}.set_offset(x=${x.toFixed(
-              2
-            )}, y=${y.toFixed(2)}, z=${z.toFixed(2)})`,
+            `labware_${labwareCount}.set_offset(x=${String(
+              x.toFixed(2)
+            )}, y=${String(y.toFixed(2))}, z=${String(z.toFixed(2))})`,
             '',
           ]
         }
@@ -80,7 +89,9 @@ export function createSnippet(
         const { model } = protocol.modules[command.params.moduleId]
         const { slotName } = command.params.location
         addendum = [
-          `${moduleVariable} = protocol.load_module("${model}", location="${slotName}")`,
+          `${moduleVariable} = protocol.load_module("${String(
+            model
+          )}", location="${String(slotName)}")`,
           '',
         ]
       }
@@ -92,9 +103,9 @@ export function createSnippet(
 
   return loadCommandLines.reduce<string>((acc, line) => {
     if (mode === 'jupyter') {
-      return `${acc}\n${line}`
+      return `${String(acc)}\n${String(line)}`
     } else {
-      return `${acc}\n${PYTHON_INDENT}${line}`
+      return `${String(acc)}\n${PYTHON_INDENT}${String(line)}`
     }
   }, `${mode === 'jupyter' ? JUPYTER_PREFIX : CLI_PREFIX}`)
 }

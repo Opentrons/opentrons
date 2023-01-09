@@ -152,6 +152,35 @@ class AddModuleAction:
     module_live_data: LiveData
 
 
+@dataclass(frozen=True)
+class ResetTipsAction:
+    """Reset the tip tracking state of a given tip rack."""
+
+    labware_id: str
+
+
+@dataclass(frozen=True)
+class SetPipetteMovementSpeedAction:
+    """Set the speed of a pipette's X/Y/Z movements. Does not affect plunger speed.
+
+    None will use the hardware API's default.
+    """
+
+    pipette_id: str
+    speed: Optional[float]
+
+
+@dataclass(frozen=True)
+class AddPipetteConfigAction:
+    """Adds a pipette's static config to the state store."""
+
+    pipette_id: str
+    model: str
+    min_volume: float
+    max_volume: float
+    channels: int
+
+
 Action = Union[
     PlayAction,
     PauseAction,
@@ -166,4 +195,7 @@ Action = Union[
     AddLabwareDefinitionAction,
     AddModuleAction,
     AddLiquidAction,
+    ResetTipsAction,
+    SetPipetteMovementSpeedAction,
+    AddPipetteConfigAction,
 ]

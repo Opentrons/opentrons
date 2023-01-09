@@ -13,6 +13,9 @@ const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
 const OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'DECK_BASE',
   'BARCODE_COVERS',
+  'SLOT_SCREWS',
+  'SLOT_10_EXPANSION',
+  'CALIBRATION_CUTOUTS',
 ]
 
 export const getStandardDeckViewLayerBlockList = (

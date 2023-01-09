@@ -28,15 +28,17 @@ import { RobotSettingsCalibration } from '../../../organisms/RobotSettingsCalibr
 import { RobotSettingsAdvanced } from '../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced'
 import { RobotSettingsNetworking } from '../../../organisms/Devices/RobotSettings/RobotSettingsNetworking'
 import { RobotSettingsFeatureFlags } from '../../../organisms/Devices/RobotSettings/RobotSettingsFeatureFlags'
+import { RobotSettingsPrivacy } from '../../../organisms/Devices/RobotSettings/RobotSettingsPrivacy'
 import { ReachableBanner } from '../../../organisms/Devices/ReachableBanner'
 
-import type { NavRouteParams, RobotSettingsTab } from '../../../App/types'
+import type { DesktopRouteParams, RobotSettingsTab } from '../../../App/types'
 
 export function RobotSettings(): JSX.Element | null {
   const { t } = useTranslation('device_settings')
-  const { robotName, robotSettingsTab } = useParams<NavRouteParams>()
+  const { robotName, robotSettingsTab } = useParams<DesktopRouteParams>()
   const robot = useRobot(robotName)
   const isCalibrationDisabled = robot?.status !== CONNECTABLE
+  const isPrivacyDisabled = robot?.status === UNREACHABLE
   const isNetworkingDisabled = robot?.status === UNREACHABLE
   const [showRobotBusyBanner, setShowRobotBusyBanner] = React.useState<boolean>(
     false
@@ -69,6 +71,7 @@ export function RobotSettings(): JSX.Element | null {
       />
     ),
     'feature-flags': <RobotSettingsFeatureFlags robotName={robotName} />,
+    privacy: <RobotSettingsPrivacy robotName={robotName} />,
   }
 
   const devToolsOn = useSelector(getDevtoolsEnabled)
@@ -85,7 +88,8 @@ export function RobotSettings(): JSX.Element | null {
     robotSettingsTab === 'calibration' && isCalibrationDisabled
   const cannotViewFeatureFlags =
     robotSettingsTab === 'feature-flags' && !devToolsOn
-  if (cannotViewCalibration || cannotViewFeatureFlags) {
+  const cannotViewPrivacy = robotSettingsTab === 'privacy' && isPrivacyDisabled
+  if (cannotViewCalibration || cannotViewFeatureFlags || cannotViewPrivacy) {
     return <Redirect to={`/devices/${robotName}/robot-settings/networking`} />
   }
 
@@ -109,11 +113,11 @@ export function RobotSettings(): JSX.Element | null {
         marginBottom={SPACING.spacing4}
         width="100%"
       >
-        <Box padding={`0 ${SPACING.spacing4}`}>
+        <Box padding={`0 ${String(SPACING.spacing4)}`}>
           <Box
             color={COLORS.black}
             css={TYPOGRAPHY.h1Default}
-            padding={`${SPACING.spacing5} 0`}
+            padding={`${String(SPACING.spacing5)} 0`}
           >
             {t('robot_settings')}
           </Box>
@@ -141,6 +145,11 @@ export function RobotSettings(): JSX.Element | null {
               disabled={isNetworkingDisabled}
             />
             <NavTab
+              to={`/devices/${robotName}/robot-settings/privacy`}
+              tabName={t('privacy')}
+              disabled={isPrivacyDisabled}
+            />
+            <NavTab
               to={`/devices/${robotName}/robot-settings/advanced`}
               tabName={t('advanced')}
             />
@@ -153,7 +162,9 @@ export function RobotSettings(): JSX.Element | null {
           </Flex>
         </Box>
         <Line />
-        <Box padding={`${SPACING.spacing5} ${SPACING.spacing4}`}>
+        <Box
+          padding={`${String(SPACING.spacing5)} ${String(SPACING.spacing4)}`}
+        >
           <ApiHostProvider
             hostname={robot?.ip ?? null}
             port={robot?.port ?? null}

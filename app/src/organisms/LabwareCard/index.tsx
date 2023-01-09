@@ -56,7 +56,9 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
     >
       <Box id="LabwareCard_labwareImage" marginRight={SPACING.spacing5}>
         <RobotWorkSpace
-          viewBox={`0 0 ${definition.dimensions.xDimension} ${definition.dimensions.yDimension}`}
+          viewBox={`0 0 ${String(definition.dimensions.xDimension)} ${String(
+            definition.dimensions.yDimension
+          )}`}
         >
           {() => <LabwareRender definition={definition} />}
         </RobotWorkSpace>
@@ -121,7 +123,10 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
       {/* space for custom labware min: 3rem for date */}
       {/* Note kj 06/30/2022 currently this section would not be ideal implementation
         Once the team have an agreement for grid system, we could refactor */}
-      <Box marginTop={`-${SPACING.spacingSM}`} paddingRight={SPACING.spacing3}>
+      <Box
+        marginTop={`-${String(SPACING.spacingSM)}`}
+        paddingRight={SPACING.spacing3}
+      >
         {modified != null && filename != null && (
           <Flex
             height="100%"

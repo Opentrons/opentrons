@@ -95,35 +95,35 @@ export function useCalibratePipetteOffset(
 
   const startingSession =
     useSelector<State, RequestState | null>(state =>
-      createRequestId.current
+      createRequestId.current != null
         ? RobotApi.getRequestById(state, createRequestId.current)
         : null
     )?.status === RobotApi.PENDING
 
   const showSpinner =
     useSelector<State, RequestState | null>(state =>
-      spinnerRequestId.current
+      spinnerRequestId.current != null
         ? RobotApi.getRequestById(state, spinnerRequestId.current)
         : null
     )?.status === RobotApi.PENDING
 
   const shouldClose =
     useSelector<State, RequestState | null>(state =>
-      deleteRequestId.current
+      deleteRequestId.current != null
         ? RobotApi.getRequestById(state, deleteRequestId.current)
         : null
     )?.status === RobotApi.SUCCESS
 
   const isJogging =
     useSelector((state: State) =>
-      jogRequestId.current
+      jogRequestId.current != null
         ? RobotApi.getRequestById(state, jogRequestId.current)
         : null
     )?.status === RobotApi.PENDING
 
   React.useEffect(() => {
     if (shouldClose) {
-      onComplete && onComplete()
+      onComplete?.()
       deleteRequestId.current = null
     }
   }, [shouldClose, onComplete])
@@ -163,14 +163,14 @@ export function useCalibratePipetteOffset(
         mount,
         hasCalibrationBlock,
         shouldRecalibrateTipLength,
-        tipRackDefinition
+        tipRackDefinition != null
           ? `${tipRackDefinition.namespace}/${tipRackDefinition.parameters.loadName}/${tipRackDefinition.version}`
           : null
       )
     )
   }
   const isCorrectSession =
-    pipOffsetCalSession &&
+    pipOffsetCalSession != null &&
     mount === pipOffsetCalSession.createParams.mount &&
     tipRackDefinition === pipOffsetCalSession.createParams.tipRackDefinition
 

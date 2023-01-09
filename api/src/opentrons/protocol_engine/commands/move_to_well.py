@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from .pipetting_common import PipetteIdMixin, WellLocationMixin
+from .pipetting_common import PipetteIdMixin, WellLocationMixin, MovementMixin
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 MoveToWellCommandType = Literal["moveToWell"]
 
 
-class MoveToWellParams(PipetteIdMixin, WellLocationMixin):
+class MoveToWellParams(PipetteIdMixin, WellLocationMixin, MovementMixin):
     """Payload required to move a pipette to a specific well."""
 
     pass
@@ -38,6 +38,9 @@ class MoveToWellImplementation(AbstractCommandImpl[MoveToWellParams, MoveToWellR
             labware_id=params.labwareId,
             well_name=params.wellName,
             well_location=params.wellLocation,
+            force_direct=params.forceDirect,
+            minimum_z_height=params.minimumZHeight,
+            speed=params.speed,
         )
 
         return MoveToWellResult()

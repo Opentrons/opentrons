@@ -14,21 +14,21 @@ import {
 
 import { StyledText } from '../../../../atoms/text'
 import { TertiaryButton } from '../../../../atoms/buttons'
+import { INFO_TOAST, useToast } from '../../../../atoms/Toast'
 import { downloadLogs } from '../../../../redux/shell/robot-logs/actions'
 import { getRobotLogsDownloading } from '../../../../redux/shell/robot-logs/selectors'
 import { CONNECTABLE } from '../../../../redux/discovery'
 import { useRobot } from '../../hooks'
 
+import type { IconProps } from '@opentrons/components'
 import type { Dispatch } from '../../../../redux/types'
 
 interface TroubleshootingProps {
   robotName: string
-  updateDownloadLogsStatus: (status: boolean) => void
 }
 
 export function Troubleshooting({
   robotName,
-  updateDownloadLogsStatus,
 }: TroubleshootingProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const dispatch = useDispatch<Dispatch>()
@@ -36,16 +36,25 @@ export function Troubleshooting({
   const controlDisabled = robot?.status !== CONNECTABLE
   const logsAvailable = robot?.health != null && robot.health.logs
   const robotLogsDownloading = useSelector(getRobotLogsDownloading)
+  const [toastId, setToastId] = React.useState<string | null>(null)
+  const { makeToast, eatToast } = useToast()
+  const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {
-    updateDownloadLogsStatus(robotLogsDownloading)
+    const newToastId = makeToast(t('downloading_logs'), INFO_TOAST, {
+      icon: toastIcon,
+    })
+    setToastId(newToastId)
     if (!controlDisabled && robot?.status === CONNECTABLE)
       dispatch(downloadLogs(robot))
   }
 
   React.useEffect(() => {
-    updateDownloadLogsStatus(robotLogsDownloading)
-  }, [robotLogsDownloading, updateDownloadLogsStatus])
+    if (!robotLogsDownloading && toastId != null) {
+      eatToast(toastId)
+      setToastId(null)
+    }
+  }, [robotLogsDownloading, eatToast, toastId])
 
   return (
     <Flex

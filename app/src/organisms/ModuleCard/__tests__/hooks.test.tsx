@@ -693,7 +693,17 @@ describe('useIsHeaterShakerInProtocol', () => {
     when(mockUseProtocolDetailsForRun)
       .calledWith('1')
       .mockReturnValue({
-        protocolData: heaterShakerCommandsWithResultsKey,
+        protocolData: {
+          ...heaterShakerCommandsWithResultsKey,
+          labware: Object.keys(heaterShakerCommandsWithResultsKey.labware).map(
+            id => ({
+              location: 'offDeck',
+              loadName: id,
+              definitionUrui: id,
+              id,
+            })
+          ),
+        },
       } as any)
   })
 

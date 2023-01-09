@@ -1,4 +1,5 @@
 from typing import Optional
+import logging
 
 from opentrons.types import Point
 from .instrument_calibration import load_gripper_calibration_offset
@@ -6,14 +7,24 @@ from opentrons.hardware_control.dev_types import GripperDict
 from opentrons.hardware_control.types import (
     CriticalPoint,
     GripperJawState,
+    GripperProbe,
     InvalidMoveError,
     GripperNotAttachedError,
 )
 from .gripper import Gripper
 
 
+MOD_LOG = logging.getLogger(__name__)
+
+
 class GripError(Exception):
     """An error raised if a gripper action is blocked"""
+
+    pass
+
+
+class CalibrationError(Exception):
+    """An error raised if a gripper calibration is blocked"""
 
     pass
 
@@ -23,8 +34,11 @@ DEFAULT_GRIP_FORCE_IN_NEWTON = 3.0
 
 
 class GripperHandler:
+    GH_LOG = MOD_LOG.getChild("GripperHandler")
+
     def __init__(self, gripper: Optional[Gripper] = None):
         self._gripper = gripper
+        self._log = self.GH_LOG.getChild(str(id(self)))
 
     def has_gripper(self) -> bool:
         return bool(self._gripper)
@@ -60,6 +74,22 @@ class GripperHandler:
     def gripper(self, gripper: Optional[Gripper] = None) -> None:
         self._gripper = gripper
 
+    def reset_instrument_offset(self, to_default: bool) -> None:
+        """
+        Tempoarily reset the gripper offsets to default values.
+        """
+        gripper = self.get_gripper()
+        gripper.reset_offset(to_default)
+
+    def save_instrument_offset(self, delta: Point) -> None:
+        """
+        Save a new instrument offset the pipette offset to a particular value.
+        :param mount: Modify the given mount.
+        :param delta: The offset to set for the pipette.
+        """
+        gripper = self.get_gripper()
+        gripper.save_offset(delta)
+
     def get_critical_point(self, cp_override: Optional[CriticalPoint] = None) -> Point:
         if not self._gripper:
             raise GripperNotAttachedError()
@@ -73,14 +103,30 @@ class GripperHandler:
         else:
             return self._gripper.as_dict()
 
-    def check_ready_for_grip(self) -> None:
-        """Raise an exception if it is not currently valid to grip."""
+    def get_attached_probe(self) -> Optional[GripperProbe]:
+        return self.get_gripper().attached_probe
+
+    def add_probe(self, probe: GripperProbe) -> None:
+        """This is used for finding the critical point during calibration."""
         gripper = self.get_gripper()
-        self.check_ready_for_jaw_move()
-        if gripper.state == GripperJawState.GRIPPING:
-            raise GripError("Gripper is already gripping")
-        elif not gripper.state.ready_for_grip:
-            raise GripError("Gripper cannot currently grip")
+        current_probe = self.get_attached_probe()
+        if not current_probe:
+            gripper.add_probe(probe)
+        else:
+            self._log.warning("add probe called with a probe already attached.")
+
+    def remove_probe(self) -> None:
+        gripper = self.get_gripper()
+        current_probe = self.get_attached_probe()
+        if current_probe:
+            gripper.remove_probe()
+        else:
+            self._log.warning("remove probe called without a probe attached")
+
+    def check_ready_for_calibration(self) -> None:
+        """Raise an exception if a probe is not attached before calibration."""
+        gripper = self.get_gripper()
+        gripper.check_calibration_pin_location_is_accurate()
 
     def check_ready_for_jaw_move(self) -> None:
         """Raise an exception if it is not currently valid to move the jaw."""
@@ -96,3 +142,7 @@ class GripperHandler:
         if not newton:
             newton = DEFAULT_GRIP_FORCE_IN_NEWTON
         return gripper.duty_cycle_by_force(newton)
+
+    def set_jaw_displacement(self, mm: float) -> None:
+        gripper = self.get_gripper()
+        gripper.current_jaw_displacement = mm

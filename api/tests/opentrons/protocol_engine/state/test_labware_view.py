@@ -255,16 +255,40 @@ def test_get_well_definition_get_first(well_plate_def: LabwareDefinition) -> Non
     assert result == expected_well_def
 
 
-def test_get_wells(falcon_tuberack_def: LabwareDefinition) -> None:
-    """It should return a list of wells from definition."""
+def test_get_well_size_circular(well_plate_def: LabwareDefinition) -> None:
+    """It should return the well dimensions of a circular well."""
     subject = get_labware_view(
-        labware_by_id={"tube-rack-id": tube_rack},
-        definitions_by_uri={"some-tube-rack-uri": falcon_tuberack_def},
+        labware_by_id={"plate-id": plate},
+        definitions_by_uri={"some-plate-uri": well_plate_def},
+    )
+    expected_well_def = well_plate_def.wells["A2"]
+    expected_size = (
+        expected_well_def.diameter,
+        expected_well_def.diameter,
+        expected_well_def.depth,
     )
 
-    expected_wells = ["A1", "B1", "A2", "B2", "A3", "B3"]
-    result = subject.get_wells(labware_id="tube-rack-id")
-    assert result == expected_wells
+    result = subject.get_well_size(labware_id="plate-id", well_name="A2")
+
+    assert result == expected_size
+
+
+def test_get_well_size_rectangular(reservoir_def: LabwareDefinition) -> None:
+    """It should return the well dimensions of a rectangular well."""
+    subject = get_labware_view(
+        labware_by_id={"reservoir-id": reservoir},
+        definitions_by_uri={"some-reservoir-uri": reservoir_def},
+    )
+    expected_well_def = reservoir_def.wells["A2"]
+    expected_size = (
+        expected_well_def.xDimension,
+        expected_well_def.yDimension,
+        expected_well_def.depth,
+    )
+
+    result = subject.get_well_size(labware_id="reservoir-id", well_name="A2")
+
+    assert result == expected_size
 
 
 def test_labware_has_well(falcon_tuberack_def: LabwareDefinition) -> None:
@@ -286,30 +310,6 @@ def test_labware_has_well(falcon_tuberack_def: LabwareDefinition) -> None:
 
     with pytest.raises(errors.LabwareNotLoadedError):
         subject.validate_liquid_allowed_in_labware(labware_id="no-id", wells={"A1": 30})
-
-
-def test_get_well_columns(falcon_tuberack_def: LabwareDefinition) -> None:
-    """It should return wells as dict of list of columns."""
-    subject = get_labware_view(
-        labware_by_id={"tube-rack-id": tube_rack},
-        definitions_by_uri={"some-tube-rack-uri": falcon_tuberack_def},
-    )
-
-    expected_columns = {"1": ["A1", "B1"], "2": ["A2", "B2"], "3": ["A3", "B3"]}
-    result = subject.get_well_columns(labware_id="tube-rack-id")
-    assert result == expected_columns
-
-
-def test_get_well_rows(falcon_tuberack_def: LabwareDefinition) -> None:
-    """It should return wells as dict of list of rows."""
-    subject = get_labware_view(
-        labware_by_id={"tube-rack-id": tube_rack},
-        definitions_by_uri={"some-tube-rack-uri": falcon_tuberack_def},
-    )
-
-    expected_rows = {"A": ["A1", "A2", "A3"], "B": ["B1", "B2", "B3"]}
-    result = subject.get_well_rows(labware_id="tube-rack-id")
-    assert result == expected_rows
 
 
 def test_get_tip_length_raises_with_non_tip_rack(
@@ -747,3 +747,82 @@ def test_raise_if_labware_in_location(
     )
     with expected_raise:
         subject.raise_if_labware_in_location(location=location)
+
+
+def test_get_calibration_coordinates() -> None:
+    """Should return critical point and coordinates."""
+    slot_definitions = {
+        "locations": {
+            "orderedSlots": [
+                {
+                    "id": "2",
+                    "position": [2, 2, 0.0],
+                    "boundingBox": {
+                        "xDimension": 4.0,
+                        "yDimension": 6.0,
+                        "zDimension": 0,
+                    },
+                    "displayName": "Slot 2",
+                }
+            ]
+        }
+    }
+
+    subject = get_labware_view(deck_definition=cast(DeckDefinitionV3, slot_definitions))
+
+    result = subject.get_calibration_coordinates(current_z_position=3.0)
+
+    assert result == Point(x=4, y=5, z=3)
+
+
+def test_get_by_slot() -> None:
+    """It should get the labware in a given slot."""
+    labware_1 = LoadedLabware.construct(  # type: ignore[call-arg]
+        id="1", location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+    )
+    labware_2 = LoadedLabware.construct(  # type: ignore[call-arg]
+        id="2", location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2)
+    )
+    labware_3 = LoadedLabware.construct(  # type: ignore[call-arg]
+        id="3", location=ModuleLocation(moduleId="cool-module")
+    )
+
+    subject = get_labware_view(
+        labware_by_id={"1": labware_1, "2": labware_2, "3": labware_3}
+    )
+
+    assert subject.get_by_slot(DeckSlotName.SLOT_1, {"1", "2"}) == labware_1
+    assert subject.get_by_slot(DeckSlotName.SLOT_2, {"1", "2"}) == labware_2
+    assert subject.get_by_slot(DeckSlotName.SLOT_3, {"1", "2"}) is None
+
+
+def test_get_by_slot_prefers_later() -> None:
+    """It should get the labware in a slot, preferring later items if locations match."""
+    labware_1 = LoadedLabware.construct(  # type: ignore[call-arg]
+        id="1", location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+    )
+    labware_1_again = LoadedLabware.construct(  # type: ignore[call-arg]
+        id="1-again", location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+    )
+
+    subject = get_labware_view(
+        labware_by_id={"1": labware_1, "1-again": labware_1_again}
+    )
+
+    assert subject.get_by_slot(DeckSlotName.SLOT_1, {"1", "1-again"}) == labware_1_again
+
+
+def test_get_by_slot_filter_ids() -> None:
+    """It should filter labwares in the same slot using IDs."""
+    labware_1 = LoadedLabware.construct(  # type: ignore[call-arg]
+        id="1", location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+    )
+    labware_1_again = LoadedLabware.construct(  # type: ignore[call-arg]
+        id="1-again", location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+    )
+
+    subject = get_labware_view(
+        labware_by_id={"1": labware_1, "1-again": labware_1_again}
+    )
+
+    assert subject.get_by_slot(DeckSlotName.SLOT_1, {"1"}) == labware_1
