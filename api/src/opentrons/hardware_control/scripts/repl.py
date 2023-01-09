@@ -7,6 +7,36 @@ and expose it to a python commandline.
 import os
 from functools import wraps
 import asyncio
+import logging
+from logging.config import dictConfig
+
+
+log = logging.getLogger(__name__)
+
+LOG_CONFIG = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "basic": {"format": "%(asctime)s %(name)s %(levelname)s %(message)s"}
+    },
+    "handlers": {
+        "file_handler": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "formatter": "basic",
+            "filename": "/var/log/repl.log",
+            "maxBytes": 5000000,
+            "level": logging.INFO,
+            "backupCount": 3,
+        },
+    },
+    "loggers": {
+        "": {
+            "handlers": ["file_handler"],
+            "level": logging.INFO,
+        },
+    },
+}
+
 
 has_robot_server = True
 if os.environ.get("OPENTRONS_SIMULATION"):
@@ -109,6 +139,7 @@ def do_interact(api: ThreadManager[HardwareControlAPI]) -> None:
 if __name__ == "__main__":
     if has_robot_server:
         stop_server()
+    dictConfig(LOG_CONFIG)
     api_tm = build_api()
     do_interact(api_tm)
     api_tm.clean_up()
