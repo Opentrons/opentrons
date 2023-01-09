@@ -1,6 +1,5 @@
 import pytest
-import opentrons
-from typing import Any, TYPE_CHECKING
+from typing import Any
 
 from opentrons.types import Mount, Point
 from opentrons.calibration_storage import (
@@ -11,8 +10,6 @@ from opentrons.calibration_storage import (
     delete_pipette_offset_file,
 )
 
-if TYPE_CHECKING:
-    from opentrons_shared_data.deck.dev_types import RobotModel
 
 
 @pytest.fixture
@@ -36,6 +33,12 @@ def starting_calibration_data(
             Point(1, 1, 1), "pip2", Mount.RIGHT, "mytiprack", "opentrons/tip_rack/1"
         )
 
+
+def test_pipette_calibration_storage_ot2(ot_config_tempdir: Any) -> None:
+    return None
+
+def test_pipette_calibration_storage_ot3() -> None:
+    return None
 
 def test_delete_all_pipette_calibration(starting_calibration_data: Any) -> None:
     """

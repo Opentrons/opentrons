@@ -1,7 +1,5 @@
 import pytest
 import typing
-import opentrons
-import importlib
 
 from opentrons.types import Point
 from opentrons.calibration_storage import (
@@ -62,8 +60,7 @@ def test_get_gripper_calibration(
     """
     Test ability to get a gripper calibration schema.
     """
-    importlib.reload(opentrons.calibration_storage)
-    from opentrons.calibration_storage import models
+    from opentrons.calibration_storage.ot3 import models
 
     gripper_data = gripper.get_gripper_calibration_offset("gripper1")
     assert gripper_data is not None
