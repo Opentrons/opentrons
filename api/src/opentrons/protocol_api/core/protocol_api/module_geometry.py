@@ -29,10 +29,7 @@ from opentrons.drivers.types import ThermocyclerLidStatus
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     ModuleType,
-    MagneticModuleModel,
-    TemperatureModuleModel,
-    ThermocyclerModuleModel,
-    HeaterShakerModuleModel,
+    module_model_from_string,
 )
 
 
@@ -541,17 +538,3 @@ def models_compatible(
         requested_model.value == candidate_definition["model"]
         or requested_model.value in candidate_definition["compatibleWith"]
     )
-
-
-def module_model_from_string(model_string: str) -> ModuleModel:
-    for model_enum in {
-        MagneticModuleModel,
-        TemperatureModuleModel,
-        ThermocyclerModuleModel,
-        HeaterShakerModuleModel,
-    }:
-        try:
-            return cast(ModuleModel, model_enum(model_string))
-        except ValueError:
-            pass
-    raise ValueError(f"No such module model {model_string}")

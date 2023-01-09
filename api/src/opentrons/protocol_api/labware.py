@@ -18,9 +18,8 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition, LabwarePa
 
 from opentrons.types import Location, Point
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import requires_version
+from opentrons.protocols.api_support.util import requires_version, APIVersionError
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
-from opentrons.protocols.geometry.well_geometry import WellGeometry
 
 # TODO(mc, 2022-09-02): re-exports provided for backwards compatibility
 # remove when their usage is no longer needed
@@ -37,6 +36,9 @@ from .core.labware import AbstractLabware
 from .core.module import AbstractModuleCore
 from .core.protocol_api.labware import LabwareImplementation as LegacyLabwareCore
 from .core.core_map import LoadedCoreMap
+from .core.protocol_api.well import WellImplementation as LegacyWellCore
+from .core.protocol_api.well_geometry import WellGeometry
+
 
 if TYPE_CHECKING:
     from .core.common import LabwareCore, WellCore, ProtocolCore
@@ -111,12 +113,14 @@ class Well:
 
     @property
     def geometry(self) -> WellGeometry:
-        return self._impl.geometry
+        if isinstance(self._impl, LegacyWellCore):
+            return self._impl.geometry
+        raise APIVersionError("Well.geometry has been deprecated.")
 
     @property  # type: ignore
     @requires_version(2, 0)
     def diameter(self) -> Optional[float]:
-        return self.geometry.diameter
+        return self._impl.diameter
 
     @property  # type: ignore
     @requires_version(2, 9)
@@ -125,7 +129,7 @@ class Well:
         The length of a well, if the labware has
         square wells.
         """
-        return self.geometry._length
+        return self._impl.length
 
     @property  # type: ignore
     @requires_version(2, 9)
@@ -134,7 +138,7 @@ class Well:
         The width of a well, if the labware has
         square wells.
         """
-        return self.geometry._width
+        return self._impl.width
 
     @property  # type: ignore
     @requires_version(2, 9)
@@ -142,7 +146,7 @@ class Well:
         """
         The depth of a well in a labware.
         """
-        return self.geometry._depth
+        return self._impl.depth
 
     @property
     def display_name(self) -> str:
@@ -205,7 +209,7 @@ class Well:
         :return: a :py:class:`opentrons.types.Point` representing the specified
                  location in absolute deck coordinates
         """
-        return self.geometry.from_center_cartesian(x, y, z)
+        return self._impl.from_center_cartesian(x, y, z)
 
     def _from_center_cartesian(self, x: float, y: float, z: float) -> Point:
         """

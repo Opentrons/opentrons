@@ -16,6 +16,7 @@ import {
   PipetteModelSpecs,
   PipetteName,
 } from '@opentrons/shared-data'
+import * as Config from '../../../redux/config'
 import type { Mount } from '../../../redux/pipettes/types'
 
 interface PipetteOverflowMenuProps {
@@ -41,6 +42,10 @@ export const PipetteOverflowMenu = (
     handleSettingsSlideout,
     isPipetteCalibrated,
   } = props
+
+  const enableCalibrationWizards = Config.useFeatureFlag(
+    'enableCalibrationWizards'
+  )
 
   const pipetteName =
     pipetteSpecs?.name != null ? pipetteSpecs.name : t('empty')
@@ -80,19 +85,30 @@ export const PipetteOverflowMenu = (
           </MenuItem>
         ) : (
           <>
-            <MenuItem
-              key={`${String(pipetteDisplayName)}_${mount}_calibrate_offset`}
-              onClick={() => handleCalibrate()}
-              data-testid={`pipetteOverflowMenu_calibrate_offset_btn_${String(
-                pipetteDisplayName
-              )}_${mount}`}
-            >
-              {t(
-                isPipetteCalibrated
-                  ? recalibratePipetteText
-                  : calibratePipetteText
-              )}
-            </MenuItem>
+            {enableCalibrationWizards ? (
+              // Only show calibration option [RAUT-93]
+              isPipetteCalibrated ? null : (
+                <MenuItem
+                  key={`${pipetteDisplayName}_${mount}_calibrate_offset`}
+                  onClick={() => handleCalibrate()}
+                  data-testid={`pipetteOverflowMenu_calibrate_offset_btn_${pipetteDisplayName}_${mount}`}
+                >
+                  {t(calibratePipetteText)}
+                </MenuItem>
+              )
+            ) : (
+              <MenuItem
+                key={`${pipetteDisplayName}_${mount}_calibrate_offset`}
+                onClick={() => handleCalibrate()}
+                data-testid={`pipetteOverflowMenu_calibrate_offset_btn_${pipetteDisplayName}_${mount}`}
+              >
+                {t(
+                  isPipetteCalibrated
+                    ? recalibratePipetteText
+                    : calibratePipetteText
+                )}
+              </MenuItem>
+            )}
             <MenuItem
               key={`${String(pipetteDisplayName)}_${mount}_detach`}
               onClick={() => handleChangePipette()}

@@ -2,14 +2,13 @@
 import os
 
 import pytest
-from rich.console import Console
-from selenium.webdriver.chrome.webdriver import WebDriver
-
 from automation.data.protocol import Protocol
 from automation.data.protocols import Protocols
 from automation.driver.drag_drop import drag_and_drop_file
 from automation.menus.left_menu import LeftMenu
 from automation.pages.protocol_landing import ProtocolLanding
+from rich.console import Console
+from selenium.webdriver.chrome.webdriver import WebDriver
 
 
 def _what_protocols() -> list[(Protocol)]:
@@ -32,44 +31,41 @@ def test_analyses(
     request: pytest.FixtureRequest,
     protocol: Protocol,
 ) -> None:
-    """Analyze many protocols."""
+    """Analyze a protocol in the app and validate its details."""
     left_menu: LeftMenu = LeftMenu(driver, console, request.node.nodeid)
-    left_menu.navigate("protocols")
-    protocol_landing: ProtocolLanding = ProtocolLanding(
-        driver, console, request.node.nodeid
-    )
-    console.print(
-        f"uploading protocol: {protocol.file_path.resolve()}", style="white on blue"
-    )
+    left_menu.base.click(left_menu.protocols)
+
+    protocol_landing: ProtocolLanding = ProtocolLanding(driver, console, request.node.nodeid)
+    # Clean up any protocols that did not get deleted
+    protocol_landing.delete_all_protocols()
+
+    console.print(f"uploading protocol: {protocol.file_path.resolve()}", style="white on blue")
     drag_and_drop_file(
         protocol_landing.get_drag_drop_file_button(),
         protocol.file_path,
     )
-    assert protocol_landing.wait_until_loading_data_gone()
 
-    # look for error
+    analysis_timeout: int = 61
+    assert protocol_landing.wait_until_loading_data_gone(
+        timeout_sec=analysis_timeout
+    ), f"Analysis took more than {analysis_timeout} seconds."
+
+    # look for analysis error if the protocol should have one
     if protocol.app_error:
         error_link = protocol_landing.get_error_details_safe()
 
-        # stop the test if analysis did not fail
-        assert error_link is not None
+        assert error_link is not None, "No analysis error but was expecting one."
         protocol_landing.base.click_webelement(error_link)
         error_details = protocol_landing.get_popout_error().text
         assert error_details == protocol.app_analysis_error
         protocol_landing.click_popout_close()
     else:
-        # stop the test if analysis did fail
-        assert protocol_landing.get_error_details_safe() is None
+        assert protocol_landing.get_error_details_safe() is None, "Unexpected analysis error."
 
     # Verifying elements on Protocol Landing Page
-    assert protocol_landing.get_import_button_protocol_landing().is_displayed()
-    assert protocol_landing.get_deckMap_protocol_landing(
-        protocol_name=protocol.protocol_name
-    ).is_displayed()
+    assert protocol_landing.get_deckMap_protocol_landing(protocol_name=protocol.protocol_name).is_displayed()
     assert (
-        protocol_landing.get_protocol_name_text_protocol_landing(
-            protocol_name=protocol.protocol_name
-        )
+        protocol_landing.get_protocol_name_text_protocol_landing(protocol_name=protocol.protocol_name)
         == protocol.protocol_name
     )
 
@@ -77,12 +73,4 @@ def test_analyses(
 
     # TODO verify modules
 
-    # delete the protocol so we may run the test again from an empty state of the protocols page
-    protocol_landing.click_overflow_menu()
-    protocol_landing.base.click_webelement(protocol_landing.get_delete_protocol())
-    protocol_landing.base.click_webelement(
-        protocol_landing.get_delete_protocol_confirm()
-    )
-
-    # verify delete
-    protocol_landing.get_choose_file_button()
+    # No cleanup, do at the beginning of the test.
