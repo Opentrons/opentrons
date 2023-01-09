@@ -218,7 +218,7 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
             "gripper_id": self._gripper_id,
             "display_name": self._config.display_name,
             "state": self._state,
-            "calibration_offset": self._calibration_offset
+            "calibration_offset": self._calibration_offset,
         }
         return d
 

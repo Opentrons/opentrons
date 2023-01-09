@@ -7,8 +7,9 @@ from typing import Optional, Dict, List, Union
 
 from typing_extensions import TypedDict, Literal
 
-from opentrons.hardware_control.instruments.ot3.instrument_calibration import \
-    GripperCalibrationOffset
+from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
+    GripperCalibrationOffset,
+)
 from opentrons_shared_data.pipette.dev_types import (
     PipetteModel,
     PipetteName,
