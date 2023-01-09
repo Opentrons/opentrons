@@ -7,6 +7,7 @@
 
 # typescript
 app-shell/lib/**
+app-shell-odd/lib/**
 discovery-client/lib/**
 **/lib/**/*.d.ts
 **/lib/**/*.json
