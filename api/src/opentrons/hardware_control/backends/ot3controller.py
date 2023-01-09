@@ -83,11 +83,13 @@ from opentrons.hardware_control.types import (
     OT3AxisMap,
     CurrentConfig,
     OT3SubSystem,
-    InvalidPipetteName,
-    InvalidPipetteModel,
     InstrumentProbeType,
     MotorStatus,
+)
+from opentrons.hardware_control.errors import (
     MustHomeError,
+    InvalidPipetteName,
+    InvalidPipetteModel,
 )
 from opentrons_hardware.hardware_control.motion import (
     MoveStopCondition,

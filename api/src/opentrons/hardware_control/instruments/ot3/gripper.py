@@ -12,6 +12,8 @@ from opentrons.hardware_control.types import (
     GripperProbe,
     CriticalPoint,
     GripperJawState,
+)
+from opentrons.hardware_control.errors import (
     InvalidMoveError,
 )
 from .instrument_calibration import (

@@ -10,19 +10,16 @@ from opentrons.calibration_storage.types import (
     SourceType,
     CalibrationStatus,
 )
-from opentrons.hardware_control.types import (
-    Axis,
-    CriticalPoint,
-    OutOfBoundsMove,
-    MotionChecks,
-    MustHomeError,
-    InvalidMoveError,
-)
+from opentrons.hardware_control.types import Axis, CriticalPoint, MotionChecks, OT3Axis
 from opentrons.hardware_control.robot_calibration import (
     RobotCalibration,
     DeckCalibration,
 )
-from opentrons.hardware_control.types import OT3Axis
+from opentrons.hardware_control.errors import (
+    OutOfBoundsMove,
+    MustHomeError,
+    InvalidMoveError,
+)
 
 
 async def test_controller_must_home(hardware_api):

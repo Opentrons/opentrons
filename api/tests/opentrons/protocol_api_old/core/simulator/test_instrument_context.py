@@ -4,8 +4,7 @@ from typing import Callable
 import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 
-from opentrons.hardware_control import NoTipAttachedError
-from opentrons.hardware_control.types import TipAttachedError
+from opentrons.hardware_control import NoTipAttachedError, TipAttachedError
 from opentrons.protocol_api.core.common import InstrumentCore, LabwareCore
 from opentrons.types import Location, Point
 

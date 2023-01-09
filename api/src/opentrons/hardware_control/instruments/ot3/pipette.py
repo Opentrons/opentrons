@@ -29,7 +29,8 @@ from opentrons_shared_data.pipette.dev_types import (
     PipetteName,
     PipetteModel,
 )
-from opentrons.hardware_control.types import CriticalPoint, OT3Mount, InvalidMoveError
+from opentrons.hardware_control.types import CriticalPoint, OT3Mount
+from opentrons.hardware_control.errors import InvalidMoveError
 
 mod_log = logging.getLogger(__name__)
 

@@ -37,7 +37,6 @@ from .module_control import AttachedModulesControl
 from .types import (
     Axis,
     CriticalPoint,
-    MustHomeError,
     DoorState,
     DoorStateNotification,
     ErrorMessageNotification,
@@ -46,6 +45,7 @@ from .types import (
     MotionChecks,
     PauseType,
 )
+from .errors import MustHomeError
 from . import modules
 from .robot_calibration import (
     RobotCalibrationProvider,

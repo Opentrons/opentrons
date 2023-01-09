@@ -15,9 +15,11 @@ from .pause_manager import PauseManager
 from .backends import Controller, Simulator
 from .types import (
     CriticalPoint,
+    ExecutionState,
+)
+from .errors import (
     NoTipAttachedError,
     TipAttachedError,
-    ExecutionState,
     ExecutionCancelledError,
 )
 from .constants import DROP_TIP_RELEASE_DISTANCE

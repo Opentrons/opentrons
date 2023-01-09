@@ -6,10 +6,14 @@ from typing import Dict, Optional, List
 from dataclasses import dataclass
 
 from opentrons.types import Point, Mount
-from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.types import (
+from opentrons.hardware_control import (
+    HardwareControlAPI,
     CriticalPoint,
+)
+from opentrons.hardware_control.types import (
     Axis as HardwareAxis,
+)
+from opentrons.hardware_control.errors import (
     MustHomeError as HardwareMustHomeError,
 )
 

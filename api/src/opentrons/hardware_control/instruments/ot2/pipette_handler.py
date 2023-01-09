@@ -22,12 +22,12 @@ from opentrons import types as top_types
 from opentrons.hardware_control.types import (
     CriticalPoint,
     HardwareAction,
-    TipAttachedError,
-    NoTipAttachedError,
     Axis,
     OT3Axis,
     OT3Mount,
 )
+from opentrons.hardware_control.errors import TipAttachedError, NoTipAttachedError
+
 from opentrons.hardware_control.constants import (
     SHAKE_OFF_TIPS_SPEED,
     SHAKE_OFF_TIPS_PICKUP_DISTANCE,
