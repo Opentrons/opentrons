@@ -763,7 +763,7 @@ class OT3API(
     async def home_and_recover_position(
         self, mount: OT3Mount, axes_moving: List[OT3Axis]
     ) -> None:
-        origin = await self.gantry_position(mount)
+        origin = await self.gantry_position(mount, refresh=True)
         await self._cache_and_maybe_retract_mount(mount)
         await self._move_gripper_to_idle_position(mount)
         await self.home(axes_moving)

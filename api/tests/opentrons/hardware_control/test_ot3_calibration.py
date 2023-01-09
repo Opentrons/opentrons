@@ -201,6 +201,7 @@ async def test_find_deck_checks_z_only(
     mock_move_to: AsyncMock,
     mount: OT3Mount,
 ) -> None:
+    await ot3_hardware.home()
     await find_deck_position(ot3_hardware, mount)
     config_point = Point(*ot3_hardware.config.calibration.z_offset.point)
     first_move_point = mock_move_to.call_args_list[0][0][1]
