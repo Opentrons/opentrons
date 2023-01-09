@@ -176,9 +176,7 @@ class OT3Controller:
     async def update_motor_estimation(self, axes: Sequence[OT3Axis]) -> None:
         """Update motor position estimation for commanded nodes, and update cache of data."""
         nodes = set([axis_to_node(a) for a in axes])
-        print(f'Nodes: {nodes}')
         response = await update_motor_position_estimation(self._messenger, nodes)
-        print(f'Done')
         self._handle_motor_status_response(response)
 
     @property

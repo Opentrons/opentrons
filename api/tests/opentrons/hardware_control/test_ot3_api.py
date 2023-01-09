@@ -804,3 +804,23 @@ async def test_drop_tip_full_tiprack(
         await ot3_hardware.drop_tip(Mount.LEFT)
         pipette_handler.plan_check_drop_tip.assert_called_once_with(OT3Mount.LEFT, True)
         tip_action.assert_called_once_with([OT3Axis.P_L], 1, 1, "drop")
+
+
+@pytest.mark.parametrize(
+    "axes",
+    [[OT3Axis.X], [OT3Axis.X, OT3Axis.Y], [OT3Axis.X, OT3Axis.Y, OT3Axis.P_L], None],
+)
+async def test_update_position_estimation(
+    ot3_hardware: ThreadManager[OT3API], axes: List[OT3Axis]
+) -> None:
+
+    backend = ot3_hardware.managed_obj._backend
+    with patch.object(
+        backend,
+        "update_motor_estimation",
+        AsyncMock(spec=backend.update_motor_estimation),
+    ) as mock_update:
+        await ot3_hardware.update_position_estimation(axes)
+        if axes is None:
+            axes = [ax for ax in OT3Axis]
+        mock_update.assert_called_once_with(axes)
