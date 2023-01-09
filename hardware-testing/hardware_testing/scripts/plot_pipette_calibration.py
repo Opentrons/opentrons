@@ -155,7 +155,7 @@ class Plot:
         self.plot_param["x_title"] = "Cycle Number"
         self.plot_param["y_title"] = "Z-Axis Encoder (mm)"
         self.plot_param["x_range"] = [0, x_end]
-        self.plot_param["y_range"] = [2.752, 2.762]
+        self.plot_param["y_range"] = [2.746, 2.756]
         self.plot_param["legend"] = "Data"
         self.plot_param["annotation"] = [annotation_ymin, annotation_ymax]
         self.write_plot(self.plot_param)
@@ -194,7 +194,7 @@ class Plot:
         self.plot_param["x_title"] = "Cycle Number"
         self.plot_param["y_title"] = "Deck Height (mm)"
         self.plot_param["x_range"] = [0, x_end]
-        self.plot_param["y_range"] = [-1.9, -1]
+        self.plot_param["y_range"] = [-2.6, -1.8]
         self.plot_param["legend"] = "Data"
         self.plot_param["annotation"] = [annotation_ymin, annotation_ymax]
         self.write_plot(self.plot_param)
